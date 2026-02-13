@@ -387,10 +387,9 @@ class CameraService extends EventEmitter {
       this.emit('statusChanged', this.status);
     };
 
-    // Store reference to the main peer connection (for metrics)
-    if (!this.peerConnection) {
-      this.peerConnection = newPeerConnection;
-    }
+    // Always track the latest active peer connection for metrics.
+    // A viewer refresh creates a new peer; keeping the old closed peer would freeze metrics at 0.
+    this.peerConnection = newPeerConnection;
 
     return newPeerConnection;
   }

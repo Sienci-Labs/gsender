@@ -17,8 +17,15 @@ import { ReactRoutes } from './react-routes';
 
 function App() {
     useEffect(() => {
+        let isUnmounted = false;
+        let handleControllerConnect: (() => void) | null = null;
+
         const token = store.get('session.token');
         user.signin({ token }).then((result) => {
+            if (isUnmounted) {
+                return;
+            }
+
             const { authenticated, token } = result as {
                 authenticated: boolean;
                 token: string;
@@ -29,24 +36,20 @@ function App() {
                 const options = {
                     query: 'token=' + token,
                 };
-                controller.connect(host, options);
-                
-                // Initialize camera service after controller connection (only on main client)
-                controller.addListener('connect', () => {
-                    // Main client check: Either Electron app OR localhost browser
-                    // Remote clients are browser-based connections to external servers
-                    const isMainClient = isElectron() || 
-                                        window.location.hostname === 'localhost' || 
-                                        window.location.hostname === '127.0.0.1' ||
-                                        window.location.hostname === '0.0.0.0';
-                    
-                    if (isMainClient) {
+                // Register listener before connect to avoid missing early connect events.
+                handleControllerConnect = () => {
+                    // Camera source service must run only in Electron main app.
+                    // Browser clients (including localhost tabs) are viewers.
+                    if (isElectron()) {
                         console.log('[App] Initializing camera service on main client');
                         initializeGlobalCameraService().catch((error) => {
                             console.error('Failed to initialize camera service:', error);
                         });
                     }
-                });
+                };
+                controller.addListener('connect', handleControllerConnect);
+                controller.connect(host, options);
+                handleControllerConnect();
                 
                 return;
             } else {
@@ -55,6 +58,13 @@ function App() {
         });
 
         sagaMiddleware.run(rootSaga);
+
+        return () => {
+            isUnmounted = true;
+            if (handleControllerConnect) {
+                controller.removeListener('connect', handleControllerConnect);
+            }
+        };
     }, []);
 
     return (

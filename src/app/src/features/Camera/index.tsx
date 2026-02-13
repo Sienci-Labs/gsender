@@ -21,10 +21,9 @@
  *
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { FaCamera, FaExclamationTriangle, FaInfoCircle } from 'react-icons/fa';
 import { toast } from 'app/lib/toaster';
-import isElectron from 'is-electron';
 
 import { Switch } from 'app/components/shadcn/Switch';
 import {
@@ -34,10 +33,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from 'app/components/shadcn/Select';
-import { CameraSettings, CameraStatus } from 'app/services/CameraService';
 import store from 'app/store';
 import controller from 'app/lib/controller';
+import log from 'app/lib/log';
 import { getGlobalCameraService } from 'app/lib/camera/globalCameraService';
+import { useCameraFeatureState } from './hooks/useCameraFeatureState';
 
 const RESOLUTION_OPTIONS = [
     { value: 'low', label: '640×480 (Low)' },
@@ -51,52 +51,29 @@ const FRAME_RATE_OPTIONS = [
 ];
 
 const Camera: React.FC = () => {
-    // Removed spam logs that were causing re-render loop detection issues
-    
-    // Check if we're in headless mode (remote client)
-    const [isHeadlessMode, setIsHeadlessMode] = useState(false);
-    const [isCheckingHeadless, setIsCheckingHeadless] = useState(true);
-    
-    useEffect(() => {
-        // Check if we're in headless mode (remote client connecting to external server)
-        // We need to detect if this app is connecting to an EXTERNAL server, not if it's SERVING to remote clients
-        const checkHeadlessMode = async () => {
-            try {
-                // Main client = Electron app OR localhost browser
-                // Remote client = browser accessing external server (non-localhost)
-                const isMainClient = isElectron() || 
-                                    window.location.hostname === 'localhost' || 
-                                    window.location.hostname === '127.0.0.1' ||
-                                    window.location.hostname === '0.0.0.0';
-                
-                // Only consider it headless mode if we're NOT the main client
-                // (i.e., we're a browser accessing a remote server from another device)
-                setIsHeadlessMode(!isMainClient);
-            } catch (error) {
-                console.error('[Camera] Failed to check headless mode:', error);
-                setIsHeadlessMode(false);
-            } finally {
-                setIsCheckingHeadless(false);
-            }
-        };
-        
-        checkHeadlessMode();
-    }, []);
-    
     // Helper function to safely send controller commands
-    const sendControllerCommand = (command: string, ...args: any[]) => {
+    const sendControllerCommand = (command: string, ...args: unknown[]) => {
         if (controller.socket && controller.socket.connected) {
             controller.command(command, ...args);
         } else {
-            console.warn(`Cannot send ${command}: socket not connected`);
+            log.warn(`[Camera] Cannot send ${command}: socket not connected`);
         }
     };
-    
-    // Get the global camera service instance (only if not in headless mode)
-    const cameraService = !isHeadlessMode ? getGlobalCameraService() : null;
+
+    const {
+        cameraService,
+        devices,
+        isCheckingHeadless,
+        isHeadlessMode,
+        settings,
+        setSettings,
+        setCameraState,
+        status,
+        videoRef,
+    } = useCameraFeatureState({ sendControllerCommand });
     
     // Helper function to safely use camera service
-    const withCameraService = <T extends any[]>(fn: (service: NonNullable<typeof cameraService>, ...args: T) => void | Promise<void>) => {
+    const withCameraService = <T extends unknown[]>(fn: (service: NonNullable<typeof cameraService>, ...args: T) => void | Promise<void>) => {
         return async (...args: T) => {
             let service = getGlobalCameraService();
             
@@ -113,242 +90,6 @@ const Camera: React.FC = () => {
             return fn(service, ...args);
         };
     };
-    
-    const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
-    const [settings, setSettings] = useState<CameraSettings>(() => {
-        if (cameraService) {
-            return cameraService.getSettings();
-        }
-        return store.get('workspace.camera', {
-            enabled: false,
-            deviceId: '',
-            constraints: { width: 1280, height: 720, frameRate: 30 },
-            qualityPreset: 'medium' as const,
-        });
-    });
-    const [status, setStatus] = useState<CameraStatus>(() => {
-        if (cameraService) {
-            return cameraService.getStatus();
-        }
-        return {
-            enabled: false,
-            available: false,
-            streaming: false,
-            error: null,
-            metrics: { fps: 0, bitrateKbps: 0, viewers: 0, droppedFrames: 0 },
-        };
-    });
-    const [isInitialized, setIsInitialized] = useState(!!cameraService);
-    const videoRef = useRef<HTMLVideoElement>(null);
-
-    const [, setCameraState] = useState(() => store.get('workspace.camera', {
-        enabled: false,
-        deviceId: '',
-        constraints: {
-            width: 1280,
-            height: 720,
-            frameRate: 30,
-        },
-        qualityPreset: 'medium' as const,
-    }));
-
-    // Effect to attach stream to video element when streaming status changes
-    useEffect(() => {
-        const service = getGlobalCameraService();
-        if (!service || !videoRef.current) {
-            return;
-        }
-
-        if (status.streaming) {
-            const stream = service.getStream();
-            console.log('[Camera] Attaching stream to video element, stream:', stream, 'tracks:', stream?.getTracks().length);
-            if (stream) {
-                videoRef.current.srcObject = stream;
-                videoRef.current.play().catch((err) => {
-                    console.error('[Camera] Preview video play failed:', err);
-                });
-            }
-        } else {
-            console.log('[Camera] Clearing video element srcObject');
-            videoRef.current.srcObject = null;
-        }
-    }, [status.streaming]);
-
-    useEffect(() => {
-        // Camera service is now initialized globally, just set up event listeners
-        const initializeCameraComponent = async () => {
-            let service = cameraService;
-            
-            // If service not available, wait for it or try to initialize
-            if (!service) {
-                // Try to get the service multiple times with increasing delays
-                for (let attempt = 0; attempt < 10; attempt++) {
-                    await new Promise(resolve => setTimeout(resolve, attempt * 500 + 500));
-                    service = getGlobalCameraService();
-                    if (service) {
-                        break;
-                    }
-                }
-                
-                // If still no service, try to trigger global initialization
-                if (!service) {
-                    try {
-                        const { initializeGlobalCameraService } = await import('app/lib/camera/globalCameraService');
-                        service = await initializeGlobalCameraService();
-                    } catch (error) {
-                        console.error('Failed to initialize camera service:', error);
-                        return;
-                    }
-                }
-            }
-            
-            if (service) {
-                // Wait a bit to ensure service has loaded settings from store
-                await new Promise(resolve => setTimeout(resolve, 100));
-                
-                // Get current settings and status
-                const currentSettings = service.getSettings();
-                const currentStatus = service.getStatus();
-                
-                // Update local state with current service state
-                setSettings(currentSettings);
-                setStatus(currentStatus);
-                setIsInitialized(true);
-                
-                // Initialize the service if not already done (requests permission)
-                // This only happens when user opens Camera page for the first time
-                try {
-                    if (service.getDevices().length === 0) {
-                        console.log('[Camera] Initializing camera service and requesting permission...');
-                        await service.initialize();
-                    }
-                } catch (error) {
-                    console.error('[Camera] Failed to initialize camera service:', error);
-                }
-                
-                // Enumerate devices immediately
-                try {
-                    await service.enumerateDevices();
-                    // Also directly get devices in case event hasn't fired yet
-                    const currentDevices = service.getDevices();
-                    if (currentDevices.length > 0) {
-                        setDevices(currentDevices);
-                    }
-                } catch (error) {
-                    console.error('Failed to enumerate camera devices:', error);
-                }
-                
-                // Set up event listeners
-                const handleDevicesChanged = (newDevices: MediaDeviceInfo[]) => {
-                    setDevices(newDevices);
-                };
-
-                const handleSettingsChanged = (newSettings: CameraSettings) => {
-                    setSettings(newSettings);
-                };
-
-                const handleStatusChanged = (newStatus: CameraStatus) => {
-                    setStatus(newStatus);
-                };
-
-                const handleStreamStarted = (stream: MediaStream) => {
-                    if (videoRef.current) {
-                        videoRef.current.srcObject = stream;
-                    }
-                };
-
-                const handleStreamStopped = () => {
-                    if (videoRef.current) {
-                        videoRef.current.srcObject = null;
-                    }
-                };
-
-                const handleError = (error: string) => {
-                    toast.error(error);
-                };
-
-                const handleMetricsUpdated = (metrics: any) => {
-                    setStatus(prev => ({ ...prev, metrics }));
-                    // Only send metrics to server if streaming is enabled
-                    if (status.streaming && settings.enabled) {
-                        sendControllerCommand('camera:metrics', metrics);
-                    }
-                };
-
-                service.on('devicesChanged', handleDevicesChanged);
-                service.on('settingsChanged', handleSettingsChanged);
-                service.on('statusChanged', handleStatusChanged);
-                service.on('streamStarted', handleStreamStarted);
-                service.on('streamStopped', handleStreamStopped);
-                service.on('metricsUpdated', handleMetricsUpdated);
-                service.on('error', handleError);
-
-                // Store cleanup function
-                return () => {
-                    service.off('devicesChanged', handleDevicesChanged);
-                    service.off('settingsChanged', handleSettingsChanged);
-                    service.off('statusChanged', handleStatusChanged);
-                    service.off('streamStarted', handleStreamStarted);
-                    service.off('streamStopped', handleStreamStopped);
-                    service.off('metricsUpdated', handleMetricsUpdated);
-                    service.off('error', handleError);
-                };
-            }
-        };
-        
-        // Call the async function and handle cleanup
-        let cleanupFunction: (() => void) | undefined;
-        
-        initializeCameraComponent().then(cleanup => {
-            cleanupFunction = cleanup;
-        });
-        
-        // Return cleanup function for useEffect
-        return () => {
-            if (cleanupFunction) {
-                cleanupFunction();
-            }
-        };
-    }, []);
-
-    // Separate effect to connect video element when it becomes available and stream is already active
-    useEffect(() => {
-        if (isInitialized && status.streaming && videoRef.current && !videoRef.current.srcObject) {
-            const service = getGlobalCameraService();
-            if (service) {
-                const stream = service.getStream();
-                if (stream) {
-                    videoRef.current.srcObject = stream;
-                    videoRef.current.play().catch((err) => {
-                        console.warn('[Camera] Late-bind preview video play failed:', err);
-                    });
-                }
-            }
-        }
-    }, [isInitialized, status.streaming]);
-
-    // Additional effect to connect video on render when streaming is active
-    // This runs every render to catch the case where videoRef becomes available
-    useEffect(() => {
-        if (isInitialized && status.streaming && videoRef.current && !videoRef.current.srcObject) {
-            const service = getGlobalCameraService();
-            if (service) {
-                const stream = service.getStream();
-                if (stream) {
-                    videoRef.current.srcObject = stream;
-                    videoRef.current.play().catch((err) => {
-                        console.warn('[Camera] Video play on render failed:', err);
-                    });
-                }
-            }
-        }
-    });
-
-    useEffect(() => {
-        if (isInitialized && cameraService) {
-            cameraService.enumerateDevices();
-        }
-    }, [isInitialized, cameraService]);
 
     const handleToggleStreaming = withCameraService(async (service, enabled: boolean) => {
         try {
@@ -398,7 +139,7 @@ const Camera: React.FC = () => {
                 toast.success('Camera streaming stopped');
             }
         } catch (error) {
-            console.error('Failed to toggle streaming:', error);
+            log.error('[Camera] Failed to toggle streaming:', error);
             toast.error(`Failed to ${enabled ? 'start' : 'stop'} streaming`);
         }
     });
@@ -441,6 +182,21 @@ const Camera: React.FC = () => {
 
     const hasDevices = devices.length > 0;
     const canStream = hasDevices && settings.deviceId;
+
+    useEffect(() => {
+        if (!canStream || !status.streaming || !videoRef.current || videoRef.current.srcObject) {
+            return;
+        }
+
+        const service = getGlobalCameraService();
+        const stream = service?.getStream();
+        if (stream) {
+            videoRef.current.srcObject = stream;
+            videoRef.current.play().catch((err) => {
+                log.warn('[Camera] Late preview attach failed:', err);
+            });
+        }
+    }, [canStream, status.streaming, videoRef]);
 
     // Show loading state while checking headless mode
     if (isCheckingHeadless) {

@@ -26,6 +26,15 @@ import config from '../services/configstore';
 import logger from '../lib/logger';
 
 const log = logger('api:camera');
+const normalizeClientIP = (rawIP = '') => {
+    if (!rawIP || typeof rawIP !== 'string') {
+        return '';
+    }
+    if (rawIP.startsWith('::ffff:')) {
+        return rawIP.substring(7);
+    }
+    return rawIP;
+};
 
 // Camera streaming state
 let cameraState = {
@@ -41,7 +50,7 @@ let cameraState = {
 };
 
 const isRemoteAccessAllowed = (req) => {
-    const clientIP = req.ip || req.connection.remoteAddress;
+    const clientIP = normalizeClientIP(req.ip || req.connection.remoteAddress);
 
     // Always allow localhost
     if (clientIP === '127.0.0.1' || clientIP === '::1') {
@@ -64,7 +73,7 @@ const isRemoteAccessAllowed = (req) => {
         return false;
     }
 
-    const allowedIP = remoteSettings.ip;
+    const allowedIP = normalizeClientIP(remoteSettings.ip);
     return clientIP === allowedIP || authorizeIPAddress(clientIP);
 };
 
@@ -81,10 +90,18 @@ const checkOriginAndHost = (req) => {
 
     // Check if origin matches allowed remote access configuration
     if (origin) {
-        const originUrl = new URL(origin);
-        const isAllowedOrigin = originUrl.hostname === allowedIP ||
-                               originUrl.hostname === 'localhost' ||
-                               originUrl.hostname === '127.0.0.1';
+        let originUrl;
+        try {
+            originUrl = new URL(origin);
+        } catch (error) {
+            log.warn(`Invalid Origin header for camera status: ${origin}`);
+            return false;
+        }
+        const originHostname = normalizeClientIP(originUrl.hostname);
+        const normalizedAllowedIP = normalizeClientIP(allowedIP);
+        const isAllowedOrigin = originHostname === normalizedAllowedIP ||
+                               originHostname === 'localhost' ||
+                               originHostname === '127.0.0.1';
 
         if (!isAllowedOrigin) {
             return false;
@@ -96,7 +113,7 @@ const checkOriginAndHost = (req) => {
 
 export const getStatus = (req, res) => {
     try {
-        const clientIP = req.ip || req.connection.remoteAddress;
+        const clientIP = normalizeClientIP(req.ip || req.connection.remoteAddress);
         // Reduced logging to prevent spam - only log non-localhost requests
         if (clientIP !== '127.0.0.1' && clientIP !== '::1') {
             // Only log every 10th request to reduce spam

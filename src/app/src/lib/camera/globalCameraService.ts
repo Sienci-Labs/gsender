@@ -24,10 +24,30 @@
 import CameraService from 'app/services/CameraService';
 import store from 'app/store';
 import controller from 'app/lib/controller';
+import log from 'app/lib/log';
 import { initializeCameraWebRTC } from './webrtcHandlers';
 
 // Global camera service instance
 let globalCameraService: CameraService | null = null;
+let hasRegisteredCameraSocketSync = false;
+
+const syncCameraStateToServer = (): void => {
+  if (!globalCameraService || !controller.socket?.connected) {
+    return;
+  }
+
+  const settings = globalCameraService.getSettings();
+  const status = globalCameraService.getStatus();
+
+  log.debug('[GlobalCameraService] Syncing camera state to server:', {
+    streaming: status.streaming,
+    enabled: settings.enabled,
+    hasDeviceId: Boolean(settings.deviceId),
+    socketId: controller.socket.id
+  });
+  controller.socket.emit('camera:updateSettings', settings);
+  controller.socket.emit(status.streaming ? 'camera:startStream' : 'camera:stopStream');
+};
 
 // Initialize the global camera service
 export const initializeGlobalCameraService = async (): Promise<CameraService> => {
@@ -54,6 +74,10 @@ export const initializeGlobalCameraService = async (): Promise<CameraService> =>
 
     // Initialize WebRTC handlers AFTER settings are loaded
     initializeCameraWebRTC(globalCameraService);
+    if (!hasRegisteredCameraSocketSync) {
+      controller.addListener('connect', syncCameraStateToServer);
+      hasRegisteredCameraSocketSync = true;
+    }
 
     // Auto-start streaming if enabled and device is selected
     if (storedSettings?.enabled && storedSettings?.deviceId) {
@@ -66,7 +90,7 @@ export const initializeGlobalCameraService = async (): Promise<CameraService> =>
         const deviceExists = availableDevices.some(device => device.deviceId === storedSettings.deviceId);
 
         if (!deviceExists && availableDevices.length > 0) {
-          console.warn('[GlobalCameraService] Stored device no longer available, using first available device');
+          log.warn('[GlobalCameraService] Stored device no longer available, using first available device');
           // Update to first available device
           const firstDevice = availableDevices[0];
           const updatedSettings = {
@@ -76,27 +100,22 @@ export const initializeGlobalCameraService = async (): Promise<CameraService> =>
           globalCameraService.updateSettings(updatedSettings);
           store.set('workspace.camera', updatedSettings);
         } else if (!deviceExists) {
-          console.warn('[GlobalCameraService] No camera devices available, skipping auto-start');
+          log.warn('[GlobalCameraService] No camera devices available, skipping auto-start');
           return globalCameraService;
         }
 
-        console.log('[GlobalCameraService] Attempting to auto-start camera streaming with device:', globalCameraService.getSettings().deviceId);
+        log.debug('[GlobalCameraService] Attempting to auto-start camera streaming with device:', globalCameraService.getSettings().deviceId);
         await globalCameraService.startStream();
-        console.log('[GlobalCameraService] Camera streaming auto-started successfully');
+        log.info('[GlobalCameraService] Camera streaming auto-started successfully');
 
         // Notify server about the streaming status
         if (controller.socket?.connected) {
-          // Send startStream command to mark stream as available on server
-          controller.socket.emit('camera:startStream');
-
-          // Also send settings
-          const updatedSettings = globalCameraService.getSettings();
-          controller.socket.emit('camera:updateSettings', updatedSettings);
+          syncCameraStateToServer();
         } else {
-          console.warn('[GlobalCameraService] Socket not connected, will notify server when connection is established');
+          log.warn('[GlobalCameraService] Socket not connected, will notify server when connection is established');
         }
       } catch (error) {
-        console.error('[GlobalCameraService] Failed to auto-start camera streaming:', error);
+        log.error('[GlobalCameraService] Failed to auto-start camera streaming:', error);
 
         // Extract user-friendly error message
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -106,7 +125,7 @@ export const initializeGlobalCameraService = async (): Promise<CameraService> =>
         store.set('workspace.camera.enabled', false);
 
         // Log warning to help user understand what happened
-        console.warn(
+        log.warn(
           '[GlobalCameraService] Camera streaming disabled due to auto-start failure.',
           'You can manually enable it from the Camera page.',
           'Error details:', errorMessage
@@ -116,7 +135,7 @@ export const initializeGlobalCameraService = async (): Promise<CameraService> =>
 
     return globalCameraService;
   } catch (error) {
-    console.error('[GlobalCameraService] Failed to initialize:', error);
+    log.error('[GlobalCameraService] Failed to initialize:', error);
     throw error;
   }
 };
@@ -131,5 +150,9 @@ export const cleanupGlobalCameraService = (): void => {
   if (globalCameraService) {
     globalCameraService.stopStream();
     globalCameraService = null;
+  }
+  if (hasRegisteredCameraSocketSync) {
+    controller.removeListener('connect', syncCameraStateToServer);
+    hasRegisteredCameraSocketSync = false;
   }
 };

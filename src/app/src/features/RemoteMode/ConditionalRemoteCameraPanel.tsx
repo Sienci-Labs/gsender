@@ -24,6 +24,8 @@
 import { useState, useEffect } from 'react';
 import isElectron from 'is-electron';
 import RemoteCameraPanel from 'app/features/RemoteCameraPanel';
+import controller from 'app/lib/controller';
+import log from 'app/lib/log';
 
 /**
  * Component to conditionally render RemoteCameraPanel based on streaming settings.
@@ -56,7 +58,8 @@ export const ConditionalRemoteCameraPanel = () => {
             return;
         }
 
-        // Check server camera status via API
+        // Check server camera status via API.
+        // Keep panel mounted once available to avoid tearing down active video.
         const checkCameraStatus = async () => {
             try {
                 const response = await fetch('/api/camera/status');
@@ -64,16 +67,16 @@ export const ConditionalRemoteCameraPanel = () => {
                     const status = await response.json();
                     // Show panel if camera is enabled and available for streaming
                     const isAvailable = status.enabled && status.available;
-                    setCameraAvailable(isAvailable);
+                    if (isAvailable) {
+                        setCameraAvailable(true);
+                    }
                     setIsCheckingInitialStatus(false);
                 } else {
-                    console.warn('[ConditionalRemoteCameraPanel] Failed to fetch camera status:', response.status);
-                    setCameraAvailable(false);
+                    log.warn('[ConditionalRemoteCameraPanel] Failed to fetch camera status:', response.status);
                     setIsCheckingInitialStatus(false);
                 }
             } catch (error) {
-                console.warn('[ConditionalRemoteCameraPanel] Error fetching camera status:', error);
-                setCameraAvailable(false);
+                log.warn('[ConditionalRemoteCameraPanel] Error fetching camera status:', error);
                 setIsCheckingInitialStatus(false);
             }
         };
@@ -81,29 +84,51 @@ export const ConditionalRemoteCameraPanel = () => {
         // Check immediately
         checkCameraStatus();
 
-        // Poll every 5 seconds to detect when camera becomes available
-        // Once available, keep rendering the panel (don't unmount it)
-        const interval = setInterval(async () => {
-            try {
-                const response = await fetch('/api/camera/status');
-                if (response.ok) {
-                    const status = await response.json();
-                    const isAvailable = status.enabled && status.available;
-                    // Only update if changing from unavailable to available
-                    // Never unmount once mounted by not setting to false
-                    if (isAvailable && !cameraAvailable) {
-                        setCameraAvailable(true);
-                    }
-                }
-            } catch (error) {
-                // Silently ignore polling errors to keep component mounted
+        const handleCameraAvailability = (data: { available: boolean }) => {
+            if (data.available) {
+                setCameraAvailable(true);
             }
-        }, 10000);
+        };
+
+        const handleSocketConnect = () => {
+            checkCameraStatus();
+        };
+
+        let socketListenersBound = false;
+        let socketBindingTimer: ReturnType<typeof setInterval> | null = null;
+
+        const bindSocketListeners = () => {
+            const socket = controller.socket;
+            if (!socket || socketListenersBound) {
+                return;
+            }
+            socket.on('camera:availability', handleCameraAvailability);
+            socket.on('connect', handleSocketConnect);
+            socketListenersBound = true;
+        };
+
+        bindSocketListeners();
+        if (!socketListenersBound) {
+            socketBindingTimer = setInterval(() => {
+                bindSocketListeners();
+                if (socketListenersBound && socketBindingTimer) {
+                    clearInterval(socketBindingTimer);
+                    socketBindingTimer = null;
+                }
+            }, 250);
+        }
 
         return () => {
-            clearInterval(interval);
+            if (socketBindingTimer) {
+                clearInterval(socketBindingTimer);
+            }
+            const socket = controller.socket;
+            if (socket) {
+                socket.off('camera:availability', handleCameraAvailability);
+                socket.off('connect', handleSocketConnect);
+            }
         };
-    }, [cameraAvailable]);
+    }, []);
 
     if (!isRemoteClient) {
         return null;
@@ -121,4 +146,3 @@ export const ConditionalRemoteCameraPanel = () => {
 
     return null;
 };
-

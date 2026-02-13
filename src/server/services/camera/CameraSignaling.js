@@ -27,6 +27,15 @@ import logger from '../../lib/logger';
 import { updateStatus, getCameraState } from '../../api/api.camera';
 
 const log = logger('camera:signaling');
+const normalizeClientIP = (rawIP = '') => {
+    if (!rawIP || typeof rawIP !== 'string') {
+        return '';
+    }
+    if (rawIP.startsWith('::ffff:')) {
+        return rawIP.substring(7);
+    }
+    return rawIP;
+};
 
 /**
  * @typedef {Object} CameraOfferData
@@ -89,7 +98,7 @@ class CameraSignaling {
      * @private
      */
     handleConnection(socket) {
-        const clientIP = socket.handshake.address;
+        const clientIP = normalizeClientIP(socket.handshake.address);
 
         // Check if client is authorized for camera access
         if (!this.isClientAuthorized(clientIP)) {
@@ -101,6 +110,18 @@ class CameraSignaling {
         this.activeConnections.set(socket.id, socket);
 
         // Set up camera-specific event handlers
+        socket.on('camera:startStream', () => {
+            socket.data.cameraSource = true;
+        });
+        socket.on('camera:stopStream', () => {
+            socket.data.cameraSource = false;
+        });
+        socket.on('camera:updateSettings', (settings = {}) => {
+            socket.data.cameraConfigured = Boolean(settings.enabled);
+            if (!settings.enabled) {
+                socket.data.cameraSource = false;
+            }
+        });
         socket.on('camera:offer', (data) => this.handleOffer(socket, data));
         socket.on('camera:answer', (data) => this.handleAnswer(socket, data));
         socket.on('camera:ice', (data) => this.handleIceCandidate(socket, data));
@@ -123,6 +144,7 @@ class CameraSignaling {
      * @private
      */
     handleViewerDisconnect(socket) {
+        socket.data.cameraViewerDisconnectNotified = true;
         // Broadcast to all clients (especially main client) that this viewer disconnected
         this.io.emit('camera:viewerDisconnected', {
             viewerId: socket.id
@@ -136,6 +158,14 @@ class CameraSignaling {
      */
     handleDisconnection(socket) {
         this.activeConnections.delete(socket.id);
+        if (socket.data.cameraViewerDisconnectNotified) {
+            return;
+        }
+        // Ensure main client cleans up viewer-specific peer connection even when
+        // viewer disconnects abruptly (refresh, tab close, network loss).
+        this.io.emit('camera:viewerDisconnected', {
+            viewerId: socket.id
+        });
     }
 
     /**
@@ -219,15 +249,32 @@ class CameraSignaling {
         // Check if camera is available
         const status = getCameraState();
         if (!status.available) {
+            log.warn(`Rejecting camera stream request for ${socket.id}: camera not available`);
             socket.emit('camera:error', { message: 'Camera not available' });
             return;
         }
 
-        // Send the request to all clients (including the sender)
-        // The main client (with camera) should respond with an offer
-        this.io.emit('camera:streamRequest', {
+        // Prefer known camera-source sockets (those advertising startStream).
+        // This avoids non-streaming clients handling streamRequest.
+        const sourceSockets = Array.from(this.activeConnections.values())
+            .filter((s) => Boolean(s.data?.cameraSource || s.data?.cameraConfigured));
+
+        const payload = {
             requesterId: socket.id
-        });
+        };
+
+        if (sourceSockets.length > 0) {
+            const sourceSocket =
+                sourceSockets.find((s) => Boolean(s.data?.cameraSource)) ||
+                sourceSockets[0];
+            log.debug(`Forwarding camera stream request from ${socket.id} to camera source socket ${sourceSocket.id}`);
+            sourceSocket.emit('camera:streamRequest', payload);
+            return;
+        }
+
+        // No known camera source socket available.
+        log.warn(`Rejecting camera stream request for ${socket.id}: no camera source socket available`);
+        socket.emit('camera:error', { message: 'No camera source available' });
     }
 
     /**
@@ -281,16 +328,18 @@ class CameraSignaling {
      * @private
      */
     isClientAuthorized(clientIP) {
+        const normalizedClientIP = normalizeClientIP(clientIP);
+
         // Always allow localhost
-        if (clientIP === '127.0.0.1' || clientIP === '::1') {
+        if (normalizedClientIP === '127.0.0.1' || normalizedClientIP === '::1') {
             return true;
         }
 
         // Allow local network addresses
         const isLocalNetwork =
-            clientIP.startsWith('192.168.') ||
-            clientIP.startsWith('10.') ||
-            /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(clientIP);
+            normalizedClientIP.startsWith('192.168.') ||
+            normalizedClientIP.startsWith('10.') ||
+            /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(normalizedClientIP);
 
         if (isLocalNetwork) {
             return true;
@@ -303,8 +352,8 @@ class CameraSignaling {
         }
 
         // Allow configured remote IP
-        const allowedIP = remoteSettings.ip;
-        return clientIP === allowedIP || authorizeIPAddress(clientIP);
+        const allowedIP = normalizeClientIP(remoteSettings.ip);
+        return normalizedClientIP === allowedIP || authorizeIPAddress(normalizedClientIP);
     }
 }
 

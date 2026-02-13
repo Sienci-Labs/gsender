@@ -23,6 +23,7 @@
 
 import controller from 'app/lib/controller';
 import CameraService from 'app/services/CameraService';
+import log from 'app/lib/log';
 
 // Global camera service instance
 let cameraService: CameraService | null = null;
@@ -33,7 +34,7 @@ const activePeerConnections = new Map<string, RTCPeerConnection>();
 // WebRTC handlers that need to persist globally
 const handleStreamRequest = async (data: { requesterId: string }) => {
   if (!cameraService) {
-    console.warn('[MainCamera] No camera service available for stream request');
+    log.warn('[MainCamera] No camera service available for stream request');
     return;
   }
 
@@ -49,7 +50,7 @@ const handleStreamRequest = async (data: { requesterId: string }) => {
   const freshStatus = cameraService.getStatus();
 
   if (!freshStatus.streaming) {
-    console.warn('[MainCamera] Not streaming, ignoring stream request from', data.requesterId);
+    log.warn('[MainCamera] Not streaming, ignoring stream request from', data.requesterId);
     return;
   }
 
@@ -80,23 +81,23 @@ const handleStreamRequest = async (data: { requesterId: string }) => {
         clientId: data.requesterId
       });
     } else {
-      console.error('[MainCamera] Socket not connected, cannot send offer');
+      log.error('[MainCamera] Socket not connected, cannot send offer');
     }
   } catch (error) {
-    console.error('[MainCamera] Failed to create offer for stream request:', error);
+    log.error('[MainCamera] Failed to create offer for stream request:', error);
   }
 };
 
 const handleCameraAnswer = async (data: { sdp: string; clientId: string }) => {
   if (!cameraService) {
-    console.warn('[MainCamera] No camera service available for answer');
+    log.warn('[MainCamera] No camera service available for answer');
     return;
   }
 
   // Get the peer connection for this specific client
   const peerConnection = activePeerConnections.get(data.clientId);
   if (!peerConnection) {
-    console.warn('[MainCamera] No peer connection found for client:', data.clientId);
+    log.warn('[MainCamera] No peer connection found for client:', data.clientId);
     return;
   }
 
@@ -105,7 +106,7 @@ const handleCameraAnswer = async (data: { sdp: string; clientId: string }) => {
 
     // Only set remote description if we're expecting an answer
     if (state !== 'have-local-offer') {
-      console.warn('[MainCamera] Cannot set answer - peer connection in wrong state:', state);
+      log.warn('[MainCamera] Cannot set answer - peer connection in wrong state:', state);
       return;
     }
 
@@ -114,27 +115,27 @@ const handleCameraAnswer = async (data: { sdp: string; clientId: string }) => {
       sdp: data.sdp
     }));
   } catch (error) {
-    console.error('[MainCamera] Failed to handle camera answer:', error);
+    log.error('[MainCamera] Failed to handle camera answer:', error);
   }
 };
 
 const handleCameraIce = async (data: { candidate: RTCIceCandidateInit; clientId: string }) => {
   if (!cameraService) {
-    console.warn('[MainCamera] No camera service available for ICE candidate');
+    log.warn('[MainCamera] No camera service available for ICE candidate');
     return;
   }
 
   // Get the peer connection for this specific client
   const peerConnection = activePeerConnections.get(data.clientId);
   if (!peerConnection) {
-    console.warn('[MainCamera] No peer connection found for client:', data.clientId);
+    log.warn('[MainCamera] No peer connection found for client:', data.clientId);
     return;
   }
 
   try {
     await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
   } catch (error) {
-    console.error('[MainCamera] Failed to add ICE candidate:', error);
+    log.error('[MainCamera] Failed to add ICE candidate:', error);
   }
 };
 
