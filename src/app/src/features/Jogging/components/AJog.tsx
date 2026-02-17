@@ -41,6 +41,7 @@ export function AJog({
                 topHandlers={aPlusJogHandlers}
                 bottomHandlers={aMinusJogHandlers}
                 canClick={canClick}
+                idForTest="A"
             />
             <img
                 src={aLabels}

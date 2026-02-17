@@ -4,6 +4,7 @@ export interface TabJogProps {
     topHandlers: object;
     bottomHandlers: object;
     canClick?: boolean;
+    idForTest: string;
 }
 
 const TabJog = (props: TabJogProps) => {
@@ -31,6 +32,7 @@ const TabJog = (props: TabJogProps) => {
                     props.canClick ? standardColourClass : disabledColorClass,
                 )}
                 {...props.topHandlers}
+                testId={props.idForTest + '+'}
             />
             <path
                 d="M0.5 98.5H49.5V177C49.5 182.247 45.2467 186.5 40 186.5H10C4.75329 186.5 0.5 182.247 0.5 177V98.5Z"
@@ -39,6 +41,7 @@ const TabJog = (props: TabJogProps) => {
                     props.canClick ? standardColourClass : disabledColorClass,
                 )}
                 {...props.bottomHandlers}
+                testId={props.idForTest + '-'}
             />
             <line y1={93.5} x2={49} y2={93.5} stroke="#CECECE" />
         </svg>
