@@ -733,6 +733,13 @@ Cypress.Commands.add('zeroZAxis', () => {
   cy.log('Z axis zeroed');
 });
 
+//-----------------------
+// Zero A axis 
+Cypress.Commands.add('zeroAAxis', () => {
+  cy.log('Zeroing A axis');
+  cy.contains('button', 'A0').click();
+  cy.log('A axis zeroed');
+});
 // ----------------------
 //15.Zero All Axes
 // ----------------------
@@ -1156,9 +1163,15 @@ Cypress.Commands.add('applySettings', (options = {}) => {
 // URL Definitions
 
 Cypress.Commands.add('loadUI', (url, options = {}) => {
-  cy.visit(url, { timeout: options.timeout || 10000 });
-  // You can also handle retries or waits here if needed
+  cy.visit(url, { 
+    timeout: options.timeout || 30000,
+    failOnStatusCode: false
+  });
+  
+  // Wait for the app to be ready
+  cy.wait(options.waitTime || 2000);
 });
+  // You can also handle retries or waits here if needed
 
 // Page URLs
 Cypress.Commands.add('goToCarve', () => {

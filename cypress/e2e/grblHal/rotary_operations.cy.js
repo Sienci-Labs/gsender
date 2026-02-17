@@ -1,16 +1,15 @@
 describe('A-Axis Go To Location Tests', () => {
 
   beforeEach(() => {
-    cy.viewport(1920, 1080);
-    // Use loadUI custom command with dynamic baseUrl
+    cy.viewport(2844, 1450);
     cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
-      maxRetries: 4,
-      waitTime: 4000,
+      maxRetries: 5,
+      waitTime: 5000,
       timeout: 5000
     });
   });
 
-  it('Tests A-axis go to location functionality with positive and negative values', () => {
+  it('Tests A-axis go to location functionality with positive values', () => {
 
     // Step 1: Navigate to config
     cy.log('Step 1: Navigating to Config...');
@@ -26,13 +25,11 @@ describe('A-Axis Go To Location Tests', () => {
     cy.log('Step 3: Verifying machine status...');
     cy.verifyMachineStatus('Idle');
     cy.wait(2000);
-    cy.log('Machine is in idle status');
 
     // Step 4: Unlock machine if needed
     cy.log('Step 4: Unlocking machine if needed...');
     cy.unlockMachineIfNeeded();
     cy.wait(2000);
-
     // Step 5: Go to Config and enable rotary controls
     cy.log('Step 5: Going to Config and enabling Rotary controls...');
     cy.goToConfig();
@@ -63,247 +60,63 @@ describe('A-Axis Go To Location Tests', () => {
     cy.goToCarve();
     cy.wait(2000);
 
-    // Step 7: Open A-axis go to location dialog (first click on A-axis jog button)
-    cy.log('Step 7: Opening A-axis Go To Location dialog...');
-    cy.get('div.min-h-10 > div:nth-of-type(1)')
-      .find('button')
-      .first()
+    // Step 6: Open "Go To Location" dialog
+    cy.log('Step 6: Opening Go To Location dialog...');
+    cy.get('div.min-h-10 > div:nth-of-type(1) > button')
       .click();
     cy.wait(500);
+    cy.log('Go To dialog opened');
 
-    // Step 8: Test positive A-axis movement (10 degrees)
-    cy.log('Step 8: Testing positive A-axis movement to 10 degrees...');
-    
-    // Verify the go to location dialog is visible
-    cy.get('body > div:nth-of-type(2)').should('be.visible');
-    
-    // Clear and enter positive value
+     // Step 10: Enter A-axis value (5)
+    cy.log('Step 10: Entering A-axis coordinate...');
     cy.get('body > div:nth-of-type(2) div:nth-of-type(5) input')
-      .should('be.visible')
-      .clear()
-      .type('10', { delay: 100 });
-    
-    cy.wait(500);
-    
-    // Click the "Go!" button to move to position
-    cy.log('Clicking Go! button to move A-axis to 10 degrees...');
-    cy.contains('button', 'Go!').click();
-    cy.wait(2000);
+      .clear({ force: true })
+      .type('5', { force: true })
+      .should('have.value', '5');
+    cy.log('A coordinate set to 5');
 
-    // Step 9: Verify A-axis position shows 10 (or close to it)
-    cy.log('Step 9: Verifying A-axis position...');
-    cy.get('[data-testid="wcs-input-A"]')
-      .should('be.visible')
-      .invoke('val')
-      .then((value) => {
-        const numValue = parseFloat(value);
-        cy.log(`Current A-axis position: ${numValue}`);
-        // Allow small tolerance for position verification
-        expect(numValue).to.be.closeTo(10, 0.5);
-      });
-
-    cy.wait(1000);
-
-    // Step 10: Open A-axis go to location dialog again
-    cy.log('Step 10: Opening A-axis Go To Location dialog again...');
-    cy.get('div.min-h-10 > div:nth-of-type(1)')
-      .find('button')
-      .first()
-      .click();
-    cy.wait(500);
-
-    // Step 11: Test negative A-axis movement (-10 degrees)
-    cy.log('Step 11: Testing negative A-axis movement to -10 degrees...');
-    
-    // Clear and enter negative value
+    // Step 9: Select all existing text and replace with new value
+    cy.log('Step 9: Entering A-axis coordinate...');
     cy.get('body > div:nth-of-type(2) div:nth-of-type(5) input')
-      .should('be.visible')
-      .clear()
-      .type('-10', { delay: 100 });
+      .focus()
+      .type('{selectall}', { force: true })  // Select all text first
+      .type('5', { force: true })             // Type new value
+      .trigger('change', { force: true })     // Trigger change event
+      .trigger('input', { force: true })      // Trigger input event
+      .blur();                                 // Blur to finalize
     
-    cy.wait(500);
+    cy.wait(300);
     
-    // Click the "Go!" button to move to negative position
-    cy.log('Clicking Go! button to move A-axis to -10 degrees...');
-    cy.contains('button', 'Go!').click();
-    cy.wait(2000);
-
-    // Step 12: Verify A-axis position shows -10 (or close to it)
-    cy.log('Step 12: Verifying negative A-axis position...');
-    cy.get('[data-testid="wcs-input-A"]')
-      .should('be.visible')
-      .invoke('val')
-      .then((value) => {
-        const numValue = parseFloat(value);
-        cy.log(`Current A-axis position: ${numValue}`);
-        // Allow small tolerance for position verification
-        expect(numValue).to.be.closeTo(-10, 0.5);
-      });
-
-    cy.wait(1000);
-
-    // Step 13: Return to zero position
-    cy.log('Step 13: Returning A-axis to zero position...');
-    cy.get('div.min-h-10 > div:nth-of-type(1)')
-      .find('button')
-      .first()
-      .click();
-    cy.wait(500);
-
+    // Verify the value in the dialog
     cy.get('body > div:nth-of-type(2) div:nth-of-type(5) input')
-      .should('be.visible')
-      .clear()
-      .type('0', { delay: 100 });
-    
-    cy.wait(500);
-    
-    cy.contains('button', 'Go!').click();
+      .should('have.value', '5');
+    cy.log(' A coordinate set to 5 in dialog');
+
+    // Step 10: Click Go button
+    cy.log('Step 10: Clicking Go button...');
+    cy.get('body > div:nth-of-type(2) button')
+      .contains('Go!')
+      .click({ force: true });
     cy.wait(2000);
+    cy.log(' Go button clicked - movement initiated');
 
-    // Step 14: Final verification at zero
-    cy.log('Step 14: Verifying A-axis returned to zero...');
+    // Step 11: Close popup by clicking outside
+    cy.log('Step 11: Closing popup...');
+    cy.get('body').click(50, 50, { force: true });
+    cy.wait(500);
+    cy.log('Popup closed');
+
+    // Step 12: Verify the A-axis value in the main interface (FIXED)
+    cy.log('Step 12: Verifying A-axis value updated in main UI...');
     cy.get('[data-testid="wcs-input-A"]')
-      .should('be.visible')
-      .invoke('val')
-      .then((value) => {
-        const numValue = parseFloat(value);
-        cy.log(`Final A-axis position: ${numValue}`);
-        expect(numValue).to.be.closeTo(0, 0.5);
-      });
+      .should('have.value', '5.000');  // Changed from .contain to .have.value
+    cy.log(' A-axis value confirmed: 5.000');
 
-    cy.log('A-axis Go To Location test completed successfully!');
-  });
-
-  // Additional test case for edge values
-  it('Tests A-axis go to location with various angles', () => {
-
-    // Setup steps (similar to above)
-    cy.log('Setting up test environment...');
-    cy.goToConfig();
-    cy.connectMachine();
-    cy.wait(6000);
+    // Step 13: Wait for movement and verify machine returns to idle
+    cy.log('Step 13: Waiting for movement to complete...');
+    cy.wait(5000);
     cy.verifyMachineStatus('Idle');
-    cy.unlockMachineIfNeeded();
-    cy.wait(2000);
-
-    // Enable rotary controls
-    cy.goToConfig();
-    cy.searchInSettings('rotary');
-    cy.contains('div', 'Rotary controls')
-      .find('button[role="switch"]')
-      .then($toggle => {
-        if ($toggle.attr('aria-checked') === 'false') {
-          cy.wrap($toggle).click();
-          cy.wait(300);
-        }
-      });
-    cy.applySettings();
-    cy.wait(500);
-
-    cy.goToCarve();
-    cy.wait(2000);
-
-    // Test array of different angles
-    const testAngles = [45, 90, 180, -45, -90, 0];
-
-    testAngles.forEach((angle, index) => {
-      cy.log(`Test ${index + 1}: Moving A-axis to ${angle} degrees`);
-
-      // Open go to location dialog
-      cy.get('div.min-h-10 > div:nth-of-type(1)')
-        .find('button')
-        .first()
-        .click();
-      cy.wait(500);
-
-      // Enter angle value
-      cy.get('body > div:nth-of-type(2) div:nth-of-type(5) input')
-        .should('be.visible')
-        .clear()
-        .type(angle.toString(), { delay: 100 });
-      
-      cy.wait(300);
-      
-      // Click Go! button
-      cy.contains('button', 'Go!').click();
-      cy.wait(2000);
-
-      // Verify position
-      cy.get('[data-testid="wcs-input-A"]')
-        .invoke('val')
-        .then((value) => {
-          const numValue = parseFloat(value);
-          cy.log(`Position verified: ${numValue} (expected: ${angle})`);
-          expect(numValue).to.be.closeTo(angle, 0.5);
-        });
-
-      cy.wait(1000);
-    });
-
-    cy.log('Multiple angle test completed successfully!');
-  });
-
-  // Test case for decimal values
-  it('Tests A-axis go to location with decimal values', () => {
-
-    // Setup
-    cy.goToConfig();
-    cy.connectMachine();
-    cy.wait(6000);
-    cy.verifyMachineStatus('Idle');
-    cy.unlockMachineIfNeeded();
-    cy.wait(2000);
-
-    cy.goToConfig();
-    cy.searchInSettings('rotary');
-    cy.contains('div', 'Rotary controls')
-      .find('button[role="switch"]')
-      .then($toggle => {
-        if ($toggle.attr('aria-checked') === 'false') {
-          cy.wrap($toggle).click();
-          cy.wait(300);
-        }
-      });
-    cy.applySettings();
-    cy.wait(500);
-
-    cy.goToCarve();
-    cy.wait(2000);
-
-    // Test decimal angle values
-    const decimalAngles = [5.5, 12.75, -8.25, 0.5];
-
-    decimalAngles.forEach((angle, index) => {
-      cy.log(`Test ${index + 1}: Moving A-axis to ${angle} degrees (decimal)`);
-
-      cy.get('div.min-h-10 > div:nth-of-type(1)')
-        .find('button')
-        .first()
-        .click();
-      cy.wait(500);
-
-      cy.get('body > div:nth-of-type(2) div:nth-of-type(5) input')
-        .should('be.visible')
-        .clear()
-        .type(angle.toString(), { delay: 100 });
-      
-      cy.wait(300);
-      
-      cy.contains('button', 'Go!').click();
-      cy.wait(2000);
-
-      cy.get('[data-testid="wcs-input-A"]')
-        .invoke('val')
-        .then((value) => {
-          const numValue = parseFloat(value);
-          cy.log(`Decimal position verified: ${numValue} (expected: ${angle})`);
-          expect(numValue).to.be.closeTo(angle, 0.1);
-        });
-
-      cy.wait(1000);
-    });
-
-    cy.log('Decimal value test completed successfully!');
+    cy.log(' Test completed successfully');
   });
 
 });

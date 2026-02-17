@@ -1,6 +1,6 @@
 {
   "testName": "Spindle Configuration and Control Test - Decrease & Increase (Stopped)",
-  "timestamp": "2026-01-22T15:19:11.665Z",
+  "timestamp": "2026-02-17T18:37:10.279Z",
   "spindleConfiguration": {
     "minSpindleSpeed": 2,
     "maxSpindleSpeed": 24000
@@ -28,9 +28,9 @@
     }
   },
   "jobDetails": {
-    "jobStartTime": "2026-01-22T15:18:27.920Z",
-    "jobEndTime": "2026-01-22T15:19:09.873Z",
-    "jobDurationSeconds": 41.953,
+    "jobStartTime": "2026-02-17T18:36:27.420Z",
+    "jobEndTime": "2026-02-17T18:37:08.675Z",
+    "jobDurationSeconds": 41.255,
     "status": "STOPPED",
     "timeTaken": "00:00:40",
     "errors": "Status: STOPPED\nTime: 00:00:40\n\nNone",

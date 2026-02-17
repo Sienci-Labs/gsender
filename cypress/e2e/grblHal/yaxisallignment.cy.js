@@ -80,9 +80,10 @@ cy.log('Machine status: Running');
 
 // Wait for minimum probing time
 cy.wait(10000); 
-
+cy.unlockMachineIfNeeded();
 // Wait for machine to return to Idle
 cy.verifyMachineStatus('Idle', { timeout: 60000 });
+cy.unlockMachineIfNeeded();
 cy.wait(2000); // ADD THIS - ensure fully settled
 cy.log(' Machine status: Idle - Probing completed');
 // Verify Y axis value is 0

@@ -33,7 +33,7 @@ describe('Gsender testing preset create update', () => {
 
     // Step 3: Navigate to configuration page
     cy.log('Step 3: Navigating to config page...');
-    cy.visit('http://localhost:8000/#/configuration');
+    cy.goToConfig();
     cy.wait(2000);
     cy.log(' On configuration page');
     
@@ -95,8 +95,8 @@ describe('Gsender testing preset create update', () => {
     cy.log('Settings applied');
 
     // Step 7: Navigate back to home page
-    cy.log('Step 7: Navigating to home page...');
-    cy.visit('http://localhost:8000/#/');
+    cy.log('Step 7: Navigating to Carve page...');
+    cy.goToCarve();
     cy.wait(3000);
     cy.log('On home page');
 
@@ -169,7 +169,7 @@ describe('Gsender testing preset create update', () => {
 
     // Step 3: Navigate to home page and click Rapid
     cy.log('Step 3: Navigating to home page...');
-    cy.visit('http://localhost:8000/#/');
+    cy.goToCarve();
     cy.wait(3000);
     
     cy.log('Step 4: Clicking Rapid button...');

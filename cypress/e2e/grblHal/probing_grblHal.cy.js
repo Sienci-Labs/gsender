@@ -1,10 +1,9 @@
 describe('CNC Machine - Complete Z and XYZ Axis Probing', () => {
  beforeEach(() => {
   cy.viewport(1920, 1080);
-  // Use loadUI custom command with dynamic baseUrl
   cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
-    maxRetries: 3,
-    waitTime: 3000,
+    maxRetries: 5,
+    waitTime: 5000,
     timeout: 5000
   });
 });

@@ -71,7 +71,7 @@ describe('Gsender testing jogging using buttons', () => {
 
     // Step 10: Test Z- jogging
     cy.log('Step 10: Testing Z- jogging...');
-    cy.jogMinusTimes(1);
+    cy.jogZMinusTimes(1);
     cy.wait(3000);
     cy.log(' Z- jog button clicked');
 

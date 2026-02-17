@@ -1,21 +1,5 @@
 describe('Gsender testing - AXIS Homing functionality', () => {
 
-  // Ignore known hydration-related UI errors
-  Cypress.on('uncaught:exception', (err) => {
-    console.log('Uncaught exception:', err.message);
-    
-    const ignoreMessages = [
-      'Hydration failed',
-      'There was an error while hydrating',
-      'Cannot read properties of undefined',
-      'reading \'get\''
-    ];
-    
-    if (ignoreMessages.some(msg => err.message.includes(msg))) {
-      return false;
-    }
-    return true;
-  });
 
  beforeEach(() => {
   cy.viewport(1920, 1080);
@@ -39,7 +23,7 @@ describe('Gsender testing - AXIS Homing functionality', () => {
 
     // Step 2: Wait for idle state before proceeding
     cy.log('Step 2: Waiting for idle state...');
-    cy.contains(/^idle$/i, { timeout: 30000 }).should('be.visible');
+    cy.verifyMachineStatus('Idle');
     cy.wait(1000);
 
     //X+ jogging

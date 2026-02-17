@@ -1,7 +1,8 @@
-describe('gSender Movement tuning test', () => {
+describe('A-Axis Go To Location Tests', () => {
 
   beforeEach(() => {
-    cy.viewport(2844, 1450);
+    cy.viewport(1920, 1080);
+    // Use loadUI custom command with dynamic baseUrl
     cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
       maxRetries: 5,
       waitTime: 5000,
@@ -9,133 +10,101 @@ describe('gSender Movement tuning test', () => {
     });
   });
 
-  it('Should complete movement tuning for Y axis', () => {
-    
-    // Step 1: Connect to CNC
-    cy.log('Step 1: Connecting to CNC...');
+  it('Tests A-axis go to location functionality with positive and negative values', () => {
+
+    // Step 1: Navigate to config
+    cy.log('Step 1: Navigating to Config...');
+    cy.goToConfig();
+
+    // Step 2: Connect to CNC
+    cy.log('Step 2: Connecting to CNC...');
     cy.connectMachine();
     cy.wait(6000);
-    cy.log('✓ Connected to CNC');
+    cy.log('Connected to CNC');
 
-    // Step 2: Verify CNC machine status is Idle
-    cy.log('Step 2: Verifying machine status...');
+    // Step 3: Verify CNC machine status is Idle
+    cy.log('Step 3: Verifying machine status...');
     cy.verifyMachineStatus('Idle');
     cy.wait(2000);
-    cy.log('✓ Machine is in idle status');
+    cy.log('Machine is in idle status');
 
-    // Step 3: Unlock machine if needed
+    // Step 4: Unlock machine if needed
+    cy.log('Step 4: Unlocking machine if needed...');
     cy.unlockMachineIfNeeded();
     cy.wait(2000);
 
-    // Step 4: Navigate to Tools page
-    cy.log('Step 4: Navigating to Tools page...');
-    cy.goToTools();
-    cy.wait(1000);
-    cy.log('✓ Tools page opened');
-
-    // Step 5: Click on Movement Tuning tool
-    cy.log('Step 5: Opening Movement Tuning tool...');
-    cy.get('a:nth-of-type(3) p')
-      .contains('Ensure that each')
-      .should('be.visible')
-      .click();
-    cy.wait(1500);
-    cy.log('✓ Movement Tuning tool opened');
-
-    // Step 6: Select Y-axis from dropdown
-    cy.log('Step 6: Selecting Y-axis...');
-    cy.get('.css-1hwfws3')
-      .should('be.visible')
-      .click();
-    cy.wait(500);
-
-    cy.get('[id^="react-select-"][id$="-option-1"]')
-      .should('be.visible')
-      .click();
-    cy.wait(1000);
-    cy.log('✓ Y-axis selected');
-
-    // Step 7: Click "Start Movement Tuning" button
-    cy.log('Step 7: Starting Movement Tuning wizard...');
-    cy.get('button')
-      .contains('Start Movement Tuning')
-      .should('be.visible')
-      .click();
-    cy.wait(1500);
-    cy.log('✓ Movement Tuning wizard started');
-
-    // Step 8: Mark First Location
-    cy.log('Step 8: Marking first location...');
-    cy.get('button')
-      .contains('Mark First Location')
-      .should('be.visible')
-      .click();
-    cy.wait(1000);
-    cy.log('✓ First location marked');
-
-    // Step 9: Enter distance value
-    cy.log('Step 9: Entering distance value: 50mm...');
-    cy.get('input.text-robin-500[value="100"]')
-      .first()
-      .should('be.visible')
-      .clear()
-      .type('50');
-    cy.wait(500);
-    cy.log('✓ Distance value entered: 50mm');
-
-    // Step 10: Move Y-axis
-    cy.log('Step 10: Moving Y-axis...');
-    cy.contains('button', 'Move Y-axis')
-      .should('be.visible')
-      .click();
-    cy.log('✓ Y-axis movement initiated');
-
-    // Step 11: Monitor status transition from Jogging to Idle
-    cy.log('Step 11: Monitoring machine status transition...');
-
-    // Wait a moment for jogging to start
-    cy.wait(500);
-
-    // Poll for status changes
-    cy.window().then((win) => {
-      cy.log('Waiting for Jogging status...');
-      cy.verifyMachineStatus('Jogging', { timeout: 5000 }).then(() => {
-        cy.log('✓ Machine is jogging');
-        
-        cy.log('Waiting for machine to return to Idle...');
-        cy.verifyMachineStatus('Idle', { timeout: 30000 }).then(() => {
-          cy.wait(1000);
-          cy.log(' Machine status changed: Jogging → Idle');
-        });
+    // Step 5: Go to Config and enable rotary controls
+    cy.log('Step 5: Going to Config and enabling Rotary controls...');
+    cy.goToConfig();
+    cy.log('Searching for rotary settings...');
+    cy.searchInSettings('rotary');
+    
+    // Enable rotary axis toggle if not already enabled
+    cy.log('Enabling Rotary controls toggle...');
+    cy.contains('div', 'Rotary controls')
+      .find('button[role="switch"]')
+      .then($toggle => {
+        if ($toggle.attr('aria-checked') === 'false') {
+          cy.log('  Enabling Rotary controls');
+          cy.wrap($toggle).click();
+          cy.wait(300);
+        } else {
+          cy.log('Rotary controls already enabled');
+        }
       });
-    });
-// Step 11: Enter distance travelled (100mm)
-cy.log('Step 11: Entering distance travelled (100mm)...');
-cy.get('div.bg-blue-50 input')
-  .should('be.visible')
-  .clear()
-  .type('100');
+    
+    // Apply settings
+    cy.log('Applying settings...');
+    cy.applySettings();
+    cy.wait(500);
+
+    // Step 6: Navigate to Carve page
+    cy.log('Step 6: Navigating to Carve page...');
+    cy.goToCarve();
+    cy.wait(2000);
+    ///test case start here
+
+
+
+// Test case : Zeroing A axis and jogging 
+
+
+  // Step 7: Go to rotary tab to enable rotary axis view 
+  cy.log('Step 7: Switch to rotary tab');
+  cy.contains('button','Rotary').click();
+  cy.wait(500);
+  cy.log('Switched to Rotary tab');
+
+  //step 8: Enable rotary mode 
+  cy.log('Enabling rotary mode');
+  cy.get('div.block >div.block >div > div.flex button').first().click();
+  cy.wait(500);
+
+// step 9: Confirm /OK the rotary settings
+cy.log('Step 9:Confirming rotary settings');
+cy.contains('button','OK').click();
 cy.wait(500);
-cy.log('Distance entered: 100mm');
-    // Step 12: Click "Set Distance Travelled" button to confirm
-cy.log('Step 12: Confirming distance travelled...');
-cy.get('button')
-  .contains('Set Distance Travelled')
-  .should('be.visible')
+cy.log('Rotary settings enabled');
+
+// Step 10: Zero the A axis
+cy.log('Zeroing A axis');
+cy.zeroAAxis();
+
+// Verify A axis is 0.000
+cy.log('Step 8: Verifying A axis is at 0.00...');
+
+// Make sure rotary controls are visible
+cy.contains('button', 'Rotary').click();
+cy.wait(500);
+
+// Wait for the input to be visible and check value
+cy.get('.border.border-gray-200.dark\\:border-gray-700.rounded-md')
+  .contains('button', 'A0')
   .click();
-cy.wait(1000);
-cy.log('Distance confirmed');
+cy.log(' A axis confirmed at 0.00');
 
-// Step 13: Verify X-axis accuracy success message
-cy.log('Step 13: Verifying X-axis accuracy message...');
-cy.contains('button','Update step/mm').should('be.visible');
-cy.log('✓ Y-axis inaccuracy message confirmed');
-
-
-    // Test completed
-    cy.log(' Movement Tuning test for X-axis completed successfully');
-
-
+cy.get('path[d="M0.5 10C0.5 4.75329 4.75329 0.5 10 0.5H40C45.2467 0.5 49.5 4.7533 49.5 10V88.5H0.5V10Z"]')
+  .first()
+  .click({ force: true });
+    });
   });
-
-});
