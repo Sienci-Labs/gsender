@@ -1,0 +1,8 @@
+[
+ {
+  "name": "Jog Y axis plus and minus ",
+  "content": "$J=G21 G91 Y10 F6000\n$J=G21 G91 Y-10 F6000\n$$",
+  "description": "TEST DATA FOR ADDING MACROS",
+  "id": "097c7eb7-3f8a-492b-9ea6-c124360fad9e"
+ }
+]
