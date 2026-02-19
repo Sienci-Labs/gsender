@@ -675,11 +675,6 @@ class GrblHalController {
         });
 
         this.runner.on('status', (res) => {
-            if (!this.runner.hasSettings() && res.activeState === GRBL_HAL_ACTIVE_STATE_IDLE) {
-                this.initialized = true;
-                this.initController();
-            }
-
             // Make sure we also have axs parsed - at most two times or we get endless loop
             if (!this.runner.hasAXS() && res.activeState === GRBL_HAL_ACTIVE_STATE_IDLE && this.actionMask.axsReportCount < 2) {
                 this.writeln('$I');
@@ -988,7 +983,7 @@ class GrblHalController {
             this.emit('grblHal:info', res);
         });
 
-        this.runner.on('startup', async (res, semver) => {
+        this.runner.on('startup', (res, semver) => {
             this.emit('serialport:read', res.raw);
 
             // The startup message always prints upon startup, after a reset, or at program end.
@@ -1003,26 +998,7 @@ class GrblHalController {
 
             if (!this.initialized) {
                 this.initialized = true;
-
-                // Initialize controller
-                this.initController();
-            }
-
-            await delay(500);
-            this.connection.write('$ES\n$ESH\n$EG\n$EA\n$EE\n$#\n');
-            await delay(25);
-
-            const hasSD = _.get(this.state, 'status.sdCard', null);
-
-            if (hasSD && !this.actionMask.accessoryState.SD) {
-                this.connection.write('$FM\n$F\n');
-                this.actionMask.accessoryState.SD = true;
-            }
-
-            if (semver >= 20231210) { // TODO: Verify that this version is valid for SLB as well
-                this.connection.writeln('$spindlesh');
-            } else {
-                this.connection.writeln('$spindles');
+                this.initController(semver);
             }
         });
 
@@ -1288,14 +1264,56 @@ class GrblHalController {
         });
     }
 
-    async initController() {
-        // $13=0 (report in mm)
-        // $13=1 (report in inches)
-        this.writeln('$$');
-        await delay(50);
-        this.writeln('$I');
-        await delay(50);
+    async initController(semver) {
+        const hasSD = _.get(this.state, 'status.sdCard', null);
+
+        // Startup command sequence. Each step runs in order if enabled.
+        // To add future startup behaviour, append a new step object.
+        // Shape: { name: string, enabled: boolean, commands: string[], onRun?: () => void }
+        const startupSequence = [
+            {
+                name: 'settings',
+                enabled: true,
+                commands: ['$$'],
+            },
+            {
+                name: 'extendedInfo',
+                enabled: true,
+                commands: ['$ES', '$ESH', '$EG', '$EA', '$EE', '$#'],
+            },
+            {
+                name: 'sdCard',
+                enabled: !!(hasSD && !this.actionMask.accessoryState.SD),
+                commands: ['$FM', '$F'],
+                onRun: () => { this.actionMask.accessoryState.SD = true; },
+            },
+            {
+                // TODO: Verify that semver 20231210 is valid for SLB as well
+                name: 'spindles',
+                enabled: true,
+                commands: [semver >= 20231210 ? '$spindlesh' : '$spindles'],
+            },
+        ];
+
+        await delay(500);
+
+        for (const step of startupSequence) {
+            if (!step.enabled) {
+                continue;
+            }
+            this.connection.write(step.commands.join('\n') + '\n');
+            if (step.onRun) {
+                step.onRun();
+            }
+            await delay(25);
+        }
+
         this.event.trigger(CONTROLLER_READY);
+
+        // Send \x87 as a raw realtime byte at the end of startup
+        if (this.connection) {
+            this.connection.write(Buffer.from([0x87]));
+        }
     }
 
     populateContext(context = {}) {
@@ -1477,6 +1495,9 @@ class GrblHalController {
 
         // Nothing else here matters if connecting to existing instantiated controller
         if (refresh) {
+            console.log('RESTORED');
+            this.initialized = true;
+            this.initController(this.runner.settings?.version?.semver);
             return;
         }
 
@@ -1485,52 +1506,10 @@ class GrblHalController {
         // Clear action values
         this.clearActionValues();
 
-        // We need to query version after waiting for connection, so wait 0.5 seconds and query $I
-        // We set controller ready if version found
-        setTimeout(async () => {
+        // Send $I to query firmware version; the startup event handler will take it from here
+        setTimeout(() => {
             if (this.connection) {
-                this.connection.writeln('\x87');
-                await delay(100);
                 this.write('$I\n');
-            }
-            if (!refresh) {
-                let counter = 3;
-                const interval = setInterval(() => {
-                    // check if 3 tries or controller is ready
-                    if (this.ready) {
-                        clearInterval(interval);
-                        return;
-                    } else if (counter <= 0) {
-                        clearInterval(interval);
-                        // The startup message always prints upon startup, after a reset, or at program end.
-                        // Setting the initial state when Grbl has completed re-initializing all systems.
-                        this.clearActionValues();
-
-                        // Set ready flag to true when a startup message has arrived
-                        this.ready = true;
-
-                        // Rewind any files in the sender
-                        this.workflow && this.workflow.stop();
-
-                        if (!this.initialized) {
-                            this.initialized = true;
-
-                            // Initialize controller
-                            this.initController();
-                        }
-
-                        this.connection.writeImmediate('$ES\n$ESH\n$EG\n$EA\n$EE\n$spindles\n');
-                        return;
-                    }
-                    if (this.connection) {
-                        // this.write('$I\n');
-                        this.write('\x18');
-                    }
-                    counter--;
-                }, 3000);
-            } else {
-                this.initialized = true;
-                this.initController();
             }
         }, 500);
     }
