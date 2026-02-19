@@ -1270,7 +1270,6 @@ class GrblHalController {
     }
 
     async initController(semver) {
-
         console.log('Semver is: ', semver);
         const hasSD = _.get(this.state, 'status.sdCard', null);
 
@@ -1308,10 +1307,12 @@ class GrblHalController {
             if (!step.enabled) {
                 continue;
             }
+            log.info(`Running startup sequence step: ${step.name}`);
             this.connection.write(step.commands.join('\n') + '\n');
             if (step.onRun) {
                 step.onRun();
             }
+            // eslint-disable-next-line no-await-in-loop
             await delay(25);
         }
 
