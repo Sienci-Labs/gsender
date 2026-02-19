@@ -205,7 +205,7 @@ class Connection extends EventEmitter {
                         clearInterval(this.timeout);
                         return;
                     }
-                    this.connection.writeImmediate('\x18');
+                    //this.connection.writeImmediate('\x18');
                     this.count++;
                 }, 800);
             }
