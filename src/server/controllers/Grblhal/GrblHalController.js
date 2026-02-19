@@ -1270,7 +1270,6 @@ class GrblHalController {
     }
 
     async initController(semver) {
-        console.log('Semver is: ', semver);
         const hasSD = _.get(this.state, 'status.sdCard', null);
 
         // Startup command sequence. Each step runs in order if enabled.
