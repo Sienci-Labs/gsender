@@ -246,7 +246,10 @@ class GrblHalController {
         this.connection = connection;
 
         this.connection.setWriteFilter((data) => {
-            const line = data.trim();
+            let line;
+            if (!Buffer.isBuffer(data)) {
+                line = data.trim();
+            }
 
             if (!line) {
                 return data;
@@ -996,7 +999,9 @@ class GrblHalController {
             // Rewind any files in the sender
             this.workflow.stop();
 
-            if (!this.initialized) {
+            // Only initialize when we have a firmware version (triggered by $I / [VER:] response).
+            // The bare startup greeting fires without semver and should not trigger startup commands.
+            if (!this.initialized && semver !== undefined) {
                 this.initialized = true;
                 this.initController(semver);
             }
@@ -1265,6 +1270,8 @@ class GrblHalController {
     }
 
     async initController(semver) {
+
+        console.log('Semver is: ', semver);
         const hasSD = _.get(this.state, 'status.sdCard', null);
 
         // Startup command sequence. Each step runs in order if enabled.
