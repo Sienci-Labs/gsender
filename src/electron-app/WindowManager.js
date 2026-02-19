@@ -22,186 +22,187 @@
  */
 
 /* eslint import/no-unresolved: 0 */
-import { app, BrowserWindow, dialog, ipcMain, shell, nativeImage } from "electron";
-import path from "path";
+import { app, BrowserWindow, dialog, ipcMain, shell, nativeImage } from 'electron';
+import path from 'path';
 
-const remoteMain = require("@electron/remote/main");
+const remoteMain = require('@electron/remote/main');
 
 class WindowManager {
-  windows = [];
+    windows = [];
 
-  childWindows = [];
+    childWindows = [];
 
-  title = "";
+    title = '';
 
-  url = "";
+    url = '';
 
-  width = 0;
+    width = 0;
 
-  height = 0;
+    height = 0;
 
-  shouldPromptExit = false;
+    shouldPromptExit = false;
 
-  constructor() {
-    // https://github.com/electron/electron/blob/master/docs/api/app.md#event-activate-os-x
-    // Emitted when the application is activated, which usually happens
-    // when the user clicks on the application's dock icon.
-    app.on("activate", (e) => {
-      const window = this.getWindow();
-      if (!window) {
-        this.openWindow(this.url, {
-          title: this.title,
-          width: this.width || 500,
-          height: this.height || 400,
-          minWidth: 1024,
-          minHeight: 768,
+    constructor() {
+        // https://github.com/electron/electron/blob/master/docs/api/app.md#event-activate-os-x
+        // Emitted when the application is activated, which usually happens
+        // when the user clicks on the application's dock icon.
+        app.on('activate', (e) => {
+            const window = this.getWindow();
+            if (!window) {
+                this.openWindow(this.url, {
+                    title: this.title,
+                    width: this.width || 500,
+                    height: this.height || 400,
+                    minWidth: 1024,
+                    minHeight: 768,
+                });
+            }
         });
-      }
-    });
 
-    // https://github.com/electron/electron/blob/master/docs/api/app.md#event-window-all-closed
-    // Emitted when all windows have been closed.
-    // This event is only emitted when the application is not going to quit.
-    // If the user pressed Cmd + Q, or the developer called app.quit(), Electron
-    // will first try to close all the windows and then emit the will-quit event,
-    // and in this case the window-all-closed event would not be emitted.
-    app.on("window-all-closed", () => {
-      // On OS X it is common for applications and their menu bar
-      // to stay active until the user quits explicitly with Cmd + Q
-      if (process.platform === "darwin") {
-        const window = this.getWindow();
-        if (window) {
-          // Remember current window attributes that will be used for the next 'activate' event
-          this.title = window.title;
-          this.url = window.webContents.getURL();
+        // https://github.com/electron/electron/blob/master/docs/api/app.md#event-window-all-closed
+        // Emitted when all windows have been closed.
+        // This event is only emitted when the application is not going to quit.
+        // If the user pressed Cmd + Q, or the developer called app.quit(), Electron
+        // will first try to close all the windows and then emit the will-quit event,
+        // and in this case the window-all-closed event would not be emitted.
+        app.on('window-all-closed', () => {
+            // On OS X it is common for applications and their menu bar
+            // to stay active until the user quits explicitly with Cmd + Q
+            if (process.platform === 'darwin') {
+                const window = this.getWindow();
+                if (window) {
+                    // Remember current window attributes that will be used for the next 'activate' event
+                    this.title = window.title;
+                    this.url = window.webContents.getURL();
 
-          const [width, height] = window.getSize();
-          this.width = width;
-          this.height = height;
-        }
-      }
+                    const [width, height] = window.getSize();
+                    this.width = width;
+                    this.height = height;
+                }
+            }
 
-      app.quit();
-    });
-  }
-
-  async openWindow(
-    url,
-    options,
-    splashScreen,
-    shouldMaximize = true,
-    isChild = false /*, data = null*/,
-  ) {
-    const window = new BrowserWindow({
-      ...options,
-      show: false,
-      webPreferences: {
-        nodeIntegration: true,
-        enableRemoteModule: true,
-        sandbox: false,
-        contextIsolation: false,
-        preload: path.join(__dirname, "preload.js"),
-      },
-    });
-    const webContents = window.webContents;
-    // Enable remote API
-    remoteMain.enable(window.webContents);
-    //window.removeMenu();
-    window.webContents.once("did-finish-load", () => {
-      window.setTitle(options.title);
-    });
-
-    window.on('close', (e) => {
-      if (this.shouldPromptExit) {
-        const image = nativeImage.createFromPath('../app/images/favicon.png');
-        const options = {
-            type: 'question',
-            buttons: ['No', 'Yes'],
-            message: 'Exit gSender',
-            detail: 'Are you sure you want to exit?',
-            icon: image,
-        };
-        const response = dialog.showMessageBoxSync(null, options);
-        if (response === 0) {
-          e.preventDefault();
-        }
-      }
-    });
-
-    window.on("closed", (event) => {
-      const index = this.windows.indexOf(event.sender);
-      console.assert(index >= 0);
-      this.windows.splice(index, 1);
-    });
-
-    ipcMain.on("assignPromptExit", (_msg, promptExit) => {
-      this.shouldPromptExit = promptExit;
-    })
-
-    window.on("maximize", (event) => {
-      window.webContents.send("maximize-window");
-    });
-
-    // Open every external link in a new window
-    // https://github.com/electron/electron/blob/master/docs/api/web-contents.md
-    webContents.on("new-window", (event, url) => {
-      event.preventDefault();
-      shell.openExternal(url);
-    });
-
-    if (splashScreen) {
-      webContents.once("dom-ready", () => {
-        if (shouldMaximize) {
-          window.maximize();
-        }
-        window.show();
-        splashScreen.close();
-        splashScreen.destroy();
-      });
-    } else {
-      if (shouldMaximize) {
-        window.maximize();
-      }
-      window.show();
+            app.quit();
+        });
     }
 
-    // Call `ses.setProxy` to ignore proxy settings
-    // http://electron.atom.io/docs/latest/api/session/#sessetproxyconfig-callback
-    const ses = webContents.session;
-    ses.setProxy({ proxyRules: "direct://" }).then(() => {
-      window.loadURL(url);
-    });
+    async openWindow(
+        url,
+        options,
+        splashScreen,
+        shouldMaximize = true,
+        isChild = false /*, data = null*/,
+    ) {
+        const window = new BrowserWindow({
+            ...options,
+            show: false,
+            autoHideMenuBar: true,
+            webPreferences: {
+                nodeIntegration: true,
+                enableRemoteModule: true,
+                contextIsolation: false,
+                preload: path.join(__dirname, 'preload.js'),
+            },
+        });
+        const webContents = window.webContents;
+        // Enable remote API
+        remoteMain.enable(window.webContents);
+        //window.removeMenu();
+        window.webContents.once('did-finish-load', () => {
+            window.setTitle(options.title);
+        });
 
-    await ses.clearCache();
+        window.on('close', (e) => {
+            if (this.shouldPromptExit) {
+                const image = nativeImage.createFromPath('../app/images/favicon.png');
+                const options = {
+                    type: 'question',
+                    buttons: ['No', 'Yes'],
+                    message: 'Exit gSender',
+                    detail: 'Are you sure you want to exit?',
+                    icon: image,
+                };
+                const response = dialog.showMessageBoxSync(null, options);
+                if (response === 0) {
+                    e.preventDefault();
+                }
+            }
+        });
 
-    if (isChild) {
-      window.on("close", (e) => {
-        e.preventDefault();
-        window.hide();
-      });
-      window.key = this.childWindows.length;
-      this.childWindows.push(window);
-    } else {
-      this.windows.push(window);
+        window.on('closed', (event) => {
+            const index = this.windows.indexOf(event.sender);
+            console.assert(index >= 0);
+            this.windows.splice(index, 1);
+        });
+
+        ipcMain.on('assignPromptExit', (_msg, promptExit) => {
+            this.shouldPromptExit = promptExit;
+        });
+
+        window.on('maximize', (event) => {
+            window.webContents.send('maximize-window');
+        });
+
+        // Open every external link in a new window
+        // https://github.com/electron/electron/blob/master/docs/api/web-contents.md
+        webContents.on('new-window', (event, url) => {
+            event.preventDefault();
+            shell.openExternal(url);
+        });
+
+        if (splashScreen) {
+            webContents.once('dom-ready', () => {
+                if (shouldMaximize) {
+                    window.maximize();
+                }
+                window.show();
+                splashScreen.close();
+                splashScreen.destroy();
+            });
+        } else {
+            if (shouldMaximize) {
+                window.maximize();
+            }
+            window.show();
+        }
+
+        // Call `ses.setProxy` to ignore proxy settings
+        // http://electron.atom.io/docs/latest/api/session/#sessetproxyconfig-callback
+        const ses = webContents.session;
+        ses.setProxy({ proxyRules: 'direct://' })
+            .then(() => {
+                window.loadURL(url);
+            });
+
+        await ses.clearCache();
+
+        if (isChild) {
+            window.on('close', (e) => {
+                e.preventDefault();
+                window.hide();
+            });
+            window.key = this.childWindows.length;
+            this.childWindows.push(window);
+        } else {
+            this.windows.push(window);
+        }
+
+        return window;
     }
 
-    return window;
-  }
+    createSplashScreen(options) {
+        const splashScreen = new BrowserWindow({
+            ...options,
+        });
 
-  createSplashScreen(options) {
-    const splashScreen = new BrowserWindow({
-      ...options,
-    });
-
-    return splashScreen;
-  }
-
-  getWindow(index = 0) {
-    if (this.windows.length === 0) {
-      return null;
+        return splashScreen;
     }
-    return this.windows[index] || null;
-  }
+
+    getWindow(index = 0) {
+        if (this.windows.length === 0) {
+            return null;
+        }
+        return this.windows[index] || null;
+    }
 }
 
 export default WindowManager;

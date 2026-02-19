@@ -25,6 +25,7 @@ import React, { useState } from 'react';
 import { PiFileZipFill } from 'react-icons/pi';
 import isEmpty from 'lodash/isEmpty';
 import get from 'lodash/get';
+import { resolveGrblCoreDefaults } from 'app/features/Config/utils/grblCoreMigration.ts';
 import partition from 'lodash/partition';
 import uniqueId from 'lodash/uniqueId';
 import isEqual from 'lodash/isEqual';
@@ -434,10 +435,18 @@ const isEEPROMValueDifferent = (
     machineProfile: MachineProfile,
     controllerType: string,
 ): boolean => {
+    const firmwareSemver = get(
+        reduxStore.getState(),
+        'controller.settings.version.semver',
+        undefined,
+    );
     const profileDefaults =
         controllerType === 'Grbl'
             ? machineProfile.eepromSettings
-            : machineProfile.grblHALeepromSettings;
+            : resolveGrblCoreDefaults({
+                  firmwareSemver,
+                  baseDefaults: machineProfile.grblHALeepromSettings || {},
+              }).defaults;
 
     if (!profileDefaults) {
         return false;
@@ -470,10 +479,18 @@ const createTableRows = (
             controllerType,
         );
 
+        const firmwareSemver = get(
+            reduxStore.getState(),
+            'controller.settings.version.semver',
+            undefined,
+        );
         const profileDefaults =
             controllerType === 'Grbl'
                 ? machineProfile.eepromSettings
-                : machineProfile.grblHALeepromSettings;
+                : resolveGrblCoreDefaults({
+                      firmwareSemver,
+                      baseDefaults: machineProfile.grblHALeepromSettings || {},
+                  }).defaults;
         const defaultValue = get(profileDefaults, key, '-');
 
         const rowStyle =
@@ -568,13 +585,13 @@ function generateSupportFile() {
     const workspaceUnits = getWorkspaceUnits();
     const isRotaryMode = getRotaryMode();
     const safeHeight = getSafeHeight();
+    const isConnected = connection.isConnected;
     let fileStart = {};
     let filePause = {};
     let fileResume = {};
     let fileStop = {};
 
     getEvents().then((events) => {
-        console.log(events);
         if (events) {
             fileStart = events['gcode:start'];
             filePause = events['gcode:pause'];
@@ -653,9 +670,11 @@ function generateSupportFile() {
                                     : styles.statusDisabled,
                             ]}
                         >
-                            {Number(eeprom.$22) % 2 === 1
-                                ? 'Enabled'
-                                : 'Disabled'}
+                            {isConnected
+                                ? Number(eeprom.$22) % 2 === 1
+                                    ? 'Enabled'
+                                    : 'Disabled'
+                                : 'Not Connected'}
                         </Text>
 
                         <Text style={styles.textBold}>Soft Limits:</Text>
@@ -667,12 +686,23 @@ function generateSupportFile() {
                                     : styles.statusDisabled,
                             ]}
                         >
-                            {eeprom.$20 === '1' ? 'Enabled' : 'Disabled'}
+                            {isConnected
+                                ? eeprom.$20 === '1'
+                                    ? 'Enabled'
+                                    : 'Disabled'
+                                : 'Not Connected'}
                         </Text>
 
                         <Text style={styles.textBold}>Home Location:</Text>
-                        <Text style={styles.text}>
-                            {homingString(eeprom.$23 as string)}
+                        <Text
+                            style={[
+                                styles.text,
+                                !isConnected && styles.statusDisabled,
+                            ]}
+                        >
+                            {isConnected
+                                ? homingString(eeprom.$23 as string)
+                                : 'Not Connected'}
                         </Text>
 
                         <Text style={styles.textBold}>Report Inches:</Text>
@@ -684,19 +714,29 @@ function generateSupportFile() {
                                     : styles.statusDisabled,
                             ]}
                         >
-                            {eeprom.$13 === '1' ? 'Enabled' : 'Disabled'}
+                            {isConnected
+                                ? eeprom.$13 === '1'
+                                    ? 'Enabled'
+                                    : 'Disabled'
+                                : 'Not Connected'}
                         </Text>
 
                         <Text style={styles.textBold}>Stepper Motors:</Text>
                         <Text
                             style={[
                                 styles.text,
-                                eeprom.$1 === '255'
-                                    ? styles.statusWarning
-                                    : styles.statusEnabled,
+                                isConnected
+                                    ? eeprom.$1 === '255'
+                                        ? styles.statusWarning
+                                        : styles.statusEnabled
+                                    : styles.statusDisabled,
                             ]}
                         >
-                            {eeprom.$1 === '255' ? 'Locked' : 'Unlocked'}
+                            {isConnected
+                                ? eeprom.$1 === '255'
+                                    ? 'Locked'
+                                    : 'Unlocked'
+                                : 'Not Connected'}
                         </Text>
                     </View>
 
@@ -747,12 +787,18 @@ function generateSupportFile() {
                                 <Text
                                     style={[
                                         styles.text,
-                                        machineProfile.spindle
+                                        store.get(
+                                            'workspace.spindleFunctions',
+                                            false,
+                                        )
                                             ? styles.statusEnabled
                                             : styles.statusDisabled,
                                     ]}
                                 >
-                                    {machineProfile.spindle
+                                    {store.get(
+                                        'workspace.spindleFunctions',
+                                        false,
+                                    )
                                         ? 'Available'
                                         : 'Not Available'}
                                 </Text>
@@ -866,41 +912,55 @@ function generateSupportFile() {
                         <Text id="controller-status" style={styles.subtitle}>
                             Controller Status
                         </Text>
-                        <Text style={styles.textBold}>Type:</Text>
-                        <Text style={styles.text}>
-                            {grblInfo.type || 'Unknown'}
-                        </Text>
+                        {isConnected ? (
+                            <>
+                                <Text style={styles.textBold}>Type:</Text>
+                                <Text style={styles.text}>
+                                    {grblInfo.type || 'Unknown'}
+                                </Text>
 
-                        <Text style={styles.textBold}>Firmware:</Text>
-                        <Text style={styles.text}>
-                            {grblInfo.settings.info?.BOARD || 'N/A'}
-                        </Text>
+                                <Text style={styles.textBold}>Firmware:</Text>
+                                <Text style={styles.text}>
+                                    {grblInfo.settings.info?.BOARD || 'N/A'}
+                                </Text>
 
-                        <Text style={styles.textBold}>Workflow State:</Text>
-                        <Text
-                            style={[
-                                styles.text,
-                                grblInfo.workflow.state === 'Idle'
-                                    ? styles.statusEnabled
-                                    : styles.statusWarning,
-                            ]}
-                        >
-                            {grblInfo.workflow.state}
-                        </Text>
+                                <Text style={styles.textBold}>
+                                    Workflow State:
+                                </Text>
+                                <Text
+                                    style={[
+                                        styles.text,
+                                        grblInfo.workflow.state === 'Idle'
+                                            ? styles.statusEnabled
+                                            : styles.statusWarning,
+                                    ]}
+                                >
+                                    {grblInfo.workflow.state}
+                                </Text>
 
-                        <Text style={styles.textBold}>Homing Status:</Text>
-                        <Text
-                            style={[
-                                styles.text,
-                                grblInfo.homingFlag
-                                    ? styles.statusEnabled
-                                    : styles.statusDisabled,
-                            ]}
-                        >
-                            {grblInfo.homingFlag ? 'Homed' : 'Not Homed'}
-                        </Text>
+                                <Text style={styles.textBold}>
+                                    Homing Status:
+                                </Text>
+                                <Text
+                                    style={[
+                                        styles.text,
+                                        grblInfo.homingFlag
+                                            ? styles.statusEnabled
+                                            : styles.statusDisabled,
+                                    ]}
+                                >
+                                    {grblInfo.homingFlag
+                                        ? 'Homed'
+                                        : 'Not Homed'}
+                                </Text>
+                            </>
+                        ) : (
+                            <Text style={[styles.text, styles.statusDisabled]}>
+                                Not Connected
+                            </Text>
+                        )}
 
-                        {!isEmpty(grblInfo.mpos) && (
+                        {isConnected && !isEmpty(grblInfo.mpos) && (
                             <>
                                 <Text style={styles.textBold}>
                                     Machine Position:
@@ -919,7 +979,7 @@ function generateSupportFile() {
                             </>
                         )}
 
-                        {!isEmpty(grblInfo.wpos) && (
+                        {isConnected && !isEmpty(grblInfo.wpos) && (
                             <>
                                 <Text style={styles.textBold}>
                                     Work Position:
@@ -995,15 +1055,26 @@ function generateSupportFile() {
                                     <Text style={styles.textBold}>
                                         Rotary Settings:
                                     </Text>
-                                    <Text style={styles.textSmall}>
-                                        Travel Resolution: Y={eeprom.$101}
-                                        {'\n'}
-                                        {grblInfo.type === GRBLHAL &&
-                                            `A=${eeprom.$103}\n`}
-                                        Max Rate: Y={eeprom.$111}
-                                        {grblInfo.type === GRBLHAL &&
-                                            `, A=${eeprom.$113}`}
-                                    </Text>
+                                    {isConnected ? (
+                                        <Text style={styles.textSmall}>
+                                            Travel Resolution: Y={eeprom.$101}
+                                            {'\n'}
+                                            {grblInfo.type === GRBLHAL &&
+                                                `A=${eeprom.$103}\n`}
+                                            Max Rate: Y={eeprom.$111}
+                                            {grblInfo.type === GRBLHAL &&
+                                                `, A=${eeprom.$113}`}
+                                        </Text>
+                                    ) : (
+                                        <Text
+                                            style={[
+                                                styles.text,
+                                                styles.statusDisabled,
+                                            ]}
+                                        >
+                                            Not Connected
+                                        </Text>
+                                    )}
                                 </>
                             )}
                         </View>
@@ -1212,28 +1283,39 @@ function generateSupportFile() {
                     <Text id="firmware" style={styles.subtitle}>
                         Firmware Settings
                     </Text>
-                    <View style={styles.table}>
-                        {/* TableHeader */}
-                        <View style={styles.tableHeader}>
-                            <View style={styles.tableCol}>
-                                <Text style={styles.tableCellHeader}>
-                                    Setting
-                                </Text>
+                    {isConnected ? (
+                        <View style={styles.table}>
+                            {/* TableHeader */}
+                            <View style={styles.tableHeader}>
+                                <View style={styles.tableCol}>
+                                    <Text style={styles.tableCellHeader}>
+                                        Setting
+                                    </Text>
+                                </View>
+                                <View style={styles.tableCol}>
+                                    <Text style={styles.tableCellHeader}>
+                                        Current Value
+                                    </Text>
+                                </View>
+                                <View style={styles.tableColLast}>
+                                    <Text style={styles.tableCellHeader}>
+                                        Default Value
+                                    </Text>
+                                </View>
                             </View>
-                            <View style={styles.tableCol}>
-                                <Text style={styles.tableCellHeader}>
-                                    Current Value
-                                </Text>
-                            </View>
-                            <View style={styles.tableColLast}>
-                                <Text style={styles.tableCellHeader}>
-                                    Default Value
-                                </Text>
-                            </View>
+                            {/* TableContent */}
+
+                            {createTableRows(
+                                eeprom,
+                                machineProfile,
+                                grblInfo.type,
+                            )}
                         </View>
-                        {/* TableContent */}
-                        {createTableRows(eeprom, machineProfile, grblInfo.type)}
-                    </View>
+                    ) : (
+                        <Text style={[styles.text, styles.statusDisabled]}>
+                            Not Connected
+                        </Text>
+                    )}
                 </View>
                 <View style={styles.section} break>
                     <Text id="alerts" style={styles.subtitle}>
@@ -1317,13 +1399,19 @@ function generateSupportFile() {
                     <Text id="terminal" style={styles.subtitle}>
                         Terminal History
                     </Text>
-                    <View style={styles.codeBlock}>
-                        <Text style={styles.codeBlockText}>
-                            {terminalHistory.length > 0
-                                ? terminalHistory.join('\n') // Show last 20 commands
-                                : 'No terminal history available'}
+                    {isConnected ? (
+                        <View style={styles.codeBlock}>
+                            <Text style={styles.codeBlockText}>
+                                {terminalHistory.length > 0
+                                    ? terminalHistory.join('\n') // Show last 20 commands
+                                    : 'No terminal history available'}
+                            </Text>
+                        </View>
+                    ) : (
+                        <Text style={[styles.text, styles.statusDisabled]}>
+                            Not Connected
                         </Text>
-                    </View>
+                    )}
                 </View>
 
                 <View style={styles.section}>

@@ -1619,6 +1619,22 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'eeprom',
                         eID: '$538',
                     },
+                    {
+                        label: 'Use A-axis for grbl',
+                        type: 'boolean',
+                        description:
+                            'Use the A-axis for grbl instead of the Y-axis (grbl only). This is useful for devices that support A-axis commands.',
+                        key: 'workspace.rotaryAxis.useAaxisForGrbl',
+                        onUpdate: () => {
+                            const useAaxisForGrbl = store.get(
+                                'workspace.rotaryAxis.useAaxisForGrbl',
+                                false,
+                            );
+                            controller.command('settings:updated', {
+                                useAaxisForGrbl,
+                            });
+                        },
+                    },
                 ],
             },
         ],

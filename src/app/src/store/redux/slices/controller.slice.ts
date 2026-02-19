@@ -160,11 +160,6 @@ const updateMachineLimitsFromEEPROM = ({
         height: zmax,
         width: xmax,
     };
-    machineProfile.in = {
-        depth: Number(mm2in(ymax).toFixed(2)),
-        height: Number(mm2in(zmax).toFixed(2)),
-        width: Number(mm2in(xmax).toFixed(2)),
-    };
     store.set('workspace.machineProfile', machineProfile);
     store.emit('dimensions');
 };
@@ -304,9 +299,13 @@ const controllerSlice = createSlice({
         },
         addSpindle: (state, action: PayloadAction<Spindle>) => {
             const otherSpindles = state.spindles.filter(
-                (spindle: Spindle) => spindle.label !== action.payload.label,
+                (spindle: Spindle) =>
+                    String(spindle.id) !== String(action.payload.id),
             );
             state.spindles = [...otherSpindles, action.payload];
+        },
+        clearSpindles: (state) => {
+            state.spindles = [];
         },
         updateControllerType: (
             state,
@@ -347,7 +346,6 @@ const controllerSlice = createSlice({
             state.sdcard.files = filteredFiles;
         },
         emptyAllSDFiles: (state) => {
-            console.log('emptying SD list');
             state.sdcard.files = [];
         },
     },
@@ -366,6 +364,7 @@ export const {
     updateSettingsDescriptions,
     updateAlarmDescriptions,
     addSpindle,
+    clearSpindles,
     updateControllerType,
     updateSDCardMountStatus,
     addSDCardFileToList,

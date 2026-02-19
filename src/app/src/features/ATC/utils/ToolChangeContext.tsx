@@ -73,6 +73,7 @@ export const ToolchangeProvider = ({ children }: { children: JSX.Element }) => {
     );
     const atc: string = get(settings, 'info.NEWOPT.ATC', '0');
     const reportedRackSize = Number(get(settings, 'atci.rack_size', -1));
+    console.log(reportedRackSize, ' RACK SIZE')
     const atcAvailable = atc === '1';
 
     useEffect(() => {
@@ -98,8 +99,10 @@ export const ToolchangeProvider = ({ children }: { children: JSX.Element }) => {
 
     useEffect(() => {
         if (reportedRackSize > 0) {
+            console.log('updating rack size to', reportedRackSize);
             setRackSize(reportedRackSize);
         } else {
+            console.log('not updating rack size', reportedRackSize);
             setRackSize(tools.length);
         }
     }, [reportedRackSize, tools]);

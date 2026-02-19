@@ -27,7 +27,6 @@ import {
     GCodeOptions,
     SigninOptions,
     StateOptions,
-    USER_DATA_COLLECTION_T,
     WatchOptions,
 } from './definitions';
 import { MachineProfile } from 'app/definitions/firmware';

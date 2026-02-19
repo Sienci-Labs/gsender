@@ -16,39 +16,218 @@ interface ParseLineResult {
     err?: boolean;
 }
 
+export interface FastLineScanScratch {
+    letters: string[];
+    values: string[];
+    count: number;
+    hasInvalidTokens: boolean;
+}
+
+const COMMENT_PARENS_RE = /\s*\([^\)]*\)/g;
+const COMMENT_SEMICOLON_RE = /\s*;.*/g;
+const WHITESPACE_RE = /\s+/g;
+const WORD_MATCH_RE =
+    /(%.*)|({.*)|((?:\$\$)|(?:\$[a-zA-Z0-9#]*))|([a-zA-Z][0-9\+\-\.]+)|(\*[0-9]+)/gim;
+
+const ALLOWED_WORD_LETTERS = new Set<string>([
+    'N',
+    'G',
+    'M',
+    'X',
+    'Y',
+    'Z',
+    'H',
+    'I',
+    'L',
+    'T',
+    'P',
+    'A',
+    'J',
+    'K',
+    'F',
+    'R',
+    'S',
+]);
+
+const isWhitespaceCode = (code: number): boolean =>
+    code === 32 || code === 9 || code === 10 || code === 13;
+
+const isAlphaCode = (code: number): boolean =>
+    (code >= 65 && code <= 90) || (code >= 97 && code <= 122);
+
+const isDigitCode = (code: number): boolean => code >= 48 && code <= 57;
+
+const isAlphaNumericHashCode = (code: number): boolean =>
+    isAlphaCode(code) || isDigitCode(code) || code === 35;
+
+const isSignedNumberCode = (code: number): boolean =>
+    isDigitCode(code) || code === 43 || code === 45 || code === 46;
+
+export const createFastLineScanScratch = (): FastLineScanScratch => ({
+    letters: [],
+    values: [],
+    count: 0,
+    hasInvalidTokens: false,
+});
+
+export const stripCommentsAndWhitespace = (line: string): string =>
+    line
+        .replace(COMMENT_PARENS_RE, '')
+        .replace(COMMENT_SEMICOLON_RE, '')
+        .replace(WHITESPACE_RE, '');
+
+export const scanLineFast = (
+    line: string,
+    scratch: FastLineScanScratch,
+): FastLineScanScratch => {
+    scratch.letters.length = 0;
+    scratch.values.length = 0;
+    scratch.count = 0;
+    scratch.hasInvalidTokens = false;
+
+    const length = line.length;
+    let i = 0;
+
+    while (i < length) {
+        const code = line.charCodeAt(i);
+
+        if (isWhitespaceCode(code)) {
+            i++;
+            continue;
+        }
+
+        // ; comment until end-of-line
+        if (code === 59) {
+            break;
+        }
+
+        // ( ... ) inline comment
+        if (code === 40) {
+            i++;
+            while (i < length && line.charCodeAt(i) !== 41) {
+                i++;
+            }
+            if (i < length && line.charCodeAt(i) === 41) {
+                i++;
+            }
+            continue;
+        }
+
+        const ch = line[i];
+
+        // % command (bCNC/CNCjs) - consume remainder
+        if (ch === '%') {
+            scratch.letters.push('%');
+            scratch.values.push(line.slice(i + 1).trim());
+            scratch.count += 1;
+            break;
+        }
+
+        // JSON command (TinyG/g2core) - consume remainder
+        if (ch === '{') {
+            scratch.letters.push('{');
+            scratch.values.push(line.slice(i + 1).trim());
+            scratch.count += 1;
+            break;
+        }
+
+        // $ command (Grbl)
+        if (ch === '$') {
+            let j = i + 1;
+            if (j < length && line[j] === '$') {
+                scratch.letters.push('$');
+                scratch.values.push('$');
+                scratch.count += 1;
+                i = j + 1;
+                continue;
+            }
+
+            while (j < length && isAlphaNumericHashCode(line.charCodeAt(j))) {
+                j++;
+            }
+
+            const value = line.slice(i + 1, j);
+            if (value.length === 0) {
+                scratch.hasInvalidTokens = true;
+                i++;
+                continue;
+            }
+
+            scratch.letters.push('$');
+            scratch.values.push(value);
+            scratch.count += 1;
+            i = j;
+            continue;
+        }
+
+        // checksum
+        if (ch === '*') {
+            let j = i + 1;
+            while (j < length && isDigitCode(line.charCodeAt(j))) {
+                j++;
+            }
+            if (j === i + 1) {
+                scratch.hasInvalidTokens = true;
+                i++;
+                continue;
+            }
+
+            scratch.letters.push('*');
+            scratch.values.push(line.slice(i + 1, j));
+            scratch.count += 1;
+            i = j;
+            continue;
+        }
+
+        if (isAlphaCode(code)) {
+            const letter = ch.toUpperCase();
+            let j = i + 1;
+            while (j < length && isSignedNumberCode(line.charCodeAt(j))) {
+                j++;
+            }
+
+            if (j === i + 1) {
+                scratch.hasInvalidTokens = true;
+                i++;
+                continue;
+            }
+
+            if (!ALLOWED_WORD_LETTERS.has(letter)) {
+                scratch.hasInvalidTokens = true;
+            }
+
+            scratch.letters.push(letter);
+            scratch.values.push(line.slice(i + 1, j));
+            scratch.count += 1;
+            i = j;
+            continue;
+        }
+
+        scratch.hasInvalidTokens = true;
+        i++;
+    }
+
+    return scratch;
+};
+
+const computeChecksum = (s: string): number => {
+    s = s || '';
+    if (s.lastIndexOf('*') >= 0) {
+        s = s.substr(0, s.lastIndexOf('*'));
+    }
+
+    let cs = 0;
+    for (let i = 0; i < s.length; ++i) {
+        const c = s[i].charCodeAt(0);
+        cs ^= c;
+    }
+    return cs;
+};
+
 export const parseLine = (
     line: string,
     options: ParseLineOptions = {},
 ): ParseLineResult => {
-    // http://reprap.org/wiki/G-code#Special_fields
-    // The checksum "cs" for a GCode string "cmd" (including its line number) is computed
-    // by exor-ing the bytes in the string up to and not including the * character.
-    const computeChecksum = (s: string): number => {
-        s = s || '';
-        if (s.lastIndexOf('*') >= 0) {
-            s = s.substr(0, s.lastIndexOf('*'));
-        }
-
-        let cs = 0;
-        for (let i = 0; i < s.length; ++i) {
-            const c = s[i].charCodeAt(0);
-            cs ^= c;
-        }
-        return cs;
-    };
-
-    // http://linuxcnc.org/docs/html/gcode/overview.html#gcode:comments
-    // Comments can be embedded in a line using parentheses () or for the remainder of a line using a semi-colon. The semi-colon is not treated as the start of a comment when enclosed in parentheses.
-    const stripComments = (line: string): string => {
-        const re1 = /\s*\([^\)]*\)/g; // Remove anything inside the parentheses
-        const re2 = /\s*;.*/g; // Remove anything after a semi-colon to the end of the line, including preceding spaces
-        const re3 = /\s+/g;
-        return line.replace(re1, '').replace(re2, '').replace(re3, '');
-    };
-
-    const re =
-        /(%.*)|({.*)|((?:\$\$)|(?:\$[a-zA-Z0-9#]*))|([a-zA-Z][0-9\+\-\.]+)|(\*[0-9]+)/gim;
-
     // options.flatten = !!options.flatten;
     options.noParseLine = !!options.noParseLine;
 
@@ -63,7 +242,8 @@ export const parseLine = (
 
     let ln: number | undefined; // Line number
     let cs: number | undefined; // Checksum
-    const words = stripComments(line).match(re) || [];
+    WORD_MATCH_RE.lastIndex = 0;
+    const words = stripCommentsAndWhitespace(line).match(WORD_MATCH_RE) || [];
 
     for (let i = 0; i < words.length; ++i) {
         const word = words[i];

@@ -46,7 +46,7 @@ export function AJog({
             <img
                 src={aLabels}
                 alt="a Labels tab"
-                className="absolute top-1 right-1 pointer-events-none w-full h-full object-contain"
+                className="absolute top-0 right-0 pointer-events-none w-full h-full object-contain"
             />
         </div>
     );

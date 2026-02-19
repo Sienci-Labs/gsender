@@ -1644,12 +1644,12 @@ class GrblHalController {
                 //const dwell = '%wait ; Wait for the planner to empty';
 
                 // add delay to spindle startup if enabled
-                const preferences = store.get('preferences', {});
-                const delay = _.get(preferences, 'spindleDelay', 0);
+                //const preferences = store.get('preferences', {});
+                /*const delay = _.get(preferences, 'spindleDelay', 0);
 
                 if (Number(delay)) {
                     gcode = gcode.replace(/\b(?:S\d* ?M[34]|M[34] ?S\d*)\b(?! ?G4 ?P?\b)/g, `$& G4 P${delay}`);
-                }
+                }*/
 
                 // Reset mappings on file load
                 this.toolChangeContext.mappings = {};

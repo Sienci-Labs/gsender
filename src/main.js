@@ -68,6 +68,9 @@ let windowManager = null;
 let hostInformation = {};
 let grblLog = log.create('grbl');
 let logPath;
+const externalRendererUrl = process.env.NODE_ENV === 'development'
+    ? process.env.ELECTRON_RENDERER_URL
+    : '';
 
 if (process.env.NODE_ENV === 'production') {
     Sentry.init({
@@ -151,40 +154,68 @@ const main = () => {
                 splashScreen.focus();
             });
 
-            let res;
-            try {
-                res = await launchServer();
-            } catch (error) {
-                if (error.message.includes('EADDR')) {
-                    dialog.showMessageBoxSync(null, {
-                        title: 'Error Connecting to Remote Address',
-                        message:
-              'There was an problem connecting to the remote address in gSender.',
-                        detail:
-              'Remote mode has been disabled. Please verify the configured IP address before restarting the application.',
-                    });
-                    app.relaunch();
-                    app.exit(-1);
-                } else {
-                    log.error(error);
+            let url = '';
+            let kiosk = false;
+
+            if (externalRendererUrl) {
+                url = externalRendererUrl;
+                try {
+                    const parsedUrl = new URL(url);
+                    hostInformation = {
+                        address: parsedUrl.hostname,
+                        port: Number(parsedUrl.port) || (parsedUrl.protocol === 'https:' ? 443 : 80),
+                    };
+                } catch (error) {
+                    hostInformation = {};
                 }
-            }
-
-            const { address, port, kiosk } = { ...res };
-            log.info(`Returned - http://${address}:${port}`);
-            hostInformation = {
-                address,
-                port,
-            };
-            if (!(address && port)) {
-                log.error(
-                    'Unable to start the server at ' +
-            chalk.cyan(`http://${address}:${port}`),
-                );
+                log.info(`Using external renderer URL in development: ${url}`);
+            } else if (process.env.NODE_ENV === 'development') {
+                const errorMessage = 'ELECTRON_RENDERER_URL is required in development mode';
+                log.error(errorMessage);
+                await dialog.showMessageBox({
+                    type: 'error',
+                    title: 'Development Startup Error',
+                    message: errorMessage,
+                });
+                app.exit(1);
                 return;
-            }
+            } else {
+                let res;
+                try {
+                    res = await launchServer();
+                } catch (error) {
+                    if (error.message.includes('EADDR')) {
+                        dialog.showMessageBoxSync(null, {
+                            title: 'Error Connecting to Remote Address',
+                            message:
+                  'There was an problem connecting to the remote address in gSender.',
+                            detail:
+                  'Remote mode has been disabled. Please verify the configured IP address before restarting the application.',
+                        });
+                        app.relaunch();
+                        app.exit(-1);
+                    } else {
+                        log.error(error);
+                    }
+                }
 
-            const url = `http://${address}:${port}`;
+                const { address, port, kiosk: resolvedKiosk } = { ...res };
+                kiosk = resolvedKiosk;
+                log.info(`Returned - http://${address}:${port}`);
+                hostInformation = {
+                    address,
+                    port,
+                };
+                if (!(address && port)) {
+                    log.error(
+                        'Unable to start the server at ' +
+                chalk.cyan(`http://${address}:${port}`),
+                    );
+                    return;
+                }
+
+                url = `http://${address}:${port}`;
+            }
             // The bounds is a rectangle object with the following properties:
             // * `x` Number - The x coordinate of the origin of the rectangle.
             // * `y` Number - The y coordinate of the origin of the rectangle.

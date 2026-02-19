@@ -40,11 +40,11 @@ export function ATC() {
                 setShow={setShowValidator}
                 payload={validationPayload}
             />
-            <div className="grid w-full h-full grid-cols-1 gap-4 lg:grid-cols-[3fr_2fr]">
-                <div className="flex h-full flex-col">
+            <div className="grid w-full h-full grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-2">
+                <div className="flex h-full min-w-0 flex-col">
                     <ToolDisplay />
                 </div>
-                <div className="flex h-full flex-col">
+                <div className="flex h-full min-w-0 flex-col">
                     <AdvancedOptions />
                 </div>
             </div>

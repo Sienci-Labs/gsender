@@ -8,6 +8,7 @@ import controller from 'app/lib/controller.ts';
 import pubsub from 'pubsub-js';
 import { EEPROM, FilteredEEPROM } from 'app/definitions/firmware';
 import { gSenderSetting, gSenderSettingsValues } from '../assets/SettingsMenu';
+import { State } from 'app/store/definitions';
 
 export function exportFirmwareSettings(settings: object) {
     const output = JSON.stringify(settings);
@@ -76,7 +77,30 @@ const onImportConfirm = (file: File) => {
         const reader = new FileReader();
         reader.readAsText(file, 'UTF-8');
         reader.onload = async (event) => {
-            await storeUpdate(event.target.result as string);
+            try {
+                const importData = JSON.parse(event.target.result as string);
+
+                // Validate the imported data
+                // check that the major properties exist
+                if (
+                    !importData.settings ||
+                    !importData.settings.workspace ||
+                    !importData.settings.widgets ||
+                    !importData.settings.commandKeys ||
+                    !importData.events
+                ) {
+                    throw new Error('Invalid gSender settings file format');
+                }
+                await storeUpdate(event.target.result as string);
+            } catch (error) {
+                console.error('Import error:', error);
+                toast.error(
+                    'Failed to import settings. Please check the file format.',
+                    {
+                        position: 'bottom-right',
+                    },
+                );
+            }
         };
         reader.onerror = () => {
             console.error('Unable to load settings to import');

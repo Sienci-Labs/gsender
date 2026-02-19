@@ -25,7 +25,6 @@ export function TLSPosition({ onComplete, onUncomplete }: StepProps) {
     const [position, setPosition] = useState({ x: '0', y: '0', z: '0' });
 
     const setTLSPosition = () => {
-        console.log('setting');
         controller.command(
             'gcode',
             `G21 G10 L2 P9 X${position.x} Y${position.y}`,

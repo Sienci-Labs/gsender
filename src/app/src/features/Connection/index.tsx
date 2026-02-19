@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import cn from 'classnames';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
@@ -16,6 +16,11 @@ import { DisconnectButton } from './components/DisconnectButton';
 import { Port } from './definitions';
 import WidgetConfig from '../WidgetConfig/WidgetConfig';
 import pubsub from 'pubsub-js';
+import {
+    Popover,
+    PopoverTrigger,
+    PopoverContent,
+} from 'app/components/shadcn/Popover';
 
 export enum ConnectionState {
     DISCONNECTED,
@@ -45,7 +50,6 @@ function Connection(props: ConnectionProps) {
     // Add listener for reconnect request
     useEffect(() => {
         pubsub.subscribe('reconnect', () => {
-            console.log('requesting reconnect');
             attemptAutoConnect(true);
         });
 
@@ -65,13 +69,16 @@ function Connection(props: ConnectionProps) {
 
     const [activePort, setActivePort] = useState('');
 
+    const [isOpen, setIsOpen] = useState(false);
+
+    const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const isHoveringRef = useRef(false);
+
     useEffect(() => {
         controller.addListener('serialport:close', () => {
             onControllerDisconnect();
         });
-    }, []);
 
-    useEffect(() => {
         const preferredFirmware = store.get(
             'widgets.connection.controller.type',
             'grbl',
@@ -81,11 +88,21 @@ function Connection(props: ConnectionProps) {
         refreshPorts();
 
         setTimeout(() => attemptAutoConnect(), 500);
+
+        return () => {
+            if (closeTimeoutRef.current) {
+                clearTimeout(closeTimeoutRef.current);
+            }
+        };
     }, []);
+
+    useEffect(() => {
+        setFirmware(props.reportedFirmware);
+    }, [props.reportedFirmware]);
 
     function handleConnect(port: string, type: ConnectionType) {
         if (!port) {
-            console.assert('Connect called with empty port');
+            console.error('Connect called with empty port');
         }
 
         const network = type === ConnectionType.ETHERNET;
@@ -161,59 +178,105 @@ function Connection(props: ConnectionProps) {
         handleConnect(port, ConnectionType.USB);
     }
 
-    useEffect(() => {
-        setFirmware(props.reportedFirmware);
-    }, [props.reportedFirmware]);
+    const handleMouseEnter = () => {
+        // Cancel any pending close timeout
+        if (closeTimeoutRef.current) {
+            clearTimeout(closeTimeoutRef.current);
+            closeTimeoutRef.current = null;
+        }
+        isHoveringRef.current = true;
+        setIsOpen(true);
+    };
+
+    const handleMouseLeave = () => {
+        // Debounce popover close - only set flag to false after delay
+        closeTimeoutRef.current = setTimeout(() => {
+            isHoveringRef.current = false;
+            setIsOpen(false);
+        }, 250);
+    };
+
+    const handleClick = () => {
+        setIsOpen((prev) => !prev);
+    };
 
     return (
-        <div
-            className="relative group cursor-pointer dropdown z-50"
-            onMouseEnter={refreshPortsOnParentEntry}
-        >
-            {connectionState !== ConnectionState.CONNECTED && (
-                <div
-                    className={cn(
-                        'absolute -inset-0.5 bg-gradient-to-r from-blue-300 to-blue-800 rounded-lg blur opacity-70 group-hover:opacity-100 transition duration-1000 group-hover:duration-200',
-                    )}
-                />
-            )}
-            <div className="h-12 max-xl:h-10 relative border border-gray-400 bg-gray-100 font-bold px-4 py-2 max-sm:p-1 ring-1 ring-gray-900/5 gap-4 justify-between items-center rounded-lg leading-none flex flex-row items-top portrait:min-w-[170px] portrait:max-sm:min-w-max min-w-[250px] max-xl:min-w-[180px] max-sm:min-w-0 dark:bg-dark text-black dark:text-white">
-                <ConnectionStateIndicator
-                    state={connectionState}
-                    type={connectionType}
-                />
-                {connectionState === ConnectionState.DISCONNECTED && (
-                    <span className="max-sm:hidden portrait:hidden animate-pulse">
-                        Connect to CNC
-                    </span>
-                )}
-                {connectionState === ConnectionState.DISCONNECTED && (
-                    <span className="max-sm:hidden landscape:hidden animate-pulse">
-                        Connect
-                    </span>
-                )}
-                {connectionState === ConnectionState.CONNECTING && (
-                    <span className="max-sm:hidden">Connecting...</span>
-                )}
-                {connectionState === ConnectionState.ERROR && (
-                    <span className="max-sm:hidden">Unable to connect.</span>
-                )}
-                {connectionState == ConnectionState.CONNECTED && (
-                    <ConnectionInfo port={activePort} firmwareType={firmware} />
-                )}
-                {(connectionState == ConnectionState.DISCONNECTED ||
-                    connectionState === ConnectionState.ERROR) && (
-                    <PortListings
-                        connectHandler={handleConnect}
-                        unrecognizedPorts={props.unrecognizedPorts}
-                        ports={props.ports}
+        <Popover open={isOpen} onOpenChange={setIsOpen}>
+            <div
+                className="relative group z-50"
+                onMouseEnter={() => {
+                    refreshPortsOnParentEntry();
+                    handleMouseEnter();
+                }}
+                onMouseLeave={handleMouseLeave}
+            >
+                {connectionState !== ConnectionState.CONNECTED && (
+                    <div
+                        className={cn(
+                            'absolute -inset-0.5 bg-gradient-to-r from-blue-300 to-blue-800 rounded-lg blur opacity-70 group-hover:opacity-100 transition duration-1000 group-hover:duration-200',
+                        )}
                     />
                 )}
-                {connectionState == ConnectionState.CONNECTED && (
-                    <DisconnectButton disconnectHandler={onDisconnectClick} />
+                <PopoverTrigger asChild>
+                    <button
+                        className="h-12 max-xl:h-10 relative border border-gray-400 bg-gray-100 font-bold px-4 py-2 max-sm:p-1 ring-1 ring-gray-900/5 gap-4 justify-between items-center rounded-lg leading-none flex flex-row items-top portrait:min-w-[170px] portrait:max-sm:min-w-max min-w-[250px] max-xl:min-w-[180px] max-sm:min-w-0 dark:bg-dark text-black dark:text-white cursor-pointer"
+                        onClick={handleClick}
+                    >
+                        <ConnectionStateIndicator
+                            state={connectionState}
+                            type={connectionType}
+                        />
+                        {connectionState === ConnectionState.DISCONNECTED && (
+                            <span className="max-sm:hidden portrait:hidden animate-pulse">
+                                Connect to CNC
+                            </span>
+                        )}
+                        {connectionState === ConnectionState.DISCONNECTED && (
+                            <span className="max-sm:hidden landscape:hidden animate-pulse">
+                                Connect
+                            </span>
+                        )}
+                        {connectionState === ConnectionState.CONNECTING && (
+                            <span className="max-sm:hidden">Connecting...</span>
+                        )}
+                        {connectionState === ConnectionState.ERROR && (
+                            <span className="max-sm:hidden">
+                                Unable to connect.
+                            </span>
+                        )}
+                        {connectionState == ConnectionState.CONNECTED && (
+                            <ConnectionInfo
+                                port={activePort}
+                                firmwareType={firmware}
+                            />
+                        )}
+                        {connectionState == ConnectionState.CONNECTED && (
+                            <DisconnectButton
+                                disconnectHandler={onDisconnectClick}
+                            />
+                        )}
+                    </button>
+                </PopoverTrigger>
+                {(connectionState == ConnectionState.DISCONNECTED ||
+                    connectionState === ConnectionState.ERROR) && (
+                    <PopoverContent
+                        align="start"
+                        sideOffset={0}
+                        className="w-auto p-0 min-w-[250px] mt-1"
+                        onOpenAutoFocus={(e) => e.preventDefault()}
+                    >
+                        <PortListings
+                            connectHandler={(port, type) => {
+                                handleConnect(port, type);
+                                setIsOpen(false);
+                            }}
+                            unrecognizedPorts={props.unrecognizedPorts}
+                            ports={props.ports}
+                        />
+                    </PopoverContent>
                 )}
             </div>
-        </div>
+        </Popover>
     );
 }
 

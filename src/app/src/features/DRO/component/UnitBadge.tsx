@@ -23,16 +23,21 @@ export function UnitBadge({ isRemote }: Props) {
     const handleUnitSwap = () => {
         store.set('workspace.units', localUnits);
     };
+
+    const unitLabel = units == METRIC_UNITS ? 'mm' : "Inch";
     return (
         <>
             <div
                 onPointerUp={isRemote ? () => setShowPopup(true) : () => {}}
-                className="z-10 absolute -top-2 -left-1 max-xl:-top-1 max-xl:-left-1 px-2 max-xl:px-1 py-1.5 max-xl:py-1 text-xs font-semibold text-gray-600 bg-gray-300 rounded-tl items-center text-center rounded-br-lg  dark:bg-gray-700 dark:text-gray-400"
+                className="z-10 absolute -top-2 -left-1 max-xl:top-0 max-xl:-left-1 px-2 max-xl:px-1 py-1.5 max-xl:py-1 text-xs font-semibold text-gray-600 bg-gray-300 rounded-tl items-center text-center rounded-br-lg  dark:bg-gray-700 dark:text-gray-400"
             >
-                <span>
+                <div className="max-xl:hidden">
                     Units:
                     <br /> {units}
-                </span>
+                </div>
+                <div className={"max-xl:block hidden px-1 py-1.5"}>
+                    {unitLabel}
+                </div>
             </div>
             <Dialog
                 open={showPopup}

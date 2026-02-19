@@ -425,7 +425,7 @@ function DRO({
                     homingEnabled={homingEnabled}
                 />
             </div>
-            <div className="w-full flex flex-row justify-between px-3">
+            <div className="w-full flex flex-row justify-between px-3 max-xl:px-5 max-xl:-mt-[4px] max-xl:-mb-[4px]">
                 <Label>{homingMode ? 'Home' : 'Zero'}</Label>
                 <Label>Go</Label>
             </div>

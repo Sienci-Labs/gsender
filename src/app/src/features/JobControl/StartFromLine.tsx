@@ -181,7 +181,6 @@ const StartFromLine = ({
                                     }}
                                     min={1}
                                     max={lineTotal}
-                                    className="w-20"
                                 />
                             </div>
                         </div>
@@ -210,7 +209,7 @@ const StartFromLine = ({
                                                     ),
                                                 }));
                                             }}
-                                            className="w-20"
+                                            suffix={units}
                                         />
                                     </>
                                 </Tooltip>
@@ -222,7 +221,7 @@ const StartFromLine = ({
                         <div className="mb-4">
                             <p className="text-[#E2943B]">
                                 Calculates all your CNC movements, attributes,
-                                and gS automations to pick up right where you
+                                and gSender automations to pick up right where you
                                 left off.
                             </p>
                         </div>

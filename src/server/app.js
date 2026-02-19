@@ -472,7 +472,9 @@ const appMain = () => {
     }
 
     const { viteServer } = require('./vite-server');
-    viteServer(app);
+    viteServer(app).catch((err) => {
+        log.error('Failed to initialize vite server:', err);
+    });
 
     return app;
 };

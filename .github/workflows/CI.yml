@@ -13,69 +13,27 @@ on:
   pull_request:
     branches: [ "master" ]
 
+env:
+  GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
+  NODE_OPTIONS: --max-old-space-size=8192
+
 jobs:
   build-linux:
     name: Build Linux packages
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [22.x]
-    env:
-      GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
-      NODE_OPTIONS: --max-old-space-size=8192
     permissions:
       contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: Environment variables
-        run: |
-          # https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables
-          echo "• GITHUB_REF_NAME=$GITHUB_REF_NAME"
-          echo "• GITHUB_REF_TYPE=$GITHUB_REF_TYPE" # `branch` or `tag`
-          echo "• GITHUB_RUN_NUMBER=$GITHUB_RUN_NUMBER"
-          echo "• GITHUB_SHA=$GITHUB_SHA"
-          echo "• RUNNER_ARCH=$RUNNER_ARCH"
-          echo "• RUNNER_NAME=$RUNNER_NAME"
-          echo "• RUNNER_OS=$RUNNER_OS"
-          echo "• RUNNER_TEMP=$RUNNER_TEMP"
-          echo "• RUNNER_TOOL_CACHE=$RUNNER_TOOL_CACHE"
-      - name: Install Yarn package manager
-        run: |
-          npm install -g yarn
-          yarn global add node-gyp
-      - name: Install necessary dependencies and perform initial checks
-        run: |
-          yarn install
-          yarn lint
-      - name: Sync app package and install app deps
-        run: |
-          npm run package-sync
-          yarn --cwd src install --production --ignore-scripts --non-interactive
-      - name: Prebuild (tag)
-        if: github.ref_type == 'tag'
-        run: npm run prebuild-prod
-      - name: Prebuild (branch)
-        if: github.ref_type == 'branch'
-        run: npm run prebuild-latest
-      - name: Run "build" script
-        if: github.ref_type == 'tag'
-        run: yarn run build
-      - name: Run "build-latest" script
-        if: github.ref_type == 'branch'
-        run: yarn run build-latest
+      - name: Setup and build
+        uses: ./.github/actions/setup-build
       - name: Build Linux binaries
-        run: |
-          yarn run build:linux
+        run: yarn run build:linux
       - name: Prepare release assets
         shell: bash
         run: |
           GIT_COMMIT_LOG=`git log -1 --format='%ci %H %s'`
-          PRODUCT_NAME=gSender
           PACKAGE_NAME=`node -e "console.log(require('./src/package.json').name)"`
           PACKAGE_VERSION=`node -e "console.log(require('./src/package.json').version)"`
           mkdir -p releases/linux
@@ -100,32 +58,20 @@ jobs:
               --body="${GIT_COMMIT_LOG}" \
               releases/linux/*;
           fi
-      #- name: Upload release assets
-      #  uses: actions/github-script@v6
-      #  with:
-      #    github-token: ${{ secrets.GITHUB_TOKEN }}
-      #    script: |
-      #      // https://github.com/actions/upload-release-asset/issues/47#issuecomment-659071145
-      #      console.log('environment:', process.versions);
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: |
-            releases/linux/*
+          files: releases/linux/*
           prerelease: true
           draft: true
+
   build-macos:
     name: Build macOS packages
     environment: CI
     runs-on: macos-latest
-    strategy:
-      matrix:
-        node-version: [22.x]
     env:
-      GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
       GH_TOKEN: ${{ secrets.CI_TOKEN }}
-      NODE_OPTIONS: --max-old-space-size=8192
       APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
       APPLE_ID: ${{ secrets.APPLE_ID }}
       APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
@@ -136,56 +82,16 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: Environment variables
-        run: |
-          # https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables
-          echo "• GITHUB_REF_NAME=$GITHUB_REF_NAME"
-          echo "• GITHUB_REF_TYPE=$GITHUB_REF_TYPE" # `branch` or `tag`
-          echo "• GITHUB_RUN_NUMBER=$GITHUB_RUN_NUMBER"
-          echo "• GITHUB_SHA=$GITHUB_SHA"
-          echo "• RUNNER_ARCH=$RUNNER_ARCH"
-          echo "• RUNNER_NAME=$RUNNER_NAME"
-          echo "• RUNNER_OS=$RUNNER_OS"
-          echo "• RUNNER_TEMP=$RUNNER_TEMP"
-          echo "• RUNNER_TOOL_CACHE=$RUNNER_TOOL_CACHE"
-      - name: Install Yarn package manager and Node Gyp
-        run: |
-          npm install -g yarn
-          yarn global add node-gyp
       - name: Pip setuptools
-        run: |
-          sudo -H pip install setuptools
-      - name: Install necessary dependencies and perform initial checks
-        run: |
-          yarn install
-          yarn lint
-      - name: Sync app package and install app deps
-        run: |
-          npm run package-sync
-          yarn --cwd src install --production --ignore-scripts --non-interactive
-      - name: Prebuild (tag)
-        if: github.ref_type == 'tag'
-        run: npm run prebuild-prod
-      - name: Prebuild (branch)
-        if: github.ref_type == 'branch'
-        run: npm run prebuild-latest
-      - name: Run "build" script
-        if: github.ref_type == 'tag'
-        run: yarn run build
-      - name: Run "build-latest" script
-        if: github.ref_type == 'branch'
-        run: yarn run build-latest
+        run: sudo -H pip install setuptools
+      - name: Setup and build
+        uses: ./.github/actions/setup-build
       - name: Build macOS binaries
         run: yarn run build:macos
       - name: Prepare release assets
         shell: bash
         run: |
           GIT_COMMIT_LOG=`git log -1 --format='%ci %H %s'`
-          PRODUCT_NAME=gSender
           PACKAGE_NAME=`node -e "console.log(require('./src/package.json').name)"`
           PACKAGE_VERSION=`node -e "console.log(require('./src/package.json').version)"`
           mkdir -p releases/macos
@@ -208,19 +114,11 @@ jobs:
               --body="${GIT_COMMIT_LOG}" \
               releases/macos/*;
           fi
-      #- name: Upload release assets
-      #  uses: actions/github-script@v6
-      #  with:
-      #    github-token: ${{ secrets.GITHUB_TOKEN }}
-      #    script: |
-      #      // https://github.com/actions/upload-release-asset/issues/47#issuecomment-659071145
-      #      console.log('environment:', process.versions);
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: |
-            releases/macos/*
+          files: releases/macos/*
           prerelease: true
           draft: true
       - name: Upload Mac Artifacts
@@ -230,15 +128,10 @@ jobs:
           path: releases/macos/*.dmg
           compression-level: 0 # no compression
           retention-days: 2
+
   build-windows:
     name: Build Windows packages
     runs-on: windows-latest
-    strategy:
-      matrix:
-        node-version: [22.x]
-    env:
-      GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
-      NODE_OPTIONS: --max-old-space-size=8192
     permissions:
       contents: write
     steps:
@@ -246,52 +139,14 @@ jobs:
         run: choco install -y vcredist2017
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: Environment variables
-        run: |
-          # https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables
-          echo "• GITHUB_REF_NAME=$GITHUB_REF_NAME"
-          echo "• GITHUB_REF_TYPE=$GITHUB_REF_TYPE" # `branch` or `tag`
-          echo "• GITHUB_RUN_NUMBER=$GITHUB_RUN_NUMBER"
-          echo "• GITHUB_SHA=$GITHUB_SHA"
-          echo "• RUNNER_ARCH=$RUNNER_ARCH"
-          echo "• RUNNER_NAME=$RUNNER_NAME"
-          echo "• RUNNER_OS=$RUNNER_OS"
-          echo "• RUNNER_TEMP=$RUNNER_TEMP"
-          echo "• RUNNER_TOOL_CACHE=$RUNNER_TOOL_CACHE"
-      - name: Install Yarn package manager and Node Gyp
-        run: |
-          npm install -g yarn
-          yarn global add node-gyp
-      - name: Install necessary dependencies and perform initial checks
-        run: |
-          yarn install
-      - name: Sync app package and install app deps
-        run: |
-          npm run package-sync
-          yarn --cwd src install --production --ignore-scripts --non-interactive
-      - name: Prebuild (tag)
-        if: github.ref_type == 'tag'
-        run: npm run prebuild-prod
-      - name: Prebuild (branch)
-        if: github.ref_type == 'branch'
-        run: npm run prebuild-latest
-      - name: Run "build-latest" script
-        if: github.ref_type == 'tag'
-        run: yarn run build
-      - name: Run "build-latest" script
-        if: github.ref_type == 'branch'
-        run: yarn run build-latest
+      - name: Setup and build
+        uses: ./.github/actions/setup-build
       - name: Build Windows binaries
         run: yarn run build:windows
       - name: Prepare release assets
         shell: bash
         run: |
           GIT_COMMIT_LOG=`git log -1 --format='%ci %H %s'`
-          PRODUCT_NAME=gSender
           PACKAGE_NAME=`node -e "console.log(require('./src/package.json').name)"`
           PACKAGE_VERSION=`node -e "console.log(require('./src/package.json').version)"`
           mkdir -p releases/windows
@@ -317,8 +172,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: |
-            releases/windows/*
+          files: releases/windows/*
           prerelease: true
           draft: true
       - name: Upload Windows Artifacts
@@ -333,9 +187,7 @@ jobs:
     name: Build Raspberry PI packages
     runs-on: ubuntu-24.04-arm
     env:
-      GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
       GH_TOKEN: ${{ secrets.CI_TOKEN }}
-      NODE_OPTIONS: --max-old-space-size=8192
     permissions:
       contents: write
     steps:

@@ -33,7 +33,6 @@ import PropTypes from 'prop-types';
 import combokeys from 'app/lib/combokeys';
 import store from 'app/store';
 import { store as reduxStore } from 'app/store/redux';
-import { colorsResponse } from 'app/workers/colors.response';
 import controller from 'app/lib/controller';
 import log from 'app/lib/log';
 import * as WebGL from 'app/lib/three/WebGL';
@@ -83,13 +82,8 @@ import {
 import {
     CAMERA_MODE_PAN,
     CAMERA_MODE_ROTATE,
-    LIGHT_THEME,
-    LIGHT_THEME_VALUES,
-    DARK_THEME,
-    DARK_THEME_VALUES,
-    CUSTOMIZABLE_THEMES,
-    PARTS_LIST,
 } from './constants';
+import { getVisualizerTheme } from 'app/lib/getVisualizerTheme';
 import SecondaryVisualizer from './SecondaryVisualizer';
 import useKeybinding from '../../lib/useKeybinding';
 import { CommandKeys } from 'app/lib/definitions/shortcuts';
@@ -311,22 +305,6 @@ class Visualizer extends Component {
             };
 
             this.setState(updater, callback);
-            if (this.visualizer) {
-                const colorsWorker = new Worker(
-                    new URL('../../workers/colors.worker.js', import.meta.url),
-                    { type: 'module' },
-                );
-                this.colorsWorker = colorsWorker;
-                this.colorsWorker.onmessage = colorsResponse;
-                this.colorsWorker.postMessage({
-                    colors: vizualization.colors,
-                    frames: vizualization.frames,
-                    spindleSpeeds: vizualization.spindleSpeeds,
-                    isLaser: vizualization.isLaser,
-                    spindleChanges: vizualization.spindleChanges,
-                    theme: this.state.currentTheme,
-                });
-            }
         },
         unloadGCode: () => {
             const visualizer = this.visualizer;
@@ -868,7 +846,7 @@ class Visualizer extends Component {
             cameraMode: this.config.get('cameraMode', CAMERA_MODE_PAN),
             cameraPosition: '3D', // 'Top', '3D', 'Front', 'Left', 'Right'
             isAgitated: false, // Defaults to false
-            currentTheme: this.getVisualizerTheme(),
+            currentTheme: getVisualizerTheme(),
             currentTab: 0,
             filename: '',
             fileSize: 0, //in bytes
@@ -1325,28 +1303,6 @@ class Visualizer extends Component {
         });
     }
 
-    getVisualizerTheme() {
-        const { theme } = store.get('widgets.visualizer');
-        if (theme === LIGHT_THEME) {
-            return LIGHT_THEME_VALUES;
-        } else if (theme === DARK_THEME) {
-            return DARK_THEME_VALUES;
-        } else if (CUSTOMIZABLE_THEMES.includes(theme)) {
-            let colourMap = new Map();
-            PARTS_LIST.map((part) =>
-                colourMap.set(
-                    part,
-                    this.config.get(
-                        theme + ' ' + part,
-                        DARK_THEME_VALUES.get(part),
-                    ),
-                ),
-            );
-            return colourMap;
-        }
-        return DARK_THEME_VALUES;
-    }
-
     isAgitated() {
         const { disabled, objects } = this.state;
         const { workflow, controllerType, activeState } = this.props;
@@ -1390,7 +1346,7 @@ class Visualizer extends Component {
                         theme: theme,
                     },
                     this.setState({
-                        currentTheme: this.getVisualizerTheme(),
+                        currentTheme: getVisualizerTheme(),
                     }),
                     pubsub.publish('visualizer:redraw'),
                 );

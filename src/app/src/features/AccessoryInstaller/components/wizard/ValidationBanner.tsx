@@ -13,7 +13,6 @@ export function ValidationBanner({ validations }: ValidationBannerProps) {
         if (validations && validations.length > 0) {
             for (const validation of validations) {
                 const result = validation();
-                console.log('result:', result);
                 if (!result.success) {
                     setValidationError(result.reason || 'Validation failed');
                     return;

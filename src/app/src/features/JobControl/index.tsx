@@ -16,9 +16,10 @@ import OutlineButton from './OutlineButton';
 import StartFromLine from './StartFromLine';
 import ProgressArea from './ProgressArea';
 import { SenderStatus } from 'app/lib/definitions/sender_feeder';
-import { useEffect, useState } from 'react';
+import { JSX, useEffect, useState } from 'react';
 import pubsub from 'pubsub-js';
 import { SDCardProgress } from 'app/features/JobControl/SDCardProgress.tsx';
+import cx from 'classnames';
 
 interface JobControlProps {
     workflow: { state: WORKFLOW_STATES_T };
@@ -235,7 +236,14 @@ const JobControl: React.FC<JobControlProps> = ({
                 )}
             </div>
             <div className="relative h-full">
-                <div className="bg-transparent z-10 absolute top-[-80px] left-1/2 right-1/2 flex flex-col justify-center items-center">
+                <div
+                    className={cx(
+                        'bg-transparent z-10 absolute top-[-80px] left-1/2 right-1/2 flex flex-col justify-center items-center',
+                        {
+                            hidden: disabled,
+                        },
+                    )}
+                >
                     <div className="flex flex-row gap-2 justify-center mb-3 w-full">
                         <OutlineButton disabled={disabled} />
                         <StartFromLine
@@ -246,7 +254,7 @@ const JobControl: React.FC<JobControlProps> = ({
                     </div>
                 </div>
 
-                <div className="z-10 absolute top-[-30px] max-xl:top-[-28px] left-1/2 right-1/2 flex flex-row gap-2 justify-center items-center">
+                <div className="z-10 absolute top-[-30px] max-xl:top-[-34px] left-1/2 right-1/2 flex flex-row gap-2 justify-center items-center">
                     <ControlButton
                         type={START}
                         workflow={workflow}

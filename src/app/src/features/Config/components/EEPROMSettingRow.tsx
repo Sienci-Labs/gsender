@@ -8,6 +8,13 @@ import { FaMicrochip } from 'react-icons/fa6';
 import { ToolLink } from 'app/features/Config/components/wizards/SquaringToolWizard.tsx';
 import Tooltip from 'app/components/Tooltip';
 import { EEPROM } from 'app/definitions/firmware';
+import { RootState } from 'app/store/redux';
+import { useSelector } from 'react-redux';
+import {
+    resolveGrblCoreDefaults,
+    translateGrblCoreKey,
+} from 'app/features/Config/utils/grblCoreMigration.ts';
+import { GRBLHAL } from 'app/constants';
 
 interface EEPROMSettingRowProps {
     eID: string;
@@ -33,25 +40,35 @@ export function EEPROMSettingRow({
 }: EEPROMSettingRowProps) {
     const { EEPROM, machineProfile, firmwareType, eepromIsDefault } =
         useSettings();
+    const firmwareSemver = useSelector(
+        (state: RootState) => state.controller.settings.version?.semver,
+    );
     if (!EEPROM) {
         return;
     }
 
-    const EEPROMData = EEPROM.find((s) => s.setting === eID);
+    const effectiveEID =
+        firmwareType === GRBLHAL
+            ? translateGrblCoreKey(eID as EEPROM, firmwareSemver)
+            : eID;
+    const EEPROMData = EEPROM.find((s) => s.setting === effectiveEID);
 
     if (EEPROMData) {
         const isDefault = eepromIsDefault(EEPROMData);
         const profileDefaults =
             firmwareType === 'Grbl'
                 ? machineProfile.eepromSettings
-                : machineProfile.grblHALeepromSettings;
+                : resolveGrblCoreDefaults({
+                      firmwareSemver,
+                      baseDefaults: machineProfile.grblHALeepromSettings || {},
+                  }).defaults;
 
         const InputElement = getDatatypeInput(
             EEPROMData.dataType,
             firmwareType,
         );
 
-        const inputDefault = get(profileDefaults, eID, '-');
+        const inputDefault = get(profileDefaults, effectiveEID, '-');
 
         //const matchesSearch = matchesSearchTerm(EEPROMData, searchTerm);
 

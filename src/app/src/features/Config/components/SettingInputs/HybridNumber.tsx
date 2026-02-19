@@ -49,9 +49,11 @@ export function HybridNumber({
                 return updated;
             });
             setSettingsAreDirty(true);
+        } else {
+            onChange(v);
         }
         // since hybrids are always referencing the settings values, we always have to update that as well
-        onChange(v);
+        /*onChange(v);*/
     }
 
     // If we're connected and using SLB we use the EEPROM value

@@ -23,9 +23,6 @@
 
 /* eslint max-len: 0 */
 /* eslint no-console: 0 */
-require('core-js/stable');
-require('regenerator-runtime/runtime');
-
 const path = require('path');
 const isElectron = require('is-electron');
 const program = require('commander');

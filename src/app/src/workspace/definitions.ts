@@ -79,6 +79,7 @@ export interface Workspace {
         defaultFirmwareSettings: RotarySettings;
         forceHardLimits: boolean;
         forceSoftLimits: boolean;
+        useAaxisForGrbl: boolean;
     };
     shouldWarnZero: boolean;
     diagnostics: {

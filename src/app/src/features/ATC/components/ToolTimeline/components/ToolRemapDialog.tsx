@@ -19,27 +19,22 @@ import { Label } from 'app/components/shadcn/Label';
 import { Badge } from 'app/components/shadcn/Badge';
 import {
     ArrowRight,
-    CheckCircle,
-    AlertTriangle,
-    XCircle,
-    Ban,
 } from 'lucide-react';
 import cn from 'classnames';
-import type { Tool } from './types';
 import { ToolInstance } from 'app/features/ATC/components/ToolTable.tsx';
 import {
-    getToolStateClasses,
     toolStateThemes,
 } from 'app/features/ATC/utils/ATCiConstants.ts';
-import { undefined } from 'zod';
+import { ToolStatusBadges } from 'app/features/ATC/components/ui/ToolStatusBadges.tsx';
+import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import { RootState } from 'app/store/redux';
+import get from 'lodash/get';
 
 interface ToolRemapDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     originalTool: Number;
     allTools: ToolInstance[];
-    passedTools: number[];
-    existingMappings: Map<number, number>;
     onConfirm: (fromTool: number, toTool: number) => void;
 }
 
@@ -48,15 +43,20 @@ export function ToolRemapDialog({
     onOpenChange,
     originalTool,
     allTools,
-    passedTools,
-    existingMappings,
     onConfirm,
 }: ToolRemapDialogProps) {
     const [selectedTool, setSelectedTool] = useState<string>('');
-    const [currentTool, setCurrentTool] = useState<Tool>({
-        number: 0,
-        status: 'current',
-    });
+    const [currentTool, setCurrentTool] = useState<ToolInstance | undefined>(
+        undefined,
+    );
+    const isConnected = useTypedSelector(
+        (state: RootState) => state.connection.isConnected,
+    );
+    const settings = useTypedSelector(
+        (state: RootState) => state.controller.settings,
+    );
+    const atcAvailable = get(settings, 'info.NEWOPT.ATC', '0') === '1';
+    const allowManualBadge = isConnected && atcAvailable;
 
     const handleConfirm = () => {
         if (selectedTool) {
@@ -75,19 +75,29 @@ export function ToolRemapDialog({
     const isToolAvailable = (toolNumber: number): boolean => {
         if (toolNumber === originalTool) return true;
 
-        /*const mappedTo = Array.from(existingMappings.values());
-        if (mappedTo.includes(toolNumber)) return false;
-        */
-
-        //const isPassedTool = passedTools.includes(toolNumber);
-        const isPassedTool = false;
-        const toolIsRemapped = existingMappings.has(toolNumber);
-
-        return !(isPassedTool && !toolIsRemapped);
+        return true;
     };
 
-    const getToolInfo = (toolNumber: number): Tool | undefined => {
+    const getToolInfo = (toolNumber: number): ToolInstance | undefined => {
         return allTools.find((t) => t.id === toolNumber);
+    };
+
+    const selectedToolNumber = selectedTool ? parseInt(selectedTool) : undefined;
+    const selectedToolInfo = selectedToolNumber
+        ? getToolInfo(selectedToolNumber)
+        : undefined;
+
+    const formatToolLabel = (
+        tool: ToolInstance | undefined,
+        fallbackId?: number,
+    ) => {
+        if (!tool) return fallbackId ? `T${fallbackId}` : '';
+        const nickname = tool.nickname && tool.nickname !== '-' ? tool.nickname : '';
+        return nickname ? `T${tool.id} - ${nickname}` : `T${tool.id}`;
+    };
+
+    const formatToolNumber = (toolNumber?: number) => {
+        return toolNumber ? `T${toolNumber}` : '';
     };
 
     useEffect(() => {
@@ -95,8 +105,9 @@ export function ToolRemapDialog({
         setCurrentTool(tool);
     }, [originalTool]);
 
-    const originalStatus =
-        toolStateThemes[currentTool?.status] || toolStateThemes['current'];
+    const currentProbeState = currentTool?.status;
+    const currentIsManual =
+        allowManualBadge && (currentTool?.isManual ?? false);
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -117,32 +128,47 @@ export function ToolRemapDialog({
                             onValueChange={setSelectedTool}
                         >
                             <SelectTrigger id="tool-select">
-                                <SelectValue placeholder="Select a tool" />
+                                <SelectValue asChild>
+                                    {selectedToolInfo ? (
+                                        <div className="flex items-center gap-3 w-full flex-1 min-w-0">
+                                            <span className="flex-1 min-w-0 font-mono font-medium truncate">
+                                                {formatToolLabel(
+                                                    selectedToolInfo,
+                                                    selectedToolNumber,
+                                                )}
+                                            </span>
+                                                <ToolStatusBadges
+                                                    probeState={
+                                                        selectedToolInfo.status
+                                                    }
+                                                    isManual={
+                                                        selectedToolInfo.isManual &&
+                                                        allowManualBadge
+                                                    }
+                                                    size="sm"
+                                                    className="ml-auto"
+                                                />
+                                        </div>
+                                    ) : (
+                                        <span className="text-muted-foreground">
+                                            Select a tool
+                                        </span>
+                                    )}
+                                </SelectValue>
                             </SelectTrigger>
                             <SelectContent className="z-[10000] bg-white dark:bg-dark">
                                 {allTools.map((tool) => {
                                     tool = { ...tool };
                                     const available = isToolAvailable(tool.id);
 
-                                    const isMapped = Array.from(
-                                        existingMappings.values(),
-                                    ).includes(tool.id);
-                                    const isPassedTool = passedTools.includes(
-                                        tool.id,
-                                    );
-                                    const isUsed = isMapped || isPassedTool;
-
-                                    if (isUsed) {
-                                        tool.status = 'used';
-                                    }
-
                                     //const status = toolStateThemes[tool.status];
 
-                                    const stateStyle = available
-                                        ? toolStateThemes[tool.status]
-                                        : toolStateThemes.used;
+                                    const stateStyle =
+                                        toolStateThemes[tool.status];
 
-                                    const IconComponent = stateStyle.icon;
+                                    const toolIsManual = allowManualBadge
+                                        ? tool.isManual ?? false
+                                        : false;
 
                                     return (
                                         <SelectPrimitive.Item
@@ -152,7 +178,7 @@ export function ToolRemapDialog({
                                             className={cn(
                                                 'relative flex w-full bg-white dark:bg-dark cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
                                                 'border-l-4',
-                                                stateStyle.border,
+                                                stateStyle.borderColor,
                                                 !available &&
                                                     'cursor-not-allowed',
                                             )}
@@ -165,23 +191,18 @@ export function ToolRemapDialog({
                                                     : ''
                                             }
                                         >
-                                            <SelectPrimitive.ItemText>
-                                                <div className="flex items-center justify-between gap-3 w-full pr-6">
-                                                    <span className="font-mono font-medium min-w-[4ch]">
-                                                        T{tool.id}
+                                            <SelectPrimitive.ItemText asChild>
+                                                <div className="flex items-center gap-3 w-full">
+                                                    <span className="flex-1 min-w-0 font-mono font-medium truncate">
+                                                        {formatToolLabel(tool)}
                                                     </span>
-                                                    <Badge
-                                                        variant="outline"
-                                                        className={cn(
-                                                            'text-xs font-medium flex items-center gap-1.5 shrink-0 w-24 justify-center',
-                                                            getToolStateClasses(
-                                                                tool.status,
-                                                            ),
-                                                        )}
-                                                    >
-                                                        <IconComponent className="h-4 w-4" />
-                                                        {stateStyle.label}
-                                                    </Badge>
+                                                    <ToolStatusBadges
+                                                        probeState={tool.status}
+                                                        isManual={toolIsManual}
+                                                        size="sm"
+                                                        showLabel={false}
+                                                        className="ml-auto"
+                                                    />
                                                 </div>
                                             </SelectPrimitive.ItemText>
                                             {/*<span className="absolute right-2 flex h-3.5 w-3.5 items-center justify-center">
@@ -201,43 +222,42 @@ export function ToolRemapDialog({
                     <div className="flex items-center justify-center gap-4">
                         <div className="flex items-center gap-2">
                             <span className="font-mono font-semibold text-lg">
-                                T{originalTool}
+                                {formatToolNumber(originalTool)}
                             </span>
-                            <Badge
-                                variant="outline"
-                                className={cn(
-                                    'text-xs font-medium',
-                                    getToolStateClasses(currentTool?.status),
-                                )}
-                            >
-                                {originalStatus.label}
-                            </Badge>
+                            {currentProbeState ? (
+                                <ToolStatusBadges
+                                    probeState={currentProbeState}
+                                    isManual={currentIsManual}
+                                    size="sm"
+                                />
+                            ) : (
+                                <Badge
+                                    variant="outline"
+                                    className={cn('text-xs font-medium')}
+                                >
+                                    {toolStateThemes.current.label}
+                                </Badge>
+                            )}
                         </div>
 
                         <ArrowRight className="h-5 w-5 text-muted-foreground" />
 
                         <div className="flex items-center gap-2">
                             <span className="font-mono font-semibold text-lg text-primary">
-                                {selectedTool && `T${selectedTool}`}
+                                {formatToolNumber(parseInt(selectedTool))}
                             </span>
                             {getToolInfo(parseInt(selectedTool)) && (
-                                <Badge
-                                    variant="outline"
-                                    className={cn(
-                                        'text-xs font-medium',
-                                        getToolStateClasses(
-                                            getToolInfo(parseInt(selectedTool))!
-                                                .status,
-                                        ),
-                                    )}
-                                >
-                                    {
-                                        toolStateThemes[
-                                            getToolInfo(parseInt(selectedTool))!
-                                                .status
-                                        ].label
+                                <ToolStatusBadges
+                                    probeState={
+                                        getToolInfo(parseInt(selectedTool))!
+                                            .status
                                     }
-                                </Badge>
+                                    isManual={
+                                        getToolInfo(parseInt(selectedTool))!
+                                            .isManual
+                                    }
+                                    size="sm"
+                                />
                             )}
                         </div>
                     </div>

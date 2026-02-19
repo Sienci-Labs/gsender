@@ -18,6 +18,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from 'app/components/shadcn/AlertDialog';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 
 interface FormattedTask {
     id: number;
@@ -203,6 +204,24 @@ export function MaintenanceList() {
         setShowAddForm(true);
     }
 
+    function onResetAll() {
+        Confirm({
+            title: 'Reset All Tasks',
+            content:
+                'Are you sure you want to reset the times for every Maintenance Task?',
+            confirmLabel: 'Reset',
+            cancelLabel: 'Cancel',
+            onConfirm: () => {
+                const updatedTasks = maintenanceTasks.map((task, _i) => {
+                    task.currentTime = 0;
+                    return task;
+                });
+                setMaintenanceTasks(updatedTasks);
+                maintenanceActions.update(updatedTasks);
+            },
+        });
+    }
+
     function onEdit(id: number) {
         const selectedTask = maintenanceTasks.find((obj) => obj.id === id);
         setCurrentTask(selectedTask);
@@ -223,6 +242,7 @@ export function MaintenanceList() {
                 enableSortingRemoval={false}
                 sortBy={sortBy}
                 onAdd={onAdd}
+                onResetAll={onResetAll}
                 pagination={false}
                 searchPlaceholder="Search Tasks..."
                 columnVisibility={{ description: false }} // this makes it so the description column doesnt show, but it exists to search on

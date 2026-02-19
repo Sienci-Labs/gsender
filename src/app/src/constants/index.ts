@@ -353,10 +353,6 @@ export const STATS_PAGES = {
     RUN_TIME_PER_PORT,
 };
 
-export const DB_NAME = 'ParsedDataDB';
-export const OBJECT_STORE = 'parsedData';
-export const DATA_ID = 'data';
-
 export const USAGE_TOOL_NAME = {
     LOCATION: 'LOCATION',
     JOG_CONTROL: 'JOG_CONTROL',

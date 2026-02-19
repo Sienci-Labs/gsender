@@ -18,10 +18,8 @@ export interface ToolTimelineProps {
 export type ToolStatus =
     | 'probed'
     | 'unprobed'
-    | 'offrack'
     | 'current'
-    | 'error'
-    | 'used';
+    | 'error';
 
 export interface Tool {
     number: number;

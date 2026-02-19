@@ -93,16 +93,17 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
         return (
             <div
                 className={cx('mt-3 h-full', {
-                    'grid grid-cols-[3fr_2fr] gap-8': isElectron(),
+                    'grid grid-cols-[3fr_2fr] gap-8 portrait:flex':
+                        isElectron(),
                     'flex justify-center': !isElectron(),
                 })}
             >
                 {isElectron() && (
-                    <div className="flex flex-col gap-2 max-xl:gap-1">
+                    <div className="flex flex-col gap-2 max-xl:gap-1 portrait:w-3/4">
                         <span className="ml-6 dark:text-white">
                             Recent Files
                         </span>
-                        <ScrollArea className="ml-2 px-2 h-28 bg-white dark:bg-dark rounded-xl border-2 dark:border-dark-lighter">
+                        <ScrollArea className="ml-2 px-2 h-28 portrait:mb-5 bg-white dark:bg-dark rounded-xl border-2 dark:border-dark-lighter">
                             <div className="grid divide-y items-center mr-2">
                                 {recentFiles.map(
                                     (file, index) =>

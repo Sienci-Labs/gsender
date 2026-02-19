@@ -9,9 +9,11 @@ import { Wrench } from 'lucide-react';
 import Button from 'app/components/Button';
 import { toolStateThemes } from 'app/features/ATC/utils/ATCiConstants.ts';
 import pubsub from 'pubsub-js';
+import { ToolStatusBadges } from 'app/features/ATC/components/ui/ToolStatusBadges.tsx';
+import { Badge } from 'app/features/ATC/components/ui/Badge.tsx';
 
 export function CurrentToolInfo({ disabled }: { disabled?: boolean }) {
-    const { rackSize, connected } = useToolChange();
+    const { rackSize, connected, atcAvailable } = useToolChange();
     const [spindleTool, setSpindleTool] = useState(0);
     const [toolMapVersion, setToolMapVersion] = useState(0);
     const [selectedTool, setSelectedTool] = useState<ToolInstance>({
@@ -96,12 +98,17 @@ export function CurrentToolInfo({ disabled }: { disabled?: boolean }) {
     const formattedOffset = isEmptyTool
         ? '-'
         : selectedTool.toolOffsets.z.toFixed(3);
-    const BadgeIcon = state.icon;
+    const allowManualBadge = connected && atcAvailable;
+    const isManualTool =
+        !isEmptyTool &&
+        (selectedTool.isManual ?? selectedTool.id > rackSize);
+    const EmptyIcon = state.icon;
+    const isRackTool = !isEmptyTool && selectedTool.id <= rackSize;
 
     return (
-        <div className="w-full">
+        <div className="w-full h-full flex-1">
             <div
-                className={`${state.backgroundColor} ${state.borderColor} bg-opacity-10 border rounded p-3 transition-all duration-200`}
+                className={`${state.backgroundColor} ${state.borderColor} bg-opacity-10 border rounded p-3 transition-all duration-200 h-full flex flex-col justify-between`}
             >
                 <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-3">
@@ -114,23 +121,40 @@ export function CurrentToolInfo({ disabled }: { disabled?: boolean }) {
                             >
                                 {isEmptyTool ? 'Empty' : `T${selectedTool.id}`}
                             </span>
-                            {selectedTool.nickname && (
+                            {!isEmptyTool && isRackTool && (
                                 <span className="text-gray-600 text-xs">
-                                    {selectedTool.nickname}
+                                    Rack
+                                </span>
+                            )}
+                            {!isEmptyTool && !isRackTool && allowManualBadge && (
+                                <span className="text-gray-600 text-xs">
+                                    Manual
                                 </span>
                             )}
                         </div>
                     </div>
 
-                    <span
-                        className={`${state.backgroundColor} ${state.borderColor} border-2 min-w-18 ${state.textColor} text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1`}
-                    >
-                        <BadgeIcon className="w-3 h-3" />
-                        {state.label}
-                    </span>
+                    {isEmptyTool ? (
+                        <Badge
+                            className={`${state.backgroundColor} ${state.borderColor} border-2 min-w-18 ${state.textColor} text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1`}
+                        >
+                            <EmptyIcon size={12} />
+                            {state.label}
+                        </Badge>
+                    ) : (
+                        <ToolStatusBadges
+                            probeState={selectedTool.status}
+                            isManual={isManualTool && allowManualBadge}
+                            size="sm"
+                        />
+                    )}
                 </div>
 
-                <div className="mt-2.5 grid grid-cols-[1fr_auto] items-center gap-3">
+                <div className="text-left text-sm font-bold text-gray-700">
+                    {isEmptyTool ? '' : selectedTool.nickname ?? ''}
+                </div>
+
+                <div className="grid grid-cols-[1fr_auto] items-center gap-3">
                     <div className="rounded-lg px-2 py-1 border border-gray-200 bg-white shadow-inner pointer-events-none select-none">
                         <div
                             className={`${state.textColor} font-mono text-lg font-bold text-center`}

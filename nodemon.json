@@ -5,7 +5,6 @@
   ],
   "ignore": [
     "output/app/**/*",
-    "output/electron-app/**/*",
     "node_modules/**/*",
     "**/*.test.js",
     "**/*.spec.js"

@@ -2,13 +2,12 @@ import cn from 'classnames';
 import { ToolChange } from './types';
 import Button from 'app/components/Button';
 import { TbSwitch3 } from 'react-icons/tb';
-import { ArrowRight } from 'lucide-react';
-import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
-import { RootState } from 'app/store/redux';
 import { useEffect, useState } from 'react';
 import { lookupToolName } from 'app/features/ATC/utils/ATCFunctions.ts';
 import pubsub from 'pubsub-js';
 import Tooltip from 'app/components/Tooltip';
+import { ToolProbeState } from 'app/features/ATC/types.ts';
+import { ToolStatusBadges } from 'app/features/ATC/components/ui/ToolStatusBadges.tsx';
 
 interface ToolTimelineItemProps {
     tool: ToolChange;
@@ -16,7 +15,10 @@ interface ToolTimelineItemProps {
     isLast: boolean;
     progress: number;
     isRemapped: boolean;
+    isManual?: boolean;
     remapValue?: number;
+    probeState?: ToolProbeState;
+    canRemap?: boolean;
     handleRemap?: (number) => void;
 }
 
@@ -26,21 +28,18 @@ export function ToolTimelineItem({
     isLast,
     handleRemap,
     isRemapped,
+    isManual = false,
     remapValue,
+    probeState = 'unprobed',
+    canRemap = false,
 }: ToolTimelineItemProps) {
     const [label, setLabel] = useState('');
-    const MAX_LABEL_LENGTH = 16;
 
-    const truncateLabel = (value: string) => {
-        if (!value || value.length <= MAX_LABEL_LENGTH) {
-            return value;
-        }
-        return `${value.slice(0, MAX_LABEL_LENGTH - 3)}...`;
-    };
-
-    const isConnected = useTypedSelector(
-        (state: RootState) => state.connection.isConnected,
-    );
+    const hasNickname = label !== '-' && Boolean(label);
+    const currentToolLabel = tool.label || `T${tool.toolNumber}`;
+    const mappedToolLabel =
+        remapValue !== undefined ? `T${remapValue}` : currentToolLabel;
+    const lineRange = `${tool.startLine}${tool.endLine ? `-${tool.endLine}` : ''}`;
 
     useEffect(() => {
         const toolLookup = isRemapped ? remapValue : tool.toolNumber;
@@ -58,133 +57,99 @@ export function ToolTimelineItem({
     }, [tool, isRemapped, remapValue]);
 
     return (
-        <div className="relative">
+        <div className="flex flex-col items-center">
             <div
                 className={cn(
-                    'relative rounded-lg transition-all duration-300 backdrop-blur-xl overflow-hidden',
+                    'group relative flex w-full items-center gap-3 rounded-lg px-3 py-3 transition-colors border border-l-0 overflow-hidden',
                     isActive
-                        ? 'bg-white/90 dark:bg-gray-800/90 shadow-2xl scale-[1.02] border-2 p-3'
-                        : 'bg-white/40 dark:bg-gray-800/30 shadow-lg border border-white/20 dark:border-gray-700/20 opacity-60 p-2',
+                        ? 'bg-gray-50/80 border-2 dark:bg-gray-800/80'
+                        : 'bg-gray-50/80 border-gray-200 dark:bg-gray-800/80 dark:border-gray-700 hover:bg-gray-100/80 dark:hover:bg-gray-800/80',
                 )}
                 style={{
-                    borderLeftWidth: isActive ? '4px' : '2px',
-                    borderLeftColor: isActive ? tool.color : 'transparent',
                     borderColor: isActive ? tool.color : undefined,
-                    borderWidth: isActive ? '2px' : undefined,
+                    boxShadow: isActive
+                        ? `0 0 18px 2px ${tool.color}44`
+                        : undefined,
                 }}
             >
+                <div
+                    className="absolute left-0 top-0 h-full w-[3px] rounded-l-lg"
+                    style={{ backgroundColor: tool.color }}
+                />
                 {isActive && (
                     <div
-                        className="absolute inset-0 opacity-[0.1] dark:opacity-[0.05] pointer-events-none"
+                        className="pointer-events-none absolute inset-0 opacity-10"
                         style={{
-                            backgroundImage: `repeating-linear-gradient(
-                45deg,
-                ${tool.color},
-                ${tool.color} 10px,
-                transparent 10px,
-                transparent 20px
-              )`,
+                            backgroundImage: `repeating-linear-gradient(135deg, ${tool.color}, ${tool.color} 6px, transparent 6px, transparent 14px)`,
                         }}
                     />
                 )}
-                <div className="flex items-center gap-3">
-                    <div className="flex flex-col items-center flex-shrink-0">
-                        <div
-                            className={cn(
-                                'relative z-10 flex items-center justify-center rounded-full border-3 transition-all duration-300',
-                                isActive
-                                    ? 'h-10 w-10 scale-110 border-white shadow-lg'
-                                    : 'h-7 w-7 border-white/80 dark:border-gray-600',
-                            )}
-                            style={{
-                                backgroundColor: tool.color,
-                                borderWidth: isActive ? '3px' : '2px',
-                            }}
-                        >
-                            <span
-                                className={cn(
-                                    'font-bold text-white',
-                                    isActive ? 'text-sm' : 'text-xs',
-                                )}
-                            >
-                                {tool.index}
+                <div
+                    className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md text-xs font-bold text-white"
+                    style={{ backgroundColor: tool.color }}
+                >
+                    {tool.index}
+                </div>
+
+                <div className="flex min-w-0 flex-1 flex-col gap-1">
+                    <div className="flex items-center gap-1.5 min-h-[1.25rem]">
+                        {isRemapped ? (
+                            <>
+                                <span className="text-xs text-gray-500 dark:text-gray-400 line-through">
+                                    {currentToolLabel}
+                                </span>
+                                <span className="font-mono text-sm font-semibold text-gray-900 dark:text-gray-100">
+                                    {mappedToolLabel}
+                                </span>
+                            </>
+                        ) : (
+                            <span className="font-mono text-sm font-semibold text-gray-900 dark:text-gray-100">
+                                {currentToolLabel}
                             </span>
-                        </div>
+                        )}
+                        {hasNickname && (
+                            <>
+                                <span className="text-gray-500 dark:text-gray-400">
+                                    ·
+                                </span>
+                                <Tooltip content={label} side="top">
+                                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                                        {label}
+                                    </span>
+                                </Tooltip>
+                            </>
+                        )}
                     </div>
 
-                    <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-2">
-                            <div
-                                className={cn(
-                                    'font-semibold transition-colors flex flex-row gap-1 items-center flex flex-col',
-                                    isActive
-                                        ? 'text-sm text-gray-900 dark:text-white'
-                                        : 'text-xs text-gray-700 dark:text-gray-300',
-                                )}
-                            >
-                                <div className="flex flex-row gap-2 items-center justify-start">
-                                    <span
-                                        className={cn(
-                                            isRemapped && 'line-through',
-                                            'flex flex-col',
-                                        )}
-                                    >
-                                        {tool.label || `T${tool.toolNumber}`}
-                                    </span>
-                                    {isRemapped && (
-                                        <>
-                                            <ArrowRight />
-                                            <span className="no-underline">
-                                                T{remapValue}
-                                            </span>
-                                        </>
-                                    )}
-                                </div>
-                                <div>
-                                    {label !== '-' && label && (
-                                        <Tooltip content={label} side="top">
-                                            <span className="text-xs text-gray-500">
-                                                {truncateLabel(label)}
-                                            </span>
-                                        </Tooltip>
-                                    )}
-                                </div>
-                            </div>
-                            <div className="flex flex-col items-end">
-                                <span
-                                    className={cn(
-                                        'transition-colors whitespace-nowrap text-xs font-medium opacity-100 text-black dark:text-white',
-                                    )}
-                                >
-                                    Line {tool.startLine}
-                                    {tool.endLine && ` - ${tool.endLine}`}
-                                </span>
-                                {isConnected && (
-                                    <Button
-                                        className="!w-auto"
-                                        onClick={handleRemap}
-                                        size="xs"
-                                    >
-                                        <TbSwitch3 />
-                                    </Button>
-                                )}
-                            </div>
-                        </div>
+                    <div className="flex items-center gap-2">
+                        <ToolStatusBadges
+                            probeState={probeState}
+                            isManual={isManual}
+                            size="sm"
+                            manualPosition="after"
+                            className="[&>div:first-child]:min-w-[124px]"
+                        />
                     </div>
+                </div>
+
+                <div className="flex flex-shrink-0 items-center gap-3 self-stretch">
+                    <span className="whitespace-nowrap font-mono text-xs text-gray-500 dark:text-gray-400">
+                        {lineRange}
+                    </span>
+                    {canRemap && (
+                        <Button
+                            className="relative z-10 !h-full !w-11 self-stretch rounded-lg border border-gray-300/80 bg-gray-100 text-gray-600 hover:bg-gray-200 dark:border-gray-600/70 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                            onClick={handleRemap}
+                            size="custom"
+                        >
+                            <TbSwitch3 size={32} />
+                        </Button>
+                    )}
                 </div>
             </div>
 
             {!isLast && (
-                <div className="flex justify-center py-1">
-                    <div
-                        className={cn(
-                            'w-0.5 h-4 rounded-full transition-all duration-300',
-                            isActive
-                                ? 'bg-gray-400 dark:bg-gray-500'
-                                : 'bg-gray-300/50 dark:bg-gray-600/50',
-                        )}
-                    />
-                </div>
+                <div className="h-4 w-px bg-gray-300/50 dark:bg-gray-600/50" />
             )}
         </div>
     );

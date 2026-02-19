@@ -19,6 +19,8 @@ import {
 import { gSenderSetting, SettingsMenuSection } from './assets/SettingsMenu';
 import { convertEIDToNumber } from 'app/lib/numeral';
 import controller from 'app/lib/controller.ts';
+import { GRBLHAL } from 'app/constants';
+import { resolveGrblCoreDefaults } from 'app/features/Config/utils/grblCoreMigration.ts';
 
 export function Config() {
     const { ref: inViewRef } = useInView({
@@ -41,7 +43,7 @@ export function Config() {
         }
     }
 
-    useEffect(() => {
+    /*useEffect(() => {
         if (connected) {
             if (firmwareType === 'grblHAL') {
                 controller.command('gcode', ['$$', '$ESH', '$ES']);
@@ -49,9 +51,67 @@ export function Config() {
                 controller.command('gcode', '$$');
             }
         }
+    }, []);*/
+
+    useEffect(() => {
+        if (connected) {
+            controller.command('gcode', ['$$']);
+        }
     }, []);
 
-    const { settings, EEPROM } = useSettings();
+    const { settings, EEPROM, machineProfile } = useSettings();
+    const reportedEEPROM = useTypedSelector(
+        (state: RootState) => state.controller.settings.settings,
+    );
+    const firmwareSemver = useTypedSelector(
+        (state: RootState) => state.controller.settings.version?.semver,
+    );
+
+    useEffect(() => {
+        if (!reportedEEPROM || Object.keys(reportedEEPROM).length === 0) {
+            return;
+        }
+
+        let baseDefaults: Record<string, string> = {};
+        let orderedSettings: Map<string, string> | undefined;
+
+        if (firmwareType === GRBLHAL) {
+            const resolved = resolveGrblCoreDefaults({
+                firmwareSemver,
+                baseDefaults: machineProfile.grblHALeepromSettings || {},
+                orderedSettings: machineProfile.orderedSettings,
+            });
+            baseDefaults = resolved.defaults;
+            orderedSettings = resolved.ordered as Map<string, string> | undefined;
+        } else {
+            baseDefaults = machineProfile.eepromSettings || {};
+            orderedSettings = machineProfile.orderedSettings;
+        }
+
+        const defaultKeys = new Set<string>([
+            ...Object.keys(baseDefaults),
+            ...(orderedSettings ? Array.from(orderedSettings.keys()) : []),
+        ]);
+
+        const missingDefaults = Object.keys(reportedEEPROM)
+            .filter((key) => !defaultKeys.has(key))
+            .sort(
+                (a, b) =>
+                    Number(a.replace('$', '')) - Number(b.replace('$', '')),
+            );
+
+        if (missingDefaults.length > 0) {
+            console.info(
+                `EEPROM defaults missing (${missingDefaults.length}):`,
+                missingDefaults.join(', '),
+            );
+        }
+    }, [
+        reportedEEPROM,
+        firmwareType,
+        firmwareSemver,
+        machineProfile?.id,
+    ]);
 
     // lets extract all the eeprom settings
     let allEEPROM: gSenderSetting[] = EEPROM.map((filtered, i) => {
@@ -112,14 +172,14 @@ export function Config() {
                     <TabsList className="w-full pb-0 border-b rounded-b-none">
                         <TabsTrigger
                             value="config"
-                            className="w-full"
+                            className="w-full dark:text-white"
                             onClick={() => setActiveTab('config')}
                         >
                             All Config
                         </TabsTrigger>
                         <TabsTrigger
                             value="eeprom"
-                            className="w-full"
+                            className="w-full dark:text-white"
                             onClick={() => setActiveTab('eeprom')}
                         >
                             EEPROM

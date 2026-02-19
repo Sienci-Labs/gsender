@@ -73,18 +73,7 @@ export interface MachineProfile {
         depth: number;
         height: number;
     };
-    in: {
-        width: number;
-        depth: number;
-        height: number;
-    };
-    endstops: boolean;
-    spindle: boolean;
-    coolant: boolean;
-    laser: boolean;
-    laserOnOutline?: boolean;
     eepromSettings?: EEPROMSettings;
     grblHALeepromSettings?: EEPROMSettings;
     orderedSettings?: Map<EEPROM | string, any>;
-    isHal?: boolean;
 }

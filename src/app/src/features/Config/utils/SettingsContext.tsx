@@ -32,6 +32,10 @@ import { ATCI_SUPPORTED_VERSION } from 'app/features/ATC/utils/ATCiConstants.ts'
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { debounce } from 'lodash';
 import { BasicObject } from 'app/definitions/general';
+import {
+    resolveGrblCoreDefaults,
+    translateGrblCoreKey,
+} from 'app/features/Config/utils/grblCoreMigration.ts';
 
 interface iSettingsContext {
     settings: SettingsMenuSection[];
@@ -321,6 +325,12 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
                                     eID = get(o, 'remap', null);
                                     o.remapped = true;
                                 }
+                                if (controllerType === GRBLHAL && eID) {
+                                    eID = translateGrblCoreKey(
+                                        eID as EEPROM,
+                                        firmwareVersion,
+                                    );
+                                }
                                 // set eID to remap, maybe some sort of remapped flag?
                                 if (eID) {
                                     let oKey = Number(eID.replace('$', ''));
@@ -423,6 +433,12 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             if (Object.hasOwn(v, 'remap') && isFirmwareCurrent) {
                 idToUse = v.remap;
             }
+            if (controllerType === GRBLHAL) {
+                idToUse = translateGrblCoreKey(
+                    idToUse as EEPROM,
+                    firmwareVersion,
+                );
+            }
             searchChecker = EEPROM.find((s) => s.setting === idToUse);
         }
 
@@ -458,6 +474,12 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             if (Object.hasOwn(v, 'remap') && isFirmwareCurrent) {
                 idToUse = v.remap;
             }
+            if (controllerType === GRBLHAL) {
+                idToUse = translateGrblCoreKey(
+                    idToUse as EEPROM,
+                    firmwareVersion,
+                );
+            }
             if (v.type === 'eeprom') {
                 const EEPROMData = EEPROM.find((s) => s.setting === idToUse);
                 if (!EEPROMData) {
@@ -489,14 +511,21 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         const profileDefaults =
             controllerType === 'Grbl'
                 ? machineProfile.eepromSettings
-                : machineProfile.grblHALeepromSettings;
+                : resolveGrblCoreDefaults({
+                      firmwareSemver: firmwareVersion,
+                      baseDefaults: machineProfile.grblHALeepromSettings || {},
+                  }).defaults;
 
         const settingKey =
             (settingData as gSenderSetting).type === 'hybrid'
                 ? (settingData as gSenderSetting).eID
                 : (settingData as FilteredEEPROM).setting;
+        const lookupKey =
+            controllerType === GRBLHAL
+                ? translateGrblCoreKey(settingKey as EEPROM, firmwareVersion)
+                : settingKey;
 
-        const inputDefault = get(profileDefaults, settingKey, '-');
+        const inputDefault = get(profileDefaults, lookupKey, '-');
 
         if (inputDefault === '-') {
             return true; // default in cases where we don't know the default
@@ -535,9 +564,16 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         const profileDefaults =
             controllerType === 'Grbl'
                 ? machineProfile.eepromSettings
-                : machineProfile.grblHALeepromSettings;
+                : resolveGrblCoreDefaults({
+                      firmwareSemver: firmwareVersion,
+                      baseDefaults: machineProfile.grblHALeepromSettings || {},
+                  }).defaults;
+        const lookupKey =
+            controllerType === GRBLHAL
+                ? translateGrblCoreKey(key, firmwareVersion)
+                : key;
 
-        return get(profileDefaults, key, '-');
+        return get(profileDefaults, lookupKey, '-');
     }
 
     // Populate eeprom descriptions as needed

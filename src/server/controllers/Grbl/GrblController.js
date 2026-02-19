@@ -355,6 +355,12 @@ class GrblController {
                     }
                 }
 
+                const useAaxisForGrbl = store.get('preferences.useAaxisForGrbl', false);
+
+                // If we don't need to convert A-axis to Y-axis, return the line as is since A-axis commands are given by default
+                if (useAaxisForGrbl) {
+                    return line;
+                }
 
                 const containsACommand = A_AXIS_COMMANDS.test(line);
                 const containsYCommand = Y_AXIS_COMMANDS.test(line);
@@ -519,6 +525,13 @@ class GrblController {
                         line = line.replace('M6', '(M6)');
                     }
                     //line = line.replace(`${tool?.[0]}`, `(${tool?.[0]})`);
+                }
+
+                const useAaxisForGrbl = store.get('preferences.useAaxisForGrbl', false);
+
+                // If we don't need to convert A-axis to Y-axis, return the line as is since A-axis commands are given by default
+                if (useAaxisForGrbl) {
+                    return line;
                 }
 
                 /**

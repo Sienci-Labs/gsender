@@ -5,12 +5,26 @@ import Tooltip from 'app/components/Tooltip';
 interface Props {
     direction: number;
     onClick: () => void;
+    containerClassName?: string;
+    isAbsolute?: boolean;
 }
 
-const ProbeDirectionSelection: React.FC<Props> = ({ direction, onClick }) => {
+const ProbeDirectionSelection: React.FC<Props> = ({
+    direction,
+    onClick,
+    containerClassName,
+    isAbsolute = true,
+}) => {
     return (
         <Tooltip content="Set probing corner">
-            <div className="absolute top-0 right-0">
+            <div
+                className={cx(
+                    {
+                        'absolute top-0 right-0': isAbsolute,
+                    },
+                    containerClassName,
+                )}
+            >
                 <button
                     type="button"
                     className={cx(

@@ -26,6 +26,7 @@ import { FaQuestion } from 'react-icons/fa6';
 import { store as reduxStore } from '../../store/redux';
 import { GRBLHAL } from 'app/constants';
 import { GRBL_ALARMS } from '../../../../server/controllers/Grbl/constants';
+import { GRBL_HAL_ALARMS } from '../../../../server/controllers/Grblhal/constants';
 import { ALARM_CODE } from './definitions';
 import pubsub from 'pubsub-js';
 
@@ -37,8 +38,9 @@ const getCodeDescription = (code: number | 'Homing' = 1): string => {
     let alarm;
     if (controllerType === GRBLHAL) {
         const alarms = get(reduxStore.getState(), 'controller.settings.alarms');
-        if (alarms) {
-            alarm = alarms[code as number]; // code will not be "homing" if grblhal
+        alarm = alarms?.[code as number]; // code will not be "homing" if grblhal
+        if (!alarm) {
+            alarm = GRBL_HAL_ALARMS.find((alarm) => alarm.code === code);
         }
     } else {
         alarm = GRBL_ALARMS.find((alarm) => alarm.code === code);
@@ -46,16 +48,14 @@ const getCodeDescription = (code: number | 'Homing' = 1): string => {
     if (alarm) {
         return alarm.description;
     }
-    return 'Invalid alarm code - no matching description found';
+    return 'No matching description found';
 };
 
 const AlarmDescriptionIcon = ({ code = 1 }: { code: ALARM_CODE }) => {
-    const alarmDescription = getCodeDescription(code);
-
     const sendAlarmDescription = () => {
         pubsub.publish('helper:info', {
             title: 'Alarm Code ' + code,
-            description: alarmDescription,
+            description: getCodeDescription(code),
         });
     };
 

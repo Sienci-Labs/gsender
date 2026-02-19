@@ -22,7 +22,25 @@ DIST_DIR="$__dirname/../dist/gsender"
 NODE_MODULES_DIR="$DIST_DIR/node_modules"
 PACKAGE_JSON="$DIST_DIR/package.json"
 YARN_LOCK="$DIST_DIR/yarn.lock"
+ROOT_YARN_LOCK="$__dirname/../yarn.lock"
 MAIN_JS="$DIST_DIR/main.js"
+DEPS_HASH_FILE="$DIST_DIR/.deps-hash"
+
+compute_deps_hash() {
+    node -e '
+        const fs = require("fs");
+        const crypto = require("crypto");
+        const hash = crypto.createHash("sha256");
+        const files = process.argv.slice(1);
+        for (const file of files) {
+            if (fs.existsSync(file)) {
+                hash.update(file);
+                hash.update(fs.readFileSync(file));
+            }
+        }
+        process.stdout.write(hash.digest("hex"));
+    ' "$@"
+}
 
 if [ ! -f "$MAIN_JS" ]; then
     echo "main.js missing; building electron main bundle"
@@ -45,11 +63,26 @@ elif [ "$PACKAGE_JSON" -nt "$NODE_MODULES_DIR" ]; then
     NEEDS_INSTALL=true
 fi
 
+CURRENT_DEPS_HASH=$(compute_deps_hash "$PACKAGE_JSON" "$ROOT_YARN_LOCK")
+PREVIOUS_DEPS_HASH=""
+if [ -f "$DEPS_HASH_FILE" ]; then
+    PREVIOUS_DEPS_HASH=$(cat "$DEPS_HASH_FILE")
+fi
+
+if [ "$CURRENT_DEPS_HASH" != "$PREVIOUS_DEPS_HASH" ]; then
+    echo "Dependency hash changed, reinstall needed"
+    NEEDS_INSTALL=true
+fi
+
 if [ "$NEEDS_INSTALL" = true ]; then
     echo "Installing packages..."
+    # Copy root yarn.lock so electron-builder's module collector can find it
+    # and so --frozen-lockfile has a reference to work from
+    cp "$__dirname/../yarn.lock" "$YARN_LOCK" 2>/dev/null || true
     # Use frozen lockfile for faster, deterministic installs
     yarn install --production --frozen-lockfile --prefer-offline --ignore-engines 2>/dev/null || \
     yarn install --production --ignore-engines
+    printf '%s' "$CURRENT_DEPS_HASH" > "$DEPS_HASH_FILE"
 else
     echo "✓ Dependencies already installed, skipping..."
 fi

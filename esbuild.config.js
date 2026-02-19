@@ -156,6 +156,61 @@ async function copyDir(src, dest) {
     }
 }
 
+function copyPreloadFile(target) {
+    const isDev = target === 'development';
+    const destDir = isDev
+        ? path.join(__dirname, 'output')
+        : path.join(__dirname, 'dist/gsender');
+    const src = path.join(__dirname, 'src/electron-app/preload.js');
+    const dest = path.join(destDir, 'preload.js');
+    fs.mkdirSync(destDir, { recursive: true });
+    fs.copyFileSync(src, dest);
+}
+
+function prebuild(target) {
+    const isDev = target === 'development';
+    const baseDir = isDev
+        ? path.join(__dirname, 'output')
+        : path.join(__dirname, 'dist/gsender');
+
+    // Clean
+    fs.rmSync(isDev ? path.join(__dirname, 'output') : path.join(__dirname, 'dist'),
+              { recursive: true, force: true });
+
+    // Create output dirs
+    fs.mkdirSync(baseDir, { recursive: true });
+
+    // Copy package.json
+    fs.copyFileSync(
+        path.join(__dirname, 'src/package.json'),
+        path.join(baseDir, 'package.json')
+    );
+
+    // Dev: copy app assets (favicon, images, assets)
+    if (isDev) {
+        fs.mkdirSync(path.join(baseDir, 'app'), { recursive: true });
+        fs.mkdirSync(path.join(baseDir, 'app-server'), { recursive: true });
+        for (const asset of ['favicon.ico', 'images', 'assets']) {
+            const src = path.join(__dirname, 'src/app', asset);
+            if (fs.existsSync(src)) {
+                fs.cpSync(src, path.join(baseDir, 'app', asset), { recursive: true });
+            }
+        }
+    }
+
+    // Prod: copy yarn.lock
+    if (!isDev) {
+        const yarnLockCandidates = [
+            path.join(__dirname, 'src/yarn.lock'),
+            path.join(__dirname, 'yarn.lock'),
+        ];
+        const targetYarnLock = yarnLockCandidates.find((candidate) => fs.existsSync(candidate));
+        if (targetYarnLock) {
+            fs.copyFileSync(targetYarnLock, path.join(baseDir, 'yarn.lock'));
+        }
+    }
+}
+
 const payload = pkg.version;
 const algorithm = 'sha1';
 const buf = String(payload);
@@ -262,15 +317,12 @@ async function buildElectron(target) {
             packages: 'external', // Don't bundle any node_modules
             outExtension: { '.js': '.js' },
             plugins: [srcResolverPlugin, createHexFilePlugin(target)],
-            external: [
-                // Keep electron-app files separate (compiled by prebuild scripts)
-                './electron-app/*',
-            ],
         }
     );
 
     try {
         await esbuild.build(config);
+        copyPreloadFile(target);
         console.log('✅ Electron main build complete');
     } catch (error) {
         console.error('❌ Electron main build failed:', error);
@@ -331,7 +383,6 @@ async function watchAll() {
             packages: 'external',
             outExtension: { '.js': '.js' },
             plugins: [srcResolverPlugin, createHexFilePlugin('development')],
-            external: ['./electron-app/*'],
         }
     );
 
@@ -347,6 +398,7 @@ async function watchAll() {
     );
 
     copyStaticFiles('development');
+    copyPreloadFile('development');
 
     const serverCtx = await esbuild.context(serverConfig);
     const electronCtx = await esbuild.context(electronConfig);
@@ -377,6 +429,12 @@ async function build() {
     const buildTarget = args.find(arg => arg.startsWith('--target='))?.split('=')[1] || 'all';
 
     console.log(`🔨 Building for ${target}...`);
+
+    if (args.includes('--prebuild-only')) {
+        prebuild(target);
+        console.log('Prebuild complete');
+        return;
+    }
 
     if (watch && target === 'development') {
         await watchServer();

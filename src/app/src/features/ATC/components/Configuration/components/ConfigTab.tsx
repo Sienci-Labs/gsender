@@ -26,8 +26,6 @@ import {
     Crosshair,
     Fingerprint,
     Move,
-    Pencil,
-    Settings,
     ShieldCheck,
     SlidersHorizontal,
 } from 'lucide-react';

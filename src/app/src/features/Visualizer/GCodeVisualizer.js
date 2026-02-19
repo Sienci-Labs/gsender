@@ -41,8 +41,7 @@ class GCodeVisualizer {
         this.theme = theme;
         this.vertices = [];
         this.colors = [];
-        this.spindleSpeeds = null;
-        this.spindleChanges = null;
+        this.originalColors = null;
         this.isLaser = false;
         this.frames = []; // Example
         this.frameIndex = 0;
@@ -63,16 +62,20 @@ class GCodeVisualizer {
     }
 
     render(
-        { vertices, frames, spindleSpeeds, isLaser = false, spindleChanges },
+        { vertices, frames, isLaser = false },
         colorArray,
         savedColors,
     ) {
-        this.vertices = new THREE.Float32BufferAttribute(vertices.buffer, 3);
+        this.vertices = new THREE.BufferAttribute(vertices, 3);
         this.frames = frames;
-        this.spindleSpeeds = spindleSpeeds;
         this.isLaser = isLaser;
-        this.spindleChanges = spindleChanges;
-        this.colors = savedColors;
+        this.isRotaryFile = false;
+        const baseColors =
+            savedColors && savedColors.length === colorArray.length
+                ? savedColors
+                : colorArray;
+        this.colors = baseColors;
+        this.originalColors = null;
         const defaultColor = new THREE.Color(this.theme.get(CUTTING_PART));
         // --rotary
         this.countdown = 16;
@@ -87,7 +90,7 @@ class GCodeVisualizer {
         this.geometry.setAttribute('position', this.vertices);
         this.geometry.setAttribute(
             'color',
-            new THREE.BufferAttribute(colorArray, 4),
+            new THREE.BufferAttribute(baseColors, 4),
         );
 
         const material = new THREE.LineBasicMaterial({
@@ -102,6 +105,18 @@ class GCodeVisualizer {
         this.group.add(workpiece);
 
         return this.group;
+    }
+
+    _ensureOriginalColorsSnapshot() {
+        if (this.originalColors) {
+            return;
+        }
+        const workpiece = this.group.children[0];
+        const colorAttr = workpiece?.geometry?.getAttribute('color');
+        if (!colorAttr || !colorAttr.array) {
+            return;
+        }
+        this.originalColors = new Float32Array(colorAttr.array);
     }
 
     setFrameIndex(frameIndex) {
@@ -121,6 +136,7 @@ class GCodeVisualizer {
             // this is just a temporary fix for rotary, so there is some repeated code in both the if and else,
             // but it makes it easy to take away and edit later if i organize it like this
             if (this.isRotaryFile) {
+                this._ensureOriginalColorsSnapshot();
                 // subtract countdown and advance the queue
                 this.countdown -= 1;
                 this.frameDifferences.shift();
@@ -179,16 +195,14 @@ class GCodeVisualizer {
                         ],
                         offsetIndex,
                     );
-                    colorAttr.updateRange.count =
-                        colorArray.length +
-                        placeHolderArray.length +
-                        bufferColorArray.length;
-                    colorAttr.updateRange.offset = offsetIndex;
+                    colorAttr.addUpdateRange({
+                        start: offsetIndex,
+                        count: colorArray.length + placeHolderArray.length + bufferColorArray.length,
+                    });
                 } else {
                     // if not finished, continue colouring yellow
                     colorAttr.set([...bufferColorArray], bufferOffsetIndex);
-                    colorAttr.updateRange.count = bufferColorArray.length;
-                    colorAttr.updateRange.offset = bufferOffsetIndex;
+                    colorAttr.addUpdateRange({ start: bufferOffsetIndex, count: bufferColorArray.length });
                 }
                 colorAttr.needsUpdate = true;
             } else {
@@ -221,10 +235,15 @@ class GCodeVisualizer {
 
             // reset colours
             const workpiece = this.group.children[0];
+            const sourceColors = this.originalColors || this.colors;
+            if (!sourceColors) {
+                this.frameIndex = frameIndex;
+                return;
+            }
             for (let i = v2; i < v1; ++i) {
                 const offsetIndex = i * 4; // Account for RGB buffer
                 workpiece.geometry.attributes.color.set(
-                    [...this.colors.slice(offsetIndex, offsetIndex + 4)],
+                    [...sourceColors.slice(offsetIndex, offsetIndex + 4)],
                     offsetIndex,
                 );
             }
@@ -260,6 +279,7 @@ class GCodeVisualizer {
         }
 
         if (v1 < v2 && !this.isRotaryFile) {
+            this._ensureOriginalColorsSnapshot();
             const workpiece = this.group.children[0];
             const colorAttr = workpiece.geometry.getAttribute('color');
             const offsetIndex = v1 * 4;
@@ -295,6 +315,7 @@ class GCodeVisualizer {
 
             // if we have reached the end, fill in the rest of the yellow
             // we know its at the end if the amount to update overflows the buffer, or if the frameIndex is at the last frame
+            let updateCount = 0;
             if (
                 this.plannedState !== STATES.DONE &&
                 (isOverflowing || this.frameIndex === this.frames.length - 1)
@@ -311,8 +332,7 @@ class GCodeVisualizer {
                     [...runColorArray, ...newBufferColorArray],
                     offsetIndex,
                 );
-                colorAttr.updateRange.count =
-                    runColorArray.length + newBufferColorArray.length;
+                updateCount = runColorArray.length + newBufferColorArray.length;
                 this.plannedState = STATES.DONE;
                 // beginning lines, for regular start or start from line
             } else if (this.plannedState === STATES.START) {
@@ -330,13 +350,12 @@ class GCodeVisualizer {
                 ).flat();
 
                 colorAttr.set([...runColorArray, ...colorArray], offsetIndex);
-                colorAttr.updateRange.count =
-                    runColorArray.length + colorArray.length;
+                updateCount = runColorArray.length + colorArray.length;
                 this.plannedState = STATES.RUNNING;
                 // if the end has alrdy been reached, only update grey
             } else if (this.plannedState === STATES.DONE) {
                 colorAttr.set(runColorArray, offsetIndex);
-                colorAttr.updateRange.count = runColorArray.length;
+                updateCount = runColorArray.length;
                 // end not reached, update everything
             } else {
                 // set grey lines, planned lines that were previously calculated, and the buffer in between
@@ -348,12 +367,12 @@ class GCodeVisualizer {
                     ],
                     offsetIndex,
                 );
-                colorAttr.updateRange.count =
+                updateCount =
                     runColorArray.length +
                     bufferColorArray.length +
                     this.plannedColorArray.length;
             }
-            colorAttr.updateRange.offset = offsetIndex;
+            colorAttr.addUpdateRange({ start: offsetIndex, count: updateCount });
             colorAttr.needsUpdate = true;
         }
 
@@ -409,6 +428,7 @@ class GCodeVisualizer {
         this.geometry = new THREE.BufferGeometry();
         this.vertices = null;
         this.colors = null;
+        this.originalColors = null;
         this.frames = null;
         this.frameIndex = 0;
         this.framesLength = 0;

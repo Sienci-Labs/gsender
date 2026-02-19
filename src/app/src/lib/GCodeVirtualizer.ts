@@ -1,7 +1,11 @@
 import { EventEmitter } from 'events';
 
 import { FILE_TYPE } from '../constants';
-import { parseLine } from './GCodeParser';
+import {
+    createFastLineScanScratch,
+    FastLineScanScratch,
+    scanLineFast,
+} from './GCodeParser';
 import { BasicPosition, BBox } from 'app/definitions/general';
 
 interface Modal {
@@ -45,6 +49,16 @@ interface VMState {
     invalidLines: string[];
     toolchange: number[];
     spindleToolEvents: { [key: number]: SpindleToolEvent };
+}
+
+interface VMProfileStats {
+    linesSeen: number;
+    tokensSeen: number;
+    groupsSeen: number;
+    handlerInvocations: number;
+    emitDataCount: number;
+    estimatesPushCount: number;
+    invalidLineCount: number;
 }
 
 type Data = Array<{
@@ -135,6 +149,27 @@ const in2mm = (val: number = 0): number => val * 25.4;
 
 // noop
 const noop = (): void => {};
+const MOTION_MODAL_CODES = new Set<string>([
+    '0',
+    '1',
+    '2',
+    '3',
+    '38.2',
+    '38.3',
+    '38.4',
+    '38.5',
+]);
+const AXIS_ARGUMENT_LETTERS = new Set<string>([
+    'X',
+    'Y',
+    'Z',
+    'A',
+    'B',
+    'C',
+    'I',
+    'J',
+    'K',
+]);
 
 class GCodeVirtualizer extends EventEmitter {
     motionMode: string = 'G0';
@@ -172,12 +207,6 @@ class GCodeVirtualizer extends EventEmitter {
     rotaryDiameter: number = 50; // Default diameter in mm for rotary calculations
 
     autoDetectRotaryDiameter: boolean = true; // Automatically detect diameter from file bounds
-
-    re1: RegExp = new RegExp(/\s*\([^\)]*\)/g); // Remove anything inside the parentheses
-
-    re2: RegExp = new RegExp(/\s*;.*/g); // Remove anything after a semi-colon to the end of the line, including preceding spaces
-
-    re3: RegExp = new RegExp(/\s+/g);
 
     minBounds: [number, number, number, number] = [0, 0, 0, 0];
 
@@ -282,26 +311,21 @@ class GCodeVirtualizer extends EventEmitter {
 
     setEstimate: boolean = false;
 
-    modalChanges: ModalChanges = [
-        {
-            change: null,
-            count: 0,
-        },
-    ];
-    modalCounter: number = 0;
+    profileStats: VMProfileStats = {
+        linesSeen: 0,
+        tokensSeen: 0,
+        groupsSeen: 0,
+        handlerInvocations: 0,
+        emitDataCount: 0,
+        estimatesPushCount: 0,
+        invalidLineCount: 0,
+    };
 
-    feedrateChanges: FeedrateChanges = [
-        {
-            change: null,
-            count: 0,
-        },
-    ];
-    feedrateCounter: number = 0;
+    fastScanScratch: FastLineScanScratch = createFastLineScanScratch();
 
-    //INVALID_GCODE_REGEX = /([^NGMXYZITPAJKFRS%\-?\.?\d+\.?\s])|((G28)|(G29)|(\$H))/gi;
-    //INVALID_GCODE_REGEX = /^(?!.*\b([NGMXYZILTPAJKFRS][0-9+\-\.]+|\$\$|\$[NGMXYZILTPAJKFRS0-9#]*|\*[0-9]+|%.*|{.*})\b).+$/gi;
-    VALID_GCODE_REGEX =
-        /((%.*)|{.*)|((?:\$\$)|(?:\$[NGMXYZILTPAJKFHRS0-9#]*))|([NGMXYZHILTPAJKFRS][0-9\+\-\.]+)|(\*[0-9]+)/gi;
+    argsScratch: Record<string, any> = Object.create(null);
+
+    argsScratchKeys: string[] = [];
 
     fn: {
         addLine: (modal: Modal, v1: BasicPosition, v2: BasicPosition) => void;
@@ -941,6 +965,7 @@ class GCodeVirtualizer extends EventEmitter {
             if (this.atcEnabled) {
                 this.totalTime += 45; // add 45 seconds for toolchange
                 this.estimates.push(45);
+                this.profileStats.estimatesPushCount += 1;
                 this.setEstimate = true;
             }
         },
@@ -1073,48 +1098,105 @@ class GCodeVirtualizer extends EventEmitter {
         this.atcEnabled = atcEnabled;
     }
 
-    partitionWordsByGroup(words: [string, any][] = []): [string, any][][] {
-        const groups: [string, any][][] = [];
-
-        for (let i = 0; i < words.length; ++i) {
-            const word = words[i];
-            const letter = word[0];
-
-            if (letter === 'G' || letter === 'M' || letter === 'T') {
-                groups.push([word]);
-                continue;
-            }
-
-            if (groups.length > 0) {
-                groups[groups.length - 1].push(word);
-            } else {
-                groups.push([word]);
-            }
+    clearArgsScratch(): void {
+        for (let i = 0; i < this.argsScratchKeys.length; i++) {
+            delete this.argsScratch[this.argsScratchKeys[i]];
         }
-
-        return groups;
+        this.argsScratchKeys.length = 0;
     }
 
-    /**
-     * Returns an object composed from arrays of property names and values.
-     * @example
-     *   fromPairs([['a', 1], ['b', 2]]);
-     *   // => { 'a': 1, 'b': 2 }
-     */
-    fromPairs(pairs: [string, any][]): Record<string, string> {
-        let index = -1;
-        const length = !pairs ? 0 : pairs.length;
-        const result: Record<string, string> = {};
+    setArgScratch(letter: string, value: any): void {
+        if (this.argsScratch[letter] === undefined) {
+            this.argsScratchKeys.push(letter);
+        }
+        this.argsScratch[letter] = value;
+    }
 
-        while (++index < length) {
-            const pair = pairs[index];
-            result[pair[0]] = pair[1];
+    buildArgsScratch(
+        letters: string[],
+        values: string[],
+        start: number,
+        end: number,
+    ): Record<string, any> {
+        this.clearArgsScratch();
+        for (let i = start; i < end; i++) {
+            this.setArgScratch(letters[i], values[i]);
+        }
+        return this.argsScratch;
+    }
+
+    dispatchTokenGroup(
+        letters: string[],
+        values: string[],
+        start: number,
+        end: number,
+    ): void {
+        if (end <= start) {
+            return;
         }
 
-        return result;
+        const letter = letters[start];
+        const code = values[start];
+        let cmd = '';
+        let args: Record<string, any> | string = this.argsScratch;
+
+        if (letter === 'G') {
+            cmd = letter + code;
+            args = this.buildArgsScratch(letters, values, start + 1, end);
+
+            if (this.argsScratch.X !== undefined) {
+                this.vmState.usedAxes.add('X');
+            }
+
+            if (this.argsScratch.Y !== undefined) {
+                this.vmState.usedAxes.add('Y');
+            }
+
+            if (this.argsScratch.Z !== undefined) {
+                this.vmState.usedAxes.add('Z');
+            }
+
+            if (this.argsScratch.A !== undefined) {
+                this.vmState.usedAxes.add('A');
+            }
+
+            if (MOTION_MODAL_CODES.has(code)) {
+                this.motionMode = cmd;
+            } else if (code === '80') {
+                this.motionMode = '';
+            }
+        } else if (letter === 'M') {
+            cmd = letter + code;
+            args = this.buildArgsScratch(letters, values, start + 1, end);
+            this.updateSpindleToolEvents('M', Number(code));
+        } else if (letter === 'T') {
+            // T1 ; w/o M6
+            cmd = letter;
+            args = code;
+            this.updateSpindleToolEvents('T', Number(code));
+        } else if (letter === 'S') {
+            cmd = letter;
+            args = code;
+            this.updateSpindleToolEvents('S', Number(code));
+        } else if (AXIS_ARGUMENT_LETTERS.has(letter)) {
+            // Use previous motion command if the line does not start with G-code or M-code.
+            cmd = this.motionMode;
+            args = this.buildArgsScratch(letters, values, start, end);
+        }
+
+        if (!cmd) {
+            return;
+        }
+
+        if (typeof this.handlers[cmd] === 'function') {
+            const func = this.handlers[cmd];
+            this.profileStats.handlerInvocations += 1;
+            func(args);
+        }
     }
 
     virtualize(line = ''): void {
+        this.profileStats.linesSeen += 1;
         this.setEstimate = false; // Reset on each line
         if (!line) {
             this.totalLines += 1;
@@ -1122,26 +1204,28 @@ class GCodeVirtualizer extends EventEmitter {
             return;
         }
 
-        line = line
-            .replace(this.re1, '')
-            .replace(this.re2, '')
-            .replace(this.re3, '');
-
-        if (line === '') {
+        const scan = scanLineFast(line, this.fastScanScratch);
+        if (scan.count === 0) {
             this.totalLines += 1;
             return;
         }
 
-        if (line.replace(this.VALID_GCODE_REGEX, '').length > 0) {
+        if (scan.hasInvalidTokens) {
             this.vmState.invalidLines.push(line);
+            this.profileStats.invalidLineCount += 1;
         }
 
-        let parsedLine = parseLine(line);
+        this.profileStats.tokensSeen += scan.count;
         this.totalLines += 1; // Moved here so M6 and T commands are correctly stored
+
+        const letters = scan.letters;
+        const values = scan.values;
+        let spindleSpeedUpdate: number | null = null;
+
         // collect spindle and feed rates
-        for (let word of parsedLine.words) {
-            const letter = word[0];
-            const code = word[1];
+        for (let i = 0; i < scan.count; i++) {
+            const letter = letters[i];
+            const code = values[i];
             if (letter === 'F') {
                 this.feed = Number(code);
                 this.vmState.feedrates.add(`F${code}`);
@@ -1149,95 +1233,29 @@ class GCodeVirtualizer extends EventEmitter {
             }
             if (letter === 'S') {
                 this.vmState.spindle.add(`S${code}`);
-                this.updateSpindleToolEvents('S', Number(code));
+                const spindleSpeed = Number(code);
+                this.updateSpindleToolEvents('S', spindleSpeed);
+                if (!Number.isNaN(spindleSpeed)) {
+                    spindleSpeedUpdate = spindleSpeed;
+                }
             }
         }
 
-        const groups = this.partitionWordsByGroup(parsedLine.words);
-        for (let i = 0; i < groups.length; ++i) {
-            const words = groups[i];
-            const word = words[0] || [];
-            const letter = word[0];
-            const code = word[1];
-            let cmd = '';
-            let args: Record<string, any> = {};
-
-            if (letter === 'G') {
-                cmd = letter + code;
-                args = this.fromPairs(words.slice(1));
-
-                if (args.X !== undefined) {
-                    this.vmState.usedAxes.add('X');
-                }
-
-                if (args.Y !== undefined) {
-                    this.vmState.usedAxes.add('Y');
-                }
-
-                if (args.Z !== undefined) {
-                    this.vmState.usedAxes.add('Z');
-                }
-
-                if (args.A !== undefined) {
-                    this.vmState.usedAxes.add('A');
-                }
-
-                // Motion Mode
-
-                if (
-                    [
-                        '0',
-                        '1',
-                        '2',
-                        '3',
-                        '38.2',
-                        '38.3',
-                        '38.4',
-                        '38.5',
-                    ].includes(code)
-                ) {
-                    this.motionMode = cmd;
-                } else if (code === '80') {
-                    this.motionMode = '';
-                }
-            } else if (letter === 'M') {
-                cmd = letter + code;
-                args = this.fromPairs(words.slice(1));
-                this.updateSpindleToolEvents('M', Number(code));
-            } else if (letter === 'T') {
-                // T1 ; w/o M6
-                cmd = letter;
-                args = code;
-                this.updateSpindleToolEvents('T', Number(code));
-            } else if (letter === 'S') {
-                cmd = letter;
-                args = code;
-                this.updateSpindleToolEvents('S', Number(code));
-            } else if (
-                letter === 'X' ||
-                letter === 'Y' ||
-                letter === 'Z' ||
-                letter === 'A' ||
-                letter === 'B' ||
-                letter === 'C' ||
-                letter === 'I' ||
-                letter === 'J' ||
-                letter === 'K'
-            ) {
-                // Use previous motion command if the line does not start with G-code or M-code.
-                cmd = this.motionMode;
-                args = this.fromPairs(words);
-            }
-
-            if (!cmd) {
-                continue;
-            }
-
-            if (typeof this.handlers[cmd] === 'function') {
-                const func = this.handlers[cmd];
-                func(args);
+        let groupStart = 0;
+        let groupCount = 0;
+        for (let i = 0; i < scan.count; ++i) {
+            const letter = letters[i];
+            if ((letter === 'G' || letter === 'M' || letter === 'T') && i > groupStart) {
+                groupCount += 1;
+                this.dispatchTokenGroup(letters, values, groupStart, i);
+                groupStart = i;
             }
         }
+        if (scan.count > 0) {
+            groupCount += 1;
+            this.dispatchTokenGroup(letters, values, groupStart, scan.count);
+        }
+        this.profileStats.groupsSeen += groupCount;
 
         /*
         // if the line didnt have time calcs involved, push 0 time
@@ -1247,6 +1265,7 @@ class GCodeVirtualizer extends EventEmitter {
         */
         if (!this.setEstimate) {
             this.estimates.push(0); // Same as above but use flag instead of array length
+            this.profileStats.estimatesPushCount += 1;
         }
         /*
         // add new data structure
@@ -1259,8 +1278,8 @@ class GCodeVirtualizer extends EventEmitter {
         */
 
         this.fn.callback();
-        this.emit('data', parsedLine);
-        parsedLine = null;
+        this.profileStats.emitDataCount += 1;
+        this.emit('data', spindleSpeedUpdate);
     }
 
     generateFileStats() {
@@ -1449,10 +1468,10 @@ class GCodeVirtualizer extends EventEmitter {
                 // The range represents the full diameter of the workpiece
                 const yRange = this.maxBounds[1] - this.minBounds[1];
                 const zRange = this.maxBounds[2] - this.minBounds[2];
-                
+
                 // Use the larger range (Y or Z depending on machine configuration)
                 const detectedDiameter = Math.max(yRange, zRange);
-                
+
                 // Update if we found a larger diameter, with minimum of 10mm
                 if (detectedDiameter > this.rotaryDiameter) {
                     this.rotaryDiameter = Math.max(detectedDiameter, 10);
@@ -1556,7 +1575,7 @@ class GCodeVirtualizer extends EventEmitter {
             // Convert it to equivalent mm/min based on the workpiece diameter
             const aMaxFeedLinear = (this.aMaxFeed / 360) * (Math.PI * this.rotaryDiameter);
             const aAccelLinear = (this.aAccel / 360) * (Math.PI * this.rotaryDiameter);
-            
+
             maxFeedArray.push(aMaxFeedLinear);
             accelArray.push(aAccelLinear);
             axisMovements.push({
@@ -1569,6 +1588,7 @@ class GCodeVirtualizer extends EventEmitter {
         // If no movement, return early
         if (axisMovements.length === 0) {
             this.estimates.push(0);
+            this.profileStats.estimatesPushCount += 1;
             this.setEstimate = true;
             return;
         }
@@ -1622,7 +1642,7 @@ class GCodeVirtualizer extends EventEmitter {
 
             // if motion is G0, use the max feed
             let feed = this.modal.motion === 'G0' ? minMaxFeed : this.feed;
-            
+
             // For pure rotary moves (A-axis only), the feedrate (F value) is in degrees/min
             // Convert it to equivalent linear speed based on workpiece diameter
             if (da !== 0 && dx === 0 && dy === 0 && dz === 0) {
@@ -1653,6 +1673,7 @@ class GCodeVirtualizer extends EventEmitter {
 
         this.totalTime += moveDuration;
         this.estimates.push(Number(moveDuration.toFixed(4))); // round to avoid bad js math
+        this.profileStats.estimatesPushCount += 1;
         this.setEstimate = true;
     }
 
@@ -1690,43 +1711,8 @@ class GCodeVirtualizer extends EventEmitter {
         };
     }
 
-    // getModalChanges(): ModalChanges {
-    //     this.modalChanges[this.modalChanges.length - 1].count =
-    //         this.modalCounter;
-    //     this.modalCounter = 0;
-    //     return this.modalChanges;
-    // }
-
-    // getFeedrateChanges(): FeedrateChanges {
-    //     this.feedrateChanges[this.feedrateChanges.length - 1].count =
-    //         this.feedrateCounter;
-    //     this.feedrateCounter = 0;
-    //     return this.feedrateChanges;
-    // }
-
-    getCurrentModal(): Modal {
-        return this.modal;
-    }
-
-    // saveModal(change: Partial<Modal>): void {
-    //     this.modalChanges[this.modalChanges.length - 1].count =
-    //         this.modalCounter;
-    //     this.modalCounter = 0;
-    //     this.modalChanges.push({ change: change, count: 0 });
-    // }
-
-    // saveFeedrate(change: string): void {
-    //     this.feedrateChanges[this.feedrateChanges.length - 1].count =
-    //         this.feedrateCounter;
-    //     this.feedrateCounter = 0;
-    //     this.feedrateChanges.push({ change: change, count: 0 });
-    // }
-
-    addToTotalTime(time: number): void {
-        if (!Number(time)) {
-            return;
-        }
-        this.totalTime += time;
+    getProfileStats(): VMProfileStats {
+        return { ...this.profileStats };
     }
 
     updateSpindleToolEvents(

@@ -27,6 +27,7 @@ const formatSpindles = (spindles: Spindle[] = []): FormattedSpindle[] => {
 const SpindleSelector = ({ spindles, onChange, spindle, disabled }: Props) => {
     const spindleFormatted = { label: spindle.label, value: spindle.id };
     const formattedSpindles = formatSpindles(spindles);
+
     return (
         <Tooltip content="Select a spindle">
             <div

@@ -1,7 +1,7 @@
 import { ArrowLeft, ArrowRight, HelpCircle } from 'lucide-react';
 import { SubWizard, ValidationResult } from '../../types/wizard';
 import { ValidationBanner } from 'app/features/AccessoryInstaller/components/wizard/ValidationBanner.tsx';
-import PlaceholderImage from '../../Wizards/assets/placeholder.png';
+import PlaceholderImage from '../../Wizards/atc/assets/placeholder_1.png';
 
 interface WizardLandingProps {
     title: string;
@@ -71,7 +71,7 @@ export function WizardLanding({
                     <div className="flex flex-col gap-3 mt-12 max-w-md">
                         {subWizards.map((subWizard, index) => {
                             const isActive = index === 0;
-                            const isDisabledBySequence = index > 0;
+                            const isDisabledBySequence = index < 0;
                             const isDisabled =
                                 validationsFailed || isDisabledBySequence;
 

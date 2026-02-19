@@ -22,9 +22,6 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
         'widgets.atc.templates.variables._tc_slots.value',
     );
 
-    console.log('rackless:' + rackless);
-    console.log('slotCount:' + slotCount);
-
     const mpos = useSelector((state: RootState) => state.controller.mpos);
     const ATCIPositionSet = useTypedSelector(
         (state: RootState) => state.controller.settings.atci?.rack_set,
@@ -33,8 +30,6 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
     const ATCIMacroAborted = useTypedSelector(
         (state: RootState) => state.controller.settings.atci?.macro_aborted,
     );
-
-    console.log(`aborted: ${ATCIMacroAborted}`);
 
     useEffect(() => {
         if (ATCIMacroAborted === 1) {
@@ -65,7 +60,6 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
 
     useEffect(() => {
         if (rackless === 0 && slotCount === 0) {
-            console.log('Auto completing because rackless');
             setIsComplete(true);
             onComplete();
         }

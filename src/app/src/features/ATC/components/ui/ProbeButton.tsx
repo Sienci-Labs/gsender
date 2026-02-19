@@ -24,11 +24,6 @@ export const ProbeButton = ({
                     variant: 'warning' as const,
                     text: 'Probe Tool',
                 };
-            case 'offrack':
-                return {
-                    variant: 'error' as const,
-                    text: 'Off Rack',
-                };
             default:
                 return {
                     variant: 'error' as const,

@@ -2,13 +2,22 @@ import fs from 'fs';
 import path from 'path';
 
 export const viteServer = async (app) => {
-    const workspaceRoot = path.resolve(__dirname, '..');
-    const devDir = path.join(workspaceRoot, 'src/app');
-    const prodDir = path.join(workspaceRoot, 'dist/gsender/app');
-
     // Constants
     const isProduction = process.env.NODE_ENV === 'production';
     const base = process.env.BASE || '/';
+    const bundleRoot = path.resolve(__dirname, '..');
+    const projectRoot = process.cwd();
+
+    const devDir = path.resolve(projectRoot, 'src/app');
+    const prodDirCandidates = [
+        path.resolve(bundleRoot, 'app'),
+        path.resolve(projectRoot, 'dist/gsender/app'),
+    ];
+    const prodDir = prodDirCandidates.find((dir) => fs.existsSync(dir)) || prodDirCandidates[0];
+
+    if (!isProduction && !fs.existsSync(devDir)) {
+        throw new Error(`Vite dev directory not found: ${devDir}`);
+    }
 
     // Cached production assets
     const templateHtml = isProduction

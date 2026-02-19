@@ -1,0 +1,61 @@
+name: Setup and Build
+description: Shared setup steps for gSender Electron builds.
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node.js 22.x
+      uses: actions/setup-node@v3
+      with:
+        node-version: '22.x'
+
+    - name: Log environment variables
+      shell: bash
+      run: |
+        echo "GITHUB_REF_NAME=$GITHUB_REF_NAME"
+        echo "GITHUB_REF_TYPE=$GITHUB_REF_TYPE"
+        echo "GITHUB_RUN_NUMBER=$GITHUB_RUN_NUMBER"
+        echo "GITHUB_SHA=$GITHUB_SHA"
+        echo "RUNNER_ARCH=$RUNNER_ARCH"
+        echo "RUNNER_NAME=$RUNNER_NAME"
+        echo "RUNNER_OS=$RUNNER_OS"
+        echo "RUNNER_TEMP=$RUNNER_TEMP"
+        echo "RUNNER_TOOL_CACHE=$RUNNER_TOOL_CACHE"
+
+    - name: Install Yarn and node-gyp
+      shell: bash
+      run: |
+        npm install -g yarn
+        yarn global add node-gyp
+
+    - name: Install dependencies and lint
+      shell: bash
+      run: |
+        yarn install
+        yarn lint
+
+    - name: Sync package and install src deps
+      shell: bash
+      run: |
+        npm run package-sync
+        yarn --cwd src install --production --ignore-scripts --non-interactive
+
+    - name: Prebuild (tag)
+      if: github.ref_type == 'tag'
+      shell: bash
+      run: npm run prebuild-prod
+
+    - name: Prebuild (branch)
+      if: github.ref_type == 'branch'
+      shell: bash
+      run: npm run prebuild-latest
+
+    - name: Build renderer (tag)
+      if: github.ref_type == 'tag'
+      shell: bash
+      run: yarn run build
+
+    - name: Build renderer (branch)
+      if: github.ref_type == 'branch'
+      shell: bash
+      run: yarn run build-latest

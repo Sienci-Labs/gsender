@@ -47,41 +47,65 @@ export function ProfileBar() {
         const file = e.target.files[0];
         try {
             importFirmwareSettings(file, (e) => {
-                const uploadedSettings: EEPROMSettings = JSON.parse(
-                    e.target.result as string,
-                );
-                const code = [];
-                let formattedSettings: EEPROMSettings = {};
+                try {
+                    const uploadedSettings: EEPROMSettings = JSON.parse(
+                        e.target.result as string,
+                    );
 
-                if (machineProfile.orderedSettings) {
-                    // get the ordered settings in first
-                    machineProfile.orderedSettings.forEach((_value, key) => {
-                        if (uploadedSettings[key as EEPROM]) {
-                            formattedSettings[key as EEPROM] =
-                                uploadedSettings[key as EEPROM];
+                    // check that every property is of EEPROM type
+                    Object.keys(uploadedSettings).forEach((key) => {
+                        if (key[0] !== '$' || isNaN(Number(key.substring(1)))) {
+                            throw new Error(
+                                'Invalid firmware settings file format',
+                            );
                         }
                     });
-                    // then get the rest
-                    for (const [key, value] of Object.entries(
-                        uploadedSettings,
-                    )) {
-                        if (!formattedSettings[key as EEPROM]) {
-                            formattedSettings[key as EEPROM] = value;
+
+                    const code = [];
+                    let formattedSettings: EEPROMSettings = {};
+
+                    if (machineProfile.orderedSettings) {
+                        // get the ordered settings in first
+                        machineProfile.orderedSettings.forEach(
+                            (_value, key) => {
+                                if (uploadedSettings[key as EEPROM]) {
+                                    formattedSettings[key as EEPROM] =
+                                        uploadedSettings[key as EEPROM];
+                                }
+                            },
+                        );
+                        // then get the rest
+                        for (const [key, value] of Object.entries(
+                            uploadedSettings,
+                        )) {
+                            if (!formattedSettings[key as EEPROM]) {
+                                formattedSettings[key as EEPROM] = value;
+                            }
                         }
+                    } else {
+                        formattedSettings = uploadedSettings;
                     }
-                } else {
-                    formattedSettings = uploadedSettings;
-                }
 
-                for (const [key, value] of Object.entries(formattedSettings)) {
-                    code.push(`${key}=${value}`);
-                }
-                code.push('$$');
+                    for (const [key, value] of Object.entries(
+                        formattedSettings,
+                    )) {
+                        code.push(`${key}=${value}`);
+                    }
+                    code.push('$$');
 
-                controller.command('gcode', code);
-                toast.success('EEPROM Settings imported', {
-                    position: 'bottom-right',
-                });
+                    controller.command('gcode', code);
+                    toast.success('EEPROM Settings imported', {
+                        position: 'bottom-right',
+                    });
+                } catch (error) {
+                    console.error('Import error:', error);
+                    toast.error(
+                        'Failed to import settings. Please check the file format.',
+                        {
+                            position: 'bottom-right',
+                        },
+                    );
+                }
             });
         } catch (e) {
             toast.error('Unable to import settings', {

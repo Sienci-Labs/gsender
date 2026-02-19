@@ -7,8 +7,8 @@ import {
 } from 'app/components/shadcn/Collapsible.tsx';
 import { Badge } from 'app/features/ATC/components/ui/Badge.tsx';
 import { ChevronDown } from 'lucide-react';
-import { StatusBadge } from 'app/features/ATC/components/ui/StatusBadge.tsx';
 import { ProbeButton } from 'app/features/ATC/components/ui/ProbeButton.tsx';
+import { ToolStatusBadges } from 'app/features/ATC/components/ui/ToolStatusBadges.tsx';
 import {
     Table,
     TableBody,
@@ -23,8 +23,9 @@ import Button from 'app/components/Button';
 import partition from 'lodash/partition';
 import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
 import { getToolStateClasses } from 'app/features/ATC/utils/ATCiConstants.ts';
+import { ToolProbeState } from 'app/features/ATC/types.ts';
 
-export type ToolStatus = 'probed' | 'unprobed' | 'offrack';
+export type ToolStatus = ToolProbeState;
 
 export interface ToolInstance {
     id: number;
@@ -39,6 +40,7 @@ export interface ToolInstance {
     toolRadius: number;
     nickname?: string;
     status: ToolStatus;
+    isManual?: boolean;
 }
 
 export function probeRackTool(toolID: number) {
@@ -54,12 +56,14 @@ const ToolSection = ({
     tools,
     disabled,
     defaultOpen = true,
+    allowManualBadge = false,
 }: {
     title: string;
     tools: ToolInstance[];
     onProbe?: (toolId: string) => void;
     defaultOpen?: boolean;
     disabled?: boolean;
+    allowManualBadge?: boolean;
 }) => {
     const [isOpen, setIsOpen] = useState(defaultOpen);
 
@@ -125,14 +129,28 @@ const ToolSection = ({
                                     </TableCell>
                                     <TableCell className="portrait:flex portrait:flex-col portrait:gap-2 portrait:items-center">
                                         <div className="portrait:block hidden">
-                                            <StatusBadge status={tool.status} />
+                                            <ToolStatusBadges
+                                                probeState={tool.status}
+                                                isManual={
+                                                    tool.isManual &&
+                                                    allowManualBadge
+                                                }
+                                                size="sm"
+                                            />
                                         </div>
                                         <div className="inline-block w-[120px] px-3 py-1 bg-blue-500/10 border border-blue-500/20 text-center rounded-md font-mono font-semibold text-sm text-blue-500">
                                             {tool.toolOffsets.z.toFixed(3)}
                                         </div>
                                     </TableCell>
                                     <TableCell className="portrait:hidden">
-                                        <StatusBadge status={tool.status} />
+                                        <ToolStatusBadges
+                                            probeState={tool.status}
+                                            isManual={
+                                                tool.isManual &&
+                                                allowManualBadge
+                                            }
+                                            size="sm"
+                                        />
                                     </TableCell>
                                     <TableCell>
                                         <ProbeButton
@@ -165,7 +183,8 @@ export interface ToolTableProps {
 }
 
 export function ToolTable({ tools = [], disabled }: ToolTableProps) {
-    const { rackSize } = useToolChange();
+    const { rackSize, connected, atcAvailable } = useToolChange();
+    const allowManualBadge = connected && atcAvailable;
 
     const [onRackTools, offRackTools] = partition(
         tools,
@@ -175,18 +194,20 @@ export function ToolTable({ tools = [], disabled }: ToolTableProps) {
     return (
         <div className="sm:rounded-lg w-full h-[500px] gap-1 flex flex-col">
             <ToolSection
-                title="On-Rack Tools"
+                title="Rack Loaded Tools"
                 tools={onRackTools}
                 onProbe={() => {}}
                 defaultOpen={true}
                 disabled={disabled}
+                allowManualBadge={allowManualBadge}
             />
             <ToolSection
-                title="Off-Rack Tools"
+                title="Manually Loaded Tools"
                 tools={offRackTools}
                 onProbe={() => {}}
                 defaultOpen={false}
                 disabled={disabled}
+                allowManualBadge={allowManualBadge}
             />
         </div>
     );

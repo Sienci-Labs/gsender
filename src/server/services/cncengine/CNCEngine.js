@@ -44,7 +44,6 @@ import { GRBLHAL } from '../../controllers/Grblhal/constants';
 import { authorizeIPAddress } from '../../access-control';
 import DFUFlasher from '../../lib/Firmware/Flashing/DFUFlasher';
 import delay from '../../lib/delay';
-import SerialConnection from 'server/lib/SerialConnection';
 import Connection from '../../lib/Connection';
 import { VISUALIZER_SECONDARY } from '../../../app/src/constants';
 
@@ -590,20 +589,20 @@ class CNCEngine {
                 //Close the controller for flasher utility to take over the port
                 const controller = store.get('controllers["' + flashPort + '"]');
                 if (controller) {
-                    // handle HAL behaviour - send DFU command
                     if (isHal) {
-                        // Do hal flash
-                        log.debug('writing to close using DFU');
-                        controller.writeln('$DFU');
-
                         store.unset(`controllers[${JSON.stringify(flashPort)}]`);
-                        delay(1500).then(() => {
+                        const startFlash = () => {
                             try {
                                 halFlasher.flash(data);
                             } catch (err) {
                                 this.emit('flash:message', { type: 'Error', content: err });
                             }
-                        });
+                        };
+                        if (isInDFUmode) {
+                            startFlash();
+                        } else {
+                            delay(1500).then(startFlash);
+                        }
                         return;
                     }
 
@@ -619,25 +618,18 @@ class CNCEngine {
 
                     return;
                 } else if (isHal) {
-                    // This branch is if the controller is NOT connected but is HAL -  we need to connect and put into DFU with a manual serial connection
-                    // We don't need to instantiate an entire controller but we can definitely use our serialport shim
-                    if (!isInDFUmode) {
-                        // Connect and send $DFU
-                        const connect = new SerialConnection({
-                            path: flashPort
-                        });
-                        connect.open((err) => {
-                            if (err) {
-                                this.emit('flash:message', { type: 'Error', content: err });
-                            }
-                            connect.write('$DFU\n');
-                        });
+                    const startFlash = () => {
+                        try {
+                            halFlasher.flash(data);
+                        } catch (err) {
+                            this.emit('flash:message', { type: 'Error', content: err });
+                        }
+                    };
+                    if (isInDFUmode) {
+                        startFlash();
+                    } else {
+                        delay(1500).then(startFlash);
                     }
-
-                    // For both DFU and non DFU we flash
-                    delay(1250).then(() => {
-                        halFlasher.flash(data);
-                    });
 
                     return;
                 }

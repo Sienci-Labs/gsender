@@ -16,6 +16,7 @@ import { rankItem } from '@tanstack/match-sorter-utils';
 import React, { useState } from 'react';
 import styles from './index.module.styl';
 import { FaPlus } from 'react-icons/fa';
+import { BiReset } from 'react-icons/bi';
 import cx from 'classnames';
 
 /*
@@ -87,6 +88,7 @@ interface SortableTableProps<TData extends { subRow?: string }, TValue> {
     enableSortingRemoval?: boolean;
     rowColours?: string[];
     onAdd?: () => void;
+    onResetAll?: () => void;
     sortBy?: {
         id: string;
         desc: boolean;
@@ -122,6 +124,7 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
     */
     const sortBy = props.sortBy || null;
     const onAdd = props.onAdd || null; // function for when add button is pressed
+    const onResetAll = props.onResetAll || null; // function for when reset all button is pressed
     const rowSpan = props.rowSpan || new Map(); // map: accessorKey => num rows to span
     const pagination =
         props.pagination !== null && props.pagination !== undefined
@@ -239,6 +242,25 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
                         >
                             <FaPlus />
                             Add New Task
+                        </button>
+                    </div>
+                )}
+                {onResetAll && (
+                    <div
+                        className="flex items-center gap-1"
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            float: 'right',
+                        }}
+                    >
+                        <button
+                            title="Add New"
+                            onClick={onResetAll}
+                            className="gap-2 text-yellow-600 border border-yellow-600 hover:bg-yellow-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-yellow-500 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center me-2"
+                        >
+                            <BiReset />
+                            Reset All
                         </button>
                     </div>
                 )}

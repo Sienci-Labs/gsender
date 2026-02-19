@@ -153,6 +153,7 @@ const defaultState: State = {
             defaultFirmwareSettings: DEFAULT_FIRMWARE_SETTINGS,
             forceHardLimits: false,
             forceSoftLimits: false,
+            useAaxisForGrbl: false,
         },
         shouldWarnZero: false,
         diagnostics: {
@@ -399,6 +400,10 @@ const defaultState: State = {
             showLineWarnings: false,
             showSoftLimitWarning: false,
             hideProcessedLines: false,
+            debug: {
+                profileWorker: true,
+                profileSampleEvery: 10000
+            }
         },
     },
     commandKeys: {},

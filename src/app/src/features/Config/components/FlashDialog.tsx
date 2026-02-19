@@ -84,6 +84,20 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
     function flashPort() {
         setFlashState(FlashingState.Flashing);
 
+        const isHal = controllerType === 'grblHAL';
+        const isDfuPort = port === SLB_DFU_PORT.port;
+        if (isHal && !isDfuPort) {
+            controller.command('gcode', '$DFU');
+            setTimeout(() => {
+                startFlash({
+                    port,
+                    hex,
+                    controllerType,
+                });
+            }, 1500);
+            return;
+        }
+
         startFlash({
             port,
             hex,
@@ -109,10 +123,16 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
         controller.addListener('task:error', () => {
             setFlashState(FlashingState.Error);
         });
+        controller.addListener('flash:message', (msg) => {
+            if (msg?.type === 'Error') {
+                setFlashState(FlashingState.Error);
+            }
+        });
 
         return () => {
             controller.removeListener('flash:end');
             controller.removeListener('task:error');
+            controller.removeListener('flash:message');
         };
     }, []);
 
@@ -270,7 +290,9 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                     </div>
                     <div
                         className={cn('flex items-center justify-center', {
-                            hidden: flashState !== FlashingState.Complete,
+                            hidden:
+                                flashState !== FlashingState.Complete &&
+                                flashState !== FlashingState.Error,
                         })}
                     >
                         <Button variant="primary" onClick={toggleShow}>

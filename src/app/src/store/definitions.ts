@@ -26,9 +26,6 @@ import {
 } from 'app/features/Visualizer/definitions';
 import {
     Modal,
-    PDData,
-    FeedrateChanges,
-    ModalChanges,
 } from 'app/lib/definitions/gcode_virtualization';
 import { Feeder, Sender } from 'app/lib/definitions/sender_feeder';
 import { CommandKeys } from 'app/lib/definitions/shortcuts';
@@ -185,22 +182,6 @@ export interface ReduxState {
     file: FileInfoState;
     visualizer: VisualizerState;
     preferences: PreferencesState;
-}
-
-// Indexed DB
-
-export interface ParsedData {
-    id: string;
-    data: Array<PDData>;
-    estimates: Array<number>;
-    feedrateChanges: Array<FeedrateChanges>;
-    modalChanges: Array<ModalChanges>;
-    info: FileInfoState;
-}
-
-export interface EstimateData {
-    estimates: Array<number>;
-    estimatedTime: number;
 }
 
 // Front-end State
