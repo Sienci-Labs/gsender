@@ -1502,7 +1502,6 @@ class GrblHalController {
 
         // Nothing else here matters if connecting to existing instantiated controller
         if (refresh) {
-            console.log('RESTORED');
             this.initialized = true;
             this.initController(this.runner.settings?.version?.semver);
             return;

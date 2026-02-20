@@ -192,8 +192,9 @@ class Connection extends EventEmitter {
                     this.callback,
                 );
             } else if (!this.controllerType) {
-                this.connection.writeImmediate('$I\n');
                 this.timeout = setInterval(() => {
+                    console.log('Waiting for GRBLHAL: ', this.count);
+                    this.connection.writeImmediate('$I\n');
                     if (this.count >= 5) {
                         this.controllerType = this.options.defaultFirmware;
                         this.emit(
