@@ -63,7 +63,8 @@ import {
     GRBL_HAL_ACTIVE_STATE_HOLD,
     GRBL_HAL_ACTIVE_STATE_IDLE,
     GRBL_HAL_ACTIVE_STATE_CHECK,
-    GRBL_HAL_ACTIVE_STATE_RUN
+    GRBL_HAL_ACTIVE_STATE_RUN,
+    GRBL_HAL_ACTIVE_STATE_ALARM
 } from './constants';
 import {
     METRIC_UNITS,
@@ -174,6 +175,8 @@ class GrblHalController {
             ATCI: false
         }
     };
+
+    alarmActive = false; // state to keep track of whether we have queried for the alarm code
 
     parserStateEnabled = false;
 
@@ -1081,13 +1084,8 @@ class GrblHalController {
                 this.actionTime.queryStatusReport = now;
                 if (this.runner.isAlarm() && this.actionMask.alarmCompleteReport) {
                     this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
-                    this.actionMask.alarmCompleteReport = false;
                 } else {
                     this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT); //? or \x80
-
-                    if (!this.actionMask.alarmCompleteReport) {
-                        this.actionMask.alarmCompleteReport = true;
-                    }
                 }
             }
         };
@@ -1187,6 +1185,28 @@ class GrblHalController {
                 }
                 this.state = this.runner.state;
                 this.emit('controller:state', GRBLHAL, this.state);
+            }
+
+            // check whether we need to get alarm code
+            const runnerActiveState = _.get(this.runner.state, 'status.activeState', '');
+            const runnerAlarmCode = _.get(this.runner.state, 'status.alarmCode', '');
+            if (runnerActiveState === GRBL_HAL_ACTIVE_STATE_ALARM) {
+                if (runnerAlarmCode === '') { // no code
+                    // if this is the first alarm detection, we need a code
+                    if (!this.alarmActive) {
+                        this.alarmActive = true;
+                        // enable full report for code get
+                        this.actionMask.alarmCompleteReport = true;
+                    }
+                } else {
+                    this.alarmActive = true;
+                    this.actionMask.alarmCompleteReport = false; // we dont need full report to get code anymore
+                }
+            } else {
+                // if no alarm, clear the alarm state var
+                if (this.alarmActive) {
+                    this.alarmActive = false;
+                }
             }
 
             // Check the ready flag

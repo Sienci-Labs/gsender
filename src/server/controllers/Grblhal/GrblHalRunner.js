@@ -168,10 +168,13 @@ class GrblHalRunner extends events.EventEmitter {
 
             const probeActive = raw.includes('Pn:P');
 
+            const shouldClearAlarmCode = payload.activeState !== GRBL_HAL_ACTIVE_STATE_ALARM;
+
             const nextState = {
                 ...this.state,
                 status: {
                     ...this.state.status,
+                    alarmCode: shouldClearAlarmCode ? '' : this.state.status.alarmCode,
                     probeActive: probeActive,
                     ...payload
                 }
