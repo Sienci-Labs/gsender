@@ -21,24 +21,58 @@
  *
  */
 
-import chunk from 'lodash/chunk';
 import concaveman from 'concaveman';
 
 self.onmessage = ({ data }) => {
     const { isLaser = false, parsedData = [], mode, bbox, zTravel } = data;
 
-    const getOutlineGcode = (concavity = 20) => {
-        let vertices = [];
-        parsedData.forEach((n) => vertices.push(n.toFixed(3)));
-        vertices = chunk(vertices, 3);
+    const getOutlineGcode = (concavity = Infinity) => {
+        // 1. Extract 2D [x, y] points (parsedData is flat: x0,y0,z0,x1,y1,z1,...)
+        const points2D = [];
+        for (let i = 0; i < parsedData.length; i += 3) {
+            points2D.push([
+                parseFloat(parsedData[i].toFixed(3)),
+                parseFloat(parsedData[i + 1].toFixed(3)),
+            ]);
+        }
 
-        //const fileHull = hull(vertices);
-        let fileHull = concaveman(vertices);
-        fileHull = fileHull.slice(1); // Pop the first element since it's the same as the last and will result in weird movements.
+        // 2. Deduplicate on 0.5mm grid for efficiency on large files
+        const seen = new Set();
+        const deduped = [];
+        for (const [x, y] of points2D) {
+            const key = `${Math.round(x * 2)},${Math.round(y * 2)}`;
+            if (!seen.has(key)) {
+                seen.add(key);
+                deduped.push([x, y]);
+            }
+        }
 
-        const gCode = convertPointsToGCode(fileHull, isLaser);
+        // 3. Compute concave hull; remove duplicate closing point
+        let hull = concaveman(deduped, concavity).slice(0, -1);
 
-        return gCode;
+        // 4. Ensure clockwise winding (negative signed area in standard XY)
+        // Shoelace cross-product variant: sum of (x2-x1)*(y2+y1)
+        const area = hull.reduce((sum, pt, i) => {
+            const next = hull[(i + 1) % hull.length];
+            return sum + (next[0] - pt[0]) * (next[1] + pt[1]);
+        }, 0);
+        if (area > 0) {
+            hull.reverse();
+        }
+
+        // 5. Rotate hull to start at vertex nearest to (0, 0)
+        let startIdx = 0;
+        let minDist = Infinity;
+        hull.forEach(([x, y], i) => {
+            const d = x * x + y * y;
+            if (d < minDist) {
+                minDist = d;
+                startIdx = i;
+            }
+        });
+        const orderedHull = [...hull.slice(startIdx), ...hull.slice(0, startIdx)];
+
+        return convertPointsToGCode(orderedHull, isLaser);
     };
 
     const getSimpleOutline = () => {
