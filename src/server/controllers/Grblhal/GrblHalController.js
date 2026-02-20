@@ -1083,7 +1083,7 @@ class GrblHalController {
                 this.actionMask.queryStatusReport = true;
                 this.actionTime.queryStatusReport = now;
                 if (this.runner.isAlarm() && this.actionMask.alarmCompleteReport) {
-                    this.connection.writeImmediate(Buffer.from(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT));
+                    this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
                 } else {
                     this.connection.writeImmediate(GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT); //? or \x80
                 }
