@@ -427,7 +427,7 @@ function DRO({
             </div>
             <div className="w-full flex flex-row justify-between px-3 max-xl:px-5 max-xl:-mt-[4px] max-xl:-mb-[4px]">
                 <Label>{homingMode ? 'Home' : 'Zero'}</Label>
-                <Label>Go</Label>
+                <Label>Go to</Label>
             </div>
             <div className="flex flex-col w-full gap-1 portrait:gap-2 space-between">
                 <AxisRow

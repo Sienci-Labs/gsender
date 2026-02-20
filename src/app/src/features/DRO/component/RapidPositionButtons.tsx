@@ -39,7 +39,7 @@ export function RapidPositionButtons({ disabled = false }) {
     }
 
     return (
-        <div className="justify-center items-center text-blue-500 rapidButtonTransform portrait:rapidButtonTransformPortrait portrait:ml-24 ml-16 max-xl:-mt-[5px] max-xl:-mb-[8px]">
+        <div className="justify-center items-center text-blue-500 rapidButtonTransform portrait:rapidButtonTransformPortrait portrait:ml-24 ml-16 max-xl:-mt-[8px] max-xl:-mb-[8px]">
             <div className="grid grid-cols-2 w-16 h-14 portrait:w-20 portrait:h-[68px] font-bold">
                 <Tooltip content="Go to Back Left Corner" side="top">
                     <svg

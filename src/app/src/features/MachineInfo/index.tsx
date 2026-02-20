@@ -12,7 +12,7 @@ import Tooltip from 'app/components/Tooltip';
 
 import { MachineInfoDisplay } from './MachineInfoDisplay.tsx';
 
-import icon from './assets/icon.svg';
+import minfo from './assets/minfo.svg';
 
 const MachineInfo = () => {
     const [open, setOpen] = useState(false);
@@ -46,7 +46,7 @@ const MachineInfo = () => {
             <Tooltip content="Machine Information">
                 <PopoverTrigger asChild>
                     <button className="z-50 w-[24px] max-sm:hidden">
-                        <img src={icon} className="w-[24px]" />
+                        <img src={minfo} className="w-[24px]" />
                     </button>
                 </PopoverTrigger>
             </Tooltip>

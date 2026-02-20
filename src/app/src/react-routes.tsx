@@ -68,7 +68,7 @@ export const ReactRoutes = () => {
                     <Route
                         index
                         element={
-                            <div className="p-4 fixed-content-area no-scrollbar">
+                            <div className="py-4 px-16 max-xl:px-8 fixed-content-area no-scrollbar">
                                 <p className="text-lg font-semibold mb-4 dark:text-white">
                                     Choose a tool to get started...
                                 </p>
