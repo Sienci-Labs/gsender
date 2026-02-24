@@ -91,6 +91,8 @@ Cypress.Commands.add('loadUI', (url, options = {}) => {
 Cypress.Commands.add('connectMachine', () => {
   cy.log('Starting connection check...');
   cy.wait(2000); // Brief wait for UI to stabilize
+
+  const devicePattern = Cypress.env('deviceName') || 'COM';
   
   cy.get('body').then(($body) => {
     const bodyText = $body.text();
@@ -129,7 +131,7 @@ Cypress.Commands.add('connectMachine', () => {
           .should('be.visible')
           .find('button')
           .first()
-          .should('contain.text', 'COM')
+          .should('contain.text', devicePattern)
           .then(($btn) => {
             const portName = $btn.text().trim();
             cy.log(`Selecting port: ${portName}`);
