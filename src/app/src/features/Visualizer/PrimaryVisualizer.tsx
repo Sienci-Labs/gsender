@@ -1,65 +1,41 @@
 import React, { useState, useEffect } from 'react';
-import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import { FrownIcon } from 'lucide-react';
 import pubsub from 'pubsub-js';
 
 import * as WebGL from 'app/lib/three/WebGL';
-import {
-    GRBL_ACTIVE_STATE_ALARM,
-    GRBL_ACTIVE_STATE_HOLD,
-    WORKFLOW_STATE_IDLE,
-    GRBL_ACTIVE_STATE_DOOR,
-    GRBLHAL,
-} from 'app/constants';
 import { Widget } from 'app/components/Widget';
 import VisualizerWrapper from './VisualizerWrapper';
 import Loading from './Loading';
 import Rendering from './Rendering';
-import { MODAL_WATCH_DIRECTORY } from './constants';
 import SoftLimitsWarningArea from './SoftLimitsWarningArea';
-import LoadingAnimation from './LoadingAnimation';
 import CameraDisplay from './CameraDisplay/CameraDisplay';
 import { WorkspaceSelector } from 'app/features/WorkspaceSelector/index.tsx';
 import { FaFeatherAlt } from 'react-icons/fa';
-import { FiZoomIn, FiZoomOut } from 'react-icons/fi';
 import cx from 'classnames';
 import { Tooltip } from 'app/components/Tooltip';
 import GcodeEditor from './GcodeEditor';
+import { Actions, State } from './definitions';
+
+interface Props {
+    state: State;
+    actions: Actions;
+    showVisualizer: boolean;
+    visualizerRef: any;
+    showLoading: boolean;
+    showRendering: boolean;
+}
 
 const PrimaryVisualizer = ({
     actions,
     state,
-    capable,
     showLoading,
     showRendering,
     showVisualizer,
     visualizerRef,
-    workflowRef,
-    widgetContentRef,
-    timeline,
-}) => {
-    const {
-        liteMode,
-        modal,
-        cameraPosition,
-        invalidLine,
-        invalidGcode,
-        alarmCode,
-        activeState,
-        workflow,
-        isConnected,
-        controller,
-    } = state;
-    const isHomingAlarm =
-        activeState === GRBL_ACTIVE_STATE_ALARM && alarmCode === 'Homing'; // We are alarmed and
-    const holdWithoutWorkflowPause =
-        activeState === GRBL_ACTIVE_STATE_HOLD &&
-        workflow.state === WORKFLOW_STATE_IDLE;
-    const doorOpen = activeState === GRBL_ACTIVE_STATE_DOOR;
-    const showUnlockButton =
-        isConnected && (doorOpen || isHomingAlarm || holdWithoutWorkflowPause);
-    const { handleLiteModeToggle, handleRun, reset, camera } = actions;
+}: Props) => {
+    const { cameraPosition } = state;
+    const { camera } = actions;
 
     const [showEditor, setShowEditor] = useState(false);
     const [isEditorMounted, setIsEditorMounted] = useState(false);
@@ -161,8 +137,6 @@ const PrimaryVisualizer = ({
                     />
                     <WorkspaceSelector />
 
-                    {timeline}
-
                     {isEditorMounted && (
                         <div
                             className={cx(
@@ -204,13 +178,10 @@ const PrimaryVisualizer = ({
 PrimaryVisualizer.propTypes = {
     actions: PropTypes.object,
     state: PropTypes.object,
-    capable: PropTypes.object,
     showLoading: PropTypes.bool,
     showRendering: PropTypes.bool,
     showVisualizer: PropTypes.bool,
     visualizerRef: PropTypes.func,
-    workflowRef: PropTypes.func,
-    widgetContentRef: PropTypes.func,
     containerID: PropTypes.string,
 };
 

@@ -2392,8 +2392,6 @@ class GrblHalController {
                 this.write('$FM\n');
                 this.runner.setSDStatus();
                 this.emit('controller:state', GRBLHAL, this.runner.state);
-
-                //this.write(`${GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT}\n`);
             },
             'sdcard:list': () => {
                 const [type = 'cnc'] = args;
@@ -2402,8 +2400,10 @@ class GrblHalController {
                 this.emit('controller:state', GRBLHAL, this.runner.state);
 
                 if (type === 'cnc') {
-                    console.log('this was called');
-                    this.write('$FM\n$F\n');
+                    this.write('$FM\n');
+                    delay(100).then(() => {
+                        this.write('$F\n');
+                    });
                     return;
                 }
 
@@ -2434,7 +2434,6 @@ class GrblHalController {
             'ymodem:upload': async () => {
                 const [fileData] = args;
                 if (this.connection.isNetwork()) {
-                    console.log('Handle using FTP');
                     const [address] = this.connection.getFTPInfo();
                     const FTPPort = Number(this.runner.getSetting('$308', 21));
                     await this.ftpClient.openConnection(address, FTPPort, 'grblHAL', 'grblHAL');
@@ -2450,7 +2449,6 @@ class GrblHalController {
                 setTimeout(async () => {
                     if (this.runner.isSDMounted()) {
                         if (this.connection.isNetwork()) {
-                            console.log('Handle using FTP');
                             const [address] = this.connection.getFTPInfo();
                             const FTPPort = Number(this.runner.getSetting('$308', 21));
                             await this.ftpClient.openConnection(address, FTPPort, 'grblHAL', 'grblHAL');
@@ -2459,7 +2457,6 @@ class GrblHalController {
                         }
                         this.ymodem.sendFiles(files, this.connection.getConnectionObject());
                     } else {
-                        console.log('Failing, SD not mounted');
                         this.emit('ymodem:error', 'SD Card failed to mount, unable to upload files.');
                     }
                 }, 1500);

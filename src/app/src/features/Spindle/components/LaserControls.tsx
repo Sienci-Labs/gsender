@@ -36,6 +36,7 @@ type Props = {
         laser: LaserState;
     };
     canClick: boolean;
+    isConnected: boolean;
 };
 
 interface LaserState {
@@ -53,7 +54,7 @@ interface LaserActions {
     ) => void;
 }
 
-const LaserControls = ({ actions, state, canClick }: Props) => {
+const LaserControls = ({ actions, state, canClick, isConnected }: Props) => {
     const { laser } = state;
     const { spindle } = useTypedSelector((state) => state.controller.modal);
 
@@ -66,7 +67,7 @@ const LaserControls = ({ actions, state, canClick }: Props) => {
                     onClick={actions.sendLaserM3}
                     icon={<FaLightbulb />}
                     text="Laser On"
-                    active={laserIsOn}
+                    active={isConnected && laserIsOn}
                     size={'sm'}
                     disabled={!canClick}
                     tooltip={{ content: 'Turn on laser' }}
@@ -78,8 +79,7 @@ const LaserControls = ({ actions, state, canClick }: Props) => {
                     size={'sm'}
                     disabled={!canClick}
                     tooltip={{
-                        content:
-                            'Turn on laser for Test Duration',
+                        content: 'Turn on laser for Test Duration',
                     }}
                 />
                 <ActiveStateButton

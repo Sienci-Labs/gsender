@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
-import { firmwarePastVersion } from 'app/lib/firmwareSemver.ts';
+import { firmwareSemver } from 'app/lib/firmwareSemver.ts';
 import { ATCI_SUPPORTED_VERSION } from 'app/features/ATC/utils/ATCiConstants.ts';
 
 export function useValidations() {
@@ -11,8 +11,14 @@ export function useValidations() {
     const hasHomed = useTypedSelector(
         (state: RootState) => state.controller.state?.status?.hasHomed,
     );
+    const reportedFirmwareSemver = useTypedSelector(
+        (state: RootState) => state.controller.settings.version?.semver,
+    );
 
-    const currentFirmware = firmwarePastVersion(ATCI_SUPPORTED_VERSION);
+    const currentFirmware = firmwareSemver(
+        Number(reportedFirmwareSemver) || 0,
+        ATCI_SUPPORTED_VERSION,
+    );
 
     const connectionValidation = useMemo(
         () => () => ({
@@ -33,7 +39,7 @@ export function useValidations() {
             success: currentFirmware,
             reason: 'You must be running a more current version of the firmware to use this feature.',
         }),
-        [],
+        [currentFirmware],
     );
     return {
         connectionValidation,

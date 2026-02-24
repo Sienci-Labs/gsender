@@ -293,12 +293,24 @@ const toCompactUint32Array = (view: Uint32Array): Uint32Array => {
     return new Uint32Array(view);
 };
 
-const parseGcodeComments = (line: string): string =>
-    line.replace(/\([^\)]*\)/g, '').replace(/;.*$/, '');
+// Patterns for cylinder diameter in NC/comment headers (e.g. DeskProto "(Cylinder Dia: 64.38)")
+const ROTARY_DIAMETER_PATTERNS = [
+    /Cylinder\s*Dia\s*:\s*([0-9.+-]+)/i, // Matches: "Cylinder Dia : 64.38", allows '.' '+' '-'
+    /Cylinder\s*Dia(?:meter)?\s*[=:]\s*([0-9]+[.,][0-9]+|[0-9]+)/i, // Matches: "Cylinder Dia: 64.38" or "Cylinder Diameter=64.38"
+    /(?:Cylinder\s+)?Dia(?:meter)?\s*[=:]\s*([0-9]+[.,][0-9]+|[0-9]+)/i, // Matches: "Cylinder Diameter=64.38", "Dia: 64.38", "Cylinder Dia: 64.38"
+    /\(.*?Cylinder\s*Dia(?:meter)?\s*[=:]\s*([0-9]+[.,][0-9]+|[0-9]+)/i, // Matches when inside parens, e.g. "(Cylinder Dia: 64.38)"
+];
 
 const parseRotaryMetadata = (raw: string): RotaryMetadata => {
-    const diameterMatch = raw.match(/Cylinder\s*Dia\s*:\s*([0-9.+-]+)/i);
-    const diameter = diameterMatch ? Number(diameterMatch[1]) : Number.NaN;
+    let diameter = Number.NaN;
+    for (const re of ROTARY_DIAMETER_PATTERNS) {
+        const diameterMatch = raw.match(re);
+        const numStr = diameterMatch?.[1];
+        if (numStr) {
+            diameter = Number(numStr.replace(',', '.'));
+            if (Number.isFinite(diameter) && diameter > 0) break;
+        }
+    }
 
     const radius =
         Number.isFinite(diameter) && diameter > 0 ? diameter / 2 : null;

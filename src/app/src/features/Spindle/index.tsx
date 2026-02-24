@@ -129,13 +129,12 @@ const SpindleWidget = () => {
         order: 0,
     };
 
-    const enabledSpindle =
-        availableSpindles.find((s) => s.enabled) ?? null;
+    const enabledSpindle = availableSpindles.find((s) => s.enabled) ?? null;
     const pendingSpindle =
         pendingSpindleIdRef.current !== null
-            ? availableSpindles.find(
+            ? (availableSpindles.find(
                   (s) => s.id === pendingSpindleIdRef.current,
-              ) ?? null
+              ) ?? null)
             : null;
     const spindle =
         enabledSpindle ??
@@ -751,8 +750,8 @@ const SpindleWidget = () => {
 
     return (
         <Widget>
-            <div>
-                <div className="flex gap-2 justify-center">
+            <div className="flex flex-col gap-4 justify-center items-center h-full">
+                <div className="flex gap-2 justify-center w-full">
                     <ModalToggle
                         mode={givenMode}
                         onChange={actions.handleModeToggle}
@@ -767,19 +766,19 @@ const SpindleWidget = () => {
                         />
                     )}
                 </div>
-            </div>
-            <div>
                 {!laserAsSpindle ? (
                     <SpindleControls
                         state={state}
                         actions={actions}
                         canClick={canClick()}
+                        isConnected={isConnected}
                     />
                 ) : (
                     <LaserControls
                         state={state}
                         actions={actions}
                         canClick={canClick()}
+                        isConnected={isConnected}
                     />
                 )}
             </div>

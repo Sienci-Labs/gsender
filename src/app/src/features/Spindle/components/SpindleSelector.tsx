@@ -32,7 +32,7 @@ const SpindleSelector = ({ spindles, onChange, spindle, disabled }: Props) => {
         <Tooltip content="Select a spindle">
             <div
                 className={cx(
-                    'flex gap-1 justify-center my-2 w-full items-center',
+                    'flex gap-1 justify-center w-full items-center',
                     {
                         'cursor-not-allowed': disabled,
                     },

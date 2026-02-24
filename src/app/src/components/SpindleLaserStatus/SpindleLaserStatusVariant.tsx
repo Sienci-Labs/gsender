@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import { tv, type VariantProps } from 'tailwind-variants';
 
 export const spindleLaserStatusStyle = tv({
-    base: 'text-white rounded-lg px-2 py-1',
+    base: 'text-white rounded-lg px-2 py-1 text-xs',
     variants: {
         color: {
             spindle: 'border-red-500 bg-red-500',

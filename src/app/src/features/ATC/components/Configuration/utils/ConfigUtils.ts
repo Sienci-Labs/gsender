@@ -40,7 +40,7 @@ export function generateP100(config: ConfigState, useValues: boolean): Macro {
         `#<_passthrough_offset_setting> = ${config.variables._passthrough_offset_setting[key]}`,
         `#<_ort_offset_mode> = ${config.variables._ort_offset_mode[key]}`,
         `#<_irt_offset_mode> = ${config.variables._irt_offset_mode[key]}`,
-        `(msg, ATCI|rack_size:${config.variables._tc_slots[key]})`,
+        `(msg, ATCI|rack_size:${config.variables._tc_slots.value})`,
     ].join('\n');
 
     const data = new Blob([content]);

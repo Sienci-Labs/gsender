@@ -7,7 +7,7 @@ import redux from 'app/store/redux';
 import { emptyAllSDFiles } from 'app/store/redux/slices/controller.slice.ts';
 
 const SDCardElement = () => {
-    const { isMounted, setUploadProgress, setUploadState, isConnected } =
+    const { isMounted, isConnected } =
         useSDCard();
     useEffect(() => {
         if (isConnected) {

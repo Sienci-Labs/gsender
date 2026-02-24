@@ -40,9 +40,10 @@ type Props = {
         spindleMax: number;
     };
     canClick: boolean;
+    isConnected: boolean;
 };
 
-const SpindleControls = ({ actions, state, canClick }: Props) => {
+const SpindleControls = ({ actions, state, canClick, isConnected }: Props) => {
     const { spindle } = useTypedSelector((state) => state.controller.modal);
 
     const spindleForward = spindle === 'M3';
@@ -58,7 +59,7 @@ const SpindleControls = ({ actions, state, canClick }: Props) => {
                     text="Forward"
                     size="sm"
                     className="w-full"
-                    active={spindleForward}
+                    active={isConnected && spindleForward}
                     tooltip={{ content: 'Run spindle clockwise' }}
                 />
                 <ActiveStateButton

@@ -113,7 +113,11 @@ export default {
           "75%": { transform: "translate(-5px, 5px) rotate(-5deg)" },
           "100%": { transform: "translate(0, 0) rotate(0deg)" },
         },
-        rotate: {
+        rotatef: {
+          "0%": { transform: "rotate(0deg) scale(10)" },
+          "100%": { transform: "rotate(360deg) scale(10)" },
+        },
+        rotater: {
           "0%": { transform: "rotate(0deg) scale(10)" },
           "100%": { transform: "rotate(-360deg) scale(10)" },
         },
@@ -137,7 +141,8 @@ export default {
       animation: {
         attention: "attention 1s ease-in-out infinite",
         gradient: "gradient-shift 15s ease infinite",
-        rotate: "rotate 1s linear infinite",
+        rotatef: "rotatef 1s linear infinite",
+        rotater: "rotater 1s linear infinite",
         glowPulse: "glowPulse 1.5s ease-in-out infinite",
         glowPacity: "glowPacity 1.5s ease-in-out infinite",
       },

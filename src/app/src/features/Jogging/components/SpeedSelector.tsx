@@ -26,7 +26,7 @@ export function SpeedSelectButton({
 }: SpeedSelectButtonProps) {
     return (
         <button
-            className={cn('text-sm px-2 max-xl:px-1 max-xl:py-1 py-2 rounded', {
+            className={cn('text-sm px-2 max-xl:px-1 max-xl:py-1 py-2 rounded h-full', {
                 'bg-blue-400 bg-opacity-30': active,
             })}
             onClick={onClick}

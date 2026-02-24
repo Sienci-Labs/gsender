@@ -183,15 +183,8 @@ class Connection extends EventEmitter {
             }
 
             log.debug(`Connected to serial port "${port}"`);
-            if (!this.controllerType && network) {
-                this.controllerType = GRBLHAL;
-                this.emit(
-                    'firmwareFound',
-                    GRBLHAL,
-                    this.options,
-                    this.callback,
-                );
-            } else if (!this.controllerType) {
+            console.log('controllerType:', this.controllerType);
+            if (!this.controllerType) {
                 this.connection.writeImmediate('$I\n');
                 this.timeout = setInterval(() => {
                     if (this.count >= 5) {
