@@ -1562,6 +1562,7 @@ class Visualizer extends Component {
                 visualizerRef={(ref) => {
                     this.visualizer = ref?.visualizer;
                 }}
+                timeline={this.props.timeline}
             />
         );
 

@@ -192,6 +192,12 @@ export const scanLineFast = (
                 continue;
             }
 
+            // N: Line number — consume token but don't record it (matches parseLine behaviour)
+            if (letter === 'N') {
+                i = j;
+                continue;
+            }
+
             if (!ALLOWED_WORD_LETTERS.has(letter)) {
                 scratch.hasInvalidTokens = true;
             }

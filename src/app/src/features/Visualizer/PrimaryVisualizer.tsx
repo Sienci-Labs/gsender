@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ReactNode } from 'react';
 import PropTypes from 'prop-types';
 import { FrownIcon } from 'lucide-react';
 import pubsub from 'pubsub-js';
@@ -24,6 +24,7 @@ interface Props {
     visualizerRef: any;
     showLoading: boolean;
     showRendering: boolean;
+    timeline: ReactNode;
 }
 
 const PrimaryVisualizer = ({
@@ -33,6 +34,7 @@ const PrimaryVisualizer = ({
     showRendering,
     showVisualizer,
     visualizerRef,
+    timeline,
 }: Props) => {
     const { cameraPosition } = state;
     const { camera } = actions;
@@ -136,6 +138,8 @@ const PrimaryVisualizer = ({
                         cameraPosition={cameraPosition}
                     />
                     <WorkspaceSelector />
+
+                    {timeline}
 
                     {isEditorMounted && (
                         <div
