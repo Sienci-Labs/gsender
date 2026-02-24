@@ -37,8 +37,8 @@ export function WizardLanding({
     const validationsFailed = hasValidationFailures();
 
     return (
-        <div className="h-full bg-gray-50 dark:bg-slate-800 flex portrait:flex-col-reverse portrait:w-full">
-            <div className="w-3/5 portrait:w-full portrait:h-3/5 p-12 flex flex-col">
+        <div className="h-full min-h-0 bg-gray-50 dark:bg-slate-800 flex overflow-hidden portrait:flex-col-reverse portrait:w-full">
+            <div className="w-3/5 portrait:w-full portrait:h-3/5 p-12 flex flex-col overflow-y-auto">
                 {onBack && (
                     <button
                         onClick={onBack}
@@ -104,7 +104,7 @@ export function WizardLanding({
                 </div>
             </div>
 
-            <div className="w-2/5 portrait:w-full portrait:h-2/5 bg-gray-200 dark:bg-dark p-12 flex flex-col justify-between">
+            <div className="w-2/5 portrait:w-full portrait:h-2/5 bg-gray-200 dark:bg-dark p-12 flex flex-col justify-between overflow-y-auto">
                 <div className="flex items-center justify-center flex-1">
                     <img
                         alt="Placeholder starter image"

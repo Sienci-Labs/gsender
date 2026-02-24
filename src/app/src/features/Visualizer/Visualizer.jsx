@@ -45,7 +45,7 @@ import {
     GRBL,
     GRBLHAL,
     GRBL_ACTIVE_STATE_CHECK,
-    LASER_MODE,
+    LASER_MODE, OUTLINE_MODE_RAPIDLESS_SQUARE,
 } from 'app/constants';
 import CombinedCamera from 'app/lib/three/oldCombinedCamera';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
@@ -1201,7 +1201,7 @@ class Visualizer extends Component {
                 try {
                     const outlineWorker = new Worker(
                         new URL(
-                            '../../workers/Outline.worker.js',
+                            '../../workers/Outline.worker.ts',
                             import.meta.url,
                         ),
                         { type: 'module' },
@@ -1220,6 +1220,15 @@ class Visualizer extends Component {
                         'workspace.outlineMode',
                         'Detailed',
                     );
+                    const outlineSpeed = store.get(
+                        'workspace.outlineSpeed',
+                        null,
+                    );
+
+                    const isRapidless = outlineMode === OUTLINE_MODE_RAPIDLESS_SQUARE;
+                    const content = isRapidless
+                        ? reduxStore.getState().file.content
+                        : null;
 
                     // We want to make sure that in situations outline fails, you can try again in ~5 seconds
                     const maxRuntime = setTimeout(() => {
@@ -1238,9 +1247,11 @@ class Visualizer extends Component {
                     };
                     outlineWorker.postMessage({
                         isLaser,
-                        parsedData: vertices,
+                        parsedData: isRapidless ? [] : vertices,
                         mode: outlineMode,
                         zTravel,
+                        ...(isRapidless && { content }),
+                        outlineSpeed,
                     });
                 } catch (e) {
                     console.log(e);

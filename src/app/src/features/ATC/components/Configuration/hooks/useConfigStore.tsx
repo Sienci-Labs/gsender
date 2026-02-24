@@ -72,39 +72,20 @@ export interface ConfigState {
     slot1Position: Position;
 }*/
 
-export const defaultATCIConfig: ConfigState = {
-    variables: {
-        _ort_offset_mode: {
-            default: 0,
-            value: 0,
-        },
-        _irt_offset_mode: {
-            default: 2,
-            value: 0,
-        },
-        _tc_rack_enable: {
-            default: 0,
-            value: 0,
-        },
-        _tc_slots: {
-            default: 6,
-            value: 0,
-        },
-        _tc_slot_offset: {
-            default: 92,
-            value: 0,
-        },
-        _passthrough_offset_setting: {
-            default: 0,
-            value: 0,
-        },
-        _pres_sense: { default: 0, value: 0 },
-        _holder_sense: { default: 1, value: 0 },
-    },
-    manualLoadPosition: defaultPosition,
-    tlsPosition: defaultPosition,
-    slot1Position: defaultPosition,
-};
+function buildConfigFromStore(): ConfigState {
+    const storedVariables = store.get('widgets.atc.templates.variables', {}) as Record<string, ATCIVariable>;
+    return {
+        variables: Object.fromEntries(
+            Object.entries(storedVariables).map(([key, v]) => [
+                key,
+                { default: v.default, value: v.default },
+            ]),
+        ),
+        manualLoadPosition: defaultPosition,
+        tlsPosition: defaultPosition,
+        slot1Position: defaultPosition,
+    };
+}
 
 interface ConfigContextValue {
     config: ConfigState;
@@ -120,12 +101,15 @@ interface ConfigContextValue {
     setWorkspacePosition: (workspace: string) => void;
     isApplying: boolean;
     progress: number;
-    status: {
-        type: 'idle' | 'success' | 'error' | 'warning';
-        message: string;
-    };
-    setStatus: (s) => void;
-    templates: ATCIMacroConfig;
+    status: ConfigStatus;
+    setStatus: (status: ConfigStatus) => void;
+    templates: ATCIMacroConfig | undefined;
+    setTemplates: (templates: ATCIMacroConfig) => void;
+}
+
+export interface ConfigStatus {
+    type: 'idle' | 'success' | 'error' | 'warning';
+    message: string;
 }
 
 const ConfigContext = createContext<ConfigContextValue | undefined>(undefined);
@@ -138,19 +122,18 @@ export function mapDefaultsToValues(variables) {
     Object.entries(variables).forEach(([key, value]) => {
         variables[key].value = value.default;
     });
-
     return variables;
 }
 
 export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
-    const [config, setConfig] = useState<ConfigState>(defaultATCIConfig);
+    const [config, setConfig] = useState<ConfigState>(buildConfigFromStore);
     const [templates, setTemplates] = useState<ATCIMacroConfig>();
     const [isApplying, setIsApplying] = useState(false);
     const [progress, setProgress] = useState(0);
-    const [status, setStatus] = useState<{
-        type: 'idle' | 'success' | 'error' | 'warning';
-        message: string;
-    }>({ type: 'idle', message: '' });
+    const [status, setStatus] = useState<ConfigStatus>({
+        type: 'idle',
+        message: '',
+    });
 
     const offsetParameters = useTypedSelector(
         (state: RootState) => state.controller.settings.parameters,
@@ -158,7 +141,8 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
 
     useEffect(() => {
         const storedValues = store.get('widgets.atc.templates.variables', {});
-        const mappedVariables = mapDefaultsToValues(storedValues);
+        const cloned = JSON.parse(JSON.stringify(storedValues));
+        const mappedVariables = mapDefaultsToValues(cloned);
         updateConfig({ variables: mappedVariables });
         setTemplates(store.get('widgets.atc.templates', {}));
     }, []);

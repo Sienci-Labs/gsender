@@ -159,6 +159,7 @@ const MOTION_MODAL_CODES = new Set<string>([
     '38.4',
     '38.5',
 ]);
+const AXIS_CONSUMING_G_CODES = new Set<string>(['10', '43.1', '92']);
 const AXIS_ARGUMENT_LETTERS = new Set<string>([
     'X',
     'Y',
@@ -170,6 +171,13 @@ const AXIS_ARGUMENT_LETTERS = new Set<string>([
     'J',
     'K',
 ]);
+const normalizeCommandCode = (code: string): string => {
+    const numericCode = Number(code);
+    if (Number.isFinite(numericCode)) {
+        return String(numericCode);
+    }
+    return code;
+};
 
 class GCodeVirtualizer extends EventEmitter {
     motionMode: string = 'G0';
@@ -1136,13 +1144,17 @@ class GCodeVirtualizer extends EventEmitter {
         }
 
         const letter = letters[start];
-        const code = values[start];
+        const rawCode = values[start];
+        const code = normalizeCommandCode(rawCode);
         let cmd = '';
         let args: Record<string, any> | string = this.argsScratch;
 
         if (letter === 'G') {
             cmd = letter + code;
             args = this.buildArgsScratch(letters, values, start + 1, end);
+            const hasAxisArgs = this.argsScratchKeys.some((key) =>
+                AXIS_ARGUMENT_LETTERS.has(key),
+            );
 
             if (this.argsScratch.X !== undefined) {
                 this.vmState.usedAxes.add('X');
@@ -1164,6 +1176,43 @@ class GCodeVirtualizer extends EventEmitter {
                 this.motionMode = cmd;
             } else if (code === '80') {
                 this.motionMode = '';
+            }
+
+            // Axis words on non-motion modal lines should still execute against the
+            // currently active motion mode (e.g. "G00 G90 X...").
+            if (
+                hasAxisArgs &&
+                !MOTION_MODAL_CODES.has(code) &&
+                !AXIS_CONSUMING_G_CODES.has(code)
+            ) {
+                const modalArgs: Record<string, any> = {};
+                const motionArgs: Record<string, any> = {};
+                for (let i = 0; i < this.argsScratchKeys.length; i++) {
+                    const key = this.argsScratchKeys[i];
+                    const value = this.argsScratch[key];
+                    if (AXIS_ARGUMENT_LETTERS.has(key)) {
+                        motionArgs[key] = value;
+                    } else {
+                        modalArgs[key] = value;
+                    }
+                }
+
+                if (typeof this.handlers[cmd] === 'function') {
+                    const modalFunc = this.handlers[cmd];
+                    this.profileStats.handlerInvocations += 1;
+                    modalFunc(modalArgs);
+                }
+
+                if (
+                    Object.keys(motionArgs).length > 0 &&
+                    this.motionMode &&
+                    typeof this.handlers[this.motionMode] === 'function'
+                ) {
+                    const motionFunc = this.handlers[this.motionMode];
+                    this.profileStats.handlerInvocations += 1;
+                    motionFunc(motionArgs);
+                }
+                return;
             }
         } else if (letter === 'M') {
             cmd = letter + code;
@@ -1228,11 +1277,11 @@ class GCodeVirtualizer extends EventEmitter {
             const code = values[i];
             if (letter === 'F') {
                 this.feed = Number(code);
-                this.vmState.feedrates.add(`F${code}`);
+                if (this.collate) this.vmState.feedrates.add(`F${code}`);
                 // this.saveFeedrate(code);
             }
             if (letter === 'S') {
-                this.vmState.spindle.add(`S${code}`);
+                if (this.collate) this.vmState.spindle.add(`S${code}`);
                 const spindleSpeed = Number(code);
                 this.updateSpindleToolEvents('S', spindleSpeed);
                 if (!Number.isNaN(spindleSpeed)) {

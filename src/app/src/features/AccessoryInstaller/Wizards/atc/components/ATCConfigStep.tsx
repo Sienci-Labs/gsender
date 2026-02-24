@@ -5,25 +5,64 @@ import { ConfigTab } from 'app/features/ATC/components/Configuration/components/
 import { ConfigProvider, useConfigContext } from 'app/features/ATC/components/Configuration/hooks/useConfigStore.tsx';
 import { repopulateFromSDCard } from 'app/features/ATC/components/Configuration/utils/ConfigUtils.ts';
 
+const DEFAULT_UPLOAD_ERROR = 'SD card upload failed. Please try again.';
+
+function getUploadErrorMessage(error: unknown): string {
+    if (typeof error === 'string') {
+        const trimmedError = error.trim();
+        if (trimmedError.length > 0) {
+            return trimmedError;
+        }
+    }
+
+    if (error instanceof Error && error.message.trim().length > 0) {
+        return error.message.trim();
+    }
+
+    if (error && typeof error === 'object') {
+        const message = (error as { message?: unknown }).message;
+        if (typeof message === 'string' && message.trim().length > 0) {
+            return message.trim();
+        }
+    }
+
+    return DEFAULT_UPLOAD_ERROR;
+}
+
 function ATCConfigStepContent() {
-    const { updateConfig } = useConfigContext();
+    const { updateConfig, setStatus } = useConfigContext();
     const [uploading, setUploading] = useState(false);
     const updateConfigRef = useRef(updateConfig);
+    const setStatusRef = useRef(setStatus);
 
     useEffect(() => {
         updateConfigRef.current = updateConfig;
-    }, [updateConfig]);
+        setStatusRef.current = setStatus;
+    }, [setStatus, updateConfig]);
 
     useEffect(() => {
-        const handleSdcardJson = (payload) => {
+        const handleSdcardJson = (payload: { code?: string }) => {
+            if (!payload?.code) {
+                return;
+            }
+
             const updatedConfig = repopulateFromSDCard(payload.code);
             updateConfigRef.current({
                 variables: { ...updatedConfig.variables },
             });
         };
         const handleYmodemStart = () => setUploading(true);
-        const handleYmodemComplete = () => setUploading(false);
-        const handleYmodemError = () => setUploading(false);
+        const handleYmodemComplete = () => {
+            setUploading(false);
+            setStatusRef.current({ type: 'idle', message: '' });
+        };
+        const handleYmodemError = (error: unknown) => {
+            setUploading(false);
+            setStatusRef.current({
+                type: 'error',
+                message: getUploadErrorMessage(error),
+            });
+        };
 
         controller.addListener('sdcard:json', handleSdcardJson);
         controller.addListener('ymodem:start', handleYmodemStart);

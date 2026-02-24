@@ -38,7 +38,7 @@ export function EEPROMSettingRow({
     link = null,
     linkLabel = null,
 }: EEPROMSettingRowProps) {
-    const { EEPROM, machineProfile, firmwareType, eepromIsDefault } =
+    const { EEPROM, eepromMap, machineProfile, firmwareType, eepromIsDefault } =
         useSettings();
     const firmwareSemver = useSelector(
         (state: RootState) => state.controller.settings.version?.semver,
@@ -51,7 +51,7 @@ export function EEPROMSettingRow({
         firmwareType === GRBLHAL
             ? translateGrblCoreKey(eID as EEPROM, firmwareSemver)
             : eID;
-    const EEPROMData = EEPROM.find((s) => s.setting === effectiveEID);
+    const EEPROMData = eepromMap.get(effectiveEID as EEPROM);
 
     if (EEPROMData) {
         const isDefault = eepromIsDefault(EEPROMData);

@@ -1,8 +1,8 @@
+import React, { JSX, useCallback } from 'react';
 import { gSenderSetting } from 'app/features/Config/assets/SettingsMenu.ts';
 import { SettingRow } from 'app/features/Config/components/SettingRow.tsx';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import cn from 'classnames';
-import { JSX } from 'react';
 
 interface SettingSectionProps {
     settings: gSenderSetting[];
@@ -11,7 +11,7 @@ interface SettingSectionProps {
     wizard?: () => JSX.Element;
     showEEPROMOnly?: boolean;
 }
-export function SettingSection({
+export const SettingSection = React.memo(function SettingSection({
     settings = [],
     label = null,
     connected = false,
@@ -20,33 +20,38 @@ export function SettingSection({
 }: SettingSectionProps): JSX.Element {
     const { setSettingsValues, setSettingsAreDirty } = useSettings();
 
-    const changeHandler = (i: number) => (v: any) => {
-        setSettingsAreDirty(true);
+    const Wizard = wizard;
 
-        setSettingsValues((prev) => {
-            const updated = [...prev];
-            updated[i].value = v;
-            updated[i].dirty = true;
+    const changeHandler = useCallback(
+        (i: number) => (v: any) => {
+            setSettingsAreDirty(true);
 
-            const curSetting = updated[i];
-            // For just switches for now - if onDisable and false, run onDisable
-            if (
-                curSetting.type === 'boolean' &&
-                !v &&
-                'onDisable' in curSetting
-            ) {
-                curSetting.onDisable();
-            } else if (
-                curSetting.type === 'boolean' &&
-                v &&
-                'onEnable' in curSetting
-            ) {
-                curSetting.onEnable();
-            }
+            setSettingsValues((prev) => {
+                const updated = [...prev];
+                updated[i].value = v;
+                updated[i].dirty = true;
 
-            return updated;
-        });
-    };
+                const curSetting = updated[i];
+                // For just switches for now - if onDisable and false, run onDisable
+                if (
+                    curSetting.type === 'boolean' &&
+                    !v &&
+                    'onDisable' in curSetting
+                ) {
+                    curSetting.onDisable();
+                } else if (
+                    curSetting.type === 'boolean' &&
+                    v &&
+                    'onEnable' in curSetting
+                ) {
+                    curSetting.onEnable();
+                }
+
+                return updated;
+            });
+        },
+        [setSettingsAreDirty, setSettingsValues],
+    );
 
     return (
         <fieldset
@@ -60,7 +65,7 @@ export function SettingSection({
             {label && !showEEPROMOnly && (
                 <legend className="flex flex-row gap-8 mt-4 py-2 px-2 items-center">
                     <span className="text-blue-500  text-xl">{label}</span>
-                    {connected && wizard && wizard()}
+                    {connected && Wizard && <Wizard />}
                 </legend>
             )}
             {settings.map((setting) => {
@@ -73,4 +78,4 @@ export function SettingSection({
             })}
         </fieldset>
     );
-}
+});

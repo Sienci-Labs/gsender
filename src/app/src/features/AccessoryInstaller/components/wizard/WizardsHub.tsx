@@ -15,7 +15,7 @@ export function WizardsHub({
     description,
 }: WizardsHubProps) {
     return (
-        <div className="h-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-900">
+        <div className="h-full overflow-y-auto bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-900">
             <div className="max-w-6xl mx-auto px-8 py-16">
                 <div className="mb-12">
                     <div className="flex items-center gap-3 mb-4">

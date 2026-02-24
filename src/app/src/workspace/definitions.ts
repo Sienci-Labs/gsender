@@ -36,6 +36,7 @@ export interface Workspace {
     longestTimeRun: number;
     defaultFirmware: string;
     outlineMode: string;
+    outlineSpeed: number | null;
     revertWorkspace: boolean;
     promptExit: boolean;
     park: object;

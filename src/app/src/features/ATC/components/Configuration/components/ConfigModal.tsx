@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Dialog, DialogContent } from 'app/components/shadcn/Dialog.tsx';
 import {
     Tabs,
@@ -11,11 +11,11 @@ import { TemplatesTab } from './TemplatesTab';
 import controller from 'app/lib/controller.ts';
 import { repopulateFromSDCard } from 'app/features/ATC/components/Configuration/utils/ConfigUtils.ts';
 import { useConfigContext } from 'app/features/ATC/components/Configuration/hooks/useConfigStore.tsx';
-import { toast } from 'app/lib/toaster';
 
 interface ConfigModalProps {
     open: boolean;
     uploading: boolean;
+    uploadError?: string;
     onOpenChange: (open: boolean) => void;
 }
 
@@ -23,24 +23,34 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({
     open,
     onOpenChange,
     uploading,
+    uploadError,
 }) => {
     const [activeTab, setActiveTab] = useState('config');
-    const { updateConfig, setStatus } = useConfigContext();
+    const { updateConfig, setTemplates } = useConfigContext();
+    const updateConfigRef = useRef(updateConfig);
+    const setTemplatesRef = useRef(setTemplates);
 
     useEffect(() => {
-        // Set all config values to default, and then repopulate again from SD card.
-        controller.addListener('sdcard:json', (payload) => {
-            const updatedConfig = repopulateFromSDCard(payload.code);
+        updateConfigRef.current = updateConfig;
+        setTemplatesRef.current = setTemplates;
+    }, [setTemplates, updateConfig]);
 
-            updateConfig({
+    useEffect(() => {
+        const handleSdcardJson = (payload: { code?: string }) => {
+            if (!payload?.code) {
+                return;
+            }
+            const updatedConfig = repopulateFromSDCard(payload.code);
+            updateConfigRef.current({
                 variables: { ...updatedConfig.variables },
             });
-        });
+            setTemplatesRef.current(updatedConfig);
+        };
+
+        controller.addListener('sdcard:json', handleSdcardJson);
 
         return () => {
-            controller.removeListener('sdcard:json');
-            controller.removeListener('ymodem:error');
-            controller.removeListener('ymodem:complete');
+            controller.removeListener('sdcard:json', handleSdcardJson);
         };
     }, []);
 
@@ -61,7 +71,7 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({
                         value="config"
                         className="flex-1 mt-4 min-h-0 h-0"
                     >
-                        <ConfigTab uploading={uploading} />
+                        <ConfigTab uploading={uploading} uploadError={uploadError} />
                     </TabsContent>
 
                     <TabsContent

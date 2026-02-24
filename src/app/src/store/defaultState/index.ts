@@ -64,6 +64,7 @@ const defaultState: State = {
         longestTimeRun: 0,
         defaultFirmware: GRBLHAL,
         outlineMode: OUTLINE_MODE_DETAILED,
+        outlineSpeed: 0,
         revertWorkspace: false,
         promptExit: false,
         sendUsageData: false,
@@ -401,7 +402,7 @@ const defaultState: State = {
             showSoftLimitWarning: false,
             hideProcessedLines: false,
             debug: {
-                profileWorker: true,
+                profileWorker: false,
                 profileSampleEvery: 10000
             }
         },

@@ -20,7 +20,7 @@ const ProbeDirectionSelection: React.FC<Props> = ({
             <div
                 className={cx(
                     {
-                        'absolute top-0 right-0': isAbsolute,
+                        'absolute top-0 right-0 max-xl:pt-1': isAbsolute,
                     },
                     containerClassName,
                 )}

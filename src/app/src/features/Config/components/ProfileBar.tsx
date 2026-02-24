@@ -20,13 +20,15 @@ import { EEPROM, EEPROMSettings } from 'app/definitions/firmware';
 
 export function ProfileBar() {
     const {
-        rawEEPROM,
         settingsAreDirty,
         setSettingsAreDirty,
         EEPROM,
         settingsValues,
         machineProfile,
     } = useSettings();
+    const rawEEPROM = useSelector(
+        (state: RootState) => state.controller.settings.settings,
+    );
     const inputRef = useRef(null);
     const [flashOpen, setFlashOpen] = useState(false);
 

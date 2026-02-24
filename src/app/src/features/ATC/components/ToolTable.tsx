@@ -22,7 +22,6 @@ import { ToolNameInput } from 'app/features/ATC/components/ToolNameInput.tsx';
 import Button from 'app/components/Button';
 import partition from 'lodash/partition';
 import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
-import { getToolStateClasses } from 'app/features/ATC/utils/ATCiConstants.ts';
 import { ToolProbeState } from 'app/features/ATC/types.ts';
 
 export type ToolStatus = ToolProbeState;
@@ -114,10 +113,10 @@ const ToolSection = ({
                             {tools.map((tool) => (
                                 <TableRow
                                     key={tool.id}
-                                    className="grid grid-cols-[2fr_1fr_1fr_1fr] portrait:grid-cols-[2fr_1fr_1fr]"
+                                    className="grid grid-cols-[2fr_1fr_1fr_1fr] portrait:grid-cols-[2fr_1fr_1fr] items-center [&>td]:flex [&>td]:items-center"
                                 >
-                                    <TableCell className="font-mono">
-                                        <div className="flex flex-col">
+                                    <TableCell className="font-mono w-full">
+                                        <div className="flex flex-col w-full">
                                             <span className="font-semibold">
                                                 T{tool.id}
                                             </span>
@@ -154,10 +153,6 @@ const ToolSection = ({
                                     </TableCell>
                                     <TableCell>
                                         <ProbeButton
-                                            status={tool.status}
-                                            className={getToolStateClasses(
-                                                tool.status,
-                                            )}
                                             onProbe={() =>
                                                 probeRackTool(tool.id)
                                             }

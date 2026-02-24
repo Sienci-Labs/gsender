@@ -224,8 +224,16 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         key: 'workspace.outlineMode',
                         type: 'select',
                         description:
-                            'Detailed follows the outline of the loaded file more closely, while Square calculates much faster since it runs a simple box outline.',
+                            'Detailed follows the outline of the loaded file more closely, Square calculates a simple box outline, and Rapidless Square computes the bounding box using only cutting moves (G1/G2/G3), ignoring rapid travel (G0).',
                         options: OUTLINE_MODES,
+                    },
+                    {
+                        label: 'Outline speed',
+                        key: 'workspace.outlineSpeed',
+                        type: 'number',
+                        unit: 'mm/min',
+                        description:
+                            'Set a specific feedrate for outline movements (e.g. 3000). If zero, uses rapid moves (G0) at maximum machine speed. Lower values provide more controlled movements.',
                     },
                     {
                         label: 'Revert workspace',

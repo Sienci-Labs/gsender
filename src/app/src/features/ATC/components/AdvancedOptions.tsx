@@ -1,6 +1,5 @@
 import { Download, Upload } from 'lucide-react';
 import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
-import { ATCIConfiguration } from 'app/features/ATC/components/Configuration';
 import { ToolDisplayModal } from 'app/features/ATC/components/ToolDisplayModal.tsx';
 import { LongPressButton } from 'app/components/LongPressButton';
 import {
@@ -28,9 +27,7 @@ export function AdvancedOptions() {
     return (
         <div className="flex h-full w-full flex-col gap-4">
             <div className="flex items-center justify-end gap-2">
-                <ATCIConfiguration compact />
                 <ToolDisplayModal />
-
             </div>
 
             <div className="flex flex-col gap-2 border-t border-gray-200 pt-3">

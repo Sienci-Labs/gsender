@@ -35,18 +35,21 @@ export function WizardsManager({
         setSelectedWizard(null);
     };
 
-    if (selectedWizard) {
-        return (
-            <WizardManager wizard={selectedWizard} onExit={handleExitWizard} />
-        );
-    }
-
     return (
-        <WizardsHub
-            wizards={wizards}
-            onSelectWizard={handleSelectWizard}
-            title={hubTitle}
-            description={hubDescription}
-        />
+        <div className="h-full min-h-0 overflow-hidden">
+            {selectedWizard ? (
+                <WizardManager
+                    wizard={selectedWizard}
+                    onExit={handleExitWizard}
+                />
+            ) : (
+                <WizardsHub
+                    wizards={wizards}
+                    onSelectWizard={handleSelectWizard}
+                    title={hubTitle}
+                    description={hubDescription}
+                />
+            )}
+        </div>
     );
 }

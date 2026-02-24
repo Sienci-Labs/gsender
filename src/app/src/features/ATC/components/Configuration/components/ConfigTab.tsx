@@ -32,9 +32,10 @@ import {
 
 export interface ConfigTabProps {
     uploading: boolean;
+    uploadError?: string;
 }
 
-export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
+export const ConfigTab: React.FC = ({ uploading, uploadError }: ConfigTabProps) => {
     const {
         config,
         updateConfig,
@@ -44,7 +45,12 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
         status,
     } = useConfigContext();
 
-    const nonDefaultStyling = 'bg-yellow-50';
+    const nonDefaultStyling = 'bg-yellow-50 dark:bg-yellow-900/20';
+    const labelClass = 'text-xs font-semibold text-gray-500 dark:text-white';
+    const subLabelClass = 'text-xs font-medium text-gray-500 dark:text-gray-300';
+    const rowLabelClass = 'text-xs font-medium text-gray-700 dark:text-white';
+    const helperTextClass = 'text-[10px] text-gray-400 dark:text-gray-300';
+    const iconClass = 'h-4 w-4 text-muted-foreground dark:text-white';
     const rackSize = config.variables._tc_slots.value || 0;
     const rackEnabled = rackSize > 0;
 
@@ -93,20 +99,18 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
         <div className="space-y-4 flex flex-col h-full">
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                 {/* Tool Rack Section */}
-                <Card className="border border-border shadow-none w-full">
-                    <CardHeader className="px-4 py-3 border-b border-border bg-muted/30">
+                <Card className="border border-border dark:border-slate-700 shadow-none w-full bg-white dark:bg-dark-darker">
+                    <CardHeader className="px-4 py-3 border-b border-border dark:border-slate-700 bg-muted/30 dark:bg-slate-800/60">
                         <div className="flex items-center justify-between gap-2 w-full">
                             <CardTitle className="text-sm font-semibold text-foreground">
                                 Tool Rack
                             </CardTitle>
-                            <Crosshair className="h-4 w-4 text-muted-foreground shrink-0" />
+                            <Crosshair className={`${iconClass} shrink-0`} />
                         </div>
                     </CardHeader>
                     <CardContent className="p-5 py-1 min-h-[170px] flex flex-col justify-center gap-4">
                         <div className="space-y-1">
-                            <Label className="text-xs font-semibold text-gray-500">
-                                Rack Size
-                            </Label>
+                            <Label className={labelClass}>Rack Size</Label>
                             <div
                                 className={cn('w-52', {
                                     [nonDefaultStyling]:
@@ -121,7 +125,7 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                                     <SelectTrigger className="h-8 text-xs">
                                         <SelectValue placeholder="Select size" />
                                     </SelectTrigger>
-                                    <SelectContent className="z-[10001] bg-white">
+                                    <SelectContent className="z-[10001] bg-white dark:bg-slate-900 dark:text-gray-100">
                                         <SelectItem value="0">
                                             No tool rack
                                         </SelectItem>
@@ -142,9 +146,7 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                                     'opacity-50 pointer-events-none',
                             )}
                         >
-                            <Label className="text-xs font-semibold text-gray-500">
-                                Rack Position
-                            </Label>
+                            <Label className={labelClass}>Rack Position</Label>
                             <PositionInput
                                 label="Tool Rack Position"
                                 position={config.slot1Position}
@@ -164,19 +166,17 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                 </Card>
 
                 {/* Tool Length Sensor Section */}
-                <Card className="border border-border shadow-none w-full">
-                    <CardHeader className="px-4 py-3 border-b border-border bg-muted/30">
+                <Card className="border border-border dark:border-slate-700 shadow-none w-full bg-white dark:bg-dark-darker">
+                    <CardHeader className="px-4 py-3 border-b border-border dark:border-slate-700 bg-muted/30 dark:bg-slate-800/60">
                         <div className="flex items-center justify-between gap-2 w-full">
                             <CardTitle className="text-sm font-semibold text-foreground">
                                 Tool Length Sensor
                             </CardTitle>
-                            <Fingerprint className="h-4 w-4 text-muted-foreground shrink-0" />
+                            <Fingerprint className={`${iconClass} shrink-0`} />
                         </div>
                     </CardHeader>
                     <CardContent className="p-5 py-1 min-h-[170px] flex flex-col justify-center gap-4">
-                        <Label className="text-xs font-semibold text-gray-500">
-                            Sensor Position
-                        </Label>
+                        <Label className={labelClass}>Sensor Position</Label>
                         <PositionInput
                             label="Tool Length Sensor Position"
                             position={config.tlsPosition}
@@ -196,13 +196,13 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
             </div>
 
             {/* Advanced Section */}
-            <Card className="border border-border shadow-none w-full">
-                <CardHeader className="px-4 py-3 border-b border-border bg-muted/30">
+            <Card className="border border-border dark:border-slate-700 shadow-none w-full bg-white dark:bg-dark-darker">
+                <CardHeader className="px-4 py-3 border-b border-border dark:border-slate-700 bg-muted/30 dark:bg-slate-800/60">
                     <div className="flex items-center justify-between gap-2 w-full">
                         <CardTitle className="text-sm font-semibold text-foreground">
                             Advanced Settings
                         </CardTitle>
-                        <BookOpen className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <BookOpen className={`${iconClass} shrink-0`} />
                     </div>
                 </CardHeader>
                 <CardContent className="p-5 py-1 min-h-[320px] flex">
@@ -210,13 +210,13 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                         <div className="space-y-4">
                             <div className="space-y-1">
                                 <div className="flex items-center gap-2">
-                                    <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
-                                    <Label className="text-xs font-semibold text-gray-900">
+                                    <SlidersHorizontal className={iconClass} />
+                                    <Label className="text-xs font-semibold text-gray-900 dark:text-white">
                                         Offset Management
                                     </Label>
                                 </div>
                                 <div className="space-y-1">
-                                    <Label className="text-xs font-medium text-gray-500">
+                                    <Label className={subLabelClass}>
                                         When loading from tool rack:
                                     </Label>
                                     <OffsetManagementWidget
@@ -244,7 +244,7 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                                     />
                                 </div>
                                 <div className="space-y-1">
-                                    <Label className="text-xs font-medium text-gray-500">
+                                    <Label className={subLabelClass}>
                                         When loading manually:
                                     </Label>
                                     <OffsetManagementWidget
@@ -273,8 +273,8 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                             </div>
                             <div className="space-y-1">
                                 <div className="flex items-center gap-2">
-                                    <Move className="h-4 w-4 text-muted-foreground" />
-                                    <Label className="text-xs font-semibold text-gray-900">
+                                    <Move className={iconClass} />
+                                    <Label className="text-xs font-semibold text-gray-900 dark:text-white">
                                         Manual Change Position
                                     </Label>
                                 </div>
@@ -297,14 +297,14 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                             </div>
                             <div className="space-y-1">
                                 <div className="flex items-center gap-2">
-                                    <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
-                                    <Label className="text-xs font-semibold text-gray-900">
+                                    <SlidersHorizontal className={iconClass} />
+                                    <Label className="text-xs font-semibold text-gray-900 dark:text-white">
                                         Advanced
                                     </Label>
                                 </div>
                                 <div
                                     className={cn(
-                                        'rounded-md px-2.5 py-1.5 bg-gray-50 flex items-center justify-between gap-3 w-full',
+                                        'rounded-md px-2.5 py-1.5 bg-gray-50 dark:bg-slate-800 flex items-center justify-between gap-3 w-full',
                                         {
                                             [nonDefaultStyling]:
                                                 config.variables
@@ -316,7 +316,7 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                                         },
                                     )}
                                 >
-                                    <Label className="text-xs font-medium text-gray-700 flex-1">
+                                    <Label className="text-xs font-medium text-gray-700 dark:text-white flex-1">
                                         Retain tool table settings when rack
                                         removed
                                     </Label>
@@ -348,15 +348,15 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                         <div className="space-y-4">
                             <div className="space-y-1">
                                 <div className="flex items-center gap-2">
-                                    <ShieldCheck className="h-4 w-4 text-muted-foreground" />
-                                    <Label className="text-xs font-semibold text-gray-900">
+                                    <ShieldCheck className={iconClass} />
+                                    <Label className="text-xs font-semibold text-gray-900 dark:text-white">
                                         Safety Checks
                                     </Label>
                                 </div>
                                 <div className="space-y-3">
                                     <div
                                         className={cn(
-                                            'space-y-1 rounded-md px-2.5 py-1.5 bg-gray-50',
+                                            'space-y-1 rounded-md px-2.5 py-1.5 bg-gray-50 dark:bg-slate-800',
                                             {
                                                 [nonDefaultStyling]:
                                                     config.variables._pres_sense
@@ -368,10 +368,10 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                                     >
                                         <div className="flex items-center justify-between gap-2">
                                             <div className="space-y-1">
-                                                <Label className="text-xs font-medium text-gray-700">
+                                                <Label className={rowLabelClass}>
                                                     Pressure Sensor
                                                 </Label>
-                                                <div className="text-[10px] text-gray-400">
+                                                <div className={helperTextClass}>
                                                     Check pressure before tool
                                                     change
                                                 </div>
@@ -401,7 +401,7 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                                     </div>
                                     <div
                                         className={cn(
-                                            'space-y-1 rounded-md px-2.5 py-1.5 bg-gray-50',
+                                            'space-y-1 rounded-md px-2.5 py-1.5 bg-gray-50 dark:bg-slate-800',
                                             {
                                                 [nonDefaultStyling]:
                                                     config.variables
@@ -413,10 +413,10 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                                     >
                                         <div className="flex items-center justify-between gap-2">
                                             <div className="space-y-1">
-                                                <Label className="text-xs font-medium text-gray-700">
+                                                <Label className={rowLabelClass}>
                                                     Tool-stud Sensor
                                                 </Label>
-                                                <div className="text-[10px] text-gray-400">
+                                                <div className={helperTextClass}>
                                                     Check tool collision before
                                                     tool unload
                                                 </div>
@@ -449,14 +449,14 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                             </div>
                             <div className="space-y-1">
                                 <div className="flex items-center gap-2">
-                                    <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
-                                    <Label className="text-xs font-semibold text-gray-900">
+                                    <SlidersHorizontal className={iconClass} />
+                                    <Label className="text-xs font-semibold text-gray-900 dark:text-white">
                                         Other
                                     </Label>
                                 </div>
                                 <div
                                     className={cn(
-                                        'space-y-1 rounded-md px-2.5 py-1.5 bg-gray-50',
+                                        'space-y-1 rounded-md px-2.5 py-1.5 bg-gray-50 dark:bg-slate-800',
                                         {
                                             [nonDefaultStyling]:
                                                 config.variables._tc_slot_offset
@@ -468,10 +468,10 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                                 >
                                     <div className="flex items-center justify-between gap-2">
                                         <div className="space-y-1">
-                                            <Label className="text-xs font-medium text-gray-700">
+                                            <Label className={rowLabelClass}>
                                                 Tool Fork Spacing (mm)
                                             </Label>
-                                            <div className="text-[10px] text-gray-400">
+                                            <div className={helperTextClass}>
                                                 Distance between each fork.
                                             </div>
                                         </div>
@@ -498,7 +498,7 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                                                     },
                                                 })
                                             }
-                                            className="h-7 w-16 text-xs border-gray-300 focus:border-blue-500 focus:ring-blue-500 shrink-0 ml-auto"
+                                            className="h-7 w-16 text-xs border-gray-300 dark:border-slate-600 dark:bg-slate-900 dark:text-white focus:border-blue-500 focus:ring-blue-500 shrink-0 ml-auto"
                                         />
                                     </div>
                                 </div>
@@ -519,7 +519,9 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                     {uploading && (
                         <div className="flex flex-row gap-2 items-center">
                             <Spinner className="h-4 w-4" />
-                            <span>{status.message}</span>
+                            <span className="text-gray-700 dark:text-gray-300">
+                                {status.message}
+                            </span>
                         </div>
                     )}
 
@@ -527,6 +529,12 @@ export const ConfigTab: React.FC = ({ uploading }: ConfigTabProps) => {
                         <div className={cn('text-xs', getStatusColor())}>
                             {status.message}
                         </div>
+                    )}
+
+                    {uploadError && !uploading && (
+                        <p className="text-xs font-bold text-red-600">
+                            {uploadError}
+                        </p>
                     )}
                 </div>
 

@@ -1,4 +1,4 @@
-import React, { MouseEventHandler, useEffect } from 'react';
+import React, { MouseEventHandler, useEffect, useMemo } from 'react';
 import { Menu } from './components/Menu';
 import { Section } from './components/Section';
 import { Search } from 'app/features/Config/components/Search.tsx';
@@ -43,101 +43,44 @@ export function Config() {
         }
     }
 
-    /*useEffect(() => {
-        if (connected) {
-            if (firmwareType === 'grblHAL') {
-                controller.command('gcode', ['$$', '$ESH', '$ES']);
-            } else {
-                controller.command('gcode', '$$');
-            }
-        }
-    }, []);*/
-
     useEffect(() => {
         if (connected) {
             controller.command('gcode', ['$$']);
         }
     }, []);
 
-    const { settings, EEPROM, machineProfile } = useSettings();
-    const reportedEEPROM = useTypedSelector(
-        (state: RootState) => state.controller.settings.settings,
-    );
-    const firmwareSemver = useTypedSelector(
-        (state: RootState) => state.controller.settings.version?.semver,
-    );
+    const { settings, EEPROM } = useSettings();
 
-    useEffect(() => {
-        if (!reportedEEPROM || Object.keys(reportedEEPROM).length === 0) {
-            return;
-        }
-
-        let baseDefaults: Record<string, string> = {};
-        let orderedSettings: Map<string, string> | undefined;
-
-        if (firmwareType === GRBLHAL) {
-            const resolved = resolveGrblCoreDefaults({
-                firmwareSemver,
-                baseDefaults: machineProfile.grblHALeepromSettings || {},
-                orderedSettings: machineProfile.orderedSettings,
-            });
-            baseDefaults = resolved.defaults;
-            orderedSettings = resolved.ordered as Map<string, string> | undefined;
-        } else {
-            baseDefaults = machineProfile.eepromSettings || {};
-            orderedSettings = machineProfile.orderedSettings;
-        }
-
-        const defaultKeys = new Set<string>([
-            ...Object.keys(baseDefaults),
-            ...(orderedSettings ? Array.from(orderedSettings.keys()) : []),
-        ]);
-
-        const missingDefaults = Object.keys(reportedEEPROM)
-            .filter((key) => !defaultKeys.has(key))
-            .sort(
-                (a, b) =>
-                    Number(a.replace('$', '')) - Number(b.replace('$', '')),
-            );
-
-        if (missingDefaults.length > 0) {
-            console.info(
-                `EEPROM defaults missing (${missingDefaults.length}):`,
-                missingDefaults.join(', '),
-            );
-        }
-    }, [
-        reportedEEPROM,
-        firmwareType,
-        firmwareSemver,
-        machineProfile?.id,
-    ]);
 
     // lets extract all the eeprom settings
-    let allEEPROM: gSenderSetting[] = EEPROM.map((filtered, i) => {
-        const formatted: gSenderSetting = {
-            type: 'eeprom',
-            description: filtered.description,
-            unit: filtered.unit,
-            eID: filtered.setting,
-            globalIndex: filtered.globalIndex,
-            value: filtered.value,
-            defaultValue: filtered.defaultValue,
-        };
-        return formatted;
-    });
-    const eepromSettings: SettingsMenuSection[] = [
-        {
-            label: '',
-            icon: null,
-            settings: [
-                {
-                    label: '',
-                    settings: allEEPROM,
-                },
-            ],
-        },
-    ];
+    const allEEPROM: gSenderSetting[] = useMemo(
+        () =>
+            EEPROM.map((filtered) => ({
+                type: 'eeprom' as const,
+                description: filtered.description,
+                unit: filtered.unit,
+                eID: filtered.setting,
+                globalIndex: filtered.globalIndex,
+                value: filtered.value,
+                defaultValue: filtered.defaultValue,
+            })),
+        [EEPROM],
+    );
+    const eepromSettings: SettingsMenuSection[] = useMemo(
+        () => [
+            {
+                label: '',
+                icon: null,
+                settings: [
+                    {
+                        label: '',
+                        settings: allEEPROM,
+                    },
+                ],
+            },
+        ],
+        [allEEPROM],
+    );
 
     function navigateToSection(
         _e: MouseEventHandler<HTMLButtonElement>,

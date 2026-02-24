@@ -11,26 +11,30 @@ export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        controller.addListener('ymodem:complete', () => {
+        const handleYmodemComplete = () => {
             setIsComplete(true);
             setError(null);
             onComplete();
             setTimeout(() => {
                 setIsComplete(false);
             }, 2000);
-        });
-        controller.addListener('ymodem:error', (err) => {
+        };
+        const handleYmodemError = (err) => {
             setError(err);
             setTimeout(() => {
                 setIsComplete(false);
                 setError(null);
             }, 5000);
-        });
-        return () => {
-            controller.removeListener('ymodem:complete');
-            controller.removeListener('ymodem:error');
         };
-    }, []);
+
+        controller.addListener('ymodem:complete', handleYmodemComplete);
+        controller.addListener('ymodem:error', handleYmodemError);
+
+        return () => {
+            controller.removeListener('ymodem:complete', handleYmodemComplete);
+            controller.removeListener('ymodem:error', handleYmodemError);
+        };
+    }, [onComplete]);
 
     const handleUpload = async () => {
         if (rackSize === '0') {

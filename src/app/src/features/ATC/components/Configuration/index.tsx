@@ -9,27 +9,33 @@ import { toast } from 'app/lib/toaster';
 export function ATCIConfiguration({ compact = false }: { compact?: boolean }) {
     const [modalOpen, setModalOpen] = useState(false);
     const [uploading, setUploading] = useState(false);
+    const [uploadError, setUploadError] = useState('');
 
+    /*
     function onConfigOpen(isOpen) {
         if (isOpen) {
             controller.command('sdcard:read', 'ATCI.macro');
             controller.addListener('ymodem:error', () => {
                 toast.error('Error uploaded new config');
                 setUploading(false);
+                setUploadError('SD card upload failed. Please try again.');
             });
             controller.addListener('ymodem:complete', () => {
                 setUploading(false);
+                setUploadError('');
             });
             controller.addListener('ymodem:start', () => {
                 setUploading(true);
+                setUploadError('');
             });
         } else {
             controller.removeListener('ymodem:error');
             controller.removeListener('ymodem:complete');
             controller.removeListener('ymodem:start');
+            setUploadError('');
         }
         setModalOpen(isOpen);
-    }
+    }*/
 
     const wrapperClassName = compact
         ? 'flex'
@@ -59,6 +65,7 @@ export function ATCIConfiguration({ compact = false }: { compact?: boolean }) {
                     open={modalOpen}
                     onOpenChange={(state) => onConfigOpen(state)}
                     uploading={uploading}
+                    uploadError={uploadError}
                 />
             </ConfigProvider>
         </div>

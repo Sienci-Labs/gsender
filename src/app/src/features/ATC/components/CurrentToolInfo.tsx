@@ -11,6 +11,7 @@ import { toolStateThemes } from 'app/features/ATC/utils/ATCiConstants.ts';
 import pubsub from 'pubsub-js';
 import { ToolStatusBadges } from 'app/features/ATC/components/ui/ToolStatusBadges.tsx';
 import { Badge } from 'app/features/ATC/components/ui/Badge.tsx';
+import cn from 'classnames';
 
 export function CurrentToolInfo({ disabled }: { disabled?: boolean }) {
     const { rackSize, connected, atcAvailable } = useToolChange();
@@ -104,30 +105,46 @@ export function CurrentToolInfo({ disabled }: { disabled?: boolean }) {
         (selectedTool.isManual ?? selectedTool.id > rackSize);
     const EmptyIcon = state.icon;
     const isRackTool = !isEmptyTool && selectedTool.id <= rackSize;
+    const wrapperClassName = cn(
+        state.backgroundColor,
+        state.borderColor,
+        'border rounded p-3 transition-all duration-200 h-full flex flex-col justify-between',
+        'dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]',
+    );
+    const iconWrapperClassName =
+        'h-9 w-9 rounded-lg border border-gray-200 bg-white/80 dark:border-slate-600 dark:bg-slate-900/85 flex items-center justify-center';
+    const offsetWrapperClassName =
+        'rounded-lg px-2 py-1 border border-gray-200 bg-white shadow-inner pointer-events-none select-none dark:border-slate-600 dark:bg-slate-900/85';
 
     return (
         <div className="w-full h-full flex-1">
-            <div
-                className={`${state.backgroundColor} ${state.borderColor} bg-opacity-10 border rounded p-3 transition-all duration-200 h-full flex flex-col justify-between`}
-            >
+            <div className={wrapperClassName}>
                 <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-3">
-                        <div className="h-9 w-9 rounded-lg border border-gray-200 bg-white/80 flex items-center justify-center">
-                            <Wrench className={`${state.textColor} w-5 h-5`} />
+                        <div className={iconWrapperClassName}>
+                            <Wrench
+                                className={cn(
+                                    state.textColor,
+                                    'w-5 h-5 dark:text-white',
+                                )}
+                            />
                         </div>
                         <div className="flex flex-col">
                             <span
-                                className={`${state.textColor} font-semibold text-base`}
+                                className={cn(
+                                    state.textColor,
+                                    'font-semibold text-base dark:text-white',
+                                )}
                             >
                                 {isEmptyTool ? 'Empty' : `T${selectedTool.id}`}
                             </span>
                             {!isEmptyTool && isRackTool && (
-                                <span className="text-gray-600 text-xs">
+                                <span className="text-gray-600 text-xs dark:text-gray-300">
                                     Rack
                                 </span>
                             )}
                             {!isEmptyTool && !isRackTool && allowManualBadge && (
-                                <span className="text-gray-600 text-xs">
+                                <span className="text-gray-600 text-xs dark:text-gray-300">
                                     Manual
                                 </span>
                             )}
@@ -150,14 +167,17 @@ export function CurrentToolInfo({ disabled }: { disabled?: boolean }) {
                     )}
                 </div>
 
-                <div className="text-left text-sm font-bold text-gray-700">
+                <div className="text-left text-sm font-bold text-gray-700 dark:text-gray-200">
                     {isEmptyTool ? '' : selectedTool.nickname ?? ''}
                 </div>
 
                 <div className="grid grid-cols-[1fr_auto] items-center gap-3">
-                    <div className="rounded-lg px-2 py-1 border border-gray-200 bg-white shadow-inner pointer-events-none select-none">
+                    <div className={offsetWrapperClassName}>
                         <div
-                            className={`${state.textColor} font-mono text-lg font-bold text-center`}
+                            className={cn(
+                                state.textColor,
+                                'font-mono text-lg font-bold text-center dark:text-white',
+                            )}
                         >
                             {formattedOffset}
                         </div>

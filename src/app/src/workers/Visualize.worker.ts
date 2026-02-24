@@ -812,6 +812,7 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                     const arcLength = arcSpan * radius;
                     const divisions = Math.max(4, Math.min(Math.ceil(arcLength / 0.75), 25));
                     const points = arcCurve.getPoints(divisions);
+                    const pointCount = Math.max(points.length - 1, 1);
 
                     // svg
                     if (shouldIncludeSVG) {
@@ -822,7 +823,7 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                         const point = points[i];
                         const pointA = points[i - 1];
                         const pointB = points[i];
-                        const z = ((v2.z - v1.z) / points.length) * i + v1.z;
+                        const z = ((v2.z - v1.z) / pointCount) * i + v1.z;
 
                         if (plane === 'G17') {
                             // XY-plane
@@ -934,6 +935,7 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                 );
                 const divisions = 30;
                 const points = arcCurve.getPoints(divisions);
+                const pointCount = Math.max(points.length - 1, 1);
                 // initialize
                 if (currentMotion === '') {
                     currentMotion = motion;
@@ -950,7 +952,7 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                 for (let i = 1; i < points.length; ++i) {
                     const pointA = points[i - 1];
                     const pointB = points[i];
-                    const z = ((v2.z - v1.z) / points.length) * i + v1.z;
+                    const z = ((v2.z - v1.z) / pointCount) * i + v1.z;
 
                     if (plane === 'G17') {
                         // XY-plane

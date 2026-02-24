@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { SubWizard } from '../../types/wizard';
 import { ProgressBar } from './ProgressBar';
@@ -18,6 +18,8 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
     const [showCompletion, setShowCompletion] = useState(false);
 
     const currentStep = subWizard.steps[currentStepIndex];
+    const StepContextProvider = currentStep.contextProvider || Fragment;
+    const fillPrimaryContent = currentStep.fillPrimaryContent === true;
     const isFirstStep = currentStepIndex === 0;
     const isLastStep = currentStepIndex === subWizard.steps.length - 1;
     const isCurrentStepComplete = completedSteps.has(currentStepIndex);
@@ -75,7 +77,7 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
     const CompletionComponent = subWizard.completionPage;
 
     return (
-        <div className="h-full bg-gray-50 dark:bg-slate-800 flex flex-col">
+        <div className="h-full min-h-0 bg-gray-50 dark:bg-slate-800 flex flex-col">
             {isSingleStep ? (
                 <div className="bg-white dark:bg-dark-darker border-b border-gray-200 px-4 py-2 flex items-center justify-between">
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -108,47 +110,63 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
                 />
             )}
 
-            <div className="flex flex-1 overflow-hidden portrait:flex-col-reverse">
-                <div className="w-3/5 portrait:w-full portrait:text-xl portrait:h-3/5 p-12 overflow-y-auto">
-                    {showCompletion && CompletionComponent ? (
-                        <CompletionComponent />
-                    ) : (
-                        <>
-                            {!isSingleStep && (
-                                <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-                                    {currentStep.title}
-                                </h1>
-                            )}
+            <StepContextProvider>
+                <div className={subWizard.secondaryContentLeft ? 'flex flex-row-reverse flex-1 overflow-hidden portrait:flex-col' : 'flex flex-1 overflow-hidden portrait:flex-col-reverse'}>
+                    <div
+                        className={`w-3/5 portrait:w-full portrait:text-xl portrait:h-3/5 p-12 portrait:p-6 ${
+                            fillPrimaryContent
+                                ? 'flex flex-col min-h-0 overflow-hidden'
+                                : 'overflow-y-auto'
+                        }`}
+                    >
+                        {showCompletion && CompletionComponent ? (
+                            <CompletionComponent />
+                        ) : (
+                            <>
+                                {!isSingleStep && (
+                                    <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+                                        {currentStep.title}
+                                    </h1>
+                                )}
 
-                            {subWizard.configVersion && (
-                                <p className="text-gray-600 dark:text-gray-400 mb-8">
-                                    Configuration File Version:{' '}
-                                    {subWizard.configVersion}
-                                </p>
-                            )}
+                                {subWizard.configVersion && !subWizard.hideVersionPrintout && (
+                                    <p className="text-gray-600 dark:text-gray-400 mb-8">
+                                        Configuration File Version:{' '}
+                                        {subWizard.configVersion}
+                                    </p>
+                                )}
 
-                            <div className="mt-8">
-                                <StepComponent
-                                    onComplete={handleStepComplete}
-                                    onUncomplete={handleStepUncomplete}
-                                    data={stepData[currentStep.id]}
-                                    onDataChange={handleDataChange}
-                                />
-                            </div>
-                        </>
-                    )}
+                                <div
+                                    className={`${
+                                        fillPrimaryContent ? 'mt-0' : 'mt-8'
+                                    } ${
+                                        fillPrimaryContent
+                                            ? 'flex-1 min-h-0 overflow-hidden'
+                                            : ''
+                                    }`}
+                                >
+                                    <StepComponent
+                                        onComplete={handleStepComplete}
+                                        onUncomplete={handleStepUncomplete}
+                                        data={stepData[currentStep.id]}
+                                        onDataChange={handleDataChange}
+                                    />
+                                </div>
+                            </>
+                        )}
+                    </div>
+
+                    <div className="w-2/5 portrait:h-2/5 portrait:w-full bg-gray-200 dark:bg-dark p-12 portrait:p-4 flex flex-col overflow-hidden">
+                        <SecondaryContentPanel
+                            content={
+                                showCompletion
+                                    ? []
+                                    : currentStep.secondaryContent || []
+                            }
+                        />
+                    </div>
                 </div>
-
-                <div className="w-2/5 portrait:h-2/5 portrait:w-full bg-gray-200 dark:bg-dark p-12 overflow-y-auto">
-                    <SecondaryContentPanel
-                        content={
-                            showCompletion
-                                ? []
-                                : currentStep.secondaryContent || []
-                        }
-                    />
-                </div>
-            </div>
+            </StepContextProvider>
 
             {!isSingleStep && (
                 <div className="bg-white dark:bg-dark-darker border-t border-gray-200 dark:border-gray-800 px-8 py-4 flex items-center justify-between">

@@ -133,7 +133,7 @@ function returnSettingControl(
     }
 }
 
-export function SettingRow({
+export const SettingRow = React.memo(function SettingRow({
     setting,
     changeHandler,
 }: SettingRowProps): JSX.Element {
@@ -361,4 +361,4 @@ export function SettingRow({
             </span>
         </div>
     );
-}
+});

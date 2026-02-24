@@ -412,10 +412,21 @@ class Controller {
     removeListener(eventName: string, listener?: Function): boolean {
         const listeners =
             this.listeners[eventName as keyof typeof this.listeners];
-        if (!listeners || typeof listener !== 'function') {
+        if (!listeners) {
             return false;
         }
-        listeners.splice(listeners.indexOf(listener), 1);
+
+        if (typeof listener !== 'function') {
+            listeners.length = 0;
+            return true;
+        }
+
+        const index = listeners.indexOf(listener);
+        if (index < 0) {
+            return false;
+        }
+
+        listeners.splice(index, 1);
         return true;
     }
 

@@ -112,13 +112,13 @@ const JoystickOptions = () => {
         <div className="text-base border p-2 rounded">
             <div className="grid grid-cols-4 items-center gap-2">
                 <div />
-                <div className="dark:text-white">Action</div>
-                <div className="dark:text-white">2nd Action</div>
-                <div className="dark:text-white">Invert</div>
+                <div className="font-bold dark:text-white">Action</div>
+                <div className="font-bold dark:text-white">2nd Action</div>
+                <div className="font-bold dark:text-white">Invert</div>
             </div>
 
             <div className="grid grid-cols-4 items-center mb-2 gap-2">
-                <div className="dark:text-white">Stick 1 left/right</div>
+                <div className="leading-normal dark:text-white">Stick 1 left/right</div>
                 <Select
                     styles={
                         !stick1PrimaryActionIsUsingMPG &&
@@ -180,7 +180,7 @@ const JoystickOptions = () => {
             </div>
 
             <div className="grid grid-cols-4 items-center mb-2 gap-2">
-                <div className="dark:text-white">Stick 1 up/down</div>
+                <div className="leading-normal dark:text-white">Stick 1 up/down</div>
                 <Select
                     styles={
                         !stick1PrimaryActionIsUsingMPG &&
@@ -242,7 +242,7 @@ const JoystickOptions = () => {
             </div>
 
             <div className="grid grid-cols-4 items-center mb-2 gap-2">
-                <div className="dark:text-white">Stick 1 use MPG</div>
+                <div className="leading-normal dark:text-white">Stick 1 MPG</div>
                 <Select
                     styles={
                         stick1PrimaryActionIsUsingMPG &&
@@ -298,7 +298,7 @@ const JoystickOptions = () => {
             </div>
 
             <div className="grid grid-cols-4 items-center mb-2 gap-2">
-                <div className="dark:text-white">Stick 2 left/right</div>
+                <div className="leading-normal dark:text-white">Stick 2 left/right</div>
                 <Select
                     styles={
                         !stick2PrimaryActionIsUsingMPG &&
@@ -360,7 +360,7 @@ const JoystickOptions = () => {
             </div>
 
             <div className="grid grid-cols-4 items-center mb-2 gap-2">
-                <div className="dark:text-white">Stick 2 up/down</div>
+                <div className="leading-normal dark:text-white">Stick 2 up/down</div>
                 <Select
                     styles={
                         !stick2PrimaryActionIsUsingMPG &&
@@ -422,7 +422,7 @@ const JoystickOptions = () => {
             </div>
 
             <div className="grid grid-cols-4 items-center mb-2 gap-2">
-                <div className="dark:text-white">Stick 2 use MPG</div>
+                <div className="leading-normal dark:text-white">Stick 2 MPG</div>
                 <Select
                     styles={
                         stick2PrimaryActionIsUsingMPG &&
@@ -480,7 +480,7 @@ const JoystickOptions = () => {
             </div>
 
             <div className="grid grid-cols-4 items-center mb-2 gap-2">
-                <div className="dark:text-white">Zero threshold</div>
+                <div className="leading-normal dark:text-white">Zero threshold</div>
                 <ControlledInput
                     value={zeroThreshold}
                     type="number"
@@ -495,9 +495,9 @@ const JoystickOptions = () => {
                 />
             </div>
 
-            <div className="grid grid-cols-4 items-center gap-2">
-                <div className="dark:text-white">
-                    Movement distance override
+            <div className="grid grid-cols-4 items-center mb-2 gap-2">
+                <div className="leading-normal dark:text-white">
+                    Movement override
                 </div>
                 <ControlledInput
                     type="number"
@@ -520,17 +520,18 @@ const JoystickOptions = () => {
                 />
             </div>
 
-            <div className="grid grid-cols-4 items-center gap-2 mt-2">
-                <div className="dark:text-white">Fixed speed mode</div>
+            <div className="grid grid-cols-4 items-center gap-2">
+                <div className="leading-normal dark:text-white">Fixed speed mode</div>
                 <div className="col-span-3">
                     <Switch
+                        className="float-left mr-2"
                         checked={fixedSpeedMode}
                         onChange={(checked) =>
                             handleChange('fixedSpeedMode', checked)
                         }
                     />
-                    <p className="text-gray-500 text-xs mt-1">
-                        Use for controllers that don't work well with variable
+                    <p className="text-gray-500 text-xs -mt-[5px]">
+                        For gamepads that don't work well with variable
                         speed jogging
                     </p>
                 </div>

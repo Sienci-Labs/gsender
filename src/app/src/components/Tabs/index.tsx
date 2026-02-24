@@ -90,7 +90,7 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
     return (
         <div className="w-full">
             <div className="relative">
-                <div className="flex items-center absolute top-[-41px] max-xl:top-[-33px] portrait:top-[-62px] left-0 right-0 z-10">
+                <div className="flex items-center absolute top-[-41px] max-xl:top-[-38px] portrait:top-[-62px] left-0 right-0 z-10">
                     <button
                         className={`flex-shrink-0 p-1 rounded-full bg-transparent portrait:bg-white transition-colors duration-200 ${
                             canScrollLeft

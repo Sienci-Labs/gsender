@@ -15,30 +15,35 @@ export function StatusIndicator({ isMounted }) {
     let colourClasses: string;
 
     useEffect(() => {
-        controller.addListener('ymodem:start', () => {
+        const handleYmodemStart = () => {
             setUploadProgress(0);
             setUploadState('uploading');
-        });
-        controller.addListener('ymodem:complete', () => {
+        };
+        const handleYmodemComplete = () => {
             setUploadState('complete');
             setTimeout(() => {
                 setUploadState('idle');
             }, 1000);
-        });
-        controller.addListener('ymodem:progress', (prog) => {
+        };
+        const handleYmodemProgress = (prog) => {
             setUploadProgress(prog);
-        });
-        controller.addListener('ymodem:error', (err) => {
+        };
+        const handleYmodemError = (err) => {
             setUploadState('idle');
             toast.error('Error uploading file - ' + err + '.');
-        });
+        };
+
+        controller.addListener('ymodem:start', handleYmodemStart);
+        controller.addListener('ymodem:complete', handleYmodemComplete);
+        controller.addListener('ymodem:progress', handleYmodemProgress);
+        controller.addListener('ymodem:error', handleYmodemError);
 
         // Cleanup listeners when component unmounts
         return () => {
-            controller.removeListener('ymodem:start');
-            controller.removeListener('ymodem:complete');
-            controller.removeListener('ymodem:progress');
-            controller.removeListener('ymodem:error');
+            controller.removeListener('ymodem:start', handleYmodemStart);
+            controller.removeListener('ymodem:complete', handleYmodemComplete);
+            controller.removeListener('ymodem:progress', handleYmodemProgress);
+            controller.removeListener('ymodem:error', handleYmodemError);
         };
     }, []);
 

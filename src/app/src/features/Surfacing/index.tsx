@@ -143,7 +143,7 @@ const SurfacingTool = () => {
         <>
             <div className="bg-white dark:bg-transparent dark:text-white w-full flex flex-col gap-2">
                 <div className="grid grid-cols-2 gap-4">
-                    <div className="grid gap-4 xl:gap-2">
+                    <div className="grid gap-4 max-xl:gap-3 xl:gap-2">
                         <p className="text-sm xl:text-base font-normal text-gray-500 dark:text-gray-300">
                             <b>For ideal wasteboard surfacing:</b> know your
                             CNCs exact movement limits accounting for limit

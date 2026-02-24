@@ -96,7 +96,7 @@ export function Jobs() {
 
     return (
         <div className="grid grid-cols-6 grid-rows-6 gap-2 w-full h-full overflow-y-auto">
-            <div className="col-span-4 row-span-6 px-8 max-xl:px-0 mb-2">
+            <div className="col-span-4 row-span-6 pr-8 max-xl:pr-0 mb-2">
                 <StatCard>
                     <CardHeader>Job History</CardHeader>
                     <div className="w-full flex flex-col">
@@ -110,7 +110,7 @@ export function Jobs() {
                     </div>
                 </StatCard>
             </div>
-            <div className="col-span-2 row-span-6 col-start-5 px-8 max-xl:px-0 flex flex-col gap-4 justify-center items-center">
+            <div className="col-span-2 row-span-6 col-start-5 pl-8 max-xl:pl-0 flex flex-col gap-2 justify-center items-center">
                 <div className="flex flex-col bg-white border border-gray-300 rounded p-2 h-full dark:bg-dark dark:border-dark-lighter w-full justify-center items-center">
                     <CardHeader>Jobs per CNC</CardHeader>
                     <JobsPerComPort />

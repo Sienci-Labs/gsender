@@ -1433,6 +1433,34 @@ class Visualizer extends Component {
                 this.actions.unloadGCode();
                 this.actions.reset();
             }),
+            pubsub.subscribe('repopulate', () => {
+                this.setState({
+                    units: store.get('workspace.units', METRIC_UNITS),
+                    objects: {
+                        limits: {
+                            visible: this.config.get('objects.limits.visible', true),
+                        },
+                        coordinateSystem: {
+                            visible: this.config.get('objects.coordinateSystem.visible', true),
+                        },
+                        gridLineNumbers: {
+                            visible: this.config.get('objects.gridLineNumbers.visible', true),
+                        },
+                        cuttingTool: {
+                            visible: this.config.get('objects.cuttingTool.visible', true),
+                            visibleLite: this.config.get('objects.cuttingTool.visibleLite', false),
+                        },
+                        cuttingToolAnimation: {
+                            visible: this.config.get('objects.cuttingToolAnimation.visible', true),
+                            visibleLite: this.config.get('objects.cuttingToolAnimation.visibleLite', false),
+                        },
+                        cutPath: {
+                            visible: this.config.get('objects.cutPath.visible', true),
+                            visibleLite: this.config.get('objects.cutPath.visibleLite', true),
+                        },
+                    },
+                });
+            }),
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }

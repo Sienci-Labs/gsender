@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
     gSenderEEEPROMSettings,
     gSenderSettings,
@@ -36,11 +36,19 @@ export const Section = React.forwardRef(
     ) => {
         const { settingsFilter } = useSettings();
 
-        const filteredSettings = settings.map((s: gSenderSubSection) => {
-            const fs = { ...s };
-            fs.settings = fs.settings.filter((o) => settingsFilter(o));
-            return fs;
-        });
+        // Must be capitalized so React treats it as a component (gives it its own
+        // fiber/hook registry). Calling wizard() inline would attribute any hooks
+        // inside the wizard to Section, causing conditional-hook violations.
+        const Wizard = wizard;
+
+        const filteredSettings = useMemo(
+            () =>
+                settings.map((s: gSenderSubSection) => ({
+                    ...s,
+                    settings: s.settings.filter((o) => settingsFilter(o)),
+                })),
+            [settings, settingsFilter],
+        );
 
         const settingsAvailable = filteredSettings.reduce(
             (a, b) => a + b.settings.length,
@@ -76,7 +84,7 @@ export const Section = React.forwardRef(
                     >
                         {title}
                     </h1>
-                    {connected && wizard && wizard()}
+                    {connected && Wizard && <Wizard />}
                 </div>
                 <div className="bg-gray-100 rounded-xl shadow p-6 max-xl:p-3 flex flex-col gap-6 dark:bg-dark dark:text-white">
                     {filteredSettings.map(

@@ -26,22 +26,22 @@ export function WizardManager({ wizard, onExit }: WizardManagerProps) {
         setSelectedSubWizard(null);
     };
 
-    if (selectedSubWizard) {
-        return (
-            <WizardContainer
-                subWizard={selectedSubWizard}
-                onExit={handleExitWizard}
-            />
-        );
-    }
-
     return (
-        <WizardLanding
-            title={wizard.title}
-            subWizards={wizard.subWizards}
-            onSelectSubWizard={handleSelectSubWizard}
-            onBack={onExit}
-            validations={wizard.validations}
-        />
+        <div className="h-full min-h-0 overflow-hidden">
+            {selectedSubWizard ? (
+                <WizardContainer
+                    subWizard={selectedSubWizard}
+                    onExit={handleExitWizard}
+                />
+            ) : (
+                <WizardLanding
+                    title={wizard.title}
+                    subWizards={wizard.subWizards}
+                    onSelectSubWizard={handleSelectSubWizard}
+                    onBack={onExit}
+                    validations={wizard.validations}
+                />
+            )}
+        </div>
     );
 }

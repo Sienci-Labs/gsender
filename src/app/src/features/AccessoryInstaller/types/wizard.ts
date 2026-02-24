@@ -1,8 +1,12 @@
+import type { ComponentType, ReactNode } from 'react';
+
 export interface WizardStep {
     id: string;
     title: string;
-    component: React.ComponentType<StepProps>;
+    component: ComponentType<StepProps>;
     secondaryContent?: SecondaryContent[];
+    contextProvider?: ComponentType<{ children: ReactNode }>;
+    fillPrimaryContent?: boolean;
 }
 
 export interface StepProps {
@@ -14,10 +18,11 @@ export interface StepProps {
 
 export interface SecondaryContent {
     type: 'image' | 'component' | 'link';
-    content: string | React.ComponentType<any>;
+    content: string | ComponentType<any>;
     title?: string;
     url?: string;
     props?: Record<string, any>;
+    fill?: boolean;
 }
 
 export interface SubWizard {
@@ -27,8 +32,10 @@ export interface SubWizard {
     estimatedTime?: string;
     configVersion?: string;
     steps: WizardStep[];
-    icon?: React.ComponentType<any>;
-    completionPage?: React.ComponentType<any>;
+    icon?: ComponentType<any>;
+    completionPage?: ComponentType<any>;
+    secondaryContentLeft?: boolean;
+    hideVersionPrintout?: boolean;
 }
 
 export interface ValidationResult {
