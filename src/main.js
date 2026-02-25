@@ -138,13 +138,15 @@ const main = () => {
             windowManager = new WindowManager();
             // Create and show splash before server starts
             const splashScreen = windowManager.createSplashScreen({
-                width: 500,
-                height: 400,
+                width: 600,
+                height: 399,
                 show: false,
                 frame: false,
+                transparent: true,
+                backgroundColor: '#00000000',
             });
             splashScreen.loadFile(
-                path.join(__dirname, 'app/assets/Splashscreen.gif'),
+                path.join(__dirname, 'app/assets/Splashscreen.webp'),
             );
             splashScreen.webContents.on('did-finish-load', () => {
                 splashScreen.show();
