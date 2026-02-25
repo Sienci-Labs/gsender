@@ -139,7 +139,7 @@ const main = () => {
             // Create and show splash before server starts
             const splashScreen = windowManager.createSplashScreen({
                 width: 600,
-                height: 399,
+                height: 400,
                 show: false,
                 frame: false,
                 transparent: true,
