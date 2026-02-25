@@ -2,7 +2,6 @@ describe('gSender Configuration and Firmware Test Suite', () => {
 
   beforeEach(() => {
     cy.viewport(2844, 1450);
-    // Load the UI
     cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
       maxRetries: 6,
       waitTime: 6000,
@@ -12,9 +11,10 @@ describe('gSender Configuration and Firmware Test Suite', () => {
 
   it('Should reset, export, import gSender settings, restore firmware defaults, and perform searches', () => {
 
+    // --------------------------------------------------------
     // Part 1: gSender Configuration Settings
-
-    cy.log(' Part 1: gSender Configuration Settings');
+    // --------------------------------------------------------
+    cy.log('Part 1: gSender Configuration Settings');
 
     cy.log('Connecting to CNC...');
     cy.connectMachine();
@@ -26,7 +26,10 @@ describe('gSender Configuration and Firmware Test Suite', () => {
 
     // Reset Settings
     cy.get('[data-testid="gsender-settings-reset-button"] > span.text-sm').click();
-    cy.get('#radix-\\:rb\\: button.bg-blue-500').contains('Restore Settings').click();
+    // FIX: use cy.contains on button.bg-blue-500 — avoids hardcoded radix ID
+    cy.contains('button.bg-blue-500', 'Restore Settings', { timeout: 10000 })
+      .should('be.visible')
+      .click();
     cy.get('section line:nth-of-type(1)').click({ force: true });
 
     // Export Settings
@@ -40,8 +43,12 @@ describe('gSender Configuration and Firmware Test Suite', () => {
 
     // Import Settings
     cy.get('[data-testid="gsender-settings-import-button"] > span.text-sm').click();
-    cy.get('div.min-h-1\\/5 > fieldset input').selectFile('cypress/fixtures/gSender-settings.json', { force: true });
-    cy.get('#radix-\\:rb\\: button.bg-blue-500').contains('Import Settings').click();
+    cy.get('div.min-h-1\\/5 > fieldset input')
+      .selectFile('cypress/fixtures/gSender-settings.json', { force: true });
+    // FIX: same — use cy.contains instead of hardcoded radix ID
+    cy.contains('button.bg-blue-500', 'Import Settings', { timeout: 10000 })
+      .should('be.visible')
+      .click();
     cy.get('section line:nth-of-type(2)').click({ force: true });
 
     // Verify units reverted to mm
@@ -50,20 +57,24 @@ describe('gSender Configuration and Firmware Test Suite', () => {
         cy.get('button[role="switch"]', { timeout: 10000 })
           .first()
           .then(($toggle) => {
-            const isMMSelected = $toggle.attr('data-state') === 'unchecked' || $toggle.attr('aria-checked') === 'false';
+            const isMMSelected =
+              $toggle.attr('data-state') === 'unchecked' ||
+              $toggle.attr('aria-checked') === 'false';
             expect(isMMSelected, 'Units should be set to MM after import').to.be.true;
           });
       });
     });
 
-
+    // --------------------------------------------------------
     // Part 2: Firmware Settings
- 
-    cy.log(' Part 2: Firmware Settings ');
+    // --------------------------------------------------------
+    cy.log('Part 2: Firmware Settings');
 
     // Restore defaults
     cy.get('div.fixed div.grid > button:nth-of-type(1)').click();
-    cy.get('button.bg-blue-500').contains('Restore Defaults').click();
+    cy.contains('button.bg-blue-500', 'Restore Defaults', { timeout: 10000 })
+      .should('be.visible')
+      .click();
     cy.get('section button > svg').click({ force: true });
 
     // Export firmware settings
@@ -73,8 +84,11 @@ describe('gSender Configuration and Firmware Test Suite', () => {
 
     // Import firmware settings
     cy.get('[data-testid="firmware-settings-import-button"] > span.text-sm').click();
-    cy.get('div.fixed input').selectFile('cypress/fixtures/gSender-firmware-settings.json', { force: true });
-    cy.get('button.bg-blue-500').last().click({ force: true });
+    cy.get('div.fixed input')
+      .selectFile('cypress/fixtures/gSender-firmware-settings.json', { force: true });
+    cy.contains('button.bg-blue-500', /import/i, { timeout: 10000 })
+      .last()
+      .click({ force: true });
 
     // Close import notification if present
     cy.get('body').then(($body) => {
@@ -83,13 +97,13 @@ describe('gSender Configuration and Firmware Test Suite', () => {
       }
     });
 
-
+    // --------------------------------------------------------
     // Part 3: Search and View Modified Settings
-
+    // --------------------------------------------------------
     cy.log('Part 3: Search and View Modified');
 
     // All Config tab
-    cy.get('div.min-h-1\\/5 > div > button').click(); // View Modified toggle
+    cy.get('div.min-h-1\\/5 > div > button').click();
     cy.searchInSettings('Spindle');
     cy.searchInSettings('import');
     cy.searchInSettings('1000');

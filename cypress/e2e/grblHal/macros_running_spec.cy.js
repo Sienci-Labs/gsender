@@ -594,19 +594,13 @@ describe('Macros Upload, Execution and Verification Test', () => {
 
     cy.log('STEP 19 COMPLETED: Newly added macro executed');
     // Final summary for newly added macro
-    cy.log('═══════════════════════════════════════════════');
     cy.log('NEWLY ADDED MACRO TEST SUMMARY ');
-    cy.log('═══════════════════════════════════════════════');
     cy.log(`Macro Name: ${macroName}`);
     cy.log(`Description: ${description}`);
     cy.log('Macro added manually via UI');
     cy.log(' Macro executed successfully');
     
-    cy.log('═══════════════════════════════════════════════');
-    cy.log('STEP 20 COMPLETED');
-    cy.log('═══════════════════════════════════════════════');
-
-    cy.wait(2000);
+  cy.wait(2000);
 
     // Step 21: Export the newly added macro
     cy.log('=== STEP 21: Export Newly Added Macro ===');
@@ -669,9 +663,7 @@ cy.contains('button', /Export/i)
     cy.log('=== STEP 22 COMPLETED ===');
 
     // Final complete test summary
-    cy.log('═══════════════════════════════════════════════');
     cy.log('ALL TESTS COMPLETED SUCCESSFULLY');
-    cy.log('═══════════════════════════════════════════════');
   });
 
 });

@@ -149,7 +149,7 @@ describe('gSender Movement tuning test', () => {
       .should('be.visible')
       .click();
     cy.wait(1000);
-    cy.log('✓ Y-axis selected');
+    cy.log(' Y-axis selected');
 
     // Step 7: Click "Start Movement Tuning" button
     cy.log('Step 7: Starting Movement Tuning wizard...');
@@ -158,7 +158,7 @@ describe('gSender Movement tuning test', () => {
       .should('be.visible')
       .click();
     cy.wait(1500);
-    cy.log('✓ Movement Tuning wizard started');
+    cy.log('Movement Tuning wizard started');
 
     // Step 8: Mark First Location
     cy.log('Step 8: Marking first location...');
@@ -167,7 +167,7 @@ describe('gSender Movement tuning test', () => {
       .should('be.visible')
       .click();
     cy.wait(1000);
-    cy.log('✓ First location marked');
+    cy.log(' First location marked');
 
     // Step 9: Enter distance value
     cy.log('Step 9: Entering distance value: 50mm...');
@@ -177,14 +177,14 @@ describe('gSender Movement tuning test', () => {
       .clear()
       .type('50');
     cy.wait(500);
-    cy.log('✓ Distance value entered: 50mm');
+    cy.log(' Distance value entered: 50mm');
 
     // Step 10: Move Y-axis
     cy.log('Step 10: Moving Y-axis...');
     cy.contains('button', 'Move Y-axis')
       .should('be.visible')
       .click();
-    cy.log('✓ Y-axis movement initiated');
+    cy.log(' Y-axis movement initiated');
 
     // Step 11: Monitor status transition from Jogging to Idle
     cy.log('Step 11: Monitoring machine status transition...');
@@ -193,12 +193,12 @@ describe('gSender Movement tuning test', () => {
     cy.window().then((win) => {
       cy.log('Waiting for Jogging status...');
       cy.verifyMachineStatus('Jogging', { timeout: 5000 }).then(() => {
-        cy.log('✓ Machine is jogging');
+        cy.log('Machine is jogging');
         
         cy.log('Waiting for machine to return to Idle...');
         cy.verifyMachineStatus('Idle', { timeout: 30000 }).then(() => {
           cy.wait(1000);
-          cy.log('✓ Machine status changed: Jogging → Idle');
+          cy.log(' Machine status changed: Jogging → Idle');
         });
       });
     });
@@ -210,7 +210,7 @@ describe('gSender Movement tuning test', () => {
       .clear()
       .type('100');
     cy.wait(500);
-    cy.log('✓ Distance entered: 100mm');
+    cy.log('Distance entered: 100mm');
 
     // Step 13: Click "Set Distance Travelled" button to confirm
     cy.log('Step 13: Confirming distance travelled...');
@@ -219,14 +219,14 @@ describe('gSender Movement tuning test', () => {
       .should('be.visible')
       .click();
     cy.wait(1000);
-    cy.log('✓ Distance confirmed');
+    cy.log(' Distance confirmed');
 
     // Step 14: Verify Y-axis inaccuracy message
     cy.log('Step 14: Verifying Y-axis inaccuracy message...');
     cy.contains('button', 'Update step/mm')
       .should('be.visible').click();
-    cy.log('✓ Y-axis inaccuracy message confirmed');
-    cy.log('✓ Movement Tuning test for Y-axis completed successfully');
+    cy.log(' Y-axis inaccuracy message confirmed');
+    cy.log(' Movement Tuning test for Y-axis completed successfully');
 
   });
 

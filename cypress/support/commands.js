@@ -84,13 +84,15 @@ Cypress.Commands.add('loadUI', (url, options = {}) => {
   tryLoadUI();
 });
 
-
 // ----------------------
 //3.Connect to CNC machine grbl cy.connectMachine();
 // ----------------------
 Cypress.Commands.add('connectMachine', () => {
+<<<<<<< Updated upstream
   cy.log('Starting connection check...');
   cy.wait(2000); // Brief wait for UI to stabilize
+
+  const devicePattern = Cypress.env('deviceName') || 'COM';
   
   cy.get('body').then(($body) => {
     const bodyText = $body.text();
@@ -129,7 +131,7 @@ Cypress.Commands.add('connectMachine', () => {
           .should('be.visible')
           .find('button')
           .first()
-          .should('contain.text', 'COM')
+          .should('contain.text', devicePattern)
           .then(($btn) => {
             const portName = $btn.text().trim();
             cy.log(`Selecting port: ${portName}`);
@@ -149,6 +151,45 @@ Cypress.Commands.add('connectMachine', () => {
       });
   });
 });
+=======
+
+  // Step 1: Click "Connect to CNC" button 
+  cy.contains('span', 'Connect to CNC', { timeout: 10000 })
+    .should('be.visible')
+    .click({ force: true });
+
+  // Step 2: Wait for the radix popper div to appear 
+  cy.get('div[data-radix-popper-content-wrapper]', { timeout: 10000 })
+    .should('exist')
+    .and('be.visible')
+    .within(() => {
+
+      // Step 3: Get the first port button inside the popper
+      cy.get('button.m-0')
+        .should('have.length.greaterThan', 0)
+        .first()
+        .then(($btn) => {
+
+          // Step 4: Read and log the port label — no assertion on name 
+          const $label = $btn.find('span.font-bold');
+          const portName = $label.length > 0
+            ? $label.text().trim()
+            : $btn.text().trim();
+
+          cy.log(`Selecting first available port: "${portName}"`);
+
+          // Step 5: Click whatever port is listed first 
+          cy.wrap($btn).click({ force: true });
+        });
+    });
+
+  //  Step 6: Confirm machine reaches Idle state after connecting 
+  cy.contains(/^Idle$/i, { timeout: 30000 })
+    .should('be.visible')
+    .then(() => cy.log('CNC machine connected and in Idle state'));
+
+        });
+>>>>>>> Stashed changes
 //-----------------------
 //21.Axis Homing Z< Y & X 
 //-----------------------
