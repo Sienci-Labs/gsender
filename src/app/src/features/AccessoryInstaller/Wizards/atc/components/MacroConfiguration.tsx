@@ -9,11 +9,13 @@ export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
     const [rackSize, setRackSize] = useState<number | string>(6);
     const [isComplete, setIsComplete] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<string | null>(null);
 
     useEffect(() => {
         const handleYmodemComplete = () => {
             setIsComplete(true);
             setError(null);
+            setSuccess('Successfully uploaded macro configuration to the SD card.');
             onComplete();
             setTimeout(() => {
                 setIsComplete(false);
@@ -24,6 +26,7 @@ export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
             setTimeout(() => {
                 setIsComplete(false);
                 setError(null);
+                setSuccess(null);
             }, 5000);
         };
 
@@ -60,6 +63,8 @@ export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
         const config = store.get('widgets.atc.templates');
         const content = generateAllMacros(config, false); // To Clarify with Johann - We can't just use defaults here
 
+        setSuccess(null);
+        setError(null);
         controller.command('ymodem:uploadFiles', content);
         //await new Promise((resolve) => setTimeout(resolve, 2000));
     };
@@ -97,6 +102,7 @@ export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
                 onApply={handleUpload}
                 isComplete={isComplete}
                 error={error}
+                success={success}
             />
         </div>
     );

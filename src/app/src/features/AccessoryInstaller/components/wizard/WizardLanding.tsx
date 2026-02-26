@@ -35,6 +35,33 @@ export function WizardLanding({
     };
 
     const validationsFailed = hasValidationFailures();
+    const [primarySubWizard, ...secondarySubWizards] = subWizards;
+
+    const renderSubWizardButton = (
+        subWizard: SubWizard,
+        isActive: boolean,
+        isDisabled: boolean,
+    ) => (
+        <button
+            key={subWizard.id}
+            onClick={() => !isDisabled && onSelectSubWizard(subWizard)}
+            disabled={isDisabled}
+            className={`
+                flex items-center justify-between px-6 py-4 rounded-lg text-left
+                transition-all duration-200 font-medium text-lg
+                ${
+                    isDisabled
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : isActive
+                          ? 'bg-gray-900 text-white hover:bg-gray-800'
+                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }
+            `}
+        >
+            <span>{subWizard.title}</span>
+            <ArrowRight size={20} />
+        </button>
+    );
 
     return (
         <div className="h-full min-h-0 bg-gray-50 dark:bg-slate-800 flex overflow-hidden portrait:flex-col-reverse portrait:w-full">
@@ -69,37 +96,26 @@ export function WizardLanding({
                     )}
                     <ValidationBanner validations={validations} />
                     <div className="flex flex-col gap-3 mt-12 max-w-md">
-                        {subWizards.map((subWizard, index) => {
-                            const isActive = index === 0;
-                            const isDisabledBySequence = index < 0;
-                            const isDisabled =
-                                validationsFailed || isDisabledBySequence;
-
-                            return (
-                                <button
-                                    key={subWizard.id}
-                                    onClick={() =>
-                                        !isDisabled &&
-                                        onSelectSubWizard(subWizard)
-                                    }
-                                    disabled={isDisabled}
-                                    className={`
-                    flex items-center justify-between px-6 py-4 rounded-lg text-left
-                    transition-all duration-200 font-medium text-lg
-                    ${
-                        isDisabled
-                            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                            : isActive
-                              ? 'bg-gray-900 text-white hover:bg-gray-800'
-                              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                    }
-                  `}
-                                >
-                                    <span>{subWizard.title}</span>
-                                    <ArrowRight size={20} />
-                                </button>
-                            );
-                        })}
+                        {primarySubWizard &&
+                            renderSubWizardButton(
+                                primarySubWizard,
+                                true,
+                                validationsFailed,
+                            )}
+                        {secondarySubWizards.length > 0 && (
+                            <>
+                                <div className="my-4 pt-4 pb-4" aria-hidden="true">
+                                    <hr className="h-px border-0 bg-gradient-to-r from-transparent via-gray-300 to-transparent dark:via-slate-600" />
+                                </div>
+                                {secondarySubWizards.map((subWizard) =>
+                                    renderSubWizardButton(
+                                        subWizard,
+                                        false,
+                                        validationsFailed,
+                                    ),
+                                )}
+                            </>
+                        )}
                     </div>
                 </div>
             </div>

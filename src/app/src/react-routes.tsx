@@ -127,7 +127,7 @@ export const ReactRoutes = () => {
                                     <ToolCard
                                         title={'Accessory Installation'}
                                         description={
-                                            'Install various CNC Accessorries'
+                                            'Install various CNC Accessories'
                                         }
                                         icon={LuDrill}
                                         link={'/tools/accessoryInstall'}

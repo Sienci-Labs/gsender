@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Loader2, Check, AlertCircle } from 'lucide-react';
+import { Loader2, Check, AlertCircle, CheckCircle } from 'lucide-react';
 
 type ButtonState = 'available' | 'running' | 'finished' | 'error';
 
@@ -12,6 +12,7 @@ interface StepActionButtonProps {
     isComplete?: boolean;
     disabled?: boolean;
     error?: string | null;
+    success?: string | null;
     className?: string;
     variant?: 'primary' | 'secondary';
     icon?: React.ReactNode;
@@ -25,10 +26,11 @@ export function StepActionButton({
     onApply,
     isComplete = false,
     error = null,
+    success = null,
     className = '',
     variant = 'primary',
     icon,
-    disabled = false
+    disabled = false,
 }: StepActionButtonProps) {
     const [isRunning, setIsRunning] = useState(false);
 
@@ -124,12 +126,52 @@ export function StepActionButton({
             </button>
 
             {state === 'error' && error && (
-                <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-                    <AlertCircle
-                        className="text-red-600 flex-shrink-0 mt-0.5"
-                        size={18}
-                    />
-                    <p className="text-sm text-red-800">{error}</p>
+                <div
+                    role="alert"
+                    aria-live="assertive"
+                    className="rounded-xl border border-red-500/45 bg-red-500/15 shadow-sm backdrop-blur-sm"
+                >
+                    <div className="flex items-start gap-3 p-4">
+                        <div className="mt-0.5 rounded-full bg-red-500/25 p-1.5">
+                            <AlertCircle
+                                size={20}
+                                className="text-red-800 dark:text-red-100"
+                            />
+                        </div>
+                        <div>
+                            <p className="text-xs font-semibold uppercase tracking-wide text-red-800/80 dark:text-red-100/80">
+                                Error
+                            </p>
+                            <p className="text-base font-semibold text-red-900 dark:text-red-100">
+                                {error}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {!error && success && (
+                <div
+                    role="status"
+                    aria-live="polite"
+                    className="rounded-xl border border-green-500/45 bg-green-500/15 shadow-sm backdrop-blur-sm"
+                >
+                    <div className="flex items-start gap-3 p-4">
+                        <div className="mt-0.5 rounded-full bg-green-500/25 p-1.5">
+                            <CheckCircle
+                                size={20}
+                                className="text-green-800 dark:text-green-100"
+                            />
+                        </div>
+                        <div>
+                            <p className="text-xs font-semibold uppercase tracking-wide text-green-800/80 dark:text-green-100/80">
+                                Success
+                            </p>
+                            <p className="text-base font-semibold text-green-900 dark:text-green-100">
+                                {success}
+                            </p>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>
