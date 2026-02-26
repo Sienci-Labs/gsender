@@ -45,9 +45,7 @@ describe('Load file testing in grblHal', () => {
     // ========== STEP 3: Disconnect from CNC ==========
     cy.log('STEP 3: Disconnecting from CNC...');
 
-    cy.get('button.bg-red-600.text-white')
-      .contains(/^disconnect$/i)
-      .click({ force: true });
+    cy.disconnectIfIdle();
 
     cy.log('Disconnect clicked — verifying status...');
 
@@ -93,10 +91,7 @@ describe('Load file testing in grblHal', () => {
 
     // ========== STEP 6: Final disconnect ==========
     cy.log('STEP 6: Final disconnect from CNC...');
-
-    cy.get('button.bg-red-600.text-white')
-      .contains(/^disconnect$/i)
-      .click({ force: true });
+cy.disconnectIfIdle();
 
     cy.log('Disconnect clicked — verifying status...');
 

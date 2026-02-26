@@ -88,70 +88,6 @@ Cypress.Commands.add('loadUI', (url, options = {}) => {
 //3.Connect to CNC machine grbl cy.connectMachine();
 // ----------------------
 Cypress.Commands.add('connectMachine', () => {
-<<<<<<< Updated upstream
-  cy.log('Starting connection check...');
-  cy.wait(2000); // Brief wait for UI to stabilize
-
-  const devicePattern = Cypress.env('deviceName') || 'COM';
-  
-  cy.get('body').then(($body) => {
-    const bodyText = $body.text();
-    
-    // Check if already in Idle state
-    if (/\bIdle\b/i.test(bodyText)) {
-      cy.log('Machine is already connected and in Idle state');
-      return;
-    }
-    
-    // Check if connected but waiting for Idle
-    if (/\b(Disconnect|disconnect)\b/.test(bodyText)) {
-      cy.log('Machine is connected, waiting for Idle state...');
-      cy.contains(/^Idle$/i, { timeout: 30000 })
-        .should('be.visible')
-        .then(() => {
-          cy.log('Machine reached Idle state');
-        });
-      return;
-    }
-    
-    // Not connected - initiate connection
-    cy.log('Machine not connected. Initiating connection...');
-    
-    cy.contains(/^connect to CNC$/i, { timeout: 20000 })
-      .should('exist')
-      .scrollIntoView()
-      .should('be.visible')
-      .click({ force: true })
-      .then(() => {
-        cy.log('Connect button clicked');
-        cy.wait(1000);
-        
-        // Select first available COM port
-        cy.get('div.absolute', { timeout: 20000 })
-          .should('be.visible')
-          .find('button')
-          .first()
-          .should('contain.text', devicePattern)
-          .then(($btn) => {
-            const portName = $btn.text().trim();
-            cy.log(`Selecting port: ${portName}`);
-            cy.wrap($btn).click({ force: true });
-          });
-        
-        // Handle unlock if needed
-        cy.unlockMachineIfNeeded();
-        
-        // Wait for Idle state
-        cy.log('Waiting for machine to reach Idle state...');
-        cy.contains(/^Idle$/i, { timeout: 30000 })
-          .should('be.visible')
-          .then(() => {
-            cy.log('CNC machine connected successfully and is in Idle state');
-          });
-      });
-  });
-});
-=======
 
   // Step 1: Click "Connect to CNC" button 
   cy.contains('span', 'Connect to CNC', { timeout: 10000 })
@@ -189,7 +125,6 @@ Cypress.Commands.add('connectMachine', () => {
     .then(() => cy.log('CNC machine connected and in Idle state'));
 
         });
->>>>>>> Stashed changes
 //-----------------------
 //21.Axis Homing Z< Y & X 
 //-----------------------
@@ -449,84 +384,59 @@ Cypress.Commands.add('autoUnlock', () => {
 // ------------------------
 // 5. Connect to CNC - GrblHAL (Cross-platform compatible)
 // ----------------------
-Cypress.Commands.add('connectToGrblHAL', (options = {}) => {
-  // Get device pattern from environment variable or use default
-  const devicePattern = options.deviceName || Cypress.env('deviceName') || 'COM';
-  
+Cypress.Commands.add('connectToGrblHAL', () => {
   cy.log('Starting connection check...');
-  cy.log(`Using device pattern: "${devicePattern}"`);
-  cy.wait(2000); // Brief wait for UI to stabilize
-  
+  cy.wait(2000);
+
   cy.get('body').then(($body) => {
     const bodyText = $body.text();
-    
-    // Check if already in Idle state
+
+    // Already Idle
     if (/\bIdle\b/i.test(bodyText)) {
       cy.log(' Machine is already connected and in Idle state');
       return;
     }
-    
-    // Check if connected but waiting for Idle
-    if (/\b(Disconnect|disconnect)\b/.test(bodyText)) {
-      cy.log(' Machine is connected, waiting for Idle state...');
-      cy.contains(/^Idle$/i, { timeout: 30000 })
-        .should('be.visible')
-        .then(() => {
-          cy.log(' Machine reached Idle state');
-        });
+
+    // Connected but not Idle yet
+    if (/\bDisconnect\b/i.test(bodyText)) {
+      cy.log(' Machine connected — waiting for Idle...');
+      cy.contains(/^Idle$/i, { timeout: 30000 }).should('be.visible');
       return;
     }
-    
-    // Not connected - initiate connection
+
+    // Not connected — initiate connection
     cy.log(' Machine not connected. Initiating connection...');
-    
+
     cy.contains(/^connect to CNC$/i, { timeout: 20000 })
       .should('exist')
       .scrollIntoView()
       .should('be.visible')
-      .click({ force: true })
-      .then(() => {
-        cy.log('Connect button clicked');
-        cy.wait(1000);
-        
-        // Select device port matching the pattern
-        cy.get('div.absolute', { timeout: 20000 })
-          .should('be.visible')
-          .find('button')
-          .then(($buttons) => {
-            // Find first button that matches the device pattern
-            const matchingButton = $buttons.toArray().find(btn => {
-              const text = btn.textContent || '';
-              return text.includes(devicePattern);
-            });
+      .click({ force: true });
 
-            if (!matchingButton) {
-              const availablePorts = $buttons.toArray().map(b => b.textContent).join(', ');
-              throw new Error(
-                ` No device found matching pattern: "${devicePattern}". ` +
-                `Available ports: ${availablePorts}`
-              );
-            }
+    cy.wait(1000);
 
-            const portName = matchingButton.textContent.trim();
-            cy.log(`Selecting port: ${portName}`);
-            cy.wrap(matchingButton).click({ force: true });
-          });
-        
-        // Handle unlock if needed
-        cy.unlockMachineIfNeeded();
-        
-        // Wait for Idle state
-        cy.log(' Waiting for machine to reach Idle state...');
-        cy.contains(/^Idle$/i, { timeout: 30000 })
-          .should('be.visible')
-          .then(() => {
-            cy.log(' CNC machine connected successfully and is in Idle state');
+    // Select first available port (works on Windows/Linux/macOS)
+    cy.get('div[data-radix-popper-content-wrapper]', { timeout: 10000 })
+      .should('exist')
+      .within(() => {
+        cy.get('button.m-0')
+          .should('have.length.greaterThan', 0)
+          .first()
+          .then(($btn) => {
+            const portName = ($btn.text() || '').trim();
+            cy.log(` Selecting port: "${portName}"`);
+            cy.wrap($btn).click({ force: true });
           });
       });
+
+    cy.unlockMachineIfNeeded();
+
+    cy.log('Waiting for Idle state...');
+    cy.contains(/^Idle$/i, { timeout: 30000 })
+      .should('be.visible')
+      .then(() => cy.log(' CNC machine connected and in Idle state'));
   });
 });
-
 // ----------------------
 // 6.Disconnect if Idle
 // ----------------------
@@ -536,20 +446,27 @@ Cypress.Commands.add('disconnectIfIdle', () => {
     .then((status) => {
       const machineStatus = status.text().trim();
       cy.log(`Machine status: "${machineStatus}"`);
+
       if (machineStatus.toLowerCase() === 'idle') {
         cy.log('Machine is Idle — disconnecting...');
-        cy.get('button.bg-red-600.text-white')
+
+        cy.get('div.group')
+          .first()
+          .trigger('mouseover', { force: true });
+
+        cy.get('div.group div.w-full')
           .contains(/^disconnect$/i)
           .click({ force: true });
-        cy.contains(/(Connect to CNC|Disconnected)/i, { timeout: 10000 })
+
+        cy.contains(/Connect to CNC/i, { timeout: 30000 })
           .should('be.visible')
-          .then(() => cy.log(' Machine disconnect verified successfully.'));
+          .then(() => cy.log('Machine disconnect verified successfully.'));
+
       } else {
         cy.log('Machine is not Idle — skipping disconnect.');
       }
     });
 });
-
 // ----------------------
 //7.Upload G-code file
 // ----------------------

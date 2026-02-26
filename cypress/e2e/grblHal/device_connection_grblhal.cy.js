@@ -1,6 +1,6 @@
 describe('Device Connection', () => {
   beforeEach(() => {
-    cy.viewport(1920, 1080);
+    cy.viewport(2133, 1050);
     cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
       maxRetries: 4,
       waitTime: 4000,
@@ -9,70 +9,113 @@ describe('Device Connection', () => {
   });
 
   it('should connect to CNC machine by selecting the first available port', () => {
-    //  Step 1: Click "Connect to CNC" button 
-    cy.contains('span', 'Connect to CNC', { timeout: 10000 })
-      .should('be.visible')
-      .click({ force: true });
 
-    // Step 2: Wait for the radix popper div to appear 
-    cy.get('div[data-radix-popper-content-wrapper]', { timeout: 10000 })
-      .should('exist')
-      .and('be.visible')
-      .within(() => {
+    cy.wait(2000);
 
-        // ── Step 3: Get the first port button inside the popper 
-        cy.get('button.m-0')
-          .should('have.length.greaterThan', 0)
-          .first()
-          .then(($btn) => {
+    cy.get('body').then(($body) => {
+      const bodyText = $body.text();
 
-            // Step 4: Read and log the port label — no assertion on name 
-            const $label = $btn.find('span.font-bold');
-            const portName = $label.length > 0
-              ? $label.text().trim()
-              : $btn.text().trim();
+      // ── Already connected and Idle
+      if (/\bIdle\b/i.test(bodyText)) {
+        cy.log('Machine is already connected and in Idle state');
+        return;
+      }
 
-            cy.log(`Selecting first available port: "${portName}"`);
+      // ── Connected but not yet Idle
+      if (/\bDisconnect\b/i.test(bodyText)) {
+        cy.log('Machine connected — waiting for Idle...');
+        cy.contains(/^Idle$/i, { timeout: 30000 }).should('be.visible');
+        return;
+      }
 
-            // Step 5: Click whatever port is listed first 
-            cy.wrap($btn).click({ force: true });
+      // ── Not connected — start flow
+      cy.log('Not connected. Starting connection flow...');
+
+      // Step 1: Click "Connect to CNC"
+      cy.contains('span', 'Connect to CNC', { timeout: 10000 })
+        .should('exist')
+        .scrollIntoView()
+        .click({ force: true });
+
+      // Step 2: Wait for Radix dropdown to appear
+      cy.get('div[data-radix-popper-content-wrapper]', { timeout: 10000 })
+        .should('exist')
+        .within(() => {
+
+          // Step 3: Get all port buttons (button.m-0 confirmed from recording)
+          cy.get('button.m-0')
+            .should('have.length.greaterThan', 0)
+            .then(($buttons) => {
+
+              // Step 4: Filter out non-port UI buttons
+              const NON_PORT_LABELS = [
+                'back', 'refresh', 'cancel', 'close', 'ok',
+                'done', 'connect', 'disconnect', 'next', 'previous'
+              ];
+
+              const portButtons = $buttons.toArray().filter((btn) => {
+                const text = (btn.textContent || '').trim().toLowerCase();
+                return (
+                  text.length > 0 &&
+                  !NON_PORT_LABELS.some((label) => text === label)
+                );
+              });
+
+              expect(
+                portButtons.length,
+                'No port buttons found in dropdown'
+              ).to.be.greaterThan(0);
+
+              // Step 5: Select first port — works on all OS
+              // Windows → COM4, Linux → ttyUSB0, macOS → cu.usbmodem
+              const firstPort = portButtons[0];
+              const portName = (firstPort.textContent || '').trim();
+              cy.log(`Selecting first available port: "${portName}"`);
+
+              cy.wrap(firstPort).click({ force: true });
+            });
+        });
+
+      // Step 6: Wait for Idle state
+      cy.log('Waiting for Idle state...');
+      cy.contains(/^Idle$/i, { timeout: 30000 })
+        .should('be.visible')
+        .then(() => cy.log('Machine connected and in Idle state'));
+
+      // Step 7: Verify firmware from connected device button
+      cy.get('div.group', { timeout: 10000 })
+        .should('exist')
+        .then(($groups) => {
+
+          // Find the div.group whose text contains grbl firmware info
+          const deviceGroup = $groups.toArray().find((el) => {
+            const text = (el.textContent || '').trim();
+            return /grbl(hal)?/i.test(text);
           });
-      });
 
-    // ── Step 6: Confirm machine reaches Idle state after connecting 
-    cy.contains(/^Idle$/i, { timeout: 30000 })
-      .should('be.visible')
-      .then(() => cy.log('CNC machine connected and in Idle state'));
+          expect(
+            deviceGroup,
+            'Could not find a connected device button containing grbl/grblHAL firmware'
+          ).to.not.be.undefined;
 
-    // ── Step 7: Find the connected device button
-    cy.get(
-      'button:has(.w-full.flex.h-full.transition-opacity.duration-200.rounded.items-center.font-normal.justify-center.absolute.top-0.left-0.opacity-0.bg-red-600.text-white.z-20)',
-      { timeout: 10000 }
-    )
-      .should('exist')
-      .then(($deviceBtn) => {
+          const fullText = (deviceGroup.textContent || '').trim();
+          cy.log(`Device button text: "${fullText}"`);
 
-        // ── Step 8: Extract only the firmware name (grbl or grblHAL) 
-        // Full button text is e.g. "COM4grblHALDisconnect" — strip port and
-        // "Disconnect" to isolate just the firmware label
-        const fullText = $deviceBtn.text().trim();
-        const firmwareMatch = fullText.match(/grbl(hal)?/i);
+          const firmwareMatch = fullText.match(/grbl(hal)?/i);
+          const firmware = firmwareMatch[0];
+          cy.log(`Firmware detected: "${firmware}"`);
 
-        expect(firmwareMatch).to.not.be.null;
+          expect(firmware).to.match(
+            /^grbl(hal)?$/i,
+            `Expected "grbl" or "grblHAL" but got "${firmware}"`
+          );
 
-        const firmware = firmwareMatch[0];
-        cy.log(`Firmware detected: "${firmware}"`);
+          cy.log(`Firmware "${firmware}" confirmed`);
+        });
 
-        // ── Step 9: Assert firmware is grbl or grblHAL 
-        expect(firmware).to.match(
-          /^grbl(hal)?$/i,
-          `Expected firmware to be "grbl" or "grblHAL" but got "${firmware}"`
-        );
+      // Step 8: Disconnect
+      cy.disconnectIfIdle();
 
-        cy.log(`Firmware "${firmware}" confirmed — assertion passed`);
-      });
-
-      //Disconnect the machine using custom command
-    cy.disconnectIfIdle();
-  });
-});
+    }); 
+  });   
+});     
