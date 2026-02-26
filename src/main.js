@@ -88,6 +88,7 @@ const main = () => {
     require('@electron/remote/main').initialize();
 
     let prevDirectory = '';
+    let pendingFileToOpen = null;
 
     if (shouldQuitImmediately) {
         app.quit();
@@ -104,8 +105,24 @@ const main = () => {
         if (window) {
             if (window.isMinimized()) {
                 window.restore();
-                window.focus();
             }
+            window.focus();
+            const filePath = commandLine.find(arg =>
+                /\.(gcode|gc|nc|tap|cnc)$/i.test(arg)
+            );
+            if (filePath) {
+                loadFileAssociation(filePath, window);
+            }
+        }
+    });
+
+    app.on('open-file', (event, filePath) => {
+        event.preventDefault();
+        const window = windowManager?.getWindow();
+        if (window) {
+            loadFileAssociation(filePath, window);
+        } else {
+            pendingFileToOpen = filePath;
         }
     });
 
@@ -130,6 +147,20 @@ const main = () => {
     // Extra logging
     logPath = path.join(app.getPath('userData'), 'logs/grbl.log');
     grblLog.transports.file.resolvePath = () => logPath;
+
+    const loadFileAssociation = async (filePath, window) => {
+        try {
+            const fileMetadata = await parseAndReturnGCode({ filePath });
+            window.webContents.send('returned-upload-dialog-data', {
+                data: fileMetadata.result,
+                size: fileMetadata.size,
+                name: fileMetadata.name,
+                path: fileMetadata.fullPath,
+            });
+        } catch (err) {
+            log.error(`Error loading file association: ${err}`);
+        }
+    };
 
     app.whenReady().then(async () => {
         try {
@@ -235,6 +266,23 @@ const main = () => {
                 kiosk,
             };
             const window = await windowManager.openWindow(url, options, splashScreen);
+
+            // Check argv for file path on Windows/Linux cold start
+            if (process.platform !== 'darwin') {
+                const filePath = process.argv.find(arg =>
+                    /\.(gcode|gc|nc|tap|cnc)$/i.test(arg)
+                );
+                if (filePath) {
+                    pendingFileToOpen = filePath;
+                }
+            }
+
+            window.webContents.once('did-finish-load', () => {
+                if (pendingFileToOpen) {
+                    loadFileAssociation(pendingFileToOpen, window);
+                    pendingFileToOpen = null;
+                }
+            });
 
             // Power saver - display sleep higher precedence over app suspension
             powerSaveBlocker.start('prevent-display-sleep');

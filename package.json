@@ -169,7 +169,16 @@
         "AppImage",
         "deb"
       ]
-    }
+    },
+    "fileAssociations": [
+      {
+        "ext": ["gcode", "gc", "nc", "tap", "cnc"],
+        "name": "G-Code File",
+        "description": "G-Code CNC machining file",
+        "mimeType": "text/plain",
+        "role": "Viewer"
+      }
+    ]
   },
   "keywords": [
     "gsender",
