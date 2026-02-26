@@ -11,7 +11,7 @@ export function RestartAndRehome({ onComplete, onUncomplete }: StepProps) {
     const [error, setError] = useState<string | null>(null);
 
     const hasHomed = useTypedSelector(
-        (state: RootState) => state.controller.state.status.hasHomed,
+        (state: RootState) => state.controller.hasHomed,
     );
 
     const isConnected = useTypedSelector(

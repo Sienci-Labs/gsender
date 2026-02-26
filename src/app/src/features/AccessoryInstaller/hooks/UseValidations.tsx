@@ -9,7 +9,7 @@ export function useValidations() {
         (state: RootState) => state.connection.isConnected,
     );
     const hasHomed = useTypedSelector(
-        (state: RootState) => state.controller.state?.status?.hasHomed,
+        (state: RootState) => state.controller.hasHomed,
     );
     const reportedFirmwareSemver = useTypedSelector(
         (state: RootState) => state.controller.settings.version?.semver,
