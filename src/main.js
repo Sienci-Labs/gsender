@@ -277,7 +277,7 @@ const main = () => {
                 }
             }
 
-            window.webContents.once('did-finish-load', () => {
+            ipcMain.on('file-association-ready', () => {
                 if (pendingFileToOpen) {
                     loadFileAssociation(pendingFileToOpen, window);
                     pendingFileToOpen = null;

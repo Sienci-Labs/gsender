@@ -83,6 +83,9 @@ const FileControl = () => {
                     deleteRecentFile(data.path);
                 },
             );
+
+            // Signal to main that we're ready to receive file association data
+            (window as any).ipcRenderer.send('file-association-ready');
         }
     }, []);
 
