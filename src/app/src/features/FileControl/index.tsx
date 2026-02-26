@@ -85,7 +85,9 @@ const FileControl = () => {
             );
 
             // Signal to main that we're ready to receive file association data
-            (window as any).ipcRenderer.send('file-association-ready');
+            setTimeout(() => {
+                (window as any).ipcRenderer.send('file-association-ready');
+            }, 250)
         }
     }, []);
 
