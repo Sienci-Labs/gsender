@@ -194,6 +194,12 @@ class GrblHalController {
 
     feederCB = null;
 
+    FOQueue = []; // feedrate override queue
+    runningFOQ = false;
+
+    SOQueue = []; // spindle override queue
+    runningSOQ = false;
+
     // Sender
     sender = null;
 
@@ -1642,6 +1648,36 @@ class GrblHalController {
         }
     }
 
+    consumeFOQ() {
+        if (!this.runningFOQ) {
+            this.runningFOQ = true;
+            let index = 0;
+            while (this.FOQueue.length > 0) {
+                const command = this.FOQueue.shift();
+                setTimeout(() => {
+                    this.connection.writeImmediate(command);
+                }, 25 * (index + 1));
+                index++;
+            }
+            this.runningFOQ = false;
+        }
+    }
+
+    consumeSOQ() {
+        if (!this.runningSOQ) {
+            this.runningSOQ = true;
+            let index = 0;
+            while (this.SOQueue.length > 0) {
+                const command = this.SOQueue.shift();
+                setTimeout(() => {
+                    this.connection.writeImmediate(command);
+                }, 25 * (index + 1));
+                index++;
+            }
+            this.runningSOQ = false;
+        }
+    }
+
     command(cmd, ...args) {
         const handler = {
             'firmware:recievedProfiles': () => {
@@ -2030,15 +2066,11 @@ class GrblHalController {
 
                 let diff = value - feedOV;
                 if (value === 100) {
-                    this.write(String.fromCharCode(0x90));
+                    this.FOQueue.push(String.fromCharCode(0x90));
                 } else {
-                    const queue = calcOverrides(diff, 'feed');
-                    queue.forEach((command, index) => {
-                        setTimeout(() => {
-                            this.connection.writeImmediate(command);
-                        }, 25 * (index + 1));
-                    });
+                    this.FOQueue.push(...calcOverrides(diff, 'feed'));
                 }
+                this.consumeFOQ();
 
                 this.sender.setOvF(value);
             },
@@ -2057,15 +2089,11 @@ class GrblHalController {
                 }
 
                 if (value === 100) {
-                    this.write(String.fromCharCode(0x99));
+                    this.SOQueue.push(String.fromCharCode(0x99));
                 } else {
-                    const queue = calcOverrides(diff, 'spindle');
-                    queue.forEach((command, index) => {
-                        setTimeout(() => {
-                            this.connection.writeImmediate(command);
-                        }, 25 * (index + 1));
-                    });
+                    this.SOQueue.push(...calcOverrides(diff, 'spindle'));
                 }
+                this.consumeSOQ();
             },
             // Rapid Overrides
             // @param {number} value A percentage value of 25, 50, or 100. A value of zero will reset to 100%.

@@ -41,7 +41,7 @@ export interface RangeSliderProps {
     showText: boolean; // optional parameter to show text representations of the percentage and to show title
     onChange?: (percentage: number[]) => void;
     onButtonPress?: (percentage: number[]) => void;
-    onPointerUp?: PointerEventHandler<HTMLInputElement>;
+    onLostPointerCapture?: PointerEventHandler<HTMLInputElement>;
     unitString?: string;
 }
 
@@ -57,7 +57,7 @@ const RangeSlider = ({
     colour = 'bg-blue-400',
     onChange = null,
     onButtonPress = null,
-    onPointerUp = null,
+    onLostPointerCapture = null,
     unitString = 'unit',
     disabled,
     ...props
@@ -103,7 +103,7 @@ const RangeSlider = ({
                     min={min}
                     max={max}
                     onValueChange={onChange}
-                    onPointerUp={onPointerUp}
+                    onLostPointerCapture={onLostPointerCapture}
                     disabled={disabled}
                     {...props}
                 ></Slider>
