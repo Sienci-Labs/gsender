@@ -89,6 +89,7 @@ const main = () => {
 
     let prevDirectory = '';
     let pendingFileToOpen = null;
+    let isRendererReady = false;
 
     if (shouldQuitImmediately) {
         app.quit();
@@ -119,7 +120,7 @@ const main = () => {
     app.on('open-file', (event, filePath) => {
         event.preventDefault();
         const window = windowManager?.getWindow();
-        if (window) {
+        if (window && isRendererReady) {
             loadFileAssociation(filePath, window);
         } else {
             pendingFileToOpen = filePath;
@@ -278,6 +279,7 @@ const main = () => {
             }
 
             ipcMain.on('file-association-ready', () => {
+                isRendererReady = true;
                 if (pendingFileToOpen) {
                     loadFileAssociation(pendingFileToOpen, window);
                     pendingFileToOpen = null;
