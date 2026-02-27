@@ -146,6 +146,14 @@ export interface PreferencesState {
     };
     ipList: Array<string>;
     notifications: Notification[];
+    accessibility: {
+        statusAnnouncements: boolean;
+        jobProgressAnnouncements: boolean;
+        jobProgressIncrement: number;
+        focusRings: boolean;
+        focusTrapping: boolean;
+        visualizerKeyboardControl: boolean;
+    };
 }
 
 export interface VisualizerState {

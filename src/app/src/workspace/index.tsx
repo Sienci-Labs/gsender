@@ -27,6 +27,7 @@ import { TopBar } from './TopBar';
 import { Carve } from './Carve';
 import { Alerts } from './Alerts';
 import DataCollection from '../features/DataCollection';
+import { AccessibilityAnnouncer } from '../features/Helper/AccessibilityAnnouncer';
 import pkg from '../../package.json';
 import store from 'app/store';
 import {
@@ -390,6 +391,7 @@ const Workspace = () => {
     return (
         <SettingsProvider>
             <div className="flex flex-col h-full dark:bg-slate-800">
+                <AccessibilityAnnouncer />
                 <header>
                     <TopBar />
                 </header>

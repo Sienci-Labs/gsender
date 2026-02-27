@@ -162,6 +162,14 @@ const defaultState: State = {
         notifications: [],
         toastDuration: 0,
         enableDarkMode: false,
+        accessibility: {
+            statusAnnouncements: true,
+            jobProgressAnnouncements: true,
+            jobProgressIncrement: 10,
+            focusRings: false,
+            focusTrapping: false,
+            visualizerKeyboardControl: false,
+        },
     },
     widgets: {
         axes: {

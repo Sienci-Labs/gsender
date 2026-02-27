@@ -13,6 +13,14 @@ const initialState: PreferencesState = {
     },
     ipList: [],
     notifications: [],
+    accessibility: store.get('workspace.accessibility', {
+        statusAnnouncements: true,
+        jobProgressAnnouncements: true,
+        jobProgressIncrement: 10,
+        focusRings: false,
+        focusTrapping: false,
+        visualizerKeyboardControl: false,
+    }),
 };
 
 const preferencesSlice = createSlice({
@@ -50,6 +58,16 @@ const preferencesSlice = createSlice({
         setNotifications(state, action: PayloadAction<Notification[]>) {
             state.notifications = action.payload;
         },
+        updateAccessibility(
+            state,
+            action: PayloadAction<Partial<PreferencesState['accessibility']>>,
+        ) {
+            state.accessibility = {
+                ...state.accessibility,
+                ...action.payload,
+            };
+            store.set('workspace.accessibility', state.accessibility);
+        },
     },
 });
 
@@ -63,6 +81,7 @@ export const {
     removeNotification,
     clearNotifications,
     setNotifications,
+    updateAccessibility,
 } = preferencesSlice.actions;
 
 export default preferencesSlice.reducer;

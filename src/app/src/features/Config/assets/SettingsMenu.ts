@@ -12,7 +12,7 @@ import { IoIosSwap } from 'react-icons/io';
 import { FaArrowsSpin } from 'react-icons/fa6';
 import { MdSettingsApplications } from 'react-icons/md';
 import { SiCoronaengine } from 'react-icons/si';
-import { MdOutlineReadMore } from 'react-icons/md';
+import { MdOutlineReadMore, MdAccessibility } from 'react-icons/md';
 import { IconType } from 'react-icons';
 import {
     TOUCHPLATE_TYPE_3D,
@@ -1802,6 +1802,94 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     { type: 'eeprom', eID: '$484' },
                     { type: 'eeprom', eID: '$486' },
                     { type: 'eeprom', eID: '$666' },
+                ],
+            },
+        ],
+    },
+    {
+        label: 'Accessibility',
+        icon: MdAccessibility,
+        settings: [
+            {
+                label: 'Announcements',
+                settings: [
+                    {
+                        label: 'Status announcements',
+                        key: 'workspace.accessibility.statusAnnouncements',
+                        description:
+                            'Automatically announce machine status changes (Idle, Running, Alarm, etc.) using screen readers.',
+                        type: 'boolean',
+                        onUpdate: () => {
+                            pubsub.publish('accessibility:update');
+                        },
+                    },
+                    {
+                        label: 'Job progress announcements',
+                        key: 'workspace.accessibility.jobProgressAnnouncements',
+                        description:
+                            'Periodically announce job completion percentage.',
+                        type: 'boolean',
+                        onUpdate: () => {
+                            pubsub.publish('accessibility:update');
+                        },
+                    },
+                    {
+                        label: 'Progress increment',
+                        key: 'workspace.accessibility.jobProgressIncrement',
+                        description:
+                            'The percentage increment at which to announce progress (e.g. every 10%).',
+                        type: 'number',
+                        min: 1,
+                        max: 50,
+                        unit: '%',
+                        hidden: () =>
+                            !store.get(
+                                'workspace.accessibility.jobProgressAnnouncements',
+                            ),
+                        onUpdate: () => {
+                            pubsub.publish('accessibility:update');
+                        },
+                    },
+                ],
+            },
+            {
+                label: 'Navigation',
+                settings: [
+                    {
+                        label: 'Focus rings',
+                        key: 'workspace.accessibility.focusRings',
+                        description:
+                            'Show a high-contrast ring around the currently focused element for better keyboard navigation visibility.',
+                        type: 'boolean',
+                        onUpdate: () => {
+                            pubsub.publish('accessibility:update');
+                        },
+                    },
+                    {
+                        label: 'Focus trapping',
+                        key: 'workspace.accessibility.focusTrapping',
+                        description:
+                            'Keep keyboard focus within modals and dialogs when they are open.',
+                        type: 'boolean',
+                        onUpdate: () => {
+                            pubsub.publish('accessibility:update');
+                        },
+                    },
+                ],
+            },
+            {
+                label: 'Visualizer',
+                settings: [
+                    {
+                        label: 'Keyboard control',
+                        key: 'workspace.accessibility.visualizerKeyboardControl',
+                        description:
+                            'Allow orbiting, panning, and zooming the 3D visualizer using arrow keys and hotkeys.',
+                        type: 'boolean',
+                        onUpdate: () => {
+                            pubsub.publish('accessibility:update');
+                        },
+                    },
                 ],
             },
         ],

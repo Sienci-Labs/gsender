@@ -122,7 +122,7 @@ function populateSettingsValues(
         ss.settings.map((s) => {
             s.settings.map((o) => {
                 if (o.key && o.key.length > 0) {
-                    o.value = fetchStoreValue(o.key);
+                    o.value = store.get(o.key);
                     o.globalIndex = index;
                     o.defaultValue = fetchDefaultValue(o.key);
                     globalValueReference.push({ ...o });
