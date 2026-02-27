@@ -111,12 +111,18 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                             msOverflowStyle: 'none',
                         }}
                         onScroll={checkScrollability}
+                        role="tablist"
+                        aria-label="Widget Tabs"
                     >
                         {items &&
                             items.map((item, index) => (
                                 <button
                                     key={item.label}
                                     ref={(el) => (tabRefs.current[index] = el)}
+                                    role="tab"
+                                    aria-selected={activeTab === item.label}
+                                    aria-controls={`tabpanel-${item.label}`}
+                                    id={`tab-${item.label}`}
                                     className={`flex-grow pt-1 px-4 text-base font-medium max-xl:text-sm max-xl:pt-2 ${
                                         activeTab === item.label
                                             ? 'text-blue-600 border-b-2 border-blue-600 dark:text-blue-400 dark:border-blue-400'
@@ -149,6 +155,9 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                     items.map(({ label, content: Content }) => (
                         <div
                             key={label}
+                            role="tabpanel"
+                            id={`tabpanel-${label}`}
+                            aria-labelledby={`tab-${label}`}
                             className={classNames(
                                 'w-full h-full',
                                 activeTab === label ? 'block' : 'hidden',

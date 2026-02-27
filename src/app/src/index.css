@@ -39,6 +39,13 @@ body.focus-rings-enabled *:focus {
     outline-offset: 2px !important;
 }
 
+body.reduced-motion * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+}
+
 @layer utilities {
     input[type='number']::-webkit-inner-spin-button,
     input[type='number']::-webkit-outer-spin-button {

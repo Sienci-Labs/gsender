@@ -153,6 +153,19 @@ export interface PreferencesState {
         focusRings: boolean;
         focusTrapping: boolean;
         visualizerKeyboardControl: boolean;
+        audioCues: {
+            enabled: boolean;
+            jobComplete: boolean;
+            alarmTriggered: boolean;
+            toolChange: boolean;
+            probeSuccess: boolean;
+        };
+        reducedMotion: boolean;
+        gcodeSummary: {
+            enabled: boolean;
+            showVisually: boolean;
+        };
+        showKeyboardMap: boolean;
     };
 }
 

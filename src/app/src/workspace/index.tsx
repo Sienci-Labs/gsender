@@ -28,6 +28,7 @@ import { Carve } from './Carve';
 import { Alerts } from './Alerts';
 import DataCollection from '../features/DataCollection';
 import { AccessibilityAnnouncer } from '../features/Helper/AccessibilityAnnouncer';
+import { KeyboardMapOverlay } from '../features/Helper/KeyboardMapOverlay';
 import pkg from '../../package.json';
 import store from 'app/store';
 import {
@@ -390,19 +391,32 @@ const Workspace = () => {
 
     return (
         <SettingsProvider>
+            <AccessibilityAnnouncer />
+            <KeyboardMapOverlay />
+            <a
+                href="#main-content"
+                className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[10000] focus:bg-blue-600 focus:text-white focus:px-4 focus:py-2 focus:rounded-md"
+            >
+                Skip to main content
+            </a>
             <div className="flex flex-col h-full dark:bg-slate-800">
-                <AccessibilityAnnouncer />
-                <header>
+                <header role="banner">
                     <TopBar />
                 </header>
                 <ConfirmationDialog />
+                <div className="sr-only" role="status" aria-live="polite"></div>
                 <DataCollection />
                 <div className="flex h-full no-scrollbar ">
-                    <aside>
+                    <nav className="aside" aria-label="Main Navigation">
                         <Sidebar />
-                    </aside>
+                    </nav>
                     <Alerts />
-                    <main className="w-full max-sm:p-4">
+                    <main
+                        id="main-content"
+                        className="w-full max-sm:p-4 outline-none"
+                        tabIndex={-1}
+                        role="main"
+                    >
                         <Carve />
                         <Outlet />
                     </main>

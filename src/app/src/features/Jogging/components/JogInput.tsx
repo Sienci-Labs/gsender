@@ -6,11 +6,17 @@ import { toFixedIfNecessary } from 'app/lib/rounding';
 
 interface JogInputProps {
     label: string;
+    screenReaderLabel?: string;
     onChange: (step: number) => void;
     currentValue: number;
 }
 
-export const JogInput = ({ label, currentValue, onChange }: JogInputProps) => {
+export const JogInput = ({
+    label,
+    screenReaderLabel,
+    currentValue,
+    onChange,
+}: JogInputProps) => {
     const getStep = (increment = false) => {
         let step;
         const digitCount = Math.floor(currentValue).toString().length; // number of whole digits
@@ -78,6 +84,8 @@ export const JogInput = ({ label, currentValue, onChange }: JogInputProps) => {
         }
     };
 
+    const effectiveLabel = screenReaderLabel || label;
+
     return (
         <div className="flex flex-row justify-end items-center gap-2">
             <Label className="min-w-[2ch] text-right whitespace-nowrap">
@@ -92,7 +100,7 @@ export const JogInput = ({ label, currentValue, onChange }: JogInputProps) => {
                     }}
                     size="mini"
                     icon={<FaMinus />}
-                    aria-label={`Decrease ${label}`}
+                    aria-label={`Decrease ${effectiveLabel}`}
                 />
                 <ControlledInput
                     sizing="xs"
@@ -101,6 +109,7 @@ export const JogInput = ({ label, currentValue, onChange }: JogInputProps) => {
                     onChange={(e) => onChange(Number(e.target.value))}
                     className="flex-1"
                     min={0.001}
+                    aria-label={effectiveLabel}
                 />
                 <Button
                     type="button"
@@ -112,7 +121,7 @@ export const JogInput = ({ label, currentValue, onChange }: JogInputProps) => {
                     }}
                     size="mini"
                     icon={<FaPlus />}
-                    aria-label={`Increase ${label}`}
+                    aria-label={`Increase ${effectiveLabel}`}
                 />
             </div>
         </div>

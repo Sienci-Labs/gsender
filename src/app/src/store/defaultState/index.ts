@@ -169,6 +169,19 @@ const defaultState: State = {
             focusRings: false,
             focusTrapping: false,
             visualizerKeyboardControl: false,
+            audioCues: {
+                enabled: false,
+                jobComplete: true,
+                alarmTriggered: true,
+                toolChange: true,
+                probeSuccess: true,
+            },
+            reducedMotion: false,
+            gcodeSummary: {
+                enabled: true,
+                showVisually: false,
+            },
+            showKeyboardMap: false,
         },
     },
     widgets: {

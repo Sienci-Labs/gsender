@@ -17,12 +17,14 @@ export interface SpeedSelectButtonProps {
     active?: boolean;
     onClick?: () => void;
     label: string;
+    screenReaderLabel?: string;
 }
 
 export function SpeedSelectButton({
     label,
     active,
     onClick,
+    screenReaderLabel,
 }: SpeedSelectButtonProps) {
     return (
         <button
@@ -30,6 +32,8 @@ export function SpeedSelectButton({
                 'bg-blue-400 bg-opacity-30': active,
             })}
             onClick={onClick}
+            aria-label={screenReaderLabel || label}
+            aria-pressed={active}
         >
             {label}
         </button>
@@ -201,16 +205,19 @@ export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
                 active={preciseActive}
                 onClick={() => handleSpeedChange('Precise')}
                 label="Precise"
+                screenReaderLabel="Set to Precise jog preset"
             />
             <SpeedSelectButton
                 active={normalActive}
                 onClick={() => handleSpeedChange('Normal')}
                 label="Normal"
+                screenReaderLabel="Set to Normal jog preset"
             />
             <SpeedSelectButton
                 active={rapidActive}
                 onClick={() => handleSpeedChange('Rapid')}
                 label="Rapid"
+                screenReaderLabel="Set to Rapid jog preset"
             />
         </div>
     );

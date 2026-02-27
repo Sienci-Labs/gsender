@@ -1853,7 +1853,67 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 ],
             },
             {
-                label: 'Navigation',
+                label: 'Audio Cues',
+                settings: [
+                    {
+                        label: 'Enable audio cues',
+                        key: 'workspace.accessibility.audioCues.enabled',
+                        description:
+                            'Play short sounds for specific machine events.',
+                        type: 'boolean',
+                        onUpdate: () => {
+                            pubsub.publish('accessibility:update');
+                        },
+                    },
+                    {
+                        label: 'Job complete sound',
+                        key: 'workspace.accessibility.audioCues.jobComplete',
+                        description: 'Play sound when a job finishes.',
+                        type: 'boolean',
+                        hidden: () =>
+                            !store.get('workspace.accessibility.audioCues.enabled'),
+                        onUpdate: () => {
+                            pubsub.publish('accessibility:update');
+                        },
+                    },
+                    {
+                        label: 'Alarm sound',
+                        key: 'workspace.accessibility.audioCues.alarmTriggered',
+                        description:
+                            'Play sound when the machine enters an alarm state.',
+                        type: 'boolean',
+                        hidden: () =>
+                            !store.get('workspace.accessibility.audioCues.enabled'),
+                        onUpdate: () => {
+                            pubsub.publish('accessibility:update');
+                        },
+                    },
+                    {
+                        label: 'Tool change sound',
+                        key: 'workspace.accessibility.audioCues.toolChange',
+                        description: 'Play sound when a tool change is required.',
+                        type: 'boolean',
+                        hidden: () =>
+                            !store.get('workspace.accessibility.audioCues.enabled'),
+                        onUpdate: () => {
+                            pubsub.publish('accessibility:update');
+                        },
+                    },
+                    {
+                        label: 'Probe success sound',
+                        key: 'workspace.accessibility.audioCues.probeSuccess',
+                        description: 'Play sound after a successful probe.',
+                        type: 'boolean',
+                        hidden: () =>
+                            !store.get('workspace.accessibility.audioCues.enabled'),
+                        onUpdate: () => {
+                            pubsub.publish('accessibility:update');
+                        },
+                    },
+                ],
+            },
+            {
+                label: 'Navigation & Visuals',
                 settings: [
                     {
                         label: 'Focus rings',
@@ -1875,6 +1935,16 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             pubsub.publish('accessibility:update');
                         },
                     },
+                    {
+                        label: 'Reduced motion',
+                        key: 'workspace.accessibility.reducedMotion',
+                        description:
+                            'Minimize animations and UI transitions for improved visibility and accessibility.',
+                        type: 'boolean',
+                        onUpdate: () => {
+                            pubsub.publish('accessibility:update');
+                        },
+                    },
                 ],
             },
             {
@@ -1885,6 +1955,45 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         key: 'workspace.accessibility.visualizerKeyboardControl',
                         description:
                             'Allow orbiting, panning, and zooming the 3D visualizer using arrow keys and hotkeys.',
+                        type: 'boolean',
+                        onUpdate: () => {
+                            pubsub.publish('accessibility:update');
+                        },
+                    },
+                    {
+                        label: 'Job summary',
+                        key: 'workspace.accessibility.gcodeSummary.enabled',
+                        description:
+                            'Provide a text summary of the loaded G-code file for screen readers.',
+                        type: 'boolean',
+                        onUpdate: () => {
+                            pubsub.publish('accessibility:update');
+                        },
+                    },
+                    {
+                        label: 'Show summary visually',
+                        key: 'workspace.accessibility.gcodeSummary.showVisually',
+                        description:
+                            'Display the G-code summary text visually above the visualizer.',
+                        type: 'boolean',
+                        hidden: () =>
+                            !store.get(
+                                'workspace.accessibility.gcodeSummary.enabled',
+                            ),
+                        onUpdate: () => {
+                            pubsub.publish('accessibility:update');
+                        },
+                    },
+                ],
+            },
+            {
+                label: 'Keyboard Map',
+                settings: [
+                    {
+                        label: 'Show keyboard shortcut map',
+                        key: 'workspace.accessibility.showKeyboardMap',
+                        description:
+                            'Show an overlay with active keyboard shortcuts.',
                         type: 'boolean',
                         onUpdate: () => {
                             pubsub.publish('accessibility:update');

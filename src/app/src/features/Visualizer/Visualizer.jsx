@@ -761,8 +761,10 @@ class Visualizer extends Component {
     showAnimation = () => {
         const state = { ...this.props.state };
         const { liteMode, objects, minimizeRenders } = state;
-        // We don't animate if minimizeRenders is turned on
-        if (minimizeRenders) {
+        const { reducedMotion } = reduxStore.getState().preferences.accessibility;
+
+        // We don't animate if minimizeRenders is turned on or reducedMotion is enabled
+        if (minimizeRenders || reducedMotion) {
             return false;
         }
         if (liteMode && objects.cuttingToolAnimation.visibleLite) {

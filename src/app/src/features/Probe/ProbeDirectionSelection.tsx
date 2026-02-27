@@ -8,8 +8,17 @@ interface Props {
 }
 
 const ProbeDirectionSelection: React.FC<Props> = ({ direction, onClick }) => {
+    const cornerLabels = [
+        'Front-Left corner',
+        'Top-Left corner',
+        'Top-Right corner',
+        'Front-Right corner',
+    ];
+
+    const currentLabel = cornerLabels[direction] || 'Unknown corner';
+
     return (
-        <Tooltip content="Set probing corner">
+        <Tooltip content={`Set probing corner: ${currentLabel}`}>
             <div className="absolute top-0 right-0">
                 <button
                     type="button"
@@ -24,11 +33,11 @@ const ProbeDirectionSelection: React.FC<Props> = ({ direction, onClick }) => {
                         },
                     )}
                     onClick={onClick}
-                    aria-label="Toggle probing corner"
+                    aria-label={`Current probing corner: ${currentLabel}. Click to cycle.`}
                 >
                     <img
                         className="min-w-7"
-                        alt="Probe direction selection"
+                        alt={`Probing direction indicator for ${currentLabel}`}
                         src={directionIcon}
                     />
                 </button>
