@@ -49,6 +49,7 @@ export function UnlockButton() {
                             activateUnlockButton,
                     })}
                     onClick={() => unlockFirmware(activeState, alarmCode)}
+                    aria-label="Unlock Machine"
                 >
                     <IoLockOpenOutline
                         className={cx('hidden group-hover:block', {

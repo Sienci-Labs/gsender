@@ -390,16 +390,20 @@ const Workspace = () => {
     return (
         <SettingsProvider>
             <div className="flex flex-col h-full dark:bg-slate-800">
-                <TopBar />
+                <header>
+                    <TopBar />
+                </header>
                 <ConfirmationDialog />
                 <DataCollection />
                 <div className="flex h-full no-scrollbar ">
-                    <Sidebar />
+                    <aside>
+                        <Sidebar />
+                    </aside>
                     <Alerts />
-                    <div className="w-full max-sm:p-4">
+                    <main className="w-full max-sm:p-4">
                         <Carve />
                         <Outlet />
-                    </div>
+                    </main>
                 </div>
             </div>
         </SettingsProvider>

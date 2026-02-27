@@ -28,6 +28,7 @@ export function IndicatorButton({
             )}
             disabled={disabled}
             onClick={onClick}
+            aria-pressed={active}
         >
             <span
                 className={cn('text-blue-300', {

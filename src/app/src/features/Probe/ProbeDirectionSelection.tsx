@@ -24,6 +24,7 @@ const ProbeDirectionSelection: React.FC<Props> = ({ direction, onClick }) => {
                         },
                     )}
                     onClick={onClick}
+                    aria-label="Toggle probing corner"
                 >
                     <img
                         className="min-w-7"

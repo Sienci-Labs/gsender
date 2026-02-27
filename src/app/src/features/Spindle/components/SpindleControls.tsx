@@ -96,6 +96,7 @@ const SpindleControls = ({ actions, state, canClick }: Props) => {
                             actions.handleSpindleSpeedChange(value[0])
                         }
                         disabled={!canClick}
+                        aria-label="Adjust spindle speed"
                     />
                 </Tooltip>
                 <div className={'w-[10ch] text-left flex flex-row'}>

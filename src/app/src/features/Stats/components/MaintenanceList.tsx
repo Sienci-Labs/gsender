@@ -179,6 +179,7 @@ export function MaintenanceList() {
                             onClick={() => {
                                 onClear(info.cell.row.original.id);
                             }}
+                            aria-label={`Reset maintenance timer for ${info.cell.row.original.part}`}
                         >
                             <Icon
                                 path={mdiCheckOutline}
@@ -191,6 +192,7 @@ export function MaintenanceList() {
                             onClick={() => {
                                 onEdit(info.cell.row.original.id);
                             }}
+                            aria-label={`Edit maintenance task for ${info.cell.row.original.part}`}
                         >
                             <Icon path={mdiPencil} size={1.5} />
                         </button>

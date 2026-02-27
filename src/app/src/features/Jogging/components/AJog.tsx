@@ -35,12 +35,26 @@ export function AJog({
         },
     )();
 
+    const handleKeyDown = (
+        e: React.KeyboardEvent,
+        action: (distance: number, feedrate: number, isContinuous: boolean) => void,
+    ) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            action(distance, feedrate, false);
+        }
+    };
+
     return (
         <div id="aJog" className="relative">
             <TabJog
                 topHandlers={aPlusJogHandlers}
                 bottomHandlers={aMinusJogHandlers}
                 canClick={canClick}
+                topLabel={`Jog ${axis} plus`}
+                bottomLabel={`Jog ${axis} minus`}
+                onTopKeyDown={(e) => handleKeyDown(e, aPlusJog)}
+                onBottomKeyDown={(e) => handleKeyDown(e, aMinusJog)}
             />
             <img
                 src={aLabels}

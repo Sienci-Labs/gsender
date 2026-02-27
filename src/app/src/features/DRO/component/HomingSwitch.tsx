@@ -26,6 +26,7 @@ export function HomingSwitch({
                         checked={homingValue}
                         disabled={disabled}
                         className={cn({ hidden: !singleAxisHoming })}
+                        aria-label="Toggle single axis homing"
                     />
                 </div>
             </Tooltip>

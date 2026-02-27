@@ -92,6 +92,7 @@ export const JogInput = ({ label, currentValue, onChange }: JogInputProps) => {
                     }}
                     size="mini"
                     icon={<FaMinus />}
+                    aria-label={`Decrease ${label}`}
                 />
                 <ControlledInput
                     sizing="xs"
@@ -111,6 +112,7 @@ export const JogInput = ({ label, currentValue, onChange }: JogInputProps) => {
                     }}
                     size="mini"
                     icon={<FaPlus />}
+                    aria-label={`Increase ${label}`}
                 />
             </div>
         </div>

@@ -93,6 +93,7 @@ const ShortcutsTable = ({ onEdit, onDelete, onShortcutToggle, dataSet }) => {
                         }
                         onClick={() => onEdit(row)}
                         onKeyDown={null}
+                        aria-label={`Edit shortcut for ${allShuttleControlEvents[row.cmd]?.title ?? row.title}`}
                     />
                 </Tooltip>
             ),
@@ -106,6 +107,7 @@ const ShortcutsTable = ({ onEdit, onDelete, onShortcutToggle, dataSet }) => {
                         }
                         onClick={() => onDelete(row)}
                         onKeyDown={null}
+                        aria-label={`Delete shortcut for ${allShuttleControlEvents[row.cmd]?.title ?? row.title}`}
                     />
                 </Tooltip>
             ),
@@ -119,6 +121,7 @@ const ShortcutsTable = ({ onEdit, onDelete, onShortcutToggle, dataSet }) => {
                         }
                         onClick={() => onEdit(row)}
                         onKeyDown={null}
+                        aria-label={`Add shortcut for ${allShuttleControlEvents[row.cmd]?.title ?? row.title}`}
                     />
                 </Tooltip>
             ),
@@ -152,6 +155,7 @@ const ShortcutsTable = ({ onEdit, onDelete, onShortcutToggle, dataSet }) => {
                 onChange={(isActive) => {
                     onShortcutToggle({ ...row, isActive }, false);
                 }}
+                aria-label={`Toggle active status for ${allShuttleControlEvents[row.cmd]?.title ?? row.title}`}
             />
         );
     };

@@ -8,6 +8,15 @@ export function StopButton({ disabled = false, onClick }) {
             height={71}
             onClick={onClick}
             viewBox="0 0 79 79"
+            role="button"
+            tabIndex={disabled ? -1 : 0}
+            aria-label="Stop Jogging"
+            onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onClick(e);
+                }
+            }}
             className={cn(
                 'absolute top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2',
                 {

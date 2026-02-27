@@ -141,6 +141,7 @@ const JoystickOptions = () => {
                         handleChange('stick1.horizontal.primaryAction', value)
                     }
                     isDisabled={stick1PrimaryActionIsUsingMPG}
+                    aria-label="Stick 1 horizontal action"
                 />
                 <Select
                     styles={
@@ -165,6 +166,7 @@ const JoystickOptions = () => {
                         handleChange('stick1.horizontal.secondaryAction', value)
                     }
                     isDisabled={stick1SecondaryActionIsUsingMPG}
+                    aria-label="Stick 1 horizontal 2nd action"
                 />
                 <Switch
                     checked={stick1.horizontal.isReversed}
@@ -175,6 +177,7 @@ const JoystickOptions = () => {
                         stick1PrimaryActionIsUsingMPG &&
                         stick1SecondaryActionIsUsingMPG
                     }
+                    aria-label="Invert stick 1 horizontal"
                 />
             </div>
 
@@ -203,6 +206,7 @@ const JoystickOptions = () => {
                         handleChange('stick1.vertical.primaryAction', value)
                     }
                     isDisabled={stick1PrimaryActionIsUsingMPG}
+                    aria-label="Stick 1 vertical action"
                 />
                 <Select
                     styles={
@@ -227,6 +231,7 @@ const JoystickOptions = () => {
                         handleChange('stick1.vertical.secondaryAction', value)
                     }
                     isDisabled={stick1SecondaryActionIsUsingMPG}
+                    aria-label="Stick 1 vertical 2nd action"
                 />
                 <Switch
                     checked={stick1.vertical.isReversed}
@@ -237,6 +242,7 @@ const JoystickOptions = () => {
                         stick1PrimaryActionIsUsingMPG &&
                         stick1SecondaryActionIsUsingMPG
                     }
+                    aria-label="Invert stick 1 vertical"
                 />
             </div>
 
@@ -264,6 +270,7 @@ const JoystickOptions = () => {
                     onChange={({ value }) =>
                         handleChange('stick1.mpgMode.primaryAction', value)
                     }
+                    aria-label="Stick 1 MPG action"
                 />
                 <Select
                     styles={
@@ -287,12 +294,14 @@ const JoystickOptions = () => {
                     onChange={({ value }) =>
                         handleChange('stick1.mpgMode.secondaryAction', value)
                     }
+                    aria-label="Stick 1 MPG 2nd action"
                 />
                 <Switch
                     checked={stick1.mpgMode.isReversed}
                     onChange={(checked) =>
                         handleChange('stick1.mpgMode.isReversed', checked)
                     }
+                    aria-label="Invert stick 1 MPG"
                 />
             </div>
 
@@ -321,6 +330,7 @@ const JoystickOptions = () => {
                         handleChange('stick2.horizontal.primaryAction', value)
                     }
                     isDisabled={stick2PrimaryActionIsUsingMPG}
+                    aria-label="Stick 2 horizontal action"
                 />
                 <Select
                     styles={
@@ -345,6 +355,7 @@ const JoystickOptions = () => {
                         handleChange('stick2.horizontal.secondaryAction', value)
                     }
                     isDisabled={stick2SecondaryActionIsUsingMPG}
+                    aria-label="Stick 2 horizontal 2nd action"
                 />
                 <Switch
                     checked={stick2.horizontal.isReversed}
@@ -355,6 +366,7 @@ const JoystickOptions = () => {
                         stick2PrimaryActionIsUsingMPG &&
                         stick2SecondaryActionIsUsingMPG
                     }
+                    aria-label="Invert stick 2 horizontal"
                 />
             </div>
 
@@ -383,6 +395,7 @@ const JoystickOptions = () => {
                         handleChange('stick2.vertical.primaryAction', value)
                     }
                     isDisabled={stick2PrimaryActionIsUsingMPG}
+                    aria-label="Stick 2 vertical action"
                 />
                 <Select
                     styles={
@@ -407,6 +420,7 @@ const JoystickOptions = () => {
                         handleChange('stick2.vertical.secondaryAction', value)
                     }
                     isDisabled={stick2SecondaryActionIsUsingMPG}
+                    aria-label="Stick 2 vertical 2nd action"
                 />
                 <Switch
                     checked={stick2.vertical.isReversed}
@@ -417,6 +431,7 @@ const JoystickOptions = () => {
                         stick2PrimaryActionIsUsingMPG &&
                         stick2SecondaryActionIsUsingMPG
                     }
+                    aria-label="Invert stick 2 vertical"
                 />
             </div>
 
@@ -445,6 +460,7 @@ const JoystickOptions = () => {
                     onChange={({ value }) =>
                         handleChange('stick2.mpgMode.primaryAction', value)
                     }
+                    aria-label="Stick 2 MPG action"
                 />
                 <Select
                     styles={
@@ -469,12 +485,14 @@ const JoystickOptions = () => {
                     onChange={({ value }) =>
                         handleChange('stick2.mpgMode.secondaryAction', value)
                     }
+                    aria-label="Stick 2 MPG 2nd action"
                 />
                 <Switch
                     checked={stick2.mpgMode.isReversed}
                     onChange={(checked) =>
                         handleChange('stick2.mpgMode.isReversed', checked)
                     }
+                    aria-label="Invert stick 2 MPG"
                 />
             </div>
 
@@ -491,6 +509,7 @@ const JoystickOptions = () => {
                     }
                     className="p-1 w-full"
                     suffix="%"
+                    aria-label="Zero threshold"
                 />
             </div>
 
@@ -516,6 +535,7 @@ const JoystickOptions = () => {
                     }}
                     className="p-1 w-full"
                     suffix="%"
+                    aria-label="Movement distance override"
                 />
             </div>
         </div>

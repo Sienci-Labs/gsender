@@ -45,7 +45,10 @@ const MachineInfo = () => {
         <Popover open={open || pinned} onOpenChange={handleOpenChange}>
             <Tooltip content="Machine Information">
                 <PopoverTrigger asChild>
-                    <button className="z-50 w-[24px] max-sm:hidden">
+                    <button
+                        className="z-50 w-[24px] max-sm:hidden"
+                        aria-label="Machine Information"
+                    >
                         <img src={icon} className="w-[24px]" />
                     </button>
                 </PopoverTrigger>

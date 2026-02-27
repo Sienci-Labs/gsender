@@ -101,7 +101,7 @@ const PrimaryVisualizer = ({
 
                     <div className="absolute portrait:right-5 portrait:left-auto left-5 bottom-44 text-4xl text-white flex flex-col gap-2">
                         <Tooltip content="Toggle lightweight mode">
-                            <button>
+                            <button aria-label="Toggle lightweight mode">
                                 <FaFeatherAlt
                                     className={cx('cursor-pointer', {
                                         'text-gray-500': !state.liteMode,

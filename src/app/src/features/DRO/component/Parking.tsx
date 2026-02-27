@@ -57,6 +57,7 @@ export function Parking({ disabled = false, isConnected = false, homingEnabled =
                 variant="alt"
                 size="sm"
                 onClick={goToParkLocation}
+                aria-label="Go to Park Location"
             />
         </Tooltip>
     );

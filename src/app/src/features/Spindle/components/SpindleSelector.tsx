@@ -45,6 +45,7 @@ const SpindleSelector = ({ spindles, onChange, spindle, disabled }: Props) => {
                     className="w-full z-10"
                     menuPlacement="top"
                     isDisabled={disabled}
+                    aria-label="Select spindle"
                 />
             </div>
         </Tooltip>

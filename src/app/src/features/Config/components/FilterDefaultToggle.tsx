@@ -11,6 +11,7 @@ export function FilterDefaultToggle() {
             <Switch
                 onChange={toggleFilterNonDefault}
                 checked={filterNonDefault}
+                aria-label="View only modified settings"
             />
         </div>
     );

@@ -102,7 +102,11 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
         };
 
         return (
-            <div className="flex relative flex-col items-center">
+            <div
+                className="flex relative flex-col items-center"
+                aria-live="polite"
+                role="status"
+            >
                 <SmallUnlockButton />
                 <div
                     className={cx(

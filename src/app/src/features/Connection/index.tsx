@@ -149,6 +149,8 @@ function Connection(props: ConnectionProps) {
         <div
             className="relative group cursor-pointer dropdown z-50"
             onMouseEnter={refreshPortsOnParentEntry}
+            role="status"
+            aria-live="polite"
         >
             {connectionState !== ConnectionState.CONNECTED && (
                 <div

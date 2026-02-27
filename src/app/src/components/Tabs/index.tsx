@@ -99,6 +99,7 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                         }`}
                         onClick={() => canScrollLeft && scrollTabs('left')}
                         disabled={!canScrollLeft}
+                        aria-label="Scroll tabs left"
                     >
                         <MdKeyboardArrowLeft className="w-6 h-6" />
                     </button>
@@ -137,6 +138,7 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                         }`}
                         onClick={() => canScrollRight && scrollTabs('right')}
                         disabled={!canScrollRight}
+                        aria-label="Scroll tabs right"
                     >
                         <MdKeyboardArrowRight className="w-6 h-6" />
                     </button>

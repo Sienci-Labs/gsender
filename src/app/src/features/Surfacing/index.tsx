@@ -370,6 +370,7 @@ const SurfacingTool = () => {
                                                         checked as boolean,
                                                 });
                                             }}
+                                            aria-label="Toggle spindle delay"
                                         />
                                     </div>
                                 </Tooltip>
@@ -393,6 +394,7 @@ const SurfacingTool = () => {
                                             }
                                             checked={surfacing.mist ?? false}
                                             className="h-20"
+                                            aria-label="Toggle Mist coolant"
                                         />
                                     </div>
                                 </Tooltip>
@@ -412,6 +414,7 @@ const SurfacingTool = () => {
                                             }
                                             checked={surfacing.flood ?? false}
                                             className="h-20"
+                                            aria-label="Toggle Flood coolant"
                                         />
                                     </div>
                                 </Tooltip>

@@ -141,6 +141,7 @@ const TerminalInput = ({ onClear }: Props) => {
                     <Button 
                         variant="secondary"
                         className="h-8 text-sm"
+                        aria-label="Console options"
                     >
                         <FaEllipsisH />
                     </Button>
