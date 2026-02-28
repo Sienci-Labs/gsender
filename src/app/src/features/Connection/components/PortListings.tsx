@@ -11,6 +11,7 @@ export interface PortListingsProps {
     ports: Port[];
     connectHandler: (p: string, c: ConnectionType) => void;
     unrecognizedPorts?: Port[];
+    isOpen?: boolean;
 }
 
 function truncatePortName(port: string = ''): string {
@@ -22,8 +23,11 @@ export function PortListingButton({ port, connectionHandler, baud }) {
     return (
         <button
             type="button"
-            className="w-full m-0 p-3 max-sm:p-2 shadow-inner  flex flex-row items-center justify-between hover:bg-gray-100 dark:hover:bg-slate-800"
-            onClick={() => connectionHandler(port.port, ConnectionType.USB)}
+            className="w-full m-0 p-3 max-sm:p-2 shadow-inner  flex flex-row items-center justify-between hover:bg-gray-100 dark:hover:bg-slate-800 outline-none"
+            onClick={(e) => {
+                e.stopPropagation();
+                connectionHandler(port.port, ConnectionType.USB);
+            }}
             key={`port-${port.port}`}
         >
             <span className="text-4xl">
@@ -58,12 +62,21 @@ export function PortListings(props: PortListingsProps): JSX.Element {
         setBaud(baudrate);
     });
 
-    function toggleUnrecognizedPorts() {
+    function toggleUnrecognizedPorts(e: React.MouseEvent) {
+        e.stopPropagation();
         setOpenUnrecognized(!openUnrecognized);
     }
 
     return (
-        <div className="absolute left-0 top-full z-50 bg-white dark:bg-dark border border-gray-300 dark:border-gray-700 w-full min-w[250px] rounded mt-1 divide-y divide-dotted invisible hover:divide-solid divide-blue-300 shadow-lg group-hover:visible min-w-[250px] sm:min-w-0 ">
+        <div
+            className={cn(
+                'absolute left-0 top-full z-50 bg-white dark:bg-dark border border-gray-300 dark:border-gray-700 w-full min-w[250px] rounded mt-1 divide-y divide-dotted divide-blue-300 shadow-lg group-hover:visible min-w-[250px] sm:min-w-0',
+                {
+                    visible: props.isOpen,
+                    invisible: !props.isOpen,
+                },
+            )}
+        >
             {props.ports.length === 0 && (
                 <p className="font-normal flex items-center justify-center p-2 mt-2">
                     No USB devices found
@@ -78,8 +91,9 @@ export function PortListings(props: PortListingsProps): JSX.Element {
                 />
             ))}
             <button
-                className="px-4 shadow-inner py-4 flex flex-row items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800 mt-1 w-full"
-                onClick={() => {
+                className="px-4 shadow-inner py-4 flex flex-row items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800 outline-none mt-1 w-full"
+                onClick={(e) => {
+                    e.stopPropagation();
                     props.connectHandler(ip, ConnectionType.ETHERNET);
                 }}
             >
@@ -96,7 +110,7 @@ export function PortListings(props: PortListingsProps): JSX.Element {
             {props.unrecognizedPorts.length > 0 && (
                 <div className="flex flex-col">
                     <button
-                        className="text-base text-gray-700 dark:text-gray-300 my-2 flex flex-row justify-between items-center px-2"
+                        className="text-base text-gray-700 dark:text-gray-300 my-2 flex flex-row justify-between items-center px-2 outline-none"
                         onClick={toggleUnrecognizedPorts}
                     >
                         <span>Unrecognized Ports</span>

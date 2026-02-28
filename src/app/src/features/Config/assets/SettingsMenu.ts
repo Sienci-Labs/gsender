@@ -838,6 +838,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'eeprom',
                         eID: '$21',
                     },
+                    {
+                        label: 'Prevent jogging past limit switches',
+                        key: 'workspace.preventJoggingPastLimits',
+                        type: 'boolean',
+                        description:
+                            'If enabled, gSender will prevent jogging in a direction where a limit switch is already triggered.',
+                    },
                 ],
             },
             {
@@ -1243,6 +1250,15 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         eID: '$30',
                         forceEEPROM: true,
                         unit: 'rpm',
+                    },
+                    {
+                        label: 'Spindle speed input type',
+                        key: 'widgets.spindle.inputType',
+                        type: 'select',
+                        description:
+                            'Choose between a slider or a number input for adjusting spindle speed.',
+                        options: ['Slider', 'Number'],
+                        defaultValue: 'Slider',
                     },
                     {
                         type: 'eeprom',

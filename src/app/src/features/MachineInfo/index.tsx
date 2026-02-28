@@ -57,7 +57,11 @@ const MachineInfo = () => {
                 className="max-sm:block mt-4 -ml-4 p-4 pt-2 absolute z-10 flex flex-col justify-center w-[400px] min-h-[300px] rounded-md [box-shadow:_0px_0px_2px_1px_var(--tw-shadow-color)] shadow-gray-400 dark:border-dark-lighter"
                 align="start"
             >
-                <MachineInfoDisplay pinned={pinned} setPinned={setPinned} />
+                <MachineInfoDisplay
+                    pinned={pinned}
+                    setPinned={setPinned}
+                    onClose={() => setOpen(false)}
+                />
             </PopoverContent>
         </Popover>
     );

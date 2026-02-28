@@ -51,6 +51,7 @@ function Connection(props: ConnectionProps) {
     const [firmware, setFirmware] = useState<FirmwareFlavour>('Grbl');
 
     const [activePort, setActivePort] = useState('');
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     useEffect(() => {
         controller.addListener('serialport:close', () => {
@@ -82,6 +83,7 @@ function Connection(props: ConnectionProps) {
         // workflow - set element to connecting state, attempt to connect, and use callback to update state on end
         setConnectionState(ConnectionState.CONNECTING);
         setConnectionType(type);
+        setIsDropdownOpen(false);
 
         // Attempt connect with callback
         controller.openPort(
@@ -145,17 +147,47 @@ function Connection(props: ConnectionProps) {
         setFirmware(props.reportedFirmware);
     }, [props.reportedFirmware]);
 
+    const toggleDropdown = (e: React.MouseEvent | React.KeyboardEvent) => {
+        if (
+            connectionState === ConnectionState.DISCONNECTED ||
+            connectionState === ConnectionState.ERROR
+        ) {
+            e.stopPropagation();
+            refreshPorts();
+            setIsDropdownOpen(!isDropdownOpen);
+        }
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleDropdown(e);
+        } else if (e.key === 'Escape') {
+            setIsDropdownOpen(false);
+        }
+    };
+
     return (
         <div
             className="relative group cursor-pointer dropdown z-50"
-            onMouseEnter={refreshPortsOnParentEntry}
-            role="status"
-            aria-live="polite"
+            onMouseEnter={() => {
+                refreshPortsOnParentEntry();
+                setIsDropdownOpen(true);
+            }}
+            onMouseLeave={() => setIsDropdownOpen(false)}
+            onClick={toggleDropdown}
+            onKeyDown={handleKeyDown}
+            role="button"
+            aria-haspopup="true"
+            aria-expanded={isDropdownOpen}
+            aria-label="Connection menu"
+            tabIndex={0}
         >
             {connectionState !== ConnectionState.CONNECTED && (
                 <div
                     className={cn(
                         'absolute -inset-0.5 bg-gradient-to-r from-blue-300 to-blue-800 rounded-lg blur opacity-70 group-hover:opacity-100 transition duration-1000 group-hover:duration-200',
+                        { 'opacity-100': isDropdownOpen },
                     )}
                 />
             )}
@@ -189,6 +221,7 @@ function Connection(props: ConnectionProps) {
                         connectHandler={handleConnect}
                         unrecognizedPorts={props.unrecognizedPorts}
                         ports={props.ports}
+                        isOpen={isDropdownOpen}
                     />
                 )}
                 {connectionState == ConnectionState.CONNECTED && (
