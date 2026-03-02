@@ -168,6 +168,11 @@ class Connection extends EventEmitter {
 
         this.connection.open((err) => {
             if (err) {
+                // Remove listeners so the async 'close' from port.destroy()
+                // doesn't re-enter Connection.close() and double-fire the callback
+                this.connection.removeListener('data', this.connectionEventListener.data);
+                this.connection.removeListener('close', this.connectionEventListener.close);
+                this.connection.removeListener('error', this.connectionEventListener.error);
                 log.error(`Error opening serial port "${port}":`, err);
                 this.emit('serialport:error', { err: err, port: port });
                 callback(err); // notify error

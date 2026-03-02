@@ -425,17 +425,19 @@ class CNCEngine {
 
                 log.debug(`socket.open("${port}", ${JSON.stringify(options)}): id=${socket.id}`);
 
-                // create new connection
-                if (!this.connection) {
+                // Remove old listeners from the existing connection before potentially replacing it
+                if (this.connection) {
+                    removeConnectionListeners();
+                }
+
+                if (!this.connection || this.connection.isClose()) {
+                    // No connection or stale closed connection — start fresh
                     this.connection = new Connection(engine, port, options, callback);
-                    removeConnectionListeners(); // remove all listeners if they exist
-                    addConnectionListeners(); // add listeners back
+                    addConnectionListeners();
                 } else {
-                    removeConnectionListeners(); // remove all listeners if they exist
-                    addConnectionListeners(); // add listeners back
-
+                    // Genuinely open connection — refresh for additional client joining
+                    addConnectionListeners();
                     this.connection.updateOptions(options);
-
                     this.connection.refresh();
                 }
 
