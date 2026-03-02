@@ -183,10 +183,21 @@ class Connection extends EventEmitter {
             }
 
             log.debug(`Connected to serial port "${port}"`);
+            if (!this.controllerType && network) {
+                this.controllerType = GRBLHAL;
+                this.emit(
+                    'firmwareFound',
+                    GRBLHAL,
+                    this.options,
+                    this.callback,
+                );
+            } else if (!this.controllerType) {
             console.log('controllerType:', this.controllerType);
             if (!this.controllerType) {
                 this.connection.writeImmediate('$I\n');
                 this.timeout = setInterval(() => {
+                    console.log('Waiting for GRBLHAL: ', this.count);
+                    this.connection.writeImmediate('$I\n');
                     if (this.count >= 5) {
                         this.controllerType = this.options.defaultFirmware;
                         this.emit(
@@ -198,7 +209,7 @@ class Connection extends EventEmitter {
                         clearInterval(this.timeout);
                         return;
                     }
-                    this.connection.writeImmediate('\x18');
+                    //this.connection.writeImmediate('\x18');
                     this.count++;
                 }, 800);
             }
