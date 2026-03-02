@@ -1298,6 +1298,12 @@ class GrblHalController {
     }
 
     async initController(semver) {
+        // Send \x87 as a raw realtime byte
+        if (this.connection) {
+            this.connection.write(Buffer.from([0x87]));
+        }
+
+        await delay(500);
         const hasSD = _.get(this.state, 'status.sdCard', null);
 
         // Startup command sequence. Each step runs in order if enabled.
@@ -1328,7 +1334,7 @@ class GrblHalController {
             },
         ];
 
-        await delay(500);
+
 
         for (const step of startupSequence) {
             if (!step.enabled) {
@@ -1344,11 +1350,6 @@ class GrblHalController {
         }
 
         this.event.trigger(CONTROLLER_READY);
-
-        // Send \x87 as a raw realtime byte at the end of startup
-        if (this.connection) {
-            this.connection.write(Buffer.from([0x87]));
-        }
     }
 
     populateContext(context = {}) {
