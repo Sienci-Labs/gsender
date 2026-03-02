@@ -171,7 +171,7 @@ class SerialConnection extends EventEmitter {
 
     get isOpen() {
         if (this.settings.network) {
-            return this.port && this.port.writable;
+            return this.port && this.port.writable && this.connected;
         }
         return this.port && this.port.isOpen;
     }
@@ -213,6 +213,7 @@ class SerialConnection extends EventEmitter {
             this.port = new net.Socket();
             this.port.setTimeout(4000, () => {
                 this.port.destroy();
+                this.port = null;
                 if (this.callback) {
                     this.callback('Connection timeout');
                     this.callback = null;
