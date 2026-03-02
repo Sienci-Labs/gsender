@@ -1,19 +1,5 @@
 describe('Preset Movements by Updating Values Test', () => {
 
-  // Ignore known hydration-related UI errors and undefined.get() error
-  Cypress.on('uncaught:exception', (err) => {
-    const ignoreMessages = [
-      'Hydration failed',
-      'There was an error while hydrating',
-      'Cannot read properties of undefined',
-      'reading \'get\''
-    ];
-    
-    if (ignoreMessages.some(msg => err.message.includes(msg))) {
-      return false;
-    }
-    return true;
-  });
 
   beforeEach(() => {
     cy.viewport(1920, 1080);

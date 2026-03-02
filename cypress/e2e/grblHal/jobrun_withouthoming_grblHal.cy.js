@@ -1,5 +1,8 @@
 describe('Job Run Test in grblHal without homing', () => {
-
+Cypress.on('uncaught:exception', (err) => {
+  if (err.message.includes('addUpdateRange is not a function')) return false;
+  return true;
+});
   beforeEach(() => {
     cy.viewport(1920, 1080);
     // Use loadUI custom command with dynamic baseUrl

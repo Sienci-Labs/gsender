@@ -84,11 +84,13 @@ describe('gSender Configuration and Firmware Test Suite', () => {
 
     // Import firmware settings
     cy.get('[data-testid="firmware-settings-import-button"] > span.text-sm').click();
-    cy.get('div.fixed input')
-      .selectFile('cypress/fixtures/gSender-firmware-settings.json', { force: true });
-    cy.contains('button.bg-blue-500', /import/i, { timeout: 10000 })
-      .last()
-      .click({ force: true });
+    // Replace lines 87-91 with this:
+cy.get('div.fixed input')
+  .selectFile('cypress/fixtures/gSender-firmware-settings.json', { force: true });
+
+cy.get('[data-testid="firmware-settings-import-button"]', { timeout: 10000 })
+  .should('be.visible')
+  .click();
 
     // Close import notification if present
     cy.get('body').then(($body) => {

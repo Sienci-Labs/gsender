@@ -1,4 +1,4 @@
-describe('A-Axis Go To Location Tests', () => {
+describe('A-Axis Rotary operations', () => {
 
   beforeEach(() => {
     cy.viewport(2844, 1450);
@@ -168,7 +168,7 @@ describe('A-Axis Go To Location Tests', () => {
     cy.wait(1000);
     cy.log(' Popup closed');
 
-    // ─── A-Axis Go To Location 
+    // A-Axis Go To Location 
 
     // Step 18: Toggle Rotary axis back on and confirm dialog
     cy.log('Step 18: Toggling Rotary axis on...');

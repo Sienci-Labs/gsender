@@ -1,22 +1,5 @@
 describe('CNC Machine Tests Grbl', () => {
 
-  // Ignore known hydration-related UI errors and undefined.get() error
-  Cypress.on('uncaught:exception', (err) => {
-    console.log('Uncaught exception:', err.message);
-    
-    const ignoreMessages = [
-      'Hydration failed',
-      'There was an error while hydrating',
-      'Cannot read properties of undefined',
-      'reading \'get\''
-    ];
-    
-    if (ignoreMessages.some(msg => err.message.includes(msg))) {
-      return false; // ignore these exceptions
-    }
-    return true;
-  });
-
   beforeEach(() => {
     cy.viewport(1920, 1080);
     cy.visit('http://localhost:8000/#/');
@@ -44,10 +27,15 @@ describe('CNC Machine Tests Grbl', () => {
     
     // Step 3: Open Go To Location popup
     cy.log('Step 3: Opening Go To Location popup...');
-    cy.get('div.min-h-10 button')
-      .first()  // Click only the first button
-      .should('be.visible')
-      .click({ force: true });
+  // Step 3: Open Go To Location popup
+cy.log('Step 4: Opening Go to Location popup...');
+cy.get('button[aria-haspopup="dialog"]', { timeout: 10000 })
+  .filter(':visible')
+  .first()
+  .click({ force: true });
+
+cy.wait(1000);
+cy.log('"Go to Location" button clicked');
 
     cy.wait(1000);
     cy.log(' "Go to Location" button clicked');

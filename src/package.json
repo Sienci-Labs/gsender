@@ -6,7 +6,8 @@
     "build": "npm run build:client && npm run build:server",
     "build:client": "vite build --outDir ../../dist/gsender/app --ssrManifest --emptyOutDir",
     "build:server": "vite build --outDir ../../dist/gsender/app-server --ssr src/entry-server.tsx --emptyOutDir",
-    "preview": "cross-env NODE_ENV=production node server"
+    "preview": "cross-env NODE_ENV=production node server",
+    "test": "../../node_modules/.bin/jest --rootDir=../../ --testPathPatterns=src/app"
   },
   "dependencies": {
     "@electron/remote": "^2.1.3",

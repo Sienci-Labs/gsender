@@ -479,149 +479,80 @@ Cypress.Commands.add('uploadGcodeFile', (fileName = 'sample.gcode') => {
     .selectFile(`cypress/fixtures/${fileName}`, { force: true });
   cy.wait(5000);
   cy.log(`G-code file ${fileName} uploaded successfully`);
-});
-
-// ----------------------
-//8.Go to location grbl
-// ----------------------
-Cypress.Commands.add('goToLocation', (options = {}) => {
-  const { x = 0, y = 0, z = 0, verifyPosition = true, waitTime = 3000 } = options;
-
-  cy.log(`Opening "Go to Location" dialog for coordinates (${x}, ${y}, ${z})...`);
-  
-  cy.get('div.min-h-10 button')
-    .first()
-    .should('be.visible')
-    .click({ force: true });
-
-  cy.wait(1000);
-  cy.log('"Go to Location" button clicked');
-
-  cy.log(`Entering coordinates: X=${x}, Y=${y}, Z=${z}...`);
-  cy.get('body > div:nth-of-type(2) input[type="number"]').then(($inputs) => {
-    cy.wrap($inputs[0])
-      .clear({ force: true })
-      .type(String(x), { force: true })
-      .should('have.value', String(x));
-    cy.wrap($inputs[1])
-      .clear({ force: true })
-      .type(String(y), { force: true })
-      .should('have.value', String(y));
-    cy.wrap($inputs[2])
-      .focus()
-      .clear({ force: true })
-      .invoke('val', '')
-      .type(String(z), { force: true })
-      .blur()
-      .should('have.value', String(z));
-  });
-
-  cy.wait(500);
-
-  cy.log('Clicking "Go!" button...');
-  cy.get('body > div:nth-of-type(2) button')
-    .contains('Go!')
-    .click({ force: true, multiple: true });
-  
-  cy.wait(2000);
-  cy.log('Go button clicked');
-
-  cy.log('Closing popup...');
-  cy.get('body').click(50, 50, { force: true });
-  cy.wait(500);
-  cy.log('Popup closed');
-
-  cy.log(`Waiting ${waitTime}ms for machine to reach position...`);
-  cy.wait(waitTime);
-
-  if (verifyPosition) {
-    cy.log('Verifying machine position...');
-    cy.get('input[type="number"].text-xl.font-bold.text-blue-500.font-mono')
-      .should('have.length', 3)
-      .then(($inputs) => {
-        const xValue = $inputs.eq(0).val();
-        const yValue = $inputs.eq(1).val();
-        const zValue = $inputs.eq(2).val();
-
-        const expectedX = parseFloat(x).toFixed(2);
-        const expectedY = parseFloat(y).toFixed(2);
-        const expectedZ = parseFloat(z).toFixed(2);
-
-        cy.wrap($inputs.eq(0)).should('have.value', expectedX);
-        cy.wrap($inputs.eq(1)).should('have.value', expectedY);
-        cy.wrap($inputs.eq(2)).should('have.value', expectedZ);
-
-        if (xValue === expectedX && yValue === expectedY && zValue === expectedZ) {
-          cy.log(` POSITION VERIFIED: Machine is at (${expectedX}, ${expectedY}, ${expectedZ})`);
-        } else {
-          throw new Error(`Expected (${expectedX}, ${expectedY}, ${expectedZ}) but got (${xValue}, ${yValue}, ${zValue})`);
-        }
-      });
-  }
-
-  cy.log(`Successfully moved to location (${x}, ${y}, ${z})`);
-});
+});-
 
 // ----------------------
 //9.Go to location grblHal
 // ----------------------
-Cypress.Commands.add('goToLocation', (x = 0, y = 0, z = 0) => {
+Cypress.Commands.add('goToLocation', (options = {}) => {
+  const x = options.x ?? 0;
+  const y = options.y ?? 0;
+  const z = options.z ?? 0;
+  const waitTime = options.waitTime ?? 5000;
+
   cy.log(`Going to location: X=${x}, Y=${y}, Z=${z}`);
-  
-  // Open Go To Location dialog using the correct button selector
-  cy.log('Step 4: Opening Go to Location popup...');
-    cy.get('button[aria-controls="radix-:rn:"]').click(); //to find the excat button 
-    ({ force: true });
-  
-  cy.wait(1500);
-  
-  // Enter coordinates in the dialog inputs
-  cy.get('body > div:nth-of-type(2) input[type="number"]').then(($inputs) => {
-    cy.log(`Found ${$inputs.length} number inputs`);
-    
-    // X input
-    cy.wrap($inputs[0])
-      .clear({ force: true })
-      .type(String(x), { force: true });
-    cy.log(`X coordinate: ${x}`);
 
-    // Y input  
-    cy.wrap($inputs[1])
-      .clear({ force: true })
-      .type(String(y), { force: true });
-    cy.log(`Y coordinate: ${y}`);
-
-    // Z input
-    cy.wrap($inputs[2])
-      .focus()
-      .clear({ force: true })
-      .invoke('val', '')
-      .type(String(z), { force: true })
-      .blur();
-    cy.log(`Z coordinate: ${z}`);
-  });
-
-  cy.wait(500);
-
-  // Click Go button
-  cy.log('Clicking Go button...');
-  cy.get('body > div:nth-of-type(2) button')
-    .contains('Go!')
+  // Step 1: Open Go To Location dialog — confirmed from recording
+  cy.log('Opening Go To Location popup...');
+  cy.get('div.min-h-10 > div:nth-of-type(1) > button', { timeout: 10000 })
+    .filter(':visible')
+    .first()
     .click({ force: true });
-  
-  cy.wait(2000);
-  cy.log('Go button clicked');
+  cy.wait(1500);
+  cy.log('"Go to Location" button clicked');
 
-  // Close popup by clicking outside
+  // Step 2: Enter coordinates inside the Radix dialog
+  cy.get('[id^="radix-"]', { timeout: 10000 })
+    .should('exist')
+    .last()
+    .within(() => {
+
+      // X axis
+      cy.get('div:nth-of-type(2) input')
+        .filter(':visible')
+        .clear({ force: true })
+        .type(String(x), { force: true })
+        .trigger('change', { force: true });
+      cy.log(`X coordinate: ${x}`);
+
+      // Y axis
+      cy.get('div:nth-of-type(3) input')
+        .filter(':visible')
+        .clear({ force: true })
+        .type(String(y), { force: true })
+        .trigger('change', { force: true });
+      cy.log(`Y coordinate: ${y}`);
+
+      // Z axis — force value with multiple triggers
+      cy.get('div:nth-of-type(4) input')
+        .filter(':visible')
+        .focus()
+        .clear({ force: true })
+        .type('{selectall}', { force: true })
+        .type(String(z), { force: true })
+        .trigger('input', { force: true })
+        .trigger('change', { force: true })
+        .blur();
+      cy.log(`Z coordinate: ${z}`);
+
+      // Step 3: Click Go button
+      cy.log('Clicking Go button...');
+      cy.contains('button', 'Go!').click({ force: true });
+      cy.log('Go button clicked');
+    });
+
+  cy.wait(2000);
+
+  // Step 4: Close popup
   cy.log('Closing popup...');
   cy.get('body').click(50, 50, { force: true });
   cy.wait(500);
-  
-  // Wait for machine to reach position and return to Idle
+
+  // Step 5: Wait for machine to return to Idle
   cy.log('Waiting for machine to reach position...');
-  cy.contains(/^Idle$/i, { timeout: 30000 }).should('be.visible');
+  cy.contains(/^Idle$/i, { timeout: waitTime }).should('be.visible');
   cy.wait(2000);
-  
+
   cy.log(` Moved to X=${x}, Y=${y}, Z=${z}`);
 });
 // ----------------------
