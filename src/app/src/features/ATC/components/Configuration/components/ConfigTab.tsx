@@ -477,6 +477,7 @@ export const ConfigTab: React.FC = ({ uploading, uploadError }: ConfigTabProps) 
                                         </div>
                                         <Input
                                             type="number"
+                                            step="any"
                                             wrapperClassName="w-auto"
                                             value={
                                                 config.variables._tc_slot_offset
@@ -490,7 +491,7 @@ export const ConfigTab: React.FC = ({ uploading, uploadError }: ConfigTabProps) 
                                                             ...config.variables
                                                                 ._tc_slot_offset,
                                                             value:
-                                                                parseInt(
+                                                                parseFloat(
                                                                     e.target
                                                                         .value,
                                                                 ) || 0,
