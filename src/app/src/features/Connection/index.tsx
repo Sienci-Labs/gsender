@@ -129,7 +129,7 @@ function Connection(props: ConnectionProps) {
             connectTimeoutRef.current = setTimeout(() => {
                 connectTimeoutRef.current = null;
                 setConnectionState(ConnectionState.ERROR);
-            }, 15000);
+            }, 8000);
         }
 
         // Attempt connect with callback
