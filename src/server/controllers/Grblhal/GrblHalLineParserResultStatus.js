@@ -190,6 +190,8 @@ class GrblHalLineParserResultStatus {
 
         // Homing status
         if (_.has(result, 'H')) {
+            console.log(r);
+            console.log('homing: ', result.H);
             payload.hasHomed = Boolean(Number(result.H[0]));
         }
         // Current tool (if persisted)

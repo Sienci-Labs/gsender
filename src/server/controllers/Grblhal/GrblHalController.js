@@ -699,6 +699,7 @@ class GrblHalController {
             // Path A: H flag present in status report (newer grblHAL firmware)
             // H: field drives hasHomed (runtime homing state)
             if (res.hasHomed !== undefined) {
+                //console.log(res);
                 const newHasHomed = res.hasHomed;
                 if (newHasHomed !== this.hasHomedSet) {
                     this.hasHomedSet = newHasHomed;
@@ -1646,6 +1647,8 @@ class GrblHalController {
             // workflow state
             socket.emit('workflow:state', this.workflow.state);
         }
+        // Replay homing runtime state so reconnecting clients get the current value
+        socket.emit('homing:has-homed', this.hasHomedSet);
     }
 
     emit(eventName, ...args) {
