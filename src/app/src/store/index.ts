@@ -258,8 +258,6 @@ const backupPreviousState = (data: any): void => {
 
         const fs = window.require('fs'); // Use window.require to require fs module in Electron
         fs.writeFileSync(backupPath, value);
-    } else {
-        localStorage.setItem('sienci-backup-' + now, value);
     }
 };
 
