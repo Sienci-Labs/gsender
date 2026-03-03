@@ -114,7 +114,7 @@ export interface gSenderSetting {
     toolLink?: string;
     toolLinkLabel?: string;
     disabled?: () => boolean;
-    hidden?: () => boolean;
+    hidden?: (getPending: (key: string, defaultValue?: any) => any) => boolean;
     onDisable?: () => void;
     onEnable?: () => void;
     onUpdate?: () => void;
@@ -608,8 +608,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Diameter of probe tip where it touches off the material. (Default 2)',
                         type: 'number',
                         unit: 'mm',
-                        hidden: () => {
-                            const probeType = store.get(
+                        hidden: (getPending) => {
+                            const probeType = getPending(
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
@@ -624,8 +624,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Plate thickness where the bit touches when Z-axis probing using the Standard Block plate. (Default 15)',
                         type: 'number',
                         unit: 'mm',
-                        hidden: () => {
-                            const probeType = store.get(
+                        hidden: (getPending) => {
+                            const probeType = getPending(
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
@@ -640,8 +640,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Plate thickness where the bit touches when Z-axis probing using the AutoZero plate. (Default 5)',
                         type: 'number',
                         unit: 'mm',
-                        hidden: () => {
-                            const probeType = store.get(
+                        hidden: (getPending) => {
+                            const probeType = getPending(
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
@@ -656,8 +656,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Plate thickness where the bit touches when Z-axis probing when using the Z Probe plate. (Default 15)',
                         type: 'number',
                         unit: 'mm',
-                        hidden: () => {
-                            const probeType = store.get(
+                        hidden: (getPending) => {
+                            const probeType = getPending(
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
@@ -673,8 +673,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'number',
                         unit: 'mm',
                         defaultValue: 0,
-                        hidden: () => {
-                            const probeType = store.get(
+                        hidden: (getPending) => {
+                            const probeType = getPending(
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
@@ -689,8 +689,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Plate thickness for XYZ probing where the bit touches the inset surface inside the bore. (Default 13)',
                         type: 'number',
                         unit: 'mm',
-                        hidden: () => {
-                            const probeType = store.get(
+                        hidden: (getPending) => {
+                            const probeType = getPending(
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
@@ -705,8 +705,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Plate thickness for Z-only probing where the probe is placed flat on the surface. (Default 15.5)',
                         type: 'number',
                         unit: 'mm',
-                        hidden: () => {
-                            const probeType = store.get(
+                        hidden: (getPending) => {
+                            const probeType = getPending(
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
@@ -721,8 +721,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Plate thickness where the bit touches when X/Y-axis probing. (Default 10)',
                         type: 'number',
                         unit: 'mm',
-                        hidden: () => {
-                            const probeType = store.get(
+                        hidden: (getPending) => {
+                            const probeType = getPending(
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
@@ -738,8 +738,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'number',
                         unit: 'mm',
                         defaultValue: 10,
-                        hidden: () => {
-                            const probeType = store.get(
+                        hidden: (getPending) => {
+                            const probeType = getPending(
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
@@ -754,8 +754,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Movement in Z before it gives up on probing. (Reduce this value if you get a soft limit alarm 2 when probing, Default 30)',
                         type: 'number',
                         unit: 'mm',
-                        hidden: () => {
-                            const probeType = store.get(
+                        hidden: (getPending) => {
+                            const probeType = getPending(
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
@@ -773,8 +773,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Probe speed before the first touch-off. (Default 150)',
                         type: 'number',
                         unit: 'mm/min',
-                        hidden: () => {
-                            const probeType = store.get(
+                        hidden: (getPending) => {
+                            const probeType = getPending(
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
@@ -792,8 +792,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Speed for the more accurate second touch-off. (Default 75)',
                         type: 'number',
                         unit: 'mm/min',
-                        hidden: () => {
-                            const probeType = store.get(
+                        hidden: (getPending) => {
+                            const probeType = getPending(
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
@@ -811,8 +811,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'How far the bit moves away after a successful touch. (Default 2)',
                         type: 'number',
                         unit: 'mm',
-                        hidden: () => {
-                            const probeType = store.get(
+                        hidden: (getPending) => {
+                            const probeType = getPending(
                                 'workspace.probeProfile.touchplateType',
                                 '',
                             );
@@ -1735,8 +1735,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         unit: 'mm',
                         description:
                             'The start location for probing. To not break bits, set it using a long tool with extra Z-axis space above the sensor. (Z should be negative)',
-                        hidden: () => {
-                            const strategy = store.get(
+                        hidden: (getPending) => {
+                            const strategy = getPending(
                                 'workspace.toolChangeOption',
                                 '',
                             );
@@ -1749,8 +1749,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         key: 'workspace.toolChangeHooks.preHook',
                         description:
                             'When using the Code strategy, this code is run as soon as an M6 command is encountered.',
-                        hidden: () => {
-                            const strategy = store.get(
+                        hidden: (getPending) => {
+                            const strategy = getPending(
                                 'workspace.toolChangeOption',
                                 '',
                             );
@@ -1763,8 +1763,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         key: 'workspace.toolChangeHooks.postHook',
                         description:
                             'When using the Code strategy, this code is run after a tool change is completed.',
-                        hidden: () => {
-                            const strategy = store.get(
+                        hidden: (getPending) => {
+                            const strategy = getPending(
                                 'workspace.toolChangeOption',
                                 '',
                             );

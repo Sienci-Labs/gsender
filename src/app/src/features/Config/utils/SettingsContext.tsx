@@ -55,6 +55,7 @@ interface iSettingsContext {
     settingsValues: gSenderSetting[];
     setSettingsValues?: React.Dispatch<React.SetStateAction<gSenderSetting[]>>;
     settingsFilter: (v: gSenderSetting) => boolean;
+    getPendingOrStore: (key: string, defaultValue?: any) => any;
     toggleFilterNonDefault: () => void;
     filterNonDefault: boolean;
     setFilterNonDefault?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -100,6 +101,7 @@ const defaultState: iSettingsContext = {
         },
     ],
     settingsFilter: () => true,
+    getPendingOrStore: (key, defaultValue) => store.get(key, defaultValue),
     toggleFilterNonDefault: () => {},
     filterNonDefault: false,
     eepromIsDefault: (_v) => false,
@@ -265,6 +267,21 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     const eepromMap = useMemo(
         () => new Map(EEPROM.map((e) => [e.setting, e])),
         [EEPROM],
+    );
+
+    const pendingValueMap = useMemo(
+        () => new Map(
+            settingsValues
+                .filter((s) => s.dirty && s.key)
+                .map((s) => [s.key, s.value])
+        ),
+        [settingsValues],
+    );
+
+    const getPendingOrStore = useCallback(
+        (key: string, defaultValue?: any) =>
+            pendingValueMap.has(key) ? pendingValueMap.get(key) : store.get(key, defaultValue),
+        [pendingValueMap],
     );
 
     useEffect(() => {
@@ -473,7 +490,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
 
         // Hide hidden when filtering
         if ('hidden' in v && (!searchTerm || searchTerm.length === 0)) {
-            if (v.hidden()) {
+            if (v.hidden(getPendingOrStore)) {
                 // only return if it's supposed to be hidden, otherwise we have more to check
                 return false;
             }
@@ -518,7 +535,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             }
             return searched;
         }
-    }, [connectionState, eepromMap, isFirmwareCurrent, controllerType, firmwareVersion, searchTerm, filterNonDefault, settingsValues]);
+    }, [connectionState, eepromMap, isFirmwareCurrent, controllerType, firmwareVersion, searchTerm, filterNonDefault, settingsValues, getPendingOrStore]);
 
     function eepromIsDefault(settingData: gSenderSetting | FilteredEEPROM) {
         const profileDefaults =
@@ -605,6 +622,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         settingsValues,
         setSettingsValues,
         settingsFilter,
+        getPendingOrStore,
         toggleFilterNonDefault,
         filterNonDefault,
         eepromIsDefault,
