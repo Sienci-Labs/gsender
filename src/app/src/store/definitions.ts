@@ -93,7 +93,7 @@ export interface ControllerState {
     mpos: BasicPosition;
     wpos: BasicPosition;
     homingFlag: boolean;
-    homingRun: boolean;
+    hasHomed: boolean;
     feeder: Feeder;
     sender: Sender;
     workflow: {

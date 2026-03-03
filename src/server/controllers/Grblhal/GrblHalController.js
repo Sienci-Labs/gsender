@@ -694,8 +694,19 @@ class GrblHalController {
             }
 
             //
-            if (this.homingStarted) {
-                // We look at bit instead of faking it with machine positions
+            // Path A: H flag present in status report (newer grblHAL firmware)
+            // Authoritative — drives homing:flag directly, including resets to false
+            if (res.hasHomed !== undefined) {
+                const newFlag = res.hasHomed;
+                if (newFlag !== this.homingFlagSet) {
+                    this.homingFlagSet = newFlag;
+                    this.emit('homing:flag', this.homingFlagSet);
+                }
+                if (this.homingStarted) {
+                    this.homingStarted = false;
+                }
+            // Path B: No H flag — fall back to user-interaction-driven homing (older firmware)
+            } else if (this.homingStarted) {
                 this.homingFlagSet = determineHALMachineZeroFlag(res, this.settings);
                 this.emit('homing:flag', this.homingFlagSet);
                 this.homingStarted = false;
