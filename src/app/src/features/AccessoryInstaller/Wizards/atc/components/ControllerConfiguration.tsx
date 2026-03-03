@@ -33,7 +33,7 @@ export function ControllerConfiguration({
                 compatibility with the Sienci ATC.
             </p>
             <ul
-                className="list-disc list-inside"
+                className="list-disc list-inside text-gray-900 dark:text-white"
                 style={{ fontSize: '1.1rem' }}
             >
                 <li>Homing direction</li>

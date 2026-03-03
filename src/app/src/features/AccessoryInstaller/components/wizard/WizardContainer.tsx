@@ -85,7 +85,7 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
                     </span>
                     <button
                         onClick={onExit}
-                        className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 transition-colors"
+                        className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
                     >
                         <svg
                             className="w-5 h-5"
@@ -189,7 +189,7 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
                 ${
                     isFirstStep
                         ? 'text-gray-400 cursor-not-allowed'
-                        : 'text-gray-700 hover:bg-gray-100'
+                        : 'text-gray-700 dark:text-gray-300 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700'
                 }
               `}
                             >
