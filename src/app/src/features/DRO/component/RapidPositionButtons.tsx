@@ -13,6 +13,8 @@ import {
 } from 'app/features/DRO/utils/RapidPosition';
 import Tooltip from 'app/components/Tooltip';
 import cn from 'classnames';
+import {firmwarePastVersion} from "app/lib/firmwareSemver.ts";
+import {ATCI_SUPPORTED_VERSION} from "app/features/ATC/utils/ATCiConstants.ts";
 
 export function RapidPositionButtons({ disabled = false }) {
     const homingFlag = useSelector(
@@ -21,6 +23,7 @@ export function RapidPositionButtons({ disabled = false }) {
     const hasHomed = useSelector(
         (state: RootState) => state.controller.hasHomed,
     );
+
     const homingDirection = useSelector((state: RootState) => {
         return get(state, 'controller.settings.settings.$23', '0');
     });
@@ -31,7 +34,7 @@ export function RapidPositionButtons({ disabled = false }) {
     const altColourClass = 'stroke-robin-500';
     const disabledColorClass = 'stroke-gray-400';
 
-    const isDisabled = disabled || !hasHomed;
+    const isDisabled = firmwarePastVersion(ATCI_SUPPORTED_VERSION) ? disabled && hasHomed : disabled;
 
     function jogToCorner(corner: string) {
         if (isDisabled) {
