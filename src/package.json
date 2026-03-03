@@ -83,9 +83,12 @@
   "devDependencies": {
     "@tanstack/router-devtools": "^1.46.7",
     "@tanstack/router-plugin": "^1.47.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/classnames": "^2.3.0",
     "@types/cli-color": "^2.0.6",
     "@types/express": "^4.17.21",
+    "@types/jest": "^30.0.0",
     "@types/node": "^20.12.7",
     "@types/react": "^18.2.79",
     "@types/react-beautiful-dnd": "^13.1.8",
@@ -100,8 +103,10 @@
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.20",
     "cross-env": "^7.0.3",
+    "jest": "^30.2.0",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.13",
+    "ts-jest": "^29.4.6",
     "typescript": "^5.4.5",
     "vite": "^5.4.2",
     "vite-tsconfig-paths": "^5.0.1"

@@ -1,12 +1,12 @@
 {
   "testName": "CNC Bit Position Tracking",
-  "timestamp": "2026-02-17T19:46:51.859Z",
+  "timestamp": "2026-03-02T19:00:14.378Z",
   "totalDataPoints": 9,
   "movement": {
-    "x": 222,
-    "y": 18.18,
+    "x": 200.09,
+    "y": 15.54,
     "z": 3,
-    "total": 243.18
+    "total": 218.63
   },
   "positions": {
     "initial": {
@@ -15,8 +15,8 @@
       "z": 0
     },
     "final": {
-      "x": 222,
-      "y": 18.18,
+      "x": 200.09,
+      "y": 15.54,
       "z": -3
     }
   }

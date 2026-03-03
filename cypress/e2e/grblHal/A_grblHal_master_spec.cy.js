@@ -1,12 +1,12 @@
 // master_spec.cy.js
 describe('Master Test Suite - All Tests', () => {
-  // Import and run each test context\
+  //Import and run each test context\
 
-  import('./loadUI_grblHal.cy');
+ import('./loadUI_grblHal.cy');
   
-  import('./device_connection_grblhal.cy.js');
+ import('./device_connection_grblhal.cy.js');
 
-  import('./load_gcode_file.grblHal.cy.js');
+  import('./load_gcode_file.grblHal.cy.js');    
 
   import('./file_info_display.grblHal.cy.js');
 
@@ -30,7 +30,7 @@ describe('Master Test Suite - All Tests', () => {
 
   import('./console_communicationgrblHal.cy');
 
-  import('./config_functionalities.cy');
+ import('./config_functionalities.cy');
 
   import('./jog_controls.specgrblHal.cy');
 

@@ -75,33 +75,39 @@ describe('Surfacing Test', () => {
       .type('1');
     cy.wait(300);
 
-    // Step 9: Configure Bit Diameter
-    cy.log('Step 9: Setting bit diameter to 22mm');
-    cy.get('div.p-4 div:nth-of-type(4) input')
-      .invoke('val','')
-      .type('22');
-    cy.wait(300);
+    // DEBUG: Inspect bit diameter area
+cy.contains('label', /bit diameter/i)
+  .parent()
+  .then(($el) => {
+    cy.log($el[0].outerHTML);
+  });
+// Step 9: Configure Bit Diameter
+cy.log('Step 9: Setting bit diameter to 22mm');
+cy.get('div.px-8 div:nth-of-type(4) input')
+  .invoke('val', '')
+  .type('22');
+cy.wait(300);
 
-    // Step 10: Configure Stepover
-    cy.log('Step 10: Setting stepover to 40%');
-    cy.get('div.p-4 div:nth-of-type(5) input')
-      .invoke('val','')
-      .type('40');
-    cy.wait(300);
+// Step 10: Configure Stepover
+cy.log('Step 10: Setting stepover to 40%');
+cy.get('div.px-8 div:nth-of-type(5) input')
+  .invoke('val', '')
+  .type('40');
+cy.wait(300);
 
-    // Step 11: Configure Feedrate
-    cy.log('Step 11: Setting feedrate to 2500 mm/min');
-    cy.get('div:nth-of-type(6) input')
-      .invoke('val','')
-      .type('2500');
-    cy.wait(300);
+// Step 11: Configure Feedrate
+cy.log('Step 11: Setting feedrate to 2500 mm/min');
+cy.get('div.px-8 div:nth-of-type(6) input')
+  .invoke('val', '')
+  .type('2500');
+cy.wait(300);
 
-    // Step 12: Configure Spindle RPM
-    cy.log('Step 12: Setting spindle RPM to 17000');
-    cy.get('div:nth-of-type(7) input')
-      .invoke('val','')
-      .type('17000');
-    cy.wait(500);
+// Step 12: Configure Spindle RPM
+cy.log('Step 12: Setting spindle RPM to 17000');
+cy.get('div.px-8 div:nth-of-type(7) input')
+  .invoke('val', '')
+  .type('17000');
+cy.wait(500);
 
     // Step 13: Generate G-code
     cy.log('Step 13: Generating G-code...');

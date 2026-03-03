@@ -11,6 +11,8 @@ class GrblHalLineParserResultCompleteStatus {
             return null;
         }
 
+        console.log(r);
+
 
         const state = r[1];
         let subState = r[2] || '';
@@ -31,6 +33,8 @@ class GrblHalLineParserResultCompleteStatus {
             payload.activeState = state;
             payload.subState = subState || '';
         }
+
+        //console.log(result);
 
         // Machine Position (v0.9, v1.1)
         if (_.has(result, 'MPos')) {

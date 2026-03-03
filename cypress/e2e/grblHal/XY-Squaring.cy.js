@@ -155,12 +155,7 @@ describe('gSender XY Squaring Test', () => {
     cy.wait(1000);
     cy.log('Point 2 Y measurement entered: 424.26mm');
 
-    // Step 18: Click outside to ensure focus is removed
-    cy.log('Step 18: Confirming measurements...');
-    cy.get('div.p-4 > div.w-full')
-      .click({ force: true });
-    cy.wait(500);
-
+   
     // Step 19-21: Click all three Confirm buttons in sequence
     cy.log('Step 19-21: Clicking all three Confirm buttons...');
 
@@ -286,10 +281,6 @@ describe('gSender XY Squaring Test', () => {
     cy.wait(1000);
     cy.log('Incorrect Point 2 Y measurement entered: 300mm');
 
-    // Click outside to confirm
-    cy.get('div.p-4 > div.w-full')
-      .click({ force: true });
-    cy.wait(500);
 
     // Click all confirm buttons
     cy.get('[testid="confirm 1-2"]')

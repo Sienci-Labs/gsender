@@ -1,6 +1,6 @@
 {
   "testName": "Feedrate Performance Comparison",
-  "timestamp": "2026-03-02T15:42:18.910Z",
+  "timestamp": "2026-03-02T19:16:32.041Z",
   "firstJob": {
     "initialFeedrate": "100%",
     "finalFeedrate": "50%",

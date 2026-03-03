@@ -47,7 +47,7 @@ describe('Spindle Configuration and Control Test - Decrease to 7500 RPM', () => 
     cy.wait(2000);
 
     cy.log('Step 3: Search for Spindle settings');
-    cy.get('#simple-search').clear().type('spindle');
+    cy.searchInSettings('Spindle');
     cy.wait(1000);
 
     cy.log('Step 4: Enable spindle toggle');
@@ -386,31 +386,25 @@ cy.get('@jobStatus').then((status) => {
   cy.get('@timeTaken').then((time) => {
     cy.get('@jobErrors').then((errors) => {
       cy.log('');
-      cy.log('===============================================');
       cy.log('SPINDLE TEST SUMMARY - DECREASE & INCREASE');
-      cy.log('===============================================');
       cy.log('Configuration:');
       cy.log('  Min Spindle Speed: ' + minSpindleSpeed + ' RPM');
       cy.log('  Max Spindle Speed: ' + maxSpindleSpeed + ' RPM');
-      cy.log('');
       cy.log('Spindle Override Changes:');
       cy.log('  Initial Override: ' + (initialSpindleOverride || 'N/A'));
       cy.log('  Initial RPM: ' + initialSpindleRpm + ' RPM');
-      cy.log('');
       cy.log('  DECREASE Phase:');
       cy.log('    Decrease Clicks: ' + decreaseClickCount);
       cy.log('    Reduced Override: ' + reducedOverride);
       cy.log('    Reduced RPM: ' + reducedSpindleRpm + ' RPM');
       cy.log('    After 1st Reset Override: ' + resetOverride);
       cy.log('    After 1st Reset RPM: ' + resetSpindleRpm + ' RPM');
-      cy.log('');
       cy.log('  INCREASE Phase:');
       cy.log('    Increase Clicks: ' + increaseClickCount);
       cy.log('    Increased Override: ' + increasedOverride);
       cy.log('    Increased RPM: ' + increasedSpindleRpm + ' RPM');
       cy.log('    After 2nd Reset Override: ' + secondResetOverride);
       cy.log('    After 2nd Reset RPM: ' + secondResetSpindleRpm + ' RPM');
-      cy.log('');
       cy.log('Job Details:');
       cy.log('  Status: ' + status);
       cy.log('  Time Taken: ' + time);

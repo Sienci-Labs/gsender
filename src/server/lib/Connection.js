@@ -183,10 +183,10 @@ class Connection extends EventEmitter {
             }
 
             log.debug(`Connected to serial port "${port}"`);
-            console.log('controllerType:', this.controllerType);
             if (!this.controllerType) {
                 this.connection.writeImmediate('$I\n');
                 this.timeout = setInterval(() => {
+                    this.connection.writeImmediate('$I\n');
                     if (this.count >= 5) {
                         this.controllerType = this.options.defaultFirmware;
                         this.emit(
@@ -198,7 +198,6 @@ class Connection extends EventEmitter {
                         clearInterval(this.timeout);
                         return;
                     }
-                    this.connection.writeImmediate('\x18');
                     this.count++;
                 }, 800);
             }

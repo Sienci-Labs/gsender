@@ -13,8 +13,8 @@ module.exports = {
     'App.test.tsx',
   ],
   moduleNameMapper: {
-    '\\.(css|less|scss|sass|styl)$': '<rootDir>/__mocks__/styleMock.js',
-    '\\.(jpg|jpeg|png|gif|svg)$': '<rootDir>/__mocks__/fileMock.js',
+    '\\.(css|less|scss|sass|styl)$': '<rootDir>/src/app/src/__mocks__/styleMock.js',
+    '\\.(jpg|jpeg|png|gif|svg)$': '<rootDir>/src/app/src/__mocks__/fileMock.js',
     '^app/(.*)$': '<rootDir>/src/app/src/$1',
     '^(\\.{1,2}/)*config/settings$': '<rootDir>/src/app/src/config/__mocks__/settings.ts',
   },

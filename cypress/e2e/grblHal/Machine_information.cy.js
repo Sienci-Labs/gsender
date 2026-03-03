@@ -25,7 +25,7 @@ describe('Invert and Check Pins Test with Stepper Motor Lock/Unlock', () => {
 
     // Step 3: Open and pin Machine Info
     cy.log('Step 3: Opening Machine Information popup...');
-    cy.get('div.border > div.top-0 img').should('be.visible').click();
+    cy.get('div.border > div.hidden img').should('be.visible').click();
     cy.wait(2000);
     
     cy.log('Step 4: Pinning popup...');
@@ -170,7 +170,7 @@ describe('Invert and Check Pins Test with Stepper Motor Lock/Unlock', () => {
     
     // Navigate back to machine info popup
     cy.log('Opening Machine Info popup...');
-    cy.get('div.border > div.top-0 img').should('be.visible').click();
+    cy.get('div.border > div.hidden img').should('be.visible').click();
     cy.wait(1500);
 
     // Get the stepper motor toggle button
@@ -217,7 +217,7 @@ describe('Invert and Check Pins Test with Stepper Motor Lock/Unlock', () => {
       }
     });
 
-    // Verify motors are unlocked (toggle is disabled/unchecked)
+    // Verify motors are unlocked
     cy.get('@stepperToggle').then(($toggle) => {
       const isLocked = $toggle.attr('data-state') === 'checked' || 
                        $toggle.attr('aria-checked') === 'true';
@@ -233,7 +233,7 @@ describe('Invert and Check Pins Test with Stepper Motor Lock/Unlock', () => {
                        $toggle.attr('aria-checked') === 'true';
       
       expect(isLocked, 'Stepper motor should be UNLOCKED at test end').to.be.false;
-      cy.log(' Final state confirmed: Stepper motor is UNLOCKED');
+      cy.log('Final state confirmed: Stepper motor is UNLOCKED');
     });
 
     cy.log('Test completed successfully - All checks passed ');

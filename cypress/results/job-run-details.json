@@ -1,9 +1,9 @@
 {
   "testName": "Simple Job Run Test",
-  "timestamp": "2026-03-02T15:40:00.282Z",
-  "jobStartTime": "2026-03-02T15:39:32.150Z",
-  "jobEndTime": "2026-03-02T15:39:54.658Z",
-  "jobDuration": 22.508,
+  "timestamp": "2026-03-02T19:14:12.468Z",
+  "jobStartTime": "2026-03-02T19:13:44.281Z",
+  "jobEndTime": "2026-03-02T19:14:06.738Z",
+  "jobDuration": 22.457,
   "status": "COMPLETE",
   "timeTaken": "00:00:22",
   "errors": "None"

@@ -1004,12 +1004,16 @@ Cypress.Commands.add('verifyMachineStatus', (expectedStatus, options = {}) => {
     });
 });
 
-//27. Search items in settings {cy.searchInSettings('search item name');}
+//  After
+// ✅ Updated searchInSettings command
 Cypress.Commands.add('searchInSettings', (searchText, options = {}) => {
   const { timeout = 10000 } = options;
 
-  cy.log(`Searching for: ${searchText}`);
+  cy.log(`Navigating to configuration page...`);
+  cy.goToConfig();
+  cy.wait(2000);
 
+  cy.log(`Searching for: ${searchText}`);
   cy.get('#simple-search', { timeout })
     .should('be.visible')
     .clear()
