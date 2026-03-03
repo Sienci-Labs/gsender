@@ -268,6 +268,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
+                        label: 'Settings Backup Frequency',
+                        key: 'workspace.backupFreq',
+                        type: 'select',
+                        description:
+                            'Choose when your gSender settings backup is generated.',
+                        options: ['On Update', 'Daily', 'Weekly', 'Monthly'],
+                    },
+                    {
                         label: 'Send usage data',
                         key: 'workspace.sendUsageData',
                         description:

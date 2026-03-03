@@ -19,6 +19,8 @@ export type Notification = {
     timestamp: Date | string;
 };
 
+export type BackupFrequencies = 'On Update' | 'Daily' | 'Weekly' | 'Monthly';
+
 // Interfaces
 
 export interface Workspace {
@@ -39,6 +41,8 @@ export interface Workspace {
     outlineSpeed: number | null;
     revertWorkspace: boolean;
     promptExit: boolean;
+    backupFreq: BackupFrequencies;
+    lastBackupTime: number;
     park: object;
     jobTimes: number[];
     toolChange: {

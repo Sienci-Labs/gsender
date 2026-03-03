@@ -17,6 +17,7 @@ import {
 } from 'app/lib/constants.ts';
 import api from 'app/api';
 import pubsub from 'pubsub-js';
+import { BackupFrequencies } from 'app/workspace/definitions';
 
 interface UserData {
     path: string;
@@ -76,6 +77,11 @@ const persist = (data: StoreData): void => {
             ...state,
         },
     };
+
+    if (persistData.state.workspace.backupFreq === 'On Update') {
+        persistData.state.workspace.lastBackupTime = Date.now();
+        backupPreviousState(persistData);
+    }
 
     try {
         const value = JSON.stringify(persistData, null, 2);
@@ -256,6 +262,29 @@ const backupPreviousState = (data: any): void => {
     }
 };
 
+const isTimeToBackup = (
+    lastBackupTime: number,
+    frequency: BackupFrequencies,
+) => {
+    if (frequency === 'On Update') {
+        return false;
+    }
+
+    const now = Date.now();
+    const elapsed = now - lastBackupTime;
+
+    const intervals = {
+        Daily: 1000 * 60 * 60 * 24,
+        Weekly: 1000 * 60 * 60 * 24 * 7,
+        Monthly: 1000 * 60 * 60 * 24 * 30,
+    };
+
+    const interval = intervals[frequency];
+    if (!interval) throw new Error(`Unknown backup frequency: "${frequency}"`);
+
+    return elapsed >= interval;
+};
+
 const cnc: CncData = {
     version: settings.version,
     state: {},
@@ -266,8 +295,13 @@ try {
     const data = JSON.parse(text);
     cnc.version = get(data, 'version', settings.version);
     cnc.state = get(data, 'state', {});
+    const lastBackupTime = get(cnc.state, 'workspace.lastBackupTime', 0);
+    const backupFreq = get(cnc.state, 'workspace.backupFreq', 'On Update');
 
-    backupPreviousState(cnc.state);
+    if (isTimeToBackup(lastBackupTime, backupFreq)) {
+        data.state.workspace.lastBackupTime = Date.now();
+        backupPreviousState(data);
+    }
 } catch (e) {
     log.error(e);
 }
