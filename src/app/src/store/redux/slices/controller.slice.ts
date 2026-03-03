@@ -264,7 +264,12 @@ const controllerSlice = createSlice({
             action: PayloadAction<{ homingFlag: boolean }>,
         ) => {
             state.homingFlag = action.payload.homingFlag;
-            state.hasHomed = true;
+        },
+        updateHasHomed: (
+            state,
+            action: PayloadAction<{ hasHomed: boolean }>,
+        ) => {
+            state.hasHomed = action.payload.hasHomed;
         },
         resetHoming: (state) => {
             state.homingFlag = false;
@@ -360,6 +365,7 @@ export const {
     updateWorkflowState,
     toolChange,
     updateHomingFlag,
+    updateHasHomed,
     resetHoming,
     updateSettingsDescriptions,
     updateAlarmDescriptions,

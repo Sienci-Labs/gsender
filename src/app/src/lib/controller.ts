@@ -81,6 +81,7 @@ export interface ControllerListeners {
     'file:load': Array<Function>;
     'file:unload': Array<Function>;
     'homing:flag': Array<Function>;
+    'homing:has-homed': Array<Function>;
     'electronErrors:errorList': Array<Function>;
     'firmware:ready': Array<Function>;
     'sender:M0M1': Array<Function>;
@@ -193,6 +194,7 @@ class Controller {
         'file:load': [],
         'file:unload': [],
         'homing:flag': [],
+        'homing:has-homed': [],
         'electronErrors:errorList': [],
         'firmware:ready': [],
         'sender:M0M1': [],

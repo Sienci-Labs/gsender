@@ -33,7 +33,6 @@ export function Config() {
 
     const workflowState = useTypedSelector((state: RootState) => state.controller.workflow.state);
 
-
     const [visibleSection, setVisibleSection] = React.useState('h-section-0');
     const [activeTab, setActiveTab] = React.useState('config');
 
@@ -52,7 +51,7 @@ export function Config() {
     const { settings, EEPROM } = useSettings();
 
 
-    // lets extract all the eeprom settings
+    // lets extract all the eeprom settingsd
     const allEEPROM: gSenderSetting[] = useMemo(
         () =>
             EEPROM.map((filtered) => ({
