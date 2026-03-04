@@ -245,6 +245,7 @@ const backupPreviousState = (data: any): void => {
         null,
         2,
     );
+    const now = new Date().toISOString().replaceAll(':', '-');
 
     if (isElectron()) {
         const { app } = window.require('@electron/remote');
@@ -252,13 +253,11 @@ const backupPreviousState = (data: any): void => {
 
         const backupPath = path.join(
             app.getPath('userData'),
-            'preferences-backup.json',
+            'preferences-backup-' + now + '.json',
         );
 
         const fs = window.require('fs'); // Use window.require to require fs module in Electron
         fs.writeFileSync(backupPath, value);
-    } else {
-        localStorage.setItem('sienci-backup', value);
     }
 };
 
