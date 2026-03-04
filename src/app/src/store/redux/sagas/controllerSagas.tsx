@@ -81,6 +81,7 @@ import {
     updateAlarmDescriptions,
     updateSettingsDescriptions,
     updateHomingFlag,
+    updateHasHomed,
     updateSenderStatus,
     updateControllerType,
     addSDCardFileToList,
@@ -860,6 +861,10 @@ export function* initialize(): Generator<any, void, any> {
     controller.addListener('homing:flag', (flag: boolean) => {
         reduxStore.dispatch(updateHomingFlag({ homingFlag: flag }));
         pubsub.publish('softlimits:check');
+    });
+
+    controller.addListener('homing:has-homed', (hasHomed: boolean) => {
+        reduxStore.dispatch(updateHasHomed({ hasHomed }));
     });
 
     controller.addListener('firmware:ready', (status: string) => {

@@ -138,17 +138,17 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
 
             {rackPositionMethod === 'manual' && (
                 <>
-                    <p>
+                    <p className="text-gray-900 dark:text-white">
                         <b>
                             It is recommended that you use the provided utility.
                         </b>
                     </p>
-                    <p>
+                    <p className="text-gray-900 dark:text-white">
                         Position the spindle until the tool-stud sensor is
                         almost touching the left-most tool-stud, as in the
                         provided image. The LED on the sensor should light up.
                     </p>
-                    <p>
+                    <p className="text-gray-900 dark:text-white">
                         Once you are happy with the position, use the “Set
                         Position” button to set your rack position.
                     </p>

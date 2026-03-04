@@ -64,6 +64,9 @@ class SerialConnection extends EventEmitter {
     // SerialPort
     writeFilter = (data) => data;
 
+    // Tracks whether TCP 'connect' has fired (used to distinguish pre/post-connect errors)
+    connected = false;
+
     eventListener = {
         data: (data) => {
             this.emit('data', data);
@@ -75,12 +78,18 @@ class SerialConnection extends EventEmitter {
             this.emit('close', err);
         },
         error: (err) => {
-            if (err.code === 'ECONNRESET') {
-                this.port.destroy();
+            if (!this.connected) {
+                // Pre-connection error (ECONNREFUSED, EHOSTUNREACH, ENETUNREACH, etc.)
+                this.port && this.port.destroy();
                 this.port = null;
                 if (this.callback) {
                     this.callback(err);
+                    this.callback = null;
                 }
+            } else if (err.code === 'ECONNRESET') {
+                // Post-connection reset
+                this.port && this.port.destroy();
+                this.port = null;
             }
             this.emit('error', err);
         },
@@ -162,7 +171,7 @@ class SerialConnection extends EventEmitter {
 
     get isOpen() {
         if (this.settings.network) {
-            return this.port && this.port.writable;
+            return this.port && this.port.writable && this.connected;
         }
         return this.port && this.port.isOpen;
     }
@@ -200,23 +209,31 @@ class SerialConnection extends EventEmitter {
         console.log(`Conection to port ${ethernetPort}`);
 
         if (network || looksLikeIP) {
+            this.connected = false;
             this.port = new net.Socket();
             this.port.setTimeout(4000, () => {
                 this.port.destroy();
-                callback('Connection timeout');
+                this.port = null;
+                if (this.callback) {
+                    this.callback('Connection timeout');
+                    this.callback = null;
+                }
             });
+
+            // addPortListeners() calls removeAllListeners(), so it must run BEFORE
+            // we add the one-time 'connect' handler, otherwise that handler would
+            // be removed and callback() would never be called on a successful connect.
+            this.addPortListeners();
 
             this.port.once('connect', () => {
+                this.connected = true;
                 this.port.setTimeout(0);
-                callback();
-            });
-            this.port.on('error', (err) => {
-                this.port.setTimeout(0);
-                this.port.destroy();
-                callback(err);
+                if (this.callback) {
+                    this.callback();
+                    this.callback = null;
+                }
             });
 
-            this.addPortListeners();
             this.port.connect(ethernetPort, path);
         } else {
             this.port = new SerialPort({

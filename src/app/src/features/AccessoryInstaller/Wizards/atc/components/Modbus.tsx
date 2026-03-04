@@ -26,19 +26,27 @@ export function Modbus({ onComplete, onUncomplete }: StepProps) {
         }, 1500);
     }
 
-    return <div className="flex flex-col gap-5 justify-start">
-        <p><b>You are able to complete this step while the controller is still alarmed</b></p>
-        <p className="dark:text-white">
-            Now that your Spindle has been configured and controller rebooted, you must configure the Modbus
-            Address. This will also disconnect your controller.
-        </p>
-        <StepActionButton
-            label="Configure Modbus"
-            runningLabel="Configuring..."
-            onApply={configureModbus}
-            isComplete={hasConfiguredModbus}
-            error={error}
-            disabled={!isConnected}
-        />
-    </div>
+    return (
+        <div className="flex flex-col gap-5 justify-start">
+            <p className="text-gray-900 dark:text-white">
+                <b>
+                    You are able to complete this step while the controller is
+                    still alarmed
+                </b>
+            </p>
+            <p className="dark:text-white">
+                Now that your Spindle has been configured and controller
+                rebooted, you must configure the Modbus Address. This will also
+                disconnect your controller.
+            </p>
+            <StepActionButton
+                label="Configure Modbus"
+                runningLabel="Configuring..."
+                onApply={configureModbus}
+                isComplete={hasConfiguredModbus}
+                error={error}
+                disabled={!isConnected}
+            />
+        </div>
+    );
 }

@@ -69,7 +69,7 @@ export function WizardLanding({
                 {onBack && (
                     <button
                         onClick={onBack}
-                        className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 mb-8 self-start"
+                        className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 mb-8 self-start"
                     >
                         <ArrowLeft size={20} />
                         Back to Wizards

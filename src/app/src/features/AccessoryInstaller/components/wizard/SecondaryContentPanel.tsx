@@ -44,7 +44,7 @@ export function SecondaryContentPanel({ content }: SecondaryContentPanelProps) {
                     return (
                         <div key={index} className={containerClassName}>
                             {item.title && (
-                                <h3 className="text-sm font-semibold text-gray-700 mb-2">
+                                <h3 className="text-sm font-semibold text-gray-700 dark:text-white mb-2">
                                     {item.title}
                                 </h3>
                             )}
@@ -62,7 +62,7 @@ export function SecondaryContentPanel({ content }: SecondaryContentPanelProps) {
                     return (
                         <div key={index} className={containerClassName}>
                             {item.title && (
-                                <h3 className="text-sm font-semibold text-gray-700 mb-2">
+                                <h3 className="text-sm font-semibold text-gray-700 dark:text-white mb-2">
                                     {item.title}
                                 </h3>
                             )}

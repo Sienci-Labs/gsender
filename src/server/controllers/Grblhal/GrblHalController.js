@@ -218,6 +218,8 @@ class GrblHalController {
 
     homingFlagSet = false;
 
+    hasHomedSet = false;
+
     // Toolchange
     toolChanger = null;
 
@@ -694,10 +696,22 @@ class GrblHalController {
             }
 
             //
-            if (this.homingStarted) {
-                // We look at bit instead of faking it with machine positions
-                this.homingFlagSet = determineHALMachineZeroFlag(res, this.settings);
-                this.emit('homing:flag', this.homingFlagSet);
+            // Path A: H flag present in status report (newer grblHAL firmware)
+            // H: field drives hasHomed (runtime homing state)
+            if (res.hasHomed !== undefined) {
+                //console.log(res);
+                const newHasHomed = res.hasHomed;
+                if (newHasHomed !== this.hasHomedSet) {
+                    this.hasHomedSet = newHasHomed;
+                    this.emit('homing:has-homed', this.hasHomedSet);
+                }
+                if (this.homingStarted) {
+                    this.homingStarted = false;
+                }
+            // Path B: No H flag — fall back to user-interaction-driven homing (older firmware)
+            } else if (this.homingStarted) {
+                this.hasHomedSet = true;
+                this.emit('homing:has-homed', this.hasHomedSet);
                 this.homingStarted = false;
             }
 
@@ -1166,6 +1180,12 @@ class GrblHalController {
             if (this.settings !== this.runner.settings) {
                 this.settings = this.runner.settings;
                 this.emit('controller:settings', GRBLHAL, this.settings);
+                // Update and emit homingFlag from $22 bit 3
+                const newHomingFlag = determineHALMachineZeroFlag({}, this.settings);
+                if (newHomingFlag !== this.homingFlagSet) {
+                    this.homingFlagSet = newHomingFlag;
+                    this.emit('homing:flag', this.homingFlagSet);
+                }
             }
 
             // Grbl state
@@ -1565,6 +1585,12 @@ class GrblHalController {
         // Clear initialized flag
         this.initialized = false;
 
+        // Reset homing runtime state
+        if (this.hasHomedSet) {
+            this.hasHomedSet = false;
+            this.emit('homing:has-homed', false);
+        }
+
         this.emit('serialport:closeController', {
             port: port,
             inuse: false,
@@ -1621,6 +1647,8 @@ class GrblHalController {
             // workflow state
             socket.emit('workflow:state', this.workflow.state);
         }
+        // Replay homing runtime state so reconnecting clients get the current value
+        socket.emit('homing:has-homed', this.hasHomedSet);
     }
 
     emit(eventName, ...args) {

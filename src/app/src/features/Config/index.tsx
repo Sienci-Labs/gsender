@@ -19,7 +19,7 @@ import {
 import { gSenderSetting, SettingsMenuSection } from './assets/SettingsMenu';
 import { convertEIDToNumber } from 'app/lib/numeral';
 import controller from 'app/lib/controller.ts';
-import { GRBLHAL } from 'app/constants';
+import {GRBLHAL, WORKFLOW_STATE_IDLE} from 'app/constants';
 import { resolveGrblCoreDefaults } from 'app/features/Config/utils/grblCoreMigration.ts';
 
 export function Config() {
@@ -31,9 +31,8 @@ export function Config() {
         (state: RootState) => state.connection.isConnected,
     );
 
-    const firmwareType = useTypedSelector(
-        (state: RootState) => state.controller.type,
-    );
+    const workflowState = useTypedSelector((state: RootState) => state.controller.workflow.state);
+
     const [visibleSection, setVisibleSection] = React.useState('h-section-0');
     const [activeTab, setActiveTab] = React.useState('config');
 
@@ -44,7 +43,7 @@ export function Config() {
     }
 
     useEffect(() => {
-        if (connected) {
+        if (connected && workflowState === WORKFLOW_STATE_IDLE) {
             controller.command('gcode', ['$$']);
         }
     }, []);
@@ -52,7 +51,7 @@ export function Config() {
     const { settings, EEPROM } = useSettings();
 
 
-    // lets extract all the eeprom settings
+    // lets extract all the eeprom settingsd
     const allEEPROM: gSenderSetting[] = useMemo(
         () =>
             EEPROM.map((filtered) => ({

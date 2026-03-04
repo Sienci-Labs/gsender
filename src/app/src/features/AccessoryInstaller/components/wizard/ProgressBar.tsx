@@ -39,7 +39,7 @@ export function ProgressBar({
 
             <button
                 onClick={onExit}
-                className="ml-8 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 transition-colors"
+                className="ml-8 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
             >
                 <svg
                     className="w-5 h-5"

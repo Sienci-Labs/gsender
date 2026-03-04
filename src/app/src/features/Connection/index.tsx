@@ -72,6 +72,7 @@ function Connection(props: ConnectionProps) {
     const [isOpen, setIsOpen] = useState(false);
 
     const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const connectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const isHoveringRef = useRef(false);
 
     useEffect(() => {
@@ -92,6 +93,9 @@ function Connection(props: ConnectionProps) {
         return () => {
             if (closeTimeoutRef.current) {
                 clearTimeout(closeTimeoutRef.current);
+            }
+            if (connectTimeoutRef.current) {
+                clearTimeout(connectTimeoutRef.current);
             }
         };
     }, []);
@@ -115,6 +119,19 @@ function Connection(props: ConnectionProps) {
         setConnectionState(ConnectionState.CONNECTING);
         setConnectionType(type);
 
+        // Safety net: if the backend callback never fires (e.g. silent hang),
+        // reset the UI to ERROR after 15 seconds for network connections.
+        if (connectTimeoutRef.current) {
+            clearTimeout(connectTimeoutRef.current);
+            connectTimeoutRef.current = null;
+        }
+        if (type === ConnectionType.ETHERNET) {
+            connectTimeoutRef.current = setTimeout(() => {
+                connectTimeoutRef.current = null;
+                setConnectionState(ConnectionState.ERROR);
+            }, 6000);
+        }
+
         // Attempt connect with callback
         controller.openPort(
             port,
@@ -126,6 +143,10 @@ function Connection(props: ConnectionProps) {
                 ethernetPort,
             },
             (err: string) => {
+                if (connectTimeoutRef.current) {
+                    clearTimeout(connectTimeoutRef.current);
+                    connectTimeoutRef.current = null;
+                }
                 if (err) {
                     setConnectionState(ConnectionState.ERROR);
                     return;
