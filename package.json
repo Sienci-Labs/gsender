@@ -83,7 +83,8 @@
     "install:packages": "yarn install && yarn install --prefix /src/app",
     "check-types": "tsc --noEmit -p ./src/app/src",
     "test:unit": "jest",
-    "test:unit:watch": "jest --watch"
+    "test:unit:watch": "jest --watch",
+    "test:app": "yarn --cwd src/app test"
   },
   "build": {
     "appId": "org.sienci.gsender-edge",
@@ -380,6 +381,9 @@
     "jszip": "^3.10.1",
     "lucide-react": "^0.428.0",
     "memoize-one": "~5.0.4",
+    "mochawesome": "^7.1.4",
+    "mochawesome-merge": "^5.1.1",
+    "mochawesome-report-generator": "^6.3.2",
     "moment": "^2.30.1",
     "mousetrap": "~1.6.3",
     "namespace-constants": "^1.0.1",
@@ -418,6 +422,7 @@
     "tailwindcss-animate": "^1.0.7",
     "tap": "~12.6.2",
     "three": "^0.182.0",
+    "ts-jest": "^29.4.6",
     "typescript-eslint": "^7.16.1",
     "universal-logger": "~1.0.1",
     "universal-logger-browser": "~1.0.2",

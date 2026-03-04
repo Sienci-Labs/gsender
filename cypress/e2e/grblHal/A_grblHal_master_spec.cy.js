@@ -8,9 +8,9 @@ describe('Master Test Suite - All Tests', () => {
 
   import('./load_gcode_file.grblHal.cy.js');    
 
-  import('./file_info_display.grblHal.cy.js');
+  import('./file_info_display.grblHal.cy.js'); 
 
-  import('./jogging_using_buttons.grblHal.cy.js'); 
+  import('./jogging_using_buttons.grblHal.cy.js');  
 
   import('./jogging_usingkeybaord_grblhal.cy.js');
 
@@ -50,5 +50,5 @@ describe('Master Test Suite - All Tests', () => {
 
   import('./XY-Squaring.cy');
 
-
+ 
 });  

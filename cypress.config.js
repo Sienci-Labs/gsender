@@ -25,7 +25,7 @@ module.exports = defineConfig({
 
     setupNodeEvents(on, config) {
       // Register mochawesome plugin
-     // require('cypress-mochawesome-reporter/plugin')(on);
+     require('cypress-mochawesome-reporter/plugin')(on);
 
       
 

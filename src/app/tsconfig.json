@@ -9,12 +9,10 @@
             "esnext"
         ],
         "module": "ESNext",
-        // "module": "CommonJS",
         "skipLibCheck": true,
         "esModuleInterop": true,
         "incremental": true,
         "allowJs": true,
-        /* Bundler mode */
         "moduleResolution": "Bundler",
         "allowImportingTsExtensions": true,
         "resolveJsonModule": true,
@@ -22,17 +20,13 @@
         "noEmit": true,
         "jsx": "react-jsx",
         "strict": true,
-        "strictNullChecks": false, // this is so we can assign variables as null before defining them
+        "strictNullChecks": false,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "noUncheckedIndexedAccess": true,
         "noFallthroughCasesInSwitch": true,
         "noImplicitAny": true,
         "forceConsistentCasingInFileNames": true,
-        "typeRoots": [
-            "./node_modules/@types",
-            "./src/declarations.d.ts"
-        ],
         "baseUrl": ".",
         "paths": {
             "app/*": [
@@ -48,7 +42,7 @@
     },
     "include": [
         "vite.config.ts",
-        "declaration.d.ts",
+        "src/declarations.d.ts",
         "**/*.ts",
         "**/*.tsx",
         "**/*.cjs",
@@ -57,5 +51,4 @@
     "exclude": [
         "output"
     ]
-    // "references": [{ "path": "./tsconfig.node.json" }]
 }

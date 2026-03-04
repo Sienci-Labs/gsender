@@ -1,0 +1,1084 @@
+{
+   "settings": {
+      "workspace": {
+         "units": "mm",
+         "reverseWidgets": false,
+         "spindleFunctions": false,
+         "coolantFunctions": true,
+         "atcEnabled": false,
+         "safeRetractHeight": 0,
+         "customDecimalPlaces": 0,
+         "jobsFinished": 0,
+         "jobsCancelled": 0,
+         "timeSpentRunning": 0,
+         "longestTimeRun": 0,
+         "defaultFirmware": "grblHAL",
+         "outlineMode": "Detailed",
+         "outlineSpeed": 0,
+         "revertWorkspace": false,
+         "promptExit": false,
+         "sendUsageData": false,
+         "jobTimes": [],
+         "toolChange": {
+            "passthrough": false,
+            "skipDialog": false
+         },
+         "toolChangeOption": "Ignore",
+         "toolChangePosition": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+         },
+         "toolChangeHooks": {
+            "preHook": "",
+            "postHook": ""
+         },
+         "container": {
+            "primary": {
+               "show": true,
+               "widgets": [
+                  "location",
+                  "axes",
+                  "secondary"
+               ]
+            },
+            "default": {
+               "widgets": [
+                  "visualizer",
+                  "job_status"
+               ]
+            }
+         },
+         "machineProfile": {
+            "id": 7,
+            "company": "Sienci Labs",
+            "name": "LongMill MK2",
+            "type": "48x30",
+            "version": "MK2",
+            "mm": {
+               "width": 1279.9,
+               "depth": 845,
+               "height": 114.3
+            },
+            "eepromSettings": {
+               "$0": "10",
+               "$1": "100",
+               "$2": "1",
+               "$4": "1",
+               "$5": "0",
+               "$6": "0",
+               "$10": "1",
+               "$11": "0.010",
+               "$12": "0.002",
+               "$13": "0",
+               "$20": "0",
+               "$21": "0",
+               "$22": "0",
+               "$23": "3",
+               "$24": "25.000",
+               "$25": "1500.000",
+               "$26": "250",
+               "$27": "1.000",
+               "$30": "30000",
+               "$31": "10000",
+               "$32": "0",
+               "$100": "200.000",
+               "$101": "200.000",
+               "$102": "200.000",
+               "$110": "4000.000",
+               "$111": "4000.000",
+               "$112": "3000.000",
+               "$120": "750.000",
+               "$121": "750.000",
+               "$122": "500.000",
+               "$3": "1",
+               "$130": "1270.000",
+               "$131": "855.000",
+               "$132": "120.000"
+            },
+            "grblHALeepromSettings": {
+               "$0": "5.0",
+               "$1": "254",
+               "$2": "0",
+               "$4": "15",
+               "$5": "15",
+               "$6": "1",
+               "$8": "0",
+               "$9": "1",
+               "$10": "511",
+               "$11": "0.010",
+               "$12": "0.002",
+               "$13": "0",
+               "$14": "14",
+               "$15": "0",
+               "$16": "0",
+               "$17": "0",
+               "$18": "0",
+               "$19": "0",
+               "$20": "0",
+               "$21": "0",
+               "$22": "0",
+               "$23": "11",
+               "$24": "150.0",
+               "$25": "4300.0",
+               "$26": "25",
+               "$27": "1.500",
+               "$28": "0.100",
+               "$29": "0.0",
+               "$30": "24000.000",
+               "$31": "7500.000",
+               "$32": "0",
+               "$33": "1000.0",
+               "$34": "0.0",
+               "$35": "0.0",
+               "$36": "100.0",
+               "$37": "0",
+               "$39": "1",
+               "$40": "0",
+               "$41": "1",
+               "$42": "2",
+               "$43": "1",
+               "$44": "4",
+               "$45": "3",
+               "$46": "0",
+               "$47": "0",
+               "$56": "5.0",
+               "$57": "100.0",
+               "$58": "-5.0",
+               "$59": "500.0",
+               "$60": "1",
+               "$61": "3",
+               "$62": "0",
+               "$63": "3",
+               "$64": "0",
+               "$65": "0",
+               "$70": "11",
+               "$100": "800.000",
+               "$101": "800.000",
+               "$102": "800.000",
+               "$103": "79.01234568",
+               "$110": "4000.000",
+               "$111": "4000.000",
+               "$112": "4000.000",
+               "$113": "8000.000",
+               "$120": "750.000",
+               "$121": "750.000",
+               "$122": "750.000",
+               "$123": "1000.000",
+               "$133": "0.000",
+               "$140": "2800",
+               "$141": "2800",
+               "$142": "2800",
+               "$143": "0",
+               "$150": "32",
+               "$151": "32",
+               "$152": "32",
+               "$153": "16",
+               "$180": "150.0",
+               "$181": "150.0",
+               "$182": "150.0",
+               "$183": "150.0",
+               "$190": "4300.0",
+               "$191": "4300.0",
+               "$192": "4300.0",
+               "$193": "4300.0",
+               "$200": "22.0",
+               "$201": "22.0",
+               "$202": "22.0",
+               "$203": "22.0",
+               "$210": "35",
+               "$211": "35",
+               "$212": "35",
+               "$213": "50",
+               "$220": "22.0",
+               "$221": "22.0",
+               "$222": "22.0",
+               "$223": "22.0",
+               "$300": "grblHAL",
+               "$301": "0",
+               "$302": "192.168.5.1",
+               "$303": "192.168.5.1",
+               "$304": "255.255.255.0",
+               "$305": "23",
+               "$307": "80",
+               "$308": "21",
+               "$338": "7",
+               "$339": "0",
+               "$340": "0.0",
+               "$341": "0",
+               "$342": "30.0",
+               "$343": "25.0",
+               "$344": "200.0",
+               "$345": "200.0",
+               "$346": "1",
+               "$370": "0",
+               "$372": "0",
+               "$374": "3",
+               "$375": "50",
+               "$376": "1",
+               "$384": "0",
+               "$392": "11.0",
+               "$393": "1.0",
+               "$395": "0",
+               "$398": "128",
+               "$450": "1",
+               "$451": "2",
+               "$452": "4",
+               "$453": "G4P0",
+               "$454": "G4P0",
+               "$455": "G4P0",
+               "$456": "0",
+               "$457": "2",
+               "$458": "0",
+               "$459": "2",
+               "$462": "8192",
+               "$463": "8193",
+               "$464": "8451",
+               "$465": "18",
+               "$466": "34",
+               "$467": "1",
+               "$468": "50.0",
+               "$469": "60.0",
+               "$470": "60.0",
+               "$471": "100.0",
+               "$479": "4",
+               "$481": "0",
+               "$484": "1",
+               "$486": "0",
+               "$511": "7",
+               "$512": "5",
+               "$513": "8",
+               "$520": "0",
+               "$521": "0",
+               "$523": "0",
+               "$650": "1",
+               "$651": "1",
+               "$652": "0",
+               "$653": "2",
+               "$654": "8",
+               "$655": "0",
+               "$656": "1",
+               "$657": "22",
+               "$658": "7",
+               "$659": "3",
+               "$660": "0",
+               "$661": "3",
+               "$662": "0",
+               "$663": "41759",
+               "$664": "0",
+               "$665": "1",
+               "$666": "0",
+               "$668": "1",
+               "$730": "255.000",
+               "$731": "0.000",
+               "$733": "1000.0",
+               "$734": "0.0",
+               "$735": "0.0",
+               "$736": "100.0",
+               "$741": "0.000",
+               "$742": "0.000",
+               "$743": "0",
+               "$3": "6",
+               "$130": "1270.000",
+               "$131": "855.000",
+               "$132": "120.000"
+            }
+         },
+         "probeProfile": {
+            "xyThickness": 10,
+            "zThickness": {
+               "standardBlock": 15,
+               "autoZero": 5,
+               "zProbe": 15,
+               "probe3D": 0,
+               "bitZero": 13,
+               "bitZeroZOnly": 15.5
+            },
+            "plateWidth": 50,
+            "plateLength": 50,
+            "functions": {
+               "x": true,
+               "y": true,
+               "z": true
+            },
+            "touchplateType": "Standard Block"
+         },
+         "tools": [
+            {
+               "metricDiameter": 6.35,
+               "imperialDiameter": 0.25,
+               "type": "end mill"
+            },
+            {
+               "metricDiameter": 3.175,
+               "imperialDiameter": 0.125,
+               "type": "end mill"
+            },
+            {
+               "metricDiameter": 9.525,
+               "imperialDiameter": 0.375,
+               "type": "end mill"
+            },
+            {
+               "metricDiameter": 12.7,
+               "imperialDiameter": 0.5,
+               "type": "end mill"
+            },
+            {
+               "metricDiameter": 15.875,
+               "imperialDiameter": 0.625,
+               "type": "end mill"
+            }
+         ],
+         "recentFiles": [],
+         "gamepad": {
+            "deadZone": 0.5,
+            "precision": 3,
+            "profiles": [
+               {
+                  "id": [
+                     "Logitech Cordless RumblePad 2 (STANDARD GAMEPAD Vendor: 046d Product: c219)"
+                  ],
+                  "icon": "fas fa-gamepad",
+                  "active": true,
+                  "profileName": "Logitech F710 Gamepad",
+                  "shortcuts": {},
+                  "name": "Logitech F710 Gamepad",
+                  "mapping": "standard",
+                  "buttons": [
+                     {
+                        "label": "A",
+                        "value": 0,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     },
+                     {
+                        "label": "B",
+                        "value": 1,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     },
+                     {
+                        "label": "X",
+                        "value": 2,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     },
+                     {
+                        "label": "Y",
+                        "value": 3,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     },
+                     {
+                        "label": "LB",
+                        "value": 4,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     },
+                     {
+                        "label": "RB",
+                        "value": 5,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     },
+                     {
+                        "label": "LT",
+                        "value": 6,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     },
+                     {
+                        "label": "RT",
+                        "value": 7,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     },
+                     {
+                        "label": "Back",
+                        "value": 8,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     },
+                     {
+                        "label": "Start",
+                        "value": 9,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     },
+                     {
+                        "label": "L3",
+                        "value": 10,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     },
+                     {
+                        "label": "R3",
+                        "value": 11,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     },
+                     {
+                        "label": "Up",
+                        "value": 12,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     },
+                     {
+                        "label": "Down",
+                        "value": 13,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     },
+                     {
+                        "label": "Left",
+                        "value": 14,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     },
+                     {
+                        "label": "Right",
+                        "value": 15,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     }
+                  ],
+                  "axes": [
+                     0,
+                     0,
+                     0,
+                     0
+                  ],
+                  "joystickOptions": {
+                     "stick1": {
+                        "horizontal": {
+                           "primaryAction": "x",
+                           "secondaryAction": "x",
+                           "isReversed": false
+                        },
+                        "vertical": {
+                           "primaryAction": "y",
+                           "secondaryAction": "y",
+                           "isReversed": false
+                        },
+                        "mpgMode": {
+                           "primaryAction": null,
+                           "secondaryAction": null,
+                           "isReversed": false
+                        }
+                     },
+                     "stick2": {
+                        "horizontal": {
+                           "primaryAction": "a",
+                           "secondaryAction": "a",
+                           "isReversed": false
+                        },
+                        "vertical": {
+                           "primaryAction": "z",
+                           "secondaryAction": "z",
+                           "isReversed": false
+                        },
+                        "mpgMode": {
+                           "primaryAction": null,
+                           "secondaryAction": null,
+                           "isReversed": false
+                        }
+                     },
+                     "zeroThreshold": 30,
+                     "movementDistanceOverride": 100,
+                     "fixedSpeedMode": false
+                  },
+                  "lockout": {
+                     "button": null,
+                     "active": false
+                  },
+                  "modifier": {
+                     "button": null
+                  }
+               },
+               {
+                  "id": [
+                     "Xbox 360 Controller (XInput STANDARD GAMEPAD)",
+                     "Xbox 360 Controller (STANDARD GAMEPAD Vendor: 045e Product: 028e)",
+                     "Wireless Gamepad (Vendor: 2563 Product: 0575)"
+                  ],
+                  "icon": "fas fa-gamepad",
+                  "active": true,
+                  "profileName": "Xbox Controller",
+                  "shortcuts": {},
+                  "name": "Xbox Controller",
+                  "mapping": "standard",
+                  "buttons": [
+                     {
+                        "label": "A",
+                        "value": 0,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     },
+                     {
+                        "label": "B",
+                        "value": 1,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     },
+                     {
+                        "label": "X",
+                        "value": 2,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     },
+                     {
+                        "label": "Y",
+                        "value": 3,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     },
+                     {
+                        "label": "LB",
+                        "value": 4,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     },
+                     {
+                        "label": "RB",
+                        "value": 5,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     },
+                     {
+                        "label": "LT",
+                        "value": 6,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     },
+                     {
+                        "label": "RT",
+                        "value": 7,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     },
+                     {
+                        "label": "Back",
+                        "value": 8,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     },
+                     {
+                        "label": "Start",
+                        "value": 9,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     },
+                     {
+                        "label": "L3",
+                        "value": 10,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     },
+                     {
+                        "label": "R3",
+                        "value": 11,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     },
+                     {
+                        "label": "Up",
+                        "value": 12,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     },
+                     {
+                        "label": "Down",
+                        "value": 13,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     },
+                     {
+                        "label": "Left",
+                        "value": 14,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     },
+                     {
+                        "label": "Right",
+                        "value": 15,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     },
+                     {
+                        "label": "Home",
+                        "value": 16,
+                        "primaryAction": null,
+                        "secondaryAction": null
+                     }
+                  ],
+                  "axes": [
+                     0,
+                     0,
+                     0,
+                     0
+                  ],
+                  "joystickOptions": {
+                     "stick1": {
+                        "horizontal": {
+                           "primaryAction": "x",
+                           "secondaryAction": "x",
+                           "isReversed": false
+                        },
+                        "vertical": {
+                           "primaryAction": "y",
+                           "secondaryAction": "y",
+                           "isReversed": false
+                        },
+                        "mpgMode": {
+                           "primaryAction": null,
+                           "secondaryAction": null,
+                           "isReversed": false
+                        }
+                     },
+                     "stick2": {
+                        "horizontal": {
+                           "primaryAction": "a",
+                           "secondaryAction": "a",
+                           "isReversed": false
+                        },
+                        "vertical": {
+                           "primaryAction": "z",
+                           "secondaryAction": "z",
+                           "isReversed": false
+                        },
+                        "mpgMode": {
+                           "primaryAction": null,
+                           "secondaryAction": null,
+                           "isReversed": false
+                        }
+                     },
+                     "zeroThreshold": 30,
+                     "movementDistanceOverride": 100,
+                     "fixedSpeedMode": false
+                  },
+                  "lockout": {
+                     "button": null,
+                     "active": false
+                  },
+                  "modifier": {
+                     "button": null
+                  }
+               }
+            ]
+         },
+         "terminal": {
+            "inputHistory": []
+         },
+         "mode": "DEFAULT",
+         "rotaryAxis": {
+            "firmwareSettings": {
+               "$101": "19.75308642",
+               "$111": "8000.00",
+               "$20": "0",
+               "$21": "0"
+            },
+            "defaultFirmwareSettings": {
+               "$101": "200",
+               "$111": "4000",
+               "$20": "0",
+               "$21": "0"
+            },
+            "forceHardLimits": false,
+            "forceSoftLimits": false,
+            "useAaxisForGrbl": false
+         },
+         "shouldWarnZero": false,
+         "diagnostics": {
+            "stepperMotor": {
+               "storedValue": null
+            }
+         },
+         "park": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+         },
+         "notifications": [],
+         "toastDuration": 0,
+         "enableDarkMode": false
+      },
+      "widgets": {
+         "atc": {
+            "toolMap": {},
+            "templates": {
+               "version": 20260227,
+               "sdVersion": 20260227,
+               "variables": {
+                  "_tc_rack_enable": {
+                     "default": 0,
+                     "value": 0
+                  },
+                  "_tc_slots": {
+                     "default": 6,
+                     "value": 0
+                  },
+                  "_tc_slot_offset": {
+                     "default": 90,
+                     "value": 0
+                  },
+                  "_irt_offset_mode": {
+                     "default": 0,
+                     "value": 0
+                  },
+                  "_ort_offset_mode": {
+                     "default": 0,
+                     "value": 0
+                  },
+                  "_passthrough_offset_setting": {
+                     "default": 0,
+                     "value": 0
+                  },
+                  "_holder_sense": {
+                     "default": 1,
+                     "value": 0
+                  },
+                  "_pres_sense": {
+                     "default": 1,
+                     "value": 0
+                  }
+               },
+               "variableFile": "P100.macro",
+               "macros": [
+                  {
+                     "name": "P302.macro",
+                     "content": ";=======================================================================================\n;This is a macro for probing rack position for first time setup of a tool rack\n;=======================================================================================\n;Must run after completion of the ATC initialization macro P200.macro\n;requires machine to be homed, rack sensor #<_tc_input_rack> HIGH and probe to be in starting position above first pull-stud with #<_tc_input_th> HIGH\n;Sets g59.1 rack offset for leftmost tool position; represents pos of center of collar of tool holder\n\n;Note: Current version of grblhal () contains a bug that causes controller to hang when subroutine implementation is used for this macro. Until resolved, probing sequences are repeated inline and within the helper macro P510.macro. \n\n;TODO:\n;verify positioning in y does not exceed machine limits when running probe cycle and possibly inform user of mis-mounted rack or bent forks.\n\n;================setup================\n;#<_tc_input_th> -> TH sensor pin\n#<_NAN> = -9999999\n#<_XPrb> = #<_NAN>\n#<_YPrb> = #<_NAN>\n#<_ZPrb> = #<_NAN>\n#<_studDiam> = 6.5\n#<_xBKOff> = 3\n#<_yBKOff> = 2\n#<_roughStep> = 0.5\n#<_fineStep> = 0.2\n#<_ZPrbSensitivity> = #<_NAN>\n\n#<rackMode> = -1\n#<setUnits> = #<_NAN>\n;Z offset includes probe sensing distance of ~3mm\n#<probeZOffset> = -12\n#<probeYOffset> = -46\n#<rack2expX> = #<_NAN>\n#<rack2expY> = #<_NAN>\n#<rack2expZ> = #<_NAN>\nG4 P0.2\n\n;=================MACRO START=====================\n;Pre-flight checks\n;Check homed state\nG65 P508\n\n;Check ATC Initialization\nG65 P509\n\n;Turn off all active spindles and stop coolant\n(print, Disabling spindles and coolant...)\nM5 $-1\nM9\nG4 P0.1\n\n;Set Units as MM\no101 if [#4006 EQ 20]\n    ;if current is SAE then switch units for macro and retain flag for later\n    (print, Setting units to MM during probe utility, will revert to previous units after completion.)\n    #<setUnits> = 1\n    G21\no101 endif\n\n;Check Rack Setup\n;Check for rack presence\nG4 P0\nM66 P[#<_tc_input_rack>] L3 Q0.01\nG4 P0\n\no102 if [#5399 NE -1]\n    (abort, ATCI:1|Utility Aborted|The rack sensor does not detect a rack. Please ensure the tool rack is physically installed and the rack sensor is triggered, then trying again. [A-302-01])\no102 endif\n\n;check for rack configuration\n;#<_tc_slots> -> points to rack arrangment 6 or 12\no103 if [#<_tc_slots> EQ 6]\n    (print, Configured for 6 Tool: Rack Mode 0)\n    #<rackMode> = 0\no103 elseif [#<_tc_slots> EQ 12]\n    (print, Configured for 12 Tool: Rack Mode 1)\n    #<rackMode> = 1\no103 else\n    (abort, ATCI:1|Pull-Stud Position Found|The machine will now move to the next position in the sequence. Please be ready to E-stop the machine if a collision appears imminent. Select \"Resume\" to continue. [U-302-02])\no103 endif\n\n;check probe in starting position\nG4 P0\nM66 P[#<_tc_input_th>] L4 Q0.01\nG4 P0\no104 if [#5399 EQ -1]\n    (abort, ATCI:1|Utility Aborted|The Stud-Finder must be pre-triggered to start the utility. Jog the spindle until the sensor is ~1mm above pull-stud and the indicator LED is on, then try again. [A-302-03])\no104 endif\n\n(print, Disabling safe keepouts...)\nM960 P0\nG4 P0.1\n\n;Begin Probing Sequence\n(print, ATCI:0|Machine Movement Caution|The machine is about to perform an automated routine to determine rack position. Please be ready to E-stop the machine if a collision appears imminent. Select \"Resume\" to continue. [U-302-01])\nM0\n\n;Initialize staring position for determining Z height offset when probing x and y\nG4 P0\n#<startX> = #<_abs_x>\n#<startY> = #<_abs_y>\n#<startZ> = #<_abs_z>\nG4 P0\n\n;Probe First Pull-stud\nG65 P510\n\n;Retain user positioned sensor z offset to maintain consistency of probing (0.8X original touchoff travel distance to avoid crashing probe into pull-stud)\n#<_ZPrbSensitivity> = [0.8 * ABS[#<_ZPrb> - #<startZ>]]\n\n;rough position over second pullstud based on tool offset spacing\n(print, ATCI:0|Pull-Stud Position Found|The machine will now move to the next position in the sequence. Please be ready to E-stop the machine if a collision appears imminent. Select \"Resume\" to continue. [U-302-02])\nM0\n\nG4 P0\nG1 G53 Z0 F6000\nG1 G91 X[-1 * 90 * 5] F6000\nG1 G53 Z[-60] F1000\n\n;Free pinstate before probing\nG4 P0\nM66 P[#<_tc_input_th>] L4 Q0.01\nG4 P0\n\n;Probe Z Pos\n#<currI> = 0\nG1 G53 Z[#<_ZPrb> + #<_xBKOff>] F500\nG4 P0\no105 do\n    G1 G91 Z[-1 * #<_fineStep>] F500\n    M66 P[#<_tc_input_th>] L4 Q0.01\n    #<currI> = [#<currI> + 1]\nG4 P0\no105 while[[#5399 NE 0] AND [#<currI> LT [[#<_xBKOff> / #<_fineStep>] + 5]]]\n\no106 if [#5399 NE 0]\n    (abort, ATCI:1|Pull-Stud Not Found|The sensor could not find the next pull-stud. Please ensure a tool holder is in the slot and the rack is parallel to the machine, then try again. Alternatively, consult the Troubleshooting Guide. [A-302-04])\no106 endif\n\n;Set z height to position roughtly above stud as the starting position before probing occurred to maintain sensor consistency\nG4 P0\nG1 G91 Z[-1 * #<_ZPrbSensitivity>] F100\nG4 P0\n\n;Probe Second Stud\nG65 P510\n\n#<rack2expX> = [#<_XPrb> - 90]\n#<rack2expY> = #<_YPrb>\n#<rack2expZ> = #<_ZPrb>\n\no107 if [#<rackMode> EQ 0]\n    (print, Rack Mode 0 detected, setting offsets...)\n\no107 elseif [#<rackMode> EQ 1]\n    (print, Rack Mode 1 detected, continuing to probe second rack position...)\n    (print, ATCI:0|Pull-Stud Position Found|The machine will now move to the next position in the sequence. Please be ready to E-stop the machine if a collision appears imminent. Select \"Resume\" to continue. [U-302-02])\n    M0\n    G4 P0\n    ;Move to next PS\n    ;rough position over 3rd pullstud based on tool offset spacing\n    G1 G53 Z0 F6000\n    G1 G91 X[-90] F6000\n    G1 G53 Z[-70] F1000\n    \n    ;Free pinstate before probing\n    G4 P0\n    M66 P[#<_tc_input_th>] L4 Q0.01\n    G4 P0\n\n    #<currI> = 0\n\n    ;Probe Z Pos\n    G1 G53 Z[#<_ZPrb> + #<_xBKOff>] F500\n    G4 P0\n    o201 do\n        G1 G91 Z[-1 * #<_fineStep>] F500\n        M66 P[#<_tc_input_th>] L4 Q0.01\n        #<currI> = [#<currI> + 1]\n        G4 P0\n    o201 while[[#5399 NE 0] AND [#<currI> LT [[#<_xBKOff> / #<_fineStep>] + 5]]]\n\n    o202 if [#5399 NE 0]\n        (abort, ATCI:1|Pull-Stud Not Found|The sensor could not find the next pull-stud. Please ensure a tool holder is in the slot and the rack is parallel to the machine, then try again. Alternatively, consult the Troubleshooting Guide. [A-302-04])\n    o202 endif\n\n    ;Set z height to position roughtly above stud as the starting position before probing occurred to maintain sensor consistency\n    G4 P0\n    G1 G91 Z[-1 * #<_ZPrbSensitivity>] F100\n    G4 P0\n\n    ;Probe 3rd Stud\n    G65 P510\n\n    ;Check Second Rack Mounting Alignment\n    o203 if [[ABS[#<_XPrb> - #<rack2expX>] GT 2] OR [ABS[#<_YPrb> - #<rack2expY>] GT 2] OR [ABS[#<_ZPrb> - #<rack2expZ>] GT 2]]\n        (abort, ATCI:1|Rack Alignment Error|The second rack is not in the expected position. Please ensure both racks are lined up side-by-side with no gap between them, then try again. Alternatively, consult Troubleshooting Guide. [A-302-05])\n    o203 endif\n\n    ;Rough position over 4th pullstud based on tool offset spacing\n    (print, ATCI:0|Pull-Stud Position Found|The machine will now move to the next position in the sequence. Please be ready to E-stop the machine if a collision appears imminent. Select \"Resume\" to continue. [U-302-02])\n    M0\n\n    G4 P0\n    G1 G53 Z0 F6000\n    G1 G91 X[-1 * 90 * 5] F6000\n    G1 G53 Z[-70] F1000\n\n    ;Free pinstate before probing\n    G4 P0\n    M66 P[#<_tc_input_th>] L4 Q0.01\n    G4 P0\n\n    ;Probe Z Pos\n    #<currI> = 0\n    G1 G53 Z[#<_ZPrb> + #<_xBKOff>] F500\n    G4 P0\n    o204 do\n        G1 G91 Z[-1 * #<_fineStep>] F500\n        M66 P[#<_tc_input_th>] L4 Q0.01\n        #<currI> = [#<currI> + 1]\n        G4 P0\n    o204 while[[#5399 NE 0] AND [#<currI> LT [[#<_xBKOff> / #<_fineStep>] + 5]]]\n\n    o205 if [#5399 NE 0]\n        (abort, ATCI:1|Pull-Stud Not Found|The sensor could not find the next pull-stud. Please ensure a tool holder is in the slot and the rack is parallel to the machine, then try again. Alternatively, consult the Troubleshooting Guide. [A-302-04])\n    o205 endif\n\n    ;Set z height to position roughtly above stud as the starting position before probing occurred to maintain sensor consistency\n    G4 P0\n    G1 G91 Z[-1 * #<_ZPrbSensitivity>] F100\n    G4 P0\n\n    ;Probe 4th Stud\n    G65 P510\n\no107 endif\n\n;Set Offsets\nG10 L2 P7 X[#<_XPrb>] Y[#<_YPrb> + #<probeYOffset>] Z[#<_ZPrb> + #<probeZOffset>] \nG4 P0\n\n(print, ATCI:1|Rack Position Found|Rack position found and rack alignment verified. Select \"OK\" to home the machine and proceed to the next step. Recorded Rack Coordinates X:#5341 Y:#5342 Z:#5343 [U-302-03])\nM0\n\n;Return units to inch if previously set\no201 if [#<setUnits> EQ 1]\n    G20\no201 endif\n\n(print, PROBE MACRO COMPLETE)\n\n;Move to safe home position\n(print, Moving to safe home position...)\n$H\n(print, ATCI|rack_set:1)\n;End of Macro\nM99"
+                  },
+                  {
+                     "name": "P506.macro",
+                     "content": "; This is a helper function for moving to safe position from inside the keepout\n\n; Update and validate TLS / safe location\nG65 P512\n\nG53 G0 Z[#<_tc_safe_z>]\nG53 G0 Y[#<_tc_y_pulloff>]\nG53 G0 X[#<_tc_safe_x>]\nG53 G0 Y[#<_tc_safe_y>]\nG4 P0;"
+                  },
+                  {
+                     "name": "P900.macro",
+                     "content": "; P900 Remove tool from spindle nose\n; Logically equivalent to unloading any tool with an off rack procedure\n(debug, Running P900 - Remove tool from nose)\n\n; All Validation handled by TC.macro\n\n#1003 = 1;\nM6T0;\n#1003 = 0;"
+                  },
+                  {
+                     "name": "P502.macro",
+                     "content": "; This is a helper function to check rack sync\n\n(debug, Running helper function P502 for checking tool number - spindle synchronization)\n\nM66 P[#<_tc_input_tis>] L4 Q0.5\no100 if [[#5399] EQ -1]\n  o101 if [#<_current_tool> GT 0 AND #<_current_tool> LT #<_tool_table_size>]\n    (print, ATCI:0|Tool Mismatch Detected|No tool detected in spindle, but Tool #<active_tool> is active in software. Select \"Resume\" to set the spindle to \"Empty\" and continue. [U-502-01])\n    M0\n    M61 Q[#<_empty_tool>]\n    G49\n  o101 endif\no100 else\n  o102 if [#<_current_tool> EQ 0]\n    (print, ATCI:0|Unexpected Tool in Spindle|A tool is detected, but the software indicates the spindle should be empty. Select \"Resume\" to raise the Z-axis, allowing you to remove the tool and re-sync spindle states. [U-502-02])\n    M0\n    G53 G0 Z[#<_tc_safe_z>]\n    \n    ; Move to off rack tool load / unload position\n    o103 do\n      (print, ATCI:0|Unload Tool|Please use the physical release button on the ATC to remove the tool. Once the spindle is empty, select \"Resume\" to continue. [U-502-03])\n      G4P0\n      M64 P[#<_tc_output_bt>]\n      M0\n      M66 P[#<_tc_input_tis>] L3 Q0.05\n      G4P0.1\n    o103 while [[#5399] EQ -1]\n    M65 P[#<_tc_output_bt>]\n    M61 Q[#<_empty_tool>]\n    G49\n  o102 endif\no100 endif\nM99;"
+                  },
+                  {
+                     "name": "P500.macro",
+                     "content": "; This is a helper function to probe the currently installed tool and reapply any new tool offsets.\n; If called without an argument, it will overwrite the existing tool offset\n; If called with an argument of Q1, it will check the currently stored offset against the tool table.\n\n#<_probe_mode> = #17\n\n; Update and validate TLS / safe location\nG65 P512\n\n;Move to tool length sensor\nG53 G0 Z[#<_tc_safe_z>]\nG53 G0 X[#<_tc_measure_x>]\nG53 G0 Y[#<_tc_measure_y>]\nG53 G0 Z[#<_tc_measure_start_z>]\n\n;Scrub old offset, such that it will appear as 0 if probing fails.\no100 if [#<_probe_mode> EQ 0]\n    G10 L1 P[#<_current_tool>] Z0\n    G43 H[#<_current_tool>]\no100 endif\n\n; Touch-off\nG38.2 G91 Z[#<_tc_seek_dist>] F[#<_tc_seek_feed>]\nG0 G91 Z[#<_tc_retract_dist>]\nG38.2 G91 Z[#<_tc_set_dist>] F[#<_tc_set_feed>]\nG90\n\n; Compute tool offset\n#<tool_offset> = [#[5203 + [#5220 * 20]] + #5063]\n(debug, Tool #<_current_tool> offset is #<tool_offset>)\n\no200 if [#<_probe_mode> EQ 0]\n    ; Define new offset\n    G10 L1 P[#<_current_tool>] Z[#<tool_offset>]\no200 elseif [#<_probe_mode> EQ 1]\n    ; Check existing offset\n    G65P2Q[#<_current_tool>]R2\n    o210 while [ABS[#<tool_offset> - #<_value>] GT #<_check_tl_error>]\n        (print, ATCI:0|Tool Length Error|The measured tool length differs from the recorded value by more than #<_check_tl_error>mm. Check for breakage or tooling change. \"Resume\" to probe a new offset, or \"Reset\" to stop the program. [U-500-01])\n        M0\n        ;Reprobe offset, recursive call has race condition issues so using a while loop instead\n        ; Touch-off\n        ;Move to tool length sensor\n        G53 G0 Z[#<_tc_safe_z>]\n        G53 G0 X[#<_tc_measure_x>]\n        G53 G0 Y[#<_tc_measure_y>]\n        G53 G0 Z[#<_tc_measure_start_z>]\n        G38.2 G91 Z[#<_tc_seek_dist>] F[#<_tc_seek_feed>]\n        G0 G91 Z[#<_tc_retract_dist>]\n        G38.2 G91 Z[#<_tc_set_dist>] F[#<_tc_set_feed>]\n        G90\n        ; Compute tool offset\n        #<tool_offset> = [#[5203 + [#5220 * 20]] + #5063]\n        (debug, Tool #<_current_tool> offset is #<tool_offset>)\n        G10 L1 P[#<_current_tool>] Z[#<tool_offset>]\n        G65P2Q[#<_current_tool>]R2\n    o210 endwhile\no200 endif\n\n; Apply new offset.\nG43 H[#<_current_tool>]\n\n; Move to safe height\nG53 G0 Z[#<_tc_safe_z>]"
+                  },
+                  {
+                     "name": "P509.macro",
+                     "content": "; This is a helper function to check if P200.macro is loaded successfully.\n; #1001 is set to 1 when the parameters in P200 is set.\n\nG4 P0;\no100 if [#1001 NE 1]\n  o110 if [EXISTS[#<_initializing>] NE 1]\n    (abort, ATCI:2|Tool Change Aborted|The tool Changer is disabled due to unresolved ATC errors. Home the machine to reset the ATC, resolve any errors shown and try again. [A-509-01])\n  o110 else\n    (abort, ATCI:1|ATC Setup Aborted|The ATC setup macro P200.macro is missing or is corrupted. Return to ATC Setup and reload the macro files and try again. [A-509-02])\n  o110 endif\no100 endif\nG4 P0;\n"
+                  },
+                  {
+                     "name": "P508.macro",
+                     "content": "; This is a helper function to check if the machine has been homed.\n\nG4 P0;\no100 if [#<_homed_state> NE 1]\n  (abort, ATCI:2|Tool Change Aborted|Machine is not homed. Please home your machine and try again. [A-508-01])\no100 endif\nG4 P0;\n"
+                  },
+                  {
+                     "name": "P510.macro",
+                     "content": ";=======================================================================================\n;This is a helper macro for probing a single pull-stud for the probe utility P302.macro\n;=======================================================================================\n;Must run after completion of the ATC initialization macro P200.macro and the probing P302.macro\n;requires machine to be homed and probe to be in starting position above pull-stud with #<_tc_input_th> High\n\n;Probe First Stud\n(print, Running Probe Subroutine)\n;initialize local variables\n#<currI> = 0\n#<currJ> = 0\n#<y_prb> = #<_NAN>\n#<x_prb_R> = #<_NAN>\n#<x_prb_L> = #<_NAN>\n#<z_prb> = #<_NAN>\n#<xDiam> = #<_NAN>\n#<xCent> = #<_NAN>\n#<xMax> = #<_NAN>\n#<xMaxY> = #<_NAN>\n#<xLast> = #<_NAN>\n#<foundXMax> = #<_NAN>\nG4 P0.2\n\n;Free pinstate before probing\nG4 P0\nM66 P[#<_tc_input_th>] L4 Q0.01\nG4 P0\n\n;Move out of pullstud boundary in pos y dir until sensor reads low\no201 do\n    G4 P0\n    G1 G91 Y[#<_roughStep>] F6000\n    M66 P[#<_tc_input_th>] L4 Q0.01\n    G4 P0\no201 while[#5399 EQ 0]\n\n;=================Probe first Pull-stud=====================\n;Back-off from pull-stud\nG4 P0\nG1 G91 X[#<_xBKOff> + [#<_studDiam> / 2]] Y[#<_yBKOff>] F2000\n\n;Free pinstate before probing\nG4 P0\nM66 P[#<_tc_input_th>] L4 Q0.01\nG4 P0\n\n;Find First Stud Y pos rough search\no202 while [[#5399 NE 0] AND [#<currJ> LT [[#<_yBKOff> / #<_roughStep>] + 5]]]\n    o301 do\n        G1 G91 X[-1 * #<_roughStep>] F6000\n        M66 P[#<_tc_input_th>] L4 Q0.01\n        #<currI> = [#<currI> + 1]\n        G4 P0\n    o301 while  [[#5399 NE 0] AND [#<currI> LT [[#<_xBKOff> / #<_roughStep>] + 10]]]\n    o302 if [#5399 EQ 0]\n        #<y_prb> = #<_abs_y>\n        o202 break\n    o302 endif\n    G1 G91 X[#<_roughStep> * #<currI>] F6000\n    G1 G91 Y[-1 * #<_roughStep>]\n    #<currJ> = [#<currJ> + 1]\n    #<currI> = 0\no202 endwhile\n\no203 if [#5399 NE 0]\n    #<y_prb> = #<_NAN>\n    (abort, ATCI:1|Center of Pull-Stud not Found|The sensor did not find the center of the pull-stud. Move the sensor closer to the top of the pull-stud and try again. Alternatively, consult the Troubleshooting Guide. [A-510-01])\no203 endif\n\n;Do fine search\nG4 P0\nG1 G91 X[#<_xBKOff>] Y[#<_roughStep>] F3000\n\n;Free pinstate before probing\nG4 P0\nM66 P[#<_tc_input_th>] L4 Q0.01\nG4 P0\n\no204 while [[#5399 NE 0] AND [#<currJ> LT [[#<_yBKOff> / #<_fineStep>] + 5]]]\n    o301 do\n        G1 G91 X[-1 * #<_fineStep>] F3000\n        M66 P[#<_tc_input_th>] L4 Q0.01\n        #<currI> = [#<currI> + 1]\n        G4 P0\n    o301 while  [[#5399 NE 0] AND [#<currI> LT [[#<_xBKOff> / #<_fineStep>] + 5]]]\n    o302 if [#5399 EQ 0]\n        #<y_prb> = #<_abs_y>\n        o204 break\n    o302 endif\n    G1 G91 X[#<_fineStep> * #<currI>] F3000\n    G1 G91 Y[-1 * #<_fineStep>]\n    #<currJ> = [#<currJ> + 1]\n    #<currI> = 0\no204 endwhile\n\no205 if [#5399 NE 0]\n    (print, #<currI> #<currJ>)\n    ;return y_prb to null state to prevent garbage value being set (Unused but may want to check later)\n    #<y_prb> = #<_NAN>\n    (abort, ATCI:1|Center of Pull-Stud not Found|The sensor did not find the center of the pull-stud. Move the sensor closer to the top of the pull-stud and try again. Alternatively, consult the Troubleshooting Guide. [A-510-01])\no205 endif\n\n(print, Front Y Probe Success: #<y_prb>)\n\n;Find First Stud X Pos\nG4 P0\nG1 G91 X[[#<_studDiam> / 2] + #<_xBKOff>] Y[-1 * [#<_studDiam> / 3]] F6000\n\n;Free pinstate before probing\nG4 P0\nM66 P[#<_tc_input_th>] L4 Q0.01\nG4 P0\n\n;Find Y Centerline\n#<currI> = 0\no206 do\n    o301 do\n        G4 P0\n        G1 G91 X[-1 * #<_fineStep>] F3000\n        M66 P[#<_tc_input_th>] L4 Q0.01\n        #<currI> = [#<currI> + 1]\n        G4 P0\n    o301 while [[#5399 NE 0] AND [#<currI> LT [[#<_xBKOff> / #<_fineStep>] + 40]]]\n\n    o302 if [#5399 NE 0]\n        (abort, ATCI:1|Center of Pull-Stud not Found|The sensor did not find the center of the pull-stud. Move the sensor closer to the top of the pull-stud and try again. Alternatively, consult the Troubleshooting Guide. [A-510-01])\n        M99\n    o302 elseif [#5399 EQ 0]\n        o401 if [[[#<xLast> - #<_abs_x>] GT 0.05] AND [[#<xLast> - #<_abs_x>] LE 0.5]]\n            #<foundXMax> = 1\n            o206 break\n        o401 elseif [[#<xLast> - #<_abs_x>] LE 0.05]\n            #<xLast> = #<_abs_x>\n            #<foundXMax> = 0\n        o401 endif\n        o402 if [#<_abs_x> GT #<xMax>]\n            #<xMax> = #<_abs_x>\n            #<xMaxY> = #<_abs_y>\n        o402 endif\n    o302 endif\n    G4 P0\n    G1 G91 X[#<_fineStep> * #<currI>] F3000\n    G1 G91 Y[-1 * #<_fineStep>] F3000\n    M66 P[#<_tc_input_th>] L4 Q0.01\n    G4 P0\n    #<currI> = 0\no206 while[#<foundXMax> LT 1]\n\n;Find X Centerline\n#<x_prb_R> = #<xMax>\nG4 P0\nG1 G91 Z[#<_xBKOff>] F3000\nG1 G91 X[-1 * #<_studDiam> - #<_xBKOff> - 3] F3000\nG1 G53 Y[#<xMaxY>] F3000\nG1 G91 Z[-1 * #<_xBKOff>] F1000\n\n;Free pinstate before probing\nG4 P0\nM66 P[#<_tc_input_th>] L4 Q0.01\nG4 P0\n\n#<currI> = 0\no207 do\n    G1 G91 X[#<_fineStep>] F3000\n    M66 P[#<_tc_input_th>] L4 Q0.01\n    #<currI> = [#<currI> + 1]\n    G4 P0\no207 while[[#5399 NE 0] AND [#<currI> LT [[#<_xBKOff> / #<_fineStep>] + 40]]]\n\no208 if [#5399 NE 0]\n    (abort, ATCI:1|Center of Pull-Stud not Found|The sensor did not find the center of the pull-stud. Move the sensor closer to the top of the pull-stud and try again. Alternatively, consult the Troubleshooting Guide. [A-510-01])\n    M99\no208 endif\n\nG4 P0\n#<x_prb_L> = #<_abs_x>\nG4 P0\n\n;Find stud diameter\n#<xDiam> = [ABS[#<x_prb_R> - #<x_prb_L>]]\n#<xCent> = [[#<x_prb_L> + #<x_prb_R>] / 2]\n\n(print, X1 diam: #<xDiam>)\n(print, X1 CL: #<xCent>)\n\n;Reprobe Front Y position\nG4 P0\nG1 G53 Y[#<y_prb> + #<_yBKOff>] F6000\nG1 G53 X[#<xCent>] F6000\n\n;Free pinstate before probing\nG4 P0\nM66 P[#<_tc_input_th>] L4 Q0.01\nG4 P0\n\n#<currI> = 0\no209 do\n    G1 G91 Y[-1 * #<_fineStep>] F3000\n    M66 P[#<_tc_input_th>] L4 Q0.01\n    #<currI> = [#<currI> + 1]\n    G4 P0\no209 while[[#5399 NE 0] AND [#<currI> LT [[#<_yBKOff> / #<_fineStep>] + 5]]]\n\no210 if [#5399 NE 0]\n    (abort, ATCI:1|Center of Pull-Stud not Found|The sensor did not find the center of the pull-stud. Move the sensor closer to the top of the pull-stud and try again. Alternatively, consult the Troubleshooting Guide. [A-510-01])\no210 endif\n\n#<_XPrb> = #<xCent>\n\n;Calculate Exponential Moving Average between old Y and latest Y CP (e = 0.4 from literature for best appx weighting)\no212 if [#<_YPrb> EQ #<_NAN>]\n    ;initialize first Y probe value\n    #<_YPrb> = [#<_abs_y> - [#<xDiam> / 2]]\no212 else\n    #<_YPrb> = [#<_YPrb> + [0.4 * [[#<_abs_y> - [#<xDiam> / 2]] - #<_YPrb>]]]\no212 endif\n\n;Z probe\nG4 P0\nG1 G91 Z[#<_xBKOff>] F3000\nG1 G53 X[#<xCent>] Y[#<_abs_y> - [#<xDiam> / 2]] F3000\n\n;Free pinstate before probing\nG4 P0\nM66 P[#<_tc_input_th>] L4 Q0.01\nG4 P0\n\n#<currI> = 0\no213 do\n    G1 G91 Z[-1 * #<_fineStep>] F1000\n    M66 P[#<_tc_input_th>] L4 Q0.01\n    #<currI> = [#<currI> + 1]\n    G4 P0\no213 while[[#5399 NE 0] AND [#<currI> LT [[#<_xBKOff> / #<_fineStep>] + 5]]]\n\no214 if [#5399 NE 0]\n    (abort, ATCI:1|Center of Pull-Stud not Found|The sensor did not find the center of the pull-stud. Move the sensor closer to the top of the pull-stud and try again. Alternatively, consult the Troubleshooting Guide. [A-510-01])\no214 endif\n\n;Calculate EMA between old Z and latest Z (e = 0.4 from literature for best appx weighting)\n\no215 if [#<_ZPrb> EQ #<_NAN>]\n    ;initialize first Z probe value\n    (print, First Z init)\n    #<_ZPrb> = #<_abs_z>\no215 else\n    (print, Averaging Z)\n    #<_ZPrb> = [#<_ZPrb> + [0.4 * [#<_abs_z> - #<_ZPrb>]]]\n    (print, new z #<_ZPrb>)\no215 endif\nG4 P0\n\n(print, Stud Pos: #<_XPrb>, #<_YPrb>, #<_ZPrb>)\n\n;Free Pinstate after subroutine completion to prevent probing error or controller hang on next probe.\nM66 P[#<_tc_input_th>] L4 Q0.01\nG4 P2\n\n(print, End of Subroutine)"
+                  },
+                  {
+                     "name": "P512.macro",
+                     "content": "; This is a helper function to update and validate TLS and safe location\n\n; X and Y machine coordinate positions of the tool setter.\n#<_tc_measure_x> = #5381\n(debug, Tool Measure X: #<_tc_measure_x>, from G59.3)\n#<_tc_measure_y> = #5382\n(debug, Tool Measure Y: #<_tc_measure_y>, from G59.3)\n\n#<_tc_safe_x> = #5381 ; X coordinate should be identical to the TLS\n(debug, Safe Position: X#<_tc_safe_x> Y#<_tc_safe_y>)"
+                  },
+                  {
+                     "name": "P301.macro",
+                     "content": "; ************ DESCRIPTION ************\n; Picks up tool QX and probes it\n; If it is an in rack tool, allow the rack to be empty\n; If it is an off rack tool, user must insert a tool\n\n; Local variables\n#<_301_tool_cache> = #17;\n\n; ************ BEGIN VALIDATION ************\n;Check initializing\nG65P507;\n\n;Check homed state\nG65P508;\n\n; Check tool changer parameters\nG65P509;\n\n;Check pressure with helper function\nG65 P501\n\n; ************ PAUSE VALIDATION ************\n\n; ************ BEGIN SETUP ************\n\n; Turn off spindle and coolant\nM5\nM9\n(debug, Spindle and coolant turned off)\n\n; Record current units\no210 if [#<_metric> EQ 0]\n  #<_tc_return_units_301> = 20\no210 else\n  #<_tc_return_units_301> = 21\no210 endif\n(debug, Units recorded)\n\n; Force metric\nG21 G90\n(debug, Change to metric mode)\n\n; Record starting position, this process need to be done here since restore position is disabled in TC.macro as part of probe mode.\n#<_tc_start_x_301> =  #<_abs_x>\n#<_tc_start_y_301> =  #<_abs_y>\n#<_tc_start_z_301> = #<_abs_z>\n(debug, Absolute position before tool change: #<_tc_start_x_301>, #<_tc_start_y_301>, #<_tc_start_z_301>)\n\n; Feed override Off\nM50 P0\n\n; *************** END SETUP ****************\n\n; *************** CONTINUE VALIDATION ****************\n; Movements based validation (i.e. checks that may involve movement)\n\n; Check rack sync with helper function\nG65 P502\n; *************** END VALIDATION ****************\n\n; *************** STAGING ****************\n\n;Move to safe position\n(debug, Moving to safe position)\nG65 P504\n\n; *************** END STAGING ****************\n\n; ************ BEGIN TOOL CHANGE ************\n#1002 = 1\nM6T[#<_301_tool_cache>]\n#1002 = 0 ;Reset if tool change was not required\n\n(debug, Tool Change Complete)\no200 if [#<_current_tool> EQ #<_301_tool_cache>]\n    (debug, tool change successful, probing current tool)\n    G65P500\no200 else\n    (debug, tool change unsuccessful, offset cleared)\n    G10 L1 P[#<_301_tool_cache>] Z0\n    ;TODO Add retry option\n    (abort, ATCI:2|Probing Aborted|Tool #<selected_tool_cache> could not be loaded. Rack slot is empty or out of reach. Ensure the tool is in the correct slot and verify your rack position settings. [A-301-01])\no200 endif\n\n; ************ BEGIN RESTORE MODAL ************\n; xxxxxxxx RESTORE POSITION xxxxxxxx\n; Move to safe Z\nG53 G0 Z[#<_tc_safe_z>]\n\n; Go to safe position\nG53 G0 X[#<_tc_safe_x>]\nG53 G0 Y[#<_tc_safe_y>]\n\n; Check target position > safe\no300 if [#<_tc_start_y_301> GE #<_tc_safe_y>]\n  G53 G0 X[#<_tc_start_x_301>]\no300 endif\n\n(debug, Reapplying start coordinates #<_tc_start_x_301>, #<_tc_start_y_301>)\nG53 G0 X[#<_tc_start_x_301>] Y[#<_tc_start_y_301>]\n\n; xxxxxxxx RESTORE UNITS xxxxxxxx\n(debug, Reapplying units #<_tc_return_units_301>)\nG[#<_tc_return_units_301>]\n\n; xxxxxxxx RESTORE FEED OVERRIDE xxxxxxxx\n;Restore feed override\nM50 P1\n\n; ************ END RESTORE MODAL ************\nM99;"
+                  },
+                  {
+                     "name": "P511.macro",
+                     "content": "; This is a helper function to update and validate off rack tool location\n\n; The X and Y machine coordinate positions for loading off rack tools\n#<_tc_off_rack_x> = #5361\n(debug, Off rack X: #<_tc_off_rack_x>, from G59.2)\n#<_tc_off_rack_y> = #5362\n(debug, Off rack Y: #<_tc_off_rack_y>, from G59.2)\n\n"
+                  },
+                  {
+                     "name": "P999.macro",
+                     "content": "; This is the firmware configuration file that governs the application of firmware values required to operate the Sienci ATC system.\n; Asterisks (*) indicate non ATC specific firmware settings\n\n; ******** INITIALIZING ********\n; Flag to indicate initialization, will skip all error checking and prevent unintentional code execution for the current session.\n#<_initializing> = 1;\n\n; ******** TOOL CHANGER SETTINGS ********\n; xxxxxxxx GENERAL CONFIG xxxxxxxx\n(print, Applying tool changer settings)\n$485 = 1;       Keep tool number over reboot\n$675 = 3;       Execute M6T0 and Fail M6 if tc.macro is not found\n\n; xxxxxxxx PIN CONFIG xxxxxxxx\n$370 = 0;       Invert I/O Port inputs (TODO: Not override unrrelated bitfields)\n$372 = 1;       Invert I/O Port outputs (TODO: Not override unrrelated bitfields)\n\n$750 = 7;       Event 1 trigger: Spindle at speed\n$751 = 0;       Event 2 trigger: M62 - M65 only\n$752 = 0;       Event 3 trigger: M62 - M65 only\n\n$760 = 0;       Event 1 port\n$761 = 1;       Event 2 port\n$762 = 2;       Event 3 port\n\n; ******** HOMING SETTINGS ********\n$44 = 4;        Primary Homing Move\n$45 = 1;        Secondary Homing Move\n$46 = 2;        Tertiary Homing Move\n\n; ******** TOOL PROBE SETTINGS ********\n\n; ******** SD CARD SETTINGS ********\n(print, Applying SD settings)\n$650 = 1;       Auto mount SD Card\n\n; ******** COMMUNICATIONS SETTINGS ********\n(print, Applying communications settings)\n$534 = 1;       Output NGC debug message\n\n; ******** OTHER SETTINGS ********\n(print, Applying other settings)\n$676 = 3;       On reset, clear homed status if position was lost and clear offsets\n\n; ******** REFRESH ********\n(print, Refreshing Firmware Settings)\nG4P0;\n$$\nG4P0;\n\n; ******** STARTUP RELATED SETTINGS ********\n(print, Applying startup related settings)\n$N1=G65P100\nG4P0.5\n$N0=G65P200\nG4P0.5\n\n; ******** APPLY MANUAL TOOL CHANGE OFFSET ********\nG65P1Q130\n#<manual_x_pos> = [#<_value> - 50]\nG65P1Q131\n#<manual_y_pos> = [-0.4 * #<_value>]\n\nG10 L2 P8 X[#<manual_x_pos>] Y[#<manual_y_pos>] Z0\n\n(print, Default manual tool change position set to X: #<manual_x_pos> | Y: #<manual_y_pos> | Z: 0)\n\n; ******** CLEAR SPINDLE NOSE ********\n; Check tool changer setup\nG65 P509;\n\n;TODO Clear spindle nose\nM66 P[#<_tc_input_tis>] L4 Q0.05\no200 if [[#5399] NE -1]\n    o201 do\n        (print, ATCI:0|Spindle Must Be Empty During Setup|Press the physical tool release button on the ATC to remove the tool. Once the spindle is empty, select \"Resume\" to continue. [U-999-01])\n        G4P0\n        M64 P[#<_tc_output_bt>]\n        M0\n        M66 P[#<_tc_input_tis>] L4 Q0.05\n    o201 while [[#5399] NE -1]\n    M65 P[#<_tc_output_bt>]\no200 endif\n\nM61 Q[#<_empty_tool>]\nG49\n\n; ******** CHECK RACK CONFIGURATION ********\n; Check for rack configuration mis-match\nM66 P[#<_tc_input_rack>] L4 Q0.01\no300 if [#5399 NE -1 AND #<_tc_slots> LE 0]\n    (print, ATCI:1|Unconfigured Rack Detected|The rack sensor is active, but no rack is configured. Return to the previous page and select a configuration with a rack, or remove the rack and try again. [W-999-01])\no300 endif\n\nM99"
+                  },
+                  {
+                     "name": "P501.macro",
+                     "content": "; This is a helper function to check air pressure\n\n(debug, Running helper function P501 for pressure checking)\n\no100 if [#<_pres_sense> EQ 1]\n  M66 P[#<_tc_input_pres>] L4 Q0.01\n  G4P0.1\n  o101 while [#5399 EQ -1]\n    G4P0\n    (print, ATCI:0|System Pressure Below 82psi|Please check your compressor and regulator settings. Once pressure is restored, select \"Resume\" to clear this error. [U-501-01])\n    G4P0\n    M0\n    M66 P[#<_tc_input_pres>] L4 Q0.01\n    G4P0.1\n  o101 endwhile\no100 endif\n\nM99;"
+                  },
+                  {
+                     "name": "P504.macro",
+                     "content": "; This is a helper function for moving to safe position from outside the keepout\n; May be turned into a osub call in the future\n#<direct> = #17\n\n; Update and validate TLS / safe location\nG65 P512\n\nG53 G0 Z[#<_tc_safe_z>]\n\n; Check current position > safe\no100 if [#<_abs_y> GE #<_tc_safe_y> AND #<direct> NE 1]\n    ; Current position adjacent to rack\n    G53 G0 Y[#<_tc_safe_y>]\no100 endif\n\nG53 G0 X[#<_tc_safe_x>] Y[#<_tc_safe_y>]\nG4 P0;"
+                  },
+                  {
+                     "name": "P503.macro",
+                     "content": ";Rack probing helper\n;Pre-positions spindle tool sensor above right-most pullstud to help users during rack mounting and for probing rack offsets\n\n#<setUnits> = -1\n\n;=====================Pre-flight checks=====================\n;Check homed state\nG65 P508\n\n(print, ATCI:1|Caution Keepouts will be disabled for macro|Wait for spindle and coolant shutoff ~6s...)\nM0\n\n;Disable keepouts\nM810 P0\n\n;Turn off all active spindles and stop coolant\n(print, Turning Off Spindles and Coolant...)\nM5 $-1\nM9\nG4 P0.1\n\n;Set Units as MM\no100 if [#4006 EQ 20]\n    ;if current is SAE then switch units for macro and retain flag for later\n    (debug, Setting Units to MM for Macro will return once finished.)\n    #<setUnits> = 1\n    G21\no100 endif\n\n\n(print, ATCI:0|Position Stud-Finder Sensor above right-most tool-rack position?)\nM0\n\nG4 P0\nG1 G53 Z0 F6000\nG4 P0\n\n;1113.759,-8.947,-113.425,0.000 6 tool rack offset rough positioning\nG1 G53 X[1113] Y[-8.5] F3000\nG4 P0\n\n(print, ATCI:0|Rough Position Set|Please fine-tune the position of the sensor until it is 1mm above the pull-stud and verify sensor light illuminates before probing rack position)\nM0\n\no102 if [#<setUnits>]\n    #<setUnits> = -1\n    G20\no102 endif\n\nM99"
+                  },
+                  {
+                     "name": "P901.macro",
+                     "content": "; P901 Load tool at spindle nose\n(debug, Running P900 - Load tool at spindle nose)\n\n; All Validation handled by TC.macro\n\n; ************ VARIABLES ************\n#<selected_tool_cache> = #17;\n\n#1004 = 1;\nM6T[#<selected_tool_cache>];\n#1004 = 0;"
+                  },
+                  {
+                     "name": "P300.macro",
+                     "content": "; ************ DESCRIPTION ************\n; Probe all tools in the rack\n\n; Local variables\n#<_current_slot> = 1;\n\n; ************ BEGIN VALIDATION ************\n\n;Check initializing\nG65P507;\n\n;Check homed state\nG65P508;\n\n; Check tool changer parameters\nG65P509;\n\n; Check rack size\nG4 P0\no100 if [#<_tc_slots> EQ 0]\n  (abort, ATCI:1|Probing Aborted|No rack is configured. Please run ATC Setup to configure your rack and try again. [A-300-01])\no100 endif\nG4 P0\n; Check offset mode\no101 if [#<_irt_offset_mode> EQ 0]\n  (abort, ATCI:1|Probing Aborted|The system is set to \"Probe on Load.\" Tools will be automatically measured the first time they are picked up from the rack. Go to \"ATC Options\" if you prefer to probe all tools manually beforehand. [A-300-02])\no101 endif\nG4 P0\n\n; Check rack presence\nM66 P[#<_tc_input_rack>] L4 Q0.01\no102 if [#5399 EQ -1]\n  (abort, ATCI:1|Probing Aborted|The rack sensor does not detect a rack. Please ensure the tool rack is physically installed and the rack sensor is triggered, then trying again. [A-300-03])\no102 endif\nG4 P0.1\n\n;Check pressure with helper function\nG65 P501\n\n; ************ PAUSE VALIDATION ************\n\n; ************ BEGIN SETUP ************\n\n; Turn off spindle and coolant\nM5\nM9\n(debug, Spindle and coolant turned off)\n\n; Record current units\no210 if [#<_metric> EQ 0]\n  #<_tc_return_units_300> = 20\no210 else\n  #<_tc_return_units_300> = 21\no210 endif\n(debug, Units recorded)\n\n; Force metric\nG21 G90\n(debug, Change to metric mode)\n\n; Record starting position\n#<_tc_start_x_300> =  #<_abs_x>\n#<_tc_start_y_300> =  #<_abs_y>\n#<_tc_start_z_300> = #<_abs_z>\n(debug, Absolute position before tool change: #<_tc_start_x_300>, #<_tc_start_y_300>, #<_tc_start_z_300>)\n\n; Feed override Off\nM50 P0\n\n; *************** END SETUP ****************\n\n; *************** CONTINUE VALIDATION ****************\n; Movements based validation (i.e. checks that may involve movement)\n\n; Check rack sync with helper function\nG65 P502\n; *************** END VALIDATION ****************\n\n; *************** STAGING ****************\n\n;Move to safe position\n(debug, Moving to safe position)\nG65 P504\n\n; *************** END STAGING ****************\n\n; ************ BEGIN TOOL CHANGE ************\no200 while [#<_current_slot> LE #<_tc_slots>]\n    #1002 = 1;\n    M6T[#<_current_slot>]\n    #1002 = 0;\n    (debug, Tool Change Complete)\n    o210 if [#<_current_tool> EQ #<_current_slot>]\n        (debug, tool change successful, probing current tool)\n        G65P500\n    o210 else\n        (debug, tool change unsuccessful, offset cleared)\n        G10 L1 P[#<_current_slot>] Z0\n    o210 endif\n    ; Move to safe height\n    G53 G0 Z[#<_tc_safe_z>]\n    #<_current_slot> = [#<_current_slot> + 1]\no200 endwhile\n\n; Empty the spindle nose\nM6T0;\n\n; ************ BEGIN RESTORE MODAL ************\n; xxxxxxxx RESTORE POSITION xxxxxxxx\n; Move to safe Z\nG53 G0 Z[#<_tc_safe_z>]\n\n; Go to safe position\nG53 G0 X[#<_tc_safe_x>]\nG53 G0 Y[#<_tc_safe_y>]\n\n; xxxxxxxx RESTORE UNITS xxxxxxxx\n(debug, Reapplying units #<_tc_return_units_300>)\nG[#<_tc_return_units_300>]\n\n; xxxxxxxx RESTORE FEED OVERRIDE xxxxxxxx\n;Restore feed override\nM50 P1\n\n; ************ END RESTORE MODAL ************\n\nM99;"
+                  },
+                  {
+                     "name": "P507.macro",
+                     "content": "; This is a helper function to check if the controller is initialized without a controller restart.\n; The _initializing variable is set by P999.macro.\n\nG4 P0;\no100 if [EXISTS[#<_initializing>] EQ 1]\n  (abort, ATCI:2|Tool Change Aborted|Restart required after ATC Setup. Power cycle your controller to use the ATC. [A-507-01])\no100 endif\nG4 P0;"
+                  },
+                  {
+                     "name": "P505.macro",
+                     "content": "; This is a helper function for moving to the off rack tool position\n; May be turned into a osub call in the future\n#<direct> = #17\n\n; Update and validate off rack position\nG65 P511\n\nG53 G0 Z[#<_tc_safe_z>]\n\n; Check current position > safe\no100 if [#<_abs_y> GE #<_tc_safe_y> AND #<direct> NE 1]\n    ; Current position adjacent to rack\n    G53 G0 Y[#<_tc_safe_y>]\no100 endif\n\n; Check target position > safe\no200 if [#<_tc_off_rack_y> GE #<_tc_safe_y> AND #<direct> NE 1]\n    G53 G0 X[#<_tc_off_rack_x>]\no200 endif\n\n; If both positions are < safe, direct movement\nG53 G0 X[#<_tc_off_rack_x>] Y[#<_tc_off_rack_y>]\nG4 P0;"
+                  },
+                  {
+                     "name": "TC.macro",
+                     "content": ";if 1002 is active, set probing to 1\n;if selected tool is an off rack tool, set load condition to 1, if selected tool is 0, set load condition to -1\n;if current tool is an off rack tool, set load condition to 1, if current tool is 0, set load condition to -1\n;if tool does not have an offset and probe mode is not active, pause and wait for user to confirm probe.\n;if skip_load is false, run the unload tool program\n  ;unload tool program needs to diffrentiate between IRT and ORT\n;run the load tool program\n  ;if probing is 0, raise an alarm when no tool is picked up\n;If probing is 0, do not apply offsets.\n\n(debug, Tool change begin)\n\n; Local variables\n#<probing> = 0; Probe Mode\n#<force_manual_unload> = 0;\n#<force_manual_load> = 0;\n#<unload_mode> = 0;\n#<load_mode> = 0\n#<passthrough> = 1;\n#<unload_offset_mode> = 0\n#<load_offset_mode> = 0\n#<selected_tool_cache> = #<_selected_tool>; Caching selected tool variable as M61 will clear this variable when changing current tool to 0 between tool unload and tool load.\n\n; ************ BEGIN VALIDATION ************\n\n; Check if tool changing as part of a probe cycle\no130 if [#1002 EQ 1]\n  (debug, Mode: Probing)\n  #1002 = 0\n  #<probing> = 1\no130 else\n  (debug, Mode: Normal)\no130 endif\n\n; Check if tool unload is to be performed manually regardless of rack status\no131 if [#1003 EQ 1]\n  (debug, Forced Manual Tool Unload)\n  #1003 = 0\n  #<force_manual_unload> = 1\no131 endif\n\n; Check if tool load is to be performed manually regardless of rack status\no132 if [#1004 EQ 1]\n  (debug, Forced Manual Tool Load)\n  #1004 = 0\n  #<force_manual_load> = 1\no132 endif\n\n;Check initializing\nG65P507;\n\n;Check homed state\nG65P508;\n\n; Check tool changer parameters\nG65P509;\n\n; Check rack presence\nM66 P[#<_tc_input_rack>] L4 Q0.01\no133 if [#5399 NE -1]\n  ; Rack present\n  ; Check for rack configuration mis-match\n  o134 if [#<_tc_slots> LE 0]\n    ;Unconfigured rack present, follow safe area movements to avoid crashing.\n    #<passthrough> = 2;\n  o134 else\n    #<passthrough> = 0;\n  o134 endif\no133 else\n  ; Rack not present\n  #<passthrough> = 1;\no133 endif\n\n; Re-enable keepout unless rack is not present.\n; Keepout is turned off with P200 at startup should rack size equal to 0 so there is no need to disable it here.\no135 if [#<passthrough> EQ 0]\n  M960 P1;\n  (print, Keepout enabled)\no135 endif\n\n; Check if tool unload should be skipped because an empty tool is selected, or if passthrough mode is on, or if forcing a manual unload\no140 if [#<_current_tool> EQ #<_empty_tool>]\n  #<unload_mode> = -1\n  (debug, Unload skipped)\no140 elseif [#<_current_tool> GT #<_tc_slots> OR #<force_manual_unload> EQ 1 OR #<passthrough> EQ 1]\n  #<unload_mode> = 1\n  (debug, Manual unload)\no140 else\n  (debug, Rack unload)\no140 endif\n\n; Check if tool load should be skipped because an empty tool is selected, or if passthrough mode is on, or if forcing a manual load\no141 if [#<selected_tool_cache> EQ #<_empty_tool>]\n  #<load_mode> = -1\n  (debug, Load skipped)\no141 elseif [#<selected_tool_cache> GT #<_tc_slots> OR #<force_manual_load> EQ 1 OR #<passthrough> EQ 1]\n  #<load_mode> = 1\n  (debug, Manual load)\no141 else\n (debug, Rack load)\no141 endif\n\n; Check offset mode that applies\n  ; Use off rack unload setting when tool exceeds slot size or during passthrough (and rack offset modes not forced)\n  ; Use in rack setting otherwise\n  ; when not in probe mode,\n  ; when empty tool is not selected, \n  ; When probe new offset every time is not enforced\n\n\no160 if [#<_current_tool> GT #<_tc_slots> OR [#<_current_tool> LE #<_tc_slots> AND #<_current_tool> GT 0 AND #<passthrough> EQ 1 AND #<_passthrough_offset_setting> EQ 0]]\n  #<unload_offset_mode> = #<_ort_offset_mode>\no160 else\n  #<unload_offset_mode> = #<_irt_offset_mode>\no160 endif\n\no161 if [#<selected_tool_cache> GT #<_tc_slots> OR [#<selected_tool_cache> LE #<_tc_slots> AND #<selected_tool_cache> GT 0 AND #<passthrough> EQ 1 AND #<_passthrough_offset_setting> EQ 0]]\n  #<load_offset_mode> = #<_ort_offset_mode>\no161 else\n  #<load_offset_mode> = #<_irt_offset_mode>\no161 endif\n\n;Force probing when user selected a tool without an offset\no170 if [#<probing> EQ 0 AND #<load_offset_mode> GT 0]\n  G65 P2 Q[#<selected_tool_cache>] R2\n  o171 if [#<_value> EQ 0]\n    (print, ATCI:0|Tool #<selected_tool_cache> Offset Missing|\"Resume\" to probe the tool on pick-up, \"Reset\" if the slot is empty or the wrong tool was selected. [U-TCM-01])\n    M0\n    #<load_offset_mode> = 0\n  o171 endif\no170 endif\n\n;Check pressure with helper function\nG65 P501\n\n; ************ PAUSE VALIDATION ************\n\n; ************ BEGIN SETUP ************\n\n; Turn off spindle and coolant\nM5\nM9\n(debug, Spindle and coolant turned off)\n\n; Record current units\no210 if [#<_metric> EQ 0]\n  #<_tc_return_units> = 20\no210 else\n  #<_tc_return_units> = 21\no210 endif\n(debug, Units recorded)\n\n; Force metric\nG21 G90\n(debug, Change to metric mode)\n\n; Record starting position\n#<tc_start_x> =  #<_abs_x>\n#<tc_start_y> =  #<_abs_y>\n#<tc_start_z> = #<_abs_z>\n(debug, Absolute position before tool change: #<tc_start_x>, #<tc_start_y>, #<tc_start_z>)\n\n; Feed override Off\nM50 P0\n\n; *************** END SETUP ****************\n\n; *************** CONTINUE VALIDATION ****************\n; Movements based validation\n\n; Check rack sync with helper function\nG65 P502\n; *************** END VALIDATION ****************\n\n; *************** POSITION STAGING (UNLOAD) ****************\n; Conditionals identical to unload, just split out for clarity.\no300 if [#<unload_mode> EQ 0]\n  ; Move to safe position\n  G65 P504\n  ; Disable keepout\n  M960 P0;\n  G4 P0;\n  (debug, Disable keepout)\no300 elseif [#<unload_mode> EQ 1]\n  ; Move to off rack position\n  o310 if [[#<_tc_slots> EQ 0 AND #<passthrough> EQ 0] OR #<passthrough> EQ 1]\n    G65 P505 Q1\n  o310 else\n    G65 P505 Q0\n  o310 endif\no300 else\n  ; Hold position\no300 endif\n\n; *************** END POSITION STAGING (UNLOAD) ****************\n\n; ************ BEGIN UNLOAD ************\n\no400 if [#<unload_mode> EQ 0]\n  (debug, Unloading in rack tool)\n  ; ************ MOTION BLOCK - UNLOAD IN RACK TOOL ************\n    G53 G0 Z[#<_tc_safe_z>]\n    G53 G0 Y[#<_tc_y_pulloff>]\n\n    #<tc_x_unload> = [[[#<_current_tool> - 1] * #<_tc_slot_offset>] + #<_tc_slot_one_x>]\n    #<tc_y_unload> = #<_tc_slot_one_y>\n\n    ;Move to staging position for tool unload\n    G53 G0 X[#<tc_x_unload>] Y[#<_tc_y_pulloff>]\n\n    ; Tool holder check\n    o410 if [#<_holder_sense> EQ 1]\n      (debug, Checking tool presence for collision)\n      G53 G0 Y[#<tc_y_unload> + #<_tc_holder_sense_offset_y>]\n      G53 G0 Z[#<_tc_load_z> + #<_tc_holder_sense_offset_z> + #<_tc_holder_sense_seek_z>]\n      \n      #<current_probed_distance> = 0;\n      o411 do\n          M66 P0 L3 Q0.01\n          G1 G91 Z-0.1 F100\n          G90\n          #<current_probed_distance> = [#<current_probed_distance> + 0.1]\n          G4 P0\n          ;Added a 0.1 since there seems to be some caching issue with the loop.\n      o411 while [[#5399] NE -1 AND #<current_probed_distance> LT [#<_tc_holder_sense_seek_z>-0.1]]\n\n      o412 if [#<current_probed_distance> EQ #<_tc_holder_sense_seek_z>]\n        (debug, No tool in tool holder, safe to unload current tool.)\n      o412 else\n        ; Exit keepout and re-enable feed override\n        G65 P506\n        M50 P1\n        ; TODO Add a retry loop\n       (abort, ATCI:2|Tool Change Aborted|Slot #<_current_tool> in the rack is already occupied. Manually remove the tool from the rack at slot #<_current_tool> and try again. [A-TCM-02])\n      o412 endif\n      #<current_probe_offset> = 0;\n\n      ;G53 G0 Z[#<_tc_safe_z>]\n      G53 G0 Y[#<_tc_y_pulloff>]\n    o410 endif\n\n    ; Move to tool change location\n    G53 G0 Z[#<_tc_load_z>]\n    G53 G1 Y[#<tc_y_unload>] F[#<_tc_y_pulloff_feed>]\n    G4 P0.5\n\n    ; Release drawbar\n    M64 P[#<_tc_output_db>]\n    ; Allow for all air to vent in case there is residule pressure in the system\n    G4 P0.8\n    ; Verify drawbar release\n    M66 P[#<_tc_input_db>] L4 Q0.5\n    o420 if [[#5399] EQ -1]\n      ;Close drawbar on error\n      M65 P[#<_tc_output_db>]\n      G53 G1 Y[#<_tc_y_pulloff>] F[#<_tc_y_pulloff_feed>]\n      ; Exit keepout and re-enable feed override\n      G65 P506\n      M50 P1\n      (abort, ATCI:2|Tool Change Aborted|Drawbar failed to engage. Check if the compressor is powered on, if there is sufficient air pressure, and inspect pneumatic lines for kinks or restrictions. [A-TCM-03])\n    o420 endif\n\n    ; Move away from tool rack\n    G4 P0.2\n    G53 G1 Z[#<_tc_load_z> + #<_tc_dedust_z_offset>] F[#<_tc_z_dedust_feed>]\n    G4 P0\n    ; Drawbar off\n    M65 P[#<_tc_output_db>]\n    G4 P0.5\n\n    ; Check if tool is unloaded\n    M66 P[#<_tc_input_tis>] L3 Q0.5\n    o430 if [[#5399] EQ -1]\n      ;TODO Add retry option\n      G65 P506\n      ; Exit keepout and re-enable feed override\n      G65 P506\n      M50 P1\n      (abort, ATCI:2|Tool Change Aborted|Tool #<_current_tool> failed to release from the spindle. Refer to the Troubleshooting Guide to safely free the tool holder. Inspect tool forks for alignment or mechanical damage. [A-TCM-04])\n    o430 endif\n\n    ; Move to safe height\n    G53 G0 Z[#<_tc_safe_z>]\n\no400 elseif [#<unload_mode> EQ 1]\n  (debug, Unloading off rack tool)\n    ; Pause as long as the tool is not removed\n    o440 do\n      G4 P0\n      (print, ATCI:0|Action Required|Unload Tool #<_current_tool>|Please use the physical release button on the ATC to remove the tool. Once the spindle is empty, select \"Resume\" to continue. [U-TCM-02])\n      G4 P0\n      M64 P[#<_tc_output_bt>]\n      M0\n      M66 P[#<_tc_input_tis>] L3 Q0.05\n      G4 P0.1\n    o440 while [[#5399] EQ -1]\n    M65 P[#<_tc_output_bt>]\no400 else\n(debug, Unload skipped)\no400 endif\n\n(debug, Unload Complete)\n\n; ************ END UNLOAD ************\n\n; ************ BEGIN TOOL LENGTH MANAGEMENT (UNLOAD) ************\n; Scrub current tool offset when\n; Not probing\n; Not an empty tool\n; Not using tool table\no500 if [#<probing> EQ 0 AND #<unload_mode> NE -1 AND #<unload_offset_mode> EQ 0]\n  G10 L1 P[#<_current_tool>] Z0\no500 endif\n\nM61 Q[#<_empty_tool>]\nG4 P0\nG49\n(debug, Tool length offset cleared, vacant tool number applied)\n\n; ************ END TOOL LENGTH MANAGEMENT (UNLOAD) ************\n\n; *************** POSITION STAGING (LOAD) ****************\n; Conditionals identical to unload, just split out for clarity.\no600 if [#<unload_mode> EQ 0]\n  ; Unload happened in rack\n  o610 if [#<load_mode> EQ 0]\n    ; Load to happen in rack\n    ; Hold position\n  o610 elseif [#<load_mode> EQ 1]\n    ; Load to happen off rack\n    ; Exit rack\n    G65 P506\n    ; Re-enable keepout\n    M960 P1;\n    G4 P0;\n    (debug, Enable keepout)\n    ; Move to off rack position\n    G65 P505\n  o610 else\n    ; Loading empty\n    ; Exit rack\n    G65 P506\n    ; Re-enable keepout\n    M960 P1;\n    G4 P0;\n    (debug, Enable keepout)\n    ; Hold position\n  o610 endif\no600 elseif [#<unload_mode> EQ 1]\n  ; Unload happened off rack\n  o620 if [#<load_mode> EQ 0]\n    ; Load to happen in rack\n    ; Move to safe position\n    G65 P504\n    ; Disable keepout\n    M960 P0;\n    G4 P0;\n    (debug, Disable keepout)\n  o620 elseif [#<load_mode> EQ 1]\n    ; Load to happen off rack\n    ; Hold position\n  o620 else\n    ; Loading empty\n    ; Hold position\n  o620 endif\no600 else\n  ; Unloaded empty\n  o630 if [#<load_mode> EQ 0]\n    ; Load to happen in rack\n    ; Move to safe position\n    G65 P504\n    ; Disable keepout\n    M960 P0;\n    G4 P0;\n    (debug, Disable keepout)\n  o630 elseif [#<load_mode> EQ 1]\n    ; Load to happen off rack\n    ; Move to off rack position\n    ; Move to off rack position\n    o631 if [[#<_tc_slots> EQ 0 AND #<passthrough> EQ 0] OR #<passthrough> EQ 1]\n      G65 P505 Q1\n    o631 else\n      G65 P505 Q0\n    o631 endif\n  o630 else\n    ; Loading empty\n    ; Hold position\n  o630 endif\no600 endif\n; *************** END POSITION STAGING (LOAD) ****************\n\n; ************ BEGIN LOAD ************\n\no700 if [#<load_mode> EQ 0]\n  (debug, Loading in rack tool)\n  ; ************ MOTION BLOCK - LOAD IN RACK TOOL ************\n  ; Compute Load coordinates\n\n  #<tc_x_load> = [[[#<selected_tool_cache> - 1] * #<_tc_slot_offset>] + #<_tc_slot_one_x>]\n  #<tc_y_load> = #<_tc_slot_one_y>\n\n  ; TODO Disable Keepout\n  ; Go to load coordinates\n  G53 G0 Z[#<_tc_safe_z>]\n  G53 G0 Y[#<tc_y_load>]\n  G53 G0 X[#<tc_x_load>]\n  G53 G0 Z[#<_tc_load_z> + #<_tc_dedust_z_offset>]\n  G4 P0.1\n\n  ; Release drawbar\n  M64 P[#<_tc_output_db>]\n  ; Allow for all air to vent in case there is residule pressure in the system\n  G4 P0.8\n  ; Verify drawbar release\n  M66 P[#<_tc_input_db>] L4 Q0.5\n  o710 if [[#5399] EQ -1]\n    ;Close drawbar on error\n    M65 P[#<_tc_output_db>]\n    ; Exit keepout and re-enable feed override\n    G65 P506\n    M50 P1\n    (abort, ATCI:2|Tool change aborted|Drawbar did not engage, compressor system may be offline or under pressure. [A-TCM-03])\n  o710 endif\n\n  G53 G1 Z[#<_tc_load_z>] F[#<_tc_z_dedust_feed>]\n\n  G4 P0.5\n  M65 P[#<_tc_output_db>]\n  G4 P1\n\n  ; Check if tool is loaded\n  M66 P[#<_tc_input_tis>] L4 Q0.5\n  o720 if [[#5399] EQ -1]\n    o721 if [#<probing> EQ 1]\n    ;Allow for empty tool slot in probe mode\n      (debug, Tool #<selected_tool_cache> empty in probe mode)\n      #<selected_tool_cache> = #<_empty_tool>\n    o721 else\n      ; Exit keepout and re-enable feed override\n      G65 P506\n      M50 P1\n      ;TODO Add retry option\n      (abort, ATCI:2|Tool Tool Change Aborted|Tool #<selected_tool_cache> could not be loaded. Rack slot is empty or out of reach. Ensure the tool is in the correct slot and verify your rack position settings. [A-TCM-05])\n    o721 endif\n  o720 else\n    ;Tool change is successful, pulloff\n    G53 G1 Y[#<_tc_y_pulloff>] F[#<_tc_y_pulloff_feed>]\n    G53 G0 Z[#<_tc_safe_z>]\n  o720 endif\n\no700 elseif [#<load_mode> EQ 1]\n  (debug, Loading off rack tool)\n  ; Pause as long as the tool is not removed\n  o730 do\n    G4 P0\n    (print, ATCI:0|Load Tool #<_current_tool>|Press the physical tool release button on the ATC and insert the tool holder into the spindle. Once the tool is loaded, select \"Resume\" to continue. [U-TCM-03])\n    G4 P0\n    M64 P[#<_tc_output_bt>]\n    M0\n    M66 P[#<_tc_input_tis>] L4 Q0.05\n    G4 P0.1\n  o730 while [[#5399] EQ -1]\n  M65 P[#<_tc_output_bt>]\n\no700 else\n  (debug, Loading skipped)\no700 endif\n\n; Change current tool number\nM61 Q[#<selected_tool_cache>]\nG4 P0\n\n(debug, Load Complete)\n; ************ END LOAD ************\n\n; *************** POSITION STAGING (POST LOAD) ****************\no800 if [#<load_mode> EQ 0]\n  ; Load happened in rack\n  ; Exit rack\n  ; TODO Refactor such that sequential probes with empty holder position do not require exit of tool rack.\n  G65 P506\n  ; Re-enable keepout\n  M960 P1;\n  G4 P0;\n  (debug, Enable keepout)\no800 elseif [#<load_mode> EQ 1]\n  ; Load happened off Rack\n  ; Move to safe area if probing is required\n  ; Move directly if rack does not exist or is not present\n  ; Else hold position\n  o810 if [#<probing> EQ 0 AND #<load_offset_mode> NE 1]\n    o811 if [[#<_tc_slots> EQ 0 AND #<passthrough> EQ 0] OR #<passthrough> EQ 1]\n      G65 P504 Q1\n    o811 else\n      G65 P504 Q0\n    o811 endif\n  o810 endif\no800 else\n  ; Loaded empty\n  ; Hold position\no800 endif\n\n; *************** END POSITION STAGING (POST LOAD) ****************\n\n; ************ BEGIN TOOL LENGTH MANAGEMENT (LOAD) ************\n\n; Apply existing tool offset (if any), this will be used if compensation fails.\nG43 H[#<_current_tool>]\n\n; Execute probing if not part of a probing cycle and not loading an empty tool\n; Probe when\n; Not in probe mode\n; Not loading an empty tool \no900 if [#<probing> EQ 0 AND #<load_mode> NE -1]\n  ; If offset mode is 0, probe\n  ; If offset mode is 1, apply existing offset\n  ; If offset mode is 2, check\n\n  o910 if [#<load_offset_mode> EQ 0]\n    G65 P500 Q0\n    G65 P504\n  o910 elseif [#<load_offset_mode> EQ 2]\n    G65 P500 Q1\n    G65 P504\n  o910 endif\no900 endif\n; ************ END TOOL LENGTH MANAGEMENT (LOAD) ************\n\n; ************ BEGIN RESTORE MODAL ************\n\n; xxxxxxxx RESTORE POSITION xxxxxxxx \n; User is at safe position or at off rack tool load position\n\n;Ignore when M6 is triggered as part of a probing cycle\no1000 if [#<load_mode> NE -1 AND #<probing> EQ 0]\n  ; Move to safe Z\n  G53 G0 Z[#<_tc_safe_z>]\n\n  o1010 if [[#<_tc_slots> EQ 0 AND #<passthrough> EQ 0] OR #<passthrough> EQ 1]\n    ;Skip\n  o1010 else\n    ; Check current position > safe\n    o1011 if [#<_abs_y> GE #<_tc_safe_y>]\n      ; Current position adjacent to rack\n      G53 G0 Y[#<_tc_safe_y>]\n    o1011 endif\n\n    ; Check target position > safe\n    o1012 if [#<tc_start_y> GE #<_tc_safe_y>]\n      G53 G0 X[#<tc_start_x>]\n    o1012 endif\n  o1010 endif\n  \n  ; Restore original position\n  G53 G0 X[#<tc_start_x>]Y[#<tc_start_y>]\n\no1000 endif\n\n; xxxxxxxx RESTORE UNITS xxxxxxxx\nG[#<_tc_return_units>]\n(debug, Reapplying units #<_tc_return_units>)\n\n; xxxxxxxx RESTORE FEED OVERRIDE xxxxxxxx\n;Restore feed override\nM50 P1\n\n; ************ END RESTORE MODAL ************\n\n(debug, End tool change macro)\nM99;"
+                  },
+                  {
+                     "name": "P200.macro",
+                     "content": "; ******** SYSTEMS SETUP ********\n#<_min_vminor> = 260221\n(debug, Minimum firmware version: #<_min_vminor>)\n\no100 if [#<_vminor> LT #<_min_vminor>]\n  (abort, ATCI:1|Tool Changer Disabled|Controller firmware is out of date. Please update to version #<_min_vminor> or above and try again. [A-200-01])\no100 endif\n\n; ******** BEGIN USER CONFIGURATION ********\n\n; ******** BASIC SETUP ********\n\n; The number of slots in your magazine. Defined in P100.macro, will abort if not defined.\n;#<_tc_slots> = 6; Enable for Ad-hoc definition.\n\no101 if [[EXISTS[#<_tc_slots>]] EQ 0]\n  (abort, ATCI:1|Tool Changer Disabled|Setup parameter \"_tc_slots\" missing. Please run ATC Setup and try again. [A-200-03])\no101 endif\n(debug, Slots: #<_tc_slots>)\n\n; The number of slots in your tool table.\no102 if [#<_tool_table_size> EQ 0]\n  (abort, ATCI:1|Tool Changer Disabled|The \"Tool Table\" option is not enabled in the current controller firmware. Please flash the official firmware from Sienci Labs, or a custom build with the \"Tool Table\" option enabled. [A-200-02])\no102 endif\n\n(debug, Table size: #<_tool_table_size>)\n\n; ******** OFFSET BEHAVIOR SETUP ********\n; On and Off Rack Offset Management Modes defined by variables #<_irt_offset_mode> and #<_ort_offset_mode>\n; Passthrough mode offset management defined by variable #<_passthrough_offset_setting>\n; Defined in P100.macro, will abort if not defined.\n\n; 0: Always probe new offset\n; 1: Always use tool table offset\n; 2: Always use tool table offset and verify\n\n;#<_irt_offset_mode> = 2; Enable for Ad-hoc definition.\n;#<_ort_offset_mode> = 0; Enable for Ad-hoc definition.\n\n; 0: Follow manual tools offset mode when rack is removed\n; 1: Follow rack loaded tools offset mode when rack is removed\n;#<_passthrough_offset_setting> = 0; Enable for Ad-hoc definition.\n\no103 if [[EXISTS[#<_irt_offset_mode>]] EQ 0]\n  (abort, ATCI:1|Tool Changer Disabled|Setup parameter \"_irt_offset_mode\" missing. Please run ATC Setup and try again. [A-200-04])\no103 elseif [[EXISTS[#<_ort_offset_mode>]] EQ 0]\n  (abort, ATCI:1|Tool Changer Disabled|Setup parameter \"_ort_offset_mode\" missing. Please run ATC Setup and try again. [A-200-05])\no103 elseif [[EXISTS[#<_passthrough_offset_setting>]] EQ 0]\n  (abort, ATCI:1|Tool Changer Disabled|Setup parameter \"_passthrough_offset_setting\" missing. Please run ATC Setup and try again. [A-200-06])\no103 endif\n\n(debug, Offset Mode - Rack: #<_irt_offset_mode> | Manual: #<_ort_offset_mode> | Passthrough: #<_passthrough_offset_setting>)\n\n; ******** COORDINATES SETUP ********\n\n; ******** XY Axis ********\n; The X and Y machine coordinate positions of slot 1.\n\n;Check if slot location is valid\no104 if [[EXISTS[#<_initializing>] NE 1] AND [#<_tc_slots> GT 0] AND [#5341 EQ 0 OR #5342 EQ 0 OR #5343 GE 0]]\n    M960 P0\n  (abort, ATCI:1|Tool Changer Disabled|Rack position not set. Please run ATC Setup to define your rack position and try again. [A-200-10])\no104 endif\n\n#<_tc_slot_one_x> = #5341\n(debug, Slot 1 X: #<_tc_slot_one_x> from G59.1)\n#<_tc_slot_one_y> = #5342\n(debug, Slot 1 Y: #<_tc_slot_one_y> from G59.1)\n\n; The slot offset for your rack. Defined by variables #<_tc_slot_offset>. Defined in P100.macro, will abort if not defined.\n\n;#<_tc_slot_offset> = 90; Enable for Ad-hoc definition.\no105 if [[EXISTS[#<_tc_slot_offset>]] EQ 0]\n  (abort, ATCI:1|Tool Changer Disabled|Setup parameter \"_tc_slot_offset\" missing. Please run ATC Setup and try again. [A-200-07])\no105 endif\n(debug, Slot Offset: #<_tc_slot_offset>)\n\n; The X and Y machine coordinate positions for loading off rack tools\n#<_tc_off_rack_x> = #5361\n(debug, Off rack X: #<_tc_off_rack_x>, from G59.2)\n#<_tc_off_rack_y> = #5362\n(debug, Off rack Y: #<_tc_off_rack_y>, from G59.2)\n\n; The X and Y machine coordinate positions for safely entering and exiting the keepout area\n; TODO Refine the actual position\n\n#<_tc_safe_x> = #5381 ; X coordinate should be identical to the TLS\n#<_tc_safe_y> = -200    ; Fixed value for now, can update to dynamic value based on rack keepouts at a later date once we vetted reliability.\n(debug, Safe Position: X#<_tc_safe_x> Y#<_tc_safe_y>)\n\n; The Y machine coordinate positon for Y-axis pulloff.\n#<_tc_y_pulloff> = [#<_tc_slot_one_y> + 44]\n(debug, Pulloff Y: #<_tc_y_pulloff>)\n\n; The feedrate for Y-axis pulloff.\n#<_tc_y_pulloff_feed> = 1000\n(debug, Pulloff Y Feedrate: #<_tc_y_pulloff_feed>)\n\n; ******** Keepout ********\n; The X and Y machine coordinate positions of slot 1.\n#<shoe_width> = 120\n#<fork_width> = 45\n#<shoe_depth> = 60\n#<fork_front_depth> = 30.5\n\n#<keepout_x_min> = [#<_tc_slot_one_x> - #<shoe_width> / 2 - #<fork_width> / 2]\n(print, Keepout X min: #<keepout_x_min>)\n#<keepout_x_max> = [#<_tc_slot_one_x> + [#<_tc_slots> - 1] * #<_tc_slot_offset> + #<shoe_width> / 2 + #<fork_width> / 2]\n(print, Keepout X max: #<keepout_x_max>)\n#<keepout_y_min> = [#<_tc_slot_one_y> - #<fork_front_depth> - #<shoe_depth>]\n(print, Keepout Y min: #<keepout_y_min>)\n#<keepout_y_max> = 0\n(print, Keepout Y max #<keepout_y_max>)\n\nG65P1Q684S[#<keepout_x_min>]\nG65P1Q686S[#<keepout_x_max>]\nG65P1Q685S[#<keepout_y_min>]\nG65P1Q687S[#<keepout_y_max>]\n\n; Keepout feature on/off\no104 if [#<_tc_slots> EQ 0]\n  (print, Keepout Feature: 0)\n  G65P1Q683S0;\no104 else\n  (print, Keepout Feature: 1)\n  G65P1Q683S3;\no104 endif\n\n; ******** Z Axis ********\n; The Z machine coordinate positon for load.\n#<_tc_load_z> = #5343\n(debug, Load Z: #<_tc_load_z> from G59.1 coordinate)\n\n; The Z coordinate offset for dedust start.\n#<_tc_dedust_z_offset> = 20\n(debug, Dedust Z Offset: #<_tc_dedust_z_offset>)\n\n; The Z axis dedust feedrate.\n#<_tc_z_dedust_feed> = 1500\n(debug, Z Dedust Feedrate: #<_tc_z_dedust_feed>)\n\n; The Z machine coordinate position for clearing all obstacles.\n#<_tc_safe_z> = 0\n(debug, Safe Clearance Z: #<_tc_safe_z>)\n\n; ******** IO CONTROL ********\n\n; The output pin for the drawbar\n#<_tc_output_db> = 1\n(debug, Drawbar output at pin #<_tc_output_db>)\n\n; The output pin for air seal\n#<_tc_output_as> = 0\n(debug, NO Air seal output at pin #<_tc_output_as>)\n\n; The output pin for tool change button enable\n#<_tc_output_bt> = 2\n(debug, Button output at pin #<_tc_output_bt>)\n\n; The input pin for the drawbar sensor\n#<_tc_input_db> = 0\n(debug, Drawbar sensor at pin #<_tc_input_db>)\n\n; The input pin for the tool holder sensor, nominally tied with drawbar sensor.\n#<_tc_input_th> =  #<_tc_input_db>\n(debug, Tool holder sensor at pin #<_tc_input_th>)\n\n; The input pin for the tool in spindle sensor\n#<_tc_input_tis> = 1\n(debug, Tool in spindle sensor at pin #<_tc_input_tis>)\n\n; The input pin for the pressure sensor\n#<_tc_input_pres> = 2\n(debug, Pressure sensor at pin #<_tc_input_pres>)\n\n; The input pin for the rack sensor\n#<_tc_input_rack> = 3\n(debug, Rack presence sensor at pin #<_tc_input_rack>)\n\n; ******** TOOL LENGTH PROBE CONTROL ********\n; X and Y machine coordinate positions of the tool setter.\n#<_tc_measure_x> = #5381\n(debug, Tool Measure X: #<_tc_measure_x>, from G59.3)\n#<_tc_measure_y> = #5382\n(debug, Tool Measure Y: #<_tc_measure_y>, from G59.3)\n\n; Z machine coordinate position at which to begin the initial probe.\n#<_tc_measure_start_z> = 0\n(debug, Tool Measure Start Z: #<_tc_measure_start_z>)\n\n; The distance to probe in search of the tool setter for the initial probe.\n#<_tc_seek_dist> = -150\n(debug, Tool Measure Seek Distance: #<_tc_seek_dist>)\n\n; The distance to retract after the initial probe trigger.\n#<_tc_retract_dist> = 3\n(debug, Tool Measure Retract Distance: #<_tc_retract_dist>)\n\n; The distance to probe in search of the tool setter for the subsequent probe.\n#<_tc_set_dist> = -4\n(debug, Tool Measure Set Distance: #<_tc_set_dist>)\n\n; The feed rate for the initial probe.\n#<_tc_seek_feed> = 1000\n(debug, Tool Measure Seek Feed Rate: #<_tc_seek_feed>)\n\n; The feed rate for the second probe.\n#<_tc_set_feed> = 50\n(debug, Tool Measure Set Feed Rate: #<_tc_set_feed>)\n\n; Check tool length when tool changing\n#<_check_tl_error> = 1\n(debug, Maximum tool length difference to trigger an incorrect tool error #<_check_tl_error>)\n\n; ******** TOOL HOLDER SENSOR CONTROL ********\n\no106 if [[EXISTS[#<_holder_sense>]] EQ 0]\n  (abort, ATCI:1|Tool Changer Disabled|Setup parameter \"_holder_sense\" missing. Please run ATC Setup and try again. [A-200-08])\no106 endif\n(debug, Tool Holder Sensor: #<_holder_sense>)\n\n; Tool holder sensor Y offset relative to spindle center line\n#<_tc_holder_sense_offset_y> = 44;\n(debug, Slot Offset: #<_tc_holder_sense_offset_y>)\n\n; Tool holder sensor Z offset relative to top of pull stud\n#<_tc_holder_sense_offset_z> = 11;\n(debug, Slot Offset: #<_tc_holder_sense_offset_z>)\n\n#<_tc_holder_sense_seek_z> = 8;\n(debug, Slot Offset: #<_tc_holder_sense_seek_z>)\n\n; ******** PRESSURE SENSOR CONTROL ********\n\no107 if [[EXISTS[#<_pres_sense>]] EQ 0]\n  (abort, ATCI:1|Tool Changer Disabled|Setup parameter \"_pres_sense\" missing. Please run ATC Setup and try again. [A-200-09])\no107 endif\n(debug, Pressure Sensor: #<_pres_sense>)\n\n; ******** SYSTEM VARIABLES ********\n; Assign tool 0 as empty\n#<_empty_tool> = 0\n(debug, Empty tool assigned to: T#<_empty_tool>)\n\n; ******** STARTUP ********\n\n; ******** STARTUP ACTIONS ********\n; Turn off spindle, highly unlikely scenario\nM5\n\n; Disable tool change button (Typically turned on by manual tool change resets.)\nM65 P[#<_tc_output_bt>]\n\n; Disable drawbar (Typically turned on by tool change resets.)\nM65 P[#<_tc_output_db>]\n\n; ******** STARTUP CHECK ********\n; Disable during initialization\no200 if [EXISTS[#<_initializing>] EQ 1]\n  (print, Initializing, all checks skipped)\n  ; ******** DISABLE KEEPOUT ********\n  M960 P0\no200 else\n  ;Check homed state\n  o300 if [#<_homed_state> NE 1]\n    (abort, ATCI:1|Machine not Homed|Home your machine to enable tool changing. [W-200-01])\n  o300 endif\n\n  ; Check if state of the spindle is in sync with firmware\n  G65 P502\n\n  ; Check for rack configuration mis-match\n  M66 P[#<_tc_input_rack>] L4 Q0.01\n  o320 if [#5399 NE -1 AND #<_tc_slots> LE 0]\n    o321 if [#<_tc_slots> LE 0]\n    (abort, ATCI:1|Tool Changer Disabled|The rack sensor is active, but no rack is configured. Please run ATC Setup to configure your rack and try again. [A-200-11])\n    o321 endif\n  o320 else\n  ;Re-enable keepout unless rack is not present\n    M960 P1\n  o320 endif\n\n  ; ******** APPLY TOOL OFFSET ********\n\n  ; Reapply tool offset at startup\n  o400 if [#<_current_tool> GT 0 AND #<_current_tool> LT #<_tool_table_size>]\n    ; M61 here to help G43 run properly\n    ; TODO Remove M61 after $REBOOT bug is fixed\n    M61 Q[#<_current_tool>]\n    G43 H[#<_current_tool>]\n    (debug, Tool offset for #<_current_tool> applied)\n  o400 else\n    G49\n    (debug, Tool not in holder, offsets cleared)\n  o400 endif\n\n    ; ******** ENABLE FEED OVERRIDE ********\n  ; This re-enables feed override in case of a reset\n  M50 P1\n\no200 endif\n\n; The flag indicating that the settings have been loaded into memory.\n#1001 = 1\n(debug, Tool changer ready flag Set: #1001)\n(debug, Sienci ATC Configuration Loaded)\n\n; The flag is an internal variable for tracking whether tool length measurement is active\n#1002 = 0\n\n; The flag is an internal variable for tracking whether manual tool unloading is forced (for in rack tools)\n#1003 = 0\n\n; The flag is an internal variable for tracking whether manual tool loading is forced (for in rack tools)\n#1004 = 0\n\n; ********SENDER COMMUNICATIONS ********\n(print,ATCI|table_size:#<_tool_table_size>|rack_size:#<_tc_slots>)\n\nM99"
+                  }
+               ]
+            },
+            "warnOnHome": true
+         },
+         "axes": {
+            "minimized": false,
+            "axes": [
+               "x",
+               "y",
+               "z"
+            ],
+            "jog": {
+               "xyStep": 5,
+               "zStep": 2,
+               "aStep": 5,
+               "feedrate": 3000,
+               "keypad": false,
+               "rapid": {
+                  "xyStep": 20,
+                  "zStep": 10,
+                  "aStep": 20,
+                  "xaStep": 20,
+                  "feedrate": 5000
+               },
+               "normal": {
+                  "xyStep": 5,
+                  "zStep": 2,
+                  "aStep": 5,
+                  "xaStep": 5,
+                  "feedrate": 3000
+               },
+               "precise": {
+                  "xyStep": 0.5,
+                  "zStep": 0.1,
+                  "aStep": 0.5,
+                  "xaStep": 0.5,
+                  "feedrate": 1000
+               },
+               "step": 12,
+               "distances": [],
+               "threshold": 250
+            },
+            "mdi": {
+               "disabled": false
+            },
+            "shuttle": {
+               "feedrateMin": 500,
+               "feedrateMax": 2000,
+               "hertz": 10,
+               "overshoot": 1
+            }
+         },
+         "connection": {
+            "minimized": false,
+            "controller": {
+               "type": "Grbl"
+            },
+            "port": "",
+            "baudrate": 115200,
+            "connection": {
+               "type": "serial",
+               "serial": {
+                  "rtscts": false
+               }
+            },
+            "autoReconnect": false,
+            "ip": [
+               192,
+               168,
+               5,
+               1
+            ],
+            "ethernetPort": 23
+         },
+         "console": {
+            "minimized": false
+         },
+         "job_status": {
+            "minimized": false,
+            "speed": "",
+            "lastFile": "",
+            "lastFileSize": "",
+            "lastFileRunLength": ""
+         },
+         "grbl": {
+            "minimized": false,
+            "panel": {
+               "queueReports": {
+                  "expanded": true
+               },
+               "statusReports": {
+                  "expanded": true
+               },
+               "modalGroups": {
+                  "expanded": true
+               }
+            }
+         },
+         "location": {
+            "minimized": false,
+            "axes": [
+               "x",
+               "y",
+               "z"
+            ],
+            "jog": {
+               "keypad": true,
+               "step": 12,
+               "distances": [],
+               "speeds": {
+                  "xyStep": 5,
+                  "zStep": 0.5,
+                  "feedrate": 5000
+               }
+            },
+            "mdi": {
+               "disabled": false
+            },
+            "shuttle": {
+               "feedrateMin": 500,
+               "feedrateMax": 2000,
+               "hertz": 10,
+               "overshoot": 1
+            }
+         },
+         "macro": {
+            "minimized": false
+         },
+         "probe": {
+            "minimized": false,
+            "probeCommand": "G38.2",
+            "connectivityTest": true,
+            "useTLO": false,
+            "probeDepth": 10,
+            "probeFeedrate": 75,
+            "probeFastFeedrate": 150,
+            "retractionDistance": 2,
+            "zProbeDistance": 30,
+            "touchPlateHeight": 10,
+            "probeType": "Auto",
+            "direction": 0,
+            "probeAxis": "Z",
+            "tipDiameter3D": 2,
+            "xyRetract3D": 10
+         },
+         "rotary": {
+            "stockTurning": {
+               "options": {
+                  "stockLength": 100,
+                  "stepdown": 20,
+                  "bitDiameter": 6.35,
+                  "spindleRPM": 17000,
+                  "feedrate": 3000,
+                  "stepover": 15,
+                  "startHeight": 50,
+                  "finalHeight": 40,
+                  "enableRehoming": false,
+                  "shouldDwell": false
+               }
+            },
+            "tab": {
+               "show": false
+            }
+         },
+         "spindle": {
+            "minimized": false,
+            "mode": "spindle",
+            "speed": 1000,
+            "spindleMax": 30000,
+            "spindleMin": 10000,
+            "delay": 0,
+            "laser": {
+               "laserOnOutline": false,
+               "power": 100,
+               "duration": 1,
+               "xOffset": 0,
+               "yOffset": 0,
+               "minPower": 0,
+               "maxPower": 255
+            }
+         },
+         "surfacing": {
+            "bitDiameter": 22,
+            "stepover": 40,
+            "feedrate": 2500,
+            "length": 100,
+            "width": 100,
+            "skimDepth": 1,
+            "maxDepth": 1,
+            "spindleRPM": 17000,
+            "type": "SPIRAL_MOVEMENT",
+            "startPosition": "START_POSITION_BACK_LEFT",
+            "spindle": "M3",
+            "cutDirectionFlipped": false,
+            "shouldDwell": false,
+            "flood": false,
+            "mist": false
+         },
+         "visualizer": {
+            "minimized": false,
+            "liteMode": false,
+            "liteOption": "Light",
+            "disabled": false,
+            "disabledLite": false,
+            "minimizeRenders": false,
+            "projection": "orthographic",
+            "cameraMode": "pan",
+            "theme": "Dark",
+            "SVGEnabled": false,
+            "rotaryDiameterOffsetEnabled": false,
+            "jobEndModal": true,
+            "maintenanceTaskNotifications": true,
+            "checkFile": false,
+            "gcode": {
+               "displayName": true
+            },
+            "objects": {
+               "limits": {
+                  "visible": true
+               },
+               "coordinateSystem": {
+                  "visible": true
+               },
+               "gridLineNumbers": {
+                  "visible": true
+               },
+               "cuttingTool": {
+                  "visible": true,
+                  "visibleLite": false
+               },
+               "cuttingToolAnimation": {
+                  "visible": true,
+                  "visibleLite": false
+               },
+               "cutPath": {
+                  "visible": true,
+                  "visibleLite": true
+               }
+            },
+            "showWarning": false,
+            "showLineWarnings": false,
+            "showSoftLimitWarning": false,
+            "hideProcessedLines": false,
+            "debug": {
+               "profileWorker": false,
+               "profileSampleEvery": 10000
+            }
+         }
+      },
+      "commandKeys": {}
+   },
+   "events": {}
+}
