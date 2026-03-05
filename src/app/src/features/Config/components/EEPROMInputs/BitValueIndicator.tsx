@@ -63,7 +63,7 @@ export function BitValueIndicator({ value, format, bits, numBits = 8 }: BitValue
                 <TooltipTrigger asChild>
                     <span className="cursor-default w-fit inline-flex items-center gap-1.5">
                         <span className="text-xs text-slate-400 font-medium">Value:</span>
-                        <Badge variant="default" className="bg-blue-600 hover:bg-blue-600 text-white border-blue-500 font-bold text-sm px-2.5 py-0.5 shadow-sm">
+                        <Badge variant="outline" className="bg-gray-100 text-gray-600 border-gray-300 font-semibold text-sm px-2.5 py-0.5 rounded-full">
                             {numericValue}
                         </Badge>
                     </span>

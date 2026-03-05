@@ -42,12 +42,6 @@ const BitfieldInput = ({
 
     return (
         <div className={styles.column}>
-            <BitValueIndicator
-                value={setting.value}
-                format={format}
-                bits={info.bits}
-                numBits={info.numBits}
-            />
             {format.map((opt, index) => {
                 let key = `${setting.setting}-${index}-key`;
                 const notNA = opt !== 'N/A';
@@ -72,6 +66,12 @@ const BitfieldInput = ({
                     )
                 );
             })}
+            <BitValueIndicator
+                value={setting.value}
+                format={format}
+                bits={info.bits}
+                numBits={info.numBits}
+            />
         </div>
     );
 };
