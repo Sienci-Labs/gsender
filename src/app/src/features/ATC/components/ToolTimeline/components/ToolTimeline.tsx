@@ -175,9 +175,10 @@ export function ToolTimeline({
                                           ? toolLookupNumber > rackSize
                                           : false)
                                     : false;
+                                const itemKey = `${tool.index}-${tool.toolNumber}-${tool.startLine ?? index}`;
                                 return (
                                     <div
-                                        key={tool.id}
+                                        key={itemKey}
                                         ref={(el) => {
                                             itemRefs.current[index] = el;
                                         }}
