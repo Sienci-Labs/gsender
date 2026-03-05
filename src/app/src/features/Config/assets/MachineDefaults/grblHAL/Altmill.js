@@ -180,7 +180,7 @@ export const DEFAULT_2X4 = {
 
 export const DEFAULT_4X8 =  {
     ...ALTMILL_DEFAULT,
-    $8: '1',
+    $8: '2',
     $101: '214.4403444',
     $111: '25000',
     $131: '2661.000',
