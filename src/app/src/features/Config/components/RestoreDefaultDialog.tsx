@@ -71,7 +71,7 @@ function restoreEEPROMDefaults(
     console.log(JSON.stringify(values));
     const localSettings = { ...controller.settings };
     console.log(JSON.stringify(localSettings));
-    //controller.command('gcode', values);
+    controller.command('gcode', values);
 
 
     toast.success('Restored default settings for your machine.', {
