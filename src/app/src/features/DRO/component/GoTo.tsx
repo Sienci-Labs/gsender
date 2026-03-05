@@ -24,7 +24,9 @@ interface GotoProps {
 
 export function GoTo({ units, wpos, disabled }: GotoProps) {
     const { mode } = useWorkspaceState();
+    const [hasAAxisReported, setHasAAxisReported] = useState<boolean>(false);
 
+    const axes = useTypedSelector((state: RootState) => state.controller.state.axes?.axes);
     const controllerType = useTypedSelector((state) => state.controller.type);
     const [relativeMovement, setRelativeMovement] = useState(false);
     const [movementPos, setMovementPos] = useState({
@@ -35,6 +37,14 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
         b: 0,
         c: 0,
     });
+
+    useEffect(() => {
+        if (axes) {
+            setHasAAxisReported(axes.includes('A'));
+        } else {
+            setHasAAxisReported(false);
+        }
+    }, [axes]);
 
     useEffect(() => {
         if (relativeMovement) {
@@ -58,8 +68,8 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
     }, [relativeMovement]);
 
     const isInRotaryMode = mode === 'ROTARY';
-    const aAxisIsAvailble = isInRotaryMode || controllerType === 'grblHAL';
-    const yAxisIsAvailble = !isInRotaryMode;
+    const aAxisIsAvailable = isInRotaryMode || (controllerType === 'grblHAL' && hasAAxisReported);
+    const yAxisIsAvailable = !isInRotaryMode;
 
     const onToggleSwap = () => {
         setRelativeMovement((prev) => !prev);
@@ -74,13 +84,13 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
         const axes = [];
         axes.push(`X${movementPos.x}`);
 
-        if (yAxisIsAvailble) {
+        if (yAxisIsAvailable) {
             axes.push(`Y${movementPos.y}`);
         }
 
         axes.push(`Z${movementPos.z}`);
 
-        if (aAxisIsAvailble) {
+        if (aAxisIsAvailable) {
             axes.push(`A${movementPos.a}`);
         }
 
@@ -156,7 +166,7 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
                         label="Y"
                         value={movementPos.y}
                         onChange={(v) => onValueEdit(v, 'y')}
-                        disabled={!yAxisIsAvailble}
+                        disabled={!yAxisIsAvailable}
                     />
                     <UnitInput
                         units={units}
@@ -169,7 +179,7 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
                         label="A"
                         value={movementPos.a}
                         onChange={(v) => onValueEdit(v, 'a')}
-                        disabled={!aAxisIsAvailble}
+                        disabled={!aAxisIsAvailable}
                     />
 
                     <Button variant="alt" onClick={goToLocation}>
