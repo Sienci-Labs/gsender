@@ -573,6 +573,11 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             );
         }
 
+        const numValue = Number(settingData.value);
+        const numDefault = Number(inputDefault);
+        if (!isNaN(numValue) && !isNaN(numDefault)) {
+            return numValue === numDefault;
+        }
         return isEqual(settingData.value, inputDefault);
     }
 
