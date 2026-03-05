@@ -3,6 +3,7 @@ import { Switch } from 'app/components/shadcn/Switch';
 import ensureArray from 'ensure-array';
 import styles from './index.module.styl';
 import { convertBitfieldToValue, getBitfieldArr } from './utils.ts';
+import BitValueIndicator from './BitValueIndicator';
 
 const BitfieldInput = ({
     info,
@@ -41,6 +42,12 @@ const BitfieldInput = ({
 
     return (
         <div className={styles.column}>
+            <BitValueIndicator
+                value={setting.value}
+                format={format}
+                bits={info.bits}
+                numBits={info.numBits}
+            />
             {format.map((opt, index) => {
                 let key = `${setting.setting}-${index}-key`;
                 const notNA = opt !== 'N/A';
