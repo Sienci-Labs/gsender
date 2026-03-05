@@ -190,7 +190,6 @@ const main = () => {
 
             let url = '';
             let kiosk = false;
-            let remoteModeFailed = false;
 
             if (externalRendererUrl) {
                 url = externalRendererUrl;
@@ -223,20 +222,12 @@ const main = () => {
                         /EADDR|address not available|address already in use/i.test(error.message);
 
                     if (isBindingError) {
-                        log.warn('Remote mode binding failed — retrying with default settings...');
-                        try {
-                            res = await launchServer();
-                            remoteModeFailed = true;
-                        } catch (retryError) {
-                            log.error('Server failed to start after remote mode reset:', retryError);
-                            dialog.showMessageBoxSync(null, {
-                                title: 'Server Startup Error',
-                                message: 'gSender was unable to start.',
-                                detail: 'Remote mode settings have been reset. Please restart the application.',
-                            });
-                            app.exit(-1);
-                            return;
-                        }
+                        log.warn('Remote mode binding failed — remote config has been reset.');
+                        dialog.showMessageBoxSync(null, {
+                            title: 'Remote Mode Configuration Error',
+                            message: 'gSender could not connect to the configured remote address.',
+                            detail: 'Remote mode has been disabled and the configuration has been reset. Please restart gSender.',
+                        });
                     } else {
                         log.error('Unexpected server startup error:', error);
                         dialog.showMessageBoxSync(null, {
@@ -244,9 +235,9 @@ const main = () => {
                             message: 'gSender encountered an unexpected error while starting.',
                             detail: String(error.message),
                         });
-                        app.exit(-1);
-                        return;
                     }
+                    app.exit(-1);
+                    return;
                 }
 
                 const { address, port, kiosk: resolvedKiosk } = { ...res };
@@ -395,10 +386,6 @@ const main = () => {
             ipcMain.handle('check-remote-status', (channel) => {
                 log.debug(hostInformation);
                 return hostInformation;
-            });
-
-            ipcMain.handle('get-startup-warnings', () => {
-                return { remoteModeFailed };
             });
 
             /**

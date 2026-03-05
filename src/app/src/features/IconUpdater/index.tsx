@@ -6,7 +6,6 @@ import reduxStore from 'app/store/redux';
 import isElectron from 'is-electron';
 import { updateReleaseNotes } from 'app/store/redux/slices/gSenderInfo.slice.ts';
 import { Link } from 'react-router';
-import { toast } from 'app/lib/toaster';
 
 export function UpdateBadge({ hidden }) {
     return (
@@ -40,14 +39,7 @@ export function IconUpdater() {
                     window.dispatchEvent(new Event('resize'));
                 }, 500)
             });
-            window.ipcRenderer.invoke('get-startup-warnings').then(({ remoteModeFailed }) => {
-                if (remoteModeFailed) {
-                    toast.warning(
-                        'Remote mode was automatically disabled due to an invalid configuration. Please update your Remote Mode settings.',
-                        { position: 'bottom-right', duration: 10000 },
-                    );
-                }
-            });
+
         }
     }, []);
 
