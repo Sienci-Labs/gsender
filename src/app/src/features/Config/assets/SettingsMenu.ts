@@ -1284,7 +1284,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Spindle on delay',
                         key: 'widgets.spindle.delay',
                         description:
-                            'Adds a delay to give the spindle time to spin up. ($392)',
+                            'Adds a delay to give the spindle time to spin up. ($392, Default 0)',
                         type: 'hybrid',
                         eID: '$392',
                         unit: 's',
@@ -1297,7 +1297,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Minimum spindle speed',
                         key: 'widgets.spindle.spindleMin',
                         description:
-                            'Match this to the minimum speed of your spindle. ($31)',
+                            'Match this to the minimum speed of your spindle. ($31, Default 10000)',
                         type: 'hybrid',
                         eID: '$31',
                         forceEEPROM: true,
@@ -1307,7 +1307,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Maximum spindle speed',
                         key: 'widgets.spindle.spindleMax',
                         description:
-                            'Match this to the maximum speed of your spindle. ($30)',
+                            'Match this to the maximum speed of your spindle. ($30, Default 30000)',
                         type: 'hybrid',
                         eID: '$30',
                         forceEEPROM: true,
@@ -1470,7 +1470,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Minimum laser power',
                         key: 'widgets.spindle.laser.minPower',
                         description:
-                            'Match this to the minimum S word setting in your laser CAM software. ($731)',
+                            'Match this to the minimum S word setting in your laser CAM software. ($731, Default 0)',
                         type: 'hybrid',
                         eID: '$731',
                         unit: '',
@@ -1479,7 +1479,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Maximum laser power',
                         key: 'widgets.spindle.laser.maxPower',
                         description:
-                            'Match this to the maximum S word setting in your laser CAM software. ($730)',
+                            'Match this to the maximum S word setting in your laser CAM software. ($730, Default 255.000)',
                         type: 'hybrid',
                         eID: '$730',
                         unit: '',
@@ -1495,7 +1495,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Laser X offset',
                         key: 'widgets.spindle.laser.xOffset',
                         description:
-                            'X-axis offset from the spindle. (Mark with a v-bit then track the laser movement to reach that mark, $741)',
+                            'X-axis offset from the spindle. (Mark with a v-bit then track the laser movement to reach that mark, $741, Default 0)',
                         type: 'hybrid',
                         eID: '$741',
                         unit: 'mm',
@@ -1504,7 +1504,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Laser Y offset',
                         key: 'widgets.spindle.laser.yOffset',
                         description:
-                            'Y-axis offset from the spindle. (Mark with a v-bit then track the laser movement to reach that mark, $742)',
+                            'Y-axis offset from the spindle. (Mark with a v-bit then track the laser movement to reach that mark, $742, Default 0)',
                         type: 'hybrid',
                         eID: '$742',
                         unit: 'rpm',
@@ -1602,7 +1602,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Resolution',
                         key: 'workspace.rotaryAxis.firmwareSettings.$101',
                         description:
-                            'Travel resolution in steps per degree. ($103)',
+                            'Travel resolution in steps per degree. ($103, Default 19.75308642)',
                         type: 'hybrid',
                         eID: '$103',
                         unit: 'step/deg',
@@ -1611,7 +1611,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Max speed',
                         key: 'workspace.rotaryAxis.firmwareSettings.$111',
                         description:
-                            'Max axis speed, also used for G0 rapids. ($113)',
+                            'Max axis speed, also used for G0 rapids. ($113, Default 8000)',
                         type: 'hybrid',
                         eID: '$113',
                         unit: 'deg/min',

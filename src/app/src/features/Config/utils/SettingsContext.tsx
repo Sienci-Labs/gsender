@@ -185,10 +185,7 @@ function applyEEPROMDescriptions(
                         remapped = true;
                     }
                     if (ctrlType === GRBLHAL && eID) {
-                        eID = translateGrblCoreKey(
-                            eID as EEPROM,
-                            fwVersion,
-                        );
+                        eID = translateGrblCoreKey(eID as EEPROM, fwVersion);
                     }
                     if (!eID) {
                         return remapped ? { ...o, remapped: true } : o;
@@ -270,17 +267,20 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     );
 
     const pendingValueMap = useMemo(
-        () => new Map(
-            settingsValues
-                .filter((s) => s.dirty && s.key)
-                .map((s) => [s.key, s.value])
-        ),
+        () =>
+            new Map(
+                settingsValues
+                    .filter((s) => s.dirty && s.key)
+                    .map((s) => [s.key, s.value]),
+            ),
         [settingsValues],
     );
 
     const getPendingOrStore = useCallback(
         (key: string, defaultValue?: any) =>
-            pendingValueMap.has(key) ? pendingValueMap.get(key) : store.get(key, defaultValue),
+            pendingValueMap.has(key)
+                ? pendingValueMap.get(key)
+                : store.get(key, defaultValue),
         [pendingValueMap],
     );
 
@@ -434,16 +434,15 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             return false;
         }
 
-        if (v.type === 'eeprom') {
+        if (
+            v.type === 'eeprom' ||
+            (v.type === 'hybrid' && controllerType === GRBLHAL)
+        ) {
             const EEPROMData = eepromMap.get(v.eID as EEPROM);
             // If filterNonDefault is enabled, make sure the current value equals the default value
             if (EEPROMData) {
                 return !eepromIsDefault(EEPROMData);
             }
-        }
-
-        if (v.type === 'hybrid' && connected && controllerType === GRBLHAL) {
-            return !eepromIsDefault(v);
         }
 
         if ('key' in v) {
@@ -485,57 +484,70 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
      * Filter remaining by matching search term
      * @param v - The setting to filter
      */
-    const settingsFilter = useCallback((v: gSenderSetting) => {
-        // ***first, check conditions that are always applicable
+    const settingsFilter = useCallback(
+        (v: gSenderSetting) => {
+            // ***first, check conditions that are always applicable
 
-        // Hide hidden when filtering
-        if ('hidden' in v && (!searchTerm || searchTerm.length === 0)) {
-            if (v.hidden(getPendingOrStore)) {
-                // only return if it's supposed to be hidden, otherwise we have more to check
-                return false;
-            }
-        }
-        // Always exclude eeprom/hybrids when not connected
-        if (v.type === 'eeprom' || v.type === 'hybrid') {
-            if (!connectionState) {
-                return false;
-            }
-
-            let idToUse = v.eID;
-            if (Object.hasOwn(v, 'remap') && isFirmwareCurrent) {
-                idToUse = v.remap;
-            }
-            if (controllerType === GRBLHAL) {
-                idToUse = translateGrblCoreKey(
-                    idToUse as EEPROM,
-                    firmwareVersion,
-                );
-            }
-            if (v.type === 'eeprom') {
-                if (!eepromMap.has(idToUse as EEPROM)) {
+            // Hide hidden when filtering
+            if ('hidden' in v && (!searchTerm || searchTerm.length === 0)) {
+                if (v.hidden(getPendingOrStore)) {
+                    // only return if it's supposed to be hidden, otherwise we have more to check
                     return false;
                 }
             }
-        }
+            // Always exclude eeprom/hybrids when not connected
+            if (v.type === 'eeprom' || v.type === 'hybrid') {
+                if (!connectionState) {
+                    return false;
+                }
 
-        // ***then, consider defaults and searching
-        const modified = checkIfModified(v);
-        const searched = checkSearchTerm(v);
+                let idToUse = v.eID;
+                if (Object.hasOwn(v, 'remap') && isFirmwareCurrent) {
+                    idToUse = v.remap;
+                }
+                if (controllerType === GRBLHAL) {
+                    idToUse = translateGrblCoreKey(
+                        idToUse as EEPROM,
+                        firmwareVersion,
+                    );
+                }
+                if (v.type === 'eeprom') {
+                    if (!eepromMap.has(idToUse as EEPROM)) {
+                        return false;
+                    }
+                }
+            }
 
-        if (searchTerm.length === 0 || !searchTerm) {
-            // if no search, check modified
-            if (filterNonDefault) {
-                return modified;
+            // ***then, consider defaults and searching
+            const modified = checkIfModified(v);
+            const searched = checkSearchTerm(v);
+
+            if (searchTerm.length === 0 || !searchTerm) {
+                // if no search, check modified
+                if (filterNonDefault) {
+                    return modified;
+                }
+                return true;
+            } else {
+                // if search, consider both
+                if (filterNonDefault) {
+                    return modified && searched;
+                }
+                return searched;
             }
-            return true;
-        } else {
-            // if search, consider both
-            if (filterNonDefault) {
-                return modified && searched;
-            }
-            return searched;
-        }
-    }, [connectionState, eepromMap, isFirmwareCurrent, controllerType, firmwareVersion, searchTerm, filterNonDefault, settingsValues, getPendingOrStore]);
+        },
+        [
+            connectionState,
+            eepromMap,
+            isFirmwareCurrent,
+            controllerType,
+            firmwareVersion,
+            searchTerm,
+            filterNonDefault,
+            settingsValues,
+            getPendingOrStore,
+        ],
+    );
 
     function eepromIsDefault(settingData: gSenderSetting | FilteredEEPROM) {
         const profileDefaults =
