@@ -99,6 +99,7 @@ export function Parking({
                 variant="alt"
                 size="responsive"
                 onClick={goToParkLocation}
+                aria-label="Go to Park Location"
             />
         </Tooltip>
     );

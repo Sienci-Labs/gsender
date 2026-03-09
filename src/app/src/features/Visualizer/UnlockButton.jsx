@@ -61,6 +61,7 @@ const UnlockButton = ({ activeState, alarmCode }) => {
             onMouseOver={onMouseOver}
             onMouseLeave={onMouseOut}
             onFocus={noop}
+            aria-label={getButtonText()}
         >
             <div className={styles.unlockIndicator}>
                 <i className="fas fa-caret-right" />

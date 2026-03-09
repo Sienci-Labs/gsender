@@ -46,6 +46,7 @@ class CameraDisplay extends PureComponent {
                 <div className={styles.buttonContainer}>
                     <button
                         title={i18n._('Top')}
+                        aria-label="Top view"
                         type="button"
                         tabIndex={0}
                         className={
@@ -59,6 +60,7 @@ class CameraDisplay extends PureComponent {
                     />
                     <button
                         title={i18n._('Left')}
+                        aria-label="Left view"
                         type="button"
                         tabIndex={0}
                         className={
@@ -72,6 +74,7 @@ class CameraDisplay extends PureComponent {
                     />
                     <button
                         title={i18n._('Front')}
+                        aria-label="Front view"
                         type="button"
                         tabIndex={0}
                         className={
@@ -85,6 +88,7 @@ class CameraDisplay extends PureComponent {
                     />
                     <button
                         title={i18n._('3D')}
+                        aria-label="3D view"
                         type="button"
                         tabIndex={0}
                         className={
@@ -100,14 +104,17 @@ class CameraDisplay extends PureComponent {
                         type="button"
                         tabIndex={0}
                         className={styles.cornerC1}
+                        aria-hidden="true"
                     />
                     <button
                         type="button"
                         tabIndex={0}
                         className={styles.cornerC2}
+                        aria-hidden="true"
                     />
                     <button
                         title={i18n._('Right')}
+                        aria-label="Right view"
                         type="button"
                         tabIndex={0}
                         className={
@@ -124,6 +131,7 @@ class CameraDisplay extends PureComponent {
                         type="button"
                         tabIndex={0}
                         className={styles.cornerC3}
+                        aria-hidden="true"
                     />
                 </div>
             </div>

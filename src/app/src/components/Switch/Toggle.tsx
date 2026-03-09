@@ -45,6 +45,7 @@ const Toggle = ({
                     className="sr-only peer"
                     disabled={disabled}
                     value={value}
+                    aria-label={label || 'Toggle'}
                 />
                 <div
                     className={cn(

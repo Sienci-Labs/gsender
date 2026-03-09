@@ -99,6 +99,7 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                         }`}
                         onClick={() => canScrollLeft && scrollTabs('left')}
                         disabled={!canScrollLeft}
+                        aria-label="Scroll tabs left"
                     >
                         <MdKeyboardArrowLeft className="w-6 h-6 portrait:w-8 portrait:h-8" />
                     </button>
@@ -110,12 +111,18 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                             msOverflowStyle: 'none',
                         }}
                         onScroll={checkScrollability}
+                        role="tablist"
+                        aria-label="Widget Tabs"
                     >
                         {items &&
                             items.map((item, index) => (
                                 <button
                                     key={item.label}
                                     ref={(el) => (tabRefs.current[index] = el)}
+                                    role="tab"
+                                    aria-selected={activeTab === item.label}
+                                    aria-controls={`tabpanel-${item.label}`}
+                                    id={`tab-${item.label}`}
                                     className={`flex-grow pt-1 px-4 max-xl:px-3 text-base font-medium max-xl:text-sm portrait:text-xl max-xl:pt-2 ${
                                         activeTab === item.label
                                             ? 'text-blue-600 border-b-2 border-blue-600 dark:text-blue-400 dark:border-blue-400'
@@ -137,6 +144,7 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                         }`}
                         onClick={() => canScrollRight && scrollTabs('right')}
                         disabled={!canScrollRight}
+                        aria-label="Scroll tabs right"
                     >
                         <MdKeyboardArrowRight className="w-6 h-6 portrait:w-8 portrait:h-8" />
                     </button>
@@ -147,6 +155,9 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                     items.map(({ label, content: Content }) => (
                         <div
                             key={label}
+                            role="tabpanel"
+                            id={`tabpanel-${label}`}
+                            aria-labelledby={`tab-${label}`}
                             className={classNames(
                                 'w-full h-full',
                                 activeTab === label ? 'block' : 'hidden',

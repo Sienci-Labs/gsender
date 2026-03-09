@@ -47,6 +47,10 @@ export const SettingSection = React.memo(function SettingSection({
                     curSetting.onEnable();
                 }
 
+                if ('onUpdate' in curSetting) {
+                    curSetting.onUpdate();
+                }
+
                 return updated;
             });
         },

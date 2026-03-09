@@ -10,6 +10,10 @@ import { EEPROMNotConnectedWarning } from 'app/features/Config/components/EEPROM
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
 import { FilterDefaultToggle } from 'app/features/Config/components/FilterDefaultToggle.tsx';
+import pubsub from 'pubsub-js';
+import store from 'app/store';
+import { useDispatch } from 'react-redux';
+import { updateAccessibility } from 'app/store/redux/slices/preferences.slice';
 import {
     Tabs,
     TabsContent,
@@ -23,9 +27,24 @@ import {GRBLHAL, WORKFLOW_STATE_IDLE} from 'app/constants';
 import { resolveGrblCoreDefaults } from 'app/features/Config/utils/grblCoreMigration.ts';
 
 export function Config() {
+    const dispatch = useDispatch();
+    const [activeSection, setActiveSection] = React.useState<number>(0);
+    const [showFlashDialog, setShowFlashDialog] = React.useState(false);
     const { ref: inViewRef } = useInView({
         threshold: 0.2,
     });
+
+    useEffect(() => {
+        const token = pubsub.subscribe('accessibility:update', () => {
+            const accessibility = store.get('workspace.accessibility');
+            if (accessibility) {
+                dispatch(updateAccessibility(accessibility));
+            }
+        });
+        return () => {
+            pubsub.unsubscribe(token);
+        };
+    }, [dispatch]);
 
     const connected = useTypedSelector(
         (state: RootState) => state.connection.isConnected,

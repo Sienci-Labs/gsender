@@ -140,7 +140,8 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
                         disabled={disabled}
                         icon={<FaPaperPlane />}
                         variant="secondary"
-                        size="responsive"
+                        size="sm"
+                        aria-label="Open Go To Location dialog"
                     />
                 </PopoverTrigger>
             </Tooltip>
@@ -152,6 +153,7 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
                         <Switch
                             checked={relativeMovement}
                             onChange={onToggleSwap}
+                            aria-label="Toggle between Absolute and Incremental movement"
                         />
                         <span>INC</span>
                     </div>
@@ -182,7 +184,11 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
                         disabled={!aAxisIsAvailable}
                     />
 
-                    <Button variant="alt" onClick={goToLocation}>
+                    <Button 
+                        variant="alt" 
+                        onClick={goToLocation}
+                        aria-label="Execute move to location"
+                    >
                         Go!
                     </Button>
                 </div>

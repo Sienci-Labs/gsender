@@ -373,6 +373,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
                                 handleDeleteOption(option.value);
                             }}
                             size="sm"
+                            aria-label={`Delete tool diameter ${option.label}`}
                         >
                             {option.value !== PROBE_TYPE_AUTO &&
                                 option.value !== PROBE_TYPE_TIP && (

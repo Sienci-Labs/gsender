@@ -298,6 +298,7 @@ class Visualizer extends Component {
         this.addControllerEvents();
         this.addStoreEvents();
         this.addResizeEventListener();
+        window.addEventListener('keydown', this.handleKeyDown);
 
         // Ensure the DOM element is available before creating the scene
         if (this.node) {
@@ -684,6 +685,7 @@ class Visualizer extends Component {
         this.removeControllerEvents();
         this.unsubscribe();
         this.removeResizeEventListener();
+        window.removeEventListener('keydown', this.handleKeyDown);
         this.clearScene();
 
         // Stop animation loop
@@ -768,8 +770,10 @@ class Visualizer extends Component {
     showAnimation = () => {
         const state = { ...this.props.state };
         const { liteMode, objects, minimizeRenders } = state;
-        // We don't animate if minimizeRenders is turned on
-        if (minimizeRenders) {
+        const { reducedMotion } = reduxStore.getState().preferences.accessibility;
+
+        // We don't animate if minimizeRenders is turned on or reducedMotion is enabled
+        if (minimizeRenders || reducedMotion) {
             return false;
         }
         if (liteMode && objects.cuttingToolAnimation.visibleLite) {
@@ -2912,6 +2916,61 @@ class Visualizer extends Component {
         }
     }
 
+    isHovered = false;
+
+    handleKeyDown = (event) => {
+        const { visualizerKeyboardControl } = reduxStore.getState().preferences.accessibility;
+        if (!visualizerKeyboardControl || !this.isHovered) return;
+
+        const rotateStep = 0.1;
+        const panStep = 10;
+        const zoomStep = 0.1;
+
+        switch (event.key) {
+            case 'ArrowLeft':
+                if (event.shiftKey) {
+                    this.panLeft();
+                } else {
+                    this.controls.rotateLeft(rotateStep);
+                }
+                break;
+            case 'ArrowRight':
+                if (event.shiftKey) {
+                    this.panRight();
+                } else {
+                    this.controls.rotateLeft(-rotateStep);
+                }
+                break;
+            case 'ArrowUp':
+                if (event.shiftKey) {
+                    this.panUp();
+                } else {
+                    this.controls.rotateUp(rotateStep);
+                }
+                break;
+            case 'ArrowDown':
+                if (event.shiftKey) {
+                    this.panDown();
+                } else {
+                    this.controls.rotateUp(-rotateStep);
+                }
+                break;
+            case '+':
+            case '=':
+                this.zoomIn(zoomStep);
+                break;
+            case '-':
+            case '_':
+                this.zoomOut(zoomStep);
+                break;
+            default:
+                return;
+        }
+        event.preventDefault();
+        this.controls.update();
+        this.updateScene();
+    };
+
     render() {
         if (!WebGL.isWebGLAvailable()) {
             console.warn('Visualizer: WebGL not available, cannot render');
@@ -2931,9 +2990,14 @@ class Visualizer extends Component {
 
         return (
             <div
-                className="overflow-hidden h-full w-full rounded-lg"
+                className="overflow-hidden h-full w-full rounded-lg outline-none"
                 ref={this.setRef}
                 id="visualizer-wrapper"
+                onMouseEnter={() => { this.isHovered = true; }}
+                onMouseLeave={() => { this.isHovered = false; }}
+                tabIndex={0}
+                role="region"
+                aria-label="3D Visualizer"
             />
         );
     }
