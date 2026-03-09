@@ -1,5 +1,4 @@
 import type { Config } from 'tailwindcss';
-import defaultTheme from 'tailwindcss/defaultTheme';
 
 export default {
     content: [
@@ -19,10 +18,6 @@ export default {
     },
   ],*/
     theme: {
-        screens: {
-            ...defaultTheme.screens,
-            'max-xl': { raw: '(max-width: 1280px), (max-height: 880px)' },
-        },
         extend: {
             transitionProperty: {
                 width: 'width',
@@ -114,6 +109,14 @@ export default {
                     '0%': { transform: 'rotate(0deg) scale(10)' },
                     '100%': { transform: 'rotate(-360deg) scale(10)' },
                 },
+                rotatef: {
+                    '0%': { transform: 'rotate(0deg) scale(10)' },
+                    '100%': { transform: 'rotate(360deg) scale(10)' },
+                },
+                rotater: {
+                    '0%': { transform: 'rotate(0deg) scale(10)' },
+                    '100%': { transform: 'rotate(-360deg) scale(10)' },
+                },
                 glowPulse: {
                     '0%, 100%': {
                         boxShadow: '0 0 5px rgba(104, 154, 201, 0.5)',
@@ -135,6 +138,8 @@ export default {
                 attention: 'attention 1s ease-in-out infinite',
                 gradient: 'gradient-shift 15s ease infinite',
                 rotate: 'rotate 1s linear infinite',
+                rotatef: 'rotatef 1s linear infinite',
+                rotater: 'rotater 1s linear infinite',
                 glowPulse: 'glowPulse 1.5s ease-in-out infinite',
                 glowPacity: 'glowPacity 1.5s ease-in-out infinite',
             },
