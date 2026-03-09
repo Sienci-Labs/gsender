@@ -41,7 +41,7 @@ export function UnlockButton() {
     const activateUnlockButton = isHold || isAlarm;
 
     return (
-        <div className="text-4xl absolute top-3 max-xl:top-2 left-72">
+        <div className="text-4xl absolute top-3 max-xl:top-2 left-72 max-sm:left-56">
             <Tooltip content="Unlock Machine">
                 <button
                     className={cx('group text-gray-400', {
