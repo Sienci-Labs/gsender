@@ -1067,7 +1067,7 @@ export function* initialize(): Generator<any, void, any> {
                 });
             } else {
                 Confirm({
-                    title: 'ATCi requested a dialog.',
+                    title: 'ATC requested a dialog.',
                     content: 'Continue to unhold, Reset to stop action.',
                     confirmLabel: 'Continue',
                     cancelLabel: 'Reset',

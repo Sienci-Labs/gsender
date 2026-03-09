@@ -242,7 +242,7 @@ export const FileList: React.FC = () => {
                                     <TableCell>
                                         {isATCI && (
                                             <span className="italic">
-                                                ATCi Macro
+                                                ATC Macro
                                             </span>
                                         )}
                                     </TableCell>

@@ -1703,9 +1703,9 @@ export const SettingsMenu: SettingsMenuSection[] = [
                 settings: [
                     {
                         type: 'boolean',
-                        label: 'Enable ATCi Controls',
+                        label: 'Enable ATC Controls',
                         key: 'workspace.atcEnabled',
-                        description: 'Enable ATCi Controls',
+                        description: 'Enable ATC Controls',
                     },
                     {
                         label: 'Passthrough',
