@@ -13,6 +13,7 @@ import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
 import pubsub from 'pubsub-js';
 import get from 'lodash/get';
 import { ToolProbeState } from 'app/features/ATC/types.ts';
+import { WORKFLOW_STATE_IDLE } from 'app/constants';
 
 export function ToolTimeline({
     tools,
@@ -43,9 +44,13 @@ export function ToolTimeline({
     const isConnected = useTypedSelector(
         (state: RootState) => state.connection.isConnected,
     );
+    const workflowState = useTypedSelector(
+        (state: RootState) => state.controller.workflow.state,
+    );
     const reportedRackSize = Number(get(settings, 'atci.rack_size', -1));
     const atcAvailable = get(settings, 'info.NEWOPT.ATC', '0') === '1';
     const allowManualBadge = isConnected && atcAvailable;
+    const remapDisabled = workflowState !== WORKFLOW_STATE_IDLE;
     const rackSize =
         reportedRackSize > 0
             ? reportedRackSize
@@ -200,6 +205,7 @@ export function ToolTimeline({
                                             isManual={isManual}
                                             probeState={probeState}
                                             canRemap={allowManualBadge}
+                                            remapDisabled={remapDisabled}
                                         />
                                     </div>
                                 );
