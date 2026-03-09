@@ -117,7 +117,8 @@ module.exports = () => new Promise((resolve, reject) => {
         kiosk
     }, (err, data = {}) => {
         if (err) {
-            reject(err, {});
+            err.errData = data; // preserve bindingErr flag
+            reject(err);
             return;
         }
 

@@ -3,9 +3,8 @@
   "private": true,
   "scripts": {
     "dev": "node server",
-    "build": "npm run build:client && npm run build:server",
-    "build:client": "vite build --outDir ../../dist/gsender/app --ssrManifest --emptyOutDir",
-    "build:server": "vite build --outDir ../../dist/gsender/app-server --ssr src/entry-server.tsx --emptyOutDir",
+    "build": "npm run build:client",
+    "build:client": "vite build --outDir ../../dist/gsender/app --emptyOutDir",
     "preview": "cross-env NODE_ENV=production node server"
   },
   "dependencies": {

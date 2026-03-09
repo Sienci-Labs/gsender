@@ -20,7 +20,7 @@ export function ATCStartValidations({
     return (
         <Dialog open={show} onOpenChange={setShow}>
             <DialogContent className="w-[500px] min-h-[200px] flex flex-col">
-                <DialogTitle>ATCI - {payload.title}</DialogTitle>
+                <DialogTitle>ATC - {payload.title}</DialogTitle>
                 <DialogDescription className="flex flex-col gap-4 text-gray-400">
                     {payload.body}
                     {payload.type === 'alert' && (
