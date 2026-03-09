@@ -37,6 +37,8 @@ const buttonVariants = cva(
                 lg: 'h-11 rounded-md px-8 max-xl:px-6 py-4 max-xl:py-2 w-full text-lg',
                 icon: 'h-10 w-10',
                 custom: '',
+                responsive:
+                    'h-8 rounded-md px-4 max-xl:px-3 py-2 max-xl:py-1 w-full text-sm portrait:h-10 portrait:rounded-md portrait:px-4 portrait:max-xl:px-3 portrait:py-2 portrait:max-xl:py-1 portrait:w-full portrait:min-w-14',
             },
         },
         defaultVariants: {
@@ -47,7 +49,8 @@ const buttonVariants = cva(
 );
 
 export interface ButtonProps
-    extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    extends
+        React.ButtonHTMLAttributes<HTMLButtonElement>,
         VariantProps<typeof buttonVariants> {
     asChild?: boolean;
 }

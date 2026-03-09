@@ -45,7 +45,7 @@ import {
     GRBL,
     GRBLHAL,
     GRBL_ACTIVE_STATE_CHECK,
-    LASER_MODE,
+    LASER_MODE, OUTLINE_MODE_RAPIDLESS_SQUARE,
 } from 'app/constants';
 import CombinedCamera from 'app/lib/three/oldCombinedCamera';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
@@ -59,8 +59,6 @@ import * as WebGL from 'app/lib/three/WebGL';
 
 import _ from 'lodash';
 import store from 'app/store';
-
-import { colorsResponse } from 'app/workers/colors.response';
 
 import controller from '../../lib/controller';
 import { getBoundingBox, loadSTL, loadTexture } from './helpers';
@@ -105,6 +103,8 @@ import { outlineResponse } from '../../workers/Outline.response';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 import { toast } from 'app/lib/toaster';
 import { getZUpTravel } from 'app/lib/SoftLimits.js';
+import { mm2in } from 'app/lib/units';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 
 class Visualizer extends Component {
     static propTypes = {
@@ -149,8 +149,6 @@ class Visualizer extends Component {
 
     vizualization = null;
 
-    colorsWorker = null;
-
     renderCallback = null;
 
     machineProfile = store.get('workspace.machineProfile');
@@ -175,6 +173,12 @@ class Visualizer extends Component {
     machineConnected = false;
 
     showSoftLimitsWarning = this.visualizerConfig.get('showSoftLimitsWarning');
+
+    checkModeInterval = null;
+
+    counter = 0;
+
+    waitingForCheck = false;
 
     setRef = (node) => {
         this.node = node;
@@ -369,6 +373,7 @@ class Visualizer extends Component {
         const prevState = prevProps.state;
         const state = this.props.state;
         const isConnected = this.props.isConnected;
+        const { activeState } = state;
 
         // Check if scene needs to be recreated (e.g., if renderer was lost)
         if (this.node && !this.isSceneInitialized() && this.props.show) {
@@ -533,7 +538,6 @@ class Visualizer extends Component {
         {
             // Update position
             const { state } = this.props;
-            const { activeState } = state;
             const { machinePosition, workPosition } = this.props;
 
             let newPos = workPosition;
@@ -635,6 +639,11 @@ class Visualizer extends Component {
             if (this.props.cameraPosition === 'Right') {
                 this.toRightSideView();
             }
+        }
+
+        if (activeState === GRBL_ACTIVE_STATE_CHECK && this.waitingForCheck) {
+            this.waitingForCheck = false;
+            this.runCheck();
         }
     }
 
@@ -846,7 +855,12 @@ class Visualizer extends Component {
     }
 
     recolorGridLabels(units) {
-        const { mm, in: inches } = this.machineProfile;
+        const { mm } = this.machineProfile;
+        const inches = {
+            width: mm2in(mm.width),
+            depth: mm2in(mm.depth),
+            height: mm2in(mm.height),
+        };
 
         const axisLengthX =
             units === IMPERIAL_UNITS
@@ -910,7 +924,12 @@ class Visualizer extends Component {
     }
 
     recolorGridNumbers(units) {
-        const { mm, in: inches } = this.machineProfile;
+        const { mm } = this.machineProfile;
+        const inches = {
+            width: mm2in(mm.width),
+            depth: mm2in(mm.depth),
+            height: mm2in(mm.height),
+        };
 
         const imperialGridCountX = Math.ceil(inches.width);
         const metricGridCountX = Math.ceil(mm.width / 10) * 10;
@@ -1017,6 +1036,51 @@ class Visualizer extends Component {
             }),
             pubsub.subscribe('visualizer:redraw', () => {
                 this.recolorScene();
+                this.updateScene({ forceUpdate: true });
+            }),
+            pubsub.subscribe('job:end', () => {
+                // Reset hidden lines when job finishes
+                if (this.visualizer) {
+                    this.visualizer.setHideProcessedLines(false);
+                    this.updateScene({ forceUpdate: true });
+                }
+            }),
+            pubsub.subscribe('workflow:state', (msg, state) => {
+                // Re-apply hide processed lines setting when job starts
+                if (state === 'running' && this.visualizer) {
+                    const hideProcessedLines = store.get(
+                        'widgets.visualizer.hideProcessedLines',
+                        false,
+                    );
+                    this.visualizer.setHideProcessedLines(hideProcessedLines);
+                }
+            }),
+            pubsub.subscribe('spindle:mode', () => {
+                if (!this.cuttingTool || !this.laserPointer || !this.cuttingPointer) {
+                    return;
+                }
+                const { state, isConnected } = this.props;
+                const { liteMode } = state;
+                const isLaser = isLaserMode();
+                if (isConnected) {
+                    this.cuttingTool.visible =
+                        !isLaser &&
+                        (liteMode
+                            ? state.objects.cuttingTool.visibleLite
+                            : state.objects.cuttingTool.visible);
+                    this.laserPointer.visible =
+                        isLaser &&
+                        (liteMode
+                            ? state.objects.cuttingTool.visibleLite
+                            : state.objects.cuttingTool.visible);
+                    this.cuttingPointer.visible = liteMode
+                        ? !state.objects.cuttingTool.visibleLite
+                        : !state.objects.cuttingTool.visible;
+                } else {
+                    this.cuttingTool.visible = false;
+                    this.laserPointer.visible = false;
+                    this.cuttingPointer.visible = false;
+                }
                 this.updateScene({ forceUpdate: true });
             }),
             pubsub.subscribe('file:load', (msg, data) => {
@@ -1128,18 +1192,6 @@ class Visualizer extends Component {
                     forceUpdateAllAxes: true,
                 });
             }),
-            pubsub.subscribe('colors:load', (_, data) => {
-                const { colorArray, savedColors } = data;
-                this.handleSceneRender(
-                    this.vizualization,
-                    colorArray,
-                    savedColors,
-                    this.renderCallback,
-                );
-                if (this.colorsWorker) {
-                    this.colorsWorker.terminate();
-                }
-            }),
             pubsub.subscribe('outline:start', () => {
                 if (this.outlineRunning) {
                     return;
@@ -1153,7 +1205,7 @@ class Visualizer extends Component {
                 try {
                     const outlineWorker = new Worker(
                         new URL(
-                            '../../workers/Outline.worker.js',
+                            '../../workers/Outline.worker.ts',
                             import.meta.url,
                         ),
                         { type: 'module' },
@@ -1177,6 +1229,11 @@ class Visualizer extends Component {
                         null,
                     );
 
+                    const isRapidless = outlineMode === OUTLINE_MODE_RAPIDLESS_SQUARE;
+                    const content = isRapidless
+                        ? reduxStore.getState().file.content
+                        : null;
+
                     // We want to make sure that in situations outline fails, you can try again in ~5 seconds
                     const maxRuntime = setTimeout(() => {
                         outlineWorker.terminate();
@@ -1194,9 +1251,10 @@ class Visualizer extends Component {
                     };
                     outlineWorker.postMessage({
                         isLaser,
-                        parsedData: vertices,
+                        parsedData: isRapidless ? [] : vertices,
                         mode: outlineMode,
                         zTravel,
+                        ...(isRapidless && { content }),
                         outlineSpeed,
                     });
                 } catch (e) {
@@ -1408,7 +1466,12 @@ class Visualizer extends Component {
     }
 
     createCoordinateSystem(units) {
-        const { mm, in: inches } = this.machineProfile;
+        const { mm } = this.machineProfile;
+        const inches = {
+            width: mm2in(mm.width),
+            depth: mm2in(mm.depth),
+            height: mm2in(mm.height),
+        };
 
         const imperialGridCountX = Math.ceil(inches.width);
         const metricGridCountX = Math.ceil(mm.width / 10) * 10;
@@ -1497,7 +1560,12 @@ class Visualizer extends Component {
     }
 
     createGridLineNumbers(units) {
-        const { mm, in: inches } = this.machineProfile;
+        const { mm } = this.machineProfile;
+        const inches = {
+            width: mm2in(mm.width),
+            depth: mm2in(mm.depth),
+            height: mm2in(mm.height),
+        };
 
         const imperialGridCountX = Math.ceil(inches.width);
         const metricGridCountX = Math.ceil(mm.width / 10) * 10;
@@ -1748,8 +1816,8 @@ class Visualizer extends Component {
                         this.cuttingTool = object;
                         this.cuttingTool.name = 'CuttingTool';
                         this.cuttingTool.visible =
-                            isConnected &&
-                            !isLaser &&
+                            this.props.isConnected &&
+                            !isLaserMode() &&
                             (liteMode
                                 ? state.objects.cuttingTool.visibleLite
                                 : state.objects.cuttingTool.visible);
@@ -2149,7 +2217,13 @@ class Visualizer extends Component {
             return;
         }
 
-        this.visualizer.group.rotateX(radians);
+        // Always animate to the absolute rotation value
+        // This ensures the visual stays in sync with the actual axis position
+        gsap.to(this.visualizer.group.rotation, {
+            x: radians,
+            overwrite: true,
+            onUpdate: () => this.updateScene({ forceUpdate: true }),
+        });
     }
 
     updateGcodeModal(prevPos, currPos) {
@@ -2172,7 +2246,7 @@ class Visualizer extends Component {
         const prevValue = prevPos[axis];
         const currValue = currPos[axis];
 
-        const valueHasChanged = prevValue === currValue;
+        const valueHasChanged = prevValue !== currValue;
 
         if (!isRotaryFile) {
             return;
@@ -2193,9 +2267,11 @@ class Visualizer extends Component {
          *  - Controller is GRBLHal
          *  - A-axis value has changed since previous value
          */
+
         if (grblCondition || grblHalCondition) {
-            const axisDifference = currValue - prevValue;
-            this.rotateGcodeModal(axisDifference);
+            // Always use the absolute current axis value for rotation
+            // This keeps the visual model in perfect sync with the machine position
+            this.rotateGcodeModal(currValue);
         }
     }
 
@@ -2281,6 +2357,13 @@ class Visualizer extends Component {
             this.controls.reset();
         }
         this.updateScene();
+    }
+
+    runCheck() {
+        controller.command('gcode:start');
+        toast.info('Running Check mode', {
+            position: 'bottom-right',
+        });
     }
 
     handleSceneRender(vizualization, colorArray, savedColors, callback) {
@@ -2379,14 +2462,46 @@ class Visualizer extends Component {
         reduxStore.dispatch(
             updateFileRenderState({ renderState: RENDER_RENDERED }),
         );
+        console.timeEnd('gSender:fileLoad');
 
         typeof callback === 'function' && callback({ bbox: bbox });
 
         if (store.get('widgets.visualizer.checkFile')) {
-            controller.command('gcode:test');
-            toast.info('Running Check mode', {
-                position: 'bottom-right',
-            });
+            // wait for connection
+            // if none after 5 tries, then we must not be connected, so dont prompt
+            // have to do it this way bc the code setting "isConnected" to true is async and gets done after this code runs, generally
+            clearInterval(this.checkModeInterval); // start with a clear to prevent multiple pop ups
+            this.checkModeInterval = setInterval(() => {
+                if (this.counter < 5) {
+                    if (this.props.isConnected) {
+                        Confirm({
+                            title: 'Start Check Mode',
+                            content:
+                                'Run a validation check ($C) on this file?',
+                            confirmLabel: 'Start Check',
+                            cancelLabel: 'Cancel',
+                            onConfirm: () => {
+                                const { activeState } = this.props.state;
+                                if (activeState === GRBL_ACTIVE_STATE_CHECK) {
+                                    this.runCheck();
+                                } else {
+                                    controller.command('gcode', [
+                                        '%global.state.testWCS=modal.wcs',
+                                        '$C',
+                                    ]);
+                                    this.waitingForCheck = true;
+                                }
+                            },
+                        });
+                        this.counter = 0;
+                        clearInterval(this.checkModeInterval);
+                    }
+                    this.counter++;
+                } else {
+                    this.counter = 0;
+                    clearInterval(this.checkModeInterval);
+                }
+            }, 500);
         }
     }
 
@@ -2402,10 +2517,63 @@ class Visualizer extends Component {
         const { setVisualizerReady } = this.props.actions;
         this.visualizer = new GCodeVisualizer(currentTheme);
 
+        const toBoundedFloat32Array = (buffer, length) => {
+            if (!buffer || typeof buffer.byteLength !== 'number') {
+                return new Float32Array(0);
+            }
+            const maxLength = Math.floor(
+                buffer.byteLength / Float32Array.BYTES_PER_ELEMENT,
+            );
+            const safeLength = Number.isFinite(length)
+                ? Math.min(Math.max(Math.floor(length), 0), maxLength)
+                : maxLength;
+            return new Float32Array(buffer, 0, safeLength);
+        };
+
+        const toBoundedUint32Array = (buffer, length) => {
+            if (!buffer || typeof buffer.byteLength !== 'number') {
+                return new Uint32Array(0);
+            }
+            const maxLength = Math.floor(
+                buffer.byteLength / Uint32Array.BYTES_PER_ELEMENT,
+            );
+            const safeLength = Number.isFinite(length)
+                ? Math.min(Math.max(Math.floor(length), 0), maxLength)
+                : maxLength;
+            return new Uint32Array(buffer, 0, safeLength);
+        };
+
+        const colorArray = toBoundedFloat32Array(
+            vizualization.colorArrayBuffer,
+            vizualization.colorLen,
+        );
+        const savedColors = toBoundedFloat32Array(
+            vizualization.savedColorsBuffer,
+            vizualization.savedColorLen,
+        );
+
+        const visualization = {
+            ...vizualization,
+            vertices: toBoundedFloat32Array(
+                vizualization.vertices,
+                vizualization.verticesLen,
+            ),
+            frames: toBoundedUint32Array(
+                vizualization.frames,
+                vizualization.framesLen,
+            ),
+        };
+
+        const hideProcessedLines = store.get(
+            'widgets.visualizer.hideProcessedLines',
+            false,
+        );
+        this.visualizer.setHideProcessedLines(hideProcessedLines);
+
         const shouldRenderVisualization = liteMode ? !disabledLite : !disabled;
 
         if (shouldRenderVisualization) {
-            this.vizualization = vizualization;
+            this.vizualization = visualization;
             this.renderCallback = callback;
 
             // we may need to redraw grid if machine size is diff
@@ -2418,23 +2586,12 @@ class Visualizer extends Component {
                 this.redrawGrids();
             }
 
-            const colorsWorker = new Worker(
-                new URL('../../workers/colors.worker.js', import.meta.url),
-                { type: 'module' },
+            this.handleSceneRender(
+                visualization,
+                colorArray,
+                savedColors,
+                callback,
             );
-
-            this.colorsWorker = colorsWorker;
-            this.colorsWorker.onmessage = colorsResponse;
-            this.colorsWorker.postMessage({
-                colors: vizualization.colors,
-                frames: vizualization.frames,
-                spindleSpeeds: vizualization.spindleSpeeds,
-                isLaser: vizualization.isLaser,
-                spindleChanges: vizualization.spindleChanges,
-                theme: currentTheme,
-            });
-
-            // this.handleSceneRender(vizualization, callback);
         } else {
             setVisualizerReady();
         }

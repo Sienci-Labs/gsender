@@ -3,12 +3,12 @@ import { ControlledInput } from 'app/components/ControlledInput';
 interface IPSettingInputsProps {
     ip: number[];
     index: number;
-    subIndex: number;
-    onChange: (value) => void;
+    subIndex?: number;
+    onChange: (value: any) => void;
 }
 
 export function IPSettingInput({ ip = [], onChange }: IPSettingInputsProps) {
-    function updateIPPortion(index, v) {
+    function updateIPPortion(index: number, v: string) {
         const newIP = [...ip];
         newIP[index] = Number(v);
         onChange(newIP);

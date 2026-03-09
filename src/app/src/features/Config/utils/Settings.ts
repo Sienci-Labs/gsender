@@ -1,4 +1,3 @@
-import download from 'downloadjs';
 import store from 'app/store';
 import api from 'app/api';
 import { restoreDefault, storeUpdate } from 'app/lib/storeUpdate';
@@ -7,15 +6,25 @@ import { generateEEPROMSettings } from 'app/features/Config/utils/EEPROM.ts';
 import { toast } from 'sonner';
 import controller from 'app/lib/controller.ts';
 import pubsub from 'pubsub-js';
+import { EEPROM, FilteredEEPROM } from 'app/definitions/firmware';
+import { gSenderSetting, gSenderSettingsValues } from '../assets/SettingsMenu';
+import { State } from 'app/store/definitions';
 
-export function exportFirmwareSettings(settings) {
+export function exportFirmwareSettings(settings: object) {
     const output = JSON.stringify(settings);
     const blob = new Blob([output], { type: 'application/json' });
 
     const today = new Date();
     const filename = `gSender-firmware-settings-${today.toLocaleDateString()}-${today.toLocaleTimeString()}`;
 
-    download(blob, filename, 'json');
+    // Native JS way to download file
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
 }
 
 export function humanReadableMachineName(o) {
@@ -33,7 +42,7 @@ export async function exportSettings() {
     const settings = store.get();
     settings.commandKeys = Object.fromEntries(
         Object.entries(settings.commandKeys).filter(
-            ([key, shortcut]) => shortcut.category !== 'Macros',
+            ([_key, shortcut]) => shortcut.category !== 'Macros',
         ),
     ); //Exclude macro shortcuts
     delete settings.session;
@@ -63,12 +72,35 @@ export async function exportSettings() {
     }
 }
 
-const onImportConfirm = (file) => {
+const onImportConfirm = (file: File) => {
     if (file) {
         const reader = new FileReader();
         reader.readAsText(file, 'UTF-8');
         reader.onload = async (event) => {
-            await storeUpdate(event.target.result);
+            try {
+                const importData = JSON.parse(event.target.result as string);
+
+                // Validate the imported data
+                // check that the major properties exist
+                if (
+                    !importData.settings ||
+                    !importData.settings.workspace ||
+                    !importData.settings.widgets ||
+                    !importData.settings.commandKeys ||
+                    !importData.events
+                ) {
+                    throw new Error('Invalid gSender settings file format');
+                }
+                await storeUpdate(event.target.result as string);
+            } catch (error) {
+                console.error('Import error:', error);
+                toast.error(
+                    'Failed to import settings. Please check the file format.',
+                    {
+                        position: 'bottom-right',
+                    },
+                );
+            }
         };
         reader.onerror = () => {
             console.error('Unable to load settings to import');
@@ -76,7 +108,7 @@ const onImportConfirm = (file) => {
     }
 };
 
-export function importSettings(e) {
+export function importSettings(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files[0];
 
     Confirm({
@@ -98,7 +130,7 @@ export function handleRestoreDefaultClick() {
     });
 }
 
-export function matchesSearchTerm(o, term = '') {
+export function matchesSearchTerm(o: FilteredEEPROM[], term = '') {
     // For empty search, we always match
     if (term.length === 0 || !term) {
         return true;
@@ -106,8 +138,10 @@ export function matchesSearchTerm(o, term = '') {
     return JSON.stringify(o).toLowerCase().includes(term.toLowerCase());
 }
 
-export function generateSenderSettings(settings) {
-    const dirtySettings = {};
+export function generateSenderSettings(settings: gSenderSetting[]) {
+    const dirtySettings: {
+        [key: string]: { value: gSenderSettingsValues; onUpdate: () => void };
+    } = {};
     settings.map((s) => {
         if (s.dirty) {
             dirtySettings[s.key] = {
@@ -120,12 +154,15 @@ export function generateSenderSettings(settings) {
     return dirtySettings;
 }
 
-export function updateAllSettings(settings, eeprom) {
+export function updateAllSettings(
+    settings: gSenderSetting[],
+    eeprom: FilteredEEPROM[],
+) {
     const eepromToChange = generateEEPROMSettings(eeprom);
     const eepromNumber = Object.keys(eepromToChange).length;
     if (eepromNumber > 0) {
         let changedSettings = Object.keys(eepromToChange).map(
-            (k) => `${k}=${eepromToChange[k]}`,
+            (k) => `${k}=${eepromToChange[k as EEPROM]}`,
         );
         changedSettings.push('$$');
         controller.command('gcode', changedSettings);

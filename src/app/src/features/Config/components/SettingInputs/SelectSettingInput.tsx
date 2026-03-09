@@ -9,9 +9,9 @@ import {
 export interface SelectSettingInputProps {
     options: string[] | number[];
     index: number;
-    subIndex: number;
+    subIndex?: number;
     value: string | number;
-    onChange: (v) => void;
+    onChange: (v: any) => void;
     disabled: () => boolean;
 }
 
@@ -23,7 +23,11 @@ export function SelectSettingInput({
 }: SelectSettingInputProps): React.ReactNode {
     const isDisabled = disabled();
     return (
-        <Select onValueChange={onChange} disabled={isDisabled}>
+        <Select
+            onValueChange={onChange}
+            disabled={isDisabled}
+            value={`${value}`}
+        >
             <SelectTrigger className="bg-white bg-opacity-100 dark:border-gray-500 ring-1 ring-gray-300 rounded-md">
                 <SelectValue placeholder={`${value}`} />
             </SelectTrigger>

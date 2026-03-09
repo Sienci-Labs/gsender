@@ -432,7 +432,8 @@ class Sender extends events.EventEmitter {
             this.state.elapsedTime = 0;
             this.state.timePaused = 0;
             this.state.timeRunning = 0;
-            this.state.remainingTime = this.state.estimatedTime;
+            // make sure time is up to date will current ovF
+            this.state.remainingTime = this.state.estimatedTime / (this.state.ovF / 100);
             this.state.countdownQueue = [];
             this.state.totalSentToQueue = 0;
             this.state.queueDone = true;
@@ -476,22 +477,13 @@ class Sender extends events.EventEmitter {
         // Elapsed Time
         this.updateElapsedTime();
 
-        if (this.state.isRotaryFile) {
-            // Make a 1 second delay before estimating the remaining time
-            if (this.state.elapsedTime >= 1000 && this.state.received > 0) {
-                const timePerCode = this.state.timeRunning / this.state.received;
-                this.state.remainingTime = (timePerCode * this.state.total - this.state.timeRunning);
-            }
-        } else {
-            // eslint-disable-next-line no-lonely-if
-            if (this.state.received > 0) {
-                if (this.state.estimatedTime > 0) { // in case smth goes wrong with the estimate, don't want to show negative time
-                    if (this.state.received < this.state.estimateData.length) {
-                        // add the lines to the queue from where we left off to the current number received
-                        for (let i = this.state.totalSentToQueue; i <= this.state.received; i++) {
-                            this.state.countdownQueue.push(Number(this.state.estimateData[i] || 0));
-                            this.state.totalSentToQueue++;
-                        }
+        if (this.state.received > 0) {
+            if (this.state.estimatedTime > 0) { // in case smth goes wrong with the estimate, don't want to show negative time
+                if (this.state.received < this.state.estimateData.length) {
+                    // add the lines to the queue from where we left off to the current number received
+                    for (let i = this.state.totalSentToQueue; i <= this.state.received; i++) {
+                        this.state.countdownQueue.push(Number(this.state.estimateData[i] || 0));
+                        this.state.totalSentToQueue++;
                     }
                 }
             }

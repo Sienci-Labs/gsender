@@ -23,9 +23,6 @@
 
 /* eslint max-len: 0 */
 /* eslint no-console: 0 */
-require('core-js/stable');
-require('regenerator-runtime/runtime');
-
 const path = require('path');
 const isElectron = require('is-electron');
 const program = require('commander');
@@ -104,8 +101,6 @@ if (normalizedArgv.length > 1) {
 const options = program.opts();
 
 module.exports = () => new Promise((resolve, reject) => {
-    // Change working directory to 'server' before require('./server')
-    process.chdir(path.resolve(__dirname, 'server'));
     let kiosk = !!options.kiosk;
 
     require('./server').createServer({

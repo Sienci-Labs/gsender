@@ -73,7 +73,7 @@ export interface ControllerListeners {
     'controller:settings': Array<Function>;
     'controller:state': Array<Function>;
     'settings:description': Array<Function>;
-    'settings:alarm': Array<Function>;
+    'settings:alarms': Array<Function>;
     message: Array<Function>;
     'toolchange:start': Array<Function>;
     hPong: Array<Function>;
@@ -81,6 +81,7 @@ export interface ControllerListeners {
     'file:load': Array<Function>;
     'file:unload': Array<Function>;
     'homing:flag': Array<Function>;
+    'homing:has-homed': Array<Function>;
     'electronErrors:errorList': Array<Function>;
     'firmware:ready': Array<Function>;
     'sender:M0M1': Array<Function>;
@@ -99,7 +100,11 @@ export interface ControllerListeners {
     'flash:message': Array<Function>;
     'flash:progress': Array<Function>;
     'spindle:add': Array<Function>;
-
+    atci: Array<Function>;
+    'ymodem:start': Array<Function>;
+    'ymodem:complete': Array<Function>;
+    'ymodem:progress': Array<Function>;
+    'ymodem:error': Array<Function>;
     //A-Axis A.K.A Rotary-Axis events
     'rotaryAxis:updateState': Array<Function>;
     updateRotaryMode: Array<Function>;
@@ -108,6 +113,9 @@ export interface ControllerListeners {
     requestEstimateData: Array<Function>;
     'job:start': Array<Function>;
     'job:stop': Array<Function>;
+    'sdcard:files': Array<Function>;
+    'sdcard:clear': Array<Function>;
+    'sdcard:json': Array<Function>;
 }
 
 const ensureArray = (...args: Array<any>) => {
@@ -120,7 +128,7 @@ const ensureArray = (...args: Array<any>) => {
     return ([] as any).concat(args);
 };
 
-const noop = () => { };
+const noop = () => {};
 
 class Controller {
     io: Function = noop;
@@ -178,7 +186,7 @@ class Controller {
         'controller:settings': [],
         'controller:state': [],
         'settings:description': [],
-        'settings:alarm': [],
+        'settings:alarms': [],
         message: [],
         'toolchange:start': [],
         hPong: [],
@@ -186,6 +194,7 @@ class Controller {
         'file:load': [],
         'file:unload': [],
         'homing:flag': [],
+        'homing:has-homed': [],
         'electronErrors:errorList': [],
         'firmware:ready': [],
         'sender:M0M1': [],
@@ -211,6 +220,14 @@ class Controller {
 
         requestEstimateData: [],
         'job:start': [],
+        'sdcard:files': [],
+        'sdcard:clear': [],
+        'sdcard:json': [],
+        atci: [],
+        'ymodem:start': [],
+        'ymodem:complete': [],
+        'ymodem:progress': [],
+        'ymodem:error': [],
         'job:stop': [],
     };
 
@@ -397,10 +414,21 @@ class Controller {
     removeListener(eventName: string, listener?: Function): boolean {
         const listeners =
             this.listeners[eventName as keyof typeof this.listeners];
-        if (!listeners || typeof listener !== 'function') {
+        if (!listeners) {
             return false;
         }
-        listeners.splice(listeners.indexOf(listener), 1);
+
+        if (typeof listener !== 'function') {
+            listeners.length = 0;
+            return true;
+        }
+
+        const index = listeners.indexOf(listener);
+        if (index < 0) {
+            return false;
+        }
+
+        listeners.splice(index, 1);
         return true;
     }
 

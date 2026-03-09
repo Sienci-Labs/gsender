@@ -23,6 +23,8 @@ export function UnitBadge({ isRemote }: Props) {
     const handleUnitSwap = () => {
         store.set('workspace.units', localUnits);
     };
+
+    const unitLabel = units == METRIC_UNITS ? 'mm' : "Inch";
     return (
         <>
             <div
@@ -38,10 +40,13 @@ export function UnitBadge({ isRemote }: Props) {
                     }
                 }}
             >
-                <span>
+                <div className="max-xl:hidden">
                     Units:
                     <br /> {units}
-                </span>
+                </div>
+                <div className={"max-xl:block hidden px-1 py-1.5"}>
+                    {unitLabel}
+                </div>
             </div>
             <Dialog
                 open={showPopup}

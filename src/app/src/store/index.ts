@@ -15,6 +15,9 @@ import {
     TOUCHPLATE_TYPE_AUTOZERO,
     TOUCHPLATE_TYPE_STANDARD,
 } from 'app/lib/constants.ts';
+import api from 'app/api';
+import pubsub from 'pubsub-js';
+import { BackupFrequencies } from 'app/workspace/definitions';
 
 interface UserData {
     path: string;
@@ -75,6 +78,11 @@ const persist = (data: StoreData): void => {
         },
     };
 
+    if (persistData.state.workspace.backupFreq === 'On Update') {
+        persistData.state.workspace.lastBackupTime = Date.now();
+        backupPreviousState(persistData);
+    }
+
     try {
         const value = JSON.stringify(persistData, null, 2);
 
@@ -82,6 +90,9 @@ const persist = (data: StoreData): void => {
         if (isElectron()) {
             const fs = window.require('fs'); // Use window.require to require fs module in Electron
             fs.writeFileSync(userData!.path, value);
+
+            // save preferences to api so that remote window can fetch it
+            api.preferences.replace(persistData);
         } else {
             localStorage.setItem('sienci', value);
         }
@@ -234,6 +245,7 @@ const backupPreviousState = (data: any): void => {
         null,
         2,
     );
+    const now = new Date().toISOString().replaceAll(':', '-');
 
     if (isElectron()) {
         const { app } = window.require('@electron/remote');
@@ -241,14 +253,35 @@ const backupPreviousState = (data: any): void => {
 
         const backupPath = path.join(
             app.getPath('userData'),
-            'preferences-backup.json',
+            'preferences-backup-' + now + '.json',
         );
 
         const fs = window.require('fs'); // Use window.require to require fs module in Electron
         fs.writeFileSync(backupPath, value);
-    } else {
-        localStorage.setItem('sienci-backup', value);
     }
+};
+
+const isTimeToBackup = (
+    lastBackupTime: number,
+    frequency: BackupFrequencies,
+) => {
+    if (frequency === 'On Update') {
+        return false;
+    }
+
+    const now = Date.now();
+    const elapsed = now - lastBackupTime;
+
+    const intervals = {
+        Daily: 1000 * 60 * 60 * 24,
+        Weekly: 1000 * 60 * 60 * 24 * 7,
+        Monthly: 1000 * 60 * 60 * 24 * 30,
+    };
+
+    const interval = intervals[frequency];
+    if (!interval) throw new Error(`Unknown backup frequency: "${frequency}"`);
+
+    return elapsed >= interval;
 };
 
 const cnc: CncData = {
@@ -261,8 +294,13 @@ try {
     const data = JSON.parse(text);
     cnc.version = get(data, 'version', settings.version);
     cnc.state = get(data, 'state', {});
+    const lastBackupTime = get(cnc.state, 'workspace.lastBackupTime', 0);
+    const backupFreq = get(cnc.state, 'workspace.backupFreq', 'On Update');
 
-    backupPreviousState(cnc.state);
+    if (isTimeToBackup(lastBackupTime, backupFreq)) {
+        data.state.workspace.lastBackupTime = Date.now();
+        backupPreviousState(data);
+    }
 } catch (e) {
     log.error(e);
 }
@@ -296,7 +334,9 @@ const migrateStore = (): void => {
 
     if (semver.lt(cnc.version, '1.5.5')) {
         // if user has default retraction distance (4), change it to the new default (2)
-        const currentRetractDistance = store.get('widgets.probe.retractionDistance');
+        const currentRetractDistance = store.get(
+            'widgets.probe.retractionDistance',
+        );
         if (currentRetractDistance === 4) {
             store.set('widgets.probe.retractionDistance', 2);
         }
@@ -649,14 +689,39 @@ const migrateStore = (): void => {
     }
 };
 
+const syncPrefs = async () => {
+    try {
+        const config = await api.preferences.fetch();
+        if (config) {
+            store.restoreState(config.data.state, () => {
+                setTimeout(() => {
+                    pubsub.publish('repopulate');
+                }, 50);
+            });
+            // force UI to update with the changes
+            pubsub.publish('config:saved', config.data.state);
+        }
+    } catch (err) {
+        log.error(err);
+    }
+};
+
 try {
     // saveBackup();
     migrateStore();
+
+    if (isElectron()) {
+        window.ipcRenderer.send(
+            'assignPromptExit',
+            store.get('workspace.promptExit'),
+        );
+    }
 } catch (err) {
     log.error(err);
 }
 
 store.getConfig = getConfig;
 store.persist = persist;
+store.syncPrefs = syncPrefs;
 
 export default store;

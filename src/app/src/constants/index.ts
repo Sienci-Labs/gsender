@@ -353,10 +353,6 @@ export const STATS_PAGES = {
     RUN_TIME_PER_PORT,
 };
 
-export const DB_NAME = 'ParsedDataDB';
-export const OBJECT_STORE = 'parsedData';
-export const DATA_ID = 'data';
-
 export const USAGE_TOOL_NAME = {
     LOCATION: 'LOCATION',
     JOG_CONTROL: 'JOG_CONTROL',
@@ -412,6 +408,13 @@ export const CAMERA_MODES = {
     CAMERA_MODE_PAN: 'CAMERA_MODE_PAN',
     CAMERA_MODE_ROTATE: 'CAMERA_MODE_ROTATE',
 };
+export const CAMERA_POSITIONS = {
+    Top: 'Top',
+    '3D': '3D',
+    Front: 'Front',
+    Left: 'Left',
+    Right: 'Right',
+};
 
 export const DARK_THEME = 'Dark';
 export const LIGHT_THEME = 'Light';
@@ -447,7 +450,12 @@ export const LIGHTWEIGHT_OPTIONS = {
 // Outline Modes
 export const OUTLINE_MODE_DETAILED = 'Detailed';
 export const OUTLINE_MODE_SIMPLE = 'Square';
-export const OUTLINE_MODES = [OUTLINE_MODE_DETAILED, OUTLINE_MODE_SIMPLE];
+export const OUTLINE_MODE_RAPIDLESS_SQUARE = 'Rapidless Square';
+export const OUTLINE_MODES = [
+    OUTLINE_MODE_DETAILED,
+    OUTLINE_MODE_SIMPLE,
+    OUTLINE_MODE_RAPIDLESS_SQUARE,
+];
 export const OUTLINE_TIMEOUT = 15000;
 
 // const SPINDLE_LABELS = {

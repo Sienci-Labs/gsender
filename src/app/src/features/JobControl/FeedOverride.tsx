@@ -125,7 +125,8 @@ const Overrides: React.FC<OverridesProps> = ({
                     globalLocalOvFTimestamp = Date.now();
                     debouncedFeedHandler(values[0]);
                 }}
-                onPointerUp={(_e) => {
+                // change to lost pointer capture as pointer up does not always fire when you pull past the slider and let go
+                onLostPointerCapture={(_e) => {
                     debouncedFeedHandler(localOvF);
                 }}
             />

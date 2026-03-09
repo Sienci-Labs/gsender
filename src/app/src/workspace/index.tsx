@@ -45,6 +45,7 @@ import {
 import pubsub from 'pubsub-js';
 import ConfirmationDialog from 'app/components/ConfirmationDialog/ConfirmationDialog';
 import { SettingsProvider } from 'app/features/Config/utils/SettingsContext';
+import { Helper } from 'app/features/Helper';
 
 const Workspace = () => {
     const location = useLocation();
@@ -417,6 +418,7 @@ const Workspace = () => {
                         tabIndex={-1}
                         role="main"
                     >
+                        <Helper />
                         <Carve />
                         <Outlet />
                     </main>

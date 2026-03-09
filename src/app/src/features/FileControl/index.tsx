@@ -83,6 +83,11 @@ const FileControl = () => {
                     deleteRecentFile(data.path);
                 },
             );
+
+            // Signal to main that we're ready to receive file association data
+            setTimeout(() => {
+                (window as any).ipcRenderer.send('file-association-ready');
+            }, 250)
         }
     }, []);
 
@@ -113,7 +118,7 @@ const FileControl = () => {
     return (
         <Widget>
             <Widget.Content>
-                <div className="w-full flex flex-col gap-2 max-xl:gap-1">
+                <div className="w-full flex flex-col items-center">
                     <ButtonControlGroup />
                     <FileInformation
                         handleRecentFileUpload={handleRecentFileUpload}

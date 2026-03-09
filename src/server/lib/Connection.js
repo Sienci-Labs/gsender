@@ -94,13 +94,14 @@ class Connection extends EventEmitter {
 
     constructor(engine, port, options, callback) {
         super();
-        const { baudrate, rtscts, network, defaultFirmware } = { ...options };
+        const { baudrate, rtscts, network, defaultFirmware, ethernetPort } = { ...options };
         this.options = {
             ...this.options,
             port: port,
             baudrate: baudrate,
             rtscts: !!rtscts,
             defaultFirmware,
+            ethernetPort,
             network,
         };
         this.callback = callback;
@@ -110,6 +111,7 @@ class Connection extends EventEmitter {
             path: port,
             baudRate: baudrate,
             rtscts: !!rtscts,
+            ethernetPort,
             network,
             writeFilter: (data) => {
                 const line = data.trim();
@@ -166,6 +168,11 @@ class Connection extends EventEmitter {
 
         this.connection.open((err) => {
             if (err) {
+                // Remove listeners so the async 'close' from port.destroy()
+                // doesn't re-enter Connection.close() and double-fire the callback
+                this.connection.removeListener('data', this.connectionEventListener.data);
+                this.connection.removeListener('close', this.connectionEventListener.close);
+                this.connection.removeListener('error', this.connectionEventListener.error);
                 log.error(`Error opening serial port "${port}":`, err);
                 this.emit('serialport:error', { err: err, port: port });
                 callback(err); // notify error
@@ -181,17 +188,10 @@ class Connection extends EventEmitter {
             }
 
             log.debug(`Connected to serial port "${port}"`);
-            if (!this.controllerType && network) {
-                this.controllerType = GRBLHAL;
-                this.emit(
-                    'firmwareFound',
-                    GRBLHAL,
-                    this.options,
-                    this.callback,
-                );
-            } else if (!this.controllerType) {
+            if (!this.controllerType) {
                 this.connection.writeImmediate('$I\n');
                 this.timeout = setInterval(() => {
+                    this.connection.writeImmediate('$I\n');
                     if (this.count >= 5) {
                         this.controllerType = this.options.defaultFirmware;
                         this.emit(
@@ -203,7 +203,6 @@ class Connection extends EventEmitter {
                         clearInterval(this.timeout);
                         return;
                     }
-                    this.connection.writeImmediate('\x18');
                     this.count++;
                 }, 800);
             }
@@ -288,8 +287,16 @@ class Connection extends EventEmitter {
         return this.sockets;
     }
 
+    restoreListeners() {
+        this.connection.addPortListeners();
+    }
+
     setWriteFilter(writeFilter) {
         this.connection.setWriteFilter(writeFilter);
+    }
+
+    getConnectionObject() {
+        return this.connection.port;
     }
 
     emitToSockets(eventName, ...args) {
@@ -335,6 +342,14 @@ class Connection extends EventEmitter {
         if (this.timeout) {
             this.timeout = null;
         }
+    }
+
+    isNetwork() {
+        return this.options.network;
+    }
+
+    getFTPInfo() {
+        return [this.options.port, this.options.ethernetPort];
     }
 }
 

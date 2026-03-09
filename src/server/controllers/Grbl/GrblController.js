@@ -180,6 +180,12 @@ class GrblController {
 
     feederCB = null;
 
+    FOQueue = []; // feedrate override queue
+    runningFOQ = false;
+
+    SOQueue = []; // spindle override queue
+    runningSOQ = false;
+
     // Sender
     sender = null;
 
@@ -355,6 +361,12 @@ class GrblController {
                     }
                 }
 
+                const useAaxisForGrbl = store.get('preferences.useAaxisForGrbl', false);
+
+                // If we don't need to convert A-axis to Y-axis, return the line as is since A-axis commands are given by default
+                if (useAaxisForGrbl) {
+                    return line;
+                }
 
                 const containsACommand = A_AXIS_COMMANDS.test(line);
                 const containsYCommand = Y_AXIS_COMMANDS.test(line);
@@ -519,6 +531,13 @@ class GrblController {
                         line = line.replace('M6', '(M6)');
                     }
                     //line = line.replace(`${tool?.[0]}`, `(${tool?.[0]})`);
+                }
+
+                const useAaxisForGrbl = store.get('preferences.useAaxisForGrbl', false);
+
+                // If we don't need to convert A-axis to Y-axis, return the line as is since A-axis commands are given by default
+                if (useAaxisForGrbl) {
+                    return line;
                 }
 
                 /**
@@ -1387,6 +1406,36 @@ class GrblController {
         }
     }
 
+    consumeFOQ() {
+        if (!this.runningFOQ) {
+            this.runningFOQ = true;
+            let index = 0;
+            while (this.FOQueue.length > 0) {
+                const command = this.FOQueue.shift();
+                setTimeout(() => {
+                    this.connection.writeImmediate(command);
+                }, 25 * (index + 1));
+                index++;
+            }
+            this.runningFOQ = false;
+        }
+    }
+
+    consumeSOQ() {
+        if (!this.runningSOQ) {
+            this.runningSOQ = true;
+            let index = 0;
+            while (this.SOQueue.length > 0) {
+                const command = this.SOQueue.shift();
+                setTimeout(() => {
+                    this.connection.writeImmediate(command);
+                }, 25 * (index + 1));
+                index++;
+            }
+            this.runningSOQ = false;
+        }
+    }
+
     // eslint-disable-next-line max-lines-per-function
     command(cmd, ...args) {
         const handler = {
@@ -1736,15 +1785,12 @@ class GrblController {
                 let diff = value - feedOV;
 
                 if (value === 100) {
-                    this.write(String.fromCharCode(0x90));
+                    this.FOQueue.push(String.fromCharCode(0x90));
                 } else {
-                    const queue = calcOverrides(diff, 'feed');
-                    queue.forEach((command, index) => {
-                        setTimeout(() => {
-                            this.connection.writeImmediate(command);
-                        }, 25 * (index + 1));
-                    });
+                    this.FOQueue.push(...calcOverrides(diff, 'feed'));
                 }
+                this.consumeFOQ();
+
 
                 this.sender.setOvF(value);
             },
@@ -1763,15 +1809,11 @@ class GrblController {
                 }
 
                 if (value === 100) {
-                    this.write(String.fromCharCode(0x99));
+                    this.SOQueue.push(String.fromCharCode(0x99));
                 } else {
-                    const queue = calcOverrides(diff, 'spindle');
-                    queue.forEach((command, index) => {
-                        setTimeout(() => {
-                            this.connection.writeImmediate(command);
-                        }, 25 * (index + 1));
-                    });
+                    this.SOQueue.push(...calcOverrides(diff, 'spindle'));
                 }
+                this.consumeSOQ();
             },
             // Rapid Overrides
             // @param {number} value A percentage value of 25, 50, or 100. A value of zero will reset to 100%.
@@ -2099,6 +2141,7 @@ class GrblController {
             ...context,
             source: WRITE_SOURCE_CLIENT
         });
+
         log.silly(`> ${data}`);
     }
 

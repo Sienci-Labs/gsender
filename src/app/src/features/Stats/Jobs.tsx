@@ -7,8 +7,7 @@ import {
     StatContext,
 } from 'app/features/Stats/utils/StatContext.tsx';
 import { GRBL, JOB_STATUS, JOB_TYPES } from 'app/constants';
-import Icon from '@mdi/react';
-import { mdiCheckBold, mdiClose } from '@mdi/js';
+import { CheckCircle, XCircle } from 'lucide-react';
 import { CardHeader } from 'app/features/Stats/components/CardHeader.tsx';
 
 import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
@@ -78,10 +77,14 @@ const columnData: CustomColumnDef<Job, any>[] = [
         accessorKey: 'jobStatus',
         header: () => 'Status',
         cell: (info: { renderValue: () => JOB_STATUS_T }) => {
-            return info.renderValue() === JOB_STATUS.COMPLETE ? (
-                <Icon path={mdiCheckBold} size={1} />
-            ) : (
-                <Icon path={mdiClose} size={1} />
+            return (
+                <div className="flex items-center justify-center">
+                    {info.renderValue() === JOB_STATUS.COMPLETE ? (
+                        <CheckCircle size={24} color="green" />
+                    ) : (
+                        <XCircle size={24} color="red" />
+                    )}
+                </div>
             );
         },
         size: 20,
@@ -90,9 +93,10 @@ const columnData: CustomColumnDef<Job, any>[] = [
 
 export function Jobs() {
     const { jobs } = useContext(StatContext);
+
     return (
         <div className="grid grid-cols-6 grid-rows-6 gap-2 w-full h-full overflow-y-auto">
-            <div className="col-span-4 row-span-6 px-8 max-xl:px-0 mb-2">
+            <div className="col-span-4 row-span-6 pr-8 max-xl:pr-0 mb-2">
                 <StatCard>
                     <CardHeader>Job History</CardHeader>
                     <div className="w-full flex flex-col">
@@ -106,7 +110,7 @@ export function Jobs() {
                     </div>
                 </StatCard>
             </div>
-            <div className="col-span-2 row-span-6 col-start-5 px-8 max-xl:px-0 flex flex-col gap-4 justify-center items-center">
+            <div className="col-span-2 row-span-6 col-start-5 pl-8 max-xl:pl-0 flex flex-col gap-2 justify-center items-center">
                 <div className="flex flex-col bg-white border border-gray-300 rounded p-2 h-full dark:bg-dark dark:border-dark-lighter w-full justify-center items-center">
                     <CardHeader>Jobs per CNC</CardHeader>
                     <JobsPerComPort />

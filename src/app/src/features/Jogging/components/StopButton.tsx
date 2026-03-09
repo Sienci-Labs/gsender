@@ -4,8 +4,6 @@ export function StopButton({ disabled = false, onClick }) {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
-            width={71}
-            height={71}
             onClick={onClick}
             viewBox="0 0 79 79"
             role="button"
@@ -18,7 +16,7 @@ export function StopButton({ disabled = false, onClick }) {
                 }
             }}
             className={cn(
-                'absolute top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2',
+                'absolute top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 w-[71px] portrait:w-[83px] h-[71px] portrait:h-[83px]',
                 {
                     'cursor-not-allowed': disabled,
                     'cursor-pointer': !disabled,

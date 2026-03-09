@@ -6,11 +6,20 @@ type InputProps = React.ComponentProps<'input'> & {
     label?: string | React.ReactNode;
     sizing?: 'xs' | 'sm' | 'md' | 'lg';
     wrapperClassName?: string;
+    type?: string;
 };
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
     (
-        { wrapperClassName, className, suffix, label, sizing = 'md', ...props },
+        {
+            wrapperClassName,
+            className,
+            suffix,
+            label,
+            sizing = 'md',
+            type,
+            ...props
+        },
         ref,
     ) => {
         const inputSize = {
@@ -41,6 +50,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                         )}
                         ref={ref}
                         title=""
+                        type={type}
                         {...props}
                     />
                     {suffix && (

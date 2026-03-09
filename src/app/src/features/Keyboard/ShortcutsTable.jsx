@@ -238,6 +238,7 @@ const ShortcutsTable = ({ onEdit, onDelete, onShortcutToggle, dataSet }) => {
         const bTitle = allShuttleControlEvents[b.cmd]
             ? allShuttleControlEvents[b.cmd].title
             : b.title;
+
         return aTitle.localeCompare(bTitle);
     });
 

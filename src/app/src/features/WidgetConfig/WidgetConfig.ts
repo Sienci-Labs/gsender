@@ -26,7 +26,7 @@ import { translateKey } from './utils';
 import { State } from 'app/store/definitions';
 
 export interface WidgetConfigInterface {
-    get<T = any>(key: string, defaultValue: T): T;
+    get<T = any>(key: string, defaultValue?: T): T;
     set<T = any>(key: string, value: T): State;
     unset(key: string): Record<string, any>;
     replace<T = any>(key: string, value: T): Record<string, any>;
@@ -39,7 +39,7 @@ class WidgetConfig implements WidgetConfigInterface {
         this.widgetId = widgetId;
     }
 
-    get<T = any>(key: string, defaultValue: T): T {
+    get<T = any>(key: string, defaultValue?: T): T {
         if (!this.widgetId) {
             throw new Error('The widget id cannot be an empty string');
         }

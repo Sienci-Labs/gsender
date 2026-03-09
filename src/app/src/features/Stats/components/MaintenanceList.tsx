@@ -4,8 +4,7 @@ import {
     StatContext,
 } from 'app/features/Stats/utils/StatContext.tsx';
 import { sortingFns } from '@tanstack/react-table';
-import Icon from '@mdi/react';
-import { mdiAlert, mdiCheckOutline, mdiPencil } from '@mdi/js';
+import { CheckCircle, Pen, AlertCircle } from 'lucide-react';
 import SortableTable, { CustomColumnDef } from 'app/components/SortableTable';
 import { MaintenanceAddTaskDialog } from 'app/features/Stats/components/MaintenanceAddTaskDialog.tsx';
 import { MaintenanceEditTaskDialog } from 'app/features/Stats/components/MaintenanceEditTaskDialog.tsx';
@@ -19,11 +18,12 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from 'app/components/shadcn/AlertDialog';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 
 interface FormattedTask {
     id: number;
     part: string;
-    time: number | JSX.Element | 'Due';
+    time: number | React.ReactNode | 'Due';
     edit: string;
     description: string;
     subRow?: string;
@@ -38,7 +38,7 @@ function determineTime(task: MaintenanceTask) {
     } else {
         return (
             <div className="flex flex-col items-center text-center justify-center">
-                <Icon path={mdiAlert} size={1} />
+                <AlertCircle size={20} className="text-red-600" />
                 {'Urgent!'}
             </div>
         );
@@ -169,23 +169,14 @@ export function MaintenanceList() {
             header: () => null,
             cell: (info) => {
                 return (
-                    <div
-                        style={{
-                            flexDirection: 'column',
-                            textAlign: 'center',
-                        }}
-                    >
+                    <div className="flex gap-3 items-center justify-center">
                         <button
                             onClick={() => {
                                 onClear(info.cell.row.original.id);
                             }}
                             aria-label={`Reset maintenance timer for ${info.cell.row.original.part}`}
                         >
-                            <Icon
-                                path={mdiCheckOutline}
-                                size={1.5}
-                                color="green"
-                            />
+                            <CheckCircle size={24} color="green" />
                         </button>
 
                         <button
@@ -194,7 +185,7 @@ export function MaintenanceList() {
                             }}
                             aria-label={`Edit maintenance task for ${info.cell.row.original.part}`}
                         >
-                            <Icon path={mdiPencil} size={1.5} />
+                            <Pen size={24} />
                         </button>
                     </div>
                 );
@@ -213,6 +204,24 @@ export function MaintenanceList() {
 
     function onAdd() {
         setShowAddForm(true);
+    }
+
+    function onResetAll() {
+        Confirm({
+            title: 'Reset All Tasks',
+            content:
+                'Are you sure you want to reset the times for every Maintenance Task?',
+            confirmLabel: 'Reset',
+            cancelLabel: 'Cancel',
+            onConfirm: () => {
+                const updatedTasks = maintenanceTasks.map((task, _i) => {
+                    task.currentTime = 0;
+                    return task;
+                });
+                setMaintenanceTasks(updatedTasks);
+                maintenanceActions.update(updatedTasks);
+            },
+        });
     }
 
     function onEdit(id: number) {
@@ -235,6 +244,7 @@ export function MaintenanceList() {
                 enableSortingRemoval={false}
                 sortBy={sortBy}
                 onAdd={onAdd}
+                onResetAll={onResetAll}
                 pagination={false}
                 searchPlaceholder="Search Tasks..."
                 columnVisibility={{ description: false }} // this makes it so the description column doesnt show, but it exists to search on

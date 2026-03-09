@@ -34,7 +34,7 @@ import store from 'app/store';
 import controller from 'app/lib/controller.ts';
 
 // Fetch toolchange settings and send it to backend
-export function updateToolchangeContext() {
+export function updateToolchangeContext(mappings = null) {
     const hooks = store.get('workspace.toolChangeHooks', {});
     const options = store.get('workspace.toolChange', {});
     const toolChangeOption = store.get('workspace.toolChangeOption', 'Ignore');
@@ -43,6 +43,19 @@ export function updateToolchangeContext() {
         toolChangeOption,
         ...options,
     };
+
+    if (mappings) {
+        const plainObject = Array.from(mappings).reduce(
+            (obj, [key, value]) => {
+                obj[key] = value;
+                return obj;
+            },
+            {} as Record<number, number>,
+        );
+
+        context.mappings = plainObject;
+    }
+
     controller.command('toolchange:context', context);
 }
 

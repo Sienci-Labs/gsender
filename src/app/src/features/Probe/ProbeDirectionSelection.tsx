@@ -5,9 +5,16 @@ import Tooltip from 'app/components/Tooltip';
 interface Props {
     direction: number;
     onClick: () => void;
+    containerClassName?: string;
+    isAbsolute?: boolean;
 }
 
-const ProbeDirectionSelection: React.FC<Props> = ({ direction, onClick }) => {
+const ProbeDirectionSelection: React.FC<Props> = ({
+    direction,
+    onClick,
+    containerClassName,
+    isAbsolute = true,
+}) => {
     const cornerLabels = [
         'Front-Left corner',
         'Top-Left corner',
@@ -16,10 +23,17 @@ const ProbeDirectionSelection: React.FC<Props> = ({ direction, onClick }) => {
     ];
 
     const currentLabel = cornerLabels[direction] || 'Unknown corner';
-
+        
     return (
         <Tooltip content={`Set probing corner: ${currentLabel}`}>
-            <div className="absolute top-0 right-0">
+            <div
+                className={cx(
+                    {
+                        'absolute top-0 right-0 max-xl:pt-1': isAbsolute,
+                    },
+                    containerClassName,
+                )}
+            >
                 <button
                     type="button"
                     className={cx(

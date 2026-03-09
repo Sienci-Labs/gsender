@@ -53,9 +53,9 @@ export function AxisRow({
                             zeroWCS(axis, 0);
                         }
                     }}
+                    size="responsive"
                     disabled={disabled}
                     variant={homingMode ? 'alt' : 'secondary'}
-                    size="sm"
                     tooltip={{
                         content: `${homingMode ? 'Home' : 'Zero'} your ${label}-axis`,
                         side: 'left',
@@ -120,7 +120,7 @@ export function AxisRow({
                 disabled={disabled || disableGotoZero}
                 onClick={() => gotoZero(axis)}
                 variant="alt"
-                size="sm"
+                size="responsive"
                 tooltip={{
                     content: `Go to ${label}-axis zero`,
                 }}

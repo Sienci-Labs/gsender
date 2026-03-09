@@ -12,7 +12,7 @@ import Tooltip from 'app/components/Tooltip';
 
 import { MachineInfoDisplay } from './MachineInfoDisplay.tsx';
 
-import icon from './assets/icon.svg';
+import minfo from './assets/minfo.svg';
 
 const MachineInfo = () => {
     const [open, setOpen] = useState(false);
@@ -49,13 +49,15 @@ const MachineInfo = () => {
                         className="z-50 w-[24px] max-sm:hidden"
                         aria-label="Machine Information"
                     >
-                        <img src={icon} className="w-[24px]" />
+                        <img src={minfo} className="w-[24px]" />
                     </button>
                 </PopoverTrigger>
             </Tooltip>
             <PopoverContent
-                className="max-sm:block mt-4 -ml-4 p-4 pt-2 absolute z-10 flex flex-col justify-center w-[400px] min-h-[300px] rounded-md [box-shadow:_0px_0px_2px_1px_var(--tw-shadow-color)] shadow-gray-400 dark:border-dark-lighter"
-                align="start"
+                className="max-sm:block mt-4 p-4 pt-2 z-10 flex flex-col justify-center w-[400px] max-w-[calc(100vw-2rem)] min-h-[300px] rounded-md [box-shadow:_0px_0px_2px_1px_var(--tw-shadow-color)] shadow-gray-400 dark:border-dark-lighter"
+                align="end"
+                sideOffset={8}
+                collisionPadding={16}
             >
                 <MachineInfoDisplay
                     pinned={pinned}

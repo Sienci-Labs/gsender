@@ -55,7 +55,7 @@ export function Search() {
             <button
                 onClick={onSearchClear}
                 type="button"
-                className="p-2.5 ms-2 text-sm font-medium text-white bg-robin-400 rounded-lg border border-blue-400 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300"
+                className="p-2.5 ms-2 text-sm font-medium text-white bg-robin-400 rounded-lg border border-blue-400 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 max-sm:p-2"
             >
                 Clear
             </button>

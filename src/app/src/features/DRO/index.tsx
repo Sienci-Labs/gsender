@@ -28,7 +28,7 @@ import {
 } from 'app/constants';
 import mapValues from 'lodash/mapValues';
 import { mapPositionToUnits } from 'app/lib/units.ts';
-import {useCallback, useEffect, useRef, useState} from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import includes from 'lodash/includes';
 import { HomingSwitch } from 'app/features/DRO/component/HomingSwitch.tsx';
 import { RapidPositionButtons } from 'app/features/DRO/component/RapidPositionButtons.tsx';
@@ -59,6 +59,7 @@ import {
 } from './utils/RapidPosition';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import reduxStore from 'app/store/redux';
+import { cn } from 'app/lib/utils';
 
 interface DROProps {
     axes: AxesArray;
@@ -96,7 +97,6 @@ function DRO({
         get(state, 'controller.settings.settings.$27', 1),
     );
 
-
     // Shortcut refs
     const homingFlagRef = useRef(homingFlag);
     const homingDirectionRef = useRef(homingDirection);
@@ -107,8 +107,6 @@ function DRO({
         homingDirectionRef.current = homingDirection;
         pullOffRef.current = pullOff;
     }, [homingFlag, homingDirection, pullOff]);
-
-
 
     useEffect(() => {
         setRotaryFunctionsEnabled(store.get('widgets.rotary.tab.show', false));
@@ -128,25 +126,6 @@ function DRO({
         );
         controller.command('gcode', gcode);
     }, []);
-
-    /*function jogToCorner(
-        corner: string,
-        homingDir?: string,
-        homingFl?: boolean,
-        pullO?: string | number,
-    ) {
-        const currentHomingDir = homingDir || homingDirection;
-        const currentHomingFlag = homingFl || homingFlag;
-        const currentPullOff = pullO || pullOff;
-
-        const gcode = getMovementGCode(
-            corner,
-            currentHomingDir,
-            currentHomingFlag,
-            Number(currentPullOff),
-        );
-        controller.command('gcode', gcode);
-    }*/
 
     function toggleHoming() {
         setHomingMode((prev) => !prev);
@@ -355,7 +334,6 @@ function DRO({
                     return;
                 }
                 jogToCorner(BACK_LEFT);
-
             },
         },
         HOMING_GO_TO_BACK_RIGHT_CORNER: {
@@ -425,20 +403,33 @@ function DRO({
     return (
         <div className="relative">
             <UnitBadge isRemote={isRemote} />
-            <div className="w-full min-h-10 portrait:min-h-14 flex flex-row-reverse align-bottom justify-center gap-36 max-xl:gap-32 relative">
+            <div
+                className={cn(
+                    'w-full min-h-10 flex flex-row align-bottom items-center justify-center relative gap-2',
+                    {
+                        'gap-1': isConnected && homingEnabled,
+                        // 'gap-36 max-xl:gap-32': isRotaryMode,
+                        // 'gap-32 max-xl:gap-28': !isRotaryMode,
+                    },
+                )}
+            >
                 <GoTo wpos={wpos} units={preferredUnits} disabled={!canClick} />
+
                 {isConnected && homingEnabled && (
                     <RapidPositionButtons disabled={!canClick} />
                 )}
 
-                <Parking disabled={!canClick} isConnected={isConnected} homingEnabled={homingEnabled}/>
-
+                <Parking
+                    disabled={!canClick}
+                    isConnected={isConnected}
+                    homingEnabled={homingEnabled}
+                />
             </div>
-            <div className="w-full flex flex-row justify-between px-3">
+            <div className="w-full flex flex-row justify-between px-3 max-xl:px-5 max-xl:-mt-[4px] max-xl:-mb-[4px]">
                 <Label>{homingMode ? 'Home' : 'Zero'}</Label>
-                <Label>Go</Label>
+                <Label>Go to</Label>
             </div>
-            <div className="flex flex-col w-full gap-1 max-xl:gap-0 space-between">
+            <div className="flex flex-col w-full gap-1 portrait:gap-2 space-between">
                 <AxisRow
                     label={'X'}
                     axis={'X'}
@@ -485,8 +476,8 @@ function DRO({
                         icon={<VscTarget className="w-5 h-5" />}
                         onClick={zeroAllAxes}
                         disabled={!canClick}
-                        size="sm"
                         aria-label="Zero all axes: Set current position as work zero for all axes"
+                        size="responsive"
                     />
                 ) : (
                     <AlertDialog>
@@ -496,6 +487,7 @@ function DRO({
                                 icon={<VscTarget className="w-5 h-5" />}
                                 disabled={!canClick}
                                 aria-label="Zero all axes: Set current position as work zero for all axes"
+                                size="responsive"
                             />
                         </AlertDialogTrigger>
                         <AlertDialogContent className="bg-white">
@@ -529,9 +521,9 @@ function DRO({
                     variant="alt"
                     onClick={goXYAxes}
                     disabled={!canClick}
-                    size="sm"
                     tooltip={{ content: 'Go to XY zero', side: 'bottom' }}
                     aria-label={`Go to ${isRotaryMode ? 'XA' : 'XY'} zero: Move ${isRotaryMode ? 'X and A' : 'X and Y'} axes to their current work zero position`}
+                    size="responsive"
                 >
                     <span className="font-mono text-lg">
                         {isRotaryMode ? 'XA' : 'XY'}

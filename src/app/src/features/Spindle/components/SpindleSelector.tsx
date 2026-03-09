@@ -19,7 +19,7 @@ type Props = {
 
 const formatSpindles = (spindles: Spindle[] = []): FormattedSpindle[] => {
     return spindles.map((spindle) => ({
-        label: `${spindle.id}: ${spindle.label} (${spindle.capabilities})`,
+        label: `${spindle.label} (${spindle.capabilities})`,
         value: spindle.id,
     }));
 };
@@ -27,11 +27,12 @@ const formatSpindles = (spindles: Spindle[] = []): FormattedSpindle[] => {
 const SpindleSelector = ({ spindles, onChange, spindle, disabled }: Props) => {
     const spindleFormatted = { label: spindle.label, value: spindle.id };
     const formattedSpindles = formatSpindles(spindles);
+
     return (
         <Tooltip content="Select a spindle">
             <div
                 className={cx(
-                    'flex gap-1 justify-center my-2 w-full items-center',
+                    'flex gap-1 justify-center w-full items-center',
                     {
                         'cursor-not-allowed': disabled,
                     },

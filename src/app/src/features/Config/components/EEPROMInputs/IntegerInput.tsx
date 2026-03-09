@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './index.module.styl';
-import ControlledInput from './ControlledInput';
+import ControlledNumberInput from './ControlledNumberInput';
 
 const IntegerInput = ({ info, setting, onChange, disabled }) => {
     const { unit = null } = info;
@@ -9,7 +9,7 @@ const IntegerInput = ({ info, setting, onChange, disabled }) => {
 
     return (
         <div className="ring-1 ring-gray-300 flex flex-row flex-1 relative items-center rounded-md">
-            <ControlledInput
+            <ControlledNumberInput
                 type="decimal"
                 className={styles.textInput}
                 value={value}

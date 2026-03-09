@@ -27,7 +27,6 @@ import {
     GCodeOptions,
     SigninOptions,
     StateOptions,
-    USER_DATA_COLLECTION_T,
     WatchOptions,
 } from './definitions';
 import { MachineProfile } from 'app/definitions/firmware';
@@ -437,6 +436,18 @@ const releaseNotes = {
     },
 };
 
+//
+// gSender Preferences
+//
+const preferences = {
+    fetch: (): Promise<AxiosResponse> => {
+        return authrequest.get('/api/preferences');
+    },
+    replace: (options: Record<string, any>): Promise<AxiosResponse> => {
+        return authrequest.put('/api/preferences/', options);
+    },
+};
+
 export default {
     signin,
     getLatestVersion,
@@ -462,4 +473,5 @@ export default {
     metrics,
     alarmList,
     releaseNotes,
+    preferences,
 };

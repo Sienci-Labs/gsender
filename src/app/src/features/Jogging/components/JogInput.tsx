@@ -107,7 +107,7 @@ export const JogInput = ({
                     type="number"
                     value={currentValue}
                     onChange={(e) => onChange(Number(e.target.value))}
-                    className="flex-1"
+                    className="flex-1 max-xl:px-0.5"
                     min={0.001}
                     aria-label={effectiveLabel}
                 />

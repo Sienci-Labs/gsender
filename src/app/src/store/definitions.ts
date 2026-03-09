@@ -4,7 +4,11 @@ import {
     RENDER_STATE,
     TOGGLE_STATUS,
 } from '../constants';
-import { EEPROMSettings, EEPROMDescriptions, FIRMWARE_TYPES_T } from 'app/definitions/firmware';
+import {
+    EEPROMSettings,
+    EEPROMDescriptions,
+    FIRMWARE_TYPES_T,
+} from 'app/definitions/firmware';
 import { BasicObject, BasicPosition, BBox } from 'app/definitions/general';
 import { Axes } from 'app/features/Axes/definitions';
 import { Connection } from 'app/features/Connection/definitions';
@@ -18,12 +22,10 @@ import { Surfacing } from 'app/features/Surfacing/definitions';
 import {
     VISUALIZER_TYPES_T,
     Visualizer,
+    ATC,
 } from 'app/features/Visualizer/definitions';
 import {
     Modal,
-    PDData,
-    FeedrateChanges,
-    ModalChanges,
 } from 'app/lib/definitions/gcode_virtualization';
 import { Feeder, Sender } from 'app/lib/definitions/sender_feeder';
 import { CommandKeys } from 'app/lib/definitions/shortcuts';
@@ -57,19 +59,30 @@ export interface FirmwareOptions {
     SPINDLE: string;
 }
 
+export interface ToolTable {}
+
 export interface ControllerSettings {
+    toolTable?: any;
     //TODO
     parameters: BasicObject;
     settings: EEPROMSettings;
     info?: FirmwareOptions;
     descriptions?: EEPROMDescriptions;
     groups: BasicObject;
-    alarms: BasicObject;
+    alarms?: { [key: number]: { description: string; id: number } };
+    version?: {
+        semver: number;
+    };
 }
 
 export interface gSenderInfo {
     releaseNotes: object;
     hasUpdate: boolean;
+}
+
+export interface SDCardFile {
+    name: string;
+    size: number;
 }
 
 export interface ControllerState {
@@ -80,7 +93,7 @@ export interface ControllerState {
     mpos: BasicPosition;
     wpos: BasicPosition;
     homingFlag: boolean;
-    homingRun: boolean;
+    hasHomed: boolean;
     feeder: Feeder;
     sender: Sender;
     workflow: {
@@ -91,6 +104,13 @@ export interface ControllerState {
     };
     terminalHistory: Array<string>;
     spindles: Array<Spindle>;
+    sdcard: {
+        isMounted: boolean;
+        files: Array<{
+            fileName: string;
+            fileSize: number;
+        }>;
+    };
 }
 
 export interface PortInfo {
@@ -185,22 +205,6 @@ export interface ReduxState {
     preferences: PreferencesState;
 }
 
-// Indexed DB
-
-export interface ParsedData {
-    id: string;
-    data: Array<PDData>;
-    estimates: Array<number>;
-    feedrateChanges: Array<FeedrateChanges>;
-    modalChanges: Array<ModalChanges>;
-    info: FileInfoState;
-}
-
-export interface EstimateData {
-    estimates: Array<number>;
-    estimatedTime: number;
-}
-
 // Front-end State
 
 export interface GRBL {
@@ -241,6 +245,7 @@ export interface State {
         spindle: SpindleState;
         surfacing: Surfacing;
         visualizer: Visualizer;
+        atc: ATC;
     };
     commandKeys: CommandKeys;
 }
@@ -256,5 +261,5 @@ export interface ConsoleState {
 }
 
 export interface ShortcutSliceState {
-    isFinished: boolean
+    isFinished: boolean;
 }

@@ -64,6 +64,9 @@ class SerialConnection extends EventEmitter {
     // SerialPort
     writeFilter = (data) => data;
 
+    // Tracks whether TCP 'connect' has fired (used to distinguish pre/post-connect errors)
+    connected = false;
+
     eventListener = {
         data: (data) => {
             this.emit('data', data);
@@ -75,12 +78,18 @@ class SerialConnection extends EventEmitter {
             this.emit('close', err);
         },
         error: (err) => {
-            if (err.code === 'ECONNRESET') {
-                this.port.destroy();
+            if (!this.connected) {
+                // Pre-connection error (ECONNREFUSED, EHOSTUNREACH, ENETUNREACH, etc.)
+                this.port && this.port.destroy();
                 this.port = null;
                 if (this.callback) {
                     this.callback(err);
+                    this.callback = null;
                 }
+            } else if (err.code === 'ECONNRESET') {
+                // Post-connection reset
+                this.port && this.port.destroy();
+                this.port = null;
             }
             this.emit('error', err);
         },
@@ -102,6 +111,8 @@ class SerialConnection extends EventEmitter {
         }
 
         const settings = Object.assign({}, defaultSettings, rest);
+        settings.ethernetPort = rest.ethernetPort;
+
 
         if (settings.port) {
             throw new TypeError(
@@ -160,7 +171,7 @@ class SerialConnection extends EventEmitter {
 
     get isOpen() {
         if (this.settings.network) {
-            return this.port && this.port.writable;
+            return this.port && this.port.writable && this.connected;
         }
         return this.port && this.port.isOpen;
     }
@@ -172,7 +183,7 @@ class SerialConnection extends EventEmitter {
     // @param {function} callback The error-first callback.
     open(callback) {
         this.callback = callback;
-        const { path, baudRate, network, ...rest } = this.settings;
+        const { path, baudRate, network, ethernetPort, ...rest } = this.settings;
 
         const ip = '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)';
         const expr = new RegExp(`^${ip}\.${ip}\.${ip}\.${ip}$`, 'g');
@@ -195,25 +206,35 @@ class SerialConnection extends EventEmitter {
             return;
         }
 
+        console.log(`Conection to port ${ethernetPort}`);
+
         if (network || looksLikeIP) {
+            this.connected = false;
             this.port = new net.Socket();
             this.port.setTimeout(4000, () => {
                 this.port.destroy();
-                callback('Connection timeout');
+                this.port = null;
+                if (this.callback) {
+                    this.callback('Connection timeout');
+                    this.callback = null;
+                }
             });
+
+            // addPortListeners() calls removeAllListeners(), so it must run BEFORE
+            // we add the one-time 'connect' handler, otherwise that handler would
+            // be removed and callback() would never be called on a successful connect.
+            this.addPortListeners();
 
             this.port.once('connect', () => {
+                this.connected = true;
                 this.port.setTimeout(0);
-                callback();
-            });
-            this.port.on('error', (err) => {
-                this.port.setTimeout(0);
-                this.port.destroy();
-                callback(err);
+                if (this.callback) {
+                    this.callback();
+                    this.callback = null;
+                }
             });
 
-            this.addPortListeners();
-            this.port.connect(23, path);
+            this.port.connect(ethernetPort, path);
         } else {
             this.port = new SerialPort({
                 path,
@@ -227,6 +248,7 @@ class SerialConnection extends EventEmitter {
     }
 
     addPortListeners() {
+        this.port.removeAllListeners();
         this.port.on('open', this.eventListener.open);
         this.port.on('close', this.eventListener.close);
         this.port.on('error', this.eventListener.error);

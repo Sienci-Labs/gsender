@@ -7,11 +7,19 @@ import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib
 import { FaMicrochip } from 'react-icons/fa6';
 import { ToolLink } from 'app/features/Config/components/wizards/SquaringToolWizard.tsx';
 import Tooltip from 'app/components/Tooltip';
+import { EEPROM } from 'app/definitions/firmware';
+import { RootState } from 'app/store/redux';
+import { useSelector } from 'react-redux';
+import {
+    resolveGrblCoreDefaults,
+    translateGrblCoreKey,
+} from 'app/features/Config/utils/grblCoreMigration.ts';
+import { GRBLHAL } from 'app/constants';
 
 interface EEPROMSettingRowProps {
     eID: string;
     changeHandler: (value: number) => void;
-    resetHandler: (k, v) => void;
+    resetHandler: (setting: EEPROM, value: string | number) => void;
     link?: string;
     linkLabel?: string;
 }
@@ -30,25 +38,37 @@ export function EEPROMSettingRow({
     link = null,
     linkLabel = null,
 }: EEPROMSettingRowProps) {
-    const { EEPROM, machineProfile, firmwareType, eepromIsDefault } =
+    const { EEPROM, eepromMap, machineProfile, firmwareType, eepromIsDefault } =
         useSettings();
+    const firmwareSemver = useSelector(
+        (state: RootState) => state.controller.settings.version?.semver,
+    );
     if (!EEPROM) {
         return;
     }
-    const EEPROMData = EEPROM.find((s) => s.setting === eID);
+
+    const effectiveEID =
+        firmwareType === GRBLHAL
+            ? translateGrblCoreKey(eID as EEPROM, firmwareSemver)
+            : eID;
+    const EEPROMData = eepromMap.get(effectiveEID as EEPROM);
+
     if (EEPROMData) {
         const isDefault = eepromIsDefault(EEPROMData);
         const profileDefaults =
             firmwareType === 'Grbl'
                 ? machineProfile.eepromSettings
-                : machineProfile.grblHALeepromSettings;
+                : resolveGrblCoreDefaults({
+                      firmwareSemver,
+                      baseDefaults: machineProfile.grblHALeepromSettings || {},
+                  }).defaults;
 
         const InputElement = getDatatypeInput(
             EEPROMData.dataType,
             firmwareType,
         );
 
-        const inputDefault = get(profileDefaults, eID, '-');
+        const inputDefault = get(profileDefaults, effectiveEID, '-');
 
         //const matchesSearch = matchesSearchTerm(EEPROMData, searchTerm);
 
@@ -73,11 +93,44 @@ export function EEPROMSettingRow({
                     },
                 )}
             >
-                <div className="w-1/5 max-xl:w-full max-xl:mb-1 text-gray-700 flex flex-row gap-2 items-center relative dark:text-gray-400">
-                    {EEPROMData.description}
+                <div className="w-full sm:w-1/5 flex flex-row gap-2 items-center justify-between sm:justify-start text-gray-700 relative dark:text-gray-400 mb-2 sm:mb-0">
+                    <span>{EEPROMData.description}</span>
+                    <span className="flex flex-row gap-2 sm:hidden">
+                        {!isDefault && (
+                            <Tooltip content="Reset to default value">
+                                <button
+                                    className="text-3xl"
+                                    onClick={() => {
+                                        Confirm({
+                                            title: 'Reset Single EEPROM Value',
+                                            content:
+                                                'Are you sure you want to reset this value to default?',
+                                            confirmLabel: 'Yes',
+                                            onConfirm: () => {
+                                                resetHandler(
+                                                    EEPROMData.setting,
+                                                    inputDefault,
+                                                );
+                                            },
+                                        });
+                                    }}
+                                >
+                                    <BiReset />
+                                </button>
+                            </Tooltip>
+                        )}
+                        <Tooltip content="Machine setting">
+                            <span className="text-robin-500 text-4xl">
+                                <FaMicrochip />
+                            </span>
+                        </Tooltip>
+                    </span>
                 </div>
+                <span className="w-full sm:w-2/5 text-gray-500 text-sm mb-2 max-sm:mb-4 order-4">
+                    {detailString}
+                </span>
                 <div
-                    className="w-1/5 max-xl:w-2/5 text-xs px-4 gap-2 flex flex-col"
+                    className="w-full sm:w-1/5 text-xs px-4 gap-2 flex flex-col mb-0 sm:mb-0 max-sm:mb-2 sm:order-2 order-2"
                     key={`input-${EEPROMData.key}`}
                 >
                     <InputElement
@@ -91,7 +144,7 @@ export function EEPROMSettingRow({
                         </div>
                     )}
                 </div>
-                <span className="w-1/5 max-xl:w-1/5 text-xs px-4 flex flex-row gap-2 justify-end">
+                <span className="hidden sm:flex w-1/5 text-xs px-4 flex-row gap-2 order-3 justify-end">
                     {!isDefault && (
                         <Tooltip content="Reset to default value">
                             <button
@@ -121,11 +174,7 @@ export function EEPROMSettingRow({
                         </span>
                     </Tooltip>
                 </span>
-                <span className="text-gray-500 text-sm w-2/5 max-xl:w-2/5">
-                    {detailString}
-                </span>
             </div>
         );
     }
-    return <></>;
 }

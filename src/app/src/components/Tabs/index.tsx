@@ -90,9 +90,9 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
     return (
         <div className="w-full">
             <div className="relative">
-                <div className="flex items-center absolute top-[-41px] left-0 right-0 z-10">
+                <div className="flex items-center absolute top-[-41px] max-xl:top-[-38px] portrait:top-[-62px] left-0 right-0 z-10">
                     <button
-                        className={`flex-shrink-0 p-1 rounded-full bg-transparent transition-colors duration-200 max-xl:pt-2 ${
+                        className={`flex-shrink-0 p-1 rounded-full bg-transparent portrait:bg-white transition-colors duration-200 ${
                             canScrollLeft
                                 ? 'hover:bg-gray-100 text-gray-400 hover:text-gray-600 dark:hover:bg-dark-lighter dark:text-gray-300 dark:hover:text-gray-100'
                                 : 'text-gray-200 cursor-not-allowed dark:text-gray-500'
@@ -101,11 +101,11 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                         disabled={!canScrollLeft}
                         aria-label="Scroll tabs left"
                     >
-                        <MdKeyboardArrowLeft className="w-6 h-6" />
+                        <MdKeyboardArrowLeft className="w-6 h-6 portrait:w-8 portrait:h-8" />
                     </button>
                     <div
                         ref={tabsRef}
-                        className="flex overflow-x-auto flex-grow"
+                        className="flex overflow-x-auto flex-grow portrait:min-h-14"
                         style={{
                             scrollbarWidth: 'none',
                             msOverflowStyle: 'none',
@@ -123,7 +123,7 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                                     aria-selected={activeTab === item.label}
                                     aria-controls={`tabpanel-${item.label}`}
                                     id={`tab-${item.label}`}
-                                    className={`flex-grow pt-1 px-4 text-base font-medium max-xl:text-sm max-xl:pt-2 ${
+                                    className={`flex-grow pt-1 px-4 max-xl:px-3 text-base font-medium max-xl:text-sm portrait:text-xl max-xl:pt-2 ${
                                         activeTab === item.label
                                             ? 'text-blue-600 border-b-2 border-blue-600 dark:text-blue-400 dark:border-blue-400'
                                             : 'text-gray-600 border-b-2 border-transparent hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100'
@@ -146,7 +146,7 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                         disabled={!canScrollRight}
                         aria-label="Scroll tabs right"
                     >
-                        <MdKeyboardArrowRight className="w-6 h-6" />
+                        <MdKeyboardArrowRight className="w-6 h-6 portrait:w-8 portrait:h-8" />
                     </button>
                 </div>
             </div>

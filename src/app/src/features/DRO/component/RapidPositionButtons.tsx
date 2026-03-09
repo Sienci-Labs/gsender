@@ -13,11 +13,14 @@ import {
 } from 'app/features/DRO/utils/RapidPosition';
 import Tooltip from 'app/components/Tooltip';
 import cn from 'classnames';
-
 export function RapidPositionButtons({ disabled = false }) {
     const homingFlag = useSelector(
         (state: RootState) => state.controller.homingFlag,
     );
+    const hasHomed = useSelector(
+        (state: RootState) => state.controller.hasHomed,
+    );
+
     const homingDirection = useSelector((state: RootState) => {
         return get(state, 'controller.settings.settings.$23', '0');
     });
@@ -28,7 +31,12 @@ export function RapidPositionButtons({ disabled = false }) {
     const altColourClass = 'stroke-robin-500';
     const disabledColorClass = 'stroke-gray-400';
 
+    const isDisabled = disabled || !hasHomed;
+
     function jogToCorner(corner: string) {
+        if (isDisabled) {
+            return;
+        }
         const gcode = getMovementGCode(
             corner,
             homingDirection,
@@ -39,7 +47,7 @@ export function RapidPositionButtons({ disabled = false }) {
     }
 
     return (
-        <div className="absolute justify-center items-center -top-1 left-1/2 text-blue-500 rapidButtonTransform portrait:rapidButtonTransformPortrait">
+        <div className="justify-center items-center text-blue-500 rapidButtonTransform portrait:rapidButtonTransformPortrait portrait:ml-24 ml-16 max-xl:-mt-[8px] max-xl:-mb-[8px]">
             <div className="grid grid-cols-2 w-16 h-14 portrait:w-20 portrait:h-[68px] font-bold">
                 <Tooltip content="Go to Back Left Corner" side="top">
                     <svg
@@ -50,8 +58,8 @@ export function RapidPositionButtons({ disabled = false }) {
                         tabIndex={disabled ? -1 : 0}
                         aria-label="Go to Back Left Corner"
                         className={cx('h-full w-full', {
-                            'cursor-pointer': !disabled,
-                            'cursor-not-allowed': disabled,
+                            'cursor-pointer': !isDisabled,
+                            'cursor-not-allowed': isDisabled,
                         })}
                         onClick={() => jogToCorner(BACK_LEFT)}
                         onKeyDown={(e) => {
@@ -65,7 +73,7 @@ export function RapidPositionButtons({ disabled = false }) {
                             d="M 32 0 H 0 V 32"
                             strokeWidth="20"
                             className={cn(
-                                disabled ? disabledColorClass : altColourClass,
+                                isDisabled ? disabledColorClass : altColourClass,
                             )}
                         />
                     </svg>
@@ -80,8 +88,8 @@ export function RapidPositionButtons({ disabled = false }) {
                         tabIndex={disabled ? -1 : 0}
                         aria-label="Go to Back Right Corner"
                         className={cx('h-full w-full', {
-                            'cursor-pointer': !disabled,
-                            'cursor-not-allowed': disabled,
+                            'cursor-pointer': !isDisabled,
+                            'cursor-not-allowed': isDisabled,
                         })}
                         onClick={() => jogToCorner(BACK_RIGHT)}
                         onKeyDown={(e) => {
@@ -96,7 +104,7 @@ export function RapidPositionButtons({ disabled = false }) {
                             d="M 32 32 V 0 L 0 0"
                             strokeWidth="20"
                             className={cn(
-                                disabled ? disabledColorClass : altColourClass,
+                                isDisabled ? disabledColorClass : altColourClass,
                             )}
                         />
                     </svg>
@@ -111,8 +119,8 @@ export function RapidPositionButtons({ disabled = false }) {
                         tabIndex={disabled ? -1 : 0}
                         aria-label="Go to Front Left Corner"
                         className={cx('h-full w-full', {
-                            'cursor-pointer': !disabled,
-                            'cursor-not-allowed': disabled,
+                            'cursor-pointer': !isDisabled,
+                            'cursor-not-allowed': isDisabled,
                         })}
                         onClick={() => jogToCorner(FRONT_LEFT)}
                         onKeyDown={(e) => {
@@ -127,7 +135,7 @@ export function RapidPositionButtons({ disabled = false }) {
                             d="M 0 0 L 0 32 L 32 32"
                             strokeWidth="20"
                             className={cn(
-                                disabled ? disabledColorClass : altColourClass,
+                                isDisabled ? disabledColorClass : altColourClass,
                             )}
                         />
                     </svg>
@@ -142,8 +150,8 @@ export function RapidPositionButtons({ disabled = false }) {
                         tabIndex={disabled ? -1 : 0}
                         aria-label="Go to Front Right Corner"
                         className={cx('h-full w-full', {
-                            'cursor-pointer': !disabled,
-                            'cursor-not-allowed': disabled,
+                            'cursor-pointer': !isDisabled,
+                            'cursor-not-allowed': isDisabled,
                         })}
                         onClick={() => jogToCorner(FRONT_RIGHT)}
                         onKeyDown={(e) => {
@@ -158,7 +166,7 @@ export function RapidPositionButtons({ disabled = false }) {
                             d="M 0 32 H 32 V 0"
                             strokeWidth="20"
                             className={cn(
-                                disabled ? disabledColorClass : altColourClass,
+                                isDisabled ? disabledColorClass : altColourClass,
                             )}
                         />
                     </svg>

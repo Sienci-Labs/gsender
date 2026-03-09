@@ -1,7 +1,4 @@
 // https://ui.shadcn.com/docs/components/alert-dialog
-
-'use client';
-
 import * as React from 'react';
 import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog';
 import { IoIosWarning } from 'react-icons/io';

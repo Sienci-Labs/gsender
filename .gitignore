@@ -5,6 +5,7 @@ package-lock.json
 /.nyc_output
 /coverage
 /dist
+/docs
 /output
 /releases
 .idea
@@ -27,3 +28,4 @@ cypress.env.json
 src/app/src/routeTree.gen.ts
 src/app/src/application.css
 .env
+/docs/performance/

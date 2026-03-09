@@ -38,10 +38,12 @@ import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib
 // @ts-ignore
 import VisualizeWorker from 'app/workers/Visualize.worker';
 import {
+    setActiveVisualizeJobId,
     shouldVisualize,
     visualizeResponse,
 } from 'app/workers/Visualize.response';
 import { isLaserMode } from 'app/lib/laserMode';
+import { getVisualizerTheme } from 'app/lib/getVisualizerTheme';
 import {
     RENDER_LOADING,
     RENDER_RENDERED,
@@ -75,15 +77,19 @@ import {
     updateFeederStatus,
     updateWorkflowState,
     addSpindle,
+    clearSpindles,
     updateAlarmDescriptions,
     updateSettingsDescriptions,
     updateHomingFlag,
+    updateHasHomed,
     updateSenderStatus,
     updateControllerType,
+    addSDCardFileToList,
 } from '../slices/controller.slice';
 import {
     FILE_TYPE_T,
     PortInfo,
+    SDCardFile,
     SerialPortOptions,
     WORKFLOW_STATES_T,
 } from '../../definitions';
@@ -97,7 +103,7 @@ import {
 import { BasicObject, GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
 import { TOOL } from 'app/lib/definitions/gcode_virtualization';
 import { WORKSPACE_MODE_T } from 'app/workspace/definitions';
-import { connectToLastDevice } from 'app/features/Firmware/utils/index';
+import { connectToLastDevice } from 'app/lib/connection';
 import { updateWorkspaceMode } from 'app/lib/rotary';
 import api from 'app/api';
 import {
@@ -106,7 +112,6 @@ import {
     updateFileProcessing,
     updateFileRenderState,
 } from '../slices/fileInfo.slice';
-import { getEstimateData } from 'app/lib/indexedDB';
 import { setIpList } from '../slices/preferences.slice';
 import { updateJobOverrides } from '../slices/visualizer.slice';
 import { toast } from 'app/lib/toaster';
@@ -114,14 +119,29 @@ import { Job } from 'app/features/Stats/utils/StatContext';
 import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
 import { Spindle } from 'app/features/Spindle/definitions';
 import { AlarmsErrors } from 'app/definitions/alarms_errors';
+import { KeepoutToggle } from 'app/features/ATC/components/KeepOut/KeepOutToggle.tsx';
+import get from 'lodash/get';
 
 export function* initialize(): Generator<any, void, any> {
-    // let visualizeWorker: typeof VisualizeWorker | null = null;
+    let visualizeWorker: typeof VisualizeWorker | null = null;
+    let visualizeJobId = 0;
     // let estimateWorker: EstimateWorker | null = null;
     let currentState: GRBL_ACTIVE_STATES_T = GRBL_ACTIVE_STATE_IDLE;
     let prevState: GRBL_ACTIVE_STATES_T = GRBL_ACTIVE_STATE_IDLE;
     let errors: any[] = [];
-    let finishLoad = false;
+    let latestEstimateData: { estimates: number[]; estimatedTime: number } = {
+        estimates: [],
+        estimatedTime: 0,
+    };
+    let hasEstimateData = false;
+
+    const clearEstimateDataCache = () => {
+        latestEstimateData = {
+            estimates: [],
+            estimatedTime: 0,
+        };
+        hasEstimateData = false;
+    };
 
     /* Health check - every 3 minutes */
     setInterval(
@@ -208,10 +228,18 @@ export function* initialize(): Generator<any, void, any> {
         const reduxState = reduxStore.getState();
         const isLaser = isLaserMode();
         const shouldIncludeSVG = shouldVisualizeSVG();
+        const profileWorker = store.get(
+            'widgets.visualizer.debug.profileWorker',
+            false,
+        );
+        const profileSampleEvery = Number(
+            store.get('widgets.visualizer.debug.profileSampleEvery', 10000),
+        );
         const accelerations = {
             xAccel: _get(reduxState, 'controller.settings.settings.$120'),
             yAccel: _get(reduxState, 'controller.settings.settings.$121'),
             zAccel: _get(reduxState, 'controller.settings.settings.$122'),
+            aAccel: _get(reduxState, 'controller.settings.settings.$123'),
         };
         const maxFeedrates = {
             xMaxFeed: Number(
@@ -223,7 +251,20 @@ export function* initialize(): Generator<any, void, any> {
             zMaxFeed: Number(
                 _get(reduxState, 'controller.settings.settings.$112', 3000.0),
             ),
+            aMaxFeed: Number(
+                _get(reduxState, 'controller.settings.settings.$113', 3000.0),
+            ),
         };
+        const rotaryDiameterOffsetEnabled = store.get(
+            'widgets.visualizer.rotaryDiameterOffsetEnabled',
+            false,
+        );
+        const atcFlag: string = get(
+            reduxStore,
+            'controller.settings.info.NEWOPT.ATC',
+            '0',
+        );
+        const atcEnabled = atcFlag === '1';
 
         // compare previous file data to see if it's a new file and we need to reparse
         let isNewFile = true;
@@ -236,6 +277,9 @@ export function* initialize(): Generator<any, void, any> {
         if (content === prevContent && size === prevSize && name === prevName) {
             isNewFile = false;
         }
+
+        // Ensure a previous parse worker does not continue emitting stale messages.
+        visualizeWorker?.terminate();
 
         if (visualizer === VISUALIZER_SECONDARY) {
             reduxStore.dispatch(
@@ -256,8 +300,7 @@ export function* initialize(): Generator<any, void, any> {
             const needsVisualization = shouldVisualize();
 
             if (needsVisualization) {
-                // visualizeWorker = new VisualizeWorker();
-                const visualizeWorker = new Worker(
+                visualizeWorker = new Worker(
                     new URL(
                         '../../../workers/Visualize.worker.ts',
                         import.meta.url,
@@ -265,17 +308,24 @@ export function* initialize(): Generator<any, void, any> {
                     { type: 'module' },
                 );
                 visualizeWorker.onmessage = visualizeResponse;
-                // await getParsedData().then((value) => {
-                const parsedData: null = null;
+                const jobId = ++visualizeJobId;
+                setActiveVisualizeJobId(jobId);
                 visualizeWorker.postMessage({
+                    jobId,
                     content,
                     visualizer,
-                    parsedData,
+                    activeVisualizer: visualizer,
+                    isSecondary: visualizer === VISUALIZER_SECONDARY,
                     isNewFile,
+                    isLaser,
                     accelerations,
                     maxFeedrates,
+                    atcEnabled,
+                    rotaryDiameterOffsetEnabled,
+                    theme: getVisualizerTheme(),
+                    profile: profileWorker,
+                    profileSampleEvery,
                 });
-                // });
             } else {
                 reduxStore.dispatch(
                     updateFileRenderState({
@@ -312,26 +362,32 @@ export function* initialize(): Generator<any, void, any> {
 
         const needsVisualization = shouldVisualize();
 
-        // visualizeWorker = new VisualizeWorker();
-        const visualizeWorker = new Worker(
+        visualizeWorker = new Worker(
             new URL('../../../workers/Visualize.worker.ts', import.meta.url),
             { type: 'module' },
         );
         visualizeWorker.onmessage = visualizeResponse;
-        // await getParsedData().then((value) => {
-        const parsedData: null = null;
+        const jobId = ++visualizeJobId;
+        setActiveVisualizeJobId(jobId);
+        console.time('gSender:fileLoad');
         visualizeWorker.postMessage({
+            jobId,
             content,
             visualizer,
+            activeVisualizer: visualizer,
+            isSecondary: visualizer === VISUALIZER_SECONDARY,
             isLaser,
             shouldIncludeSVG,
             needsVisualization,
-            parsedData,
             isNewFile,
             accelerations,
             maxFeedrates,
+            atcEnabled,
+            rotaryDiameterOffsetEnabled,
+            theme: getVisualizerTheme(),
+            profile: profileWorker,
+            profileSampleEvery,
         });
-        // });
     };
 
     const updateAlarmsErrors = async (error: any) => {
@@ -458,6 +514,11 @@ export function* initialize(): Generator<any, void, any> {
                 'widgets.visualizer.showLineWarnings',
             );
             const delay: number = store.get('widgets.spindle.delay');
+            const useAaxisForGrbl: boolean = store.get(
+                'workspace.rotaryAxis.useAaxisForGrbl',
+                false,
+            );
+            reduxStore.dispatch(clearSpindles());
             // Reset homing run flag to prevent rapid position without running homing
             reduxStore.dispatch(resetHoming());
 
@@ -472,6 +533,8 @@ export function* initialize(): Generator<any, void, any> {
             if (delay !== undefined) {
                 controller.command('settings:updated', { spindleDelay: delay });
             }
+
+            controller.command('settings:updated', { useAaxisForGrbl });
 
             updateToolchangeContext();
 
@@ -493,6 +556,7 @@ export function* initialize(): Generator<any, void, any> {
     controller.addListener(
         'serialport:close',
         (options: SerialPortOptions, _received: number) => {
+            reduxStore.dispatch(clearSpindles());
             // Reset homing run flag to prevent rapid position without running homing
             reduxStore.dispatch(resetHoming());
             reduxStore.dispatch(closeConnection({ port: options.port }));
@@ -640,7 +704,7 @@ export function* initialize(): Generator<any, void, any> {
     });
 
     controller.addListener('gcode:load', (name: string, content: string) => {
-        finishLoad = false;
+        clearEstimateDataCache();
         const size = new Blob([content]).size;
         reduxStore.dispatch(updateFileContent({ content, size, name }));
     });
@@ -653,6 +717,7 @@ export function* initialize(): Generator<any, void, any> {
     );
 
     controller.addListener('gcode:unload', () => {
+        clearEstimateDataCache();
         reduxStore.dispatch(unloadFileInfo());
     });
 
@@ -699,58 +764,62 @@ export function* initialize(): Generator<any, void, any> {
     );
 
     controller.addListener('requestEstimateData', () => {
-        if (finishLoad) {
-            finishLoad = false;
-            getEstimateData().then((value) => {
-                controller.command('updateEstimateData', value);
-            });
+        if (hasEstimateData) {
+            controller.command('updateEstimateData', latestEstimateData);
         }
     });
 
     // // Need this to handle unload when machine not connected since controller event isn't sent
     pubsub.subscribe('gcode:unload', () => {
+        clearEstimateDataCache();
         reduxStore.dispatch(unloadFileInfo());
     });
 
     // TODO: uncomment when worker types are defined
-    pubsub.subscribe('file:load', () => {
-        const visualizeWorker = new Worker(
-            new URL('../../../workers/Visualize.worker.ts', import.meta.url),
-            { type: 'module' },
-        );
-
+    pubsub.subscribe('visualizeWorker:terminate', () => {
         visualizeWorker?.terminate();
     });
 
-    pubsub.subscribe('parsedData:stored', () => {
-        finishLoad = true;
-        getEstimateData().then((value) => {
-            controller.command('updateEstimateData', value);
-        });
-    });
-
-    // // for when you don't want to send file to backend
     pubsub.subscribe(
-        'visualizer:load',
-        (_, { content, size, name, visualizer }) => {
-            parseGCode(content, size, name, visualizer);
+        'estimateData:ready',
+        (
+            _msg,
+            value: { estimates?: number[]; estimatedTime?: number } = {},
+        ) => {
+            latestEstimateData = {
+                estimates: Array.isArray(value?.estimates)
+                    ? value.estimates
+                    : [],
+                estimatedTime: Number(value?.estimatedTime) || 0,
+            };
+            hasEstimateData = true;
+            controller.command('updateEstimateData', latestEstimateData);
         },
     );
+
+    // // for when you don't want to send file to backend
+    // pubsub.subscribe(
+    //     'visualizer:load',
+    //     (_, { content, size, name, visualizer }) => {
+    //         parseGCode(content, size, name, visualizer);
+    //     },
+    // );
 
     // TODO: this is where the estimate worker should be terminated, estimate worker is not defined anywhere for some reason
     pubsub.subscribe('estimate:done', (_msg, _data) => {
         // estimateWorker?.terminate();
     });
 
-    pubsub.subscribe(
-        'reparseGCode',
-        (_msg: string, { content, size, name, visualizer }) => {
-            parseGCode(content, size, name, visualizer);
-        },
-    );
+    // pubsub.subscribe(
+    //     'reparseGCode',
+    //     (_msg: string, { content, size, name, visualizer }) => {
+    //         parseGCode(content, size, name, visualizer);
+    //     },
+    // );
 
     controller.addListener('workflow:pause', (opts: { data: string }) => {
         const { data } = opts;
+
         toast.info(
             `'${data}' pause command found in file - press "Resume Job" to continue running.`,
             { position: 'bottom-right' },
@@ -794,6 +863,10 @@ export function* initialize(): Generator<any, void, any> {
         pubsub.publish('softlimits:check');
     });
 
+    controller.addListener('homing:has-homed', (hasHomed: boolean) => {
+        reduxStore.dispatch(updateHasHomed({ hasHomed }));
+    });
+
     controller.addListener('firmware:ready', (status: string) => {
         pubsub.publish('firmware:update', status);
     });
@@ -813,8 +886,6 @@ export function* initialize(): Generator<any, void, any> {
             //     reduxStore.getState(),
             //     'controller.settings.settings.$22',
             // );
-
-            console.log(error);
 
             const showLineWarnings = store.get(
                 'widgets.visualizer.showLineWarnings',
@@ -897,7 +968,7 @@ export function* initialize(): Generator<any, void, any> {
     controller.addListener(
         'gcode_error',
         _throttle(
-            (error) => {
+            (error: string) => {
                 errors.push(error);
             },
             250,
@@ -914,7 +985,7 @@ export function* initialize(): Generator<any, void, any> {
         },
     );
 
-    controller.addListener('settings:alarm', (data: BasicObject) => {
+    controller.addListener('settings:alarms', (data: BasicObject) => {
         reduxStore.dispatch(updateAlarmDescriptions({ alarms: data }));
     });
 
@@ -935,6 +1006,75 @@ export function* initialize(): Generator<any, void, any> {
     controller.addListener('job:start', () => {
         errors = [];
     });
+
+    controller.addListener('sdcard:files', (file: SDCardFile) => {
+        if (!file) return;
+        reduxStore.dispatch(addSDCardFileToList({ file }));
+    });
+
+    controller.addListener(
+        'atci',
+        (payload: {
+            subtype: string;
+            message: string;
+            description: string;
+        }) => {
+            if (payload.subtype === '0') {
+                Confirm({
+                    title: payload.message,
+                    content: payload.description,
+                    confirmLabel: 'Continue',
+                    cancelLabel: 'Reset',
+                    onConfirm: () => {
+                        controller.command('cyclestart');
+                    },
+                    onClose: () => {
+                        controller.command('reset');
+                    },
+                });
+            } else if (payload.subtype === '1') {
+                Confirm({
+                    title: payload.message,
+                    content: payload.description,
+                    confirmLabel: 'OK',
+                    cancelLabel: 'Reset',
+                    onConfirm: () => {
+                        controller.command('cyclestart');
+                    },
+                    hideClose: true,
+                });
+            } else if (payload.subtype === '2') {
+                Confirm({
+                    title: payload.message,
+                    content: payload.description,
+                    confirmLabel: 'Reset',
+                    onConfirm: () => {
+                        controller.command('reset');
+                    },
+                    hideClose: true,
+                });
+            } else if ((payload.subtype = '10')) {
+                pubsub.publish('helper:info', {
+                    title: 'Jogging Inside Keepout Area',
+                    content: (
+                        <div className="flex flex-row gap-4 items-centerx`">
+                            <span>Keepout:</span>
+                            <KeepoutToggle />
+                        </div>
+                    ),
+                    description:
+                        'You are attempting to jog inside the keepout area.  Disable keepout using the switch below and then re-enable to continue',
+                });
+            } else {
+                Confirm({
+                    title: 'ATCi requested a dialog.',
+                    content: 'Continue to unhold, Reset to stop action.',
+                    confirmLabel: 'Continue',
+                    cancelLabel: 'Reset',
+                });
+            }
+        },
+    );
 
     controller.addListener('job:stop', () => {
         const revertWorkspace = store.get('workspace.revertWorkspace');

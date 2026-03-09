@@ -33,7 +33,6 @@ import PropTypes from 'prop-types';
 import combokeys from 'app/lib/combokeys';
 import store from 'app/store';
 import { store as reduxStore } from 'app/store/redux';
-import { colorsResponse } from 'app/workers/colors.response';
 import controller from 'app/lib/controller';
 import log from 'app/lib/log';
 import * as WebGL from 'app/lib/three/WebGL';
@@ -75,24 +74,16 @@ import {
     VISUALIZER_PRIMARY,
     VISUALIZER_SECONDARY,
     GRBL_ACTIVE_STATE_CHECK,
-    CARVING_CATEGORY,
     GENERAL_CATEGORY,
     VISUALIZER_CATEGORY,
     OVERRIDES_CATEGORY,
 } from '../../constants';
-import {
-    CAMERA_MODE_PAN,
-    CAMERA_MODE_ROTATE,
-    LIGHT_THEME,
-    LIGHT_THEME_VALUES,
-    DARK_THEME,
-    DARK_THEME_VALUES,
-    CUSTOMIZABLE_THEMES,
-    PARTS_LIST,
-} from './constants';
+import { CAMERA_MODE_PAN, CAMERA_MODE_ROTATE } from './constants';
+import { getVisualizerTheme } from 'app/lib/getVisualizerTheme';
 import SecondaryVisualizer from './SecondaryVisualizer';
 import useKeybinding from '../../lib/useKeybinding';
 import { CommandKeys } from 'app/lib/definitions/shortcuts';
+import { Actions, State } from './definitions';
 
 interface Views {
     type: 'isometric' | 'top' | 'front' | 'right' | 'left' | 'default';
@@ -106,9 +97,9 @@ class Visualizer extends Component {
 
     config = new WidgetConfig('visualizer');
 
-    state = this.getInitialState();
+    state: State = this.getInitialState();
 
-    actions = {
+    actions: Actions = {
         dismissNotification: () => {
             this.setState((state) => ({
                 notification: {
@@ -127,7 +118,7 @@ class Visualizer extends Component {
             }));
         },
         closeModal: () => {
-            this.setState((state) => ({
+            this.setState((_state) => ({
                 modal: {
                     name: '',
                     params: {},
@@ -311,22 +302,6 @@ class Visualizer extends Component {
             };
 
             this.setState(updater, callback);
-            if (this.visualizer) {
-                const colorsWorker = new Worker(
-                    new URL('../../workers/colors.worker.js', import.meta.url),
-                    { type: 'module' },
-                );
-                this.colorsWorker = colorsWorker;
-                this.colorsWorker.onmessage = colorsResponse;
-                this.colorsWorker.postMessage({
-                    colors: vizualization.colors,
-                    frames: vizualization.frames,
-                    spindleSpeeds: vizualization.spindleSpeeds,
-                    isLaser: vizualization.isLaser,
-                    spindleChanges: vizualization.spindleChanges,
-                    theme: this.state.currentTheme,
-                });
-            }
         },
         unloadGCode: () => {
             const visualizer = this.visualizer;
@@ -757,7 +732,7 @@ class Visualizer extends Component {
         }
     }
 
-    getInitialState() {
+    getInitialState(): State {
         return {
             port: controller.port,
             units: store.get('workspace.units', METRIC_UNITS),
@@ -868,7 +843,7 @@ class Visualizer extends Component {
             cameraMode: this.config.get('cameraMode', CAMERA_MODE_PAN),
             cameraPosition: '3D', // 'Top', '3D', 'Front', 'Left', 'Right'
             isAgitated: false, // Defaults to false
-            currentTheme: this.getVisualizerTheme(),
+            currentTheme: getVisualizerTheme(),
             currentTab: 0,
             filename: '',
             fileSize: 0, //in bytes
@@ -1325,28 +1300,6 @@ class Visualizer extends Component {
         });
     }
 
-    getVisualizerTheme() {
-        const { theme } = store.get('widgets.visualizer');
-        if (theme === LIGHT_THEME) {
-            return LIGHT_THEME_VALUES;
-        } else if (theme === DARK_THEME) {
-            return DARK_THEME_VALUES;
-        } else if (CUSTOMIZABLE_THEMES.includes(theme)) {
-            let colourMap = new Map();
-            PARTS_LIST.map((part) =>
-                colourMap.set(
-                    part,
-                    this.config.get(
-                        theme + ' ' + part,
-                        DARK_THEME_VALUES.get(part),
-                    ),
-                ),
-            );
-            return colourMap;
-        }
-        return DARK_THEME_VALUES;
-    }
-
     isAgitated() {
         const { disabled, objects } = this.state;
         const { workflow, controllerType, activeState } = this.props;
@@ -1390,7 +1343,7 @@ class Visualizer extends Component {
                         theme: theme,
                     },
                     this.setState({
-                        currentTheme: this.getVisualizerTheme(),
+                        currentTheme: getVisualizerTheme(),
                     }),
                     pubsub.publish('visualizer:redraw'),
                 );
@@ -1477,6 +1430,61 @@ class Visualizer extends Component {
                 this.actions.unloadGCode();
                 this.actions.reset();
             }),
+            pubsub.subscribe('repopulate', () => {
+                this.setState({
+                    units: store.get('workspace.units', METRIC_UNITS),
+                    objects: {
+                        limits: {
+                            visible: this.config.get(
+                                'objects.limits.visible',
+                                true,
+                            ),
+                        },
+                        coordinateSystem: {
+                            visible: this.config.get(
+                                'objects.coordinateSystem.visible',
+                                true,
+                            ),
+                        },
+                        gridLineNumbers: {
+                            visible: this.config.get(
+                                'objects.gridLineNumbers.visible',
+                                true,
+                            ),
+                        },
+                        cuttingTool: {
+                            visible: this.config.get(
+                                'objects.cuttingTool.visible',
+                                true,
+                            ),
+                            visibleLite: this.config.get(
+                                'objects.cuttingTool.visibleLite',
+                                false,
+                            ),
+                        },
+                        cuttingToolAnimation: {
+                            visible: this.config.get(
+                                'objects.cuttingToolAnimation.visible',
+                                true,
+                            ),
+                            visibleLite: this.config.get(
+                                'objects.cuttingToolAnimation.visibleLite',
+                                false,
+                            ),
+                        },
+                        cutPath: {
+                            visible: this.config.get(
+                                'objects.cutPath.visible',
+                                true,
+                            ),
+                            visibleLite: this.config.get(
+                                'objects.cutPath.visibleLite',
+                                true,
+                            ),
+                        },
+                    },
+                });
+            }),
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
@@ -1542,26 +1550,19 @@ class Visualizer extends Component {
                 visualizerRef={(ref) => {
                     this.visualizer = ref?.visualizer;
                 }}
-                gcode={gcode}
                 cameraPosition="3D"
             />
         ) : (
             <PrimaryVisualizer
                 state={state}
                 actions={actions}
-                capable={capable}
                 showLoading={showLoading}
                 showRendering={showRendering}
                 showVisualizer={showVisualizer}
                 visualizerRef={(ref) => {
                     this.visualizer = ref?.visualizer;
                 }}
-                workflowRef={(ref) => {
-                    this.workflowControl = ref;
-                }}
-                widgetContentRef={(ref) => {
-                    this.widgetContent = ref;
-                }}
+                timeline={this.props.timeline}
             />
         );
 

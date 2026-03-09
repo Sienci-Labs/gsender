@@ -17,6 +17,7 @@ import { RootState } from 'app/store/redux';
 import machineProfiles from 'app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts';
 import { toast } from 'app/lib/toaster';
 import controller from 'app/lib/controller.ts';
+import { resolveGrblCoreDefaults } from 'app/features/Config/utils/grblCoreMigration.ts';
 
 function getMachineProfile(id: number) {
     const profile = machineProfiles.find((profile) => profile.id === id);
@@ -26,24 +27,35 @@ function getMachineProfile(id: number) {
     return profile;
 }
 
-function restoreEEPROMDefaults(type = '') {
+function restoreEEPROMDefaults(
+    type = '',
+    firmwareSemver: number | undefined,
+) {
     let eepromSettings = {};
+    let orderedSettings: Map<string, string> | undefined;
 
     const selectedMachineProfile = store.get('workspace.machineProfile');
     const profile = getMachineProfile(selectedMachineProfile.id);
 
     if (type === 'grblHAL') {
-        eepromSettings = profile?.grblHALeepromSettings;
+        const resolved = resolveGrblCoreDefaults({
+            firmwareSemver,
+            baseDefaults: profile?.grblHALeepromSettings || {},
+            orderedSettings: profile?.orderedSettings,
+        });
+        eepromSettings = resolved.defaults;
+        orderedSettings = resolved.ordered;
     } else {
-        eepromSettings = profile?.eepromSettings;
+        eepromSettings = profile?.eepromSettings || {};
+        orderedSettings = profile?.orderedSettings;
     }
 
-    const hasOrderedSettings = !!profile.orderedSettings;
+    const hasOrderedSettings = !!orderedSettings;
 
     const values = [];
 
     for (let [key, value] of Object.entries(eepromSettings)) {
-        if (hasOrderedSettings && profile.orderedSettings.has(key)) {
+        if (hasOrderedSettings && orderedSettings.has(key)) {
             continue;
         }
 
@@ -51,7 +63,7 @@ function restoreEEPROMDefaults(type = '') {
     }
 
     if (hasOrderedSettings) {
-        for (const [k, v] of profile.orderedSettings) {
+        for (const [k, v] of orderedSettings) {
             values.push(`${k}=${v}`);
         }
     }
@@ -70,6 +82,9 @@ export function RestoreDefaultDialog() {
     );
     const controllerType = useSelector(
         (state: RootState) => state.controller.type,
+    );
+    const firmwareSemver = useSelector(
+        (state: RootState) => state.controller.settings.version?.semver,
     );
 
     const machineProfile = store.get('workspace.machineProfile', {});
@@ -94,7 +109,12 @@ export function RestoreDefaultDialog() {
                 <AlertDialogFooter className={'flex flex-col'}>
                     <AlertDialogCancel>No</AlertDialogCancel>
                     <AlertDialogAction
-                        onClick={() => restoreEEPROMDefaults(controllerType)}
+                        onClick={() =>
+                            restoreEEPROMDefaults(
+                                controllerType,
+                                firmwareSemver,
+                            )
+                        }
                     >
                         Restore Defaults
                     </AlertDialogAction>

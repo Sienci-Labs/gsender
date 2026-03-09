@@ -62,6 +62,7 @@ class Feeder extends events.EventEmitter {
 
     feed(data = [], context = {}) {
         // Clear pending state when the feeder queue is empty
+        console.log(data);
         if (this.state.queue.length === 0) {
             this.state.pending = false;
         }
@@ -126,6 +127,7 @@ class Feeder extends events.EventEmitter {
 
         while (!this.state.hold && this.state.queue.length > 0) {
             let { command, context } = this.state.queue.shift();
+            console.log(command);
 
             if (this.dataFilter) {
                 command = this.dataFilter(command, context) || '';

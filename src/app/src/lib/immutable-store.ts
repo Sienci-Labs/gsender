@@ -97,7 +97,7 @@ class ImmutableStore<T extends object = object> extends events.EventEmitter {
         if (cb) {
             cb();
         }
-        this.emit('change');
+        this.emit('change', this.state);
     }
 
     clear(): T {
@@ -108,6 +108,7 @@ class ImmutableStore<T extends object = object> extends events.EventEmitter {
 
     persist = noop;
     getConfig = noop;
+    syncPrefs = noop;
 }
 
 export default ImmutableStore;

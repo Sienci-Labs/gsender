@@ -42,7 +42,7 @@ export const GRBLHAL_REALTIME_COMMANDS = {
     STATUS_REPORT: '?',
     CMD_RESET: '\x18',
     CMD_SOFT_STOP: '\x19',
-    COMPLETE_REALTIME_REPORT: String.fromCharCode(0x87),
+    COMPLETE_REALTIME_REPORT: '\x87',
     VIRTUAL_STOP_TOGGLE: '\x88',
     TOOL_CHANGE_ACK: '\xA3',
     ERR_CLEAR: 'ErrClear',
@@ -495,6 +495,11 @@ export const GRBL_HAL_ALARMS = [
         code: 17,
         message: 'Motor fault',
         description: 'Motor fault.'
+    },
+    {
+        code: 19,
+        message: 'Modbus Exception.',
+        description: 'Modbus Exception.  Timeout or error message.'
     },
     {
         code: 'Homing',
