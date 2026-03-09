@@ -8,7 +8,6 @@ import actions, {
 import RemoteIndicator from 'app/features/RemoteMode/components/RemoteIndicator.tsx';
 import Tooltip from 'app/components/Tooltip';
 
-import MachineInfo from 'app/features/MachineInfo';
 import NotificationsArea from 'app/features/NotificationsArea';
 
 const StatusIcons = () => {
@@ -30,10 +29,6 @@ const StatusIcons = () => {
 
     return (
         <div className="hidden flex-row gap-4 absolute top-4 max-xl:top-2.5 right-4 md:flex">
-            <NotificationsArea />
-
-            <MachineInfo />
-
             <Tooltip content="Wireless Control">
                 <button
                     className="flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm text-gray-500"
@@ -56,6 +51,8 @@ const StatusIcons = () => {
                 remotePort={headlessSettings.port}
                 remoteOn={headlessSettings.headlessStatus}
             />
+
+            <NotificationsArea />
         </div>
     );
 };
