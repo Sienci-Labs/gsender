@@ -1,4 +1,5 @@
 import { TiPin, TiPinOutline } from 'react-icons/ti';
+import { IoClose } from 'react-icons/io5';
 import ModalRow from 'app/features/MachineInfo/ModalRow.tsx';
 import PinRow from 'app/features/MachineInfo/PinRow.tsx';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
@@ -11,11 +12,13 @@ import { KeepoutToggle } from 'app/features/ATC/components/KeepOut/KeepOutToggle
 interface MachineInfoDisplayProps {
     pinned: boolean;
     setPinned: (pinned: boolean) => void;
+    onClose?: () => void;
 }
 
 export function MachineInfoDisplay({
     pinned,
     setPinned,
+    onClose,
 }: MachineInfoDisplayProps) {
     const { pins, keepoutFlags, modals, isConnected, settings, currentTool } =
         useTypedSelector((state) => ({
@@ -59,15 +62,46 @@ export function MachineInfoDisplay({
 
     return (
         <>
-            <div className="flex flex-row w-full justify-between">
-                <span className="float-left font-bold text-2xl pb-2">
+            <div className="flex flex-row w-full justify-between items-center mb-2">
+                <span className="font-bold text-2xl">
                     Machine Information
                 </span>
-                <div className="text-2xl float-right pt-1 text-gray-600 max-sm:hidden dark:text-white cursor-pointer">
-                    {pinned ? (
-                        <TiPin onClick={() => setPinned(!pinned)} />
-                    ) : (
-                        <TiPinOutline onClick={() => setPinned(!pinned)} />
+                <div className="flex flex-row items-center gap-2">
+                    <div className="text-2xl text-gray-600 max-sm:hidden dark:text-white cursor-pointer hover:text-blue-500 transition-colors">
+                        {pinned ? (
+                            <TiPin
+                                onClick={() => setPinned(!pinned)}
+                                aria-label="Unpin machine information"
+                                role="button"
+                                tabIndex={0}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        setPinned(!pinned);
+                                    }
+                                }}
+                            />
+                        ) : (
+                            <TiPinOutline
+                                onClick={() => setPinned(!pinned)}
+                                aria-label="Pin machine information"
+                                role="button"
+                                tabIndex={0}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        setPinned(!pinned);
+                                    }
+                                }}
+                            />
+                        )}
+                    </div>
+                    {onClose && (
+                        <button
+                            onClick={onClose}
+                            className="text-2xl text-gray-600 dark:text-white hover:text-red-500 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                            aria-label="Close machine information"
+                        >
+                            <IoClose />
+                        </button>
                     )}
                 </div>
             </div>
@@ -131,10 +165,11 @@ export function MachineInfoDisplay({
                 </div>
             )}
             <div className="flex flex-row gap-4 items-center mt-4">
-                <span className="text-gray-500 dark:text-white">
+                <span className="text-gray-500 dark:text-white" id="lock-stepper-label">
                     Lock stepper motors
                 </span>
                 <Switch
+                    aria-labelledby="lock-stepper-label"
                     onChange={handleStepperMotorToggle}
                     checked={stepperState === '255'}
                     disabled={!isConnected}

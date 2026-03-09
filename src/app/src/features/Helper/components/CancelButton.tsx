@@ -23,6 +23,7 @@ const CancelButton = () => {
             type="button"
             className="border-none outline-none bg-gray-200"
             onClick={handleCancel}
+            aria-label="Cancel wizard"
         >
             <FaTimes />
         </button>

@@ -476,6 +476,7 @@ function DRO({
                         icon={<VscTarget className="w-5 h-5" />}
                         onClick={zeroAllAxes}
                         disabled={!canClick}
+                        aria-label="Zero all axes: Set current position as work zero for all axes"
                         size="responsive"
                     />
                 ) : (
@@ -485,6 +486,7 @@ function DRO({
                                 text="Zero"
                                 icon={<VscTarget className="w-5 h-5" />}
                                 disabled={!canClick}
+                                aria-label="Zero all axes: Set current position as work zero for all axes"
                                 size="responsive"
                             />
                         </AlertDialogTrigger>
@@ -520,6 +522,7 @@ function DRO({
                     onClick={goXYAxes}
                     disabled={!canClick}
                     tooltip={{ content: 'Go to XY zero', side: 'bottom' }}
+                    aria-label={`Go to ${isRotaryMode ? 'XA' : 'XY'} zero: Move ${isRotaryMode ? 'X and A' : 'X and Y'} axes to their current work zero position`}
                     size="responsive"
                 >
                     <span className="font-mono text-lg">

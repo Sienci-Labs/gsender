@@ -143,6 +143,8 @@ const Probe = ({ state, actions }: ProbeProps) => {
                                         actions.handleProbeCommandChange(index)
                                     }
                                     size="icon"
+                                    aria-label={`Select probing routine ${command.id}`}
+                                    aria-pressed={index === selectedProbeCommand}
                                     className={cx(
                                         'rounded-md relative h-[calc(4vh+3px)]',
                                         {

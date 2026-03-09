@@ -12,7 +12,7 @@ import { IoIosSwap } from 'react-icons/io';
 import { FaArrowsSpin } from 'react-icons/fa6';
 import { MdSettingsApplications } from 'react-icons/md';
 import { SiCoronaengine } from 'react-icons/si';
-import { MdOutlineReadMore } from 'react-icons/md';
+import { MdOutlineReadMore, MdAccessibility } from 'react-icons/md';
 import { IconType } from 'react-icons';
 import {
     TOUCHPLATE_TYPE_3D,
@@ -903,6 +903,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'eeprom',
                         eID: '$21',
                     },
+                    {
+                        label: 'Prevent jogging past limit switches',
+                        key: 'workspace.preventJoggingPastLimits',
+                        type: 'boolean',
+                        description:
+                            'If enabled, gSender will prevent jogging in a direction where a limit switch is already triggered.',
+                    },
                 ],
             },
             {
@@ -1312,6 +1319,15 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         eID: '$30',
                         forceEEPROM: true,
                         unit: 'rpm',
+                    },
+                    {
+                        label: 'Spindle speed input type',
+                        key: 'widgets.spindle.inputType',
+                        type: 'select',
+                        description:
+                            'Choose between a slider or a number input for adjusting spindle speed.',
+                        options: ['Slider', 'Number'],
+                        defaultValue: 'Slider',
                     },
                     {
                         type: 'eeprom',
@@ -1965,6 +1981,203 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     { type: 'eeprom', eID: '$650' },
                     { type: 'eeprom', eID: '$666' },
                     { type: 'eeprom', eID: '$676' },
+                ],
+            },
+        ],
+    },
+    {
+        label: 'Accessibility',
+        icon: MdAccessibility,
+        settings: [
+            {
+                label: 'Announcements',
+                settings: [
+                    {
+                        label: 'Status announcements',
+                        key: 'workspace.accessibility.statusAnnouncements',
+                        description:
+                            'Automatically announce machine status changes (Idle, Running, Alarm, etc.) using screen readers.',
+                        type: 'boolean',
+                        onUpdate: () => {
+                            pubsub.publish('accessibility:update');
+                        },
+                    },
+                    {
+                        label: 'Job progress announcements',
+                        key: 'workspace.accessibility.jobProgressAnnouncements',
+                        description:
+                            'Periodically announce job completion percentage.',
+                        type: 'boolean',
+                        onUpdate: () => {
+                            pubsub.publish('accessibility:update');
+                        },
+                    },
+                    {
+                        label: 'Progress increment',
+                        key: 'workspace.accessibility.jobProgressIncrement',
+                        description:
+                            'The percentage increment at which to announce progress (e.g. every 10%).',
+                        type: 'number',
+                        min: 1,
+                        max: 50,
+                        unit: '%',
+                        hidden: () =>
+                            !store.get(
+                                'workspace.accessibility.jobProgressAnnouncements',
+                            ),
+                        onUpdate: () => {
+                            pubsub.publish('accessibility:update');
+                        },
+                    },
+                ],
+            },
+            {
+                label: 'Audio Cues',
+                settings: [
+                    {
+                        label: 'Enable audio cues',
+                        key: 'workspace.accessibility.audioCues.enabled',
+                        description:
+                            'Play short sounds for specific machine events.',
+                        type: 'boolean',
+                        onUpdate: () => {
+                            pubsub.publish('accessibility:update');
+                        },
+                    },
+                    {
+                        label: 'Job complete sound',
+                        key: 'workspace.accessibility.audioCues.jobComplete',
+                        description: 'Play sound when a job finishes.',
+                        type: 'boolean',
+                        hidden: () =>
+                            !store.get('workspace.accessibility.audioCues.enabled'),
+                        onUpdate: () => {
+                            pubsub.publish('accessibility:update');
+                        },
+                    },
+                    {
+                        label: 'Alarm sound',
+                        key: 'workspace.accessibility.audioCues.alarmTriggered',
+                        description:
+                            'Play sound when the machine enters an alarm state.',
+                        type: 'boolean',
+                        hidden: () =>
+                            !store.get('workspace.accessibility.audioCues.enabled'),
+                        onUpdate: () => {
+                            pubsub.publish('accessibility:update');
+                        },
+                    },
+                    {
+                        label: 'Tool change sound',
+                        key: 'workspace.accessibility.audioCues.toolChange',
+                        description: 'Play sound when a tool change is required.',
+                        type: 'boolean',
+                        hidden: () =>
+                            !store.get('workspace.accessibility.audioCues.enabled'),
+                        onUpdate: () => {
+                            pubsub.publish('accessibility:update');
+                        },
+                    },
+                    {
+                        label: 'Probe success sound',
+                        key: 'workspace.accessibility.audioCues.probeSuccess',
+                        description: 'Play sound after a successful probe.',
+                        type: 'boolean',
+                        hidden: () =>
+                            !store.get('workspace.accessibility.audioCues.enabled'),
+                        onUpdate: () => {
+                            pubsub.publish('accessibility:update');
+                        },
+                    },
+                ],
+            },
+            {
+                label: 'Navigation & Visuals',
+                settings: [
+                    {
+                        label: 'Focus rings',
+                        key: 'workspace.accessibility.focusRings',
+                        description:
+                            'Show a high-contrast ring around the currently focused element for better keyboard navigation visibility.',
+                        type: 'boolean',
+                        onUpdate: () => {
+                            pubsub.publish('accessibility:update');
+                        },
+                    },
+                    {
+                        label: 'Focus trapping',
+                        key: 'workspace.accessibility.focusTrapping',
+                        description:
+                            'Keep keyboard focus within modals and dialogs when they are open.',
+                        type: 'boolean',
+                        onUpdate: () => {
+                            pubsub.publish('accessibility:update');
+                        },
+                    },
+                    {
+                        label: 'Reduced motion',
+                        key: 'workspace.accessibility.reducedMotion',
+                        description:
+                            'Minimize animations and UI transitions for improved visibility and accessibility.',
+                        type: 'boolean',
+                        onUpdate: () => {
+                            pubsub.publish('accessibility:update');
+                        },
+                    },
+                ],
+            },
+            {
+                label: 'Visualizer',
+                settings: [
+                    {
+                        label: 'Keyboard control',
+                        key: 'workspace.accessibility.visualizerKeyboardControl',
+                        description:
+                            'Allow orbiting, panning, and zooming the 3D visualizer using arrow keys and hotkeys.',
+                        type: 'boolean',
+                        onUpdate: () => {
+                            pubsub.publish('accessibility:update');
+                        },
+                    },
+                    {
+                        label: 'Job summary',
+                        key: 'workspace.accessibility.gcodeSummary.enabled',
+                        description:
+                            'Provide a text summary of the loaded G-code file for screen readers.',
+                        type: 'boolean',
+                        onUpdate: () => {
+                            pubsub.publish('accessibility:update');
+                        },
+                    },
+                    {
+                        label: 'Show summary visually',
+                        key: 'workspace.accessibility.gcodeSummary.showVisually',
+                        description:
+                            'Display the G-code summary text visually above the visualizer.',
+                        type: 'boolean',
+                        hidden: () =>
+                            !store.get(
+                                'workspace.accessibility.gcodeSummary.enabled',
+                            ),
+                        onUpdate: () => {
+                            pubsub.publish('accessibility:update');
+                        },
+                    },
+                ],
+            },
+            {
+                label: 'Keyboard Map',
+                settings: [
+                    {
+                        label: 'Show keyboard shortcut map',
+                        key: 'workspace.accessibility.showKeyboardMap',
+                        description:
+                            'Show an overlay with active keyboard shortcuts.',
+                        type: 'boolean',
+                        onUpdate: () => {
+                            pubsub.publish('accessibility:update');
+                        },
+                    },
                 ],
             },
         ],

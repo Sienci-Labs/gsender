@@ -45,7 +45,10 @@ const MachineInfo = () => {
         <Popover open={open || pinned} onOpenChange={handleOpenChange}>
             <Tooltip content="Machine Information">
                 <PopoverTrigger asChild>
-                    <button className="z-20 w-[24px] max-sm:hidden">
+                    <button
+                        className="z-50 w-[24px] max-sm:hidden"
+                        aria-label="Machine Information"
+                    >
                         <img src={minfo} className="w-[24px]" />
                     </button>
                 </PopoverTrigger>
@@ -56,7 +59,11 @@ const MachineInfo = () => {
                 sideOffset={8}
                 collisionPadding={16}
             >
-                <MachineInfoDisplay pinned={pinned} setPinned={setPinned} />
+                <MachineInfoDisplay
+                    pinned={pinned}
+                    setPinned={setPinned}
+                    onClose={() => setOpen(false)}
+                />
             </PopoverContent>
         </Popover>
     );

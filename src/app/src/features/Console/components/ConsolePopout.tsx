@@ -21,6 +21,7 @@ export function ConsolePopout() {
             <button
                 className="absolute top-3 right-3 text-white text-2xl"
                 onClick={() => openWindow()}
+                aria-label="Open console in new window"
             >
                 <FaExternalLinkAlt />
             </button>

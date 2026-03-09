@@ -40,6 +40,10 @@ export function UnlockButton() {
     const isAlarm = activeState === GRBL_ACTIVE_STATE_ALARM;
     const activateUnlockButton = isHold || isAlarm;
 
+    const ariaLabel = activateUnlockButton
+        ? `Machine is ${isAlarm ? 'locked in alarm' : 'held'}. Click to unlock machine.`
+        : 'Machine is unlocked.';
+
     return (
         <div className="text-4xl absolute top-3 max-xl:top-2 left-72 max-sm:left-56">
             <Tooltip content="Unlock Machine">
@@ -49,6 +53,8 @@ export function UnlockButton() {
                             activateUnlockButton,
                     })}
                     onClick={() => unlockFirmware(activeState, alarmCode)}
+                    aria-label={ariaLabel}
+                    role="button"
                 >
                     <IoLockOpenOutline
                         className={cx('hidden group-hover:block', {

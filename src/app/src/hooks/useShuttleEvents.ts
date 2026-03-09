@@ -5,9 +5,11 @@ import {
     ShuttleControlEvents,
     ShuttleEvent,
 } from '../lib/definitions/shortcuts';
+import { shortcutRegistry } from '../lib/shortcutRegistry';
 
 const useShuttleEvents = (shuttleControlEvents: ShuttleControlEvents) => {
     useEffect(() => {
+        shortcutRegistry.register(shuttleControlEvents);
         Object.keys(shuttleControlEvents).forEach((eventName: string) => {
             const callback = (shuttleControlEvents[eventName] as ShuttleEvent)
                 .callback;
@@ -15,6 +17,7 @@ const useShuttleEvents = (shuttleControlEvents: ShuttleControlEvents) => {
         });
 
         return () => {
+            shortcutRegistry.unregister(shuttleControlEvents);
             Object.keys(shuttleControlEvents).forEach((eventName) => {
                 const callback = (
                     shuttleControlEvents[eventName] as ShuttleEvent

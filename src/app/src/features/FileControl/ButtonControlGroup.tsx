@@ -257,6 +257,44 @@ const ButtonControlGroup = () => {
 
                 <Divider />
 
+                <div className="grid grid-cols-[60px_2px_60px_2px_60px] h-full">
+                    <DropdownMenu>
+                        <Tooltip content="View Recent Files">
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    icon={
+                                        <MdKeyboardArrowDown className="w-10 h-8" />
+                                    }
+                                    variant="ghost"
+                                    disabled={!canClick}
+                                    className="h-full rounded-none"
+                                    aria-label="View Recent Files"
+                                />
+                            </DropdownMenuTrigger>
+                        </Tooltip>
+                        <DropdownMenuContent className="w-56 bg-white">
+                            <DropdownMenuLabel>Recent Files</DropdownMenuLabel>
+                            {recentFiles.map((file) => (
+                                <DropdownMenuItem
+                                    key={file.filePath}
+                                    onClick={() =>
+                                        handleLoadRecentFile(file.filePath)
+                                    }
+                                    className="flex items-center hover:bg-blue-100 transition-colors duration-200 cursor-pointer dark:hover:bg-dark-lighter"
+                                >
+                                    <div className="w-full overflow-hidden">
+                                        <span
+                                            className="block truncate"
+                                            title={file.fileName}
+                                        >
+                                            {file.fileName}
+                                        </span>
+                                    </div>
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
                 <ReloadFileAlert
                     fileLoaded={canClick && fileLoaded && usingElectron}
                     handleFileReload={handleFileReload}
@@ -292,6 +330,37 @@ const ButtonControlGroup = () => {
                     </AlertDialogContent>
                 </AlertDialog>
 
+                    <AlertDialog>
+                        <Tooltip content="Close File">
+                            <AlertDialogTrigger asChild>
+                                <Button
+                                    icon={<MdClose className="w-6 h-6" />}
+                                    variant="ghost"
+                                    className="h-full rounded-none"
+                                    disabled={isRunning || !fileLoaded}
+                                    aria-label="Close File"
+                                />
+                            </AlertDialogTrigger>
+                        </Tooltip>
+                        <AlertDialogContent className="bg-white">
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                    Are you sure?
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    This will close the current file. Any
+                                    unsaved changes will be lost.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleCloseFile}>
+                                    Close File
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+
                 <input
                     ref={fileInputRef}
                     type="file"
@@ -301,6 +370,7 @@ const ButtonControlGroup = () => {
                     accept={isIOSDevice ? "text/plain,application/octet-stream" : ".gcode,.gc,.nc,.tap,.cnc"}
                     id="fileInput"
                 />
+                </div>
             </div>
         </div>
     );

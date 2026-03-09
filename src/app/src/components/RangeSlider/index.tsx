@@ -84,6 +84,7 @@ const RangeSlider = ({
                         disabled={disabled}
                         size="sm"
                         icon={<FaUndo />}
+                        aria-label={`Reset ${title} override to 100%`}
                     />
                 </Tooltip>
                 <Slider
@@ -120,6 +121,7 @@ const RangeSlider = ({
                         disabled={disabled}
                         size="sm"
                         icon={<FaMinus />}
+                        aria-label={`Decrease ${title} override`}
                     />
                 </Tooltip>
                 <Tooltip content={`Increase ${title} override by ${step}%`}>
@@ -135,6 +137,7 @@ const RangeSlider = ({
                         disabled={disabled}
                         size="sm"
                         icon={<FaPlus />}
+                        aria-label={`Increase ${title} override`}
                     />
                 </Tooltip>
             </div>

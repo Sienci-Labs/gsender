@@ -33,6 +33,7 @@ const StatusIcons = () => {
                 <button
                     className="flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm text-gray-500"
                     onClick={toggleRemoteModeDialog}
+                    aria-label="Wireless Control"
                 >
                     <RemoteIndicator
                         className={cx('w-6 h-7', {
