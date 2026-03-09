@@ -15,6 +15,7 @@ import {
     TOUCHPLATE_TYPE_AUTOZERO,
     TOUCHPLATE_TYPE_STANDARD,
 } from 'app/lib/constants.ts';
+import defaultMachineProfiles from 'app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts';
 import api from 'app/api';
 import pubsub from 'pubsub-js';
 import { BackupFrequencies } from 'app/workspace/definitions';
@@ -331,6 +332,32 @@ const migrateStore = (): void => {
     if (!cnc.version) {
         return;
     }
+
+    if (semver.lt(cnc.version, '1.6.0')) {
+        const machineProfileID = Number(store.get(
+            'workspace.machineProfile.id',
+            4,
+        ));
+
+        if (machineProfileID === 3) {
+            // Set 2x4 (2)
+            const defaultMachineProfile = defaultMachineProfiles.find(
+                (profile) => profile.id === 2,
+            );
+            if (defaultMachineProfile) {
+                store.set('workspace.machineProfile', defaultMachineProfile);
+            }
+        }  else if (machineProfileID === 1) {
+            // set 0 (4x4)
+            const defaultMachineProfile = defaultMachineProfiles.find(
+                (profile) => profile.id === 0,
+            );
+            if (defaultMachineProfile) {
+                store.set('workspace.machineProfile', defaultMachineProfile);
+            }
+        }
+    }
+
 
     if (semver.lt(cnc.version, '1.5.5')) {
         // if user has default retraction distance (4), change it to the new default (2)
