@@ -407,18 +407,16 @@ const Workspace = () => {
                 <ConfirmationDialog />
                 <div className="sr-only" role="status" aria-live="polite"></div>
                 <DataCollection />
-                <div className="flex h-full no-scrollbar ">
-                    <nav className="aside" aria-label="Main Navigation">
-                        <Sidebar />
-                    </nav>
+                <div className="flex h-full no-scrollbar">
+                    <Sidebar />
                     <Alerts />
+                    <Helper />
                     <main
                         id="main-content"
                         className="w-full max-sm:p-4 outline-none"
                         tabIndex={-1}
                         role="main"
                     >
-                        <Helper />
                         <Carve />
                         <Outlet />
                     </main>
