@@ -32,6 +32,16 @@ export function ZJog({
         },
     )();
 
+    const handleKeyDown = (
+        e: React.KeyboardEvent,
+        action: (distance: number, feedrate: number, isContinuous: boolean) => void,
+    ) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            action(distance, feedrate, false);
+        }
+    };
+
     return (
         <div id="zJog" className="relative w-[45px] portrait:w-[52px] h-[168px] portrait:h-[195px]">
             <TabJog
@@ -39,6 +49,10 @@ export function ZJog({
                 bottomHandlers={zMinusJogHandlers}
                 canClick={canClick}
                 idForTest="Z"
+                topLabel="Jog Z plus"
+                bottomLabel="Jog Z minus"
+                onTopKeyDown={(e) => handleKeyDown(e, zPlusJog)}
+                onBottomKeyDown={(e) => handleKeyDown(e, zMinusJog)}
             />
             <img
                 src={zLabels}

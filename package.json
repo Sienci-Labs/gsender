@@ -1,6 +1,6 @@
 {
   "name": "gSender",
-  "version": "1.6.0-Edge-5",
+  "version": "1.6.0",
   "description": "Electron sender for GRBL based CNC machines",
   "author": {
     "name": "Sienci Labs <hi@sienci.com>",
@@ -35,14 +35,14 @@
     "build-latest": "concurrently --kill-others-on-fail --names \"build-dev-css,build-prod-server,vite:build\" \"npm run build-dev-css\" \"npm run build-prod-server\" \"npm run vite:build\" && npm run copy-css",
     "build-dev": "concurrently --kill-others-on-fail --names \"build-dev-css,build-dev-server\" \"npm run build-dev-server\" \"npm run build-dev-css\"",
     "build-dev-server": "node esbuild.config.js --target=all",
-    "build-dev-css": "postcss src/app/src/index.css -o src/app/src/application.css",
+    "build-dev-css": "postcss src/app/src/index.css -o src/app/src/application.css --config src/app/postcss.config.cjs",
     "build-prod": "concurrently --kill-others-on-fail --names \"build-dev-css,build-prod-server,vite:build\" \"npm run build-dev-css\" \"npm run build-prod-server\" \"npm run vite:build\" && npm run copy-css",
     "build-prod-server": "node esbuild.config.js --production --target=all",
     "copy-css": "cross-env mkdir -p dist/gsender/app/src && cp src/app/src/application.css dist/gsender/app/src/",
     "postbuild-dev-server": "echo 'Static files copied by esbuild'",
     "postbuild-prod-server": "echo 'Static files copied by esbuild'",
     "clean": "bash -c 'rm -rf ./dist ./output'",
-    "tailwind-dev": "npx tailwindcss -i src/app/src/index.css -o src/app/src/application.css --watch",
+    "tailwind-dev": "npx tailwindcss -i src/app/src/index.css -o src/app/src/application.css --config src/app/tailwind.config.ts --watch",
     "electron": "electron",
     "electron-builder": "electron-builder",
     "electron-builder:debug": "cross-env DEBUG=electron-builder electron-builder",
@@ -63,8 +63,8 @@
     "start": "cross-env ./bin/gsender",
     "start-electron": "electron ./dist/gsender/main",
     "watch-dev": "node esbuild.config.js --watch",
-    "start-dev": "cross-env NODE_ENV=development ./bin/gsender -vv -p 8000",
-    "start-dev:nodemon": "nodemon --exec \"node ./bin/gsender -vv -p 8000\"",
+    "start-dev": "cross-env NODE_ENV=development ./bin/gsender -vv -p 8010",
+    "start-dev:nodemon": "nodemon --exec \"node ./bin/gsender -vv -p 8010\"",
     "dev": "npm run prebuild-dev && npm run build-dev-server && concurrently --kill-others-on-fail --names \"esbuild,server,tailwind\" \"npm run watch-dev\" \"npm run start-dev:nodemon\" \"npm run tailwind-dev\"",
     "vite:dev": "cd src/app && vite --port 5173 --host",
     "electron:dev": "npm run electron:hot",
@@ -93,7 +93,7 @@
     "test:app": "yarn --cwd src/app test"
   },
   "build": {
-    "appId": "org.sienci.gsender-edge",
+    "appId": "org.sienci.gsender",
     "extraMetadata": {
       "main": "./main.js"
     },
@@ -105,7 +105,7 @@
       "**/*.node",
       "**/*.{dll,so,dylib,exe}"
     ],
-    "productName": "gSender Edge",
+    "productName": "gSender",
     "generateUpdatesFilesForAllChannels": true,
     "npmRebuild": false,
     "compression": "normal",

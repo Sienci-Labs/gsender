@@ -22,17 +22,21 @@ export function HybridNumber({
 }: HybridNumberInputProps) {
     const { firmwareType, connected, EEPROM, setEEPROM, setSettingsAreDirty } =
         useSettings();
-    const [eepromObject, setEEPROMObject] = useState({});
-
     const useEEPROM =
         (connected && firmwareType === 'grblHAL') || (connected && forceEEPROM);
 
-    useEffect(() => {
+    const updateEEPROMObject = () => {
         let eepromValue = EEPROM.filter((o) => o.setting === eepromKey)[0];
         if (eepromValue && useEEPROM) {
             value = Number(eepromValue.value);
-            setEEPROMObject(eepromValue);
+            return eepromValue;
         }
+    };
+
+    const [eepromObject, setEEPROMObject] = useState(updateEEPROMObject());
+
+    useEffect(() => {
+        setEEPROMObject(updateEEPROMObject);
     }, [EEPROM]);
 
     function hybridOnChange(v) {

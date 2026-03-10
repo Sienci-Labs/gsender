@@ -3,12 +3,18 @@
   "private": true,
   "scripts": {
     "dev": "node server",
+<<<<<<< HEAD
     "build": "npm run build:client && npm run build:server",
     "build:client": "vite build --outDir ../../dist/gsender/app --ssrManifest --emptyOutDir",
     "build:server": "vite build --outDir ../../dist/gsender/app-server --ssr src/entry-server.tsx --emptyOutDir",
     "preview": "cross-env NODE_ENV=production node server",
     "test": "../../node_modules/.bin/jest --config=../../jest.config.js --testPathPatterns=src/app",
     "test:watch": "../../node_modules/.bin/jest --config=../../jest.config.js --testPathPatterns=src/app --watch"
+=======
+    "build": "npm run build:client",
+    "build:client": "vite build --outDir ../../dist/gsender/app --emptyOutDir",
+    "preview": "cross-env NODE_ENV=production node server"
+>>>>>>> 2bf7ad9f6cc8ad95ea032eb7e2384b240fcee6a7
   },
   "dependencies": {
     "@electron/remote": "^2.1.3",
@@ -122,5 +128,5 @@
     "type": "git",
     "url": "https://github.com/Sienci-Labs/gsender"
   },
-  "version": "1.6.0-Edge-5"
+  "version": "1.6.0"
 }

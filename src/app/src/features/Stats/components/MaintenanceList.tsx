@@ -174,6 +174,7 @@ export function MaintenanceList() {
                             onClick={() => {
                                 onClear(info.cell.row.original.id);
                             }}
+                            aria-label={`Reset maintenance timer for ${info.cell.row.original.part}`}
                         >
                             <CheckCircle size={24} color="green" />
                         </button>
@@ -182,6 +183,7 @@ export function MaintenanceList() {
                             onClick={() => {
                                 onEdit(info.cell.row.original.id);
                             }}
+                            aria-label={`Edit maintenance task for ${info.cell.row.original.part}`}
                         >
                             <Pen size={24} />
                         </button>

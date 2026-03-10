@@ -10,6 +10,7 @@ import * as user from 'app/lib/user';
 import controller from 'app/lib/controller';
 import { Toaster } from './components/shadcn/Sonner';
 import { ReactRoutes } from './react-routes';
+import { AccessibilitySettingsHandler } from './features/Helper/AccessibilitySettingsHandler';
 
 function App() {
     useEffect(() => {
@@ -38,6 +39,7 @@ function App() {
     return (
         <>
             <ReduxProvider store={reduxStore}>
+                <AccessibilitySettingsHandler />
                 <Toaster
     {...({
         richColors: true,

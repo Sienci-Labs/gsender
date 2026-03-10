@@ -102,21 +102,24 @@ const LaserControls = ({ actions, state, canClick, isConnected }: Props) => {
                             actions.handleLaserPowerChange(value[0])
                         }
                         disabled={!canClick}
+                        aria-label="Adjust laser power"
                     />
                 </Tooltip>
                 <span>{laser.power}%</span>
             </div>
             <div className="flex gap-2 justify-center items-center mt-1 dark:text-white">
-                <label>Test Duration:</label>
+                <label htmlFor="laser-test-duration">Test Duration:</label>
                 <div className="flex gap-2">
                     <Tooltip content="Laser test duration">
                         <ControlledInput
+                            id="laser-test-duration"
                             value={laser.duration}
                             onChange={actions.handleLaserDurationChange}
                             className="z-0 text-center text-blue-500 text-xl"
                             suffix="sec"
                             type="number"
                             sizing="xs"
+                            aria-label="Laser test duration"
                         />
                     </Tooltip>
                 </div>

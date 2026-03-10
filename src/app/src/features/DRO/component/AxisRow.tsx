@@ -60,6 +60,11 @@ export function AxisRow({
                         content: `${homingMode ? 'Home' : 'Zero'} your ${label}-axis`,
                         side: 'left',
                     }}
+                    aria-label={
+                        homingMode
+                            ? `Home ${label} axis: Move to physical machine limit`
+                            : `Zero ${label} axis: Set current position as work zero`
+                    }
                 >
                     <span className="font-bold font-mono text-xl transition-all transition-duration-300">
                         {`${homingMode ? 'H' : ''}${label}${homingMode ? '' : '0'}`}
@@ -71,7 +76,8 @@ export function AxisRow({
                         <Button
                             disabled={disabled}
                             variant="secondary"
-                            size="responsive"
+                            size="sm"
+                            aria-label={`Zero ${label} axis`}
                         >
                             <span className="font-bold font-mono text-xl transition-all transition-duration-300">
                                 {`${label}0`}
@@ -118,6 +124,7 @@ export function AxisRow({
                 tooltip={{
                     content: `Go to ${label}-axis zero`,
                 }}
+                aria-label={`Go to ${label} axis zero: Move axis to its current work zero position`}
             >
                 <span className="text-lg font-mono">{label}</span>
             </Button>

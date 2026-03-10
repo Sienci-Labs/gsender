@@ -261,7 +261,9 @@ export const ReactRoutes = () => {
                     index
                     element={
                         <>
-                            <WorkspaceSelector />
+                            <div className="relative mb-6">
+                                <WorkspaceSelector />
+                            </div>
                             <DRO isRemote />
                             <Jogging />
                         </>

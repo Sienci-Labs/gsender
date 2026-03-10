@@ -53,6 +53,7 @@ const Slider = ({
                 onChange={onChange}
                 className="appearance-none h-4 rounded-md bg-gray-300 outline-none transition-opacity duration-200 ease-in-out dark:bg-dark-lighter"
                 step={step}
+                aria-label={label}
             />
             <span>
                 {value} {unitString}

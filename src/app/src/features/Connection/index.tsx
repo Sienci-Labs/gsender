@@ -68,6 +68,7 @@ function Connection(props: ConnectionProps) {
     const [firmware, setFirmware] = useState<FirmwareFlavour>('Grbl');
 
     const [activePort, setActivePort] = useState('');
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     const [isOpen, setIsOpen] = useState(false);
 
@@ -118,6 +119,7 @@ function Connection(props: ConnectionProps) {
         // workflow - set element to connecting state, attempt to connect, and use callback to update state on end
         setConnectionState(ConnectionState.CONNECTING);
         setConnectionType(type);
+        setIsDropdownOpen(false);
 
         // Safety net: if the backend callback never fires (e.g. silent hang),
         // reset the UI to ERROR after 15 seconds for network connections.
@@ -221,6 +223,26 @@ function Connection(props: ConnectionProps) {
         setIsOpen((prev) => !prev);
     };
 
+    const toggleDropdown = (e: React.MouseEvent | React.KeyboardEvent) => {
+        if (
+            connectionState === ConnectionState.DISCONNECTED ||
+            connectionState === ConnectionState.ERROR
+        ) {
+            e.stopPropagation();
+            refreshPorts();
+            setIsDropdownOpen(!isDropdownOpen);
+        }
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleDropdown(e);
+        } else if (e.key === 'Escape') {
+            setIsDropdownOpen(false);
+        }
+    };
+
     return (
         <Popover open={isOpen} onOpenChange={setIsOpen}>
             <div
@@ -230,6 +252,11 @@ function Connection(props: ConnectionProps) {
                     handleMouseEnter();
                 }}
                 onMouseLeave={handleMouseLeave}
+                role="button"
+                aria-haspopup="true"
+                aria-expanded={isDropdownOpen}
+                aria-label="Connection menu"
+                tabIndex={0}
             >
                 {connectionState !== ConnectionState.CONNECTED && (
                     <div

@@ -24,6 +24,7 @@ const Header = () => {
             <button
                 onClick={handleClearNotifications}
                 disabled={notifications?.length === 0}
+                aria-label="Clear all notifications"
             >
                 <LuTrash
                     className={`w-6 h-6 text-gray-500 ${

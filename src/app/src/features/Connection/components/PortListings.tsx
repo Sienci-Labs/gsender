@@ -12,6 +12,7 @@ export interface PortListingsProps {
     ports: Port[];
     connectHandler: (p: string, c: ConnectionType) => void;
     unrecognizedPorts?: Port[];
+    isOpen?: boolean;
 }
 
 function truncatePortName(port: string = ''): string {
@@ -23,8 +24,11 @@ export function PortListingButton({ port, connectionHandler, baud }: { port: Por
     return (
         <button
             type="button"
-            className="w-full m-0 p-3 max-sm:p-2 shadow-inner  flex flex-row items-center justify-between hover:bg-gray-100 dark:hover:bg-slate-800"
-            onClick={() => connectionHandler(port.port, ConnectionType.USB)}
+            className="w-full m-0 p-3 max-sm:p-2 shadow-inner  flex flex-row items-center justify-between hover:bg-gray-100 dark:hover:bg-slate-800 outline-none"
+            onClick={(e) => {
+                e.stopPropagation();
+                connectionHandler(port.port, ConnectionType.USB);
+            }}
             key={`port-${port.port}`}
         >
             <span className="text-4xl">
@@ -63,7 +67,8 @@ export function PortListings(props: PortListingsProps): JSX.Element {
         setPort(store.get('widgets.connection.ethernetPort', 23));
     });
 
-    function toggleUnrecognizedPorts() {
+    function toggleUnrecognizedPorts(e: React.MouseEvent) {
+        e.stopPropagation();
         setOpenUnrecognized(!openUnrecognized);
     }
 
@@ -83,8 +88,9 @@ export function PortListings(props: PortListingsProps): JSX.Element {
                 />
             ))}
             <button
-                className="px-4 shadow-inner py-4 flex flex-row items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800 mt-1 w-full"
-                onClick={() => {
+                className="px-4 shadow-inner py-4 flex flex-row items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800 outline-none mt-1 w-full"
+                onClick={(e) => {
+                    e.stopPropagation();
                     props.connectHandler(ip, ConnectionType.ETHERNET);
                 }}
             >
@@ -101,7 +107,7 @@ export function PortListings(props: PortListingsProps): JSX.Element {
             {props.unrecognizedPorts.length > 0 && (
                 <div className="flex flex-col overflow-hidden">
                     <button
-                        className="text-base text-gray-700 dark:text-gray-300 my-2 flex flex-row justify-between items-center px-2"
+                        className="text-base text-gray-700 dark:text-gray-300 my-2 flex flex-row justify-between items-center px-2 outline-none"
                         onClick={toggleUnrecognizedPorts}
                     >
                         <span>Unrecognized Ports</span>
