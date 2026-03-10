@@ -11,7 +11,7 @@ export function RestartAndRehome({ onComplete, onUncomplete }: StepProps) {
     const [error, setError] = useState<string | null>(null);
 
     const hasHomed = useTypedSelector(
-        (state: RootState) => state.controller.state.status.hasHomed,
+        (state: RootState) => state.controller.hasHomed,
     );
 
     const isConnected = useTypedSelector(
@@ -34,7 +34,7 @@ export function RestartAndRehome({ onComplete, onUncomplete }: StepProps) {
 
     return (
         <div className="flex flex-col gap-5 justify-start">
-            <label className="block text-sm font-semibold text-gray-900 mb-2">
+            <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
                 Rehome
             </label>
             <p className="dark:text-white">

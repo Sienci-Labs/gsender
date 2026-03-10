@@ -218,19 +218,26 @@ const main = () => {
                 try {
                     res = await launchServer();
                 } catch (error) {
-                    if (error.message.includes('EADDR')) {
+                    const isBindingError = error.errData?.bindingErr ||
+                        /EADDR|address not available|address already in use/i.test(error.message);
+
+                    if (isBindingError) {
+                        log.warn('Remote mode binding failed — remote config has been reset.');
                         dialog.showMessageBoxSync(null, {
-                            title: 'Error Connecting to Remote Address',
-                            message:
-                  'There was an problem connecting to the remote address in gSender.',
-                            detail:
-                  'Remote mode has been disabled. Please verify the configured IP address before restarting the application.',
+                            title: 'Remote Mode Configuration Error',
+                            message: 'gSender could not connect to the configured remote address.',
+                            detail: 'Remote mode has been disabled and the configuration has been reset. Please restart gSender.',
                         });
-                        app.relaunch();
-                        app.exit(-1);
                     } else {
-                        log.error(error);
+                        log.error('Unexpected server startup error:', error);
+                        dialog.showMessageBoxSync(null, {
+                            title: 'Server Startup Error',
+                            message: 'gSender encountered an unexpected error while starting.',
+                            detail: String(error.message),
+                        });
                     }
+                    app.exit(-1);
+                    return;
                 }
 
                 const { address, port, kiosk: resolvedKiosk } = { ...res };

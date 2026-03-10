@@ -38,7 +38,12 @@ const ModalToggle = ({ mode, onChange, ...props }: Props) => {
         <Tooltip content="Enable Spindle or Laser mode">
             <div className="flex items-center gap-2 justify-center w-full dark:text-white">
                 <span>Spindle</span>
-                <Switch checked={isToggled} onChange={onChange} {...props} />
+                <Switch
+                    checked={isToggled}
+                    onChange={onChange}
+                    {...props}
+                    aria-label="Toggle spindle or laser mode"
+                />
                 <span>Laser</span>
             </div>
         </Tooltip>

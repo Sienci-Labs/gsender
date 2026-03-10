@@ -55,14 +55,14 @@ export function PositionSetter({
     return (
         <div className="space-y-4">
             <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-3">
+                <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-3">
                     {label}
                 </label>
                 <div
                     className={`grid gap-4 ${showZ ? 'grid-cols-3' : 'grid-cols-2'}`}
                 >
                     <div>
-                        <label className="block text-xs text-gray-600 mb-1">
+                        <label className="block text-xs text-gray-600 dark:text-gray-300 mb-1">
                             X
                         </label>
                         <input
@@ -73,7 +73,7 @@ export function PositionSetter({
                         />
                     </div>
                     <div>
-                        <label className="block text-xs text-gray-600 mb-1">
+                        <label className="block text-xs text-gray-600 dark:text-gray-300 mb-1">
                             Y
                         </label>
                         <input
@@ -85,7 +85,7 @@ export function PositionSetter({
                     </div>
                     {showZ && (
                         <div>
-                            <label className="block text-xs text-gray-600 mb-1">
+                            <label className="block text-xs text-gray-600 dark:text-gray-300 mb-1">
                                 Z
                             </label>
                             <input

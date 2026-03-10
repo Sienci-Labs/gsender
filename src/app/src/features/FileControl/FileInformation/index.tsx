@@ -110,6 +110,15 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                                         index < 8 && (
                                             <div
                                                 className="grid grid-cols-[30px_3fr] items-center gap-1 cursor-pointer py-2"
+                                                role="button"
+                                                tabIndex={0}
+                                                aria-label={`Load recent file ${file.fileName}`}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter' || e.key === ' ') {
+                                                        e.preventDefault();
+                                                        handleRecentFileUpload(file, true);
+                                                    }
+                                                }}
                                                 onClick={() =>
                                                     handleRecentFileUpload(
                                                         {
@@ -285,6 +294,7 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                         onChange={() => setToggleInfo((prev) => !prev)}
                         position="vertical"
                         data-testid="toggle-info"
+                        aria-label="Toggle file info or size view"
                     />
                     <span className="text-gray-500">Size</span>
                 </div>

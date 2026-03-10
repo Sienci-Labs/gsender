@@ -10,6 +10,10 @@ import { EEPROMNotConnectedWarning } from 'app/features/Config/components/EEPROM
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
 import { FilterDefaultToggle } from 'app/features/Config/components/FilterDefaultToggle.tsx';
+import pubsub from 'pubsub-js';
+import store from 'app/store';
+import { useDispatch } from 'react-redux';
+import { updateAccessibility } from 'app/store/redux/slices/preferences.slice';
 import {
     Tabs,
     TabsContent,
@@ -19,21 +23,35 @@ import {
 import { gSenderSetting, SettingsMenuSection } from './assets/SettingsMenu';
 import { convertEIDToNumber } from 'app/lib/numeral';
 import controller from 'app/lib/controller.ts';
-import { GRBLHAL } from 'app/constants';
+import {GRBLHAL, WORKFLOW_STATE_IDLE} from 'app/constants';
 import { resolveGrblCoreDefaults } from 'app/features/Config/utils/grblCoreMigration.ts';
 
 export function Config() {
+    const dispatch = useDispatch();
+    const [activeSection, setActiveSection] = React.useState<number>(0);
+    const [showFlashDialog, setShowFlashDialog] = React.useState(false);
     const { ref: inViewRef } = useInView({
         threshold: 0.2,
     });
+
+    useEffect(() => {
+        const token = pubsub.subscribe('accessibility:update', () => {
+            const accessibility = store.get('workspace.accessibility');
+            if (accessibility) {
+                dispatch(updateAccessibility(accessibility));
+            }
+        });
+        return () => {
+            pubsub.unsubscribe(token);
+        };
+    }, [dispatch]);
 
     const connected = useTypedSelector(
         (state: RootState) => state.connection.isConnected,
     );
 
-    const firmwareType = useTypedSelector(
-        (state: RootState) => state.controller.type,
-    );
+    const workflowState = useTypedSelector((state: RootState) => state.controller.workflow.state);
+
     const [visibleSection, setVisibleSection] = React.useState('h-section-0');
     const [activeTab, setActiveTab] = React.useState('config');
 
@@ -44,7 +62,7 @@ export function Config() {
     }
 
     useEffect(() => {
-        if (connected) {
+        if (connected && workflowState === WORKFLOW_STATE_IDLE) {
             controller.command('gcode', ['$$']);
         }
     }, []);
@@ -52,7 +70,7 @@ export function Config() {
     const { settings, EEPROM } = useSettings();
 
 
-    // lets extract all the eeprom settings
+    // lets extract all the eeprom settingsd
     const allEEPROM: gSenderSetting[] = useMemo(
         () =>
             EEPROM.map((filtered) => ({

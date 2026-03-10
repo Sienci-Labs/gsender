@@ -73,6 +73,10 @@ export interface Visualizer {
     showSoftLimitWarning: boolean;
     hideProcessedLines: boolean;
     rotaryDiameterOffsetEnabled: boolean;
+    debug: {
+        profileWorker: boolean;
+        profileSampleEvery: number;
+    };
 }
 
 export interface State {

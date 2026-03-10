@@ -43,6 +43,7 @@ const SelectScrollUpButton = React.forwardRef<
             className,
         )}
         {...props}
+        aria-label="Scroll up"
     >
         <ChevronUp className="h-4 w-4" />
     </SelectPrimitive.ScrollUpButton>
@@ -60,6 +61,7 @@ const SelectScrollDownButton = React.forwardRef<
             className,
         )}
         {...props}
+        aria-label="Scroll down"
     >
         <ChevronDown className="h-4 w-4" />
     </SelectPrimitive.ScrollDownButton>

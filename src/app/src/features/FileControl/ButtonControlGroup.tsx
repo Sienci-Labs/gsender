@@ -63,9 +63,6 @@ const ButtonControlGroup = () => {
     }, [fileLoaded]);
 
     const usingElectron = isElectron();
-    // const connected = useSelector(
-    //     (state: RootState) => state.connection.isConnected,
-    // );
     const workflowState = useSelector(
         (state: RootState) => state.controller.workflow.state,
     );
@@ -229,6 +226,7 @@ const ButtonControlGroup = () => {
                                 variant="ghost"
                                 disabled={!canClick}
                                 className="h-full rounded-none"
+                                aria-label="View Recent Files"
                             />
                         </DropdownMenuTrigger>
                     </Tooltip>
@@ -272,6 +270,7 @@ const ButtonControlGroup = () => {
                                 variant="ghost"
                                 className="h-full rounded-none"
                                 disabled={isRunning || !fileLoaded}
+                                aria-label="Close File"
                             />
                         </AlertDialogTrigger>
                     </Tooltip>

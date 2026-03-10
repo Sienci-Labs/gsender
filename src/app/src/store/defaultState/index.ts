@@ -67,6 +67,8 @@ const defaultState: State = {
         outlineSpeed: 0,
         revertWorkspace: false,
         promptExit: false,
+        backupFreq: 'On Update',
+        lastBackupTime: 0,
         sendUsageData: false,
         jobTimes: [],
         toolChange: {
@@ -166,6 +168,27 @@ const defaultState: State = {
         notifications: [],
         toastDuration: 0,
         enableDarkMode: false,
+        accessibility: {
+            statusAnnouncements: true,
+            jobProgressAnnouncements: true,
+            jobProgressIncrement: 10,
+            focusRings: false,
+            focusTrapping: false,
+            visualizerKeyboardControl: false,
+            audioCues: {
+                enabled: false,
+                jobComplete: true,
+                alarmTriggered: true,
+                toolChange: true,
+                probeSuccess: true,
+            },
+            reducedMotion: false,
+            gcodeSummary: {
+                enabled: true,
+                showVisually: false,
+            },
+            showKeyboardMap: false,
+        },
     },
     widgets: {
         atc: {
@@ -403,8 +426,8 @@ const defaultState: State = {
             hideProcessedLines: false,
             debug: {
                 profileWorker: false,
-                profileSampleEvery: 10000
-            }
+                profileSampleEvery: 10000,
+            },
         },
     },
     commandKeys: {},

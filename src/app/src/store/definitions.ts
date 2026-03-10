@@ -93,7 +93,7 @@ export interface ControllerState {
     mpos: BasicPosition;
     wpos: BasicPosition;
     homingFlag: boolean;
-    homingRun: boolean;
+    hasHomed: boolean;
     feeder: Feeder;
     sender: Sender;
     workflow: {
@@ -166,6 +166,27 @@ export interface PreferencesState {
     };
     ipList: Array<string>;
     notifications: Notification[];
+    accessibility: {
+        statusAnnouncements: boolean;
+        jobProgressAnnouncements: boolean;
+        jobProgressIncrement: number;
+        focusRings: boolean;
+        focusTrapping: boolean;
+        visualizerKeyboardControl: boolean;
+        audioCues: {
+            enabled: boolean;
+            jobComplete: boolean;
+            alarmTriggered: boolean;
+            toolChange: boolean;
+            probeSuccess: boolean;
+        };
+        reducedMotion: boolean;
+        gcodeSummary: {
+            enabled: boolean;
+            showVisually: boolean;
+        };
+        showKeyboardMap: boolean;
+    };
 }
 
 export interface VisualizerState {

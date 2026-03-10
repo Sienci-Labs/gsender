@@ -55,6 +55,7 @@ interface iSettingsContext {
     settingsValues: gSenderSetting[];
     setSettingsValues?: React.Dispatch<React.SetStateAction<gSenderSetting[]>>;
     settingsFilter: (v: gSenderSetting) => boolean;
+    getPendingOrStore: (key: string, defaultValue?: any) => any;
     toggleFilterNonDefault: () => void;
     filterNonDefault: boolean;
     setFilterNonDefault?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -100,6 +101,7 @@ const defaultState: iSettingsContext = {
         },
     ],
     settingsFilter: () => true,
+    getPendingOrStore: (key, defaultValue) => store.get(key, defaultValue),
     toggleFilterNonDefault: () => {},
     filterNonDefault: false,
     eepromIsDefault: (_v) => false,
@@ -144,7 +146,7 @@ function populateSettingsValues(
         ss.settings.map((s) => {
             s.settings.map((o) => {
                 if (o.key && o.key.length > 0) {
-                    o.value = fetchStoreValue(o.key);
+                    o.value = store.get(o.key);
                     o.globalIndex = index;
                     o.defaultValue = fetchDefaultValue(o.key);
                     globalValueReference.push({ ...o });
@@ -183,10 +185,7 @@ function applyEEPROMDescriptions(
                         remapped = true;
                     }
                     if (ctrlType === GRBLHAL && eID) {
-                        eID = translateGrblCoreKey(
-                            eID as EEPROM,
-                            fwVersion,
-                        );
+                        eID = translateGrblCoreKey(eID as EEPROM, fwVersion);
                     }
                     if (!eID) {
                         return remapped ? { ...o, remapped: true } : o;
@@ -265,6 +264,24 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     const eepromMap = useMemo(
         () => new Map(EEPROM.map((e) => [e.setting, e])),
         [EEPROM],
+    );
+
+    const pendingValueMap = useMemo(
+        () =>
+            new Map(
+                settingsValues
+                    .filter((s) => s.dirty && s.key)
+                    .map((s) => [s.key, s.value]),
+            ),
+        [settingsValues],
+    );
+
+    const getPendingOrStore = useCallback(
+        (key: string, defaultValue?: any) =>
+            pendingValueMap.has(key)
+                ? pendingValueMap.get(key)
+                : store.get(key, defaultValue),
+        [pendingValueMap],
     );
 
     useEffect(() => {
@@ -417,16 +434,15 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             return false;
         }
 
-        if (v.type === 'eeprom') {
+        if (
+            v.type === 'eeprom' ||
+            (v.type === 'hybrid' && controllerType === GRBLHAL)
+        ) {
             const EEPROMData = eepromMap.get(v.eID as EEPROM);
             // If filterNonDefault is enabled, make sure the current value equals the default value
             if (EEPROMData) {
                 return !eepromIsDefault(EEPROMData);
             }
-        }
-
-        if (v.type === 'hybrid' && connected && controllerType === GRBLHAL) {
-            return !eepromIsDefault(v);
         }
 
         if ('key' in v) {
@@ -468,57 +484,70 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
      * Filter remaining by matching search term
      * @param v - The setting to filter
      */
-    const settingsFilter = useCallback((v: gSenderSetting) => {
-        // ***first, check conditions that are always applicable
+    const settingsFilter = useCallback(
+        (v: gSenderSetting) => {
+            // ***first, check conditions that are always applicable
 
-        // Hide hidden when filtering
-        if ('hidden' in v && (!searchTerm || searchTerm.length === 0)) {
-            if (v.hidden()) {
-                // only return if it's supposed to be hidden, otherwise we have more to check
-                return false;
-            }
-        }
-        // Always exclude eeprom/hybrids when not connected
-        if (v.type === 'eeprom' || v.type === 'hybrid') {
-            if (!connectionState) {
-                return false;
-            }
-
-            let idToUse = v.eID;
-            if (Object.hasOwn(v, 'remap') && isFirmwareCurrent) {
-                idToUse = v.remap;
-            }
-            if (controllerType === GRBLHAL) {
-                idToUse = translateGrblCoreKey(
-                    idToUse as EEPROM,
-                    firmwareVersion,
-                );
-            }
-            if (v.type === 'eeprom') {
-                if (!eepromMap.has(idToUse as EEPROM)) {
+            // Hide hidden when filtering
+            if ('hidden' in v && (!searchTerm || searchTerm.length === 0)) {
+                if (v.hidden(getPendingOrStore)) {
+                    // only return if it's supposed to be hidden, otherwise we have more to check
                     return false;
                 }
             }
-        }
+            // Always exclude eeprom/hybrids when not connected
+            if (v.type === 'eeprom' || v.type === 'hybrid') {
+                if (!connectionState) {
+                    return false;
+                }
 
-        // ***then, consider defaults and searching
-        const modified = checkIfModified(v);
-        const searched = checkSearchTerm(v);
+                let idToUse = v.eID;
+                if (Object.hasOwn(v, 'remap') && isFirmwareCurrent) {
+                    idToUse = v.remap;
+                }
+                if (controllerType === GRBLHAL) {
+                    idToUse = translateGrblCoreKey(
+                        idToUse as EEPROM,
+                        firmwareVersion,
+                    );
+                }
+                if (v.type === 'eeprom') {
+                    if (!eepromMap.has(idToUse as EEPROM)) {
+                        return false;
+                    }
+                }
+            }
 
-        if (searchTerm.length === 0 || !searchTerm) {
-            // if no search, check modified
-            if (filterNonDefault) {
-                return modified;
+            // ***then, consider defaults and searching
+            const modified = checkIfModified(v);
+            const searched = checkSearchTerm(v);
+
+            if (searchTerm.length === 0 || !searchTerm) {
+                // if no search, check modified
+                if (filterNonDefault) {
+                    return modified;
+                }
+                return true;
+            } else {
+                // if search, consider both
+                if (filterNonDefault) {
+                    return modified && searched;
+                }
+                return searched;
             }
-            return true;
-        } else {
-            // if search, consider both
-            if (filterNonDefault) {
-                return modified && searched;
-            }
-            return searched;
-        }
-    }, [connectionState, eepromMap, isFirmwareCurrent, controllerType, firmwareVersion, searchTerm, filterNonDefault, settingsValues]);
+        },
+        [
+            connectionState,
+            eepromMap,
+            isFirmwareCurrent,
+            controllerType,
+            firmwareVersion,
+            searchTerm,
+            filterNonDefault,
+            settingsValues,
+            getPendingOrStore,
+        ],
+    );
 
     function eepromIsDefault(settingData: gSenderSetting | FilteredEEPROM) {
         const profileDefaults =
@@ -556,6 +585,11 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             );
         }
 
+        const numValue = Number(settingData.value);
+        const numDefault = Number(inputDefault);
+        if (!isNaN(numValue) && !isNaN(numDefault)) {
+            return numValue === numDefault;
+        }
         return isEqual(settingData.value, inputDefault);
     }
 
@@ -605,6 +639,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         settingsValues,
         setSettingsValues,
         settingsFilter,
+        getPendingOrStore,
         toggleFilterNonDefault,
         filterNonDefault,
         eepromIsDefault,

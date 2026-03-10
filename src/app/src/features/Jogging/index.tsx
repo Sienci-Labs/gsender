@@ -1012,23 +1012,27 @@ export function Jogging({ hideRotary = false }) {
                     >
                         <JogInput
                             label="XY"
+                            screenReaderLabel="XY jog distance"
                             currentValue={jogSpeed.xyStep}
                             onChange={updateXYStep}
                         />
                         <JogInput
                             label="Z"
+                            screenReaderLabel="Z jog distance"
                             currentValue={jogSpeed.zStep}
                             onChange={updateZStep}
                         />
                         {showA && (
                             <JogInput
                                 label="A°"
+                                screenReaderLabel="A jog distance"
                                 currentValue={jogSpeed.aStep}
                                 onChange={updateAStep}
                             />
                         )}
                         <JogInput
                             label="at"
+                            screenReaderLabel="Jog feedrate"
                             currentValue={jogSpeed.feedrate}
                             onChange={updateFeedrate}
                         />

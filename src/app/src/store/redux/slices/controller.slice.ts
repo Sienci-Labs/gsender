@@ -53,7 +53,7 @@ const initialState: ControllerState = {
         c: 0.0,
     },
     homingFlag: false,
-    homingRun: false,
+    hasHomed: false,
     feeder: {
         status: null,
     },
@@ -264,11 +264,16 @@ const controllerSlice = createSlice({
             action: PayloadAction<{ homingFlag: boolean }>,
         ) => {
             state.homingFlag = action.payload.homingFlag;
-            state.homingRun = true;
+        },
+        updateHasHomed: (
+            state,
+            action: PayloadAction<{ hasHomed: boolean }>,
+        ) => {
+            state.hasHomed = action.payload.hasHomed;
         },
         resetHoming: (state) => {
             state.homingFlag = false;
-            state.homingRun = false;
+            state.hasHomed = false;
         },
         updateTerminalHistory: (state, action: PayloadAction<any[]>) => {
             state.terminalHistory = [
@@ -360,6 +365,7 @@ export const {
     updateWorkflowState,
     toolChange,
     updateHomingFlag,
+    updateHasHomed,
     resetHoming,
     updateSettingsDescriptions,
     updateAlarmDescriptions,

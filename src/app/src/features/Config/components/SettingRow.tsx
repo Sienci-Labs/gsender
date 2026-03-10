@@ -91,13 +91,13 @@ function returnSettingControl(
             );
         case 'hybrid':
             return (
-                <HybridNumber
+                <NumberSettingInput
+                    unit={setting.unit}
                     value={value as number}
                     index={index}
-                    eepromKey={setting.eID}
-                    forceEEPROM={setting.forceEEPROM}
                     onChange={handler}
-                    unit={setting.unit}
+                    max={setting.max}
+                    min={setting.min}
                 />
             );
         case 'event':
@@ -148,13 +148,16 @@ export const SettingRow = React.memo(function SettingRow({
         getEEPROMDefaultValue,
         EEPROM,
         isFirmwareCurrent,
+        getPendingOrStore,
     } = useSettings();
 
     const displaySetting = { ...setting };
+    const hybridShouldUseEEPROM =
+        setting.type === 'hybrid' && firmwareType === GRBLHAL;
     // Default function to not hidden
     let isHidden = false;
     if (setting && setting.hidden) {
-        isHidden = setting.hidden();
+        isHidden = setting.hidden(getPendingOrStore);
     }
 
     const handleSettingsChange = (index: number) => (value: any) => {
@@ -245,7 +248,11 @@ export const SettingRow = React.memo(function SettingRow({
         return <></>;
     }
 
-    if (connected && setting.type === 'eeprom') {
+    if (
+        connected &&
+        (setting.type === 'eeprom' ||
+            (setting.type === 'hybrid' && hybridShouldUseEEPROM))
+    ) {
         let idToUse = setting.eID;
         if (Object.hasOwn(setting, 'remap') && isFirmwareCurrent) {
             idToUse = setting.remap;
@@ -300,15 +307,7 @@ export const SettingRow = React.memo(function SettingRow({
                             </button>
                         </Tooltip>
                     )}
-                    {setting.type === 'hybrid' && firmwareType === GRBLHAL ? (
-                        <Tooltip content="Machine setting">
-                            <span className="text-robin-500 text-4xl">
-                                <FaMicrochip />
-                            </span>
-                        </Tooltip>
-                    ) : (
-                        <span className="text-robin-500 min-w-9" />
-                    )}
+                    <span className="text-robin-500 min-w-9" />
                 </span>
             </span>
             <span className="w-full sm:w-2/5 order-2 sm:order-3 text-gray-500 text-sm flex flex-col gap-2 max-sm:mb-4 mb-2">
@@ -349,15 +348,7 @@ export const SettingRow = React.memo(function SettingRow({
                         </button>
                     </Tooltip>
                 )}
-                {setting.type === 'hybrid' && firmwareType === GRBLHAL ? (
-                    <Tooltip content="Machine setting">
-                        <span className="text-robin-500 text-4xl">
-                            <FaMicrochip />
-                        </span>
-                    </Tooltip>
-                ) : (
-                    <span className="text-robin-500 min-w-9" />
-                )}
+                <span className="text-robin-500 min-w-9" />
             </span>
         </div>
     );

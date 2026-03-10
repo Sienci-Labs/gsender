@@ -15,6 +15,8 @@ import { useEffect, useRef } from 'react';
 import Tooltip from 'app/components/Tooltip';
 import { get, includes } from 'lodash';
 import reduxStore from 'app/store/redux';
+import { useSelector } from 'react-redux';
+import { RootState } from 'app/store/redux';
 
 function goToParkLocation() {
     const park = store.get('workspace.park', {});
@@ -34,11 +36,14 @@ export function Parking({
     isConnected = false,
     homingEnabled = false,
 }) {
-    const disabledRef = useRef(disabled);
+    const hasHomed = useSelector((state: RootState) => state.controller.hasHomed);
+    const isDisabled = disabled || !hasHomed;
+
+    const disabledRef = useRef(isDisabled);
 
     useEffect(() => {
-        disabledRef.current = disabled;
-    }, [disabled]);
+        disabledRef.current = isDisabled;
+    }, [isDisabled]);
 
     const shortcutIsDisabled = () => {
         const isConnected = get(
@@ -89,11 +94,12 @@ export function Parking({
     return (
         <Tooltip content="Go to Park Location">
             <Button
-                disabled={disabled}
+                disabled={isDisabled}
                 icon={<RiParkingFill className="w-4 h-4" />}
                 variant="alt"
                 size="responsive"
                 onClick={goToParkLocation}
+                aria-label="Go to Park Location"
             />
         </Tooltip>
     );

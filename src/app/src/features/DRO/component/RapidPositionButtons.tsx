@@ -13,11 +13,14 @@ import {
 } from 'app/features/DRO/utils/RapidPosition';
 import Tooltip from 'app/components/Tooltip';
 import cn from 'classnames';
-
 export function RapidPositionButtons({ disabled = false }) {
     const homingFlag = useSelector(
         (state: RootState) => state.controller.homingFlag,
     );
+    const hasHomed = useSelector(
+        (state: RootState) => state.controller.hasHomed,
+    );
+
     const homingDirection = useSelector((state: RootState) => {
         return get(state, 'controller.settings.settings.$23', '0');
     });
@@ -28,7 +31,12 @@ export function RapidPositionButtons({ disabled = false }) {
     const altColourClass = 'stroke-robin-500';
     const disabledColorClass = 'stroke-gray-400';
 
+    const isDisabled = disabled || !hasHomed;
+
     function jogToCorner(corner: string) {
+        if (isDisabled) {
+            return;
+        }
         const gcode = getMovementGCode(
             corner,
             homingDirection,
@@ -46,17 +54,26 @@ export function RapidPositionButtons({ disabled = false }) {
                         viewBox="0 0 37 34"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
+                        role="button"
+                        tabIndex={disabled ? -1 : 0}
+                        aria-label="Go to Back Left Corner"
                         className={cx('h-full w-full', {
-                            'cursor-pointer': !disabled,
-                            'cursor-not-allowed': disabled,
+                            'cursor-pointer': !isDisabled,
+                            'cursor-not-allowed': isDisabled,
                         })}
                         onClick={() => jogToCorner(BACK_LEFT)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                jogToCorner(BACK_LEFT);
+                            }
+                        }}
                     >
                         <path
                             d="M 32 0 H 0 V 32"
-                            stroke-width="20"
+                            strokeWidth="20"
                             className={cn(
-                                disabled ? disabledColorClass : altColourClass,
+                                isDisabled ? disabledColorClass : altColourClass,
                             )}
                         />
                     </svg>
@@ -67,18 +84,27 @@ export function RapidPositionButtons({ disabled = false }) {
                         viewBox="0 0 27 34"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
+                        role="button"
+                        tabIndex={disabled ? -1 : 0}
+                        aria-label="Go to Back Right Corner"
                         className={cx('h-full w-full', {
-                            'cursor-pointer': !disabled,
-                            'cursor-not-allowed': disabled,
+                            'cursor-pointer': !isDisabled,
+                            'cursor-not-allowed': isDisabled,
                         })}
                         onClick={() => jogToCorner(BACK_RIGHT)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                jogToCorner(BACK_RIGHT);
+                            }
+                        }}
                     >
                         <path
                             // d="M 74 32 V 0 L 42 0"
                             d="M 32 32 V 0 L 0 0"
-                            stroke-width="20"
+                            strokeWidth="20"
                             className={cn(
-                                disabled ? disabledColorClass : altColourClass,
+                                isDisabled ? disabledColorClass : altColourClass,
                             )}
                         />
                     </svg>
@@ -89,18 +115,27 @@ export function RapidPositionButtons({ disabled = false }) {
                         viewBox="0 0 37 33"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
+                        role="button"
+                        tabIndex={disabled ? -1 : 0}
+                        aria-label="Go to Front Left Corner"
                         className={cx('h-full w-full', {
-                            'cursor-pointer': !disabled,
-                            'cursor-not-allowed': disabled,
+                            'cursor-pointer': !isDisabled,
+                            'cursor-not-allowed': isDisabled,
                         })}
                         onClick={() => jogToCorner(FRONT_LEFT)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                jogToCorner(FRONT_LEFT);
+                            }
+                        }}
                     >
                         <path
                             // d="M 0 36 L 0 67 L 32 67"
                             d="M 0 0 L 0 32 L 32 32"
-                            stroke-width="20"
+                            strokeWidth="20"
                             className={cn(
-                                disabled ? disabledColorClass : altColourClass,
+                                isDisabled ? disabledColorClass : altColourClass,
                             )}
                         />
                     </svg>
@@ -111,18 +146,27 @@ export function RapidPositionButtons({ disabled = false }) {
                         viewBox="0 0 27 33"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
+                        role="button"
+                        tabIndex={disabled ? -1 : 0}
+                        aria-label="Go to Front Right Corner"
                         className={cx('h-full w-full', {
-                            'cursor-pointer': !disabled,
-                            'cursor-not-allowed': disabled,
+                            'cursor-pointer': !isDisabled,
+                            'cursor-not-allowed': isDisabled,
                         })}
                         onClick={() => jogToCorner(FRONT_RIGHT)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                jogToCorner(FRONT_RIGHT);
+                            }
+                        }}
                     >
                         <path
                             // d="M 42 67 H 74 V 36"
                             d="M 0 32 H 32 V 0"
-                            stroke-width="20"
+                            strokeWidth="20"
                             className={cn(
-                                disabled ? disabledColorClass : altColourClass,
+                                isDisabled ? disabledColorClass : altColourClass,
                             )}
                         />
                     </svg>

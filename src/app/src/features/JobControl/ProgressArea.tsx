@@ -126,7 +126,14 @@ const ProgressArea: React.FC<Props> = ({ senderStatus, workflowState }) => {
     const isPaused = workflowState === WORKFLOW_STATE_PAUSED;
 
     return (
-        <div className="w-64">
+        <div
+            className="w-64"
+            role="progressbar"
+            aria-valuenow={Math.round(percentageValue)}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="Job Progress"
+        >
             <div className="border-solid border border-gray-500 dark:border-gray-700 rounded-sm bg-gray-100 dark:bg-dark gap-2 flex flex-row justify-between items-center pr-1 pt-1 text-gray-900 dark:text-gray-200">
                 <div className="flex flex-col gap-0 w-full h-full -mt-6">
                     <div

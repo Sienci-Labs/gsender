@@ -81,6 +81,7 @@ import {
     updateAlarmDescriptions,
     updateSettingsDescriptions,
     updateHomingFlag,
+    updateHasHomed,
     updateSenderStatus,
     updateControllerType,
     addSDCardFileToList,
@@ -862,6 +863,10 @@ export function* initialize(): Generator<any, void, any> {
         pubsub.publish('softlimits:check');
     });
 
+    controller.addListener('homing:has-homed', (hasHomed: boolean) => {
+        reduxStore.dispatch(updateHasHomed({ hasHomed }));
+    });
+
     controller.addListener('firmware:ready', (status: string) => {
         pubsub.publish('firmware:update', status);
     });
@@ -1062,7 +1067,7 @@ export function* initialize(): Generator<any, void, any> {
                 });
             } else {
                 Confirm({
-                    title: 'ATCi requested a dialog.',
+                    title: 'ATC requested a dialog.',
                     content: 'Continue to unhold, Reset to stop action.',
                     confirmLabel: 'Continue',
                     cancelLabel: 'Reset',

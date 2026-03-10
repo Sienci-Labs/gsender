@@ -168,6 +168,11 @@ class Connection extends EventEmitter {
 
         this.connection.open((err) => {
             if (err) {
+                // Remove listeners so the async 'close' from port.destroy()
+                // doesn't re-enter Connection.close() and double-fire the callback
+                this.connection.removeListener('data', this.connectionEventListener.data);
+                this.connection.removeListener('close', this.connectionEventListener.close);
+                this.connection.removeListener('error', this.connectionEventListener.error);
                 log.error(`Error opening serial port "${port}":`, err);
                 this.emit('serialport:error', { err: err, port: port });
                 callback(err); // notify error
@@ -183,10 +188,10 @@ class Connection extends EventEmitter {
             }
 
             log.debug(`Connected to serial port "${port}"`);
-            console.log('controllerType:', this.controllerType);
             if (!this.controllerType) {
                 this.connection.writeImmediate('$I\n');
                 this.timeout = setInterval(() => {
+                    this.connection.writeImmediate('$I\n');
                     if (this.count >= 5) {
                         this.controllerType = this.options.defaultFirmware;
                         this.emit(
@@ -198,7 +203,6 @@ class Connection extends EventEmitter {
                         clearInterval(this.timeout);
                         return;
                     }
-                    this.connection.writeImmediate('\x18');
                     this.count++;
                 }, 800);
             }
