@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="823.196" tests="25" failures="10">
+  <testsuite name="Root Suite" timestamp="2026-03-10T16:56:48" tests="0" file="cypress\e2e\grblHal\A_grblHal_master_spec.cy.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="gSender UI Load Test" timestamp="2026-03-10T16:56:48" tests="1" time="12.148" failures="0">
+    <testcase name="gSender UI Load Test should load gSender UI with refresh on failure" time="12.050" classname="should load gSender UI with refresh on failure">
+    </testcase>
+  </testsuite>
+  <testsuite name="Device Connection" timestamp="2026-03-10T16:57:01" tests="1" time="14.745" failures="0">
+    <testcase name="Device Connection should connect to CNC machine by selecting the first available port" time="14.615" classname="should connect to CNC machine by selecting the first available port">
+    </testcase>
+  </testsuite>
+  <testsuite name="Load file testing in grblHal" timestamp="2026-03-10T16:57:15" tests="1" time="57.087" failures="0">
+    <testcase name="Load file testing in grblHal Complete workflow: Connect-&gt; Upload-&gt; Disconnect-&gt;Upload-&gt; Connect-&gt;Disconnect" time="56.950" classname="Complete workflow: Connect-&gt; Upload-&gt; Disconnect-&gt;Upload-&gt; Connect-&gt;Disconnect">
+    </testcase>
+  </testsuite>
+  <testsuite name="GrblHal Machine File Info Test" timestamp="2026-03-10T16:58:12" tests="1" time="16.802" failures="0">
+    <testcase name="GrblHal Machine File Info Test Uploads file, toggles, and prints file info" time="16.645" classname="Uploads file, toggles, and prints file info">
+    </testcase>
+  </testsuite>
+  <testsuite name="Gsender testing jogging using buttons" timestamp="2026-03-10T16:58:29" tests="1" time="59.718" failures="0">
+    <testcase name="Gsender testing jogging using buttons Test Case: jogging using buttons" time="59.566" classname="Test Case: jogging using buttons">
+    </testcase>
+  </testsuite>
+  <testsuite name="Dynamic Keyboard Jogging Test - All Axes" timestamp="2026-03-10T16:59:29" tests="1" time="14.939" failures="1">
+    <testcase name="Dynamic Keyboard Jogging Test - All Axes Test all keyboard jog shortcuts dynamically" time="0.000" classname="Test all keyboard jog shortcuts dynamically">
+      <failure message="Timed out retrying after 10000ms: Expected to find content: &apos;Connect to CNC&apos; within the selector: &apos;span&apos; but never did." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 10000ms: Expected to find content: 'Connect to CNC' within the selector: 'span' but never did.
+    at Context.eval (webpack://gSender/./cypress/support/commands.js:94:5)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="Gsender testing preset create update" timestamp="2026-03-10T16:59:44" tests="2" time="63.108" failures="0">
+    <testcase name="Gsender testing preset create update Test Case 1: Verify Rapid preset values are updated correctly" time="30.333" classname="Test Case 1: Verify Rapid preset values are updated correctly">
+    </testcase>
+    <testcase name="Gsender testing preset create update Test Case 2: Verify jogging speed and position accuracy" time="32.443" classname="Test Case 2: Verify jogging speed and position accuracy">
+    </testcase>
+  </testsuite>
+  <testsuite name="Grblhal Zeroing axis and go to zero" timestamp="2026-03-10T17:00:47" tests="1" time="83.809" failures="0">
+    <testcase name="Grblhal Zeroing axis and go to zero Test Case: jogging using buttons and zeroing axes" time="83.603" classname="Test Case: jogging using buttons and zeroing axes">
+    </testcase>
+  </testsuite>
+  <testsuite name="CNC Visualizer rendering test case" timestamp="2026-03-10T17:02:11" tests="1" time="27.225" failures="0">
+    <testcase name="CNC Visualizer rendering test case Connects to CNC, uploads file, and verifies visualizer + file info" time="27.037" classname="Connects to CNC, uploads file, and verifies visualizer + file info">
+    </testcase>
+  </testsuite>
+  <testsuite name="Job Run Test in grblHal without homing" timestamp="2026-03-10T17:02:38" tests="1" time="56.756" failures="0">
+    <testcase name="Job Run Test in grblHal without homing Test Case: Connect, Upload File, Run Job and Collect Details" time="56.590" classname="Test Case: Connect, Upload File, Run Job and Collect Details">
+    </testcase>
+  </testsuite>
+  <testsuite name="Coolant Testing  " timestamp="2026-03-10T17:03:35" tests="1" time="48.608" failures="0">
+    <testcase name="Coolant Testing   Apply coolant mist, flood and Off option" time="48.114" classname="Apply coolant mist, flood and Off option">
+    </testcase>
+  </testsuite>
+  <testsuite name="Feedrate Performance Comparison Test" timestamp="2026-03-10T17:04:23" tests="1" time="16.261" failures="1">
+    <testcase name="Feedrate Performance Comparison Test Should compare job completion times with different feedrates" time="0.000" classname="Should compare job completion times with different feedrates">
+      <failure message="Timed out retrying after 10000ms: Expected to find content: &apos;Connect to CNC&apos; within the selector: &apos;span&apos; but never did." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 10000ms: Expected to find content: 'Connect to CNC' within the selector: 'span' but never did.
+    at Context.eval (webpack://gSender/./cypress/support/commands.js:94:5)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="Macros Upload, Execution and Verification Test" timestamp="2026-03-10T17:04:40" tests="1" time="5.645" failures="1">
+    <testcase name="Macros Upload, Execution and Verification Test &quot;before each&quot; hook for &quot;Upload and run macro with success message verify the output&quot;" time="0.000" classname="&quot;before each&quot; hook for &quot;Upload and run macro with success message verify the output&quot;">
+      <failure message="Timed out after waiting `5000ms` for your remote page to load.
+
+Your page did not fire its `load` event within `5000ms`.
+
+You can try increasing the `pageLoadTimeout` value in `Users\shilp\Projects\gsender\cypress.config.js` to wait longer.
+
+Browsers will not fire the `load` event until all stylesheets and scripts are done downloading.
+
+When this `load` event occurs, Cypress will continue running commands.
+
+Because this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `Macros Upload, Execution an...`" type="CypressError"><![CDATA[CypressError: Timed out after waiting `5000ms` for your remote page to load.
+
+Your page did not fire its `load` event within `5000ms`.
+
+You can try increasing the `pageLoadTimeout` value in `Users\shilp\Projects\gsender\cypress.config.js` to wait longer.
+
+Browsers will not fire the `load` event until all stylesheets and scripts are done downloading.
+
+When this `load` event occurs, Cypress will continue running commands.
+
+Because this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `Macros Upload, Execution an...`
+    at timedOutWaitingForPageLoad (http://localhost:8000/__cypress/runner/cypress_runner.js:130639:64)
+    at <unknown> (http://localhost:8000/__cypress/runner/cypress_runner.js:131624:16)
+    at tryCatcher (http://localhost:8000/__cypress/runner/cypress_runner.js:1830:23)
+    at <unknown> (http://localhost:8000/__cypress/runner/cypress_runner.js:4209:41)
+    at tryCatcher (http://localhost:8000/__cypress/runner/cypress_runner.js:1830:23)
+    at Promise._settlePromiseFromHandler (http://localhost:8000/__cypress/runner/cypress_runner.js:1542:31)
+    at Promise._settlePromise (http://localhost:8000/__cypress/runner/cypress_runner.js:1599:18)
+    at Promise._settlePromise0 (http://localhost:8000/__cypress/runner/cypress_runner.js:1644:10)
+    at Promise._settlePromises (http://localhost:8000/__cypress/runner/cypress_runner.js:1720:18)
+    at _drainQueueStep (http://localhost:8000/__cypress/runner/cypress_runner.js:2430:12)
+    at _drainQueue (http://localhost:8000/__cypress/runner/cypress_runner.js:2423:9)
+    at Async._drainQueues (http://localhost:8000/__cypress/runner/cypress_runner.js:2439:5)
+    at Async.drainQueues (http://localhost:8000/__cypress/runner/cypress_runner.js:2309:14)
+From Your Spec Code:
+    at Context.eval (webpack://gSender/./cypress/support/commands.js:1059:5)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="Console commands testing " timestamp="2026-03-10T17:04:45" tests="1" time="5.661" failures="1">
+    <testcase name="Console commands testing  &quot;before each&quot; hook for &quot;Connects machine and sets axes to zero&quot;" time="0.000" classname="&quot;before each&quot; hook for &quot;Connects machine and sets axes to zero&quot;">
+      <failure message="Timed out after waiting `5000ms` for your remote page to load.
+
+Your page did not fire its `load` event within `5000ms`.
+
+You can try increasing the `pageLoadTimeout` value in `Users\shilp\Projects\gsender\cypress.config.js` to wait longer.
+
+Browsers will not fire the `load` event until all stylesheets and scripts are done downloading.
+
+When this `load` event occurs, Cypress will continue running commands.
+
+Because this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `Console commands testing `" type="CypressError"><![CDATA[CypressError: Timed out after waiting `5000ms` for your remote page to load.
+
+Your page did not fire its `load` event within `5000ms`.
+
+You can try increasing the `pageLoadTimeout` value in `Users\shilp\Projects\gsender\cypress.config.js` to wait longer.
+
+Browsers will not fire the `load` event until all stylesheets and scripts are done downloading.
+
+When this `load` event occurs, Cypress will continue running commands.
+
+Because this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `Console commands testing `
+    at timedOutWaitingForPageLoad (http://localhost:8000/__cypress/runner/cypress_runner.js:130639:64)
+    at <unknown> (http://localhost:8000/__cypress/runner/cypress_runner.js:131624:16)
+    at tryCatcher (http://localhost:8000/__cypress/runner/cypress_runner.js:1830:23)
+    at <unknown> (http://localhost:8000/__cypress/runner/cypress_runner.js:4209:41)
+    at tryCatcher (http://localhost:8000/__cypress/runner/cypress_runner.js:1830:23)
+    at Promise._settlePromiseFromHandler (http://localhost:8000/__cypress/runner/cypress_runner.js:1542:31)
+    at Promise._settlePromise (http://localhost:8000/__cypress/runner/cypress_runner.js:1599:18)
+    at Promise._settlePromise0 (http://localhost:8000/__cypress/runner/cypress_runner.js:1644:10)
+    at Promise._settlePromises (http://localhost:8000/__cypress/runner/cypress_runner.js:1720:18)
+    at _drainQueueStep (http://localhost:8000/__cypress/runner/cypress_runner.js:2430:12)
+    at _drainQueue (http://localhost:8000/__cypress/runner/cypress_runner.js:2423:9)
+    at Async._drainQueues (http://localhost:8000/__cypress/runner/cypress_runner.js:2439:5)
+    at Async.drainQueues (http://localhost:8000/__cypress/runner/cypress_runner.js:2309:14)
+From Your Spec Code:
+    at Context.eval (webpack://gSender/./cypress/support/commands.js:1059:5)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="gSender Configuration and Firmware Test Suite" timestamp="2026-03-10T17:04:51" tests="1" time="16.947" failures="1">
+    <testcase name="gSender Configuration and Firmware Test Suite Should reset, export, import gSender settings, restore firmware defaults, and perform searches" time="0.000" classname="Should reset, export, import gSender settings, restore firmware defaults, and perform searches">
+      <failure message="Timed out retrying after 10000ms: Expected to find content: &apos;Connect to CNC&apos; within the selector: &apos;span&apos; but never did." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 10000ms: Expected to find content: 'Connect to CNC' within the selector: 'span' but never did.
+    at Context.eval (webpack://gSender/./cypress/support/commands.js:94:5)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="Gsender testing jogging using buttons" timestamp="2026-03-10T17:05:08" tests="1" time="5.714" failures="1">
+    <testcase name="Gsender testing jogging using buttons &quot;before each&quot; hook for &quot;Test Case: jogging using buttons&quot;" time="0.000" classname="&quot;before each&quot; hook for &quot;Test Case: jogging using buttons&quot;">
+      <failure message="Timed out after waiting `5000ms` for your remote page to load.
+
+Your page did not fire its `load` event within `5000ms`.
+
+You can try increasing the `pageLoadTimeout` value in `Users\shilp\Projects\gsender\cypress.config.js` to wait longer.
+
+Browsers will not fire the `load` event until all stylesheets and scripts are done downloading.
+
+When this `load` event occurs, Cypress will continue running commands.
+
+Because this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `Gsender testing jogging usi...`" type="CypressError"><![CDATA[CypressError: Timed out after waiting `5000ms` for your remote page to load.
+
+Your page did not fire its `load` event within `5000ms`.
+
+You can try increasing the `pageLoadTimeout` value in `Users\shilp\Projects\gsender\cypress.config.js` to wait longer.
+
+Browsers will not fire the `load` event until all stylesheets and scripts are done downloading.
+
+When this `load` event occurs, Cypress will continue running commands.
+
+Because this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `Gsender testing jogging usi...`
+    at timedOutWaitingForPageLoad (http://localhost:8000/__cypress/runner/cypress_runner.js:130639:64)
+    at <unknown> (http://localhost:8000/__cypress/runner/cypress_runner.js:131624:16)
+    at tryCatcher (http://localhost:8000/__cypress/runner/cypress_runner.js:1830:23)
+    at <unknown> (http://localhost:8000/__cypress/runner/cypress_runner.js:4209:41)
+    at tryCatcher (http://localhost:8000/__cypress/runner/cypress_runner.js:1830:23)
+    at Promise._settlePromiseFromHandler (http://localhost:8000/__cypress/runner/cypress_runner.js:1542:31)
+    at Promise._settlePromise (http://localhost:8000/__cypress/runner/cypress_runner.js:1599:18)
+    at Promise._settlePromise0 (http://localhost:8000/__cypress/runner/cypress_runner.js:1644:10)
+    at Promise._settlePromises (http://localhost:8000/__cypress/runner/cypress_runner.js:1720:18)
+    at _drainQueueStep (http://localhost:8000/__cypress/runner/cypress_runner.js:2430:12)
+    at _drainQueue (http://localhost:8000/__cypress/runner/cypress_runner.js:2423:9)
+    at Async._drainQueues (http://localhost:8000/__cypress/runner/cypress_runner.js:2439:5)
+    at Async.drainQueues (http://localhost:8000/__cypress/runner/cypress_runner.js:2309:14)
+From Your Spec Code:
+    at Context.eval (webpack://gSender/./cypress/support/commands.js:1059:5)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="Invert and Check Pins Test with Stepper Motor Lock/Unlock" timestamp="2026-03-10T17:05:14" tests="1" time="16.241" failures="1">
+    <testcase name="Invert and Check Pins Test with Stepper Motor Lock/Unlock Checks machine information, verifies pin inversion, and tests stepper motor lock/unlock" time="0.000" classname="Checks machine information, verifies pin inversion, and tests stepper motor lock/unlock">
+      <failure message="Timed out retrying after 10000ms: Expected to find content: &apos;Connect to CNC&apos; within the selector: &apos;span&apos; but never did." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 10000ms: Expected to find content: 'Connect to CNC' within the selector: 'span' but never did.
+    at Context.eval (webpack://gSender/./cypress/support/commands.js:94:5)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="gSender Movement tuning test" timestamp="2026-03-10T17:05:30" tests="1" time="5.722" failures="1">
+    <testcase name="gSender Movement tuning test &quot;before each&quot; hook for &quot;Should complete movement tuning for x axis and y axis&quot;" time="0.000" classname="&quot;before each&quot; hook for &quot;Should complete movement tuning for x axis and y axis&quot;">
+      <failure message="Timed out after waiting `5000ms` for your remote page to load.
+
+Your page did not fire its `load` event within `5000ms`.
+
+You can try increasing the `pageLoadTimeout` value in `Users\shilp\Projects\gsender\cypress.config.js` to wait longer.
+
+Browsers will not fire the `load` event until all stylesheets and scripts are done downloading.
+
+When this `load` event occurs, Cypress will continue running commands.
+
+Because this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `gSender Movement tuning test`" type="CypressError"><![CDATA[CypressError: Timed out after waiting `5000ms` for your remote page to load.
+
+Your page did not fire its `load` event within `5000ms`.
+
+You can try increasing the `pageLoadTimeout` value in `Users\shilp\Projects\gsender\cypress.config.js` to wait longer.
+
+Browsers will not fire the `load` event until all stylesheets and scripts are done downloading.
+
+When this `load` event occurs, Cypress will continue running commands.
+
+Because this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `gSender Movement tuning test`
+    at timedOutWaitingForPageLoad (http://localhost:8000/__cypress/runner/cypress_runner.js:130639:64)
+    at <unknown> (http://localhost:8000/__cypress/runner/cypress_runner.js:131624:16)
+    at tryCatcher (http://localhost:8000/__cypress/runner/cypress_runner.js:1830:23)
+    at <unknown> (http://localhost:8000/__cypress/runner/cypress_runner.js:4209:41)
+    at tryCatcher (http://localhost:8000/__cypress/runner/cypress_runner.js:1830:23)
+    at Promise._settlePromiseFromHandler (http://localhost:8000/__cypress/runner/cypress_runner.js:1542:31)
+    at Promise._settlePromise (http://localhost:8000/__cypress/runner/cypress_runner.js:1599:18)
+    at Promise._settlePromise0 (http://localhost:8000/__cypress/runner/cypress_runner.js:1644:10)
+    at Promise._settlePromises (http://localhost:8000/__cypress/runner/cypress_runner.js:1720:18)
+    at _drainQueueStep (http://localhost:8000/__cypress/runner/cypress_runner.js:2430:12)
+    at _drainQueue (http://localhost:8000/__cypress/runner/cypress_runner.js:2423:9)
+    at Async._drainQueues (http://localhost:8000/__cypress/runner/cypress_runner.js:2439:5)
+    at Async.drainQueues (http://localhost:8000/__cypress/runner/cypress_runner.js:2309:14)
+From Your Spec Code:
+    at Context.eval (webpack://gSender/./cypress/support/commands.js:1059:5)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="Park feature " timestamp="2026-03-10T17:05:36" tests="1" time="19.191" failures="1">
+    <testcase name="Park feature  Enables homing and set park location to 0,0,0" time="0.000" classname="Enables homing and set park location to 0,0,0">
+      <failure message="Timed out retrying after 10000ms: Expected to find content: &apos;Connect to CNC&apos; within the selector: &apos;span&apos; but never did." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 10000ms: Expected to find content: 'Connect to CNC' within the selector: 'span' but never did.
+    at Context.eval (webpack://gSender/./cypress/support/commands.js:94:5)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="Rotary surfacing" timestamp="2026-03-10T17:05:55" tests="1" time="17.202" failures="1">
+    <testcase name="Rotary surfacing Rotary surfacing" time="0.000" classname="Rotary surfacing">
+      <failure message="Timed out retrying after 10000ms: Expected to find content: &apos;Connect to CNC&apos; within the selector: &apos;span&apos; but never did." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 10000ms: Expected to find content: 'Connect to CNC' within the selector: 'span' but never did.
+    at Context.eval (webpack://gSender/./cypress/support/commands.js:94:5)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="Spindle Configuration and Control Test - Decrease to 7500 RPM" timestamp="2026-03-10T17:06:12" tests="1" time="77.999" failures="0">
+    <testcase name="Spindle Configuration and Control Test - Decrease to 7500 RPM Connect, Configure Spindle, Upload File, Decrease to 7500 RPM, Reset, Increase to 24000 RPM, and Complete Job" time="77.744" classname="Connect, Configure Spindle, Upload File, Decrease to 7500 RPM, Reset, Increase to 24000 RPM, and Complete Job">
+    </testcase>
+  </testsuite>
+  <testsuite name="Surfacing Test" timestamp="2026-03-10T17:07:30" tests="1" time="63.023" failures="0">
+    <testcase name="Surfacing Test Should complete surfacing workflow successfully" time="62.738" classname="Should complete surfacing workflow successfully">
+    </testcase>
+  </testsuite>
+  <testsuite name="CNC Bit Position and Job Progress Tracking" timestamp="2026-03-10T17:08:33" tests="1" time="50.944" failures="0">
+    <testcase name="CNC Bit Position and Job Progress Tracking should connect, track bit positions, verify movement, and validate specific position values during job execution" time="50.660" classname="should connect, track bit positions, verify movement, and validate specific position values during job execution">
+    </testcase>
+  </testsuite>
+  <testsuite name="gSender XY Squaring Test" timestamp="2026-03-10T17:09:24" tests="1" time="67.685" failures="0">
+    <testcase name="gSender XY Squaring Test Should complete XY Squaring wizard with measurements and adjustments" time="67.382" classname="Should complete XY Squaring wizard with measurements and adjustments">
+    </testcase>
+  </testsuite>
+</testsuites>

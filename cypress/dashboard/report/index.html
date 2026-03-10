@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>gSender - Test Coverage Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#0d0f14;--s:#13161e;--s2:#1a1e2a;--bd:#252a38;--ac:#4ade80;--tx:#e8eaf0;--mu:#6b7280;--yes:#4ade80;--no:#9ca3af;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;padding:36px;}
+.hd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:36px;padding-bottom:24px;border-bottom:1px solid var(--bd);}
+.pl{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ac);margin-bottom:6px;}
+.pn{font-size:38px;font-weight:700;letter-spacing:-1px;}
+.ps{font-size:13px;color:var(--mu);margin-top:6px;}
+.hr{text-align:right;}
+.rd,.rv{font-family:'Space Mono',monospace;font-size:10px;color:var(--mu);margin-top:4px;}
+.pbtn{display:inline-block;margin-top:12px;padding:8px 18px;background:var(--ac);color:#000;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:6px;cursor:pointer;}
+.ss{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;}
+.sc{background:var(--s);border:1px solid var(--bd);border-radius:10px;padding:20px;position:relative;overflow:hidden;}
+.sc::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--ac);}
+.sc.or::after{background:#f97316;}.sc.bl::after{background:#60a5fa;}
+.sl{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--mu);margin-bottom:8px;}
+.sv{font-size:32px;font-weight:700;line-height:1;}
+.sv small{font-size:13px;font-weight:400;color:var(--mu);margin-left:2px;}
+.ob{background:var(--s);border:1px solid var(--bd);border-radius:10px;padding:22px 26px;margin-bottom:28px;}
+.bt{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--mu);margin-bottom:16px;}
+.ow{display:flex;align-items:center;gap:14px;margin-bottom:20px;}
+.obg{flex:1;height:12px;background:var(--s2);border-radius:99px;overflow:hidden;border:1px solid var(--bd);}
+.obf{height:100%;background:linear-gradient(90deg,#4ade80,#22d3ee);border-radius:99px;}
+.op{font-family:'Space Mono',monospace;font-size:18px;font-weight:700;color:var(--ac);min-width:50px;text-align:right;}
+.sr{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+.sr:last-child{margin-bottom:0;}
+.sn{font-size:12px;font-weight:600;min-width:60px;color:var(--tx);}
+.sb{flex:1;height:6px;background:var(--s2);border-radius:99px;overflow:hidden;}
+.sf{height:100%;border-radius:99px;}
+.sc2{font-family:'Space Mono',monospace;font-size:10px;color:var(--mu);min-width:44px;text-align:right;}
+.sp{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;min-width:34px;text-align:right;}
+.mg{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-bottom:32px;}
+.mc{background:var(--s);border:1px solid var(--bd);border-radius:10px;overflow:hidden;}
+.mh{padding:16px 20px 12px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;}
+.mn{font-size:16px;font-weight:700;}
+.mm{font-size:11px;color:var(--mu);margin-top:2px;}
+.mb{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;padding:4px 12px;border-radius:99px;border:1px solid;}
+.mpr{display:flex;align-items:center;gap:10px;padding:9px 20px;border-bottom:1px solid var(--bd);}
+.plb{font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;color:var(--mu);min-width:50px;}
+.pb{flex:1;height:6px;background:var(--s2);border-radius:99px;overflow:hidden;}
+.pf{height:100%;border-radius:99px;}
+.pp{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;min-width:32px;text-align:right;}
+.fr{display:flex;align-items:center;padding:7px 20px;border-bottom:1px solid var(--bd);transition:background 0.1s;}
+.fr:last-child{border-bottom:none;}
+.fr:hover{background:var(--s2);}
+.fn{flex:1;font-size:12px;color:var(--tx);}
+.fs{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:1px;padding:3px 8px;border-radius:4px;text-transform:uppercase;}
+.fy{background:rgba(74,222,128,0.12);color:var(--yes);border:1px solid rgba(74,222,128,0.25);}
+.fn2{background:var(--s2);color:var(--no);border:1px solid var(--bd);}
+.ft{border-top:1px solid var(--bd);padding-top:20px;display:flex;justify-content:space-between;align-items:center;}
+.fl{font-family:'Space Mono',monospace;font-size:9px;color:var(--mu);letter-spacing:1px;}
+.lg{display:flex;gap:16px;}
+.li{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--mu);}
+.ld{width:8px;height:8px;border-radius:2px;}
+@media print{body{background:#fff!important;color:#111!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}.pbtn{display:none!important;}:root{--bg:#fff;--s:#f8f9fa;--s2:#f0f1f3;--bd:#e0e0e0;--tx:#111;--mu:#666;--yes:#16a34a;--no:#666;}.mc{break-inside:avoid;}}
+</style>
+</head>
+<body>
+<div class="hd"><div><div class="pl">Test Coverage Dashboard</div><div class="pn">gSender</div><div class="ps">Sienci Labs QA &nbsp;·&nbsp; Cypress E2E &nbsp;·&nbsp; 4 Modules</div></div><div class="hr"><div class="rd">Generated: March 10, 2026</div><div class="rv">v1.6.0-Edge-5 &nbsp;·&nbsp; Updated: 2026-03-10</div><button class="pbtn" onclick="window.print()">Export PDF</button></div></div>
+<div class="ss"><div class="sc"><div class="sl">Total Features</div><div class="sv">49</div></div><div class="sc"><div class="sl">Tests Created</div><div class="sv">35 <small>/ 49</small></div></div><div class="sc or"><div class="sl">Tests Pending</div><div class="sv">14 <small>/ 49</small></div></div><div class="sc bl"><div class="sl">Overall Coverage</div><div class="sv">71<small>%</small></div></div></div>
+<div class="ob"><div class="bt">Coverage by Module</div><div class="ow"><div class="obg"><div class="obf" style="width:71%"></div></div><div class="op">71%</div></div><div class="sr"><span class="sn">Carve</span><div class="sb"><div class="sf" style="width:83%;background:#4ade80"></div></div><span class="sc2">24/29</span><span class="sp" style="color:#4ade80">83%</span></div><div class="sr"><span class="sn">Config</span><div class="sb"><div class="sf" style="width:88%;background:#a78bfa"></div></div><span class="sc2">7/8</span><span class="sp" style="color:#a78bfa">88%</span></div><div class="sr"><span class="sn">Tools</span><div class="sb"><div class="sf" style="width:57%;background:#60a5fa"></div></div><span class="sc2">4/7</span><span class="sp" style="color:#60a5fa">57%</span></div><div class="sr"><span class="sn">Stats</span><div class="sb"><div class="sf" style="width:0%;background:#f97316"></div></div><span class="sc2">0/5</span><span class="sp" style="color:#f97316">0%</span></div></div>
+<div class="mg"><div class="mc"><div class="mh" style="border-left:4px solid #4ade80"><div><div class="mn">Carve</div><div class="mm">24 of 29 test cases created</div></div><div class="mb" style="color:#4ade80;border-color:rgba(74,222,128,0.25);background:rgba(74,222,128,0.12)">83%</div></div><div class="mpr"><span class="plb">Coverage</span><div class="pb"><div class="pf" style="width:83%;background:#4ade80"></div></div><span class="pp" style="color:#4ade80">83%</span></div><div><div class="fr"><span class="fn">Device Connection</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">Unlock Machine</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">View Notification</span><span class="fs fn2">Pending</span></div><div class="fr"><span class="fn">Machine Information</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">Wireless CNC Control</span><span class="fs fn2">Pending</span></div><div class="fr"><span class="fn">Go To Location</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">Park</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">Zero Axes</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">Go to Axes 0</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">Home</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">Jog X Y Z A Axes Buttons</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">Jogging Presets</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">Jogging using Keyboard</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">Load File</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">File Information</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">Editor</span><span class="fs fn2">Pending</span></div><div class="fr"><span class="fn">Outline</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">Job Run</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">Pause</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">Stop</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">Start From Line</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">Feed Rate Control</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">Probing</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">Macros</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">Spindle / Laser</span><span class="fs fn2">Pending</span></div><div class="fr"><span class="fn">Coolant</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">Rotary</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">Console</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">Helper</span><span class="fs fn2">Pending</span></div></div></div><div class="mc"><div class="mh" style="border-left:4px solid #a78bfa"><div><div class="mn">Config</div><div class="mm">7 of 8 test cases created</div></div><div class="mb" style="color:#a78bfa;border-color:rgba(167,139,250,0.25);background:rgba(167,139,250,0.12)">88%</div></div><div class="mpr"><span class="plb">Coverage</span><div class="pb"><div class="pf" style="width:88%;background:#a78bfa"></div></div><span class="pp" style="color:#a78bfa">88%</span></div><div><div class="fr"><span class="fn">Search</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">View Modified</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">gSender Preferences</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">All Config and EPROM Tab View</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">Firmware Import and Export</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">Flash</span><span class="fs fn2">Pending</span></div><div class="fr"><span class="fn">Reset Defaults Firmware and gSender</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">Update Change and Apply Settings</span><span class="fs fy">Created</span></div></div></div><div class="mc"><div class="mh" style="border-left:4px solid #60a5fa"><div><div class="mn">Tools</div><div class="mm">4 of 7 test cases created</div></div><div class="mb" style="color:#60a5fa;border-color:rgba(96,165,250,0.25);background:rgba(96,165,250,0.12)">57%</div></div><div class="mpr"><span class="plb">Coverage</span><div class="pb"><div class="pf" style="width:57%;background:#60a5fa"></div></div><span class="pp" style="color:#60a5fa">57%</span></div><div><div class="fr"><span class="fn">Surfacing</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">Rotary Surfacing</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">Keyboard Shortcuts</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">XY Squaring</span><span class="fs fy">Created</span></div><div class="fr"><span class="fn">Game Pad</span><span class="fs fn2">Pending</span></div><div class="fr"><span class="fn">SD Card Manager</span><span class="fs fn2">Pending</span></div><div class="fr"><span class="fn">Accessory Installation</span><span class="fs fn2">Pending</span></div></div></div><div class="mc"><div class="mh" style="border-left:4px solid #f97316"><div><div class="mn">Stats</div><div class="mm">0 of 5 test cases created</div></div><div class="mb" style="color:#f97316;border-color:rgba(249,115,22,0.25);background:rgba(249,115,22,0.12)">0%</div></div><div class="mpr"><span class="plb">Coverage</span><div class="pb"><div class="pf" style="width:0%;background:#f97316"></div></div><span class="pp" style="color:#f97316">0%</span></div><div><div class="fr"><span class="fn">Overview</span><span class="fs fn2">Pending</span></div><div class="fr"><span class="fn">Jobs</span><span class="fs fn2">Pending</span></div><div class="fr"><span class="fn">Maintenance</span><span class="fs fn2">Pending</span></div><div class="fr"><span class="fn">Alarms</span><span class="fs fn2">Pending</span></div><div class="fr"><span class="fn">About</span><span class="fs fn2">Pending</span></div></div></div></div>
+<div class="ft"><div class="fl">gSender &nbsp;·&nbsp; Sienci Labs QA &nbsp;·&nbsp; March 10, 2026</div><div class="lg"><div class="li"><div class="ld" style="background:#4ade80"></div> Test Created</div><div class="li"><div class="ld" style="background:#4b5563"></div> Pending</div></div></div>
+</body>
+</html>

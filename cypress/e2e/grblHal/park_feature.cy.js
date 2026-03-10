@@ -1,11 +1,10 @@
 describe('Park feature ', () => {
 
-  beforeEach(() => {
-    cy.viewport(1920, 1080);
-    // Use loadUI custom command with dynamic baseUrl
+    beforeEach(() => {
+    cy.viewport(2844, 1450);
     cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
-      maxRetries: 4,
-      waitTime: 4000,
+      maxRetries: 5,
+      waitTime: 5000,
       timeout: 5000
     });
   });

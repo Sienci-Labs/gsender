@@ -1,15 +1,9 @@
 const { defineConfig } = require('cypress');
 
 module.exports = defineConfig({
-  reporter: 'cypress-mochawesome-reporter',
+  reporter: 'cypress-multi-reporters',        // ← CHANGED
   reporterOptions: {
-    reportDir: 'cypress/reports/mochawesome',
-    overwrite: false,
-    html: true,
-    json: true,
-    charts: true,
-    embeddedScreenshots: true,
-    inlineAssets: true, // ensures CSS/JS embedded in HTML
+    configFile: 'reporter-config.json',        // ← CHANGED (all other options moved to reporter-config.json)
   },
 
   e2e: {
@@ -25,9 +19,7 @@ module.exports = defineConfig({
 
     setupNodeEvents(on, config) {
       // Register mochawesome plugin
-     require('cypress-mochawesome-reporter/plugin')(on);
-
-      
+      require('cypress-mochawesome-reporter/plugin')(on);
 
       // Optional: before browser launch hook
       on('before:browser:launch', (browser = {}, launchOptions) => {
