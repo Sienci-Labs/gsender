@@ -510,7 +510,7 @@ class GrblController {
                         } else {
                             const count = this.sender.incrementToolChanges();
 
-                            setTimeout(() => {
+                            this.toolChanger.addInterval(() => {
                                 // Emit the current state so latest tool info is available
                                 this.runner.setTool(tool?.[2]); // set tool in runner state
                                 this.emit('controller:state', GRBL, this.state, tool?.[2]); // set tool in redux
@@ -521,7 +521,7 @@ class GrblController {
                                     tool: tool,
                                     option: toolChangeOption
                                 }, commentString);
-                            }, 500);
+                            });
                         }
                     }
 

@@ -78,7 +78,7 @@ const probeInitialToolStep = [{
     ],
 }];
 
-const moveToToolchangePositionSubstep = [{
+const getMoveToToolchangePositionSubstep = () => ({
     title: 'Change Tool',
     description: () => (
         <div>
@@ -92,21 +92,24 @@ const moveToToolchangePositionSubstep = [{
         {
             label: 'Move to Tool Change Location',
             cb: () => {
-                const manualPosition = store.get('workspace.toolChange.manualPosition', { x: 0, y: 0, z: 0 });
-
                 controller.command('gcode', [
                     '(Moving to manual toolchange location)',
                     'G90 G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
-                    `G90 G53 G0 X${manualPosition.x} Y${manualPosition.y}`,
-                    `G90 G53 G0 Z${manualPosition.z}`,
+                    'G90 G53 G0 X[global.toolchange.MANUAL_POS_X] Y[global.toolchange.MANUAL_POS_Y]',
+                    'G90 G53 G0 Z[global.toolchange.MANUAL_POS_Z]',
                 ]);
             },
-        }
-    ]
-}];
+        },
+    ],
+});
 
 const createWizard = (count: number) => {
     const hasManualToolchangePosition = store.get('workspace.toolChange.moveToManualPosition', false);
+    const manualPosition = store.get('workspace.toolChange.manualPosition', {
+        x: 0,
+        y: 0,
+        z: 0,
+    });
 
     return {
         intro: {
@@ -136,6 +139,9 @@ const createWizard = (count: number) => {
                 `%global.toolchange.PROBE_POS_X=${position.x}`,
                 `%global.toolchange.PROBE_POS_Y=${position.y}`,
                 `%global.toolchange.PROBE_POS_Z=${position.z}`,
+                `%global.toolchange.MANUAL_POS_X=${manualPosition.x}`,
+                `%global.toolchange.MANUAL_POS_Y=${manualPosition.y}`,
+                `%global.toolchange.MANUAL_POS_Z=${manualPosition.z}`,
                 `%global.toolchange.Z_SAFE_HEIGHT=${zSafe}`,
                 '%global.toolchange.UNITS=modal.units',
                 '%global.toolchange.SPINDLE=modal.spindle',
@@ -152,11 +158,13 @@ const createWizard = (count: number) => {
             ]);
         },
         steps: [
-            ...(count >= 1 ? probeInitialToolStep : []),
+            ...(count === 1 ? probeInitialToolStep : []),
             {
                 title: 'Prepare New Tool',
                 substeps: [
-                    ...( hasManualToolchangePosition ? moveToToolchangePositionSubstep : []),
+                    ...(hasManualToolchangePosition
+                        ? [getMoveToToolchangePositionSubstep()]
+                        : []),
                     {
                         title: 'Measure New Tool',
                         description: () => (
@@ -172,7 +180,7 @@ const createWizard = (count: number) => {
                             {
                                 label: 'Probe Changed Tool',
                                 cb: () => {
-                                    const modal = getUnitModal();
+                                    //const modal = getUnitModal();
                                     controller.command('gcode', [
                                         '(Moving back to configured location)',
                                         'G49', // cancel TLO offset
