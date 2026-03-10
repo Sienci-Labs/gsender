@@ -1768,7 +1768,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Manual toolchange location',
+                        label: 'Use manual toolchange location',
                         type: 'boolean',
                         key: 'workspace.toolChange.moveToManualPosition',
                         description:
