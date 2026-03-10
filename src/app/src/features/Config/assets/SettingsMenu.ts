@@ -1768,6 +1768,39 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
+                        label: 'Move to manual toolchange location',
+                        type: 'boolean',
+                        key: 'workspace.toolChange.moveToManualPosition',
+                        description:
+                            'Move the CNC to a specified location as part of the manual toolchange routine.',
+                        hidden: () => {
+                            const strategy = store.get(
+                                'workspace.toolChangeOption',
+                                '',
+                            );
+                            return strategy !== 'Fixed Tool Sensor';
+                        },
+                    },
+                    {
+                        label: 'Manual toolchange location',
+                        type: 'location',
+                        key: 'workspace.toolChange.manualPosition',
+                        unit: 'mm',
+                        description:
+                            'The location where the CNC will move to during the manual toolchange routine.',
+                        hidden: () => {
+                            const strategy = store.get(
+                                'workspace.toolChangeOption',
+                                '',
+                            );
+                            const moveToLocation = store.get(
+                                'workspace.toolChange.moveToManualPosition',
+                                false,
+                            );
+                            return strategy !== 'Fixed Tool Sensor' || !moveToLocation;
+                        },
+                    },
+                    {
                         label: 'Before tool change',
                         type: 'textarea',
                         key: 'workspace.toolChangeHooks.preHook',

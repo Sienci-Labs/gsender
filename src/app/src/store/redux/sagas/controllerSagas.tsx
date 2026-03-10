@@ -32,7 +32,6 @@ import manualToolChange from 'app/wizards/manualToolchange';
 import semiautoToolChange from 'app/wizards/semiautoToolchange';
 import automaticToolChange from 'app/wizards/automaticToolchange';
 import semiautoToolchangeSecondRun from 'app/wizards/semiautoToolchangeSecondRun';
-import automaticToolchangeSecondRun from 'app/wizards/automaticToolchangeSecondRun';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 // TODO: add worker types
 // @ts-ignore
@@ -652,10 +651,7 @@ export function* initialize(): Generator<any, void, any> {
                         : semiautoToolChange;
             } else if (option === 'Fixed Tool Sensor') {
                 title = 'Fixed Tool Sensor Tool Change';
-                instructions =
-                    count > 1
-                        ? automaticToolchangeSecondRun
-                        : automaticToolChange;
+                instructions = automaticToolChange(count);
             } else {
                 console.error('Invalid toolchange option passed');
                 return;
