@@ -832,6 +832,43 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
+                        label: 'Final Z Retraction',
+                        key: 'widgets.probe.zRetractNormal',
+                        description:
+                            'How far the bit moves away on the Z axis at the end of the routine. (Default 2)',
+                        type: 'number',
+                        min: 1,
+                        unit: 'mm',
+                        hidden: (getPending) => {
+                            const probeType = getPending(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Hidden if we are using AutoZero or BitZero touchplate
+                            return (
+                                probeType === TOUCHPLATE_TYPE_AUTOZERO ||
+                                probeType === TOUCHPLATE_TYPE_BITZERO
+                            );
+                        },
+                    },
+                    {
+                        label: 'Final Z Retraction',
+                        key: 'widgets.probe.zRetractAuto',
+                        description:
+                            'How far the bit moves away on the Z axis at the end of the routine. (Default 1)',
+                        type: 'number',
+                        min: 1,
+                        unit: 'mm',
+                        hidden: (getPending) => {
+                            const probeType = getPending(
+                                'workspace.probeProfile.touchplateType',
+                                '',
+                            );
+                            // Hidden if we are using AutoZero or BitZero touchplate
+                            return probeType !== TOUCHPLATE_TYPE_AUTOZERO;
+                        },
+                    },
+                    {
                         label: 'Connection test',
                         key: 'widgets.probe.connectivityTest',
                         description:

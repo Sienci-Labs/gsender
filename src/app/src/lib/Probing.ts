@@ -59,6 +59,7 @@ export const getPreamble = (options: ProbingOptions): Array<string> => {
         xRetract,
         yRetract,
         zRetract,
+        zRetractNormal,
         firmware,
         xyPositionAdjust,
         zPositionAdjust,
@@ -102,6 +103,7 @@ export const getPreamble = (options: ProbingOptions): Array<string> => {
         `%X_RETRACT_DISTANCE=${xRetract}`,
         `%Y_RETRACT_DISTANCE=${yRetract}`,
         `%Z_RETRACT_DISTANCE=${zRetract}`,
+        `%Z_RETRACT_FINAL=${zRetractNormal}`,
         `%Z_THICKNESS=${zThickness}`,
         `%X_THICKNESS=${xThickness}`,
         `%Y_THICKNESS=${yThickness}`,
@@ -192,10 +194,16 @@ const updateOptionsForDirection = (
     return options;
 };
 
-export const getSingleAxisStandardRoutine = (axis: AXES_T): Array<string> => {
+export const getSingleAxisStandardRoutine = (
+    axis: AXES_T,
+    useFinalZ = false,
+): Array<string> => {
     axis = axis.toUpperCase();
     const p = 'P0';
     let axisRetract = `${axis}_RETRACT_DISTANCE`;
+    let finalRetract = useFinalZ
+        ? `Z_RETRACT_FINAL`
+        : `${axis}_RETRACT_DISTANCE`;
     const code = [
         `; ${axis}-probe`,
         `G38.2 ${axis}[${axis}_PROBE_DISTANCE] F[PROBE_FAST_FEED]`,
@@ -204,7 +212,7 @@ export const getSingleAxisStandardRoutine = (axis: AXES_T): Array<string> => {
         `G38.2 ${axis}[(Math.abs(${axisRetract}) + 1) * (retractSign * -1)] F[PROBE_SLOW_FEED]`,
         'G4 P[PROBE_DELAY]',
         `G10 L20 ${p} ${axis}[${axis}_THICKNESS]`,
-        `G91 G0 ${axis}[${axis}_RETRACT_DISTANCE]`,
+        `G91 G0 ${axis}[${finalRetract}]`,
     ];
 
     return code;
@@ -261,7 +269,7 @@ export const get3AxisStandardRoutine = (
     }
     if (axes.z) {
         // Move back to original XYZ position
-        code.push('G91 G0 Z[Z_ADJUST + Z_RETRACT_DISTANCE]', 'G90 G0 X0Y0');
+        code.push('G91 G0 Z[Z_ADJUST + Z_RETRACT_FINAL]', 'G90 G0 X0Y0');
     }
     return code;
 };
@@ -300,6 +308,7 @@ export const get3AxisAutoRoutine = ({
     firmware,
     homingEnabled,
     zThickness,
+    zRetractAuto,
 }: ProbingOptions): Array<string> => {
     const code: Array<string> = [];
     const p = 'P0';
@@ -364,7 +373,7 @@ export const get3AxisAutoRoutine = ({
             `${prependUnits} G0 Y[Y_CENTER]`,
             `G21 G10 L20 ${p} X[X_OFF] Y[Y_OFF]`,
             'G21 G90 G0 X0 Y0',
-            'G21 G0 G90 Z1',
+            `G21 G0 G90 Z${zRetractAuto}`,
         );
     } else if (axes.x && axes.y) {
         code.push(
@@ -417,7 +426,7 @@ export const get3AxisAutoRoutine = ({
             'G4 P[PROBE_DELAY]',
             `G10 L20 ${p} Z[Z_THICKNESS]`,
             'G4 P[PROBE_DELAY]',
-            'G21 G91 G0 Z10',
+            `G21 G91 G0 Z${zRetractAuto}`,
         );
     } else if (axes.x) {
         code.push(
@@ -443,7 +452,7 @@ export const get3AxisAutoRoutine = ({
             'G4 P[PROBE_DELAY]',
             `G10 L20 ${p} X[X_OFF]`,
             'G4 P[PROBE_DELAY]',
-            'G21 G91 G0 Z7',
+            `G21 G91 G0 Z${zRetractAuto}`,
         );
     } else if (axes.y) {
         code.push(
@@ -469,7 +478,7 @@ export const get3AxisAutoRoutine = ({
             'G4 P[PROBE_DELAY]',
             `G10 L20 ${p} Y[Y_OFF]`,
             'G4 P[PROBE_DELAY]',
-            'G21 G91 G0 Z7',
+            `G21 G91 G0 Z${zRetractAuto}`,
         );
     }
 
@@ -484,6 +493,7 @@ export const get3AxisAutoTipRoutine = ({
     firmware,
     homingEnabled,
     zThickness,
+    zRetractAuto,
 }: ProbingOptions): Array<string> => {
     const code: Array<string> = [];
     const p = 'P0';
@@ -547,7 +557,7 @@ export const get3AxisAutoTipRoutine = ({
             `${prependUnits} G0 Y[Y_CENTER]`,
             `G21 G10 L20 ${p} X[X_OFF] Y[Y_OFF]`,
             'G21 G90 G0 X0 Y0',
-            'G21 G0 G90 Z1',
+            `G21 G0 G90 Z${zRetractAuto}`,
         );
     } else if (axes.x && axes.y) {
         code.push(
@@ -600,7 +610,7 @@ export const get3AxisAutoTipRoutine = ({
             'G4 P[PROBE_DELAY]',
             `G10 L20 ${p} Z[Z_THICKNESS]`,
             'G4 P[PROBE_DELAY]',
-            'G21 G91 G0 Z10',
+            `G21 G91 G0 Z${zRetractAuto}`,
         );
     } else if (axes.x) {
         code.push(
@@ -626,7 +636,7 @@ export const get3AxisAutoTipRoutine = ({
             'G4 P[PROBE_DELAY]',
             `G10 L20 ${p} X[X_OFF]`,
             'G4 P[PROBE_DELAY]',
-            'G21 G91 G0 Z9.5',
+            `G21 G91 G0 Z${zRetractAuto}`,
         );
     } else if (axes.y) {
         code.push(
@@ -652,7 +662,7 @@ export const get3AxisAutoTipRoutine = ({
             'G4 P[PROBE_DELAY]',
             `G10 L20 ${p} Y[Y_OFF]`,
             'G4 P[PROBE_DELAY]',
-            'G21 G91 G0 Z9.5',
+            `G21 G91 G0 Z${zRetractAuto}`,
         );
     }
 
@@ -668,6 +678,7 @@ export const get3AxisAutoDiameterRoutine = ({
     homingEnabled,
     zThickness,
     units,
+    zRetractAuto,
 }: ProbingOptions): Array<string> => {
     const code: Array<string> = [];
     const p = 'P0';
@@ -725,7 +736,7 @@ export const get3AxisAutoDiameterRoutine = ({
             'G4 P[PROBE_DELAY]',
             `G21 G10 L20 ${p} X[X_OFF] Y[Y_OFF]`,
             'G21 G90 G0 X0 Y0',
-            'G21 G90 G0 Z1',
+            `G21 G90 G0 Z${zRetractAuto}`,
         );
     } else if (axes.x && axes.y) {
         code.push(
@@ -767,7 +778,7 @@ export const get3AxisAutoDiameterRoutine = ({
             'G4 P[PROBE_DELAY]',
             `G10 L20 ${p} Z[Z_THICKNESS]`,
             'G4 P[PROBE_DELAY]',
-            'G21 G91 G0 Z10',
+            `G21 G91 G0 Z${zRetractAuto}`,
         );
     } else if (axes.y) {
         code.push(
@@ -787,7 +798,7 @@ export const get3AxisAutoDiameterRoutine = ({
             'G4 P[PROBE_DELAY]',
             `G10 L20 ${p} Y[Y_OFF]`,
             'G4 P[PROBE_DELAY]',
-            'G21 G91 G0 Z7',
+            `G21 G91 G0 Z${zRetractAuto}`,
         );
     } else if (axes.x) {
         code.push(
@@ -807,7 +818,7 @@ export const get3AxisAutoDiameterRoutine = ({
             'G4 P[PROBE_DELAY]',
             `G10 L20 ${p} X[X_OFF]`,
             'G4 P[PROBE_DELAY]',
-            'G21 G91 G0 Z7',
+            `G21 G91 G0 Z${zRetractAuto}`,
         );
     }
 
@@ -849,13 +860,17 @@ export const get3AxisBitZeroRoutine = ({
     let yMod = 1;
 
     if (direction === BL) {
-        xMod = 1; yMod = 1;    // Move toward +X, +Y for Z probe
+        xMod = 1;
+        yMod = 1; // Move toward +X, +Y for Z probe
     } else if (direction === TL) {
-        xMod = 1; yMod = -1;   // Move toward +X, -Y for Z probe
+        xMod = 1;
+        yMod = -1; // Move toward +X, -Y for Z probe
     } else if (direction === TR) {
-        xMod = -1; yMod = -1;  // Move toward -X, -Y for Z probe
+        xMod = -1;
+        yMod = -1; // Move toward -X, -Y for Z probe
     } else if (direction === BR) {
-        xMod = -1; yMod = 1;   // Move toward -X, +Y for Z probe
+        xMod = -1;
+        yMod = 1; // Move toward -X, +Y for Z probe
     }
 
     let prependUnits: UNITS_GCODE | '' = '';
@@ -1207,7 +1222,10 @@ export const getProbeCode = (
     } else if (axes.x && axes.y) {
         return get3AxisStandardRoutine(options);
     } else if (axes.z) {
-        return [...getPreamble(options), ...getSingleAxisStandardRoutine('Z')];
+        return [
+            ...getPreamble(options),
+            ...getSingleAxisStandardRoutine('Z', true),
+        ];
     } else if (axes.y) {
         return [...getPreamble(options), ...getSingleAxisStandardRoutine('Y')];
     } else if (axes.x) {

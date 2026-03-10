@@ -128,6 +128,12 @@ const ProbeWidget = () => {
     const [retractionDistance, setRetractionDistance] = useState<number>(
         config.get('retractionDistance') || {},
     );
+    const [zRetractDistance, setZRetractDistance] = useState<number>(
+        config.get('zRetractNormal') || {},
+    );
+    const [zRetractDistanceAuto, setZRetractDistanceAuto] = useState<number>(
+        config.get('zRetractAuto') || {},
+    );
     const [zProbeDistance, setZProbeDistance] = useState<number>(
         config.get('zProbeDistance') || {},
     );
@@ -261,6 +267,14 @@ const ProbeWidget = () => {
         handleRetractionDistanceChange: (event: Event): void => {
             const value = (event.target as HTMLTextAreaElement).value;
             setRetractionDistance(Number(value));
+        },
+        handleZRetractDistanceChange: (event: Event): void => {
+            const value = (event.target as HTMLTextAreaElement).value;
+            setZRetractDistance(Number(value));
+        },
+        handleZRetractDistanceAutoChange: (event: Event): void => {
+            const value = (event.target as HTMLTextAreaElement).value;
+            setZRetractDistanceAuto(Number(value));
         },
         handleProbeCommandChange: (index: number): void => {
             setUseSafeProbeOption(false);
@@ -438,6 +452,7 @@ const ProbeWidget = () => {
             feedrate,
             fastFeedrate,
             retractDistance,
+            zRetractNormal,
             tipDiameter,
             xyRetract;
         const modal = units === METRIC_UNITS ? '21' : '20';
@@ -447,6 +462,7 @@ const ProbeWidget = () => {
             feedrate = probeFeedrate;
             fastFeedrate = probeFastFeedrate;
             retractDistance = retractionDistance;
+            zRetractNormal = zRetractDistance;
             tipDiameter = tipDiameter3D;
             xyRetract = xyRetract3D;
         } else {
@@ -462,6 +478,7 @@ const ProbeWidget = () => {
             feedrate = convertToImperial(probeFeedrate);
             fastFeedrate = convertToImperial(probeFastFeedrate);
             retractDistance = convertToImperial(retractionDistance);
+            zRetractNormal = convertToImperial(zRetractDistance);
             tipDiameter = convertToImperial(tipDiameter3D);
             xyRetract = convertToImperial(xyRetract3D);
         }
@@ -473,6 +490,8 @@ const ProbeWidget = () => {
             probeSlow: feedrate,
             units,
             retract: retractDistance,
+            zRetractNormal,
+            zRetractAuto: zRetractDistanceAuto,
             toolDiameter,
             zThickness,
             xyThickness,
@@ -559,6 +578,8 @@ const ProbeWidget = () => {
             setTipDiameter3D(config.get('tipDiameter3D', 0));
             setXYRetract3D(config.get('xyRetract3D', 10));
             setConnectivityTest(config.get('connectivityTest'));
+            setZRetractDistance(config.get('zRetractNormal'));
+            setZRetractDistanceAuto(config.get('zRetractAuto'));
 
             let newZProbeDistance = config.get('zProbeDistance');
             if (newZProbeDistance) {
