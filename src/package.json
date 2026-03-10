@@ -5,8 +5,7 @@
     "dev": "node server",
     "build": "npm run build:client",
     "build:client": "vite build --outDir ../../dist/gsender/app --emptyOutDir",
-    "preview": "cross-env NODE_ENV=production node server",
-    "test": "../../node_modules/.bin/jest --rootDir=../../ --testPathPatterns=src/app"
+    "preview": "cross-env NODE_ENV=production node server"
   },
   "dependencies": {
     "@electron/remote": "^2.1.3",

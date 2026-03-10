@@ -1768,13 +1768,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'Move to manual toolchange location',
+                        label: 'Manual toolchange location',
                         type: 'boolean',
                         key: 'workspace.toolChange.moveToManualPosition',
                         description:
-                            'Move the CNC to a specified location as part of the manual toolchange routine.',
-                        hidden: () => {
-                            const strategy = store.get(
+                            'Move the CNC to a specified location as part of the fixed toolchange routine instead of prompting to change over the probe.',
+                        hidden: (getPending) => {
+                            const strategy = getPending(
                                 'workspace.toolChangeOption',
                                 '',
                             );
@@ -1788,12 +1788,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         unit: 'mm',
                         description:
                             'The location where the CNC will move to during the manual toolchange routine.',
-                        hidden: () => {
-                            const strategy = store.get(
+                        hidden: (getPending) => {
+                            const strategy = getPending(
                                 'workspace.toolChangeOption',
                                 '',
                             );
-                            const moveToLocation = store.get(
+                            const moveToLocation = getPending(
                                 'workspace.toolChange.moveToManualPosition',
                                 false,
                             );
