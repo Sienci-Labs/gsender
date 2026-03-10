@@ -311,25 +311,27 @@ const main = () => {
             // Include release notes
             //autoUpdater.fullChangelog = true;
 
-            autoUpdater.on('update-available', (info) => {
-                setTimeout(() => {
-                    window.webContents.send('update_available', info);
-                }, 8000);
-            });
+            if (process.platform === 'win32') {
+                autoUpdater.on('update-available', (info) => {
+                    setTimeout(() => {
+                        window.webContents.send('update_available', info);
+                    }, 8000);
+                });
 
-            autoUpdater.on('error', (err) => {
-                window.webContents.send('updated_error', err);
-                log.error((err));
-            });
+                autoUpdater.on('error', (err) => {
+                    window.webContents.send('updated_error', err);
+                    log.error((err));
+                });
 
-            autoUpdater.on('download-progress', (info) => {
-                window.webContents.send('update_download_progress', info.percent);
-            });
+                autoUpdater.on('download-progress', (info) => {
+                    window.webContents.send('update_download_progress', info.percent);
+                });
 
-            ipcMain.once('restart_app', async () => {
-                await autoUpdater.downloadUpdate();
-                autoUpdater.quitAndInstall(false, false);
-            });
+                ipcMain.once('restart_app', async () => {
+                    await autoUpdater.downloadUpdate();
+                    autoUpdater.quitAndInstall(false, false);
+                });
+            }
 
             ipcMain.on('load-recent-file', async (msg, recentFile) => {
                 try {
@@ -513,17 +515,19 @@ const main = () => {
             });
         }
         //Check for available updates at end to avoid try-catch failing to load events
-        const internetConnectivity = await isOnline();
-        if (internetConnectivity) {
-            autoUpdater.autoDownload = false; // We don't want to force update but will prompt until it is updated
-            // There may be situations where something is blocking the update check outside of internet connectivity
-            // This sets a 4 second timeout on the await.
-            try {
-                asyncCallWithTimeout(autoUpdater.checkForUpdates(), 5000);
-            } catch (e) {
-                log.info(
-                    'Unable to check for app updates, likely no internet connection.',
-                );
+        if (process.platform === 'win32') {
+            const internetConnectivity = await isOnline();
+            if (internetConnectivity) {
+                autoUpdater.autoDownload = false; // We don't want to force update but will prompt until it is updated
+                // There may be situations where something is blocking the update check outside of internet connectivity
+                // This sets a 4 second timeout on the await.
+                try {
+                    asyncCallWithTimeout(autoUpdater.checkForUpdates(), 5000);
+                } catch (e) {
+                    log.info(
+                        'Unable to check for app updates, likely no internet connection.',
+                    );
+                }
             }
         }
     });
