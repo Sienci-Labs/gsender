@@ -21,7 +21,7 @@
  *
  */
 
-import {useCallback, useEffect, useRef, useState} from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
     Dialog,
@@ -53,7 +53,6 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
     useEffect(() => {
         actionsRef.current = actions;
     }, [actions]);
-
 
     const {
         connectionMade,
@@ -129,7 +128,6 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
         actionsRef.current.onOpenChange(false);
     }, []);
 
-
     useEffect(() => {
         return () => {
             testInterval && clearInterval(testInterval);
@@ -176,7 +174,9 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
                                         invisible: !showDirectionWarning,
                                     },
                                 )}
-                                role={showDirectionWarning ? 'alert' : undefined}
+                                role={
+                                    showDirectionWarning ? 'alert' : undefined
+                                }
                                 aria-hidden={!showDirectionWarning}
                             >
                                 <svg
@@ -191,9 +191,12 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
                                 <span className="sr-only">Warning</span>
                                 <div>
                                     <span className="font-medium">
-                                        Warning - Probing {directionLabel} corner
+                                        Warning - Probing {directionLabel}{' '}
+                                        corner
                                     </span>
-                                    <div>Verify this is correct before starting.</div>
+                                    <div>
+                                        Verify this is correct before starting.
+                                    </div>
                                 </div>
                             </div>
                             <p className="mb-3">
@@ -222,15 +225,14 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
                         </Button>
                     </div>
                     <div className="flex flex-col sm:m-auto sm:mb-4">
-
                         {touchplateType !== 'Z Probe' && (
                             <div className="flex justify-center items-center mb-1">
-                            <ProbeDirectionSelection
-                                direction={direction}
-                                onClick={actions.nextProbeDirection}
-                                isAbsolute={false}
-                                containerClassName="self-end mb-2 inline-flex items-center justify-center rounded-lg border border-gray-300 p-1"
-                            />
+                                <ProbeDirectionSelection
+                                    direction={direction}
+                                    onClick={actions.nextProbeDirection}
+                                    isAbsolute={false}
+                                    containerClassName="self-end mb-2 inline-flex items-center justify-center rounded-lg border border-gray-300 p-1"
+                                />
                             </div>
                         )}
                         <ProbeImage
