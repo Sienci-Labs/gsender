@@ -4,8 +4,7 @@ import * as user from 'app/lib/user';
 import * as sagaModule from 'app/store/redux/sagas';
 import store from 'app/store';
 
-// ─── Mocks ───────────────────────────────────────────────────────────────────
-
+// Mocks 
 jest.mock('app/store/redux', () => ({
     store: {
         getState: () => ({}),
@@ -17,11 +16,6 @@ jest.mock('app/store/redux', () => ({
 jest.mock('app/store/redux/sagas', () => ({
     default: jest.fn(),
     sagaMiddleware: { run: jest.fn() },
-}));
-
-jest.mock('app/store', () => ({
-    __esModule: true,
-    default: { get: jest.fn(() => null) },
 }));
 
 jest.mock('app/lib/user', () => ({

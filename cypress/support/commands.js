@@ -1004,8 +1004,7 @@ Cypress.Commands.add('verifyMachineStatus', (expectedStatus, options = {}) => {
     });
 });
 
-//  After
-// ✅ Updated searchInSettings command
+// Updated searchInSettings command
 Cypress.Commands.add('searchInSettings', (searchText, options = {}) => {
   const { timeout = 10000 } = options;
 
@@ -1068,18 +1067,18 @@ Cypress.Commands.add('loadUI', (url, options = {}) => {
 
 // Page URLs
 Cypress.Commands.add('goToCarve', () => {
-  cy.visit('http://localhost:8000/#/');
+  cy.visit('http://127.0.0.1:8010/');
   
 });
 
 Cypress.Commands.add('goToStats', () => {
-  cy.visit('http://localhost:8000/#/stats');
+  cy.visit('http://127.0.0.1:8010/stats');
 });
 
 Cypress.Commands.add('goToTools', () => {
-  cy.visit('http://localhost:8000/#/tools');
+  cy.visit('http://127.0.0.1:8010//#/tools');
 });
 
 Cypress.Commands.add('goToConfig', () => {
-  cy.visit('http://localhost:8000/#/configuration');
+  cy.visit('http://127.0.0.1:8010/configuration');
 });
