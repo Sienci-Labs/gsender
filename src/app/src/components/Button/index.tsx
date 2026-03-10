@@ -45,7 +45,8 @@ export type ButtonProps = ButtonVariants &
         text?: string;
         active?: boolean;
         tooltip?: TooltipProps;
-        size?: 'mini' | 'xs' | 'sm' | 'md' | 'lg' | 'icon' | 'custom' | 'responsive';
+        size?: 'mini' | 'xs' | 'sm' | 'md' | 'lg' | 'icon' | 'custom';
+        testId?: string;
     };
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(

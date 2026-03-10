@@ -26,7 +26,7 @@
 ### API:
 **https://docs.cypress.io/api/table-of-contents**
 - most common functions:
-    - `cy.visit` => visit a webpage. if no url is specified, uses `baseUrl` in `cypress.config.json`
+    - - `cy.visit` => visit a webpage. If no URL is specified, uses `baseUrl` in `cypress.config.js`
     - `cy.get` => find an element by id or class
     - `cy.contains` => find an element by the value it contains (ex. `cy.contains('Save')` to get a button with the text 'Save')
     - `cy.should` => make an assertion

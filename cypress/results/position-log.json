@@ -1,0 +1,234 @@
+{
+  "work": {
+    "x": [
+      {
+        "value": 0,
+        "label": "After Zeroing"
+      },
+      {
+        "value": 26.06,
+        "label": "Job Started"
+      },
+      {
+        "value": 33.94,
+        "label": "During Job - 1000ms"
+      },
+      {
+        "value": 92.99,
+        "label": "During Job - 2000ms"
+      },
+      {
+        "value": 57.79,
+        "label": "During Job - 3000ms"
+      },
+      {
+        "value": 140.99,
+        "label": "During Job - 5000ms"
+      },
+      {
+        "value": 119.83,
+        "label": "During Job - 7000ms"
+      },
+      {
+        "value": 213.66,
+        "label": "During Job - 10000ms"
+      },
+      {
+        "value": 222,
+        "label": "Job Stopped/Paused"
+      }
+    ],
+    "y": [
+      {
+        "value": 0,
+        "label": "After Zeroing"
+      },
+      {
+        "value": 4.89,
+        "label": "Job Started"
+      },
+      {
+        "value": 16.62,
+        "label": "During Job - 1000ms"
+      },
+      {
+        "value": 11.63,
+        "label": "During Job - 2000ms"
+      },
+      {
+        "value": 14.84,
+        "label": "During Job - 3000ms"
+      },
+      {
+        "value": 7.72,
+        "label": "During Job - 5000ms"
+      },
+      {
+        "value": 48.06,
+        "label": "During Job - 7000ms"
+      },
+      {
+        "value": 9.84,
+        "label": "During Job - 10000ms"
+      },
+      {
+        "value": 18.18,
+        "label": "Job Stopped/Paused"
+      }
+    ],
+    "z": [
+      {
+        "value": 0,
+        "label": "After Zeroing"
+      },
+      {
+        "value": -3,
+        "label": "Job Started"
+      },
+      {
+        "value": -3,
+        "label": "During Job - 1000ms"
+      },
+      {
+        "value": 3.32,
+        "label": "During Job - 2000ms"
+      },
+      {
+        "value": -3,
+        "label": "During Job - 3000ms"
+      },
+      {
+        "value": 5.08,
+        "label": "During Job - 5000ms"
+      },
+      {
+        "value": -3,
+        "label": "During Job - 7000ms"
+      },
+      {
+        "value": -3,
+        "label": "During Job - 10000ms"
+      },
+      {
+        "value": -3,
+        "label": "Job Stopped/Paused"
+      }
+    ]
+  },
+  "machine": {
+    "x": [
+      {
+        "value": 610,
+        "label": "After Zeroing"
+      },
+      {
+        "value": 636.06,
+        "label": "Job Started"
+      },
+      {
+        "value": 643.94,
+        "label": "During Job - 1000ms"
+      },
+      {
+        "value": 702.99,
+        "label": "During Job - 2000ms"
+      },
+      {
+        "value": 667.79,
+        "label": "During Job - 3000ms"
+      },
+      {
+        "value": 750.99,
+        "label": "During Job - 5000ms"
+      },
+      {
+        "value": 729.83,
+        "label": "During Job - 7000ms"
+      },
+      {
+        "value": 823.66,
+        "label": "During Job - 10000ms"
+      },
+      {
+        "value": 832,
+        "label": "Job Stopped/Paused"
+      }
+    ],
+    "y": [
+      {
+        "value": 5,
+        "label": "After Zeroing"
+      },
+      {
+        "value": 9.89,
+        "label": "Job Started"
+      },
+      {
+        "value": 21.62,
+        "label": "During Job - 1000ms"
+      },
+      {
+        "value": 16.63,
+        "label": "During Job - 2000ms"
+      },
+      {
+        "value": 19.84,
+        "label": "During Job - 3000ms"
+      },
+      {
+        "value": 12.72,
+        "label": "During Job - 5000ms"
+      },
+      {
+        "value": 53.06,
+        "label": "During Job - 7000ms"
+      },
+      {
+        "value": 14.84,
+        "label": "During Job - 10000ms"
+      },
+      {
+        "value": 23.18,
+        "label": "Job Stopped/Paused"
+      }
+    ]
+  },
+  "timestamps": [
+    {
+      "time": "2026-02-17T19:46:04.418Z",
+      "label": "After Zeroing"
+    },
+    {
+      "time": "2026-02-17T19:46:04.419Z",
+      "label": "Job Started"
+    },
+    {
+      "time": "2026-02-17T19:46:04.420Z",
+      "label": "During Job - 1000ms"
+    },
+    {
+      "time": "2026-02-17T19:46:04.421Z",
+      "label": "During Job - 2000ms"
+    },
+    {
+      "time": "2026-02-17T19:46:04.422Z",
+      "label": "During Job - 3000ms"
+    },
+    {
+      "time": "2026-02-17T19:46:04.423Z",
+      "label": "During Job - 5000ms"
+    },
+    {
+      "time": "2026-02-17T19:46:04.423Z",
+      "label": "During Job - 7000ms"
+    },
+    {
+      "time": "2026-02-17T19:46:04.424Z",
+      "label": "During Job - 10000ms"
+    },
+    {
+      "time": "2026-02-17T19:46:04.425Z",
+      "label": "Job Stopped/Paused"
+    }
+  ]
+}

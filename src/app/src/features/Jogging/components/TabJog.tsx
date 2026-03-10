@@ -4,6 +4,7 @@ export interface TabJogProps {
     topHandlers: object;
     bottomHandlers: object;
     canClick?: boolean;
+    idForTest: string;
     topLabel?: string;
     bottomLabel?: string;
     onTopKeyDown?: (e: React.KeyboardEvent) => void;
@@ -37,6 +38,7 @@ const TabJog = (props: TabJogProps) => {
                 )}
                 onKeyDown={props.onTopKeyDown}
                 {...props.topHandlers}
+                testId={props.idForTest + '+'}
             />
             <path
                 role="button"
@@ -49,6 +51,7 @@ const TabJog = (props: TabJogProps) => {
                 )}
                 onKeyDown={props.onBottomKeyDown}
                 {...props.bottomHandlers}
+                testId={props.idForTest + '-'}
             />
             <line y1={93.5} x2={49} y2={93.5} stroke="#CECECE" />
         </svg>

@@ -129,6 +129,7 @@ const Overrides: React.FC<OverridesProps> = ({
                 onLostPointerCapture={(_e) => {
                     debouncedFeedHandler(localOvF);
                 }}
+                id="feed-override"
             />
             {showSpindleOverride && (
                 <RangeSlider
@@ -163,6 +164,7 @@ const Overrides: React.FC<OverridesProps> = ({
                     onPointerUp={(_e) => {
                         debouncedSpindleHandler(localOvS);
                     }}
+                    id="spindle-override"
                 />
             )}
         </div>

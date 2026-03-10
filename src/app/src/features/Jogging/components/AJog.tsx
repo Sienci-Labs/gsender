@@ -51,6 +51,7 @@ export function AJog({
                 topHandlers={aPlusJogHandlers}
                 bottomHandlers={aMinusJogHandlers}
                 canClick={canClick}
+                idForTest="A"
                 topLabel={`Jog ${axis} plus`}
                 bottomLabel={`Jog ${axis} minus`}
                 onTopKeyDown={(e) => handleKeyDown(e, aPlusJog)}
