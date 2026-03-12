@@ -1,4 +1,4 @@
-import store from '../store';
+import store, { merge } from '../store';
 import defaultState from '../store/defaultState';
 import api from '../api';
 import { toast } from 'app/lib/toaster';
@@ -40,11 +40,9 @@ export const storeUpdate = async (
             ]);
         });*/
 
-        if (settings) {
-            restoreSettings(settings, isSync);
-        } else {
-            restoreSettings(state, isSync);
-        }
+        const rawSettings = settings || state;
+        const mergedSettings = merge(JSON.parse(JSON.stringify(defaultState)), rawSettings);
+        restoreSettings(mergedSettings, isSync);
     } catch (error) {
         console.error(error);
         /**

@@ -202,7 +202,7 @@ const normalizeState = (state: any): any => {
     return state;
 };
 
-const merge = (base: any, saved: any): any => {
+export const merge = (base: any, saved: any): any => {
     const baseIsObject = base instanceof Object;
     const baseIsArray = Array.isArray(base);
 
