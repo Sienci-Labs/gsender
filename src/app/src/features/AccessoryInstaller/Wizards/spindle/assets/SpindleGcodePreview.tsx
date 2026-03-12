@@ -5,7 +5,7 @@ import { grblCoreGcode, sienciHalGcode } from './SpindleConfig.tsx';
 export function SpindleGcodePreview() {
     const isGrblCore = firmwarePastVersion(ATCI_SUPPORTED_VERSION);
     const lines = isGrblCore ? grblCoreGcode : sienciHalGcode;
-    const label = isGrblCore ? 'grblCore' : 'sienciHAL';
+    const label = isGrblCore ? `grblHAL (>${ATCI_SUPPORTED_VERSION})` : `sienciHAL (< ${ATCI_SUPPORTED_VERSION})`;
 
     return (
         <div className="w-full h-full flex flex-col gap-3">
@@ -14,25 +14,25 @@ export function SpindleGcodePreview() {
                     {label}
                 </span>
             </div>
-            <div className="relative flex-1">
-                <div className="rounded-md absolute top-0 left-0 right-0 bottom-0 overflow-auto">
-                    <pre className="font-mono text-sm">
+            <div>
+                <div className="rounded-md bg-white dark:bg-dark-lighter">
+                    <div className="font-mono text-sm">
                         {lines.map((line, index) => (
                             <div
                                 key={index}
-                                className={`py-1 px-2 rounded-sm ${
+                                className={`py-1 px-2 text-gray-900 dark:text-gray-100 ${
                                     index % 2 === 0
-                                        ? 'bg-gray-200 dark:bg-dark-lighter'
+                                        ? 'bg-gray-100 dark:bg-dark'
                                         : ''
                                 }`}
                             >
-                                <span className="text-muted-foreground mr-4">
+                                <span className="text-gray-500 dark:text-gray-400 mr-4">
                                     {index + 1}
                                 </span>
                                 {line}
                             </div>
                         ))}
-                    </pre>
+                    </div>
                 </div>
             </div>
         </div>
