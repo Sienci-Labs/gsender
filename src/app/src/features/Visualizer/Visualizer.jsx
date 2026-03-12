@@ -1791,10 +1791,10 @@ class Visualizer extends Component {
                         geometry.computeBoundingBox();
 
                         // Set the desired position from the origin rather than its center.
-                        const height =
+                        /*const height =
                             geometry.boundingBox.max.z -
-                            geometry.boundingBox.min.z;
-                        geometry.translate(0, 0, height / 2);
+                            geometry.boundingBox.min.z;*/
+                        geometry.translate(0, 0, -geometry.boundingBox.min.z);
 
                         let material = new THREE.MeshLambertMaterial({
                             map: texture,
