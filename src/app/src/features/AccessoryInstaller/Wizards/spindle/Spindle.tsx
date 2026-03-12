@@ -44,12 +44,6 @@ export function useSienciSpindle() {
                         component: SpindleConfig,
                         secondaryContent: []
                     },
-                    {
-                        id: 'controller-reboot',
-                        title: 'Reboot your controller',
-                        component: ControllerReboot,
-                        secondaryContent: []
-                    },
                 ]
             }]
         }), [validations]);

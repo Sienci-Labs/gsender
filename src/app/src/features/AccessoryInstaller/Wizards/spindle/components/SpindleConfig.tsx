@@ -33,7 +33,6 @@ export const grblCoreGcode = [
 ];
 
 export function SpindleConfig({ onComplete, onUncomplete }) {
-    const [isComplete, setIsComplete] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
     const [hasSetupSpindle, setHasSetupSpindle] = useState<boolean>(false);
@@ -60,6 +59,7 @@ export function SpindleConfig({ onComplete, onUncomplete }) {
             setupSienciHalSpindle()
         }
         setTimeout(() => {
+            setHasSetupSpindle(true)
             onComplete();
         }, 500)
     }
