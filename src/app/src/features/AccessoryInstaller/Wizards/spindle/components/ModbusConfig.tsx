@@ -59,4 +59,5 @@ export function ModbusConfig({ onComplete, onUncomplete }: StepProps) {
                 disabled={!isConnected}
             />
         </div>
+    )
 }
