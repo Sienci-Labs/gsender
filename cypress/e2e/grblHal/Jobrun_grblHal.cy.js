@@ -4,8 +4,8 @@ describe('Job Run in grblHal', () => {
     cy.viewport(1920, 1080);
     // Use loadUI custom command with dynamic baseUrl
     cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
-      maxRetries: 3,
-      waitTime: 3000,
+      maxRetries: 6,
+      waitTime: 6000,
       timeout: 120000
     });
   });

@@ -2,8 +2,8 @@ describe('Device Connection', () => {
   beforeEach(() => {
     cy.viewport(2133, 1050);
     cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
-      maxRetries: 4,
-      waitTime: 4000,
+      maxRetries: 6,
+      waitTime: 6000,
       timeout: 5000
     });
   });

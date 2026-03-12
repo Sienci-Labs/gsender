@@ -56,6 +56,8 @@ export interface ProbingOptions {
     xRetract?: number;
     yRetract?: number;
     zRetract?: number;
+    zRetractNormal: number;
+    zRetractAuto: number;
     xyRetract3D?: number;
     retract: number;
     axes: {
@@ -107,6 +109,8 @@ export interface Probe {
     probeFeedrate: number;
     probeFastFeedrate: number;
     retractionDistance: number;
+    zRetractNormal: number;
+    zRetractAuto: number;
     zProbeDistance: number;
     touchPlateHeight: number;
     probeType: string;
@@ -125,6 +129,8 @@ export interface Actions {
     handleProbeDepthChange: (event: Event) => void;
     handleProbeFeedrateChange: (event: Event) => void;
     handleRetractionDistanceChange: (event: Event) => void;
+    handleZRetractDistanceChange: (event: Event) => void;
+    handleZRetractDistanceAutoChange: (event: Event) => void;
     handleProbeCommandChange: (index: number) => void;
     handleSafeProbeToggle: () => void;
     generatePossibleProbeCommands: () => ProbeCommand[];

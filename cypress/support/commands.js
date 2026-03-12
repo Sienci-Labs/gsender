@@ -1067,18 +1067,18 @@ Cypress.Commands.add('loadUI', (url, options = {}) => {
 
 // Page URLs
 Cypress.Commands.add('goToCarve', () => {
-  cy.visit('http://127.0.0.1:8010/');
+  cy.visit('http://localhost:8000/#/');
   
 });
 
 Cypress.Commands.add('goToStats', () => {
-  cy.visit('http://127.0.0.1:8010/stats');
+  cy.visit('http://localhost:8000/#/stats');
 });
 
 Cypress.Commands.add('goToTools', () => {
-  cy.visit('http://127.0.0.1:8010//#/tools');
+  cy.visit('http://localhost:8000/#/tools');
 });
 
 Cypress.Commands.add('goToConfig', () => {
-  cy.visit('http://127.0.0.1:8010/configuration');
+  cy.visit('http://localhost:8000/#/configuration');
 });

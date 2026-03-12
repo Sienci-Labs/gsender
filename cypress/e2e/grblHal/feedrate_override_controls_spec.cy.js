@@ -3,8 +3,8 @@ describe('Feedrate Performance Comparison Test', () => {
   beforeEach(() => {
     cy.viewport(1920, 1080);
     cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
-      maxRetries: 4,
-      waitTime: 4000,
+      maxRetries: 6,
+      waitTime: 6000,
       timeout: 5000
     });
   });
