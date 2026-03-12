@@ -1,10 +1,10 @@
 import {Wizard} from 'app/features/AccessoryInstaller/types';
-import SpindlePlaceholder from 'app/features/AccessoryInstaller/Wizards/assets/placeholder.png';
+import SpindlePlaceholder from 'app/features/AccessoryInstaller/Wizards/spindle/assets/spindle_image.png';
 import {useMemo} from "react";
 import {useValidations} from "app/features/AccessoryInstaller/hooks/UseValidations.tsx";
-import {SpindleConfig} from "app/features/AccessoryInstaller/Wizards/spindle/assets/SpindleConfig.tsx";
-import {SpindleGcodePreview} from "app/features/AccessoryInstaller/Wizards/spindle/assets/SpindleGcodePreview.tsx";
-import {ControllerReboot} from "app/features/AccessoryInstaller/Wizards/spindle/assets/ControllerReboot.tsx";
+import {SpindleConfig} from "app/features/AccessoryInstaller/Wizards/spindle/components/SpindleConfig.tsx";
+import {SpindleGcodePreview} from "app/features/AccessoryInstaller/Wizards/spindle/components/SpindleGcodePreview.tsx";
+import {ControllerReboot} from "app/features/AccessoryInstaller/Wizards/spindle/components/ControllerReboot.tsx";
 
 export function useSienciSpindle() {
     const {connectionValidation, grblHAlValidator } = useValidations();
