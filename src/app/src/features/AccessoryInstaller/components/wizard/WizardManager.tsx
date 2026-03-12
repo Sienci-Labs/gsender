@@ -14,7 +14,12 @@ export function WizardManager({ wizard, onExit }: WizardManagerProps) {
 
     useEffect(() => {
         if (wizard.subWizards.length === 1) {
-            setSelectedSubWizard(wizard.subWizards[0]);
+            const allValid =
+                !wizard.validations.length ||
+                wizard.validations.every((v) => v().success);
+            if (allValid) {
+                setSelectedSubWizard(wizard.subWizards[0]);
+            }
         }
     }, [wizard]);
 
@@ -36,6 +41,7 @@ export function WizardManager({ wizard, onExit }: WizardManagerProps) {
             ) : (
                 <WizardLanding
                     title={wizard.title}
+                    image={wizard.image}
                     subWizards={wizard.subWizards}
                     onSelectSubWizard={handleSelectSubWizard}
                     onBack={onExit}

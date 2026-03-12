@@ -59,13 +59,15 @@ export function SpindleConfig({ onComplete, onUncomplete }) {
         } else {
             setupSienciHalSpindle()
         }
+        setTimeout(() => {
+            onComplete();
+        }, 500)
     }
 
     return (
         <div className="flex flex-col gap-5 justify-start">
             <p className="dark:text-white">
-                Your spindle must now be configured. This will require a reboot
-                before setting the modbus address.
+                Your spindle must now be configured.  Several settings will be sent configuring the spindle speeds, and various modbus addresses.
             </p>
             <StepActionButton
                 label="Setup Spindle and Reboot"
