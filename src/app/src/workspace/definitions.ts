@@ -97,4 +97,26 @@ export interface Workspace {
     notifications: Notification[];
     toastDuration: number;
     enableDarkMode: boolean;
+    accessibility: {
+        statusAnnouncements: boolean;
+        jobProgressAnnouncements: boolean;
+        jobProgressIncrement: number;
+        focusRings: boolean;
+        focusTrapping: boolean;
+        visualizerKeyboardControl: boolean;
+        audioCues: {
+            enabled: boolean;
+            jobComplete: boolean;
+            alarmTriggered: boolean;
+            toolChange: boolean;
+            probeSuccess: boolean;
+        };
+        reducedMotion: boolean;
+        gcodeSummary: {
+            enabled: boolean;
+            showVisually: boolean;
+        };
+        showKeyboardMap: boolean;
+    };
+    preventJoggingPastLimits: boolean;
 }
