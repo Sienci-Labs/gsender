@@ -69,6 +69,11 @@ export function SpindleConfig({ onComplete, onUncomplete }) {
             <p className="dark:text-white">
                 Your spindle must now be configured.  Several settings will be sent configuring the spindle speeds, and various modbus addresses.
             </p>
+            <p>
+                If you are on more modern versions of grblHAL, your controller will be rebooted at the end of this step.
+            </p>
+            <p>If you are on older versions, you will need to manually restart your controller.</p>
+            <p>You can view the commands to be sent in the sidebar.</p>
             <StepActionButton
                 label="Setup Spindle and Reboot"
                 runningLabel="Configuring..."
