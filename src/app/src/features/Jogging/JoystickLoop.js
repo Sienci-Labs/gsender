@@ -53,6 +53,7 @@ export class JoystickLoop {
         this.currentDirection = null; // For direction hysteresis
         this.pendingDirection = null; // For direction debouncing
         this.pendingDirectionCount = 0; // How many frames the pending direction has been stable
+        this.lastDirectionKey = null; // Last sent jog direction (for quick reversals)
         this.continuousJogActive = false; // For fixed speed continuous jogging
         this.continuousJogDirection = null; // Current direction of continuous jog
         this.continuousJogStartTime = null; // When current jog command was sent
@@ -86,7 +87,8 @@ export class JoystickLoop {
     };
 
     _getDirectionKey = (degrees) => {
-        if (inRange(degrees, 0, 22.5) || inRange(degrees, 337.5, 360)) return 'X+';
+        if (inRange(degrees, 0, 22.5) || inRange(degrees, 337.5, 360))
+            return 'X+';
         if (inRange(degrees, 22.5, 67.5)) return 'X+Y+';
         if (inRange(degrees, 67.5, 112.5)) return 'Y+';
         if (inRange(degrees, 112.5, 157.5)) return 'X-Y+';
@@ -136,6 +138,14 @@ export class JoystickLoop {
         const feedrate =
             givenFeedrate > maxFeedrate ? maxFeedrate : givenFeedrate;
 
+        const stickMagnitude = Math.abs(stickValue);
+
+        // Treat very small inputs as idle to avoid tiny, stuttering jog moves
+        const MIN_STICK_THRESHOLD = 0.05;
+        if (stickMagnitude < MIN_STICK_THRESHOLD) {
+            return 0;
+        }
+
         const fixedSpeedMode = get(
             this.gamepadProfile,
             'joystickOptions.fixedSpeedMode',
@@ -146,7 +156,15 @@ export class JoystickLoop {
             return Math.round(feedrate);
         }
 
-        return Math.round(Math.abs(feedrate * stickValue));
+        // In variable speed mode, scale the feedrate by stick magnitude but
+        // clamp to a minimum fraction so motion stays smooth
+        const MIN_FEEDRATE_FRACTION = 0.25;
+        const effectiveFraction = Math.max(
+            stickMagnitude,
+            MIN_FEEDRATE_FRACTION,
+        );
+
+        return Math.round(feedrate * effectiveFraction);
     };
 
     _computeIncrementalDistance = ({ axis, feedrate: givenFeedrate }) => {
@@ -172,7 +190,9 @@ export class JoystickLoop {
 
         const feedrateInMMPerSec = Math.round(feedrate / 60);
 
-        const COMMAND_EXECUTION_TIME_IN_SECONDS = 0.06;
+        // Very short command duration keeps the planner queue shallow so
+        // direction changes are followed quickly
+        const COMMAND_EXECUTION_TIME_IN_SECONDS = 0.03;
 
         const multiplier = 1;
         const incrementalDistance =
@@ -319,13 +339,34 @@ export class JoystickLoop {
 
         const controllerType = get(reduxStore.getState(), 'controller.type');
 
-        const timer = new Date() - this.jogMovementStartTime;
+        const timer = this.jogMovementStartTime
+            ? new Date() - this.jogMovementStartTime
+            : 0;
+
+        const rawDirectionKey = this._getDirectionKey(degrees);
 
         if (!this.isReadyForNextCommand) {
             return;
         }
 
-        if (this.jogMovementStartTime && timer <= this.jogMovementDuration) {
+        const directionChangedSinceLastJog =
+            this.jogMovementStartTime &&
+            this.lastDirectionKey &&
+            rawDirectionKey &&
+            this.lastDirectionKey !== rawDirectionKey;
+
+        // If the stick direction flipped, aggressively clear any queued jog
+        // motion so the new direction can take effect as soon as possible.
+        if (directionChangedSinceLastJog) {
+            controller.command('jog:cancel');
+            this.jogMovementStartTime = null;
+            this.jogMovementDuration = 0;
+            this.isReadyForNextCommand = true;
+        } else if (
+            this.jogMovementStartTime &&
+            timer <= this.jogMovementDuration
+        ) {
+            // Normal case: wait until the previous incremental jog is done
             return;
         }
 
@@ -343,11 +384,11 @@ export class JoystickLoop {
             false,
         );
 
-        const axesValues = fixedSpeedMode
-            ? rawAxesValues.map((value, index) =>
-                  this._smoothAxisValue(index, value),
-              )
-            : rawAxesValues;
+        const smoothedAxesValues = rawAxesValues.map((value, index) =>
+            this._smoothAxisValue(index, value),
+        );
+
+        const axesValues = fixedSpeedMode ? smoothedAxesValues : rawAxesValues;
 
         // Direction locking for fixed speed mode only
         let degreesForAxes = degrees;
@@ -514,7 +555,10 @@ export class JoystickLoop {
                 controller.command('jog:cancel');
                 this.continuousJogActive = false;
                 needsNewCommand = true;
-            } else if (this.continuousJogStartTime && this.continuousJogDuration) {
+            } else if (
+                this.continuousJogStartTime &&
+                this.continuousJogDuration
+            ) {
                 // Check if current jog is near completion (80% done)
                 const elapsed = Date.now() - this.continuousJogStartTime;
                 if (elapsed >= this.continuousJogDuration * 0.8) {
@@ -537,7 +581,11 @@ export class JoystickLoop {
             this.continuousJogDirection = this.currentDirection;
             this.continuousJogStartTime = Date.now();
             // Calculate expected duration: distance / (feedrate in mm/ms)
-            this.continuousJogDuration = (JOG_DISTANCE / (feedrate / 60)) * 1000;
+            this.continuousJogDuration =
+                (JOG_DISTANCE / (feedrate / 60)) * 1000;
+            if (rawDirectionKey) {
+                this.lastDirectionKey = rawDirectionKey;
+            }
             return;
         }
 
@@ -551,6 +599,10 @@ export class JoystickLoop {
         );
 
         this.isReadyForNextCommand = false;
+
+        if (rawDirectionKey) {
+            this.lastDirectionKey = rawDirectionKey;
+        }
     };
 
     _axesArrayToObject = (arr) => {
