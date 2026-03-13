@@ -187,6 +187,7 @@ export interface PreferencesState {
         };
         showKeyboardMap: boolean;
     };
+    preventJoggingPastLimits: boolean;
 }
 
 export interface VisualizerState {
