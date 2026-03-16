@@ -67,7 +67,6 @@ export class YModem extends events.EventEmitter {
         }
 
         const header = this.createHeaderPacket(this.SOH, fileData.name, fileData.data.byteLength);
-        console.log(header.length);
         this.comms.write(header);
 
         // [<<< C]
@@ -295,6 +294,7 @@ export class YModem extends events.EventEmitter {
             // eslint-disable-next-line no-await-in-loop
             const result = await Promise.race([waitForCCs, timeout]);
             // Cancel the pending listener if timeout fired (result is undefined)
+            // eslint-disable-next-line no-unused-expressions
             waitForCCs.cancel?.();
 
             console.log('result', result);
@@ -387,13 +387,11 @@ export class YModem extends events.EventEmitter {
 
         // Write CRC
         headerPacket.writeUInt16BE(dataCrc, bufferSize - 2);
-        console.log('headerPacket', headerPacket);
         return headerPacket;
     }
 
     splitFileToChunks(buf, chunkSize) {
         const chunks = bufferChunks(buf, chunkSize);
-        console.log('chunk', chunks);
         const lastChunk = chunks[chunks.length - 1];
 
         let isLastByteSOH = false;
