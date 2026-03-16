@@ -416,9 +416,9 @@ class GrblHalRunner extends events.EventEmitter {
         }
         if (type === GrblHalLineParserResultVersion) {
             const { version } = payload;
-
-            const parts = version.split('.');
-            const last = parts[parts.length - 1].replace(':', '');
+            const versionString = version.split(':');
+            const parts = versionString[0].split('.');
+            const last = parts[parts.length - 1];
             const semver = Number(last);
 
             const nextSettings = { // enforce change
