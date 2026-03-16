@@ -5,7 +5,7 @@ export function FilterDefaultToggle() {
     const { filterNonDefault, toggleFilterNonDefault } = useSettings();
 
     return (
-        <div className="ml-8 flex flex-row gap-4 items-center max-xl:text-xs flex-grow">
+        <div className="ml-8 flex flex-row gap-4 items-center max-xl:text-xs flex-grow max-sm:ml-0">
             <p className="text-gray-500 max-xl:hidden">View Modified</p>
             <p className="text-gray-500 hidden max-xl:block">Modified</p>
             <Switch
