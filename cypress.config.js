@@ -18,10 +18,7 @@ module.exports = defineConfig({
     // ========================================
 
     setupNodeEvents(on, config) {
-      // Register mochawesome plugin
-      require('cypress-mochawesome-reporter/plugin')(on);
-
-      // Optional: before browser launch hook
+  
       on('before:browser:launch', (browser = {}, launchOptions) => {
         return launchOptions;
       });

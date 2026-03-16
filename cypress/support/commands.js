@@ -585,43 +585,40 @@ Cypress.Commands.add('verifyConsoleContains', (text) => {
       cy.log(`Console contains: "${text}"`);
     });
 });
-
-// ----------------------
-//12.Zero X Axis
-// ----------------------
+//-----------------------
+// Zero X axis 
+//-----------------------
 Cypress.Commands.add('zeroXAxis', () => {
   cy.log('Zeroing X axis...');
-  cy.get('div.flex-shrink-0 > div > div > div > div > div.relative div:nth-of-type(1) > div:nth-of-type(1) > button')
+  cy.get('div.h-\\[75\\%\\] div.flex-col > div:nth-of-type(1) > div:nth-of-type(1) button')
     .contains('X0')
     .click();
   cy.wait(500);
   cy.log('X axis zeroed');
 });
+//-----------------------
+// Zero Y axis 
+//-----------------------
 
-// ----------------------
-//13.Zero Y Axis
-// ----------------------
 Cypress.Commands.add('zeroYAxis', () => {
   cy.log('Zeroing Y axis...');
-  cy.get('div.h-\\[75\\%\\] div.flex-col > div:nth-of-type(2) > div:nth-of-type(1) span')
+  cy.get('div.h-\\[75\\%\\] div.flex-col > div:nth-of-type(2) > div:nth-of-type(1) button')
     .contains('Y0')
     .click();
   cy.wait(500);
   cy.log('Y axis zeroed');
 });
-
-// ----------------------
-//14.Zero Z Axis
-// ----------------------
+//-----------------------
+// Zero Z axis 
+//-----------------------
 Cypress.Commands.add('zeroZAxis', () => {
   cy.log('Zeroing Z axis...');
-  cy.get('div.flex-shrink-0 > div > div > div > div > div.relative div:nth-of-type(3) > div:nth-of-type(1) span')
+  cy.get('div.h-\\[75\\%\\] div.flex-col > div:nth-of-type(3) > div:nth-of-type(1) button')
     .contains('Z0')
     .click();
-  cy.wait(1000);
+  cy.wait(500);
   cy.log('Z axis zeroed');
 });
-
 //-----------------------
 // Zero A axis 
 Cypress.Commands.add('zeroAAxis', () => {
@@ -1003,20 +1000,20 @@ Cypress.Commands.add('verifyMachineStatus', (expectedStatus, options = {}) => {
       expect(actualStatus.toLowerCase()).to.eq(expectedStatus.toLowerCase());
     });
 });
-
-// Updated searchInSettings command
+//------------------------------//
+// Search Elements in Config page
+//------------------------------//
 Cypress.Commands.add('searchInSettings', (searchText, options = {}) => {
   const { timeout = 10000 } = options;
-
-  cy.log(`Navigating to configuration page...`);
-  cy.goToConfig();
-  cy.wait(2000);
 
   cy.log(`Searching for: ${searchText}`);
   cy.get('#simple-search', { timeout })
     .should('be.visible')
-    .clear()
-    .type(searchText);
+    .click({ force: true })
+    .invoke('val', '')           // force-clear React controlled input
+    .type(searchText, { force: true, delay: 50 });
+
+  cy.wait(500);
 });
 // Apply settings { cy.applySettings(); }
 Cypress.Commands.add('applySettings', (options = {}) => {

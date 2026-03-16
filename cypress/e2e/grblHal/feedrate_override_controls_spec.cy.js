@@ -62,14 +62,14 @@ describe('Feedrate Performance Comparison Test', () => {
       });
 
     // Step 5: Click Minus Button 5 Times
-    cy.log('Step 5: Decreasing Feedrate - Clicking Minus 5 Times');
-    for (let i = 0; i < 5; i++) {
-      cy.get('div.relative > div.h-full > div > div > div > div > div.gap-2 > div:nth-of-type(2) svg')
-        .should('be.visible')
-        .click({ force: true });
-      cy.wait(500);
-      cy.log(`Minus click ${i + 1}/5`);
-    }
+  // Step 5: Decrease feedrate
+for (let i = 0; i < 5; i++) {
+  cy.get('div.order-2 section > div > div > div > div:nth-of-type(1) div:nth-of-type(2) > button')
+    .should('be.visible')
+    .click({ force: true });
+  cy.wait(500);
+  cy.log(`Minus click ${i + 1}/5`);
+}
 
     // Wait for acceleration/deceleration to apply
     cy.log('Waiting for feedrate change to apply (acceleration/deceleration)...');
@@ -181,15 +181,14 @@ describe('Feedrate Performance Comparison Test', () => {
         cy.wrap(initialFeedrate).as('secondJobInitialFeedrate');
       });
 
-    // Step 9: Click Plus Button 5 Times
-    cy.log('Step 9: Increasing Feedrate - Clicking Plus 5 Times');
+ // Step 9: Increase feedrate
     for (let i = 0; i < 5; i++) {
-      cy.get('div.relative > div.h-full div.gap-2 > div:nth-of-type(3) svg')
-        .should('be.visible')
-        .click({ force: true });
-      cy.wait(500);
-      cy.log(`Plus click ${i + 1}/5`);
-    }
+  cy.get('div.h-\\[25\\%\\] section > div > div > div > div:nth-of-type(1) div:nth-of-type(3) svg')
+    .should('be.visible')
+    .click({ force: true });
+  cy.wait(500);
+  cy.log(`Plus click ${i + 1}/5`);
+}
 
     // Wait for acceleration/deceleration to apply
     cy.log('Waiting for feedrate change to apply (acceleration/deceleration)...');

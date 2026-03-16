@@ -25,7 +25,7 @@ describe('Invert and Check Pins Test with Stepper Motor Lock/Unlock', () => {
 
     // Step 3: Open and pin Machine Info
     cy.log('Step 3: Opening Machine Information popup...');
-    cy.get('div.border > div.hidden img').should('be.visible').click();
+    cy.get('img.w-\\[24px\\]').click();
     cy.wait(2000);
     
     cy.log('Step 4: Pinning popup...');
@@ -41,10 +41,7 @@ describe('Invert and Check Pins Test with Stepper Motor Lock/Unlock', () => {
 
     // Step 6: Search for "invert"
     cy.log('Step 6: Searching for "invert" settings...');
-    cy.get('#simple-search')
-      .should('be.visible')
-      .clear()
-      .type('invert');
+    cy.searchInSettings('invert');
     cy.wait(1500);
     cy.log('Search results displayed for "invert"');
 

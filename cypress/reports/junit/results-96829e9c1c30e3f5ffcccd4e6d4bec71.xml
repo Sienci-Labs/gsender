@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="87.534" tests="3" failures="0">
+  <testsuite name="Root Suite" timestamp="2026-03-12T16:14:55" tests="0" file="cypress\e2e\grblHal\A_grblHal_master_spec.cy.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="gSender UI Load Test" timestamp="2026-03-12T16:14:55" tests="1" time="10.013" failures="0">
+    <testcase name="gSender UI Load Test should load gSender UI with refresh on failure" time="9.932" classname="should load gSender UI with refresh on failure">
+    </testcase>
+  </testsuite>
+  <testsuite name="Device Connection" timestamp="2026-03-12T16:15:05" tests="1" time="17.225" failures="0">
+    <testcase name="Device Connection should connect to CNC machine by selecting the first available port" time="17.137" classname="should connect to CNC machine by selecting the first available port">
+    </testcase>
+  </testsuite>
+  <testsuite name="Load file testing in grblHal" timestamp="2026-03-12T16:15:22" tests="1" time="60.282" failures="0">
+    <testcase name="Load file testing in grblHal Complete workflow: Connect-&gt; Upload-&gt; Disconnect-&gt;Upload-&gt; Connect-&gt;Disconnect" time="59.536" classname="Complete workflow: Connect-&gt; Upload-&gt; Disconnect-&gt;Upload-&gt; Connect-&gt;Disconnect">
+    </testcase>
+  </testsuite>
+</testsuites>
