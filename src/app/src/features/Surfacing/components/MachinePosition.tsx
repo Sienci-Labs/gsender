@@ -62,7 +62,7 @@ const MachinePosition: React.FC<Props> = ({ surfacing, setSurfacing }) => {
 
     return (
         <div className="flex items-center gap-8 justify-between">
-            <div className="w-20 h-20 border-4 border-black relative">
+            <div className="w-18 h-18 border-4 border-black relative">
                 <RadioGroup
                     name="positions"
                     value={startPosition}
@@ -91,7 +91,7 @@ const MachinePosition: React.FC<Props> = ({ surfacing, setSurfacing }) => {
                         <SpiralIcon
                             checked={surfacing.type === SPIRAL_MOVEMENT}
                             className={cx(
-                                'fill-black w-16 h-16 p-3 border-2 border-black rounded-lg hover:cursor-pointer hover:bg-gray-500 hover:fill-white transition-all duration-300',
+                                'fill-black w-14 h-14 p-2 border-2 border-black rounded-lg hover:cursor-pointer hover:bg-gray-500 hover:fill-white transition-all duration-300',
                                 {
                                     'bg-blue-50 fill-black border-blue-500':
                                         type === SPIRAL_MOVEMENT,
@@ -110,7 +110,7 @@ const MachinePosition: React.FC<Props> = ({ surfacing, setSurfacing }) => {
                         <ZigZagIcon
                             checked={surfacing.type === ZIG_ZAG_MOVEMENT}
                             className={cx(
-                                'fill-black w-16 h-16 p-3 border-2 border-black rounded-lg hover:cursor-pointer hover:bg-gray-500 hover:fill-white transition-all duration-300',
+                                'fill-black w-14 h-14 p-2 border-2 border-black rounded-lg hover:cursor-pointer hover:bg-gray-500 hover:fill-white transition-all duration-300',
                                 {
                                     'bg-blue-50 fill-black border-blue-500':
                                         type === ZIG_ZAG_MOVEMENT,
@@ -126,7 +126,7 @@ const MachinePosition: React.FC<Props> = ({ surfacing, setSurfacing }) => {
                     </Tooltip>
                 </div>
 
-                <div className="flex mt-4 justify-between items-center">
+                <div className="flex mt-1 justify-between items-center">
                     <span className="font-light text-sm max-w-20 dark:text-white">
                         Flip Cut Direction
                     </span>
