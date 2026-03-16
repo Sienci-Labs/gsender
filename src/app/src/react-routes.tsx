@@ -211,10 +211,6 @@ export const ReactRoutes = () => {
                         }
                     />
                     <Route
-                        path="gamepad/:gamepadProfileId"
-                        element={<Profile />}
-                    />
-                    <Route
                         path={'sd'}
                         element={
                             <Page
@@ -241,13 +237,13 @@ export const ReactRoutes = () => {
             </Route>
             <Route
                 path="console"
-                element={<Console isActive={true} isChildWindow={true} />}
+                element={<Console isActive isChildWindow />}
             ></Route>
             <Route
                 path="remote"
                 element={
                     <div className="flex flex-col gap-2">
-                        <TopBar isRemoteWindow={true} />
+                        <TopBar isRemoteWindow />
                         <ConfirmationDialog />
                         <div className="flex flex-col gap-8 min-h-screen p-4">
                             <Outlet />
@@ -275,7 +271,7 @@ export const ReactRoutes = () => {
                         <div className="flex flex-col justify-center gap-8 p-4">
                             <div>
                                 <MachineInfoDisplay
-                                    pinned={true}
+                                    pinned
                                     setPinned={noop}
                                 />
                             </div>
@@ -311,7 +307,7 @@ export const ReactRoutes = () => {
                 <Route
                     path="workflow"
                     element={
-                        <div className="flex flex-col gap-48 mt-6">
+                        <div className="flex flex-col gap-48 mt-12 relative">
                             <FileControl />
                             <JobControl />
                         </div>

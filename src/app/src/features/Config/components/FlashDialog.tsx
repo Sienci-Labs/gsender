@@ -4,17 +4,18 @@ import {
     DialogHeader,
     DialogTitle,
 } from 'app/components/shadcn/Dialog';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
     Select,
     SelectContent,
+    SelectGroup,
     SelectItem,
+    SelectLabel,
+    SelectSeparator,
     SelectTrigger,
     SelectValue,
 } from 'app/components/shadcn/Select.tsx';
 import { Button } from 'app/components/Button';
-import { RootState } from 'app/store/redux';
-import { useSelector } from 'react-redux';
 import { toast } from 'app/lib/toaster';
 import controller from 'app/lib/controller.ts';
 import store from 'app/store';
@@ -22,10 +23,11 @@ import get from 'lodash/get';
 
 import cn from 'classnames';
 import { FlashingProgress } from 'app/features/Config/components/FlashingProgress.tsx';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 
 interface flashDialogProps {
     show: boolean;
-    toggleShow: (b) => void;
+    toggleShow: (b: boolean) => void;
 }
 
 enum FlashingState {
@@ -37,7 +39,7 @@ enum FlashingState {
 
 interface startFlashOptions {
     port: string;
-    hex: string;
+    hex: ArrayBuffer;
     controllerType: string;
 }
 
@@ -72,14 +74,13 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [controllerType, setControllerType] = useState('grbl');
     const [port, setPort] = useState('');
-    const [ports, setPorts] = useState([]);
     const [file, setFile] = useState('');
     const [hex, setHex] = useState(new ArrayBuffer(1));
     const [flashState, setFlashState] = useState<FlashingState>(
         FlashingState.Idle,
     );
 
-    const portList = useSelector((state: RootState) => state.connection.ports);
+    const [ports, unrecognizedPorts, otherPorts] = useTypedSelector((state) => [state.connection.ports, state.connection.unrecognizedPorts, [SLB_DFU_PORT]]);
 
     function flashPort() {
         setFlashState(FlashingState.Flashing);
@@ -104,11 +105,6 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
             controllerType,
         });
     }
-
-    // get Port list, set port, get connection type (if exists)
-    useEffect(() => {
-        setPorts([...portList, SLB_DFU_PORT]);
-    }, [portList]);
 
     // On show, refresh ports
     useEffect(() => {
@@ -189,7 +185,7 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                     <DialogTitle>Flash Firmware</DialogTitle>
                 </DialogHeader>
                 <div className="flex flex-col gap-4">
-                    <p className="text-sm text-gray-700">
+                    <p className="text-sm text-gray-700 dark:text-white">
                         This feature exists to flash firmware onto a compatible
                         SLB or Arduino-based device.
                     </p>
@@ -199,7 +195,7 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                         })}
                     >
                         <div className="flex flex-col">
-                            <h2 className="text-gray-600 text-sm">Port</h2>
+                            <h2 className="text-gray-600 text-sm dark:text-white">Port</h2>
                             <Select
                                 onValueChange={handlePortSelect}
                                 value={port}
@@ -208,16 +204,44 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                                     <SelectValue placeholder={port} />
                                 </SelectTrigger>
                                 <SelectContent className="bg-white bg-opacity-100 z-[10000]">
-                                    {ports.map((p) => (
-                                        <SelectItem key={p.port} value={p.port}>
-                                            {p.port}
-                                        </SelectItem>
-                                    ))}
+                                {ports.length > 0 && (
+                                        <SelectGroup>
+                                            <SelectLabel className="text-gray-500 text-sm">Recognized Ports</SelectLabel>
+                                            {ports.map((p) => (
+                                                <SelectItem key={p.port} value={p.port}>
+                                                    {p.port}
+                                                </SelectItem>
+                                            ))}
+                                            {(unrecognizedPorts.length > 0 ||
+                                                otherPorts.length > 0) && <SelectSeparator />}
+                                        </SelectGroup>
+                                    )}
+                                    {otherPorts.length > 0 && (
+                                        <SelectGroup>
+                                            <SelectLabel className="text-gray-500 text-sm">Other Ports</SelectLabel>
+                                            {otherPorts.map((p) => (
+                                                <SelectItem key={p.port} value={p.port}>
+                                                    {p.port}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectGroup>
+                                    )}
+                                    {unrecognizedPorts.length > 0 && (
+                                        <SelectGroup>
+                                            <SelectLabel className="text-gray-500 text-sm">Unrecognized Ports</SelectLabel>
+                                            {unrecognizedPorts.map((p) => (
+                                                <SelectItem key={p.port} value={p.port}>
+                                                    {p.port}
+                                                </SelectItem>
+                                            ))}
+                                            {otherPorts.length > 0 && <SelectSeparator />}
+                                        </SelectGroup>
+                                    )}
                                 </SelectContent>
                             </Select>
                         </div>
                         <div className="flex flex-col">
-                            <h2 className="text-gray-600 text-sm">
+                            <h2 className="text-gray-600 text-sm dark:text-white">
                                 Controller Type
                             </h2>
                             <Select
@@ -241,7 +265,7 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                                 invisible: controllerType === 'grbl',
                             })}
                         >
-                            <h2 className="text-gray-600 text-sm">Hex File</h2>
+                            <h2 className="text-gray-600 text-sm dark:text-white">Hex File</h2>
                             <input
                                 type="file"
                                 id="firmware_image"
@@ -260,14 +284,14 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                             },
                         )}
                     >
-                        <p className="text-sm text-gray-600 text-center">
+                        <p className="text-sm text-gray-600 text-center dark:text-white">
                             This process will disconnect your machine, and may
                             take a couple of minutes to complete.
                             <br />
                             <b>Continue?</b>
                         </p>
                         <div className="flex flex-row gap-4 items-center justify-center">
-                            <Button onClick={toggleShow}>No</Button>
+                            <Button onClick={() => toggleShow(false)}>No</Button>
                             <Button
                                 variant="primary"
                                 disabled={!canClickFlash()}
@@ -295,7 +319,7 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                                 flashState !== FlashingState.Error,
                         })}
                     >
-                        <Button variant="primary" onClick={toggleShow}>
+                        <Button variant="primary" onClick={() => toggleShow(false)}>
                             Close
                         </Button>
                     </div>
