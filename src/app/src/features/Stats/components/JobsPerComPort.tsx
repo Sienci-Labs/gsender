@@ -48,7 +48,7 @@ export function JobsPerComPort() {
     };
 
     return (
-        <div className="w-40">
+        <div className="w-52 h-52">
             <Pie
                 data={data}
                 width={280}
