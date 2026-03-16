@@ -38,7 +38,7 @@ const TabJog = (props: TabJogProps) => {
                 )}
                 onKeyDown={props.onTopKeyDown}
                 {...props.topHandlers}
-                testId={props.idForTest + '+'}
+                data-testid={props.idForTest + '+'}
             />
             <path
                 role="button"
@@ -51,7 +51,7 @@ const TabJog = (props: TabJogProps) => {
                 )}
                 onKeyDown={props.onBottomKeyDown}
                 {...props.bottomHandlers}
-                testId={props.idForTest + '-'}
+                data-testid={props.idForTest + '-'}
             />
             <line y1={93.5} x2={49} y2={93.5} stroke="#CECECE" />
         </svg>

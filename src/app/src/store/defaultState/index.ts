@@ -195,6 +195,7 @@ const defaultState: State = {
             },
             showKeyboardMap: false,
         },
+        preventJoggingPastLimits: false,
     },
     widgets: {
         atc: {
@@ -368,6 +369,7 @@ const defaultState: State = {
                 minPower: 0,
                 maxPower: 255,
             },
+            inputType: 'Slider'
         },
         surfacing: {
             bitDiameter: 22,

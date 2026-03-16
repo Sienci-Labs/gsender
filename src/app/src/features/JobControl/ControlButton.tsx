@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { JSX, useEffect, useState } from 'react';
 import cx from 'classnames';
 import includes from 'lodash/includes';
 import pubsub from 'pubsub-js';
@@ -72,11 +72,13 @@ const ControlButton: React.FC<ControlButtonProps> = ({
     onStop,
     validateATC,
 }) => {
-    function canRun(reduxActiveState?: GRBL_ACTIVE_STATES_T) {
+    function canRun(reduxActiveState?: GRBL_ACTIVE_STATES_T, reduxWorkflow?: { state: WORKFLOW_STATES_T }) {
         const currentActiveState = reduxActiveState || activeState;
+        const currentWorkflow = reduxWorkflow || workflow;
+        const { state } = currentWorkflow;
         return (
-            currentActiveState === GRBL_ACTIVE_STATE_IDLE ||
-            currentActiveState === GRBL_ACTIVE_STATE_HOLD
+            (currentActiveState === GRBL_ACTIVE_STATE_IDLE ||
+            currentActiveState === GRBL_ACTIVE_STATE_HOLD) && state !== WORKFLOW_STATE_RUNNING
         );
     }
 
@@ -129,7 +131,7 @@ const ControlButton: React.FC<ControlButtonProps> = ({
         if (!isConnected || !fileLoaded) {
             return true;
         } else if (
-            (type === START && canRun(activeState)) ||
+            (type === START && canRun(activeState, workflow)) ||
             (type === PAUSE && canPause(activeState, workflow)) ||
             (type === STOP && canStop(workflow))
         ) {

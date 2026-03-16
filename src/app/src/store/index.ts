@@ -79,11 +79,6 @@ const persist = (data: StoreData): void => {
         },
     };
 
-    if (persistData.state.workspace.backupFreq === 'On Update') {
-        persistData.state.workspace.lastBackupTime = Date.now();
-        backupPreviousState(persistData);
-    }
-
     try {
         const value = JSON.stringify(persistData, null, 2);
 
@@ -202,7 +197,7 @@ const normalizeState = (state: any): any => {
     return state;
 };
 
-const merge = (base: any, saved: any): any => {
+export const merge = (base: any, saved: any): any => {
     const baseIsObject = base instanceof Object;
     const baseIsArray = Array.isArray(base);
 
@@ -267,6 +262,9 @@ const isTimeToBackup = (
     frequency: BackupFrequencies,
 ) => {
     if (frequency === 'On Update') {
+        if (semver.lt(cnc.version, settings.version)) {
+            return true;
+        }
         return false;
     }
 
