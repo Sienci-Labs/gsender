@@ -77,7 +77,7 @@ export const ConfigTab: React.FC = ({ uploading, uploadError }: ConfigTabProps) 
                             <Crosshair className={`${iconClass} shrink-0`} />
                         </div>
                     </CardHeader>
-                    <CardContent className="p-5 min-h-[170px] flex flex-col justify-center gap-4 py-2">
+                    <CardContent className="p-5 !pt-4 min-h-[170px] flex flex-col justify-center gap-4">
 
                         <Button
                             variant="outline"
@@ -104,7 +104,7 @@ export const ConfigTab: React.FC = ({ uploading, uploadError }: ConfigTabProps) 
                             <Fingerprint className={`${iconClass} shrink-0`} />
                         </div>
                     </CardHeader>
-                    <CardContent className="p-5 py-2 min-h-[170px] flex flex-col justify-center gap-4">
+                    <CardContent className="p-5 !pt-4 min-h-[170px] flex flex-col justify-center gap-4">
                         <Label className={labelClass}>Sensor Position</Label>
                         <PositionInput
                             label="Tool Length Sensor Position"
@@ -134,7 +134,7 @@ export const ConfigTab: React.FC = ({ uploading, uploadError }: ConfigTabProps) 
                         <BookOpen className={`${iconClass} shrink-0`} />
                     </div>
                 </CardHeader>
-                <CardContent className="p-5 py-1 min-h-[320px] flex">
+                <CardContent className="p-5 !pt-4 min-h-[320px] flex">
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 w-full items-center">
                         <div className="space-y-4">
                             <div className="space-y-1">
