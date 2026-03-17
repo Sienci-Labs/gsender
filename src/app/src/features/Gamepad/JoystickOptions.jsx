@@ -118,7 +118,9 @@ const JoystickOptions = () => {
             </div>
 
             <div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center mb-2 gap-2">
-                <div className="leading-[1.3] dark:text-white">Stick 1 left/right</div>
+                <div className="leading-[1.3] dark:text-white">
+                    Stick 1 left/right
+                </div>
                 <Select
                     styles={
                         !stick1PrimaryActionIsUsingMPG &&
@@ -183,7 +185,9 @@ const JoystickOptions = () => {
             </div>
 
             <div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center mb-2 gap-2">
-                <div className="leading-[1.3] dark:text-white">Stick 1 up/down</div>
+                <div className="leading-[1.3] dark:text-white">
+                    Stick 1 up/down
+                </div>
                 <Select
                     styles={
                         !stick1PrimaryActionIsUsingMPG &&
@@ -307,7 +311,9 @@ const JoystickOptions = () => {
             </div>
 
             <div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center mb-2 gap-2">
-                <div className="leading-[1.3] dark:text-white">Stick 2 left/right</div>
+                <div className="leading-[1.3] dark:text-white">
+                    Stick 2 left/right
+                </div>
                 <Select
                     styles={
                         !stick2PrimaryActionIsUsingMPG &&
@@ -372,7 +378,9 @@ const JoystickOptions = () => {
             </div>
 
             <div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center mb-2 gap-2">
-                <div className="leading-[1.3] dark:text-white">Stick 2 up/down</div>
+                <div className="leading-[1.3] dark:text-white">
+                    Stick 2 up/down
+                </div>
                 <Select
                     styles={
                         !stick2PrimaryActionIsUsingMPG &&
@@ -498,7 +506,9 @@ const JoystickOptions = () => {
             </div>
 
             <div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center mb-2 gap-2">
-                <div className="leading-[1.4] dark:text-white">Zero threshold</div>
+                <div className="leading-[1.4] dark:text-white">
+                    Zero threshold
+                </div>
                 <ControlledInput
                     value={zeroThreshold}
                     type="number"
@@ -541,8 +551,10 @@ const JoystickOptions = () => {
             </div>
 
             <div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center gap-2">
-                <div className="leading-[1.4] dark:text-white">Fixed speed mode</div>
-                <div className="col-span-3">
+                <div className="leading-[1.4] dark:text-white">
+                    Fixed speed mode
+                </div>
+                <div className="col-span-3 flex gap-2 items-center">
                     <Switch
                         className="float-left mr-2"
                         checked={fixedSpeedMode}
@@ -551,8 +563,8 @@ const JoystickOptions = () => {
                         }
                     />
                     <p className="text-gray-500 text-xs -mt-[5px]">
-                        For gamepads that don't work well with variable
-                        speed jogging
+                        For gamepads that don't work well with variable speed
+                        jogging
                     </p>
                 </div>
             </div>

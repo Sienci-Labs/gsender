@@ -435,6 +435,7 @@ const SurfacingTool = () => {
                                     value="gcode-viewer"
                                     className="w-full"
                                     onClick={() => setTabSwitch(true)}
+                                    disabled={!gcode}
                                 >
                                     G-Code{' '}
                                     {gcode.length !== 0 ? (
@@ -445,7 +446,7 @@ const SurfacingTool = () => {
                                 </TabsTrigger>
                             </TabsList>
                         </Tabs>
-                        <div className="relative w-[calc(100vw/2] h-[calc(100vh-224px-40px)]">
+                        <div className="relative w-full h-full">
                             <div
                                 className={cx(
                                     'absolute w-full h-full top-0 left-0 rounded-md',
