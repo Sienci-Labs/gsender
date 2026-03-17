@@ -269,6 +269,9 @@ export class YModem extends events.EventEmitter {
             const newChar = newData[0];
             if (controlChars.includes(newChar)) {
                 this.logger(`[<<< ${DebugDict[newChar]}]`);
+                if (newChar === this.NAK) {
+                    console.log('NAK SEEN');
+                }
                 this.comms.removeListener('data', bound);
                 callback(newChar);
             }
