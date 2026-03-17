@@ -159,15 +159,6 @@ export const DEFAULT = {
     $20: '1',
 };
 
-export const SPINDLE_KIT = {
-    ...ALTMILL_DEFAULT,
-    $395: '6',
-    $23: '1',
-    $22: '79',
-    $21: '1',
-    $20: '1',
-    $476: '2',
-};
 
 export const DEFAULT_2X4 = {
     ...ALTMILL_DEFAULT,
