@@ -4,6 +4,7 @@ import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
 import { StepActionButton } from 'app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx';
 import { StepProps } from 'app/features/AccessoryInstaller/types';
+import {GRBL_ACTIVE_STATE_ALARM} from "app/constants";
 
 export function RestartAndRehome({ onComplete, onUncomplete }: StepProps) {
     const [rehomed, setRehomed] = useState<boolean>(false);
@@ -18,12 +19,24 @@ export function RestartAndRehome({ onComplete, onUncomplete }: StepProps) {
         (state: RootState) => state.connection.isConnected,
     );
 
+    const activeState= useTypedSelector((state: RootState) => state.controller.state.status?.activeState);
+    const alarmCode = Number(useTypedSelector((state: RootState) => state.controller.state.status?.alarmCode));
+
     useEffect(() => {
         if (clickedRehome && hasHomed) {
             setRehomed(true)
             onComplete(); // onComplete when we have clicked and rehoming is done
         }
     }, [hasHomed, clickedRehome]);
+
+    useEffect(() => {
+        if (activeState === GRBL_ACTIVE_STATE_ALARM && alarmCode === 11) {
+            setError('Homing failed.');
+            setTimeout(() => {
+                setError(null);
+            }, 2500)
+        }
+    }, [activeState, alarmCode]);
 
     const handleRehome = () => {
         setClickedRehome(true);
