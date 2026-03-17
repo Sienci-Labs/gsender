@@ -72,10 +72,6 @@ export const ALTMILL_DEFAULT = {
     $161: '0.000',
     $162: '0.000',
     $163: '0.000',
-    $170: '0.000',
-    $171: '0.000',
-    $172: '0.000',
-    $173: '0.000',
     $300: 'grblHAL',
     $301: '0',
     $302: '192.168.5.1',
@@ -163,15 +159,6 @@ export const DEFAULT = {
     $20: '1',
 };
 
-export const SPINDLE_KIT = {
-    ...ALTMILL_DEFAULT,
-    $395: '6',
-    $23: '1',
-    $22: '79',
-    $21: '1',
-    $20: '1',
-    $476: '2',
-};
 
 export const DEFAULT_2X4 = {
     ...ALTMILL_DEFAULT,
@@ -202,10 +189,6 @@ ALTMILL_ORDERED.set('$21', '1');
 ALTMILL_ORDERED.set('$20', '1');
 ALTMILL_ORDERED.set('$40', '1');
 ALTMILL_ORDERED.set('$744', '15');
-ALTMILL_ORDERED.set('$170', '0');
-ALTMILL_ORDERED.set('$171', '0');
-ALTMILL_ORDERED.set('$172', '0');
-ALTMILL_ORDERED.set('$173', '0');
 
 export const SPINDLE_ORDERED = new Map();
 SPINDLE_ORDERED.set('$462', '8192');
@@ -218,11 +201,6 @@ SPINDLE_ORDERED.set('$20', '1');
 SPINDLE_ORDERED.set('$476', '2');
 SPINDLE_ORDERED.set('$40', '1');
 SPINDLE_ORDERED.set('$395', '6');
-SPINDLE_ORDERED.set('$744', '15');
-SPINDLE_ORDERED.set('$170', '0');
-SPINDLE_ORDERED.set('$171', '0');
-SPINDLE_ORDERED.set('$172', '0');
-SPINDLE_ORDERED.set('$173', '0');
 
 export const SHARED_CORE_REMAPS = {};
 

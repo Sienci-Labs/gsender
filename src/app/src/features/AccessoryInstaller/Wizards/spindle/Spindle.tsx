@@ -4,7 +4,8 @@ import {useMemo} from "react";
 import {useValidations} from "app/features/AccessoryInstaller/hooks/UseValidations.tsx";
 import {SpindleConfig} from "app/features/AccessoryInstaller/Wizards/spindle/components/SpindleConfig.tsx";
 import {SpindleGcodePreview} from "app/features/AccessoryInstaller/Wizards/spindle/components/SpindleGcodePreview.tsx";
-import {ControllerReboot} from "app/features/AccessoryInstaller/Wizards/spindle/components/ControllerReboot.tsx";
+import {ModbusConfig} from "app/features/AccessoryInstaller/Wizards/spindle/components/ModbusConfig.tsx";
+import {SpindleCompletion} from "app/features/AccessoryInstaller/Wizards/spindle/components/Completion.tsx";
 
 export function useSienciSpindle() {
     const {connectionValidation, grblHAlValidator } = useValidations();
@@ -25,7 +26,7 @@ export function useSienciSpindle() {
                 description: 'Configure your Sienci Spindle for first time use',
                 estimatedTime: '5 - 30 minutes',
                 configVersion: '1.0',
-                completionPage: null,
+                completionPage: SpindleCompletion,
                 steps: [
                     {
                         id: 'spindle-config',
@@ -41,7 +42,7 @@ export function useSienciSpindle() {
                     {
                         id: 'modbus-config',
                         title: 'Modbus Configuration',
-                        component: SpindleConfig,
+                        component: ModbusConfig,
                         secondaryContent: []
                     },
                 ]
