@@ -5,6 +5,7 @@ import {RootState} from "app/store/redux";
 import controller from "app/lib/controller.ts";
 import {firmwarePastVersion} from "app/lib/firmwareSemver.ts";
 import {ATCI_SUPPORTED_VERSION} from "app/features/ATC/utils/ATCiConstants.ts";
+import store from "app/store";
 
 export const sienciHalGcode = [
     '$30=24000',
@@ -58,6 +59,8 @@ export function SpindleConfig({ onComplete, onUncomplete }) {
         } else {
             setupSienciHalSpindle()
         }
+
+        store.set('workspace.spindleFunctions', true);
         setTimeout(() => {
             setHasSetupSpindle(true)
             onComplete();
