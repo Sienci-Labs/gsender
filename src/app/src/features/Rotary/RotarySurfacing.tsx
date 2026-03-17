@@ -342,7 +342,7 @@ const RotarySurfacing = () => {
                                     />
                                 </div>
                             </Tooltip>
-                            <div className="flex flex-col gap-2 w-full col-span-2 text-xs xl:text-sm text-gray-500 mt-3">
+                            <div className="flex flex-col gap-2 w-full col-span-2 text-xs xl:text-sm text-gray-500">
                                 Cut faster and cleaner by only rotating one
                                 direction, but you will need to rehome your
                                 A-axis at the end.
