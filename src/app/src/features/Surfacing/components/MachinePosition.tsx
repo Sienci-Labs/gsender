@@ -52,7 +52,7 @@ const MachinePosition: React.FC<Props> = ({ surfacing, setSurfacing }) => {
         },
         {
             key: 4,
-            className: 'absolute top-5 left-5',
+            className: 'absolute top-3 left-3',
             title: 'Start at the Center',
             value: START_POSITION_CENTER,
         },
@@ -62,7 +62,7 @@ const MachinePosition: React.FC<Props> = ({ surfacing, setSurfacing }) => {
 
     return (
         <div className="flex items-center gap-8 justify-between">
-            <div className="w-18 h-18 border-4 border-black relative">
+            <div className="w-16 h-16 border-4 border-black relative">
                 <RadioGroup
                     name="positions"
                     value={startPosition}
@@ -127,7 +127,7 @@ const MachinePosition: React.FC<Props> = ({ surfacing, setSurfacing }) => {
                 </div>
 
                 <div className="flex mt-1 justify-between items-center">
-                    <span className="font-light text-sm max-w-20 dark:text-white">
+                    <span className="leading-[1.3] font-light text-sm max-w-20 dark:text-white">
                         Flip Cut Direction
                     </span>
                     <Switch
