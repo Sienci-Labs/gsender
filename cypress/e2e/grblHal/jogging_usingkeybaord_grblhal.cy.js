@@ -1,16 +1,5 @@
 describe('Dynamic Keyboard Jogging Test - All Axes', () => {
-
-  // Ignore known exceptions
-  Cypress.on('uncaught:exception', (err) => {
-    console.log('Uncaught exception:', err.message);
-    const ignoreMessages = ['reading \'get\''];
-    if (ignoreMessages.some(msg => err.message.includes(msg))) {
-      return false;
-    }
-    return true;
-  });
-
-  before(() => {
+ before(() => {
     cy.viewport(1920, 1080);
   });
 
