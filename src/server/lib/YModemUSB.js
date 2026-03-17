@@ -71,7 +71,7 @@ export class YModem extends events.EventEmitter {
 
         // [<<< C]
         try {
-            await this.waitForNextWithTimeout([this.C, this.ACK], 5000);
+            await this.waitForNextWithTimeout([this.C, this.ACK, this.NAK], 3000);
         } catch (e) {
             this.emit('error', e.message);
             throw e;
@@ -172,7 +172,7 @@ export class YModem extends events.EventEmitter {
 
             try {
                 // eslint-disable-next-line no-await-in-loop
-                await this.waitForNextWithTimeout([this.C, this.ACK], 5000);
+                await this.waitForNextWithTimeout([this.C, this.ACK, this.NAK], 5000);
             } catch (e) {
                 this.emit('error', e.message);
                 throw e;
@@ -242,7 +242,7 @@ export class YModem extends events.EventEmitter {
             this.logger('[>>> EOT]');
 
             // eslint-disable-next-line no-await-in-loop
-            await sleep(150);
+            await sleep(200);
         }
 
         this.logger('Finished sending packets');
