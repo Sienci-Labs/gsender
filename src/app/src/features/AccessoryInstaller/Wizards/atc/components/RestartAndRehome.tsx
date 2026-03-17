@@ -30,7 +30,7 @@ export function RestartAndRehome({ onComplete, onUncomplete }: StepProps) {
     }, [hasHomed, clickedRehome]);
 
     useEffect(() => {
-        if (activeState === GRBL_ACTIVE_STATE_ALARM && alarmCode === 11) {
+        if (activeState === GRBL_ACTIVE_STATE_ALARM && alarmCode === 9) {
             setError('Homing failed.');
             setTimeout(() => {
                 setError(null);
