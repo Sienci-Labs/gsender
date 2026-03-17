@@ -77,19 +77,20 @@ export const ConfigTab: React.FC = ({ uploading, uploadError }: ConfigTabProps) 
                             <Crosshair className={`${iconClass} shrink-0`} />
                         </div>
                     </CardHeader>
-                    <CardContent className="p-5 min-h-[170px] flex flex-col justify-center gap-4">
-                        <p className="text-sm text-muted-foreground">
-                            Tool rack configuration — including rack size and position — is managed through the initial setup process. Re-run setup to reconfigure your rack.
-                        </p>
+                    <CardContent className="p-5 min-h-[170px] flex flex-col justify-center gap-4 py-2">
+
                         <Button
                             variant="outline"
                             size="sm"
                             className="w-fit"
                             onClick={() => navigate('/tools/accessoryInstall/sienci-atc/initial-setup')}
                         >
-                            Go to Initial Setup
+                            Go to ATC Setup
                             <ArrowRight className="h-4 w-4 ml-1" />
                         </Button>
+                        <p className="text-sm text-gray-600 dark:text-gray-200">
+                            Tool rack configuration is managed through the ATC setup process. Re-run setup to reconfigure your rack.
+                        </p>
                     </CardContent>
                 </Card>
 
@@ -103,7 +104,7 @@ export const ConfigTab: React.FC = ({ uploading, uploadError }: ConfigTabProps) 
                             <Fingerprint className={`${iconClass} shrink-0`} />
                         </div>
                     </CardHeader>
-                    <CardContent className="p-5 py-1 min-h-[170px] flex flex-col justify-center gap-4">
+                    <CardContent className="p-5 py-2 min-h-[170px] flex flex-col justify-center gap-4">
                         <Label className={labelClass}>Sensor Position</Label>
                         <PositionInput
                             label="Tool Length Sensor Position"
