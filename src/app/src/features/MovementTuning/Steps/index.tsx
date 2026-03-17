@@ -201,7 +201,7 @@ const Steps = () => {
                             </div>
                         )}
                     </div>
-                    <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-4 items-center">
                         <img
                             src={starterImage}
                             alt="Movement Tuning Example"
