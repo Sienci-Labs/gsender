@@ -16,6 +16,7 @@ import {
 } from 'app/constants';
 import controller from 'app/lib/controller';
 import defaultState from 'app/store/defaultState';
+import reduxStore from 'app/store/redux';
 
 import { convertToImperial } from '../../Preferences/calculate';
 
@@ -49,7 +50,11 @@ export default class Generator {
             flood,
         } = { ...defaultSurfacingState, ...surfacing };
 
-        const wcs = controller.state?.parserstate?.modal?.wcs || 'G54';
+        const wcs = get(
+            reduxStore.getState(),
+            'controller.state.parserstate.modal.wcs',
+            'G54',
+        );
         const z = getSafeZValue();
 
         const dwell = shouldDwell ? [`G04 P${SURFACING_DWELL_DURATION}`] : [];

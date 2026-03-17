@@ -1,3 +1,5 @@
+import get from 'lodash/get';
+
 import store from 'app/store';
 import reduxStore from 'app/store/redux';
 import {
@@ -6,9 +8,8 @@ import {
     SURFACING_DWELL_DURATION,
     WORKSPACE_MODE,
 } from 'app/constants';
-
-import defaultState from '../../../store/defaultState';
 import { Rotary } from 'app/features/Rotary/definitions';
+import defaultState from 'app/store/defaultState';
 
 type StockTurningGeneratorOptions = Rotary['stockTurning']['options'] & {
     method?: string;
@@ -53,9 +54,11 @@ export class StockTurningGenerator {
         const { feedrate, spindleRPM, enableRehoming, shouldDwell } =
             this.options;
 
-        const wcs =
-            reduxStore.getState().controller.state?.parserstate?.modal?.wcs ||
-            'G54';
+            const wcs = get(
+                reduxStore.getState(),
+                'controller.state.parserstate.modal.wcs',
+                'G54',
+            );
 
         const dwell = shouldDwell ? [`G04 P${SURFACING_DWELL_DURATION}`] : [];
 
