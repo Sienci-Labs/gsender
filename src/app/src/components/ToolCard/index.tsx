@@ -21,7 +21,7 @@ const ToolCard = ({
     const CardContent = (
         <Card
             className="hover:bg-gray-300 bg-gray-100 cursor-pointer p-4 
-            flex flex-col items-center justify-between text-center gap-4 min-h-48 
+            flex flex-col items-center justify-between text-center gap-4
             transition-all duration-300 ease-in-out h-full dark:bg-dark"
             onClick={onClick}
         >
