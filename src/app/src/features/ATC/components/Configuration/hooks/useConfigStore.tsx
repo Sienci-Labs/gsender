@@ -218,7 +218,10 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
         const handleComplete = () => {
             controller.removeListener('ymodem:complete', handleComplete);
             controller.removeListener('ymodem:error', handleError);
-            setStatus({ type: 'idle', message: '' });
+            setStatus({ type: 'success', message: 'Configuration applied successfully!' });
+            setTimeout(() => {
+                setStatus({ type: 'idle', message: '' });
+            }, 5000);
             setTimeout(() => {
                 controller.command('gcode', ['G65 P100', 'G65 P200']);
             }, 1000);

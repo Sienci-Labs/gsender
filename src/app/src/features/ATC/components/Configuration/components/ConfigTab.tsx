@@ -23,6 +23,7 @@ import OffsetManagementWidget from 'app/features/ATC/components/Configuration/co
 import { Spinner } from 'app/components/shadcn/Spinner';
 import {
     BookOpen,
+    CheckCircle2,
     Crosshair,
     Fingerprint,
     Move,
@@ -526,7 +527,14 @@ export const ConfigTab: React.FC = ({ uploading, uploadError }: ConfigTabProps) 
                         </div>
                     )}
 
-                    {status.message && !uploading && (
+                    {!uploading && status.type === 'success' && (
+                        <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-green-50 border border-green-200 text-green-700 dark:bg-green-950/40 dark:border-green-800 dark:text-green-400 animate-in fade-in-0 duration-300">
+                            <CheckCircle2 className="h-4 w-4 shrink-0" />
+                            <span className="text-xs font-medium">{status.message}</span>
+                        </div>
+                    )}
+
+                    {!uploading && status.type !== 'success' && status.message && (
                         <div className={cn('text-xs', getStatusColor())}>
                             {status.message}
                         </div>
