@@ -233,7 +233,7 @@ const Profile = ({ data }) => {
                 </div>
             </div>
 
-            <div className="flex gap-4 mt-4">
+            <div className="flex gap-4 mt-3">
                 <div className="w-3/5 flex flex-col gap-2">
                     <h3 className="text-xl font-bold dark:text-white">
                         Button Actions
@@ -243,8 +243,10 @@ const Profile = ({ data }) => {
                         or a &quot;2nd Action&quot; button to use like a
                         Function key and give your gamepad double the functions!
                     </p>
-                    <div className="overflow-y-auto h-[400px] bg-white rounded border border-gray-300 dark:bg-dark dark:border-gray-700">
-                        <ButtonActionsTable />
+                    <div className="relative h-full bg-white rounded border border-gray-300 dark:bg-dark dark:border-gray-700">
+                        <div className="overflow-y-auto absolute top-0 left-0 w-full h-full">
+                            <ButtonActionsTable />
+                        </div>
                     </div>
                 </div>
 
