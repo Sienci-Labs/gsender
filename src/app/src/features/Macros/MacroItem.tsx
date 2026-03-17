@@ -44,32 +44,27 @@ const MacroButton = forwardRef<HTMLButtonElement, MacroButtonProps>(
         };
 
         return (
-            <Button
+            <button
                 ref={ref}
                 onClick={run}
                 disabled={disabled}
-                className={cn('block h-10 rounded-md w-full text-base', {
-                    'animate-pulse bg-gradient-to-r from-green-500 via-green-500 to-green-100 ':
-                        running,
-                    'opacity-50 cursor-not-allowed': disabled,
-                })}
-                active={running}
-                variant="ghost"
-                size="custom"
+                className={cn(
+                    'block h-10 rounded-md w-full text-base overflow-hidden text-ellipsis px-2',
+                    {
+                        'animate-pulse bg-gradient-to-r from-green-500 via-green-500 to-green-100 ':
+                            running,
+                        'opacity-50 cursor-not-allowed': disabled,
+                    },
+                )}
             >
-                <span className="w-[14ch] text-left text-overflow-clip overflow-hidden whitespace-nowrap max-w-[14ch]">
+                <span className="block w-full text-left whitespace-nowrap overflow-hidden text-ellipsis">
                     {running ? 'Running...' : macro.name}
                 </span>
-            </Button>
+            </button>
         );
     },
 );
 
-MacroButton.displayName = 'MacroButton';
-
-/**
- * Macro Item Component
- */
 const MacroItem = ({
     macro,
     onRun,
@@ -105,7 +100,6 @@ const MacroItem = ({
                 onMacroRun={onMacroRun}
                 disabled={disabled}
                 macro={macro}
-                className="h-8 text-sm"
             />
 
             <DropdownMenu>

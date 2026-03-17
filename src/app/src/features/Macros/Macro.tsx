@@ -46,16 +46,12 @@ import { WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED } from '../../constants';
 import DroppableColumn, { Actions } from './DroppableColumn';
 
 type ContainerProps = {
-    columns: number;
     children: React.ReactNode;
 };
 
-const Container = ({ columns, children }: ContainerProps) => {
-    const arr = new Array(columns).fill(columns);
-    const gridTemplateColumns = arr.reduce((acc) => acc + ' 1fr', '');
-
+const Container = ({ children }: ContainerProps) => {
     return (
-        <div className="grid grid-cols-[1fr_1fr] absolute h-full w-full gap-1">
+        <div className="grid grid-cols-2 absolute h-full w-full gap-1">
             {children}
         </div>
     );
@@ -241,22 +237,25 @@ const Macro = ({ state, actions, workflow }: MacroProps) => {
     const disabled = !canRunMacro();
     const { column1, column2 } = columns;
 
+    if (macros.length === 0) {
+        return (
+            <div className="flex flex-col gap-1 p-1 h-full justify-center items-center">
+                <p className="text-center dark:text-white">
+                    No Macros...
+                </p>
+            </div>
+        );
+    }
+
     return (
         <>
-            {macros.length === 0 ? (
-                <div className="flex gap-1 p-1 h-full">
-                    <div className="w-full flex justify-center items-center dark:text-white">
-                        No Macros...
-                    </div>
-                </div>
-            ) : (
                 <DndContext
                     sensors={sensors}
                     onDragStart={handleDragStart}
                     onDragOver={handleDragOver}
                     onDragEnd={handleDragEnd}
                 >
-                    <Container columns={2}>
+                    <Container>
                         <SortableContext
                             items={column1.items.map((item) => item.id)}
                             strategy={verticalListSortingStrategy}
@@ -292,7 +291,6 @@ const Macro = ({ state, actions, workflow }: MacroProps) => {
                         ) : null}
                     </DragOverlay>
                 </DndContext>
-            )}
         </>
     );
 };
