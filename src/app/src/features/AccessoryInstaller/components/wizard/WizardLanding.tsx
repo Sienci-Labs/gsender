@@ -143,7 +143,7 @@ export function WizardLanding({
                             </h3>
                             <p className="text-gray-600 dark:text-gray-400">
                                 Follow along in our{' '}
-                                <a href="#" className="text-blue-500 font-bold">
+                                <a href="#https://resources.sienci.com/" target="_blank" className="text-blue-500 font-bold">
                                     online resources
                                 </a>
                             </p>
