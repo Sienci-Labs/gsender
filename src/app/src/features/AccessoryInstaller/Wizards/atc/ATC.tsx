@@ -74,7 +74,7 @@ export function useSienciATCWizard(): Wizard {
                                     title: 'Learn More',
                                     content:
                                         'View our online resources for a full list of settings changes.',
-                                    url: 'https://example.com/docs',
+                                    url: 'https://resources.sienci.com/view/atc-software/',
                                 },
                             ],
                         },
