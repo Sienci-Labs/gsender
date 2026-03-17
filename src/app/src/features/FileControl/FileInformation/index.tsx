@@ -103,7 +103,7 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                         <span className="ml-6 dark:text-white">
                             Recent Files
                         </span>
-                        <ScrollArea className="ml-2 px-2 max-xl:h-26 h-28 portrait:mb-5 bg-white dark:bg-dark rounded-xl border-2 dark:border-dark-lighter">
+                        <ScrollArea className="ml-2 px-2 h-28 max-xl:h-[6.5rem] portrait:mb-5 bg-white dark:bg-dark rounded-xl border-2 dark:border-dark-lighter">
                             <div className="grid divide-y items-center mr-2">
                                 {recentFiles.map(
                                     (file, index) =>
