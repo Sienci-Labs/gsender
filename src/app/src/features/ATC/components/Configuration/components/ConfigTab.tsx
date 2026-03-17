@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router';
 import {
     Card,
     CardContent,
@@ -8,13 +9,6 @@ import {
 import { Switch } from 'app/components/shadcn/Switch';
 import { Input } from 'app/components/shadcn/Input';
 import { Label } from 'app/components/shadcn/Label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from 'app/components/shadcn/Select';
 import { Button } from 'app/components/Button';
 import { PositionInput } from './PositionInput';
 import { useConfigContext } from 'app/features/ATC/components/Configuration/hooks/useConfigStore';
@@ -22,6 +16,7 @@ import cn from 'classnames';
 import OffsetManagementWidget from 'app/features/ATC/components/Configuration/components/OffsetManagement.tsx';
 import { Spinner } from 'app/components/shadcn/Spinner';
 import {
+    ArrowRight,
     BookOpen,
     CheckCircle2,
     Crosshair,
@@ -37,6 +32,7 @@ export interface ConfigTabProps {
 }
 
 export const ConfigTab: React.FC = ({ uploading, uploadError }: ConfigTabProps) => {
+    const navigate = useNavigate();
     const {
         config,
         updateConfig,
@@ -54,34 +50,6 @@ export const ConfigTab: React.FC = ({ uploading, uploadError }: ConfigTabProps) 
     const iconClass = 'h-4 w-4 text-muted-foreground dark:text-white';
     const rackSize = config.variables._tc_slots.value || 0;
     const rackEnabled = rackSize > 0;
-
-    const handleRackSizeChange = (value: string) => {
-        const nextRackSize = parseInt(value, 10) || 0;
-        const nextVariables = {
-            ...config.variables,
-            _tc_slots: {
-                ...config.variables._tc_slots,
-                value: nextRackSize,
-            },
-            _tc_rack_enable: {
-                ...config.variables._tc_rack_enable,
-                value: nextRackSize === 0 ? 0 : 1,
-            },
-        };
-
-        if (nextRackSize === 0) {
-            nextVariables._irt_offset_mode = {
-                ...config.variables._irt_offset_mode,
-                value: 0,
-            };
-            nextVariables._ort_offset_mode = {
-                ...config.variables._ort_offset_mode,
-                value: 0,
-            };
-        }
-
-        updateConfig({ variables: nextVariables });
-    };
 
     const getStatusColor = () => {
         switch (status.type) {
@@ -109,60 +77,19 @@ export const ConfigTab: React.FC = ({ uploading, uploadError }: ConfigTabProps) 
                             <Crosshair className={`${iconClass} shrink-0`} />
                         </div>
                     </CardHeader>
-                    <CardContent className="p-5 py-1 min-h-[170px] flex flex-col justify-center gap-4">
-                        <div className="space-y-1">
-                            <Label className={labelClass}>Rack Size</Label>
-                            <div
-                                className={cn('w-52', {
-                                    [nonDefaultStyling]:
-                                        config.variables._tc_slots.value !==
-                                        config.variables._tc_slots.default,
-                                })}
-                            >
-                                <Select
-                                    value={String(rackSize)}
-                                    onValueChange={handleRackSizeChange}
-                                >
-                                    <SelectTrigger className="h-8 text-xs">
-                                        <SelectValue placeholder="Select size" />
-                                    </SelectTrigger>
-                                    <SelectContent className="z-[10001] bg-white dark:bg-slate-900 dark:text-gray-100">
-                                        <SelectItem value="0">
-                                            No tool rack
-                                        </SelectItem>
-                                        <SelectItem value="6">
-                                            Rack with 6 tools
-                                        </SelectItem>
-                                        <SelectItem value="12">
-                                            Rack with 12 tools
-                                        </SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
-                        <div
-                            className={cn(
-                                'space-y-1',
-                                !rackEnabled &&
-                                    'opacity-50 pointer-events-none',
-                            )}
+                    <CardContent className="p-5 min-h-[170px] flex flex-col justify-center gap-4">
+                        <p className="text-sm text-muted-foreground">
+                            Tool rack configuration — including rack size and position — is managed through the initial setup process. Re-run setup to reconfigure your rack.
+                        </p>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-fit"
+                            onClick={() => navigate('/tools/accessoryInstall/sienci-atc/initial-setup')}
                         >
-                            <Label className={labelClass}>Rack Position</Label>
-                            <PositionInput
-                                label="Tool Rack Position"
-                                position={config.slot1Position}
-                                onPositionChange={(position) =>
-                                    updatePosition(
-                                        'toolRack.slot1Position',
-                                        position,
-                                    )
-                                }
-                                onUseCurrent={() => setWorkspacePosition('P7')}
-                                disabled={!rackEnabled}
-                                actionLabel="Set Manually"
-                                hideLabel
-                            />
-                        </div>
+                            Go to Initial Setup
+                            <ArrowRight className="h-4 w-4 ml-1" />
+                        </Button>
                     </CardContent>
                 </Card>
 

@@ -226,6 +226,14 @@ export const ReactRoutes = () => {
                         path={'accessoryInstall'}
                         element={<AccessoryInstaller />}
                     />
+                    <Route
+                        path={'accessoryInstall/:wizardId'}
+                        element={<AccessoryInstaller />}
+                    />
+                    <Route
+                        path={'accessoryInstall/:wizardId/:subWizardId'}
+                        element={<AccessoryInstaller />}
+                    />
                 </Route>
                 <Route path="stats" element={<StatParent />}>
                     <Route index element={<Stats />} />
