@@ -22,13 +22,13 @@ export function Stats() {
                 >
                     <h1 className="text-3xl font-bold dark:text-white">Your Machine</h1>
                     <StatCard>
-                        <div className="grid grid-cols-2">
-                            <div className="px-4 flex flex-col gap-2">
+                        <div className="grid grid-cols-2 gap-2">
+                            <div className="flex flex-col gap-2">
                                 <CardHeader>Stats</CardHeader>
                                 <JobResultsChart />
                                 <StatTable />
                             </div>
-                            <div className="px-4 flex flex-col gap-2">
+                            <div className="flex flex-col gap-2">
                                 <CardHeader
                                     link={'/stats/jobs'}
                                     linkLabel={'More'}
