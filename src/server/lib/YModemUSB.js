@@ -3,6 +3,9 @@ import { ByteLengthParser } from '@serialport/parser-byte-length';
 import { ReadlineParser } from '@serialport/parser-readline';
 import { CRC } from 'crc-full';
 import bufferChunks from 'buffer-chunks';
+import logger from 'server/lib/logger';
+
+const log = logger('lib:ymodem');
 
 const SendSize = {
     0x01: 128,
@@ -49,7 +52,6 @@ export class YModem extends events.EventEmitter {
         super();
         this.comms = null;
         this.ByteReader = new ByteLengthParser({ length: 1 });
-        this.logger = console.log;
     }
 
     async sendFile(fileData, comms, progressCB) {
@@ -137,11 +139,11 @@ export class YModem extends events.EventEmitter {
             this.emit('progress', progress);
         }
 
-        this.logger('Finished sending packets');
+        log.info('sendFile: finished sending all packets');
 
         // [>>> EOT]
         this.comms.write([this.EOT]);
-        this.logger('[>>> EOT]');
+        log.info('sendFile: [>>> EOT] sent');
         this.comms.removeAllListeners('data');
         await sleep(100);
         this.comms.unpipe();
@@ -159,11 +161,16 @@ export class YModem extends events.EventEmitter {
         this.comms.pipe(this.ByteReader);
 
 
-        for (const fileData of files) {
+        log.info(`sendFiles: starting transfer of ${files.length} file(s)`);
+
+        for (let fileIndex = 0; fileIndex < files.length; fileIndex++) {
+            const fileData = files[fileIndex];
             // Empty file - add blank buffer
             if (!fileData.data) {
                 fileData.data = Buffer.alloc(0);
             }
+
+            log.info(`sendFiles: [${fileIndex + 1}/${files.length}] starting "${fileData.name}" (${fileData.data.byteLength} bytes)`);
 
             const header = this.createHeaderPacket(this.SOH, fileData.name, fileData.data.byteLength);
             this.comms.write(header);
@@ -173,7 +180,9 @@ export class YModem extends events.EventEmitter {
             try {
                 // eslint-disable-next-line no-await-in-loop
                 await this.waitForNextWithTimeout([this.C, this.ACK, this.NAK], 5000);
+                log.info(`sendFiles: header ACK/C received for "${fileData.name}"`);
             } catch (e) {
+                log.error(`sendFiles: timeout/error waiting for header ACK on "${fileData.name}": ${e.message}`);
                 this.emit('error', e.message);
                 throw e;
             }
@@ -237,15 +246,17 @@ export class YModem extends events.EventEmitter {
                 this.emit('progress', progress);
             }
 
+            log.info(`sendFiles: [${fileIndex + 1}/${files.length}] all packets sent for "${fileData.name}"`);
+
             // [>>> EOT]
             this.comms.write([this.EOT]);
-            this.logger('[>>> EOT]');
+            log.info(`sendFiles: [>>> EOT] sent for file "${fileData.name}"`);
 
             // eslint-disable-next-line no-await-in-loop
             await sleep(200);
         }
 
-        this.logger('Finished sending packets');
+        log.info('sendFiles: finished sending all files');
 
 
         this.comms.removeAllListeners('data');
@@ -268,9 +279,9 @@ export class YModem extends events.EventEmitter {
         const bound = function onCharRead(newData) {
             const newChar = newData[0];
             if (controlChars.includes(newChar)) {
-                this.logger(`[<<< ${DebugDict[newChar]}]`);
+                log.debug(`[<<< ${DebugDict[newChar]}]`);
                 if (newChar === this.NAK) {
-                    console.log('NAK SEEN');
+                    log.debug('NAK received during control char read');
                 }
                 this.comms.removeListener('data', bound);
                 callback(newChar);
@@ -281,7 +292,7 @@ export class YModem extends events.EventEmitter {
     }
 
     async sendDataPacket(packetNo, dataPacket) {
-        this.logger(`Sending frame: ${packetNo}.`);
+        log.debug(`Sending frame: ${packetNo}`);
 
         for (let retryCount = 1; retryCount <= 10; retryCount++) {
             // Create a fresh listener for each attempt
@@ -300,20 +311,18 @@ export class YModem extends events.EventEmitter {
             // eslint-disable-next-line no-unused-expressions
             waitForCCs.cancel?.();
 
-            console.log('result', result);
+            log.debug(`Frame ${packetNo} response: ${DebugDict[result] ?? result}`);
             if (result === this.ACK) {
                 break;
             } else if (result === this.NAK) {
                 retryCount -= 1;
-                this.logger(`NAK received for frame ${packetNo}, retransmitting.`);
+                log.warn(`NAK received for frame ${packetNo}, retransmitting`);
             } else if (result === this.CAN) {
-                this.logger(`Throw on data frame ${packetNo + 1}.`);
+                log.warn(`CAN received on frame ${packetNo}, aborting`);
                 this.emit('error', 'Operation cancelled by remote device.');
                 throw new Error('Operation cancelled by remote device.');
             } else {
-                this.logger(
-                    `Packet was not sent! Retrying... Retry No: ${retryCount}.`
-                );
+                log.debug(`Frame ${packetNo} timeout/no-ack, retry ${retryCount}`);
             }
 
             if (retryCount >= 9) {
@@ -345,7 +354,7 @@ export class YModem extends events.EventEmitter {
     createHeaderPacket(sendType, fileName, fileSize) {
         fileName = `/${fileName}`;
         const chosenSendSize = SendSize[sendType];
-        console.log(`File: ${fileName} Size: ${fileSize}`);
+        log.info(`createHeaderPacket: file="${fileName}" size=${fileSize}`);
 
 
         // Check if file size exceeds maximum allowed for transmission

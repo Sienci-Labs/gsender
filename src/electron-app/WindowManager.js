@@ -109,7 +109,7 @@ class WindowManager {
         remoteMain.enable(window.webContents);
         
         // Show or hide window toolbar
-        // window.removeMenu();
+        //window.removeMenu();
         window.webContents.once('did-finish-load', () => {
             window.setTitle(options.title);
         });

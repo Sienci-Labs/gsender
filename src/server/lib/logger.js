@@ -21,10 +21,21 @@
  *
  */
 
+import path from 'path';
 import util from 'util';
 import chalk from 'chalk';
 import winston from 'winston';
 import settings from '../config/settings';
+
+const getLogDir = () => {
+    try {
+        // eslint-disable-next-line global-require
+        const { app } = require('electron');
+        return app.getPath('userData');
+    } catch (e) {
+        return process.cwd();
+    }
+};
 
 // https://code.google.com/p/v8/wiki/JavaScriptStackTraceApi
 const getStackTrace = () => {
@@ -52,7 +63,7 @@ const logger = winston.createLogger({
             handleExceptions: true
         }),
         new winston.transports.File({
-            filename: 'gsender_server_log.txt',
+            filename: path.join(getLogDir(), 'gsender_server_log.txt'),
             level: 'info'
         })
     ]
