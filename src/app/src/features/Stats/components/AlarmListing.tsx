@@ -14,7 +14,11 @@ import { EmptyAlarmList } from 'app/features/Stats/components/EmptyAlarmList.tsx
 //     ERROR: '#ff0000',
 // };
 
-function AlarmItem({ alarm, key }: { alarm: FirmwareEvent; key: string }) {
+type AlarmItemProps = {
+    alarm: FirmwareEvent;
+};
+
+function AlarmItem({ alarm }: AlarmItemProps) {
     const [yyyy, mm, dd, hh, mi, _ss] = alarm.time.toString().split(/[:\-T.]+/);
 
     const isAlarm = alarm.type === 'ALARM';
@@ -24,7 +28,6 @@ function AlarmItem({ alarm, key }: { alarm: FirmwareEvent; key: string }) {
                 'border-l-2 border-red-500': isAlarm,
                 'border-l-2 border-orange-500': !isAlarm,
             })}
-            key={key}
         >
             <span
                 className={cx(
@@ -66,8 +69,8 @@ export function AlarmListing() {
     }
 
     return (
-        <div className="">
-            <ol className="relative overflow-y-auto fixed-tool-area">
+        <div className="min-h-0">
+            <ol className="relative">
                 {alarms.map((alarm) => (
                     <AlarmItem key={alarm.id} alarm={alarm} />
                 ))}
