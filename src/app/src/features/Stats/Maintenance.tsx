@@ -6,7 +6,7 @@ import { MaintenanceList } from 'app/features/Stats/components/MaintenanceList.t
 export function Maintenance() {
     return (
         <div className="grid grid-cols-6 grid-rows-6 gap-4 max-xl:gap-2 w-full h-full overflow-y-auto">
-            <div className="col-span-4 row-span-6 pr-8 max-xl:pr-0 mb-2">
+            <div className="col-span-4 row-span-6 pr-8 max-xl:pr-0">
                 <StatCard>
                     <CardHeader>Maintenance</CardHeader>
                     <div className="w-full flex flex-col">
