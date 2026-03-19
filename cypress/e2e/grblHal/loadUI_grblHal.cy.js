@@ -1,47 +1,40 @@
 describe('gSender UI Load Test', () => {
-  const APP_URL = 'http://localhost:8000/#/';
-  const MAX_RETRIES = 3;
-  
   beforeEach(() => {
     cy.viewport(1920, 1080);
   });
 
-  it('should load gSender UI with refresh on failure', () => {
-    function tryLoadUI(attempt = 1) {
-      cy.log(`Loading attempt ${attempt} of ${MAX_RETRIES}`);
-      
-      if (attempt === 1) {
-        cy.visit(APP_URL, { 
-          failOnStatusCode: false,
-          timeout: 30000 
-        });
-      } else {
-        cy.reload();
-      }
+  it('should load gSender UI', () => {
+    let startTime;
 
-      cy.wait(3000);
+    cy.then(() => {
+      startTime = performance.now();
+      cy.log(`Load started at: ${new Date().toISOString()}`);
+    });
 
-      // Check multiple indicators that UI has loaded
-      cy.get('body', { timeout: 5000 }).then(($body) => {
-        const hasButton = $body.find('button').length > 0;
-        const hasCOM = $body.text().includes('COM');
-        const hasConnection = $body.text().includes('Connect') || $body.text().includes('Connection');
-        
-        const uiLoaded = hasButton && (hasCOM || hasConnection);
-        
-        cy.log(`Buttons found: ${hasButton}, COM text: ${hasCOM}, Connection text: ${hasConnection}`);
-        
-        if (uiLoaded) {
-          cy.log('UI loaded successfully');
-        } else if (attempt < MAX_RETRIES) {
-          cy.log('UI not loaded, refreshing...');
-          tryLoadUI(attempt + 1);
-        } else {
-          throw new Error(`Failed to load UI after ${MAX_RETRIES} attempts`);
-        }
-      });
-    }
+    cy.visit('/', {
+      failOnStatusCode: false,
+      timeout: 30000
+    });
 
-    tryLoadUI();
+    cy.document().its('readyState').should('eq', 'complete');
+
+    // Only check UI rendered — remove hasCOM
+    cy.get('body', { timeout: 20000 }).should(($body) => {
+      const hasButton     = $body.find('button').length > 0;
+      const hasConnection = $body.text().includes('Connect') ||
+                            $body.text().includes('Connection');
+
+      expect(hasButton, 'buttons should exist').to.be.true;
+      expect(hasConnection, 'connection text should exist').to.be.true;
+    });
+
+    cy.then(() => {
+      const endTime  = performance.now();
+      const loadTime = ((endTime - startTime) / 1000).toFixed(2);
+      const status   = loadTime < 5 ? 'FAST' : loadTime < 10 ? 'ACCEPTABLE' : 'SLOW';
+
+      cy.log(`[${status}] UI load time: ${loadTime}s`);
+      cy.task('log', `[${status}] UI Load Time: ${loadTime}s`);
+    });
   });
 });

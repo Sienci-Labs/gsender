@@ -78,6 +78,7 @@
     "test": "tap test/*.js --no-timeout --node-arg=--require --node-arg=esbuild-register",
     "coveralls": "tap test/*.js --coverage --coverage-report=text-lcov --nyc-arg=--require --nyc-arg=esbuild-register | coveralls",
     "cy:run": "cypress run",
+    "test:grblhal": "npm run report:clean && (npx cypress run --headed --browser chrome --spec cypress/e2e/grblHal/A_grblHal_master_spec.cy.js || true) && npm run report:merge && npm run report:generate && npm run dashboard:generate && npm run dashboard:open",
     "report:clean": "if exist cypress\\reports rmdir /s /q cypress\\reports",
     "report:merge": "mochawesome-merge cypress/reports/mochawesome/.jsons/*.json -o cypress/reports/mochawesome/merged.json",
     "report:generate": "marge cypress/reports/mochawesome/merged.json -f report --reportDir cypress/reports/html --inline --charts",

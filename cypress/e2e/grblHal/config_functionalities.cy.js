@@ -3,8 +3,8 @@ describe('gSender Configuration and Firmware Test Suite', () => {
   beforeEach(() => {
     cy.viewport(2844, 1450);
     cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
-      maxRetries: 6,
-      waitTime: 6000,
+      maxRetries: 8,
+      waitTime: 8000,
       timeout: 5000
     });
   });

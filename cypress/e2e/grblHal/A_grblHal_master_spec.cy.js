@@ -14,7 +14,7 @@ describe('Master Test Suite - All Tests', () => {
 
   import('./jogging_usingkeybaord_grblhal.cy.js');
 
-  import('./jog_presets.spec.grblHal.cy.js');
+ import('./jog_presets.spec.grblHal.cy.js');
 
   import('./zeroing_operations.grblHal.cy.js');
 

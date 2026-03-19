@@ -37,11 +37,9 @@ describe('gSender XY Squaring Test', () => {
 
     // Step 5: Click on XY Squaring tool
     cy.log('Step 5: Opening XY Squaring tool...');
-    cy.get('div.w-full a:nth-of-type(4) > div')
-      .should('be.visible')
-      .click();
-    cy.wait(1500);
-    cy.log('XY Squaring tool opened');
+   cy.contains('div.rounded-lg', 'XY Squaring')
+  .should('be.visible')
+  .click();
 
     // Step 6: Click "Start XY Squaring" button
     cy.log('Step 6: Starting XY Squaring wizard...');

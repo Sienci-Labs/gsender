@@ -36,12 +36,11 @@ describe('Surfacing Test', () => {
     cy.log('Tools page opened');
 
     // Step 4: Click on Surfacing tool - using the link selector
-    cy.log('Step 4: Opening Surfacing tool...');
-    cy.get('div.w-full a:nth-of-type(1) > div')
-      .should('be.visible')
-      .click();
-    cy.wait(1500);
-    cy.log('Surfacing tool opened');
+  
+  cy.contains('h3', 'Surfacing')
+  .closest('div.rounded-lg')
+  .should('be.visible')
+  .click();
 
     // Step 5: Configure Width
     cy.log('Step 5: Setting width to 75mm');

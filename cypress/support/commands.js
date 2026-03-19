@@ -33,57 +33,47 @@
 //=======//
 //2.Load UI//   cy.loadUI(`${Cypress.config('baseUrl')}/#/configuration`, {
 //=======//
-Cypress.Commands.add('loadUI', (url, options = {}) => {
+Cypress.Commands.add('loadUI', (options = {}) => {
   const {
-    maxRetries = 3,
-    waitTime = 3000,
-    timeout = 5000,
+    timeout = 20000,
     viewport = { width: 1920, height: 1080 }
   } = options;
 
+  let startTime;
+
   cy.viewport(viewport.width, viewport.height);
 
-  function tryLoadUI(attempt = 1) {
-    cy.log(`Loading attempt ${attempt} of ${maxRetries}`);
+  cy.then(() => {
+    startTime = performance.now();
+    cy.log(`Load started at: ${new Date().toISOString()}`);
+  });
 
-    if (attempt === 1) {
-      cy.visit(url, {
-        failOnStatusCode: false,
-        timeout: 30000
-      });
-    } else {
-      cy.reload();
-    }
+  cy.visit('/', {
+    failOnStatusCode: false,
+    timeout: 30000
+  });
 
-    cy.wait(waitTime);
+  cy.document().its('readyState').should('eq', 'complete');
 
-    cy.get('body', { timeout }).then(($body) => {
-      const hasButton = $body.find('button').length > 0;
-      const hasCOM = $body.text().includes('COM');
-      const hasConnection =
-        $body.text().includes('Connect') ||
-        $body.text().includes('Connection');
+  // Only check UI is rendered — no port/hardware checks
+  cy.get('body', { timeout }).should(($body) => {
+    const hasButton     = $body.find('button').length > 0;
+    const hasConnection = $body.text().includes('Connect') ||
+                          $body.text().includes('Connection');
 
-      const uiLoaded = hasButton && (hasCOM || hasConnection);
+    expect(hasButton, 'buttons should exist').to.be.true;
+    expect(hasConnection, 'connection text should exist').to.be.true;
+  });
 
-      cy.log(
-        `Buttons found: ${hasButton}, COM text: ${hasCOM}, Connection text: ${hasConnection}`
-      );
+  cy.then(() => {
+    const endTime  = performance.now();
+    const loadTime = ((endTime - startTime) / 1000).toFixed(2);
+    const status   = loadTime < 5 ? 'FAST' : loadTime < 10 ? 'ACCEPTABLE' : 'SLOW';
 
-      if (uiLoaded) {
-        cy.log('UI loaded successfully');
-      } else if (attempt < maxRetries) {
-        cy.log('UI not loaded, refreshing...');
-        tryLoadUI(attempt + 1);
-      } else {
-        throw new Error(`Failed to load UI after ${maxRetries} attempts`);
-      }
-    });
-  }
-
-  tryLoadUI();
+    cy.log(`[${status}] UI load time: ${loadTime}s`);
+    cy.task('log', `[${status}] UI Load Time: ${loadTime}s`);
+  });
 });
-
 // ----------------------
 //3.Connect to CNC machine grbl cy.connectMachine();
 // ----------------------
@@ -1051,17 +1041,62 @@ Cypress.Commands.add('applySettings', (options = {}) => {
 
 // URL Definitions
 
-Cypress.Commands.add('loadUI', (url, options = {}) => {
-  cy.visit(url, { 
-    timeout: options.timeout || 30000,
-    failOnStatusCode: false
-  });
-  
-  // Wait for the app to be ready
-  cy.wait(options.waitTime || 2000);
-});
-  // You can also handle retries or waits here if needed
+Cypress.Commands.add('loadUI', (options = {}) => {
+  const {
+    timeout = 20000,
+    viewport = { width: 1920, height: 1080 }
+  } = options;
 
+  let startTime;
+
+  cy.viewport(viewport.width, viewport.height);
+
+  cy.then(() => {
+    startTime = performance.now();
+    cy.log(`Load started at: ${new Date().toISOString()}`);
+  });
+
+  // Uses baseUrl from cypress.config.js — no hardcoded URL
+  cy.visit('/', {
+    failOnStatusCode: false,
+    timeout: 30000
+  });
+
+  // Wait for real document readiness
+  cy.document().its('readyState').should('eq', 'complete');
+
+  // Cypress retries this block automatically until timeout
+  cy.get('body', { timeout }).should(($body) => {
+    const hasButton     = $body.find('button').length > 0;
+    const hasConnection = $body.text().includes('Connect') ||
+                          $body.text().includes('Connection');
+
+    expect(hasButton, 'buttons should exist').to.be.true;
+    expect(hasConnection, 'connection text should exist').to.be.true;
+  });
+
+  // Log load time after UI confirmed ready
+  cy.then(() => {
+    const endTime  = performance.now();
+    const loadTime = ((endTime - startTime) / 1000).toFixed(2);
+    const status   = loadTime < 5 ? 'FAST' : loadTime < 10 ? 'ACCEPTABLE' : 'SLOW';
+
+    cy.log(`[${status}] UI load time: ${loadTime}s`);
+    cy.task('log', `[${status}] UI Load Time: ${loadTime}s`);
+  });
+
+  cy.waitUntilIdle();
+});
+
+Cypress.Commands.add('waitUntilIdle', () => {
+  cy.get('body').then(($body) => {
+    if ($body.find('[data-cy="loading-spinner"]').length > 0) {
+      cy.get('[data-cy="loading-spinner"]', { timeout: 10000 })
+        .should('not.exist');
+    }
+    // If spinner never existed, skip silently
+  });
+});
 // Page URLs
 Cypress.Commands.add('goToCarve', () => {
   cy.visit('http://localhost:8000/#/');
