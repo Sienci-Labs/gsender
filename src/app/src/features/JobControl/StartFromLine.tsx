@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { JSX, useEffect, useState } from 'react';
 import cx from 'classnames';
 import { Button as ShadButton } from 'app/components/shadcn/Button';
 import { Button } from 'app/components/Button';
@@ -22,6 +22,7 @@ import { useSelector } from 'react-redux';
 import { useWidgetState } from 'app/hooks/useWidgetState';
 import pubsub from 'pubsub-js';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { convertToImperial } from 'app/lib/units';
 
 type StartFromLineProps = {
     disabled: boolean;
@@ -42,27 +43,39 @@ const StartFromLine = ({
     atcValidator,
 }: StartFromLineProps) => {
     const zMax = useTypedSelector((state) => state.file.bbox.max.z);
-    const { units } = useWorkspaceState();
+    const { units, safeRetractHeight } = useWorkspaceState();
+    const { delay = 0 } = useWidgetState('spindle');
+    const lineTotal = useSelector((state: RootState) => state.file.total);
+
+    const calculateSafeHeight = () => {
+        if (safeRetractHeight === 0) {
+            return units === METRIC_UNITS ? 10 : 0.4;
+        } else {
+            return units === METRIC_UNITS
+                ? safeRetractHeight
+                : convertToImperial(safeRetractHeight);
+        }
+    };
+
     const [state, setState] = useState({
         showModal: false,
         needsRecovery: false,
         value: lastLine,
         startFromLine: lastLine - 10 >= 0 ? lastLine - 10 : 0,
         waitForHoming: false,
-        safeHeight: units === METRIC_UNITS ? 10 : 0.4,
+        useDefaultSafe: safeRetractHeight === 0,
+        safeHeight: calculateSafeHeight(),
         defaultSafeHeight: units === METRIC_UNITS ? 10 : 0.4,
     });
-    const { delay = 0 } = useWidgetState('spindle');
-
-    const lineTotal = useSelector((state: RootState) => state.file.total);
 
     // update units for safe height
     useEffect(() => {
         setState({
             ...state,
-            safeHeight: units === METRIC_UNITS ? 10 : 0.4,
+            safeHeight: calculateSafeHeight(),
+            defaultSafeHeight: units === METRIC_UNITS ? 10 : 0.4,
         });
-    }, [units]);
+    }, [units, safeRetractHeight]);
 
     const handleStartFromLine = () => {
         const { safeHeight, startFromLine } = state;
@@ -221,8 +234,8 @@ const StartFromLine = ({
                         <div className="mb-4">
                             <p className="text-[#E2943B]">
                                 Calculates all your CNC movements, attributes,
-                                and gSender automations to pick up right where you
-                                left off.
+                                and gSender automations to pick up right where
+                                you left off.
                             </p>
                         </div>
                         <div className="flex justify-center">
