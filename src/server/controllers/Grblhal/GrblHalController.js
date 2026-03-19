@@ -40,6 +40,7 @@ import delay from '../../lib/delay';
 import ensurePositiveNumber from '../../lib/ensure-positive-number';
 import evaluateAssignmentExpression from '../../lib/evaluate-assignment-expression';
 import logger from '../../lib/logger';
+import debugLog from '../../lib/debugLog';
 import translateExpression from '../../lib/translate-expression';
 import config from '../../services/configstore';
 import monitor from '../../services/monitor';
@@ -2481,20 +2482,39 @@ class GrblHalController {
             },
             'ymodem:uploadFiles': () => {
                 const [files] = args;
+                debugLog(`ymodem:uploadFiles: handler entered, files=${Array.isArray(files) ? files.length : typeof files} items`);
+                if (Array.isArray(files)) {
+                    files.forEach((f, i) => {
+                        const dataDesc = f.data == null ? 'null' : (f.data.constructor?.name ?? typeof f.data);
+                        debugLog(`ymodem:uploadFiles: file[${i}] name="${f.name}" size=${f.size} dataType=${dataDesc}`);
+                    });
+                }
                 console.log(files);
                 console.log(args);
                 this.command('sdcard:mount');
+                debugLog('ymodem:uploadFiles: sdcard:mount sent, starting 1500ms wait');
                 setTimeout(async () => {
-                    if (this.runner.isSDMounted()) {
+                    const mounted = this.runner.isSDMounted();
+                    debugLog(`ymodem:uploadFiles: setTimeout fired, isSDMounted=${mounted}`);
+                    if (mounted) {
                         if (this.connection.isNetwork()) {
+                            debugLog('ymodem:uploadFiles: using FTP path');
                             const [address] = this.connection.getFTPInfo();
                             const FTPPort = Number(this.runner.getSetting('$308', 21));
                             await this.ftpClient.openConnection(address, FTPPort, 'grblHAL', 'grblHAL');
                             await this.ftpClient.sendFiles(files);
                             return;
                         }
-                        this.ymodem.sendFiles(files, this.connection.getConnectionObject());
+                        const conn = this.connection.getConnectionObject();
+                        debugLog(`ymodem:uploadFiles: conn=${conn ? 'valid' : 'null/undefined'}, calling sendFiles`);
+                        try {
+                            this.ymodem.sendFiles(files, conn);
+                        } catch (e) {
+                            debugLog(`ymodem:uploadFiles: sendFiles threw synchronously: ${e.message}`);
+                            this.emit('ymodem:error', e.message);
+                        }
                     } else {
+                        debugLog('ymodem:uploadFiles: isSDMounted=false, emitting error');
                         this.emit('ymodem:error', 'SD Card failed to mount, unable to upload files.');
                     }
                 }, 1500);

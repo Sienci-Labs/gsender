@@ -153,6 +153,8 @@ export class YModem extends events.EventEmitter {
     }
 
     async sendFiles(files, comms) {
+        log.info(`sendFiles: starting transfer of ${files.length} file(s)`);
+        debugLog(`sendFiles: starting transfer of ${files.length} file(s)`);
         this.comms = comms;
         this.emit('start');
         await sleep(500);
@@ -161,15 +163,23 @@ export class YModem extends events.EventEmitter {
         this.comms.removeAllListeners('data');
         this.comms.pipe(this.ByteReader);
 
-
-        log.info(`sendFiles: starting transfer of ${files.length} file(s)`);
-        debugLog(`sendFiles: starting transfer of ${files.length} file(s)`);
-
         for (let fileIndex = 0; fileIndex < files.length; fileIndex++) {
             const fileData = files[fileIndex];
             // Empty file - add blank buffer
             if (!fileData.data) {
                 fileData.data = Buffer.alloc(0);
+            } else if (!Buffer.isBuffer(fileData.data)) {
+                if (typeof fileData.content === 'string') {
+                    debugLog(`sendFiles: converting content string to Buffer for "${fileData.name}"`);
+                    fileData.data = Buffer.from(fileData.content, 'utf8');
+                } else if (typeof fileData.data === 'string') {
+                    debugLog(`sendFiles: converting data string to Buffer for "${fileData.name}"`);
+                    fileData.data = Buffer.from(fileData.data, 'utf8');
+                } else {
+                    debugLog(`sendFiles: data is unexpected type ${fileData.data?.constructor?.name} for "${fileData.name}", converting`);
+                    fileData.data = Buffer.from(fileData.data);
+                }
+                fileData.size = fileData.data.byteLength;
             }
 
             log.info(`sendFiles: [${fileIndex + 1}/${files.length}] starting "${fileData.name}" (${fileData.data.byteLength} bytes)`);

@@ -46,6 +46,7 @@ import DFUFlasher from '../../lib/Firmware/Flashing/DFUFlasher';
 import delay from '../../lib/delay';
 import Connection from '../../lib/Connection';
 import { VISUALIZER_SECONDARY } from '../../../app/src/constants';
+import debugLog from '../../lib/debugLog';
 
 const log = logger('service:cncengine');
 
@@ -536,6 +537,10 @@ class CNCEngine {
 
             socket.on('command', (port, cmd, ...args) => {
                 log.debug(`socket.command("${port}", "${cmd}"): id=${socket.id}`);
+
+                if (cmd === 'ymodem:uploadFiles' || cmd === 'ymodem:upload') {
+                    debugLog(`CNCEngine: received socket command="${cmd}" port="${port}" connected=${!this.connection?.isClose()}`);
+                }
 
                 if (!this.connection || this.connection.isClose()) {
                     log.error(`Serial port "${port}" not accessible`);

@@ -64,6 +64,7 @@ export function getTemplateMacros(): Macro[] {
         };
 
         data.name = macro.name;
+        data.content = macro.content;
         data.data = new Blob([macro.content]);
         data.size = data.data.size;
         blobs.push(data);
@@ -87,10 +88,12 @@ export function generateAllMacros(
 }
 
 export function writeableATCIConfig(json: ATCIJSON): Macro {
-    const data = new Blob([JSON.stringify(json) + '\n']);
+    const jsonString = JSON.stringify(json) + '\n';
+    const data = new Blob([jsonString]);
     return {
         name: 'ATCI.macro',
         data,
+        content: jsonString,
         size: data.size,
     };
 }
