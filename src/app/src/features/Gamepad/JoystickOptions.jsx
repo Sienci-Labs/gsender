@@ -54,7 +54,21 @@ const JoystickOptions = () => {
         { label: 'Y', value: 'y' },
         { label: 'Z', value: 'z' },
         { label: 'A', value: 'a' },
+        { label: 'Feed+/-', value: 'feed+/-' },
+        { label: 'Feed++/--', value: 'feed++/--' },
+        { label: 'Spindle+/-', value: 'spindle+/-' },
+        { label: 'Spindle++/--', value: 'spindle++/--' },
     ];
+
+    // Helper to get proper display label for action values
+    const getActionLabel = (value) => {
+        if (value === null) return 'None';
+        // Override actions - return as-is with proper capitalization
+        if (value?.startsWith('feed') || value?.startsWith('spindle')) {
+            return value.charAt(0).toUpperCase() + value.slice(1);
+        }
+        return String(value).toUpperCase();
+    };
 
     const profile = getGamepadProfile(currentProfile);
 
@@ -133,11 +147,7 @@ const JoystickOptions = () => {
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: get(stick1, 'horizontal.primaryAction', null)
-                            ? String(
-                                  get(stick1, 'horizontal.primaryAction'),
-                              ).toUpperCase()
-                            : 'None',
+                        label: getActionLabel(get(stick1, 'horizontal.primaryAction', null)),
                         value: get(stick1, 'horizontal.primaryAction', null),
                     }}
                     onChange={({ value }) =>
@@ -158,11 +168,7 @@ const JoystickOptions = () => {
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: get(stick1, 'horizontal.secondaryAction', null)
-                            ? String(
-                                  get(stick1, 'horizontal.secondaryAction'),
-                              ).toUpperCase()
-                            : 'None',
+                        label: getActionLabel(get(stick1, 'horizontal.secondaryAction', null)),
                         value: get(stick1, 'horizontal.secondaryAction', null),
                     }}
                     onChange={({ value }) =>
@@ -200,11 +206,7 @@ const JoystickOptions = () => {
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: get(stick1, 'vertical.primaryAction', null)
-                            ? String(
-                                  get(stick1, 'vertical.primaryAction'),
-                              ).toUpperCase()
-                            : 'None',
+                        label: getActionLabel(get(stick1, 'vertical.primaryAction', null)),
                         value: get(stick1, 'vertical.primaryAction', null),
                     }}
                     onChange={({ value }) =>
@@ -225,11 +227,7 @@ const JoystickOptions = () => {
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: get(stick1, 'vertical.secondaryAction', null)
-                            ? String(
-                                  get(stick1, 'vertical.secondaryAction'),
-                              ).toUpperCase()
-                            : 'None',
+                        label: getActionLabel(get(stick1, 'vertical.secondaryAction', null)),
                         value: get(stick1, 'vertical.secondaryAction', null),
                     }}
                     onChange={({ value }) =>
@@ -265,11 +263,7 @@ const JoystickOptions = () => {
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: get(stick1, 'mpgMode.primaryAction', null)
-                            ? String(
-                                  get(stick1, 'mpgMode.primaryAction'),
-                              ).toUpperCase()
-                            : 'None',
+                        label: getActionLabel(get(stick1, 'mpgMode.primaryAction', null)),
                         value: get(stick1, 'mpgMode.primaryAction', null),
                     }}
                     onChange={({ value }) =>
@@ -289,11 +283,7 @@ const JoystickOptions = () => {
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: get(stick1, 'mpgMode.secondaryAction', null)
-                            ? String(
-                                  get(stick1, 'mpgMode.secondaryAction'),
-                              ).toUpperCase()
-                            : 'None',
+                        label: getActionLabel(get(stick1, 'mpgMode.secondaryAction', null)),
                         value: get(stick1, 'mpgMode.secondaryAction', null),
                     }}
                     onChange={({ value }) =>
@@ -326,11 +316,7 @@ const JoystickOptions = () => {
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: get(stick2, 'horizontal.primaryAction', null)
-                            ? String(
-                                  get(stick2, 'horizontal.primaryAction'),
-                              ).toUpperCase()
-                            : 'None',
+                        label: getActionLabel(get(stick2, 'horizontal.primaryAction', null)),
                         value: get(stick2, 'horizontal.primaryAction'),
                     }}
                     onChange={({ value }) =>
@@ -351,11 +337,7 @@ const JoystickOptions = () => {
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: get(stick2, 'horizontal.secondaryAction', null)
-                            ? String(
-                                  get(stick2, 'horizontal.secondaryAction'),
-                              ).toUpperCase()
-                            : 'None',
+                        label: getActionLabel(get(stick2, 'horizontal.secondaryAction', null)),
                         value: get(stick2, 'horizontal.secondaryAction'),
                     }}
                     onChange={({ value }) =>
@@ -393,11 +375,7 @@ const JoystickOptions = () => {
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: get(stick2, 'vertical.primaryAction', null)
-                            ? String(
-                                  get(stick2, 'vertical.primaryAction'),
-                              ).toUpperCase()
-                            : 'None',
+                        label: getActionLabel(get(stick2, 'vertical.primaryAction', null)),
                         value: get(stick2, 'vertical.primaryAction'),
                     }}
                     onChange={({ value }) =>
@@ -418,11 +396,7 @@ const JoystickOptions = () => {
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: get(stick2, 'vertical.secondaryAction', null)
-                            ? String(
-                                  get(stick2, 'vertical.secondaryAction'),
-                              ).toUpperCase()
-                            : 'None',
+                        label: getActionLabel(get(stick2, 'vertical.secondaryAction', null)),
                         value: get(stick2, 'vertical.secondaryAction'),
                     }}
                     onChange={({ value }) =>
@@ -459,11 +433,7 @@ const JoystickOptions = () => {
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: get(stick2, 'mpgMode.primaryAction', null)
-                            ? String(
-                                  get(stick2, 'mpgMode.primaryAction'),
-                              ).toUpperCase()
-                            : 'None',
+                        label: getActionLabel(get(stick2, 'mpgMode.primaryAction', null)),
                         value: get(stick2, 'mpgMode.primaryAction'),
                     }}
                     onChange={({ value }) =>
@@ -484,11 +454,7 @@ const JoystickOptions = () => {
                     options={axesOptions}
                     placeholder={null}
                     value={{
-                        label: get(stick2, 'mpgMode.secondaryAction', null)
-                            ? String(
-                                  get(stick2, 'mpgMode.secondaryAction'),
-                              ).toUpperCase()
-                            : 'None',
+                        label: getActionLabel(get(stick2, 'mpgMode.secondaryAction', null)),
                         value: get(stick2, 'mpgMode.secondaryAction'),
                     }}
                     onChange={({ value }) =>

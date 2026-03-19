@@ -45,6 +45,7 @@ import jogWheeelLabels from './assets/labels.svg';
 import JogHelper from './utils/jogHelper';
 import { preventDefault } from 'app/lib/dom-events';
 import { checkThumbsticskAreIdle, JoystickLoop } from './JoystickLoop';
+import { OverrideLoop, checkThumbstickIsIdle, isOverrideAction } from './OverrideLoop';
 import { convertValue } from './utils/units';
 import reduxStore from 'app/store/redux';
 import { UNITS_EN } from 'app/definitions/general';
@@ -152,6 +153,7 @@ export function Jogging({ hideRotary = false }) {
     const [firmware, setFirmware] = useState<FirmwareFlavour>('Grbl');
 
     const joystickLoop = useRef<JoystickLoop | null>(null);
+    const overrideLoop = useRef<OverrideLoop | null>(null);
 
     const handleJoystickJog = useCallback(
         (
@@ -321,6 +323,90 @@ export function Jogging({ hideRotary = false }) {
                         return;
                     }
 
+                    // Check if any stick direction is configured for override actions
+                    const stick = get(joystickOptions, activeStick, null);
+                    if (stick) {
+                        const { horizontal, vertical } = stick;
+                        const horizontalAction = horizontal[actionType];
+                        const verticalAction = vertical[actionType];
+
+                        // Check if either direction is an override action
+                        const isHorizontalOverride = isOverrideAction(horizontalAction);
+                        const isVerticalOverride = isOverrideAction(verticalAction);
+
+                        if (isHorizontalOverride || isVerticalOverride) {
+                            const deadZone =
+                                (joystickOptions?.zeroThreshold || 30) / 100;
+
+                            // Read axis values directly from the gamepad rather than
+                            // relying on which axis triggered this event, since the
+                            // throttle (trailing edge) may swallow the override axis event.
+                            const horizontalAxisIndex = axis - (axis % 2); // 0 for stick1, 2 for stick2
+                            const verticalAxisIndex = horizontalAxisIndex + 1;
+                            const hValue = detail.gamepad.axes[horizontalAxisIndex];
+                            const vValue = detail.gamepad.axes[verticalAxisIndex];
+
+                            // Find an active override axis — prefer the one that's deflected
+                            let activeOverrideAction = null;
+                            let overrideAxisValue = 0;
+                            let overrideAxisIndex = null;
+                            let overrideIsReversed = false;
+                            let overrideIsVertical = false;
+
+                            if (isHorizontalOverride && !checkThumbstickIsIdle(hValue, deadZone)) {
+                                activeOverrideAction = horizontalAction;
+                                overrideAxisValue = hValue;
+                                overrideAxisIndex = horizontalAxisIndex;
+                                overrideIsReversed = horizontal.isReversed;
+                            } else if (isVerticalOverride && !checkThumbstickIsIdle(vValue, deadZone)) {
+                                activeOverrideAction = verticalAction;
+                                overrideAxisValue = vValue;
+                                overrideAxisIndex = verticalAxisIndex;
+                                overrideIsReversed = vertical.isReversed;
+                                overrideIsVertical = true;
+                            }
+
+                            if (activeOverrideAction) {
+                                let direction = overrideAxisValue > 0 ? 1 : -1;
+                                if (overrideIsVertical) {
+                                    direction = -direction;
+                                }
+                                if (overrideIsReversed) {
+                                    direction = -direction;
+                                }
+
+                                if (!overrideLoop.current) {
+                                    overrideLoop.current = new OverrideLoop({
+                                        gamepadProfile: currentProfile,
+                                    });
+                                }
+
+                                // Already running or within cooldown from last command
+                                if (overrideLoop.current.isRunning || !overrideLoop.current.canStart()) {
+                                    return;
+                                }
+
+                                overrideLoop.current.setOptions({
+                                    gamepadProfile: currentProfile,
+                                    action: activeOverrideAction,
+                                    direction,
+                                    activeAxis: overrideAxisIndex,
+                                });
+                                overrideLoop.current.start();
+                                return;
+                            }
+
+                            // Override axis is idle — stop loop if running
+                            if (overrideLoop.current && overrideLoop.current.isRunning) {
+                                overrideLoop.current.stop();
+                                return;
+                            }
+
+                            // If we get here, override axes are idle but non-override
+                            // axes might be active — fall through to normal jogging
+                        }
+                    }
+
                     const computeAxesAndDirection = (degrees: number) => {
                         const stick = get(joystickOptions, activeStick, null);
 
@@ -336,7 +422,7 @@ export function Jogging({ hideRotary = false }) {
                         const MOVEMENT_DISTANCE = 1;
 
                         const stickX = {
-                            axis: horizontal[actionType],
+                            axis: isOverrideAction(horizontal[actionType]) ? null : horizontal[actionType],
                             positiveDirection:
                                 MOVEMENT_DISTANCE *
                                 getDirection(horizontal.isReversed),
@@ -346,7 +432,7 @@ export function Jogging({ hideRotary = false }) {
                         };
 
                         const stickY = {
-                            axis: vertical[actionType],
+                            axis: isOverrideAction(vertical[actionType]) ? null : vertical[actionType],
                             positiveDirection:
                                 MOVEMENT_DISTANCE *
                                 getDirection(vertical.isReversed),
@@ -503,6 +589,9 @@ export function Jogging({ hideRotary = false }) {
 
                     if (thumbsticksAreIdle) {
                         joystickLoop.current.stop();
+                        if (overrideLoop.current) {
+                            overrideLoop.current.stop();
+                        }
                         return;
                     }
 
@@ -542,6 +631,10 @@ export function Jogging({ hideRotary = false }) {
             if (joystickLoop.current) {
                 joystickLoop.current.stop();
                 joystickLoop.current = null;
+            }
+            if (overrideLoop.current) {
+                overrideLoop.current.stop();
+                overrideLoop.current = null;
             }
         };
     }, [isConnected, handleJoystickJog]);
