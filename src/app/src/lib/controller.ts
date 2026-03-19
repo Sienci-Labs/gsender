@@ -551,8 +551,11 @@ class Controller {
     command(cmd: string, ...args: Array<any>): void {
         const { port } = this;
         if (!port) {
+            console.log('no port');
             return;
         }
+        console.log(port);
+        console.log('socket', this.socket);
         const socketArgs = [port, cmd, ...args];
         this.socket &&
             this.socket.emit.apply(this.socket, ['command', ...socketArgs]);
