@@ -516,10 +516,15 @@ class GrblHalController {
                     }
 
                     let tool = line.match(toolCommand);
+                    log.debug('Found tool');
                     if (tool && this.toolChangeContext.mappings) {
                         const remap = _.get(this.toolChangeContext.mappings, tool[2], null);
+
                         if (remap) {
+                            log.debug(`Mapping ${tool} to T${remap}`);
                             line = line.replace(tool[0], `T${remap}`);
+                        } else {
+                            log.debug(`no remap found for ${tool}`);
                         }
                     }
 
@@ -1718,9 +1723,6 @@ class GrblHalController {
                     gcode = gcode.replace(/\b(?:S\d* ?M[34]|M[34] ?S\d*)\b(?! ?G4 ?P?\b)/g, `$& G4 P${delay}`);
                 }*/
 
-                // Reset mappings on file load
-                this.toolChangeContext.mappings = {};
-
                 const ok = this.sender.load(name, gcode + '\n', context);
                 if (!ok) {
                     callback(new Error(`Invalid G-code: name=${name}`));
@@ -1843,10 +1845,12 @@ class GrblHalController {
                     modalGCode.push(`G0 G90 G21 Z${zMax + safeHeight}`);
                     // ATCI - add M6 before spindles turned on to get correct tool to spin up
                     if (atci && modal.tool !== 0) {
-                        if (this.toolChangeContext.mappings) {
+                        if (this.toolChangeContext.modal) {
                             const remap = _.get(this.toolChangeContext.mappings, modal.tool, null);
                             if (remap) {
                                 modalGCode.push(`M6 T${remap}`);
+                            } else {
+                                modalGCode.push(`M6 T${modal.tool}`);
                             }
                         } else {
                             modalGCode.push(`M6 T${modal.tool}`);
@@ -2377,6 +2381,7 @@ class GrblHalController {
             'toolchange:context': () => {
                 const [context] = args;
                 this.toolChangeContext = { ...this.toolChangeContext, ...context };
+                console.log(this.toolChangeContext);
             },
             'toolchange:pre': () => {
                 log.debug('Starting pre hook');

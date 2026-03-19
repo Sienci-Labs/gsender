@@ -127,7 +127,7 @@ export function WizardLanding({
                     <img
                         alt="Wizard image"
                         src={image ?? DefaultImage}
-                        className="w-[500px]"
+                        className="rounded-2xl"
                     />
                 </div>
 

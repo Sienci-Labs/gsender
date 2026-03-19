@@ -69,12 +69,12 @@ export function ToolTimeline({
     }, [toolTableData, rackSize]);
 
     useEffect(() => {
-        pubsub.subscribe('file:load', () => {
+        const token = pubsub.subscribe('file:load', () => {
             setMappings(new Map());
             updateToolchangeContext(new Map());
         });
         return () => {
-            pubsub.unsubscribe('file:loaded');
+            pubsub.unsubscribe(token);
         };
     }, []);
 
