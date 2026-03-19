@@ -335,7 +335,7 @@ export class YModem extends events.EventEmitter {
                 log.debug(`Frame ${packetNo} timeout/no-ack, retry ${retryCount}`);
             }
 
-            if (retryCount >= 9) {
+            if (retryCount >= 3) {
                 this.emit('error', 'Packet timed out after 10 retries.');
                 throw new Error(
                     `Packet timed out after ${retryCount} retries.`
@@ -365,13 +365,6 @@ export class YModem extends events.EventEmitter {
         fileName = `/${fileName}`;
         const chosenSendSize = SendSize[sendType];
         log.info(`createHeaderPacket: file="${fileName}" size=${fileSize}`);
-
-
-        // Check if file size exceeds maximum allowed for transmission
-        /*if (fileSize !== 0 && 0xff - 0x01 * chosenSendSize > fileSize) {
-            this.emit('error', 'File size too big');
-            throw new Error('Couldn\'t send file. File is too big.');
-        }*/
 
         const strFileSize = fileSize.toString();
 
