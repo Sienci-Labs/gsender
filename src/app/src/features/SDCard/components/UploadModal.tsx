@@ -66,8 +66,8 @@ export const UploadModal: React.FC<UploadModalProps> = ({
 
                 await uploadFileToSDCard({
                     name: selectedFile.name,
-                    size: selectedFile.size,
-                    data: new Blob([text], { type: 'text/plain' }),
+                    size: (text as string).length,
+                    content: text as string,
                 });
             };
             reader.readAsText(selectedFile);

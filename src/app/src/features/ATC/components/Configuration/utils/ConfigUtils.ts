@@ -10,9 +10,8 @@ import {
 
 export interface Macro {
     name: string;
-    data: Blob;
     size: number;
-    content?: string;
+    content: string;
 }
 
 function calculateOffsetValue(data: OffsetManagement): number {
@@ -43,33 +42,24 @@ export function generateP100(config: ConfigState, useValues: boolean): Macro {
         `(msg, ATCI|rack_size:${config.variables._tc_slots.value})`,
     ].join('\n');
 
-    const data = new Blob([content]);
-
     return {
         name: 'P100.macro',
-        data,
         content,
-        size: data.size,
+        size: content.length,
     };
 }
 
 export function getTemplateMacros(): Macro[] {
     const macros = store.get('widgets.atc.templates.macros', []);
-    const blobs: Macro[] = [];
+    const result: Macro[] = [];
     macros.forEach((macro: Macro) => {
-        let data: Macro = {
-            name: '',
-            data: new Blob([]),
-            size: 0,
-        };
-
-        data.name = macro.name;
-        data.content = macro.content;
-        data.data = new Blob([macro.content]);
-        data.size = data.data.size;
-        blobs.push(data);
+        result.push({
+            name: macro.name,
+            content: macro.content,
+            size: macro.content.length,
+        });
     });
-    return blobs;
+    return result;
 }
 
 export function generateAllMacros(
@@ -89,12 +79,10 @@ export function generateAllMacros(
 
 export function writeableATCIConfig(json: ATCIJSON): Macro {
     const jsonString = JSON.stringify(json) + '\n';
-    const data = new Blob([jsonString]);
     return {
         name: 'ATCI.macro',
-        data,
         content: jsonString,
-        size: data.size,
+        size: jsonString.length,
     };
 }
 

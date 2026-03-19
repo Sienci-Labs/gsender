@@ -62,12 +62,9 @@ export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
         // start macros copying over
         const config = store.get('widgets.atc.templates');
         const content = generateAllMacros(config, false); // To Clarify with Johann - We can't just use defaults here
-        console.log('[MacroConfiguration] content structure:', content?.length, content?.map((f: any) => ({ name: f?.name, size: f?.size, dataType: f?.data?.constructor?.name, hasContent: typeof f?.content === 'string' })));
         setSuccess(null);
         setError(null);
-        console.log('[MacroConfiguration] calling controller.command ymodem:uploadFiles');
         controller.command('ymodem:uploadFiles', content);
-        console.log('[MacroConfiguration] controller.command returned');
         //await new Promise((resolve) => setTimeout(resolve, 2000));
     };
 

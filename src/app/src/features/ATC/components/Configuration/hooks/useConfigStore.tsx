@@ -234,9 +234,7 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
 
         controller.addListener('ymodem:complete', handleComplete);
         controller.addListener('ymodem:error', handleError);
-        console.log('[applyConfig] calling ymodem:uploadFiles, files:', content?.length, content?.map((f: any) => ({ name: f?.name, size: f?.size, dataType: f?.data?.constructor?.name, hasContent: typeof f?.content === 'string' })));
         controller.command('ymodem:uploadFiles', content);
-        console.log('[applyConfig] controller.command returned');
     };
 
     const setWorkspacePosition = (workspace: string) => {

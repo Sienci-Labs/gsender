@@ -94,8 +94,8 @@ export const FileList: React.FC = () => {
 
                 await uploadFileToSDCard({
                     name: file.name,
-                    size: file.size,
-                    data: new Blob([text], { type: 'text/plain' }),
+                    size: (text as string).length,
+                    content: text as string,
                 });
                 fileInputRef.current.value = '';
             };

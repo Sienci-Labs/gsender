@@ -67,6 +67,18 @@ export class YModem extends events.EventEmitter {
         // Empty file - add blank buffer
         if (!fileData.data) {
             fileData.data = Buffer.alloc(0);
+        } else if (!Buffer.isBuffer(fileData.data)) {
+            if (typeof fileData.content === 'string') {
+                debugLog(`sendFile: converting content string to Buffer for "${fileData.name}"`);
+                fileData.data = Buffer.from(fileData.content, 'utf8');
+            } else if (typeof fileData.data === 'string') {
+                debugLog(`sendFile: converting data string to Buffer for "${fileData.name}"`);
+                fileData.data = Buffer.from(fileData.data, 'utf8');
+            } else {
+                debugLog(`sendFile: data is unexpected type ${fileData.data?.constructor?.name} for "${fileData.name}", converting`);
+                fileData.data = Buffer.from(fileData.data);
+            }
+            fileData.size = fileData.data.byteLength;
         }
 
         const header = this.createHeaderPacket(this.SOH, fileData.name, fileData.data.byteLength);
