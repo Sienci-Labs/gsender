@@ -31,7 +31,6 @@ import controller from 'app/lib/controller';
 import manualToolChange from 'app/wizards/manualToolchange';
 import semiautoToolChange from 'app/wizards/semiautoToolchange';
 import automaticToolChange from 'app/wizards/automaticToolchange';
-import semiautoToolchangeSecondRun from 'app/wizards/semiautoToolchangeSecondRun';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 // TODO: add worker types
 // @ts-ignore
@@ -645,10 +644,7 @@ export function* initialize(): Generator<any, void, any> {
                 instructions = manualToolChange;
             } else if (option === 'Flexible Re-zero') {
                 title = 'Flexible Re-zero Tool Change';
-                instructions =
-                    count > 1
-                        ? semiautoToolchangeSecondRun
-                        : semiautoToolChange;
+                instructions = semiautoToolChange(count)
             } else if (option === 'Fixed Tool Sensor') {
                 title = 'Fixed Tool Sensor Tool Change';
                 instructions = automaticToolChange(count);
