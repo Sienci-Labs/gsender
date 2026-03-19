@@ -127,18 +127,8 @@ export function ProfileBar() {
                     <MachineProfileSelector />
                 </div>
 
-                <div
-                    className={cx(
-                        'grid h-full max-w-lg font-medium divide-x max-sm:divide-x-0 max-sm:hidden',
-                        {
-                            'grid-cols-3': !isSienciMachine,
-                        },
-                        {
-                            'grid-cols-4': isSienciMachine,
-                        },
-                    )}
-                >
-                    {isSienciMachine && <RestoreDefaultDialog />}
+                <div className="grid grid-cols-4 h-full max-w-lg font-medium divide-x max-sm:divide-x-0 max-sm:hidden">
+                    <RestoreDefaultDialog isSienciMachine={isSienciMachine} />
                     <ActionButton
                         icon={<PiLightning />}
                         label="Flash"

@@ -10,9 +10,15 @@ import defaultMachineProfiles from 'app/features/Config/assets/MachineDefaults/d
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import store from 'app/store';
 import find from 'lodash/find';
+import { useRef } from 'react';
 
 export function MachineProfileSelector() {
-    const { setMachineProfile, machineProfile } = useSettings();
+    const { setMachineProfile, machineProfile, setProfileChangedSinceDefaults } = useSettings();
+    const baselineProfileId = useRef<number | null>(null);
+
+    if (baselineProfileId.current === null && machineProfile?.id !== undefined) {
+        baselineProfileId.current = machineProfile.id;
+    }
 
     function machineProfileLookup(idString) {
         const id = Number(idString);
@@ -28,6 +34,8 @@ export function MachineProfileSelector() {
         }
         store.replace('workspace.machineProfile', profile);
         setMachineProfile(profile);
+        const isSienci = profile.company === 'Sienci Labs';
+        setProfileChangedSinceDefaults(isSienci && id !== baselineProfileId.current);
     }
 
     return (
