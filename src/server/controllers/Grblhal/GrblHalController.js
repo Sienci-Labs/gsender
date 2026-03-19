@@ -2481,7 +2481,8 @@ class GrblHalController {
             },
             'ymodem:uploadFiles': () => {
                 const [files] = args;
-
+                console.log(files);
+                console.log(args);
                 this.command('sdcard:mount');
                 setTimeout(async () => {
                     if (this.runner.isSDMounted()) {

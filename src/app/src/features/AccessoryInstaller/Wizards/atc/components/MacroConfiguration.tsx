@@ -62,7 +62,7 @@ export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
         // start macros copying over
         const config = store.get('widgets.atc.templates');
         const content = generateAllMacros(config, false); // To Clarify with Johann - We can't just use defaults here
-
+        console.log('content', content);
         setSuccess(null);
         setError(null);
         controller.command('ymodem:uploadFiles', content);
