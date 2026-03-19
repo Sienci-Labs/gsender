@@ -336,7 +336,7 @@ export class YModem extends events.EventEmitter {
             }
 
             if (retryCount >= 3) {
-                this.emit('error', 'Packet timed out after 10 retries.');
+                this.emit('error', 'Packet timed out after 3 retries.');
                 throw new Error(
                     `Packet timed out after ${retryCount} retries.`
                 );
