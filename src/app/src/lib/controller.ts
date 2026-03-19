@@ -551,12 +551,34 @@ class Controller {
     command(cmd: string, ...args: Array<any>): void {
         const { port } = this;
         if (!port) {
+            if (cmd === 'ymodem:uploadFiles' || cmd === 'ymodem:upload') {
+                console.error(`[controller.command] DROPPED: no port — cmd="${cmd}"`);
+            }
             return;
         }
 
+        if (cmd === 'ymodem:uploadFiles' || cmd === 'ymodem:upload') {
+            console.log(`[controller.command] cmd="${cmd}" port="${port}" hasSocket=${!!this.socket} socketConnected=${(this.socket as any)?.connected}`);
+            if (Array.isArray(args[0])) {
+                args[0].forEach((f: any, i: number) => {
+                    const dataDesc = f?.data == null ? 'null' : (f.data?.constructor?.name ?? typeof f.data);
+                    console.log(`[controller.command]   file[${i}] name="${f?.name}" size=${f?.size} dataType=${dataDesc} hasContent=${typeof f?.content === 'string'}`);
+                });
+            }
+        }
+
         const socketArgs = [port, cmd, ...args];
-        this.socket &&
-            this.socket.emit.apply(this.socket, ['command', ...socketArgs]);
+        try {
+            this.socket &&
+                this.socket.emit.apply(this.socket, ['command', ...socketArgs]);
+            if (cmd === 'ymodem:uploadFiles' || cmd === 'ymodem:upload') {
+                console.log(`[controller.command] socket.emit returned (sync) for cmd="${cmd}"`);
+            }
+        } catch (e: any) {
+            if (cmd === 'ymodem:uploadFiles' || cmd === 'ymodem:upload') {
+                console.error(`[controller.command] socket.emit THREW for cmd="${cmd}": ${e?.message}`, e);
+            }
+        }
     }
 
     // Writes data to the serial port.
