@@ -4,6 +4,7 @@ import { ReadlineParser } from '@serialport/parser-readline';
 import { CRC } from 'crc-full';
 import bufferChunks from 'buffer-chunks';
 import logger from 'server/lib/logger';
+import debugLog from './debugLog';
 
 const log = logger('lib:ymodem');
 
@@ -162,6 +163,7 @@ export class YModem extends events.EventEmitter {
 
 
         log.info(`sendFiles: starting transfer of ${files.length} file(s)`);
+        debugLog(`sendFiles: starting transfer of ${files.length} file(s)`);
 
         for (let fileIndex = 0; fileIndex < files.length; fileIndex++) {
             const fileData = files[fileIndex];
@@ -171,6 +173,7 @@ export class YModem extends events.EventEmitter {
             }
 
             log.info(`sendFiles: [${fileIndex + 1}/${files.length}] starting "${fileData.name}" (${fileData.data.byteLength} bytes)`);
+            debugLog(`sendFiles: [${fileIndex + 1}/${files.length}] starting "${fileData.name}" (${fileData.data.byteLength} bytes)`);
 
             const header = this.createHeaderPacket(this.SOH, fileData.name, fileData.data.byteLength);
             this.comms.write(header);
@@ -181,8 +184,10 @@ export class YModem extends events.EventEmitter {
                 // eslint-disable-next-line no-await-in-loop
                 await this.waitForNextWithTimeout([this.C, this.ACK, this.NAK], 5000);
                 log.info(`sendFiles: header ACK/C received for "${fileData.name}"`);
+                debugLog(`sendFiles: header ACK/C received for "${fileData.name}"`);
             } catch (e) {
                 log.error(`sendFiles: timeout/error waiting for header ACK on "${fileData.name}": ${e.message}`);
+                debugLog(`sendFiles: timeout/error waiting for header ACK on "${fileData.name}": ${e.message}`);
                 this.emit('error', e.message);
                 throw e;
             }
@@ -247,16 +252,19 @@ export class YModem extends events.EventEmitter {
             }
 
             log.info(`sendFiles: [${fileIndex + 1}/${files.length}] all packets sent for "${fileData.name}"`);
+            debugLog(`sendFiles: [${fileIndex + 1}/${files.length}] all packets sent for "${fileData.name}"`);
 
             // [>>> EOT]
             this.comms.write([this.EOT]);
             log.info(`sendFiles: [>>> EOT] sent for file "${fileData.name}"`);
+            debugLog(`sendFiles: [>>> EOT] sent for file "${fileData.name}"`);
 
             // eslint-disable-next-line no-await-in-loop
             await sleep(200);
         }
 
         log.info('sendFiles: finished sending all files');
+        debugLog('sendFiles: finished sending all files');
 
 
         this.comms.removeAllListeners('data');
@@ -317,8 +325,10 @@ export class YModem extends events.EventEmitter {
             } else if (result === this.NAK) {
                 retryCount -= 1;
                 log.warn(`NAK received for frame ${packetNo}, retransmitting`);
+                debugLog(`NAK received for frame ${packetNo}, retransmitting`);
             } else if (result === this.CAN) {
                 log.warn(`CAN received on frame ${packetNo}, aborting`);
+                debugLog(`CAN received on frame ${packetNo}, aborting`);
                 this.emit('error', 'Operation cancelled by remote device.');
                 throw new Error('Operation cancelled by remote device.');
             } else {

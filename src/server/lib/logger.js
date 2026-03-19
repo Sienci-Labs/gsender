@@ -21,21 +21,69 @@
  *
  */
 
+import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import util from 'util';
 import chalk from 'chalk';
 import winston from 'winston';
+import Transport from 'winston-transport';
+import mkdirp from 'mkdirp';
+import isElectron from 'is-electron';
 import settings from '../config/settings';
 
 const getLogDir = () => {
-    try {
-        // eslint-disable-next-line global-require
-        const { app } = require('electron');
-        return app.getPath('userData');
-    } catch (e) {
-        return process.cwd();
+    if (process.env.GSENDER_USER_DATA) {
+        return process.env.GSENDER_USER_DATA;
     }
+    if (isElectron()) {
+        try {
+            // eslint-disable-next-line global-require
+            const { app } = require('electron');
+            if (app && app.getPath) {
+                return app.getPath('userData');
+            }
+        } catch (err) {
+            // fall through
+        }
+    }
+    return os.homedir();
 };
+
+// Custom file transport using appendFileSync — avoids stream-based failures in
+// packaged Electron builds where Winston's built-in File transport can silently
+// fail to open its write stream.
+class SyncFileTransport extends Transport {
+    constructor(opts = {}) {
+        super(opts);
+        this.filename = opts.filename;
+        this._ready = false;
+        try {
+            mkdirp.sync(path.dirname(this.filename));
+            // Verify we can write to the path by appending an empty string
+            fs.appendFileSync(this.filename, '');
+            this._ready = true;
+            console.log(`[logger] File transport active: ${this.filename}`);
+        } catch (err) {
+            console.error(`[logger] Failed to open log file at ${this.filename}:`, err);
+        }
+    }
+
+    log(info, callback) {
+        setImmediate(() => this.emit('logged', info));
+        if (!this._ready) {
+            callback();
+            return;
+        }
+        try {
+            const line = `${new Date().toISOString()} [${info.level}] ${info.message}\n`;
+            fs.appendFileSync(this.filename, line);
+        } catch (err) {
+            console.error('[logger] Write error:', err);
+        }
+        callback();
+    }
+}
 
 // https://code.google.com/p/v8/wiki/JavaScriptStackTraceApi
 const getStackTrace = () => {
@@ -47,6 +95,10 @@ const getStackTrace = () => {
 const VERBOSITY_MAX = 3; // -vvv
 
 const { combine, colorize, timestamp, printf } = winston.format;
+
+const logDir = getLogDir();
+const logFile = path.join(logDir, 'gsender_server_log.txt');
+console.log(`[logger] Log directory: ${logDir}`);
 
 // https://github.com/winstonjs/winston/blob/master/README.md#creating-your-own-logger
 const logger = winston.createLogger({
@@ -62,8 +114,8 @@ const logger = winston.createLogger({
             ),
             handleExceptions: true
         }),
-        new winston.transports.File({
-            filename: path.join(getLogDir(), 'gsender_server_log.txt'),
+        new SyncFileTransport({
+            filename: logFile,
             level: 'info'
         })
     ]
