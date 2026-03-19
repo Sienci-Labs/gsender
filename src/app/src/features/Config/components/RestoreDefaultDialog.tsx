@@ -18,6 +18,9 @@ import machineProfiles from 'app/features/Config/assets/MachineDefaults/defaultM
 import { toast } from 'app/lib/toaster';
 import controller from 'app/lib/controller.ts';
 import { resolveGrblCoreDefaults } from 'app/features/Config/utils/grblCoreMigration.ts';
+import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
+import { cn } from 'app/lib/utils.ts';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'app/components/shadcn/Tooltip.tsx';
 
 function getMachineProfile(id: number) {
     const profile = machineProfiles.find((profile) => profile.id === id);
@@ -79,7 +82,7 @@ function restoreEEPROMDefaults(
     });
 }
 
-export function RestoreDefaultDialog() {
+export function RestoreDefaultDialog({ isSienciMachine = false }: { isSienciMachine?: boolean }) {
     const isConnected = useSelector(
         (state: RootState) => state.connection.isConnected,
     );
@@ -90,39 +93,56 @@ export function RestoreDefaultDialog() {
         (state: RootState) => state.controller.settings.version?.semver,
     );
 
+    const { profileChangedSinceDefaults, setProfileChangedSinceDefaults } = useSettings();
+
     const machineProfile = store.get('workspace.machineProfile', {});
     const machineName = `${machineProfile.name} ${machineProfile.type}`;
     return (
-        <AlertDialog>
-            <AlertDialogTrigger asChild>
-                <ActionButton
-                    icon={<GrRevert />}
-                    label="Defaults"
-                    disabled={!isConnected}
-                />
-            </AlertDialogTrigger>
-            <AlertDialogContent className="bg-white">
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Restore Defaults</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        Are you sure you want to restore your{' '}
-                        <b>{machineName}</b> back to its default state?
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter className={'flex flex-col'}>
-                    <AlertDialogCancel>No</AlertDialogCancel>
-                    <AlertDialogAction
-                        onClick={() =>
-                            restoreEEPROMDefaults(
-                                controllerType,
-                                firmwareSemver,
-                            )
-                        }
-                    >
-                        Restore Defaults
-                    </AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
+        <TooltipProvider>
+            <Tooltip open={profileChangedSinceDefaults || undefined}>
+                <TooltipTrigger asChild>
+                    <div className={cn('ring rounded relative', {
+                        'ring-blue-400': profileChangedSinceDefaults,
+                        'ring-transparent': !profileChangedSinceDefaults,
+                    })}>
+                        {profileChangedSinceDefaults && (
+                            <span className="w-4 h-4 animate-ping absolute -top-2 -left-2 bg-blue-400 rounded-xl z-10" />
+                        )}
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <ActionButton
+                                    icon={<GrRevert />}
+                                    label="Defaults"
+                                    disabled={!isConnected || !isSienciMachine}
+                                />
+                            </AlertDialogTrigger>
+                            <AlertDialogContent className="bg-white">
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Restore Defaults</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        Are you sure you want to restore your{' '}
+                                        <b>{machineName}</b> back to its default state?
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter className={'flex flex-col'}>
+                                    <AlertDialogCancel>No</AlertDialogCancel>
+                                    <AlertDialogAction
+                                        onClick={() => {
+                                            restoreEEPROMDefaults(controllerType, firmwareSemver);
+                                            setProfileChangedSinceDefaults(false);
+                                        }}
+                                    >
+                                        Restore Defaults
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    </div>
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                    Make sure you click to apply your defaults to your controller
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
     );
 }
