@@ -205,11 +205,15 @@ class Sender extends events.EventEmitter {
                 }
 
                 while (!this.state.hold && (this.state.sent < this.state.total)) {
-                    // Remove leading and trailing whitespace from both ends of a string
-                    sp.line = sp.line || this.state.lines[this.state.sent].trim();
-
-                    if (this.dataFilter) {
-                        sp.line = this.dataFilter(sp.line, this.state.context) || '';
+                    // Remove leading and trailing whitespace from both ends of a string.
+                    // Only load and filter a fresh line when sp.line is empty; if sp.line is
+                    // already set, it was cached from a previous iteration where the buffer
+                    // was full — re-running dataFilter would double-remap tool numbers.
+                    if (!sp.line) {
+                        sp.line = this.state.lines[this.state.sent].trim();
+                        if (this.dataFilter) {
+                            sp.line = this.dataFilter(sp.line, this.state.context) || '';
+                        }
                     }
 
                     // The newline character (\n) consumed the RX buffer space
