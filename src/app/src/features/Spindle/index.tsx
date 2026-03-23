@@ -750,7 +750,7 @@ const SpindleWidget = () => {
 
     return (
         <Widget>
-            <div className="flex flex-col gap-4 justify-center items-center h-full">
+            <div className="flex flex-col gap-2 justify-center items-center h-full">
                 <div className="flex gap-2 justify-center w-full">
                     <ModalToggle
                         mode={givenMode}
