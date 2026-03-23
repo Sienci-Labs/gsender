@@ -11,9 +11,8 @@ describe('gSender Configuration and Firmware Test Suite', () => {
 
   it('Should reset, export, import gSender settings, restore firmware defaults, and perform searches', () => {
 
-    // --------------------------------------------------------
+    
     // Part 1: gSender Configuration Settings
-    // --------------------------------------------------------
     cy.log('Part 1: gSender Configuration Settings');
 
     cy.log('Connecting to CNC...');
@@ -65,9 +64,7 @@ describe('gSender Configuration and Firmware Test Suite', () => {
       });
     });
 
-    // --------------------------------------------------------
     // Part 2: Firmware Settings
-    // --------------------------------------------------------
 cy.log('Part 2: Firmware Settings');
 
 // Restore defaults
@@ -117,9 +114,7 @@ cy.get('body').then(($body) => {
     cy.get('section button > svg').first().click({ force: true });
   }
 });
-    // --------------------------------------------------------
     // Part 3: Search and View Modified Settings
-    // --------------------------------------------------------
     cy.log('Part 3: Search and View Modified');
 
     // All Config tab
