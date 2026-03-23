@@ -80,7 +80,7 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
         FlashingState.Idle,
     );
 
-    const [ports, unrecognizedPorts, otherPorts] = useTypedSelector((state) => [state.connection.ports, state.connection.unrecognizedPorts, [SLB_DFU_PORT]]);
+    const [ports, unrecognizedPorts] = useTypedSelector((state) => [state.connection.ports, [SLB_DFU_PORT, ...state.connection.unrecognizedPorts]]);
 
     function flashPort() {
         setFlashState(FlashingState.Flashing);
@@ -212,18 +212,7 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                                                     {p.port}
                                                 </SelectItem>
                                             ))}
-                                            {(unrecognizedPorts.length > 0 ||
-                                                otherPorts.length > 0) && <SelectSeparator />}
-                                        </SelectGroup>
-                                    )}
-                                    {otherPorts.length > 0 && (
-                                        <SelectGroup>
-                                            <SelectLabel className="text-gray-500 text-sm">Other Ports</SelectLabel>
-                                            {otherPorts.map((p) => (
-                                                <SelectItem key={p.port} value={p.port}>
-                                                    {p.port}
-                                                </SelectItem>
-                                            ))}
+                                            {unrecognizedPorts.length > 0 && <SelectSeparator />}
                                         </SelectGroup>
                                     )}
                                     {unrecognizedPorts.length > 0 && (
@@ -234,7 +223,6 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                                                     {p.port}
                                                 </SelectItem>
                                             ))}
-                                            {otherPorts.length > 0 && <SelectSeparator />}
                                         </SelectGroup>
                                     )}
                                 </SelectContent>

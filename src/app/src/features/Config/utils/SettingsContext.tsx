@@ -63,6 +63,8 @@ interface iSettingsContext {
     isSettingDefault: (v: gSenderSetting) => boolean;
     getEEPROMDefaultValue: (v: EEPROM) => string | number;
     isFirmwareCurrent: boolean;
+    profileChangedSinceDefaults: boolean;
+    setProfileChangedSinceDefaults?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 interface SettingsProviderProps {
@@ -106,6 +108,7 @@ const defaultState: iSettingsContext = {
     filterNonDefault: false,
     eepromIsDefault: (_v) => false,
     isFirmwareCurrent: false,
+    profileChangedSinceDefaults: false,
 };
 
 export const SettingsContext =
@@ -229,6 +232,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     const [settingsValues, setSettingsValues] = useState<gSenderSetting[]>([]);
     const [filterNonDefault, setFilterNonDefault] = useState(false);
     const [isFirmwareCurrent, setIsFirmwareCurrent] = useState(false);
+    const [profileChangedSinceDefaults, setProfileChangedSinceDefaults] = useState(false);
 
     const firmwareVersion = useTypedSelector(
         (state: RootState) => state.controller.settings.version?.semver,
@@ -646,6 +650,8 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         isSettingDefault,
         getEEPROMDefaultValue,
         isFirmwareCurrent,
+        profileChangedSinceDefaults,
+        setProfileChangedSinceDefaults,
     };
 
     return (

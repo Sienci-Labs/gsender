@@ -818,33 +818,36 @@ export function* initialize(): Generator<any, void, any> {
         );
     });
 
-    controller.addListener('sender:M0M1', (opts: { comment: string }) => {
-        const { comment = '' } = opts;
-        const msg =
-            'Hit ‘Close Window‘ if you want to do a tool change, jog, set a new zero, or perform any other operation then hit the standard ‘Resume Job’ button to keep cutting when you’re ready.';
+    controller.addListener(
+        'sender:M0M1',
+        (opts: { comment: string; ignoreEvent: boolean }) => {
+            const { comment = '', ignoreEvent = false } = opts;
+            const msg =
+                'Hit ‘Close Window‘ if you want to do a tool change, jog, set a new zero, or perform any other operation then hit the standard ‘Resume Job’ button to keep cutting when you’re ready.';
 
-        const content =
-            comment.length > 0 ? (
-                <div>
-                    <p>{msg}</p>
-                    <p>
-                        Comment: <b>{comment}</b>
-                    </p>
-                </div>
-            ) : (
-                msg
-            );
+            const content =
+                comment.length > 0 ? (
+                    <div>
+                        <p>{msg}</p>
+                        <p>
+                            Comment: <b>{comment}</b>
+                        </p>
+                    </div>
+                ) : (
+                    msg
+                );
 
-        Confirm({
-            title: 'M0/M1 Pause',
-            content,
-            confirmLabel: 'Resume Job',
-            cancelLabel: 'Close Window',
-            onConfirm: () => {
-                controller.command('gcode:resume');
-            },
-        });
-    });
+            Confirm({
+                title: 'M0/M1 Pause',
+                content,
+                confirmLabel: 'Resume Job',
+                cancelLabel: 'Close Window',
+                onConfirm: () => {
+                    controller.command('gcode:resume', ignoreEvent);
+                },
+            });
+        },
+    );
 
     controller.addListener('outline:start', () => {
         toast.success('Running file outline', { position: 'bottom-right' });

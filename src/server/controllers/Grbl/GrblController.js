@@ -272,6 +272,7 @@ class GrblController {
                     .replace(';', '') : '';
                 line = line.replace(commentMatcher, '')
                     .trim();
+                const ignoreEvent = context ? context.ignoreEvent : true;
                 context = this.populateContext(context);
 
                 if (line[0] === '%') {
@@ -297,7 +298,8 @@ class GrblController {
                         log.debug('Found M0/M1, pausing program');
                         this.emit('sender:M0M1', {
                             data: 'M0/M1',
-                            comment: commentString
+                            comment: commentString,
+                            ignoreEvent: ignoreEvent
                         });
                         return 'G4 P0.5';
                     }
@@ -465,13 +467,13 @@ class GrblController {
                         // Workaround for Carbide files - prevent M0 early from pausing program
                         if (sent > 10) {
                             this.workflow.pause({ data: 'M0', comment: commentString });
-                            this.command('gcode', `${WAIT}\n${PAUSE_START} ;${commentString}`);
+                            this.command('gcode', `${WAIT}\n${PAUSE_START} ;${commentString}`, { ignoreEvent: false });
                         }
                         line = line.replace('M0', '(M0)');
                     } else if (programMode === 'M1') {
                         log.debug(`M1 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);
                         this.workflow.pause({ data: 'M1', comment: commentString });
-                        this.command('gcode', `${WAIT}\n${PAUSE_START} ;${commentString}`);
+                        this.command('gcode', `${WAIT}\n${PAUSE_START} ;${commentString}`, { ignoreEvent: false });
                         line = line.replace('M1', '(M1)');
                     }
                 }
@@ -1694,7 +1696,8 @@ class GrblController {
                 this.command('gcode:resume');
             },
             'gcode:resume': async () => {
-                if (this.event.hasEnabledEvent(PROGRAM_RESUME)) {
+                const [ignoreEvents = false] = args;
+                if (!ignoreEvents && this.event.hasEnabledEvent(PROGRAM_RESUME)) {
                     this.feederCB = () => {
                         this.write('~');
                         this.workflow.resume();

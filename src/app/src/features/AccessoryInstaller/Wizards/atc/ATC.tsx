@@ -1,7 +1,7 @@
 import { Wizard } from 'app/features/AccessoryInstaller/types';
 import { useValidations } from 'app/features/AccessoryInstaller/hooks/UseValidations.tsx';
 import { useMemo } from 'react';
-import ATCiLogo from 'app/features/AccessoryInstaller/Wizards/atc/assets/placeholder_1.png';
+import ATCiLogo from 'app/features/AccessoryInstaller/Wizards/atc/assets/ATC_1.webp';
 import PlaceholderImageSd from './assets/placeholder_sd.png';
 import PlaceholderImageTwo from './assets/placeholder_2.png';
 import PlaceholderImageThree from './assets/placeholder_3.png';
