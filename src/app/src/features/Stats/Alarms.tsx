@@ -18,22 +18,25 @@ export function Alarms() {
             confirmLabel: 'Confirm',
             cancelLabel: 'Cancel',
             onConfirm: async () => {
-                await api.alarmList.clearAll().then((res) => {
-                    setAlarms([]);
-                });
+                await api.alarmList.clearAll();
+                setAlarms([]);
             },
         });
     }
 
     return (
-        <div className="grid grid-cols-6 grid-rows-6 gap-4 w-full h-full overflow-y-auto">
-            <div className="col-span-4 max-xl:col-span-6 row-span-6 pr-8 max-xl:pr-0 mb-2">
+        <div className="grid grid-cols-6 grid-rows-6 gap-4 w-full h-full min-h-0 overflow-hidden">
+            <div className="col-span-4 max-xl:col-span-6 row-span-6 min-h-0">
                 <StatCard>
-                    <CardHeader>Alarms & Errors</CardHeader>
-                    <AlarmListing />
+                    <div className="h-full flex flex-col min-h-0">
+                        <CardHeader>Alarms & Errors</CardHeader>
+                        <div className="flex-1 min-h-0 overflow-y-auto">
+                            <AlarmListing />
+                        </div>
+                    </div>
                 </StatCard>
             </div>
-            <div className="col-span-2 row-span-6 col-start-5 pl-8 max-xl:pl-0 flex flex-col max-xl:flex-row max-xl:col-span-6 max-xl:col-start-1 max-xl:-order-1 gap-4">
+            <div className="col-span-2 row-span-6 col-start-5 flex flex-col max-xl:flex-row max-xl:col-span-6 max-xl:col-start-1 max-xl:-order-1 gap-4 min-h-0">
                 <div className="max-xl:flex-1">
                     <StatCard>
                         <div className="h-full flex flex-col gap-4 max-xl:justify-center">

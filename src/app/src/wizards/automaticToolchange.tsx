@@ -44,6 +44,7 @@ const calculateMaxZProbeDistance = (_zProbeDistance = 30) => {
 
 const probeInitialToolStep = [{
     title: 'Starting Off',
+    firstRunOnly: true,
     substeps: [
         {
             title: 'Safety First',

@@ -63,6 +63,9 @@ const Step = ({ step, index = 1, active, complete }) => {
                 >
                     {step.title}
                 </span>
+                {step.firstRunOnly && (
+                    <span className={styles.firstRunBadge}>First Run Only</span>
+                )}
             </div>
         </div>
     );

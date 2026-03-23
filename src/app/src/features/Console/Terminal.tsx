@@ -91,7 +91,7 @@ const Terminal = (
                 scrollSensitivity: 0.5,
                 smoothScrollDuration: 100,
                 tabStopWidth: 4,
-                lineHeight: 1.4,
+                lineHeight: 1.2,
                 fontFamily:
                     'Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif',
                 fontSize: 14,

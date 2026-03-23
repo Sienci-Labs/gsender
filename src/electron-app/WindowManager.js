@@ -53,6 +53,7 @@ class WindowManager {
                     title: this.title,
                     width: this.width || 500,
                     height: this.height || 400,
+                    // Set minimum screen resolution
                     minWidth: 1024,
                     minHeight: 768,
                 });
@@ -106,7 +107,9 @@ class WindowManager {
         const webContents = window.webContents;
         // Enable remote API
         remoteMain.enable(window.webContents);
-        window.removeMenu();
+        
+        // Show or hide window toolbar
+        // window.removeMenu();
         window.webContents.once('did-finish-load', () => {
             window.setTitle(options.title);
         });

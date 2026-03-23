@@ -1,6 +1,7 @@
 import { Wizard } from 'app/features/AccessoryInstaller/types';
 import { useValidations } from 'app/features/AccessoryInstaller/hooks/UseValidations.tsx';
 import { useMemo } from 'react';
+import ATCiLogo from 'app/features/AccessoryInstaller/Wizards/atc/assets/placeholder_1.png';
 import PlaceholderImageSd from './assets/placeholder_sd.png';
 import PlaceholderImageTwo from './assets/placeholder_2.png';
 import PlaceholderImageThree from './assets/placeholder_3.png';
@@ -36,6 +37,7 @@ export function useSienciATCWizard(): Wizard {
         () => ({
             id: 'sienci-atc',
             title: 'Sienci ATC',
+            image: ATCiLogo,
             validations: [...validations],
             subWizards: [
                 {
@@ -66,13 +68,6 @@ export function useSienciATCWizard(): Wizard {
                                 {
                                     type: 'image',
                                     content: PlaceholderImageTwo,
-                                },
-                                {
-                                    type: 'link',
-                                    title: 'Learn More',
-                                    content:
-                                        'View our online resources for a full list of settings changes.',
-                                    url: 'https://example.com/docs',
                                 },
                             ],
                         },

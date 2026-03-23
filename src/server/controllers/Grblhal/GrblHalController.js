@@ -708,11 +708,6 @@ class GrblHalController {
                 if (this.homingStarted) {
                     this.homingStarted = false;
                 }
-            // Path B: No H flag — fall back to user-interaction-driven homing (older firmware)
-            } else if (this.homingStarted) {
-                this.hasHomedSet = true;
-                this.emit('homing:has-homed', this.hasHomedSet);
-                this.homingStarted = false;
             }
 
             this.actionMask.queryStatusReport = false;

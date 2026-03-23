@@ -1,10 +1,11 @@
 import { ArrowLeft, ArrowRight, HelpCircle } from 'lucide-react';
 import { SubWizard, ValidationResult } from '../../types/wizard';
 import { ValidationBanner } from 'app/features/AccessoryInstaller/components/wizard/ValidationBanner.tsx';
-import PlaceholderImage from '../../Wizards/atc/assets/placeholder_1.png';
+import DefaultImage from '../../Wizards/atc/assets/placeholder_1.png';
 
 interface WizardLandingProps {
     title: string;
+    image?: string;
     subWizards: SubWizard[];
     onSelectSubWizard: (subWizard: SubWizard) => void;
     onBack?: () => void;
@@ -13,6 +14,7 @@ interface WizardLandingProps {
 
 export function WizardLanding({
     title,
+    image,
     subWizards,
     onSelectSubWizard,
     onBack,
@@ -123,8 +125,8 @@ export function WizardLanding({
             <div className="w-2/5 portrait:w-full portrait:h-2/5 bg-gray-200 dark:bg-dark p-12 flex flex-col justify-between overflow-y-auto">
                 <div className="flex items-center justify-center flex-1">
                     <img
-                        alt="Placeholder starter image"
-                        src={PlaceholderImage}
+                        alt="Wizard image"
+                        src={image ?? DefaultImage}
                         className="w-[500px]"
                     />
                 </div>
@@ -141,7 +143,7 @@ export function WizardLanding({
                             </h3>
                             <p className="text-gray-600 dark:text-gray-400">
                                 Follow along in our{' '}
-                                <a href="#" className="text-blue-500 font-bold">
+                                <a href="https://resources.sienci.com/" target="_blank" className="text-blue-500 font-bold">
                                     online resources
                                 </a>
                             </p>

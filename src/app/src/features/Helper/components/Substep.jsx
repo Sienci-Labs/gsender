@@ -28,7 +28,7 @@ import { useWizardContext } from 'app/features/Helper/context';
 import Actions from './Actions';
 import styles from '../index.module.styl';
 
-const Substep = ({ step, index, stepIndex }) => {
+const Substep = ({ step, index, stepIndex, firstRunOnly }) => {
     const { activeSubstep, activeStep, completedStep, completedSubStep } =
         useWizardContext();
 
@@ -58,6 +58,11 @@ const Substep = ({ step, index, stepIndex }) => {
                 active={stepIsActive}
             />
             <div className={styles.substep} id={`step-${stepIndex}-${index}`}>
+                {firstRunOnly && (
+                    <div className={styles.firstRunBanner}>
+                        <strong>One-time setup</strong> — this step only runs on your first toolchange. It measures your initial tool so subsequent tools can be compared against it.
+                    </div>
+                )}
                 <span className={styles.substepTitle}>{step.title}</span>
                 <div className={cx({ [styles.hidden]: futureStep })}>
                     <span className={styles.substepDescription}>

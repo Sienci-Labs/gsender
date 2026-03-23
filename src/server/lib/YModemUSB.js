@@ -67,12 +67,11 @@ export class YModem extends events.EventEmitter {
         }
 
         const header = this.createHeaderPacket(this.SOH, fileData.name, fileData.data.byteLength);
-        console.log(header.length);
         this.comms.write(header);
 
         // [<<< C]
         try {
-            await this.waitForNextWithTimeout([this.C, this.ACK], 5000);
+            await this.waitForNextWithTimeout([this.C, this.ACK, this.NAK], 3000);
         } catch (e) {
             this.emit('error', e.message);
             throw e;
@@ -130,8 +129,7 @@ export class YModem extends events.EventEmitter {
             // eslint-disable-next-line no-await-in-loop
             await this.sendDataPacket(
                 packetNo,
-                dataPacket,
-                50
+                dataPacket
             );
 
             this.sentPackets = packetNo;
@@ -174,7 +172,7 @@ export class YModem extends events.EventEmitter {
 
             try {
                 // eslint-disable-next-line no-await-in-loop
-                await this.waitForNextWithTimeout([this.C, this.ACK], 5000);
+                await this.waitForNextWithTimeout([this.C, this.ACK, this.NAK], 5000);
             } catch (e) {
                 this.emit('error', e.message);
                 throw e;
@@ -231,8 +229,7 @@ export class YModem extends events.EventEmitter {
                 // eslint-disable-next-line no-await-in-loop
                 await this.sendDataPacket(
                     packetNo,
-                    dataPacket,
-                    50
+                    dataPacket
                 );
 
                 this.sentPackets = packetNo;
@@ -245,7 +242,7 @@ export class YModem extends events.EventEmitter {
             this.logger('[>>> EOT]');
 
             // eslint-disable-next-line no-await-in-loop
-            await sleep(150);
+            await sleep(200);
         }
 
         this.logger('Finished sending packets');
@@ -259,46 +256,57 @@ export class YModem extends events.EventEmitter {
     }
 
     waitForNext(controlChars) {
-        return new Promise((resolve) => {
-            this.onControlCharsRead(controlChars, resolve);
+        let cancel;
+        const promise = new Promise((resolve) => {
+            cancel = this.onControlCharsRead(controlChars, resolve);
         });
+        promise.cancel = cancel;
+        return promise;
     }
 
     onControlCharsRead(controlChars, callback) {
-        this.comms.on('data', function onCharRead(newData) {
+        const bound = function onCharRead(newData) {
             const newChar = newData[0];
             if (controlChars.includes(newChar)) {
                 this.logger(`[<<< ${DebugDict[newChar]}]`);
-                this.comms.removeListener('data', onCharRead);
+                if (newChar === this.NAK) {
+                    console.log('NAK SEEN');
+                }
+                this.comms.removeListener('data', bound);
                 callback(newChar);
             }
-        }.bind(this));
+        }.bind(this);
+        this.comms.on('data', bound);
+        return () => this.comms.removeListener('data', bound);
     }
 
-    async sendDataPacket(packetNo, dataPacket, sendDelay) {
+    async sendDataPacket(packetNo, dataPacket) {
         this.logger(`Sending frame: ${packetNo}.`);
 
-        const waitForCCs = this.waitForNext([
-            this.ACK,
-            this.NAK,
-            this.CAN,
-        ]);
-
         for (let retryCount = 1; retryCount <= 10; retryCount++) {
+            // Create a fresh listener for each attempt
+            const waitForCCs = this.waitForNext([
+                this.ACK,
+                this.NAK,
+                this.CAN,
+            ]);
+
             this.comms.write(dataPacket);
 
-            this.logger('delay:', sendDelay);
-            const timeout = sleep(sendDelay);
+            const timeout = sleep(3000);
             // eslint-disable-next-line no-await-in-loop
             const result = await Promise.race([waitForCCs, timeout]);
+            // Cancel the pending listener if timeout fired (result is undefined)
+            // eslint-disable-next-line no-unused-expressions
+            waitForCCs.cancel?.();
+
             console.log('result', result);
             if (result === this.ACK) {
                 break;
-            }
-            if (result === this.NAK) {
+            } else if (result === this.NAK) {
                 retryCount -= 1;
-            }
-            if (result === this.CAN) {
+                this.logger(`NAK received for frame ${packetNo}, retransmitting.`);
+            } else if (result === this.CAN) {
                 this.logger(`Throw on data frame ${packetNo + 1}.`);
                 this.emit('error', 'Operation cancelled by remote device.');
                 throw new Error('Operation cancelled by remote device.');
@@ -382,13 +390,11 @@ export class YModem extends events.EventEmitter {
 
         // Write CRC
         headerPacket.writeUInt16BE(dataCrc, bufferSize - 2);
-        console.log('headerPacket', headerPacket);
         return headerPacket;
     }
 
     splitFileToChunks(buf, chunkSize) {
         const chunks = bufferChunks(buf, chunkSize);
-        console.log('chunk', chunks);
         const lastChunk = chunks[chunks.length - 1];
 
         let isLastByteSOH = false;
@@ -438,7 +444,7 @@ export class YModem extends events.EventEmitter {
     }
 
     isLast(length, current) {
-        return length - 1 === current;
+        return length === current;
     }
 
 

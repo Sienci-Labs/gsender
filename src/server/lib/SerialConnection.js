@@ -206,12 +206,12 @@ class SerialConnection extends EventEmitter {
             return;
         }
 
-        console.log(`Conection to port ${ethernetPort}`);
+        console.log(`Connection to port ${ethernetPort}`);
 
         if (network || looksLikeIP) {
             this.connected = false;
             this.port = new net.Socket();
-            this.port.setTimeout(4000, () => {
+            this.port.setTimeout(2000, () => {
                 this.port.destroy();
                 this.port = null;
                 if (this.callback) {

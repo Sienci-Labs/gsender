@@ -193,7 +193,7 @@ const Steps = () => {
                         </div>
 
                         {!isConnected && (
-                            <div className="text-yellow-800 bg-yellow-100 text-sm p-4 xl:p-2 rounded-lg border flex flex-col gap-4 justify-center items-center text-center">
+                            <div className="text-yellow-800 bg-yellow-100 p-4 xl:p-2 rounded-lg border flex flex-col gap-4 justify-center items-center text-center">
                                 <p>
                                     Please connect to a device before starting
                                     the movement tuning wizard.
@@ -201,7 +201,7 @@ const Steps = () => {
                             </div>
                         )}
                     </div>
-                    <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-4 items-center">
                         <img
                             src={starterImage}
                             alt="Movement Tuning Example"

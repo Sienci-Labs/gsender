@@ -46,6 +46,7 @@ export interface ValidationResult {
 export interface Wizard {
     id: string;
     title: string;
+    image?: string;
     subWizards: SubWizard[];
     validations: (() => ValidationResult)[];
 }

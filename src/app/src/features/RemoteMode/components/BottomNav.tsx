@@ -21,7 +21,7 @@ export function BottomNavLink({ label, icon, href }) {
 
 export function BottomNav() {
     return (
-        <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-gray-100 border-t border-gray-400">
+        <div className="sticky bottom-0 left-0 z-50 w-full h-16 bg-gray-100 border-t border-gray-400">
             <div className="grid h-full max-w-lg grid-cols-4 mx-auto font-medium">
                 <BottomNavLink
                     href="/remote/"
