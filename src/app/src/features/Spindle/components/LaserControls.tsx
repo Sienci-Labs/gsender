@@ -62,14 +62,13 @@ const LaserControls = ({ actions, state, canClick, isConnected }: Props) => {
 
     return (
         <div>
-            <div className="flex justify-center">
+            <div className="flex justify-center gap-2">
                 <ActiveStateButton
                     onClick={actions.sendLaserM3}
                     icon={<FaLightbulb />}
                     text="Laser On"
                     active={isConnected && laserIsOn}
                     size={'sm'}
-                    className="max-xl:px-2"
                     disabled={!canClick}
                     tooltip={{ content: 'Turn on laser' }}
                 />
@@ -78,7 +77,6 @@ const LaserControls = ({ actions, state, canClick, isConnected }: Props) => {
                     icon={<FaSatelliteDish />}
                     text="Laser Test"
                     size={'sm'}
-                    className="max-xl:px-2"
                     disabled={!canClick}
                     tooltip={{
                         content: 'Turn on laser for Test Duration',
@@ -87,9 +85,8 @@ const LaserControls = ({ actions, state, canClick, isConnected }: Props) => {
                 <ActiveStateButton
                     onClick={actions.sendM5}
                     icon={<FaRegLightbulb />}
-                    text="Laser Off"
+                    text="Off"
                     size={'sm'}
-                    className="max-xl:px-2"
                     disabled={!canClick}
                     tooltip={{ content: 'Turn off laser' }}
                 />
