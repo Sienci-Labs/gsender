@@ -57,6 +57,9 @@ export class JoystickLoop {
         this.continuousJogDirection = null; // Current direction of continuous jog
         this.continuousJogStartTime = null; // When current jog command was sent
         this.continuousJogDuration = null; // Expected duration of current jog
+        this.lastVariableJogCommandTime = 0; // Rate limiting for incremental jog
+        this.variableAxisSmoothed = [0, 0, 0, 0]; // EMA smoothing for variable jog
+        this.horizontalDominantAxis = null; // Hysteresis for X/Y dominance
     }
 
     _getCurrentGamepad = () => {
@@ -86,7 +89,8 @@ export class JoystickLoop {
     };
 
     _getDirectionKey = (degrees) => {
-        if (inRange(degrees, 0, 22.5) || inRange(degrees, 337.5, 360)) return 'X+';
+        if (inRange(degrees, 0, 22.5) || inRange(degrees, 337.5, 360))
+            return 'X+';
         if (inRange(degrees, 22.5, 67.5)) return 'X+Y+';
         if (inRange(degrees, 67.5, 112.5)) return 'Y+';
         if (inRange(degrees, 112.5, 157.5)) return 'X-Y+';
@@ -95,6 +99,15 @@ export class JoystickLoop {
         if (inRange(degrees, 247.5, 292.5)) return 'Y-';
         if (inRange(degrees, 292.5, 337.5)) return 'X+Y-';
         return null;
+    };
+
+    _smoothVariableAxisValue = (axisIndex, rawValue) => {
+        const EMA_ALPHA = 0.35;
+        const previous = this.variableAxisSmoothed[axisIndex] ?? 0;
+        const smoothed = previous + EMA_ALPHA * (rawValue - previous);
+        this.variableAxisSmoothed[axisIndex] = smoothed;
+
+        return smoothed;
     };
 
     _computeJogMoveDuration = (axis, feedrate) => {
@@ -423,17 +436,71 @@ export class JoystickLoop {
             return;
         }
 
+        let filteredAxesData = [...axesData];
+        if (!fixedSpeedMode && activeAxis < 2) {
+            const HORIZONTAL_EFFECTIVE_IDLE_THRESHOLD = 0.14;
+            const HORIZONTAL_DOMINANCE_ENTER_RATIO = 1.8;
+            const HORIZONTAL_DOMINANCE_EXIT_RATIO = 1.35;
+            const stickBaseAxis = activeAxis < 2 ? 0 : 2;
+            const [xAxisRaw = 0, yAxisRaw = 0] = filteredAxesData;
+            const xAxis = this._smoothVariableAxisValue(
+                stickBaseAxis,
+                xAxisRaw,
+            );
+            const yAxis = this._smoothVariableAxisValue(
+                stickBaseAxis + 1,
+                yAxisRaw,
+            );
+            const absX = Math.abs(xAxis);
+            const absY = Math.abs(yAxis);
+
+            // Treat tiny XY stick movement as idle to avoid micro-jog spam.
+            if (
+                Math.max(absX, absY) < HORIZONTAL_EFFECTIVE_IDLE_THRESHOLD
+            ) {
+                this.horizontalDominantAxis = null;
+                return;
+            }
+
+            // Apply entry/exit hysteresis to prevent rapid X<->Y toggling.
+            if (this.horizontalDominantAxis === 'x') {
+                if (absY > absX * HORIZONTAL_DOMINANCE_ENTER_RATIO) {
+                    this.horizontalDominantAxis = 'y';
+                } else if (absX < absY * HORIZONTAL_DOMINANCE_EXIT_RATIO) {
+                    this.horizontalDominantAxis = null;
+                }
+            } else if (this.horizontalDominantAxis === 'y') {
+                if (absX > absY * HORIZONTAL_DOMINANCE_ENTER_RATIO) {
+                    this.horizontalDominantAxis = 'x';
+                } else if (absY < absX * HORIZONTAL_DOMINANCE_EXIT_RATIO) {
+                    this.horizontalDominantAxis = null;
+                }
+            } else if (absX > absY * HORIZONTAL_DOMINANCE_ENTER_RATIO) {
+                this.horizontalDominantAxis = 'x';
+            } else if (absY > absX * HORIZONTAL_DOMINANCE_ENTER_RATIO) {
+                this.horizontalDominantAxis = 'y';
+            }
+
+            if (this.horizontalDominantAxis === 'x') {
+                filteredAxesData = [xAxis, 0];
+            } else if (this.horizontalDominantAxis === 'y') {
+                filteredAxesData = [0, yAxis];
+            } else {
+                filteredAxesData = [xAxis, yAxis];
+            }
+        }
+
         const multiplier = [leftStick, leftStick, rightStick, rightStick][
             activeAxis
         ];
 
         const feedrate = this._computeFeedrate(
             numberOfAxes === 1
-                ? Math.max(...axesData.map((item) => Math.abs(item)))
+                ? Math.max(...filteredAxesData.map((item) => Math.abs(item)))
                 : multiplier,
         );
 
-        const updatedAxes = axesData.reduce((acc, curr, index) => {
+        const updatedAxes = filteredAxesData.reduce((acc, curr, index) => {
             const axesData = axes[index];
 
             if (!axesData) {
@@ -514,7 +581,10 @@ export class JoystickLoop {
                 controller.command('jog:cancel');
                 this.continuousJogActive = false;
                 needsNewCommand = true;
-            } else if (this.continuousJogStartTime && this.continuousJogDuration) {
+            } else if (
+                this.continuousJogStartTime &&
+                this.continuousJogDuration
+            ) {
                 // Check if current jog is near completion (80% done)
                 const elapsed = Date.now() - this.continuousJogStartTime;
                 if (elapsed >= this.continuousJogDuration * 0.8) {
@@ -537,12 +607,50 @@ export class JoystickLoop {
             this.continuousJogDirection = this.currentDirection;
             this.continuousJogStartTime = Date.now();
             // Calculate expected duration: distance / (feedrate in mm/ms)
-            this.continuousJogDuration = (JOG_DISTANCE / (feedrate / 60)) * 1000;
+            this.continuousJogDuration =
+                (JOG_DISTANCE / (feedrate / 60)) * 1000;
             return;
         }
 
         // Variable speed mode - use incremental jog commands
-        this.jog(updatedAxesWithOverride, feedrate);
+        // Normalize axis keys because profile mappings may use upper/lower case.
+        const axisKeys = Object.keys(updatedAxesWithOverride).map((key) =>
+            key.toLowerCase(),
+        );
+        const isHorizontalJog =
+            axisKeys.includes('x') || axisKeys.includes('y');
+        const MIN_VARIABLE_HORIZONTAL_JOG_INTERVAL_MS = 90;
+        const now = Date.now();
+
+        if (
+            isHorizontalJog &&
+            now - this.lastVariableJogCommandTime <
+                MIN_VARIABLE_HORIZONTAL_JOG_INTERVAL_MS
+        ) {
+            return;
+        }
+
+        const MIN_HORIZONTAL_INCREMENT_MM = 0.1;
+        const normalizedAxesForJog = Object.entries(
+            updatedAxesWithOverride,
+        ).reduce((acc, [axis, value]) => {
+            const axisLowerCase = axis.toLowerCase();
+
+            if (
+                (axisLowerCase === 'x' || axisLowerCase === 'y') &&
+                value !== 0 &&
+                Math.abs(value) < MIN_HORIZONTAL_INCREMENT_MM
+            ) {
+                acc[axis] = Math.sign(value) * MIN_HORIZONTAL_INCREMENT_MM;
+                return acc;
+            }
+
+            acc[axis] = value;
+            return acc;
+        }, {});
+
+        this.jog(normalizedAxesForJog, feedrate);
+        this.lastVariableJogCommandTime = now;
 
         this.jogMovementStartTime = new Date();
 
@@ -624,6 +732,9 @@ export class JoystickLoop {
         this.currentDirection = null;
         this.pendingDirection = null;
         this.pendingDirectionCount = 0;
+        this.lastVariableJogCommandTime = 0;
+        this.variableAxisSmoothed = [0, 0, 0, 0];
+        this.horizontalDominantAxis = null;
 
         // Cancel any active continuous jog
         if (this.continuousJogActive) {
