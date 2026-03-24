@@ -64,12 +64,15 @@ export const getUnitModal = (): UNITS_GCODE => {
 
 /**
  * Determines which wizard instructions to use for Fixed Tool Sensor toolchange.
- * For the first tool (count <= 1), prompts the user to decide whether to perform
- * the initial tool change or just probe the tool length.
+ * For the first tool (count <= 1), behavior is controlled by the user's setting:
+ * - "Always run full wizard": Always runs automaticToolChange
+ * - "Prompt for first tool": Prompts user to choose between automaticToolChange or probeToolLength
+ * - "Always probe length only": Always runs probeToolLength
+ * For subsequent tools (count > 1), always runs automaticToolChange.
  *
  * @param count - The tool change count (1 for first tool, >1 for subsequent tools)
  * @param comment - Optional comment from the gcode file
- * @returns The appropriate wizard instructions
+ * @returns The apprporiate wizard instructions
  */
 export const determineFixedSensorInstructions = async (
     count: number,
@@ -79,13 +82,25 @@ export const determineFixedSensorInstructions = async (
         return automaticToolChange(count);
     }
 
-    const performInitialTC = await showFirstToolchangePrompt({
-        comment,
-    });
+    const firstToolBehavior = store.get(
+        'workspace.toolChange.firstToolBehavior',
+        'Always run full wizard',
+    );
 
-    if (performInitialTC) {
+    if (firstToolBehavior === 'Always run full wizard') {
         return automaticToolChange(count);
-    } else {
+    } else if (firstToolBehavior === 'Always probe length only') {
         return probeToolLength();
+    } else {
+        // 'Prompt for first tool' - ask the user
+        const performInitialTC = await showFirstToolchangePrompt({
+            comment,
+        });
+
+        if (performInitialTC) {
+            return automaticToolChange(count);
+        } else {
+            return probeToolLength();
+        }
     }
 };

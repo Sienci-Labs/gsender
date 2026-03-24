@@ -41,9 +41,9 @@ export const showFirstToolchangePrompt = ({
                     A toolchange command was detected at the start of your file.
                 </p>
                 <p>
-                    If you already have the correct tool installed, you can skip
-                    the toolchange routine. Otherwise, run the routine to probe
-                    and set up your initial tool.
+                    If you already have the correct tool installed, you only
+                    need to probe your initial tool. Otherwise, run the
+                    toolchange routine to install and set up your initial tool.
                 </p>
                 {comment && (
                     <p>
@@ -56,8 +56,8 @@ export const showFirstToolchangePrompt = ({
         Confirm({
             title: 'First Tool Change Detected',
             content: promptContent,
-            confirmLabel: 'Run Toolchange Routine',
-            cancelLabel: 'Skip & Continue',
+            confirmLabel: 'Run Full Toolchange Routine',
+            cancelLabel: 'Only Probe Tool Length',
             onConfirm: () => resolve(true),
             onClose: () => resolve(false),
         });
