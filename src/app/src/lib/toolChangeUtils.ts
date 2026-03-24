@@ -72,7 +72,7 @@ export const getUnitModal = (): UNITS_GCODE => {
  *
  * @param count - The tool change count (1 for first tool, >1 for subsequent tools)
  * @param comment - Optional comment from the gcode file
- * @returns The apprporiate wizard instructions
+ * @returns The appropriate wizard instructions
  */
 export const determineFixedSensorInstructions = async (
     count: number,
