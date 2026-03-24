@@ -62,7 +62,7 @@ const LaserControls = ({ actions, state, canClick, isConnected }: Props) => {
 
     return (
         <div>
-            <div className="flex justify-center mt-2">
+            <div className="flex justify-center">
                 <ActiveStateButton
                     onClick={actions.sendLaserM3}
                     icon={<FaLightbulb />}
