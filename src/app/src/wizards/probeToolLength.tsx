@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Sienci Labs Inc.
+ * Copyright (C) 2026 Sienci Labs Inc.
  *
  * This file is part of gSender.
  *

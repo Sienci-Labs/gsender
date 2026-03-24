@@ -30,9 +30,7 @@ import { store as reduxStore } from 'app/store/redux';
 import controller from 'app/lib/controller';
 import manualToolChange from 'app/wizards/manualToolchange';
 import semiautoToolChange from 'app/wizards/semiautoToolchange';
-import automaticToolChange from 'app/wizards/automaticToolchange';
-import probeToolLength from 'app/wizards/probeToolLength';
-import { showFirstToolchangePrompt } from 'app/wizards/firstToolchangePrompt';
+import { determineFixedSensorInstructions } from 'app/lib/toolChangeUtils';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 // TODO: add worker types
 // @ts-ignore
@@ -655,23 +653,10 @@ export function* initialize(): Generator<any, void, any> {
                     instructions = semiautoToolChange(count);
                 } else if (option === 'Fixed Tool Sensor') {
                     title = 'Fixed Tool Sensor Tool Change';
-
-                    if (count <= 1) {
-                        const performInitialTC =
-                            await showFirstToolchangePrompt({
-                                comment,
-                            });
-
-                        console.log({ performInitialTC });
-
-                        if (performInitialTC) {
-                            instructions = automaticToolChange(count);
-                        } else {
-                            instructions = probeToolLength();
-                        }
-                    } else {
-                        instructions = automaticToolChange(count);
-                    }
+                    instructions = await determineFixedSensorInstructions(
+                        count,
+                        comment,
+                    );
                 } else {
                     console.error('Invalid toolchange option passed');
                     return;

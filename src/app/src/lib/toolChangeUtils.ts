@@ -15,6 +15,9 @@ import {
     TOUCHPLATE_TYPES_T,
 } from 'app/features/Probe/definitions';
 import { ReduxState } from 'app/store/definitions';
+import automaticToolChange from 'app/wizards/automaticToolchange';
+import probeToolLength from 'app/wizards/probeToolLength';
+import { showFirstToolchangePrompt } from 'app/wizards/firstToolchangePrompt';
 
 export const getProbeSettings = (): ProbeWidgetSettings => {
     const probeProfile: ProbeProfile = store.get('workspace.probeProfile');
@@ -57,4 +60,32 @@ export const getUnitModal = (): UNITS_GCODE => {
         return 'G20';
     }
     return 'G21';
+};
+
+/**
+ * Determines which wizard instructions to use for Fixed Tool Sensor toolchange.
+ * For the first tool (count <= 1), prompts the user to decide whether to perform
+ * the initial tool change or just probe the tool length.
+ *
+ * @param count - The tool change count (1 for first tool, >1 for subsequent tools)
+ * @param comment - Optional comment from the gcode file
+ * @returns The appropriate wizard instructions
+ */
+export const determineFixedSensorInstructions = async (
+    count: number,
+    comment = '',
+) => {
+    if (count > 1) {
+        return automaticToolChange(count);
+    }
+
+    const performInitialTC = await showFirstToolchangePrompt({
+        comment,
+    });
+
+    if (performInitialTC) {
+        return automaticToolChange(count);
+    } else {
+        return probeToolLength();
+    }
 };
