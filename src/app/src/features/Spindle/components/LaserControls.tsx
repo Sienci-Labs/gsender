@@ -69,6 +69,7 @@ const LaserControls = ({ actions, state, canClick, isConnected }: Props) => {
                     text="Laser On"
                     active={isConnected && laserIsOn}
                     size={'sm'}
+                    className="max-xl:px-2"
                     disabled={!canClick}
                     tooltip={{ content: 'Turn on laser' }}
                 />
@@ -77,6 +78,7 @@ const LaserControls = ({ actions, state, canClick, isConnected }: Props) => {
                     icon={<FaSatelliteDish />}
                     text="Laser Test"
                     size={'sm'}
+                    className="max-xl:px-2"
                     disabled={!canClick}
                     tooltip={{
                         content: 'Turn on laser for Test Duration',
@@ -87,6 +89,7 @@ const LaserControls = ({ actions, state, canClick, isConnected }: Props) => {
                     icon={<FaRegLightbulb />}
                     text="Laser Off"
                     size={'sm'}
+                    className="max-xl:px-2"
                     disabled={!canClick}
                     tooltip={{ content: 'Turn off laser' }}
                 />
