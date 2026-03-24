@@ -82,14 +82,14 @@ export const determineFixedSensorInstructions = async (
         return automaticToolChange(count);
     }
 
-    const firstToolBehavior = store.get(
-        'workspace.toolChange.firstToolBehavior',
+    const firstToolBehaviour = store.get(
+        'workspace.toolChange.firstToolBehaviour',
         'Always run full wizard',
     );
 
-    if (firstToolBehavior === 'Always run full wizard') {
+    if (firstToolBehaviour === 'Always run full wizard') {
         return automaticToolChange(count);
-    } else if (firstToolBehavior === 'Always probe length only') {
+    } else if (firstToolBehaviour === 'Always probe length only') {
         return probeToolLength();
     } else {
         // 'Prompt for first tool' - ask the user

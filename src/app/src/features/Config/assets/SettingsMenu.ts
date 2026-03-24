@@ -1796,9 +1796,9 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
-                        label: 'First tool behavior',
+                        label: 'First tool behaviour',
                         type: 'select',
-                        key: 'workspace.toolChange.firstToolBehavior',
+                        key: 'workspace.toolChange.firstToolBehaviour',
                         description:
                             'Control how the first tool change is handled. Many CAM programs add an initial tool change command even when you already have the tool loaded.\n\n"Always run full wizard" runs the complete tool change process.\n\n"Prompt for first tool" asks whether to run the full wizard or just probe the current tool length.\n\n"Always probe length only" skips the tool change and only measures the current tool.',
                         options: [

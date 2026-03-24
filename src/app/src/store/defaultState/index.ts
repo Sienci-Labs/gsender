@@ -75,7 +75,7 @@ const defaultState: State = {
             passthrough: false,
             skipDialog: false,
             moveToManualPosition: false,
-            firstToolBehavior: 'Always run full wizard',
+            firstToolBehaviour: 'Always run full wizard',
             manualPosition: {
                 x: 0,
                 y: 0,
