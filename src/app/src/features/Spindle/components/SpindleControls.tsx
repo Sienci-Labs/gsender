@@ -91,15 +91,9 @@ const SpindleControls = ({ actions, state, canClick, isConnected }: Props) => {
         }
     };
 
-    const toggleInputType = () => {
-        const nextType = inputType === 'Slider' ? 'Number' : 'Slider';
-        store.set('widgets.spindle.inputType', nextType);
-        setInputType(nextType);
-    };
-
     return (
         <>
-            <div className="flex flex-row gap-2 justify-center my-2">
+            <div className="flex flex-row gap-2 justify-center">
                 <ActiveStateButton
                     onClick={actions.sendM3}
                     disabled={!canClick}
@@ -135,7 +129,7 @@ const SpindleControls = ({ actions, state, canClick, isConnected }: Props) => {
                     aria-label="Stop spindle (M5)"
                 />
             </div>
-            <div className="grid grid-cols-[1fr_3fr_1fr] gap-2 justify-center my-2 items-center dark:text-white">
+            <div className="grid grid-cols-[1fr_3fr_1fr] gap-2 justify-center items-center dark:text-white">
                 <span className="text-right">Speed</span>
                 {inputType === 'Slider' ? (
                     <Tooltip content="Adjust spindle speed" side="bottom">

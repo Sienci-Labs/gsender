@@ -62,7 +62,7 @@ const LaserControls = ({ actions, state, canClick, isConnected }: Props) => {
 
     return (
         <div>
-            <div className="flex justify-center mt-2">
+            <div className="flex justify-center gap-2">
                 <ActiveStateButton
                     onClick={actions.sendLaserM3}
                     icon={<FaLightbulb />}
@@ -85,7 +85,7 @@ const LaserControls = ({ actions, state, canClick, isConnected }: Props) => {
                 <ActiveStateButton
                     onClick={actions.sendM5}
                     icon={<FaRegLightbulb />}
-                    text="Laser Off"
+                    text="Off"
                     size={'sm'}
                     disabled={!canClick}
                     tooltip={{ content: 'Turn off laser' }}
