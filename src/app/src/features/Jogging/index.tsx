@@ -45,6 +45,7 @@ import jogWheeelLabels from './assets/labels.svg';
 import JogHelper from './utils/jogHelper';
 import { preventDefault } from 'app/lib/dom-events';
 import { checkThumbsticskAreIdle, JoystickLoop } from './JoystickLoop';
+import { MPGJogManager } from './MPGJogManager.ts';
 import { convertValue } from './utils/units';
 import reduxStore from 'app/store/redux';
 import { UNITS_EN } from 'app/definitions/general';
@@ -152,6 +153,7 @@ export function Jogging({ hideRotary = false }) {
     const [firmware, setFirmware] = useState<FirmwareFlavour>('Grbl');
 
     const joystickLoop = useRef<JoystickLoop | null>(null);
+    const mpgJogManagerRef = useRef<MPGJogManager | null>(null);
 
     const handleJoystickJog = useCallback(
         (
@@ -318,6 +320,43 @@ export function Jogging({ hideRotary = false }) {
                     );
 
                     if (isUsingMPGMode) {
+                        const isInRotaryMode =
+                            store.get('workspace.mode', '') ===
+                            WORKSPACE_MODE.ROTARY;
+                        if (!mpgJogManagerRef.current) {
+                            mpgJogManagerRef.current = new MPGJogManager();
+                        }
+
+                        const mpgCommand = mpgJogManagerRef.current.buildCommand(
+                            {
+                                joystickOptions,
+                                activeStick: activeStick as
+                                    | 'stick1'
+                                    | 'stick2',
+                                actionType: actionType as
+                                    | 'primaryAction'
+                                    | 'secondaryAction',
+                                gamepadDetail: detail,
+                                activeStickDegrees,
+                                firmwareType,
+                                isInRotaryMode,
+                                canJog: canClickShortcut(),
+                                currentProfile,
+                                baseDistanceByAxis: {
+                                    x: jogSpeedRef.current.xyStep,
+                                    y: jogSpeedRef.current.xyStep,
+                                    z: jogSpeedRef.current.zStep,
+                                    a: jogSpeedRef.current.aStep,
+                                },
+                                baseFeedrate: jogSpeedRef.current.feedrate,
+                            },
+                        );
+
+                        if (!mpgCommand) {
+                            return;
+                        }
+
+                        handleJoystickJog(mpgCommand);
                         return;
                     }
 
@@ -543,6 +582,8 @@ export function Jogging({ hideRotary = false }) {
                 joystickLoop.current.stop();
                 joystickLoop.current = null;
             }
+            mpgJogManagerRef.current?.reset();
+            mpgJogManagerRef.current = null;
         };
     }, [isConnected, handleJoystickJog]);
 
