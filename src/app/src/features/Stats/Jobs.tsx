@@ -9,6 +9,9 @@ import {
 import { GRBL, JOB_STATUS, JOB_TYPES } from 'app/constants';
 import { CheckCircle, XCircle } from 'lucide-react';
 import { CardHeader } from 'app/features/Stats/components/CardHeader.tsx';
+import { Button } from 'app/components/Button';
+import { FaTrash } from 'react-icons/fa';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 
 import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
 import { JobsPerComPort } from 'app/features/Stats/components/JobsPerComPort.tsx';
@@ -92,13 +95,34 @@ const columnData: CustomColumnDef<Job, any>[] = [
 ];
 
 export function Jobs() {
-    const { jobs } = useContext(StatContext);
+    const { jobs, clearJobHistory } = useContext(StatContext);
+
+    function onClearJobHistory() {
+        Confirm({
+            title: 'Delete Job History',
+            content: 'Are you sure you want to delete all job history?',
+            confirmLabel: 'Confirm',
+            cancelLabel: 'Cancel',
+            onConfirm: async () => {
+                await clearJobHistory?.();
+            },
+        });
+    }
 
     return (
         <div className="grid grid-cols-6 grid-rows-6 gap-2 w-full h-full overflow-y-auto">
             <div className="col-span-4 row-span-6 pr-8 max-xl:pr-0">
                 <StatCard>
-                    <CardHeader>Job History</CardHeader>
+                    <div className="flex items-center justify-between gap-2">
+                        <CardHeader>Job History</CardHeader>
+                        <Button
+                            icon={<FaTrash className="text-gray-600 w-4 h-4 dark:text-gray-200" />}
+                            onClick={onClearJobHistory}
+                            text="Clear"
+                            size="sm"
+                            className="text-gray-600"
+                        />
+                    </div>
                     <div className="w-full flex flex-col">
                         <SortableTable
                             defaultData={defaultData}

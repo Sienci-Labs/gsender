@@ -343,6 +343,7 @@ const appMain = () => {
         // Job Stats
         app.put(urljoin(settings.route, '/api/jobstats'), api.jobStats.update);
         app.get(urljoin(settings.route, 'api/jobstats'), api.jobStats.fetch);
+        app.delete(urljoin(settings.route, 'api/jobstats'), api.jobStats.clearAll);
 
         // Maintenance
         app.put(urljoin(settings.route, '/api/maintenance'), api.maintenance.update);

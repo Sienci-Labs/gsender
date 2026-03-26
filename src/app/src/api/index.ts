@@ -249,6 +249,10 @@ const jobStats = {
     update: (options: Record<string, any>): Promise<AxiosResponse> => {
         return authrequest.put('/api/jobstats', options);
     },
+
+    clearAll: (): Promise<AxiosResponse> => {
+        return authrequest.delete('/api/jobstats');
+    },
 };
 
 //

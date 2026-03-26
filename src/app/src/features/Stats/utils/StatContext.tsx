@@ -75,6 +75,7 @@ const initialState: {
             newTasks: MaintenanceTask[],
         ) => Promise<AxiosResponse<any, any>>;
     };
+    clearJobHistory?: () => Promise<void>;
     setAlarms?: React.Dispatch<React.SetStateAction<FirmwareEvent[]>>;
     setMaintenanceTasks?: React.Dispatch<React.SetStateAction<any[]>>;
 } = {
@@ -157,6 +158,20 @@ export function StatsProvider({ children }: { children: ReactNode }) {
         },
     };
 
+    const clearJobHistory = async () => {
+        await api.jobStats.clearAll();
+        setJobs([]);
+        setJobAggregate({});
+        setFilteredJobs([]);
+        setJobStats({
+            averageCutTime: 0,
+            completeJobs: 0,
+            incompleteJobs: 0,
+            longestCutTime: 0,
+            totalCutTime: 0,
+        });
+    };
+
     const payload = {
         jobs,
         jobAggregate,
@@ -166,6 +181,7 @@ export function StatsProvider({ children }: { children: ReactNode }) {
         isConnected,
         setAlarms,
         setMaintenanceTasks,
+        clearJobHistory,
         jobStats,
         filteredJobs,
     };
