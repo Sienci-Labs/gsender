@@ -186,6 +186,7 @@ export interface PreferencesState {
             showVisually: boolean;
         };
         showKeyboardMap: boolean;
+        displayScaleFactor?: number;
     };
     preventJoggingPastLimits: boolean;
 }

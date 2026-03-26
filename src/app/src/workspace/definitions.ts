@@ -117,6 +117,7 @@ export interface Workspace {
             showVisually: boolean;
         };
         showKeyboardMap: boolean;
+        displayScaleFactor?: number;
     };
     preventJoggingPastLimits: boolean;
 }
