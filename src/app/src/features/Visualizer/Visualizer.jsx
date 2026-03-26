@@ -45,7 +45,9 @@ import {
     GRBL,
     GRBLHAL,
     GRBL_ACTIVE_STATE_CHECK,
-    LASER_MODE, OUTLINE_MODE_RAPIDLESS_SQUARE,
+    LASER_MODE,
+    OUTLINE_MODE_RAPIDLESS_SQUARE,
+    LIGHTWEIGHT_OPTIONS,
 } from 'app/constants';
 import CombinedCamera from 'app/lib/three/oldCombinedCamera';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
@@ -770,7 +772,8 @@ class Visualizer extends Component {
     showAnimation = () => {
         const state = { ...this.props.state };
         const { liteMode, objects, minimizeRenders } = state;
-        const { reducedMotion } = reduxStore.getState().preferences.accessibility;
+        const { reducedMotion } =
+            reduxStore.getState().preferences.accessibility;
 
         // We don't animate if minimizeRenders is turned on or reducedMotion is enabled
         if (minimizeRenders || reducedMotion) {
@@ -1056,7 +1059,11 @@ class Visualizer extends Component {
                 }
             }),
             pubsub.subscribe('spindle:mode', () => {
-                if (!this.cuttingTool || !this.laserPointer || !this.cuttingPointer) {
+                if (
+                    !this.cuttingTool ||
+                    !this.laserPointer ||
+                    !this.cuttingPointer
+                ) {
                     return;
                 }
                 const { state, isConnected } = this.props;
@@ -1229,7 +1236,8 @@ class Visualizer extends Component {
                         null,
                     );
 
-                    const isRapidless = outlineMode === OUTLINE_MODE_RAPIDLESS_SQUARE;
+                    const isRapidless =
+                        outlineMode === OUTLINE_MODE_RAPIDLESS_SQUARE;
                     const content = isRapidless
                         ? reduxStore.getState().file.content
                         : null;
@@ -2919,7 +2927,8 @@ class Visualizer extends Component {
     isHovered = false;
 
     handleKeyDown = (event) => {
-        const { visualizerKeyboardControl } = reduxStore.getState().preferences.accessibility;
+        const { visualizerKeyboardControl } =
+            reduxStore.getState().preferences.accessibility;
         if (!visualizerKeyboardControl || !this.isHovered) return;
 
         const rotateStep = 0.1;
@@ -2993,8 +3002,12 @@ class Visualizer extends Component {
                 className="overflow-hidden h-full w-full rounded-lg outline-none"
                 ref={this.setRef}
                 id="visualizer-wrapper"
-                onMouseEnter={() => { this.isHovered = true; }}
-                onMouseLeave={() => { this.isHovered = false; }}
+                onMouseEnter={() => {
+                    this.isHovered = true;
+                }}
+                onMouseLeave={() => {
+                    this.isHovered = false;
+                }}
                 tabIndex={0}
                 role="region"
                 aria-label="3D Visualizer"

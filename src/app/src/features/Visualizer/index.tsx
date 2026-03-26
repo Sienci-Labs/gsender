@@ -267,6 +267,44 @@ class Visualizer extends Component {
                 };
 
                 if (!capable.view3D) {
+                    let interval = setInterval(() => {
+                        if (this.actions.checkVisualizerRef()) {
+                            clearInterval(interval);
+
+                            console.log('hi ' + this.visualizer);
+                            this.visualizer.load(
+                                name,
+                                vizualization,
+                                ({ bbox }) => {
+                                    // Set gcode bounding box
+                                    controller.context = {
+                                        ...controller.context,
+                                        xmin: bbox.min.x,
+                                        xmax: bbox.max.x,
+                                        ymin: bbox.min.y,
+                                        ymax: bbox.max.y,
+                                        zmin: bbox.min.z,
+                                        zmax: bbox.max.z,
+                                    };
+
+                                    const { port } = this.state;
+
+                                    this.setState((state) => ({
+                                        gcode: {
+                                            ...state.gcode,
+                                            loading: false,
+                                            rendering: false,
+                                            ready: true,
+                                            bbox: bbox,
+                                            loadedBeforeConnection: !port,
+                                        },
+                                        filename: name,
+                                        fileSize: size,
+                                    }));
+                                },
+                            );
+                        }
+                    }, 100);
                     return;
                 }
 
@@ -593,6 +631,9 @@ class Visualizer extends Component {
         getHull: () => {
             return this.visualizer.getToolpathHull();
         },
+        checkVisualizerRef: () => {
+            return this.visualizer !== null;
+        },
     };
 
     pubsubTokens = [];
@@ -793,6 +834,7 @@ class Visualizer extends Component {
             },
             disabled: this.config.get('disabled', false),
             disabledLite: this.config.get('disabledLite'),
+            liteOption: this.config.get('liteOption'),
             liteMode: this.config.get('liteMode'),
             minimizeRenders: this.config.get('minimizeRenders'),
             projection: this.config.get('projection', 'orthographic'),
