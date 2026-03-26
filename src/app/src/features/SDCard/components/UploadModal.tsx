@@ -106,7 +106,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                     </DialogDescription>
                 </DialogHeader>
 
-                <div className="space-y-4">
+                <div className="space-y-4 my-2">
                     <div
                         className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-200 ${
                             dragOver
