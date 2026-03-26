@@ -2,11 +2,14 @@ import { Wizard } from 'app/features/AccessoryInstaller/types';
 import { useValidations } from 'app/features/AccessoryInstaller/hooks/UseValidations.tsx';
 import { useMemo } from 'react';
 import ATCiLogo from 'app/features/AccessoryInstaller/Wizards/atc/assets/ATC_1.webp';
-import PlaceholderImageSd from './assets/placeholder_sd.png';
-import PlaceholderImageTwo from './assets/placeholder_2.png';
-import PlaceholderImageThree from './assets/placeholder_3.png';
-import PlaceholderImageFour from './assets/placeholder_4.png';
+import SDImg from './assets/Step_02_Macro_Configuration_Insert_SD_Card.webp';
+import ControllerConfigImg from './assets/Step_03_Controller_Configuration.webp';
+import HomingImg from './assets/Step_04_Homing.webp';
+import RackA from './assets/Step_5A_Rack_Position_06.webp';
+// import RackB from './assets/Step_5B_Rack_Position_01.webp';
+import TLSPosImg from './assets/Step_07_ToolLength_Sensor_Position.webp';
 import PlaceholderImageFive from './assets/placeholder_TLS.png';
+import CompletionImg from './assets/Step_10_Setup_Complete.webp';
 import { MacroConfiguration } from 'app/features/AccessoryInstaller/Wizards/atc/components/MacroConfiguration.tsx';
 import { ControllerConfiguration } from 'app/features/AccessoryInstaller/Wizards/atc/components/ControllerConfiguration.tsx';
 import { RackPosition } from 'app/features/AccessoryInstaller/Wizards/atc/components/RackPosition.tsx';
@@ -47,6 +50,7 @@ export function useSienciATCWizard(): Wizard {
                     estimatedTime: '30 minutes - 2 hours',
                     configVersion: storeVersion,
                     completionPage: ATCCompletion,
+                    completionImage: CompletionImg,
                     steps: [
                         {
                             id: 'macro-configuration',
@@ -55,7 +59,7 @@ export function useSienciATCWizard(): Wizard {
                             secondaryContent: [
                                 {
                                     type: 'image',
-                                    content: PlaceholderImageSd,
+                                    content: SDImg,
                                     title: 'SD Card Installation',
                                 },
                             ],
@@ -67,7 +71,7 @@ export function useSienciATCWizard(): Wizard {
                             secondaryContent: [
                                 {
                                     type: 'image',
-                                    content: PlaceholderImageTwo,
+                                    content: ControllerConfigImg,
                                 },
                             ],
                         },
@@ -78,7 +82,7 @@ export function useSienciATCWizard(): Wizard {
                             secondaryContent: [
                                 {
                                     type: 'image',
-                                    content: PlaceholderImageThree,
+                                    content: HomingImg,
                                 },
                             ],
                         },
@@ -87,6 +91,10 @@ export function useSienciATCWizard(): Wizard {
                             title: 'Rack Position',
                             component: RackPosition,
                             secondaryContent: [
+                                {
+                                    type: 'image',
+                                    content: RackA,
+                                },
                                 {
                                     type: 'component',
                                     content: Jogging,
@@ -103,7 +111,7 @@ export function useSienciATCWizard(): Wizard {
                             secondaryContent: [
                                 {
                                     type: 'image',
-                                    content: PlaceholderImageFour,
+                                    content: TLSPosImg,
                                 },
                                 {
                                     type: 'component',

@@ -111,7 +111,13 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
             )}
 
             <StepContextProvider>
-                <div className={subWizard.secondaryContentLeft ? 'flex flex-row-reverse flex-1 overflow-hidden portrait:flex-col' : 'flex flex-1 overflow-hidden portrait:flex-col-reverse'}>
+                <div
+                    className={
+                        subWizard.secondaryContentLeft
+                            ? 'flex flex-row-reverse flex-1 overflow-hidden portrait:flex-col'
+                            : 'flex flex-1 overflow-hidden portrait:flex-col-reverse'
+                    }
+                >
                     <div
                         className={`w-3/5 portrait:w-full portrait:text-xl portrait:h-3/5 p-12 portrait:p-6 ${
                             fillPrimaryContent
@@ -129,12 +135,13 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
                                     </h1>
                                 )}
 
-                                {subWizard.configVersion && !subWizard.hideVersionPrintout && (
-                                    <p className="text-gray-600 dark:text-gray-400 mb-8">
-                                        Configuration File Version:{' '}
-                                        {subWizard.configVersion}
-                                    </p>
-                                )}
+                                {subWizard.configVersion &&
+                                    !subWizard.hideVersionPrintout && (
+                                        <p className="text-gray-600 dark:text-gray-400 mb-8">
+                                            Configuration File Version:{' '}
+                                            {subWizard.configVersion}
+                                        </p>
+                                    )}
 
                                 <div
                                     className={`${
@@ -157,13 +164,24 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
                     </div>
 
                     <div className="w-2/5 portrait:h-2/5 portrait:w-full bg-gray-200 dark:bg-dark p-12 portrait:p-4 flex flex-col overflow-hidden">
-                        <SecondaryContentPanel
-                            content={
-                                showCompletion
-                                    ? []
-                                    : currentStep.secondaryContent || []
-                            }
-                        />
+                        {showCompletion && CompletionComponent ? (
+                            <SecondaryContentPanel
+                                content={[
+                                    {
+                                        type: 'image',
+                                        content: subWizard.completionImage,
+                                    },
+                                ]}
+                            />
+                        ) : (
+                            <SecondaryContentPanel
+                                content={
+                                    showCompletion
+                                        ? []
+                                        : currentStep.secondaryContent || []
+                                }
+                            />
+                        )}
                     </div>
                 </div>
             </StepContextProvider>

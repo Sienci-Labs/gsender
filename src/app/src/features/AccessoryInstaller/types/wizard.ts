@@ -34,6 +34,7 @@ export interface SubWizard {
     steps: WizardStep[];
     icon?: ComponentType<any>;
     completionPage?: ComponentType<any>;
+    completionImage?: string;
     secondaryContentLeft?: boolean;
     hideVersionPrintout?: boolean;
 }
