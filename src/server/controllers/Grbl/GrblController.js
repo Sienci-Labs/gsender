@@ -467,12 +467,12 @@ class GrblController {
                             this.workflow.pause({ data: 'M0', comment: commentString });
                             this.command('gcode', `${WAIT}\n${PAUSE_START} ;${commentString}`);
                         }
-                        line = line.replace('M0', '(M0)');
+                        line = line.replace(/M0+(?!\d)/i, '(M0)');
                     } else if (programMode === 'M1') {
                         log.debug(`M1 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);
                         this.workflow.pause({ data: 'M1', comment: commentString });
                         this.command('gcode', `${WAIT}\n${PAUSE_START} ;${commentString}`);
-                        line = line.replace('M1', '(M1)');
+                        line = line.replace(/M0*1(?!\d)/i, '(M1)');
                     }
                 }
 

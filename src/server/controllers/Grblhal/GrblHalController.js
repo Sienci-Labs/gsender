@@ -491,12 +491,12 @@ class GrblHalController {
                             this.workflow.pause({ data: 'M0', comment: commentString });
                             this.command('gcode', `${WAIT}\n${PAUSE_START} ;${commentString}`);
                         }
-                        line = line.replace('M0', '(M0)');
+                        line = line.replace(/M0+(?!\d)/i, '(M0)');
                     } else if (programMode === 'M1') {
                         log.debug(`M1 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);
                         this.workflow.pause({ data: 'M1', comment: commentString });
                         this.command('gcode', `${WAIT}\n${PAUSE_START} ;${commentString}`);
-                        line = line.replace('M1', '(M1)');
+                        line = line.replace(/M0*1(?!\d)/i, '(M1)');
                     }
                 }
 
@@ -1188,7 +1188,7 @@ class GrblHalController {
                 // Unpause sending when hold state exited using macro buttons - We check if software sender paused + state changed from hold to idle/run
                 const currentActiveState = _.get(this.state, 'status.activeState', '');
                 const runnerActiveState = _.get(this.runner.state, 'status.activeState', '');
-                if (this.workflow.isPaused &&
+                if (this.workflow.isPaused() &&
                     currentActiveState === GRBL_HAL_ACTIVE_STATE_HOLD &&
                     (runnerActiveState === GRBL_HAL_ACTIVE_STATE_IDLE || runnerActiveState === GRBL_HAL_ACTIVE_STATE_RUN)
                 ) {
