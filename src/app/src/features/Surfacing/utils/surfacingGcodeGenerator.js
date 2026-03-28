@@ -64,8 +64,8 @@ export default class Generator {
             'G90',
             `${spindle} S${spindleRPM}`,
             ...dwell,
-            `G0 Z${z}`,
             'G0 X0 Y0',
+            `G0 Z${z}`,
             ...m7,
             ...m8,
             `G1 F${feedrate}`,
@@ -538,8 +538,8 @@ export default class Generator {
         );
         const startFromCenterStartPosition = [
             '(Entering Start Position)',
-            `G0 Z${zValue} ; Start Pos - (Curr Depth - Cut Depth)`,
             `G0 X${position.x} Y${position.y}`,
+            `G0 Z${zValue} ; Start Pos - (Curr Depth - Cut Depth)`,
             'G91',
             `G0 Z${Math.abs(depth) * -1 - safeHeight}`,
             'G90',
