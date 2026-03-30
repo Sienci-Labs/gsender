@@ -1821,6 +1821,9 @@ class Visualizer extends Component {
                         const object = new THREE.Object3D();
                         object.add(mesh);
 
+                        // unload the old one
+                        this.group.remove(this.cuttingTool);
+
                         this.cuttingTool = object;
                         this.cuttingTool.name = 'CuttingTool';
                         this.cuttingTool.visible =
@@ -1845,6 +1848,9 @@ class Visualizer extends Component {
             {
                 // Laser Tool
                 this.setupScene();
+
+                // unload the old one
+                this.group.remove(this.laserPointer);
 
                 // add tool
                 this.laserPointer = new LaserPointer({
