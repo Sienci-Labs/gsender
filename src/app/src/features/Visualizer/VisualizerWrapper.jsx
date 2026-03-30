@@ -50,8 +50,8 @@ class VisualizerWrapper extends Component {
 
     componentDidUpdate() {
         // force refresh, changing which visualizer component is being used
-        if (this.state.needRefresh) {
-            this.visualizer && this.visualizer.reloadGCode();
+        if (this.state.needRefresh && shouldVisualize()) {
+            this.visualizer.reloadGCode();
             this.setNeedRefresh(false);
             // a step further than refresh, reparsing the gcode as well
         } else if (this.state.needReload) {
