@@ -42,7 +42,7 @@ export function ControllerConfiguration({
             </ul>
 
             <p className="dark:text-white">
-                Select “Apply” to apply these changes.
+                Select <b>“Apply”</b> to apply these changes.
             </p>
             <StepActionButton
                 label={'Apply'}

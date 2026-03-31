@@ -53,6 +53,30 @@ export function useSienciATCWizard(): Wizard {
                     completionImage: CompletionImg,
                     steps: [
                         {
+                            id: 'tool-length-sensor',
+                            title: 'Tool Length Sensor Position',
+                            component: TLSPosition,
+                            secondaryContent: [
+                                {
+                                    type: 'image',
+                                    content: TLSPosImg,
+                                },
+                                {
+                                    type: 'component',
+                                    content: Jogging,
+                                    props: {
+                                        hideRotary: true,
+                                    },
+                                },
+                                {
+                                    type: 'link',
+                                    title: 'Need help?',
+                                    content: "Follow along in our online resources",
+                                    url: 'https://resources.sienci.com/view/atc-software/'
+                                }
+                            ],
+                        },
+                        {
                             id: 'macro-configuration',
                             title: 'Tool Changing Macros',
                             component: MacroConfiguration,
@@ -62,6 +86,12 @@ export function useSienciATCWizard(): Wizard {
                                     content: SDImg,
                                     title: 'SD Card Installation',
                                 },
+                                {
+                                    type: 'link',
+                                    title: 'Need help?',
+                                    content: "Follow along in our online resources",
+                                    url: 'https://resources.sienci.com/view/atc-software/'
+                                }
                             ],
                         },
                         {
@@ -73,6 +103,12 @@ export function useSienciATCWizard(): Wizard {
                                     type: 'image',
                                     content: ControllerConfigImg,
                                 },
+                                {
+                                    type: 'link',
+                                    title: 'Need help?',
+                                    content: "Follow along in our online resources",
+                                    url: 'https://resources.sienci.com/view/atc-software/'
+                                }
                             ],
                         },
                         {
@@ -84,6 +120,12 @@ export function useSienciATCWizard(): Wizard {
                                     type: 'image',
                                     content: HomingImg,
                                 },
+                                {
+                                    type: 'link',
+                                    title: 'Need help?',
+                                    content: "Follow along in our online resources",
+                                    url: 'https://resources.sienci.com/view/atc-software/'
+                                }
                             ],
                         },
                         {
@@ -102,6 +144,12 @@ export function useSienciATCWizard(): Wizard {
                                         hideRotary: true,
                                     },
                                 },
+                                {
+                                    type: 'link',
+                                    title: 'Need help?',
+                                    content: "Follow along in our online resources",
+                                    url: 'https://resources.sienci.com/view/atc-software/'
+                                }
                             ],
                         },
                         {
@@ -120,6 +168,12 @@ export function useSienciATCWizard(): Wizard {
                                         hideRotary: true,
                                     },
                                 },
+                                {
+                                    type: 'link',
+                                    title: 'Need help?',
+                                    content: "Follow along in our online resources",
+                                    url: 'https://resources.sienci.com/view/atc-software/'
+                                }
                             ],
                         },
                         {
@@ -131,13 +185,24 @@ export function useSienciATCWizard(): Wizard {
                                     type: 'image',
                                     content: PlaceholderImageFive,
                                 },
+                                {
+                                    type: 'link',
+                                    title: 'Need help?',
+                                    content: "Follow along in our online resources",
+                                    url: 'https://resources.sienci.com/view/atc-software/'
+                                }
                             ],
                         },
                         {
                             id: 'modbus-config',
                             title: 'Spindle Setup - Part 2',
                             component: Modbus,
-                            secondaryContent: [],
+                            secondaryContent: [                                {
+                                type: 'link',
+                                title: 'Need help?',
+                                content: "Follow along in our online resources",
+                                url: 'https://resources.sienci.com/view/atc-software/'
+                            }],
                         },
                     ],
                 },

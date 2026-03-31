@@ -49,11 +49,11 @@ export function SpindleSetRestart({ onComplete, onUncomplete }: StepProps) {
             <p className="dark:text-white">
                 Your spindle settings are applied in this step and the controller will restart automatically.
             </p>
-            <ol>
+            <ol className="list-decimal">
                 <li>
                     Press <b>"Apply And Restart"</b>
                 </li>
-                <li>Click "Next"</li>
+                <li>Click <b>"Next"</b></li>
             </ol>
             <StepActionButton
                 label="Apply and Restart"
