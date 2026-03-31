@@ -33,110 +33,119 @@ export function SecondaryContentPanel({ content }: SecondaryContentPanelProps) {
         );
     }
 
+    const mainContent = content.filter((item) => item.type !== 'link');
+    const linkItem = content.find((item) => item.type === 'link');
+
+    const renderItem = (item: SecondaryContent, index: number) => {
+        const containerClassName = item.fill
+            ? 'flex-1 min-h-0 overflow-hidden portrait:min-w-0 portrait:h-full'
+            : 'flex-shrink-0 portrait:flex-1 portrait:min-w-0 portrait:overflow-hidden';
+
+        if (item.type === 'image') {
+            return (
+                <div key={index} className={containerClassName}>
+                    {item.title && (
+                        <h3 className="text-sm font-semibold text-gray-700 dark:text-white mb-2">
+                            {item.title}
+                        </h3>
+                    )}
+                    <img
+                        src={item.content as string}
+                        alt={item.title || 'Secondary content'}
+                        className="w-full rounded-lg shadow-sm"
+                    />
+                </div>
+            );
+        }
+
+        if (item.type === 'component') {
+            const Component = item.content as ComponentType<any>;
+            return (
+                <div key={index} className={containerClassName}>
+                    {item.title && (
+                        <h3 className="text-sm font-semibold text-gray-700 dark:text-white mb-2">
+                            {item.title}
+                        </h3>
+                    )}
+                    <Component {...item.props} />
+                </div>
+            );
+        }
+
+        return null;
+    };
+
     return (
-        <div className="flex flex-col portrait:flex-row portrait:items-center gap-6 h-full">
-            {content.map((item, index) => {
-                const containerClassName = item.fill
-                    ? 'flex-1 min-h-0 overflow-hidden portrait:min-w-0 portrait:h-full'
-                    : 'flex-shrink-0 portrait:flex-1 portrait:min-w-0 portrait:overflow-hidden';
+        <div className="flex flex-col gap-6 h-full">
+            {mainContent.length > 0 && (
+                <div className="flex flex-col portrait:flex-row portrait:items-center gap-6 flex-1 min-h-0 overflow-hidden portrait:min-w-0">
+                    {mainContent.map((item, index) => renderItem(item, index))}
+                </div>
+            )}
 
-                if (item.type === 'image') {
-                    return (
-                        <div key={index} className={containerClassName}>
-                            {item.title && (
-                                <h3 className="text-sm font-semibold text-gray-700 dark:text-white mb-2">
-                                    {item.title}
-                                </h3>
-                            )}
-                            <img
-                                src={item.content as string}
-                                alt={item.title || 'Secondary content'}
-                                className="w-full portrait:max-h-full portrait:object-contain rounded-lg shadow-sm"
+            {linkItem && (
+                <div className="flex-shrink-0 mt-auto">
+                    <div className="bg-white rounded-lg border border-gray-200 p-3 shadow-sm">
+                        <div className="flex items-start gap-3">
+                            <ExternalLink
+                                className="text-blue-500 flex-shrink-0 mt-0.5"
+                                size={18}
                             />
-                        </div>
-                    );
-                }
-
-                if (item.type === 'component') {
-                    const Component = item.content as ComponentType<any>;
-                    return (
-                        <div key={index} className={containerClassName}>
-                            {item.title && (
-                                <h3 className="text-sm font-semibold text-gray-700 dark:text-white mb-2">
-                                    {item.title}
-                                </h3>
-                            )}
-                            <Component {...item.props} />
-                        </div>
-                    );
-                }
-
-                if (item.type === 'link') {
-                    return (
-                        <div key={index} className={containerClassName}>
-                            <div className="bg-white rounded-lg border border-gray-200 p-3 shadow-sm">
-                                <div className="flex items-start gap-3">
-                                    <ExternalLink
-                                        className="text-blue-500 flex-shrink-0 mt-0.5"
-                                        size={18}
-                                    />
-                                    <div className="flex-1 min-w-0">
-                                        {item.title && (
-                                            <div className="font-semibold text-gray-900 text-sm mb-1">
-                                                {item.title}
-                                            </div>
-                                        )}
-                                        <div className="text-xs text-gray-600 mb-2">
-                                            {item.content as string}
-                                        </div>
-                                        {item.url && (
-                                            <a
-                                                href={item.url}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-xs text-blue-600 hover:text-blue-700 hover:underline break-all"
-                                            >
-                                                {item.url}
-                                            </a>
-                                        )}
+                            <div className="flex-1 min-w-0">
+                                {linkItem.title && (
+                                    <div className="font-semibold text-gray-900 text-sm mb-1">
+                                        {linkItem.title}
                                     </div>
-                                    {item.url && (
-                                        <Popover>
-                                            <PopoverTrigger asChild>
-                                                <button className="flex-shrink-0 p-1.5 rounded-md hover:bg-gray-100 transition-colors">
-                                                    <QrCode
-                                                        className="text-gray-600"
-                                                        size={18}
-                                                    />
-                                                </button>
-                                            </PopoverTrigger>
-                                            <PopoverContent
-                                                className="w-auto p-4 mr-14"
-                                                sideOffset={10}
-                                            >
-                                                <div className="flex flex-col items-center gap-3">
-                                                    <div className="text-sm font-semibold text-gray-900">
-                                                        Scan QR Code
-                                                    </div>
-                                                    <div className="bg-white p-2 rounded border border-gray-100">
-                                                        <QRCodeComponent
-                                                            value={item.url}
-                                                            size={180}
-                                                            level="H"
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </PopoverContent>
-                                        </Popover>
-                                    )}
+                                )}
+                                <div className="text-xs text-gray-600 mb-2">
+                                    {linkItem.content as string}
                                 </div>
+                                {linkItem.url && (
+                                    <a
+                                        href={linkItem.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-xs text-blue-600 hover:text-blue-700 hover:underline break-all"
+                                    >
+                                        {linkItem.url}
+                                    </a>
+                                )}
                             </div>
+                            {linkItem.url && (
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <button className="flex-shrink-0 p-1.5 rounded-md hover:bg-gray-100 transition-colors">
+                                            <QrCode
+                                                className="text-gray-600"
+                                                size={18}
+                                            />
+                                        </button>
+                                    </PopoverTrigger>
+                                    <PopoverContent
+                                        className="w-auto p-4"
+                                        sideOffset={10}
+                                        side="top"
+                                        align="end"
+                                    >
+                                        <div className="flex flex-col items-center gap-3">
+                                            <div className="text-sm font-semibold text-gray-900">
+                                                Scan QR Code
+                                            </div>
+                                            <div className="bg-white p-2 rounded border border-gray-100">
+                                                <QRCodeComponent
+                                                    value={linkItem.url}
+                                                    size={180}
+                                                    level="H"
+                                                />
+                                            </div>
+                                        </div>
+                                    </PopoverContent>
+                                </Popover>
+                            )}
                         </div>
-                    );
-                }
-
-                return null;
-            })}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
