@@ -139,14 +139,6 @@ const main = () => {
     app.commandLine.appendSwitch("--no-sandbox");
   }
 
-  const savedScaleFactor = Number(store.get("displayScaleFactor", 0));
-  if (savedScaleFactor > 0 && savedScaleFactor <= 5) {
-    app.commandLine.appendSwitch(
-      "force-device-scale-factor",
-      String(savedScaleFactor),
-    );
-  }
-
   // Create the user data directory if it does not exist
   const userData = app.getPath("userData");
   mkdirp.sync(userData);
@@ -290,6 +282,12 @@ const main = () => {
         kiosk,
       };
       const window = await windowManager.openWindow(url, options, splashScreen);
+
+      window.on("ready-to-show", () => {
+        const savedScaleFactor = Number(store.get("displayScaleFactor", 1.0));
+
+        window.webContents.setZoomFactor(savedScaleFactor);
+      });
 
       // Check argv for file path on Windows/Linux cold start
       if (process.platform !== "darwin") {
@@ -518,15 +516,11 @@ const main = () => {
         });
       });
 
-      // Persist display scale factor chosen in settings so it can be
-      // applied via force-device-scale-factor on the next launch.
       ipcMain.on("save-display-scale", (_event, scaleFactor) => {
-        const value = Number(scaleFactor);
-        if (value > 0) {
-          store.set("displayScaleFactor", value);
-        } else {
-          store.delete("displayScaleFactor");
-        }
+        const value = Number(scaleFactor) || 1.0;
+
+        store.set("displayScaleFactor", value);
+        window.webContents.setZoomFactor(value);
       });
 
       //Handle app restart with remote settings

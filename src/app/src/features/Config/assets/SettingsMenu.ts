@@ -2209,18 +2209,30 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         label: 'App display scale',
                         key: 'workspace.accessibility.displayScaleFactor',
-                        type: 'number',
-                        min: 0,
-                        max: 5,
+                        type: 'select',
+                        options: [
+                            '50%',
+                            '67%',
+                            '75%',
+                            '100%',
+                            '125%',
+                            '150%',
+                            '175%',
+                            '200%',
+                        ],
+                        defaultValue: '100%',
                         description:
-                            "Override the app's display scale independently of Windows DPI settings. Set to 0 (or leave blank) to follow system scaling. Valid range: 0 - 5. (Requires a restart to take effect)",
+                            "Override the app's display scale independently of your OS' DPI settings.",
                         hidden: () => !isElectron(),
                         onUpdate: () => {
                             if (isElectron()) {
-                                const scaleFactor = store.get(
+                                const scaleFactorStr = store.get(
                                     'workspace.accessibility.displayScaleFactor',
-                                    0,
+                                    '100%',
                                 );
+                                // Normalize percentage to decimal (e.g., "100%" -> 1.0)
+                                const scaleFactor =
+                                    parseFloat(scaleFactorStr) / 100;
                                 // @ts-ignore
                                 window.ipcRenderer.send(
                                     'save-display-scale',
