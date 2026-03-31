@@ -290,9 +290,11 @@ class Visualizer extends Component {
     }
 
     addStoreEvents() {
-        store.on('_dimensions', () => {
-            this.changeMachineProfile();
-        });
+        store.on('_dimensions', this.changeMachineProfile);
+    }
+
+    removeStoreEvents() {
+        store.removeListener('_dimensions', this.changeMachineProfile);
     }
 
     componentDidMount() {
@@ -329,7 +331,8 @@ class Visualizer extends Component {
         const handleContextLost = (event) => {
             console.warn('Visualizer: WebGL context lost');
             event.preventDefault();
-            this.renderer = null;
+            this.renderer.dispose();
+            this.renderer.forceContextLoss();
             this.scene = null;
             this.camera = null;
         };
@@ -686,9 +689,12 @@ class Visualizer extends Component {
     componentWillUnmount() {
         this.removeControllerEvents();
         this.unsubscribe();
+        this.removeStoreEvents();
         this.removeResizeEventListener();
         window.removeEventListener('keydown', this.handleKeyDown);
         this.clearScene();
+        this.renderer.dispose();
+        this.renderer.forceContextLoss();
 
         // Stop animation loop
         this.animationLoopRunning = false;

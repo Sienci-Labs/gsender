@@ -271,7 +271,6 @@ class Visualizer extends Component {
                         if (this.actions.checkVisualizerRef()) {
                             clearInterval(interval);
 
-                            console.log('hi ' + this.visualizer);
                             this.visualizer.load(
                                 name,
                                 vizualization,
