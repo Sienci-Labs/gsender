@@ -56,9 +56,9 @@ export const Section = React.forwardRef(
         );
         return showEEPROMOnly ? (
             filteredSettings.length > 0 &&
-                filteredSettings.map((setting: gSenderSubSection, _index) => {
+                filteredSettings.map((setting: gSenderSubSection, index) => {
                     return (
-                        <div className="bg-gray-100 rounded-xl shadow p-6 max-xl:p-3 flex flex-col gap-6 dark:bg-dark dark:text-white">
+                        <div key={setting.label ?? index} className="bg-gray-100 rounded-xl shadow p-6 max-xl:p-3 flex flex-col gap-6 dark:bg-dark dark:text-white">
                             <SettingSection
                                 connected={connected}
                                 settings={setting.settings}
@@ -91,6 +91,7 @@ export const Section = React.forwardRef(
                         (setting: gSenderSubSection, index) => {
                             return (
                                 <SettingSection
+                                    key={setting.label ?? index}
                                     connected={connected}
                                     settings={setting.settings}
                                     label={setting.label}

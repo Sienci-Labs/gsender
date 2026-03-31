@@ -28,7 +28,10 @@ export function RadioSettingInput({
             onValueChange={handler}
         >
             {options.map((o) => (
-                <div className="flex flex-row gap-2 items-center">
+                <div
+                    key={`radio-${o}`}
+                    className="flex flex-row gap-2 items-center"
+                >
                     <RadioGroupItem value={`${o}`} />
                     <Label htmlFor={`radio-${o}`}>{o}</Label>
                 </div>
