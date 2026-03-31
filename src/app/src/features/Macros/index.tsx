@@ -163,6 +163,14 @@ const MacroWidget = ({
                 const res = await api.macros.fetch();
                 const { records: macros } = res.data;
                 setMacros(macros);
+
+                const commandKeys = store.get('commandKeys', {});
+                const filteredCommandKeys = cloneDeep(commandKeys);
+                filteredCommandKeys[id].title = name;
+
+                store.replace('commandKeys', filteredCommandKeys);
+                combokeys.reload();
+
                 actions.closeModal();
                 if (!skipToast) {
                     toast.success(`Updated macro '${name}'`, {
