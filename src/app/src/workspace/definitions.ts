@@ -21,6 +21,11 @@ export type Notification = {
 
 export type BackupFrequencies = 'On Update' | 'Daily' | 'Weekly' | 'Monthly';
 
+export type FirstToolBehavior =
+    | 'Always run full wizard'
+    | 'Prompt for first tool'
+    | 'Always probe length only';
+
 // Interfaces
 
 export interface Workspace {
@@ -50,6 +55,7 @@ export interface Workspace {
         skipDialog: boolean;
         moveToManualPosition: boolean;
         manualPosition: BasicPosition;
+        firstToolBehaviour: FirstToolBehavior;
     };
     toolChangeOption:
         | 'Ignore'

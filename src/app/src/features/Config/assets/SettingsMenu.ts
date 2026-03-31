@@ -1796,6 +1796,26 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
+                        label: 'First tool behaviour',
+                        type: 'select',
+                        key: 'workspace.toolChange.firstToolBehaviour',
+                        description:
+                            'Control how the first tool change is handled. Many CAM programs add an initial tool change command even when you already have the tool loaded.\n\n"Always run full wizard" runs the complete tool change process.\n\n"Prompt for first tool" asks whether to run the full wizard or just probe the current tool length.\n\n"Always probe length only" skips the tool change and only measures the current tool.',
+                        options: [
+                            'Always run full wizard',
+                            'Prompt for first tool',
+                            'Always probe length only',
+                        ],
+                        defaultValue: 'Always run full wizard',
+                        hidden: (getPending) => {
+                            const strategy = getPending(
+                                'workspace.toolChangeOption',
+                                '',
+                            );
+                            return strategy !== 'Fixed Tool Sensor';
+                        },
+                    },
+                    {
                         label: 'Set tool change location',
                         type: 'boolean',
                         key: 'workspace.toolChange.moveToManualPosition',
@@ -1825,7 +1845,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                                 'workspace.toolChange.moveToManualPosition',
                                 false,
                             );
-                            return strategy !== 'Fixed Tool Sensor' || !moveToLocation;
+                            return (
+                                strategy !== 'Fixed Tool Sensor' ||
+                                !moveToLocation
+                            );
                         },
                     },
                     {
@@ -2111,7 +2134,9 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description: 'Play sound when a job finishes.',
                         type: 'boolean',
                         hidden: () =>
-                            !store.get('workspace.accessibility.audioCues.enabled'),
+                            !store.get(
+                                'workspace.accessibility.audioCues.enabled',
+                            ),
                         onUpdate: () => {
                             pubsub.publish('accessibility:update');
                         },
@@ -2123,7 +2148,9 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Play sound when the machine enters an alarm state.',
                         type: 'boolean',
                         hidden: () =>
-                            !store.get('workspace.accessibility.audioCues.enabled'),
+                            !store.get(
+                                'workspace.accessibility.audioCues.enabled',
+                            ),
                         onUpdate: () => {
                             pubsub.publish('accessibility:update');
                         },
@@ -2131,10 +2158,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         label: 'Tool change sound',
                         key: 'workspace.accessibility.audioCues.toolChange',
-                        description: 'Play sound when a tool change is required.',
+                        description:
+                            'Play sound when a tool change is required.',
                         type: 'boolean',
                         hidden: () =>
-                            !store.get('workspace.accessibility.audioCues.enabled'),
+                            !store.get(
+                                'workspace.accessibility.audioCues.enabled',
+                            ),
                         onUpdate: () => {
                             pubsub.publish('accessibility:update');
                         },
@@ -2145,7 +2175,9 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description: 'Play sound after a successful probe.',
                         type: 'boolean',
                         hidden: () =>
-                            !store.get('workspace.accessibility.audioCues.enabled'),
+                            !store.get(
+                                'workspace.accessibility.audioCues.enabled',
+                            ),
                         onUpdate: () => {
                             pubsub.publish('accessibility:update');
                         },

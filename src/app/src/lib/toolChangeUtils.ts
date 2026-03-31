@@ -15,6 +15,9 @@ import {
     TOUCHPLATE_TYPES_T,
 } from 'app/features/Probe/definitions';
 import { ReduxState } from 'app/store/definitions';
+import automaticToolChange from 'app/wizards/automaticToolchange';
+import probeToolLength from 'app/wizards/probeToolLength';
+import { showFirstToolchangePrompt } from 'app/wizards/firstToolchangePrompt';
 
 export const getProbeSettings = (): ProbeWidgetSettings => {
     const probeProfile: ProbeProfile = store.get('workspace.probeProfile');
@@ -57,4 +60,47 @@ export const getUnitModal = (): UNITS_GCODE => {
         return 'G20';
     }
     return 'G21';
+};
+
+/**
+ * Determines which wizard instructions to use for Fixed Tool Sensor toolchange.
+ * For the first tool (count <= 1), behavior is controlled by the user's setting:
+ * - "Always run full wizard": Always runs automaticToolChange
+ * - "Prompt for first tool": Prompts user to choose between automaticToolChange or probeToolLength
+ * - "Always probe length only": Always runs probeToolLength
+ * For subsequent tools (count > 1), always runs automaticToolChange.
+ *
+ * @param count - The tool change count (1 for first tool, >1 for subsequent tools)
+ * @param comment - Optional comment from the gcode file
+ * @returns The appropriate wizard instructions
+ */
+export const determineFixedSensorInstructions = async (
+    count: number,
+    comment = '',
+) => {
+    if (count > 1) {
+        return automaticToolChange(count);
+    }
+
+    const firstToolBehaviour = store.get(
+        'workspace.toolChange.firstToolBehaviour',
+        'Always run full wizard',
+    );
+
+    if (firstToolBehaviour === 'Always run full wizard') {
+        return automaticToolChange(count);
+    } else if (firstToolBehaviour === 'Always probe length only') {
+        return probeToolLength();
+    } else {
+        // 'Prompt for first tool' - ask the user
+        const performInitialTC = await showFirstToolchangePrompt({
+            comment,
+        });
+
+        if (performInitialTC) {
+            return automaticToolChange(count);
+        } else {
+            return probeToolLength();
+        }
+    }
 };

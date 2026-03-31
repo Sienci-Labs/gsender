@@ -30,7 +30,7 @@ import { store as reduxStore } from 'app/store/redux';
 import controller from 'app/lib/controller';
 import manualToolChange from 'app/wizards/manualToolchange';
 import semiautoToolChange from 'app/wizards/semiautoToolchange';
-import automaticToolChange from 'app/wizards/automaticToolchange';
+import { determineFixedSensorInstructions } from 'app/lib/toolChangeUtils';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 // TODO: add worker types
 // @ts-ignore
@@ -623,48 +623,58 @@ export function* initialize(): Generator<any, void, any> {
         },
     );
 
-    controller.addListener('gcode:toolChange', (context: any, comment = '') => {
-        const payload = {
-            context,
-            comment,
-        };
-        const skipDialog = store.get('workspace.toolChange.skipDialog', false);
+    controller.addListener(
+        'gcode:toolChange',
+        async (context: any, comment = '') => {
+            const payload = {
+                context,
+                comment,
+            };
+            const skipDialog = store.get(
+                'workspace.toolChange.skipDialog',
+                false,
+            );
 
-        const { option, count } = context;
-        if (option === 'Pause') {
-            const msg = 'Toolchange pause' + (comment ? ` - ${comment}` : '');
-            if (!skipDialog) {
-                toast.info(msg, { position: 'bottom-right' });
-            }
-        } else {
-            let title, instructions;
-
-            if (option === 'Standard Re-zero') {
-                title = 'Standard Re-zero Tool Change';
-                instructions = manualToolChange;
-            } else if (option === 'Flexible Re-zero') {
-                title = 'Flexible Re-zero Tool Change';
-                instructions = semiautoToolChange(count)
-            } else if (option === 'Fixed Tool Sensor') {
-                title = 'Fixed Tool Sensor Tool Change';
-                instructions = automaticToolChange(count);
+            const { option, count } = context;
+            if (option === 'Pause') {
+                const msg =
+                    'Toolchange pause' + (comment ? ` - ${comment}` : '');
+                if (!skipDialog) {
+                    toast.info(msg, { position: 'bottom-right' });
+                }
             } else {
-                console.error('Invalid toolchange option passed');
-                return;
-            }
+                let title, instructions;
 
-            // Run start block on idle if exists
-            if (instructions.onStart) {
-                const onStart = instructions.onStart();
-                controller.command('wizard:start', onStart);
+                if (option === 'Standard Re-zero') {
+                    title = 'Standard Re-zero Tool Change';
+                    instructions = manualToolChange;
+                } else if (option === 'Flexible Re-zero') {
+                    title = 'Flexible Re-zero Tool Change';
+                    instructions = semiautoToolChange(count);
+                } else if (option === 'Fixed Tool Sensor') {
+                    title = 'Fixed Tool Sensor Tool Change';
+                    instructions = await determineFixedSensorInstructions(
+                        count,
+                        comment,
+                    );
+                } else {
+                    console.error('Invalid toolchange option passed');
+                    return;
+                }
+
+                if (instructions.onStart) {
+                    const onStart = instructions.onStart();
+                    controller.command('wizard:start', onStart);
+                }
+
+                pubsub.publish('wizard:load', {
+                    ...payload,
+                    title,
+                    instructions,
+                });
             }
-            pubsub.publish('wizard:load', {
-                ...payload,
-                title,
-                instructions,
-            });
-        }
-    });
+        },
+    );
 
     controller.addListener('toolchange:preHookComplete', (comment = '') => {
         const onConfirmhandler = () => {
