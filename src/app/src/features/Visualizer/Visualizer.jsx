@@ -1834,6 +1834,14 @@ class Visualizer extends Component {
                                 : state.objects.cuttingTool.visible);
 
                         this.group.add(this.cuttingTool);
+
+                        // Sync to current machine position (e.g. after remount from lite mode toggle)
+                        if (this.props.isConnected) {
+                            this.workPosition = this.props.workPosition;
+                            this.machinePosition = this.props.machinePosition;
+                            this.updateCuttingToolPosition(this.props.workPosition);
+                        }
+
                         // Update the scene
                         this.updateScene();
                     })
