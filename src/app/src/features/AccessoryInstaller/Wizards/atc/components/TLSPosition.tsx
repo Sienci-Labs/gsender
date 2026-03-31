@@ -43,11 +43,6 @@ export function TLSPosition({ onComplete, onUncomplete }: StepProps) {
                 position of your tool length sensor using the “Set Position”
                 button.
             </p>
-            <p className="dark:text-white">
-                If you are setting up the TLS for the first time and do not have
-                a tool in the spindle, you can align the TLS using the taper of
-                the spindle as well.
-            </p>
             <PositionSetter
                 showZ={false}
                 xPosition={position.x}

@@ -108,23 +108,26 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
                     onChange={(e) => setRackPositionMethod(e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
-                    <option value="utility">Use Utility</option>
+                    <option value="utility">Automatic</option>
                     <option value="manual">Manual</option>
                 </select>
             </div>
             {rackPositionMethod === 'utility' && (
                 <>
+                <ol>
+                    <li className="dark:text-white">
+                        Populate your tool rack with tool holders
+                    </li>
+                    <li className="dark:text-white">
+                        Position the spindle so that the tool-stud sensor is directly over the right most tool holder. Once in the proper position, the LED on the sensor will light up.
+                    </li>
+                    <li className="dark:text-white">
+                        Press the “Find Rack” button for the wizard to determine the precise position of your tool holders.
+
+                    </li>
+                </ol>
                     <p className="dark:text-white">
-                        Position the spindle until the tool-stud sensor is
-                        almost touching the right-most tool-stud, as in the
-                        provided image. The LED on the sensor should light up.
-                    </p>
-                    <p className="dark:text-white">
-                        The machine will use the Stud-finder Sensor to determine
-                        the precise position of your tool rack.
-                        <b>Keep your hands near the E-stop</b> and click “Find
-                        Rack” to start. Expect the process to take a few
-                        minutes.
+                        The machine will take a few minutes to check the position of the left-most and right-most position of each tool rack.
                     </p>
                     <StepActionButton
                         label="Find Rack"
@@ -134,24 +137,21 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
                         error={error}
                     />
                 </>
+
             )}
 
             {rackPositionMethod === 'manual' && (
                 <>
                     <p className="text-gray-900 dark:text-white">
                         <b>
-                            It is recommended that you use the provided utility.
+                            It is highly recommended that you use the automatic method, your rack may be damaged if done incorrectly.
                         </b>
                     </p>
-                    <p className="text-gray-900 dark:text-white">
-                        Position the spindle until the tool-stud sensor is
-                        almost touching the left-most tool-stud, as in the
-                        provided image. The LED on the sensor should light up.
-                    </p>
-                    <p className="text-gray-900 dark:text-white">
-                        Once you are happy with the position, use the “Set
-                        Position” button to set your rack position.
-                    </p>
+                  <ol>
+                      <li>Install a tool holder (with pull-stud removed) into the left-most slot</li>
+                      <li>Lower the spindle taper onto the tool holder until the tapers match</li>
+                      <li>Press “Set Position”</li>
+                  </ol>
                     <PositionSetter
                         showZ={true}
                         xPosition={position.x}

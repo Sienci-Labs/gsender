@@ -29,8 +29,7 @@ export function ControllerConfiguration({
     return (
         <div className="flex flex-col gap-5 justify-start">
             <p className="dark:text-white">
-                The following controller settings are required to ensure
-                compatibility with the Sienci ATC.
+                The following controller settings are being updated to ensure compatibility with the ATC.
             </p>
             <ul
                 className="list-disc list-inside text-gray-900 dark:text-white"
@@ -39,13 +38,11 @@ export function ControllerConfiguration({
                 <li>Homing direction</li>
                 <li>Tool number persistence</li>
                 <li>Input and output pin settings</li>
-                <li>Spindle VFD</li>
                 <li>Startup gcode</li>
-                <li>etc.</li>
             </ul>
 
             <p className="dark:text-white">
-                Select “Apply Settings” to apply these changes.
+                Select “Apply” to apply these changes.
             </p>
             <StepActionButton
                 label={'Apply'}

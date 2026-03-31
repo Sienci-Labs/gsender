@@ -35,10 +35,15 @@ export function Modbus({ onComplete, onUncomplete }: StepProps) {
                 </b>
             </p>
             <p className="dark:text-white">
-                Now that your Spindle has been configured and controller
-                rebooted, you must configure the Modbus Address. This will also
-                disconnect your controller.
+                Additional spindle settings are applied in this step.
             </p>
+            <ol>
+                <li>
+                Reconnect to your controller.
+                Please ignore any alarms that pop-up.
+                </li>
+                <li>Click "Apply"</li>
+            </ol>
             <StepActionButton
                 label="Configure Modbus"
                 runningLabel="Configuring..."

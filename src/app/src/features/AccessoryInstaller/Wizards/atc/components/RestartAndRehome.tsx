@@ -51,8 +51,10 @@ export function RestartAndRehome({ onComplete, onUncomplete }: StepProps) {
                 Rehome
             </label>
             <p className="dark:text-white">
-                The updated homing location requires you to rehome the machine
-                before continuing. Re-home using the provided buttons
+                Homing movements have been updated and require the machine to be rehomed.
+            </p>
+            <p className="dark:text-white">
+                Select "Re-home" to continue.
             </p>
 
             <StepActionButton

@@ -45,7 +45,7 @@ export function useSienciATCWizard(): Wizard {
             subWizards: [
                 {
                     id: 'initial-setup',
-                    title: 'Initial Setup',
+                    title: 'Setup Wizard',
                     description: 'Configure your ATC for first time use',
                     estimatedTime: '30 minutes - 2 hours',
                     configVersion: storeVersion,
@@ -54,7 +54,7 @@ export function useSienciATCWizard(): Wizard {
                     steps: [
                         {
                             id: 'macro-configuration',
-                            title: 'Macro Configuration',
+                            title: 'Tool Changing Macros',
                             component: MacroConfiguration,
                             secondaryContent: [
                                 {
@@ -66,7 +66,7 @@ export function useSienciATCWizard(): Wizard {
                         },
                         {
                             id: 'controller-configuration',
-                            title: 'Controller Configuration',
+                            title: 'Controller Setup',
                             component: ControllerConfiguration,
                             secondaryContent: [
                                 {
@@ -124,7 +124,7 @@ export function useSienciATCWizard(): Wizard {
                         },
                         {
                             id: 'spindle-config',
-                            title: 'Spindle Configuration',
+                            title: 'Spindle Setup - Part 1',
                             component: SpindleSetRestart,
                             secondaryContent: [
                                 {
@@ -135,7 +135,7 @@ export function useSienciATCWizard(): Wizard {
                         },
                         {
                             id: 'modbus-config',
-                            title: 'Modbus Configuration',
+                            title: 'Spindle Setup - Part 2',
                             component: Modbus,
                             secondaryContent: [],
                         },
@@ -150,7 +150,7 @@ export function useSienciATCWizard(): Wizard {
                     steps: [
                         {
                             id: 'atc-settings',
-                            title: 'ATC Config',
+                            title: 'ATC Options',
                             component: ATCConfigStep,
                             secondaryContent: [
                                 {

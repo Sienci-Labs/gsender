@@ -26,7 +26,7 @@ export function useValidations() {
     const connectionValidation = useMemo(
         () => () => ({
             success: isConnected,
-            reason: 'Your controller is not connected.  Connect to your controller to configure your Sienci ATC.',
+            reason: 'Your controller is not connected.  Connect to your CNC to configure this accessory.',
         }),
         [isConnected],
     );
@@ -40,7 +40,7 @@ export function useValidations() {
     const coreFirmwareValidation = useMemo(
         () => () => ({
             success: currentFirmware,
-            reason: 'You must be running a more current version of the firmware to use this feature.',
+            reason: 'This setup wizard requires a newer firmware version, please update your firmware before proceeding.',
         }),
         [currentFirmware],
     );

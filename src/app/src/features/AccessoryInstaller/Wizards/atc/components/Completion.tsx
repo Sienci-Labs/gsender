@@ -8,17 +8,15 @@ export function ATCCompletion() {
                 Setup Complete!
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl">
-                Your ATC has been successfully configured and is ready to use.
-                All calibration steps have been completed.
+                Reconnect to your CNC to start using your ATC.
             </p>
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 max-w-2xl">
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                    Next Steps:
+                    Suggested Next Steps:
                 </h3>
                 <ul className="text-left text-gray-700 dark:text-white space-y-2">
-                    <li>• Test your ATC with a sample tool change</li>
-                    <li>• Review the configuration settings if needed</li>
-                    <li>• Refer to the documentation for advanced features</li>
+                    <li>• Test your ATC with a tool change</li>
+                    <li>• Perform spindle warm up</li>
                 </ul>
             </div>
         </div>
