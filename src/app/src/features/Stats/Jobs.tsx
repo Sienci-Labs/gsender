@@ -61,16 +61,13 @@ const columnData: CustomColumnDef<Job, any>[] = [
     {
         accessorKey: 'startTime',
         header: () => 'Start Time',
-        cell: (info: { renderValue: () => Date }) => {
-            const [yyyy, mm, dd, hh, mi, _ss] = info
-                .renderValue()
-                .toString()
-                .split(/[:\-T.]+/);
+        cell: (info: { renderValue: () => string }) => {
+            const dateString = new Date(info.renderValue()).toLocaleString(
+                'en-US',
+            );
             return (
                 <>
-                    <div>
-                        {hh}:{mi} {dd}/{mm}/{yyyy}
-                    </div>
+                    <div>{dateString}</div>
                 </>
             );
         },
@@ -116,7 +113,9 @@ export function Jobs() {
                     <div className="flex items-center justify-between gap-2">
                         <CardHeader>Job History</CardHeader>
                         <Button
-                            icon={<FaTrash className="text-gray-600 w-4 h-4 dark:text-gray-200" />}
+                            icon={
+                                <FaTrash className="text-gray-600 w-4 h-4 dark:text-gray-200" />
+                            }
                             onClick={onClearJobHistory}
                             text="Clear"
                             size="sm"

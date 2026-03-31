@@ -19,7 +19,7 @@ type AlarmItemProps = {
 };
 
 function AlarmItem({ alarm }: AlarmItemProps) {
-    const [yyyy, mm, dd, hh, mi, _ss] = alarm.time.toString().split(/[:\-T.]+/);
+    const dateString = new Date(alarm.time).toLocaleString('en-US');
 
     const isAlarm = alarm.type === 'ALARM';
     return (
@@ -49,7 +49,7 @@ function AlarmItem({ alarm }: AlarmItemProps) {
                 {alarm.type} {alarm.CODE} - {alarm.source}
             </h3>
             <time className="block mb-2 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">
-                {`at ${hh}:${mi} ${dd}/${mm}/${yyyy}`}
+                {`at ${dateString}`}
             </time>
             <p className="text-base font-normal text-gray-500 dark:text-gray-300">
                 {alarm.MESSAGE || 'No associated message'}
