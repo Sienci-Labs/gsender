@@ -33,7 +33,9 @@ export function SelectSettingInput({
             </SelectTrigger>
             <SelectContent className="bg-white bg-opacity-100 dark:border-gray-500 ring-1 ring-gray-300 rounded-md">
                 {options.map((o) => (
-                    <SelectItem value={`${o}`}>{o}</SelectItem>
+                    <SelectItem key={`${o}`} value={`${o}`}>
+                        {o}
+                    </SelectItem>
                 ))}
             </SelectContent>
         </Select>

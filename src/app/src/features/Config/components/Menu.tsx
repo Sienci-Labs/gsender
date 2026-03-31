@@ -14,7 +14,6 @@ interface MenuProps {
 }
 
 interface MenuItemProps {
-    key: string;
     label: string;
     active?: boolean;
     onClick?: (e: MouseEventHandler<HTMLButtonElement>, n: number) => void;
@@ -26,14 +25,7 @@ export function tallySettings(settings: SettingsMenuSection) {
     return settings.settings.reduce((a, b) => a + b.settings.length, 0);
 }
 
-function MenuItem({
-    key,
-    label,
-    active,
-    onClick,
-    icon,
-    available,
-}: MenuItemProps) {
+function MenuItem({ label, active, onClick, icon, available }: MenuItemProps) {
     return (
         <button
             className={cn(
@@ -46,7 +38,6 @@ function MenuItem({
                     hidden: available === 0,
                 },
             )}
-            key={key}
             onClick={onClick}
         >
             <span
