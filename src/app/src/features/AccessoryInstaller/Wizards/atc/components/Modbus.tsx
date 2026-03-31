@@ -37,12 +37,12 @@ export function Modbus({ onComplete, onUncomplete }: StepProps) {
             <p className="dark:text-white">
                 Additional spindle settings are applied in this step.
             </p>
-            <ol>
+            <ol className="list-decimal">
                 <li>
                 Reconnect to your controller.
                 Please ignore any alarms that pop-up.
                 </li>
-                <li>Press "Apply and Restart"</li>
+                <li>Press <b>"Apply and Restart"</b></li>
             </ol>
             <StepActionButton
                 label="Apply and Restart"

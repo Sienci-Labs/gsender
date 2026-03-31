@@ -91,13 +91,13 @@ export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
             </p>
 
             <p className="dark:text-white">
-                Specify your rack size and click “Upload Macros” to upload the
+                Specify your rack size and press <b>“Upload Macros”</b> to upload the
                 relevant program files into the SD card. This can be changed
                 later.
             </p>
 
             <StepActionButton
-                label={'Upload'}
+                label={'Upload Macros'}
                 runningLabel="Uploading..."
                 onApply={handleUpload}
                 isComplete={isComplete}

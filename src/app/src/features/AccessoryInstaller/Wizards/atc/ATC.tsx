@@ -53,6 +53,17 @@ export function useSienciATCWizard(): Wizard {
                     completionImage: CompletionImg,
                     steps: [
                         {
+                            id: 'spindle-config',
+                            title: 'Spindle Setup - Part 1',
+                            component: SpindleSetRestart,
+                            secondaryContent: [
+                                {
+                                    type: 'image',
+                                    content: PlaceholderImageFive,
+                                },
+                            ],
+                        },
+                        {
                             id: 'macro-configuration',
                             title: 'Tool Changing Macros',
                             component: MacroConfiguration,

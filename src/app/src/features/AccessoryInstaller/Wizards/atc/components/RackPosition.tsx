@@ -114,7 +114,7 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
             </div>
             {rackPositionMethod === 'utility' && (
                 <>
-                <ol>
+                <ol className="list-decimal">
                     <li className="dark:text-white">
                         Populate your tool rack with tool holders
                     </li>
@@ -147,10 +147,10 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
                             It is highly recommended that you use the automatic method, your rack may be damaged if done incorrectly.
                         </b>
                     </p>
-                  <ol>
+                  <ol className="list-decimal">
                       <li>Install a tool holder (with pull-stud removed) into the left-most slot</li>
                       <li>Lower the spindle taper onto the tool holder until the tapers match</li>
-                      <li>Press “Set Position”</li>
+                      <li>Press <b>“Set Position”</b></li>
                   </ol>
                     <PositionSetter
                         showZ={true}
