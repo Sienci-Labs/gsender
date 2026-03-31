@@ -51,13 +51,13 @@ export function SpindleSetRestart({ onComplete, onUncomplete }: StepProps) {
             </p>
             <ol>
                 <li>
-                    Click <b>"Apply And Restart"</b>
+                    Press <b>"Apply And Restart"</b>
                 </li>
                 <li>Click "Next"</li>
             </ol>
             <StepActionButton
-                label="Setup Spindle and Reboot"
-                runningLabel="Configuring..."
+                label="Apply and Restart"
+                runningLabel="Applying..."
                 onApply={setupSpindleAndReboot}
                 isComplete={hasSetupSpindle}
                 error={error}

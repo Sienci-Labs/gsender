@@ -38,7 +38,7 @@ export function ControllerConfiguration({
                 <li>Homing direction</li>
                 <li>Tool number persistence</li>
                 <li>Input and output pin settings</li>
-                <li>Startup gcode</li>
+                <li>Startup g-code</li>
             </ul>
 
             <p className="dark:text-white">

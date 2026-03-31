@@ -42,11 +42,11 @@ export function Modbus({ onComplete, onUncomplete }: StepProps) {
                 Reconnect to your controller.
                 Please ignore any alarms that pop-up.
                 </li>
-                <li>Click "Apply"</li>
+                <li>Press "Apply and Restart"</li>
             </ol>
             <StepActionButton
-                label="Configure Modbus"
-                runningLabel="Configuring..."
+                label="Apply and Restart"
+                runningLabel="Applying..."
                 onApply={configureModbus}
                 isComplete={hasConfiguredModbus}
                 error={error}
