@@ -2501,7 +2501,7 @@ class GrblHalController {
                         }
                         this.ymodem.sendFiles(files, this.connection.getConnectionObject());
                     } else {
-                        this.emit('ymodem:error', 'SD Card failed to mount, unable to upload files.');
+                        this.emit('ymodem:error', 'SD Card not detected, please insert an SD Card in FAT32 format, 32 GB or under, and try again');
                     }
                 }, 1500);
             },

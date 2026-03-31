@@ -143,7 +143,7 @@ export function useSienciATCWizard(): Wizard {
                 },
                 {
                     id: 'configure-atc',
-                    title: 'Configure ATC',
+                    title: 'ATC Options',
                     description: 'Adjust ATC settings',
                     estimatedTime: '10 minutes',
                     configVersion: storeVersion,
