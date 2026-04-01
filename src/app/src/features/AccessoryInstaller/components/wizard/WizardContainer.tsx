@@ -163,7 +163,7 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
                         )}
                     </div>
 
-                    <div className="w-2/5 portrait:h-2/5 portrait:w-full bg-gray-200 dark:bg-dark p-12 portrait:p-4 flex flex-col overflow-hidden">
+                    <div className="w-2/5 portrait:h-2/5 portrait:w-full p-4 portrait:p-4 flex flex-col overflow-hidden">
                         {showCompletion && CompletionComponent ? (
                             <SecondaryContentPanel
                                 content={[
