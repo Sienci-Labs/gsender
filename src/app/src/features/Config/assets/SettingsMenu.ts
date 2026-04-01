@@ -1318,6 +1318,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         eID: '$32',
                     },
                     {
+                        type: 'eeprom',
+                        eID: '$394'
+                    },
+                    {
                         label: 'Spindle on delay',
                         key: 'widgets.spindle.delay',
                         description:
@@ -1326,6 +1330,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         eID: '$392',
                         unit: 's',
                     },
+
                     {
                         type: 'eeprom',
                         eID: '$539',
