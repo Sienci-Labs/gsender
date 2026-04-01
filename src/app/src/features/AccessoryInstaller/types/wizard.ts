@@ -18,7 +18,7 @@ export interface StepProps {
 }
 
 export interface SecondaryContent {
-    type: 'image' | 'component' | 'link';
+    type: 'image' | 'component' | 'link' | 'video';
     content: string | ComponentType<any>;
     title?: string;
     url?: string;

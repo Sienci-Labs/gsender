@@ -8,7 +8,8 @@ import HomingImg from './assets/Step_04_Homing.webp';
 import RackA from './assets/Step_5A_Rack_Position_06.webp';
 // import RackB from './assets/Step_5B_Rack_Position_01.webp';
 import TLSPosImg from './assets/Step_07_ToolLength_Sensor_Position.webp';
-import PlaceholderImageFive from './assets/placeholder_TLS.png';
+import Spindle1Video from './assets/spindle_1.mp4';
+import Spindle2Video from './assets/spindle_2.mp4';
 import CompletionImg from './assets/Step_10_Setup_Complete.webp';
 import { MacroConfiguration } from 'app/features/AccessoryInstaller/Wizards/atc/components/MacroConfiguration.tsx';
 import { ControllerConfiguration } from 'app/features/AccessoryInstaller/Wizards/atc/components/ControllerConfiguration.tsx';
@@ -53,6 +54,40 @@ export function useSienciATCWizard(): Wizard {
                     completionPage: ATCCompletion,
                     completionImage: CompletionImg,
                     steps: [
+                        {
+                            id: 'spindle-config',
+                            title: 'Spindle Setup - Part 1',
+                            component: SpindleSetRestart,
+                            secondaryContent: [
+                                {
+                                    type: 'video',
+                                    content: Spindle1Video,
+                                },
+                                {
+                                    type: 'link',
+                                    title: 'Need help?',
+                                    content: "Follow along in our",
+                                    url: 'https://resources.sienci.com/view/atc-software/'
+                                }
+                            ],
+                        },
+                        {
+                            id: 'modbus-config',
+                            title: 'Spindle Setup - Part 2',
+                            component: Modbus,
+                            secondaryContent: [
+                                {
+                                    type: 'video',
+                                    content: Spindle2Video,
+                                },
+                                {
+                                    type: 'link',
+                                    title: 'Need help?',
+                                    content: "Follow along in our",
+                                    url: 'https://resources.sienci.com/view/atc-software/'
+                                }
+                            ],
+                        },
                         {
                             id: 'macro-configuration',
                             title: 'Tool Changing Macros',
@@ -162,8 +197,8 @@ export function useSienciATCWizard(): Wizard {
                             component: SpindleSetRestart,
                             secondaryContent: [
                                 {
-                                    type: 'image',
-                                    content: PlaceholderImageFive,
+                                    type: 'video',
+                                    content: Spindle1Video,
                                 },
                                 {
                                     type: 'link',
@@ -177,12 +212,18 @@ export function useSienciATCWizard(): Wizard {
                             id: 'modbus-config',
                             title: 'Spindle Setup - Part 2',
                             component: Modbus,
-                            secondaryContent: [                                {
-                                type: 'link',
-                                title: 'Need help?',
-                                content: "Follow along in our",
-                                url: 'https://resources.sienci.com/view/atc-software/'
-                            }],
+                            secondaryContent: [
+                                {
+                                    type: 'video',
+                                    content: Spindle2Video,
+                                },
+                                {
+                                    type: 'link',
+                                    title: 'Need help?',
+                                    content: "Follow along in our",
+                                    url: 'https://resources.sienci.com/view/atc-software/'
+                                }
+                            ],
                         },
                     ],
                 },

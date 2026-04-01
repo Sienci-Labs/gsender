@@ -58,6 +58,28 @@ export function SecondaryContentPanel({ content }: SecondaryContentPanelProps) {
             );
         }
 
+        if (item.type === 'video') {
+            return (
+                <div key={index} className={containerClassName}>
+                    {item.title && (
+                        <h3 className="text-sm font-semibold text-gray-700 dark:text-white mb-2">
+                            {item.title}
+                        </h3>
+                    )}
+                    <div className="rounded-lg bg-gray-300 dark:bg-gray-700 p-1.5">
+                        <video
+                            src={item.content as string}
+                            className="w-full rounded-md shadow-sm"
+                            autoPlay
+                            muted
+                            loop
+                            playsInline
+                        />
+                    </div>
+                </div>
+            );
+        }
+
         if (item.type === 'component') {
             const Component = item.content as ComponentType<any>;
             return (
