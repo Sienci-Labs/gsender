@@ -4,6 +4,7 @@ import get from 'lodash/get';
 import reduxStore from 'app/store/redux';
 
 import gamepad, { checkButtonHold } from 'app/lib/gamepad';
+import { isOverrideAction } from './OverrideLoop';
 import controller from 'app/lib/controller';
 import { GRBLHAL } from '../../constants';
 
@@ -206,7 +207,7 @@ export class JoystickLoop {
             : 'secondaryAction';
 
         const stickX = {
-            axis: horizontal[actionType],
+            axis: isOverrideAction(horizontal[actionType]) ? null : horizontal[actionType],
             positiveDirection:
                 MOVEMENT_DISTANCE * getDirection(horizontal.isReversed),
             negativeDirection:
@@ -214,7 +215,7 @@ export class JoystickLoop {
         };
 
         const stickY = {
-            axis: vertical[actionType],
+            axis: isOverrideAction(vertical[actionType]) ? null : vertical[actionType],
             positiveDirection:
                 MOVEMENT_DISTANCE * getDirection(vertical.isReversed),
             negativeDirection:
@@ -442,6 +443,10 @@ export class JoystickLoop {
 
             const [axis, axisValue] = Object.entries(axesData)[0];
 
+            if (isOverrideAction(axis)) {
+                return acc;
+            }
+
             const feedrate = this._computeFeedrate(curr);
 
             acc[axis] =
@@ -560,6 +565,10 @@ export class JoystickLoop {
             }
 
             const [axis, axisValue] = Object.entries(curr)[0];
+
+            if (isOverrideAction(axis)) {
+                return acc;
+            }
 
             acc[axis] = axisValue;
 
