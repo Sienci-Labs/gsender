@@ -55,40 +55,6 @@ export function useSienciATCWizard(): Wizard {
                     completionImage: CompletionImg,
                     steps: [
                         {
-                            id: 'spindle-config',
-                            title: 'Spindle Setup - Part 1',
-                            component: SpindleSetRestart,
-                            secondaryContent: [
-                                {
-                                    type: 'video',
-                                    content: Spindle1Video,
-                                },
-                                {
-                                    type: 'link',
-                                    title: 'Need help?',
-                                    content: "Follow along in our",
-                                    url: 'https://resources.sienci.com/view/atc-software/'
-                                }
-                            ],
-                        },
-                        {
-                            id: 'modbus-config',
-                            title: 'Spindle Setup - Part 2',
-                            component: Modbus,
-                            secondaryContent: [
-                                {
-                                    type: 'video',
-                                    content: Spindle2Video,
-                                },
-                                {
-                                    type: 'link',
-                                    title: 'Need help?',
-                                    content: "Follow along in our",
-                                    url: 'https://resources.sienci.com/view/atc-software/'
-                                }
-                            ],
-                        },
-                        {
                             id: 'macro-configuration',
                             title: 'Tool Changing Macros',
                             component: MacroConfiguration,
