@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import {
     Card,
@@ -41,6 +41,14 @@ export const ConfigTab: React.FC = ({ uploading, uploadError }: ConfigTabProps) 
         setWorkspacePosition,
         status,
     } = useConfigContext();
+
+    const [forkSpacingStr, setForkSpacingStr] = useState<string>(
+        () => String(config.variables._tc_slot_offset.value),
+    );
+
+    useEffect(() => {
+        setForkSpacingStr(String(config.variables._tc_slot_offset.value));
+    }, [config.variables._tc_slot_offset.value]);
 
     const nonDefaultStyling = 'bg-yellow-50 dark:bg-yellow-900/20';
     const labelClass = 'text-xs font-semibold text-gray-500 dark:text-white';
@@ -408,26 +416,33 @@ export const ConfigTab: React.FC = ({ uploading, uploadError }: ConfigTabProps) 
                                             type="number"
                                             step="any"
                                             wrapperClassName="w-auto"
-                                            value={
-                                                config.variables._tc_slot_offset
-                                                    .value
-                                            }
+                                            value={forkSpacingStr}
                                             onChange={(e) =>
-                                                updateConfig({
-                                                    variables: {
-                                                        ...config.variables,
-                                                        _tc_slot_offset: {
-                                                            ...config.variables
-                                                                ._tc_slot_offset,
-                                                            value:
-                                                                parseFloat(
-                                                                    e.target
-                                                                        .value,
-                                                                ) || 0,
-                                                        },
-                                                    },
-                                                })
+                                                setForkSpacingStr(e.target.value)
                                             }
+                                            onBlur={() => {
+                                                const parsed = parseFloat(forkSpacingStr);
+                                                if (!isNaN(parsed)) {
+                                                    updateConfig({
+                                                        variables: {
+                                                            ...config.variables,
+                                                            _tc_slot_offset: {
+                                                                ...config.variables._tc_slot_offset,
+                                                                value: parsed,
+                                                            },
+                                                        },
+                                                    });
+                                                } else {
+                                                    setForkSpacingStr(
+                                                        String(config.variables._tc_slot_offset.value),
+                                                    );
+                                                }
+                                            }}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.currentTarget.blur();
+                                                }
+                                            }}
                                             className="h-7 w-16 text-xs border-gray-300 dark:border-slate-600 dark:bg-slate-900 dark:text-white focus:border-blue-500 focus:ring-blue-500 shrink-0 ml-auto"
                                         />
                                     </div>
