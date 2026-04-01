@@ -122,7 +122,7 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
                         Position the spindle so that the tool-stud sensor is directly over the right most tool holder. Once in the proper position, the LED on the sensor will light up.
                     </li>
                     <li className="dark:text-white">
-                        Press the “Find Rack” button for the wizard to determine the precise position of your tool holders.
+                        Press the <b>“Find Rack”</b> button for the wizard to determine the precise position of your tool holders.
 
                     </li>
                 </ol>

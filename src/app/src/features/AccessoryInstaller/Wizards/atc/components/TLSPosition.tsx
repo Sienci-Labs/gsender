@@ -40,7 +40,7 @@ export function TLSPosition({ onComplete, onUncomplete }: StepProps) {
         <div className="flex flex-col gap-5 justify-start">
             <p className="dark:text-white">
                 Please jog until just above the Tool Length Sensor and set the
-                position of your tool length sensor using the “Set Position”
+                position of your tool length sensor using the <b>“Set Position”</b>
                 button.
             </p>
             <PositionSetter

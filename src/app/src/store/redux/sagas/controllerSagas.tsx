@@ -1018,7 +1018,7 @@ export function* initialize(): Generator<any, void, any> {
                 Confirm({
                     title: payload.message,
                     content: payload.description,
-                    confirmLabel: 'Continue',
+                    confirmLabel: 'Resume',
                     cancelLabel: 'Reset',
                     onConfirm: () => {
                         controller.command('cyclestart');
