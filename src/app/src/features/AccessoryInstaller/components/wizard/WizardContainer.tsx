@@ -32,6 +32,15 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
         setShowCompletion(false);
     }, [subWizard.id]);
 
+    useEffect(() => {
+        if (!currentStep.autoComplete?.()) return;
+
+        setCompletedSteps(prev => new Set(prev).add(currentStepIndex));
+        if (currentStepIndex < subWizard.steps.length - 1) {
+            setCurrentStepIndex(prev => prev + 1);
+        }
+    }, [currentStepIndex, subWizard.id]);
+
     const handleNext = () => {
         if (!isLastStep && isCurrentStepComplete) {
             setCurrentStepIndex(currentStepIndex + 1);

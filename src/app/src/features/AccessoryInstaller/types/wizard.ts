@@ -7,6 +7,7 @@ export interface WizardStep {
     secondaryContent?: SecondaryContent[];
     contextProvider?: ComponentType<{ children: ReactNode }>;
     fillPrimaryContent?: boolean;
+    autoComplete?: () => boolean;
 }
 
 export interface StepProps {
