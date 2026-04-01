@@ -42,6 +42,7 @@ export function useSienciATCWizard(): Wizard {
             title: 'Sienci ATC',
             image: ATCiLogo,
             validations: [...validations],
+            helpUrl: 'https://resources.sienci.com/view/atc-software/',
             subWizards: [
                 {
                     id: 'initial-setup',

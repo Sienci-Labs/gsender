@@ -57,6 +57,7 @@ export function WizardManager({ wizard, onExit, initialSubWizardId }: WizardMana
                     onSelectSubWizard={handleSelectSubWizard}
                     onBack={onExit}
                     validations={wizard.validations}
+                    helpUrl={wizard.helpUrl}
                 />
             )}
         </div>

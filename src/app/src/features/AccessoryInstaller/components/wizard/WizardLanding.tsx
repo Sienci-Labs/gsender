@@ -10,6 +10,7 @@ interface WizardLandingProps {
     onSelectSubWizard: (subWizard: SubWizard) => void;
     onBack?: () => void;
     validations?: (() => ValidationResult)[];
+    helpUrl?: string;
 }
 
 export function WizardLanding({
@@ -19,6 +20,7 @@ export function WizardLanding({
     onSelectSubWizard,
     onBack,
     validations,
+    helpUrl,
 }: WizardLandingProps) {
     const activeSubWizard = subWizards.find(
         (sw) => sw.id === subWizards[0]?.id,
@@ -143,7 +145,12 @@ export function WizardLanding({
                             </h3>
                             <p className="text-gray-600 dark:text-gray-400">
                                 Follow along in our{' '}
-                                <a href="https://resources.sienci.com/" target="_blank" className="text-blue-500 font-bold">
+                                <a
+                                    href={helpUrl ?? 'https://resources.sienci.com/'}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-500 font-bold"
+                                >
                                     online resources
                                 </a>
                             </p>

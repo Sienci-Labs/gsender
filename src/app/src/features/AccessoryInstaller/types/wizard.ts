@@ -51,4 +51,5 @@ export interface Wizard {
     image?: string;
     subWizards: SubWizard[];
     validations: (() => ValidationResult)[];
+    helpUrl?: string;
 }
