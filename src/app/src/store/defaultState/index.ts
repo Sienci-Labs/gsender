@@ -194,6 +194,7 @@ const defaultState: State = {
                 showVisually: false,
             },
             showKeyboardMap: false,
+            displayScaleFactor: '100%',
         },
         preventJoggingPastLimits: false,
     },
@@ -369,7 +370,7 @@ const defaultState: State = {
                 minPower: 0,
                 maxPower: 255,
             },
-            inputType: 'Slider'
+            inputType: 'Slider',
         },
         surfacing: {
             bitDiameter: 22,

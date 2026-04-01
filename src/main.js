@@ -275,6 +275,12 @@ const main = () => {
             };
             const window = await windowManager.openWindow(url, options, splashScreen);
 
+            window.on("ready-to-show", () => {
+                const savedScaleFactor = Number(store.get("displayScaleFactor", 1.0));
+
+                window.webContents.setZoomFactor(savedScaleFactor);
+            });
+
             // Check argv for file path on Windows/Linux cold start
             if (process.platform !== 'darwin') {
                 const filePath = process.argv.find(arg =>
@@ -500,6 +506,13 @@ const main = () => {
                 windowManager.childWindows.forEach((window) => {
                     window.webContents.send('recieve-data-' + widget, data);
                 });
+            });
+
+            ipcMain.on("save-display-scale", (_event, scaleFactor) => {
+                const value = Number(scaleFactor) || 1.0;
+
+                store.set("displayScaleFactor", value);
+                window.webContents.setZoomFactor(value);
             });
 
             //Handle app restart with remote settings
