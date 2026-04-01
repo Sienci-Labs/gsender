@@ -40,7 +40,7 @@ export function useValidations() {
     const coreFirmwareValidation = useMemo(
         () => () => ({
             success: currentFirmware,
-            reason: 'This setup wizard requires a newer firmware version, please update your firmware before proceeding.',
+            reason: <p>This setup wizard requires a newer firmware version, please update your firmware before proceeding. <a target="_blank" className="text-blue-500 underline" href="https://resources.sienci.com/view/slb-firmware-flashing/">Learn More</a></p>,
         }),
         [currentFirmware],
     );

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import type { ReactNode } from 'react';
 import { Loader2, Check, AlertCircle, CheckCircle } from 'lucide-react';
 
 type ButtonState = 'available' | 'running' | 'finished' | 'error';
@@ -11,8 +12,8 @@ interface StepActionButtonProps {
     onApply: () => void;
     isComplete?: boolean;
     disabled?: boolean;
-    error?: string | null;
-    success?: string | null;
+    error?: ReactNode | null;
+    success?: ReactNode | null;
     className?: string;
     variant?: 'primary' | 'secondary';
     icon?: React.ReactNode;

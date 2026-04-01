@@ -41,7 +41,7 @@ export interface SubWizard {
 
 export interface ValidationResult {
     success: boolean;
-    reason?: string;
+    reason?: ReactNode;
 }
 
 export interface Wizard {

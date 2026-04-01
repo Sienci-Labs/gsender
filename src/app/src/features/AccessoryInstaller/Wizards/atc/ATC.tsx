@@ -71,7 +71,7 @@ export function useSienciATCWizard(): Wizard {
                                 {
                                     type: 'link',
                                     title: 'Need help?',
-                                    content: "Follow along in our online resources",
+                                    content: "Follow along in our",
                                     url: 'https://resources.sienci.com/view/atc-software/'
                                 }
                             ],
@@ -89,7 +89,7 @@ export function useSienciATCWizard(): Wizard {
                                 {
                                     type: 'link',
                                     title: 'Need help?',
-                                    content: "Follow along in our online resources",
+                                    content: "Follow along in our",
                                     url: 'https://resources.sienci.com/view/atc-software/'
                                 }
                             ],
@@ -106,7 +106,7 @@ export function useSienciATCWizard(): Wizard {
                                 {
                                     type: 'link',
                                     title: 'Need help?',
-                                    content: "Follow along in our online resources",
+                                    content: "Follow along in our",
                                     url: 'https://resources.sienci.com/view/atc-software/'
                                 }
                             ],
@@ -123,7 +123,7 @@ export function useSienciATCWizard(): Wizard {
                                 {
                                     type: 'link',
                                     title: 'Need help?',
-                                    content: "Follow along in our online resources",
+                                    content: "Follow along in our",
                                     url: 'https://resources.sienci.com/view/atc-software/'
                                 }
                             ],
@@ -147,7 +147,7 @@ export function useSienciATCWizard(): Wizard {
                                 {
                                     type: 'link',
                                     title: 'Need help?',
-                                    content: "Follow along in our online resources",
+                                    content: "Follow along in our",
                                     url: 'https://resources.sienci.com/view/atc-software/'
                                 }
                             ],
@@ -171,7 +171,7 @@ export function useSienciATCWizard(): Wizard {
                                 {
                                     type: 'link',
                                     title: 'Need help?',
-                                    content: "Follow along in our online resources",
+                                    content: "Follow along in our",
                                     url: 'https://resources.sienci.com/view/atc-software/'
                                 }
                             ],
@@ -188,7 +188,7 @@ export function useSienciATCWizard(): Wizard {
                                 {
                                     type: 'link',
                                     title: 'Need help?',
-                                    content: "Follow along in our online resources",
+                                    content: "Follow along in our",
                                     url: 'https://resources.sienci.com/view/atc-software/'
                                 }
                             ],
@@ -200,7 +200,7 @@ export function useSienciATCWizard(): Wizard {
                             secondaryContent: [                                {
                                 type: 'link',
                                 title: 'Need help?',
-                                content: "Follow along in our online resources",
+                                content: "Follow along in our",
                                 url: 'https://resources.sienci.com/view/atc-software/'
                             }],
                         },
