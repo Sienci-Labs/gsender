@@ -1770,6 +1770,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Standard wizard will guide you through the steps to manually set up a new tool and resume cutting.\n\nFlexible is similar but uses a touch plate like a tool length sensor.\n\nFixed is also guided but fully automated, moving around and measuring tools for you. Homing and TLS required.\n\nCode is for fully custom setups.',
                         options: [
                             'Ignore',
+                            'GrblHAL Toolchange Protocol',
                             'Pause',
                             'Standard Re-zero',
                             'Flexible Re-zero',

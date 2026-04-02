@@ -64,7 +64,8 @@ import {
     GRBL_HAL_ACTIVE_STATE_IDLE,
     GRBL_HAL_ACTIVE_STATE_CHECK,
     GRBL_HAL_ACTIVE_STATE_RUN,
-    GRBL_HAL_ACTIVE_STATE_ALARM
+    GRBL_HAL_ACTIVE_STATE_ALARM,
+    GRBL_HAL_ACTIVE_STATE_TOOL
 } from './constants';
 import {
     METRIC_UNITS,
@@ -152,6 +153,8 @@ class GrblHalController {
     settings = {};
 
     toolChangeContext = {};
+
+    grblHalToolChangePending = false;
 
     queryTimer = null;
 
@@ -531,7 +534,10 @@ class GrblHalController {
 
                     // Handle specific cases for macro and pause, ignore is default and comments line out with no other action
                     // If toolchange is at very beginning of file, ignore it
-                    if (toolChangeOption !== 'Ignore') {
+                    if (toolChangeOption === 'GrblHAL Toolchange Protocol') {
+                        // Firmware handles M6 and will enter Tool state; we respond via status handler
+                        // Pass M6 through unmodified - no gSender workflow involved
+                    } else if (toolChangeOption !== 'Ignore') {
                         if (tool) {
                             commentString = `(${tool?.[0]}) ` + commentString;
                         }
@@ -561,7 +567,7 @@ class GrblHalController {
                     }
 
                     const passthroughM6 = _.get(this.toolChangeContext, 'passthrough', false);
-                    if (!passthroughM6 || toolChangeOption === 'Code') {
+                    if (toolChangeOption !== 'GrblHAL Toolchange Protocol' && (!passthroughM6 || toolChangeOption === 'Code')) {
                         line = line.replace('M6', '(M6)');
                     }
                     //line = line.replace(`${tool?.[0]}`, `(${tool?.[0]})`);
@@ -695,6 +701,19 @@ class GrblHalController {
         });
 
         this.runner.on('status', (res) => {
+            // grblHAL manual tool change protocol:
+            // When firmware enters Tool state, send ACK (0xA3) once
+            if (res.activeState === GRBL_HAL_ACTIVE_STATE_TOOL) {
+                if (this.toolChangeContext.toolChangeOption === 'GrblHAL Toolchange Protocol' && !this.grblHalToolChangePending) {
+                    this.grblHalToolChangePending = true;
+                    log.info('grblHAL toolchange protocol: sending ACK (0xA3), suspending sender');
+                    this.write(GRBLHAL_REALTIME_COMMANDS.TOOL_CHANGE_ACK);
+                    this.workflow.pause({ data: 'grblhal-toolchange' });
+                }
+            } else if (this.grblHalToolChangePending) {
+                this.grblHalToolChangePending = false;
+            }
+
             // Make sure we also have axs parsed - at most two times or we get endless loop
             if (!this.runner.hasAXS() && res.activeState === GRBL_HAL_ACTIVE_STATE_IDLE && this.actionMask.axsReportCount < 2) {
                 this.writeln('$I');
