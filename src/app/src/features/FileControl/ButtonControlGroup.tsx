@@ -12,7 +12,7 @@ import { RootState, store as reduxStore } from 'app/store/redux';
 import store from 'app/store';
 import controller from 'app/lib/controller';
 import {
-    CARVING_CATEGORY,
+    CARVING_CATEGORY, GRBL_ACTIVE_STATE_CHECK,
     VISUALIZER_PRIMARY,
     WORKFLOW_STATE_RUNNING,
 } from 'app/constants';
@@ -66,7 +66,11 @@ const ButtonControlGroup = () => {
     const workflowState = useSelector(
         (state: RootState) => state.controller.workflow.state,
     );
+
+    const activeState = useTypedSelector((state: RootState) => state.controller.state.status?.activeState);
+
     const isRunning = workflowState === WORKFLOW_STATE_RUNNING;
+    const isCheck = workflowState === GRBL_ACTIVE_STATE_CHECK;
     const canClick = !isRunning;
 
     useEffect(() => {
@@ -224,7 +228,7 @@ const ButtonControlGroup = () => {
                                     <MdKeyboardArrowDown className="w-10 h-8" />
                                 }
                                 variant="ghost"
-                                disabled={!canClick}
+                                disabled={!canClick || isCheck}
                                 className="h-full rounded-none"
                                 aria-label="View Recent Files"
                             />
