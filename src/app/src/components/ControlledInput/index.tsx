@@ -23,10 +23,14 @@ const ControlledInput = forwardRef<HTMLInputElement, InputProps>(
             type,
             value,
             onChange,
+            onFocus: externalOnFocus,
+            onBlur: externalOnBlur,
+            onKeyDown: externalOnKeyDown,
             wrapperClassName,
             immediateOnChange = false,
             min,
             max,
+            step,
             ...props
         },
         ref,
@@ -47,6 +51,8 @@ const ControlledInput = forwardRef<HTMLInputElement, InputProps>(
 
         const saveChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
             const current = e.target.value;
+            const originalString = String(originalValue ?? '');
+            const hasChanged = current !== originalString;
 
             if (isDeferredNumeric) {
                 const parsed = parseFloat(current);
@@ -59,14 +65,28 @@ const ControlledInput = forwardRef<HTMLInputElement, InputProps>(
                 }
             }
 
-            if (localValue && localValue !== originalValue) {
+            if (hasChanged) {
                 if (type === 'number') {
-                    if (min !== null && current < min) {
-                        e.target.value = String(min);
-                        setLocalValue(min);
-                    } else if (max !== null && current > max) {
-                        e.target.value = String(max);
-                        setLocalValue(max);
+                    const numericCurrent = Number(current);
+                    const numericMin =
+                        min !== undefined && min !== null ? Number(min) : null;
+                    const numericMax =
+                        max !== undefined && max !== null ? Number(max) : null;
+
+                    if (
+                        numericMin !== null &&
+                        !Number.isNaN(numericCurrent) &&
+                        numericCurrent < numericMin
+                    ) {
+                        e.target.value = String(numericMin);
+                        setLocalValue(numericMin);
+                    } else if (
+                        numericMax !== null &&
+                        !Number.isNaN(numericCurrent) &&
+                        numericCurrent > numericMax
+                    ) {
+                        e.target.value = String(numericMax);
+                        setLocalValue(numericMax);
                     } else {
                         setLocalValue(current);
                     }
@@ -79,15 +99,20 @@ const ControlledInput = forwardRef<HTMLInputElement, InputProps>(
             }
         };
 
-        const onFocus = () => {
+        const onFocus = (e: React.FocusEvent<HTMLInputElement>) => {
             setOriginalValue(localValue);
             setIsFocused(true);
+            if (externalOnFocus) {
+                externalOnFocus(e);
+            }
         };
 
         const onBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-            setIsFocused(false);
-            e.target.blur();
             saveChanges(e);
+            setIsFocused(false);
+            if (externalOnBlur) {
+                externalOnBlur(e);
+            }
         };
 
         const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -100,6 +125,9 @@ const ControlledInput = forwardRef<HTMLInputElement, InputProps>(
                 saveChanges(
                     e as unknown as React.ChangeEvent<HTMLInputElement>,
                 );
+            }
+            if (externalOnKeyDown) {
+                externalOnKeyDown(e);
             }
         };
 
@@ -130,6 +158,7 @@ const ControlledInput = forwardRef<HTMLInputElement, InputProps>(
             <ShadcnInput
                 type={isDeferredNumeric ? 'text' : type}
                 inputMode={isDeferredNumeric ? 'decimal' : undefined}
+                step={type === 'number' && step == null ? 'any' : step}
                 className={className}
                 wrapperClassName={wrapperClassName}
                 onFocus={onFocus}

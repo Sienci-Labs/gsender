@@ -138,6 +138,7 @@ const SurfacingTool = () => {
                   skimDepth: convertToImperial(defaultSurfacingState.skimDepth),
                   maxDepth: convertToImperial(defaultSurfacingState.maxDepth),
               };
+    const xyMin = units === IMPERIAL_UNITS ? convertToImperial(1) : 1;
 
     return (
         <>
@@ -172,7 +173,7 @@ const SurfacingTool = () => {
                                         type="number"
                                         id="width"
                                         suffix={units}
-                                        min={1}
+                                        min={xyMin}
                                         max={50000}
                                         className={inputStyle}
                                         wrapperClassName="w-full"
@@ -196,7 +197,7 @@ const SurfacingTool = () => {
                                         type="number"
                                         id="length"
                                         suffix={units}
-                                        min={1}
+                                        min={xyMin}
                                         max={50000}
                                         className={inputStyle}
                                         wrapperClassName="w-full"
