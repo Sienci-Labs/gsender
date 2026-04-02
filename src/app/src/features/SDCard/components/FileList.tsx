@@ -48,9 +48,11 @@ export const FileList: React.FC = () => {
         runSDFile,
         uploadFileToSDCard,
         isConnected,
+        isRunningSDFile,
         firmwareType,
         hasFTP,
         hasYM,
+        isWorkflowIdle
     } = useSDCard();
     const [dragOver, setDragOver] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -252,7 +254,7 @@ export const FileList: React.FC = () => {
                                                 onClick={() =>
                                                     runSDFile(file.name)
                                                 }
-                                                disabled={isLoading || isATCI}
+                                                disabled={isRunningSDFile || !isWorkflowIdle || isLoading || isATCI}
                                                 className="flex items-center space-x-1 px-3 py-1.5 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                                             >
                                                 <Play className="w-3.5 h-3.5" />
@@ -263,7 +265,7 @@ export const FileList: React.FC = () => {
                                                 onClick={() =>
                                                     handleDelete(file.name)
                                                 }
-                                                disabled={isLoading}
+                                                disabled={isRunningSDFile || !isWorkflowIdle || isLoading}
                                                 className="flex items-center space-x-1 px-3 py-1.5 text-sm bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                                             >
                                                 <Trash2 className="w-3.5 h-3.5" />
