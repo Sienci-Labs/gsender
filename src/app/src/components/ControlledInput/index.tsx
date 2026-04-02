@@ -53,13 +53,16 @@ const ControlledInput = forwardRef<HTMLInputElement, InputProps>(
             const current = e.target.value;
             const originalString = String(originalValue ?? '');
             const hasChanged = current !== originalString;
+            const restoreOriginalValue = () => {
+                e.target.value = originalString;
+                setLocalValue(originalValue);
+            };
 
             if (isDeferredNumeric) {
                 const parsed = parseFloat(current);
                 if (current.trim() === '' || isNaN(parsed)) {
                     // Revert to original and notify parent so its state stays consistent
-                    e.target.value = String(originalValue);
-                    setLocalValue(originalValue);
+                    restoreOriginalValue();
                     if (onChange) onChange(e);
                     return;
                 }
@@ -67,7 +70,17 @@ const ControlledInput = forwardRef<HTMLInputElement, InputProps>(
 
             if (hasChanged) {
                 if (type === 'number') {
+                    if (current.trim() === '') {
+                        restoreOriginalValue();
+                        return;
+                    }
+
                     const numericCurrent = Number(current);
+                    if (Number.isNaN(numericCurrent)) {
+                        restoreOriginalValue();
+                        return;
+                    }
+
                     const numericMin =
                         min !== undefined && min !== null ? Number(min) : null;
                     const numericMax =
