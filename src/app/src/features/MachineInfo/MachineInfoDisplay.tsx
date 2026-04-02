@@ -31,6 +31,31 @@ export function MachineInfoDisplay({
         }));
     const probeSelection = store.get('widgets.probe.probeCommand');
     const stepperState = get(settings, 'settings.$1', '0');
+    // We do some firmware version finagling
+    const reportedFirmwareVersion = settings?.version;
+    const firmwareVersion = (() => {
+        const disconnectedValue = 'disconnected';
+
+        if (!isConnected) {
+            return disconnectedValue;
+        }
+
+        if (typeof reportedFirmwareVersion === 'string') {
+            const sanitizedVersion = reportedFirmwareVersion.trim();
+            return sanitizedVersion || disconnectedValue;
+        }
+
+        if (reportedFirmwareVersion && typeof reportedFirmwareVersion === 'object') {
+            const semver = get(reportedFirmwareVersion, 'semver');
+
+            if (typeof semver === 'string' || typeof semver === 'number') {
+                const sanitizedSemver = String(semver).trim();
+                return sanitizedSemver || disconnectedValue;
+            }
+        }
+
+        return disconnectedValue;
+    })();
 
     const handleStepperMotorToggle = (value: boolean) => {
         if (!controller.settings?.settings) {
@@ -63,9 +88,13 @@ export function MachineInfoDisplay({
     return (
         <>
             <div className="flex flex-row w-full justify-between items-center mb-2">
-                <span className="font-bold text-2xl">
+                <div>
+                    <span className="font-bold text-2xl">
                     Machine Information
                 </span>
+                    <div className="my-3"><b>Firmware version:</b> {firmwareVersion}</div>
+                </div>
+
                 <div className="flex flex-row items-center gap-2">
                     <div className="text-2xl text-gray-600 max-sm:hidden dark:text-white cursor-pointer hover:text-blue-500 transition-colors">
                         {pinned ? (
