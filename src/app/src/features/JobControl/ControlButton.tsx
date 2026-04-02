@@ -29,7 +29,8 @@ import {
     WORKFLOW_STATE_RUNNING,
 } from '../../constants';
 import get from 'lodash/get';
-import reduxStore from 'app/store/redux';
+import reduxStore, {RootState} from 'app/store/redux';
+import {useTypedSelector} from "app/hooks/useTypedSelector.ts";
 
 type MACHINE_CONTROL_BUTTONS_T =
     (typeof MACHINE_CONTROL_BUTTONS)[keyof typeof MACHINE_CONTROL_BUTTONS];
@@ -72,11 +73,23 @@ const ControlButton: React.FC<ControlButtonProps> = ({
     onStop,
     validateATC,
 }) => {
+    const [isRunningSDFile, setIsRunningSDFile] = useState<boolean>(false);
+    // If we have a name, we a running a SD file - convert to boolean in following useEffect
+    const sdRunReported = useTypedSelector((state: RootState) => state.controller.state.status?.SD?.name);
+    useEffect(() => {
+        if (sdRunReported !== null) {
+            setIsRunningSDFile(true);
+        } else {
+            setIsRunningSDFile(false)
+        }
+    }, [sdRunReported]);
+
     function canRun(reduxActiveState?: GRBL_ACTIVE_STATES_T, reduxWorkflow?: { state: WORKFLOW_STATES_T }) {
         const currentActiveState = reduxActiveState || activeState;
         const currentWorkflow = reduxWorkflow || workflow;
         const { state } = currentWorkflow;
         return (
+            !isRunningSDFile &&
             (currentActiveState === GRBL_ACTIVE_STATE_IDLE ||
             currentActiveState === GRBL_ACTIVE_STATE_HOLD) && state !== WORKFLOW_STATE_RUNNING
         );

@@ -23,7 +23,6 @@ export function useSDCard() {
 
     // If we have a name, we a running a SD file - convert to boolean in following useEffect
     const sdRunReported = useTypedSelector((state: RootState) => state.controller.state.status?.SD?.name);
-
     useEffect(() => {
         if (sdRunReported !== null) {
             setIsRunningSDFile(true);
