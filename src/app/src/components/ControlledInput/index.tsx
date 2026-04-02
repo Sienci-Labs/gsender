@@ -33,14 +33,32 @@ const ControlledInput = forwardRef<HTMLInputElement, InputProps>(
     ) => {
         const [originalValue, setOriginalValue] = useState(value);
         const [localValue, setLocalValue] = useState(value);
+        const [isFocused, setIsFocused] = useState(false);
 
         useEffect(() => {
-            setOriginalValue(value);
-            setLocalValue(value);
-        }, [value]);
+            if (!isFocused) {
+                setOriginalValue(value);
+                setLocalValue(value);
+            }
+        }, [value, isFocused]);
+
+        // Whether this input uses deferred numeric validation (allows ".", "" while typing)
+        const isDeferredNumeric = type === 'number' && immediateOnChange;
 
         const saveChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
             const current = e.target.value;
+
+            if (isDeferredNumeric) {
+                const parsed = parseFloat(current);
+                if (current.trim() === '' || isNaN(parsed)) {
+                    // Revert to original and notify parent so its state stays consistent
+                    e.target.value = String(originalValue);
+                    setLocalValue(originalValue);
+                    if (onChange) onChange(e);
+                    return;
+                }
+            }
+
             if (localValue && localValue !== originalValue) {
                 if (type === 'number') {
                     if (min !== null && current < min) {
@@ -61,7 +79,13 @@ const ControlledInput = forwardRef<HTMLInputElement, InputProps>(
             }
         };
 
+        const onFocus = () => {
+            setOriginalValue(localValue);
+            setIsFocused(true);
+        };
+
         const onBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+            setIsFocused(false);
             e.target.blur();
             saveChanges(e);
         };
@@ -89,17 +113,26 @@ const ControlledInput = forwardRef<HTMLInputElement, InputProps>(
         const localChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             setLocalValue(e.target.value);
 
-            // If immediateOnChange is enabled, call onChange immediately
             if (immediateOnChange && onChange) {
-                onChange(e);
+                if (isDeferredNumeric) {
+                    // Only propagate valid numbers; allow intermediate states like "" or "." to display
+                    const parsed = parseFloat(e.target.value);
+                    if (!isNaN(parsed) && e.target.value.trim() !== '') {
+                        onChange(e);
+                    }
+                } else {
+                    onChange(e);
+                }
             }
         };
 
         return (
             <ShadcnInput
-                type={type}
+                type={isDeferredNumeric ? 'text' : type}
+                inputMode={isDeferredNumeric ? 'decimal' : undefined}
                 className={className}
                 wrapperClassName={wrapperClassName}
+                onFocus={onFocus}
                 onBlur={onBlur}
                 onKeyDown={onKeyDown}
                 onChange={localChange}
