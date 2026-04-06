@@ -53,6 +53,7 @@ export interface Workspace {
     };
     toolChangeOption:
         | 'Ignore'
+        | 'GrblHAL Toolchange Protocol'
         | 'Pause'
         | 'Standard Re-zero'
         | 'Flexible Re-zero'

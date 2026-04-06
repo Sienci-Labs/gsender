@@ -27,6 +27,7 @@ export const GRBLHAL = 'grblHAL';
 
 // Active State
 export const GRBL_HAL_ACTIVE_STATE_IDLE = 'Idle';
+export const GRBL_HAL_ACTIVE_STATE_TOOL = 'Tool';
 export const GRBL_HAL_ACTIVE_STATE_RUN = 'Run';
 export const GRBL_HAL_ACTIVE_STATE_HOLD = 'Hold';
 export const GRBL_HAL_ACTIVE_STATE_DOOR = 'Door';
