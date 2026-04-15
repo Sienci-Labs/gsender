@@ -21,7 +21,7 @@
  *
  */
 
-import GrblController from './Grbl/GrblController';
-import GrblHalController from './Grblhal/GrblHalController';
+import GrblController from "./Grbl/GrblController";
+import GrblHalController from "./Grblhal/GrblHalController";
 
 export { GrblController, GrblHalController };

@@ -21,48 +21,48 @@
  *
  */
 
-import pubsub from 'pubsub-js';
-import { ReactNode } from 'react';
+import pubsub from "pubsub-js";
+import type { ReactNode } from "react";
 
-export const DIALOG_CONFIRM = 'confirm';
-export const DIALOG_CANCEL = 'cancel';
-export const DIALOG_INVERT = 'invert';
+export const DIALOG_CONFIRM = "confirm";
+export const DIALOG_CANCEL = "cancel";
+export const DIALOG_INVERT = "invert";
 
 interface ConfirmOptions {
-    title?: string;
-    buttons?: string[];
-    content?: ReactNode;
-    onClose?: () => void;
-    onConfirm?: () => void;
-    confirmLabel?: string;
-    cancelLabel?: string;
-    hideClose?: boolean;
-    show?: boolean;
+	title?: string;
+	buttons?: string[];
+	content?: ReactNode;
+	onClose?: () => void;
+	onConfirm?: () => void;
+	confirmLabel?: string;
+	cancelLabel?: string;
+	hideClose?: boolean;
+	show?: boolean;
 }
 
 export const Confirm = (options: ConfirmOptions = {}): void => {
-    const {
-        title = 'Confirm',
-        buttons = [],
-        content = 'Are you sure you want to do this?',
-        onClose = null,
-        onConfirm = null,
-        confirmLabel = 'Confirm',
-        cancelLabel = 'Cancel',
-        show = true,
-        hideClose = false,
-        hideConfirm,
-    } = options;
+	const {
+		title = "Confirm",
+		buttons = [],
+		content = "Are you sure you want to do this?",
+		onClose = null,
+		onConfirm = null,
+		confirmLabel = "Confirm",
+		cancelLabel = "Cancel",
+		show = true,
+		hideClose = false,
+		hideConfirm,
+	} = options;
 
-    pubsub.publish('dialog:new', {
-        title,
-        buttons,
-        content,
-        onClose,
-        onConfirm,
-        confirmLabel,
-        cancelLabel,
-        hideClose,
-        show,
-    });
+	pubsub.publish("dialog:new", {
+		title,
+		buttons,
+		content,
+		onClose,
+		onConfirm,
+		confirmLabel,
+		cancelLabel,
+		hideClose,
+		show,
+	});
 };

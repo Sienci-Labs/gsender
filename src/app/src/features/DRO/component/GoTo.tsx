@@ -1,198 +1,201 @@
-import { useEffect, useState } from 'react';
-import { FaPaperPlane } from 'react-icons/fa6';
+import { Button } from "app/components/Button";
+import Switch from "app/components/Switch";
 
 import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from 'app/components/shadcn/Popover';
-import { Button } from 'app/components/Button';
-import { UnitInput } from 'app/components/UnitInput';
-import { DROPosition } from 'app/features/DRO/utils/DRO';
-import Switch from 'app/components/Switch';
-import controller from 'app/lib/controller';
-import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import { METRIC_UNITS } from 'app/constants';
-import Tooltip from 'app/components/Tooltip';
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "app/components/shadcn/Popover";
+import Tooltip from "app/components/Tooltip";
+import { UnitInput } from "app/components/UnitInput";
+import { METRIC_UNITS } from "app/constants";
+import type { DROPosition } from "app/features/DRO/utils/DRO";
+import { useTypedSelector } from "app/hooks/useTypedSelector";
+import { useWorkspaceState } from "app/hooks/useWorkspaceState";
+import controller from "app/lib/controller";
+import { useEffect, useState } from "react";
+import { FaPaperPlane } from "react-icons/fa6";
 
 interface GotoProps {
-    units: string;
-    wpos: DROPosition;
-    disabled: boolean;
+	units: string;
+	wpos: DROPosition;
+	disabled: boolean;
 }
 
 export function GoTo({ units, wpos, disabled }: GotoProps) {
-    const { mode } = useWorkspaceState();
-    const [hasAAxisReported, setHasAAxisReported] = useState<boolean>(false);
+	const { mode } = useWorkspaceState();
+	const [hasAAxisReported, setHasAAxisReported] = useState<boolean>(false);
 
-    const axes = useTypedSelector((state: RootState) => state.controller.state.axes?.axes);
-    const controllerType = useTypedSelector((state) => state.controller.type);
-    const [relativeMovement, setRelativeMovement] = useState(false);
-    const [movementPos, setMovementPos] = useState({
-        x: 0,
-        y: 0,
-        z: 0,
-        a: 0,
-        b: 0,
-        c: 0,
-    });
+	const axes = useTypedSelector(
+		(state: RootState) => state.controller.state.axes?.axes,
+	);
+	const controllerType = useTypedSelector((state) => state.controller.type);
+	const [relativeMovement, setRelativeMovement] = useState(false);
+	const [movementPos, setMovementPos] = useState({
+		x: 0,
+		y: 0,
+		z: 0,
+		a: 0,
+		b: 0,
+		c: 0,
+	});
 
-    useEffect(() => {
-        if (axes) {
-            setHasAAxisReported(axes.includes('A'));
-        } else {
-            setHasAAxisReported(false);
-        }
-    }, [axes]);
+	useEffect(() => {
+		if (axes) {
+			setHasAAxisReported(axes.includes("A"));
+		} else {
+			setHasAAxisReported(false);
+		}
+	}, [axes]);
 
-    useEffect(() => {
-        if (relativeMovement) {
-            setMovementPos({
-                x: 0,
-                y: 0,
-                z: 0,
-                a: 0,
-                b: 0,
-                c: 0,
-            });
-        } else {
-            setMovementPos({
-                ...movementPos,
-                x: Number(wpos.x),
-                y: Number(wpos.y),
-                z: Number(wpos.z),
-                a: Number(wpos.a),
-            });
-        }
-    }, [relativeMovement]);
+	useEffect(() => {
+		if (relativeMovement) {
+			setMovementPos({
+				x: 0,
+				y: 0,
+				z: 0,
+				a: 0,
+				b: 0,
+				c: 0,
+			});
+		} else {
+			setMovementPos({
+				...movementPos,
+				x: Number(wpos.x),
+				y: Number(wpos.y),
+				z: Number(wpos.z),
+				a: Number(wpos.a),
+			});
+		}
+	}, [relativeMovement]);
 
-    const isInRotaryMode = mode === 'ROTARY';
-    const aAxisIsAvailable = isInRotaryMode || (controllerType === 'grblHAL' && hasAAxisReported);
-    const yAxisIsAvailable = !isInRotaryMode;
+	const isInRotaryMode = mode === "ROTARY";
+	const aAxisIsAvailable =
+		isInRotaryMode || (controllerType === "grblHAL" && hasAAxisReported);
+	const yAxisIsAvailable = !isInRotaryMode;
 
-    const onToggleSwap = () => {
-        setRelativeMovement((prev) => !prev);
-    };
+	const onToggleSwap = () => {
+		setRelativeMovement((prev) => !prev);
+	};
 
-    function goToLocation() {
-        const code = [];
-        const unitModal = units === METRIC_UNITS ? 'G21' : 'G20';
-        const movementModal = relativeMovement ? 'G91' : 'G90'; // Is G91 enabled?
+	function goToLocation() {
+		const code = [];
+		const unitModal = units === METRIC_UNITS ? "G21" : "G20";
+		const movementModal = relativeMovement ? "G91" : "G90"; // Is G91 enabled?
 
-        // Build axis commands based on non-zero values
-        const axes = [];
-        axes.push(`X${movementPos.x}`);
+		// Build axis commands based on non-zero values
+		const axes = [];
+		axes.push(`X${movementPos.x}`);
 
-        if (yAxisIsAvailable) {
-            axes.push(`Y${movementPos.y}`);
-        }
+		if (yAxisIsAvailable) {
+			axes.push(`Y${movementPos.y}`);
+		}
 
-        axes.push(`Z${movementPos.z}`);
+		axes.push(`Z${movementPos.z}`);
 
-        if (aAxisIsAvailable) {
-            axes.push(`A${movementPos.a}`);
-        }
+		if (aAxisIsAvailable) {
+			axes.push(`A${movementPos.a}`);
+		}
 
-        // Only add movement command if there are axes to move
-        if (axes.length > 0) {
-            code.push(movementModal, `G0 ${axes.join(' ')}`);
-        }
+		// Only add movement command if there are axes to move
+		if (axes.length > 0) {
+			code.push(movementModal, `G0 ${axes.join(" ")}`);
+		}
 
-        controller.command('gcode:safe', code, unitModal);
-    }
+		controller.command("gcode:safe", code, unitModal);
+	}
 
-    function onValueEdit(e: React.ChangeEvent<HTMLInputElement>, axis: string) {
-        const value = e.target.value;
-        const payload = {
-            ...movementPos,
-            [axis]: value,
-        };
-        setMovementPos(payload);
-    }
-    function onPopoverOpen(open: boolean) {
-        if (open) {
-            if (relativeMovement) {
-                setMovementPos({
-                    ...movementPos,
-                    x: Number(0),
-                    y: Number(0),
-                    z: Number(0),
-                    a: Number(0),
-                });
-            } else {
-                setMovementPos({
-                    ...movementPos,
-                    x: Number(wpos.x),
-                    y: Number(wpos.y),
-                    z: Number(wpos.z),
-                    a: Number(wpos.a),
-                });
-            }
-        }
-    }
+	function onValueEdit(e: React.ChangeEvent<HTMLInputElement>, axis: string) {
+		const value = e.target.value;
+		const payload = {
+			...movementPos,
+			[axis]: value,
+		};
+		setMovementPos(payload);
+	}
+	function onPopoverOpen(open: boolean) {
+		if (open) {
+			if (relativeMovement) {
+				setMovementPos({
+					...movementPos,
+					x: Number(0),
+					y: Number(0),
+					z: Number(0),
+					a: Number(0),
+				});
+			} else {
+				setMovementPos({
+					...movementPos,
+					x: Number(wpos.x),
+					y: Number(wpos.y),
+					z: Number(wpos.z),
+					a: Number(wpos.a),
+				});
+			}
+		}
+	}
 
-    return (
-        <Popover onOpenChange={onPopoverOpen}>
-            <Tooltip content="Go To Location">
-                <PopoverTrigger asChild>
-                    <Button
-                        disabled={disabled}
-                        icon={<FaPaperPlane />}
-                        variant="secondary"
-                        size="sm"
-                        aria-label="Open Go To Location dialog"
-                    />
-                </PopoverTrigger>
-            </Tooltip>
-            <PopoverContent className="bg-white">
-                <div className="w-full gap-2 flex flex-col">
-                    <h1>Go To Location</h1>
-                    <div className="flex flex-row text-sm text-gray-400 justify-between">
-                        <span>ABS</span>
-                        <Switch
-                            checked={relativeMovement}
-                            onChange={onToggleSwap}
-                            aria-label="Toggle between Absolute and Incremental movement"
-                        />
-                        <span>INC</span>
-                    </div>
-                    <UnitInput
-                        units={units}
-                        label="X"
-                        value={movementPos.x}
-                        onChange={(v) => onValueEdit(v, 'x')}
-                    />
-                    <UnitInput
-                        units={units}
-                        label="Y"
-                        value={movementPos.y}
-                        onChange={(v) => onValueEdit(v, 'y')}
-                        disabled={!yAxisIsAvailable}
-                    />
-                    <UnitInput
-                        units={units}
-                        label="Z"
-                        value={movementPos.z}
-                        onChange={(v) => onValueEdit(v, 'z')}
-                    />
-                    <UnitInput
-                        units="deg"
-                        label="A"
-                        value={movementPos.a}
-                        onChange={(v) => onValueEdit(v, 'a')}
-                        disabled={!aAxisIsAvailable}
-                    />
+	return (
+		<Popover onOpenChange={onPopoverOpen}>
+			<Tooltip content="Go To Location">
+				<PopoverTrigger asChild>
+					<Button
+						disabled={disabled}
+						icon={<FaPaperPlane />}
+						variant="secondary"
+						size="sm"
+						aria-label="Open Go To Location dialog"
+					/>
+				</PopoverTrigger>
+			</Tooltip>
+			<PopoverContent className="bg-white">
+				<div className="w-full gap-2 flex flex-col">
+					<h1>Go To Location</h1>
+					<div className="flex flex-row text-sm text-gray-400 justify-between">
+						<span>ABS</span>
+						<Switch
+							checked={relativeMovement}
+							onChange={onToggleSwap}
+							aria-label="Toggle between Absolute and Incremental movement"
+						/>
+						<span>INC</span>
+					</div>
+					<UnitInput
+						units={units}
+						label="X"
+						value={movementPos.x}
+						onChange={(v) => onValueEdit(v, "x")}
+					/>
+					<UnitInput
+						units={units}
+						label="Y"
+						value={movementPos.y}
+						onChange={(v) => onValueEdit(v, "y")}
+						disabled={!yAxisIsAvailable}
+					/>
+					<UnitInput
+						units={units}
+						label="Z"
+						value={movementPos.z}
+						onChange={(v) => onValueEdit(v, "z")}
+					/>
+					<UnitInput
+						units="deg"
+						label="A"
+						value={movementPos.a}
+						onChange={(v) => onValueEdit(v, "a")}
+						disabled={!aAxisIsAvailable}
+					/>
 
-                    <Button 
-                        variant="alt" 
-                        onClick={goToLocation}
-                        aria-label="Execute move to location"
-                    >
-                        Go!
-                    </Button>
-                </div>
-            </PopoverContent>
-        </Popover>
-    );
+					<Button
+						variant="alt"
+						onClick={goToLocation}
+						aria-label="Execute move to location"
+					>
+						Go!
+					</Button>
+				</div>
+			</PopoverContent>
+		</Popover>
+	);
 }

@@ -21,68 +21,73 @@
  *
  */
 
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ConnectionState, PortInfo } from '../../definitions';
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import type { ConnectionState, PortInfo } from "../../definitions";
 
 const initialState: ConnectionState = {
-    isConnected: false,
-    isScanning: false,
-    port: null,
-    baudrate: '',
-    ports: [],
-    unrecognizedPorts: [],
-    networkPorts: [],
-    err: '',
+	isConnected: false,
+	isScanning: false,
+	port: null,
+	baudrate: "",
+	ports: [],
+	unrecognizedPorts: [],
+	networkPorts: [],
+	err: "",
 };
 
 const connectionSlice = createSlice({
-    name: 'connection',
-    initialState,
-    reducers: {
-        openConnection: (
-            state,
-            action: PayloadAction<{
-                port: string;
-                baudrate: string;
-                isConnected: boolean;
-            }>,
-        ) => {
-            const { isConnected: prevIsConnected } = state;
-            const { port, baudrate, isConnected } = action.payload;
-            state.port = port;
-            state.baudrate = baudrate;
-            state.isConnected = prevIsConnected ? true : isConnected;
-        },
-        setConnectionState: (state, action: PayloadAction<{ isConnected: boolean }>) => {
-          state.isConnected = action.payload.isConnected;
-        },
-        closeConnection: (state, action: PayloadAction<{ port: string }>) => {
-            state.port = action.payload.port;
-            state.isConnected = false;
-        },
-        listPorts: (
-            state,
-            action: PayloadAction<{
-                ports: Array<PortInfo>;
-                unrecognizedPorts: Array<PortInfo>;
-                networkPorts: Array<PortInfo>;
-            }>,
-        ) => {
-            const { ports, unrecognizedPorts, networkPorts } = action.payload;
-            state.ports = ports;
-            state.unrecognizedPorts = unrecognizedPorts;
-            state.networkPorts = networkPorts;
-        },
-        scanNetwork: (
-            state,
-            action: PayloadAction<{ isScanning: boolean }>,
-        ) => {
-            state.isScanning = action.payload.isScanning;
-        },
-    },
+	name: "connection",
+	initialState,
+	reducers: {
+		openConnection: (
+			state,
+			action: PayloadAction<{
+				port: string;
+				baudrate: string;
+				isConnected: boolean;
+			}>,
+		) => {
+			const { isConnected: prevIsConnected } = state;
+			const { port, baudrate, isConnected } = action.payload;
+			state.port = port;
+			state.baudrate = baudrate;
+			state.isConnected = prevIsConnected ? true : isConnected;
+		},
+		setConnectionState: (
+			state,
+			action: PayloadAction<{ isConnected: boolean }>,
+		) => {
+			state.isConnected = action.payload.isConnected;
+		},
+		closeConnection: (state, action: PayloadAction<{ port: string }>) => {
+			state.port = action.payload.port;
+			state.isConnected = false;
+		},
+		listPorts: (
+			state,
+			action: PayloadAction<{
+				ports: Array<PortInfo>;
+				unrecognizedPorts: Array<PortInfo>;
+				networkPorts: Array<PortInfo>;
+			}>,
+		) => {
+			const { ports, unrecognizedPorts, networkPorts } = action.payload;
+			state.ports = ports;
+			state.unrecognizedPorts = unrecognizedPorts;
+			state.networkPorts = networkPorts;
+		},
+		scanNetwork: (state, action: PayloadAction<{ isScanning: boolean }>) => {
+			state.isScanning = action.payload.isScanning;
+		},
+	},
 });
 
-export const { openConnection, setConnectionState, closeConnection, listPorts, scanNetwork } =
-    connectionSlice.actions;
+export const {
+	openConnection,
+	setConnectionState,
+	closeConnection,
+	listPorts,
+	scanNetwork,
+} = connectionSlice.actions;
 
 export default connectionSlice.reducer;

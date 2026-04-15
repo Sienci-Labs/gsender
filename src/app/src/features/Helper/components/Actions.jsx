@@ -21,109 +21,96 @@
  *
  */
 
-import React, { useEffect } from 'react';
-import pubsub from 'pubsub-js';
-import { GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
-import uniqueId from 'lodash/uniqueId';
-import get from 'lodash/get';
-import controller from 'app/lib/controller';
-import ToolModalButton from 'app/components/ToolModalButton';
-import { useWizardAPI, useWizardContext } from 'app/features/Helper/context';
-import styles from '../index.module.styl';
-import { FaCode } from 'react-icons/fa';
-import { useSelector } from 'react-redux';
+import ToolModalButton from "app/components/ToolModalButton";
+import { GRBL_ACTIVE_STATE_IDLE } from "app/constants";
+import { useWizardAPI, useWizardContext } from "app/features/Helper/context";
+import controller from "app/lib/controller";
+import get from "lodash/get";
+import uniqueId from "lodash/uniqueId";
+import pubsub from "pubsub-js";
+import React, { useEffect } from "react";
+import { FaCode } from "react-icons/fa";
+import { useSelector } from "react-redux";
+import styles from "../index.module.styl";
 
 const Actions = ({ actions = [], stepIndex, substepIndex }) => {
-    const {
-        markActionAsComplete,
-        completeSubStep,
-        scrollToActiveStep,
-        setIsLoading,
-        updateSubstepOverlay,
-    } = useWizardAPI();
-    const { isLoading } = useWizardContext();
-    const activeState = useSelector((state) =>
-        get(state, 'controller.state.status.activeState', ''),
-    );
+	const {
+		markActionAsComplete,
+		completeSubStep,
+		scrollToActiveStep,
+		setIsLoading,
+		updateSubstepOverlay,
+	} = useWizardAPI();
+	const { isLoading } = useWizardContext();
+	const activeState = useSelector((state) =>
+		get(state, "controller.state.status.activeState", ""),
+	);
 
-    const isNotIdle = () => {
-        return activeState !== GRBL_ACTIVE_STATE_IDLE;
-    };
+	const isNotIdle = () => {
+		return activeState !== GRBL_ACTIVE_STATE_IDLE;
+	};
 
-    useEffect(() => {
-        const tokens = [
-            pubsub.subscribe('wizard:next', (msg, indexes) => {
-                const { stepIndex: stepIn, substepIndex: subStepIn } = indexes;
-                if (stepIn === stepIndex && subStepIn === substepIndex) {
-                    markActionAsComplete(stepIndex, substepIndex);
-                    const activeValues = completeSubStep(
-                        stepIndex,
-                        substepIndex,
-                    );
-                    updateSubstepOverlay(activeValues);
-                    scrollToActiveStep(activeValues);
-                    setIsLoading(false);
-                }
-            }),
-            pubsub.subscribe('error', (msg, error) => {
-                setIsLoading(false);
-            }),
-        ];
+	useEffect(() => {
+		const tokens = [
+			pubsub.subscribe("wizard:next", (msg, indexes) => {
+				const { stepIndex: stepIn, substepIndex: subStepIn } = indexes;
+				if (stepIn === stepIndex && subStepIn === substepIndex) {
+					markActionAsComplete(stepIndex, substepIndex);
+					const activeValues = completeSubStep(stepIndex, substepIndex);
+					updateSubstepOverlay(activeValues);
+					scrollToActiveStep(activeValues);
+					setIsLoading(false);
+				}
+			}),
+			pubsub.subscribe("error", (msg, error) => {
+				setIsLoading(false);
+			}),
+		];
 
-        return () => {
-            tokens.forEach((token) => {
-                pubsub.unsubscribe(token);
-            });
-        };
-    }, []);
+		return () => {
+			tokens.forEach((token) => {
+				pubsub.unsubscribe(token);
+			});
+		};
+	}, []);
 
-    return (
-        <>
-            {actions.length > 0 && (
-                <h2 className={styles.subHeading}>Run G-Code:</h2>
-            )}
-            <div className={styles.actionRow}>
-                {actions.map((action, index) => {
-                    const cbWithCompletion = () => {
-                        setIsLoading(true);
-                        controller.command(
-                            'wizard:step',
-                            stepIndex,
-                            substepIndex,
-                        );
-                        action.cb();
-                    };
-                    return (
-                        <React.Fragment key={`action-${uniqueId()}`}>
-                            {isLoading ? (
-                                index === 0 && (
-                                    <span className={styles.loadingSpan}>
-                                        Running
-                                    </span>
-                                )
-                            ) : (
-                                <>
-                                    <ToolModalButton
-                                        disabled={isNotIdle()}
-                                        onClick={cbWithCompletion}
-                                        icon={<FaCode />}
-                                        id="button-action"
-                                    >
-                                        {action.label}
-                                    </ToolModalButton>
-                                    {index !== actions.length - 1 && (
-                                        <span className={styles.orSpan}>
-                                            OR
-                                        </span>
-                                    )}
-                                </>
-                            )}
-                        </React.Fragment>
-                    );
-                })}
-            </div>
-        </>
-    );
+	return (
+		<>
+			{actions.length > 0 && <h2 className={styles.subHeading}>Run G-Code:</h2>}
+			<div className={styles.actionRow}>
+				{actions.map((action, index) => {
+					const cbWithCompletion = () => {
+						setIsLoading(true);
+						controller.command("wizard:step", stepIndex, substepIndex);
+						action.cb();
+					};
+					return (
+						<React.Fragment key={`action-${uniqueId()}`}>
+							{isLoading ? (
+								index === 0 && (
+									<span className={styles.loadingSpan}>Running</span>
+								)
+							) : (
+								<>
+									<ToolModalButton
+										disabled={isNotIdle()}
+										onClick={cbWithCompletion}
+										icon={<FaCode />}
+										id="button-action"
+									>
+										{action.label}
+									</ToolModalButton>
+									{index !== actions.length - 1 && (
+										<span className={styles.orSpan}>OR</span>
+									)}
+								</>
+							)}
+						</React.Fragment>
+					);
+				})}
+			</div>
+		</>
+	);
 };
 
 export default Actions;

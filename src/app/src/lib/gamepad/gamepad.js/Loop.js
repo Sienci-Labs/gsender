@@ -1,34 +1,34 @@
 export default class Loop {
-    constructor(callback) {
-        this.callback = callback;
-        this.frame = null;
-        this.update = this.update.bind(this);
-    }
+	constructor(callback) {
+		this.callback = callback;
+		this.frame = null;
+		this.update = this.update.bind(this);
+	}
 
-    setCallback(callback) {
-        this.callback = callback;
-    }
+	setCallback(callback) {
+		this.callback = callback;
+	}
 
-    start() {
-        if (this.frame) {
-            return;
-        }
+	start() {
+		if (this.frame) {
+			return;
+		}
 
-        this.frame = window.requestAnimationFrame(this.update);
-    }
+		this.frame = window.requestAnimationFrame(this.update);
+	}
 
-    stop() {
-        if (!this.frame) {
-            return;
-        }
+	stop() {
+		if (!this.frame) {
+			return;
+		}
 
-        window.cancelAnimationFrame(this.frame);
+		window.cancelAnimationFrame(this.frame);
 
-        this.frame = null;
-    }
+		this.frame = null;
+	}
 
-    update() {
-        this.frame = window.requestAnimationFrame(this.update);
-        this.callback();
-    }
+	update() {
+		this.frame = window.requestAnimationFrame(this.update);
+		this.callback();
+	}
 }

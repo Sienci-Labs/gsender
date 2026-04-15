@@ -1,3 +1,3 @@
 export function EEPROMSettingInput() {
-    return <div>HI</div>;
+	return <div>HI</div>;
 }

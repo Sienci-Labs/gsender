@@ -21,286 +21,275 @@
  *
  */
 
-import { EventEmitter } from 'events';
-import { SerialPort } from 'serialport';
-import { ReadlineParser } from '@serialport/parser-readline';
-import net from 'net';
+import { ReadlineParser } from "@serialport/parser-readline";
+import { EventEmitter } from "events";
+import net from "net";
+import { SerialPort } from "serialport";
 
 // Validation
 
 const DATABITS = Object.freeze([5, 6, 7, 8]);
 const STOPBITS = Object.freeze([1, 2]);
-const PARITY = Object.freeze(['none', 'even', 'mark', 'odd', 'space']);
-const FLOWCONTROLS = Object.freeze(['rtscts', 'xon', 'xoff', 'xany']);
+const PARITY = Object.freeze(["none", "even", "mark", "odd", "space"]);
+const FLOWCONTROLS = Object.freeze(["rtscts", "xon", "xoff", "xany"]);
 
 const defaultSettings = Object.freeze({
-    baudRate: 115200,
-    dataBits: 8,
-    stopBits: 1,
-    parity: 'none',
-    rtscts: false,
-    xon: false,
-    xoff: false,
-    xany: false,
+	baudRate: 115200,
+	dataBits: 8,
+	stopBits: 1,
+	parity: "none",
+	rtscts: false,
+	xon: false,
+	xoff: false,
+	xany: false,
 });
 
 const toIdent = (options) => {
-    // Only the path option is required for generating the ident property
-    const { path } = { ...options };
-    return JSON.stringify({ type: 'serial', path: path });
+	// Only the path option is required for generating the ident property
+	const { path } = { ...options };
+	return JSON.stringify({ type: "serial", path: path });
 };
 
 class SerialConnection extends EventEmitter {
-    type = 'serial';
+	type = "serial";
 
-    parser = null;
+	parser = null;
 
-    // Readline parser
-    port = null;
+	// Readline parser
+	port = null;
 
-    // callback on state
-    callback = null;
+	// callback on state
+	callback = null;
 
-    // SerialPort
-    writeFilter = (data) => data;
+	// SerialPort
+	writeFilter = (data) => data;
 
-    // Tracks whether TCP 'connect' has fired (used to distinguish pre/post-connect errors)
-    connected = false;
+	// Tracks whether TCP 'connect' has fired (used to distinguish pre/post-connect errors)
+	connected = false;
 
-    eventListener = {
-        data: (data) => {
-            this.emit('data', data);
-        },
-        open: () => {
-            this.emit('open');
-        },
-        close: (err) => {
-            this.emit('close', err);
-        },
-        error: (err) => {
-            if (!this.connected) {
-                // Pre-connection error (ECONNREFUSED, EHOSTUNREACH, ENETUNREACH, etc.)
-                this.port && this.port.destroy();
-                this.port = null;
-                if (this.callback) {
-                    this.callback(err);
-                    this.callback = null;
-                }
-            } else if (err.code === 'ECONNRESET') {
-                // Post-connection reset
-                this.port && this.port.destroy();
-                this.port = null;
-            }
-            this.emit('error', err);
-        },
-    };
+	eventListener = {
+		data: (data) => {
+			this.emit("data", data);
+		},
+		open: () => {
+			this.emit("open");
+		},
+		close: (err) => {
+			this.emit("close", err);
+		},
+		error: (err) => {
+			if (!this.connected) {
+				// Pre-connection error (ECONNREFUSED, EHOSTUNREACH, ENETUNREACH, etc.)
+				this.port && this.port.destroy();
+				this.port = null;
+				if (this.callback) {
+					this.callback(err);
+					this.callback = null;
+				}
+			} else if (err.code === "ECONNRESET") {
+				// Post-connection reset
+				this.port && this.port.destroy();
+				this.port = null;
+			}
+			this.emit("error", err);
+		},
+	};
 
-    constructor(options) {
-        super();
+	constructor(options) {
+		super();
 
-        const { writeFilter, ...rest } = { ...options };
+		const { writeFilter, ...rest } = { ...options };
 
-        if (writeFilter) {
-            if (typeof writeFilter !== 'function') {
-                throw new TypeError(
-                    `"writeFilter" must be a function: ${writeFilter}`,
-                );
-            }
+		if (writeFilter) {
+			if (typeof writeFilter !== "function") {
+				throw new TypeError(`"writeFilter" must be a function: ${writeFilter}`);
+			}
 
-            this.writeFilter = writeFilter;
-        }
+			this.writeFilter = writeFilter;
+		}
 
-        const settings = Object.assign({}, defaultSettings, rest);
-        settings.ethernetPort = rest.ethernetPort;
+		const settings = Object.assign({}, defaultSettings, rest);
+		settings.ethernetPort = rest.ethernetPort;
 
+		if (settings.port) {
+			throw new TypeError('"port" is an unknown option, did you mean "path"?');
+		}
 
-        if (settings.port) {
-            throw new TypeError(
-                '"port" is an unknown option, did you mean "path"?',
-            );
-        }
+		if (!settings.path) {
+			throw new TypeError(`"path" is not defined: ${settings.path}`);
+		}
 
-        if (!settings.path) {
-            throw new TypeError(`"path" is not defined: ${settings.path}`);
-        }
+		if (settings.baudrate) {
+			throw new TypeError(
+				'"baudrate" is an unknown option, did you mean "baudRate"?',
+			);
+		}
 
-        if (settings.baudrate) {
-            throw new TypeError(
-                '"baudrate" is an unknown option, did you mean "baudRate"?',
-            );
-        }
+		if (typeof settings.baudRate !== "number") {
+			throw new TypeError(`"baudRate" must be a number: ${settings.baudRate}`);
+		}
 
-        if (typeof settings.baudRate !== 'number') {
-            throw new TypeError(
-                `"baudRate" must be a number: ${settings.baudRate}`,
-            );
-        }
+		if (DATABITS.indexOf(settings.dataBits) < 0) {
+			throw new TypeError(`"databits" is invalid: ${settings.dataBits}`);
+		}
 
-        if (DATABITS.indexOf(settings.dataBits) < 0) {
-            throw new TypeError(`"databits" is invalid: ${settings.dataBits}`);
-        }
+		if (STOPBITS.indexOf(settings.stopBits) < 0) {
+			throw new TypeError(`"stopbits" is invalid: ${settings.stopbits}`);
+		}
 
-        if (STOPBITS.indexOf(settings.stopBits) < 0) {
-            throw new TypeError(`"stopbits" is invalid: ${settings.stopbits}`);
-        }
+		if (PARITY.indexOf(settings.parity) < 0) {
+			throw new TypeError(`"parity" is invalid: ${settings.parity}`);
+		}
 
-        if (PARITY.indexOf(settings.parity) < 0) {
-            throw new TypeError(`"parity" is invalid: ${settings.parity}`);
-        }
+		FLOWCONTROLS.forEach((control) => {
+			if (typeof settings[control] !== "boolean") {
+				throw new TypeError(
+					`"${control}" is not boolean: ${settings[control]}`,
+				);
+			}
+		});
 
-        FLOWCONTROLS.forEach((control) => {
-            if (typeof settings[control] !== 'boolean') {
-                throw new TypeError(
-                    `"${control}" is not boolean: ${settings[control]}`,
-                );
-            }
-        });
+		Object.defineProperties(this, {
+			settings: {
+				enumerable: true,
+				value: settings,
+				writable: false,
+			},
+		});
+	}
 
-        Object.defineProperties(this, {
-            settings: {
-                enumerable: true,
-                value: settings,
-                writable: false,
-            },
-        });
-    }
+	get ident() {
+		return toIdent(this.settings);
+	}
 
-    get ident() {
-        return toIdent(this.settings);
-    }
+	get isOpen() {
+		if (this.settings.network) {
+			return this.port && this.port.writable && this.connected;
+		}
+		return this.port && this.port.isOpen;
+	}
 
-    get isOpen() {
-        if (this.settings.network) {
-            return this.port && this.port.writable && this.connected;
-        }
-        return this.port && this.port.isOpen;
-    }
+	get isClose() {
+		return !this.isOpen;
+	}
 
-    get isClose() {
-        return !this.isOpen;
-    }
+	// @param {function} callback The error-first callback.
+	open(callback) {
+		this.callback = callback;
+		const { path, baudRate, network, ethernetPort, ...rest } = this.settings;
 
-    // @param {function} callback The error-first callback.
-    open(callback) {
-        this.callback = callback;
-        const { path, baudRate, network, ethernetPort, ...rest } = this.settings;
+		const ip = "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)";
+		const expr = new RegExp(`^${ip}.${ip}.${ip}.${ip}$`, "g");
+		const looksLikeIP = path.match(expr);
 
-        const ip = '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)';
-        const expr = new RegExp(`^${ip}\.${ip}\.${ip}\.${ip}$`, 'g');
-        const looksLikeIP = path.match(expr);
+		if (this.port && !looksLikeIP) {
+			const err = new Error(`Cannot open serial port "${this.settings.path}"`);
+			callback(err);
+			return;
+		}
 
-        if (this.port && !looksLikeIP) {
-            const err = new Error(
-                `Cannot open serial port "${this.settings.path}"`,
-            );
-            callback(err);
-            return;
-        }
+		// Single telnet - don't return early, just close it and reopen it
+		if (this.port && (network || looksLikeIP)) {
+			this.port.destroy();
+			this.port = null;
+			const err = new Error("Serial port connection reset");
+			callback(err);
+			return;
+		}
 
-        // Single telnet - don't return early, just close it and reopen it
-        if (this.port && (network || looksLikeIP)) {
-            this.port.destroy();
-            this.port = null;
-            const err = new Error('Serial port connection reset');
-            callback(err);
-            return;
-        }
+		console.log(`Connection to port ${ethernetPort}`);
 
-        console.log(`Connection to port ${ethernetPort}`);
+		if (network || looksLikeIP) {
+			this.connected = false;
+			this.port = new net.Socket();
+			this.port.setTimeout(2000, () => {
+				this.port.destroy();
+				this.port = null;
+				if (this.callback) {
+					this.callback("Connection timeout");
+					this.callback = null;
+				}
+			});
 
-        if (network || looksLikeIP) {
-            this.connected = false;
-            this.port = new net.Socket();
-            this.port.setTimeout(2000, () => {
-                this.port.destroy();
-                this.port = null;
-                if (this.callback) {
-                    this.callback('Connection timeout');
-                    this.callback = null;
-                }
-            });
+			// addPortListeners() calls removeAllListeners(), so it must run BEFORE
+			// we add the one-time 'connect' handler, otherwise that handler would
+			// be removed and callback() would never be called on a successful connect.
+			this.addPortListeners();
 
-            // addPortListeners() calls removeAllListeners(), so it must run BEFORE
-            // we add the one-time 'connect' handler, otherwise that handler would
-            // be removed and callback() would never be called on a successful connect.
-            this.addPortListeners();
+			this.port.once("connect", () => {
+				this.connected = true;
+				this.port.setTimeout(0);
+				if (this.callback) {
+					this.callback();
+					this.callback = null;
+				}
+			});
 
-            this.port.once('connect', () => {
-                this.connected = true;
-                this.port.setTimeout(0);
-                if (this.callback) {
-                    this.callback();
-                    this.callback = null;
-                }
-            });
+			this.port.connect(ethernetPort, path);
+		} else {
+			this.port = new SerialPort({
+				path,
+				baudRate,
+				...rest,
+				autoOpen: false,
+			});
+			this.addPortListeners();
+			this.port.open(callback);
+		}
+	}
 
-            this.port.connect(ethernetPort, path);
-        } else {
-            this.port = new SerialPort({
-                path,
-                baudRate,
-                ...rest,
-                autoOpen: false,
-            });
-            this.addPortListeners();
-            this.port.open(callback);
-        }
-    }
+	addPortListeners() {
+		this.port.removeAllListeners();
+		this.port.on("open", this.eventListener.open);
+		this.port.on("close", this.eventListener.close);
+		this.port.on("error", this.eventListener.error);
 
-    addPortListeners() {
-        this.port.removeAllListeners();
-        this.port.on('open', this.eventListener.open);
-        this.port.on('close', this.eventListener.close);
-        this.port.on('error', this.eventListener.error);
+		this.parser = this.port.pipe(new ReadlineParser({ delimiter: "\n" }));
+		this.parser.on("data", this.eventListener.data);
+	}
 
-        this.parser = this.port.pipe(new ReadlineParser({ delimiter: '\n' }));
-        this.parser.on('data', this.eventListener.data);
-    }
+	// @param {function} callback The error-first callback.
+	close(callback) {
+		if (!this.port) {
+			const err = new Error(`Cannot close serial port "${this.settings.path}"`);
+			callback && callback(err);
+			return;
+		}
 
-    // @param {function} callback The error-first callback.
-    close(callback) {
-        if (!this.port) {
-            const err = new Error(
-                `Cannot close serial port "${this.settings.path}"`,
-            );
-            callback && callback(err);
-            return;
-        }
+		this.port.removeListener("open", this.eventListener.open);
+		this.port.removeListener("close", this.eventListener.close);
+		this.port.removeListener("error", this.eventListener.error);
+		this.parser.removeListener("data", this.eventListener.data);
 
-        this.port.removeListener('open', this.eventListener.open);
-        this.port.removeListener('close', this.eventListener.close);
-        this.port.removeListener('error', this.eventListener.error);
-        this.parser.removeListener('data', this.eventListener.data);
+		if (this.settings.network) {
+			this.port.on("close", () => {
+				callback();
+			});
+			this.port.destroy();
+		} else {
+			this.port.close(callback);
+		}
 
-        if (this.settings.network) {
-            this.port.on('close', () => {
-                callback();
-            });
-            this.port.destroy();
-        } else {
-            this.port.close(callback);
-        }
+		this.port = null;
+		this.parser = null;
+	}
 
-        this.port = null;
-        this.parser = null;
-    }
+	write(data, context) {
+		if (!this.port) {
+			return;
+		}
 
-    write(data, context) {
-        if (!this.port) {
-            return;
-        }
+		data = this.writeFilter(data, context);
+		this.port.write(Buffer.from(data));
+	}
 
-        data = this.writeFilter(data, context);
-        this.port.write(Buffer.from(data));
-    }
+	writeImmediate(data) {
+		this.port.write(data);
+	}
 
-    writeImmediate(data) {
-        this.port.write(data);
-    }
-
-    setWriteFilter(writeFilter) {
-        this.writeFilter = writeFilter;
-    }
+	setWriteFilter(writeFilter) {
+		this.writeFilter = writeFilter;
+	}
 }
 
 export { toIdent };

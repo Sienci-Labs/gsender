@@ -21,101 +21,101 @@
  *
  */
 
-import _ from 'lodash';
 import store from "app/store";
+import _ from "lodash";
 
 type JogHelperProps = {
-    jogCB: (coordinates: Record<string, number>, feedrate: number) => void;
-    startContinuousJogCB: (
-        coordinates: Record<string, number>,
-        feedrate: number,
-    ) => void;
-    stopContinuousJogCB: () => void;
+	jogCB: (coordinates: Record<string, number>, feedrate: number) => void;
+	startContinuousJogCB: (
+		coordinates: Record<string, number>,
+		feedrate: number,
+	) => void;
+	stopContinuousJogCB: () => void;
 };
 
 class JogHelper {
-    timeoutFunction: NodeJS.Timeout | null = null;
+	timeoutFunction: NodeJS.Timeout | null = null;
 
-    timeout = 600; // 600 ms to be consistent with jog controls
+	timeout = 600; // 600 ms to be consistent with jog controls
 
-    startTime = 0;
+	startTime = 0;
 
-    didPress = false;
+	didPress = false;
 
-    currentCoordinates: Record<string, number> | null = null;
+	currentCoordinates: Record<string, number> | null = null;
 
-    feedrate = 3000;
+	feedrate = 3000;
 
-    jog: (coordinates: Record<string, number>, feedrate: number) => void = null;
+	jog: (coordinates: Record<string, number>, feedrate: number) => void = null;
 
-    continuousJog: (
-        coordinates: Record<string, number>,
-        feedrate: number,
-    ) => void = null;
+	continuousJog: (
+		coordinates: Record<string, number>,
+		feedrate: number,
+	) => void = null;
 
-    stopContinuousJog: () => void = null;
+	stopContinuousJog: () => void = null;
 
-    constructor({
-        jogCB,
-        startContinuousJogCB,
-        stopContinuousJogCB,
-    }: JogHelperProps) {
-        this.timeout = store.get('widgets.axes.jog.threshold', 200)
-        this.jog = _.throttle(jogCB, 150, { trailing: false });
-        this.continuousJog = _.throttle(startContinuousJogCB, 150, {
-            trailing: false,
-        });
-        this.stopContinuousJog = _.throttle(
-            stopContinuousJogCB,
-            this.timeout - 25,
-            { leading: true, trailing: false },
-        );
-    }
+	constructor({
+		jogCB,
+		startContinuousJogCB,
+		stopContinuousJogCB,
+	}: JogHelperProps) {
+		this.timeout = store.get("widgets.axes.jog.threshold", 200);
+		this.jog = _.throttle(jogCB, 150, { trailing: false });
+		this.continuousJog = _.throttle(startContinuousJogCB, 150, {
+			trailing: false,
+		});
+		this.stopContinuousJog = _.throttle(
+			stopContinuousJogCB,
+			this.timeout - 25,
+			{ leading: true, trailing: false },
+		);
+	}
 
-    onKeyDown(coordinates: Record<string, number>, feedrate: number) {
-        const startTime = new Date();
+	onKeyDown(coordinates: Record<string, number>, feedrate: number) {
+		const startTime = new Date();
 
-        if (this.timeoutFunction) {
-            return;
-        }
+		if (this.timeoutFunction) {
+			return;
+		}
 
-        this.startTime = startTime.getTime();
-        this.currentCoordinates = coordinates;
-        this.didPress = true;
+		this.startTime = startTime.getTime();
+		this.currentCoordinates = coordinates;
+		this.didPress = true;
 
-        this.feedrate = feedrate;
+		this.feedrate = feedrate;
 
-        this.timeoutFunction = setTimeout(() => {
-            this.continuousJog(coordinates, feedrate);
-        }, this.timeout);
-    }
+		this.timeoutFunction = setTimeout(() => {
+			this.continuousJog(coordinates, feedrate);
+		}, this.timeout);
+	}
 
-    updateThreshold(threshold: number) {
-        this.timeout = threshold + 100;
-    }
+	updateThreshold(threshold: number) {
+		this.timeout = threshold + 100;
+	}
 
-    onKeyUp() {
-        const timer = new Date().getTime() - this.startTime;
+	onKeyUp() {
+		const timer = new Date().getTime() - this.startTime;
 
-        if (!this.timeoutFunction) {
-            return;
-        }
+		if (!this.timeoutFunction) {
+			return;
+		}
 
-        clearTimeout(this.timeoutFunction);
-        this.timeoutFunction = null;
+		clearTimeout(this.timeoutFunction);
+		this.timeoutFunction = null;
 
-        if (timer < this.timeout && this.didPress) {
-            this.jog({ ...this.currentCoordinates }, this.feedrate);
-            this.startTime = new Date().getTime();
-            this.didPress = false;
-            this.currentCoordinates = null;
-        } else {
-            this.stopContinuousJog();
-            this.startTime = new Date().getTime();
-            this.didPress = false;
-            this.currentCoordinates = null;
-        }
-    }
+		if (timer < this.timeout && this.didPress) {
+			this.jog({ ...this.currentCoordinates }, this.feedrate);
+			this.startTime = new Date().getTime();
+			this.didPress = false;
+			this.currentCoordinates = null;
+		} else {
+			this.stopContinuousJog();
+			this.startTime = new Date().getTime();
+			this.didPress = false;
+			this.currentCoordinates = null;
+		}
+	}
 }
 
 export default JogHelper;

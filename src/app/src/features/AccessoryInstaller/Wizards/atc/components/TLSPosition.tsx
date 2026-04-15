@@ -1,65 +1,65 @@
-import { StepProps } from 'app/features/AccessoryInstaller/types';
-import { StepActionButton } from 'app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx';
-import { PositionSetter } from 'app/features/AccessoryInstaller/Wizards/atc/components/PositionSetter.tsx';
-import { useSelector } from 'react-redux';
-import { RootState } from 'app/store/redux';
-import { useEffect, useState } from 'react';
-import controller from 'app/lib/controller.ts';
+import { StepActionButton } from "app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx";
+import type { StepProps } from "app/features/AccessoryInstaller/types";
+import { PositionSetter } from "app/features/AccessoryInstaller/Wizards/atc/components/PositionSetter.tsx";
+import controller from "app/lib/controller.ts";
+import type { RootState } from "app/store/redux";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 export function TLSPosition({ onComplete, onUncomplete }: StepProps) {
-    const applySettings = async () => {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-    };
+	const applySettings = async () => {
+		await new Promise((resolve) => setTimeout(resolve, 500));
+	};
 
-    const [isComplete, setIsComplete] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>(null);
+	const [isComplete, setIsComplete] = useState<boolean>(false);
+	const [error, setError] = useState<string | null>(null);
 
-    const mpos = useSelector((state: RootState) => state.controller.mpos);
+	const mpos = useSelector((state: RootState) => state.controller.mpos);
 
-    useEffect(() => {
-        if (!mpos || !mpos.x || !mpos.y || !mpos.z) return;
-        const { x, y, z } = mpos;
-        setPosition({ x, y, z });
-    }, [mpos]);
+	useEffect(() => {
+		if (!mpos || !mpos.x || !mpos.y || !mpos.z) return;
+		const { x, y, z } = mpos;
+		setPosition({ x, y, z });
+	}, [mpos]);
 
-    const [position, setPosition] = useState({ x: '0', y: '0', z: '0' });
+	const [position, setPosition] = useState({ x: "0", y: "0", z: "0" });
 
-    const setTLSPosition = () => {
-        controller.command(
-            'gcode',
-            `G21 G10 L2 P9 X${position.x} Y${position.y}`,
-            '$#',
-        );
-        setTimeout(() => {
-            setIsComplete(true);
-            onComplete();
-        }, 1500);
-    };
+	const setTLSPosition = () => {
+		controller.command(
+			"gcode",
+			`G21 G10 L2 P9 X${position.x} Y${position.y}`,
+			"$#",
+		);
+		setTimeout(() => {
+			setIsComplete(true);
+			onComplete();
+		}, 1500);
+	};
 
-    return (
-        <div className="flex flex-col gap-5 justify-start">
-            <p className="dark:text-white">
-                Please jog until just above the Tool Length Sensor and set the
-                position of your tool length sensor using the <b>“Set Position”</b>
-                button.
-            </p>
-            <PositionSetter
-                showZ={false}
-                xPosition={position.x}
-                yPosition={position.y}
-                onPositionChange={(positions) => {
-                    setPosition(positions);
-                }}
-                actionButton={
-                    <StepActionButton
-                        label={'Set Position'}
-                        runningLabel="Setting..."
-                        onApply={setTLSPosition}
-                        isComplete={isComplete}
-                        error={error}
-                    />
-                }
-            />
-        </div>
-    );
+	return (
+		<div className="flex flex-col gap-5 justify-start">
+			<p className="dark:text-white">
+				Please jog until just above the Tool Length Sensor and set the position
+				of your tool length sensor using the <b>“Set Position”</b>
+				button.
+			</p>
+			<PositionSetter
+				showZ={false}
+				xPosition={position.x}
+				yPosition={position.y}
+				onPositionChange={(positions) => {
+					setPosition(positions);
+				}}
+				actionButton={
+					<StepActionButton
+						label={"Set Position"}
+						runningLabel="Setting..."
+						onApply={setTLSPosition}
+						isComplete={isComplete}
+						error={error}
+					/>
+				}
+			/>
+		</div>
+	);
 }

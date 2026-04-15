@@ -21,27 +21,27 @@
  *
  */
 
-import classNames from 'classnames';
-import React from 'react';
-import { WidgetProps } from './definitions';
+import classNames from "classnames";
+import type React from "react";
+import type { WidgetProps } from "./definitions";
 
 const Header: React.FC<WidgetProps> = ({
-    fixed,
-    className,
-    embedded = false,
-    ...props
+	fixed,
+	className,
+	embedded = false,
+	...props
 }) => (
-    <div
-        {...props}
-        className={classNames(
-            className,
-            'bg-gray-200 relative border-gray-400 text-gray-900',
-            {
-                'cursor-default': fixed,
-                hidden: embedded,
-            },
-        )}
-    />
+	<div
+		{...props}
+		className={classNames(
+			className,
+			"bg-gray-200 relative border-gray-400 text-gray-900",
+			{
+				"cursor-default": fixed,
+				hidden: embedded,
+			},
+		)}
+	/>
 );
 
 export default Header;

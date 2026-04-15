@@ -21,132 +21,124 @@
  *
  */
 
-import React, { Component } from 'react';
-import pubsub from 'pubsub-js';
+import { VisualizerPlaceholder } from "app/features/Visualizer/Placeholder.jsx";
+import pubsub from "pubsub-js";
+import React, { Component } from "react";
 import {
-    shouldVisualize,
-    shouldVisualizeSVG,
-} from '../../workers/Visualize.response';
-import SVGVisualizer from './SVGVisualizer';
-import Visualizer from './Visualizer';
-import { VisualizerPlaceholder } from 'app/features/Visualizer/Placeholder.jsx';
+	shouldVisualize,
+	shouldVisualizeSVG,
+} from "../../workers/Visualize.response";
+import SVGVisualizer from "./SVGVisualizer";
+import Visualizer from "./Visualizer";
 
 class VisualizerWrapper extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            needRefresh: false,
-            needReload: false,
-        };
-    }
+	constructor(props) {
+		super(props);
+		this.state = {
+			needRefresh: false,
+			needReload: false,
+		};
+	}
 
-    pubsubTokens = [];
+	pubsubTokens = [];
 
-    visualizer = null;
+	visualizer = null;
 
-    componentDidMount() {
-        this.subscribe();
-    }
+	componentDidMount() {
+		this.subscribe();
+	}
 
-    componentDidUpdate() {
-        // force refresh, changing which visualizer component is being used
-        if (this.state.needRefresh && shouldVisualize()) {
-            this.visualizer.reloadGCode();
-            this.setNeedRefresh(false);
-            // a step further than refresh, reparsing the gcode as well
-        } else if (this.state.needReload) {
-            this.visualizer.reparseGCode();
-            this.setNeedReload(false);
-        }
-    }
+	componentDidUpdate() {
+		// force refresh, changing which visualizer component is being used
+		if (this.state.needRefresh && shouldVisualize()) {
+			this.visualizer.reloadGCode();
+			this.setNeedRefresh(false);
+			// a step further than refresh, reparsing the gcode as well
+		} else if (this.state.needReload) {
+			this.visualizer.reparseGCode();
+			this.setNeedReload(false);
+		}
+	}
 
-    setNeedRefresh(state) {
-        this.setState(() => {
-            return {
-                needRefresh: state,
-            };
-        });
-    }
+	setNeedRefresh(state) {
+		this.setState(() => {
+			return {
+				needRefresh: state,
+			};
+		});
+	}
 
-    setNeedReload(state) {
-        this.setState(() => {
-            return {
-                needReload: state,
-            };
-        });
-    }
+	setNeedReload(state) {
+		this.setState(() => {
+			return {
+				needReload: state,
+			};
+		});
+	}
 
-    subscribe() {
-        const tokens = [
-            pubsub.subscribe('litemode:change', (msg, isFileLoaded) => {
-                if (isFileLoaded) {
-                    this.setNeedRefresh(true);
-                    this.forceUpdate();
-                } else {
-                    this.forceUpdate();
-                }
-            }),
-            // currently, changing the settings requires reparsing of the gcode
-            pubsub.subscribe('visualizer:settings', () => {
-                this.setNeedReload(true);
-            }),
-        ];
-        this.pubsubTokens = this.pubsubTokens.concat(tokens);
-    }
+	subscribe() {
+		const tokens = [
+			pubsub.subscribe("litemode:change", (msg, isFileLoaded) => {
+				if (isFileLoaded) {
+					this.setNeedRefresh(true);
+					this.forceUpdate();
+				} else {
+					this.forceUpdate();
+				}
+			}),
+			// currently, changing the settings requires reparsing of the gcode
+			pubsub.subscribe("visualizer:settings", () => {
+				this.setNeedReload(true);
+			}),
+		];
+		this.pubsubTokens = this.pubsubTokens.concat(tokens);
+	}
 
-    unsubscribe() {
-        this.pubsubTokens.forEach((token) => {
-            pubsub.unsubscribe(token);
-        });
-        this.pubsubTokens = [];
-    }
+	unsubscribe() {
+		this.pubsubTokens.forEach((token) => {
+			pubsub.unsubscribe(token);
+		});
+		this.pubsubTokens = [];
+	}
 
-    render() {
-        const {
-            state,
-            show,
-            cameraPosition,
-            actions,
-            containerID,
-            isSecondary,
-        } = this.props;
+	render() {
+		const { state, show, cameraPosition, actions, containerID, isSecondary } =
+			this.props;
 
-        let renderSVG = shouldVisualizeSVG();
-        let renderAny = shouldVisualize() && !renderSVG;
+		const renderSVG = shouldVisualizeSVG();
+		const renderAny = shouldVisualize() && !renderSVG;
 
-        return (
-            <>
-                {(isSecondary || renderAny) && (
-                    <Visualizer
-                        show={show}
-                        cameraPosition={cameraPosition}
-                        ref={(visualizerRef) => {
-                            this.visualizer = visualizerRef;
-                        }}
-                        state={state}
-                        actions={actions}
-                        containerID={containerID}
-                        isSecondary={isSecondary}
-                    />
-                )}
-                {!isSecondary && renderSVG && (
-                    <SVGVisualizer
-                        show={show}
-                        ref={(visualizerRef) => {
-                            this.visualizer = visualizerRef;
-                        }}
-                        state={state}
-                        actions={actions}
-                        containerID={containerID}
-                        isSecondary={isSecondary}
-                    />
-                )}
-                {!isSecondary && !renderSVG && !renderAny && (
-                    <VisualizerPlaceholder />
-                )}
-            </>
-        );
-    }
+		return (
+			<>
+				{(isSecondary || renderAny) && (
+					<Visualizer
+						show={show}
+						cameraPosition={cameraPosition}
+						ref={(visualizerRef) => {
+							this.visualizer = visualizerRef;
+						}}
+						state={state}
+						actions={actions}
+						containerID={containerID}
+						isSecondary={isSecondary}
+					/>
+				)}
+				{!isSecondary && renderSVG && (
+					<SVGVisualizer
+						show={show}
+						ref={(visualizerRef) => {
+							this.visualizer = visualizerRef;
+						}}
+						state={state}
+						actions={actions}
+						containerID={containerID}
+						isSecondary={isSecondary}
+					/>
+				)}
+				{!isSecondary && !renderSVG && !renderAny && <VisualizerPlaceholder />}
+			</>
+		);
+	}
 }
 
 export default VisualizerWrapper;

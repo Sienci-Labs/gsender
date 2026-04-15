@@ -21,50 +21,48 @@
  *
  */
 
-import React from 'react';
-import uniqueId from 'lodash/uniqueId';
-import { useWizardContext } from 'app/features/Helper/context';
-import Substep from 'app/features/Helper/components/Substep';
-import Introduction from 'app/features/Helper/components/Introduction';
-import Controls from './Controls';
-import styles from '../index.module.styl';
+import Introduction from "app/features/Helper/components/Introduction";
+import Substep from "app/features/Helper/components/Substep";
+import { useWizardContext } from "app/features/Helper/context";
+import uniqueId from "lodash/uniqueId";
+import React from "react";
+import styles from "../index.module.styl";
+import Controls from "./Controls";
 
 const Instructions = () => {
-    const { steps, intro, title } = useWizardContext();
+	const { steps, intro, title } = useWizardContext();
 
-    return (
-        <div className={styles.instructionWrapper}>
-            <div className={styles.stepWrapper}>
-                {intro && <Introduction description={intro} title={title} />}
-                {steps.map((step, stepIndex) => {
-                    return (
-                        // eslint-disable-next-line react/no-array-index-key
-                        <div
-                            className={styles.substeps}
-                            key={`substepwrapper-${stepIndex}`}
-                        >
-                            <h2 className={styles.instructionTitle}>
-                                {step.title}
-                            </h2>
-                            {
-                                // eslint-disable-next-line react/no-array-index-key
-                                step.substeps.map((substep, index) => (
-                                    <Substep
-                                        step={substep}
-                                        key={`substep-${uniqueId()}`}
-                                        index={index}
-                                        stepIndex={stepIndex}
-                                        firstRunOnly={step.firstRunOnly && index === 0}
-                                    />
-                                ))
-                            }
-                        </div>
-                    );
-                })}
-            </div>
-            <Controls />
-        </div>
-    );
+	return (
+		<div className={styles.instructionWrapper}>
+			<div className={styles.stepWrapper}>
+				{intro && <Introduction description={intro} title={title} />}
+				{steps.map((step, stepIndex) => {
+					return (
+						// eslint-disable-next-line react/no-array-index-key
+						<div
+							className={styles.substeps}
+							key={`substepwrapper-${stepIndex}`}
+						>
+							<h2 className={styles.instructionTitle}>{step.title}</h2>
+							{
+								// eslint-disable-next-line react/no-array-index-key
+								step.substeps.map((substep, index) => (
+									<Substep
+										step={substep}
+										key={`substep-${uniqueId()}`}
+										index={index}
+										stepIndex={stepIndex}
+										firstRunOnly={step.firstRunOnly && index === 0}
+									/>
+								))
+							}
+						</div>
+					);
+				})}
+			</div>
+			<Controls />
+		</div>
+	);
 };
 
 export default Instructions;

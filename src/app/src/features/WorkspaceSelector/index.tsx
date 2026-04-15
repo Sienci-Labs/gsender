@@ -1,94 +1,93 @@
-import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from 'app/components/shadcn/Select';
-import controller from 'app/lib/controller.ts';
-import { RootState } from 'app/store/redux';
-import Tooltip from 'app/components/Tooltip';
-import { GRBL_ACTIVE_STATE_RUN, WORKFLOW_STATE_RUNNING } from 'app/constants';
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "app/components/shadcn/Select";
+import Tooltip from "app/components/Tooltip";
+import { GRBL_ACTIVE_STATE_RUN, WORKFLOW_STATE_RUNNING } from "app/constants";
+import controller from "app/lib/controller.ts";
+import type { RootState } from "app/store/redux";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 const availableWorkspaces = {
-    G54: 'P1',
-    G55: 'P2',
-    G56: 'P3',
-    G57: 'P4',
-    G58: 'P5',
-    G59: 'P6',
+	G54: "P1",
+	G55: "P2",
+	G56: "P3",
+	G57: "P4",
+	G58: "P5",
+	G59: "P6",
 };
 
-export type GrblWorkspace = 'G54' | 'G55' | 'G56' | 'G57' | 'G58' | 'G59';
+export type GrblWorkspace = "G54" | "G55" | "G56" | "G57" | "G58" | "G59";
 
 export function WorkspaceSelector() {
-    const activeWorkspace = useSelector(
-        (state: RootState) => state.controller.modal.wcs,
-    );
-    const isConnected = useSelector(
-        (state: RootState) => state.connection.isConnected,
-    );
+	const activeWorkspace = useSelector(
+		(state: RootState) => state.controller.modal.wcs,
+	);
+	const isConnected = useSelector(
+		(state: RootState) => state.connection.isConnected,
+	);
 
-    const activeState = useSelector(
-        (state: RootState) => state.controller.state.status?.activeState,
-    );
+	const activeState = useSelector(
+		(state: RootState) => state.controller.state.status?.activeState,
+	);
 
-    const workflowState = useSelector((state: RootState) => state.controller.workflow.state);
+	const workflowState = useSelector(
+		(state: RootState) => state.controller.workflow.state,
+	);
 
-    const [workspace, setWorkspace] = useState<GrblWorkspace>('G54');
+	const [workspace, setWorkspace] = useState<GrblWorkspace>("G54");
 
-    // Update selected workspace if it changes elsewhere
-    useEffect(() => {
-        setWorkspace(activeWorkspace);
-    }, [activeWorkspace]);
+	// Update selected workspace if it changes elsewhere
+	useEffect(() => {
+		setWorkspace(activeWorkspace);
+	}, [activeWorkspace]);
 
-    function onWorkspaceSelect(value: GrblWorkspace) {
-        setWorkspace(value);
-        controller.command('gcode', value);
-    }
+	function onWorkspaceSelect(value: GrblWorkspace) {
+		setWorkspace(value);
+		controller.command("gcode", value);
+	}
 
-    const disabled = !isConnected || activeState === GRBL_ACTIVE_STATE_RUN || workflowState === WORKFLOW_STATE_RUNNING;
+	const disabled =
+		!isConnected ||
+		activeState === GRBL_ACTIVE_STATE_RUN ||
+		workflowState === WORKFLOW_STATE_RUNNING;
 
-    return (
-        <div className="absolute top-4 right-4 w-56 flex flex-row items-center justify-end gap-2">
-            <span className="text-gray-400 text-normal">Workspace:</span>
-            <Tooltip content="Select a workspace" side="left">
-                <div>
-                    <Select
-                        onValueChange={onWorkspaceSelect}
-                        value={workspace}
-                        disabled={disabled}
-                    >
-                        <SelectTrigger 
-                            className="max-w-24 h-7 bg-white rounded-md border-solid border border-gray-300"
-                            aria-label="Select workspace"
-                        >
-                            <SelectValue placeholder="G54" />
-                        </SelectTrigger>
-                        <SelectContent className="flex-1 bg-white">
-                            <SelectGroup className="bg-white">
-                                {Object.entries(availableWorkspaces).map(
-                                    (option, _index) => {
-                                        const [key, value] = option;
-                                        return (
-                                            <SelectItem
-                                                key={key}
-                                                value={key}
-                                                className="bg-white h-8"
-                                            >
-                                                {`${key} (${value})`}
-                                            </SelectItem>
-                                        );
-                                    },
-                                )}
-                            </SelectGroup>
-                        </SelectContent>
-                    </Select>
-                </div>
-            </Tooltip>
-        </div>
-    );
+	return (
+		<div className="absolute top-4 right-4 w-56 flex flex-row items-center justify-end gap-2">
+			<span className="text-gray-400 text-normal">Workspace:</span>
+			<Tooltip content="Select a workspace" side="left">
+				<div>
+					<Select
+						onValueChange={onWorkspaceSelect}
+						value={workspace}
+						disabled={disabled}
+					>
+						<SelectTrigger
+							className="max-w-24 h-7 bg-white rounded-md border-solid border border-gray-300"
+							aria-label="Select workspace"
+						>
+							<SelectValue placeholder="G54" />
+						</SelectTrigger>
+						<SelectContent className="flex-1 bg-white">
+							<SelectGroup className="bg-white">
+								{Object.entries(availableWorkspaces).map((option, _index) => {
+									const [key, value] = option;
+									return (
+										<SelectItem key={key} value={key} className="bg-white h-8">
+											{`${key} (${value})`}
+										</SelectItem>
+									);
+								})}
+							</SelectGroup>
+						</SelectContent>
+					</Select>
+				</div>
+			</Tooltip>
+		</div>
+	);
 }

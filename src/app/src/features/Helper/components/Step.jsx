@@ -21,54 +21,50 @@
  *
  */
 
-import React from 'react';
-import styles from '../index.module.styl';
-import { FaCheck } from 'react-icons/fa';
+import React from "react";
+import { FaCheck } from "react-icons/fa";
+import styles from "../index.module.styl";
 
 const Step = ({ step, index = 1, active, complete }) => {
-    const getTitleClass = () => {
-        if (active) {
-            return 'stepTitle-active';
-        }
-        if (complete) {
-            return 'stepTitle';
-        }
-        return 'stepTitle-future';
-    };
-    const getStepIndexClass = () => {
-        if (active) {
-            return 'stepIndex-active';
-        }
-        if (complete) {
-            return 'stepIndex-complete';
-        }
-        return 'stepIndex';
-    };
+	const getTitleClass = () => {
+		if (active) {
+			return "stepTitle-active";
+		}
+		if (complete) {
+			return "stepTitle";
+		}
+		return "stepTitle-future";
+	};
+	const getStepIndexClass = () => {
+		if (active) {
+			return "stepIndex-active";
+		}
+		if (complete) {
+			return "stepIndex-complete";
+		}
+		return "stepIndex";
+	};
 
-    return (
-        <div className={active ? styles.stepActive : styles.step}>
-            <div className={styles[getStepIndexClass()]}>
-                {complete ? <FaCheck /> : index + 1}
-            </div>
-            <div className={styles.stepText}>
-                <span className={styles[getTitleClass()]}>
-                    Step {index + 1}
-                </span>
-                <span
-                    className={
-                        active
-                            ? styles.stepperDescriptionActive
-                            : styles.stepperDescription
-                    }
-                >
-                    {step.title}
-                </span>
-                {step.firstRunOnly && (
-                    <span className={styles.firstRunBadge}>First Run Only</span>
-                )}
-            </div>
-        </div>
-    );
+	return (
+		<div className={active ? styles.stepActive : styles.step}>
+			<div className={styles[getStepIndexClass()]}>
+				{complete ? <FaCheck /> : index + 1}
+			</div>
+			<div className={styles.stepText}>
+				<span className={styles[getTitleClass()]}>Step {index + 1}</span>
+				<span
+					className={
+						active ? styles.stepperDescriptionActive : styles.stepperDescription
+					}
+				>
+					{step.title}
+				</span>
+				{step.firstRunOnly && (
+					<span className={styles.firstRunBadge}>First Run Only</span>
+				)}
+			</div>
+		</div>
+	);
 };
 
 export default Step;

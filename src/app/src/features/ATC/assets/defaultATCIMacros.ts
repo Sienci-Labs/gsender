@@ -1,8 +1,8 @@
-import { ATCIVariable } from 'app/features/ATC/components/Configuration/hooks/useConfigStore.tsx';
+import type { ATCIVariable } from "app/features/ATC/components/Configuration/hooks/useConfigStore.tsx";
 
 export type Macro = {
-    name: string;
-    content: string;
+	name: string;
+	content: string;
 };
 
 export const P302Content = `;=======================================================================================
@@ -2048,151 +2048,151 @@ o200 endif
 M99`;
 
 const defaultMacros: Macro[] = [
-    {
-        name: 'P302.macro',
-        content: P302Content,
-    },
-    {
-        name: 'P506.macro',
-        content: P506Content,
-    },
-    {
-        name: 'P900.macro',
-        content: P900Content,
-    },
-    {
-        name: 'P502.macro',
-        content: P502Content,
-    },
-    {
-        name: 'P500.macro',
-        content: P500Content,
-    },
-    {
-        name: 'P509.macro',
-        content: P509Content,
-    },
-    {
-        name: 'P508.macro',
-        content: P508Content,
-    },
-    {
-        name: 'P510.macro',
-        content: P510Content,
-    },
-    {
-        name: 'P512.macro',
-        content: P512Content,
-    },
-    {
-        name: 'P301.macro',
-        content: P301Content,
-    },
-    {
-        name: 'P511.macro',
-        content: P511Content,
-    },
-    {
-        name: 'P999.macro',
-        content: P999Content,
-    },
-    {
-        name: 'P501.macro',
-        content: P501Content,
-    },
-    {
-        name: 'P504.macro',
-        content: P504Content,
-    },
-    {
-        name: 'P503.macro',
-        content: P503Content,
-    },
-    {
-        name: 'P901.macro',
-        content: P901Content,
-    },
-    {
-        name: 'P300.macro',
-        content: P300Content,
-    },
-    {
-        name: 'P507.macro',
-        content: P507Content,
-    },
-    {
-        name: 'P505.macro',
-        content: P505Content,
-    },
-    {
-        name: 'TC.macro',
-        content: TCContent,
-    },
-    {
-        name: 'P200.macro',
-        content: P200Content,
-    },
+	{
+		name: "P302.macro",
+		content: P302Content,
+	},
+	{
+		name: "P506.macro",
+		content: P506Content,
+	},
+	{
+		name: "P900.macro",
+		content: P900Content,
+	},
+	{
+		name: "P502.macro",
+		content: P502Content,
+	},
+	{
+		name: "P500.macro",
+		content: P500Content,
+	},
+	{
+		name: "P509.macro",
+		content: P509Content,
+	},
+	{
+		name: "P508.macro",
+		content: P508Content,
+	},
+	{
+		name: "P510.macro",
+		content: P510Content,
+	},
+	{
+		name: "P512.macro",
+		content: P512Content,
+	},
+	{
+		name: "P301.macro",
+		content: P301Content,
+	},
+	{
+		name: "P511.macro",
+		content: P511Content,
+	},
+	{
+		name: "P999.macro",
+		content: P999Content,
+	},
+	{
+		name: "P501.macro",
+		content: P501Content,
+	},
+	{
+		name: "P504.macro",
+		content: P504Content,
+	},
+	{
+		name: "P503.macro",
+		content: P503Content,
+	},
+	{
+		name: "P901.macro",
+		content: P901Content,
+	},
+	{
+		name: "P300.macro",
+		content: P300Content,
+	},
+	{
+		name: "P507.macro",
+		content: P507Content,
+	},
+	{
+		name: "P505.macro",
+		content: P505Content,
+	},
+	{
+		name: "TC.macro",
+		content: TCContent,
+	},
+	{
+		name: "P200.macro",
+		content: P200Content,
+	},
 ];
 
 export interface ATCIMacroConfig {
-    version: number;
-    sdVersion: number;
-    variables: {
-        [key: string]: ATCIVariable;
-    };
-    variableFile: string;
-    macros: Macro[];
+	version: number;
+	sdVersion: number;
+	variables: {
+		[key: string]: ATCIVariable;
+	};
+	variableFile: string;
+	macros: Macro[];
 }
 
 export interface ATCIJSON {
-    version: number;
-    variables: {
-        [key: string]: {
-            default: number;
-            value: number;
-        };
-    };
-    variableFile: string;
-    files: string[];
+	version: number;
+	variables: {
+		[key: string]: {
+			default: number;
+			value: number;
+		};
+	};
+	variableFile: string;
+	files: string[];
 }
 
 export const defaultATCIMacros: ATCIMacroConfig = {
-    version: 20260227,
-    sdVersion: 20260227,
-    variables: {
-        _tc_rack_enable: {
-            default: 0,
-            value: 0,
-        },
-        _tc_slots: {
-            default: 6,
-            value: 0,
-        },
-        _tc_slot_offset: {
-            default: 90,
-            value: 0,
-        },
-        _irt_offset_mode: {
-            default: 0,
-            value: 0,
-        },
-        _ort_offset_mode: {
-            default: 0,
-            value: 0,
-        },
-        _passthrough_offset_setting: {
-            default: 0,
-            value: 0,
-        },
-        _holder_sense: {
-            default: 1,
-            value: 0,
-        },
-        _pres_sense: {
-            default: 1,
-            value: 0,
-        },
-    },
-    variableFile: 'P100.macro',
-    macros: defaultMacros,
+	version: 20260227,
+	sdVersion: 20260227,
+	variables: {
+		_tc_rack_enable: {
+			default: 0,
+			value: 0,
+		},
+		_tc_slots: {
+			default: 6,
+			value: 0,
+		},
+		_tc_slot_offset: {
+			default: 90,
+			value: 0,
+		},
+		_irt_offset_mode: {
+			default: 0,
+			value: 0,
+		},
+		_ort_offset_mode: {
+			default: 0,
+			value: 0,
+		},
+		_passthrough_offset_setting: {
+			default: 0,
+			value: 0,
+		},
+		_holder_sense: {
+			default: 1,
+			value: 0,
+		},
+		_pres_sense: {
+			default: 1,
+			value: 0,
+		},
+	},
+	variableFile: "P100.macro",
+	macros: defaultMacros,
 };
