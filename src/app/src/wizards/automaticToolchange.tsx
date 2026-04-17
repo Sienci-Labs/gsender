@@ -31,15 +31,14 @@ import { store as reduxStore } from 'app/store/redux';
 import get from 'lodash/get';
 
 // $132 is max z travel, if soft limits ($20) enabled we need to make sure probe distance will not exceed max limits
-const calculateMaxZProbeDistance = (_zProbeDistance = 30) => {
+const calculateMaxZProbeDistance = () => {
     const state = reduxStore.getState();
     const maxZTravel = Number(get(state, 'controller.settings.settings.$132'));
+    const tcPosition = store.get('workspace.toolChangePosition');
+    const tcZPos = Math.abs(tcPosition.z);
 
-    //const curZPos = Math.abs(Number(get(state, 'controller.mpos.z')));
-    const position = store.get('workspace.toolChangePosition');
-    const curZPos = Math.abs(position.z);
-
-    return (maxZTravel - curZPos - 2).toFixed(3);
+    // leave 2mm of buffer to ensure we don't hit the max travel limit and cause a hard stop
+    return (maxZTravel - tcZPos - 2).toFixed(3);
 };
 
 const probeInitialToolStep = [{
@@ -56,11 +55,12 @@ const probeInitialToolStep = [{
                     label: 'Probe Initial Tool',
                     cb: () => {
                         controller.command('gcode', [
-                            'G91 G21',
+                            'G90 G21',
                             'G49', // cancel applied TLO offsets
-                            'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
-                            'G53 G0 X[global.toolchange.PROBE_POS_X] Y[global.toolchange.PROBE_POS_Y]',
-                            'G53 G0 Z[global.toolchange.PROBE_POS_Z]',
+                            'G90 G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                            'G90 G53 G0 X[global.toolchange.PROBE_POS_X] Y[global.toolchange.PROBE_POS_Y]',
+                            'G90 G53 G0 Z[global.toolchange.PROBE_POS_Z]',
+                            'G91 G21',
                             'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
                             'G0 Z[global.toolchange.RETRACT]',
                             'G38.2 Z-10 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
@@ -125,10 +125,7 @@ const createWizard = (count: number) => {
             const state = reduxStore.getState();
             const $13 = get(state, 'controller.settings.settings.$13', '0');
             const zSafe = $13 === '1' ? '-0.5' : '-10';
-
-            const zProbeDistance = calculateMaxZProbeDistance(
-                settings.zProbeDistance,
-            );
+            const zProbeDistance = calculateMaxZProbeDistance();
 
             controller.command('gcode', [
                 '%wait',
