@@ -103,6 +103,7 @@ export interface Workspace {
     notifications: Notification[];
     toastDuration: number;
     enableDarkMode: boolean;
+    showPowerButton: boolean;
     accessibility: {
         statusAnnouncements: boolean;
         jobProgressAnnouncements: boolean;

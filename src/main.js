@@ -31,6 +31,7 @@ import {
     session,
     clipboard,
 } from 'electron';
+import { exec } from 'child_process';
 import { autoUpdater } from 'electron-updater';
 import Store from 'electron-store';
 import chalk from 'chalk';
@@ -513,6 +514,23 @@ const main = () => {
 
                 store.set("displayScaleFactor", value);
                 window.webContents.setZoomFactor(value);
+            });
+
+            ipcMain.on('shutdown-host', () => {
+                let command;
+                if (process.platform === 'win32') {
+                    command = 'shutdown /s /t 0';
+                } else if (process.platform === 'darwin') {
+                    command = 'osascript -e \'tell app "System Events" to shut down\'';
+                } else {
+                    // Linux, including Raspberry Pi
+                    command = 'shutdown -h now';
+                }
+                exec(command, (err) => {
+                    if (err) {
+                        log.error(`Failed to shut down host: ${err.message}`);
+                    }
+                });
             });
 
             //Handle app restart with remote settings

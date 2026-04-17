@@ -175,6 +175,7 @@ const defaultState: State = {
         notifications: [],
         toastDuration: 0,
         enableDarkMode: false,
+        showPowerButton: false,
         accessibility: {
             statusAnnouncements: false,
             jobProgressAnnouncements: false,

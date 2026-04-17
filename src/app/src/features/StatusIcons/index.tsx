@@ -12,6 +12,7 @@ import RemoteIndicator from 'app/features/RemoteMode/components/RemoteIndicator.
 import Tooltip from 'app/components/Tooltip';
 
 import NotificationsArea from 'app/features/NotificationsArea';
+import PowerButton from 'app/features/PowerButton';
 
 const StatusIcons = () => {
     const [gamepadConnected, setGamePadConnected] = useState(false);
@@ -102,6 +103,8 @@ const StatusIcons = () => {
             />
 
             <NotificationsArea />
+
+            <PowerButton />
         </div>
     );
 };

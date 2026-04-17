@@ -332,6 +332,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         min: 0,
                         max: 4,
                     },
+                    {
+                        label: 'Show power button',
+                        key: 'workspace.showPowerButton',
+                        description:
+                            'Show a power button in the top bar to shut down the host computer',
+                        type: 'boolean',
+                        hidden: () => !isElectron(),
+                    },
                 ],
             },
             {
@@ -1319,7 +1327,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     },
                     {
                         type: 'eeprom',
-                        eID: '$394'
+                        eID: '$394',
                     },
                     {
                         label: 'Spindle on delay',
