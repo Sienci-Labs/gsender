@@ -79,7 +79,7 @@ const ControlButton: React.FC<ControlButtonProps> = ({
         (state: RootState) => state.controller.state.status?.SD?.name,
     );
     useEffect(() => {
-        if (sdRunReported !== null) {
+        if (sdRunReported !== null || sdRunReported === undefined) {
             setIsRunningSDFile(true);
         } else {
             setIsRunningSDFile(false);
