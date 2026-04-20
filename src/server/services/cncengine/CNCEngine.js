@@ -535,7 +535,7 @@ class CNCEngine {
             });
 
             socket.on('command', (port, cmd, ...args) => {
-                log.debug(`socket.command("${port}", "${cmd}"): id=${socket.id}, args=${JSON.stringify(args)}`);
+                log.debug(`socket.command("${port}", "${cmd}"): id=${socket.id}`);
 
                 if (!this.connection || this.connection.isClose()) {
                     log.error(`Serial port "${port}" not accessible`);
