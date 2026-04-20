@@ -17,7 +17,7 @@ type ConsoleProps = {
 };
 
 const Console = ({ isActive, isChildWindow }: ConsoleProps) => {
-    const terminalRef = useRef<{ clear: () => void }>(null);
+    const terminalRef = useRef<{ clear: () => void; write: (data: string, source: string) => void }>(null);
     const [port, setPort] = useState(controller.port);
 
     const controllerEvents: {
@@ -135,7 +135,7 @@ const Console = ({ isActive, isChildWindow }: ConsoleProps) => {
             </div>
             <div className="grid grid-rows-[1fr_auto] absolute gap-1 top-0 left-0 w-full h-full p-1">
                 <Terminal ref={terminalRef} isActive={isActive} />
-                <TerminalInput onClear={handleTerminalClear} />
+                <TerminalInput onClear={handleTerminalClear} onWrite={(data, source) => terminalRef.current?.write(data, source)} />
                 <ConsolePopout />
             </div>
         </>

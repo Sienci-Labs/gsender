@@ -30,9 +30,10 @@ const REALTIME_COMMANDS = new Set<string>([
 
 type Props = {
     onClear: () => void;
+    onWrite: (data: string, source: string) => void;
 };
 
-const TerminalInput = ({ onClear }: Props) => {
+const TerminalInput = ({ onClear, onWrite }: Props) => {
     const dispatch = useDispatch();
     const inputRef = useRef<HTMLInputElement>(null);
     const { inputHistory, history } = useTypedSelector(
@@ -52,8 +53,11 @@ const TerminalInput = ({ onClear }: Props) => {
         // dataFilter can interpret it.
         if (REALTIME_COMMANDS.has(command)) {
             controller.writeln(command);
+            // Write it to the terminal so it's clear to the user what command was sent.
+            // Remember this is purely a visual update and doesn't impact the command sent to the controller
+            onWrite(command, 'client');
         } else {
-            controller.command('gcode', command);
+            controller.command('gcode', command, { source: 'feeder (console)' });
         }
 
         // Use addToInputHistory instead of setInputHistory
