@@ -10,6 +10,8 @@ import { addToInputHistory } from 'app/store/redux/slices/console.slice';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import controller from 'app/lib/controller';
 import { toast } from 'app/lib/toaster';
+import { GRBL_REALTIME_COMMANDS } from 'server/controllers/Grbl/constants';
+import { GRBLHAL_REALTIME_COMMANDS } from 'server/controllers/Grblhal/constants';
 import {
     Popover,
     PopoverContent,
@@ -17,6 +19,14 @@ import {
 } from 'app/components/shadcn/Popover';
 
 const COPY_HISTORY_LIMIT = 50;
+
+// Union of all realtime commands from both firmware variants.
+// These must reach the serial port immediately without appending
+// a newline or going through the feeder queue
+const REALTIME_COMMANDS = new Set<string>([
+    ...GRBL_REALTIME_COMMANDS,
+    ...Object.values(GRBLHAL_REALTIME_COMMANDS),
+]);
 
 type Props = {
     onClear: () => void;
@@ -37,7 +47,14 @@ const TerminalInput = ({ onClear }: Props) => {
             return;
         }
 
-        controller.writeln(command);
+        // Realtime commands must bypass the Feeder and go directly to the serial
+        // port. Everything else routes through the Feeder so its
+        // dataFilter can interpret it.
+        if (REALTIME_COMMANDS.has(command)) {
+            controller.writeln(command);
+        } else {
+            controller.command('gcode', command);
+        }
 
         // Use addToInputHistory instead of setInputHistory
         dispatch(addToInputHistory(command));
@@ -138,7 +155,7 @@ const TerminalInput = ({ onClear }: Props) => {
 
             <Popover>
                 <PopoverTrigger asChild>
-                    <Button 
+                    <Button
                         variant="secondary"
                         className="h-8 text-sm"
                         aria-label="Console options"
