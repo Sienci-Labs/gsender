@@ -57,7 +57,15 @@ const TerminalInput = ({ onClear, onWrite }: Props) => {
             // Remember this is purely a visual update and doesn't impact the command sent to the controller
             onWrite(command, 'client');
         } else {
-            controller.command('gcode', command, { source: 'feeder (console)' });
+            controller.command('gcode', command, {
+                source: 'feeder (console)',
+            });
+
+            if (command.startsWith('%')) {
+                // The feeder normally eats commands that start with % but
+                // we still want to show them in the terminal for user feedback
+                onWrite(command, 'feeder (console)');
+            }
         }
 
         // Use addToInputHistory instead of setInputHistory
