@@ -283,21 +283,21 @@ const main = () => {
 			};
 			const window = await windowManager.openWindow(url, options, splashScreen);
 
-            window.on("ready-to-show", () => {
-                const savedScaleFactor = Number(store.get("displayScaleFactor", 1.0));
+			window.on("ready-to-show", () => {
+				const savedScaleFactor = Number(store.get("displayScaleFactor", 1.0));
 
-                window.webContents.setZoomFactor(savedScaleFactor);
-            });
+				window.webContents.setZoomFactor(savedScaleFactor);
+			});
 
-            // Check argv for file path on Windows/Linux cold start
-            if (process.platform !== 'darwin') {
-                const filePath = process.argv.find(arg =>
-                    /\.(gcode|gc|nc|tap|cnc)$/i.test(arg)
-                );
-                if (filePath) {
-                    pendingFileToOpen = filePath;
-                }
-            }
+			// Check argv for file path on Windows/Linux cold start
+			if (process.platform !== "darwin") {
+				const filePath = process.argv.find((arg) =>
+					/\.(gcode|gc|nc|tap|cnc)$/i.test(arg),
+				);
+				if (filePath) {
+					pendingFileToOpen = filePath;
+				}
+			}
 
 			ipcMain.on("file-association-ready", () => {
 				isRendererReady = true;
@@ -516,42 +516,42 @@ const main = () => {
 				});
 			});
 
-            ipcMain.on("save-display-scale", (_event, scaleFactor) => {
-                const value = Number(scaleFactor) || 1.0;
+			ipcMain.on("save-display-scale", (_event, scaleFactor) => {
+				const value = Number(scaleFactor) || 1.0;
 
-                store.set("displayScaleFactor", value);
-                window.webContents.setZoomFactor(value);
-            });
+				store.set("displayScaleFactor", value);
+				window.webContents.setZoomFactor(value);
+			});
 
-            //Handle app restart with remote settings
-            ipcMain.on('remoteMode-restart', (event, headlessSettings) => {
-                app.relaunch(); // flags are handled in server/index.js
-                app.exit(0);
-            });
-        } catch (err) {
-            log.error(err);
-            log.err(err.name);
-            await dialog.showMessageBox({
-                message: err,
-            });
-        }
-        //Check for available updates at end to avoid try-catch failing to load events
-        if (process.platform === 'win32') {
-            const internetConnectivity = await isOnline();
-            if (internetConnectivity) {
-                autoUpdater.autoDownload = false; // We don't want to force update but will prompt until it is updated
-                // There may be situations where something is blocking the update check outside of internet connectivity
-                // This sets a 4 second timeout on the await.
-                try {
-                    asyncCallWithTimeout(autoUpdater.checkForUpdates(), 5000);
-                } catch (e) {
-                    log.info(
-                        'Unable to check for app updates, likely no internet connection.',
-                    );
-                }
-            }
-        }
-    });
+			//Handle app restart with remote settings
+			ipcMain.on("remoteMode-restart", (event, headlessSettings) => {
+				app.relaunch(); // flags are handled in server/index.js
+				app.exit(0);
+			});
+		} catch (err) {
+			log.error(err);
+			log.err(err.name);
+			await dialog.showMessageBox({
+				message: err,
+			});
+		}
+		//Check for available updates at end to avoid try-catch failing to load events
+		if (process.platform === "win32") {
+			const internetConnectivity = await isOnline();
+			if (internetConnectivity) {
+				autoUpdater.autoDownload = false; // We don't want to force update but will prompt until it is updated
+				// There may be situations where something is blocking the update check outside of internet connectivity
+				// This sets a 4 second timeout on the await.
+				try {
+					asyncCallWithTimeout(autoUpdater.checkForUpdates(), 5000);
+				} catch (e) {
+					log.info(
+						"Unable to check for app updates, likely no internet connection.",
+					);
+				}
+			}
+		}
+	});
 };
 
 main();
