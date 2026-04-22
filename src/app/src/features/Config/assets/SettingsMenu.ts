@@ -1301,7 +1301,6 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						eID: "$392",
 						unit: "s",
 					},
-
 					{
 						type: "eeprom",
 						eID: "$539",
