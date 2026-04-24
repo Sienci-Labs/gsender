@@ -10,6 +10,8 @@ import { addToInputHistory } from 'app/store/redux/slices/console.slice';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import controller from 'app/lib/controller';
 import { toast } from 'app/lib/toaster';
+import { GRBL_REALTIME_COMMANDS } from 'server/controllers/Grbl/constants';
+import { GRBLHAL_REALTIME_COMMANDS } from 'server/controllers/Grblhal/constants';
 import {
     Popover,
     PopoverContent,
@@ -18,11 +20,20 @@ import {
 
 const COPY_HISTORY_LIMIT = 50;
 
+// Union of all realtime commands from both firmware variants.
+// These must reach the serial port immediately without appending
+// a newline or going through the feeder queue
+const REALTIME_COMMANDS = new Set<string>([
+    ...GRBL_REALTIME_COMMANDS,
+    ...Object.values(GRBLHAL_REALTIME_COMMANDS),
+]);
+
 type Props = {
     onClear: () => void;
+    onWrite: (data: string, source: string) => void;
 };
 
-const TerminalInput = ({ onClear }: Props) => {
+const TerminalInput = ({ onClear, onWrite }: Props) => {
     const dispatch = useDispatch();
     const inputRef = useRef<HTMLInputElement>(null);
     const { inputHistory, history } = useTypedSelector(
@@ -37,7 +48,25 @@ const TerminalInput = ({ onClear }: Props) => {
             return;
         }
 
-        controller.writeln(command);
+        // Realtime commands must bypass the Feeder and go directly to the serial
+        // port. Everything else routes through the Feeder so its
+        // dataFilter can interpret it.
+        if (REALTIME_COMMANDS.has(command)) {
+            controller.writeln(command);
+            // Write it to the terminal so it's clear to the user what command was sent.
+            // Remember this is purely a visual update and doesn't impact the command sent to the controller
+            onWrite(command, 'client');
+        } else {
+            controller.command('gcode', command, {
+                source: 'feeder (console)',
+            });
+
+            if (command.startsWith('%')) {
+                // The feeder normally eats commands that start with % but
+                // we still want to show them in the terminal for user feedback
+                onWrite(command, 'feeder (console)');
+            }
+        }
 
         // Use addToInputHistory instead of setInputHistory
         dispatch(addToInputHistory(command));
@@ -138,7 +167,7 @@ const TerminalInput = ({ onClear }: Props) => {
 
             <Popover>
                 <PopoverTrigger asChild>
-                    <Button 
+                    <Button
                         variant="secondary"
                         className="h-8 text-sm"
                         aria-label="Console options"

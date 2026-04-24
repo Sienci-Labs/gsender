@@ -432,12 +432,12 @@ class GrblHalController {
 
             this.emit('serialport:write', line + '\n', {
                 ...context,
-                source: WRITE_SOURCE_FEEDER
+                source: context.source || WRITE_SOURCE_FEEDER
             });
 
             this.write(line + '\n', {
                 ...context,
-                source: WRITE_SOURCE_FEEDER
+                source: context.source || WRITE_SOURCE_FEEDER
             });
             log.silly(`> ${line}`);
         });

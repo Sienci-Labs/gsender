@@ -34,6 +34,7 @@ let FitAddon: any;
 
 type TerminalRef = {
     clear: () => void;
+    write: (data: string, source: string) => void;
 };
 
 type Props = {
@@ -64,6 +65,9 @@ const Terminal = (
             if (terminalInstance.current) {
                 terminalInstance.current.clear();
             }
+        },
+        write: (data: string, source: string) => {
+            writeToTerminal(data, source);
         },
     }));
 
@@ -161,7 +165,7 @@ const Terminal = (
 
         if (source) {
             terminalInstance.current?.writeln(
-                color.blackBright(source) +
+                color.xterm(75)(source) +
                     ' ' +
                     color.xterm(TERMINAL_GREY)(data),
             );
