@@ -20,13 +20,13 @@ function App() {
 				token: string;
 			};
 
-            if (!authenticated) return;
+			if (!authenticated) return;
 
-            const host = '';
-            const options = { query: 'token=' + token };
+			const host = "";
+			const options = { query: "token=" + token };
 
-            controller.connect(host, options);
-        });
+			controller.connect(host, options);
+		});
 
 		sagaMiddleware.run(rootSaga);
 	}, []);

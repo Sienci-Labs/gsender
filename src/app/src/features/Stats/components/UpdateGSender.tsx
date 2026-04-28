@@ -30,35 +30,32 @@ export function UpdateGSender({
 		setReleaseNotes(notes.releaseNotes);
 	}, [notes]);
 
-    return (
-        <div className="grid grid-cols-3 grid-rows-1 gap-4 h-full">
-            <DownloadGSender
-                version={version}
-                downloadPercent={downloadPercent}
-            />
-            <div className="col-span-2 flex flex-col">
-                <div className="flex gap-2 items-center justify-between">
-                    <h2 className="text-2xl font-bold dark:text-white">
-                        What's new in v{version}
-                    </h2>
-                    <a
-                        className="text-sm text-blue-500 underline"
-                        href="https://github.com/Sienci-Labs/gsender"
-                        target="_blank"
-                        rel="noreferrer"
-                    >
-                        <div className="flex items-center gap-1">
-                            <FaExternalLinkAlt />
-                            See all recent releases
-                        </div>
-                    </a>
-                </div>
-                <div className="relative h-full">
-                    <div className="absolute top-0 left-0 w-full h-full overflow-y-auto border border-gray-300 rounded-md p-4 dark:text-white">
-                        {ReactParse(releaseNotes)}
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
+	return (
+		<div className="grid grid-cols-3 grid-rows-1 gap-4 h-full">
+			<DownloadGSender version={version} downloadPercent={downloadPercent} />
+			<div className="col-span-2 flex flex-col">
+				<div className="flex gap-2 items-center justify-between">
+					<h2 className="text-2xl font-bold dark:text-white">
+						What's new in v{version}
+					</h2>
+					<a
+						className="text-sm text-blue-500 underline"
+						href="https://github.com/Sienci-Labs/gsender"
+						target="_blank"
+						rel="noreferrer"
+					>
+						<div className="flex items-center gap-1">
+							<FaExternalLinkAlt />
+							See all recent releases
+						</div>
+					</a>
+				</div>
+				<div className="relative h-full">
+					<div className="absolute top-0 left-0 w-full h-full overflow-y-auto border border-gray-300 rounded-md p-4 dark:text-white">
+						{ReactParse(releaseNotes)}
+					</div>
+				</div>
+			</div>
+		</div>
+	);
 }

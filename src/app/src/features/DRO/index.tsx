@@ -84,20 +84,20 @@ function DRO({
 	singleAxisHoming,
 	isRemote,
 }: DROProps) {
-    const [homingMode, setHomingMode] = useState<boolean>(false);
-    const { units: preferredUnits } = useWorkspaceState();
-    const [rotaryFunctionsEnabled, setRotaryFunctionsEnabled] = useState(false);
-    const [useAaxisForGrbl, setUseAaxisForGrbl] = useState(
-        store.get('workspace.rotaryAxis.useAaxisForGrbl', false),
-    );
-    const { shouldWarnZero, mode } = useWorkspaceState();
-    const homingFlag = useTypedSelector((state) => state.controller.homingFlag);
-    const homingDirection = useTypedSelector((state) =>
-        get(state, 'controller.settings.settings.$23', '0'),
-    );
-    const pullOff = useTypedSelector((state) =>
-        get(state, 'controller.settings.settings.$27', 1),
-    );
+	const [homingMode, setHomingMode] = useState<boolean>(false);
+	const { units: preferredUnits } = useWorkspaceState();
+	const [rotaryFunctionsEnabled, setRotaryFunctionsEnabled] = useState(false);
+	const [useAaxisForGrbl, setUseAaxisForGrbl] = useState(
+		store.get("workspace.rotaryAxis.useAaxisForGrbl", false),
+	);
+	const { shouldWarnZero, mode } = useWorkspaceState();
+	const homingFlag = useTypedSelector((state) => state.controller.homingFlag);
+	const homingDirection = useTypedSelector((state) =>
+		get(state, "controller.settings.settings.$23", "0"),
+	);
+	const pullOff = useTypedSelector((state) =>
+		get(state, "controller.settings.settings.$27", 1),
+	);
 
 	// Shortcut refs
 	const homingFlagRef = useRef(homingFlag);
@@ -110,20 +110,18 @@ function DRO({
 		pullOffRef.current = pullOff;
 	}, [homingFlag, homingDirection, pullOff]);
 
-    useEffect(() => {
-        setRotaryFunctionsEnabled(store.get('widgets.rotary.tab.show', false));
-        setUseAaxisForGrbl(
-            store.get('workspace.rotaryAxis.useAaxisForGrbl', false),
-        );
-        store.on('change', () => {
-            setRotaryFunctionsEnabled(
-                store.get('widgets.rotary.tab.show', false),
-            );
-            setUseAaxisForGrbl(
-                store.get('workspace.rotaryAxis.useAaxisForGrbl', false),
-            );
-        });
-    }, []);
+	useEffect(() => {
+		setRotaryFunctionsEnabled(store.get("widgets.rotary.tab.show", false));
+		setUseAaxisForGrbl(
+			store.get("workspace.rotaryAxis.useAaxisForGrbl", false),
+		);
+		store.on("change", () => {
+			setRotaryFunctionsEnabled(store.get("widgets.rotary.tab.show", false));
+			setUseAaxisForGrbl(
+				store.get("workspace.rotaryAxis.useAaxisForGrbl", false),
+			);
+		});
+	}, []);
 
 	const jogToCorner = useCallback((corner: string) => {
 		const gcode = getMovementGCode(
@@ -424,104 +422,102 @@ function DRO({
 					<RapidPositionButtons disabled={!canClick} />
 				)}
 
-                <Parking
-                    disabled={!canClick}
-                    isConnected={isConnected}
-                    homingEnabled={homingEnabled}
-                />
-            </div>
-            <div className="w-full flex flex-row justify-between px-3 max-xl:px-5 max-xl:-mt-[4px] max-xl:-mb-[4px]">
-                <Label>{homingMode ? 'Home' : 'Zero'}</Label>
-                <Label>Go to</Label>
-            </div>
-            <div className="flex flex-col w-full gap-1 portrait:gap-2 space-between">
-                <AxisRow
-                    label={'X'}
-                    axis={'X'}
-                    mpos={mpos.x}
-                    wpos={wpos.x}
-                    disabled={!canClick}
-                    homingMode={homingMode}
-                />
-                <AxisRow
-                    label={'Y'}
-                    axis={'Y'}
-                    mpos={mpos.y}
-                    wpos={wpos.y}
-                    disabled={!canClick || isRotaryMode}
-                    homingMode={homingMode}
-                    disablePositionUpdate={isRotaryMode}
-                />
-                <AxisRow
-                    label={'Z'}
-                    axis={'Z'}
-                    mpos={mpos.z}
-                    wpos={wpos.z}
-                    disabled={!canClick}
-                    homingMode={homingMode}
-                    disableGotoZero={isRotaryMode}
-                />
-                {(isRotaryMode ||
-                    (rotaryFunctionsEnabled && axes.includes('A')) ||
-                    useAaxisForGrbl) && (
-                    <AxisRow
-                        label={'A'}
-                        axis={isRotaryMode ? 'Y' : 'A'}
-                        mpos={isRotaryMode ? mpos.y : mpos.a}
-                        wpos={isRotaryMode ? wpos.y : wpos.a}
-                        disabled={!canClick}
-                        homingMode={homingMode}
-                    />
-                )}
-            </div>
-            <div className="flex flex-row justify-between w-full max-xl:scale-95 mt-2 max-xl:mt-1 items-center">
-                {!shouldWarnZero ? (
-                    <Button
-                        tooltip={{ content: 'Zero all axes', side: 'left' }}
-                        text="Zero"
-                        icon={<VscTarget className="w-5 h-5" />}
-                        onClick={zeroAllAxes}
-                        disabled={!canClick}
-                        aria-label="Zero all axes: Set current position as work zero for all axes"
-                        size="responsive"
-                    />
-                ) : (
-                    <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                            <Button
-                                text="Zero"
-                                icon={<VscTarget className="w-5 h-5" />}
-                                disabled={!canClick}
-                                aria-label="Zero all axes: Set current position as work zero for all axes"
-                                size="responsive"
-                            />
-                        </AlertDialogTrigger>
-                        <AlertDialogContent className="bg-white">
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                    Zero All Axes
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    Are you sure you want to zero all axes?
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={zeroAllAxes}>
-                                    Continue
-                                </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
-                )}
-                {homingEnabled && (
-                    <HomingSwitch
-                        onChange={toggleHoming}
-                        homingValue={homingMode}
-                        disabled={!canClick}
-                        singleAxisHoming={singleAxisHoming}
-                    />
-                )}
+				<Parking
+					disabled={!canClick}
+					isConnected={isConnected}
+					homingEnabled={homingEnabled}
+				/>
+			</div>
+			<div className="w-full flex flex-row justify-between px-3 max-xl:px-5 max-xl:-mt-[4px] max-xl:-mb-[4px]">
+				<Label>{homingMode ? "Home" : "Zero"}</Label>
+				<Label>Go to</Label>
+			</div>
+			<div className="flex flex-col w-full gap-1 portrait:gap-2 space-between">
+				<AxisRow
+					label={"X"}
+					axis={"X"}
+					mpos={mpos.x}
+					wpos={wpos.x}
+					disabled={!canClick}
+					homingMode={homingMode}
+				/>
+				<AxisRow
+					label={"Y"}
+					axis={"Y"}
+					mpos={mpos.y}
+					wpos={wpos.y}
+					disabled={!canClick || isRotaryMode}
+					homingMode={homingMode}
+					disablePositionUpdate={isRotaryMode}
+				/>
+				<AxisRow
+					label={"Z"}
+					axis={"Z"}
+					mpos={mpos.z}
+					wpos={wpos.z}
+					disabled={!canClick}
+					homingMode={homingMode}
+					disableGotoZero={isRotaryMode}
+				/>
+				{(isRotaryMode ||
+					(rotaryFunctionsEnabled && axes.includes("A")) ||
+					useAaxisForGrbl) && (
+					<AxisRow
+						label={"A"}
+						axis={isRotaryMode ? "Y" : "A"}
+						mpos={isRotaryMode ? mpos.y : mpos.a}
+						wpos={isRotaryMode ? wpos.y : wpos.a}
+						disabled={!canClick}
+						homingMode={homingMode}
+					/>
+				)}
+			</div>
+			<div className="flex flex-row justify-between w-full max-xl:scale-95 mt-2 max-xl:mt-1 items-center">
+				{!shouldWarnZero ? (
+					<Button
+						tooltip={{ content: "Zero all axes", side: "left" }}
+						text="Zero"
+						icon={<VscTarget className="w-5 h-5" />}
+						onClick={zeroAllAxes}
+						disabled={!canClick}
+						aria-label="Zero all axes: Set current position as work zero for all axes"
+						size="responsive"
+					/>
+				) : (
+					<AlertDialog>
+						<AlertDialogTrigger asChild>
+							<Button
+								text="Zero"
+								icon={<VscTarget className="w-5 h-5" />}
+								disabled={!canClick}
+								aria-label="Zero all axes: Set current position as work zero for all axes"
+								size="responsive"
+							/>
+						</AlertDialogTrigger>
+						<AlertDialogContent className="bg-white">
+							<AlertDialogHeader>
+								<AlertDialogTitle>Zero All Axes</AlertDialogTitle>
+								<AlertDialogDescription>
+									Are you sure you want to zero all axes?
+								</AlertDialogDescription>
+							</AlertDialogHeader>
+							<AlertDialogFooter>
+								<AlertDialogCancel>Cancel</AlertDialogCancel>
+								<AlertDialogAction onClick={zeroAllAxes}>
+									Continue
+								</AlertDialogAction>
+							</AlertDialogFooter>
+						</AlertDialogContent>
+					</AlertDialog>
+				)}
+				{homingEnabled && (
+					<HomingSwitch
+						onChange={toggleHoming}
+						homingValue={homingMode}
+						disabled={!canClick}
+						singleAxisHoming={singleAxisHoming}
+					/>
+				)}
 
 				<Button
 					variant="alt"

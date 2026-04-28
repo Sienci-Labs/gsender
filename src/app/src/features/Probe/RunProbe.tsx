@@ -135,19 +135,19 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
 		};
 	}, []);
 
-    const { touchplateType } = touchplate;
-    //const probeCommands = actions.generateProbeCommands();
-    //console.log(probeCommands.length);
-    const probeCommand = availableProbeCommands[selectedProbeCommand];
-    const directionLabels = [
-        'Bottom Left',
-        'Top Left',
-        'Top Right',
-        'Bottom Right',
-    ];
-    const directionLabel = directionLabels[direction] || 'Unknown';
-    const showDirectionWarning = direction !== 0;
-    const is3DProbe = touchplateType === TOUCHPLATE_TYPE_3D;
+	const { touchplateType } = touchplate;
+	//const probeCommands = actions.generateProbeCommands();
+	//console.log(probeCommands.length);
+	const probeCommand = availableProbeCommands[selectedProbeCommand];
+	const directionLabels = [
+		"Bottom Left",
+		"Top Left",
+		"Top Right",
+		"Bottom Right",
+	];
+	const directionLabel = directionLabels[direction] || "Unknown";
+	const showDirectionWarning = direction !== 0;
+	const is3DProbe = touchplateType === TOUCHPLATE_TYPE_3D;
 
 	const probeActive = actions.returnProbeConnectivity();
 
@@ -165,92 +165,85 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
 					<DialogTitle>{`Probe - ${probeCommand.id}`}</DialogTitle>
 				</DialogHeader>
 
-                <div className="grid grid-cols-[1.5fr_1fr] gap-2 w-[600px] min-h-[200px]">
-                    <div className="flex flex-col justify-between pb-4">
-                        <div className="text-black leading-snug dark:text-white">
-                            <div
-                                className={cx(
-                                    'flex items-center p-4 text-sm text-yellow-800 border border-yellow-300 rounded-lg bg-yellow-50 w-full mb-3',
-                                    {
-                                        invisible: !showDirectionWarning,
-                                    },
-                                )}
-                                role={
-                                    showDirectionWarning ? 'alert' : undefined
-                                }
-                                aria-hidden={!showDirectionWarning}
-                            >
-                                <svg
-                                    className="flex-shrink-0 inline w-4 h-4 me-3"
-                                    aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="currentColor"
-                                    viewBox="0 0 20 20"
-                                >
-                                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
-                                </svg>
-                                <span className="sr-only">Warning</span>
-                                <div>
-                                    <span className="font-medium">
-                                        Warning - Probing {directionLabel}{' '}
-                                        corner
-                                    </span>
-                                    <div>
-                                        Verify this is correct before starting.
-                                    </div>
-                                </div>
-                            </div>
-                            <p className="mb-3">
-                                1. Check the tool is positioned correctly
-                                (pictured).
-                            </p>
-                            <p className="mb-3">
-                                {is3DProbe
-                                    ? '2. Gently push the probe needle to check the circuit is triggered properly (indicated by a green light).'
-                                    : '2. Lift your touch plate to the tool to check the circuit is good (indicated by a green light), then put it back where it was.'}
-                            </p>
-                            {!is3DProbe && (
-                                <p className="mb-3">
-                                    3. In some cases, holding the touch plate
-                                    still while probing will give a more
-                                    consistent measurement.
-                                </p>
-                            )}
-                        </div>
-                        <Button
-                            variant="primary"
-                            disabled={!connectionMade}
-                            onClick={startProbe}
-                        >
-                            {connectionMade
-                                ? 'Start Probe'
-                                : 'Waiting for probe circuit check...'}
-                        </Button>
-                    </div>
-                    <div className="flex flex-col sm:m-auto sm:mb-4">
-                        {touchplateType !== TOUCHPLATE_TYPE_ZERO && (
-                            <div className="flex justify-center items-center mb-1">
-                                <ProbeDirectionSelection
-                                    direction={direction}
-                                    onClick={actions.nextProbeDirection}
-                                    isAbsolute={false}
-                                    containerClassName="self-end mb-2 inline-flex items-center justify-center rounded-lg border border-gray-300 p-1"
-                                />
-                            </div>
-                        )}
-                        <ProbeImage
-                            probeCommand={probeCommand}
-                            touchplateType={touchplateType}
-                        />
-                        <ProbeCircuitStatus
-                            connected={canClick}
-                            probeActive={probeActive}
-                        />
-                    </div>
-                </div>
-            </DialogContent>
-        </Dialog>
-    );
+				<div className="grid grid-cols-[1.5fr_1fr] gap-2 w-[600px] min-h-[200px]">
+					<div className="flex flex-col justify-between pb-4">
+						<div className="text-black leading-snug dark:text-white">
+							<div
+								className={cx(
+									"flex items-center p-4 text-sm text-yellow-800 border border-yellow-300 rounded-lg bg-yellow-50 w-full mb-3",
+									{
+										invisible: !showDirectionWarning,
+									},
+								)}
+								role={showDirectionWarning ? "alert" : undefined}
+								aria-hidden={!showDirectionWarning}
+							>
+								<svg
+									className="flex-shrink-0 inline w-4 h-4 me-3"
+									aria-hidden="true"
+									xmlns="http://www.w3.org/2000/svg"
+									fill="currentColor"
+									viewBox="0 0 20 20"
+								>
+									<path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+								</svg>
+								<span className="sr-only">Warning</span>
+								<div>
+									<span className="font-medium">
+										Warning - Probing {directionLabel} corner
+									</span>
+									<div>Verify this is correct before starting.</div>
+								</div>
+							</div>
+							<p className="mb-3">
+								1. Check the tool is positioned correctly (pictured).
+							</p>
+							<p className="mb-3">
+								{is3DProbe
+									? "2. Gently push the probe needle to check the circuit is triggered properly (indicated by a green light)."
+									: "2. Lift your touch plate to the tool to check the circuit is good (indicated by a green light), then put it back where it was."}
+							</p>
+							{!is3DProbe && (
+								<p className="mb-3">
+									3. In some cases, holding the touch plate still while probing
+									will give a more consistent measurement.
+								</p>
+							)}
+						</div>
+						<Button
+							variant="primary"
+							disabled={!connectionMade}
+							onClick={startProbe}
+						>
+							{connectionMade
+								? "Start Probe"
+								: "Waiting for probe circuit check..."}
+						</Button>
+					</div>
+					<div className="flex flex-col sm:m-auto sm:mb-4">
+						{touchplateType !== TOUCHPLATE_TYPE_ZERO && (
+							<div className="flex justify-center items-center mb-1">
+								<ProbeDirectionSelection
+									direction={direction}
+									onClick={actions.nextProbeDirection}
+									isAbsolute={false}
+									containerClassName="self-end mb-2 inline-flex items-center justify-center rounded-lg border border-gray-300 p-1"
+								/>
+							</div>
+						)}
+						<ProbeImage
+							probeCommand={probeCommand}
+							touchplateType={touchplateType}
+						/>
+						<ProbeCircuitStatus
+							connected={canClick}
+							probeActive={probeActive}
+						/>
+					</div>
+				</div>
+			</DialogContent>
+		</Dialog>
+	);
 };
 
 export default RunProbe;

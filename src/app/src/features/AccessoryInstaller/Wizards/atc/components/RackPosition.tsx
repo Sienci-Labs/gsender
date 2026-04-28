@@ -1,15 +1,15 @@
-import { StepProps } from 'app/features/AccessoryInstaller/types';
-import { StepActionButton } from 'app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx';
-import { useEffect, useRef, useState } from 'react';
-import { PositionSetter } from 'app/features/AccessoryInstaller/Wizards/atc/components/PositionSetter.tsx';
-import { useSelector } from 'react-redux';
-import { RootState } from 'app/store/redux';
-import controller from 'app/lib/controller.ts';
-import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
-import store from 'app/store';
-import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-import { mapPositionToUnits, in2mm } from 'app/lib/units.ts';
-import { IMPERIAL_UNITS } from 'app/constants';
+import { StepProps } from "app/features/AccessoryInstaller/types";
+import { StepActionButton } from "app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx";
+import { useEffect, useRef, useState } from "react";
+import { PositionSetter } from "app/features/AccessoryInstaller/Wizards/atc/components/PositionSetter.tsx";
+import { useSelector } from "react-redux";
+import { RootState } from "app/store/redux";
+import controller from "app/lib/controller.ts";
+import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
+import store from "app/store";
+import { useWorkspaceState } from "app/hooks/useWorkspaceState";
+import { mapPositionToUnits, in2mm } from "app/lib/units.ts";
+import { IMPERIAL_UNITS } from "app/constants";
 
 export function RackPosition({ onComplete, onUncomplete }: StepProps) {
 	const [rackPositionMethod, setRackPositionMethod] =
@@ -17,16 +17,16 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
 	const [isComplete, setIsComplete] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
 
-    const { units } = useWorkspaceState();
-    const isManuallyEditing = useRef(false);
+	const { units } = useWorkspaceState();
+	const isManuallyEditing = useRef(false);
 
-    const rackless = store.get(
-        'widgets.atc.templates.variables._tc_rack_enable.value',
-        0,
-    );
-    const slotCount = store.get(
-        'widgets.atc.templates.variables._tc_slots.value',
-    );
+	const rackless = store.get(
+		"widgets.atc.templates.variables._tc_rack_enable.value",
+		0,
+	);
+	const slotCount = store.get(
+		"widgets.atc.templates.variables._tc_slots.value",
+	);
 
 	const mpos = useSelector((state: RootState) => state.controller.mpos);
 	const ATCIPositionSet = useTypedSelector(
@@ -58,16 +58,16 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
 		}
 	}, [ATCIPositionSet]);
 
-    useEffect(() => {
-        if (isManuallyEditing.current) return;
-        if (!mpos || !mpos.x || !mpos.y || !mpos.z) return;
-        const { x, y, z } = mpos;
-        setPosition({
-            x: mapPositionToUnits(x, units),
-            y: mapPositionToUnits(y, units),
-            z: mapPositionToUnits(z, units),
-        });
-    }, [mpos, units]);
+	useEffect(() => {
+		if (isManuallyEditing.current) return;
+		if (!mpos || !mpos.x || !mpos.y || !mpos.z) return;
+		const { x, y, z } = mpos;
+		setPosition({
+			x: mapPositionToUnits(x, units),
+			y: mapPositionToUnits(y, units),
+			z: mapPositionToUnits(z, units),
+		});
+	}, [mpos, units]);
 
 	useEffect(() => {
 		if (rackless === 0 && slotCount === 0) {
@@ -82,18 +82,18 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
 		controller.command("gcode", "G65 P302");
 	};
 
-    const setPositionViaPositionSetting = () => {
-        const toMM = (val: string) =>
-            units === IMPERIAL_UNITS ? in2mm(Number(val)) : Number(val);
-        controller.command('gcode', [
-            `G10 L2 P7 X${toMM(position.x)} Y${toMM(position.y)} Z${toMM(position.z)}`,
-            '$#',
-        ]);
-        setTimeout(() => {
-            setIsComplete(true);
-            onComplete();
-        }, 1000);
-    };
+	const setPositionViaPositionSetting = () => {
+		const toMM = (val: string) =>
+			units === IMPERIAL_UNITS ? in2mm(Number(val)) : Number(val);
+		controller.command("gcode", [
+			`G10 L2 P7 X${toMM(position.x)} Y${toMM(position.y)} Z${toMM(position.z)}`,
+			"$#",
+		]);
+		setTimeout(() => {
+			setIsComplete(true);
+			onComplete();
+		}, 1000);
+	};
 
 	if (rackless === 0 && slotCount === 0) {
 		return (
@@ -141,53 +141,63 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
 							the precise position of your tool holders.
 						</li>
 					</ol>
-                    <p className="dark:text-white">
-                        The machine will take a few minutes to check the position of the left-most and right-most position of each tool rack.
-                    </p>
-                    <StepActionButton
-                        label="Find Rack"
-                        runningLabel="Finding..."
-                        onApply={handleUseUtility}
-                        isComplete={isComplete}
-                        error={error}
-                    />
+					<p className="dark:text-white">
+						The machine will take a few minutes to check the position of the
+						left-most and right-most position of each tool rack.
+					</p>
+					<StepActionButton
+						label="Find Rack"
+						runningLabel="Finding..."
+						onApply={handleUseUtility}
+						isComplete={isComplete}
+						error={error}
+					/>
 				</>
 			)}
 
-            {rackPositionMethod === 'manual' && (
-                <>
-                    <p className="text-gray-900 dark:text-white">
-                        <b>
-                            It is highly recommended that you use the automatic method, your rack may be damaged if done incorrectly.
-                        </b>
-                    </p>
-                  <ol className="list-decimal p-5 gap-4 space-y-2">
-                      <li>Install a tool holder (with pull-stud removed) into the left-most slot</li>
-                      <li>Lower the spindle taper onto the tool holder until the tapers match</li>
-                      <li>Press <b>“Set Position”</b></li>
-                  </ol>
-                    <PositionSetter
-                        showZ={true}
-                        xPosition={position.x}
-                        yPosition={position.y}
-                        zPosition={position.z}
-                        units={units}
-                        onPositionChange={(positions) => {
-                            isManuallyEditing.current = true;
-                            setPosition(positions);
-                        }}
-                        actionButton={
-                            <StepActionButton
-                                label="Set Position"
-                                runningLabel="Setting..."
-                                onApply={setPositionViaPositionSetting}
-                                isComplete={isComplete}
-                                error={error}
-                            />
-                        }
-                    />
-                </>
-            )}
-        </div>
-    );
+			{rackPositionMethod === "manual" && (
+				<>
+					<p className="text-gray-900 dark:text-white">
+						<b>
+							It is highly recommended that you use the automatic method, your
+							rack may be damaged if done incorrectly.
+						</b>
+					</p>
+					<ol className="list-decimal p-5 gap-4 space-y-2">
+						<li>
+							Install a tool holder (with pull-stud removed) into the left-most
+							slot
+						</li>
+						<li>
+							Lower the spindle taper onto the tool holder until the tapers
+							match
+						</li>
+						<li>
+							Press <b>“Set Position”</b>
+						</li>
+					</ol>
+					<PositionSetter
+						showZ={true}
+						xPosition={position.x}
+						yPosition={position.y}
+						zPosition={position.z}
+						units={units}
+						onPositionChange={(positions) => {
+							isManuallyEditing.current = true;
+							setPosition(positions);
+						}}
+						actionButton={
+							<StepActionButton
+								label="Set Position"
+								runningLabel="Setting..."
+								onApply={setPositionViaPositionSetting}
+								isComplete={isComplete}
+								error={error}
+							/>
+						}
+					/>
+				</>
+			)}
+		</div>
+	);
 }
