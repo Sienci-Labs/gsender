@@ -138,11 +138,11 @@ const Probe = ({ state, actions }: ProbeProps) => {
             <div className="grid grid-cols-[5fr_3fr] w-full h-full max-xl:max-h-[144px]">
                 {/* <div className="w-full h-full m-auto grid gap-4">
                     <div className="h-full grid grid-rows[4fr_2fr] self-center gap-2"> */}
-                <div className="grid grid-rows-[1fr_1fr_1fr] gap-1 items-center justify-center">
+                <div className="grid grid-rows-[1fr_1fr_1fr] gap-0.5 items-center justify-center">
                     { touchplateTypeSwitcher &&
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button className="h-full" aria-label="Change Probe Type">{touchplateType}</Button>
+                                <Button  aria-label="Change Probe Type" size="sm">{touchplateType}</Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-56 bg-white">
                                 { Object.values(TOUCHPLATE_TYPES).map((tpt) =>

@@ -725,7 +725,11 @@ export function Jogging({ hideRotary = false }) {
 
             const controllerIsGrbl = firmware === 'Grbl';
 
-            if (controllerIsGrbl && axis.a && !isInRotaryMode) {
+            const useAaxisForGrblShortcut = store.get(
+                'workspace.rotaryAxis.useAaxisForGrbl',
+                false,
+            );
+            if (controllerIsGrbl && axis.a && !isInRotaryMode && !useAaxisForGrblShortcut) {
                 return;
             }
 
@@ -985,10 +989,15 @@ export function Jogging({ hideRotary = false }) {
     }, []);
 
     const isRotaryMode = mode === 'ROTARY';
+    const useAaxisForGrbl = store.get(
+        'workspace.rotaryAxis.useAaxisForGrbl',
+        false,
+    );
     const showA =
         !hideRotary &&
-        (firmwareType === 'grblHAL' || isRotaryMode) &&
-        rotaryWidgetState.tab.show;
+        ((firmwareType === 'grblHAL' || isRotaryMode) &&
+            rotaryWidgetState.tab.show ||
+            useAaxisForGrbl);
 
     return (
         <>

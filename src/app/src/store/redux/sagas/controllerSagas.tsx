@@ -225,6 +225,8 @@ export function* initialize(): Generator<any, void, any> {
     ) => {
         const reduxState = reduxStore.getState();
         const isLaser = isLaserMode();
+        // Keep SVG path generation tied to lightweight option selection so
+        // users can switch to SVG view instantly after a file is loaded.
         const shouldIncludeSVG = shouldVisualizeSVG();
         const profileWorker = store.get(
             'widgets.visualizer.debug.profileWorker',

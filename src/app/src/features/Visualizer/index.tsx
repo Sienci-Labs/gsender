@@ -1411,6 +1411,7 @@ class Visualizer extends Component {
                 this.setState({
                     disabled: this.config.get('disabled'),
                     disabledLite: this.config.get('disabledLite'),
+                    liteOption: this.config.get('liteOption'),
                     objects: this.config.get('objects'),
                     minimizeRenders: this.config.get('minimizeRenders'),
                     jobEndModal: this.config.get('jobEndModal'),

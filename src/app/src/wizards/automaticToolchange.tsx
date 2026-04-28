@@ -57,10 +57,10 @@ const probeInitialToolStep = [{
                     cb: () => {
                         controller.command('gcode', [
                             'G91 G21',
-                            'G49', // cancel applied TLO offsets
                             'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
                             'G53 G0 X[global.toolchange.PROBE_POS_X] Y[global.toolchange.PROBE_POS_Y]',
                             'G53 G0 Z[global.toolchange.PROBE_POS_Z]',
+                            'G49', // cancel applied TLO offsets
                             'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
                             'G0 Z[global.toolchange.RETRACT]',
                             'G38.2 Z-10 F[global.toolchange.PROBE_SLOW_FEEDRATE]',

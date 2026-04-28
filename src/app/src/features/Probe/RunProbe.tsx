@@ -41,6 +41,7 @@ import { Actions, State } from './definitions';
 import { PROBING_CATEGORY } from 'app/constants';
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import { TOUCHPLATE_TYPE_3D, TOUCHPLATE_TYPE_ZERO } from 'app/lib/constants';
 
 interface RunProbeProps {
     state: State;
@@ -147,6 +148,7 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
     ];
     const directionLabel = directionLabels[direction] || 'Unknown';
     const showDirectionWarning = direction !== 0;
+    const is3DProbe = touchplateType === TOUCHPLATE_TYPE_3D;
 
     const probeActive = actions.returnProbeConnectivity();
 
@@ -204,15 +206,17 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
                                 (pictured).
                             </p>
                             <p className="mb-3">
-                                2. Lift your touch plate to the tool to check
-                                the circuit is good (indicated by a green
-                                light), then put it back where it was.{'\n'}
+                                {is3DProbe
+                                    ? '2. Gently push the probe needle to check the circuit is triggered properly (indicated by a green light).'
+                                    : '2. Lift your touch plate to the tool to check the circuit is good (indicated by a green light), then put it back where it was.'}
                             </p>
-                            <p className="mb-3">
-                                3. In some cases, holding the touch plate still
-                                while probing will give a more consistent
-                                measurement.
-                            </p>
+                            {!is3DProbe && (
+                                <p className="mb-3">
+                                    3. In some cases, holding the touch plate
+                                    still while probing will give a more
+                                    consistent measurement.
+                                </p>
+                            )}
                         </div>
                         <Button
                             variant="primary"
@@ -225,7 +229,7 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
                         </Button>
                     </div>
                     <div className="flex flex-col sm:m-auto sm:mb-4">
-                        {touchplateType !== 'Z Probe' && (
+                        {touchplateType !== TOUCHPLATE_TYPE_ZERO && (
                             <div className="flex justify-center items-center mb-1">
                                 <ProbeDirectionSelection
                                     direction={direction}

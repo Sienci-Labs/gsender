@@ -88,6 +88,9 @@ function DRO({
     const [homingMode, setHomingMode] = useState<boolean>(false);
     const { units: preferredUnits } = useWorkspaceState();
     const [rotaryFunctionsEnabled, setRotaryFunctionsEnabled] = useState(false);
+    const [useAaxisForGrbl, setUseAaxisForGrbl] = useState(
+        store.get('workspace.rotaryAxis.useAaxisForGrbl', false),
+    );
     const { shouldWarnZero, mode } = useWorkspaceState();
     const homingFlag = useTypedSelector((state) => state.controller.homingFlag);
     const homingDirection = useTypedSelector((state) =>
@@ -110,9 +113,15 @@ function DRO({
 
     useEffect(() => {
         setRotaryFunctionsEnabled(store.get('widgets.rotary.tab.show', false));
+        setUseAaxisForGrbl(
+            store.get('workspace.rotaryAxis.useAaxisForGrbl', false),
+        );
         store.on('change', () => {
             setRotaryFunctionsEnabled(
                 store.get('widgets.rotary.tab.show', false),
+            );
+            setUseAaxisForGrbl(
+                store.get('workspace.rotaryAxis.useAaxisForGrbl', false),
             );
         });
     }, []);
@@ -457,7 +466,8 @@ function DRO({
                     disableGotoZero={isRotaryMode}
                 />
                 {(isRotaryMode ||
-                    (rotaryFunctionsEnabled && axes.includes('A'))) && (
+                    (rotaryFunctionsEnabled && axes.includes('A')) ||
+                    useAaxisForGrbl) && (
                     <AxisRow
                         label={'A'}
                         axis={isRotaryMode ? 'Y' : 'A'}

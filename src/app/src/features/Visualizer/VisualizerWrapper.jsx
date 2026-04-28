@@ -98,8 +98,16 @@ class VisualizerWrapper extends Component {
     subscribe() {
         const tokens = [
             pubsub.subscribe('litemode:change', (msg, { isFileLoaded, enteringLiteMode, wasInEverythingMode }) => {
-                if (enteringLiteMode && this.threeVisualizer) {
-                    this.threeVisualizer.disposeGeometries();
+                const enteringSVGMode = enteringLiteMode && shouldVisualizeSVG();
+
+                if (enteringLiteMode) {
+                    if (this.threeVisualizer) {
+                        this.threeVisualizer.disposeGeometries();
+                    }
+                    if (isFileLoaded && enteringSVGMode) {
+                        // Ensure SVG visualizer reloads current file on 3D -> SVG switch.
+                        this.setNeedRefresh(true);
+                    }
                 }
                 if (!enteringLiteMode) {
                     // Always rebuild scene structure when exiting lite mode —
