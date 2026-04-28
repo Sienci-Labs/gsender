@@ -26,7 +26,7 @@ gSender is available for the systems below and does not yet support headless Pi 
 | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x64)        | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/MAC.png)<br>Mac (Universal)          | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/LIN.png)<br>Linux (Intel)                | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/LIN.png)<br>Linux (ARM)              | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Pi (64 bit)                                                   |
 |-----------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
 |                                                                                                                             |                                                                                                                             |                                                                                                                                      |                                                                                                                               |                                                                                                                                   |
-| ```  Available  ```  [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.5.5/gSender-1.5.5-Windows-64Bit.exe) | ```  Available  ```  [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.5.5/gSender-1.5.5-Mac-Universal.dmg) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.5.5/gSender-1.5.5-Linux-Intel-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.5.5/gSender-1.5.5-Linux-ARM-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.5.5/gSender-1.5.5-PI-64Bit.deb) |
+| ```  Available  ```  [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.6.0/gSender-1.6.0-Windows-64Bit.exe) | ```  Available  ```  [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.6.0/gSender-1.6.0-Mac-Universal.dmg) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.6.0/gSender-1.6.0-Linux-Intel-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.6.0/gSender-1.6.0-Linux-ARM-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.6.0/gSender-1.6.0-PI-64Bit.deb) |
      
 
 [Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
@@ -111,6 +111,30 @@ You can both run gSender locally using the public code-base as well as compile i
 ## 🕣 Development History
 <details>
 <summary>Expand to see all version notes</summary>
+
+### 1.6.0 (April 15, 2026)
+- Expanded compatibility with newer grblHAL firmware, improving reliability with updated controllers and settings
+- Significantly faster startup times through optimized initialization and module loading
+- Build system improvements resulting in faster builds, smaller install size, and Mac silicon support with signing
+- Added built-in G-code editor with syntax highlighting, search, navigation, and inline editing
+- Expanded SD card file management with upload, run, delete, and progress tracking (yModem/FTP support)
+- Full Automatic Tool Changer (ATC) workflow support including tool table, timeline, remapping, and controls
+- Introduced ATC setup tool to simplify initial configuration and macro installation
+- Introduce Spindle setup tool, supporting sienciHAL and grblHAL core versions
+- Visualization improvements including faster parsing, reduced memory usage, rotary accuracy fixes, and tool-based coloring
+- Added option to hide processed lines for improved readability on long jobs
+- New EEPROM editor for viewing and modifying controller configuration values
+- Added Check Mode automation for pre-run file validation using GRBL check mode
+- Ethernet enhancements including custom ports and improved auto-reconnect
+- Improved UI responsiveness and layout for smaller screens and portrait mode
+- Remote mode improvements including synced settings and config access
+- Improved job time estimation, including rotary jobs and feed override scenarios
+- Added scheduled settings backup options
+- Improved handling of M0/M1 pauses with comment display
+- Added file associations for opening G-code files directly from the OS
+- Improved config tool performance and reactivity
+- Gamepad configuration updates and jogging behaviour improvements
+- Numerous bug fixes, dependency updates, and overall stability improvements
 
 ### 1.5.7 (January 8th, 2026)
 - Fixed issue with start job shortcut not firing in some situations.

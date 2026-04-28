@@ -45,11 +45,15 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
 		}
 	};
 
-	const handlePrevious = () => {
-		if (!isFirstStep) {
-			setCurrentStepIndex(currentStepIndex - 1);
-		}
-	};
+    const handlePrevious = () => {
+        if (!isFirstStep) {
+            let prevIndex = currentStepIndex - 1;
+            while (prevIndex > 0 && subWizard.steps[prevIndex].autoComplete?.()) {
+                prevIndex--;
+            }
+            setCurrentStepIndex(prevIndex);
+        }
+    };
 
 	const handleStepComplete = () => {
 		const newCompletedSteps = new Set(completedSteps).add(currentStepIndex);

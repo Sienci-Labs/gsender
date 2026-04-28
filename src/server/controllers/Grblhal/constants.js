@@ -25,6 +25,8 @@
 // Grbl
 export const GRBLHAL = "grblHAL";
 
+export const ATCI_SUPPORTED_VERSION = 20250627;
+
 // Active State
 export const GRBL_HAL_ACTIVE_STATE_IDLE = "Idle";
 export const GRBL_HAL_ACTIVE_STATE_RUN = "Run";

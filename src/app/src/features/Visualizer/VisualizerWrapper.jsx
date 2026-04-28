@@ -21,124 +21,165 @@
  *
  */
 
-import { VisualizerPlaceholder } from "app/features/Visualizer/Placeholder.jsx";
-import pubsub from "pubsub-js";
-import React, { Component } from "react";
+import React, { Component } from 'react';
+import pubsub from 'pubsub-js';
 import {
-	shouldVisualize,
-	shouldVisualizeSVG,
-} from "../../workers/Visualize.response";
-import SVGVisualizer from "./SVGVisualizer";
-import Visualizer from "./Visualizer";
+    shouldVisualize,
+    shouldVisualizeSVG,
+} from '../../workers/Visualize.response';
+import SVGVisualizer from './SVGVisualizer';
+import Visualizer from './Visualizer';
+import { VisualizerPlaceholder } from 'app/features/Visualizer/Placeholder.jsx';
 
 class VisualizerWrapper extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			needRefresh: false,
-			needReload: false,
-		};
-	}
+    constructor(props) {
+        super(props);
+        this.state = {
+            needRefresh: false,
+            needReload: false,
+        };
+    }
 
-	pubsubTokens = [];
+    pubsubTokens = [];
 
-	visualizer = null;
+    visualizer = null;
 
-	componentDidMount() {
-		this.subscribe();
-	}
+    threeVisualizer = null;
 
-	componentDidUpdate() {
-		// force refresh, changing which visualizer component is being used
-		if (this.state.needRefresh && shouldVisualize()) {
-			this.visualizer.reloadGCode();
-			this.setNeedRefresh(false);
-			// a step further than refresh, reparsing the gcode as well
-		} else if (this.state.needReload) {
-			this.visualizer.reparseGCode();
-			this.setNeedReload(false);
-		}
-	}
+    componentDidMount() {
+        this.subscribe();
+    }
 
-	setNeedRefresh(state) {
-		this.setState(() => {
-			return {
-				needRefresh: state,
-			};
-		});
-	}
+    componentWillUnmount() {
+        this.unsubscribe();
+    }
 
-	setNeedReload(state) {
-		this.setState(() => {
-			return {
-				needReload: state,
-			};
-		});
-	}
+    componentDidUpdate() {
+        const inSVGMode = shouldVisualizeSVG();
+        // shouldVisualize() returns true for SVG/Light mode too, so explicitly exclude it
+        const inFullMode = shouldVisualize() && !inSVGMode;
 
-	subscribe() {
-		const tokens = [
-			pubsub.subscribe("litemode:change", (msg, isFileLoaded) => {
-				if (isFileLoaded) {
-					this.setNeedRefresh(true);
-					this.forceUpdate();
-				} else {
-					this.forceUpdate();
-				}
-			}),
-			// currently, changing the settings requires reparsing of the gcode
-			pubsub.subscribe("visualizer:settings", () => {
-				this.setNeedReload(true);
-			}),
-		];
-		this.pubsubTokens = this.pubsubTokens.concat(tokens);
-	}
+        if (this.state.needRefresh) {
+            if (inFullMode && this.threeVisualizer) {
+                // Rebuild entire scene (lights, grids, tools, limits) then reload GCode.
+                // Uses threeVisualizer directly because SVGVisualizer's unmount ref cleanup
+                // fires after the 3D ref update, leaving this.visualizer null by now.
+                this.threeVisualizer.rebuildSceneContents();
+            } else if (inSVGMode && this.visualizer) {
+                this.visualizer.reloadGCode();
+            }
+            this.setNeedRefresh(false);
+        } else if (this.state.needReload) {
+            if (inFullMode && this.threeVisualizer) {
+                this.threeVisualizer.reparseGCode();
+            } else if (this.visualizer) {
+                this.visualizer.reparseGCode();
+            }
+            this.setNeedReload(false);
+        }
+    }
 
-	unsubscribe() {
-		this.pubsubTokens.forEach((token) => {
-			pubsub.unsubscribe(token);
-		});
-		this.pubsubTokens = [];
-	}
+    setNeedRefresh(state) {
+        this.setState(() => {
+            return {
+                needRefresh: state,
+            };
+        });
+    }
 
-	render() {
-		const { state, show, cameraPosition, actions, containerID, isSecondary } =
-			this.props;
+    setNeedReload(state) {
+        this.setState(() => {
+            return {
+                needReload: state,
+            };
+        });
+    }
 
-		const renderSVG = shouldVisualizeSVG();
-		const renderAny = shouldVisualize() && !renderSVG;
+    subscribe() {
+        const tokens = [
+            pubsub.subscribe('litemode:change', (msg, { isFileLoaded, enteringLiteMode, wasInEverythingMode }) => {
+                if (enteringLiteMode && this.threeVisualizer) {
+                    this.threeVisualizer.disposeGeometries();
+                }
+                if (!enteringLiteMode) {
+                    // Always rebuild scene structure when exiting lite mode —
+                    // disposeGeometries() orphaned this.group, stopped the animation loop,
+                    // and cleared lights/grids. rebuildSceneContents() restores all of this.
+                    this.setNeedRefresh(true);
+                    if (isFileLoaded && wasInEverythingMode) {
+                        // Geometry was never parsed in EVERYTHING mode.
+                        // reparseGCode() runs after rebuildSceneContents() completes (next cycle).
+                        this.setNeedReload(true);
+                    }
+                }
+                this.forceUpdate();
+            }),
+            // currently, changing the settings requires reparsing of the gcode
+            pubsub.subscribe('visualizer:settings', () => {
+                this.setNeedReload(true);
+            }),
+        ];
+        this.pubsubTokens = this.pubsubTokens.concat(tokens);
+    }
 
-		return (
-			<>
-				{(isSecondary || renderAny) && (
-					<Visualizer
-						show={show}
-						cameraPosition={cameraPosition}
-						ref={(visualizerRef) => {
-							this.visualizer = visualizerRef;
-						}}
-						state={state}
-						actions={actions}
-						containerID={containerID}
-						isSecondary={isSecondary}
-					/>
-				)}
-				{!isSecondary && renderSVG && (
-					<SVGVisualizer
-						show={show}
-						ref={(visualizerRef) => {
-							this.visualizer = visualizerRef;
-						}}
-						state={state}
-						actions={actions}
-						containerID={containerID}
-						isSecondary={isSecondary}
-					/>
-				)}
-				{!isSecondary && !renderSVG && !renderAny && <VisualizerPlaceholder />}
-			</>
-		);
-	}
+    unsubscribe() {
+        this.pubsubTokens.forEach((token) => {
+            pubsub.unsubscribe(token);
+        });
+        this.pubsubTokens = [];
+    }
+
+    render() {
+        const {
+            state,
+            show,
+            cameraPosition,
+            actions,
+            containerID,
+            isSecondary,
+        } = this.props;
+
+        let renderSVG = shouldVisualizeSVG();
+        let renderAny = shouldVisualize() && !renderSVG;
+
+        const show3D = isSecondary || renderAny;
+
+        return (
+            <>
+                {/* Keep Visualizer always mounted to avoid WebGL renderer recreation on each toggle.
+                    Hide with CSS when not active so the renderer instance is preserved. */}
+                <div style={{ display: show3D ? '' : 'none' }} className="w-full h-full">
+                    <Visualizer
+                        show={show && show3D}
+                        cameraPosition={cameraPosition}
+                        ref={(visualizerRef) => {
+                            this.threeVisualizer = visualizerRef;
+                            this.visualizer = visualizerRef;
+                        }}
+                        state={state}
+                        actions={actions}
+                        containerID={containerID}
+                        isSecondary={isSecondary}
+                    />
+                </div>
+                {!isSecondary && renderSVG && (
+                    <SVGVisualizer
+                        show={show}
+                        ref={(visualizerRef) => {
+                            this.visualizer = visualizerRef;
+                        }}
+                        state={state}
+                        actions={actions}
+                        containerID={containerID}
+                        isSecondary={isSecondary}
+                    />
+                )}
+                {!isSecondary && !renderSVG && !renderAny && (
+                    <VisualizerPlaceholder />
+                )}
+            </>
+        );
+    }
 }
 
 export default VisualizerWrapper;

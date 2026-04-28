@@ -1,292 +1,332 @@
-import api from "app/api";
-import { ScrollArea } from "app/components/shadcn/ScrollArea";
-import { Switch } from "app/components/shadcn/Switch";
+import { useEffect, useState } from 'react';
+import pubsub from 'pubsub-js';
+
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { Switch } from 'app/components/shadcn/Switch';
+
+import Size from './Size';
+import Info from './Info';
+import LoadingAnimation from './LoadingAnimation';
 import {
-	Tooltip,
-	TooltipContent,
-	TooltipProvider,
-	TooltipTrigger,
-} from "app/components/shadcn/Tooltip";
-import { JOB_STATUS } from "app/constants";
-import type { Job } from "app/features/Stats/utils/StatContext";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-import { convertMillisecondsToTimeStamp } from "app/lib/datetime";
-import cx from "classnames";
-import isElectron from "is-electron";
-import pubsub from "pubsub-js";
-import { useEffect, useState } from "react";
-import { FiClock } from "react-icons/fi";
-import { LiaFileUploadSolid } from "react-icons/lia";
-import { LuFileCode2 } from "react-icons/lu";
-import { MdInfoOutline } from "react-icons/md";
-import type { RecentFile } from "../definitions";
-import { getRecentFiles } from "../utils/recentfiles";
-import Info from "./Info";
-import LoadingAnimation from "./LoadingAnimation";
-import Size from "./Size";
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from 'app/components/shadcn/Tooltip';
+import { getRecentFiles } from '../utils/recentfiles';
+import { RecentFile } from '../definitions';
+import { Job } from 'app/features/Stats/utils/StatContext';
+import { MdInfoOutline } from 'react-icons/md';
+import { LuFileCode2 } from 'react-icons/lu';
+import { FiClock } from 'react-icons/fi';
+import cx from 'classnames';
+import { JOB_STATUS } from 'app/constants';
+import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
+import api from 'app/api';
+import isElectron from 'is-electron';
+import { ScrollArea } from 'app/components/shadcn/ScrollArea';
+import { LiaFileUploadSolid } from 'react-icons/lia';
 
 interface Props {
-	handleRecentFileUpload: (file: RecentFile, isRecentFile?: boolean) => void;
+    handleRecentFileUpload: (file: RecentFile, isRecentFile?: boolean) => void;
 }
 
 const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
-	const { name, size, total, path, fileLoaded, fileProcessing } =
-		useTypedSelector((state) => state.file);
+    const { name, size, total, path, fileLoaded, fileProcessing } =
+        useTypedSelector((state) => state.file);
 
-	const [toggleInfo, setToggleInfo] = useState(false);
-	const [showEditor, setShowEditor] = useState(false);
-	const [recentFiles, setRecentFiles] = useState<RecentFile[]>(
-		getRecentFiles(),
-	);
-	const [lastJob, setLastJob] = useState<Job>(null);
+    const [toggleInfo, setToggleInfo] = useState(false);
+    const [showEditor, setShowEditor] = useState(false);
+    const [recentFiles, setRecentFiles] =
+        useState<RecentFile[]>(getRecentFiles());
+    const [lastJob, setLastJob] = useState<Job>(null);
 
-	const fetchJobs = async () => {
-		const jobStatRes = await api.jobStats.fetch();
-		const { jobs = [] } = jobStatRes.data;
-		setLastJob(jobs[jobs.length - 1]);
-	};
+    const fetchJobs = async () => {
+        const jobStatRes = await api.jobStats.fetch();
+        const { jobs = [] } = jobStatRes.data;
+        setLastJob(jobs[jobs.length - 1]);
+    };
 
-	useEffect(() => {
-		setRecentFiles(getRecentFiles());
-		fetchJobs();
+    useEffect(() => {
+        setRecentFiles(getRecentFiles());
+        fetchJobs();
 
-		const tokens = [
-			pubsub.subscribe(
-				"recent-files-updated",
-				(_: string, files: RecentFile[]) => {
-					setRecentFiles(files.slice());
-				},
-			),
-			pubsub.subscribe("lastJob", (_: string, job: Job) => {
-				setLastJob(job);
-			}),
-			pubsub.subscribe(
-				"gcode-editor:toggle",
-				(_: string, isVisible: boolean) => {
-					setShowEditor(isVisible);
-				},
-			),
-		];
-		return () => {
-			tokens.forEach((token) => {
-				pubsub.unsubscribe(token);
-			});
-		};
-	}, []);
+        const tokens = [
+            pubsub.subscribe(
+                'recent-files-updated',
+                (_: string, files: RecentFile[]) => {
+                    setRecentFiles(files.slice());
+                },
+            ),
+            pubsub.subscribe('lastJob', (_: string, job: Job) => {
+                setLastJob(job);
+            }),
+            pubsub.subscribe(
+                'gcode-editor:toggle',
+                (_: string, isVisible: boolean) => {
+                    setShowEditor(isVisible);
+                },
+            ),
+            pubsub.subscribe('outline:start', () => {
+                setShowEditor(false);
+            }),
+            pubsub.subscribe('macro:run', () => {
+                setShowEditor(false);
+            }),
+        ];
+        return () => {
+            tokens.forEach((token) => {
+                pubsub.unsubscribe(token);
+            });
+        };
+    }, []);
 
-	useEffect(() => {
-		pubsub.publish("gcode-editor:toggle", showEditor);
-	}, [showEditor]);
+    useEffect(() => {
+        pubsub.publish('gcode-editor:toggle', showEditor);
+    }, [showEditor]);
 
-	useEffect(() => {
-		if (!fileLoaded && showEditor) {
-			setShowEditor(false);
-		}
-	}, [fileLoaded, showEditor]);
+    useEffect(() => {
+        if (!fileLoaded && showEditor) {
+            setShowEditor(false);
+        }
+    }, [fileLoaded, showEditor]);
 
-	if (fileProcessing) {
-		return <LoadingAnimation />;
-	}
+    if (fileProcessing) {
+        return <LoadingAnimation />;
+    }
 
-	if (!fileLoaded) {
-		return (
-			<div
-				className={cx("mt-3 h-full", {
-					"grid grid-cols-[3fr_2fr] gap-8 portrait:flex": isElectron(),
-					"flex justify-center": !isElectron(),
-				})}
-			>
-				{isElectron() && (
-					<div className="flex flex-col gap-2 max-xl:gap-1 portrait:w-3/4">
-						<span className="ml-6 dark:text-white">Recent Files</span>
-						<ScrollArea className="ml-2 px-2 h-28 max-xl:h-[6.5rem] portrait:mb-5 bg-white dark:bg-dark rounded-xl border-2 dark:border-dark-lighter">
-							<div className="grid divide-y items-center mr-2">
-								{recentFiles.map(
-									(file, index) =>
-										index < 8 && (
-											<div
-												className="grid grid-cols-[30px_3fr] items-center gap-1 cursor-pointer py-2"
-												role="button"
-												tabIndex={0}
-												aria-label={`Load recent file ${file.fileName}`}
-												onKeyDown={(e) => {
-													if (e.key === "Enter" || e.key === " ") {
-														e.preventDefault();
-														handleRecentFileUpload(file, true);
-													}
-												}}
-												onClick={() =>
-													handleRecentFileUpload(
-														{
-															fileName: file.fileName,
-															fileSize: file.fileSize,
-															filePath: file.filePath,
-															timeUploaded: file.timeUploaded,
-														},
-														true,
-													)
-												}
-											>
-												<div className="text-2xl float-right rounded-r dark:text-white">
-													<LiaFileUploadSolid />
-												</div>
-												<div className="grid items-start">
-													<TooltipProvider>
-														<Tooltip>
-															<TooltipTrigger asChild>
-																<span className="block text-ellipsis text-nowrap overflow-hidden whitespace-nowrap dark:text-white">
-																	{file.fileName}
-																</span>
-															</TooltipTrigger>
-															<TooltipContent>{file.fileName}</TooltipContent>
-														</Tooltip>
-													</TooltipProvider>
-												</div>
-											</div>
-										),
-								)}
-							</div>
-						</ScrollArea>
-					</div>
-				)}
-				<div
-					className={cx("flex flex-col gap-4 text-sm justify-between", {
-						"max-w-60": !isElectron(),
-					})}
-				>
-					{lastJob && (
-						<>
-							<span className="text-base text-gray-900 dark:text-gray-300">
-								Last Job
-							</span>
-							<div className="grid grid-rows-3 gap-4 max-xl:gap-2 -ml-[2px] text-gray-500 font-bold">
-								<TooltipProvider>
-									<Tooltip>
-										<TooltipTrigger asChild>
-											<div className="grid grid-cols-[20px_5fr] items-start gap-2">
-												<LuFileCode2 className="text-lg" />
-												<div className="block text-ellipsis text-nowrap overflow-hidden whitespace-nowrap">
-													<span className="font-bold">{lastJob.file}</span>
-												</div>
-											</div>
-										</TooltipTrigger>
-										<TooltipContent>{lastJob.file}</TooltipContent>
-									</Tooltip>
-								</TooltipProvider>
+    if (!fileLoaded) {
+        return (
+            <div
+                className={cx('mt-3 h-full', {
+                    'grid grid-cols-[3fr_2fr] gap-8 portrait:flex':
+                        isElectron(),
+                    'flex justify-center': !isElectron(),
+                })}
+            >
+                {isElectron() && (
+                    <div className="flex flex-col gap-2 max-xl:gap-1 portrait:w-3/4">
+                        <span className="ml-6 dark:text-white">
+                            Recent Files
+                        </span>
+                        <ScrollArea className="ml-2 px-2 h-28 max-xl:h-[6.5rem] portrait:mb-5 bg-white dark:bg-dark rounded-xl border-2 dark:border-dark-lighter">
+                            <div className="grid divide-y items-center mr-2">
+                                {recentFiles.map(
+                                    (file, index) =>
+                                        index < 8 && (
+                                            <div
+                                                className="grid grid-cols-[30px_3fr] items-center gap-1 cursor-pointer py-2"
+                                                role="button"
+                                                tabIndex={0}
+                                                aria-label={`Load recent file ${file.fileName}`}
+                                                onKeyDown={(e) => {
+                                                    if (
+                                                        e.key === 'Enter' ||
+                                                        e.key === ' '
+                                                    ) {
+                                                        e.preventDefault();
+                                                        handleRecentFileUpload(
+                                                            file,
+                                                            true,
+                                                        );
+                                                    }
+                                                }}
+                                                onClick={() =>
+                                                    handleRecentFileUpload(
+                                                        {
+                                                            fileName:
+                                                                file.fileName,
+                                                            fileSize:
+                                                                file.fileSize,
+                                                            filePath:
+                                                                file.filePath,
+                                                            timeUploaded:
+                                                                file.timeUploaded,
+                                                        },
+                                                        true,
+                                                    )
+                                                }
+                                            >
+                                                <div className="text-2xl float-right rounded-r dark:text-white">
+                                                    <LiaFileUploadSolid />
+                                                </div>
+                                                <div className="grid items-start">
+                                                    <TooltipProvider>
+                                                        <Tooltip>
+                                                            <TooltipTrigger
+                                                                asChild
+                                                            >
+                                                                <span className="block text-ellipsis text-nowrap overflow-hidden whitespace-nowrap dark:text-white">
+                                                                    {
+                                                                        file.fileName
+                                                                    }
+                                                                </span>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent>
+                                                                {file.fileName}
+                                                            </TooltipContent>
+                                                        </Tooltip>
+                                                    </TooltipProvider>
+                                                </div>
+                                            </div>
+                                        ),
+                                )}
+                            </div>
+                        </ScrollArea>
+                    </div>
+                )}
+                <div
+                    className={cx(
+                        'flex flex-col gap-4 text-sm justify-between',
+                        {
+                            'max-w-60': !isElectron(),
+                        },
+                    )}
+                >
+                    {lastJob && (
+                        <>
+                            <span className="text-base text-gray-900 dark:text-gray-300">
+                                Last Job
+                            </span>
+                            <div className="grid grid-rows-3 gap-4 max-xl:gap-2 -ml-[2px] text-gray-500 font-bold">
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <div className="grid grid-cols-[20px_5fr] items-start gap-2">
+                                                <LuFileCode2 className="text-lg" />
+                                                <div className="block text-ellipsis text-nowrap overflow-hidden whitespace-nowrap">
+                                                    <span className="font-bold">
+                                                        {lastJob.file}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            {lastJob.file}
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
 
-								<div className="flex flex-row gap-2">
-									<MdInfoOutline className="text-xl -ml-[1px]" />
-									<span
-										className={cx({
-											"text-green-500":
-												lastJob.jobStatus === JOB_STATUS.COMPLETE,
-											"text-red-500": lastJob.jobStatus === JOB_STATUS.STOPPED,
-										})}
-									>
-										{lastJob.jobStatus}
-									</span>
-								</div>
-								<div className="flex flex-row gap-2">
-									<FiClock className="text-lg" />
-									<span>
-										{convertMillisecondsToTimeStamp(lastJob.duration)}
-									</span>
-								</div>
-							</div>
-							<div className="h-1/2"></div>
-						</>
-					)}
-				</div>
-			</div>
-		);
-	}
+                                <div className="flex flex-row gap-2">
+                                    <MdInfoOutline className="text-xl -ml-[1px]" />
+                                    <span
+                                        className={cx({
+                                            'text-green-500':
+                                                lastJob.jobStatus ===
+                                                JOB_STATUS.COMPLETE,
+                                            'text-red-500':
+                                                lastJob.jobStatus ===
+                                                JOB_STATUS.STOPPED,
+                                        })}
+                                    >
+                                        {lastJob.jobStatus}
+                                    </span>
+                                </div>
+                                <div className="flex flex-row gap-2">
+                                    <FiClock className="text-lg" />
+                                    <span>
+                                        {convertMillisecondsToTimeStamp(
+                                            lastJob.duration,
+                                        )}
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="h-1/2"></div>
+                        </>
+                    )}
+                </div>
+            </div>
+        );
+    }
 
-	const formatFileSize = (size: number): string => {
-		if (size < 1024) {
-			return `${size} Bytes`;
-		}
+    const formatFileSize = (size: number): string => {
+        if (size < 1024) {
+            return `${size} Bytes`;
+        }
 
-		if (size < 1024 * 1024) {
-			return `${(size / 1024).toFixed(0)} KB`;
-		}
+        if (size < 1024 * 1024) {
+            return `${(size / 1024).toFixed(0)} KB`;
+        }
 
-		return `${(size / (1024 * 1024)).toFixed(0)} MB`;
-	};
+        return `${(size / (1024 * 1024)).toFixed(0)} MB`;
+    };
 
-	const splitFileNameAndExtension = (name: string = "") => {
-		if (!name) return ["", ""];
+    const splitFileNameAndExtension = (name: string = '') => {
+        if (!name) return ['', ''];
 
-		if (name.indexOf(".") > 0) {
-			return name.split(".");
-		}
+        if (name.indexOf('.') > 0) {
+            return name.split('.');
+        }
 
-		return [name, ""];
-	};
+        return [name, ''];
+    };
 
-	const fileSize = formatFileSize(size);
-	const ToggleOutput = toggleInfo ? Info : Size;
+    const fileSize = formatFileSize(size);
+    const ToggleOutput = toggleInfo ? Info : Size;
 
-	const [fileName, extension] = splitFileNameAndExtension(name);
+    const [fileName, extension] = splitFileNameAndExtension(name);
 
-	return (
-		<div className="flex flex-col justify-center items-center text-sm max-w-full text-gray-900 dark:text-gray-300 h-full w-full">
-			<TooltipProvider>
-				<Tooltip>
-					<TooltipTrigger asChild>
-						<div className="max-w-full flex flex-row">
-							<h2 className="inline-block text-lg font-bold text-ellipsis overflow-hidden whitespace-nowrap">
-								{fileName}
-							</h2>
-							<h2 className="inline-block text-lg font-bold">.{extension}</h2>
-						</div>
-					</TooltipTrigger>
-					<TooltipContent>{name}</TooltipContent>
-				</Tooltip>
-			</TooltipProvider>
+    return (
+        <div className="flex flex-col justify-center items-center text-sm max-w-full text-gray-900 dark:text-gray-300 h-full w-full">
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <div className="max-w-full flex flex-row">
+                            <h2 className="inline-block text-lg font-bold text-ellipsis overflow-hidden whitespace-nowrap">
+                                {fileName}
+                            </h2>
+                            <h2 className="inline-block text-lg font-bold">
+                                .{extension}
+                            </h2>
+                        </div>
+                    </TooltipTrigger>
+                    <TooltipContent>{name}</TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
 
-			<div className="text-gray-500 flex gap-1 text-xs">
-				<span>{fileSize}</span>
+            <div className="text-gray-500 flex gap-1 text-xs">
+                <span>{fileSize}</span>
 
-				<span>({total} lines)</span>
-			</div>
+                <span>({total} lines)</span>
+            </div>
 
-			{path && (
-				<div className="text-gray-500 text-xs max-w-full flex flex-row">
-					<span className="inline-block text-ellipsis overflow-hidden whitespace-nowrap">
-						{path}
-					</span>
-				</div>
-			)}
+            {path && (
+                <div className="text-gray-500 text-xs max-w-full flex flex-row">
+                    <span className="inline-block text-ellipsis overflow-hidden whitespace-nowrap">
+                        {path}
+                    </span>
+                </div>
+            )}
 
-			<div className="flex gap-4 justify-center items-center w-full">
-				<div className="flex flex-col items-center flex-shrink-0">
-					<span className="text-gray-500">Info</span>
-					<Switch
-						checked={toggleInfo}
-						onChange={() => setToggleInfo((prev) => !prev)}
-						position="vertical"
-						data-testid="toggle-info"
-						aria-label="Toggle file info or size view"
-					/>
-					<span className="text-gray-500">Size</span>
-				</div>
+            <div className="flex gap-4 justify-center items-center w-full">
+                <div className="flex flex-col items-center flex-shrink-0">
+                    <span className="text-gray-500">Info</span>
+                    <Switch
+                        checked={toggleInfo}
+                        onChange={() => setToggleInfo((prev) => !prev)}
+                        position="vertical"
+                        data-testid="toggle-info"
+                        aria-label="Toggle file info or size view"
+                    />
+                    <span className="text-gray-500">Size</span>
+                </div>
 
-				<ToggleOutput />
+                <ToggleOutput />
 
-				{fileLoaded && (
-					<div className="flex flex-col items-center mr-1">
-						<span className="text-gray-500">Editor</span>
-						<Switch
-							checked={showEditor}
-							onChange={() => setShowEditor((prev) => !prev)}
-							position="vertical"
-							data-testid="show-gcode-editor"
-						/>
-					</div>
-				)}
-			</div>
-		</div>
-	);
+                {fileLoaded && (
+                    <div className="flex flex-col items-center mr-1">
+                        <span className="text-gray-500">Editor</span>
+                        <Switch
+                            checked={showEditor}
+                            onChange={() => setShowEditor((prev) => !prev)}
+                            position="vertical"
+                            data-testid="show-gcode-editor"
+                        />
+                    </div>
+                )}
+            </div>
+        </div>
+    );
 };
 
 export default FileInformation;

@@ -188,6 +188,7 @@ jobs:
   build-pi:
     name: Build Raspberry PI packages
     runs-on: ubuntu-24.04-arm
+    environment: CI
     env:
       GH_TOKEN: ${{ secrets.CI_TOKEN }}
     permissions:
