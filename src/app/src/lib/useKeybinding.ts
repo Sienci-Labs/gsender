@@ -51,7 +51,7 @@ function useKeybinding(shuttleControlEvents: ShuttleControlEvents): void {
                 !currentCommandKeys[defaultShuttle.cmd]
             ) {
                 // add to store
-                let updatedCommandKeys = JSON.parse(
+                const updatedCommandKeys = JSON.parse(
                     JSON.stringify(currentCommandKeys),
                 );
                 const key = defaultShuttle.keys || '';
@@ -106,10 +106,7 @@ export function removeOldKeybindings(): void {
     // Only keep keybindings that exist in the shuttleControlEvents arrays
     Object.entries(currentCommandKeys).forEach(([key, keybinding]) => {
         const event = allShuttleControlEvents[key];
-        if (
-            event !== undefined ||
-            keybinding?.category === MACRO_CATEGORY
-        ) {
+        if (event !== undefined || keybinding?.category === MACRO_CATEGORY) {
             updatedCommandKeys[key] = keybinding;
         }
     });

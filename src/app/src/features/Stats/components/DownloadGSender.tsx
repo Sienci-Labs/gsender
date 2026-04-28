@@ -1,16 +1,16 @@
-import { Button } from 'app/components/Button';
-import { FaDownload, FaExternalLinkAlt } from 'react-icons/fa';
-import { useState } from 'react';
-import isElectron from 'is-electron';
+import { Button } from "app/components/Button";
+import isElectron from "is-electron";
+import { useState } from "react";
+import { FaDownload, FaExternalLinkAlt } from "react-icons/fa";
 
-export function DownloadGSender({ version = '1.5.0', downloadPercent = 0 }) {
-    const [canClick, setCanClick] = useState(true);
-    function updateGSender() {
-        setCanClick(false);
-        if (isElectron()) {
-            window.ipcRenderer.send('restart_app');
-        }
-    }
+export function DownloadGSender({ version = "1.5.0", downloadPercent = 0 }) {
+	const [canClick, setCanClick] = useState(true);
+	function updateGSender() {
+		setCanClick(false);
+		if (isElectron()) {
+			window.ipcRenderer.send("restart_app");
+		}
+	}
 
     return (
         <div

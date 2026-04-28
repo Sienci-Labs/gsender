@@ -1,104 +1,99 @@
-describe('Load file testing in grblHal', () => {
+describe("Load file testing in grblHal", () => {
+	beforeEach(() => {
+		cy.viewport(1689, 810);
+		cy.visit("http://localhost:8000/#/");
+		cy.wait(2000);
+	});
+	it("Complete workflow: Connect-> Upload-> Disconnect->Upload-> Connect->Disconnect", () => {
+		// ========== STEP 1: Connect to CNC ==========
+		cy.log("STEP 1: Connecting to CNC...");
+		cy.connectToGrblHAL();
+		cy.wait(6000);
+		cy.log("Connected to CNC");
 
-  beforeEach(() => {
-    cy.viewport(1689, 810);
-    cy.visit('http://localhost:8000/#/');
-    cy.wait(2000);
-  });
-  it('Complete workflow: Connect-> Upload-> Disconnect->Upload-> Connect->Disconnect', () => {
+		// Verify CNC machine status is Idle
+		cy.contains(/^Idle$/i, { timeout: 30000 })
+			.should("be.visible")
+			.then((status) => {
+				cy.log(`Machine status: "${status.text().trim()}"`);
+			});
 
-    // ========== STEP 1: Connect to CNC ==========
-    cy.log('STEP 1: Connecting to CNC...');
-    cy.connectToGrblHAL();
-    cy.wait(6000);
-    cy.log('Connected to CNC');
+		// ========== STEP 2: Upload file (while connected) ==========
+		cy.log("STEP 2: Uploading file while connected...");
+		cy.wait(5000);
+		cy.contains("Load File").should("be.visible").click({ force: true });
 
-    // Verify CNC machine status is Idle
-    cy.contains(/^Idle$/i, { timeout: 30000 })
-      .should('be.visible')
-      .then(status => {
-        cy.log(`Machine status: "${status.text().trim()}"`);
-      });
+		cy.get("#fileInput").selectFile("cypress/fixtures/sample.gcode", {
+			force: true,
+		});
 
-    // ========== STEP 2: Upload file (while connected) ==========
-    cy.log('STEP 2: Uploading file while connected...');
-    cy.wait(5000);
-    cy.contains('Load File')
-      .should('be.visible')
-      .click({ force: true });
+		cy.wait(5000);
 
-    cy.get('#fileInput')
-      .selectFile('cypress/fixtures/sample.gcode', { force: true });
+		// Verify uploaded file name
+		cy.get("h2.inline-block.text-lg.font-bold", { timeout: 15000 })
+			.should("be.visible")
+			.invoke("text")
+			.then((fileName) => {
+				const trimmedName = fileName.trim();
+				cy.log(`Uploaded file name: "${trimmedName}"`);
+				expect(trimmedName).to.contain(".gcode");
+			});
 
-    cy.wait(5000);
+		// ========== STEP 3: Disconnect from CNC ==========
+		cy.log("STEP 3: Disconnecting from CNC...");
 
-    // Verify uploaded file name
-    cy.get('h2.inline-block.text-lg.font-bold', { timeout: 15000 })
-      .should('be.visible')
-      .invoke('text')
-      .then((fileName) => {
-        const trimmedName = fileName.trim();
-        cy.log(`Uploaded file name: "${trimmedName}"`);
-        expect(trimmedName).to.contain('.gcode');
-      });
+		cy.disconnectIfIdle();
 
-    // ========== STEP 3: Disconnect from CNC ==========
-    cy.log('STEP 3: Disconnecting from CNC...');
+		cy.log("Disconnect clicked — verifying status...");
 
-    cy.disconnectIfIdle();
+		// Verify the machine is disconnected
+		cy.contains(/(Connect to CNC|Disconnected)/i, { timeout: 10000 })
+			.should("be.visible")
+			.then(() => cy.log("Machine disconnected successfully"));
 
-    cy.log('Disconnect clicked — verifying status...');
+		// ========== STEP 4: Upload file (while disconnected) ==========
+		cy.log("STEP 4: Uploading file while disconnected...");
+		cy.wait(5000);
+		cy.contains("Load File").should("be.visible").click({ force: true });
 
-    // Verify the machine is disconnected
-    cy.contains(/(Connect to CNC|Disconnected)/i, { timeout: 10000 })
-      .should('be.visible')
-      .then(() => cy.log('Machine disconnected successfully'));
+		cy.get("#fileInput").selectFile("cypress/fixtures/sample.gcode", {
+			force: true,
+		});
 
-    // ========== STEP 4: Upload file (while disconnected) ==========
-    cy.log('STEP 4: Uploading file while disconnected...');
-    cy.wait(5000);
-    cy.contains('Load File')
-      .should('be.visible')
-      .click({ force: true });
+		cy.wait(5000);
 
-    cy.get('#fileInput')
-      .selectFile('cypress/fixtures/sample.gcode', { force: true });
+		// Verify uploaded file name
+		cy.get("h2.inline-block.text-lg.font-bold", { timeout: 15000 })
+			.should("be.visible")
+			.invoke("text")
+			.then((fileName) => {
+				const trimmedName = fileName.trim();
+				cy.log(`Uploaded file name: "${trimmedName}"`);
+				expect(trimmedName).to.contain(".gcode");
+			});
 
-    cy.wait(5000);
+		// ========== STEP 5: Connect to CNC again ==========
+		cy.log("STEP 5: Connecting to CNC again...");
+		cy.connectToGrblHAL();
+		cy.wait(6000);
+		cy.log("Connected to CNC");
 
-    // Verify uploaded file name
-    cy.get('h2.inline-block.text-lg.font-bold', { timeout: 15000 })
-      .should('be.visible')
-      .invoke('text')
-      .then((fileName) => {
-        const trimmedName = fileName.trim();
-        cy.log(`Uploaded file name: "${trimmedName}"`);
-        expect(trimmedName).to.contain('.gcode');
-      });
+		// Verify CNC machine status is Idle
+		cy.contains(/^Idle$/i, { timeout: 30000 })
+			.should("be.visible")
+			.then((status) => {
+				cy.log(`Machine status: "${status.text().trim()}"`);
+			});
 
-    // ========== STEP 5: Connect to CNC again ==========
-    cy.log('STEP 5: Connecting to CNC again...');
-    cy.connectToGrblHAL();
-    cy.wait(6000);
-    cy.log('Connected to CNC');
+		// ========== STEP 6: Final disconnect ==========
+		cy.log("STEP 6: Final disconnect from CNC...");
+		cy.disconnectIfIdle();
 
-    // Verify CNC machine status is Idle
-    cy.contains(/^Idle$/i, { timeout: 30000 })
-      .should('be.visible')
-      .then(status => {
-        cy.log(`Machine status: "${status.text().trim()}"`);
-      });
+		cy.log("Disconnect clicked — verifying status...");
 
-    // ========== STEP 6: Final disconnect ==========
-    cy.log('STEP 6: Final disconnect from CNC...');
-cy.disconnectIfIdle();
-
-    cy.log('Disconnect clicked — verifying status...');
-
-    // Verify the machine is disconnected
-    cy.contains(/(Connect to CNC|Disconnected)/i, { timeout: 10000 })
-      .should('be.visible')
-      .then(() => cy.log('Test completed successfully!'));
-  });
-
+		// Verify the machine is disconnected
+		cy.contains(/(Connect to CNC|Disconnected)/i, { timeout: 10000 })
+			.should("be.visible")
+			.then(() => cy.log("Test completed successfully!"));
+	});
 });

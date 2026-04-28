@@ -1,148 +1,147 @@
-import SortableTable, { CustomColumnDef } from 'app/components/SortableTable';
-import { StatCard } from 'app/features/Stats/components/StatCard.tsx';
-import { useContext } from 'react';
+import { Button } from "app/components/Button";
+import { Confirm } from "app/components/ConfirmationDialog/ConfirmationDialogLib.ts";
+import SortableTable, {
+	type CustomColumnDef,
+} from "app/components/SortableTable";
+import { GRBL, JOB_STATUS, JOB_TYPES } from "app/constants";
+import { CardHeader } from "app/features/Stats/components/CardHeader.tsx";
+import { JobsPerComPort } from "app/features/Stats/components/JobsPerComPort.tsx";
+import { RunTimePerComPort } from "app/features/Stats/components/RunTimePerComPort.tsx";
+import { StatCard } from "app/features/Stats/components/StatCard.tsx";
 import {
-    Job,
-    JOB_STATUS_T,
-    StatContext,
-} from 'app/features/Stats/utils/StatContext.tsx';
-import { GRBL, JOB_STATUS, JOB_TYPES } from 'app/constants';
-import { CheckCircle, XCircle } from 'lucide-react';
-import { CardHeader } from 'app/features/Stats/components/CardHeader.tsx';
-import { Button } from 'app/components/Button';
-import { FaTrash } from 'react-icons/fa';
-import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
-
-import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
-import { JobsPerComPort } from 'app/features/Stats/components/JobsPerComPort.tsx';
-import { RunTimePerComPort } from 'app/features/Stats/components/RunTimePerComPort.tsx';
+	type JOB_STATUS_T,
+	type Job,
+	StatContext,
+} from "app/features/Stats/utils/StatContext.tsx";
+import { convertMillisecondsToTimeStamp } from "app/lib/datetime";
+import { CheckCircle, XCircle } from "lucide-react";
+import { useContext } from "react";
+import { FaTrash } from "react-icons/fa";
 
 const defaultData: Job[] = [
-    {
-        type: JOB_TYPES.JOB,
-        file: '',
-        path: null,
-        totalLines: 0,
-        port: '',
-        controller: GRBL,
-        startTime: new Date(),
-        endTime: null,
-        jobStatus: JOB_STATUS.COMPLETE,
-        duration: 0,
-    },
+	{
+		type: JOB_TYPES.JOB,
+		file: "",
+		path: null,
+		totalLines: 0,
+		port: "",
+		controller: GRBL,
+		startTime: new Date(),
+		endTime: null,
+		jobStatus: JOB_STATUS.COMPLETE,
+		duration: 0,
+	},
 ];
 const columnData: CustomColumnDef<Job, any>[] = [
-    {
-        accessorKey: 'file',
-        header: () => 'File Name',
-        cell: (info: { renderValue: () => string }) => {
-            return (
-                <>
-                    <div className="break-all">{info.renderValue()}</div>
-                </>
-            );
-        },
-        size: 400,
-    },
-    {
-        accessorKey: 'duration',
-        header: () => 'Duration',
-        cell: (info: { renderValue: () => number }) => {
-            const ms = Number(info.renderValue());
-            return convertMillisecondsToTimeStamp(ms);
-        },
-        size: 90,
-    },
-    {
-        accessorKey: 'totalLines',
-        header: () => '# Lines',
-        size: 50,
-    },
-    {
-        accessorKey: 'startTime',
-        header: () => 'Start Time',
-        cell: (info: { renderValue: () => string }) => {
-            const dateString = new Date(info.renderValue()).toLocaleString(
-                'en-US',
-            );
-            return (
-                <>
-                    <div>{dateString}</div>
-                </>
-            );
-        },
-        size: 100,
-    },
-    {
-        accessorKey: 'jobStatus',
-        header: () => 'Status',
-        cell: (info: { renderValue: () => JOB_STATUS_T }) => {
-            return (
-                <div className="flex items-center justify-center">
-                    {info.renderValue() === JOB_STATUS.COMPLETE ? (
-                        <CheckCircle size={24} color="green" />
-                    ) : (
-                        <XCircle size={24} color="red" />
-                    )}
-                </div>
-            );
-        },
-        size: 20,
-    },
+	{
+		accessorKey: "file",
+		header: () => "File Name",
+		cell: (info: { renderValue: () => string }) => {
+			return (
+				<>
+					<div className="break-all">{info.renderValue()}</div>
+				</>
+			);
+		},
+		size: 400,
+	},
+	{
+		accessorKey: "duration",
+		header: () => "Duration",
+		cell: (info: { renderValue: () => number }) => {
+			const ms = Number(info.renderValue());
+			return convertMillisecondsToTimeStamp(ms);
+		},
+		size: 90,
+	},
+	{
+		accessorKey: "totalLines",
+		header: () => "# Lines",
+		size: 50,
+	},
+	{
+		accessorKey: "startTime",
+		header: () => "Start Time",
+		cell: (info: { renderValue: () => string }) => {
+			const dateString = new Date(info.renderValue()).toLocaleString("en-US");
+			return (
+				<>
+					<div>{dateString}</div>
+				</>
+			);
+		},
+		size: 100,
+	},
+	{
+		accessorKey: "jobStatus",
+		header: () => "Status",
+		cell: (info: { renderValue: () => JOB_STATUS_T }) => {
+			return (
+				<div className="flex items-center justify-center">
+					{info.renderValue() === JOB_STATUS.COMPLETE ? (
+						<CheckCircle size={24} color="green" />
+					) : (
+						<XCircle size={24} color="red" />
+					)}
+				</div>
+			);
+		},
+		size: 20,
+	},
 ];
 
 export function Jobs() {
-    const { jobs, clearJobHistory } = useContext(StatContext);
+	const { jobs, clearJobHistory } = useContext(StatContext);
 
-    function onClearJobHistory() {
-        Confirm({
-            title: 'Delete Job History',
-            content: 'Are you sure you want to delete all job history?',
-            confirmLabel: 'Confirm',
-            cancelLabel: 'Cancel',
-            onConfirm: async () => {
-                await clearJobHistory?.();
-            },
-        });
-    }
+	function onClearJobHistory() {
+		Confirm({
+			title: "Delete Job History",
+			content: "Are you sure you want to delete all job history?",
+			confirmLabel: "Confirm",
+			cancelLabel: "Cancel",
+			onConfirm: async () => {
+				await clearJobHistory?.();
+			},
+		});
+	}
 
-    return (
-        <div className="grid grid-cols-6 grid-rows-6 gap-2 w-full h-full overflow-y-auto">
-            <div className="col-span-4 row-span-6 pr-8 max-xl:pr-0">
-                <StatCard>
-                    <div className="flex items-center justify-between gap-2">
-                        <CardHeader>Job History</CardHeader>
-                        <Button
-                            icon={
-                                <FaTrash className="text-gray-600 w-4 h-4 dark:text-gray-200" />
-                            }
-                            onClick={onClearJobHistory}
-                            text="Clear"
-                            size="sm"
-                            className="text-gray-600"
-                        />
-                    </div>
-                    <div className="w-full flex flex-col">
-                        <SortableTable
-                            defaultData={defaultData}
-                            data={jobs}
-                            columns={columnData}
-                            searchPlaceholder="Search past jobs..."
-                            height="h-[calc(100vh-260px)]"
-                        />
-                    </div>
-                </StatCard>
-            </div>
-            <div className="col-span-2 row-span-6 col-start-5 pl-8 max-xl:pl-0 flex flex-col gap-2 justify-center items-center">
-                <div className="flex flex-col bg-white border border-gray-300 rounded p-2 h-full dark:bg-dark dark:border-dark-lighter w-full justify-center items-center">
-                    <CardHeader>Jobs per CNC</CardHeader>
-                    <JobsPerComPort />
-                </div>
-                <div className="flex flex-col bg-white border border-gray-300 rounded p-2 h-full dark:bg-dark dark:border-dark-lighter w-full justify-center items-center">
-                    <CardHeader>Run Time per CNC</CardHeader>
-                    <RunTimePerComPort />
-                </div>
-            </div>
-        </div>
-    );
+	return (
+		<div className="grid grid-cols-6 grid-rows-6 gap-2 w-full h-full overflow-y-auto">
+			<div className="col-span-4 row-span-6 pr-8 max-xl:pr-0">
+				<StatCard>
+					<div className="flex items-center justify-between gap-2">
+						<CardHeader>Job History</CardHeader>
+						<Button
+							icon={
+								<FaTrash className="text-gray-600 w-4 h-4 dark:text-gray-200" />
+							}
+							onClick={onClearJobHistory}
+							text="Clear"
+							size="sm"
+							className="text-gray-600"
+						/>
+					</div>
+					<div className="w-full flex flex-col">
+						<SortableTable
+							defaultData={defaultData}
+							data={jobs}
+							columns={columnData}
+							searchPlaceholder="Search past jobs..."
+							height="h-[calc(100vh-260px)]"
+						/>
+					</div>
+				</StatCard>
+			</div>
+			<div className="col-span-2 row-span-6 col-start-5 pl-8 max-xl:pl-0 flex flex-col gap-2 justify-center items-center">
+				<div className="flex flex-col bg-white border border-gray-300 rounded p-2 h-full dark:bg-dark dark:border-dark-lighter w-full justify-center items-center">
+					<CardHeader>Jobs per CNC</CardHeader>
+					<JobsPerComPort />
+				</div>
+				<div className="flex flex-col bg-white border border-gray-300 rounded p-2 h-full dark:bg-dark dark:border-dark-lighter w-full justify-center items-center">
+					<CardHeader>Run Time per CNC</CardHeader>
+					<RunTimePerComPort />
+				</div>
+			</div>
+		</div>
+	);
 }

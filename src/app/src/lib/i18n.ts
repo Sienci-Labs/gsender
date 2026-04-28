@@ -21,52 +21,52 @@
  *
  */
 
-import sha1 from 'sha1';
-import i18next from 'i18next';
+import i18next from "i18next";
+import sha1 from "sha1";
 
 export interface i18n__Options {
-    context?: object;
-    count?: number;
-    defaultValue?: string;
+	context?: object;
+	count?: number;
+	defaultValue?: string;
 }
 
 const t = (...args: Array<any>): string => {
-    const key = args[0];
-    const options = args[1];
+	const key = args[0];
+	const options = args[1];
 
-    let text = i18next.t(key, options);
-    if (typeof text === 'string' && text.length === 0) {
-        text = i18next.t(key, { ...options, lng: 'en' });
-    }
+	let text = i18next.t(key, options);
+	if (typeof text === "string" && text.length === 0) {
+		text = i18next.t(key, { ...options, lng: "en" });
+	}
 
-    return text;
+	return text;
 };
 
 const _ = (value: string, options: i18n__Options = {}): string => {
-    const key = ((value, options) => {
-        const { context, count } = { ...options };
-        const containsContext = context !== undefined && context !== null;
-        const containsPlural = typeof count === 'number';
-        if (containsContext) {
-            value = value + i18next.options.contextSeparator + options.context;
-        }
-        if (containsPlural) {
-            value = value + i18next.options.pluralSeparator + 'plural';
-        }
-        return sha1(value);
-    })(value, options);
+	const key = ((value, options) => {
+		const { context, count } = { ...options };
+		const containsContext = context !== undefined && context !== null;
+		const containsPlural = typeof count === "number";
+		if (containsContext) {
+			value = value + i18next.options.contextSeparator + options.context;
+		}
+		if (containsPlural) {
+			value = value + i18next.options.pluralSeparator + "plural";
+		}
+		return sha1(value);
+	})(value, options);
 
-    options.defaultValue = value;
+	options.defaultValue = value;
 
-    let text = i18next.t(key, options);
-    if (typeof text !== 'string' || text.length === 0) {
-        text = i18next.t(key, { ...options, lng: 'en' });
-    }
+	let text = i18next.t(key, options);
+	if (typeof text !== "string" || text.length === 0) {
+		text = i18next.t(key, { ...options, lng: "en" });
+	}
 
-    return text;
+	return text;
 };
 
 export default {
-    t,
-    _,
+	t,
+	_,
 };

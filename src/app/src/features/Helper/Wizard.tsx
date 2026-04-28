@@ -21,123 +21,122 @@
  *
  */
 
-import styles from './index.module.styl';
-import Instructions from 'app/features/Helper/components/Instructions';
-import Stepper from 'app/features/Helper/components/Stepper';
-import { useWizardContext } from 'app/features/Helper/context';
-import cx from 'classnames';
-import MinMaxButton from 'app/features/Helper/components/MinMaxButton';
-import CancelButton from 'app/features/Helper/components/CancelButton';
-import { CSSTransition } from 'react-transition-group';
-import { FaHatWizard } from 'react-icons/fa';
-import store from 'app/store';
-import controller from 'app/lib/controller.ts';
+import CancelButton from "app/features/Helper/components/CancelButton";
+import Instructions from "app/features/Helper/components/Instructions";
+import MinMaxButton from "app/features/Helper/components/MinMaxButton";
+import Stepper from "app/features/Helper/components/Stepper";
+import { useWizardContext } from "app/features/Helper/context";
+import controller from "app/lib/controller.ts";
+import store from "app/store";
+import cx from "classnames";
+import { FaHatWizard } from "react-icons/fa";
+import { CSSTransition } from "react-transition-group";
+import styles from "./index.module.styl";
 
 // Fetch toolchange settings and send it to backend
 export function updateToolchangeContext(mappings = null) {
-    const hooks = store.get('workspace.toolChangeHooks', {});
-    const options = store.get('workspace.toolChange', {});
-    const toolChangeOption = store.get('workspace.toolChangeOption', 'Ignore');
-    const context = {
-        ...hooks,
-        toolChangeOption,
-        ...options,
-    };
+	const hooks = store.get("workspace.toolChangeHooks", {});
+	const options = store.get("workspace.toolChange", {});
+	const toolChangeOption = store.get("workspace.toolChangeOption", "Ignore");
+	const context = {
+		...hooks,
+		toolChangeOption,
+		...options,
+	};
 
-    if (mappings) {
-        const plainObject = Array.from(mappings).reduce(
-            (obj, [key, value]) => {
-                obj[key] = value;
-                return obj;
-            },
-            {} as Record<number, number>,
-        );
+	if (mappings) {
+		const plainObject = Array.from(mappings).reduce(
+			(obj, [key, value]) => {
+				obj[key] = value;
+				return obj;
+			},
+			{} as Record<number, number>,
+		);
 
-        context.mappings = plainObject;
-    }
+		context.mappings = plainObject;
+	}
 
-    controller.command('toolchange:context', context);
+	controller.command("toolchange:context", context);
 }
 
 const Wizard = () => {
-    const { title, visible, minimized, activeStep, overlay, steps } =
-        useWizardContext();
+	const { title, visible, minimized, activeStep, overlay, steps } =
+		useWizardContext();
 
-    return (
-        <>
-            <div
-                className={cx({
-                    hidden: !visible,
-                    [styles.overlay]: !minimized && overlay,
-                })}
-            />
-            <div
-                className={cx({
-                    hidden: !visible,
-                    'absolute top-1/2 left-4 w-4/5 max-h-[500px] border-2 border-gray-500 rounded-lg shadow [transform:translate(0,-50%)] z-40 flex flex-col justify-between [transition:all_300ms_ease]':
-                        !minimized,
-                })}
-            >
-                <div
-                    className={cx({
-                        hidden: !visible || !overlay,
-                        'px-1 py-4 flex flex-col justify-center items-center z-40 bg-amber-100 rounded content-start':
-                            !minimized && overlay,
-                    })}
-                >
-                    <div className="text-black text-center text-xl/relaxed font-bold z-40">
-                        Widgets are disabled
-                    </div>
-                    <div className="text-black text-center text-sm/relaxed z-40">
-                        Please use the button(s) in the wizard instead.
-                    </div>
-                </div>
-                <div
-                    className={cx({
-                        hidden: !visible,
-                        'absolute bg-white top-3 left-1/2 -translate-x-1/2 w-2/5 h-auto rounded [box-shadow:0px_20px_20px_-17px_rgba(255,159,16,0.73)] duration-300 ease-linear transition-all z-40':
-                            minimized,
-                        'bg-white rounded flex h-[550px] flex-col content-end overflow-hidden z-40 duration-300 ease-linear transition-all':
-                            !minimized,
-                    })}
-                >
-                    <div className="border-b border-b-slate-400 p-2 flex flex-row justify-between items-center">
-                        <h1 className="flex flex-row gap-2 items-center justify-center p-0 mr-4 text-slate-600 font-bold text-xl">
-                            <FaHatWizard /> {title} - Step {activeStep + 1} of{' '}
-                            {steps.length}
-                        </h1>
-                        <div className="flex">
-                            <MinMaxButton />
-                            <CancelButton />
-                        </div>
-                    </div>
-                    <CSSTransition
-                        key="wizContent"
-                        timeout={350}
-                        classNames={{
-                            enterActive: styles.maximizeActive,
-                            enterDone: styles.maximizeDone,
-                            exitActive: styles.minimizeActive,
-                            exitDone: styles.minimizeDone,
-                        }}
-                    >
-                        <div
-                            id="wizContent"
-                            className={cx(
-                                'flex flex-row h-[calc(100%-40px)] justify-items-stretch items-stretch justify-stretch flex-grow',
-                                {
-                                    hidden: minimized,
-                                },
-                            )}
-                        >
-                            <Stepper />
-                            <Instructions />
-                        </div>
-                    </CSSTransition>
-                </div>
-            </div>
-        </>
-    );
+	return (
+		<>
+			<div
+				className={cx({
+					hidden: !visible,
+					[styles.overlay]: !minimized && overlay,
+				})}
+			/>
+			<div
+				className={cx({
+					hidden: !visible,
+					"absolute top-1/2 left-4 w-4/5 max-h-[500px] border-2 border-gray-500 rounded-lg shadow [transform:translate(0,-50%)] z-40 flex flex-col justify-between [transition:all_300ms_ease]":
+						!minimized,
+				})}
+			>
+				<div
+					className={cx({
+						hidden: !visible || !overlay,
+						"px-1 py-4 flex flex-col justify-center items-center z-40 bg-amber-100 rounded content-start":
+							!minimized && overlay,
+					})}
+				>
+					<div className="text-black text-center text-xl/relaxed font-bold z-40">
+						Widgets are disabled
+					</div>
+					<div className="text-black text-center text-sm/relaxed z-40">
+						Please use the button(s) in the wizard instead.
+					</div>
+				</div>
+				<div
+					className={cx({
+						hidden: !visible,
+						"absolute bg-white top-3 left-1/2 -translate-x-1/2 w-2/5 h-auto rounded [box-shadow:0px_20px_20px_-17px_rgba(255,159,16,0.73)] duration-300 ease-linear transition-all z-40":
+							minimized,
+						"bg-white rounded flex h-[550px] flex-col content-end overflow-hidden z-40 duration-300 ease-linear transition-all":
+							!minimized,
+					})}
+				>
+					<div className="border-b border-b-slate-400 p-2 flex flex-row justify-between items-center">
+						<h1 className="flex flex-row gap-2 items-center justify-center p-0 mr-4 text-slate-600 font-bold text-xl">
+							<FaHatWizard /> {title} - Step {activeStep + 1} of {steps.length}
+						</h1>
+						<div className="flex">
+							<MinMaxButton />
+							<CancelButton />
+						</div>
+					</div>
+					<CSSTransition
+						key="wizContent"
+						timeout={350}
+						classNames={{
+							enterActive: styles.maximizeActive,
+							enterDone: styles.maximizeDone,
+							exitActive: styles.minimizeActive,
+							exitDone: styles.minimizeDone,
+						}}
+					>
+						<div
+							id="wizContent"
+							className={cx(
+								"flex flex-row h-[calc(100%-40px)] justify-items-stretch items-stretch justify-stretch flex-grow",
+								{
+									hidden: minimized,
+								},
+							)}
+						>
+							<Stepper />
+							<Instructions />
+						</div>
+					</CSSTransition>
+				</div>
+			</div>
+		</>
+	);
 };
 
 export default Wizard;

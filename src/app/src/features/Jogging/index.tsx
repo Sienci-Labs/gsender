@@ -1,60 +1,57 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
-import includes from 'lodash/includes';
-import get from 'lodash/get';
-import inRange from 'lodash/inRange';
-import throttle from 'lodash/throttle';
-import cx from 'classnames';
-
-import { JogInput } from 'app/features/Jogging/components/JogInput';
-import { JogWheel } from 'app/features/Jogging/components/JogWheel';
-import { SpeedSelector } from 'app/features/Jogging/components/SpeedSelector';
-import { ZJog } from 'app/features/Jogging/components/ZJog';
-import { AJog } from 'app/features/Jogging/components/AJog';
-import store from 'app/store';
 import {
-    cancelJog,
-    jogAxis,
-    startJogCommand,
-} from 'app/features/Jogging/utils/Jogging';
-import { FirmwareFlavour } from 'app/features/Connection';
-import { RootState } from 'app/store/redux';
+	GRBL_ACTIVE_STATE_IDLE,
+	GRBL_ACTIVE_STATE_JOG,
+	IMPERIAL_UNITS,
+	JOGGING_CATEGORY,
+	METRIC_UNITS,
+	TOOLBAR_CATEGORY,
+	WORKFLOW_STATE_IDLE,
+	WORKFLOW_STATE_PAUSED,
+	WORKFLOW_STATE_RUNNING,
+	WORKSPACE_MODE,
+} from "app/constants";
+import type { UNITS_EN } from "app/definitions/general";
+import type { FirmwareFlavour } from "app/features/Connection";
+import { AJog } from "app/features/Jogging/components/AJog";
+import { JogInput } from "app/features/Jogging/components/JogInput";
+import { JogWheel } from "app/features/Jogging/components/JogWheel";
+import { SpeedSelector } from "app/features/Jogging/components/SpeedSelector";
+import { StopButton } from "app/features/Jogging/components/StopButton";
+import { ZJog } from "app/features/Jogging/components/ZJog";
 import {
-    GRBL_ACTIVE_STATE_IDLE,
-    GRBL_ACTIVE_STATE_JOG,
-    IMPERIAL_UNITS,
-    JOGGING_CATEGORY,
-    METRIC_UNITS,
-    TOOLBAR_CATEGORY,
-    WORKFLOW_STATE_IDLE,
-    WORKFLOW_STATE_PAUSED,
-    WORKFLOW_STATE_RUNNING,
-    WORKSPACE_MODE,
-} from 'app/constants';
-import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-import { toast } from 'app/lib/toaster';
-import controller from 'app/lib/controller';
-import useKeybinding from 'app/lib/useKeybinding';
-import useShuttleEvents from 'app/hooks/useShuttleEvents';
-import gamepad, { checkButtonHold } from 'app/lib/gamepad';
-import { GamepadProfile } from 'app/lib/gamepad/definitions';
-import { StopButton } from 'app/features/Jogging/components/StopButton';
-import { useWidgetState } from 'app/hooks/useWidgetState';
-
-import jogWheeelLabels from './assets/labels.svg';
-import JogHelper from './utils/jogHelper';
-import { preventDefault } from 'app/lib/dom-events';
-import { checkThumbsticskAreIdle, JoystickLoop } from './JoystickLoop';
-import { MPGJogManager } from './MPGJogManager.ts';
-import { convertValue } from './utils/units';
-import reduxStore from 'app/store/redux';
-import { UNITS_EN } from 'app/definitions/general';
+	cancelJog,
+	jogAxis,
+	startJogCommand,
+} from "app/features/Jogging/utils/Jogging";
+import useShuttleEvents from "app/hooks/useShuttleEvents";
+import { useWidgetState } from "app/hooks/useWidgetState";
+import { useWorkspaceState } from "app/hooks/useWorkspaceState";
+import controller from "app/lib/controller";
+import { preventDefault } from "app/lib/dom-events";
+import gamepad, { checkButtonHold } from "app/lib/gamepad";
+import type { GamepadProfile } from "app/lib/gamepad/definitions";
+import { toast } from "app/lib/toaster";
+import useKeybinding from "app/lib/useKeybinding";
+import store from "app/store";
+import reduxStore, { type RootState } from "app/store/redux";
+import cx from "classnames";
+import get from "lodash/get";
+import includes from "lodash/includes";
+import inRange from "lodash/inRange";
+import throttle from "lodash/throttle";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import jogWheeelLabels from "./assets/labels.svg";
+import { checkThumbsticskAreIdle, JoystickLoop } from "./JoystickLoop";
+import { MPGJogManager } from "./MPGJogManager.ts";
+import JogHelper from "./utils/jogHelper";
+import { convertValue } from "./utils/units";
 
 export interface JogValueObject {
-    xyStep: number;
-    aStep: number;
-    zStep: number;
-    feedrate: number;
+	xyStep: number;
+	aStep: number;
+	zStep: number;
+	feedrate: number;
 }
 
 export function Jogging({ hideRotary = false }) {
@@ -1025,73 +1022,69 @@ export function Jogging({ hideRotary = false }) {
 
                         onClick={() => cancelJog(activeState, firmware)}
                     />*/}
-                </div>
-                <div className="flex justify-center gap-4">
-                    <ZJog
-                        distance={jogSpeed.zStep}
-                        feedrate={jogSpeed.feedrate}
-                        canClick={canClick}
-                        threshold={jogThreshold}
-                    />
-                    {showA && (
-                        <AJog
-                            distance={jogSpeed.aStep}
-                            feedrate={jogSpeed.feedrate}
-                            canClick={canClick}
-                            isRotaryMode={isRotaryMode}
-                            threshold={jogThreshold}
-                        />
-                    )}
-                </div>
-            </div>
-            <div className="flex gap-1 w-full justify-around">
-                <div
-                    className={cx('flex items-center justify-center', {
-                        'px-7': !showA,
-                    })}
-                >
-                    <div
-                        className={cx(
-                            'grid gap-x-1 portrait:gap-x-2 items-center',
-                            {
-                                'grid-cols-2 gap-y-3 portrait:gap-y-6': showA,
-                                'grid-cols-1 gap-y-1 xl:gap-y-2 portrait:gap-y-4':
-                                    !showA,
-                            },
-                        )}
-                    >
-                        <JogInput
-                            label="XY"
-                            screenReaderLabel="XY jog distance"
-                            currentValue={jogSpeed.xyStep}
-                            onChange={updateXYStep}
-                        />
-                        <JogInput
-                            label="Z"
-                            screenReaderLabel="Z jog distance"
-                            currentValue={jogSpeed.zStep}
-                            onChange={updateZStep}
-                        />
-                        {showA && (
-                            <JogInput
-                                label="A°"
-                                screenReaderLabel="A jog distance"
-                                currentValue={jogSpeed.aStep}
-                                onChange={updateAStep}
-                            />
-                        )}
-                        <JogInput
-                            label="at"
-                            screenReaderLabel="Jog feedrate"
-                            currentValue={jogSpeed.feedrate}
-                            onChange={updateFeedrate}
-                        />
-                    </div>
-                </div>
-                <div className="flex float-right portrait:scale-100 max-xl:scale-90 max-xl:-mt-[5px] max-xl:-mb-[5px]">
-                    <SpeedSelector handleClick={updateJogValues} />
-                </div>
-            </div>
-        </>
-    );
+				</div>
+				<div className="flex justify-center gap-4">
+					<ZJog
+						distance={jogSpeed.zStep}
+						feedrate={jogSpeed.feedrate}
+						canClick={canClick}
+						threshold={jogThreshold}
+					/>
+					{showA && (
+						<AJog
+							distance={jogSpeed.aStep}
+							feedrate={jogSpeed.feedrate}
+							canClick={canClick}
+							isRotaryMode={isRotaryMode}
+							threshold={jogThreshold}
+						/>
+					)}
+				</div>
+			</div>
+			<div className="flex gap-1 w-full justify-around">
+				<div
+					className={cx("flex items-center justify-center", {
+						"px-7": !showA,
+					})}
+				>
+					<div
+						className={cx("grid gap-x-1 portrait:gap-x-2 items-center", {
+							"grid-cols-2 gap-y-3 portrait:gap-y-6": showA,
+							"grid-cols-1 gap-y-1 xl:gap-y-2 portrait:gap-y-4": !showA,
+						})}
+					>
+						<JogInput
+							label="XY"
+							screenReaderLabel="XY jog distance"
+							currentValue={jogSpeed.xyStep}
+							onChange={updateXYStep}
+						/>
+						<JogInput
+							label="Z"
+							screenReaderLabel="Z jog distance"
+							currentValue={jogSpeed.zStep}
+							onChange={updateZStep}
+						/>
+						{showA && (
+							<JogInput
+								label="A°"
+								screenReaderLabel="A jog distance"
+								currentValue={jogSpeed.aStep}
+								onChange={updateAStep}
+							/>
+						)}
+						<JogInput
+							label="at"
+							screenReaderLabel="Jog feedrate"
+							currentValue={jogSpeed.feedrate}
+							onChange={updateFeedrate}
+						/>
+					</div>
+				</div>
+				<div className="flex float-right portrait:scale-100 max-xl:scale-90 max-xl:-mt-[5px] max-xl:-mb-[5px]">
+					<SpeedSelector handleClick={updateJogValues} />
+				</div>
+			</div>
+		</>
+	);
 }

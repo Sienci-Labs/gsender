@@ -1,16 +1,16 @@
-import { StatCard } from 'app/features/Stats/components/StatCard';
-import { Diagnostic } from 'app/features/Stats/components/Diagnostic.tsx';
-import { ExternalLink } from 'app/features/Stats/components/ExternalLink.tsx';
-import { FaBookBookmark } from 'react-icons/fa6';
-import { ImBubbles4 } from 'react-icons/im';
-import { FaGithub } from 'react-icons/fa';
-import { AlarmPreview } from 'app/features/Stats/components/AlarmPreview.tsx';
-import { CardHeader } from 'app/features/Stats/components/CardHeader.tsx';
-import { JobPreviewList } from 'app/features/Stats/components/JobPreviewList.tsx';
-import { MaintenancePreview } from 'app/features/Stats/components/MaintenancePreview.tsx';
-import { Configuration } from 'app/features/Stats/components/Configuration.tsx';
-import { JobResultsChart } from 'app/features/Stats/JobResultsChart.tsx';
-import { StatTable } from 'app/features/Stats/components/StatTable.tsx';
+import { AlarmPreview } from "app/features/Stats/components/AlarmPreview.tsx";
+import { CardHeader } from "app/features/Stats/components/CardHeader.tsx";
+import { Configuration } from "app/features/Stats/components/Configuration.tsx";
+import { Diagnostic } from "app/features/Stats/components/Diagnostic.tsx";
+import { ExternalLink } from "app/features/Stats/components/ExternalLink.tsx";
+import { JobPreviewList } from "app/features/Stats/components/JobPreviewList.tsx";
+import { MaintenancePreview } from "app/features/Stats/components/MaintenancePreview.tsx";
+import { StatCard } from "app/features/Stats/components/StatCard";
+import { StatTable } from "app/features/Stats/components/StatTable.tsx";
+import { JobResultsChart } from "app/features/Stats/JobResultsChart.tsx";
+import { FaGithub } from "react-icons/fa";
+import { FaBookBookmark } from "react-icons/fa6";
+import { ImBubbles4 } from "react-icons/im";
 
 export function Stats() {
     return (

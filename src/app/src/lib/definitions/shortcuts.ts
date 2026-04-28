@@ -1,5 +1,5 @@
-import { SHORTCUT_CATEGORY } from '../../constants';
-import { BasicObject } from 'app/definitions/general';
+import type { BasicObject } from 'app/definitions/general';
+import type { SHORTCUT_CATEGORY } from '../../constants';
 
 // Types
 

@@ -20,114 +20,114 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-import { useState, useEffect, ReactNode } from 'react';
-import pubsub from 'pubsub-js';
-import cx from 'classnames';
-import { FaExclamationTriangle, FaRedo } from 'react-icons/fa';
-import { Button } from 'app/components/Button';
-import ConfirmationDialogButton from './ConfirmationDialogButton';
-import { DIALOG_CONFIRM, DIALOG_CANCEL } from './ConfirmationDialogLib';
 
-import styles from './index.module.styl';
+import { Button } from "app/components/Button";
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from 'app/components/shadcn/AlertDialog.tsx';
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "app/components/shadcn/AlertDialog.tsx";
+import cx from "classnames";
+import pubsub from "pubsub-js";
+import { type ReactNode, useEffect, useState } from "react";
+import { FaExclamationTriangle, FaRedo } from "react-icons/fa";
+import ConfirmationDialogButton from "./ConfirmationDialogButton";
+import { DIALOG_CANCEL, DIALOG_CONFIRM } from "./ConfirmationDialogLib";
+import styles from "./index.module.styl";
 
 interface DialogOptions {
-    title: string;
-    content: ReactNode;
-    onClose?: () => void;
-    onConfirm?: () => void;
-    confirmLabel?: string;
-    cancelLabel?: string;
-    hideClose?: boolean;
-    hideConfirm?: boolean;
-    show: boolean;
+	title: string;
+	content: ReactNode;
+	onClose?: () => void;
+	onConfirm?: () => void;
+	confirmLabel?: string;
+	cancelLabel?: string;
+	hideClose?: boolean;
+	hideConfirm?: boolean;
+	show: boolean;
 }
 
 const ConfirmationDialog = () => {
-    const [show, setShow] = useState<boolean>(false);
-    const [title, setTitle] = useState<string | null>(null);
-    const [content, setContent] = useState<ReactNode | null>(null);
-    const [onClose, setOnClose] = useState<(() => void) | null>(null);
-    const [onConfirm, setOnConfirm] = useState<(() => void) | null>(null);
-    const [confirmLabel, setConfirmLabel] = useState<string | null>(null);
-    const [cancelLabel, setCancelLabel] = useState<string | null>(null);
-    const [hideClose, setHideClose] = useState(false);
-    const [hideConfirm, setHideConfirm] = useState(false);
+	const [show, setShow] = useState<boolean>(false);
+	const [title, setTitle] = useState<string | null>(null);
+	const [content, setContent] = useState<ReactNode | null>(null);
+	const [onClose, setOnClose] = useState<(() => void) | null>(null);
+	const [onConfirm, setOnConfirm] = useState<(() => void) | null>(null);
+	const [confirmLabel, setConfirmLabel] = useState<string | null>(null);
+	const [cancelLabel, setCancelLabel] = useState<string | null>(null);
+	const [hideClose, setHideClose] = useState(false);
+	const [hideConfirm, setHideConfirm] = useState(false);
 
-    let hideModal = !show;
+	let hideModal = !show;
 
-    useEffect(() => {
-        hideModal = !show;
-    }, [show]);
+	useEffect(() => {
+		hideModal = !show;
+	}, [show]);
 
-    useEffect(() => {
-        const token = pubsub.subscribe(
-            'dialog:new',
-            (_: string, options: DialogOptions) => {
-                setTitle(options.title);
-                setContent(options.content);
-                setOnClose(() => options.onClose);
-                setOnConfirm(() => options.onConfirm);
-                setConfirmLabel(options.confirmLabel || null);
-                setCancelLabel(options.cancelLabel || null);
-                setHideClose(options.hideClose || false);
-                setHideConfirm(options.hideConfirm || false);
-                setShow(options.show);
-            },
-        );
+	useEffect(() => {
+		const token = pubsub.subscribe(
+			"dialog:new",
+			(_: string, options: DialogOptions) => {
+				setTitle(options.title);
+				setContent(options.content);
+				setOnClose(() => options.onClose);
+				setOnConfirm(() => options.onConfirm);
+				setConfirmLabel(options.confirmLabel || null);
+				setCancelLabel(options.cancelLabel || null);
+				setHideClose(options.hideClose || false);
+				setHideConfirm(options.hideConfirm || false);
+				setShow(options.show);
+			},
+		);
 
-        return () => {
-            pubsub.unsubscribe(token);
-        };
-    }, []);
+		return () => {
+			pubsub.unsubscribe(token);
+		};
+	}, []);
 
-    return (
-        <AlertDialog open={show}>
-            <AlertDialogContent className="bg-white">
-                <AlertDialogHeader>
-                    <AlertDialogTitle>{title}</AlertDialogTitle>
-                    <AlertDialogDescription>{content}</AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                    {!hideClose && (
-                        <AlertDialogCancel
-                            onClick={() => {
-                                if (onClose !== null) {
-                                    onClose();
-                                }
-                                setShow(false);
-                            }}
-                        >
-                            {cancelLabel}
-                        </AlertDialogCancel>
-                    )}
-                    {!hideConfirm && (
-                        <AlertDialogAction
-                            onClick={() => {
-                                if (onConfirm !== null) {
-                                    onConfirm();
-                                }
-                                setShow(false);
-                            }}
-                        >
-                            {confirmLabel}
-                        </AlertDialogAction>
-                    )}
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
-    );
-    /*return (
+	return (
+		<AlertDialog open={show}>
+			<AlertDialogContent className="bg-white">
+				<AlertDialogHeader>
+					<AlertDialogTitle>{title}</AlertDialogTitle>
+					<AlertDialogDescription>{content}</AlertDialogDescription>
+				</AlertDialogHeader>
+				<AlertDialogFooter>
+					{!hideClose && (
+						<AlertDialogCancel
+							onClick={() => {
+								if (onClose !== null) {
+									onClose();
+								}
+								setShow(false);
+							}}
+						>
+							{cancelLabel}
+						</AlertDialogCancel>
+					)}
+					{!hideConfirm && (
+						<AlertDialogAction
+							onClick={() => {
+								if (onConfirm !== null) {
+									onConfirm();
+								}
+								setShow(false);
+							}}
+						>
+							{confirmLabel}
+						</AlertDialogAction>
+					)}
+				</AlertDialogFooter>
+			</AlertDialogContent>
+		</AlertDialog>
+	);
+	/*return (
         <div
             className={cx(styles.confirmationDialogWrapper, {
                 [styles.hidden]: hideModal,

@@ -22,36 +22,37 @@
  */
 
 class GrblHalLineParserResultTool {
-    static parse(line) {
-        //   [T:1|0.000,0.000,0.000,0.000|0.000]
-        //
-        //const r = line.match(/\[T:(\d+)\|([-\d.]+(?:,[-\d.]+){2,6})\|([-\d.]+)]/);
+	static parse(line) {
+		//   [T:1|0.000,0.000,0.000,0.000|0.000]
+		//
+		//const r = line.match(/\[T:(\d+)\|([-\d.]+(?:,[-\d.]+){2,6})\|([-\d.]+)]/);
 
-        const r = line.match(/\[T:(\d+)\|([-\d.]+(?:,[-\d.]+){2,6})\|([-\d.]+)(.+)?]/);
+		const r = line.match(
+			/\[T:(\d+)\|([-\d.]+(?:,[-\d.]+){2,6})\|([-\d.]+)(.+)?]/,
+		);
 
-        if (!r) {
-            return null;
-        }
+		if (!r) {
+			return null;
+		}
 
-        const axes = ['x', 'y', 'z', 'a', 'b', 'c'];
+		const axes = ["x", "y", "z", "a", "b", "c"];
 
-        const offsetMap = r[2].split(',')
-            .reduce((acc, cur, i) => {
-                acc[axes[i]] = Number(Number(cur).toFixed(3));
-                return acc;
-            }, {});
+		const offsetMap = r[2].split(",").reduce((acc, cur, i) => {
+			acc[axes[i]] = Number(Number(cur).toFixed(3));
+			return acc;
+		}, {});
 
-        const payload = {
-            id: Number(r[1]),
-            toolOffsets: offsetMap,
-            toolRadius: Number(r[3])
-        };
+		const payload = {
+			id: Number(r[1]),
+			toolOffsets: offsetMap,
+			toolRadius: Number(r[3]),
+		};
 
-        return {
-            type: GrblHalLineParserResultTool,
-            payload: payload
-        };
-    }
+		return {
+			type: GrblHalLineParserResultTool,
+			payload: payload,
+		};
+	}
 }
 
 export default GrblHalLineParserResultTool;

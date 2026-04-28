@@ -1,4 +1,4 @@
-import { useState, useEffect, ReactNode } from 'react';
+import { type ReactNode, useEffect, useState } from "react";
 
 interface PositionSetterProps {
     xPosition: string;
@@ -21,38 +21,38 @@ export function PositionSetter({
     units = 'mm',
     actionButton,
 }: PositionSetterProps) {
-    const [x, setX] = useState(initialX);
-    const [y, setY] = useState(initialY);
-    const [z, setZ] = useState(initialZ || '0');
+	const [x, setX] = useState(initialX);
+	const [y, setY] = useState(initialY);
+	const [z, setZ] = useState(initialZ || "0");
 
-    useEffect(() => {
-        setX(initialX);
-    }, [initialX]);
+	useEffect(() => {
+		setX(initialX);
+	}, [initialX]);
 
-    useEffect(() => {
-        setY(initialY);
-    }, [initialY]);
+	useEffect(() => {
+		setY(initialY);
+	}, [initialY]);
 
-    useEffect(() => {
-        if (initialZ !== undefined) {
-            setZ(initialZ);
-        }
-    }, [initialZ]);
+	useEffect(() => {
+		if (initialZ !== undefined) {
+			setZ(initialZ);
+		}
+	}, [initialZ]);
 
-    const handleXChange = (value: string) => {
-        setX(value);
-        onPositionChange({ x: value, y, ...(showZ && { z }) });
-    };
+	const handleXChange = (value: string) => {
+		setX(value);
+		onPositionChange({ x: value, y, ...(showZ && { z }) });
+	};
 
-    const handleYChange = (value: string) => {
-        setY(value);
-        onPositionChange({ x, y: value, ...(showZ && { z }) });
-    };
+	const handleYChange = (value: string) => {
+		setY(value);
+		onPositionChange({ x, y: value, ...(showZ && { z }) });
+	};
 
-    const handleZChange = (value: string) => {
-        setZ(value);
-        onPositionChange({ x, y, z: value });
-    };
+	const handleZChange = (value: string) => {
+		setZ(value);
+		onPositionChange({ x, y, z: value });
+	};
 
     return (
         <div className="space-y-4">
@@ -101,7 +101,7 @@ export function PositionSetter({
                 </div>
             </div>
 
-            {actionButton && <div>{actionButton}</div>}
-        </div>
-    );
+			{actionButton && <div>{actionButton}</div>}
+		</div>
+	);
 }
