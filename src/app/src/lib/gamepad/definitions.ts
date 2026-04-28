@@ -1,5 +1,5 @@
-import type { AXES_T } from "app/features/Axes/definitions";
 import type { CommandKeys } from "app/lib/definitions/shortcuts";
+import type { AXES_T } from "app/store/definitions";
 
 export interface GamepadDetail {
 	detail: {

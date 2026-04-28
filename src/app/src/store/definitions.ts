@@ -10,7 +10,9 @@ import {
 	FIRMWARE_TYPES_T,
 } from "app/definitions/firmware";
 import { BasicObject, BasicPosition, BBox } from "app/definitions/general";
-import { Axes } from "app/features/Axes/definitions";
+import type { MDI, Shuttle } from "app/definitions/general";
+import type { AXES } from "app/constants";
+import type { JogSpeed } from "app/features/Jogging/definitions";
 import { Connection } from "app/features/Connection/definitions";
 import { Console } from "app/features/Console/definitions";
 import { JobStatus } from "app/features/FileControl/definitions";
@@ -58,6 +60,28 @@ export interface FirmwareOptions {
 }
 
 export interface ToolTable {}
+
+export type AXES_T = (typeof AXES)[keyof typeof AXES];
+
+export interface Axes {
+	minimized: boolean;
+	axes: AXES_T[];
+	jog: {
+		xyStep: number;
+		zStep: number;
+		aStep: number;
+		feedrate: number;
+		keypad: boolean;
+		rapid: JogSpeed;
+		normal: JogSpeed;
+		precise: JogSpeed;
+		step: number;
+		threshold: number;
+		distances: number[];
+	};
+	mdi: MDI;
+	shuttle: Shuttle;
+}
 
 export interface ControllerSettings {
 	toolTable?: any;

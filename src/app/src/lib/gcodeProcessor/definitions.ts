@@ -1,5 +1,5 @@
 import type { BasicType, UNITS_EN } from "app/definitions/general";
-import type { AXES_T } from "app/features/Axes/definitions";
+import type { AXES_T } from "app/store/definitions";
 
 // Types
 

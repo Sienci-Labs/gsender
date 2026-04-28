@@ -1,5 +1,5 @@
 import type { UNITS_GCODE } from "app/definitions/general";
-import type { AXES_T } from "app/features/Axes/definitions";
+import type { AXES_T } from "app/store/definitions";
 import type {
 	PROBE_DIRECTIONS,
 	PROBE_TYPES_T,

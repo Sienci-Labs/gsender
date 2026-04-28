@@ -1,5 +1,5 @@
 import type { BasicType, BBox } from "app/definitions/general";
-import type { AXES_T } from "app/features/Axes/definitions";
+import type { AXES_T } from "app/store/definitions";
 import Interpreter from "gcode-interpreter";
 import objtools from "objtools";
 import { METRIC_UNITS } from "../../constants";
