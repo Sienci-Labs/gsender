@@ -14,7 +14,7 @@ import {
     AlertDialogHeader,
     AlertDialogContent,
     AlertDialogTrigger,
-} from 'app/components/shadcn/AlertDialog';
+} from '@gsender/ui/shadcn/AlertDialog';
 
 import xAxisCalibrationImage1 from '../assets/X_axis-calibration_1.png';
 import xAxisCalibrationImage2 from '../assets/X_axis-calibration_2.png';

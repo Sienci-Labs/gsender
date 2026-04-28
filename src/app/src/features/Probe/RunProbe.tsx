@@ -28,7 +28,7 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-} from 'app/components/shadcn/Dialog';
+} from '@gsender/ui/shadcn/Dialog';
 import { Button } from 'app/components/Button';
 import cx from 'classnames';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';

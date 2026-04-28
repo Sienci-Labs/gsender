@@ -13,11 +13,11 @@ import {
     VISUALIZER_SECONDARY,
 } from 'app/constants';
 import { convertToImperial, convertToMetric } from 'app/lib/units';
-import { Switch } from 'app/components/shadcn/Switch';
+import { Switch } from '@gsender/ui/shadcn/Switch';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { ControlledInput } from 'app/components/ControlledInput';
 import defaultState from 'app/store/defaultState';
-import { Tabs, TabsList, TabsTrigger } from 'app/components/shadcn/Tabs';
+import { Tabs, TabsList, TabsTrigger } from '@gsender/ui/shadcn/Tabs';
 import controller from 'app/lib/controller';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 import InputArea from 'app/components/InputArea';

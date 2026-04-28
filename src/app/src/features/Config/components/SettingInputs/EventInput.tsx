@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import React from 'react';
 import { toast } from 'app/lib/toaster';
 import api from 'app/api';
-import { Switch } from 'app/components/shadcn/Switch';
+import { Switch } from '@gsender/ui/shadcn/Switch';
 import MacroForm from 'app/features/Macros/MacroForm';
 
 interface EventInputProps {

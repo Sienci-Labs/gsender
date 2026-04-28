@@ -15,7 +15,7 @@ import { GAMEPAD_MODAL } from '../../utils/constants';
 
 import get from 'lodash/get';
 import classNames from 'classnames';
-import { Input } from 'app/components/shadcn/Input';
+import { Input } from '@gsender/ui/shadcn/Input';
 
 const ButtonActionsTable = () => {
     const {

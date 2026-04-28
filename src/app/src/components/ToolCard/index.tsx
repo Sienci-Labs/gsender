@@ -1,7 +1,7 @@
 import { Link } from 'react-router';
 import { IconType } from 'react-icons';
 
-import { Card, CardTitle, CardDescription } from 'app/components/shadcn/Card';
+import { Card, CardTitle, CardDescription } from '@gsender/ui/shadcn/Card';
 
 type ToolCardProps = {
     title: string;

@@ -17,7 +17,7 @@ import {
     AlertDialogFooter,
     AlertDialogCancel,
     AlertDialogAction,
-} from 'app/components/shadcn/AlertDialog';
+} from '@gsender/ui/shadcn/AlertDialog';
 
 interface AxisRowProps {
     label: string;

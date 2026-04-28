@@ -21,7 +21,7 @@
  *
  */
 
-import { Switch } from 'app/components/shadcn/Switch';
+import { Switch } from '@gsender/ui/shadcn/Switch';
 import { LASER_MODE } from 'app/constants';
 import Tooltip from 'app/components/Tooltip';
 

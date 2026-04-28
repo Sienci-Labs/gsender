@@ -7,7 +7,7 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-} from 'app/components/shadcn/Dialog.tsx';
+} from '@gsender/ui/shadcn/Dialog.tsx';
 
 import { tv } from 'tailwind-variants';
 import { useContext, useRef } from 'react';

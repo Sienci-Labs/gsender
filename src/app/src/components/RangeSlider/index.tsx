@@ -22,7 +22,7 @@
  */
 
 import React, { PointerEventHandler } from 'react';
-import { Slider } from '../shadcn/Slider';
+import { Slider } from '@gsender/ui/shadcn/Slider';
 import { FaMinus, FaPlus, FaUndo } from 'react-icons/fa';
 import cx from 'classnames';
 

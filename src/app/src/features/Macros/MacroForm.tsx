@@ -9,8 +9,8 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-} from 'app/components/shadcn/Dialog';
-import { Input } from 'app/components/shadcn/Input';
+} from '@gsender/ui/shadcn/Dialog';
+import { Input } from '@gsender/ui/shadcn/Input';
 import Tooltip from 'app/components/Tooltip';
 
 import { MACRO_VARIABLES } from './constants';

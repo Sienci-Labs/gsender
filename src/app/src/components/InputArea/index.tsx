@@ -1,5 +1,5 @@
 import React from 'react';
-import { Label } from '../shadcn/Label';
+import { Label } from '@gsender/ui/shadcn/Label';
 
 const InputArea = ({
     children,

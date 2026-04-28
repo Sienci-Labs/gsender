@@ -5,7 +5,7 @@ import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from 'app/components/shadcn/Popover';
+} from '@gsender/ui/shadcn/Popover';
 import { Button } from 'app/components/Button';
 import { UnitInput } from 'app/components/UnitInput';
 import { DROPosition } from 'app/features/DRO/utils/DRO';

@@ -25,7 +25,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { LuTrash, LuPencil, LuPlus } from 'react-icons/lu';
 
-import { Switch } from 'app/components/shadcn/Switch';
+import { Switch } from '@gsender/ui/shadcn/Switch';
 import shuttleEvents from 'app/lib/shuttleEvents';
 import {
     Table,
@@ -34,7 +34,7 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from 'app/components/shadcn/Table';
+} from '@gsender/ui/shadcn/Table';
 import {
     CARVING_CATEGORY,
     OVERRIDES_CATEGORY,

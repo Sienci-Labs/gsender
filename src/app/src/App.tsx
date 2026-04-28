@@ -1,16 +1,29 @@
-import { useEffect } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 import { HashRouter } from 'react-router';
 
-import { store as reduxStore } from 'app/store/redux';
+import { store as reduxStore, RootState } from 'app/store/redux';
 import rootSaga from 'app/store/redux/sagas';
 import { sagaMiddleware } from 'app/store/redux/sagas';
 import store from 'app/store';
 import * as user from 'app/lib/user';
 import controller from 'app/lib/controller';
-import { Toaster } from './components/shadcn/Sonner';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { FocusTrappingProvider } from '@gsender/ui/lib/focus-trapping';
+import { Toaster } from '@gsender/ui/shadcn/Sonner';
 import { ReactRoutes } from './react-routes';
 import { AccessibilitySettingsHandler } from './features/Helper/AccessibilitySettingsHandler';
+
+function FocusTrappingBridge({ children }: { children: ReactNode }) {
+    const focusTrapping = useTypedSelector(
+        (state: RootState) => state.preferences.accessibility.focusTrapping,
+    );
+    return (
+        <FocusTrappingProvider value={focusTrapping}>
+            {children}
+        </FocusTrappingProvider>
+    );
+}
 
 function App() {
     useEffect(() => {
@@ -35,16 +48,18 @@ function App() {
     return (
         <>
             <ReduxProvider store={reduxStore}>
-                <AccessibilitySettingsHandler />
-                <Toaster
-                    richColors
-                    closeButton
-                    theme="light"
-                    visibleToasts={5}
-                />
-                <HashRouter>
-                    <ReactRoutes />
-                </HashRouter>
+                <FocusTrappingBridge>
+                    <AccessibilitySettingsHandler />
+                    <Toaster
+                        richColors
+                        closeButton
+                        theme="light"
+                        visibleToasts={5}
+                    />
+                    <HashRouter>
+                        <ReactRoutes />
+                    </HashRouter>
+                </FocusTrappingBridge>
             </ReduxProvider>
         </>
     );

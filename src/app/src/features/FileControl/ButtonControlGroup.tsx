@@ -23,7 +23,7 @@ import {
     DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuTrigger,
-} from 'app/components/shadcn/Dropdown';
+} from '@gsender/ui/shadcn/Dropdown';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 import {
@@ -36,7 +36,7 @@ import {
     AlertDialogFooter,
     AlertDialogCancel,
     AlertDialogAction,
-} from 'app/components/shadcn/AlertDialog';
+} from '@gsender/ui/shadcn/AlertDialog';
 
 import { getRecentFiles } from './utils/recentfiles';
 import { ReloadFileAlert } from 'app/features/FileControl/components/ReloadFileAlert.tsx';

@@ -20,7 +20,7 @@ import {
     Popover,
     PopoverTrigger,
     PopoverContent,
-} from 'app/components/shadcn/Popover';
+} from '@gsender/ui/shadcn/Popover';
 
 export enum ConnectionState {
     DISCONNECTED,

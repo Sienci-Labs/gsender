@@ -3,8 +3,8 @@ import {
     TooltipTrigger,
     TooltipContent,
     TooltipProvider,
-} from 'app/components/shadcn/Tooltip';
-import { Badge } from 'app/components/shadcn/Badge';
+} from '@gsender/ui/shadcn/Tooltip';
+import { Badge } from '@gsender/ui/shadcn/Badge';
 import { getBitfieldArr } from './utils.ts';
 
 interface BitValueIndicatorProps {

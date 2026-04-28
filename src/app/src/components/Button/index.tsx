@@ -1,7 +1,7 @@
 import React, { JSX } from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
 
-import { Button as ShadcnButton } from 'app/components/shadcn/Button';
+import { Button as ShadcnButton } from '@gsender/ui/shadcn/Button';
 import Tooltip, { TooltipProps } from 'app/components/Tooltip';
 
 export const buttonStyle = tv({

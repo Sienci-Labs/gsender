@@ -3,7 +3,7 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-} from 'app/components/shadcn/Dialog.tsx';
+} from '@gsender/ui/shadcn/Dialog.tsx';
 import { MaintenanceTaskForm } from 'app/features/Stats/components/MaintenanceTaskForm.tsx';
 import { buttonStyle } from 'app/features/Stats/components/MaintenanceAddTaskDialog.tsx';
 import { useContext, useEffect, useState } from 'react';
@@ -20,7 +20,7 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
-} from 'app/components/shadcn/AlertDialog';
+} from '@gsender/ui/shadcn/AlertDialog';
 // import Button from 'app/components/Button';
 
 interface MaintenanceEditTaskDialogProps {

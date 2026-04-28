@@ -3,8 +3,8 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-} from 'app/components/shadcn/Dialog';
-import { RadioGroup, RadioGroupItem } from 'app/components/shadcn/RadioGroup';
+} from '@gsender/ui/shadcn/Dialog';
+import { RadioGroup, RadioGroupItem } from '@gsender/ui/shadcn/RadioGroup';
 import { IMPERIAL_UNITS, METRIC_UNITS } from 'app/constants';
 import { UNITS_EN } from 'app/definitions/general';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';

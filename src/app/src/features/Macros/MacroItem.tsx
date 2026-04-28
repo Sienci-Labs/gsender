@@ -7,7 +7,7 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from 'app/components/shadcn/Dropdown';
+} from '@gsender/ui/shadcn/Dropdown';
 import Tooltip from 'app/components/Tooltip';
 import { toast } from 'app/lib/toaster';
 import Button from 'app/components/Button';

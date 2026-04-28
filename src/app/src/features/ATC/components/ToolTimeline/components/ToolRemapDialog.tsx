@@ -6,17 +6,17 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-} from 'app/components/shadcn/Dialog';
+} from '@gsender/ui/shadcn/Dialog';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import {
     Select,
     SelectContent,
     SelectTrigger,
     SelectValue,
-} from 'app/components/shadcn/Select';
+} from '@gsender/ui/shadcn/Select';
 import { Button } from 'app/components/Button';
-import { Label } from 'app/components/shadcn/Label';
-import { Badge } from 'app/components/shadcn/Badge';
+import { Label } from '@gsender/ui/shadcn/Label';
+import { Badge } from '@gsender/ui/shadcn/Badge';
 import {
     ArrowRight,
 } from 'lucide-react';

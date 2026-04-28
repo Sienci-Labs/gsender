@@ -5,7 +5,7 @@ import { LuPaintbrush } from 'react-icons/lu';
 import { FaEllipsisH } from 'react-icons/fa';
 
 import { Button } from 'app/components/Button';
-import { Input } from 'app/components/shadcn/Input';
+import { Input } from '@gsender/ui/shadcn/Input';
 import { addToInputHistory } from 'app/store/redux/slices/console.slice';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import controller from 'app/lib/controller';
@@ -14,7 +14,7 @@ import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from 'app/components/shadcn/Popover';
+} from '@gsender/ui/shadcn/Popover';
 
 const COPY_HISTORY_LIMIT = 50;
 

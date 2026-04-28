@@ -44,9 +44,9 @@ import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from 'app/components/shadcn/Popover';
+} from '@gsender/ui/shadcn/Popover';
 
-import { Input } from 'app/components/shadcn/Input';
+import { Input } from '@gsender/ui/shadcn/Input';
 import { Button } from 'app/components/Button';
 
 import {

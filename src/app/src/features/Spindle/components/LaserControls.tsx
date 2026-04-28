@@ -23,7 +23,7 @@
 
 import React from 'react';
 
-import { Slider } from 'app/components/shadcn/Slider';
+import { Slider } from '@gsender/ui/shadcn/Slider';
 import { ControlledInput } from 'app/components/ControlledInput';
 import { FaLightbulb, FaRegLightbulb, FaSatelliteDish } from 'react-icons/fa';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';

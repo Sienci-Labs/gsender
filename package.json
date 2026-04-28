@@ -78,7 +78,7 @@
     "test": "tap test/*.js --no-timeout --node-arg=--require --node-arg=esbuild-register",
     "coveralls": "tap test/*.js --coverage --coverage-report=text-lcov --nyc-arg=--require --nyc-arg=esbuild-register | coveralls",
     "cypress:open": "cypress open",
-    "vite:build": "cross-env NODE_OPTIONS='--max-old-space-size=8192' yarn --cwd ./src/app build",
+    "vite:build": "cross-env NODE_OPTIONS='--max-old-space-size=8192' bash -c 'cd src/app && bun run build:client'",
     "postvite:build": "bash -c \"mkdir -p dist/gsender/app; cp -af src/app/{favicon.ico,images,assets} dist/gsender/app/\"",
     "install:packages": "yarn install && yarn install --prefix /src/app",
     "check-types": "tsc --noEmit -p ./src/app/src",

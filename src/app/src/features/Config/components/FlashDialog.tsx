@@ -3,7 +3,7 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-} from 'app/components/shadcn/Dialog';
+} from '@gsender/ui/shadcn/Dialog';
 import { useEffect, useRef, useState } from 'react';
 import {
     Select,
@@ -14,7 +14,7 @@ import {
     SelectSeparator,
     SelectTrigger,
     SelectValue,
-} from 'app/components/shadcn/Select.tsx';
+} from '@gsender/ui/shadcn/Select.tsx';
 import { Button } from 'app/components/Button';
 import { toast } from 'app/lib/toaster';
 import controller from 'app/lib/controller.ts';

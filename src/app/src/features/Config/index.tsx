@@ -19,7 +19,7 @@ import {
     TabsContent,
     TabsList,
     TabsTrigger,
-} from 'app/components/shadcn/Tabs';
+} from '@gsender/ui/shadcn/Tabs';
 import { gSenderSetting, SettingsMenuSection } from './assets/SettingsMenu';
 import { convertEIDToNumber } from 'app/lib/numeral';
 import controller from 'app/lib/controller.ts';

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import pubsub from 'pubsub-js';
 
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import { Switch } from 'app/components/shadcn/Switch';
+import { Switch } from '@gsender/ui/shadcn/Switch';
 
 import Size from './Size';
 import Info from './Info';
@@ -12,7 +12,7 @@ import {
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
-} from 'app/components/shadcn/Tooltip';
+} from '@gsender/ui/shadcn/Tooltip';
 import { getRecentFiles } from '../utils/recentfiles';
 import { RecentFile } from '../definitions';
 import { Job } from 'app/features/Stats/utils/StatContext';
@@ -24,7 +24,7 @@ import { JOB_STATUS } from 'app/constants';
 import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
 import api from 'app/api';
 import isElectron from 'is-electron';
-import { ScrollArea } from 'app/components/shadcn/ScrollArea';
+import { ScrollArea } from '@gsender/ui/shadcn/ScrollArea';
 import { LiaFileUploadSolid } from 'react-icons/lia';
 
 interface Props {

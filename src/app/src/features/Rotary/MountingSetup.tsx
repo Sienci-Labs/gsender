@@ -8,9 +8,9 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from 'app/components/shadcn/Dialog';
+} from '@gsender/ui/shadcn/Dialog';
 import Button from 'app/components/Button';
-import { RadioGroup, RadioGroupItem } from 'app/components/shadcn/RadioGroup';
+import { RadioGroup, RadioGroupItem } from '@gsender/ui/shadcn/RadioGroup';
 import { toast } from 'app/lib/toaster';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 import {

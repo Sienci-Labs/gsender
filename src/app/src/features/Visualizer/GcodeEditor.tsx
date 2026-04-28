@@ -35,7 +35,7 @@ import {
     a11yLight,
     a11yDark,
 } from 'react-syntax-highlighter/dist/esm/styles/hljs';
-import { Input } from 'app/components/shadcn/Input';
+import { Input } from '@gsender/ui/shadcn/Input';
 
 type GcodeEditorProps = {
     onClose: () => void;

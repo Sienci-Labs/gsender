@@ -3,7 +3,7 @@ import {
     TabsContent,
     TabsList,
     TabsTrigger,
-} from 'app/components/shadcn/Tabs';
+} from '@gsender/ui/shadcn/Tabs';
 
 import NotificationList from './NotificationList';
 

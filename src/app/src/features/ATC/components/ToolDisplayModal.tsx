@@ -1,4 +1,4 @@
-import { Dialog, DialogContent } from 'app/components/shadcn/Dialog.tsx';
+import { Dialog, DialogContent } from '@gsender/ui/shadcn/Dialog.tsx';
 import { DialogTitle } from '@radix-ui/react-dialog';
 import { ToolTable } from 'app/features/ATC/components/ToolTable.tsx';
 import Button from 'app/components/Button';

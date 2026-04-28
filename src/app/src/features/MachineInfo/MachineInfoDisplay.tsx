@@ -4,7 +4,7 @@ import ModalRow from 'app/features/MachineInfo/ModalRow.tsx';
 import PinRow from 'app/features/MachineInfo/PinRow.tsx';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import store from 'app/store';
-import { Switch } from 'app/components/shadcn/Switch';
+import { Switch } from '@gsender/ui/shadcn/Switch';
 import controller from 'app/lib/controller.ts';
 import get from 'lodash/get';
 import { KeepoutToggle } from 'app/features/ATC/components/KeepOut/KeepOutToggle.tsx';

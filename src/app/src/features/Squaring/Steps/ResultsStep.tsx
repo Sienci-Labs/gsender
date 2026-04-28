@@ -12,7 +12,7 @@ import {
     AlertDialogHeader,
     AlertDialogContent,
     AlertDialogTrigger,
-} from 'app/components/shadcn/AlertDialog';
+} from '@gsender/ui/shadcn/AlertDialog';
 
 import { useSquaring } from '../context/SquaringContext';
 import {

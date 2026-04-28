@@ -4,8 +4,7 @@ import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog';
 import { IoIosWarning } from 'react-icons/io';
 
 import cx from 'classnames';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import { RootState } from 'app/store/redux';
+import { useFocusTrapping } from '../lib/focus-trapping';
 import { buttonVariants } from './Button';
 
 const AlertDialog = AlertDialogPrimitive.Root;
@@ -33,9 +32,7 @@ const AlertDialogContent = React.forwardRef<
     React.ElementRef<typeof AlertDialogPrimitive.Content>,
     React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Content>
 >(({ className, ...props }, ref) => {
-    const { focusTrapping } = useTypedSelector(
-        (state: RootState) => state.preferences.accessibility,
-    );
+    const focusTrapping = useFocusTrapping();
 
     return (
         <AlertDialogPortal>

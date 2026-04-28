@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 import cx from 'classnames';
 
-import { Input as ShadCNInput } from 'app/components/shadcn/Input';
+import { Input as ShadCNInput } from '@gsender/ui/shadcn/Input';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label?: string;

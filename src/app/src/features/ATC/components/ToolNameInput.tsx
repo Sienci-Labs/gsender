@@ -3,7 +3,7 @@ import {
     lookupToolName,
     setToolName,
 } from 'app/features/ATC/utils/ATCFunctions.ts';
-import { Input } from 'app/components/shadcn/Input.tsx';
+import { Input } from '@gsender/ui/shadcn/Input.tsx';
 import pubsub from 'pubsub-js';
 
 const TOOL_OPTIONS = {

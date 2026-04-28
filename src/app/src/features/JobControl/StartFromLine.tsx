@@ -1,6 +1,6 @@
 import { JSX, useEffect, useState } from 'react';
 import cx from 'classnames';
-import { Button as ShadButton } from 'app/components/shadcn/Button';
+import { Button as ShadButton } from '@gsender/ui/shadcn/Button';
 import { Button } from 'app/components/Button';
 import { MdFormatListNumbered } from 'react-icons/md';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
@@ -13,7 +13,7 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-} from 'app/components/shadcn/Dialog';
+} from '@gsender/ui/shadcn/Dialog';
 import Tooltip from 'app/components/Tooltip';
 import { ControlledInput } from 'app/components/ControlledInput';
 import { FaPlay } from 'react-icons/fa';

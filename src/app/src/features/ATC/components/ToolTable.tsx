@@ -4,7 +4,7 @@ import {
     Collapsible,
     CollapsibleContent,
     CollapsibleTrigger,
-} from 'app/components/shadcn/Collapsible.tsx';
+} from '@gsender/ui/shadcn/Collapsible.tsx';
 import { Badge } from 'app/features/ATC/components/ui/Badge.tsx';
 import { ChevronDown } from 'lucide-react';
 import { ProbeButton } from 'app/features/ATC/components/ui/ProbeButton.tsx';
@@ -16,7 +16,7 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from 'app/components/shadcn/Table';
+} from '@gsender/ui/shadcn/Table';
 
 import { ToolNameInput } from 'app/features/ATC/components/ToolNameInput.tsx';
 import Button from 'app/components/Button';

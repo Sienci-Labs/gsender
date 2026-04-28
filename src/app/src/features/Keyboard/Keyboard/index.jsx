@@ -43,7 +43,7 @@ import {
     DialogDescription,
     DialogHeader,
     DialogTitle,
-} from 'app/components/shadcn/Dialog';
+} from '@gsender/ui/shadcn/Dialog';
 import combokeys from 'app/lib/combokeys';
 import {
     holdShortcuts,

@@ -21,8 +21,8 @@
  *
  */
 
-import { Slider } from 'app/components/shadcn/Slider';
-import { Input } from 'app/components/shadcn/Input';
+import { Slider } from '@gsender/ui/shadcn/Slider';
+import { Input } from '@gsender/ui/shadcn/Input';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { FaBan, FaRedoAlt, FaUndoAlt } from 'react-icons/fa';
 import { ActiveStateButton } from 'app/components/ActiveStateButton';

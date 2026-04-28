@@ -15,7 +15,7 @@ import {
     COOLANT_CATEGORY,
     ALL_CATEGORIES,
 } from 'app/constants';
-import { Tabs, TabsList, TabsTrigger } from 'app/components/shadcn/Tabs';
+import { Tabs, TabsList, TabsTrigger } from '@gsender/ui/shadcn/Tabs';
 import { cn } from 'app/lib/utils';
 
 const CategoryFilter = ({ onChange, filterCategory }) => {

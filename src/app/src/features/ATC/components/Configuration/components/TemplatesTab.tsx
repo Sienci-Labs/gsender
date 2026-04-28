@@ -7,7 +7,7 @@ import React, {
     useState,
 } from 'react';
 import { Button } from 'app/components/Button';
-import { Badge } from 'app/components/shadcn/Badge';
+import { Badge } from '@gsender/ui/shadcn/Badge';
 import {
     Upload,
     FileText,

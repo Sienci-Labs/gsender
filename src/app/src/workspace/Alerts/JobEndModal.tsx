@@ -6,8 +6,8 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
-} from 'app/components/shadcn/AlertDialog';
-import { Button } from 'app/components/shadcn/Button';
+} from '@gsender/ui/shadcn/AlertDialog';
+import { Button } from '@gsender/ui/shadcn/Button';
 import { JOB_STATUS } from 'app/constants';
 import { Job } from 'app/features/Stats/utils/StatContext';
 import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';

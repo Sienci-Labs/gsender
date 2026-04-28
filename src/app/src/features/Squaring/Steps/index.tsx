@@ -10,7 +10,7 @@ import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from 'app/components/shadcn/Popover';
+} from '@gsender/ui/shadcn/Popover';
 
 import { useSquaring } from '../context/SquaringContext';
 import MarkingStep from './MarkingStep';

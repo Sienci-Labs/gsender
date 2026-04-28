@@ -8,7 +8,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
     AlertDialogTrigger,
-} from 'app/components/shadcn/AlertDialog.tsx';
+} from '@gsender/ui/shadcn/AlertDialog.tsx';
 import { Button } from 'app/components/Button';
 import { FaRedo } from 'react-icons/fa';
 

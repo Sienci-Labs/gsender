@@ -4,7 +4,7 @@ import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from 'app/components/shadcn/Popover';
+} from '@gsender/ui/shadcn/Popover';
 import useKeybinding from 'app/lib/useKeybinding.ts';
 import useShuttleEvents from 'app/hooks/useShuttleEvents.ts';
 import { TOOLBAR_CATEGORY } from 'app/constants';

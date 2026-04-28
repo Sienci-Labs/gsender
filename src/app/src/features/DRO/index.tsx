@@ -43,7 +43,7 @@ import {
     AlertDialogFooter,
     AlertDialogCancel,
     AlertDialogAction,
-} from 'app/components/shadcn/AlertDialog';
+} from '@gsender/ui/shadcn/AlertDialog';
 import { UnitBadge } from 'app/features/DRO/component/UnitBadge.tsx';
 import { Parking } from 'app/features/DRO/component/Parking.tsx';
 

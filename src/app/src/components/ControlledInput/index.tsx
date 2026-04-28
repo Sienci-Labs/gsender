@@ -5,7 +5,7 @@ import {
     useEffect,
     useState,
 } from 'react';
-import { Input as ShadcnInput } from 'app/components/shadcn/Input';
+import { Input as ShadcnInput } from '@gsender/ui/shadcn/Input';
 
 type InputProps = ComponentProps<'input'> & {
     suffix?: ReactNode;

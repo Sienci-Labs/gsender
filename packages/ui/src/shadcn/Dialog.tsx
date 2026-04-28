@@ -5,8 +5,7 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 
 import cx from 'classnames';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import { RootState } from 'app/store/redux';
+import { useFocusTrapping } from '../lib/focus-trapping';
 
 const Dialog = DialogPrimitive.Root;
 
@@ -35,9 +34,7 @@ const DialogContent = React.forwardRef<
     React.ElementRef<typeof DialogPrimitive.Content>,
     React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
 >(({ className, children, ...props }, ref) => {
-    const { focusTrapping } = useTypedSelector(
-        (state: RootState) => state.preferences.accessibility,
-    );
+    const focusTrapping = useFocusTrapping();
 
     return (
         <DialogPortal>

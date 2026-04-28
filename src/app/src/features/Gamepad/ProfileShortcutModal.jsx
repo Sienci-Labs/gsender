@@ -11,10 +11,10 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-} from 'app/components/shadcn/Dialog';
+} from '@gsender/ui/shadcn/Dialog';
 import shuttleEvents from 'app/lib/shuttleEvents';
 
-import { Input } from 'app/components/shadcn/Input';
+import { Input } from '@gsender/ui/shadcn/Input';
 
 import { AVAILABILITY_TYPES } from '../utils';
 import Availability from './Availability';

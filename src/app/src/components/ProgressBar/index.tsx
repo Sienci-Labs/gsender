@@ -1,4 +1,4 @@
-import { Progress } from 'app/components/shadcn/Progress.tsx';
+import { Progress } from '@gsender/ui/shadcn/Progress.tsx';
 
 export function ProgressBar({ sent, total }) {
     const now = sent === 0 && total === 0 ? 0 : (sent / total).toFixed(1) * 100;

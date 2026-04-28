@@ -8,7 +8,7 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from 'app/components/shadcn/Table';
+} from '@gsender/ui/shadcn/Table';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 import controller from 'app/lib/controller.ts';
 import reduxStore from 'app/store/redux';

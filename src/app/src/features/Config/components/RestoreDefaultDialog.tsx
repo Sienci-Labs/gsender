@@ -8,7 +8,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
     AlertDialogTrigger,
-} from 'app/components/shadcn/AlertDialog.tsx';
+} from '@gsender/ui/shadcn/AlertDialog.tsx';
 import { ActionButton } from 'app/features/Config/components/ActionButton.tsx';
 import { GrRevert } from 'react-icons/gr';
 import store from 'app/store';
@@ -20,7 +20,7 @@ import controller from 'app/lib/controller.ts';
 import { resolveGrblCoreDefaults } from 'app/features/Config/utils/grblCoreMigration.ts';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import { cn } from 'app/lib/utils.ts';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'app/components/shadcn/Tooltip.tsx';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@gsender/ui/shadcn/Tooltip.tsx';
 
 function getMachineProfile(id: number) {
     const profile = machineProfiles.find((profile) => profile.id === id);

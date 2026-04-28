@@ -35,8 +35,8 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
-} from 'app/components/shadcn/AlertDialog';
-import { Button } from 'app/components/shadcn/Button';
+} from '@gsender/ui/shadcn/AlertDialog';
+import { Button } from '@gsender/ui/shadcn/Button';
 import { toast } from 'app/lib/toaster';
 
 interface Props {

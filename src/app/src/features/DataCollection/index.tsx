@@ -6,7 +6,7 @@ import {
     SheetContent,
     SheetHeader,
     SheetTitle,
-} from 'app/components/shadcn/Sheet';
+} from '@gsender/ui/shadcn/Sheet';
 import api from 'app/api';
 import { USER_DATA_COLLECTION } from 'app/constants';
 import Button from 'app/components/Button';

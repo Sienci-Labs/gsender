@@ -5,7 +5,7 @@ import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from 'app/components/shadcn/Popover';
+} from '@gsender/ui/shadcn/Popover';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { NotificationDisplay } from 'app/features/NotificationsArea/NotificationDisplay';
 import useKeybinding from 'app/lib/useKeybinding';

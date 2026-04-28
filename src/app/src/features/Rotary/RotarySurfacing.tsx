@@ -4,8 +4,8 @@ import cx from 'classnames';
 
 import { Button } from 'app/components/Button';
 import { ControlledInput } from 'app/components/ControlledInput';
-import { Switch } from 'app/components/shadcn/Switch';
-import { Tabs, TabsList, TabsTrigger } from 'app/components/shadcn/Tabs';
+import { Switch } from '@gsender/ui/shadcn/Switch';
+import { Tabs, TabsList, TabsTrigger } from '@gsender/ui/shadcn/Tabs';
 import controller from 'app/lib/controller';
 import {
     GRBL_ACTIVE_STATE_IDLE,

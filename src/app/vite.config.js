@@ -40,6 +40,9 @@ export default defineConfig({
     ],
     resolve: {
         alias: {
+            '@gsender/ui/shadcn': path.resolve(__dirname, '../../packages/ui/src/shadcn'),
+            '@gsender/ui/lib': path.resolve(__dirname, '../../packages/ui/src/lib'),
+            '@gsender/ui': path.resolve(__dirname, '../../packages/ui/src/index.ts'),
             app: path.resolve(__dirname, './src'),
             '@': path.resolve(__dirname, './src'),
         },

@@ -1,5 +1,5 @@
 import cx from 'classnames';
-import { Button } from 'app/components/shadcn/Button';
+import { Button } from '@gsender/ui/shadcn/Button';
 import { TbVector } from 'react-icons/tb';
 import pubsub from 'pubsub-js';
 import store from 'app/store';

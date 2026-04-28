@@ -1,8 +1,8 @@
 import {
     RadioGroup,
     RadioGroupItem,
-} from 'app/components/shadcn/RadioGroup.tsx';
-import { Label } from 'app/components/shadcn/Label.tsx';
+} from '@gsender/ui/shadcn/RadioGroup.tsx';
+import { Label } from '@gsender/ui/shadcn/Label.tsx';
 
 export interface RadioSettingInputProps {
     options: string[] | number[];

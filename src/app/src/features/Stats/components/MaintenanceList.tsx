@@ -17,7 +17,7 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
-} from 'app/components/shadcn/AlertDialog';
+} from '@gsender/ui/shadcn/AlertDialog';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 
 interface FormattedTask {

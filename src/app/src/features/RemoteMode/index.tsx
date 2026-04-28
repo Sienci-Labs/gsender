@@ -6,17 +6,17 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-} from 'app/components/shadcn/Dialog.tsx';
+} from '@gsender/ui/shadcn/Dialog.tsx';
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from 'app/components/shadcn/Select.tsx';
+} from '@gsender/ui/shadcn/Select.tsx';
 import { QRCodeDisplay } from 'app/features/RemoteMode/components/QRCode.tsx';
 import Button from 'app/components/Button';
-import { Switch } from 'app/components/shadcn/Switch';
+import { Switch } from '@gsender/ui/shadcn/Switch';
 import { toast } from 'app/lib/toaster';
 import controller from 'app/lib/controller.ts';
 import { RootState } from 'app/store/redux';

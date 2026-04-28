@@ -7,7 +7,7 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from 'app/components/shadcn/Select';
+} from '@gsender/ui/shadcn/Select';
 import controller from 'app/lib/controller.ts';
 import { RootState } from 'app/store/redux';
 import Tooltip from 'app/components/Tooltip';

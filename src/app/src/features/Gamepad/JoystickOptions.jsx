@@ -4,7 +4,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import set from 'lodash/set';
 import get from 'lodash/get';
 
-import { Switch } from 'app/components/shadcn/Switch';
+import { Switch } from '@gsender/ui/shadcn/Switch';
 
 import { ControlledInput } from 'app/components/ControlledInput';
 import { GamepadContext } from './utils/context';

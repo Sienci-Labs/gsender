@@ -4,7 +4,7 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from 'app/components/shadcn/Select.tsx';
+} from '@gsender/ui/shadcn/Select.tsx';
 import { humanReadableMachineName } from 'app/features/Config/utils/Settings.ts';
 import defaultMachineProfiles from 'app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';

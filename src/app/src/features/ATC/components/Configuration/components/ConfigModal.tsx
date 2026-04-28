@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Dialog, DialogContent } from 'app/components/shadcn/Dialog.tsx';
+import { Dialog, DialogContent } from '@gsender/ui/shadcn/Dialog.tsx';
 import {
     Tabs,
     TabsContent,
     TabsList,
     TabsTrigger,
-} from 'app/components/shadcn/Tabs';
+} from '@gsender/ui/shadcn/Tabs';
 import { ConfigTab } from './ConfigTab';
 import { TemplatesTab } from './TemplatesTab';
 import controller from 'app/lib/controller.ts';

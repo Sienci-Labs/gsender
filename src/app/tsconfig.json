@@ -40,6 +40,15 @@
             ],
             "app-root/*": [
                 "./*"
+            ],
+            "@gsender/ui": [
+                "../../packages/ui/src/index.ts"
+            ],
+            "@gsender/ui/shadcn/*": [
+                "../../packages/ui/src/shadcn/*"
+            ],
+            "@gsender/ui/lib/*": [
+                "../../packages/ui/src/lib/*"
             ]
         }
     },

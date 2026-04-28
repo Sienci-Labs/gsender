@@ -24,14 +24,14 @@
 import React, { useCallback, useRef, useEffect } from 'react';
 import cx from 'classnames';
 
-import { Button as ShadcnButton } from 'app/components/shadcn/Button';
+import { Button as ShadcnButton } from '@gsender/ui/shadcn/Button';
 import { Button } from 'app/components/Button';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from 'app/components/shadcn/Dropdown';
+} from '@gsender/ui/shadcn/Dropdown';
 
 import { METRIC_UNITS, PROBING_CATEGORY } from '../../constants';
 import ProbeImage from './ProbeImage';

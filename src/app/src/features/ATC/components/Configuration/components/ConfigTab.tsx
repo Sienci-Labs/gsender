@@ -5,16 +5,16 @@ import {
     CardContent,
     CardHeader,
     CardTitle,
-} from 'app/components/shadcn/Card';
-import { Switch } from 'app/components/shadcn/Switch';
-import { Input } from 'app/components/shadcn/Input';
-import { Label } from 'app/components/shadcn/Label';
+} from '@gsender/ui/shadcn/Card';
+import { Switch } from '@gsender/ui/shadcn/Switch';
+import { Input } from '@gsender/ui/shadcn/Input';
+import { Label } from '@gsender/ui/shadcn/Label';
 import { Button } from 'app/components/Button';
 import { PositionInput } from './PositionInput';
 import { useConfigContext } from 'app/features/ATC/components/Configuration/hooks/useConfigStore';
 import cn from 'classnames';
 import OffsetManagementWidget from 'app/features/ATC/components/Configuration/components/OffsetManagement.tsx';
-import { Spinner } from 'app/components/shadcn/Spinner';
+import { Spinner } from '@gsender/ui/shadcn/Spinner';
 import {
     ArrowRight,
     BookOpen,

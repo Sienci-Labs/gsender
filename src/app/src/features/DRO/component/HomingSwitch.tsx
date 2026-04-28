@@ -1,4 +1,4 @@
-import { Switch } from 'app/components/shadcn/Switch';
+import { Switch } from '@gsender/ui/shadcn/Switch';
 import Button from 'app/components/Button';
 import { homeMachine } from 'app/features/DRO/utils/DRO.ts';
 import cn from 'classnames';
