@@ -15,7 +15,7 @@ export function ATC() {
     const isHomed = useTypedSelector((state) => state.controller.hasHomed);
 
     useEffect(() => {
-        pubsub.subscribe('atc_validator', (k, payload) => {
+        pubsub.subscribe('atc_validator', (_k, payload) => {
             setValidationPayload(payload);
             setShowValidator(true);
         });

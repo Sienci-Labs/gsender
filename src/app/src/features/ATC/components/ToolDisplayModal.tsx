@@ -1,6 +1,4 @@
 import { Dialog, DialogContent } from 'app/components/shadcn/Dialog.tsx';
-import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
-import { RootState } from 'app/store/redux';
 import { DialogTitle } from '@radix-ui/react-dialog';
 import { ToolTable } from 'app/features/ATC/components/ToolTable.tsx';
 import Button from 'app/components/Button';
