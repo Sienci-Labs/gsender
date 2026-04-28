@@ -1,6 +1,6 @@
 {
   "name": "gSender",
-  "version": "1.7.0-Edge-1",
+  "version": "1.6.1",
   "description": "Electron sender for GRBL based CNC machines",
   "author": {
     "name": "Sienci Labs <hi@sienci.com>",
@@ -86,7 +86,7 @@
     "test:unit:watch": "jest --watch"
   },
   "build": {
-    "appId": "org.sienci.gsender-edge",
+    "appId": "org.sienci.gsender",
     "extraMetadata": {
       "main": "./main.js"
     },
@@ -98,7 +98,7 @@
       "**/*.node",
       "**/*.{dll,so,dylib,exe}"
     ],
-    "productName": "gSender Edge",
+    "productName": "gSender",
     "generateUpdatesFilesForAllChannels": true,
     "npmRebuild": false,
     "compression": "normal",

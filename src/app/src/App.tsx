@@ -21,16 +21,12 @@ function App() {
                 token: string;
             };
 
-            if (authenticated) {
-                const host = '';
-                const options = {
-                    query: 'token=' + token,
-                };
-                controller.connect(host, options);
-                return;
-            } else {
-                console.log('no auth');
-            }
+            if (!authenticated) return;
+
+            const host = '';
+            const options = { query: 'token=' + token };
+
+            controller.connect(host, options);
         });
 
         sagaMiddleware.run(rootSaga);

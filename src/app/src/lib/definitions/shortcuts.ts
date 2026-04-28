@@ -8,7 +8,9 @@ export type SHORTCUT_CATEGORY_T =
 
 // Interfaces
 
-export interface CommandKey { // we only save these properties in store, even though the shuttle events have more
+export interface CommandKey {
+    // we only save these properties in store, even though the shuttle events have more
+    category: string;
     cmd: string;
     keys: string;
     isActive: boolean;

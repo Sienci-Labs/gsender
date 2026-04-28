@@ -38,17 +38,17 @@ import { WORKFLOW_STATE_PAUSED } from '../../constants';
 
 import WoodcuttingProgress from './WoodcuttingProgress';
 
-interface Props {
+type Props = {
     senderStatus: SenderStatus;
     workflowState?: string;
-}
+};
 
 /**
  * Progress Area component to display running job information
  * @prop {Object} state Default state given from parent component
  *
  */
-const ProgressArea: React.FC<Props> = ({ senderStatus, workflowState }) => {
+const ProgressArea = ({ senderStatus, workflowState }: Props) => {
     const { total, currentLineRunning, elapsedTime, remainingTime, startTime } =
         senderStatus || {};
 
@@ -112,6 +112,8 @@ const ProgressArea: React.FC<Props> = ({ senderStatus, workflowState }) => {
     const percentageValue = Number.isNaN((currentLineRunning / total) * 100)
         ? 0
         : (currentLineRunning / total) * 100;
+    const displayedPercentage = Math.min(100, Math.floor(percentageValue));
+    const isFinalizing = displayedPercentage >= 100 && Number(remainingTime) > 0;
 
     const timeSplit = convertSecondsToDHMS(Number(remainingTime));
     const timeComponent = getTimesHTML(timeSplit);
@@ -143,7 +145,7 @@ const ProgressArea: React.FC<Props> = ({ senderStatus, workflowState }) => {
                         }}
                     >
                         <span className="font-bold text-2xl">
-                            {Math.floor(percentageValue)}
+                            {displayedPercentage}
                         </span>
                         <span>%</span>
                     </div>
@@ -157,8 +159,16 @@ const ProgressArea: React.FC<Props> = ({ senderStatus, workflowState }) => {
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <div className="flex flex-col  justify-center items-center w-32">
-                                {timeComponent}
-                                <span className="text-sm">remaining</span>
+                                {isFinalizing ? (
+                                    <>
+                                        <span className="text-sm">Finalizing</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        {timeComponent}
+                                        <span className="text-sm">remaining</span>
+                                    </>
+                                )}
                             </div>
                         </TooltipTrigger>
                         <TooltipContent className="max-w-64">
