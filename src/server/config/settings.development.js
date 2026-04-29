@@ -34,7 +34,8 @@ const getAppPath = () => {
     return path.resolve(__dirname, 'app');
 };
 
-const getPendantPath = () => path.resolve(__dirname, 'pendant');
+// In dev, __dirname = output/ — pendant is built to dist/gsender/pendant/ by vite:build:pendant
+const getPendantPath = () => path.resolve(__dirname, '../dist/gsender/pendant');
 
 export default {
     route: '/', // with trailing slash
