@@ -50,8 +50,15 @@ const srcResolverPlugin = {
         });
 
         build.onResolve({ filter: /^app\// }, (args) => {
-            const resolved = resolveFromSrc(args.path);
-            return { path: resolved };
+            // app/ alias → apps/desktop/ (matches Vite alias in apps/desktop/vite.config.js)
+            const relativePath = args.path.replace(/^app\//, '');
+            const basePath = path.resolve(__dirname, 'apps/desktop', relativePath);
+            const isFile = (p) => fs.existsSync(p) && fs.statSync(p).isFile();
+            for (const ext of ['.js', '.ts', '/index.js', '/index.ts']) {
+                if (isFile(basePath + ext)) return { path: basePath + ext };
+            }
+            if (isFile(basePath)) return { path: basePath };
+            return { path: basePath };
         });
 
         build.onResolve({ filter: /^electron-app\// }, (args) => {

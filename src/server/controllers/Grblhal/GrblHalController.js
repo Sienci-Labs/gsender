@@ -83,7 +83,7 @@ import {
     FILE_UNLOAD,
     ALARM,
     ERROR
-} from '../../../app/src/constants';
+} from 'app/src/constants';
 import { determineHALMachineZeroFlag, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
 import { calcOverrides } from '../runOverride';
 import ToolChanger from '../../lib/ToolChanger';

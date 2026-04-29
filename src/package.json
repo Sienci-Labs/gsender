@@ -1,5 +1,5 @@
 {
-  "name": "gSender",
+  "name": "@gsender/desktop",
   "private": true,
   "scripts": {
     "dev": "node server",

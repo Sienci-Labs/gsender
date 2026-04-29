@@ -45,7 +45,7 @@ import { authorizeIPAddress } from '../../access-control';
 import DFUFlasher from '../../lib/Firmware/Flashing/DFUFlasher';
 import delay from '../../lib/delay';
 import Connection from '../../lib/Connection';
-import { VISUALIZER_SECONDARY } from '../../../app/src/constants';
+import { VISUALIZER_SECONDARY } from 'app/src/constants';
 
 const log = logger('service:cncengine');
 
