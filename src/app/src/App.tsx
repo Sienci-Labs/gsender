@@ -2,13 +2,13 @@ import { ReactNode, useEffect } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 import { HashRouter } from 'react-router';
 
-import { store as reduxStore, RootState } from 'app/store/redux';
-import rootSaga from 'app/store/redux/sagas';
-import { sagaMiddleware } from 'app/store/redux/sagas';
+import { store as reduxStore, RootState } from '@gsender/controller-client/store/redux';
+import { sagaMiddleware, createRootSaga } from '@gsender/controller-client/store/redux/sagas';
+import * as controllerSagas from 'app/store/redux/sagas/controllerSagas';
 import store from 'app/store';
 import * as user from 'app/lib/user';
-import controller from 'app/lib/controller';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import controller from '@gsender/controller-client/controller';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import { FocusTrappingProvider } from '@gsender/ui/lib/focus-trapping';
 import { Toaster } from '@gsender/ui/shadcn/Sonner';
 import { ReactRoutes } from './react-routes';
@@ -42,7 +42,7 @@ function App() {
             controller.connect(host, options);
         });
 
-        sagaMiddleware.run(rootSaga);
+        sagaMiddleware.run(createRootSaga([controllerSagas]));
     }, []);
 
     return (

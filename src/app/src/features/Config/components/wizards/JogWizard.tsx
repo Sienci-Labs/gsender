@@ -1,4 +1,4 @@
-import controller from 'app/lib/controller.ts';
+import controller from '@gsender/controller-client/controller';
 import Button from '@gsender/ui/primitives/Button';
 
 interface JogWizardProps {

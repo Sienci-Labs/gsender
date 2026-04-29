@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 interface Props {
     label: string;
     value: string;

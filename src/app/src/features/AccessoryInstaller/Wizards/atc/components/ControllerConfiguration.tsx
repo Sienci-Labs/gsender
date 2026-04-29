@@ -1,7 +1,7 @@
 import { StepActionButton } from 'app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx';
 import { StepProps } from 'app/features/AccessoryInstaller/types';
 import { useState } from 'react';
-import controller from 'app/lib/controller.ts';
+import controller from '@gsender/controller-client/controller';
 import store from 'app/store';
 
 export function ControllerConfiguration({

@@ -6,6 +6,12 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./controller": "./src/controller.ts",
+    "./store/redux": "./src/store/redux/index.ts",
+    "./store/redux/slices/*": "./src/store/redux/slices/*.ts",
+    "./store/redux/sagas": "./src/store/redux/sagas/index.ts",
+    "./store/definitions": "./src/store/definitions.ts",
+    "./hooks/useTypedSelector": "./src/hooks/useTypedSelector.ts"
   }
 }

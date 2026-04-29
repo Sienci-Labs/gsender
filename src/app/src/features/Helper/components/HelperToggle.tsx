@@ -3,10 +3,10 @@ import { RiSpeakLine } from 'react-icons/ri';
 import {
     toggleWizardVisibility,
     toggleInfoHelperVisibility,
-} from 'app/store/redux/slices/helper.slice';
-import { RootState } from 'app/store/redux';
+} from '@gsender/controller-client/store/redux/slices/helper.slice';
+import { RootState } from '@gsender/controller-client/store/redux';
 import { useSelector } from 'react-redux';
-import reduxStore from 'app/store/redux';
+import reduxStore from '@gsender/controller-client/store/redux';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import useKeybinding from 'app/lib/useKeybinding';
 import { TOOLBAR_CATEGORY } from 'app/constants';

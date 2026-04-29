@@ -1,5 +1,5 @@
 import { Confirm } from '@gsender/ui/primitives/ConfirmationDialog/ConfirmationDialogLib';
-import controller from 'app/lib/controller';
+import controller from '@gsender/controller-client/controller';
 import { toast } from 'app/lib/toaster';
 import { getUnitModal } from 'app/lib/toolChangeUtils';
 

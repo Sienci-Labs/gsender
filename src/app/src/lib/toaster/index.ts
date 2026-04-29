@@ -4,8 +4,8 @@ import get from 'lodash/get';
 
 import store from 'app/store';
 import { Notification } from 'app/workspace/definitions';
-import reduxStore from 'app/store/redux';
-import { setNotifications } from 'app/store/redux/slices/preferences.slice';
+import reduxStore from '@gsender/controller-client/store/redux';
+import { setNotifications } from '@gsender/controller-client/store/redux/slices/preferences.slice';
 import {
     TOASTER_DEFAULT,
     TOASTER_DISABLED,

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import isEqual from 'lodash/isEqual';
 
 import store from 'app/store';
-import { State } from 'app/store/definitions';
+import { State } from '@gsender/controller-client/store/definitions';
 
 type WidgetKey = keyof State['widgets'];
 

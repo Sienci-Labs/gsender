@@ -7,13 +7,13 @@ import { useSettings } from 'app/features/Config/utils/SettingsContext';
 import { ProfileBar } from 'app/features/Config/components/ProfileBar.tsx';
 import { useInView, InView } from 'react-intersection-observer';
 import { EEPROMNotConnectedWarning } from 'app/features/Config/components/EEPROMNotConnectedWarning.tsx';
-import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
-import { RootState } from 'app/store/redux';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
+import { RootState } from '@gsender/controller-client/store/redux';
 import { FilterDefaultToggle } from 'app/features/Config/components/FilterDefaultToggle.tsx';
 import pubsub from 'pubsub-js';
 import store from 'app/store';
 import { useDispatch } from 'react-redux';
-import { updateAccessibility } from 'app/store/redux/slices/preferences.slice';
+import { updateAccessibility } from '@gsender/controller-client/store/redux/slices/preferences.slice';
 import {
     Tabs,
     TabsContent,
@@ -22,7 +22,7 @@ import {
 } from '@gsender/ui/shadcn/Tabs';
 import { gSenderSetting, SettingsMenuSection } from './assets/SettingsMenu';
 import { convertEIDToNumber } from 'app/lib/numeral';
-import controller from 'app/lib/controller.ts';
+import controller from '@gsender/controller-client/controller';
 import {GRBLHAL, WORKFLOW_STATE_IDLE} from 'app/constants';
 import { resolveGrblCoreDefaults } from 'app/features/Config/utils/grblCoreMigration.ts';
 

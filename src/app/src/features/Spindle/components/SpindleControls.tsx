@@ -23,7 +23,7 @@
 
 import { Slider } from '@gsender/ui/shadcn/Slider';
 import { Input } from '@gsender/ui/shadcn/Input';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import { FaBan, FaRedoAlt, FaUndoAlt } from 'react-icons/fa';
 import { ActiveStateButton } from '@gsender/ui/primitives/ActiveStateButton';
 import Tooltip from '@gsender/ui/primitives/Tooltip';

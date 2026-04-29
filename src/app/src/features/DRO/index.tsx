@@ -49,7 +49,7 @@ import { Parking } from 'app/features/DRO/component/Parking.tsx';
 
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
-import controller from 'app/lib/controller';
+import controller from '@gsender/controller-client/controller';
 import {
     BACK_RIGHT,
     BACK_LEFT,
@@ -57,8 +57,8 @@ import {
     FRONT_LEFT,
     getMovementGCode,
 } from './utils/RapidPosition';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import reduxStore from 'app/store/redux';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
+import reduxStore from '@gsender/controller-client/store/redux';
 import { cn } from 'app/lib/utils';
 
 interface DROProps {

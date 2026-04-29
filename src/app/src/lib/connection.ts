@@ -1,6 +1,6 @@
 import { GRBL } from 'app/constants';
 import WidgetConfig from 'app/features/WidgetConfig/WidgetConfig';
-import controller from './controller';
+import controller from '@gsender/controller-client/controller';
 import { isIPv4 } from './utils';
 import store from 'app/store';
 

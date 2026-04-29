@@ -1,4 +1,4 @@
-import { RootState } from 'app/store/redux';
+import { RootState } from '@gsender/controller-client/store/redux';
 import { useSelector } from 'react-redux';
 import cx from 'classnames';
 import { WizardProvider } from 'app/features/Helper/context';

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { VISUALIZER_PRIMARY } from '../../../constants';
+import { VISUALIZER_PRIMARY } from 'app/constants';
 import { VisualizerState } from '../../definitions';
 
 const initialState: VisualizerState = {

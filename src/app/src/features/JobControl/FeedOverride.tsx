@@ -4,7 +4,7 @@ import {
     OVERRIDE_VALUE_RANGES,
     SPINDLE_MODE,
 } from '../../constants';
-import controller from 'app/lib/controller';
+import controller from '@gsender/controller-client/controller';
 import debounce from 'lodash/debounce';
 import { useEffect, useState } from 'react';
 import store from 'app/store';

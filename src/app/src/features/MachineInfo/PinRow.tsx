@@ -2,7 +2,7 @@ import React from 'react';
 import cx from 'classnames';
 import { FaCheck, FaTimes } from 'react-icons/fa';
 
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 
 interface Props {
     label: string;

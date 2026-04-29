@@ -3,8 +3,8 @@ import api from 'app/api';
 import { FIRMWARE_TYPES_T } from 'app/definitions/firmware';
 import { JOB_STATUS, JOB_TYPES } from 'app/constants';
 import { AxiosResponse } from 'axios';
-import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
-import { RootState } from 'app/store/redux';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
+import { RootState } from '@gsender/controller-client/store/redux';
 import {
     calculateJobStats,
     filterJobsByPort,

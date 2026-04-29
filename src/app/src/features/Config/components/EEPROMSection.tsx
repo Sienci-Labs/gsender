@@ -5,13 +5,13 @@ import {
 } from 'app/features/Config/assets/SettingsMenu.ts';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import { EEPROMNotConnectedWarning } from 'app/features/Config/components/EEPROMNotConnectedWarning.tsx';
-import { RootState } from 'app/store/redux';
+import { RootState } from '@gsender/controller-client/store/redux';
 import { useSelector } from 'react-redux';
 import get from 'lodash/get';
 import { BiReset } from 'react-icons/bi';
 import { getDatatypeInput } from 'app/features/Config/utils/EEPROM.ts';
 import { EEPROMSettingRow } from 'app/features/Config/components/EEPROMSettingRow.tsx';
-import controller from 'app/lib/controller.ts';
+import controller from '@gsender/controller-client/controller';
 import { toast } from 'app/lib/toaster';
 
 export function isEEPROMSettingsSection(s: gSenderEEEPROMSettings): boolean {

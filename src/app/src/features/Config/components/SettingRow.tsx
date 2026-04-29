@@ -12,7 +12,7 @@ import { HybridNumber } from 'app/features/Config/components/SettingInputs/Hybri
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import { EEPROMSettingRow } from 'app/features/Config/components/EEPROMSettingRow.tsx';
 import { EventInput } from 'app/features/Config/components/SettingInputs/EventInput.tsx';
-import controller from 'app/lib/controller.ts';
+import controller from '@gsender/controller-client/controller';
 import { toast } from 'app/lib/toaster';
 import { TextAreaInput } from 'app/features/Config/components/SettingInputs/TextAreaInput.tsx';
 import { LocationInput } from 'app/features/Config/components/SettingInputs/LocationInput.tsx';

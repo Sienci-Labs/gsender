@@ -1,9 +1,9 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import pubsub from 'pubsub-js';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import { RootState } from 'app/store/redux';
-import { updateAccessibility } from 'app/store/redux/slices/preferences.slice';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
+import { RootState } from '@gsender/controller-client/store/redux';
+import { updateAccessibility } from '@gsender/controller-client/store/redux/slices/preferences.slice';
 import { useActiveShortcuts } from 'app/lib/shortcutRegistry';
 import {
     GENERAL_CATEGORY,

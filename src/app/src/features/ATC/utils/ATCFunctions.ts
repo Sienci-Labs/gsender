@@ -1,8 +1,8 @@
 import { toast } from 'app/lib/toaster';
 import store from 'app/store';
-import reduxStore from 'app/store/redux';
+import reduxStore from '@gsender/controller-client/store/redux';
 import get from 'lodash/get';
-import controller from 'app/lib/controller.ts';
+import controller from '@gsender/controller-client/controller';
 import {
     IToolListing,
     ToolInstance,

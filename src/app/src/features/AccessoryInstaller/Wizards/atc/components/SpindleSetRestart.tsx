@@ -1,8 +1,8 @@
 import { StepActionButton } from 'app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx';
 import { useState } from 'react';
-import controller from 'app/lib/controller.ts';
-import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
-import { RootState } from 'app/store/redux';
+import controller from '@gsender/controller-client/controller';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
+import { RootState } from '@gsender/controller-client/store/redux';
 import {StepProps} from "app/features/AccessoryInstaller/types";
 
 export function SpindleSetRestart({ onComplete, onUncomplete }: StepProps) {

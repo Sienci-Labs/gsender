@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import { RootState } from 'app/store/redux';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
+import { RootState } from '@gsender/controller-client/store/redux';
 import { GRBL_ACTIVE_STATE_ALARM } from 'app/constants';
 import pubsub from 'pubsub-js';
 

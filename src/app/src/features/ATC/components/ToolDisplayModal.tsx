@@ -4,7 +4,7 @@ import { ToolTable } from 'app/features/ATC/components/ToolTable.tsx';
 import Button from '@gsender/ui/primitives/Button';
 import { Table2 } from 'lucide-react';
 import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
-import controller from 'app/lib/controller.ts';
+import controller from '@gsender/controller-client/controller';
 
 export function ToolDisplayModal() {
     const { connected, setShowTable, showTable, tools, disabled } =

@@ -8,8 +8,8 @@ import {
     ShuttleControlEvents,
     ShuttleEvent,
 } from './definitions/shortcuts';
-import reduxStore from 'app/store/redux';
-import { updateShuttleStatus } from 'app/store/redux/slices/shortcuts.slice';
+import reduxStore from '@gsender/controller-client/store/redux';
+import { updateShuttleStatus } from '@gsender/controller-client/store/redux/slices/shortcuts.slice';
 
 const TARGET_NUM_CALLS = 16; // this is the current number of times that useKeybinding is called throughout the program
 let numCalls = 0; // number of useKeybinding hooks that have been called

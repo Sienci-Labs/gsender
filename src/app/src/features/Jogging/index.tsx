@@ -18,7 +18,7 @@ import {
     startJogCommand,
 } from 'app/features/Jogging/utils/Jogging';
 import { FirmwareFlavour } from 'app/features/Connection';
-import { RootState } from 'app/store/redux';
+import { RootState } from '@gsender/controller-client/store/redux';
 import {
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
@@ -33,7 +33,7 @@ import {
 } from 'app/constants';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { toast } from 'app/lib/toaster';
-import controller from 'app/lib/controller';
+import controller from '@gsender/controller-client/controller';
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import gamepad, { checkButtonHold } from 'app/lib/gamepad';
@@ -47,7 +47,7 @@ import { preventDefault } from 'app/lib/dom-events';
 import { checkThumbsticskAreIdle, JoystickLoop } from './JoystickLoop';
 import { MPGJogManager } from './MPGJogManager.ts';
 import { convertValue } from './utils/units';
-import reduxStore from 'app/store/redux';
+import reduxStore from '@gsender/controller-client/store/redux';
 import { UNITS_EN } from 'app/definitions/general';
 
 export interface JogValueObject {

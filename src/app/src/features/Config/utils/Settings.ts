@@ -4,11 +4,11 @@ import { restoreDefault, storeUpdate } from 'app/lib/storeUpdate';
 import { Confirm } from '@gsender/ui/primitives/ConfirmationDialog/ConfirmationDialogLib.ts';
 import { generateEEPROMSettings } from 'app/features/Config/utils/EEPROM.ts';
 import { toast } from 'sonner';
-import controller from 'app/lib/controller.ts';
+import controller from '@gsender/controller-client/controller';
 import pubsub from 'pubsub-js';
 import { EEPROM, FilteredEEPROM } from 'app/definitions/firmware';
 import { gSenderSetting, gSenderSettingsValues } from '../assets/SettingsMenu';
-import { State } from 'app/store/definitions';
+import { State } from '@gsender/controller-client/store/definitions';
 
 export function exportFirmwareSettings(settings: object) {
     const output = JSON.stringify(settings);

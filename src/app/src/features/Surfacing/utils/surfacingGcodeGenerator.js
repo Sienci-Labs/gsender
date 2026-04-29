@@ -14,9 +14,9 @@ import {
     SPINDLE_MODES,
     SURFACING_DWELL_DURATION,
 } from 'app/constants';
-import controller from 'app/lib/controller';
+import controller from '@gsender/controller-client/controller';
 import defaultState from 'app/store/defaultState';
-import reduxStore from 'app/store/redux';
+import reduxStore from '@gsender/controller-client/store/redux';
 
 import { convertToImperial } from '../../Preferences/calculate';
 

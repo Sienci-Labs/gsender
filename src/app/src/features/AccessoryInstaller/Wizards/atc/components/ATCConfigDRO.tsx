@@ -1,7 +1,7 @@
 import get from 'lodash/get';
 import includes from 'lodash/includes';
 import mapValues from 'lodash/mapValues';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { defaultDROPosition } from 'app/features/DRO/utils/DRO';
 import { mapPositionToUnits } from 'app/lib/units.ts';

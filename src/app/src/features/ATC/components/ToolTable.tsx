@@ -1,4 +1,4 @@
-import controller from 'app/lib/controller.ts';
+import controller from '@gsender/controller-client/controller';
 import { useState } from 'react';
 import {
     Collapsible,
@@ -23,8 +23,8 @@ import Button from '@gsender/ui/primitives/Button';
 import partition from 'lodash/partition';
 import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
 import { ToolProbeState } from 'app/features/ATC/types.ts';
-import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
-import { RootState } from 'app/store/redux';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
+import { RootState } from '@gsender/controller-client/store/redux';
 import get from 'lodash/get';
 import store from "app/store";
 

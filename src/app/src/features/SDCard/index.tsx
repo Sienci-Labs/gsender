@@ -2,10 +2,10 @@ import { StatusIndicator } from 'app/features/SDCard/components/StatusIndicator.
 import { FileList } from 'app/features/SDCard/components/FileList.tsx';
 import { useSDCard } from 'app/features/SDCard/hooks/useSDCard.ts';
 import { useEffect } from 'react';
-import controller from 'app/lib/controller.ts';
-import redux, {RootState} from 'app/store/redux';
-import { emptyAllSDFiles } from 'app/store/redux/slices/controller.slice.ts';
-import {useTypedSelector} from "app/hooks/useTypedSelector.ts";
+import controller from '@gsender/controller-client/controller';
+import redux, {RootState} from '@gsender/controller-client/store/redux';
+import { emptyAllSDFiles } from '@gsender/controller-client/store/redux/slices/controller.slice.ts';
+import {useTypedSelector} from "@gsender/controller-client/hooks/useTypedSelector";
 import {GRBL_ACTIVE_STATE_ALARM, GRBL_ACTIVE_STATE_IDLE} from "app/constants";
 
 const SDCardElement = () => {

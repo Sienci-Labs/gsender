@@ -1,4 +1,4 @@
-import reduxStore from 'app/store/redux';
+import reduxStore from '@gsender/controller-client/store/redux';
 import prefStore from 'app/store';
 
 import get from 'lodash/get';

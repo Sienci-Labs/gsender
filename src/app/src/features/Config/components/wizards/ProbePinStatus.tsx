@@ -1,7 +1,7 @@
 import { PinIndicator } from 'app/features/MachineInfo/PinRow.tsx';
 import get from 'lodash/get';
 import { useSelector } from 'react-redux';
-import { RootState } from 'app/store/redux';
+import { RootState } from '@gsender/controller-client/store/redux';
 
 export function ProbePinStatus() {
     const status = useSelector(

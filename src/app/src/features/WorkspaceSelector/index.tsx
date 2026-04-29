@@ -8,8 +8,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@gsender/ui/shadcn/Select';
-import controller from 'app/lib/controller.ts';
-import { RootState } from 'app/store/redux';
+import controller from '@gsender/controller-client/controller';
+import { RootState } from '@gsender/controller-client/store/redux';
 import Tooltip from '@gsender/ui/primitives/Tooltip';
 import { GRBL_ACTIVE_STATE_RUN, WORKFLOW_STATE_RUNNING } from 'app/constants';
 

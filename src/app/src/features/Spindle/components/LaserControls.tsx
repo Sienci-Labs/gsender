@@ -26,7 +26,7 @@ import React from 'react';
 import { Slider } from '@gsender/ui/shadcn/Slider';
 import { ControlledInput } from '@gsender/ui/form/ControlledInput';
 import { FaLightbulb, FaRegLightbulb, FaSatelliteDish } from 'react-icons/fa';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import { ActiveStateButton } from '@gsender/ui/primitives/ActiveStateButton';
 import Tooltip from '@gsender/ui/primitives/Tooltip';
 

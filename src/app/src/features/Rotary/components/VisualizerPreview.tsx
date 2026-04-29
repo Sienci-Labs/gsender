@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 import Visualizer from 'app/features/Visualizer';
 import { useDispatch } from 'react-redux';
-import { setCurrentVisualizer } from 'app/store/redux/slices/visualizer.slice';
+import { setCurrentVisualizer } from '@gsender/controller-client/store/redux/slices/visualizer.slice';
 import {
     SURFACING_VISUALIZER_CONTAINER_ID,
     VISUALIZER_PRIMARY,

@@ -2,7 +2,7 @@ import { RiParkingFill } from 'react-icons/ri';
 
 import Button from '@gsender/ui/primitives/Button';
 import store from 'app/store';
-import controller from 'app/lib/controller.ts';
+import controller from '@gsender/controller-client/controller';
 import {
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
@@ -14,9 +14,9 @@ import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { useEffect, useRef } from 'react';
 import Tooltip from '@gsender/ui/primitives/Tooltip';
 import { get, includes } from 'lodash';
-import reduxStore from 'app/store/redux';
+import reduxStore from '@gsender/controller-client/store/redux';
 import { useSelector } from 'react-redux';
-import { RootState } from 'app/store/redux';
+import { RootState } from '@gsender/controller-client/store/redux';
 
 function goToParkLocation() {
     const park = store.get('workspace.park', {});

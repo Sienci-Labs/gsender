@@ -1,5 +1,5 @@
 import { ButtonVariants } from '@gsender/ui/primitives/Button';
-import controller from 'app/lib/controller';
+import controller from '@gsender/controller-client/controller';
 import store from 'app/store';
 import { createContext, useContext, ReactNode, useState } from 'react';
 

@@ -32,8 +32,8 @@ import PropTypes from 'prop-types';
 
 import combokeys from 'app/lib/combokeys';
 import store from 'app/store';
-import { store as reduxStore } from 'app/store/redux';
-import controller from 'app/lib/controller';
+import { store as reduxStore } from '@gsender/controller-client/store/redux';
+import controller from '@gsender/controller-client/controller';
 import log from 'app/lib/log';
 import * as WebGL from 'app/lib/three/WebGL';
 import {
@@ -45,7 +45,7 @@ import { toast } from 'app/lib/toaster';
 import {
     updateFileInfo,
     updateFileProcessing,
-} from 'app/store/redux/slices/fileInfo.slice';
+} from '@gsender/controller-client/store/redux/slices/fileInfo.slice';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 
 import WidgetConfig from '../WidgetConfig/WidgetConfig';

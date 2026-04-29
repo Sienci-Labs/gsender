@@ -1,4 +1,4 @@
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 
 const Size = () => {

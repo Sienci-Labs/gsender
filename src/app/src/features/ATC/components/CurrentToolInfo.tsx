@@ -1,9 +1,9 @@
 import { ToolInstance } from 'app/features/ATC/components/ToolTable.tsx';
-import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
-import { RootState } from 'app/store/redux';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
+import { RootState } from '@gsender/controller-client/store/redux';
 import { useEffect, useState } from 'react';
 import { lookupSpecificTool } from 'app/features/ATC/utils/ATCFunctions.ts';
-import controller from 'app/lib/controller.ts';
+import controller from '@gsender/controller-client/controller';
 import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
 import { Wrench } from 'lucide-react';
 import Button from '@gsender/ui/primitives/Button';

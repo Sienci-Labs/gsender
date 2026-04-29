@@ -25,7 +25,7 @@ import { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import cx from 'classnames';
 import get from 'lodash/get';
-import controller from '../../lib/controller';
+import controller from '@gsender/controller-client/controller';
 import AlarmDescriptionIcon from './AlarmDescriptionIcon';
 import UnlockButton from './UnlockButton';
 import { UnlockButton as SmallUnlockButton } from 'app/features/UnlockButton';

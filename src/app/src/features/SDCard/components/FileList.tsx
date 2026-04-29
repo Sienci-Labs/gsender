@@ -10,9 +10,9 @@ import {
     TableRow,
 } from '@gsender/ui/shadcn/Table';
 import { Confirm } from '@gsender/ui/primitives/ConfirmationDialog/ConfirmationDialogLib.ts';
-import controller from 'app/lib/controller.ts';
-import reduxStore from 'app/store/redux';
-import { clearSDCardFiles } from 'app/store/redux/slices/controller.slice.ts';
+import controller from '@gsender/controller-client/controller';
+import reduxStore from '@gsender/controller-client/store/redux';
+import { clearSDCardFiles } from '@gsender/controller-client/store/redux/slices/controller.slice.ts';
 import cn from 'classnames';
 import { toast } from 'app/lib/toaster';
 import { ACCEPTED_EXTENSIONS, validateSDFilename } from 'app/features/SDCard/components/UploadModal.tsx';

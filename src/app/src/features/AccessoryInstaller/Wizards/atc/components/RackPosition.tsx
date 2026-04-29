@@ -3,9 +3,9 @@ import { StepActionButton } from 'app/features/AccessoryInstaller/components/wiz
 import { useEffect, useRef, useState } from 'react';
 import { PositionSetter } from 'app/features/AccessoryInstaller/Wizards/atc/components/PositionSetter.tsx';
 import { useSelector } from 'react-redux';
-import { RootState } from 'app/store/redux';
-import controller from 'app/lib/controller.ts';
-import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import { RootState } from '@gsender/controller-client/store/redux';
+import controller from '@gsender/controller-client/controller';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import store from 'app/store';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { mapPositionToUnits, in2mm } from 'app/lib/units.ts';

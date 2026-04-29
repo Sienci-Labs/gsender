@@ -25,7 +25,7 @@ import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import noop from 'lodash/noop';
-import controller from 'app/lib/controller';
+import controller from '@gsender/controller-client/controller';
 import { GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
 import styles from './UnlockButton.styl';
 

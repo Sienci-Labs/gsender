@@ -26,7 +26,7 @@ import pubsub from 'pubsub-js';
 import { GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
 import uniqueId from 'lodash/uniqueId';
 import get from 'lodash/get';
-import controller from 'app/lib/controller';
+import controller from '@gsender/controller-client/controller';
 import ToolModalButton from '@gsender/ui/primitives/ToolModalButton';
 import { useWizardAPI, useWizardContext } from 'app/features/Helper/context';
 import styles from '../index.module.styl';

@@ -9,13 +9,13 @@ import {
 import { importFirmwareSettings } from 'app/features/Config/utils/EEPROM.ts';
 import { useRef, useState } from 'react';
 import { toast } from 'app/lib/toaster';
-import { RootState } from 'app/store/redux';
+import { RootState } from '@gsender/controller-client/store/redux';
 import { useSelector } from 'react-redux';
 import cn from 'classnames';
 import { ActionButton } from 'app/features/Config/components/ActionButton.tsx';
 import { FlashDialog } from 'app/features/Config/components/FlashDialog.tsx';
 import { RestoreDefaultDialog } from 'app/features/Config/components/RestoreDefaultDialog.tsx';
-import controller from 'app/lib/controller.ts';
+import controller from '@gsender/controller-client/controller';
 import { EEPROM, EEPROMSettings } from 'app/definitions/firmware';
 import cx from 'classnames';
 

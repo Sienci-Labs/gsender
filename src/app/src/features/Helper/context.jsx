@@ -25,8 +25,8 @@ import React, { createContext, useContext, useState, useMemo } from 'react';
 import _ from 'lodash';
 
 import { Toaster } from 'app/lib/toaster/ToasterLib';
-import { disableWizard } from 'app/store/redux/slices/helper.slice';
-import reduxStore from 'app/store/redux';
+import { disableWizard } from '@gsender/controller-client/store/redux/slices/helper.slice';
+import reduxStore from '@gsender/controller-client/store/redux';
 
 const WizardContext = createContext({});
 const WizardAPI = createContext({});

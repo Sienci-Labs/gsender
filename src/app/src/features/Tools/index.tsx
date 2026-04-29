@@ -9,8 +9,8 @@ import Macros from '../Macros';
 import { useWidgetState } from 'app/hooks/useWidgetState';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { ATCWidget } from 'app/features/ATC';
-import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
-import { RootState } from 'app/store/redux';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
+import { RootState } from '@gsender/controller-client/store/redux';
 
 export interface TabItem {
     label: string;

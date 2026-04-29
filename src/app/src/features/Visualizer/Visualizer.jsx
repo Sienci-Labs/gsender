@@ -21,7 +21,7 @@
  *
  */
 
-import { store as reduxStore } from 'app/store/redux';
+import { store as reduxStore } from '@gsender/controller-client/store/redux';
 import gsap from 'gsap';
 import { connect } from 'react-redux';
 import _get from 'lodash/get';
@@ -62,7 +62,7 @@ import * as WebGL from 'app/lib/three/WebGL';
 import _ from 'lodash';
 import store from 'app/store';
 
-import controller from '../../lib/controller';
+import controller from '@gsender/controller-client/controller';
 import { getBoundingBox, loadSTL, loadTexture } from './helpers';
 import Viewport from './Viewport';
 import CoordinateAxes from './CoordinateAxes';
@@ -86,7 +86,7 @@ import {
 } from './constants';
 import WidgetConfig from '../WidgetConfig/WidgetConfig';
 import { isLaserMode } from '../../lib/laserMode';
-import { updateFileRenderState } from 'app/store/redux/slices/fileInfo.slice';
+import { updateFileRenderState } from '@gsender/controller-client/store/redux/slices/fileInfo.slice';
 
 const IMPERIAL_GRID_SPACING = 25.4; // 1 in
 const METRIC_GRID_SPACING = 10; // 10 mm

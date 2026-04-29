@@ -26,8 +26,8 @@ import {
     toolStateThemes,
 } from 'app/features/ATC/utils/ATCiConstants.ts';
 import { ToolStatusBadges } from 'app/features/ATC/components/ui/ToolStatusBadges.tsx';
-import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
-import { RootState } from 'app/store/redux';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
+import { RootState } from '@gsender/controller-client/store/redux';
 import get from 'lodash/get';
 
 interface ToolRemapDialogProps {

@@ -24,7 +24,7 @@ import get from 'lodash/get';
 import includes from 'lodash/includes';
 import { useCallback, useEffect, useRef, useState } from 'react';
 // import Space from 'app/components/Space';
-import controller from 'app/lib/controller';
+import controller from '@gsender/controller-client/controller';
 import {
     TOUCHPLATE_TYPE_AUTOZERO,
     PROBE_TYPE_AUTO,
@@ -59,7 +59,7 @@ import {
     TOUCHPLATE_TYPES_T,
 } from './definitions';
 import { UNITS_EN } from 'app/definitions/general';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import { WidgetConfigProvider } from '../WidgetConfig/WidgetContextProvider';
 import { Workspace } from 'app/workspace/definitions';
 

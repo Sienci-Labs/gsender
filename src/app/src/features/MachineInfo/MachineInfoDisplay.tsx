@@ -2,10 +2,10 @@ import { TiPin, TiPinOutline } from 'react-icons/ti';
 import { IoClose } from 'react-icons/io5';
 import ModalRow from 'app/features/MachineInfo/ModalRow.tsx';
 import PinRow from 'app/features/MachineInfo/PinRow.tsx';
-import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import store from 'app/store';
 import { Switch } from '@gsender/ui/shadcn/Switch';
-import controller from 'app/lib/controller.ts';
+import controller from '@gsender/controller-client/controller';
 import get from 'lodash/get';
 import { KeepoutToggle } from 'app/features/ATC/components/KeepOut/KeepOutToggle.tsx';
 

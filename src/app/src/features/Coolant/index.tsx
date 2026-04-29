@@ -19,7 +19,7 @@ import { ActiveStateButton } from '@gsender/ui/primitives/ActiveStateButton';
 import ensureArray from 'ensure-array';
 import includes from 'lodash/includes';
 import { useCallback } from 'react';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 
 export interface CoolantProps {
     mistActive: boolean;

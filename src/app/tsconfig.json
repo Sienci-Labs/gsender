@@ -41,6 +41,24 @@
             "app-root/*": [
                 "./*"
             ],
+            "@gsender/controller-client": [
+                "../../packages/controller-client/src/index.ts"
+            ],
+            "@gsender/controller-client/controller": [
+                "../../packages/controller-client/src/controller.ts"
+            ],
+            "@gsender/controller-client/store/redux": [
+                "../../packages/controller-client/src/store/redux/index.ts"
+            ],
+            "@gsender/controller-client/store/definitions": [
+                "../../packages/controller-client/src/store/definitions.ts"
+            ],
+            "@gsender/controller-client/store/*": [
+                "../../packages/controller-client/src/store/*"
+            ],
+            "@gsender/controller-client/hooks/*": [
+                "../../packages/controller-client/src/hooks/*"
+            ],
             "@gsender/ui": [
                 "../../packages/ui/src/index.ts"
             ],

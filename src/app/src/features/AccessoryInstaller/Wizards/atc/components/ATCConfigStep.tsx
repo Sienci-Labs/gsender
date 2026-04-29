@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { StepProps } from 'app/features/AccessoryInstaller/types';
-import controller from 'app/lib/controller.ts';
+import controller from '@gsender/controller-client/controller';
 import { ConfigTab } from 'app/features/ATC/components/Configuration/components/ConfigTab.tsx';
 import { ConfigProvider, useConfigContext } from 'app/features/ATC/components/Configuration/hooks/useConfigStore.tsx';
 import { repopulateFromSDCard } from 'app/features/ATC/components/Configuration/utils/ConfigUtils.ts';

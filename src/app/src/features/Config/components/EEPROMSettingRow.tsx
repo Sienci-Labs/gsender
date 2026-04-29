@@ -8,7 +8,7 @@ import { FaMicrochip } from 'react-icons/fa6';
 import { ToolLink } from 'app/features/Config/components/wizards/SquaringToolWizard.tsx';
 import Tooltip from '@gsender/ui/primitives/Tooltip';
 import { EEPROM } from 'app/definitions/firmware';
-import { RootState } from 'app/store/redux';
+import { RootState } from '@gsender/controller-client/store/redux';
 import { useSelector } from 'react-redux';
 import {
     resolveGrblCoreDefaults,

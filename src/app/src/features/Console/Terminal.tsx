@@ -8,21 +8,21 @@ import {
 import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 import color from 'cli-color';
-import reduxStore from 'app/store/redux';
+import reduxStore from '@gsender/controller-client/store/redux';
 import { useDispatch } from 'react-redux';
 import uuidv4 from 'uuid/v4';
 
 import controller, {
     addControllerEvents,
     removeControllerEvents,
-} from 'app/lib/controller';
+} from '@gsender/controller-client/controller';
 import {
     TERMINAL_GREY,
     TERMINAL_RED,
     TERMINAL_ALARM_RED,
     WORKSPACE_MODE,
 } from 'app/constants';
-import { addToHistory } from 'app/store/redux/slices/console.slice';
+import { addToHistory } from '@gsender/controller-client/store/redux/slices/console.slice';
 import store from 'app/store';
 
 import '@xterm/xterm/css/xterm.css';

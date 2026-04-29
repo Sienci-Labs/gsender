@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router';
 import get from 'lodash/get';
 
-import controller from 'app/lib/controller';
-import reduxStore from 'app/store/redux';
+import controller from '@gsender/controller-client/controller';
+import reduxStore from '@gsender/controller-client/store/redux';
 import {
     COOLANT_CATEGORY,
     GENERAL_CATEGORY,

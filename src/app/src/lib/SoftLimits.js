@@ -1,4 +1,4 @@
-import reduxStore from 'app/store/redux';
+import reduxStore from '@gsender/controller-client/store/redux';
 import get from 'lodash/get';
 
 const OFFSET = 1; // 1mm offset on all travel movements for soft limits.

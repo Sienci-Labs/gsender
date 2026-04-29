@@ -1,4 +1,4 @@
-import controller from 'app/lib/controller';
+import controller from '@gsender/controller-client/controller';
 
 export function refreshPorts() {
     if (!controller.connected) {

@@ -2,10 +2,10 @@ import { ToolTimeline } from 'app/features/ATC/components/ToolTimeline/component
 import { ToolChange } from 'app/features/ATC/components/ToolTimeline/components/types.ts';
 import { useEffect, useState } from 'react';
 import pubsub from 'pubsub-js';
-import { RootState } from 'app/store/redux';
-import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import { RootState } from '@gsender/controller-client/store/redux';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import get from 'lodash/get';
-import controller from 'app/lib/controller.ts';
+import controller from '@gsender/controller-client/controller';
 import { getToolpathColor } from 'app/features/ATC/utils/ATCFunctions.ts';
 
 function buildToolArray(toolEvents, fileLength) {

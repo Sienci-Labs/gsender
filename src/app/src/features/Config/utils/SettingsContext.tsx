@@ -6,7 +6,7 @@ import {
 import store from 'app/store';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState, store as reduxStore } from 'app/store/redux';
+import { RootState, store as reduxStore } from '@gsender/controller-client/store/redux';
 
 import {
     GRBL_HAL_SETTINGS_MAP,
@@ -29,7 +29,7 @@ import {
 import pubsub from 'pubsub-js';
 import { firmwarePastVersion } from 'app/lib/firmwareSemver.ts';
 import { ATCI_SUPPORTED_VERSION } from 'app/features/ATC/utils/ATCiConstants.ts';
-import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import { debounce } from 'lodash';
 import { BasicObject } from 'app/definitions/general';
 import {

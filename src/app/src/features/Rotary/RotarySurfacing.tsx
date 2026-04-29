@@ -6,7 +6,7 @@ import { Button } from '@gsender/ui/primitives/Button';
 import { ControlledInput } from '@gsender/ui/form/ControlledInput';
 import { Switch } from '@gsender/ui/shadcn/Switch';
 import { Tabs, TabsList, TabsTrigger } from '@gsender/ui/shadcn/Tabs';
-import controller from 'app/lib/controller';
+import controller from '@gsender/controller-client/controller';
 import {
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
@@ -22,7 +22,7 @@ import { convertToImperial, convertToMetric } from 'app/lib/units';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import store from 'app/store';
 import { Tooltip } from '@gsender/ui/primitives/Tooltip';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 
 import { RotarySurfacingOptions } from './definitions';
 import { GcodeViewer } from '../Surfacing/components/GcodeViewer';

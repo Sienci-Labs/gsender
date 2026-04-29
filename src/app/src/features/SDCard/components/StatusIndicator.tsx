@@ -4,7 +4,7 @@ import { UploadState, useSDCard } from 'app/features/SDCard/hooks/useSDCard.ts';
 import { UploadProgressBar } from 'app/features/SDCard/components/UploadProgressBar.tsx';
 import cn from 'classnames';
 import { useEffect, useState } from 'react';
-import controller from 'app/lib/controller.ts';
+import controller from '@gsender/controller-client/controller';
 import { toast } from 'app/lib/toaster';
 
 export function StatusIndicator({ isMounted }) {

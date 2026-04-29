@@ -3,7 +3,7 @@ import cn from 'classnames';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 
-import controller from 'app/lib/controller';
+import controller from '@gsender/controller-client/controller';
 import store from 'app/store';
 import { GRBL } from 'app/constants';
 import { isIPv4 } from 'app/lib/utils';

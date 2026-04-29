@@ -23,7 +23,7 @@
 
 import get from 'lodash/get';
 import { FaQuestion } from 'react-icons/fa6';
-import { store as reduxStore } from '../../store/redux';
+import { store as reduxStore } from '@gsender/controller-client/store/redux';
 import { GRBLHAL } from 'app/constants';
 import { GRBL_ALARMS } from '../../../../server/controllers/Grbl/constants';
 import { GRBL_HAL_ALARMS } from '../../../../server/controllers/Grblhal/constants';

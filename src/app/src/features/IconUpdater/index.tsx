@@ -2,9 +2,9 @@ import gSenderIcon from 'app/workspace/TopBar/assets/icon-round.png';
 import { useState, useEffect } from 'react';
 import { FaDownload } from 'react-icons/fa';
 import cn from 'classnames';
-import reduxStore from 'app/store/redux';
+import reduxStore from '@gsender/controller-client/store/redux';
 import isElectron from 'is-electron';
-import { updateReleaseNotes } from 'app/store/redux/slices/gSenderInfo.slice.ts';
+import { updateReleaseNotes } from '@gsender/controller-client/store/redux/slices/gSenderInfo.slice.ts';
 import { Link } from 'react-router';
 
 export function UpdateBadge({ hidden }) {

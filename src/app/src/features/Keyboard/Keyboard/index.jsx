@@ -48,7 +48,7 @@ import combokeys from 'app/lib/combokeys';
 import {
     holdShortcuts,
     unholdShortcuts,
-} from 'app/store/redux/slices/preferences.slice';
+} from '@gsender/controller-client/store/redux/slices/preferences.slice';
 
 import { formatShortcut } from '../helpers';
 import CategoryFilter from '../CategoryFilter';

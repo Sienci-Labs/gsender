@@ -1,4 +1,4 @@
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 
 import { SpindleLaserStatusVariant } from './SpindleLaserStatusVariant';
 import store from 'app/store';

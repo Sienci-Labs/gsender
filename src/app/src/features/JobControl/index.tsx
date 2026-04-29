@@ -2,7 +2,7 @@ import { Widget } from '@gsender/ui/primitives/Widget';
 import { BasicPosition, GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
-import { WORKFLOW_STATES_T } from 'app/store/definitions';
+import { WORKFLOW_STATES_T } from '@gsender/controller-client/store/definitions';
 import ControlButton from './ControlButton';
 import {
     GRBL_ACTIVE_STATE_IDLE,

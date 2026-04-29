@@ -1,6 +1,6 @@
-import { RootState } from 'app/store/redux';
+import { RootState } from '@gsender/controller-client/store/redux';
 import { useSelector } from 'react-redux';
-import controller from 'app/lib/controller.ts';
+import controller from '@gsender/controller-client/controller';
 import { Button } from '@gsender/ui/primitives/Button';
 import autoSpinIcon from '../../assets/images/autospin.svg';
 import delay from 'lodash/delay';

@@ -4,7 +4,7 @@ import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
 import { useEffect, useState } from 'react';
 import { ATCStartValidations } from 'app/features/ATC/components/ATCStartValidations.tsx';
 import pubsub from 'pubsub-js';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import { getATCUnavailablePayload } from 'app/features/ATC/utils';
 import {ATCUnavailable} from "app/features/ATC/components/ATCUnavailable.tsx";
 

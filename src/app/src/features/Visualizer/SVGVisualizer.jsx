@@ -21,7 +21,7 @@
  *
  */
 
-import { store as reduxStore } from 'app/store/redux';
+import { store as reduxStore } from '@gsender/controller-client/store/redux';
 import api from 'app/api';
 import { connect } from 'react-redux';
 import _get from 'lodash/get';
@@ -34,9 +34,9 @@ import {
     VISUALIZER_PRIMARY,
     VISUALIZER_SECONDARY,
 } from 'app/constants';
-import controller from '../../lib/controller';
+import controller from '@gsender/controller-client/controller';
 import { BACKGROUND_PART, G0_PART, G1_PART } from './constants';
-import { updateFileRenderState } from 'app/store/redux/slices/fileInfo.slice';
+import { updateFileRenderState } from '@gsender/controller-client/store/redux/slices/fileInfo.slice';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 
 class SVGVisualizer extends Component {

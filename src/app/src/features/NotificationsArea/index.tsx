@@ -6,13 +6,13 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from '@gsender/ui/shadcn/Popover';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import { NotificationDisplay } from 'app/features/NotificationsArea/NotificationDisplay';
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { TOOLBAR_CATEGORY } from 'app/constants';
-import reduxStore from 'app/store/redux';
-import { readAllNotifications } from 'app/store/redux/slices/preferences.slice.ts';
+import reduxStore from '@gsender/controller-client/store/redux';
+import { readAllNotifications } from '@gsender/controller-client/store/redux/slices/preferences.slice.ts';
 import Tooltip from '@gsender/ui/primitives/Tooltip';
 
 const NotificationsArea = () => {

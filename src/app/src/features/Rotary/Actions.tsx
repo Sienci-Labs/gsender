@@ -1,5 +1,5 @@
 import Button from '@gsender/ui/primitives/Button';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 
 import MountingSetup from './MountingSetup';
 import {

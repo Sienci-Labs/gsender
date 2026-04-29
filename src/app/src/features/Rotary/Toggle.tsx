@@ -2,7 +2,7 @@ import { Switch } from '@gsender/ui/shadcn/Switch';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { WORKSPACE_MODE } from 'app/constants';
 import { updateWorkspaceMode } from 'app/lib/rotary';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import Tooltip from '@gsender/ui/primitives/Tooltip';
 
 const Toggle = () => {

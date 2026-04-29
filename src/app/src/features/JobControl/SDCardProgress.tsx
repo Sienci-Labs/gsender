@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
-import { RootState } from 'app/store/redux';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
+import { RootState } from '@gsender/controller-client/store/redux';
 import WoodcuttingProgress from 'app/features/JobControl/WoodcuttingProgress.tsx';
 
 export function SDCardProgress() {

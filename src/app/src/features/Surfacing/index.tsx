@@ -14,11 +14,11 @@ import {
 } from 'app/constants';
 import { convertToImperial, convertToMetric } from 'app/lib/units';
 import { Switch } from '@gsender/ui/shadcn/Switch';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import { ControlledInput } from '@gsender/ui/form/ControlledInput';
 import defaultState from 'app/store/defaultState';
 import { Tabs, TabsList, TabsTrigger } from '@gsender/ui/shadcn/Tabs';
-import controller from 'app/lib/controller';
+import controller from '@gsender/controller-client/controller';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 import InputArea from '@gsender/ui/form/InputArea';
 import { Button } from '@gsender/ui/primitives/Button';

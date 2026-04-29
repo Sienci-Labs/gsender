@@ -8,15 +8,15 @@ import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 
 import { Button } from '@gsender/ui/primitives/Button';
-import { RootState, store as reduxStore } from 'app/store/redux';
+import { RootState, store as reduxStore } from '@gsender/controller-client/store/redux';
 import store from 'app/store';
-import controller from 'app/lib/controller';
+import controller from '@gsender/controller-client/controller';
 import {
     CARVING_CATEGORY, GRBL_ACTIVE_STATE_CHECK,
     VISUALIZER_PRIMARY,
     WORKFLOW_STATE_RUNNING,
 } from 'app/constants';
-import { unloadFileInfo } from 'app/store/redux/slices/fileInfo.slice';
+import { unloadFileInfo } from '@gsender/controller-client/store/redux/slices/fileInfo.slice';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -24,7 +24,7 @@ import {
     DropdownMenuLabel,
     DropdownMenuTrigger,
 } from '@gsender/ui/shadcn/Dropdown';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 import {
     AlertDialog,

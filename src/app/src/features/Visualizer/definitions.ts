@@ -7,7 +7,7 @@ import {
     VISUALIZER_TYPES,
 } from '../../constants';
 import { ATCIMacroConfig } from 'app/features/ATC/assets/defaultATCIMacros.ts';
-import { WORKFLOW_STATES_T } from 'app/store/definitions';
+import { WORKFLOW_STATES_T } from '@gsender/controller-client/store/definitions';
 import { WORKSPACE_MODE_T } from 'app/workspace/definitions';
 // Types
 

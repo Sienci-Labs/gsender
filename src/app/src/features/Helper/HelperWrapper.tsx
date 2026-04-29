@@ -24,12 +24,12 @@
 import { useEffect, useState } from 'react';
 import pubsub from 'pubsub-js';
 import { useWizardAPI } from 'app/features/Helper/context';
-import reduxStore from 'app/store/redux';
+import reduxStore from '@gsender/controller-client/store/redux';
 import {
     disableInfoHelper,
     enableInfoHelper,
     enableWizard,
-} from 'app/store/redux/slices/helper.slice.ts';
+} from '@gsender/controller-client/store/redux/slices/helper.slice.ts';
 import Wizard from './Wizard';
 import HelperInfo from './HelperInfo';
 

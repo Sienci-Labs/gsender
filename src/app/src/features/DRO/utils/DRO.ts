@@ -1,8 +1,8 @@
-import controller from 'app/lib/controller';
+import controller from '@gsender/controller-client/controller';
 import store from 'app/store';
 import get from 'lodash/get';
 import { METRIC_UNITS } from 'app/constants';
-import { store as reduxStore } from 'app/store/redux';
+import { store as reduxStore } from '@gsender/controller-client/store/redux';
 import {
     isATCAvailable,
     sendATCHomingDialog,

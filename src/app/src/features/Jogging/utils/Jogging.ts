@@ -1,6 +1,6 @@
 import map from 'lodash/map';
 
-import controller from 'app/lib/controller';
+import controller from '@gsender/controller-client/controller';
 import {
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,

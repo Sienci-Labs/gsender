@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Select from 'react-select';
 import { LuRefreshCw } from 'react-icons/lu';
 
-import controller from 'app/lib/controller';
+import controller from '@gsender/controller-client/controller';
 import { Button } from '@gsender/ui/primitives/Button';
 import { ControlledInput } from '@gsender/ui/form/ControlledInput';
 import {
@@ -27,7 +27,7 @@ import zAxisCalibrationImage2 from '../assets/Z_axis-calibration_2.png';
 
 import { Jogging } from '../../Jogging';
 import { getEEPROMSettingKey, calculateNewStepsPerMM } from '../utils';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import { EEPROM } from 'app/definitions/firmware';
 import { jogAxis } from 'app/features/Jogging/utils/Jogging';
 import { toast } from 'app/lib/toaster';

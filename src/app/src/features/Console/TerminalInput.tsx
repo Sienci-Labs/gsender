@@ -6,9 +6,9 @@ import { FaEllipsisH } from 'react-icons/fa';
 
 import { Button } from '@gsender/ui/primitives/Button';
 import { Input } from '@gsender/ui/shadcn/Input';
-import { addToInputHistory } from 'app/store/redux/slices/console.slice';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import controller from 'app/lib/controller';
+import { addToInputHistory } from '@gsender/controller-client/store/redux/slices/console.slice';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
+import controller from '@gsender/controller-client/controller';
 import { toast } from 'app/lib/toaster';
 import {
     Popover,

@@ -26,8 +26,8 @@ import pubsub from 'pubsub-js';
 import isElectron from 'is-electron';
 
 import store from 'app/store';
-import { store as reduxStore } from 'app/store/redux';
-import controller from 'app/lib/controller';
+import { store as reduxStore } from '@gsender/controller-client/store/redux';
+import controller from '@gsender/controller-client/controller';
 import manualToolChange from 'app/wizards/manualToolchange';
 import semiautoToolChange from 'app/wizards/semiautoToolchange';
 import { determineFixedSensorInstructions } from 'app/lib/toolChangeUtils';
@@ -66,8 +66,8 @@ import {
     openConnection,
     scanNetwork,
     setConnectionState,
-} from '../slices/connection.slice';
-import { listPorts } from '../slices/connection.slice';
+} from '@gsender/controller-client/store/redux/slices/connection.slice';
+import { listPorts } from '@gsender/controller-client/store/redux/slices/connection.slice';
 import {
     resetHoming,
     updateControllerSettings,
@@ -83,7 +83,7 @@ import {
     updateSenderStatus,
     updateControllerType,
     addSDCardFileToList,
-} from '../slices/controller.slice';
+} from '@gsender/controller-client/store/redux/slices/controller.slice';
 import {
     FILE_TYPE_T,
     PortInfo,
@@ -109,9 +109,9 @@ import {
     updateFileContent,
     updateFileProcessing,
     updateFileRenderState,
-} from '../slices/fileInfo.slice';
-import { setIpList } from '../slices/preferences.slice';
-import { updateJobOverrides } from '../slices/visualizer.slice';
+} from '@gsender/controller-client/store/redux/slices/fileInfo.slice';
+import { setIpList } from '@gsender/controller-client/store/redux/slices/preferences.slice';
+import { updateJobOverrides } from '@gsender/controller-client/store/redux/slices/visualizer.slice';
 import { toast } from 'app/lib/toaster';
 import { Job } from 'app/features/Stats/utils/StatContext';
 import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';

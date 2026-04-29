@@ -8,8 +8,8 @@ import {
 } from 'app/definitions/firmware';
 
 import store from '../store';
-import controller from './controller';
-import { store as reduxStore } from '../store/redux';
+import controller from '@gsender/controller-client/controller';
+import { store as reduxStore } from '@gsender/controller-client/store/redux';
 import {
     WORKSPACE_MODE,
     ROTARY_MODE_FIRMWARE_SETTINGS,

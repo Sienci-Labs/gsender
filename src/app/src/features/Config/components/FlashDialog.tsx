@@ -17,13 +17,13 @@ import {
 } from '@gsender/ui/shadcn/Select.tsx';
 import { Button } from '@gsender/ui/primitives/Button';
 import { toast } from 'app/lib/toaster';
-import controller from 'app/lib/controller.ts';
+import controller from '@gsender/controller-client/controller';
 import store from 'app/store';
 import get from 'lodash/get';
 
 import cn from 'classnames';
 import { FlashingProgress } from 'app/features/Config/components/FlashingProgress.tsx';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 
 interface flashDialogProps {
     show: boolean;

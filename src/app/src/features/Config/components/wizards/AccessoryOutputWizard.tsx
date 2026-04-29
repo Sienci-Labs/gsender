@@ -1,5 +1,5 @@
 import { Button } from '@gsender/ui/primitives/Button';
-import controller from 'app/lib/controller.ts';
+import controller from '@gsender/controller-client/controller';
 
 export function AccessoryOutputWizard() {
     function sendCommand(command) {

@@ -4,7 +4,7 @@ import {
     VISUALIZER_SECONDARY,
 } from 'app/constants';
 import Visualizer from 'app/features/Visualizer';
-import { setCurrentVisualizer } from 'app/store/redux/slices/visualizer.slice';
+import { setCurrentVisualizer } from '@gsender/controller-client/store/redux/slices/visualizer.slice';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 

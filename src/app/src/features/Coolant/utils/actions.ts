@@ -1,7 +1,7 @@
 import { GRBL, GRBL_ACTIVE_STATE_IDLE, GRBLHAL, WORKFLOW_STATE_RUNNING } from 'app/constants';
-import controller from 'app/lib/controller';
+import controller from '@gsender/controller-client/controller';
 import { get } from 'lodash';
-import reduxStore from 'app/store/redux';
+import reduxStore from '@gsender/controller-client/store/redux';
 
 export function startMist() {
     controller.command('gcode', 'M7');

@@ -16,17 +16,17 @@ import {
 
 import { Button } from '@gsender/ui/primitives/Button';
 import { toast } from 'app/lib/toaster';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
-import controller from 'app/lib/controller';
+import controller from '@gsender/controller-client/controller';
 import {
     VISUALIZER_PRIMARY,
     WORKFLOW_STATE_RUNNING,
     WORKFLOW_STATE_PAUSED,
 } from 'app/constants';
-import { store as reduxStore } from 'app/store/redux';
-import { updateFileContent } from 'app/store/redux/slices/fileInfo.slice';
-import { RootState } from 'app/store/redux';
+import { store as reduxStore } from '@gsender/controller-client/store/redux';
+import { updateFileContent } from '@gsender/controller-client/store/redux/slices/fileInfo.slice';
+import { RootState } from '@gsender/controller-client/store/redux';
 import { cn } from 'app/lib/utils';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 

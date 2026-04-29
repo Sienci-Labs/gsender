@@ -5,7 +5,7 @@ import {
     DialogTitle,
 } from '@gsender/ui/shadcn/Dialog.tsx';
 import Button from '@gsender/ui/primitives/Button';
-import controller from 'app/lib/controller.ts';
+import controller from '@gsender/controller-client/controller';
 import { FaPlay } from 'react-icons/fa';
 
 export function ATCStartValidations({

@@ -52,11 +52,11 @@ import {
     ConnectionState,
     ControllerState,
     FileInfoState,
-} from 'app/store/definitions';
-import controllerInstance from 'app/lib/controller';
+} from '@gsender/controller-client/store/definitions';
+import controllerInstance from '@gsender/controller-client/controller';
 
 import store from '../store';
-import { store as reduxStore } from '../store/redux';
+import { store as reduxStore } from '@gsender/controller-client/store/redux';
 import pkg from '../../package.json';
 import {
     GRBLHAL,

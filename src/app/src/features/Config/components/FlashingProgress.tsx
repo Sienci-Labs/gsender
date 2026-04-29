@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import controller from 'app/lib/controller.ts';
+import controller from '@gsender/controller-client/controller';
 import _throttle from 'lodash/throttle';
 import cn from 'classnames';
 import { ProgressBar } from '@gsender/ui/primitives/ProgressBar';

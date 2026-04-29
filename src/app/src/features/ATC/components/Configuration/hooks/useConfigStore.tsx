@@ -5,9 +5,9 @@ import React, {
     ReactNode,
     useEffect,
 } from 'react';
-import controller from 'app/lib/controller.ts';
-import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
-import { RootState } from 'app/store/redux';
+import controller from '@gsender/controller-client/controller';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
+import { RootState } from '@gsender/controller-client/store/redux';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import mapValues from 'lodash/mapValues';

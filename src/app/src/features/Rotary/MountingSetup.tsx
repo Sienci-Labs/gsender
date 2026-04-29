@@ -18,7 +18,7 @@ import {
     VISUALIZER_PRIMARY,
     WORKSPACE_MODE,
 } from 'app/constants';
-import controller from 'app/lib/controller';
+import controller from '@gsender/controller-client/controller';
 
 import standardTrackGraphic from './assets/standard-track-top-view.png';
 import extensionTrackGraphic from './assets/extension-track-top-view.png';

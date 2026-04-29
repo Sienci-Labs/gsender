@@ -24,7 +24,7 @@
 // import colornames from 'colornames';
 import * as THREE from 'three';
 import _get from 'lodash/get';
-import { store as reduxStore } from 'app/store/redux';
+import { store as reduxStore } from '@gsender/controller-client/store/redux';
 import { CUTTING_PART, PLANNED_PART, SECONDARY_COLOR } from './constants';
 import { checkIfRotaryFile } from '../../lib/rotary';
 

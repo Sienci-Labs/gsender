@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
-import { RootState } from 'app/store/redux';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
+import { RootState } from '@gsender/controller-client/store/redux';
 import { firmwareSemver } from 'app/lib/firmwareSemver.ts';
 import { ATCI_SUPPORTED_VERSION } from 'app/features/ATC/utils/ATCiConstants.ts';
 import {GRBL, GRBLHAL} from "app/constants";

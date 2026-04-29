@@ -8,7 +8,7 @@ import {
 } from '@gsender/ui/shadcn/Tabs';
 import { ConfigTab } from './ConfigTab';
 import { TemplatesTab } from './TemplatesTab';
-import controller from 'app/lib/controller.ts';
+import controller from '@gsender/controller-client/controller';
 import { repopulateFromSDCard } from 'app/features/ATC/components/Configuration/utils/ConfigUtils.ts';
 import { useConfigContext } from 'app/features/ATC/components/Configuration/hooks/useConfigStore.tsx';
 

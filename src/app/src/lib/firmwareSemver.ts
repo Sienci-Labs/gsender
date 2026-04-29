@@ -1,4 +1,4 @@
-import reduxStore from 'app/store/redux';
+import reduxStore from '@gsender/controller-client/store/redux';
 import get from 'lodash/get';
 /**
  * Predicate whether the currently reported firmware version exceeds the required version

@@ -20,13 +20,13 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-import controller from 'app/lib/controller';
+import controller from '@gsender/controller-client/controller';
 import {
     getProbeSettings,
     getUnitModal,
     getToolString,
 } from 'app/lib/toolChangeUtils';
-import { store as reduxStore } from 'app/store/redux';
+import { store as reduxStore } from '@gsender/controller-client/store/redux';
 import get from 'lodash/get';
 
 const getMoveAmount = () => {

@@ -1,7 +1,7 @@
 import get from 'lodash/get';
 
 import store from 'app/store';
-import reduxStore from 'app/store/redux';
+import reduxStore from '@gsender/controller-client/store/redux';
 import {
     METRIC_UNITS,
     STOCK_TURNING_METHOD,

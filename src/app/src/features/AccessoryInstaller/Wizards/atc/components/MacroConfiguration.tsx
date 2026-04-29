@@ -2,7 +2,7 @@ import { StepProps } from 'app/features/AccessoryInstaller/types';
 import { StepActionButton } from 'app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx';
 import { useEffect, useState } from 'react';
 import { generateAllMacros } from 'app/features/ATC/components/Configuration/utils/ConfigUtils.ts';
-import controller from 'app/lib/controller.ts';
+import controller from '@gsender/controller-client/controller';
 import store from 'app/store';
 
 export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {

@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import { useSelector } from 'react-redux';
 import get from 'lodash/get';
 
-import { RootState } from 'app/store/redux';
+import { RootState } from '@gsender/controller-client/store/redux';
 import { homingString } from 'app/lib/eeprom.ts';
 import { truncatePort } from 'app/features/Stats/utils/statUtils.ts';
 import store from 'app/store';

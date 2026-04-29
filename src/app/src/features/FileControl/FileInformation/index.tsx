@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import pubsub from 'pubsub-js';
 
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import { Switch } from '@gsender/ui/shadcn/Switch';
 
 import Size from './Size';
