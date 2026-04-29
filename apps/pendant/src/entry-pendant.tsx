@@ -1,34 +1,38 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { Provider as ReduxProvider } from 'react-redux';
 
-function PendantPlaceholder() {
-    return (
-        <div
-            style={{
-                fontFamily:
-                    '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                background: '#0f172a',
-                color: '#f1f5f9',
-                minHeight: '100vh',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexDirection: 'column',
-                gap: 16,
-            }}
-        >
-            <h1 style={{ fontSize: 48, margin: 0 }}>gSender Pendant</h1>
-            <p style={{ fontSize: 18, opacity: 0.7, margin: 0 }}>
-                Placeholder — touch UI coming soon
-            </p>
-            <p style={{ fontSize: 12, opacity: 0.4, margin: 0 }}>
-                Served from gSender at {window.location.host}
-            </p>
-        </div>
+import { store as reduxStore } from '@gsender/controller-client/store/redux';
+import { sagaMiddleware, createRootSaga } from '@gsender/controller-client/store/redux/sagas';
+import controller from '@gsender/controller-client/controller';
+import { FocusTrappingProvider } from '@gsender/ui/lib/focus-trapping';
+import { getHost } from './tauri-bridge';
+import PendantShell from './PendantShell';
+
+import './index.css';
+
+sagaMiddleware.run(createRootSaga([]));
+
+async function bootstrap() {
+    // In Tauri, getHost() returns the stored gSender host.
+    // In a browser, fall back to same-origin (connects to whatever served this page).
+    const storedHost = await getHost();
+    const host = storedHost ? `http://${storedHost}` : '';
+
+    controller.connect(host, { query: 'token=' });
+
+    const root = document.getElementById('root');
+    if (!root) return;
+
+    ReactDOM.createRoot(root).render(
+        <React.StrictMode>
+            <ReduxProvider store={reduxStore}>
+                <FocusTrappingProvider value={true}>
+                    <PendantShell />
+                </FocusTrappingProvider>
+            </ReduxProvider>
+        </React.StrictMode>,
     );
 }
 
-const root = document.getElementById('root');
-if (root) {
-    ReactDOM.createRoot(root).render(<PendantPlaceholder />);
-}
+bootstrap();
