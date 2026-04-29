@@ -191,7 +191,7 @@ function prebuild(target) {
         fs.mkdirSync(path.join(baseDir, 'app'), { recursive: true });
         fs.mkdirSync(path.join(baseDir, 'app-server'), { recursive: true });
         for (const asset of ['favicon.ico', 'images', 'assets']) {
-            const src = path.join(__dirname, 'src/app', asset);
+            const src = path.join(__dirname, 'apps/desktop', asset);
             if (fs.existsSync(src)) {
                 fs.cpSync(src, path.join(baseDir, 'app', asset), { recursive: true });
             }

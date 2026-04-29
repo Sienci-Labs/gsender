@@ -15,8 +15,8 @@ module.exports = {
   moduleNameMapper: {
     '\\.(css|less|scss|sass|styl)$': '<rootDir>/__mocks__/styleMock.js',
     '\\.(jpg|jpeg|png|gif|svg)$': '<rootDir>/__mocks__/fileMock.js',
-    '^app/(.*)$': '<rootDir>/src/app/src/$1',
-    '^(\\.{1,2}/)*config/settings$': '<rootDir>/src/app/src/config/__mocks__/settings.ts',
+    '^app/(.*)$': '<rootDir>/apps/desktop/src/$1',
+    '^(\\.{1,2}/)*config/settings$': '<rootDir>/apps/desktop/src/config/__mocks__/settings.ts',
   },
   testMatch: ['**/__tests__/**/*.[jt]s?(x)', '**/*.test.[jt]s?(x)'],
   haste: {

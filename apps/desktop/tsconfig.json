@@ -39,7 +39,7 @@
                 "src/*"
             ],
             "app-root/*": [
-                "./*"
+                "../../*"
             ],
             "@gsender/features/*": [
                 "../../packages/features/src/*"

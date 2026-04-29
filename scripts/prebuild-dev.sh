@@ -8,4 +8,4 @@ cross-env NODE_ENV=development babel "electron-app/**/*.js" \
     --out-dir ../output/electron-app
 popd
 mkdir -p output/app output/app-server
-cp -af src/app/{favicon.ico,images,assets} output/app/ 2>/dev/null || true
+cp -af apps/desktop/{favicon.ico,images,assets} output/app/ 2>/dev/null || true

@@ -52,6 +52,7 @@ export default defineConfig({
             '@gsender/ui/form': path.resolve(__dirname, '../../packages/ui/src/form'),
             '@gsender/ui/lib': path.resolve(__dirname, '../../packages/ui/src/lib'),
             '@gsender/ui': path.resolve(__dirname, '../../packages/ui/src/index.ts'),
+            'app-root': path.resolve(__dirname, '../../'),
             app: path.resolve(__dirname, './src'),
             '@': path.resolve(__dirname, './src'),
         },
