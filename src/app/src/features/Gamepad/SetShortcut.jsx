@@ -23,7 +23,7 @@ import {
 import shuttleEvents from 'app/lib/shuttleEvents';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
 import { Switch } from '@gsender/ui/shadcn/Switch';
-import Button from 'app/components/Button';
+import Button from '@gsender/ui/primitives/Button';
 import {
     Table,
     TableHeader,

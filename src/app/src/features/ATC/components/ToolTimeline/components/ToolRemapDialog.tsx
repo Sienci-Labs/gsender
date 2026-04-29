@@ -14,7 +14,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@gsender/ui/shadcn/Select';
-import { Button } from 'app/components/Button';
+import { Button } from '@gsender/ui/primitives/Button';
 import { Label } from '@gsender/ui/shadcn/Label';
 import { Badge } from '@gsender/ui/shadcn/Badge';
 import {

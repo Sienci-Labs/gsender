@@ -2,9 +2,9 @@ import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { FaGamepad, FaTimes } from 'react-icons/fa';
 
-import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
+import { Confirm } from '@gsender/ui/primitives/ConfirmationDialog/ConfirmationDialogLib';
 import { toast } from 'app/lib/toaster';
-import ToolCard from 'app/components/ToolCard';
+import ToolCard from '@gsender/ui/primitives/ToolCard';
 
 import { GamepadContext } from './utils/context';
 import {

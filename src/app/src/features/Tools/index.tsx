@@ -1,5 +1,5 @@
-import { Widget } from '../../components/Widget';
-import { Tabs } from '../../components/Tabs';
+import { Widget } from '@gsender/ui/primitives/Widget';
+import { Tabs } from '@gsender/ui/primitives/Tabs';
 import Console from '../Console';
 import Probe from '../Probe';
 import Spindle from '../Spindle';

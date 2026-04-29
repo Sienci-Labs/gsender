@@ -5,7 +5,7 @@ import React, {
     useImperativeHandle,
 } from 'react';
 
-import { Tooltip } from 'app/components/Tooltip';
+import { Tooltip } from '@gsender/ui/primitives/Tooltip';
 
 const queue = [];
 

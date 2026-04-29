@@ -1,7 +1,7 @@
-import { Label } from 'app/components/Label';
-import { ControlledInput } from 'app/components/ControlledInput';
+import { Label } from '@gsender/ui/primitives/Label';
+import { ControlledInput } from '@gsender/ui/form/ControlledInput';
 import { FaMinus, FaPlus } from 'react-icons/fa';
-import Button from 'app/components/Button';
+import Button from '@gsender/ui/primitives/Button';
 import { toFixedIfNecessary } from 'app/lib/rounding';
 
 interface JogInputProps {

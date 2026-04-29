@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { store as reduxStore } from 'app/store/redux';
-import Button from 'app/components/Button';
+import Button from '@gsender/ui/primitives/Button';
 import controller from 'app/lib/controller';
 import {
     AlertDialog,

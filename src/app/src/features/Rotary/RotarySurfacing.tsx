@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import cx from 'classnames';
 
-import { Button } from 'app/components/Button';
-import { ControlledInput } from 'app/components/ControlledInput';
+import { Button } from '@gsender/ui/primitives/Button';
+import { ControlledInput } from '@gsender/ui/form/ControlledInput';
 import { Switch } from '@gsender/ui/shadcn/Switch';
 import { Tabs, TabsList, TabsTrigger } from '@gsender/ui/shadcn/Tabs';
 import controller from 'app/lib/controller';
@@ -21,7 +21,7 @@ import useKeybinding from 'app/lib/useKeybinding';
 import { convertToImperial, convertToMetric } from 'app/lib/units';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import store from 'app/store';
-import { Tooltip } from 'app/components/Tooltip';
+import { Tooltip } from '@gsender/ui/primitives/Tooltip';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 
 import { RotarySurfacingOptions } from './definitions';

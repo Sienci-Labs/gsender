@@ -3,7 +3,7 @@ import {
     handleManualOffset,
     homeAxis,
 } from 'app/features/DRO/utils/DRO.ts';
-import { Button } from 'app/components/Button';
+import { Button } from '@gsender/ui/primitives/Button';
 import { zeroWCS, gotoZero } from '../utils/DRO.ts';
 import { WCSInput } from 'app/features/DRO/component/WCSInput.tsx';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState.ts';

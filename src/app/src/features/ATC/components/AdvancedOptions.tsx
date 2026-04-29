@@ -1,7 +1,7 @@
 import { Download, Upload } from 'lucide-react';
 import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
 import { ToolDisplayModal } from 'app/features/ATC/components/ToolDisplayModal.tsx';
-import { LongPressButton } from 'app/components/LongPressButton';
+import { LongPressButton } from '@gsender/ui/primitives/LongPressButton';
 import {
     releaseToolFromSpindle,
     unloadTool,

@@ -7,7 +7,7 @@ import pubsub from 'pubsub-js';
 import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 
-import { Button } from 'app/components/Button';
+import { Button } from '@gsender/ui/primitives/Button';
 import { RootState, store as reduxStore } from 'app/store/redux';
 import store from 'app/store';
 import controller from 'app/lib/controller';
@@ -48,7 +48,7 @@ import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
 import { useSelector } from 'react-redux';
 import { toast } from 'app/lib/toaster';
 import get from 'lodash/get';
-import { Tooltip } from 'app/components/Tooltip';
+import { Tooltip } from '@gsender/ui/primitives/Tooltip';
 
 const ButtonControlGroup = () => {
     const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.platform) ||

@@ -25,7 +25,7 @@ import React, { useCallback, useRef, useEffect } from 'react';
 import cx from 'classnames';
 
 import { Button as ShadcnButton } from '@gsender/ui/shadcn/Button';
-import { Button } from 'app/components/Button';
+import { Button } from '@gsender/ui/primitives/Button';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -40,7 +40,7 @@ import ProbeDirectionSelection from './ProbeDirectionSelection';
 import { Actions, State } from './definitions';
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
-import Tooltip from 'app/components/Tooltip';
+import Tooltip from '@gsender/ui/primitives/Tooltip';
 import { TOUCHPLATE_TYPES } from 'app/lib/constants';
 
 type ProbeProps = {

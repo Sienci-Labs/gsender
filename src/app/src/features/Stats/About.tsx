@@ -5,7 +5,7 @@ import { FaExternalLinkAlt } from 'react-icons/fa';
 import { version } from 'app-root/package.json';
 
 import useGetReleaseNotes from './utils/useGetReleaseNotes';
-import { Button } from 'app/components/Button';
+import { Button } from '@gsender/ui/primitives/Button';
 import { cn } from 'app/lib/utils';
 import { RootState } from 'app/store/redux';
 import { useSelector } from 'react-redux';

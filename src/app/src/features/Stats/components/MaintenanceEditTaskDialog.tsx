@@ -21,7 +21,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@gsender/ui/shadcn/AlertDialog';
-// import Button from 'app/components/Button';
+// import Button from '@gsender/ui/primitives/Button';
 
 interface MaintenanceEditTaskDialogProps {
     show: boolean;

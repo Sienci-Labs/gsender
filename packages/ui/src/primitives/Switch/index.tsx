@@ -1,7 +1,7 @@
 import React, { useId } from 'react';
 
 import Toggle from './Toggle';
-import { cn } from 'app/lib/utils';
+import { cn } from '@gsender/ui/lib/utils';
 
 interface SwitchProps {
     label?: string;

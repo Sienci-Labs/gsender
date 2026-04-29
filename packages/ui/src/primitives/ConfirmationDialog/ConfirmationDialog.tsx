@@ -24,7 +24,7 @@ import { useState, useEffect, ReactNode } from 'react';
 import pubsub from 'pubsub-js';
 import cx from 'classnames';
 import { FaExclamationTriangle, FaRedo } from 'react-icons/fa';
-import { Button } from 'app/components/Button';
+import { Button } from '@gsender/ui/primitives/Button';
 import ConfirmationDialogButton from './ConfirmationDialogButton';
 import { DIALOG_CONFIRM, DIALOG_CANCEL } from './ConfirmationDialogLib';
 

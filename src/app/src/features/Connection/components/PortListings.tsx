@@ -1,7 +1,7 @@
 import { BsEthernet, BsUsbPlug } from 'react-icons/bs';
 import { ConnectionType, FirmwareFlavour } from '../index';
 import { Port } from '../definitions';
-import Tooltip from 'app/components/Tooltip';
+import Tooltip from '@gsender/ui/primitives/Tooltip';
 import { useEffect, useState } from 'react';
 import store from 'app/store';
 import { FaArrowAltCircleRight } from 'react-icons/fa';

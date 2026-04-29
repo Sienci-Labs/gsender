@@ -4,7 +4,7 @@ import { FrownIcon } from 'lucide-react';
 import pubsub from 'pubsub-js';
 
 import * as WebGL from 'app/lib/three/WebGL';
-import { Widget } from 'app/components/Widget';
+import { Widget } from '@gsender/ui/primitives/Widget';
 import VisualizerWrapper from './VisualizerWrapper';
 import Loading from './Loading';
 import Rendering from './Rendering';
@@ -13,7 +13,7 @@ import CameraDisplay from './CameraDisplay/CameraDisplay';
 import { WorkspaceSelector } from 'app/features/WorkspaceSelector/index.tsx';
 import { FaFeatherAlt } from 'react-icons/fa';
 import cx from 'classnames';
-import { Tooltip } from 'app/components/Tooltip';
+import { Tooltip } from '@gsender/ui/primitives/Tooltip';
 import GcodeEditor from './GcodeEditor';
 import { Actions, State } from './definitions';
 

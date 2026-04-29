@@ -8,7 +8,7 @@ import { GRBL_ACTIVE_STATE_ALARM, GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import controller from 'app/lib/controller';
 import { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
-import Tooltip from 'app/components/Tooltip';
+import Tooltip from '@gsender/ui/primitives/Tooltip';
 
 export function unlockFirmware(
     state: GRBL_ACTIVE_STATES_T,

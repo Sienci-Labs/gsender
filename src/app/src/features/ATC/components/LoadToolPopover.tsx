@@ -12,7 +12,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@gsender/ui/shadcn/Select.tsx';
-import { Button } from 'app/components/Button';
+import { Button } from '@gsender/ui/primitives/Button';
 import { cn } from 'app/lib/utils';
 import {
     ToolInstance,

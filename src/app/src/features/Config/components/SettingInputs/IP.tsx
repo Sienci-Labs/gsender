@@ -1,4 +1,4 @@
-import { ControlledInput } from 'app/components/ControlledInput';
+import { ControlledInput } from '@gsender/ui/form/ControlledInput';
 
 interface IPSettingInputsProps {
     ip: number[];

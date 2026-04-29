@@ -31,7 +31,7 @@ import controller from 'app/lib/controller';
 import manualToolChange from 'app/wizards/manualToolchange';
 import semiautoToolChange from 'app/wizards/semiautoToolchange';
 import { determineFixedSensorInstructions } from 'app/lib/toolChangeUtils';
-import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
+import { Confirm } from '@gsender/ui/primitives/ConfirmationDialog/ConfirmationDialogLib';
 // TODO: add worker types
 // @ts-ignore
 import VisualizeWorker from 'app/workers/Visualize.worker';

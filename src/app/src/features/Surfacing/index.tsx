@@ -15,15 +15,15 @@ import {
 import { convertToImperial, convertToMetric } from 'app/lib/units';
 import { Switch } from '@gsender/ui/shadcn/Switch';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import { ControlledInput } from 'app/components/ControlledInput';
+import { ControlledInput } from '@gsender/ui/form/ControlledInput';
 import defaultState from 'app/store/defaultState';
 import { Tabs, TabsList, TabsTrigger } from '@gsender/ui/shadcn/Tabs';
 import controller from 'app/lib/controller';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
-import InputArea from 'app/components/InputArea';
-import { Button } from 'app/components/Button';
+import InputArea from '@gsender/ui/form/InputArea';
+import { Button } from '@gsender/ui/primitives/Button';
 import VisualizerPreview from './components/VisualizerPreview';
-import Tooltip from 'app/components/Tooltip';
+import Tooltip from '@gsender/ui/primitives/Tooltip';
 
 import { Surfacing } from './definitions';
 import MachinePosition from './components/MachinePosition';

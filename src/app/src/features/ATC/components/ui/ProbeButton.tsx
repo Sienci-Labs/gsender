@@ -1,4 +1,4 @@
-import { Button } from 'app/components/Button/';
+import { Button } from '@gsender/ui/primitives/Button/';
 import { Settings } from 'lucide-react';
 import cn from 'classnames';
 

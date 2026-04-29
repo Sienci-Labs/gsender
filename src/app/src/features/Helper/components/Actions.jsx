@@ -27,7 +27,7 @@ import { GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
 import uniqueId from 'lodash/uniqueId';
 import get from 'lodash/get';
 import controller from 'app/lib/controller';
-import ToolModalButton from 'app/components/ToolModalButton';
+import ToolModalButton from '@gsender/ui/primitives/ToolModalButton';
 import { useWizardAPI, useWizardContext } from 'app/features/Helper/context';
 import styles from '../index.module.styl';
 import { FaCode } from 'react-icons/fa';

@@ -1,7 +1,7 @@
 import { JSX, useEffect, useState } from 'react';
 import cx from 'classnames';
 import { Button as ShadButton } from '@gsender/ui/shadcn/Button';
-import { Button } from 'app/components/Button';
+import { Button } from '@gsender/ui/primitives/Button';
 import { MdFormatListNumbered } from 'react-icons/md';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { METRIC_UNITS, IMPERIAL_UNITS } from 'app/constants';
@@ -14,8 +14,8 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@gsender/ui/shadcn/Dialog';
-import Tooltip from 'app/components/Tooltip';
-import { ControlledInput } from 'app/components/ControlledInput';
+import Tooltip from '@gsender/ui/primitives/Tooltip';
+import { ControlledInput } from '@gsender/ui/form/ControlledInput';
 import { FaPlay } from 'react-icons/fa';
 import { toast } from 'app/lib/toaster';
 import { useSelector } from 'react-redux';

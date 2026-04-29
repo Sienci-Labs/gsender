@@ -34,7 +34,7 @@ import {
     SHORTCUT_CATEGORY,
 } from 'app/constants';
 import store from 'app/store';
-import Button from 'app/components/Button';
+import Button from '@gsender/ui/primitives/Button';
 import shuttleEvents from 'app/lib/shuttleEvents';
 import { toast } from 'app/lib/toaster';
 import {

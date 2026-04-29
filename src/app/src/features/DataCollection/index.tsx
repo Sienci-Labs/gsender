@@ -9,7 +9,7 @@ import {
 } from '@gsender/ui/shadcn/Sheet';
 import api from 'app/api';
 import { USER_DATA_COLLECTION } from 'app/constants';
-import Button from 'app/components/Button';
+import Button from '@gsender/ui/primitives/Button';
 
 const DataCollection = () => {
     const [open, setOpen] = useState(false);

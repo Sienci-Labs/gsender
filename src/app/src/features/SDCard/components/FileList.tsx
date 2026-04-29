@@ -9,7 +9,7 @@ import {
     TableHeader,
     TableRow,
 } from '@gsender/ui/shadcn/Table';
-import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
+import { Confirm } from '@gsender/ui/primitives/ConfirmationDialog/ConfirmationDialogLib.ts';
 import controller from 'app/lib/controller.ts';
 import reduxStore from 'app/store/redux';
 import { clearSDCardFiles } from 'app/store/redux/slices/controller.slice.ts';

@@ -1,7 +1,7 @@
 import cx from 'classnames';
 
-import { Label } from 'app/components/Label';
-import { ControlledInput } from 'app/components/ControlledInput';
+import { Label } from '@gsender/ui/primitives/Label';
+import { ControlledInput } from '@gsender/ui/form/ControlledInput';
 
 export interface UnitInputProps {
     units: string;

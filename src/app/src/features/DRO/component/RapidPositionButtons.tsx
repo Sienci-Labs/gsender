@@ -11,7 +11,7 @@ import {
     FRONT_RIGHT,
     getMovementGCode,
 } from 'app/features/DRO/utils/RapidPosition';
-import Tooltip from 'app/components/Tooltip';
+import Tooltip from '@gsender/ui/primitives/Tooltip';
 import cn from 'classnames';
 export function RapidPositionButtons({ disabled = false }) {
     const homingFlag = useSelector(

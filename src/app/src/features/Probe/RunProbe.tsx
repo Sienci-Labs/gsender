@@ -29,7 +29,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@gsender/ui/shadcn/Dialog';
-import { Button } from 'app/components/Button';
+import { Button } from '@gsender/ui/primitives/Button';
 import cx from 'classnames';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { toast } from 'app/lib/toaster';

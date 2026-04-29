@@ -6,7 +6,7 @@ import {
     mountSDCard,
     refreshSDCardFiles,
 } from 'app/features/SDCard/utils/utils.ts';
-import Button from 'app/components/Button';
+import Button from '@gsender/ui/primitives/Button';
 
 export function ActionButtons() {
     const { isMounted, isConnected, isLoading, setIsLoading, firmwareType, hasFTP, hasYM } = useSDCard();

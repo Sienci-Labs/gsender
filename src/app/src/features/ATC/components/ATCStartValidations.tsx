@@ -4,7 +4,7 @@ import {
     DialogDescription,
     DialogTitle,
 } from '@gsender/ui/shadcn/Dialog.tsx';
-import Button from 'app/components/Button';
+import Button from '@gsender/ui/primitives/Button';
 import controller from 'app/lib/controller.ts';
 import { FaPlay } from 'react-icons/fa';
 

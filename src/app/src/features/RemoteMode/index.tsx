@@ -15,12 +15,12 @@ import {
     SelectValue,
 } from '@gsender/ui/shadcn/Select.tsx';
 import { QRCodeDisplay } from 'app/features/RemoteMode/components/QRCode.tsx';
-import Button from 'app/components/Button';
+import Button from '@gsender/ui/primitives/Button';
 import { Switch } from '@gsender/ui/shadcn/Switch';
 import { toast } from 'app/lib/toaster';
 import controller from 'app/lib/controller.ts';
 import { RootState } from 'app/store/redux';
-import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
+import { Confirm } from '@gsender/ui/primitives/ConfirmationDialog/ConfirmationDialogLib.ts';
 import { isIPv4 } from 'app/lib/utils';
 
 import { actions } from './apiActions.ts';

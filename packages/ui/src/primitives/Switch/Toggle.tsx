@@ -1,4 +1,4 @@
-import { cn } from 'app/lib/utils';
+import { cn } from '@gsender/ui/lib/utils';
 
 type Props = {
     checked?: boolean;

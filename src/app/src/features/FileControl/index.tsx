@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import isElectron from 'is-electron';
 
-import { Widget } from 'app/components/Widget';
+import { Widget } from '@gsender/ui/primitives/Widget';
 import { store as reduxStore } from 'app/store/redux';
 import controller from 'app/lib/controller';
 import { VISUALIZER_PRIMARY } from 'app/constants';

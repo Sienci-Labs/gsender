@@ -1,4 +1,4 @@
-import { Button } from 'app/components/Button';
+import { Button } from '@gsender/ui/primitives/Button';
 import { FaDownload, FaExternalLinkAlt } from 'react-icons/fa';
 import { useState } from 'react';
 import isElectron from 'is-electron';

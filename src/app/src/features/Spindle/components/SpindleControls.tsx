@@ -25,8 +25,8 @@ import { Slider } from '@gsender/ui/shadcn/Slider';
 import { Input } from '@gsender/ui/shadcn/Input';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { FaBan, FaRedoAlt, FaUndoAlt } from 'react-icons/fa';
-import { ActiveStateButton } from 'app/components/ActiveStateButton';
-import Tooltip from 'app/components/Tooltip';
+import { ActiveStateButton } from '@gsender/ui/primitives/ActiveStateButton';
+import Tooltip from '@gsender/ui/primitives/Tooltip';
 import { useState, useEffect } from 'react';
 import store from 'app/store';
 

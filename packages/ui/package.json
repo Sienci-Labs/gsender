@@ -8,6 +8,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./shadcn/*": "./src/shadcn/*.tsx",
+    "./primitives/*": "./src/primitives/*",
+    "./form/*": "./src/form/*",
     "./lib/utils": "./src/lib/utils.ts",
     "./lib/focus-trapping": "./src/lib/focus-trapping.tsx"
   },

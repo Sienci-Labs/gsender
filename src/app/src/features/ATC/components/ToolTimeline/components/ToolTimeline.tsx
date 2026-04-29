@@ -1,6 +1,6 @@
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import cn from 'classnames';
-import { Button } from 'app/components/Button';
+import { Button } from '@gsender/ui/primitives/Button';
 import { ToolTimelineItem } from './ToolTimelineItem';
 import { ToolMapping, ToolTimelineProps } from './types';
 import { useEffect, useRef, useState } from 'react';

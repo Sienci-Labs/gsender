@@ -2,7 +2,7 @@ import React from 'react';
 
 import { RadioGroup, RadioGroupItem } from '@gsender/ui/shadcn/RadioGroup';
 import { Switch } from '@gsender/ui/shadcn/Switch';
-import { Tooltip } from 'app/components/Tooltip';
+import { Tooltip } from '@gsender/ui/primitives/Tooltip';
 import SpiralIcon from '../SVG/Spiral';
 import ZigZagIcon from '../SVG/ZigZag';
 import {

@@ -1,7 +1,7 @@
 import { useState, useRef, ChangeEvent, FormEvent } from 'react';
 import Select from 'react-select';
 
-import Button from 'app/components/Button';
+import Button from '@gsender/ui/primitives/Button';
 import {
     Dialog,
     DialogContent,
@@ -11,7 +11,7 @@ import {
     DialogTitle,
 } from '@gsender/ui/shadcn/Dialog';
 import { Input } from '@gsender/ui/shadcn/Input';
-import Tooltip from 'app/components/Tooltip';
+import Tooltip from '@gsender/ui/primitives/Tooltip';
 
 import { MACRO_VARIABLES } from './constants';
 import insertAtCaret from './insertAtCaret';

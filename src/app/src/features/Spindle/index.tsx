@@ -9,7 +9,7 @@ import {
     updatePartialControllerSettings,
 } from 'app/store/redux/slices/controller.slice';
 import store from 'app/store';
-import Widget from 'app/components/Widget';
+import Widget from '@gsender/ui/primitives/Widget';
 import controller from 'app/lib/controller';
 import { convertToImperial } from 'app/lib/units';
 import { UNITS_EN, UNITS_GCODE } from 'app/definitions/general';

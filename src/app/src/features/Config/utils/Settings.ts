@@ -1,7 +1,7 @@
 import store from 'app/store';
 import api from 'app/api';
 import { restoreDefault, storeUpdate } from 'app/lib/storeUpdate';
-import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
+import { Confirm } from '@gsender/ui/primitives/ConfirmationDialog/ConfirmationDialogLib.ts';
 import { generateEEPROMSettings } from 'app/features/Config/utils/EEPROM.ts';
 import { toast } from 'sonner';
 import controller from 'app/lib/controller.ts';

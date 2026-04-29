@@ -6,7 +6,7 @@ import get from 'lodash/get';
 
 import { Switch } from '@gsender/ui/shadcn/Switch';
 
-import { ControlledInput } from 'app/components/ControlledInput';
+import { ControlledInput } from '@gsender/ui/form/ControlledInput';
 import { GamepadContext } from './utils/context';
 import { arrayComparator } from './utils';
 import { setGamepadProfileList } from './utils/actions';

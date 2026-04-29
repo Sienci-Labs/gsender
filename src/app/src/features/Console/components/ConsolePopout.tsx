@@ -1,7 +1,7 @@
 import { FaExternalLinkAlt } from 'react-icons/fa';
 import isElectron from 'is-electron';
 
-import Tooltip from 'app/components/Tooltip';
+import Tooltip from '@gsender/ui/primitives/Tooltip';
 import { toast } from 'app/lib/toaster';
 
 export function ConsolePopout() {

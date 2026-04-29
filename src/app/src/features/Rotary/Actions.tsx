@@ -1,4 +1,4 @@
-import Button from 'app/components/Button';
+import Button from '@gsender/ui/primitives/Button';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 
 import MountingSetup from './MountingSetup';

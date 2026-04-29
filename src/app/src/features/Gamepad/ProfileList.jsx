@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 
-import { Button } from 'app/components/Button';
+import { Button } from '@gsender/ui/primitives/Button';
 
 import ProfileItem from './ProfileItem';
 import { GamepadContext } from './utils/context';

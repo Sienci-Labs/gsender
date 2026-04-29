@@ -1,4 +1,4 @@
-import { Widget } from 'app/components/Widget';
+import { Widget } from '@gsender/ui/primitives/Widget';
 
 export function RemoteWidget({ children, label }) {
     return (

@@ -30,7 +30,7 @@ import {
 } from 'react-icons/fa';
 
 import { cn } from 'app/lib/utils';
-import { Button } from 'app/components/Button';
+import { Button } from '@gsender/ui/primitives/Button';
 import shuttleEvents from 'app/lib/shuttleEvents';
 
 import { formatShortcut, shouldHideShiftForKey } from '../helpers';

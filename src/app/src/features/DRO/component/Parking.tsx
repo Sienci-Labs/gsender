@@ -1,6 +1,6 @@
 import { RiParkingFill } from 'react-icons/ri';
 
-import Button from 'app/components/Button';
+import Button from '@gsender/ui/primitives/Button';
 import store from 'app/store';
 import controller from 'app/lib/controller.ts';
 import {
@@ -12,7 +12,7 @@ import {
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { useEffect, useRef } from 'react';
-import Tooltip from 'app/components/Tooltip';
+import Tooltip from '@gsender/ui/primitives/Tooltip';
 import { get, includes } from 'lodash';
 import reduxStore from 'app/store/redux';
 import { useSelector } from 'react-redux';

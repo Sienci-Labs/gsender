@@ -15,7 +15,7 @@ import {
     GRBLHAL,
     WORKFLOW_STATE_RUNNING,
 } from 'app/constants';
-import { ActiveStateButton } from 'app/components/ActiveStateButton';
+import { ActiveStateButton } from '@gsender/ui/primitives/ActiveStateButton';
 import ensureArray from 'ensure-array';
 import includes from 'lodash/includes';
 import { useCallback } from 'react';

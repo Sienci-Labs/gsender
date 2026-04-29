@@ -11,7 +11,7 @@ import store from 'app/store';
 import controller from 'app/lib/controller';
 import combokeys from 'app/lib/combokeys';
 import log from 'app/lib/log';
-import Button from 'app/components/Button';
+import Button from '@gsender/ui/primitives/Button';
 import { toast } from 'app/lib/toaster';
 import pubsub from 'pubsub-js';
 

@@ -1,4 +1,4 @@
-import SortableTable, { CustomColumnDef } from 'app/components/SortableTable';
+import SortableTable, { CustomColumnDef } from '@gsender/ui/primitives/SortableTable';
 import { StatCard } from 'app/features/Stats/components/StatCard.tsx';
 import { useContext } from 'react';
 import {
@@ -9,9 +9,9 @@ import {
 import { GRBL, JOB_STATUS, JOB_TYPES } from 'app/constants';
 import { CheckCircle, XCircle } from 'lucide-react';
 import { CardHeader } from 'app/features/Stats/components/CardHeader.tsx';
-import { Button } from 'app/components/Button';
+import { Button } from '@gsender/ui/primitives/Button';
 import { FaTrash } from 'react-icons/fa';
-import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
+import { Confirm } from '@gsender/ui/primitives/ConfirmationDialog/ConfirmationDialogLib.ts';
 
 import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
 import { JobsPerComPort } from 'app/features/Stats/components/JobsPerComPort.tsx';

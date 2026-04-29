@@ -14,7 +14,7 @@ import {
     CopyCheck,
 } from 'lucide-react';
 
-import { Button } from 'app/components/Button';
+import { Button } from '@gsender/ui/primitives/Button';
 import { toast } from 'app/lib/toaster';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';

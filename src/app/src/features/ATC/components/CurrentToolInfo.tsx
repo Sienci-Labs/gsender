@@ -6,7 +6,7 @@ import { lookupSpecificTool } from 'app/features/ATC/utils/ATCFunctions.ts';
 import controller from 'app/lib/controller.ts';
 import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
 import { Wrench } from 'lucide-react';
-import Button from 'app/components/Button';
+import Button from '@gsender/ui/primitives/Button';
 import { toolStateThemes } from 'app/features/ATC/utils/ATCiConstants.ts';
 import pubsub from 'pubsub-js';
 import { ToolStatusBadges } from 'app/features/ATC/components/ui/ToolStatusBadges.tsx';

@@ -1,8 +1,8 @@
 import { Switch } from '@gsender/ui/shadcn/Switch';
-import Button from 'app/components/Button';
+import Button from '@gsender/ui/primitives/Button';
 import { homeMachine } from 'app/features/DRO/utils/DRO.ts';
 import cn from 'classnames';
-import Tooltip from 'app/components/Tooltip';
+import Tooltip from '@gsender/ui/primitives/Tooltip';
 
 interface HomingSwitchProps {
     onChange: () => void;

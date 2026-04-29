@@ -24,11 +24,11 @@
 import React from 'react';
 
 import { Slider } from '@gsender/ui/shadcn/Slider';
-import { ControlledInput } from 'app/components/ControlledInput';
+import { ControlledInput } from '@gsender/ui/form/ControlledInput';
 import { FaLightbulb, FaRegLightbulb, FaSatelliteDish } from 'react-icons/fa';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import { ActiveStateButton } from 'app/components/ActiveStateButton';
-import Tooltip from 'app/components/Tooltip';
+import { ActiveStateButton } from '@gsender/ui/primitives/ActiveStateButton';
+import Tooltip from '@gsender/ui/primitives/Tooltip';
 
 type Props = {
     actions: LaserActions;

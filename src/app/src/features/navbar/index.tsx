@@ -8,7 +8,7 @@ import { NavbarLink } from './components/NavbarLink.tsx';
 import { useLocation, useNavigate } from 'react-router';
 import { useSettings } from '../Config/utils/SettingsContext.tsx';
 import Blocker from './components/Blocker.tsx';
-import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
+import { Confirm } from '@gsender/ui/primitives/ConfirmationDialog/ConfirmationDialogLib.ts';
 import pubsub from 'pubsub-js';
 
 export const NavBar = () => {

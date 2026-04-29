@@ -10,7 +10,7 @@ import {
 } from '@gsender/ui/shadcn/Select';
 import controller from 'app/lib/controller.ts';
 import { RootState } from 'app/store/redux';
-import Tooltip from 'app/components/Tooltip';
+import Tooltip from '@gsender/ui/primitives/Tooltip';
 import { GRBL_ACTIVE_STATE_RUN, WORKFLOW_STATE_RUNNING } from 'app/constants';
 
 const availableWorkspaces = {

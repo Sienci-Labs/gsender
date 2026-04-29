@@ -2,7 +2,7 @@ import React, { JSX } from 'react';
 import { tv, type VariantProps } from 'tailwind-variants';
 
 import { Button as ShadcnButton } from '@gsender/ui/shadcn/Button';
-import Tooltip, { TooltipProps } from 'app/components/Tooltip';
+import Tooltip, { TooltipProps } from '@gsender/ui/primitives/Tooltip';
 
 export const buttonStyle = tv({
     base: 'relative border rounded hover:opacity-90 shadow active:bg-opacity-70 active:shadow-[inset_7px_4px_6px_0px_rgba(59,_130,_246,_0.1)]',

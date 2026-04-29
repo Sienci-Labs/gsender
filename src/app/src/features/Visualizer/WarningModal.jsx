@@ -22,7 +22,7 @@
  */
 
 import React from 'react';
-import Modal from 'app/components/Modal';
+import Modal from '@gsender/ui/primitives/Modal';
 import { Button } from 'app/components/Buttons';
 import PropTypes from 'prop-types';
 

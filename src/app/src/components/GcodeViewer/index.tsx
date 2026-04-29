@@ -2,7 +2,7 @@ import React from 'react';
 import throttle from 'lodash/throttle';
 import uniqueId from 'lodash/uniqueId';
 
-import Button from 'app/components/Button';
+import Button from '@gsender/ui/primitives/Button';
 
 import Line from './Line';
 import { toast } from 'app/lib/toaster';

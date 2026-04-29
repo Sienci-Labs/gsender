@@ -1,4 +1,4 @@
-import RangeSlider from 'app/components/RangeSlider';
+import RangeSlider from '@gsender/ui/primitives/RangeSlider';
 import {
     METRIC_UNITS,
     OVERRIDE_VALUE_RANGES,

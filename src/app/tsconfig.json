@@ -47,6 +47,12 @@
             "@gsender/ui/shadcn/*": [
                 "../../packages/ui/src/shadcn/*"
             ],
+            "@gsender/ui/primitives/*": [
+                "../../packages/ui/src/primitives/*"
+            ],
+            "@gsender/ui/form/*": [
+                "../../packages/ui/src/form/*"
+            ],
             "@gsender/ui/lib/*": [
                 "../../packages/ui/src/lib/*"
             ]

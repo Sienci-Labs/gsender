@@ -1,7 +1,7 @@
 import React from 'react';
 import { FaTimes } from 'react-icons/fa';
 import { useWizardAPI } from 'app/features/Helper/context';
-import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
+import { Confirm } from '@gsender/ui/primitives/ConfirmationDialog/ConfirmationDialogLib';
 
 const CancelButton = () => {
     const { cancelToolchange } = useWizardAPI();

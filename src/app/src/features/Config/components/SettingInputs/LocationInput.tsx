@@ -1,6 +1,6 @@
-import Button from 'app/components/Button';
+import Button from '@gsender/ui/primitives/Button';
 import { FiTarget } from 'react-icons/fi';
-import { ControlledInput } from 'app/components/ControlledInput';
+import { ControlledInput } from '@gsender/ui/form/ControlledInput';
 import { useSelector } from 'react-redux';
 import { RootState } from 'app/store/redux';
 import { FaChartLine } from 'react-icons/fa';

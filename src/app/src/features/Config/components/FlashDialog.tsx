@@ -15,7 +15,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@gsender/ui/shadcn/Select.tsx';
-import { Button } from 'app/components/Button';
+import { Button } from '@gsender/ui/primitives/Button';
 import { toast } from 'app/lib/toaster';
 import controller from 'app/lib/controller.ts';
 import store from 'app/store';

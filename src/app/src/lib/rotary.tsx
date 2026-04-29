@@ -18,7 +18,7 @@ import {
     GRBL,
     GRBLHAL,
 } from '../constants';
-import { Confirm } from '../components/ConfirmationDialog/ConfirmationDialogLib';
+import { Confirm } from '@gsender/ui/primitives/ConfirmationDialog/ConfirmationDialogLib';
 import { toast } from './toaster';
 
 export const updateWorkspaceMode = (mode: WORKSPACE_MODE_T): void => {

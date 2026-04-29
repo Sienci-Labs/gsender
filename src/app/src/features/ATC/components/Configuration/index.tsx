@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Button from 'app/components/Button';
+import Button from '@gsender/ui/primitives/Button';
 import { Settings } from 'lucide-react';
 import { ConfigModal } from 'app/features/ATC/components/Configuration/components/ConfigModal.tsx';
 import { ConfigProvider } from 'app/features/ATC/components/Configuration/hooks/useConfigStore.tsx';

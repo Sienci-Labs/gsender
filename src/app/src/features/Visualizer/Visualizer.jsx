@@ -107,7 +107,7 @@ import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 import { toast } from 'app/lib/toaster';
 import { getZUpTravel } from 'app/lib/SoftLimits.js';
 import { mm2in } from 'app/lib/units';
-import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
+import { Confirm } from '@gsender/ui/primitives/ConfirmationDialog/ConfirmationDialogLib';
 
 class Visualizer extends Component {
     static propTypes = {

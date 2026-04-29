@@ -49,8 +49,8 @@ import {
     COOLANT_CATEGORY,
     GRBLHAL,
 } from 'app/constants';
-import Button from 'app/components/Button';
-import { Tooltip } from 'app/components/Tooltip';
+import Button from '@gsender/ui/primitives/Button';
+import { Tooltip } from '@gsender/ui/primitives/Tooltip';
 import { cn } from 'app/lib/utils';
 
 import { formatShortcut } from './helpers';

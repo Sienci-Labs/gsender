@@ -1,7 +1,7 @@
 import { FaClipboard, FaClipboardCheck, FaClipboardList } from 'react-icons/fa';
 
-import Button from 'app/components/Button';
-import { ControlledInput } from 'app/components/ControlledInput';
+import Button from '@gsender/ui/primitives/Button';
+import { ControlledInput } from '@gsender/ui/form/ControlledInput';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { GRBL_ACTIVE_STATE_RUN, GRBL_HAL_ACTIVE_STATE_RUN } from 'app/constants';

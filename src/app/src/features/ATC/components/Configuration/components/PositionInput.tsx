@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from 'app/components/Button';
+import { Button } from '@gsender/ui/primitives/Button';
 import { Input } from '@gsender/ui/shadcn/Input';
 import { Label } from '@gsender/ui/shadcn/Label';
 import { Position } from 'app/features/ATC/components/Configuration/hooks/useConfigStore';

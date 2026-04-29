@@ -41,7 +41,7 @@ import {
 import saveAs from 'file-saver';
 import JSZip from 'jszip';
 
-import { Button } from 'app/components/Button';
+import { Button } from '@gsender/ui/primitives/Button';
 import { toast } from 'app/lib/toaster';
 import { AlarmsErrors } from 'app/definitions/alarms_errors';
 import { EEPROMSettings, MachineProfile } from 'app/definitions/firmware';

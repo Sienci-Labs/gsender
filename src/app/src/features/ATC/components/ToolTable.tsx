@@ -19,7 +19,7 @@ import {
 } from '@gsender/ui/shadcn/Table';
 
 import { ToolNameInput } from 'app/features/ATC/components/ToolNameInput.tsx';
-import Button from 'app/components/Button';
+import Button from '@gsender/ui/primitives/Button';
 import partition from 'lodash/partition';
 import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
 import { ToolProbeState } from 'app/features/ATC/types.ts';

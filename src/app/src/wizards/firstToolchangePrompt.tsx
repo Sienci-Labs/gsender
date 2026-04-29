@@ -20,7 +20,7 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
+import { Confirm } from '@gsender/ui/primitives/ConfirmationDialog/ConfirmationDialogLib';
 
 interface FirstToolchangePromptOptions {
     comment: string;

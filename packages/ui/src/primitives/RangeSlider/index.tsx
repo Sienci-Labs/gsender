@@ -26,7 +26,7 @@ import { Slider } from '@gsender/ui/shadcn/Slider';
 import { FaMinus, FaPlus, FaUndo } from 'react-icons/fa';
 import cx from 'classnames';
 
-import Button from 'app/components/Button';
+import Button from '@gsender/ui/primitives/Button';
 import Tooltip from '../Tooltip';
 
 export interface RangeSliderProps {

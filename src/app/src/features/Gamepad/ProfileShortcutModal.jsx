@@ -5,7 +5,7 @@ import _ from 'lodash';
 import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import store from 'app/store';
 import gamepad, { shortcutComboBuilder } from 'app/lib/gamepad';
-import { Button } from 'app/components/Button';
+import { Button } from '@gsender/ui/primitives/Button';
 import {
     Dialog,
     DialogContent,

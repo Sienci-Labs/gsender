@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import controller from 'app/lib/controller.ts';
 import _throttle from 'lodash/throttle';
 import cn from 'classnames';
-import { ProgressBar } from 'app/components/ProgressBar';
+import { ProgressBar } from '@gsender/ui/primitives/ProgressBar';
 
 interface FlashMessage {
     content: string;

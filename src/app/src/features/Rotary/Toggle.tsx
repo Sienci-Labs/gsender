@@ -3,7 +3,7 @@ import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { WORKSPACE_MODE } from 'app/constants';
 import { updateWorkspaceMode } from 'app/lib/rotary';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import Tooltip from 'app/components/Tooltip';
+import Tooltip from '@gsender/ui/primitives/Tooltip';
 
 const Toggle = () => {
     const { mode } = useWorkspaceState();

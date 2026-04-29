@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { LongPressCallbackReason, useLongPress } from 'use-long-press';
 
-import { cn } from 'app/lib/utils';
+import { cn } from '@gsender/ui/lib/utils';
 
 export type LongPressButtonOptions = {
     holdDurationMs: number;

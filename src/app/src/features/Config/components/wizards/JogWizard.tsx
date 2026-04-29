@@ -1,5 +1,5 @@
 import controller from 'app/lib/controller.ts';
-import Button from 'app/components/Button';
+import Button from '@gsender/ui/primitives/Button';
 
 interface JogWizardProps {
     axis: string;

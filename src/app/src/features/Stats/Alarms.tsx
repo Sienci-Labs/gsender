@@ -3,11 +3,11 @@ import { StatCard } from 'app/features/Stats/components/StatCard';
 import { AlarmListing } from 'app/features/Stats/components/AlarmListing.tsx';
 import { CardHeader } from 'app/features/Stats/components/CardHeader.tsx';
 import { FaTrash } from 'react-icons/fa';
-import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
+import { Confirm } from '@gsender/ui/primitives/ConfirmationDialog/ConfirmationDialogLib.ts';
 import api from 'app/api';
 import { useContext } from 'react';
 import { StatContext } from 'app/features/Stats/utils/StatContext.tsx';
-import { Button } from 'app/components/Button';
+import { Button } from '@gsender/ui/primitives/Button';
 
 export function Alarms() {
     const { setAlarms } = useContext(StatContext);

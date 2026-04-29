@@ -1,6 +1,6 @@
 import { useEffect, useState, useImperativeHandle, forwardRef } from 'react';
 import { MaintenanceTask } from '../utils/StatContext';
-import { ControlledInput } from 'app/components/ControlledInput';
+import { ControlledInput } from '@gsender/ui/form/ControlledInput';
 
 interface Props {
     task?: MaintenanceTask;

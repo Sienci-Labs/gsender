@@ -13,7 +13,7 @@ import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { TOOLBAR_CATEGORY } from 'app/constants';
 import reduxStore from 'app/store/redux';
 import { readAllNotifications } from 'app/store/redux/slices/preferences.slice.ts';
-import Tooltip from 'app/components/Tooltip';
+import Tooltip from '@gsender/ui/primitives/Tooltip';
 
 const NotificationsArea = () => {
     const [open, setOpen] = useState(false);

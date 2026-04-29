@@ -23,7 +23,7 @@
 
 import { Switch } from '@gsender/ui/shadcn/Switch';
 import { LASER_MODE } from 'app/constants';
-import Tooltip from 'app/components/Tooltip';
+import Tooltip from '@gsender/ui/primitives/Tooltip';
 
 type Props = {
     mode: string;

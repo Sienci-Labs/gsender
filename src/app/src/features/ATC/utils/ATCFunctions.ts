@@ -8,7 +8,7 @@ import {
     ToolInstance,
 } from 'app/features/ATC/components/ToolTable.tsx';
 import { ToolFlags } from 'app/features/ATC/types.ts';
-import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
+import { Confirm } from '@gsender/ui/primitives/ConfirmationDialog/ConfirmationDialogLib.ts';
 import * as THREE from 'three';
 import { TOOLPATH_COLOR_HEXES } from 'app/features/Visualizer/constants';
 import pubsub from 'pubsub-js';

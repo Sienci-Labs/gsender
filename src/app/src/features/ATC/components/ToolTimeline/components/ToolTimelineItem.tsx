@@ -1,11 +1,11 @@
 import cn from 'classnames';
 import { ToolChange } from './types';
-import Button from 'app/components/Button';
+import Button from '@gsender/ui/primitives/Button';
 import { TbSwitch3 } from 'react-icons/tb';
 import { useEffect, useState } from 'react';
 import { lookupToolName } from 'app/features/ATC/utils/ATCFunctions.ts';
 import pubsub from 'pubsub-js';
-import Tooltip from 'app/components/Tooltip';
+import Tooltip from '@gsender/ui/primitives/Tooltip';
 import { ToolProbeState } from 'app/features/ATC/types.ts';
 import { ToolStatusBadges } from 'app/features/ATC/components/ui/ToolStatusBadges.tsx';
 

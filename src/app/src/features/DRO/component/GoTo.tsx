@@ -6,14 +6,14 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from '@gsender/ui/shadcn/Popover';
-import { Button } from 'app/components/Button';
-import { UnitInput } from 'app/components/UnitInput';
+import { Button } from '@gsender/ui/primitives/Button';
+import { UnitInput } from '@gsender/ui/form/UnitInput';
 import { DROPosition } from 'app/features/DRO/utils/DRO';
 import controller from 'app/lib/controller';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { METRIC_UNITS } from 'app/constants';
-import Tooltip from 'app/components/Tooltip';
+import Tooltip from '@gsender/ui/primitives/Tooltip';
 import store from 'app/store';
 import { get } from 'lodash';
 import { RootState } from 'app/store/redux';

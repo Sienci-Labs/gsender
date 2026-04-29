@@ -1,4 +1,4 @@
-import { ButtonProps } from 'app/components/Button';
+import { ButtonProps } from '@gsender/ui/primitives/Button';
 import { Button } from '@gsender/ui/shadcn/Button';
 
 export interface IconButtonProps extends ButtonProps {

@@ -1,5 +1,5 @@
-import Button from 'app/components/Button';
-import { ControlledInput } from 'app/components/ControlledInput';
+import Button from '@gsender/ui/primitives/Button';
+import { ControlledInput } from '@gsender/ui/form/ControlledInput';
 import { useSquaring } from '../context/SquaringContext';
 import TriangleDiagram from '../components/TriangleDiagram';
 import { useState, useEffect } from 'react';

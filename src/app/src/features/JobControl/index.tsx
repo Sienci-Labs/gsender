@@ -1,4 +1,4 @@
-import { Widget } from 'app/components/Widget';
+import { Widget } from '@gsender/ui/primitives/Widget';
 import { BasicPosition, GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
 import get from 'lodash/get';
 import { connect } from 'react-redux';

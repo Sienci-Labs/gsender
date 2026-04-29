@@ -4,7 +4,7 @@ import { LuCopy } from 'react-icons/lu';
 import { LuPaintbrush } from 'react-icons/lu';
 import { FaEllipsisH } from 'react-icons/fa';
 
-import { Button } from 'app/components/Button';
+import { Button } from '@gsender/ui/primitives/Button';
 import { Input } from '@gsender/ui/shadcn/Input';
 import { addToInputHistory } from 'app/store/redux/slices/console.slice';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';

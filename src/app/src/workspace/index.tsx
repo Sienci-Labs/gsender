@@ -43,7 +43,7 @@ import {
     stopCoolant,
 } from 'app/features/Coolant/utils/actions';
 import pubsub from 'pubsub-js';
-import ConfirmationDialog from 'app/components/ConfirmationDialog/ConfirmationDialog';
+import ConfirmationDialog from '@gsender/ui/primitives/ConfirmationDialog/ConfirmationDialog';
 import { SettingsProvider } from 'app/features/Config/utils/SettingsContext';
 import { Helper } from 'app/features/Helper';
 

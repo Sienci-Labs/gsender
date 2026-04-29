@@ -10,8 +10,8 @@ import {
 } from 'app/features/DRO/utils/DRO';
 import { AxisRow } from 'app/features/DRO/component/AxisRow.tsx';
 import { VscTarget } from 'react-icons/vsc';
-import { Button } from 'app/components/Button';
-import { Label } from 'app/components/Label';
+import { Button } from '@gsender/ui/primitives/Button';
+import { Label } from '@gsender/ui/primitives/Label';
 import get from 'lodash/get';
 import { GoTo } from 'app/features/DRO/component/GoTo.tsx';
 import store from 'app/store';

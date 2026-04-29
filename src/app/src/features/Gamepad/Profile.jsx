@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import store from 'app/store';
 import GamepadManager from 'app/lib/gamepad';
 import { toast } from 'app/lib/toaster';
-import { Button } from 'app/components/Button';
+import { Button } from '@gsender/ui/primitives/Button';
 
 import { GamepadContext } from './utils/context';
 import {

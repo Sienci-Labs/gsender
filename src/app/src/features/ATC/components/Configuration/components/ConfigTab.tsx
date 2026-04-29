@@ -9,7 +9,7 @@ import {
 import { Switch } from '@gsender/ui/shadcn/Switch';
 import { Input } from '@gsender/ui/shadcn/Input';
 import { Label } from '@gsender/ui/shadcn/Label';
-import { Button } from 'app/components/Button';
+import { Button } from '@gsender/ui/primitives/Button';
 import { PositionInput } from './PositionInput';
 import { useConfigContext } from 'app/features/ATC/components/Configuration/hooks/useConfigStore';
 import cn from 'classnames';
