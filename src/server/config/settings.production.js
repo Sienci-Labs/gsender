@@ -36,9 +36,21 @@ const getAppPath = () => {
     return path.resolve(__dirname, 'app');
 };
 
+const getPendantPath = () => path.resolve(__dirname, 'pendant');
+
 export default {
     route: '/', // with trailing slash
     assets: {
+        // Pendant is registered first so its more-specific /pendant route
+        // is checked before the catch-all '/' for the desktop app.
+        pendant: {
+            routes: [
+                urljoin(publicPath, '/pendant'),
+                '/pendant'
+            ],
+            path: getPendantPath(),
+            maxAge: maxAge
+        },
         app: {
             routes: [ // with trailing slash
                 urljoin(publicPath, '/'),
