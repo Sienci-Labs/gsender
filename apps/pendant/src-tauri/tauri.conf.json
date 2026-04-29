@@ -5,20 +5,6 @@
   "version": "0.1.0",
   "app": {
     "withGlobalTauri": false,
-    "windows": [
-      {
-        "label": "main",
-        "title": "gSender Pendant",
-        "width": 1024,
-        "height": 768,
-        "minWidth": 800,
-        "minHeight": 600,
-        "resizable": true,
-        "fullscreen": false,
-        "decorations": false,
-        "url": "http://127.0.0.1:8000/pendant"
-      }
-    ],
     "security": {
       "csp": null,
       "dangerousDisableAssetCspModification": true

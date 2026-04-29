@@ -6,9 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build:client": "vite build --outDir ../../dist/gsender/pendant --emptyOutDir",
-    "tauri:dev": "tauri dev",
-    "tauri:build": "tauri build",
-    "tauri:build:debug": "tauri build --debug"
+    "tauri:dev": "npx @tauri-apps/cli@2 dev",
+    "tauri:build": "npx @tauri-apps/cli@2 build",
+    "tauri:build:debug": "npx @tauri-apps/cli@2 build --debug"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2"
