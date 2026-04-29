@@ -1,10 +1,20 @@
 {
   "name": "@gsender/pendant",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build:client": "vite build --outDir ../../dist/gsender/pendant --emptyOutDir"
+    "build:client": "vite build --outDir ../../dist/gsender/pendant --emptyOutDir",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build",
+    "tauri:build:debug": "tauri build --debug"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-opener": "^2"
   }
 }

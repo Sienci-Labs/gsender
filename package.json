@@ -80,6 +80,8 @@
     "cypress:open": "cypress open",
     "vite:build": "cross-env NODE_OPTIONS='--max-old-space-size=8192' bash -c 'cd apps/desktop && bun run build:client'",
     "vite:build:pendant": "bash -c 'cd apps/pendant && bun run build:client'",
+    "pendant:tauri:dev": "bash -c 'cd apps/pendant && bun run tauri:dev'",
+    "pendant:tauri:build": "bash -c 'cd apps/pendant && bun run tauri:build'",
     "postvite:build": "bash -c \"mkdir -p dist/gsender/app; cp -af apps/desktop/{favicon.ico,images,assets} dist/gsender/app/\"",
     "install:packages": "yarn install && yarn install --prefix /apps/desktop",
     "check-types": "tsc --noEmit -p ./apps/desktop/src",
