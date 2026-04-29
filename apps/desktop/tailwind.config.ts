@@ -1,5 +1,9 @@
 import type { Config } from 'tailwindcss';
 import defaultTheme from 'tailwindcss/defaultTheme';
+import path from 'path';
+
+// __dirname provided by jiti (used by both Tailwind CLI and Vite's PostCSS pipeline)
+const root = path.resolve(__dirname, '../..');
 
 const { screens } = defaultTheme;
 const screensWithoutXl = { sm: screens.sm, md: screens.md, lg: screens.lg, '2xl': screens['2xl'] };
@@ -16,9 +20,11 @@ function customScreenVariants({
 
 export default {
     content: [
-        './src/**/*.{js,ts,jsx,tsx,html}',
-        './index.html',
-        '!**/node_modules/**',
+        path.join(__dirname, './src/**/*.{js,ts,jsx,tsx,html}'),
+        path.join(__dirname, './index.html'),
+        path.join(root, 'packages/ui/src/**/*.{js,ts,jsx,tsx}'),
+        path.join(root, 'packages/features/src/**/*.{js,ts,jsx,tsx}'),
+        path.join(root, 'packages/controller-client/src/**/*.{js,ts,jsx,tsx}'),
     ],
     important: true,
     darkMode: 'class',
