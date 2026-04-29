@@ -45,9 +45,9 @@ import {
     GRBLHAL,
     GRBL_ACTIVE_STATE_IDLE,
     WORKFLOW_STATE_RUNNING,
-} from '../../constants';
+} from 'app/constants';
 import { getProbeCode } from 'app/lib/Probing';
-import { getWidgetConfigContext } from '../WidgetConfig/WidgetContextProvider';
+import { getWidgetConfigContext } from 'app/features/WidgetConfig/WidgetContextProvider';
 import {
     Actions,
     AvailableTool,
@@ -60,7 +60,7 @@ import {
 } from './definitions';
 import { UNITS_EN } from 'app/definitions/general';
 import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
-import { WidgetConfigProvider } from '../WidgetConfig/WidgetContextProvider';
+import { WidgetConfigProvider } from 'app/features/WidgetConfig/WidgetContextProvider';
 import { Workspace } from 'app/workspace/definitions';
 
 const ProbeWidget = () => {

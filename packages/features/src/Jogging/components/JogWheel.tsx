@@ -12,7 +12,7 @@ import {
     xPlusYPlus,
     xMinusYMinus,
     xMinusYPlus,
-} from 'app/features/Jogging/utils/Jogging.ts';
+} from '../utils/Jogging.ts';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { WORKSPACE_MODE } from 'app/constants';
 

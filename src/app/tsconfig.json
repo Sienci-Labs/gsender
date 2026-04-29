@@ -41,6 +41,12 @@
             "app-root/*": [
                 "./*"
             ],
+            "@gsender/features/*": [
+                "../../packages/features/src/*"
+            ],
+            "@gsender/features": [
+                "../../packages/features/src/index.ts"
+            ],
             "@gsender/controller-client": [
                 "../../packages/controller-client/src/index.ts"
             ],

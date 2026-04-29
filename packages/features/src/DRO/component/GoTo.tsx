@@ -8,7 +8,7 @@ import {
 } from '@gsender/ui/shadcn/Popover';
 import { Button } from '@gsender/ui/primitives/Button';
 import { UnitInput } from '@gsender/ui/form/UnitInput';
-import { DROPosition } from 'app/features/DRO/utils/DRO';
+import { DROPosition } from '@gsender/features/DRO/utils/DRO';
 import controller from '@gsender/controller-client/controller';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';

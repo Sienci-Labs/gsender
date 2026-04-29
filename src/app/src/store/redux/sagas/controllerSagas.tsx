@@ -115,7 +115,7 @@ import { updateJobOverrides } from '@gsender/controller-client/store/redux/slice
 import { toast } from 'app/lib/toaster';
 import { Job } from 'app/features/Stats/utils/StatContext';
 import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
-import { Spindle } from 'app/features/Spindle/definitions';
+import { Spindle } from '@gsender/features/Spindle/definitions';
 import { AlarmsErrors } from 'app/definitions/alarms_errors';
 import { KeepoutToggle } from 'app/features/ATC/components/KeepOut/KeepOutToggle.tsx';
 import get from 'lodash/get';

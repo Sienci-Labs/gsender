@@ -1,7 +1,7 @@
 import { WORKSPACE_MODE } from '../constants';
 import { MachineProfile } from 'app/definitions/firmware';
 import { UNITS_EN, BasicPosition } from 'app/definitions/general';
-import { ProbeProfile } from 'app/features/Probe/definitions';
+import { ProbeProfile } from '@gsender/features/Probe/definitions';
 import { RotarySettings } from 'app/features/Rotary/definitions';
 import { Tool } from 'app/features/Tools/definitions';
 import { GamepadConfig } from 'app/lib/gamepad/definitions';

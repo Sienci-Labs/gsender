@@ -1,11 +1,11 @@
 import { Widget } from '@gsender/ui/primitives/Widget';
 import { Tabs } from '@gsender/ui/primitives/Tabs';
 import Console from '../Console';
-import Probe from '../Probe';
-import Spindle from '../Spindle';
+import Probe from '@gsender/features/Probe';
+import Spindle from '@gsender/features/Spindle';
 import Coolant from '../Coolant';
 import Rotary from '../Rotary';
-import Macros from '../Macros';
+import Macros from '@gsender/features/Macros';
 import { useWidgetState } from 'app/hooks/useWidgetState';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { ATCWidget } from 'app/features/ATC';

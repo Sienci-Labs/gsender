@@ -3,7 +3,7 @@ import React from 'react';
 import { toast } from 'app/lib/toaster';
 import api from 'app/api';
 import { Switch } from '@gsender/ui/shadcn/Switch';
-import MacroForm from 'app/features/Macros/MacroForm';
+import MacroForm from '@gsender/features/Macros/MacroForm';
 
 interface EventInputProps {
     eventType: string;

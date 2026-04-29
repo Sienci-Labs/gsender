@@ -10,7 +10,7 @@ import {
     FRONT_LEFT,
     FRONT_RIGHT,
     getMovementGCode,
-} from 'app/features/DRO/utils/RapidPosition';
+} from '@gsender/features/DRO/utils/RapidPosition';
 import Tooltip from '@gsender/ui/primitives/Tooltip';
 import cn from 'classnames';
 export function RapidPositionButtons({ disabled = false }) {

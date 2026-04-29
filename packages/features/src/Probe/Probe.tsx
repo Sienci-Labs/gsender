@@ -33,7 +33,7 @@ import {
     DropdownMenuTrigger,
 } from '@gsender/ui/shadcn/Dropdown';
 
-import { METRIC_UNITS, PROBING_CATEGORY } from '../../constants';
+import { METRIC_UNITS, PROBING_CATEGORY } from 'app/constants';
 import ProbeImage from './ProbeImage';
 import ProbeDiameter from './ProbeDiameter';
 import ProbeDirectionSelection from './ProbeDirectionSelection';

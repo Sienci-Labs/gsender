@@ -46,8 +46,8 @@ import { toast } from 'app/lib/toaster';
 import { AlarmsErrors } from 'app/definitions/alarms_errors';
 import { EEPROMSettings, MachineProfile } from 'app/definitions/firmware';
 import { UNITS_EN } from 'app/definitions/general';
-import { JogSpeeds } from 'app/features/Jogging/definitions';
-import { SPINDLE_LASER_T } from 'app/features/Spindle/definitions';
+import { JogSpeeds } from '@gsender/features/Jogging/definitions';
+import { SPINDLE_LASER_T } from '@gsender/features/Spindle/definitions';
 import {
     ConnectionState,
     ControllerState,

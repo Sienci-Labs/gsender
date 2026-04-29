@@ -1,4 +1,4 @@
-import { Jogging } from 'app/features/Jogging';
+import { Jogging } from '@gsender/features/Jogging';
 import {
     Popover,
     PopoverContent,

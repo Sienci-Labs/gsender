@@ -1,6 +1,6 @@
 import { Switch } from '@gsender/ui/shadcn/Switch';
 import Button from '@gsender/ui/primitives/Button';
-import { homeMachine } from 'app/features/DRO/utils/DRO.ts';
+import { homeMachine } from '../utils/DRO.ts';
 import cn from 'classnames';
 import Tooltip from '@gsender/ui/primitives/Tooltip';
 

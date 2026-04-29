@@ -25,11 +25,11 @@ import yAxisCalibrationImage2 from '../assets/Y_axis-calibration_2.png';
 import zAxisCalibrationImage1 from '../assets/Z_axis-calibration_1.png';
 import zAxisCalibrationImage2 from '../assets/Z_axis-calibration_2.png';
 
-import { Jogging } from '../../Jogging';
+import { Jogging } from '@gsender/features/Jogging';
 import { getEEPROMSettingKey, calculateNewStepsPerMM } from '../utils';
 import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import { EEPROM } from 'app/definitions/firmware';
-import { jogAxis } from 'app/features/Jogging/utils/Jogging';
+import { jogAxis } from '@gsender/features/Jogging/utils/Jogging';
 import { toast } from 'app/lib/toaster';
 import { FaClipboard, FaClipboardCheck, FaClipboardList } from 'react-icons/fa';
 import { GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG } from 'app/constants';

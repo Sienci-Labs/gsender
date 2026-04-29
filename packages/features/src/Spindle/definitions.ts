@@ -1,4 +1,4 @@
-import { SPINDLE_LASER } from '../../constants';
+import { SPINDLE_LASER } from 'app/constants';
 
 // Types
 

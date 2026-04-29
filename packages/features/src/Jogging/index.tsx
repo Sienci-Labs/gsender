@@ -6,17 +6,17 @@ import inRange from 'lodash/inRange';
 import throttle from 'lodash/throttle';
 import cx from 'classnames';
 
-import { JogInput } from 'app/features/Jogging/components/JogInput';
-import { JogWheel } from 'app/features/Jogging/components/JogWheel';
-import { SpeedSelector } from 'app/features/Jogging/components/SpeedSelector';
-import { ZJog } from 'app/features/Jogging/components/ZJog';
-import { AJog } from 'app/features/Jogging/components/AJog';
+import { JogInput } from './components/JogInput';
+import { JogWheel } from './components/JogWheel';
+import { SpeedSelector } from './components/SpeedSelector';
+import { ZJog } from './components/ZJog';
+import { AJog } from './components/AJog';
 import store from 'app/store';
 import {
     cancelJog,
     jogAxis,
     startJogCommand,
-} from 'app/features/Jogging/utils/Jogging';
+} from './utils/Jogging';
 import { FirmwareFlavour } from 'app/features/Connection';
 import { RootState } from '@gsender/controller-client/store/redux';
 import {
@@ -38,7 +38,7 @@ import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import gamepad, { checkButtonHold } from 'app/lib/gamepad';
 import { GamepadProfile } from 'app/lib/gamepad/definitions';
-import { StopButton } from 'app/features/Jogging/components/StopButton';
+import { StopButton } from './components/StopButton';
 import { useWidgetState } from 'app/hooks/useWidgetState';
 
 import jogWheeelLabels from './assets/labels.svg';

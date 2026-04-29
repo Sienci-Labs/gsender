@@ -13,7 +13,7 @@ import Widget from '@gsender/ui/primitives/Widget';
 import controller from '@gsender/controller-client/controller';
 import { convertToImperial } from 'app/lib/units';
 import { UNITS_EN, UNITS_GCODE } from 'app/definitions/general';
-import WidgetConfig from '../WidgetConfig/WidgetConfig';
+import WidgetConfig from 'app/features/WidgetConfig/WidgetConfig';
 import {
     GRBL,
     GRBLHAL,
@@ -23,12 +23,12 @@ import {
     SPINDLE_LASER_CATEGORY,
     SPINDLE_MODE,
     WORKFLOW_STATE_RUNNING,
-} from '../../constants';
+} from 'app/constants';
 import SpindleControls from './components/SpindleControls';
 import LaserControls from './components/LaserControls';
 import ModalToggle from './components/ModalToggle';
 import SpindleSelector from './components/SpindleSelector';
-import { roundMetric, round } from '../../lib/rounding';
+import { roundMetric, round } from 'app/lib/rounding';
 import findIndex from 'lodash/findIndex';
 import get from 'lodash/get';
 import reduxStore from '@gsender/controller-client/store/redux';

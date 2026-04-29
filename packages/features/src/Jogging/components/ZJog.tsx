@@ -1,12 +1,12 @@
-import zLabels from 'app/features/Jogging/assets/zLabels.svg';
-import TabJog from 'app/features/Jogging/components/TabJog.tsx';
+import zLabels from '../assets/zLabels.svg';
+import TabJog from './TabJog.tsx';
 import {
     continuousJogAxis,
     JoggerProps,
     stopContinuousJog,
     zMinusJog,
     zPlusJog,
-} from 'app/features/Jogging/utils/Jogging.ts';
+} from '../utils/Jogging.ts';
 import { useLongPress } from 'use-long-press';
 
 export function ZJog({

@@ -53,7 +53,7 @@ import {
     IMPERIAL_UNITS,
     METRIC_UNITS,
     PROBING_CATEGORY,
-} from '../../constants';
+} from 'app/constants';
 import {
     Actions,
     AvailableTool,

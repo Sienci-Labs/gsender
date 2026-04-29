@@ -4,7 +4,7 @@ import {
     FRONT_RIGHT,
     FRONT_LEFT,
     BACK_LEFT,
-} from 'app/features/DRO/utils/RapidPosition.ts';
+} from '@gsender/features/DRO/utils/RapidPosition.ts';
 
 export const homingString = (mask: string): string => {
     let location = '';

@@ -20,7 +20,7 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-import { SPINDLE_LASER_T } from 'app/features/Spindle/definitions';
+import { SPINDLE_LASER_T } from '@gsender/features/Spindle/definitions';
 import { LASER_MODE, SPINDLE_MODE } from '../constants';
 import store from '../store';
 

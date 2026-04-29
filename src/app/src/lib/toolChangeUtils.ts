@@ -13,7 +13,7 @@ import {
     ProbeProfile,
     ProbeWidgetSettings,
     TOUCHPLATE_TYPES_T,
-} from 'app/features/Probe/definitions';
+} from '@gsender/features/Probe/definitions';
 import { ReduxState } from '@gsender/controller-client/store/definitions';
 import automaticToolChange from 'app/wizards/automaticToolchange';
 import probeToolLength from 'app/wizards/probeToolLength';

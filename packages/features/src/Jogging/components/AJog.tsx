@@ -1,12 +1,12 @@
-import aLabels from 'app/features/Jogging/assets/aLabels.svg';
-import TabJog from 'app/features/Jogging/components/TabJog.tsx';
+import aLabels from '../assets/aLabels.svg';
+import TabJog from './TabJog.tsx';
 import {
     aMinusJog,
     aPlusJog,
     continuousJogAxis,
     JoggerProps,
     stopContinuousJog,
-} from 'app/features/Jogging/utils/Jogging.ts';
+} from '../utils/Jogging.ts';
 import { useLongPress } from 'use-long-press';
 
 export function AJog({

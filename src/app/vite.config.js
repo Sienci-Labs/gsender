@@ -40,6 +40,7 @@ export default defineConfig({
     ],
     resolve: {
         alias: {
+            '@gsender/features': path.resolve(__dirname, '../../packages/features/src'),
             '@gsender/controller-client/store/redux': path.resolve(__dirname, '../../packages/controller-client/src/store/redux'),
             '@gsender/controller-client/store/definitions': path.resolve(__dirname, '../../packages/controller-client/src/store/definitions.ts'),
             '@gsender/controller-client/store': path.resolve(__dirname, '../../packages/controller-client/src/store'),

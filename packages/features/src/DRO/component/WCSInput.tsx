@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 
-import { Axis } from 'app/features/DRO/utils/DRO.ts';
+import { Axis } from '../utils/DRO.ts';
 
 export interface WCSInputProps {
     value: string;

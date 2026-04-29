@@ -61,7 +61,7 @@ import {
     LaserState,
     Spindle,
     SPINDLE_LASER_T,
-} from 'app/features/Spindle/definitions';
+} from '@gsender/features/Spindle/definitions';
 import { updateWorkspaceMode } from 'app/lib/rotary';
 import {
     TOASTER_DISABLED,

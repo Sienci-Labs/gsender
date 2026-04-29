@@ -3,7 +3,7 @@ import { LuMove, LuRefreshCw } from 'react-icons/lu';
 import { cx } from 'class-variance-authority';
 
 import Button from '@gsender/ui/primitives/Button';
-import { Jogging } from 'app/features/Jogging';
+import { Jogging } from '@gsender/features/Jogging';
 import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import { GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG } from 'app/constants';
 import {

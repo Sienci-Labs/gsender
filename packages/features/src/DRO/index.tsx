@@ -7,13 +7,13 @@ import {
     goXYAxes,
     zeroWCS,
     gotoZero,
-} from 'app/features/DRO/utils/DRO';
-import { AxisRow } from 'app/features/DRO/component/AxisRow.tsx';
+} from './utils/DRO';
+import { AxisRow } from './component/AxisRow.tsx';
 import { VscTarget } from 'react-icons/vsc';
 import { Button } from '@gsender/ui/primitives/Button';
 import { Label } from '@gsender/ui/primitives/Label';
 import get from 'lodash/get';
-import { GoTo } from 'app/features/DRO/component/GoTo.tsx';
+import { GoTo } from './component/GoTo.tsx';
 import store from 'app/store';
 import {
     AXIS_X,
@@ -30,8 +30,8 @@ import mapValues from 'lodash/mapValues';
 import { mapPositionToUnits } from 'app/lib/units.ts';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import includes from 'lodash/includes';
-import { HomingSwitch } from 'app/features/DRO/component/HomingSwitch.tsx';
-import { RapidPositionButtons } from 'app/features/DRO/component/RapidPositionButtons.tsx';
+import { HomingSwitch } from './component/HomingSwitch.tsx';
+import { RapidPositionButtons } from './component/RapidPositionButtons.tsx';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import {
     AlertDialog,
@@ -44,8 +44,8 @@ import {
     AlertDialogCancel,
     AlertDialogAction,
 } from '@gsender/ui/shadcn/AlertDialog';
-import { UnitBadge } from 'app/features/DRO/component/UnitBadge.tsx';
-import { Parking } from 'app/features/DRO/component/Parking.tsx';
+import { UnitBadge } from './component/UnitBadge.tsx';
+import { Parking } from './component/Parking.tsx';
 
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';

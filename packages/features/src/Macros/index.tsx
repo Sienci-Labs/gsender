@@ -31,7 +31,7 @@ import {
     TINYG,
     // Workflow
     WORKFLOW_STATE_RUNNING,
-} from '../../constants';
+} from 'app/constants';
 import {
     MODAL_NONE,
     MODAL_ADD_MACRO,
@@ -39,7 +39,7 @@ import {
     MODAL_RUN_MACRO,
     ModalType,
 } from './constants';
-import { deleteGamepadMacro } from '../../lib/gamepad';
+import { deleteGamepadMacro } from 'app/lib/gamepad';
 import cx from 'classnames';
 
 type MacroWidgetProps = {

@@ -3,7 +3,7 @@ import cn from 'classnames';
 import pubsub from 'pubsub-js';
 import get from 'lodash/get';
 
-import { JoggingSpeedOptions } from 'app/features/Jogging/utils/Jogging';
+import { JoggingSpeedOptions } from '@gsender/features/Jogging/utils/Jogging';
 import store from 'app/store';
 import { JogValueObject } from 'app/features/Jogging';
 import { IMPERIAL_UNITS, JOGGING_CATEGORY, METRIC_UNITS } from 'app/constants';

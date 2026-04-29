@@ -5,7 +5,7 @@ import reduxStore from '@gsender/controller-client/store/redux';
 
 import gamepad, { checkButtonHold } from 'app/lib/gamepad';
 import controller from '@gsender/controller-client/controller';
-import { GRBLHAL } from '../../constants';
+import { GRBLHAL } from 'app/constants';
 
 export const checkThumbsticskAreIdle = (axes, profile) => {
     const deadZone =

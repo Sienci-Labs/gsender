@@ -42,7 +42,7 @@ import {
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 
-import { WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED } from '../../constants';
+import { WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED } from 'app/constants';
 import DroppableColumn, { Actions } from './DroppableColumn';
 
 type ContainerProps = {
