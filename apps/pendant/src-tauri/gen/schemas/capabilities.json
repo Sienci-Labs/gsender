@@ -1,0 +1,1 @@
+{"main":{"identifier":"main","description":"Main window capabilities","local":true,"windows":["main"],"permissions":["core:default","opener:default"]}}
