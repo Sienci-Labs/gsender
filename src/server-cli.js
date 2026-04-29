@@ -80,6 +80,8 @@ program
     .option('-H, --host <host>', `Set listen address or hostname (default: ${defaultHost})`, defaultHost)
     .option('-b, --backlog <backlog>', 'Set listen backlog (default: 511)', 511)
     .option('-c, --config <filename>', 'Set config file (default: ~/.cncrc)')
+    .option('--error-file, --error-file <filename>', 'Set errors file (default: ~/.errorrc)')
+    .option('--job-file, --job-file <filename>', 'Set job file (default: ~/.jobrc)')
     .option('-v, --verbose', 'Increase the verbosity level (-v, -vv, -vvv)', increaseVerbosityLevel, 0)
     .option('-m, --mount <route-path>:<target>', 'Add a mount point for serving static files', parseMountPoint, [])
     .option('-w, --watch-directory <path>', 'Watch a directory for changes')
@@ -108,6 +110,8 @@ module.exports = () => new Promise((resolve, reject) => {
         host: options.host,
         backlog: options.backlog,
         configFile: options.config,
+        errorFile: options.errorFile,
+        jobFile: options.jobFile,
         verbosity: options.verbose,
         mountPoints: options.mount,
         watchDirectory: options.watchDirectory,

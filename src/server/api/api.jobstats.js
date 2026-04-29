@@ -1,4 +1,4 @@
-import config from '../services/configstore';
+import config from '../services/configstore/jobStore';
 import {
     ERR_INTERNAL_SERVER_ERROR
 } from '../constants';
