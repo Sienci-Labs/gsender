@@ -112,6 +112,29 @@ You can both run gSender locally using the public code-base as well as compile i
 <details>
 <summary>Expand to see all version notes</summary>
 
+### 1.6.1 (April 30, 2026)
+- Added option to skip first tool change on fixed strategy or prompt use if they want to skip
+- Added application scaling for larger monitors and devices - in accessibility section in Config
+- Rapid Position and Park buttons now properly enabled after homing on grbl devices
+- Spindle Delay config should now be reading $392 correctly on older firmware versions
+- Go To Flyout widget can now move in machine coordinates if homing enabled - check out the new MCS option
+- Go To Flyout widget now uses the same safe height logic as several other Go To functionalities
+- Machine defaults selector will prompt to apply where necessary
+- Macro keybinds should persist
+- Gamepad - Park shortcut works as expected
+- Gamepad - Rapid position shortcut calculation fixed to not use stale position data
+- Macro keybindings should persist again
+- Further tweaks to rotary time estimation
+- Fixed issue where tool table was assumed to exist on PRB: output which is not the case for some grblHAL compilations
+- Laser test now calculates max values using $30 (grbl) or $730 (grblHAL) instead of depending on local state
+- Added application icon for IOS devices
+- Added Config option to let user toggle probe type selection directly in Probe drawer
+- Updates to Automations editor to include variables dropdown and general UX improvements
+- Config option - now possible to disable power saving on Electron to allow screen blanking
+- Lite mode toggle feather should be more obvious when it’s enabled or disabled
+- Macros again show on remote mode
+- Updates to 3d Probe text instructions to be more relevant to that probe type
+
 ### 1.6.0 (April 15, 2026)
 - Expanded compatibility with newer grblHAL firmware, improving reliability with updated controllers and settings
 - Significantly faster startup times through optimized initialization and module loading

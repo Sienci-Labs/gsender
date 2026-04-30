@@ -966,9 +966,13 @@ class Visualizer extends Component {
         const metricGridCountY = Math.ceil(mm.depth / 10) * 10;
 
         const gridCountX =
-            units === IMPERIAL_UNITS ? imperialGridCountX : metricGridCountX;
+            units === IMPERIAL_UNITS
+                ? imperialGridCountX
+                : Math.ceil(metricGridCountX / 10);
         const gridCountY =
-            units === IMPERIAL_UNITS ? imperialGridCountY : metricGridCountY;
+            units === IMPERIAL_UNITS
+                ? imperialGridCountY
+                : Math.ceil(metricGridCountY / 10);
         const gridSpacing =
             units === IMPERIAL_UNITS
                 ? IMPERIAL_GRID_SPACING
