@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronUp, ChevronDown, FolderOpen, Upload } from 'lucide-react';
+import { ChevronUp, ChevronDown, Upload, X } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@gsender/ui/shadcn/Tabs';
 
 const TABS = ['File', 'Probe', 'Spindle', 'Macros'] as const;
@@ -8,7 +8,7 @@ export default function BottomDrawer() {
     const [expanded, setExpanded] = useState(false);
 
     return (
-        <div className="shrink-0 border-t border-gray-200 dark:border-dark-lighter bg-white dark:bg-dark-darker">
+        <div className="relative shrink-0 border-t border-gray-200 dark:border-dark-lighter bg-white dark:bg-dark-darker overflow-visible">
             {/* Collapsed header */}
             <button
                 onClick={() => setExpanded((e) => !e)}
@@ -26,10 +26,20 @@ export default function BottomDrawer() {
 
             {/* Expandable panel */}
             <div
-                className="overflow-hidden transition-all duration-300"
-                style={{ maxHeight: expanded ? '32rem' : '0' }}
+                className="absolute left-0 right-0 bottom-full z-30 overflow-hidden transition-all duration-300 bg-white dark:bg-dark-darker border-t border-x border-gray-200 dark:border-dark-lighter shadow-2xl"
+                style={{ height: expanded ? '60vh' : '0' }}
             >
-                <Tabs defaultValue="File" className="flex flex-col">
+                <Tabs defaultValue="File" className="flex flex-col h-full">
+                    <div className="h-12 flex items-center justify-end px-3 border-b border-gray-200 dark:border-dark-lighter">
+                        <button
+                            onClick={() => setExpanded(false)}
+                            className="p-2 rounded border border-gray-200 dark:border-dark-lighter text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-dark-lighter"
+                            aria-label="Close tools drawer"
+                        >
+                            <X size={16} />
+                        </button>
+                    </div>
+
                     <div className="flex items-center border-b border-gray-200 dark:border-dark-lighter px-4">
                         <TabsList className="bg-transparent gap-0 h-10">
                             {TABS.map((t) => (
@@ -42,20 +52,16 @@ export default function BottomDrawer() {
                                 </TabsTrigger>
                             ))}
                         </TabsList>
-                        <div className="flex-1" />
-                        <div className="flex gap-2">
-                            <button className="flex items-center gap-1.5 text-sm border border-gray-200 dark:border-dark-lighter rounded-lg px-3 py-1.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-lighter">
-                                <FolderOpen size={14} /> Browse
-                            </button>
-                            <button className="flex items-center gap-1.5 text-sm bg-robin-600 hover:bg-robin-500 rounded-lg px-3 py-1.5 text-white font-semibold">
-                                <Upload size={14} /> Load File
-                            </button>
-                        </div>
                     </div>
 
-                    <div className="overflow-y-auto max-h-96">
+                    <div className="overflow-y-auto flex-1 min-h-0">
                         <TabsContent value="File" className="m-0 p-4 text-sm text-gray-400 dark:text-gray-500">
-                            No file loaded. Use Browse or Load File to open a G-code file.
+                            <div className="flex flex-col items-start gap-4">
+                                <button className="flex items-center gap-2 text-base bg-robin-600 hover:bg-robin-500 rounded-lg px-5 py-3 text-white font-semibold">
+                                    <Upload size={18} /> Load File
+                                </button>
+                                <span>No file loaded. Use Load File to open a G-code file.</span>
+                            </div>
                         </TabsContent>
                         <TabsContent value="Probe" className="m-0 p-4 text-sm text-gray-400 dark:text-gray-500">
                             Probe routines — coming soon.

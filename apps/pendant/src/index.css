@@ -6,6 +6,34 @@
     app-region: drag;
 }
 
+.status-badge {
+    position: relative;
+    overflow: hidden;
+}
+
+.status-badge > * {
+    position: relative;
+    z-index: 1;
+}
+
+.status-badge--run::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+        -45deg,
+        rgba(255, 255, 255, 0.18) 0 10px,
+        rgba(255, 255, 255, 0) 10px 20px
+    );
+    animation: status-stripes 900ms linear infinite;
+    pointer-events: none;
+}
+
+@keyframes status-stripes {
+    from { background-position: 0 0; }
+    to { background-position: 40px 0; }
+}
+
 html,
 body,
 #root {
