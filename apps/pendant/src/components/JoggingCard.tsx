@@ -376,7 +376,7 @@ export default function JoggingCard() {
                         onClick={() => setStepPreset(preset.id)}
                         className={`px-3 py-1 rounded text-xs font-semibold transition-colors ${
                             stepPreset === preset.id
-                                ? 'bg-robin-600 text-white'
+                                ? 'bg-robin-500 text-white'
                                 : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white border border-gray-200 dark:border-dark-lighter'
                         }`}
                     >

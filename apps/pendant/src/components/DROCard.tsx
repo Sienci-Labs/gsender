@@ -31,7 +31,7 @@ export default function DROCard() {
                         onClick={() => setMode(m)}
                         className={`px-3 py-1 rounded text-xs font-semibold uppercase tracking-wide transition-colors ${
                             mode === m
-                                ? 'bg-robin-600 text-white'
+                                ? 'bg-robin-500 text-white'
                                 : 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300'
                         }`}
                     >
@@ -74,7 +74,7 @@ export default function DROCard() {
                         className={`flex items-center justify-center gap-1.5 rounded-lg py-3 text-sm border transition-colors ${
                             primary
                                 ? (isConnected
-                                    ? 'bg-robin-500 hover:bg-robin-600 active:bg-robin-700 border-robin-500 text-white'
+                                    ? 'bg-blue-500 hover:bg-blue-600 active:bg-blue-700 border-blue-500 text-white'
                                     : 'bg-gray-200 border-gray-200 text-gray-400 dark:bg-dark-lighter dark:border-dark-lighter dark:text-gray-500')
                                 : 'border-gray-200 dark:border-dark-lighter text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-lighter hover:text-gray-900 dark:hover:text-white'
                         }`}
