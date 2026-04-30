@@ -2,8 +2,42 @@ import { defineConfig } from 'vite';
 import path from 'path';
 import react from '@vitejs/plugin-react';
 import tailwindcss from 'tailwindcss';
+import type { Plugin, ViteDevServer } from 'vite';
 
 const root = path.resolve(__dirname, '../..');
+
+// Tailwind v3 + PostCSS only re-runs when the CSS entry file itself is touched.
+// This plugin watches all Tailwind content directories (including those outside
+// the Vite root) and invalidates the CSS module whenever a source file changes,
+// so new utility classes appear in the browser without a manual refresh.
+function tailwindHmr(): Plugin {
+    const contentDirs = [
+        path.join(__dirname, 'src'),
+        path.join(root, 'apps/desktop/src'),
+        path.join(root, 'packages/ui/src'),
+        path.join(root, 'packages/features/src'),
+        path.join(root, 'packages/controller-client/src'),
+    ];
+    const cssEntry = path.join(__dirname, 'src/index.css');
+
+    return {
+        name: 'tailwind-hmr',
+        configureServer(server: ViteDevServer) {
+            contentDirs.forEach(dir => server.watcher.add(dir));
+
+            server.watcher.on('change', (file: string) => {
+                if (
+                    contentDirs.some(d => file.startsWith(d)) &&
+                    /\.(tsx?|jsx?|html)$/.test(file)
+                ) {
+                    const mods = server.moduleGraph.getModulesByFile(cssEntry);
+                    mods?.forEach(m => server.moduleGraph.invalidateModule(m));
+                    server.ws.send({ type: 'full-reload' });
+                }
+            });
+        },
+    };
+}
 
 export default defineConfig({
     root: path.resolve(__dirname, './'),
@@ -13,7 +47,7 @@ export default defineConfig({
             plugins: [tailwindcss()],
         },
     },
-    plugins: [react()],
+    plugins: [react(), tailwindHmr()],
     resolve: {
         alias: {
             // Shared packages

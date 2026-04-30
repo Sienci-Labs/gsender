@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import cn from 'classnames';
 import { Home, Target, Crosshair } from 'lucide-react';
 import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import type { RootState } from '@gsender/controller-client/store/redux';
@@ -69,7 +70,10 @@ export default function DROCard() {
                         >
                             {label}
                         </button>
-                        <span className="flex-1 min-w-0 text-right font-mono text-[2rem] tabular-nums text-gray-900 dark:text-white leading-tight">
+                        <span className={cn(
+                            'flex-1 min-w-0 text-right font-mono text-[2rem] tabular-nums leading-tight',
+                            mode === 'work' ? 'text-blue-500' : 'text-gray-400 dark:text-gray-500',
+                        )}>
                             {formatAxisValue(activePos?.[label.toLowerCase() as 'x' | 'y' | 'z' | 'a'])}
                         </span>
                         <button

@@ -106,7 +106,7 @@ export default function PendantTopBar() {
     };
 
     return (
-        <header className="h-14 px-3 flex items-center gap-3 bg-gray-50 border-b border-gray-200 dark:bg-dark-darker dark:border-dark-lighter shrink-0 select-none">
+        <header className="h-14 px-3 flex items-center gap-3 bg-gray-50 border-b border-gray-200 dark:bg-dark-darker dark:border-dark-lighter shrink-0 select-none relative">
             {/* Logo */}
             <div data-tauri-drag-region className="flex items-center gap-2 shrink-0 cursor-grab active:cursor-grabbing">
                 <img src={iconRound} alt="gSender" className="w-9 h-9" />
@@ -117,10 +117,10 @@ export default function PendantTopBar() {
                 <Connection />
             </div>
 
-            {/* State pill */}
+            {/* State pill — absolutely centred so Connection resizing doesn't shift it */}
             <div
                 data-tauri-drag-region
-                className={`status-badge flex items-center justify-center gap-2 w-44 h-9 px-3 rounded-full text-sm font-semibold shrink-0 whitespace-nowrap cursor-grab active:cursor-grabbing ${badge.classes} ${badge.animation === 'alarm' ? 'animate-pulse' : ''} ${badge.animation === 'run' ? 'status-badge--run' : ''}`}
+                className={`status-badge absolute left-1/2 -translate-x-1/2 flex items-center justify-center gap-2 w-44 h-9 px-3 rounded-full text-sm font-semibold whitespace-nowrap pointer-events-none ${badge.classes} ${badge.animation === 'alarm' ? 'animate-pulse' : ''} ${badge.animation === 'run' ? 'status-badge--run' : ''}`}
             >
                 <BadgeIcon className="w-4 h-4 shrink-0" />
                 <span>{badge.label}</span>
