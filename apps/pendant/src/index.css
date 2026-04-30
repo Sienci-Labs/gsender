@@ -60,6 +60,23 @@ body,
     -webkit-touch-callout: none;
 }
 
+/* Config view: override desktop-assumed heights for pendant chrome.
+   Top chrome = PendantTopBar (56px) + InfoStrip (~32px) = 88px.
+   BottomNav (64px) is a sibling below, not included here. */
+.pendant-config .fixed-content-area {
+    height: calc(100vh - 88px) !important;
+    max-height: calc(100vh - 88px) !important;
+}
+.pendant-config .fixed-config-area {
+    height: calc(100vh - 88px - 115px) !important;
+    max-height: calc(100vh - 88px - 115px) !important;
+}
+/* ProfileBar is position:fixed and escapes normal flow.
+   Shift it up so it sits above BottomNav (h-16 = 64px). */
+body.pendant-mode .fixed.z-50 {
+    bottom: 72px !important;
+}
+
 input,
 textarea,
 [contenteditable="true"] {
