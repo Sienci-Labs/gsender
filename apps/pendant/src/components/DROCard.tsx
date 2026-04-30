@@ -2,11 +2,18 @@ import { useState } from 'react';
 import { Home, Target, Crosshair } from 'lucide-react';
 import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import type { RootState } from '@gsender/controller-client/store/redux';
+import { zeroAllAxes, zeroWCS } from '@gsender/features/DRO/utils/DRO';
+import {
+    GRBL_ACTIVE_STATE_IDLE,
+    GRBL_ACTIVE_STATE_JOG,
+    WORKFLOW_STATE_RUNNING,
+} from 'app/constants';
 
 const AXES = [
     { label: 'X', color: 'bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400' },
     { label: 'Y', color: 'bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400' },
     { label: 'Z', color: 'bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400' },
+    { label: 'A', color: 'bg-purple-100 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400' },
 ] as const;
 
 function formatAxisValue(value: unknown): string {
@@ -17,13 +24,20 @@ function formatAxisValue(value: unknown): string {
 export default function DROCard() {
     const [mode, setMode] = useState<'work' | 'machine'>('work');
     const isConnected = useTypedSelector((s: RootState) => s.connection.isConnected);
+    const workflowState = useTypedSelector((s: RootState) => s.controller.workflow.state);
+    const activeState = useTypedSelector((s: RootState) => s.controller.state.status?.activeState ?? '');
     const wpos = useTypedSelector((s: RootState) => s.controller.wpos);
     const mpos = useTypedSelector((s: RootState) => s.controller.mpos);
     const activePos = !isConnected
-        ? { x: 0, y: 0, z: 0 }
+        ? { x: 0, y: 0, z: 0, a: 0 }
         : mode === 'machine'
             ? mpos
             : wpos;
+    const canZero =
+        isConnected &&
+        workflowState !== WORKFLOW_STATE_RUNNING &&
+        (activeState === GRBL_ACTIVE_STATE_IDLE ||
+            activeState === GRBL_ACTIVE_STATE_JOG);
 
     return (
         <div className="rounded-xl bg-white border border-gray-200 dark:bg-dark-darker dark:border-dark-lighter p-3 flex flex-col gap-3">
@@ -47,7 +61,7 @@ export default function DROCard() {
             {/* Axis rows */}
             <div className="flex flex-col gap-1.5">
                 {AXES.map(({ label, color }) => (
-                    <div key={label} className="flex items-center gap-2 px-2 py-2 rounded-lg bg-gray-50 dark:bg-dark">
+                    <div key={label} className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-gray-50 dark:bg-dark">
                         <button
                             type="button"
                             aria-label={`Go to ${label} axis`}
@@ -55,10 +69,18 @@ export default function DROCard() {
                         >
                             {label}
                         </button>
-                        <span className="flex-1 min-w-0 text-right font-mono text-[2.25rem] tabular-nums text-gray-900 dark:text-white leading-tight">
-                            {formatAxisValue(activePos?.[label.toLowerCase() as 'x' | 'y' | 'z'])}
+                        <span className="flex-1 min-w-0 text-right font-mono text-[2rem] tabular-nums text-gray-900 dark:text-white leading-tight">
+                            {formatAxisValue(activePos?.[label.toLowerCase() as 'x' | 'y' | 'z' | 'a'])}
                         </span>
-                        <button className="text-xs text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 border border-gray-200 dark:border-dark-lighter rounded px-2 py-1 shrink-0">
+                        <button
+                            onClick={() => zeroWCS(label, 0)}
+                            disabled={!canZero}
+                            className={`text-sm font-semibold border rounded-md px-3 py-1.5 shrink-0 transition-colors ${
+                                canZero
+                                    ? 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 border-gray-200 dark:border-dark-lighter'
+                                    : 'text-gray-400 dark:text-gray-500 border-gray-200 dark:border-dark-lighter cursor-default'
+                            }`}
+                        >
                             ZERO
                         </button>
                     </div>
@@ -74,16 +96,19 @@ export default function DROCard() {
                 ].map(({ icon: Icon, label, primary }) => (
                     <button
                         key={label}
-                        disabled={primary && !isConnected}
-                        className={`flex items-center justify-center gap-1.5 rounded-lg py-3 text-sm border transition-colors ${
+                        onClick={label === 'Zero All' ? zeroAllAxes : undefined}
+                        disabled={primary ? !isConnected : !canZero}
+                        className={`flex items-center justify-center gap-2 rounded-lg h-12 text-sm border transition-colors ${
                             primary
                                 ? (isConnected
                                     ? 'bg-blue-500 hover:bg-blue-600 active:bg-blue-700 border-blue-500 text-white'
                                     : 'bg-gray-200 border-gray-200 text-gray-400 dark:bg-dark-lighter dark:border-dark-lighter dark:text-gray-500')
-                                : 'border-gray-200 dark:border-dark-lighter text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-lighter hover:text-gray-900 dark:hover:text-white'
+                                : (canZero
+                                    ? 'border-gray-200 dark:border-dark-lighter text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-lighter hover:text-gray-900 dark:hover:text-white'
+                                    : 'border-gray-200 dark:border-dark-lighter text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-dark cursor-default')
                         }`}
                     >
-                        <Icon size={14} />
+                        <Icon size={16} />
                         {label}
                     </button>
                 ))}
