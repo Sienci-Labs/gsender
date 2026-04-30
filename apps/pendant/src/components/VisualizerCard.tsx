@@ -11,9 +11,9 @@ export default function VisualizerCard() {
                 {/* Top toolbar */}
                 <div className="flex items-center px-3 py-2 bg-white dark:bg-dark-darker border-b border-gray-200 dark:border-dark-lighter">
                     <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 flex-1">
-                        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-orange-400 inline-block" />Cut</span>
-                        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-400 inline-block" />Rapid</span>
-                        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-400 inline-block" />Bounds</span>
+                        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-400 inline-block" />Cut</span>
+                        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-orange-400 inline-block" />Rapid</span>
+                        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-gray-400 inline-block" />Bounds</span>
                     </div>
                     <WorkspaceSelector />
                 </div>
