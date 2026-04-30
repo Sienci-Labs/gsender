@@ -37,13 +37,11 @@ function App() {
             <ReduxProvider store={reduxStore}>
                 <AccessibilitySettingsHandler />
                 <Toaster
-    {...({
-        richColors: true,
-        closeButton: true,
-        theme: 'light',
-        visibleToasts: 5,
-    } as React.ComponentProps<typeof Toaster>)}
-/>
+                    richColors
+                    closeButton
+                    theme="light"
+                    visibleToasts={5}
+                />
                 <HashRouter>
                     <ReactRoutes />
                 </HashRouter>
