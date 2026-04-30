@@ -15,7 +15,7 @@ interface BottomNavProps {
 
 export default function BottomNav({ active, onChange }: BottomNavProps) {
     return (
-        <nav className="grid grid-cols-3 h-16 bg-dark-darker border-t border-dark-lighter shrink-0">
+        <nav className="grid grid-cols-3 h-16 bg-white border-t border-gray-200 dark:bg-dark-darker dark:border-dark-lighter shrink-0">
             {TABS.map(({ id, label, Icon }) => {
                 const isActive = active === id;
                 return (
@@ -24,8 +24,8 @@ export default function BottomNav({ active, onChange }: BottomNavProps) {
                         onClick={() => onChange(id)}
                         className={`flex flex-col items-center justify-center gap-1 transition-colors ${
                             isActive
-                                ? 'bg-robin-600/20 text-robin-400'
-                                : 'text-gray-500 hover:text-gray-300'
+                                ? 'bg-robin-50 text-robin-600 dark:bg-robin-600/20 dark:text-robin-400'
+                                : 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300'
                         }`}
                     >
                         <Icon size={22} />

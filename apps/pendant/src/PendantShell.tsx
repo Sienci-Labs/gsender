@@ -13,11 +13,10 @@ export default function PendantShell() {
     useDarkMode(); // syncs workspace.enableDarkMode → <html class="dark">
 
     return (
-        <div className="h-screen w-screen flex flex-col bg-dark overflow-hidden">
+        <div className="h-screen w-screen flex flex-col bg-gray-100 dark:bg-dark overflow-hidden">
             <PendantTopBar />
             <InfoStrip />
 
-            {/* Main content switches with bottom nav */}
             {activeTab === 'carve' && <CarveView />}
             {activeTab === 'tools' && <PlaceholderView title="Tools" />}
             {activeTab === 'config' && <PlaceholderView title="Config" />}

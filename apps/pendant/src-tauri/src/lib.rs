@@ -77,8 +77,8 @@ pub fn run() {
 
             WebviewWindowBuilder::new(app, "main", WebviewUrl::External(url.parse()?))
                 .title("gSender Pendant")
-                .inner_size(1024.0, 768.0)
-                .min_inner_size(800.0, 600.0)
+                .inner_size(768.0, 1024.0)
+                .min_inner_size(768.0, 1024.0)
                 .decorations(false)
                 .resizable(true)
                 .build()?;
