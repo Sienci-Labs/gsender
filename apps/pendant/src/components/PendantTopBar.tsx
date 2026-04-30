@@ -1,5 +1,4 @@
 import Connection from 'app/features/Connection';
-import ThemeToggle from './ThemeToggle';
 import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import type { RootState } from '@gsender/controller-client/store/redux';
 import { getCurrentWindow } from '@tauri-apps/api/window';
@@ -134,8 +133,7 @@ export default function PendantTopBar() {
                 onMouseDown={handleDragMouseDown}
             />
 
-            {/* Theme toggle + unlock + E-STOP */}
-            <ThemeToggle />
+            {/* Unlock + E-STOP */}
             <button
                 onClick={handleUnlock}
                 disabled={!unlockActionable}

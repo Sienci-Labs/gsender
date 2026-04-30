@@ -60,6 +60,63 @@ body,
     -webkit-touch-callout: none;
 }
 
+/* Hide native number spinners — desktop hides these in application.css which pendant doesn't import */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0;
+}
+input[type='number'] {
+    -moz-appearance: textfield !important;
+}
+
+/* ======= Pendant Config: setting row layout =======
+   Desktop 4-col: [label 1/5] [description 2/5] [input 1/5] [icons 1/5]
+   Pendant:       [label+icons stacked 1/4]      [input 3/4]
+                  [description — full-width second row]
+*/
+
+/* 1. Label column — SettingRow uses sm:block (kills flex at sm+); restore as flex-col */
+.pendant-config .sm\:block {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.25rem;
+    width: 25% !important;
+}
+/* EEPROMSettingRow label is flex-row with sm:justify-start — change to flex-col */
+.pendant-config .sm\:justify-start {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    width: 25% !important;
+}
+
+/* 2. Show the sm:hidden icon chips nested inside each label column */
+.pendant-config .sm\:block .sm\:hidden,
+.pendant-config .sm\:justify-start .sm\:hidden {
+    display: flex !important;
+}
+
+/* 3. All sm:w-1/5 children → expand to 75%; label columns then pin back to 25% (more specific rule wins) */
+.pendant-config .sm\:w-1\/5 {
+    width: 75% !important;
+}
+.pendant-config .sm\:block.sm\:w-1\/5,
+.pendant-config .sm\:justify-start.sm\:w-1\/5 {
+    width: 25% !important;
+}
+
+/* 4. Description → full-width, pushed below label+input */
+.pendant-config .sm\:w-2\/5 {
+    width: 100% !important;
+    order: 10 !important;
+}
+
+/* 5. Hide the dedicated right-side icons column — icons are now under the label */
+.pendant-config .sm\:flex.w-1\/5 {
+    display: none !important;
+}
+
 /* Config view: override desktop-assumed heights for pendant chrome.
    Top chrome = PendantTopBar (56px) + InfoStrip (~32px) = 88px.
    BottomNav (64px) is a sibling below, not included here. */

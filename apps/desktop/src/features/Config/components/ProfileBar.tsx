@@ -171,7 +171,7 @@ export function ProfileBar() {
                     disabled={!settingsAreDirty}
                     onClick={updateSettingsHandler}
                 >
-                    Apply Settings
+                    Apply<span className="max-xl:hidden"> Settings</span>
                 </button>
                 {settingsAreDirty && (
                     <span className="w-4 h-4 animate-ping absolute -top-2 -left-2 bg-blue-400 rounded-xl"></span>
