@@ -256,6 +256,9 @@ class GrblHalController {
 
         // Connection
         this.connection = connection;
+        if (!this.connection) {
+            throw new Error('connection must be specified');
+        }
 
         this.connection.setWriteFilter((data) => {
             let line;
