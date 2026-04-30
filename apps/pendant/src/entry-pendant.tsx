@@ -7,11 +7,12 @@ import { sagaMiddleware, createRootSaga } from '@gsender/controller-client/store
 import controller from '@gsender/controller-client/controller';
 import { FocusTrappingProvider } from '@gsender/ui/lib/focus-trapping';
 import { getHost } from './tauri-bridge';
+import * as pendantSagas from './pendant-sagas';
 import PendantShell from './PendantShell';
 
 import './index.css';
 
-sagaMiddleware.run(createRootSaga([]));
+sagaMiddleware.run(createRootSaga([pendantSagas]));
 
 async function bootstrap() {
     // In Tauri, getHost() returns the stored gSender host.
