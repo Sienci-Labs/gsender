@@ -1,6 +1,7 @@
 import { ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 import Visualizer from './Visualizer';
 import JobControls from './JobControls';
+import FeedOverrideWrapper from './FeedOverrideWrapper';
 
 export default function VisualizerCard() {
     return (
@@ -33,6 +34,9 @@ export default function VisualizerCard() {
                 </div>
             </div>
 
+            {/* Job controls */}
+            <JobControls />
+
             {/* Progress */}
             <div className="flex flex-col gap-1 px-1">
                 <div className="flex justify-between text-xs text-gray-400 dark:text-gray-400">
@@ -44,24 +48,8 @@ export default function VisualizerCard() {
                 </div>
             </div>
 
-            {/* Job controls */}
-            <JobControls />
-
             {/* Override sliders */}
-            <div className="flex flex-col gap-3 px-1">
-                {['FEED OVERRIDE', 'SPINDLE OVERRIDE'].map((label) => (
-                    <div key={label} className="flex flex-col gap-1">
-                        <div className="flex justify-between text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wide">
-                            <span>{label}</span>
-                            <span className="text-gray-700 dark:text-white font-semibold">100%</span>
-                        </div>
-                        <div className="relative h-2 bg-gray-200 dark:bg-dark-lighter rounded-full">
-                            <div className="absolute h-full bg-robin-500 rounded-full" style={{ width: '100%' }} />
-                            <div className="absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-robin-400 border-2 border-white shadow" style={{ left: 'calc(100% - 8px)' }} />
-                        </div>
-                    </div>
-                ))}
-            </div>
+            <FeedOverrideWrapper />
         </div>
     );
 }

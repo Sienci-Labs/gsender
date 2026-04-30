@@ -27,7 +27,7 @@ export default function BottomDrawer() {
             {/* Expandable panel */}
             <div
                 className="overflow-hidden transition-all duration-300"
-                style={{ maxHeight: expanded ? '22rem' : '0' }}
+                style={{ maxHeight: expanded ? '32rem' : '0' }}
             >
                 <Tabs defaultValue="File" className="flex flex-col">
                     <div className="flex items-center border-b border-gray-200 dark:border-dark-lighter px-4">
@@ -53,7 +53,7 @@ export default function BottomDrawer() {
                         </div>
                     </div>
 
-                    <div className="overflow-y-auto max-h-64">
+                    <div className="overflow-y-auto max-h-96">
                         <TabsContent value="File" className="m-0 p-4 text-sm text-gray-400 dark:text-gray-500">
                             No file loaded. Use Browse or Load File to open a G-code file.
                         </TabsContent>
