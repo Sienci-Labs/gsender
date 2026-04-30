@@ -1,27 +1,32 @@
 import { useState } from 'react';
 import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Plus, Minus } from 'lucide-react';
 
-const STEPS = ['0.1', '1.0', '10', '100'] as const;
+const STEP_PRESETS = [
+    { id: 'precise', label: 'Precise', value: '0.1' },
+    { id: 'normal', label: 'Normal', value: '1.0' },
+    { id: 'rapid', label: 'Rapid', value: '10' },
+] as const;
 
 export default function JoggingCard() {
-    const [step, setStep] = useState<string>('1.0');
+    const [stepPreset, setStepPreset] = useState<(typeof STEP_PRESETS)[number]['id']>('normal');
 
     return (
         <div className="rounded-xl bg-white border border-gray-200 dark:bg-dark-darker dark:border-dark-lighter p-4 flex flex-col gap-3">
             {/* Step size selector */}
             <div className="flex items-center gap-1">
                 <span className="text-xs text-gray-400 dark:text-gray-500 mr-1">Step:</span>
-                {STEPS.map((s) => (
+                {STEP_PRESETS.map((preset) => (
                     <button
-                        key={s}
-                        onClick={() => setStep(s)}
+                        key={preset.id}
+                        onClick={() => setStepPreset(preset.id)}
                         className={`px-3 py-1 rounded text-xs font-semibold transition-colors ${
-                            step === s
+                            stepPreset === preset.id
                                 ? 'bg-robin-600 text-white'
                                 : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white border border-gray-200 dark:border-dark-lighter'
                         }`}
+                        data-step-value={preset.value}
                     >
-                        {s}
+                        {preset.label}
                     </button>
                 ))}
             </div>
