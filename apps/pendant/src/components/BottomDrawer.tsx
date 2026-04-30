@@ -25,9 +25,9 @@ export default function BottomDrawer() {
             : <ChevronUp size={16} className="text-gray-400 shrink-0" />;
 
     return (
-        <div className="relative shrink-0 border-t border-gray-200 dark:border-dark-lighter bg-white dark:bg-dark-darker overflow-visible">
+        <div className="relative shrink-0 border-t border-gray-200 dark:border-dark-lighter bg-gray-100 dark:bg-dark-darker overflow-visible">
             {/* Drawer mode bar */}
-            <div className="w-full flex items-center gap-3 px-4 py-3 bg-white dark:bg-dark-darker">
+            <div className="w-full flex items-center gap-3 px-4 py-3 bg-gray-100 dark:bg-dark-darker">
                 <button
                     onClick={() => {
                         if (mode === 'closed') setMode('minimal');
@@ -71,7 +71,7 @@ export default function BottomDrawer() {
 
             {/* 3-state panel */}
             <div
-                className="absolute left-0 right-0 bottom-full z-30 overflow-hidden transition-all duration-300 bg-white dark:bg-dark-darker border-t border-x border-gray-200 dark:border-dark-lighter shadow-2xl"
+                className="absolute left-0 right-0 bottom-full z-30 overflow-hidden transition-all duration-300 bg-gray-100 dark:bg-dark-darker border-t border-x border-gray-200 dark:border-dark-lighter shadow-2xl"
                 style={{ height: panelHeight }}
             >
                 <Tabs

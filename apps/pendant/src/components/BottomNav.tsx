@@ -15,7 +15,7 @@ interface BottomNavProps {
 
 export default function BottomNav({ active, onChange }: BottomNavProps) {
     return (
-        <nav className="grid grid-cols-3 h-16 bg-white border-t border-gray-200 dark:bg-dark-darker dark:border-dark-lighter shrink-0">
+        <nav className="grid grid-cols-3 h-16 bg-gray-100 border-t border-gray-200 dark:bg-dark-darker dark:border-dark-lighter shrink-0">
             {TABS.map(({ id, label, Icon }) => {
                 const isActive = active === id;
                 return (

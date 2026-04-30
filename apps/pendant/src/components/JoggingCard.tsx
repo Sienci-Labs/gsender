@@ -368,7 +368,7 @@ export default function JoggingCard() {
     );
 
     return (
-        <div className="rounded-xl bg-white border border-gray-200 dark:bg-dark-darker dark:border-dark-lighter p-4 flex flex-col gap-4">
+        <div className="rounded-xl bg-gray-100 border border-gray-200 dark:bg-dark-darker dark:border-dark-lighter p-4 flex flex-col gap-4">
             <div className="flex items-center justify-center gap-1.5">
                 {PRESET_META.map((preset) => (
                     <button
