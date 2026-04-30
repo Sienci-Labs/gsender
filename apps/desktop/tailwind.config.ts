@@ -16,6 +16,8 @@ function customScreenVariants({
     addVariant('xl', '@media (min-width: 1280px) { & }');
     addVariant('max-xl', '@media (max-width: 1280px), (max-height: 880px) { & }');
     addVariant('short', '@media (max-height: 820px) { & }');
+    addVariant('portrait', '@media (orientation: portrait) { & }');
+    addVariant('landscape', '@media (orientation: landscape) { & }');
 }
 
 export default {

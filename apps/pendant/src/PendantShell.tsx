@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useDarkMode } from 'app/hooks/useDarkMode';
 import PendantTopBar from './components/PendantTopBar';
 import InfoStrip from './components/InfoStrip';
 import CarveView from './components/CarveView';
@@ -9,6 +10,7 @@ type NavTab = 'carve' | 'tools' | 'config';
 
 export default function PendantShell() {
     const [activeTab, setActiveTab] = useState<NavTab>('carve');
+    useDarkMode(); // syncs workspace.enableDarkMode → <html class="dark">
 
     return (
         <div className="h-screen w-screen flex flex-col bg-dark overflow-hidden">

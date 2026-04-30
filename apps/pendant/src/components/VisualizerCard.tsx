@@ -1,5 +1,6 @@
-import { ZoomIn, ZoomOut, Maximize2, Play, Pause, Square } from 'lucide-react';
+import { ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 import Visualizer from './Visualizer';
+import JobControls from './JobControls';
 
 export default function VisualizerCard() {
     return (
@@ -45,17 +46,7 @@ export default function VisualizerCard() {
             </div>
 
             {/* Job controls */}
-            <div className="grid grid-cols-3 gap-2">
-                <button className="flex items-center justify-center gap-2 h-14 rounded-xl bg-green-700 hover:bg-green-600 text-white font-bold text-sm">
-                    <Play size={16} fill="currentColor" /> START
-                </button>
-                <button className="flex items-center justify-center gap-2 h-14 rounded-xl border border-dark-lighter text-gray-300 hover:bg-dark-lighter font-semibold text-sm">
-                    <Pause size={16} /> PAUSE
-                </button>
-                <button className="flex items-center justify-center gap-2 h-14 rounded-xl border border-red-800 text-red-400 hover:bg-red-900/30 font-semibold text-sm">
-                    <Square size={14} fill="currentColor" /> STOP
-                </button>
-            </div>
+            <JobControls />
 
             {/* Override sliders */}
             <div className="flex flex-col gap-3 px-1">
