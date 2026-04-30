@@ -71,48 +71,47 @@ input[type='number'] {
 }
 
 /* ======= Pendant Config: setting row layout =======
-   Desktop 4-col: [label 1/5] [description 2/5] [input 1/5] [icons 1/5]
-   Pendant:       [label+icons stacked 1/4]      [input 3/4]
-                  [description — full-width second row]
+   Match desktop small-resolution stacking order:
+     Row 1: label + reset/eeprom icons (justify-between)
+     Row 2: description
+     Row 3: input
 */
 
-/* 1. Label column — SettingRow uses sm:block (kills flex at sm+); restore as flex-col */
-.pendant-config .sm\:block {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 0.25rem;
-    width: 25% !important;
-}
-/* EEPROMSettingRow label is flex-row with sm:justify-start — change to flex-col */
-.pendant-config .sm\:justify-start {
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    width: 25% !important;
+/* 1. All columns → full width */
+.pendant-config .sm\:w-1\/5,
+.pendant-config .sm\:w-2\/5 {
+    width: 100% !important;
 }
 
-/* 2. Show the sm:hidden icon chips nested inside each label column */
+/* 2. Label column: restore flex-row justify-between
+      SettingRow label has sm:block (turns off flex at sm+) — revert to flex row
+      EEPROMSettingRow label has sm:justify-start — revert to justify-between */
+.pendant-config .sm\:block {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+.pendant-config .sm\:justify-start {
+    flex-direction: row !important;
+    justify-content: space-between !important;
+}
+
+/* 3. Show the sm:hidden icons on the right of the label row */
 .pendant-config .sm\:block .sm\:hidden,
 .pendant-config .sm\:justify-start .sm\:hidden {
     display: flex !important;
 }
 
-/* 3. All sm:w-1/5 children → expand to 75%; label columns then pin back to 25% (more specific rule wins) */
-.pendant-config .sm\:w-1\/5 {
-    width: 75% !important;
-}
-.pendant-config .sm\:block.sm\:w-1\/5,
-.pendant-config .sm\:justify-start.sm\:w-1\/5 {
-    width: 25% !important;
-}
+/* 4. Restore small-screen order: label(auto) → description(2) → input(3)
+      SettingRow:     description has sm:order-3 (→2), input has sm:order-none (→3)
+      EEPROMSettingRow: input has sm:order-2 (push to 3), description has order-4 (pull to 2) */
+.pendant-config .sm\:order-3    { order: 2 !important; }
+.pendant-config .sm\:order-none { order: 3 !important; }
+.pendant-config .sm\:order-2    { order: 3 !important; }
+.pendant-config .order-4        { order: 2 !important; }
 
-/* 4. Description → full-width, pushed below label+input */
-.pendant-config .sm\:w-2\/5 {
-    width: 100% !important;
-    order: 10 !important;
-}
-
-/* 5. Hide the dedicated right-side icons column — icons are now under the label */
+/* 5. Hide the dedicated right-side icons column — icons are now inline with the label */
 .pendant-config .sm\:flex.w-1\/5 {
     display: none !important;
 }
