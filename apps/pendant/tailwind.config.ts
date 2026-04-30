@@ -12,6 +12,7 @@ export default {
     content: [
         path.join(__dirname, './src/**/*.{js,ts,jsx,tsx,html}'),
         path.join(__dirname, './index.html'),
+        path.join(root, 'apps/desktop/src/**/*.{js,ts,jsx,tsx,html}'),
         path.join(root, 'packages/ui/src/**/*.{js,ts,jsx,tsx}'),
         path.join(root, 'packages/features/src/**/*.{js,ts,jsx,tsx}'),
         path.join(root, 'packages/controller-client/src/**/*.{js,ts,jsx,tsx}'),

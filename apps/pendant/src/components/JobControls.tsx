@@ -20,7 +20,7 @@ export default function JobControls() {
     const sharedProps = { workflow, activeState, isConnected, fileLoaded, onStop };
 
     return (
-        <div className="flex gap-2">
+        <div className="flex w-full items-center justify-center gap-2">
             <ControlButton type={START} {...sharedProps} />
             <ControlButton type={PAUSE} {...sharedProps} />
             <ControlButton type={STOP}  {...sharedProps} />

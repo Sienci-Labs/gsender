@@ -2,6 +2,7 @@ import Connection from 'app/features/Connection';
 import ThemeToggle from './ThemeToggle';
 import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import type { RootState } from '@gsender/controller-client/store/redux';
+import { getCurrentWindow } from '@tauri-apps/api/window';
 import iconRound from '../assets/icon-round.png';
 
 const STATE_COLOR: Record<string, string> = {
@@ -16,15 +17,23 @@ const DEFAULT_STATE_COLOR = 'bg-gray-100 text-gray-500 border-gray-300 dark:bg-g
 export default function PendantTopBar() {
     const rawState = useTypedSelector((s: RootState) => s.controller.state) as any;
     const activeState: string = rawState?.status?.activeState ?? '';
+    const handleDragMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
+        if (event.button !== 0) return; // left mouse only
+        // Fallback for environments where data-tauri-drag-region is unreliable.
+        // In browser (non-Tauri), this safely no-ops.
+        getCurrentWindow().startDragging().catch((err) => {
+            console.warn('Unable to start window drag', err);
+        });
+    };
 
     return (
-        <header data-tauri-drag-region className="h-14 px-3 flex items-center gap-3 bg-gray-50 border-b border-gray-200 dark:bg-dark-darker dark:border-dark-lighter shrink-0 cursor-grab active:cursor-grabbing select-none">
+        <header className="h-14 px-3 flex items-center gap-3 bg-gray-50 border-b border-gray-200 dark:bg-dark-darker dark:border-dark-lighter shrink-0 select-none">
             {/* Logo + name */}
-            <div className="flex items-center gap-2 shrink-0">
+            <div data-tauri-drag-region className="flex items-center gap-2 shrink-0 cursor-grab active:cursor-grabbing">
                 <img src={iconRound} alt="gSender" className="w-9 h-9" />
                 <div className="flex flex-col leading-tight">
                     <span className="text-sm font-semibold text-gray-900 dark:text-white">gSender</span>
-                    <span className="text-[10px] text-gray-400 dark:text-gray-500">Pendant v1.4.2</span>
+                    <span className="text-[10px] text-gray-400 dark:text-gray-500">Pendant v0.1.0</span>
                 </div>
             </div>
 
@@ -35,14 +44,18 @@ export default function PendantTopBar() {
 
             {/* State pill */}
             {activeState && (
-                <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-semibold uppercase tracking-wide shrink-0 ${STATE_COLOR[activeState] ?? DEFAULT_STATE_COLOR}`}>
+                <div data-tauri-drag-region className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-semibold uppercase tracking-wide shrink-0 cursor-grab active:cursor-grabbing ${STATE_COLOR[activeState] ?? DEFAULT_STATE_COLOR}`}>
                     <span className="w-1.5 h-1.5 rounded-full bg-current" />
                     STATE {activeState}
                 </div>
             )}
 
             {/* Spacer */}
-            <div className="flex-1" />
+            <div
+                data-tauri-drag-region
+                className="flex-1 h-full cursor-grab active:cursor-grabbing"
+                onMouseDown={handleDragMouseDown}
+            />
 
             {/* Theme toggle + E-STOP */}
             <ThemeToggle />
