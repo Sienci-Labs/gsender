@@ -34,6 +34,23 @@
     to { background-position: 40px 0; }
 }
 
+.jog-btn-active {
+    transform: translateY(1px) scale(0.985);
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.24),
+        0 0 0 2px rgba(59, 130, 246, 0.18);
+    animation: jog-press 220ms ease-out;
+}
+
+@keyframes jog-press {
+    0% {
+        filter: brightness(1.12);
+    }
+    100% {
+        filter: brightness(1);
+    }
+}
+
 html,
 body,
 #root {

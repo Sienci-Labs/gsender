@@ -1,20 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import type { RootState } from '@gsender/controller-client/store/redux';
 import controller from '@gsender/controller-client/controller';
-import { GRBL_ACTIVE_STATE_RUN, WORKFLOW_STATE_RUNNING } from 'app/constants';
+import { GRBL_ACTIVE_STATE_RUN, METRIC_UNITS, WORKFLOW_STATE_RUNNING } from 'app/constants';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { mapPositionToUnits } from 'app/lib/units';
+import { ChevronDown } from 'lucide-react';
 
 type GrblWorkspace = 'G54' | 'G55' | 'G56' | 'G57' | 'G58' | 'G59';
 
 const WORKSPACE_VALUES: GrblWorkspace[] = ['G54', 'G55', 'G56', 'G57', 'G58', 'G59'];
 
-const WORKSPACE_COLORS: Record<GrblWorkspace, string> = {
-    G54: 'bg-blue-600 text-white border-blue-700 dark:border-blue-500',
-    G55: 'bg-emerald-600 text-white border-emerald-700 dark:border-emerald-500',
-    G56: 'bg-amber-500 text-white border-amber-600 dark:border-amber-400',
-    G57: 'bg-violet-600 text-white border-violet-700 dark:border-violet-500',
-    G58: 'bg-rose-600 text-white border-rose-700 dark:border-rose-500',
-    G59: 'bg-cyan-600 text-white border-cyan-700 dark:border-cyan-500',
+const WORKSPACE_TEXT_COLORS: Record<GrblWorkspace, string> = {
+    G54: 'text-blue-600 dark:text-blue-400',
+    G55: 'text-emerald-600 dark:text-emerald-400',
+    G56: 'text-amber-600 dark:text-amber-400',
+    G57: 'text-violet-600 dark:text-violet-400',
+    G58: 'text-rose-600 dark:text-rose-400',
+    G59: 'text-cyan-600 dark:text-cyan-400',
 };
 
 function isWorkspace(value: unknown): value is GrblWorkspace {
@@ -34,12 +37,25 @@ function Clock() {
     return <span>{time}</span>;
 }
 
+function formatReadout(value: unknown): string {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) return '0';
+    const rounded = Math.round(parsed * 100) / 100;
+    return Number.isInteger(rounded)
+        ? String(rounded)
+        : String(rounded).replace(/(?:\.0+|(\.\d+?)0+)$/, '$1');
+}
+
 export default function InfoStrip() {
     const activeWorkspace = useTypedSelector((state: RootState) => state.controller.modal.wcs);
     const isConnected = useTypedSelector((state: RootState) => state.connection.isConnected);
     const activeState = useTypedSelector((state: RootState) => state.controller.state.status?.activeState);
     const workflowState = useTypedSelector((state: RootState) => state.controller.workflow.state);
+    const status = useTypedSelector((state: RootState) => state.controller.state.status) as any;
+    const { units } = useWorkspaceState();
     const [workspace, setWorkspace] = useState<GrblWorkspace>('G54');
+    const [workspaceMenuOpen, setWorkspaceMenuOpen] = useState(false);
+    const workspaceMenuRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
         if (isWorkspace(activeWorkspace)) {
@@ -60,36 +76,66 @@ export default function InfoStrip() {
         controller.command('gcode', value);
     };
 
+    useEffect(() => {
+        if (!workspaceMenuOpen) return;
+
+        const onPointerDown = (event: globalThis.MouseEvent) => {
+            const target = event.target as Node | null;
+            if (!workspaceMenuRef.current || !target) return;
+            if (!workspaceMenuRef.current.contains(target)) {
+                setWorkspaceMenuOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', onPointerDown);
+        return () => {
+            document.removeEventListener('mousedown', onPointerDown);
+        };
+    }, [workspaceMenuOpen]);
+
+    let feedrate = status?.feedrate ?? '0';
+    const spindle = status?.spindle ?? '0';
+    if (units !== METRIC_UNITS) {
+        feedrate = mapPositionToUnits(feedrate, units);
+    }
+    const feedLabel = formatReadout(feedrate);
+    const spindleLabel = formatReadout(spindle);
+
     return (
-        <div className="flex items-center gap-3 px-3 md:px-4 py-1.5 bg-white border-b border-gray-200 dark:bg-dark dark:border-dark-lighter shrink-0 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-            <span className="hidden lg:inline">Feed <strong className="text-gray-900 dark:text-white font-mono">0</strong> mm/min</span>
-            <span className="hidden xl:inline">Spindle <strong className="text-gray-900 dark:text-white font-mono">0</strong> RPM</span>
-            <span className="hidden md:inline">Units <strong className="text-gray-900 dark:text-white">mm</strong></span>
-            <div className={`flex items-center gap-1.5 shrink-0 ${disabled ? 'opacity-70' : ''}`}>
-                <span className="text-gray-400 dark:text-gray-500">G54-&gt;G59</span>
-                <div className="flex items-center rounded-md border border-gray-200 dark:border-dark-lighter overflow-hidden bg-white dark:bg-dark-darker">
-                    {WORKSPACE_VALUES.map((value, index) => {
-                        const isActive = workspace === value;
-                        return (
+        <div className="relative z-40 flex items-center gap-3 px-3 md:px-4 py-1.5 bg-white border-b border-gray-200 dark:bg-dark dark:border-dark-lighter shrink-0 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+            <span>Feed <strong className="text-gray-900 dark:text-white font-mono">{feedLabel}</strong> {units}/min</span>
+            <span>Spindle <strong className="text-gray-900 dark:text-white font-mono">{spindleLabel}</strong> RPM</span>
+            <div ref={workspaceMenuRef} className={`relative flex items-center shrink-0 ${disabled ? 'opacity-70' : ''}`}>
+                <button
+                    type="button"
+                    aria-label="Select workspace"
+                    aria-haspopup="listbox"
+                    aria-expanded={workspaceMenuOpen}
+                    onClick={() => setWorkspaceMenuOpen((current) => !current)}
+                    className={`h-7 min-w-[5.25rem] rounded-md border border-gray-200 dark:border-dark-lighter bg-white dark:bg-dark-darker px-2 text-xs font-semibold outline-none transition-colors flex items-center justify-between gap-1 ${WORKSPACE_TEXT_COLORS[workspace]} ${disabled ? 'cursor-default' : 'cursor-pointer hover:bg-gray-50 dark:hover:bg-dark-lighter'}`}
+                >
+                    <span>{workspace}</span>
+                    <ChevronDown className={`w-3.5 h-3.5 transition-transform ${workspaceMenuOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {workspaceMenuOpen && (
+                    <div className="absolute top-full right-0 mt-1 z-50 w-24 rounded-md border border-gray-200 dark:border-dark-lighter bg-white dark:bg-dark-darker shadow-lg p-1">
+                        {WORKSPACE_VALUES.map((value) => (
                             <button
                                 key={value}
-                                onClick={() => onWorkspaceSelect(value)}
-                                disabled={disabled}
-                                className={`h-7 min-w-[2.6rem] px-2 text-xs font-semibold transition-colors ${
-                                    index > 0 ? 'border-l border-gray-200 dark:border-dark-lighter' : ''
-                                } ${
-                                    isActive
-                                        ? WORKSPACE_COLORS[value]
-                                        : 'bg-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-dark-lighter'
-                                } ${disabled ? 'cursor-default' : ''}`}
-                                aria-pressed={isActive}
-                                aria-label={`Switch workspace to ${value}`}
+                                type="button"
+                                role="option"
+                                aria-selected={workspace === value}
+                                onClick={() => {
+                                    onWorkspaceSelect(value);
+                                    setWorkspaceMenuOpen(false);
+                                }}
+                                className={`w-full h-7 rounded text-xs font-semibold transition-colors ${WORKSPACE_TEXT_COLORS[value]} ${workspace === value ? 'bg-gray-100 dark:bg-dark-lighter' : 'hover:bg-gray-100 dark:hover:bg-dark-lighter'} ${disabled ? 'cursor-default' : 'cursor-pointer'}`}
                             >
                                 {value}
                             </button>
-                        );
-                    })}
-                </div>
+                        ))}
+                    </div>
+                )}
             </div>
             <div className="flex-1" />
             <span className="font-mono text-gray-400 dark:text-gray-500">
