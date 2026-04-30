@@ -1,20 +1,18 @@
 import { ZoomIn, ZoomOut, Maximize2, Play, Pause, Square } from 'lucide-react';
+import Visualizer from './Visualizer';
 
 export default function VisualizerCard() {
     return (
-        <div className="flex flex-col gap-3 min-h-0">
+        <div className="flex flex-col gap-3">
             {/* Visualizer canvas placeholder */}
-            <div className="rounded-xl border border-dark-lighter overflow-hidden flex flex-col" style={{ minHeight: 0, flex: '1 1 0' }}>
-                {/* Canvas area */}
-                <div className="relative bg-[#0a1628] flex-1 min-h-0">
+            <div className="rounded-xl border border-dark-lighter overflow-hidden flex flex-col">
+                {/* Canvas area — fixed height so it never collapses */}
+                <div className="relative h-56">
+                    <Visualizer />
                     {/* View label pills */}
                     <div className="absolute top-3 left-3 flex flex-col gap-1 z-10">
                         <span className="text-xs bg-dark-lighter/70 text-gray-300 rounded px-2 py-0.5 backdrop-blur-sm">View: ISO</span>
                         <span className="text-xs bg-dark-lighter/70 text-gray-300 rounded px-2 py-0.5 backdrop-blur-sm">Zoom: 1.0x</span>
-                    </div>
-                    {/* Placeholder grid */}
-                    <div className="absolute inset-0 flex items-center justify-center opacity-10">
-                        <div className="w-3/4 h-1/2 border-2 border-dashed border-gray-500 rounded" />
                     </div>
                 </div>
 
