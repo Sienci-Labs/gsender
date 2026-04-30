@@ -103,8 +103,12 @@ export default function InfoStrip() {
 
     return (
         <div className="relative z-40 flex items-center gap-3 px-3 md:px-4 py-1.5 bg-white border-b border-gray-200 dark:bg-dark dark:border-dark-lighter shrink-0 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-            <span>Feed <strong className="text-gray-900 dark:text-white font-mono">{feedLabel}</strong> {units}/min</span>
-            <span>Spindle <strong className="text-gray-900 dark:text-white font-mono">{spindleLabel}</strong> RPM</span>
+            <span className="whitespace-nowrap">
+                Feed <strong className="inline-block w-[5ch] text-right tabular-nums text-gray-900 dark:text-white font-mono">{feedLabel}</strong> {units}/min
+            </span>
+            <span className="whitespace-nowrap">
+                Spindle <strong className="inline-block w-[5ch] text-right tabular-nums text-gray-900 dark:text-white font-mono">{spindleLabel}</strong> RPM
+            </span>
             <div ref={workspaceMenuRef} className={`relative flex items-center shrink-0 ${disabled ? 'opacity-70' : ''}`}>
                 <button
                     type="button"
