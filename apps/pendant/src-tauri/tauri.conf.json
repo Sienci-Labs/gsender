@@ -19,6 +19,7 @@
       "../../../electron-build/icon-edge.ico"
     ],
     "category": "Utility",
-    "shortDescription": "Touch-first pendant UI for gSender CNC controller"
+    "shortDescription": "Touch-first pendant UI for gSender CNC controller",
+    "externalBin": ["binaries/gsender-server"]
   }
 }

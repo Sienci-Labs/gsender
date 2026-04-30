@@ -8,6 +8,16 @@
   },
   "main": "./dist/gsender/server-cli",
   "types": "./dist/gsender/server-cli",
+  "pkg": {
+    "scripts": [
+      "node_modules/axios/dist/**/*.cjs",
+      "node_modules/axios/dist/**/*.js"
+    ],
+    "assets": [
+      "dist/gsender/pendant/**/*",
+      "node_modules/**/*.node"
+    ]
+  },
   "bin": {
     "cnc": "./bin/cnc",
     "gsender": "./bin/gsender"
@@ -82,8 +92,10 @@
     "vite:build:pendant": "bash -c 'cd apps/pendant && bun run build:client'",
     "vite:dev:pendant": "cd apps/pendant && vite --port 5174 --host",
     "pendant:dev": "npm run build-dev-server && concurrently --kill-others-on-fail --names \"server,vite,tauri\" \"npm run start-dev\" \"bash -lc 'until curl -sf http://127.0.0.1:8000 >/dev/null; do sleep 0.2; done; cd apps/pendant && vite --port 5174 --host'\" \"bash -lc 'until curl -sf http://127.0.0.1:5174 >/dev/null; do sleep 0.2; done; cd apps/pendant && npx @tauri-apps/cli@2 dev'\"",
+    "build:server-sidecar": "npm run build-prod-server && npm run vite:build:pendant && node scripts/build-sidecar.js",
     "pendant:tauri:dev": "bash -c 'cd apps/pendant && npx @tauri-apps/cli@2 dev'",
-    "pendant:tauri:build": "bash -c 'cd apps/pendant && npx @tauri-apps/cli@2 build'",
+    "pendant:tauri:build": "npm run build:server-sidecar && bash -c 'cd apps/pendant && npx @tauri-apps/cli@2 build'",
+    "build:pendant:mac": "npm run pendant:tauri:build",
     "postvite:build": "bash -c \"mkdir -p dist/gsender/app; cp -af apps/desktop/{favicon.ico,images,assets} dist/gsender/app/\"",
     "install:packages": "yarn install && yarn install --prefix /apps/desktop",
     "check-types": "tsc --noEmit -p ./apps/desktop/src",
@@ -358,6 +370,7 @@
     "colornames": "~1.1.1",
     "concaveman": "^2.0.0",
     "concurrently": "~4.1.0",
+    "pkg": "^5.8.1",
     "coveralls": "^3.1.1",
     "cross-env": "^10.1.0",
     "cypress": "^13.4.0",

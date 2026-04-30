@@ -1,7 +1,12 @@
 use std::fs;
+use std::net::TcpStream;
 use std::path::PathBuf;
+use std::sync::Mutex;
+use std::time::Duration;
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
+use tauri_plugin_shell::ShellExt;
+use tauri_plugin_shell::process::CommandChild;
 
 const CONFIG_FILE: &str = "pendant-config.json";
 const DEFAULT_HOST: &str = "127.0.0.1:8000";
@@ -18,6 +23,9 @@ impl Default for PendantConfig {
         }
     }
 }
+
+#[allow(dead_code)]
+struct ServerSidecar(Mutex<Option<CommandChild>>);
 
 fn config_path(app: &AppHandle) -> PathBuf {
     app.path()
@@ -46,14 +54,22 @@ fn pendant_url(host: &str) -> String {
     format!("http://{}/pendant", host)
 }
 
-/// Exposed to the pendant web UI via Tauri's invoke bridge.
-/// Called when the user changes the gSender host in the UI.
+/// Poll TCP port until it accepts connections (max 30 s).
+fn wait_for_port(port: u16) {
+    let addr: std::net::SocketAddr = format!("127.0.0.1:{port}").parse().unwrap();
+    for _ in 0..150 {
+        if TcpStream::connect_timeout(&addr, Duration::from_millis(100)).is_ok() {
+            return;
+        }
+        std::thread::sleep(Duration::from_millis(200));
+    }
+    eprintln!("Warning: gSender server did not respond on port {port} within 30 s");
+}
+
 #[tauri::command]
 fn set_host(app: AppHandle, host: String) -> Result<(), String> {
     let config = PendantConfig { host: host.clone() };
     save_config(&app, &config);
-
-    // Navigate the main window to the new host
     if let Some(win) = app.get_webview_window("main") {
         let url = pendant_url(&host);
         win.navigate(url.parse().map_err(|e| format!("Invalid URL: {e}"))?)
@@ -62,7 +78,6 @@ fn set_host(app: AppHandle, host: String) -> Result<(), String> {
     Ok(())
 }
 
-/// Returns the currently stored host so the UI can display it.
 #[tauri::command]
 fn get_host(app: AppHandle) -> String {
     load_config(&app).host
@@ -71,7 +86,25 @@ fn get_host(app: AppHandle) -> String {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_shell::init())
         .setup(|app| {
+            // Spawn the bundled gSender server sidecar
+            let (mut rx, child) = app.shell()
+                .sidecar("gsender-server")?
+                .args(["-p", "8000"])
+                .spawn()?;
+
+            // Drain stdout/stderr in background so the pipe never stalls the server
+            tauri::async_runtime::spawn(async move {
+                while let Some(_event) = rx.recv().await {}
+            });
+
+            // Keep child alive for the lifetime of the app
+            app.manage(ServerSidecar(Mutex::new(Some(child))));
+
+            // Block until server is accepting connections, then open the window
+            wait_for_port(8000);
+
             let config = load_config(app.handle());
             let url = pendant_url(&config.host);
 

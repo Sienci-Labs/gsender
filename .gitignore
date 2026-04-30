@@ -29,3 +29,9 @@ src/app/src/routeTree.gen.ts
 src/app/src/application.css
 .env
 /docs/performance/
+
+# Pendant build artifacts
+/apps/pendant/src-tauri/binaries/
+/apps/pendant/src-tauri/target/
+/apps/pendant/src-tauri/gen/schemas/
+/dist/gsender/pendant/
