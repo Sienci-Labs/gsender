@@ -14,14 +14,17 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
-          node-version: '22'
+          node-version: '24.x'
+
+      - name: Install Yarn and node-gyp
+        run: |
+          npm install -g yarn
+          yarn global add node-gyp
 
       - name: Install dependencies
-        working-directory: src/app
-        run: yarn install --frozen-lockfile
+        run: yarn install
 
       - name: Run tests
-        working-directory: src/app
         run: yarn test
