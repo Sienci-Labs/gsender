@@ -19,7 +19,11 @@ export default function DROCard() {
     const isConnected = useTypedSelector((s: RootState) => s.connection.isConnected);
     const wpos = useTypedSelector((s: RootState) => s.controller.wpos);
     const mpos = useTypedSelector((s: RootState) => s.controller.mpos);
-    const activePos = mode === 'machine' ? mpos : wpos;
+    const activePos = !isConnected
+        ? { x: 0, y: 0, z: 0 }
+        : mode === 'machine'
+            ? mpos
+            : wpos;
 
     return (
         <div className="rounded-xl bg-white border border-gray-200 dark:bg-dark-darker dark:border-dark-lighter p-3 flex flex-col gap-3">

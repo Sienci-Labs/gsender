@@ -14,7 +14,7 @@ const PREVIEW_TEXT: Record<DrawerTab, string> = {
 };
 
 export default function BottomDrawer() {
-    const [mode, setMode] = useState<DrawerMode>('minimal');
+    const [mode, setMode] = useState<DrawerMode>('closed');
     const [activeTab, setActiveTab] = useState<DrawerTab>('File');
 
     const panelHeight = mode === 'expanded' ? '60vh' : mode === 'minimal' ? '6.75rem' : '0';

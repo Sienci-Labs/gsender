@@ -41,12 +41,15 @@ export default function InfoStrip() {
 
     return (
         <div className="relative z-40 flex items-center gap-3 px-3 md:px-4 py-1.5 bg-white border-b border-gray-200 dark:bg-dark dark:border-dark-lighter shrink-0 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-            <span className="whitespace-nowrap">
-                Feed <strong className="inline-block w-[5ch] text-right tabular-nums text-gray-900 dark:text-white font-mono">{feedLabel}</strong> {units}/min
-            </span>
-            <span className="whitespace-nowrap">
-                Spindle <strong className="inline-block w-[5ch] text-right tabular-nums text-gray-900 dark:text-white font-mono">{spindleLabel}</strong> RPM
-            </span>
+            <div className="flex items-center rounded-md border border-gray-200 dark:border-dark-lighter overflow-hidden bg-gray-50/70 dark:bg-dark-darker/60">
+                <span className="whitespace-nowrap px-2.5 py-1">
+                    Feed <strong className="inline-block w-[5ch] text-right tabular-nums text-gray-900 dark:text-white font-mono">{feedLabel}</strong> {units}/min
+                </span>
+                <span className="h-5 w-px bg-gray-200 dark:bg-dark-lighter" />
+                <span className="whitespace-nowrap px-2.5 py-1">
+                    Spindle <strong className="inline-block w-[5ch] text-right tabular-nums text-gray-900 dark:text-white font-mono">{spindleLabel}</strong> RPM
+                </span>
+            </div>
             <div className="flex-1" />
             <span className="font-mono text-gray-400 dark:text-gray-500">
                 <Clock />
