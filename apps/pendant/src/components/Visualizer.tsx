@@ -6,7 +6,7 @@ import type { RootState } from '@gsender/controller-client/store/redux';
 
 export default function Visualizer() {
     const svgRef = useRef<GCodeSVGRendererHandle>(null);
-    const content = useTypedSelector((s: RootState) => s.fileInfo.content);
+    const content = useTypedSelector((s: RootState) => s.file.content);
 
     useEffect(() => {
         if (!svgRef.current) return;
@@ -22,8 +22,8 @@ export default function Visualizer() {
             ref={svgRef}
             id="pendant-svg-vis"
             options={{
-                cutColor: '#3b82f6',
-                rapidColor: '#f97316',
+                cutColor: '#3e85c7',
+                rapidColor: '#0ef6ae',
                 boundingBoxColor: '#9ca3af',
                 strokeWidth: 1,
                 projectionMode: 'isometric',
