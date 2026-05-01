@@ -30,6 +30,31 @@ const outPath = path.join(outDir, `gsender-server-${triple}${ext}`);
 
 fs.mkdirSync(outDir, { recursive: true });
 
+// Generate a flat file manifest so the sidecar can extract pendant files
+// without needing fs.readdirSync (which doesn't work inside pkg snapshots).
+const pendantDir = path.join(root, 'dist', 'gsender', 'pendant');
+function listFiles(dir, base) {
+    const result = [];
+    for (const name of fs.readdirSync(dir)) {
+        if (name.startsWith('_')) continue; // skip build-time helper files
+        const full = path.join(dir, name);
+        const rel = base ? `${base}/${name}` : name;
+        if (fs.statSync(full).isDirectory()) {
+            result.push(...listFiles(full, rel));
+        } else {
+            result.push(rel);
+        }
+    }
+    return result;
+}
+const manifest = listFiles(pendantDir, '');
+// Write as a JS module so pkg bundles it via static require() — more reliable than --assets
+fs.writeFileSync(
+    path.join(root, 'pendant-manifest.js'),
+    `'use strict';\nmodule.exports = ${JSON.stringify(manifest)};\n`
+);
+console.log(`Pendant manifest: ${manifest.length} files`);
+
 console.log(`Platform : ${triple}`);
 console.log(`Output   : ${outPath}`);
 console.log('Building sidecar binary (this may take a minute)...\n');

@@ -1,4 +1,5 @@
 use std::fs;
+use std::io::Write as IoWrite;
 use std::net::TcpStream;
 use std::path::PathBuf;
 use std::sync::Mutex;
@@ -6,7 +7,7 @@ use std::time::Duration;
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
 use tauri_plugin_shell::ShellExt;
-use tauri_plugin_shell::process::CommandChild;
+use tauri_plugin_shell::process::{CommandChild, CommandEvent};
 
 const CONFIG_FILE: &str = "pendant-config.json";
 const DEFAULT_HOST: &str = "127.0.0.1:8000";
@@ -26,6 +27,30 @@ impl Default for PendantConfig {
 
 #[allow(dead_code)]
 struct ServerSidecar(Mutex<Option<CommandChild>>);
+
+// --- Logging to ~/Library/Logs/gSender Pendant/startup.log ---
+// eprintln! is invisible when launched from Finder; the log file persists.
+
+fn log_path() -> PathBuf {
+    let dir = dirs::home_dir()
+        .unwrap_or_default()
+        .join("Library/Logs/gSender Pendant");
+    let _ = fs::create_dir_all(&dir);
+    dir.join("startup.log")
+}
+
+fn tlog(msg: &str) {
+    eprintln!("{msg}");
+    if let Ok(mut f) = fs::OpenOptions::new().create(true).append(true).open(log_path()) {
+        let _ = writeln!(f, "{msg}");
+    }
+}
+
+macro_rules! tlog {
+    ($($arg:tt)*) => { tlog(&format!($($arg)*)) };
+}
+
+// --- Config helpers ---
 
 fn config_path(app: &AppHandle) -> PathBuf {
     app.path()
@@ -51,19 +76,24 @@ fn save_config(app: &AppHandle, config: &PendantConfig) {
 }
 
 fn pendant_url(host: &str) -> String {
-    format!("http://{}/pendant", host)
+    // Trailing slash is required so that relative asset URLs (./assets/...) in
+    // the Vite-built index.html resolve to /pendant/assets/... not /assets/...
+    format!("http://{}/pendant/", host)
 }
 
-/// Poll TCP port until it accepts connections (max 30 s).
-fn wait_for_port(port: u16) {
+/// Poll TCP port until it accepts connections (max 30 s). Returns true if ready.
+fn wait_for_port(port: u16) -> bool {
+    tlog!("[tauri] polling port {port}...");
     let addr: std::net::SocketAddr = format!("127.0.0.1:{port}").parse().unwrap();
-    for _ in 0..150 {
+    for i in 0..150 {
         if TcpStream::connect_timeout(&addr, Duration::from_millis(100)).is_ok() {
-            return;
+            tlog!("[tauri] port {port} ready after ~{} ms", i * 200);
+            return true;
         }
         std::thread::sleep(Duration::from_millis(200));
     }
-    eprintln!("Warning: gSender server did not respond on port {port} within 30 s");
+    tlog!("[tauri] ERROR: port {port} did not respond within 30 s — sidecar likely crashed");
+    false
 }
 
 #[tauri::command]
@@ -84,29 +114,58 @@ fn get_host(app: AppHandle) -> String {
 }
 
 pub fn run() {
+    // Truncate the log file on each fresh launch
+    let _ = fs::write(log_path(), "");
+
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_shell::init())
         .setup(|app| {
-            // Spawn the bundled gSender server sidecar
+            tlog!("[tauri] setup — spawning gSender server sidecar");
+            tlog!("[tauri] log file: {}", log_path().display());
+
             let (mut rx, child) = app.shell()
                 .sidecar("gsender-server")?
                 .args(["-p", "8000"])
                 .spawn()?;
 
-            // Drain stdout/stderr in background so the pipe never stalls the server
+            tlog!("[tauri] sidecar spawned OK");
+
+            // Log all sidecar output — written to both stderr AND the log file
             tauri::async_runtime::spawn(async move {
-                while let Some(_event) = rx.recv().await {}
+                while let Some(event) = rx.recv().await {
+                    match event {
+                        CommandEvent::Stdout(line) =>
+                            tlog!("[sidecar] {}", String::from_utf8_lossy(&line)),
+                        CommandEvent::Stderr(line) =>
+                            tlog!("[sidecar:err] {}", String::from_utf8_lossy(&line)),
+                        CommandEvent::Error(e) =>
+                            tlog!("[sidecar:spawn-error] {e}"),
+                        CommandEvent::Terminated(s) =>
+                            tlog!("[sidecar:exit] code={:?} signal={:?}", s.code, s.signal),
+                        _ => {}
+                    }
+                }
             });
 
-            // Keep child alive for the lifetime of the app
             app.manage(ServerSidecar(Mutex::new(Some(child))));
 
-            // Block until server is accepting connections, then open the window
-            wait_for_port(8000);
-
+            let ready = wait_for_port(8000);
             let config = load_config(app.handle());
-            let url = pendant_url(&config.host);
+            let url = if ready {
+                tlog!("[tauri] opening webview at {}", pendant_url(&config.host));
+                pendant_url(&config.host)
+            } else {
+                tlog!("[tauri] server never ready — showing error page");
+                format!(
+                    "data:text/html,<body style='font-family:sans-serif;padding:2rem'>\
+                    <h2>gSender server failed to start</h2>\
+                    <p>Check the log file for details:</p>\
+                    <pre style='background:#f3f4f6;padding:1rem;border-radius:4px'>\
+                    {}</pre></body>",
+                    log_path().display()
+                )
+            };
 
             WebviewWindowBuilder::new(app, "main", WebviewUrl::External(url.parse()?))
                 .title("gSender Pendant")
@@ -114,6 +173,7 @@ pub fn run() {
                 .min_inner_size(768.0, 1024.0)
                 .decorations(false)
                 .resizable(true)
+                .devtools(true)
                 .build()?;
 
             Ok(())
