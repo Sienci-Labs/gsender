@@ -19,6 +19,10 @@ import {
     updateFeederStatus,
     updateSenderStatus,
 } from '@gsender/controller-client/store/redux/slices/controller.slice';
+import {
+    updateFileContent,
+    unloadFileInfo,
+} from '@gsender/controller-client/store/redux/slices/fileInfo.slice';
 
 import type { PortInfo } from '@gsender/controller-client/store/definitions';
 import type { ControllerSettings, FIRMWARE_TYPES_T } from 'app/definitions/firmware';
@@ -92,4 +96,21 @@ export function* initialize() {
             reduxStore.dispatch(listPorts({ ports, unrecognizedPorts, networkPorts }));
         },
     );
+
+    // ── File load/unload (feeds the SVG visualizer) ────────────────────────
+    controller.addListener('gcode:load', (name: string, content: string) => {
+        const size = new Blob([content]).size;
+        reduxStore.dispatch(updateFileContent({ content, size, name }));
+    });
+
+    controller.addListener(
+        'file:load',
+        (content: string, size: number, name: string) => {
+            reduxStore.dispatch(updateFileContent({ content, size, name }));
+        },
+    );
+
+    controller.addListener('gcode:unload', () => {
+        reduxStore.dispatch(unloadFileInfo());
+    });
 }

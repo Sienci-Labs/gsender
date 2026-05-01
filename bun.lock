@@ -11,6 +11,7 @@
         "@serialport/parser-byte-length": "^13.0.0",
         "@serialport/parser-readline": "^13.0.0",
         "@sienci/avrgirl-arduino": "^5.0.3",
+        "@sienci/gviewer": "^0.1.0",
         "axios": "^1.2.4",
         "basic-ftp": "^5.1.0",
         "bcrypt-nodejs": "0.0.3",
@@ -1193,6 +1194,8 @@
     "@serialport/stream": ["@serialport/stream@13.0.0", "", { "dependencies": { "@serialport/bindings-interface": "1.2.2", "debug": "4.4.0" } }, "sha512-F7xLJKsjGo2WuEWMSEO1SimRcOA+WtWICsY13r0ahx8s2SecPQH06338g28OT7cW7uRXI7oEQAk62qh5gHJW3g=="],
 
     "@sienci/avrgirl-arduino": ["@sienci/avrgirl-arduino@5.0.3", "", { "dependencies": { "async": "^2.6.3", "awty": "^0.1.0", "browser-serialport": "git+https://github.com/noopkat/browser-serialport.git#c8628c41c11890d3058875994c15f83f2df8185b", "chip.avr.avr109": "^1.1.1", "colors": "^1.4.0", "graceful-fs": "^4.2.4", "intel-hex": "^0.1.2", "minimist": "^1.2.5", "process": "^0.11.10", "serialport": "^10.5.0", "stk500": "^2.0.3", "stk500-v2": "^1.0.4" }, "bin": { "avrgirl-arduino": "bin/cli.js" } }, "sha512-LKvyYYdU0adr5C8Y1Fdn4VP9Zoh5pSKldntK1m/R77zsGHXCOakI17BvXFNLOmGBGGNda8Xr4x+lJojXK0Z7jA=="],
+
+    "@sienci/gviewer": ["@sienci/gviewer@0.1.0", "", { "peerDependencies": { "react": ">=18", "react-dom": ">=18", "three": "^0.168.0" }, "optionalPeers": ["react", "react-dom", "three"] }, "sha512-jslzFX4al1PxTW9s0lZUP47SJ+XVtkmLabFkfY53U9c0GXv6s9/xovo9gG5A+c4CkFEsiv6wwnnJYFXzesG1wA=="],
 
     "@sinclair/typebox": ["@sinclair/typebox@0.34.48", "", {}, "sha512-kKJTNuK3AQOrgjjotVxMrCn1sUJwM76wMszfq1kdU4uYVJjvEWuFQ6HgvLt4Xz3fSmZlTOxJ/Ie13KnIcWQXFA=="],
 
