@@ -1,7 +1,5 @@
 // https://ui.shadcn.com/docs/components/drawer
 
-'use client';
-
 import * as React from 'react';
 import { Drawer as DrawerPrimitive } from 'vaul';
 

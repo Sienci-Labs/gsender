@@ -17,19 +17,23 @@ export interface SpeedSelectButtonProps {
     active?: boolean;
     onClick?: () => void;
     label: string;
+    screenReaderLabel?: string;
 }
 
 export function SpeedSelectButton({
     label,
     active,
     onClick,
+    screenReaderLabel,
 }: SpeedSelectButtonProps) {
     return (
         <button
-            className={cn('text-sm px-2 max-xl:px-1 max-xl:py-1 py-2 rounded', {
+            className={cn('text-sm px-2 max-xl:px-1 max-xl:py-1 py-2 rounded h-full', {
                 'bg-blue-400 bg-opacity-30': active,
             })}
             onClick={onClick}
+            aria-label={screenReaderLabel || label}
+            aria-pressed={active}
         >
             {label}
         </button>
@@ -53,19 +57,27 @@ export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
         handleClickRef.current = handleClick;
     }, [handleClick]);
 
+    useEffect(() => {
+        selectedSpeedRef.current = selectedSpeed;
+    }, [selectedSpeed]);
+
     const rapidActive = selectedSpeed === 'Rapid';
     const normalActive = selectedSpeed === 'Normal';
     const preciseActive = selectedSpeed === 'Precise';
 
     function handleSpeedChange(speed: JoggingSpeedOptions) {
-        // save old values to config
+        if (speed === selectedSpeedRef.current) {
+            updateCurrentJogValues(speed);
+            return;
+        }
+
         setSelectedSpeed(speed);
         selectedSpeedRef.current = speed;
     }
 
-    function updateCurrentJogValues() {
+    function updateCurrentJogValues(speedOverride?: JoggingSpeedOptions) {
         const jogValues = store.get('widgets.axes.jog', {});
-        const key = selectedSpeed.toLowerCase();
+        const key = (speedOverride ?? selectedSpeedRef.current).toLowerCase();
         const newSpeeds = { ...get(jogValues, key, {}) };
 
         // Only convert if the units have changed or we've selected a different speed
@@ -201,16 +213,19 @@ export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
                 active={preciseActive}
                 onClick={() => handleSpeedChange('Precise')}
                 label="Precise"
+                screenReaderLabel="Set to Precise jog preset"
             />
             <SpeedSelectButton
                 active={normalActive}
                 onClick={() => handleSpeedChange('Normal')}
                 label="Normal"
+                screenReaderLabel="Set to Normal jog preset"
             />
             <SpeedSelectButton
                 active={rapidActive}
                 onClick={() => handleSpeedChange('Rapid')}
                 label="Rapid"
+                screenReaderLabel="Set to Rapid jog preset"
             />
         </div>
     );

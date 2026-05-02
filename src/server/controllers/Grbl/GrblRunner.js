@@ -299,6 +299,10 @@ class GrblRunner extends events.EventEmitter {
     hasSettings() {
         return !_.isEmpty(this.settings.settings);
     }
+
+    getSetting(key, defaultValue = '') {
+        return _.get(this.settings.settings, key, defaultValue);
+    }
 }
 
 export default GrblRunner;

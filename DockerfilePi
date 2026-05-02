@@ -1,3 +1,6 @@
+### Enable BuildKit features (e.g. secrets mounts)
+# syntax=docker/dockerfile:1.5
+
 FROM --platform=$BUILDPLATFORM kglovernsienci/gsender-pi-builder AS builder
 ARG BUILDPLATFORM
 ARG NODE_OPTIONS="--max-old-space-size=8192"
@@ -10,8 +13,14 @@ WORKDIR /app
 COPY . .
 
 RUN yarn install
-RUN yarn run build
-RUN yarn run build:linux-arm64
+RUN npm run package-sync
+RUN yarn --cwd src install --production --ignore-scripts --non-interactive
+RUN if [ "$GITHUB_REF_TYPE" = "tag" ]; then npm run prebuild-prod; else npm run prebuild-latest; fi
+RUN if [ "$GITHUB_REF_TYPE" = "tag" ]; then yarn run build; else yarn run build-latest; fi
+RUN --mount=type=secret,id=GH_TOKEN \
+    export GH_TOKEN="$(cat /run/secrets/GH_TOKEN)" && \
+    export GITHUB_TOKEN="$GH_TOKEN" && \
+    yarn run build:linux-arm64
 
 # rename package to PI-64Bit
 RUN for f in /app/output/*.deb; do mv "$f" "$(echo "$f" | sed s/arm64/PI-64Bit/)"; done
@@ -22,7 +31,10 @@ RUN mkdir -p release/pi/
 RUN for f in /app/output/*.deb; do cp -af "$f" "$(echo "$f" | sed s/output/release\\/pi/)"; done
 RUN for f in /app/output/*.AppImage; do cp -af "$f" "$(echo "$f" | sed s/output/release\\/pi/)"; done
 
-RUN  if [[ "$GITHUB_REF_TYPE" == "branch" && "$GITHUB_REF_NAME" == "master" ]]; then \
+RUN --mount=type=secret,id=GH_TOKEN \
+    export GH_TOKEN="$(cat /run/secrets/GH_TOKEN)" && \
+    export GITHUB_TOKEN="$GH_TOKEN" && \
+    if [[ "$GITHUB_REF_TYPE" == "branch" && "$GITHUB_REF_NAME" == "master" ]]; then \
         yarn github-release delete \
             --owner=gSender \
             --repo=gsender \

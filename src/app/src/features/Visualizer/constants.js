@@ -89,6 +89,21 @@ export const PARTS_LIST = [
     LASER_PART,
 ];
 
+export const TOOLPATH_COLOR_HEXES = [
+    '#4A90E2',
+    '#F08A4F',
+    '#D74296',
+    '#42D7BA',
+    '#A7D742',
+    '#C44C36',
+    '#A142D7',
+    '#4296D7',
+    '#D7BA42',
+    '#42D763',
+    '#D742C4',
+    '#D74242',
+];
+
 export const DARK_THEME_VALUES = new Map([
     [BACKGROUND_PART, '#111827'], //Navy Blue
     [GRID_PART, '#77a9d7'], // Turqoise / Light Blue

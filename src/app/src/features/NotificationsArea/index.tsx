@@ -51,7 +51,10 @@ const NotificationsArea = () => {
         <Popover open={open} onOpenChange={markNotificationsRead}>
             <Tooltip content="Notifications">
                 <PopoverTrigger asChild>
-                    <button className="relative max-sm:hidden">
+                    <button
+                        className="relative max-sm:hidden"
+                        aria-label={`Notifications${notifications && notifications.length > 0 ? `, ${notifications.length} unread` : ''}`}
+                    >
                         <LuBell className="w-6 h-6 text-gray-400 cursor-pointer" />
                         {notifications && notifications.length > 0 && (
                             <div className="absolute -top-2 -right-1 bg-red-500 text-white text-xs rounded-full min-w-4 min-h-4 flex items-center justify-center">

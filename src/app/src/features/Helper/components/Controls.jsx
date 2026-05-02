@@ -23,13 +23,13 @@
 
 import React from 'react';
 import get from 'lodash/get';
-import reduxStore from 'app/store/redux';
 import { GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
 import { useWizardAPI } from 'app/features/Helper/context';
 import StepButton from 'app/features/Helper/components/StepButton';
 import styles from '../index.module.styl';
 import { FaArrowLeft } from 'react-icons/fa';
 import { FaArrowRight } from 'react-icons/fa6';
+import { useSelector } from 'react-redux';
 
 const Controls = () => {
     const {
@@ -40,13 +40,11 @@ const Controls = () => {
         updateSubstepOverlay,
     } = useWizardAPI();
 
+    const activeState = useSelector((state) =>
+        get(state, 'controller.state.status.activeState', ''),
+    );
+
     const isNotIdle = () => {
-        const state = reduxStore.getState();
-        const activeState = get(
-            state,
-            'controller.state.status.activeState',
-            '',
-        );
         return activeState !== GRBL_ACTIVE_STATE_IDLE;
     };
 

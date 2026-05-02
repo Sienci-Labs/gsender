@@ -21,11 +21,23 @@
  *
  */
 
+import isEqual from 'lodash/isEqual';
+
 class GrblHalLineParserResultInfo {
     static parse(line) {
         const r = line.match(/^\[([A-Z ]*):(.+)\]$/);
         if (!r) {
             return null;
+        }
+
+        if (isEqual(r[1], 'NEWOPT')) {
+            let values = {};
+            let opts = r[2].split(',');
+            opts.forEach(opt => {
+                let [key, value] = opt.split('=');
+                values[key] = value || null;
+            });
+            r[2] = values;
         }
 
         const payload = {

@@ -25,12 +25,12 @@ import classNames from 'classnames';
 import { WidgetProps } from './definitions';
 
 const Title: React.FC<WidgetProps> = ({ className, ...props }) => (
-    <div
+    <h2
         {...props}
         className={classNames(
             className,
             'text-lg h-8 font-bold inline-block align-middle ' +
-                'mt-0 mb-0 px-3 py-0 text-blue-500 text-ellipsis ' +
+                'm-0 px-3 py-0 text-blue-500 text-ellipsis ' +
                 'overflow-hidden whitespace-nowrap w-full max-w-full',
         )}
     />

@@ -34,6 +34,7 @@ export function ReloadFileAlert({
                         }
                         variant="ghost"
                         className="h-full rounded-none"
+                        aria-label="Reload File"
                     />
                 </AlertDialogTrigger>
             </Tooltip>

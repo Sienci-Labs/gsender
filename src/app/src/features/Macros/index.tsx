@@ -8,12 +8,12 @@ import { FaPlus, FaFileImport, FaFileExport } from 'react-icons/fa';
 
 import api from 'app/api';
 import store from 'app/store';
-import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
 import combokeys from 'app/lib/combokeys';
 import log from 'app/lib/log';
 import Button from 'app/components/Button';
 import { toast } from 'app/lib/toaster';
+import pubsub from 'pubsub-js';
 
 import Macro from './Macro';
 import MacroForm from './MacroForm';
@@ -40,12 +40,14 @@ import {
     ModalType,
 } from './constants';
 import { deleteGamepadMacro } from '../../lib/gamepad';
+import cx from 'classnames';
 
 type MacroWidgetProps = {
     type: string;
     state: any;
     workflow: any;
     isConnected: boolean;
+    isRemote?: boolean;
 };
 
 const MacroWidget = ({
@@ -53,6 +55,7 @@ const MacroWidget = ({
     state,
     workflow,
     isConnected,
+    isRemote,
 }: MacroWidgetProps) => {
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -163,6 +166,14 @@ const MacroWidget = ({
                 const res = await api.macros.fetch();
                 const { records: macros } = res.data;
                 setMacros(macros);
+
+                const commandKeys = store.get('commandKeys', {});
+                const filteredCommandKeys = cloneDeep(commandKeys);
+                filteredCommandKeys[id].title = name;
+
+                store.replace('commandKeys', filteredCommandKeys);
+                combokeys.reload();
+
                 actions.closeModal();
                 if (!skipToast) {
                     toast.success(`Updated macro '${name}'`, {
@@ -212,6 +223,7 @@ const MacroWidget = ({
                     }
                 },
             );
+            pubsub.publish('macro:run');
         },
         loadMacro: async (id: string) => {
             try {
@@ -396,7 +408,12 @@ const MacroWidget = ({
     };
 
     return (
-        <Widget>
+        <div
+            className={cx({
+                'h-48': isRemote,
+                'h-full': !isRemote,
+            })}
+        >
             {(modal.name === MODAL_ADD_MACRO ||
                 modal.name === MODAL_EDIT_MACRO) && (
                 <MacroForm
@@ -430,6 +447,16 @@ const MacroWidget = ({
                     macroName={editMacro?.name}
                     macroContent={editMacro?.content}
                     macroDescription={editMacro?.description}
+                    title={
+                        modal.name === MODAL_EDIT_MACRO
+                            ? 'Edit Macro'
+                            : 'Add Macro'
+                    }
+                    submitLabel={
+                        modal.name === MODAL_EDIT_MACRO
+                            ? 'Update Macro'
+                            : 'Add New Macro'
+                    }
                 />
             )}
 
@@ -483,7 +510,7 @@ const MacroWidget = ({
                     />
                 </div>
             </div>
-        </Widget>
+        </div>
     );
 };
 

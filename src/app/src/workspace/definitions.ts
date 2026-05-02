@@ -19,6 +19,13 @@ export type Notification = {
     timestamp: Date | string;
 };
 
+export type BackupFrequencies = 'On Update' | 'Daily' | 'Weekly' | 'Monthly';
+
+export type FirstToolBehavior =
+    | 'Always run full wizard'
+    | 'Prompt for first tool'
+    | 'Always probe length only';
+
 // Interfaces
 
 export interface Workspace {
@@ -26,6 +33,7 @@ export interface Workspace {
     reverseWidgets: boolean;
     spindleFunctions: boolean;
     coolantFunctions: boolean;
+    atcEnabled: boolean;
     sendUsageData: boolean;
     safeRetractHeight: number;
     customDecimalPlaces: number;
@@ -35,20 +43,28 @@ export interface Workspace {
     longestTimeRun: number;
     defaultFirmware: string;
     outlineMode: string;
+    outlineSpeed: number | null;
     revertWorkspace: boolean;
+    promptExit: boolean;
+    backupFreq: BackupFrequencies;
+    lastBackupTime: number;
+    powerSaving: boolean;
     park: object;
     jobTimes: number[];
     toolChange: {
         passthrough: boolean;
         skipDialog: boolean;
+        moveToManualPosition: boolean;
+        manualPosition: BasicPosition;
+        firstToolBehaviour: FirstToolBehavior;
     };
     toolChangeOption:
-    | 'Ignore'
-    | 'Pause'
-    | 'Standard Re-zero'
-    | 'Flexible Re-zero'
-    | 'Fixed Tool Sensor'
-    | 'Code';
+        | 'Ignore'
+        | 'Pause'
+        | 'Standard Re-zero'
+        | 'Flexible Re-zero'
+        | 'Fixed Tool Sensor'
+        | 'Code';
     toolChangePosition: BasicPosition;
     toolChangeHooks: {
         preHook: string;
@@ -77,6 +93,7 @@ export interface Workspace {
         defaultFirmwareSettings: RotarySettings;
         forceHardLimits: boolean;
         forceSoftLimits: boolean;
+        useAaxisForGrbl: boolean;
     };
     shouldWarnZero: boolean;
     diagnostics: {
@@ -87,4 +104,27 @@ export interface Workspace {
     notifications: Notification[];
     toastDuration: number;
     enableDarkMode: boolean;
+    accessibility: {
+        statusAnnouncements: boolean;
+        jobProgressAnnouncements: boolean;
+        jobProgressIncrement: number;
+        focusRings: boolean;
+        focusTrapping: boolean;
+        visualizerKeyboardControl: boolean;
+        audioCues: {
+            enabled: boolean;
+            jobComplete: boolean;
+            alarmTriggered: boolean;
+            toolChange: boolean;
+            probeSuccess: boolean;
+        };
+        reducedMotion: boolean;
+        gcodeSummary: {
+            enabled: boolean;
+            showVisually: boolean;
+        };
+        showKeyboardMap: boolean;
+        displayScaleFactor?: string;
+    };
+    preventJoggingPastLimits: boolean;
 }

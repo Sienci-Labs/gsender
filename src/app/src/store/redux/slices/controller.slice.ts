@@ -9,9 +9,13 @@ import { EEPROMDescriptions, EEPROMSettings } from 'app/definitions/firmware';
 import { Modal } from 'app/lib/definitions/gcode_virtualization';
 import { Feeder, Sender } from 'app/lib/definitions/sender_feeder';
 import { Spindle } from 'app/features/Spindle/definitions';
-import { BasicPosition, BasicObject } from 'app/definitions/general';
+import { BasicPosition } from 'app/definitions/general';
 
-import { ControllerSettings, ControllerState } from '../../definitions';
+import {
+    ControllerSettings,
+    ControllerState,
+    SDCardFile,
+} from '../../definitions';
 
 const initialState: ControllerState = {
     type: '',
@@ -19,7 +23,6 @@ const initialState: ControllerState = {
         parameters: {},
         settings: {},
         groups: {},
-        alarms: {},
     },
     state: {},
     modal: {
@@ -50,7 +53,7 @@ const initialState: ControllerState = {
         c: 0.0,
     },
     homingFlag: false,
-    homingRun: false,
+    hasHomed: false,
     feeder: {
         status: null,
     },
@@ -65,6 +68,10 @@ const initialState: ControllerState = {
     },
     terminalHistory: [],
     spindles: [],
+    sdcard: {
+        isMounted: false,
+        files: [],
+    },
 };
 
 function mapPosToFeedbackUnits(
@@ -152,11 +159,6 @@ const updateMachineLimitsFromEEPROM = ({
         depth: ymax,
         height: zmax,
         width: xmax,
-    };
-    machineProfile.in = {
-        depth: Number(mm2in(ymax).toFixed(2)),
-        height: Number(mm2in(zmax).toFixed(2)),
-        width: Number(mm2in(xmax).toFixed(2)),
     };
     store.set('workspace.machineProfile', machineProfile);
     store.emit('dimensions');
@@ -262,11 +264,16 @@ const controllerSlice = createSlice({
             action: PayloadAction<{ homingFlag: boolean }>,
         ) => {
             state.homingFlag = action.payload.homingFlag;
-            state.homingRun = true;
+        },
+        updateHasHomed: (
+            state,
+            action: PayloadAction<{ hasHomed: boolean }>,
+        ) => {
+            state.hasHomed = action.payload.hasHomed;
         },
         resetHoming: (state) => {
             state.homingFlag = false;
-            state.homingRun = false;
+            state.hasHomed = false;
         },
         updateTerminalHistory: (state, action: PayloadAction<any[]>) => {
             state.terminalHistory = [
@@ -289,15 +296,21 @@ const controllerSlice = createSlice({
         },
         updateAlarmDescriptions: (
             state,
-            action: PayloadAction<{ alarms: BasicObject }>,
+            action: PayloadAction<{
+                alarms: { [key: number]: { description: string; id: number } };
+            }>,
         ) => {
             state.settings.alarms = action.payload.alarms;
         },
         addSpindle: (state, action: PayloadAction<Spindle>) => {
             const otherSpindles = state.spindles.filter(
-                (spindle: Spindle) => spindle.label !== action.payload.label,
+                (spindle: Spindle) =>
+                    String(spindle.id) !== String(action.payload.id),
             );
             state.spindles = [...otherSpindles, action.payload];
+        },
+        clearSpindles: (state) => {
+            state.spindles = [];
         },
         updateControllerType: (
             state,
@@ -307,6 +320,38 @@ const controllerSlice = createSlice({
         ) => {
             const { type } = action.payload;
             state.type = type;
+        },
+        updateSDCardMountStatus: (
+            state,
+            action: PayloadAction<{ isMounted: boolean }>,
+        ) => {
+            state.sdcard.isMounted = action.payload.isMounted;
+        },
+        addSDCardFileToList: (
+            state,
+            action: PayloadAction<{
+                file: SDCardFile;
+            }>,
+        ) => {
+            const filteredFiles = state.sdcard.files.filter(
+                (file) => file.name !== action.payload.file.name,
+            );
+
+            state.sdcard.files = [...filteredFiles, action.payload.file];
+        },
+        clearSDCardFiles: (
+            state,
+            action: PayloadAction<{
+                path: string;
+            }>,
+        ) => {
+            const filteredFiles = state.sdcard.files.filter(
+                (file) => file.name !== action.payload.path,
+            );
+            state.sdcard.files = filteredFiles;
+        },
+        emptyAllSDFiles: (state) => {
+            state.sdcard.files = [];
         },
     },
 });
@@ -320,12 +365,17 @@ export const {
     updateWorkflowState,
     toolChange,
     updateHomingFlag,
+    updateHasHomed,
     resetHoming,
-    updateTerminalHistory,
     updateSettingsDescriptions,
     updateAlarmDescriptions,
     addSpindle,
+    clearSpindles,
     updateControllerType,
+    updateSDCardMountStatus,
+    addSDCardFileToList,
+    clearSDCardFiles,
+    emptyAllSDFiles,
 } = controllerSlice.actions;
 
 export default controllerSlice.reducer;

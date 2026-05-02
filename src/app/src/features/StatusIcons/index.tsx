@@ -11,6 +11,8 @@ import actions, {
 import RemoteIndicator from 'app/features/RemoteMode/components/RemoteIndicator.tsx';
 import Tooltip from 'app/components/Tooltip';
 
+import NotificationsArea from 'app/features/NotificationsArea';
+
 const StatusIcons = () => {
     const [gamepadConnected, setGamePadConnected] = useState(false);
     const [headlessSettings, setHeadlessSettings] = useState<HeadlessSettings>({
@@ -98,6 +100,8 @@ const StatusIcons = () => {
                 remotePort={headlessSettings.port}
                 remoteOn={headlessSettings.headlessStatus}
             />
+
+            <NotificationsArea />
         </div>
     );
 };

@@ -14,9 +14,9 @@ import {
 } from '@tanstack/react-table';
 import { rankItem } from '@tanstack/match-sorter-utils';
 import React, { useState } from 'react';
-import { Table as BTable } from 'react-bootstrap';
 import styles from './index.module.styl';
 import { FaPlus } from 'react-icons/fa';
+import { BiReset } from 'react-icons/bi';
 import cx from 'classnames';
 
 /*
@@ -88,6 +88,7 @@ interface SortableTableProps<TData extends { subRow?: string }, TValue> {
     enableSortingRemoval?: boolean;
     rowColours?: string[];
     onAdd?: () => void;
+    onResetAll?: () => void;
     sortBy?: {
         id: string;
         desc: boolean;
@@ -123,6 +124,7 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
     */
     const sortBy = props.sortBy || null;
     const onAdd = props.onAdd || null; // function for when add button is pressed
+    const onResetAll = props.onResetAll || null; // function for when reset all button is pressed
     const rowSpan = props.rowSpan || new Map(); // map: accessorKey => num rows to span
     const pagination =
         props.pagination !== null && props.pagination !== undefined
@@ -243,6 +245,25 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
                         </button>
                     </div>
                 )}
+                {onResetAll && (
+                    <div
+                        className="flex items-center gap-1"
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            float: 'right',
+                        }}
+                    >
+                        <button
+                            title="Add New"
+                            onClick={onResetAll}
+                            className="gap-2 text-yellow-600 border border-yellow-600 hover:bg-yellow-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-yellow-500 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center me-2"
+                        >
+                            <BiReset />
+                            Reset All
+                        </button>
+                    </div>
+                )}
             </div>
             {/*** TABLE ***/}
             <div
@@ -255,59 +276,49 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
                 )}
             >
                 <div className="w-full h-full mb-1 overflow-y-scroll">
-                    <BTable
-                        striped
-                        bordered
-                        responsive
-                        hover
-                        className="min-w-full leading-normal"
-                    >
+                    <table className="min-w-full leading-normal border-collapse border border-gray-200 dark:border-dark-lighter">
                         <thead>
-                            {table.getHeaderGroups().map(
-                                (
-                                    headerGroup, // we currently only have 1 group
-                                ) => (
-                                    <tr key={headerGroup.id}>
-                                        {headerGroup.headers.map((header) => (
-                                            <th
-                                                key={header.id}
-                                                colSpan={header.colSpan}
-                                                className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider dark:text-white dark:bg-dark-lighter"
-                                            >
-                                                {header.isPlaceholder ? null : (
-                                                    <>
-                                                        <div
-                                                            {...{
-                                                                className:
-                                                                    header.column.getCanSort()
-                                                                        ? 'cursor-pointer select-none'
-                                                                        : '',
-                                                                onClick:
-                                                                    header.column.getToggleSortingHandler(),
-                                                            }}
-                                                        >
-                                                            {flexRender(
-                                                                header.column
-                                                                    .columnDef
-                                                                    .header,
-                                                                header.getContext(),
-                                                            )}
-                                                            {{
-                                                                asc: ' 🔼',
-                                                                desc: ' 🔽',
-                                                            }[
-                                                                header.column
-                                                                    .getIsSorted()
-                                                                    .toString()
-                                                            ] ?? null}
-                                                        </div>
-                                                    </>
-                                                )}
-                                            </th>
-                                        ))}
-                                    </tr>
-                                ),
-                            )}
+                            {table.getHeaderGroups().map((headerGroup) => (
+                                <tr key={headerGroup.id}>
+                                    {headerGroup.headers.map((header) => (
+                                        <th
+                                            key={header.id}
+                                            colSpan={header.colSpan}
+                                            className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider dark:text-white dark:bg-dark-lighter"
+                                        >
+                                            {header.isPlaceholder ? null : (
+                                                <>
+                                                    <div
+                                                        {...{
+                                                            className:
+                                                                header.column.getCanSort()
+                                                                    ? 'cursor-pointer select-none'
+                                                                    : '',
+                                                            onClick:
+                                                                header.column.getToggleSortingHandler(),
+                                                        }}
+                                                    >
+                                                        {flexRender(
+                                                            header.column
+                                                                .columnDef
+                                                                .header,
+                                                            header.getContext(),
+                                                        )}
+                                                        {{
+                                                            asc: ' 🔼',
+                                                            desc: ' 🔽',
+                                                        }[
+                                                            header.column
+                                                                .getIsSorted()
+                                                                .toString()
+                                                        ] ?? null}
+                                                    </div>
+                                                </>
+                                            )}
+                                        </th>
+                                    ))}
+                                </tr>
+                            ))}
                         </thead>
                         <tbody>
                             {table.getRowModel().rows.map((row, _i) => {
@@ -335,7 +346,7 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
                                                                 'break-word',
                                                             width: cell.column.getSize(),
                                                         }}
-                                                        className="px-5 py-5 border border-gray-200 text-sm"
+                                                        className="px-5 py-5 border border-gray-200 text-sm dark:border-dark-lighter"
                                                     >
                                                         {flexRender(
                                                             cell.column
@@ -357,6 +368,7 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
                                                         overflowWrap:
                                                             'break-word',
                                                     }}
+                                                    className="px-5 py-5 border border-gray-200 text-sm dark:border-dark-lighter"
                                                 >
                                                     {row.original.subRow}
                                                 </td>
@@ -366,7 +378,7 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
                                 );
                             })}
                         </tbody>
-                    </BTable>
+                    </table>
                 </div>
                 {/* buttons */}
                 {pagination && (

@@ -1,0 +1,179 @@
+import { ExternalLink, QrCode } from 'lucide-react';
+import type { ComponentType } from 'react';
+import QRCodeComponent from 'react-qr-code';
+import { SecondaryContent } from '../../types/wizard';
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from 'app/components/shadcn/Popover';
+
+interface SecondaryContentPanelProps {
+    content: SecondaryContent[];
+}
+
+export function SecondaryContentPanel({ content }: SecondaryContentPanelProps) {
+    if (!content || content.length === 0) {
+        return (
+            <div className="flex items-center justify-center h-full">
+                <div className="w-full aspect-video bg-gray-300 rounded-lg flex items-center justify-center">
+                    <div className="text-center text-gray-400">
+                        <div className="w-32 h-32 mx-auto border-4 border-gray-400 rounded-lg flex items-center justify-center">
+                            <svg
+                                className="w-16 h-16"
+                                fill="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    const mainContent = content.filter((item) => item.type !== 'link');
+    const linkItem = content.find((item) => item.type === 'link');
+
+    const renderItem = (item: SecondaryContent, index: number) => {
+        const containerClassName = item.fill
+            ? 'flex-1 min-h-0 overflow-hidden portrait:min-w-0 portrait:h-full'
+            : 'flex-shrink-0 portrait:flex-1 portrait:min-w-0 portrait:overflow-hidden';
+
+        if (item.type === 'image') {
+            const imageContainerClass =
+                'flex flex-col flex-1 min-h-0 overflow-hidden portrait:min-w-0 portrait:h-full';
+            return (
+                <div key={index} className={imageContainerClass}>
+                    {item.title && (
+                        <h3 className="text-sm font-semibold text-gray-700 dark:text-white mb-2">
+                            {item.title}
+                        </h3>
+                    )}
+                    <div className="flex-1 min-h-0 overflow-hidden flex items-center justify-center">
+                        <img
+                            src={item.content as string}
+                            alt={item.title || 'Secondary content'}
+                            className="max-h-full max-w-full rounded-xl"
+                        />
+                    </div>
+                </div>
+            );
+        }
+
+        if (item.type === 'video') {
+            return (
+                <div key={index} className={containerClassName}>
+                    {item.title && (
+                        <h3 className="text-sm font-semibold text-gray-700 dark:text-white mb-2">
+                            {item.title}
+                        </h3>
+                    )}
+                    <div className="rounded-lg bg-gray-300 dark:bg-gray-700 p-1.5">
+                        <video
+                            src={item.content as string}
+                            className="w-full rounded-md shadow-sm"
+                            autoPlay
+                            muted
+                            loop
+                            playsInline
+                        />
+                    </div>
+                </div>
+            );
+        }
+
+        if (item.type === 'component') {
+            const Component = item.content as ComponentType<any>;
+            return (
+                <div key={index} className={containerClassName}>
+                    {item.title && (
+                        <h3 className="text-sm font-semibold text-gray-700 dark:text-white mb-2">
+                            {item.title}
+                        </h3>
+                    )}
+                    <Component {...item.props} />
+                </div>
+            );
+        }
+
+        return null;
+    };
+
+    return (
+        <div className="flex flex-col gap-2 h-full">
+            {mainContent.length > 0 && (
+                <div className="flex flex-col portrait:flex-row portrait:items-center gap-2 flex-1 min-h-0 overflow-hidden portrait:min-w-0">
+                    {mainContent.map((item, index) => renderItem(item, index))}
+                </div>
+            )}
+
+            {linkItem && (
+                <div className="flex-shrink-0 mt-auto pt-2">
+                    <div className="bg-white rounded-lg border border-gray-200 px-3 py-2 shadow-sm">
+                        <div className="flex items-center gap-2">
+                            <ExternalLink
+                                className="text-blue-500 flex-shrink-0"
+                                size={16}
+                            />
+                            <span className="flex-1 text-sm text-gray-700">
+                                {linkItem.title && (
+                                    <span className="font-semibold text-gray-900">
+                                        {linkItem.title}{' '}
+                                    </span>
+                                )}
+                                {linkItem.url ? (
+                                    <>
+                                        {linkItem.content as string}{' '}
+                                        <a
+                                            href={linkItem.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-blue-600 hover:text-blue-700 hover:underline"
+                                        >
+                                            online resources
+                                        </a>
+                                    </>
+                                ) : (
+                                    linkItem.content as string
+                                )}
+                            </span>
+                            {linkItem.url && (
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <button className="flex-shrink-0 p-1.5 rounded-md hover:bg-gray-100 transition-colors">
+                                            <QrCode
+                                                className="text-gray-600"
+                                                size={18}
+                                            />
+                                        </button>
+                                    </PopoverTrigger>
+                                    <PopoverContent
+                                        className="w-auto p-4"
+                                        sideOffset={10}
+                                        side="top"
+                                        align="end"
+                                    >
+                                        <div className="flex flex-col items-center gap-3">
+                                            <div className="text-sm font-semibold text-gray-900">
+                                                Scan QR Code
+                                            </div>
+                                            <div className="bg-white p-2 rounded border border-gray-100">
+                                                <QRCodeComponent
+                                                    value={linkItem.url}
+                                                    size={180}
+                                                    level="H"
+                                                />
+                                            </div>
+                                        </div>
+                                    </PopoverContent>
+                                </Popover>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}

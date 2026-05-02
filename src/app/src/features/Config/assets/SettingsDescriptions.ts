@@ -1672,3 +1672,8 @@ export const GRBL_HAL_SETTINGS = [
         setting: '$471',
     },
 ];
+
+export const GRBL_SETTINGS_MAP = new Map(GRBL_SETTINGS.map((s) => [s.setting, s]));
+export const GRBL_HAL_SETTINGS_MAP = new Map(
+    GRBL_HAL_SETTINGS.map((s) => [s.setting, s]),
+);

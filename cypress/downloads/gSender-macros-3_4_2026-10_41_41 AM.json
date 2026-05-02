@@ -1,0 +1,12 @@
+[
+ {
+  "name": "Jog Y axis plus and minus ",
+  "content": "$J=G21 G91 Y10 F6000\n$J=G21 G91 Y-10 F6000\n$$",
+  "description": "TEST DATA FOR ADDING MACROS",
+<<<<<<<< HEAD:cypress/downloads/gSender-macros-4_21_2026-10_11_39 AM.json
+  "id": "6ac03443-74d8-4f80-8185-5ec054345c59"
+========
+  "id": "75fe1d53-46e6-4329-a024-fb501a5bb495"
+>>>>>>>> 00da1c50e ( reporting config and jest configuration are added):cypress/downloads/gSender-macros-3_4_2026-10_41_41 AM.json
+ }
+]

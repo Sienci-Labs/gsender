@@ -23,7 +23,6 @@
 
 import React, { useEffect } from 'react';
 import pubsub from 'pubsub-js';
-import reduxStore from 'app/store/redux';
 import { GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
 import uniqueId from 'lodash/uniqueId';
 import get from 'lodash/get';
@@ -32,6 +31,7 @@ import ToolModalButton from 'app/components/ToolModalButton';
 import { useWizardAPI, useWizardContext } from 'app/features/Helper/context';
 import styles from '../index.module.styl';
 import { FaCode } from 'react-icons/fa';
+import { useSelector } from 'react-redux';
 
 const Actions = ({ actions = [], stepIndex, substepIndex }) => {
     const {
@@ -42,14 +42,11 @@ const Actions = ({ actions = [], stepIndex, substepIndex }) => {
         updateSubstepOverlay,
     } = useWizardAPI();
     const { isLoading } = useWizardContext();
+    const activeState = useSelector((state) =>
+        get(state, 'controller.state.status.activeState', ''),
+    );
 
     const isNotIdle = () => {
-        const state = reduxStore.getState();
-        const activeState = get(
-            state,
-            'controller.state.status.activeState',
-            '',
-        );
         return activeState !== GRBL_ACTIVE_STATE_IDLE;
     };
 

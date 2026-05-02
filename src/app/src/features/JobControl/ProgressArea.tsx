@@ -38,18 +38,18 @@ import { WORKFLOW_STATE_PAUSED } from '../../constants';
 
 import WoodcuttingProgress from './WoodcuttingProgress';
 
-interface Props {
+type Props = {
     senderStatus: SenderStatus;
     workflowState?: string;
-}
+};
 
 /**
  * Progress Area component to display running job information
  * @prop {Object} state Default state given from parent component
  *
  */
-const ProgressArea: React.FC<Props> = ({ senderStatus, workflowState }) => {
-    const { total, received, elapsedTime, remainingTime, startTime } =
+const ProgressArea = ({ senderStatus, workflowState }: Props) => {
+    const { total, currentLineRunning, elapsedTime, remainingTime, startTime } =
         senderStatus || {};
 
     const getFinishTime = (givenTime: number): string => {
@@ -109,9 +109,11 @@ const ProgressArea: React.FC<Props> = ({ senderStatus, workflowState }) => {
         );
     };
 
-    const percentageValue = Number.isNaN((received / total) * 100)
+    const percentageValue = Number.isNaN((currentLineRunning / total) * 100)
         ? 0
-        : (received / total) * 100;
+        : (currentLineRunning / total) * 100;
+    const displayedPercentage = Math.min(100, Math.floor(percentageValue));
+    const isFinalizing = displayedPercentage >= 100 && Number(remainingTime) > 0;
 
     const timeSplit = convertSecondsToDHMS(Number(remainingTime));
     const timeComponent = getTimesHTML(timeSplit);
@@ -126,7 +128,14 @@ const ProgressArea: React.FC<Props> = ({ senderStatus, workflowState }) => {
     const isPaused = workflowState === WORKFLOW_STATE_PAUSED;
 
     return (
-        <div className="w-64">
+        <div
+            className="w-64"
+            role="progressbar"
+            aria-valuenow={Math.round(percentageValue)}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="Job Progress"
+        >
             <div className="border-solid border border-gray-500 dark:border-gray-700 rounded-sm bg-gray-100 dark:bg-dark gap-2 flex flex-row justify-between items-center pr-1 pt-1 text-gray-900 dark:text-gray-200">
                 <div className="flex flex-col gap-0 w-full h-full -mt-6">
                     <div
@@ -136,7 +145,7 @@ const ProgressArea: React.FC<Props> = ({ senderStatus, workflowState }) => {
                         }}
                     >
                         <span className="font-bold text-2xl">
-                            {percentageValue.toFixed(0)}
+                            {displayedPercentage}
                         </span>
                         <span>%</span>
                     </div>
@@ -150,8 +159,16 @@ const ProgressArea: React.FC<Props> = ({ senderStatus, workflowState }) => {
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <div className="flex flex-col  justify-center items-center w-32">
-                                {timeComponent}
-                                <span className="text-sm">remaining</span>
+                                {isFinalizing ? (
+                                    <>
+                                        <span className="text-sm">Finalizing</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        {timeComponent}
+                                        <span className="text-sm">remaining</span>
+                                    </>
+                                )}
                             </div>
                         </TooltipTrigger>
                         <TooltipContent className="max-w-64">
@@ -161,7 +178,7 @@ const ProgressArea: React.FC<Props> = ({ senderStatus, workflowState }) => {
                 </TooltipProvider>
             </div>
             <div className="w-full flex flex-row justify-between gap-2 text-gray-400 text-sm whitespace-nowrap">
-                <span>{`${received} / ${total} Lines`}</span>
+                <span>{`${currentLineRunning} / ${total} Lines`}</span>
                 <span>
                     {convertMillisecondsToTimeStamp(elapsedTime, true)} cutting
                 </span>

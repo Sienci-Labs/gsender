@@ -1,7 +1,5 @@
 // https://ui.shadcn.com/docs/components/progress
 
-'use client';
-
 import * as React from 'react';
 import * as ProgressPrimitive from '@radix-ui/react-progress';
 

@@ -26,6 +26,12 @@ import cx from 'classnames';
 
 import { Button as ShadcnButton } from 'app/components/shadcn/Button';
 import { Button } from 'app/components/Button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from 'app/components/shadcn/Dropdown';
 
 import { METRIC_UNITS, PROBING_CATEGORY } from '../../constants';
 import ProbeImage from './ProbeImage';
@@ -35,6 +41,7 @@ import { Actions, State } from './definitions';
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import Tooltip from 'app/components/Tooltip';
+import { TOUCHPLATE_TYPES } from 'app/lib/constants';
 
 type ProbeProps = {
     state: State;
@@ -118,6 +125,7 @@ const Probe = ({ state, actions }: ProbeProps) => {
         availableProbeCommands,
         selectedProbeCommand,
         touchplate,
+        touchplateTypeSwitcher,
         direction,
     } = state;
 
@@ -126,11 +134,29 @@ const Probe = ({ state, actions }: ProbeProps) => {
     const probeCommand = availableProbeCommands[selectedProbeCommand];
 
     return (
-        <div className="w-full h-full">
-            <div className="grid grid-cols-[5fr_3fr] w-full h-full">
+        <div className="w-full h-full max-xl:pt-1">
+            <div className="grid grid-cols-[5fr_3fr] w-full h-full max-xl:max-h-[144px]">
                 {/* <div className="w-full h-full m-auto grid gap-4">
                     <div className="h-full grid grid-rows[4fr_2fr] self-center gap-2"> */}
-                <div className="grid grid-rows-[1fr_1fr_1fr] gap-2 items-center justify-center">
+                <div className="grid grid-rows-[1fr_1fr_1fr] gap-0.5 items-center justify-center">
+                    { touchplateTypeSwitcher &&
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button  aria-label="Change Probe Type" size="sm">{touchplateType}</Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-56 bg-white">
+                                { Object.values(TOUCHPLATE_TYPES).map((tpt) =>
+                                    <DropdownMenuItem
+                                        key={tpt}
+                                        onClick={() => actions.changeTouchPlateType(tpt)}
+                                        className="flex items-center hover:bg-blue-100 transition-colors duration-200 cursor-pointer dark:hover:bg-dark-lighter"
+                                    >
+                                        {tpt}
+                                    </DropdownMenuItem>)
+                                }
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    }
                     <div className="flex w-full bg-white dark:bg-dark rounded-md border-solid border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-200 p-[2px]">
                         {availableProbeCommands.map((command, index) => (
                             <Tooltip
@@ -143,6 +169,8 @@ const Probe = ({ state, actions }: ProbeProps) => {
                                         actions.handleProbeCommandChange(index)
                                     }
                                     size="icon"
+                                    aria-label={`Select probing routine ${command.id}`}
+                                    aria-pressed={index === selectedProbeCommand}
                                     className={cx(
                                         'rounded-md relative h-[calc(4vh+3px)]',
                                         {
@@ -157,7 +185,7 @@ const Probe = ({ state, actions }: ProbeProps) => {
                         ))}
                     </div>
                     <div
-                        className={cx('flex items-center', {
+                        className={cx('flex items-center max-xl:px-6', {
                             hidden: !probeCommand?.tool,
                         })}
                     >
@@ -176,7 +204,7 @@ const Probe = ({ state, actions }: ProbeProps) => {
                         </Button>
                     </div>
                 </div>
-                <div className="flex w-full h-full min-h-full">
+                <div className="flex w-full h-full min-h-full max-xl:pt-2">
                     <ProbeImage
                         touchplateType={touchplateType}
                         probeCommand={probeCommand}

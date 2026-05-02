@@ -13,6 +13,7 @@ export interface Connection {
     };
     autoReconnect: boolean;
     ip: number[];
+    ethernetPort: number;
 }
 
 export interface Port {

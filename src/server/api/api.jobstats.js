@@ -4,9 +4,16 @@ import {
 } from '../constants';
 
 const CONFIG_KEY = 'jobStats';
+const DEFAULT_JOB_STATS = {
+    totalRuntime: 0,
+    totalJobs: 0,
+    jobsCompleted: 0,
+    jobsCancelled: 0,
+    jobs: [],
+};
 
 const getJobStats = () => {
-    const jobStats = config.get(CONFIG_KEY, { totalRuntime: 0, totalJobs: 0, jobsCompleted: 0, jobsCancelled: 0, jobs: [] });
+    const jobStats = config.get(CONFIG_KEY, DEFAULT_JOB_STATS);
 
     if (!jobStats.jobs) {
         jobStats.jobs = [];
@@ -40,6 +47,17 @@ export const update = (req, res) => {
     } catch (err) {
         res.status(ERR_INTERNAL_SERVER_ERROR).send({
             msg: 'Failed to save settings' + JSON.stringify(jobStats.rcfile)
+        });
+    }
+};
+
+export const clearAll = (req, res) => {
+    try {
+        config.set(CONFIG_KEY, DEFAULT_JOB_STATS);
+        res.send({ msg: 'Successfully cleared job history' });
+    } catch (err) {
+        res.status(ERR_INTERNAL_SERVER_ERROR).send({
+            msg: 'Failed to clear job history: \n' + err
         });
     }
 };

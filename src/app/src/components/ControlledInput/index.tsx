@@ -23,32 +23,83 @@ const ControlledInput = forwardRef<HTMLInputElement, InputProps>(
             type,
             value,
             onChange,
+            onFocus: externalOnFocus,
+            onBlur: externalOnBlur,
+            onKeyDown: externalOnKeyDown,
             wrapperClassName,
             immediateOnChange = false,
             min,
             max,
+            step,
             ...props
         },
         ref,
     ) => {
         const [originalValue, setOriginalValue] = useState(value);
         const [localValue, setLocalValue] = useState(value);
+        const [isFocused, setIsFocused] = useState(false);
 
         useEffect(() => {
-            setOriginalValue(value);
-            setLocalValue(value);
-        }, [value]);
+            if (!isFocused) {
+                setOriginalValue(value);
+                setLocalValue(value);
+            }
+        }, [value, isFocused]);
+
+        // Whether this input uses deferred numeric validation (allows ".", "" while typing)
+        const isDeferredNumeric = type === 'number' && immediateOnChange;
 
         const saveChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
             const current = e.target.value;
-            if (localValue && localValue !== originalValue) {
+            const originalString = String(originalValue ?? '');
+            const hasChanged = current !== originalString;
+            const restoreOriginalValue = () => {
+                e.target.value = originalString;
+                setLocalValue(originalValue);
+            };
+
+            if (isDeferredNumeric) {
+                const parsed = parseFloat(current);
+                if (current.trim() === '' || isNaN(parsed)) {
+                    // Revert to original and notify parent so its state stays consistent
+                    restoreOriginalValue();
+                    if (onChange) onChange(e);
+                    return;
+                }
+            }
+
+            if (hasChanged) {
                 if (type === 'number') {
-                    if (min !== null && current < min) {
-                        e.target.value = String(min);
-                        setLocalValue(min);
-                    } else if (max !== null && current > max) {
-                        e.target.value = String(max);
-                        setLocalValue(max);
+                    if (current.trim() === '') {
+                        restoreOriginalValue();
+                        return;
+                    }
+
+                    const numericCurrent = Number(current);
+                    if (Number.isNaN(numericCurrent)) {
+                        restoreOriginalValue();
+                        return;
+                    }
+
+                    const numericMin =
+                        min !== undefined && min !== null ? Number(min) : null;
+                    const numericMax =
+                        max !== undefined && max !== null ? Number(max) : null;
+
+                    if (
+                        numericMin !== null &&
+                        !Number.isNaN(numericCurrent) &&
+                        numericCurrent < numericMin
+                    ) {
+                        e.target.value = String(numericMin);
+                        setLocalValue(numericMin);
+                    } else if (
+                        numericMax !== null &&
+                        !Number.isNaN(numericCurrent) &&
+                        numericCurrent > numericMax
+                    ) {
+                        e.target.value = String(numericMax);
+                        setLocalValue(numericMax);
                     } else {
                         setLocalValue(current);
                     }
@@ -61,9 +112,20 @@ const ControlledInput = forwardRef<HTMLInputElement, InputProps>(
             }
         };
 
+        const onFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+            setOriginalValue(localValue);
+            setIsFocused(true);
+            if (externalOnFocus) {
+                externalOnFocus(e);
+            }
+        };
+
         const onBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-            e.target.blur();
             saveChanges(e);
+            setIsFocused(false);
+            if (externalOnBlur) {
+                externalOnBlur(e);
+            }
         };
 
         const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -77,6 +139,9 @@ const ControlledInput = forwardRef<HTMLInputElement, InputProps>(
                     e as unknown as React.ChangeEvent<HTMLInputElement>,
                 );
             }
+            if (externalOnKeyDown) {
+                externalOnKeyDown(e);
+            }
         };
 
         const modifiedOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,17 +154,27 @@ const ControlledInput = forwardRef<HTMLInputElement, InputProps>(
         const localChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             setLocalValue(e.target.value);
 
-            // If immediateOnChange is enabled, call onChange immediately
             if (immediateOnChange && onChange) {
-                onChange(e);
+                if (isDeferredNumeric) {
+                    // Only propagate valid numbers; allow intermediate states like "" or "." to display
+                    const parsed = parseFloat(e.target.value);
+                    if (!isNaN(parsed) && e.target.value.trim() !== '') {
+                        onChange(e);
+                    }
+                } else {
+                    onChange(e);
+                }
             }
         };
 
         return (
             <ShadcnInput
-                type={type}
+                type={isDeferredNumeric ? 'text' : type}
+                inputMode={isDeferredNumeric ? 'decimal' : undefined}
+                step={type === 'number' && step == null ? 'any' : step}
                 className={className}
                 wrapperClassName={wrapperClassName}
+                onFocus={onFocus}
                 onBlur={onBlur}
                 onKeyDown={onKeyDown}
                 onChange={localChange}

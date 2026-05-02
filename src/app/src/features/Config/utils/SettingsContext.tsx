@@ -4,13 +4,13 @@ import {
     SettingsMenuSection,
 } from 'app/features/Config/assets/SettingsMenu.ts';
 import store from 'app/store';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from 'app/store/redux';
+import { RootState, store as reduxStore } from 'app/store/redux';
 
 import {
-    GRBL_HAL_SETTINGS,
-    GRBL_SETTINGS,
+    GRBL_HAL_SETTINGS_MAP,
+    GRBL_SETTINGS_MAP,
 } from 'app/features/Config/assets/SettingsDescriptions.ts';
 import { GRBLHAL } from 'app/constants';
 import { getFilteredEEPROMSettings } from 'app/features/Config/utils/EEPROM.ts';
@@ -20,19 +20,30 @@ import isEqual from 'lodash/isEqual';
 import machineProfiles from 'app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts';
 import {
     EEPROM,
+    EEPROMDescriptions,
+    EEPROMSettings,
     FilteredEEPROM,
     FIRMWARE_TYPES_T,
     MachineProfile,
 } from 'app/definitions/firmware';
 import pubsub from 'pubsub-js';
+import { firmwarePastVersion } from 'app/lib/firmwareSemver.ts';
+import { ATCI_SUPPORTED_VERSION } from 'app/features/ATC/utils/ATCiConstants.ts';
+import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import { debounce } from 'lodash';
+import { BasicObject } from 'app/definitions/general';
+import {
+    resolveGrblCoreDefaults,
+    translateGrblCoreKey,
+} from 'app/features/Config/utils/grblCoreMigration.ts';
 
 interface iSettingsContext {
     settings: SettingsMenuSection[];
-    EEPROM?: object;
+    EEPROM?: FilteredEEPROM[];
+    eepromMap: Map<EEPROM, FilteredEEPROM>;
     settingsToUpdate?: object;
     EEPROMToUpdate?: object;
     machineProfile: MachineProfile;
-    rawEEPROM: object;
     firmwareType: FIRMWARE_TYPES_T;
     setMachineProfile?: React.Dispatch<React.SetStateAction<MachineProfile>>;
     setEEPROM?: React.Dispatch<React.SetStateAction<FilteredEEPROM[]>>;
@@ -44,12 +55,18 @@ interface iSettingsContext {
     settingsValues: gSenderSetting[];
     setSettingsValues?: React.Dispatch<React.SetStateAction<gSenderSetting[]>>;
     settingsFilter: (v: gSenderSetting) => boolean;
+    getPendingOrStore: (key: string, defaultValue?: any) => any;
     toggleFilterNonDefault: () => void;
     filterNonDefault: boolean;
     setFilterNonDefault?: React.Dispatch<React.SetStateAction<boolean>>;
     eepromIsDefault: (settingData: FilteredEEPROM | gSenderSetting) => boolean;
     isSettingDefault: (v: gSenderSetting) => boolean;
     getEEPROMDefaultValue: (v: EEPROM) => string | number;
+    isFirmwareCurrent: boolean;
+    profileChangedSinceDefaults: boolean;
+    setProfileChangedSinceDefaults?: React.Dispatch<
+        React.SetStateAction<boolean>
+    >;
 }
 
 interface SettingsProviderProps {
@@ -60,14 +77,23 @@ const defaultState: iSettingsContext = {
     settings: SettingsMenu,
     settingsToUpdate: {},
     EEPROMToUpdate: {},
-    EEPROM: {},
+    EEPROM: [
+        {
+            unit: '',
+            setting: '$',
+            globalIndex: 0,
+            value: '',
+            group: '',
+            groupID: 0,
+        },
+    ],
+    eepromMap: new Map(),
     getEEPROMDefaultValue(_v: EEPROM): string | number {
         return undefined;
     },
     isSettingDefault(_v: object): boolean {
         return false;
     },
-    rawEEPROM: {},
     machineProfile: {} as MachineProfile,
     firmwareType: 'Grbl',
     connected: false,
@@ -79,9 +105,12 @@ const defaultState: iSettingsContext = {
         },
     ],
     settingsFilter: () => true,
+    getPendingOrStore: (key, defaultValue) => store.get(key, defaultValue),
     toggleFilterNonDefault: () => {},
     filterNonDefault: false,
     eepromIsDefault: (_v) => false,
+    isFirmwareCurrent: false,
+    profileChangedSinceDefaults: false,
 };
 
 export const SettingsContext =
@@ -122,7 +151,7 @@ function populateSettingsValues(
         ss.settings.map((s) => {
             s.settings.map((o) => {
                 if (o.key && o.key.length > 0) {
-                    o.value = fetchStoreValue(o.key);
+                    o.value = store.get(o.key);
                     o.globalIndex = index;
                     o.defaultValue = fetchDefaultValue(o.key);
                     globalValueReference.push({ ...o });
@@ -133,6 +162,54 @@ function populateSettingsValues(
     });
 
     return [settingsSections, globalValueReference];
+}
+
+function applyEEPROMDescriptions(
+    settings: SettingsMenuSection[],
+    descriptions: EEPROMDescriptions,
+    ctrlType: string,
+    fwVersion: string,
+    firmwareCurrent: boolean,
+): SettingsMenuSection[] {
+    return settings.map((ss) => {
+        if (!ss || !ss.settings) {
+            return ss;
+        }
+        return {
+            ...ss,
+            settings: ss.settings.map((s) => ({
+                ...s,
+                settings: s.settings.map((o) => {
+                    if (o.type !== 'eeprom') {
+                        return o;
+                    }
+                    let eID = get(o, 'eID', null);
+                    let remapped = false;
+                    if (Object.hasOwn(o, 'remap') && firmwareCurrent) {
+                        eID = get(o, 'remap', null);
+                        remapped = true;
+                    }
+                    if (ctrlType === GRBLHAL && eID) {
+                        eID = translateGrblCoreKey(eID as EEPROM, fwVersion);
+                    }
+                    if (!eID) {
+                        return remapped ? { ...o, remapped: true } : o;
+                    }
+                    const oKey = Number(eID.replace('$', ''));
+                    const oEEPROM = get(descriptions, oKey, '');
+                    if (!oEEPROM) {
+                        return remapped ? { ...o, remapped: true } : o;
+                    }
+                    return {
+                        ...o,
+                        ...(remapped ? { remapped: true } : {}),
+                        description: get(oEEPROM, 'details', ''),
+                        label: get(oEEPROM, 'description', ''),
+                    };
+                }),
+            })),
+        };
+    });
 }
 
 export function SettingsProvider({ children }: SettingsProviderProps) {
@@ -148,7 +225,6 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             groupID: 0,
         },
     ]);
-    const [rawEEPROM, setRawEEPROM] = useState<object>({});
     const [machineProfile, setMachineProfile] = useState<MachineProfile>(
         {} as MachineProfile,
     );
@@ -157,6 +233,17 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     const [searchTerm, setSearchTerm] = useState('');
     const [settingsValues, setSettingsValues] = useState<gSenderSetting[]>([]);
     const [filterNonDefault, setFilterNonDefault] = useState(false);
+    const [isFirmwareCurrent, setIsFirmwareCurrent] = useState(false);
+    const [profileChangedSinceDefaults, setProfileChangedSinceDefaults] =
+        useState(false);
+
+    const firmwareVersion = useTypedSelector(
+        (state: RootState) => state.controller.settings.version?.semver,
+    );
+
+    useEffect(() => {
+        setIsFirmwareCurrent(firmwarePastVersion(ATCI_SUPPORTED_VERSION));
+    }, [firmwareVersion]);
 
     const detectedEEPROM = useSelector(
         (state: RootState) => state.controller.settings.settings,
@@ -178,10 +265,33 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         (state: RootState) => state.connection.isConnected,
     );
 
-    const BASE_SETTINGS =
-        controllerType === GRBLHAL ? GRBL_HAL_SETTINGS : GRBL_SETTINGS;
+    const BASE_SETTINGS_MAP =
+        controllerType === GRBLHAL ? GRBL_HAL_SETTINGS_MAP : GRBL_SETTINGS_MAP;
 
-    useEffect(() => {
+    const eepromMap = useMemo(
+        () => new Map(EEPROM.map((e) => [e.setting, e])),
+        [EEPROM],
+    );
+
+    const pendingValueMap = useMemo(
+        () =>
+            new Map(
+                settingsValues
+                    .filter((s) => s.dirty && s.key)
+                    .map((s) => [s.key, s.value]),
+            ),
+        [settingsValues],
+    );
+
+    const getPendingOrStore = useCallback(
+        (key: string, defaultValue?: any) =>
+            pendingValueMap.has(key)
+                ? pendingValueMap.get(key)
+                : store.get(key, defaultValue),
+        [pendingValueMap],
+    );
+
+    function repopulateMachineProfile() {
         const storeMachineProfile: MachineProfile = store.get(
             'workspace.machineProfile',
             {},
@@ -195,9 +305,14 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             console.error(
                 'No machine profile with this ID found, using previous value.',
             );
-            return setMachineProfile(storeMachineProfile);
+            setMachineProfile(storeMachineProfile);
+            return;
         }
         setMachineProfile(latest);
+    }
+
+    useEffect(() => {
+        repopulateMachineProfile();
     }, []);
 
     function repopulateSettings() {
@@ -208,44 +323,123 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     }
 
     function repopulateEEPROM() {
+        const detectedE = get(
+            reduxStore.getState(),
+            'controller.settings.settings',
+        );
+        const detectedDesc = get(
+            reduxStore.getState(),
+            'controller.settings.descriptions',
+        );
+        const detectedGroups = get(
+            reduxStore.getState(),
+            'controller.settings.groups',
+        );
         setEEPROM(
             getFilteredEEPROMSettings(
-                BASE_SETTINGS,
-                detectedEEPROM,
-                detectedEEPROMDescriptions,
-                detectedEEPROMGroups,
+                BASE_SETTINGS_MAP,
+                detectedE,
+                detectedDesc,
+                detectedGroups,
             ),
         );
     }
 
+    // Fires on EEPROM value/group changes — fast path, does NOT re-run applyEEPROMDescriptions
+    const updateEEPROM = useCallback(
+        debounce(
+            (
+                baseSettingsMap: Map<EEPROM, any>,
+                detectedEEPROM: EEPROMSettings,
+                detectedEEPROMDescriptions: EEPROMDescriptions,
+                detectedEEPROMGroups: BasicObject,
+                currentEEPROM: FilteredEEPROM[],
+            ) => {
+                const filteredEEPROMSettings = getFilteredEEPROMSettings(
+                    baseSettingsMap,
+                    detectedEEPROM,
+                    detectedEEPROMDescriptions,
+                    detectedEEPROMGroups,
+                );
+                const dirtyMap = new Map(
+                    currentEEPROM
+                        .filter((e) => e.dirty)
+                        .map((e) => [e.setting, e]),
+                );
+                setEEPROM(
+                    filteredEEPROMSettings.map(
+                        (eeprom) => dirtyMap.get(eeprom.setting) ?? eeprom,
+                    ),
+                );
+            },
+            100,
+        ),
+        [],
+    );
+
+    // Fires only when descriptions change — runs once on connect
+    const updateDescriptions = useCallback(
+        debounce(
+            (
+                currentSettings: SettingsMenuSection[],
+                detectedEEPROMDescriptions: EEPROMDescriptions,
+                ctrlType: string,
+                fwVersion: string,
+            ) => {
+                if (!currentSettings.length || !detectedEEPROMDescriptions) {
+                    return;
+                }
+                const firmwareCurrent = firmwarePastVersion(
+                    ATCI_SUPPORTED_VERSION,
+                );
+                setSettings(
+                    applyEEPROMDescriptions(
+                        currentSettings,
+                        detectedEEPROMDescriptions,
+                        ctrlType,
+                        fwVersion,
+                        firmwareCurrent,
+                    ),
+                );
+            },
+            200,
+        ),
+        [],
+    );
+
     useEffect(() => {
         repopulateSettings();
         pubsub.subscribe('repopulate', () => {
-            return repopulateSettings();
+            repopulateSettings();
+            repopulateMachineProfile();
         });
         pubsub.subscribe('eeprom:repopulate', () => {
-            return repopulateEEPROM();
+            repopulateEEPROM();
         });
     }, []);
-
-    useEffect(() => {
-        setRawEEPROM(detectedEEPROM);
-    }, [detectedEEPROM]);
 
     useEffect(() => {
         setConnected(connectionState);
     }, [connectionState]);
 
     useEffect(() => {
-        setEEPROM(
-            getFilteredEEPROMSettings(
-                BASE_SETTINGS,
-                detectedEEPROM,
-                detectedEEPROMDescriptions,
-                detectedEEPROMGroups,
-            ),
+        updateEEPROM(
+            BASE_SETTINGS_MAP,
+            detectedEEPROM,
+            detectedEEPROMDescriptions,
+            detectedEEPROMGroups,
+            EEPROM,
         );
-    }, [detectedEEPROM, detectedEEPROMDescriptions, detectedEEPROMGroups]);
+    }, [detectedEEPROM, detectedEEPROMGroups]);
+
+    useEffect(() => {
+        updateDescriptions(
+            settings,
+            detectedEEPROMDescriptions,
+            controllerType,
+            firmwareVersion,
+        );
+    }, [detectedEEPROMDescriptions]);
 
     function checkIfModified(v: gSenderSetting) {
         if (v.type === 'wizard' || v.type === 'event') {
@@ -253,22 +447,19 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             return false;
         }
 
-        if (v.type === 'eeprom') {
-            const EEPROMData = EEPROM.find((s) => s.setting === v.eID);
+        if (
+            v.type === 'eeprom' ||
+            (v.type === 'hybrid' && controllerType === GRBLHAL)
+        ) {
+            const EEPROMData = eepromMap.get(v.eID as EEPROM);
             // If filterNonDefault is enabled, make sure the current value equals the default value
             if (EEPROMData) {
                 return !eepromIsDefault(EEPROMData);
             }
         }
 
-        if (v.type === 'hybrid') {
-            // If filterNonDefault is enabled, make sure the current value equals the default value
-            return !eepromIsDefault(v);
-        }
-
         if ('key' in v) {
             if ('defaultValue' in v) {
-                console.log(v);
                 return !isEqual(
                     settingsValues[v.globalIndex]?.value,
                     v.defaultValue,
@@ -281,12 +472,22 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     function checkSearchTerm(v: gSenderSetting) {
         let searchChecker: any = v;
         if (v.type === 'eeprom') {
-            searchChecker = EEPROM.find((s) => s.setting === v.eID);
+            let idToUse = v.eID;
+            if (Object.hasOwn(v, 'remap') && isFirmwareCurrent) {
+                idToUse = v.remap;
+            }
+            if (controllerType === GRBLHAL) {
+                idToUse = translateGrblCoreKey(
+                    idToUse as EEPROM,
+                    firmwareVersion,
+                );
+            }
+            searchChecker = eepromMap.get(idToUse as EEPROM);
         }
 
         return JSON.stringify(searchChecker)
             .toLowerCase()
-            .includes(searchTerm.toLowerCase());
+            .includes(searchTerm.trim().toLowerCase());
     }
 
     /**
@@ -296,74 +497,112 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
      * Filter remaining by matching search term
      * @param v - The setting to filter
      */
-    function settingsFilter(v: gSenderSetting) {
-        // ***first, check conditions that are always applicable
+    const settingsFilter = useCallback(
+        (v: gSenderSetting) => {
+            // ***first, check conditions that are always applicable
 
-        // Hide hidden when filtering
-        if ('hidden' in v && (!searchTerm || searchTerm.length === 0)) {
-            if (v.hidden()) {
-                // only return if it's supposed to be hidden, otherwise we have more to check
-                return false;
+            // Hide hidden when filtering
+            if ('hidden' in v && (!searchTerm || searchTerm.trim().length === 0)) {
+                if (v.hidden(getPendingOrStore)) {
+                    // only return if it's supposed to be hidden, otherwise we have more to check
+                    return false;
+                }
             }
-        }
-        // Always exclude eeprom/hybrids when not connected
-        if (v.type === 'eeprom' || v.type === 'hybrid') {
-            if (!connectionState) {
-                return false;
-            }
-        }
-        // can't find a relevant value, we hide it, unless it's a hybrid, where we use the fallback
-        if (v.type === 'eeprom') {
-            const EEPROMData = EEPROM.find((s) => s.setting === v.eID);
-            if (!EEPROMData) {
-                return false;
-            }
-        }
+            // Always exclude eeprom/hybrids when not connected
+            if (v.type === 'eeprom' || v.type === 'hybrid') {
+                if (!connectionState) {
+                    return false;
+                }
 
-        // ***then, consider defaults and searching
-        const modified = checkIfModified(v);
-        const searched = checkSearchTerm(v);
+                let idToUse = v.eID;
+                if (Object.hasOwn(v, 'remap') && isFirmwareCurrent) {
+                    idToUse = v.remap;
+                }
+                if (controllerType === GRBLHAL) {
+                    idToUse = translateGrblCoreKey(
+                        idToUse as EEPROM,
+                        firmwareVersion,
+                    );
+                }
+                if (v.type === 'eeprom') {
+                    if (!eepromMap.has(idToUse as EEPROM)) {
+                        return false;
+                    }
+                }
+            }
 
-        if (searchTerm.length === 0 || !searchTerm) {
-            // if no search, check modified
-            if (filterNonDefault) {
-                return modified;
+            // ***then, consider defaults and searching
+            const modified = checkIfModified(v);
+            const searched = checkSearchTerm(v);
+
+            if (searchTerm.trim().length === 0 || !searchTerm) {
+                // if no search, check modified
+                if (filterNonDefault) {
+                    return modified;
+                }
+                return true;
+            } else {
+                // if search, consider both
+                if (filterNonDefault) {
+                    return modified && searched;
+                }
+                return searched;
             }
-            return true;
-        } else {
-            // if search, consider both
-            if (filterNonDefault) {
-                return modified && searched;
-            }
-            return searched;
-        }
-    }
+        },
+        [
+            connectionState,
+            eepromMap,
+            isFirmwareCurrent,
+            controllerType,
+            firmwareVersion,
+            searchTerm,
+            filterNonDefault,
+            settingsValues,
+            getPendingOrStore,
+        ],
+    );
 
     function eepromIsDefault(settingData: gSenderSetting | FilteredEEPROM) {
         const profileDefaults =
             controllerType === 'Grbl'
                 ? machineProfile.eepromSettings
-                : machineProfile.grblHALeepromSettings;
+                : resolveGrblCoreDefaults({
+                      firmwareSemver: firmwareVersion,
+                      baseDefaults: machineProfile.grblHALeepromSettings || {},
+                  }).defaults;
 
         const settingKey =
             (settingData as gSenderSetting).type === 'hybrid'
                 ? (settingData as gSenderSetting).eID
                 : (settingData as FilteredEEPROM).setting;
+        const lookupKey =
+            controllerType === GRBLHAL
+                ? translateGrblCoreKey(settingKey as EEPROM, firmwareVersion)
+                : settingKey;
 
-        const inputDefault = get(profileDefaults, settingKey, '-');
+        const inputDefault = get(profileDefaults, lookupKey, '-');
 
         if (inputDefault === '-') {
             return true; // default in cases where we don't know the default
         }
 
-        // Lookup hybrid current value because stored value is actually the local state
-        if ((settingData as gSenderSetting).type === 'hybrid') {
+        // if we are checking default for numbers, we need to include decimals
+        if (
+            (settingData as gSenderSetting).type === 'hybrid' ||
+            Number((settingData as FilteredEEPROM).dataType) === 5 || // integer
+            Number((settingData as FilteredEEPROM).dataType) === 6 // decimal
+        ) {
             return isEqual(
-                Number(detectedEEPROM[settingKey]).toFixed(3),
+                Number(settingData.value).toFixed(3),
                 Number(inputDefault).toFixed(3),
             );
         }
 
+        const numValue = Number(settingData.value);
+        const numDefault = Number(inputDefault);
+        if (!isNaN(numValue) && !isNaN(numDefault)) {
+            return numValue === numDefault;
+        }
         return isEqual(settingData.value, inputDefault);
     }
 
@@ -385,49 +624,25 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         const profileDefaults =
             controllerType === 'Grbl'
                 ? machineProfile.eepromSettings
-                : machineProfile.grblHALeepromSettings;
+                : resolveGrblCoreDefaults({
+                      firmwareSemver: firmwareVersion,
+                      baseDefaults: machineProfile.grblHALeepromSettings || {},
+                  }).defaults;
+        const lookupKey =
+            controllerType === GRBLHAL
+                ? translateGrblCoreKey(key, firmwareVersion)
+                : key;
 
-        return get(profileDefaults, key, '-');
+        return get(profileDefaults, lookupKey, '-');
     }
-
-    // Populate eeprom descriptions as needed
-    useEffect(() => {
-        if (!settings.length) {
-            return;
-        }
-        settings.map((ss) => {
-            if (!ss || !ss.settings) {
-                return;
-            }
-            ss.settings.map((s) => {
-                s.settings.map((o) => {
-                    if (o.type == 'eeprom') {
-                        const eID = get(o, 'eID', null);
-                        if (eID) {
-                            let oKey = Number(eID.replace('$', ''));
-                            let oEEPROM = get(
-                                detectedEEPROMDescriptions,
-                                oKey,
-                                '',
-                            );
-                            if (oEEPROM) {
-                                o.description = get(oEEPROM, 'details', '');
-                                o.label = get(oEEPROM, 'description', '');
-                            }
-                        }
-                    }
-                });
-            });
-        });
-    }, [detectedEEPROM, detectedEEPROMDescriptions, detectedEEPROMGroups]);
 
     const payload = {
         settings,
         EEPROM,
+        eepromMap,
         setEEPROM,
         machineProfile,
         firmwareType: controllerType,
-        rawEEPROM,
         setMachineProfile,
         connected,
         settingsAreDirty,
@@ -437,11 +652,15 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         settingsValues,
         setSettingsValues,
         settingsFilter,
+        getPendingOrStore,
         toggleFilterNonDefault,
         filterNonDefault,
         eepromIsDefault,
         isSettingDefault,
         getEEPROMDefaultValue,
+        isFirmwareCurrent,
+        profileChangedSinceDefaults,
+        setProfileChangedSinceDefaults,
     };
 
     return (

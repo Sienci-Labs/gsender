@@ -41,7 +41,7 @@ export interface RangeSliderProps {
     showText: boolean; // optional parameter to show text representations of the percentage and to show title
     onChange?: (percentage: number[]) => void;
     onButtonPress?: (percentage: number[]) => void;
-    onPointerUp?: PointerEventHandler<HTMLInputElement>;
+    onLostPointerCapture?: PointerEventHandler<HTMLInputElement>;
     unitString?: string;
 }
 
@@ -57,7 +57,7 @@ const RangeSlider = ({
     colour = 'bg-blue-400',
     onChange = null,
     onButtonPress = null,
-    onPointerUp = null,
+    onLostPointerCapture = null,
     unitString = 'unit',
     disabled,
     ...props
@@ -84,6 +84,7 @@ const RangeSlider = ({
                         disabled={disabled}
                         size="sm"
                         icon={<FaUndo />}
+                        aria-label={`Reset ${title} override to 100%`}
                     />
                 </Tooltip>
                 <Slider
@@ -103,7 +104,7 @@ const RangeSlider = ({
                     min={min}
                     max={max}
                     onValueChange={onChange}
-                    onPointerUp={onPointerUp}
+                    onLostPointerCapture={onLostPointerCapture}
                     disabled={disabled}
                     {...props}
                 ></Slider>
@@ -120,6 +121,7 @@ const RangeSlider = ({
                         disabled={disabled}
                         size="sm"
                         icon={<FaMinus />}
+                        aria-label={`Decrease ${title} override`}
                     />
                 </Tooltip>
                 <Tooltip content={`Increase ${title} override by ${step}%`}>
@@ -135,6 +137,7 @@ const RangeSlider = ({
                         disabled={disabled}
                         size="sm"
                         icon={<FaPlus />}
+                        aria-label={`Increase ${title} override`}
                     />
                 </Tooltip>
             </div>

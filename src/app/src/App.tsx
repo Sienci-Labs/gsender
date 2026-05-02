@@ -8,10 +8,9 @@ import { sagaMiddleware } from 'app/store/redux/sagas';
 import store from 'app/store';
 import * as user from 'app/lib/user';
 import controller from 'app/lib/controller';
-import ConfirmationDialog from 'app/components/ConfirmationDialog/ConfirmationDialog';
-
 import { Toaster } from './components/shadcn/Sonner';
 import { ReactRoutes } from './react-routes';
+import { AccessibilitySettingsHandler } from './features/Helper/AccessibilitySettingsHandler';
 
 function App() {
     useEffect(() => {
@@ -22,16 +21,12 @@ function App() {
                 token: string;
             };
 
-            if (authenticated) {
-                const host = '';
-                const options = {
-                    query: 'token=' + token,
-                };
-                controller.connect(host, options);
-                return;
-            } else {
-                console.log('no auth');
-            }
+            if (!authenticated) return;
+
+            const host = '';
+            const options = { query: 'token=' + token };
+
+            controller.connect(host, options);
         });
 
         sagaMiddleware.run(rootSaga);
@@ -40,6 +35,7 @@ function App() {
     return (
         <>
             <ReduxProvider store={reduxStore}>
+                <AccessibilitySettingsHandler />
                 <Toaster
                     richColors
                     closeButton

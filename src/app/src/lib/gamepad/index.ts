@@ -15,6 +15,9 @@ const macroCallbackDebounce = debounce(
     500,
 );
 
+// Cache for throttled callbacks to ensure throttling works across multiple calls
+const throttledCallbackCache = new Map<string, ReturnType<typeof throttle>>();
+
 type GamepadOptions = {
     axis: {
         precision: number;
@@ -244,9 +247,24 @@ export const runAction = ({ event }: { event: GamepadDetail }): void => {
         const shuttleEvent = shuttleControlEvents[action];
         const shuttleEv = shuttleEvent as ShuttleEvent;
 
-        const throttledCallback = throttle(shuttleEv.callback, 100);
+        // Use cached throttled callback to ensure throttling works across calls
+        if (!throttledCallbackCache.has(action)) {
+            throttledCallbackCache.set(
+                action,
+                throttle(
+                    (payload: unknown) => {
+                        // Get fresh callback reference in case it was updated
+                        const currentEvent = shuttleEvents.allShuttleControlEvents[action] as ShuttleEvent;
+                        currentEvent?.callback?.(null, payload);
+                    },
+                    100,
+                    { trailing: false }
+                )
+            );
+        }
 
-        throttledCallback(null, shuttleEv.payload);
+        const throttledCallback = throttledCallbackCache.get(action);
+        throttledCallback(shuttleEv.payload);
     } else {
         macroCallbackDebounce(action);
     }

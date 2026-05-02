@@ -248,11 +248,15 @@ export const WizardProvider = ({ children }) => {
                 if (activeStep > steps.length) {
                     return;
                 }
-                const element = document.getElementById(
-                    `step-${activeStep}-${activeSubstep}`,
-                );
-                element.scrollIntoView({
-                    behavior: 'smooth',
+                requestAnimationFrame(() => {
+                    const element = document.getElementById(
+                        `step-${activeStep}-${activeSubstep}`,
+                    );
+                    if (!element) return;
+                    element.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center',
+                    });
                 });
             },
             markActionAsComplete: (stepIndex, substepIndex) => {

@@ -35,6 +35,7 @@ const MinMaxButton = () => {
             className={styles.actionButton}
             onClick={() => toggleMinimized(minimized)}
             style={{ marginRight: 5 }}
+            aria-label={minimized ? "Maximize wizard" : "Minimize wizard"}
         >
             {!minimized ? (
                 <FaMinus className="bg-transparent" />

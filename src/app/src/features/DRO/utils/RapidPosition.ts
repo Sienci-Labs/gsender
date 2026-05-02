@@ -11,7 +11,6 @@ export const BACK_LEFT = 'BL';
 export const OTHER = 'OT';
 
 const OFFSET_DISTANCE = 1;
-const PULLOFF_DISTANCE = 5;
 
 export const getHomingLocation = (value: string) => {
     // convert settting to number and bitmask it with 7 (000111) in order to strip out A -> C axes and just leave XYZ
@@ -32,14 +31,13 @@ export const getHomingLocation = (value: string) => {
     }
 };
 
-const getMachineMovementLimits = (): number[] => {
+const getMachineMovementLimits = (pullOff: number): number[] => {
     const store = reduxStore.getState();
     const settings = get(store, 'controller.settings.settings');
     const { $130: xMax, $131: yMax } = settings;
 
-    // Limits are PULLOFF_DISTANCE away from reported limits
-    const xLimit = (Number(xMax) - PULLOFF_DISTANCE).toFixed(3);
-    const yLimit = (Number(yMax) - PULLOFF_DISTANCE).toFixed(3);
+    const xLimit = (Number(xMax) - pullOff).toFixed(3);
+    const yLimit = (Number(yMax) - pullOff).toFixed(3);
 
     return [Number(xLimit), Number(yLimit)];
 };
@@ -57,9 +55,7 @@ const getPositionMovements = (
     homingFlag: boolean,
     pullOff: number,
 ) => {
-    const [xLimit, yLimit] = getMachineMovementLimits();
-
-    pullOff = PULLOFF_DISTANCE;
+    const [xLimit, yLimit] = getMachineMovementLimits(pullOff);
     // If homing flag not set, we treat all movements as negative space
     if (!homingFlag) {
         homingPosition = BACK_RIGHT;

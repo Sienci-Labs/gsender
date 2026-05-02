@@ -112,8 +112,7 @@ const DroppableColumn = ({
     return (
         <div
             ref={setNodeRef}
-            className="w-full grid gap-1"
-            style={{ gridAutoRows: 'min-content' }}
+            className="flex flex-col gap-1"
         >
             {macros.map((macro) => (
                 <SortableMacroItem

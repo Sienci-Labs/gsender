@@ -56,8 +56,8 @@ const connectionSlice = createSlice({
         setConnectionState: (state, action: PayloadAction<{ isConnected: boolean }>) => {
           state.isConnected = action.payload.isConnected;
         },
-        closeConnection: (state, action: PayloadAction<{ port: string }>) => {
-            state.port = action.payload.port;
+        closeConnection: (state) => {
+            state.port = initialState.port;
             state.isConnected = false;
         },
         listPorts: (

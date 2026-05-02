@@ -134,9 +134,9 @@ class DFU {
     async open() {
         const [vid, pid] = this.IDS;
 
-        const device = findByIds(vid, pid);
+        const device = await this.findDeviceWithRetries(vid, pid);
         if (!device) {
-            throw new Error(`Unable to find valid device using vendor ID "${vid.toString(16)}" and product ID "${pid.toString(16)}".  Make sure the device is in DFU mode.`);
+            throw new Error(`Unable to find STM device in DFU mode after 6 seconds. Make sure the device is in DFU mode, then try again.`);
         }
 
         if (device) {
@@ -167,6 +167,26 @@ class DFU {
             log.error('Unable to find valid DFU device');
             throw new Error('Unable to find valid device');
         }
+    }
+
+    async findDeviceWithRetries(vid, pid) {
+        const maxAttempts = 6;
+        for (let attempt = 0; attempt < maxAttempts; attempt++) {
+            if (this.options.onInfo) {
+                this.options.onInfo('Looking for STM device in DFU');
+            }
+
+            const device = findByIds(vid, pid);
+            if (device) {
+                return device;
+            }
+
+            if (attempt < maxAttempts - 1) {
+                await delay(1000);
+            }
+        }
+
+        return null;
     }
 
     requestIn(bRequest, wLength, wValue = 0) {

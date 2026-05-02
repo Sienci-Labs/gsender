@@ -1,4 +1,4 @@
-import { Link } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import { IoSpeedometerOutline } from 'react-icons/io5';
 import { FaTasks } from 'react-icons/fa';
 import { RiToolsFill } from 'react-icons/ri';
@@ -20,8 +20,11 @@ export function BottomNavLink({ label, icon, href }) {
 }
 
 export function BottomNav() {
+    const { pathname } = useLocation();
+    if (pathname.includes('/remote/config')) return null;
+
     return (
-        <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-gray-100 border-t border-gray-400">
+        <div className="sticky bottom-0 left-0 z-50 w-full h-16 bg-gray-100 border-t border-gray-400">
             <div className="grid h-full max-w-lg grid-cols-4 mx-auto font-medium">
                 <BottomNavLink
                     href="/remote/"

@@ -45,6 +45,7 @@ import jogWheeelLabels from './assets/labels.svg';
 import JogHelper from './utils/jogHelper';
 import { preventDefault } from 'app/lib/dom-events';
 import { checkThumbsticskAreIdle, JoystickLoop } from './JoystickLoop';
+import { MPGJogManager } from './MPGJogManager.ts';
 import { convertValue } from './utils/units';
 import reduxStore from 'app/store/redux';
 import { UNITS_EN } from 'app/definitions/general';
@@ -56,7 +57,7 @@ export interface JogValueObject {
     feedrate: number;
 }
 
-export function Jogging() {
+export function Jogging({ hideRotary = false }) {
     const { mode } = useWorkspaceState();
     const rotaryWidgetState = useWidgetState('rotary');
     const [initialized, setInitialized] = useState(false);
@@ -152,6 +153,7 @@ export function Jogging() {
     const [firmware, setFirmware] = useState<FirmwareFlavour>('Grbl');
 
     const joystickLoop = useRef<JoystickLoop | null>(null);
+    const mpgJogManagerRef = useRef<MPGJogManager | null>(null);
 
     const handleJoystickJog = useCallback(
         (
@@ -318,6 +320,43 @@ export function Jogging() {
                     );
 
                     if (isUsingMPGMode) {
+                        const isInRotaryMode =
+                            store.get('workspace.mode', '') ===
+                            WORKSPACE_MODE.ROTARY;
+                        if (!mpgJogManagerRef.current) {
+                            mpgJogManagerRef.current = new MPGJogManager();
+                        }
+
+                        const mpgCommand = mpgJogManagerRef.current.buildCommand(
+                            {
+                                joystickOptions,
+                                activeStick: activeStick as
+                                    | 'stick1'
+                                    | 'stick2',
+                                actionType: actionType as
+                                    | 'primaryAction'
+                                    | 'secondaryAction',
+                                gamepadDetail: detail,
+                                activeStickDegrees,
+                                firmwareType,
+                                isInRotaryMode,
+                                canJog: canClickShortcut(),
+                                currentProfile,
+                                baseDistanceByAxis: {
+                                    x: jogSpeedRef.current.xyStep,
+                                    y: jogSpeedRef.current.xyStep,
+                                    z: jogSpeedRef.current.zStep,
+                                    a: jogSpeedRef.current.aStep,
+                                },
+                                baseFeedrate: jogSpeedRef.current.feedrate,
+                            },
+                        );
+
+                        if (!mpgCommand) {
+                            return;
+                        }
+
+                        handleJoystickJog(mpgCommand);
                         return;
                     }
 
@@ -543,6 +582,8 @@ export function Jogging() {
                 joystickLoop.current.stop();
                 joystickLoop.current = null;
             }
+            mpgJogManagerRef.current?.reset();
+            mpgJogManagerRef.current = null;
         };
     }, [isConnected, handleJoystickJog]);
 
@@ -684,7 +725,11 @@ export function Jogging() {
 
             const controllerIsGrbl = firmware === 'Grbl';
 
-            if (controllerIsGrbl && axis.a && !isInRotaryMode) {
+            const useAaxisForGrblShortcut = store.get(
+                'workspace.rotaryAxis.useAaxisForGrbl',
+                false,
+            );
+            if (controllerIsGrbl && axis.a && !isInRotaryMode && !useAaxisForGrblShortcut) {
                 return;
             }
 
@@ -944,14 +989,20 @@ export function Jogging() {
     }, []);
 
     const isRotaryMode = mode === 'ROTARY';
+    const useAaxisForGrbl = store.get(
+        'workspace.rotaryAxis.useAaxisForGrbl',
+        false,
+    );
     const showA =
-        (firmwareType === 'grblHAL' || isRotaryMode) &&
-        rotaryWidgetState.tab.show;
+        !hideRotary &&
+        ((firmwareType === 'grblHAL' || isRotaryMode) &&
+            rotaryWidgetState.tab.show ||
+            useAaxisForGrbl);
 
     return (
         <>
-            <div className="flex flex-row w-full gap-2 max-xl:gap-2 justify-around items-center select-none xl:mt-4 portrait:scale-100 max-xl:scale-90">
-                <div className="min-w-[180px] relative">
+            <div className="flex flex-row w-full gap-2 justify-around items-center select-none max-xl:scale-90">
+                <div className="min-w-[180px] portrait:min-w-[210px] relative">
                     <JogWheel
                         distance={jogSpeed.xyStep}
                         feedrate={jogSpeed.feedrate}
@@ -959,7 +1010,7 @@ export function Jogging() {
                         threshold={jogThreshold}
                     />
                     <img
-                        className="absolute top-0 left-0 pointer-events-none"
+                        className="absolute top-0 left-0 pointer-events-none w-[180px] portrait:w-[210px] h-[180px] portrait:h-[210px]"
                         src={jogWheeelLabels}
                         alt="Jog wheel arrows"
                     />
@@ -1011,29 +1062,33 @@ export function Jogging() {
                     >
                         <JogInput
                             label="XY"
+                            screenReaderLabel="XY jog distance"
                             currentValue={jogSpeed.xyStep}
                             onChange={updateXYStep}
                         />
                         <JogInput
                             label="Z"
+                            screenReaderLabel="Z jog distance"
                             currentValue={jogSpeed.zStep}
                             onChange={updateZStep}
                         />
                         {showA && (
                             <JogInput
                                 label="A°"
+                                screenReaderLabel="A jog distance"
                                 currentValue={jogSpeed.aStep}
                                 onChange={updateAStep}
                             />
                         )}
                         <JogInput
                             label="at"
+                            screenReaderLabel="Jog feedrate"
                             currentValue={jogSpeed.feedrate}
                             onChange={updateFeedrate}
                         />
                     </div>
                 </div>
-                <div className="flex float-right portrait:scale-100 max-xl:scale-90">
+                <div className="flex float-right portrait:scale-100 max-xl:scale-90 max-xl:-mt-[5px] max-xl:-mb-[5px]">
                     <SpeedSelector handleClick={updateJogValues} />
                 </div>
             </div>

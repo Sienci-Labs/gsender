@@ -9,9 +9,10 @@ import { toast } from 'app/lib/toaster';
 
 interface GcodeViewerProps {
     gcode: string;
+    className?: string;
 }
 
-const GcodeViewer: React.FC<GcodeViewerProps> = ({ gcode }) => {
+const GcodeViewer: React.FC<GcodeViewerProps> = ({ gcode, className = '' }) => {
     const handleCopy = throttle(
         async () => {
             await navigator.clipboard?.writeText(gcode);
@@ -29,7 +30,7 @@ const GcodeViewer: React.FC<GcodeViewerProps> = ({ gcode }) => {
     }
 
     return (
-        <div className="flex flex-col">
+        <div className={`flex flex-col ${className}`.trim()}>
             <div className="overflow-auto">
                 {gcode.split('\n').map((line: string, i: number) => (
                     <Line

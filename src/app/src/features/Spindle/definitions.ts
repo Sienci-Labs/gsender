@@ -15,6 +15,7 @@ export interface SpindleState {
     spindleMin: number;
     delay: number;
     laser: LaserState;
+    inputType: 'Slider' | 'Number';
 }
 
 export interface Spindle {

@@ -10,8 +10,10 @@ import {
 import api from 'app/api';
 import { USER_DATA_COLLECTION } from 'app/constants';
 import Button from 'app/components/Button';
+import { usePostHog } from '@posthog/react';
 
 const DataCollection = () => {
+    const posthog = usePostHog();
     const [open, setOpen] = useState(false);
 
     useEffect(() => {
@@ -35,7 +37,7 @@ const DataCollection = () => {
         await api.metrics.updateCollectDataStatus(
             USER_DATA_COLLECTION.ACCEPTED,
         );
-
+        posthog?.capture('data_collection_accepted');
         setOpen(false);
     };
 
@@ -43,7 +45,7 @@ const DataCollection = () => {
         await api.metrics.updateCollectDataStatus(
             USER_DATA_COLLECTION.REJECTED,
         );
-
+        posthog?.capture('data_collection_declined');
         setOpen(false);
     };
 

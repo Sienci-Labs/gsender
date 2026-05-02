@@ -33,7 +33,7 @@ const Page = ({
         <div
             className={cn(
                 withBorder && 'border',
-                withPadding && !withFullPadding && 'p-4 pb-0', // it helps fitting on small screens a lot if there isnt padding on the bottom
+                withPadding && !withFullPadding && 'px-8 py-4 pb-0', // it helps fitting on small screens a lot if there isnt padding on the bottom
                 withFullPadding && 'p-4',
                 withFixedArea && 'fixed-content-area',
                 'w-full h-full flex flex-col',

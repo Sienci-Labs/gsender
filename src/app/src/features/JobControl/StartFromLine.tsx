@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { JSX, useEffect, useState } from 'react';
 import cx from 'classnames';
 import { Button as ShadButton } from 'app/components/shadcn/Button';
 import { Button } from 'app/components/Button';
@@ -20,36 +20,62 @@ import { FaPlay } from 'react-icons/fa';
 import { toast } from 'app/lib/toaster';
 import { useSelector } from 'react-redux';
 import { useWidgetState } from 'app/hooks/useWidgetState';
+import pubsub from 'pubsub-js';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { convertToImperial } from 'app/lib/units';
 
 type StartFromLineProps = {
     disabled: boolean;
     lastLine: number;
+    atcValidator?: () => [
+        boolean,
+        {
+            type: string;
+            title: string;
+            body: JSX.Element;
+        },
+    ];
 };
 
-const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
+const StartFromLine = ({
+    disabled,
+    lastLine,
+    atcValidator,
+}: StartFromLineProps) => {
     const zMax = useTypedSelector((state) => state.file.bbox.max.z);
-    const { units } = useWorkspaceState();
+    const { units, safeRetractHeight } = useWorkspaceState();
+    const { delay = 0 } = useWidgetState('spindle');
+    const lineTotal = useSelector((state: RootState) => state.file.total);
+
+    const calculateSafeHeight = () => {
+        if (safeRetractHeight === 0) {
+            return units === METRIC_UNITS ? 10 : 0.4;
+        } else {
+            return units === METRIC_UNITS
+                ? safeRetractHeight
+                : convertToImperial(safeRetractHeight);
+        }
+    };
+
     const [state, setState] = useState({
         showModal: false,
         needsRecovery: false,
         value: lastLine,
         startFromLine: lastLine - 10 >= 0 ? lastLine - 10 : 0,
         waitForHoming: false,
-        safeHeight: units === METRIC_UNITS ? 10 : 0.4,
+        useDefaultSafe: safeRetractHeight === 0,
+        safeHeight: calculateSafeHeight(),
         defaultSafeHeight: units === METRIC_UNITS ? 10 : 0.4,
     });
-    const { delay = 0 } = useWidgetState('spindle');
-
-    const lineTotal = useSelector((state: RootState) => state.file.total);
 
     // update units for safe height
     useEffect(() => {
         setState({
             ...state,
-            safeHeight: units === METRIC_UNITS ? 10 : 0.4,
+            safeHeight: calculateSafeHeight(),
+            defaultSafeHeight: units === METRIC_UNITS ? 10 : 0.4,
         });
-    }, [units]);
+    }, [units, safeRetractHeight]);
 
     const handleStartFromLine = () => {
         const { safeHeight, startFromLine } = state;
@@ -90,9 +116,17 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                             disabled,
                     },
                 )}
-                onClick={() =>
-                    setState((prev) => ({ ...prev, showModal: true }))
-                }
+                onClick={() => {
+                    const [invalidATC, payload] = atcValidator();
+                    if (invalidATC) {
+                        if (payload.type === 'error') {
+                            pubsub.publish('atc_validator', payload);
+                            return;
+                        }
+                    }
+
+                    setState((prev) => ({ ...prev, showModal: true }));
+                }}
             >
                 <MdFormatListNumbered className="text-2xl mr-1" /> Start From
             </ShadButton>
@@ -156,14 +190,13 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                                     }}
                                     min={1}
                                     max={lineTotal}
-                                    className="w-20"
                                 />
                             </div>
                         </div>
                         <div className="mb-4">
                             <div className="grid grid-cols-4 gap-2 items-center">
                                 {/*
-                                    tooltip cannot be nested any deeper, or the controlled input 
+                                    tooltip cannot be nested any deeper, or the controlled input
                                     wont fire onBlur when you click off of it
                                 */}
                                 <Tooltip
@@ -185,7 +218,7 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                                                     ),
                                                 }));
                                             }}
-                                            className="w-20"
+                                            suffix={units}
                                         />
                                     </>
                                 </Tooltip>
@@ -197,8 +230,8 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                         <div className="mb-4">
                             <p className="text-[#E2943B]">
                                 Calculates all your CNC movements, attributes,
-                                and gS automations to pick up right where you
-                                left off.
+                                and gSender automations to pick up right where
+                                you left off.
                             </p>
                         </div>
                         <div className="flex justify-center">
@@ -206,7 +239,7 @@ const StartFromLine = ({ disabled, lastLine }: StartFromLineProps) => {
                                 onClick={handleStartFromLine}
                                 variant={'primary'}
                                 // disabled={!isConnected}
-                                className="flex flex-row p-3 items-center gap-2"
+                                className="flex flex-row p-3 items-center gap-2 portrait:px-6 portrait:text-xl"
                             >
                                 <FaPlay className="ml-2" />
                                 <span>Start from Line</span>

@@ -40,7 +40,10 @@ class DFUFlasher extends events.EventEmitter {
         super();
         this.options = options;
         this.hex = Buffer.from(hex, 'utf-8').toString();
-        this.dfu = new DFU(this.path, options);
+        this.dfu = new DFU(this.path, {
+            ...options,
+            onInfo: (message) => this.emit('info', message)
+        });
     }
 
     async flash() {
@@ -48,9 +51,15 @@ class DFUFlasher extends events.EventEmitter {
             await this.dfu.open();
         } catch (e) {
             this.emit('error', e.message);
+            return;
         }
 
-        this.map = this.parseHex(this.hex);
+        try {
+            this.map = this.parseHex(this.hex);
+        } catch (e) {
+            this.emit('error', `Invalid hex file: ${e.message}`);
+            return;
+        }
 
         let startAddress = null;
         let byteSize = 0;
@@ -67,27 +76,40 @@ class DFUFlasher extends events.EventEmitter {
             log.info('Aborted to IDLE state');
         } catch (e) {
             this.emit('error', e.message);
+            return;
         }
 
         // Erase chip
-        await this.erase(startAddress, byteSize);
+        const eraseSuccess = await this.erase(startAddress, byteSize);
+        if (!eraseSuccess) {
+            return;
+        }
 
 
         for (let [address, dataBlock] of this.map) {
             this.emit('info', `Writing block of size ${dataBlock.byteLength} at address 0x${address.toString(16)}`);
-            await this.download(address, this.XFER_SIZE, dataBlock);
+            const downloadSuccess = await this.download(address, this.XFER_SIZE, dataBlock);
+            if (!downloadSuccess) {
+                return;
+            }
         }
 
-        await this.dfu.abortToIdle();
-        log.info(`Jumping back to start address ${startAddress} to manifest`);
-        await this.sendDFUCommand(this.SET_ADDRESS, startAddress, 4);
-        const status = await this.dfu.getStatus();
-        log.info(status);
-        await this.dfu.download(new ArrayBuffer(0), 0);
         try {
+            await this.dfu.abortToIdle();
+        } catch (e) {
+            this.emit('error', e.message);
+            return;
+        }
+        log.info(`Jumping back to start address ${startAddress} to manifest`);
+        try {
+            await this.sendDFUCommand(this.SET_ADDRESS, startAddress, 4);
+            const status = await this.dfu.getStatus();
+            log.info(status);
+            await this.dfu.download(new ArrayBuffer(0), 0);
             await this.dfu.pollUntil(state => (state === this.dfu.dfuMANIFEST));
         } catch (error) {
-            this.emit('error', error);
+            this.emit('error', error.message || error);
+            return;
         }
 
         await this.dfu.close();
@@ -130,17 +152,20 @@ class DFUFlasher extends events.EventEmitter {
                 chunks += 1;
             } catch (e) {
                 log.error(e);
-                this.emit('error', `Error during download: ${e}`);
+                this.emit('error', `Error during download: ${e.message || e}`);
+                return false;
             }
 
             if (dfuStatus.status !== this.dfu.STATUS_OK) {
-                this.emit('error', `DFU DOWNLOAD failed state=${dfuStatus.state}, status=${dfuStatus.status}`);
+                this.emit('error', `DFU download failed: state=${dfuStatus.state}, status=${dfuStatus.status}`);
+                return false;
             }
 
             bytesSent += bytesWritten;
             this.logProgress(bytesSent, expectedSize);
         }
         log.info('Finished download chunk');
+        return true;
     }
 
     /**
@@ -172,7 +197,7 @@ class DFUFlasher extends events.EventEmitter {
         if (!segment) {
             this.emit('error', 'Invalid segment in memory map');
             log.error(`Unable to find valid segment for address ${startAddr}`);
-            return;
+            return false;
         }
         let addr = this.getSectorStart(startAddr, segment);
         let endAddr = this.getSectorEnd(startAddr + length - 1, segment);
@@ -194,8 +219,13 @@ class DFUFlasher extends events.EventEmitter {
             const sectorIndex = Math.floor((addr - segment.start) / segment.sectorSize);
             const sectorAddr = segment.start + sectorIndex * segment.sectorSize;
             // eslint-disable-next-line no-await-in-loop
-            await this.sendDFUCommand(this.ERASE_PAGE, sectorAddr, 4);
-            await this.dfu.getStatus();
+            try {
+                await this.sendDFUCommand(this.ERASE_PAGE, sectorAddr, 4);
+                await this.dfu.getStatus();
+            } catch (e) {
+                this.emit('error', `Erase failed: ${e.message || e}`);
+                return false;
+            }
             addr = sectorAddr + segment.sectorSize;
             bytesErased += segment.sectorSize;
             this.logProgress(bytesErased, bytesToErase);
@@ -203,6 +233,7 @@ class DFUFlasher extends events.EventEmitter {
             this.emit('info', `Erased ${bytesErased} of ${bytesToErase} bytes`);
         }
         log.info('Erase finished');
+        return true;
     }
 
     async sendDFUCommand(command, param = 0x00, len = 1) {
@@ -224,15 +255,14 @@ class DFUFlasher extends events.EventEmitter {
             await this.dfu.download(payload, 0);
         } catch (err) {
             log.error(err);
-            this.emit('error', `Error during DFU command ${command}`);
-            return;
+            throw new Error(`Error during DFU command 0x${command.toString(16)}`);
         }
 
         // Poll status
         log.info('Poll status');
         let status = await this.dfu.pollUntil(state => (state !== DFU.dfuDNBUSY));
         if (status.status !== this.dfu.STATUS_OK) {
-            this.emit('error', 'Special DfuSe command ' + command + ' failed');
+            throw new Error(`Special DfuSe command 0x${command.toString(16)} failed`);
         }
     }
 }

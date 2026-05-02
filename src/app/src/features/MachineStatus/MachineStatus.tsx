@@ -21,6 +21,7 @@
  *
  */
 
+import { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import cx from 'classnames';
 import get from 'lodash/get';
@@ -41,11 +42,16 @@ import {
 } from '../../constants';
 import { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
 import { ALARM_CODE } from './definitions';
+import {
+    isATCAvailable,
+    sendATCHomingDialog,
+} from 'app/features/ATC/utils/ATCFunctions.ts';
 
 interface MachineStatusProps {
     alarmCode: ALARM_CODE;
-    activeState: GRBL_ACTIVE_STATES_T;
+    activeState: GRBL_ACTIVE_STATES_T | null;
     isConnected: boolean;
+    port: string | null;
 }
 
 interface Message {
@@ -61,9 +67,45 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
     activeState,
     alarmCode,
     isConnected,
+    port,
 }) => {
+    const isPortOpen = isConnected || !!port;
+    const [hasFreshControllerState, setHasFreshControllerState] = useState(
+        isPortOpen && !!activeState,
+    );
+    const displayActiveState =
+        isPortOpen && hasFreshControllerState ? activeState : null;
+
+    useEffect(() => {
+        if (!isPortOpen) {
+            setHasFreshControllerState(false);
+        }
+    }, [isPortOpen]);
+
+    useEffect(() => {
+        const handlePortOpen = () => {
+            setHasFreshControllerState(false);
+        };
+        const handlePortClose = () => {
+            setHasFreshControllerState(false);
+        };
+        const handleControllerState = () => {
+            setHasFreshControllerState(true);
+        };
+
+        controller.addListener('serialport:open', handlePortOpen);
+        controller.addListener('serialport:close', handlePortClose);
+        controller.addListener('controller:state', handleControllerState);
+
+        return () => {
+            controller.removeListener('serialport:open', handlePortOpen);
+            controller.removeListener('serialport:close', handlePortClose);
+            controller.removeListener('controller:state', handleControllerState);
+        };
+    }, []);
+
     const unlock = (): void => {
-        if (activeState === GRBL_ACTIVE_STATE_ALARM) {
+        if (displayActiveState === GRBL_ACTIVE_STATE_ALARM) {
             if (
                 alarmCode === 1 ||
                 alarmCode === 2 ||
@@ -74,10 +116,14 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
                 controller.command('reset:limit');
                 return;
             } else if (alarmCode === 'Homing' || alarmCode === 11) {
-                controller.command('homing');
+                if (isATCAvailable()) {
+                    sendATCHomingDialog();
+                } else {
+                    controller.command('homing');
+                }
                 return;
             }
-        } else if (activeState === GRBL_ACTIVE_STATE_HOLD) {
+        } else if (displayActiveState === GRBL_ACTIVE_STATE_HOLD) {
             return controller.command('cyclestart');
         }
         controller.command('unlock');
@@ -102,45 +148,43 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
         };
 
         return (
-            <div className="flex relative flex-col items-center">
+            <div
+                className="flex relative flex-col items-center"
+                aria-live="polite"
+                role="status"
+            >
                 <SmallUnlockButton />
                 <div
                     className={cx(
                         'transition-colors duration-100 ease-in-out flex max-sm:w-40 max-sm:text-normal w-72 h-[60px] justify-between items-center [clip-path:_polygon(0%_0%,_100%_0%,_85%_100%,_15%_100%)]',
                         {
                             'text-white bg-gray-800':
-                                !isConnected || !activeState,
+                                !displayActiveState,
                             'bg-gray-500 text-white':
-                                activeState === GRBL_ACTIVE_STATE_IDLE &&
-                                isConnected,
+                                displayActiveState === GRBL_ACTIVE_STATE_IDLE,
                             'bg-green-600 text-white':
-                                isConnected &&
-                                (activeState === GRBL_ACTIVE_STATE_RUN ||
-                                    activeState === GRBL_ACTIVE_STATE_JOG ||
-                                    activeState === GRBL_ACTIVE_STATE_CHECK),
+                                displayActiveState === GRBL_ACTIVE_STATE_RUN ||
+                                displayActiveState === GRBL_ACTIVE_STATE_JOG ||
+                                displayActiveState === GRBL_ACTIVE_STATE_CHECK,
                             'bg-blue-500 text-white':
-                                activeState === GRBL_ACTIVE_STATE_HOME &&
-                                isConnected,
+                                displayActiveState === GRBL_ACTIVE_STATE_HOME,
                             'bg-yellow-600 text-white':
-                                (activeState === GRBL_ACTIVE_STATE_HOLD ||
-                                    activeState === GRBL_ACTIVE_STATE_DOOR) &&
-                                isConnected,
+                                displayActiveState === GRBL_ACTIVE_STATE_HOLD ||
+                                displayActiveState === GRBL_ACTIVE_STATE_DOOR,
                             'bg-red-500 text-white':
-                                activeState === GRBL_ACTIVE_STATE_ALARM &&
-                                isConnected,
+                                displayActiveState === GRBL_ACTIVE_STATE_ALARM,
                             'bg-purple-600 text-white':
-                                activeState === GRBL_ACTIVE_STATE_TOOL &&
-                                isConnected,
+                                displayActiveState === GRBL_ACTIVE_STATE_TOOL,
                         },
                     )}
                 >
-                    {isConnected && activeState ? (
+                    {displayActiveState ? (
                         <>
-                            {activeState === GRBL_ACTIVE_STATE_ALARM ? (
+                            {displayActiveState === GRBL_ACTIVE_STATE_ALARM ? (
                                 <div className="flex w-full flex-row justify-center align-middle items-center font-light sm:text-base text-3xl mb-1">
                                     <div className="flex justify-center">
-                                        {activeState}
-                                        {activeState ===
+                                        {displayActiveState}
+                                        {displayActiveState ===
                                             GRBL_ACTIVE_STATE_ALARM && (
                                             <span>({alarmCode})</span>
                                         )}
@@ -153,7 +197,7 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
                                 </div>
                             ) : (
                                 <span className="flex w-full font-light text-3xl max-sm:text-base sm:text-normal mb-1 justify-center">
-                                    {message[activeState]}
+                                    {message[displayActiveState]}
                                 </span>
                             )}
                         </>
@@ -164,11 +208,11 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
                     )}
                 </div>
                 <div className="mt-4 z-50">
-                    {isConnected && ((activeState === GRBL_ACTIVE_STATE_ALARM) || (activeState === GRBL_ACTIVE_STATE_HOLD)) && (
+                    {displayActiveState === GRBL_ACTIVE_STATE_ALARM && (
                         <UnlockButton
                             onClick={unlock}
                             alarmCode={alarmCode}
-                            activeState={activeState}
+                            activeState={displayActiveState}
                         />
                     )}
                 </div>
@@ -187,16 +231,19 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
 export default connect((store) => {
     const $22 = get(store, 'controller.settings.settings.$22', '0');
     const alarmCode = get(store, 'controller.state.status.alarmCode', 0);
+
     const activeState = get(
         store,
         'controller.state.status.activeState',
-        GRBL_ACTIVE_STATE_IDLE,
+        null,
     );
     const isConnected = get(store, 'connection.isConnected', false);
+    const port = get(store, 'connection.port', null);
     return {
         $22,
         alarmCode,
         activeState,
         isConnected,
+        port,
     };
 })(MachineStatus);

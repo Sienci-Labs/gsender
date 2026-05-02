@@ -20,6 +20,32 @@ export interface JogSpeeds {
 export type JoggingSpeedOptions = 'Rapid' | 'Normal' | 'Precise';
 
 export function jogAxis(params: JogDistances, feedrate: number) {
+    const preventJoggingPastLimits = store.get(
+        'workspace.preventJoggingPastLimits',
+        false,
+    );
+
+    if (preventJoggingPastLimits) {
+        const pinState = (controller.state as any)?.status?.pinState || {};
+        const filteredParams: JogDistances = { ...params };
+
+        // Block jogging in the negative direction if X-, Y-, or A- limit is triggered
+        // Block jogging in the positive direction if Z+ limit is triggered (typical Z homing direction)
+        if (params.X !== undefined && pinState.X && params.X < 0)
+            delete filteredParams.X;
+        if (params.Y !== undefined && pinState.Y && params.Y < 0)
+            delete filteredParams.Y;
+        if (params.Z !== undefined && pinState.Z && params.Z > 0)
+            delete filteredParams.Z;
+        if (params.A !== undefined && pinState.A && params.A < 0)
+            delete filteredParams.A;
+
+        if (Object.keys(filteredParams).length === 0) {
+            return;
+        }
+        params = filteredParams;
+    }
+
     const units = store.get('workspace.units', 'mm');
     const modal = units === 'mm' ? 'G21' : 'G20';
     const s = map(
@@ -31,6 +57,30 @@ export function jogAxis(params: JogDistances, feedrate: number) {
 }
 
 export function continuousJogAxis(axes: JogDistances, feedrate: number) {
+    const preventJoggingPastLimits = store.get(
+        'workspace.preventJoggingPastLimits',
+        false,
+    );
+
+    if (preventJoggingPastLimits) {
+        const pinState = (controller.state as any)?.status?.pinState || {};
+        const filteredAxes: JogDistances = { ...axes };
+
+        if (axes.X !== undefined && pinState.X && axes.X < 0)
+            delete filteredAxes.X;
+        if (axes.Y !== undefined && pinState.Y && axes.Y < 0)
+            delete filteredAxes.Y;
+        if (axes.Z !== undefined && pinState.Z && axes.Z > 0)
+            delete filteredAxes.Z;
+        if (axes.A !== undefined && pinState.A && axes.A < 0)
+            delete filteredAxes.A;
+
+        if (Object.keys(filteredAxes).length === 0) {
+            return;
+        }
+        axes = filteredAxes;
+    }
+
     const units = store.get('workspace.units', 'mm');
     controller.command('jog:start', axes, feedrate, units);
 }

@@ -48,12 +48,13 @@ const Instructions = () => {
                             </h2>
                             {
                                 // eslint-disable-next-line react/no-array-index-key
-                                step.substeps.map((step, index) => (
+                                step.substeps.map((substep, index) => (
                                     <Substep
-                                        step={step}
+                                        step={substep}
                                         key={`substep-${uniqueId()}`}
                                         index={index}
                                         stepIndex={stepIndex}
+                                        firstRunOnly={step.firstRunOnly && index === 0}
                                     />
                                 ))
                             }

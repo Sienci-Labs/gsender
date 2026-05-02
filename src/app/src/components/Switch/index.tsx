@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 
 import Toggle from './Toggle';
 import { cn } from 'app/lib/utils';
@@ -31,11 +31,21 @@ const Switch: React.FC<SwitchProps> = ({
     id,
     position = 'horizontal',
 }) => {
+    const generatedId = useId();
+    const switchId = id || generatedId;
+
     return (
         <div className={cn('flex items-center', className)}>
-            {label && <span className="mr-2">{label}</span>}
+            {label && (
+                <label
+                    htmlFor={switchId}
+                    className="mr-2 cursor-pointer text-sm font-medium text-gray-900 dark:text-gray-300"
+                >
+                    {label}
+                </label>
+            )}
             <Toggle
-                id={id}
+                id={switchId}
                 checked={checked}
                 onChange={onChange}
                 value={value}
@@ -47,7 +57,14 @@ const Switch: React.FC<SwitchProps> = ({
                 )}
                 position={position}
             />
-            {secondaryLabel && <span className="ml-2">{secondaryLabel}</span>}
+            {secondaryLabel && (
+                <label
+                    htmlFor={switchId}
+                    className="ml-2 cursor-pointer text-sm font-medium text-gray-900 dark:text-gray-300"
+                >
+                    {secondaryLabel}
+                </label>
+            )}
         </div>
     );
 };

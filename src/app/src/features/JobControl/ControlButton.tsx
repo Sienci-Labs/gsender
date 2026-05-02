@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { JSX, useEffect, useState } from 'react';
 import cx from 'classnames';
 import includes from 'lodash/includes';
 import pubsub from 'pubsub-js';
 import { PiPause } from 'react-icons/pi';
 import { FiOctagon } from 'react-icons/fi';
 import { IoPlayOutline } from 'react-icons/io5';
+import { usePostHog } from '@posthog/react';
 
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
@@ -29,7 +30,8 @@ import {
     WORKFLOW_STATE_RUNNING,
 } from '../../constants';
 import get from 'lodash/get';
-import reduxStore from 'app/store/redux';
+import reduxStore, { RootState } from 'app/store/redux';
+import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 
 type MACHINE_CONTROL_BUTTONS_T =
     (typeof MACHINE_CONTROL_BUTTONS)[keyof typeof MACHINE_CONTROL_BUTTONS];
@@ -40,6 +42,14 @@ interface ControlButtonProps {
     activeState: GRBL_ACTIVE_STATES_T;
     isConnected: boolean;
     fileLoaded: boolean;
+    validateATC?: () => [
+        boolean,
+        {
+            type: string;
+            title: string;
+            body: JSX.Element;
+        },
+    ];
     onStop: () => void;
 }
 
@@ -62,12 +72,35 @@ const ControlButton: React.FC<ControlButtonProps> = ({
     isConnected,
     fileLoaded,
     onStop,
+    validateATC,
 }) => {
-    function canRun(reduxActiveState?: GRBL_ACTIVE_STATES_T) {
+    const posthog = usePostHog();
+    const [isRunningSDFile, setIsRunningSDFile] = useState<boolean>(false);
+    // If we have a name, we a running a SD file - convert to boolean in following useEffect
+    const sdRunReported = useTypedSelector(
+        (state: RootState) => state.controller.state.status?.SD?.name,
+    );
+    useEffect(() => {
+        if (sdRunReported !== null && sdRunReported !== undefined) {
+            setIsRunningSDFile(true);
+        } else {
+            setIsRunningSDFile(false);
+        }
+    }, [sdRunReported]);
+
+    function canRun(
+        reduxActiveState?: GRBL_ACTIVE_STATES_T,
+        reduxWorkflow?: { state: WORKFLOW_STATES_T },
+    ) {
         const currentActiveState = reduxActiveState || activeState;
+        const currentWorkflow = reduxWorkflow || workflow;
+        const { state } = currentWorkflow;
         return (
-            currentActiveState === GRBL_ACTIVE_STATE_IDLE ||
-            currentActiveState === GRBL_ACTIVE_STATE_HOLD
+            !isRunningSDFile &&
+            (currentActiveState === GRBL_ACTIVE_STATE_IDLE ||
+                currentActiveState === GRBL_ACTIVE_STATE_HOLD ||
+                currentActiveState === GRBL_ACTIVE_STATE_CHECK) &&
+            state !== WORKFLOW_STATE_RUNNING
         );
     }
 
@@ -120,7 +153,7 @@ const ControlButton: React.FC<ControlButtonProps> = ({
         if (!isConnected || !fileLoaded) {
             return true;
         } else if (
-            (type === START && canRun(activeState)) ||
+            (type === START && canRun(activeState, workflow)) ||
             (type === PAUSE && canPause(activeState, workflow)) ||
             (type === STOP && canStop(workflow))
         ) {
@@ -272,21 +305,33 @@ const ControlButton: React.FC<ControlButtonProps> = ({
             currentActiveState === GRBL_ACTIVE_STATE_HOLD
         ) {
             controller.command('gcode:resume');
+            posthog?.capture('job_resumed', { active_state: currentActiveState });
             return;
         }
 
         if (state === WORKFLOW_STATE_IDLE) {
+            const [atcInvalid, payload] = validateATC();
+            if (currentActiveState === GRBL_ACTIVE_STATE_CHECK) {
+                controller.command('gcode', '%global.state.testWCS=modal.wcs'); // go in test wcs before starting
+            }
+            if (atcInvalid) {
+                pubsub.publish('atc_validator', payload);
+                return;
+            }
             controller.command('gcode:start');
+            posthog?.capture('job_started', { active_state: currentActiveState });
             return;
         }
     };
     const handlePause = (): void => {
         controller.command('gcode:pause');
+        posthog?.capture('job_paused');
     };
     const handleStop = (reduxActiveState?: GRBL_ACTIVE_STATES_T): void => {
         const currentActiveState = reduxActiveState || activeState;
         onStop();
         controller.command('gcode:stop', { force: true });
+        posthog?.capture('job_stopped', { active_state: currentActiveState });
         if (currentActiveState === GRBL_ACTIVE_STATE_CHECK) {
             controller.command('gcode', '$C');
         }
@@ -315,7 +360,7 @@ const ControlButton: React.FC<ControlButtonProps> = ({
             <button
                 type="button"
                 className={cx(
-                    'grid grid-cols-[1fr_2fr] gap-[1px] items-center portrait:h-12 h-12 max-xl:h-9 w-24 max-xl:w-22 px-2 text-base rounded border-solid border-gray-600 duration-150 ease-in-out',
+                    'grid grid-cols-[1fr_2fr] gap-[1px] items-center portrait:h-14 h-12 max-xl:h-11 w-24 max-xl:w-22 portrait:w-28 px-2 text-base portrait:text-xl rounded border-solid border-gray-600 duration-150 ease-in-out',
                     '[box-shadow:_0.4px_0.4px_2px_2px_var(--tw-shadow-color)] shadow-gray-500',
                     {
                         'bg-gray-300 text-gray-600 dark:bg-dark dark:text-gray-400 cursor-not-allowed':
@@ -328,7 +373,10 @@ const ControlButton: React.FC<ControlButtonProps> = ({
                             !disabled && type === STOP,
                     },
                 )}
-                onClick={onClick[type]}
+                onClick={() => {
+                    // keep this anonymous function or it will pass the onclick event
+                    onClick[type]();
+                }}
                 disabled={disabled}
             >
                 {icons[type]}

@@ -15,6 +15,10 @@ import {
     TOUCHPLATE_TYPE_AUTOZERO,
     TOUCHPLATE_TYPE_STANDARD,
 } from 'app/lib/constants.ts';
+import defaultMachineProfiles from 'app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts';
+import api from 'app/api';
+import pubsub from 'pubsub-js';
+import { BackupFrequencies } from 'app/workspace/definitions';
 
 interface UserData {
     path: string;
@@ -82,6 +86,9 @@ const persist = (data: StoreData): void => {
         if (isElectron()) {
             const fs = window.require('fs'); // Use window.require to require fs module in Electron
             fs.writeFileSync(userData!.path, value);
+
+            // save preferences to api so that remote window can fetch it
+            api.preferences.replace(persistData);
         } else {
             localStorage.setItem('sienci', value);
         }
@@ -190,7 +197,7 @@ const normalizeState = (state: any): any => {
     return state;
 };
 
-const merge = (base: any, saved: any): any => {
+export const merge = (base: any, saved: any): any => {
     const baseIsObject = base instanceof Object;
     const baseIsArray = Array.isArray(base);
 
@@ -234,6 +241,7 @@ const backupPreviousState = (data: any): void => {
         null,
         2,
     );
+    const now = new Date().toISOString().replaceAll(':', '-');
 
     if (isElectron()) {
         const { app } = window.require('@electron/remote');
@@ -241,14 +249,38 @@ const backupPreviousState = (data: any): void => {
 
         const backupPath = path.join(
             app.getPath('userData'),
-            'preferences-backup.json',
+            'preferences-backup-' + now + '.json',
         );
 
         const fs = window.require('fs'); // Use window.require to require fs module in Electron
         fs.writeFileSync(backupPath, value);
-    } else {
-        localStorage.setItem('sienci-backup', value);
     }
+};
+
+const isTimeToBackup = (
+    lastBackupTime: number,
+    frequency: BackupFrequencies,
+) => {
+    if (frequency === 'On Update') {
+        if (semver.lt(cnc.version, settings.version)) {
+            return true;
+        }
+        return false;
+    }
+
+    const now = Date.now();
+    const elapsed = now - lastBackupTime;
+
+    const intervals = {
+        Daily: 1000 * 60 * 60 * 24,
+        Weekly: 1000 * 60 * 60 * 24 * 7,
+        Monthly: 1000 * 60 * 60 * 24 * 30,
+    };
+
+    const interval = intervals[frequency];
+    if (!interval) throw new Error(`Unknown backup frequency: "${frequency}"`);
+
+    return elapsed >= interval;
 };
 
 const cnc: CncData = {
@@ -256,20 +288,44 @@ const cnc: CncData = {
     state: {},
 };
 
+const preserveSavedCommandKeys = (state: any, savedState: any): any => {
+    const savedCommandKeys = get(savedState, 'commandKeys', {});
+    const mergedCommandKeys = get(state, 'commandKeys', {});
+
+    if (
+        !(savedCommandKeys instanceof Object) ||
+        Array.isArray(savedCommandKeys)
+    ) {
+        return state;
+    }
+
+    // Keep dynamic command keys (for example, macro IDs) that are not in defaults.
+    set(state, 'commandKeys', {
+        ...mergedCommandKeys,
+        ...savedCommandKeys,
+    });
+
+    return state;
+};
+
 try {
     const text = getConfig();
     const data = JSON.parse(text);
     cnc.version = get(data, 'version', settings.version);
     cnc.state = get(data, 'state', {});
+    const lastBackupTime = get(cnc.state, 'workspace.lastBackupTime', 0);
+    const backupFreq = get(cnc.state, 'workspace.backupFreq', 'On Update');
 
-    backupPreviousState(cnc.state);
+    if (isTimeToBackup(lastBackupTime, backupFreq)) {
+        data.state.workspace.lastBackupTime = Date.now();
+        backupPreviousState(data);
+    }
 } catch (e) {
     log.error(e);
 }
 
-store.state = normalizeState(
-    merge(JSON.parse(JSON.stringify(defaultState)), cnc.state || {}),
-);
+const mergedState = merge(JSON.parse(JSON.stringify(defaultState)), cnc.state || {});
+store.state = normalizeState(preserveSavedCommandKeys(mergedState, cnc.state || {}));
 
 // Debouncing enforces that a function not be called again until a certain amount of time (e.g. 100ms) has passed without it being called.
 store.on(
@@ -294,9 +350,35 @@ const migrateStore = (): void => {
         return;
     }
 
+    if (semver.lt(cnc.version, '1.6.0')) {
+        const machineProfileID = Number(
+            store.get('workspace.machineProfile.id', 4),
+        );
+
+        if (machineProfileID === 3) {
+            // Set 2x4 (2)
+            const defaultMachineProfile = defaultMachineProfiles.find(
+                (profile) => profile.id === 2,
+            );
+            if (defaultMachineProfile) {
+                store.set('workspace.machineProfile', defaultMachineProfile);
+            }
+        } else if (machineProfileID === 1) {
+            // set 0 (4x4)
+            const defaultMachineProfile = defaultMachineProfiles.find(
+                (profile) => profile.id === 0,
+            );
+            if (defaultMachineProfile) {
+                store.set('workspace.machineProfile', defaultMachineProfile);
+            }
+        }
+    }
+
     if (semver.lt(cnc.version, '1.5.5')) {
         // if user has default retraction distance (4), change it to the new default (2)
-        const currentRetractDistance = store.get('widgets.probe.retractionDistance');
+        const currentRetractDistance = store.get(
+            'widgets.probe.retractionDistance',
+        );
         if (currentRetractDistance === 4) {
             store.set('widgets.probe.retractionDistance', 2);
         }
@@ -649,14 +731,44 @@ const migrateStore = (): void => {
     }
 };
 
+const syncPrefs = async () => {
+    try {
+        const config = await api.preferences.fetch();
+        if (config) {
+            store.restoreState(config.data.state, () => {
+                setTimeout(() => {
+                    pubsub.publish('repopulate');
+                }, 50);
+            });
+            // force UI to update with the changes
+            pubsub.publish('config:saved', config.data.state);
+        }
+    } catch (err) {
+        log.error(err);
+    }
+};
+
 try {
     // saveBackup();
     migrateStore();
+
+    if (isElectron()) {
+        window.ipcRenderer.send(
+            'assignPromptExit',
+            store.get('workspace.promptExit'),
+        );
+
+        window.ipcRenderer.send(
+            'change-power-saving',
+            store.get('workspace.powerSaving'),
+        );
+    }
 } catch (err) {
     log.error(err);
 }
 
 store.getConfig = getConfig;
 store.persist = persist;
+store.syncPrefs = syncPrefs;
 
 export default store;

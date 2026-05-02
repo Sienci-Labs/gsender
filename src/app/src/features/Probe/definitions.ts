@@ -22,6 +22,8 @@ export interface ProbeProfile {
         autoZero: number;
         zProbe: number;
         probe3D: number;
+        bitZero: number;
+        bitZeroZOnly: number;
     };
     plateWidth: number;
     plateLength: number;
@@ -54,6 +56,8 @@ export interface ProbingOptions {
     xRetract?: number;
     yRetract?: number;
     zRetract?: number;
+    zRetractNormal: number;
+    zRetractAuto: number;
     xyRetract3D?: number;
     retract: number;
     axes: {
@@ -72,6 +76,8 @@ export interface ProbingOptions {
         autoZero: number;
         zProbe: number;
         probe3D: number;
+        bitZero: number;
+        bitZeroZOnly: number;
     };
     xThickness?: number;
     yThickness?: number;
@@ -103,9 +109,12 @@ export interface Probe {
     probeFeedrate: number;
     probeFastFeedrate: number;
     retractionDistance: number;
+    zRetractNormal: number;
+    zRetractAuto: number;
     zProbeDistance: number;
     touchPlateHeight: number;
     probeType: string;
+    touchplateTypeSwitcher: boolean;
     probeAxis: string;
     direction: number;
     tipDiameter3D: number;
@@ -117,10 +126,13 @@ export interface Actions {
     setProbeConnectivity: (connectionMade: boolean) => void;
     onOpenChange: (isOpen: boolean) => void;
     changeProbeCommand: (value: string) => void;
+    changeTouchPlateType: (value: TOUCHPLATE_TYPES_T) => void;
     toggleUseTLO: () => void;
     handleProbeDepthChange: (event: Event) => void;
     handleProbeFeedrateChange: (event: Event) => void;
     handleRetractionDistanceChange: (event: Event) => void;
+    handleZRetractDistanceChange: (event: Event) => void;
+    handleZRetractDistanceAutoChange: (event: Event) => void;
     handleProbeCommandChange: (index: number) => void;
     handleSafeProbeToggle: () => void;
     generatePossibleProbeCommands: () => ProbeCommand[];
@@ -147,6 +159,7 @@ export interface State {
     availableProbeCommands: ProbeCommand[];
     selectedProbeCommand: number;
     touchplate: ProbeProfile;
+    touchplateTypeSwitcher: boolean;
     toolDiameter: number;
     availableTools: AvailableTool[];
     units: UNITS_EN;

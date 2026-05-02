@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="1197.744" tests="23" failures="5">
+  <testsuite name="Root Suite" timestamp="2026-04-21T13:59:38" tests="0" file="cypress\e2e\grblHal\A_grblHal_master_spec.cy.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="gSender UI Load Test" timestamp="2026-04-21T13:59:38" tests="1" time="3.524" failures="0">
+    <testcase name="gSender UI Load Test should navigate to gSender and verify the UI loads" time="2.549" classname="should navigate to gSender and verify the UI loads">
+    </testcase>
+  </testsuite>
+  <testsuite name="Device Connection" timestamp="2026-04-21T13:59:41" tests="1" time="10.259" failures="0">
+    <testcase name="Device Connection should connect to CNC machine by selecting the first available port" time="10.164" classname="should connect to CNC machine by selecting the first available port">
+    </testcase>
+  </testsuite>
+  <testsuite name="Load file testing in grblHal" timestamp="2026-04-21T13:59:51" tests="1" time="55.352" failures="0">
+    <testcase name="Load file testing in grblHal Complete workflow: Connect-&gt; Upload-&gt; Disconnect-&gt;Upload-&gt; Connect-&gt;Disconnect" time="55.172" classname="Complete workflow: Connect-&gt; Upload-&gt; Disconnect-&gt;Upload-&gt; Connect-&gt;Disconnect">
+    </testcase>
+  </testsuite>
+  <testsuite name="GrblHal Machine File Info Test" timestamp="2026-04-21T14:00:47" tests="1" time="11.513" failures="0">
+    <testcase name="GrblHal Machine File Info Test Uploads file, toggles, and prints file info" time="11.366" classname="Uploads file, toggles, and prints file info">
+    </testcase>
+  </testsuite>
+  <testsuite name="Gsender testing jogging using buttons" timestamp="2026-04-21T14:00:58" tests="1" time="51.470" failures="0">
+    <testcase name="Gsender testing jogging using buttons Test Case: jogging using buttons" time="51.380" classname="Test Case: jogging using buttons">
+    </testcase>
+  </testsuite>
+  <testsuite name="Dynamic Keyboard Jogging Test - All Axes" timestamp="2026-04-21T14:01:50" tests="1" time="137.108" failures="0">
+    <testcase name="Dynamic Keyboard Jogging Test - All Axes Test all keyboard jog shortcuts dynamically" time="136.958" classname="Test all keyboard jog shortcuts dynamically">
+    </testcase>
+  </testsuite>
+  <testsuite name="Gsender testing preset create update" timestamp="2026-04-21T14:04:07" tests="1" time="39.424" failures="0">
+    <testcase name="Gsender testing preset create update Verify Rapid preset values are updated and jogging speed/position is accurate" time="39.268" classname="Verify Rapid preset values are updated and jogging speed/position is accurate">
+    </testcase>
+  </testsuite>
+  <testsuite name="Grblhal Zeroing axis and go to zero" timestamp="2026-04-21T14:04:46" tests="1" time="78.563" failures="0">
+    <testcase name="Grblhal Zeroing axis and go to zero Test Case: jogging using buttons and zeroing axes" time="78.376" classname="Test Case: jogging using buttons and zeroing axes">
+    </testcase>
+  </testsuite>
+  <testsuite name="CNC Visualizer rendering test case" timestamp="2026-04-21T14:06:05" tests="1" time="23.443" failures="0">
+    <testcase name="CNC Visualizer rendering test case Connects to CNC, uploads file, and verifies visualizer + file info" time="23.154" classname="Connects to CNC, uploads file, and verifies visualizer + file info">
+    </testcase>
+  </testsuite>
+  <testsuite name="Job Run Test in grblHal without homing" timestamp="2026-04-21T14:06:28" tests="1" time="61.125" failures="0">
+    <testcase name="Job Run Test in grblHal without homing Test Case: Connect, Upload File, Run Job and Collect Details" time="60.996" classname="Test Case: Connect, Upload File, Run Job and Collect Details">
+    </testcase>
+  </testsuite>
+  <testsuite name="Coolant Testing  " timestamp="2026-04-21T14:07:29" tests="1" time="41.280" failures="0">
+    <testcase name="Coolant Testing   Apply coolant mist, flood and Off option" time="41.142" classname="Apply coolant mist, flood and Off option">
+    </testcase>
+  </testsuite>
+  <testsuite name="Feedrate Performance Comparison Test" timestamp="2026-04-21T14:08:11" tests="1" time="105.411" failures="0">
+    <testcase name="Feedrate Performance Comparison Test Should compare job completion times with different feedrates" time="105.231" classname="Should compare job completion times with different feedrates">
+    </testcase>
+  </testsuite>
+  <testsuite name="Macros Upload, Execution and Verification Test" timestamp="2026-04-21T14:09:56" tests="1" time="114.505" failures="0">
+    <testcase name="Macros Upload, Execution and Verification Test Upload and run macro with success message verify the output" time="114.330" classname="Upload and run macro with success message verify the output">
+    </testcase>
+  </testsuite>
+  <testsuite name="Console commands testing " timestamp="2026-04-21T14:11:51" tests="1" time="33.713" failures="0">
+    <testcase name="Console commands testing  Connects machine and sets axes to zero" time="33.454" classname="Connects machine and sets axes to zero">
+    </testcase>
+  </testsuite>
+  <testsuite name="gSender Configuration and Firmware Test Suite" timestamp="2026-04-21T14:12:24" tests="1" time="48.250" failures="0">
+    <testcase name="gSender Configuration and Firmware Test Suite Should reset, export, import gSender settings, restore firmware defaults, and perform searches" time="47.888" classname="Should reset, export, import gSender settings, restore firmware defaults, and perform searches">
+    </testcase>
+  </testsuite>
+  <testsuite name="Gsender testing jogging using buttons" timestamp="2026-04-21T14:13:13" tests="1" time="34.354" failures="1">
+    <testcase name="Gsender testing jogging using buttons Test Case: jogging using buttons" time="0.000" classname="Test Case: jogging using buttons">
+      <failure message="Timed out retrying after 30000ms: Expected to find content: &apos;/^Idle$/i&apos; but never did." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 30000ms: Expected to find content: '/^Idle$/i' but never did.
+    at Context.eval (webpack://gSender/./cypress/support/commands.js:87:5)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="Invert and Check Pins Test with Stepper Motor Lock/Unlock" timestamp="2026-04-21T14:13:47" tests="1" time="13.504" failures="1">
+    <testcase name="Invert and Check Pins Test with Stepper Motor Lock/Unlock Checks machine information, verifies pin inversion, and tests stepper motor lock/unlock" time="0.000" classname="Checks machine information, verifies pin inversion, and tests stepper motor lock/unlock">
+      <failure message="Timed out retrying after 10000ms: Expected to find element: `button.m-0`, but never found it." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 10000ms: Expected to find element: `button.m-0`, but never found it.
+    at Context.eval (webpack://gSender/./cypress/support/commands.js:68:9)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="gSender Movement tuning test" timestamp="2026-04-21T14:14:01" tests="1" time="12.903" failures="1">
+    <testcase name="gSender Movement tuning test Should complete movement tuning for x axis and y axis" time="0.000" classname="Should complete movement tuning for x axis and y axis">
+      <failure message="Timed out retrying after 10000ms: Expected to find element: `button.m-0`, but never found it." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 10000ms: Expected to find element: `button.m-0`, but never found it.
+    at Context.eval (webpack://gSender/./cypress/support/commands.js:68:9)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="Rotary surfacing" timestamp="2026-04-21T14:14:13" tests="1" time="33.795" failures="1">
+    <testcase name="Rotary surfacing Rotary surfacing" time="0.000" classname="Rotary surfacing">
+      <failure message="Timed out retrying after 30000ms: Expected to find content: &apos;/^Idle$/i&apos; but never did." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 30000ms: Expected to find content: '/^Idle$/i' but never did.
+    at Context.eval (webpack://gSender/./cypress/support/commands.js:87:5)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="Spindle Configuration and Control Test - Decrease to 7500 RPM" timestamp="2026-04-21T14:14:47" tests="1" time="82.835" failures="0">
+    <testcase name="Spindle Configuration and Control Test - Decrease to 7500 RPM Connect, Configure Spindle, Upload File, Decrease to 7500 RPM, Reset, Increase to 24000 RPM, and Complete Job" time="82.604" classname="Connect, Configure Spindle, Upload File, Decrease to 7500 RPM, Reset, Increase to 24000 RPM, and Complete Job">
+    </testcase>
+  </testsuite>
+  <testsuite name="Surfacing Test" timestamp="2026-04-21T14:16:10" tests="1" time="71.807" failures="1">
+    <testcase name="Surfacing Test Should complete surfacing workflow successfully" time="0.000" classname="Should complete surfacing workflow successfully">
+      <failure message="Timed out retrying after 10000ms: Expected to find content: &apos;Job End&apos; within the selector: &apos;h2&apos; but never did." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 10000ms: Expected to find content: 'Job End' within the selector: 'h2' but never did.
+    at Context.eval (webpack://gSender/./cypress/e2e/grblHal/surfacing.cy.js:152:7)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="CNC Bit Position and Job Progress Tracking" timestamp="2026-04-21T14:17:22" tests="1" time="58.873" failures="0">
+    <testcase name="CNC Bit Position and Job Progress Tracking should connect, track bit positions, verify movement, and validate specific position values during job execution" time="58.480" classname="should connect, track bit positions, verify movement, and validate specific position values during job execution">
+    </testcase>
+  </testsuite>
+  <testsuite name="gSender XY Squaring Test" timestamp="2026-04-21T14:18:21" tests="1" time="74.702" failures="0">
+    <testcase name="gSender XY Squaring Test Should complete XY Squaring wizard with measurements and adjustments" time="74.363" classname="Should complete XY Squaring wizard with measurements and adjustments">
+    </testcase>
+  </testsuite>
+</testsuites>

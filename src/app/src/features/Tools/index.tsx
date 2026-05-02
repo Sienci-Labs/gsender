@@ -8,8 +8,11 @@ import Rotary from '../Rotary';
 import Macros from '../Macros';
 import { useWidgetState } from 'app/hooks/useWidgetState';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { ATCWidget } from 'app/features/ATC';
+import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import { RootState } from 'app/store/redux';
 
-interface TabItem {
+export interface TabItem {
     label: string;
     content: React.ComponentType<{ isActive: boolean }>;
 }
@@ -28,6 +31,10 @@ const tabs = [
         content: Spindle,
     },
     {
+        label: 'ATC',
+        content: ATCWidget,
+    },
+    {
         label: 'Coolant',
         content: Coolant,
     },
@@ -43,7 +50,13 @@ const tabs = [
 
 const Tools = () => {
     const rotary = useWidgetState('rotary');
-    const { spindleFunctions, coolantFunctions } = useWorkspaceState();
+    const { spindleFunctions, coolantFunctions, atcEnabled } =
+        useWorkspaceState();
+    const atcReport = useTypedSelector(
+        (state: RootState) => state.controller.settings.info?.NEWOPT?.ATC,
+    );
+
+    const atcEnabledOrCompiled = atcEnabled || atcReport === '1';
 
     const filteredTabs = tabs.filter((tab) => {
         if (tab.label === 'Rotary' && !rotary.tab.show) {
@@ -51,6 +64,9 @@ const Tools = () => {
         }
 
         if (tab.label === 'Spindle/Laser' && !spindleFunctions) {
+            return false;
+        }
+        if (tab.label === 'ATC' && !atcEnabledOrCompiled) {
             return false;
         }
 

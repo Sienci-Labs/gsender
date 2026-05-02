@@ -184,7 +184,17 @@ class SVGVisualizer extends Component {
     reloadGCode() {
         const { actions, state } = this.props;
         const { gcode } = state;
-        actions.loadGCode('', gcode.visualization);
+        const visualization = gcode.visualization;
+        const hasSVGPaths =
+            Array.isArray(visualization?.paths) &&
+            visualization.paths.length > 0;
+
+        if (!hasSVGPaths && gcode.content) {
+            this.reparseGCode();
+            return;
+        }
+
+        actions.loadGCode('', visualization);
     }
 
     async uploadGCodeFile(gcode) {

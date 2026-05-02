@@ -1,0 +1,91 @@
+{
+  "project": "gSender",
+  "team": "Sienci Labs QA",
+  "version": "1.6.0-Edge-5",
+  "lastUpdated": "2026-03-10",
+
+  "modules": [
+    {
+      "name": "Carve",
+      "color": "green",
+      "created": [
+        "Device Connection",
+        "Unlock Machine",
+        "Machine Information",
+        "Go To Location",
+        "Park",
+        "Zero Axes",
+        "Go to Axes 0",
+        "Home",
+        "Jog X Y Z A Axes Buttons",
+        "Jogging Presets",
+        "Jogging using Keyboard",
+        "Load File",
+        "File Information",
+        "Outline",
+        "Job Run",
+        "Pause",
+        "Stop",
+        "Start From Line",
+        "Feed Rate Control",
+        "Probing",
+        "Macros",
+        "Coolant",
+        "Rotary",
+        "Console"
+      ],
+      "pending": [
+        "View Notification",
+        "Wireless CNC Control",
+        "Editor",
+        "Spindle / Laser",
+        "Helper"
+      ]
+    },
+
+    {
+      "name": "Config",
+      "color": "purple",
+      "created": [
+        "Search",
+        "View Modified",
+        "gSender Preferences",
+        "All Config and EPROM Tab View",
+        "Firmware Import and Export",
+        "Reset Defaults Firmware and gSender",
+        "Update Change and Apply Settings"
+      ],
+      "pending": [
+        "Flash"
+      ]
+    },
+
+    {
+      "name": "Tools",
+      "color": "blue",
+      "created": [
+        "Surfacing",
+        "Rotary Surfacing",
+        "Keyboard Shortcuts",
+        "XY Squaring"
+      ],
+      "pending": [
+        "Game Pad",
+        "SD Card Manager",
+        "Accessory Installation"
+      ]
+    },
+
+    {
+      "name": "Stats",
+      "color": "orange",
+      "pending": [
+        "Overview",
+        "Jobs",
+        "Maintenance",
+        "Alarms",
+        "About"
+      ]
+    }
+  ]
+}

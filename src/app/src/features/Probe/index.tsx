@@ -23,6 +23,7 @@
 import get from 'lodash/get';
 import includes from 'lodash/includes';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { usePostHog } from '@posthog/react';
 // import Space from 'app/components/Space';
 import controller from 'app/lib/controller';
 import {
@@ -64,6 +65,7 @@ import { WidgetConfigProvider } from '../WidgetConfig/WidgetContextProvider';
 import { Workspace } from 'app/workspace/definitions';
 
 const ProbeWidget = () => {
+    const posthog = usePostHog();
     const {
         probePinStatus,
         distance,
@@ -128,6 +130,12 @@ const ProbeWidget = () => {
     const [retractionDistance, setRetractionDistance] = useState<number>(
         config.get('retractionDistance') || {},
     );
+    const [zRetractDistance, setZRetractDistance] = useState<number>(
+        config.get('zRetractNormal') || {},
+    );
+    const [zRetractDistanceAuto, setZRetractDistanceAuto] = useState<number>(
+        config.get('zRetractAuto') || {},
+    );
     const [zProbeDistance, setZProbeDistance] = useState<number>(
         config.get('zProbeDistance') || {},
     );
@@ -143,6 +151,9 @@ const ProbeWidget = () => {
     const [useSafeProbeOption, setUseSafeProbeOption] =
         useState<boolean>(false);
     const [selectedProbeCommand, setSelectedProbeCommand] = useState<number>(0);
+    const [touchplateTypeSwitcher, setTouchplateTypeSwitcher] = useState<boolean>(
+        config.get('touchplateTypeSwitcher')
+    );
     const [connectivityTest, setConnectivityTest] = useState<boolean>(
         config.get('connectivityTest'),
     );
@@ -247,6 +258,9 @@ const ProbeWidget = () => {
         changeProbeCommand: (value: string): void => {
             setProbeCommand(value);
         },
+        changeTouchPlateType: (value: TOUCHPLATE_TYPES_T): void => {
+            store.set('workspace.probeProfile.touchplateType', value);
+        },
         toggleUseTLO: (): void => {
             setUseTLO(!useTLO);
         },
@@ -261,6 +275,14 @@ const ProbeWidget = () => {
         handleRetractionDistanceChange: (event: Event): void => {
             const value = (event.target as HTMLTextAreaElement).value;
             setRetractionDistance(Number(value));
+        },
+        handleZRetractDistanceChange: (event: Event): void => {
+            const value = (event.target as HTMLTextAreaElement).value;
+            setZRetractDistance(Number(value));
+        },
+        handleZRetractDistanceAutoChange: (event: Event): void => {
+            const value = (event.target as HTMLTextAreaElement).value;
+            setZRetractDistanceAuto(Number(value));
         },
         handleProbeCommandChange: (index: number): void => {
             setUseSafeProbeOption(false);
@@ -362,6 +384,12 @@ const ProbeWidget = () => {
         },
         runProbeCommands: (commands: string[]): void => {
             controller.command('gcode:safe', commands, 'G21');
+            posthog?.capture('probe_run', {
+                probe_command_id: availableProbeCommands[selectedProbeCommand]?.id,
+                touchplate_type: touchplateType,
+                units,
+                firmware: type,
+            });
         },
         returnProbeConnectivity: (): boolean => {
             return probePinStatus;
@@ -438,6 +466,7 @@ const ProbeWidget = () => {
             feedrate,
             fastFeedrate,
             retractDistance,
+            zRetractNormal,
             tipDiameter,
             xyRetract;
         const modal = units === METRIC_UNITS ? '21' : '20';
@@ -447,6 +476,7 @@ const ProbeWidget = () => {
             feedrate = probeFeedrate;
             fastFeedrate = probeFastFeedrate;
             retractDistance = retractionDistance;
+            zRetractNormal = zRetractDistance;
             tipDiameter = tipDiameter3D;
             xyRetract = xyRetract3D;
         } else {
@@ -462,6 +492,7 @@ const ProbeWidget = () => {
             feedrate = convertToImperial(probeFeedrate);
             fastFeedrate = convertToImperial(probeFastFeedrate);
             retractDistance = convertToImperial(retractionDistance);
+            zRetractNormal = convertToImperial(zRetractDistance);
             tipDiameter = convertToImperial(tipDiameter3D);
             xyRetract = convertToImperial(xyRetract3D);
         }
@@ -473,6 +504,8 @@ const ProbeWidget = () => {
             probeSlow: feedrate,
             units,
             retract: retractDistance,
+            zRetractNormal,
+            zRetractAuto: zRetractDistanceAuto,
             toolDiameter,
             zThickness,
             xyThickness,
@@ -548,6 +581,7 @@ const ProbeWidget = () => {
                 store.get('workspace.probeProfile.touchplateType'),
             );
             setTouchplate(store.get('workspace.probeProfile', {}));
+            setTouchplateTypeSwitcher(config.get('touchplateTypeSwitcher'));
             setProbeCommand(config.get('probeCommand', 'G38.2'));
             setUseTLO(config.get('useTLO'));
             setProbeDepth(config.get('probeDepth') || {});
@@ -559,6 +593,8 @@ const ProbeWidget = () => {
             setTipDiameter3D(config.get('tipDiameter3D', 0));
             setXYRetract3D(config.get('xyRetract3D', 10));
             setConnectivityTest(config.get('connectivityTest'));
+            setZRetractDistance(config.get('zRetractNormal'));
+            setZRetractDistanceAuto(config.get('zRetractAuto'));
 
             let newZProbeDistance = config.get('zProbeDistance');
             if (newZProbeDistance) {
@@ -578,6 +614,7 @@ const ProbeWidget = () => {
         availableProbeCommands: availableProbeCommands,
         selectedProbeCommand: selectedProbeCommand,
         touchplate: touchplate,
+        touchplateTypeSwitcher: touchplateTypeSwitcher,
         toolDiameter: toolDiameter,
         availableTools: availableTools,
         units: units,

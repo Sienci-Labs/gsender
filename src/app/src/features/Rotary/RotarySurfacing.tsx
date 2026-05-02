@@ -342,7 +342,7 @@ const RotarySurfacing = () => {
                                     />
                                 </div>
                             </Tooltip>
-                            <div className="flex flex-col gap-2 w-full col-span-2 text-xs xl:text-sm text-gray-500 mt-3">
+                            <div className="flex flex-col gap-2 w-full col-span-2 text-xs xl:text-sm text-gray-500">
                                 Cut faster and cleaner by only rotating one
                                 direction, but you will need to rehome your
                                 A-axis at the end.
@@ -374,7 +374,7 @@ const RotarySurfacing = () => {
                                 </TabsTrigger>
                             </TabsList>
                         </Tabs>
-                        <div className="relative w-[calc(100vw/2] h-[calc(100vh-224px-40px)]">
+                        <div className="relative w-full h-full">
                             <div
                                 className={cx(
                                     'absolute w-full h-full top-0 left-0 rounded-md',

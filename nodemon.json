@@ -1,0 +1,21 @@
+{
+  "watch": [
+    "output/server-cli.js",
+    "output/server/**/*"
+  ],
+  "ignore": [
+    "output/app/**/*",
+    "node_modules/**/*",
+    "**/*.test.js",
+    "**/*.spec.js"
+  ],
+  "delay": 500,
+  "verbose": false,
+  "execMap": {
+    "js": "node"
+  },
+  "env": {
+    "NODE_ENV": "development"
+  }
+}
+

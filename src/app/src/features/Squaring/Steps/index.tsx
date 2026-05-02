@@ -87,7 +87,7 @@ const Steps = () => {
                         </p>
 
                         <div className="flex justify-center items-center">
-                            <div className="w-full max-w-96 -mt-4">
+                            <div className="w-full max-w-96">
                                 <Jogging />
                             </div>
                         </div>

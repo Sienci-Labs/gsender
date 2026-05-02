@@ -1,14 +1,16 @@
 import { NumberSettingInput } from 'app/features/Config/components/SettingInputs/NumberSettingInput.tsx';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
+import { isEmpty } from 'lodash';
 import { useEffect, useState } from 'react';
 
 export interface HybridNumberInputProps {
     unit?: string;
     value: number;
     index: number;
-    subIndex: number;
+    subIndex?: number;
     eepromKey: string;
     forceEEPROM?: boolean;
+    onChange?: (v: any) => void;
 }
 
 export function HybridNumber({
@@ -20,24 +22,33 @@ export function HybridNumber({
 }: HybridNumberInputProps) {
     const { firmwareType, connected, EEPROM, setEEPROM, setSettingsAreDirty } =
         useSettings();
-    const [eepromObject, setEEPROMObject] = useState({});
-
     const useEEPROM =
         (connected && firmwareType === 'grblHAL') || (connected && forceEEPROM);
 
-    useEffect(() => {
+    const updateEEPROMObject = () => {
         let eepromValue = EEPROM.filter((o) => o.setting === eepromKey)[0];
         if (eepromValue && useEEPROM) {
             value = Number(eepromValue.value);
-            setEEPROMObject(eepromValue);
+            return eepromValue;
         }
+    };
+
+    const [eepromObject, setEEPROMObject] = useState(updateEEPROMObject());
+
+    useEffect(() => {
+        setEEPROMObject(updateEEPROMObject);
     }, [EEPROM]);
 
     function hybridOnChange(v) {
-        if (useEEPROM) {
-            const payload = { ...eepromObject, value: v, dirty: true };
+        // if it's empty, then the value isnt reported in eeprom. so dont try to change the eeprom
+        if (useEEPROM && !isEmpty(eepromObject)) {
+            let payload = { ...eepromObject, value: v, dirty: true };
             setEEPROM((prev) => {
                 const updated = [...prev];
+                // save the value from before we started editing
+                if (!payload.ogValue) {
+                    payload.ogValue = prev[payload.globalIndex].value;
+                }
                 updated[payload.globalIndex] = payload;
                 return updated;
             });
@@ -45,10 +56,12 @@ export function HybridNumber({
         } else {
             onChange(v);
         }
+        // since hybrids are always referencing the settings values, we always have to update that as well
+        /*onChange(v);*/
     }
 
     // If we're connected and using SLB we use the EEPROM value
-    if (useEEPROM) {
+    if (useEEPROM && !isEmpty(eepromObject)) {
         value = eepromObject.value;
     }
 

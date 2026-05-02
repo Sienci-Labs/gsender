@@ -30,6 +30,12 @@ interface MacroFormProps {
         description: string;
     }) => void;
     onCancel: () => void;
+    title: string;
+    dialogDescription?: string;
+    showNameField?: boolean;
+    showDescriptionField?: boolean;
+    submitLabel: string;
+    allowEmptyContent?: boolean;
 }
 
 interface MacroState {
@@ -50,6 +56,12 @@ const MacroForm = ({
     macroDescription = '',
     onSubmit,
     onCancel,
+    title,
+    dialogDescription,
+    showNameField = true,
+    showDescriptionField = true,
+    submitLabel,
+    allowEmptyContent = false,
 }: MacroFormProps) => {
     const [macroState, setMacroState] = useState<MacroState>({
         name: macroName,
@@ -70,7 +82,10 @@ const MacroForm = ({
 
     const validateForm = (): boolean => {
         const { name, content } = macroState;
-        return name.trim() !== '' && content.trim() !== '';
+        return (
+            (showNameField ? name.trim() !== '' : true) &&
+            (allowEmptyContent || content.trim() !== '')
+        );
     };
 
     const options = MACRO_VARIABLES.reduce((acc: any[], v: any) => {
@@ -107,27 +122,26 @@ const MacroForm = ({
                     }}
                 >
                     <DialogHeader>
-                        <DialogTitle>
-                            {id ? 'Edit Macro' : 'Add Macro'}
-                        </DialogTitle>
+                        <DialogTitle>{title}</DialogTitle>
                     </DialogHeader>
-                    <DialogDescription className="mt-1 text-sm text-gray-500">
-                        Macros are a way to store and reuse commands. They can
-                        be used to speed up repetitive tasks and make your CNC
-                        more efficient.
+                    <DialogDescription className="mt-1 mb-4 text-sm text-gray-500">
+                        {dialogDescription ??
+                            'Macros are a way to store and reuse commands. They can be used to speed up repetitive tasks and make your CNC more efficient.'}
                     </DialogDescription>
-                    <div className="flex flex-col gap-2 my-4">
-                        <label>Name</label>
-                        <Input
-                            ref={nameRef}
-                            maxLength={MAX_CHARACTERS}
-                            type="text"
-                            name="name"
-                            value={macroState.name}
-                            onChange={handleInputChange}
-                            required
-                        />
-                    </div>
+                    {showNameField && (
+                        <div className="flex flex-col gap-2 mb-4">
+                            <label>Name</label>
+                            <Input
+                                ref={nameRef}
+                                maxLength={MAX_CHARACTERS}
+                                type="text"
+                                name="name"
+                                value={macroState.name}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
+                    )}
                     <div className="flex flex-col gap-2 mb-4">
                         <div className="flex flex-row gap-2 items-center justify-between">
                             <label>G-code</label>
@@ -205,19 +219,21 @@ const MacroForm = ({
                             />
                         </Tooltip>
                     </div>
-                    <div className="flex flex-col gap-2 mb-4">
-                        <label>Macro Description</label>
-                        <textarea
-                            ref={descriptionRef}
-                            rows={4}
-                            maxLength={MAX_CHARACTERS}
-                            className="border border-gray-300 rounded-md p-2 dark:text-white dark:bg-dark dark:border-gray-500"
-                            name="description"
-                            value={macroState.description}
-                            onChange={handleInputChange}
-                            title=""
-                        />
-                    </div>
+                    {showDescriptionField && (
+                        <div className="flex flex-col gap-2 mb-4">
+                            <label>Macro Description</label>
+                            <textarea
+                                ref={descriptionRef}
+                                rows={4}
+                                maxLength={MAX_CHARACTERS}
+                                className="border border-gray-300 rounded-md p-2 dark:text-white dark:bg-dark dark:border-gray-500"
+                                name="description"
+                                value={macroState.description}
+                                onChange={handleInputChange}
+                                title=""
+                            />
+                        </div>
+                    )}
                     <DialogFooter>
                         <Button
                             color="primary"
@@ -233,8 +249,9 @@ const MacroForm = ({
                                     });
                                 }
                             }}
+                            data-testid="add-macro-button"
                         >
-                            {id ? 'Update Macro' : 'Add New Macro'}
+                            {submitLabel}
                         </Button>
                         <Button onClick={onCancel}>Cancel</Button>
                     </DialogFooter>

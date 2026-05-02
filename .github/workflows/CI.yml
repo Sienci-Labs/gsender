@@ -13,59 +13,28 @@ on:
   pull_request:
     branches: [ "master" ]
 
+env:
+  GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
+  NODE_OPTIONS: --max-old-space-size=8192
+
 jobs:
   build-linux:
     name: Build Linux packages
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [20.x]
-    env:
-      GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
-      NODE_OPTIONS: --max-old-space-size=8192
+    environment: CI
     permissions:
       contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: Environment variables
-        run: |
-          # https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables
-          echo "• GITHUB_REF_NAME=$GITHUB_REF_NAME"
-          echo "• GITHUB_REF_TYPE=$GITHUB_REF_TYPE" # `branch` or `tag`
-          echo "• GITHUB_RUN_NUMBER=$GITHUB_RUN_NUMBER"
-          echo "• GITHUB_SHA=$GITHUB_SHA"
-          echo "• RUNNER_ARCH=$RUNNER_ARCH"
-          echo "• RUNNER_NAME=$RUNNER_NAME"
-          echo "• RUNNER_OS=$RUNNER_OS"
-          echo "• RUNNER_TEMP=$RUNNER_TEMP"
-          echo "• RUNNER_TOOL_CACHE=$RUNNER_TOOL_CACHE"
-      - name: Install Yarn package manager
-        run: |
-          npm install -g yarn
-          yarn global add node-gyp
-      - name: Install necessary dependencies and perform initial checks
-        run: |
-          yarn install
-          yarn lint
-      - name: Run "build" script
-        if: github.ref_type == 'tag'
-        run: yarn run build
-      - name: Run "build-latest" script
-        if: github.ref_type == 'branch'
-        run: yarn run build-latest
+      - name: Setup and build
+        uses: ./.github/actions/setup-build
       - name: Build Linux binaries
-        run: |
-          yarn run build:linux
+        run: yarn run build:linux
       - name: Prepare release assets
         shell: bash
         run: |
           GIT_COMMIT_LOG=`git log -1 --format='%ci %H %s'`
-          PRODUCT_NAME=gSender
           PACKAGE_NAME=`node -e "console.log(require('./src/package.json').name)"`
           PACKAGE_VERSION=`node -e "console.log(require('./src/package.json').version)"`
           mkdir -p releases/linux
@@ -90,80 +59,46 @@ jobs:
               --body="${GIT_COMMIT_LOG}" \
               releases/linux/*;
           fi
-      #- name: Upload release assets
-      #  uses: actions/github-script@v6
-      #  with:
-      #    github-token: ${{ secrets.GITHUB_TOKEN }}
-      #    script: |
-      #      // https://github.com/actions/upload-release-asset/issues/47#issuecomment-659071145
-      #      console.log('environment:', process.versions);
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: |
-            releases/linux/*
+          files: releases/linux/*
           prerelease: true
           draft: true
+
   build-macos:
     name: Build macOS packages
+    environment: CI
     runs-on: macos-latest
-    strategy:
-      matrix:
-        node-version: [20.x]
     env:
-      GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
-      NODE_OPTIONS: --max-old-space-size=8192
+      GH_TOKEN: ${{ secrets.CI_TOKEN }}
+      APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+      CSC_LINK: ${{ secrets.CSC_LINK }}
     permissions:
       contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: Environment variables
-        run: |
-          # https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables
-          echo "• GITHUB_REF_NAME=$GITHUB_REF_NAME"
-          echo "• GITHUB_REF_TYPE=$GITHUB_REF_TYPE" # `branch` or `tag`
-          echo "• GITHUB_RUN_NUMBER=$GITHUB_RUN_NUMBER"
-          echo "• GITHUB_SHA=$GITHUB_SHA"
-          echo "• RUNNER_ARCH=$RUNNER_ARCH"
-          echo "• RUNNER_NAME=$RUNNER_NAME"
-          echo "• RUNNER_OS=$RUNNER_OS"
-          echo "• RUNNER_TEMP=$RUNNER_TEMP"
-          echo "• RUNNER_TOOL_CACHE=$RUNNER_TOOL_CACHE"
-      - name: Install Yarn package manager and Node Gyp
-        run: |
-          npm install -g yarn
-          yarn global add node-gyp
       - name: Pip setuptools
-        run: |
-          sudo -H pip install setuptools
-      - name: Install necessary dependencies and perform initial checks
-        run: |
-          yarn install
-          yarn lint
-      - name: Run "build" script
-        if: github.ref_type == 'tag'
-        run: yarn run build
-      - name: Run "build-latest" script
-        if: github.ref_type == 'branch'
-        run: yarn run build-latest
+        run: sudo -H pip install setuptools
+      - name: Setup and build
+        uses: ./.github/actions/setup-build
       - name: Build macOS binaries
         run: yarn run build:macos
       - name: Prepare release assets
         shell: bash
         run: |
           GIT_COMMIT_LOG=`git log -1 --format='%ci %H %s'`
-          PRODUCT_NAME=gSender
           PACKAGE_NAME=`node -e "console.log(require('./src/package.json').name)"`
           PACKAGE_VERSION=`node -e "console.log(require('./src/package.json').version)"`
           mkdir -p releases/macos
           ls -al output
           cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-x64.dmg" "releases/macos/gSender-${PACKAGE_VERSION}-Mac-Universal.dmg"
+          cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-arm64.dmg" "releases/macos/gSender-${PACKAGE_VERSION}-Mac-Silicon.dmg"
           ls -al output releases/macos
           if [[ "$GITHUB_REF_TYPE" == "branch" && "$GITHUB_REF_NAME" == "master" ]]; then
             yarn github-release delete \
@@ -180,19 +115,11 @@ jobs:
               --body="${GIT_COMMIT_LOG}" \
               releases/macos/*;
           fi
-      #- name: Upload release assets
-      #  uses: actions/github-script@v6
-      #  with:
-      #    github-token: ${{ secrets.GITHUB_TOKEN }}
-      #    script: |
-      #      // https://github.com/actions/upload-release-asset/issues/47#issuecomment-659071145
-      #      console.log('environment:', process.versions);
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: |
-            releases/macos/*
+          files: releases/macos/*
           prerelease: true
           draft: true
       - name: Upload Mac Artifacts
@@ -202,15 +129,11 @@ jobs:
           path: releases/macos/*.dmg
           compression-level: 0 # no compression
           retention-days: 2
+
   build-windows:
     name: Build Windows packages
+    environment: CI
     runs-on: windows-latest
-    strategy:
-      matrix:
-        node-version: [20.x]
-    env:
-      GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
-      NODE_OPTIONS: --max-old-space-size=8192
     permissions:
       contents: write
     steps:
@@ -218,42 +141,64 @@ jobs:
         run: choco install -y vcredist2017
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: Environment variables
+      - name: Write client auth certificate
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: pwsh
         run: |
-          # https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables
-          echo "• GITHUB_REF_NAME=$GITHUB_REF_NAME"
-          echo "• GITHUB_REF_TYPE=$GITHUB_REF_TYPE" # `branch` or `tag`
-          echo "• GITHUB_RUN_NUMBER=$GITHUB_RUN_NUMBER"
-          echo "• GITHUB_SHA=$GITHUB_SHA"
-          echo "• RUNNER_ARCH=$RUNNER_ARCH"
-          echo "• RUNNER_NAME=$RUNNER_NAME"
-          echo "• RUNNER_OS=$RUNNER_OS"
-          echo "• RUNNER_TEMP=$RUNNER_TEMP"
-          echo "• RUNNER_TOOL_CACHE=$RUNNER_TOOL_CACHE"
-      - name: Install Yarn package manager and Node Gyp
+          $b64 = "${{ secrets.SM_CLIENT_CERT_FILE_BASE64 }}" -replace '\s', ''
+          $certBytes = [Convert]::FromBase64String($b64)
+          $certPath = "${{ github.workspace }}\sm_client_cert.p12"
+          [IO.File]::WriteAllBytes($certPath, $certBytes)
+          echo "SM_CLIENT_CERT_FILE=$certPath" | Out-File -Append -FilePath $env:GITHUB_ENV -Encoding utf8
+      - name: Set up DigiCert SM Tools
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: pwsh
+        env:
+          SM_API_KEY: ${{ secrets.SM_API_KEY }}
+          SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD }}
+          SM_HOST: ${{ secrets.SM_HOST }}
         run: |
-          npm install -g yarn
-          yarn global add node-gyp
-      - name: Install necessary dependencies and perform initial checks
+          curl -X GET "https://one.digicert.com/signingmanager/api-ui/v1/releases/smtools-windows-x64.msi/download" `
+            -H "x-api-key:$env:SM_API_KEY" -o smtools.msi
+          $msiPath = (Resolve-Path smtools.msi).Path
+          $proc = Start-Process msiexec -ArgumentList "/i `"$msiPath`" /quiet /qn" -Wait -PassThru
+          if ($proc.ExitCode -ne 0) { throw "msiexec failed with exit code $($proc.ExitCode)" }
+          $smctl = Get-ChildItem "C:\Program Files", "C:\Program Files (x86)" -Recurse -Filter "smctl.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $smctl) { throw "smctl.exe not found after install" }
+          $klPath = $smctl.DirectoryName
+          Write-Host "smctl found at: $klPath"
+          echo $klPath | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
+          Set-Content -Path "C:\Windows\System32\pkcs11properties.cfg" -Value "curl_path=$klPath"
+          [System.Environment]::SetEnvironmentVariable("SM_API_KEY",              $env:SM_API_KEY,              "Machine")
+          [System.Environment]::SetEnvironmentVariable("SM_CLIENT_CERT_FILE",     $env:SM_CLIENT_CERT_FILE,     "Machine")
+          [System.Environment]::SetEnvironmentVariable("SM_CLIENT_CERT_PASSWORD", $env:SM_CLIENT_CERT_PASSWORD, "Machine")
+          [System.Environment]::SetEnvironmentVariable("SM_HOST",                 $env:SM_HOST,                 "Machine")
+          & $smctl.FullName healthcheck
+          & $smctl.FullName creds save $env:SM_API_KEY $env:SM_CLIENT_CERT_PASSWORD
+          & $smctl.FullName windows certsync --keypair-alias="${{ secrets.SM_KEYPAIR_ALIAS }}"
+      - name: Add signtool to PATH
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: pwsh
         run: |
-          yarn install
-      - name: Run "build-latest" script
-        if: github.ref_type == 'tag'
-        run: yarn run build
-      - name: Run "build-latest" script
-        if: github.ref_type == 'branch'
-        run: yarn run build-latest
+          $signtool = Get-ChildItem -Path "${env:ProgramFiles(x86)}\Windows Kits\10\bin" -Recurse -Filter "signtool.exe" |
+            Where-Object { $_.FullName -match "x64" } |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1
+          if (-not $signtool) { throw "signtool.exe not found in Windows SDK" }
+          $signtool.DirectoryName | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
+      - name: Setup and build
+        uses: ./.github/actions/setup-build
       - name: Build Windows binaries
+        env:
+          SM_API_KEY: ${{ startsWith(github.ref, 'refs/tags/') && secrets.SM_API_KEY || '' }}
+          SM_CLIENT_CERT_PASSWORD: ${{ startsWith(github.ref, 'refs/tags/') && secrets.SM_CLIENT_CERT_PASSWORD || '' }}
+          SM_HOST: ${{ startsWith(github.ref, 'refs/tags/') && secrets.SM_HOST || '' }}
+          SM_KEYPAIR_ALIAS: ${{ startsWith(github.ref, 'refs/tags/') && secrets.SM_KEYPAIR_ALIAS || '' }}
         run: yarn run build:windows
       - name: Prepare release assets
         shell: bash
         run: |
           GIT_COMMIT_LOG=`git log -1 --format='%ci %H %s'`
-          PRODUCT_NAME=gSender
           PACKAGE_NAME=`node -e "console.log(require('./src/package.json').name)"`
           PACKAGE_VERSION=`node -e "console.log(require('./src/package.json').version)"`
           mkdir -p releases/windows
@@ -279,8 +224,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: |
-            releases/windows/*
+          files: releases/windows/*
           prerelease: true
           draft: true
       - name: Upload Windows Artifacts
@@ -290,13 +234,12 @@ jobs:
           path: releases/windows/*.exe
           compression-level: 0 # no compression
           retention-days: 2
-
   build-pi:
     name: Build Raspberry PI packages
     runs-on: ubuntu-24.04-arm
+    environment: CI
     env:
-      GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
-      NODE_OPTIONS: --max-old-space-size=8192
+      GH_TOKEN: ${{ secrets.CI_TOKEN }}
     permissions:
       contents: write
     steps:

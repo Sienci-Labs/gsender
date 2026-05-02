@@ -170,7 +170,11 @@ const ProfileModal = () => {
                     <Button
                         variant="primary"
                         disabled={availabilityType !== AVAILABLE}
-                        onClick={handleAddProfile}
+                        onClick={() => {
+                            if (inputRef.current?.value.trim() !== '') {
+                                handleAddProfile();
+                            }
+                        }}
                         className="w-full"
                     >
                         Add New Profile

@@ -42,10 +42,16 @@ const ProfileItem = ({ title, icon, id }) => {
                 onClick={() => setCurrentProfile(id)}
             />
             <FaTimes
-                tabIndex={-1}
+                tabIndex={0}
                 role="button"
                 onClick={(e) => handleDelete(e)}
-                onKeyDown={null}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleDelete(e);
+                    }
+                }}
+                aria-label={`Delete gamepad profile ${title}`}
                 className="text-red-500 cursor-pointer hover:text-red-700 absolute top-2 right-2 z-10"
             />
         </div>

@@ -34,7 +34,7 @@ const Size = () => {
     };
 
     return (
-        <table className="border-collapse border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-300">
+        <table className="border-collapse border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-300 max-xl:leading-[1.3]">
             <thead>
                 <tr>
                     <th className="border border-gray-300 px-1"></th>

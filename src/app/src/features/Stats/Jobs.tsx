@@ -7,9 +7,11 @@ import {
     StatContext,
 } from 'app/features/Stats/utils/StatContext.tsx';
 import { GRBL, JOB_STATUS, JOB_TYPES } from 'app/constants';
-import Icon from '@mdi/react';
-import { mdiCheckBold, mdiClose } from '@mdi/js';
+import { CheckCircle, XCircle } from 'lucide-react';
 import { CardHeader } from 'app/features/Stats/components/CardHeader.tsx';
+import { Button } from 'app/components/Button';
+import { FaTrash } from 'react-icons/fa';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 
 import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
 import { JobsPerComPort } from 'app/features/Stats/components/JobsPerComPort.tsx';
@@ -59,16 +61,13 @@ const columnData: CustomColumnDef<Job, any>[] = [
     {
         accessorKey: 'startTime',
         header: () => 'Start Time',
-        cell: (info: { renderValue: () => Date }) => {
-            const [yyyy, mm, dd, hh, mi, _ss] = info
-                .renderValue()
-                .toString()
-                .split(/[:\-T.]+/);
+        cell: (info: { renderValue: () => string }) => {
+            const dateString = new Date(info.renderValue()).toLocaleString(
+                'en-US',
+            );
             return (
                 <>
-                    <div>
-                        {hh}:{mi} {dd}/{mm}/{yyyy}
-                    </div>
+                    <div>{dateString}</div>
                 </>
             );
         },
@@ -78,10 +77,14 @@ const columnData: CustomColumnDef<Job, any>[] = [
         accessorKey: 'jobStatus',
         header: () => 'Status',
         cell: (info: { renderValue: () => JOB_STATUS_T }) => {
-            return info.renderValue() === JOB_STATUS.COMPLETE ? (
-                <Icon path={mdiCheckBold} size={1} />
-            ) : (
-                <Icon path={mdiClose} size={1} />
+            return (
+                <div className="flex items-center justify-center">
+                    {info.renderValue() === JOB_STATUS.COMPLETE ? (
+                        <CheckCircle size={24} color="green" />
+                    ) : (
+                        <XCircle size={24} color="red" />
+                    )}
+                </div>
             );
         },
         size: 20,
@@ -89,12 +92,36 @@ const columnData: CustomColumnDef<Job, any>[] = [
 ];
 
 export function Jobs() {
-    const { jobs } = useContext(StatContext);
+    const { jobs, clearJobHistory } = useContext(StatContext);
+
+    function onClearJobHistory() {
+        Confirm({
+            title: 'Delete Job History',
+            content: 'Are you sure you want to delete all job history?',
+            confirmLabel: 'Confirm',
+            cancelLabel: 'Cancel',
+            onConfirm: async () => {
+                await clearJobHistory?.();
+            },
+        });
+    }
+
     return (
         <div className="grid grid-cols-6 grid-rows-6 gap-2 w-full h-full overflow-y-auto">
-            <div className="col-span-4 row-span-6 px-8 max-xl:px-0 mb-2">
+            <div className="col-span-4 row-span-6 pr-8 max-xl:pr-0">
                 <StatCard>
-                    <CardHeader>Job History</CardHeader>
+                    <div className="flex items-center justify-between gap-2">
+                        <CardHeader>Job History</CardHeader>
+                        <Button
+                            icon={
+                                <FaTrash className="text-gray-600 w-4 h-4 dark:text-gray-200" />
+                            }
+                            onClick={onClearJobHistory}
+                            text="Clear"
+                            size="sm"
+                            className="text-gray-600"
+                        />
+                    </div>
                     <div className="w-full flex flex-col">
                         <SortableTable
                             defaultData={defaultData}
@@ -106,7 +133,7 @@ export function Jobs() {
                     </div>
                 </StatCard>
             </div>
-            <div className="col-span-2 row-span-6 col-start-5 px-8 max-xl:px-0 flex flex-col gap-4 justify-center items-center">
+            <div className="col-span-2 row-span-6 col-start-5 pl-8 max-xl:pl-0 flex flex-col gap-2 justify-center items-center">
                 <div className="flex flex-col bg-white border border-gray-300 rounded p-2 h-full dark:bg-dark dark:border-dark-lighter w-full justify-center items-center">
                     <CardHeader>Jobs per CNC</CardHeader>
                     <JobsPerComPort />

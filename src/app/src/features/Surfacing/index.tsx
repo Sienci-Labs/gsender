@@ -138,12 +138,13 @@ const SurfacingTool = () => {
                   skimDepth: convertToImperial(defaultSurfacingState.skimDepth),
                   maxDepth: convertToImperial(defaultSurfacingState.maxDepth),
               };
+    const xyMin = units === IMPERIAL_UNITS ? convertToImperial(1) : 1;
 
     return (
         <>
             <div className="bg-white dark:bg-transparent dark:text-white w-full flex flex-col gap-2">
                 <div className="grid grid-cols-2 gap-4">
-                    <div className="grid gap-4 xl:gap-2">
+                    <div className="grid gap-4 max-xl:gap-3 xl:gap-2">
                         <p className="text-sm xl:text-base font-normal text-gray-500 dark:text-gray-300">
                             <b>For ideal wasteboard surfacing:</b> know your
                             CNCs exact movement limits accounting for limit
@@ -172,7 +173,7 @@ const SurfacingTool = () => {
                                         type="number"
                                         id="width"
                                         suffix={units}
-                                        min={1}
+                                        min={xyMin}
                                         max={50000}
                                         className={inputStyle}
                                         wrapperClassName="w-full"
@@ -196,7 +197,7 @@ const SurfacingTool = () => {
                                         type="number"
                                         id="length"
                                         suffix={units}
-                                        min={1}
+                                        min={xyMin}
                                         max={50000}
                                         className={inputStyle}
                                         wrapperClassName="w-full"
@@ -370,6 +371,7 @@ const SurfacingTool = () => {
                                                         checked as boolean,
                                                 });
                                             }}
+                                            aria-label="Toggle spindle delay"
                                         />
                                     </div>
                                 </Tooltip>
@@ -393,6 +395,7 @@ const SurfacingTool = () => {
                                             }
                                             checked={surfacing.mist ?? false}
                                             className="h-20"
+                                            aria-label="Toggle Mist coolant"
                                         />
                                     </div>
                                 </Tooltip>
@@ -412,6 +415,7 @@ const SurfacingTool = () => {
                                             }
                                             checked={surfacing.flood ?? false}
                                             className="h-20"
+                                            aria-label="Toggle Flood coolant"
                                         />
                                     </div>
                                 </Tooltip>
@@ -432,6 +436,7 @@ const SurfacingTool = () => {
                                     value="gcode-viewer"
                                     className="w-full"
                                     onClick={() => setTabSwitch(true)}
+                                    disabled={!gcode}
                                 >
                                     G-Code{' '}
                                     {gcode.length !== 0 ? (
@@ -442,7 +447,7 @@ const SurfacingTool = () => {
                                 </TabsTrigger>
                             </TabsList>
                         </Tabs>
-                        <div className="relative w-[calc(100vw/2] h-[calc(100vh-224px-40px)]">
+                        <div className="relative w-full h-full">
                             <div
                                 className={cx(
                                     'absolute w-full h-full top-0 left-0 rounded-md',

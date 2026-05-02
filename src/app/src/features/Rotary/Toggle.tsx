@@ -32,6 +32,7 @@ const Toggle = () => {
                         checked={mode === WORKSPACE_MODE.ROTARY}
                         onChange={handleToggle}
                         disabled={!connected}
+                        aria-label="Toggle Rotary mode"
                     />
                 </div>
             </Tooltip>

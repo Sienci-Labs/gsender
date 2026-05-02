@@ -125,6 +125,7 @@ const ButtonActionsTable = () => {
                         onBlur={(e) =>
                             handleButtonLabelChange(row.value, e.target.value)
                         }
+                        aria-label={`Label for button ${row.value}`}
                     />
                 );
             }
@@ -136,6 +137,7 @@ const ButtonActionsTable = () => {
                     onBlur={(e) =>
                         handleButtonLabelChange(row.value, e.target.value)
                     }
+                    aria-label={`Label for button ${row.value}`}
                 />
             );
         },
@@ -145,14 +147,18 @@ const ButtonActionsTable = () => {
                     <div className="flex items-center justify-center p-2 border border-dashed border-gray-300 rounded">
                         <FaPlus
                             role="button"
-                            tabIndex={-1}
+                            tabIndex={0}
                             className="text-blue-500 cursor-pointer"
+                            aria-label={`Add action to button ${value}`}
                             onClick={() =>
                                 handleOpenSetShortcutModal(value, type)
                             }
-                            onKeyDown={() =>
-                                handleOpenSetShortcutModal(value, type)
-                            }
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    handleOpenSetShortcutModal(value, type);
+                                }
+                            }}
                         />
                     </div>
                 );
@@ -171,25 +177,33 @@ const ButtonActionsTable = () => {
                     <div className="flex space-x-2">
                         <FaEdit
                             role="button"
-                            tabIndex={-1}
+                            tabIndex={0}
                             className="text-blue-500 w-5 cursor-pointer"
+                            aria-label={`Edit action for button ${value}`}
                             onClick={() =>
                                 handleOpenSetShortcutModal(value, type)
                             }
-                            onKeyDown={() =>
-                                handleOpenSetShortcutModal(value, type)
-                            }
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    handleOpenSetShortcutModal(value, type);
+                                }
+                            }}
                         />
                         <FaTrash
                             role="button"
-                            tabIndex={-1}
+                            tabIndex={0}
                             className="text-red-500 w-5 cursor-pointer"
+                            aria-label={`Remove action for button ${value}`}
                             onClick={() =>
                                 handleRemoveButtonAction(value, type)
                             }
-                            onKeyDown={() =>
-                                handleRemoveButtonAction(value, type)
-                            }
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    handleRemoveButtonAction(value, type);
+                                }
+                            }}
                         />
                     </div>
                 </div>
@@ -211,10 +225,16 @@ const ButtonActionsTable = () => {
                     <div>Lockout</div>
                     <FaTrash
                         role="button"
-                        tabIndex={-1}
+                        tabIndex={0}
                         className="text-red-500 w-5 cursor-pointer"
+                        aria-label="Remove lockout button"
                         onClick={() => handleRemoveLockoutButton()}
-                        onKeyDown={() => handleRemoveLockoutButton()}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                handleRemoveLockoutButton();
+                            }
+                        }}
                     />
                 </div>
             );
@@ -225,10 +245,16 @@ const ButtonActionsTable = () => {
                     <div className="dark:text-white">Activate 2nd Actions</div>
                     <FaTrash
                         role="button"
-                        tabIndex={-1}
+                        tabIndex={0}
                         className="text-red-500 w-5 cursor-pointer"
+                        aria-label="Remove 2nd action button"
                         onClick={() => handleRemoveModifierButton()}
-                        onKeyDown={() => handleRemoveModifierButton()}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                handleRemoveModifierButton();
+                            }
+                        }}
                     />
                 </div>
             );

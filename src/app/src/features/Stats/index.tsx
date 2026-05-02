@@ -15,20 +15,22 @@ import { StatTable } from 'app/features/Stats/components/StatTable.tsx';
 export function Stats() {
     return (
         <div className="fixed-content-area overflow-y-auto">
-            <div className="grid grid-cols-6 grid-rows-6 gap-4">
+            <div className="grid grid-cols-6 grid-rows-6 gap-4 mr-5">
                 <div
                     id="mainStats"
-                    className="col-span-4 max-xl:col-span-6 row-span-6 px-8 mb-2 gap-4 flex flex-col"
+                    className="col-span-4 max-xl:col-span-6 row-span-6 pr-8 max-xl:pr-0 mb-2 gap-4 flex flex-col"
                 >
-                    <h1 className="text-3xl font-bold dark:text-white">Your Machine</h1>
+                    <h1 className="text-3xl font-bold dark:text-white">
+                        Your Machine
+                    </h1>
                     <StatCard>
-                        <div className="grid grid-cols-2">
-                            <div className="px-4 flex flex-col gap-2">
+                        <div className="grid grid-cols-2 gap-2">
+                            <div className="flex flex-col gap-2">
                                 <CardHeader>Stats</CardHeader>
                                 <JobResultsChart />
                                 <StatTable />
                             </div>
-                            <div className="px-4 flex flex-col gap-2">
+                            <div className="flex flex-col gap-2">
                                 <CardHeader
                                     link={'/stats/jobs'}
                                     linkLabel={'More'}
@@ -62,10 +64,12 @@ export function Stats() {
                 </div>
                 <div
                     id="secondaryStats"
-                    className="col-span-2 max-xl:col-span-6 max-xl:flex-row max-xl:grid max-xl:grid-cols-2 row-span-6 col-start-5 px-8 flex flex-col gap-4"
+                    className="col-span-2 max-xl:col-span-6 max-xl:flex-row max-xl:grid max-xl:grid-cols-2 row-span-6 col-start-5 pl-8 max-xl:pl-0 flex flex-col gap-4"
                 >
                     <div className="flex flex-col gap-4">
-                        <h1 className="text-3xl font-bold dark:text-white">Get Help</h1>
+                        <h1 className="text-3xl font-bold dark:text-white">
+                            Get Help
+                        </h1>
                         <StatCard>
                             <Diagnostic />
                         </StatCard>

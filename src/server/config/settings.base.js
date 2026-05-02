@@ -23,8 +23,8 @@
 
 import path from 'path';
 import pkg from '../../package.json';
-import { languages } from '../../../build.config';
 import os from 'os';
+import isElectron from 'is-electron';
 
 const RC_FILE = pkg.version.includes('EDGE') ? '.edge_rc' : '.sender_rc';
 const SESSION_PATH = '.sienci-sessions';
@@ -34,6 +34,24 @@ const secret = pkg.version;
 
 //const getUserHome = () => (process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME']);
 const getUserHome = () => os.homedir();
+const getUserDataPath = () => {
+    if (process.env.GSENDER_USER_DATA) {
+        return process.env.GSENDER_USER_DATA;
+    }
+
+    if (isElectron()) {
+        try {
+            const { app } = require('electron');
+            if (app && app.getPath) {
+                return app.getPath('userData');
+            }
+        } catch (err) {
+            // Fallback to homedir if electron is unavailable
+        }
+    }
+
+    return os.homedir();
+};
 
 
 export default {
@@ -120,7 +138,7 @@ export default {
         }
     },
     siofu: { // SocketIOFileUploader
-        dir: './tmp/siofu'
+        dir: path.resolve(getUserDataPath(), 'tmp', 'siofu')
     },
     i18next: {
         lowerCaseLng: true,
@@ -140,7 +158,7 @@ export default {
         // default namespace used if not passed to translation function
         defaultNS: 'resource',
 
-        whitelist: languages,
+        whitelist: ['en'],
 
         // array of languages to preload
         preload: [],
@@ -180,7 +198,7 @@ export default {
             loadPath: path.resolve(__dirname, '..', 'i18n', '{{lng}}', '{{ns}}.json'),
 
             // path to post missing resources
-            addPath: path.resolve(__dirname, '..', 'i18n', '{{lng}}', '{{ns}}.savedMissing.json'),
+            addPath: path.resolve(getUserDataPath(), 'i18n', '{{lng}}', '{{ns}}.savedMissing.json'),
 
             // jsonIndent to use when storing json files
             jsonIndent: 4

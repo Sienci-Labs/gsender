@@ -8,8 +8,8 @@ export interface RadioSettingInputProps {
     options: string[] | number[];
     value: string | number;
     index: number;
-    subIndex: number;
-    onChange: (v) => void;
+    subIndex?: number;
+    onChange: (v: any) => void;
 }
 
 export function RadioSettingInput({
@@ -18,7 +18,7 @@ export function RadioSettingInput({
     onChange,
 }: RadioSettingInputProps): React.ReactNode {
     value = `${value}`;
-    const handler = (e) => {
+    const handler = (e: string) => {
         onChange(e);
     };
     return (
@@ -28,7 +28,10 @@ export function RadioSettingInput({
             onValueChange={handler}
         >
             {options.map((o) => (
-                <div className="flex flex-row gap-2 items-center">
+                <div
+                    key={`radio-${o}`}
+                    className="flex flex-row gap-2 items-center"
+                >
                     <RadioGroupItem value={`${o}`} />
                     <Label htmlFor={`radio-${o}`}>{o}</Label>
                 </div>

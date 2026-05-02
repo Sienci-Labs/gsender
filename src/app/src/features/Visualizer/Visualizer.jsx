@@ -46,6 +46,8 @@ import {
     GRBLHAL,
     GRBL_ACTIVE_STATE_CHECK,
     LASER_MODE,
+    OUTLINE_MODE_RAPIDLESS_SQUARE,
+    LIGHTWEIGHT_OPTIONS,
 } from 'app/constants';
 import CombinedCamera from 'app/lib/three/oldCombinedCamera';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
@@ -59,8 +61,6 @@ import * as WebGL from 'app/lib/three/WebGL';
 
 import _ from 'lodash';
 import store from 'app/store';
-
-import { colorsResponse } from 'app/workers/colors.response';
 
 import controller from '../../lib/controller';
 import { getBoundingBox, loadSTL, loadTexture } from './helpers';
@@ -102,9 +102,12 @@ const CAMERA_DISTANCE = 1900; // Move the camera out a bit from the origin (0, 0
 const TRACKBALL_CONTROLS_MIN_DISTANCE = 1;
 const TRACKBALL_CONTROLS_MAX_DISTANCE = 7000;
 import { outlineResponse } from '../../workers/Outline.response';
+import { shouldVisualizeSVG } from '../../workers/Visualize.response';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 import { toast } from 'app/lib/toaster';
 import { getZUpTravel } from 'app/lib/SoftLimits.js';
+import { mm2in } from 'app/lib/units';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 
 class Visualizer extends Component {
     static propTypes = {
@@ -149,8 +152,6 @@ class Visualizer extends Component {
 
     vizualization = null;
 
-    colorsWorker = null;
-
     renderCallback = null;
 
     machineProfile = store.get('workspace.machineProfile');
@@ -175,6 +176,12 @@ class Visualizer extends Component {
     machineConnected = false;
 
     showSoftLimitsWarning = this.visualizerConfig.get('showSoftLimitsWarning');
+
+    checkModeInterval = null;
+
+    counter = 0;
+
+    waitingForCheck = false;
 
     setRef = (node) => {
         this.node = node;
@@ -284,9 +291,10 @@ class Visualizer extends Component {
     }
 
     addStoreEvents() {
-        store.on('_dimensions', () => {
+        this._dimensionsHandler = () => {
             this.changeMachineProfile();
-        });
+        };
+        store.on('_dimensions', this._dimensionsHandler);
     }
 
     componentDidMount() {
@@ -294,6 +302,7 @@ class Visualizer extends Component {
         this.addControllerEvents();
         this.addStoreEvents();
         this.addResizeEventListener();
+        window.addEventListener('keydown', this.handleKeyDown);
 
         // Ensure the DOM element is available before creating the scene
         if (this.node) {
@@ -368,6 +377,7 @@ class Visualizer extends Component {
         const prevState = prevProps.state;
         const state = this.props.state;
         const isConnected = this.props.isConnected;
+        const { activeState } = state;
 
         // Check if scene needs to be recreated (e.g., if renderer was lost)
         if (this.node && !this.isSceneInitialized() && this.props.show) {
@@ -532,7 +542,6 @@ class Visualizer extends Component {
         {
             // Update position
             const { state } = this.props;
-            const { activeState } = state;
             const { machinePosition, workPosition } = this.props;
 
             let newPos = workPosition;
@@ -635,6 +644,11 @@ class Visualizer extends Component {
                 this.toRightSideView();
             }
         }
+
+        if (activeState === GRBL_ACTIVE_STATE_CHECK && this.waitingForCheck) {
+            this.waitingForCheck = false;
+            this.runCheck();
+        }
     }
 
     showToast = _.throttle(
@@ -675,11 +689,18 @@ class Visualizer extends Component {
         this.removeControllerEvents();
         this.unsubscribe();
         this.removeResizeEventListener();
+        window.removeEventListener('keydown', this.handleKeyDown);
         this.clearScene();
 
         // Stop animation loop
         this.animationLoopRunning = false;
         this.isAgitated = false;
+
+        // Remove store _dimensions listener
+        if (this._dimensionsHandler) {
+            store.removeListener('_dimensions', this._dimensionsHandler);
+            this._dimensionsHandler = null;
+        }
 
         // Clean up WebGL context handlers
         if (this.contextLostHandler) {
@@ -695,6 +716,21 @@ class Visualizer extends Component {
                 this.contextRestoredHandler,
                 false,
             );
+        }
+
+        // Dispose post-processing composers and renderer
+        // (defensive cleanup — normally the component stays mounted via display:none)
+        [
+            this.copyComposer,
+            this.fxaaComposer,
+            this.bloomComposer,
+            this.finalComposer,
+        ].forEach((composer) => {
+            if (composer) composer.dispose();
+        });
+        if (this.renderer) {
+            this.renderer.dispose();
+            this.renderer = null;
         }
     }
 
@@ -749,7 +785,10 @@ class Visualizer extends Component {
     reloadGCode() {
         const { actions, state } = this.props;
         const { gcode } = state;
-        actions.loadGCode('', gcode.visualization);
+        // Guard against null visualization — occurs when rebuildSceneContents() is called
+        // after exiting EVERYTHING lite mode where no geometry was ever parsed.
+        if (!gcode.visualization) return;
+        actions.loadGCode(gcode.name, gcode.visualization);
     }
 
     removeSceneGroup() {
@@ -759,8 +798,11 @@ class Visualizer extends Component {
     showAnimation = () => {
         const state = { ...this.props.state };
         const { liteMode, objects, minimizeRenders } = state;
-        // We don't animate if minimizeRenders is turned on
-        if (minimizeRenders) {
+        const { reducedMotion } =
+            reduxStore.getState().preferences.accessibility;
+
+        // We don't animate if minimizeRenders is turned on or reducedMotion is enabled
+        if (minimizeRenders || reducedMotion) {
             return false;
         }
         if (liteMode && objects.cuttingToolAnimation.visibleLite) {
@@ -842,7 +884,12 @@ class Visualizer extends Component {
     }
 
     recolorGridLabels(units) {
-        const { mm, in: inches } = this.machineProfile;
+        const { mm } = this.machineProfile;
+        const inches = {
+            width: mm2in(mm.width),
+            depth: mm2in(mm.depth),
+            height: mm2in(mm.height),
+        };
 
         const axisLengthX =
             units === IMPERIAL_UNITS
@@ -906,7 +953,12 @@ class Visualizer extends Component {
     }
 
     recolorGridNumbers(units) {
-        const { mm, in: inches } = this.machineProfile;
+        const { mm } = this.machineProfile;
+        const inches = {
+            width: mm2in(mm.width),
+            depth: mm2in(mm.depth),
+            height: mm2in(mm.height),
+        };
 
         const imperialGridCountX = Math.ceil(inches.width);
         const metricGridCountX = Math.ceil(mm.width / 10) * 10;
@@ -914,9 +966,13 @@ class Visualizer extends Component {
         const metricGridCountY = Math.ceil(mm.depth / 10) * 10;
 
         const gridCountX =
-            units === IMPERIAL_UNITS ? imperialGridCountX : metricGridCountX;
+            units === IMPERIAL_UNITS
+                ? imperialGridCountX
+                : Math.ceil(metricGridCountX / 10);
         const gridCountY =
-            units === IMPERIAL_UNITS ? imperialGridCountY : metricGridCountY;
+            units === IMPERIAL_UNITS
+                ? imperialGridCountY
+                : Math.ceil(metricGridCountY / 10);
         const gridSpacing =
             units === IMPERIAL_UNITS
                 ? IMPERIAL_GRID_SPACING
@@ -1013,6 +1069,55 @@ class Visualizer extends Component {
             }),
             pubsub.subscribe('visualizer:redraw', () => {
                 this.recolorScene();
+                this.updateScene({ forceUpdate: true });
+            }),
+            pubsub.subscribe('job:end', () => {
+                // Reset hidden lines when job finishes
+                if (this.visualizer) {
+                    this.visualizer.setHideProcessedLines(false);
+                    this.updateScene({ forceUpdate: true });
+                }
+            }),
+            pubsub.subscribe('workflow:state', (msg, state) => {
+                // Re-apply hide processed lines setting when job starts
+                if (state === 'running' && this.visualizer) {
+                    const hideProcessedLines = store.get(
+                        'widgets.visualizer.hideProcessedLines',
+                        false,
+                    );
+                    this.visualizer.setHideProcessedLines(hideProcessedLines);
+                }
+            }),
+            pubsub.subscribe('spindle:mode', () => {
+                if (
+                    !this.cuttingTool ||
+                    !this.laserPointer ||
+                    !this.cuttingPointer
+                ) {
+                    return;
+                }
+                const { state, isConnected } = this.props;
+                const { liteMode } = state;
+                const isLaser = isLaserMode();
+                if (isConnected) {
+                    this.cuttingTool.visible =
+                        !isLaser &&
+                        (liteMode
+                            ? state.objects.cuttingTool.visibleLite
+                            : state.objects.cuttingTool.visible);
+                    this.laserPointer.visible =
+                        isLaser &&
+                        (liteMode
+                            ? state.objects.cuttingTool.visibleLite
+                            : state.objects.cuttingTool.visible);
+                    this.cuttingPointer.visible = liteMode
+                        ? !state.objects.cuttingTool.visibleLite
+                        : !state.objects.cuttingTool.visible;
+                } else {
+                    this.cuttingTool.visible = false;
+                    this.laserPointer.visible = false;
+                    this.cuttingPointer.visible = false;
+                }
                 this.updateScene({ forceUpdate: true });
             }),
             pubsub.subscribe('file:load', (msg, data) => {
@@ -1124,18 +1229,6 @@ class Visualizer extends Component {
                     forceUpdateAllAxes: true,
                 });
             }),
-            pubsub.subscribe('colors:load', (_, data) => {
-                const { colorArray, savedColors } = data;
-                this.handleSceneRender(
-                    this.vizualization,
-                    colorArray,
-                    savedColors,
-                    this.renderCallback,
-                );
-                if (this.colorsWorker) {
-                    this.colorsWorker.terminate();
-                }
-            }),
             pubsub.subscribe('outline:start', () => {
                 if (this.outlineRunning) {
                     return;
@@ -1149,7 +1242,7 @@ class Visualizer extends Component {
                 try {
                     const outlineWorker = new Worker(
                         new URL(
-                            '../../workers/Outline.worker.js',
+                            '../../workers/Outline.worker.ts',
                             import.meta.url,
                         ),
                         { type: 'module' },
@@ -1168,6 +1261,16 @@ class Visualizer extends Component {
                         'workspace.outlineMode',
                         'Detailed',
                     );
+                    const outlineSpeed = store.get(
+                        'workspace.outlineSpeed',
+                        null,
+                    );
+
+                    const isRapidless =
+                        outlineMode === OUTLINE_MODE_RAPIDLESS_SQUARE;
+                    const content = isRapidless
+                        ? reduxStore.getState().file.content
+                        : null;
 
                     // We want to make sure that in situations outline fails, you can try again in ~5 seconds
                     const maxRuntime = setTimeout(() => {
@@ -1186,9 +1289,11 @@ class Visualizer extends Component {
                     };
                     outlineWorker.postMessage({
                         isLaser,
-                        parsedData: vertices,
+                        parsedData: isRapidless ? [] : vertices,
                         mode: outlineMode,
                         zTravel,
+                        ...(isRapidless && { content }),
+                        outlineSpeed,
                     });
                 } catch (e) {
                     console.log(e);
@@ -1399,7 +1504,12 @@ class Visualizer extends Component {
     }
 
     createCoordinateSystem(units) {
-        const { mm, in: inches } = this.machineProfile;
+        const { mm } = this.machineProfile;
+        const inches = {
+            width: mm2in(mm.width),
+            depth: mm2in(mm.depth),
+            height: mm2in(mm.height),
+        };
 
         const imperialGridCountX = Math.ceil(inches.width);
         const metricGridCountX = Math.ceil(mm.width / 10) * 10;
@@ -1488,7 +1598,12 @@ class Visualizer extends Component {
     }
 
     createGridLineNumbers(units) {
-        const { mm, in: inches } = this.machineProfile;
+        const { mm } = this.machineProfile;
+        const inches = {
+            width: mm2in(mm.width),
+            depth: mm2in(mm.depth),
+            height: mm2in(mm.height),
+        };
 
         const imperialGridCountX = Math.ceil(inches.width);
         const metricGridCountX = Math.ceil(mm.width / 10) * 10;
@@ -1714,10 +1829,10 @@ class Visualizer extends Component {
                         geometry.computeBoundingBox();
 
                         // Set the desired position from the origin rather than its center.
-                        const height =
+                        /*const height =
                             geometry.boundingBox.max.z -
-                            geometry.boundingBox.min.z;
-                        geometry.translate(0, 0, height / 2);
+                            geometry.boundingBox.min.z;*/
+                        geometry.translate(0, 0, -geometry.boundingBox.min.z);
 
                         let material = new THREE.MeshLambertMaterial({
                             map: texture,
@@ -1736,16 +1851,29 @@ class Visualizer extends Component {
                         const object = new THREE.Object3D();
                         object.add(mesh);
 
+                        // unload the old one
+                        this.group.remove(this.cuttingTool);
+
                         this.cuttingTool = object;
                         this.cuttingTool.name = 'CuttingTool';
                         this.cuttingTool.visible =
-                            isConnected &&
-                            !isLaser &&
+                            this.props.isConnected &&
+                            !isLaserMode() &&
                             (liteMode
                                 ? state.objects.cuttingTool.visibleLite
                                 : state.objects.cuttingTool.visible);
 
                         this.group.add(this.cuttingTool);
+
+                        // Sync to current machine position (e.g. after remount from lite mode toggle)
+                        if (this.props.isConnected) {
+                            this.workPosition = this.props.workPosition;
+                            this.machinePosition = this.props.machinePosition;
+                            this.updateCuttingToolPosition(
+                                this.props.workPosition,
+                            );
+                        }
+
                         // Update the scene
                         this.updateScene();
                     })
@@ -1760,6 +1888,9 @@ class Visualizer extends Component {
             {
                 // Laser Tool
                 this.setupScene();
+
+                // unload the old one
+                this.group.remove(this.laserPointer);
 
                 // add tool
                 this.laserPointer = new LaserPointer({
@@ -1962,6 +2093,228 @@ class Visualizer extends Component {
         this.updateScene();
     }
 
+    // Called when entering lite mode to free GPU memory while keeping the renderer alive.
+    // Geometries/materials are re-created on the next reloadGCode/reparseGCode call.
+    disposeGeometries() {
+        // Reset pivot internal state to (0,0,0) so that on rebuild, pivotPoint.set(center)
+        // produces the correct delta to re-center fresh children. Without this, the pivot
+        // retains the old center value and the delta becomes zero on reload.
+        this.pivotPoint.clear();
+
+        this.animationLoopRunning = false;
+
+        if (this.scene) {
+            this.scene.traverse((obj) => {
+                if (obj.geometry) {
+                    obj.geometry.dispose();
+                }
+                if (obj.material) {
+                    const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+                    mats.forEach((m) => {
+                        if (m.map) m.map.dispose();
+                        m.dispose();
+                    });
+                }
+            });
+            while (this.scene.children.length > 0) {
+                this.scene.remove(this.scene.children[0]);
+            }
+        }
+
+        // Null out object refs so they are recreated on next scene setup
+        this.coordinateAxes = null;
+        this.limits = null;
+        this.visualizer = null;
+        this.cuttingTool = null;
+        this.laserPointer = null;
+        this.cuttingPointer = null;
+    }
+
+    // Rebuilds all static scene contents (lights, grids, tools, limits) after disposeGeometries()
+    // without recreating the renderer, camera, or controls. Ends with reloadGCode() to restore toolpath.
+    rebuildSceneContents() {
+        if (!this.scene || !this.renderer) {
+            console.warn(
+                'Visualizer: rebuildSceneContents called before scene/renderer ready',
+            );
+            return;
+        }
+
+        // Resize renderer now that the container is visible again (was display:none in lite mode).
+        // componentDidUpdate runs after the DOM update, so the container has correct dimensions.
+        this.resizeRenderer();
+
+        const { state, isConnected } = this.props;
+        const { units, objects, currentTheme, liteMode } = state;
+        const isLaser = isLaserMode();
+
+        // Clear zombie children left in the group after disposeGeometries()
+        while (this.group.children.length > 0) {
+            this.group.remove(this.group.children[0]);
+        }
+
+        {
+            // Directional Light
+            const color = 0xffffff;
+            const intensity = 1;
+            let light;
+
+            light = new THREE.DirectionalLight(color, intensity);
+            light.position.set(-1, -1, 1);
+            this.scene.add(light);
+
+            light = new THREE.DirectionalLight(color, intensity);
+            light.position.set(1, -1, 1);
+            this.scene.add(light);
+        }
+
+        {
+            // Ambient Light
+            const light = new THREE.AmbientLight(colornames('gray 25'));
+            this.scene.add(light);
+        }
+
+        {
+            // Imperial Coordinate System
+            const visible = objects.coordinateSystem.visible;
+            const imperialCoordinateSystem = this.createCoordinateSystem(IMPERIAL_UNITS);
+            imperialCoordinateSystem.name = 'ImperialCoordinateSystem';
+            imperialCoordinateSystem.visible = visible && units === IMPERIAL_UNITS;
+            this.group.add(imperialCoordinateSystem);
+        }
+
+        {
+            // Metric Coordinate System
+            const visible = objects.coordinateSystem.visible;
+            const metricCoordinateSystem = this.createCoordinateSystem(METRIC_UNITS);
+            metricCoordinateSystem.name = 'MetricCoordinateSystem';
+            metricCoordinateSystem.visible = visible && units === METRIC_UNITS;
+            this.group.add(metricCoordinateSystem);
+        }
+
+        {
+            // Imperial Grid Line Numbers
+            const visible = objects.gridLineNumbers.visible;
+            const imperialGridLineNumbers = this.createGridLineNumbers(IMPERIAL_UNITS);
+            imperialGridLineNumbers.name = 'ImperialGridLineNumbers';
+            imperialGridLineNumbers.visible = visible && units === IMPERIAL_UNITS;
+            this.group.add(imperialGridLineNumbers);
+        }
+
+        {
+            // Metric Grid Line Numbers
+            const visible = objects.gridLineNumbers.visible;
+            const metricGridLineNumbers = this.createGridLineNumbers(METRIC_UNITS);
+            metricGridLineNumbers.name = 'MetricGridLineNumbers';
+            metricGridLineNumbers.visible = visible && units === METRIC_UNITS;
+            this.group.add(metricGridLineNumbers);
+        }
+
+        {
+            // Cutting Tool (async STL load)
+            Promise.all([
+                loadSTL('assets/models/stl/bit.stl').then((geometry) => geometry),
+                loadTexture('assets/textures/brushed-steel-texture.jpg').then((texture) => texture),
+            ])
+                .then((result) => {
+                    const [geometry, texture] = result;
+
+                    geometry.rotateX(-Math.PI / 2);
+                    geometry.scale(0.5, 0.5, 0.5);
+                    geometry.computeBoundingBox();
+                    geometry.translate(0, 0, -geometry.boundingBox.min.z);
+
+                    let material = new THREE.MeshLambertMaterial({
+                        map: texture,
+                        opacity: 0.9,
+                        transparent: false,
+                        emissive: 0xcccccc,
+                        emissiveIntensity: 0.5,
+                        color: '#caf0f8',
+                    });
+
+                    if (geometry.hasColors) {
+                        material.vertexColors = true;
+                    }
+
+                    const mesh = new THREE.Mesh(geometry, material);
+                    const object = new THREE.Object3D();
+                    object.add(mesh);
+
+                    this.group.remove(this.cuttingTool);
+
+                    this.cuttingTool = object;
+                    this.cuttingTool.name = 'CuttingTool';
+                    this.cuttingTool.visible =
+                        this.props.isConnected &&
+                        !isLaserMode() &&
+                        (liteMode
+                            ? state.objects.cuttingTool.visibleLite
+                            : state.objects.cuttingTool.visible);
+
+                    this.group.add(this.cuttingTool);
+
+                    if (this.props.isConnected) {
+                        this.workPosition = this.props.workPosition;
+                        this.machinePosition = this.props.machinePosition;
+                        this.updateCuttingToolPosition(this.props.workPosition);
+                    }
+
+                    this.updateScene();
+                })
+                .catch((error) => {
+                    console.error('Visualizer: Failed to load cutting tool assets during rebuild:', error);
+                });
+        }
+
+        {
+            // Laser Tool — skip setupScene() since EffectComposers are still valid
+            this.group.remove(this.laserPointer);
+
+            this.laserPointer = new LaserPointer({
+                color: currentTheme.get(CUTTING_PART),
+                diameter: 4,
+            });
+            this.laserPointer.name = 'LaserPointer';
+            this.laserPointer.visible =
+                isConnected &&
+                isLaser &&
+                (liteMode
+                    ? state.objects.cuttingTool.visibleLite
+                    : state.objects.cuttingTool.visible);
+
+            this.group.add(this.laserPointer);
+        }
+
+        {
+            // Cutting Pointer
+            this.createCuttingPointer();
+        }
+
+        {
+            // Limits
+            const limits = _get(this.machineProfile, 'limits');
+            const {
+                xmin = 0,
+                xmax = 0,
+                ymin = 0,
+                ymax = 0,
+                zmin = 0,
+                zmax = 0,
+            } = { ...limits };
+            this.limits = this.createLimits(xmin, xmax, ymin, ymax, zmin, zmax);
+            this.limits.name = 'Limits';
+            this.limits.visible = objects.limits.visible;
+            this.updateLimitsPosition();
+        }
+
+        this.scene.add(this.group);
+
+        this.startAnimationLoop();
+        this.updateScene({ forceUpdate: true });
+        this.reloadGCode();
+    }
+
     createCombinedCamera(width, height) {
         const frustumWidth = width / 2;
         const frustumHeight = (height || width) / 2; // same to width if height is 0
@@ -2140,7 +2493,13 @@ class Visualizer extends Component {
             return;
         }
 
-        this.visualizer.group.rotateX(radians);
+        // Always animate to the absolute rotation value
+        // This ensures the visual stays in sync with the actual axis position
+        gsap.to(this.visualizer.group.rotation, {
+            x: radians,
+            overwrite: true,
+            onUpdate: () => this.updateScene({ forceUpdate: true }),
+        });
     }
 
     updateGcodeModal(prevPos, currPos) {
@@ -2163,7 +2522,7 @@ class Visualizer extends Component {
         const prevValue = prevPos[axis];
         const currValue = currPos[axis];
 
-        const valueHasChanged = prevValue === currValue;
+        const valueHasChanged = prevValue !== currValue;
 
         if (!isRotaryFile) {
             return;
@@ -2184,9 +2543,11 @@ class Visualizer extends Component {
          *  - Controller is GRBLHal
          *  - A-axis value has changed since previous value
          */
+
         if (grblCondition || grblHalCondition) {
-            const axisDifference = currValue - prevValue;
-            this.rotateGcodeModal(axisDifference);
+            // Always use the absolute current axis value for rotation
+            // This keeps the visual model in perfect sync with the machine position
+            this.rotateGcodeModal(currValue);
         }
     }
 
@@ -2272,6 +2633,13 @@ class Visualizer extends Component {
             this.controls.reset();
         }
         this.updateScene();
+    }
+
+    runCheck() {
+        controller.command('gcode:start');
+        toast.info('Running Check mode', {
+            position: 'bottom-right',
+        });
     }
 
     handleSceneRender(vizualization, colorArray, savedColors, callback) {
@@ -2370,14 +2738,46 @@ class Visualizer extends Component {
         reduxStore.dispatch(
             updateFileRenderState({ renderState: RENDER_RENDERED }),
         );
+        console.timeEnd('gSender:fileLoad');
 
         typeof callback === 'function' && callback({ bbox: bbox });
 
         if (store.get('widgets.visualizer.checkFile')) {
-            controller.command('gcode:test');
-            toast.info('Running Check mode', {
-                position: 'bottom-right',
-            });
+            // wait for connection
+            // if none after 5 tries, then we must not be connected, so dont prompt
+            // have to do it this way bc the code setting "isConnected" to true is async and gets done after this code runs, generally
+            clearInterval(this.checkModeInterval); // start with a clear to prevent multiple pop ups
+            this.checkModeInterval = setInterval(() => {
+                if (this.counter < 5) {
+                    if (this.props.isConnected) {
+                        Confirm({
+                            title: 'Start Check Mode',
+                            content:
+                                'Run a validation check ($C) on this file?',
+                            confirmLabel: 'Start Check',
+                            cancelLabel: 'Cancel',
+                            onConfirm: () => {
+                                const { activeState } = this.props.state;
+                                if (activeState === GRBL_ACTIVE_STATE_CHECK) {
+                                    this.runCheck();
+                                } else {
+                                    controller.command('gcode', [
+                                        '%global.state.testWCS=modal.wcs',
+                                        '$C',
+                                    ]);
+                                    this.waitingForCheck = true;
+                                }
+                            },
+                        });
+                        this.counter = 0;
+                        clearInterval(this.checkModeInterval);
+                    }
+                    this.counter++;
+                } else {
+                    this.counter = 0;
+                    clearInterval(this.checkModeInterval);
+                }
+            }, 500);
         }
     }
 
@@ -2386,6 +2786,16 @@ class Visualizer extends Component {
     }
 
     load(name, vizualization, callback) {
+        // When in SVG lite mode, the 3D Visualizer is hidden with a cleared scene.
+        // Returning early here prevents creating a GCodeVisualizer and calling
+        // pivotPoint.set(center), which would corrupt the pivot state for the
+        // next full-3D restore. The SVGVisualizer handles this file:load independently.
+        if (shouldVisualizeSVG()) {
+            const { setVisualizerReady } = this.props.actions;
+            setVisualizerReady();
+            return;
+        }
+
         // Remove previous G-code object
         this.unload();
         const { currentTheme, disabled, disabledLite, liteMode } =
@@ -2393,10 +2803,64 @@ class Visualizer extends Component {
         const { setVisualizerReady } = this.props.actions;
         this.visualizer = new GCodeVisualizer(currentTheme);
 
+        const toBoundedFloat32Array = (buffer, length) => {
+            if (!buffer || typeof buffer.byteLength !== 'number') {
+                return new Float32Array(0);
+            }
+            const maxLength = Math.floor(
+                buffer.byteLength / Float32Array.BYTES_PER_ELEMENT,
+            );
+            const safeLength = Number.isFinite(length)
+                ? Math.min(Math.max(Math.floor(length), 0), maxLength)
+                : maxLength;
+            return new Float32Array(buffer, 0, safeLength);
+        };
+
+        const toBoundedUint32Array = (buffer, length) => {
+            if (!buffer || typeof buffer.byteLength !== 'number') {
+                return new Uint32Array(0);
+            }
+            const maxLength = Math.floor(
+                buffer.byteLength / Uint32Array.BYTES_PER_ELEMENT,
+            );
+            const safeLength = Number.isFinite(length)
+                ? Math.min(Math.max(Math.floor(length), 0), maxLength)
+                : maxLength;
+            return new Uint32Array(buffer, 0, safeLength);
+        };
+
+        const colorArray = toBoundedFloat32Array(
+            vizualization.colorArrayBuffer,
+            vizualization.colorLen,
+        );
+        const savedColors = toBoundedFloat32Array(
+            vizualization.savedColorsBuffer,
+            vizualization.savedColorLen,
+        );
+
+        const visualization = {
+            ...vizualization,
+            vertices: toBoundedFloat32Array(
+                vizualization.vertices,
+                vizualization.verticesLen,
+            ),
+            frames: toBoundedUint32Array(
+                vizualization.frames,
+                vizualization.framesLen,
+            ),
+        };
+
+        const hideProcessedLines = store.get(
+            'widgets.visualizer.hideProcessedLines',
+            false,
+        );
+
+        this.visualizer.setHideProcessedLines(hideProcessedLines);
+
         const shouldRenderVisualization = liteMode ? !disabledLite : !disabled;
 
         if (shouldRenderVisualization) {
-            this.vizualization = vizualization;
+            this.vizualization = visualization;
             this.renderCallback = callback;
 
             // we may need to redraw grid if machine size is diff
@@ -2409,23 +2873,12 @@ class Visualizer extends Component {
                 this.redrawGrids();
             }
 
-            const colorsWorker = new Worker(
-                new URL('../../workers/colors.worker.js', import.meta.url),
-                { type: 'module' },
+            this.handleSceneRender(
+                visualization,
+                colorArray,
+                savedColors,
+                callback,
             );
-
-            this.colorsWorker = colorsWorker;
-            this.colorsWorker.onmessage = colorsResponse;
-            this.colorsWorker.postMessage({
-                colors: vizualization.colors,
-                frames: vizualization.frames,
-                spindleSpeeds: vizualization.spindleSpeeds,
-                isLaser: vizualization.isLaser,
-                spindleChanges: vizualization.spindleChanges,
-                theme: currentTheme,
-            });
-
-            // this.handleSceneRender(vizualization, callback);
         } else {
             setVisualizerReady();
         }
@@ -2678,6 +3131,7 @@ class Visualizer extends Component {
             return;
         }
 
+        this.props.actions.camera.toFreeView();
         this.controls.zoomIn(delta);
         this.controls.update();
 
@@ -2691,6 +3145,7 @@ class Visualizer extends Component {
             return;
         }
 
+        this.props.actions.camera.toFreeView();
         this.controls.zoomOut(delta);
         this.controls.update();
 
@@ -2710,6 +3165,7 @@ class Visualizer extends Component {
         pan.copy(eye).cross(objectUp.clone()).setLength(deltaX);
         pan.add(objectUp.clone().setLength(deltaY));
 
+        this.props.actions.camera.toFreeView();
         this.controls.object.position.add(pan);
         this.controls.target.add(pan);
         this.controls.update();
@@ -2718,21 +3174,25 @@ class Visualizer extends Component {
     // http://stackoverflow.com/questions/18581225/orbitcontrol-or-trackballcontrol
     panUp() {
         const { noPan, panSpeed } = this.controls;
+        this.props.actions.camera.toFreeView();
         !noPan && this.pan(0, 1 * panSpeed);
     }
 
     panDown() {
         const { noPan, panSpeed } = this.controls;
+        this.props.actions.camera.toFreeView();
         !noPan && this.pan(0, -1 * panSpeed);
     }
 
     panLeft() {
         const { noPan, panSpeed } = this.controls;
+        this.props.actions.camera.toFreeView();
         !noPan && this.pan(1 * panSpeed, 0);
     }
 
     panRight() {
         const { noPan, panSpeed } = this.controls;
+        this.props.actions.camera.toFreeView();
         !noPan && this.pan(-1 * panSpeed, 0);
     }
 
@@ -2749,6 +3209,62 @@ class Visualizer extends Component {
             }, 50);
         }
     }
+
+    isHovered = false;
+
+    handleKeyDown = (event) => {
+        const { visualizerKeyboardControl } =
+            reduxStore.getState().preferences.accessibility;
+        if (!visualizerKeyboardControl || !this.isHovered) return;
+
+        const rotateStep = 0.1;
+        const panStep = 10;
+        const zoomStep = 0.1;
+
+        switch (event.key) {
+            case 'ArrowLeft':
+                if (event.shiftKey) {
+                    this.panLeft();
+                } else {
+                    this.controls.rotateLeft(rotateStep);
+                }
+                break;
+            case 'ArrowRight':
+                if (event.shiftKey) {
+                    this.panRight();
+                } else {
+                    this.controls.rotateLeft(-rotateStep);
+                }
+                break;
+            case 'ArrowUp':
+                if (event.shiftKey) {
+                    this.panUp();
+                } else {
+                    this.controls.rotateUp(rotateStep);
+                }
+                break;
+            case 'ArrowDown':
+                if (event.shiftKey) {
+                    this.panDown();
+                } else {
+                    this.controls.rotateUp(-rotateStep);
+                }
+                break;
+            case '+':
+            case '=':
+                this.zoomIn(zoomStep);
+                break;
+            case '-':
+            case '_':
+                this.zoomOut(zoomStep);
+                break;
+            default:
+                return;
+        }
+        event.preventDefault();
+        this.controls.update();
+        this.updateScene();
+    };
 
     render() {
         if (!WebGL.isWebGLAvailable()) {
@@ -2769,9 +3285,18 @@ class Visualizer extends Component {
 
         return (
             <div
-                className="overflow-hidden h-full w-full rounded-lg"
+                className="overflow-hidden h-full w-full rounded-lg outline-none"
                 ref={this.setRef}
                 id="visualizer-wrapper"
+                onMouseEnter={() => {
+                    this.isHovered = true;
+                }}
+                onMouseLeave={() => {
+                    this.isHovered = false;
+                }}
+                tabIndex={0}
+                role="region"
+                aria-label="3D Visualizer"
             />
         );
     }

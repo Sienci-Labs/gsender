@@ -31,13 +31,21 @@ export function JobResultsChart() {
             },
         ],
     };
+    const options = {
+        responsive: true,
+        maintainAspectRatio: false,
+    };
 
     return (
         <div className={'w-full h-52 flex items-center justify-center'}>
             {(!isConnected || filteredJobs.length === 0) && (
                 <EmptyDataPlaceholder />
             )}
-            {isConnected && filteredJobs.length > 0 && <Pie data={data} />}
+            {isConnected && filteredJobs.length > 0 && (
+                <div className="relative w-48 h-48">
+                    <Pie data={data} options={options} />
+                </div>
+            )}
         </div>
     );
 }

@@ -50,6 +50,7 @@ export function WCSInput({
                 onBlur={onBlur}
                 onKeyDown={onKeyPress}
                 className="text-xl font-bold flex items-center text-blue-500 font-mono w-[9ch] p-0 m-0 text-center border-none bg-gray-100 outline-none focus:bg-white dark:bg-dark "
+                data-testid={`wcs-input-${axis}`}
             />
         </div>
     );

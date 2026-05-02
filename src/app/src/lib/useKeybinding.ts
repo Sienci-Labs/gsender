@@ -2,6 +2,7 @@ import _ from 'lodash';
 import combokeys from './combokeys';
 import store from '../store';
 import shuttleEvents from './shuttleEvents';
+import { MACRO_CATEGORY } from 'app/constants';
 import {
     CommandKeys,
     ShuttleControlEvents,
@@ -105,7 +106,10 @@ export function removeOldKeybindings(): void {
     // Only keep keybindings that exist in the shuttleControlEvents arrays
     Object.entries(currentCommandKeys).forEach(([key, keybinding]) => {
         const event = allShuttleControlEvents[key];
-        if (event !== undefined) {
+        if (
+            event !== undefined ||
+            keybinding?.category === MACRO_CATEGORY
+        ) {
             updatedCommandKeys[key] = keybinding;
         }
     });

@@ -113,7 +113,7 @@ class GrblController {
         },
         close: (err) => {
             this.ready = false;
-            const received = this.sender?.state?.received;
+            const currentLineRunning = this.sender?.state?.totalSentToQueue - this.sender?.state?.countdownQueue.length;
             if (err) {
                 log.warn(`Disconnected from serial port "${this.options.port}":`, err);
             }
@@ -125,7 +125,7 @@ class GrblController {
 
                 // Destroy controller
                 this.destroy();
-            }, received);
+            }, currentLineRunning);
         },
         error: (err) => {
             this.ready = false;
@@ -180,6 +180,12 @@ class GrblController {
 
     feederCB = null;
 
+    FOQueue = []; // feedrate override queue
+    runningFOQ = false;
+
+    SOQueue = []; // spindle override queue
+    runningSOQ = false;
+
     // Sender
     sender = null;
 
@@ -201,6 +207,8 @@ class GrblController {
 
     homingFlagSet = false;
 
+    hasHomedSet = false;
+
     // eslint-disable-next-line max-lines-per-function
     constructor(engine, connection, options) {
         if (!engine) {
@@ -219,6 +227,9 @@ class GrblController {
 
         // Connection
         this.connection = connection;
+        if (!this.connection) {
+            throw new Error('connection must be specified');
+        }
 
         this.connection.setWriteFilter((data) => {
             const line = data.trim();
@@ -266,6 +277,7 @@ class GrblController {
                     .replace(';', '') : '';
                 line = line.replace(commentMatcher, '')
                     .trim();
+                const ignoreEvent = context ? context.ignoreEvent : true;
                 context = this.populateContext(context);
 
                 if (line[0] === '%') {
@@ -291,7 +303,8 @@ class GrblController {
                         log.debug('Found M0/M1, pausing program');
                         this.emit('sender:M0M1', {
                             data: 'M0/M1',
-                            comment: commentString
+                            comment: commentString,
+                            ignoreEvent: ignoreEvent
                         });
                         return 'G4 P0.5';
                     }
@@ -351,10 +364,16 @@ class GrblController {
                     }); // Hold reason
 
                     if (!passthroughM6) {
-                        line = line.replace('M6', '(M6)');
+                        line = line.replace(/M0*6(?!\d)/i, '(M6)');
                     }
                 }
 
+                const useAaxisForGrbl = store.get('preferences.useAaxisForGrbl', false);
+
+                // If we don't need to convert A-axis to Y-axis, return the line as is since A-axis commands are given by default
+                if (useAaxisForGrbl) {
+                    return line;
+                }
 
                 const containsACommand = A_AXIS_COMMANDS.test(line);
                 const containsYCommand = Y_AXIS_COMMANDS.test(line);
@@ -453,14 +472,18 @@ class GrblController {
                         // Workaround for Carbide files - prevent M0 early from pausing program
                         if (sent > 10) {
                             this.workflow.pause({ data: 'M0', comment: commentString });
-                            this.command('gcode', `${WAIT}\n${PAUSE_START} ;${commentString}`);
+                            this.command('gcode', `${WAIT}\n${PAUSE_START} ;${commentString}`, { ignoreEvent: false });
                         }
-                        line = line.replace('M0', '(M0)');
+                        // This regex is required since M00 (or M01, M06, etc) are valid gcode commands that
+                        // some CAM programs issue. We normalize the line to M0 using `parseLine` for
+                        // comparison's sake but the line sent to the controller hasn't been normalized
+                        // and could still contain leading 0's
+                        line = line.replace(/M0+(?!\d)/i, '(M0)');
                     } else if (programMode === 'M1') {
                         log.debug(`M1 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);
                         this.workflow.pause({ data: 'M1', comment: commentString });
-                        this.command('gcode', `${WAIT}\n${PAUSE_START} ;${commentString}`);
-                        line = line.replace('M1', '(M1)');
+                        this.command('gcode', `${WAIT}\n${PAUSE_START} ;${commentString}`, { ignoreEvent: false });
+                        line = line.replace(/M0*1(?!\d)/i, '(M1)');
                     }
                 }
 
@@ -477,7 +500,7 @@ class GrblController {
                     // No toolchange in check mode
                     const currentState = _.get(this.state, 'status.activeState', '');
                     if (currentState === 'Check') {
-                        return line.replace('M6', '(M6)');
+                        return line.replace(/M0*6(?!\d)/i, '(M6)');
                     }
 
                     const { toolChangeOption } = this.toolChangeContext;
@@ -498,7 +521,7 @@ class GrblController {
                         } else {
                             const count = this.sender.incrementToolChanges();
 
-                            setTimeout(() => {
+                            this.toolChanger.addInterval(() => {
                                 // Emit the current state so latest tool info is available
                                 this.runner.setTool(tool?.[2]); // set tool in runner state
                                 this.emit('controller:state', GRBL, this.state, tool?.[2]); // set tool in redux
@@ -509,16 +532,23 @@ class GrblController {
                                     tool: tool,
                                     option: toolChangeOption
                                 }, commentString);
-                            }, 500);
+                            });
                         }
                     }
 
                     //const passthroughM6 = store.get('preferences.toolChange.passthrough', false);
                     const passthroughM6 = _.get(this.toolChangeContext, 'passthrough', false);
                     if (!passthroughM6) {
-                        line = line.replace('M6', '(M6)');
+                        line = line.replace(/M0*6(?!\d)/i, '(M6)');
                     }
                     //line = line.replace(`${tool?.[0]}`, `(${tool?.[0]})`);
+                }
+
+                const useAaxisForGrbl = store.get('preferences.useAaxisForGrbl', false);
+
+                // If we don't need to convert A-axis to Y-axis, return the line as is since A-axis commands are given by default
+                if (useAaxisForGrbl) {
+                    return line;
                 }
 
                 /**
@@ -640,6 +670,10 @@ class GrblController {
                 this.homingFlagSet = determineMachineZeroFlagSet(res, this.settings);
                 this.emit('homing:flag', this.homingFlagSet);
                 this.homingStarted = false;
+                if (!this.hasHomedSet) {
+                    this.hasHomedSet = true;
+                    this.emit('homing:has-homed', true);
+                }
             }
 
             this.actionMask.queryStatusReport = false;
@@ -1298,7 +1332,7 @@ class GrblController {
         }, 500);
     }
 
-    close(callback, received) {
+    close(callback, currentLineRunning) {
         const { port } = this.options;
 
         // Assertion check
@@ -1317,7 +1351,7 @@ class GrblController {
         this.emit('serialport:closeController', {
             port: port,
             inuse: false,
-        }, received);
+        }, currentLineRunning);
 
         if (this.isClose()) {
             callback(null);
@@ -1374,6 +1408,7 @@ class GrblController {
             // workflow state
             socket.emit('workflow:state', this.workflow.state);
         }
+        socket.emit('homing:has-homed', this.hasHomedSet);
     }
 
     emit(eventName, ...args) {
@@ -1384,6 +1419,36 @@ class GrblController {
         if (this.feederCB && typeof this.feederCB === 'function') {
             this.feederCB();
             this.feederCB = null;
+        }
+    }
+
+    consumeFOQ() {
+        if (!this.runningFOQ) {
+            this.runningFOQ = true;
+            let index = 0;
+            while (this.FOQueue.length > 0) {
+                const command = this.FOQueue.shift();
+                setTimeout(() => {
+                    this.connection.writeImmediate(command);
+                }, 25 * (index + 1));
+                index++;
+            }
+            this.runningFOQ = false;
+        }
+    }
+
+    consumeSOQ() {
+        if (!this.runningSOQ) {
+            this.runningSOQ = true;
+            let index = 0;
+            while (this.SOQueue.length > 0) {
+                const command = this.SOQueue.shift();
+                setTimeout(() => {
+                    this.connection.writeImmediate(command);
+                }, 25 * (index + 1));
+                index++;
+            }
+            this.runningSOQ = false;
         }
     }
 
@@ -1554,6 +1619,8 @@ class GrblController {
                     modalGCode.push(`G0 G90 G21 Z${zMax + safeHeight}`);
                     if (hasSpindle) {
                         modalGCode.push(`${modal.units} ${modal.spindle} F${feedRate} S${spindleRate}`);
+                    } else {
+                        modalGCode.push(`${modal.units} F${feedRate}`); // Fallback to add F always just in case no spindle
                     }
                     modalGCode.push(`G0 G90 G21 X${xVal.toFixed(3)} Y${yVal.toFixed(3)}`);
                     if (aVal) {
@@ -1645,7 +1712,8 @@ class GrblController {
                 this.command('gcode:resume');
             },
             'gcode:resume': async () => {
-                if (this.event.hasEnabledEvent(PROGRAM_RESUME)) {
+                const [ignoreEvents = false] = args;
+                if (!ignoreEvents && this.event.hasEnabledEvent(PROGRAM_RESUME)) {
                     this.feederCB = () => {
                         this.write('~');
                         this.workflow.resume();
@@ -1736,15 +1804,12 @@ class GrblController {
                 let diff = value - feedOV;
 
                 if (value === 100) {
-                    this.write(String.fromCharCode(0x90));
+                    this.FOQueue.push(String.fromCharCode(0x90));
                 } else {
-                    const queue = calcOverrides(diff, 'feed');
-                    queue.forEach((command, index) => {
-                        setTimeout(() => {
-                            this.connection.writeImmediate(command);
-                        }, 25 * (index + 1));
-                    });
+                    this.FOQueue.push(...calcOverrides(diff, 'feed'));
                 }
+                this.consumeFOQ();
+
 
                 this.sender.setOvF(value);
             },
@@ -1763,15 +1828,11 @@ class GrblController {
                 }
 
                 if (value === 100) {
-                    this.write(String.fromCharCode(0x99));
+                    this.SOQueue.push(String.fromCharCode(0x99));
                 } else {
-                    const queue = calcOverrides(diff, 'spindle');
-                    queue.forEach((command, index) => {
-                        setTimeout(() => {
-                            this.connection.writeImmediate(command);
-                        }, 25 * (index + 1));
-                    });
+                    this.SOQueue.push(...calcOverrides(diff, 'spindle'));
                 }
+                this.consumeSOQ();
             },
             // Rapid Overrides
             // @param {number} value A percentage value of 25, 50, or 100. A value of zero will reset to 100%.
@@ -1790,11 +1851,15 @@ class GrblController {
                 }
             },
             'lasertest:on': () => {
-                const [power = 0, duration = 0, maxS = 1000] = args;
+                const [power = 0, duration = 0] = args;
+
+                const maxS = ensurePositiveNumber(this.runner.getSetting('$30', 255));
+                const laserPower = ensurePositiveNumber(maxS * (power / 100)).toFixed(2);
+
                 const commands = [
                     // https://github.com/gnea/grbl/wiki/Grbl-v1.1-Laser-Mode
                     // The laser will only turn on when Grbl is in a G1, G2, or G3 motion mode.
-                    'G1F1 M3 S' + ensurePositiveNumber(maxS * (power / 100))
+                    'G1F1 M3 S' + laserPower
                 ];
                 if (duration > 0) {
                     commands.push('G4P' + ensurePositiveNumber(duration));
@@ -2099,6 +2164,7 @@ class GrblController {
             ...context,
             source: WRITE_SOURCE_CLIENT
         });
+
         log.silly(`> ${data}`);
     }
 

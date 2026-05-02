@@ -3,6 +3,10 @@ import store from 'app/store';
 import get from 'lodash/get';
 import { METRIC_UNITS } from 'app/constants';
 import { store as reduxStore } from 'app/store/redux';
+import {
+    isATCAvailable,
+    sendATCHomingDialog,
+} from 'app/features/ATC/utils/ATCFunctions.ts';
 export type Axis =
     | 'A'
     | 'B'
@@ -142,7 +146,11 @@ export function handleManualOffset(value: string | number, axis: Axis) {
 }
 
 export function homeMachine() {
-    controller.command('homing');
+    if (isATCAvailable()) {
+        sendATCHomingDialog();
+    } else {
+        controller.command('homing');
+    }
 }
 
 export function homeAxis(axis: string) {

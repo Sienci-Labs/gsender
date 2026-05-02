@@ -8,6 +8,7 @@ export interface NumberSettingInputProps {
     index: number;
     min?: number;
     max?: number;
+    subIndex?: number;
     onChange: (value: number) => void;
 }
 

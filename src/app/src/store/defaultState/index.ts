@@ -41,6 +41,7 @@ import { profiles } from './gamepad';
 import { State } from '../definitions';
 import { MachineProfile } from 'app/definitions/firmware';
 import { SPINDLE } from 'app/lib/definitions/gcode_virtualization';
+import { defaultATCIMacros } from 'app/features/ATC/assets/defaultATCIMacros.ts';
 
 const [M3] = SPINDLE_MODES;
 
@@ -54,6 +55,7 @@ const defaultState: State = {
         reverseWidgets: false,
         spindleFunctions: false,
         coolantFunctions: true,
+        atcEnabled: false,
         safeRetractHeight: 0,
         customDecimalPlaces: 0,
         jobsFinished: 0,
@@ -62,12 +64,24 @@ const defaultState: State = {
         longestTimeRun: 0,
         defaultFirmware: GRBLHAL,
         outlineMode: OUTLINE_MODE_DETAILED,
+        outlineSpeed: 0,
         revertWorkspace: false,
+        promptExit: false,
+        backupFreq: 'On Update',
+        powerSaving: true,
+        lastBackupTime: 0,
         sendUsageData: false,
         jobTimes: [],
         toolChange: {
             passthrough: false,
             skipDialog: false,
+            moveToManualPosition: false,
+            firstToolBehaviour: 'Always run full wizard',
+            manualPosition: {
+                x: 0,
+                y: 0,
+                z: 0,
+            },
         },
         toolChangeOption: 'Ignore',
         toolChangePosition: {
@@ -96,6 +110,8 @@ const defaultState: State = {
                 autoZero: 5,
                 zProbe: 15,
                 probe3D: 0,
+                bitZero: 13,
+                bitZeroZOnly: 15.5,
             },
             plateWidth: 50,
             plateLength: 50,
@@ -148,6 +164,7 @@ const defaultState: State = {
             defaultFirmwareSettings: DEFAULT_FIRMWARE_SETTINGS,
             forceHardLimits: false,
             forceSoftLimits: false,
+            useAaxisForGrbl: false,
         },
         shouldWarnZero: false,
         diagnostics: {
@@ -159,8 +176,36 @@ const defaultState: State = {
         notifications: [],
         toastDuration: 0,
         enableDarkMode: false,
+        accessibility: {
+            statusAnnouncements: false,
+            jobProgressAnnouncements: false,
+            jobProgressIncrement: 10,
+            focusRings: false,
+            focusTrapping: false,
+            visualizerKeyboardControl: false,
+            audioCues: {
+                enabled: false,
+                jobComplete: false,
+                alarmTriggered: false,
+                toolChange: false,
+                probeSuccess: false,
+            },
+            reducedMotion: false,
+            gcodeSummary: {
+                enabled: false,
+                showVisually: false,
+            },
+            showKeyboardMap: false,
+            displayScaleFactor: '100%',
+        },
+        preventJoggingPastLimits: false,
     },
     widgets: {
+        atc: {
+            toolMap: {},
+            templates: defaultATCIMacros,
+            warnOnHome: true,
+        },
         axes: {
             minimized: false,
             axes: ['x', 'y', 'z'],
@@ -221,6 +266,7 @@ const defaultState: State = {
             },
             autoReconnect: false,
             ip: [192, 168, 5, 1],
+            ethernetPort: 23,
         },
         console: {
             minimized: false,
@@ -276,11 +322,14 @@ const defaultState: State = {
             minimized: false,
             probeCommand: 'G38.2',
             connectivityTest: true,
+            touchplateTypeSwitcher: false,
             useTLO: false,
             probeDepth: 10,
             probeFeedrate: 75,
             probeFastFeedrate: 150,
             retractionDistance: 2,
+            zRetractNormal: 2,
+            zRetractAuto: 1,
             zProbeDistance: 30,
             touchPlateHeight: 10,
             probeType: 'Auto',
@@ -324,6 +373,7 @@ const defaultState: State = {
                 minPower: 0,
                 maxPower: 255,
             },
+            inputType: 'Slider',
         },
         surfacing: {
             bitDiameter: 22,
@@ -354,6 +404,7 @@ const defaultState: State = {
             cameraMode: 'pan', // 'pan' or 'rotate',
             theme: 'Dark',
             SVGEnabled: false,
+            rotaryDiameterOffsetEnabled: false,
             jobEndModal: true,
             maintenanceTaskNotifications: true,
             checkFile: false,
@@ -386,6 +437,11 @@ const defaultState: State = {
             showWarning: false,
             showLineWarnings: false,
             showSoftLimitWarning: false,
+            hideProcessedLines: false,
+            debug: {
+                profileWorker: false,
+                profileSampleEvery: 10000,
+            },
         },
     },
     commandKeys: {},

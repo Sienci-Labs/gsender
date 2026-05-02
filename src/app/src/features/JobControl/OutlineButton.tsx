@@ -36,6 +36,7 @@ const OutlineButton: React.FC<OutlineButtonProps> = ({ disabled }) => {
                 );
                 const spindleMode = store.get('widgets.spindle.mode');
                 const isLaser = laserOnOutline && spindleMode === LASER_MODE;
+                const outlineSpeed = store.get('workspace.outlineSpeed', null);
 
                 const maxRuntime = setTimeout(() => {
                     outlineWorker.terminate();
@@ -56,6 +57,7 @@ const OutlineButton: React.FC<OutlineButtonProps> = ({ disabled }) => {
                     parsedData: [],
                     mode: 'Square',
                     bbox: bbox,
+                    outlineSpeed,
                 });
             } catch (e) {
                 console.log(e);
@@ -69,7 +71,7 @@ const OutlineButton: React.FC<OutlineButtonProps> = ({ disabled }) => {
         <Button
             disabled={disabled}
             className={cx(
-                'rounded-[0.2rem] border-solid border-2 text-base px-3',
+                'rounded-[0.2rem] border-solid border-2 text-base px-3 portrait:px-6 portrait:text-lg',
                 {
                     'border-blue-500 bg-blue-500 text-white [box-shadow:_2px_2px_5px_0px_var(--tw-shadow-color)] shadow-gray-400':
                         !disabled,

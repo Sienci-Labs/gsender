@@ -6,13 +6,14 @@ import isElectron from 'is-electron';
 import pubsub from 'pubsub-js';
 import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
+import { usePostHog } from '@posthog/react';
 
 import { Button } from 'app/components/Button';
 import { RootState, store as reduxStore } from 'app/store/redux';
 import store from 'app/store';
 import controller from 'app/lib/controller';
 import {
-    CARVING_CATEGORY,
+    CARVING_CATEGORY, GRBL_ACTIVE_STATE_CHECK,
     VISUALIZER_PRIMARY,
     WORKFLOW_STATE_RUNNING,
 } from 'app/constants';
@@ -51,6 +52,9 @@ import get from 'lodash/get';
 import { Tooltip } from 'app/components/Tooltip';
 
 const ButtonControlGroup = () => {
+    const posthog = usePostHog();
+    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.platform) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const fileLoadedRef = useRef(false);
     const [recentFiles, setRecentFiles] = useState<RecentFile[]>([]);
@@ -61,13 +65,14 @@ const ButtonControlGroup = () => {
     }, [fileLoaded]);
 
     const usingElectron = isElectron();
-    // const connected = useSelector(
-    //     (state: RootState) => state.connection.isConnected,
-    // );
     const workflowState = useSelector(
         (state: RootState) => state.controller.workflow.state,
     );
+
+    const activeState = useTypedSelector((state: RootState) => state.controller.state.status?.activeState);
+
     const isRunning = workflowState === WORKFLOW_STATE_RUNNING;
+    const isCheck = workflowState === GRBL_ACTIVE_STATE_CHECK;
     const canClick = !isRunning;
 
     useEffect(() => {
@@ -158,6 +163,11 @@ const ButtonControlGroup = () => {
             controller.port,
             VISUALIZER_PRIMARY,
         );
+        posthog?.capture('file_loaded', {
+            file_name: file.name,
+            file_size_bytes: file.size,
+            source: 'file_picker',
+        });
     };
 
     const handleClickLoadFile = () => {
@@ -197,6 +207,7 @@ const ButtonControlGroup = () => {
             return;
         }
 
+        posthog?.capture('file_closed', { file_name: name });
         controller.command('gcode:unload');
         reduxStore.dispatch(unloadFileInfo());
         pubsub.publish('unload:file');
@@ -206,103 +217,101 @@ const ButtonControlGroup = () => {
     }, 100);
 
     return (
-        <div className="relative w-full flex justify-center">
-            <div className="flex rounded-md absolute top-[-35px] bg-white dark:bg-dark shadow-md z-40 border-blue-500 border-2 overflow-hidden h-12 max-xl:h-11">
-                <Button
-                    onClick={handleClickLoadFile}
-                    icon={<FaFolderOpen className="w-5 h-5" />}
-                    text="Load File"
-                    variant="ghost"
-                    disabled={!canClick}
-                    className="h-full px-4 rounded-none"
-                />
+        <div className="flex rounded-md absolute top-[-35px] bg-white dark:bg-dark shadow-md z-40 border-blue-500 border-2 overflow-hidden h-12 max-xl:h-11 portrait:h-14 portrait:top-[-45px]">
+            <Button
+                onClick={handleClickLoadFile}
+                icon={<FaFolderOpen className="w-5 h-5" />}
+                text="Load File"
+                variant="ghost"
+                disabled={!canClick}
+                className="h-full px-4 rounded-none portrait:text-xl portrait:px-6"
+            />
+            <Divider />
+            <div className="grid grid-cols-[60px_2px_60px_2px_60px] h-full portrait:grid-cols-[80px_2px_80px_2px_80px]">
+                <DropdownMenu>
+                    <Tooltip content="View Recent Files">
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                icon={
+                                    <MdKeyboardArrowDown className="w-10 h-8" />
+                                }
+                                variant="ghost"
+                                disabled={!canClick || isCheck}
+                                className="h-full rounded-none"
+                                aria-label="View Recent Files"
+                            />
+                        </DropdownMenuTrigger>
+                    </Tooltip>
+                    <DropdownMenuContent className="w-56 bg-white">
+                        <DropdownMenuLabel>Recent Files</DropdownMenuLabel>
+                        {recentFiles.map((file) => (
+                            <DropdownMenuItem
+                                key={file.filePath}
+                                onClick={() =>
+                                    handleLoadRecentFile(file.filePath)
+                                }
+                                className="flex items-center hover:bg-blue-100 transition-colors duration-200 cursor-pointer dark:hover:bg-dark-lighter"
+                            >
+                                <div className="w-full overflow-hidden">
+                                    <span
+                                        className="block truncate"
+                                        title={file.fileName}
+                                    >
+                                        {file.fileName}
+                                    </span>
+                                </div>
+                            </DropdownMenuItem>
+                        ))}
+                    </DropdownMenuContent>
+                </DropdownMenu>
+
                 <Divider />
-                <div className="grid grid-cols-[60px_2px_60px_2px_60px] h-full">
-                    <DropdownMenu>
-                        <Tooltip content="View Recent Files">
-                            <DropdownMenuTrigger asChild>
-                                <Button
-                                    icon={
-                                        <MdKeyboardArrowDown className="w-10 h-8" />
-                                    }
-                                    variant="ghost"
-                                    disabled={!canClick}
-                                    className="h-full rounded-none"
-                                />
-                            </DropdownMenuTrigger>
-                        </Tooltip>
-                        <DropdownMenuContent className="w-56 bg-white">
-                            <DropdownMenuLabel>Recent Files</DropdownMenuLabel>
-                            {recentFiles.map((file) => (
-                                <DropdownMenuItem
-                                    key={file.filePath}
-                                    onClick={() =>
-                                        handleLoadRecentFile(file.filePath)
-                                    }
-                                    className="flex items-center hover:bg-blue-100 transition-colors duration-200 cursor-pointer dark:hover:bg-dark-lighter"
-                                >
-                                    <div className="w-full overflow-hidden">
-                                        <span
-                                            className="block truncate"
-                                            title={file.fileName}
-                                        >
-                                            {file.fileName}
-                                        </span>
-                                    </div>
-                                </DropdownMenuItem>
-                            ))}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
 
-                    <Divider />
+                <ReloadFileAlert
+                    fileLoaded={canClick && fileLoaded && usingElectron}
+                    handleFileReload={handleFileReload}
+                />
 
-                    <ReloadFileAlert
-                        fileLoaded={canClick && fileLoaded && usingElectron}
-                        handleFileReload={handleFileReload}
-                    />
+                <Divider />
 
-                    <Divider />
+                <AlertDialog>
+                    <Tooltip content="Close File">
+                        <AlertDialogTrigger asChild>
+                            <Button
+                                icon={<MdClose className="w-6 h-6" />}
+                                variant="ghost"
+                                className="h-full rounded-none"
+                                disabled={isRunning || !fileLoaded}
+                                aria-label="Close File"
+                            />
+                        </AlertDialogTrigger>
+                    </Tooltip>
+                    <AlertDialogContent className="bg-white">
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                This will close the current file. Any unsaved
+                                changes will be lost.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleCloseFile}>
+                                Close File
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
 
-                    <AlertDialog>
-                        <Tooltip content="Close File">
-                            <AlertDialogTrigger asChild>
-                                <Button
-                                    icon={<MdClose className="w-6 h-6" />}
-                                    variant="ghost"
-                                    className="h-full rounded-none"
-                                    disabled={isRunning || !fileLoaded}
-                                />
-                            </AlertDialogTrigger>
-                        </Tooltip>
-                        <AlertDialogContent className="bg-white">
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                    Are you sure?
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    This will close the current file. Any
-                                    unsaved changes will be lost.
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={handleCloseFile}>
-                                    Close File
-                                </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
-
-                    <input
-                        ref={fileInputRef}
-                        type="file"
-                        className="hidden"
-                        multiple={false}
-                        onChange={handleLoadFile}
-                        accept=".gcode,.gc,.nc,.tap,.cnc"
-                        id="fileInput"
-                    />
-                </div>
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    className="hidden"
+                    multiple={false}
+                    onChange={handleLoadFile}
+                    accept={isIOSDevice ? "text/plain,application/octet-stream" : ".gcode,.gc,.nc,.tap,.cnc"}
+                    id="fileInput"
+                />
             </div>
         </div>
     );

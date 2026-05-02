@@ -14,8 +14,12 @@ import { EmptyAlarmList } from 'app/features/Stats/components/EmptyAlarmList.tsx
 //     ERROR: '#ff0000',
 // };
 
-function AlarmItem({ alarm, key }: { alarm: FirmwareEvent; key: string }) {
-    const [yyyy, mm, dd, hh, mi, _ss] = alarm.time.toString().split(/[:\-T.]+/);
+type AlarmItemProps = {
+    alarm: FirmwareEvent;
+};
+
+function AlarmItem({ alarm }: AlarmItemProps) {
+    const dateString = new Date(alarm.time).toLocaleString('en-US');
 
     const isAlarm = alarm.type === 'ALARM';
     return (
@@ -24,7 +28,6 @@ function AlarmItem({ alarm, key }: { alarm: FirmwareEvent; key: string }) {
                 'border-l-2 border-red-500': isAlarm,
                 'border-l-2 border-orange-500': !isAlarm,
             })}
-            key={key}
         >
             <span
                 className={cx(
@@ -46,7 +49,7 @@ function AlarmItem({ alarm, key }: { alarm: FirmwareEvent; key: string }) {
                 {alarm.type} {alarm.CODE} - {alarm.source}
             </h3>
             <time className="block mb-2 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">
-                {`at ${hh}:${mi} ${dd}/${mm}/${yyyy}`}
+                {`at ${dateString}`}
             </time>
             <p className="text-base font-normal text-gray-500 dark:text-gray-300">
                 {alarm.MESSAGE || 'No associated message'}
@@ -66,8 +69,8 @@ export function AlarmListing() {
     }
 
     return (
-        <div className="">
-            <ol className="relative overflow-y-auto fixed-tool-area">
+        <div className="min-h-0">
+            <ol className="relative">
                 {alarms.map((alarm) => (
                     <AlarmItem key={alarm.id} alarm={alarm} />
                 ))}

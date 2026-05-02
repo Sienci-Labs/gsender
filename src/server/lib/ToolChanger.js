@@ -42,7 +42,7 @@ class ToolChanger {
     }
 
     addInterval(cb) {
-        if (this.onIdleInterval === null) {
+        if (this.onIdleInterval !== null) {
             clearInterval(this.onIdleInterval);
         }
 

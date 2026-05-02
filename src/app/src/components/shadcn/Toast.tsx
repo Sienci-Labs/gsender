@@ -1,7 +1,5 @@
 // https://ui.shadcn.com/docs/components/toast
 
-'use client';
-
 import * as React from 'react';
 import * as ToastPrimitives from '@radix-ui/react-toast';
 import { cva, VariantProps } from 'class-variance-authority';

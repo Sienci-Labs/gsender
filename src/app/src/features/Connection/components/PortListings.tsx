@@ -6,11 +6,13 @@ import { useEffect, useState } from 'react';
 import store from 'app/store';
 import { FaArrowAltCircleRight } from 'react-icons/fa';
 import cn from 'classnames';
+import { JSX } from 'react';
 
 export interface PortListingsProps {
     ports: Port[];
     connectHandler: (p: string, c: ConnectionType) => void;
     unrecognizedPorts?: Port[];
+    isOpen?: boolean;
 }
 
 function truncatePortName(port: string = ''): string {
@@ -18,19 +20,22 @@ function truncatePortName(port: string = ''): string {
     return portName.substring(portName.length - 10, portName.length);
 }
 
-export function PortListingButton({ port, connectionHandler, baud }) {
+export function PortListingButton({ port, connectionHandler, baud }: { port: Port, connectionHandler: (port: string, type: ConnectionType) => void, baud: number }): JSX.Element {
     return (
         <button
             type="button"
-            className="w-full m-0 p-3 max-sm:p-2 shadow-inner  flex flex-row items-center justify-between hover:bg-gray-100 dark:hover:bg-slate-800"
-            onClick={() => connectionHandler(port.port, ConnectionType.USB)}
+            className="w-full m-0 p-3 max-sm:p-2 shadow-inner  flex flex-row items-center justify-between hover:bg-gray-100 dark:hover:bg-slate-800 outline-none"
+            onClick={(e) => {
+                e.stopPropagation();
+                connectionHandler(port.port, ConnectionType.USB);
+            }}
             key={`port-${port.port}`}
         >
             <span className="text-4xl">
                 <BsUsbPlug />
             </span>
             <div className="flex flex-col gap-1 text-right">
-                <span>{truncatePortName(port.port)}</span>
+                <span className="font-bold">{truncatePortName(port.port)}</span>
                 <span className="text-sm text-gray-600 font-normal">
                     USB ({baud})
                 </span>
@@ -41,6 +46,7 @@ export function PortListingButton({ port, connectionHandler, baud }) {
 
 export function PortListings(props: PortListingsProps): JSX.Element {
     const [ip, setIP] = useState<string>('255.255.255.255');
+    const [port, setPort] = useState<number>(23);
     const [baud, setBaud] = useState(115200);
     const [openUnrecognized, setOpenUnrecognized] = useState<boolean>(false);
 
@@ -48,6 +54,8 @@ export function PortListings(props: PortListingsProps): JSX.Element {
         const ip = store.get('widgets.connection.ip', []);
         const ipString = ip.join('.');
         setIP(ipString);
+
+        setPort(store.get('widgets.connection.ethernetPort', 23));
     }, []);
 
     store.on('change', () => {
@@ -56,14 +64,16 @@ export function PortListings(props: PortListingsProps): JSX.Element {
         const ipString = ip.join('.');
         setIP(ipString);
         setBaud(baudrate);
+        setPort(store.get('widgets.connection.ethernetPort', 23));
     });
 
-    function toggleUnrecognizedPorts() {
+    function toggleUnrecognizedPorts(e: React.MouseEvent) {
+        e.stopPropagation();
         setOpenUnrecognized(!openUnrecognized);
     }
 
     return (
-        <div className="absolute left-0 top-full z-50 bg-white dark:bg-dark border border-gray-300 dark:border-gray-700 w-full min-w[250px] rounded mt-1 divide-y divide-dotted invisible hover:divide-solid divide-blue-300 shadow-lg group-hover:visible min-w-[250px] sm:min-w-0 ">
+        <div className="w-full bg-white dark:bg-dark divide-y divide-dotted divide-blue-300">
             {props.ports.length === 0 && (
                 <p className="font-normal flex items-center justify-center p-2 mt-2">
                     No USB devices found
@@ -78,8 +88,9 @@ export function PortListings(props: PortListingsProps): JSX.Element {
                 />
             ))}
             <button
-                className="px-4 shadow-inner py-4 flex flex-row items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800 mt-1 w-full"
-                onClick={() => {
+                className="px-4 shadow-inner py-4 flex flex-row items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800 outline-none mt-1 w-full"
+                onClick={(e) => {
+                    e.stopPropagation();
                     props.connectHandler(ip, ConnectionType.ETHERNET);
                 }}
             >
@@ -87,26 +98,31 @@ export function PortListings(props: PortListingsProps): JSX.Element {
                     <BsEthernet />
                 </span>
                 <div className="flex flex-col gap-1 text-right">
-                    <span>{ip}</span>
+                    <span className="font-bold">{ip}</span>
                     <span className="text-sm text-gray-600 font-normal">
-                        Ethernet (port 23)
+                        Ethernet (port {port})
                     </span>
                 </div>
             </button>
             {props.unrecognizedPorts.length > 0 && (
-                <div className="flex flex-col">
+                <div className="flex flex-col overflow-hidden">
                     <button
-                        className="text-base text-gray-700 dark:text-gray-300 my-2 flex flex-row justify-between items-center px-2"
+                        className="text-base text-gray-700 dark:text-gray-300 my-2 flex flex-row justify-between items-center px-2 outline-none"
                         onClick={toggleUnrecognizedPorts}
                     >
                         <span>Unrecognized Ports</span>
-                        <span>
+                        <span
+                            className={cn('transition-transform duration-300 ease-in-out', {
+                                'rotate-90': openUnrecognized,
+                            })}
+                        >
                             <FaArrowAltCircleRight />
                         </span>
                     </button>
                     <div
-                        className={cn('flex flex-col', {
-                            hidden: !openUnrecognized,
+                        className={cn('flex flex-col transition-all duration-300 ease-in-out origin-top', {
+                            'max-h-0 opacity-0 scale-y-0': !openUnrecognized,
+                            'max-h-[500px] opacity-100 scale-y-100': openUnrecognized,
                         })}
                     >
                         {props.unrecognizedPorts.map((port) => {

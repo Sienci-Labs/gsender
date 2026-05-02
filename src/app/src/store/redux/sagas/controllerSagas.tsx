@@ -30,18 +30,18 @@ import { store as reduxStore } from 'app/store/redux';
 import controller from 'app/lib/controller';
 import manualToolChange from 'app/wizards/manualToolchange';
 import semiautoToolChange from 'app/wizards/semiautoToolchange';
-import automaticToolChange from 'app/wizards/automaticToolchange';
-import semiautoToolchangeSecondRun from 'app/wizards/semiautoToolchangeSecondRun';
-import automaticToolchangeSecondRun from 'app/wizards/automaticToolchangeSecondRun';
+import { determineFixedSensorInstructions } from 'app/lib/toolChangeUtils';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 // TODO: add worker types
 // @ts-ignore
 import VisualizeWorker from 'app/workers/Visualize.worker';
 import {
+    setActiveVisualizeJobId,
     shouldVisualize,
     visualizeResponse,
 } from 'app/workers/Visualize.response';
 import { isLaserMode } from 'app/lib/laserMode';
+import { getVisualizerTheme } from 'app/lib/getVisualizerTheme';
 import {
     RENDER_LOADING,
     RENDER_RENDERED,
@@ -75,15 +75,19 @@ import {
     updateFeederStatus,
     updateWorkflowState,
     addSpindle,
+    clearSpindles,
     updateAlarmDescriptions,
     updateSettingsDescriptions,
     updateHomingFlag,
+    updateHasHomed,
     updateSenderStatus,
     updateControllerType,
+    addSDCardFileToList,
 } from '../slices/controller.slice';
 import {
     FILE_TYPE_T,
     PortInfo,
+    SDCardFile,
     SerialPortOptions,
     WORKFLOW_STATES_T,
 } from '../../definitions';
@@ -97,7 +101,7 @@ import {
 import { BasicObject, GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
 import { TOOL } from 'app/lib/definitions/gcode_virtualization';
 import { WORKSPACE_MODE_T } from 'app/workspace/definitions';
-import { connectToLastDevice } from 'app/features/Firmware/utils/index';
+import { connectToLastDevice } from 'app/lib/connection';
 import { updateWorkspaceMode } from 'app/lib/rotary';
 import api from 'app/api';
 import {
@@ -106,7 +110,6 @@ import {
     updateFileProcessing,
     updateFileRenderState,
 } from '../slices/fileInfo.slice';
-import { getEstimateData } from 'app/lib/indexedDB';
 import { setIpList } from '../slices/preferences.slice';
 import { updateJobOverrides } from '../slices/visualizer.slice';
 import { toast } from 'app/lib/toaster';
@@ -114,14 +117,29 @@ import { Job } from 'app/features/Stats/utils/StatContext';
 import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
 import { Spindle } from 'app/features/Spindle/definitions';
 import { AlarmsErrors } from 'app/definitions/alarms_errors';
+import { KeepoutToggle } from 'app/features/ATC/components/KeepOut/KeepOutToggle.tsx';
+import get from 'lodash/get';
 
 export function* initialize(): Generator<any, void, any> {
-    // let visualizeWorker: typeof VisualizeWorker | null = null;
+    let visualizeWorker: typeof VisualizeWorker | null = null;
+    let visualizeJobId = 0;
     // let estimateWorker: EstimateWorker | null = null;
     let currentState: GRBL_ACTIVE_STATES_T = GRBL_ACTIVE_STATE_IDLE;
     let prevState: GRBL_ACTIVE_STATES_T = GRBL_ACTIVE_STATE_IDLE;
     let errors: any[] = [];
-    let finishLoad = false;
+    let latestEstimateData: { estimates: number[]; estimatedTime: number } = {
+        estimates: [],
+        estimatedTime: 0,
+    };
+    let hasEstimateData = false;
+
+    const clearEstimateDataCache = () => {
+        latestEstimateData = {
+            estimates: [],
+            estimatedTime: 0,
+        };
+        hasEstimateData = false;
+    };
 
     /* Health check - every 3 minutes */
     setInterval(
@@ -207,11 +225,21 @@ export function* initialize(): Generator<any, void, any> {
     ) => {
         const reduxState = reduxStore.getState();
         const isLaser = isLaserMode();
+        // Keep SVG path generation tied to lightweight option selection so
+        // users can switch to SVG view instantly after a file is loaded.
         const shouldIncludeSVG = shouldVisualizeSVG();
+        const profileWorker = store.get(
+            'widgets.visualizer.debug.profileWorker',
+            false,
+        );
+        const profileSampleEvery = Number(
+            store.get('widgets.visualizer.debug.profileSampleEvery', 10000),
+        );
         const accelerations = {
             xAccel: _get(reduxState, 'controller.settings.settings.$120'),
             yAccel: _get(reduxState, 'controller.settings.settings.$121'),
             zAccel: _get(reduxState, 'controller.settings.settings.$122'),
+            aAccel: _get(reduxState, 'controller.settings.settings.$123'),
         };
         const maxFeedrates = {
             xMaxFeed: Number(
@@ -223,7 +251,20 @@ export function* initialize(): Generator<any, void, any> {
             zMaxFeed: Number(
                 _get(reduxState, 'controller.settings.settings.$112', 3000.0),
             ),
+            aMaxFeed: Number(
+                _get(reduxState, 'controller.settings.settings.$113', 3000.0),
+            ),
         };
+        const rotaryDiameterOffsetEnabled = store.get(
+            'widgets.visualizer.rotaryDiameterOffsetEnabled',
+            false,
+        );
+        const atcFlag: string = get(
+            reduxStore,
+            'controller.settings.info.NEWOPT.ATC',
+            '0',
+        );
+        const atcEnabled = atcFlag === '1';
 
         // compare previous file data to see if it's a new file and we need to reparse
         let isNewFile = true;
@@ -236,6 +277,9 @@ export function* initialize(): Generator<any, void, any> {
         if (content === prevContent && size === prevSize && name === prevName) {
             isNewFile = false;
         }
+
+        // Ensure a previous parse worker does not continue emitting stale messages.
+        visualizeWorker?.terminate();
 
         if (visualizer === VISUALIZER_SECONDARY) {
             reduxStore.dispatch(
@@ -256,8 +300,7 @@ export function* initialize(): Generator<any, void, any> {
             const needsVisualization = shouldVisualize();
 
             if (needsVisualization) {
-                // visualizeWorker = new VisualizeWorker();
-                const visualizeWorker = new Worker(
+                visualizeWorker = new Worker(
                     new URL(
                         '../../../workers/Visualize.worker.ts',
                         import.meta.url,
@@ -265,17 +308,24 @@ export function* initialize(): Generator<any, void, any> {
                     { type: 'module' },
                 );
                 visualizeWorker.onmessage = visualizeResponse;
-                // await getParsedData().then((value) => {
-                const parsedData: null = null;
+                const jobId = ++visualizeJobId;
+                setActiveVisualizeJobId(jobId);
                 visualizeWorker.postMessage({
+                    jobId,
                     content,
                     visualizer,
-                    parsedData,
+                    activeVisualizer: visualizer,
+                    isSecondary: visualizer === VISUALIZER_SECONDARY,
                     isNewFile,
+                    isLaser,
                     accelerations,
                     maxFeedrates,
+                    atcEnabled,
+                    rotaryDiameterOffsetEnabled,
+                    theme: getVisualizerTheme(),
+                    profile: profileWorker,
+                    profileSampleEvery,
                 });
-                // });
             } else {
                 reduxStore.dispatch(
                     updateFileRenderState({
@@ -312,26 +362,32 @@ export function* initialize(): Generator<any, void, any> {
 
         const needsVisualization = shouldVisualize();
 
-        // visualizeWorker = new VisualizeWorker();
-        const visualizeWorker = new Worker(
+        visualizeWorker = new Worker(
             new URL('../../../workers/Visualize.worker.ts', import.meta.url),
             { type: 'module' },
         );
         visualizeWorker.onmessage = visualizeResponse;
-        // await getParsedData().then((value) => {
-        const parsedData: null = null;
+        const jobId = ++visualizeJobId;
+        setActiveVisualizeJobId(jobId);
+        console.time('gSender:fileLoad');
         visualizeWorker.postMessage({
+            jobId,
             content,
             visualizer,
+            activeVisualizer: visualizer,
+            isSecondary: visualizer === VISUALIZER_SECONDARY,
             isLaser,
             shouldIncludeSVG,
             needsVisualization,
-            parsedData,
             isNewFile,
             accelerations,
             maxFeedrates,
+            atcEnabled,
+            rotaryDiameterOffsetEnabled,
+            theme: getVisualizerTheme(),
+            profile: profileWorker,
+            profileSampleEvery,
         });
-        // });
     };
 
     const updateAlarmsErrors = async (error: any) => {
@@ -458,6 +514,11 @@ export function* initialize(): Generator<any, void, any> {
                 'widgets.visualizer.showLineWarnings',
             );
             const delay: number = store.get('widgets.spindle.delay');
+            const useAaxisForGrbl: boolean = store.get(
+                'workspace.rotaryAxis.useAaxisForGrbl',
+                false,
+            );
+            reduxStore.dispatch(clearSpindles());
             // Reset homing run flag to prevent rapid position without running homing
             reduxStore.dispatch(resetHoming());
 
@@ -472,6 +533,8 @@ export function* initialize(): Generator<any, void, any> {
             if (delay !== undefined) {
                 controller.command('settings:updated', { spindleDelay: delay });
             }
+
+            controller.command('settings:updated', { useAaxisForGrbl });
 
             updateToolchangeContext();
 
@@ -492,10 +555,11 @@ export function* initialize(): Generator<any, void, any> {
 
     controller.addListener(
         'serialport:close',
-        (options: SerialPortOptions, _received: number) => {
+        (_options: SerialPortOptions, _received: number) => {
+            reduxStore.dispatch(clearSpindles());
             // Reset homing run flag to prevent rapid position without running homing
             reduxStore.dispatch(resetHoming());
-            reduxStore.dispatch(closeConnection({ port: options.port }));
+            reduxStore.dispatch(closeConnection());
 
             pubsub.publish('machine:disconnected');
         },
@@ -503,12 +567,12 @@ export function* initialize(): Generator<any, void, any> {
 
     controller.addListener(
         'serialport:closeController',
-        (_options: SerialPortOptions, received: number) => {
+        (_options: SerialPortOptions, currentLineRunning: number) => {
             // if the connection was closed unexpectedly (not by the user),
             // the number of lines sent will be defined.
             // create a pop up so the user can connect to the last active port
             // and resume from the last line
-            if (received) {
+            if (currentLineRunning) {
                 const homingEnabled: string = _get(
                     reduxStore.getState(),
                     'controller.settings.settings.$22',
@@ -520,7 +584,7 @@ export function* initialize(): Generator<any, void, any> {
                         : 'The machine connection has been disrupted. To attempt to reconnect to the last active port, ' +
                           'press Resume. After that, you can set your Workspace 0 and use the Start From Line function to continue the job. ' +
                           'Suggested line to start from: ' +
-                          received;
+                          currentLineRunning;
 
                 const content = (
                     <div>
@@ -538,7 +602,7 @@ export function* initialize(): Generator<any, void, any> {
                         connectToLastDevice(() => {
                             // prompt recovery, either with homing or a prompt to start from line
                             pubsub.publish('disconnect:recovery', {
-                                received,
+                                currentLineRunning,
                                 homingEnabled,
                             });
                         });
@@ -561,54 +625,58 @@ export function* initialize(): Generator<any, void, any> {
         },
     );
 
-    controller.addListener('gcode:toolChange', (context: any, comment = '') => {
-        const payload = {
-            context,
-            comment,
-        };
-        const skipDialog = store.get('workspace.toolChange.skipDialog', false);
+    controller.addListener(
+        'gcode:toolChange',
+        async (context: any, comment = '') => {
+            const payload = {
+                context,
+                comment,
+            };
+            const skipDialog = store.get(
+                'workspace.toolChange.skipDialog',
+                false,
+            );
 
-        const { option, count } = context;
-        if (option === 'Pause') {
-            const msg = 'Toolchange pause' + (comment ? ` - ${comment}` : '');
-            if (!skipDialog) {
-                toast.info(msg, { position: 'bottom-right' });
-            }
-        } else {
-            let title, instructions;
-
-            if (option === 'Standard Re-zero') {
-                title = 'Standard Re-zero Tool Change';
-                instructions = manualToolChange;
-            } else if (option === 'Flexible Re-zero') {
-                title = 'Flexible Re-zero Tool Change';
-                instructions =
-                    count > 1
-                        ? semiautoToolchangeSecondRun
-                        : semiautoToolChange;
-            } else if (option === 'Fixed Tool Sensor') {
-                title = 'Fixed Tool Sensor Tool Change';
-                instructions =
-                    count > 1
-                        ? automaticToolchangeSecondRun
-                        : automaticToolChange;
+            const { option, count } = context;
+            if (option === 'Pause') {
+                const msg =
+                    'Toolchange pause' + (comment ? ` - ${comment}` : '');
+                if (!skipDialog) {
+                    toast.info(msg, { position: 'bottom-right' });
+                }
             } else {
-                console.error('Invalid toolchange option passed');
-                return;
-            }
+                let title, instructions;
 
-            // Run start block on idle if exists
-            if (instructions.onStart) {
-                const onStart = instructions.onStart();
-                controller.command('wizard:start', onStart);
+                if (option === 'Standard Re-zero') {
+                    title = 'Standard Re-zero Tool Change';
+                    instructions = manualToolChange;
+                } else if (option === 'Flexible Re-zero') {
+                    title = 'Flexible Re-zero Tool Change';
+                    instructions = semiautoToolChange(count);
+                } else if (option === 'Fixed Tool Sensor') {
+                    title = 'Fixed Tool Sensor Tool Change';
+                    instructions = await determineFixedSensorInstructions(
+                        count,
+                        comment,
+                    );
+                } else {
+                    console.error('Invalid toolchange option passed');
+                    return;
+                }
+
+                if (instructions.onStart) {
+                    const onStart = instructions.onStart();
+                    controller.command('wizard:start', onStart);
+                }
+
+                pubsub.publish('wizard:load', {
+                    ...payload,
+                    title,
+                    instructions,
+                });
             }
-            pubsub.publish('wizard:load', {
-                ...payload,
-                title,
-                instructions,
-            });
-        }
-    });
+        },
+    );
 
     controller.addListener('toolchange:preHookComplete', (comment = '') => {
         const onConfirmhandler = () => {
@@ -640,7 +708,7 @@ export function* initialize(): Generator<any, void, any> {
     });
 
     controller.addListener('gcode:load', (name: string, content: string) => {
-        finishLoad = false;
+        clearEstimateDataCache();
         const size = new Blob([content]).size;
         reduxStore.dispatch(updateFileContent({ content, size, name }));
     });
@@ -653,6 +721,7 @@ export function* initialize(): Generator<any, void, any> {
     );
 
     controller.addListener('gcode:unload', () => {
+        clearEstimateDataCache();
         reduxStore.dispatch(unloadFileInfo());
     });
 
@@ -699,43 +768,46 @@ export function* initialize(): Generator<any, void, any> {
     );
 
     controller.addListener('requestEstimateData', () => {
-        if (finishLoad) {
-            finishLoad = false;
-            getEstimateData().then((value) => {
-                controller.command('updateEstimateData', value);
-            });
+        if (hasEstimateData) {
+            controller.command('updateEstimateData', latestEstimateData);
         }
     });
 
     // // Need this to handle unload when machine not connected since controller event isn't sent
     pubsub.subscribe('gcode:unload', () => {
+        clearEstimateDataCache();
         reduxStore.dispatch(unloadFileInfo());
     });
 
     // TODO: uncomment when worker types are defined
-    pubsub.subscribe('file:load', () => {
-        const visualizeWorker = new Worker(
-            new URL('../../../workers/Visualize.worker.ts', import.meta.url),
-            { type: 'module' },
-        );
-
+    pubsub.subscribe('visualizeWorker:terminate', () => {
         visualizeWorker?.terminate();
     });
 
-    pubsub.subscribe('parsedData:stored', () => {
-        finishLoad = true;
-        getEstimateData().then((value) => {
-            controller.command('updateEstimateData', value);
-        });
-    });
-
-    // // for when you don't want to send file to backend
     pubsub.subscribe(
-        'visualizer:load',
-        (_, { content, size, name, visualizer }) => {
-            parseGCode(content, size, name, visualizer);
+        'estimateData:ready',
+        (
+            _msg,
+            value: { estimates?: number[]; estimatedTime?: number } = {},
+        ) => {
+            latestEstimateData = {
+                estimates: Array.isArray(value?.estimates)
+                    ? value.estimates
+                    : [],
+                estimatedTime: Number(value?.estimatedTime) || 0,
+            };
+            hasEstimateData = true;
+            controller.command('updateEstimateData', latestEstimateData);
         },
     );
+
+    // // for when you don't want to send file to backend
+    // pubsub.subscribe(
+    //     'visualizer:load',
+    //     (_, { content, size, name, visualizer }) => {
+    //         parseGCode(content, size, name, visualizer);
+    //     },
+    // );
 
     // TODO: this is where the estimate worker should be terminated, estimate worker is not defined anywhere for some reason
     pubsub.subscribe('estimate:done', (_msg, _data) => {
@@ -751,39 +823,43 @@ export function* initialize(): Generator<any, void, any> {
 
     controller.addListener('workflow:pause', (opts: { data: string }) => {
         const { data } = opts;
+
         toast.info(
             `'${data}' pause command found in file - press "Resume Job" to continue running.`,
             { position: 'bottom-right' },
         );
     });
 
-    controller.addListener('sender:M0M1', (opts: { comment: string }) => {
-        const { comment = '' } = opts;
-        const msg =
-            'Hit ‘Close Window‘ if you want to do a tool change, jog, set a new zero, or perform any other operation then hit the standard ‘Resume Job’ button to keep cutting when you’re ready.';
+    controller.addListener(
+        'sender:M0M1',
+        (opts: { comment: string; ignoreEvent: boolean }) => {
+            const { comment = '', ignoreEvent = false } = opts;
+            const msg =
+                'Hit ‘Close Window‘ if you want to do a tool change, jog, set a new zero, or perform any other operation then hit the standard ‘Resume Job’ button to keep cutting when you’re ready.';
 
-        const content =
-            comment.length > 0 ? (
-                <div>
-                    <p>{msg}</p>
-                    <p>
-                        Comment: <b>{comment}</b>
-                    </p>
-                </div>
-            ) : (
-                msg
-            );
+            const content =
+                comment.length > 0 ? (
+                    <div>
+                        <p>{msg}</p>
+                        <p>
+                            Comment: <b>{comment}</b>
+                        </p>
+                    </div>
+                ) : (
+                    msg
+                );
 
-        Confirm({
-            title: 'M0/M1 Pause',
-            content,
-            confirmLabel: 'Resume Job',
-            cancelLabel: 'Close Window',
-            onConfirm: () => {
-                controller.command('gcode:resume');
-            },
-        });
-    });
+            Confirm({
+                title: 'M0/M1 Pause',
+                content,
+                confirmLabel: 'Resume Job',
+                cancelLabel: 'Close Window',
+                onConfirm: () => {
+                    controller.command('gcode:resume', ignoreEvent);
+                },
+            });
+        },
+    );
 
     controller.addListener('outline:start', () => {
         toast.success('Running file outline', { position: 'bottom-right' });
@@ -792,6 +868,10 @@ export function* initialize(): Generator<any, void, any> {
     controller.addListener('homing:flag', (flag: boolean) => {
         reduxStore.dispatch(updateHomingFlag({ homingFlag: flag }));
         pubsub.publish('softlimits:check');
+    });
+
+    controller.addListener('homing:has-homed', (hasHomed: boolean) => {
+        reduxStore.dispatch(updateHasHomed({ hasHomed }));
     });
 
     controller.addListener('firmware:ready', (status: string) => {
@@ -813,8 +893,6 @@ export function* initialize(): Generator<any, void, any> {
             //     reduxStore.getState(),
             //     'controller.settings.settings.$22',
             // );
-
-            console.log(error);
 
             const showLineWarnings = store.get(
                 'widgets.visualizer.showLineWarnings',
@@ -897,7 +975,7 @@ export function* initialize(): Generator<any, void, any> {
     controller.addListener(
         'gcode_error',
         _throttle(
-            (error) => {
+            (error: string) => {
                 errors.push(error);
             },
             250,
@@ -914,7 +992,7 @@ export function* initialize(): Generator<any, void, any> {
         },
     );
 
-    controller.addListener('settings:alarm', (data: BasicObject) => {
+    controller.addListener('settings:alarms', (data: BasicObject) => {
         reduxStore.dispatch(updateAlarmDescriptions({ alarms: data }));
     });
 
@@ -935,6 +1013,75 @@ export function* initialize(): Generator<any, void, any> {
     controller.addListener('job:start', () => {
         errors = [];
     });
+
+    controller.addListener('sdcard:files', (file: SDCardFile) => {
+        if (!file) return;
+        reduxStore.dispatch(addSDCardFileToList({ file }));
+    });
+
+    controller.addListener(
+        'atci',
+        (payload: {
+            subtype: string;
+            message: string;
+            description: string;
+        }) => {
+            if (payload.subtype === '0') {
+                Confirm({
+                    title: payload.message,
+                    content: payload.description,
+                    confirmLabel: 'Resume',
+                    cancelLabel: 'Reset',
+                    onConfirm: () => {
+                        controller.command('cyclestart');
+                    },
+                    onClose: () => {
+                        controller.command('reset');
+                    },
+                });
+            } else if (payload.subtype === '1') {
+                Confirm({
+                    title: payload.message,
+                    content: payload.description,
+                    confirmLabel: 'OK',
+                    cancelLabel: 'Reset',
+                    onConfirm: () => {
+                        controller.command('cyclestart');
+                    },
+                    hideClose: true,
+                });
+            } else if (payload.subtype === '2') {
+                Confirm({
+                    title: payload.message,
+                    content: payload.description,
+                    confirmLabel: 'Reset',
+                    onConfirm: () => {
+                        controller.command('reset');
+                    },
+                    hideClose: true,
+                });
+            } else if ((payload.subtype = '10')) {
+                pubsub.publish('helper:info', {
+                    title: 'Jogging Inside Keepout Area',
+                    content: (
+                        <div className="flex flex-row gap-4 items-centerx`">
+                            <span>Keepout:</span>
+                            <KeepoutToggle />
+                        </div>
+                    ),
+                    description:
+                        'You are attempting to jog inside the keepout area.  Disable keepout using the switch below and then re-enable to continue',
+                });
+            } else {
+                Confirm({
+                    title: 'ATC requested a dialog.',
+                    content: 'Continue to unhold, Reset to stop action.',
+                    confirmLabel: 'Continue',
+                    cancelLabel: 'Reset',
+                });
+            }
+        },
+    );
 
     controller.addListener('job:stop', () => {
         const revertWorkspace = store.get('workspace.revertWorkspace');

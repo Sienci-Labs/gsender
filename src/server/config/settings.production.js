@@ -28,6 +28,14 @@ import urljoin from '../lib/urljoin';
 const publicPath = global.PUBLIC_PATH || ''; // see gulp/task/app.js
 const maxAge = (365 * 24 * 60 * 60 * 1000); // one year
 
+// Resolve paths relative to where the binary is located
+// In prod: dist/gsender/server-cli.js needs to find dist/gsender/app
+const getAppPath = () => {
+    // __dirname will be the bundled output location (dist/gsender)
+    // We need to go from dist/gsender/server-cli.js to dist/gsender/app
+    return path.resolve(__dirname, 'app');
+};
+
 export default {
     route: '/', // with trailing slash
     assets: {
@@ -36,7 +44,8 @@ export default {
                 urljoin(publicPath, '/'),
                 '/' // fallback
             ],
-            path: path.resolve(__dirname, '..', '..', 'app'),
+            // In production, app is in dist/gsender/app
+            path: getAppPath(),
             maxAge: maxAge
         }
     },
