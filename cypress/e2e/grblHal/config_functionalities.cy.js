@@ -65,10 +65,6 @@ describe('gSender Configuration and Firmware Test Suite', () => {
     });
 
     // Part 2: Firmware Settings
-<<<<<<< HEAD
-=======
-    // --------------------------------------------------------
->>>>>>> fef908f00 (saving changes before merging dev)
 cy.log('Part 2: Firmware Settings');
 
 // Restore defaults
