@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import controller from '@gsender/controller-client/controller';
 import { VISUALIZER_PRIMARY } from 'app/constants';
+import GcodeEditor from 'app/features/Visualizer/GcodeEditor';
 import { store as reduxStore } from '@gsender/controller-client/store/redux';
 import {
     updateFileContent,
@@ -135,10 +136,6 @@ export default function BottomDrawer() {
         { label: 'BOUNDS',    Icon: Move,      value: boundsStr },
         { label: 'SIZE',      Icon: HardDrive, value: formatSize(file.size) },
     ];
-
-    const gcodeLines = file.fileLoaded
-        ? file.content.split('\n').filter(l => l.trim()).slice(0, 40)
-        : [];
 
     // Total drawer height includes header so the header rises with expansion.
     const panelHeight = mode === 'expanded'
@@ -301,13 +298,10 @@ export default function BottomDrawer() {
                     {mode === 'expanded' && (
                         <div className="flex-1 overflow-hidden min-h-0">
                             {activeTab === 'File' && file.fileLoaded && (
-                                <div className="h-full overflow-auto font-mono text-[10px] leading-5 text-gray-500 dark:text-gray-400 px-3 py-2">
-                                    {gcodeLines.map((line, i) => (
-                                        <div key={i} className="flex gap-3 hover:bg-gray-200/40 dark:hover:bg-dark-lighter/20">
-                                            <span className="w-8 text-right shrink-0 text-gray-300 dark:text-gray-600 select-none">{i + 1}</span>
-                                            <span>{line}</span>
-                                        </div>
-                                    ))}
+                                <div className="h-full overflow-auto px-3 py-2">
+                                    <div className="h-full rounded-lg border border-gray-200 dark:border-dark-lighter bg-white dark:bg-dark overflow-hidden">
+                                        <GcodeEditor onClose={() => setMode('minimal')} />
+                                    </div>
                                 </div>
                             )}
                             {activeTab === 'File' && !file.fileLoaded && (
