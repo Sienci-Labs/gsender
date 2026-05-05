@@ -6,6 +6,7 @@ import CarveView from './components/CarveView';
 import PlaceholderView from './components/PlaceholderView';
 import PendantConfigView from './components/PendantConfigView';
 import BottomNav from './components/BottomNav';
+import JobCompletionAlert from './components/JobCompletionAlert';
 
 type NavTab = 'carve' | 'tools' | 'config';
 
@@ -28,6 +29,7 @@ export default function PendantShell() {
             {activeTab === 'config' && <PendantConfigView />}
 
             <BottomNav active={activeTab} onChange={setActiveTab} />
+            <JobCompletionAlert />
         </div>
     );
 }
