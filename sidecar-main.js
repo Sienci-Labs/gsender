@@ -48,6 +48,7 @@ if (process.pkg) {
 // Static requires so pkg includes these dynamically-resolved modules in the bundle
 require('axios/dist/node/axios.cjs');
 
+process.env.GSENDER_SIDECAR = '1';
 process.env.NODE_ENV = 'production';
 const launchServer = require('./dist/gsender/server-cli');
 launchServer().catch(function (e) {

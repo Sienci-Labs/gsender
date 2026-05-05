@@ -65,6 +65,7 @@ const result = spawnSync(
         'sidecar-main.js',
         '--target', 'node18',
         '--assets', 'dist/gsender/pendant/**/*',
+        '--assets', 'dist/gsender/views/**/*',
         '--output', outPath,
     ],
     { stdio: 'inherit', cwd: root, shell: isWindows }

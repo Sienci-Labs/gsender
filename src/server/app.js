@@ -472,10 +472,22 @@ const appMain = () => {
         // }));
     }
 
-    const { viteServer } = require('./vite-server');
-    viteServer(app).catch((err) => {
-        log.error('Failed to initialize vite server:', err);
-    });
+    if (!process.env.GSENDER_SIDECAR) {
+        const { viteServer } = require('./vite-server');
+        viteServer(app).catch((err) => {
+            log.error('Failed to initialize vite server:', err);
+        });
+    } else {
+        // In sidecar mode there is no main web app, so swallow unmatched requests
+        // before they reach webappengine's Hogan error middleware.
+        app.use((req, res) => {
+            res.status(404).end();
+        });
+        app.use((err, req, res, next) => {
+            log.error('Unhandled request error:', err);
+            res.status(500).end();
+        });
+    }
 
     return app;
 };
