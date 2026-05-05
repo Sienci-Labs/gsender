@@ -82,7 +82,7 @@ const readRecentFiles = (): RecentFile[] => {
         fileSize: Number(entry.fileSize) || 0,
         timeLoaded: Number(entry.timeLoaded) || 0,
         filePath: entry.filePath || '',
-    }));
+    })).slice(0, 5);
 };
 
 export default function BottomDrawer() {
@@ -99,7 +99,9 @@ export default function BottomDrawer() {
     const file = useTypedSelector((s: RootState) => s.file);
 
     useEffect(() => {
-        setRecentFiles(readRecentFiles());
+        const normalized = readRecentFiles();
+        localStorage.setItem(RECENT_KEY, JSON.stringify(normalized));
+        setRecentFiles(normalized);
     }, []);
 
     useEffect(() => () => {
