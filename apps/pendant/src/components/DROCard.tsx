@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import cn from 'classnames';
 import { Home, Target, Crosshair } from 'lucide-react';
+import get from 'lodash/get';
 import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import type { RootState } from '@gsender/controller-client/store/redux';
-import { goXYAxes, gotoZero, zeroAllAxes, zeroWCS } from '@gsender/features/DRO/utils/DRO';
+import { goXYAxes, gotoZero, homeMachine, zeroAllAxes, zeroWCS } from '@gsender/features/DRO/utils/DRO';
 import {
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
@@ -27,6 +28,9 @@ export default function DROCard() {
     const isConnected = useTypedSelector((s: RootState) => s.connection.isConnected);
     const workflowState = useTypedSelector((s: RootState) => s.controller.workflow.state);
     const activeState = useTypedSelector((s: RootState) => s.controller.state.status?.activeState ?? '');
+    const homingEnabled = useTypedSelector((s: RootState) =>
+        Number(get(s, 'controller.settings.settings.$22', 0)) > 0,
+    );
     const wpos = useTypedSelector((s: RootState) => s.controller.wpos);
     const mpos = useTypedSelector((s: RootState) => s.controller.mpos);
     const activePos = !isConnected
@@ -40,6 +44,7 @@ export default function DROCard() {
         (activeState === GRBL_ACTIVE_STATE_IDLE ||
             activeState === GRBL_ACTIVE_STATE_JOG);
     const canGoTo = canZero;
+    const canHome = canGoTo && homingEnabled;
 
     return (
         <div className="rounded-xl bg-gray-100 border border-gray-200 dark:bg-dark-darker dark:border-dark-lighter p-3 flex flex-col gap-3">
@@ -108,14 +113,18 @@ export default function DROCard() {
                     <button
                         key={label}
                         onClick={
-                            label === 'Zero All'
+                            label === 'Home'
+                                ? homeMachine
+                                : label === 'Zero All'
                                 ? zeroAllAxes
                                 : label === 'Go to XY'
                                     ? goXYAxes
                                     : undefined
                         }
                         disabled={
-                            label === 'Go to XY'
+                            label === 'Home'
+                                ? !canHome
+                                : label === 'Go to XY'
                                 ? !canGoTo
                                 : primary
                                     ? !isConnected
@@ -123,7 +132,7 @@ export default function DROCard() {
                         }
                         className={`flex items-center justify-center gap-2 rounded-lg h-12 text-sm border transition-colors ${
                             primary
-                                ? (isConnected
+                                ? ((label === 'Home' ? canHome : label === 'Go to XY' ? canGoTo : isConnected)
                                     ? 'bg-blue-500 hover:bg-blue-600 active:bg-blue-700 border-blue-500 text-white'
                                     : 'bg-gray-200 border-gray-200 text-gray-400 dark:bg-dark-lighter dark:border-dark-lighter dark:text-gray-500')
                                 : (canZero

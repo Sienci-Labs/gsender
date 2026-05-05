@@ -216,7 +216,7 @@ function JogActionButton({
             type="button"
             disabled={disabled}
             aria-label={ariaLabel}
-            className={`${resolvedClassName} ${active ? 'jog-btn-active' : ''} ${disabled ? 'opacity-50 cursor-default' : ''}`}
+            className={`${resolvedClassName} ${active ? 'jog-btn-active' : ''} ${disabled ? 'cursor-default' : ''}`}
             onContextMenu={(event) => event.preventDefault()}
             {...longPressBind}
         >
@@ -599,8 +599,8 @@ export default function JoggingCard() {
                             >
                                 {(active) => (
                                     <div className="h-full w-full flex flex-col items-center justify-center gap-0.5">
-                                        <ChevronUp className={`w-5 h-5 ${active ? 'text-white' : 'text-blue-500 dark:text-blue-400'}`} />
-                                        <span className={`text-xl font-semibold leading-none ${active ? 'text-white' : 'text-blue-700 dark:text-blue-300'}`}>Z+</span>
+                                        <ChevronUp className={`w-5 h-5 ${active ? 'text-white' : canJog ? 'text-blue-500 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500'}`} />
+                                        <span className={`text-xl font-semibold leading-none ${active ? 'text-white' : canJog ? 'text-blue-700 dark:text-blue-300' : 'text-gray-400 dark:text-gray-500'}`}>Z+</span>
                                     </div>
                                 )}
                             </JogActionButton>
@@ -617,8 +617,8 @@ export default function JoggingCard() {
                             >
                                 {(active) => (
                                     <div className="h-full w-full flex flex-col items-center justify-center gap-0.5">
-                                        <ChevronDown className={`w-5 h-5 ${active ? 'text-white' : 'text-blue-500 dark:text-blue-400'}`} />
-                                        <span className={`text-xl font-semibold leading-none ${active ? 'text-white' : 'text-blue-700 dark:text-blue-300'}`}>Z-</span>
+                                        <ChevronDown className={`w-5 h-5 ${active ? 'text-white' : canJog ? 'text-blue-500 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500'}`} />
+                                        <span className={`text-xl font-semibold leading-none ${active ? 'text-white' : canJog ? 'text-blue-700 dark:text-blue-300' : 'text-gray-400 dark:text-gray-500'}`}>Z-</span>
                                     </div>
                                 )}
                             </JogActionButton>
@@ -640,8 +640,8 @@ export default function JoggingCard() {
                             >
                                 {(active) => (
                                     <div className="h-full w-full flex flex-col items-center justify-center gap-0.5">
-                                        <RotateCw className={`w-5 h-5 ${active ? 'text-white' : 'text-purple-500 dark:text-purple-400'}`} />
-                                        <span className={`text-xl font-semibold leading-none ${active ? 'text-white' : 'text-purple-700 dark:text-purple-300'}`}>A+</span>
+                                        <RotateCw className={`w-5 h-5 ${active ? 'text-white' : canJog ? 'text-purple-500 dark:text-purple-400' : 'text-gray-400 dark:text-gray-500'}`} />
+                                        <span className={`text-xl font-semibold leading-none ${active ? 'text-white' : canJog ? 'text-purple-700 dark:text-purple-300' : 'text-gray-400 dark:text-gray-500'}`}>A+</span>
                                     </div>
                                 )}
                             </JogActionButton>
@@ -658,8 +658,8 @@ export default function JoggingCard() {
                             >
                                 {(active) => (
                                     <div className="h-full w-full flex flex-col items-center justify-center gap-0.5">
-                                        <RotateCcw className={`w-5 h-5 ${active ? 'text-white' : 'text-purple-500 dark:text-purple-400'}`} />
-                                        <span className={`text-xl font-semibold leading-none ${active ? 'text-white' : 'text-purple-700 dark:text-purple-300'}`}>A-</span>
+                                        <RotateCcw className={`w-5 h-5 ${active ? 'text-white' : canJog ? 'text-purple-500 dark:text-purple-400' : 'text-gray-400 dark:text-gray-500'}`} />
+                                        <span className={`text-xl font-semibold leading-none ${active ? 'text-white' : canJog ? 'text-purple-700 dark:text-purple-300' : 'text-gray-400 dark:text-gray-500'}`}>A-</span>
                                     </div>
                                 )}
                             </JogActionButton>

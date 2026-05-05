@@ -45,6 +45,28 @@
     animation: jog-press 220ms ease-out;
 }
 
+.jog-btn:disabled,
+.jog-btn:disabled:hover {
+    background-color: rgb(229 231 235) !important;
+    border-color: rgb(229 231 235) !important;
+    color: rgb(156 163 175) !important;
+    cursor: default !important;
+}
+
+.dark .jog-btn:disabled,
+.dark .jog-btn:disabled:hover {
+    background-color: rgb(61 69 84) !important;
+    border-color: rgb(61 69 84) !important;
+    color: rgb(107 114 128) !important;
+}
+
+.jog-btn:disabled svg,
+.jog-btn:disabled span,
+.jog-btn:disabled:hover svg,
+.jog-btn:disabled:hover span {
+    color: inherit !important;
+}
+
 @keyframes jog-press {
     0% {
         filter: brightness(1.12);

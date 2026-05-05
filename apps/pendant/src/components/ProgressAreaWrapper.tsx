@@ -1,7 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import type { RootState } from '@gsender/controller-client/store/redux';
-import { WORKFLOW_STATE_IDLE, WORKFLOW_STATE_RUNNING } from 'app/constants';
+import {
+    WORKFLOW_STATE_IDLE,
+    WORKFLOW_STATE_PAUSED,
+    WORKFLOW_STATE_RUNNING,
+} from 'app/constants';
 
 const clamp = (value: number, min: number, max: number) =>
     Math.min(max, Math.max(min, value));
@@ -109,7 +113,9 @@ export default function ProgressAreaWrapper() {
         ? '0%'
         : `min(100%, max(${progressPercent}%, 56px))`;
     const showExpandedBar =
-        workflowState === WORKFLOW_STATE_RUNNING || isFlashingComplete;
+        workflowState === WORKFLOW_STATE_RUNNING ||
+        workflowState === WORKFLOW_STATE_PAUSED ||
+        isFlashingComplete;
     const fillColor = interpolateProgressGreen(progressPercent);
 
     return (
@@ -122,8 +128,8 @@ export default function ProgressAreaWrapper() {
                 <div
                     className={`relative w-full overflow-hidden transition-all duration-300 ease-out ${
                         showExpandedBar
-                            ? 'h-7 rounded-md bg-gray-200 dark:bg-dark-lighter opacity-100 pendant-progress-track'
-                            : 'h-2 rounded-full bg-gray-300 dark:bg-dark-lighter opacity-100'
+                            ? 'h-7 rounded-md bg-gray-200 dark:bg-dark-lighter opacity-100 pendant-progress-track border border-gray-400/80 dark:border-gray-500'
+                            : 'h-2 rounded-full bg-gray-300 dark:bg-dark-lighter opacity-100 border border-gray-400/80 dark:border-gray-500'
                     }`}
                 >
                     <div
@@ -139,7 +145,7 @@ export default function ProgressAreaWrapper() {
                         }}
                     >
                         {progressPercent > 0 && (
-                            <div className="absolute right-1 top-1/2 -translate-y-1/2 h-6 min-w-8 px-1 rounded-[5px] border border-white/55 bg-white/28 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.22)] text-[11px] leading-none text-white font-semibold tabular-nums flex items-center justify-center">
+                            <div className="absolute z-10 right-1 top-1/2 -translate-y-1/2 h-6 min-w-8 px-1 rounded-[5px] border border-white/80 bg-white/75 shadow-[0_1px_2px_rgba(0,0,0,0.2)] text-[11px] leading-none text-green-900 font-semibold tabular-nums flex items-center justify-center">
                                 {roundedProgress}%
                             </div>
                         )}
