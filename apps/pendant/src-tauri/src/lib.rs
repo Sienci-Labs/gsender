@@ -17,6 +17,14 @@ struct PendantConfig {
     host: String,
 }
 
+#[derive(Debug, Clone, Serialize)]
+struct GcodeFilePayload {
+    path: String,
+    name: String,
+    size: u64,
+    content: String,
+}
+
 impl Default for PendantConfig {
     fn default() -> Self {
         Self {
@@ -113,6 +121,41 @@ fn get_host(app: AppHandle) -> String {
     load_config(&app).host
 }
 
+fn read_gcode_payload(path: PathBuf) -> Result<GcodeFilePayload, String> {
+    let metadata = fs::metadata(&path).map_err(|e| e.to_string())?;
+    let bytes = fs::read(&path).map_err(|e| e.to_string())?;
+    let content = String::from_utf8_lossy(&bytes).to_string();
+    let name = path
+        .file_name()
+        .and_then(|s| s.to_str())
+        .unwrap_or("file.gcode")
+        .to_string();
+
+    Ok(GcodeFilePayload {
+        path: path.to_string_lossy().to_string(),
+        name,
+        size: metadata.len(),
+        content,
+    })
+}
+
+#[tauri::command]
+fn pick_gcode_file() -> Result<Option<GcodeFilePayload>, String> {
+    let picked = rfd::FileDialog::new()
+        .add_filter("G-code", &["gcode", "nc", "tap", "cnc", "g", "gc"])
+        .pick_file();
+
+    match picked {
+        Some(path) => read_gcode_payload(path).map(Some),
+        None => Ok(None),
+    }
+}
+
+#[tauri::command]
+fn read_gcode_file(path: String) -> Result<GcodeFilePayload, String> {
+    read_gcode_payload(PathBuf::from(path))
+}
+
 pub fn run() {
     // Truncate the log file on each fresh launch
     let _ = fs::write(log_path(), "");
@@ -178,7 +221,12 @@ pub fn run() {
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![set_host, get_host])
+        .invoke_handler(tauri::generate_handler![
+            set_host,
+            get_host,
+            pick_gcode_file,
+            read_gcode_file
+        ])
         .run(tauri::generate_context!())
         .expect("Error running gSender Pendant");
 }

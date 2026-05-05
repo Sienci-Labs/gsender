@@ -6,6 +6,12 @@ import {
 import controller from '@gsender/controller-client/controller';
 import { VISUALIZER_PRIMARY } from 'app/constants';
 import GcodeEditor from 'app/features/Visualizer/GcodeEditor';
+import {
+    GcodeFilePayload,
+    isTauri,
+    pickGcodeFile,
+    readGcodeFile,
+} from '../tauri-bridge';
 import { store as reduxStore } from '@gsender/controller-client/store/redux';
 import {
     updateFileContent,
@@ -18,7 +24,12 @@ import type { RootState } from '@gsender/controller-client/store/redux';
 const TABS = ['File', 'Probe', 'Spindle', 'Macros'] as const;
 type DrawerTab = (typeof TABS)[number];
 type DrawerMode = 'closed' | 'minimal' | 'expanded';
-type RecentFile = { fileName: string; fileSize: number; timeLoaded: number };
+type RecentFile = {
+    fileName: string;
+    fileSize: number;
+    timeLoaded: number;
+    filePath?: string;
+};
 
 const RECENT_KEY = 'pendant-recent-files';
 
@@ -64,6 +75,16 @@ const formatAgo = (ts: number | null) => {
     return `${Math.floor(mins / 60)}h ago`;
 };
 
+const readRecentFiles = (): RecentFile[] => {
+    const raw = JSON.parse(localStorage.getItem(RECENT_KEY) ?? '[]') as Partial<RecentFile>[];
+    return raw.map((entry) => ({
+        fileName: entry.fileName ?? '',
+        fileSize: Number(entry.fileSize) || 0,
+        timeLoaded: Number(entry.timeLoaded) || 0,
+        filePath: entry.filePath || '',
+    }));
+};
+
 export default function BottomDrawer() {
     const HEADER_HEIGHT_REM = 3.5;
     const DOUBLE_TAP_MS = 260;
@@ -78,7 +99,7 @@ export default function BottomDrawer() {
     const file = useTypedSelector((s: RootState) => s.file);
 
     useEffect(() => {
-        setRecentFiles(JSON.parse(localStorage.getItem(RECENT_KEY) ?? '[]'));
+        setRecentFiles(readRecentFiles());
     }, []);
 
     useEffect(() => () => {
@@ -87,7 +108,71 @@ export default function BottomDrawer() {
         }
     }, []);
 
-    const handleLoadClick = () => fileInputRef.current?.click();
+    const saveRecentEntry = (entry: RecentFile) => {
+        const stored = readRecentFiles();
+        const entryKey = entry.filePath?.trim() ? `path:${entry.filePath}` : `name:${entry.fileName}`;
+        const updated = [
+            entry,
+            ...stored.filter((r) => {
+                const existingKey = r.filePath?.trim() ? `path:${r.filePath}` : `name:${r.fileName}`;
+                return existingKey !== entryKey;
+            }),
+        ].slice(0, 5);
+
+        localStorage.setItem(RECENT_KEY, JSON.stringify(updated));
+        setRecentFiles(updated);
+    };
+
+    const uploadLoadedFileToServer = (name: string, content: string) => {
+        if (!controller.port) return;
+
+        const gcodeFile = new File([content], name, { type: 'text/plain' });
+        const formData = new FormData();
+        formData.append('gcode', gcodeFile);
+        formData.append('port', controller.port);
+        formData.append('visualizer', VISUALIZER_PRIMARY);
+        fetch('/api/file', { method: 'POST', body: formData }).catch(() => {});
+    };
+
+    const applyLoadedFile = (payload: GcodeFilePayload) => {
+        const { name, size, content, path } = payload;
+        const total = content.split('\n').filter((line) => line.trim()).length;
+        const toolSet = [...new Set((content.match(/\bT(\d+)/gi) ?? []).map((t) => t.toUpperCase()))];
+        const spindleSet = [...new Set((content.match(/\bS(\d+)/gi) ?? []).map((s) => `S${parseInt(s.slice(1))}`))];
+
+        const bbox = computeBounds(content);
+        reduxStore.dispatch(updateFileContent({ content, size, name }));
+        reduxStore.dispatch(
+            updateFileInfo({
+                total,
+                toolSet,
+                spindleSet,
+                fileLoaded: true,
+                path,
+                ...(bbox ? { bbox } : {}),
+            }),
+        );
+
+        const timeLoaded = Date.now();
+        setLoadedAt(timeLoaded);
+        saveRecentEntry({ fileName: name, fileSize: size, timeLoaded, filePath: path });
+        uploadLoadedFileToServer(name, content);
+    };
+
+    const handleLoadClick = async () => {
+        if (!isTauri()) {
+            fileInputRef.current?.click();
+            return;
+        }
+
+        try {
+            const picked = await pickGcodeFile();
+            if (!picked) return;
+            applyLoadedFile(picked);
+        } catch (_error) {
+            // no-op: picker cancelled/failed
+        }
+    };
 
     const handleUnload = () => {
         reduxStore.dispatch(unloadFileInfo());
@@ -100,27 +185,27 @@ export default function BottomDrawer() {
         e.target.value = '';
 
         const content = await f.text();
-        const total = content.split('\n').filter(l => l.trim()).length;
-        const toolSet = [...new Set((content.match(/\bT(\d+)/gi) ?? []).map(t => t.toUpperCase()))];
-        const spindleSet = [...new Set((content.match(/\bS(\d+)/gi) ?? []).map(s => `S${parseInt(s.slice(1))}`))];
+        applyLoadedFile({
+            name: f.name,
+            size: f.size,
+            content,
+            path: String((f as any).path || ''),
+        });
+    };
 
-        const bbox = computeBounds(content);
-        reduxStore.dispatch(updateFileContent({ content, size: f.size, name: f.name }));
-        reduxStore.dispatch(updateFileInfo({ total, toolSet, spindleSet, fileLoaded: true, ...(bbox ? { bbox } : {}) }));
-        setLoadedAt(Date.now());
+    const handleRecentLoad = async (recentFile: RecentFile) => {
+        if (!recentFile.filePath) return;
 
-        const entry: RecentFile = { fileName: f.name, fileSize: f.size, timeLoaded: Date.now() };
-        const stored: RecentFile[] = JSON.parse(localStorage.getItem(RECENT_KEY) ?? '[]');
-        const updated = [entry, ...stored.filter(r => r.fileName !== f.name)].slice(0, 8);
-        localStorage.setItem(RECENT_KEY, JSON.stringify(updated));
-        setRecentFiles(updated);
-
-        if (controller.port) {
-            const formData = new FormData();
-            formData.append('gcode', f);
-            formData.append('port', controller.port);
-            formData.append('visualizer', VISUALIZER_PRIMARY);
-            fetch('/api/file', { method: 'POST', body: formData }).catch(() => {});
+        if (isTauri()) {
+            try {
+                const loaded = await readGcodeFile(recentFile.filePath);
+                if (loaded) {
+                    applyLoadedFile(loaded);
+                }
+            } catch (_error) {
+                // no-op: file missing/unreadable
+            }
+            return;
         }
     };
 
@@ -280,9 +365,9 @@ export default function BottomDrawer() {
                                 <span className="text-xs text-gray-500 dark:text-gray-400">No file loaded</span>
                                 <button
                                     onClick={handleLoadClick}
-                                    className="flex items-center gap-1.5 text-xs bg-robin-600 hover:bg-robin-500 rounded-lg px-3 py-1.5 text-white font-semibold shrink-0"
+                                    className="flex items-center gap-2 text-sm bg-robin-600 hover:bg-robin-500 rounded-lg px-4 py-2 text-white font-semibold shrink-0"
                                 >
-                                    <Upload size={12} /> Load File
+                                    <Upload size={14} /> Load File
                                 </button>
                             </div>
                         )
@@ -312,7 +397,20 @@ export default function BottomDrawer() {
                                         : recentFiles.map((r, i) => (
                                             <div key={i} className="flex items-center justify-between py-2 border-b border-gray-200 dark:border-dark-lighter last:border-0 gap-2">
                                                 <span className="text-xs text-gray-700 dark:text-gray-300 truncate">{r.fileName}</span>
-                                                <span className="text-[10px] text-gray-400 shrink-0">{formatSize(r.fileSize)}</span>
+                                                <div className="flex items-center gap-2 shrink-0">
+                                                    <span className="text-[10px] text-gray-400">{formatSize(r.fileSize)}</span>
+                                                    <button
+                                                        onClick={() => handleRecentLoad(r)}
+                                                        disabled={!r.filePath}
+                                                        className={`text-xs font-semibold rounded px-3 py-1.5 border transition-colors ${
+                                                            r.filePath
+                                                                ? 'text-robin-600 dark:text-robin-400 border-robin-300 dark:border-robin-600 hover:bg-robin-50 dark:hover:bg-robin-500/15'
+                                                                : 'text-gray-400 dark:text-gray-500 border-gray-200 dark:border-dark-lighter cursor-default'
+                                                        }`}
+                                                    >
+                                                        Load
+                                                    </button>
+                                                </div>
                                             </div>
                                         ))
                                     }

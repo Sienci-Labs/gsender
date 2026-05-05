@@ -20,6 +20,7 @@ tauri-plugin-shell = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 dirs = "5"
+rfd = "0.15"
 
 [profile.dev]
 incremental = true

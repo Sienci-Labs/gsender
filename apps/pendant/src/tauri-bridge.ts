@@ -24,5 +24,22 @@ export async function setHost(host: string): Promise<void> {
     await invoke<void>('set_host', { host });
 }
 
+export interface GcodeFilePayload {
+    path: string;
+    name: string;
+    size: number;
+    content: string;
+}
+
+/** Opens a native file picker and returns selected G-code file data. */
+export async function pickGcodeFile(): Promise<GcodeFilePayload | undefined> {
+    return invoke<GcodeFilePayload | undefined>('pick_gcode_file');
+}
+
+/** Reads a G-code file from an absolute path on disk. */
+export async function readGcodeFile(path: string): Promise<GcodeFilePayload | undefined> {
+    return invoke<GcodeFilePayload | undefined>('read_gcode_file', { path });
+}
+
 /** True when running inside the Tauri native binary. */
 export { isTauri };
