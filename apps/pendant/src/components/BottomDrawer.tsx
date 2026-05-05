@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import {
-    ChevronUp, ChevronDown, Upload, X, Minimize2, Maximize2,
+    Upload, X, Minimize2, Maximize2,
     Clock, Hash, Move, HardDrive, FileCode,
 } from 'lucide-react';
-import { Tabs, TabsList, TabsTrigger } from '@gsender/ui/shadcn/Tabs';
 import controller from '@gsender/controller-client/controller';
 import { VISUALIZER_PRIMARY } from 'app/constants';
 import { store as reduxStore } from '@gsender/controller-client/store/redux';
@@ -65,16 +64,26 @@ const formatAgo = (ts: number | null) => {
 };
 
 export default function BottomDrawer() {
+    const HEADER_HEIGHT_REM = 3.5;
+    const DOUBLE_TAP_MS = 260;
     const [mode, setMode] = useState<DrawerMode>('closed');
     const [activeTab, setActiveTab] = useState<DrawerTab>('File');
     const [recentFiles, setRecentFiles] = useState<RecentFile[]>([]);
     const [loadedAt, setLoadedAt] = useState<number | null>(null);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const tapTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const lastTapRef = useRef(0);
     const file = useTypedSelector((s: RootState) => s.file);
 
     useEffect(() => {
         setRecentFiles(JSON.parse(localStorage.getItem(RECENT_KEY) ?? '[]'));
+    }, []);
+
+    useEffect(() => () => {
+        if (tapTimeoutRef.current) {
+            clearTimeout(tapTimeoutRef.current);
+        }
     }, []);
 
     const handleLoadClick = () => fileInputRef.current?.click();
@@ -131,14 +140,53 @@ export default function BottomDrawer() {
         ? file.content.split('\n').filter(l => l.trim()).slice(0, 40)
         : [];
 
-    // minimal = tabs + file card + stats; expanded = 60vh
-    const panelHeight = mode === 'expanded' ? '60vh' : mode === 'minimal' ? '10.5rem' : '0';
-    const panelIcon = mode !== 'closed'
-        ? <ChevronDown size={16} className="text-gray-400 shrink-0" />
-        : <ChevronUp size={16} className="text-gray-400 shrink-0" />;
+    // Total drawer height includes header so the header rises with expansion.
+    const panelHeight = mode === 'expanded'
+        ? `calc(60vh + ${HEADER_HEIGHT_REM}rem)`
+        : mode === 'minimal'
+            ? `calc(10.5rem + ${HEADER_HEIGHT_REM}rem)`
+            : `${HEADER_HEIGHT_REM}rem`;
+    const handleTabChange = (tab: DrawerTab) => {
+        setActiveTab(tab);
+        if (mode === 'closed') {
+            setMode('minimal');
+        }
+    };
+    const handleHeaderTap = (target: EventTarget | null) => {
+        const el = target as HTMLElement | null;
+        if (el?.closest('button, a, input, select, textarea, label')) {
+            return;
+        }
+
+        const now = Date.now();
+        const isDoubleTap = now - lastTapRef.current <= DOUBLE_TAP_MS;
+
+        if (isDoubleTap) {
+            if (tapTimeoutRef.current) {
+                clearTimeout(tapTimeoutRef.current);
+                tapTimeoutRef.current = null;
+            }
+            lastTapRef.current = 0;
+            setMode('expanded');
+            return;
+        }
+
+        lastTapRef.current = now;
+        if (tapTimeoutRef.current) {
+            clearTimeout(tapTimeoutRef.current);
+        }
+        tapTimeoutRef.current = setTimeout(() => {
+            setMode((currentMode) => {
+                if (currentMode === 'closed') return 'minimal';
+                if (currentMode === 'minimal') return 'expanded';
+                return currentMode;
+            });
+            tapTimeoutRef.current = null;
+        }, DOUBLE_TAP_MS);
+    };
 
     return (
-        <div className="relative shrink-0 border-t border-gray-200 dark:border-dark-lighter bg-gray-100 dark:bg-dark-darker overflow-visible">
+        <div className={`relative shrink-0 h-14 ${mode !== 'closed' ? 'z-40' : ''}`}>
             <input
                 ref={fileInputRef}
                 type="file"
@@ -147,82 +195,56 @@ export default function BottomDrawer() {
                 onChange={handleFileChange}
             />
 
-            {/* Header bar */}
-            <div className="w-full flex items-center gap-3 px-4 py-3 bg-gray-100 dark:bg-dark-darker">
-                <button
-                    onClick={() => {
-                        if (mode === 'closed') setMode('minimal');
-                        else if (mode === 'minimal') setMode('expanded');
-                        else setMode('minimal');
-                    }}
-                    className="p-1 rounded hover:bg-gray-50 dark:hover:bg-dark-lighter/30"
-                    aria-label="Toggle drawer"
-                >
-                    {panelIcon}
-                </button>
-                <div className="flex gap-3 flex-1">
-                    {TABS.map(t => (
-                        <span key={t} className="text-xs text-gray-400 font-medium">{t}</span>
-                    ))}
-                </div>
-                <div className="flex items-center gap-1">
-                    <button
-                        onClick={() => setMode('minimal')}
-                        className={`p-1.5 rounded border ${mode === 'minimal' ? 'border-robin-500 text-robin-600 dark:text-robin-400' : 'border-gray-200 dark:border-dark-lighter text-gray-500 dark:text-gray-400'} hover:bg-gray-50 dark:hover:bg-dark-lighter`}
-                    >
-                        <Minimize2 size={14} />
-                    </button>
-                    <button
-                        onClick={() => setMode('expanded')}
-                        className={`p-1.5 rounded border ${mode === 'expanded' ? 'border-robin-500 text-robin-600 dark:text-robin-400' : 'border-gray-200 dark:border-dark-lighter text-gray-500 dark:text-gray-400'} hover:bg-gray-50 dark:hover:bg-dark-lighter`}
-                    >
-                        <Maximize2 size={14} />
-                    </button>
-                    <button
-                        onClick={() => setMode('closed')}
-                        className="p-1.5 rounded border border-gray-200 dark:border-dark-lighter text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-dark-lighter"
-                    >
-                        <X size={14} />
-                    </button>
-                </div>
-            </div>
-
             {/* Sliding panel */}
             <div
-                className="absolute left-0 right-0 bottom-full z-30 overflow-hidden transition-all duration-300 bg-gray-100 dark:bg-dark-darker border-t border-x border-gray-200 dark:border-dark-lighter shadow-2xl"
+                className="absolute left-0 right-0 bottom-0 z-30 overflow-hidden transition-all duration-300 bg-gray-100 dark:bg-dark-darker border border-gray-200 dark:border-dark-lighter shadow-2xl"
                 style={{ height: panelHeight }}
             >
-                <Tabs
-                    value={activeTab}
-                    onValueChange={v => setActiveTab(v as DrawerTab)}
-                    className="flex flex-col h-full"
-                >
-                    {/* Expanded-only controls */}
-                    {mode === 'expanded' && (
-                        <div className="h-10 flex items-center justify-end px-3 border-b border-gray-200 dark:border-dark-lighter shrink-0">
-                            <button onClick={() => setMode('minimal')} className="p-1.5 rounded border border-gray-200 dark:border-dark-lighter text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-dark-lighter">
-                                <ChevronDown size={14} />
+                <div className="flex flex-col h-full">
+                    {/* Header bar */}
+                    <div
+                        className="w-full h-14 shrink-0 flex items-center gap-3 px-4 py-3 bg-gray-100 dark:bg-dark-darker border-b border-gray-200 dark:border-dark-lighter"
+                        onClick={(e) => handleHeaderTap(e.target)}
+                    >
+                        <div className="flex items-center gap-1 flex-1 min-w-0">
+                            {TABS.map(t => (
+                                <button
+                                    key={t}
+                                    onClick={() => handleTabChange(t)}
+                                    className={`px-2.5 h-8 text-xs rounded border transition-colors ${
+                                        activeTab === t
+                                            ? 'border-robin-500 text-robin-600 dark:text-robin-400 bg-robin-50/60 dark:bg-robin-500/10'
+                                            : 'border-transparent text-gray-400 hover:text-gray-600 hover:bg-gray-50 dark:text-gray-500 dark:hover:text-gray-300 dark:hover:bg-dark-lighter/30'
+                                    }`}
+                                >
+                                    {t}
+                                </button>
+                            ))}
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <button
+                                onClick={() => setMode('minimal')}
+                                className={`p-1.5 rounded border ${mode === 'minimal' ? 'border-robin-500 text-robin-600 dark:text-robin-400' : 'border-gray-200 dark:border-dark-lighter text-gray-500 dark:text-gray-400'} hover:bg-gray-50 dark:hover:bg-dark-lighter`}
+                            >
+                                <Minimize2 size={14} />
                             </button>
-                            <button onClick={() => setMode('closed')} className="ml-1.5 p-1.5 rounded border border-gray-200 dark:border-dark-lighter text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-dark-lighter">
+                            <button
+                                onClick={() => setMode('expanded')}
+                                className={`p-1.5 rounded border ${mode === 'expanded' ? 'border-robin-500 text-robin-600 dark:text-robin-400' : 'border-gray-200 dark:border-dark-lighter text-gray-500 dark:text-gray-400'} hover:bg-gray-50 dark:hover:bg-dark-lighter`}
+                            >
+                                <Maximize2 size={14} />
+                            </button>
+                            <button
+                                onClick={() => setMode('closed')}
+                                className="p-1.5 rounded border border-gray-200 dark:border-dark-lighter text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-dark-lighter"
+                            >
                                 <X size={14} />
                             </button>
                         </div>
-                    )}
-
-                    {/* Tabs */}
-                    <div className="flex items-center border-b border-gray-200 dark:border-dark-lighter px-3 shrink-0">
-                        <TabsList className="bg-transparent gap-0 h-8">
-                            {TABS.map(t => (
-                                <TabsTrigger
-                                    key={t} value={t}
-                                    className="px-3 text-xs data-[state=active]:border-b-2 data-[state=active]:border-robin-500 data-[state=active]:text-robin-600 dark:data-[state=active]:text-white rounded-none bg-transparent text-gray-500 dark:text-gray-400"
-                                >
-                                    {t}
-                                </TabsTrigger>
-                            ))}
-                        </TabsList>
                     </div>
 
+                    {mode === 'closed' ? null : (
+                        <>
                     {/* UPPER ZONE */}
                     {activeTab === 'File' ? (
                         file.fileLoaded ? (
@@ -235,7 +257,6 @@ export default function BottomDrawer() {
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2">
                                             <span className="text-xs font-semibold text-gray-800 dark:text-white truncate">{file.name}</span>
-                                            <span className="text-[9px] border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 px-1.5 py-0.5 rounded shrink-0 leading-none">G-code</span>
                                         </div>
                                         <span className="text-[10px] text-gray-400">{formatAgo(loadedAt)} · {formatSize(file.size)}</span>
                                     </div>
@@ -308,7 +329,9 @@ export default function BottomDrawer() {
                             )}
                         </div>
                     )}
-                </Tabs>
+                        </>
+                    )}
+                </div>
             </div>
         </div>
     );
