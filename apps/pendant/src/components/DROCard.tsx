@@ -3,7 +3,7 @@ import cn from 'classnames';
 import { Home, Target, Crosshair } from 'lucide-react';
 import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import type { RootState } from '@gsender/controller-client/store/redux';
-import { zeroAllAxes, zeroWCS } from '@gsender/features/DRO/utils/DRO';
+import { goXYAxes, gotoZero, zeroAllAxes, zeroWCS } from '@gsender/features/DRO/utils/DRO';
 import {
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
@@ -39,6 +39,7 @@ export default function DROCard() {
         workflowState !== WORKFLOW_STATE_RUNNING &&
         (activeState === GRBL_ACTIVE_STATE_IDLE ||
             activeState === GRBL_ACTIVE_STATE_JOG);
+    const canGoTo = canZero;
 
     return (
         <div className="rounded-xl bg-gray-100 border border-gray-200 dark:bg-dark-darker dark:border-dark-lighter p-3 flex flex-col gap-3">
@@ -66,7 +67,13 @@ export default function DROCard() {
                         <button
                             type="button"
                             aria-label={`Go to ${label} axis`}
-                            className={`w-9 h-9 rounded flex items-center justify-center text-base font-bold shrink-0 transition-colors hover:brightness-95 active:brightness-90 ${color}`}
+                            onClick={() => gotoZero(label)}
+                            disabled={!canGoTo}
+                            className={`w-9 h-9 rounded flex items-center justify-center text-base font-bold shrink-0 transition-colors ${
+                                canGoTo
+                                    ? `hover:brightness-95 active:brightness-90 ${color}`
+                                    : 'bg-gray-200 text-gray-400 dark:bg-dark-lighter dark:text-gray-500 cursor-default'
+                            }`}
                         >
                             {label}
                         </button>
@@ -100,8 +107,20 @@ export default function DROCard() {
                 ].map(({ icon: Icon, label, primary }) => (
                     <button
                         key={label}
-                        onClick={label === 'Zero All' ? zeroAllAxes : undefined}
-                        disabled={primary ? !isConnected : !canZero}
+                        onClick={
+                            label === 'Zero All'
+                                ? zeroAllAxes
+                                : label === 'Go to XY'
+                                    ? goXYAxes
+                                    : undefined
+                        }
+                        disabled={
+                            label === 'Go to XY'
+                                ? !canGoTo
+                                : primary
+                                    ? !isConnected
+                                    : !canZero
+                        }
                         className={`flex items-center justify-center gap-2 rounded-lg h-12 text-sm border transition-colors ${
                             primary
                                 ? (isConnected
