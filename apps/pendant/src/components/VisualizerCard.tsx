@@ -2,6 +2,7 @@ import Visualizer from './Visualizer';
 import JobControls from './JobControls';
 import FeedOverrideWrapper from './FeedOverrideWrapper';
 import WorkspaceSelector from './WorkspaceSelector';
+import ProgressAreaWrapper from './ProgressAreaWrapper';
 
 export default function VisualizerCard() {
     return (
@@ -26,16 +27,7 @@ export default function VisualizerCard() {
             {/* Job controls */}
             <JobControls />
 
-            {/* Progress */}
-            <div className="flex flex-col gap-1 px-1">
-                <div className="flex justify-between text-xs text-gray-400 dark:text-gray-400">
-                    <span>Progress</span>
-                    <span>Line 0 / 0 · 0%</span>
-                </div>
-                <div className="w-full h-1.5 bg-gray-200 dark:bg-dark-lighter rounded-full overflow-hidden">
-                    <div className="h-full bg-robin-500 rounded-full" style={{ width: '0%' }} />
-                </div>
-            </div>
+            <ProgressAreaWrapper />
 
             {/* Override sliders */}
             <FeedOverrideWrapper />
