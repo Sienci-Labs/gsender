@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { JSX, useState } from 'react';
 import get from 'lodash/get';
 import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import type { RootState } from '@gsender/controller-client/store/redux';
@@ -17,7 +17,11 @@ export default function JobControls() {
         setLastLine(null);
     };
 
-    const sharedProps = { workflow, activeState, isConnected, fileLoaded, onStop };
+    const validateATC = (): [boolean, { type: string; title: string; body: JSX.Element }] => [
+        false,
+        { type: '', title: '', body: <span /> },
+    ];
+    const sharedProps = { workflow, activeState, isConnected, fileLoaded, onStop, validateATC };
 
     return (
         <div className="flex w-full items-center justify-center gap-2">
