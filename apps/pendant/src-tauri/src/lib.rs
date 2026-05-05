@@ -89,6 +89,12 @@ fn pendant_url(host: &str) -> String {
     format!("http://{}/pendant/", host)
 }
 
+/// Returns true if nothing is currently listening on the port.
+fn is_port_free(port: u16) -> bool {
+    let addr: std::net::SocketAddr = format!("127.0.0.1:{port}").parse().unwrap();
+    TcpStream::connect_timeout(&addr, Duration::from_millis(100)).is_err()
+}
+
 /// Poll TCP port until it accepts connections (max 30 s). Returns true if ready.
 fn wait_for_port(port: u16) -> bool {
     tlog!("[tauri] polling port {port}...");
@@ -167,31 +173,38 @@ pub fn run() {
             tlog!("[tauri] setup — spawning gSender server sidecar");
             tlog!("[tauri] log file: {}", log_path().display());
 
-            let (mut rx, child) = app.shell()
-                .sidecar("gsender-server")?
-                .args(["-p", "8000"])
-                .spawn()?;
+            let sidecar_child: Option<CommandChild> = if is_port_free(8000) {
+                let (mut rx, child) = app.shell()
+                    .sidecar("gsender-server")?
+                    .args(["-p", "8000"])
+                    .spawn()?;
 
-            tlog!("[tauri] sidecar spawned OK");
+                tlog!("[tauri] sidecar spawned OK");
 
-            // Log all sidecar output — written to both stderr AND the log file
-            tauri::async_runtime::spawn(async move {
-                while let Some(event) = rx.recv().await {
-                    match event {
-                        CommandEvent::Stdout(line) =>
-                            tlog!("[sidecar] {}", String::from_utf8_lossy(&line)),
-                        CommandEvent::Stderr(line) =>
-                            tlog!("[sidecar:err] {}", String::from_utf8_lossy(&line)),
-                        CommandEvent::Error(e) =>
-                            tlog!("[sidecar:spawn-error] {e}"),
-                        CommandEvent::Terminated(s) =>
-                            tlog!("[sidecar:exit] code={:?} signal={:?}", s.code, s.signal),
-                        _ => {}
+                // Log all sidecar output — written to both stderr AND the log file
+                tauri::async_runtime::spawn(async move {
+                    while let Some(event) = rx.recv().await {
+                        match event {
+                            CommandEvent::Stdout(line) =>
+                                tlog!("[sidecar] {}", String::from_utf8_lossy(&line)),
+                            CommandEvent::Stderr(line) =>
+                                tlog!("[sidecar:err] {}", String::from_utf8_lossy(&line)),
+                            CommandEvent::Error(e) =>
+                                tlog!("[sidecar:spawn-error] {e}"),
+                            CommandEvent::Terminated(s) =>
+                                tlog!("[sidecar:exit] code={:?} signal={:?}", s.code, s.signal),
+                            _ => {}
+                        }
                     }
-                }
-            });
+                });
 
-            app.manage(ServerSidecar(Mutex::new(Some(child))));
+                Some(child)
+            } else {
+                tlog!("[tauri] port 8000 already in use — skipping sidecar, using existing server");
+                None
+            };
+
+            app.manage(ServerSidecar(Mutex::new(sidecar_child)));
 
             let ready = wait_for_port(8000);
             let config = load_config(app.handle());

@@ -50,6 +50,20 @@ require('axios/dist/node/axios.cjs');
 
 process.env.GSENDER_SIDECAR = '1';
 process.env.NODE_ENV = 'production';
+
+// When running as a pkg binary the pendant SPA is NOT served from the snapshot
+// (pkg's fs.createReadStream doesn't work for snapshot assets).
+// Instead, build-sidecar.js copies dist/gsender/pendant/ next to the binary as
+// a real directory that express.static can serve normally.
+if (process.pkg) {
+    const path = require('path');
+    const fs = require('fs');
+    // Look for a 'pendant' folder placed next to the binary by build-sidecar.js
+    const pendantPath = path.join(path.dirname(process.execPath), 'pendant');
+    if (fs.existsSync(path.join(pendantPath, 'index.html'))) {
+        process.env.GSENDER_PENDANT_PATH = pendantPath;
+    }
+}
 const launchServer = require('./dist/gsender/server-cli');
 launchServer().catch(function (e) {
     process.stderr.write('gSender server error: ' + e.message + '\n');

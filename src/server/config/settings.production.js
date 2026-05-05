@@ -36,7 +36,7 @@ const getAppPath = () => {
     return path.resolve(__dirname, 'app');
 };
 
-const getPendantPath = () => path.resolve(__dirname, 'pendant');
+const getPendantPath = () => process.env.GSENDER_PENDANT_PATH || path.resolve(__dirname, 'pendant');
 
 export default {
     route: '/', // with trailing slash

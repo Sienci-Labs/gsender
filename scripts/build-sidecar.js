@@ -74,4 +74,21 @@ const result = spawnSync(
 if (result.status !== 0) {
     process.exit(result.status ?? 1);
 }
+
+// Copy pendant SPA files next to the binary so sidecar-main.js can serve them
+// from the real filesystem (pkg's snapshot fs.createReadStream doesn't work).
+const pendantDest = path.join(outDir, 'pendant');
+function copyDir(src, dest) {
+    fs.mkdirSync(dest, { recursive: true });
+    for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+        const s = path.join(src, entry.name);
+        const d = path.join(dest, entry.name);
+        if (entry.isDirectory()) copyDir(s, d);
+        else fs.copyFileSync(s, d);
+    }
+}
+try { fs.rmSync(pendantDest, { recursive: true, force: true }); } catch (_) {}
+copyDir(pendantDir, pendantDest);
+console.log(`Pendant SPA copied to: ${pendantDest}`);
+
 console.log(`\nDone. Sidecar binary: ${outPath}`);
