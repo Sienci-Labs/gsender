@@ -28,8 +28,7 @@ runs:
     - name: Install Yarn and node-gyp
       shell: bash
       run: |
-        npm install -g yarn
-        yarn global add node-gyp
+        npm install -g yarn node-gyp
 
     - name: Install dependencies and lint
       shell: bash
