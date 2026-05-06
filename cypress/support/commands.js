@@ -38,7 +38,7 @@ Cypress.Commands.add('loadUI', (options = {}) => {
     viewport = [1920, 1080],
     visitTimeout = 30000,
     elementTimeout = 15000,
-    expectedTitle = 'gSender 1.6.0'
+    expectedTitle = 'gSender'
   } = options;
 
   cy.viewport(...viewport);

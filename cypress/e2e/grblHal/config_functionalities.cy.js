@@ -64,23 +64,34 @@ describe('gSender Configuration and Firmware Test Suite', () => {
       });
     });
 
-    // Part 2: Firmware Settings
-cy.log('Part 2: Firmware Settings');
+    cy.log('Part 2: Firmware Settings');
 
-// Restore defaults
-cy.get('div.fixed div.grid > button:nth-of-type(1)').click();
-cy.contains('button.bg-blue-500', 'Restore Defaults', { timeout: 10000 })
+// Restore defaults - open the dialog
+cy.get('div.fixed div.grid').contains('button', 'Defaults')
   .should('be.visible')
   .should('not.be.disabled')
   .click();
 
-// Skip waiting — force click past the notification
+// Click the confirm button inside the dialog
+cy.get('button.bg-blue-500').contains('Restore Defaults')
+  .should('be.visible')
+  .click();
+
+// Wait for the toast notification and close it
+cy.get('#app > section button > svg', { timeout: 10000 }).click();
+
+// Wait for overlay to be gone
+cy.get('div[data-state="open"].fixed.inset-0').should('not.exist');
+
+// Now safe to interact with the export button
 cy.get('[data-testid="firmware-settings-export-button"]', { timeout: 10000 })
   .should('be.visible')
-  .click({ force: true });
+  .should('not.be.disabled')
+  .click();
 
 // Confirm notification is gone before proceeding
 cy.get('div[data-title]', { timeout: 10000 }).should('not.exist');
+
 
 // Export firmware settings
 cy.get('[data-testid="firmware-settings-export-button"]', { timeout: 10000 })

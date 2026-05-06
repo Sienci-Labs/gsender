@@ -7,7 +7,7 @@ module.exports = defineConfig({
   },
 
   e2e: {
-    specPattern: 'cypress/e2e/grblHal/A_grblHal_master_spec.cy.js',
+    specPattern: 'cypress/e2e/**/*.cy.js',
     baseUrl: process.env.BASE_URL || 'http://localhost:8000',
 
     
