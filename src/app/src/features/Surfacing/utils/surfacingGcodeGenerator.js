@@ -22,10 +22,13 @@ import Toolpath from "./gcode-toolpath";
 const [M3] = SPINDLE_MODES;
 
 export default class Generator {
-	constructor({ surfacing, units, rampingDegrees = 10 }) {
+	constructor({ surfacing, units }) {
 		this.surfacing = surfacing;
 		this.units = units;
-		this.rampingDegrees = rampingDegrees;
+		this.rampingDegrees = this.computeRampAngle(
+			surfacing.width,
+			surfacing.length,
+		);
 	}
 
 	/**
@@ -185,6 +188,25 @@ export default class Generator {
 	toFixedValue(value = 0, amount = 3) {
 		return Number(value.toFixed(amount));
 	}
+
+	computeRampAngle = (width, length) => {
+		const units = store.get("workspace.units");
+		const minDimension = Math.min(Math.abs(width), Math.abs(length));
+
+		const minSize = units === METRIC_UNITS ? 50 : 2;
+		const maxSize = units === METRIC_UNITS ? 500 : 20;
+
+		const MIN_ANGLE = 2;
+		const MAX_ANGLE = 10;
+
+		// Remap the ranges of minSize..maxSize to MIN_ANGLE..MAX_ANGLE, choosing the
+		// remapped angle based on where the minDimension falls in the minSize..maxSize range.
+		// In other words, smaller surfacing areas will have a steeper ramping angle
+		// and larger surfacing areas will have a shallower ramping angle.
+		// If this pattern looks weird, it's an inverse lerp followed by a regular lerp (aka: a remap)
+		const t = Math.max(0, Math.min(1, (minDimension - minSize) / (maxSize - minSize)));
+		return Math.round((MAX_ANGLE - t * (MAX_ANGLE - MIN_ANGLE)) * 10) / 10;
+	};
 
 	rampIntoMaterial = (z, direction = { axis: "Y", factor: 1 }) => {
 		const { axis, factor } = direction;
