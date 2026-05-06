@@ -18,6 +18,13 @@ jobs:
   pendant-mac:
     name: Pendant — macOS
     runs-on: macos-latest
+    environment: CI
+    env:
+      APPLE_CERTIFICATE: ${{ secrets.CSC_LINK }}
+      APPLE_CERTIFICATE_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
     permissions:
       contents: write
     steps:
@@ -100,7 +107,8 @@ jobs:
             librsvg2-dev \
             build-essential \
             libudev-dev \
-            patchelf
+            patchelf \
+            xdg-utils
 
       - name: Cache node_modules
         uses: actions/cache@v4
