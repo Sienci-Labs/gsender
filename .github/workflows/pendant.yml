@@ -110,7 +110,7 @@ jobs:
           restore-keys: ${{ runner.os }}-${{ runner.arch }}-npm-
 
       - name: Install dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       - name: Build pendant Linux ARM64 app
         run: npm run pendant:tauri:build
