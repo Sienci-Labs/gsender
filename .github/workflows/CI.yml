@@ -30,7 +30,7 @@ jobs:
       - name: Setup and build
         uses: ./.github/actions/setup-build
       - name: Build Linux binaries
-        run: yarn run build:linux
+        run: bun run build:linux
       - name: Prepare release assets
         shell: bash
         run: |
@@ -45,13 +45,13 @@ jobs:
           cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-arm64.deb" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-Linux-ARM-64Bit.deb"
           ls -al output releases/linux
           if [[ "$GITHUB_REF_TYPE" == "branch" && "$GITHUB_REF_NAME" == "master" ]]; then
-            yarn github-release delete \
+            bun run github-release delete \
               --owner=gSender \
               --repo=gsender \
               --tag="${GITHUB_REF_NAME}-latest" \
               --release-name="${GITHUB_REF_NAME}" \
               "*-linux*";
-            yarn github-release upload \
+            bun run github-release upload \
               --owner=gSender \
               --repo=gsender \
               --tag="${GITHUB_REF_NAME}-latest" \
@@ -88,7 +88,7 @@ jobs:
       - name: Setup and build
         uses: ./.github/actions/setup-build
       - name: Build macOS binaries
-        run: yarn run build:macos
+        run: bun run build:macos
       - name: Prepare release assets
         shell: bash
         run: |
@@ -101,13 +101,13 @@ jobs:
           cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-arm64.dmg" "releases/macos/gSender-${PACKAGE_VERSION}-Mac-Silicon.dmg"
           ls -al output releases/macos
           if [[ "$GITHUB_REF_TYPE" == "branch" && "$GITHUB_REF_NAME" == "master" ]]; then
-            yarn github-release delete \
+            bun run github-release delete \
               --owner=gSender \
               --repo=gsender \
               --tag="${GITHUB_REF_NAME}-latest" \
               --release-name="${GITHUB_REF_NAME}" \
               "*-macos*";
-            yarn github-release upload \
+            bun run github-release upload \
               --owner=gSender \
               --repo=gsender \
               --tag="${GITHUB_REF_NAME}-latest" \
@@ -194,7 +194,7 @@ jobs:
           SM_CLIENT_CERT_PASSWORD: ${{ startsWith(github.ref, 'refs/tags/') && secrets.SM_CLIENT_CERT_PASSWORD || '' }}
           SM_HOST: ${{ startsWith(github.ref, 'refs/tags/') && secrets.SM_HOST || '' }}
           SM_KEYPAIR_ALIAS: ${{ startsWith(github.ref, 'refs/tags/') && secrets.SM_KEYPAIR_ALIAS || '' }}
-        run: yarn run build:windows
+        run: bun run build:windows
       - name: Prepare release assets
         shell: bash
         run: |
@@ -206,13 +206,13 @@ jobs:
           cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-x64.exe" "releases/windows/gSender-${PACKAGE_VERSION}-Windows-64Bit.exe"
           ls -al output releases/windows
           if [[ "$GITHUB_REF_TYPE" == "branch" && "$GITHUB_REF_NAME" == "master" ]]; then
-            yarn github-release delete \
+            bun run github-release delete \
               --owner=gSender \
               --repo=gsender \
               --tag="${GITHUB_REF_NAME}-latest" \
               --release-name="${GITHUB_REF_NAME}" \
               "*-windows*";
-            yarn github-release upload \
+            bun run github-release upload \
               --owner=gSender \
               --repo=gsender \
               --tag="${GITHUB_REF_NAME}-latest" \
