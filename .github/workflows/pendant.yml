@@ -1,4 +1,5 @@
 name: Pendant
+run-name: "Pendant — ${{ github.ref_name }}"
 
 on:
   push:
