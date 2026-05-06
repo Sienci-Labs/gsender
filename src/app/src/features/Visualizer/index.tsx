@@ -1395,15 +1395,16 @@ class Visualizer extends Component {
         const tokens = [
             pubsub.subscribe('theme:change', (_msg, themeType) => {
                 const theme = themeType || this.config.get('theme', 'dark');
+                if (theme === this.state.theme) {
+                    return;
+                }
                 this.setState(
                     {
                         theme: theme,
                         currentTheme: getVisualizerTheme(theme),
                     },
                     () => {
-                        this.setState({}, () => {
-                            debouncedThemeChange();
-                        });
+                        debouncedThemeChange();
                     },
                 );
             }),

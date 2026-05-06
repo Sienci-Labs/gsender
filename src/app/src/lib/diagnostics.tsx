@@ -943,6 +943,11 @@ function generateSupportFile() {
                                     {grblInfo.type || 'Unknown'}
                                 </Text>
 
+                                <Text style={styles.textBold}>Board:</Text>
+                                <Text style={styles.text}>
+                                    {grblInfo.board || 'Unknown'}
+                                </Text>
+
                                 <Text style={styles.textBold}>Firmware:</Text>
                                 <Text style={styles.text}>
                                     {firmwareVersion}

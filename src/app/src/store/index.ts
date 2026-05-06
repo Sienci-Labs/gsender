@@ -288,6 +288,26 @@ const cnc: CncData = {
     state: {},
 };
 
+const preserveSavedCommandKeys = (state: any, savedState: any): any => {
+    const savedCommandKeys = get(savedState, 'commandKeys', {});
+    const mergedCommandKeys = get(state, 'commandKeys', {});
+
+    if (
+        !(savedCommandKeys instanceof Object) ||
+        Array.isArray(savedCommandKeys)
+    ) {
+        return state;
+    }
+
+    // Keep dynamic command keys (for example, macro IDs) that are not in defaults.
+    set(state, 'commandKeys', {
+        ...mergedCommandKeys,
+        ...savedCommandKeys,
+    });
+
+    return state;
+};
+
 try {
     const text = getConfig();
     const data = JSON.parse(text);
@@ -304,9 +324,8 @@ try {
     log.error(e);
 }
 
-store.state = normalizeState(
-    merge(JSON.parse(JSON.stringify(defaultState)), cnc.state || {}),
-);
+const mergedState = merge(JSON.parse(JSON.stringify(defaultState)), cnc.state || {});
+store.state = normalizeState(preserveSavedCommandKeys(mergedState, cnc.state || {}));
 
 // Debouncing enforces that a function not be called again until a certain amount of time (e.g. 100ms) has passed without it being called.
 store.on(

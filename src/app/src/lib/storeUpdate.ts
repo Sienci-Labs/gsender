@@ -70,9 +70,14 @@ export const storeUpdate = async (
                 TOUCHPLATE_TYPE_STANDARD;
         }
 
+        const currentTheme = store.get('widgets.visualizer.theme');
+        const nextTheme = mergedSettings?.widgets?.visualizer?.theme;
+
         restoreSettings(mergedSettings, isSync);
 
-        pubsub.publish('theme:change');
+        if (nextTheme && nextTheme !== currentTheme) {
+            pubsub.publish('theme:change', nextTheme);
+        }
     } catch (error) {
         console.error(error);
         /**

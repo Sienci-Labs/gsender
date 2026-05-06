@@ -1,5 +1,32 @@
 [
   {
+    "version": "1.6.1",
+    "date": "April 30, 2026",
+    "notes": [
+      "Added option to skip first tool change on fixed strategy or prompt use if they want to skip",
+      "Added application scaling for larger monitors and devices - in accessibility section in Config",
+      "Rapid Position and Park buttons now properly enabled after homing on grbl devices",
+      "Spindle Delay config should now be reading $392 correctly on older firmware versions",
+      "Go To Flyout widget can now move in machine coordinates if homing enabled - check out the new MCS option",
+      "Go To Flyout widget now uses the same safe height logic as several other Go To functionalities",
+      "Machine defaults selector will prompt to apply where necessary",
+      "Macro keybinds should persist",
+      "Gamepad - Park shortcut works as expected",
+      "Gamepad - Rapid position shortcut calculation fixed to not use stale position data",
+      "Macro keybindings should persist again",
+      "Further tweaks to rotary time estimation",
+      "Fixed issue where tool table was assumed to exist on PRB: output which is not the case for some grblHAL compilations",
+      "Laser test now calculates max values using $30 (grbl) or $730 (grblHAL) instead of depending on local state",
+      "Added application icon for IOS devices",
+      "Added Config option to let user toggle probe type selection directly in Probe drawer",
+      "Updates to Automations editor to include variables dropdown and general UX improvements",
+      "Config option - now possible to disable power saving on Electron to allow screen blanking",
+      "Lite mode toggle feather should be more obvious when it’s enabled or disabled",
+      "Macros again show on remote mode",
+      "Updates to 3d Probe text instructions to be more relevant to that probe type"
+    ]
+  },
+  {
     "version": "1.6.0",
     "date": "April 15, 2026",
     "notes": [
@@ -50,24 +77,6 @@
       "Config search behaviour updates to be more consistent with modified flag enabled.",
       "Probe shortcut no longer causes an error 2 due to stale distance modal.",
       "Rapid position shortcut no longer has a stale homing location value."
-    ]
-  },
-  {
-    "version": "1.5.6",
-    "date": "October 20th, 2025",
-    "notes": [
-      "Fixed issue with surfacing tool inputs not using latest input values when generating gcode",
-      "Job stats update function altered to prevent situations where jobs would get lost when the array becomes too large",
-      "Reverted removing early M6 commands",
-      "Start job shortcut fixed to work on controllers for grblHAL devices",
-      "Probe diameter cycle shortcut working again",
-      "Updating values does not remove custom jog values on carve page",
-      "Added way to change default units on remote view",
-      "Bad file/invalid gcode checker will now run if the visualizer disabled in lightweight mode",
-      "Various portrait mode look and feel changes",
-      "Keyboard shortcut tool will no longer crash the UI if a keybind is configured but that feature then turned off",
-      "Toasts can now have custom durations or disabled entirely (Thanks @Tecknickel-Dev)",
-      "Future updates should again be appearing in-app when they become available."
     ]
   }
 ]

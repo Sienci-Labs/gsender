@@ -154,7 +154,6 @@ function populateSettingsValues(
                     o.value = store.get(o.key);
                     o.globalIndex = index;
                     o.defaultValue = fetchDefaultValue(o.key);
-                    o.onChange && o.onChange();
                     globalValueReference.push({ ...o });
                     index++;
                 }
