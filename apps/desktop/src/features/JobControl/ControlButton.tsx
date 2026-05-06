@@ -5,6 +5,7 @@ import pubsub from 'pubsub-js';
 import { PiPause } from 'react-icons/pi';
 import { FiOctagon } from 'react-icons/fi';
 import { IoPlayOutline } from 'react-icons/io5';
+import { stopMachineMotion } from '@gsender/features/Jogging/utils/Jogging';
 
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
@@ -17,9 +18,7 @@ import {
     GRBL_ACTIVE_STATE_CHECK,
     GRBL_ACTIVE_STATE_HOLD,
     GRBL_ACTIVE_STATE_IDLE,
-    GRBL_ACTIVE_STATE_JOG,
     GRBL_ACTIVE_STATE_RUN,
-    GRBLHAL,
     MACHINE_CONTROL_BUTTONS,
     PAUSE,
     START,
@@ -259,17 +258,10 @@ const ControlButton: React.FC<ControlButtonProps> = ({
                             );
                             // if shortcut is disabled (aka job isnt running) it works as a jog stop shortcut
                             if (shortcutIsDisabled()) {
-                                if (activeState === GRBL_ACTIVE_STATE_JOG) {
-                                    return controller.command('jog:cancel');
-                                }
-                                if (activeState === GRBL_ACTIVE_STATE_IDLE) {
-                                    return;
-                                }
-                                if (firmwareType === GRBLHAL) {
-                                    return controller.command('reset:soft');
-                                }
-                                controller.command('reset');
-                                return;
+                                return stopMachineMotion(
+                                    activeState,
+                                    firmwareType,
+                                );
                             }
                             handleStop(activeState);
                         },

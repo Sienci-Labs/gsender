@@ -6,11 +6,31 @@
 // node-gyp-build can't scan the prebuilds/ directory to find .node files.
 // Intercept the module and load each .node file directly — pkg DOES support
 // require() on snapshot .node paths (it extracts them to a temp dir).
+// If the .node file cannot be loaded (e.g. in a production app bundle where
+// the snapshot fallback path is unavailable), a graceful stub is returned so
+// the server still starts — serial port connections will fail with a clear
+// error rather than crashing the entire process.
 if (process.pkg) {
     const Module = require('module');
     const path = require('path');
     const fs = require('fs');
     const origLoad = Module._load;
+
+    function createSerialStub() {
+        const unavailable = () => new Error('Serial port support unavailable in this build (native binding missing)');
+        return {
+            open:        (_p, _o, cb) => cb ? cb(unavailable()) : Promise.reject(unavailable()),
+            close:       (_fd, cb)    => cb ? cb(unavailable()) : Promise.reject(unavailable()),
+            read:        (_fd, _b, _off, _len, _pos, cb) => cb ? cb(unavailable()) : Promise.reject(unavailable()),
+            write:       (_fd, _b, cb) => cb ? cb(unavailable()) : Promise.reject(unavailable()),
+            drain:       (_fd, cb)    => cb ? cb(unavailable()) : Promise.reject(unavailable()),
+            flush:       (_fd, cb)    => cb ? cb(unavailable()) : Promise.reject(unavailable()),
+            set:         (_fd, _o, cb) => cb ? cb(unavailable()) : Promise.reject(unavailable()),
+            get:         (_fd, cb)    => cb ? cb(null, {}) : Promise.resolve({}),
+            getBaudRate: (_fd, cb)    => cb ? cb(unavailable()) : Promise.reject(unavailable()),
+            list:        (cb)         => cb ? cb(null, []) : Promise.resolve([]),
+        };
+    }
 
     Module._load = function (request, parent, isMain) {
         if (request === 'node-gyp-build') {
@@ -24,12 +44,10 @@ if (process.pkg) {
                 const prebuildsDir = path.join(dir, 'prebuilds', subdir);
 
                 // Derive .node filename from package.json name (e.g. @serialport/bindings-cpp → @serialport+bindings-cpp.node)
-                let nodeFile;
                 try {
                     const pkg = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf8'));
                     const stem = pkg.name.replace(/\//g, '+');   // @scope/pkg → @scope+pkg
-                    nodeFile = path.join(prebuildsDir, stem + '.node');
-                    return require(nodeFile);
+                    return require(path.join(prebuildsDir, stem + '.node'));
                 } catch (_) {}
 
                 // Fallback: try all common naming patterns
@@ -37,7 +55,9 @@ if (process.pkg) {
                     try { return require(path.join(prebuildsDir, name)); } catch (_) {}
                 }
 
-                throw new Error(`node-gyp-build shim: could not load native binding from ${prebuildsDir}`);
+                // Could not load — return a stub so the server starts without serial support
+                process.stderr.write('[sidecar] WARNING: serialport native binding unavailable — CNC serial connections will fail\n');
+                return createSerialStub();
             };
         }
         return origLoad.apply(this, arguments);

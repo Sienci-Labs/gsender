@@ -21,6 +21,9 @@
     "category": "Utility",
     "shortDescription": "Touch-first pendant UI for gSender CNC controller",
     "externalBin": ["binaries/gsender-server"],
+    "resources": {
+      "binaries/pendant": "pendant"
+    },
     "macOS": {
       "entitlements": "entitlements.plist"
     }

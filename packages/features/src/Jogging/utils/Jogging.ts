@@ -106,7 +106,10 @@ export interface JoggerProps {
     threshold?: number;
 }
 
-export function cancelJog(state: GRBL_ACTIVE_STATES_T, firmwareType: FIRMWARE_TYPES_T) {
+export function stopMachineMotion(
+    state: GRBL_ACTIVE_STATES_T | string | null | undefined,
+    firmwareType: FIRMWARE_TYPES_T | string | null | undefined,
+) {
     if (state) {
         if (state === GRBL_ACTIVE_STATE_JOG) {
             return controller.command('jog:cancel');
@@ -119,6 +122,13 @@ export function cancelJog(state: GRBL_ACTIVE_STATES_T, firmwareType: FIRMWARE_TY
         }
         controller.command('reset');
     }
+}
+
+export function cancelJog(
+    state: GRBL_ACTIVE_STATES_T | string | null | undefined,
+    firmwareType: FIRMWARE_TYPES_T | string | null | undefined,
+) {
+    return stopMachineMotion(state, firmwareType);
 }
 
 export function startJogCommand(

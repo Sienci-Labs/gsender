@@ -173,11 +173,40 @@ pub fn run() {
             tlog!("[tauri] setup — spawning gSender server sidecar");
             tlog!("[tauri] log file: {}", log_path().display());
 
+            // Resolve pendant SPA path.
+            // Dev:        exe = …/src-tauri/target/debug/gsender-pendant
+            //             parent×3 = …/src-tauri/ → binaries/pendant
+            // Production: exe = …/MacOS/gsender-pendant
+            //             parent×2 = …/Contents/ → Resources/pendant (Tauri resource)
+            let pendant_spa_path: Option<std::path::PathBuf> = std::env::current_exe()
+                .ok()
+                .and_then(|exe| {
+                    let dev_candidate = exe.parent()?.parent()?.parent()?
+                        .join("binaries/pendant");
+                    if dev_candidate.join("index.html").exists() {
+                        return Some(dev_candidate);
+                    }
+                    let prod_candidate = exe.parent()?.parent()?
+                        .join("Resources/pendant");
+                    if prod_candidate.join("index.html").exists() {
+                        return Some(prod_candidate);
+                    }
+                    None
+                });
+            if let Some(ref p) = pendant_spa_path {
+                tlog!("[tauri] pendant SPA path: {}", p.display());
+            } else {
+                tlog!("[tauri] pendant SPA path: not found — server will use default");
+            }
+
             let sidecar_child: Option<CommandChild> = if is_port_free(8000) {
-                let (mut rx, child) = app.shell()
+                let mut cmd = app.shell()
                     .sidecar("gsender-server")?
-                    .args(["-p", "8000"])
-                    .spawn()?;
+                    .args(["-p", "8000"]);
+                if let Some(ref p) = pendant_spa_path {
+                    cmd = cmd.env("GSENDER_PENDANT_PATH", p);
+                }
+                let (mut rx, child) = cmd.spawn()?;
 
                 tlog!("[tauri] sidecar spawned OK");
 

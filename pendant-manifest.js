@@ -1,2 +1,2 @@
 'use strict';
-module.exports = ["assets/icon-round-C6RkeomL.png","assets/index-BGbX5oBD.css","assets/index-BgfRMB_8.js","index.html"];
+module.exports = ["assets/icon-round-C6RkeomL.png","assets/index-Czr__X8G.js","assets/index-DYgtR8_I.css","index.html"];

@@ -1,4 +1,5 @@
 import Connection from 'app/features/Connection';
+import { stopMachineMotion } from '@gsender/features/Jogging/utils/Jogging';
 import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import type { RootState } from '@gsender/controller-client/store/redux';
 import { getCurrentWindow } from '@tauri-apps/api/window';
@@ -70,11 +71,19 @@ const STATE_BADGES: Record<string, BadgeConfig> = {
 
 export default function PendantTopBar() {
     const isConnected = useTypedSelector((s: RootState) => s.connection.isConnected);
+    const controllerType = useTypedSelector((s: RootState) => s.controller.type);
     const rawState = useTypedSelector((s: RootState) => s.controller.state) as any;
     const activeState: string = rawState?.status?.activeState ?? '';
     const alarmCode: string | number = rawState?.status?.alarmCode ?? 0;
     const badge = !isConnected ? BADGE_DISCONNECTED : (STATE_BADGES[activeState] ?? BADGE_DEFAULT);
     const BadgeIcon = badge.icon;
+    const showAlarmCode =
+        isConnected &&
+        activeState === GRBL_ACTIVE_STATE_ALARM &&
+        alarmCode !== 0 &&
+        alarmCode !== '0' &&
+        alarmCode !== '';
+    const badgeLabel = showAlarmCode ? `${badge.label} ${alarmCode}` : badge.label;
     const unlockActionable = isConnected && (activeState === GRBL_ACTIVE_STATE_HOLD || activeState === GRBL_ACTIVE_STATE_ALARM);
     const handleDragMouseDown = (event: MouseEvent<HTMLDivElement>) => {
         if (event.button !== 0) return; // left mouse only
@@ -104,6 +113,10 @@ export default function PendantTopBar() {
             controller.command('cyclestart');
         }
     };
+    const handleEStop = () => {
+        if (!isConnected) return;
+        stopMachineMotion(activeState, controllerType);
+    };
 
     return (
         <header className="h-14 px-3 flex items-center gap-3 bg-gray-50 border-b border-gray-200 dark:bg-dark-darker dark:border-dark-lighter shrink-0 select-none relative">
@@ -120,10 +133,10 @@ export default function PendantTopBar() {
             {/* State pill — absolutely centred so Connection resizing doesn't shift it */}
             <div
                 data-tauri-drag-region
-                className={`status-badge absolute left-1/2 -translate-x-1/2 flex items-center justify-center gap-2 w-44 h-9 px-3 rounded-full text-sm font-semibold whitespace-nowrap pointer-events-none ${badge.classes} ${badge.animation === 'alarm' ? 'animate-pulse' : ''} ${badge.animation === 'run' ? 'status-badge--run' : ''}`}
+                className={`status-badge absolute left-1/2 -translate-x-1/2 flex items-center justify-center gap-2 min-w-[11rem] max-w-[16rem] h-9 px-4 rounded-full text-sm font-semibold whitespace-nowrap pointer-events-none ${badge.classes} ${badge.animation === 'alarm' ? 'animate-pulse' : ''} ${badge.animation === 'run' ? 'status-badge--run' : ''}`}
             >
                 <BadgeIcon className="w-4 h-4 shrink-0" />
-                <span>{badge.label}</span>
+                <span>{badgeLabel}</span>
             </div>
 
             {/* Spacer */}
@@ -142,7 +155,12 @@ export default function PendantTopBar() {
                 <LockOpen className="w-4 h-4" />
                 Unlock
             </button>
-            <button className="flex items-center gap-2 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold px-4 py-2 rounded-lg text-sm">
+            <button
+                type="button"
+                onClick={handleEStop}
+                disabled={!isConnected}
+                className={`flex items-center gap-2 font-bold px-4 py-2 rounded-lg text-sm transition-colors ${isConnected ? 'bg-red-600 hover:bg-red-700 active:bg-red-800 text-white' : 'bg-gray-300 text-gray-600 dark:bg-dark-lighter dark:text-gray-400'}`}
+            >
                 <span>⊗</span> E-STOP
             </button>
         </header>
