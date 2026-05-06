@@ -1,5 +1,5 @@
 name: Pendant
-run-name: "Pendant — ${{ github.ref_name }}"
+run-name: "Pendant — ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event.head_commit.message }}"
 
 on:
   push:

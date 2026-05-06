@@ -1,5 +1,5 @@
 name: CI
-run-name: "Desktop — ${{ github.ref_name }}"
+run-name: "Desktop — ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event.head_commit.message }}"
 
 on:
   push:
