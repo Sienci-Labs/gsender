@@ -25,10 +25,6 @@ export default class Generator {
 	constructor({ surfacing, units }) {
 		this.surfacing = surfacing;
 		this.units = units;
-		this.rampingDegrees = this.computeRampAngle(
-			surfacing.width,
-			surfacing.length,
-		);
 	}
 
 	/**
@@ -189,59 +185,48 @@ export default class Generator {
 		return Number(value.toFixed(amount));
 	}
 
-	computeRampAngle = (width, length) => {
-		const units = store.get("workspace.units");
-		const minDimension = Math.min(Math.abs(width), Math.abs(length));
-
-		const minSize = units === METRIC_UNITS ? 50 : 2;
-		const maxSize = units === METRIC_UNITS ? 500 : 20;
-
-		const MIN_ANGLE = 2;
-		const MAX_ANGLE = 10;
-
-		// Remap the ranges of minSize..maxSize to MIN_ANGLE..MAX_ANGLE, choosing the
-		// remapped angle based on where the minDimension falls in the minSize..maxSize range.
-		// In other words, smaller surfacing areas will have a steeper ramping angle
-		// and larger surfacing areas will have a shallower ramping angle.
-		// If this pattern looks weird, it's an inverse lerp followed by a regular lerp (aka: a remap)
-		const t = Math.max(0, Math.min(1, (minDimension - minSize) / (maxSize - minSize)));
-		return Math.round((MAX_ANGLE - t * (MAX_ANGLE - MIN_ANGLE)) * 10) / 10;
-	};
-
 	rampIntoMaterial = (z, direction = { axis: "Y", factor: 1 }) => {
-		const { axis, factor } = direction;
-		const degrees = this.rampingDegrees;
-		const { skimDepth } = this.surfacing;
-		const units = store.get("workspace.units");
-		const depth = skimDepth;
-		const EXTRA_LENGTH = units === METRIC_UNITS ? 1 : convertToImperial(1);
-		const safeHeight = this.getSafeZValue();
-		const EXTRA_RAMP_COAST = units === METRIC_UNITS ? 5 : convertToImperial(5);
-		const RAMP_HEIGHT = Math.abs(depth) * -1 - safeHeight;
+		const RAMP_ANGLE_DEGREES = 2;
+		const MAX_ZIGZAG_LENGTH_MM = 150;
 
-		const rampingLength = Number(
-			(
-				(depth + safeHeight + EXTRA_LENGTH) /
-				getTanFromDegrees(degrees)
-			).toFixed(2),
+		const { axis, factor } = direction;
+		const { skimDepth, bitDiameter, width, length } = this.surfacing;
+		const units = store.get("workspace.units");
+		const safeHeight = this.getSafeZValue();
+
+		const totalZDrop = safeHeight + Math.abs(skimDepth);
+
+		// Zigzag length: min surface dimension minus one full bit diameter (to stay within bounds),
+		// capped at `MAX_ZIGZAG_LENGTH_MM` so the ramp doesn't span the entire workpiece on large jobs.
+		const minDimension = Math.min(Math.abs(width), Math.abs(length));
+		const maxZigzagLength = units === METRIC_UNITS ?
+			MAX_ZIGZAG_LENGTH_MM :
+			convertToImperial(MAX_ZIGZAG_LENGTH_MM);
+
+		const zigzagLength = Math.max(
+			bitDiameter,
+			Math.min(minDimension - bitDiameter, maxZigzagLength),
 		);
 
-		function getTanFromDegrees(degrees) {
-			return Math.tan((degrees * Math.PI) / 180);
+		const zPerLeg = zigzagLength * Math.tan((RAMP_ANGLE_DEGREES * Math.PI) / 180);
+
+		// Use an even number of legs so the tool returns to the start XY position after ramping
+		const numLegsRaw = Math.ceil(totalZDrop / zPerLeg);
+		const numLegs = numLegsRaw % 2 === 0 ? numLegsRaw : numLegsRaw + 1;
+
+		// Spread the total Z drop evenly across all legs (keeps angle at or below `RAMP_ANGLE_DEGREES`)
+		const actualZPerLeg = Number((totalZDrop / numLegs).toFixed(3));
+
+		const rampingArr = ["(Ramping into Material)", "G91"];
+
+		for (let i = 0; i < numLegs; i++) {
+			const legFactor = i % 2 === 0 ? factor : factor * -1;
+			rampingArr.push(
+				`G1 ${axis}${Number((zigzagLength * legFactor).toFixed(3))} Z${-actualZPerLeg}`,
+			);
 		}
 
-		const rampingArr = [];
-
-		rampingArr.push(
-			"(Ramping into Material)",
-			"G91",
-			`G1 ${axis}${rampingLength * factor} Z${RAMP_HEIGHT}`,
-			`G1 ${axis}${EXTRA_RAMP_COAST * factor}`,
-			`G1 ${axis}${(rampingLength + EXTRA_RAMP_COAST) * factor * -1}`,
-			"G90",
-			"(End of Ramping into Material)",
-			"",
-		);
+		rampingArr.push("G90", "(End of Ramping into Material)", "");
 
 		return rampingArr;
 	};
