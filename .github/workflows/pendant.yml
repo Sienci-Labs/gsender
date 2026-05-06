@@ -1,0 +1,141 @@
+name: Pendant
+
+on:
+  push:
+    branches:
+      - master
+      - features/pendant_view
+    tags:
+      - '*'
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  NODE_OPTIONS: --max-old-space-size=8192
+
+jobs:
+  # ── macOS: full Tauri .app / .dmg ──────────────────────────────────────────
+  pendant-mac:
+    name: Pendant — macOS
+    runs-on: macos-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: ${{ runner.os }}-npm-
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build pendant macOS app
+        run: npm run build:pendant:mac
+
+      - name: Collect artifacts
+        run: |
+          mkdir -p releases/pendant-mac
+          cp "apps/pendant/src-tauri/target/release/bundle/dmg/"*.dmg releases/pendant-mac/
+
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pendant-mac
+          path: releases/pendant-mac/*.dmg
+          compression-level: 0
+          retention-days: 7
+
+      - name: Release (tag only)
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: releases/pendant-mac/*.dmg
+          prerelease: true
+          draft: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
+
+  # ── Raspberry Pi ARM64: full Tauri webview app (.deb + .AppImage) ──────────
+  pendant-pi:
+    name: Pendant — Raspberry Pi ARM64
+    runs-on: ubuntu-24.04-arm
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Tauri Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libgtk-3-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            build-essential \
+            libudev-dev \
+            patchelf
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-${{ runner.arch }}-npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: ${{ runner.os }}-${{ runner.arch }}-npm-
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build pendant Linux ARM64 app
+        run: npm run pendant:tauri:build
+
+      - name: Collect artifacts
+        run: |
+          mkdir -p releases/pendant-pi
+          cp apps/pendant/src-tauri/target/release/bundle/deb/*.deb releases/pendant-pi/ || true
+          cp apps/pendant/src-tauri/target/release/bundle/appimage/*.AppImage releases/pendant-pi/ || true
+          ls -la releases/pendant-pi/
+
+      - name: Upload Pi artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pendant-pi
+          path: releases/pendant-pi/*
+          compression-level: 0
+          retention-days: 7
+
+      - name: Release (tag only)
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: releases/pendant-pi/*
+          prerelease: true
+          draft: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}

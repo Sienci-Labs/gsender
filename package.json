@@ -96,6 +96,7 @@
     "pendant:tauri:dev": "bash -c 'cd apps/pendant && npx @tauri-apps/cli@2 dev'",
     "pendant:tauri:build": "npm run build:server-sidecar && bash -c 'cd apps/pendant && npx @tauri-apps/cli@2 build'",
     "build:pendant:mac": "npm run pendant:tauri:build && xattr -cr \"$(ls -d apps/pendant/src-tauri/target/release/bundle/macos/*.app 2>/dev/null | head -1)\"",
+    "build:pendant:pi": "npm run build:server-sidecar",
     "postvite:build": "bash -c \"mkdir -p dist/gsender/app; cp -af apps/desktop/{favicon.ico,images,assets} dist/gsender/app/\"",
     "install:packages": "yarn install && yarn install --prefix /apps/desktop",
     "check-types": "tsc --noEmit -p ./apps/desktop/src",

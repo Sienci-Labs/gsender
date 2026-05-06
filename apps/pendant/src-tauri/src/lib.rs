@@ -174,25 +174,25 @@ pub fn run() {
             tlog!("[tauri] log file: {}", log_path().display());
 
             // Resolve pendant SPA path.
-            // Dev:        exe = …/src-tauri/target/debug/gsender-pendant
-            //             parent×3 = …/src-tauri/ → binaries/pendant
-            // Production: exe = …/MacOS/gsender-pendant
-            //             parent×2 = …/Contents/ → Resources/pendant (Tauri resource)
-            let pendant_spa_path: Option<std::path::PathBuf> = std::env::current_exe()
-                .ok()
-                .and_then(|exe| {
-                    let dev_candidate = exe.parent()?.parent()?.parent()?
-                        .join("binaries/pendant");
-                    if dev_candidate.join("index.html").exists() {
-                        return Some(dev_candidate);
-                    }
-                    let prod_candidate = exe.parent()?.parent()?
-                        .join("Resources/pendant");
-                    if prod_candidate.join("index.html").exists() {
-                        return Some(prod_candidate);
-                    }
-                    None
-                });
+            // Production (all platforms): use Tauri's resource_dir() which returns
+            //   Contents/Resources on macOS, /usr/lib/<id>/ on Linux deb, etc.
+            // Dev fallback: binaries/pendant/ next to src-tauri/ in the workspace.
+            let pendant_spa_path: Option<std::path::PathBuf> = {
+                let from_resources = app.path().resource_dir()
+                    .ok()
+                    .map(|d| d.join("pendant"))
+                    .filter(|p| p.join("index.html").exists());
+
+                if from_resources.is_some() {
+                    from_resources
+                } else {
+                    std::env::current_exe().ok().and_then(|exe| {
+                        // exe = …/src-tauri/target/debug/gsender-pendant → parent×3 = …/src-tauri/
+                        let dev = exe.parent()?.parent()?.parent()?.join("binaries/pendant");
+                        if dev.join("index.html").exists() { Some(dev) } else { None }
+                    })
+                }
+            };
             if let Some(ref p) = pendant_spa_path {
                 tlog!("[tauri] pendant SPA path: {}", p.display());
             } else {
