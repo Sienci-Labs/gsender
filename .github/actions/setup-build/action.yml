@@ -22,6 +22,9 @@ runs:
         echo "RUNNER_TEMP=$RUNNER_TEMP"
         echo "RUNNER_TOOL_CACHE=$RUNNER_TOOL_CACHE"
 
+    - name: Install Bun
+      uses: oven-sh/setup-bun@v2
+
     - name: Install Yarn and node-gyp
       shell: bash
       run: |
@@ -31,8 +34,8 @@ runs:
     - name: Install dependencies and lint
       shell: bash
       run: |
-        yarn install
-        yarn lint
+        bun install
+        bun run lint
 
     - name: Sync package and install src deps
       shell: bash
@@ -53,9 +56,9 @@ runs:
     - name: Build renderer (tag)
       if: github.ref_type == 'tag'
       shell: bash
-      run: yarn run build
+      run: bun run build
 
     - name: Build renderer (branch)
       if: github.ref_type == 'branch'
       shell: bash
-      run: yarn run build-latest
+      run: bun run build-latest
