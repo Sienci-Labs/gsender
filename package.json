@@ -110,7 +110,7 @@
     },
     "afterSign": "./notarize.js",
     "extends": null,
-    "artifactName": "${name}-${version}-${arch}.${ext}",
+    "artifactName": "gSender-${version}-${arch}.${ext}",
     "asar": true,
     "asarUnpack": [
       "**/*.node",
