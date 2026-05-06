@@ -4,7 +4,7 @@ __dirname="$(CDPATH= cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 electron_version=$(electron --version)
 
 display_usage() {
-    yarn electron-builder -- --help
+    ./node_modules/.bin/electron-builder -- --help
 }
 
 if [ $# -le 1 ]; then
@@ -21,8 +21,7 @@ fi
 DIST_DIR="$__dirname/../dist/gsender"
 NODE_MODULES_DIR="$DIST_DIR/node_modules"
 PACKAGE_JSON="$DIST_DIR/package.json"
-YARN_LOCK="$DIST_DIR/yarn.lock"
-ROOT_YARN_LOCK="$__dirname/../yarn.lock"
+ROOT_PACKAGE_LOCK="$__dirname/../package-lock.json"
 MAIN_JS="$DIST_DIR/main.js"
 DEPS_HASH_FILE="$DIST_DIR/.deps-hash"
 
@@ -55,15 +54,12 @@ NEEDS_INSTALL=false
 if [ ! -d "$NODE_MODULES_DIR" ]; then
     echo "No node_modules found, fresh install needed"
     NEEDS_INSTALL=true
-elif [ ! -f "$YARN_LOCK" ]; then
-    echo "No yarn.lock found, reinstall needed"
-    NEEDS_INSTALL=true
 elif [ "$PACKAGE_JSON" -nt "$NODE_MODULES_DIR" ]; then
     echo "package.json is newer than node_modules, reinstall needed"
     NEEDS_INSTALL=true
 fi
 
-CURRENT_DEPS_HASH=$(compute_deps_hash "$PACKAGE_JSON" "$ROOT_YARN_LOCK")
+CURRENT_DEPS_HASH=$(compute_deps_hash "$PACKAGE_JSON" "$ROOT_PACKAGE_LOCK")
 PREVIOUS_DEPS_HASH=""
 if [ -f "$DEPS_HASH_FILE" ]; then
     PREVIOUS_DEPS_HASH=$(cat "$DEPS_HASH_FILE")
@@ -76,12 +72,7 @@ fi
 
 if [ "$NEEDS_INSTALL" = true ]; then
     echo "Installing packages..."
-    # Copy root yarn.lock so electron-builder's module collector can find it
-    # and so --frozen-lockfile has a reference to work from
-    cp "$__dirname/../yarn.lock" "$YARN_LOCK" 2>/dev/null || true
-    # Use frozen lockfile for faster, deterministic installs
-    yarn install --production --frozen-lockfile --prefer-offline --ignore-engines 2>/dev/null || \
-    yarn install --production --ignore-engines
+    npm install --production --legacy-peer-deps
     printf '%s' "$CURRENT_DEPS_HASH" > "$DEPS_HASH_FILE"
 else
     echo "✓ Dependencies already installed, skipping..."
@@ -94,7 +85,7 @@ REBUILD_MARKER="$DIST_DIR/.rebuild-${electron_version}"
 
 if [ ! -f "$REBUILD_MARKER" ]; then
     echo "Rebuilding native modules for electron ${electron_version}"
-    yarn electron-rebuild -- \
+    ./node_modules/.bin/electron-rebuild \
         --version=${electron_version:1} \
         --module-dir=dist/gsender \
         --which-module=serialport
@@ -111,6 +102,6 @@ CSC_IDENTITY_AUTO_DISCOVERY_VALUE=false
 if [ -n "$CSC_LINK" ] || [ -n "$CSC_NAME" ]; then
     CSC_IDENTITY_AUTO_DISCOVERY_VALUE=true
 fi
-cross-env USE_HARD_LINKS=false \
+./node_modules/.bin/cross-env USE_HARD_LINKS=false \
     CSC_IDENTITY_AUTO_DISCOVERY=$CSC_IDENTITY_AUTO_DISCOVERY_VALUE \
-    yarn electron-builder -- "$@"
+    ./node_modules/.bin/electron-builder -- "$@"
