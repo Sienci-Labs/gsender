@@ -216,11 +216,12 @@ export default class Generator {
 
 		// Spread the total Z drop evenly across all legs (keeps angle at or below `RAMP_ANGLE_DEGREES`)
 		const actualZPerLeg = Number((totalZDrop / numLegs).toFixed(3));
-
 		const rampingArr = ["(Ramping into Material)", "G91"];
 
 		for (let i = 0; i < numLegs; i++) {
+			// Switch direction on each leg to create a zigzag pattern
 			const legFactor = i % 2 === 0 ? factor : factor * -1;
+
 			rampingArr.push(
 				`G1 ${axis}${Number((zigzagLength * legFactor).toFixed(3))} Z${-actualZPerLeg}`,
 			);
