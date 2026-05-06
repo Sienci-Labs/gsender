@@ -44,10 +44,10 @@ jobs:
           PACKAGE_VERSION=`node -e "console.log(require('./src/package.json').version)"`
           mkdir -p releases/linux
           ls -al output
-          cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-x86_64.AppImage" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-Linux-Intel-64Bit.AppImage"
-          cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-amd64.deb" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-Linux-Intel-64Bit.deb"
-          cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-arm64.AppImage" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-Linux-ARM-64Bit.AppImage"
-          cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-arm64.deb" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-Linux-ARM-64Bit.deb"
+          cp -af output/${PACKAGE_NAME}-${PACKAGE_VERSION}*x86_64.AppImage "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-Linux-Intel-64Bit.AppImage"
+          cp -af output/${PACKAGE_NAME}-${PACKAGE_VERSION}*amd64.deb "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-Linux-Intel-64Bit.deb"
+          cp -af output/${PACKAGE_NAME}-${PACKAGE_VERSION}*arm64.AppImage "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-Linux-ARM-64Bit.AppImage" || true
+          cp -af output/${PACKAGE_NAME}-${PACKAGE_VERSION}*arm64.deb "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-Linux-ARM-64Bit.deb" || true
           ls -al output releases/linux
           if [[ "$GITHUB_REF_TYPE" == "branch" && "$GITHUB_REF_NAME" == "master" ]]; then
             bun run github-release delete \
@@ -102,8 +102,8 @@ jobs:
           PACKAGE_VERSION=`node -e "console.log(require('./src/package.json').version)"`
           mkdir -p releases/macos
           ls -al output
-          cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-x64.dmg" "releases/macos/gSender-${PACKAGE_VERSION}-Mac-Universal.dmg"
-          cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-arm64.dmg" "releases/macos/gSender-${PACKAGE_VERSION}-Mac-Silicon.dmg"
+          cp -af output/${PACKAGE_NAME}-${PACKAGE_VERSION}*x64.dmg "releases/macos/gSender-${PACKAGE_VERSION}-Mac-Universal.dmg"
+          cp -af output/${PACKAGE_NAME}-${PACKAGE_VERSION}*arm64.dmg "releases/macos/gSender-${PACKAGE_VERSION}-Mac-Silicon.dmg"
           ls -al output releases/macos
           if [[ "$GITHUB_REF_TYPE" == "branch" && "$GITHUB_REF_NAME" == "master" ]]; then
             bun run github-release delete \
@@ -208,7 +208,7 @@ jobs:
           PACKAGE_VERSION=`node -e "console.log(require('./src/package.json').version)"`
           mkdir -p releases/windows
           ls -al output
-          cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-x64.exe" "releases/windows/gSender-${PACKAGE_VERSION}-Windows-64Bit.exe"
+          cp -af output/${PACKAGE_NAME}-${PACKAGE_VERSION}*x64.exe "releases/windows/gSender-${PACKAGE_VERSION}-Windows-64Bit.exe"
           ls -al output releases/windows
           if [[ "$GITHUB_REF_TYPE" == "branch" && "$GITHUB_REF_NAME" == "master" ]]; then
             bun run github-release delete \
