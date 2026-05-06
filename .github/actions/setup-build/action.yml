@@ -40,7 +40,7 @@ runs:
       shell: bash
       run: |
         npm run package-sync
-        yarn --cwd src install --production --ignore-scripts --non-interactive
+        npm install --prefix src --production --ignore-scripts
 
     - name: Prebuild (tag)
       if: github.ref_type == 'tag'
