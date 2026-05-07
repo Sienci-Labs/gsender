@@ -21,29 +21,29 @@
  *
  */
 
-import React from 'react';
-import { useWizardAPI, useWizardContext } from 'app/features/Helper/context';
-import styles from '../index.module.styl';
-import { FaMinus, FaPlus } from 'react-icons/fa';
+import { useWizardAPI, useWizardContext } from "app/features/Helper/context";
+import React from "react";
+import { FaMinus, FaPlus } from "react-icons/fa";
+import styles from "../index.module.styl";
 
 const MinMaxButton = () => {
-    const { minimized } = useWizardContext();
-    const { toggleMinimized } = useWizardAPI();
-    return (
-        <button
-            type="button"
-            className={styles.actionButton}
-            onClick={() => toggleMinimized(minimized)}
-            style={{ marginRight: 5 }}
-            aria-label={minimized ? "Maximize wizard" : "Minimize wizard"}
-        >
-            {!minimized ? (
-                <FaMinus className="bg-transparent" />
-            ) : (
-                <FaPlus className="bg-transparent" />
-            )}
-        </button>
-    );
+	const { minimized } = useWizardContext();
+	const { toggleMinimized } = useWizardAPI();
+	return (
+		<button
+			type="button"
+			className={styles.actionButton}
+			onClick={() => toggleMinimized(minimized)}
+			style={{ marginRight: 5 }}
+			aria-label={minimized ? "Maximize wizard" : "Minimize wizard"}
+		>
+			{!minimized ? (
+				<FaMinus className="bg-transparent" />
+			) : (
+				<FaPlus className="bg-transparent" />
+			)}
+		</button>
+	);
 };
 
 export default MinMaxButton;

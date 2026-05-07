@@ -1,41 +1,40 @@
-import React, { useContext, useMemo, useEffect } from 'react';
-
-import { GamepadContext } from './utils/context';
-import Profile from './Profile';
-import ProfileList from './ProfileList';
-import GamepadManager from 'app/lib/gamepad';
+import GamepadManager from "app/lib/gamepad";
+import React, { useContext, useEffect, useMemo } from "react";
+import Profile from "./Profile";
+import ProfileList from "./ProfileList";
+import { GamepadContext } from "./utils/context";
 
 const Gamepad = () => {
-    useEffect(() => {
-        const gamepadInstance = GamepadManager.getInstance();
+	useEffect(() => {
+		const gamepadInstance = GamepadManager.getInstance();
 
-        gamepadInstance.holdListener();
+		gamepadInstance.holdListener();
 
-        return () => {
-            gamepadInstance.unholdListener();
-        };
-    }, []);
+		return () => {
+			gamepadInstance.unholdListener();
+		};
+	}, []);
 
-    const {
-        state: {
-            currentProfile,
-            settings: { profiles },
-        },
-    } = useContext(GamepadContext);
+	const {
+		state: {
+			currentProfile,
+			settings: { profiles },
+		},
+	} = useContext(GamepadContext);
 
-    const profile = useMemo(
-        () =>
-            profiles.find((profile) =>
-                profile.id.some((item) => currentProfile?.includes(item)),
-            ),
-        [currentProfile, profiles],
-    );
+	const profile = useMemo(
+		() =>
+			profiles.find((profile) =>
+				profile.id.some((item) => currentProfile?.includes(item)),
+			),
+		[currentProfile, profiles],
+	);
 
-    if (profile) {
-        return <Profile data={profile} />;
-    }
+	if (profile) {
+		return <Profile data={profile} />;
+	}
 
-    return <ProfileList />;
+	return <ProfileList />;
 };
 
 export default Gamepad;

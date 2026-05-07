@@ -1,5 +1,5 @@
 export function MacroVariableDropdown() {
-    return <div></div>;
+	return <div></div>;
 }
 
 export default MacroVariableDropdown;

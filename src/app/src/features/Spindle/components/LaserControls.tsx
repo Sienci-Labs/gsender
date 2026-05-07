@@ -21,111 +21,110 @@
  *
  */
 
-import React from 'react';
-
-import { Slider } from 'app/components/shadcn/Slider';
-import { ControlledInput } from 'app/components/ControlledInput';
-import { FaLightbulb, FaRegLightbulb, FaSatelliteDish } from 'react-icons/fa';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import { ActiveStateButton } from 'app/components/ActiveStateButton';
-import Tooltip from 'app/components/Tooltip';
+import { ActiveStateButton } from "app/components/ActiveStateButton";
+import { ControlledInput } from "app/components/ControlledInput";
+import { Slider } from "app/components/shadcn/Slider";
+import Tooltip from "app/components/Tooltip";
+import { useTypedSelector } from "app/hooks/useTypedSelector";
+import type React from "react";
+import { FaLightbulb, FaRegLightbulb, FaSatelliteDish } from "react-icons/fa";
 
 type Props = {
-    actions: LaserActions;
-    state: {
-        laser: LaserState;
-    };
-    canClick: boolean;
-    isConnected: boolean;
+	actions: LaserActions;
+	state: {
+		laser: LaserState;
+	};
+	canClick: boolean;
+	isConnected: boolean;
 };
 
 interface LaserState {
-    power: number;
-    duration: number;
+	power: number;
+	duration: number;
 }
 
 interface LaserActions {
-    sendLaserM3: () => void;
-    runLaserTest: () => void;
-    sendM5: () => void;
-    handleLaserPowerChange: (value: number) => void;
-    handleLaserDurationChange: (
-        event: React.ChangeEvent<HTMLInputElement>,
-    ) => void;
+	sendLaserM3: () => void;
+	runLaserTest: () => void;
+	sendM5: () => void;
+	handleLaserPowerChange: (value: number) => void;
+	handleLaserDurationChange: (
+		event: React.ChangeEvent<HTMLInputElement>,
+	) => void;
 }
 
 const LaserControls = ({ actions, state, canClick, isConnected }: Props) => {
-    const { laser } = state;
-    const { spindle } = useTypedSelector((state) => state.controller.modal);
+	const { laser } = state;
+	const { spindle } = useTypedSelector((state) => state.controller.modal);
 
-    const laserIsOn = spindle !== 'M5';
+	const laserIsOn = spindle !== "M5";
 
-    return (
-        <div>
-            <div className="flex justify-center gap-2">
-                <ActiveStateButton
-                    onClick={actions.sendLaserM3}
-                    icon={<FaLightbulb />}
-                    text="Laser On"
-                    active={isConnected && laserIsOn}
-                    size={'sm'}
-                    disabled={!canClick}
-                    tooltip={{ content: 'Turn on laser' }}
-                />
-                <ActiveStateButton
-                    onClick={actions.runLaserTest}
-                    icon={<FaSatelliteDish />}
-                    text="Laser Test"
-                    size={'sm'}
-                    disabled={!canClick}
-                    tooltip={{
-                        content: 'Turn on laser for Test Duration',
-                    }}
-                />
-                <ActiveStateButton
-                    onClick={actions.sendM5}
-                    icon={<FaRegLightbulb />}
-                    text="Off"
-                    size={'sm'}
-                    disabled={!canClick}
-                    tooltip={{ content: 'Turn off laser' }}
-                />
-            </div>
-            <div className="grid grid-cols-[1fr_3fr_1fr] gap-2 justify-center mt-2 items-center dark:text-white">
-                <span className="text-right">Power</span>
-                <Tooltip content="Adjust laser power">
-                    <Slider
-                        value={[laser.power]}
-                        max={100}
-                        step={1}
-                        onValueChange={(value: number[]) =>
-                            actions.handleLaserPowerChange(value[0])
-                        }
-                        disabled={!canClick}
-                        aria-label="Adjust laser power"
-                    />
-                </Tooltip>
-                <span>{laser.power}%</span>
-            </div>
-            <div className="flex gap-2 justify-center items-center mt-1 dark:text-white">
-                <label htmlFor="laser-test-duration">Test Duration:</label>
-                <div className="flex gap-2">
-                    <Tooltip content="Laser test duration">
-                        <ControlledInput
-                            id="laser-test-duration"
-                            value={laser.duration}
-                            onChange={actions.handleLaserDurationChange}
-                            className="z-0 text-center text-blue-500 text-xl"
-                            suffix="sec"
-                            type="number"
-                            sizing="xs"
-                            aria-label="Laser test duration"
-                        />
-                    </Tooltip>
-                </div>
-            </div>
-        </div>
-    );
+	return (
+		<div>
+			<div className="flex justify-center gap-2">
+				<ActiveStateButton
+					onClick={actions.sendLaserM3}
+					icon={<FaLightbulb />}
+					text="Laser On"
+					active={isConnected && laserIsOn}
+					size={"sm"}
+					disabled={!canClick}
+					tooltip={{ content: "Turn on laser" }}
+				/>
+				<ActiveStateButton
+					onClick={actions.runLaserTest}
+					icon={<FaSatelliteDish />}
+					text="Laser Test"
+					size={"sm"}
+					disabled={!canClick}
+					tooltip={{
+						content: "Turn on laser for Test Duration",
+					}}
+				/>
+				<ActiveStateButton
+					onClick={actions.sendM5}
+					icon={<FaRegLightbulb />}
+					text="Off"
+					size={"sm"}
+					disabled={!canClick}
+					tooltip={{ content: "Turn off laser" }}
+				/>
+			</div>
+			<div className="grid grid-cols-[1fr_3fr_1fr] gap-2 justify-center mt-2 items-center dark:text-white">
+				<span className="text-right">Power</span>
+				<Tooltip content="Adjust laser power">
+					<Slider
+						value={[laser.power]}
+						max={100}
+						step={1}
+						onValueChange={(value: number[]) =>
+							actions.handleLaserPowerChange(value[0])
+						}
+						disabled={!canClick}
+						aria-label="Adjust laser power"
+					/>
+				</Tooltip>
+				<span>{laser.power}%</span>
+			</div>
+			<div className="flex gap-2 justify-center items-center mt-1 dark:text-white">
+				<label htmlFor="laser-test-duration">Test Duration:</label>
+				<div className="flex gap-2">
+					<Tooltip content="Laser test duration">
+						<ControlledInput
+							id="laser-test-duration"
+							value={laser.duration}
+							onChange={actions.handleLaserDurationChange}
+							className="z-0 text-center text-blue-500 text-xl"
+							suffix="sec"
+							type="number"
+							sizing="xs"
+							aria-label="Laser test duration"
+						/>
+					</Tooltip>
+				</div>
+			</div>
+		</div>
+	);
 };
 
 export default LaserControls;

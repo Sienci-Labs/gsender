@@ -1,5 +1,5 @@
-import reduxStore from 'app/store/redux';
-import get from 'lodash/get';
+import reduxStore from "app/store/redux";
+import get from "lodash/get";
 
 const OFFSET = 1; // 1mm offset on all travel movements for soft limits.
 
@@ -11,14 +11,14 @@ const OFFSET = 1; // 1mm offset on all travel movements for soft limits.
  *                          - The second number represents the maximum Z-axis travel DOWN after deducting the current position and offset.
  */
 export function getZTravels() {
-    const store = reduxStore.getState();
-    const settings = get(store, 'controller.settings', {});
-    const mpos = get(store, 'controller.mpos', {});
+	const store = reduxStore.getState();
+	const settings = get(store, "controller.settings", {});
+	const mpos = get(store, "controller.mpos", {});
 
-    const zMaxTravel = Math.abs(Number(get(settings, 'settings.$132', 0)));
-    const zMpos = Math.abs(Number(get(mpos, 'z', 0)));
+	const zMaxTravel = Math.abs(Number(get(settings, "settings.$132", 0)));
+	const zMpos = Math.abs(Number(get(mpos, "z", 0)));
 
-    return [zMpos - OFFSET, zMaxTravel - zMpos - OFFSET];
+	return [zMpos - OFFSET, zMaxTravel - zMpos - OFFSET];
 }
 
 /**
@@ -29,7 +29,7 @@ export function getZTravels() {
  * @return {number} The calculated Z-axis travel distance.
  */
 export function getZUpTravel(requestedDistance) {
-    return Math.min(getZTravels()[0], Number(requestedDistance));
+	return Math.min(getZTravels()[0], Number(requestedDistance));
 }
 
 /**
@@ -40,5 +40,5 @@ export function getZUpTravel(requestedDistance) {
  * @return {number} The computed downward travel distance, constrained by the offset and requested distance.
  */
 export function getZDownTravel(requestedDistance) {
-    return Math.min(getZTravels()[1], Number(requestedDistance));
+	return Math.min(getZTravels()[1], Number(requestedDistance));
 }

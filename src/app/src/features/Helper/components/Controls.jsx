@@ -21,59 +21,59 @@
  *
  */
 
-import React from 'react';
-import get from 'lodash/get';
-import { GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
-import { useWizardAPI } from 'app/features/Helper/context';
-import StepButton from 'app/features/Helper/components/StepButton';
-import styles from '../index.module.styl';
-import { FaArrowLeft } from 'react-icons/fa';
-import { FaArrowRight } from 'react-icons/fa6';
-import { useSelector } from 'react-redux';
+import { GRBL_ACTIVE_STATE_IDLE } from "app/constants";
+import StepButton from "app/features/Helper/components/StepButton";
+import { useWizardAPI } from "app/features/Helper/context";
+import get from "lodash/get";
+import React from "react";
+import { FaArrowLeft } from "react-icons/fa";
+import { FaArrowRight } from "react-icons/fa6";
+import { useSelector } from "react-redux";
+import styles from "../index.module.styl";
 
 const Controls = () => {
-    const {
-        completeSubStep,
-        decrementStep,
-        scrollToActiveStep,
-        hasIncompleteActions,
-        updateSubstepOverlay,
-    } = useWizardAPI();
+	const {
+		completeSubStep,
+		decrementStep,
+		scrollToActiveStep,
+		hasIncompleteActions,
+		updateSubstepOverlay,
+	} = useWizardAPI();
 
-    const activeState = useSelector((state) =>
-        get(state, 'controller.state.status.activeState', ''),
-    );
+	const activeState = useSelector((state) =>
+		get(state, "controller.state.status.activeState", ""),
+	);
 
-    const isNotIdle = () => {
-        return activeState !== GRBL_ACTIVE_STATE_IDLE;
-    };
+	const isNotIdle = () => {
+		return activeState !== GRBL_ACTIVE_STATE_IDLE;
+	};
 
-    return (
-        <div className={styles.controls}>
-            <StepButton
-                inverted
-                onClick={() => {
-                    const activeValues = decrementStep();
-                    updateSubstepOverlay(activeValues);
-                    scrollToActiveStep(activeValues);
-                }}
-            >
-                <FaArrowLeft />
-                Back
-            </StepButton>
-            <StepButton
-                onClick={() => {
-                    const activeValues = completeSubStep();
-                    updateSubstepOverlay(activeValues);
-                    scrollToActiveStep(activeValues);
-                }}
-                disabled={hasIncompleteActions() || isNotIdle()}
-            >
-                Complete
-                <FaArrowRight />
-            </StepButton>
-        </div>
-    );
+	return (
+		<div className={styles.controls}>
+			<StepButton
+				inverted
+				onClick={() => {
+					const activeValues = decrementStep();
+					updateSubstepOverlay(activeValues);
+					scrollToActiveStep(activeValues);
+				}}
+			>
+				<FaArrowLeft />
+				Back
+			</StepButton>
+			<StepButton
+				onClick={() => {
+					const activeValues = completeSubStep();
+					updateSubstepOverlay(activeValues);
+					scrollToActiveStep(activeValues);
+				}}
+				disabled={hasIncompleteActions() || isNotIdle()}
+			>
+				Complete
+				<FaArrowRight />
+			</StepButton>
+		</div>
+	);
 };
 
 export default Controls;

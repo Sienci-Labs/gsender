@@ -1,312 +1,304 @@
-import { useRef, useEffect, useState } from 'react';
-import { FaFolderOpen } from 'react-icons/fa';
-import { MdKeyboardArrowDown } from 'react-icons/md';
-import { MdClose } from 'react-icons/md';
-import isElectron from 'is-electron';
-import pubsub from 'pubsub-js';
-import debounce from 'lodash/debounce';
-import throttle from 'lodash/throttle';
-
-import { Button } from 'app/components/Button';
-import { RootState, store as reduxStore } from 'app/store/redux';
-import store from 'app/store';
-import controller from 'app/lib/controller';
+import { Button } from "app/components/Button";
 import {
-    CARVING_CATEGORY, GRBL_ACTIVE_STATE_CHECK,
-    VISUALIZER_PRIMARY,
-    WORKFLOW_STATE_RUNNING,
-} from 'app/constants';
-import { unloadFileInfo } from 'app/store/redux/slices/fileInfo.slice';
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "app/components/shadcn/AlertDialog";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuTrigger,
-} from 'app/components/shadcn/Dropdown';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import { uploadGcodeFileToServer } from 'app/lib/fileupload';
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuTrigger,
+} from "app/components/shadcn/Dropdown";
+import { Tooltip } from "app/components/Tooltip";
 import {
-    AlertDialog,
-    AlertDialogTrigger,
-    AlertDialogContent,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogCancel,
-    AlertDialogAction,
-} from 'app/components/shadcn/AlertDialog';
-
-import { getRecentFiles } from './utils/recentfiles';
-import { ReloadFileAlert } from 'app/features/FileControl/components/ReloadFileAlert.tsx';
-import { RecentFile } from './definitions';
-import Divider from './components/Divider';
-import useKeybinding from 'app/lib/useKeybinding';
-import useShuttleEvents from 'app/hooks/useShuttleEvents';
-import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
-import { useSelector } from 'react-redux';
-import { toast } from 'app/lib/toaster';
-import get from 'lodash/get';
-import { Tooltip } from 'app/components/Tooltip';
+	CARVING_CATEGORY,
+	GRBL_ACTIVE_STATE_CHECK,
+	VISUALIZER_PRIMARY,
+	WORKFLOW_STATE_RUNNING,
+} from "app/constants";
+import { ReloadFileAlert } from "app/features/FileControl/components/ReloadFileAlert.tsx";
+import { updateToolchangeContext } from "app/features/Helper/Wizard.tsx";
+import useShuttleEvents from "app/hooks/useShuttleEvents";
+import { useTypedSelector } from "app/hooks/useTypedSelector";
+import controller from "app/lib/controller";
+import { uploadGcodeFileToServer } from "app/lib/fileupload";
+import { toast } from "app/lib/toaster";
+import useKeybinding from "app/lib/useKeybinding";
+import store from "app/store";
+import { type RootState, store as reduxStore } from "app/store/redux";
+import { unloadFileInfo } from "app/store/redux/slices/fileInfo.slice";
+import isElectron from "is-electron";
+import debounce from "lodash/debounce";
+import get from "lodash/get";
+import throttle from "lodash/throttle";
+import pubsub from "pubsub-js";
+import { useEffect, useRef, useState } from "react";
+import { FaFolderOpen } from "react-icons/fa";
+import { MdClose, MdKeyboardArrowDown } from "react-icons/md";
+import { useSelector } from "react-redux";
+import Divider from "./components/Divider";
+import type { RecentFile } from "./definitions";
+import { getRecentFiles } from "./utils/recentfiles";
 
 const ButtonControlGroup = () => {
-    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.platform) ||
-        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const fileLoadedRef = useRef(false);
-    const [recentFiles, setRecentFiles] = useState<RecentFile[]>([]);
-    const { fileLoaded, path, name } = useTypedSelector((state) => state.file);
+	const isIOSDevice =
+		/iPad|iPhone|iPod/.test(navigator.platform) ||
+		(navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+	const fileInputRef = useRef<HTMLInputElement>(null);
+	const fileLoadedRef = useRef(false);
+	const [recentFiles, setRecentFiles] = useState<RecentFile[]>([]);
+	const { fileLoaded, path, name } = useTypedSelector((state) => state.file);
 
-    useEffect(() => {
-        fileLoadedRef.current = fileLoaded;
-    }, [fileLoaded]);
+	useEffect(() => {
+		fileLoadedRef.current = fileLoaded;
+	}, [fileLoaded]);
 
-    const usingElectron = isElectron();
-    const workflowState = useSelector(
-        (state: RootState) => state.controller.workflow.state,
-    );
+	const usingElectron = isElectron();
+	const workflowState = useSelector(
+		(state: RootState) => state.controller.workflow.state,
+	);
 
-    const activeState = useTypedSelector((state: RootState) => state.controller.state.status?.activeState);
+	const activeState = useTypedSelector(
+		(state: RootState) => state.controller.state.status?.activeState,
+	);
 
-    const isRunning = workflowState === WORKFLOW_STATE_RUNNING;
-    const isCheck = workflowState === GRBL_ACTIVE_STATE_CHECK;
-    const canClick = !isRunning;
+	const isRunning = workflowState === WORKFLOW_STATE_RUNNING;
+	const isCheck = workflowState === GRBL_ACTIVE_STATE_CHECK;
+	const canClick = !isRunning;
 
-    useEffect(() => {
-        setRecentFiles(getRecentFiles());
-        const token = pubsub.subscribe(
-            'recent-files-updated',
-            (_: string, files: RecentFile[]) => {
-                setRecentFiles(files);
-            },
-        );
-        // Always update context on store change so latest config is present
-        store.on('change', () => {
-            updateToolchangeContext();
-        });
+	useEffect(() => {
+		setRecentFiles(getRecentFiles());
+		const token = pubsub.subscribe(
+			"recent-files-updated",
+			(_: string, files: RecentFile[]) => {
+				setRecentFiles(files);
+			},
+		);
+		// Always update context on store change so latest config is present
+		store.on("change", () => {
+			updateToolchangeContext();
+		});
 
-        return () => {
-            pubsub.unsubscribe(token);
-        };
-    }, []);
+		return () => {
+			pubsub.unsubscribe(token);
+		};
+	}, []);
 
-    const canRunShortcut = () => {
-        const workflowState = get(
-            reduxStore.getState(),
-            'controller.workflow.state',
-        );
-        return workflowState !== WORKFLOW_STATE_RUNNING;
-    };
+	const canRunShortcut = () => {
+		const workflowState = get(
+			reduxStore.getState(),
+			"controller.workflow.state",
+		);
+		return workflowState !== WORKFLOW_STATE_RUNNING;
+	};
 
-    const shuttleControlEvents = {
-        LOAD_FILE: {
-            title: 'Load file',
-            keys: ['shift', 'l'].join('+'),
-            gamepadKeys: '0',
-            keysName: 'A',
-            cmd: 'LOAD_FILE',
-            preventDefault: false,
-            isActive: true,
-            category: CARVING_CATEGORY,
-            callback: throttle(
-                () => {
-                    if (!canRunShortcut()) {
-                        return;
-                    }
-                    handleClickLoadFile();
-                },
-                300,
-                { leading: true, trailing: false },
-            ),
-        },
-        UNLOAD_FILE: {
-            title: 'Unload file',
-            keys: ['shift', 'k'].join('+'),
-            gamepadKeys: '1',
-            keysName: 'B',
-            cmd: 'UNLOAD_FILE',
-            preventDefault: false,
-            isActive: true,
-            category: CARVING_CATEGORY,
-            callback: () => {
-                if (!fileLoadedRef.current || !canRunShortcut()) {
-                    return;
-                }
-                controller.command('gcode:unload');
-                reduxStore.dispatch(unloadFileInfo());
-                pubsub.publish('unload:file');
-                if (fileInputRef.current) {
-                    fileInputRef.current.value = '';
-                }
-            },
-        },
-    };
+	const shuttleControlEvents = {
+		LOAD_FILE: {
+			title: "Load file",
+			keys: ["shift", "l"].join("+"),
+			gamepadKeys: "0",
+			keysName: "A",
+			cmd: "LOAD_FILE",
+			preventDefault: false,
+			isActive: true,
+			category: CARVING_CATEGORY,
+			callback: throttle(
+				() => {
+					if (!canRunShortcut()) {
+						return;
+					}
+					handleClickLoadFile();
+				},
+				300,
+				{ leading: true, trailing: false },
+			),
+		},
+		UNLOAD_FILE: {
+			title: "Unload file",
+			keys: ["shift", "k"].join("+"),
+			gamepadKeys: "1",
+			keysName: "B",
+			cmd: "UNLOAD_FILE",
+			preventDefault: false,
+			isActive: true,
+			category: CARVING_CATEGORY,
+			callback: () => {
+				if (!fileLoadedRef.current || !canRunShortcut()) {
+					return;
+				}
+				controller.command("gcode:unload");
+				reduxStore.dispatch(unloadFileInfo());
+				pubsub.publish("unload:file");
+				if (fileInputRef.current) {
+					fileInputRef.current.value = "";
+				}
+			},
+		},
+	};
 
-    useShuttleEvents(shuttleControlEvents);
-    useEffect(() => {
-        useKeybinding(shuttleControlEvents);
-    }, []);
+	useShuttleEvents(shuttleControlEvents);
+	useEffect(() => {
+		useKeybinding(shuttleControlEvents);
+	}, []);
 
-    const handleLoadFile = async (
-        event: React.ChangeEvent<HTMLInputElement>,
-    ) => {
-        const files = event.target.files;
-        const file = files[0];
+	const handleLoadFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
+		const files = event.target.files;
+		const file = files[0];
 
-        updateToolchangeContext();
+		updateToolchangeContext();
 
-        await uploadGcodeFileToServer(
-            file,
-            controller.port,
-            VISUALIZER_PRIMARY,
-        );
-    };
+		await uploadGcodeFileToServer(file, controller.port, VISUALIZER_PRIMARY);
+	};
 
-    const handleClickLoadFile = () => {
-        if (isElectron()) {
-            (window as any).ipcRenderer?.send('open-upload-dialog');
-        } else {
-            if (fileInputRef.current) {
-                fileInputRef.current.value = '';
-                fileInputRef.current.click();
-            }
-        }
-    };
+	const handleClickLoadFile = () => {
+		if (isElectron()) {
+			(window as any).ipcRenderer?.send("open-upload-dialog");
+		} else {
+			if (fileInputRef.current) {
+				fileInputRef.current.value = "";
+				fileInputRef.current.click();
+			}
+		}
+	};
 
-    const handleLoadRecentFile = (filePath: string) => {
-        (window as any).ipcRenderer?.send('load-recent-file', { filePath });
-    };
+	const handleLoadRecentFile = (filePath: string) => {
+		(window as any).ipcRenderer?.send("load-recent-file", { filePath });
+	};
 
-    const handleFileReload = debounce(() => {
-        if (!fileLoaded) {
-            return;
-        }
+	const handleFileReload = debounce(() => {
+		if (!fileLoaded) {
+			return;
+		}
 
-        if (
-            name === 'gSender_Surfacing.gcode' ||
-            name === 'gSender_Rotary_Surfacing'
-        ) {
-            return;
-        }
+		if (
+			name === "gSender_Surfacing.gcode" ||
+			name === "gSender_Rotary_Surfacing"
+		) {
+			return;
+		}
 
-        (window as any).ipcRenderer?.send('load-recent-file', {
-            filePath: path,
-        });
-    }, 300);
+		(window as any).ipcRenderer?.send("load-recent-file", {
+			filePath: path,
+		});
+	}, 300);
 
-    const handleCloseFile = debounce(() => {
-        if (!fileLoaded) {
-            return;
-        }
+	const handleCloseFile = debounce(() => {
+		if (!fileLoaded) {
+			return;
+		}
 
-        controller.command('gcode:unload');
-        reduxStore.dispatch(unloadFileInfo());
-        pubsub.publish('unload:file');
-        toast('G-code File Closed', { position: 'bottom-right' });
+		controller.command("gcode:unload");
+		reduxStore.dispatch(unloadFileInfo());
+		pubsub.publish("unload:file");
+		toast("G-code File Closed", { position: "bottom-right" });
 
-        fileInputRef.current.value = '';
-    }, 100);
+		fileInputRef.current.value = "";
+	}, 100);
 
-    return (
-        <div className="flex rounded-md absolute top-[-35px] bg-white dark:bg-dark shadow-md z-40 border-blue-500 border-2 overflow-hidden h-12 max-xl:h-11 portrait:h-14 portrait:top-[-45px]">
-            <Button
-                onClick={handleClickLoadFile}
-                icon={<FaFolderOpen className="w-5 h-5" />}
-                text="Load File"
-                variant="ghost"
-                disabled={!canClick}
-                className="h-full px-4 rounded-none portrait:text-xl portrait:px-6"
-            />
-            <Divider />
-            <div className="grid grid-cols-[60px_2px_60px_2px_60px] h-full portrait:grid-cols-[80px_2px_80px_2px_80px]">
-                <DropdownMenu>
-                    <Tooltip content="View Recent Files">
-                        <DropdownMenuTrigger asChild>
-                            <Button
-                                icon={
-                                    <MdKeyboardArrowDown className="w-10 h-8" />
-                                }
-                                variant="ghost"
-                                disabled={!canClick || isCheck}
-                                className="h-full rounded-none"
-                                aria-label="View Recent Files"
-                            />
-                        </DropdownMenuTrigger>
-                    </Tooltip>
-                    <DropdownMenuContent className="w-56 bg-white">
-                        <DropdownMenuLabel>Recent Files</DropdownMenuLabel>
-                        {recentFiles.map((file) => (
-                            <DropdownMenuItem
-                                key={file.filePath}
-                                onClick={() =>
-                                    handleLoadRecentFile(file.filePath)
-                                }
-                                className="flex items-center hover:bg-blue-100 transition-colors duration-200 cursor-pointer dark:hover:bg-dark-lighter"
-                            >
-                                <div className="w-full overflow-hidden">
-                                    <span
-                                        className="block truncate"
-                                        title={file.fileName}
-                                    >
-                                        {file.fileName}
-                                    </span>
-                                </div>
-                            </DropdownMenuItem>
-                        ))}
-                    </DropdownMenuContent>
-                </DropdownMenu>
+	return (
+		<div className="flex rounded-md absolute top-[-35px] bg-white dark:bg-dark shadow-md z-40 border-blue-500 border-2 overflow-hidden h-12 max-xl:h-11 portrait:h-14 portrait:top-[-45px]">
+			<Button
+				onClick={handleClickLoadFile}
+				icon={<FaFolderOpen className="w-5 h-5" />}
+				text="Load File"
+				variant="ghost"
+				disabled={!canClick}
+				className="h-full px-4 rounded-none portrait:text-xl portrait:px-6"
+			/>
+			<Divider />
+			<div className="grid grid-cols-[60px_2px_60px_2px_60px] h-full portrait:grid-cols-[80px_2px_80px_2px_80px]">
+				<DropdownMenu>
+					<Tooltip content="View Recent Files">
+						<DropdownMenuTrigger asChild>
+							<Button
+								icon={<MdKeyboardArrowDown className="w-10 h-8" />}
+								variant="ghost"
+								disabled={!canClick || isCheck}
+								className="h-full rounded-none"
+								aria-label="View Recent Files"
+							/>
+						</DropdownMenuTrigger>
+					</Tooltip>
+					<DropdownMenuContent className="w-56 bg-white">
+						<DropdownMenuLabel>Recent Files</DropdownMenuLabel>
+						{recentFiles.map((file) => (
+							<DropdownMenuItem
+								key={file.filePath}
+								onClick={() => handleLoadRecentFile(file.filePath)}
+								className="flex items-center hover:bg-blue-100 transition-colors duration-200 cursor-pointer dark:hover:bg-dark-lighter"
+							>
+								<div className="w-full overflow-hidden">
+									<span className="block truncate" title={file.fileName}>
+										{file.fileName}
+									</span>
+								</div>
+							</DropdownMenuItem>
+						))}
+					</DropdownMenuContent>
+				</DropdownMenu>
 
-                <Divider />
+				<Divider />
 
-                <ReloadFileAlert
-                    fileLoaded={canClick && fileLoaded && usingElectron}
-                    handleFileReload={handleFileReload}
-                />
+				<ReloadFileAlert
+					fileLoaded={canClick && fileLoaded && usingElectron}
+					handleFileReload={handleFileReload}
+				/>
 
-                <Divider />
+				<Divider />
 
-                <AlertDialog>
-                    <Tooltip content="Close File">
-                        <AlertDialogTrigger asChild>
-                            <Button
-                                icon={<MdClose className="w-6 h-6" />}
-                                variant="ghost"
-                                className="h-full rounded-none"
-                                disabled={isRunning || !fileLoaded}
-                                aria-label="Close File"
-                            />
-                        </AlertDialogTrigger>
-                    </Tooltip>
-                    <AlertDialogContent className="bg-white">
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                                This will close the current file. Any unsaved
-                                changes will be lost.
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={handleCloseFile}>
-                                Close File
-                            </AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
+				<AlertDialog>
+					<Tooltip content="Close File">
+						<AlertDialogTrigger asChild>
+							<Button
+								icon={<MdClose className="w-6 h-6" />}
+								variant="ghost"
+								className="h-full rounded-none"
+								disabled={isRunning || !fileLoaded}
+								aria-label="Close File"
+							/>
+						</AlertDialogTrigger>
+					</Tooltip>
+					<AlertDialogContent className="bg-white">
+						<AlertDialogHeader>
+							<AlertDialogTitle>Are you sure?</AlertDialogTitle>
+							<AlertDialogDescription>
+								This will close the current file. Any unsaved changes will be
+								lost.
+							</AlertDialogDescription>
+						</AlertDialogHeader>
+						<AlertDialogFooter>
+							<AlertDialogCancel>Cancel</AlertDialogCancel>
+							<AlertDialogAction onClick={handleCloseFile}>
+								Close File
+							</AlertDialogAction>
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialog>
 
-                <input
-                    ref={fileInputRef}
-                    type="file"
-                    className="hidden"
-                    multiple={false}
-                    onChange={handleLoadFile}
-                    accept={isIOSDevice ? "text/plain,application/octet-stream" : ".gcode,.gc,.nc,.tap,.cnc"}
-                    id="fileInput"
-                />
-            </div>
-        </div>
-    );
+				<input
+					ref={fileInputRef}
+					type="file"
+					className="hidden"
+					multiple={false}
+					onChange={handleLoadFile}
+					accept={
+						isIOSDevice
+							? "text/plain,application/octet-stream"
+							: ".gcode,.gc,.nc,.tap,.cnc"
+					}
+					id="fileInput"
+				/>
+			</div>
+		</div>
+	);
 };
 
 export default ButtonControlGroup;

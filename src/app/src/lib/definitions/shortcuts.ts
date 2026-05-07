@@ -1,54 +1,54 @@
-import { SHORTCUT_CATEGORY } from '../../constants';
-import { BasicObject } from 'app/definitions/general';
+import type { BasicObject } from "app/definitions/general";
+import type { SHORTCUT_CATEGORY } from "../../constants";
 
 // Types
 
 export type SHORTCUT_CATEGORY_T =
-    (typeof SHORTCUT_CATEGORY)[keyof typeof SHORTCUT_CATEGORY];
+	(typeof SHORTCUT_CATEGORY)[keyof typeof SHORTCUT_CATEGORY];
 
 // Interfaces
 
 export interface CommandKey {
-    // we only save these properties in store, even though the shuttle events have more
-    category: string;
-    cmd: string;
-    keys: string;
-    isActive: boolean;
+	// we only save these properties in store, even though the shuttle events have more
+	category: string;
+	cmd: string;
+	keys: string;
+	isActive: boolean;
 }
 
 export interface CommandKeys {
-    [key: string]: CommandKey | undefined;
+	[key: string]: CommandKey | undefined;
 }
 
 export interface ShuttleEvent {
-    title: string;
-    keys: string;
-    gamepadKeys?: string;
-    keysName?: string;
-    cmd: string;
-    payload?: BasicObject;
-    preventDefault: boolean;
-    isActive: boolean;
-    category: SHORTCUT_CATEGORY_T;
-    callback: (...args: any) => void;
+	title: string;
+	keys: string;
+	gamepadKeys?: string;
+	keysName?: string;
+	cmd: string;
+	payload?: BasicObject;
+	preventDefault: boolean;
+	isActive: boolean;
+	category: SHORTCUT_CATEGORY_T;
+	callback: (...args: any) => void;
 }
 
 export interface ShuttleControlEvents {
-    [key: string]: ShuttleEvent | Function;
-    MACRO?: Function;
+	[key: string]: ShuttleEvent | Function;
+	MACRO?: Function;
 }
 
 export interface Macro {
-    id: string;
-    mtime: string;
-    name: string;
-    content: string;
-    description: string;
-    column: string;
-    rowIndex: number;
+	id: string;
+	mtime: string;
+	name: string;
+	content: string;
+	description: string;
+	column: string;
+	rowIndex: number;
 }
 
 export interface Shortcut {
-    keys: string;
-    callback: Function;
+	keys: string;
+	callback: Function;
 }

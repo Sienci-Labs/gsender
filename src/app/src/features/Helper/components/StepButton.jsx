@@ -21,19 +21,19 @@
  *
  */
 
-import React from 'react';
-import styles from '../index.module.styl';
+import React from "react";
+import styles from "../index.module.styl";
 
 const StepButton = ({ children, inverted = false, ...props }) => {
-    return (
-        <button
-            type="button"
-            className={inverted ? styles.stepButtonInverted : styles.stepButton}
-            {...props}
-        >
-            {children}
-        </button>
-    );
+	return (
+		<button
+			type="button"
+			className={inverted ? styles.stepButtonInverted : styles.stepButton}
+			{...props}
+		>
+			{children}
+		</button>
+	);
 };
 
 export default StepButton;

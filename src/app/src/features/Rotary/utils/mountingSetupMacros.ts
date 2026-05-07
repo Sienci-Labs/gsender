@@ -6,7 +6,7 @@
 
 //Rotary setup hole types
 export const HOLE_TYPES = {
-    QUARTER_INCH_TEN_HOLES_SHORT: `(10HolesVortexMounting0_25Dia)
+	QUARTER_INCH_TEN_HOLES_SHORT: `(10HolesVortexMounting0_25Dia)
 G90 G94
 G17
 G21
@@ -2598,7 +2598,7 @@ G0 Z15
 M5
 M30
 `,
-    EIGHTH_INCH_TEN_HOLES_SHORT: `(10HolesVortexMounting0_125Dia)
+	EIGHTH_INCH_TEN_HOLES_SHORT: `(10HolesVortexMounting0_125Dia)
 G90 G94
 G17
 G21
@@ -5100,7 +5100,7 @@ G0 Z15
 M5
 M30
 `,
-    QUARTER_INCH_SIX_HOLES: `(0.25_Standard 30in Boring)
+	QUARTER_INCH_SIX_HOLES: `(0.25_Standard 30in Boring)
     (T6  D=6.35 CR=0 - ZMIN=-15.24 - flat end mill)
     G90 G94
     G17
@@ -5960,7 +5960,7 @@ M30
     G0 X0 Y0
     M5
     M30`,
-    EIGHTH_INCH_SIX_HOLES: `(0.125_Standard 30 Boring)
+	EIGHTH_INCH_SIX_HOLES: `(0.125_Standard 30 Boring)
     (T17  D=3.175 CR=0 - ZMIN=-15.24 - flat end mill)
     G90 G94
     G17
@@ -6684,7 +6684,7 @@ M30
     G0 X0 Y0
     M5
     M30`,
-    QUARTER_INCH_TEN_HOLES: `(0.25_With Extension Track 48in Boring)
+	QUARTER_INCH_TEN_HOLES: `(0.25_With Extension Track 48in Boring)
     (T6  D=6.35 CR=0 - ZMIN=-15.24 - flat end mill)
     G90 G94
     G17
@@ -8108,7 +8108,7 @@ M30
     G0 X0 Y0
     M5
     M30`,
-    EIGHTH_INCH_TEN_HOLES: `(0.125_With Extension Track 48 Boring)
+	EIGHTH_INCH_TEN_HOLES: `(0.125_With Extension Track 48 Boring)
     (T17  D=3.175 CR=0 - ZMIN=-15.24 - flat end mill)
     G90 G94
     G17
@@ -9308,7 +9308,7 @@ M30
     G0 X0 Y0
     M5
     M30`,
-    DOESNT_LINE_UP_QUARTER: `(0.25_Individual Top and Bottom Hole Boring)
+	DOESNT_LINE_UP_QUARTER: `(0.25_Individual Top and Bottom Hole Boring)
     (T6  D=6.35 CR=0 - ZMIN=-15.24 - flat end mill)
     G90 G94
     G17
@@ -9604,7 +9604,7 @@ M30
     G0 X0 Y0
     M5
     M30`,
-    DOESNT_LINE_UP_EIGHTH: `(0.125_Individual Top and Bottom Hole Boring)
+	DOESNT_LINE_UP_EIGHTH: `(0.125_Individual Top and Bottom Hole Boring)
     (T17  D=3.175 CR=0 - ZMIN=-15.24 - flat end mill)
     G90 G94
     G17
