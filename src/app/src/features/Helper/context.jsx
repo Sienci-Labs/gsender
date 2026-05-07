@@ -148,8 +148,7 @@ export const WizardProvider = ({ children }) => {
                     };
                     if (stepIndex >= maxStepIndex) {
                         // reset values
-                        const element = document.getElementById('step-0-0');
-                        element.scrollIntoView();
+                        document.getElementById('step-0-0')?.scrollIntoView();
                         setVisible(false);
                         setCompletedStep(-1);
                         setCompletedSubStep(-1);
@@ -173,8 +172,7 @@ export const WizardProvider = ({ children }) => {
                 // close window on everything done.
                 if (activeStep >= maxStepIndex) {
                     // reset values
-                    const element = document.getElementById('step-0-0');
-                    element.scrollIntoView();
+                    document.getElementById('step-0-0')?.scrollIntoView();
                     setVisible(false);
                     setCompletedStep(-1);
                     setCompletedSubStep(-1);
@@ -281,8 +279,7 @@ export const WizardProvider = ({ children }) => {
                 );
             },
             cancelToolchange: () => {
-                const element = document.getElementById('step-0-0');
-                element.scrollIntoView();
+                document.getElementById('step-0-0')?.scrollIntoView();
                 setVisible(false);
                 setCompletedStep(-1);
                 setCompletedSubStep(-1);

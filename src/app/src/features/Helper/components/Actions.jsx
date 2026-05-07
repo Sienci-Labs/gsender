@@ -22,6 +22,7 @@
  */
 
 import React, { useEffect } from 'react';
+import { unstable_batchedUpdates } from 'react-dom';
 import pubsub from 'pubsub-js';
 import { GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
 import uniqueId from 'lodash/uniqueId';
@@ -53,14 +54,18 @@ const Actions = ({ actions = [], stepIndex, substepIndex }) => {
             pubsub.subscribe('wizard:next', (msg, indexes) => {
                 const { stepIndex: stepIn, substepIndex: subStepIn } = indexes;
                 if (stepIn === stepIndex && subStepIn === substepIndex) {
-                    markActionAsComplete(stepIndex, substepIndex);
-                    const activeValues = completeSubStep(
-                        stepIndex,
-                        substepIndex,
-                    );
-                    updateSubstepOverlay(activeValues);
-                    scrollToActiveStep(activeValues);
-                    setIsLoading(false);
+                    // Batch all state updates so the component doesn't unmount
+                    // mid-handler (React 17 doesn't auto-batch async callbacks)
+                    unstable_batchedUpdates(() => {
+                        markActionAsComplete(stepIndex, substepIndex);
+                        const activeValues = completeSubStep(
+                            stepIndex,
+                            substepIndex,
+                        );
+                        updateSubstepOverlay(activeValues);
+                        scrollToActiveStep(activeValues);
+                        setIsLoading(false);
+                    });
                 }
             }),
             pubsub.subscribe('error', (msg, error) => {
