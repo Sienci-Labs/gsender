@@ -1,14 +1,12 @@
 import React from 'react';
 import uniqueId from 'lodash/uniqueId';
 import { useWizardContext } from 'app/features/Helper/context';
-//import PropTypes from 'prop-types';
 import Step from './Step';
-import styles from '../index.module.styl';
 
 const Stepper = () => {
     const { steps, completedStep, activeStep } = useWizardContext();
     return (
-        <div className={styles.stepperWrapper}>
+        <div className="w-[172px] shrink-0 border-r border-gray-200 dark:border-[#2a2a35] bg-gray-50 dark:bg-[#141418] overflow-y-auto">
             {steps.map((step, index) => (
                 <Step
                     step={step}
@@ -21,7 +19,5 @@ const Stepper = () => {
         </div>
     );
 };
-
-Stepper.propTypes = {};
 
 export default Stepper;

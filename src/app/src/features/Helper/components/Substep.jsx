@@ -22,64 +22,38 @@
  */
 
 import React from 'react';
-import cx from 'classnames';
-import SubstepCompletionIndicator from 'app/features/Helper/components/SubstepCompletionIndicator';
-import { useWizardContext } from 'app/features/Helper/context';
 import Actions from './Actions';
-import styles from '../index.module.styl';
 
 const Substep = ({ step, index, stepIndex, firstRunOnly }) => {
-    const { activeSubstep, activeStep, completedStep, completedSubStep } =
-        useWizardContext();
-
-    // // State calculation
-    /*
-        complete is:
-        - on or before the last completed step
-        - on the step after the completed one, but on a substep that is on or before a completed substep
-    */
-    const stepComplete =
-        stepIndex <= completedStep ||
-        (stepIndex === completedStep + 1 && index <= completedSubStep);
-    const stepIsActive = stepIndex === activeStep && index === activeSubstep;
-    const futureStep = !stepIsActive && !stepComplete;
-
     return (
-        <div
-            className={cx(styles.substepWrapper, {
-                [styles.substepComplete]: stepComplete,
-                [styles.substepActive]: stepIsActive,
-                [styles.substepPending]: futureStep,
-            })}
-        >
-            <SubstepCompletionIndicator
-                completed={stepComplete}
-                future={futureStep}
-                active={stepIsActive}
-            />
-            <div className={styles.substep} id={`step-${stepIndex}-${index}`}>
-                {firstRunOnly && (
-                    <div className={styles.firstRunBanner}>
-                        <strong>One-time setup</strong> — this step only runs on your first toolchange. It measures your initial tool so subsequent tools can be compared against it.
+        <div className="flex flex-col gap-3" id={`step-${stepIndex}-${index}`}>
+            {firstRunOnly && (
+                <div className="rounded px-3 py-2.5 border bg-amber-50 dark:bg-[#1c1500] border-amber-300 dark:border-[#3a2e00]">
+                    <div className="text-xs font-semibold text-amber-700 dark:text-amber-400 mb-1">
+                        One-time setup
                     </div>
-                )}
-                <span className={styles.substepTitle}>{step.title}</span>
-                <div className={cx({ [styles.hidden]: futureStep })}>
-                    <span className={styles.substepDescription}>
-                        {typeof step.description === 'function'
-                            ? step.description()
-                            : step.description}
-                    </span>
-                    <div>
-                        <Actions
-                            actions={step.actions}
-                            index={index}
-                            stepIndex={stepIndex}
-                            substepIndex={index}
-                        />
+                    <div className="text-xs text-amber-700 dark:text-amber-300/80">
+                        Runs on your first toolchange only — measures the initial tool so subsequent tools can be compared against it.
                     </div>
                 </div>
+            )}
+
+            <div className="text-[10px] font-semibold uppercase tracking-widest text-gray-500 dark:text-amber-400">
+                {step.title}
             </div>
+
+            <div className="text-xs leading-relaxed text-gray-600 dark:text-gray-400">
+                {typeof step.description === 'function'
+                    ? step.description()
+                    : step.description}
+            </div>
+
+            <Actions
+                actions={step.actions}
+                index={index}
+                stepIndex={stepIndex}
+                substepIndex={index}
+            />
         </div>
     );
 };

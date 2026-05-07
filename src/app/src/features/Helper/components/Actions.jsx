@@ -27,10 +27,8 @@ import { GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
 import uniqueId from 'lodash/uniqueId';
 import get from 'lodash/get';
 import controller from 'app/lib/controller';
-import ToolModalButton from 'app/components/ToolModalButton';
 import { useWizardAPI, useWizardContext } from 'app/features/Helper/context';
-import styles from '../index.module.styl';
-import { FaCode } from 'react-icons/fa';
+import { Terminal } from 'lucide-react';
 import { useSelector } from 'react-redux';
 
 const Actions = ({ actions = [], stepIndex, substepIndex }) => {
@@ -80,9 +78,11 @@ const Actions = ({ actions = [], stepIndex, substepIndex }) => {
     return (
         <>
             {actions.length > 0 && (
-                <h2 className={styles.subHeading}>Run G-Code:</h2>
+                <div className="text-[10px] font-semibold uppercase tracking-widest text-gray-500 dark:text-amber-400 mb-1">
+                    Run G-Code
+                </div>
             )}
-            <div className={styles.actionRow}>
+            <div className="flex flex-col gap-2">
                 {actions.map((action, index) => {
                     const cbWithCompletion = () => {
                         setIsLoading(true);
@@ -95,28 +95,27 @@ const Actions = ({ actions = [], stepIndex, substepIndex }) => {
                     };
                     return (
                         <React.Fragment key={`action-${uniqueId()}`}>
-                            {isLoading ? (
-                                index === 0 && (
-                                    <span className={styles.loadingSpan}>
-                                        Running
-                                    </span>
-                                )
-                            ) : (
-                                <>
-                                    <ToolModalButton
+                            {isLoading && index === 0 ? (
+                                <span className="text-xs text-gray-400 dark:text-gray-500 animate-pulse">
+                                    Running…
+                                </span>
+                            ) : !isLoading && (
+                                <div className="flex items-center justify-between px-3 py-2 rounded border border-gray-200 dark:border-[#2a2a35] bg-gray-50 dark:bg-[#0d0d12]">
+                                    <div className="flex items-center gap-2 min-w-0">
+                                        <Terminal size={12} className="shrink-0 text-gray-400 dark:text-cyan-400" />
+                                        <code className="text-xs font-mono text-sky-700 dark:text-cyan-400 truncate">
+                                            {action.label}
+                                        </code>
+                                    </div>
+                                    <button
+                                        type="button"
                                         disabled={isNotIdle()}
                                         onClick={cbWithCompletion}
-                                        icon={<FaCode />}
-                                        id="button-action"
+                                        className="ml-3 shrink-0 text-xs font-medium px-3 py-1 rounded bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-600 text-white disabled:opacity-35 disabled:pointer-events-none transition-colors"
                                     >
-                                        {action.label}
-                                    </ToolModalButton>
-                                    {index !== actions.length - 1 && (
-                                        <span className={styles.orSpan}>
-                                            OR
-                                        </span>
-                                    )}
-                                </>
+                                        Run
+                                    </button>
+                                </div>
                             )}
                         </React.Fragment>
                     );

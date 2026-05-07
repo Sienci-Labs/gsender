@@ -22,47 +22,31 @@
  */
 
 import React from 'react';
-import uniqueId from 'lodash/uniqueId';
+import { CheckCircle } from 'lucide-react';
 import { useWizardContext } from 'app/features/Helper/context';
 import Substep from 'app/features/Helper/components/Substep';
-import Introduction from 'app/features/Helper/components/Introduction';
-import Controls from './Controls';
-import styles from '../index.module.styl';
 
 const Instructions = () => {
-    const { steps, intro, title } = useWizardContext();
+    const { steps, intro, activeStep, activeSubstep } = useWizardContext();
+    const step = steps[activeStep];
+    if (!step) return null;
+    const substep = step.substeps[activeSubstep];
+    if (!substep) return null;
 
     return (
-        <div className={styles.instructionWrapper}>
-            <div className={styles.stepWrapper}>
-                {intro && <Introduction description={intro} title={title} />}
-                {steps.map((step, stepIndex) => {
-                    return (
-                        // eslint-disable-next-line react/no-array-index-key
-                        <div
-                            className={styles.substeps}
-                            key={`substepwrapper-${stepIndex}`}
-                        >
-                            <h2 className={styles.instructionTitle}>
-                                {step.title}
-                            </h2>
-                            {
-                                // eslint-disable-next-line react/no-array-index-key
-                                step.substeps.map((substep, index) => (
-                                    <Substep
-                                        step={substep}
-                                        key={`substep-${uniqueId()}`}
-                                        index={index}
-                                        stepIndex={stepIndex}
-                                        firstRunOnly={step.firstRunOnly && index === 0}
-                                    />
-                                ))
-                            }
-                        </div>
-                    );
-                })}
-            </div>
-            <Controls />
+        <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3 bg-white dark:bg-[#18181f]">
+            {intro && (
+                <div className="flex items-center gap-2 px-3 py-2 rounded bg-emerald-50 dark:bg-[#052e16] text-emerald-800 dark:text-[#6ee7b7] text-xs">
+                    <CheckCircle size={13} className="shrink-0" />
+                    {intro}
+                </div>
+            )}
+            <Substep
+                step={substep}
+                index={activeSubstep}
+                stepIndex={activeStep}
+                firstRunOnly={step.firstRunOnly && activeSubstep === 0}
+            />
         </div>
     );
 };
