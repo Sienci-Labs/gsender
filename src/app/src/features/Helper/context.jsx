@@ -21,7 +21,7 @@
  *
  */
 
-import React, { createContext, useContext, useState, useMemo } from 'react';
+import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
 import _ from 'lodash';
 
 import { Toaster } from 'app/lib/toaster/ToasterLib';
@@ -49,6 +49,24 @@ export const WizardProvider = ({ children }) => {
     const [minimized, setMinimized] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [overlay, setOverlay] = useState(false);
+
+    // Auto-close when activeStep reaches or exceeds stepCount.
+    // completeSubStep sets activeStep = lastStep+1 before setVisible(false);
+    // if the close branch is missed due to a stale closure, this catches it.
+    useEffect(() => {
+        if (visible && stepCount > 0 && activeStep >= stepCount) {
+            setVisible(false);
+            setCompletedStep(-1);
+            setCompletedSubStep(-1);
+            setActiveStep(0);
+            setActiveSubstep(0);
+            setTitle('Wizard');
+            setSteps([]);
+            setStepCount(0);
+            setMinimized(false);
+            reduxStore.dispatch(disableWizard());
+        }
+    }, [activeStep, stepCount, visible]);
 
     // Memoized API for context, can be fetched separate to data context
     const api = useMemo(
