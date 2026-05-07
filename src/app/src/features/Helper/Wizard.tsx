@@ -71,16 +71,16 @@ const Wizard = () => {
             )}
 
             <div className="fixed inset-0 flex items-center justify-center z-[200] pointer-events-none">
-                <div className="pointer-events-auto w-[700px] rounded-lg overflow-hidden shadow-2xl border border-gray-300/50 dark:border-[#2a2a35] bg-white dark:bg-[#18181f]">
+                <div className="pointer-events-auto w-[860px] rounded-lg overflow-hidden shadow-2xl border border-gray-300/50 dark:border-[#2a2a35] bg-white dark:bg-[#18181f]">
 
                     {/* Titlebar */}
                     <div className="flex items-center justify-between px-3 py-2 border-b border-gray-200 dark:border-[#2a2a35] bg-gray-100 dark:bg-[#111116]">
                         <div className="flex items-center gap-2">
                             <Wrench size={14} className="text-gray-500 dark:text-gray-400" />
-                            <span className="font-semibold text-sm text-gray-900 dark:text-[#e5e5ea]">
+                            <span className="font-semibold text-base text-gray-900 dark:text-[#e5e5ea]">
                                 {title}
                             </span>
-                            <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400">
+                            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400">
                                 Step {activeStep + 1} of {steps.length} · {activeSubstep + 1}/{steps[activeStep]?.substeps?.length ?? 1}
                             </span>
                         </div>
@@ -92,7 +92,7 @@ const Wizard = () => {
 
                     {/* Body */}
                     {!minimized && (
-                        <div className="flex h-[400px]">
+                        <div className="flex h-[420px]">
                             <Stepper />
                             <Instructions />
                         </div>

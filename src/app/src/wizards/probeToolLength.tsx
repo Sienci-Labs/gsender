@@ -93,6 +93,18 @@ const createWizard = () => {
                         actions: [
                             {
                                 label: 'Probe Tool Length',
+                                gcodeLines: [
+                                    'G91 G21',
+                                    'G49',
+                                    'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                                    'G53 G0 X[global.toolchange.PROBE_POS_X] Y[global.toolchange.PROBE_POS_Y]',
+                                    'G53 G0 Z[global.toolchange.PROBE_POS_Z]',
+                                    'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
+                                    'G0 Z[global.toolchange.RETRACT]',
+                                    'G38.2 Z-10 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
+                                    'G43.1 Z0',
+                                    'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                                ],
                                 cb: () => {
                                     controller.command('gcode', [
                                         'G91 G21',
@@ -128,6 +140,13 @@ const createWizard = () => {
                         actions: [
                             {
                                 label: 'Resume',
+                                gcodeLines: [
+                                    'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                                    'G90 G21 G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]',
+                                    'G90 G21 G0 Z[global.toolchange.ZPOS]',
+                                    'M3 [global.toolchange.UNITS] [global.toolchange.DISTANCE] [global.toolchange.FEEDRATE]',
+                                    '%toolchange_complete',
+                                ],
                                 cb: () => {
                                     const unit = getUnitModal();
                                     controller.command('gcode', [

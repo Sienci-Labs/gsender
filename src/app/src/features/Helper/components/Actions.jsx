@@ -21,7 +21,7 @@
  *
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { unstable_batchedUpdates } from 'react-dom';
 import pubsub from 'pubsub-js';
 import { GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
@@ -33,6 +33,8 @@ import { Terminal } from 'lucide-react';
 import { useSelector } from 'react-redux';
 
 const Actions = ({ actions = [], stepIndex, substepIndex }) => {
+    const [tooltip, setTooltip] = useState(null); // { index, rect, lines }
+    const tooltipTimer = useRef(null);
     const {
         markActionAsComplete,
         completeSubStep,
@@ -77,13 +79,14 @@ const Actions = ({ actions = [], stepIndex, substepIndex }) => {
             tokens.forEach((token) => {
                 pubsub.unsubscribe(token);
             });
+            clearTimeout(tooltipTimer.current);
         };
     }, []);
 
     return (
         <>
             {actions.length > 0 && (
-                <div className="text-[10px] font-semibold uppercase tracking-widest text-gray-500 dark:text-amber-400 mb-1">
+                <div className="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-amber-400 mb-1">
                     Run G-Code
                 </div>
             )}
@@ -101,26 +104,64 @@ const Actions = ({ actions = [], stepIndex, substepIndex }) => {
                     return (
                         <React.Fragment key={`action-${uniqueId()}`}>
                             {isLoading && index === 0 ? (
-                                <span className="text-xs text-gray-400 dark:text-gray-500 animate-pulse">
+                                <span className="text-sm text-gray-400 dark:text-gray-500 animate-pulse">
                                     Running…
                                 </span>
                             ) : !isLoading && (
-                                <div className="flex items-center justify-between px-3 py-2 rounded border border-gray-200 dark:border-[#2a2a35] bg-gray-50 dark:bg-[#0d0d12]">
-                                    <div className="flex items-center gap-2 min-w-0">
-                                        <Terminal size={12} className="shrink-0 text-gray-400 dark:text-cyan-400" />
-                                        <code className="text-xs font-mono text-sky-700 dark:text-cyan-400 truncate">
-                                            {action.label}
-                                        </code>
-                                    </div>
-                                    <button
-                                        type="button"
-                                        disabled={isNotIdle()}
-                                        onClick={cbWithCompletion}
-                                        className="ml-3 shrink-0 text-xs font-medium px-3 py-1 rounded bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-600 text-white disabled:opacity-35 disabled:pointer-events-none transition-colors"
+                                <>
+                                    <div
+                                        className="flex items-center justify-between px-3 py-2 rounded border border-gray-200 dark:border-[#2a2a35] bg-gray-50 dark:bg-[#0d0d12]"
+                                        data-chip="true"
                                     >
-                                        Run
-                                    </button>
-                                </div>
+                                        <div
+                                            className="flex items-center gap-2 min-w-0 cursor-default"
+                                            onMouseEnter={(e) => {
+                                                if (!action.gcodeLines?.length) return;
+                                                const chipEl = e.currentTarget.closest('[data-chip]');
+                                                tooltipTimer.current = setTimeout(() => {
+                                                    const rect = chipEl.getBoundingClientRect();
+                                                    setTooltip({ index, rect, lines: action.gcodeLines });
+                                                }, 1200);
+                                            }}
+                                            onMouseLeave={() => {
+                                                clearTimeout(tooltipTimer.current);
+                                                setTooltip(null);
+                                            }}
+                                        >
+                                            <Terminal size={13} className="shrink-0 text-gray-400 dark:text-cyan-400" />
+                                            <code className="text-sm font-mono text-sky-700 dark:text-cyan-400 truncate">
+                                                {action.label}
+                                            </code>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            disabled={isNotIdle()}
+                                            onClick={cbWithCompletion}
+                                            className="ml-3 shrink-0 text-sm font-medium px-3 py-1 rounded bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-600 text-white disabled:opacity-35 disabled:pointer-events-none transition-colors"
+                                        >
+                                            Run
+                                        </button>
+                                    </div>
+                                    {tooltip?.index === index && (
+                                        <div
+                                            style={{
+                                                position: 'fixed',
+                                                top: tooltip.rect.bottom + 4,
+                                                left: tooltip.rect.left,
+                                                width: tooltip.rect.width,
+                                                zIndex: 9999,
+                                                pointerEvents: 'none',
+                                            }}
+                                            className="px-3 py-2.5 rounded border border-gray-200 dark:border-[#2a2a35] bg-white dark:bg-[#0d0d12] shadow-lg"
+                                        >
+                                            {tooltip.lines.map((line, i) => (
+                                                <div key={i} className="font-mono text-xs leading-5 text-gray-600 dark:text-gray-400">
+                                                    {line}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </>
                             )}
                         </React.Fragment>
                     );

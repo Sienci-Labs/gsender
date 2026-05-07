@@ -54,6 +54,18 @@ const probeInitialToolStep = [{
             actions: [
                 {
                     label: 'Probe Initial Tool',
+                    gcodeLines: [
+                        'G91 G21',
+                        'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                        'G53 G0 X[global.toolchange.PROBE_POS_X] Y[global.toolchange.PROBE_POS_Y]',
+                        'G53 G0 Z[global.toolchange.PROBE_POS_Z]',
+                        'G49',
+                        'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
+                        'G0 Z[global.toolchange.RETRACT]',
+                        'G38.2 Z-10 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
+                        'G43.1 Z0',
+                        'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                    ],
                     cb: () => {
                         controller.command('gcode', [
                             'G91 G21',
@@ -92,6 +104,11 @@ const getMoveToToolchangePositionSubstep = () => ({
     actions: [
         {
             label: 'Move to Tool Change Location',
+            gcodeLines: [
+                'G90 G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                'G90 G53 G0 X[global.toolchange.MANUAL_POS_X] Y[global.toolchange.MANUAL_POS_Y]',
+                'G90 G53 G0 Z[global.toolchange.MANUAL_POS_Z]',
+            ],
             cb: () => {
                 controller.command('gcode', [
                     '(Moving to manual toolchange location)',
@@ -180,6 +197,18 @@ const createWizard = (count: number) => {
                         actions: [
                             {
                                 label: 'Probe Changed Tool',
+                                gcodeLines: [
+                                    'G49',
+                                    'G90 G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                                    'G90 G53 G0 X[global.toolchange.PROBE_POS_X] Y[global.toolchange.PROBE_POS_Y]',
+                                    'G53 G0 Z[global.toolchange.PROBE_POS_Z]',
+                                    'G91 G21',
+                                    'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
+                                    'G0 Z[global.toolchange.RETRACT]',
+                                    'G38.2 Z-15 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
+                                    'G43.1 Z[posz - global.toolchange.TOOL_OFFSET]',
+                                    'G53 G21 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                                ],
                                 cb: () => {
                                     //const modal = getUnitModal();
                                     controller.command('gcode', [
@@ -217,6 +246,13 @@ const createWizard = (count: number) => {
                         actions: [
                             {
                                 label: 'Resume Cutting',
+                                gcodeLines: [
+                                    'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                                    'G90 G21 G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]',
+                                    'G90 G21 G0 Z[global.toolchange.ZPOS]',
+                                    'M3 [global.toolchange.UNITS] [global.toolchange.DISTANCE] [global.toolchange.FEEDRATE]',
+                                    '%toolchange_complete',
+                                ],
                                 cb: () => {
                                     const unit = getUnitModal();
                                     controller.command('gcode', [

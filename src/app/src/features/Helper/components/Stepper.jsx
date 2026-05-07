@@ -7,7 +7,7 @@ const Stepper = () => {
     const { steps, activeStep, activeSubstep } = useWizardContext();
 
     return (
-        <div className="w-[200px] shrink-0 border-r border-gray-200 dark:border-[#2a2a35] bg-gray-50 dark:bg-[#141418] overflow-y-auto">
+        <div className="w-[230px] shrink-0 border-r border-gray-200 dark:border-[#2a2a35] bg-gray-50 dark:bg-[#141418] overflow-y-auto">
             {steps.map((step, si) => {
                 const stepDone   = si < activeStep;
                 const stepActive = si === activeStep;
@@ -27,7 +27,7 @@ const Stepper = () => {
                                 {stepDone ? <Check size={9} /> : si + 1}
                             </div>
                             <span className={cx(
-                                'text-[11px] font-medium leading-snug',
+                                'text-xs font-medium leading-snug',
                                 stepDone
                                     ? 'text-emerald-600 dark:text-[#34d399]'
                                     : stepActive
@@ -38,8 +38,8 @@ const Stepper = () => {
                             </span>
                         </div>
 
-                        {/* Substep rows */}
-                        {step.substeps.map((sub, ssi) => {
+                        {/* Substep rows — only when there are multiple substeps */}
+                        {step.substeps.length > 1 && step.substeps.map((sub, ssi) => {
                             const subActive = si === activeStep && ssi === activeSubstep;
                             const subDone   = si < activeStep || (si === activeStep && ssi < activeSubstep);
 
@@ -59,7 +59,7 @@ const Stepper = () => {
                                                 : 'bg-gray-300 dark:bg-[#2a2a35]'
                                     )} />
                                     <span className={cx(
-                                        'text-[11px] leading-snug',
+                                        'text-xs leading-snug',
                                         subDone
                                             ? 'text-gray-500 dark:text-[#6b7280]'
                                             : subActive

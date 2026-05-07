@@ -89,6 +89,14 @@ const wizard = {
                     actions: [
                         {
                             label: 'Probe Z (touch plate)',
+                            gcodeLines: [
+                                'G91',
+                                'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
+                                'G0 Z[global.toolchange.RETRACT]',
+                                'G38.2 Z-10 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
+                                'G10 L20 P0 Z[global.toolchange.PROBE_THICKNESS]',
+                                'G0 G21 Z10',
+                            ],
                             cb: () => {
                                 controller.command('gcode', [
                                     '(Probing Z 0 with probe thickness of [global.toolchange.PROBE_THICKNESS]mm)',
@@ -104,6 +112,10 @@ const wizard = {
                         },
                         {
                             label: 'Set Z0 (paper method)',
+                            gcodeLines: [
+                                'G10 L20 P0 Z0',
+                                'G21',
+                            ],
                             cb: () => {
                                 controller.command('gcode', [
                                     '(Setting Z 0)',
@@ -127,6 +139,13 @@ const wizard = {
                     actions: [
                         {
                             label: 'Resume Job',
+                            gcodeLines: [
+                                'G21',
+                                'G90 G21 G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]',
+                                'G90 G21 G0 Z[global.toolchange.ZPOS]',
+                                'M3 [global.toolchange.UNITS] [global.toolchange.DISTANCE] [global.toolchange.FEEDRATE]',
+                                '%toolchange_complete',
+                            ],
                             cb: () => {
                                 const prefUnit = getUnitModal();
                                 controller.command('gcode', [
