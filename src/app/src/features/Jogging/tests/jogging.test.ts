@@ -270,4 +270,4 @@ describe('Jogging direction functions', () => {
         cancelJog('Idle', 'Grbl');
         expect(controller.command).not.toHaveBeenCalled();
     });
-});
+}); 

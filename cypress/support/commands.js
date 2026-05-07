@@ -32,13 +32,13 @@
 //=======//
 //2.Load UI//   cy.loadUI(`${Cypress.config('baseUrl')}/#/configuration`, {
 //=======//
-Cypress.Commands.add("loadUI", (url, options = {}) => {
-	const {
-		maxRetries = 3,
-		waitTime = 3000,
-		timeout = 5000,
-		viewport = { width: 1920, height: 1080 },
-	} = options;
+Cypress.Commands.add('loadUI', (url, options = {}) => {
+  const {
+    maxRetries = 3,
+    waitTime = 3000,
+    timeout = 5000,
+    viewport = { width: 1920, height: 1080 }
+  } = options;
 
   cy.viewport(viewport.width, viewport.height);
 
