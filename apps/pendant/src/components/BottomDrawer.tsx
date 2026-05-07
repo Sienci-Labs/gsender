@@ -285,7 +285,7 @@ export default function BottomDrawer() {
                 tapTimeoutRef.current = null;
             }
             lastTapRef.current = 0;
-            setMode('expanded');
+            setMode((currentMode) => currentMode === 'expanded' ? 'closed' : 'expanded');
             return;
         }
 

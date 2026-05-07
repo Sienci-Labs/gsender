@@ -1,7 +1,7 @@
 import VisualizerCard from './VisualizerCard';
 import DROCard from './DROCard';
 import JoggingCard from './JoggingCard';
-import BottomDrawer from './BottomDrawer';
+import BottomDrawer from './BottomDrawer';L
 
 export default function CarveView() {
     return (
