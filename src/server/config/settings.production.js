@@ -49,7 +49,7 @@ export default {
                 '/pendant'
             ],
             path: getPendantPath(),
-            maxAge: maxAge
+            maxAge: 0 // index.html must never be stale; assets use content-hashed filenames
         },
         app: {
             routes: [ // with trailing slash
