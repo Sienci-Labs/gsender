@@ -113,7 +113,8 @@ jobs:
             build-essential \
             libudev-dev \
             patchelf \
-            xdg-utils
+            xdg-utils \
+            squashfs-tools
 
       - name: Cache node_modules
         uses: actions/cache@v4
@@ -127,6 +128,8 @@ jobs:
 
       - name: Build pendant Linux ARM64 app
         run: npm run pendant:tauri:build
+        env:
+          APPIMAGE_EXTRACT_AND_RUN: 1
 
       - name: Collect artifacts
         run: |
