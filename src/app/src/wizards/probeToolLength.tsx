@@ -21,7 +21,7 @@
  *
  */
 import controller from "app/lib/controller";
-import { getProbeSettings, getUnitModal } from "app/lib/toolChangeUtils";
+import { getProbeSettings } from "app/lib/toolChangeUtils";
 import store from "app/store";
 import { store as reduxStore } from "app/store/redux";
 import get from "lodash/get";
@@ -47,11 +47,7 @@ const createWizard = () => {
 		onStart: () => {
 			const settings = getProbeSettings();
 			const position = store.get("workspace.toolChangePosition");
-			// Get $13 value for adjustment of Z Safe Height
-			const state = reduxStore.getState();
-			const $13 = get(state, "controller.settings.settings.$13", "0");
-			const zSafe = $13 === "1" ? "-0.5" : "-10";
-
+			const zSafe = "-10"; // millimeters
 			const zProbeDistance = calculateMaxZProbeDistance();
 
 			controller.command("gcode", [
@@ -60,7 +56,8 @@ const createWizard = () => {
 				`%global.toolchange.PROBE_DISTANCE=${zProbeDistance}`,
 				`%global.toolchange.PROBE_FEEDRATE=${settings.fastSpeed}`,
 				`%global.toolchange.PROBE_SLOW_FEEDRATE=${settings.slowSpeed}`,
-				`%global.toolchange.RETRACT=${settings.retract}`,
+				`%global.toolchange.RETRACT_DISTANCE=${settings.retract}`,
+				`%global.toolchange.ADVANCE_DISTANCE=${settings.retract + 2}`,
 				`%global.toolchange.PROBE_POS_X=${position.x}`,
 				`%global.toolchange.PROBE_POS_Y=${position.y}`,
 				`%global.toolchange.PROBE_POS_Z=${position.z}`,
@@ -74,7 +71,7 @@ const createWizard = () => {
 				"%global.toolchange.XPOS=posx",
 				"%global.toolchange.YPOS=posy",
 				"%global.toolchange.ZPOS=posz",
-				"G91 G21",
+				"G90 G21", // Set absolute positioning (modal)
 				"G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]",
 				"(Tool probe initiated)",
 			]);
@@ -93,21 +90,21 @@ const createWizard = () => {
 								label: "Probe Tool Length",
 								cb: () => {
 									controller.command("gcode", [
-										"G90 G21",
+										"G90 G21", // Set absolute positioning (modal)
 										"G49", // cancel applied TLO offsets
-										"G90 G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]",
-										"G90 G53 G0 X[global.toolchange.PROBE_POS_X] Y[global.toolchange.PROBE_POS_Y]",
-										"G90 G53 G0 Z[global.toolchange.PROBE_POS_Z]",
-										"G91 G21",
+										"G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]",
+										"G53 G0 X[global.toolchange.PROBE_POS_X] Y[global.toolchange.PROBE_POS_Y]",
+										"G53 G0 Z[global.toolchange.PROBE_POS_Z]",
+										"G91 G21", // Set incremental positioning (modal) just for probing moves
 										"G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]",
-										"G0 Z[global.toolchange.RETRACT]",
-										"G38.2 Z-10 F[global.toolchange.PROBE_SLOW_FEEDRATE]",
+										"G0 Z[global.toolchange.RETRACT_DISTANCE]",
+										"G38.2 Z-[global.toolchange.ADVANCE_DISTANCE] F[global.toolchange.PROBE_SLOW_FEEDRATE]",
 										"G4 P0.3",
 										"G43.1 Z0", // Set Z0 on initial tool offset
 										"%global.toolchange.TOOL_OFFSET=posz",
 										"(TLO set: [global.toolchange.TOOL_OFFSET])",
-										"G0 Z[global.toolchange.RETRACT]",
-										"G90 G21",
+										"G0 Z[global.toolchange.RETRACT_DISTANCE]",
+										"G90 G21", // Back to absolute positioning (modal)
 										"G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]",
 									]);
 								},
@@ -128,14 +125,13 @@ const createWizard = () => {
 							{
 								label: "Resume",
 								cb: () => {
-									const unit = getUnitModal();
 									controller.command("gcode", [
 										"(Returning to initial position)",
 										"G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]",
-										`G90 ${unit} G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]`,
-										`G90 ${unit} G0 Z[global.toolchange.ZPOS]`,
+										`G90 [global.toolchange.UNITS] G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]`,
+										`G90 [global.toolchange.UNITS] G0 Z[global.toolchange.ZPOS]`,
 										"(Restore initial modals)",
-										"M3 [global.toolchange.UNITS] [global.toolchange.DISTANCE] [global.toolchange.FEEDRATE]",
+										"[global.toolchange.SPINDLE] [global.toolchange.UNITS] [global.toolchange.DISTANCE] [global.toolchange.FEEDRATE]",
 										"%toolchange_complete",
 									]);
 								},
