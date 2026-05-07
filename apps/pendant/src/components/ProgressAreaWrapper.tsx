@@ -37,6 +37,7 @@ export default function ProgressAreaWrapper() {
     const [isFlashingComplete, setIsFlashingComplete] = useState(false);
     const [completedThisRun, setCompletedThisRun] = useState(false);
     const previousReceivedRef = useRef(0);
+    const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const totalFromContent = useMemo(() => {
         if (!fileContent) {
@@ -105,6 +106,20 @@ export default function ProgressAreaWrapper() {
         completedThisRun,
     ]);
 
+    // Primary reset mechanism: guaranteed timer so onAnimationEnd is not load-bearing.
+    // 180ms * 6 iterations = 1080ms animation; give it a 200ms buffer.
+    useEffect(() => {
+        if (!isFlashingComplete) return;
+        flashTimerRef.current = setTimeout(() => {
+            setIsFlashingComplete(false);
+            setCompletedThisRun(true);
+            setDisplaySent(0);
+        }, 1280);
+        return () => {
+            if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
+        };
+    }, [isFlashingComplete]);
+
     const progressPercent = totalLines > 0
         ? clamp((displaySent / totalLines) * 100, 0, 100)
         : 0;
@@ -139,6 +154,7 @@ export default function ProgressAreaWrapper() {
                         style={{ width: fillWidth, backgroundColor: fillColor }}
                         onAnimationEnd={() => {
                             if (!isFlashingComplete) return;
+                            if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
                             setIsFlashingComplete(false);
                             setCompletedThisRun(true);
                             setDisplaySent(0);
