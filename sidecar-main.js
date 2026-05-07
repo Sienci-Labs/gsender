@@ -55,6 +55,20 @@ if (process.pkg) {
                     try { return require(path.join(prebuildsDir, name)); } catch (_) {}
                 }
 
+                // Try real-filesystem prebuilds shipped alongside the binary
+                // (path passed via GSENDER_SERIALPORT_PREBUILDS env var from Tauri lib.rs)
+                if (process.env.GSENDER_SERIALPORT_PREBUILDS) {
+                    const externalDir = path.join(process.env.GSENDER_SERIALPORT_PREBUILDS, subdir);
+                    try {
+                        const pkgMeta = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf8'));
+                        const externalStem = pkgMeta.name.replace(/\//g, '+');
+                        return require(path.join(externalDir, externalStem + '.node'));
+                    } catch (_) {}
+                    for (const name of ['node.napi.node', 'binding.node', 'bindings.node']) {
+                        try { return require(path.join(externalDir, name)); } catch (_) {}
+                    }
+                }
+
                 // Could not load — return a stub so the server starts without serial support
                 process.stderr.write('[sidecar] WARNING: serialport native binding unavailable — CNC serial connections will fail\n');
                 return createSerialStub();

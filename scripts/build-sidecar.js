@@ -91,4 +91,17 @@ try { fs.rmSync(pendantDest, { recursive: true, force: true }); } catch (_) {}
 copyDir(pendantDir, pendantDest);
 console.log(`Pendant SPA copied to: ${pendantDest}`);
 
+// Copy serialport native prebuilts next to the binary.
+// pkg's snapshot require() can't load .node files reliably; we ship the real
+// binding in a real directory and tell the sidecar where via GSENDER_SERIALPORT_PREBUILDS.
+const serialportPrebuildsDir = path.join(root, 'node_modules/@serialport/bindings-cpp/prebuilds');
+const serialportDest = path.join(outDir, 'prebuilds');
+if (fs.existsSync(serialportPrebuildsDir)) {
+    try { fs.rmSync(serialportDest, { recursive: true, force: true }); } catch (_) {}
+    copyDir(serialportPrebuildsDir, serialportDest);
+    console.log(`Serialport prebuilds copied to: ${serialportDest}`);
+} else {
+    console.warn(`Serialport prebuilds not found — serial port connections may be unavailable`);
+}
+
 console.log(`\nDone. Sidecar binary: ${outPath}`);

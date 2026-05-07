@@ -91,7 +91,7 @@
     "vite:build": "cross-env NODE_OPTIONS='--max-old-space-size=8192' bash -c 'cd apps/desktop && bun run build:client'",
     "vite:build:pendant": "bash -c 'cd apps/pendant && bun run build:client'",
     "vite:dev:pendant": "cd apps/pendant && vite --port 5174 --host",
-    "pendant:dev": "npm run build-dev-server && concurrently --kill-others-on-fail --names \"server,vite,tauri\" \"npm run start-dev\" \"bash -lc 'until curl -sf http://127.0.0.1:8000 >/dev/null; do sleep 0.2; done; cd apps/pendant && vite --port 5174 --host'\" \"bash -lc 'until curl -sf http://127.0.0.1:5174 >/dev/null; do sleep 0.2; done; cd apps/pendant && npx @tauri-apps/cli@2 dev'\"",
+    "pendant:dev": "npm run build-dev-server && concurrently --kill-others-on-fail --names \"server,tauri\" \"npm run start-dev\" \"bash -lc 'until curl -sf http://127.0.0.1:8000 >/dev/null; do sleep 0.2; done; cd apps/pendant && npx @tauri-apps/cli@2 dev'\"",
     "build:server-sidecar": "npm run build-prod-server && npm run vite:build:pendant && node scripts/build-sidecar.js",
     "pendant:tauri:dev": "bash -c 'cd apps/pendant && npx @tauri-apps/cli@2 dev'",
     "pendant:tauri:build": "npm run build:server-sidecar && bash -c 'cd apps/pendant && npx @tauri-apps/cli@2 build'",

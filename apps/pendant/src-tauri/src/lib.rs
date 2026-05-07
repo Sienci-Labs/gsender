@@ -33,8 +33,18 @@ impl Default for PendantConfig {
     }
 }
 
-#[allow(dead_code)]
 struct ServerSidecar(Mutex<Option<CommandChild>>);
+
+impl Drop for ServerSidecar {
+    fn drop(&mut self) {
+        if let Ok(mut guard) = self.0.lock() {
+            if let Some(child) = guard.take() {
+                let _ = child.kill();
+                eprintln!("[tauri] sidecar killed on exit");
+            }
+        }
+    }
+}
 
 // --- Logging to ~/Library/Logs/gSender Pendant/startup.log ---
 // eprintln! is invisible when launched from Finder; the log file persists.
@@ -199,12 +209,38 @@ pub fn run() {
                 tlog!("[tauri] pendant SPA path: not found — server will use default");
             }
 
+            // Resolve serialport prebuilds path (same pattern as pendant_spa_path).
+            // The real .node binding is shipped alongside the binary so pkg's
+            // broken snapshot require() is bypassed entirely.
+            let serialport_prebuilds_path: Option<std::path::PathBuf> = {
+                let from_resources = app.path().resource_dir()
+                    .ok()
+                    .map(|d| d.join("prebuilds"))
+                    .filter(|p| p.exists());
+                if from_resources.is_some() {
+                    from_resources
+                } else {
+                    std::env::current_exe().ok().and_then(|exe| {
+                        let dev = exe.parent()?.parent()?.parent()?.join("binaries/prebuilds");
+                        if dev.exists() { Some(dev) } else { None }
+                    })
+                }
+            };
+            if let Some(ref p) = serialport_prebuilds_path {
+                tlog!("[tauri] serialport prebuilds: {}", p.display());
+            } else {
+                tlog!("[tauri] serialport prebuilds: not found — serial port connections may be unavailable");
+            }
+
             let sidecar_child: Option<CommandChild> = if is_port_free(8000) {
                 let mut cmd = app.shell()
                     .sidecar("gsender-server")?
                     .args(["-p", "8000"]);
                 if let Some(ref p) = pendant_spa_path {
                     cmd = cmd.env("GSENDER_PENDANT_PATH", p);
+                }
+                if let Some(ref p) = serialport_prebuilds_path {
+                    cmd = cmd.env("GSENDER_SERIALPORT_PREBUILDS", p);
                 }
                 let (mut rx, child) = cmd.spawn()?;
 
@@ -237,10 +273,12 @@ pub fn run() {
 
             let ready = wait_for_port(8000);
             let config = load_config(app.handle());
-            let url = if ready {
-                tlog!("[tauri] opening webview at {}", pendant_url(&config.host));
-                pendant_url(&config.host)
-            } else {
+
+            // Dev builds: open the Vite HMR server (beforeDevCommand starts it).
+            // Sidecar still runs so socket.io at 8000 is available; the pendant
+            // connects directly to 8000 (Vite proxies /api and /socket.io too).
+            // Release builds: open the sidecar URL as normal.
+            let url = if !ready {
                 tlog!("[tauri] server never ready — showing error page");
                 format!(
                     "data:text/html,<body style='font-family:sans-serif;padding:2rem'>\
@@ -250,6 +288,17 @@ pub fn run() {
                     {}</pre></body>",
                     log_path().display()
                 )
+            } else {
+                #[cfg(debug_assertions)]
+                {
+                    tlog!("[tauri] dev build — opening Vite HMR server at http://localhost:5174/");
+                    "http://localhost:5174/".to_string()
+                }
+                #[cfg(not(debug_assertions))]
+                {
+                    tlog!("[tauri] opening webview at {}", pendant_url(&config.host));
+                    pendant_url(&config.host)
+                }
             };
 
             WebviewWindowBuilder::new(app, "main", WebviewUrl::External(url.parse()?))

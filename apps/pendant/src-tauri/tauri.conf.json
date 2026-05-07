@@ -1,6 +1,10 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "identifier": "com.sienci.gsender-pendant",
+  "build": {
+    "devUrl": "http://localhost:5174",
+    "beforeDevCommand": "bun run dev"
+  },
   "productName": "gSender Pendant",
   "version": "0.1.0",
   "app": {
@@ -22,7 +26,8 @@
     "shortDescription": "Touch-first pendant UI for gSender CNC controller",
     "externalBin": ["binaries/gsender-server"],
     "resources": {
-      "binaries/pendant": "pendant"
+      "binaries/pendant": "pendant",
+      "binaries/prebuilds": "prebuilds"
     },
     "macOS": {
       "entitlements": "entitlements.plist"
