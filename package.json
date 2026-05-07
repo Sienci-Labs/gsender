@@ -94,7 +94,7 @@
     "pendant:dev": "npm run build-dev-server && concurrently --kill-others-on-fail --names \"server,tauri\" \"npm run start-dev\" \"bash -lc 'until curl -sf http://127.0.0.1:8000 >/dev/null; do sleep 0.2; done; cd apps/pendant && npx @tauri-apps/cli@2 dev'\"",
     "build:server-sidecar": "npm run build-prod-server && npm run vite:build:pendant && node scripts/build-sidecar.js",
     "pendant:tauri:dev": "bash -c 'cd apps/pendant && npx @tauri-apps/cli@2 dev'",
-    "pendant:tauri:build": "npm run build:server-sidecar && bash -c 'cd apps/pendant && npx @tauri-apps/cli@2 build'",
+    "pendant:tauri:build": "npm run build:server-sidecar && node scripts/sign-node-binaries.js && bash -c 'cd apps/pendant && npx @tauri-apps/cli@2 build'",
     "build:pendant:mac": "npm run pendant:tauri:build && xattr -cr \"$(ls -d apps/pendant/src-tauri/target/release/bundle/macos/*.app 2>/dev/null | head -1)\"",
     "build:pendant:pi": "npm run build:server-sidecar",
     "postvite:build": "bash -c \"mkdir -p dist/gsender/app; cp -af apps/desktop/{favicon.ico,images,assets} dist/gsender/app/\"",
