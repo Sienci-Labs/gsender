@@ -34,4 +34,5 @@ src/app/src/application.css
 /apps/pendant/src-tauri/binaries/
 /apps/pendant/src-tauri/target/
 /apps/pendant/src-tauri/gen/schemas/
+/apps/pendant/dist/
 /dist/gsender/pendant/
