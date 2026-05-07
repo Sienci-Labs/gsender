@@ -41,6 +41,13 @@ const Instructions = () => {
                     {intro}
                 </div>
             )}
+            {/* Breadcrumb */}
+            <div className="flex items-center gap-1 text-[10px] text-gray-400 dark:text-[#4b5563]">
+                <span>{step.title}</span>
+                <span className="text-gray-300 dark:text-[#2a2a35]">›</span>
+                <span className="text-gray-600 dark:text-[#9ca3af]">{substep.title}</span>
+            </div>
+
             <Substep
                 step={substep}
                 index={activeSubstep}

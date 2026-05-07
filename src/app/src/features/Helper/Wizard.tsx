@@ -58,7 +58,7 @@ export function updateToolchangeContext(mappings = null) {
 }
 
 const Wizard = () => {
-    const { title, visible, minimized, activeStep, steps } =
+    const { title, visible, minimized, activeStep, activeSubstep, steps } =
         useWizardContext();
 
     if (!visible) return null;
@@ -71,7 +71,7 @@ const Wizard = () => {
             )}
 
             <div className="fixed inset-0 flex items-center justify-center z-[200] pointer-events-none">
-                <div className="pointer-events-auto w-[640px] rounded-lg overflow-hidden shadow-2xl border border-gray-300/50 dark:border-[#2a2a35] bg-white dark:bg-[#18181f]">
+                <div className="pointer-events-auto w-[700px] rounded-lg overflow-hidden shadow-2xl border border-gray-300/50 dark:border-[#2a2a35] bg-white dark:bg-[#18181f]">
 
                     {/* Titlebar */}
                     <div className="flex items-center justify-between px-3 py-2 border-b border-gray-200 dark:border-[#2a2a35] bg-gray-100 dark:bg-[#111116]">
@@ -81,7 +81,7 @@ const Wizard = () => {
                                 {title}
                             </span>
                             <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400">
-                                Step {activeStep + 1} of {steps.length}
+                                Step {activeStep + 1} of {steps.length} · {activeSubstep + 1}/{steps[activeStep]?.substeps?.length ?? 1}
                             </span>
                         </div>
                         <div className="flex gap-1">
@@ -92,7 +92,7 @@ const Wizard = () => {
 
                     {/* Body */}
                     {!minimized && (
-                        <div className="flex h-[330px]">
+                        <div className="flex h-[400px]">
                             <Stepper />
                             <Instructions />
                         </div>
