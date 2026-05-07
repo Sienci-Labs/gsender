@@ -3,7 +3,8 @@ import {
     Upload, X, Minimize2, Maximize2,
     Clock, Hash, Move, HardDrive, FileCode,
 } from 'lucide-react';
-import controller from '@gsender/controller-client/controller';
+import ConsolePanel from '@gsender/features/Console';
+import controller, { addControllerEvents, removeControllerEvents } from '@gsender/controller-client/controller';
 import { VISUALIZER_PRIMARY } from 'app/constants';
 import GcodeEditor from 'app/features/Visualizer/GcodeEditor';
 import {
@@ -18,10 +19,11 @@ import {
     updateFileInfo,
     unloadFileInfo,
 } from '@gsender/controller-client/store/redux/slices/fileInfo.slice';
+import { addToHistory } from '@gsender/controller-client/store/redux/slices/console.slice';
 import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import type { RootState } from '@gsender/controller-client/store/redux';
 
-const TABS = ['File', 'Probe', 'Spindle', 'Macros'] as const;
+const TABS = ['File', 'Console', 'Probe', 'Spindle', 'Macros'] as const;
 type DrawerTab = (typeof TABS)[number];
 type DrawerMode = 'closed' | 'minimal' | 'expanded';
 type RecentFile = {
@@ -96,7 +98,9 @@ export default function BottomDrawer() {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const tapTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const lastTapRef = useRef(0);
+    const consolePreviewBottomRef = useRef<HTMLDivElement>(null);
     const file = useTypedSelector((s: RootState) => s.file);
+    const consoleHistory = useTypedSelector((s: RootState) => s.console.history);
 
     useEffect(() => {
         const normalized = readRecentFiles();
@@ -108,6 +112,34 @@ export default function BottomDrawer() {
         if (tapTimeoutRef.current) {
             clearTimeout(tapTimeoutRef.current);
         }
+    }, []);
+
+    useEffect(() => {
+        consolePreviewBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [consoleHistory]);
+
+    // Always-on serial event subscription — must not depend on drawer mode or tab
+    useEffect(() => {
+        const events = {
+            'serialport:read': (data: string) => {
+                const line = String(data).trim();
+                if (line) reduxStore.dispatch(addToHistory([line]));
+            },
+            'serialport:write': (data: string, context: { source?: string }) => {
+                const line = String(data).trim();
+                if (!line) return;
+                const prefix = context?.source ? `[${context.source}] ` : '';
+                reduxStore.dispatch(addToHistory([`${prefix}${line}`]));
+            },
+            'serialport:open': ({ port, baudrate }: { port: string; baudrate: number }) => {
+                reduxStore.dispatch(addToHistory([`Connected to ${port} @ ${baudrate}`]));
+            },
+            'serialport:close': () => {
+                reduxStore.dispatch(addToHistory(['Disconnected']));
+            },
+        };
+        addControllerEvents(events);
+        return () => removeControllerEvents(events);
     }, []);
 
     const saveRecentEntry = (entry: RecentFile) => {
@@ -232,7 +264,9 @@ export default function BottomDrawer() {
             : `${HEADER_HEIGHT_REM}rem`;
     const handleTabChange = (tab: DrawerTab) => {
         setActiveTab(tab);
-        if (mode === 'closed') {
+        if (tab === 'Console') {
+            setMode('expanded');
+        } else if (mode === 'closed') {
             setMode('minimal');
         }
     };
@@ -330,7 +364,19 @@ export default function BottomDrawer() {
                     {mode === 'closed' ? null : (
                         <>
                     {/* UPPER ZONE */}
-                    {activeTab === 'File' ? (
+                    {activeTab === 'Console' && mode !== 'expanded' ? (
+                        /* Console preview — fills the minimal upper zone, scrolled to bottom */
+                        <div className="flex-1 overflow-y-auto px-3 py-2 space-y-0.5 min-h-0">
+                            {consoleHistory.length === 0 ? (
+                                <span className="font-mono text-xs text-gray-400 dark:text-gray-500 italic">No output yet</span>
+                            ) : (
+                                consoleHistory.map((line, i) => (
+                                    <p key={i} className="font-mono text-xs text-gray-500 dark:text-gray-300 truncate">{line}</p>
+                                ))
+                            )}
+                            <div ref={consolePreviewBottomRef} />
+                        </div>
+                    ) : activeTab === 'File' ? (
                         file.fileLoaded ? (
                             <div className="shrink-0 px-3 py-2 flex flex-col gap-2">
                                 {/* File header card */}
@@ -373,7 +419,7 @@ export default function BottomDrawer() {
                                 </button>
                             </div>
                         )
-                    ) : (
+                    ) : activeTab === 'Console' && mode === 'expanded' ? null : (
                         <div className="shrink-0 px-3 py-3 border-b border-gray-200 dark:border-dark-lighter">
                             <span className="text-xs text-gray-500 dark:text-gray-400">
                                 {activeTab} — coming soon
@@ -384,6 +430,9 @@ export default function BottomDrawer() {
                     {/* LOWER ZONE — expanded only */}
                     {mode === 'expanded' && (
                         <div className="flex-1 overflow-hidden min-h-0">
+                            {activeTab === 'Console' && (
+                                <ConsolePanel className="h-full" />
+                            )}
                             {activeTab === 'File' && file.fileLoaded && (
                                 <div className="h-full overflow-auto px-3 py-2">
                                     <div className="h-full rounded-lg border border-gray-200 dark:border-dark-lighter bg-white dark:bg-dark overflow-hidden">
@@ -418,7 +467,7 @@ export default function BottomDrawer() {
                                     }
                                 </div>
                             )}
-                            {activeTab !== 'File' && (
+                            {activeTab !== 'File' && activeTab !== 'Console' && (
                                 <div className="h-full flex items-center justify-center text-xs text-gray-400">Coming soon</div>
                             )}
                         </div>
