@@ -22,23 +22,23 @@
  */
 
 class GrblHalLineParserResultCode {
-    static parse(line) {
-        // * Grbl v1.1
-        //   <Alarm:#|[...]>
-        const r = line.match(/^\<(Alarm):([0-9]*)\|.*\>$/);
-        if (!r) {
-            return null;
-        }
+	static parse(line) {
+		// * Grbl v1.1
+		//   <Alarm:#|[...]>
+		const r = line.match(/^<(Alarm):([0-9]*)\|.*>$/);
+		if (!r) {
+			return null;
+		}
 
-        const payload = {
-            code: r[2]
-        };
+		const payload = {
+			code: r[2],
+		};
 
-        return {
-            type: GrblHalLineParserResultCode,
-            payload: payload
-        };
-    }
+		return {
+			type: GrblHalLineParserResultCode,
+			payload: payload,
+		};
+	}
 }
 
 export default GrblHalLineParserResultCode;

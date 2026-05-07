@@ -141,9 +141,59 @@ jobs:
         run: choco install -y vcredist2017
       - name: Checkout code
         uses: actions/checkout@v3
+      - name: Write client auth certificate
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: pwsh
+        run: |
+          $b64 = "${{ secrets.SM_CLIENT_CERT_FILE_BASE64 }}" -replace '\s', ''
+          $certBytes = [Convert]::FromBase64String($b64)
+          $certPath = "${{ github.workspace }}\sm_client_cert.p12"
+          [IO.File]::WriteAllBytes($certPath, $certBytes)
+          echo "SM_CLIENT_CERT_FILE=$certPath" | Out-File -Append -FilePath $env:GITHUB_ENV -Encoding utf8
+      - name: Set up DigiCert SM Tools
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: pwsh
+        env:
+          SM_API_KEY: ${{ secrets.SM_API_KEY }}
+          SM_CLIENT_CERT_PASSWORD: ${{ secrets.SM_CLIENT_CERT_PASSWORD }}
+          SM_HOST: ${{ secrets.SM_HOST }}
+        run: |
+          curl -X GET "https://one.digicert.com/signingmanager/api-ui/v1/releases/smtools-windows-x64.msi/download" `
+            -H "x-api-key:$env:SM_API_KEY" -o smtools.msi
+          $msiPath = (Resolve-Path smtools.msi).Path
+          $proc = Start-Process msiexec -ArgumentList "/i `"$msiPath`" /quiet /qn" -Wait -PassThru
+          if ($proc.ExitCode -ne 0) { throw "msiexec failed with exit code $($proc.ExitCode)" }
+          $smctl = Get-ChildItem "C:\Program Files", "C:\Program Files (x86)" -Recurse -Filter "smctl.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $smctl) { throw "smctl.exe not found after install" }
+          $klPath = $smctl.DirectoryName
+          Write-Host "smctl found at: $klPath"
+          echo $klPath | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
+          Set-Content -Path "C:\Windows\System32\pkcs11properties.cfg" -Value "curl_path=$klPath"
+          [System.Environment]::SetEnvironmentVariable("SM_API_KEY",              $env:SM_API_KEY,              "Machine")
+          [System.Environment]::SetEnvironmentVariable("SM_CLIENT_CERT_FILE",     $env:SM_CLIENT_CERT_FILE,     "Machine")
+          [System.Environment]::SetEnvironmentVariable("SM_CLIENT_CERT_PASSWORD", $env:SM_CLIENT_CERT_PASSWORD, "Machine")
+          [System.Environment]::SetEnvironmentVariable("SM_HOST",                 $env:SM_HOST,                 "Machine")
+          & $smctl.FullName healthcheck
+          & $smctl.FullName creds save $env:SM_API_KEY $env:SM_CLIENT_CERT_PASSWORD
+          & $smctl.FullName windows certsync --keypair-alias="${{ secrets.SM_KEYPAIR_ALIAS }}"
+      - name: Add signtool to PATH
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: pwsh
+        run: |
+          $signtool = Get-ChildItem -Path "${env:ProgramFiles(x86)}\Windows Kits\10\bin" -Recurse -Filter "signtool.exe" |
+            Where-Object { $_.FullName -match "x64" } |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1
+          if (-not $signtool) { throw "signtool.exe not found in Windows SDK" }
+          $signtool.DirectoryName | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
       - name: Setup and build
         uses: ./.github/actions/setup-build
       - name: Build Windows binaries
+        env:
+          SM_API_KEY: ${{ startsWith(github.ref, 'refs/tags/') && secrets.SM_API_KEY || '' }}
+          SM_CLIENT_CERT_PASSWORD: ${{ startsWith(github.ref, 'refs/tags/') && secrets.SM_CLIENT_CERT_PASSWORD || '' }}
+          SM_HOST: ${{ startsWith(github.ref, 'refs/tags/') && secrets.SM_HOST || '' }}
+          SM_KEYPAIR_ALIAS: ${{ startsWith(github.ref, 'refs/tags/') && secrets.SM_KEYPAIR_ALIAS || '' }}
         run: yarn run build:windows
       - name: Prepare release assets
         shell: bash
@@ -188,6 +238,7 @@ jobs:
   build-pi:
     name: Build Raspberry PI packages
     runs-on: ubuntu-24.04-arm
+    environment: CI
     env:
       GH_TOKEN: ${{ secrets.CI_TOKEN }}
     permissions:

@@ -21,138 +21,145 @@
  *
  */
 
-import { METRIC_UNITS } from '../constants';
-import { BasicObject, UNITS_EN, UNITS_GCODE } from 'app/definitions/general';
+import type {
+	BasicObject,
+	UNITS_EN,
+	UNITS_GCODE,
+} from "app/definitions/general";
+import { METRIC_UNITS } from "../constants";
 
 const storeValuesThatNeedRounding = new Set([
-    'workspace.safeRetractHeight',
-    'workspace.toolChangePosition.x',
-    'workspace.toolChangePosition.y',
-    'workspace.toolChangePosition.z',
-    'workspace.probeProfile.xyThickness',
-    'workspace.probeProfile.zThickness.standardBlock',
-    'workspace.probeProfile.zThickness.autoZero',
-    'workspace.probeProfile.zThickness.zProbe',
-    'workspace.probeProfile.zThickness.probe3D',
-    'workspace.probeProfile.plateWidth',
-    'workspace[probeProfile].xyThickness',
-    'workspace[probeProfile].zThickness.standardBlock',
-    'workspace[probeProfile].zThickness.autoZero',
-    'workspace[probeProfile].zThickness.zProbe',
-    'workspace[probeProfile].zThickness.probe3D',
-    'workspace[probeProfile].plateWidth',
-    'widgets.rotary.stockTurning.options.stockLength',
-    'widgets.rotary.stockTurning.options.stepdown',
-    'widgets.rotary.stockTurning.options.bitDiameter',
-    'widgets.rotary.stockTurning.options.stepover',
-    'widgets.rotary.stockTurning.options.startHeight',
-    'widgets.rotary.stockTurning.options.finalHeight',
-    'widgets.surfacing.bitDiameter',
-    'widgets.surfacing.stepover',
-    'widgets.surfacing.length',
-    'widgets.surfacing.width',
-    'widgets.surfacing.skimDepth',
-    'widgets.surfacing.maxDepth',
-    'widgets.spindle.laser.xOffset',
-    'widgets.spindle.laser.yOffset',
-    'widgets.axes.jog.rapid.xyStep',
-    'widgets.axes.jog.rapid.xaStep',
-    'widgets.axes.jog.rapid.zStep',
-    'widgets.axes.jog.rapid.feedrate',
-    'widgets.axes.jog.normal.xyStep',
-    'widgets.axes.jog.normal.zStep',
-    'widgets.axes.jog.normal.feedrate',
-    'widgets.axes.jog.precise.xyStep',
-    'widgets.axes.jog.precise.zStep',
-    'widgets.axes.jog.precise.feedrate',
-    'widgets.axes.jog.step',
-    'widgets.axes.jog.distances',
-    'widgets.location.jog.step',
-    'widgets.location.jog.distances',
-    'widgets.probe.probeFeedrate',
-    'widgets.probe.probeFastFeedrate',
-    'widgets.probe.retractionDistance',
-    'widgets.probe.zProbeDistance',
-    'widgets.probe.xyRetract3D',
-    'widgets["rotary"].stockTurning.options.stockLength',
-    'widgets["rotary"].stockTurning.options.stepdown',
-    'widgets["rotary"].stockTurning.options.bitDiameter',
-    'widgets["rotary"].stockTurning.options.stepover',
-    'widgets["rotary"].stockTurning.options.startHeight',
-    'widgets["rotary"].stockTurning.options.finalHeight',
-    'widgets["surfacing"].bitDiameter',
-    'widgets["surfacing"].stepover',
-    'widgets["surfacing"].length',
-    'widgets["surfacing"].width',
-    'widgets["surfacing"].skimDepth',
-    'widgets["surfacing"].maxDepth',
-    'widgets["spindle"].laser.xOffset',
-    'widgets["spindle"].laser.yOffset',
-    'widgets["axes"].jog.rapid.xyStep',
-    'widgets["axes"].jog.rapid.zStep',
-    'widgets["axes"].jog.rapid.feedrate',
-    'widgets["axes"].jog.normal.xyStep',
-    'widgets["axes"].jog.normal.xaStep',
-    'widgets["axes"].jog.normal.zStep',
-    'widgets["axes"].jog.normal.feedrate',
-    'widgets["axes"].jog.precise.xyStep',
-    'widgets["axes"].jog.precise.zStep',
-    'widgets["axes"].jog.precise.feedrate',
-    'widgets["axes"].jog.step',
-    'widgets["axes"].jog.distances',
-    'widgets["location"].jog.step',
-    'widgets["location"].jog.distances',
-    'widgets["probe"].probeFeedrate',
-    'widgets["probe"].probeFastFeedrate',
-    'widgets["probe"].retractionDistance',
-    'widgets["probe"].zProbeDistance',
-    'widgets["probe"].xyRetract3D',
+	"workspace.safeRetractHeight",
+	"workspace.toolChangePosition.x",
+	"workspace.toolChangePosition.y",
+	"workspace.toolChangePosition.z",
+	"workspace.probeProfile.xyThickness",
+	"workspace.probeProfile.zThickness.standardBlock",
+	"workspace.probeProfile.zThickness.autoZero",
+	"workspace.probeProfile.zThickness.zProbe",
+	"workspace.probeProfile.zThickness.probe3D",
+	"workspace.probeProfile.plateWidth",
+	"workspace[probeProfile].xyThickness",
+	"workspace[probeProfile].zThickness.standardBlock",
+	"workspace[probeProfile].zThickness.autoZero",
+	"workspace[probeProfile].zThickness.zProbe",
+	"workspace[probeProfile].zThickness.probe3D",
+	"workspace[probeProfile].plateWidth",
+	"widgets.rotary.stockTurning.options.stockLength",
+	"widgets.rotary.stockTurning.options.stepdown",
+	"widgets.rotary.stockTurning.options.bitDiameter",
+	"widgets.rotary.stockTurning.options.stepover",
+	"widgets.rotary.stockTurning.options.startHeight",
+	"widgets.rotary.stockTurning.options.finalHeight",
+	"widgets.surfacing.bitDiameter",
+	"widgets.surfacing.stepover",
+	"widgets.surfacing.length",
+	"widgets.surfacing.width",
+	"widgets.surfacing.skimDepth",
+	"widgets.surfacing.maxDepth",
+	"widgets.spindle.laser.xOffset",
+	"widgets.spindle.laser.yOffset",
+	"widgets.axes.jog.rapid.xyStep",
+	"widgets.axes.jog.rapid.xaStep",
+	"widgets.axes.jog.rapid.zStep",
+	"widgets.axes.jog.rapid.feedrate",
+	"widgets.axes.jog.normal.xyStep",
+	"widgets.axes.jog.normal.zStep",
+	"widgets.axes.jog.normal.feedrate",
+	"widgets.axes.jog.precise.xyStep",
+	"widgets.axes.jog.precise.zStep",
+	"widgets.axes.jog.precise.feedrate",
+	"widgets.axes.jog.step",
+	"widgets.axes.jog.distances",
+	"widgets.location.jog.step",
+	"widgets.location.jog.distances",
+	"widgets.probe.probeFeedrate",
+	"widgets.probe.probeFastFeedrate",
+	"widgets.probe.retractionDistance",
+	"widgets.probe.zProbeDistance",
+	"widgets.probe.xyRetract3D",
+	'widgets["rotary"].stockTurning.options.stockLength',
+	'widgets["rotary"].stockTurning.options.stepdown',
+	'widgets["rotary"].stockTurning.options.bitDiameter',
+	'widgets["rotary"].stockTurning.options.stepover',
+	'widgets["rotary"].stockTurning.options.startHeight',
+	'widgets["rotary"].stockTurning.options.finalHeight',
+	'widgets["surfacing"].bitDiameter',
+	'widgets["surfacing"].stepover',
+	'widgets["surfacing"].length',
+	'widgets["surfacing"].width',
+	'widgets["surfacing"].skimDepth',
+	'widgets["surfacing"].maxDepth',
+	'widgets["spindle"].laser.xOffset',
+	'widgets["spindle"].laser.yOffset',
+	'widgets["axes"].jog.rapid.xyStep',
+	'widgets["axes"].jog.rapid.zStep',
+	'widgets["axes"].jog.rapid.feedrate',
+	'widgets["axes"].jog.normal.xyStep',
+	'widgets["axes"].jog.normal.xaStep',
+	'widgets["axes"].jog.normal.zStep',
+	'widgets["axes"].jog.normal.feedrate',
+	'widgets["axes"].jog.precise.xyStep',
+	'widgets["axes"].jog.precise.zStep',
+	'widgets["axes"].jog.precise.feedrate',
+	'widgets["axes"].jog.step',
+	'widgets["axes"].jog.distances',
+	'widgets["location"].jog.step',
+	'widgets["location"].jog.distances',
+	'widgets["probe"].probeFeedrate',
+	'widgets["probe"].probeFastFeedrate',
+	'widgets["probe"].retractionDistance',
+	'widgets["probe"].zProbeDistance',
+	'widgets["probe"].xyRetract3D',
 ]);
 
 export const roundImperial = (val: number | string): number => {
-    return Number(Number(val).toFixed(3));
+	return Number(Number(val).toFixed(3));
 };
 
 export const roundMetric = (val: number | string): number => {
-    return Number(Number(val).toFixed(2));
+	return Number(Number(val).toFixed(2));
 };
 
 export const round = (
-    val: number | string,
-    units: UNITS_GCODE | UNITS_EN,
+	val: number | string,
+	units: UNITS_GCODE | UNITS_EN,
 ): number => {
-    if (units === METRIC_UNITS || units === 'G21') {
-        return roundMetric(val);
-    } else {
-        return roundImperial(val);
-    }
+	if (units === METRIC_UNITS || units === "G21") {
+		return roundMetric(val);
+	} else {
+		return roundImperial(val);
+	}
 };
 
 // rounds applicable values
 // recursive, looks through object properties
 export const determineRoundedValue = (key: string, value: any): any => {
-    const isObject = value instanceof Object;
-    const isArray = Array.isArray(value);
+	const isObject = value instanceof Object;
+	const isArray = Array.isArray(value);
 
-    // if object, recurse
-    if (isObject && !isArray) {
-        let newVal: BasicObject = {};
-        Object.keys(value as BasicObject).forEach((el, _index) => {
-            newVal[el] = determineRoundedValue(key + '.' + el, value[el]);
-        });
-        return newVal;
-        // if array and is something we should round, iterate through the values and round
-    } else if (isArray && storeValuesThatNeedRounding.has(key)) {
-        return value.map((el) => roundMetric(el));
-        // if a single value, round
-    } else if (storeValuesThatNeedRounding.has(key)) {
-        return roundMetric(value as string);
-    }
-    return value;
+	// if object, recurse
+	if (isObject && !isArray) {
+		const newVal: BasicObject = {};
+		Object.keys(value as BasicObject).forEach((el, _index) => {
+			newVal[el] = determineRoundedValue(key + "." + el, value[el]);
+		});
+		return newVal;
+		// if array and is something we should round, iterate through the values and round
+	} else if (isArray && storeValuesThatNeedRounding.has(key)) {
+		return value.map((el) => roundMetric(el));
+		// if a single value, round
+	} else if (storeValuesThatNeedRounding.has(key)) {
+		return roundMetric(value as string);
+	}
+	return value;
 };
 
 // round up to decimalPoints only
 // https://stackoverflow.com/a/32229831
-export const toFixedIfNecessary = (value: string | number, decimalPoints: number) => {
-    return +parseFloat(String(value)).toFixed(decimalPoints);
-}
+export const toFixedIfNecessary = (
+	value: string | number,
+	decimalPoints: number,
+) => {
+	return +parseFloat(String(value)).toFixed(decimalPoints);
+};

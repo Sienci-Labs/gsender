@@ -21,56 +21,56 @@
  *
  */
 
-import store from '../store';
+import store from "../store";
 
 class WidgetConfig {
-    widgetId = '';
+	widgetId = "";
 
-    translateKey = (key) => {
-        const widgetId = this.widgetId;
-        if (typeof key !== 'undefined') {
-            key = `widgets["${widgetId}"].${key}`;
-        } else {
-            key = `widgets["${widgetId}"]`;
-        }
-        return key;
-    };
+	translateKey = (key) => {
+		const widgetId = this.widgetId;
+		if (typeof key !== "undefined") {
+			key = `widgets["${widgetId}"].${key}`;
+		} else {
+			key = `widgets["${widgetId}"]`;
+		}
+		return key;
+	};
 
-    constructor(widgetId) {
-        this.widgetId = widgetId;
-    }
+	constructor(widgetId) {
+		this.widgetId = widgetId;
+	}
 
-    get(key, defaultValue) {
-        if (!this.widgetId) {
-            throw new Error('The widget id cannot be an empty string');
-        }
-        key = this.translateKey(key);
-        return store.get(key, defaultValue);
-    }
+	get(key, defaultValue) {
+		if (!this.widgetId) {
+			throw new Error("The widget id cannot be an empty string");
+		}
+		key = this.translateKey(key);
+		return store.get(key, defaultValue);
+	}
 
-    set(key, value) {
-        if (!this.widgetId) {
-            throw new Error('The widget id cannot be an empty string');
-        }
-        key = this.translateKey(key);
-        return store.set(key, value);
-    }
+	set(key, value) {
+		if (!this.widgetId) {
+			throw new Error("The widget id cannot be an empty string");
+		}
+		key = this.translateKey(key);
+		return store.set(key, value);
+	}
 
-    unset(key) {
-        if (!this.widgetId) {
-            throw new Error('The widget id cannot be an empty string');
-        }
-        key = this.translateKey(key);
-        return store.unset(key);
-    }
+	unset(key) {
+		if (!this.widgetId) {
+			throw new Error("The widget id cannot be an empty string");
+		}
+		key = this.translateKey(key);
+		return store.unset(key);
+	}
 
-    replace(key, value) {
-        if (!this.widgetId) {
-            throw new Error('The widget id cannot be an empty string');
-        }
-        key = this.translateKey(key);
-        return store.replace(key, value);
-    }
+	replace(key, value) {
+		if (!this.widgetId) {
+			throw new Error("The widget id cannot be an empty string");
+		}
+		key = this.translateKey(key);
+		return store.replace(key, value);
+	}
 }
 
 export default WidgetConfig;

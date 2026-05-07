@@ -1,189 +1,197 @@
-import store from 'app/store';
-import api from 'app/api';
-import { restoreDefault, storeUpdate } from 'app/lib/storeUpdate';
-import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
-import { generateEEPROMSettings } from 'app/features/Config/utils/EEPROM.ts';
-import { toast } from 'sonner';
-import controller from 'app/lib/controller.ts';
-import pubsub from 'pubsub-js';
-import { EEPROM, FilteredEEPROM } from 'app/definitions/firmware';
-import { gSenderSetting, gSenderSettingsValues } from '../assets/SettingsMenu';
-import { State } from 'app/store/definitions';
+import store from "app/store";
+import api from "app/api";
+import { restoreDefault, storeUpdate } from "app/lib/storeUpdate";
+import { Confirm } from "app/components/ConfirmationDialog/ConfirmationDialogLib.ts";
+import { generateEEPROMSettings } from "app/features/Config/utils/EEPROM.ts";
+import { toast } from "sonner";
+import controller from "app/lib/controller.ts";
+import pubsub from "pubsub-js";
+import { EEPROM, FilteredEEPROM } from "app/definitions/firmware";
+import { gSenderSetting, gSenderSettingsValues } from "../assets/SettingsMenu";
+import { State } from "app/store/definitions";
 
 export function exportFirmwareSettings(settings: object) {
-    const output = JSON.stringify(settings);
-    const blob = new Blob([output], { type: 'application/json' });
+	const output = JSON.stringify(settings);
+	const blob = new Blob([output], { type: "application/json" });
 
-    const today = new Date();
-    const filename = `gSender-firmware-settings-${today.toLocaleDateString()}-${today.toLocaleTimeString()}`;
+	const today = new Date();
+	const filename = `gSender-firmware-settings-${today.toLocaleDateString()}-${today.toLocaleTimeString()}`;
 
-    // Native JS way to download file
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.setAttribute('download', filename);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(link.href);
+	// Native JS way to download file
+	const link = document.createElement("a");
+	link.href = URL.createObjectURL(blob);
+	link.setAttribute("download", filename);
+	document.body.appendChild(link);
+	link.click();
+	document.body.removeChild(link);
+	URL.revokeObjectURL(link.href);
 }
 
 export function humanReadableMachineName(o) {
-    let name = o.name;
-    if (o.type?.length > 0) {
-        name += ` ${o.type}`;
-    }
-    if (o.version?.length > 0) {
-        name += ` (${o.version})`;
-    }
-    return name;
+	let name = o.name;
+	if (o.type?.length > 0) {
+		name += ` ${o.type}`;
+	}
+	if (o.version?.length > 0) {
+		name += ` (${o.version})`;
+	}
+	return name;
 }
 
 export async function exportSettings() {
-    const settings = store.get();
-    settings.commandKeys = Object.fromEntries(
-        Object.entries(settings.commandKeys).filter(
-            ([_key, shortcut]) => shortcut.category !== 'Macros',
-        ),
-    ); //Exclude macro shortcuts
-    delete settings.session;
+	const settings = store.get();
+	settings.commandKeys = Object.fromEntries(
+		Object.entries(settings.commandKeys).filter(
+			([_key, shortcut]) => shortcut.category !== "Macros",
+		),
+	); //Exclude macro shortcuts
+	delete settings.session;
 
-    const res = await api.events.fetch();
-    const events = res.data.records;
+	const res = await api.events.fetch();
+	const events = res.data.records;
 
-    const settingsJSON = JSON.stringify({ settings, events }, null, 3);
-    const data = new Blob([settingsJSON], {
-        type: 'application/json',
-    });
+	const settingsJSON = JSON.stringify({ settings, events }, null, 3);
+	const data = new Blob([settingsJSON], {
+		type: "application/json",
+	});
 
-    const today = new Date();
-    const filename = `gSender-settings-${today.toLocaleDateString()}-${today.toLocaleTimeString()}`;
+	const today = new Date();
+	const filename = `gSender-settings-${today.toLocaleDateString()}-${today.toLocaleTimeString()}`;
 
-    // IE11 & Edge
-    if (navigator.msSaveBlob) {
-        navigator.msSaveBlob(data, filename);
-    } else {
-        // In FF link must be added to DOM to be clicked
-        const link = document.createElement('a');
-        link.href = window.URL.createObjectURL(data);
-        link.setAttribute('download', filename);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
+	// IE11 & Edge
+	if (navigator.msSaveBlob) {
+		navigator.msSaveBlob(data, filename);
+	} else {
+		// In FF link must be added to DOM to be clicked
+		const link = document.createElement("a");
+		link.href = window.URL.createObjectURL(data);
+		link.setAttribute("download", filename);
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	}
 }
 
 const onImportConfirm = (file: File) => {
-    if (file) {
-        const reader = new FileReader();
-        reader.readAsText(file, 'UTF-8');
-        reader.onload = async (event) => {
-            try {
-                const importData = JSON.parse(event.target.result as string);
+	if (file) {
+		const reader = new FileReader();
+		reader.readAsText(file, "UTF-8");
+		reader.onload = async (event) => {
+			try {
+				const importData = JSON.parse(event.target.result as string);
 
-                // Validate the imported data
-                // check that the major properties exist
-                if (
-                    !importData.settings ||
-                    !importData.settings.workspace ||
-                    !importData.settings.widgets ||
-                    !importData.settings.commandKeys ||
-                    !importData.events
-                ) {
-                    throw new Error('Invalid gSender settings file format');
-                }
-                await storeUpdate(event.target.result as string);
-            } catch (error) {
-                console.error('Import error:', error);
-                toast.error(
-                    'Failed to import settings. Please check the file format.',
-                    {
-                        position: 'bottom-right',
-                    },
-                );
-            }
-        };
-        reader.onerror = () => {
-            console.error('Unable to load settings to import');
-        };
-    }
+				// Validate the imported data
+				// check that the major properties exist
+				if (
+					!importData.settings ||
+					!importData.settings.workspace ||
+					!importData.settings.widgets ||
+					!importData.settings.commandKeys ||
+					!importData.events
+				) {
+					throw new Error("Invalid gSender settings file format");
+				}
+				await storeUpdate(event.target.result as string);
+			} catch (error) {
+				console.error("Import error:", error);
+				toast.error(
+					"Failed to import settings. Please check the file format.",
+					{
+						position: "bottom-right",
+					},
+				);
+			}
+		};
+		reader.onerror = () => {
+			console.error("Unable to load settings to import");
+		};
+	}
 };
 
 export function importSettings(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files[0];
+	const file = e.target.files[0];
 
-    Confirm({
-        title: 'Import Settings',
-        content:
-            'All your current settings will be replaced. Are you sure you want to import your settings on gSender?',
-        confirmLabel: 'Import Settings',
-        onConfirm: () => onImportConfirm(file),
-    });
+	Confirm({
+		title: "Import Settings",
+		content:
+			"All your current settings will be replaced. Are you sure you want to import your settings on gSender?",
+		confirmLabel: "Import Settings",
+		onConfirm: () => onImportConfirm(file),
+	});
 }
 
 export function handleRestoreDefaultClick() {
-    Confirm({
-        title: 'Restore Settings',
-        content:
-            'All your current settings will be removed. Are you sure you want to restore default settings on gSender?',
-        confirmLabel: 'Restore Settings',
-        onConfirm: restoreDefault,
-    });
+	Confirm({
+		title: "Restore Settings",
+		content:
+			"All your current settings will be removed. Are you sure you want to restore default settings on gSender?",
+		confirmLabel: "Restore Settings",
+		onConfirm: restoreDefault,
+	});
 }
 
-export function matchesSearchTerm(o: FilteredEEPROM[], term = '') {
-    // For empty search, we always match
-    if (term.length === 0 || !term) {
-        return true;
-    }
-    return JSON.stringify(o).toLowerCase().includes(term.toLowerCase());
+export function matchesSearchTerm(o: FilteredEEPROM[], term = "") {
+	// For empty search, we always match
+	if (term.length === 0 || !term) {
+		return true;
+	}
+	return JSON.stringify(o).toLowerCase().includes(term.toLowerCase());
 }
 
 export function generateSenderSettings(settings: gSenderSetting[]) {
-    const dirtySettings: {
-        [key: string]: { value: gSenderSettingsValues; onUpdate: () => void };
-    } = {};
-    settings.map((s) => {
-        if (s.dirty) {
-            dirtySettings[s.key] = {
-                value: s.value,
-                onUpdate: s.onUpdate || null,
-            };
-            s.dirty = false;
-        }
-    });
-    return dirtySettings;
+	const dirtySettings: {
+		[key: string]: {
+			value: gSenderSettingsValues;
+			onUpdate?: () => void;
+			onApply?: () => void;
+		};
+	} = {};
+	settings.map((s) => {
+		if (s.dirty) {
+			dirtySettings[s.key] = {
+				value: s.value,
+				onUpdate: s.onUpdate || null,
+				onApply: s.onApply || null,
+			};
+			s.dirty = false;
+		}
+	});
+	return dirtySettings;
 }
 
 export function updateAllSettings(
-    settings: gSenderSetting[],
-    eeprom: FilteredEEPROM[],
+	settings: gSenderSetting[],
+	eeprom: FilteredEEPROM[],
 ) {
-    const eepromToChange = generateEEPROMSettings(eeprom);
-    const eepromNumber = Object.keys(eepromToChange).length;
-    if (eepromNumber > 0) {
-        let changedSettings = Object.keys(eepromToChange).map(
-            (k) => `${k}=${eepromToChange[k as EEPROM]}`,
-        );
-        changedSettings.push('$$');
-        controller.command('gcode', changedSettings);
-        toast.success(`Updated ${eepromNumber} EEPROM values.`, {
-            position: 'bottom-right',
-        });
-    }
+	const eepromToChange = generateEEPROMSettings(eeprom);
+	const eepromNumber = Object.keys(eepromToChange).length;
+	if (eepromNumber > 0) {
+		let changedSettings = Object.keys(eepromToChange).map(
+			(k) => `${k}=${eepromToChange[k as EEPROM]}`,
+		);
+		changedSettings.push("$$");
+		controller.command("gcode", changedSettings);
+		toast.success(`Updated ${eepromNumber} EEPROM values.`, {
+			position: "bottom-right",
+		});
+	}
 
-    const settingsToUpdate = generateSenderSettings(settings);
-    const updateableSettingsNumber = Object.keys(settingsToUpdate).length;
-    if (updateableSettingsNumber > 0) {
-        Object.keys(settingsToUpdate).map((k) => {
-            store.set(k, settingsToUpdate[k].value);
-            if (settingsToUpdate[k].onUpdate) {
-                settingsToUpdate[k].onUpdate();
-            }
-        });
-        toast.success(`Updated ${updateableSettingsNumber} settings.`, {
-            position: 'bottom-right',
-        });
-    }
+	const settingsToUpdate = generateSenderSettings(settings);
+	const updateableSettingsNumber = Object.keys(settingsToUpdate).length;
+	if (updateableSettingsNumber > 0) {
+		Object.keys(settingsToUpdate).map((k) => {
+			store.set(k, settingsToUpdate[k].value);
+			if (settingsToUpdate[k].onUpdate) {
+				settingsToUpdate[k].onUpdate();
+			}
+			if (settingsToUpdate[k].onApply) {
+				settingsToUpdate[k].onApply();
+			}
+		});
+		toast.success(`Updated ${updateableSettingsNumber} settings.`, {
+			position: "bottom-right",
+		});
+	}
 
-    pubsub.publish('config:saved', settingsToUpdate);
+	pubsub.publish("config:saved", settingsToUpdate);
 }

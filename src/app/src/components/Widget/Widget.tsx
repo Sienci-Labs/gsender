@@ -21,11 +21,11 @@
  *
  */
 
-import classNames from 'classnames';
-import { WidgetProps } from './definitions';
+import classNames from "classnames";
+import type { WidgetProps } from "./definitions";
 
 const WidgetComponent: React.FC<WidgetProps> = ({ className, ...props }) => {
-    return <section {...props} className={classNames(className, 'h-full')} />;
+	return <section {...props} className={classNames(className, "h-full")} />;
 };
 
 export default WidgetComponent;

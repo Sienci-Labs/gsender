@@ -21,31 +21,31 @@
  *
  */
 
-export const modifierKeys = ['shift', 'alt', 'ctrl', 'meta'];
+export const modifierKeys = ["shift", "alt", "ctrl", "meta"];
 
 export const MAX_TERMINAL_INPUT_ARRAY_SIZE = 300;
 
-export const TOUCHPLATE_TYPE_STANDARD = 'Standard Block';
-export const TOUCHPLATE_TYPE_AUTOZERO = 'AutoZero';
-export const TOUCHPLATE_TYPE_ZERO = 'Z Probe';
-export const TOUCHPLATE_TYPE_3D = '3D Probe';
-export const TOUCHPLATE_TYPE_BITZERO = 'BitZero';
+export const TOUCHPLATE_TYPE_STANDARD = "Standard Block";
+export const TOUCHPLATE_TYPE_AUTOZERO = "AutoZero";
+export const TOUCHPLATE_TYPE_ZERO = "Z Probe";
+export const TOUCHPLATE_TYPE_3D = "3D Probe";
+export const TOUCHPLATE_TYPE_BITZERO = "BitZero";
 export const TOUCHPLATE_TYPES = {
-    TOUCHPLATE_TYPE_STANDARD: 'Standard Block',
-    TOUCHPLATE_TYPE_AUTOZERO: 'AutoZero',
-    TOUCHPLATE_TYPE_ZERO: 'Z Probe',
-    TOUCHPLATE_TYPE_3D: '3D Probe',
-    TOUCHPLATE_TYPE_BITZERO: 'BitZero',
+	TOUCHPLATE_TYPE_STANDARD: "Standard Block",
+	TOUCHPLATE_TYPE_AUTOZERO: "AutoZero",
+	TOUCHPLATE_TYPE_ZERO: "Z Probe",
+	TOUCHPLATE_TYPE_3D: "3D Probe",
+	TOUCHPLATE_TYPE_BITZERO: "BitZero",
 };
 
-export const PROBE_TYPE_AUTO = 'Auto';
-export const PROBE_TYPE_TIP = 'Tip';
-export const PROBE_TYPE_DIAMETER = 'Diameter';
+export const PROBE_TYPE_AUTO = "Auto";
+export const PROBE_TYPE_TIP = "Tip";
+export const PROBE_TYPE_DIAMETER = "Diameter";
 export const PROBE_TYPES = {
-    PROBE_TYPE_AUTO: 'Auto',
-    PROBE_TYPE_TIP: 'Tip',
-    PROBE_TYPE_DIAMETER: 'Diameter',
+	PROBE_TYPE_AUTO: "Auto",
+	PROBE_TYPE_TIP: "Tip",
+	PROBE_TYPE_DIAMETER: "Diameter",
 };
 
-export const END_MILL = 'End Mill';
-export const DRILL = 'Drill';
+export const END_MILL = "End Mill";
+export const DRILL = "Drill";

@@ -21,67 +21,69 @@
  *
  */
 
-import React from 'react';
-import cx from 'classnames';
-import SubstepCompletionIndicator from 'app/features/Helper/components/SubstepCompletionIndicator';
-import { useWizardContext } from 'app/features/Helper/context';
-import Actions from './Actions';
-import styles from '../index.module.styl';
+import SubstepCompletionIndicator from "app/features/Helper/components/SubstepCompletionIndicator";
+import { useWizardContext } from "app/features/Helper/context";
+import cx from "classnames";
+import React from "react";
+import styles from "../index.module.styl";
+import Actions from "./Actions";
 
 const Substep = ({ step, index, stepIndex, firstRunOnly }) => {
-    const { activeSubstep, activeStep, completedStep, completedSubStep } =
-        useWizardContext();
+	const { activeSubstep, activeStep, completedStep, completedSubStep } =
+		useWizardContext();
 
-    // // State calculation
-    /*
+	// // State calculation
+	/*
         complete is:
         - on or before the last completed step
         - on the step after the completed one, but on a substep that is on or before a completed substep
     */
-    const stepComplete =
-        stepIndex <= completedStep ||
-        (stepIndex === completedStep + 1 && index <= completedSubStep);
-    const stepIsActive = stepIndex === activeStep && index === activeSubstep;
-    const futureStep = !stepIsActive && !stepComplete;
+	const stepComplete =
+		stepIndex <= completedStep ||
+		(stepIndex === completedStep + 1 && index <= completedSubStep);
+	const stepIsActive = stepIndex === activeStep && index === activeSubstep;
+	const futureStep = !stepIsActive && !stepComplete;
 
-    return (
-        <div
-            className={cx(styles.substepWrapper, {
-                [styles.substepComplete]: stepComplete,
-                [styles.substepActive]: stepIsActive,
-                [styles.substepPending]: futureStep,
-            })}
-        >
-            <SubstepCompletionIndicator
-                completed={stepComplete}
-                future={futureStep}
-                active={stepIsActive}
-            />
-            <div className={styles.substep} id={`step-${stepIndex}-${index}`}>
-                {firstRunOnly && (
-                    <div className={styles.firstRunBanner}>
-                        <strong>One-time setup</strong> — this step only runs on your first toolchange. It measures your initial tool so subsequent tools can be compared against it.
-                    </div>
-                )}
-                <span className={styles.substepTitle}>{step.title}</span>
-                <div className={cx({ [styles.hidden]: futureStep })}>
-                    <span className={styles.substepDescription}>
-                        {typeof step.description === 'function'
-                            ? step.description()
-                            : step.description}
-                    </span>
-                    <div>
-                        <Actions
-                            actions={step.actions}
-                            index={index}
-                            stepIndex={stepIndex}
-                            substepIndex={index}
-                        />
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
+	return (
+		<div
+			className={cx(styles.substepWrapper, {
+				[styles.substepComplete]: stepComplete,
+				[styles.substepActive]: stepIsActive,
+				[styles.substepPending]: futureStep,
+			})}
+		>
+			<SubstepCompletionIndicator
+				completed={stepComplete}
+				future={futureStep}
+				active={stepIsActive}
+			/>
+			<div className={styles.substep} id={`step-${stepIndex}-${index}`}>
+				{firstRunOnly && (
+					<div className={styles.firstRunBanner}>
+						<strong>One-time setup</strong> — this step only runs on your first
+						toolchange. It measures your initial tool so subsequent tools can be
+						compared against it.
+					</div>
+				)}
+				<span className={styles.substepTitle}>{step.title}</span>
+				<div className={cx({ [styles.hidden]: futureStep })}>
+					<span className={styles.substepDescription}>
+						{typeof step.description === "function"
+							? step.description()
+							: step.description}
+					</span>
+					<div>
+						<Actions
+							actions={step.actions}
+							index={index}
+							stepIndex={stepIndex}
+							substepIndex={index}
+						/>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
 };
 
 export default Substep;

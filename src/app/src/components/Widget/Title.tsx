@@ -21,19 +21,19 @@
  *
  */
 
-import classNames from 'classnames';
-import { WidgetProps } from './definitions';
+import classNames from "classnames";
+import type { WidgetProps } from "./definitions";
 
 const Title: React.FC<WidgetProps> = ({ className, ...props }) => (
-    <h2
-        {...props}
-        className={classNames(
-            className,
-            'text-lg h-8 font-bold inline-block align-middle ' +
-                'm-0 px-3 py-0 text-blue-500 text-ellipsis ' +
-                'overflow-hidden whitespace-nowrap w-full max-w-full',
-        )}
-    />
+	<h2
+		{...props}
+		className={classNames(
+			className,
+			"text-lg h-8 font-bold inline-block align-middle " +
+				"m-0 px-3 py-0 text-blue-500 text-ellipsis " +
+				"overflow-hidden whitespace-nowrap w-full max-w-full",
+		)}
+	/>
 );
 
 export default Title;
