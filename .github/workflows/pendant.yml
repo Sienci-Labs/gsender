@@ -113,8 +113,7 @@ jobs:
             build-essential \
             libudev-dev \
             patchelf \
-            xdg-utils \
-            squashfs-tools
+            xdg-utils
 
       - name: Cache node_modules
         uses: actions/cache@v4
@@ -127,15 +126,12 @@ jobs:
         run: npm install --legacy-peer-deps
 
       - name: Build pendant Linux ARM64 app
-        run: npm run pendant:tauri:build
-        env:
-          APPIMAGE_EXTRACT_AND_RUN: 1
+        run: npm run build:server-sidecar && bash -c 'cd apps/pendant && npx @tauri-apps/cli@2 build --bundles deb'
 
       - name: Collect artifacts
         run: |
           mkdir -p releases/pendant-pi
           cp apps/pendant/src-tauri/target/release/bundle/deb/*.deb releases/pendant-pi/ || true
-          cp apps/pendant/src-tauri/target/release/bundle/appimage/*.AppImage releases/pendant-pi/ || true
           ls -la releases/pendant-pi/
 
       - name: Upload Pi artifact
