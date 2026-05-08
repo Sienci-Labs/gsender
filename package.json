@@ -83,7 +83,12 @@
 		"install:packages": "yarn install && yarn install --prefix /src/app",
 		"check-types": "tsc --noEmit -p ./src/app/src",
 		"test:unit": "jest",
-		"test:unit:watch": "jest --watch"
+		"test:unit:watch": "jest --watch",
+		"report:clean": "rm -rf cypress/reports",
+		"dashboard:build": "node cypress/dashboard/generate-dashboard.js",
+		"dashboard:generate": "yarn report:clean && npx cypress run --headed --browser chrome --spec \"cypress/e2e/grblHal/A_grblHal_master_spec.cy.js\"",
+		"dashboard:open": "start cypress\\dashboard\\report\\index.html"
+		
 	},
 	"build": {
 		"appId": "org.sienci.gsender-edge",
@@ -359,6 +364,7 @@
 		"cypress": "^13.4.0",
 		"cypress-grep": "^3.0.4",
 		"cypress-mochawesome-reporter": "^4.0.2",
+		"cypress-multi-reporters": "^2.0.5",
 		"cypress-real-events": "^1.11.0",
 		"date-fns": "^4.1.0",
 		"detect-browser": "~4.4.0",
@@ -384,6 +390,10 @@
 		"jszip": "^3.10.1",
 		"lucide-react": "^0.428.0",
 		"memoize-one": "~5.0.4",
+		"mocha-junit-reporter": "^2.2.1",
+		"mochawesome": "^7.1.4",
+		"mochawesome-merge": "^5.1.1",
+		"mochawesome-report-generator": "^6.3.2",
 		"moment": "^2.30.1",
 		"mousetrap": "~1.6.3",
 		"namespace-constants": "^1.0.1",

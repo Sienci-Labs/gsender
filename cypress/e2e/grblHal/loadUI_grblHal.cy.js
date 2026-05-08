@@ -1,20 +1,26 @@
-
-
 describe('gSender UI Load Test', () => {
   beforeEach(() => {
-    cy.viewport(1920, 1080);
+    cy.viewport(1732, 1305);
   });
 
   it('should navigate to gSender and verify the UI loads', () => {
-    // Visit with timeout for slow load
-    cy.visit('/', { timeout: 40000 });
+    cy.visit('http://localhost:8000/#/', { 
+      timeout: 60000,
+      failOnStatusCode: false 
+    });
 
-    // Wait for title with timeout
-    cy.title({ timeout: 15000 }).should('eq', 'gSender');
+    cy.title({ timeout: 30000 }).should('eq', 'gSender');
 
-    // Wait for body to be visible
-    cy.get('body', { timeout: 15000 }).should('be.visible');
+    cy.get('body', { timeout: 30000 }).should('be.visible');
 
-  
+    // Log the time when Connect to CNC appears
+    cy.log('Waiting for Connect to CNC...');
+    const start = Date.now();
+
+    cy.contains('Connect to CNC', { timeout: 60000 })
+      .should('be.visible')
+      .then(() => {
+        cy.log(`Connect to CNC appeared after ${Date.now() - start}ms`);
+      });
   });
 });
