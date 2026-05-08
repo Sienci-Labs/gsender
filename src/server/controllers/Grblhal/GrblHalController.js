@@ -1735,7 +1735,8 @@ class GrblHalController {
 
                 // Insert dwell for firmware < ATCI_SUPPORTED_VERSION where $392 is not acted on by firmware
                 const semver = this.runner.settings?.version?.semver ?? 0;
-                const spindleOnDelay = Number(_.get(this.settings, ['settings', '$392'], 0));
+                const preferences = store.get('preferences', {});
+                const spindleOnDelay = Number(_.get(preferences, 'spindleDelay', 0));
                 console.log('Spindle delay: ', spindleOnDelay);
                 if (semver < ATCI_SUPPORTED_VERSION && spindleOnDelay > 0) {
                     gcode = gcode.replace(/\b(?:S\d* ?M[34]|M[34] ?S\d*)\b(?! ?G4 ?P?\b)/g, `$& G4 P${spindleOnDelay}`);
@@ -1769,6 +1770,8 @@ class GrblHalController {
                 this.command('gcode:start');
             },
             'gcode:start': () => {
+                const preferences = store.get('preferences', {});
+                const defaultSpindleDelay = Number(_.get(preferences, 'spindleDelay', 0));
                 const [lineToStartFrom, zMax, safeHeight = 10] = args;
                 const totalLines = this.sender.state.total;
                 const startEventEnabled = this.event.hasEnabledEvent(PROGRAM_START);
@@ -1889,7 +1892,9 @@ class GrblHalController {
                     modalGCode.push(`${modal.units} ${modal.distance} ${modal.arc} ${modalWcs} ${modal.plane} ${coolant.flood} ${coolant.mist}`);
                     modalGCode.push(`F${feedRate}`);
                     modalGCode.push(setModalGcode);
-                    modalGCode.push('G4 P1');
+                    if (defaultSpindleDelay > 0) {
+                        modalGCode.push(`G4 P${defaultSpindleDelay}`);
+                    }
                     modalGCode.push('%_GCODE_START');
                     // console.log(modalGCode);
 

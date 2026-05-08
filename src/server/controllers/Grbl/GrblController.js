@@ -1528,7 +1528,9 @@ class GrblController {
                 this.command('gcode:start');
             },
             'gcode:start': () => {
-                const [lineToStartFrom, zMax, safeHeight = 10, spindleDelay = 1] = args;
+                const preferences = store.get('preferences', {});
+                const defaultSpindleDelay = Number(_.get(preferences, 'spindleDelay', 0));
+                const [lineToStartFrom, zMax, safeHeight = 10, spindleDelay = defaultSpindleDelay] = args;
                 const totalLines = this.sender.state.total;
                 const startEventEnabled = this.event.hasEnabledEvent(PROGRAM_START);
                 log.info(startEventEnabled);
