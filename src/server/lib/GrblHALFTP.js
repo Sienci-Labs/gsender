@@ -38,7 +38,29 @@ export class GrblHALFTP extends events.EventEmitter {
     }
 
     async sendFile(fileData) {
-        const { name, data } = fileData;
+        const { name } = fileData;
+        let { data } = fileData;
+
+        // Convert content to data Buffer if needed (matches YModemUSB pattern)
+        if (!data) {
+            if (typeof fileData.content === 'string') {
+                console.log(`sendFile: converting content string to Buffer for "${name}"`);
+                data = Buffer.from(fileData.content, 'utf8');
+            } else {
+                data = Buffer.alloc(0);
+            }
+        } else if (!Buffer.isBuffer(data)) {
+            if (typeof fileData.content === 'string') {
+                console.log(`sendFile: converting content string to Buffer for "${name}"`);
+                data = Buffer.from(fileData.content, 'utf8');
+            } else if (typeof data === 'string') {
+                console.log(`sendFile: converting data string to Buffer for "${name}"`);
+                data = Buffer.from(data, 'utf8');
+            } else {
+                data = Buffer.from(data);
+            }
+        }
+
         const dataStream = Readable.from(data);
         this.emit('start');
         await this.client.uploadFrom(dataStream, name);
@@ -50,7 +72,29 @@ export class GrblHALFTP extends events.EventEmitter {
     async sendFiles(files = []) {
         this.emit('start');
         for (const fileData of files) {
-            const { name, data } = fileData;
+            const { name } = fileData;
+            let { data } = fileData;
+
+            // Convert content to data Buffer if needed (matches YModemUSB pattern)
+            if (!data) {
+                if (typeof fileData.content === 'string') {
+                    console.log(`sendFiles: converting content string to Buffer for "${name}"`);
+                    data = Buffer.from(fileData.content, 'utf8');
+                } else {
+                    data = Buffer.alloc(0);
+                }
+            } else if (!Buffer.isBuffer(data)) {
+                if (typeof fileData.content === 'string') {
+                    console.log(`sendFiles: converting content string to Buffer for "${name}"`);
+                    data = Buffer.from(fileData.content, 'utf8');
+                } else if (typeof data === 'string') {
+                    console.log(`sendFiles: converting data string to Buffer for "${name}"`);
+                    data = Buffer.from(data, 'utf8');
+                } else {
+                    data = Buffer.from(data);
+                }
+            }
+
             const dataStream = Readable.from(data);
             // eslint-disable-next-line no-await-in-loop
             await this.client.uploadFrom(dataStream, name);
