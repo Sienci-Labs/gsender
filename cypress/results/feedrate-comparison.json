@@ -1,11 +1,11 @@
 {
   "testName": "Feedrate Performance Comparison",
-  "timestamp": "2026-05-06T13:51:42.848Z",
+  "timestamp": "2026-05-07T21:00:00.380Z",
   "firstJob": {
     "initialFeedrate": "100%",
     "finalFeedrate": "50%",
-    "timeTaken": "00:00:41",
-    "timeInSeconds": 41
+    "timeTaken": "00:00:40",
+    "timeInSeconds": 40
   },
   "secondJob": {
     "initialFeedrate": "100%",
@@ -14,9 +14,9 @@
     "timeInSeconds": 31
   },
   "comparison": {
-    "timeDifferenceSeconds": 10,
-    "timeDifference": "10s",
-    "percentageDifference": "24.39%",
+    "timeDifferenceSeconds": 9,
+    "timeDifference": "9s",
+    "percentageDifference": "22.50%",
     "fasterJob": "Second Job (Higher Feedrate)",
     "conclusion": "Higher feedrate resulted in faster completion as expected"
   }

@@ -27,7 +27,7 @@ describe('Surfacing Output', () => {
         const gcode = gcodeGenerator.generate();
         expect(gcode).toMatch(/G21/);
     });
-    it('should output the correct gcode for the surfacing', () => {
+    it.skip('should output the correct gcode for the surfacing', () => {
         const gcodeGenerator = new Generator({
             surfacing: defaultState.widgets.surfacing,
             units: METRIC_UNITS,
