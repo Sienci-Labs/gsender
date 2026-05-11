@@ -1356,14 +1356,27 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         eID: '$394',
                     },
                     {
-                        label: 'Spindle on delay',
+                        type: 'eeprom',
+                        eID: '$392',
+                    },
+                    {
+                        label: 'Insert dwell for spindle commands',
                         key: 'widgets.spindle.delay',
                         description:
-                            'Adds a delay to give the spindle time to spin up. ($392, Default 0)',
-                        type: 'hybrid',
-                        eID: '$392',
+                            'Adds a delay to give the spindle time to spin up.  This will insert a G4 command on every M3/M4 within the file, and is unnecessary if your firmware otherwise handles spindle-at-speed operations. (Default 0)',
+                        type: 'number',
                         unit: 's',
-                        hideWhenFirmwareCurrent: true,
+                        defaultValue: 0,
+                        onUpdate: () => {
+                            const delay = Number(
+                                store.get('widgets.spindle.delay', 0),
+                            );
+                            controller.command('settings:updated', {
+                                spindleDelay: Number.isFinite(delay)
+                                    ? delay
+                                    : 0,
+                            });
+                        },
                     },
 
                     {
