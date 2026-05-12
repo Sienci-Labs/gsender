@@ -21,6 +21,8 @@
  *
  */
 
+import ReactDOM from 'react-dom';
+import { useState, useEffect } from 'react';
 import Instructions from 'app/features/Helper/components/Instructions';
 import Stepper from 'app/features/Helper/components/Stepper';
 import Controls from 'app/features/Helper/components/Controls';
@@ -58,19 +60,45 @@ export function updateToolchangeContext(mappings = null) {
 }
 
 const Wizard = () => {
-    const { title, visible, minimized, activeStep, activeSubstep, steps } =
-        useWizardContext();
+    const { title, visible, minimized, overlay } = useWizardContext();
+    const [vizEl, setVizEl] = useState<Element | null>(null);
+
+    useEffect(() => {
+        setVizEl(document.getElementById('visualizer_container'));
+    }, []);
 
     if (!visible) return null;
 
+    // Minimized: compact pill at top-center of visualizer
+    if (minimized) {
+        const pill = (
+            <div className="absolute top-2 left-1/2 -translate-x-1/2 z-50 pointer-events-auto flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/90 dark:bg-[#18181f]/90 backdrop-blur-sm border border-gray-200 dark:border-[#2a2a35] shadow-md">
+                <Wrench size={12} className="text-gray-500 dark:text-gray-400 shrink-0" />
+                <span className="font-medium text-gray-700 dark:text-[#e5e5ea] text-xs whitespace-nowrap">{title}</span>
+                <MinMaxButton />
+                <CancelButton />
+            </div>
+        );
+
+        if (vizEl) {
+            return ReactDOM.createPortal(pill, vizEl);
+        }
+        // Fallback: fixed at top of visualizer area
+        return (
+            <div className="fixed top-14 max-xl:top-12 left-0 right-[33%] flex justify-center z-[200] pointer-events-none">
+                {pill}
+            </div>
+        );
+    }
+
     return (
         <>
-            {/* Backdrop — blocks jog controls / DRO widgets when modal is open */}
-            {!minimized && (
+            {/* Backdrop — only when not overlay (jog-safe) mode */}
+            {!overlay && (
                 <div className="fixed inset-0 bg-black/55 z-[199] pointer-events-auto" />
             )}
 
-            <div className="fixed inset-0 flex items-center justify-center z-[200] pointer-events-none">
+            <div className="fixed inset-y-0 left-0 right-[33%] flex items-center justify-center z-[200] pointer-events-none">
                 <div className="pointer-events-auto w-[860px] rounded-lg overflow-hidden shadow-2xl border border-gray-300/50 dark:border-[#2a2a35] bg-white dark:bg-[#18181f]">
 
                     {/* Titlebar */}
@@ -80,9 +108,6 @@ const Wizard = () => {
                             <span className="font-semibold text-base text-gray-900 dark:text-[#e5e5ea]">
                                 {title}
                             </span>
-                            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400">
-                                Step {activeStep + 1} of {steps.length} · {activeSubstep + 1}/{steps[activeStep]?.substeps?.length ?? 1}
-                            </span>
                         </div>
                         <div className="flex gap-1">
                             <MinMaxButton />
@@ -91,15 +116,13 @@ const Wizard = () => {
                     </div>
 
                     {/* Body */}
-                    {!minimized && (
-                        <div className="flex h-[420px]">
-                            <Stepper />
-                            <Instructions />
-                        </div>
-                    )}
+                    <div className="flex h-[420px]">
+                        <Stepper />
+                        <Instructions />
+                    </div>
 
                     {/* Footer */}
-                    {!minimized && <Controls />}
+                    <Controls />
                 </div>
             </div>
         </>

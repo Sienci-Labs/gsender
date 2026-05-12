@@ -15,9 +15,9 @@ const Stepper = () => {
                 return (
                     <div key={si}>
                         {/* Step group header */}
-                        <div className="flex items-center gap-1.5 px-3 pt-2.5 pb-1.5">
+                        <div className="flex items-start gap-1.5 px-3 pt-2.5 pb-1.5">
                             <div className={cx(
-                                'w-[18px] h-[18px] rounded-full flex items-center justify-center text-[10px] font-medium shrink-0',
+                                'w-[18px] h-[18px] rounded-full flex items-center justify-center text-[10px] font-medium shrink-0 mt-px',
                                 stepDone
                                     ? 'bg-emerald-100 dark:bg-[#052e16] text-emerald-700 dark:text-[#6ee7b7]'
                                     : stepActive
@@ -26,16 +26,23 @@ const Stepper = () => {
                             )}>
                                 {stepDone ? <Check size={9} /> : si + 1}
                             </div>
-                            <span className={cx(
-                                'text-xs font-medium leading-snug',
-                                stepDone
-                                    ? 'text-emerald-600 dark:text-[#9ca3af]'
-                                    : stepActive
-                                        ? 'text-blue-700 dark:text-blue-400'
-                                        : 'text-gray-400 dark:text-[#9ca3af]'
-                            )}>
-                                {step.title}
-                            </span>
+                            <div className="flex flex-col gap-0.5">
+                                <span className={cx(
+                                    'text-xs font-medium leading-snug',
+                                    stepDone
+                                        ? 'text-emerald-600 dark:text-[#9ca3af]'
+                                        : stepActive
+                                            ? 'text-blue-700 dark:text-blue-400'
+                                            : 'text-gray-400 dark:text-[#9ca3af]'
+                                )}>
+                                    {step.title}
+                                </span>
+                                {step.firstRunOnly && (
+                                    <span className="inline-block text-[10px] px-1.5 py-0.5 rounded bg-amber-100 dark:bg-[#2a1e00] text-amber-800 dark:text-amber-400">
+                                        First run only
+                                    </span>
+                                )}
+                            </div>
                         </div>
 
                         {/* Substep rows — only when there are multiple substeps */}
