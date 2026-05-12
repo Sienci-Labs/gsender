@@ -526,12 +526,16 @@ class GrblHalController {
 
                     let tool = line.match(toolCommand);
                     log.debug('Found tool');
+                    let toolLabel = tool?.[0] || null;
+                    let toolNumber = tool?.[2] || null;
                     if (tool && this.toolChangeContext.mappings) {
                         const remap = _.get(this.toolChangeContext.mappings, tool[2], null);
 
                         if (remap) {
                             log.debug(`Mapping ${tool} to T${remap}`);
                             line = line.replace(tool[0], `T${remap}`);
+                            toolLabel = `T${remap}`;
+                            toolNumber = String(remap);
                         } else {
                             log.debug(`no remap found for ${tool}`);
                         }
@@ -540,8 +544,8 @@ class GrblHalController {
                     // Handle specific cases for macro and pause, ignore is default and comments line out with no other action
                     // If toolchange is at very beginning of file, ignore it
                     if (toolChangeOption !== 'Ignore') {
-                        if (tool) {
-                            commentString = `(${tool?.[0]}) ` + commentString;
+                        if (toolLabel) {
+                            commentString = `(${toolLabel}) ` + commentString;
                         }
                         this.workflow.pause({ data: 'M6', comment: commentString });
 
@@ -555,13 +559,13 @@ class GrblHalController {
 
                             this.toolChanger.addInterval(() => {
                                 // Emit the current state so latest tool info is available
-                                this.runner.setTool(tool?.[2]); // set tool in runner state
-                                this.emit('controller:state', GRBLHAL, this.state, tool?.[2]); // set tool in redux
+                                this.runner.setTool(toolNumber); // set tool in runner state
+                                this.emit('controller:state', GRBLHAL, this.state, toolNumber); // set tool in redux
                                 this.emit('gcode:toolChange', {
                                     line: sent + 1,
                                     count,
                                     block: line,
-                                    tool: tool,
+                                    tool: toolLabel,
                                     option: toolChangeOption
                                 }, commentString);
                             });

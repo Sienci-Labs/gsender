@@ -23,23 +23,50 @@
 
 import React from 'react';
 import { CheckCircle } from 'lucide-react';
+import { getToolString } from 'app/lib/toolChangeUtils';
 import { useWizardContext } from 'app/features/Helper/context';
 import Substep from 'app/features/Helper/components/Substep';
+import ToolRequirementBanner from 'app/features/Helper/components/ToolRequirementBanner';
+
+const getToolLabel = (toolchangeContext) => {
+    const backendTool =
+        toolchangeContext?.tool ?? toolchangeContext?.modal?.tool;
+
+    if (Array.isArray(backendTool)) {
+        return backendTool[0] || null;
+    }
+
+    if (backendTool !== undefined && backendTool !== null && backendTool !== '') {
+        const toolValue = String(backendTool).trim();
+        return toolValue.toUpperCase().startsWith('T') ? toolValue : `T${toolValue}`;
+    }
+
+    const fallbackTool = getToolString();
+    return fallbackTool === 'T-' ? null : fallbackTool;
+};
 
 const Instructions = () => {
-    const { steps, intro, activeStep, activeSubstep } = useWizardContext();
+    const {
+        steps,
+        intro,
+        activeStep,
+        activeSubstep,
+        toolchangeContext,
+        toolchangeComment,
+    } = useWizardContext();
     const step = steps[activeStep];
     if (!step) return null;
     const substep = step.substeps[activeSubstep];
     if (!substep) return null;
+    const toolLabel = substep.toolBanner ? getToolLabel(toolchangeContext) : null;
 
     return (
         <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3 bg-white dark:bg-[#18181f]">
             {/* Breadcrumb */}
-            <div className="flex items-center gap-1 text-xs text-gray-400 dark:text-[#4b5563]">
+            <div className="flex items-center gap-1 text-xs text-gray-400 dark:text-[#9ca3af]">
                 <span>{step.title}</span>
-                <span className="text-gray-300 dark:text-[#2a2a35]">›</span>
-                <span className="text-gray-600 dark:text-[#9ca3af]">{substep.title}</span>
+                <span className="text-gray-300 dark:text-[#9ca3af]">›</span>
+                <span className="text-gray-600 dark:text-white">{substep.title}</span>
             </div>
             {/* Warning banner — first step only */}
             {intro && activeStep === 0 && activeSubstep === 0 && (
@@ -47,6 +74,12 @@ const Instructions = () => {
                     <CheckCircle size={13} className="shrink-0" />
                     {intro}
                 </div>
+            )}
+            {substep.toolBanner && (
+                <ToolRequirementBanner
+                    toolLabel={toolLabel}
+                    comment={toolchangeComment}
+                />
             )}
 
             <Substep

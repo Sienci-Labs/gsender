@@ -172,6 +172,7 @@ const createWizard = (count: number) => {
                             );
                         },
                         overlay: false,
+                        toolBanner: true,
                         actions: [
                             {
                                 label: 'Probe Changed Tool',

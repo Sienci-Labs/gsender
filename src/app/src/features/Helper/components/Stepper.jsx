@@ -29,10 +29,10 @@ const Stepper = () => {
                             <span className={cx(
                                 'text-xs font-medium leading-snug',
                                 stepDone
-                                    ? 'text-emerald-600 dark:text-[#34d399]'
+                                    ? 'text-emerald-600 dark:text-[#9ca3af]'
                                     : stepActive
                                         ? 'text-blue-700 dark:text-blue-400'
-                                        : 'text-gray-400 dark:text-[#4b5563]'
+                                        : 'text-gray-400 dark:text-[#9ca3af]'
                             )}>
                                 {step.title}
                             </span>
@@ -61,10 +61,10 @@ const Stepper = () => {
                                     <span className={cx(
                                         'text-xs leading-snug',
                                         subDone
-                                            ? 'text-gray-500 dark:text-[#6b7280]'
+                                            ? 'text-gray-500 dark:text-[#9ca3af]'
                                             : subActive
                                                 ? 'font-medium text-blue-700 dark:text-blue-300'
-                                                : 'text-gray-400 dark:text-[#4b5563]'
+                                                : 'text-gray-400 dark:text-[#9ca3af]'
                                     )}>
                                         {sub.title}
                                     </span>

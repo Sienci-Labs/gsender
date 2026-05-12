@@ -101,6 +101,7 @@ const getMoveToToolchangePositionSubstep = () => ({
         </div>
     ),
     overlay: false,
+    toolBanner: true,
     actions: [
         {
             label: 'Move to Tool Change Location',
@@ -194,6 +195,7 @@ const createWizard = (count: number) => {
                             </div>
                         ),
                         overlay: false,
+                        toolBanner: !hasManualToolchangePosition,
                         actions: [
                             {
                                 label: 'Probe Changed Tool',

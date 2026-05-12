@@ -40,6 +40,8 @@ export const WizardProvider = ({ children }) => {
     const [completedStep, setCompletedStep] = useState(-1);
     const [completedSubStep, setCompletedSubStep] = useState(-1);
     const [intro, setIntro] = useState(null);
+    const [toolchangeContext, setToolchangeContext] = useState(null);
+    const [toolchangeComment, setToolchangeComment] = useState('');
     const [activeStep, setActiveStep] = useState(0);
     const [activeSubstep, setActiveSubstep] = useState(0);
     const [title, setTitle] = useState('Wizard');
@@ -62,6 +64,9 @@ export const WizardProvider = ({ children }) => {
             setActiveSubstep(0);
             setTitle('Wizard');
             setSteps([]);
+            setIntro(null);
+            setToolchangeContext(null);
+            setToolchangeComment('');
             setStepCount(0);
             setMinimized(false);
             reduxStore.dispatch(disableWizard());
@@ -174,6 +179,9 @@ export const WizardProvider = ({ children }) => {
                         setActiveSubstep(0);
                         setTitle('Wizard');
                         setSteps([]);
+                        setIntro(null);
+                        setToolchangeContext(null);
+                        setToolchangeComment('');
                         setStepCount(0);
                         setMinimized(false);
                         reduxStore.dispatch(disableWizard());
@@ -198,6 +206,9 @@ export const WizardProvider = ({ children }) => {
                     setActiveSubstep(0);
                     setTitle('Wizard');
                     setSteps([]);
+                    setIntro(null);
+                    setToolchangeContext(null);
+                    setToolchangeComment('');
                     setStepCount(0);
                     setMinimized(false);
                     return {};
@@ -230,7 +241,7 @@ export const WizardProvider = ({ children }) => {
                     stepIndex === completedStep
                 );
             },
-            load: (instructions, title) => {
+            load: (instructions, title, metadata = {}) => {
                 if (!instructions || !instructions.steps) {
                     return;
                 }
@@ -245,9 +256,9 @@ export const WizardProvider = ({ children }) => {
                 setSteps([...instructions.steps]);
                 setStepCount(instructions.steps.length);
                 setTitle(title);
-                if (instructions.intro) {
-                    setIntro(instructions.intro.description);
-                }
+                setIntro(instructions.intro?.description ?? null);
+                setToolchangeContext(metadata.context ?? null);
+                setToolchangeComment(metadata.comment ?? '');
 
                 setActiveStep(0);
                 setVisible(true);
@@ -305,6 +316,9 @@ export const WizardProvider = ({ children }) => {
                 setActiveSubstep(0);
                 setTitle('Wizard');
                 setSteps([]);
+                setIntro(null);
+                setToolchangeContext(null);
+                setToolchangeComment('');
                 setStepCount(0);
                 setMinimized(false);
                 setIsLoading(false);
@@ -347,6 +361,8 @@ export const WizardProvider = ({ children }) => {
                 isLoading,
                 overlay,
                 intro,
+                toolchangeContext,
+                toolchangeComment,
             }}
         >
             <WizardAPI.Provider value={api}>{children}</WizardAPI.Provider>

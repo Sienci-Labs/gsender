@@ -75,6 +75,7 @@ const wizard = {
                     description: () =>
                         `Change over to the next tool (${getToolString()})`,
                     overlay: false,
+                    toolBanner: true,
                 },
             ],
         },
