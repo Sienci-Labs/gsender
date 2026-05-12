@@ -51,27 +51,42 @@ const Actions = ({ actions = [], stepIndex, substepIndex }) => {
         return activeState !== GRBL_ACTIVE_STATE_IDLE;
     };
 
+    // Always-current ref so the pubsub handler never reads stale props/API.
+    // The subscription is registered once ([] deps) but cbRef.current is
+    // updated on every render before any async event can fire.
+    const cbRef = useRef(null);
+    cbRef.current = {
+        stepIndex,
+        substepIndex,
+        markActionAsComplete,
+        completeSubStep,
+        updateSubstepOverlay,
+        scrollToActiveStep,
+        setIsLoading,
+    };
+
     useEffect(() => {
         const tokens = [
             pubsub.subscribe('wizard:next', (msg, indexes) => {
                 const { stepIndex: stepIn, substepIndex: subStepIn } = indexes;
-                if (stepIn === stepIndex && subStepIn === substepIndex) {
+                const cb = cbRef.current;
+                if (stepIn === cb.stepIndex && subStepIn === cb.substepIndex) {
                     // Batch all state updates so the component doesn't unmount
                     // mid-handler (React 17 doesn't auto-batch async callbacks)
                     unstable_batchedUpdates(() => {
-                        markActionAsComplete(stepIndex, substepIndex);
-                        const activeValues = completeSubStep(
-                            stepIndex,
-                            substepIndex,
+                        cb.markActionAsComplete(cb.stepIndex, cb.substepIndex);
+                        const activeValues = cb.completeSubStep(
+                            cb.stepIndex,
+                            cb.substepIndex,
                         );
-                        updateSubstepOverlay(activeValues);
-                        scrollToActiveStep(activeValues);
-                        setIsLoading(false);
+                        cb.updateSubstepOverlay(activeValues);
+                        cb.scrollToActiveStep(activeValues);
+                        cb.setIsLoading(false);
                     });
                 }
             }),
-            pubsub.subscribe('error', (msg, error) => {
-                setIsLoading(false);
+            pubsub.subscribe('error', () => {
+                cbRef.current.setIsLoading(false);
             }),
         ];
 
