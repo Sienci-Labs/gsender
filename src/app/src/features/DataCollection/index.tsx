@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { FaUserShield } from 'react-icons/fa';
 
 import {
@@ -7,50 +7,27 @@ import {
     SheetHeader,
     SheetTitle,
 } from 'app/components/shadcn/Sheet';
-import api from 'app/api';
-import { USER_DATA_COLLECTION } from 'app/constants';
 import Button from 'app/components/Button';
 import { usePostHog } from '@posthog/react';
 
 const DataCollection = () => {
     const posthog = usePostHog();
-    const [open, setOpen] = useState(false);
-
-    useEffect(() => {
-        handleDataCollection();
-    }, []);
-
-    const handleDataCollection = () => {
-        setTimeout(async () => {
-            try {
-                const response = await api.metrics.getCollectDataStatus();
-                const currentStatus = response.data.collectUserDataStatus;
-
-                setOpen(currentStatus === USER_DATA_COLLECTION.INITIAL);
-            } catch (error) {
-                console.error(error);
-            }
-        }, 3000);
-    };
+    const [open, setOpen] = useState(true);
 
     const handleAccept = async () => {
-        await api.metrics.updateCollectDataStatus(
-            USER_DATA_COLLECTION.ACCEPTED,
-        );
-        posthog?.capture('data_collection_accepted');
+        posthog.opt_in_capturing();
         setOpen(false);
     };
 
     const handleDecline = async () => {
-        await api.metrics.updateCollectDataStatus(
-            USER_DATA_COLLECTION.REJECTED,
-        );
-        posthog?.capture('data_collection_declined');
+        posthog.opt_out_capturing();
         setOpen(false);
     };
 
+    const consentStatus = posthog.get_explicit_consent_status();
+
     return (
-        <Sheet open={open} onOpenChange={setOpen}>
+        <Sheet open={open && consentStatus === 'pending'} onOpenChange={setOpen}>
             <SheetContent
                 side="bottom"
                 className="bg-white"
