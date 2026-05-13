@@ -31,28 +31,52 @@ import { useWizardAPI, useWizardContext } from 'app/features/Helper/context';
 import { Terminal } from 'lucide-react';
 import { useSelector } from 'react-redux';
 
-const Actions = ({ actions = [], stepIndex, substepIndex }) => {
-    const [tooltip, setTooltip] = useState(null); // { index, rect, lines }
-    const tooltipTimer = useRef(null);
-    const loadingStartRef = useRef(null);
+interface WizardAction {
+    label: string;
+    gcodeLines: string[];
+}
+
+interface TooltipState {
+    index: number;
+    rect: DOMRect;
+    lines: string[];
+}
+
+interface CbRef {
+    stepIndex: number;
+    substepIndex: number;
+    isLastSubstep: boolean;
+    markActionAsComplete: (stepIndex: number, substepIndex: number) => void;
+    completeSubStep: (stepIndex: number, substepIndex: number) => Record<string, number>;
+    setIsLoading: (loading: boolean) => void;
+}
+
+interface ActionsProps {
+    actions?: WizardAction[];
+    stepIndex: number;
+    substepIndex: number;
+}
+
+const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
+    const [tooltip, setTooltip] = useState<TooltipState | null>(null);
+    const tooltipTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const loadingStartRef = useRef<number | null>(null);
     const {
         markActionAsComplete,
         completeSubStep,
         setIsLoading,
     } = useWizardAPI();
     const { isLoading, steps } = useWizardContext();
-    const activeState = useSelector((state) =>
+    const activeState = useSelector((state: Record<string, unknown>) =>
         get(state, 'controller.state.status.activeState', ''),
     );
 
-    const isNotIdle = () => {
-        return activeState !== GRBL_ACTIVE_STATE_IDLE;
-    };
+    const isNotIdle = () => activeState !== GRBL_ACTIVE_STATE_IDLE;
 
     // Always-current ref so the pubsub handler never reads stale props/API.
     // The subscription is registered once ([] deps) but cbRef.current is
     // updated on every render before any async event can fire.
-    const cbRef = useRef(null);
+    const cbRef = useRef<CbRef | null>(null);
     const isLastSubstep =
         stepIndex === steps.length - 1 &&
         substepIndex === (steps[stepIndex]?.substeps?.length ?? 1) - 1;
@@ -68,9 +92,10 @@ const Actions = ({ actions = [], stepIndex, substepIndex }) => {
 
     useEffect(() => {
         const tokens = [
-            pubsub.subscribe('wizard:next', (msg, indexes) => {
+            pubsub.subscribe('wizard:next', (msg: string, indexes: { stepIndex: number; substepIndex: number }) => {
                 const { stepIndex: stepIn, substepIndex: subStepIn } = indexes;
                 const cb = cbRef.current;
+                if (!cb) return;
                 if (stepIn === cb.stepIndex && subStepIn === cb.substepIndex) {
                     const MIN_LOADING_MS = 1250;
                     const elapsed = Date.now() - (loadingStartRef.current ?? 0);
@@ -85,7 +110,7 @@ const Actions = ({ actions = [], stepIndex, substepIndex }) => {
                 }
             }),
             pubsub.subscribe('error', () => {
-                cbRef.current.setIsLoading(false);
+                cbRef.current?.setIsLoading(false);
             }),
         ];
 
@@ -93,7 +118,7 @@ const Actions = ({ actions = [], stepIndex, substepIndex }) => {
             tokens.forEach((token) => {
                 pubsub.unsubscribe(token);
             });
-            clearTimeout(tooltipTimer.current);
+            if (tooltipTimer.current) clearTimeout(tooltipTimer.current);
         };
     }, []);
 
@@ -139,14 +164,15 @@ const Actions = ({ actions = [], stepIndex, substepIndex }) => {
                                             className="flex items-center gap-2 min-w-0 cursor-default"
                                             onMouseEnter={(e) => {
                                                 if (!action.gcodeLines?.length) return;
-                                                const chipEl = e.currentTarget.closest('[data-chip]');
+                                                const chipEl = (e.currentTarget as HTMLElement).closest('[data-chip]');
+                                                if (!chipEl) return;
                                                 tooltipTimer.current = setTimeout(() => {
                                                     const rect = chipEl.getBoundingClientRect();
                                                     setTooltip({ index, rect, lines: action.gcodeLines });
                                                 }, 1200);
                                             }}
                                             onMouseLeave={() => {
-                                                clearTimeout(tooltipTimer.current);
+                                                if (tooltipTimer.current) clearTimeout(tooltipTimer.current);
                                                 setTooltip(null);
                                             }}
                                         >

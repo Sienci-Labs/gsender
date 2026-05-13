@@ -40,7 +40,7 @@ const Controls = () => {
 
     const { steps, activeStep, activeSubstep } = useWizardContext();
 
-    const activeState = useSelector((state) =>
+    const activeState = useSelector((state: Record<string, unknown>) =>
         get(state, 'controller.state.status.activeState', ''),
     );
 
@@ -53,10 +53,10 @@ const Controls = () => {
         activeSubstep === (steps[activeStep]?.substeps?.length ?? 1) - 1;
 
     const allSubsteps = steps.flatMap((s, si) =>
-        s.substeps.map((_, ssi) => ({ si, ssi })),
+        s.substeps.map((_: unknown, ssi: number) => ({ si, ssi })),
     );
     const flatCurrent = allSubsteps.findIndex(
-        ({ si, ssi }) => si === activeStep && ssi === activeSubstep,
+        ({ si, ssi }: { si: number; ssi: number }) => si === activeStep && ssi === activeSubstep,
     );
 
     return (
@@ -76,7 +76,7 @@ const Controls = () => {
             </button>
 
             <div className="flex items-center gap-1">
-                {allSubsteps.map((_, i) => (
+                {allSubsteps.map((_: unknown, i: number) => (
                     <div
                         key={i}
                         className={cx(

@@ -23,7 +23,12 @@
 
 import React from 'react';
 
-const ToolRequirementBanner = ({ toolLabel, comment }) => {
+interface ToolRequirementBannerProps {
+    toolLabel: string | null;
+    comment?: string;
+}
+
+const ToolRequirementBanner = ({ toolLabel, comment }: ToolRequirementBannerProps) => {
     if (!toolLabel) {
         return null;
     }

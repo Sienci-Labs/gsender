@@ -28,12 +28,12 @@ import { useWizardContext } from 'app/features/Helper/context';
 import Substep from 'app/features/Helper/components/Substep';
 import ToolRequirementBanner from 'app/features/Helper/components/ToolRequirementBanner';
 
-const getToolLabel = (toolchangeContext) => {
+const getToolLabel = (toolchangeContext: Record<string, unknown> | null): string | null => {
     const backendTool =
-        toolchangeContext?.tool ?? toolchangeContext?.modal?.tool;
+        (toolchangeContext?.tool ?? (toolchangeContext?.modal as Record<string, unknown>)?.tool) as unknown;
 
     if (Array.isArray(backendTool)) {
-        return backendTool[0] || null;
+        return (backendTool[0] as string) || null;
     }
 
     if (backendTool !== undefined && backendTool !== null && backendTool !== '') {

@@ -25,7 +25,27 @@ import React from 'react';
 import { Info } from 'lucide-react';
 import Actions from './Actions';
 
-const Substep = ({ step, index, stepIndex, firstRunOnly }) => {
+interface WizardAction {
+    label: string;
+    gcodeLines: string[];
+}
+
+interface WizardSubstep {
+    title: string;
+    description?: string | (() => React.ReactNode);
+    overlay?: boolean;
+    toolBanner?: boolean;
+    actions?: WizardAction[];
+}
+
+interface SubstepProps {
+    step: WizardSubstep;
+    index: number;
+    stepIndex: number;
+    firstRunOnly?: boolean;
+}
+
+const Substep = ({ step, index, stepIndex, firstRunOnly }: SubstepProps) => {
     return (
         <div className="flex flex-col gap-3" id={`step-${stepIndex}-${index}`}>
             <div className="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-amber-400">
