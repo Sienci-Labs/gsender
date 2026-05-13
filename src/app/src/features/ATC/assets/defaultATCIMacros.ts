@@ -2175,8 +2175,8 @@ export const defaultATCIMacros: ATCIMacroConfig = {
             value: 0,
         },
         _holder_sense: {
-            "default": 1,
-            "value": 1,
+            default: 1,
+            value: 1,
         },
         _pres_sense: {
             default: 1,
