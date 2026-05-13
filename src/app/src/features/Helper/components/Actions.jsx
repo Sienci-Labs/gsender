@@ -114,7 +114,7 @@ const Actions = ({ actions = [], stepIndex, substepIndex }) => {
                             stepIndex,
                             substepIndex,
                         );
-                        action.cb();
+                        controller.command('gcode', action.gcodeLines);
                     };
                     return (
                         <React.Fragment key={`action-${uniqueId()}`}>

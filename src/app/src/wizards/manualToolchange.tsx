@@ -20,10 +20,8 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-import controller from 'app/lib/controller';
 import {
     getProbeSettings,
-    getUnitModal,
     getToolString,
 } from 'app/lib/toolChangeUtils';
 
@@ -91,39 +89,23 @@ const wizard = {
                         {
                             label: 'Probe Z (touch plate)',
                             gcodeLines: [
+                                '(Probing Z 0 with probe thickness of [global.toolchange.PROBE_THICKNESS]mm)',
                                 'G91',
                                 'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
                                 'G0 Z[global.toolchange.RETRACT]',
                                 'G38.2 Z-10 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
+                                '%wait',
                                 'G10 L20 P0 Z[global.toolchange.PROBE_THICKNESS]',
                                 'G0 G21 Z10',
                             ],
-                            cb: () => {
-                                controller.command('gcode', [
-                                    '(Probing Z 0 with probe thickness of [global.toolchange.PROBE_THICKNESS]mm)',
-                                    'G91',
-                                    'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
-                                    'G0 Z[global.toolchange.RETRACT]',
-                                    'G38.2 Z-10 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
-                                    '%wait',
-                                    'G10 L20 P0 Z[global.toolchange.PROBE_THICKNESS]',
-                                    'G0 G21 Z10',
-                                ]);
-                            },
                         },
                         {
                             label: 'Set Z0 (paper method)',
                             gcodeLines: [
+                                '(Setting Z 0)',
                                 'G10 L20 P0 Z0',
                                 'G21',
                             ],
-                            cb: () => {
-                                controller.command('gcode', [
-                                    '(Setting Z 0)',
-                                    'G10 L20 P0 Z0',
-                                    'G21',
-                                ]);
-                            },
                         },
                     ],
                 },
@@ -141,24 +123,14 @@ const wizard = {
                         {
                             label: 'Resume Job',
                             gcodeLines: [
+                                '(Returning to initial position)',
                                 'G21',
-                                'G90 G21 G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]',
-                                'G90 G21 G0 Z[global.toolchange.ZPOS]',
+                                'G90 [global.toolchange.UNITS] G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]',
+                                'G90 [global.toolchange.UNITS] G0 Z[global.toolchange.ZPOS]',
+                                '(Restore initial modals)',
                                 'M3 [global.toolchange.UNITS] [global.toolchange.DISTANCE] [global.toolchange.FEEDRATE]',
                                 '%toolchange_complete',
                             ],
-                            cb: () => {
-                                const prefUnit = getUnitModal();
-                                controller.command('gcode', [
-                                    '(Returning to initial position)',
-                                    'G21',
-                                    `G90 ${prefUnit} G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]`,
-                                    `G90 ${prefUnit} G0 Z[global.toolchange.ZPOS]`,
-                                    '(Restore initial modals)',
-                                    'M3 [global.toolchange.UNITS] [global.toolchange.DISTANCE] [global.toolchange.FEEDRATE]',
-                                    '%toolchange_complete',
-                                ]);
-                            },
                         },
                     ],
                 },

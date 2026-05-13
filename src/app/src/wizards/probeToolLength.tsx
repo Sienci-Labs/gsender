@@ -22,7 +22,7 @@
  */
 import controller from 'app/lib/controller';
 import store from 'app/store';
-import { getProbeSettings, getUnitModal } from 'app/lib/toolChangeUtils';
+import { getProbeSettings } from 'app/lib/toolChangeUtils';
 import { store as reduxStore } from 'app/store/redux';
 import get from 'lodash/get';
 
@@ -102,28 +102,14 @@ const createWizard = () => {
                                     'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
                                     'G0 Z[global.toolchange.RETRACT]',
                                     'G38.2 Z-10 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
+                                    'G4 P0.3',
                                     'G43.1 Z0',
+                                    '%global.toolchange.TOOL_OFFSET=posz',
+                                    '(TLO set: [global.toolchange.TOOL_OFFSET])',
+                                    'G0 Z[global.toolchange.RETRACT]',
+                                    'G90 G21',
                                     'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
                                 ],
-                                cb: () => {
-                                    controller.command('gcode', [
-                                        'G91 G21',
-                                        'G49', // cancel applied TLO offsets
-                                        'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
-                                        'G53 G0 X[global.toolchange.PROBE_POS_X] Y[global.toolchange.PROBE_POS_Y]',
-                                        'G53 G0 Z[global.toolchange.PROBE_POS_Z]',
-                                        'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
-                                        'G0 Z[global.toolchange.RETRACT]',
-                                        'G38.2 Z-10 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
-                                        'G4 P0.3',
-                                        'G43.1 Z0', // Set Z0 on initial tool offset
-                                        '%global.toolchange.TOOL_OFFSET=posz',
-                                        '(TLO set: [global.toolchange.TOOL_OFFSET])',
-                                        'G0 Z[global.toolchange.RETRACT]',
-                                        'G90 G21',
-                                        'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
-                                    ]);
-                                },
                             },
                         ],
                     },
@@ -141,24 +127,14 @@ const createWizard = () => {
                             {
                                 label: 'Resume',
                                 gcodeLines: [
+                                    '(Returning to initial position)',
                                     'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
-                                    'G90 G21 G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]',
-                                    'G90 G21 G0 Z[global.toolchange.ZPOS]',
+                                    'G90 [global.toolchange.UNITS] G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]',
+                                    'G90 [global.toolchange.UNITS] G0 Z[global.toolchange.ZPOS]',
+                                    '(Restore initial modals)',
                                     'M3 [global.toolchange.UNITS] [global.toolchange.DISTANCE] [global.toolchange.FEEDRATE]',
                                     '%toolchange_complete',
                                 ],
-                                cb: () => {
-                                    const unit = getUnitModal();
-                                    controller.command('gcode', [
-                                        '(Returning to initial position)',
-                                        'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
-                                        `G90 ${unit} G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]`,
-                                        `G90 ${unit} G0 Z[global.toolchange.ZPOS]`,
-                                        '(Restore initial modals)',
-                                        'M3 [global.toolchange.UNITS] [global.toolchange.DISTANCE] [global.toolchange.FEEDRATE]',
-                                        '%toolchange_complete',
-                                    ]);
-                                },
                             },
                         ],
                     },
