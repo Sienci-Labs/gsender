@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Select from 'react-select';
-import { LuRefreshCw } from 'react-icons/lu';
+import { LuMove, LuRefreshCw } from 'react-icons/lu';
 
 import controller from 'app/lib/controller';
 import { Button } from 'app/components/Button';
@@ -35,6 +35,11 @@ import { FaClipboard, FaClipboardCheck, FaClipboardList } from 'react-icons/fa';
 import { GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG } from 'app/constants';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { toFixedIfNecessary } from 'app/lib/rounding';
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from 'app/components/shadcn/Popover';
 
 const Steps = () => {
     const [status, setStatus] = useState<'initial' | 'started'>('initial');
@@ -318,6 +323,19 @@ const Steps = () => {
                             icon={<LuRefreshCw className="w-4 h-4" />}
                             text="Restart Wizard"
                         />
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    icon={<LuMove className="w-4 h-4" />}
+                                    text="Jog Controls"
+                                />
+                            </PopoverTrigger>
+
+                            <PopoverContent className="w-auto">
+                                <Jogging />
+                            </PopoverContent>
+                        </Popover>
                     </div>
                 </div>
             );
@@ -339,6 +357,19 @@ const Steps = () => {
                         icon={<LuRefreshCw className="w-4 h-4" />}
                         text="Restart Wizard"
                     />
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button
+                                variant="outline"
+                                icon={<LuMove className="w-4 h-4" />}
+                                text="Jog Controls"
+                            />
+                        </PopoverTrigger>
+
+                        <PopoverContent className="w-auto">
+                            <Jogging />
+                        </PopoverContent>
+                    </Popover>
                 </div>
             </div>
         );
@@ -543,6 +574,19 @@ const Steps = () => {
                     icon={<LuRefreshCw className="w-4 h-4" />}
                     text="Restart Wizard"
                 />
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <Button
+                            variant="outline"
+                            icon={<LuMove className="w-4 h-4" />}
+                            text="Jog Controls"
+                        />
+                    </PopoverTrigger>
+
+                    <PopoverContent className="w-auto">
+                        <Jogging />
+                    </PopoverContent>
+                </Popover>
             </div>
         </div>
     );

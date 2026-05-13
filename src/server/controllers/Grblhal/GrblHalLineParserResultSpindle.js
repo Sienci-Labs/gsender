@@ -22,7 +22,7 @@ class GrblHalLineParserResultSpindle {
                 return null;
             }
             payload.label = parts[4];
-            payload.id = Number(parts[0]);
+            payload.id = Number(parts[1]);
             payload.capabilities = parts[3];
             payload.enabled = payload.capabilities.indexOf('*') > -1;
             payload.laser = payload.capabilities.indexOf('L') > -1;
