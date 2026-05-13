@@ -309,8 +309,6 @@ class GrblHalController {
                 line = line.replace(commentMatcher, '').trim();
                 const ignoreEvent = context ? context.ignoreEvent : true;
                 context = this.populateContext(context);
-                console.log(context);
-
                 // We don't want some of these events firing if updating EEPROM in a macro - super edge case.
                 const looksLikeEEPROM = line.charAt(0) === '$';
 
@@ -2418,7 +2416,7 @@ class GrblHalController {
             },
             'toolchange:context': () => {
                 const [context] = args;
-                console.log(context);
+
                 this.toolChangeContext = { ...this.toolChangeContext, ...context };
             },
             'toolchange:pre': () => {

@@ -22,22 +22,12 @@
  */
 
 import React from 'react';
+import { Info } from 'lucide-react';
 import Actions from './Actions';
 
 const Substep = ({ step, index, stepIndex, firstRunOnly }) => {
     return (
         <div className="flex flex-col gap-3" id={`step-${stepIndex}-${index}`}>
-            {firstRunOnly && (
-                <div className="rounded px-3 py-2.5 border bg-amber-50 dark:bg-[#1c1500] border-amber-300 dark:border-[#3a2e00]">
-                    <div className="text-sm font-semibold text-amber-700 dark:text-amber-400 mb-1">
-                        One-time setup
-                    </div>
-                    <div className="text-sm text-amber-700 dark:text-amber-300/80">
-                        Runs on your first toolchange only — measures the initial tool so subsequent tools can be compared against it.
-                    </div>
-                </div>
-            )}
-
             <div className="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-amber-400">
                 {step.title}
             </div>
@@ -48,6 +38,15 @@ const Substep = ({ step, index, stepIndex, firstRunOnly }) => {
                     : step.description}
             </div>
 
+            {firstRunOnly && (
+                <div className="flex items-start gap-2 px-3 py-2 rounded-md border border-orange-200 dark:border-orange-800 bg-amber-50 dark:bg-orange-950/40">
+                    <Info size={13} className="shrink-0 mt-0.5 text-orange-500 dark:text-orange-400" />
+                    <span className="text-sm text-orange-800 dark:text-orange-300">
+                        <span className="font-semibold">One-time setup:</span>{' '}
+                        measures the initial tool so subsequent tools can be compared against it.
+                    </span>
+                </div>
+            )}
             <Actions
                 actions={step.actions}
                 index={index}
