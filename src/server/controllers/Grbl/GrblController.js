@@ -1174,6 +1174,7 @@ class GrblController {
         // Program feedrate
         const programFeedrate = this.runner.getCurrentFeedrate();
 
+        // Spindle RPM
         const spindleRate = this.runner.getCurrentSpindleRate();
 
         return Object.assign(context || {}, {
