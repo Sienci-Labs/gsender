@@ -93,8 +93,8 @@ const Wizard = () => {
 
     return (
         <>
-            {/* Backdrop — only when not overlay (jog-safe) mode */}
-            {!overlay && (
+            {/* Backdrop — only when substep.overlay is true (blocks UI interaction) */}
+            {overlay && (
                 <div className="fixed inset-0 bg-black/55 z-[199] pointer-events-auto" />
             )}
 
