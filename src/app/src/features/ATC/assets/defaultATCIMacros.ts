@@ -2156,11 +2156,11 @@ export const defaultATCIMacros: ATCIMacroConfig = {
         },
         _tc_slots: {
             default: 6,
-            value: 0,
+            value: 6,
         },
         _tc_slot_offset: {
             default: 90,
-            value: 0,
+            value: 90,
         },
         _irt_offset_mode: {
             default: 0,
@@ -2176,11 +2176,11 @@ export const defaultATCIMacros: ATCIMacroConfig = {
         },
         _holder_sense: {
             default: 1,
-            value: 0,
+            value: 1,
         },
         _pres_sense: {
             default: 1,
-            value: 0,
+            value: 1,
         },
     },
     variableFile: 'P100.macro',

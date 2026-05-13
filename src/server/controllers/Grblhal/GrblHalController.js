@@ -2489,6 +2489,12 @@ class GrblHalController {
             'sdcard:read': () => {
                 const [fileName] = args;
 
+                // Always request $F<= if ATCI.macro
+                if (fileName === 'ATCI.macro') {
+                    this.command('gcode', `$F<=${fileName}`);
+                    return;
+                }
+
                 const availableFiles = _.get(this.state, 'sdcard.files', []);
                 const hasFile = _.find(availableFiles, (file) => file.name === fileName);
 
