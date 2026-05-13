@@ -1174,6 +1174,8 @@ class GrblController {
         // Program feedrate
         const programFeedrate = this.runner.getCurrentFeedrate();
 
+        const spindleRate = this.runner.getCurrentSpindleRate();
+
         return Object.assign(context || {}, {
             // User-defined global variables
             global: this.sharedContext,
@@ -1225,6 +1227,9 @@ class GrblController {
 
             // Program Feedrate
             programFeedrate: programFeedrate,
+
+            // Current spindle RPM
+            spindleRate: spindleRate,
 
             // Global objects
             ...globalObjects,

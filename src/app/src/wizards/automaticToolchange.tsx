@@ -256,12 +256,11 @@ const createWizard = (count: number) => {
                                     '%toolchange_complete',
                                 ],
                                 cb: () => {
-                                    const unit = getUnitModal();
                                     controller.command('gcode', [
                                         '(Returning to initial position)',
                                         'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
-                                        `G90 ${unit} G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]`,
-                                        `G90 ${unit} G0 Z[global.toolchange.ZPOS]`,
+                                        `G90 G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]`,
+                                        `G90 G0 Z[global.toolchange.ZPOS]`,
                                         '(Restore initial modals)',
                                         'M3 [global.toolchange.UNITS] [global.toolchange.DISTANCE] [global.toolchange.FEEDRATE]',
                                         '%toolchange_complete',

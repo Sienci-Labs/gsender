@@ -309,6 +309,7 @@ class GrblHalController {
                 line = line.replace(commentMatcher, '').trim();
                 const ignoreEvent = context ? context.ignoreEvent : true;
                 context = this.populateContext(context);
+                console.log(context);
 
                 // We don't want some of these events firing if updating EEPROM in a macro - super edge case.
                 const looksLikeEEPROM = line.charAt(0) === '$';
@@ -1422,6 +1423,7 @@ class GrblHalController {
 
         // Program feedrate
         const programFeedrate = this.runner.getCurrentFeedrate();
+        const spindleRate = this.runner.getCurrentSpindleRate();
 
         return Object.assign(context || {}, {
             // User-defined global variables
@@ -1473,6 +1475,9 @@ class GrblHalController {
 
             // Program Feedrate
             programFeedrate: programFeedrate,
+
+            // Current Spindle RPM
+            spindleRate: spindleRate,
 
             // Global objects
             ...globalObjects,
