@@ -259,7 +259,7 @@ const createWizard = (count: number) => {
                                 cb: () => {
                                     controller.command('gcode', [
                                         '(Restart Spindle)',
-                                        '[global.toolchange.SPINDLE] S[global.toolchange.SPINDLE_SPEED]',
+                                        '[global.toolchange.SPINDLE] S[global.toolchange.SPINDLE_RATE]',
                                         '(Returning to initial position)',
                                         'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
                                         `G90 G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]`,
