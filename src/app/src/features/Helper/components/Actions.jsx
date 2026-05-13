@@ -22,7 +22,6 @@
  */
 
 import React, { useEffect, useRef, useState } from 'react';
-import { unstable_batchedUpdates } from 'react-dom';
 import pubsub from 'pubsub-js';
 import { GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
 import uniqueId from 'lodash/uniqueId';
@@ -35,14 +34,13 @@ import { useSelector } from 'react-redux';
 const Actions = ({ actions = [], stepIndex, substepIndex }) => {
     const [tooltip, setTooltip] = useState(null); // { index, rect, lines }
     const tooltipTimer = useRef(null);
+    const loadingStartRef = useRef(null);
     const {
         markActionAsComplete,
         completeSubStep,
-        scrollToActiveStep,
         setIsLoading,
-        updateSubstepOverlay,
     } = useWizardAPI();
-    const { isLoading } = useWizardContext();
+    const { isLoading, steps } = useWizardContext();
     const activeState = useSelector((state) =>
         get(state, 'controller.state.status.activeState', ''),
     );
@@ -55,13 +53,16 @@ const Actions = ({ actions = [], stepIndex, substepIndex }) => {
     // The subscription is registered once ([] deps) but cbRef.current is
     // updated on every render before any async event can fire.
     const cbRef = useRef(null);
+    const isLastSubstep =
+        stepIndex === steps.length - 1 &&
+        substepIndex === (steps[stepIndex]?.substeps?.length ?? 1) - 1;
+
     cbRef.current = {
         stepIndex,
         substepIndex,
+        isLastSubstep,
         markActionAsComplete,
         completeSubStep,
-        updateSubstepOverlay,
-        scrollToActiveStep,
         setIsLoading,
     };
 
@@ -71,18 +72,16 @@ const Actions = ({ actions = [], stepIndex, substepIndex }) => {
                 const { stepIndex: stepIn, substepIndex: subStepIn } = indexes;
                 const cb = cbRef.current;
                 if (stepIn === cb.stepIndex && subStepIn === cb.substepIndex) {
-                    // Batch all state updates so the component doesn't unmount
-                    // mid-handler (React 17 doesn't auto-batch async callbacks)
-                    unstable_batchedUpdates(() => {
+                    const MIN_LOADING_MS = 1250;
+                    const elapsed = Date.now() - (loadingStartRef.current ?? 0);
+                    const delay = Math.max(0, MIN_LOADING_MS - elapsed);
+                    setTimeout(() => {
                         cb.markActionAsComplete(cb.stepIndex, cb.substepIndex);
-                        const activeValues = cb.completeSubStep(
-                            cb.stepIndex,
-                            cb.substepIndex,
-                        );
-                        cb.updateSubstepOverlay(activeValues);
-                        cb.scrollToActiveStep(activeValues);
                         cb.setIsLoading(false);
-                    });
+                        if (cb.isLastSubstep) {
+                            cb.completeSubStep(cb.stepIndex, cb.substepIndex);
+                        }
+                    }, delay);
                 }
             }),
             pubsub.subscribe('error', () => {
@@ -108,6 +107,7 @@ const Actions = ({ actions = [], stepIndex, substepIndex }) => {
             <div className="flex flex-col gap-2">
                 {actions.map((action, index) => {
                     const cbWithCompletion = () => {
+                        loadingStartRef.current = Date.now();
                         setIsLoading(true);
                         controller.command(
                             'wizard:step',
@@ -118,6 +118,13 @@ const Actions = ({ actions = [], stepIndex, substepIndex }) => {
                     };
                     return (
                         <React.Fragment key={`action-${uniqueId()}`}>
+                            {!isLoading && index > 0 && (
+                                <div className="flex items-center gap-2 my-0.5 px-6">
+                                    <div className="flex-1 h-px bg-gray-200 dark:bg-[#2a2a35]" />
+                                    <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">or</span>
+                                    <div className="flex-1 h-px bg-gray-200 dark:bg-[#2a2a35]" />
+                                </div>
+                            )}
                             {isLoading && index === 0 ? (
                                 <span className="text-sm text-gray-400 dark:text-gray-500 animate-pulse">
                                     Running…
