@@ -14,7 +14,7 @@ module.exports = defineConfig({
     reportFilename: "mochawesome",
   },
   e2e: {
-    baseUrl: process.env.BASE_URL || 'http://localhost:8000/#',
+    baseUrl: process.env.BASE_URL || 'http://localhost:8000',
     env: {
       deviceName: process.env.CYPRESS_DEVICE_NAME || 'COM',
     },

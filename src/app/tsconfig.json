@@ -25,6 +25,7 @@
 		"noImplicitAny": true,
 		"forceConsistentCasingInFileNames": true,
 		"typeRoots": ["./node_modules/@types", "./src/declarations.d.ts"],
+		"types": ["jest", "@testing-library/jest-dom"],
 		"baseUrl": ".",
 		"paths": {
 			"app/*": ["src/*"],

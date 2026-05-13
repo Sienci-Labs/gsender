@@ -8,7 +8,7 @@ describe('Master Test Suite - All Tests', () => {
 
   import('./load_gcode_file.grblHal.cy.js');    
 
-  /*import('./file_info_display.grblHal.cy.js'); 
+  import('./file_info_display.grblHal.cy.js'); 
 
   import('./jogging_using_buttons.grblHal.cy.js');  
 
@@ -48,7 +48,7 @@ describe('Master Test Suite - All Tests', () => {
 
   import('./visualizer_features_outline_bitposition.cy');
 
-  import('./XY-Squaring.cy');*/
+  import('./XY-Squaring.cy');
 
  
 });  

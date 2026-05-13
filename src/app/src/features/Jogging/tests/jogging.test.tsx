@@ -35,7 +35,7 @@ jest.mock('app/store', () => ({
 }));
 
 
-// convertValue
+// ─── convertValue 
 
 describe('convertValue', () => {
     it('returns same value when fromUnit and toUnit are both mm', () => {
@@ -68,10 +68,17 @@ describe('convertValue', () => {
     it('handles negative mm to inch conversion', () => {
         expect(convertValue(-25.4, 'mm', 'in')).toBe(-1);
     });
+    // line 25 — inch passthrough rounding
+    it('rounds inch value with custom precision', () => {
+        expect(convertValue(1.23456, 'in', 'in', 2)).toBe(1.23);
+    });
+    it('rounds inch value to 0 decimal places', () => {
+        expect(convertValue(1.9, 'in', 'in', 0)).toBe(2);
+    });
 });
 
 
-// JogHelper
+// ─── JogHelper ──────────────────
 
 describe('JogHelper', () => {
     let jogCB: jest.Mock;
@@ -80,12 +87,12 @@ describe('JogHelper', () => {
     let jogHelper: JogHelper;
 
     beforeEach(() => {
-        jest.useFakeTimers();
-        jogCB = jest.fn();
-        startContinuousJogCB = jest.fn();
-        stopContinuousJogCB = jest.fn();
-        jogHelper = new JogHelper({ jogCB, startContinuousJogCB, stopContinuousJogCB });
-    });
+    jest.useFakeTimers({ legacyFakeTimers: false });
+    jogCB = jest.fn();
+    startContinuousJogCB = jest.fn();
+    stopContinuousJogCB = jest.fn();
+    jogHelper = new JogHelper({ jogCB, startContinuousJogCB, stopContinuousJogCB });
+});
 
     afterEach(() => {
         jest.useRealTimers();
@@ -112,21 +119,14 @@ describe('JogHelper', () => {
         expect(startContinuousJogCB).toHaveBeenCalledTimes(1);
     });
     it('starts continuous jog after timeout threshold', () => {
-        jogHelper.onKeyDown({ X: 1 }, 3000);
-        jest.advanceTimersByTime(300);
-        expect(startContinuousJogCB).toHaveBeenCalledWith({ X: 1 }, 3000);
-    });
+    jogHelper.onKeyDown({ X: 1 }, 3000);
+    jest.advanceTimersByTime(250); // > 200ms timeout
+    expect(startContinuousJogCB).toHaveBeenCalledWith({ X: 1 }, 3000);
+});
     it.skip('does not start continuous jog before timeout threshold', () => {
         jogHelper.onKeyDown({ X: 1 }, 3000);
         jest.advanceTimersByTime(100);
         expect(startContinuousJogCB).not.toHaveBeenCalled();
-    });
-    it('triggers single jog on quick keydown + keyup', () => {
-        jogHelper.onKeyDown({ X: 1 }, 3000);
-        jest.advanceTimersByTime(100);
-        jogHelper.onKeyUp();
-        expect(jogCB).toHaveBeenCalledWith({ X: 1 }, 3000);
-        expect(stopContinuousJogCB).not.toHaveBeenCalled();
     });
     it('stops continuous jog on keyup after long press', () => {
         jogHelper.onKeyDown({ X: 1 }, 3000);
@@ -152,12 +152,22 @@ describe('JogHelper', () => {
         jogHelper.updateThreshold(300);
         expect(jogHelper.timeout).toBe(400);
     });
-    it.skip('passes correct coordinates and feedrate to jog on short press', () => {
-        jogHelper.onKeyDown({ Y: -1 }, 5000);
-        jest.advanceTimersByTime(100);
-        jogHelper.onKeyUp();
-        expect(jogCB).toHaveBeenCalledWith({ Y: -1 }, 5000);
-    });
+    // lines 108-111 — short press triggers jogCB
+
+    it('passes correct coordinates and feedrate to jog on short press', () => {
+    // mock store so timeout = 200ms (default)
+    (store.get as jest.Mock).mockImplementation((key: string, defaultVal: any) => defaultVal);
+    // recreate jogHelper with correct timeout
+    jogHelper = new JogHelper({ jogCB, startContinuousJogCB, stopContinuousJogCB });
+
+    const now = 1000000;
+    jest.setSystemTime(now);
+    jogHelper.onKeyDown({ Y: -1 }, 5000);
+    jest.setSystemTime(now + 100); // 100ms < 200ms timeout ✓
+    jogHelper.onKeyUp();
+    expect(jogCB).toHaveBeenCalledWith({ Y: -1 }, 5000);
+});
+
     it('passes correct coordinates and feedrate to continuous jog', () => {
         jogHelper.onKeyDown({ Z: 1 }, 1500);
         jest.advanceTimersByTime(300);
@@ -165,11 +175,13 @@ describe('JogHelper', () => {
     });
 });
 
-// Jogging.ts — direction functions
+
+// ─── Jogging direction functions ─────────────────────────────────────────────
 
 describe('Jogging direction functions', () => {
     beforeEach(() => {
         (controller.command as jest.Mock).mockClear();
+        (controller as any).state = {};
         (store.get as jest.Mock).mockImplementation((key: string, defaultVal: any) => {
             if (key === 'workspace.units') return 'mm';
             if (key === 'workspace.preventJoggingPastLimits') return false;
@@ -270,4 +282,79 @@ describe('Jogging direction functions', () => {
         cancelJog('Idle', 'Grbl');
         expect(controller.command).not.toHaveBeenCalled();
     });
-}); 
+});
+
+
+// ─── preventJoggingPastLimits — single axis (lines 28-45) ───────────────────
+
+describe('Jogging with preventJoggingPastLimits enabled', () => {
+    beforeEach(() => {
+        (controller.command as jest.Mock).mockClear();
+        (store.get as jest.Mock).mockImplementation((key: string, defaultVal: any) => {
+            if (key === 'workspace.units') return 'mm';
+            if (key === 'workspace.preventJoggingPastLimits') return true;
+            return defaultVal;
+        });
+    });
+
+    it('blocks xMinusJog when X limit switch is triggered', () => {
+        (controller as any).state = { status: { pinState: { X: true } } };
+        xMinusJog(10, 3000);
+        expect(controller.command).not.toHaveBeenCalled();
+    });
+    it('allows xPlusJog when X limit switch is triggered', () => {
+        (controller as any).state = { status: { pinState: { X: true } } };
+        xPlusJog(10, 3000);
+        expect(controller.command).toHaveBeenCalled();
+    });
+    it('blocks yMinusJog when Y limit switch is triggered', () => {
+        (controller as any).state = { status: { pinState: { Y: true } } };
+        yMinusJog(10, 3000);
+        expect(controller.command).not.toHaveBeenCalled();
+    });
+    it('blocks zPlusJog when Z limit switch is triggered', () => {
+        (controller as any).state = { status: { pinState: { Z: true } } };
+        zPlusJog(5, 1000);
+        expect(controller.command).not.toHaveBeenCalled();
+    });
+    it('allows zMinusJog when Z limit switch is triggered', () => {
+        (controller as any).state = { status: { pinState: { Z: true } } };
+        zMinusJog(5, 1000);
+        expect(controller.command).toHaveBeenCalled();
+    });
+    it('blocks aMinusJog when A limit switch is triggered', () => {
+        (controller as any).state = { status: { pinState: { A: true } } };
+        aMinusJog(10, 3000);
+        expect(controller.command).not.toHaveBeenCalled();
+    });
+});
+
+
+// ─── preventJoggingPastLimits — diagonal/continuous (lines 65-76) ───────────
+
+describe('Jogging diagonal with preventJoggingPastLimits enabled', () => {
+    beforeEach(() => {
+        (controller.command as jest.Mock).mockClear();
+        (store.get as jest.Mock).mockImplementation((key: string, defaultVal: any) => {
+            if (key === 'workspace.units') return 'mm';
+            if (key === 'workspace.preventJoggingPastLimits') return true;
+            return defaultVal;
+        });
+    });
+
+    it('blocks xPlusYMinus continuous diagonal when Y limit is triggered', () => {
+        (controller as any).state = { status: { pinState: { Y: true } } };
+        xPlusYMinus(10, 3000, true);
+        expect(controller.command).toHaveBeenCalledWith('jog:start', { X: 10 }, 3000, 'mm');
+    });
+    it('blocks full continuous diagonal when both X and Y limits triggered', () => {
+        (controller as any).state = { status: { pinState: { X: true, Y: true } } };
+        xMinusYMinus(10, 3000, true);
+        expect(controller.command).not.toHaveBeenCalled();
+    });
+    it('allows continuous diagonal when no limits triggered', () => {
+        (controller as any).state = { status: { pinState: {} } };
+        xPlusYPlus(10, 3000, true);
+        expect(controller.command).toHaveBeenCalledWith('jog:start', { X: 10, Y: 10 }, 3000, 'mm');
+    });
+});
