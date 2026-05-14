@@ -185,7 +185,7 @@ export default class Generator {
 		return Number(value.toFixed(amount));
 	}
 
-	rampIntoMaterial = (z, direction = { axis: "Y", factor: 1 }) => {
+	rampIntoMaterial = (direction = { axis: "Y", factor: 1 }) => {
 		const RAMP_ANGLE_DEGREES = 2;
 		const MAX_ZIGZAG_LENGTH_MM = 150;
 
@@ -241,7 +241,7 @@ export default class Generator {
 		startPosition,
 		cutDirectionFlipped,
 	) => {
-		const enterMaterial = this.rampIntoMaterial(z, direction);
+		const enterMaterial = this.rampIntoMaterial(direction);
 
 		let mainPerimeterArea = [
 			"G91",
@@ -853,7 +853,7 @@ export default class Generator {
 		const gcodeArr = startIsInCenter
 			? [
 					...startArea,
-					...rampIntoMaterial(z, direction),
+					...rampIntoMaterial(direction),
 					...startFromCenterPerimeter,
 					...spirals,
 					...returnToStart,
