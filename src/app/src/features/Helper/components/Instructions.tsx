@@ -69,7 +69,7 @@ const Instructions = () => {
                 <span className="text-gray-600 dark:text-white">{substep.title}</span>
             </div>
             {/* Warning banner — first step only */}
-            {intro && activeStep === 0 && activeSubstep === 0 && (
+            {intro && activeStep === 0 && activeSubstep === 0 && !substep.toolBanner && (
                 <div className="flex items-center gap-2 px-3 py-2 rounded bg-emerald-50 dark:bg-[#052e16] text-emerald-800 dark:text-[#6ee7b7] text-sm">
                     <CheckCircle size={13} className="shrink-0" />
                     {intro}

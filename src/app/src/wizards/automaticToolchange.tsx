@@ -118,7 +118,7 @@ const createWizard = (count: number) => {
             // Get $13 value for adjustment of Z Safe Height
             const state = reduxStore.getState();
             const $13 = get(state, 'controller.settings.settings.$13', '0');
-            const zSafe = $13 === '1' ? '-0.5' : '-10';
+            const zSafe = $13 === '1' ? '-0.2' : '-5';
 
             const zProbeDistance = calculateMaxZProbeDistance(
                 settings.zProbeDistance,
