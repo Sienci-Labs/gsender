@@ -437,9 +437,15 @@ class GrblController {
                 let commentMatcher = /\s*;.*/g;
                 let bracketCommentLine = /\s*\(.*\)*\)/gm;
                 let toolCommand = /(T)(-?\d*\.?\d+\.?)/;
+                const commentRegex = /\(([^)]*)\)|;(.*)/g;
+                const commentParts = [];
+                let m;
+                while ((m = commentRegex.exec(line)) !== null) {
+                    const text = (m[1] !== undefined ? m[1] : m[2]).trim();
+                    if (text) commentParts.push(text);
+                }
+                let commentString = commentParts.join(' ');
                 line = line.replace(bracketCommentLine, '').trim();
-                let comment = line.match(commentMatcher);
-                let commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
                 line = line.replace(commentMatcher, '').trim();
                 context = this.populateContext(context);
 
