@@ -518,9 +518,6 @@ class GrblController {
                     // Handle specific cases for macro and pause, ignore is default and comments line out with no other action
                     // If toolchange is at very beginning of file, ignore it
                     if (toolChangeOption !== 'Ignore') {
-                        if (toolLabel) {
-                            commentString = `(${toolLabel}) ` + commentString;
-                        }
                         this.workflow.pause({ data: 'M6', comment: commentString });
 
                         if (toolChangeOption === 'Code') {

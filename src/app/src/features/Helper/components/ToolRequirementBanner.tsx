@@ -33,6 +33,8 @@ const ToolRequirementBanner = ({ toolLabel, comment }: ToolRequirementBannerProp
         return null;
     }
 
+    console.log(comment);
+
     return (
         <div className="self-center w-full max-w-[320px] rounded-[8px] border border-emerald-300/80 bg-emerald-50 px-5 py-4 text-center shadow-sm dark:border-emerald-700/60 dark:bg-[#0d2518]">
             <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700 dark:text-emerald-300">
@@ -42,7 +44,7 @@ const ToolRequirementBanner = ({ toolLabel, comment }: ToolRequirementBannerProp
                 {toolLabel}
             </div>
             {comment ? (
-                <div className="mt-4 rounded-[6px] border border-gray-200/90 bg-white/75 px-3 py-2 text-left font-mono text-xs leading-relaxed text-gray-500 whitespace-pre-wrap break-words dark:border-white/10 dark:bg-black/10 dark:text-gray-300">
+                <div className="mt-4 rounded-[6px] border border-gray-200/90 bg-white/75 px-3 py-2 text-center font-mono text-xs leading-relaxed text-gray-500 whitespace-pre-wrap break-words dark:border-white/10 dark:bg-black/10 dark:text-gray-300">
                     {comment}
                 </div>
             ) : null}
