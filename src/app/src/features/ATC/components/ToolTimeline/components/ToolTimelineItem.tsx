@@ -126,7 +126,7 @@ export function ToolTimelineItem({
                                 <span className="text-gray-500 dark:text-gray-400">
                                     ·
                                 </span>
-                                <span className="text-xs text-gray-500 dark:text-gray-400">
+                                <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
                                     {tool.comment}
                                 </span>
                             </>
