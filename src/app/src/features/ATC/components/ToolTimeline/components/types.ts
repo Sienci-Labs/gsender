@@ -5,6 +5,7 @@ export interface ToolChange {
     label?: string;
     startLine?: number;
     endLine?: number;
+    comment?: string;
 }
 
 export interface ToolTimelineProps {

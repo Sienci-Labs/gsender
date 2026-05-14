@@ -128,7 +128,7 @@ const wizard = {
                                 'G90 [global.toolchange.UNITS] G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]',
                                 'G90 [global.toolchange.UNITS] G0 Z[global.toolchange.ZPOS]',
                                 '(Restore initial modals)',
-                                'M3 [global.toolchange.UNITS] [global.toolchange.DISTANCE] [global.toolchange.FEEDRATE]',
+                                '[global.toolchange.SPINDLE] [global.toolchange.UNITS] [global.toolchange.DISTANCE] [global.toolchange.FEEDRATE]',
                                 '%toolchange_complete',
                             ],
                         },
