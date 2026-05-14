@@ -719,9 +719,10 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                         variant="outline"
                         size="icon"
                         onClick={() => {
+                            const currentLine = Math.floor((scrollContainerRef.current?.scrollTop ?? 0) / LINE_HEIGHT);
                             scrollContainerRef.current?.scrollTo({
                                 top: 0,
-                                behavior: 'smooth',
+                                behavior: currentLine > SMOOTH_SCROLL_THRESHOLD ? 'auto' : 'smooth',
                             });
                         }}
                         disabled={isJobRunning}
