@@ -34,7 +34,7 @@
     "target": [
       "dmg"
     ],
-    "icon": "electron-build/icon.icns",
+    "icon": "electron-build/icon-pendant.icns",
     "darkModeSupport": true,
     "mergeASARs": false,
     "hardenedRuntime": true,
@@ -62,6 +62,7 @@
   },
   "linux": {
     "category": "Utility",
+    "icon": "electron-build/icon-pendant.png",
     "target": [
       "deb"
     ]
