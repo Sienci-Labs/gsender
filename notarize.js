@@ -1,8 +1,9 @@
-const { notarize } = require('@electron/notarize');
 const path = require('path');
 const fs = require('fs');
 
 exports.default = async function notarizing(context) {
+    const { notarize } = await import('@electron/notarize');
+
     const {
         electronPlatformName,
         appOutDir,
