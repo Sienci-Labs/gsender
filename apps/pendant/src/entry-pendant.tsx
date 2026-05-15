@@ -6,7 +6,7 @@ import { store as reduxStore } from '@gsender/controller-client/store/redux';
 import { sagaMiddleware, createRootSaga } from '@gsender/controller-client/store/redux/sagas';
 import controller from '@gsender/controller-client/controller';
 import { FocusTrappingProvider } from '@gsender/ui/lib/focus-trapping';
-import { getHost } from './tauri-bridge';
+import { getHost } from './electron-bridge';
 import * as pendantSagas from './pendant-sagas';
 import PendantShell from './PendantShell';
 
@@ -15,7 +15,7 @@ import './index.css';
 sagaMiddleware.run(createRootSaga([pendantSagas]));
 
 async function bootstrap() {
-    // In Tauri, getHost() returns the stored gSender host.
+    // In Electron, getHost() returns the embedded server's host.
     // In a browser, fall back to same-origin (connects to whatever served this page).
     const storedHost = await getHost();
     const host = storedHost ? `http://${storedHost}` : '';

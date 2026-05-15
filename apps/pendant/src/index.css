@@ -2,10 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-[data-tauri-drag-region] {
-    app-region: drag;
-}
-
 .status-badge {
     position: relative;
     overflow: hidden;

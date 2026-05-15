@@ -9,10 +9,10 @@ import { VISUALIZER_PRIMARY } from 'app/constants';
 import GcodeEditor from 'app/features/Visualizer/GcodeEditor';
 import {
     GcodeFilePayload,
-    isTauri,
+    isElectron,
     pickGcodeFile,
     readGcodeFile,
-} from '../tauri-bridge';
+} from '../electron-bridge';
 import { store as reduxStore } from '@gsender/controller-client/store/redux';
 import {
     updateFileContent,
@@ -194,7 +194,7 @@ export default function BottomDrawer() {
     };
 
     const handleLoadClick = async () => {
-        if (!isTauri()) {
+        if (!isElectron()) {
             fileInputRef.current?.click();
             return;
         }
@@ -230,7 +230,7 @@ export default function BottomDrawer() {
     const handleRecentLoad = async (recentFile: RecentFile) => {
         if (!recentFile.filePath) return;
 
-        if (isTauri()) {
+        if (isElectron()) {
             try {
                 const loaded = await readGcodeFile(recentFile.filePath);
                 if (loaded) {

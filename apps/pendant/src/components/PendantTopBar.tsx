@@ -2,9 +2,8 @@ import Connection from 'app/features/Connection';
 import { stopMachineMotion } from '@gsender/features/Jogging/utils/Jogging';
 import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import type { RootState } from '@gsender/controller-client/store/redux';
-import { getCurrentWindow } from '@tauri-apps/api/window';
 import { useState, useEffect } from 'react';
-import type { ComponentType, MouseEvent } from 'react';
+import type { ComponentType } from 'react';
 import {
     Circle,
     CircleCheck,
@@ -165,14 +164,6 @@ export default function PendantTopBar() {
         alarmCode !== '';
     const badgeLabel = showAlarmCode ? `${badge.label} ${alarmCode}` : badge.label;
     const unlockActionable = isConnected && (activeState === GRBL_ACTIVE_STATE_HOLD || activeState === GRBL_ACTIVE_STATE_ALARM);
-    const handleDragMouseDown = (event: MouseEvent<HTMLDivElement>) => {
-        if (event.button !== 0) return; // left mouse only
-        // Fallback for environments where data-tauri-drag-region is unreliable.
-        // In browser (non-Tauri), this safely no-ops.
-        getCurrentWindow().startDragging().catch((err) => {
-            console.warn('Unable to start window drag', err);
-        });
-    };
     const handleUnlock = () => {
         if (!isConnected) return;
 
@@ -201,7 +192,7 @@ export default function PendantTopBar() {
     return (
         <header className="h-14 px-3 flex items-center gap-3 bg-gray-50 border-b border-gray-200 dark:bg-dark-darker dark:border-dark-lighter shrink-0 select-none relative">
             {/* Logo */}
-            <div data-tauri-drag-region className="flex items-center gap-2 shrink-0 cursor-grab active:cursor-grabbing">
+            <div className="flex items-center gap-2 shrink-0">
                 <img src={iconRound} alt="gSender" className="w-9 h-9" />
             </div>
 
@@ -212,7 +203,6 @@ export default function PendantTopBar() {
 
             {/* State pill — absolutely centred so Connection resizing doesn't shift it */}
             <div
-                data-tauri-drag-region
                 className={[
                     'status-badge absolute left-1/2 -translate-x-1/2',
                     'flex items-center justify-center gap-2',
@@ -228,11 +218,7 @@ export default function PendantTopBar() {
             </div>
 
             {/* Spacer */}
-            <div
-                data-tauri-drag-region
-                className="flex-1 h-full cursor-grab active:cursor-grabbing"
-                onMouseDown={handleDragMouseDown}
-            />
+            <div className="flex-1 h-full" />
 
             {/* Unlock + E-STOP */}
             <button

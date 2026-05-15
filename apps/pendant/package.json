@@ -5,16 +5,6 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build:client": "vite build --outDir ../../dist/gsender/pendant --emptyOutDir",
-    "tauri:dev": "npx @tauri-apps/cli@2 dev",
-    "tauri:build": "npx @tauri-apps/cli@2 build",
-    "tauri:build:debug": "npx @tauri-apps/cli@2 build --debug"
-  },
-  "devDependencies": {
-    "@tauri-apps/cli": "^2"
-  },
-  "dependencies": {
-    "@tauri-apps/api": "^2",
-    "@tauri-apps/plugin-opener": "^2"
+    "build:client": "vite build --outDir ../../dist/gsender/pendant --emptyOutDir"
   }
 }

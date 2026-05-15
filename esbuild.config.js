@@ -174,6 +174,36 @@ function copyPreloadFile(target) {
     fs.copyFileSync(src, dest);
 }
 
+function copyPendantPreloadFile(target) {
+    const isDev = target === 'development';
+    const destDir = isDev
+        ? path.join(__dirname, 'output')
+        : path.join(__dirname, 'dist/gsender-pendant');
+    const src = path.join(__dirname, 'src/electron-app/preload-pendant.js');
+    const dest = path.join(destDir, 'preload-pendant.js');
+    fs.mkdirSync(destDir, { recursive: true });
+    fs.copyFileSync(src, dest);
+}
+
+function copyStaticFilesPendant() {
+    const serverDirs = ['i18n', 'views'];
+    const baseDir = path.join(__dirname, 'dist/gsender-pendant');
+    const serverOutputDir = path.join(__dirname, 'dist/gsender-pendant/server');
+
+    for (const dir of serverDirs) {
+        const srcDir = path.join(__dirname, 'src/server', dir);
+        if (fs.existsSync(srcDir)) {
+            const serverDestDir = path.join(serverOutputDir, dir);
+            fs.promises.mkdir(serverDestDir, { recursive: true });
+            copyDir(srcDir, serverDestDir);
+
+            const baseDestDir = path.join(baseDir, dir);
+            fs.promises.mkdir(baseDestDir, { recursive: true });
+            copyDir(srcDir, baseDestDir);
+        }
+    }
+}
+
 function prebuild(target) {
     const isDev = target === 'development';
     const baseDir = isDev
@@ -215,6 +245,29 @@ function prebuild(target) {
         if (targetYarnLock) {
             fs.copyFileSync(targetYarnLock, path.join(baseDir, 'yarn.lock'));
         }
+    }
+}
+
+function prebuildPendant() {
+    // Production-only: pendant dev artifacts share the `output/` dir with desktop
+    // (different filenames) and are covered by the desktop prebuild step.
+    const baseDir = path.join(__dirname, 'dist/gsender-pendant');
+
+    fs.rmSync(baseDir, { recursive: true, force: true });
+    fs.mkdirSync(baseDir, { recursive: true });
+
+    fs.copyFileSync(
+        path.join(__dirname, 'src/pendant-package.json'),
+        path.join(baseDir, 'package.json')
+    );
+
+    const yarnLockCandidates = [
+        path.join(__dirname, 'src/yarn.lock'),
+        path.join(__dirname, 'yarn.lock'),
+    ];
+    const targetYarnLock = yarnLockCandidates.find((candidate) => fs.existsSync(candidate));
+    if (targetYarnLock) {
+        fs.copyFileSync(targetYarnLock, path.join(baseDir, 'yarn.lock'));
     }
 }
 
@@ -366,6 +419,91 @@ async function buildServerCli(target) {
     }
 }
 
+// Pendant: bundle pendant-main.js into output dir (shared with desktop in dev,
+// separate dist/gsender-pendant in prod).
+async function buildPendantElectron(target) {
+    loadEnv(target);
+
+    const isDev = target === 'development';
+    const outdir = isDev
+        ? path.join(__dirname, 'output')
+        : path.join(__dirname, 'dist/gsender-pendant');
+
+    const config = createConfig(
+        target,
+        path.join(__dirname, 'src/pendant-main.js'),
+        outdir,
+        {
+            packages: 'external',
+            outExtension: { '.js': '.js' },
+            plugins: [srcResolverPlugin, createHexFilePlugin(target)],
+        }
+    );
+
+    try {
+        await esbuild.build(config);
+        copyPendantPreloadFile(target);
+        console.log('✅ Pendant electron main build complete');
+    } catch (error) {
+        console.error('❌ Pendant electron main build failed:', error);
+        process.exit(1);
+    }
+}
+
+// Pendant: bundle the gSender server into dist/gsender-pendant/server/ for
+// the standalone pendant binary. Dev reuses the desktop output/server bundle.
+async function buildPendantServer(target) {
+    loadEnv(target);
+
+    const outdir = path.join(__dirname, 'dist/gsender-pendant/server');
+
+    const config = createConfig(
+        target,
+        path.join(__dirname, 'src/server/index.js'),
+        outdir,
+        {
+            packages: 'external',
+            plugins: [srcResolverPlugin, createHexFilePlugin(target)],
+        }
+    );
+
+    try {
+        await esbuild.build(config);
+        copyStaticFilesPendant();
+        console.log('✅ Pendant server build complete');
+    } catch (error) {
+        console.error('❌ Pendant server build failed:', error);
+        process.exit(1);
+    }
+}
+
+// Pendant: bundle server-cli.js (entrypoint that launchServer pulls in) into
+// dist/gsender-pendant/. Mirrors buildServerCli but with a different outdir.
+async function buildPendantServerCli(target) {
+    loadEnv(target);
+
+    const outdir = path.join(__dirname, 'dist/gsender-pendant');
+
+    const config = createConfig(
+        target,
+        path.join(__dirname, 'src/server-cli.js'),
+        outdir,
+        {
+            packages: 'external',
+            outExtension: { '.js': '.js' },
+            plugins: [srcResolverPlugin, createHexFilePlugin(target)],
+        }
+    );
+
+    try {
+        await esbuild.build(config);
+        console.log('✅ Pendant server CLI build complete');
+    } catch (error) {
+        console.error('❌ Pendant server CLI build failed:', error);
+        process.exit(1);
+    }
+}
+
 // Watch mode for development - watches all targets
 async function watchAll() {
     loadEnv('development');
@@ -404,22 +542,37 @@ async function watchAll() {
         }
     );
 
+    const pendantElectronConfig = createConfig(
+        'development',
+        path.join(__dirname, 'src/pendant-main.js'),
+        path.join(__dirname, 'output'),
+        {
+            packages: 'external',
+            outExtension: { '.js': '.js' },
+            plugins: [srcResolverPlugin, createHexFilePlugin('development')],
+        }
+    );
+
     copyStaticFiles('development');
     copyPreloadFile('development');
+    copyPendantPreloadFile('development');
 
     const serverCtx = await esbuild.context(serverConfig);
     const electronCtx = await esbuild.context(electronConfig);
     const cliCtx = await esbuild.context(cliConfig);
+    const pendantElectronCtx = await esbuild.context(pendantElectronConfig);
 
     await Promise.all([
         serverCtx.watch(),
         electronCtx.watch(),
         cliCtx.watch(),
+        pendantElectronCtx.watch(),
     ]);
 
     console.log('👀 Watching:');
     console.log('   - Server files (output/server/index.js)');
     console.log('   - Electron main (output/main.js)');
+    console.log('   - Pendant electron main (output/pendant-main.js)');
     console.log('   - Server CLI (output/server-cli.js)');
     console.log('\n✨ Hot reload enabled! Edit files and see changes instantly.\n');
 }
@@ -443,6 +596,12 @@ async function build() {
         return;
     }
 
+    if (args.includes('--prebuild-pendant-only')) {
+        prebuildPendant();
+        console.log('Pendant prebuild complete');
+        return;
+    }
+
     if (watch && target === 'development') {
         await watchServer();
         return;
@@ -458,6 +617,16 @@ async function build() {
         if (buildTarget === 'all' || buildTarget === 'server-cli') {
             await buildServerCli(target);
         }
+        // In dev, also produce pendant main + preload in the shared output/ dir
+        // so `npm run electron:dev`-style watchers and pendant:electron:dev share artifacts.
+        if (buildTarget === 'all' && target === 'development') {
+            await buildPendantElectron(target);
+        }
+        if (buildTarget === 'pendant') {
+            await buildPendantServer(target);
+            await buildPendantElectron(target);
+            await buildPendantServerCli(target);
+        }
     } catch (error) {
         console.error('Build failed:', error);
         process.exit(1);
@@ -468,6 +637,9 @@ module.exports = {
     buildServer,
     buildElectron,
     buildServerCli,
+    buildPendantServer,
+    buildPendantElectron,
+    buildPendantServerCli,
     watchAll,
     createConfig,
 };

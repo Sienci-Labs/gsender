@@ -15,11 +15,13 @@ exports.default = async function notarizing(context) {
 
     const appName = context.packager.appInfo.productFilename;
     const appPath = path.join(appOutDir, `${appName}.app`);
+    const appBundleId = context.packager.appInfo.id;
 
     console.log('============ Notarization Info ============');
     console.log('App Out Dir:', appOutDir);
     console.log('App Name:', appName);
     console.log('App Path:', appPath);
+    console.log('Bundle ID:', appBundleId);
     console.log('Architecture:', arch);
     console.log('==========================================');
 
@@ -39,7 +41,7 @@ exports.default = async function notarizing(context) {
     try {
         await notarize({
             tool: 'notarytool',
-            appBundleId: 'org.sienci.gsender',
+            appBundleId,
             appPath: appPath,
             appleId: process.env.APPLE_ID,
             appleIdPassword: process.env.APPLE_APP_SPECIFIC_PASSWORD,
