@@ -28,7 +28,7 @@ export function SpindleSetRestart({ onComplete, onUncomplete }: StepProps) {
             '$374=3',
             '$375=50',
             '$681=0',
-            '$395=2',
+            '$395=7',
             '$REBOOT',
         ]);
     }

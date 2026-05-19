@@ -19,6 +19,8 @@ export const sienciHalGcode = [
     '$$',
 ];
 
+
+
 export const grblCoreGcode = [
     '$30=24000',
     '$31=7500',
@@ -26,7 +28,7 @@ export const grblCoreGcode = [
     '$374=3',
     '$375=50',
     '$394=11',
-    '$395=2',
+    '$395=7',
     '$539=11',
     '$681=0',
     '$$',
