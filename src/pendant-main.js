@@ -126,12 +126,13 @@ const main = () => {
                 title: `gSender Pendant ${pkg.version}`,
                 kiosk: !isDev,
                 fullscreen: !isDev,
+                frame: !isDev,
                 autoHideMenuBar: true,
                 show: false,
-                width: 1280,
-                height: 800,
-                minWidth: 1024,
-                minHeight: 600,
+                width: isDev ? 768 : 1280,
+                height: isDev ? 1024 : 800,
+                minWidth: isDev ? 600 : 1024,
+                minHeight: isDev ? 1024 : 600,
                 webPreferences: {
                     // Shared code from apps/desktop/ uses window.require + window.ipcRenderer
                     // at module load; matching desktop's preload posture avoids forking that.
