@@ -1,6 +1,9 @@
 import { IconType } from 'react-icons';
 export const ATCI_SUPPORTED_VERSION = 20250627;
 
+// $395=7 applies to firmware strictly after + including 20260515
+export const SPINDLE_395_V7_VERSION = 20260515;
+
 export interface ToolStateTheme {
     label: string;
     backgroundColor: string;
