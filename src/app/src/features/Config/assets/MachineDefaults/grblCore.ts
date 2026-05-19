@@ -80,7 +80,7 @@ export const GRBLCORE_MIGRATION: GrblCoreMigration = {
         $685: '10',
         $686: '50',
         $687: '50',
-        $709: '1',
+        $709: '19',
         $741: null,
         $742: null,
         $745: '15',
