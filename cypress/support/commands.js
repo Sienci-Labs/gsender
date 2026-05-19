@@ -592,20 +592,14 @@ Cypress.Commands.add("verifyConsoleContains", (text) => {
 //12.Zero X Axis
 // ----------------------
 Cypress.Commands.add('zeroXAxis', () => {
-  cy.log('Zeroing X axis...');
-  cy.get('div.flex-shrink-0 > div > div > div > div > div.relative div:nth-of-type(1) > div:nth-of-type(1) > button')
-    .contains('X0')
-    .click();
-  cy.wait(500);
-  cy.log('X axis zeroed');
+    cy.log('Zeroing X axis...');
+    cy.get('[aria-label="Zero X axis: Set current position as work zero"]')
+        .should('exist')
+        .click();
+    cy.wait(500);
+    cy.log('X axis zeroed');
 });
-//-----------------------
-// Zero Y axis 
-//-----------------------
 
-// ----------------------
-//13.Zero Y Axis
-// ----------------------
 Cypress.Commands.add('zeroYAxis', () => {
   cy.log('Zeroing Y axis...');
   cy.get('div.h-\\[75\\%\\] div.flex-col > div:nth-of-type(2) > div:nth-of-type(1) span')
@@ -628,22 +622,24 @@ Cypress.Commands.add('zeroZAxis', () => {
 });
 //-----------------------
 // Zero A axis
-Cypress.Commands.add("zeroAAxis", () => {
-	cy.log("Zeroing A axis");
-	cy.contains("button", "A0").click();
-	cy.log("A axis zeroed");
+Cypress.Commands.add('zeroZAxis', () => {
+  cy.log('Zeroing Z axis...');
+  cy.get('div > div.relative div:nth-of-type(3) > div:nth-of-type(1) span')
+    .contains('Z0')
+    .click();
+  cy.wait(1000);
+  cy.log('Z axis zeroed');
 });
 // ----------------------
 //15.Zero All Axes
 // ----------------------
 Cypress.Commands.add("zeroAllAxes", () => {
-	cy.log("Resetting all axes to zero...");
-	cy.zeroXAxis();
-	cy.zeroYAxis();
-	cy.zeroZAxis();
-	cy.log("All axes zeroed");
+    cy.log("Resetting all axes to zero...");
+    // Click the "Zero All" button
+    cy.get('div.relative > div.max-xl\\:scale-95 > div:nth-of-type(1) span')
+      .click();
+    cy.log("All axes zeroed");
 });
-
 // ----------------------
 //16.Force input into a field
 // ----------------------

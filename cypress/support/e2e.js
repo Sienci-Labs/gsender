@@ -33,6 +33,11 @@ Cypress.on("uncaught:exception", (err) => {
         return false;
     }
 
+    // Ignore WebGL errors in test environment
+    if (err.message.includes('displayWebGLErrorMessage')) {
+        return false;
+    }
+
     // Still fail on all other unexpected errors
     return true;
 });

@@ -1,9 +1,11 @@
 describe('Invert and Check Pins Test with Stepper Motor Lock/Unlock', () => {
   beforeEach(() => {
     cy.viewport(1920, 1080);
-    cy.loadUI();
+    cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
+      waitTime: 3000,
+      timeout: 15000
+    });
   });
-
   it('Checks machine information, verifies pin inversion, and tests stepper motor lock/unlock', () => {
 
     const CHECKMARK_PATH = 'M173.898 439.404';

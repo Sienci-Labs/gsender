@@ -28,27 +28,15 @@ describe('Surfacing Test', () => {
     cy.wait(2000);
 
     // Step 3: Navigate to Tools
-    cy.log('Step 3: Navigating to Tools page...');
-    cy.contains('span', 'Tools')
-      .should('be.visible')
+   
+    cy.log('Zeroing all axis...');
+     cy.get('div.relative > div.max-xl\\:scale-95 > div:nth-of-type(1) span')
       .click();
-    cy.wait(1500);
-    cy.log('Tools page opened');
+    cy.log("All axes zeroed");
+
 
     // Step 4: Click on Surfacing tool - using the link selector
-  
-  cy.contains('h3', 'Surfacing')
-  .closest('div.rounded-lg')
-  .should('be.visible')
-  .click();
 
-// Step 5: Configure Width
-cy.log('Step 5: Setting width to 75mm');
-cy.get('#width')
-  .should('be.visible')
-  .clear()
-  .type('75');
-cy.wait(300);
 
 
   

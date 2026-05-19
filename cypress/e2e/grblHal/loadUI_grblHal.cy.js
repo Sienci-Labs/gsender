@@ -1,27 +1,17 @@
 describe('gSender App Load', () => {
+    before(() => {
+        Cypress.on('uncaught:exception', (err) => {
+            if (err.message.includes('displayWebGLErrorMessage')) {
+                return false;
+            }
+            return true;
+        });
+    });
+
     it('loads the app and verifies title and Connect to CNC button', () => {
         cy.viewport(1409, 945);
-
-        // Capture all console errors
-        cy.visit(`${Cypress.config('baseUrl')}/#/`, {
-            timeout: 60000,
-            onBeforeLoad(win) {
-                cy.spy(win.console, 'error').as('consoleError');
-                cy.spy(win.console, 'warn').as('consoleWarn');
-            }
-        });
-
-        cy.wait(10000);
-
-        cy.screenshot('after-10s');
-
-        // Print all console errors
-        cy.get('@consoleError').then((spy) => {
-            cy.log('Console errors:', JSON.stringify(spy.args));
-        });
-
-        cy.get('#app').invoke('html').then((html) => {
-            cy.log('App HTML:', html.substring(0, 500));
-        });
+        cy.visit('http://localhost:8000/#/');
+        cy.title({ timeout: 15000 }).should('eq', 'gSender');
+        cy.get('body', { timeout: 15000 }).should('be.visible');
     });
 });
