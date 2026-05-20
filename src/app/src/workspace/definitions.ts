@@ -34,7 +34,7 @@ export interface Workspace {
     spindleFunctions: boolean;
     coolantFunctions: boolean;
     atcEnabled: boolean;
-    sendUsageData: boolean;
+    collectUsageDataStatus: 'accepted' | 'denied' | 'pending';
     safeRetractHeight: number;
     customDecimalPlaces: number;
     jobsFinished: number;

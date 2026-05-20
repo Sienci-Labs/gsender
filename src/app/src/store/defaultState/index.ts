@@ -70,7 +70,7 @@ const defaultState: State = {
         backupFreq: 'On Update',
         powerSaving: true,
         lastBackupTime: 0,
-        sendUsageData: false,
+        collectUsageDataStatus: 'pending',
         jobTimes: [],
         toolChange: {
             passthrough: false,
