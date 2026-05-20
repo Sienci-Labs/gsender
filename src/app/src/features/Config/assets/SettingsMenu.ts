@@ -111,6 +111,7 @@ export interface gSenderSetting {
     value?: gSenderSettingsValues;
     defaultValue?: any;
     dirty?: boolean;
+    ignoreDefaultCheck?: boolean;
     eventType?: string;
     wizard?: () => JSX.Element;
     toolLink?: string;
@@ -303,11 +304,16 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         options: ['On Update', 'Daily', 'Weekly', 'Monthly'],
                     },
                     {
-                        label: 'Send usage data',
-                        key: 'workspace.sendUsageData',
+                        label: 'Collect usage data',
+                        key: 'workspace.collectUsageDataStatus',
                         description:
-                            'This info is sent to us as an anonymous data point, but greatly helps us improve gSender by seeing how people use it.',
+                            'This info is collected anonymously to help us improve gSender by seeing how people use it.',
                         type: 'boolean',
+                        onApply: () => {
+                            const toggleValue = store.get('workspace.collectUsageDataStatus', 'pending');
+                            store.replace('workspace.collectUsageDataStatus', toggleValue ? 'accepted' : 'denied');
+                        },
+                        ignoreDefaultCheck: true,
                     },
                 ],
             },
