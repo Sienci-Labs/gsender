@@ -71,6 +71,7 @@ import {
 import isElectron from 'is-electron';
 import { THEMES_T } from 'app/features/Visualizer/definitions';
 import { JSX } from 'react';
+import posthog from 'posthog-js';
 
 export interface SettingsMenuSection {
     label: string;
@@ -118,6 +119,7 @@ export interface gSenderSetting {
     toolLinkLabel?: string;
     disabled?: () => boolean;
     hidden?: (getPending: (key: string, defaultValue?: any) => any) => boolean;
+    valueTransform?: (v: any) => any;
     onDisable?: () => void;
     onEnable?: () => void;
     onUpdate?: () => void;
@@ -309,9 +311,19 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'This info is collected anonymously to help us improve gSender by seeing how people use it.',
                         type: 'boolean',
+                        valueTransform: (v: any) => v === 'accepted' || v === true,
                         onApply: () => {
-                            const toggleValue = store.get('workspace.collectUsageDataStatus', 'pending');
-                            store.replace('workspace.collectUsageDataStatus', toggleValue ? 'accepted' : 'denied');
+                            const toggle = store.get('workspace.collectUsageDataStatus');
+                            store.replace(
+                                'workspace.collectUsageDataStatus',
+                                toggle === true || toggle === 'accepted' ? 'accepted' : 'denied',
+                            );
+
+                            if (toggle === true || toggle === 'accepted') {
+                                posthog.opt_in_capturing();
+                            } else {
+                                posthog.opt_out_capturing();
+                            }
                         },
                         ignoreDefaultCheck: true,
                     },

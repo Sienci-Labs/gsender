@@ -325,7 +325,9 @@ export const SettingRow = React.memo(function SettingRow({
                 {returnSettingControl(
                     connected,
                     displaySetting,
-                    populatedValue.value,
+                    setting.valueTransform
+                        ? setting.valueTransform(populatedValue.value)
+                        : populatedValue.value,
                     setting.globalIndex,
                     changeHandler(populatedValue.globalIndex),
                 )}
