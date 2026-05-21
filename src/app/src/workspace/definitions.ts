@@ -1,130 +1,130 @@
-import { WORKSPACE_MODE } from "../constants";
-import { MachineProfile } from "app/definitions/firmware";
-import { UNITS_EN, BasicPosition } from "app/definitions/general";
-import { ProbeProfile } from "app/features/Probe/definitions";
-import { RotarySettings } from "app/features/Rotary/definitions";
-import { Tool } from "app/features/Tools/definitions";
-import { GamepadConfig } from "app/lib/gamepad/definitions";
+import { WORKSPACE_MODE } from '../constants';
+import { MachineProfile } from 'app/definitions/firmware';
+import { UNITS_EN, BasicPosition } from 'app/definitions/general';
+import { ProbeProfile } from 'app/features/Probe/definitions';
+import { RotarySettings } from 'app/features/Rotary/definitions';
+import { Tool } from 'app/features/Tools/definitions';
+import { GamepadConfig } from 'app/lib/gamepad/definitions';
 
 // Types
 
 export type WORKSPACE_MODE_T =
-	(typeof WORKSPACE_MODE)[keyof typeof WORKSPACE_MODE];
+    (typeof WORKSPACE_MODE)[keyof typeof WORKSPACE_MODE];
 
 export type Notification = {
-	id: string;
-	message: string;
-	type: "success" | "error" | "info" | "warning";
-	status: "read" | "unread";
-	timestamp: Date | string;
+    id: string;
+    message: string;
+    type: 'success' | 'error' | 'info' | 'warning';
+    status: 'read' | 'unread';
+    timestamp: Date | string;
 };
 
-export type BackupFrequencies = "On Update" | "Daily" | "Weekly" | "Monthly";
+export type BackupFrequencies = 'On Update' | 'Daily' | 'Weekly' | 'Monthly';
 
 export type FirstToolBehavior =
-	| "Always run full wizard"
-	| "Prompt for first tool"
-	| "Always probe length only";
+    | 'Always run full wizard'
+    | 'Prompt for first tool'
+    | 'Always probe length only';
 
 // Interfaces
 
 export interface Workspace {
-	units: UNITS_EN;
-	reverseWidgets: boolean;
-	spindleFunctions: boolean;
-	coolantFunctions: boolean;
-	atcEnabled: boolean;
-	sendUsageData: boolean;
-	safeRetractHeight: number;
-	customDecimalPlaces: number;
-	jobsFinished: number;
-	jobsCancelled: number;
-	timeSpentRunning: number;
-	longestTimeRun: number;
-	defaultFirmware: string;
-	outlineMode: string;
-	outlineSpeed: number | null;
-	revertWorkspace: boolean;
-	promptExit: boolean;
-	backupFreq: BackupFrequencies;
-	lastBackupTime: number;
-	powerSaving: boolean;
-	park: object;
-	jobTimes: number[];
-	toolChange: {
-		passthrough: boolean;
-		skipDialog: boolean;
-		moveToManualPosition: boolean;
-		manualPosition: BasicPosition;
-		firstToolBehaviour: FirstToolBehavior;
-	};
-	toolChangeOption:
-		| "Ignore"
-		| "Pause"
-		| "Standard Re-zero"
-		| "Flexible Re-zero"
-		| "Fixed Tool Sensor"
-		| "Code";
-	toolChangePosition: BasicPosition;
-	toolChangeHooks: {
-		preHook: string;
-		postHook: string;
-	};
-	container: {
-		primary: {
-			show: boolean;
-			widgets: string[];
-		};
-		default: {
-			widgets: string[];
-		};
-	};
-	machineProfile: MachineProfile;
-	probeProfile: ProbeProfile;
-	tools: Tool[];
-	recentFiles: string[];
-	gamepad: GamepadConfig;
-	terminal: {
-		inputHistory: string[];
-	};
-	mode: WORKSPACE_MODE_T;
-	rotaryAxis: {
-		firmwareSettings: RotarySettings;
-		defaultFirmwareSettings: RotarySettings;
-		forceHardLimits: boolean;
-		forceSoftLimits: boolean;
-		useAaxisForGrbl: boolean;
-	};
-	shouldWarnZero: boolean;
-	diagnostics: {
-		stepperMotor: {
-			storedValue: number;
-		};
-	};
-	notifications: Notification[];
-	toastDuration: number;
-	enableDarkMode: boolean;
-	accessibility: {
-		statusAnnouncements: boolean;
-		jobProgressAnnouncements: boolean;
-		jobProgressIncrement: number;
-		focusRings: boolean;
-		focusTrapping: boolean;
-		visualizerKeyboardControl: boolean;
-		audioCues: {
-			enabled: boolean;
-			jobComplete: boolean;
-			alarmTriggered: boolean;
-			toolChange: boolean;
-			probeSuccess: boolean;
-		};
-		reducedMotion: boolean;
-		gcodeSummary: {
-			enabled: boolean;
-			showVisually: boolean;
-		};
-		showKeyboardMap: boolean;
-		displayScaleFactor?: string;
-	};
-	preventJoggingPastLimits: boolean;
+    units: UNITS_EN;
+    reverseWidgets: boolean;
+    spindleFunctions: boolean;
+    coolantFunctions: boolean;
+    atcEnabled: boolean;
+    collectUsageDataStatus: 'accepted' | 'denied' | 'pending';
+    safeRetractHeight: number;
+    customDecimalPlaces: number;
+    jobsFinished: number;
+    jobsCancelled: number;
+    timeSpentRunning: number;
+    longestTimeRun: number;
+    defaultFirmware: string;
+    outlineMode: string;
+    outlineSpeed: number | null;
+    revertWorkspace: boolean;
+    promptExit: boolean;
+    backupFreq: BackupFrequencies;
+    lastBackupTime: number;
+    powerSaving: boolean;
+    park: object;
+    jobTimes: number[];
+    toolChange: {
+        passthrough: boolean;
+        skipDialog: boolean;
+        moveToManualPosition: boolean;
+        manualPosition: BasicPosition;
+        firstToolBehaviour: FirstToolBehavior;
+    };
+    toolChangeOption:
+        | 'Ignore'
+        | 'Pause'
+        | 'Standard Re-zero'
+        | 'Flexible Re-zero'
+        | 'Fixed Tool Sensor'
+        | 'Code';
+    toolChangePosition: BasicPosition;
+    toolChangeHooks: {
+        preHook: string;
+        postHook: string;
+    };
+    container: {
+        primary: {
+            show: boolean;
+            widgets: string[];
+        };
+        default: {
+            widgets: string[];
+        };
+    };
+    machineProfile: MachineProfile;
+    probeProfile: ProbeProfile;
+    tools: Tool[];
+    recentFiles: string[];
+    gamepad: GamepadConfig;
+    terminal: {
+        inputHistory: string[];
+    };
+    mode: WORKSPACE_MODE_T;
+    rotaryAxis: {
+        firmwareSettings: RotarySettings;
+        defaultFirmwareSettings: RotarySettings;
+        forceHardLimits: boolean;
+        forceSoftLimits: boolean;
+        useAaxisForGrbl: boolean;
+    };
+    shouldWarnZero: boolean;
+    diagnostics: {
+        stepperMotor: {
+            storedValue: number;
+        };
+    };
+    notifications: Notification[];
+    toastDuration: number;
+    enableDarkMode: boolean;
+    accessibility: {
+        statusAnnouncements: boolean;
+        jobProgressAnnouncements: boolean;
+        jobProgressIncrement: number;
+        focusRings: boolean;
+        focusTrapping: boolean;
+        visualizerKeyboardControl: boolean;
+        audioCues: {
+            enabled: boolean;
+            jobComplete: boolean;
+            alarmTriggered: boolean;
+            toolChange: boolean;
+            probeSuccess: boolean;
+        };
+        reducedMotion: boolean;
+        gcodeSummary: {
+            enabled: boolean;
+            showVisually: boolean;
+        };
+        showKeyboardMap: boolean;
+        displayScaleFactor?: string;
+    };
+    preventJoggingPastLimits: boolean;
 }

@@ -71,6 +71,7 @@ import {
 import isElectron from 'is-electron';
 import { THEMES_T } from 'app/features/Visualizer/definitions';
 import { JSX } from 'react';
+import posthog from 'posthog-js';
 
 export interface SettingsMenuSection {
     label: string;
@@ -111,12 +112,14 @@ export interface gSenderSetting {
     value?: gSenderSettingsValues;
     defaultValue?: any;
     dirty?: boolean;
+    ignoreDefaultCheck?: boolean;
     eventType?: string;
     wizard?: () => JSX.Element;
     toolLink?: string;
     toolLinkLabel?: string;
     disabled?: () => boolean;
     hidden?: (getPending: (key: string, defaultValue?: any) => any) => boolean;
+    valueTransform?: (v: any) => any;
     onDisable?: () => void;
     onEnable?: () => void;
     onUpdate?: () => void;
@@ -303,11 +306,26 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         options: ['On Update', 'Daily', 'Weekly', 'Monthly'],
                     },
                     {
-                        label: 'Send usage data',
-                        key: 'workspace.sendUsageData',
+                        label: 'Collect usage data',
+                        key: 'workspace.collectUsageDataStatus',
                         description:
-                            'This info is sent to us as an anonymous data point, but greatly helps us improve gSender by seeing how people use it.',
+                            'This info is collected anonymously to help us improve gSender by seeing how people use it.',
                         type: 'boolean',
+                        valueTransform: (v: any) => v === 'accepted' || v === true,
+                        onApply: () => {
+                            const toggle = store.get('workspace.collectUsageDataStatus');
+                            store.replace(
+                                'workspace.collectUsageDataStatus',
+                                toggle === true || toggle === 'accepted' ? 'accepted' : 'denied',
+                            );
+
+                            if (toggle === true || toggle === 'accepted') {
+                                posthog.opt_in_capturing();
+                            } else {
+                                posthog.opt_out_capturing();
+                            }
+                        },
+                        ignoreDefaultCheck: true,
                     },
                 ],
             },

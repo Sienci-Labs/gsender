@@ -466,6 +466,14 @@ const SpindleWidget = () => {
         controller.command('gcode', commands);
     };
 
+    // refresh spindle list if it didn't populate
+    const refreshSpindles = () => {
+        if (availableSpindles.length === 0) {
+            // only happens on old firmware so we can safely use the old command
+            controller.writeln('$spindles');
+        }
+    };
+
     const actions = {
         handleModeToggle: () => {
             const newMode =
@@ -713,6 +721,7 @@ const SpindleWidget = () => {
                     />
                     {controllerType === GRBLHAL && (
                         <SpindleSelector
+                            onClick={refreshSpindles}
                             spindles={availableSpindles}
                             onChange={actions.handleHALSpindleSelect}
                             spindle={spindle}
