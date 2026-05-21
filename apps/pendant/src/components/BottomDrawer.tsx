@@ -338,8 +338,12 @@ export default function BottomDrawer() {
                                         </div>
                                         <span className="text-[10px] text-gray-400">{formatAgo(loadedAt)} · {formatSize(file.size)}</span>
                                     </div>
-                                    <button onClick={handleUnload} className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 shrink-0">
-                                        <X size={13} />
+                                    <button
+                                        onClick={handleUnload}
+                                        className="shrink-0 flex items-center gap-1 text-xs font-medium px-2.5 py-1.5 rounded-md border border-gray-300 dark:border-dark-lighter text-gray-500 dark:text-gray-400 hover:text-red-600 hover:bg-red-50 hover:border-red-300 dark:hover:text-red-400 dark:hover:bg-red-500/10 transition-colors"
+                                    >
+                                        <X size={12} />
+                                        Close
                                     </button>
                                 </div>
 

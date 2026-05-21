@@ -168,14 +168,12 @@ export default function PendantTopBar() {
         if (!isConnected) return;
 
         if (activeState === GRBL_ACTIVE_STATE_ALARM) {
-            if (alarmCode === 17 || alarmCode === 10) {
+            if (alarmCode === 1 || alarmCode === 2 || alarmCode === 10 || alarmCode === 14 || alarmCode === 17) {
                 controller.command('reset:limit');
+            } else if (alarmCode === 11 || alarmCode === 'Homing') {
+                controller.command('homing');
             } else {
                 controller.command('unlock');
-            }
-
-            if (alarmCode === 11 || alarmCode === 'Homing') {
-                controller.command('populateConfig');
             }
             return;
         }
