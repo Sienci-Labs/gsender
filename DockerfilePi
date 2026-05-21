@@ -12,6 +12,7 @@ ARG GIT_COMMIT_LOG
 WORKDIR /app
 COPY . .
 
+RUN npm install -g bun
 RUN npm install --legacy-peer-deps
 RUN npm run package-sync
 RUN npm install --prefix src --production --ignore-scripts --legacy-peer-deps
