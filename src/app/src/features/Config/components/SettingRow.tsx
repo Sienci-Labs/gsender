@@ -204,14 +204,17 @@ export const SettingRow = React.memo(function SettingRow({
 
     function handleProgramSettingReset(setting: gSenderSetting) {
         if (setting.type === 'hybrid' && firmwareType === GRBLHAL) {
-            // check if eeprom is reported
+            const effectiveEID =
+                Object.hasOwn(setting, 'remap') && isFirmwareCurrent
+                    ? setting.remap
+                    : setting.eID;
             let eepromValue = EEPROM.filter(
-                (o) => o.setting === setting.eID,
+                (o) => o.setting === effectiveEID,
             )[0];
             if (eepromValue) {
-                const defaultVal = getEEPROMDefaultValue(setting.eID);
+                const defaultVal = getEEPROMDefaultValue(effectiveEID);
                 if (defaultVal !== '-') {
-                    handleSingleSettingReset(setting.eID, defaultVal);
+                    handleSingleSettingReset(effectiveEID, defaultVal);
                     // since hybrids are sometimes referenced using the settings values, we have to update that as well
                     store.set(setting.key, defaultVal);
                     setSettingsValues((prev) => {
@@ -221,7 +224,7 @@ export const SettingRow = React.memo(function SettingRow({
                         return updated;
                     });
                 } else {
-                    toast.error(`No default found for $${setting.eID}.`);
+                    toast.error(`No default found for ${effectiveEID}.`);
                 }
             }
         }

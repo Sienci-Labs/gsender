@@ -104,8 +104,8 @@ const SpindleWidget = () => {
         $13: state.controller.settings.settings.$13 ?? '0',
         laserMax: Number(state.controller.settings.settings.$730 ?? 255),
         laserMin: Number(state.controller.settings.settings.$731 ?? 0),
-        laserXOffset: Number(state.controller.settings.settings.$741 ?? 0),
-        laserYOffset: Number(state.controller.settings.settings.$742 ?? 0),
+        laserXOffset: Number(state.controller.settings.settings.$770 ?? state.controller.settings.settings.$741 ?? 0),
+        laserYOffset: Number(state.controller.settings.settings.$771 ?? state.controller.settings.settings.$742 ?? 0),
     }));
 
     const [isLaserOn, setIsLaserOn] = useState<boolean>(false);
