@@ -90,7 +90,7 @@
     "cypress:open": "cypress open",
     "vite:build": "cross-env NODE_OPTIONS='--max-old-space-size=8192' bash -c 'cd apps/desktop && bun run build:client'",
     "vite:build:pendant": "bash -c 'cd apps/pendant && bun run build:client'",
-    "vite:build:pendant-standalone": "bash -c 'cd apps/pendant && vite build --outDir ../../dist/gsender-pendant/pendant --emptyOutDir'",
+    "vite:build:pendant-standalone": "vite build --config apps/pendant/vite.config.ts --outDir ../../dist/gsender-pendant/pendant --emptyOutDir",
     "vite:dev:pendant": "cd apps/pendant && vite --port 5174 --host",
     "prebuild-pendant": "npm run package-sync && node esbuild.config.js --production --prebuild-pendant-only",
     "pendant:electron:dev": "npm run build-dev && concurrently --kill-others-on-fail --names \"esbuild,server,vite,electron\" \"npm run watch-dev\" \"npm run start-dev:nodemon\" \"npm run vite:dev:pendant\" \"bash -lc 'until curl -sf http://127.0.0.1:5174 >/dev/null; do sleep 0.2; done; cross-env NODE_ENV=development ELECTRON_RENDERER_URL=http://127.0.0.1:5174 electron ./output/pendant-main'\"",

@@ -12,15 +12,15 @@ ARG GIT_COMMIT_LOG
 WORKDIR /app
 COPY . .
 
-RUN yarn install
+RUN npm install --legacy-peer-deps
 RUN npm run package-sync
-RUN yarn --cwd src install --production --ignore-scripts --non-interactive
+RUN npm install --prefix src --production --ignore-scripts --legacy-peer-deps
 RUN if [ "$GITHUB_REF_TYPE" = "tag" ]; then npm run prebuild-prod; else npm run prebuild-latest; fi
-RUN if [ "$GITHUB_REF_TYPE" = "tag" ]; then yarn run build; else yarn run build-latest; fi
+RUN if [ "$GITHUB_REF_TYPE" = "tag" ]; then npm run build; else npm run build-latest; fi
 RUN --mount=type=secret,id=GH_TOKEN \
     export GH_TOKEN="$(cat /run/secrets/GH_TOKEN)" && \
     export GITHUB_TOKEN="$GH_TOKEN" && \
-    yarn run build:linux-arm64
+    npm run build:linux-arm64
 
 # rename package to PI-64Bit
 RUN for f in /app/output/*.deb; do mv "$f" "$(echo "$f" | sed s/arm64/PI-64Bit/)"; done
@@ -35,13 +35,13 @@ RUN --mount=type=secret,id=GH_TOKEN \
     export GH_TOKEN="$(cat /run/secrets/GH_TOKEN)" && \
     export GITHUB_TOKEN="$GH_TOKEN" && \
     if [[ "$GITHUB_REF_TYPE" == "branch" && "$GITHUB_REF_NAME" == "master" ]]; then \
-        yarn github-release delete \
+        ./node_modules/.bin/github-release delete \
             --owner=gSender \
             --repo=gsender \
             --tag="${GITHUB_REF_NAME}-latest" \
             --release-name="${GITHUB_REF_NAME}" \
             "*-pi*"; \
-        yarn github-release upload \
+        ./node_modules/.bin/github-release upload \
             --owner=gSender \
             --repo=gsender \
             --tag="${GITHUB_REF_NAME}-latest" \
