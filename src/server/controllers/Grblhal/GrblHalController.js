@@ -504,13 +504,6 @@ class GrblHalController {
 
                 // line="G0 X[posx - 8] Y[ymax]"
                 // > "G0 X2 Y50"
-
-                // [\xNN] realtime-command tokens — write immediately, strip from line
-                { const { line: rtLine, realtimeCmds } = extractRealtimeCommands(line);
-                    realtimeCmds.forEach(cmd => this.connection.writeImmediate(cmd));
-                    line = rtLine;
-                    if (!line) return ''; }
-
                 line = translateExpression(line, context);
                 const data = parser.parseLine(line, { flatten: true });
                 const words = ensureArray(data.words);
