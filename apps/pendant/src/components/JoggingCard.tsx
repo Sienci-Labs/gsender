@@ -268,11 +268,11 @@ export default function JoggingCard() {
         'jog-btn relative rounded-2xl border transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-robin-500';
 
     const toneClasses: Record<JogTone, string> = {
-        neutral: 'bg-white border-gray-200 text-gray-500 dark:bg-dark dark:border-dark-lighter dark:text-gray-400',
-        x: 'bg-white border-red-300 text-red-600 dark:bg-dark dark:border-dark-lighter dark:text-red-400',
-        y: 'bg-white border-green-300 text-green-600 dark:bg-dark dark:border-dark-lighter dark:text-green-400',
-        z: 'bg-white border-blue-300 text-blue-600 dark:bg-dark dark:border-dark-lighter dark:text-blue-400',
-        a: 'bg-white border-purple-300 text-purple-600 dark:bg-dark dark:border-dark-lighter dark:text-purple-400',
+        neutral: 'bg-gray-50 border-gray-300 text-gray-400 shadow-sm dark:bg-dark dark:border-dark-lighter dark:text-gray-400 dark:shadow-none',
+        x: 'bg-gray-50 border-red-400 text-red-600 shadow-sm dark:bg-dark dark:border-dark-lighter dark:text-red-400 dark:shadow-none',
+        y: 'bg-gray-50 border-green-400 text-green-600 shadow-sm dark:bg-dark dark:border-dark-lighter dark:text-green-400 dark:shadow-none',
+        z: 'bg-gray-50 border-blue-400 text-blue-600 shadow-sm dark:bg-dark dark:border-dark-lighter dark:text-blue-400 dark:shadow-none',
+        a: 'bg-gray-50 border-purple-400 text-purple-600 shadow-sm dark:bg-dark dark:border-dark-lighter dark:text-purple-400 dark:shadow-none',
     };
 
     const activeClasses: Record<JogTone, string> = {
@@ -368,7 +368,7 @@ export default function JoggingCard() {
     );
 
     return (
-        <div className="rounded-xl bg-gray-100 border border-gray-200 dark:bg-dark-darker dark:border-dark-lighter p-4 flex flex-col gap-4">
+        <div className="rounded-xl bg-white border border-gray-300 dark:bg-dark-darker dark:border-dark-lighter p-4 flex flex-col gap-4">
             <div className="flex items-center justify-center gap-1.5">
                 {PRESET_META.map((preset) => (
                     <button
@@ -377,7 +377,7 @@ export default function JoggingCard() {
                         className={`px-3 py-1 rounded text-xs font-semibold transition-colors ${
                             stepPreset === preset.id
                                 ? 'bg-robin-500 text-white'
-                                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white border border-gray-200 dark:border-dark-lighter'
+                                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white border border-gray-300 dark:border-dark-lighter'
                         }`}
                     >
                         {preset.label}

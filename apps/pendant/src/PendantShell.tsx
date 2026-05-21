@@ -20,7 +20,7 @@ export default function PendantShell() {
     }, []);
 
     return (
-        <div className="h-screen w-screen flex flex-col bg-white dark:bg-dark overflow-hidden">
+        <div className="h-screen w-screen flex flex-col bg-gray-100 dark:bg-dark overflow-hidden">
             <PendantTopBar />
             <InfoStrip />
 
