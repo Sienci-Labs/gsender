@@ -110,13 +110,11 @@ describe('Invert and Check Pins Test with Stepper Motor Lock/Unlock', () => {
     cy.get('header div.top-0 img').should('be.visible').click();
     cy.wait(2000);
 
-    // Step 4: Pin the popup — from recording
-    cy.log('Step 4: Pinning popup...');
-    cy.get('body > div:nth-of-type(2) div > svg')
-      .should('exist')
-      .click({ force: true });
-    cy.wait(1000);
-    cy.log('Machine Info popup pinned');
+    // Step 4: Pin the popup 
+
+  cy.get('[aria-label="Pin machine information"]')
+  .should('exist')
+  .click({ force: true });
 
     // Step 5: Navigate to Configuration
     cy.log('Step 5: Navigating to Configuration page...');
@@ -125,12 +123,8 @@ describe('Invert and Check Pins Test with Stepper Motor Lock/Unlock', () => {
     cy.log('Configuration page opened');
 
     // Step 6: Search for invert
-    cy.log('Step 6: Searching for invert settings...');
-    cy.searchInSettings('invert');
-    cy.wait(1500);
-    cy.log('Search results displayed for invert');
-
-    // Disable all axes
+    cy.log('Disbale all invert pin  limits..');
+  
     disableAxisIfEnabled('\\$5-0-key', 'X');
     disableAxisIfEnabled('\\$5-1-key', 'Y');
     disableAxisIfEnabled('\\$5-2-key', 'Z');

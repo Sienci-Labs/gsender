@@ -42,9 +42,9 @@ describe("CNC Machine Tests job run Grbl", () => {
 
 		cy.wait(2000);
 
-		// Step 3: Go to location 000 using cypress command
+		// Step 3: Zero all axes
 		cy.log("Step 3: Moving to home position (0,0,0)...");
-		cy.goToLocation(0, 0, 0);
+		cy.zeroAllAxes();
 		cy.log("Machine is in 0,0,0 location");
 
 		// Step 4: Upload File using custom command
@@ -154,7 +154,7 @@ describe("CNC Machine Tests job run Grbl", () => {
 
 		// Step 12: Return to home position
 		cy.log("Step 12: Returning to home position...");
-		cy.goToLocation(0, 0, 0);
+		cy.zeroAllAxes();
 		cy.log(" Returned to home position");
 
 		cy.log("========================================");

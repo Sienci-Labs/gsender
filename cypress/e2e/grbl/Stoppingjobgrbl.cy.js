@@ -28,7 +28,7 @@ describe("Stop job ", () => {
 
 		// Step 3: Go to location 000 using cypress command
 		cy.log("Step 3: Moving to home position (0,0,0)...");
-		cy.goToLocation(0, 0, 0);
+		cy.zeroAllAxes();
 		cy.log("Machine is in 0,0,0 location");
 
 		// Step 4: Upload File using custom command
