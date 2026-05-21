@@ -571,6 +571,11 @@ class GrblHalRunner extends events.EventEmitter {
         return `F${value}`;
     }
 
+    getCurrentSpindleRate(state = this.state) {
+        const value = _.get(state, 'parserstate.spindle');
+        return `${value}`;
+    }
+
     isAlarm() {
         const activeState = _.get(this.state, 'status.activeState');
         return activeState === GRBL_HAL_ACTIVE_STATE_ALARM;

@@ -24,7 +24,6 @@ import controller from 'app/lib/controller';
 import store from 'app/store';
 import {
     getProbeSettings,
-    getUnitModal,
     getToolString,
 } from 'app/lib/toolChangeUtils';
 import { store as reduxStore } from 'app/store/redux';
@@ -54,25 +53,21 @@ const probeInitialToolStep = [{
             actions: [
                 {
                     label: 'Probe Initial Tool',
-                    cb: () => {
-                        controller.command('gcode', [
-                            'G91 G21',
-                            'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
-                            'G53 G0 X[global.toolchange.PROBE_POS_X] Y[global.toolchange.PROBE_POS_Y]',
-                            'G53 G0 Z[global.toolchange.PROBE_POS_Z]',
-                            'G49', // cancel applied TLO offsets
-                            'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
-                            'G0 Z[global.toolchange.RETRACT]',
-                            'G38.2 Z-10 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
-                            'G4 P0.3',
-                            'G43.1 Z0', // Set Z0 on initial tool offset
-                            '%global.toolchange.TOOL_OFFSET=posz',
-                            '(TLO set: [global.toolchange.TOOL_OFFSET])',
-                            'G0 Z[global.toolchange.RETRACT]',
-                            'G90 G21',
-                            'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
-                        ]);
-                    },
+                    gcodeLines: [
+                        'G91 G21',
+                        'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                        'G53 G0 X[global.toolchange.PROBE_POS_X] Y[global.toolchange.PROBE_POS_Y]',
+                        'G53 G0 Z[global.toolchange.PROBE_POS_Z]',
+                        'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
+                        'G0 Z[global.toolchange.RETRACT]',
+                        'G38.2 Z-10 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
+                        'G4 P0.3',
+                        '%global.toolchange.TOOL_OFFSET=posz',
+                        '(TLO set: [global.toolchange.TOOL_OFFSET])',
+                        'G0 Z[global.toolchange.RETRACT]',
+                        'G90 G21',
+                        'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                    ],
                 },
             ],
         },
@@ -89,17 +84,16 @@ const getMoveToToolchangePositionSubstep = () => ({
         </div>
     ),
     overlay: false,
+    toolBanner: true,
     actions: [
         {
             label: 'Move to Tool Change Location',
-            cb: () => {
-                controller.command('gcode', [
-                    '(Moving to manual toolchange location)',
-                    'G90 G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
-                    'G90 G53 G0 X[global.toolchange.MANUAL_POS_X] Y[global.toolchange.MANUAL_POS_Y]',
-                    'G90 G53 G0 Z[global.toolchange.MANUAL_POS_Z]',
-                ]);
-            },
+            gcodeLines: [
+                '(Moving to manual toolchange location)',
+                'G90 G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                'G90 G53 G0 X[global.toolchange.MANUAL_POS_X] Y[global.toolchange.MANUAL_POS_Y]',
+                'G90 G53 G0 Z[global.toolchange.MANUAL_POS_Z]',
+            ],
         },
     ],
 });
@@ -124,7 +118,7 @@ const createWizard = (count: number) => {
             // Get $13 value for adjustment of Z Safe Height
             const state = reduxStore.getState();
             const $13 = get(state, 'controller.settings.settings.$13', '0');
-            const zSafe = $13 === '1' ? '-0.5' : '-10';
+            const zSafe = $13 === '1' ? '-0.2' : '-5';
 
             const zProbeDistance = calculateMaxZProbeDistance(
                 settings.zProbeDistance,
@@ -148,7 +142,8 @@ const createWizard = (count: number) => {
                 '%global.toolchange.SPINDLE=modal.spindle',
                 '%global.toolchange.DISTANCE=modal.distance',
                 '%global.toolchange.FEEDRATE=programFeedrate',
-                'M5',
+                '%global.toolchange.SPINDLE_RATE=spindleRate',
+                'M5 S0',
                 '%wait',
                 '%global.toolchange.XPOS=posx',
                 '%global.toolchange.YPOS=posy',
@@ -177,30 +172,26 @@ const createWizard = (count: number) => {
                             </div>
                         ),
                         overlay: false,
+                        toolBanner: !hasManualToolchangePosition,
                         actions: [
                             {
                                 label: 'Probe Changed Tool',
-                                cb: () => {
-                                    //const modal = getUnitModal();
-                                    controller.command('gcode', [
-                                        '(Moving back to configured location)',
-                                        'G49', // cancel TLO offset
-                                        'G90 G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
-                                        'G90 G53 G0 X[global.toolchange.PROBE_POS_X] Y[global.toolchange.PROBE_POS_Y]',
-                                        'G53 G0 Z[global.toolchange.PROBE_POS_Z]',
-                                        'G91 G21',
-                                        'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
-                                        'G0 Z[global.toolchange.RETRACT]',
-                                        'G38.2 Z-15 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
-                                        '(Set Z to Tool offset and wait)',
-                                        'G4 P0.3',
-                                        //`${modal} G10 L20 P0 Z[global.toolchange.TOOL_OFFSET]`,
-                                        'G43.1 Z[posz - global.toolchange.TOOL_OFFSET]',
-                                        'G0 Z[global.toolchange.RETRACT]',
-                                        'G53 G21 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
-                                        'G21 G91',
-                                    ]);
-                                },
+                                gcodeLines: [
+                                    '(Moving back to configured location)',
+                                    'G90 G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                                    'G90 G53 G0 X[global.toolchange.PROBE_POS_X] Y[global.toolchange.PROBE_POS_Y]',
+                                    'G53 G0 Z[global.toolchange.PROBE_POS_Z]',
+                                    'G91 G21',
+                                    'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
+                                    'G0 Z[global.toolchange.RETRACT]',
+                                    'G38.2 Z-15 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
+                                    '(Set Z to Tool offset and wait)',
+                                    'G4 P0.3',
+                                    `G10 L20 P0 Z[global.toolchange.TOOL_OFFSET]`,
+                                    'G0 Z[global.toolchange.RETRACT]',
+                                    'G53 G21 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                                    'G21 G91',
+                                ],
                             },
                         ],
                     },
@@ -217,18 +208,18 @@ const createWizard = (count: number) => {
                         actions: [
                             {
                                 label: 'Resume Cutting',
-                                cb: () => {
-                                    const unit = getUnitModal();
-                                    controller.command('gcode', [
-                                        '(Returning to initial position)',
-                                        'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
-                                        `G90 ${unit} G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]`,
-                                        `G90 ${unit} G0 Z[global.toolchange.ZPOS]`,
-                                        '(Restore initial modals)',
-                                        'M3 [global.toolchange.UNITS] [global.toolchange.DISTANCE] [global.toolchange.FEEDRATE]',
-                                        '%toolchange_complete',
-                                    ]);
-                                },
+                                gcodeLines: [
+                                    '(Restart Spindle)',
+                                    '[global.toolchange.SPINDLE] S[global.toolchange.SPINDLE_RATE]',
+                                    '(Returning to initial position)',
+                                    'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                                    'G90 G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]',
+                                    'G90 G0 Z[global.toolchange.ZPOS]',
+                                    '(Restore initial modals)',
+                                    '[global.toolchange.UNITS] [global.toolchange.DISTANCE] [global.toolchange.FEEDRATE]',
+                                    '%wait',
+                                    '%toolchange_complete',
+                                ],
                             },
                         ],
                     },

@@ -23,8 +23,7 @@
 
 import React from 'react';
 import { useWizardAPI, useWizardContext } from 'app/features/Helper/context';
-import styles from '../index.module.styl';
-import { FaMinus, FaPlus } from 'react-icons/fa';
+import { Minus, Maximize2 } from 'lucide-react';
 
 const MinMaxButton = () => {
     const { minimized } = useWizardContext();
@@ -32,16 +31,11 @@ const MinMaxButton = () => {
     return (
         <button
             type="button"
-            className={styles.actionButton}
             onClick={() => toggleMinimized(minimized)}
-            style={{ marginRight: 5 }}
-            aria-label={minimized ? "Maximize wizard" : "Minimize wizard"}
+            aria-label={minimized ? 'Restore wizard' : 'Minimise wizard'}
+            className="flex items-center justify-center w-7 h-7 rounded border border-gray-300 dark:border-[#3a3a48] bg-transparent text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors mr-1"
         >
-            {!minimized ? (
-                <FaMinus className="bg-transparent" />
-            ) : (
-                <FaPlus className="bg-transparent" />
-            )}
+            {minimized ? <Maximize2 size={12} /> : <Minus size={12} />}
         </button>
     );
 };

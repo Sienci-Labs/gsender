@@ -502,7 +502,10 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             // ***first, check conditions that are always applicable
 
             // Hide hidden when filtering
-            if ('hidden' in v && (!searchTerm || searchTerm.trim().length === 0)) {
+            if (
+                'hidden' in v &&
+                (!searchTerm || searchTerm.trim().length === 0)
+            ) {
                 if (v.hidden(getPendingOrStore)) {
                     // only return if it's supposed to be hidden, otherwise we have more to check
                     return false;
@@ -607,10 +610,22 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     }
 
     function isSettingDefault(v: gSenderSetting) {
+        if (v.ignoreDefaultCheck) {
+            return true;
+        }
+
         if (v.type === 'hybrid' && connected && controllerType === GRBLHAL) {
             return eepromIsDefault(v);
         }
         if ('key' in v) {
+            if (v.key === 'workspace.collectUsageDataStatus') {
+                console.log({
+                    key: v.key,
+                    value: v.value,
+                    defaultValue: v.defaultValue,
+                });
+            }
+
             return isEqual(v.value, v.defaultValue);
         }
         return true; // Default to true, so non-key settings aren't always highlighted.

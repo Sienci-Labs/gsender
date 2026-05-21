@@ -16,6 +16,8 @@ on:
 env:
   GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
   NODE_OPTIONS: --max-old-space-size=8192
+  VITE_PUBLIC_POSTHOG_PROJECT_TOKEN: ${{ secrets.VITE_PUBLIC_POSTHOG_PROJECT_TOKEN }}
+  VITE_PUBLIC_POSTHOG_HOST: ${{ secrets.VITE_PUBLIC_POSTHOG_HOST }}
 
 jobs:
   build-linux:
@@ -78,6 +80,8 @@ jobs:
       APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
       CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
       CSC_LINK: ${{ secrets.CSC_LINK }}
+      # Skip code signing for pull requests
+      CSC_IDENTITY_AUTO_DISCOVERY: ${{ github.event_name == 'pull_request' && 'false' || 'true' }}
     permissions:
       contents: write
     steps:
@@ -97,7 +101,7 @@ jobs:
           PACKAGE_VERSION=`node -e "console.log(require('./src/package.json').version)"`
           mkdir -p releases/macos
           ls -al output
-          cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-x64.dmg" "releases/macos/gSender-${PACKAGE_VERSION}-Mac-Universal.dmg"
+          cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-x64.dmg" "releases/macos/gSender-${PACKAGE_VERSION}-Mac-Intel.dmg"
           cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-arm64.dmg" "releases/macos/gSender-${PACKAGE_VERSION}-Mac-Silicon.dmg"
           ls -al output releases/macos
           if [[ "$GITHUB_REF_TYPE" == "branch" && "$GITHUB_REF_NAME" == "master" ]]; then

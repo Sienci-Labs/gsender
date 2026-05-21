@@ -13,6 +13,7 @@ type FormattedSpindle = {
 type Props = {
     spindles: Spindle[];
     onChange: (selectedOption: FormattedSpindle | null) => void;
+    onClick: () => void;
     spindle: Spindle | null;
     disabled: boolean;
 };
@@ -24,19 +25,23 @@ const formatSpindles = (spindles: Spindle[] = []): FormattedSpindle[] => {
     }));
 };
 
-const SpindleSelector = ({ spindles, onChange, spindle, disabled }: Props) => {
+const SpindleSelector = ({
+    spindles,
+    onChange,
+    onClick,
+    spindle,
+    disabled,
+}: Props) => {
     const spindleFormatted = { label: spindle.label, value: spindle.id };
     const formattedSpindles = formatSpindles(spindles);
 
     return (
         <Tooltip content="Select a spindle">
             <div
-                className={cx(
-                    'flex gap-1 justify-center w-full items-center',
-                    {
-                        'cursor-not-allowed': disabled,
-                    },
-                )}
+                className={cx('flex gap-1 justify-center w-full items-center', {
+                    'cursor-not-allowed': disabled,
+                })}
+                onClick={onClick}
             >
                 <Select<FormattedSpindle>
                     options={formattedSpindles}

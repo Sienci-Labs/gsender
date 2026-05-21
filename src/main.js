@@ -445,7 +445,7 @@ const main = () => {
 
                     prevDirectory = filePath; // set previous directory
 
-                    fs.readFile(FULL_FILE_PATH, 'utf8', (err, data) => {
+                    fs.readFile(FULL_FILE_PATH, 'latin1', (err, data) => {
                         if (err) {
                             log.error(`Error in readFile: ${err}`);
                             return;

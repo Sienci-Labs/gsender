@@ -305,12 +305,19 @@ class GrblHalController {
         this.feeder = new Feeder({
             dataFilter: (line, context) => {
                 let commentMatcher = /\s*;.*/g;
-                let comment = line.match(commentMatcher);
-                const commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
+                let bracketCommentLine = /\([^\)]*\)/gm;
+                const commentRegex = /\(([^)]*)\)|;(.*)/g;
+                const commentParts = [];
+                let m;
+                while ((m = commentRegex.exec(line)) !== null) {
+                    const text = (m[1] !== undefined ? m[1] : m[2]).trim();
+                    if (text) commentParts.push(text);
+                }
+                const commentString = commentParts.join(' ');
+                line = line.replace(bracketCommentLine, '').trim();
                 line = line.replace(commentMatcher, '').trim();
                 const ignoreEvent = context ? context.ignoreEvent : true;
                 context = this.populateContext(context);
-
                 // We don't want some of these events firing if updating EEPROM in a macro - super edge case.
                 const looksLikeEEPROM = line.charAt(0) === '$';
 
@@ -467,9 +474,15 @@ class GrblHalController {
                 let commentMatcher = /\s*;.*/g;
                 let bracketCommentLine = /\([^\)]*\)/gm;
                 let toolCommand = /(T)(-?\d*\.?\d+\.?)/;
+                const commentRegex = /\(([^)]*)\)|;(.*)/g;
+                const commentParts = [];
+                let m;
+                while ((m = commentRegex.exec(line)) !== null) {
+                    const text = (m[1] !== undefined ? m[1] : m[2]).trim();
+                    if (text) commentParts.push(text);
+                }
+                let commentString = commentParts.join(' ');
                 line = line.replace(bracketCommentLine, '').trim();
-                let comment = line.match(commentMatcher);
-                let commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
                 line = line.replace(commentMatcher, '').replace('/uFEFF', '').trim();
                 context = this.populateContext(context);
 
@@ -541,12 +554,16 @@ class GrblHalController {
 
                     let tool = line.match(toolCommand);
                     log.debug('Found tool');
+                    let toolLabel = tool?.[0] || null;
+                    let toolNumber = tool?.[2] || null;
                     if (tool && this.toolChangeContext.mappings) {
                         const remap = _.get(this.toolChangeContext.mappings, tool[2], null);
 
                         if (remap) {
                             log.debug(`Mapping ${tool} to T${remap}`);
                             line = line.replace(tool[0], `T${remap}`);
+                            toolLabel = `T${remap}`;
+                            toolNumber = String(remap);
                         } else {
                             log.debug(`no remap found for ${tool}`);
                         }
@@ -555,9 +572,6 @@ class GrblHalController {
                     // Handle specific cases for macro and pause, ignore is default and comments line out with no other action
                     // If toolchange is at very beginning of file, ignore it
                     if (toolChangeOption !== 'Ignore') {
-                        if (tool) {
-                            commentString = `(${tool?.[0]}) ` + commentString;
-                        }
                         this.workflow.pause({ data: 'M6', comment: commentString });
 
                         if (toolChangeOption === 'Code') {
@@ -570,13 +584,13 @@ class GrblHalController {
 
                             this.toolChanger.addInterval(() => {
                                 // Emit the current state so latest tool info is available
-                                this.runner.setTool(tool?.[2]); // set tool in runner state
-                                this.emit('controller:state', GRBLHAL, this.state, tool?.[2]); // set tool in redux
+                                this.runner.setTool(toolNumber); // set tool in runner state
+                                this.emit('controller:state', GRBLHAL, this.state, toolNumber); // set tool in redux
                                 this.emit('gcode:toolChange', {
                                     line: sent + 1,
                                     count,
                                     block: line,
-                                    tool: tool,
+                                    tool: toolLabel,
                                     option: toolChangeOption
                                 }, commentString);
                             });
@@ -1433,6 +1447,7 @@ class GrblHalController {
 
         // Program feedrate
         const programFeedrate = this.runner.getCurrentFeedrate();
+        const spindleRate = this.runner.getCurrentSpindleRate();
 
         return Object.assign(context || {}, {
             // User-defined global variables
@@ -1484,6 +1499,9 @@ class GrblHalController {
 
             // Program Feedrate
             programFeedrate: programFeedrate,
+
+            // Current Spindle RPM
+            spindleRate: spindleRate,
 
             // Global objects
             ...globalObjects,
@@ -2424,7 +2442,7 @@ class GrblHalController {
             },
             'toolchange:context': () => {
                 const [context] = args;
-                console.log(context);
+
                 this.toolChangeContext = { ...this.toolChangeContext, ...context };
             },
             'toolchange:pre': () => {

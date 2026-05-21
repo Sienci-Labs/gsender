@@ -3,6 +3,7 @@ import pubsub from 'pubsub-js';
 
 import { WORKSPACE_MODE_T } from 'app/workspace/definitions';
 import {
+    EEPROMSettings,
     FIRMWARE_TYPES_T,
     RotaryModeFirmwareSettings,
 } from 'app/definitions/firmware';
@@ -26,6 +27,10 @@ export const updateWorkspaceMode = (mode: WORKSPACE_MODE_T): void => {
     const firmwareType: FIRMWARE_TYPES_T = get(
         reduxStore.getState(),
         'controller.type',
+    );
+    const EEPROMSettings: EEPROMSettings = get(
+        reduxStore.getState(),
+        'controller.settings.settings',
     );
     const rotaryFirmwareSettings: RotaryModeFirmwareSettings = store.get(
         'workspace.rotaryAxis.firmwareSettings',
@@ -84,6 +89,18 @@ export const updateWorkspaceMode = (mode: WORKSPACE_MODE_T): void => {
         case ROTARY: {
             // We only need to update the firmware settings on grbl machines
             if (firmwareType === GRBL) {
+                // save default settings
+                const defaultFirmwareSettings = {
+                    $101: EEPROMSettings.$101,
+                    $111: EEPROMSettings.$111,
+                    $20: EEPROMSettings.$20,
+                    $21: EEPROMSettings.$21,
+                };
+                store.replace(
+                    'workspace.rotaryAxis.defaultFirmwareSettings',
+                    defaultFirmwareSettings,
+                );
+
                 // Convert to array to send to the controller, will look something like this: ["$101=26.667", ...]
                 const rotaryFirmwareSettingsArr = Object.entries(
                     rotaryFirmwareSettings,

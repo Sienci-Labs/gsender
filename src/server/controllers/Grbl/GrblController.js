@@ -273,11 +273,17 @@ class GrblController {
         this.feeder = new Feeder({
             dataFilter: (line, context) => {
                 let commentMatcher = /\s*;.*/g;
-                let comment = line.match(commentMatcher);
-                const commentString = (comment && comment[0].length > 0) ? comment[0].trim()
-                    .replace(';', '') : '';
-                line = line.replace(commentMatcher, '')
-                    .trim();
+                let bracketCommentLine = /\([^\)]*\)/gm;
+                const commentRegex = /\(([^)]*)\)|;(.*)/g;
+                const commentParts = [];
+                let m;
+                while ((m = commentRegex.exec(line)) !== null) {
+                    const text = (m[1] !== undefined ? m[1] : m[2]).trim();
+                    if (text) commentParts.push(text);
+                }
+                const commentString = commentParts.join(' ');
+                line = line.replace(bracketCommentLine, '').trim();
+                line = line.replace(commentMatcher, '').trim();
                 const ignoreEvent = context ? context.ignoreEvent : true;
                 context = this.populateContext(context);
 
@@ -445,9 +451,15 @@ class GrblController {
                 let commentMatcher = /\s*;.*/g;
                 let bracketCommentLine = /\s*\(.*\)*\)/gm;
                 let toolCommand = /(T)(-?\d*\.?\d+\.?)/;
+                const commentRegex = /\(([^)]*)\)|;(.*)/g;
+                const commentParts = [];
+                let m;
+                while ((m = commentRegex.exec(line)) !== null) {
+                    const text = (m[1] !== undefined ? m[1] : m[2]).trim();
+                    if (text) commentParts.push(text);
+                }
+                let commentString = commentParts.join(' ');
                 line = line.replace(bracketCommentLine, '').trim();
-                let comment = line.match(commentMatcher);
-                let commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
                 line = line.replace(commentMatcher, '').trim();
                 context = this.populateContext(context);
 
@@ -521,13 +533,12 @@ class GrblController {
                     const { toolChangeOption } = this.toolChangeContext;
 
                     let tool = line.match(toolCommand);
+                    const toolLabel = tool?.[0] || null;
+                    const toolNumber = tool?.[2] || null;
 
                     // Handle specific cases for macro and pause, ignore is default and comments line out with no other action
                     // If toolchange is at very beginning of file, ignore it
                     if (toolChangeOption !== 'Ignore') {
-                        if (tool) {
-                            commentString = `(${tool?.[0]}) ` + commentString;
-                        }
                         this.workflow.pause({ data: 'M6', comment: commentString });
 
                         if (toolChangeOption === 'Code') {
@@ -538,13 +549,13 @@ class GrblController {
 
                             this.toolChanger.addInterval(() => {
                                 // Emit the current state so latest tool info is available
-                                this.runner.setTool(tool?.[2]); // set tool in runner state
-                                this.emit('controller:state', GRBL, this.state, tool?.[2]); // set tool in redux
+                                this.runner.setTool(toolNumber); // set tool in runner state
+                                this.emit('controller:state', GRBL, this.state, toolNumber); // set tool in redux
                                 this.emit('gcode:toolChange', {
                                     line: sent + 1,
                                     count,
                                     block: line,
-                                    tool: tool,
+                                    tool: toolLabel,
                                     option: toolChangeOption
                                 }, commentString);
                             });
@@ -1187,6 +1198,9 @@ class GrblController {
         // Program feedrate
         const programFeedrate = this.runner.getCurrentFeedrate();
 
+        // Spindle RPM
+        const spindleRate = this.runner.getCurrentSpindleRate();
+
         return Object.assign(context || {}, {
             // User-defined global variables
             global: this.sharedContext,
@@ -1238,6 +1252,9 @@ class GrblController {
 
             // Program Feedrate
             programFeedrate: programFeedrate,
+
+            // Current spindle RPM
+            spindleRate: spindleRate,
 
             // Global objects
             ...globalObjects,

@@ -121,6 +121,16 @@ export function ToolTimelineItem({
                                 </Tooltip>
                             </>
                         )}
+                        {!hasNickname && tool.comment && (
+                            <>
+                                <span className="text-gray-500 dark:text-gray-400">
+                                    ·
+                                </span>
+                                <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                                    {tool.comment}
+                                </span>
+                            </>
+                        )}
                     </div>
 
                     <div className="flex items-center gap-2">

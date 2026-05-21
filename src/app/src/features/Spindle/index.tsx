@@ -51,6 +51,8 @@ interface SpindleState {
     spindleMin: number;
 }
 
+const SLB_LASERS = ['SLB_LASER', 'PWM2'];
+
 const SpindleWidget = () => {
     const dispatch = useDispatch();
     const config = new WidgetConfig('spindle');
@@ -102,8 +104,8 @@ const SpindleWidget = () => {
         $13: state.controller.settings.settings.$13 ?? '0',
         laserMax: Number(state.controller.settings.settings.$730 ?? 255),
         laserMin: Number(state.controller.settings.settings.$731 ?? 0),
-        laserXOffset: Number(state.controller.settings.settings.$741 ?? 0),
-        laserYOffset: Number(state.controller.settings.settings.$742 ?? 0),
+        laserXOffset: Number(state.controller.settings.settings.$770 ?? state.controller.settings.settings.$741 ?? 0),
+        laserYOffset: Number(state.controller.settings.settings.$771 ?? state.controller.settings.settings.$742 ?? 0),
     }));
 
     const [isLaserOn, setIsLaserOn] = useState<boolean>(false);
@@ -358,9 +360,14 @@ const SpindleWidget = () => {
         const prevSpindleMin = config.get('spindleMin', 0);
         const prevSpindleMax = config.get('spindleMax', 0);
 
+        availableSpindles.forEach((o) => {
+            console.log(SLB_LASERS.includes(o.label));
+        });
         const SLBLaserExists =
             controllerType === GRBLHAL &&
-            findIndex(availableSpindles, (o) => o.label === 'SLB_LASER') !== -1;
+            findIndex(availableSpindles, (o) =>
+                SLB_LASERS.includes(o.label),
+            ) !== -1;
 
         // save current laser values if laser spindle doesnt exist
         if (!SLBLaserExists) {
@@ -419,7 +426,9 @@ const SpindleWidget = () => {
 
         const SLBLaserExists =
             controllerType === GRBLHAL &&
-            findIndex(availableSpindles, (o) => o.label === 'SLB_LASER') !== -1;
+            findIndex(availableSpindles, (o) =>
+                SLB_LASERS.includes(o.label),
+            ) !== -1;
 
         // save current spindle values if laser spindle doesnt exist
         if (!SLBLaserExists) {
@@ -457,6 +466,14 @@ const SpindleWidget = () => {
         controller.command('gcode', commands);
     };
 
+    // refresh spindle list if it didn't populate
+    const refreshSpindles = () => {
+        if (availableSpindles.length === 0) {
+            // only happens on old firmware so we can safely use the old command
+            controller.writeln('$spindles');
+        }
+    };
+
     const actions = {
         handleModeToggle: () => {
             const newMode =
@@ -485,9 +502,11 @@ const SpindleWidget = () => {
             controller.command('gcode', 'M5 S0');
         },
         sendLaserM3: () => {
-            const laserPower =
-                stateRef.current.laser.maxPower *
-                (stateRef.current.laser.power / 100);
+            const laserMaxx =
+                controller.type === GRBLHAL
+                    ? laserMax
+                    : stateRef.current.laser.maxPower;
+            const laserPower = laserMaxx * (stateRef.current.laser.power / 100);
 
             setIsLaserOn(true);
             controller.command('gcode', `G1F1 M3 S${laserPower}`);
@@ -502,7 +521,7 @@ const SpindleWidget = () => {
             if (isLaserOn) {
                 debounceLaserPower(
                     value,
-                    spindle.label === 'SLB_LASER'
+                    controller.type === GRBLHAL
                         ? laserMax
                         : state.laser.maxPower,
                 );
@@ -522,34 +541,16 @@ const SpindleWidget = () => {
         runLaserTest: () => {
             const { power, duration } = state.laser;
             const maxPower =
-                spindle.label === 'SLB_LASER' ? laserMax : state.laser.maxPower;
+                controller.type === GRBLHAL ? laserMax : state.laser.maxPower;
             controller.command('lasertest:on', power, duration, maxPower);
             setTimeout(() => {
                 actions.sendM5();
             }, duration * 1000);
         },
         runShortcutLaserTest: () => {
-            const spindle = get(
-                reduxStore.getState(),
-                'controller.spindles',
-            ).find((s) => s.enabled) ?? {
-                label: 'Default Spindle',
-                id: '0',
-                enabled: true,
-                capabilities: '',
-                laser: false,
-                raw: '',
-                order: 0,
-            };
-            const laserMax = Number(
-                get(
-                    reduxStore.getState(),
-                    'controller.settings.settings.$730',
-                ) ?? 255,
-            );
             const { power, duration } = stateRef.current.laser;
             const maxPower =
-                spindle.label === 'SLB_LASER'
+                controller.type === GRBLHAL
                     ? laserMax
                     : stateRef.current.laser.maxPower;
 
@@ -576,45 +577,6 @@ const SpindleWidget = () => {
                 `M104 Q${selectedSpindle.value}`,
                 `${spindleCommand}`,
             ]);
-        },
-        enableSpindleMode() {
-            const preferredUnits =
-                store.get('workspace.units') === IMPERIAL_UNITS ? 'G20' : 'G21';
-            const active = getSpindleActiveState();
-
-            // get previously saved spindle values
-            const spindleMin = config.get('spindleMin', 0);
-            const spindleMax = config.get('spindleMax', 0);
-
-            // save current laser values
-            let laser = config.get('laser', {
-                maxPower: 0,
-                minPower: 0,
-            });
-            laser.maxPower = laserMax;
-            laser.minPower = laserMin;
-
-            config.set('laser', laser);
-
-            const powerCommands =
-                spindle.label === 'SLB_LASER'
-                    ? []
-                    : [`$30=${spindleMax}`, `$31=${spindleMin}`];
-
-            if (active) {
-                setIsSpindleOn(false);
-                controller.command('gcode', 'M5');
-                //this.setInactive();
-            }
-            const commands = [
-                preferredUnits,
-                ...actions.getSpindleOffsetCode(preferredUnits),
-                ...powerCommands,
-                '$32=0',
-                units,
-            ];
-            updateControllerSettings(spindleMax, spindleMin, '0');
-            controller.command('gcode', commands);
         },
         getSpindleOffsetCode(preferredUnits: UNITS_GCODE | UNITS_EN): string[] {
             const laser = config.get('laser', {
@@ -759,6 +721,7 @@ const SpindleWidget = () => {
                     />
                     {controllerType === GRBLHAL && (
                         <SpindleSelector
+                            onClick={refreshSpindles}
                             spindles={availableSpindles}
                             onChange={actions.handleHALSpindleSelect}
                             spindle={spindle}
