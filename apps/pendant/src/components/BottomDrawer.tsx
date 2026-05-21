@@ -340,7 +340,7 @@ export default function BottomDrawer() {
                                     </div>
                                     <button
                                         onClick={handleUnload}
-                                        className="shrink-0 flex items-center gap-1 text-xs font-medium px-2.5 py-1.5 rounded-md border border-gray-300 dark:border-dark-lighter text-gray-500 dark:text-gray-400 hover:text-red-600 hover:bg-red-50 hover:border-red-300 dark:hover:text-red-400 dark:hover:bg-red-500/10 transition-colors"
+                                        className="shrink-0 flex items-center gap-1 text-xs font-medium px-2.5 py-1.5 rounded-md border border-red-400 bg-red-50 text-red-600 dark:border-red-500/50 dark:bg-red-500/10 dark:text-red-400 active:brightness-90"
                                     >
                                         <X size={12} />
                                         Close

@@ -190,14 +190,14 @@ export default function PendantTopBar() {
     };
 
     return (
-        <header className="h-14 px-3 flex items-center gap-3 bg-gray-50 border-b border-gray-200 dark:bg-dark-darker dark:border-dark-lighter shrink-0 select-none relative">
+        <header className="h-14 px-3 flex items-center gap-3 bg-gray-50 border-b border-gray-200 dark:bg-dark-darker dark:border-dark-lighter shrink-0 select-none relative drag-region">
             {/* Logo */}
             <div className="flex items-center gap-2 shrink-0">
                 <img src={iconRound} alt="gSender" className="w-9 h-9" />
             </div>
 
             {/* Connection widget from desktop */}
-            <div className="shrink-0">
+            <div className="shrink-0 no-drag">
                 <Connection />
             </div>
 
@@ -224,7 +224,7 @@ export default function PendantTopBar() {
             <button
                 onClick={handleUnlock}
                 disabled={!unlockActionable}
-                className={`w-[90px] flex items-center justify-center gap-2 font-bold px-3 py-2 rounded-lg text-sm transition-colors ${
+                className={`w-[90px] flex items-center justify-center gap-2 font-bold px-3 py-2 rounded-lg text-sm transition-colors no-drag ${
                     unlockActionable
                         ? (alarmCode === 11 || alarmCode === 'Homing'
                             ? 'bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white unlock-attention-home'
@@ -239,7 +239,7 @@ export default function PendantTopBar() {
                 type="button"
                 onClick={handleEStop}
                 disabled={!isConnected}
-                className={`flex items-center gap-2 font-bold px-4 py-2 rounded-lg text-sm transition-colors ${isConnected ? 'bg-red-600 hover:bg-red-700 active:bg-red-800 text-white' : 'bg-gray-300 text-gray-600 dark:bg-dark-lighter dark:text-gray-400'}`}
+                className={`flex items-center gap-2 font-bold px-4 py-2 rounded-lg text-sm transition-colors no-drag ${isConnected ? 'bg-red-600 hover:bg-red-700 active:bg-red-800 text-white' : 'bg-gray-300 text-gray-600 dark:bg-dark-lighter dark:text-gray-400'}`}
             >
                 <span>⊗</span> E-STOP
             </button>
