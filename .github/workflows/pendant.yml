@@ -144,3 +144,64 @@ jobs:
           draft: true
         env:
           GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
+
+  # ── Windows x64: Electron pendant .exe (unsigned) ─────────────────────────
+  pendant-win:
+    name: Pendant — Windows
+    runs-on: windows-latest
+    environment: CI
+    env:
+      GH_TOKEN: ${{ secrets.CI_TOKEN }}
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare VC++ Runtime
+        run: choco install -y vcredist2017
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: ${{ runner.os }}-npm-
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Build pendant Windows app
+        shell: bash
+        run: npm run build:pendant:win
+
+      - name: Collect artifacts
+        shell: bash
+        run: |
+          mkdir -p releases/pendant-win
+          cp output-pendant/*.exe releases/pendant-win/
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pendant-win
+          path: releases/pendant-win/*.exe
+          compression-level: 0
+          retention-days: 7
+
+      - name: Release (tag only)
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: releases/pendant-win/*.exe
+          prerelease: true
+          draft: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}

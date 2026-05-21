@@ -66,5 +66,9 @@
     "target": [
       "deb"
     ]
+  },
+  "win": {
+    "target": ["nsis"],
+    "icon": "electron-build/icon-pendant.ico"
   }
 }

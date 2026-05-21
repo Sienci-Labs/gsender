@@ -97,6 +97,7 @@
     "pendant:build": "npm run prebuild-pendant && concurrently --kill-others-on-fail --names \"build-pendant-bundles,vite:build:pendant\" \"node esbuild.config.js --production --target=pendant\" \"npm run vite:build:pendant-standalone\"",
     "build:pendant:mac": "npm run pendant:build && bash -c 'scripts/electron-builder-pendant.sh --macos --x64 --arm64'",
     "build:pendant:pi": "npm run pendant:build && bash -c 'scripts/electron-builder-pendant.sh --linux --arm64'",
+    "build:pendant:win": "npm run pendant:build && bash -c 'scripts/electron-builder-pendant.sh --win --x64'",
     "postvite:build": "bash -c \"mkdir -p dist/gsender/app; cp -af apps/desktop/{favicon.ico,images,assets} dist/gsender/app/\"",
     "install:packages": "yarn install && yarn install --prefix /apps/desktop",
     "check-types": "tsc --noEmit -p ./apps/desktop/src",
