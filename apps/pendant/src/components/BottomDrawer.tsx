@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import {
-    Upload, X, Minimize2, Maximize2,
+    Upload, X, ChevronUp, ChevronsUp,
     Clock, Hash, Move, HardDrive, FileCode,
 } from 'lucide-react';
 import ConsolePanel from '@gsender/features/Console';
@@ -287,24 +287,24 @@ export default function BottomDrawer() {
                                 </button>
                             ))}
                         </div>
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-[8px] pl-[9px] pr-[7px] border-l border-gray-300 dark:border-dark-lighter self-stretch">
                             <button
-                                onClick={() => setMode('minimal')}
-                                className={`p-1.5 rounded border ${mode === 'minimal' ? 'border-robin-500 text-robin-600 dark:text-robin-400' : 'border-gray-200 dark:border-dark-lighter text-gray-500 dark:text-gray-400'} hover:bg-gray-50 dark:hover:bg-dark-lighter`}
+                                onClick={() => setMode(mode === 'closed' ? 'minimal' : mode === 'minimal' ? 'expanded' : 'closed')}
+                                style={{ width: 40, height: 32, borderRadius: 6 }}
+                                className={`flex items-center justify-center border transition-colors ${
+                                    mode === 'minimal' || mode === 'expanded'
+                                        ? 'bg-[#ddeaf8] border-[#7aadd8] text-[#185FA5] dark:bg-[#0c2d4a] dark:border-[#2a6090] dark:text-[#5ba3e0]'
+                                        : 'border-gray-200 dark:border-dark-lighter text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-dark-lighter'
+                                }`}
                             >
-                                <Minimize2 size={14} />
-                            </button>
-                            <button
-                                onClick={() => setMode('expanded')}
-                                className={`p-1.5 rounded border ${mode === 'expanded' ? 'border-robin-500 text-robin-600 dark:text-robin-400' : 'border-gray-200 dark:border-dark-lighter text-gray-500 dark:text-gray-400'} hover:bg-gray-50 dark:hover:bg-dark-lighter`}
-                            >
-                                <Maximize2 size={14} />
+                                {mode === 'expanded' ? <ChevronsUp size={16} /> : <ChevronUp size={16} />}
                             </button>
                             <button
                                 onClick={() => setMode('closed')}
-                                className="p-1.5 rounded border border-gray-200 dark:border-dark-lighter text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-dark-lighter"
+                                style={{ width: 32, height: 32, borderRadius: 6 }}
+                                className="flex items-center justify-center border border-gray-200 dark:border-dark-lighter text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-dark-lighter transition-colors"
                             >
-                                <X size={14} />
+                                <X size={16} />
                             </button>
                         </div>
                     </div>
