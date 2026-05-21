@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import type { RootState } from '@gsender/controller-client/store/redux';
-import { METRIC_UNITS } from 'app/constants';
+import { GRBLHAL, METRIC_UNITS } from 'app/constants';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { mapPositionToUnits } from 'app/lib/units';
 
@@ -29,7 +29,10 @@ function formatReadout(value: unknown): string {
 
 export default function InfoStrip() {
     const status = useTypedSelector((state: RootState) => state.controller.state.status) as any;
+    const controllerType = useTypedSelector((state: RootState) => state.controller.type);
+    const currentTool = useTypedSelector((state: RootState) => (state.controller.state.status as any)?.currentTool);
     const { units } = useWorkspaceState();
+    const showTool = controllerType === GRBLHAL && currentTool != null && Number(currentTool) >= 0;
 
     let feedrate = status?.feedrate ?? '0';
     const spindle = status?.spindle ?? '0';
@@ -49,6 +52,14 @@ export default function InfoStrip() {
                 <span className="whitespace-nowrap px-2.5 py-1">
                     Spindle <strong className="inline-block w-[5ch] text-right tabular-nums text-gray-900 dark:text-white font-mono">{spindleLabel}</strong> RPM
                 </span>
+                {showTool && (
+                    <>
+                        <span className="h-5 w-px bg-gray-200 dark:bg-dark-lighter" />
+                        <span className="whitespace-nowrap px-2.5 py-1">
+                            Tool <strong className="inline-block w-[3ch] text-right tabular-nums text-gray-900 dark:text-white font-mono">{currentTool}</strong>
+                        </span>
+                    </>
+                )}
             </div>
             <div className="flex-1" />
             <span className="font-mono text-gray-400 dark:text-gray-500">
