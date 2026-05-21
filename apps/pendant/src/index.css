@@ -17,13 +17,26 @@
     50%       { box-shadow: 0 0 0 5px rgba(22, 163, 74, 0.25); }
 }
 
-@keyframes pulse-alarm {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
-    50%       { box-shadow: 0 0 0 6px rgba(220, 38, 38, 0.35); }
-}
+.badge-animate-run { animation: pulse-run 2s ease-in-out infinite; }
 
-.badge-animate-run   { animation: pulse-run   2s ease-in-out infinite; }
-.badge-animate-alarm { animation: pulse-alarm 1s ease-in-out infinite; }
+@keyframes breathe {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.7; transform: scale(0.96); }
+}
+.state-attention { animation: breathe 2s ease-in-out infinite; }
+
+@keyframes border-march {
+    0%, 100% { outline-offset: 2px; outline-width: 2px; }
+    50%       { outline-offset: 5px; outline-width: 2px; }
+}
+.unlock-attention {
+    outline: 2px solid rgb(245, 158, 11);
+    animation: border-march 1.2s ease-in-out infinite;
+}
+.unlock-attention-home {
+    outline: 2px solid rgb(59, 130, 246);
+    animation: border-march 1.2s ease-in-out infinite;
+}
 
 .jog-btn-active {
     transform: translateY(1px) scale(0.985);

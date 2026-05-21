@@ -113,12 +113,14 @@ const STATE_BADGES: Record<string, BadgeConfig> = {
         darkClasses:  'bg-yellow-700/[0.15] border-yellow-500/[0.6] text-yellow-400',
         lightClasses: 'bg-amber-50 border-amber-600 text-amber-900',
         icon: Pause,
+        animation: 'alarm',
     },
     [GRBL_ACTIVE_STATE_DOOR]: {
         label: 'Door',
         darkClasses:  'bg-yellow-700/[0.15] border-yellow-500/[0.6] text-yellow-400',
         lightClasses: 'bg-amber-50 border-amber-600 text-amber-900',
         icon: DoorClosed,
+        animation: 'alarm',
     },
     [GRBL_ACTIVE_STATE_ALARM]: {
         label: 'Alarm',
@@ -207,8 +209,8 @@ export default function PendantTopBar() {
                     'w-[160px] h-10 px-4 rounded-full border border-[1.5px]',
                     'text-[15px] font-medium whitespace-nowrap pointer-events-none',
                     isDark ? badge.darkClasses : badge.lightClasses,
-                    badge.animation === 'run'   ? 'badge-animate-run'   : '',
-                    badge.animation === 'alarm' ? 'badge-animate-alarm' : '',
+                    badge.animation === 'run'   ? 'badge-animate-run' : '',
+                    badge.animation === 'alarm' ? 'state-attention'    : '',
                 ].join(' ')}
             >
                 <BadgeIcon size={17} className="shrink-0" />
@@ -222,10 +224,16 @@ export default function PendantTopBar() {
             <button
                 onClick={handleUnlock}
                 disabled={!unlockActionable}
-                className={`flex items-center gap-2 font-bold px-3 py-2 rounded-lg text-sm transition-colors ${unlockActionable ? 'bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white' : 'bg-gray-300 text-gray-600 dark:bg-dark-lighter dark:text-gray-400'}`}
+                className={`w-[90px] flex items-center justify-center gap-2 font-bold px-3 py-2 rounded-lg text-sm transition-colors ${
+                    unlockActionable
+                        ? (alarmCode === 11 || alarmCode === 'Homing'
+                            ? 'bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white unlock-attention-home'
+                            : 'bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white unlock-attention')
+                        : 'bg-gray-300 text-gray-600 dark:bg-dark-lighter dark:text-gray-400'
+                }`}
             >
-                <LockOpen className="w-4 h-4" />
-                Unlock
+                {alarmCode === 11 || alarmCode === 'Homing' ? <House className="w-4 h-4" /> : <LockOpen className="w-4 h-4" />}
+                {alarmCode === 11 || alarmCode === 'Homing' ? 'Home' : 'Unlock'}
             </button>
             <button
                 type="button"

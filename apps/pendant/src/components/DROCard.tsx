@@ -6,6 +6,7 @@ import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelec
 import type { RootState } from '@gsender/controller-client/store/redux';
 import { goXYAxes, gotoZero, homeMachine, zeroAllAxes, zeroWCS } from '@gsender/features/DRO/utils/DRO';
 import {
+    GRBL_ACTIVE_STATE_ALARM,
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
     WORKFLOW_STATE_RUNNING,
@@ -38,13 +39,15 @@ export default function DROCard() {
         : mode === 'machine'
             ? mpos
             : wpos;
+    const alarmCode = useTypedSelector((s: RootState) => s.controller.state.status?.alarmCode ?? 0) as string | number;
+    const isHomingAlarm = activeState === GRBL_ACTIVE_STATE_ALARM && (alarmCode === 11 || alarmCode === 'Homing');
     const canZero =
         isConnected &&
         workflowState !== WORKFLOW_STATE_RUNNING &&
         (activeState === GRBL_ACTIVE_STATE_IDLE ||
             activeState === GRBL_ACTIVE_STATE_JOG);
     const canGoTo = canZero;
-    const canHome = canGoTo && homingEnabled;
+    const canHome = (canGoTo && homingEnabled) || isHomingAlarm;
 
     return (
         <div className="rounded-xl bg-white border border-gray-300 dark:bg-dark-darker dark:border-dark-lighter p-3 flex flex-col gap-3">
