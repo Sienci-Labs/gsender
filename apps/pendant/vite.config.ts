@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite';
 import path from 'path';
 import react from '@vitejs/plugin-react';
-import tailwindcss from 'tailwindcss';
 import type { Plugin, ViteDevServer } from 'vite';
 
 const root = path.resolve(__dirname, '../..');
@@ -42,11 +41,6 @@ function tailwindHmr(): Plugin {
 export default defineConfig({
     root: path.resolve(__dirname, './'),
     base: './',
-    css: {
-        postcss: {
-            plugins: [tailwindcss()],
-        },
-    },
     plugins: [react(), tailwindHmr()],
     resolve: {
         alias: {
