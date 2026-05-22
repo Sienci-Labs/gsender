@@ -1606,6 +1606,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'X-axis offset from the spindle. (Mark with a v-bit then track the laser movement to reach that mark, $741, Default 0)',
                         type: 'hybrid',
                         eID: '$741',
+                        remap: '$770',
                         unit: 'mm',
                     },
                     {
@@ -1615,7 +1616,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
                             'Y-axis offset from the spindle. (Mark with a v-bit then track the laser movement to reach that mark, $742, Default 0)',
                         type: 'hybrid',
                         eID: '$742',
-                        unit: 'rpm',
+                        remap: '$771',
+                        unit: 'mm',
                     },
                     {
                         type: 'eeprom',

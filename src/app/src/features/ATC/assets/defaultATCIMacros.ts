@@ -570,7 +570,7 @@ $45 = 1;        Secondary Homing Move
 $46 = 2;        Tertiary Homing Move
 
 ; ******** TOOL PROBE SETTINGS ********
-$6 = 3;         Invert TLS pin for NC tool probe
+$6 = 1;         Invert TLS pin for NC tool probe
 
 ; ******** SD CARD SETTINGS ********
 (print, Applying SD settings)
