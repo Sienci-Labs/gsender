@@ -22,10 +22,9 @@ import Toolpath from "./gcode-toolpath";
 const [M3] = SPINDLE_MODES;
 
 export default class Generator {
-	constructor({ surfacing, units, rampingDegrees = 10 }) {
+	constructor({ surfacing, units }) {
 		this.surfacing = surfacing;
 		this.units = units;
-		this.rampingDegrees = rampingDegrees;
 	}
 
 	/**
@@ -63,8 +62,8 @@ export default class Generator {
 			"G90",
 			`${spindle} S${spindleRPM}`,
 			...dwell,
-			"G0 X0 Y0",
 			`G0 Z${z}`,
+			"G0 X0 Y0",
 			...m7,
 			...m8,
 			`G1 F${feedrate}`,
@@ -186,40 +185,49 @@ export default class Generator {
 		return Number(value.toFixed(amount));
 	}
 
-	rampIntoMaterial = (z, direction = { axis: "Y", factor: 1 }) => {
-		const { axis, factor } = direction;
-		const degrees = this.rampingDegrees;
-		const { skimDepth } = this.surfacing;
-		const units = store.get("workspace.units");
-		const depth = skimDepth;
-		const EXTRA_LENGTH = units === METRIC_UNITS ? 1 : convertToImperial(1);
-		const safeHeight = this.getSafeZValue();
-		const EXTRA_RAMP_COAST = units === METRIC_UNITS ? 5 : convertToImperial(5);
-		const RAMP_HEIGHT = Math.abs(depth) * -1 - safeHeight;
+	rampIntoMaterial = (direction = { axis: "Y", factor: 1 }) => {
+		const RAMP_ANGLE_DEGREES = 2;
+		const MAX_ZIGZAG_LENGTH_MM = 150;
 
-		const rampingLength = Number(
-			(
-				(depth + safeHeight + EXTRA_LENGTH) /
-				getTanFromDegrees(degrees)
-			).toFixed(2),
+		const { axis, factor } = direction;
+		const { skimDepth, bitDiameter, width, length } = this.surfacing;
+		const units = store.get("workspace.units");
+		const safeHeight = this.getSafeZValue();
+
+		const totalZDrop = safeHeight + Math.abs(skimDepth);
+
+		// Zigzag length: min surface dimension minus one full bit diameter (to stay within bounds),
+		// capped at `MAX_ZIGZAG_LENGTH_MM` so the ramp doesn't span the entire workpiece on large jobs.
+		const minDimension = Math.min(Math.abs(width), Math.abs(length));
+		const maxZigzagLength = units === METRIC_UNITS ?
+			MAX_ZIGZAG_LENGTH_MM :
+			convertToImperial(MAX_ZIGZAG_LENGTH_MM);
+
+		const zigzagLength = Math.max(
+			bitDiameter,
+			Math.min(minDimension - bitDiameter, maxZigzagLength),
 		);
 
-		function getTanFromDegrees(degrees) {
-			return Math.tan((degrees * Math.PI) / 180);
+		const zPerLeg = zigzagLength * Math.tan((RAMP_ANGLE_DEGREES * Math.PI) / 180);
+
+		// Use an even number of legs so the tool returns to the start XY position after ramping
+		const numLegsRaw = Math.ceil(totalZDrop / zPerLeg);
+		const numLegs = numLegsRaw % 2 === 0 ? numLegsRaw : numLegsRaw + 1;
+
+		// Spread the total Z drop evenly across all legs (keeps angle at or below `RAMP_ANGLE_DEGREES`)
+		const actualZPerLeg = Number((totalZDrop / numLegs).toFixed(3));
+		const rampingArr = ["(Ramping into Material)", "G91"];
+
+		for (let i = 0; i < numLegs; i++) {
+			// Switch direction on each leg to create a zigzag pattern
+			const legFactor = i % 2 === 0 ? factor : factor * -1;
+
+			rampingArr.push(
+				`G1 ${axis}${Number((zigzagLength * legFactor).toFixed(3))} Z${-actualZPerLeg}`,
+			);
 		}
 
-		const rampingArr = [];
-
-		rampingArr.push(
-			"(Ramping into Material)",
-			"G91",
-			`G1 ${axis}${rampingLength * factor} Z${RAMP_HEIGHT}`,
-			`G1 ${axis}${EXTRA_RAMP_COAST * factor}`,
-			`G1 ${axis}${(rampingLength + EXTRA_RAMP_COAST) * factor * -1}`,
-			"G90",
-			"(End of Ramping into Material)",
-			"",
-		);
+		rampingArr.push("G90", "(End of Ramping into Material)", "");
 
 		return rampingArr;
 	};
@@ -233,7 +241,7 @@ export default class Generator {
 		startPosition,
 		cutDirectionFlipped,
 	) => {
-		const enterMaterial = this.rampIntoMaterial(z, direction);
+		const enterMaterial = this.rampIntoMaterial(direction);
 
 		let mainPerimeterArea = [
 			"G91",
@@ -845,7 +853,7 @@ export default class Generator {
 		const gcodeArr = startIsInCenter
 			? [
 					...startArea,
-					...rampIntoMaterial(z, direction),
+					...rampIntoMaterial(direction),
 					...startFromCenterPerimeter,
 					...spirals,
 					...returnToStart,
