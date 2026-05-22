@@ -550,7 +550,7 @@ G53 G0 Z[#<_tc_safe_z>]`,
 ; xxxxxxxx GENERAL CONFIG xxxxxxxx
 (print, Applying tool changer settings)
 $485 = 1;       Keep tool number over reboot
-$675 = 3;       Execute M6T0 and Fail M6 if tc.macro is not found
+$675 = 1;       Execute M6T0 and Fail M6 if tc.macro is not found
 
 ; xxxxxxxx PIN CONFIG xxxxxxxx
 $370 = 0;       Invert I/O Port inputs (TODO: Not override unrrelated bitfields)
