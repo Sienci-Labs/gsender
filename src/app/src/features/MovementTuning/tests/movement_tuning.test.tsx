@@ -1,4 +1,18 @@
-import { calculateNewStepsPerMM } from '../Steps';
+import { calculateNewStepsPerMM, getEEPROMSettingKey } from '../utils';
+
+describe('getEEPROMSettingKey', () => {
+    test('returns $100 for x axis', () => {
+        expect(getEEPROMSettingKey('x')).toBe('$100');
+    });
+
+    test('returns $101 for y axis', () => {
+        expect(getEEPROMSettingKey('y')).toBe('$101');
+    });
+
+    test('returns $102 for z axis', () => {
+        expect(getEEPROMSettingKey('z')).toBe('$102');
+    });
+});
 
 describe('calculateNewStepsPerMM', () => {
 

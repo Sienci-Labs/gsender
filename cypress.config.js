@@ -32,12 +32,14 @@ module.exports = defineConfig({
         }
       });
 
-   on('before:browser:launch', (browser, launchOptions) => {
+  on('before:browser:launch', (browser, launchOptions) => {
     if (browser.name === 'chrome') {
         launchOptions.args.push('--no-sandbox');
         launchOptions.args.push('--disable-dev-shm-usage');
-        // Removed: --disable-gpu (breaks WebGL)
-        // Removed: --disable-software-rasterizer (breaks WebGL)
+        launchOptions.args.push('--enable-webgl');
+        launchOptions.args.push('--ignore-gpu-blocklist');
+        launchOptions.args.push('--enable-gpu-rasterization');
+        launchOptions.args.push('--use-gl=swiftshader');
     }
     return launchOptions;
 });
