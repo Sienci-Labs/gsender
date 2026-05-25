@@ -15,7 +15,14 @@ import store from 'app/store';
 /** Wait before showing the consent sheet so startup UI can settle. */
 const SHOW_DELAY_MS = 3000;
 
+const isDev =
+    typeof process !== 'undefined'
+        ? process.env.NODE_ENV === 'development'
+        : import.meta?.env?.MODE === 'development';
+
 const DataCollection = () => {
+    if (isDev) return null;
+
     const posthog = usePostHog();
     const [open, setOpen] = useState(false);
 
