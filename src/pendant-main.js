@@ -129,9 +129,9 @@ const main = () => {
                 frame: !isDev,
                 autoHideMenuBar: true,
                 show: false,
-                width: isDev ? 768 : 1280,
-                height: isDev ? 1024 : 800,
-                minWidth: isDev ? 600 : 1024,
+                width: isDev ? 768 : 800,
+                height: isDev ? 1024 : 1280,
+                minWidth: isDev ? 600 : 720,
                 minHeight: isDev ? 1024 : 600,
                 webPreferences: {
                     // Shared code from apps/desktop/ uses window.require + window.ipcRenderer
