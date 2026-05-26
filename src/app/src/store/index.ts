@@ -16,6 +16,7 @@ import {
     TOUCHPLATE_TYPE_STANDARD,
 } from 'app/lib/constants.ts';
 import defaultMachineProfiles from 'app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts';
+import { defaultATCIMacros } from '../features/ATC/assets/defaultATCIMacros';
 import api from 'app/api';
 import pubsub from 'pubsub-js';
 import { BackupFrequencies } from 'app/workspace/definitions';
@@ -348,6 +349,10 @@ store.on(
 const migrateStore = (): void => {
     if (!cnc.version) {
         return;
+    }
+
+    if (semver.lt(cnc.version, '1.6.2')) {
+        store.set('widgets.atc.templates', defaultATCIMacros);
     }
 
     if (semver.lt(cnc.version, '1.6.0')) {
