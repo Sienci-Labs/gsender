@@ -112,6 +112,29 @@ You can both run gSender locally using the public code-base as well as compile i
 <details>
 <summary>Expand to see all version notes</summary>
 
+### 1.6.2 (May 26, 2026)
+
+- Updated firmware defaults to better account for TLS/probe misconfiguration scenarios
+- Various firmware default updates and compatibility improvements for newer firmware versions
+- Uploading to SD cards over ethernet is working correctly again
+- Laser power slider now behaves as expected on newer firmware
+- Spindle selector now works correctly on newer firmware
+- Laser offsets now map correctly to the updated Config key structure
+- Flash utility will now automatically select grblHAL firmware when `SLB_DFU` is detected
+- Exiting rotary mode will once again properly restore previous machine values
+- Spindle commands are no longer sent when the spindle list is empty
+- Non-enabled spindles will no longer appear in the spindle dropdown list
+- Spindle dropdown will now attempt to refresh itself automatically if empty in the Spindle/Laser drawer
+- Numerous visual and workflow improvements to the tool change wizard
+- Tool change wizard will now resume the spindle before returning to the previous XY position
+- Tool change wizard and tool timeline now display annotation comments when no ATC nickname is set
+- Removed probed/unprobed status on firmware versions without a tool table
+- ATC Config will now send default values on first install
+- Squaring and motor tuning workflows now share the same jog popover for a more consistent experience
+- Spindle delay behaviour has been updated and is now an explicit configurable option for forced insertion when needed
+- Macros can now send realtime commands
+- M0 macros will now correctly parse both `;` and `()` style comments
+
 ### 1.6.1 (April 30, 2026)
 - Added option to skip first tool change on fixed strategy or prompt use if they want to skip
 - Added application scaling for larger monitors and devices - in accessibility section in Config
