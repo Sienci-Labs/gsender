@@ -44,7 +44,6 @@ function App() {
             posthog.opt_out_capturing();
         }
     }, []);
->>>>>>> origin/master
 
 	return (
 		<>
