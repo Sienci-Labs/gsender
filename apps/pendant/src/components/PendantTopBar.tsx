@@ -40,6 +40,7 @@ interface StateColors {
     border: string;
     background: string;
     iconBackground: string;
+    iconColor: string;
     divider: string;
     color: string;
 }
@@ -67,82 +68,82 @@ function useIsDark() {
 }
 
 const DISC_COLORS = {
-    dark:  { border: 'rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.04)', iconBackground: 'rgba(255,255,255,0.06)', divider: 'rgba(255,255,255,0.10)', color: 'rgba(255,255,255,0.30)' },
-    light: { border: '#cbd5e1', background: '#f8fafc', iconBackground: '#f1f5f9', divider: '#e2e8f0', color: '#94a3b8' },
+    dark:  { border: 'rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.04)', iconBackground: 'rgba(255,255,255,0.08)', iconColor: 'rgba(255,255,255,0.3)',  divider: 'rgba(255,255,255,0.10)', color: 'rgba(255,255,255,0.30)' },
+    light: { border: '#cbd5e1',                background: '#f8fafc',                iconBackground: '#94a3b8',               iconColor: '#ffffff',                  divider: '#cbd5e1',                color: '#94a3b8' },
 };
 
-const BADGE_DISCONNECTED: BadgeConfig = { label: 'Disconnected', icon: Unplug, ...DISC_COLORS };
+const BADGE_DISCONNECTED: BadgeConfig = { label: 'Disconnected', icon: Unplug,    ...DISC_COLORS };
 const BADGE_DEFAULT: BadgeConfig      = { label: 'No State',     icon: CircleOff, ...DISC_COLORS };
 
 const STATE_BADGES: Record<string, BadgeConfig> = {
     [GRBL_ACTIVE_STATE_IDLE]: {
         label: 'Idle',
         icon: Circle,
-        dark:  { border: 'rgba(107,114,128,0.40)', background: 'rgba(107,114,128,0.06)', iconBackground: 'rgba(107,114,128,0.12)', divider: 'rgba(107,114,128,0.25)', color: '#9ca3af' },
-        light: { border: '#cbd5e1', background: '#f8fafc', iconBackground: '#f1f5f9', divider: '#e2e8f0', color: '#475569' },
+        dark:  { border: 'rgba(107,114,128,0.40)', background: 'rgba(107,114,128,0.08)', iconBackground: 'rgba(107,114,128,0.22)', iconColor: '#ffffff',                  divider: 'rgba(107,114,128,0.25)', color: '#6b7280' },
+        light: { border: '#64748b',                background: '#f8fafc',                iconBackground: '#64748b',               iconColor: '#ffffff',                  divider: 'rgba(100,116,139,0.3)',  color: '#64748b' },
     },
     [GRBL_ACTIVE_STATE_RUN]: {
         label: 'Running',
         icon: Play,
         animation: 'pulse-run',
-        dark:  { border: 'rgba(22,163,74,0.50)', background: 'rgba(22,163,74,0.08)', iconBackground: 'rgba(22,163,74,0.15)', divider: 'rgba(22,163,74,0.30)', color: '#4ade80' },
-        light: { border: '#16a34a', background: '#f0fdf4', iconBackground: '#dcfce7', divider: 'rgba(22,163,74,0.25)', color: '#166534' },
+        dark:  { border: 'rgba(5,150,105,0.50)',   background: 'rgba(5,150,105,0.08)',   iconBackground: 'rgba(5,150,105,0.25)',   iconColor: '#ffffff', divider: 'rgba(5,150,105,0.30)',   color: '#059669' },
+        light: { border: '#059669',                background: '#ecfdf5',                iconBackground: '#059669',                iconColor: '#ffffff', divider: 'rgba(5,150,105,0.3)',    color: '#059669' },
     },
     [GRBL_ACTIVE_STATE_JOG]: {
         label: 'Jogging',
         icon: Move,
         animation: 'pulse-run',
-        dark:  { border: 'rgba(22,163,74,0.50)', background: 'rgba(22,163,74,0.08)', iconBackground: 'rgba(22,163,74,0.15)', divider: 'rgba(22,163,74,0.30)', color: '#4ade80' },
-        light: { border: '#16a34a', background: '#f0fdf4', iconBackground: '#dcfce7', divider: 'rgba(22,163,74,0.25)', color: '#166534' },
+        dark:  { border: 'rgba(5,150,105,0.50)',   background: 'rgba(5,150,105,0.08)',   iconBackground: 'rgba(5,150,105,0.25)',   iconColor: '#ffffff', divider: 'rgba(5,150,105,0.30)',   color: '#059669' },
+        light: { border: '#059669',                background: '#ecfdf5',                iconBackground: '#059669',                iconColor: '#ffffff', divider: 'rgba(5,150,105,0.3)',    color: '#059669' },
     },
     [GRBL_ACTIVE_STATE_CHECK]: {
         label: 'Check',
         icon: CircleCheck,
-        dark:  { border: 'rgba(37,99,235,0.50)', background: 'rgba(37,99,235,0.08)', iconBackground: 'rgba(37,99,235,0.15)', divider: 'rgba(37,99,235,0.30)', color: '#60a5fa' },
-        light: { border: '#2563eb', background: '#eff6ff', iconBackground: '#dbeafe', divider: 'rgba(37,99,235,0.25)', color: '#1e40af' },
+        dark:  { border: 'rgba(57,120,179,0.55)',  background: 'rgba(57,120,179,0.10)',  iconBackground: 'rgba(57,120,179,0.28)',  iconColor: '#ffffff', divider: 'rgba(57,120,179,0.30)',  color: '#3978b3' },
+        light: { border: '#3978b3',                background: '#eff6ff',                iconBackground: '#3978b3',                iconColor: '#ffffff', divider: 'rgba(57,120,179,0.3)',   color: '#3978b3' },
     },
     [GRBL_ACTIVE_STATE_HOME]: {
         label: 'Homing',
         icon: House,
-        dark:  { border: 'rgba(37,99,235,0.50)', background: 'rgba(37,99,235,0.08)', iconBackground: 'rgba(37,99,235,0.15)', divider: 'rgba(37,99,235,0.30)', color: '#60a5fa' },
-        light: { border: '#2563eb', background: '#eff6ff', iconBackground: '#dbeafe', divider: 'rgba(37,99,235,0.25)', color: '#1e40af' },
+        dark:  { border: 'rgba(57,120,179,0.55)',  background: 'rgba(57,120,179,0.10)',  iconBackground: 'rgba(57,120,179,0.28)',  iconColor: '#ffffff', divider: 'rgba(57,120,179,0.30)',  color: '#3978b3' },
+        light: { border: '#3978b3',                background: '#eff6ff',                iconBackground: '#3978b3',                iconColor: '#ffffff', divider: 'rgba(57,120,179,0.3)',   color: '#3978b3' },
     },
     [GRBL_ACTIVE_STATE_HOLD]: {
         label: 'Hold',
         icon: Pause,
-        dark:  { border: 'rgba(202,138,4,0.50)', background: 'rgba(161,98,7,0.08)', iconBackground: 'rgba(202,138,4,0.15)', divider: 'rgba(202,138,4,0.30)', color: '#fbbf24' },
-        light: { border: '#d97706', background: '#fffbeb', iconBackground: '#fef3c7', divider: 'rgba(217,119,6,0.25)', color: '#92400e' },
+        dark:  { border: 'rgba(187,106,12,0.55)',  background: 'rgba(161,98,7,0.10)',    iconBackground: 'rgba(187,106,12,0.28)',  iconColor: '#ffffff', divider: 'rgba(187,106,12,0.30)',  color: '#bb6a0c' },
+        light: { border: '#bb6a0c',                background: '#fffbeb',                iconBackground: '#bb6a0c',                iconColor: '#ffffff', divider: 'rgba(187,106,12,0.3)',   color: '#bb6a0c' },
     },
     [GRBL_ACTIVE_STATE_DOOR]: {
         label: 'Door',
         icon: DoorClosed,
-        dark:  { border: 'rgba(202,138,4,0.50)', background: 'rgba(161,98,7,0.08)', iconBackground: 'rgba(202,138,4,0.15)', divider: 'rgba(202,138,4,0.30)', color: '#fbbf24' },
-        light: { border: '#d97706', background: '#fffbeb', iconBackground: '#fef3c7', divider: 'rgba(217,119,6,0.25)', color: '#92400e' },
+        dark:  { border: 'rgba(187,106,12,0.55)',  background: 'rgba(161,98,7,0.10)',    iconBackground: 'rgba(187,106,12,0.28)',  iconColor: '#ffffff', divider: 'rgba(187,106,12,0.30)',  color: '#bb6a0c' },
+        light: { border: '#bb6a0c',                background: '#fffbeb',                iconBackground: '#bb6a0c',                iconColor: '#ffffff', divider: 'rgba(187,106,12,0.3)',   color: '#bb6a0c' },
     },
     [GRBL_ACTIVE_STATE_ALARM]: {
         label: 'Alarm',
         icon: TriangleAlert,
         animation: 'pulse-alarm',
-        dark:  { border: 'rgba(220,38,38,0.55)', background: 'rgba(185,28,28,0.08)', iconBackground: 'rgba(220,38,38,0.15)', divider: 'rgba(220,38,38,0.30)', color: '#f87171' },
-        light: { border: '#dc2626', background: '#fef2f2', iconBackground: '#fee2e2', divider: 'rgba(220,38,38,0.25)', color: '#991b1b' },
+        dark:  { border: 'rgba(220,38,38,0.55)',   background: 'rgba(185,28,28,0.10)',   iconBackground: 'rgba(220,38,38,0.28)',   iconColor: '#ffffff', divider: 'rgba(220,38,38,0.30)',   color: '#dc2626' },
+        light: { border: '#dc2626',                background: '#fff1f1',                iconBackground: '#dc2626',                iconColor: '#ffffff', divider: 'rgba(220,38,38,0.3)',    color: '#dc2626' },
     },
     [GRBL_ACTIVE_STATE_TOOL]: {
         label: 'Tool Change',
         icon: Wrench,
-        dark:  { border: 'rgba(139,92,246,0.50)', background: 'rgba(124,58,237,0.08)', iconBackground: 'rgba(139,92,246,0.15)', divider: 'rgba(139,92,246,0.30)', color: '#c4b5fd' },
-        light: { border: '#7c3aed', background: '#f5f3ff', iconBackground: '#ede9fe', divider: 'rgba(124,58,237,0.25)', color: '#4c1d95' },
+        dark:  { border: 'rgba(124,58,237,0.50)',  background: 'rgba(124,58,237,0.10)',  iconBackground: 'rgba(124,58,237,0.28)',  iconColor: '#ffffff', divider: 'rgba(124,58,237,0.30)',  color: '#7c3aed' },
+        light: { border: '#7c3aed',                background: '#f5f3ff',                iconBackground: '#7c3aed',                iconColor: '#ffffff', divider: 'rgba(124,58,237,0.3)',   color: '#7c3aed' },
     },
     [GRBL_ACTIVE_STATE_SLEEP]: {
         label: 'Sleep',
         icon: Moon,
-        dark:  { border: 'rgba(100,130,180,0.30)', background: 'rgba(26,41,66,0.60)', iconBackground: 'rgba(100,130,180,0.15)', divider: 'rgba(100,130,180,0.20)', color: 'rgba(148,174,213,0.85)' },
-        light: { border: '#93c5fd', background: '#f1f5f9', iconBackground: '#e0f2fe', divider: 'rgba(147,197,253,0.4)', color: '#1e3a5f' },
+        dark:  { border: 'rgba(100,130,180,0.30)', background: 'rgba(26,41,66,0.60)',    iconBackground: 'rgba(100,130,180,0.20)', iconColor: 'rgba(148,174,213,0.85)', divider: 'rgba(100,130,180,0.20)', color: 'rgba(148,174,213,0.85)' },
+        light: { border: '#93c5fd',                background: '#f0f9ff',                iconBackground: '#3b82f6',                iconColor: '#ffffff',               divider: 'rgba(59,130,246,0.3)',   color: '#3b82f6' },
     },
     [GRBL_ACTIVE_STATE_TESTING]: {
         label: 'Testing',
         icon: FileSearch,
-        dark:  { border: 'rgba(99,102,241,0.50)', background: 'rgba(67,56,202,0.08)', iconBackground: 'rgba(99,102,241,0.15)', divider: 'rgba(99,102,241,0.30)', color: '#a5b4fc' },
-        light: { border: '#4f46e5', background: '#eef2ff', iconBackground: '#e0e7ff', divider: 'rgba(79,70,229,0.25)', color: '#3730a3' },
+        dark:  { border: 'rgba(99,102,241,0.50)',  background: 'rgba(67,56,202,0.10)',   iconBackground: 'rgba(99,102,241,0.28)',  iconColor: '#ffffff', divider: 'rgba(99,102,241,0.30)',  color: '#6366f1' },
+        light: { border: '#4f46e5',                background: '#eef2ff',                iconBackground: '#4f46e5',                iconColor: '#ffffff', divider: 'rgba(79,70,229,0.3)',    color: '#4f46e5' },
     },
 };
 
@@ -155,7 +156,7 @@ export default function PendantTopBar() {
     const alarmCode: string | number = rawState?.status?.alarmCode ?? 0;
     const badge = !isConnected ? BADGE_DISCONNECTED : (STATE_BADGES[activeState] ?? BADGE_DEFAULT);
     const BadgeIcon = badge.icon;
-    const colors = isDark ? badge.dark : badge.light;
+    const c = isDark ? badge.dark : badge.light;
     const showAlarmCode =
         isConnected &&
         activeState === GRBL_ACTIVE_STATE_ALARM &&
@@ -213,18 +214,18 @@ export default function PendantTopBar() {
                     overflow: 'hidden',
                     display: 'flex',
                     alignItems: 'stretch',
-                    border: `1px solid ${colors.border}`,
-                    background: colors.background,
-                    color: colors.color,
+                    border: `1px solid ${c.border}`,
+                    background: c.background,
+                    color: c.color,
                     fontSize: '14px',
                     fontWeight: 500,
                     flexShrink: 0,
                 }}
             >
-                <div style={{ width: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: colors.iconBackground, flexShrink: 0 }}>
+                <div style={{ width: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: c.iconBackground, color: c.iconColor, flexShrink: 0 }}>
                     <BadgeIcon size={18} aria-hidden />
                 </div>
-                <div style={{ width: '1px', background: colors.divider, flexShrink: 0 }} />
+                <div style={{ width: '1px', background: c.divider, flexShrink: 0 }} />
                 <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 8px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {badgeLabel}
                 </div>
