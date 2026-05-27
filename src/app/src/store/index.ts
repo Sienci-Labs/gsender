@@ -12,14 +12,14 @@ import log from "app/lib/log";
 import defaultState from "./defaultState";
 import { MACRO_CATEGORY, METRIC_UNITS } from "../constants";
 import {
-    TOUCHPLATE_TYPE_AUTOZERO,
-    TOUCHPLATE_TYPE_STANDARD,
-} from 'app/lib/constants.ts';
-import defaultMachineProfiles from 'app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts';
-import { defaultATCIMacros } from '../features/ATC/assets/defaultATCIMacros';
-import api from 'app/api';
-import pubsub from 'pubsub-js';
-import { BackupFrequencies } from 'app/workspace/definitions';
+	TOUCHPLATE_TYPE_AUTOZERO,
+	TOUCHPLATE_TYPE_STANDARD,
+} from "app/lib/constants.ts";
+import defaultMachineProfiles from "app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts";
+import { defaultATCIMacros } from "../features/ATC/assets/defaultATCIMacros";
+import api from "app/api";
+import pubsub from "pubsub-js";
+import { BackupFrequencies } from "app/workspace/definitions";
 
 interface UserData {
 	path: string;
@@ -356,21 +356,14 @@ const migrateStore = (): void => {
 		return;
 	}
 
-<<<<<<< HEAD
+	if (semver.lt(cnc.version, "1.6.2")) {
+		store.set("widgets.atc.templates", defaultATCIMacros);
+	}
+
 	if (semver.lt(cnc.version, "1.6.0")) {
 		const machineProfileID = Number(
 			store.get("workspace.machineProfile.id", 4),
 		);
-=======
-    if (semver.lt(cnc.version, '1.6.2')) {
-        store.set('widgets.atc.templates', defaultATCIMacros);
-    }
-
-    if (semver.lt(cnc.version, '1.6.0')) {
-        const machineProfileID = Number(
-            store.get('workspace.machineProfile.id', 4),
-        );
->>>>>>> origin/master
 
 		if (machineProfileID === 3) {
 			// Set 2x4 (2)
