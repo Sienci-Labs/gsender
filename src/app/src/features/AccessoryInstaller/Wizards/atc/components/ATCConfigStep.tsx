@@ -32,6 +32,7 @@ function getUploadErrorMessage(error: unknown): string {
 function ATCConfigStepContent() {
     const { updateConfig, setStatus } = useConfigContext();
     const [uploading, setUploading] = useState(false);
+    const [macroReadFailed, setMacroReadFailed] = useState(false);
     const updateConfigRef = useRef(updateConfig);
     const setStatusRef = useRef(setStatus);
 
@@ -42,6 +43,7 @@ function ATCConfigStepContent() {
 
     useEffect(() => {
         const handleSdcardJson = (payload: { code?: string }) => {
+            setMacroReadFailed(false);
             if (!payload?.code) {
                 return;
             }
@@ -63,11 +65,17 @@ function ATCConfigStepContent() {
                 message: getUploadErrorMessage(error),
             });
         };
+        const handleControllerError = (error: { code: number }) => {
+            if (error.code === 84) {
+                setMacroReadFailed(true);
+            }
+        };
 
         controller.addListener('sdcard:json', handleSdcardJson);
         controller.addListener('ymodem:start', handleYmodemStart);
         controller.addListener('ymodem:complete', handleYmodemComplete);
         controller.addListener('ymodem:error', handleYmodemError);
+        controller.addListener('error', handleControllerError);
         controller.command('sdcard:read', 'ATCI.macro');
 
         return () => {
@@ -75,10 +83,11 @@ function ATCConfigStepContent() {
             controller.removeListener('ymodem:start', handleYmodemStart);
             controller.removeListener('ymodem:complete', handleYmodemComplete);
             controller.removeListener('ymodem:error', handleYmodemError);
+            controller.removeListener('error', handleControllerError);
         };
     }, []);
 
-    return <ConfigTab uploading={uploading} />;
+    return <ConfigTab uploading={uploading} macroReadFailed={macroReadFailed} />;
 }
 
 export function ATCConfigStep(_props: StepProps) {
