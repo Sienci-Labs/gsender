@@ -374,7 +374,7 @@ export default function JoggingCard() {
                     <button
                         key={preset.id}
                         onClick={() => setStepPreset(preset.id)}
-                        className={`px-3 py-1 rounded text-xs font-semibold transition-colors ${
+                        className={`px-3 py-2 rounded text-sm font-semibold transition-colors ${
                             stepPreset === preset.id
                                 ? 'bg-robin-500 text-white'
                                 : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white border border-gray-300 dark:border-dark-lighter'
@@ -593,7 +593,7 @@ export default function JoggingCard() {
                                 disabled={!canJog}
                                 onShortPress={() => zPlusJog(zDistance, feedrate, false)}
                                 onLongPress={() => continuousJogAxis({ Z: 1 }, feedrate)}
-                                className={(active) => `${baseButton} h-11 w-full ${
+                                className={(active) => `${baseButton} h-16 w-full ${
                                     active ? activeClasses.z : `${toneClasses.z} ${hoverToneClasses.z}`
                                 }`}
                             >
@@ -611,7 +611,7 @@ export default function JoggingCard() {
                                 disabled={!canJog}
                                 onShortPress={() => zMinusJog(zDistance, feedrate, false)}
                                 onLongPress={() => continuousJogAxis({ Z: -1 }, feedrate)}
-                                className={(active) => `${baseButton} h-11 w-full ${
+                                className={(active) => `${baseButton} h-16 w-full ${
                                     active ? activeClasses.z : `${toneClasses.z} ${hoverToneClasses.z}`
                                 }`}
                             >
@@ -634,7 +634,7 @@ export default function JoggingCard() {
                                 disabled={!canJog}
                                 onShortPress={() => aPlusJog(aDistance, feedrate, false, isRotaryMode)}
                                 onLongPress={() => continuousJogAxis(rotaryAxis === 'Y' ? { Y: 1 } : { A: 1 }, feedrate)}
-                                className={(active) => `${baseButton} h-11 w-full ${
+                                className={(active) => `${baseButton} h-16 w-full ${
                                     active ? activeClasses.a : `${toneClasses.a} ${hoverToneClasses.a}`
                                 }`}
                             >
@@ -652,7 +652,7 @@ export default function JoggingCard() {
                                 disabled={!canJog}
                                 onShortPress={() => aMinusJog(aDistance, feedrate, false, isRotaryMode)}
                                 onLongPress={() => continuousJogAxis(rotaryAxis === 'Y' ? { Y: -1 } : { A: -1 }, feedrate)}
-                                className={(active) => `${baseButton} h-11 w-full ${
+                                className={(active) => `${baseButton} h-16 w-full ${
                                     active ? activeClasses.a : `${toneClasses.a} ${hoverToneClasses.a}`
                                 }`}
                             >
