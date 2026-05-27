@@ -30,10 +30,6 @@ function App() {
 			controller.connect(host, options);
 		});
 
-<<<<<<< HEAD
-		sagaMiddleware.run(rootSaga);
-	}, []);
-=======
         sagaMiddleware.run(rootSaga);
 
         const shouldSendUsageData = store.get(
