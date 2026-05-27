@@ -131,8 +131,6 @@ const main = () => {
                 show: false,
                 width: isDev ? 768 : 800,
                 height: isDev ? 1024 : 1280,
-                minWidth: isDev ? 600 : 720,
-                minHeight: isDev ? 1024 : 600,
                 webPreferences: {
                     // Shared code from apps/desktop/ uses window.require + window.ipcRenderer
                     // at module load; matching desktop's preload posture avoids forking that.
