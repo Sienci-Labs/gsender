@@ -92,7 +92,7 @@ export default function BottomDrawer() {
     }, []);
 
     useEffect(() => {
-        consolePreviewBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+        consolePreviewBottomRef.current?.scrollIntoView();
     }, [consoleHistory]);
 
     // Always-on serial event subscription — must not depend on drawer mode or tab
