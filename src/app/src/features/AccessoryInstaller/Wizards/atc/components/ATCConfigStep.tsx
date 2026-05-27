@@ -65,8 +65,8 @@ function ATCConfigStepContent() {
                 message: getUploadErrorMessage(error),
             });
         };
-        const handleControllerError = (error: { code: number }) => {
-            if (error.code === 84) {
+        const handleControllerError = (error: { code: number | string }) => {
+            if (Number(error.code) === 84) {
                 setMacroReadFailed(true);
             }
         };
