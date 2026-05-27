@@ -2148,8 +2148,8 @@ export const P505Content = getMacroContent('P505.macro');
 export const TCContent = getMacroContent('TC.macro');
 export const P200Content = getMacroContent('P200.macro');
 export const defaultATCIMacros: ATCIMacroConfig = {
-    version: 20260514,
-    sdVersion: 20260514,
+    version: 20260521,
+    sdVersion: 20260521,
     variables: {
         _tc_rack_enable: {
             default: 0,

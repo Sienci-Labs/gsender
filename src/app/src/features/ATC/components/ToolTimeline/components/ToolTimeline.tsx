@@ -31,31 +31,32 @@ export function ToolTimeline({
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [selectedTool, setSelectedTool] = useState<number>(tools[0].toolNumber);
 
-	// Tool Table
-	const [toolTable, setToolTable] = useState<ToolInstance[]>([]);
-	const toolTableData = useTypedSelector(
-		(state: RootState) => state.controller.settings.toolTable,
-	);
-	const settings = useTypedSelector(
-		(state: RootState) => state.controller.settings,
-	);
-	const isConnected = useTypedSelector(
-		(state: RootState) => state.connection.isConnected,
-	);
-	const workflowState = useTypedSelector(
-		(state: RootState) => state.controller.workflow.state,
-	);
-	const reportedRackSize = Number(get(settings, "atci.rack_size", -1));
-	const atcAvailable = get(settings, "info.NEWOPT.ATC", "0") === "1";
-	const allowManualBadge = isConnected && atcAvailable;
-	const remapDisabled = workflowState !== WORKFLOW_STATE_IDLE;
-	const rackSize =
-		reportedRackSize > 0
-			? reportedRackSize
-			: Object.values(toolTableData || {}).length;
-	useEffect(() => {
-		setToolTable(mapToolNicknamesAndStatus(toolTableData, rackSize));
-	}, [toolTableData, rackSize]);
+    // Tool Table
+    const [toolTable, setToolTable] = useState<ToolInstance[]>([]);
+    const toolTableData = useTypedSelector(
+        (state: RootState) => state.controller.settings.toolTable,
+    );
+    const settings = useTypedSelector(
+        (state: RootState) => state.controller.settings,
+    );
+    const isConnected = useTypedSelector(
+        (state: RootState) => state.connection.isConnected,
+    );
+    const workflowState = useTypedSelector(
+        (state: RootState) => state.controller.workflow.state,
+    );
+    const reportedRackSize = Number(get(settings, 'atci.rack_size', -1));
+    const atcAvailable = get(settings, 'info.NEWOPT.ATC', '0') === '1';
+    const allowManualBadge = isConnected && atcAvailable;
+    const remapDisabled = workflowState !== WORKFLOW_STATE_IDLE;
+    const rackSize =
+        reportedRackSize > 0
+            ? reportedRackSize
+            : Object.values(toolTableData || {}).length;
+    const hasToolTable = Object.values(toolTableData || {}).length > 0;
+    useEffect(() => {
+        setToolTable(mapToolNicknamesAndStatus(toolTableData, rackSize));
+    }, [toolTableData, rackSize]);
 
 	useEffect(() => {
 		const token = pubsub.subscribe("toolmap:updated", () => {
@@ -143,6 +144,7 @@ export function ToolTimeline({
 					</Button>
 				</div>
 
+<<<<<<< HEAD
 				{!isCollapsed && (
 					<div className="mt-2 relative">
 						<div
@@ -202,4 +204,78 @@ export function ToolTimeline({
 			</div>
 		</div>
 	);
+=======
+                {!isCollapsed && (
+                    <div className="mt-2 relative">
+                        <div
+                            ref={scrollContainerRef}
+                            className="max-h-[18.5rem] overflow-y-auto overflow-x-hidden scroll-smooth no-scrollbar px-2 py-1"
+                        >
+                            <ToolRemapDialog
+                                open={dialogOpen}
+                                onOpenChange={setDialogOpen}
+                                originalTool={selectedTool}
+                                allTools={toolTable}
+                                onConfirm={handleConfirmRemap}
+                            />
+                            {tools.map((tool, index) => {
+                                const isRemapped = mappings.has(
+                                    tool.toolNumber,
+                                );
+                                const remapValue = mappings.get(
+                                    tool.toolNumber,
+                                );
+                                const toolLookupNumber =
+                                    isRemapped && remapValue !== undefined
+                                        ? remapValue
+                                        : tool.toolNumber;
+                                const toolInfo = toolTable.find(
+                                    (entry) => entry.id === toolLookupNumber,
+                                );
+                                const probeState: ToolProbeState =
+                                    toolInfo?.status ?? 'unprobed';
+                                const isManual = allowManualBadge
+                                    ? toolInfo?.isManual ??
+                                      (rackSize > 0
+                                          ? toolLookupNumber > rackSize
+                                          : false)
+                                    : false;
+                                const itemKey = `${tool.index}-${tool.toolNumber}-${tool.startLine ?? index}`;
+                                return (
+                                    <div
+                                        key={itemKey}
+                                        ref={(el) => {
+                                            itemRefs.current[index] = el;
+                                        }}
+                                    >
+                                        <ToolTimelineItem
+                                            tool={tool}
+                                            isActive={index === activeToolIndex}
+                                            isLast={index === tools.length - 1}
+                                            progress={
+                                                index === activeToolIndex
+                                                    ? progress
+                                                    : 0
+                                            }
+                                            handleRemap={() =>
+                                                handleRemapClick(tool.toolNumber)
+                                            }
+                                            isRemapped={isRemapped}
+                                            remapValue={remapValue}
+                                            isManual={isManual}
+                                            probeState={probeState}
+                                            showProbeStatus={hasToolTable}
+                                            canRemap={allowManualBadge}
+                                            remapDisabled={remapDisabled}
+                                        />
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+>>>>>>> origin/master
 }

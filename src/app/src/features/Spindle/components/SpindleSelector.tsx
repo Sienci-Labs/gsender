@@ -13,7 +13,7 @@ type FormattedSpindle = {
 type Props = {
     spindles: Spindle[];
     onChange: (selectedOption: FormattedSpindle | null) => void;
-    onClick: () => void;
+    onMenuOpen: () => void;
     spindle: Spindle | null;
     disabled: boolean;
 };
@@ -28,7 +28,7 @@ const formatSpindles = (spindles: Spindle[] = []): FormattedSpindle[] => {
 const SpindleSelector = ({
     spindles,
     onChange,
-    onClick,
+    onMenuOpen,
     spindle,
     disabled,
 }: Props) => {
@@ -41,13 +41,13 @@ const SpindleSelector = ({
                 className={cx('flex gap-1 justify-center w-full items-center', {
                     'cursor-not-allowed': disabled,
                 })}
-                onClick={onClick}
             >
                 <Select<FormattedSpindle>
                     options={formattedSpindles}
                     placeholder="Default Spindle"
                     value={spindleFormatted}
                     onChange={onChange}
+                    onMenuOpen={onMenuOpen}
                     className="w-full z-10"
                     menuPlacement="top"
                     isDisabled={disabled}

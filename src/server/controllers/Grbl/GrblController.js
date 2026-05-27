@@ -282,8 +282,10 @@ class GrblController {
                     if (text) commentParts.push(text);
                 }
                 const commentString = commentParts.join(' ');
-                line = line.replace(bracketCommentLine, '').trim();
-                line = line.replace(commentMatcher, '').trim();
+                if (line[0] !== '%') {
+                    line = line.replace(bracketCommentLine, '').trim();
+                    line = line.replace(commentMatcher, '').trim();
+                }
                 const ignoreEvent = context ? context.ignoreEvent : true;
                 context = this.populateContext(context);
 
@@ -459,8 +461,10 @@ class GrblController {
                     if (text) commentParts.push(text);
                 }
                 let commentString = commentParts.join(' ');
-                line = line.replace(bracketCommentLine, '').trim();
-                line = line.replace(commentMatcher, '').trim();
+                if (line[0] !== '%') {
+                    line = line.replace(bracketCommentLine, '').trim();
+                    line = line.replace(commentMatcher, '').trim();
+                }
                 context = this.populateContext(context);
 
                 const { sent, received } = this.sender.state;

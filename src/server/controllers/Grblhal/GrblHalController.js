@@ -314,8 +314,10 @@ class GrblHalController {
                     if (text) commentParts.push(text);
                 }
                 const commentString = commentParts.join(' ');
-                line = line.replace(bracketCommentLine, '').trim();
-                line = line.replace(commentMatcher, '').trim();
+                if (line[0] !== '%') {
+                    line = line.replace(bracketCommentLine, '').trim();
+                    line = line.replace(commentMatcher, '').trim();
+                }
                 const ignoreEvent = context ? context.ignoreEvent : true;
                 context = this.populateContext(context);
                 // We don't want some of these events firing if updating EEPROM in a macro - super edge case.
@@ -482,8 +484,10 @@ class GrblHalController {
                     if (text) commentParts.push(text);
                 }
                 let commentString = commentParts.join(' ');
-                line = line.replace(bracketCommentLine, '').trim();
-                line = line.replace(commentMatcher, '').replace('/uFEFF', '').trim();
+                if (line[0] !== '%') {
+                    line = line.replace(bracketCommentLine, '').trim();
+                    line = line.replace(commentMatcher, '').replace('/uFEFF', '').trim();
+                }
                 context = this.populateContext(context);
 
                 const { sent, received } = this.sender.state;

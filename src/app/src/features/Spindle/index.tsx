@@ -469,8 +469,10 @@ const SpindleWidget = () => {
     // refresh spindle list if it didn't populate
     const refreshSpindles = () => {
         if (availableSpindles.length === 0) {
-            // only happens on old firmware so we can safely use the old command
-            controller.writeln('$spindles');
+            const spindleCommand = firmwarePastVersion(ATCI_SUPPORTED_VERSION)
+                ? '$spindlesh'
+                : '$spindles';
+            controller.writeln(spindleCommand);
         }
     };
 
@@ -721,7 +723,7 @@ const SpindleWidget = () => {
                     />
                     {controllerType === GRBLHAL && (
                         <SpindleSelector
-                            onClick={refreshSpindles}
+                            onMenuOpen={refreshSpindles}
                             spindles={availableSpindles}
                             onChange={actions.handleHALSpindleSelect}
                             spindle={spindle}
