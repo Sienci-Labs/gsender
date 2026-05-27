@@ -8,6 +8,9 @@ import { Toaster } from './components/shadcn/Sonner';
 import { ReactRoutes } from './react-routes';
 import { AccessibilitySettingsHandler } from './features/Helper/AccessibilitySettingsHandler';
 import { posthog } from 'posthog-js';
+import { useEffect } from 'react';
+import { Provider as ReduxProvider } from 'react-redux';
+import { HashRouter } from 'react-router';
 
 function App() {
 	useEffect(() => {
