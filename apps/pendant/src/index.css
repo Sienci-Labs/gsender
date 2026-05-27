@@ -19,11 +19,12 @@
 
 .badge-animate-run { animation: pulse-run 2s ease-in-out infinite; }
 
-@keyframes breathe {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50%       { opacity: 0.7; transform: scale(0.96); }
+@keyframes pulse-alarm {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+    50%       { box-shadow: 0 0 0 6px rgba(220, 38, 38, 0.35); }
 }
-.state-attention { animation: breathe 2s ease-in-out infinite; }
+
+.badge-animate-alarm { animation: pulse-alarm 1s ease-in-out infinite; }
 
 @keyframes border-march {
     0%, 100% { outline-offset: 2px; outline-width: 2px; }
