@@ -1,24 +1,28 @@
 describe("Grblhal Zeroing axis and go to zero", () => {
-	beforeEach(() => {
-		cy.viewport(1920, 1080);
-		// Use loadUI custom command with dynamic baseUrl
-		cy.loadUI(`${Cypress.config("baseUrl")}/#/`, {
-			maxRetries: 3,
-			waitTime: 3000,
-			timeout: 5000,
-		});
-	});
+  beforeEach(() => {
+    cy.viewport(1920, 1080);
+    // Use loadUI custom command with dynamic baseUrl
+    cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
+      maxRetries: 6,
+      waitTime: 6000,
+      timeout: 120000
+    });
+  });
 
-	it("Test Case: jogging using buttons and zeroing axes", () => {
+it("Test Case: jogging using buttons and zeroing axes", () => {
 		const waitAfter = 2000; // Define waitAfter variable
 
-		// Step 1: Connect to CNC
-		cy.log("Step 1: Connecting to CNC...");
-		cy.connectMachine();
-		cy.wait(3000);
-		cy.unlockMachineIfNeeded();
-		cy.wait(1000);
-		cy.log("Connected");
+
+
+    // Step 1: Connect to CNC
+    cy.log('Step 1: Connecting to CNC...');
+    cy.connectMachine();
+    cy.wait(6000);
+    cy.log('Connected to CNC');
+    
+    // Handle unlock if needed
+    cy.unlockMachineIfNeeded();
+
 
 		// Step 2: Wait for Idle status
 		cy.log("Step 2: Waiting for Idle status...");

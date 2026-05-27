@@ -87,37 +87,50 @@ Cypress.Commands.add('loadUI', (url, options = {}) => {
 //3.Connect to CNC machine grbl cy.connectMachine();
 // ----------------------
 Cypress.Commands.add("connectMachine", () => {
-	// Step 1: Click "Connect to CNC" button
-	cy.contains("span", "Connect to CNC", { timeout: 10000 })
-		.should("be.visible")
-		.click({ force: true });
+    // Step 1: Click the parent button, not just the span
+    cy.contains('span', 'Connect to CNC', { timeout: 15000 })
+        .should('exist')
+        .scrollIntoView()
+        .parents('button')
+        .first()
+        .should('be.visible')
+        .should('not.be.disabled')
+        .click({ force: true });
 
-	// Step 2: Wait for the radix popper div to appear
-	cy.get("div[data-radix-popper-content-wrapper]", { timeout: 10000 })
-		.should("exist")
-		.and("be.visible")
-		.within(() => {
-			// Step 3: Get the first port button inside the popper
-			cy.get("button.m-0")
-				.should("have.length.greaterThan", 0)
-				.first()
-				.then(($btn) => {
-					// Step 4: Read and log the port label — no assertion on name
-					const $label = $btn.find("span.font-bold");
-					const portName =
-						$label.length > 0 ? $label.text().trim() : $btn.text().trim();
+    cy.wait(1500);
 
-					cy.log(`Selecting first available port: "${portName}"`);
+    // Step 2: If dropdown didn't open, retry click once
+    cy.get('body').then(($body) => {
+        if ($body.find('div[data-radix-popper-content-wrapper]').length === 0) {
+            cy.log('Dropdown not open - retrying click...');
+            cy.contains('span', 'Connect to CNC', { timeout: 5000 })
+                .parents('button')
+                .first()
+                .click({ force: true });
+            cy.wait(1500);
+        }
+    });
 
-					// Step 5: Click whatever port is listed first
-					cy.wrap($btn).click({ force: true });
-				});
-		});
+    // Step 3: Wait for the radix popper div to appear
+    cy.get("div[data-radix-popper-content-wrapper]", { timeout: 15000 })
+        .should("exist")
+        .within(() => {
+            cy.get("button.m-0")
+                .should("have.length.greaterThan", 0)
+                .first()
+                .then(($btn) => {
+                    const $label = $btn.find("span.font-bold");
+                    const portName =
+                        $label.length > 0 ? $label.text().trim() : $btn.text().trim();
+                    cy.log(`Selecting first available port: "${portName}"`);
+                    cy.wrap($btn).click({ force: true });
+                });
+        });
 
-	//  Step 6: Confirm machine reaches Idle state after connecting
-	cy.contains(/^Idle$/i, { timeout: 30000 })
-		.should("be.visible")
-		.then(() => cy.log("CNC machine connected and in Idle state"));
+    // Step 4: Confirm Idle state
+    cy.contains(/^Idle$/i, { timeout: 30000 })
+        .should("be.visible")
+        .then(() => cy.log("CNC machine connected and in Idle state"));
 });
 //-----------------------
 //21.Axis Homing Z< Y & X

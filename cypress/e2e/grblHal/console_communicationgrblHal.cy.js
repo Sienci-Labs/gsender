@@ -8,15 +8,16 @@ describe("Console commands testing ", () => {
 			timeout: 5000,
 		});
 	});
-	it("Connects machine and sets axes to zero", () => {
-		//Connection
-		cy.log("Step 1: Connecting to CNC...");
-		cy.connectMachine();
-		cy.wait(3000);
-		cy.autoUnlock();
-		cy.log("Connected to CNC");
-		//Unlock machine if needed
-		cy.unlockMachineIfNeeded();
+	it("Connects machine and checks console commands", () => {
+    // Connection
+    cy.log("Step 1: Connecting to CNC...");
+    cy.contains("span", "Connect to CNC", { timeout: 15000 })
+        .should("be.visible");
+    cy.wait(1000);
+    cy.connectMachine();
+    cy.wait(3000);
+    cy.autoUnlock();
+    cy.log("Connected to CNC");
 
 		//Waiting until idle status
 		cy.log("Step 2: Waiting for idle state...");

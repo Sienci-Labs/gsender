@@ -63,56 +63,55 @@ describe('gSender Configuration and Firmware Test Suite', () => {
         });
 
         // Part 2: Firmware Settings
-        // --------------------------------------------------------
-        cy.log('Part 2: Firmware Settings');
+        // Part 2: Firmware Settings
+cy.log('Part 2: Firmware Settings');
 
-        // Restore defaults
-        cy.get('div.fixed div.grid > button:nth-of-type(1)').click();
-        cy.contains('button.bg-blue-500', 'Restore Defaults', { timeout: 10000 })
-            .should('be.visible')
-            .should('not.be.disabled')
-            .click();
+// Restore defaults
+cy.get('#main-content > div.flex div.grid > div span.text-sm')
+  .contains('Defaults')
+  .should('be.visible')
+  .click();
+cy.wait(1000);
 
-        // Skip waiting — force click past the notification
-        cy.get('[data-testid="firmware-settings-export-button"]', { timeout: 10000 })
-            .should('be.visible')
-            .click({ force: true });
+cy.get('button.bg-blue-500', { timeout: 10000 })
+  .contains('Restore Defaults')
+  .should('be.visible')
+  .should('not.be.disabled')
+  .click();
+cy.wait(2000);
 
-        // Confirm notification is gone before proceeding
-        cy.get('div[data-title]', { timeout: 10000 }).should('not.exist');
+// Confirm notification is gone before proceeding
+cy.get('div[data-title]', { timeout: 10000 }).should('not.exist');
 
-        // Export firmware settings
-        cy.get('[data-testid="firmware-settings-export-button"]', { timeout: 10000 })
-            .should('be.visible')
-            .should('not.be.disabled')
-            .click();
+// Export firmware settings
+cy.get('[data-testid="firmware-settings-export-button"]', { timeout: 10000 })
+  .should('be.visible')
+  .should('not.be.disabled')
+  .click();
 
+// Import firmware settings
+cy.get('[data-testid="firmware-settings-import-button"]', { timeout: 10000 })
+  .should('be.visible')
+  .should('not.be.disabled')
+  .click();
 
-        // Import firmware settings
-        cy.get('[data-testid="firmware-settings-import-button"]', { timeout: 10000 })
-            .should('be.visible')
-            .should('not.be.disabled')
-            .click();
+cy.get('div.fixed input')
+  .selectFile('cypress/fixtures/gSender-firmware-settings.json', { force: true });
 
-        cy.get('div.fixed input')
-            .selectFile('cypress/fixtures/gSender-firmware-settings.json', { force: true });
+cy.wait(2000);
 
-        // Wait for import to process — no confirm button needed, file auto-imports
-        cy.wait(2000);
+// Close toast if present
+cy.get('body').then(($body) => {
+  if ($body.find('section line:nth-of-type(2)').length > 0) {
+    cy.get('section line:nth-of-type(2)').click({ force: true });
+  }
+});
 
-        // Close the success/notification toast if it appears
-        cy.get('body').then(($body) => {
-            if ($body.find('section line:nth-of-type(2)').length > 0) {
-                cy.get('section line:nth-of-type(2)').click({ force: true });
-            }
-        });
-
-        // Close import notification if present
-        cy.get('body').then(($body) => {
-            if ($body.find('section:contains("EPROM settings imported")').length > 0) {
-                cy.get('section button > svg').first().click({ force: true });
-            }
-        });
+cy.get('body').then(($body) => {
+  if ($body.find('section:contains("EPROM settings imported")').length > 0) {
+    cy.get('section button > svg').first().click({ force: true });
+  }
+});
         // --------------------------------------------------------
         // Part 3: Search and View Modified Settings
         cy.log('Part 3: Search and View Modified');

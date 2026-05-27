@@ -2,7 +2,7 @@
 describe('Master Test Suite - All Tests', () => {
   //Import and run each test context\
 
- import('./loadUI_grblHal.cy');
+import('./loadUI_grblHal.cy');
   
  import('./device_connection_grblhal.cy.js');
 
@@ -26,11 +26,12 @@ describe('Master Test Suite - All Tests', () => {
 
   import('./feedrate_override_controls_spec.cy.js');
 
+  import('./config_functionalities.cy');
+
   import('./macros_running_spec.cy.js');
 
   import('./console_communicationgrblHal.cy');
 
- import('./config_functionalities.cy');
 
   import('./jog_controls.specgrblHal.cy');
 
