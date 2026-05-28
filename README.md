@@ -130,10 +130,10 @@ You can both run gSender locally using the public code-base as well as compile i
 - Tool change wizard and tool timeline now display annotation comments when no ATC nickname is set
 - Removed probed/unprobed status on firmware versions without a tool table
 - ATC Config will now send default values on first install
+- ATC config will now warn when unable to read the stored configuration values.
 - Squaring and motor tuning workflows now share the same jog popover for a more consistent experience
 - Spindle delay behaviour has been updated and is now an explicit configurable option for forced insertion when needed
 - Macros can now send realtime commands
-- M0 macros will now correctly parse both `;` and `()` style comments
 
 ### 1.6.1 (April 30, 2026)
 - Added option to skip first tool change on fixed strategy or prompt use if they want to skip
