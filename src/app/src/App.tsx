@@ -30,25 +30,8 @@ function App() {
 			controller.connect(host, options);
 		});
 
-<<<<<<< HEAD
-		sagaMiddleware.run(rootSaga);
-	}, []);
-=======
         sagaMiddleware.run(rootSaga);
-
-        const shouldSendUsageData = store.get(
-            'workspace.collectUsageDataStatus',
-            'pending',
-        );
-
-        if (shouldSendUsageData === 'accepted') {
-            console.log('Collecting usage data through PostHog');
-            posthog.opt_in_capturing();
-        } else {
-            posthog.opt_out_capturing();
-        }
     }, []);
->>>>>>> origin/master
 
 	return (
 		<>

@@ -356,12 +356,6 @@ const migrateStore = (): void => {
 		return;
 	}
 
-<<<<<<< HEAD
-	if (semver.lt(cnc.version, "1.6.0")) {
-		const machineProfileID = Number(
-			store.get("workspace.machineProfile.id", 4),
-		);
-=======
     if (semver.lt(cnc.version, '1.6.2')) {
         store.set('widgets.atc.templates', defaultATCIMacros);
     }
@@ -370,7 +364,6 @@ const migrateStore = (): void => {
         const machineProfileID = Number(
             store.get('workspace.machineProfile.id', 4),
         );
->>>>>>> origin/master
 
 		if (machineProfileID === 3) {
 			// Set 2x4 (2)
