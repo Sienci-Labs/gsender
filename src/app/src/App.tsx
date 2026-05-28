@@ -1,7 +1,3 @@
-import controller from "app/lib/controller";
-import * as user from "app/lib/user";
-import store from "app/store";
-
 import { store as reduxStore } from 'app/store/redux';
 import rootSaga from 'app/store/redux/sagas';
 import { sagaMiddleware } from 'app/store/redux/sagas';
@@ -12,6 +8,9 @@ import { Toaster } from './components/shadcn/Sonner';
 import { ReactRoutes } from './react-routes';
 import { AccessibilitySettingsHandler } from './features/Helper/AccessibilitySettingsHandler';
 import { posthog } from 'posthog-js';
+import { useEffect } from 'react';
+import { Provider as ReduxProvider } from 'react-redux';
+import { HashRouter } from 'react-router';
 
 function App() {
 	useEffect(() => {
