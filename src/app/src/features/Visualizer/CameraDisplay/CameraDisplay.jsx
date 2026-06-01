@@ -24,6 +24,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import i18n from 'app/lib/i18n';
+import { posthog } from 'posthog-js';
 
 import styles from './index.module.styl';
 
@@ -37,6 +38,15 @@ class CameraDisplay extends PureComponent {
         camera: PropTypes.object,
         cameraPosition: PropTypes.string,
     };
+
+    handleCameraChange = (cameraPosition, changeCameraView) => {
+        changeCameraView();
+
+        posthog.capture('visualizer_camera_change', {
+            cameraPosition,
+            feature: 'Visualizer'
+        });
+    }
 
     render = () => {
         let { camera, cameraPosition } = this.props;
@@ -55,7 +65,7 @@ class CameraDisplay extends PureComponent {
                                 : `${styles.faceTop}`
                         }
                         onClick={(event) => {
-                            camera.toTopView();
+                            this.handleCameraChange('Top', camera.toTopView);
                         }}
                     />
                     <button
@@ -69,7 +79,7 @@ class CameraDisplay extends PureComponent {
                                 : `${styles.faceLeft}`
                         }
                         onClick={(event) => {
-                            camera.toLeftSideView();
+                            this.handleCameraChange('Left', camera.toLeftSideView);
                         }}
                     />
                     <button
@@ -83,7 +93,7 @@ class CameraDisplay extends PureComponent {
                                 : `${styles.faceFront}`
                         }
                         onClick={(event) => {
-                            camera.toFrontView();
+                            this.handleCameraChange('Front', camera.toFrontView);
                         }}
                     />
                     <button
@@ -97,7 +107,7 @@ class CameraDisplay extends PureComponent {
                                 : `${styles.faceIso}`
                         }
                         onClick={(event) => {
-                            camera.to3DView();
+                            this.handleCameraChange('3D', camera.to3DView);
                         }}
                     />
                     <button
@@ -123,7 +133,7 @@ class CameraDisplay extends PureComponent {
                                 : `${styles.cornerC2}`
                         }
                         onClick={(event) => {
-                            camera.toRightSideView();
+                            this.handleCameraChange('Right', camera.toRightSideView);
                         }}
                     />
 
