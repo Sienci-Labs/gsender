@@ -18,6 +18,7 @@ import {
     AlertDialogCancel,
     AlertDialogAction,
 } from 'app/components/shadcn/AlertDialog';
+import { usePostHog } from '@posthog/react';
 
 interface AxisRowProps {
     label: string;
@@ -41,6 +42,7 @@ export function AxisRow({
     disableGotoZero,
 }: AxisRowProps) {
     const { shouldWarnZero } = useWorkspaceState();
+    const posthog = usePostHog();
 
     return (
         <div className="border border-gray-200 dark:border-gray-700 rounded-md w-full flex flex-row items-stretch justify-between flex-1 max-xl:scale-95">
@@ -49,8 +51,16 @@ export function AxisRow({
                     onClick={() => {
                         if (homingMode) {
                             homeAxis(axis);
+                            posthog.capture('axis_homed', {
+                                axis,
+                                feature: 'DRO',
+                            });
                         } else {
                             zeroWCS(axis, 0);
+                            posthog.capture('axis_zeroed', {
+                                axis,
+                                feature: 'DRO',
+                            });
                         }
                     }}
                     size="responsive"
@@ -96,7 +106,13 @@ export function AxisRow({
                         <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
                             <AlertDialogAction
-                                onClick={() => zeroWCS(label, 0)}
+                                onClick={() => {
+                                    zeroWCS(label, 0);
+                                    posthog.capture('axis_zeroed', {
+                                        axis: label,
+                                        feature: 'DRO',
+                                    });
+                                }}
                             >
                                 Continue
                             </AlertDialogAction>
@@ -112,13 +128,22 @@ export function AxisRow({
                 movementHandler={handleManualOffset}
             />
 
-            <span className="font-mono flex items-center text-sm text-gray-400 w-[9ch] text-center" data-testid={`mpos-${axis}`}>
+            <span
+                className="font-mono flex items-center text-sm text-gray-400 w-[9ch] text-center"
+                data-testid={`mpos-${axis}`}
+            >
                 {disablePositionUpdate ? '0.00' : mpos}
             </span>
 
             <Button
                 disabled={disabled || disableGotoZero}
-                onClick={() => gotoZero(axis)}
+                onClick={() => {
+                    gotoZero(axis);
+                    posthog.capture('go_to_axis_zero', {
+                        axis,
+                        feature: 'DRO',
+                    });
+                }}
                 variant="alt"
                 size="responsive"
                 tooltip={{
