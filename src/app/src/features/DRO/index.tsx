@@ -60,6 +60,7 @@ import {
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import reduxStore from 'app/store/redux';
 import { cn } from 'app/lib/utils';
+import { usePostHog } from '@posthog/react';
 
 interface DROProps {
     axes: AxesArray;
@@ -105,6 +106,8 @@ function DRO({
     const homingDirectionRef = useRef(homingDirection);
     const pullOffRef = useRef(pullOff);
 
+    const posthog = usePostHog();
+
     useEffect(() => {
         homingFlagRef.current = homingFlag;
         homingDirectionRef.current = homingDirection;
@@ -138,6 +141,10 @@ function DRO({
 
     function toggleHoming() {
         setHomingMode((prev) => !prev);
+        posthog.capture('homing_mode_toggled', {
+            homing_mode: homingMode,
+            feature: 'DRO',
+        });
     }
 
     const canClick = useCallback((): boolean => {
@@ -484,7 +491,13 @@ function DRO({
                         tooltip={{ content: 'Zero all axes', side: 'left' }}
                         text="Zero"
                         icon={<VscTarget className="w-5 h-5" />}
-                        onClick={zeroAllAxes}
+                        onClick={() => {
+                            zeroAllAxes();
+                            posthog.capture('zero_all_axes', {
+                                feature: 'DRO',
+                                withConfirmation: false,
+                            });
+                        }}
                         disabled={!canClick}
                         aria-label="Zero all axes: Set current position as work zero for all axes"
                         size="responsive"
@@ -511,7 +524,15 @@ function DRO({
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={zeroAllAxes}>
+                                <AlertDialogAction
+                                    onClick={() => {
+                                        zeroAllAxes();
+                                        posthog.capture('zero_all_axes', {
+                                            feature: 'DRO',
+                                            withConfirmation: true,
+                                        });
+                                    }}
+                                >
                                     Continue
                                 </AlertDialogAction>
                             </AlertDialogFooter>
