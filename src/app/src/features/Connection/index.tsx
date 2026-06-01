@@ -151,6 +151,7 @@ function Connection(props: ConnectionProps) {
                     clearTimeout(connectTimeoutRef.current);
                     connectTimeoutRef.current = null;
                 }
+
                 if (err) {
                     setConnectionState(ConnectionState.ERROR);
                     posthog?.capture('connection_failed', {
@@ -160,6 +161,24 @@ function Connection(props: ConnectionProps) {
                     });
                     return;
                 }
+
+                const firmwareVersion = get(
+                    controller.settings,
+                    'version.semver',
+                    undefined,
+                );
+
+                console.log('machine_connected', {
+                    port,
+                    connection_type: type,
+                    baudrate: baud,
+                    ethernetPort:
+                        type === ConnectionType.ETHERNET
+                            ? ethernetPort
+                            : undefined,
+                    firmware: defaultFirmware,
+                    firmware_version: firmwareVersion,
+                });
 
                 setConnectionState(ConnectionState.CONNECTED);
                 setActivePort(port);
