@@ -12,6 +12,7 @@ import { Toaster } from './components/shadcn/Sonner';
 import { ReactRoutes } from './react-routes';
 import { AccessibilitySettingsHandler } from './features/Helper/AccessibilitySettingsHandler';
 import { posthog } from 'posthog-js';
+import isElectron from 'is-electron';
 
 function App() {
     useEffect(() => {
@@ -42,6 +43,13 @@ function App() {
             posthog.opt_in_capturing();
         } else {
             posthog.opt_out_capturing();
+        }
+
+        if (isElectron()) {
+            console.log('Getting windows registry');
+            window.ipcRenderer.invoke('get-windows-registry').then((value) => {
+                console.log({ REGISTRY: value });
+            });
         }
     }, []);
 

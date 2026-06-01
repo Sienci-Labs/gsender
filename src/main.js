@@ -40,6 +40,7 @@ import log from 'electron-log';
 import path from 'path';
 import fs from 'fs';
 import * as Sentry from '@sentry/electron/main';
+import WinReg from 'winreg';
 import WindowManager from './electron-app/WindowManager';
 import launchServer from './server-cli';
 import pkg from './package.json';
@@ -406,9 +407,24 @@ const main = () => {
                 return hostInformation;
             });
 
+            ipcMain.handle('get-windows-registry', async (channel) => {
+                if (process.platform !== 'win32') {
+                    return null;
+                }
+
+                const registry = new WinReg({
+                    hive: WinReg.HKCU,
+                    key: 'Software\\SienciLabs\\gSender\\IsBundled',
+                });
+
+                const value = await registry.getValue();
+                console.log({ REGISTRY: value, });
+                return value;
+            });
+
             /**
-       * gSender config events - move electron store changes out of renderer process
-       */
+            * gSender config events - move electron store changes out of renderer process
+            */
             ipcMain.on('open-upload-dialog', async () => {
                 try {
                     let additionalOptions = {};
