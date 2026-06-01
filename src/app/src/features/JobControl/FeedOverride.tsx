@@ -10,6 +10,8 @@ import { useEffect, useState } from 'react';
 import store from 'app/store';
 import { mapPositionToUnits } from 'app/lib/units';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState.ts';
+import posthog from 'posthog-js';
+import { usePostHog } from '@posthog/react';
 
 interface OverridesProps {
     ovF: number;
@@ -34,12 +36,20 @@ let globalLocalOvSTimestamp = 0;
 const debouncedOvFUpdateHandler = debounce((ovF, setLocalOvF) => {
     if (globalOvTimestamp > globalLocalOvFTimestamp) {
         setLocalOvF(ovF);
+        posthog.capture('feed_override_changed', {
+            value: Number(ovF),
+            feature: 'JobControl',
+        });
     }
 }, 1000);
 
 const debouncedOvSUpdateHandler = debounce((ovS, setLocalOvS) => {
     if (globalOvTimestamp > globalLocalOvSTimestamp) {
         setLocalOvS(ovS);
+        posthog.capture('spindle_override_changed', {
+            value: Number(ovS),
+            feature: 'JobControl',
+        });
     }
 }, 1000);
 
@@ -53,6 +63,7 @@ const Overrides: React.FC<OverridesProps> = ({
 }) => {
     globalOvTimestamp = ovTimestamp;
     const { units } = useWorkspaceState();
+    const posthog = usePostHog();
 
     const [showSpindleOverride, setShowSpindleOverride] = useState(
         store.get('workspace.spindleFunctions'),
