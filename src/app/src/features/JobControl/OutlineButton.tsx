@@ -8,6 +8,7 @@ import { outlineResponse } from 'app/workers/Outline.response';
 import { toast } from 'app/lib/toaster';
 import { store as reduxStore } from 'app/store/redux';
 import get from 'lodash/get';
+import { usePostHog } from '@posthog/react';
 
 interface OutlineButtonProps {
     disabled: boolean;
@@ -16,7 +17,8 @@ interface OutlineButtonProps {
 let outlineRunning = false;
 
 const OutlineButton: React.FC<OutlineButtonProps> = ({ disabled }) => {
-    // TODO
+    const posthog = usePostHog();
+
     const runOutline = () => {
         const liteMode = store.get('widgets.visualizer.liteMode', false);
         if (liteMode) {
@@ -65,6 +67,10 @@ const OutlineButton: React.FC<OutlineButtonProps> = ({ disabled }) => {
         } else {
             pubsub.publish('outline:start');
         }
+
+        posthog.capture('outline_run_started', {
+            feature: 'JobControl',
+        });
     };
 
     return (
