@@ -305,7 +305,10 @@ const ControlButton: React.FC<ControlButtonProps> = ({
             currentActiveState === GRBL_ACTIVE_STATE_HOLD
         ) {
             controller.command('gcode:resume');
-            posthog?.capture('job_resumed', { active_state: currentActiveState });
+            posthog?.capture('job_resumed', {
+                active_state: currentActiveState,
+                feature: 'JobControl',
+            });
             return;
         }
 
@@ -319,7 +322,10 @@ const ControlButton: React.FC<ControlButtonProps> = ({
                 return;
             }
             controller.command('gcode:start');
-            posthog?.capture('job_started', { active_state: currentActiveState });
+            posthog?.capture('job_started', {
+                active_state: currentActiveState,
+                feature: 'JobControl',
+            });
             return;
         }
     };
@@ -331,7 +337,10 @@ const ControlButton: React.FC<ControlButtonProps> = ({
         const currentActiveState = reduxActiveState || activeState;
         onStop();
         controller.command('gcode:stop', { force: true });
-        posthog?.capture('job_stopped', { active_state: currentActiveState });
+        posthog?.capture('job_stopped', {
+            active_state: currentActiveState,
+            feature: 'JobControl',
+        });
         if (currentActiveState === GRBL_ACTIVE_STATE_CHECK) {
             controller.command('gcode', '$C');
         }
