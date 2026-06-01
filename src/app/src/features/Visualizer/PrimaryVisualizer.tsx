@@ -16,6 +16,7 @@ import cx from 'classnames';
 import { Tooltip } from 'app/components/Tooltip';
 import GcodeEditor from './GcodeEditor';
 import { Actions, State } from './definitions';
+import posthog from 'posthog-js';
 
 interface Props {
     state: State;
@@ -126,9 +127,16 @@ const PrimaryVisualizer = ({
                                         'text-gray-400': !state.liteMode,
                                         'text-green-400': state.liteMode,
                                     })}
-                                    onClick={() =>
-                                        actions.handleLiteModeToggle()
-                                    }
+                                    onClick={() => {
+                                        actions.handleLiteModeToggle();
+                                        posthog.capture(
+                                            'visualizer_lite_mode_toggle',
+                                            {
+                                                feature: 'Visualizer',
+                                                liteMode: state.liteMode,
+                                            },
+                                        );
+                                    }}
                                 />
                             </button>
                         </Tooltip>
