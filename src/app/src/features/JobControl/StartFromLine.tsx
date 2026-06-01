@@ -23,6 +23,7 @@ import { useWidgetState } from 'app/hooks/useWidgetState';
 import pubsub from 'pubsub-js';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { convertToImperial } from 'app/lib/units';
+import { usePostHog } from '@posthog/react';
 
 type StartFromLineProps = {
     disabled: boolean;
@@ -46,6 +47,7 @@ const StartFromLine = ({
     const { units, safeRetractHeight } = useWorkspaceState();
     const { delay = 0 } = useWidgetState('spindle');
     const lineTotal = useSelector((state: RootState) => state.file.total);
+    const posthog = usePostHog();
 
     const calculateSafeHeight = () => {
         if (safeRetractHeight === 0) {
@@ -100,6 +102,13 @@ const StartFromLine = ({
         );
         toast.info('Running Start From Specific Line Command', {
             position: 'bottom-right',
+        });
+        posthog.capture('start_from_line_run', {
+            feature: 'JobControl',
+            line: startFromLine,
+            safe_height: newSafeHeight,
+            z_max: zMax,
+            delay,
         });
     };
 
