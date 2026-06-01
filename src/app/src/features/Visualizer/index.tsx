@@ -85,6 +85,7 @@ import SecondaryVisualizer from './SecondaryVisualizer';
 import useKeybinding from '../../lib/useKeybinding';
 import { CommandKeys } from 'app/lib/definitions/shortcuts';
 import { Actions, State } from './definitions';
+import posthog from 'posthog-js';
 
 interface Views {
     type: 'isometric' | 'top' | 'front' | 'right' | 'left' | 'default';
@@ -578,7 +579,7 @@ class Visualizer extends Component {
         },
         handleLiteModeToggle: () => {
             const { liteMode, liteOption } = this.state;
-            const { isFileLoaded } = this.props;
+            const { isFileLoaded, isSecondary } = this.props;
             const newLiteModeValue = !liteMode;
 
             this.setState({
@@ -600,6 +601,12 @@ class Visualizer extends Component {
                 isFileLoaded,
                 enteringLiteMode: newLiteModeValue,
                 wasInEverythingMode,
+            });
+
+            posthog.capture('visualizer_lite_mode_toggle', {
+                feature: 'Visualizer',
+                visualizer_type: !isSecondary ? 'primary' : 'secondary',
+                lite_mode: newLiteModeValue,
             });
         },
         lineWarning: {
