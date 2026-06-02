@@ -321,31 +321,10 @@ export default function BottomDrawer() {
                         </div>
                     </div>
 
-                    {mode === 'closed' ? null : activeTab === 'Macros' ? (
-                        <MacrosPanel mode={mode} />
-                    ) : activeTab === 'Coolant' ? (
-                        <CoolantPanel />
-                    ) : activeTab === 'Spindle' ? (
-                        <SpindlePanel mode={mode} />
-                    ) : (
-                        <>
-                    {/* UPPER ZONE */}
-                    {activeTab === 'Console' && mode !== 'expanded' ? (
-                        /* Console preview — fills the minimal upper zone, scrolled to bottom */
-                        <div className="flex-1 overflow-y-auto px-3 py-2 space-y-0.5 min-h-0">
-                            {consoleHistory.length === 0 ? (
-                                <span className="font-mono text-xs text-gray-400 dark:text-gray-500 italic">No output yet</span>
-                            ) : (
-                                consoleHistory.map((line, i) => (
-                                    <p key={i} className="font-mono text-xs text-gray-500 dark:text-gray-300 truncate">{line}</p>
-                                ))
-                            )}
-                            <div ref={consolePreviewBottomRef} />
-                        </div>
-                    ) : activeTab === 'File' ? (
-                        file.fileLoaded ? (
+                    {/* File tab — always mounted */}
+                    <div className={activeTab === 'File' ? 'flex-1 flex flex-col overflow-hidden min-h-0' : 'hidden'}>
+                        {file.fileLoaded ? (
                             <div className="shrink-0 px-3 py-2 flex flex-col gap-2">
-                                {/* File header card */}
                                 <div className="flex items-center gap-3 bg-gray-200/70 dark:bg-dark rounded-lg px-3 py-2">
                                     <div className="w-8 h-8 rounded-lg bg-gray-300 dark:bg-dark-lighter flex items-center justify-center shrink-0">
                                         <FileCode size={15} className="text-gray-600 dark:text-gray-400" />
@@ -364,8 +343,6 @@ export default function BottomDrawer() {
                                         Close
                                     </button>
                                 </div>
-
-                                {/* 4 stat blocks */}
                                 <div className="grid grid-cols-4 gap-1.5">
                                     {stats.map(({ label, Icon, value }) => (
                                         <div key={label} className="bg-white dark:bg-dark rounded-lg border border-gray-200 dark:border-dark-lighter px-2 py-2">
@@ -378,7 +355,6 @@ export default function BottomDrawer() {
                                 </div>
                             </div>
                         ) : (
-                            /* No file — load prompt */
                             <div className="shrink-0 px-3 py-3 flex items-center justify-between gap-3 border-b border-gray-200 dark:border-dark-lighter">
                                 <span className="text-xs text-gray-500 dark:text-gray-400">No file loaded</span>
                                 <button
@@ -388,62 +364,83 @@ export default function BottomDrawer() {
                                     <Upload size={14} /> Load File
                                 </button>
                             </div>
-                        )
-                    ) : activeTab === 'Console' && mode === 'expanded' ? null : (
-                        <div className="shrink-0 px-3 py-3 border-b border-gray-200 dark:border-dark-lighter">
-                            <span className="text-xs text-gray-500 dark:text-gray-400">
-                                {activeTab} — coming soon
-                            </span>
-                        </div>
-                    )}
-
-                    {/* LOWER ZONE — expanded only */}
-                    {mode === 'expanded' && (
-                        <div className="flex-1 overflow-hidden min-h-0">
-                            {activeTab === 'Console' && (
-                                <ConsolePanel className="h-full" />
-                            )}
-                            {activeTab === 'File' && file.fileLoaded && (
-                                <div className="h-full overflow-auto px-3 py-2">
-                                    <div className="h-full rounded-lg border border-gray-200 dark:border-dark-lighter bg-white dark:bg-dark overflow-hidden">
-                                        <GcodeEditor onClose={() => setMode('minimal')} />
+                        )}
+                        {mode === 'expanded' && (
+                            <div className="flex-1 overflow-hidden min-h-0">
+                                {file.fileLoaded ? (
+                                    <div className="h-full overflow-auto px-3 py-2">
+                                        <div className="h-full rounded-lg border border-gray-200 dark:border-dark-lighter bg-white dark:bg-dark overflow-hidden">
+                                            <GcodeEditor onClose={() => setMode('minimal')} />
+                                        </div>
                                     </div>
-                                </div>
-                            )}
-                            {activeTab === 'File' && !file.fileLoaded && (
-                                <div className="h-full overflow-auto px-3 py-2">
-                                    <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wide mb-2">Recent files</p>
-                                    {recentFiles.length === 0
-                                        ? <p className="text-xs text-gray-400">No recent files.</p>
-                                        : recentFiles.map((r, i) => (
-                                            <div key={i} className="flex items-center justify-between py-2 border-b border-gray-200 dark:border-dark-lighter last:border-0 gap-2">
-                                                <span className="text-xs text-gray-700 dark:text-gray-300 truncate">{r.fileName}</span>
-                                                <div className="flex items-center gap-2 shrink-0">
-                                                    <span className="text-[10px] text-gray-400">{formatSize(r.fileSize)}</span>
-                                                    <button
-                                                        onClick={() => handleRecentLoad(r)}
-                                                        disabled={!r.filePath}
-                                                        className={`text-xs font-semibold rounded px-3 py-1.5 border transition-colors ${
-                                                            r.filePath
-                                                                ? 'text-robin-600 dark:text-robin-400 border-robin-300 dark:border-robin-600 hover:bg-robin-50 dark:hover:bg-robin-500/15'
-                                                                : 'text-gray-400 dark:text-gray-500 border-gray-200 dark:border-dark-lighter cursor-default'
-                                                        }`}
-                                                    >
-                                                        Load
-                                                    </button>
+                                ) : (
+                                    <div className="h-full overflow-auto px-3 py-2">
+                                        <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wide mb-2">Recent files</p>
+                                        {recentFiles.length === 0
+                                            ? <p className="text-xs text-gray-400">No recent files.</p>
+                                            : recentFiles.map((r, i) => (
+                                                <div key={i} className="flex items-center justify-between py-2 border-b border-gray-200 dark:border-dark-lighter last:border-0 gap-2">
+                                                    <span className="text-xs text-gray-700 dark:text-gray-300 truncate">{r.fileName}</span>
+                                                    <div className="flex items-center gap-2 shrink-0">
+                                                        <span className="text-[10px] text-gray-400">{formatSize(r.fileSize)}</span>
+                                                        <button
+                                                            onClick={() => handleRecentLoad(r)}
+                                                            disabled={!r.filePath}
+                                                            className={`text-xs font-semibold rounded px-3 py-1.5 border transition-colors ${
+                                                                r.filePath
+                                                                    ? 'text-robin-600 dark:text-robin-400 border-robin-300 dark:border-robin-600 hover:bg-robin-50 dark:hover:bg-robin-500/15'
+                                                                    : 'text-gray-400 dark:text-gray-500 border-gray-200 dark:border-dark-lighter cursor-default'
+                                                            }`}
+                                                        >
+                                                            Load
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        ))
-                                    }
-                                </div>
-                            )}
-                            {activeTab !== 'File' && activeTab !== 'Console' && (
-                                <div className="h-full flex items-center justify-center text-xs text-gray-400">Coming soon</div>
-                            )}
-                        </div>
-                    )}
-                        </>
-                    )}
+                                            ))
+                                        }
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Console tab — always mounted */}
+                    <div className={activeTab === 'Console' ? 'flex-1 flex flex-col overflow-hidden min-h-0' : 'hidden'}>
+                        {mode !== 'expanded' ? (
+                            <div className="flex-1 overflow-y-auto px-3 py-2 space-y-0.5 min-h-0">
+                                {consoleHistory.length === 0 ? (
+                                    <span className="font-mono text-xs text-gray-400 dark:text-gray-500 italic">No output yet</span>
+                                ) : (
+                                    consoleHistory.map((line, i) => (
+                                        <p key={i} className="font-mono text-xs text-gray-500 dark:text-gray-300 truncate">{line}</p>
+                                    ))
+                                )}
+                                <div ref={consolePreviewBottomRef} />
+                            </div>
+                        ) : (
+                            <ConsolePanel className="h-full" />
+                        )}
+                    </div>
+
+                    {/* Macros tab — always mounted */}
+                    <div className={activeTab === 'Macros' ? 'flex-1 flex flex-col overflow-hidden min-h-0' : 'hidden'}>
+                        <MacrosPanel mode={mode} />
+                    </div>
+
+                    {/* Coolant tab — always mounted */}
+                    <div className={activeTab === 'Coolant' ? 'flex-1 flex flex-col overflow-hidden min-h-0' : 'hidden'}>
+                        <CoolantPanel />
+                    </div>
+
+                    {/* Spindle tab — always mounted */}
+                    <div className={activeTab === 'Spindle' ? 'flex-1 flex flex-col overflow-hidden min-h-0' : 'hidden'}>
+                        <SpindlePanel mode={mode} />
+                    </div>
+
+                    {/* Probe tab — always mounted */}
+                    <div className={activeTab === 'Probe' ? 'flex-1 flex items-center justify-center' : 'hidden'}>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">Probe — coming soon</span>
+                    </div>
                 </div>
             </div>
         </div>
