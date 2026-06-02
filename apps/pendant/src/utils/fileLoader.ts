@@ -4,6 +4,7 @@ import { store as reduxStore } from '@gsender/controller-client/store/redux';
 import {
     updateFileContent,
     updateFileInfo,
+    updateFileProcessing,
 } from '@gsender/controller-client/store/redux/slices/fileInfo.slice';
 import { GcodeFilePayload, isElectron, pickGcodeFile } from '../electron-bridge';
 
@@ -37,13 +38,19 @@ function uploadToServer(name: string, content: string) {
     fetch('/api/file', { method: 'POST', body: formData }).catch(() => {});
 }
 
-export function applyGcodeFile(payload: GcodeFilePayload) {
+export async function applyGcodeFile(payload: GcodeFilePayload) {
     const { name, size, content, path } = payload;
+
+    // Show loading overlay before the heavy synchronous work begins
+    reduxStore.dispatch(updateFileProcessing({ fileProcessing: true }));
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+
     const total = content.split('\n').filter((line) => line.trim()).length;
     const toolSet = [...new Set((content.match(/\bT(\d+)/gi) ?? []).map((t) => t.toUpperCase()))];
     const spindleSet = [...new Set((content.match(/\bS(\d+)/gi) ?? []).map((s) => `S${parseInt(s.slice(1))}`))];
     const bbox = computeBounds(content);
     reduxStore.dispatch(updateFileContent({ content, size, name }));
+    // updateFileInfo automatically resets fileProcessing → false (slice reducers line 61)
     reduxStore.dispatch(updateFileInfo({
         total,
         toolSet,

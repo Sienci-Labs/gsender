@@ -7,9 +7,12 @@ import JobControls from './JobControls';
 import FeedOverrideWrapper from './FeedOverrideWrapper';
 import WorkspaceSelector from './WorkspaceSelector';
 import ProgressAreaWrapper from './ProgressAreaWrapper';
+import FileLoadingOverlay from './FileLoadingOverlay';
 
 export default function VisualizerCard() {
     const fileLoaded = useTypedSelector((s: RootState) => s.file.fileLoaded);
+    const fileProcessing = useTypedSelector((s: RootState) => s.file.fileProcessing);
+    const fileName = useTypedSelector((s: RootState) => s.file.name ?? '');
 
     return (
         <div className="flex flex-col gap-3">
@@ -27,7 +30,12 @@ export default function VisualizerCard() {
 
                 <div className="relative h-56 overflow-hidden rounded-b-xl">
                     <Visualizer />
-                    {!fileLoaded && (
+                    {fileProcessing && (
+                        <div className="absolute inset-0 flex items-center justify-center p-3 bg-dark-darker/95">
+                            <FileLoadingOverlay fileName={fileName} />
+                        </div>
+                    )}
+                    {!fileLoaded && !fileProcessing && (
                         <button
                             type="button"
                             onClick={() => openGcodeFile()}
