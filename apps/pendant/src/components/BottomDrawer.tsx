@@ -7,6 +7,7 @@ import ConsolePanel from '@gsender/features/Console';
 import MacrosPanel from './MacrosPanel';
 import CoolantPanel from './CoolantPanel';
 import SpindlePanel from './SpindlePanel';
+import ProbePanel from './ProbePanel';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { addControllerEvents, removeControllerEvents } from '@gsender/controller-client/controller';
 import GcodeEditor from 'app/features/Visualizer/GcodeEditor';
@@ -438,8 +439,8 @@ export default function BottomDrawer() {
                     </div>
 
                     {/* Probe tab — always mounted */}
-                    <div className={activeTab === 'Probe' ? 'flex-1 flex items-center justify-center' : 'hidden'}>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">Probe — coming soon</span>
+                    <div className={activeTab === 'Probe' ? 'flex-1 flex flex-col overflow-hidden min-h-0' : 'hidden'}>
+                        <ProbePanel mode={mode} />
                     </div>
                 </div>
             </div>
