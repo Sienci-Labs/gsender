@@ -4,6 +4,9 @@ import {
     Clock, Hash, Move, HardDrive, FileCode,
 } from 'lucide-react';
 import ConsolePanel from '@gsender/features/Console';
+import MacrosPanel from './MacrosPanel';
+import CoolantPanel from './CoolantPanel';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { addControllerEvents, removeControllerEvents } from '@gsender/controller-client/controller';
 import GcodeEditor from 'app/features/Visualizer/GcodeEditor';
 import {
@@ -19,8 +22,8 @@ import { addToHistory } from '@gsender/controller-client/store/redux/slices/cons
 import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import type { RootState } from '@gsender/controller-client/store/redux';
 
-const TABS = ['File', 'Console', 'Probe', 'Spindle', 'Macros'] as const;
-type DrawerTab = (typeof TABS)[number];
+const ALL_TABS = ['File', 'Console', 'Probe', 'Spindle', 'Macros', 'Coolant'] as const;
+type DrawerTab = (typeof ALL_TABS)[number];
 type DrawerMode = 'closed' | 'minimal' | 'expanded';
 type RecentFile = {
     fileName: string;
@@ -78,6 +81,14 @@ export default function BottomDrawer() {
     const consolePreviewBottomRef = useRef<HTMLDivElement>(null);
     const file = useTypedSelector((s: RootState) => s.file);
     const consoleHistory = useTypedSelector((s: RootState) => s.console.history);
+    const { coolantFunctions = false } = useWorkspaceState();
+    const TABS = ALL_TABS.filter(t => t !== 'Coolant' || coolantFunctions);
+
+    useEffect(() => {
+        if (!coolantFunctions && activeTab === 'Coolant') {
+            setActiveTab('File');
+        }
+    }, [coolantFunctions, activeTab]);
 
     useEffect(() => {
         const normalized = readRecentFiles();
@@ -309,7 +320,11 @@ export default function BottomDrawer() {
                         </div>
                     </div>
 
-                    {mode === 'closed' ? null : (
+                    {mode === 'closed' ? null : activeTab === 'Macros' ? (
+                        <MacrosPanel mode={mode} />
+                    ) : activeTab === 'Coolant' ? (
+                        <CoolantPanel />
+                    ) : (
                         <>
                     {/* UPPER ZONE */}
                     {activeTab === 'Console' && mode !== 'expanded' ? (
