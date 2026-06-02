@@ -413,7 +413,7 @@ const main = () => {
                 }
 
                 const registry = new WinReg({
-                    hive: WinReg.HKCU,
+                    hive: WinReg.HKLM,
                     key: 'Software\\SienciLabs\\gSender',
                 });
 
