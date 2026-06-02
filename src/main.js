@@ -414,7 +414,7 @@ const main = () => {
 
                 const registry = new WinReg({
                     hive: WinReg.HKLM,
-                    key: 'Software\\SienciLabs\\gSender',
+                    key: '\\SOFTWARE\\SienciLabs\\gSender',
                 });
 
                 try {
