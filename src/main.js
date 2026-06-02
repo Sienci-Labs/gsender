@@ -419,12 +419,12 @@ const main = () => {
 
                 try {
                     const isBundledItem = await new Promise((resolve, reject) => {
-                        registry.get('IsBundled', (err, item) => {
+                        registry.get('', (err, item) => {
                             if (err) {
                                 reject(err);
                                 return;
                             }
-                            resolve(item);
+                            resolve(item?.isBundled);
                         });
                     });
                     const normalizedValue = String(isBundledItem?.value ?? '').toLowerCase();
