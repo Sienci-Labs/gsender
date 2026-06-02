@@ -31,6 +31,13 @@ export default function InfoStrip() {
     const status = useTypedSelector((state: RootState) => state.controller.state.status) as any;
     const controllerType = useTypedSelector((state: RootState) => state.controller.type);
     const currentTool = useTypedSelector((state: RootState) => (state.controller.state.status as any)?.currentTool);
+    const isLaserMode = useTypedSelector((state: RootState) =>
+        Number(state.controller.settings.settings.$32 ?? 0) === 1,
+    );
+    const spindleModal = useTypedSelector((state: RootState) =>
+        state.controller.modal.spindle ?? 'M5',
+    );
+    const spindleActive = spindleModal !== 'M5';
     const { units } = useWorkspaceState();
     const showTool = controllerType === GRBLHAL && currentTool != null && Number(currentTool) >= 0;
 
@@ -50,7 +57,9 @@ export default function InfoStrip() {
                 </span>
                 <span className="h-5 w-px bg-gray-200 dark:bg-dark-lighter" />
                 <span className="whitespace-nowrap px-2.5 py-1">
-                    Spindle <strong className="inline-block w-[5ch] text-right tabular-nums text-gray-900 dark:text-white font-mono">{spindleLabel}</strong> RPM
+                    <span className={spindleActive ? (isLaserMode ? 'text-purple-500 animate-pulse' : 'text-red-500 animate-pulse') : ''}>
+                        {isLaserMode ? 'Laser' : 'Spindle'}
+                    </span>{' '}<strong className="inline-block w-[5ch] text-right tabular-nums text-gray-900 dark:text-white font-mono">{spindleLabel}</strong> {isLaserMode ? 'POW' : 'RPM'}
                 </span>
                 {showTool && (
                     <>
