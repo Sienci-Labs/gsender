@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { clsx } from 'clsx';
 import { Plus, Upload, Download, Play, MoreHorizontal, Command, type LucideIcon } from 'lucide-react';
 import api from 'app/api';
 import controller from '@gsender/controller-client/controller';
@@ -33,12 +34,7 @@ interface Props {
 
 const tokens = {
     dark: {
-        tileBg: '#252a38',
-        tileAddBg: 'rgba(74,158,255,0.10)',
-        tileBorder: 'rgba(255,255,255,0.09)',
-        tileAddBorder: 'rgba(74,158,255,0.35)',
         accent: '#4a9eff',
-        labelMuted: 'rgba(255,255,255,0.50)',
         divider: 'rgba(255,255,255,0.07)',
         btnBg: 'linear-gradient(180deg, #323b54 0%, #1a2035 100%)',
         btnBorderTop: 'rgba(255,255,255,0.14)',
@@ -53,12 +49,7 @@ const tokens = {
         circleBorderSide: 'rgba(0,0,0,0.50)',
     },
     light: {
-        tileBg: '#f4f5f7',
-        tileAddBg: '#eaf2ff',
-        tileBorder: '#e0e2e8',
-        tileAddBorder: '#a8c8f0',
         accent: '#1a6fc4',
-        labelMuted: '#7a8299',
         divider: '#e8eaed',
         btnBg: 'linear-gradient(180deg, #ffffff 0%, #e8ecf4 100%)',
         btnBorderTop: 'rgba(255,255,255,0.95)',
@@ -79,33 +70,30 @@ interface ActionTileProps {
     label: string;
     Icon: LucideIcon;
     onClick: () => void;
-    isAdd?: boolean;
-    isDark: boolean;
 }
 
-function ActionTile({ label, Icon, onClick, isAdd = false, isDark }: ActionTileProps) {
-    const t = isDark ? tokens.dark : tokens.light;
+function ActionTile({ label, Icon, onClick }: ActionTileProps) {
     return (
         <button
+            type="button"
             onClick={onClick}
-            style={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 4,
-                padding: '8px 4px',
-                borderRadius: 8,
-                border: `1px solid ${isAdd ? t.tileAddBorder : t.tileBorder}`,
-                background: isAdd ? t.tileAddBg : t.tileBg,
-                cursor: 'pointer',
-            }}
+            className={clsx(
+                'flex-1 relative rounded-xl border border-transparent p-[1px] overflow-hidden select-none',
+                'cursor-pointer bg-transparent',
+            )}
         >
-            <Icon size={18} color={t.accent} />
-            <span style={{ fontSize: 9, color: isAdd ? t.accent : t.labelMuted, fontWeight: 500 }}>
-                {label}
-            </span>
+            <div
+                className={clsx(
+                    'relative z-10 flex flex-col items-center justify-center gap-2 rounded-xl',
+                    'min-h-[80px] px-2 py-4 border transition-colors',
+                    'bg-gray-100 dark:bg-dark border-gray-300 dark:border-dark-lighter',
+                    'text-[#7a8299] dark:text-white/50',
+                    'hover:bg-gray-200 dark:hover:bg-dark-lighter',
+                )}
+            >
+                <Icon size={24} />
+                <span className="text-[11px] font-semibold">{label}</span>
+            </div>
         </button>
     );
 }
@@ -465,10 +453,10 @@ export default function MacrosPanel({ mode }: Props) {
     return (
         <div className={`h-full flex flex-col min-h-0${isMinimal ? ' justify-center' : ''}`}>
             {/* Action row */}
-            <div style={{ display: 'flex', gap: 6, padding: isMinimal ? '10px 10px' : '4px 10px 8px', flexShrink: 0 }}>
-                <ActionTile label="Add" Icon={Plus} onClick={() => setShowAddModal(true)} isAdd isDark={isDark} />
-                <ActionTile label="Import" Icon={Upload} onClick={() => importInputRef.current?.click()} isDark={isDark} />
-                <ActionTile label="Export" Icon={Download} onClick={handleExport} isDark={isDark} />
+            <div className="flex flex-shrink-0 gap-3 px-4 py-3">
+                <ActionTile label="Add" Icon={Plus} onClick={() => setShowAddModal(true)} />
+                <ActionTile label="Import" Icon={Upload} onClick={() => importInputRef.current?.click()} />
+                <ActionTile label="Export" Icon={Download} onClick={handleExport} />
             </div>
 
             {mode === 'expanded' && (
