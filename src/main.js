@@ -414,12 +414,27 @@ const main = () => {
 
                 const registry = new WinReg({
                     hive: WinReg.HKCU,
-                    key: 'Software\\SienciLabs\\gSender\\IsBundled',
+                    key: 'Software\\SienciLabs\\gSender',
                 });
 
-                const value = await registry.getValue();
-                console.log({ REGISTRY: value, });
-                return value;
+                try {
+                    const isBundledItem = await new Promise((resolve, reject) => {
+                        registry.get('IsBundled', (err, item) => {
+                            if (err) {
+                                reject(err);
+                                return;
+                            }
+                            resolve(item);
+                        });
+                    });
+                    const normalizedValue = String(isBundledItem?.value ?? '').toLowerCase();
+                    const isBundled = normalizedValue === '1' || normalizedValue === 'true';
+                    console.log({ REGISTRY: isBundledItem, isBundled });
+                    return isBundled;
+                } catch (error) {
+                    console.log({ REGISTRY_ERROR: error?.message ?? error });
+                    return null;
+                }
             });
 
             /**
