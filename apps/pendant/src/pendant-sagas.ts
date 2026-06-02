@@ -18,6 +18,7 @@ import {
     updateWorkflowState,
     updateFeederStatus,
     updateSenderStatus,
+    addSpindle,
 } from '@gsender/controller-client/store/redux/slices/controller.slice';
 import {
     updateFileContent,
@@ -54,6 +55,10 @@ export function* initialize() {
 
     controller.addListener('sender:status', (status: any) => {
         reduxStore.dispatch(updateSenderStatus({ status }));
+    });
+
+    controller.addListener('spindle:add', (spindle: any) => {
+        reduxStore.dispatch(addSpindle(spindle));
     });
 
     // ── Connection lifecycle ───────────────────────────────────────────────

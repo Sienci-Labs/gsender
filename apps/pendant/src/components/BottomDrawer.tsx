@@ -6,6 +6,7 @@ import {
 import ConsolePanel from '@gsender/features/Console';
 import MacrosPanel from './MacrosPanel';
 import CoolantPanel from './CoolantPanel';
+import SpindlePanel from './SpindlePanel';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { addControllerEvents, removeControllerEvents } from '@gsender/controller-client/controller';
 import GcodeEditor from 'app/features/Visualizer/GcodeEditor';
@@ -324,6 +325,8 @@ export default function BottomDrawer() {
                         <MacrosPanel mode={mode} />
                     ) : activeTab === 'Coolant' ? (
                         <CoolantPanel />
+                    ) : activeTab === 'Spindle' ? (
+                        <SpindlePanel mode={mode} />
                     ) : (
                         <>
                     {/* UPPER ZONE */}
