@@ -368,7 +368,7 @@ export default function JoggingCard() {
     );
 
     return (
-        <div className="rounded-xl bg-white border border-gray-300 dark:bg-dark-darker dark:border-dark-lighter p-4 flex flex-col gap-4">
+        <div className="rounded-xl bg-white border border-gray-300 dark:bg-dark-darker dark:border-dark-lighter p-[max(0.375rem,min(0.75rem,1.75vh))] flex flex-col gap-[max(0.375rem,min(0.75rem,1.75vh))]">
             <div className="flex items-center justify-center gap-1.5">
                 {PRESET_META.map((preset) => (
                     <button
@@ -385,7 +385,7 @@ export default function JoggingCard() {
                 ))}
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-[clamp(0.375rem,1.5vh,0.75rem)]">
                 <div className="grid grid-cols-3 gap-2">
                     <JogActionButton
                         id={xyButtons[0].id}
@@ -394,7 +394,7 @@ export default function JoggingCard() {
                         disabled={!canJog}
                         onShortPress={xyButtons[0].shortPress}
                         onLongPress={xyButtons[0].longPress}
-                        className={(active) => `${baseButton} h-16 ${
+                        className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,4rem)] ${
                             active
                                 ? activeClasses[xyButtons[0].tone]
                                 : `${toneClasses[xyButtons[0].tone]} ${hoverToneClasses[xyButtons[0].tone]}`
@@ -404,7 +404,7 @@ export default function JoggingCard() {
                             const Icon = xyButtons[0].icon!;
                             return (
                                 <div className="h-full w-full flex flex-col items-center justify-center gap-1">
-                                    <Icon className="w-6 h-6" />
+                                    <Icon className="w-[clamp(1rem,2.5vh,1.5rem)] h-[clamp(1rem,2.5vh,1.5rem)]" />
                                 </div>
                             );
                         }}
@@ -417,7 +417,7 @@ export default function JoggingCard() {
                         disabled={!canJog}
                         onShortPress={xyButtons[1].shortPress}
                         onLongPress={xyButtons[1].longPress}
-                        className={(active) => `${baseButton} h-16 ${
+                        className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,4rem)] ${
                             active
                                 ? activeClasses[xyButtons[1].tone]
                                 : `${toneClasses[xyButtons[1].tone]} ${hoverToneClasses[xyButtons[1].tone]}`
@@ -427,8 +427,8 @@ export default function JoggingCard() {
                             const Icon = xyButtons[1].icon!;
                             return (
                                 <div className="h-full w-full flex flex-col items-center justify-center gap-1">
-                                    <Icon className="w-6 h-6" />
-                                    <span className="text-xl font-semibold leading-none">{xyButtons[1].label}</span>
+                                    <Icon className="w-[clamp(1rem,2.5vh,1.5rem)] h-[clamp(1rem,2.5vh,1.5rem)]" />
+                                    <span className="text-[clamp(0.875rem,2.2vh,1.25rem)] font-semibold leading-none">{xyButtons[1].label}</span>
                                 </div>
                             );
                         }}
@@ -441,7 +441,7 @@ export default function JoggingCard() {
                         disabled={!canJog}
                         onShortPress={xyButtons[2].shortPress}
                         onLongPress={xyButtons[2].longPress}
-                        className={(active) => `${baseButton} h-16 ${
+                        className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,4rem)] ${
                             active
                                 ? activeClasses[xyButtons[2].tone]
                                 : `${toneClasses[xyButtons[2].tone]} ${hoverToneClasses[xyButtons[2].tone]}`
@@ -451,7 +451,7 @@ export default function JoggingCard() {
                             const Icon = xyButtons[2].icon!;
                             return (
                                 <div className="h-full w-full flex flex-col items-center justify-center gap-1">
-                                    <Icon className="w-6 h-6" />
+                                    <Icon className="w-[clamp(1rem,2.5vh,1.5rem)] h-[clamp(1rem,2.5vh,1.5rem)]" />
                                 </div>
                             );
                         }}
@@ -464,7 +464,7 @@ export default function JoggingCard() {
                         disabled={!canJog}
                         onShortPress={xyButtons[3].shortPress}
                         onLongPress={xyButtons[3].longPress}
-                        className={(active) => `${baseButton} h-16 ${
+                        className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,4rem)] ${
                             active
                                 ? activeClasses[xyButtons[3].tone]
                                 : `${toneClasses[xyButtons[3].tone]} ${hoverToneClasses[xyButtons[3].tone]}`
@@ -474,8 +474,8 @@ export default function JoggingCard() {
                             const Icon = xyButtons[3].icon!;
                             return (
                                 <div className="h-full w-full flex flex-col items-center justify-center gap-1">
-                                    <Icon className="w-6 h-6" />
-                                    <span className="text-xl font-semibold leading-none">{xyButtons[3].label}</span>
+                                    <Icon className="w-[clamp(1rem,2.5vh,1.5rem)] h-[clamp(1rem,2.5vh,1.5rem)]" />
+                                    <span className="text-[clamp(0.875rem,2.2vh,1.25rem)] font-semibold leading-none">{xyButtons[3].label}</span>
                                 </div>
                             );
                         }}
@@ -483,9 +483,9 @@ export default function JoggingCard() {
 
                     <div
                         aria-hidden="true"
-                        className="h-16 flex items-center justify-center"
+                        className="h-[clamp(2.5rem,7vh,4rem)] flex items-center justify-center"
                     >
-                        <Move className="w-5 h-5 text-gray-400/35 dark:text-gray-500/30" />
+                        <Move className="w-[clamp(0.875rem,2vh,1.25rem)] h-[clamp(0.875rem,2vh,1.25rem)] text-gray-400/35 dark:text-gray-500/30" />
                     </div>
 
                     <JogActionButton
@@ -495,7 +495,7 @@ export default function JoggingCard() {
                         disabled={!canJog}
                         onShortPress={xyButtons[4].shortPress}
                         onLongPress={xyButtons[4].longPress}
-                        className={(active) => `${baseButton} h-16 ${
+                        className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,4rem)] ${
                             active
                                 ? activeClasses[xyButtons[4].tone]
                                 : `${toneClasses[xyButtons[4].tone]} ${hoverToneClasses[xyButtons[4].tone]}`
@@ -505,8 +505,8 @@ export default function JoggingCard() {
                             const Icon = xyButtons[4].icon!;
                             return (
                                 <div className="h-full w-full flex flex-col items-center justify-center gap-1">
-                                    <Icon className="w-6 h-6" />
-                                    <span className="text-xl font-semibold leading-none">{xyButtons[4].label}</span>
+                                    <Icon className="w-[clamp(1rem,2.5vh,1.5rem)] h-[clamp(1rem,2.5vh,1.5rem)]" />
+                                    <span className="text-[clamp(0.875rem,2.2vh,1.25rem)] font-semibold leading-none">{xyButtons[4].label}</span>
                                 </div>
                             );
                         }}
@@ -519,7 +519,7 @@ export default function JoggingCard() {
                         disabled={!canJog}
                         onShortPress={xyButtons[5].shortPress}
                         onLongPress={xyButtons[5].longPress}
-                        className={(active) => `${baseButton} h-16 ${
+                        className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,4rem)] ${
                             active
                                 ? activeClasses[xyButtons[5].tone]
                                 : `${toneClasses[xyButtons[5].tone]} ${hoverToneClasses[xyButtons[5].tone]}`
@@ -529,7 +529,7 @@ export default function JoggingCard() {
                             const Icon = xyButtons[5].icon!;
                             return (
                                 <div className="h-full w-full flex flex-col items-center justify-center gap-1">
-                                    <Icon className="w-6 h-6" />
+                                    <Icon className="w-[clamp(1rem,2.5vh,1.5rem)] h-[clamp(1rem,2.5vh,1.5rem)]" />
                                 </div>
                             );
                         }}
@@ -542,7 +542,7 @@ export default function JoggingCard() {
                         disabled={!canJog}
                         onShortPress={xyButtons[6].shortPress}
                         onLongPress={xyButtons[6].longPress}
-                        className={(active) => `${baseButton} h-16 ${
+                        className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,4rem)] ${
                             active
                                 ? activeClasses[xyButtons[6].tone]
                                 : `${toneClasses[xyButtons[6].tone]} ${hoverToneClasses[xyButtons[6].tone]}`
@@ -552,8 +552,8 @@ export default function JoggingCard() {
                             const Icon = xyButtons[6].icon!;
                             return (
                                 <div className="h-full w-full flex flex-col items-center justify-center gap-1">
-                                    <Icon className="w-6 h-6" />
-                                    <span className="text-xl font-semibold leading-none">{xyButtons[6].label}</span>
+                                    <Icon className="w-[clamp(1rem,2.5vh,1.5rem)] h-[clamp(1rem,2.5vh,1.5rem)]" />
+                                    <span className="text-[clamp(0.875rem,2.2vh,1.25rem)] font-semibold leading-none">{xyButtons[6].label}</span>
                                 </div>
                             );
                         }}
@@ -566,7 +566,7 @@ export default function JoggingCard() {
                         disabled={!canJog}
                         onShortPress={xyButtons[7].shortPress}
                         onLongPress={xyButtons[7].longPress}
-                        className={(active) => `${baseButton} h-16 ${
+                        className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,4rem)] ${
                             active
                                 ? activeClasses[xyButtons[7].tone]
                                 : `${toneClasses[xyButtons[7].tone]} ${hoverToneClasses[xyButtons[7].tone]}`
@@ -576,7 +576,7 @@ export default function JoggingCard() {
                             const Icon = xyButtons[7].icon!;
                             return (
                                 <div className="h-full w-full flex flex-col items-center justify-center gap-1">
-                                    <Icon className="w-6 h-6" />
+                                    <Icon className="w-[clamp(1rem,2.5vh,1.5rem)] h-[clamp(1rem,2.5vh,1.5rem)]" />
                                 </div>
                             );
                         }}
@@ -593,14 +593,14 @@ export default function JoggingCard() {
                                 disabled={!canJog}
                                 onShortPress={() => zPlusJog(zDistance, feedrate, false)}
                                 onLongPress={() => continuousJogAxis({ Z: 1 }, feedrate)}
-                                className={(active) => `${baseButton} h-16 w-full ${
+                                className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,4rem)] w-full ${
                                     active ? activeClasses.z : `${toneClasses.z} ${hoverToneClasses.z}`
                                 }`}
                             >
                                 {(active) => (
                                     <div className="h-full w-full flex flex-col items-center justify-center gap-0.5">
-                                        <ChevronUp className={`w-5 h-5 ${active ? 'text-white' : canJog ? 'text-blue-500 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500'}`} />
-                                        <span className={`text-xl font-semibold leading-none ${active ? 'text-white' : canJog ? 'text-blue-700 dark:text-blue-300' : 'text-gray-400 dark:text-gray-500'}`}>Z+</span>
+                                        <ChevronUp className={`w-[clamp(0.875rem,2vh,1.25rem)] h-[clamp(0.875rem,2vh,1.25rem)] ${active ? 'text-white' : canJog ? 'text-blue-500 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500'}`} />
+                                        <span className={`text-[clamp(0.875rem,2.2vh,1.25rem)] font-semibold leading-none ${active ? 'text-white' : canJog ? 'text-blue-700 dark:text-blue-300' : 'text-gray-400 dark:text-gray-500'}`}>Z+</span>
                                     </div>
                                 )}
                             </JogActionButton>
@@ -611,14 +611,14 @@ export default function JoggingCard() {
                                 disabled={!canJog}
                                 onShortPress={() => zMinusJog(zDistance, feedrate, false)}
                                 onLongPress={() => continuousJogAxis({ Z: -1 }, feedrate)}
-                                className={(active) => `${baseButton} h-16 w-full ${
+                                className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,4rem)] w-full ${
                                     active ? activeClasses.z : `${toneClasses.z} ${hoverToneClasses.z}`
                                 }`}
                             >
                                 {(active) => (
                                     <div className="h-full w-full flex flex-col items-center justify-center gap-0.5">
-                                        <ChevronDown className={`w-5 h-5 ${active ? 'text-white' : canJog ? 'text-blue-500 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500'}`} />
-                                        <span className={`text-xl font-semibold leading-none ${active ? 'text-white' : canJog ? 'text-blue-700 dark:text-blue-300' : 'text-gray-400 dark:text-gray-500'}`}>Z-</span>
+                                        <ChevronDown className={`w-[clamp(0.875rem,2vh,1.25rem)] h-[clamp(0.875rem,2vh,1.25rem)] ${active ? 'text-white' : canJog ? 'text-blue-500 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500'}`} />
+                                        <span className={`text-[clamp(0.875rem,2.2vh,1.25rem)] font-semibold leading-none ${active ? 'text-white' : canJog ? 'text-blue-700 dark:text-blue-300' : 'text-gray-400 dark:text-gray-500'}`}>Z-</span>
                                     </div>
                                 )}
                             </JogActionButton>
@@ -634,14 +634,14 @@ export default function JoggingCard() {
                                 disabled={!canJog}
                                 onShortPress={() => aPlusJog(aDistance, feedrate, false, isRotaryMode)}
                                 onLongPress={() => continuousJogAxis(rotaryAxis === 'Y' ? { Y: 1 } : { A: 1 }, feedrate)}
-                                className={(active) => `${baseButton} h-16 w-full ${
+                                className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,4rem)] w-full ${
                                     active ? activeClasses.a : `${toneClasses.a} ${hoverToneClasses.a}`
                                 }`}
                             >
                                 {(active) => (
                                     <div className="h-full w-full flex flex-col items-center justify-center gap-0.5">
-                                        <RotateCw className={`w-5 h-5 ${active ? 'text-white' : canJog ? 'text-purple-500 dark:text-purple-400' : 'text-gray-400 dark:text-gray-500'}`} />
-                                        <span className={`text-xl font-semibold leading-none ${active ? 'text-white' : canJog ? 'text-purple-700 dark:text-purple-300' : 'text-gray-400 dark:text-gray-500'}`}>A+</span>
+                                        <RotateCw className={`w-[clamp(0.875rem,2vh,1.25rem)] h-[clamp(0.875rem,2vh,1.25rem)] ${active ? 'text-white' : canJog ? 'text-purple-500 dark:text-purple-400' : 'text-gray-400 dark:text-gray-500'}`} />
+                                        <span className={`text-[clamp(0.875rem,2.2vh,1.25rem)] font-semibold leading-none ${active ? 'text-white' : canJog ? 'text-purple-700 dark:text-purple-300' : 'text-gray-400 dark:text-gray-500'}`}>A+</span>
                                     </div>
                                 )}
                             </JogActionButton>
@@ -652,14 +652,14 @@ export default function JoggingCard() {
                                 disabled={!canJog}
                                 onShortPress={() => aMinusJog(aDistance, feedrate, false, isRotaryMode)}
                                 onLongPress={() => continuousJogAxis(rotaryAxis === 'Y' ? { Y: -1 } : { A: -1 }, feedrate)}
-                                className={(active) => `${baseButton} h-16 w-full ${
+                                className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,4rem)] w-full ${
                                     active ? activeClasses.a : `${toneClasses.a} ${hoverToneClasses.a}`
                                 }`}
                             >
                                 {(active) => (
                                     <div className="h-full w-full flex flex-col items-center justify-center gap-0.5">
-                                        <RotateCcw className={`w-5 h-5 ${active ? 'text-white' : canJog ? 'text-purple-500 dark:text-purple-400' : 'text-gray-400 dark:text-gray-500'}`} />
-                                        <span className={`text-xl font-semibold leading-none ${active ? 'text-white' : canJog ? 'text-purple-700 dark:text-purple-300' : 'text-gray-400 dark:text-gray-500'}`}>A-</span>
+                                        <RotateCcw className={`w-[clamp(0.875rem,2vh,1.25rem)] h-[clamp(0.875rem,2vh,1.25rem)] ${active ? 'text-white' : canJog ? 'text-purple-500 dark:text-purple-400' : 'text-gray-400 dark:text-gray-500'}`} />
+                                        <span className={`text-[clamp(0.875rem,2.2vh,1.25rem)] font-semibold leading-none ${active ? 'text-white' : canJog ? 'text-purple-700 dark:text-purple-300' : 'text-gray-400 dark:text-gray-500'}`}>A-</span>
                                     </div>
                                 )}
                             </JogActionButton>

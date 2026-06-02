@@ -50,7 +50,7 @@ export default function DROCard() {
     const canHome = (canGoTo && homingEnabled) || isHomingAlarm;
 
     return (
-        <div className="rounded-xl bg-white border border-gray-300 dark:bg-dark-darker dark:border-dark-lighter p-3 flex flex-col gap-3">
+        <div className="rounded-xl bg-white border border-gray-300 dark:bg-dark-darker dark:border-dark-lighter p-2 flex flex-col gap-2">
             {/* Work / Machine toggle */}
             <div className="flex gap-1 self-end">
                 {(['work', 'machine'] as const).map((m) => (
