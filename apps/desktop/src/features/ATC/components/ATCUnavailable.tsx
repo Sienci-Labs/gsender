@@ -14,13 +14,13 @@ export function ATCUnavailable({
             }
         >
             <div>
-                <p className="text-gray-500 text-sm">ATC Unavailable</p>
-                <h1 className="text-xl font-bold">{title}</h1>
+                <p className="text-gray-500 dark:text-gray-400 text-sm">ATC Unavailable</p>
+                <h1 className="text-xl font-bold dark:text-white">{title}</h1>
             </div>
-            <p className="">{message}</p>
+            <p className="dark:text-gray-200">{message}</p>
 
             {additionalInfo && (
-                <p className="text-gray-500 text-sm">{additionalInfo}</p>
+                <p className="text-gray-500 dark:text-gray-400 text-sm">{additionalInfo}</p>
             )}
         </div>
     );

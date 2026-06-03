@@ -9,6 +9,7 @@ import CoolantPanel from './CoolantPanel';
 import SpindlePanel from './SpindlePanel';
 import ProbePanel from './ProbePanel';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import ATCPanel from './ATCPanel';
 import { addControllerEvents, removeControllerEvents } from '@gsender/controller-client/controller';
 import GcodeEditor from 'app/features/Visualizer/GcodeEditor';
 import {
@@ -25,7 +26,7 @@ import { addToHistory } from '@gsender/controller-client/store/redux/slices/cons
 import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import type { RootState } from '@gsender/controller-client/store/redux';
 
-const ALL_TABS = ['File', 'Probe', 'Spindle', 'Macros', 'Coolant', 'Console'] as const;
+const ALL_TABS = ['File', 'Probe', 'Spindle', 'Macros', 'ATC', 'Coolant', 'Console'] as const;
 type DrawerTab = (typeof ALL_TABS)[number];
 type DrawerMode = 'closed' | 'minimal' | 'expanded';
 type RecentFile = {
@@ -84,14 +85,22 @@ export default function BottomDrawer() {
     const consolePreviewBottomRef = useRef<HTMLDivElement>(null);
     const file = useTypedSelector((s: RootState) => s.file);
     const consoleHistory = useTypedSelector((s: RootState) => s.console.history);
-    const { coolantFunctions = false } = useWorkspaceState();
-    const TABS = ALL_TABS.filter(t => t !== 'Coolant' || coolantFunctions);
+    const { coolantFunctions = false, atcEnabled = false } = useWorkspaceState();
+    const atcReport = useTypedSelector((s: RootState) => s.controller.settings.info?.NEWOPT?.ATC);
+    const atcEnabledOrCompiled = atcEnabled || atcReport === '1';
+    const TABS = ALL_TABS.filter(t =>
+        (t !== 'Coolant' || coolantFunctions) &&
+        (t !== 'ATC' || atcEnabledOrCompiled)
+    );
 
     useEffect(() => {
         if (!coolantFunctions && activeTab === 'Coolant') {
             setActiveTab('File');
         }
-    }, [coolantFunctions, activeTab]);
+        if (!atcEnabledOrCompiled && activeTab === 'ATC') {
+            setActiveTab('File');
+        }
+    }, [coolantFunctions, atcEnabledOrCompiled, activeTab]);
 
     useEffect(() => {
         const normalized = readRecentFiles();
@@ -437,6 +446,11 @@ export default function BottomDrawer() {
                     {/* Macros tab — always mounted */}
                     <div className={activeTab === 'Macros' ? 'flex-1 flex flex-col overflow-hidden min-h-0' : 'hidden'}>
                         <MacrosPanel mode={mode} />
+                    </div>
+
+                    {/* ATC tab — always mounted */}
+                    <div className={activeTab === 'ATC' ? 'flex-1 flex flex-col overflow-hidden min-h-0' : 'hidden'}>
+                        <ATCPanel mode={mode} />
                     </div>
 
                     {/* Coolant tab — always mounted */}
