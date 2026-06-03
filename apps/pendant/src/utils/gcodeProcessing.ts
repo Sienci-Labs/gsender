@@ -67,6 +67,7 @@ type VisualizeWorkerGeometryMessage = {
     isLaser?: boolean;
     isSecondary?: boolean;
     activeVisualizer?: string;
+    svgSegmentGroups?: { hexColor: string; opacity: number; positionsBuffer: ArrayBuffer; positionsLen: number }[];
 };
 
 type VisualizeWorkerMetadataMessage = {
@@ -377,6 +378,8 @@ const applyWorkerResult = (
             name: payload.name,
         }),
     );
+    // Publish before updateFileInfo so the SVG is updated before React hides the overlay.
+    pubsub.publish('file:load', geometry);
     reduxStore.dispatch(
         updateFileInfo(mapWorkerInfoToFileState(payload, geometry.info)),
     );
@@ -388,7 +391,6 @@ const applyWorkerResult = (
         'placeholder:invalidLines',
         geometry.parsedData?.invalidLines ?? geometry.info.invalidLines ?? [],
     );
-    pubsub.publish('file:load', geometry);
 };
 
 const paintOverlay = () =>

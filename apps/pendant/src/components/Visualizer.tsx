@@ -17,7 +17,11 @@ export default function Visualizer() {
     useEffect(() => {
         const tokens = [
             pubsub.subscribe('file:load', (_msg, data) => {
-                svgRef.current?.loadFromWorkerData(data);
+                if (data.svgSegmentGroups?.length) {
+                    svgRef.current?.loadFromPrecomputedGroups(data.svgSegmentGroups);
+                } else {
+                    svgRef.current?.loadFromWorkerData(data);
+                }
             }),
         ];
 

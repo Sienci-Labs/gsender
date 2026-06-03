@@ -1181,6 +1181,39 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
 
     const effectiveVisualizer = activeVisualizer ?? visualizer;
 
+    const buildSvgGroups = (
+        verts: Float32Array,
+        frs: Uint32Array,
+        cols: Float32Array,
+        vLen: number,
+        fLen: number,
+    ): { hexColor: string; opacity: number; positionsBuffer: ArrayBuffer; positionsLen: number }[] => {
+        const toHex = (r: number, g: number, b: number) => {
+            const ch = (v: number) => Math.round(Math.min(1, Math.max(0, v)) * 255).toString(16).padStart(2, '0');
+            return `#${ch(r)}${ch(g)}${ch(b)}`;
+        };
+        const map = new Map<string, { hexColor: string; opacity: number; pos: number[] }>();
+        for (let i = 0; i < fLen; i++) {
+            const s = frs[i];
+            const e = i < fLen - 1 ? frs[i + 1] : vLen;
+            if (e <= s + 1) continue;
+            const ci = s * 4;
+            const r = cols[ci], g = cols[ci + 1], b = cols[ci + 2], a = cols[ci + 3];
+            const hex = toHex(r, g, b);
+            const key = `${hex}|${Math.round(a * 100)}`;
+            let grp = map.get(key);
+            if (!grp) { grp = { hexColor: hex, opacity: a, pos: [] }; map.set(key, grp); }
+            for (let j = s; j < e - 1; j++) {
+                const j0 = j * 3, j1 = (j + 1) * 3;
+                grp.pos.push(verts[j0], verts[j0 + 1], verts[j0 + 2], verts[j1], verts[j1 + 1], verts[j1 + 2]);
+            }
+        }
+        return Array.from(map.values()).map(({ hexColor, opacity, pos }) => {
+            const positions = new Float32Array(pos);
+            return { hexColor, opacity, positionsBuffer: positions.buffer, positionsLen: positions.length };
+        });
+    };
+
     const geometryMessage: {
         type: 'geometryReady';
         jobId: number;
@@ -1205,6 +1238,7 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
         isLaser?: boolean;
         isSecondary?: boolean;
         activeVisualizer?: VISUALIZER_TYPES_T;
+        svgSegmentGroups?: { hexColor: string; opacity: number; positionsBuffer: ArrayBuffer; positionsLen: number }[];
     } = {
         type: 'geometryReady',
         jobId,
@@ -1234,6 +1268,11 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
         geometryMessage.isLaser = isLaser;
     }
 
+    const svgGroups = needsVisualization && !isSecondary
+        ? buildSvgGroups(compactVertices, compactFrames, compactColorArray, tVertices.length, tFrames.length)
+        : [];
+    geometryMessage.svgSegmentGroups = svgGroups;
+
     const transferList: ArrayBuffer[] = [
         compactVertices.buffer,
         compactFrames.buffer,
@@ -1242,6 +1281,9 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
     ];
     if (isLaser) {
         transferList.push(compactSpindleFrameSpeeds.buffer);
+    }
+    for (const group of svgGroups) {
+        transferList.push(group.positionsBuffer);
     }
 
     markProfile(profiler, 'before_post_message');
