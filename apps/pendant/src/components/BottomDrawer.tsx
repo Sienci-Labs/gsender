@@ -25,7 +25,7 @@ import { addToHistory } from '@gsender/controller-client/store/redux/slices/cons
 import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import type { RootState } from '@gsender/controller-client/store/redux';
 
-const ALL_TABS = ['File', 'Console', 'Probe', 'Spindle', 'Macros', 'Coolant'] as const;
+const ALL_TABS = ['File', 'Probe', 'Spindle', 'Macros', 'Coolant', 'Console'] as const;
 type DrawerTab = (typeof ALL_TABS)[number];
 type DrawerMode = 'closed' | 'minimal' | 'expanded';
 type RecentFile = {
