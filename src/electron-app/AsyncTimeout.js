@@ -28,19 +28,21 @@
  * @returns {Promise<any> | undefined} Resolved promise for async function call, or an error if time limit reached
  */
 export const asyncCallWithTimeout = async (asyncPromise, timeLimit) => {
-    let timeoutHandle = null;
+	let timeoutHandle = null;
 
-    const timeoutPromise = new Promise((_resolve, reject) => {
-        timeoutHandle = setTimeout(
-            () => reject(new Error('Async call timeout limit reached')),
-            timeLimit
-        );
-    });
+	const timeoutPromise = new Promise((_resolve, reject) => {
+		timeoutHandle = setTimeout(
+			() => reject(new Error("Async call timeout limit reached")),
+			timeLimit,
+		);
+	});
 
-    return Promise.race([asyncPromise, timeoutPromise]).then(result => {
-        clearTimeout(timeoutHandle);
-        return result;
-    }).catch(e => {
-        console.log(e);
-    });
+	return Promise.race([asyncPromise, timeoutPromise])
+		.then((result) => {
+			clearTimeout(timeoutHandle);
+			return result;
+		})
+		.catch((e) => {
+			console.log(e);
+		});
 };

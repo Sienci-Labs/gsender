@@ -1,22 +1,22 @@
-import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
-import controller from 'app/lib/controller';
-import { toast } from 'app/lib/toaster';
-import { getUnitModal } from 'app/lib/toolChangeUtils';
+import { Confirm } from "app/components/ConfirmationDialog/ConfirmationDialogLib";
+import controller from "app/lib/controller";
+import { toast } from "app/lib/toaster";
+import { getUnitModal } from "app/lib/toolChangeUtils";
 
 const processValue = (value: number) => {
-    const unitModal = getUnitModal();
+	const unitModal = getUnitModal();
 
-    if (unitModal === 'G20') {
-        return +(value / 25.4).toFixed(3);
-    }
+	if (unitModal === "G20") {
+		return +(value / 25.4).toFixed(3);
+	}
 
-    return value;
+	return value;
 };
 
 export const getZAxisProbing = () => {
-    const unitModal = getUnitModal();
+	const unitModal = getUnitModal();
 
-    return `
+	return `
         %PROBE_FAST_FEEDRATE = ${processValue(150)}
         %PROBE_SLOW_FEEDRATE = ${processValue(50)}
         %PROBE_RETRACTION = ${processValue(1)}
@@ -46,9 +46,9 @@ export const getZAxisProbing = () => {
 };
 
 export const getYAxisAlignmentProbing = () => {
-    const unitModal = getUnitModal();
+	const unitModal = getUnitModal();
 
-    return `
+	return `
         %PROBE_FAST_FEEDRATE = ${processValue(150)}
         %PROBE_SLOW_FEEDRATE = ${processValue(50)}
         %PROBE_RETRACTION = ${processValue(1)}
@@ -132,18 +132,18 @@ export const getYAxisAlignmentProbing = () => {
     `;
 };
 
-export const runProbing = (name = 'rotary', commands: string) => {
-    Confirm({
-        title: `${name} probing`,
-        content: `Click 'Run' to start the ${name} probing cycle`,
-        confirmLabel: `Run`,
-        onConfirm: () => {
-            toast.info(`Running ${name} probing commands`, {
-                position: 'bottom-right',
-            });
-            const unitModal = getUnitModal();
+export const runProbing = (name = "rotary", commands: string) => {
+	Confirm({
+		title: `${name} probing`,
+		content: `Click 'Run' to start the ${name} probing cycle`,
+		confirmLabel: `Run`,
+		onConfirm: () => {
+			toast.info(`Running ${name} probing commands`, {
+				position: "bottom-right",
+			});
+			const unitModal = getUnitModal();
 
-            controller.command('gcode:safe', commands, unitModal);
-        },
-    });
+			controller.command("gcode:safe", commands, unitModal);
+		},
+	});
 };

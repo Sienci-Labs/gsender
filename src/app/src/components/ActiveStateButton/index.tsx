@@ -1,53 +1,53 @@
-import Button from 'app/components/Button';
-import cn from 'classnames';
-import { TooltipProps } from 'app/components/Tooltip';
+import Button from "app/components/Button";
+import type { TooltipProps } from "app/components/Tooltip";
+import cn from "classnames";
 
 interface ActiveStateButtonProps {
-    icon: JSX.Element;
-    active?: boolean;
-    onClick?: (event: React.MouseEvent) => void;
-    size?: 'sm' | 'md' | 'lg';
-    className?: string;
-    text?: string;
-    disabled?: boolean;
-    tooltip?: TooltipProps;
+	icon: JSX.Element;
+	active?: boolean;
+	onClick?: (event: React.MouseEvent) => void;
+	size?: "sm" | "md" | "lg";
+	className?: string;
+	text?: string;
+	disabled?: boolean;
+	tooltip?: TooltipProps;
 }
 
 export function ActiveStateButton({
-    icon,
-    active = false,
-    text = '',
-    onClick = () => {},
-    size = 'md',
-    className = '',
-    ...rest
+	icon,
+	active = false,
+	text = "",
+	onClick = () => {},
+	size = "md",
+	className = "",
+	...rest
 }: ActiveStateButtonProps): JSX.Element {
-    return (
-        <div className="flex items-center">
-            <div className="relative z-10 flex w-full cursor-pointer items-center overflow-hidden rounded-xl border border-transparent p-[1px]">
-                <div
-                    className={cn(
-                        'animate-rotatef absolute inset-0 h-full w-full rounded-full bg-[conic-gradient(transparent_0deg,theme(colors.robin.500)_120deg,theme(colors.robin.500)_140deg,transparent_140deg)]',
-                        {
-                            'bg-none': !active,
-                        },
-                    )}
-                ></div>
-                <div className="relative z-20 flex w-full rounded-2xl bg-transparent p-[1px]">
-                    <Button
-                        text={text}
-                        icon={icon}
-                        variant="active"
-                        onClick={onClick}
-                        size={size}
-                        className={cn(className, {
-                            'shadow-[inset_7px_4px_6px_0px_rgba(59,_130,_246,_0.1)] text-robin-500 dark:text-robin-500 w-full flex':
-                                active,
-                        })}
-                        {...rest}
-                    />
-                </div>
-            </div>
-        </div>
-    );
+	return (
+		<div className="flex items-center">
+			<div className="relative z-10 flex w-full cursor-pointer items-center overflow-hidden rounded-xl border border-transparent p-[1px]">
+				<div
+					className={cn(
+						"animate-rotatef absolute inset-0 h-full w-full rounded-full bg-[conic-gradient(transparent_0deg,theme(colors.robin.500)_120deg,theme(colors.robin.500)_140deg,transparent_140deg)]",
+						{
+							"bg-none": !active,
+						},
+					)}
+				></div>
+				<div className="relative z-20 flex w-full rounded-2xl bg-transparent p-[1px]">
+					<Button
+						text={text}
+						icon={icon}
+						variant="active"
+						onClick={onClick}
+						size={size}
+						className={cn(className, {
+							"shadow-[inset_7px_4px_6px_0px_rgba(59,_130,_246,_0.1)] text-robin-500 dark:text-robin-500 w-full flex":
+								active,
+						})}
+						{...rest}
+					/>
+				</div>
+			</div>
+		</div>
+	);
 }

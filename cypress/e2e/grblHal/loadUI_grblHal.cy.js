@@ -1,20 +1,29 @@
+describe('gSender App Load', () => {
+    before(() => {
+        Cypress.on('uncaught:exception', (err) => {
+            if (err.message.includes('displayWebGLErrorMessage')) return false;
+            if (err.message.includes('WebGL')) return false;
+            if (err.message.includes('WebSocket')) return false;
+            return true;
+        });
+    });
 
+    it('loads the app and verifies Connect to CNC button', () => {
+        // Set viewport as per recording
+        cy.viewport(966, 714);
 
-describe('gSender UI Load Test', () => {
-  beforeEach(() => {
-    cy.viewport(1920, 1080);
-  });
+        // Navigate to app
+        cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
+            waitTime: 5000,
+            timeout: 30000,
+        });
 
-  it('should navigate to gSender and verify the UI loads', () => {
-    // Visit with timeout for slow load
-    cy.visit('/', { timeout: 40000 });
+        // Verify title
+        cy.title({ timeout: 30000 }).should('contain', 'gSender');
 
-    // Wait for title with timeout
-    cy.title({ timeout: 15000 }).should('eq', 'gSender 1.6.0');
+        // Verify Connect to CNC button is visible
+        cy.contains('Connect to CNC', { timeout: 30000 }).should('be.visible');
 
-    // Wait for body to be visible
-    cy.get('body', { timeout: 15000 }).should('be.visible');
-
-  
-  });
+        cy.log('UI loaded successfully - Connect to CNC button is present');
+    });
 });

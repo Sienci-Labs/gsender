@@ -21,26 +21,26 @@
  *
  */
 
-import classNames from 'classnames';
-import { WidgetProps } from './definitions';
+import classNames from "classnames";
+import type { WidgetProps } from "./definitions";
 
 const Button = ({ className, inverted, disabled, ...props }: WidgetProps) => {
-    return (
-        <button
-            {...props}
-            disabled={disabled}
-            className={classNames(
-                className,
-                'min-w-8 h-8 float-left relative text-sm font-[$font-family-arial] m-0 text-center first:pl-0',
-                {
-                    'disabled:text-yellow-300 disabled:cursor-not-allowed disabled:hover:bg-inherit':
-                        disabled,
-                    'text-white bg-gray-800 hover:bg-gray-900': inverted,
-                    'opacity-40': disabled && inverted,
-                },
-            )}
-        />
-    );
+	return (
+		<button
+			{...props}
+			disabled={disabled}
+			className={classNames(
+				className,
+				"min-w-8 h-8 float-left relative text-sm font-[$font-family-arial] m-0 text-center first:pl-0",
+				{
+					"disabled:text-yellow-300 disabled:cursor-not-allowed disabled:hover:bg-inherit":
+						disabled,
+					"text-white bg-gray-800 hover:bg-gray-900": inverted,
+					"opacity-40": disabled && inverted,
+				},
+			)}
+		/>
+	);
 };
 
 export default Button;

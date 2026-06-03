@@ -1,488 +1,476 @@
-import * as events from 'events';
-import { ByteLengthParser } from '@serialport/parser-byte-length';
-import { ReadlineParser } from '@serialport/parser-readline';
-import { CRC } from 'crc-full';
-import bufferChunks from 'buffer-chunks';
+import { ByteLengthParser } from "@serialport/parser-byte-length";
+import { ReadlineParser } from "@serialport/parser-readline";
+import bufferChunks from "buffer-chunks";
+import { CRC } from "crc-full";
+import * as events from "events";
 
 const SendSize = {
-    0x01: 128,
-    0x02: 1024,
+	1: 128,
+	2: 1024,
 };
 
 function sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-
 const DebugDict = {
-    0x01: 'SOH',
-    0x02: 'STX',
-    0x04: 'EOT',
-    0x06: 'ACK',
-    0x15: 'NAK',
-    0x18: 'CAN',
-    0x43: 'C',
-    0x1a: 'PADDING',
+	1: "SOH",
+	2: "STX",
+	4: "EOT",
+	6: "ACK",
+	21: "NAK",
+	24: "CAN",
+	67: "C",
+	26: "PADDING",
 };
 
-
 export class YModem extends events.EventEmitter {
-    SOH = 0x01;
+	SOH = 0x01;
 
-    STX = 0x02;
+	STX = 0x02;
 
-    EOT = 0x04;
+	EOT = 0x04;
 
-    ACK = 0x06;
+	ACK = 0x06;
 
-    NAK = 0x15;
+	NAK = 0x15;
 
-    CAN = 0x18;
+	CAN = 0x18;
 
-    C = 'C'.charCodeAt(0);
+	C = "C".charCodeAt(0);
 
-    PAD_CHAR = 0x1a;
+	PAD_CHAR = 0x1a;
 
-    crcCalc = new CRC('CRC16_XMODEM', 16, 0x1021, 0x0000, 0x0000, false, false);
+	crcCalc = new CRC("CRC16_XMODEM", 16, 0x1021, 0x0000, 0x0000, false, false);
 
-    constructor() {
-        super();
-        this.comms = null;
-        this.ByteReader = new ByteLengthParser({ length: 1 });
-        this.logger = console.log;
-    }
+	constructor() {
+		super();
+		this.comms = null;
+		this.ByteReader = new ByteLengthParser({ length: 1 });
+		this.logger = console.log;
+	}
 
-    async sendFile(fileData, comms, progressCB) {
-        this.comms = comms;
-        this.emit('start');
-        await sleep(500);
-        // Drop line reader, use byte reader
-        this.comms.unpipe();
-        this.comms.removeAllListeners('data');
-        this.comms.pipe(this.ByteReader);
+	async sendFile(fileData, comms, progressCB) {
+		this.comms = comms;
+		this.emit("start");
+		await sleep(500);
+		// Drop line reader, use byte reader
+		this.comms.unpipe();
+		this.comms.removeAllListeners("data");
+		this.comms.pipe(this.ByteReader);
 
-        // Empty file - add blank buffer
-        if (!fileData.data) {
-            if (typeof fileData.content === 'string') {
-                console.log(`sendFile: converting content string to Buffer for "${fileData.name}"`);
-                fileData.data = Buffer.from(fileData.content, 'utf8');
-                fileData.size = fileData.data.byteLength;
-            } else {
-                fileData.data = Buffer.alloc(0);
-            }
-        } else if (!Buffer.isBuffer(fileData.data)) {
-            if (typeof fileData.content === 'string') {
-                console.log(`sendFile: converting content string to Buffer for "${fileData.name}"`);
-                fileData.data = Buffer.from(fileData.content, 'utf8');
-            } else if (typeof fileData.data === 'string') {
-                console.log(`sendFile: converting data string to Buffer for "${fileData.name}"`);
-                fileData.data = Buffer.from(fileData.data, 'utf8');
-            } else {
-                fileData.data = Buffer.from(fileData.data);
-            }
-            fileData.size = fileData.data.byteLength;
-        }
+		// Empty file - add blank buffer
+		if (!fileData.data) {
+			if (typeof fileData.content === "string") {
+				console.log(
+					`sendFile: converting content string to Buffer for "${fileData.name}"`,
+				);
+				fileData.data = Buffer.from(fileData.content, "utf8");
+				fileData.size = fileData.data.byteLength;
+			} else {
+				fileData.data = Buffer.alloc(0);
+			}
+		} else if (!Buffer.isBuffer(fileData.data)) {
+			if (typeof fileData.content === "string") {
+				console.log(
+					`sendFile: converting content string to Buffer for "${fileData.name}"`,
+				);
+				fileData.data = Buffer.from(fileData.content, "utf8");
+			} else if (typeof fileData.data === "string") {
+				console.log(
+					`sendFile: converting data string to Buffer for "${fileData.name}"`,
+				);
+				fileData.data = Buffer.from(fileData.data, "utf8");
+			} else {
+				fileData.data = Buffer.from(fileData.data);
+			}
+			fileData.size = fileData.data.byteLength;
+		}
 
-        const header = this.createHeaderPacket(this.SOH, fileData.name, fileData.data.byteLength);
-        this.comms.write(header);
+		const header = this.createHeaderPacket(
+			this.SOH,
+			fileData.name,
+			fileData.data.byteLength,
+		);
+		this.comms.write(header);
 
-        // [<<< C]
-        try {
-            await this.waitForNextWithTimeout([this.C, this.ACK, this.NAK], 3000);
-        } catch (e) {
-            this.emit('error', e.message);
-            throw e;
-        }
+		// [<<< C]
+		try {
+			await this.waitForNextWithTimeout([this.C, this.ACK, this.NAK], 3000);
+		} catch (e) {
+			this.emit("error", e.message);
+			throw e;
+		}
 
+		let fileChunks;
+		let isLastByteSOH = false;
 
-        let fileChunks;
-        let isLastByteSOH = false;
+		if (fileData.size === 0) {
+			fileChunks = [];
+		} else if (fileData.size <= SendSize[this.SOH]) {
+			fileChunks = [
+				this.padRBuffer(fileData.data, SendSize[this.SOH], this.PAD_CHAR),
+			];
+			isLastByteSOH = true;
+		} else if (fileData.size <= SendSize[this.STX]) {
+			fileChunks = [
+				this.padRBuffer(fileData.data, SendSize[this.STX], this.PAD_CHAR),
+			];
+			isLastByteSOH = false;
+		} else {
+			const fileSplit = this.splitFileToChunks(
+				fileData.data,
+				SendSize[this.STX],
+			);
+			fileChunks = fileSplit.chunks;
+			isLastByteSOH = fileSplit.isLastByteSOH;
+		}
 
-        if (fileData.size === 0) {
-            fileChunks = [];
-        } else if (fileData.size <= SendSize[this.SOH]) {
-            fileChunks = [
-                this.padRBuffer(
-                    fileData.data,
-                    SendSize[this.SOH],
-                    this.PAD_CHAR
-                ),
-            ];
-            isLastByteSOH = true;
-        } else if (fileData.size <= SendSize[this.STX]) {
-            fileChunks = [
-                this.padRBuffer(
-                    fileData.data,
-                    SendSize[this.STX],
-                    this.PAD_CHAR
-                ),
-            ];
-            isLastByteSOH = false;
-        } else {
-            const fileSplit = this.splitFileToChunks(
-                fileData.data,
-                SendSize[this.STX]
-            );
-            fileChunks = fileSplit.chunks;
-            isLastByteSOH = fileSplit.isLastByteSOH;
-        }
+		let sendType =
+			fileChunks.length === 1 && isLastByteSOH ? this.SOH : this.STX;
+		this.totalPackets = fileChunks.length;
 
-        let sendType = fileChunks.length === 1 && isLastByteSOH ? this.SOH : this.STX;
-        this.totalPackets = fileChunks.length;
+		for (let packetNo = 1; packetNo <= fileChunks.length; packetNo++) {
+			if (this.isLast(fileChunks.length, packetNo)) {
+				sendType = isLastByteSOH ? this.SOH : this.STX;
+			}
 
-        for (let packetNo = 1; packetNo <= fileChunks.length; packetNo++) {
-            if (this.isLast(fileChunks.length, packetNo)) {
-                sendType = isLastByteSOH ? this.SOH : this.STX;
-            }
+			const fileChunk = fileChunks[packetNo - 1];
 
-            const fileChunk = fileChunks[packetNo - 1];
+			const dataPacket = this.createDataPacket(
+				sendType,
+				packetNo % 256,
+				fileChunk,
+			);
 
-            const dataPacket = this.createDataPacket(
-                sendType,
-                packetNo % 256,
-                fileChunk
-            );
+			// eslint-disable-next-line no-await-in-loop
+			await this.sendDataPacket(packetNo, dataPacket);
 
-            // eslint-disable-next-line no-await-in-loop
-            await this.sendDataPacket(
-                packetNo,
-                dataPacket
-            );
+			this.sentPackets = packetNo;
+			const progress = Math.ceil((packetNo / fileChunks.length) * 100);
+			this.emit("progress", progress);
+		}
 
-            this.sentPackets = packetNo;
-            const progress = Math.ceil((packetNo / fileChunks.length) * 100);
-            this.emit('progress', progress);
-        }
+		this.logger("Finished sending packets");
 
-        this.logger('Finished sending packets');
+		// [>>> EOT]
+		this.comms.write([this.EOT]);
+		this.logger("[>>> EOT]");
+		this.comms.removeAllListeners("data");
+		await sleep(100);
+		this.comms.unpipe();
+		this.comms.pipe(new ReadlineParser({ delimiter: "\n" }));
+		this.emit("complete");
+	}
 
-        // [>>> EOT]
-        this.comms.write([this.EOT]);
-        this.logger('[>>> EOT]');
-        this.comms.removeAllListeners('data');
-        await sleep(100);
-        this.comms.unpipe();
-        this.comms.pipe(new ReadlineParser({ delimiter: '\n' }));
-        this.emit('complete');
-    }
+	async sendFiles(files, comms) {
+		this.comms = comms;
+		this.emit("start");
+		await sleep(500);
+		// Drop line reader, use byte reader
+		this.comms.unpipe();
+		this.comms.removeAllListeners("data");
+		this.comms.pipe(this.ByteReader);
 
-    async sendFiles(files, comms) {
-        this.comms = comms;
-        this.emit('start');
-        await sleep(500);
-        // Drop line reader, use byte reader
-        this.comms.unpipe();
-        this.comms.removeAllListeners('data');
-        this.comms.pipe(this.ByteReader);
+		for (const fileData of files) {
+			// Empty file - add blank buffer
+			if (!fileData.data) {
+				if (typeof fileData.content === "string") {
+					console.log(
+						`sendFiles: converting content string to Buffer for "${fileData.name}"`,
+					);
+					fileData.data = Buffer.from(fileData.content, "utf8");
+					fileData.size = fileData.data.byteLength;
+				} else {
+					fileData.data = Buffer.alloc(0);
+				}
+			} else if (!Buffer.isBuffer(fileData.data)) {
+				if (typeof fileData.content === "string") {
+					console.log(
+						`sendFiles: converting content string to Buffer for "${fileData.name}"`,
+					);
+					fileData.data = Buffer.from(fileData.content, "utf8");
+				} else if (typeof fileData.data === "string") {
+					console.log(
+						`sendFiles: converting data string to Buffer for "${fileData.name}"`,
+					);
+					fileData.data = Buffer.from(fileData.data, "utf8");
+				} else {
+					fileData.data = Buffer.from(fileData.data);
+				}
+				fileData.size = fileData.data.byteLength;
+			}
 
+			const header = this.createHeaderPacket(
+				this.SOH,
+				fileData.name,
+				fileData.data.byteLength,
+			);
+			this.comms.write(header);
 
-        for (const fileData of files) {
-            // Empty file - add blank buffer
-            if (!fileData.data) {
-                if (typeof fileData.content === 'string') {
-                    console.log(`sendFiles: converting content string to Buffer for "${fileData.name}"`);
-                    fileData.data = Buffer.from(fileData.content, 'utf8');
-                    fileData.size = fileData.data.byteLength;
-                } else {
-                    fileData.data = Buffer.alloc(0);
-                }
-            } else if (!Buffer.isBuffer(fileData.data)) {
-                if (typeof fileData.content === 'string') {
-                    console.log(`sendFiles: converting content string to Buffer for "${fileData.name}"`);
-                    fileData.data = Buffer.from(fileData.content, 'utf8');
-                } else if (typeof fileData.data === 'string') {
-                    console.log(`sendFiles: converting data string to Buffer for "${fileData.name}"`);
-                    fileData.data = Buffer.from(fileData.data, 'utf8');
-                } else {
-                    fileData.data = Buffer.from(fileData.data);
-                }
-                fileData.size = fileData.data.byteLength;
-            }
+			// [<<< C]
 
-            const header = this.createHeaderPacket(this.SOH, fileData.name, fileData.data.byteLength);
-            this.comms.write(header);
+			try {
+				// eslint-disable-next-line no-await-in-loop
+				await this.waitForNextWithTimeout([this.C, this.ACK, this.NAK], 5000);
+			} catch (e) {
+				this.emit("error", e.message);
+				throw e;
+			}
 
-            // [<<< C]
+			let fileChunks;
+			let isLastByteSOH = false;
+			if (fileData.size === 0) {
+				fileChunks = [];
+			} else if (fileData.size <= SendSize[this.SOH]) {
+				fileChunks = [
+					this.padRBuffer(fileData.data, SendSize[this.SOH], this.PAD_CHAR),
+				];
+				isLastByteSOH = true;
+			} else if (fileData.size <= SendSize[this.STX]) {
+				fileChunks = [
+					this.padRBuffer(fileData.data, SendSize[this.STX], this.PAD_CHAR),
+				];
+				isLastByteSOH = false;
+			} else {
+				const fileSplit = this.splitFileToChunks(
+					fileData.data,
+					SendSize[this.STX],
+				);
+				fileChunks = fileSplit.chunks;
+				isLastByteSOH = fileSplit.isLastByteSOH;
+			}
 
-            try {
-                // eslint-disable-next-line no-await-in-loop
-                await this.waitForNextWithTimeout([this.C, this.ACK, this.NAK], 5000);
-            } catch (e) {
-                this.emit('error', e.message);
-                throw e;
-            }
+			let sendType =
+				fileChunks.length === 1 && isLastByteSOH ? this.SOH : this.STX;
+			this.totalPackets = fileChunks.length;
 
+			for (let packetNo = 1; packetNo <= fileChunks.length; packetNo++) {
+				if (this.isLast(fileChunks.length, packetNo)) {
+					sendType = isLastByteSOH ? this.SOH : this.STX;
+				}
 
-            let fileChunks;
-            let isLastByteSOH = false;
-            if (fileData.size === 0) {
-                fileChunks = [];
-            } else if (fileData.size <= SendSize[this.SOH]) {
-                fileChunks = [
-                    this.padRBuffer(
-                        fileData.data,
-                        SendSize[this.SOH],
-                        this.PAD_CHAR
-                    ),
-                ];
-                isLastByteSOH = true;
-            } else if (fileData.size <= SendSize[this.STX]) {
-                fileChunks = [
-                    this.padRBuffer(
-                        fileData.data,
-                        SendSize[this.STX],
-                        this.PAD_CHAR
-                    ),
-                ];
-                isLastByteSOH = false;
-            } else {
-                const fileSplit = this.splitFileToChunks(
-                    fileData.data,
-                    SendSize[this.STX]
-                );
-                fileChunks = fileSplit.chunks;
-                isLastByteSOH = fileSplit.isLastByteSOH;
-            }
+				const fileChunk = fileChunks[packetNo - 1];
 
-            let sendType = fileChunks.length === 1 && isLastByteSOH ? this.SOH : this.STX;
-            this.totalPackets = fileChunks.length;
+				const dataPacket = this.createDataPacket(
+					sendType,
+					packetNo % 256,
+					fileChunk,
+				);
 
-            for (let packetNo = 1; packetNo <= fileChunks.length; packetNo++) {
-                if (this.isLast(fileChunks.length, packetNo)) {
-                    sendType = isLastByteSOH ? this.SOH : this.STX;
-                }
+				// eslint-disable-next-line no-await-in-loop
+				await this.sendDataPacket(packetNo, dataPacket);
 
-                const fileChunk = fileChunks[packetNo - 1];
+				this.sentPackets = packetNo;
+				const progress = Math.ceil((packetNo / fileChunks.length) * 100);
+				this.emit("progress", progress);
+			}
 
-                const dataPacket = this.createDataPacket(
-                    sendType,
-                    packetNo % 256,
-                    fileChunk
-                );
+			// [>>> EOT]
+			this.comms.write([this.EOT]);
+			this.logger("[>>> EOT]");
 
-                // eslint-disable-next-line no-await-in-loop
-                await this.sendDataPacket(
-                    packetNo,
-                    dataPacket
-                );
+			// eslint-disable-next-line no-await-in-loop
+			await sleep(200);
+		}
 
-                this.sentPackets = packetNo;
-                const progress = Math.ceil((packetNo / fileChunks.length) * 100);
-                this.emit('progress', progress);
-            }
+		this.logger("Finished sending packets");
 
-            // [>>> EOT]
-            this.comms.write([this.EOT]);
-            this.logger('[>>> EOT]');
+		this.comms.removeAllListeners("data");
+		await sleep(100);
+		this.comms.unpipe();
+		this.comms.pipe(new ReadlineParser({ delimiter: "\n" }));
+		this.emit("complete");
+	}
 
-            // eslint-disable-next-line no-await-in-loop
-            await sleep(200);
-        }
+	waitForNext(controlChars) {
+		let cancel;
+		const promise = new Promise((resolve) => {
+			cancel = this.onControlCharsRead(controlChars, resolve);
+		});
+		promise.cancel = cancel;
+		return promise;
+	}
 
-        this.logger('Finished sending packets');
+	onControlCharsRead(controlChars, callback) {
+		const bound = function onCharRead(newData) {
+			const newChar = newData[0];
+			if (controlChars.includes(newChar)) {
+				this.logger(`[<<< ${DebugDict[newChar]}]`);
+				if (newChar === this.NAK) {
+					console.log("NAK SEEN");
+				}
+				this.comms.removeListener("data", bound);
+				callback(newChar);
+			}
+		}.bind(this);
+		this.comms.on("data", bound);
+		return () => this.comms.removeListener("data", bound);
+	}
 
+	async sendDataPacket(packetNo, dataPacket) {
+		this.logger(`Sending frame: ${packetNo}.`);
 
-        this.comms.removeAllListeners('data');
-        await sleep(100);
-        this.comms.unpipe();
-        this.comms.pipe(new ReadlineParser({ delimiter: '\n' }));
-        this.emit('complete');
-    }
+		for (let retryCount = 1; retryCount <= 10; retryCount++) {
+			// Create a fresh listener for each attempt
+			const waitForCCs = this.waitForNext([this.ACK, this.NAK, this.CAN]);
 
-    waitForNext(controlChars) {
-        let cancel;
-        const promise = new Promise((resolve) => {
-            cancel = this.onControlCharsRead(controlChars, resolve);
-        });
-        promise.cancel = cancel;
-        return promise;
-    }
+			this.comms.write(dataPacket);
 
-    onControlCharsRead(controlChars, callback) {
-        const bound = function onCharRead(newData) {
-            const newChar = newData[0];
-            if (controlChars.includes(newChar)) {
-                this.logger(`[<<< ${DebugDict[newChar]}]`);
-                if (newChar === this.NAK) {
-                    console.log('NAK SEEN');
-                }
-                this.comms.removeListener('data', bound);
-                callback(newChar);
-            }
-        }.bind(this);
-        this.comms.on('data', bound);
-        return () => this.comms.removeListener('data', bound);
-    }
+			const timeout = sleep(3000);
+			// eslint-disable-next-line no-await-in-loop
+			const result = await Promise.race([waitForCCs, timeout]);
+			// Cancel the pending listener if timeout fired (result is undefined)
+			// eslint-disable-next-line no-unused-expressions
+			waitForCCs.cancel?.();
 
-    async sendDataPacket(packetNo, dataPacket) {
-        this.logger(`Sending frame: ${packetNo}.`);
+			console.log("result", result);
+			if (result === this.ACK) {
+				break;
+			} else if (result === this.NAK) {
+				retryCount -= 1;
+				this.logger(`NAK received for frame ${packetNo}, retransmitting.`);
+			} else if (result === this.CAN) {
+				this.logger(`Throw on data frame ${packetNo + 1}.`);
+				this.emit("error", "Operation cancelled by remote device.");
+				throw new Error("Operation cancelled by remote device.");
+			} else {
+				this.logger(
+					`Packet was not sent! Retrying... Retry No: ${retryCount}.`,
+				);
+			}
 
-        for (let retryCount = 1; retryCount <= 10; retryCount++) {
-            // Create a fresh listener for each attempt
-            const waitForCCs = this.waitForNext([
-                this.ACK,
-                this.NAK,
-                this.CAN,
-            ]);
+			if (retryCount >= 9) {
+				this.emit("error", "Packet timed out after 10 retries.");
+				throw new Error(`Packet timed out after ${retryCount} retries.`);
+			}
+		}
+	}
 
-            this.comms.write(dataPacket);
+	waitForNextWithTimeout(controlChars, timeoutMs = 10000) {
+		let timeoutHandle;
+		const timeoutPromise = new Promise((_, reject) => {
+			timeoutHandle = setTimeout(() => {
+				reject(
+					new Error(
+						`Timeout waiting for control characters: ${controlChars.map((c) => DebugDict[c] || c).join(", ")}`,
+					),
+				);
+			}, timeoutMs);
+		});
 
-            const timeout = sleep(3000);
-            // eslint-disable-next-line no-await-in-loop
-            const result = await Promise.race([waitForCCs, timeout]);
-            // Cancel the pending listener if timeout fired (result is undefined)
-            // eslint-disable-next-line no-unused-expressions
-            waitForCCs.cancel?.();
+		return Promise.race([
+			this.waitForNext(controlChars),
+			timeoutPromise,
+		]).finally(() => {
+			clearTimeout(timeoutHandle);
+		});
+	}
 
-            console.log('result', result);
-            if (result === this.ACK) {
-                break;
-            } else if (result === this.NAK) {
-                retryCount -= 1;
-                this.logger(`NAK received for frame ${packetNo}, retransmitting.`);
-            } else if (result === this.CAN) {
-                this.logger(`Throw on data frame ${packetNo + 1}.`);
-                this.emit('error', 'Operation cancelled by remote device.');
-                throw new Error('Operation cancelled by remote device.');
-            } else {
-                this.logger(
-                    `Packet was not sent! Retrying... Retry No: ${retryCount}.`
-                );
-            }
+	createHeaderPacket(sendType, fileName, fileSize) {
+		fileName = `/${fileName}`;
+		const chosenSendSize = SendSize[sendType];
+		console.log(`File: ${fileName} Size: ${fileSize}`);
 
-            if (retryCount >= 9) {
-                this.emit('error', 'Packet timed out after 10 retries.');
-                throw new Error(
-                    `Packet timed out after ${retryCount} retries.`
-                );
-            }
-        }
-    }
-
-    waitForNextWithTimeout(controlChars, timeoutMs = 10000) {
-        let timeoutHandle;
-        const timeoutPromise = new Promise((_, reject) => {
-            timeoutHandle = setTimeout(() => {
-                reject(new Error(`Timeout waiting for control characters: ${controlChars.map(c => DebugDict[c] || c).join(', ')}`));
-            }, timeoutMs);
-        });
-
-        return Promise.race([
-            this.waitForNext(controlChars),
-            timeoutPromise
-        ]).finally(() => {
-            clearTimeout(timeoutHandle);
-        });
-    }
-
-
-    createHeaderPacket(sendType, fileName, fileSize) {
-        fileName = `/${fileName}`;
-        const chosenSendSize = SendSize[sendType];
-        console.log(`File: ${fileName} Size: ${fileSize}`);
-
-
-        // Check if file size exceeds maximum allowed for transmission
-        /*if (fileSize !== 0 && 0xff - 0x01 * chosenSendSize > fileSize) {
+		// Check if file size exceeds maximum allowed for transmission
+		/*if (fileSize !== 0 && 0xff - 0x01 * chosenSendSize > fileSize) {
             this.emit('error', 'File size too big');
             throw new Error('Couldn\'t send file. File is too big.');
         }*/
 
-        const strFileSize = fileSize.toString();
+		const strFileSize = fileSize.toString();
 
-        // Check if combined length of filename and filesize exceeds packet size
-        if (fileName.length + strFileSize.length > chosenSendSize - 1) {
-            throw new Error(
-                'Couldn\'t send file. Either filename is too big or the file is extremely large.'
-            );
-        }
+		// Check if combined length of filename and filesize exceeds packet size
+		if (fileName.length + strFileSize.length > chosenSendSize - 1) {
+			throw new Error(
+				"Couldn't send file. Either filename is too big or the file is extremely large.",
+			);
+		}
 
-        const bufferSize = chosenSendSize + 5;
-        const headerPacket = Buffer.alloc(bufferSize);
-        let currentBufferLoc = 0;
+		const bufferSize = chosenSendSize + 5;
+		const headerPacket = Buffer.alloc(bufferSize);
+		let currentBufferLoc = 0;
 
-        // Write header fields
-        headerPacket.writeUInt8(sendType, currentBufferLoc++);
-        headerPacket.writeUInt8(0x00, currentBufferLoc++); // seq
-        headerPacket.writeUInt8(0xff, currentBufferLoc++); // seqOc
+		// Write header fields
+		headerPacket.writeUInt8(sendType, currentBufferLoc++);
+		headerPacket.writeUInt8(0x00, currentBufferLoc++); // seq
+		headerPacket.writeUInt8(0xff, currentBufferLoc++); // seqOc
 
-        // Write filename
-        headerPacket.write(fileName, currentBufferLoc);
-        currentBufferLoc += fileName.length;
-        headerPacket.writeUInt8(0x00, currentBufferLoc++); // separator
+		// Write filename
+		headerPacket.write(fileName, currentBufferLoc);
+		currentBufferLoc += fileName.length;
+		headerPacket.writeUInt8(0x00, currentBufferLoc++); // separator
 
-        // Write file size
-        headerPacket.write(strFileSize, currentBufferLoc);
-        currentBufferLoc += strFileSize.length;
-        headerPacket.writeUInt8(0x00, currentBufferLoc++); // separator
+		// Write file size
+		headerPacket.write(strFileSize, currentBufferLoc);
+		currentBufferLoc += strFileSize.length;
+		headerPacket.writeUInt8(0x00, currentBufferLoc++); // separator
 
-        // Calculate CRC
-        const dataFrame = Buffer.from(
-            headerPacket.buffer.slice(3, 3 + chosenSendSize)
-        );
-        const dataCrc = this.calculateCRC(dataFrame);
+		// Calculate CRC
+		const dataFrame = Buffer.from(
+			headerPacket.buffer.slice(3, 3 + chosenSendSize),
+		);
+		const dataCrc = this.calculateCRC(dataFrame);
 
-        // Write CRC
-        headerPacket.writeUInt16BE(dataCrc, bufferSize - 2);
-        return headerPacket;
-    }
+		// Write CRC
+		headerPacket.writeUInt16BE(dataCrc, bufferSize - 2);
+		return headerPacket;
+	}
 
-    splitFileToChunks(buf, chunkSize) {
-        const chunks = bufferChunks(buf, chunkSize);
-        const lastChunk = chunks[chunks.length - 1];
+	splitFileToChunks(buf, chunkSize) {
+		const chunks = bufferChunks(buf, chunkSize);
+		const lastChunk = chunks[chunks.length - 1];
 
-        let isLastByteSOH = false;
+		let isLastByteSOH = false;
 
-        if (lastChunk.buffer.byteLength <= SendSize[this.SOH]) {
-            chunks[chunks.length - 1] = this.padRBuffer(
-                lastChunk,
-                SendSize[this.SOH],
-                0x00
-            );
-            isLastByteSOH = true;
-        } else {
-            chunks[chunks.length - 1] = this.padRBuffer(
-                lastChunk,
-                SendSize[this.STX],
-                0x00
-            );
-        }
+		if (lastChunk.buffer.byteLength <= SendSize[this.SOH]) {
+			chunks[chunks.length - 1] = this.padRBuffer(
+				lastChunk,
+				SendSize[this.SOH],
+				0x00,
+			);
+			isLastByteSOH = true;
+		} else {
+			chunks[chunks.length - 1] = this.padRBuffer(
+				lastChunk,
+				SendSize[this.STX],
+				0x00,
+			);
+		}
 
-        return { chunks, isLastByteSOH };
-    }
+		return { chunks, isLastByteSOH };
+	}
 
+	createDataPacket(sendType, seq, fileData) {
+		const chosenSendSize = SendSize[sendType];
+		const bufferSize = chosenSendSize + 5;
+		const dataPacket = Buffer.alloc(bufferSize);
 
-    createDataPacket(sendType, seq, fileData) {
-        const chosenSendSize = SendSize[sendType];
-        const bufferSize = chosenSendSize + 5;
-        const dataPacket = Buffer.alloc(bufferSize);
+		dataPacket.writeUInt8(sendType, 0);
+		dataPacket.writeUInt8(seq, 1);
+		const seqOc = 0xff - seq;
+		dataPacket.writeUInt8(seqOc, 2);
 
-        dataPacket.writeUInt8(sendType, 0);
-        dataPacket.writeUInt8(seq, 1);
-        const seqOc = 0xff - seq;
-        dataPacket.writeUInt8(seqOc, 2);
+		fileData.copy(dataPacket, 3);
 
-        fileData.copy(dataPacket, 3);
+		const dataCrc = this.calculateCRC(fileData);
+		dataPacket.writeUInt16BE(dataCrc, bufferSize - 2);
 
-        const dataCrc = this.calculateCRC(fileData);
-        dataPacket.writeUInt16BE(dataCrc, bufferSize - 2);
+		return dataPacket;
+	}
 
-        return dataPacket;
-    }
+	padRBuffer(buf, desiredLength, padChar = 0x00) {
+		const padBuf = Buffer.alloc(desiredLength).fill(padChar);
+		buf.copy(padBuf);
 
-    padRBuffer(buf, desiredLength, padChar = 0x00) {
-        const padBuf = Buffer.alloc(desiredLength).fill(padChar);
-        buf.copy(padBuf);
+		return padBuf;
+	}
 
-        return padBuf;
-    }
+	isLast(length, current) {
+		return length === current;
+	}
 
-    isLast(length, current) {
-        return length === current;
-    }
-
-
-    calculateCRC(data) {
-        return this.crcCalc.compute(data);
-    }
+	calculateCRC(data) {
+		return this.crcCalc.compute(data);
+	}
 }

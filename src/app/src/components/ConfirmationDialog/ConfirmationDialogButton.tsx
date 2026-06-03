@@ -21,43 +21,41 @@
  *
  */
 
-import React from 'react';
-import cx from 'classnames';
+import cx from "classnames";
+import type React from "react";
 
-import { DIALOG_CANCEL, DIALOG_CONFIRM } from './ConfirmationDialogLib';
+import { DIALOG_CANCEL, DIALOG_CONFIRM } from "./ConfirmationDialogLib";
 
-import styles from './index.module.styl';
+import styles from "./index.module.styl";
 
 interface ConfirmationDialogButtonProps {
-    children: React.ReactNode;
-    onClick: () => void;
-    variant?: typeof DIALOG_CONFIRM | typeof DIALOG_CANCEL;
+	children: React.ReactNode;
+	onClick: () => void;
+	variant?: typeof DIALOG_CONFIRM | typeof DIALOG_CANCEL;
 }
 
 const ConfirmationDialogButton: React.FC<ConfirmationDialogButtonProps> = ({
-    children,
-    onClick,
-    variant = DIALOG_CONFIRM,
+	children,
+	onClick,
+	variant = DIALOG_CONFIRM,
 }) => {
-    return (
-        <button
-            type="button"
-            onClick={onClick}
-            className={cx(
-                styles.confirmationDialogButton,
-                {
-                    [styles.confirmationDialogButtonConfirm]:
-                        variant === DIALOG_CONFIRM,
-                },
-                {
-                    [styles.confirmationDialogButtonCancel]:
-                        variant === DIALOG_CANCEL,
-                },
-            )}
-        >
-            {children}
-        </button>
-    );
+	return (
+		<button
+			type="button"
+			onClick={onClick}
+			className={cx(
+				styles.confirmationDialogButton,
+				{
+					[styles.confirmationDialogButtonConfirm]: variant === DIALOG_CONFIRM,
+				},
+				{
+					[styles.confirmationDialogButtonCancel]: variant === DIALOG_CANCEL,
+				},
+			)}
+		>
+			{children}
+		</button>
+	);
 };
 
 export default ConfirmationDialogButton;

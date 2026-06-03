@@ -292,7 +292,7 @@ describe('Macros Upload, Execution and Verification Test', () => {
 
     // Update Name field
     cy.log('Updating macro name...');
-    cy.get('div.my-4 input', { timeout: 10000 })
+    cy.get('input[name="name"]', { timeout: 10000 })
       .should('be.visible')
       .clear()
       .type('X Minus jogging Editing ');

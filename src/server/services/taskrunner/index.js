@@ -21,7 +21,7 @@
  *
  */
 
-import TaskRunner from './TaskRunner';
+import TaskRunner from "./TaskRunner";
 
 const taskRunner = new TaskRunner();
 

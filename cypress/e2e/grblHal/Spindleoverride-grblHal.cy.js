@@ -2,7 +2,10 @@ describe('Spindle Configuration and Control Test - Decrease to 7500 RPM', () => 
 
   beforeEach(() => {
     cy.viewport(1689, 810);
-    cy.loadUI();
+    cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
+      waitTime: 3000,
+      timeout: 15000
+    });
     cy.goToConfig();
   });
 
@@ -29,34 +32,33 @@ describe('Spindle Configuration and Control Test - Decrease to 7500 RPM', () => 
     const INCREASE_BTN = () => cy.get('div.order-2 section > div > div > div > div:nth-of-type(2) div:nth-of-type(3) > button').first();
     const RESET_BTN    = () => cy.get('div.order-2 section > div > div > div > div:nth-of-type(2) div:nth-of-type(1) > button').first();
 
-    // --------------------------------------------------------
+   
     // Step 1: Connect to CNC
-    // --------------------------------------------------------
+   
     cy.log('Step 1: Connect to CNC');
     cy.connectMachine();
     cy.wait(6000);
     cy.unlockMachineIfNeeded();
     cy.log('Connected to CNC');
 
-    // --------------------------------------------------------
     // Step 2: Verify machine status is Idle
-    // --------------------------------------------------------
+
     cy.log('Step 2: Verify machine status is Idle');
     cy.contains(/^Idle$/i, { timeout: 30000 })
       .should('be.visible')
       .then(status => cy.log('Machine status: ' + status.text().trim()));
     cy.wait(2000);
 
-    // --------------------------------------------------------
+
     // Step 3: Search for Spindle settings
-    // --------------------------------------------------------
+
     cy.log('Step 3: Search for Spindle settings');
     cy.searchInSettings('Spindle');
     cy.wait(1000);
 
-    // --------------------------------------------------------
+
     // Step 4: Enable spindle toggle
-    // --------------------------------------------------------
+
     cy.log('Step 4: Enable spindle toggle');
     cy.get('#section-6')
       .find('fieldset').first()
@@ -67,9 +69,9 @@ describe('Spindle Configuration and Control Test - Decrease to 7500 RPM', () => 
       .click({ force: true });
     cy.wait(1000);
 
-    // --------------------------------------------------------
+
     // Step 5: Record Maximum and Minimum Spindle Speed
-    // --------------------------------------------------------
+
     cy.log('Step 5: Record Maximum and Minimum Spindle Speed');
     cy.get('input[type="number"]').then(($inputs) => {
       $inputs.each((index, input) => {
@@ -83,35 +85,34 @@ describe('Spindle Configuration and Control Test - Decrease to 7500 RPM', () => 
       cy.log('Minimum Spindle Speed: ' + minSpindleSpeed + ' RPM');
     });
 
-    // --------------------------------------------------------
+
     // Step 6: Apply settings
-    // --------------------------------------------------------
+  
     cy.log('Step 6: Apply settings');
     cy.get('div.ring > button')
       .contains('Apply Settings')
       .click({ force: true });
     cy.wait(2000);
 
-    // --------------------------------------------------------
+
     // Step 7: Navigate to Carve page
-    // --------------------------------------------------------
+
     cy.log('Step 7: Navigate to Carve page');
     cy.get('#app > div > div.h-full > div.flex img')
       .first()
       .click({ force: true });
     cy.wait(2000);
 
-    // --------------------------------------------------------
+
     // Step 8: Upload G-code file
-    // --------------------------------------------------------
+   
     cy.log('Step 8: Upload G-code file');
     cy.contains('Load File').should('be.visible').click({ force: true });
     cy.get('#fileInput').selectFile('cypress/fixtures/demo.gcode', { force: true });
     cy.wait(5000);
 
-    // --------------------------------------------------------
     // Step 9: Start job
-    // --------------------------------------------------------
+
     cy.log('Step 9: Start job');
     cy.then(() => {
       jobStartTime = Date.now();
@@ -125,18 +126,17 @@ describe('Spindle Configuration and Control Test - Decrease to 7500 RPM', () => 
     cy.wait(2000);
     cy.log('Job started');
 
-    // --------------------------------------------------------
+    
     // Step 10: Verify job is running
-    // --------------------------------------------------------
+
     cy.log('Step 10: Verify job is running');
     cy.contains(/running|run/i, { timeout: 10000 })
       .should('be.visible')
       .then(status => cy.log('Job status: ' + status.text().trim()));
     cy.wait(2000);
 
-    // --------------------------------------------------------
     // Step 11: Capture initial spindle override and RPM
-    // --------------------------------------------------------
+
     cy.log('Step 11: Capture initial spindle override and RPM');
     cy.get('#spindle-override').parent().then($parent => {
       const percentMatch = $parent.text().match(/(\d+)%/g);
@@ -153,9 +153,8 @@ describe('Spindle Configuration and Control Test - Decrease to 7500 RPM', () => 
     });
     cy.wait(1000);
 
-    // --------------------------------------------------------
     // Step 12: Decrease spindle — 5 clicks, 10s wait each
-    // --------------------------------------------------------
+
     cy.log('Step 12: Decreasing spindle speed - 5 clicks x 10s');
 
     DECREASE_BTN().then(($btn) => {
@@ -173,9 +172,9 @@ describe('Spindle Configuration and Control Test - Decrease to 7500 RPM', () => 
       });
     });
 
-    // --------------------------------------------------------
+
     // Step 13: Capture RPM and override after decrease
-    // --------------------------------------------------------
+
     cy.log('Step 13: Capture spindle state after decrease');
     cy.contains(/\d+\s*RPM/i).invoke('text').then((text) => {
       const match = text.match(/(\d+)\s*RPM/i);
@@ -193,17 +192,16 @@ describe('Spindle Configuration and Control Test - Decrease to 7500 RPM', () => 
     });
     cy.wait(2000);
 
-    // --------------------------------------------------------
+   
     // Step 14: Reset spindle to 100%
-    // --------------------------------------------------------
+
     cy.log('Step 14: Click Reset button to return spindle to 100%');
     RESET_BTN().should('exist').click({ force: true });
     cy.wait(2000);
     cy.log('Reset button clicked - spindle should return to 100%');
 
-    // --------------------------------------------------------
     // Step 15: Verify spindle returned to 100%
-    // --------------------------------------------------------
+
     cy.log('Step 15: Verify spindle returned to 100% override');
     cy.get('#spindle-override').parent().then($parent => {
       const percentMatch = $parent.text().match(/(\d+)%/g);
@@ -227,9 +225,9 @@ describe('Spindle Configuration and Control Test - Decrease to 7500 RPM', () => 
     });
     cy.wait(2000);
 
-    // --------------------------------------------------------
+
     // Step 16: Increase spindle — 5 clicks, 10s wait each
-    // --------------------------------------------------------
+
     cy.log('Step 16: Increasing spindle speed - 5 clicks x 10s');
 
     INCREASE_BTN().then(($btn) => {
@@ -247,9 +245,9 @@ describe('Spindle Configuration and Control Test - Decrease to 7500 RPM', () => 
       });
     });
 
-    // --------------------------------------------------------
+
     // Step 17: Capture RPM and override after increase
-    // --------------------------------------------------------
+
     cy.log('Step 17: Capture spindle state after increase');
     cy.get('#spindle-override').parent().then($parent => {
       const percentMatch = $parent.text().match(/(\d+)%/g);
@@ -267,17 +265,16 @@ describe('Spindle Configuration and Control Test - Decrease to 7500 RPM', () => 
     });
     cy.wait(2000);
 
-    // --------------------------------------------------------
     // Step 18: Reset spindle to 100% again
-    // --------------------------------------------------------
+   
     cy.log('Step 18: Click Reset button again to return spindle to 100%');
     RESET_BTN().should('exist').click({ force: true });
     cy.wait(2000);
     cy.log('Second reset button clicked');
 
-    // --------------------------------------------------------
+  
     // Step 19: Verify spindle returned to 100% after increase
-    // --------------------------------------------------------
+   
     cy.log('Step 19: Verify spindle returned to 100% override after increase');
     cy.get('#spindle-override').parent().then($parent => {
       const percentMatch = $parent.text().match(/(\d+)%/g);
@@ -301,15 +298,14 @@ describe('Spindle Configuration and Control Test - Decrease to 7500 RPM', () => 
     });
     cy.wait(2000);
 
-    // --------------------------------------------------------
-    // Step 20: Wait before stopping job
-    // --------------------------------------------------------
+   
+
     cy.log('Step 20: Wait 5 seconds before stopping job');
     cy.wait(5000);
 
-    // --------------------------------------------------------
+  
     // Step 21: Stop job
-    // --------------------------------------------------------
+
     cy.log('Step 21: Stop job and get details');
     cy.stopJobAndGetDetails();
 
@@ -326,9 +322,8 @@ describe('Spindle Configuration and Control Test - Decrease to 7500 RPM', () => 
       cy.wrap(details.errors).as('jobErrors');
     });
 
-    // --------------------------------------------------------
     // Step 22: Display final summary
-    // --------------------------------------------------------
+
     cy.log('Step 22: Display final summary');
     cy.get('@jobStatus').then((status) => {
       cy.get('@timeTaken').then((time) => {
@@ -356,23 +351,19 @@ describe('Spindle Configuration and Control Test - Decrease to 7500 RPM', () => 
       });
     });
 
-    // --------------------------------------------------------
     // Step 23: Close the job completion popup
-    // --------------------------------------------------------
+
     cy.log('Step 23: Close the job completion popup');
     cy.contains('button', 'Close').should('be.visible').click({ force: true });
     cy.wait(1000);
 
-    // --------------------------------------------------------
     // Step 24: Verify popup is closed
-    // --------------------------------------------------------
     cy.log('Step 24: Verify popup is closed');
     cy.contains('h2', 'Job End').should('not.exist');
     cy.log('Popup successfully closed');
 
-    // --------------------------------------------------------
     // Step 25: Save test results to file
-    // --------------------------------------------------------
+
     cy.log('Step 25: Save comprehensive test results to file');
     cy.get('@jobStatus').then((status) => {
       cy.get('@timeTaken').then((time) => {

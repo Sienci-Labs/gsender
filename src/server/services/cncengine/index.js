@@ -21,29 +21,29 @@
  *
  */
 
-import CNCEngine from './CNCEngine';
+import CNCEngine from "./CNCEngine";
 
 const cncengine = new CNCEngine();
 
 const start = (server, controller) => {
-    cncengine.start(server, controller);
+	cncengine.start(server, controller);
 };
 
 const stop = () => {
-    cncengine.stop();
+	cncengine.stop();
 };
 
 const load = (gcode) => {
-    cncengine.load(gcode);
+	cncengine.load(gcode);
 };
 
 const unload = () => {
-    cncengine.unload();
+	cncengine.unload();
 };
 
 export default {
-    start,
-    stop,
-    load,
-    unload
+	start,
+	stop,
+	load,
+	unload,
 };

@@ -21,55 +21,55 @@
  *
  */
 
-import store from 'app/store';
-import { translateKey } from './utils';
-import { State } from 'app/store/definitions';
+import store from "app/store";
+import type { State } from "app/store/definitions";
+import { translateKey } from "./utils";
 
 export interface WidgetConfigInterface {
-    get<T = any>(key: string, defaultValue?: T): T;
-    set<T = any>(key: string, value: T): State;
-    unset(key: string): Record<string, any>;
-    replace<T = any>(key: string, value: T): Record<string, any>;
+	get<T = any>(key: string, defaultValue?: T): T;
+	set<T = any>(key: string, value: T): State;
+	unset(key: string): Record<string, any>;
+	replace<T = any>(key: string, value: T): Record<string, any>;
 }
 
 class WidgetConfig implements WidgetConfigInterface {
-    widgetId: string = '';
+	widgetId: string = "";
 
-    constructor(widgetId: string) {
-        this.widgetId = widgetId;
-    }
+	constructor(widgetId: string) {
+		this.widgetId = widgetId;
+	}
 
-    get<T = any>(key: string, defaultValue?: T): T {
-        if (!this.widgetId) {
-            throw new Error('The widget id cannot be an empty string');
-        }
-        const translatedKey = translateKey(key, this.widgetId);
-        return store.get<T>(translatedKey, defaultValue);
-    }
+	get<T = any>(key: string, defaultValue?: T): T {
+		if (!this.widgetId) {
+			throw new Error("The widget id cannot be an empty string");
+		}
+		const translatedKey = translateKey(key, this.widgetId);
+		return store.get<T>(translatedKey, defaultValue);
+	}
 
-    set<T = any>(key: string, value: T): State {
-        if (!this.widgetId) {
-            throw new Error('The widget id cannot be an empty string');
-        }
-        const translatedKey = translateKey(key, this.widgetId);
-        return store.set(translatedKey, value);
-    }
+	set<T = any>(key: string, value: T): State {
+		if (!this.widgetId) {
+			throw new Error("The widget id cannot be an empty string");
+		}
+		const translatedKey = translateKey(key, this.widgetId);
+		return store.set(translatedKey, value);
+	}
 
-    unset(key: string): Record<string, any> {
-        if (!this.widgetId) {
-            throw new Error('The widget id cannot be an empty string');
-        }
-        const translatedKey = translateKey(key, this.widgetId);
-        return store.unset(translatedKey);
-    }
+	unset(key: string): Record<string, any> {
+		if (!this.widgetId) {
+			throw new Error("The widget id cannot be an empty string");
+		}
+		const translatedKey = translateKey(key, this.widgetId);
+		return store.unset(translatedKey);
+	}
 
-    replace<T = any>(key: string, value: T): Record<string, any> {
-        if (!this.widgetId) {
-            throw new Error('The widget id cannot be an empty string');
-        }
-        const translatedKey = translateKey(key, this.widgetId);
-        return store.replace(translatedKey, value);
-    }
+	replace<T = any>(key: string, value: T): Record<string, any> {
+		if (!this.widgetId) {
+			throw new Error("The widget id cannot be an empty string");
+		}
+		const translatedKey = translateKey(key, this.widgetId);
+		return store.replace(translatedKey, value);
+	}
 }
 
 export default WidgetConfig;

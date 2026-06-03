@@ -21,50 +21,48 @@
  *
  */
 
-import React from 'react';
-import cx from 'classnames';
-import { FaInfoCircle } from 'react-icons/fa';
-import { IconType } from 'react-icons';
+import cx from "classnames";
+import type React from "react";
+import type { IconType } from "react-icons";
+import { FaInfoCircle } from "react-icons/fa";
 
 interface Props {
-    className: string;
-    Icon: IconType;
-    children: React.ReactElement | string;
-    disabled: boolean;
-    onClick: () => void;
+	className: string;
+	Icon: IconType;
+	children: React.ReactElement | string;
+	disabled: boolean;
+	onClick: () => void;
 }
 
 const ToolModalButton: React.FC<Props> = ({
-    className,
-    Icon = FaInfoCircle,
-    children,
-    disabled,
-    onClick,
-    ...props
+	className,
+	Icon = FaInfoCircle,
+	children,
+	disabled,
+	onClick,
+	...props
 }) => {
-    return (
-        <button
-            type="button"
-            className={cx(
-                'w-full bg-white border-blue-500 border-1',
-                '[--tw-shadow:0_4px_6px_-1px_rgba(0,0,0,0.1),_0_2px_4px_-1px_rgba(0,0,0,0.06)]',
-                'shadow rounded text-blue-500 flex flex-row p-0 items-stretch text-base mb-4',
-                'hover:bg-gray-300 disabled:bg-black disabled:bg-opacity-15 disabled:text-black',
-                'disabled:text-opacity-30 disabled:border-black disabled:border-opacity-15 disabled:cursor-not-allowed',
-                className,
-            )}
-            disabled={disabled}
-            onClick={onClick}
-            {...props}
-        >
-            <div className="text-white text-2xl w-12 bg-blue-500 flex items-center justify-center mr-2 flex-col">
-                <Icon />
-            </div>
-            <div className="py-4 px-0 flex flex-grow justify-center">
-                {children}
-            </div>
-        </button>
-    );
+	return (
+		<button
+			type="button"
+			className={cx(
+				"w-full bg-white border-blue-500 border-1",
+				"[--tw-shadow:0_4px_6px_-1px_rgba(0,0,0,0.1),_0_2px_4px_-1px_rgba(0,0,0,0.06)]",
+				"shadow rounded text-blue-500 flex flex-row p-0 items-stretch text-base mb-4",
+				"hover:bg-gray-300 disabled:bg-black disabled:bg-opacity-15 disabled:text-black",
+				"disabled:text-opacity-30 disabled:border-black disabled:border-opacity-15 disabled:cursor-not-allowed",
+				className,
+			)}
+			disabled={disabled}
+			onClick={onClick}
+			{...props}
+		>
+			<div className="text-white text-2xl w-12 bg-blue-500 flex items-center justify-center mr-2 flex-col">
+				<Icon />
+			</div>
+			<div className="py-4 px-0 flex flex-grow justify-center">{children}</div>
+		</button>
+	);
 };
 
 export default ToolModalButton;

@@ -21,81 +21,81 @@
  *
  */
 
-import { BasicObject, BasicType } from 'definitions/general';
+import type { BasicObject, BasicType } from "definitions/general";
 
 class GCodeBlock {
-    words: Array<Array<string>> = null;
-    pairs: BasicObject = null;
-    flatPairs: BasicObject = null;
-    line: string = '';
+	words: Array<Array<string>> = null;
+	pairs: BasicObject = null;
+	flatPairs: BasicObject = null;
+	line: string = "";
 
-    constructor(words: Array<Array<string>>, line: string) {
-        this.line = line;
-        this.words = words;
-        this.toPairs();
-    }
+	constructor(words: Array<Array<string>>, line: string) {
+		this.line = line;
+		this.words = words;
+		this.toPairs();
+	}
 
-    toPairs(): void {
-        const result: BasicObject = {};
-        const flatResult: BasicObject = {};
-        for (let word of this.words) {
-            let letter = word[0];
-            let value = word[1];
-            flatResult[letter] = value;
-            if (letter === 'G' || letter === 'L') {
-                result[`${letter}${value}`] = true;
-            } else {
-                result[letter] = value;
-            }
-        }
-        this.pairs = result;
-        this.flatPairs = flatResult;
-    }
+	toPairs(): void {
+		const result: BasicObject = {};
+		const flatResult: BasicObject = {};
+		for (const word of this.words) {
+			const letter = word[0];
+			const value = word[1];
+			flatResult[letter] = value;
+			if (letter === "G" || letter === "L") {
+				result[`${letter}${value}`] = true;
+			} else {
+				result[letter] = value;
+			}
+		}
+		this.pairs = result;
+		this.flatPairs = flatResult;
+	}
 
-    asString(): string {
-        return this.line;
-    }
+	asString(): string {
+		return this.line;
+	}
 
-    has(word: string): boolean {
-        const result = word in this.pairs;
-        return result;
-    }
+	has(word: string): boolean {
+		const result = word in this.pairs;
+		return result;
+	}
 
-    hasLetter(letter: string): boolean {
-        return letter in this.flatPairs;
-    }
+	hasLetter(letter: string): boolean {
+		return letter in this.flatPairs;
+	}
 
-    get(word: string): BasicType {
-        if (word in this.pairs) {
-            return this.pairs[word];
-        }
-        return null;
-    }
+	get(word: string): BasicType {
+		if (word in this.pairs) {
+			return this.pairs[word];
+		}
+		return null;
+	}
 
-    getLetter(letter: string): BasicType {
-        if (letter in this.flatPairs) {
-            return this.flatPairs[letter];
-        }
-        return null;
-    }
+	getLetter(letter: string): BasicType {
+		if (letter in this.flatPairs) {
+			return this.flatPairs[letter];
+		}
+		return null;
+	}
 
-    getAxes(): Array<string> {
-        const axes: Array<string> = [];
-        if (this.has('X')) {
-            axes.push('X');
-        }
-        if (this.has('Y')) {
-            axes.push('Y');
-        }
-        if (this.has('Z')) {
-            axes.push('Z');
-        }
-        return axes;
-    }
+	getAxes(): Array<string> {
+		const axes: Array<string> = [];
+		if (this.has("X")) {
+			axes.push("X");
+		}
+		if (this.has("Y")) {
+			axes.push("Y");
+		}
+		if (this.has("Z")) {
+			axes.push("Z");
+		}
+		return axes;
+	}
 
-    isSimpleMotion(): boolean {
-        return this.has('G0') || this.has('G1');
-    }
+	isSimpleMotion(): boolean {
+		return this.has("G0") || this.has("G1");
+	}
 }
 
 export default GCodeBlock;

@@ -21,126 +21,132 @@
  *
  */
 
-import uuid from 'uuid';
-import os from 'os';
-import axios from 'axios';
-import isOnline from 'is-online';
+import axios from "axios";
+import isOnline from "is-online";
+import os from "os";
+import uuid from "uuid";
+import { USER_DATA_COLLECTION } from "../../app/src/constants";
+import pkg from "../../package.json";
+import { ERR_BAD_REQUEST, ERR_INTERNAL_SERVER_ERROR } from "../constants";
+import logger from "../lib/logger";
+import config from "../services/configstore";
 
-import logger from '../lib/logger';
-import config from '../services/configstore';
-import pkg from '../../package.json';
-import { ERR_BAD_REQUEST, ERR_INTERNAL_SERVER_ERROR } from '../constants';
-import { USER_DATA_COLLECTION } from '../../app/src/constants';
+const CONFIG_KEY = "metrics";
 
-const CONFIG_KEY = 'metrics';
-
-const log = logger('api:metrics');
+const log = logger("api:metrics");
 
 const generateUniqueID = () => {
-    const uniqueID = uuid.v4();
+	const uniqueID = uuid.v4();
 
-    config.set(`${CONFIG_KEY}.uniqueID`, uniqueID, { silent: true });
+	config.set(`${CONFIG_KEY}.uniqueID`, uniqueID, { silent: true });
 
-    return uniqueID;
+	return uniqueID;
 };
 
 export const getUniqueID = () => {
-    const uniqueID = config.get(`${CONFIG_KEY}.uniqueID`);
+	const uniqueID = config.get(`${CONFIG_KEY}.uniqueID`);
 
-    if (!uniqueID) {
-        return generateUniqueID();
-    }
+	if (!uniqueID) {
+		return generateUniqueID();
+	}
 
-    return uniqueID;
+	return uniqueID;
 };
 
 export const toggleCollectData = (req, res) => {
-    const { collectUserDataStatus } = req.body;
+	const { collectUserDataStatus } = req.body;
 
-    config.set(`${CONFIG_KEY}.collectUserData`, collectUserDataStatus);
+	config.set(`${CONFIG_KEY}.collectUserData`, collectUserDataStatus);
 
-    res.json({ collectUserDataStatus });
+	res.json({ collectUserDataStatus });
 };
 
 export const getCollectDataStatus = (_, res) => {
-    const collectUserDataStatus = config.get(`${CONFIG_KEY}.collectUserData`, USER_DATA_COLLECTION.INITIAL);
+	const collectUserDataStatus = config.get(
+		`${CONFIG_KEY}.collectUserData`,
+		USER_DATA_COLLECTION.INITIAL,
+	);
 
-    res.json({ collectUserDataStatus });
+	res.json({ collectUserDataStatus });
 };
 
 export const sendData = async (req, res) => {
-    const payload = {
-        userID: getUniqueID(),
-        gSenderVersion: pkg.version,
-        os: os.type(),
-        osVersion: os.version(),
-        release: os.release(),
-        arch: os.arch(),
-        machineProfile: JSON.stringify(req.body),
-    };
+	const payload = {
+		userID: getUniqueID(),
+		gSenderVersion: pkg.version,
+		os: os.type(),
+		osVersion: os.version(),
+		release: os.release(),
+		arch: os.arch(),
+		machineProfile: JSON.stringify(req.body),
+	};
 
-    const ENDPOINT = global.METRICS_ENDPOINT;
-    const NODE_ENV = global.NODE_ENV;
+	const ENDPOINT = global.METRICS_ENDPOINT;
+	const NODE_ENV = global.NODE_ENV;
 
-    //Don't need to ping the API
-    if (NODE_ENV === 'development') {
-        res.json({ message: 'Mock 200 status return' });
-        return;
-    }
+	//Don't need to ping the API
+	if (NODE_ENV === "development") {
+		res.json({ message: "Mock 200 status return" });
+		return;
+	}
 
-    const internetConnectivity = await isOnline();
+	const internetConnectivity = await isOnline();
 
-    if (!internetConnectivity) {
-        res.status(ERR_BAD_REQUEST).send({ msg: 'Not Connected to the Internet' });
-        return;
-    }
+	if (!internetConnectivity) {
+		res.status(ERR_BAD_REQUEST).send({ msg: "Not Connected to the Internet" });
+		return;
+	}
 
-    try {
-        const metricsRes = await axios.post(`${ENDPOINT}/metrics`, payload);
+	try {
+		const metricsRes = await axios.post(`${ENDPOINT}/metrics`, payload);
 
-        res.status(201).json(metricsRes.data);
-    } catch (error) {
-        log.debug(`Error Sending Usage Data for ${payload.userID}. API Might Be Offline.`);
-        res.status(ERR_INTERNAL_SERVER_ERROR).json({ error });
-    }
+		res.status(201).json(metricsRes.data);
+	} catch (error) {
+		log.debug(
+			`Error Sending Usage Data for ${payload.userID}. API Might Be Offline.`,
+		);
+		res.status(ERR_INTERNAL_SERVER_ERROR).json({ error });
+	}
 };
 
 export const sendUsageData = async (req, res) => {
-    const payload = {
-        toolName: req.body?.data,
-        user: {
-            gSenderVersion: pkg.version,
-            os: os.type(),
-            osVersion: os.version(),
-            release: os.release(),
-            arch: os.arch(),
-            userID: getUniqueID(),
-        },
-    };
+	const payload = {
+		toolName: req.body?.data,
+		user: {
+			gSenderVersion: pkg.version,
+			os: os.type(),
+			osVersion: os.version(),
+			release: os.release(),
+			arch: os.arch(),
+			userID: getUniqueID(),
+		},
+	};
 
-    const ENDPOINT = global.METRICS_ENDPOINT;
+	const ENDPOINT = global.METRICS_ENDPOINT;
 
-    const NODE_ENV = global.NODE_ENV;
+	const NODE_ENV = global.NODE_ENV;
 
-    //Don't need to ping the API
-    if (NODE_ENV === 'development') {
-        res.json({ message: 'Mock 200 status return' });
-        return;
-    }
+	//Don't need to ping the API
+	if (NODE_ENV === "development") {
+		res.json({ message: "Mock 200 status return" });
+		return;
+	}
 
-    const internetConnectivity = await isOnline();
+	const internetConnectivity = await isOnline();
 
-    if (!internetConnectivity) {
-        res.status(ERR_BAD_REQUEST).send({ msg: 'Not Connected to the Internet' });
-        return;
-    }
+	if (!internetConnectivity) {
+		res.status(ERR_BAD_REQUEST).send({ msg: "Not Connected to the Internet" });
+		return;
+	}
 
-    try {
-        const usageRes = await axios.post(`${ENDPOINT}/usage`, payload);
+	try {
+		const usageRes = await axios.post(`${ENDPOINT}/usage`, payload);
 
-        res.status(201).json(usageRes.data);
-    } catch (error) {
-        log.debug(`Error Sending Usage Data for ${payload.userID}. API Might Be Offline.`);
-        res.status(ERR_INTERNAL_SERVER_ERROR).json({ error });
-    }
+		res.status(201).json(usageRes.data);
+	} catch (error) {
+		log.debug(
+			`Error Sending Usage Data for ${payload.userID}. API Might Be Offline.`,
+		);
+		res.status(ERR_INTERNAL_SERVER_ERROR).json({ error });
+	}
 };

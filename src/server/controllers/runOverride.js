@@ -4,44 +4,45 @@
 // @param {number} overridePercentage The amount of percentage increase or decrease.
 // @param {string} type The type of override - spindle or feeder
 
-export const calcOverrides = (difference = 100, type = 'feed') => {
-    const commandQueue = [];
+export const calcOverrides = (difference = 100, type = "feed") => {
+	const commandQueue = [];
 
-    if (difference === 0) {
-        return commandQueue;
-    }
+	if (difference === 0) {
+		return commandQueue;
+	}
 
-    const commands = {
-        spindle: {
-            majorIncrease: String.fromCharCode(0x9A),
-            majorDecrease: String.fromCharCode(0x9B),
-            minorIncrease: String.fromCharCode(0x9C),
-            minorDecrease: String.fromCharCode(0x9D),
-        },
-        feed: {
-            majorIncrease: String.fromCharCode(0x91),
-            majorDecrease: String.fromCharCode(0x92),
-            minorIncrease: String.fromCharCode(0x93),
-            minorDecrease: String.fromCharCode(0x94),
-        }
-    };
-    const { majorIncrease, majorDecrease, minorIncrease, minorDecrease } = commands[type];
-    // Determine quotient and remainder to determine amount of major and minor commands to send
-    const absValue = Math.abs(difference);
-    const quotient = Math.floor(absValue / 10);
-    const remainder = absValue % 10;
+	const commands = {
+		spindle: {
+			majorIncrease: String.fromCharCode(0x9a),
+			majorDecrease: String.fromCharCode(0x9b),
+			minorIncrease: String.fromCharCode(0x9c),
+			minorDecrease: String.fromCharCode(0x9d),
+		},
+		feed: {
+			majorIncrease: String.fromCharCode(0x91),
+			majorDecrease: String.fromCharCode(0x92),
+			minorIncrease: String.fromCharCode(0x93),
+			minorDecrease: String.fromCharCode(0x94),
+		},
+	};
+	const { majorIncrease, majorDecrease, minorIncrease, minorDecrease } =
+		commands[type];
+	// Determine quotient and remainder to determine amount of major and minor commands to send
+	const absValue = Math.abs(difference);
+	const quotient = Math.floor(absValue / 10);
+	const remainder = absValue % 10;
 
-    if (difference > 0) {
-        commandQueue.push(
-            ...Array.from({ length: quotient }).fill(majorIncrease),
-            ...Array.from({ length: remainder }).fill(minorIncrease)
-        );
-    } else {
-        commandQueue.push(
-            ...Array.from({ length: quotient }).fill(majorDecrease),
-            ...Array.from({ length: remainder }).fill(minorDecrease)
-        );
-    }
-    // Space out realtime commands by 50ms intervals
-    return commandQueue;
+	if (difference > 0) {
+		commandQueue.push(
+			...Array.from({ length: quotient }).fill(majorIncrease),
+			...Array.from({ length: remainder }).fill(minorIncrease),
+		);
+	} else {
+		commandQueue.push(
+			...Array.from({ length: quotient }).fill(majorDecrease),
+			...Array.from({ length: remainder }).fill(minorDecrease),
+		);
+	}
+	// Space out realtime commands by 50ms intervals
+	return commandQueue;
 };
