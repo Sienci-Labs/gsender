@@ -860,6 +860,8 @@ o100 endif
 
 o101 if [[EXISTS[#<_tc_slots>]] EQ 0]
   (abort, ATCI:1|Tool Changer Disabled|Setup parameter "_tc_slots" missing. Please run ATC Setup and try again. [A-200-03])
+o101 elseif [#<_tc_slots> LT 0]
+  (abort, ATCI:1|Tool Changer Disabled|Setup parameter "_tc_slots" invalid. Please run ATC Setup and try again. [A-200-13])
 o101 endif
 (debug, Slots: #<_tc_slots>)
 
@@ -917,7 +919,10 @@ o104 endif
 ;#<_tc_slot_offset> = 90; Enable for Ad-hoc definition.
 o105 if [[EXISTS[#<_tc_slot_offset>]] EQ 0]
   (abort, ATCI:1|Tool Changer Disabled|Setup parameter "_tc_slot_offset" missing. Please run ATC Setup and try again. [A-200-07])
+o105 elseif [[EXISTS[#<_initializing>] NE 1] AND [#<_tc_slots> GT 0] AND [#<_tc_slot_offset> LE 0]]
+  (abort, ATCI:1|Tool Changer Disabled|Rack offset invalid. Please run ATC Setup again or correct the value in ATC Options. [A-200-12])
 o105 endif
+
 (debug, Slot Offset: #<_tc_slot_offset>)
 
 ; The X and Y machine coordinate positions for loading off rack tools
@@ -2148,8 +2153,8 @@ export const P505Content = getMacroContent('P505.macro');
 export const TCContent = getMacroContent('TC.macro');
 export const P200Content = getMacroContent('P200.macro');
 export const defaultATCIMacros: ATCIMacroConfig = {
-    version: 20260521,
-    sdVersion: 20260521,
+    version: 20260527,
+    sdVersion: 20260527,
     variables: {
         _tc_rack_enable: {
             default: 0,

@@ -2,7 +2,7 @@ const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
 
-const YOUR_FILE_PATH = "./output/gSender-1.6.2-Windows-64Bit.exe"
+const YOUR_FILE_PATH = "./output/gSender-1.6.2-Windows-64Bit (1).exe"
 
 function hashFile(file, algorithm = "sha512", encoding = "base64", options) {
 	return new Promise((resolve, reject) => {

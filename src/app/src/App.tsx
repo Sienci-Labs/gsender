@@ -11,6 +11,7 @@ import { posthog } from 'posthog-js';
 import { useEffect } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 import { HashRouter } from 'react-router';
+import isElectron from 'is-electron';
 
 function App() {
 	useEffect(() => {
@@ -41,6 +42,13 @@ function App() {
             posthog.opt_in_capturing();
         } else {
             posthog.opt_out_capturing();
+        }
+
+        if (isElectron()) {
+            console.log('Getting windows registry');
+            window.ipcRenderer.invoke('get-windows-registry').then((value: boolean) => {
+                posthog.register({ isBundled: value });
+            });
         }
     }, []);
 
