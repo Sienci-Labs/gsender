@@ -9,12 +9,12 @@ export default function CarveView() {
             {/* 2-col main grid */}
             <div className="flex-1 grid grid-cols-2 gap-3 p-3 min-h-0 overflow-hidden">
                 {/* Left col: visualizer + job controls */}
-                <div className="flex flex-col gap-3 min-h-0 overflow-y-auto">
+                <div className="flex flex-col gap-3 min-h-0 overflow-y-auto no-scrollbar">
                     <VisualizerCard />
                 </div>
 
                 {/* Right col: DRO + jogging */}
-                <div className="flex flex-col gap-3 min-h-0 overflow-y-auto">
+                <div className="flex flex-col gap-3 min-h-0 overflow-y-auto no-scrollbar">
                     <DROCard />
                     <JoggingCard />
                 </div>
