@@ -197,7 +197,7 @@ function ATCContent({ mode }: { mode: DrawerMode }) {
                     type="button"
                     onClick={openToolTable}
                     disabled={disabled}
-                    className="w-24 shrink-0 flex flex-col items-center justify-center gap-1.5 rounded-xl border border-gray-300 dark:border-dark-lighter bg-gray-50 dark:bg-dark text-gray-600 dark:text-gray-300 text-xs font-medium disabled:opacity-40 disabled:cursor-default transition-colors hover:bg-gray-100 dark:hover:bg-dark-lighter"
+                    className="w-48 shrink-0 flex flex-col items-center justify-center gap-1.5 rounded-xl border border-gray-300 dark:border-dark-lighter bg-gray-50 dark:bg-dark text-gray-600 dark:text-gray-300 text-xs font-medium disabled:opacity-40 disabled:cursor-default transition-colors hover:bg-gray-100 dark:hover:bg-dark-lighter"
                 >
                     <Table2 className="w-5 h-5" />
                     <span>Tools</span>
