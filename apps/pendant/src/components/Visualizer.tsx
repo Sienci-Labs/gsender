@@ -4,6 +4,7 @@ import { GCodeSVGVisualizer } from '@sienci/gviewer/react';
 import type { GCodeSVGRendererHandle } from '@sienci/gviewer/react';
 import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import type { RootState } from '@gsender/controller-client/store/redux';
+import { WORKFLOW_STATE_RUNNING } from 'app/constants';
 import {
     PENDANT_BOUNDS_COLOR,
     PENDANT_CUT_COLOR,
@@ -13,6 +14,8 @@ import {
 export default function Visualizer() {
     const svgRef = useRef<GCodeSVGRendererHandle>(null);
     const fileLoaded = useTypedSelector((s: RootState) => s.file.fileLoaded);
+    const workflowState = useTypedSelector((s: RootState) => s.controller.workflow.state);
+    const wpos = useTypedSelector((s: RootState) => s.controller.wpos);
 
     useEffect(() => {
         const tokens = [
@@ -35,6 +38,19 @@ export default function Visualizer() {
             svgRef.current?.clear();
         }
     }, [fileLoaded]);
+
+    useEffect(() => {
+        svgRef.current?.setBitVisible(workflowState === WORKFLOW_STATE_RUNNING);
+    }, [workflowState]);
+
+    useEffect(() => {
+        if (workflowState !== WORKFLOW_STATE_RUNNING) return;
+        svgRef.current?.setBitPosition({
+            x: Number(wpos.x),
+            y: Number(wpos.y),
+            z: Number(wpos.z),
+        });
+    }, [wpos, workflowState]);
 
     return (
         <GCodeSVGVisualizer

@@ -6097,6 +6097,11 @@ body.reduced-motion * {
   border-color: rgb(16 185 129 / var(--tw-border-opacity, 1)) !important;
 }
 
+.dark\:border-gray-400:is(.dark *) {
+  --tw-border-opacity: 1 !important;
+  border-color: rgb(156 163 175 / var(--tw-border-opacity, 1)) !important;
+}
+
 .dark\:border-gray-500:is(.dark *) {
   --tw-border-opacity: 1 !important;
   border-color: rgb(107 114 128 / var(--tw-border-opacity, 1)) !important;
