@@ -147,7 +147,9 @@ describe('Rotary surfacing', () => {
       .click();
     cy.wait(500);
     
-    // Step 15: Start the job
+    // Step 15: Make all axes 0 and Start the job 
+    cy.zeroAllAxes();
+    cy.wait(500);
     cy.get('div.top-\\[-30px\\] > div:nth-of-type(1) > button')
       .contains('Start')
       .should('be.visible')

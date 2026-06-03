@@ -45,16 +45,16 @@ describe('Surfacing Test', () => {
     // Step 5: Configure Width
     cy.log('Step 5: Setting width to 75mm');
     cy.get('#width')
-      .should('be.visible')
-      .invoke('val', '')
-      .type('75');
-    cy.wait(300);
+  .should('be.visible')
+  .clear()
+  .type('75');
+  cy.wait(300);
 
     // Step 6: Configure Length
     cy.log('Step 6: Setting length to 75mm');
     cy.get('#length')
       .should('be.visible')
-      .invoke('val', '')
+      .clear()
       .type('75');
     cy.wait(300);
 
@@ -62,7 +62,7 @@ describe('Surfacing Test', () => {
     cy.log('Step 7: Setting skim depth to 1mm');
     cy.get('#skimDepth')
       .should('be.visible')
-      .invoke('val','')
+      .clear()
       .type('1');
     cy.wait(300);
 
@@ -70,7 +70,7 @@ describe('Surfacing Test', () => {
     cy.log('Step 8: Setting max depth to 1mm');
     cy.get('#maxDepth')
       .should('be.visible')
-      .invoke('val','')
+      .clear()
       .type('1');
     cy.wait(300);
 
@@ -83,28 +83,28 @@ cy.contains('label', /bit diameter/i)
 // Step 9: Configure Bit Diameter
 cy.log('Step 9: Setting bit diameter to 22mm');
 cy.get('div.px-8 div:nth-of-type(4) input')
-  .invoke('val', '')
+  .clear()
   .type('22');
 cy.wait(300);
 
 // Step 10: Configure Stepover
 cy.log('Step 10: Setting stepover to 40%');
 cy.get('div.px-8 div:nth-of-type(5) input')
-  .invoke('val', '')
+  .clear()
   .type('40');
 cy.wait(300);
 
 // Step 11: Configure Feedrate
 cy.log('Step 11: Setting feedrate to 2500 mm/min');
 cy.get('div.px-8 div:nth-of-type(6) input')
-  .invoke('val', '')
+  .clear()
   .type('2500');
 cy.wait(300);
 
 // Step 12: Configure Spindle RPM
 cy.log('Step 12: Setting spindle RPM to 17000');
 cy.get('div.px-8 div:nth-of-type(7) input')
-  .invoke('val', '')
+  .clear()
   .type('17000');
 cy.wait(500);
 
@@ -124,7 +124,10 @@ cy.wait(500);
     cy.wait(2000);
     cy.log('Loaded to main visualizer');
 
-    // Step 15: Starting Job
+    // Step 15: Zero all axes and Starting Job
+    cy.log('Make all axes 0');
+    cy.zeroAllAxes();
+    cy.wait(500);
     cy.log('Step 15: Starting Job...');
     cy.get('div.top-\\[-30px\\] > div:nth-of-type(1) > button')
       .contains('Start')

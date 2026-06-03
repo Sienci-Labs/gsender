@@ -46,9 +46,9 @@ describe('gSender Movement tuning test', () => {
 
     // Step 6: Select X-axis from dropdown
     cy.log('Step 6: Selecting X-axis from dropdown...');
-    cy.get('div.css-19bb58m')
-      .should('be.visible')
-      .click();
+    cy.get('div.space-y-1 > div.gap-2')
+    .find('svg')
+    .click();
     cy.wait(500);
     
     cy.get('#react-select-2-option-0')
@@ -139,17 +139,14 @@ describe('gSender Movement tuning test', () => {
     // ========== Y-AXIS TESTING ==========
 
     // Step 6: Select Y-axis from dropdown
-    cy.log('Step 6: Selecting Y-axis...');
-    cy.get('div.css-19bb58m')
-      .should('be.visible')
-      .click();
-    cy.wait(500);
+  cy.log('Step 6: Selecting Y-axis...');
+// Open the dropdown
+cy.get('div.space-y-1 > div.gap-2').find('svg').click();
+cy.wait(500);
 
-    cy.get('[id^="react-select-"][id$="-option-1"]')
-      .should('be.visible')
-      .click();
-    cy.wait(1000);
-    cy.log('Y-axis selected');
+// Click Y-Axis option (option-1)
+cy.contains('[id^="react-select"][id$="option-1"]', 'Y').click();
+cy.wait(500);
 
     // Step 7: Click "Start Movement Tuning" button
     cy.log('Step 7: Starting Movement Tuning wizard...');
