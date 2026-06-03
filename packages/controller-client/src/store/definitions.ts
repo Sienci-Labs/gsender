@@ -141,6 +141,8 @@ export interface HelperState {
 export interface FileInfoState {
     fileLoaded: boolean;
     fileProcessing: boolean;
+    processingName: string;
+    processingProgress: number;
     renderState: RENDER_STATE_T;
     name: string;
     path: string;

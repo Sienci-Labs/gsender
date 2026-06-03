@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
-
 interface Props {
     fileName: string;
+    progress: number;
 }
 
 const LINE_WIDTHS = [92, 61, 83, 50, 74, 66];
@@ -15,19 +14,7 @@ function segmentColor(index: number, filled: boolean): string {
     return 'bg-orange-500';
 }
 
-export default function FileLoadingOverlay({ fileName }: Props) {
-    const [progress, setProgress] = useState(0);
-
-    useEffect(() => {
-        const id = setInterval(() => {
-            setProgress((p) => {
-                const next = p + 0.3 + Math.random() * 1.4;
-                return next >= 100 ? 0 : next;
-            });
-        }, 60);
-        return () => clearInterval(id);
-    }, []);
-
+export default function FileLoadingOverlay({ fileName, progress }: Props) {
     const pct = `${Math.floor(progress)}%`;
     const filledSegments = Math.floor((progress / 100) * SEGMENT_COUNT);
     const shortName = fileName.length > 28 ? `…${fileName.slice(-26)}` : fileName;

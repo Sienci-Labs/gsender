@@ -7,6 +7,8 @@ import { FileInfoState } from 'app/store/definitions';
 const initialState: FileInfoState = {
     fileLoaded: false,
     fileProcessing: false,
+    processingName: '',
+    processingProgress: 0,
     renderState: RENDER_NO_FILE,
     name: null,
     path: '',
@@ -59,6 +61,8 @@ const fileInfoSlice = createSlice({
                 ...action.payload,
                 fileLoaded: true,
                 fileProcessing: false,
+                processingName: '',
+                processingProgress: 0,
                 ...bbox,
             };
         },
@@ -78,9 +82,28 @@ const fileInfoSlice = createSlice({
         },
         updateFileProcessing: (
             state,
-            action: PayloadAction<{ fileProcessing: boolean }>,
+            action: PayloadAction<
+                boolean | {
+                    fileProcessing: boolean;
+                    processingName?: string;
+                    processingProgress?: number;
+                }
+            >,
         ) => {
-            state.fileProcessing = action.payload.fileProcessing;
+            const payload = typeof action.payload === 'boolean'
+                ? { fileProcessing: action.payload }
+                : action.payload;
+
+            state.fileProcessing = payload.fileProcessing;
+
+            if (!payload.fileProcessing) {
+                state.processingName = '';
+                state.processingProgress = 0;
+                return;
+            }
+
+            state.processingName = payload.processingName ?? state.processingName;
+            state.processingProgress = payload.processingProgress ?? state.processingProgress;
         },
         updateFileRenderState: (
             state,

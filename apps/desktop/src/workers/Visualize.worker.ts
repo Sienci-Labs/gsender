@@ -50,6 +50,7 @@ interface WorkerData {
     jobId?: number;
     visualizer?: VISUALIZER_TYPES_T;
     isLaser?: boolean;
+    rapidOpacity?: number;
     shouldIncludeSVG?: boolean;
     needsVisualization?: boolean;
     accelerations?: any;
@@ -344,6 +345,7 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
         jobId = 0,
         visualizer,
         isLaser = false,
+        rapidOpacity = 0.5,
         shouldIncludeSVG = false,
         needsVisualization = true,
         // parsedData = {},
@@ -584,7 +586,7 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                             1,
                             Math.ceil(Math.abs((v2.a || 0) - (v1.a || 0)) / 5),
                         );
-                        const opacity = motion === 'G0' ? 0.5 : 1;
+                        const opacity = motion === 'G0' ? rapidOpacity : 1;
 
                         // Reusable scalars — no per-iteration object allocation
                         let prevX = 0, prevY = 0, prevZ = 0;
@@ -662,7 +664,7 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                         v2.z = newV2.z;
 
                         // normal
-                        const opacity = motion === 'G0' ? 0.5 : 1;
+                        const opacity = motion === 'G0' ? rapidOpacity : 1;
                         pushMotionColor(motion, opacity, 2);
                         pushFloat32_6(
                             vertices,

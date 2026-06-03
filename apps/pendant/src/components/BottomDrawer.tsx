@@ -17,7 +17,8 @@ import {
     pickGcodeFile,
     readGcodeFile,
 } from '../electron-bridge';
-import { applyGcodeFile, computeBounds } from '../utils/fileLoader';
+import { applyGcodeFile } from '../utils/fileLoader';
+import { cancelGcodeProcessing } from '../utils/gcodeProcessing';
 import { store as reduxStore } from '@gsender/controller-client/store/redux';
 import { unloadFileInfo } from '@gsender/controller-client/store/redux/slices/fileInfo.slice';
 import { addToHistory } from '@gsender/controller-client/store/redux/slices/console.slice';
@@ -170,6 +171,7 @@ export default function BottomDrawer() {
     };
 
     const handleUnload = () => {
+        cancelGcodeProcessing();
         reduxStore.dispatch(unloadFileInfo());
         setLoadedAt(null);
     };

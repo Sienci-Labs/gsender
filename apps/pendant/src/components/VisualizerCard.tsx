@@ -12,7 +12,11 @@ import FileLoadingOverlay from './FileLoadingOverlay';
 export default function VisualizerCard() {
     const fileLoaded = useTypedSelector((s: RootState) => s.file.fileLoaded);
     const fileProcessing = useTypedSelector((s: RootState) => s.file.fileProcessing);
-    const fileName = useTypedSelector((s: RootState) => s.file.name ?? '');
+    const processingName = useTypedSelector((s: RootState) => s.file.processingName ?? '');
+    const processingProgress = useTypedSelector((s: RootState) => s.file.processingProgress ?? 0);
+    const fileName = useTypedSelector((s: RootState) =>
+        s.file.fileProcessing ? (s.file.processingName || s.file.name || '') : (s.file.name || ''),
+    );
 
     return (
         <div className="flex flex-col gap-3">
@@ -32,7 +36,10 @@ export default function VisualizerCard() {
                     <Visualizer />
                     {fileProcessing && (
                         <div className="absolute inset-0 flex items-center justify-center p-3 bg-dark-darker/95">
-                            <FileLoadingOverlay fileName={fileName} />
+                            <FileLoadingOverlay
+                                fileName={processingName || fileName}
+                                progress={processingProgress}
+                            />
                         </div>
                     )}
                     {!fileLoaded && !fileProcessing && (

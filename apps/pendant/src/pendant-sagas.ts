@@ -21,9 +21,12 @@ import {
     addSpindle,
 } from '@gsender/controller-client/store/redux/slices/controller.slice';
 import {
-    updateFileContent,
     unloadFileInfo,
 } from '@gsender/controller-client/store/redux/slices/fileInfo.slice';
+import {
+    applyControllerGcodePayload,
+    shouldIgnoreControllerGcodeLoad,
+} from './utils/gcodeProcessing';
 
 import type { PortInfo } from '@gsender/controller-client/store/definitions';
 import type { ControllerSettings, FIRMWARE_TYPES_T } from 'app/definitions/firmware';
@@ -105,13 +108,21 @@ export function* initialize() {
     // ── File load/unload (feeds the SVG visualizer) ────────────────────────
     controller.addListener('gcode:load', (name: string, content: string) => {
         const size = new Blob([content]).size;
-        reduxStore.dispatch(updateFileContent({ content, size, name }));
+        const payload = { content, size, name };
+        if (shouldIgnoreControllerGcodeLoad(payload)) {
+            return;
+        }
+        void applyControllerGcodePayload(payload);
     });
 
     controller.addListener(
         'file:load',
         (content: string, size: number, name: string) => {
-            reduxStore.dispatch(updateFileContent({ content, size, name }));
+            const payload = { content, size, name };
+            if (shouldIgnoreControllerGcodeLoad(payload)) {
+                return;
+            }
+            void applyControllerGcodePayload(payload);
         },
     );
 
