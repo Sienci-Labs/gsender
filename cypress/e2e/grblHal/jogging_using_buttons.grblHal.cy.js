@@ -24,9 +24,10 @@ describe('Gsender testing jogging using buttons', () => {
     cy.wait(2000);
     cy.log(' Machine is Idle');
 
-    // Step 3: Move to position (0, 0, 0)
-    cy.log('Step 3: Moving to position (0, 0, 0)...');
-    cy.goToLocation({ x: 0, y: 0, z: 0 });
+    // Step 3: Zero all axes (0, 0, 0)
+    cy.log('Step 3: Zero All axes');
+    cy.zeroAllAxes();
+    
 
     // Step 4: Check initial position
     cy.log('Step 4: Checking initial position...');

@@ -10,7 +10,7 @@ describe('gSender UI Load Test', () => {
     cy.visit('/', { timeout: 30000 });
 
     // Wait for title with timeout
-    cy.title({ timeout: 15000 }).should('eq', 'gSender 1.6.0');
+    cy.title({ timeout: 15000 }).should('eq', 'gSender'); // avoid version number
 
     // Wait for body to be visible
     cy.get('body', { timeout: 15000 }).should('be.visible');

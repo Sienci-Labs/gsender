@@ -6,6 +6,7 @@ const OUTPUT_DIR     = path.join(__dirname, 'report');
 const OUTPUT_FILE    = path.join(OUTPUT_DIR, 'index.html');
 
 const POSSIBLE_REPORTS = [
+  path.join(__dirname, '..', 'reports', 'mochawesome', '.jsons', 'mochawesome.json'),
   path.join(__dirname, '..', 'reports', 'mochawesome', 'merged.json'),
   path.join(__dirname, '..', 'reports', 'mochawesome', 'index.json'),
   path.join(__dirname, '..', 'reports', 'merged.json'),
