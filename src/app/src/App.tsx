@@ -47,8 +47,8 @@ function App() {
 
         if (isElectron()) {
             console.log('Getting windows registry');
-            window.ipcRenderer.invoke('get-windows-registry').then((value) => {
-                console.log({ REGISTRY: value });
+            window.ipcRenderer.invoke('get-windows-registry').then((value: boolean) => {
+                posthog.register({ isBundled: value });
             });
         }
     }, []);
