@@ -21,126 +21,128 @@
  *
  */
 
-import pubsub from 'pubsub-js';
+import { toast } from "app/lib/toaster";
 
-import store from 'app/store';
-import { toast } from 'app/lib/toaster';
-import { RecentFile } from '../definitions';
-import { FileData } from '..';
+import store from "app/store";
+import pubsub from "pubsub-js";
+import type { FileData } from "..";
+import type { RecentFile } from "../definitions";
 
 export const RECENT_FILE_LIMIT = 8;
 
 export const recentFileExists = (
-    filePath: string,
-    recentFiles: RecentFile[],
+	filePath: string,
+	recentFiles: RecentFile[],
 ) => {
-    const file = recentFiles.find((file) => file.filePath === filePath);
-    return !!file;
+	const file = recentFiles.find((file) => file.filePath === filePath);
+	return !!file;
 };
 
 export const createRecentFile = ({
-    name,
-    dir,
+	name,
+	dir,
 }: {
-    name: string;
-    dir: string;
+	name: string;
+	dir: string;
 }) => {
-    return {
-        fileName: name,
-        filePath: `${dir}\\${name}`,
-        timeUploaded: Date.now(),
-    };
+	return {
+		fileName: name,
+		filePath: `${dir}\\${name}`,
+		timeUploaded: Date.now(),
+	};
 };
 
 export const createRecentFileFromRawPath = (file: FileData): RecentFile => {
-    return {
-        fileName: file.name,
-        filePath: file.path,
-        fileSize: file.size,
-        timeUploaded: Date.now(),
-    };
+	return {
+		fileName: file.name,
+		filePath: file.path,
+		fileSize: file.size,
+		timeUploaded: Date.now(),
+	};
 };
 
 export const updateRecentFileDate = (
-    filepath: string,
-    recentFiles: RecentFile[],
+	filepath: string,
+	recentFiles: RecentFile[],
 ) => {
-    recentFiles.forEach((recentFile) => {
-        if (recentFile.filePath === filepath) {
-            recentFile.timeUploaded = Date.now();
-        }
-    });
-    return recentFiles;
+	recentFiles.forEach((recentFile) => {
+		if (recentFile.filePath === filepath) {
+			recentFile.timeUploaded = Date.now();
+		}
+	});
+	return recentFiles;
 };
 
 export const addRecentFile = (fileMetaData: RecentFile) => {
-    if (fileMetaData === null) {
-        toast.error(
-            'Unable to load file - file may have been moved or deleted.',
-            { position: 'bottom-right' }
-        );
-        return;
-    }
-    const recentFiles = getRecentFiles();
+	if (fileMetaData === null) {
+		toast.error("Unable to load file - file may have been moved or deleted.", {
+			position: "bottom-right",
+		});
+		return;
+	}
+	const recentFiles = getRecentFiles();
 
-    let sortedFiles;
+	let sortedFiles;
 
-    if (recentFileExists(fileMetaData.filePath, recentFiles)) {
-        sortedFiles = updateRecentFileDate(fileMetaData.filePath, recentFiles);
-        sortedFiles = sortRecentFiles(sortedFiles);
-    } else {
-        recentFiles.push(fileMetaData);
-        sortedFiles = sortRecentFiles(recentFiles);
-        sortedFiles = trimRecentFilesToLimit(sortedFiles);
-    }
+	if (recentFileExists(fileMetaData.filePath, recentFiles)) {
+		sortedFiles = updateRecentFileDate(fileMetaData.filePath, recentFiles);
+		sortedFiles = sortRecentFiles(sortedFiles);
+	} else {
+		recentFiles.push(fileMetaData);
+		sortedFiles = sortRecentFiles(recentFiles);
+		sortedFiles = trimRecentFilesToLimit(sortedFiles);
+	}
 
-    updateStoredRecentFiles(sortedFiles);
-    pubsub.publish('recent-files-updated', sortedFiles);
+	updateStoredRecentFiles(sortedFiles);
+	pubsub.publish("recent-files-updated", sortedFiles);
 };
 
 export const getRecentFiles = (): RecentFile[] => {
-    const savedFiles = store.get('workspace.recentFiles', []);
-    return savedFiles.slice();
+	const savedFiles = store.get("workspace.recentFiles", []);
+	return savedFiles.slice();
 };
 
 export const updateStoredRecentFiles = (recentFiles: RecentFile[]) => {
-    store.replace('workspace.recentFiles', recentFiles);
+	store.replace("workspace.recentFiles", recentFiles);
 };
 
 export const trimRecentFilesToLimit = (
-    recentFiles: any[],
-    limit = RECENT_FILE_LIMIT,
+	recentFiles: any[],
+	limit = RECENT_FILE_LIMIT,
 ) => {
-    if (recentFiles.length > limit) {
-        return recentFiles.slice(0, limit);
-    }
-    return recentFiles;
+	if (recentFiles.length > limit) {
+		return recentFiles.slice(0, limit);
+	}
+	return recentFiles;
 };
 
 export const recentFileSortHandler = (a: any, b: any) => {
-    return b.timeUploaded - a.timeUploaded;
+	return b.timeUploaded - a.timeUploaded;
 };
 
 export const sortRecentFiles = (recentFiles: RecentFile[] = []) => {
-    return recentFiles.sort(recentFileSortHandler);
+	return recentFiles.sort(recentFileSortHandler);
 };
 
 export const loadRecentFile = (filePath: string) => {
-    (window as any).ipcRenderer.send('load-recent-file', {
-        filePath: filePath,
-    });
-    return true;
+	(window as any).ipcRenderer.send("load-recent-file", {
+		filePath: filePath,
+	});
+	return true;
 };
 
 export const deleteRecentFile = (filePath: string) => {
-    let savedFiles: RecentFile[] = store.get('workspace.recentFiles', []);
-    let updatedFiles = savedFiles.slice();
-    const indexToDelete = updatedFiles.findIndex((file, _index) => file.filePath === filePath);
-    if (indexToDelete > -1) { // sanity check
-        updatedFiles.splice(indexToDelete, 1);
-        updateStoredRecentFiles(updatedFiles);
-        pubsub.publish('recent-files-updated', updatedFiles);
-    } else {
-        console.error('Recent file to be deleted cannot be found in storage');
-    }
+	const savedFiles: RecentFile[] = store.get("workspace.recentFiles", []);
+	const updatedFiles = savedFiles.slice();
+	const indexToDelete = updatedFiles.findIndex(
+		(file, _index) => file.filePath === filePath,
+	);
+	if (indexToDelete > -1) {
+		// sanity check
+		updatedFiles.splice(indexToDelete, 1);
+		updateStoredRecentFiles(updatedFiles);
+		pubsub.publish("recent-files-updated", updatedFiles);
+	} else {
+		console.error("Recent file to be deleted cannot be found in storage");
+	}
 };

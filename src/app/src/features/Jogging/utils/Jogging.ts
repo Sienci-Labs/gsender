@@ -1,237 +1,235 @@
-import map from 'lodash/map';
-
-import controller from 'app/lib/controller';
 import {
-    GRBL_ACTIVE_STATE_IDLE,
-    GRBL_ACTIVE_STATE_JOG,
-    GRBLHAL,
-} from 'app/constants';
-import store from 'app/store';
-import { FIRMWARE_TYPES_T } from 'app/definitions/firmware';
-import { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
+	GRBL_ACTIVE_STATE_IDLE,
+	GRBL_ACTIVE_STATE_JOG,
+	GRBLHAL,
+} from "app/constants";
+import type { FIRMWARE_TYPES_T } from "app/definitions/firmware";
+import type { GRBL_ACTIVE_STATES_T } from "app/definitions/general";
+import controller from "app/lib/controller";
+import store from "app/store";
+import map from "lodash/map";
 
 export interface JogSpeeds {
-    aStep: number;
-    zStep: number;
-    xyStep: number;
-    feedrate: number;
+	aStep: number;
+	zStep: number;
+	xyStep: number;
+	feedrate: number;
 }
 
-export type JoggingSpeedOptions = 'Rapid' | 'Normal' | 'Precise';
+export type JoggingSpeedOptions = "Rapid" | "Normal" | "Precise";
 
 export function jogAxis(params: JogDistances, feedrate: number) {
-    const preventJoggingPastLimits = store.get(
-        'workspace.preventJoggingPastLimits',
-        false,
-    );
+	const preventJoggingPastLimits = store.get(
+		"workspace.preventJoggingPastLimits",
+		false,
+	);
 
-    if (preventJoggingPastLimits) {
-        const pinState = (controller.state as any)?.status?.pinState || {};
-        const filteredParams: JogDistances = { ...params };
+	if (preventJoggingPastLimits) {
+		const pinState = (controller.state as any)?.status?.pinState || {};
+		const filteredParams: JogDistances = { ...params };
 
-        // Block jogging in the negative direction if X-, Y-, or A- limit is triggered
-        // Block jogging in the positive direction if Z+ limit is triggered (typical Z homing direction)
-        if (params.X !== undefined && pinState.X && params.X < 0)
-            delete filteredParams.X;
-        if (params.Y !== undefined && pinState.Y && params.Y < 0)
-            delete filteredParams.Y;
-        if (params.Z !== undefined && pinState.Z && params.Z > 0)
-            delete filteredParams.Z;
-        if (params.A !== undefined && pinState.A && params.A < 0)
-            delete filteredParams.A;
+		// Block jogging in the negative direction if X-, Y-, or A- limit is triggered
+		// Block jogging in the positive direction if Z+ limit is triggered (typical Z homing direction)
+		if (params.X !== undefined && pinState.X && params.X < 0)
+			delete filteredParams.X;
+		if (params.Y !== undefined && pinState.Y && params.Y < 0)
+			delete filteredParams.Y;
+		if (params.Z !== undefined && pinState.Z && params.Z > 0)
+			delete filteredParams.Z;
+		if (params.A !== undefined && pinState.A && params.A < 0)
+			delete filteredParams.A;
 
-        if (Object.keys(filteredParams).length === 0) {
-            return;
-        }
-        params = filteredParams;
-    }
+		if (Object.keys(filteredParams).length === 0) {
+			return;
+		}
+		params = filteredParams;
+	}
 
-    const units = store.get('workspace.units', 'mm');
-    const modal = units === 'mm' ? 'G21' : 'G20';
-    const s = map(
-        params,
-        (value, letter) => '' + letter.toUpperCase() + value,
-    ).join(' ');
-    const commands = [`$J=${modal} G91 ` + s + ` F${feedrate}`];
-    controller.command('gcode', commands);
+	const units = store.get("workspace.units", "mm");
+	const modal = units === "mm" ? "G21" : "G20";
+	const s = map(
+		params,
+		(value, letter) => "" + letter.toUpperCase() + value,
+	).join(" ");
+	const commands = [`$J=${modal} G91 ` + s + ` F${feedrate}`];
+	controller.command("gcode", commands);
 }
 
 export function continuousJogAxis(axes: JogDistances, feedrate: number) {
-    const preventJoggingPastLimits = store.get(
-        'workspace.preventJoggingPastLimits',
-        false,
-    );
+	const preventJoggingPastLimits = store.get(
+		"workspace.preventJoggingPastLimits",
+		false,
+	);
 
-    if (preventJoggingPastLimits) {
-        const pinState = (controller.state as any)?.status?.pinState || {};
-        const filteredAxes: JogDistances = { ...axes };
+	if (preventJoggingPastLimits) {
+		const pinState = (controller.state as any)?.status?.pinState || {};
+		const filteredAxes: JogDistances = { ...axes };
 
-        if (axes.X !== undefined && pinState.X && axes.X < 0)
-            delete filteredAxes.X;
-        if (axes.Y !== undefined && pinState.Y && axes.Y < 0)
-            delete filteredAxes.Y;
-        if (axes.Z !== undefined && pinState.Z && axes.Z > 0)
-            delete filteredAxes.Z;
-        if (axes.A !== undefined && pinState.A && axes.A < 0)
-            delete filteredAxes.A;
+		if (axes.X !== undefined && pinState.X && axes.X < 0) delete filteredAxes.X;
+		if (axes.Y !== undefined && pinState.Y && axes.Y < 0) delete filteredAxes.Y;
+		if (axes.Z !== undefined && pinState.Z && axes.Z > 0) delete filteredAxes.Z;
+		if (axes.A !== undefined && pinState.A && axes.A < 0) delete filteredAxes.A;
 
-        if (Object.keys(filteredAxes).length === 0) {
-            return;
-        }
-        axes = filteredAxes;
-    }
+		if (Object.keys(filteredAxes).length === 0) {
+			return;
+		}
+		axes = filteredAxes;
+	}
 
-    const units = store.get('workspace.units', 'mm');
-    controller.command('jog:start', axes, feedrate, units);
+	const units = store.get("workspace.units", "mm");
+	controller.command("jog:start", axes, feedrate, units);
 }
 
 export function stopContinuousJog() {
-    controller.command('jog:stop');
+	controller.command("jog:stop");
 }
 
 export interface JogDistances {
-    X?: number;
-    Y?: number;
-    Z?: number;
-    A?: number;
-    B?: number;
-    C?: number;
+	X?: number;
+	Y?: number;
+	Z?: number;
+	A?: number;
+	B?: number;
+	C?: number;
 }
 
 export interface JoggerProps {
-    distance: number;
-    feedrate: number;
-    canClick?: boolean;
-    isRotaryMode?: boolean;
-    threshold?: number;
+	distance: number;
+	feedrate: number;
+	canClick?: boolean;
+	isRotaryMode?: boolean;
+	threshold?: number;
 }
 
-export function cancelJog(state: GRBL_ACTIVE_STATES_T, firmwareType: FIRMWARE_TYPES_T) {
-    if (state) {
-        if (state === GRBL_ACTIVE_STATE_JOG) {
-            return controller.command('jog:cancel');
-        }
-        if (state === GRBL_ACTIVE_STATE_IDLE) {
-            return;
-        }
-        if (firmwareType === GRBLHAL) {
-            return controller.command('reset:soft');
-        }
-        controller.command('reset');
-    }
+export function cancelJog(
+	state: GRBL_ACTIVE_STATES_T,
+	firmwareType: FIRMWARE_TYPES_T,
+) {
+	if (state) {
+		if (state === GRBL_ACTIVE_STATE_JOG) {
+			return controller.command("jog:cancel");
+		}
+		if (state === GRBL_ACTIVE_STATE_IDLE) {
+			return;
+		}
+		if (firmwareType === GRBLHAL) {
+			return controller.command("reset:soft");
+		}
+		controller.command("reset");
+	}
 }
 
 export function startJogCommand(
-    axes: JogDistances,
-    feed: number,
-    continuous: boolean,
+	axes: JogDistances,
+	feed: number,
+	continuous: boolean,
 ) {
-    if (continuous) {
-        continuousJogAxis(axes, feed);
-    } else {
-        jogAxis(axes, feed);
-    }
+	if (continuous) {
+		continuousJogAxis(axes, feed);
+	} else {
+		jogAxis(axes, feed);
+	}
 }
 
 export function xPlusJog(
-    distance: number,
-    feed: number,
-    continuous: boolean = false,
+	distance: number,
+	feed: number,
+	continuous: boolean = false,
 ) {
-    startJogCommand({ X: distance }, feed, continuous);
+	startJogCommand({ X: distance }, feed, continuous);
 }
 
 export function xMinusJog(
-    distance: number,
-    feed: number,
-    continuous: boolean = false,
+	distance: number,
+	feed: number,
+	continuous: boolean = false,
 ) {
-    startJogCommand({ X: distance * -1 }, feed, continuous);
+	startJogCommand({ X: distance * -1 }, feed, continuous);
 }
 
 export function yPlusJog(
-    distance: number,
-    feed: number,
-    continuous: boolean = false,
+	distance: number,
+	feed: number,
+	continuous: boolean = false,
 ) {
-    startJogCommand({ Y: distance }, feed, continuous);
+	startJogCommand({ Y: distance }, feed, continuous);
 }
 
 export function yMinusJog(
-    distance: number,
-    feed: number,
-    continuous: boolean = false,
+	distance: number,
+	feed: number,
+	continuous: boolean = false,
 ) {
-    startJogCommand({ Y: distance * -1 }, feed, continuous);
+	startJogCommand({ Y: distance * -1 }, feed, continuous);
 }
 
 export function zPlusJog(
-    distance: number,
-    feed: number,
-    continuous: boolean = false,
+	distance: number,
+	feed: number,
+	continuous: boolean = false,
 ) {
-    startJogCommand({ Z: distance }, feed, continuous);
+	startJogCommand({ Z: distance }, feed, continuous);
 }
 
 export function zMinusJog(
-    distance: number,
-    feed: number,
-    continuous: boolean = false,
+	distance: number,
+	feed: number,
+	continuous: boolean = false,
 ) {
-    startJogCommand({ Z: distance * -1 }, feed, continuous);
+	startJogCommand({ Z: distance * -1 }, feed, continuous);
 }
 
 export function aPlusJog(
-    distance: number,
-    feed: number,
-    continuous: boolean = false,
-    isRotaryMode = false,
+	distance: number,
+	feed: number,
+	continuous: boolean = false,
+	isRotaryMode = false,
 ) {
-    if (isRotaryMode) {
-        startJogCommand({ Y: distance }, feed, continuous);
-    } else {
-        startJogCommand({ A: distance }, feed, continuous);
-    }
+	if (isRotaryMode) {
+		startJogCommand({ Y: distance }, feed, continuous);
+	} else {
+		startJogCommand({ A: distance }, feed, continuous);
+	}
 }
 
 export function aMinusJog(
-    distance: number,
-    feed: number,
-    continuous: boolean = false,
-    isRotaryMode = false,
+	distance: number,
+	feed: number,
+	continuous: boolean = false,
+	isRotaryMode = false,
 ) {
-    if (isRotaryMode) {
-        startJogCommand({ Y: distance * -1 }, feed, continuous);
-    } else {
-        startJogCommand({ A: distance * -1 }, feed, continuous);
-    }
+	if (isRotaryMode) {
+		startJogCommand({ Y: distance * -1 }, feed, continuous);
+	} else {
+		startJogCommand({ A: distance * -1 }, feed, continuous);
+	}
 }
 
 export function xPlusYPlus(
-    distance: number,
-    feed: number,
-    continuous: boolean = false,
+	distance: number,
+	feed: number,
+	continuous: boolean = false,
 ) {
-    startJogCommand({ X: distance, Y: distance }, feed, continuous);
+	startJogCommand({ X: distance, Y: distance }, feed, continuous);
 }
 export function xPlusYMinus(
-    distance: number,
-    feed: number,
-    continuous: boolean = false,
+	distance: number,
+	feed: number,
+	continuous: boolean = false,
 ) {
-    startJogCommand({ X: distance, Y: distance * -1 }, feed, continuous);
+	startJogCommand({ X: distance, Y: distance * -1 }, feed, continuous);
 }
 export function xMinusYPlus(
-    distance: number,
-    feed: number,
-    continuous: boolean = false,
+	distance: number,
+	feed: number,
+	continuous: boolean = false,
 ) {
-    startJogCommand({ X: distance * -1, Y: distance }, feed, continuous);
+	startJogCommand({ X: distance * -1, Y: distance }, feed, continuous);
 }
 export function xMinusYMinus(
-    distance: number,
-    feed: number,
-    continuous: boolean = false,
+	distance: number,
+	feed: number,
+	continuous: boolean = false,
 ) {
-    startJogCommand({ X: distance * -1, Y: distance * -1 }, feed, continuous);
+	startJogCommand({ X: distance * -1, Y: distance * -1 }, feed, continuous);
 }

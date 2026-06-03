@@ -21,52 +21,49 @@
  *
  */
 
-import get from 'lodash/get';
-import { FaQuestion } from 'react-icons/fa6';
-import { store as reduxStore } from '../../store/redux';
-import { GRBLHAL } from 'app/constants';
-import { GRBL_ALARMS } from '../../../../server/controllers/Grbl/constants';
-import { GRBL_HAL_ALARMS } from '../../../../server/controllers/Grblhal/constants';
-import { ALARM_CODE } from './definitions';
-import pubsub from 'pubsub-js';
+import { GRBLHAL } from "app/constants";
+import get from "lodash/get";
+import pubsub from "pubsub-js";
+import { FaQuestion } from "react-icons/fa6";
+import { GRBL_ALARMS } from "../../../../server/controllers/Grbl/constants";
+import { GRBL_HAL_ALARMS } from "../../../../server/controllers/Grblhal/constants";
+import { store as reduxStore } from "../../store/redux";
+import type { ALARM_CODE } from "./definitions";
 
-const getCodeDescription = (code: number | 'Homing' = 1): string => {
-    const controllerType: string = get(
-        reduxStore.getState(),
-        'controller.type',
-    );
-    let alarm;
-    if (controllerType === GRBLHAL) {
-        const alarms = get(reduxStore.getState(), 'controller.settings.alarms');
-        alarm = alarms?.[code as number]; // code will not be "homing" if grblhal
-        if (!alarm) {
-            alarm = GRBL_HAL_ALARMS.find((alarm) => alarm.code === code);
-        }
-    } else {
-        alarm = GRBL_ALARMS.find((alarm) => alarm.code === code);
-    }
-    if (alarm) {
-        return alarm.description;
-    }
-    return 'No matching description found';
+const getCodeDescription = (code: number | "Homing" = 1): string => {
+	const controllerType: string = get(reduxStore.getState(), "controller.type");
+	let alarm;
+	if (controllerType === GRBLHAL) {
+		const alarms = get(reduxStore.getState(), "controller.settings.alarms");
+		alarm = alarms?.[code as number]; // code will not be "homing" if grblhal
+		if (!alarm) {
+			alarm = GRBL_HAL_ALARMS.find((alarm) => alarm.code === code);
+		}
+	} else {
+		alarm = GRBL_ALARMS.find((alarm) => alarm.code === code);
+	}
+	if (alarm) {
+		return alarm.description;
+	}
+	return "No matching description found";
 };
 
 const AlarmDescriptionIcon = ({ code = 1 }: { code: ALARM_CODE }) => {
-    const sendAlarmDescription = () => {
-        pubsub.publish('helper:info', {
-            title: 'Alarm Code ' + code,
-            description: getCodeDescription(code),
-        });
-    };
+	const sendAlarmDescription = () => {
+		pubsub.publish("helper:info", {
+			title: "Alarm Code " + code,
+			description: getCodeDescription(code),
+		});
+	};
 
-    return (
-        <div className="bg-white opacity-90 rounded-full w-8 h-8 my-0 mx-4 flex items-center justify-center shadow-[rgba(0,0,0,0.35)_0px_5px_15px] [pointer-events:_all]">
-            <FaQuestion
-                className="text-xl text-gray-600 cursor-pointer"
-                onClick={sendAlarmDescription}
-            />
-        </div>
-    );
+	return (
+		<div className="bg-white opacity-90 rounded-full w-8 h-8 my-0 mx-4 flex items-center justify-center shadow-[rgba(0,0,0,0.35)_0px_5px_15px] [pointer-events:_all]">
+			<FaQuestion
+				className="text-xl text-gray-600 cursor-pointer"
+				onClick={sendAlarmDescription}
+			/>
+		</div>
+	);
 };
 
 export default AlarmDescriptionIcon;

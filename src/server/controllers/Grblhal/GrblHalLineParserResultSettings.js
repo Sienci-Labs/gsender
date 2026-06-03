@@ -21,26 +21,26 @@
  *
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 
 class GrblHalLineParserResultSettings {
-    static parse(line) {
-        const r = line.match(/^(\$[^=]+)=([^(]*)(\(.*\))*/);
-        if (!r) {
-            return null;
-        }
+	static parse(line) {
+		const r = line.match(/^(\$[^=]+)=([^(]*)(\(.*\))*/);
+		if (!r) {
+			return null;
+		}
 
-        const payload = {
-            name: r[1],
-            value: r[2].trim(), // need this trim as it may have a space at the end
-            message: _.trim(r[3], '()')
-        };
+		const payload = {
+			name: r[1],
+			value: r[2].trim(), // need this trim as it may have a space at the end
+			message: _.trim(r[3], "()"),
+		};
 
-        return {
-            type: GrblHalLineParserResultSettings,
-            payload: payload
-        };
-    }
+		return {
+			type: GrblHalLineParserResultSettings,
+			payload: payload,
+		};
+	}
 }
 
 export default GrblHalLineParserResultSettings;
