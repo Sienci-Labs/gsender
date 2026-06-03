@@ -1195,7 +1195,7 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
         const map = new Map<string, { hexColor: string; opacity: number; pos: number[] }>();
         for (let i = 0; i < fLen; i++) {
             const s = frs[i];
-            const e = i < fLen - 1 ? frs[i + 1] : vLen;
+            const e = i < fLen - 1 ? frs[i + 1] : vLen / 3;
             if (e <= s + 1) continue;
             const ci = s * 4;
             const r = cols[ci], g = cols[ci + 1], b = cols[ci + 2], a = cols[ci + 3];
