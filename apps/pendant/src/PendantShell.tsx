@@ -24,7 +24,10 @@ export default function PendantShell() {
             <PendantTopBar />
             <InfoStrip />
 
-            {activeTab === 'carve' && <CarveView />}
+            {/* Always mounted — keeps the SVG canvas alive across tab navigation */}
+            <div className={activeTab !== 'carve' ? 'hidden' : 'flex-1 flex flex-col min-h-0'}>
+                <CarveView />
+            </div>
             {activeTab === 'tools' && <PlaceholderView title="Tools" />}
             {activeTab === 'config' && <PendantConfigView />}
 

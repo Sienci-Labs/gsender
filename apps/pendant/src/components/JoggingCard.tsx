@@ -394,7 +394,7 @@ export default function JoggingCard() {
                         disabled={!canJog}
                         onShortPress={xyButtons[0].shortPress}
                         onLongPress={xyButtons[0].longPress}
-                        className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,4rem)] ${
+                        className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,3.75rem)] ${
                             active
                                 ? activeClasses[xyButtons[0].tone]
                                 : `${toneClasses[xyButtons[0].tone]} ${hoverToneClasses[xyButtons[0].tone]}`
@@ -417,7 +417,7 @@ export default function JoggingCard() {
                         disabled={!canJog}
                         onShortPress={xyButtons[1].shortPress}
                         onLongPress={xyButtons[1].longPress}
-                        className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,4rem)] ${
+                        className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,3.75rem)] ${
                             active
                                 ? activeClasses[xyButtons[1].tone]
                                 : `${toneClasses[xyButtons[1].tone]} ${hoverToneClasses[xyButtons[1].tone]}`
@@ -441,7 +441,7 @@ export default function JoggingCard() {
                         disabled={!canJog}
                         onShortPress={xyButtons[2].shortPress}
                         onLongPress={xyButtons[2].longPress}
-                        className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,4rem)] ${
+                        className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,3.75rem)] ${
                             active
                                 ? activeClasses[xyButtons[2].tone]
                                 : `${toneClasses[xyButtons[2].tone]} ${hoverToneClasses[xyButtons[2].tone]}`
@@ -464,7 +464,7 @@ export default function JoggingCard() {
                         disabled={!canJog}
                         onShortPress={xyButtons[3].shortPress}
                         onLongPress={xyButtons[3].longPress}
-                        className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,4rem)] ${
+                        className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,3.75rem)] ${
                             active
                                 ? activeClasses[xyButtons[3].tone]
                                 : `${toneClasses[xyButtons[3].tone]} ${hoverToneClasses[xyButtons[3].tone]}`
@@ -483,7 +483,7 @@ export default function JoggingCard() {
 
                     <div
                         aria-hidden="true"
-                        className="h-[clamp(2.5rem,7vh,4rem)] flex items-center justify-center"
+                        className="h-[clamp(2.5rem,7vh,3.75rem)] flex items-center justify-center"
                     >
                         <Move className="w-[clamp(0.875rem,2vh,1.25rem)] h-[clamp(0.875rem,2vh,1.25rem)] text-gray-400/35 dark:text-gray-500/30" />
                     </div>
@@ -495,7 +495,7 @@ export default function JoggingCard() {
                         disabled={!canJog}
                         onShortPress={xyButtons[4].shortPress}
                         onLongPress={xyButtons[4].longPress}
-                        className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,4rem)] ${
+                        className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,3.75rem)] ${
                             active
                                 ? activeClasses[xyButtons[4].tone]
                                 : `${toneClasses[xyButtons[4].tone]} ${hoverToneClasses[xyButtons[4].tone]}`
@@ -519,7 +519,7 @@ export default function JoggingCard() {
                         disabled={!canJog}
                         onShortPress={xyButtons[5].shortPress}
                         onLongPress={xyButtons[5].longPress}
-                        className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,4rem)] ${
+                        className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,3.75rem)] ${
                             active
                                 ? activeClasses[xyButtons[5].tone]
                                 : `${toneClasses[xyButtons[5].tone]} ${hoverToneClasses[xyButtons[5].tone]}`
@@ -542,7 +542,7 @@ export default function JoggingCard() {
                         disabled={!canJog}
                         onShortPress={xyButtons[6].shortPress}
                         onLongPress={xyButtons[6].longPress}
-                        className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,4rem)] ${
+                        className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,3.75rem)] ${
                             active
                                 ? activeClasses[xyButtons[6].tone]
                                 : `${toneClasses[xyButtons[6].tone]} ${hoverToneClasses[xyButtons[6].tone]}`
@@ -566,7 +566,7 @@ export default function JoggingCard() {
                         disabled={!canJog}
                         onShortPress={xyButtons[7].shortPress}
                         onLongPress={xyButtons[7].longPress}
-                        className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,4rem)] ${
+                        className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,3.75rem)] ${
                             active
                                 ? activeClasses[xyButtons[7].tone]
                                 : `${toneClasses[xyButtons[7].tone]} ${hoverToneClasses[xyButtons[7].tone]}`
@@ -593,7 +593,7 @@ export default function JoggingCard() {
                                 disabled={!canJog}
                                 onShortPress={() => zPlusJog(zDistance, feedrate, false)}
                                 onLongPress={() => continuousJogAxis({ Z: 1 }, feedrate)}
-                                className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,4rem)] w-full ${
+                                className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,3.75rem)] w-full ${
                                     active ? activeClasses.z : `${toneClasses.z} ${hoverToneClasses.z}`
                                 }`}
                             >
@@ -611,7 +611,7 @@ export default function JoggingCard() {
                                 disabled={!canJog}
                                 onShortPress={() => zMinusJog(zDistance, feedrate, false)}
                                 onLongPress={() => continuousJogAxis({ Z: -1 }, feedrate)}
-                                className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,4rem)] w-full ${
+                                className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,3.75rem)] w-full ${
                                     active ? activeClasses.z : `${toneClasses.z} ${hoverToneClasses.z}`
                                 }`}
                             >
@@ -634,7 +634,7 @@ export default function JoggingCard() {
                                 disabled={!canJog}
                                 onShortPress={() => aPlusJog(aDistance, feedrate, false, isRotaryMode)}
                                 onLongPress={() => continuousJogAxis(rotaryAxis === 'Y' ? { Y: 1 } : { A: 1 }, feedrate)}
-                                className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,4rem)] w-full ${
+                                className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,3.75rem)] w-full ${
                                     active ? activeClasses.a : `${toneClasses.a} ${hoverToneClasses.a}`
                                 }`}
                             >
@@ -652,7 +652,7 @@ export default function JoggingCard() {
                                 disabled={!canJog}
                                 onShortPress={() => aMinusJog(aDistance, feedrate, false, isRotaryMode)}
                                 onLongPress={() => continuousJogAxis(rotaryAxis === 'Y' ? { Y: -1 } : { A: -1 }, feedrate)}
-                                className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,4rem)] w-full ${
+                                className={(active) => `${baseButton} h-[clamp(2.5rem,7vh,3.75rem)] w-full ${
                                     active ? activeClasses.a : `${toneClasses.a} ${hoverToneClasses.a}`
                                 }`}
                             >
