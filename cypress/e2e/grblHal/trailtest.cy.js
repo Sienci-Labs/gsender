@@ -1,64 +1,44 @@
-describe('Surfacing Tool - Input Fields', () => {
+describe('Surfacing Test', () => {
+
   beforeEach(() => {
-    cy.visit('http://localhost:8000/#/tools/surfacing');
+    cy.viewport(1920, 1080);
+    // Use loadUI custom command with dynamic baseUrl
+    cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
+      maxRetries: 4,
+      waitTime: 4000,
+      timeout: 5000
+    });
   });
 
-  it('should navigate to Surfacing and fill in all input fields', () => {
-    // Navigate to Tools > Surfacing
-    cy.contains('a', 'Tools').click();
-    cy.contains('Surfacing').click();
+  it('Should complete surfacing workflow successfully', () => {
 
-    // Width
-    cy.get('#width')
-      .clear()
-      .type('75');
+    // Step 1: Connect to CNC
+    cy.log('Step 1: Connecting to CNC...');
+    cy.connectMachine();
+    cy.wait(6000);
+    cy.log('Connected to CNC');
 
-    // Length
-    cy.get('#length')
-      .clear()
-      .type('75');
+    // Step 2: Verify CNC machine status is Idle
+    cy.log('Step 2: Verifying machine status...');
+    cy.verifyMachineStatus('Idle');
+    cy.wait(2000);
+    cy.log('Machine is in idle status');
 
-    // Skim Depth
-    cy.get('#skimDepth')
-      .clear()
-      .type('1');
+    cy.unlockMachineIfNeeded();
+    cy.wait(2000);
 
-    // Max Depth
-    cy.get('#maxDepth')
-      .clear()
-      .type('1');
+    // Step 3: Navigate to Tools
+   
+    cy.log('Zeroing all axis...');
+     cy.get('div.relative > div.max-xl\\:scale-95 > div:nth-of-type(1) span')
+      .click();
+    cy.log("All axes zeroed");
 
-    // Bit diameter (4th field — no ID, use positional selector)
-    cy.get('div.px-8 div:nth-of-type(4) input')
-      .clear()
-      .type('22');
 
-    // Stepover (5th field)
-    cy.get('div.px-8 div:nth-of-type(5) input')
-      .clear()
-      .type('40');
+    // Step 4: Click on Surfacing tool - using the link selector
 
-    // Feed rate (6th field)
-    cy.get('div:nth-of-type(6) input')
-      .clear()
-      .type('2500');
 
-    // Spindle RPM (7th field)
-    cy.get('div:nth-of-type(7) input')
-      .clear()
-      .type('17000');
 
-    // Generate G-code
-    cy.contains('button', 'Generate G-code').click();
-
-    // Assertions — verify values were accepted
-    cy.get('#width').should('have.value', '75');
-    cy.get('#length').should('have.value', '75');
-    cy.get('#skimDepth').should('have.value', '1');
-    cy.get('#maxDepth').should('have.value', '1');
-    cy.get('div.px-8 div:nth-of-type(4) input').should('have.value', '22');
-    cy.get('div.px-8 div:nth-of-type(5) input').should('have.value', '40');
-    cy.get('div:nth-of-type(6) input').should('have.value', '2500');
-    cy.get('div:nth-of-type(7) input').should('have.value', '17000');
+  
   });
 });

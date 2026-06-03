@@ -21,36 +21,36 @@
  *
  */
 
-import isEqual from 'lodash/isEqual';
+import isEqual from "lodash/isEqual";
 
 class GrblHalLineParserResultInfo {
-    static parse(line) {
-        const r = line.match(/^\[([A-Z ]*):(.+)\]$/);
-        if (!r) {
-            return null;
-        }
+	static parse(line) {
+		const r = line.match(/^\[([A-Z ]*):(.+)\]$/);
+		if (!r) {
+			return null;
+		}
 
-        if (isEqual(r[1], 'NEWOPT')) {
-            let values = {};
-            let opts = r[2].split(',');
-            opts.forEach(opt => {
-                let [key, value] = opt.split('=');
-                values[key] = value || null;
-            });
-            r[2] = values;
-        }
+		if (isEqual(r[1], "NEWOPT")) {
+			const values = {};
+			const opts = r[2].split(",");
+			opts.forEach((opt) => {
+				const [key, value] = opt.split("=");
+				values[key] = value || null;
+			});
+			r[2] = values;
+		}
 
-        const payload = {
-            name: r[1],
-            value: r[2],
-            raw: r[0]
-        };
+		const payload = {
+			name: r[1],
+			value: r[2],
+			raw: r[0],
+		};
 
-        return {
-            type: GrblHalLineParserResultInfo,
-            payload: payload
-        };
-    }
+		return {
+			type: GrblHalLineParserResultInfo,
+			payload: payload,
+		};
+	}
 }
 
 export default GrblHalLineParserResultInfo;

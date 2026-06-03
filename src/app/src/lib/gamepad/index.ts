@@ -1,376 +1,377 @@
-import debounce from 'lodash/debounce';
-import throttle from 'lodash/throttle';
+import type { ShuttleEvent } from "app/lib/definitions/shortcuts";
+import GamepadListener from "app/lib/gamepad/gamepad.js/GamepadListener";
 
-import store from 'app/store';
-import GamepadListener from 'app/lib/gamepad/gamepad.js/GamepadListener';
-import { ShuttleEvent } from 'app/lib/definitions/shortcuts';
+import store from "app/store";
+import debounce from "lodash/debounce";
+import throttle from "lodash/throttle";
 
-import shuttleEvents from '../shuttleEvents';
-import { toast } from '../toaster';
-import { GamepadConfig, GamepadDetail, GamepadProfile } from './definitions';
+import shuttleEvents from "../shuttleEvents";
+import { toast } from "../toaster";
+import type {
+	GamepadConfig,
+	GamepadDetail,
+	GamepadProfile,
+} from "./definitions";
 
 const macroCallbackDebounce = debounce(
-    (action: string) =>
-        shuttleEvents.allShuttleControlEvents.MACRO(null, { macroID: action }),
-    500,
+	(action: string) =>
+		shuttleEvents.allShuttleControlEvents.MACRO(null, { macroID: action }),
+	500,
 );
 
 // Cache for throttled callbacks to ensure throttling works across multiple calls
 const throttledCallbackCache = new Map<string, ReturnType<typeof throttle>>();
 
 type GamepadOptions = {
-    axis: {
-        precision: number;
-    };
-    button: {
-        analog: boolean;
-    };
-    deadZone?: number;
-    precision?: number;
+	axis: {
+		precision: number;
+	};
+	button: {
+		analog: boolean;
+	};
+	deadZone?: number;
+	precision?: number;
 };
 
 class Gamepad extends GamepadListener {
-    shouldHold: boolean;
-    declare options: GamepadOptions;
+	shouldHold: boolean;
+	declare options: GamepadOptions;
 
-    constructor() {
-        super({ axis: { precision: 2 }, button: { analog: false } });
-        this.shouldHold = false;
-        this.options = { axis: { precision: 2 }, button: { analog: false } };
-        this.start();
-    }
+	constructor() {
+		super({ axis: { precision: 2 }, button: { analog: false } });
+		this.shouldHold = false;
+		this.options = { axis: { precision: 2 }, button: { analog: false } };
+		this.start();
+	}
 
-    override update(): void {
-        super.update();
-    }
+	override update(): void {
+		super.update();
+	}
 
-    updateConfig(config: GamepadConfig): void {
-        if (config.deadZone) {
-            this.options.deadZone = config.deadZone;
-        }
+	updateConfig(config: GamepadConfig): void {
+		if (config.deadZone) {
+			this.options.deadZone = config.deadZone;
+		}
 
-        if (config.precision) {
-            this.options.precision = config.precision;
-        }
-    }
+		if (config.precision) {
+			this.options.precision = config.precision;
+		}
+	}
 
-    holdListener(): void {
-        this.shouldHold = true;
-    }
+	holdListener(): void {
+		this.shouldHold = true;
+	}
 
-    unholdListener(): void {
-        this.shouldHold = false;
-    }
+	unholdListener(): void {
+		this.shouldHold = false;
+	}
 
-    override onAxis(event: Event): void {
-        const gamepadEvent = event as unknown as {
-            detail: GamepadDetail['detail'];
-        };
-        const profiles: Array<GamepadProfile> = store.get(
-            'workspace.gamepad.profiles',
-            [],
-        );
-        const currentProfile = profiles.find((profile) =>
-            profile.id.includes(gamepadEvent.detail.gamepad.id),
-        );
+	override onAxis(event: Event): void {
+		const gamepadEvent = event as unknown as {
+			detail: GamepadDetail["detail"];
+		};
+		const profiles: Array<GamepadProfile> = store.get(
+			"workspace.gamepad.profiles",
+			[],
+		);
+		const currentProfile = profiles.find((profile) =>
+			profile.id.includes(gamepadEvent.detail.gamepad.id),
+		);
 
-        const lockoutButton =
-            gamepadEvent.detail.gamepad.buttons[
-                currentProfile?.lockout?.button
-            ];
+		const lockoutButton =
+			gamepadEvent.detail.gamepad.buttons[currentProfile?.lockout?.button];
 
-        if (lockoutButton && !lockoutButton?.pressed) {
-            return;
-        }
+		if (lockoutButton && !lockoutButton?.pressed) {
+			return;
+		}
 
-        const deadZone =
-            currentProfile?.joystickOptions?.zeroThreshold &&
-            currentProfile?.joystickOptions?.zeroThreshold / 100;
+		const deadZone =
+			currentProfile?.joystickOptions?.zeroThreshold &&
+			currentProfile?.joystickOptions?.zeroThreshold / 100;
 
-        const [leftStickX, leftStickY, rightStickX, rightStickY] =
-            gamepadEvent.detail.gamepad.axes;
+		const [leftStickX, leftStickY, rightStickX, rightStickY] =
+			gamepadEvent.detail.gamepad.axes;
 
-        const cartesian2Polar = (x: number, y: number): number => {
-            const radians = Math.atan2(y, x);
-            const degrees = Math.round(radians * (180 / Math.PI)) * -1;
-            return (degrees + 360) % 360; //https://stackoverflow.com/a/25725005
-        };
+		const cartesian2Polar = (x: number, y: number): number => {
+			const radians = Math.atan2(y, x);
+			const degrees = Math.round(radians * (180 / Math.PI)) * -1;
+			return (degrees + 360) % 360; //https://stackoverflow.com/a/25725005
+		};
 
-        const cartesian2PolarDistance = (x: number, y: number): number => {
-            const distance = Math.sqrt(x * x + y * y);
-            return +distance.toFixed(2);
-        };
+		const cartesian2PolarDistance = (x: number, y: number): number => {
+			const distance = Math.sqrt(x * x + y * y);
+			return +distance.toFixed(2);
+		};
 
-        const leftStickDistance = cartesian2PolarDistance(
-            leftStickX,
-            leftStickY,
-        );
-        const rightStickDistance = cartesian2PolarDistance(
-            rightStickX,
-            rightStickY,
-        );
+		const leftStickDistance = cartesian2PolarDistance(leftStickX, leftStickY);
+		const rightStickDistance = cartesian2PolarDistance(
+			rightStickX,
+			rightStickY,
+		);
 
-        const leftStick = cartesian2Polar(leftStickX, leftStickY);
-        const rightStick = cartesian2Polar(rightStickX, rightStickY);
+		const leftStick = cartesian2Polar(leftStickX, leftStickY);
+		const rightStick = cartesian2Polar(rightStickX, rightStickY);
 
-        const dataOutput = {
-            detail: gamepadEvent.detail,
-            degrees: {
-                leftStick,
-                rightStick,
-            },
-            distance: {
-                leftStick: leftStickDistance,
-                rightStick: rightStickDistance,
-            },
-        };
+		const dataOutput = {
+			detail: gamepadEvent.detail,
+			degrees: {
+				leftStick,
+				rightStick,
+			},
+			distance: {
+				leftStick: leftStickDistance,
+				rightStick: rightStickDistance,
+			},
+		};
 
-        const { index } = dataOutput.detail;
+		const { index } = dataOutput.detail;
 
-        if (
-            deadZone &&
-            gamepadEvent.detail.value < deadZone &&
-            gamepadEvent.detail.value > -deadZone
-        ) {
-            const payload = {
-                ...dataOutput,
-                value: 0,
-            };
+		if (
+			deadZone &&
+			gamepadEvent.detail.value < deadZone &&
+			gamepadEvent.detail.value > -deadZone
+		) {
+			const payload = {
+				...dataOutput,
+				value: 0,
+			};
 
-            this.emit('gamepad:axis', payload);
-            this.emit(`gamepad:${index}:axis`, payload);
-            this.emit(
-                `gamepad:${index}:axis:${dataOutput.detail.axis}`,
-                payload.detail,
-            );
+			this.emit("gamepad:axis", payload);
+			this.emit(`gamepad:${index}:axis`, payload);
+			this.emit(
+				`gamepad:${index}:axis:${dataOutput.detail.axis}`,
+				payload.detail,
+			);
 
-            return;
-        }
+			return;
+		}
 
-        this.emit('gamepad:axis', dataOutput);
-        this.emit(`gamepad:${index}:axis`, dataOutput);
-        this.emit(
-            `gamepad:${index}:axis:${dataOutput.detail.axis}`,
-            dataOutput.detail,
-        );
-    }
+		this.emit("gamepad:axis", dataOutput);
+		this.emit(`gamepad:${index}:axis`, dataOutput);
+		this.emit(
+			`gamepad:${index}:axis:${dataOutput.detail.axis}`,
+			dataOutput.detail,
+		);
+	}
 }
 
 export const shortcutComboBuilder = (list: Array<string> = []): string => {
-    const JOIN_KEY = '+';
+	const JOIN_KEY = "+";
 
-    return list.join(JOIN_KEY);
+	return list.join(JOIN_KEY);
 };
 
 export const checkButtonHold = (
-    buttonType: 'modifier' | 'lockout',
-    currentProfile: GamepadProfile,
+	buttonType: "modifier" | "lockout",
+	currentProfile: GamepadProfile,
 ): boolean => {
-    if (typeof navigator === 'undefined') {
-        return false;
-    }
+	if (typeof navigator === "undefined") {
+		return false;
+	}
 
-    const gamepads = navigator.getGamepads();
+	const gamepads = navigator.getGamepads();
 
-    const currentGamepad = gamepads.find((gamepad) =>
-        currentProfile.id.includes(gamepad?.id),
-    );
+	const currentGamepad = gamepads.find((gamepad) =>
+		currentProfile.id.includes(gamepad?.id),
+	);
 
-    if (!currentGamepad) {
-        return false;
-    }
+	if (!currentGamepad) {
+		return false;
+	}
 
-    const isHoldingButton =
-        currentGamepad.buttons[currentProfile[buttonType]?.button]?.pressed;
+	const isHoldingButton =
+		currentGamepad.buttons[currentProfile[buttonType]?.button]?.pressed;
 
-    return isHoldingButton;
+	return isHoldingButton;
 };
 
 export const onGamepadButtonPress = ({ detail }: GamepadDetail): string => {
-    if ((GamepadManager.getInstance() as Gamepad).shouldHold) {
-        return null;
-    }
+	if ((GamepadManager.getInstance() as Gamepad).shouldHold) {
+		return null;
+	}
 
-    const { gamepad, button } = detail;
-    const gamepadID = gamepad.id;
+	const { gamepad, button } = detail;
+	const gamepadID = gamepad.id;
 
-    const profiles: Array<GamepadProfile> = store.get(
-        'workspace.gamepad.profiles',
-        [],
-    );
-    const currentProfile = profiles.find((profile) =>
-        profile.id.includes(gamepadID),
-    );
+	const profiles: Array<GamepadProfile> = store.get(
+		"workspace.gamepad.profiles",
+		[],
+	);
+	const currentProfile = profiles.find((profile) =>
+		profile.id.includes(gamepadID),
+	);
 
-    if (!currentProfile) {
-        return null;
-    }
+	if (!currentProfile) {
+		return null;
+	}
 
-    const foundAction = currentProfile.buttons?.find(
-        ({ value }) => value === button,
-    );
+	const foundAction = currentProfile.buttons?.find(
+		({ value }) => value === button,
+	);
 
-    if (
-        !detail.pressed &&
-        (foundAction?.primaryAction?.includes('JOG') ||
-            foundAction?.secondaryAction?.includes('JOG'))
-    ) {
-        return 'STOP_CONT_JOG';
-    }
+	if (
+		!detail.pressed &&
+		(foundAction?.primaryAction?.includes("JOG") ||
+			foundAction?.secondaryAction?.includes("JOG"))
+	) {
+		return "STOP_CONT_JOG";
+	}
 
-    if (!detail.pressed) {
-        return null;
-    }
+	if (!detail.pressed) {
+		return null;
+	}
 
-    const modifierButton = gamepad.buttons[currentProfile.modifier?.button];
-    const lockoutButton = gamepad.buttons[currentProfile.lockout?.button];
+	const modifierButton = gamepad.buttons[currentProfile.modifier?.button];
+	const lockoutButton = gamepad.buttons[currentProfile.lockout?.button];
 
-    if (lockoutButton && !lockoutButton?.pressed) {
-        return null;
-    }
+	if (lockoutButton && !lockoutButton?.pressed) {
+		return null;
+	}
 
-    if (modifierButton?.pressed) {
-        return foundAction?.secondaryAction;
-    }
+	if (modifierButton?.pressed) {
+		return foundAction?.secondaryAction;
+	}
 
-    return foundAction?.primaryAction;
+	return foundAction?.primaryAction;
 };
 
 export const runAction = ({ event }: { event: GamepadDetail }): void => {
-    const shuttleControlEvents = shuttleEvents.allShuttleControlEvents;
-    const action = onGamepadButtonPress(event);
+	const shuttleControlEvents = shuttleEvents.allShuttleControlEvents;
+	const action = onGamepadButtonPress(event);
 
-    if (!action) {
-        return;
-    }
-    if (shuttleControlEvents[action]) {
-        const shuttleEvent = shuttleControlEvents[action];
-        const shuttleEv = shuttleEvent as ShuttleEvent;
+	if (!action) {
+		return;
+	}
+	if (shuttleControlEvents[action]) {
+		const shuttleEvent = shuttleControlEvents[action];
+		const shuttleEv = shuttleEvent as ShuttleEvent;
 
-        // Use cached throttled callback to ensure throttling works across calls
-        if (!throttledCallbackCache.has(action)) {
-            throttledCallbackCache.set(
-                action,
-                throttle(
-                    (payload: unknown) => {
-                        // Get fresh callback reference in case it was updated
-                        const currentEvent = shuttleEvents.allShuttleControlEvents[action] as ShuttleEvent;
-                        currentEvent?.callback?.(null, payload);
-                    },
-                    100,
-                    { trailing: false }
-                )
-            );
-        }
+		// Use cached throttled callback to ensure throttling works across calls
+		if (!throttledCallbackCache.has(action)) {
+			throttledCallbackCache.set(
+				action,
+				throttle(
+					(payload: unknown) => {
+						// Get fresh callback reference in case it was updated
+						const currentEvent = shuttleEvents.allShuttleControlEvents[
+							action
+						] as ShuttleEvent;
+						currentEvent?.callback?.(null, payload);
+					},
+					100,
+					{ trailing: false },
+				),
+			);
+		}
 
-        const throttledCallback = throttledCallbackCache.get(action);
-        throttledCallback(shuttleEv.payload);
-    } else {
-        macroCallbackDebounce(action);
-    }
+		const throttledCallback = throttledCallbackCache.get(action);
+		throttledCallback(shuttleEv.payload);
+	} else {
+		macroCallbackDebounce(action);
+	}
 };
 
 export const deleteGamepadMacro = (macroID: string): void => {
-    const profiles: Array<GamepadProfile> = store.get(
-        'workspace.gamepad.profiles',
-        [],
-    );
+	const profiles: Array<GamepadProfile> = store.get(
+		"workspace.gamepad.profiles",
+		[],
+	);
 
-    profiles.forEach((profile) => {
-        const macroIndexPrimary = profile.buttons.findIndex(
-            (button) => button.primaryAction === macroID,
-        );
-        if (macroIndexPrimary > -1) {
-            profile.buttons[macroIndexPrimary].primaryAction = null;
-        }
+	profiles.forEach((profile) => {
+		const macroIndexPrimary = profile.buttons.findIndex(
+			(button) => button.primaryAction === macroID,
+		);
+		if (macroIndexPrimary > -1) {
+			profile.buttons[macroIndexPrimary].primaryAction = null;
+		}
 
-        const macroIndexSecondary = profile.buttons.findIndex(
-            (button) => button.secondaryAction === macroID,
-        );
-        if (macroIndexSecondary > -1) {
-            profile.buttons[macroIndexSecondary].secondaryAction = null;
-        }
-    });
+		const macroIndexSecondary = profile.buttons.findIndex(
+			(button) => button.secondaryAction === macroID,
+		);
+		if (macroIndexSecondary > -1) {
+			profile.buttons[macroIndexSecondary].secondaryAction = null;
+		}
+	});
 };
 
 type GamepadInstance = Gamepad;
 
 class GamepadManager {
-    private static instance: GamepadInstance | null = null;
-    private static connectedListener: (event: GamepadDetail) => void;
-    private static disconnectedListener: () => void;
-    private static buttonListener: (event: GamepadDetail) => void;
+	private static instance: GamepadInstance | null = null;
+	private static connectedListener: (event: GamepadDetail) => void;
+	private static disconnectedListener: () => void;
+	private static buttonListener: (event: GamepadDetail) => void;
 
-    static initialize(): GamepadInstance {
-        if (GamepadManager.instance) {
-            return GamepadManager.instance;
-        }
+	static initialize(): GamepadInstance {
+		if (GamepadManager.instance) {
+			return GamepadManager.instance;
+		}
 
-        const instance = new Gamepad();
+		const instance = new Gamepad();
 
-        // Store references to the listeners so we can remove them later
-        this.connectedListener = ({ detail }: GamepadDetail) => {
-            const { gamepad } = detail;
+		// Store references to the listeners so we can remove them later
+		GamepadManager.connectedListener = ({ detail }: GamepadDetail) => {
+			const { gamepad } = detail;
 
-            const profiles: GamepadProfile[] = store.get(
-                'workspace.gamepad.profiles',
-                [],
-            );
+			const profiles: GamepadProfile[] = store.get(
+				"workspace.gamepad.profiles",
+				[],
+			);
 
-            const foundGamepad = profiles.find((profile) =>
-                profile.id.includes(gamepad.id),
-            );
+			const foundGamepad = profiles.find((profile) =>
+				profile.id.includes(gamepad.id),
+			);
 
-            const toastMessage = foundGamepad
-                ? `${foundGamepad.name} Connected`
-                : 'New gamepad connected, add it as a profile in your preferences';
+			const toastMessage = foundGamepad
+				? `${foundGamepad.name} Connected`
+				: "New gamepad connected, add it as a profile in your preferences";
 
-            toast.info(toastMessage, { position: 'bottom-right' });
-        };
+			toast.info(toastMessage, { position: "bottom-right" });
+		};
 
-        this.disconnectedListener = () => {
-            toast.info('Gamepad disconnected', { position: 'bottom-right' });
-        };
+		GamepadManager.disconnectedListener = () => {
+			toast.info("Gamepad disconnected", { position: "bottom-right" });
+		};
 
-        this.buttonListener = (event: GamepadDetail) => {
-            runAction({ event });
-        };
+		GamepadManager.buttonListener = (event: GamepadDetail) => {
+			runAction({ event });
+		};
 
-        instance.on('gamepad:connected', this.connectedListener);
-        instance.on('gamepad:disconnected', this.disconnectedListener);
-        instance.on('gamepad:button', this.buttonListener);
+		instance.on("gamepad:connected", GamepadManager.connectedListener);
+		instance.on("gamepad:disconnected", GamepadManager.disconnectedListener);
+		instance.on("gamepad:button", GamepadManager.buttonListener);
 
-        if (instance instanceof Gamepad) {
-            GamepadManager.instance = instance;
-        }
+		if (instance instanceof Gamepad) {
+			GamepadManager.instance = instance;
+		}
 
-        return instance;
-    }
+		return instance;
+	}
 
-    static cleanup() {
-        if (GamepadManager.instance) {
-            // Remove all event listeners before nullifying the instance
-            if (GamepadManager.instance instanceof Gamepad) {
-                GamepadManager.instance.off(
-                    'gamepad:connected',
-                    this.connectedListener,
-                );
-                GamepadManager.instance.off(
-                    'gamepad:disconnected',
-                    this.disconnectedListener,
-                );
-                GamepadManager.instance.off(
-                    'gamepad:button',
-                    this.buttonListener,
-                );
-            }
-            GamepadManager.instance = null;
-        }
-    }
+	static cleanup() {
+		if (GamepadManager.instance) {
+			// Remove all event listeners before nullifying the instance
+			if (GamepadManager.instance instanceof Gamepad) {
+				GamepadManager.instance.off(
+					"gamepad:connected",
+					GamepadManager.connectedListener,
+				);
+				GamepadManager.instance.off(
+					"gamepad:disconnected",
+					GamepadManager.disconnectedListener,
+				);
+				GamepadManager.instance.off(
+					"gamepad:button",
+					GamepadManager.buttonListener,
+				);
+			}
+			GamepadManager.instance = null;
+		}
+	}
 
-    static getInstance() {
-        return GamepadManager.instance || this.initialize();
-    }
+	static getInstance() {
+		return GamepadManager.instance || GamepadManager.initialize();
+	}
 }
 
 export default GamepadManager;

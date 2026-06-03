@@ -1,23 +1,23 @@
-import get from 'lodash/get';
-import { GRBL_SETTINGS_MAP } from 'app/features/Config/assets/SettingsDescriptions.ts';
-import BooleanInput from 'app/features/Config/components/EEPROMInputs/BooleanInput.tsx';
-import BitfieldInput from 'app/features/Config/components/EEPROMInputs/BitfieldInput.tsx';
-import ExclusiveBitfieldInput from 'app/features/Config/components/EEPROMInputs/ExclusiveBitfieldInput.tsx';
-import RadioButtonInput from 'app/features/Config/components/EEPROMInputs/RadioButtonInput.tsx';
-import AxisMaskInput from 'app/features/Config/components/EEPROMInputs/AxisMaskInput.tsx';
-import IntegerInput from 'app/features/Config/components/EEPROMInputs/IntegerInput.tsx';
-import DecimalInput from 'app/features/Config/components/EEPROMInputs/DecimalInput.tsx';
-import StringInput from 'app/features/Config/components/EEPROMInputs/StringInput.tsx';
-import PasswordInput from 'app/features/Config/components/EEPROMInputs/PasswordInput.tsx';
-import Ipv4Input from 'app/features/Config/components/EEPROMInputs/Ipv4Input.tsx';
-import {
-    EEPROM,
-    EEPROMDescriptions,
-    EEPROMSettings,
-    FilteredEEPROM,
-    FIRMWARE_TYPES_T,
-} from 'app/definitions/firmware';
-import { BasicObject } from 'app/definitions/general';
+import type {
+	EEPROM,
+	EEPROMDescriptions,
+	EEPROMSettings,
+	FIRMWARE_TYPES_T,
+	FilteredEEPROM,
+} from "app/definitions/firmware";
+import type { BasicObject } from "app/definitions/general";
+import { GRBL_SETTINGS_MAP } from "app/features/Config/assets/SettingsDescriptions.ts";
+import AxisMaskInput from "app/features/Config/components/EEPROMInputs/AxisMaskInput.tsx";
+import BitfieldInput from "app/features/Config/components/EEPROMInputs/BitfieldInput.tsx";
+import BooleanInput from "app/features/Config/components/EEPROMInputs/BooleanInput.tsx";
+import DecimalInput from "app/features/Config/components/EEPROMInputs/DecimalInput.tsx";
+import ExclusiveBitfieldInput from "app/features/Config/components/EEPROMInputs/ExclusiveBitfieldInput.tsx";
+import IntegerInput from "app/features/Config/components/EEPROMInputs/IntegerInput.tsx";
+import Ipv4Input from "app/features/Config/components/EEPROMInputs/Ipv4Input.tsx";
+import PasswordInput from "app/features/Config/components/EEPROMInputs/PasswordInput.tsx";
+import RadioButtonInput from "app/features/Config/components/EEPROMInputs/RadioButtonInput.tsx";
+import StringInput from "app/features/Config/components/EEPROMInputs/StringInput.tsx";
+import get from "lodash/get";
 export const BOOLEAN_ID = 0;
 export const BITFIELD_ID = 1;
 export const EXCLUSIVE_BITFIELD_ID = 2;
@@ -30,86 +30,86 @@ export const PASSWORD_ID = 8;
 export const IPV4_ID = 9;
 
 interface HalDataTypeMap {
-    [key: number]: any;
+	[key: number]: any;
 }
 
 export function getFilteredEEPROMSettings(
-    settingsMap: Map<EEPROM, any>,
-    eeprom: EEPROMSettings,
-    halDescriptions: EEPROMDescriptions,
-    halGroups: BasicObject,
+	settingsMap: Map<EEPROM, any>,
+	eeprom: EEPROMSettings,
+	halDescriptions: EEPROMDescriptions,
+	halGroups: BasicObject,
 ): FilteredEEPROM[] {
-    return Object.keys(eeprom).map((setting, index) => {
-        const properties = settingsMap.get(setting as EEPROM);
+	return Object.keys(eeprom).map((setting, index) => {
+		const properties = settingsMap.get(setting as EEPROM);
 
-        // Below is to grab the grbl unit as configured and use it as a fallback if it's not parsed
-        // in the settings description.  It will be replaced in grblHAL by the actual unit.
-        const grblProperties = GRBL_SETTINGS_MAP.get(setting as EEPROM);
+		// Below is to grab the grbl unit as configured and use it as a fallback if it's not parsed
+		// in the settings description.  It will be replaced in grblHAL by the actual unit.
+		const grblProperties = GRBL_SETTINGS_MAP.get(setting as EEPROM);
 
-        let baseUnit = '';
-        if (grblProperties) {
-            baseUnit = grblProperties.units;
-        }
+		let baseUnit = "";
+		if (grblProperties) {
+			baseUnit = grblProperties.units;
+		}
 
-        const eKey = setting.replace('$', '');
-        const halData = get(halDescriptions, `${eKey}`, {
-            group: -1,
-        });
-        const halGroup = get(halGroups, `${halData.group}.label`, '');
+		const eKey = setting.replace("$", "");
+		const halData = get(halDescriptions, `${eKey}`, {
+			group: -1,
+		});
+		const halGroup = get(halGroups, `${halData.group}.label`, "");
 
-        return {
-            unit: baseUnit,
-            ...(properties || {}),
-            globalIndex: index,
-            setting: setting as EEPROM,
-            value: eeprom[setting as EEPROM],
-            ...halData,
-            group: halGroup,
-            groupID: halData.group,
-        };
-    });
+		return {
+			unit: baseUnit,
+			...(properties || {}),
+			globalIndex: index,
+			setting: setting as EEPROM,
+			value: eeprom[setting as EEPROM],
+			...halData,
+			group: halGroup,
+			groupID: halData.group,
+		};
+	});
 }
 
 export const importFirmwareSettings = (
-    file: File,
-    callback: (this: FileReader, ev: ProgressEvent<FileReader>) => any,
+	file: File,
+	callback: (this: FileReader, ev: ProgressEvent<FileReader>) => any,
 ) => {
-    const reader = new FileReader();
+	const reader = new FileReader();
 
-    reader.onload = callback;
-    reader.readAsText(file);
+	reader.onload = callback;
+	reader.readAsText(file);
 };
 
 export const halDatatypeMap: HalDataTypeMap = {
-    [BOOLEAN_ID]: BooleanInput,
-    [BITFIELD_ID]: BitfieldInput,
-    [EXCLUSIVE_BITFIELD_ID]: ExclusiveBitfieldInput,
-    [RADIO_BUTTON_ID]: RadioButtonInput,
-    [AXIS_MASK_ID]: AxisMaskInput,
-    [INTEGER_ID]: IntegerInput,
-    [DECIMAL_ID]: DecimalInput,
-    [STRING_ID]: StringInput,
-    [PASSWORD_ID]: PasswordInput,
-    [IPV4_ID]: Ipv4Input,
+	[BOOLEAN_ID]: BooleanInput,
+	[BITFIELD_ID]: BitfieldInput,
+	[EXCLUSIVE_BITFIELD_ID]: ExclusiveBitfieldInput,
+	[RADIO_BUTTON_ID]: RadioButtonInput,
+	[AXIS_MASK_ID]: AxisMaskInput,
+	[INTEGER_ID]: IntegerInput,
+	[DECIMAL_ID]: DecimalInput,
+	[STRING_ID]: StringInput,
+	[PASSWORD_ID]: PasswordInput,
+	[IPV4_ID]: Ipv4Input,
 };
 
 export const getDatatypeInput = (
-    type: string | number,
-    _firmware: FIRMWARE_TYPES_T,
+	type: string | number,
+	_firmware: FIRMWARE_TYPES_T,
 ) => {
-    // Translate the old values to new
-    type = Number(type);
-    return halDatatypeMap[type] || String;
+	// Translate the old values to new
+	type = Number(type);
+	return halDatatypeMap[type] || String;
 };
 
 export function generateEEPROMSettings(eeprom: FilteredEEPROM[]) {
-    const toChange: EEPROMSettings = {};
-    eeprom.map((setting) => {
-        if (setting.dirty) {
-            toChange[setting.setting] = setting.value;
-            setting.dirty = false;
-            setting.ogValue = null; // reset og value
-        }
-    });
-    return toChange;
+	const toChange: EEPROMSettings = {};
+	eeprom.map((setting) => {
+		if (setting.dirty) {
+			toChange[setting.setting] = setting.value;
+			setting.dirty = false;
+			setting.ogValue = null; // reset og value
+		}
+	});
+	return toChange;
 }

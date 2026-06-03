@@ -1,56 +1,57 @@
-import { StepActionButton } from 'app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx';
-import { StepProps } from 'app/features/AccessoryInstaller/types';
-import { useState } from 'react';
-import controller from 'app/lib/controller.ts';
-import store from 'app/store';
+import { StepActionButton } from "app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx";
+import type { StepProps } from "app/features/AccessoryInstaller/types";
+import controller from "app/lib/controller.ts";
+import store from "app/store";
+import { useState } from "react";
 
 export function ControllerConfiguration({
-    onComplete,
-    onUncomplete,
+	onComplete,
+	onUncomplete,
 }: StepProps) {
-    const [error, setError] = useState<string>('');
-    const [isComplete, setIsComplete] = useState<boolean>(false);
+	const [error, setError] = useState<string>("");
+	const [isComplete, setIsComplete] = useState<boolean>(false);
 
-    const applySettings = async () => {
-        // Also setup gSender settings :)
-        // Enable ATCI tab, enable spindle tab, set TC strategy to ignore
-        store.set('workspace.atcEnabled', true);
-        store.set('workspace.toolChangeOption', 'Ignore');
-        store.set('workspace.spindleFunctions', true)
-        store.set('workspace.toolChange.passthrough', true);
-        // Use macro for controller settings
-        controller.command('gcode', 'G65 P999');
-        setTimeout(() => {
-            setIsComplete(true);
-            onComplete();
-        }, 2000);
-    };
+	const applySettings = async () => {
+		// Also setup gSender settings :)
+		// Enable ATCI tab, enable spindle tab, set TC strategy to ignore
+		store.set("workspace.atcEnabled", true);
+		store.set("workspace.toolChangeOption", "Ignore");
+		store.set("workspace.spindleFunctions", true);
+		store.set("workspace.toolChange.passthrough", true);
+		// Use macro for controller settings
+		controller.command("gcode", "G65 P999");
+		setTimeout(() => {
+			setIsComplete(true);
+			onComplete();
+		}, 2000);
+	};
 
-    return (
-        <div className="flex flex-col gap-5 justify-start">
-            <p className="dark:text-white">
-                The following controller settings are being updated to ensure compatibility with the ATC.
-            </p>
-            <ul
-                className="list-disc list-inside text-gray-900 dark:text-white"
-                style={{ fontSize: '1.1rem' }}
-            >
-                <li>Homing direction</li>
-                <li>Tool number persistence</li>
-                <li>Input and output pin settings</li>
-                <li>Startup g-code</li>
-            </ul>
+	return (
+		<div className="flex flex-col gap-5 justify-start">
+			<p className="dark:text-white">
+				The following controller settings are being updated to ensure
+				compatibility with the ATC.
+			</p>
+			<ul
+				className="list-disc list-inside text-gray-900 dark:text-white"
+				style={{ fontSize: "1.1rem" }}
+			>
+				<li>Homing direction</li>
+				<li>Tool number persistence</li>
+				<li>Input and output pin settings</li>
+				<li>Startup g-code</li>
+			</ul>
 
-            <p className="dark:text-white">
-                Select <b>“Apply”</b> to apply these changes.
-            </p>
-            <StepActionButton
-                label={'Apply'}
-                runningLabel="Applying..."
-                onApply={applySettings}
-                isComplete={isComplete}
-                error={error}
-            />
-        </div>
-    );
+			<p className="dark:text-white">
+				Select <b>“Apply”</b> to apply these changes.
+			</p>
+			<StepActionButton
+				label={"Apply"}
+				runningLabel="Applying..."
+				onApply={applySettings}
+				isComplete={isComplete}
+				error={error}
+			/>
+		</div>
+	);
 }

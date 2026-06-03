@@ -21,45 +21,45 @@
  *
  */
 
-import { ChangeEvent } from 'react';
+import type { ChangeEvent } from "react";
 
 type Props = {
-    step?: number;
-    min?: number;
-    max?: number;
-    value?: number;
-    onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
-    label?: string;
-    unitString?: string;
+	step?: number;
+	min?: number;
+	max?: number;
+	value?: number;
+	onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
+	label?: string;
+	unitString?: string;
 };
 
 const Slider = ({
-    step = 1,
-    min = 0,
-    max = 100,
-    value = 50,
-    onChange = null,
-    label = 'Range',
-    unitString = 'RPM',
+	step = 1,
+	min = 0,
+	max = 100,
+	value = 50,
+	onChange = null,
+	label = "Range",
+	unitString = "RPM",
 }: Props) => {
-    return (
-        <div className="grid grid-cols-[1fr_3fr_1fr] mt-4 items-center gap-2 justify-center dark:text-white">
-            <span className="text-right">{label}:</span>
-            <input
-                type="range"
-                min={min}
-                max={max}
-                value={value}
-                onChange={onChange}
-                className="appearance-none h-4 rounded-md bg-gray-300 outline-none transition-opacity duration-200 ease-in-out dark:bg-dark-lighter"
-                step={step}
-                aria-label={label}
-            />
-            <span>
-                {value} {unitString}
-            </span>
-        </div>
-    );
+	return (
+		<div className="grid grid-cols-[1fr_3fr_1fr] mt-4 items-center gap-2 justify-center dark:text-white">
+			<span className="text-right">{label}:</span>
+			<input
+				type="range"
+				min={min}
+				max={max}
+				value={value}
+				onChange={onChange}
+				className="appearance-none h-4 rounded-md bg-gray-300 outline-none transition-opacity duration-200 ease-in-out dark:bg-dark-lighter"
+				step={step}
+				aria-label={label}
+			/>
+			<span>
+				{value} {unitString}
+			</span>
+		</div>
+	);
 };
 
 export default Slider;

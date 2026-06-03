@@ -21,39 +21,39 @@
  *
  */
 
-import * as THREE from 'three';
+import * as THREE from "three";
 
 class LaserPointer {
-    constructor(options) {
-        const { diameter = 1 } = { ...options };
-        const radius = Number(diameter / 2) || 1;
+	constructor(options) {
+		const { diameter = 1 } = { ...options };
+		const radius = Number(diameter / 2) || 1;
 
-        // line
-        const geometryC = new THREE.CylinderGeometry(0.8, 0.8, 30, 32);
-        const materialC = new THREE.MeshBasicMaterial({
-            color: 0x80388b,
-            opacity: 0.6,
-            transparent: true,
-        });
-        const cylinder = new THREE.Mesh(geometryC, materialC);
-        cylinder.position.set(0, 0, 15); // move up
-        cylinder.rotation.setFromVector3(new THREE.Vector3(Math.PI / 2, 0, 0)); // stand up
+		// line
+		const geometryC = new THREE.CylinderGeometry(0.8, 0.8, 30, 32);
+		const materialC = new THREE.MeshBasicMaterial({
+			color: 0x80388b,
+			opacity: 0.6,
+			transparent: true,
+		});
+		const cylinder = new THREE.Mesh(geometryC, materialC);
+		cylinder.position.set(0, 0, 15); // move up
+		cylinder.rotation.setFromVector3(new THREE.Vector3(Math.PI / 2, 0, 0)); // stand up
 
-        // sphere
-        const geometryB = new THREE.IcosahedronGeometry(radius, 5);
-        const materialB = new THREE.MeshBasicMaterial({
-            color: 0x9dfcff,
-        });
-        const ball = new THREE.Mesh(geometryB, materialB);
-        ball.layers.enable(1); // bloom
+		// sphere
+		const geometryB = new THREE.IcosahedronGeometry(radius, 5);
+		const materialB = new THREE.MeshBasicMaterial({
+			color: 0x9dfcff,
+		});
+		const ball = new THREE.Mesh(geometryB, materialB);
+		ball.layers.enable(1); // bloom
 
-        // put together
-        const group = new THREE.Group();
-        group.add(cylinder);
-        group.add(ball);
+		// put together
+		const group = new THREE.Group();
+		group.add(cylinder);
+		group.add(ball);
 
-        return group;
-    }
+		return group;
+	}
 }
 
 export default LaserPointer;

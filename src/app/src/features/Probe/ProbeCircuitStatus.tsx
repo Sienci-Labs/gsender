@@ -21,48 +21,46 @@
  *
  */
 
-import cx from 'classnames';
-import { FaCheck, FaTimes } from 'react-icons/fa';
+import cx from "classnames";
+import { FaCheck, FaTimes } from "react-icons/fa";
 
 interface Props {
-    probeActive: boolean;
-    connected: boolean;
+	probeActive: boolean;
+	connected: boolean;
 }
 
 const ProbeCircuitStatus: React.FC<Props> = ({ probeActive, connected }) => {
-    return (
-        <div className="w-full flex flex-col justify-center items-center sm:mt-4">
-            {connected && (
-                <div className="w-full flex flex-col justify-center items-center sm:mt-4">
-                    <div
-                        aria-label={probeActive ? 'Touch detected' : 'No touch'}
-                        title={probeActive ? 'Touch detected' : 'No touch'}
-                        className={cx(
-                            'w-8 h-8 rounded-full relative flex items-center justify-center',
-                            {
-                                'bg-red-500': !probeActive,
-                                'bg-green-500': probeActive,
-                            },
-                        )}
-                    >
-                        <span className="text-white" aria-hidden="true">
-                            {probeActive ? (
-                                <FaCheck className="w-4 h-4" />
-                            ) : (
-                                <FaTimes className="w-4 h-4" />
-                            )}
-                        </span>
-                    </div>
-                    <span className="mt-3">
-                        {connected && probeActive
-                            ? 'Touch detected'
-                            : 'No Touch'}
-                    </span>
-                </div>
-            )}
-            {!connected && 'No device connected'}
-        </div>
-    );
+	return (
+		<div className="w-full flex flex-col justify-center items-center sm:mt-4">
+			{connected && (
+				<div className="w-full flex flex-col justify-center items-center sm:mt-4">
+					<div
+						aria-label={probeActive ? "Touch detected" : "No touch"}
+						title={probeActive ? "Touch detected" : "No touch"}
+						className={cx(
+							"w-8 h-8 rounded-full relative flex items-center justify-center",
+							{
+								"bg-red-500": !probeActive,
+								"bg-green-500": probeActive,
+							},
+						)}
+					>
+						<span className="text-white" aria-hidden="true">
+							{probeActive ? (
+								<FaCheck className="w-4 h-4" />
+							) : (
+								<FaTimes className="w-4 h-4" />
+							)}
+						</span>
+					</div>
+					<span className="mt-3">
+						{connected && probeActive ? "Touch detected" : "No Touch"}
+					</span>
+				</div>
+			)}
+			{!connected && "No device connected"}
+		</div>
+	);
 };
 
 export default ProbeCircuitStatus;

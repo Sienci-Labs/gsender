@@ -1,1 +1,1 @@
-export type ALARM_CODE = number | 'Homing';
+export type ALARM_CODE = number | "Homing";

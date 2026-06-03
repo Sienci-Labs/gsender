@@ -1,13 +1,19 @@
 describe('Dynamic Keyboard Jogging Test - All Axes', () => {
-  before(() => {
-    cy.viewport(1920, 1080);
-  });
+    before(() => {
+        cy.viewport(1920, 1080);
+    });
 
-  beforeEach(() => {
-    cy.goToCarve();
-    cy.get('#app', { timeout: 20000 }).should('exist');
-    cy.wait(3000);
-  });
+    beforeEach(() => {
+        cy.viewport(1920, 1080);
+        cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
+            maxRetries: 6,
+            waitTime: 6000,
+            timeout: 120000
+        });
+        cy.goToCarve();
+        cy.get('#app', { timeout: 20000 }).should('exist');
+        cy.wait(3000);
+    });
 
   // Map axisIndex to data-testid selectors 
   const axisSelector = {

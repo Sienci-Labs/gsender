@@ -26,28 +26,28 @@
 // If value is less than min, min will be returned.
 // Otherwise, value is returned unaltered. Both ends of this range are inclusive.
 export const limit = (value: number, min: number, max: number): number => {
-    return Math.max(min, Math.min(max, value));
+	return Math.max(min, Math.min(max, value));
 };
 
 // Returns true if value is within the range, false otherwise.
 // It defaults to inclusive on both ends of the range, but that can be changed by
 // setting minExclusive and/or maxExclusive to a truthy value.
 export const test = (
-    value: number,
-    min: number,
-    max: number,
-    minExclusive: number,
-    maxExclusive: number,
+	value: number,
+	min: number,
+	max: number,
+	minExclusive: number,
+	maxExclusive: number,
 ): boolean => {
-    return !(
-        value < min ||
-        value > max ||
-        (maxExclusive && value === max) ||
-        (minExclusive && value === min)
-    );
+	return !(
+		value < min ||
+		value > max ||
+		(maxExclusive && value === max) ||
+		(minExclusive && value === min)
+	);
 };
 
 export default {
-    limit,
-    test,
+	limit,
+	test,
 };
