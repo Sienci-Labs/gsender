@@ -409,31 +409,31 @@ const main = () => {
 
             ipcMain.handle('get-windows-registry', async (channel) => {
                 if (process.platform !== 'win32') {
-                    return null;
+                    return false;
                 }
 
-                const registry = new WinReg({
-                    hive: WinReg.HKLM,
-                    key: '\\SOFTWARE\\SienciLabs\\gSender',
-                });
-
                 try {
-                    const isBundledItem = await new Promise((resolve, reject) => {
-                        registry.get('', (err, item) => {
+                    const registry = new WinReg({
+                        hive: WinReg.HKLM,
+                        key: '\\Software\\SienciLabs\\gSender',
+                    });
+
+                    const isBundledValue = await new Promise((resolve, reject) => {
+                        registry.get('IsBundled', (err, item) => {
                             if (err) {
                                 reject(err);
                                 return;
                             }
-                            resolve(item?.isBundled);
+                            resolve(item.value);
                         });
                     });
-                    const normalizedValue = String(isBundledItem?.value ?? '').toLowerCase();
-                    const isBundled = normalizedValue === '1' || normalizedValue === 'true';
-                    console.log({ REGISTRY: isBundledItem, isBundled });
+
+                    const isBundled = isBundledValue === '0x1';
+
                     return isBundled;
                 } catch (error) {
-                    console.log({ REGISTRY_ERROR: error?.message ?? error });
-                    return null;
+                    console.error(error);
+                    return false;
                 }
             });
 
