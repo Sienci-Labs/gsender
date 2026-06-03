@@ -276,6 +276,15 @@ export default function BottomDrawer() {
                 onChange={handleFileChange}
             />
 
+            {/* Backdrop — closes drawer when tapping outside it */}
+            {mode !== 'closed' && (
+                <div
+                    className="fixed inset-0 z-20"
+                    onClick={() => setMode('closed')}
+                    aria-hidden="true"
+                />
+            )}
+
             {/* Sliding panel */}
             <div
                 className={`absolute left-0 right-0 bottom-0 z-30 overflow-hidden transition-all duration-300 bg-gray-100 dark:bg-dark-darker border-t-2 border-gray-400 dark:border-dark-lighter ${mode !== 'closed' ? 'shadow-[0_-8px_20px_rgba(0,0,0,0.12)] dark:shadow-[0_-8px_20px_rgba(0,0,0,0.55)]' : ''}`}
