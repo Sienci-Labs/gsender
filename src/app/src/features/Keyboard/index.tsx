@@ -1,15 +1,13 @@
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-import pubsub from "pubsub-js";
-import { useEffect, useState } from "react";
-import KeyboardShortcuts from "./Keyboard";
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import KeyboardShortcuts from './Keyboard';
 
 const Shortcuts = () => {
-	const { isFinished } = useTypedSelector((state) => state.shortcuts);
-	// const componentRef = useRef();
+    const { isFinished } = useTypedSelector((state) => state.shortcuts);
+    // const componentRef = useRef();
 
-	return (
-		<>
-			{/* <ReactToPrint
+    return (
+        <>
+            {/* <ReactToPrint
                     trigger={() => (
                         <Button className="absolute top-5 left-[26em]">
                             Print
@@ -21,9 +19,9 @@ const Shortcuts = () => {
                     <PrintableShortcuts ref={componentRef} />
                 </div> */}
 
-			{isFinished && <KeyboardShortcuts />}
-		</>
-	);
+            {isFinished && <KeyboardShortcuts />}
+        </>
+    );
 };
 
 export default Shortcuts;
