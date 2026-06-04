@@ -1,35 +1,40 @@
-import {
-	FILE_TYPE,
-	WORKFLOW_STATES,
-	RENDER_STATE,
-	TOGGLE_STATUS,
-} from "../constants";
-import {
-	EEPROMSettings,
+import type { AXES } from "app/constants";
+import type {
 	EEPROMDescriptions,
+	EEPROMSettings,
 	FIRMWARE_TYPES_T,
 } from "app/definitions/firmware";
-import { BasicObject, BasicPosition, BBox } from "app/definitions/general";
-import type { MDI, Shuttle } from "app/definitions/general";
-import type { AXES } from "app/constants";
+import type {
+	BasicObject,
+	BasicPosition,
+	BBox,
+	MDI,
+	Shuttle,
+} from "app/definitions/general";
+import type { Connection } from "app/features/Connection/definitions";
+import type { Console } from "app/features/Console/definitions";
+import type { JobStatus } from "app/features/FileControl/definitions";
 import type { JogSpeed } from "app/features/Jogging/definitions";
-import { Connection } from "app/features/Connection/definitions";
-import { Console } from "app/features/Console/definitions";
-import { JobStatus } from "app/features/FileControl/definitions";
-import { Location } from "app/features/Location/definitions";
-import { Probe } from "app/features/Probe/definitions";
-import { Rotary } from "app/features/Rotary/definitions";
-import { Spindle, SpindleState } from "app/features/Spindle/definitions";
-import { Surfacing } from "app/features/Surfacing/definitions";
-import {
+import type { Location } from "app/features/Location/definitions";
+import type { Probe } from "app/features/Probe/definitions";
+import type { Rotary } from "app/features/Rotary/definitions";
+import type { Spindle, SpindleState } from "app/features/Spindle/definitions";
+import type { Surfacing } from "app/features/Surfacing/definitions";
+import type {
+	ATC,
 	VISUALIZER_TYPES_T,
 	Visualizer,
-	ATC,
 } from "app/features/Visualizer/definitions";
-import { Modal } from "app/lib/definitions/gcode_virtualization";
-import { Feeder, Sender } from "app/lib/definitions/sender_feeder";
-import { CommandKeys } from "app/lib/definitions/shortcuts";
-import { Notification, Workspace } from "app/workspace/definitions";
+import type { Modal } from "app/lib/definitions/gcode_virtualization";
+import type { Feeder, Sender } from "app/lib/definitions/sender_feeder";
+import type { CommandKeys } from "app/lib/definitions/shortcuts";
+import type { Notification, Workspace } from "app/workspace/definitions";
+import type {
+	FILE_TYPE,
+	RENDER_STATE,
+	TOGGLE_STATUS,
+	WORKFLOW_STATES,
+} from "../constants";
 
 // Types
 
@@ -58,8 +63,6 @@ export interface FirmwareOptions {
 	PLUGIN: string;
 	SPINDLE: string;
 }
-
-export interface ToolTable {}
 
 export type AXES_T = (typeof AXES)[keyof typeof AXES];
 

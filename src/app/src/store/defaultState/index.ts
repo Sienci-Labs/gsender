@@ -21,27 +21,26 @@
  *
  */
 
+import type { MachineProfile } from "app/definitions/firmware";
+import { defaultATCIMacros } from "app/features/ATC/assets/defaultATCIMacros.ts";
+import machineProfiles from "app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts";
+import type { SPINDLE } from "app/lib/definitions/gcode_virtualization";
 import {
+	DEFAULT_FIRMWARE_SETTINGS,
+	GRBLHAL,
+	LIGHTWEIGHT_OPTIONS,
 	METRIC_STEPS,
 	METRIC_UNITS,
+	OUTLINE_MODE_DETAILED,
+	ROTARY_MODE_FIRMWARE_SETTINGS,
 	SPINDLE_MODE,
+	SPINDLE_MODES,
 	SPIRAL_MOVEMENT,
 	START_POSITION_BACK_LEFT,
-	SPINDLE_MODES,
 	WORKSPACE_MODE,
-	ROTARY_MODE_FIRMWARE_SETTINGS,
-	DEFAULT_FIRMWARE_SETTINGS,
-	LIGHTWEIGHT_OPTIONS,
-	GRBLHAL,
-	OUTLINE_MODE_DETAILED,
 } from "../../constants";
-
-import machineProfiles from "app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts";
+import type { State } from "../definitions";
 import { profiles } from "./gamepad";
-import { State } from "../definitions";
-import { MachineProfile } from "app/definitions/firmware";
-import { SPINDLE } from "app/lib/definitions/gcode_virtualization";
-import { defaultATCIMacros } from "app/features/ATC/assets/defaultATCIMacros.ts";
 
 const [M3] = SPINDLE_MODES;
 
@@ -199,6 +198,7 @@ const defaultState: State = {
 			displayScaleFactor: "100%",
 		},
 		preventJoggingPastLimits: false,
+		lastViewedConfigLocation: "h-section-0",
 	},
 	widgets: {
 		atc: {
