@@ -273,19 +273,9 @@ class GrblController {
         this.feeder = new Feeder({
             dataFilter: (line, context) => {
                 let commentMatcher = /\s*;.*/g;
-                let bracketCommentLine = /\([^\)]*\)/gm;
-                const commentRegex = /\(([^)]*)\)|;(.*)/g;
-                const commentParts = [];
-                let m;
-                while ((m = commentRegex.exec(line)) !== null) {
-                    const text = (m[1] !== undefined ? m[1] : m[2]).trim();
-                    if (text) commentParts.push(text);
-                }
-                const commentString = commentParts.join(' ');
-                if (line[0] !== '%') {
-                    line = line.replace(bracketCommentLine, '').trim();
-                    line = line.replace(commentMatcher, '').trim();
-                }
+                let comment = line.match(commentMatcher);
+                const commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
+                line = line.replace(commentMatcher, '').trim();
                 const ignoreEvent = context ? context.ignoreEvent : true;
                 context = this.populateContext(context);
 

@@ -343,7 +343,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         label: 'Visualizer theme',
                         key: 'widgets.visualizer.theme',
                         description:
-                            'Independant colour control for the visualizer.',
+                            'Independent colour control for the visualizer.',
                         type: 'select',
                         options: [THEMES.LIGHT_THEME, THEMES.DARK_THEME],
                         onChange: (theme: THEMES_T) => {

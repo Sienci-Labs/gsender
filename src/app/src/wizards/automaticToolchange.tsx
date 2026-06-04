@@ -143,6 +143,7 @@ const createWizard = (count: number) => {
                 '%global.toolchange.DISTANCE=modal.distance',
                 '%global.toolchange.FEEDRATE=programFeedrate',
                 '%global.toolchange.SPINDLE_RATE=spindleRate',
+                '(STORED: [global.toolchange.SPINDLE] S[global.toolchange.SPINDLE_RATE])',
                 'M5 S0',
                 '%wait',
                 '%global.toolchange.XPOS=posx',
@@ -210,6 +211,7 @@ const createWizard = (count: number) => {
                                 label: 'Resume Cutting',
                                 gcodeLines: [
                                     '(Restart Spindle)',
+                                    '([global.toolchange.SPINDLE] S[global.toolchange.SPINDLE_RATE])',
                                     '[global.toolchange.SPINDLE] S[global.toolchange.SPINDLE_RATE]',
                                     '(Returning to initial position)',
                                     'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
