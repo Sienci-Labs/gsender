@@ -55,8 +55,13 @@ export function useSDCard() {
         newOpts !== undefined &&
         Object.prototype.hasOwnProperty.call(newOpts, 'YM');
 
-    const uploadFileToSDCard = (file) => {
-        controller.command('ymodem:upload', file);
+    const uploadFileToSDCard = (filesData) => {
+        // Support both single file and multiple files
+        if (Array.isArray(filesData)) {
+            controller.command('ymodem:uploadFiles', filesData);
+        } else {
+            controller.command('ymodem:upload', filesData);
+        }
     };
 
     const runSDFile = (path) => {
