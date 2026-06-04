@@ -16,14 +16,11 @@ describe("Console commands testing ", () => {
     cy.wait(1000);
     cy.connectMachine();
     cy.wait(3000);
-    cy.autoUnlock();
-    cy.log("Connected to CNC");
+
 
 		//Waiting until idle status
-		cy.log("Step 2: Waiting for idle state...");
-		cy.unlockMachineIfNeeded();
-		cy.contains(/^idle$/i, { timeout: 30000 }).should("be.visible");
-		cy.wait(1000);
+		cy.log('Checking Machine is in idle');
+    	cy.verifyMachineStatus('Idle');
 
 		//Go to console and clear
 		cy.log("Step 3: Clearing console...");

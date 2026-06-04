@@ -24,8 +24,6 @@ describe('Surfacing Test', () => {
     cy.wait(2000);
     cy.log('Machine is in idle status');
 
-    cy.unlockMachineIfNeeded();
-    cy.wait(2000);
 
     // Step 3: Navigate to Tools
     cy.log('Step 3: Navigating to Tools page...');

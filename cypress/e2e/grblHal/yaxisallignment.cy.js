@@ -20,7 +20,6 @@ describe("Rotary surfacing, Y axis allignment", () => {
 		cy.log("Step 2: Verifying machine status...");
 		cy.verifyMachineStatus("Idle");
 
-		cy.unlockMachineIfNeeded();
 
 		//Go to Config and turn on rotary surfacing
 		cy.goToConfig();

@@ -43,12 +43,8 @@ describe('Spindle Configuration and Control Test - Decrease to 7500 RPM', () => 
 
     // Step 2: Verify machine status is Idle
 
-    cy.log('Step 2: Verify machine status is Idle');
-    cy.contains(/^Idle$/i, { timeout: 30000 })
-      .should('be.visible')
-      .then(status => cy.log('Machine status: ' + status.text().trim()));
-    cy.wait(2000);
-
+cy.log('Checking Machine is in idle');
+    cy.verifyMachineStatus('Idle');
 
     // Step 3: Search for Spindle settings
 

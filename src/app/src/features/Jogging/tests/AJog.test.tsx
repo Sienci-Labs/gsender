@@ -1,6 +1,13 @@
+/** @jest-environment jsdom */  
+
 /**
- * @jest-environment jsdom
- */
+ * The tests check:              
+ * UI rendering
+ * Button accessibility
+ * Long press behavior
+ * Keyboard support
+ */  
+
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -12,11 +19,13 @@ import {
     stopContinuousJog,
 } from 'app/features/Jogging/utils/Jogging';
 
-// ─── Mocks ───────────────────────────────────────────────────────────────────
+//----------------------------------//
+// ─── Mocks ────────────────────────
+//----------------------------------//
 
 const longPressCallbacks: any[] = [];
 
-jest.mock('app/features/Jogging/utils/Jogging', () => ({
+jest.mock('app/features/Jogging/utils/Jogging', () => ({               //Real jogging functions are replaced with fake functions.
     aPlusJog: jest.fn(),
     aMinusJog: jest.fn(),
     continuousJogAxis: jest.fn(),
@@ -25,7 +34,7 @@ jest.mock('app/features/Jogging/utils/Jogging', () => ({
 
 jest.mock('use-long-press', () => ({
     useLongPress: jest.fn((callback, options) => {
-        longPressCallbacks.push({ callback, options });
+        longPressCallbacks.push({ callback, options });            //replaces the long-press library with a fake version (manually trigger long press)
         return () => ({
             onMouseDown: jest.fn(),
             onMouseUp: jest.fn(),
@@ -42,53 +51,56 @@ const defaultProps = {
     isRotaryMode: false,
     threshold: 200,
 };
+//----------------------------------//
+// ─── Rendering ───────────────────//
+//----------------------------------//
 
-// ─── Rendering ───────────────────────────────────────────────────────────────
 
-describe('AJog — rendering', () => {
+describe('AJog — rendering', () => {       
     beforeEach(() => {
         jest.clearAllMocks();
         longPressCallbacks.length = 0;
     });
 
-    it('renders top and bottom jog buttons', () => {
+    it('renders top and bottom jog buttons', () => {                  //Checks A+ button and A- Button are there, tested
         render(<AJog {...defaultProps} />);
         expect(screen.getByTestId('A+')).toBeInTheDocument();
         expect(screen.getByTestId('A-')).toBeInTheDocument();
     });
 
-    it('renders with correct aria-labels for A axis in normal mode', () => {
+    it('renders with correct aria-labels for A axis in normal mode', () => {    //Check correct aria-labels for A axis shown
         render(<AJog {...defaultProps} />);
         expect(screen.getByLabelText('Jog A plus')).toBeInTheDocument();
         expect(screen.getByLabelText('Jog A minus')).toBeInTheDocument();
     });
 
-    it('renders with correct aria-labels for Y axis in rotary mode', () => {
+    it('renders with correct aria-labels for Y axis in rotary mode', () => {    //Checks Y+ button and Y- Button are there, tested
+        render(<AJog {...defaultProps} />);
         render(<AJog {...defaultProps} isRotaryMode={true} />);
         expect(screen.getByLabelText('Jog Y plus')).toBeInTheDocument();
         expect(screen.getByLabelText('Jog Y minus')).toBeInTheDocument();
     });
 
-    it('renders container with correct id', () => {
+    it('renders container with correct id', () => {                        //Checks component renders container with correct id , tested
         const { container } = render(<AJog {...defaultProps} />);
         expect(container.querySelector('#aJog')).toBeInTheDocument();
     });
 
-    it('buttons are focusable when canClick is true', () => {
+    it('buttons are focusable when canClick is true', () => {            //Checks the buttons is focuasable , tested
         render(<AJog {...defaultProps} canClick={true} />);
-        expect(screen.getByTestId('A+')).toHaveAttribute('tabindex', '0');
+        expect(screen.getByTestId('A+')).toHaveAttribute('tabindex', '0');  //tab index 0 , user can TAB to button (keyboard)
         expect(screen.getByTestId('A-')).toHaveAttribute('tabindex', '0');
     });
 
     it('buttons are not focusable when canClick is false', () => {
         render(<AJog {...defaultProps} canClick={false} />);
-        expect(screen.getByTestId('A+')).toHaveAttribute('tabindex', '-1');
-        expect(screen.getByTestId('A-')).toHaveAttribute('tabindex', '-1');
+        expect(screen.getByTestId('A+')).toHaveAttribute('tabindex', '-1');  
+        expect(screen.getByTestId('A-')).toHaveAttribute('tabindex', '-1');   //tab index -1 , button is skipped during navigation  
     });
 });
-
-// ─── Long press behavior ──────────────────────────────────────────────────────
-
+//----------------------------------//
+// ─── Long press behavior ────────//
+//----------------------------------//
 describe('AJog — long press behavior', () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -148,9 +160,9 @@ describe('AJog — long press behavior', () => {
         expect(longPressCallbacks[0].options.threshold).toBe(500);
     });
 });
-
-// ─── Function call arguments ──────────────────────────────────────────────────
-
+//----------------------------------//
+// ─── Function call arguments ─────//
+//----------------------------------//
 describe('AJog — correct arguments', () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -175,8 +187,9 @@ describe('AJog — correct arguments', () => {
         expect(continuousJogAxis).toHaveBeenCalledWith({ A: 1 }, 1500);
     });
 });
-
-// ─── Keyboard behavior ────────────────────────────────────────────────────────
+//----------------------------------//
+// ─── Keyboard behavior ─────────────
+//----------------------------------//
 
 describe('AJog — keyboard behavior', () => {
     beforeEach(() => {

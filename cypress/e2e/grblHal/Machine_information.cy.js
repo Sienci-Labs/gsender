@@ -100,8 +100,6 @@ describe('Invert and Check Pins Test with Stepper Motor Lock/Unlock', () => {
     cy.wait(1000);
     cy.connectMachine();
     cy.wait(6000);
-    cy.unlockMachineIfNeeded();
-    cy.wait(2000);
     cy.log('Connected to CNC');
 
     // Step 2: Verify machine status

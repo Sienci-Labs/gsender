@@ -22,8 +22,7 @@ describe('Park feature ', () => {
     cy.wait(2000);
     cy.log('Machine is in idle status');
 
-    cy.unlockMachineIfNeeded();
-    cy.wait(2000);
+
     
     // Step 3: Jog machine X, Y & Z axis
     cy.log('Step 3: Jogging machine axes...');

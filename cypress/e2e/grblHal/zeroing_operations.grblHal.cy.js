@@ -20,16 +20,12 @@ it("Test Case: jogging using buttons and zeroing axes", () => {
     cy.wait(6000);
     cy.log('Connected to CNC');
     
-    // Handle unlock if needed
-    cy.unlockMachineIfNeeded();
 
 
 		// Step 2: Wait for Idle status
 		cy.log("Step 2: Waiting for Idle status...");
-		cy.contains(/^Idle$/i, { timeout: 30000 }).should("be.visible");
-		cy.wait(2000);
-		cy.log("Machine is Idle");
-
+		cy.log('Checking Machine is in idle');
+        cy.verifyMachineStatus('Idle');
 		// Step 3: Move to position (0, 0, 0)
 		cy.log("Step 3: Moving to position (0, 0, 0)...");
 		cy.goToLocation({ x: 0, y: 0, z: 0 });

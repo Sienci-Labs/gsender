@@ -23,9 +23,7 @@ Cypress.on('uncaught:exception', (err) => {
     cy.connectMachine();
     cy.wait(6000);
     cy.log('Connected to CNC');
-    
-    // Handle unlock if needed
-    cy.unlockMachineIfNeeded();
+  
 
     // Step 2: Verify CNC machine status is Idle
     cy.log('Step 2: Verifying machine status...');

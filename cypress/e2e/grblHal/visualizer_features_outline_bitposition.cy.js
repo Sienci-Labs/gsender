@@ -67,19 +67,10 @@ describe("CNC Bit Position and Job Progress Tracking", () => {
 		cy.wait(6000); // Wait for connection to establish
 		cy.log(" Connected to CNC");
 
-		// Step 2: Handle unlock if needed
-		cy.log("Step 2: Unlocking machine if needed...");
-		cy.unlockMachineIfNeeded();
 
 		// Step 3: Verify machine is in Idle state
-		cy.log("Step 3: Verifying machine status...");
-		cy.contains(/^Idle$/i, { timeout: 30000 })
-			.should("be.visible")
-			.then((status) => {
-				cy.log(` Machine status: "${status.text().trim()}"`);
-			});
-		cy.wait(2000);
-
+		cy.log('Step : 3 Checking Machine is in idle');
+    	cy.verifyMachineStatus('Idle');
 		// Step 4: Load a G-code file (required before job can start)
 		cy.log("Step 4: Loading G-code file...");
 		cy.uploadGcodeFile();

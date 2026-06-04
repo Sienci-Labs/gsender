@@ -14,11 +14,8 @@ describe("Preset Movements by Updating Values Test", () => {
 		cy.connectMachine();
 		cy.wait(7000);
 
-		// Unlock machine if needed
-		cy.unlockMachineIfNeeded();
-
-		// Verify machine status is Idle
-		cy.contains(/^Idle$/i, { timeout: 30000 }).should("be.visible");
+		cy.log('Checking Machine is in idle');
+   		cy.verifyMachineStatus('Idle');
 
 		// Step 2: Reset all axes to zero
 		cy.zeroAllAxes();
@@ -85,8 +82,8 @@ describe("Preset Movements by Updating Values Test", () => {
 		cy.connectMachine();
 		cy.wait(7000);
 
-		cy.unlockMachineIfNeeded();
-		cy.contains(/^Idle$/i, { timeout: 30000 }).should("be.visible");
+		cy.log('Checking Machine is in idle');
+    	cy.verifyMachineStatus('Idle');
 
 		cy.zeroAllAxes();
 		cy.verifyAxes(0, 0, 0);
@@ -146,8 +143,8 @@ describe("Preset Movements by Updating Values Test", () => {
 		cy.connectMachine();
 		cy.wait(7000);
 
-		cy.unlockMachineIfNeeded();
-		cy.contains(/^Idle$/i, { timeout: 30000 }).should("be.visible");
+		cy.log('Checking Machine is in idle');
+    	cy.verifyMachineStatus('Idle');
 
 		cy.zeroAllAxes();
 		cy.verifyAxes(0, 0, 0);

@@ -6,35 +6,35 @@
         "label": "After Zeroing"
       },
       {
-        "value": 35.15,
+        "value": 0,
         "label": "Job Started"
       },
       {
-        "value": 27.41,
+        "value": 35.15,
         "label": "During Job - 1000ms"
       },
       {
-        "value": 65,
+        "value": 18.33,
         "label": "During Job - 2000ms"
       },
       {
-        "value": 92.99,
+        "value": 42.73,
         "label": "During Job - 3000ms"
       },
       {
-        "value": 96.93,
+        "value": 53.89,
         "label": "During Job - 5000ms"
       },
       {
-        "value": 138.7,
+        "value": 140.12,
         "label": "During Job - 7000ms"
       },
       {
-        "value": 219.47,
+        "value": 165.82,
         "label": "During Job - 10000ms"
       },
       {
-        "value": 193.01,
+        "value": 221.85,
         "label": "Job Stopped/Paused"
       }
     ],
@@ -44,35 +44,35 @@
         "label": "After Zeroing"
       },
       {
-        "value": 5.77,
+        "value": 0,
         "label": "Job Started"
       },
       {
-        "value": 42.73,
+        "value": 5.77,
         "label": "During Job - 1000ms"
       },
       {
-        "value": 8.8,
+        "value": 41.47,
         "label": "During Job - 2000ms"
       },
       {
-        "value": 11.63,
+        "value": 6.54,
         "label": "During Job - 3000ms"
       },
       {
-        "value": 11.31,
+        "value": 30.62,
         "label": "During Job - 5000ms"
       },
       {
-        "value": 4.89,
+        "value": 7.79,
         "label": "During Job - 7000ms"
       },
       {
-        "value": 17.52,
+        "value": 34.95,
         "label": "During Job - 10000ms"
       },
       {
-        "value": 37.67,
+        "value": 18.03,
         "label": "Job Stopped/Paused"
       }
     ],
@@ -82,35 +82,35 @@
         "label": "After Zeroing"
       },
       {
-        "value": -2.9,
+        "value": 5.08,
         "label": "Job Started"
       },
       {
-        "value": -3,
+        "value": -0.05,
         "label": "During Job - 1000ms"
       },
       {
-        "value": 5.08,
+        "value": -3,
         "label": "During Job - 2000ms"
       },
       {
-        "value": -2.7,
+        "value": 5.08,
         "label": "During Job - 3000ms"
       },
       {
-        "value": 5.08,
+        "value": -3,
         "label": "During Job - 5000ms"
       },
       {
-        "value": -3,
+        "value": 5.08,
         "label": "During Job - 7000ms"
       },
       {
-        "value": 5.08,
+        "value": -3,
         "label": "During Job - 10000ms"
       },
       {
-        "value": -3,
+        "value": 2.98,
         "label": "Job Stopped/Paused"
       }
     ]
@@ -118,116 +118,116 @@
   "machine": {
     "x": [
       {
-        "value": 105,
+        "value": 825,
         "label": "After Zeroing"
       },
       {
-        "value": 140.15,
+        "value": 825,
         "label": "Job Started"
       },
       {
-        "value": 132.41,
+        "value": 860.15,
         "label": "During Job - 1000ms"
       },
       {
-        "value": 170,
+        "value": 843.33,
         "label": "During Job - 2000ms"
       },
       {
-        "value": 197.99,
+        "value": 867.73,
         "label": "During Job - 3000ms"
       },
       {
-        "value": 201.93,
+        "value": 878.89,
         "label": "During Job - 5000ms"
       },
       {
-        "value": 243.7,
+        "value": 965.12,
         "label": "During Job - 7000ms"
       },
       {
-        "value": 324.47,
+        "value": 990.82,
         "label": "During Job - 10000ms"
       },
       {
-        "value": 298.01,
+        "value": 1046.85,
         "label": "Job Stopped/Paused"
       }
     ],
     "y": [
       {
-        "value": 105,
+        "value": 820,
         "label": "After Zeroing"
       },
       {
-        "value": 110.77,
+        "value": 820,
         "label": "Job Started"
       },
       {
-        "value": 147.73,
+        "value": 825.77,
         "label": "During Job - 1000ms"
       },
       {
-        "value": 113.8,
+        "value": 861.47,
         "label": "During Job - 2000ms"
       },
       {
-        "value": 116.63,
+        "value": 826.54,
         "label": "During Job - 3000ms"
       },
       {
-        "value": 116.31,
+        "value": 850.62,
         "label": "During Job - 5000ms"
       },
       {
-        "value": 109.89,
+        "value": 827.79,
         "label": "During Job - 7000ms"
       },
       {
-        "value": 122.52,
+        "value": 854.95,
         "label": "During Job - 10000ms"
       },
       {
-        "value": 142.67,
+        "value": 838.03,
         "label": "Job Stopped/Paused"
       }
     ]
   },
   "timestamps": [
     {
-      "time": "2026-05-27T03:18:23.554Z",
+      "time": "2026-05-28T17:14:38.785Z",
       "label": "After Zeroing"
     },
     {
-      "time": "2026-05-27T03:18:23.557Z",
+      "time": "2026-05-28T17:14:38.789Z",
       "label": "Job Started"
     },
     {
-      "time": "2026-05-27T03:18:23.560Z",
+      "time": "2026-05-28T17:14:38.793Z",
       "label": "During Job - 1000ms"
     },
     {
-      "time": "2026-05-27T03:18:23.562Z",
+      "time": "2026-05-28T17:14:38.795Z",
       "label": "During Job - 2000ms"
     },
     {
-      "time": "2026-05-27T03:18:23.565Z",
+      "time": "2026-05-28T17:14:38.798Z",
       "label": "During Job - 3000ms"
     },
     {
-      "time": "2026-05-27T03:18:23.567Z",
+      "time": "2026-05-28T17:14:38.801Z",
       "label": "During Job - 5000ms"
     },
     {
-      "time": "2026-05-27T03:18:23.569Z",
+      "time": "2026-05-28T17:14:38.803Z",
       "label": "During Job - 7000ms"
     },
     {
-      "time": "2026-05-27T03:18:23.571Z",
+      "time": "2026-05-28T17:14:38.806Z",
       "label": "During Job - 10000ms"
     },
     {
-      "time": "2026-05-27T03:18:23.574Z",
+      "time": "2026-05-28T17:14:38.809Z",
       "label": "Job Stopped/Paused"
     }
   ]

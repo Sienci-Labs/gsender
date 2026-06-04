@@ -182,7 +182,7 @@ it('should generate 4 layers when maxDepth is 8 and skimDepth is 2', () => {
     });
 
 
-        it('should include Move to Starting Height for layers after first', () => {
+        it('should include Move to Starting Height for layers after first', () => {                  //Checks the Machine moves tool upward before cutting,tested
             const gen = new Generator({
                 surfacing: { ...baseSurfacing, skimDepth: 1, maxDepth: 2 },
                 units: METRIC_UNITS,
@@ -192,7 +192,7 @@ it('should generate 4 layers when maxDepth is 8 and skimDepth is 2', () => {
     });
 
     describe('ZigZag Pattern', () => {
-        it('should generate zigzag gcode', () => {
+        it('should generate zigzag gcode', () => {                                               //Checks zig zag mode working 
             const gen = new Generator({
                 surfacing: { ...baseSurfacing, type: ZIG_ZAG_MOVEMENT },
                 units: METRIC_UNITS,
@@ -200,29 +200,44 @@ it('should generate 4 layers when maxDepth is 8 and skimDepth is 2', () => {
             expect(gen.generate()).toBeTruthy();
         });
 
-        it('should generate zigzag with cutDirectionFlipped true', () => {
-            const gen = new Generator({
-                surfacing: { ...baseSurfacing, type: ZIG_ZAG_MOVEMENT, cutDirectionFlipped: true },
-                units: METRIC_UNITS,
-            });
-            expect(gen.generate()).toBeTruthy();
-        });
+ it('should generate zigzag with cutDirectionFlipped true', () => {
+    const genFlipped = new Generator({
+        surfacing: { ...baseSurfacing, type: ZIG_ZAG_MOVEMENT, cutDirectionFlipped: true },       //Checks zigzag is generated when cutDirectionFlipped is ture
+        units: METRIC_UNITS,
+    });
 
-        it('should generate zigzag with cutDirectionFlipped false', () => {
-            const gen = new Generator({
-                surfacing: { ...baseSurfacing, type: ZIG_ZAG_MOVEMENT, cutDirectionFlipped: false },
-                units: METRIC_UNITS,
-            });
-            expect(gen.generate()).toBeTruthy();
-        });
+    const genNotFlipped = new Generator({
+        surfacing: { ...baseSurfacing, type: ZIG_ZAG_MOVEMENT, cutDirectionFlipped: false },
+        units: METRIC_UNITS,
+    });
 
-        it('should generate zigzag when width > length', () => {
-            const gen = new Generator({
-                surfacing: { ...baseSurfacing, type: ZIG_ZAG_MOVEMENT, width: 150, length: 80 },
-                units: METRIC_UNITS,
-            });
-            expect(gen.generate()).toBeTruthy();
-        });
+    const resultFlipped = genFlipped.generate();
+    const resultNotFlipped = genNotFlipped.generate();
+
+    expect(resultFlipped).toBeTruthy();
+    expect(resultFlipped).toContain('G1');
+
+    expect(resultFlipped).not.toEqual(resultNotFlipped);
+});
+    it('should generate zigzag when width > length', () => {
+    const gen = new Generator({
+        surfacing: { ...baseSurfacing, type: ZIG_ZAG_MOVEMENT, width: 80, length: 150 },    //Check zigzag generated when width > length, tested
+        units: METRIC_UNITS,
+    });
+
+    const genReversed = new Generator({
+        surfacing: { ...baseSurfacing, type: ZIG_ZAG_MOVEMENT, width: 150, length: 80 }, // swapped   
+        units: METRIC_UNITS,
+    });
+
+    const result = gen.generate();
+    const resultReversed = genReversed.generate();
+
+    expect(result).toBeTruthy();
+    expect(result).toContain('G1');
+
+    expect(result).not.toEqual(resultReversed);
+});
 
         it('should generate zigzag when length > width', () => {
             const gen = new Generator({

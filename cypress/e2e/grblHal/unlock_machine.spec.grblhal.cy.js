@@ -1,85 +1,117 @@
 describe("Machine Connection and Unlock Test", () => {
-	beforeEach(() => {
-		cy.viewport(1920, 1080);
-		cy.loadUI(`${Cypress.config("baseUrl")}/#/`, {
-			maxRetries: 4,
-			waitTime: 4000,
-			timeout: 5000,
-		});
-	});
+  beforeEach(() => {
+    cy.viewport(1920, 1080);
+    cy.loadUI(`${Cypress.config("baseUrl")}/#/`, {
+      maxRetries: 4,
+      waitTime: 4000,
+      timeout: 5000,
+    });
+  });
 
-	it("Connect to machine and unlock if needed", () => {
-		// Get device prefix from environment variable
-		const devicePrefix = Cypress.env("devicePrefix") || "COM";
+  it("Connect to machine and unlock if needed", () => {
 
-		cy.wait(3000);
+    // --- Step 1: Click "Connect to CNC" button ---
+    cy.contains('span', 'Connect to CNC', { timeout: 15000 })
+      .should('exist')
+      .scrollIntoView()
+      .parents('button')
+      .first()
+      .should('be.visible')
+      .should('not.be.disabled')
+      .click({ force: true });
 
-		// Step 1: Click "Connect to CNC" button first
-		cy.log("Step 1: Clicking Connect to CNC button...");
-		cy.contains(/^connect to CNC$/i, { timeout: 20000 })
-			.should("exist")
-			.scrollIntoView()
-			.should("be.visible")
-			.click({ force: true });
+    cy.wait(1500);
 
-		cy.wait(2000);
+    // --- Step 2: Retry if dropdown didn't open ---
+    cy.get('body').then(($body) => {
+      if ($body.find('div[data-radix-popper-content-wrapper]').length === 0) {
+        cy.log('Dropdown not open - retrying click...');
+        cy.contains('span', 'Connect to CNC', { timeout: 5000 })
+          .parents('button')
+          .first()
+          .click({ force: true });
+        cy.wait(1500);
+      }
+    });
 
-		// Step 2: Select device from the connection dialog
-		cy.log(`Step 2: Selecting device with prefix: ${devicePrefix}...`);
+    // --- Step 3: Select first available port ---
+    cy.get("div[data-radix-popper-content-wrapper]", { timeout: 15000 })
+      .should("exist")
+      .within(() => {
+        cy.get("button.m-0")
+          .should("have.length.greaterThan", 0)
+          .first()
+          .then(($btn) => {
+            const $label = $btn.find("span.font-bold");
+            const portName =
+              $label.length > 0 ? $label.text().trim() : $btn.text().trim();
+            cy.log(`Selecting first available port: "${portName}"`);
+            cy.wrap($btn).click({ force: true });
+          });
+      });
 
-		cy.get("div.absolute", { timeout: 20000 })
-			.should("be.visible")
-			.find("button")
-			.then(($buttons) => {
-				// Find the button that contains the device prefix
-				const matchingButton = $buttons.filter((i, btn) =>
-					btn.textContent.includes(devicePrefix),
-				);
+    // --- Step 4: Wait for machine to stabilize after connection ---
+    cy.log("Waiting for machine to stabilize after connection...");
+    cy.wait(4000);
 
-				if (matchingButton.length > 0) {
-					const portName = matchingButton.first().text().trim();
-					cy.log(`Selecting port: ${portName}`);
-					cy.wrap(matchingButton.first()).click({ force: true });
-				} else {
-					cy.log(`No device found with prefix: ${devicePrefix}`);
-					throw new Error(`No device found with prefix: ${devicePrefix}`);
-				}
-			});
+    // --- Step 5: Check machine status — skip unlock if already Idle ---
+    cy.get("body").then(($body) => {
+      const isAlreadyIdle = $body.text().match(/^Idle$/im);
 
-		cy.wait(4000);
-		cy.log("Connection initiated");
+      if (isAlreadyIdle) {
+        cy.log("✓ Machine is already in Idle state — no unlock needed");
+        return;
+      }
 
-		// Step 3: Check if unlock/homing is needed and click if it appears
-		cy.log("Step 3: Checking if machine needs to be unlocked or homed...");
+      cy.log("Machine is not Idle — checking if unlock is needed...");
 
-		cy.get("body").then(($body) => {
-			// Check for the specific unlock/homing button with SVG icon
-			const unlockButton = $body.find("button.border-red-800.bg-red-600 svg");
+      // --- Option 1: Lock icon button in sidebar ---
+      const lockButtonSvg = $body.find(
+        "#app > div.flex > div.flex > div:nth-of-type(2) div > svg"
+      );
 
-			if (unlockButton.length > 0) {
-				cy.log("Unlock/Homing button found - clicking to unlock machine...");
+      if (lockButtonSvg.length > 0) {
+        cy.log("Option 1: Lock icon found — clicking lock button...");
 
-				// Click the button that contains the SVG (the unlock/homing button)
-				cy.get("button.border-red-800.bg-red-600")
-					.should("be.visible")
-					.click({ force: true });
+        cy.get("#app > div.flex > div.flex > div:nth-of-type(2) div > svg")
+          .should("exist")
+          .click({ force: true });
 
-				cy.wait(3000);
-				cy.log("Unlock/Homing button clicked");
-			} else {
-				cy.log("No unlock needed - machine is already unlocked");
-			}
-		});
+        cy.wait(2000);
 
-		// Step 4: Verify machine reaches idle state
-		cy.log("Step 4: Waiting for machine to reach idle state...");
+        // --- Option 2 (fallback): "Click to Unlock" dialog button ---
+        cy.get("body").then(($bodyAfter) => {
+          const unlockDialogBtn = $bodyAfter.find("header div.mt-4 button");
 
-		cy.contains(/^Idle$/i, { timeout: 30000 })
-			.should("be.visible")
-			.then(() => {
-				cy.log("Machine is in Idle state and ready for operations");
-			});
+          if (unlockDialogBtn.length > 0) {
+            cy.log("Option 1 opened a dialog — clicking 'Click to Unlock' button...");
 
-		cy.log("Test completed successfully");
-	});
+            cy.get("header div.mt-4 button")
+              .contains(/click to unlock/i)
+              .should("be.visible")
+              .click({ force: true });
+
+            cy.wait(2000);
+            cy.log("Unlocked via Option 2 (dialog button)");
+          } else {
+            cy.log("Unlocked via Option 1 (lock button click)");
+          }
+        });
+
+      } else {
+        cy.log("No lock button found — machine may already be unlocked");
+      }
+    });
+
+    // --- Step 6: Verify Idle state — passes if either unlock worked ---
+    cy.log("Waiting for machine to reach Idle state...");
+
+    cy.contains(/^Idle$/i, { timeout: 30000 })
+      .should("be.visible")
+      .then(() => {
+        cy.log("✓ Machine is in Idle state — test passed");
+      });
+
+    cy.log("Test completed successfully");
+  });
 });

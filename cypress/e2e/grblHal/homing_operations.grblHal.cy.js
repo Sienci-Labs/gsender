@@ -14,8 +14,6 @@ describe("Gsender testing - Homing functionality", () => {
 		cy.log("Step 1: Connecting to CNC...");
 		cy.connectMachine();
 		cy.wait(3000);
-		cy.unlockMachineIfNeeded();
-		cy.wait(1000);
 		cy.log("Connected to CNC");
 
 		// Step 2: Wait for idle state before proceeding
@@ -102,17 +100,16 @@ describe("Gsender testing - Homing functionality", () => {
 		cy.log("Machine is ready");
 
 		// Step 10: Execute Homing sequence
-		cy.log("Step 10: Executing homing sequence...");
-		cy.get("div.flex-shrink-0 > div > div > div > div").click();
-		cy.wait(500);
-		cy.contains("button", "Home").click();
-		cy.wait(1000);
-		cy.log("Homing command sent");
+cy.log('Step 10: Executing homing sequence...');
+cy.contains('button', /^Home$/i).click();
 
+cy.wait(1000);
+cy.log('Homing command sent');
 		// Step 11: Verify homing status appears
 		cy.log("Step 11: Verifying homing status...");
 		cy.verifyMachineStatus("Homing");
 		cy.log('Machine status changed to "Homing"');
+		cy.wait(10000);
 
 		// Step 12: Wait for homing to complete and verify Idle status
 		cy.log("Step 12: Waiting for homing to complete...");

@@ -352,6 +352,7 @@
     "@types/react-syntax-highlighter": "^15.5.13",
     "@types/redux-mock-store": "^1.5.0",
     "@vitejs/plugin-react": "4.3.1",
+    "@vitest/coverage-v8": "^4.1.8",
     "@xterm/addon-fit": "^0.10.0",
     "@xterm/xterm": "^5.5.0",
     "autoprefixer": "^10.4.19",

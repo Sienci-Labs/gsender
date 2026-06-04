@@ -34,10 +34,8 @@ describe("Gsender testing jogging using buttons", () => {
 		cy.log("Connected");
 
 		// Step 2: Wait for Idle status
-		cy.log("Step 2: Waiting for Idle status...");
-		cy.contains(/^Idle$/i, { timeout: 30000 }).should("be.visible");
-		cy.wait(2000);
-		cy.log(" Machine is Idle");
+		cy.log('Checking Machine is in idle');
+    	cy.verifyMachineStatus('Idle');
 
 		// Step 3: Move to position (0, 0, 0)
 		cy.log("Step 3: Moving to position (0, 0, 0)...");

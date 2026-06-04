@@ -87,17 +87,10 @@ describe('Macros Upload, Execution and Verification Test', () => {
     cy.wait(6000);
     cy.log('Connected to CNC');
     
-    // Handle unlock if needed after connection
-    cy.unlockMachineIfNeeded();
-    cy.wait(2000);
 
     // Verify machine is in Idle state
-    cy.log('Verifying machine status...');
-    cy.contains(/^Idle$/i, { timeout: 30000 })
-      .should('be.visible')
-      .then(() => {
-        cy.log('Machine is Idle');
-      });
+   cy.log('Checking Machine is in idle');
+    cy.verifyMachineStatus('Idle');
 
     // Handle unlock again if alarm 11 occurred during idle
     cy.log('Checking for alarm during idle state...');

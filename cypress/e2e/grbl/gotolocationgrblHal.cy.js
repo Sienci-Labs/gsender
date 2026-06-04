@@ -18,12 +18,8 @@ describe('CNC Machine Tests Grbl', () => {
     cy.log('Connected to CNC');
 
     // Step 2: Verify machine status is Idle
-    cy.log('Step 2: Verifying machine status...');
-    cy.contains(/^Idle$/i, { timeout: 30000 })
-      .should('be.visible')
-      .then(($status) => {
-        cy.log(`Machine status: "${$status.text().trim()}"`);
-      });
+    cy.log('Checking Machine is in idle');
+    cy.verifyMachineStatus('Idle');
 
     cy.wait(2000);
 

@@ -67,6 +67,8 @@ describe('Gsender testing preset create update', () => {
     cy.connectMachine();
     cy.wait(6000);
     cy.log('Connected to CNC');
+    cy.log('Checking Machine is in idle');
+    cy.verifyMachineStatus('Idle');
 
     // ── Step 2: Zero all axes
     cy.log('Step 2: Zeroing all axes...');

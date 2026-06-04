@@ -26,23 +26,19 @@ describe('gSender XY Squaring Test', () => {
     cy.wait(2000);
     cy.log('Machine is in idle status');
 
-    // Step 3: Unlock machine if needed
-    cy.unlockMachineIfNeeded();
-    cy.wait(2000);
-
     // Step 4: Navigate to Tools page
-    cy.log('Step 4: Navigating to Tools page...');
+    cy.log('Step 3: Navigating to Tools page...');
     cy.goToTools();
     cy.log('Tools page opened');
 
     // Step 5: Click on XY Squaring tool
-    cy.log('Step 5: Opening XY Squaring tool...');
+    cy.log('Step 4: Opening XY Squaring tool...');
    cy.contains('div.rounded-lg', 'XY Squaring')
   .should('be.visible')
   .click();
 
-    // Step 6: Click "Start XY Squaring" button
-    cy.log('Step 6: Starting XY Squaring wizard...');
+    // Step 5: Click "Start XY Squaring" button
+    cy.log('Step 5: Starting XY Squaring wizard...');
     cy.get('button')
       .contains('Start XY Squaring')
       .should('be.visible')
@@ -50,8 +46,8 @@ describe('gSender XY Squaring Test', () => {
     cy.wait(1500);
     cy.log('XY Squaring wizard started');
 
-    // Step 7: Open Jog Controls
-    cy.log('Step 7: Opening Jog Controls...');
+    // Step 6: Open Jog Controls
+    cy.log('Step 6: Opening Jog Controls...');
     cy.get('div.justify-start > div:nth-of-type(1) > div:nth-of-type(2) span')
       .contains('Jog Controls')
       .should('be.visible')
@@ -59,8 +55,8 @@ describe('gSender XY Squaring Test', () => {
     cy.wait(1000);
     cy.log('Jog Controls opened');
 
-    // Step 8: Set jog distance to 10mm
-    cy.log('Step 8: Setting jog distance to 10mm...');
+    // Step 7: Set jog distance to 10mm
+    cy.log('Step 7: Setting jog distance to 10mm...');
     cy.get('body > div:nth-of-type(2) div.gap-1 > div.items-center > div > div:nth-of-type(1) > div')
       .should('be.visible')
       .click();

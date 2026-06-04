@@ -126,11 +126,9 @@ Cypress.Commands.add("connectMachine", () => {
                     cy.wrap($btn).click({ force: true });
                 });
         });
-
+		cy.log('Unlocking machine if needed')
+		cy.unlockMachineIfNeeded();
     // Step 4: Confirm Idle state
-    cy.contains(/^Idle$/i, { timeout: 30000 })
-        .should("be.visible")
-        .then(() => cy.log("CNC machine connected and in Idle state"));
 });
 //-----------------------
 //21.Axis Homing Z< Y & X
@@ -574,16 +572,62 @@ Cypress.Commands.add("uploadGcodeFile", (fileName = "sample.gcode") => {
 //10.Unlock Machine if Needed
 // ----------------------
 Cypress.Commands.add("unlockMachineIfNeeded", () => {
-	cy.get("body").then(($body) => {
-		if ($body.find("svg.hidden").length > 0) {
-			cy.log("Machine locked - unlocking...");
-			cy.get("svg.hidden").parent("button").click({ force: true });
-			cy.wait(1000);
-			cy.log("Machine unlocked");
-		} else {
-			cy.log("Machine already unlocked");
-		}
-	});
+  cy.wait(4000); // Wait for machine to stabilize
+
+  cy.get("body").then(($body) => {
+    const isAlreadyIdle = $body.text().match(/^Idle$/im);
+
+    if (isAlreadyIdle) {
+      cy.log("✓ Machine is already Idle — no unlock needed");
+      return;
+    }
+
+    cy.log("Machine is not Idle — attempting unlock...");
+
+    // --- Option 1: Lock icon button in sidebar ---
+    const lockButtonSvg = $body.find(
+      "#app > div.flex > div.flex > div:nth-of-type(2) div > svg"
+    );
+
+    if (lockButtonSvg.length > 0) {
+      cy.log("Option 1: Lock icon found — clicking...");
+
+      cy.get("#app > div.flex > div.flex > div:nth-of-type(2) div > svg")
+        .should("exist")
+        .click({ force: true });
+
+      cy.wait(2000);
+
+      // --- Option 2 (fallback): "Click to Unlock" dialog button ---
+      cy.get("body").then(($bodyAfter) => {
+        const unlockDialogBtn = $bodyAfter.find("header div.mt-4 button");
+
+        if (unlockDialogBtn.length > 0) {
+          cy.log("Option 1 opened dialog — clicking 'Click to Unlock'...");
+
+          cy.get("header div.mt-4 button")
+            .contains(/click to unlock/i)
+            .should("be.visible")
+            .click({ force: true });
+
+          cy.wait(2000);
+          cy.log("✓ Unlocked via Option 2 (dialog button)");
+        } else {
+          cy.log("✓ Unlocked via Option 1 (lock icon)");
+        }
+      });
+
+    } else {
+      cy.log("No lock button found — machine may already be unlocked");
+    }
+
+    // Verify machine reaches Idle after unlock attempt
+    cy.contains(/^Idle$/i, { timeout: 30000 })
+      .should("be.visible")
+      .then(() => {
+        cy.log("✓ Machine reached Idle state — unlock successful");
+      });
+  });
 });
 
 // ----------------------
@@ -1017,6 +1061,7 @@ Cypress.Commands.add("verifyMachineStatus", (expectedStatus, options = {}) => {
 		"Disconnected",
 		"Running",
 		"Jogging",
+		"Homing",
 		"Hold",
 	];
 

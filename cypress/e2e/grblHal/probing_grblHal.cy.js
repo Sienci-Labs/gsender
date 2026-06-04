@@ -17,12 +17,11 @@ describe("CNC Machine - Complete Z and XYZ Axis Probing", () => {
 		cy.log("Step 2: Connecting to CNC machine...");
 		cy.connectMachine();
 		cy.wait(6000);
-		cy.unlockMachineIfNeeded();
-		cy.wait(2000);
+	
 		cy.log(" Connected to CNC");
 
-		cy.contains(/^Idle$/i, { timeout: 30000 }).should("be.visible");
-		cy.log("Machine is Idle");
+	cy.log('Checking Machine is in idle');
+    cy.verifyMachineStatus('Idle');
 
 		// Step 2: Configure probe settings
 		cy.log("Step 3: Navigating to Config page...");

@@ -104,10 +104,7 @@ describe("CNC Machine Tests", () => {
 		cy.log("Connected to CNC");
 
 		// Step 4: Verify CNC machine status is Idle
-		cy.contains(/^Idle$/i, { timeout: 30000 })
-			.should("be.visible")
-			.then((status) => {
-				cy.log(`Machine status: "${status.text().trim()}"`);
-			});
+		cy.log('Checking Machine is in idle');
+   	    cy.verifyMachineStatus('Idle');
 	});
 });

@@ -30,16 +30,11 @@ describe("CNC Machine Tests job run Grbl", () => {
 		cy.wait(6000);
 		cy.log("Connected to CNC");
 		// Handle unlock if needed
-		cy.unlockMachineIfNeeded();
+		
 
 		// Step 2: Verify CNC machine status is Idle
-		cy.log("Step 2: Verifying machine status...");
-		cy.contains(/^Idle$/i, { timeout: 30000 })
-			.should("be.visible")
-			.then((status) => {
-				cy.log(`Machine status: "${status.text().trim()}"`);
-			});
-
+		cy.log('Checking Machine is in idle');
+   	    cy.verifyMachineStatus('Idle');
 		cy.wait(2000);
 
 		// Step 3: Zero all axes

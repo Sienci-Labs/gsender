@@ -16,8 +16,9 @@ describe("Go to axis  Movements by Adding and  Values Test", () => {
 		cy.connectMachine();
 		cy.wait(7000);
 
-		cy.unlockMachineIfNeeded();
-		cy.contains(/^Idle$/i, { timeout: 30000 }).should("be.visible");
+		cy.log('Checking Machine is in idle');
+    	cy.verifyMachineStatus('Idle');
+		
 
 		cy.log("Step 2: Zeroing all axes...");
 
@@ -184,8 +185,8 @@ describe("Go to axis  Movements by Adding and  Values Test", () => {
 		cy.connectMachine();
 		cy.wait(7000);
 
-		cy.unlockMachineIfNeeded();
-		cy.contains(/^Idle$/i, { timeout: 30000 }).should("be.visible");
+		cy.log('Checking Machine is in idle');
+    	cy.verifyMachineStatus('Idle');
 
 		cy.log("Step 2: Zeroing all axes...");
 
@@ -352,8 +353,8 @@ describe("Go to axis  Movements by Adding and  Values Test", () => {
 		cy.connectMachine();
 		cy.wait(7000);
 
-		cy.unlockMachineIfNeeded();
-		cy.contains(/^Idle$/i, { timeout: 30000 }).should("be.visible");
+		cy.log('Checking Machine is in idle');
+    	cy.verifyMachineStatus('Idle');
 
 		cy.log("Step 2: Zeroing all axes...");
 

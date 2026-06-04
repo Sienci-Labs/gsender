@@ -150,8 +150,8 @@ describe('Dynamic Keyboard Jogging Test - All Axes', () => {
     cy.log('STEP 1: Connect to CNC');
     cy.connectMachine();
     cy.wait(7000);
-    cy.unlockMachineIfNeeded();
-    cy.contains(/^Idle$/i, { timeout: 30000 }).should('be.visible');
+    cy.log('Checking Machine is in idle');
+    cy.verifyMachineStatus('Idle');
 
     cy.log('STEP 2: Zero All Axes');
     cy.zeroAllAxes();

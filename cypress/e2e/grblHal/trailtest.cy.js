@@ -23,10 +23,6 @@ describe('Surfacing Test', () => {
     cy.verifyMachineStatus('Idle');
     cy.wait(2000);
     cy.log('Machine is in idle status');
-
-    cy.unlockMachineIfNeeded();
-    cy.wait(2000);
-
     // Step 3: Navigate to Tools
    
     cy.log('Zeroing all axis...');

@@ -17,8 +17,6 @@ describe('Feedrate Performance Comparison Test', () => {
     cy.wait(6000);
     cy.log('Connected to CNC');
     
-    // Handle unlock if needed
-    cy.unlockMachineIfNeeded();
 
     // Verify machine status is Idle
     cy.log('Verifying machine status is Idle...');

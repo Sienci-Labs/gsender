@@ -17,8 +17,6 @@ describe('Gsender testing - AXIS Homing functionality', () => {
     cy.log('Step 1: Connecting to CNC...');
     cy.connectMachine();
     cy.wait(3000);
-    cy.unlockMachineIfNeeded();
-    cy.wait(1000);
     cy.log('Connected to CNC');
 
     // Step 2: Wait for idle state before proceeding
@@ -113,83 +111,71 @@ describe('Gsender testing - AXIS Homing functionality', () => {
     cy.log('Step 8: Zeroing out axes...');
     
     cy.log('Setting X to zero...');
-    cy.get('div.flex-shrink-0 > div > div > div > div > div.relative > div.flex-col > div:nth-of-type(1) > div:nth-of-type(1) span')
-      .should('contain.text', 'X0')
-      .click();
+    cy.zeroXAxis();
     cy.wait(1000);
 
     cy.log('Setting Y to zero...');
-    cy.get('div.h-\\[75\\%\\] div.flex-col > div:nth-of-type(2) > div:nth-of-type(1) span')
-      .should('contain.text', 'Y0')
-      .click();
+    cy.zeroYAxis();
     cy.wait(1000);
 
     cy.log('Setting Z to zero...');
-    cy.get('div.flex-shrink-0 > div > div > div > div > div.relative div:nth-of-type(3) > div:nth-of-type(1) span')
-      .should('contain.text', 'Z0')
-      .click();
+    cy.zeroZAxis();
     cy.wait(1000);
     cy.log('All axes zeroed');
 
-    // Step 9: Enable Homing Toggle
-    cy.log('Step 9: Enabling homing toggle...');
-    cy.get('div.flex-shrink-0 > div > div > div > div > div.relative div.flex > button')
-      .click();
-    cy.wait(1000);
-    cy.log('Homing toggle enabled');
+   // Step 9: Enable Homing Toggle
+cy.log('Step 9: Enabling homing toggle...');
+cy.get('button[aria-label="Toggle single axis homing"]')
+  .click();
+cy.wait(1000);
+cy.log('Homing toggle enabled');
+// Step 10: Verify axes changed to HX, HY, HZ
+cy.log('Step 10: Verifying axes changed to homing mode...');
 
-    // Step 10: Verify axes changed to HX, HY, HZ
-    cy.log('Step 10: Verifying axes changed to homing mode...');
-    
-    cy.get('div.flex-shrink-0 > div > div > div > div > div.relative > div.flex-col > div:nth-of-type(1) > div:nth-of-type(1) span')
-      .should('contain.text', 'HX');
-    cy.log('X axis changed to HX');
+cy.contains('span', 'HX').should('be.visible');
+cy.log('X axis changed to HX');
 
-    cy.get('div.h-\\[75\\%\\] div.flex-col > div:nth-of-type(2) > div:nth-of-type(1) span')
-      .should('contain.text', 'HY');
-    cy.log('Y axis changed to HY');
+cy.contains('span', 'HY').should('be.visible');
+cy.log('Y axis changed to HY');
 
-    cy.get('div.flex-shrink-0 > div > div > div > div > div.relative div:nth-of-type(3) > div:nth-of-type(1) span')
-      .should('contain.text', 'HZ');
-    cy.log('Z axis changed to HZ');
+cy.contains('span', 'HZ').should('be.visible');
+cy.log('Z axis changed to HZ');
 
-    // Step 11: Execute Z-axis homing first to block the unnecessary errors or crashes 
-    cy.log('Step 13: Executing Z-axis homing...');
-    cy.get('div.flex-shrink-0 > div > div > div > div > div.relative div:nth-of-type(3) > div:nth-of-type(1) span')
-      .contains('HZ')
-      .click();
-    cy.wait(2000);
-    
-    cy.log('Waiting for Z-axis homing to complete...');
-    cy.contains(/^idle$/i, { timeout: 30000 }).should('be.visible');
-    cy.log('Z-axis homing completed - Machine is Idle');
-    cy.wait(1000);
+// Step 11: Execute Z-axis homing first
+cy.log('Step 11: Executing Z-axis homing...');
+cy.get('button[aria-label*="Home Z axis"]').click();
+// OR: cy.contains('span', 'HZ').click();
+cy.wait(2000);
 
+cy.log('Waiting for Z-axis homing to complete...');
+cy.contains(/^idle$/i, { timeout: 30000 }).should('be.visible');
+cy.log('Z-axis homing completed - Machine is Idle');
+cy.wait(1000);
 
-    // Step 12: Execute X-axis homing
-    cy.log('Step 11: Executing X-axis homing...');
-    cy.get('div.flex-shrink-0 > div > div > div > div > div.relative > div.flex-col > div:nth-of-type(1) > div:nth-of-type(1) span')
-      .contains('HX')
-      .click();
-    cy.wait(2000);
-    
-    cy.log('Waiting for X-axis homing to complete...');
-    cy.contains(/^idle$/i, { timeout: 30000 }).should('be.visible');
-    cy.log('X-axis homing completed - Machine is Idle');
-    cy.wait(1000);
+// Step 12: Execute X-axis homing
+cy.log('Step 12: Executing X-axis homing...');
+cy.get('button[aria-label*="Home X axis"]').click();
+// OR: cy.contains('span', 'HX').click();
+cy.wait(2000);
 
-    // Step 13: Execute Y-axis homing
-    cy.log('Step 12: Executing Y-axis homing...');
-    cy.get('div.h-\\[75\\%\\] div.flex-col > div:nth-of-type(2) > div:nth-of-type(1) span')
-      .contains('HY')
-      .click();
-    cy.wait(2000);
-    
-    cy.log('Waiting for Y-axis homing to complete...');
-    cy.contains(/^idle$/i, { timeout: 30000 }).should('be.visible');
-    cy.log('Y-axis homing completed - Machine is Idle');
-    cy.wait(1000);
-    
-    cy.log('Axis homing test completed successfully!');
+cy.log('Waiting for X-axis homing to complete...');
+cy.contains(/^idle$/i, { timeout: 30000 }).should('be.visible');
+cy.log('X-axis homing completed - Machine is Idle');
+cy.wait(1000);
+
+// Step 13: Execute Y-axis homing
+cy.log('Step 13: Executing Y-axis homing...');
+cy.get('button[aria-label*="Home Y axis"]').click();
+// OR: cy.contains('span', 'HY').click();
+cy.wait(2000);
+
+cy.log('Waiting for Y-axis homing to complete...');
+cy.contains(/^idle$/i, { timeout: 30000 }).should('be.visible');
+cy.log('Y-axis homing completed - Machine is Idle');
+cy.wait(1000);
+
+cy.log('Axis homing test completed successfully!');
+
   });
+
 });

@@ -1,0 +1,9 @@
+#<_tc_slots> = 6
+#<_tc_rack_enable> = 0
+#<_pres_sense> = 1
+#<_holder_sense> = 1
+#<_tc_slot_offset> = 90
+#<_passthrough_offset_setting> = 0
+#<_ort_offset_mode> = 0
+#<_irt_offset_mode> = 0
+(msg, ATCI|rack_size:6)

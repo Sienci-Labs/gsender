@@ -35,20 +35,8 @@ describe('CNC Visualizer rendering test case', () => {
     cy.wait(6000);
     cy.log('Connected to CNC');
 
-    // Step 2: Check for unlock popup and click if present
-    cy.log('Step 2: Checking for unlock popup...');
-    cy.get('body').then($body => {
-      if ($body.find('#app > div > div.border div.mt-4 button').length > 0) {
-        cy.log('Unlock popup found - clicking to unlock...');
-        cy.get('#app > div > div.border div.mt-4 button')
-          .click({ force: true });
-        cy.wait(2000);
-        cy.log('Machine unlocked');
-      } else {
-        cy.log('No unlock popup - machine ready');
-      }
-    });
-
+    cy.log('Checking Machine is in idle');
+    cy.verifyMachineStatus('Idle');
     // Step 3: Verify visualizer exists BEFORE file upload
     cy.log('Step 3: Checking visualizer UI before file upload...');
     cy.get('#visualizer_container', { timeout: 10000 })
