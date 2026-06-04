@@ -28,9 +28,9 @@ export default defineConfig({
         patchCssModules(),
         tailwindcss(),
         nodePolyfills({
-            // To add only specific polyfills, add them here. If no option is passed, adds all polyfills
-            include: ['process'],
-            globals: { global: true, process: true },
+            // @react-pdf/renderer (js-md5, pdfkit) expects Node Buffer in the browser bundle
+            include: ['process', 'buffer'],
+            globals: { global: true, process: true, Buffer: true },
         }),
         sentryVitePlugin({
             org: process.env.SENTRY_ORG,
