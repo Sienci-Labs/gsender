@@ -120,6 +120,7 @@ class Visualizer extends Component {
             'Right',
             'Free',
         ]),
+        followTool: PropTypes.bool,
         state: PropTypes.object,
         isSecondary: PropTypes.bool,
     };
@@ -129,6 +130,9 @@ class Visualizer extends Component {
     pubsubTokens = [];
 
     outlineRunning = false;
+
+    // requestAnimationFrame handle for the smooth camera-follow loop (null = idle)
+    cameraFollowRAF = null;
 
     isAgitated = false;
 
@@ -603,6 +607,12 @@ class Visualizer extends Component {
                     prevProps.workPosition,
                     this.props.workPosition,
                 );
+                // Keep the camera following the tool while "follow tool" is on.
+                // Driven here (per position update) rather than via the gsap
+                // onUpdate inside updateCuttingToolPosition, which early-returns
+                // when the tool STL model hasn't loaded. startCameraFollow eases
+                // the camera toward the new position and self-gates when off.
+                this.startCameraFollow();
             }
         }
 
@@ -643,6 +653,17 @@ class Visualizer extends Component {
             if (this.props.cameraPosition === 'Right') {
                 this.toRightSideView();
             }
+        }
+
+        // Start/stop the smooth follow loop when "follow tool" is toggled.
+        const followNow =
+            this.props.followTool || this.props.state?.followTool;
+        const followPrev =
+            prevProps.followTool || prevProps.state?.followTool;
+        if (followNow && !followPrev) {
+            this.startCameraFollow();
+        } else if (!followNow && followPrev) {
+            this.stopCameraFollow();
         }
 
         if (activeState === GRBL_ACTIVE_STATE_CHECK && this.waitingForCheck) {
@@ -2088,6 +2109,10 @@ class Visualizer extends Component {
         if (this.controls) {
             this.controls.dispose();
         }
+        if (this.disposeFollowDragDetection) {
+            this.disposeFollowDragDetection();
+            this.disposeFollowDragDetection = null;
+        }
 
         // Update the scene
         this.updateScene();
@@ -2417,6 +2442,57 @@ class Visualizer extends Component {
             this.updateScene();
         });
 
+        // Turn off "follow tool" when the user actually DRAGS the view (pointer
+        // down + movement past a small threshold) — not on a plain click, and
+        // not on wheel-zoom (so the user can still zoom while following). The
+        // controls' own 'start' event fires for mousedown, wheel and touch
+        // alike and carries no movement info, so detect the drag here instead.
+        const DRAG_THRESHOLD_SQ = 16; // (4px)^2 before a press counts as a drag
+        let dragOrigin = null;
+        const onGrabStart = (event) => {
+            const p = event.touches ? event.touches[0] : event;
+            dragOrigin = p ? { x: p.clientX, y: p.clientY } : null;
+        };
+        const onGrabMove = (event) => {
+            if (!dragOrigin) {
+                return;
+            }
+            const p = event.touches ? event.touches[0] : event;
+            if (!p) {
+                return;
+            }
+            const dx = p.clientX - dragOrigin.x;
+            const dy = p.clientY - dragOrigin.y;
+            if (dx * dx + dy * dy >= DRAG_THRESHOLD_SQ) {
+                dragOrigin = null; // fire once per press
+                if (
+                    this.isFollowEnabled() &&
+                    this.props.actions?.camera?.toggleFollowTool
+                ) {
+                    this.props.actions.camera.toggleFollowTool();
+                }
+            }
+        };
+        const onGrabEnd = () => {
+            dragOrigin = null;
+        };
+        domElement.addEventListener('mousedown', onGrabStart);
+        domElement.addEventListener('mousemove', onGrabMove);
+        domElement.addEventListener('mouseup', onGrabEnd);
+        domElement.addEventListener('touchstart', onGrabStart, {
+            passive: true,
+        });
+        domElement.addEventListener('touchmove', onGrabMove, { passive: true });
+        domElement.addEventListener('touchend', onGrabEnd);
+        this.disposeFollowDragDetection = () => {
+            domElement.removeEventListener('mousedown', onGrabStart);
+            domElement.removeEventListener('mousemove', onGrabMove);
+            domElement.removeEventListener('mouseup', onGrabEnd);
+            domElement.removeEventListener('touchstart', onGrabStart);
+            domElement.removeEventListener('touchmove', onGrabMove);
+            domElement.removeEventListener('touchend', onGrabEnd);
+        };
+
         return controls;
     }
 
@@ -2622,6 +2698,84 @@ class Visualizer extends Component {
         this.controls.target.y = y;
         this.controls.target.z = z;
         this.controls.update();
+    }
+
+    // True when the "follow tool" toggle is on.
+    isFollowEnabled() {
+        return !!(this.props.followTool || this.props.state?.followTool);
+    }
+
+    // The cutting tool's position in scene space. Prefer the live tool object
+    // (when its STL model is loaded); otherwise compute workPosition - pivotPoint,
+    // the same value updateCuttingToolPosition uses, so following still works
+    // when this.cuttingTool is null.
+    getToolScenePosition() {
+        if (this.cuttingTool) {
+            const p = this.cuttingTool.position;
+            return { x: p.x, y: p.y, z: p.z };
+        }
+        const pivot = this.pivotPoint.get();
+        const wp = this.workPosition || {};
+        return {
+            x: (wp.x || 0) - pivot.x,
+            y: (wp.y || 0) - pivot.y,
+            z: (wp.z || 0) - pivot.z,
+        };
+    }
+
+    // Smoothly pan the camera so the orbit target eases toward the cutting tool,
+    // keeping the user's viewing angle and zoom (the same delta is added to the
+    // camera position and the controls target, as panHandler() does). Runs as its
+    // own requestAnimationFrame loop so the motion is smooth regardless of the
+    // (choppy) status-report rate, and stops itself once it has caught up.
+    startCameraFollow() {
+        if (this.cameraFollowRAF !== null || !this.isFollowEnabled()) {
+            return;
+        }
+
+        const SMOOTHING = 0.08; // fraction of remaining distance eased per frame (lower = smoother/floatier)
+        const SETTLE_SQ = 1e-4; // stop easing once within ~0.01 mm
+
+        const tick = () => {
+            if (!this.isFollowEnabled() || !this.controls || !this.camera) {
+                this.cameraFollowRAF = null;
+                return;
+            }
+
+            const tool = this.getToolScenePosition();
+            const ex = tool.x - this.controls.target.x;
+            const ey = tool.y - this.controls.target.y;
+            const ez = tool.z - this.controls.target.z;
+
+            if (ex * ex + ey * ey + ez * ez < SETTLE_SQ) {
+                // Caught up — idle until the tool moves again.
+                this.cameraFollowRAF = null;
+                return;
+            }
+
+            const mx = ex * SMOOTHING;
+            const my = ey * SMOOTHING;
+            const mz = ez * SMOOTHING;
+            this.camera.position.x += mx;
+            this.camera.position.y += my;
+            this.camera.position.z += mz;
+            this.controls.target.x += mx;
+            this.controls.target.y += my;
+            this.controls.target.z += mz;
+            this.controls.update();
+            this.updateScene({ forceUpdate: true });
+
+            this.cameraFollowRAF = requestAnimationFrame(tick);
+        };
+
+        this.cameraFollowRAF = requestAnimationFrame(tick);
+    }
+
+    stopCameraFollow() {
+        if (this.cameraFollowRAF !== null) {
+            cancelAnimationFrame(this.cameraFollowRAF);
+            this.cameraFollowRAF = null;
+        }
     }
 
     // Make the controls look at the center position
