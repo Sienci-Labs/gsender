@@ -29,3 +29,11 @@ src/app/src/routeTree.gen.ts
 src/app/src/application.css
 .env
 /docs/performance/
+# Cypress artifacts
+cypress/screenshots/
+cypress/videos/
+cypress/results/
+cypress/reports/
+cypress/Reports/
+cypress/downloads/
+

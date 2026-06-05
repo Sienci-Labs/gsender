@@ -1,243 +1,229 @@
-describe("Invert and Check Pins Test with Stepper Motor Lock/Unlock", () => {
-	beforeEach(() => {
-		cy.viewport(1920, 1080);
-		cy.loadUI(`${Cypress.config("baseUrl")}/#/`, {
-			maxRetries: 4,
-			waitTime: 4000,
-			timeout: 5000,
-		});
-	});
+describe('Invert and Check Pins Test with Stepper Motor Lock/Unlock', () => {
+  beforeEach(() => {
+    cy.viewport(1920, 1080);
+    cy.loadUI();
+  });
 
-	it("Checks machine information, verifies pin inversion, and tests stepper motor lock/unlock", () => {
-		// Step 1: Connect to CNC machine
-		cy.log("Step 1: Connecting to CNC machine...");
-		cy.connectMachine();
-		cy.wait(6000);
-		cy.unlockMachineIfNeeded();
-		cy.wait(2000);
-		cy.log("Connected to CNC");
+  it('Checks machine information, verifies pin inversion, and tests stepper motor lock/unlock', () => {
 
-		// Step 2: Verify machine status
-		cy.log("Step 2: Verifying machine status...");
-		cy.verifyMachineStatus("Idle");
-		cy.log("Machine is Idle");
+    const CHECKMARK_PATH = 'M173.898 439.404';
+    const CROSS_PATH     = 'M242.72 256l100.07';
 
-		// Step 3: Open and pin Machine Info
-		cy.log("Step 3: Opening Machine Information popup...");
-		cy.get("div.border > div.top-0 img").should("be.visible").click();
-		cy.wait(2000);
+    // Helper: get limit pin state from pinned popup
+    const checkLimitState = (limitName) => {
+      return cy.get('body > div:nth-of-type(2)').then(($popup) => {
+        const $rows = $popup.find('div').filter((i, el) => {
+          return el.textContent.trim() === limitName;
+        });
 
-		cy.log("Step 4: Pinning popup...");
-		cy.get("body > div:nth-of-type(2) svg").first().click({ force: true });
-		cy.wait(1000);
-		cy.log("Machine Info popup pinned");
+        if ($rows.length === 0) {
+          cy.log(`WARNING: Could not find label "${limitName}" in popup`);
+          return 'not-found';
+        }
 
-		// Step 5: Navigate to Configuration
-		cy.log("Step 5: Navigating to Configuration page...");
-		cy.goToConfig();
-		cy.wait(3000);
-		cy.log("Configuration page opened");
+        const $row   = $rows.first().parent();
+        const $paths = $row.find('svg path');
 
-		// Step 6: Search for "invert"
-		cy.log('Step 6: Searching for "invert" settings...');
-		cy.get("#simple-search").should("be.visible").clear().type("invert");
-		cy.wait(1500);
-		cy.log('Search results displayed for "invert"');
+        if ($paths.length === 0) {
+          cy.log(`WARNING: No SVG icon found near "${limitName}"`);
+          return 'no-icon';
+        }
 
-		// Helper function to disable axis if enabled (toggle off if on)
-		const disableAxisIfEnabled = (axisId, axisName) => {
-			cy.log(`Step: Checking ${axisName} axis invert limit pin...`);
-			cy.get(`#${axisId}`)
-				.scrollIntoView()
-				.should("exist")
-				.then(($switch) => {
-					const isEnabled =
-						$switch.attr("data-state") === "checked" ||
-						$switch.attr("aria-checked") === "true";
+        const pathD = $paths.first().attr('d') || '';
+        if (pathD.includes(CHECKMARK_PATH)) return 'green';
+        if (pathD.includes(CROSS_PATH))     return 'red';
 
-					if (isEnabled) {
-						cy.log(`${axisName} axis is ENABLED - Disabling...`);
-						cy.wrap($switch).click({ force: true });
-						cy.wait(500);
-						cy.log(`${axisName} axis toggled to DISABLED `);
-					} else {
-						cy.log(`${axisName} axis already DISABLED  - Skipping toggle`);
-					}
-				});
-		};
+        cy.log(`Unknown path near "${limitName}": ${pathD.substring(0, 40)}`);
+        return 'unknown';
+      });
+    };
 
-		// Helper function to enable axis if disabled (toggle on if off)
-		const enableAxisIfDisabled = (axisId, axisName) => {
-			cy.log(`Step: Checking ${axisName} axis invert limit pin...`);
-			cy.get(`#${axisId}`)
-				.scrollIntoView()
-				.should("exist")
-				.then(($switch) => {
-					const isEnabled =
-						$switch.attr("data-state") === "checked" ||
-						$switch.attr("aria-checked") === "true";
+    // Helper: click Apply Settings only if present and enabled
+    const applyIfNeeded = () => {
+      cy.get('body').then(($body) => {
+        const $btn = $body.find('button:contains("Apply Settings")');
+        if ($btn.length > 0 && !$btn.is(':disabled')) {
+          cy.log('Apply Settings button is active - Clicking...');
+          cy.wrap($btn).click();
+          cy.wait(2000);
+        } else {
+          cy.log('Apply Settings not needed - Settings already up to date');
+        }
+      });
+    };
 
-					if (!isEnabled) {
-						cy.log(`${axisName} axis is DISABLED - Enabling...`);
-						cy.wrap($switch).click({ force: true });
-						cy.wait(500);
-						cy.log(`${axisName} axis toggled to ENABLED `);
-					} else {
-						cy.log(`${axisName} axis already ENABLED - Skipping toggle`);
-					}
-				});
-		};
+    // Helper: disable axis toggle if enabled
+    const disableAxisIfEnabled = (axisId, axisName) => {
+      cy.log(`Checking ${axisName} axis invert limit pin...`);
+      cy.get(`#${axisId}`)
+        .scrollIntoView()
+        .should('exist')
+        .then(($switch) => {
+          const isEnabled = $switch.attr('data-state') === 'checked' ||
+                            $switch.attr('aria-checked') === 'true';
+          if (isEnabled) {
+            cy.log(`${axisName} axis ENABLED - Disabling...`);
+            cy.wrap($switch).click({ force: true });
+            cy.wait(500);
+          } else {
+            cy.log(`${axisName} axis already DISABLED - Skipping`);
+          }
+        });
+    };
 
-		// Disable X axis invert limit pin if enabled
-		disableAxisIfEnabled("\\$5-0-key", "X");
+    // Helper: enable axis toggle if disabled
+    const enableAxisIfDisabled = (axisId, axisName) => {
+      cy.log(`Checking ${axisName} axis invert limit pin...`);
+      cy.get(`#${axisId}`)
+        .scrollIntoView()
+        .should('exist')
+        .then(($switch) => {
+          const isEnabled = $switch.attr('data-state') === 'checked' ||
+                            $switch.attr('aria-checked') === 'true';
+          if (!isEnabled) {
+            cy.log(`${axisName} axis DISABLED - Enabling...`);
+            cy.wrap($switch).click({ force: true });
+            cy.wait(500);
+          } else {
+            cy.log(`${axisName} axis already ENABLED - Skipping`);
+          }
+        });
+    };
 
-		// Disable Y axis invert limit pin if enabled
-		disableAxisIfEnabled("\\$5-1-key", "Y");
+    // Step 1: Connect
+    cy.log('Step 1: Connecting to CNC machine...');
+    cy.connectMachine();
+    cy.wait(6000);
+    cy.unlockMachineIfNeeded();
+    cy.wait(2000);
+    cy.log('Connected to CNC');
 
-		// Disable Z axis invert limit pin if enabled
-		disableAxisIfEnabled("\\$5-2-key", "Z");
+    // Step 2: Verify machine status
+    cy.log('Step 2: Verifying machine status...');
+    cy.verifyMachineStatus('Idle');
+    cy.log('Machine is Idle');
 
-		// Disable A axis invert limit pin if enabled
-		disableAxisIfEnabled("\\$5-3-key", "A");
+    // Step 3: Open Machine Info popup
+    cy.log('Step 3: Opening Machine Information popup...');
+    cy.get('header div.top-0 img').should('be.visible').click();
+    cy.wait(2000);
 
-		// Apply settings
-		cy.log("Step 7: Applying settings...");
-		cy.contains("button", "Apply Settings").should("be.visible").click();
-		cy.wait(2000);
-		cy.log("Settings applied");
+    // Step 4: Pin the popup — from recording
+    cy.log('Step 4: Pinning popup...');
+    cy.get('body > div:nth-of-type(2) div > svg')
+      .should('exist')
+      .click({ force: true });
+    cy.wait(1000);
+    cy.log('Machine Info popup pinned');
 
-		// Helper function to check if a specific limit is green
-		const checkLimitGreen = (limitName) => {
-			return cy.get("body").then(($body) => {
-				const $limit = $body.find(`div.text-gray-500:contains("${limitName}")`);
-				if ($limit.length > 0) {
-					return $limit.closest(".relative").find(".bg-green-500").length > 0;
-				}
-				return false;
-			});
-		};
+    // Step 5: Navigate to Configuration
+    cy.log('Step 5: Navigating to Configuration page...');
+    cy.goToConfig();
+    cy.wait(3000);
+    cy.log('Configuration page opened');
 
-		// Check all limits are green
-		cy.log("Verifying all limit pins turned green...");
+    // Step 6: Search for invert
+    cy.log('Step 6: Searching for invert settings...');
+    cy.searchInSettings('invert');
+    cy.wait(1500);
+    cy.log('Search results displayed for invert');
 
-		checkLimitGreen("X limit").then((isGreen) => {
-			expect(isGreen, "X limit should be green").to.be.true;
-		});
+    // Disable all axes
+    disableAxisIfEnabled('\\$5-0-key', 'X');
+    disableAxisIfEnabled('\\$5-1-key', 'Y');
+    disableAxisIfEnabled('\\$5-2-key', 'Z');
+    disableAxisIfEnabled('\\$5-3-key', 'A');
 
-		checkLimitGreen("Y limit").then((isGreen) => {
-			expect(isGreen, "Y limit should be green").to.be.true;
-		});
+    // Step 7: Apply if needed
+    cy.log('Step 7: Applying settings...');
+    applyIfNeeded();
+    cy.log('Settings applied');
 
-		checkLimitGreen("Z limit").then((isGreen) => {
-			expect(isGreen, "Z limit should be green").to.be.true;
-		});
+    // Verify all limits green in pinned popup
+    cy.log('Verifying all limit pins turned green...');
+    ['X limit', 'Y limit', 'Z limit', 'A limit'].forEach((limitName) => {
+      checkLimitState(limitName).then((state) => {
+        cy.log(`${limitName} state: ${state}`);
+        expect(state, `${limitName} should be green`).to.equal('green');
+      });
+    });
+    cy.log('All limit pins verified as green');
 
-		checkLimitGreen("A limit").then((isGreen) => {
-			expect(isGreen, "A limit should be green").to.be.true;
-		});
+    // Step 8: Re-enable all axes
+    cy.log('Step 8: Re-enabling all axis invert limit pins...');
+    enableAxisIfDisabled('\\$5-0-key', 'X');
+    enableAxisIfDisabled('\\$5-1-key', 'Y');
+    enableAxisIfDisabled('\\$5-2-key', 'Z');
+    enableAxisIfDisabled('\\$5-3-key', 'A');
 
-		cy.log("All limit pins verified as green");
+    // Step 9: Apply if needed
+    cy.log('Step 9: Applying settings after re-enabling axes...');
+    applyIfNeeded();
+    cy.log('Settings applied - All axes re-enabled');
 
-		// ===== RE-ENABLE ALL AXES =====
-		cy.log("Step 8: Re-enabling all axis invert limit pins...");
+    // ===== STEPPER MOTOR LOCK/UNLOCK TEST =====
+    cy.log('Step 10: Testing Stepper Motor Lock/Unlock...');
 
-		// Enable X axis invert limit pin if disabled
-		enableAxisIfDisabled("\\$5-0-key", "X");
+    cy.log('Opening Machine Info popup...');
+    cy.get('header div.top-0 img').should('be.visible').click();
+    cy.wait(1500);
 
-		// Enable Y axis invert limit pin if disabled
-		enableAxisIfDisabled("\\$5-1-key", "Y");
+    cy.get('div.mt-4 > button')
+      .should('be.visible')
+      .as('stepperToggle');
 
-		// Enable Z axis invert limit pin if disabled
-		enableAxisIfDisabled("\\$5-2-key", "Z");
+    // Lock
+    cy.log('Step 10a: Locking Stepper Motors...');
+    cy.get('@stepperToggle').then(($toggle) => {
+      const isLocked = $toggle.attr('data-state') === 'checked' ||
+                       $toggle.attr('aria-checked') === 'true';
+      if (!isLocked) {
+        cy.log('Stepper motors UNLOCKED - Locking now...');
+        cy.get('@stepperToggle').click({ force: true });
+        cy.wait(1000);
+      } else {
+        cy.log('Stepper motors already LOCKED - Skipping');
+      }
+    });
 
-		// Enable A axis invert limit pin if disabled
-		enableAxisIfDisabled("\\$5-3-key", "A");
+    cy.get('@stepperToggle').then(($toggle) => {
+      const isLocked = $toggle.attr('data-state') === 'checked' ||
+                       $toggle.attr('aria-checked') === 'true';
+      expect(isLocked, 'Stepper motors should be LOCKED').to.be.true;
+    });
+    cy.log('Stepper motors LOCKED');
+    cy.wait(2000);
 
-		// Apply settings again
-		cy.log("Step 9: Applying settings after re-enabling axes...");
-		cy.contains("button", "Apply Settings").should("be.visible").click();
-		cy.wait(2000);
-		cy.log("Settings applied - All axes re-enabled");
+    // Unlock
+    cy.log('Step 10b: Unlocking Stepper Motors...');
+    cy.get('@stepperToggle').then(($toggle) => {
+      const isLocked = $toggle.attr('data-state') === 'checked' ||
+                       $toggle.attr('aria-checked') === 'true';
+      if (isLocked) {
+        cy.log('Stepper motors LOCKED - Unlocking now...');
+        cy.get('@stepperToggle').click({ force: true });
+        cy.wait(1000);
+      } else {
+        cy.log('Stepper motors already UNLOCKED - Skipping');
+      }
+    });
 
-		// ===== STEPPER MOTOR LOCK/UNLOCK TEST =====
-		cy.log("Step 10: Testing Stepper Motor Lock/Unlock...");
+    cy.get('@stepperToggle').then(($toggle) => {
+      const isLocked = $toggle.attr('data-state') === 'checked' ||
+                       $toggle.attr('aria-checked') === 'true';
+      expect(isLocked, 'Stepper motors should be UNLOCKED').to.be.false;
+    });
+    cy.log('Stepper motors UNLOCKED');
 
-		// Navigate back to machine info popup
-		cy.log("Opening Machine Info popup...");
-		cy.get("div.border > div.top-0 img").should("be.visible").click();
-		cy.wait(1500);
+    // Final verification
+    cy.log('Step 11: Final verification - Stepper motor unlocked...');
+    cy.get('@stepperToggle').then(($toggle) => {
+      const isLocked = $toggle.attr('data-state') === 'checked' ||
+                       $toggle.attr('aria-checked') === 'true';
+      expect(isLocked, 'Stepper motor should be UNLOCKED at test end').to.be.false;
+      cy.log('Final state confirmed: Stepper motor is UNLOCKED');
+    });
 
-		// Get the stepper motor toggle button
-		cy.get('body > div:nth-of-type(2) button[role="switch"]')
-			.should("be.visible")
-			.as("stepperToggle");
-
-		// Test Lock (Enable stepper motor)
-		cy.log("Step 10a: Locking Stepper Motors...");
-		cy.get("@stepperToggle").then(($toggle) => {
-			const isLocked =
-				$toggle.attr("data-state") === "checked" ||
-				$toggle.attr("aria-checked") === "true";
-
-			if (!isLocked) {
-				cy.log("Stepper motors currently UNLOCKED - Locking now...");
-				cy.get("@stepperToggle").click({ force: true });
-				cy.wait(1000);
-			} else {
-				cy.log("Stepper motors already LOCKED - Skipping lock");
-			}
-		});
-
-		// Verify motors are locked
-		cy.get("@stepperToggle").then(($toggle) => {
-			const isLocked =
-				$toggle.attr("data-state") === "checked" ||
-				$toggle.attr("aria-checked") === "true";
-			expect(isLocked, "Stepper motors should be LOCKED").to.be.true;
-		});
-		cy.log("Stepper motors LOCKED ");
-		cy.wait(2000);
-
-		// Test Unlock (Disable stepper motor)
-		cy.log("Step 10b: Unlocking Stepper Motors...");
-		cy.get("@stepperToggle").then(($toggle) => {
-			const isLocked =
-				$toggle.attr("data-state") === "checked" ||
-				$toggle.attr("aria-checked") === "true";
-
-			if (isLocked) {
-				cy.log("Stepper motors currently LOCKED - Unlocking now...");
-				cy.get("@stepperToggle").click({ force: true });
-				cy.wait(1000);
-			} else {
-				cy.log("Stepper motors already UNLOCKED - Skipping unlock");
-			}
-		});
-
-		// Verify motors are unlocked (toggle is disabled/unchecked)
-		cy.get("@stepperToggle").then(($toggle) => {
-			const isLocked =
-				$toggle.attr("data-state") === "checked" ||
-				$toggle.attr("aria-checked") === "true";
-			expect(isLocked, "Stepper motors should be UNLOCKED").to.be.false;
-		});
-		cy.log("Stepper motors UNLOCKED ");
-		cy.wait(1000);
-
-		// Final verification: Ensure motor is NOT locked at the end
-		cy.log(
-			"Step 11: Final verification - Ensuring stepper motor is unlocked...",
-		);
-		cy.get("@stepperToggle").then(($toggle) => {
-			const isLocked =
-				$toggle.attr("data-state") === "checked" ||
-				$toggle.attr("aria-checked") === "true";
-
-			expect(isLocked, "Stepper motor should be UNLOCKED at test end").to.be
-				.false;
-			cy.log(" Final state confirmed: Stepper motor is UNLOCKED");
-		});
-
-		cy.log("Test completed successfully - All checks passed ");
-	});
+    cy.log('Test completed successfully');
+  });
 });

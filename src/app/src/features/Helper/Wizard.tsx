@@ -21,122 +21,112 @@
  *
  */
 
-import CancelButton from "app/features/Helper/components/CancelButton";
-import Instructions from "app/features/Helper/components/Instructions";
-import MinMaxButton from "app/features/Helper/components/MinMaxButton";
-import Stepper from "app/features/Helper/components/Stepper";
-import { useWizardContext } from "app/features/Helper/context";
-import controller from "app/lib/controller.ts";
-import store from "app/store";
-import cx from "classnames";
-import { FaHatWizard } from "react-icons/fa";
-import { CSSTransition } from "react-transition-group";
-import styles from "./index.module.styl";
+import ReactDOM from 'react-dom';
+import { useState, useEffect } from 'react';
+import Instructions from 'app/features/Helper/components/Instructions';
+import Stepper from 'app/features/Helper/components/Stepper';
+import Controls from 'app/features/Helper/components/Controls';
+import { useWizardContext } from 'app/features/Helper/context';
+import MinMaxButton from 'app/features/Helper/components/MinMaxButton';
+import CancelButton from 'app/features/Helper/components/CancelButton';
+import { Wrench } from 'lucide-react';
+import store from 'app/store';
+import controller from 'app/lib/controller.ts';
 
 // Fetch toolchange settings and send it to backend
 export function updateToolchangeContext(mappings = null) {
-	const hooks = store.get("workspace.toolChangeHooks", {});
-	const options = store.get("workspace.toolChange", {});
-	const toolChangeOption = store.get("workspace.toolChangeOption", "Ignore");
-	const context = {
-		...hooks,
-		toolChangeOption,
-		...options,
-	};
+    const hooks = store.get('workspace.toolChangeHooks', {});
+    const options = store.get('workspace.toolChange', {});
+    const toolChangeOption = store.get('workspace.toolChangeOption', 'Ignore');
+    const context = {
+        ...hooks,
+        toolChangeOption,
+        ...options,
+    };
 
-	if (mappings) {
-		const plainObject = Array.from(mappings).reduce(
-			(obj, [key, value]) => {
-				obj[key] = value;
-				return obj;
-			},
-			{} as Record<number, number>,
-		);
+    if (mappings) {
+        const plainObject = Array.from(mappings).reduce(
+            (obj, [key, value]) => {
+                obj[key] = value;
+                return obj;
+            },
+            {} as Record<number, number>,
+        );
 
-		context.mappings = plainObject;
-	}
+        context.mappings = plainObject;
+    }
 
-	controller.command("toolchange:context", context);
+    controller.command('toolchange:context', context);
 }
 
 const Wizard = () => {
-	const { title, visible, minimized, activeStep, overlay, steps } =
-		useWizardContext();
+    const { title, visible, minimized, overlay } = useWizardContext();
+    const [vizEl, setVizEl] = useState<Element | null>(null);
 
-	return (
-		<>
-			<div
-				className={cx({
-					hidden: !visible,
-					[styles.overlay]: !minimized && overlay,
-				})}
-			/>
-			<div
-				className={cx({
-					hidden: !visible,
-					"absolute top-1/2 left-4 w-4/5 max-h-[500px] border-2 border-gray-500 rounded-lg shadow [transform:translate(0,-50%)] z-40 flex flex-col justify-between [transition:all_300ms_ease]":
-						!minimized,
-				})}
-			>
-				<div
-					className={cx({
-						hidden: !visible || !overlay,
-						"px-1 py-4 flex flex-col justify-center items-center z-40 bg-amber-100 rounded content-start":
-							!minimized && overlay,
-					})}
-				>
-					<div className="text-black text-center text-xl/relaxed font-bold z-40">
-						Widgets are disabled
-					</div>
-					<div className="text-black text-center text-sm/relaxed z-40">
-						Please use the button(s) in the wizard instead.
-					</div>
-				</div>
-				<div
-					className={cx({
-						hidden: !visible,
-						"absolute bg-white top-3 left-1/2 -translate-x-1/2 w-2/5 h-auto rounded [box-shadow:0px_20px_20px_-17px_rgba(255,159,16,0.73)] duration-300 ease-linear transition-all z-40":
-							minimized,
-						"bg-white rounded flex h-[550px] flex-col content-end overflow-hidden z-40 duration-300 ease-linear transition-all":
-							!minimized,
-					})}
-				>
-					<div className="border-b border-b-slate-400 p-2 flex flex-row justify-between items-center">
-						<h1 className="flex flex-row gap-2 items-center justify-center p-0 mr-4 text-slate-600 font-bold text-xl">
-							<FaHatWizard /> {title} - Step {activeStep + 1} of {steps.length}
-						</h1>
-						<div className="flex">
-							<MinMaxButton />
-							<CancelButton />
-						</div>
-					</div>
-					<CSSTransition
-						key="wizContent"
-						timeout={350}
-						classNames={{
-							enterActive: styles.maximizeActive,
-							enterDone: styles.maximizeDone,
-							exitActive: styles.minimizeActive,
-							exitDone: styles.minimizeDone,
-						}}
-					>
-						<div
-							id="wizContent"
-							className={cx(
-								"flex flex-row h-[calc(100%-40px)] justify-items-stretch items-stretch justify-stretch flex-grow",
-								{
-									hidden: minimized,
-								},
-							)}
-						>
-							<Stepper />
-							<Instructions />
-						</div>
-					</CSSTransition>
-				</div>
-			</div>
-		</>
-	);
+    useEffect(() => {
+        setVizEl(document.getElementById('visualizer_container'));
+    }, []);
+
+    if (!visible) return null;
+
+    // Minimized: compact pill at top-center of visualizer
+    if (minimized) {
+        const pill = (
+            <div className="absolute top-2 left-1/2 -translate-x-1/2 z-50 pointer-events-auto flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/90 dark:bg-[#18181f]/90 backdrop-blur-sm border border-gray-200 dark:border-[#2a2a35] shadow-md">
+                <Wrench size={12} className="text-gray-500 dark:text-gray-400 shrink-0" />
+                <span className="font-medium text-gray-700 dark:text-[#e5e5ea] text-xs whitespace-nowrap">{title}</span>
+                <MinMaxButton />
+                <CancelButton />
+            </div>
+        );
+
+        if (vizEl) {
+            return ReactDOM.createPortal(pill, vizEl);
+        }
+        // Fallback: fixed at top of visualizer area
+        return (
+            <div className="fixed top-14 max-xl:top-12 left-0 right-[33%] flex justify-center z-[200] pointer-events-none">
+                {pill}
+            </div>
+        );
+    }
+
+    return (
+        <>
+            {/* Backdrop — only when substep.overlay is true (blocks UI interaction) */}
+            {overlay && (
+                <div className="fixed inset-0 bg-black/55 z-[199] pointer-events-auto" />
+            )}
+
+            <div className="fixed inset-y-0 left-0 right-[33%] flex items-center justify-center z-[200] pointer-events-none">
+                <div className="pointer-events-auto w-[860px] rounded-lg overflow-hidden shadow-2xl border border-gray-300/50 dark:border-[#2a2a35] bg-white dark:bg-[#18181f]">
+
+                    {/* Titlebar */}
+                    <div className="flex items-center justify-between px-3 py-2 border-b border-gray-200 dark:border-[#2a2a35] bg-gray-100 dark:bg-[#111116]">
+                        <div className="flex items-center gap-2">
+                            <Wrench size={14} className="text-gray-500 dark:text-gray-400" />
+                            <span className="font-semibold text-base text-gray-900 dark:text-[#e5e5ea]">
+                                {title}
+                            </span>
+                        </div>
+                        <div className="flex gap-1">
+                            <MinMaxButton />
+                            <CancelButton />
+                        </div>
+                    </div>
+
+                    {/* Body */}
+                    <div className="flex h-[420px]">
+                        <Stepper />
+                        <Instructions />
+                    </div>
+
+                    {/* Footer */}
+                    <Controls />
+                </div>
+            </div>
+        </>
+    );
 };
 
 export default Wizard;
