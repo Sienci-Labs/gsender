@@ -66,7 +66,7 @@ describe('gSender XY Squaring Test', () => {
       .clear()
       .type('10');
     cy.wait(500);
-    cy.log('✓ Jog distance set to 10mm');
+    cy.log('Jog distance set to 10mm');
 
     // Jogging x axis one time 
     cy.get('#xPlus').click({ force: true });

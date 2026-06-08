@@ -14,6 +14,7 @@ describe('gSender Configuration and Firmware Test Suite', () => {
         cy.log('Part 1: gSender Configuration Settings');
 
         cy.log('Connecting to CNC...');
+        cy.closePopupIfVisible();
         cy.connectMachine();
         cy.wait(6000);
         cy.verifyMachineStatus('Idle');

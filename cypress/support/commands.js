@@ -1131,6 +1131,23 @@ Cypress.Commands.add('loadUI', (url, options = {}) => {
     timeout: options.timeout || 30000,
     failOnStatusCode: false
   });
+
+  Cypress.Commands.add('closePopupIfVisible', () => {
+    cy.get('body').then(($body) => {
+        if ($body.find('[role="dialog"]').length > 0) {
+            cy.log('Popup found - closing...');
+            cy.get('[role="dialog"]')
+                .find('button')
+                .filter('[aria-label="Close"], :last-of-type')
+                .first()
+                .click({ force: true });
+            cy.wait(500);
+            cy.log('Popup closed');
+        } else {
+            cy.log('No popup found - continuing...');
+        }
+    });
+});
   
   // Wait for the app to be ready
   cy.wait(options.waitTime || 2000);
