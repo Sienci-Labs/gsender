@@ -72,11 +72,11 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
 
     useEffect(() => {
         if (!connectivityTest) {
-            actions.setProbeConnectivity(true);
+            actionsRef.current.setProbeConnectivity(true);
         } else if (probePinStatus) {
-            actions.setProbeConnectivity(true);
+            actionsRef.current.setProbeConnectivity(true);
         }
-    }, [connectivityTest, probePinStatus, actions]);
+    }, [connectivityTest, probePinStatus]);
 
     const [testInterval, setTestInterval] = useState<NodeJS.Timeout>(null);
 

@@ -9,7 +9,7 @@ const BooleanInput = ({ info, setting, onChange, disabled, ...props }) => {
         let { value } = setting;
         value = Number(value) === 1;
         setBool(value);
-    }, []);
+    }, [setting.value]);
 
     const booleanOnChange = (checked: boolean) => {
         const value = checked ? 1 : 0;
