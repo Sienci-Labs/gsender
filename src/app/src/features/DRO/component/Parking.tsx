@@ -76,7 +76,7 @@ export function Parking({
             isActive: true,
             category: LOCATION_CATEGORY,
             callback: () => {
-                if (disabledRef.current || shortcutIsDisabled())
+                if (!disabledRef.current && !shortcutIsDisabled())
                     goToParkLocation();
             },
         },
