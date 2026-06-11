@@ -141,6 +141,7 @@ export interface State {
         };
     };
     cameraMode: CAMERA_MODES_T;
+    followTool: boolean;
     cameraPosition: CAMERA_POSITIONS_T; // 'Top', '3D', 'Front', 'Left', 'Right'
     isAgitated: boolean; // Defaults to false
     currentTheme: Map<string, string>;
@@ -203,6 +204,7 @@ export interface Actions {
         toLeftSideView: () => void;
         toRightSideView: () => void;
         toFreeView: () => void;
+        toggleFollowTool: () => void;
     };
     handleLiteModeToggle: () => void;
     lineWarning: {
