@@ -1851,6 +1851,13 @@ class Visualizer extends Component {
                         const object = new THREE.Object3D();
                         object.add(mesh);
 
+                        // Black edge outline so the spinning tool reads as a
+                        // rotating fluted bit instead of a featureless grey blob.
+                        const outline = this.createToolOutline(geometry);
+                        if (outline) {
+                            object.add(outline);
+                        }
+
                         // unload the old one
                         this.group.remove(this.cuttingTool);
 
@@ -2241,6 +2248,13 @@ class Visualizer extends Component {
                     const object = new THREE.Object3D();
                     object.add(mesh);
 
+                    // Black edge outline so the spinning tool reads as a
+                    // rotating fluted bit instead of a featureless grey blob.
+                    const outline = this.createToolOutline(geometry);
+                    if (outline) {
+                        object.add(outline);
+                    }
+
                     this.group.remove(this.cuttingTool);
 
                     this.cuttingTool = object;
@@ -2435,6 +2449,28 @@ class Visualizer extends Component {
         const delta = 1 / fps;
         const degrees = 360 * ((delta * Math.PI) / 180); // Rotates 360 degrees per second
         this.cuttingTool.rotateZ(-((rpm / 60) * degrees)); // rotate in clockwise direction
+    }
+
+    // Build a black edge "outline" of the tool model — the geometric edges of
+    // the bit (its flutes and silhouette) drawn as black lines on top of the
+    // mesh. Added as a child of the rotating cuttingTool so the outlined flutes
+    // sweep as it spins, instead of the bit reading as a featureless grey blob.
+    // EdgesGeometry keeps only edges whose adjacent faces meet more sharply than
+    // thresholdAngleDeg, so smooth round areas stay clean and the flute creases
+    // stand out. Lower the threshold to catch more edges, raise it for fewer.
+    createToolOutline(geometry, { thresholdAngleDeg = 30 } = {}) {
+        if (
+            !geometry ||
+            !geometry.getAttribute ||
+            !geometry.getAttribute('position')
+        ) {
+            return null;
+        }
+        const edges = new THREE.EdgesGeometry(geometry, thresholdAngleDeg);
+        const material = new THREE.LineBasicMaterial({ color: 0x000000 });
+        const lines = new THREE.LineSegments(edges, material);
+        lines.name = 'CuttingToolOutline';
+        return lines;
     }
 
     // Update cutting tool position
