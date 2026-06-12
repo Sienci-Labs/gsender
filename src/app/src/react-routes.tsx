@@ -145,14 +145,7 @@ export const ReactRoutes = () => {
 							</Page>
 						}
 					/>
-					<Route
-						path="movement-tuning"
-						element={
-							<Page title="Movement Tuning" withGoBackButton withFixedArea>
-								<MovementTuning />
-							</Page>
-						}
-					/>
+					<Route path="movement-tuning" element={<MovementTuning />} />
 					<Route
 						path="squaring"
 						element={

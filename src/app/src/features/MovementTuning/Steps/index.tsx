@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/a11y/noLabelWithoutControl: <> */
 import { Button } from "app/components/Button";
 import { ControlledInput } from "app/components/ControlledInput";
 import {

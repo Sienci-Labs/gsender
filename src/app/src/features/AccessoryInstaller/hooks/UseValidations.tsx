@@ -1,4 +1,4 @@
-import { GRBL, GRBLHAL } from "app/constants";
+import { GRBL, GRBL_ACTIVE_STATE_IDLE, GRBLHAL } from "app/constants";
 import { ATCI_SUPPORTED_VERSION } from "app/features/ATC/utils/ATCiConstants.ts";
 import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
 import { firmwareSemver } from "app/lib/firmwareSemver.ts";
@@ -23,6 +23,10 @@ export function useValidations() {
 
 	const firmwareType = useTypedSelector(
 		(state: RootState) => state.controller.type,
+	);
+
+	const activeState = useTypedSelector(
+		(state) => state?.controller.state?.status?.activeState,
 	);
 
 	const connectionValidation = useMemo(
@@ -78,11 +82,20 @@ export function useValidations() {
 		[firmwareType],
 	);
 
+	const activeStateMovementTuning = useMemo(
+		() => () => ({
+			success: activeState === GRBL_ACTIVE_STATE_IDLE,
+			reason: "Your machine must be idle or jogging to use this wizard.",
+		}),
+		[activeState],
+	);
+
 	return {
 		connectionValidation,
 		homingValidation,
 		coreFirmwareValidation,
 		grblHAlValidator,
 		grblValidator,
+		activeStateMovementTuning,
 	};
 }
