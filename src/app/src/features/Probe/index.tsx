@@ -100,7 +100,7 @@ const ProbeWidget = () => {
         store.get('workspace.probeProfile.touchplateType'),
     );
     const [units, setUnits] = useState<UNITS_EN>(store.get('workspace.units'));
-    const [testInterval, setTestInterval] = useState<NodeJS.Timeout>(null);
+    const testIntervalRef = useRef<NodeJS.Timeout>(null);
     const [availableTools, setAvailableTools] = useState<AvailableTool[]>(
         store.get('workspace.tools', []),
     );
@@ -204,6 +204,10 @@ const ProbeWidget = () => {
     });
 
     const connectionMadeRef = useRef<boolean>(false);
+    const probePinStatusRef = useRef<boolean>(probePinStatus);
+    useEffect(() => {
+        probePinStatusRef.current = probePinStatus;
+    }, [probePinStatus]);
 
     // const DWELL_TIME = 0.3;
     const PROBE_DISTANCE_METRIC = {
@@ -219,25 +223,21 @@ const ProbeWidget = () => {
 
     const actions: Actions = {
         startConnectivityTest: (): void => {
-            const { returnProbeConnectivity } = actions;
-
-            if (testInterval) {
-                clearInterval(testInterval);
-                setTestInterval(null);
+            if (testIntervalRef.current) {
+                clearInterval(testIntervalRef.current);
+                testIntervalRef.current = null;
             }
             if (!connectivityTest) {
                 setConnectionMade(true);
                 return;
             }
-            setTestInterval(
-                setInterval(() => {
-                    if (returnProbeConnectivity()) {
-                        setConnectionMade(true);
-                        clearInterval(testInterval);
-                        setTestInterval(null);
-                    }
-                }, 250),
-            );
+            testIntervalRef.current = setInterval(() => {
+                if (probePinStatusRef.current) {
+                    setConnectionMade(true);
+                    clearInterval(testIntervalRef.current);
+                    testIntervalRef.current = null;
+                }
+            }, 250);
         },
         setProbeConnectivity: (connectionMade: boolean): void => {
             setConnectionMade(connectionMade);
@@ -247,10 +247,10 @@ const ProbeWidget = () => {
                 setConnectionMade(false);
                 actions.startConnectivityTest();
             } else {
-                if (testInterval) {
-                    clearInterval(testInterval);
+                if (testIntervalRef.current) {
+                    clearInterval(testIntervalRef.current);
+                    testIntervalRef.current = null;
                 }
-                setTestInterval(null);
                 setConnectionMade(false);
             }
             setModalIsOpen(isOpen);
@@ -392,7 +392,7 @@ const ProbeWidget = () => {
             });
         },
         returnProbeConnectivity: (): boolean => {
-            return probePinStatus;
+            return probePinStatusRef.current;
         },
         _setToolDiameter: (selection: { value: number }): void => {
             let diameter: number;
