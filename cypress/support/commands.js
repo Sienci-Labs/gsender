@@ -83,6 +83,7 @@ Cypress.Commands.add('loadUI', (url, options = {}) => {
   tryLoadUI();
 });
 
+
 // ----------------------
 //3.Connect to CNC machine grbl cy.connectMachine();
 // ----------------------
@@ -129,6 +130,51 @@ Cypress.Commands.add("connectMachine", () => {
 		cy.log('Unlocking machine if needed')
 		cy.unlockMachineIfNeeded();
     // Step 4: Confirm Idle state
+});
+
+// Without unlock 
+Cypress.Commands.add("connectMachineNUL", () => {
+    // Step 1: Click the parent button, not just the span
+    cy.contains('span', 'Connect to CNC', { timeout: 15000 })
+        .should('exist')
+        .scrollIntoView()
+        .parents('button')
+        .first()
+        .should('be.visible')
+        .should('not.be.disabled')
+        .click({ force: true });
+
+    cy.wait(1500);
+
+    // Step 2: If dropdown didn't open, retry click once
+    cy.get('body').then(($body) => {
+        if ($body.find('div[data-radix-popper-content-wrapper]').length === 0) {
+            cy.log('Dropdown not open - retrying click...');
+            cy.contains('span', 'Connect to CNC', { timeout: 5000 })
+                .parents('button')
+                .first()
+                .click({ force: true });
+            cy.wait(1500);
+        }
+    });
+
+    // Step 3: Wait for the radix popper div to appear
+    cy.get("div[data-radix-popper-content-wrapper]", { timeout: 15000 })
+        .should("exist")
+        .within(() => {
+            cy.get("button.m-0")
+                .should("have.length.greaterThan", 0)
+                .first()
+                .then(($btn) => {
+                    const $label = $btn.find("span.font-bold");
+                    const portName =
+                        $label.length > 0 ? $label.text().trim() : $btn.text().trim();
+                    cy.log(`Selecting first available port: "${portName}"`);
+                    cy.wrap($btn).click({ force: true });
+                });
+        });
+		
+   
 });
 //-----------------------
 //21.Axis Homing Z< Y & X
@@ -332,9 +378,6 @@ Cypress.Commands.add("ensureHomingEnabledAndHome", (options = {}) => {
 		// Perform homing sequence
 		cy.log("Performing homing sequence...");
 
-		// Open homing menu
-		cy.get("div.flex-shrink-0 > div > div > div > div").click();
-		cy.wait(500);
 
 		// Click Home button
 		cy.contains("button", "Home").click();
@@ -578,7 +621,7 @@ Cypress.Commands.add("unlockMachineIfNeeded", () => {
     const isAlreadyIdle = $body.text().match(/^Idle$/im);
 
     if (isAlreadyIdle) {
-      cy.log("✓ Machine is already Idle — no unlock needed");
+      cy.log("Machine is already Idle — no unlock needed");
       return;
     }
 
@@ -611,9 +654,9 @@ Cypress.Commands.add("unlockMachineIfNeeded", () => {
             .click({ force: true });
 
           cy.wait(2000);
-          cy.log("✓ Unlocked via Option 2 (dialog button)");
+          cy.log("Unlocked via Option 2 (dialog button)");
         } else {
-          cy.log("✓ Unlocked via Option 1 (lock icon)");
+          cy.log("Unlocked via Option 1 (lock icon)");
         }
       });
 
@@ -625,7 +668,7 @@ Cypress.Commands.add("unlockMachineIfNeeded", () => {
     cy.contains(/^Idle$/i, { timeout: 30000 })
       .should("be.visible")
       .then(() => {
-        cy.log("✓ Machine reached Idle state — unlock successful");
+        cy.log("Machine reached Idle state — unlock successful");
       });
   });
 });
@@ -1126,12 +1169,6 @@ Cypress.Commands.add("applySettings", (options = {}) => {
 
 // URL Definitions
 
-Cypress.Commands.add('loadUI', (url, options = {}) => {
-  cy.visit(url, { 
-    timeout: options.timeout || 30000,
-    failOnStatusCode: false
-  });
-
   Cypress.Commands.add('closePopupIfVisible', () => {
     cy.get('body').then(($body) => {
         if ($body.find('[role="dialog"]').length > 0) {
@@ -1148,25 +1185,79 @@ Cypress.Commands.add('loadUI', (url, options = {}) => {
         }
     });
 });
-  
-  // Wait for the app to be ready
-  cy.wait(options.waitTime || 2000);
+
+Cypress.Commands.add("closeAccPopupIfVisible", () => {
+    cy.get("body").then(($body) => {
+        if ($body.find('[role="alertdialog"]').length > 0) {
+            cy.log("Popup detected - closing...");
+            cy.get('[role="alertdialog"]')
+                .contains("button", "OK")
+                .click();
+
+            cy.wait(500);
+            cy.log("Popup closed");
+        } else {
+            cy.log("No popup visible - continuing");
+        }
+    });
 });
-  // You can also handle retries or waits here if needed
+
+Cypress.Commands.add("clickToRunHomingIfNeeded", () => {
+    cy.wait(3000); // Wait for machine to stabilize after connect
+
+    cy.get("body").then(($body) => {
+        const hasHomingButton = $body.find("header div.mt-4 button").length > 0;
+        const homingButtonText = hasHomingButton
+            ? $body.find("header div.mt-4 button").text()
+            : "";
+        const isHomingPrompt = /click to run homing/i.test(homingButtonText);
+
+        if (!hasHomingButton || !isHomingPrompt) {
+            cy.log("No 'Click to Run Homing' prompt found — skipping");
+            return;
+        }
+
+        cy.log("'Click to Run Homing' prompt detected — clicking...");
+
+        cy.get("header div.mt-4 button")
+            .contains(/click to run homing/i)
+            .should("be.visible")
+            .click({ force: true });
+
+        cy.wait(2000);
+
+        // Close the OK alertdialog that appears after homing starts
+        cy.get("body").then(($bodyAfter) => {
+            const hasAlertDialog = $bodyAfter.find('[role="alertdialog"]').length > 0;
+
+            if (hasAlertDialog) {
+                cy.log("Alertdialog appeared — clicking OK...");
+                cy.get('[role="alertdialog"]')
+                    .contains("button", "OK")
+                    .should("be.visible")
+                    .click();
+                cy.wait(1000);
+                cy.log("✓ Homing started — alertdialog dismissed");
+            } else {
+                cy.log("✓ Homing started — no dialog to dismiss");
+            }
+        });
+    });
+});
 
 // Page URLs
 Cypress.Commands.add("goToCarve", () => {
-	cy.visit("http://localhost:8000/#/");
+    cy.visit("http://localhost:8000/#/");
 });
 
 Cypress.Commands.add("goToStats", () => {
-	cy.visit("http://localhost:8000/#/stats");
+    cy.visit("http://localhost:8000/#/stats");
 });
 
 Cypress.Commands.add("goToTools", () => {
-	cy.visit("http://localhost:8000/#/tools");
+    cy.visit("http://localhost:8000/#/tools");
 });
 
 Cypress.Commands.add("goToConfig", () => {
-	cy.visit("http://localhost:8000/#/configuration");
+    cy.visit("http://localhost:8000/#/configuration");
 });

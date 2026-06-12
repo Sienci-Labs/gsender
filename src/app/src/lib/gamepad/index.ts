@@ -373,5 +373,8 @@ class GamepadManager {
 		return GamepadManager.instance || GamepadManager.initialize();
 	}
 }
+if (typeof window !== 'undefined' && (window as any).Cypress) {
+  (window as any).__GamepadManager = GamepadManager;
+}
 
 export default GamepadManager;
