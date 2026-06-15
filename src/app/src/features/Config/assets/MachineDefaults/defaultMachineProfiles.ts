@@ -83,8 +83,8 @@ export default [
             depth: 345,
             height: 114.3,
         },
-        eepromSettings: longMillGrblEEPROM.LONGMILL_MK2_12x30,
-        grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK2_12x30,
+        eepromSettings: longMillGrblHALEEPROM.LONGMILL_MK3_30x30,
+        grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK3_30x30,
     },
     {
         id: 19,
@@ -97,8 +97,8 @@ export default [
             depth: 345,
             height: 114.3,
         },
-        eepromSettings: longMillGrblEEPROM.LONGMILL_MK2_12x30,
-        grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK2_12x30,
+        eepromSettings: longMillGrblHALEEPROM.LONGMILL_MK3_48x30,
+        grblHALeepromSettings:longMillGrblHALEEPROM.LONGMILL_MK3_48x30,
     },
     {
         id: 5,

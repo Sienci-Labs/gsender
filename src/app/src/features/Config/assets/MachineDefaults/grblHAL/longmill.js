@@ -259,6 +259,7 @@ const MK3_CONSTANTS = {
 }
 
 export const LONGMILL_MK3_30x30 = {
+    LONGMILL_MASTER_LIST_GRBLHAL,
     ...MK3_CONSTANTS,
     $130: 816,
     $131: 812,
@@ -266,6 +267,7 @@ export const LONGMILL_MK3_30x30 = {
 }
 
 export const LONGMILL_MK3_48x30 = {
+    LONGMILL_MASTER_LIST_GRBLHAL,
     ...MK3_CONSTANTS,
     $130: 1296,
     $131: 812,
