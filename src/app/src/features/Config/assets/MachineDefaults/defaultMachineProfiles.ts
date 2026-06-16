@@ -85,6 +85,7 @@ export default [
         },
         eepromSettings: longMillGrblHALEEPROM.LONGMILL_MK3_30x30,
         grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK3_30x30,
+        orderedSettings: longMillGrblHALEEPROM.MK3_ORDERED
     },
     {
         id: 19,
@@ -99,6 +100,7 @@ export default [
         },
         eepromSettings: longMillGrblHALEEPROM.LONGMILL_MK3_48x30,
         grblHALeepromSettings:longMillGrblHALEEPROM.LONGMILL_MK3_48x30,
+        orderedSettings: longMillGrblHALEEPROM.MK3_ORDERED
     },
     {
         id: 5,
