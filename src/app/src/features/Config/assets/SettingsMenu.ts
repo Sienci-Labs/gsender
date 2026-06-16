@@ -72,6 +72,7 @@ import isElectron from 'is-electron';
 import { THEMES_T } from 'app/features/Visualizer/definitions';
 import { JSX } from 'react';
 import posthog from 'posthog-js';
+import {updateToolchangeContext} from "app/features/Helper/Wizard.tsx";
 
 export interface SettingsMenuSection {
     label: string;
@@ -1830,6 +1831,9 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         key: 'workspace.toolChange.passthrough',
                         description:
                             'Send tool change lines as-is, assuming your CNC can properly handle M6 and T commands.',
+                        onApply: () => {
+                            updateToolchangeContext();
+                        }
                     },
                     {
                         label: 'gSender strategy',
