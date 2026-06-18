@@ -48,7 +48,7 @@ const MoveAxis = ({ onComplete }: Props) => {
 					<div className="flex flex-col gap-2 flex-1">
 						<div className="flex items-center gap-4">
 							<Button
-								disabled={moveAxisCompleted}
+								// disabled={moveAxisCompleted}
 								onClick={() => {
 									jogAxis(
 										{
