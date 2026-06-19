@@ -115,15 +115,16 @@ fi
 # Extra args appended to the electron-builder invocation.
 EXTRA_ARGS=()
 
-# Only publish when a GitHub token is available. On the upstream repo's CI the
-# token is provided via the CI_TOKEN secret (exposed as GITHUB_TOKEN/GH_TOKEN);
-# forks and local builds have no such secret, so the env var is empty. Without
-# this guard electron-builder still tries to publish to the upstream releases
-# API (resolved from package.json "repository") and fails with 401 Unauthorized.
-# The explicit release/upload steps in .github/workflows/CI.yml handle the actual
-# distribution, so skipping the in-build publish here is safe.
-if [ -z "$GH_TOKEN" ] && [ -z "$GITHUB_TOKEN" ]; then
-    echo "ℹ No GH_TOKEN/GITHUB_TOKEN set — skipping electron-builder publish (--publish never)"
+# electron-builder implicitly publishes when it detects CI, targeting the repo
+# in package.json "repository" (Sienci-Labs/gsender). On forks and local builds
+# that fails with 401 Unauthorized against the upstream releases API. Only allow
+# publishing when actually building on that upstream repo; otherwise force
+# --publish never. GitHub Actions sets GITHUB_REPOSITORY to "owner/repo"; it is
+# unset for local builds, which also correctly resolves to "never".
+PUBLISH_REPO=$(node -e "const u=(require('$__dirname/../package.json').repository||{}).url||'';const m=u.match(/github\.com[/:]+([^/]+\/[^/.]+)/i);process.stdout.write(m?m[1].toLowerCase():'')")
+CURRENT_REPO=$(printf '%s' "$GITHUB_REPOSITORY" | tr '[:upper:]' '[:lower:]')
+if [ -z "$CURRENT_REPO" ] || [ "$CURRENT_REPO" != "$PUBLISH_REPO" ]; then
+    echo "ℹ Not building on the upstream publish repo (${PUBLISH_REPO}) — skipping electron-builder publish (--publish never)"
     EXTRA_ARGS+=("--publish" "never")
 fi
 
