@@ -111,6 +111,22 @@ CSC_IDENTITY_AUTO_DISCOVERY_VALUE=false
 if [ -n "$CSC_LINK" ] || [ -n "$CSC_NAME" ]; then
     CSC_IDENTITY_AUTO_DISCOVERY_VALUE=true
 fi
+
+# Extra args appended to the electron-builder invocation.
+EXTRA_ARGS=()
+
+# Only publish when a GitHub token is available. On the upstream repo's CI the
+# token is provided via the CI_TOKEN secret (exposed as GITHUB_TOKEN/GH_TOKEN);
+# forks and local builds have no such secret, so the env var is empty. Without
+# this guard electron-builder still tries to publish to the upstream releases
+# API (resolved from package.json "repository") and fails with 401 Unauthorized.
+# The explicit release/upload steps in .github/workflows/CI.yml handle the actual
+# distribution, so skipping the in-build publish here is safe.
+if [ -z "$GH_TOKEN" ] && [ -z "$GITHUB_TOKEN" ]; then
+    echo "ℹ No GH_TOKEN/GITHUB_TOKEN set — skipping electron-builder publish (--publish never)"
+    EXTRA_ARGS+=("--publish" "never")
+fi
+
 cross-env USE_HARD_LINKS=false \
     CSC_IDENTITY_AUTO_DISCOVERY=$CSC_IDENTITY_AUTO_DISCOVERY_VALUE \
-    yarn electron-builder -- "$@"
+    yarn electron-builder -- "$@" "${EXTRA_ARGS[@]}"
