@@ -137,8 +137,6 @@ if [[ " $* " == *" --windows "* ]] || [[ " $* " == *" --win "* ]]; then
         *)
             if ! command -v wine >/dev/null 2>&1; then
                 echo "✗ Building a Windows installer on $(uname -s) requires 'wine' (used by electron-builder to generate the NSIS uninstaller)." >&2
-                echo "  Install it, e.g. on Debian/Ubuntu:" >&2
-                echo "    sudo dpkg --add-architecture i386 && sudo apt-get update && sudo apt-get install -y wine wine32:i386" >&2
                 exit 1
             fi
             ;;
