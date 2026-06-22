@@ -83,6 +83,13 @@ class CombinedCamera extends THREE.Camera {
         this.cameraP.updateProjectionMatrix();
 
         this.projectionMatrix = this.cameraP.projectionMatrix;
+        this.projectionMatrixInverse = this.cameraP.projectionMatrixInverse;
+
+        // Expose the standard THREE camera type flags so that helpers such as
+        // THREE.Raycaster (which dispatches on these) treat this combined
+        // camera as the projection it is currently emulating.
+        this.isPerspectiveCamera = true;
+        this.isOrthographicCamera = false;
 
         this.inPerspectiveMode = true;
         this.inOrthographicMode = false;
@@ -117,6 +124,12 @@ class CombinedCamera extends THREE.Camera {
         this.near = this.cameraO.near;
         this.far = this.cameraO.far;
         this.projectionMatrix = this.cameraO.projectionMatrix;
+        this.projectionMatrixInverse = this.cameraO.projectionMatrixInverse;
+
+        // See note in toPerspective(): keep the THREE camera type flags in sync
+        // with the active projection so Raycaster/unproject behave correctly.
+        this.isPerspectiveCamera = false;
+        this.isOrthographicCamera = true;
 
         this.inPerspectiveMode = false;
         this.inOrthographicMode = true;

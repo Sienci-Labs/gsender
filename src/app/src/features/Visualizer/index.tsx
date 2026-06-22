@@ -575,6 +575,23 @@ class Visualizer extends Component {
             toFreeView: () => {
                 this.setState({ cameraPosition: 'Free' });
             },
+            // Arm/disarm "Move To Here": clicking-and-holding in the viewport
+            // rapids the spindle to that spot. Arming locks the camera to the
+            // Top view so the click maps cleanly to the XY work plane.
+            toggleMoveToHere: () => {
+                this.setState((state) => {
+                    const moveToHere = !state.moveToHere;
+                    return {
+                        moveToHere,
+                        cameraPosition: moveToHere
+                            ? 'Top'
+                            : state.cameraPosition,
+                    };
+                });
+            },
+            disableMoveToHere: () => {
+                this.setState({ moveToHere: false });
+            },
         },
         handleLiteModeToggle: () => {
             const { liteMode, liteOption } = this.state;
@@ -899,6 +916,7 @@ class Visualizer extends Component {
             },
             cameraMode: this.config.get('cameraMode', CAMERA_MODE_PAN),
             cameraPosition: '3D', // 'Top', '3D', 'Front', 'Left', 'Right'
+            moveToHere: false, // "Move To Here" placement mode is armed
             isAgitated: false, // Defaults to false
             currentTheme: getVisualizerTheme(),
             currentTab: 0,

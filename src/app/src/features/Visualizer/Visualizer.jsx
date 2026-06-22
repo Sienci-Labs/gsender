@@ -45,6 +45,7 @@ import {
     GRBL,
     GRBLHAL,
     GRBL_ACTIVE_STATE_CHECK,
+    GRBL_ACTIVE_STATE_IDLE,
     LASER_MODE,
     OUTLINE_MODE_RAPIDLESS_SQUARE,
     LIGHTWEIGHT_OPTIONS,
@@ -63,6 +64,7 @@ import _ from 'lodash';
 import store from 'app/store';
 
 import controller from '../../lib/controller';
+import { getSafeXYMoveCode } from 'app/features/DRO/utils/SafeMove';
 import { getBoundingBox, loadSTL, loadTexture } from './helpers';
 import Viewport from './Viewport';
 import CoordinateAxes from './CoordinateAxes';
@@ -101,6 +103,10 @@ const ORTHOGRAPHIC_FAR = 7000;
 const CAMERA_DISTANCE = 1900; // Move the camera out a bit from the origin (0, 0, 0)
 const TRACKBALL_CONTROLS_MIN_DISTANCE = 1;
 const TRACKBALL_CONTROLS_MAX_DISTANCE = 7000;
+// "Move To Here": how long to hold before committing, and how far the pointer
+// may drift before the gesture is treated as a pan instead of a placement.
+const MOVE_TO_HERE_HOLD_MS = 500;
+const MOVE_TO_HERE_CANCEL_PX = 8;
 import { outlineResponse } from '../../workers/Outline.response';
 import { shouldVisualizeSVG } from '../../workers/Visualize.response';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
@@ -182,6 +188,17 @@ class Visualizer extends Component {
     counter = 0;
 
     waitingForCheck = false;
+
+    // "Move To Here" placement mode state
+    moveToHereActive = false;
+
+    mthPointerId = null;
+
+    mthStart = null;
+
+    mthTimer = null;
+
+    mthIndicator = null;
 
     setRef = (node) => {
         this.node = node;
@@ -443,6 +460,11 @@ class Visualizer extends Component {
             needUpdateScene = true;
         }
 
+        // "Move To Here" placement mode
+        if (prevState.moveToHere !== state.moveToHere) {
+            this.setMoveToHereMode(state.moveToHere);
+        }
+
         // Whether to show coordinate system
         if (
             prevState.units !== state.units ||
@@ -687,6 +709,7 @@ class Visualizer extends Component {
 
     componentWillUnmount() {
         this.removeControllerEvents();
+        this.setMoveToHereMode(false);
         this.unsubscribe();
         this.removeResizeEventListener();
         window.removeEventListener('keydown', this.handleKeyDown);
@@ -2383,6 +2406,8 @@ class Visualizer extends Component {
         controls.panSpeed = 0.4;
         controls.noZoom = false;
         controls.noPan = false;
+        // Keep rotation locked if "Move To Here" is armed during a rebuild
+        controls.noRotate = this.moveToHereActive;
 
         controls.staticMoving = true;
         controls.dynamicDampingFactor = 0.3;
@@ -2409,7 +2434,11 @@ class Visualizer extends Component {
 
         controls.addEventListener('end', () => {
             shouldAnimate = false;
-            this.props.actions.camera.toFreeView();
+            // While "Move To Here" is armed the camera stays locked to the Top
+            // view, so don't switch to the free view on pan/zoom interactions.
+            if (!this.moveToHereActive) {
+                this.props.actions.camera.toFreeView();
+            }
             this.updateScene();
         });
 
@@ -2418,6 +2447,276 @@ class Visualizer extends Component {
         });
 
         return controls;
+    }
+
+    setMoveToHereMode(enabled) {
+        this.moveToHereActive = enabled;
+        const dom = this.renderer && this.renderer.domElement;
+
+        if (enabled) {
+            if (this.controls) {
+                this.controls.noRotate = true;
+            }
+            if (dom) {
+                dom.style.cursor = 'crosshair';
+                dom.addEventListener(
+                    'pointerdown',
+                    this.handleMoveToHerePointerDown,
+                );
+                window.addEventListener(
+                    'pointermove',
+                    this.handleMoveToHerePointerMove,
+                );
+                window.addEventListener(
+                    'pointerup',
+                    this.handleMoveToHerePointerUp,
+                );
+                window.addEventListener(
+                    'pointercancel',
+                    this.handleMoveToHerePointerUp,
+                );
+            }
+        } else {
+            if (this.controls) {
+                this.controls.noRotate = false;
+            }
+            if (dom) {
+                dom.style.cursor = '';
+                dom.removeEventListener(
+                    'pointerdown',
+                    this.handleMoveToHerePointerDown,
+                );
+            }
+            window.removeEventListener(
+                'pointermove',
+                this.handleMoveToHerePointerMove,
+            );
+            window.removeEventListener(
+                'pointerup',
+                this.handleMoveToHerePointerUp,
+            );
+            window.removeEventListener(
+                'pointercancel',
+                this.handleMoveToHerePointerUp,
+            );
+            this.cancelMoveToHereHold();
+        }
+    }
+
+    machineIsReadyToMove() {
+        const { activeState } = this.props.state;
+        return (
+            this.props.isConnected && activeState === GRBL_ACTIVE_STATE_IDLE
+        );
+    }
+
+    handleMoveToHerePointerDown = (e) => {
+        if (!this.moveToHereActive) {
+            return;
+        }
+        // Primary (left mouse / touch) button only
+        if (e.button !== undefined && e.button !== 0) {
+            return;
+        }
+        // Only track a single pointer at a time (ignore multi-touch gestures)
+        if (this.mthPointerId !== null) {
+            return;
+        }
+        if (!this.machineIsReadyToMove()) {
+            toast.info('Machine must be connected and idle to move', {
+                position: 'bottom-right',
+            });
+            return;
+        }
+
+        this.mthPointerId = e.pointerId;
+        this.mthStart = { x: e.clientX, y: e.clientY };
+        this.showMoveToHereIndicator(e.clientX, e.clientY);
+
+        const { clientX, clientY } = e;
+        this.mthTimer = setTimeout(() => {
+            this.commitMoveToHere(clientX, clientY);
+        }, MOVE_TO_HERE_HOLD_MS);
+    };
+
+    handleMoveToHerePointerMove = (e) => {
+        if (this.mthPointerId === null || e.pointerId !== this.mthPointerId) {
+            return;
+        }
+        const dx = e.clientX - this.mthStart.x;
+        const dy = e.clientY - this.mthStart.y;
+        // Movement beyond the threshold means the user is panning, not placing
+        if (Math.hypot(dx, dy) > MOVE_TO_HERE_CANCEL_PX) {
+            this.cancelMoveToHereHold();
+        }
+    };
+
+    handleMoveToHerePointerUp = (e) => {
+        if (this.mthPointerId === null || e.pointerId !== this.mthPointerId) {
+            return;
+        }
+        // Released before the hold completed - cancel the placement
+        this.cancelMoveToHereHold();
+    };
+
+    cancelMoveToHereHold() {
+        if (this.mthTimer) {
+            clearTimeout(this.mthTimer);
+            this.mthTimer = null;
+        }
+        this.removeMoveToHereIndicator();
+        this.mthPointerId = null;
+        this.mthStart = null;
+    }
+
+    commitMoveToHere(clientX, clientY) {
+        this.cancelMoveToHereHold();
+
+        if (!this.machineIsReadyToMove()) {
+            toast.info('Machine must be connected and idle to move', {
+                position: 'bottom-right',
+            });
+            this.props.actions.camera.disableMoveToHere();
+            return;
+        }
+
+        const target = this.getWorkCoordsFromClient(clientX, clientY);
+        if (!target) {
+            return;
+        }
+
+        const { units } = this.props.state;
+        const unitModal = units === METRIC_UNITS ? 'G21' : 'G20';
+        controller.command(
+            'gcode:safe',
+            getSafeXYMoveCode(target.x, target.y),
+            unitModal,
+        );
+
+        toast.success(
+            `Moving to X${target.x.toFixed(2)} Y${target.y.toFixed(2)}`,
+            { position: 'bottom-right' },
+        );
+
+        // Auto-disarm after a successful move
+        this.props.actions.camera.disableMoveToHere();
+    }
+
+    getWorkCoordsFromClient(clientX, clientY) {
+        if (!this.renderer || !this.camera || !this.cuttingTool) {
+            return null;
+        }
+
+        const rect = this.renderer.domElement.getBoundingClientRect();
+        const ndc = new THREE.Vector2(
+            ((clientX - rect.left) / rect.width) * 2 - 1,
+            -((clientY - rect.top) / rect.height) * 2 + 1,
+        );
+
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(ndc, this.camera);
+
+        // Measure the clicked point relative to the cutting tool, whose world
+        // position corresponds to the current work position. This sidesteps the
+        // scene's pivot/group offsets and works in whatever units the scene is
+        // drawn in.
+        const toolWorld = new THREE.Vector3();
+        this.cuttingTool.getWorldPosition(toolWorld);
+
+        const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), -toolWorld.z);
+        const hit = new THREE.Vector3();
+        if (!raycaster.ray.intersectPlane(plane, hit)) {
+            return null;
+        }
+
+        const deltaX = hit.x - toolWorld.x;
+        const deltaY = hit.y - toolWorld.y;
+        const workX = Number(this.workPosition.x) + deltaX;
+        const workY = Number(this.workPosition.y) + deltaY;
+
+        return {
+            x: Number(workX.toFixed(3)),
+            y: Number(workY.toFixed(3)),
+        };
+    }
+
+    showMoveToHereIndicator(clientX, clientY) {
+        this.removeMoveToHereIndicator();
+
+        const size = 48;
+        const r = size / 2 - 4;
+        const c = size / 2;
+        const circumference = 2 * Math.PI * r;
+        const ns = 'http://www.w3.org/2000/svg';
+
+        // Use fixed positioning relative to the viewport so the indicator lands
+        // exactly under the pointer regardless of ancestor positioning.
+        const wrapper = document.createElement('div');
+        wrapper.style.cssText = [
+            'position:fixed',
+            'pointer-events:none',
+            'z-index:9999',
+            `width:${size}px`,
+            `height:${size}px`,
+            'transform:translate(-50%,-50%)',
+            `left:${clientX}px`,
+            `top:${clientY}px`,
+        ].join(';');
+
+        const svg = document.createElementNS(ns, 'svg');
+        svg.setAttribute('width', size);
+        svg.setAttribute('height', size);
+
+        const bg = document.createElementNS(ns, 'circle');
+        bg.setAttribute('cx', c);
+        bg.setAttribute('cy', c);
+        bg.setAttribute('r', r);
+        bg.setAttribute('fill', 'rgba(0,0,0,0.35)');
+        bg.setAttribute('stroke', 'rgba(255,255,255,0.4)');
+        bg.setAttribute('stroke-width', '3');
+
+        const progress = document.createElementNS(ns, 'circle');
+        progress.setAttribute('cx', c);
+        progress.setAttribute('cy', c);
+        progress.setAttribute('r', r);
+        progress.setAttribute('fill', 'none');
+        progress.setAttribute('stroke', '#4ade80');
+        progress.setAttribute('stroke-width', '3');
+        progress.setAttribute('stroke-linecap', 'round');
+        progress.setAttribute('stroke-dasharray', `${circumference}`);
+        progress.setAttribute('stroke-dashoffset', `${circumference}`);
+        progress.setAttribute('transform', `rotate(-90 ${c} ${c})`);
+
+        const dot = document.createElementNS(ns, 'circle');
+        dot.setAttribute('cx', c);
+        dot.setAttribute('cy', c);
+        dot.setAttribute('r', '2');
+        dot.setAttribute('fill', '#4ade80');
+
+        svg.appendChild(bg);
+        svg.appendChild(progress);
+        svg.appendChild(dot);
+        wrapper.appendChild(svg);
+        document.body.appendChild(wrapper);
+
+        if (typeof progress.animate === 'function') {
+            progress.animate(
+                [
+                    { strokeDashoffset: circumference },
+                    { strokeDashoffset: 0 },
+                ],
+                { duration: MOVE_TO_HERE_HOLD_MS, fill: 'forwards' },
+            );
+        }
+
+        this.mthIndicator = wrapper;
+    }
+
+    removeMoveToHereIndicator() {
+        if (this.mthIndicator && this.mthIndicator.parentElement) {
+            this.mthIndicator.parentElement.removeChild(this.mthIndicator);
+        }
+        this.mthIndicator = null;
     }
 
     getRadiansFromDegrees(val) {

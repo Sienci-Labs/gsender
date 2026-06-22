@@ -1,6 +1,6 @@
 import React, { useState, useEffect, ReactNode } from 'react';
 import PropTypes from 'prop-types';
-import { FrownIcon } from 'lucide-react';
+import { FrownIcon, Crosshair } from 'lucide-react';
 import pubsub from 'pubsub-js';
 
 import * as WebGL from 'app/lib/three/WebGL';
@@ -132,6 +132,24 @@ const PrimaryVisualizer = ({
                                 />
                             </button>
                         </Tooltip>
+                        {state.isConnected && (
+                            <Tooltip content="Move To Here: press and hold a spot to move the spindle there">
+                                <button
+                                    className="bg-gray-600 bg-opacity-50 rounded-full p-3.5"
+                                    onClick={() =>
+                                        camera.toggleMoveToHere()
+                                    }
+                                >
+                                    <Crosshair
+                                        size={36}
+                                        className={cx('cursor-pointer', {
+                                            'text-gray-400': !state.moveToHere,
+                                            'text-green-400': state.moveToHere,
+                                        })}
+                                    />
+                                </button>
+                            </Tooltip>
+                        )}
                     </div>
 
                     <CameraDisplay
