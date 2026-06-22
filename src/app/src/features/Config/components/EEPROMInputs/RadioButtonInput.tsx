@@ -5,11 +5,11 @@ import styles from "./index.module.styl";
 const RadioButtonInput = ({ info, setting, onChange, disabled }) => {
 	const [localValue, setLocalValue] = useState(0);
 
-	useEffect(() => {
-		let { value } = setting;
-		value = Number(value);
-		setLocalValue(value);
-	}, [setting]);
+    useEffect(() => {
+        let { value } = setting;
+        value = Number(value);
+        setLocalValue(value);
+    }, [setting.value]);
 
 	const rbOnClick = (e) => {
 		const value = e.target.value;

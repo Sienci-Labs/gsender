@@ -1005,6 +1005,7 @@ export function* initialize(): Generator<any, void, any> {
     });
 
     controller.addListener('spindle:add', (spindle: Spindle) => {
+        console.log(spindle);
         if (Object.hasOwn(spindle, 'id') && spindle.id !== null) {
             reduxStore.dispatch(addSpindle(spindle));
         }

@@ -63,19 +63,46 @@ export function useSDCard() {
 		console.log("deleting file from SD card");
 	};
 
-	return {
-		isConnected,
-		isMounted,
-		files,
-		isLoading,
-		setIsLoading,
-		uploadFileToSDCard,
-		runSDFile,
-		deleteSDCard,
-		firmwareType,
-		hasFTP,
-		hasYM,
-		isRunningSDFile,
-		isWorkflowIdle,
-	};
+    const newOpts = useTypedSelector(
+        (state: RootState) => state.controller.settings.info?.NEWOPT,
+    );
+    const hasFTP =
+        newOpts !== undefined &&
+        Object.prototype.hasOwnProperty.call(newOpts, 'FTP');
+    const hasYM =
+        newOpts !== undefined &&
+        Object.prototype.hasOwnProperty.call(newOpts, 'YM');
+
+    const uploadFileToSDCard = (filesData) => {
+        // Support both single file and multiple files
+        if (Array.isArray(filesData)) {
+            controller.command('ymodem:uploadFiles', filesData);
+        } else {
+            controller.command('ymodem:upload', filesData);
+        }
+    };
+
+    const runSDFile = (path) => {
+        controller.command('sdcard:run', path);
+    };
+
+    const deleteSDCard = (path) => {
+        console.log('deleting file from SD card');
+    };
+
+    return {
+        isConnected,
+        isMounted,
+        files,
+        isLoading,
+        setIsLoading,
+        uploadFileToSDCard,
+        runSDFile,
+        deleteSDCard,
+        firmwareType,
+        hasFTP,
+        hasYM,
+        isRunningSDFile,
+        isWorkflowIdle
+    };
 }

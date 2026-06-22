@@ -5,11 +5,11 @@ import styles from "./index.module.styl";
 const BooleanInput = ({ info, setting, onChange, disabled, ...props }) => {
 	const [bool, setBool] = useState(false);
 
-	useEffect(() => {
-		let { value } = setting;
-		value = Number(value) === 1;
-		setBool(value);
-	}, []);
+    useEffect(() => {
+        let { value } = setting;
+        value = Number(value) === 1;
+        setBool(value);
+    }, [setting.value]);
 
 	const booleanOnChange = (checked: boolean) => {
 		const value = checked ? 1 : 0;
