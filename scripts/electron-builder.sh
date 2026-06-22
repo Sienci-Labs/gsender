@@ -111,6 +111,38 @@ CSC_IDENTITY_AUTO_DISCOVERY_VALUE=false
 if [ -n "$CSC_LINK" ] || [ -n "$CSC_NAME" ]; then
     CSC_IDENTITY_AUTO_DISCOVERY_VALUE=true
 fi
+
+# Extra args appended to the electron-builder invocation.
+EXTRA_ARGS=()
+
+# Windows-specific handling (building a Windows target, e.g. on a dev machine).
+if [[ " $* " == *" --windows "* ]] || [[ " $* " == *" --win "* ]]; then
+    # Skip Windows code signing unless DigiCert KeyLocker credentials are present.
+    # These are only set on release (tag) builds in CI; locally / on PR builds they
+    # are absent, in which case electron-builder would otherwise try to invoke
+    # signtool.exe (via wine on non-Windows hosts) and fail. signExecutable=false
+    # still applies the icon/version metadata, it only skips the signature.
+    # See WindowsSigner.js for the credentials contract.
+    if [ -z "$SM_KEYPAIR_ALIAS" ] || [ -z "$SM_CLIENT_CERT_FILE" ]; then
+        echo "ℹ Windows signing credentials (SM_KEYPAIR_ALIAS / SM_CLIENT_CERT_FILE) not set — skipping code signing for this build"
+        EXTRA_ARGS+=("-c.win.signExecutable=false")
+    fi
+
+    # Building an NSIS installer on a non-Windows host requires wine to generate
+    # the uninstaller stub. Fail early with a clear message instead of a cryptic
+    # "spawn wine ENOENT" deep inside electron-builder. Skip the check on native
+    # Windows (Git Bash / MSYS), where wine is neither present nor needed.
+    case "$(uname -s)" in
+        MINGW* | MSYS* | CYGWIN*) ;; # native Windows host, no wine needed
+        *)
+            if ! command -v wine >/dev/null 2>&1; then
+                echo "✗ Building a Windows installer on $(uname -s) requires 'wine' (used by electron-builder to generate the NSIS uninstaller)." >&2
+                exit 1
+            fi
+            ;;
+    esac
+fi
+
 cross-env USE_HARD_LINKS=false \
     CSC_IDENTITY_AUTO_DISCOVERY=$CSC_IDENTITY_AUTO_DISCOVERY_VALUE \
-    yarn electron-builder -- "$@"
+    yarn electron-builder -- "$@" "${EXTRA_ARGS[@]}"
