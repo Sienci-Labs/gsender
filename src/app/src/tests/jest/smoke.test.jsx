@@ -2,6 +2,7 @@
  * @jest-environment jsdom
  */
 
+import { render, screen } from "@testing-library/react";
 /**
  * Specifically it checks:
  * Jest can run
@@ -11,7 +12,6 @@
  * The test pipeline itself is not broken
  */
 import React from "react";
-import { render, screen } from "@testing-library/react";
 
 function Hello() {
 	return <div>Hello World</div>;

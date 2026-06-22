@@ -1,47 +1,45 @@
+import { Button } from "app/components/Button";
+import { Input } from "app/components/shadcn/Input";
+import {
+	VISUALIZER_PRIMARY,
+	WORKFLOW_STATE_PAUSED,
+	WORKFLOW_STATE_RUNNING,
+} from "app/constants";
+import { useTypedSelector } from "app/hooks/useTypedSelector";
+import { useWorkspaceState } from "app/hooks/useWorkspaceState";
+import controller from "app/lib/controller";
+import { uploadGcodeFileToServer } from "app/lib/fileupload";
+import { toast } from "app/lib/toaster";
+import { cn } from "app/lib/utils";
+import type { RootState } from "app/store/redux";
+import { store as reduxStore } from "app/store/redux";
+import { updateFileContent } from "app/store/redux/slices/fileInfo.slice";
+import {
+	ArrowUp,
+	BoxIcon,
+	Check,
+	ChevronDown,
+	ChevronUp,
+	Copy,
+	CopyCheck,
+	RotateCcw,
+	Save,
+	Search,
+	Trash2,
+	X,
+} from "lucide-react";
 import React, {
-	useState,
+	useCallback,
 	useEffect,
 	useMemo,
 	useRef,
-	useCallback,
+	useState,
 } from "react";
-import {
-	Copy,
-	Save,
-	X,
-	Check,
-	RotateCcw,
-	Trash2,
-	ArrowUp,
-	Search,
-	ChevronUp,
-	ChevronDown,
-	BoxIcon,
-	CopyCheck,
-} from "lucide-react";
-
-import { Button } from "app/components/Button";
-import { toast } from "app/lib/toaster";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-import { uploadGcodeFileToServer } from "app/lib/fileupload";
-import controller from "app/lib/controller";
-import {
-	VISUALIZER_PRIMARY,
-	WORKFLOW_STATE_RUNNING,
-	WORKFLOW_STATE_PAUSED,
-} from "app/constants";
-import { store as reduxStore } from "app/store/redux";
-import { updateFileContent } from "app/store/redux/slices/fileInfo.slice";
-import { RootState } from "app/store/redux";
-import { cn } from "app/lib/utils";
-import { useWorkspaceState } from "app/hooks/useWorkspaceState";
-
 import SyntaxHighlighter from "react-syntax-highlighter";
 import {
-	a11yLight,
 	a11yDark,
+	a11yLight,
 } from "react-syntax-highlighter/dist/esm/styles/hljs";
-import { Input } from "app/components/shadcn/Input";
 
 type LineStatus = "processed" | "current" | "upcoming" | "none";
 

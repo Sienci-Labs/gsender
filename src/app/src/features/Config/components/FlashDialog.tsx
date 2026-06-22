@@ -1,10 +1,10 @@
+import { Button } from "app/components/Button";
 import {
 	Dialog,
 	DialogContent,
 	DialogHeader,
 	DialogTitle,
 } from "app/components/shadcn/Dialog";
-import { useEffect, useRef, useState } from "react";
 import {
 	Select,
 	SelectContent,
@@ -15,15 +15,15 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "app/components/shadcn/Select.tsx";
-import { Button } from "app/components/Button";
-import { toast } from "app/lib/toaster";
-import controller from "app/lib/controller.ts";
-import store from "app/store";
-import get from "lodash/get";
-
-import cn from "classnames";
 import { FlashingProgress } from "app/features/Config/components/FlashingProgress.tsx";
 import { useTypedSelector } from "app/hooks/useTypedSelector";
+import controller from "app/lib/controller.ts";
+import { toast } from "app/lib/toaster";
+import store from "app/store";
+
+import cn from "classnames";
+import get from "lodash/get";
+import { useEffect, useRef, useState } from "react";
 
 interface flashDialogProps {
 	show: boolean;

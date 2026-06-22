@@ -1,12 +1,11 @@
+import type { BasicPosition, BBox } from "app/definitions/general";
 import { EventEmitter } from "events";
-
 import { FILE_TYPE } from "../constants";
 import {
 	createFastLineScanScratch,
-	FastLineScanScratch,
+	type FastLineScanScratch,
 	scanLineFast,
 } from "./GCodeParser";
-import { BasicPosition, BBox } from "app/definitions/general";
 
 interface Modal {
 	motion: string;
@@ -34,9 +33,9 @@ interface RotationResult {
 type SpindleToolEventCode = "S" | "T" | "M" | "TC";
 
 interface SpindleToolEvent {
-	S?: Number;
-	T?: Number;
-	M?: Number;
+	S?: number;
+	T?: number;
+	M?: number;
 	TC?: boolean;
 	comment?: string;
 }
@@ -1551,14 +1550,14 @@ class GCodeVirtualizer extends EventEmitter {
 
 	calculateMachiningTime(endPos: BasicPosition, v1?: BasicPosition): void {
 		let moveDuration = 0;
-		let currentPos = v1 || this.position;
+		const currentPos = v1 || this.position;
 
 		const dx = endPos.x - currentPos.x;
 		const dy = endPos.y - currentPos.y;
 		const dz = endPos.z - currentPos.z;
 		const da = (endPos.a ?? 0) - (currentPos.a ?? 0);
 
-		let travelXY = Math.hypot(dx, dy);
+		const travelXY = Math.hypot(dx, dy);
 		if (Number.isNaN(travelXY)) {
 			console.error(
 				"Invalid travel while calculating distance between V1 and V2",
@@ -1567,7 +1566,7 @@ class GCodeVirtualizer extends EventEmitter {
 		}
 
 		// Calculate linear travel distance (XYZ)
-		let linearTravel = Math.hypot(travelXY, dz);
+		const linearTravel = Math.hypot(travelXY, dz);
 
 		// Calculate rotary travel distance
 		// Convert angular motion (degrees) to linear distance (mm) using the rotary diameter
@@ -1756,7 +1755,7 @@ class GCodeVirtualizer extends EventEmitter {
 		if (!this.vmState.spindleToolEvents[this.totalLines]) {
 			this.vmState.spindleToolEvents[this.totalLines] = { [word]: code };
 		} else {
-			// @ts-ignore
+			// @ts-expect-error
 			this.vmState.spindleToolEvents[this.totalLines][word] = code;
 		}
 	}

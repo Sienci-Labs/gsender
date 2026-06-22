@@ -21,17 +21,17 @@
  *
  */
 
-import ReactDOM from "react-dom";
-import { useState, useEffect } from "react";
-import Instructions from "app/features/Helper/components/Instructions";
-import Stepper from "app/features/Helper/components/Stepper";
-import Controls from "app/features/Helper/components/Controls";
-import { useWizardContext } from "app/features/Helper/context";
-import MinMaxButton from "app/features/Helper/components/MinMaxButton";
 import CancelButton from "app/features/Helper/components/CancelButton";
-import { Wrench } from "lucide-react";
-import store from "app/store";
+import Controls from "app/features/Helper/components/Controls";
+import Instructions from "app/features/Helper/components/Instructions";
+import MinMaxButton from "app/features/Helper/components/MinMaxButton";
+import Stepper from "app/features/Helper/components/Stepper";
+import { useWizardContext } from "app/features/Helper/context";
 import controller from "app/lib/controller.ts";
+import store from "app/store";
+import { Wrench } from "lucide-react";
+import { useEffect, useState } from "react";
+import ReactDOM from "react-dom";
 
 // Fetch toolchange settings and send it to backend
 export function updateToolchangeContext(mappings = null) {

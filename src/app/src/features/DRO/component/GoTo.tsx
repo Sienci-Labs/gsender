@@ -1,22 +1,21 @@
-import { useEffect, useState } from "react";
-import { FaPaperPlane } from "react-icons/fa6";
-
+import { Button } from "app/components/Button";
 import {
 	Popover,
 	PopoverContent,
 	PopoverTrigger,
 } from "app/components/shadcn/Popover";
-import { Button } from "app/components/Button";
-import { UnitInput } from "app/components/UnitInput";
-import { DROPosition } from "app/features/DRO/utils/DRO";
-import controller from "app/lib/controller";
-import { useWorkspaceState } from "app/hooks/useWorkspaceState";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-import { METRIC_UNITS } from "app/constants";
 import Tooltip from "app/components/Tooltip";
+import { UnitInput } from "app/components/UnitInput";
+import { METRIC_UNITS } from "app/constants";
+import type { DROPosition } from "app/features/DRO/utils/DRO";
+import { useTypedSelector } from "app/hooks/useTypedSelector";
+import { useWorkspaceState } from "app/hooks/useWorkspaceState";
+import controller from "app/lib/controller";
 import store from "app/store";
+import type { RootState } from "app/store/redux";
 import { get } from "lodash";
-import { RootState } from "app/store/redux";
+import { useEffect, useState } from "react";
+import { FaPaperPlane } from "react-icons/fa6";
 
 type MovementMode = "abs" | "inc" | "mcs";
 

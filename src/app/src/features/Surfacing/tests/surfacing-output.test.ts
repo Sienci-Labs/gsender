@@ -1,6 +1,6 @@
+import { IMPERIAL_UNITS, METRIC_UNITS } from "app/constants";
 import defaultState from "app/store/defaultState";
 import Generator from "../utils/surfacingGcodeGenerator";
-import { IMPERIAL_UNITS, METRIC_UNITS } from "app/constants";
 
 describe("Surfacing Output", () => {
 	it("should generate gcode for surfacing", () => {

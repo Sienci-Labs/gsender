@@ -21,58 +21,52 @@
  *
  */
 
-import { store as reduxStore } from "app/store/redux";
-import gsap from "gsap";
-import { connect } from "react-redux";
-import _get from "lodash/get";
-import _each from "lodash/each";
-import _isEqual from "lodash/isEqual";
-import _throttle from "lodash/throttle";
-import colornames from "colornames";
-import pubsub from "pubsub-js";
-import PropTypes from "prop-types";
-import React, { Component } from "react";
-import * as THREE from "three";
-import { degToRad } from "three/src/math/MathUtils";
 import {
+	FILE_TYPE,
+	GRBL,
+	GRBL_ACTIVE_STATE_CHECK,
+	GRBLHAL,
 	IMPERIAL_UNITS,
+	LASER_MODE,
+	LIGHTWEIGHT_OPTIONS,
 	METRIC_UNITS,
+	OUTLINE_MODE_RAPIDLESS_SQUARE,
 	RENDER_RENDERED,
 	VISUALIZER_PRIMARY,
 	VISUALIZER_SECONDARY,
-	FILE_TYPE,
 	WORKSPACE_MODE,
-	GRBL,
-	GRBLHAL,
-	GRBL_ACTIVE_STATE_CHECK,
-	LASER_MODE,
-	OUTLINE_MODE_RAPIDLESS_SQUARE,
-	LIGHTWEIGHT_OPTIONS,
 } from "app/constants";
 import CombinedCamera from "app/lib/three/oldCombinedCamera";
+import TrackballControls from "app/lib/three/oldTrackballControls";
+import * as WebGL from "app/lib/three/WebGL";
+import store from "app/store";
+import { store as reduxStore } from "app/store/redux";
+import { updateFileRenderState } from "app/store/redux/slices/fileInfo.slice";
+import colornames from "colornames";
+import gsap from "gsap";
+import _ from "lodash";
+import _each from "lodash/each";
+import _get from "lodash/get";
+import _isEqual from "lodash/isEqual";
+import _throttle from "lodash/throttle";
+import PropTypes from "prop-types";
+import pubsub from "pubsub-js";
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import * as THREE from "three";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
 import { CopyShader } from "three/examples/jsm/shaders/CopyShader";
 import { FXAAShader } from "three/examples/jsm/shaders/FXAAShader";
-import TrackballControls from "app/lib/three/oldTrackballControls";
-import * as WebGL from "app/lib/three/WebGL";
-
-import _ from "lodash";
-import store from "app/store";
-
+import { degToRad } from "three/src/math/MathUtils";
 import controller from "../../lib/controller";
-import { getBoundingBox, loadSTL, loadTexture } from "./helpers";
-import Viewport from "./Viewport";
+import { isLaserMode } from "../../lib/laserMode";
+import WidgetConfig from "../WidgetConfig/WidgetConfig";
 import CoordinateAxes from "./CoordinateAxes";
 import Cuboid from "./Cuboid";
 import CuttingPointer from "./CuttingPointer";
-import LaserPointer from "./LaserPointer";
-import GridLine from "./GridLine";
-import PivotPoint3 from "./PivotPoint3";
-import TextSprite from "./TextSprite";
-import GCodeVisualizer from "./GCodeVisualizer";
 import {
 	BACKGROUND_PART,
 	CAMERA_MODE_PAN,
@@ -84,9 +78,13 @@ import {
 	YAXIS_PART,
 	ZAXIS_PART,
 } from "./constants";
-import WidgetConfig from "../WidgetConfig/WidgetConfig";
-import { isLaserMode } from "../../lib/laserMode";
-import { updateFileRenderState } from "app/store/redux/slices/fileInfo.slice";
+import GCodeVisualizer from "./GCodeVisualizer";
+import GridLine from "./GridLine";
+import { getBoundingBox, loadSTL, loadTexture } from "./helpers";
+import LaserPointer from "./LaserPointer";
+import PivotPoint3 from "./PivotPoint3";
+import TextSprite from "./TextSprite";
+import Viewport from "./Viewport";
 
 const IMPERIAL_GRID_SPACING = 25.4; // 1 in
 const METRIC_GRID_SPACING = 10; // 10 mm
@@ -101,13 +99,14 @@ const ORTHOGRAPHIC_FAR = 7000;
 const CAMERA_DISTANCE = 1900; // Move the camera out a bit from the origin (0, 0, 0)
 const TRACKBALL_CONTROLS_MIN_DISTANCE = 1;
 const TRACKBALL_CONTROLS_MAX_DISTANCE = 7000;
+
+import { Confirm } from "app/components/ConfirmationDialog/ConfirmationDialogLib";
+import { uploadGcodeFileToServer } from "app/lib/fileupload";
+import { getZUpTravel } from "app/lib/SoftLimits.js";
+import { toast } from "app/lib/toaster";
+import { mm2in } from "app/lib/units";
 import { outlineResponse } from "../../workers/Outline.response";
 import { shouldVisualizeSVG } from "../../workers/Visualize.response";
-import { uploadGcodeFileToServer } from "app/lib/fileupload";
-import { toast } from "app/lib/toaster";
-import { getZUpTravel } from "app/lib/SoftLimits.js";
-import { mm2in } from "app/lib/units";
-import { Confirm } from "app/components/ConfirmationDialog/ConfirmationDialogLib";
 
 class Visualizer extends Component {
 	static propTypes = {
@@ -1738,112 +1737,103 @@ class Visualizer extends Component {
 				metricGridLineNumbers.visible = visible && units === METRIC_UNITS;
 				this.group.add(metricGridLineNumbers);
 			}
+			// Cutting Tool
+			Promise.all([
+				loadSTL("assets/models/stl/bit.stl").then((geometry) => geometry),
+				loadTexture("assets/textures/brushed-steel-texture.jpg").then(
+					(texture) => texture,
+				),
+			])
+				.then((result) => {
+					const [geometry, texture] = result;
 
-			{
-				// Cutting Tool
-				Promise.all([
-					loadSTL("assets/models/stl/bit.stl").then((geometry) => geometry),
-					loadTexture("assets/textures/brushed-steel-texture.jpg").then(
-						(texture) => texture,
-					),
-				])
-					.then((result) => {
-						const [geometry, texture] = result;
+					// Rotate the geometry 90 degrees about the X axis.
+					geometry.rotateX(-Math.PI / 2);
 
-						// Rotate the geometry 90 degrees about the X axis.
-						geometry.rotateX(-Math.PI / 2);
+					// Scale the geometry data.
+					geometry.scale(0.5, 0.5, 0.5);
 
-						// Scale the geometry data.
-						geometry.scale(0.5, 0.5, 0.5);
+					// Compute the bounding box.
+					geometry.computeBoundingBox();
 
-						// Compute the bounding box.
-						geometry.computeBoundingBox();
-
-						// Set the desired position from the origin rather than its center.
-						/*const height =
+					// Set the desired position from the origin rather than its center.
+					/*const height =
                             geometry.boundingBox.max.z -
                             geometry.boundingBox.min.z;*/
-						geometry.translate(0, 0, -geometry.boundingBox.min.z);
+					geometry.translate(0, 0, -geometry.boundingBox.min.z);
 
-						let material = new THREE.MeshLambertMaterial({
-							map: texture,
-							opacity: 0.9,
-							transparent: false,
-							emissive: 0xcccccc,
-							emissiveIntensity: 0.5,
-							color: "#caf0f8",
-						});
-
-						if (geometry.hasColors) {
-							material.vertexColors = true;
-						}
-
-						const mesh = new THREE.Mesh(geometry, material);
-						const object = new THREE.Object3D();
-						object.add(mesh);
-
-						// unload the old one
-						this.group.remove(this.cuttingTool);
-
-						this.cuttingTool = object;
-						this.cuttingTool.name = "CuttingTool";
-						this.cuttingTool.visible =
-							this.props.isConnected &&
-							!isLaserMode() &&
-							(liteMode
-								? state.objects.cuttingTool.visibleLite
-								: state.objects.cuttingTool.visible);
-
-						this.group.add(this.cuttingTool);
-
-						// Sync to current machine position (e.g. after remount from lite mode toggle)
-						if (this.props.isConnected) {
-							this.workPosition = this.props.workPosition;
-							this.machinePosition = this.props.machinePosition;
-							this.updateCuttingToolPosition(this.props.workPosition);
-						}
-
-						// Update the scene
-						this.updateScene();
-					})
-					.catch((error) => {
-						console.error(
-							"Visualizer: Failed to load cutting tool assets:",
-							error,
-						);
+					const material = new THREE.MeshLambertMaterial({
+						map: texture,
+						opacity: 0.9,
+						transparent: false,
+						emissive: 0xcccccc,
+						emissiveIntensity: 0.5,
+						color: "#caf0f8",
 					});
-			}
 
-			{
-				// Laser Tool
-				this.setupScene();
+					if (geometry.hasColors) {
+						material.vertexColors = true;
+					}
 
-				// unload the old one
-				this.group.remove(this.laserPointer);
+					const mesh = new THREE.Mesh(geometry, material);
+					const object = new THREE.Object3D();
+					object.add(mesh);
 
-				// add tool
-				this.laserPointer = new LaserPointer({
-					color: currentTheme.get(CUTTING_PART),
-					diameter: 4,
+					// unload the old one
+					this.group.remove(this.cuttingTool);
+
+					this.cuttingTool = object;
+					this.cuttingTool.name = "CuttingTool";
+					this.cuttingTool.visible =
+						this.props.isConnected &&
+						!isLaserMode() &&
+						(liteMode
+							? state.objects.cuttingTool.visibleLite
+							: state.objects.cuttingTool.visible);
+
+					this.group.add(this.cuttingTool);
+
+					// Sync to current machine position (e.g. after remount from lite mode toggle)
+					if (this.props.isConnected) {
+						this.workPosition = this.props.workPosition;
+						this.machinePosition = this.props.machinePosition;
+						this.updateCuttingToolPosition(this.props.workPosition);
+					}
+
+					// Update the scene
+					this.updateScene();
+				})
+				.catch((error) => {
+					console.error(
+						"Visualizer: Failed to load cutting tool assets:",
+						error,
+					);
 				});
-				this.laserPointer.name = "LaserPointer";
-				this.laserPointer.visible =
-					isConnected &&
-					isLaser &&
-					(liteMode
-						? state.objects.cuttingTool.visibleLite
-						: state.objects.cuttingTool.visible);
+			// Laser Tool
+			this.setupScene();
 
-				this.group.add(this.laserPointer);
+			// unload the old one
+			this.group.remove(this.laserPointer);
 
-				// Update the scene
-				this.updateScene();
-			}
+			// add tool
+			this.laserPointer = new LaserPointer({
+				color: currentTheme.get(CUTTING_PART),
+				diameter: 4,
+			});
+			this.laserPointer.name = "LaserPointer";
+			this.laserPointer.visible =
+				isConnected &&
+				isLaser &&
+				(liteMode
+					? state.objects.cuttingTool.visibleLite
+					: state.objects.cuttingTool.visible);
 
-			{
-				// Cutting Pointer
-				this.createCuttingPointer();
-			}
+			this.group.add(this.laserPointer);
+
+			// Update the scene
+			this.updateScene();
+			// Cutting Pointer
+			this.createCuttingPointer();
 
 			{
 				// Limits
@@ -1946,7 +1936,7 @@ class Visualizer extends Component {
 	renderBloom() {
 		const { state } = this.props;
 		const { currentTheme } = state;
-		let materials = {};
+		const materials = {};
 		const darkMaterial = new THREE.MeshBasicMaterial({ color: "black" });
 		const bloomLayer = new THREE.Layers();
 		bloomLayer.set(1);
@@ -2131,92 +2121,83 @@ class Visualizer extends Component {
 			metricGridLineNumbers.visible = visible && units === METRIC_UNITS;
 			this.group.add(metricGridLineNumbers);
 		}
+		// Cutting Tool (async STL load)
+		Promise.all([
+			loadSTL("assets/models/stl/bit.stl").then((geometry) => geometry),
+			loadTexture("assets/textures/brushed-steel-texture.jpg").then(
+				(texture) => texture,
+			),
+		])
+			.then((result) => {
+				const [geometry, texture] = result;
 
-		{
-			// Cutting Tool (async STL load)
-			Promise.all([
-				loadSTL("assets/models/stl/bit.stl").then((geometry) => geometry),
-				loadTexture("assets/textures/brushed-steel-texture.jpg").then(
-					(texture) => texture,
-				),
-			])
-				.then((result) => {
-					const [geometry, texture] = result;
+				geometry.rotateX(-Math.PI / 2);
+				geometry.scale(0.5, 0.5, 0.5);
+				geometry.computeBoundingBox();
+				geometry.translate(0, 0, -geometry.boundingBox.min.z);
 
-					geometry.rotateX(-Math.PI / 2);
-					geometry.scale(0.5, 0.5, 0.5);
-					geometry.computeBoundingBox();
-					geometry.translate(0, 0, -geometry.boundingBox.min.z);
-
-					let material = new THREE.MeshLambertMaterial({
-						map: texture,
-						opacity: 0.9,
-						transparent: false,
-						emissive: 0xcccccc,
-						emissiveIntensity: 0.5,
-						color: "#caf0f8",
-					});
-
-					if (geometry.hasColors) {
-						material.vertexColors = true;
-					}
-
-					const mesh = new THREE.Mesh(geometry, material);
-					const object = new THREE.Object3D();
-					object.add(mesh);
-
-					this.group.remove(this.cuttingTool);
-
-					this.cuttingTool = object;
-					this.cuttingTool.name = "CuttingTool";
-					this.cuttingTool.visible =
-						this.props.isConnected &&
-						!isLaserMode() &&
-						(liteMode
-							? state.objects.cuttingTool.visibleLite
-							: state.objects.cuttingTool.visible);
-
-					this.group.add(this.cuttingTool);
-
-					if (this.props.isConnected) {
-						this.workPosition = this.props.workPosition;
-						this.machinePosition = this.props.machinePosition;
-						this.updateCuttingToolPosition(this.props.workPosition);
-					}
-
-					this.updateScene();
-				})
-				.catch((error) => {
-					console.error(
-						"Visualizer: Failed to load cutting tool assets during rebuild:",
-						error,
-					);
+				const material = new THREE.MeshLambertMaterial({
+					map: texture,
+					opacity: 0.9,
+					transparent: false,
+					emissive: 0xcccccc,
+					emissiveIntensity: 0.5,
+					color: "#caf0f8",
 				});
-		}
 
-		{
-			// Laser Tool — skip setupScene() since EffectComposers are still valid
-			this.group.remove(this.laserPointer);
+				if (geometry.hasColors) {
+					material.vertexColors = true;
+				}
 
-			this.laserPointer = new LaserPointer({
-				color: currentTheme.get(CUTTING_PART),
-				diameter: 4,
+				const mesh = new THREE.Mesh(geometry, material);
+				const object = new THREE.Object3D();
+				object.add(mesh);
+
+				this.group.remove(this.cuttingTool);
+
+				this.cuttingTool = object;
+				this.cuttingTool.name = "CuttingTool";
+				this.cuttingTool.visible =
+					this.props.isConnected &&
+					!isLaserMode() &&
+					(liteMode
+						? state.objects.cuttingTool.visibleLite
+						: state.objects.cuttingTool.visible);
+
+				this.group.add(this.cuttingTool);
+
+				if (this.props.isConnected) {
+					this.workPosition = this.props.workPosition;
+					this.machinePosition = this.props.machinePosition;
+					this.updateCuttingToolPosition(this.props.workPosition);
+				}
+
+				this.updateScene();
+			})
+			.catch((error) => {
+				console.error(
+					"Visualizer: Failed to load cutting tool assets during rebuild:",
+					error,
+				);
 			});
-			this.laserPointer.name = "LaserPointer";
-			this.laserPointer.visible =
-				isConnected &&
-				isLaser &&
-				(liteMode
-					? state.objects.cuttingTool.visibleLite
-					: state.objects.cuttingTool.visible);
+		// Laser Tool — skip setupScene() since EffectComposers are still valid
+		this.group.remove(this.laserPointer);
 
-			this.group.add(this.laserPointer);
-		}
+		this.laserPointer = new LaserPointer({
+			color: currentTheme.get(CUTTING_PART),
+			diameter: 4,
+		});
+		this.laserPointer.name = "LaserPointer";
+		this.laserPointer.visible =
+			isConnected &&
+			isLaser &&
+			(liteMode
+				? state.objects.cuttingTool.visibleLite
+				: state.objects.cuttingTool.visible);
 
-		{
-			// Cutting Pointer
-			this.createCuttingPointer();
-		}
+		this.group.add(this.laserPointer);
+		// Cutting Pointer
+		this.createCuttingPointer();
 
 		{
 			// Limits
@@ -2845,14 +2826,14 @@ class Visualizer extends Component {
 		}
 
 		// get mpos
-		let mpos = machinePosition;
+		const mpos = machinePosition;
 
-		let origin = {
+		const origin = {
 			x: parseFloat(mpos.x) - parseFloat(wpos.x) * xMultiplier,
 			y: parseFloat(mpos.y) - parseFloat(wpos.y) * yMultiplier,
 			z: parseFloat(mpos.z) - parseFloat(wpos.z) * -1,
 		};
-		let limitsMax = {
+		const limitsMax = {
 			x: softXMax * xMultiplier - origin.x,
 			y: softYMax * yMultiplier - origin.y,
 			z: softZMax - origin.z,
@@ -2865,9 +2846,9 @@ class Visualizer extends Component {
 		// };
 
 		// get bbox
-		let bbox = reduxStore.getState().file.bbox;
+		const bbox = reduxStore.getState().file.bbox;
 		// let bboxMin = bbox.min;
-		let bboxMax = bbox.max;
+		const bboxMax = bbox.max;
 
 		// check if machine will leave soft limits
 		if (

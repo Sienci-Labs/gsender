@@ -21,70 +21,68 @@
  *
  */
 
-import { Component } from "react";
-import { connect } from "react-redux";
-import _ from "lodash";
-import includes from "lodash/includes";
-import get from "lodash/get";
-import debounce from "lodash/debounce";
-import pubsub from "pubsub-js";
-import PropTypes from "prop-types";
-
 import combokeys from "app/lib/combokeys";
-import store from "app/store";
-import { store as reduxStore } from "app/store/redux";
 import controller from "app/lib/controller";
+import type { CommandKeys } from "app/lib/definitions/shortcuts";
+import { uploadGcodeFileToServer } from "app/lib/fileupload";
+import { getVisualizerTheme } from "app/lib/getVisualizerTheme";
 import log from "app/lib/log";
 import * as WebGL from "app/lib/three/WebGL";
+import { toast } from "app/lib/toaster";
 import {
-	Toaster,
 	TOASTER_LONG,
 	TOASTER_WARNING,
+	Toaster,
 } from "app/lib/toaster/ToasterLib";
-import { toast } from "app/lib/toaster";
+import store from "app/store";
+import { store as reduxStore } from "app/store/redux";
 import {
 	updateFileInfo,
 	updateFileProcessing,
 } from "app/store/redux/slices/fileInfo.slice";
-import { uploadGcodeFileToServer } from "app/lib/fileupload";
-
-import WidgetConfig from "../WidgetConfig/WidgetConfig";
-import PrimaryVisualizer from "./PrimaryVisualizer";
+import _ from "lodash";
+import debounce from "lodash/debounce";
+import get from "lodash/get";
+import includes from "lodash/includes";
+import PropTypes from "prop-types";
+import pubsub from "pubsub-js";
+import { Component } from "react";
+import { connect } from "react-redux";
 import {
-	// Units
-	METRIC_UNITS,
+	GENERAL_CATEGORY,
 	// Grbl
 	GRBL,
-	GRBLHAL,
+	GRBL_ACTIVE_STATE_CHECK,
+	GRBL_ACTIVE_STATE_HOLD,
+	GRBL_ACTIVE_STATE_IDLE,
 	GRBL_ACTIVE_STATE_RUN,
+	GRBLHAL,
+	LIGHTWEIGHT_OPTIONS,
 	// Marlin
 	MARLIN,
+	// Units
+	METRIC_UNITS,
+	OVERRIDES_CATEGORY,
+	RENDER_LOADING,
+	RENDER_RENDERING,
 	// Smoothie
 	SMOOTHIE,
 	// TinyG
 	TINYG,
-	// Workflow
-	WORKFLOW_STATE_RUNNING,
-	WORKFLOW_STATE_PAUSED,
-	WORKFLOW_STATE_IDLE,
-	RENDER_RENDERING,
-	RENDER_LOADING,
-	GRBL_ACTIVE_STATE_HOLD,
-	GRBL_ACTIVE_STATE_IDLE,
+	VISUALIZER_CATEGORY,
 	VISUALIZER_PRIMARY,
 	VISUALIZER_SECONDARY,
-	GRBL_ACTIVE_STATE_CHECK,
-	GENERAL_CATEGORY,
-	VISUALIZER_CATEGORY,
-	OVERRIDES_CATEGORY,
-	LIGHTWEIGHT_OPTIONS,
+	WORKFLOW_STATE_IDLE,
+	WORKFLOW_STATE_PAUSED,
+	// Workflow
+	WORKFLOW_STATE_RUNNING,
 } from "../../constants";
-import { CAMERA_MODE_PAN, CAMERA_MODE_ROTATE } from "./constants";
-import { getVisualizerTheme } from "app/lib/getVisualizerTheme";
-import SecondaryVisualizer from "./SecondaryVisualizer";
 import useKeybinding from "../../lib/useKeybinding";
-import { CommandKeys } from "app/lib/definitions/shortcuts";
-import { Actions, State } from "./definitions";
+import WidgetConfig from "../WidgetConfig/WidgetConfig";
+import { CAMERA_MODE_PAN, CAMERA_MODE_ROTATE } from "./constants";
+import type { Actions, State } from "./definitions";
+import PrimaryVisualizer from "./PrimaryVisualizer";
+import SecondaryVisualizer from "./SecondaryVisualizer";
 
 interface Views {
 	type: "isometric" | "top" | "front" | "right" | "left" | "default";
@@ -263,7 +261,7 @@ class Visualizer extends Component {
 				};
 
 				if (!capable.view3D) {
-					let interval = setInterval(() => {
+					const interval = setInterval(() => {
 						if (this.actions.checkVisualizerRef()) {
 							clearInterval(interval);
 

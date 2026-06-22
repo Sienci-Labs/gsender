@@ -1,14 +1,14 @@
-import store, { merge } from "../store";
-import defaultState from "../store/defaultState";
-import api from "../api";
 import { toast } from "app/lib/toaster";
 import pubsub from "pubsub-js";
+import api from "../api";
+import store, { merge } from "../store";
+import defaultState from "../store/defaultState";
 import {
-	TOUCHPLATE_TYPE_STANDARD,
-	TOUCHPLATE_TYPE_AUTOZERO,
-	TOUCHPLATE_TYPE_ZERO,
 	TOUCHPLATE_TYPE_3D,
+	TOUCHPLATE_TYPE_AUTOZERO,
 	TOUCHPLATE_TYPE_BITZERO,
+	TOUCHPLATE_TYPE_STANDARD,
+	TOUCHPLATE_TYPE_ZERO,
 } from "./constants";
 
 export const restoreDefault = async (): Promise<void> => {

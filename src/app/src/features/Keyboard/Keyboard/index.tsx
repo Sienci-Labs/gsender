@@ -45,6 +45,12 @@ import {
 	VISUALIZER_CATEGORY,
 } from "app/constants";
 import combokeys from "app/lib/combokeys";
+import type {
+	CommandKey,
+	CommandKeys,
+	Macro,
+	ShuttleEvent,
+} from "app/lib/definitions/shortcuts";
 import shuttleEvents from "app/lib/shuttleEvents";
 import { toast } from "app/lib/toaster";
 import store from "app/store";
@@ -69,12 +75,6 @@ import CategoryFilter from "../CategoryFilter";
 import ShortcutsTable from "../ShortcutsTable";
 import { generateList } from "../utils";
 import EditArea from "./EditArea";
-import {
-	CommandKey,
-	CommandKeys,
-	Macro,
-	ShuttleEvent,
-} from "app/lib/definitions/shortcuts";
 
 type ShortcutByCategory = CommandKey & { title: string; category: string };
 

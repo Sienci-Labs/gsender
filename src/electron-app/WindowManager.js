@@ -27,8 +27,8 @@ import {
 	BrowserWindow,
 	dialog,
 	ipcMain,
-	shell,
 	nativeImage,
+	shell,
 } from "electron";
 import path from "path";
 

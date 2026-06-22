@@ -1,20 +1,17 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
+import { Button } from "app/components/Button";
 import {
 	Card,
 	CardContent,
 	CardHeader,
 	CardTitle,
 } from "app/components/shadcn/Card";
-import { Switch } from "app/components/shadcn/Switch";
 import { Input } from "app/components/shadcn/Input";
 import { Label } from "app/components/shadcn/Label";
-import { Button } from "app/components/Button";
-import { PositionInput } from "./PositionInput";
+import { Spinner } from "app/components/shadcn/Spinner";
+import { Switch } from "app/components/shadcn/Switch";
+import OffsetManagementWidget from "app/features/ATC/components/Configuration/components/OffsetManagement.tsx";
 import { useConfigContext } from "app/features/ATC/components/Configuration/hooks/useConfigStore";
 import cn from "classnames";
-import OffsetManagementWidget from "app/features/ATC/components/Configuration/components/OffsetManagement.tsx";
-import { Spinner } from "app/components/shadcn/Spinner";
 import {
 	AlertTriangle,
 	ArrowRight,
@@ -26,6 +23,10 @@ import {
 	ShieldCheck,
 	SlidersHorizontal,
 } from "lucide-react";
+import type React from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
+import { PositionInput } from "./PositionInput";
 
 export interface ConfigTabProps {
 	uploading: boolean;

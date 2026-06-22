@@ -1,25 +1,23 @@
-import get from "lodash/get";
-import pubsub from "pubsub-js";
-
-import { WORKSPACE_MODE_T } from "app/workspace/definitions";
-import {
+import type {
 	EEPROMSettings,
 	FIRMWARE_TYPES_T,
 	RotaryModeFirmwareSettings,
 } from "app/definitions/firmware";
-
-import store from "../store";
-import controller from "./controller";
-import { store as reduxStore } from "../store/redux";
+import type { WORKSPACE_MODE_T } from "app/workspace/definitions";
+import get from "lodash/get";
+import pubsub from "pubsub-js";
+import { Confirm } from "../components/ConfirmationDialog/ConfirmationDialogLib";
 import {
-	WORKSPACE_MODE,
-	ROTARY_MODE_FIRMWARE_SETTINGS,
-	ROTARY_TOGGLE_MACRO,
 	DEFAULT_FIRMWARE_SETTINGS,
 	GRBL,
 	GRBLHAL,
+	ROTARY_MODE_FIRMWARE_SETTINGS,
+	ROTARY_TOGGLE_MACRO,
+	WORKSPACE_MODE,
 } from "../constants";
-import { Confirm } from "../components/ConfirmationDialog/ConfirmationDialogLib";
+import store from "../store";
+import { store as reduxStore } from "../store/redux";
+import controller from "./controller";
 import { toast } from "./toaster";
 
 export const updateWorkspaceMode = (mode: WORKSPACE_MODE_T): void => {
@@ -245,7 +243,7 @@ export const updateWorkspaceMode = (mode: WORKSPACE_MODE_T): void => {
 
 export const checkIfRotaryFile = (gcode: string): boolean => {
 	const commentMatcher = /\s*;.*/g;
-	const bracketCommentLine = /\([^\)]*\)/gm;
+	const bracketCommentLine = /\([^)]*\)/gm;
 	const content = gcode
 		.replace(bracketCommentLine, "")
 		.trim()

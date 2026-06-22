@@ -21,9 +21,9 @@
  *
  */
 
-import React from "react";
 import { useWizardAPI, useWizardContext } from "app/features/Helper/context";
-import { Minus, Maximize2 } from "lucide-react";
+import { Maximize2, Minus } from "lucide-react";
+import React from "react";
 
 const MinMaxButton = () => {
 	const { minimized } = useWizardContext();

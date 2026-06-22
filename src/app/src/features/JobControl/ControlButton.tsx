@@ -1,17 +1,19 @@
-import { JSX, useEffect, useState } from "react";
+import { usePostHog } from "@posthog/react";
+import type { GRBL_ACTIVE_STATES_T } from "app/definitions/general";
+import useShuttleEvents from "app/hooks/useShuttleEvents";
+import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
+import controller from "app/lib/controller";
+import useKeybinding from "app/lib/useKeybinding";
+import type { WORKFLOW_STATES_T } from "app/store/definitions";
+import reduxStore, { type RootState } from "app/store/redux";
 import cx from "classnames";
+import get from "lodash/get";
 import includes from "lodash/includes";
 import pubsub from "pubsub-js";
-import { PiPause } from "react-icons/pi";
+import { type JSX, useEffect, useState } from "react";
 import { FiOctagon } from "react-icons/fi";
 import { IoPlayOutline } from "react-icons/io5";
-import { usePostHog } from "@posthog/react";
-
-import useKeybinding from "app/lib/useKeybinding";
-import useShuttleEvents from "app/hooks/useShuttleEvents";
-import { GRBL_ACTIVE_STATES_T } from "app/definitions/general";
-import { WORKFLOW_STATES_T } from "app/store/definitions";
-import controller from "app/lib/controller";
+import { PiPause } from "react-icons/pi";
 import {
 	CARVING_CATEGORY,
 	GRBL,
@@ -21,7 +23,7 @@ import {
 	GRBL_ACTIVE_STATE_JOG,
 	GRBL_ACTIVE_STATE_RUN,
 	GRBLHAL,
-	MACHINE_CONTROL_BUTTONS,
+	type MACHINE_CONTROL_BUTTONS,
 	PAUSE,
 	START,
 	STOP,
@@ -29,9 +31,6 @@ import {
 	WORKFLOW_STATE_PAUSED,
 	WORKFLOW_STATE_RUNNING,
 } from "../../constants";
-import get from "lodash/get";
-import reduxStore, { RootState } from "app/store/redux";
-import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
 
 type MACHINE_CONTROL_BUTTONS_T =
 	(typeof MACHINE_CONTROL_BUTTONS)[keyof typeof MACHINE_CONTROL_BUTTONS];

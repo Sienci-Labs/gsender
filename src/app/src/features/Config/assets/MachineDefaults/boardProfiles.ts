@@ -1,4 +1,4 @@
-import { EEPROMSettings } from "app/definitions/firmware";
+import type { EEPROMSettings } from "app/definitions/firmware";
 
 export interface BoardProfile {
 	boardId: string;

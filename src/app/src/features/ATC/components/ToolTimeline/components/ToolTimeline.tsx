@@ -1,19 +1,19 @@
-import { ChevronDown, ChevronUp } from "lucide-react";
-import cn from "classnames";
 import { Button } from "app/components/Button";
-import { ToolTimelineItem } from "./ToolTimelineItem";
-import { ToolMapping, ToolTimelineProps } from "./types";
-import { useEffect, useRef, useState } from "react";
-import { ToolRemapDialog } from "app/features/ATC/components/ToolTimeline/components/ToolRemapDialog.tsx";
-import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
-import { RootState } from "app/store/redux";
-import { mapToolNicknamesAndStatus } from "app/features/ATC/utils/ATCFunctions.ts";
-import { ToolInstance } from "app/features/ATC/components/ToolTable.tsx";
-import { updateToolchangeContext } from "app/features/Helper/Wizard.tsx";
-import pubsub from "pubsub-js";
-import get from "lodash/get";
-import { ToolProbeState } from "app/features/ATC/types.ts";
 import { WORKFLOW_STATE_IDLE } from "app/constants";
+import type { ToolInstance } from "app/features/ATC/components/ToolTable.tsx";
+import { ToolRemapDialog } from "app/features/ATC/components/ToolTimeline/components/ToolRemapDialog.tsx";
+import type { ToolProbeState } from "app/features/ATC/types.ts";
+import { mapToolNicknamesAndStatus } from "app/features/ATC/utils/ATCFunctions.ts";
+import { updateToolchangeContext } from "app/features/Helper/Wizard.tsx";
+import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
+import type { RootState } from "app/store/redux";
+import cn from "classnames";
+import get from "lodash/get";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import pubsub from "pubsub-js";
+import { useEffect, useRef, useState } from "react";
+import { ToolTimelineItem } from "./ToolTimelineItem";
+import type { ToolMapping, ToolTimelineProps } from "./types";
 
 export function ToolTimeline({
 	tools,

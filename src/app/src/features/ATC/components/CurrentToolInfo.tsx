@@ -1,18 +1,18 @@
-import { ToolInstance } from "app/features/ATC/components/ToolTable.tsx";
-import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
-import { RootState } from "app/store/redux";
-import { useEffect, useState } from "react";
-import { lookupSpecificTool } from "app/features/ATC/utils/ATCFunctions.ts";
-import controller from "app/lib/controller.ts";
-import { useToolChange } from "app/features/ATC/utils/ToolChangeContext.tsx";
-import { Wrench } from "lucide-react";
 import Button from "app/components/Button";
-import { toolStateThemes } from "app/features/ATC/utils/ATCiConstants.ts";
-import pubsub from "pubsub-js";
-import { ToolStatusBadges } from "app/features/ATC/components/ui/ToolStatusBadges.tsx";
+import type { ToolInstance } from "app/features/ATC/components/ToolTable.tsx";
 import { Badge } from "app/features/ATC/components/ui/Badge.tsx";
-import cn from "classnames";
+import { ToolStatusBadges } from "app/features/ATC/components/ui/ToolStatusBadges.tsx";
+import { lookupSpecificTool } from "app/features/ATC/utils/ATCFunctions.ts";
+import { toolStateThemes } from "app/features/ATC/utils/ATCiConstants.ts";
+import { useToolChange } from "app/features/ATC/utils/ToolChangeContext.tsx";
+import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
+import controller from "app/lib/controller.ts";
 import store from "app/store";
+import type { RootState } from "app/store/redux";
+import cn from "classnames";
+import { Wrench } from "lucide-react";
+import pubsub from "pubsub-js";
+import { useEffect, useState } from "react";
 
 export function CurrentToolInfo({ disabled }: { disabled?: boolean }) {
 	const { rackSize, connected, atcAvailable } = useToolChange();

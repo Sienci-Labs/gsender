@@ -1,12 +1,12 @@
 import { ToolTimeline } from "app/features/ATC/components/ToolTimeline/components/ToolTimeline.tsx";
-import { ToolChange } from "app/features/ATC/components/ToolTimeline/components/types.ts";
-import { useEffect, useState } from "react";
-import pubsub from "pubsub-js";
-import { RootState } from "app/store/redux";
-import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
-import get from "lodash/get";
-import controller from "app/lib/controller.ts";
+import type { ToolChange } from "app/features/ATC/components/ToolTimeline/components/types.ts";
 import { getToolpathColor } from "app/features/ATC/utils/ATCFunctions.ts";
+import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
+import controller from "app/lib/controller.ts";
+import type { RootState } from "app/store/redux";
+import get from "lodash/get";
+import pubsub from "pubsub-js";
+import { useEffect, useState } from "react";
 
 function buildToolArray(toolEvents, fileLength) {
 	let count = 0;
@@ -14,7 +14,7 @@ function buildToolArray(toolEvents, fileLength) {
 
 	Object.entries(toolEvents).forEach(([line, value]) => {
 		if (Object.hasOwn(value, "M") && Object.hasOwn(value, "T")) {
-			let newTool: ToolChange = {};
+			const newTool: ToolChange = {};
 			newTool.toolNumber = value.T;
 			newTool.startLine = Number(line);
 			newTool.label = `T${value.T}`;

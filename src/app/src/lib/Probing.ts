@@ -1,11 +1,11 @@
 import type { UNITS_GCODE } from "app/definitions/general";
-import type { AXES_T } from "app/store/definitions";
 import type {
 	PROBE_DIRECTIONS,
 	PROBE_TYPES_T,
 	ProbingOptions,
 } from "app/features/Probe/definitions";
 import { getZDownTravel } from "app/lib/SoftLimits.js";
+import type { AXES_T } from "app/store/definitions";
 import { GRBLHAL, METRIC_UNITS } from "../constants";
 import {
 	PROBE_TYPE_AUTO,

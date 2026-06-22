@@ -21,8 +21,8 @@
  *
  */
 
-import React from "react";
 import cx from "classnames";
+import React from "react";
 
 const Step = ({ step, index = 0, active }) => {
 	return (

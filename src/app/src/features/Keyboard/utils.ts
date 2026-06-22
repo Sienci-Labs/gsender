@@ -1,5 +1,5 @@
 import { MACRO_CATEGORY } from "app/constants";
-import {
+import type {
 	CommandKey,
 	CommandKeys,
 	ShuttleEvent,

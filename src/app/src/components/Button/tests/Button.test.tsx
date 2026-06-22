@@ -1,6 +1,6 @@
-import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { Button } from "app/components/Button";
+import React from "react";
 
 describe("Button component", () => {
 	test("renders with text prop", () => {

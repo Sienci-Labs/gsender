@@ -1,5 +1,5 @@
-import { firmwarePastVersion } from "app/lib/firmwareSemver.ts";
 import { ATCI_SUPPORTED_VERSION } from "app/features/ATC/utils/ATCiConstants.ts";
+import { firmwarePastVersion } from "app/lib/firmwareSemver.ts";
 import { getGrblCoreGcode, sienciHalGcode } from "./SpindleConfig.tsx";
 
 export function SpindleGcodePreview() {

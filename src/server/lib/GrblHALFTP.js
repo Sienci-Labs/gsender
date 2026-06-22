@@ -1,5 +1,5 @@
-import * as events from "events";
 import { Client } from "basic-ftp";
+import * as events from "events";
 import { Readable } from "stream";
 
 export class GrblHALFTP extends events.EventEmitter {

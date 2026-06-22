@@ -21,8 +21,8 @@
  *
  */
 
-import React from "react";
 import { Info } from "lucide-react";
+import type React from "react";
 import Actions from "./Actions";
 
 interface WizardAction {

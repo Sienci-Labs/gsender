@@ -21,14 +21,14 @@
  *
  */
 
-import React, { useEffect, useRef, useState } from "react";
-import pubsub from "pubsub-js";
 import { GRBL_ACTIVE_STATE_IDLE } from "app/constants";
-import uniqueId from "lodash/uniqueId";
-import get from "lodash/get";
-import controller from "app/lib/controller";
 import { useWizardAPI, useWizardContext } from "app/features/Helper/context";
+import controller from "app/lib/controller";
+import get from "lodash/get";
+import uniqueId from "lodash/uniqueId";
 import { Terminal } from "lucide-react";
+import pubsub from "pubsub-js";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
 interface WizardAction {

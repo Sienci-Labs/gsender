@@ -21,15 +21,15 @@
  *
  */
 
-import React, { Component } from "react";
+import { VisualizerPlaceholder } from "app/features/Visualizer/Placeholder.jsx";
 import pubsub from "pubsub-js";
+import React, { Component } from "react";
 import {
 	shouldVisualize,
 	shouldVisualizeSVG,
 } from "../../workers/Visualize.response";
 import SVGVisualizer from "./SVGVisualizer";
 import Visualizer from "./Visualizer";
-import { VisualizerPlaceholder } from "app/features/Visualizer/Placeholder.jsx";
 
 class VisualizerWrapper extends Component {
 	constructor(props) {
@@ -144,8 +144,8 @@ class VisualizerWrapper extends Component {
 		const { state, show, cameraPosition, actions, containerID, isSecondary } =
 			this.props;
 
-		let renderSVG = shouldVisualizeSVG();
-		let renderAny = shouldVisualize() && !renderSVG;
+		const renderSVG = shouldVisualizeSVG();
+		const renderAny = shouldVisualize() && !renderSVG;
 
 		const show3D = isSecondary || renderAny;
 

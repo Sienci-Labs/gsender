@@ -21,12 +21,12 @@
  *
  */
 
-import React from "react";
-import { CheckCircle } from "lucide-react";
-import { getToolString } from "app/lib/toolChangeUtils";
-import { useWizardContext } from "app/features/Helper/context";
 import Substep from "app/features/Helper/components/Substep";
 import ToolRequirementBanner from "app/features/Helper/components/ToolRequirementBanner";
+import { useWizardContext } from "app/features/Helper/context";
+import { getToolString } from "app/lib/toolChangeUtils";
+import { CheckCircle } from "lucide-react";
+import React from "react";
 
 const getToolLabel = (
 	toolchangeContext: Record<string, unknown> | null,

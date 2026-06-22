@@ -20,90 +20,100 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-import _get from "lodash/get";
-import _throttle from "lodash/throttle";
-import pubsub from "pubsub-js";
-import isElectron from "is-electron";
 
+import api from "app/api";
+import { Confirm } from "app/components/ConfirmationDialog/ConfirmationDialogLib";
+import {
+	ALARM,
+	ALARM_ERROR_TYPES,
+	ERROR,
+	FILE_TYPE,
+	GRBL,
+	GRBL_ACTIVE_STATE_CHECK,
+	GRBL_ACTIVE_STATE_HOLD,
+	GRBL_ACTIVE_STATE_IDLE,
+	GRBL_ACTIVE_STATE_RUN,
+	JOB_STATUS,
+	JOB_TYPES,
+	LIGHTWEIGHT_OPTIONS,
+	RENDER_LOADING,
+	RENDER_NO_FILE,
+	RENDER_RENDERED,
+	VISUALIZER_SECONDARY,
+	WORKSPACE_MODE,
+} from "app/constants";
+import type { AlarmsErrors } from "app/definitions/alarms_errors";
+import type {
+	EEPROMDescriptions,
+	FIRMWARE_TYPES_T,
+	MachineProfile,
+} from "app/definitions/firmware";
+import type {
+	BasicObject,
+	GRBL_ACTIVE_STATES_T,
+} from "app/definitions/general";
+import { KeepoutToggle } from "app/features/ATC/components/KeepOut/KeepOutToggle.tsx";
+import { updateToolchangeContext } from "app/features/Helper/Wizard.tsx";
+import type { Spindle } from "app/features/Spindle/definitions";
+import type { Job } from "app/features/Stats/utils/StatContext";
+import { connectToLastDevice } from "app/lib/connection";
+import controller from "app/lib/controller";
+import type { TOOL } from "app/lib/definitions/gcode_virtualization";
+import type { FeederStatus } from "app/lib/definitions/sender_feeder";
+import { getVisualizerTheme } from "app/lib/getVisualizerTheme";
+import { isLaserMode } from "app/lib/laserMode";
+import { updateWorkspaceMode } from "app/lib/rotary";
+import { toast } from "app/lib/toaster";
+import { determineFixedSensorInstructions } from "app/lib/toolChangeUtils";
 import store from "app/store";
 import { store as reduxStore } from "app/store/redux";
-import controller from "app/lib/controller";
 import manualToolChange from "app/wizards/manualToolchange";
 import semiautoToolChange from "app/wizards/semiautoToolchange";
-import { determineFixedSensorInstructions } from "app/lib/toolChangeUtils";
-import { Confirm } from "app/components/ConfirmationDialog/ConfirmationDialogLib";
-// TODO: add worker types
-// @ts-ignore
-import VisualizeWorker from "app/workers/Visualize.worker";
 import {
 	setActiveVisualizeJobId,
 	shouldVisualize,
 	visualizeResponse,
 } from "app/workers/Visualize.response";
-import { isLaserMode } from "app/lib/laserMode";
-import { getVisualizerTheme } from "app/lib/getVisualizerTheme";
-import {
-	RENDER_LOADING,
-	RENDER_RENDERED,
-	VISUALIZER_SECONDARY,
-	GRBL_ACTIVE_STATE_RUN,
-	GRBL_ACTIVE_STATE_IDLE,
-	GRBL_ACTIVE_STATE_HOLD,
-	FILE_TYPE,
-	WORKSPACE_MODE,
-	RENDER_NO_FILE,
-	ALARM_ERROR_TYPES,
-	ALARM,
-	ERROR,
-	JOB_TYPES,
-	JOB_STATUS,
-	GRBL,
-	LIGHTWEIGHT_OPTIONS,
-	GRBL_ACTIVE_STATE_CHECK,
-} from "app/constants";
-import {
-	closeConnection,
-	openConnection,
-	scanNetwork,
-	setConnectionState,
-} from "../slices/connection.slice";
-import { listPorts } from "../slices/connection.slice";
-import {
-	resetHoming,
-	updateControllerSettings,
-	updateControllerState,
-	updateFeederStatus,
-	updateWorkflowState,
-	addSpindle,
-	clearSpindles,
-	updateAlarmDescriptions,
-	updateSettingsDescriptions,
-	updateHomingFlag,
-	updateHasHomed,
-	updateSenderStatus,
-	updateControllerType,
-	addSDCardFileToList,
-} from "../slices/controller.slice";
-import {
+// TODO: add worker types
+// @ts-expect-error
+import type VisualizeWorker from "app/workers/Visualize.worker";
+import type { WORKSPACE_MODE_T } from "app/workspace/definitions";
+import isElectron from "is-electron";
+import _get from "lodash/get";
+import get from "lodash/get";
+import _throttle from "lodash/throttle";
+import pubsub from "pubsub-js";
+import type {
+	ControllerSettings,
 	FILE_TYPE_T,
 	PortInfo,
 	SDCardFile,
 	SerialPortOptions,
 	WORKFLOW_STATES_T,
 } from "../../definitions";
-import { ControllerSettings } from "../../definitions";
-import { FeederStatus } from "app/lib/definitions/sender_feeder";
 import {
-	EEPROMDescriptions,
-	FIRMWARE_TYPES_T,
-	MachineProfile,
-} from "app/definitions/firmware";
-import { BasicObject, GRBL_ACTIVE_STATES_T } from "app/definitions/general";
-import { TOOL } from "app/lib/definitions/gcode_virtualization";
-import { WORKSPACE_MODE_T } from "app/workspace/definitions";
-import { connectToLastDevice } from "app/lib/connection";
-import { updateWorkspaceMode } from "app/lib/rotary";
-import api from "app/api";
+	closeConnection,
+	listPorts,
+	openConnection,
+	scanNetwork,
+	setConnectionState,
+} from "../slices/connection.slice";
+import {
+	addSDCardFileToList,
+	addSpindle,
+	clearSpindles,
+	resetHoming,
+	updateAlarmDescriptions,
+	updateControllerSettings,
+	updateControllerState,
+	updateControllerType,
+	updateFeederStatus,
+	updateHasHomed,
+	updateHomingFlag,
+	updateSenderStatus,
+	updateSettingsDescriptions,
+	updateWorkflowState,
+} from "../slices/controller.slice";
 import {
 	unloadFileInfo,
 	updateFileContent,
@@ -112,13 +122,6 @@ import {
 } from "../slices/fileInfo.slice";
 import { setIpList } from "../slices/preferences.slice";
 import { updateJobOverrides } from "../slices/visualizer.slice";
-import { toast } from "app/lib/toaster";
-import { Job } from "app/features/Stats/utils/StatContext";
-import { updateToolchangeContext } from "app/features/Helper/Wizard.tsx";
-import { Spindle } from "app/features/Spindle/definitions";
-import { AlarmsErrors } from "app/definitions/alarms_errors";
-import { KeepoutToggle } from "app/features/ATC/components/KeepOut/KeepOutToggle.tsx";
-import get from "lodash/get";
 
 export function* initialize(): Generator<any, void, any> {
 	let visualizeWorker: typeof VisualizeWorker | null = null;
@@ -155,7 +158,7 @@ export function* initialize(): Generator<any, void, any> {
 		const path = _get(reduxStore.getState(), "file.path");
 
 		try {
-			let res = await api.jobStats.fetch();
+			const res = await api.jobStats.fetch();
 			const jobStats = res.data;
 
 			const job: Job = {
@@ -187,10 +190,10 @@ export function* initialize(): Generator<any, void, any> {
 
 	const updateMaintenanceTasks = async (status: any) => {
 		try {
-			let res = await api.maintenance.fetch();
+			const res = await api.maintenance.fetch();
 			const tasks = res.data;
-			let newTasks = tasks.map((task: any) => {
-				let newTask = task;
+			const newTasks = tasks.map((task: any) => {
+				const newTask = task;
 				newTask.currentTime += status.timeRunning / 1000 / 3600;
 				return newTask;
 			});
@@ -373,7 +376,7 @@ export function* initialize(): Generator<any, void, any> {
 
 	const updateAlarmsErrors = async (error: any) => {
 		try {
-			let res = await api.alarmList.fetch();
+			const res = await api.alarmList.fetch();
 			const alarmList = res.data;
 
 			const alarmError: AlarmsErrors = {

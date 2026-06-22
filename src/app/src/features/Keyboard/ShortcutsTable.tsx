@@ -46,13 +46,16 @@ import {
 	TOOLBAR_CATEGORY,
 	VISUALIZER_CATEGORY,
 } from "app/constants";
+import type {
+	CommandKey,
+	Macro,
+	ShuttleEvent,
+} from "app/lib/definitions/shortcuts";
 import shuttleEvents from "app/lib/shuttleEvents";
 import { cn } from "app/lib/utils";
 import PropTypes from "prop-types";
 import { LuPencil, LuPlus, LuTrash } from "react-icons/lu";
-
 import { formatShortcut } from "./helpers";
-import { CommandKey, Macro, ShuttleEvent } from "app/lib/definitions/shortcuts";
 
 interface Props {
 	onEdit: (currentShortcut: CommandKey | Macro) => void;

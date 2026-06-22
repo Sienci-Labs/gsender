@@ -21,14 +21,16 @@
  *
  */
 
-import { useEffect, useState } from "react";
-import { connect } from "react-redux";
+import type { GRBL_ACTIVE_STATES_T } from "app/definitions/general";
+import {
+	isATCAvailable,
+	sendATCHomingDialog,
+} from "app/features/ATC/utils/ATCFunctions.ts";
+import { UnlockButton as SmallUnlockButton } from "app/features/UnlockButton";
 import cx from "classnames";
 import get from "lodash/get";
-import controller from "../../lib/controller";
-import AlarmDescriptionIcon from "./AlarmDescriptionIcon";
-import UnlockButton from "./UnlockButton";
-import { UnlockButton as SmallUnlockButton } from "app/features/UnlockButton";
+import { useEffect, useState } from "react";
+import { connect } from "react-redux";
 import {
 	GRBL_ACTIVE_STATE_ALARM,
 	GRBL_ACTIVE_STATE_CHECK,
@@ -40,12 +42,10 @@ import {
 	GRBL_ACTIVE_STATE_RUN,
 	GRBL_ACTIVE_STATE_TOOL,
 } from "../../constants";
-import { GRBL_ACTIVE_STATES_T } from "app/definitions/general";
-import { ALARM_CODE } from "./definitions";
-import {
-	isATCAvailable,
-	sendATCHomingDialog,
-} from "app/features/ATC/utils/ATCFunctions.ts";
+import controller from "../../lib/controller";
+import AlarmDescriptionIcon from "./AlarmDescriptionIcon";
+import type { ALARM_CODE } from "./definitions";
+import UnlockButton from "./UnlockButton";
 
 interface MachineStatusProps {
 	alarmCode: ALARM_CODE;

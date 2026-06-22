@@ -1,8 +1,8 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import App from "app/App";
 import * as user from "app/lib/user";
-import * as sagaModule from "app/store/redux/sagas";
 import store from "app/store";
+import * as sagaModule from "app/store/redux/sagas";
 
 // ─── Mocks
 

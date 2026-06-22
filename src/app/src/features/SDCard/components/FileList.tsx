@@ -1,6 +1,4 @@
-import React, { useRef, useState } from "react";
-import { Play, Trash2, File } from "lucide-react";
-import { useSDCard } from "../hooks/useSDCard";
+import { Confirm } from "app/components/ConfirmationDialog/ConfirmationDialogLib.ts";
 import {
 	Table,
 	TableBody,
@@ -9,17 +7,20 @@ import {
 	TableHeader,
 	TableRow,
 } from "app/components/shadcn/Table";
-import { Confirm } from "app/components/ConfirmationDialog/ConfirmationDialogLib.ts";
-import controller from "app/lib/controller.ts";
-import reduxStore from "app/store/redux";
-import { clearSDCardFiles } from "app/store/redux/slices/controller.slice.ts";
-import cn from "classnames";
-import { toast } from "app/lib/toaster";
 import {
 	ACCEPTED_EXTENSIONS,
 	validateSDFilename,
 } from "app/features/SDCard/components/UploadModal.tsx";
+import controller from "app/lib/controller.ts";
+import { toast } from "app/lib/toaster";
 import store from "app/store";
+import reduxStore from "app/store/redux";
+import { clearSDCardFiles } from "app/store/redux/slices/controller.slice.ts";
+import cn from "classnames";
+import { File, Play, Trash2 } from "lucide-react";
+import type React from "react";
+import { useRef, useState } from "react";
+import { useSDCard } from "../hooks/useSDCard";
 
 const formatFileSize = (bytes: number): string => {
 	const units = ["B", "KB", "MB", "GB"];

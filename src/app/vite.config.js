@@ -1,11 +1,11 @@
-import { defineConfig } from "vite";
-import path from "path";
+import { sentryVitePlugin } from "@sentry/vite-plugin";
 import react from "@vitejs/plugin-react";
+import path from "path";
 import tailwindcss from "tailwindcss";
-import tsconfigPaths from "vite-tsconfig-paths";
+import { defineConfig } from "vite";
 import { patchCssModules } from "vite-css-modules";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
-import { sentryVitePlugin } from "@sentry/vite-plugin";
+import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
 	root: path.resolve(__dirname, "./"), // Set root to the directory containing index.html

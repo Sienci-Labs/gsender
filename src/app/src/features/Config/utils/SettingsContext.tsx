@@ -1,41 +1,41 @@
-import {
-	gSenderSetting,
-	SettingsMenu,
-	SettingsMenuSection,
-} from "app/features/Config/assets/SettingsMenu.ts";
-import store from "app/store";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
-import { RootState, store as reduxStore } from "app/store/redux";
+import { GRBLHAL } from "app/constants";
+import type {
+	EEPROM,
+	EEPROMDescriptions,
+	EEPROMSettings,
+	FIRMWARE_TYPES_T,
+	FilteredEEPROM,
+	MachineProfile,
+} from "app/definitions/firmware";
+import type { BasicObject } from "app/definitions/general";
+import { ATCI_SUPPORTED_VERSION } from "app/features/ATC/utils/ATCiConstants.ts";
+import machineProfiles from "app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts";
 
 import {
 	GRBL_HAL_SETTINGS_MAP,
 	GRBL_SETTINGS_MAP,
 } from "app/features/Config/assets/SettingsDescriptions.ts";
-import { GRBLHAL } from "app/constants";
-import { getFilteredEEPROMSettings } from "app/features/Config/utils/EEPROM.ts";
-import get from "lodash/get";
-import defaultStoreState from "app/store/defaultState";
-import isEqual from "lodash/isEqual";
-import machineProfiles from "app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts";
 import {
-	EEPROM,
-	EEPROMDescriptions,
-	EEPROMSettings,
-	FilteredEEPROM,
-	FIRMWARE_TYPES_T,
-	MachineProfile,
-} from "app/definitions/firmware";
-import pubsub from "pubsub-js";
-import { firmwarePastVersion } from "app/lib/firmwareSemver.ts";
-import { ATCI_SUPPORTED_VERSION } from "app/features/ATC/utils/ATCiConstants.ts";
-import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
-import { debounce } from "lodash";
-import { BasicObject } from "app/definitions/general";
+	type gSenderSetting,
+	SettingsMenu,
+	type SettingsMenuSection,
+} from "app/features/Config/assets/SettingsMenu.ts";
+import { getFilteredEEPROMSettings } from "app/features/Config/utils/EEPROM.ts";
 import {
 	resolveGrblCoreDefaults,
 	translateGrblCoreKey,
 } from "app/features/Config/utils/grblCoreMigration.ts";
+import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
+import { firmwarePastVersion } from "app/lib/firmwareSemver.ts";
+import store from "app/store";
+import defaultStoreState from "app/store/defaultState";
+import { type RootState, store as reduxStore } from "app/store/redux";
+import { debounce } from "lodash";
+import get from "lodash/get";
+import isEqual from "lodash/isEqual";
+import pubsub from "pubsub-js";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
 
 interface iSettingsContext {
 	settings: SettingsMenuSection[];

@@ -1,6 +1,3 @@
-import React, { useState, useRef } from "react";
-import { Upload, File, X } from "lucide-react";
-import { useSDCard } from "../hooks/useSDCard";
 import {
 	Dialog,
 	DialogContent,
@@ -10,6 +7,10 @@ import {
 	DialogTitle,
 } from "app/components/shadcn/Dialog";
 import { toast } from "app/lib/toaster";
+import { File, Upload, X } from "lucide-react";
+import type React from "react";
+import { useRef, useState } from "react";
+import { useSDCard } from "../hooks/useSDCard";
 
 interface UploadModalProps {
 	isOpen: boolean;

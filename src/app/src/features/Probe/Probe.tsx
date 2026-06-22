@@ -21,27 +21,25 @@
  *
  */
 
-import React, { useCallback, useRef, useEffect } from "react";
-import cx from "classnames";
-
-import { Button as ShadcnButton } from "app/components/shadcn/Button";
 import { Button } from "app/components/Button";
+import { Button as ShadcnButton } from "app/components/shadcn/Button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "app/components/shadcn/Dropdown";
-
+import Tooltip from "app/components/Tooltip";
+import useShuttleEvents from "app/hooks/useShuttleEvents";
+import { TOUCHPLATE_TYPES } from "app/lib/constants";
+import useKeybinding from "app/lib/useKeybinding";
+import cx from "classnames";
+import React, { useCallback, useEffect, useRef } from "react";
 import { METRIC_UNITS, PROBING_CATEGORY } from "../../constants";
-import ProbeImage from "./ProbeImage";
+import type { Actions, State } from "./definitions";
 import ProbeDiameter from "./ProbeDiameter";
 import ProbeDirectionSelection from "./ProbeDirectionSelection";
-import { Actions, State } from "./definitions";
-import useKeybinding from "app/lib/useKeybinding";
-import useShuttleEvents from "app/hooks/useShuttleEvents";
-import Tooltip from "app/components/Tooltip";
-import { TOUCHPLATE_TYPES } from "app/lib/constants";
+import ProbeImage from "./ProbeImage";
 
 type ProbeProps = {
 	state: State;

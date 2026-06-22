@@ -21,8 +21,8 @@
  *
  */
 import controller from "app/lib/controller";
-import store from "app/store";
 import { getProbeSettings } from "app/lib/toolChangeUtils";
+import store from "app/store";
 import { store as reduxStore } from "app/store/redux";
 import get from "lodash/get";
 

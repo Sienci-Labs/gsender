@@ -21,28 +21,28 @@
  *
  */
 
+import { app } from "electron";
 import ensureArray from "ensure-array";
+import fs from "fs";
 import noop from "lodash/noop";
 import partition from "lodash/partition";
+import path from "path";
 import { SerialPort } from "serialport";
 import socketIO from "socket.io";
-import { app } from "electron";
-import fs from "fs";
-import path from "path";
+import { VISUALIZER_SECONDARY } from "../../../app/src/constants";
+import { authorizeIPAddress } from "../../access-control";
+import { GrblController, GrblHalController } from "../../controllers";
+import { GRBL } from "../../controllers/Grbl/constants";
+import { GRBLHAL } from "../../controllers/Grblhal/constants";
+import Connection from "../../lib/Connection";
+import delay from "../../lib/delay";
 import EventTrigger from "../../lib/EventTrigger";
+import DFUFlasher from "../../lib/Firmware/Flashing/DFUFlasher";
+import FlashingFirmware from "../../lib/Firmware/Flashing/firmwareflashing";
 import logger from "../../lib/logger";
 import store from "../../store";
 import config from "../configstore";
 import taskRunner from "../taskrunner";
-import FlashingFirmware from "../../lib/Firmware/Flashing/firmwareflashing";
-import { GrblController, GrblHalController } from "../../controllers";
-import { GRBL } from "../../controllers/Grbl/constants";
-import { GRBLHAL } from "../../controllers/Grblhal/constants";
-import { authorizeIPAddress } from "../../access-control";
-import DFUFlasher from "../../lib/Firmware/Flashing/DFUFlasher";
-import delay from "../../lib/delay";
-import Connection from "../../lib/Connection";
-import { VISUALIZER_SECONDARY } from "../../../app/src/constants";
 
 const log = logger("service:cncengine");
 
@@ -200,7 +200,7 @@ class CNCEngine {
 					callback = noop,
 					refresh = false,
 				) => {
-					let { port, baudrate, rtscts, network } = { ...options };
+					const { port, baudrate, rtscts, network } = { ...options };
 					log.debug("firmwareFound event fired");
 					if (typeof callback !== "function") {
 						callback = noop;
@@ -342,7 +342,7 @@ class CNCEngine {
 					log.info("connection no longer open");
 				}
 
-				let controller = store.get(`controllers["${port}"]`);
+				const controller = store.get(`controllers["${port}"]`);
 				if (!controller) {
 					const message = `No controller found on port ${port} to reconnect to`;
 					log.info(message);
@@ -373,7 +373,7 @@ class CNCEngine {
 				this.connection.addConnection(socket);
 				log.info(`connection state: ${this.connection.isOpen()}`);
 
-				let controller = store.get(`controllers["${port}"]`);
+				const controller = store.get(`controllers["${port}"]`);
 				if (!controller) {
 					log.info(`No controller found on port ${port} to reconnect to`);
 					return;

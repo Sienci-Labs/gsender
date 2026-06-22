@@ -1,24 +1,16 @@
-import { useRef, useEffect, useState } from "react";
-import { FaFolderOpen } from "react-icons/fa";
-import { MdKeyboardArrowDown } from "react-icons/md";
-import { MdClose } from "react-icons/md";
-import isElectron from "is-electron";
-import pubsub from "pubsub-js";
-import debounce from "lodash/debounce";
-import throttle from "lodash/throttle";
 import { usePostHog } from "@posthog/react";
-
 import { Button } from "app/components/Button";
-import { RootState, store as reduxStore } from "app/store/redux";
-import store from "app/store";
-import controller from "app/lib/controller";
 import {
-	CARVING_CATEGORY,
-	GRBL_ACTIVE_STATE_CHECK,
-	VISUALIZER_PRIMARY,
-	WORKFLOW_STATE_RUNNING,
-} from "app/constants";
-import { unloadFileInfo } from "app/store/redux/slices/fileInfo.slice";
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "app/components/shadcn/AlertDialog";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -26,31 +18,36 @@ import {
 	DropdownMenuLabel,
 	DropdownMenuTrigger,
 } from "app/components/shadcn/Dropdown";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-import { uploadGcodeFileToServer } from "app/lib/fileupload";
-import {
-	AlertDialog,
-	AlertDialogTrigger,
-	AlertDialogContent,
-	AlertDialogHeader,
-	AlertDialogTitle,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogCancel,
-	AlertDialogAction,
-} from "app/components/shadcn/AlertDialog";
-
-import { getRecentFiles } from "./utils/recentfiles";
-import { ReloadFileAlert } from "app/features/FileControl/components/ReloadFileAlert.tsx";
-import { RecentFile } from "./definitions";
-import Divider from "./components/Divider";
-import useKeybinding from "app/lib/useKeybinding";
-import useShuttleEvents from "app/hooks/useShuttleEvents";
-import { updateToolchangeContext } from "app/features/Helper/Wizard.tsx";
-import { useSelector } from "react-redux";
-import { toast } from "app/lib/toaster";
-import get from "lodash/get";
 import { Tooltip } from "app/components/Tooltip";
+import {
+	CARVING_CATEGORY,
+	GRBL_ACTIVE_STATE_CHECK,
+	VISUALIZER_PRIMARY,
+	WORKFLOW_STATE_RUNNING,
+} from "app/constants";
+import { ReloadFileAlert } from "app/features/FileControl/components/ReloadFileAlert.tsx";
+import { updateToolchangeContext } from "app/features/Helper/Wizard.tsx";
+import useShuttleEvents from "app/hooks/useShuttleEvents";
+import { useTypedSelector } from "app/hooks/useTypedSelector";
+import controller from "app/lib/controller";
+import { uploadGcodeFileToServer } from "app/lib/fileupload";
+import { toast } from "app/lib/toaster";
+import useKeybinding from "app/lib/useKeybinding";
+import store from "app/store";
+import { type RootState, store as reduxStore } from "app/store/redux";
+import { unloadFileInfo } from "app/store/redux/slices/fileInfo.slice";
+import isElectron from "is-electron";
+import debounce from "lodash/debounce";
+import get from "lodash/get";
+import throttle from "lodash/throttle";
+import pubsub from "pubsub-js";
+import { useEffect, useRef, useState } from "react";
+import { FaFolderOpen } from "react-icons/fa";
+import { MdClose, MdKeyboardArrowDown } from "react-icons/md";
+import { useSelector } from "react-redux";
+import Divider from "./components/Divider";
+import type { RecentFile } from "./definitions";
+import { getRecentFiles } from "./utils/recentfiles";
 
 const ButtonControlGroup = () => {
 	const posthog = usePostHog();

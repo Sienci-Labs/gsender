@@ -20,36 +20,41 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
+
+import { usePostHog } from "@posthog/react";
+import type { UNITS_EN } from "app/definitions/general";
+import { useTypedSelector } from "app/hooks/useTypedSelector";
+import {
+	PROBE_TYPE_AUTO,
+	PROBE_TYPE_DIAMETER,
+	PROBE_TYPE_TIP,
+	TOUCHPLATE_TYPE_3D,
+	TOUCHPLATE_TYPE_AUTOZERO,
+	TOUCHPLATE_TYPE_ZERO,
+} from "app/lib/constants";
+// import Space from 'app/components/Space';
+import controller from "app/lib/controller";
+import { getProbeCode } from "app/lib/Probing";
+import { convertToImperial } from "app/lib/units";
+import store from "app/store";
+import type { Workspace } from "app/workspace/definitions";
 import get from "lodash/get";
 import includes from "lodash/includes";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { usePostHog } from "@posthog/react";
-// import Space from 'app/components/Space';
-import controller from "app/lib/controller";
 import {
-	TOUCHPLATE_TYPE_AUTOZERO,
-	PROBE_TYPE_AUTO,
-	TOUCHPLATE_TYPE_ZERO,
-	PROBE_TYPE_DIAMETER,
-	TOUCHPLATE_TYPE_3D,
-	PROBE_TYPE_TIP,
-} from "app/lib/constants";
-import store from "app/store";
-import { convertToImperial } from "app/lib/units";
-import Probe from "./Probe";
-import RunProbe from "./RunProbe";
-import {
-	// Units
-	METRIC_UNITS,
 	// Grbl
 	GRBL,
-	GRBLHAL,
 	GRBL_ACTIVE_STATE_IDLE,
+	GRBLHAL,
+	// Units
+	METRIC_UNITS,
 	WORKFLOW_STATE_RUNNING,
 } from "../../constants";
-import { getProbeCode } from "app/lib/Probing";
-import { getWidgetConfigContext } from "../WidgetConfig/WidgetContextProvider";
 import {
+	getWidgetConfigContext,
+	WidgetConfigProvider,
+} from "../WidgetConfig/WidgetContextProvider";
+import type {
 	Actions,
 	AvailableTool,
 	PROBE_TYPES_T,
@@ -59,10 +64,8 @@ import {
 	State,
 	TOUCHPLATE_TYPES_T,
 } from "./definitions";
-import { UNITS_EN } from "app/definitions/general";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-import { WidgetConfigProvider } from "../WidgetConfig/WidgetContextProvider";
-import { Workspace } from "app/workspace/definitions";
+import Probe from "./Probe";
+import RunProbe from "./RunProbe";
 
 const ProbeWidget = () => {
 	const posthog = usePostHog();
@@ -447,7 +450,7 @@ const ProbeWidget = () => {
 		const { axes } = determineProbeOptions(
 			availableProbeCommands[selectedProbeCommand],
 		);
-		let probeDistances =
+		const probeDistances =
 			units === METRIC_UNITS ? PROBE_DISTANCE_METRIC : PROBE_DISTANCE_IMPERIAL;
 		// Grab units for correct modal
 		let zThickness,
@@ -575,7 +578,7 @@ const ProbeWidget = () => {
 			setZRetractDistance(config.get("zRetractNormal"));
 			setZRetractDistanceAuto(config.get("zRetractAuto"));
 
-			let newZProbeDistance = config.get("zProbeDistance");
+			const newZProbeDistance = config.get("zProbeDistance");
 			if (newZProbeDistance) {
 				PROBE_DISTANCE_METRIC.z = newZProbeDistance;
 				PROBE_DISTANCE_IMPERIAL.z = convertToImperial(newZProbeDistance);

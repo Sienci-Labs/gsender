@@ -21,32 +21,32 @@
  *
  */
 
+import * as Sentry from "@sentry/electron/main";
+import chalk from "chalk";
 import {
 	app,
-	ipcMain,
+	clipboard,
 	dialog,
-	powerSaveBlocker,
+	ipcMain,
 	powerMonitor,
+	powerSaveBlocker,
 	screen,
 	session,
-	clipboard,
 } from "electron";
-import { autoUpdater } from "electron-updater";
-import Store from "electron-store";
-import chalk from "chalk";
-import mkdirp from "mkdirp";
-import isOnline from "is-online";
 import log from "electron-log";
-import path from "path";
+import Store from "electron-store";
+import { autoUpdater } from "electron-updater";
 import fs from "fs";
-import * as Sentry from "@sentry/electron/main";
+import isOnline from "is-online";
+import mkdirp from "mkdirp";
+import path from "path";
 import WinReg from "winreg";
-import WindowManager from "./electron-app/WindowManager";
-import launchServer from "./server-cli";
-import pkg from "./package.json";
-import { parseAndReturnGCode } from "./electron-app/RecentFiles";
 import { asyncCallWithTimeout } from "./electron-app/AsyncTimeout";
 import { getGRBLLog } from "./electron-app/grblLogs";
+import { parseAndReturnGCode } from "./electron-app/RecentFiles";
+import WindowManager from "./electron-app/WindowManager";
+import pkg from "./package.json";
+import launchServer from "./server-cli";
 
 // Hot reload in development
 if (process.env.NODE_ENV === "development") {
@@ -63,7 +63,7 @@ if (process.env.NODE_ENV === "development") {
 
 let windowManager = null;
 let hostInformation = {};
-let grblLog = log.create("grbl");
+const grblLog = log.create("grbl");
 let logPath;
 let powerBlockerNum = 0;
 const externalRendererUrl =
@@ -450,8 +450,8 @@ const main = () => {
 			 */
 			ipcMain.on("open-upload-dialog", async () => {
 				try {
-					let additionalOptions = {};
-					let gSenderWindow = windowManager.getWindow();
+					const additionalOptions = {};
+					const gSenderWindow = windowManager.getWindow();
 
 					if (prevDirectory) {
 						additionalOptions.defaultPath = prevDirectory;

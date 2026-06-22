@@ -1,12 +1,12 @@
-import {
+import type {
+	ATCIJSON,
+	ATCIMacroConfig,
+} from "app/features/ATC/assets/defaultATCIMacros.ts";
+import type {
 	ConfigState,
 	OffsetManagement,
 } from "app/features/ATC/components/Configuration/hooks/useConfigStore.tsx";
 import store from "app/store";
-import {
-	ATCIJSON,
-	ATCIMacroConfig,
-} from "app/features/ATC/assets/defaultATCIMacros.ts";
 
 export interface Macro {
 	name: string;

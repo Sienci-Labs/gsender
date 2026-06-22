@@ -30,7 +30,7 @@ data.modules = data.modules.map((m) => {
 
 let cypress = null;
 let cypressAvailable = false;
-let allTests = [];
+const allTests = [];
 
 if (fs.existsSync(CYPRESS_REPORT)) {
 	try {
@@ -377,7 +377,7 @@ function summaryRows() {
         ctx.fillText(m.created + '/' + m.total, cx, cy + 10);
       });
     })();
-    <\/script>`;
+    </script>`;
 }
 
 const today = new Date().toLocaleDateString("en-CA", {

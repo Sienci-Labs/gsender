@@ -1,5 +1,5 @@
+import type { EEPROM } from "app/definitions/firmware";
 import { ATCI_SUPPORTED_VERSION } from "app/features/ATC/utils/ATCiConstants.ts";
-import { EEPROM } from "app/definitions/firmware";
 
 export interface GrblCoreMigration {
 	cutoffSemver: number;

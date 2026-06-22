@@ -20,8 +20,6 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-import { JSX } from "react";
-import moment from "moment";
 
 import {
 	Tooltip,
@@ -29,11 +27,13 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from "app/components/shadcn/Tooltip";
-import { SenderStatus } from "app/lib/definitions/sender_feeder";
 import {
 	convertMillisecondsToTimeStamp,
 	convertSecondsToDHMS,
 } from "app/lib/datetime";
+import type { SenderStatus } from "app/lib/definitions/sender_feeder";
+import moment from "moment";
+import type { JSX } from "react";
 import { WORKFLOW_STATE_PAUSED } from "../../constants";
 
 import WoodcuttingProgress from "./WoodcuttingProgress";

@@ -21,10 +21,10 @@
  *
  */
 
-import React from "react";
+import { useWizardContext } from "app/features/Helper/context";
 import cx from "classnames";
 import { Check } from "lucide-react";
-import { useWizardContext } from "app/features/Helper/context";
+import React from "react";
 
 const Stepper = () => {
 	const { steps, activeStep, activeSubstep } = useWizardContext();

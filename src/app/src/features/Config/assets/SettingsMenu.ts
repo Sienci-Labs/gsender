@@ -1,35 +1,3 @@
-import { BsEthernet } from "react-icons/bs";
-import { FaCog } from "react-icons/fa";
-import { PiEngine } from "react-icons/pi";
-import { MdTouchApp } from "react-icons/md";
-import { CiLight } from "react-icons/ci";
-import { FaHome } from "react-icons/fa";
-import { GiTargetLaser } from "react-icons/gi";
-import { FaRobot } from "react-icons/fa";
-import { RxButton } from "react-icons/rx";
-import { CiMapPin } from "react-icons/ci";
-import { IoIosSwap } from "react-icons/io";
-import { FaArrowsSpin } from "react-icons/fa6";
-import { MdSettingsApplications } from "react-icons/md";
-import { SiCoronaengine } from "react-icons/si";
-import { MdOutlineReadMore, MdAccessibility } from "react-icons/md";
-import { IconType } from "react-icons";
-import {
-	TOUCHPLATE_TYPE_3D,
-	TOUCHPLATE_TYPE_AUTOZERO,
-	TOUCHPLATE_TYPE_BITZERO,
-	TOUCHPLATE_TYPE_STANDARD,
-	TOUCHPLATE_TYPE_ZERO,
-} from "app/lib/constants";
-import { AJogWizard } from "app/features/Config/components/wizards/AJogWizard.tsx";
-import { ProbePinStatus } from "app/features/Config/components/wizards/ProbePinStatus.tsx";
-import { LimitSwitchIndicators } from "app/features/Config/components/wizards/LimitSwitchIndicators.tsx";
-import { SpindleWizard } from "app/features/Config/components/wizards/SpindleWizard.tsx";
-import { AccessoryOutputWizard } from "app/features/Config/components/wizards/AccessoryOutputWizard.tsx";
-import { SquaringToolWizard } from "app/features/Config/components/wizards/SquaringToolWizard.tsx";
-import { XJogWizard } from "app/features/Config/components/wizards/XJogWizard.tsx";
-import { YJogWizard } from "app/features/Config/components/wizards/YJogWizard.tsx";
-import { ZJogWizard } from "app/features/Config/components/wizards/ZJogWizard.tsx";
 import {
 	GRBL,
 	GRBLHAL,
@@ -41,38 +9,74 @@ import {
 	THEMES,
 	WORKSPACE_MODE,
 } from "app/constants";
-import { LaserWizard } from "app/features/Config/components/wizards/LaserWizard.tsx";
+import type { EEPROM, FIRMWARE_TYPES_T } from "app/definitions/firmware";
+import type {
+	BasicPosition,
+	UNITS_EN,
+	UNITS_GCODE,
+} from "app/definitions/general";
 import {
 	GamepadLinkWizard,
 	KeyboardLinkWizard,
 } from "app/features/Config/components/ShortcutLinkWizards.tsx";
-import controller from "app/lib/controller.ts";
-import get from "lodash/get";
-import store from "app/store";
-import reduxStore from "app/store/redux";
-import pubsub from "pubsub-js";
-import { EEPROM, FIRMWARE_TYPES_T } from "app/definitions/firmware";
-import { updatePartialControllerSettings } from "app/store/redux/slices/controller.slice";
-import findIndex from "lodash/findIndex";
-import { BasicPosition, UNITS_EN, UNITS_GCODE } from "app/definitions/general";
-import { convertToImperial } from "app/lib/units";
-import { round, roundMetric } from "app/lib/rounding";
-import {
+import { AccessoryOutputWizard } from "app/features/Config/components/wizards/AccessoryOutputWizard.tsx";
+import { AJogWizard } from "app/features/Config/components/wizards/AJogWizard.tsx";
+import { LaserWizard } from "app/features/Config/components/wizards/LaserWizard.tsx";
+import { LimitSwitchIndicators } from "app/features/Config/components/wizards/LimitSwitchIndicators.tsx";
+import { ProbePinStatus } from "app/features/Config/components/wizards/ProbePinStatus.tsx";
+import { SpindleWizard } from "app/features/Config/components/wizards/SpindleWizard.tsx";
+import { SquaringToolWizard } from "app/features/Config/components/wizards/SquaringToolWizard.tsx";
+import { XJogWizard } from "app/features/Config/components/wizards/XJogWizard.tsx";
+import { YJogWizard } from "app/features/Config/components/wizards/YJogWizard.tsx";
+import { ZJogWizard } from "app/features/Config/components/wizards/ZJogWizard.tsx";
+import { updateToolchangeContext } from "app/features/Helper/Wizard.tsx";
+import type {
 	LaserState,
-	Spindle,
 	SPINDLE_LASER_T,
+	Spindle,
 } from "app/features/Spindle/definitions";
+import type { THEMES_T } from "app/features/Visualizer/definitions";
+import {
+	TOUCHPLATE_TYPE_3D,
+	TOUCHPLATE_TYPE_AUTOZERO,
+	TOUCHPLATE_TYPE_BITZERO,
+	TOUCHPLATE_TYPE_STANDARD,
+	TOUCHPLATE_TYPE_ZERO,
+} from "app/lib/constants";
+import controller from "app/lib/controller.ts";
 import { updateWorkspaceMode } from "app/lib/rotary";
+import { round, roundMetric } from "app/lib/rounding";
 import {
 	TOASTER_DISABLED,
 	TOASTER_LONG,
 	TOASTER_UNTIL_CLOSE,
 } from "app/lib/toaster/ToasterLib";
+import { convertToImperial } from "app/lib/units";
+import store from "app/store";
+import reduxStore from "app/store/redux";
+import { updatePartialControllerSettings } from "app/store/redux/slices/controller.slice";
 import isElectron from "is-electron";
-import { THEMES_T } from "app/features/Visualizer/definitions";
-import { JSX } from "react";
+import findIndex from "lodash/findIndex";
+import get from "lodash/get";
 import posthog from "posthog-js";
-import { updateToolchangeContext } from "app/features/Helper/Wizard.tsx";
+import pubsub from "pubsub-js";
+import type { JSX } from "react";
+import type { IconType } from "react-icons";
+import { BsEthernet } from "react-icons/bs";
+import { CiLight, CiMapPin } from "react-icons/ci";
+import { FaCog, FaHome, FaRobot } from "react-icons/fa";
+import { FaArrowsSpin } from "react-icons/fa6";
+import { GiTargetLaser } from "react-icons/gi";
+import { IoIosSwap } from "react-icons/io";
+import {
+	MdAccessibility,
+	MdOutlineReadMore,
+	MdSettingsApplications,
+	MdTouchApp,
+} from "react-icons/md";
+import { PiEngine } from "react-icons/pi";
+import { RxButton } from "react-icons/rx";
+import { SiCoronaengine } from "react-icons/si";
 
 export interface SettingsMenuSection {
 	label: string;
@@ -2251,7 +2255,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
 								);
 								// Normalize percentage to decimal (e.g., "100%" -> 1.0)
 								const scaleFactor = parseFloat(scaleFactorStr) / 100;
-								// @ts-ignore
+								// @ts-expect-error
 								window.ipcRenderer.send("save-display-scale", scaleFactor);
 							}
 						},

@@ -1,4 +1,4 @@
-import { ATCIVariable } from "app/features/ATC/components/Configuration/hooks/useConfigStore.tsx";
+import type { ATCIVariable } from "app/features/ATC/components/Configuration/hooks/useConfigStore.tsx";
 
 export type Macro = {
 	name: string;

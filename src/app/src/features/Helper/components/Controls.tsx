@@ -21,12 +21,12 @@
  *
  */
 
-import React from "react";
-import get from "lodash/get";
-import cx from "classnames";
 import { GRBL_ACTIVE_STATE_IDLE } from "app/constants";
 import { useWizardAPI, useWizardContext } from "app/features/Helper/context";
+import cx from "classnames";
+import get from "lodash/get";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
+import React from "react";
 import { useSelector } from "react-redux";
 
 const Controls = () => {

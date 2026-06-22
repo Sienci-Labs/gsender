@@ -1,12 +1,12 @@
-import { useEffect, useRef, useState } from "react";
-import { StepProps } from "app/features/AccessoryInstaller/types";
-import controller from "app/lib/controller.ts";
+import type { StepProps } from "app/features/AccessoryInstaller/types";
 import { ConfigTab } from "app/features/ATC/components/Configuration/components/ConfigTab.tsx";
 import {
 	ConfigProvider,
 	useConfigContext,
 } from "app/features/ATC/components/Configuration/hooks/useConfigStore.tsx";
 import { repopulateFromSDCard } from "app/features/ATC/components/Configuration/utils/ConfigUtils.ts";
+import controller from "app/lib/controller.ts";
+import { useEffect, useRef, useState } from "react";
 
 const DEFAULT_UPLOAD_ERROR = "SD card upload failed. Please try again.";
 

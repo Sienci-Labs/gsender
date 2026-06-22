@@ -22,6 +22,11 @@
  */
 
 import { Button } from "app/components/Button";
+import type {
+	CommandKey,
+	CommandKeys,
+	ShuttleEvent,
+} from "app/lib/definitions/shortcuts";
 import shuttleEvents from "app/lib/shuttleEvents";
 import { cn } from "app/lib/utils";
 import React, { useEffect, useState } from "react";
@@ -30,13 +35,7 @@ import {
 	FaExclamationCircle,
 	FaInfoCircle,
 } from "react-icons/fa";
-
 import { formatShortcut, shouldHideShiftForKey } from "../helpers";
-import {
-	CommandKey,
-	CommandKeys,
-	ShuttleEvent,
-} from "app/lib/definitions/shortcuts";
 
 const triggerKeys = ["Meta", "Alt", "Shift", "Control"];
 const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;

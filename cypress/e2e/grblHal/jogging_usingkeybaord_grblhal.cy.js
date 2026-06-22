@@ -96,7 +96,7 @@ describe("Dynamic Keyboard Jogging Test - All Axes", () => {
 			if (!shortcutText || shortcutText.length < 2) {
 				const dialogContent = $body.find('[role="dialog"]').text();
 				const match = dialogContent.match(
-					/(shift|ctrl|alt)[\s\+]+(left|right|up|down|pageup|pagedown)/i,
+					/(shift|ctrl|alt)[\s+]+(left|right|up|down|pageup|pagedown)/i,
 				);
 				if (match) shortcutText = match[0];
 			}

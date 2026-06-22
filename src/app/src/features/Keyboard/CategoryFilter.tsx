@@ -1,7 +1,7 @@
 import { Tabs, TabsList, TabsTrigger } from "app/components/shadcn/Tabs";
 
 import { ALL_CATEGORIES } from "app/constants";
-import { CommandKeys } from "app/lib/definitions/shortcuts";
+import type { CommandKeys } from "app/lib/definitions/shortcuts";
 import { cn } from "app/lib/utils";
 
 interface Props {

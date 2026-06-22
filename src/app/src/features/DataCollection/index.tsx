@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { BarChart3, ShieldCheck, SlidersHorizontal, X } from "lucide-react";
+import { usePostHog } from "@posthog/react";
+import Button from "app/components/Button";
 
 import {
 	Sheet,
@@ -8,9 +8,9 @@ import {
 	SheetDescription,
 	SheetTitle,
 } from "app/components/shadcn/Sheet";
-import Button from "app/components/Button";
-import { usePostHog } from "@posthog/react";
 import store from "app/store";
+import { BarChart3, ShieldCheck, SlidersHorizontal, X } from "lucide-react";
+import { useEffect, useState } from "react";
 
 /** Wait before showing the consent sheet so startup UI can settle. */
 const SHOW_DELAY_MS = 3000;

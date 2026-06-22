@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-import React from "react";
-import { toast } from "app/lib/toaster";
 import api from "app/api";
 import { Switch } from "app/components/shadcn/Switch";
 import MacroForm from "app/features/Macros/MacroForm";
+import { toast } from "app/lib/toaster";
+import type React from "react";
+import { useEffect, useState } from "react";
 
 interface EventInputProps {
 	eventType: string;

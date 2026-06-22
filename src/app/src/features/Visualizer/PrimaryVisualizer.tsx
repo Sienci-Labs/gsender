@@ -1,21 +1,20 @@
-import React, { useState, useEffect, ReactNode } from "react";
-import PropTypes from "prop-types";
-import { FrownIcon } from "lucide-react";
-import pubsub from "pubsub-js";
-
-import * as WebGL from "app/lib/three/WebGL";
+import { Tooltip } from "app/components/Tooltip";
 import { Widget } from "app/components/Widget";
-import VisualizerWrapper from "./VisualizerWrapper";
+import { WorkspaceSelector } from "app/features/WorkspaceSelector/index.tsx";
+import * as WebGL from "app/lib/three/WebGL";
+import cx from "classnames";
+import { FrownIcon } from "lucide-react";
+import PropTypes from "prop-types";
+import pubsub from "pubsub-js";
+import React, { type ReactNode, useEffect, useState } from "react";
+import { FaFeatherAlt } from "react-icons/fa";
+import CameraDisplay from "./CameraDisplay/CameraDisplay";
+import type { Actions, State } from "./definitions";
+import GcodeEditor from "./GcodeEditor";
 import Loading from "./Loading";
 import Rendering from "./Rendering";
 import SoftLimitsWarningArea from "./SoftLimitsWarningArea";
-import CameraDisplay from "./CameraDisplay/CameraDisplay";
-import { WorkspaceSelector } from "app/features/WorkspaceSelector/index.tsx";
-import { FaFeatherAlt } from "react-icons/fa";
-import cx from "classnames";
-import { Tooltip } from "app/components/Tooltip";
-import GcodeEditor from "./GcodeEditor";
-import { Actions, State } from "./definitions";
+import VisualizerWrapper from "./VisualizerWrapper";
 
 interface Props {
 	state: State;
