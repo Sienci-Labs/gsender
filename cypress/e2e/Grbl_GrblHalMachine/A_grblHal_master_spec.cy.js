@@ -39,7 +39,7 @@ import('./loadUI_grblHal.cy');
 
   import('./movement_tuning.cy');
 
-  // import('./park_feature.cy'); Test case is failing as homing not done
+  import('./park_feature.cy'); 
 
   import('./rotarysurfacing_surfacing.cy');
 

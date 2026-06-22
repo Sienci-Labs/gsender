@@ -1,8 +1,7 @@
-// cypress/e2e/grblHal/gamepad_connection.grblHal.cy.js
-
 const MOCK_GAMEPAD_ID = 'Mock Xbox Controller (XInput STANDARD GAMEPAD)';
+const TOTAL_BUTTONS = 17;
 
-function createMockGamepad(win) {
+function createMockGamepad(win, pressedIndex = 0) {
   return {
     id: MOCK_GAMEPAD_ID,
     index: 0,
@@ -10,30 +9,44 @@ function createMockGamepad(win) {
     timestamp: win.performance.now(),
     mapping: 'standard',
     axes: [0, 0, 0, 0],
-    buttons: Array.from({ length: 17 }, (_, i) => ({
-      pressed: i === 0,
-      touched: i === 0,
-      value: i === 0 ? 1 : 0,
+    buttons: Array.from({ length: TOTAL_BUTTONS }, (_, i) => ({
+      pressed: i === pressedIndex,
+      touched: i === pressedIndex,
+      value: i === pressedIndex ? 1 : 0,
     })),
   };
 }
 
-describe('Gamepad - Connect and Add New Profile', () => {
-  beforeEach(() => {
-    cy.viewport(1359, 945);
+// Click a jog button 3 times with a wait between each click
+function jogFiveTimes(selector) {
+  for (let i = 0; i < 3; i++) {
+    cy.get(selector).should('exist').click({ force: true });
+    cy.wait(1500);
+  }
+}
 
-    cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
-      maxRetries: 5,
-      waitTime: 5000,
-      timeout: 5000,
-      onBeforeLoad(win) {
-        win.navigator.getGamepads = () => [createMockGamepad(win)];
-      },
-    });
-  });
+// Assign an action to a button row using the SetShortcut modal
+function assignActionToRow(row, action) {
+  cy.log(`  Assigning "${action}" to row ${row}...`);
 
-  // Clean up the mock profile after each test run — even if the test fails.
-  // This prevents duplicate profiles building up across runs.
+  cy.get(`tr:nth-of-type(${row}) > td:nth-of-type(2) svg`)
+    .first()
+    .should('exist')
+    .click({ force: true });
+
+  cy.contains('button', action, { timeout: 10000 })
+    .should('be.visible')
+    .click({ force: true });
+
+  cy.contains('button', /set shortcut/i)
+    .should('not.be.disabled')
+    .click({ force: true });
+
+  cy.wait(500);
+  cy.log(` "${action}" assigned to row ${row}`);
+}
+
+describe('Gamepad - Full Workflow', () => {
   afterEach(() => {
     cy.visit(`${Cypress.config('baseUrl')}/#/tools/gamepad`);
     cy.wait(1000);
@@ -47,55 +60,41 @@ describe('Gamepad - Connect and Add New Profile', () => {
     });
   });
 
-  it('should connect to machine, navigate to Gamepad page, simulate controller, and add a new profile', () => {
+  it('should add profile, verify connected, assign jog actions, test jogging on carve page, verify axes return to 0, then delete profile', () => {
 
-    // ── Step 1: Connect to Machine ──────────────────────────────────────────
-    cy.log('Step 1: Connecting to machine...');
+    // ── Step 1: Load UI and connect -------------------
+    //--------------------------------------------------
+    cy.log('Step 1: Loading UI and connecting to machine...');
+    cy.viewport(1706, 810);
+    cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
+      maxRetries: 5,
+      waitTime: 5000,
+      timeout: 5000,
+      onBeforeLoad(win) {
+        win.navigator.getGamepads = () => [createMockGamepad(win)];
+      },
+    });
     cy.connectMachine();
     cy.verifyMachineStatus('Idle');
-    cy.log('✓ Machine connected and Idle');
+    cy.log(' Machine connected and Idle');
 
-    // ── Step 2: Navigate to Tools ───────────────────────────────────────────
-    cy.log('Step 2: Navigating to Tools...');
-    cy.goToTools();
-    cy.log('✓ Tools panel open');
+    // ── Step 2: Navigate to Gamepad page
+    cy.log('Step 2: Navigating to Gamepad page...');
+    cy.visit(`${Cypress.config('baseUrl')}/#/tools/gamepad`);
+    cy.wait(1000);
 
-    // ── Step 3: Open the Gamepad tool ───────────────────────────────────────
-    cy.log('Step 3: Opening Gamepad tool...');
-    cy.contains('a', /gamepad/i).click({ force: true });
-    cy.url().should('include', 'gamepad');
-    cy.log('✓ Gamepad page open');
-
-    // ── Step 4: Click "Add New Gamepad" button ───────────────────────────────
-    cy.log('Step 4: Clicking Add New Gamepad...');
+    // ── Step 3: Add new gamepad profile 
+    cy.log('Step 3: Adding new gamepad profile...');
     cy.contains('span', /add new gamepad/i)
       .closest('button')
       .first()
       .click({ force: true });
-    cy.log('✓ Add Gamepad Profile modal opened');
-
-    // ── Step 5: Verify modal shows instructions ──────────────────────────────
-    cy.log('Step 5: Verifying modal shows controller prompt...');
     cy.contains(/connect your device and press any button/i).should('be.visible');
-    cy.log('✓ Modal open — waiting for button press');
 
-    // ── Step 6: Emit "gamepad:button" via __GamepadManager ───────────────────
-    // index.ts now exposes GamepadManager on window.__GamepadManager when
-    // Cypress is running. ProfileModal listens for "gamepad:button" on this
-    // instance — emitting it triggers the availability check.
-    cy.log('Step 6: Simulating gamepad button press via __GamepadManager...');
     cy.window().then((win) => {
-      const mockGamepad = createMockGamepad(win);
-
-      // Make sure getGamepads returns our mock for the availability check
+      const mockGamepad = createMockGamepad(win, 0);
       win.navigator.getGamepads = () => [mockGamepad];
-
-      // Emit gamepad:button on the GamepadManager instance
-      // ProfileModal listens for { detail: { gamepad, button, pressed, value } }
       const gamepadManager = win.__GamepadManager.getInstance();
-      // EventEmitter wraps our data: emit(name, data) -> callback({ type, detail: data })
-      // ProfileModal: ({ detail }) => { const { gamepad } = detail }
-      // So data should be the gamepad event object directly (not wrapped in detail again)
       gamepadManager.emit('gamepad:button', {
         gamepad: {
           id: mockGamepad.id,
@@ -111,52 +110,135 @@ describe('Gamepad - Connect and Add New Profile', () => {
         index: 0,
       });
     });
-    cy.log('✓ gamepad:button emitted');
 
-    // ── Step 7: Wait for modal to show "Profile Is Available" ────────────────
-    cy.log('Step 7: Waiting for Profile Is Available...');
     cy.contains(/profile is available/i, { timeout: 10000 }).should('be.visible');
-    cy.log(' Controller detected — Profile Is Available');
-
-    // ── Step 8: Confirm "Add New Profile" ────────────────────────────────────
-    cy.log('Step 8: Clicking Add New Profile...');
-    cy.contains('button', /add new profile/i)
-      .should('not.be.disabled')
-      .click();
-    cy.log(' New profile created');
-
-    // ── Step 9: Verify profile appears in the list ───────────────────────────
-    cy.log('Step 9: Verifying new profile is listed...');
-    cy.contains(/mock xbox|profile|gamepad/i).should('be.visible');
-    cy.log('New gamepad profile present in the list');
-
-    // ── Step 10: Delete the created profile (cleanup) ────────────────────────
-    // From recording: delete icon aria-label contains "Delete gamepad profile"
-    cy.log('Step 10: Deleting the created gamepad profile...');
-    // Target delete button by exact profile name — unique even with multiple profiles
-    cy.get(`[aria-label="Delete gamepad profile ${MOCK_GAMEPAD_ID}"]`)
-      .click({ force: true });
-    cy.log(' Delete dialog opened');
-
-    // Confirm deletion — from recording: button text is "Confirm"
-    cy.contains('button', /confirm/i)
-      .should('be.visible')
-      .click();
+    cy.contains('button', /add new profile/i).should('not.be.disabled').click();
     cy.wait(1000);
-    cy.log(' Profile deleted');
+    cy.log(' Profile created successfully');
 
-    // Close the toast notification if it appears
+    // ── Step 4: Open profile and verify Connected state 
+    cy.log('Step 4: Opening profile and verifying Connected state...');
+    cy.contains(/mock xbox/i).click({ force: true });
+    cy.wait(1000);
+    cy.get('table').should('be.visible');
+    cy.contains('span', /connected/i).should('be.visible');
+    cy.log(' Gamepad shows as Connected');
+
+    // ── Step 5: Assign jog actions to each button row 
+    cy.log('Step 5: Assigning jog actions to button rows...');
+    assignActionToRow(1, 'Zero all axes');
+    assignActionToRow(2, 'Jog X+ (right)');
+    assignActionToRow(3, 'Jog X- (left)');
+    assignActionToRow(4, 'Jog Y+ (back)');
+    assignActionToRow(5, 'Jog Y- (fwd)');
+    assignActionToRow(6, 'Jog Z+ (up)');
+    assignActionToRow(7, 'Jog Z- (down)');
+    cy.log(' All jog actions assigned');
+
+    // ── Step 6: Verify all assignments appear in the table
+    cy.log('Step 6: Verifying assignments in table...');
+    cy.contains('Zero all axes').should('exist');
+    cy.contains('Jog X+ (right)').should('exist');
+    cy.contains('Jog X- (left)').should('exist');
+    cy.contains('Jog Y+ (back)').should('exist');
+    cy.contains('Jog Y- (fwd)').should('exist');
+    cy.contains('Jog Z+ (up)').should('exist');
+    cy.contains('Jog Z- (down)').scrollIntoView().should('exist');
+    cy.log(' All 7 assignments confirmed in table');
+
+    // ── Step 7: Go to Carve page and zero all axes 
+    cy.log('Step 7: Going to Carve page and zeroing axes...');
+    cy.get('#app > div.flex > div.flex > div.flex img').first().click({ force: true });
+    cy.wait(1000);
+    cy.verifyMachineStatus('Idle');
+    cy.zeroAllAxes();
+    cy.wait(1000);
+    cy.verifyAxes(0, 0, 0);
+    cy.log(' All axes zeroed at 0.00');
+
+    // ── Step 8: Jog X+ 3 times 
+    cy.log('Step 8: Jogging X+ 3 times...');
+    jogFiveTimes('#xPlus');
+    cy.verifyMachineStatus('Idle', { timeout: 15000 });
+    cy.log(' X+ jogged 3 times');
+
+    // ── Step 9: Jog X- 5 times to return to 0 
+    cy.log('Step 9: Jogging X- 3 times to return to 0...');
+    jogFiveTimes('#xMinus');
+    cy.verifyMachineStatus('Idle', { timeout: 15000 });
+    cy.verifyAxes(0, 0, 0);
+    cy.log(' X axis returned to 0.00');
+
+    // ── Step 10: Jog Y+ 3 times
+    cy.log('Step 10: Jogging Y+ 3 times...');
+    jogFiveTimes('#yPlus');
+    cy.verifyMachineStatus('Idle', { timeout: 15000 });
+    cy.log(' Y+ jogged 3 times');
+
+    // ── Step 11: Jog Y- 5 times to return to 0 
+    cy.log('Step 11: Jogging Y- 3 times to return to 0...');
+    jogFiveTimes('#yMinus');
+    cy.verifyMachineStatus('Idle', { timeout: 15000 });
+    cy.verifyAxes(0, 0, 0);
+    cy.log(' Y axis returned to 0.00');
+
+    // ── Step 12: Jog Z+ 3 times 
+    cy.log('Step 12: Jogging Z+ 3 times...');
+    cy.jogZPlusTimes(3, 1500);
+    cy.verifyMachineStatus('Idle', { timeout: 15000 });
+    cy.log(' Z+ jogged 3 times');
+
+    // ── Step 13: Jog Z- 5 times to return to 0 
+    cy.log('Step 13: Jogging Z- 3 times to return to 0...');
+    cy.jogZMinusTimes(3, 1500);
+    cy.verifyMachineStatus('Idle', { timeout: 15000 });
+    cy.verifyAxes(0, 0, 0);
+    cy.log(' Z axis returned to 0.00');
+
+    // ── Step 14: Final axes check 
+    cy.log('Step 14: Final axes verification...');
+    cy.verifyAxes(0, 0, 0);
+    cy.log(' All axes confirmed at 0.00, 0.00, 0.00');
+
+    // ── Step 15: Go to Gamepad page and verify profile still exists
+    cy.log('Step 15: Verifying profile persists on Gamepad page...');
+    cy.visit(`${Cypress.config('baseUrl')}/#/tools/gamepad`);
+    cy.wait(500);
     cy.get('body').then(($body) => {
-      if ($body.find('#app > section button').length > 0) {
-        cy.get('#app > section button').first().click({ force: true });
+      if ($body.find('button:contains("Back to Profiles")').length > 0) {
+        cy.contains('button', /back to profiles/i).click({ force: true });
+        cy.wait(500);
       }
     });
+    cy.contains(/mock xbox/i).should('be.visible');
+    cy.log(' Profile confirmed in list');
 
-    // Verify the mock profile no longer exists in the DOM
+    // Open profile and verify assignments still present
+    cy.contains(/mock xbox/i).click({ force: true });
+    cy.wait(1000);
+    cy.contains('Jog X+ (right)').should('exist');
+    cy.contains('Jog X- (left)').should('exist');
+    cy.contains('Jog Y+ (back)').should('exist');
+    cy.contains('Jog Y- (fwd)').should('exist');
+    cy.contains('Jog Z+ (up)').should('exist');
+    cy.contains('Jog Z- (down)').should('exist');
+    cy.log(' All assignments still present');
+
+    // ── Step 16: Go back to profiles and delete mock profile 
+    cy.log('Step 16: Deleting mock gamepad profile...');
+    cy.contains('button', /back to profiles/i).click({ force: true });
+    cy.wait(500);
+
+    cy.get(`[aria-label="Delete gamepad profile ${MOCK_GAMEPAD_ID}"]`)
+      .should('be.visible')
+      .click({ force: true });
+    cy.contains('button', /confirm/i).should('be.visible').click();
+    cy.wait(1000);
+
     cy.get(`[aria-label="Delete gamepad profile ${MOCK_GAMEPAD_ID}"]`)
       .should('not.exist');
-    cy.log(' Profile list is empty — cleanup complete');
+    cy.log(' Mock profile deleted successfully');
 
-    cy.log(' Gamepad test PASSED');
+    cy.log(' Full gamepad workflow test PASSED');
   });
 });
