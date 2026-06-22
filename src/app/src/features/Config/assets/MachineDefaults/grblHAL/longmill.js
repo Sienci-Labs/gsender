@@ -1,5 +1,7 @@
 /* eslint-disable camelcase */
 
+import { ALTMILL_DEFAULT, SPINDLE_ORDERED } from 'app/features/Config/assets/MachineDefaults/grblHAL/Altmill.js';
+
 export const LONGMILL_MASTER_LIST_GRBLHAL = {
 	$0: "5.0",
 	$1: "254",
@@ -245,3 +247,39 @@ export const LONGMILL_MK2_48x30 = {
 	$131: "855.000",
 	$132: "120.000",
 };
+
+const MK3_CONSTANTS = {
+    $4: 0,
+    $100: 100,
+    $101: 100,
+    $102: 100,
+    $110: 7000,
+    $111: 7000,
+    $112: 4000,
+    $120: 750,
+    $121: 750,
+    $122: 750,
+}
+
+export const LONGMILL_MK3_30x30 = {
+    ...ALTMILL_DEFAULT,
+    ...MK3_CONSTANTS,
+    $130: 805,
+    $131: 830,
+    $132: 129
+}
+
+export const LONGMILL_MK3_48x30 = {
+    ...ALTMILL_DEFAULT,
+    ...MK3_CONSTANTS,
+    $130: 1296,
+    $131: 830,
+    $132: 129
+}
+
+export const MK3_ORDERED = new Map()
+
+MK3_ORDERED.set('$23', '1');
+MK3_ORDERED.set('$22', '79');
+MK3_ORDERED.set('$21', '1');
+MK3_ORDERED.set('$20', '1');
