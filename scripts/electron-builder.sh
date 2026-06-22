@@ -98,7 +98,7 @@ if [ ! -f "$REBUILD_MARKER" ]; then
         --version=${electron_version:1} \
         --module-dir=dist/gsender \
         --which-module=serialport
-    
+
     # Mark that rebuild is done for this electron version
     touch "$REBUILD_MARKER"
 else
@@ -107,9 +107,41 @@ fi
 
 # Run electron-builder with optimizations
 echo "Building with electron-builder..."
+
+# Extra args appended to the electron-builder invocation.
+EXTRA_ARGS=()
+
+# Determine whether we're building on the upstream repo. Publishing and code
+# signing both target Sienci-Labs/gsender (publish repo is taken from
+# package.json "repository") and require secrets that only exist there. On forks
+# and local builds those operations fail (401 on publish; signing errors with no
+# certificate), so they must be disabled. GitHub Actions sets GITHUB_REPOSITORY
+# to "owner/repo"; it is unset locally, which correctly resolves to "not upstream".
+PUBLISH_REPO=$(node -e "const u=(require('$__dirname/../package.json').repository||{}).url||'';const m=u.match(/github\.com[/:]+([^/]+\/[^/.]+)/i);process.stdout.write(m?m[1].toLowerCase():'')")
+CURRENT_REPO=$(printf '%s' "$GITHUB_REPOSITORY" | tr '[:upper:]' '[:lower:]')
+ON_UPSTREAM=false
+if [ -n "$CURRENT_REPO" ] && [ "$CURRENT_REPO" = "$PUBLISH_REPO" ]; then
+    ON_UPSTREAM=true
+fi
+
+# Publishing: electron-builder publishes implicitly on CI detection. Only allow
+# it on the upstream repo; otherwise force --publish never.
+if [ "$ON_UPSTREAM" != true ]; then
+    echo "ℹ Not building on the upstream repo (${PUBLISH_REPO}) — skipping electron-builder publish (--publish never)"
+    EXTRA_ARGS+=("--publish" "never")
+fi
+
+# macOS code signing: only sign when on the upstream repo AND a signing
+# certificate is available (CSC_LINK / CSC_NAME). Otherwise disable signing
+# entirely — setting mac.identity=null skips it (electron-builder would
+# otherwise attempt to sign and fail with "not a file" when no cert is present).
+# Notarization is gated separately in notarize.js on the APPLE_* credentials.
 CSC_IDENTITY_AUTO_DISCOVERY_VALUE=false
-if [ -n "$CSC_LINK" ] || [ -n "$CSC_NAME" ]; then
+if [ "$ON_UPSTREAM" = true ] && { [ -n "$CSC_LINK" ] || [ -n "$CSC_NAME" ]; }; then
     CSC_IDENTITY_AUTO_DISCOVERY_VALUE=true
+else
+    echo "ℹ No macOS signing certificate / not on upstream repo — disabling code signing (mac.identity=null)"
+    EXTRA_ARGS+=("-c.mac.identity=null")
 fi
 
 # Extra args appended to the electron-builder invocation.
