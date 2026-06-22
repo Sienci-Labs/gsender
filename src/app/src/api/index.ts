@@ -53,7 +53,7 @@ authrequest.interceptors.request.use(
 		const token = "";
 
 		if (token) {
-			config.headers["Authorization"] = "Bearer " + token;
+			config.headers.Authorization = `Bearer ${token}`;
 		}
 		if (config.method === "get" || config.method === "head") {
 			config.params = { ...config.params, _: Date.now() };
@@ -96,7 +96,7 @@ const getState = (options?: StateOptions): Promise<AxiosResponse> => {
 	return authrequest.get("/api/state", { params: { key } });
 };
 
-const setState = (options: Record<string, any>): Promise<AxiosResponse> => {
+const setState = (options: Record<string, unknown>): Promise<AxiosResponse> => {
 	const data = { ...options };
 	return authrequest.post("/api/state", data);
 };
@@ -176,23 +176,23 @@ const users = {
 		return authrequest.get("/api/users", { params: options });
 	},
 
-	create: (options: Record<string, any>): Promise<AxiosResponse> => {
+	create: (options: Record<string, unknown>): Promise<AxiosResponse> => {
 		return authrequest.post("/api/users", options);
 	},
 
 	read: (id: string): Promise<AxiosResponse> => {
-		return authrequest.get("/api/users/" + id);
+		return authrequest.get(`/api/users/${id}`);
 	},
 
 	delete: (id: string): Promise<AxiosResponse> => {
-		return authrequest.delete("/api/users/" + id);
+		return authrequest.delete(`/api/users/${id}`);
 	},
 
 	update: (
 		id: string,
-		options: Record<string, any>,
+		options: Record<string, unknown>,
 	): Promise<AxiosResponse> => {
-		return authrequest.put("/api/users/" + id, options);
+		return authrequest.put(`/api/users/${id}`, options);
 	},
 };
 
@@ -204,16 +204,16 @@ const events = {
 		return authrequest.get("/api/events", { params: options });
 	},
 
-	create: (options: Record<string, any>): Promise<AxiosResponse> => {
+	create: (options: Record<string, unknown>): Promise<AxiosResponse> => {
 		return authrequest.post("/api/events", options);
 	},
 
 	read: (id: string): Promise<AxiosResponse> => {
-		return authrequest.get("/api/events/" + id);
+		return authrequest.get(`/api/events/${id}`);
 	},
 
 	delete: (id: string): Promise<AxiosResponse> => {
-		return authrequest.delete("/api/events/" + id);
+		return authrequest.delete(`/api/events/${id}`);
 	},
 
 	clearAll: (): Promise<AxiosResponse> => {
@@ -222,9 +222,9 @@ const events = {
 
 	update: (
 		id: string,
-		options: Record<string, any>,
+		options: Record<string, unknown>,
 	): Promise<AxiosResponse> => {
-		return authrequest.put("/api/events/" + id, options);
+		return authrequest.put(`/api/events/${id}`, options);
 	},
 };
 
@@ -236,7 +236,7 @@ const remoteSetting = {
 		return authrequest.get("/api/remote", { params: options });
 	},
 
-	update: (options: Record<string, any>): Promise<AxiosResponse> => {
+	update: (options: Record<string, unknown>): Promise<AxiosResponse> => {
 		return authrequest.put("/api/remote", options);
 	},
 };
@@ -249,7 +249,7 @@ const jobStats = {
 		return authrequest.get("/api/jobstats", { params: options });
 	},
 
-	update: (options: Record<string, any>): Promise<AxiosResponse> => {
+	update: (options: Record<string, unknown>): Promise<AxiosResponse> => {
 		return authrequest.put("/api/jobstats", options);
 	},
 
@@ -266,7 +266,7 @@ const maintenance = {
 		return authrequest.get("/api/maintenance", { params: options });
 	},
 
-	update: (options: Record<string, any>): Promise<AxiosResponse> => {
+	update: (options: Record<string, unknown>): Promise<AxiosResponse> => {
 		return authrequest.put("/api/maintenance", options);
 	},
 };
@@ -279,23 +279,23 @@ const macros = {
 		return authrequest.get("/api/macros", { params: options });
 	},
 
-	create: (options: Record<string, any>): Promise<AxiosResponse> => {
+	create: (options: Record<string, unknown>): Promise<AxiosResponse> => {
 		return authrequest.post("/api/macros", options);
 	},
 
 	read: (id: string): Promise<AxiosResponse> => {
-		return authrequest.get("/api/macros/" + id);
+		return authrequest.get(`/api/macros/${id}`);
 	},
 
 	update: (
 		id: string,
-		options: Record<string, any>,
+		options: Record<string, unknown>,
 	): Promise<AxiosResponse> => {
-		return authrequest.put("/api/macros/" + id, options);
+		return authrequest.put(`/api/macros/${id}`, options);
 	},
 
 	delete: (id: string): Promise<AxiosResponse> => {
-		return authrequest.delete("/api/macros/" + id);
+		return authrequest.delete(`/api/macros/${id}`);
 	},
 };
 
@@ -307,23 +307,23 @@ const mdi = {
 		return authrequest.get("/api/mdi", { params: options });
 	},
 
-	create: (options: Record<string, any>): Promise<AxiosResponse> => {
+	create: (options: Record<string, unknown>): Promise<AxiosResponse> => {
 		return authrequest.post("/api/mdi", options);
 	},
 
 	read: (id: string): Promise<AxiosResponse> => {
-		return authrequest.get("/api/mdi/" + id);
+		return authrequest.get(`/api/mdi/${id}`);
 	},
 
 	update: (
 		id: string,
-		options: Record<string, any>,
+		options: Record<string, unknown>,
 	): Promise<AxiosResponse> => {
-		return authrequest.put("/api/mdi/" + id, options);
+		return authrequest.put(`/api/mdi/${id}`, options);
 	},
 
 	delete: (id: string): Promise<AxiosResponse> => {
-		return authrequest.delete("/api/mdi/" + id);
+		return authrequest.delete(`/api/mdi/${id}`);
 	},
 };
 
@@ -335,23 +335,23 @@ const commands = {
 		return authrequest.get("/api/commands", { params: options });
 	},
 
-	create: (options: Record<string, any>): Promise<AxiosResponse> => {
+	create: (options: Record<string, unknown>): Promise<AxiosResponse> => {
 		return authrequest.post("/api/commands", options);
 	},
 
 	read: (id: string): Promise<AxiosResponse> => {
-		return authrequest.get("/api/commands/" + id);
+		return authrequest.get(`/api/commands/${id}`);
 	},
 
 	update: (
 		id: string,
-		options: Record<string, any>,
+		options: Record<string, unknown>,
 	): Promise<AxiosResponse> => {
-		return authrequest.put("/api/commands/" + id, options);
+		return authrequest.put(`/api/commands/${id}`, options);
 	},
 
 	delete: (id: string): Promise<AxiosResponse> => {
-		return authrequest.delete("/api/commands/" + id);
+		return authrequest.delete(`/api/commands/${id}`);
 	},
 };
 
@@ -363,23 +363,23 @@ const machines = {
 		return authrequest.get("/api/machines", { params: options });
 	},
 
-	create: (options: Record<string, any>): Promise<AxiosResponse> => {
+	create: (options: Record<string, unknown>): Promise<AxiosResponse> => {
 		return authrequest.post("/api/machines", options);
 	},
 
 	read: (id: string): Promise<AxiosResponse> => {
-		return authrequest.get("/api/machines/" + id);
+		return authrequest.get(`/api/machines/${id}`);
 	},
 
 	update: (
 		id: string,
-		options: Record<string, any>,
+		options: Record<string, unknown>,
 	): Promise<AxiosResponse> => {
-		return authrequest.put("/api/machines/" + id, options);
+		return authrequest.put(`/api/machines/${id}`, options);
 	},
 
 	delete: (id: string): Promise<AxiosResponse> => {
-		return authrequest.delete("/api/machines/" + id);
+		return authrequest.delete(`/api/machines/${id}`);
 	},
 };
 
@@ -411,7 +411,7 @@ const metrics = {
 			collectUserDataStatus,
 		});
 	},
-	sendUsageData: (options: Record<string, any>): Promise<AxiosResponse> => {
+	sendUsageData: (options: Record<string, unknown>): Promise<AxiosResponse> => {
 		return authrequest.post("/api/metrics/sendUsageData", options);
 	},
 };
@@ -426,7 +426,7 @@ const alarmList = {
 	recent: (options?: FetchOptions): Promise<AxiosResponse> => {
 		return authrequest.get("/api/alarmList/recent", { params: options });
 	},
-	update: (options: Record<string, any>): Promise<AxiosResponse> => {
+	update: (options: Record<string, unknown>): Promise<AxiosResponse> => {
 		return authrequest.put("/api/alarmList/", options);
 	},
 	clearAll: (): Promise<AxiosResponse> => {
@@ -450,7 +450,7 @@ const preferences = {
 	fetch: (): Promise<AxiosResponse> => {
 		return authrequest.get("/api/preferences");
 	},
-	replace: (options: Record<string, any>): Promise<AxiosResponse> => {
+	replace: (options: Record<string, unknown>): Promise<AxiosResponse> => {
 		return authrequest.put("/api/preferences/", options);
 	},
 };

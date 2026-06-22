@@ -119,9 +119,10 @@ function extractModuleSpecifiers(source) {
 	const matches = new Set();
 	for (const pattern of IMPORT_PATTERNS) {
 		pattern.lastIndex = 0;
-		let match;
-		while ((match = pattern.exec(sourceWithoutComments)) !== null) {
+		let match = pattern.exec(sourceWithoutComments);
+		while (match !== null) {
 			matches.add(match[1]);
+			match = pattern.exec(sourceWithoutComments);
 		}
 	}
 	return Array.from(matches);
@@ -204,8 +205,8 @@ const content = JSON.stringify(pkgApp, null, 2);
 delete pkgApp.type;
 const secondContent = JSON.stringify(pkgApp, null, 2);
 
-fs.writeFileSync(target, content + "\n", "utf8");
-fs.writeFileSync(secondTarget, secondContent + "\n", "utf8");
+fs.writeFileSync(target, `${content}\n`, "utf8");
+fs.writeFileSync(secondTarget, `${secondContent}\n`, "utf8");
 
 // Update readme notes
 const readme = fs.readFileSync("README.md", "utf8");

@@ -44,7 +44,7 @@ export const viteServer = async (app) => {
 		app.use(base, sirv(path.resolve(prodDir), { extensions: [] }));
 
 		// SPA fallback for prod: serve index.html for all unmatched routes
-		app.use("*", (req, res) => {
+		app.use("*", (_req, res) => {
 			if (templateHtml) {
 				res.status(200).set({ "Content-Type": "text/html" }).send(templateHtml);
 			} else {

@@ -25,7 +25,7 @@ function App() {
 			if (!authenticated) return;
 
 			const host = "";
-			const options = { query: "token=" + token };
+			const options = { query: `token=${token}` };
 
 			controller.connect(host, options);
 		});
@@ -55,15 +55,13 @@ function App() {
 	}, []);
 
 	return (
-		<>
-			<ReduxProvider store={reduxStore}>
-				<AccessibilitySettingsHandler />
-				<Toaster richColors closeButton theme="light" visibleToasts={5} />
-				<HashRouter>
-					<ReactRoutes />
-				</HashRouter>
-			</ReduxProvider>
-		</>
+		<ReduxProvider store={reduxStore}>
+			<AccessibilitySettingsHandler />
+			<Toaster richColors closeButton theme="light" visibleToasts={5} />
+			<HashRouter>
+				<ReactRoutes />
+			</HashRouter>
+		</ReduxProvider>
 	);
 }
 

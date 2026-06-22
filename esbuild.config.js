@@ -21,12 +21,12 @@ const srcResolverPlugin = {
 				return basePath;
 			}
 
-			if (fs.existsSync(basePath + ".js")) {
-				return basePath + ".js";
+			if (fs.existsSync(`${basePath}.js`)) {
+				return `${basePath}.js`;
 			}
 
-			if (fs.existsSync(basePath + ".ts")) {
-				return basePath + ".ts";
+			if (fs.existsSync(`${basePath}.ts`)) {
+				return `${basePath}.ts`;
 			}
 
 			if (fs.existsSync(path.join(basePath, "index.js"))) {
@@ -74,7 +74,7 @@ function createHexFilePlugin(target) {
 
 				const transformed = source.replace(
 					/(['"])!file-loader!([^'"]+\.hex)\1/g,
-					(match, quote, hexPath) => `${quote}${hexPath}${quote}`,
+					(_match, quote, hexPath) => `${quote}${hexPath}${quote}`,
 				);
 
 				return {
@@ -105,7 +105,7 @@ function createHexFilePlugin(target) {
 				);
 
 				return {
-					contents: `module.exports = ${JSON.stringify("./" + relativeToOutput.replace(/\\/g, "/"))}`,
+					contents: `module.exports = ${JSON.stringify(`./${relativeToOutput.replace(/\\/g, "/")}`)}`,
 					loader: "js",
 				};
 			});
@@ -221,7 +221,7 @@ const payload = pkg.version;
 const algorithm = "sha1";
 const buf = String(payload);
 const hash = crypto.createHash(algorithm).update(buf).digest("hex");
-const publicPath = "/" + hash.substr(0, 8) + "/";
+const publicPath = `/${hash.substr(0, 8)}/`;
 const buildVersion = pkg.version;
 
 // Sentry plugin for esbuild (optional - only in production)
@@ -238,7 +238,7 @@ function getSentryPlugin() {
 				org: process.env.SENTRY_ORG,
 				project: process.env.SENTRY_PROJECT,
 			});
-		} catch (error) {
+		} catch (_error) {
 			console.warn(
 				"⚠️  Sentry plugin not available, skipping source map upload",
 			);

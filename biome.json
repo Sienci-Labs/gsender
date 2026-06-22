@@ -19,9 +19,12 @@
 		"lineEnding": "lf"
 	},
 	"linter": {
-		"enabled": false,
+		"enabled": true,
 		"rules": {
-			"recommended": true
+			"recommended": true,
+			"style": {
+				"useNodejsImportProtocol": "off"
+			}
 		}
 	},
 	"javascript": {

@@ -178,7 +178,7 @@ describe("gSender Movement tuning test", () => {
 		cy.log("Step 11: Monitoring machine status transition...");
 		cy.wait(500);
 
-		cy.window().then((win) => {
+		cy.window().then(() => {
 			cy.log("Waiting for Jogging status...");
 			cy.verifyMachineStatus("Jogging", { timeout: 5000 }).then(() => {
 				cy.log("Machine is jogging");

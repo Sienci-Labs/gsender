@@ -51,8 +51,8 @@ const log = logger("service:cncengine");
 // @param {string} str2 Second string to check.
 // @return {boolean} True if str1 and str2 are the same string, ignoring case.
 const caseInsensitiveEquals = (str1, str2) => {
-	str1 = str1 ? (str1 + "").toUpperCase() : "";
-	str2 = str2 ? (str2 + "").toUpperCase() : "";
+	str1 = str1 ? `${str1}`.toUpperCase() : "";
+	str2 = str2 ? `${str2}`.toUpperCase() : "";
 	return str1 === str2;
 };
 
@@ -396,7 +396,7 @@ class CNCEngine {
 						const controllers = store.get("controllers", {});
 						const portsInUse = Object.keys(controllers).filter((port) => {
 							const controller = controllers[port];
-							return controller && controller.isOpen();
+							return controller?.isOpen();
 						});
 
 						// Filter ports by productId to avoid non-arduino devices from appearing
@@ -587,7 +587,7 @@ class CNCEngine {
 					// if only this one was connected
 					this.connection.close();
 					this.connection = null;
-					controller.close((err) => {
+					controller.close(() => {
 						// Remove controller from store
 						store.unset(`controllers[${JSON.stringify(port)}]`);
 
@@ -660,7 +660,7 @@ class CNCEngine {
 					const isInDFUmode = flashPort === "SLB_DFU";
 
 					//Close the controller for flasher utility to take over the port
-					const controller = store.get('controllers["' + flashPort + '"]');
+					const controller = store.get(`controllers["${flashPort}"]`);
 					if (controller) {
 						if (isHal) {
 							store.unset(`controllers[${JSON.stringify(flashPort)}]`);

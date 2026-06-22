@@ -286,7 +286,7 @@ describe("Feedrate Performance Comparison Test", () => {
 
 			// Handle HH:MM:SS or MM:SS format
 			if (timeStr.includes(":")) {
-				const parts = timeStr.split(":").map((p) => parseInt(p.trim()));
+				const parts = timeStr.split(":").map((p) => parseInt(p.trim(), 10));
 
 				if (parts.length === 3) {
 					// HH:MM:SS format
@@ -303,8 +303,8 @@ describe("Feedrate Performance Comparison Test", () => {
 				const minuteMatch = timeStr.match(/(\d+)\s*m/i);
 				const secondMatch = timeStr.match(/(\d+)\s*s/i);
 
-				if (minuteMatch) totalSeconds += parseInt(minuteMatch[1]) * 60;
-				if (secondMatch) totalSeconds += parseInt(secondMatch[1]);
+				if (minuteMatch) totalSeconds += parseInt(minuteMatch[1], 10) * 60;
+				if (secondMatch) totalSeconds += parseInt(secondMatch[1], 10);
 			}
 
 			if (totalSeconds === 0) {
@@ -418,7 +418,7 @@ describe("Feedrate Performance Comparison Test", () => {
 									comparison: {
 										timeDifferenceSeconds: timeDifference,
 										timeDifference: timeDiffStr,
-										percentageDifference: percentageDiff + "%",
+										percentageDifference: `${percentageDiff}%`,
 										fasterJob:
 											secondSeconds < firstSeconds
 												? "Second Job (Higher Feedrate)"

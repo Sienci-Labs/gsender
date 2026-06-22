@@ -57,7 +57,7 @@ describe("Dynamic Keyboard Jogging Test - All Axes", () => {
 		// Find the row and click its edit button
 		cy.get("tbody tr", { timeout: 10000 }).then(($rows) => {
 			let foundRow = false;
-			$rows.each((index, row) => {
+			$rows.each((_index, row) => {
 				const rowText = Cypress.$(row).text();
 				if (searchPattern.test(rowText)) {
 					cy.log(`Matched row: "${rowText.substring(0, 50)}"`);
@@ -88,7 +88,7 @@ describe("Dynamic Keyboard Jogging Test - All Axes", () => {
 				const kbdElements = $body.find("kbd");
 				if (kbdElements.length > 0)
 					shortcutText = kbdElements
-						.map((i, el) => Cypress.$(el).text())
+						.map((_i, el) => Cypress.$(el).text())
 						.get()
 						.join(" + ");
 			}

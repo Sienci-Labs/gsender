@@ -57,7 +57,7 @@ describe("Spindle Configuration and Control Test - Decrease to 7500 RPM", () => 
 		cy.log("Step 2: Verify machine status is Idle");
 		cy.contains(/^Idle$/i, { timeout: 30000 })
 			.should("be.visible")
-			.then((status) => cy.log("Machine status: " + status.text().trim()));
+			.then((status) => cy.log(`Machine status: ${status.text().trim()}`));
 		cy.wait(2000);
 
 		// --------------------------------------------------------
@@ -88,15 +88,15 @@ describe("Spindle Configuration and Control Test - Decrease to 7500 RPM", () => 
 		// --------------------------------------------------------
 		cy.log("Step 5: Record Maximum and Minimum Spindle Speed");
 		cy.get('input[type="number"]').then(($inputs) => {
-			$inputs.each((index, input) => {
+			$inputs.each((_index, input) => {
 				const val = parseFloat(input.value);
-				if (!isNaN(val) && val > 0) {
+				if (!Number.isNaN(val) && val > 0) {
 					if (!maxSpindleSpeed || val > maxSpindleSpeed) maxSpindleSpeed = val;
 					if (!minSpindleSpeed || val < minSpindleSpeed) minSpindleSpeed = val;
 				}
 			});
-			cy.log("Maximum Spindle Speed: " + maxSpindleSpeed + " RPM");
-			cy.log("Minimum Spindle Speed: " + minSpindleSpeed + " RPM");
+			cy.log(`Maximum Spindle Speed: ${maxSpindleSpeed} RPM`);
+			cy.log(`Minimum Spindle Speed: ${minSpindleSpeed} RPM`);
 		});
 
 		// --------------------------------------------------------
@@ -133,7 +133,7 @@ describe("Spindle Configuration and Control Test - Decrease to 7500 RPM", () => 
 		cy.log("Step 9: Start job");
 		cy.then(() => {
 			jobStartTime = Date.now();
-			cy.log("Job Start Time: " + new Date(jobStartTime).toISOString());
+			cy.log(`Job Start Time: ${new Date(jobStartTime).toISOString()}`);
 		});
 
 		cy.get("div.top-\\[-30px\\] > div:nth-of-type(1) > button")
@@ -149,7 +149,7 @@ describe("Spindle Configuration and Control Test - Decrease to 7500 RPM", () => 
 		cy.log("Step 10: Verify job is running");
 		cy.contains(/running|run/i, { timeout: 10000 })
 			.should("be.visible")
-			.then((status) => cy.log("Job status: " + status.text().trim()));
+			.then((status) => cy.log(`Job status: ${status.text().trim()}`));
 		cy.wait(2000);
 
 		// --------------------------------------------------------
@@ -162,7 +162,7 @@ describe("Spindle Configuration and Control Test - Decrease to 7500 RPM", () => 
 				const percentMatch = $parent.text().match(/(\d+)%/g);
 				if (percentMatch) {
 					initialSpindleOverride = percentMatch[percentMatch.length - 1];
-					cy.log("Initial Spindle Override: " + initialSpindleOverride);
+					cy.log(`Initial Spindle Override: ${initialSpindleOverride}`);
 				}
 			});
 
@@ -171,7 +171,7 @@ describe("Spindle Configuration and Control Test - Decrease to 7500 RPM", () => 
 			.then((text) => {
 				const match = text.match(/(\d+)\s*RPM/i);
 				initialSpindleRpm = match ? parseInt(match[1], 10) : null;
-				cy.log("Initial Spindle RPM: " + initialSpindleRpm + " RPM");
+				cy.log(`Initial Spindle RPM: ${initialSpindleRpm} RPM`);
 			});
 		cy.wait(1000);
 
@@ -185,7 +185,7 @@ describe("Spindle Configuration and Control Test - Decrease to 7500 RPM", () => 
 			cy.log(`Decrease button disabled: ${$btn.is(":disabled")}`);
 		});
 
-		Cypress._.times(5, (i) => {
+		Cypress._.times(5, (_i) => {
 			DECREASE_BTN().should("exist").click({ force: true });
 			cy.wait(10000);
 			cy.contains(/\d+\s*RPM/i)
@@ -208,7 +208,7 @@ describe("Spindle Configuration and Control Test - Decrease to 7500 RPM", () => 
 			.then((text) => {
 				const match = text.match(/(\d+)\s*RPM/i);
 				reducedSpindleRpm = match ? parseInt(match[1], 10) : 0;
-				cy.log("Spindle RPM after decrease: " + reducedSpindleRpm + " RPM");
+				cy.log(`Spindle RPM after decrease: ${reducedSpindleRpm} RPM`);
 				cy.wrap(reducedSpindleRpm).as("reducedSpindleRpm");
 			});
 
@@ -218,7 +218,7 @@ describe("Spindle Configuration and Control Test - Decrease to 7500 RPM", () => 
 				const percentMatch = $parent.text().match(/(\d+)%/g);
 				if (percentMatch) {
 					reducedOverride = percentMatch[percentMatch.length - 1];
-					cy.log("Spindle Override after decrease: " + reducedOverride);
+					cy.log(`Spindle Override after decrease: ${reducedOverride}`);
 				}
 			});
 		cy.wait(2000);
@@ -241,8 +241,8 @@ describe("Spindle Configuration and Control Test - Decrease to 7500 RPM", () => 
 				const percentMatch = $parent.text().match(/(\d+)%/g);
 				if (percentMatch) {
 					resetOverride = percentMatch[percentMatch.length - 1];
-					cy.log("Spindle Override after reset: " + resetOverride);
-					const overrideValue = parseInt(resetOverride);
+					cy.log(`Spindle Override after reset: ${resetOverride}`);
+					const overrideValue = parseInt(resetOverride, 10);
 					if (overrideValue >= 95 && overrideValue <= 105) {
 						cy.log("Spindle successfully reset to 100%");
 					} else {
@@ -256,7 +256,7 @@ describe("Spindle Configuration and Control Test - Decrease to 7500 RPM", () => 
 			.then((text) => {
 				const match = text.match(/(\d+)\s*RPM/i);
 				resetSpindleRpm = match ? parseInt(match[1], 10) : 0;
-				cy.log("Spindle RPM after reset: " + resetSpindleRpm + " RPM");
+				cy.log(`Spindle RPM after reset: ${resetSpindleRpm} RPM`);
 				cy.wrap(resetSpindleRpm).as("resetSpindleRpm");
 			});
 		cy.wait(2000);
@@ -295,7 +295,7 @@ describe("Spindle Configuration and Control Test - Decrease to 7500 RPM", () => 
 				const percentMatch = $parent.text().match(/(\d+)%/g);
 				if (percentMatch) {
 					increasedOverride = percentMatch[percentMatch.length - 1];
-					cy.log("Spindle Override after increase: " + increasedOverride);
+					cy.log(`Spindle Override after increase: ${increasedOverride}`);
 				}
 			});
 
@@ -304,7 +304,7 @@ describe("Spindle Configuration and Control Test - Decrease to 7500 RPM", () => 
 			.then((text) => {
 				const match = text.match(/(\d+)\s*RPM/i);
 				increasedSpindleRpm = match ? parseInt(match[1], 10) : 0;
-				cy.log("Spindle RPM after increase: " + increasedSpindleRpm + " RPM");
+				cy.log(`Spindle RPM after increase: ${increasedSpindleRpm} RPM`);
 				cy.wrap(increasedSpindleRpm).as("increasedSpindleRpm");
 			});
 		cy.wait(2000);
@@ -327,8 +327,8 @@ describe("Spindle Configuration and Control Test - Decrease to 7500 RPM", () => 
 				const percentMatch = $parent.text().match(/(\d+)%/g);
 				if (percentMatch) {
 					secondResetOverride = percentMatch[percentMatch.length - 1];
-					cy.log("Spindle Override after second reset: " + secondResetOverride);
-					const overrideValue = parseInt(secondResetOverride);
+					cy.log(`Spindle Override after second reset: ${secondResetOverride}`);
+					const overrideValue = parseInt(secondResetOverride, 10);
 					if (overrideValue >= 95 && overrideValue <= 105) {
 						cy.log("Spindle successfully reset to 100%");
 					} else {
@@ -342,9 +342,7 @@ describe("Spindle Configuration and Control Test - Decrease to 7500 RPM", () => 
 			.then((text) => {
 				const match = text.match(/(\d+)\s*RPM/i);
 				secondResetSpindleRpm = match ? parseInt(match[1], 10) : 0;
-				cy.log(
-					"Spindle RPM after second reset: " + secondResetSpindleRpm + " RPM",
-				);
+				cy.log(`Spindle RPM after second reset: ${secondResetSpindleRpm} RPM`);
 				cy.wrap(secondResetSpindleRpm).as("secondResetSpindleRpm");
 			});
 		cy.wait(2000);
@@ -368,9 +366,7 @@ describe("Spindle Configuration and Control Test - Decrease to 7500 RPM", () => 
 			cy.log(`Time: ${details.time}`);
 			cy.log(`Errors: ${details.errors}`);
 			cy.log(
-				"Total Job Duration: " +
-					((jobEndTime - jobStartTime) / 1000).toFixed(2) +
-					"s",
+				`Total Job Duration: ${((jobEndTime - jobStartTime) / 1000).toFixed(2)}s`,
 			);
 			expect(details.status.toLowerCase()).to.not.include("error");
 			cy.wrap(details.status).as("jobStatus");
@@ -386,27 +382,23 @@ describe("Spindle Configuration and Control Test - Decrease to 7500 RPM", () => 
 			cy.get("@timeTaken").then((time) => {
 				cy.get("@jobErrors").then((errors) => {
 					cy.log("SPINDLE TEST SUMMARY - DECREASE & INCREASE");
-					cy.log("  Min Spindle Speed: " + minSpindleSpeed + " RPM");
-					cy.log("  Max Spindle Speed: " + maxSpindleSpeed + " RPM");
-					cy.log("  Initial Override: " + (initialSpindleOverride || "N/A"));
-					cy.log("  Initial RPM: " + initialSpindleRpm + " RPM");
-					cy.log("  Reduced Override: " + reducedOverride);
-					cy.log("  Reduced RPM: " + reducedSpindleRpm + " RPM");
-					cy.log("  After 1st Reset Override: " + resetOverride);
-					cy.log("  After 1st Reset RPM: " + resetSpindleRpm + " RPM");
-					cy.log("  Increased Override: " + increasedOverride);
-					cy.log("  Increased RPM: " + increasedSpindleRpm + " RPM");
-					cy.log("  After 2nd Reset Override: " + secondResetOverride);
-					cy.log("  After 2nd Reset RPM: " + secondResetSpindleRpm + " RPM");
-					cy.log("  Status: " + status);
-					cy.log("  Time Taken: " + time);
-					cy.log("  Errors: " + errors);
+					cy.log(`  Min Spindle Speed: ${minSpindleSpeed} RPM`);
+					cy.log(`  Max Spindle Speed: ${maxSpindleSpeed} RPM`);
+					cy.log(`  Initial Override: ${initialSpindleOverride || "N/A"}`);
+					cy.log(`  Initial RPM: ${initialSpindleRpm} RPM`);
+					cy.log(`  Reduced Override: ${reducedOverride}`);
+					cy.log(`  Reduced RPM: ${reducedSpindleRpm} RPM`);
+					cy.log(`  After 1st Reset Override: ${resetOverride}`);
+					cy.log(`  After 1st Reset RPM: ${resetSpindleRpm} RPM`);
+					cy.log(`  Increased Override: ${increasedOverride}`);
+					cy.log(`  Increased RPM: ${increasedSpindleRpm} RPM`);
+					cy.log(`  After 2nd Reset Override: ${secondResetOverride}`);
+					cy.log(`  After 2nd Reset RPM: ${secondResetSpindleRpm} RPM`);
+					cy.log(`  Status: ${status}`);
+					cy.log(`  Time Taken: ${time}`);
+					cy.log(`  Errors: ${errors}`);
 					cy.log(
-						"  Total Duration: " +
-							(jobEndTime && jobStartTime
-								? ((jobEndTime - jobStartTime) / 1000).toFixed(2)
-								: "N/A") +
-							"s",
+						`  Total Duration: ${((jobEndTime - jobStartTime) / 1000).toFixed(2)}s`,
 					);
 					cy.log("===============================================");
 				});

@@ -25,7 +25,7 @@ export interface GCodeOptions {
 }
 
 export interface FetchOptions {
-	[key: string]: any;
+	[key: string]: unknown;
 }
 
 export interface WatchOptions {

@@ -32,7 +32,7 @@ describe("Machine Connection and Unlock Test", () => {
 			.find("button")
 			.then(($buttons) => {
 				// Find the button that contains the device prefix
-				const matchingButton = $buttons.filter((i, btn) =>
+				const matchingButton = $buttons.filter((_i, btn) =>
 					btn.textContent.includes(devicePrefix),
 				);
 

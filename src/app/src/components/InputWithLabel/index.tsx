@@ -12,7 +12,7 @@ interface InputProps {
 	style?: React.CSSProperties;
 	tooltip?: {
 		content: string;
-		[key: string]: any;
+		[key: string]: unknown;
 	};
 }
 
@@ -43,7 +43,7 @@ const Input: React.FC<InputProps> = ({
 	return (
 		<ShowTooltip tooltip={tooltip}>
 			<div className={classNames("grid gap-4", { "grid-cols-3": label })}>
-				{label && <label className="text-lg self-center">{label}</label>}
+				{label && <label htmlFor={additionalProps.id} className="text-lg self-center">{label}</label>}
 				<div className="flex">
 					<input
 						{...additionalProps}

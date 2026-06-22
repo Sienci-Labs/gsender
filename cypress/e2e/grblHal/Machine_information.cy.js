@@ -11,7 +11,7 @@ describe("Invert and Check Pins Test with Stepper Motor Lock/Unlock", () => {
 		// Helper: get limit pin state from pinned popup
 		const checkLimitState = (limitName) => {
 			return cy.get("body > div:nth-of-type(2)").then(($popup) => {
-				const $rows = $popup.find("div").filter((i, el) => {
+				const $rows = $popup.find("div").filter((_i, el) => {
 					return el.textContent.trim() === limitName;
 				});
 

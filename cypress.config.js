@@ -28,7 +28,7 @@ module.exports = defineConfig({
 				},
 			});
 
-			on("before:browser:launch", (browser = {}, launchOptions) => {
+			on("before:browser:launch", (_browser = {}, launchOptions) => {
 				return launchOptions;
 			});
 

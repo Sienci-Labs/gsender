@@ -31,7 +31,7 @@ const pkg = require("./package.json");
 // Defaults to 'production'
 process.env.NODE_ENV = process.env.NODE_ENV || "production";
 
-const increaseVerbosityLevel = (val, total) => {
+const increaseVerbosityLevel = (_val, total) => {
 	return total + 1;
 };
 
@@ -61,7 +61,7 @@ const parseMountPoint = (val, acc) => {
 };
 
 const parseController = (val) => {
-	val = val ? (val + "").toLowerCase() : "";
+	val = val ? `${val}`.toLowerCase() : "";
 
 	if (["grbl", "grblHAL"].includes(val)) {
 		return val;
@@ -130,7 +130,7 @@ program
 // Commander assumes that the first two values in argv are 'node' and appname, and then followed by the args.
 // This is not the case when running from a packaged Electron app. Here you have the first value appname and then args.
 const normalizedArgv =
-	("" + process.argv[0]).indexOf(pkg.name) >= 0
+	`${process.argv[0]}`.indexOf(pkg.name) >= 0
 		? ["node", pkg.name, ...process.argv.slice(1)]
 		: process.argv;
 if (normalizedArgv.length > 1) {

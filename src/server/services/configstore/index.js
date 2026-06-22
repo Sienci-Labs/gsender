@@ -156,7 +156,7 @@ class ConfigStore extends events.EventEmitter {
 				this.config = JSON.parse(fs.readFileSync(this.file, "utf8"));
 				// migration
 				const events = this.config.events;
-				if (events instanceof Array) {
+				if (Array.isArray(events)) {
 					const eventMap = new Map();
 					for (let i = 0; i < events.length; i++) {
 						eventMap.set(events[i].event, events[i]);

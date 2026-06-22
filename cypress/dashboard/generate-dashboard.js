@@ -41,18 +41,17 @@ if (fs.existsSync(CYPRESS_REPORT)) {
 			if (!suites) return;
 			suites.forEach((suite) => {
 				const name = specFile || suite.file || suite.title || "Unknown Spec";
-				if (suite.tests && suite.tests.length) {
+				if (suite.tests?.length) {
 					suite.tests.forEach((test) => {
 						allTests.push({
 							spec: path.basename(name),
 							suite: suite.title || "",
 							test: test.title || "Unnamed test",
 							state: test.state || (test.fail ? "failed" : "passed"),
-							error: test.err && test.err.message ? test.err.message : "",
-							stack:
-								test.err && test.err.estack
-									? test.err.estack.split("\n").slice(0, 3).join("\n")
-									: "",
+							error: test.err?.message ? test.err.message : "",
+							stack: test.err?.estack
+								? test.err.estack.split("\n").slice(0, 3).join("\n")
+								: "",
 							duration: test.duration || 0,
 						});
 					});
@@ -62,7 +61,9 @@ if (fs.existsSync(CYPRESS_REPORT)) {
 		}
 
 		if (raw.results)
-			raw.results.forEach((r) => walkSuites(r.suites, r.file || r.fullFile));
+			raw.results.forEach((r) => {
+				walkSuites(r.suites, r.file || r.fullFile);
+			});
 		else if (raw.suites) walkSuites(raw.suites, raw.file);
 
 		const bySpec = {};
@@ -86,7 +87,7 @@ if (fs.existsSync(CYPRESS_REPORT)) {
 			passed: stats.passes || 0,
 			failed: stats.failures || 0,
 			pending: stats.pending || 0,
-			duration: Math.floor(duration / 60) + "m " + (duration % 60) + "s",
+			duration: `${Math.floor(duration / 60)}m ${duration % 60}s`,
 			passRate:
 				stats.tests > 0 ? Math.round((stats.passes / stats.tests) * 100) : 0,
 			failures,
@@ -215,11 +216,9 @@ function buildDetailedTestResults() {
 			spec +
 			"</span>" +
 			'<span class="spec-counts">' +
-			(passed ? '<span class="sc-pass">✔ ' + passed + " passed</span>" : "") +
-			(failed ? '<span class="sc-fail">✘ ' + failed + " failed</span>" : "") +
-			(pending
-				? '<span class="sc-skip">⏭ ' + pending + " pending</span>"
-				: "") +
+			(passed ? `<span class="sc-pass">✔ ${passed} passed</span>` : "") +
+			(failed ? `<span class="sc-fail">✘ ${failed} failed</span>` : "") +
+			(pending ? `<span class="sc-skip">⏭ ${pending} pending</span>` : "") +
 			'</span></div><div class="test-list">';
 
 		tests.forEach((t) => {
@@ -237,11 +236,11 @@ function buildDetailedTestResults() {
 				'"><span class="tr-icon">' +
 				icon +
 				'</span><span class="tr-suite">' +
-				(t.suite ? t.suite + " › " : "") +
+				(t.suite ? `${t.suite} › ` : "") +
 				'</span><span class="tr-name">' +
 				t.test +
 				'</span><span class="tr-dur">' +
-				(t.duration ? (t.duration / 1000).toFixed(1) + "s" : "-") +
+				(t.duration ? `${(t.duration / 1000).toFixed(1)}s` : "-") +
 				"</span></div>";
 			if (t.state === "failed" && t.error) {
 				html +=
@@ -443,20 +442,12 @@ if (!fs.existsSync(OUTPUT_DIR)) fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 fs.writeFileSync(OUTPUT_FILE, html, "utf8");
 
 console.log("\n   Dashboard generated!\n");
-console.log(
-	"   Coverage : " + g.created + "/" + g.total + " features (" + g.pct + "%)",
-);
+console.log(`   Coverage : ${g.created}/${g.total} features (${g.pct}%)`);
 if (cypressAvailable) {
 	console.log(
-		"   Tests    : " +
-			cypress.passed +
-			" passed, " +
-			cypress.failed +
-			" failed (" +
-			cypress.passRate +
-			"% pass rate)",
+		`   Tests    : ${cypress.passed} passed, ${cypress.failed} failed (${cypress.passRate}% pass rate)`,
 	);
-	console.log("   Duration : " + cypress.duration);
+	console.log(`   Duration : ${cypress.duration}`);
 } else {
 	console.log(
 		"   Tests    : No Cypress report — run npm run test:report first",
@@ -468,17 +459,7 @@ mods.forEach((m) => {
 		"█".repeat(Math.round(m.pct / 10)) +
 		"░".repeat(10 - Math.round(m.pct / 10));
 	console.log(
-		"   " +
-			m.name.padEnd(10) +
-			"  " +
-			bar +
-			"  " +
-			m.pct +
-			"%  (" +
-			m.created +
-			"/" +
-			m.total +
-			")",
+		`   ${m.name.padEnd(10)}  ${bar}  ${m.pct}%  (${m.created}/${m.total})`,
 	);
 });
 console.log("\n   Output: cypress/dashboard/report/index.html\n");

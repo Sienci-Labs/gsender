@@ -35,7 +35,7 @@
  */
 
 const errlog = () => {
-	return (err, req, res, next) => {
+	return (err, _req, _res, next) => {
 		console.error(err.stack);
 		next(err);
 	};

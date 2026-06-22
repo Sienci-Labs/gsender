@@ -21,7 +21,7 @@
  *
  */
 
-import React, { PureComponent } from "react";
+import { PureComponent } from "react";
 import ControlledNumberInput from "./";
 import styles from "./numberInput.module.styl";
 
@@ -144,14 +144,16 @@ class NumberInput extends PureComponent {
 	checkForInvalidInput(value) {
 		const regex = /[^0-9.]/g;
 		let dotOccurance = 0;
-		[...value].forEach((char) => char === "." && dotOccurance++);
+		[...value].forEach((char) => {
+			if (char === ".") dotOccurance++;
+		});
 		if (regex.test(value) || dotOccurance > 1) {
 			return true;
 		}
 		return false;
 	}
 
-	componentDidUpdate(prevProps, prevState, snapshot) {
+	componentDidUpdate(_prevProps, _prevState, _snapshot) {
 		this.updateState();
 	}
 
