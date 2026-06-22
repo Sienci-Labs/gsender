@@ -77,37 +77,37 @@ export const FileList: React.FC = () => {
 		});
 	}
 
-    const handleFileSelect = (files: FileList | null) => {
-        if (!files || files.length === 0) return;
+	const handleFileSelect = (files: FileList | null) => {
+		if (!files || files.length === 0) return;
 
-        const validFiles: File[] = [];
-        const errors: string[] = [];
+		const validFiles: File[] = [];
+		const errors: string[] = [];
 
-        Array.from(files).forEach((file) => {
-            const extension = '.' + file.name.split('.').pop()?.toLowerCase();
+		Array.from(files).forEach((file) => {
+			const extension = "." + file.name.split(".").pop()?.toLowerCase();
 
-            if (!ACCEPTED_EXTENSIONS.includes(extension)) {
-                errors.push(`${file.name}: Invalid file type`);
-                return;
-            }
+			if (!ACCEPTED_EXTENSIONS.includes(extension)) {
+				errors.push(`${file.name}: Invalid file type`);
+				return;
+			}
 
-            const validationError = validateSDFilename(file.name);
-            if (validationError) {
-                errors.push(`${file.name}: ${validationError}`);
-                return;
-            }
+			const validationError = validateSDFilename(file.name);
+			if (validationError) {
+				errors.push(`${file.name}: ${validationError}`);
+				return;
+			}
 
-            validFiles.push(file);
-        });
+			validFiles.push(file);
+		});
 
-        if (errors.length > 0) {
-            toast.error(`Some files were rejected:\n${errors.join('\n')}`);
-        }
+		if (errors.length > 0) {
+			toast.error(`Some files were rejected:\n${errors.join("\n")}`);
+		}
 
-        if (validFiles.length > 0) {
-            handleUpload(validFiles);
-        }
-    };
+		if (validFiles.length > 0) {
+			handleUpload(validFiles);
+		}
+	};
 
 	function handleDrop(e: React.DragEvent<HTMLDivElement>) {
 		e.preventDefault();
@@ -115,32 +115,32 @@ export const FileList: React.FC = () => {
 		handleFileSelect(e.dataTransfer.files);
 	}
 
-    const handleUpload = async (files: File | File[]) => {
-        const fileArray = Array.isArray(files) ? files : [files];
+	const handleUpload = async (files: File | File[]) => {
+		const fileArray = Array.isArray(files) ? files : [files];
 
-        if (fileArray.length === 0) return;
+		if (fileArray.length === 0) return;
 
-        const fileDataPromises = fileArray.map((file) => {
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const text = e.target.result as string;
-                    resolve({
-                        name: file.name,
-                        content: text,
-                        size: text.length,
-                    });
-                };
-                reader.readAsText(file);
-            });
-        });
+		const fileDataPromises = fileArray.map((file) => {
+			return new Promise((resolve) => {
+				const reader = new FileReader();
+				reader.onload = (e) => {
+					const text = e.target.result as string;
+					resolve({
+						name: file.name,
+						content: text,
+						size: text.length,
+					});
+				};
+				reader.readAsText(file);
+			});
+		});
 
-        const filesData = await Promise.all(fileDataPromises);
-        await uploadFileToSDCard(filesData);
-        if (fileInputRef.current) {
-            fileInputRef.current.value = '';
-        }
-    };
+		const filesData = await Promise.all(fileDataPromises);
+		await uploadFileToSDCard(filesData);
+		if (fileInputRef.current) {
+			fileInputRef.current.value = "";
+		}
+	};
 
 	if (!isConnected) {
 		return (
@@ -166,80 +166,80 @@ export const FileList: React.FC = () => {
 		);
 	}
 
-    if (files.length === 0) {
-        return (
-            <div
-                className={cn(
-                    'flex-1 items-center justify-center flex flex-col overflow-auto text-center py-12 text-gray-500 dark:text-gray-300 rounded-lg shadow-sm border border-gray-200',
-                    {
-                        'border-blue-400 bg-blue-50': dragOver,
-                        'border-gray-300 bg-white dark:bg-dark': !dragOver,
-                    },
-                )}
-                onDragOver={(e) => {
-                    e.preventDefault();
-                    setDragOver(true);
-                }}
-                onDragLeave={(e) => {
-                    e.preventDefault();
-                    setDragOver(false);
-                }}
-                onDrop={(e) => {
-                    handleDrop(e);
-                }}
-            >
-                <File className="w-12 h-12 mx-auto mb-4 opacity-30" />
-                <p className="text-lg font-medium">No files found</p>
-                <p className="text-sm">
-                    Upload files or refresh to see SD card contents
-                </p>
-                <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept=".gcode,.nc,.macro,.ncc,.ngc,.cnc,.txt,.text,.tap,.json"
-                    multiple
-                    onChange={(e) => handleFileSelect(e.target.files)}
-                    className="hidden"
-                />
-            </div>
-        );
-    }
+	if (files.length === 0) {
+		return (
+			<div
+				className={cn(
+					"flex-1 items-center justify-center flex flex-col overflow-auto text-center py-12 text-gray-500 dark:text-gray-300 rounded-lg shadow-sm border border-gray-200",
+					{
+						"border-blue-400 bg-blue-50": dragOver,
+						"border-gray-300 bg-white dark:bg-dark": !dragOver,
+					},
+				)}
+				onDragOver={(e) => {
+					e.preventDefault();
+					setDragOver(true);
+				}}
+				onDragLeave={(e) => {
+					e.preventDefault();
+					setDragOver(false);
+				}}
+				onDrop={(e) => {
+					handleDrop(e);
+				}}
+			>
+				<File className="w-12 h-12 mx-auto mb-4 opacity-30" />
+				<p className="text-lg font-medium">No files found</p>
+				<p className="text-sm">
+					Upload files or refresh to see SD card contents
+				</p>
+				<input
+					ref={fileInputRef}
+					type="file"
+					accept=".gcode,.nc,.macro,.ncc,.ngc,.cnc,.txt,.text,.tap,.json"
+					multiple
+					onChange={(e) => handleFileSelect(e.target.files)}
+					className="hidden"
+				/>
+			</div>
+		);
+	}
 
-    return (
-        <>
-            <div
-                className={cn(
-                    'flex-1 overflow-auto rounded-lg shadow-sm border border-gray-200',
-                    {
-                        'border-blue-400 bg-blue-50': dragOver,
-                        'border-gray-300 bg-white ': !dragOver,
-                    },
-                )}
-                onDragOver={(e) => {
-                    e.preventDefault();
-                    setDragOver(true);
-                }}
-                onDragLeave={(e) => {
-                    e.preventDefault();
-                    setDragOver(false);
-                }}
-                onDrop={(e) => {
-                    handleDrop(e);
-                }}
-            >
-                <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept=".gcode,.nc,.macro,.ncc,.ngc,.cnc,.txt,.text,.tap,.json"
-                    multiple
-                    onChange={(e) => handleFileSelect(e.target.files)}
-                    className="hidden"
-                />
-                <div className="px-6 py-4 border-b border-gray-200">
-                    <h2 className="text-lg font-semibold text-gray-900">
-                        Files ({files.length})
-                    </h2>
-                </div>
+	return (
+		<>
+			<div
+				className={cn(
+					"flex-1 overflow-auto rounded-lg shadow-sm border border-gray-200",
+					{
+						"border-blue-400 bg-blue-50": dragOver,
+						"border-gray-300 bg-white ": !dragOver,
+					},
+				)}
+				onDragOver={(e) => {
+					e.preventDefault();
+					setDragOver(true);
+				}}
+				onDragLeave={(e) => {
+					e.preventDefault();
+					setDragOver(false);
+				}}
+				onDrop={(e) => {
+					handleDrop(e);
+				}}
+			>
+				<input
+					ref={fileInputRef}
+					type="file"
+					accept=".gcode,.nc,.macro,.ncc,.ngc,.cnc,.txt,.text,.tap,.json"
+					multiple
+					onChange={(e) => handleFileSelect(e.target.files)}
+					className="hidden"
+				/>
+				<div className="px-6 py-4 border-b border-gray-200">
+					<h2 className="text-lg font-semibold text-gray-900">
+						Files ({files.length})
+					</h2>
+				</div>
 
 				<Table>
 					<TableHeader>

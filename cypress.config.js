@@ -1,47 +1,43 @@
-const { defineConfig } = require('cypress');
+const { defineConfig } = require("cypress");
 
 module.exports = defineConfig({
-  reporter: 'cypress-multi-reporters',
-  reporterOptions: {
-    configFile: 'reporter-config.json',
-  },
+	reporter: "cypress-multi-reporters",
+	reporterOptions: {
+		configFile: "reporter-config.json",
+	},
 
-  e2e: {
-    specPattern: 'cypress/e2e/grblHal/A_grblHal_master_spec.cy.js',
-    baseUrl: process.env.BASE_URL || 'http://localhost:8000',
+	e2e: {
+		specPattern: "cypress/e2e/grblHal/A_grblHal_master_spec.cy.js",
+		baseUrl: process.env.BASE_URL || "http://localhost:8000",
 
-    
-    // Timeouts
+		// Timeouts
 
-    pageLoadTimeout: 60000,
-    defaultCommandTimeout: 10000,
+		pageLoadTimeout: 60000,
+		defaultCommandTimeout: 10000,
 
+		// Environment Variables
+		env: {
+			deviceName: process.env.CYPRESS_DEVICE_NAME || "COM",
+		},
+		setupNodeEvents(on, config) {
+			// Terminal Logging Task
+			on("task", {
+				log(message) {
+					console.log(`[gSender] ${message}`);
+					return null;
+				},
+			});
 
-    // Environment Variables
-    env: {
-      deviceName: process.env.CYPRESS_DEVICE_NAME || 'COM',
-    },
-    setupNodeEvents(on, config) {
+			on("before:browser:launch", (browser = {}, launchOptions) => {
+				return launchOptions;
+			});
 
-      // Terminal Logging Task
-      on('task', {
-        log(message) {
-          console.log(`[gSender] ${message}`);
-          return null;
-        }
-      });
+			return config;
+		},
 
+		chromeWebSecurity: false,
+		experimentalModifyObstructiveThirdPartyCode: true,
 
-      on('before:browser:launch', (browser = {}, launchOptions) => {
-        return launchOptions;
-      });
-
-      return config;
-    },
-
-    chromeWebSecurity: false,
-    experimentalModifyObstructiveThirdPartyCode: true,
-
-    supportFile: 'cypress/support/e2e.js',
-  },
+		supportFile: "cypress/support/e2e.js",
+	},
 });

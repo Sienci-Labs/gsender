@@ -1,36 +1,36 @@
-import { ATCIVariable } from 'app/features/ATC/components/Configuration/hooks/useConfigStore.tsx';
+import { ATCIVariable } from "app/features/ATC/components/Configuration/hooks/useConfigStore.tsx";
 
 export type Macro = {
-    name: string;
-    content: string;
+	name: string;
+	content: string;
 };
 
 export interface ATCIMacroConfig {
-    version: number;
-    sdVersion: number;
-    variables: {
-        [key: string]: ATCIVariable;
-    };
-    variableFile: string;
-    macros: Macro[];
+	version: number;
+	sdVersion: number;
+	variables: {
+		[key: string]: ATCIVariable;
+	};
+	variableFile: string;
+	macros: Macro[];
 }
 
 export interface ATCIJSON {
-    version: number;
-    variables: {
-        [key: string]: {
-            default: number;
-            value: number;
-        };
-    };
-    variableFile: string;
-    files: string[];
+	version: number;
+	variables: {
+		[key: string]: {
+			default: number;
+			value: number;
+		};
+	};
+	variableFile: string;
+	files: string[];
 }
 
 const defaultMacros: Macro[] = [
-    {
-        name: 'P301.macro',
-        content: `; ************ DESCRIPTION ************
+	{
+		name: "P301.macro",
+		content: `; ************ DESCRIPTION ************
 ; Picks up tool QX and probes it
 ; If it is an in rack tool, allow the rack to be empty
 ; If it is an off rack tool, user must insert a tool
@@ -141,10 +141,10 @@ M50 P1
 
 ; ************ END RESTORE MODAL ************
 M99;`,
-    },
-    {
-        name: 'P302.macro',
-        content: `;=======================================================================================
+	},
+	{
+		name: "P302.macro",
+		content: `;=======================================================================================
 ;This is a macro for probing rack position for first time setup of a tool rack
 ;=======================================================================================
 ;Must run after completion of the ATC initialization macro P200.macro
@@ -408,10 +408,10 @@ $H
 (print, ATCI|rack_set:1)
 ;End of Macro
 M99`,
-    },
-    {
-        name: 'P501.macro',
-        content: `; This is a helper function to check air pressure
+	},
+	{
+		name: "P501.macro",
+		content: `; This is a helper function to check air pressure
 
 (debug, Running helper function P501 for pressure checking)
 
@@ -429,10 +429,10 @@ o100 if [#<_pres_sense> EQ 1]
 o100 endif
 
 M99;`,
-    },
-    {
-        name: 'P505.macro',
-        content: `; This is a helper function for moving to the off rack tool position
+	},
+	{
+		name: "P505.macro",
+		content: `; This is a helper function for moving to the off rack tool position
 ; May be turned into a osub call in the future
 #<direct> = #17
 
@@ -455,10 +455,10 @@ o200 endif
 ; If both positions are < safe, direct movement
 G53 G0 X[#<_tc_off_rack_x>] Y[#<_tc_off_rack_y>]
 G4 P0;`,
-    },
-    {
-        name: 'P901.macro',
-        content: `; P901 Load tool at spindle nose
+	},
+	{
+		name: "P901.macro",
+		content: `; P901 Load tool at spindle nose
 (debug, Running P900 - Load tool at spindle nose)
 
 ; All Validation handled by TC.macro
@@ -469,10 +469,10 @@ G4 P0;`,
 #1004 = 1;
 M6T[#<selected_tool_cache>];
 #1004 = 0;`,
-    },
-    {
-        name: 'P500.macro',
-        content: `; This is a helper function to probe the currently installed tool and reapply any new tool offsets.
+	},
+	{
+		name: "P500.macro",
+		content: `; This is a helper function to probe the currently installed tool and reapply any new tool offsets.
 ; If called without an argument, it will overwrite the existing tool offset
 ; If called with an argument of Q1, it will check the currently stored offset against the tool table.
 
@@ -536,10 +536,10 @@ G43 H[#<_current_tool>]
 
 ; Move to safe height
 G53 G0 Z[#<_tc_safe_z>]`,
-    },
-    {
-        name: 'P999.macro',
-        content: `; This is the firmware configuration file that governs the application of firmware values required to operate the Sienci ATC system.
+	},
+	{
+		name: "P999.macro",
+		content: `; This is the firmware configuration file that governs the application of firmware values required to operate the Sienci ATC system.
 ; Asterisks (*) indicate non ATC specific firmware settings
 
 ; ******** INITIALIZING ********
@@ -635,10 +635,10 @@ o300 if [#5399 NE -1 AND #<_tc_slots> LE 0]
 o300 endif
 
 M99`,
-    },
-    {
-        name: 'P300.macro',
-        content: `; ************ DESCRIPTION ************
+	},
+	{
+		name: "P300.macro",
+		content: `; ************ DESCRIPTION ************
 ; Probe all tools in the rack
 
 ; Local variables
@@ -765,10 +765,10 @@ M50 P1
 ; ************ END RESTORE MODAL ************
 
 M99;`,
-    },
-    {
-        name: 'P900.macro',
-        content: `; P900 Remove tool from spindle nose
+	},
+	{
+		name: "P900.macro",
+		content: `; P900 Remove tool from spindle nose
 ; Logically equivalent to unloading any tool with an off rack procedure
 (debug, Running P900 - Remove tool from nose)
 
@@ -777,10 +777,10 @@ M99;`,
 #1003 = 1;
 M6T0;
 #1003 = 0;`,
-    },
-    {
-        name: 'P502.macro',
-        content: `; This is a helper function to check rack sync
+	},
+	{
+		name: "P502.macro",
+		content: `; This is a helper function to check rack sync
 
 (debug, Running helper function P502 for checking tool number - spindle synchronization)
 
@@ -813,10 +813,10 @@ o100 else
   o102 endif
 o100 endif
 M99;`,
-    },
-    {
-        name: 'P508.macro',
-        content: `; This is a helper function to check if the machine has been homed.
+	},
+	{
+		name: "P508.macro",
+		content: `; This is a helper function to check if the machine has been homed.
 
 G4 P0;
 o100 if [#<_homed_state> NE 1]
@@ -824,10 +824,10 @@ o100 if [#<_homed_state> NE 1]
 o100 endif
 G4 P0;
 `,
-    },
-    {
-        name: 'P509.macro',
-        content: `; This is a helper function to check if P200.macro is loaded successfully.
+	},
+	{
+		name: "P509.macro",
+		content: `; This is a helper function to check if P200.macro is loaded successfully.
 ; #1001 is set to 1 when the parameters in P200 is set.
 
 G4 P0;
@@ -840,10 +840,10 @@ o100 if [#1001 NE 1]
 o100 endif
 G4 P0;
 `,
-    },
-    {
-        name: 'P200.macro',
-        content: `; ******** SYSTEMS SETUP ********
+	},
+	{
+		name: "P200.macro",
+		content: `; ******** SYSTEMS SETUP ********
 #<_min_vminor> = 260221
 (debug, Minimum firmware version: #<_min_vminor>)
 
@@ -1170,10 +1170,10 @@ o200 endif
 (print,ATCI|table_size:#<_tool_table_size>|rack_size:#<_tc_slots>)
 
 M99`,
-    },
-    {
-        name: 'P511.macro',
-        content: `; This is a helper function to update and validate off rack tool location
+	},
+	{
+		name: "P511.macro",
+		content: `; This is a helper function to update and validate off rack tool location
 
 ; The X and Y machine coordinate positions for loading off rack tools
 #<_tc_off_rack_x> = #5361
@@ -1182,10 +1182,10 @@ M99`,
 (debug, Off rack Y: #<_tc_off_rack_y>, from G59.2)
 
 `,
-    },
-    {
-        name: 'P507.macro',
-        content: `; This is a helper function to check if the controller is initialized without a controller restart.
+	},
+	{
+		name: "P507.macro",
+		content: `; This is a helper function to check if the controller is initialized without a controller restart.
 ; The _initializing variable is set by P999.macro.
 
 G4 P0;
@@ -1193,10 +1193,10 @@ o100 if [EXISTS[#<_initializing>] EQ 1]
   (abort, ATCI:2|Tool Change Aborted|Restart required after ATC Setup. Power cycle your controller to use the ATC. [A-507-01])
 o100 endif
 G4 P0;`,
-    },
-    {
-        name: 'P512.macro',
-        content: `; This is a helper function to update and validate TLS and safe location
+	},
+	{
+		name: "P512.macro",
+		content: `; This is a helper function to update and validate TLS and safe location
 
 ; X and Y machine coordinate positions of the tool setter.
 #<_tc_measure_x> = #5381
@@ -1206,10 +1206,10 @@ G4 P0;`,
 
 #<_tc_safe_x> = #5381 ; X coordinate should be identical to the TLS
 (debug, Safe Position: X#<_tc_safe_x> Y#<_tc_safe_y>)`,
-    },
-    {
-        name: 'P504.macro',
-        content: `; This is a helper function for moving to safe position from outside the keepout
+	},
+	{
+		name: "P504.macro",
+		content: `; This is a helper function for moving to safe position from outside the keepout
 ; May be turned into a osub call in the future
 #<direct> = #17
 
@@ -1226,10 +1226,10 @@ o100 endif
 
 G53 G0 X[#<_tc_safe_x>] Y[#<_tc_safe_y>]
 G4 P0;`,
-    },
-    {
-        name: 'P506.macro',
-        content: `; This is a helper function for moving to safe position from inside the keepout
+	},
+	{
+		name: "P506.macro",
+		content: `; This is a helper function for moving to safe position from inside the keepout
 
 ; Update and validate TLS / safe location
 G65 P512
@@ -1239,10 +1239,10 @@ G53 G0 Y[#<_tc_y_pulloff>]
 G53 G0 X[#<_tc_safe_x>]
 G53 G0 Y[#<_tc_safe_y>]
 G4 P0;`,
-    },
-    {
-        name: 'P510.macro',
-        content: `;=======================================================================================
+	},
+	{
+		name: "P510.macro",
+		content: `;=======================================================================================
 ;This is a helper macro for probing a single pull-stud for the probe utility P302.macro
 ;=======================================================================================
 ;Must run after completion of the ATC initialization macro P200.macro and the probing P302.macro
@@ -1501,10 +1501,10 @@ M66 P[#<_tc_input_th>] L4 Q0.01
 G4 P2
 
 (print, End of Subroutine)`,
-    },
-    {
-        name: 'TC.macro',
-        content: `;if 1002 is active, set probing to 1
+	},
+	{
+		name: "TC.macro",
+		content: `;if 1002 is active, set probing to 1
 ;if selected tool is an off rack tool, set load condition to 1, if selected tool is 0, set load condition to -1
 ;if current tool is an off rack tool, set load condition to 1, if current tool is 0, set load condition to -1
 ;if tool does not have an offset and probe mode is not active, pause and wait for user to confirm probe.
@@ -2074,10 +2074,10 @@ M50 P1
 
 (debug, End tool change macro)
 M99;`,
-    },
-    {
-        name: 'P503.macro',
-        content: `;Rack probing helper
+	},
+	{
+		name: "P503.macro",
+		content: `;Rack probing helper
 ;Pre-positions spindle tool sensor above right-most pullstud to help users during rack mounting and for probing rack offsets
 
 #<setUnits> = -1
@@ -2127,68 +2127,68 @@ o102 if [#<setUnits>]
 o102 endif
 
 M99`,
-    }
+	},
 ];
 const getMacroContent = (name: string): string =>
-    defaultMacros.find((macro) => macro.name === name)?.content ?? '';
-export const P302Content = getMacroContent('P302.macro');
-export const P506Content = getMacroContent('P506.macro');
-export const P900Content = getMacroContent('P900.macro');
-export const P502Content = getMacroContent('P502.macro');
-export const P500Content = getMacroContent('P500.macro');
-export const P509Content = getMacroContent('P509.macro');
-export const P508Content = getMacroContent('P508.macro');
-export const P510Content = getMacroContent('P510.macro');
-export const P512Content = getMacroContent('P512.macro');
-export const P301Content = getMacroContent('P301.macro');
-export const P511Content = getMacroContent('P511.macro');
-export const P999Content = getMacroContent('P999.macro');
-export const P501Content = getMacroContent('P501.macro');
-export const P504Content = getMacroContent('P504.macro');
-export const P503Content = getMacroContent('P503.macro');
-export const P901Content = getMacroContent('P901.macro');
-export const P300Content = getMacroContent('P300.macro');
-export const P507Content = getMacroContent('P507.macro');
-export const P505Content = getMacroContent('P505.macro');
-export const TCContent = getMacroContent('TC.macro');
-export const P200Content = getMacroContent('P200.macro');
+	defaultMacros.find((macro) => macro.name === name)?.content ?? "";
+export const P302Content = getMacroContent("P302.macro");
+export const P506Content = getMacroContent("P506.macro");
+export const P900Content = getMacroContent("P900.macro");
+export const P502Content = getMacroContent("P502.macro");
+export const P500Content = getMacroContent("P500.macro");
+export const P509Content = getMacroContent("P509.macro");
+export const P508Content = getMacroContent("P508.macro");
+export const P510Content = getMacroContent("P510.macro");
+export const P512Content = getMacroContent("P512.macro");
+export const P301Content = getMacroContent("P301.macro");
+export const P511Content = getMacroContent("P511.macro");
+export const P999Content = getMacroContent("P999.macro");
+export const P501Content = getMacroContent("P501.macro");
+export const P504Content = getMacroContent("P504.macro");
+export const P503Content = getMacroContent("P503.macro");
+export const P901Content = getMacroContent("P901.macro");
+export const P300Content = getMacroContent("P300.macro");
+export const P507Content = getMacroContent("P507.macro");
+export const P505Content = getMacroContent("P505.macro");
+export const TCContent = getMacroContent("TC.macro");
+export const P200Content = getMacroContent("P200.macro");
 export const defaultATCIMacros: ATCIMacroConfig = {
-    version: 20260527,
-    sdVersion: 20260527,
-    variables: {
-        _tc_rack_enable: {
-            default: 0,
-            value: 0,
-        },
-        _tc_slots: {
-            default: 6,
-            value: 6,
-        },
-        _tc_slot_offset: {
-            default: 90,
-            value: 90,
-        },
-        _irt_offset_mode: {
-            default: 0,
-            value: 0,
-        },
-        _ort_offset_mode: {
-            default: 0,
-            value: 0,
-        },
-        _passthrough_offset_setting: {
-            default: 0,
-            value: 0,
-        },
-        _holder_sense: {
-            default: 1,
-            value: 1,
-        },
-        _pres_sense: {
-            default: 1,
-            value: 1,
-        },
-    },
-    variableFile: 'P100.macro',
-    macros: defaultMacros,
+	version: 20260527,
+	sdVersion: 20260527,
+	variables: {
+		_tc_rack_enable: {
+			default: 0,
+			value: 0,
+		},
+		_tc_slots: {
+			default: 6,
+			value: 6,
+		},
+		_tc_slot_offset: {
+			default: 90,
+			value: 90,
+		},
+		_irt_offset_mode: {
+			default: 0,
+			value: 0,
+		},
+		_ort_offset_mode: {
+			default: 0,
+			value: 0,
+		},
+		_passthrough_offset_setting: {
+			default: 0,
+			value: 0,
+		},
+		_holder_sense: {
+			default: 1,
+			value: 1,
+		},
+		_pres_sense: {
+			default: 1,
+			value: 1,
+		},
+	},
+	variableFile: "P100.macro",
+	macros: defaultMacros,
 };

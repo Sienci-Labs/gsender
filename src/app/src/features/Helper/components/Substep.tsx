@@ -21,60 +21,63 @@
  *
  */
 
-import React from 'react';
-import { Info } from 'lucide-react';
-import Actions from './Actions';
+import React from "react";
+import { Info } from "lucide-react";
+import Actions from "./Actions";
 
 interface WizardAction {
-    label: string;
-    gcodeLines: string[];
+	label: string;
+	gcodeLines: string[];
 }
 
 interface WizardSubstep {
-    title: string;
-    description?: string | (() => React.ReactNode);
-    overlay?: boolean;
-    toolBanner?: boolean;
-    actions?: WizardAction[];
+	title: string;
+	description?: string | (() => React.ReactNode);
+	overlay?: boolean;
+	toolBanner?: boolean;
+	actions?: WizardAction[];
 }
 
 interface SubstepProps {
-    step: WizardSubstep;
-    index: number;
-    stepIndex: number;
-    firstRunOnly?: boolean;
+	step: WizardSubstep;
+	index: number;
+	stepIndex: number;
+	firstRunOnly?: boolean;
 }
 
 const Substep = ({ step, index, stepIndex, firstRunOnly }: SubstepProps) => {
-    return (
-        <div className="flex flex-col gap-3" id={`step-${stepIndex}-${index}`}>
-            <div className="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-amber-400">
-                {step.title}
-            </div>
+	return (
+		<div className="flex flex-col gap-3" id={`step-${stepIndex}-${index}`}>
+			<div className="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-amber-400">
+				{step.title}
+			</div>
 
-            <div className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">
-                {typeof step.description === 'function'
-                    ? step.description()
-                    : step.description}
-            </div>
+			<div className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">
+				{typeof step.description === "function"
+					? step.description()
+					: step.description}
+			</div>
 
-            {firstRunOnly && (
-                <div className="flex items-start gap-2 px-3 py-2 rounded-md border border-orange-200 dark:border-orange-800 bg-amber-50 dark:bg-orange-950/40">
-                    <Info size={13} className="shrink-0 mt-0.5 text-orange-500 dark:text-orange-400" />
-                    <span className="text-sm text-orange-800 dark:text-orange-300">
-                        <span className="font-semibold">One-time setup:</span>{' '}
-                        measures the initial tool so subsequent tools can be compared against it.
-                    </span>
-                </div>
-            )}
-            <Actions
-                actions={step.actions}
-                index={index}
-                stepIndex={stepIndex}
-                substepIndex={index}
-            />
-        </div>
-    );
+			{firstRunOnly && (
+				<div className="flex items-start gap-2 px-3 py-2 rounded-md border border-orange-200 dark:border-orange-800 bg-amber-50 dark:bg-orange-950/40">
+					<Info
+						size={13}
+						className="shrink-0 mt-0.5 text-orange-500 dark:text-orange-400"
+					/>
+					<span className="text-sm text-orange-800 dark:text-orange-300">
+						<span className="font-semibold">One-time setup:</span> measures the
+						initial tool so subsequent tools can be compared against it.
+					</span>
+				</div>
+			)}
+			<Actions
+				actions={step.actions}
+				index={index}
+				stepIndex={stepIndex}
+				substepIndex={index}
+			/>
+		</div>
+	);
 };
 
 export default Substep;
