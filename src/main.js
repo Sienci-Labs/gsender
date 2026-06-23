@@ -21,7 +21,6 @@
  *
  */
 
-import * as Sentry from "@sentry/electron/main";
 import chalk from "chalk";
 import {
 	app,
@@ -44,6 +43,10 @@ import WinReg from "winreg";
 import { asyncCallWithTimeout } from "./electron-app/AsyncTimeout";
 import { getGRBLLog } from "./electron-app/grblLogs";
 import { parseAndReturnGCode } from "./electron-app/RecentFiles";
+import {
+	setupSentryFromStore,
+	updateSentryMainConsent,
+} from "./electron-app/sentryMain.js";
 import WindowManager from "./electron-app/WindowManager";
 import pkg from "./package.json";
 import launchServer from "./server-cli";
@@ -70,13 +73,6 @@ const externalRendererUrl =
 	process.env.NODE_ENV === "development"
 		? process.env.ELECTRON_RENDERER_URL
 		: "";
-
-if (process.env.NODE_ENV === "production") {
-	Sentry.init({
-		dsn: "https://eeb4899f0415aa6bc9de477a7faeb720@o558751.ingest.us.sentry.io/4509479105986560",
-		release: pkg.version,
-	});
-}
 
 const main = () => {
 	// https://github.com/electron/electron/blob/master/docs/api/app.md#apprequestsingleinstancelock
@@ -144,6 +140,7 @@ const main = () => {
 	// Create the user data directory if it does not exist
 	const userData = app.getPath("userData");
 	mkdirp.sync(userData);
+	setupSentryFromStore({ release: pkg.version, userDataPath: userData });
 	// Extra logging
 	logPath = path.join(app.getPath("userData"), "logs/grbl.log");
 	grblLog.transports.file.resolvePath = () => logPath;
@@ -300,6 +297,14 @@ const main = () => {
 					pendingFileToOpen = filePath;
 				}
 			}
+
+			ipcMain.handle("sentry-consent", (_event, status) => {
+				updateSentryMainConsent({
+					status,
+					release: pkg.version,
+					userDataPath: userData,
+				});
+			});
 
 			ipcMain.on("file-association-ready", () => {
 				isRendererReady = true;
