@@ -984,13 +984,6 @@ export function Jogging({ hideRotary = false }) {
 						disabled={!isConnected}
 						onClick={() => cancelJog(activeState, firmware)}
 					/>
-					{/*<img
-                        src={stopSign}
-                        className="absolute top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 hover:fill-red-200"
-                        alt="E-Stop button"
-
-                        onClick={() => cancelJog(activeState, firmware)}
-                    />*/}
 				</div>
 				<div className="flex justify-center gap-4">
 					<ZJog
@@ -1054,6 +1047,14 @@ export function Jogging({ hideRotary = false }) {
 					<SpeedSelector handleClick={updateJogValues} />
 				</div>
 			</div>
+			<button
+				onClick={() => {
+					throw new Error("Manually thrown error");
+				}}
+				className="bg-red-400 text-white px-4 py-2 rounded-md"
+			>
+				Manually Throw Error
+			</button>
 		</>
 	);
 }
