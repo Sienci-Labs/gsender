@@ -1,7 +1,13 @@
+import fs from "fs";
+import os from "os";
+import path from "path";
+
 export const SENTRY_DSN =
 	"https://eeb4899f0415aa6bc9de477a7faeb720@o558751.ingest.us.sentry.io/4509479105986560";
 
 export const STORE_FILENAME = "gsender-0.5.6.json";
+
+const ELECTRON_APP_DATA_DIR_NAMES = ["gSender Edge", "gSender"];
 
 const SENSITIVE_KEY_PATTERN =
 	/token|password|secret|authorization|cookie|session|api[_-]?key/i;
@@ -18,17 +24,50 @@ export function getSentryEnvironment(release) {
 	return "production";
 }
 
-export function getUsageDataConsentFromStore(userDataPath, fs) {
+export function getUsageDataConsentFromStore(userDataPath, fsModule = fs) {
 	try {
 		const storePath = `${userDataPath}/${STORE_FILENAME}`;
-		if (!fs.existsSync(storePath)) {
+		if (!fsModule.existsSync(storePath)) {
 			return "pending";
 		}
-		const data = JSON.parse(fs.readFileSync(storePath, "utf8"));
+		const data = JSON.parse(fsModule.readFileSync(storePath, "utf8"));
 		return data?.state?.workspace?.collectUsageDataStatus ?? "pending";
 	} catch {
 		return "pending";
 	}
+}
+
+export function resolveConsentStoreDirectory() {
+	if (process.env.GSENDER_USER_DATA) {
+		return process.env.GSENDER_USER_DATA;
+	}
+
+	const home = os.homedir();
+	const candidates = [];
+
+	if (process.platform === "darwin") {
+		for (const name of ELECTRON_APP_DATA_DIR_NAMES) {
+			candidates.push(path.join(home, "Library", "Application Support", name));
+		}
+	} else if (process.platform === "win32") {
+		const appData =
+			process.env.APPDATA || path.join(home, "AppData", "Roaming");
+		for (const name of ELECTRON_APP_DATA_DIR_NAMES) {
+			candidates.push(path.join(appData, name));
+		}
+	} else {
+		for (const name of ELECTRON_APP_DATA_DIR_NAMES) {
+			candidates.push(path.join(home, ".config", name));
+		}
+	}
+
+	for (const directory of candidates) {
+		if (fs.existsSync(path.join(directory, STORE_FILENAME))) {
+			return directory;
+		}
+	}
+
+	return candidates[0] || home;
 }
 
 function scrubString(value) {

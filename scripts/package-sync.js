@@ -34,6 +34,7 @@ const INTERNAL_PREFIXES = ["server/", "app/", "electron-app/"];
 const MANUAL_RUNTIME_DEPS = [
 	"@electron/remote",
 	"@sentry/electron",
+	"@sentry/node",
 	"@sentry/react",
 	"@serialport/parser-byte-length",
 	"@serialport/parser-readline",
