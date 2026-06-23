@@ -113,9 +113,14 @@ export function Config() {
 		_e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
 		index: number,
 	) {
-		document
-			.getElementById(`section-${index}`)
-			.scrollIntoView({ behavior: "instant" });
+		const sectionElement = document.getElementById(`section-${index}`);
+
+		if (!sectionElement) {
+			return;
+		}
+
+		sectionElement.scrollIntoView({ behavior: "instant" });
+
 		setTimeout(() => {
 			setVisibleSection(`h-section-${index}`);
 		}, 50);
