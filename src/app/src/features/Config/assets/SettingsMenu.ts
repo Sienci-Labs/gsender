@@ -52,6 +52,7 @@ import {
 	TOASTER_UNTIL_CLOSE,
 } from "app/lib/toaster/ToasterLib";
 import { convertToImperial } from "app/lib/units";
+import { updateSentryConsent } from "app/sentry-config";
 import store from "app/store";
 import reduxStore from "app/store/redux";
 import { updatePartialControllerSettings } from "app/store/redux/slices/controller.slice";
@@ -59,7 +60,6 @@ import isElectron from "is-electron";
 import findIndex from "lodash/findIndex";
 import get from "lodash/get";
 import posthog from "posthog-js";
-import { updateSentryConsent } from "app/sentry-config";
 import pubsub from "pubsub-js";
 import type { JSX } from "react";
 import type { IconType } from "react-icons";
