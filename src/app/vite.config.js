@@ -6,6 +6,23 @@ import { defineConfig } from "vite";
 import { patchCssModules } from "vite-css-modules";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 import tsconfigPaths from "vite-tsconfig-paths";
+import pkg from "./package.json";
+
+const sentryPlugins =
+	process.env.SENTRY_AUTH_TOKEN &&
+	process.env.SENTRY_ORG &&
+	process.env.SENTRY_PROJECT
+		? [
+				sentryVitePlugin({
+					org: process.env.SENTRY_ORG,
+					project: process.env.SENTRY_PROJECT,
+					authToken: process.env.SENTRY_AUTH_TOKEN,
+					release: {
+						name: pkg.version,
+					},
+				}),
+			]
+		: [];
 
 export default defineConfig({
 	root: path.resolve(__dirname, "./"), // Set root to the directory containing index.html
@@ -32,11 +49,7 @@ export default defineConfig({
 			include: ["process"],
 			globals: { global: true, process: true },
 		}),
-		sentryVitePlugin({
-			org: process.env.SENTRY_ORG,
-			project: process.env.SENTRY_PROJECT,
-			authToken: process.env.SENTRY_AUTH_TOKEN,
-		}),
+		...sentryPlugins,
 	],
 	resolve: {
 		alias: {
