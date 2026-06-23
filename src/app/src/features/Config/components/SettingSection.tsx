@@ -1,8 +1,8 @@
-import React, { JSX, useCallback } from "react";
-import { gSenderSetting } from "app/features/Config/assets/SettingsMenu.ts";
+import type { gSenderSetting } from "app/features/Config/assets/SettingsMenu.ts";
 import { SettingRow } from "app/features/Config/components/SettingRow.tsx";
 import { useSettings } from "app/features/Config/utils/SettingsContext.tsx";
 import cn from "classnames";
+import React, { type JSX, useCallback } from "react";
 
 interface SettingSectionProps {
 	settings: gSenderSetting[];

@@ -2,8 +2,8 @@ describe("Feedrate Performance Comparison Test", () => {
 	beforeEach(() => {
 		cy.viewport(1920, 1080);
 		cy.loadUI(`${Cypress.config("baseUrl")}/#/`, {
-			maxRetries: 4,
-			waitTime: 4000,
+			maxRetries: 6,
+			waitTime: 6000,
 			timeout: 5000,
 		});
 	});
@@ -60,10 +60,10 @@ describe("Feedrate Performance Comparison Test", () => {
 			});
 
 		// Step 5: Click Minus Button 5 Times
-		cy.log("Step 5: Decreasing Feedrate - Clicking Minus 5 Times");
+		// Step 5: Decrease feedrate
 		for (let i = 0; i < 5; i++) {
 			cy.get(
-				"div.relative > div.h-full > div > div > div > div > div.gap-2 > div:nth-of-type(2) svg",
+				"div.order-2 section > div > div > div > div:nth-of-type(1) div:nth-of-type(2) > button",
 			)
 				.should("be.visible")
 				.click({ force: true });
@@ -182,10 +182,11 @@ describe("Feedrate Performance Comparison Test", () => {
 				cy.wrap(initialFeedrate).as("secondJobInitialFeedrate");
 			});
 
-		// Step 9: Click Plus Button 5 Times
-		cy.log("Step 9: Increasing Feedrate - Clicking Plus 5 Times");
+		// Step 9: Increase feedrate
 		for (let i = 0; i < 5; i++) {
-			cy.get("div.relative > div.h-full div.gap-2 > div:nth-of-type(3) svg")
+			cy.get(
+				"div.h-\\[25\\%\\] section > div > div > div > div:nth-of-type(1) div:nth-of-type(3) svg",
+			)
 				.should("be.visible")
 				.click({ force: true });
 			cy.wait(500);

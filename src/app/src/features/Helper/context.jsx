@@ -25,7 +25,13 @@ import { Toaster } from "app/lib/toaster/ToasterLib";
 import reduxStore from "app/store/redux";
 import { disableWizard } from "app/store/redux/slices/helper.slice";
 import _ from "lodash";
-import React, { createContext, useContext, useMemo, useState } from "react";
+import React, {
+	createContext,
+	useContext,
+	useEffect,
+	useMemo,
+	useState,
+} from "react";
 
 const WizardContext = createContext({});
 const WizardAPI = createContext({});
@@ -39,6 +45,8 @@ export const WizardProvider = ({ children }) => {
 	const [completedStep, setCompletedStep] = useState(-1);
 	const [completedSubStep, setCompletedSubStep] = useState(-1);
 	const [intro, setIntro] = useState(null);
+	const [toolchangeContext, setToolchangeContext] = useState(null);
+	const [toolchangeComment, setToolchangeComment] = useState("");
 	const [activeStep, setActiveStep] = useState(0);
 	const [activeSubstep, setActiveSubstep] = useState(0);
 	const [title, setTitle] = useState("Wizard");
@@ -48,6 +56,27 @@ export const WizardProvider = ({ children }) => {
 	const [minimized, setMinimized] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 	const [overlay, setOverlay] = useState(false);
+
+	// Auto-close when activeStep reaches or exceeds stepCount.
+	// completeSubStep sets activeStep = lastStep+1 before setVisible(false);
+	// if the close branch is missed due to a stale closure, this catches it.
+	useEffect(() => {
+		if (visible && stepCount > 0 && activeStep >= stepCount) {
+			setVisible(false);
+			setCompletedStep(-1);
+			setCompletedSubStep(-1);
+			setActiveStep(0);
+			setActiveSubstep(0);
+			setTitle("Wizard");
+			setSteps([]);
+			setIntro(null);
+			setToolchangeContext(null);
+			setToolchangeComment("");
+			setStepCount(0);
+			setMinimized(false);
+			reduxStore.dispatch(disableWizard());
+		}
+	}, [activeStep, stepCount, visible]);
 
 	// Memoized API for context, can be fetched separate to data context
 	const api = useMemo(
@@ -147,8 +176,7 @@ export const WizardProvider = ({ children }) => {
 					};
 					if (stepIndex >= maxStepIndex) {
 						// reset values
-						const element = document.getElementById("step-0-0");
-						element.scrollIntoView();
+						document.getElementById("step-0-0")?.scrollIntoView();
 						setVisible(false);
 						setCompletedStep(-1);
 						setCompletedSubStep(-1);
@@ -156,6 +184,9 @@ export const WizardProvider = ({ children }) => {
 						setActiveSubstep(0);
 						setTitle("Wizard");
 						setSteps([]);
+						setIntro(null);
+						setToolchangeContext(null);
+						setToolchangeComment("");
 						setStepCount(0);
 						setMinimized(false);
 						reduxStore.dispatch(disableWizard());
@@ -172,8 +203,7 @@ export const WizardProvider = ({ children }) => {
 				// close window on everything done.
 				if (activeStep >= maxStepIndex) {
 					// reset values
-					const element = document.getElementById("step-0-0");
-					element.scrollIntoView();
+					document.getElementById("step-0-0")?.scrollIntoView();
 					setVisible(false);
 					setCompletedStep(-1);
 					setCompletedSubStep(-1);
@@ -181,6 +211,9 @@ export const WizardProvider = ({ children }) => {
 					setActiveSubstep(0);
 					setTitle("Wizard");
 					setSteps([]);
+					setIntro(null);
+					setToolchangeContext(null);
+					setToolchangeComment("");
 					setStepCount(0);
 					setMinimized(false);
 					return {};
@@ -209,7 +242,7 @@ export const WizardProvider = ({ children }) => {
 				}
 				return completedSubStep > substepIndex && stepIndex === completedStep;
 			},
-			load: (instructions, title) => {
+			load: (instructions, title, metadata = {}) => {
 				if (!instructions || !instructions.steps) {
 					return;
 				}
@@ -224,9 +257,9 @@ export const WizardProvider = ({ children }) => {
 				setSteps([...instructions.steps]);
 				setStepCount(instructions.steps.length);
 				setTitle(title);
-				if (instructions.intro) {
-					setIntro(instructions.intro.description);
-				}
+				setIntro(instructions.intro?.description ?? null);
+				setToolchangeContext(metadata.context ?? null);
+				setToolchangeComment(metadata.comment ?? "");
 
 				setActiveStep(0);
 				setVisible(true);
@@ -274,8 +307,7 @@ export const WizardProvider = ({ children }) => {
 				return substep.actions.length > 0 && substep.actionTaken === false;
 			},
 			cancelToolchange: () => {
-				const element = document.getElementById("step-0-0");
-				element.scrollIntoView();
+				document.getElementById("step-0-0")?.scrollIntoView();
 				setVisible(false);
 				setCompletedStep(-1);
 				setCompletedSubStep(-1);
@@ -283,6 +315,9 @@ export const WizardProvider = ({ children }) => {
 				setActiveSubstep(0);
 				setTitle("Wizard");
 				setSteps([]);
+				setIntro(null);
+				setToolchangeContext(null);
+				setToolchangeComment("");
 				setStepCount(0);
 				setMinimized(false);
 				setIsLoading(false);
@@ -325,6 +360,8 @@ export const WizardProvider = ({ children }) => {
 				isLoading,
 				overlay,
 				intro,
+				toolchangeContext,
+				toolchangeComment,
 			}}
 		>
 			<WizardAPI.Provider value={api}>{children}</WizardAPI.Provider>

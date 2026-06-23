@@ -20,6 +20,7 @@ interface ToolTimelineItemProps {
 	probeState?: ToolProbeState;
 	canRemap?: boolean;
 	remapDisabled?: boolean;
+	showProbeStatus?: boolean;
 	handleRemap?: (number) => void;
 }
 
@@ -34,6 +35,7 @@ export function ToolTimelineItem({
 	probeState = "unprobed",
 	canRemap = false,
 	remapDisabled = false,
+	showProbeStatus = true,
 }: ToolTimelineItemProps) {
 	const [label, setLabel] = useState("");
 
@@ -117,17 +119,27 @@ export function ToolTimelineItem({
 								</Tooltip>
 							</>
 						)}
+						{!hasNickname && tool.comment && (
+							<>
+								<span className="text-gray-500 dark:text-gray-400">·</span>
+								<span className="text-xs text-gray-500 dark:text-gray-400 truncate">
+									{tool.comment}
+								</span>
+							</>
+						)}
 					</div>
 
-					<div className="flex items-center gap-2">
-						<ToolStatusBadges
-							probeState={probeState}
-							isManual={isManual}
-							size="sm"
-							manualPosition="after"
-							className="[&>div:first-child]:min-w-[124px]"
-						/>
-					</div>
+					{showProbeStatus && (
+						<div className="flex items-center gap-2">
+							<ToolStatusBadges
+								probeState={probeState}
+								isManual={isManual}
+								size="sm"
+								manualPosition="after"
+								className="[&>div:first-child]:min-w-[124px]"
+							/>
+						</div>
+					)}
 				</div>
 
 				<div className="flex flex-shrink-0 items-center gap-3 self-stretch">

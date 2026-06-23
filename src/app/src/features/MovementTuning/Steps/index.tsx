@@ -11,6 +11,11 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 } from "app/components/shadcn/AlertDialog";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "app/components/shadcn/Popover";
 import { GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG } from "app/constants";
 import type { EEPROM } from "app/definitions/firmware";
 import { jogAxis } from "app/features/Jogging/utils/Jogging";
@@ -21,7 +26,7 @@ import { toFixedIfNecessary } from "app/lib/rounding";
 import { toast } from "app/lib/toaster";
 import { useState } from "react";
 import { FaClipboard, FaClipboardCheck, FaClipboardList } from "react-icons/fa";
-import { LuRefreshCw } from "react-icons/lu";
+import { LuMove, LuRefreshCw } from "react-icons/lu";
 import Select from "react-select";
 import { Jogging } from "../../Jogging";
 import xAxisCalibrationImage1 from "../assets/X_axis-calibration_1.png";
@@ -281,6 +286,19 @@ const Steps = () => {
 							icon={<LuRefreshCw className="w-4 h-4" />}
 							text="Restart Wizard"
 						/>
+						<Popover>
+							<PopoverTrigger asChild>
+								<Button
+									variant="outline"
+									icon={<LuMove className="w-4 h-4" />}
+									text="Jog Controls"
+								/>
+							</PopoverTrigger>
+
+							<PopoverContent className="w-auto">
+								<Jogging />
+							</PopoverContent>
+						</Popover>
 					</div>
 				</div>
 			);
@@ -302,6 +320,19 @@ const Steps = () => {
 						icon={<LuRefreshCw className="w-4 h-4" />}
 						text="Restart Wizard"
 					/>
+					<Popover>
+						<PopoverTrigger asChild>
+							<Button
+								variant="outline"
+								icon={<LuMove className="w-4 h-4" />}
+								text="Jog Controls"
+							/>
+						</PopoverTrigger>
+
+						<PopoverContent className="w-auto">
+							<Jogging />
+						</PopoverContent>
+					</Popover>
 				</div>
 			</div>
 		);
@@ -487,9 +518,23 @@ const Steps = () => {
 					icon={<LuRefreshCw className="w-4 h-4" />}
 					text="Restart Wizard"
 				/>
+				<Popover>
+					<PopoverTrigger asChild>
+						<Button
+							variant="outline"
+							icon={<LuMove className="w-4 h-4" />}
+							text="Jog Controls"
+						/>
+					</PopoverTrigger>
+
+					<PopoverContent className="w-auto">
+						<Jogging />
+					</PopoverContent>
+				</Popover>
 			</div>
 		</div>
 	);
 };
 
 export default Steps;
+export { calculateNewStepsPerMM } from "../utils";

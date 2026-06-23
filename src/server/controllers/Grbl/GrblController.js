@@ -26,72 +26,74 @@ import ensureArray from "ensure-array";
 import * as parser from "gcode-parser";
 import _ from "lodash";
 import map from "lodash/map";
-import GcodeToolpath from "../../lib/GcodeToolpath";
-import EventTrigger from "../../lib/EventTrigger";
-import Feeder from "../../lib/Feeder";
-import ToolChanger from "../../lib/ToolChanger";
-import Sender, { SP_TYPE_CHAR_COUNTING } from "../../lib/Sender";
-import Workflow, {
-	WORKFLOW_STATE_IDLE,
-	WORKFLOW_STATE_PAUSED,
-	WORKFLOW_STATE_RUNNING,
-} from "../../lib/Workflow";
-import delay from "../../lib/delay";
-import ensurePositiveNumber from "../../lib/ensure-positive-number";
-import evaluateAssignmentExpression from "../../lib/evaluate-assignment-expression";
-import logger from "../../lib/logger";
-import translateExpression from "../../lib/translate-expression";
-import config from "../../services/configstore";
-import monitor from "../../services/monitor";
-import taskRunner from "../../services/taskrunner";
-import store from "../../store";
 import {
-	GLOBAL_OBJECTS as globalObjects,
-	WRITE_SOURCE_CLIENT,
-	WRITE_SOURCE_FEEDER,
-	A_AXIS_COMMANDS,
-	Y_AXIS_COMMANDS,
-} from "../constants";
-import GrblRunner from "./GrblRunner";
-import {
-	GRBL,
-	GRBL_ACTIVE_STATE_RUN,
-	GRBL_ACTIVE_STATE_HOME,
-	GRBL_ACTIVE_STATE_ALARM,
-	GRBL_ACTIVE_STATE_IDLE,
-	GRBL_REALTIME_COMMANDS,
-	GRBL_ALARMS,
-	GRBL_ERRORS,
-	GRBL_SETTINGS,
-} from "./constants";
-import {
+	ALARM,
+	CONTROLLER_READY,
+	CYCLE_START,
+	ERROR,
+	FEED_HOLD,
+	FILE_TYPE,
+	FILE_UNLOAD,
+	HOMING,
+	MACRO_LOAD,
+	MACRO_RUN,
 	METRIC_UNITS,
+	PROGRAM_END,
 	PROGRAM_PAUSE,
 	PROGRAM_RESUME,
 	PROGRAM_START,
-	PROGRAM_END,
-	CONTROLLER_READY,
-	FEED_HOLD,
-	CYCLE_START,
-	HOMING,
 	SLEEP,
-	MACRO_RUN,
-	MACRO_LOAD,
-	FILE_UNLOAD,
-	FILE_TYPE,
-	ALARM,
-	ERROR,
 } from "../../../app/src/constants";
+import delay from "../../lib/delay";
+import EventTrigger from "../../lib/EventTrigger";
+import ensurePositiveNumber from "../../lib/ensure-positive-number";
+import evaluateAssignmentExpression from "../../lib/evaluate-assignment-expression";
+import { extractRealtimeCommands } from "../../lib/extract-realtime-commands";
+import Feeder from "../../lib/Feeder";
+import GcodeToolpath from "../../lib/GcodeToolpath";
+import {
+	GCODE_TRANSLATION_TYPE,
+	translateGcode,
+} from "../../lib/gcode-translation";
 import {
 	determineMachineZeroFlagSet,
 	determineMaxMovement,
 	getAxisMaximumLocation,
 } from "../../lib/homing";
+import logger from "../../lib/logger";
+import Sender, { SP_TYPE_CHAR_COUNTING } from "../../lib/Sender";
+import ToolChanger from "../../lib/ToolChanger";
+import translateExpression from "../../lib/translate-expression";
+import Workflow, {
+	WORKFLOW_STATE_IDLE,
+	WORKFLOW_STATE_PAUSED,
+	WORKFLOW_STATE_RUNNING,
+} from "../../lib/Workflow";
+import config from "../../services/configstore";
+import monitor from "../../services/monitor";
+import taskRunner from "../../services/taskrunner";
+import store from "../../store";
+import {
+	A_AXIS_COMMANDS,
+	GLOBAL_OBJECTS as globalObjects,
+	WRITE_SOURCE_CLIENT,
+	WRITE_SOURCE_FEEDER,
+	Y_AXIS_COMMANDS,
+} from "../constants";
 import { calcOverrides } from "../runOverride";
 import {
-	GCODE_TRANSLATION_TYPE,
-	translateGcode,
-} from "../../lib/gcode-translation";
+	GRBL,
+	GRBL_ACTIVE_STATE_ALARM,
+	GRBL_ACTIVE_STATE_HOME,
+	GRBL_ACTIVE_STATE_IDLE,
+	GRBL_ACTIVE_STATE_RUN,
+	GRBL_ALARMS,
+	GRBL_ERRORS,
+	GRBL_REALTIME_COMMANDS,
+	GRBL_SETTINGS,
+} from "./constants";
+import GrblRunner from "./GrblRunner";
+
 // % commands
 const WAIT = "%wait";
 const PREHOOK_COMPLETE = "%pre_complete";
@@ -238,6 +240,9 @@ class GrblController {
 
 		// Connection
 		this.connection = connection;
+		if (!this.connection) {
+			throw new Error("connection must be specified");
+		}
 
 		this.connection.setWriteFilter((data) => {
 			const line = data.trim();
@@ -248,7 +253,7 @@ class GrblController {
 
 			{
 				// Grbl settings: $0-$255
-				const r = line.match(/^(\$\d{1,3})=([\d\.]+)$/);
+				const r = line.match(/^(\$\d{1,3})=([\d.]+)$/);
 				if (r) {
 					const name = r[1];
 					const value = Number(r[2]);
@@ -264,7 +269,7 @@ class GrblController {
 					}
 				}
 			}
-			return data.replace(/\([^\)]*\)/gm, "");
+			return data.replace(/\([^)]*\)/gm, "");
 		});
 
 		// Event Trigger
@@ -282,8 +287,8 @@ class GrblController {
 		// Feeder
 		this.feeder = new Feeder({
 			dataFilter: (line, context) => {
-				let commentMatcher = /\s*;.*/g;
-				let comment = line.match(commentMatcher);
+				const commentMatcher = /\s*;.*/g;
+				const comment = line.match(commentMatcher);
 				const commentString =
 					comment && comment[0].length > 0
 						? comment[0].trim().replace(";", "")
@@ -339,6 +344,15 @@ class GrblController {
 
 				// line="G0 X[posx - 8] Y[ymax]"
 				// > "G0 X2 Y50"
+
+				// [\xNN] realtime-command tokens — write immediately, strip from line
+				{
+					const { line: rtLine, realtimeCmds } = extractRealtimeCommands(line);
+					realtimeCmds.forEach((cmd) => this.connection.writeImmediate(cmd));
+					line = rtLine;
+					if (!line) return "";
+				}
+
 				line = translateExpression(line, context);
 				const data = parser.parseLine(line, { flatten: true });
 				const words = ensureArray(data.words);
@@ -453,16 +467,21 @@ class GrblController {
 			bufferSize: 128 - 28, // The default buffer size is 128 bytes
 			dataFilter: (line, context) => {
 				// Remove comments that start with a semicolon `;`
-				let commentMatcher = /\s*;.*/g;
-				let bracketCommentLine = /\s*\(.*\)*\)/gm;
-				let toolCommand = /(T)(-?\d*\.?\d+\.?)/;
-				line = line.replace(bracketCommentLine, "").trim();
-				let comment = line.match(commentMatcher);
-				let commentString =
-					comment && comment[0].length > 0
-						? comment[0].trim().replace(";", "")
-						: "";
-				line = line.replace(commentMatcher, "").trim();
+				const commentMatcher = /\s*;.*/g;
+				const bracketCommentLine = /\s*\(.*\)*\)/gm;
+				const toolCommand = /(T)(-?\d*\.?\d+\.?)/;
+				const commentRegex = /\(([^)]*)\)|;(.*)/g;
+				const commentParts = [];
+				let m;
+				while ((m = commentRegex.exec(line)) !== null) {
+					const text = (m[1] !== undefined ? m[1] : m[2]).trim();
+					if (text) commentParts.push(text);
+				}
+				const commentString = commentParts.join(" ");
+				if (line[0] !== "%") {
+					line = line.replace(bracketCommentLine, "").trim();
+					line = line.replace(commentMatcher, "").trim();
+				}
 				context = this.populateContext(context);
 
 				const { sent, received } = this.sender.state;
@@ -542,14 +561,13 @@ class GrblController {
 
 					const { toolChangeOption } = this.toolChangeContext;
 
-					let tool = line.match(toolCommand);
+					const tool = line.match(toolCommand);
+					const toolLabel = tool?.[0] || null;
+					const toolNumber = tool?.[2] || null;
 
 					// Handle specific cases for macro and pause, ignore is default and comments line out with no other action
 					// If toolchange is at very beginning of file, ignore it
 					if (toolChangeOption !== "Ignore") {
-						if (tool) {
-							commentString = `(${tool?.[0]}) ` + commentString;
-						}
 						this.workflow.pause({ data: "M6", comment: commentString });
 
 						if (toolChangeOption === "Code") {
@@ -560,15 +578,15 @@ class GrblController {
 
 							this.toolChanger.addInterval(() => {
 								// Emit the current state so latest tool info is available
-								this.runner.setTool(tool?.[2]); // set tool in runner state
-								this.emit("controller:state", GRBL, this.state, tool?.[2]); // set tool in redux
+								this.runner.setTool(toolNumber); // set tool in runner state
+								this.emit("controller:state", GRBL, this.state, toolNumber); // set tool in redux
 								this.emit(
 									"gcode:toolChange",
 									{
 										line: sent + 1,
 										count,
 										block: line,
-										tool: tool,
+										tool: toolLabel,
 										option: toolChangeOption,
 									},
 									commentString,
@@ -682,7 +700,7 @@ class GrblController {
 		this.workflow.on("resume", (...args) => {
 			this.emit("workflow:state", this.workflow.state);
 
-			let pauseTime = new Date().getTime() - this.timePaused;
+			const pauseTime = new Date().getTime() - this.timePaused;
 
 			// Reset feeder prior to resume program execution
 			this.feeder.reset();
@@ -1243,6 +1261,9 @@ class GrblController {
 		// Program feedrate
 		const programFeedrate = this.runner.getCurrentFeedrate();
 
+		// Spindle RPM
+		const spindleRate = this.runner.getCurrentSpindleRate();
+
 		return Object.assign(context || {}, {
 			// User-defined global variables
 			global: this.sharedContext,
@@ -1293,6 +1314,9 @@ class GrblController {
 
 			// Program Feedrate
 			programFeedrate: programFeedrate,
+
+			// Current spindle RPM
+			spindleRate: spindleRate,
 
 			// Global objects
 			...globalObjects,
@@ -1536,7 +1560,7 @@ class GrblController {
 	command(cmd, ...args) {
 		const handler = {
 			"firmware:recievedProfiles": () => {
-				let [files] = args;
+				const [files] = args;
 				this.emit("task:finish", files);
 			},
 			"firmware:grabMachineProfile": () => {
@@ -1546,7 +1570,7 @@ class GrblController {
 			"gcode:load": () => {
 				let [meta, gcode, context = {}, callback = noop] = args;
 				const { name } = meta;
-				const bracketCommentLine = /\([^\)]*\)/gm;
+				const bracketCommentLine = /\([^)]*\)/gm;
 
 				if (typeof context === "function") {
 					callback = context;
@@ -1564,7 +1588,7 @@ class GrblController {
 				const delay = _.get(preferences, "spindleDelay", 0);
 
 				// test if there is a G4 command already
-				const delayRegex = new RegExp("(G4 ?P?[0-9]+)");
+				const delayRegex = /(G4 ?P?[0-9]+)/;
 				// only add one if there isn't
 				if (Number(delay) && !delayRegex.test(gcode)) {
 					gcode = gcode.replace(
@@ -1615,7 +1639,16 @@ class GrblController {
 				this.command("gcode:start");
 			},
 			"gcode:start": () => {
-				const [lineToStartFrom, zMax, safeHeight = 10, spindleDelay = 1] = args;
+				const preferences = store.get("preferences", {});
+				const defaultSpindleDelay = Number(
+					_.get(preferences, "spindleDelay", 0),
+				);
+				const [
+					lineToStartFrom,
+					zMax,
+					safeHeight = 10,
+					spindleDelay = defaultSpindleDelay,
+				] = args;
 				const totalLines = this.sender.state.total;
 				const startEventEnabled = this.event.hasEnabledEvent(PROGRAM_START);
 				log.info(startEventEnabled);
@@ -1631,7 +1664,7 @@ class GrblController {
 					let spindleRate = 0;
 
 					const getWordValue = (token, words) => {
-						for (let wordPair of words) {
+						for (const wordPair of words) {
 							const [word, value] = wordPair;
 							if (word === token) {
 								return value;
@@ -1893,7 +1926,7 @@ class GrblController {
 				const [value] = args;
 				const [feedOV] = this.state.status.ov;
 
-				let diff = value - feedOV;
+				const diff = value - feedOV;
 
 				if (value === 100) {
 					this.FOQueue.push(String.fromCharCode(0x90));
@@ -2035,7 +2068,7 @@ class GrblController {
 				let unitModal = units === METRIC_UNITS ? "G21" : "G20";
 				let { $20, $130, $131, $132, $23, $13 } = this.settings.settings;
 
-				let jogFeedrate = unitModal === "G21" ? 3000 : 118;
+				const jogFeedrate = unitModal === "G21" ? 3000 : 118;
 
 				if ($20 === "1") {
 					$130 = Number($130);
@@ -2070,7 +2103,7 @@ class GrblController {
 						}
 					};
 
-					let { mpos } = this.state.status;
+					const { mpos } = this.state.status;
 					Object.keys(mpos).forEach((axis) => {
 						const val = Number(mpos[axis]);
 

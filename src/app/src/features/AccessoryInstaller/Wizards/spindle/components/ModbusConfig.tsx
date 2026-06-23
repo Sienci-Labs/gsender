@@ -1,11 +1,11 @@
-import { useState } from "react";
-import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
-import { RootState } from "app/store/redux";
-import controller from "app/lib/controller.ts";
 import { StepActionButton } from "app/components/Wizard/StepActionButton.tsx";
-import { StepProps } from "app/components/Wizard/types";
-import { firmwarePastVersion } from "app/lib/firmwareSemver.ts";
+import type { StepProps } from "app/components/Wizard/types";
 import { ATCI_SUPPORTED_VERSION } from "app/features/ATC/utils/ATCiConstants.ts";
+import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
+import controller from "app/lib/controller.ts";
+import { firmwarePastVersion } from "app/lib/firmwareSemver.ts";
+import type { RootState } from "app/store/redux";
+import { useState } from "react";
 
 export function ModbusConfig({ onComplete, onUncomplete }: StepProps) {
 	const [hasConfiguredModbus, setHasConfiguredModbus] =

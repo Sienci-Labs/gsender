@@ -1,10 +1,10 @@
 import { ATCI_SUPPORTED_VERSION } from "app/features/ATC/utils/ATCiConstants.ts";
 import { firmwarePastVersion } from "app/lib/firmwareSemver.ts";
-import { grblCoreGcode, sienciHalGcode } from "./SpindleConfig.tsx";
+import { getGrblCoreGcode, sienciHalGcode } from "./SpindleConfig.tsx";
 
 export function SpindleGcodePreview() {
 	const isGrblCore = firmwarePastVersion(ATCI_SUPPORTED_VERSION);
-	const lines = isGrblCore ? grblCoreGcode : sienciHalGcode;
+	const lines = isGrblCore ? getGrblCoreGcode() : sienciHalGcode;
 	const label = isGrblCore
 		? `grblHAL (>${ATCI_SUPPORTED_VERSION})`
 		: `sienciHAL (< ${ATCI_SUPPORTED_VERSION})`;

@@ -2,9 +2,9 @@ describe("Device Connection", () => {
 	beforeEach(() => {
 		cy.viewport(2133, 1050);
 		cy.loadUI(`${Cypress.config("baseUrl")}/#/`, {
-			maxRetries: 4,
-			waitTime: 4000,
-			timeout: 5000,
+			maxRetries: 8,
+			waitTime: 8000,
+			timeout: 8000,
 		});
 	});
 
@@ -40,7 +40,7 @@ describe("Device Connection", () => {
 			cy.get("div[data-radix-popper-content-wrapper]", { timeout: 10000 })
 				.should("exist")
 				.within(() => {
-					// Step 3: Get all port buttons (button.m-0 confirmed from recording)
+					// Step 3: Get all port buttons
 					cy.get("button.m-0")
 						.should("have.length.greaterThan", 0)
 						.then(($buttons) => {

@@ -24,18 +24,18 @@
 import events from "events";
 import _ from "lodash";
 import decimalPlaces from "../../lib/decimal-places";
+import logger from "../../lib/logger";
+import { GRBL_ACTIVE_STATE_ALARM, GRBL_ACTIVE_STATE_IDLE } from "./constants";
 import GrblLineParser from "./GrblLineParser";
-import GrblLineParserResultStatus from "./GrblLineParserResultStatus";
-import GrblLineParserResultOk from "./GrblLineParserResultOk";
-import GrblLineParserResultError from "./GrblLineParserResultError";
 import GrblLineParserResultAlarm from "./GrblLineParserResultAlarm";
-import GrblLineParserResultParserState from "./GrblLineParserResultParserState";
-import GrblLineParserResultParameters from "./GrblLineParserResultParameters";
+import GrblLineParserResultError from "./GrblLineParserResultError";
 import GrblLineParserResultFeedback from "./GrblLineParserResultFeedback";
+import GrblLineParserResultOk from "./GrblLineParserResultOk";
+import GrblLineParserResultParameters from "./GrblLineParserResultParameters";
+import GrblLineParserResultParserState from "./GrblLineParserResultParserState";
 import GrblLineParserResultSettings from "./GrblLineParserResultSettings";
 import GrblLineParserResultStartup from "./GrblLineParserResultStartup";
-import logger from "../../lib/logger";
-import { GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_ALARM } from "./constants";
+import GrblLineParserResultStatus from "./GrblLineParserResultStatus";
 
 const log = logger("controller:Grbl");
 
@@ -280,6 +280,11 @@ class GrblRunner extends events.EventEmitter {
 	getCurrentFeedrate(state = this.state) {
 		const value = _.get(state, "parserstate.feedrate");
 		return `F${value}`;
+	}
+
+	getCurrentSpindleRate(state = this.state) {
+		const value = _.get(state, "parserstate.spindle");
+		return `${value}`;
 	}
 
 	getParameters() {

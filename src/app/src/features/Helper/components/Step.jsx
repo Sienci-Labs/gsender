@@ -21,48 +21,37 @@
  *
  */
 
+import cx from "classnames";
 import React from "react";
-import { FaCheck } from "react-icons/fa";
-import styles from "../index.module.styl";
 
-const Step = ({ step, index = 1, active, complete }) => {
-	const getTitleClass = () => {
-		if (active) {
-			return "stepTitle-active";
-		}
-		if (complete) {
-			return "stepTitle";
-		}
-		return "stepTitle-future";
-	};
-	const getStepIndexClass = () => {
-		if (active) {
-			return "stepIndex-active";
-		}
-		if (complete) {
-			return "stepIndex-complete";
-		}
-		return "stepIndex";
-	};
-
+const Step = ({ step, index = 0, active }) => {
 	return (
-		<div className={active ? styles.stepActive : styles.step}>
-			<div className={styles[getStepIndexClass()]}>
-				{complete ? <FaCheck /> : index + 1}
+		<div
+			className={cx(
+				"px-3.5 py-2.5 border-l-2 cursor-default select-none",
+				active
+					? "border-l-blue-600 dark:border-l-blue-400 bg-blue-50 dark:bg-[#1a1f30]"
+					: "border-l-transparent",
+			)}
+		>
+			<div className="text-[10px] text-gray-400 dark:text-gray-500 mb-0.5">
+				Step {index + 1}
 			</div>
-			<div className={styles.stepText}>
-				<span className={styles[getTitleClass()]}>Step {index + 1}</span>
-				<span
-					className={
-						active ? styles.stepperDescriptionActive : styles.stepperDescription
-					}
-				>
-					{step.title}
-				</span>
-				{step.firstRunOnly && (
-					<span className={styles.firstRunBadge}>First Run Only</span>
+			<div
+				className={cx(
+					"text-xs font-medium leading-snug",
+					active
+						? "text-blue-700 dark:text-blue-300"
+						: "text-gray-500 dark:text-gray-500",
 				)}
+			>
+				{step.title}
 			</div>
+			{step.firstRunOnly && (
+				<span className="mt-1 inline-block text-[10px] px-1.5 py-0.5 rounded bg-amber-100 dark:bg-[#2a1e00] text-amber-800 dark:text-amber-400">
+					First run only
+				</span>
+			)}
 		</div>
 	);
 };

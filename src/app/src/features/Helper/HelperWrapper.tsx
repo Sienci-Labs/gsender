@@ -41,8 +41,8 @@ const HelperWrapper = () => {
 	useEffect(() => {
 		const tokens = [
 			pubsub.subscribe("wizard:load", (_, payload) => {
-				const { instructions, title } = payload;
-				load(instructions, title);
+				const { instructions, title, context, comment } = payload;
+				load(instructions, title, { context, comment });
 				updateSubstepOverlay(
 					{ activeStep: 0, activeSubstep: 0 },
 					instructions.steps,

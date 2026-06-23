@@ -46,6 +46,14 @@ export function EEPROMSection({
 	};
 
 	function handleSingleSettingReset(setting, value) {
+		setEEPROM((prev) => {
+			const updated = [...prev];
+			const idx = updated.findIndex((e) => e.setting === setting);
+			if (idx !== -1) {
+				updated[idx] = { ...updated[idx], dirty: false, value };
+			}
+			return updated;
+		});
 		controller.command("gcode", [`${setting}=${value}`, "$$"]);
 		toast.success(`Restored ${setting} to default value of ${value}`, {
 			position: "bottom-right",

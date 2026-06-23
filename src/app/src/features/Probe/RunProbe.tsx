@@ -32,6 +32,7 @@ import {
 import { PROBING_CATEGORY } from "app/constants";
 import useShuttleEvents from "app/hooks/useShuttleEvents";
 import { useTypedSelector } from "app/hooks/useTypedSelector";
+import { TOUCHPLATE_TYPE_3D, TOUCHPLATE_TYPE_ZERO } from "app/lib/constants";
 import { toast } from "app/lib/toaster";
 import useKeybinding from "app/lib/useKeybinding";
 import cx from "classnames";
@@ -40,7 +41,6 @@ import type { Actions, State } from "./definitions";
 import ProbeCircuitStatus from "./ProbeCircuitStatus";
 import ProbeDirectionSelection from "./ProbeDirectionSelection";
 import ProbeImage from "./ProbeImage";
-import { TOUCHPLATE_TYPE_3D, TOUCHPLATE_TYPE_ZERO } from "app/lib/constants";
 
 interface RunProbeProps {
 	state: State;
@@ -71,11 +71,11 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
 
 	useEffect(() => {
 		if (!connectivityTest) {
-			actions.setProbeConnectivity(true);
+			actionsRef.current.setProbeConnectivity(true);
 		} else if (probePinStatus) {
-			actions.setProbeConnectivity(true);
+			actionsRef.current.setProbeConnectivity(true);
 		}
-	}, [connectivityTest, probePinStatus, actions]);
+	}, [connectivityTest, probePinStatus]);
 
 	const [testInterval, setTestInterval] = useState<NodeJS.Timeout>(null);
 

@@ -23,38 +23,38 @@
 
 import events from "events";
 import _ from "lodash";
+import GrblHalLineParserResultATCI from "server/controllers/Grblhal/GrblHalLineParserResultATCI";
+import GrblHalLineParserResultCompleteStatus from "server/controllers/Grblhal/GrblHalLineParserResultCompleteStatus";
+import GrblHalLineParserResultJSON from "server/controllers/Grblhal/GrblHalLineParserResultJSON";
+import GrblHalLineParserResultSpindle from "server/controllers/Grblhal/GrblHalLineParserResultSpindle";
 import decimalPlaces from "../../lib/decimal-places";
-import GrblHalLineParser from "./GrblHalLineParser";
-import GrblHalLineParserResultStatus from "./GrblHalLineParserResultStatus";
-import GrblHalLineParserResultOk from "./GrblHalLineParserResultOk";
-import GrblHalLineParserResultError from "./GrblHalLineParserResultError";
-import GrblHalLineParserResultAlarm from "./GrblHalLineParserResultAlarm";
-import GrbHalLineParserResultParserState from "./GrblHalLineParserResultParserState";
-import GrblHalLineParserResultParameters from "./GrblHalLineParserResultParameters";
-import GrblHalLineParserResultFeedback from "./GrblHalLineParserResultFeedback";
-import GrblHalLineParserResultSettings from "./GrblHalLineParserResultSettings";
-import GrblHalLineParserResultStartup from "./GrblHalLineParserResultStartup";
-import GrblHalLineParserResultSettingDescription from "./GrblHalLineParserResultSettingDescription";
-import GrblHalLineParserResultVersion from "./GrblHalLineParserResultVersion";
-import GrblHalLineParserResultCode from "./GrblHalLineParserResultCode";
 import logger from "../../lib/logger";
 import {
-	GRBL_HAL_ACTIVE_STATE_IDLE,
 	GRBL_HAL_ACTIVE_STATE_ALARM,
 	GRBL_HAL_ACTIVE_STATE_CHECK,
+	GRBL_HAL_ACTIVE_STATE_IDLE,
 } from "./constants";
-import GrblHalLineParserResultInfo from "./GrblHalLineParserResultInfo";
-import GrblHalLineParserResultSettingDetails from "./GrblHalLineParserResultSettingDetails";
-import GrblHalLineParserResultCompleteStatus from "server/controllers/Grblhal/GrblHalLineParserResultCompleteStatus";
-import GrblHalLineParserResultAXS from "./GrblHalLineParserResultAXS";
-import GrblHalLineParserResultGroupDetail from "./GrblHalLineParserResultGroupDetail";
-import GrblHalLineParserResultAlarmDetails from "./GrblHalLineParserResultAlarmDetails";
-import GrblHalLineParserResultSpindle from "server/controllers/Grblhal/GrblHalLineParserResultSpindle";
-import GrblHalLineParserResultTool from "./GrblHalLineParserResultTool";
-import GrblHalLineParserResultSDCard from "./GrblHalLineParserResultSDCard";
-import GrblHalLineParserResultATCI from "server/controllers/Grblhal/GrblHalLineParserResultATCI";
-import GrblHalLineParserResultJSON from "server/controllers/Grblhal/GrblHalLineParserResultJSON";
 import GrblHalErrorDescription from "./GrblHalErrorDescription";
+import GrblHalLineParser from "./GrblHalLineParser";
+import GrblHalLineParserResultAlarm from "./GrblHalLineParserResultAlarm";
+import GrblHalLineParserResultAlarmDetails from "./GrblHalLineParserResultAlarmDetails";
+import GrblHalLineParserResultAXS from "./GrblHalLineParserResultAXS";
+import GrblHalLineParserResultCode from "./GrblHalLineParserResultCode";
+import GrblHalLineParserResultError from "./GrblHalLineParserResultError";
+import GrblHalLineParserResultFeedback from "./GrblHalLineParserResultFeedback";
+import GrblHalLineParserResultGroupDetail from "./GrblHalLineParserResultGroupDetail";
+import GrblHalLineParserResultInfo from "./GrblHalLineParserResultInfo";
+import GrblHalLineParserResultOk from "./GrblHalLineParserResultOk";
+import GrblHalLineParserResultParameters from "./GrblHalLineParserResultParameters";
+import GrbHalLineParserResultParserState from "./GrblHalLineParserResultParserState";
+import GrblHalLineParserResultSDCard from "./GrblHalLineParserResultSDCard";
+import GrblHalLineParserResultSettingDescription from "./GrblHalLineParserResultSettingDescription";
+import GrblHalLineParserResultSettingDetails from "./GrblHalLineParserResultSettingDetails";
+import GrblHalLineParserResultSettings from "./GrblHalLineParserResultSettings";
+import GrblHalLineParserResultStartup from "./GrblHalLineParserResultStartup";
+import GrblHalLineParserResultStatus from "./GrblHalLineParserResultStatus";
+import GrblHalLineParserResultTool from "./GrblHalLineParserResultTool";
+import GrblHalLineParserResultVersion from "./GrblHalLineParserResultVersion";
 
 const log = logger("controller:grblHAL");
 
@@ -577,6 +577,11 @@ class GrblHalRunner extends events.EventEmitter {
 	getCurrentFeedrate(state = this.state) {
 		const value = _.get(state, "parserstate.feedrate");
 		return `F${value}`;
+	}
+
+	getCurrentSpindleRate(state = this.state) {
+		const value = _.get(state, "parserstate.spindle");
+		return `${value}`;
 	}
 
 	isAlarm() {

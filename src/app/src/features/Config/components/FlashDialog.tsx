@@ -159,6 +159,9 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
 
 	function handlePortSelect(value) {
 		setPort(value);
+		if (value === SLB_DFU_PORT.port) {
+			setControllerType("grblHAL");
+		}
 	}
 
 	function handleTypeSelect(value) {

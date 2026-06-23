@@ -69,7 +69,7 @@ const defaultState: State = {
 		backupFreq: "On Update",
 		powerSaving: true,
 		lastBackupTime: 0,
-		sendUsageData: false,
+		collectUsageDataStatus: "pending",
 		jobTimes: [],
 		toolChange: {
 			passthrough: false,
@@ -198,7 +198,6 @@ const defaultState: State = {
 			displayScaleFactor: "100%",
 		},
 		preventJoggingPastLimits: false,
-		lastViewedConfigLocation: "h-section-0",
 	},
 	widgets: {
 		atc: {

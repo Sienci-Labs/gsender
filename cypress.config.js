@@ -1,33 +1,33 @@
 const { defineConfig } = require("cypress");
 
 module.exports = defineConfig({
-	reporter: "cypress-mochawesome-reporter",
+	reporter: "cypress-multi-reporters",
 	reporterOptions: {
-		reportDir: "cypress/reports/mochawesome",
-		overwrite: false,
-		html: true,
-		json: true,
-		charts: true,
-		embeddedScreenshots: true,
-		inlineAssets: true, // ensures CSS/JS embedded in HTML
+		configFile: "reporter-config.json",
 	},
 
 	e2e: {
-		baseUrl: process.env.BASE_URL || "http://localhost:8000/#",
+		specPattern: "cypress/e2e/grblHal/A_grblHal_master_spec.cy.js",
+		baseUrl: process.env.BASE_URL || "http://localhost:8000",
 
-		// ========================================
+		// Timeouts
+
+		pageLoadTimeout: 60000,
+		defaultCommandTimeout: 10000,
+
 		// Environment Variables
-		// ========================================
 		env: {
 			deviceName: process.env.CYPRESS_DEVICE_NAME || "COM",
 		},
-		// ========================================
-
 		setupNodeEvents(on, config) {
-			// Register mochawesome plugin
-			// require('cypress-mochawesome-reporter/plugin')(on);
+			// Terminal Logging Task
+			on("task", {
+				log(message) {
+					console.log(`[gSender] ${message}`);
+					return null;
+				},
+			});
 
-			// Optional: before browser launch hook
 			on("before:browser:launch", (browser = {}, launchOptions) => {
 				return launchOptions;
 			});

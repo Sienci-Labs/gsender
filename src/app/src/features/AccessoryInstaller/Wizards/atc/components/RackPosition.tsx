@@ -1,15 +1,17 @@
-import { StepProps } from "app/components/Wizard/types";
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
+/** biome-ignore-all lint/a11y/noLabelWithoutControl: <> */
 import { StepActionButton } from "app/components/Wizard/StepActionButton.tsx";
-import { useEffect, useRef, useState } from "react";
-import { PositionSetter } from "app/features/AccessoryInstaller/Wizards/atc/components/PositionSetter.tsx";
-import { useSelector } from "react-redux";
-import { RootState } from "app/store/redux";
-import controller from "app/lib/controller.ts";
-import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
-import store from "app/store";
-import { useWorkspaceState } from "app/hooks/useWorkspaceState";
-import { mapPositionToUnits, in2mm } from "app/lib/units.ts";
+import type { StepProps } from "app/components/Wizard/types";
 import { IMPERIAL_UNITS } from "app/constants";
+import { PositionSetter } from "app/features/AccessoryInstaller/Wizards/atc/components/PositionSetter.tsx";
+import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
+import { useWorkspaceState } from "app/hooks/useWorkspaceState";
+import controller from "app/lib/controller.ts";
+import { in2mm, mapPositionToUnits } from "app/lib/units.ts";
+import store from "app/store";
+import type { RootState } from "app/store/redux";
+import { useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
 
 export function RackPosition({ onComplete, onUncomplete }: StepProps) {
 	const [rackPositionMethod, setRackPositionMethod] =

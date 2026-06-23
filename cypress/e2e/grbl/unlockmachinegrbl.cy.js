@@ -128,7 +128,7 @@ beforeEach(() => {
 		cy.log("=== Test Passed ===");
 	});
 
-	it("TC-UNLOCK-004: Verify unlock button using exact selectors from recording", () => {
+	it("TC-UNLOCK-004: Verify unlock button using exact selectors", () => {
 		cy.log("=== Test Case: Unlock using recorded selectors ===");
 
 		// Connect
@@ -136,7 +136,6 @@ beforeEach(() => {
 		cy.connectMachine();
 		cy.wait(6000);
 
-		// Use exact selector from JSON recording
 		cy.log("Step 2: Using recorded selector to unlock...");
 		cy.get("body").then(($body) => {
 			if ($body.find("#app > div > div.border div.mt-4 path").length > 0) {

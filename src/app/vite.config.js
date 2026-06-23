@@ -43,6 +43,7 @@ export default defineConfig({
 			app: path.resolve(__dirname, "./src"),
 			"@": path.resolve(__dirname, "./src"),
 		},
+		dedupe: ["react", "react-dom"],
 	},
 	define: {},
 	server: {

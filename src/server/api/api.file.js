@@ -37,7 +37,7 @@ export const uploadFile = (req, res) => {
 	}
 
 	const { buffer } = file;
-	const gcode = buffer.toString();
+	const gcode = buffer.toString("latin1");
 
 	CNCEngine.load({
 		gcode,

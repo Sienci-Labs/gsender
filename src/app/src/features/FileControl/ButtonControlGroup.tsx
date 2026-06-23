@@ -1,3 +1,4 @@
+import { usePostHog } from "@posthog/react";
 import { Button } from "app/components/Button";
 import {
 	AlertDialog,
@@ -49,6 +50,7 @@ import type { RecentFile } from "./definitions";
 import { getRecentFiles } from "./utils/recentfiles";
 
 const ButtonControlGroup = () => {
+	const posthog = usePostHog();
 	const isIOSDevice =
 		/iPad|iPhone|iPod/.test(navigator.platform) ||
 		(navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
@@ -156,6 +158,11 @@ const ButtonControlGroup = () => {
 		updateToolchangeContext();
 
 		await uploadGcodeFileToServer(file, controller.port, VISUALIZER_PRIMARY);
+		posthog?.capture("file_loaded", {
+			file_name: file.name,
+			file_size_bytes: file.size,
+			source: "file_picker",
+		});
 	};
 
 	const handleClickLoadFile = () => {
@@ -195,6 +202,7 @@ const ButtonControlGroup = () => {
 			return;
 		}
 
+		posthog?.capture("file_closed", { file_name: name });
 		controller.command("gcode:unload");
 		reduxStore.dispatch(unloadFileInfo());
 		pubsub.publish("unload:file");

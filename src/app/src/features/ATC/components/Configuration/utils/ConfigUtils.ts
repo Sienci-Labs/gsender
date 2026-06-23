@@ -1,12 +1,12 @@
-import {
+import type {
+	ATCIJSON,
+	ATCIMacroConfig,
+} from "app/features/ATC/assets/defaultATCIMacros.ts";
+import type {
 	ConfigState,
 	OffsetManagement,
 } from "app/features/ATC/components/Configuration/hooks/useConfigStore.tsx";
 import store from "app/store";
-import {
-	ATCIJSON,
-	ATCIMacroConfig,
-} from "app/features/ATC/assets/defaultATCIMacros.ts";
 
 export interface Macro {
 	name: string;
@@ -70,7 +70,7 @@ export function generateAllMacros(
 ) {
 	const macros: Macro[] = [];
 
-	const atciContent = generateATCIJSON(config);
+	const atciContent = generateATCIJSON(config, useValuesForP100);
 
 	macros.push(generateP100(config, useValuesForP100));
 	macros.push(...getTemplateMacros());
@@ -111,13 +111,25 @@ export function populateATCIVariables(variables, config: ConfigState) {
 	return populatedVariables;
 }
 
-export function generateATCIJSON(config: ConfigState): ATCIJSON {
+export function generateATCIJSON(
+	config: ConfigState,
+	useValues = true,
+): ATCIJSON {
 	const templateConfig: ATCIMacroConfig = store.get(
 		"widgets.atc.templates",
 		{},
 	);
 
 	let variables = { ...config.variables };
+
+	if (!useValues) {
+		const excluded = ["_tc_slots", "_tc_rack_enable"];
+		variables = Object.fromEntries(
+			Object.entries(variables).map(([k, v]) =>
+				excluded.includes(k) ? [k, v] : [k, { ...v, value: v.default }],
+			),
+		) as typeof variables;
+	}
 
 	const files = templateConfig.macros.map((macro) => macro.name);
 

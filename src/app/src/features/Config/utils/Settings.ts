@@ -1,14 +1,17 @@
-import store from "app/store";
 import api from "app/api";
-import { restoreDefault, storeUpdate } from "app/lib/storeUpdate";
 import { Confirm } from "app/components/ConfirmationDialog/ConfirmationDialogLib.ts";
+import type { EEPROM, FilteredEEPROM } from "app/definitions/firmware";
 import { generateEEPROMSettings } from "app/features/Config/utils/EEPROM.ts";
-import { toast } from "sonner";
 import controller from "app/lib/controller.ts";
-import pubsub from "pubsub-js";
-import { EEPROM, FilteredEEPROM } from "app/definitions/firmware";
-import { gSenderSetting, gSenderSettingsValues } from "../assets/SettingsMenu";
+import { restoreDefault, storeUpdate } from "app/lib/storeUpdate";
+import store from "app/store";
 import { State } from "app/store/definitions";
+import pubsub from "pubsub-js";
+import { toast } from "sonner";
+import type {
+	gSenderSetting,
+	gSenderSettingsValues,
+} from "../assets/SettingsMenu";
 
 export function exportFirmwareSettings(settings: object) {
 	const output = JSON.stringify(settings);
@@ -166,7 +169,7 @@ export function updateAllSettings(
 	const eepromToChange = generateEEPROMSettings(eeprom);
 	const eepromNumber = Object.keys(eepromToChange).length;
 	if (eepromNumber > 0) {
-		let changedSettings = Object.keys(eepromToChange).map(
+		const changedSettings = Object.keys(eepromToChange).map(
 			(k) => `${k}=${eepromToChange[k as EEPROM]}`,
 		);
 		changedSettings.push("$$");

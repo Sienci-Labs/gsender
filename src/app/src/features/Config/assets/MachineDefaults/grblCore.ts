@@ -1,5 +1,5 @@
+import type { EEPROM } from "app/definitions/firmware";
 import { ATCI_SUPPORTED_VERSION } from "app/features/ATC/utils/ATCiConstants.ts";
-import { EEPROM } from "app/definitions/firmware";
 
 export interface GrblCoreMigration {
 	cutoffSemver: number;
@@ -27,6 +27,8 @@ export const GRBLCORE_MIGRATION: GrblCoreMigration = {
 		$454: "$491",
 		$455: "$492",
 		$743: "$716",
+		$741: "$770",
+		$742: "$771",
 		$456: "$750",
 		$457: "$751",
 		$458: "$752",
@@ -35,6 +37,8 @@ export const GRBLCORE_MIGRATION: GrblCoreMigration = {
 		$665: "$536",
 	},
 	valueOverrides: {
+		$6: "3",
+		$9: "5",
 		$14: "0",
 		$170: null,
 		$171: null,
@@ -59,6 +63,9 @@ export const GRBLCORE_MIGRATION: GrblCoreMigration = {
 		$478: null,
 		$484: "0",
 		$485: "1",
+		$490: "",
+		$491: "",
+		$492: "",
 		$511: null,
 		$512: null,
 		$513: null,
@@ -79,10 +86,12 @@ export const GRBLCORE_MIGRATION: GrblCoreMigration = {
 		$685: "10",
 		$686: "50",
 		$687: "50",
-		$709: "1",
-		$741: null,
-		$742: null,
+		$709: "17",
 		$745: "15",
+		$750: "1",
+		$751: "4",
+		$752: "1",
+		$753: "4",
 		$760: "0",
 		$761: "1",
 		$762: "2",

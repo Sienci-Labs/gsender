@@ -37,6 +37,7 @@ interface SpindleToolEvent {
 	T?: number;
 	M?: number;
 	TC?: boolean;
+	comment?: string;
 }
 
 interface VMState {
@@ -1281,6 +1282,22 @@ class GCodeVirtualizer extends EventEmitter {
 			this.dispatchTokenGroup(letters, values, groupStart, scan.count);
 		}
 		this.profileStats.groupsSeen += groupCount;
+
+		const currentEvent = this.vmState.spindleToolEvents[this.totalLines];
+		if (
+			currentEvent &&
+			(currentEvent.T !== undefined || currentEvent.M !== undefined)
+		) {
+			const commentRegex = /\(([^)]*)\)|;(.*)/g;
+			const parts: string[] = [];
+			let cm: RegExpExecArray | null;
+			while ((cm = commentRegex.exec(line)) !== null) {
+				const text = (cm[1] !== undefined ? cm[1] : cm[2]).trim();
+				if (text) parts.push(text);
+			}
+			const extracted = parts.join(" ");
+			if (extracted) currentEvent.comment = extracted;
+		}
 
 		/*
         // if the line didnt have time calcs involved, push 0 time

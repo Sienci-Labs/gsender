@@ -12,6 +12,7 @@ type FormattedSpindle = {
 type Props = {
 	spindles: Spindle[];
 	onChange: (selectedOption: FormattedSpindle | null) => void;
+	onMenuOpen: () => void;
 	spindle: Spindle | null;
 	disabled: boolean;
 };
@@ -23,7 +24,13 @@ const formatSpindles = (spindles: Spindle[] = []): FormattedSpindle[] => {
 	}));
 };
 
-const SpindleSelector = ({ spindles, onChange, spindle, disabled }: Props) => {
+const SpindleSelector = ({
+	spindles,
+	onChange,
+	onMenuOpen,
+	spindle,
+	disabled,
+}: Props) => {
 	const spindleFormatted = { label: spindle.label, value: spindle.id };
 	const formattedSpindles = formatSpindles(spindles);
 
@@ -39,6 +46,7 @@ const SpindleSelector = ({ spindles, onChange, spindle, disabled }: Props) => {
 					placeholder="Default Spindle"
 					value={spindleFormatted}
 					onChange={onChange}
+					onMenuOpen={onMenuOpen}
 					className="w-full z-10"
 					menuPlacement="top"
 					isDisabled={disabled}

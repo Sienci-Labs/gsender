@@ -1,6 +1,4 @@
-import React, { useRef, useState } from "react";
-import { Play, Trash2, File } from "lucide-react";
-import { useSDCard } from "../hooks/useSDCard";
+import { Confirm } from "app/components/ConfirmationDialog/ConfirmationDialogLib.ts";
 import {
 	Table,
 	TableBody,
@@ -9,17 +7,20 @@ import {
 	TableHeader,
 	TableRow,
 } from "app/components/shadcn/Table";
-import { Confirm } from "app/components/ConfirmationDialog/ConfirmationDialogLib.ts";
-import controller from "app/lib/controller.ts";
-import reduxStore from "app/store/redux";
-import { clearSDCardFiles } from "app/store/redux/slices/controller.slice.ts";
-import cn from "classnames";
-import { toast } from "app/lib/toaster";
 import {
 	ACCEPTED_EXTENSIONS,
 	validateSDFilename,
 } from "app/features/SDCard/components/UploadModal.tsx";
+import controller from "app/lib/controller.ts";
+import { toast } from "app/lib/toaster";
 import store from "app/store";
+import reduxStore from "app/store/redux";
+import { clearSDCardFiles } from "app/store/redux/slices/controller.slice.ts";
+import cn from "classnames";
+import { File, Play, Trash2 } from "lucide-react";
+import type React from "react";
+import { useRef, useState } from "react";
+import { useSDCard } from "../hooks/useSDCard";
 
 const formatFileSize = (bytes: number): string => {
 	const units = ["B", "KB", "MB", "GB"];
@@ -79,21 +80,34 @@ export const FileList: React.FC = () => {
 
 	const handleFileSelect = (files: FileList | null) => {
 		if (!files || files.length === 0) return;
-		const file = files[0]; // Only take the first file
-		const extension = "." + file.name.split(".").pop()?.toLowerCase();
 
-		if (!ACCEPTED_EXTENSIONS.includes(extension)) {
-			toast.error("Please select a valid gcode file");
-			return;
+		const validFiles: File[] = [];
+		const errors: string[] = [];
+
+		Array.from(files).forEach((file) => {
+			const extension = "." + file.name.split(".").pop()?.toLowerCase();
+
+			if (!ACCEPTED_EXTENSIONS.includes(extension)) {
+				errors.push(`${file.name}: Invalid file type`);
+				return;
+			}
+
+			const validationError = validateSDFilename(file.name);
+			if (validationError) {
+				errors.push(`${file.name}: ${validationError}`);
+				return;
+			}
+
+			validFiles.push(file);
+		});
+
+		if (errors.length > 0) {
+			toast.error(`Some files were rejected:\n${errors.join("\n")}`);
 		}
 
-		const validationError = validateSDFilename(file.name);
-		if (validationError) {
-			toast.error(`Invalid filename: ${validationError}`);
-			return;
+		if (validFiles.length > 0) {
+			handleUpload(validFiles);
 		}
-
-		handleUpload(file);
 	};
 
 	function handleDrop(e: React.DragEvent<HTMLDivElement>) {
@@ -102,20 +116,30 @@ export const FileList: React.FC = () => {
 		handleFileSelect(e.dataTransfer.files);
 	}
 
-	const handleUpload = async (file) => {
-		if (file) {
-			const reader = new FileReader();
-			reader.onload = async (e) => {
-				const text = e.target.result;
+	const handleUpload = async (files: File | File[]) => {
+		const fileArray = Array.isArray(files) ? files : [files];
 
-				await uploadFileToSDCard({
-					name: file.name,
-					content: text as string,
-					size: (text as string).length,
-				});
-				fileInputRef.current.value = "";
-			};
-			reader.readAsText(file);
+		if (fileArray.length === 0) return;
+
+		const fileDataPromises = fileArray.map((file) => {
+			return new Promise((resolve) => {
+				const reader = new FileReader();
+				reader.onload = (e) => {
+					const text = e.target.result as string;
+					resolve({
+						name: file.name,
+						content: text,
+						size: text.length,
+					});
+				};
+				reader.readAsText(file);
+			});
+		});
+
+		const filesData = await Promise.all(fileDataPromises);
+		await uploadFileToSDCard(filesData);
+		if (fileInputRef.current) {
+			fileInputRef.current.value = "";
 		}
 	};
 
@@ -173,7 +197,8 @@ export const FileList: React.FC = () => {
 				<input
 					ref={fileInputRef}
 					type="file"
-					accept=".gcode,.nc,.macro"
+					accept=".gcode,.nc,.macro,.ncc,.ngc,.cnc,.txt,.text,.tap,.json"
+					multiple
 					onChange={(e) => handleFileSelect(e.target.files)}
 					className="hidden"
 				/>
@@ -206,7 +231,8 @@ export const FileList: React.FC = () => {
 				<input
 					ref={fileInputRef}
 					type="file"
-					accept=".gcode,.nc,.macro"
+					accept=".gcode,.nc,.macro,.ncc,.ngc,.cnc,.txt,.text,.tap,.json"
+					multiple
 					onChange={(e) => handleFileSelect(e.target.files)}
 					className="hidden"
 				/>

@@ -154,7 +154,7 @@ const createWizard = (count: number) => {
 						description: () => {
 							const preamble =
 								count === 1
-									? "Jog your maching to a place you can reach using the jog controls and change over to the next tool"
+									? "Jog your machine to a place you can reach using the jog controls and change over to the next tool"
 									: "Change over to the next tool";
 
 							return (
@@ -166,6 +166,7 @@ const createWizard = (count: number) => {
 							);
 						},
 						overlay: false,
+						toolBanner: true,
 						actions: [
 							{
 								label: "Probe Changed Tool",

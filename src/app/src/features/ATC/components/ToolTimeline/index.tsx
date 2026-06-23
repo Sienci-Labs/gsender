@@ -18,6 +18,7 @@ function buildToolArray(toolEvents, fileLength) {
 			newTool.toolNumber = value.T;
 			newTool.startLine = Number(line);
 			newTool.label = `T${value.T}`;
+			if (value.comment) newTool.comment = value.comment;
 			const legendColor = getToolpathColor(count);
 			newTool.color = `#${legendColor.getHexString()}`;
 			newTool.index = count + 1;

@@ -1,6 +1,3 @@
-import { useState, useRef, ChangeEvent, FormEvent } from "react";
-import Select from "react-select";
-
 import Button from "app/components/Button";
 import {
 	Dialog,
@@ -12,6 +9,8 @@ import {
 } from "app/components/shadcn/Dialog";
 import { Input } from "app/components/shadcn/Input";
 import Tooltip from "app/components/Tooltip";
+import { type ChangeEvent, type FormEvent, useRef, useState } from "react";
+import Select from "react-select";
 
 import { MACRO_VARIABLES } from "./constants";
 import insertAtCaret from "./insertAtCaret";

@@ -216,7 +216,7 @@ export function Jogging({ hideRotary = false }) {
 			const units: UNITS_EN = store.get("workspace.units", METRIC_UNITS);
 			setFirmware(firmwareType);
 
-			let convertedJogValues = JSON.parse(JSON.stringify(jogValues));
+			const convertedJogValues = JSON.parse(JSON.stringify(jogValues));
 
 			if (units === IMPERIAL_UNITS) {
 				convertedJogValues.xyStep = convertValue(

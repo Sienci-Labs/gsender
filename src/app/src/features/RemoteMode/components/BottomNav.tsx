@@ -1,8 +1,8 @@
-import { Link, useLocation } from "react-router";
-import { IoSpeedometerOutline } from "react-icons/io5";
 import { FaTasks } from "react-icons/fa";
+import { IoSpeedometerOutline } from "react-icons/io5";
 import { RiToolsFill } from "react-icons/ri";
 import { RxDashboard } from "react-icons/rx";
+import { Link, useLocation } from "react-router";
 export function BottomNavLink({ label, icon, href }) {
 	return (
 		<Link

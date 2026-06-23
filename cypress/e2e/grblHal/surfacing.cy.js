@@ -32,10 +32,11 @@ describe("Surfacing Test", () => {
 		cy.log("Tools page opened");
 
 		// Step 4: Click on Surfacing tool - using the link selector
-		cy.log("Step 4: Opening Surfacing tool...");
-		cy.get("div.w-full a:nth-of-type(1) > div").should("be.visible").click();
-		cy.wait(1500);
-		cy.log("Surfacing tool opened");
+
+		cy.contains("h3", "Surfacing")
+			.closest("div.rounded-lg")
+			.should("be.visible")
+			.click();
 
 		// Step 5: Configure Width
 		cy.log("Step 5: Setting width to 75mm");
@@ -57,24 +58,30 @@ describe("Surfacing Test", () => {
 		cy.get("#maxDepth").should("be.visible").invoke("val", "").type("1");
 		cy.wait(300);
 
+		// DEBUG: Inspect bit diameter area
+		cy.contains("label", /bit diameter/i)
+			.parent()
+			.then(($el) => {
+				cy.log($el[0].outerHTML);
+			});
 		// Step 9: Configure Bit Diameter
 		cy.log("Step 9: Setting bit diameter to 22mm");
-		cy.get("div.p-4 div:nth-of-type(4) input").invoke("val", "").type("22");
+		cy.get("div.px-8 div:nth-of-type(4) input").invoke("val", "").type("22");
 		cy.wait(300);
 
 		// Step 10: Configure Stepover
 		cy.log("Step 10: Setting stepover to 40%");
-		cy.get("div.p-4 div:nth-of-type(5) input").invoke("val", "").type("40");
+		cy.get("div.px-8 div:nth-of-type(5) input").invoke("val", "").type("40");
 		cy.wait(300);
 
 		// Step 11: Configure Feedrate
 		cy.log("Step 11: Setting feedrate to 2500 mm/min");
-		cy.get("div:nth-of-type(6) input").invoke("val", "").type("2500");
+		cy.get("div.px-8 div:nth-of-type(6) input").invoke("val", "").type("2500");
 		cy.wait(300);
 
 		// Step 12: Configure Spindle RPM
 		cy.log("Step 12: Setting spindle RPM to 17000");
-		cy.get("div:nth-of-type(7) input").invoke("val", "").type("17000");
+		cy.get("div.px-8 div:nth-of-type(7) input").invoke("val", "").type("17000");
 		cy.wait(500);
 
 		// Step 13: Generate G-code

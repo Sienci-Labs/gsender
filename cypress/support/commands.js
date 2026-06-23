@@ -32,54 +32,18 @@
 //=======//
 //2.Load UI//   cy.loadUI(`${Cypress.config('baseUrl')}/#/configuration`, {
 //=======//
-Cypress.Commands.add("loadUI", (url, options = {}) => {
+Cypress.Commands.add("loadUI", (options = {}) => {
 	const {
-		maxRetries = 3,
-		waitTime = 3000,
-		timeout = 5000,
-		viewport = { width: 1920, height: 1080 },
+		viewport = [1920, 1080],
+		visitTimeout = 30000,
+		elementTimeout = 15000,
+		expectedTitle = "gSender 1.6.0",
 	} = options;
 
-	cy.viewport(viewport.width, viewport.height);
-
-	function tryLoadUI(attempt = 1) {
-		cy.log(`Loading attempt ${attempt} of ${maxRetries}`);
-
-		if (attempt === 1) {
-			cy.visit(url, {
-				failOnStatusCode: false,
-				timeout: 30000,
-			});
-		} else {
-			cy.reload();
-		}
-
-		cy.wait(waitTime);
-
-		cy.get("body", { timeout }).then(($body) => {
-			const hasButton = $body.find("button").length > 0;
-			const hasCOM = $body.text().includes("COM");
-			const hasConnection =
-				$body.text().includes("Connect") || $body.text().includes("Connection");
-
-			const uiLoaded = hasButton && (hasCOM || hasConnection);
-
-			cy.log(
-				`Buttons found: ${hasButton}, COM text: ${hasCOM}, Connection text: ${hasConnection}`,
-			);
-
-			if (uiLoaded) {
-				cy.log("UI loaded successfully");
-			} else if (attempt < maxRetries) {
-				cy.log("UI not loaded, refreshing...");
-				tryLoadUI(attempt + 1);
-			} else {
-				throw new Error(`Failed to load UI after ${maxRetries} attempts`);
-			}
-		});
-	}
-
-	tryLoadUI();
+	cy.viewport(...viewport);
+	cy.visit("/", { timeout: visitTimeout });
+	cy.title({ timeout: elementTimeout }).should("eq", expectedTitle);
+	cy.get("body", { timeout: elementTimeout }).should("be.visible");
 });
 
 // ----------------------
@@ -493,7 +457,7 @@ Cypress.Commands.add("uploadGcodeFile", (fileName = "sample.gcode") => {
 
 		cy.log(`Going to location: X=${x}, Y=${y}, Z=${z}`);
 
-		// Step 1: Open Go To Location dialog — confirmed from recording
+		// Step 1: Open Go To Location dialog
 		cy.log("Opening Go To Location popup...");
 		cy.get("div.min-h-10 > div:nth-of-type(1) > button", { timeout: 10000 })
 			.filter(":visible")
@@ -586,49 +550,46 @@ Cypress.Commands.add("verifyConsoleContains", (text) => {
 			cy.log(`Console contains: "${text}"`);
 		});
 });
-
-// ----------------------
-//12.Zero X Axis
-// ----------------------
+//-----------------------
+// Zero X axis
+//-----------------------
 Cypress.Commands.add("zeroXAxis", () => {
 	cy.log("Zeroing X axis...");
 	cy.get(
-		"div.flex-shrink-0 > div > div > div > div > div.relative div:nth-of-type(1) > div:nth-of-type(1) > button",
+		"div.h-\\[75\\%\\] div.flex-col > div:nth-of-type(1) > div:nth-of-type(1) button",
 	)
 		.contains("X0")
 		.click();
 	cy.wait(500);
 	cy.log("X axis zeroed");
 });
+//-----------------------
+// Zero Y axis
+//-----------------------
 
-// ----------------------
-//13.Zero Y Axis
-// ----------------------
 Cypress.Commands.add("zeroYAxis", () => {
 	cy.log("Zeroing Y axis...");
 	cy.get(
-		"div.h-\\[75\\%\\] div.flex-col > div:nth-of-type(2) > div:nth-of-type(1) span",
+		"div.h-\\[75\\%\\] div.flex-col > div:nth-of-type(2) > div:nth-of-type(1) button",
 	)
 		.contains("Y0")
 		.click();
 	cy.wait(500);
 	cy.log("Y axis zeroed");
 });
-
-// ----------------------
-//14.Zero Z Axis
-// ----------------------
+//-----------------------
+// Zero Z axis
+//-----------------------
 Cypress.Commands.add("zeroZAxis", () => {
 	cy.log("Zeroing Z axis...");
 	cy.get(
-		"div.flex-shrink-0 > div > div > div > div > div.relative div:nth-of-type(3) > div:nth-of-type(1) span",
+		"div.h-\\[75\\%\\] div.flex-col > div:nth-of-type(3) > div:nth-of-type(1) button",
 	)
 		.contains("Z0")
 		.click();
-	cy.wait(1000);
+	cy.wait(500);
 	cy.log("Z axis zeroed");
 });
-
 //-----------------------
 // Zero A axis
 Cypress.Commands.add("zeroAAxis", () => {
@@ -1032,17 +993,20 @@ Cypress.Commands.add("verifyMachineStatus", (expectedStatus, options = {}) => {
 			expect(actualStatus.toLowerCase()).to.eq(expectedStatus.toLowerCase());
 		});
 });
-
-//27. Search items in settings {cy.searchInSettings('search item name');}
+//------------------------------//
+// Search Elements in Config page
+//------------------------------//
 Cypress.Commands.add("searchInSettings", (searchText, options = {}) => {
 	const { timeout = 10000 } = options;
 
 	cy.log(`Searching for: ${searchText}`);
-
 	cy.get("#simple-search", { timeout })
 		.should("be.visible")
-		.clear()
-		.type(searchText);
+		.click({ force: true })
+		.invoke("val", "") // force-clear React controlled input
+		.type(searchText, { force: true, delay: 50 });
+
+	cy.wait(500);
 });
 // Apply settings { cy.applySettings(); }
 Cypress.Commands.add("applySettings", (options = {}) => {
@@ -1075,17 +1039,61 @@ Cypress.Commands.add("applySettings", (options = {}) => {
 
 // URL Definitions
 
-Cypress.Commands.add("loadUI", (url, options = {}) => {
-	cy.visit(url, {
-		timeout: options.timeout || 30000,
-		failOnStatusCode: false,
+Cypress.Commands.add("loadUI", (options = {}) => {
+	const { timeout = 20000, viewport = { width: 1920, height: 1080 } } = options;
+
+	let startTime;
+
+	cy.viewport(viewport.width, viewport.height);
+
+	cy.then(() => {
+		startTime = performance.now();
+		cy.log(`Load started at: ${new Date().toISOString()}`);
 	});
 
-	// Wait for the app to be ready
-	cy.wait(options.waitTime || 2000);
-});
-// You can also handle retries or waits here if needed
+	// Uses baseUrl from cypress.config.js — no hardcoded URL
+	cy.visit("/", {
+		failOnStatusCode: false,
+		timeout: 30000,
+	});
 
+	// Wait for real document readiness
+	cy.document().its("readyState").should("eq", "complete");
+
+	// Cypress retries this block automatically until timeout
+	cy.get("body", { timeout }).should(($body) => {
+		const hasButton = $body.find("button").length > 0;
+		const hasConnection =
+			$body.text().includes("Connect") || $body.text().includes("Connection");
+
+		expect(hasButton, "buttons should exist").to.be.true;
+		expect(hasConnection, "connection text should exist").to.be.true;
+	});
+
+	// Log load time after UI confirmed ready
+	cy.then(() => {
+		const endTime = performance.now();
+		const loadTime = ((endTime - startTime) / 1000).toFixed(2);
+		const status =
+			loadTime < 5 ? "FAST" : loadTime < 10 ? "ACCEPTABLE" : "SLOW";
+
+		cy.log(`[${status}] UI load time: ${loadTime}s`);
+		cy.task("log", `[${status}] UI Load Time: ${loadTime}s`);
+	});
+
+	cy.waitUntilIdle();
+});
+
+Cypress.Commands.add("waitUntilIdle", () => {
+	cy.get("body").then(($body) => {
+		if ($body.find('[data-cy="loading-spinner"]').length > 0) {
+			cy.get('[data-cy="loading-spinner"]', { timeout: 10000 }).should(
+				"not.exist",
+			);
+		}
+		// If spinner never existed, skip silently
+	});
+});
 // Page URLs
 Cypress.Commands.add("goToCarve", () => {
 	cy.visit("http://localhost:8000/#/");

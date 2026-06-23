@@ -1,13 +1,13 @@
 import { StepActionButton } from "app/components/Wizard/StepActionButton.tsx";
-import { StepProps } from "app/components/Wizard/types";
-import { PositionSetter } from "app/features/AccessoryInstaller/Wizards/atc/components/PositionSetter.tsx";
-import { useSelector } from "react-redux";
-import { RootState } from "app/store/redux";
-import { useEffect, useRef, useState } from "react";
-import controller from "app/lib/controller.ts";
-import { useWorkspaceState } from "app/hooks/useWorkspaceState";
-import { mapPositionToUnits, in2mm } from "app/lib/units.ts";
+import type { StepProps } from "app/components/Wizard/types";
 import { IMPERIAL_UNITS } from "app/constants";
+import { PositionSetter } from "app/features/AccessoryInstaller/Wizards/atc/components/PositionSetter.tsx";
+import { useWorkspaceState } from "app/hooks/useWorkspaceState";
+import controller from "app/lib/controller.ts";
+import { in2mm, mapPositionToUnits } from "app/lib/units.ts";
+import type { RootState } from "app/store/redux";
+import { useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
 
 export function TLSPosition({ onComplete, onUncomplete }: StepProps) {
 	const applySettings = async () => {

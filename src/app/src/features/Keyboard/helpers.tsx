@@ -21,61 +21,59 @@
  *
  */
 
-import { cn } from 'app/lib/utils';
-import { Fragment } from 'react';
+import { cn } from "app/lib/utils";
+import { Fragment } from "react";
 
 export const formatShortcut = (shortcut: string[] = [], isActive = true) => {
-    const baseClass = 'px-2 py-1 rounded';
-    const opacityClass = !isActive ? 'opacity-40' : 'opacity-100';
-    const output = [];
+	const baseClass = "px-2 py-1 rounded";
+	const opacityClass = !isActive ? "opacity-40" : "opacity-100";
+	const output = [];
 
-    for (let i = 0; i < shortcut.length; i++) {
-        if (i === shortcut.length - 1) {
-            output.push(
-                <kbd className={cn(baseClass, opacityClass)} key={i}>
-                    {shortcut[i]}
-                </kbd>,
-            );
-        } else {
-            output.push(
-                <Fragment key={i}>
-                    <kbd className={cn(baseClass, opacityClass)}>
-                        {shortcut[i]}
-                    </kbd>{' '}
-                    <span className={opacityClass}>+</span>{' '}
-                </Fragment>,
-            );
-        }
-    }
+	for (let i = 0; i < shortcut.length; i++) {
+		if (i === shortcut.length - 1) {
+			output.push(
+				<kbd className={cn(baseClass, opacityClass)} key={i}>
+					{shortcut[i]}
+				</kbd>,
+			);
+		} else {
+			output.push(
+				<Fragment key={i}>
+					<kbd className={cn(baseClass, opacityClass)}>{shortcut[i]}</kbd>{" "}
+					<span className={opacityClass}>+</span>{" "}
+				</Fragment>,
+			);
+		}
+	}
 
-    return output;
+	return output;
 };
 
 // Helper function to determine if a key should hide the shift key
 export const shouldHideShiftForKey = (key: string) => {
-    // Special characters that are secondary to number keys
-    const specialChars = [
-        '!',
-        '@',
-        '#',
-        '$',
-        '%',
-        '^',
-        '&',
-        '*',
-        '(',
-        ')',
-        '_',
-        '+',
-        '{',
-        '}',
-        '|',
-        ':',
-        '"',
-        '<',
-        '>',
-        '?',
-        '~',
-    ];
-    return specialChars.includes(key);
+	// Special characters that are secondary to number keys
+	const specialChars = [
+		"!",
+		"@",
+		"#",
+		"$",
+		"%",
+		"^",
+		"&",
+		"*",
+		"(",
+		")",
+		"_",
+		"+",
+		"{",
+		"}",
+		"|",
+		":",
+		'"',
+		"<",
+		">",
+		"?",
+		"~",
+	];
+	return specialChars.includes(key);
 };

@@ -1,7 +1,9 @@
 import { StepActionButton } from "app/components/Wizard/StepActionButton.tsx";
 import type { StepProps } from "app/components/Wizard/types";
+import { SPINDLE_395_V7_VERSION } from "app/features/ATC/utils/ATCiConstants.ts";
 import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
 import controller from "app/lib/controller.ts";
+import { firmwarePastVersion } from "app/lib/firmwareSemver.ts";
 import type { RootState } from "app/store/redux";
 import { useState } from "react";
 
@@ -27,7 +29,7 @@ export function SpindleSetRestart({ onComplete, onUncomplete }: StepProps) {
 			"$374=3",
 			"$375=50",
 			"$681=0",
-			"$395=2",
+			`$395=${firmwarePastVersion(SPINDLE_395_V7_VERSION) ? "7" : "2"}`,
 			"$REBOOT",
 		]);
 	}
