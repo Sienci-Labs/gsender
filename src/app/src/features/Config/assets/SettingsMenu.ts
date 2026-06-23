@@ -59,6 +59,7 @@ import isElectron from "is-electron";
 import findIndex from "lodash/findIndex";
 import get from "lodash/get";
 import posthog from "posthog-js";
+import { updateSentryConsent } from "app/sentry-config";
 import pubsub from "pubsub-js";
 import type { JSX } from "react";
 import type { IconType } from "react-icons";
@@ -316,8 +317,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
 
 							if (toggle === true || toggle === "accepted") {
 								posthog.opt_in_capturing();
+								updateSentryConsent("accepted");
 							} else {
 								posthog.opt_out_capturing();
+								updateSentryConsent("denied");
 							}
 						},
 						ignoreDefaultCheck: true,

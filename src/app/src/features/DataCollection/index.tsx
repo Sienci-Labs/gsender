@@ -8,6 +8,7 @@ import {
 	SheetDescription,
 	SheetTitle,
 } from "app/components/shadcn/Sheet";
+import { updateSentryConsent } from "app/sentry-config";
 import store from "app/store";
 import { BarChart3, ShieldCheck, SlidersHorizontal, X } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -44,12 +45,14 @@ const DataCollection = () => {
 
 	const handleAccept = async () => {
 		posthog.opt_in_capturing();
+		updateSentryConsent("accepted");
 		store.replace("workspace.collectUsageDataStatus", "accepted");
 		setOpen(false);
 	};
 
 	const handleDecline = async () => {
 		posthog.opt_out_capturing();
+		updateSentryConsent("denied");
 		store.replace("workspace.collectUsageDataStatus", "denied");
 		setOpen(false);
 	};
