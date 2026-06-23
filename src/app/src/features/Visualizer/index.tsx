@@ -77,12 +77,23 @@ import {
 	// Workflow
 	WORKFLOW_STATE_RUNNING,
 } from "../../constants";
+import { Tooltip } from "app/components/Tooltip";
+import { Widget } from "app/components/Widget";
+import { WorkspaceSelector } from "app/features/WorkspaceSelector/index.tsx";
+import cx from "classnames";
+import { FrownIcon } from "lucide-react";
+import { FaFeatherAlt } from "react-icons/fa";
+import { SURFACING_VISUALIZER_CONTAINER_ID } from "../../constants";
 import useKeybinding from "../../lib/useKeybinding";
 import WidgetConfig from "../WidgetConfig/WidgetConfig";
 import { CAMERA_MODE_PAN, CAMERA_MODE_ROTATE } from "./constants";
 import type { Actions, State } from "./definitions";
-import PrimaryVisualizer from "./PrimaryVisualizer";
-import SecondaryVisualizer from "./SecondaryVisualizer";
+import GcodeEditorOverlay from "./GcodeEditorOverlay";
+import GcodeViewer from "./GcodeViewer";
+import Loading from "./Loading";
+import { VisualizerPlaceholder } from "./Placeholder";
+import Rendering from "./Rendering";
+import SoftLimitsWarningArea from "./SoftLimitsWarningArea";
 
 interface Views {
 	type: "isometric" | "top" | "front" | "right" | "left" | "default";
@@ -1490,7 +1501,6 @@ class Visualizer extends Component {
 		const {
 			renderState,
 			isSecondary,
-			gcode,
 			activeVisualizer,
 			activeState,
 			alarmCode,
@@ -1530,33 +1540,102 @@ class Visualizer extends Component {
 			((isSecondary && activeVisualizer === VISUALIZER_SECONDARY) ||
 				(!isSecondary && activeVisualizer === VISUALIZER_PRIMARY));
 
-		const MainComponent = isSecondary ? (
-			<SecondaryVisualizer
-				state={state}
-				actions={actions}
-				showLoading={showLoading}
-				showRendering={showRendering}
-				showVisualizer={showVisualizer}
-				visualizerRef={(ref) => {
-					this.visualizer = ref?.visualizer;
-				}}
-				cameraPosition="3D"
-			/>
-		) : (
-			<PrimaryVisualizer
-				state={state}
-				actions={actions}
-				showLoading={showLoading}
-				showRendering={showRendering}
-				showVisualizer={showVisualizer}
-				visualizerRef={(ref) => {
-					this.visualizer = ref?.visualizer;
-				}}
-				timeline={this.props.timeline}
-			/>
-		);
+		const setVisualizerRef = (ref) => {
+			this.visualizer = ref;
+		};
 
-		return MainComponent;
+		const webGLAvailable = WebGL.isWebGLAvailable();
+
+		if (isSecondary) {
+			return (
+				<>
+					<div
+						className={cx(
+							"z-10 absolute w-[40vw] h-[25vh] top-1/2 right-1/4 translate-x-1/4 -translate-y-1/2",
+							{ hidden: !showLoading && !showRendering },
+						)}
+					>
+						{showLoading && <Loading />}
+						{showRendering && <Rendering />}
+					</div>
+
+					{webGLAvailable && (
+						<GcodeViewer
+							show={showVisualizer}
+							cameraPosition={state.cameraPosition}
+							ref={setVisualizerRef}
+							state={state}
+							actions={actions}
+							containerID={SURFACING_VISUALIZER_CONTAINER_ID}
+							isSecondary={true}
+						/>
+					)}
+				</>
+			);
+		}
+
+		const containerID = "visualizer_container";
+
+		return (
+			<Widget className="w-full p-1 max-xl:p-0.5">
+				<Widget.Content
+					id={containerID}
+					className="w-full bg-no-repeat bg-center"
+				>
+					{showLoading && (
+						<div className=" z-10 relative  w-[40vw] h-[25vh] top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+							<Loading />
+						</div>
+					)}
+
+					{showRendering && <Rendering />}
+
+					<div className="h-full w-full absolute top-0 left-0">
+						<SoftLimitsWarningArea />
+						{webGLAvailable ? (
+							<GcodeViewer
+								show={showVisualizer}
+								cameraPosition={state.cameraPosition}
+								ref={setVisualizerRef}
+								state={state}
+								actions={actions}
+								containerID={containerID}
+								isSecondary={false}
+							/>
+						) : (
+							<div>
+								<FrownIcon size={4} />
+								<span style={{ fontSize: "16px" }}>
+									{"It looks like your device doesn't support WebGL"}
+								</span>
+							</div>
+						)}
+
+						{!showVisualizer && webGLAvailable && <VisualizerPlaceholder />}
+
+						<div className="absolute portrait:right-5 portrait:left-auto left-5 bottom-44 text-4xl text-white flex flex-col gap-2">
+							<Tooltip content="Toggle lightweight mode">
+								<button className="bg-gray-600 bg-opacity-50 rounded-full p-3.5">
+									<FaFeatherAlt
+										className={cx("cursor-pointer", {
+											"text-gray-400": !state.liteMode,
+											"text-green-400": state.liteMode,
+										})}
+										onClick={() => actions.handleLiteModeToggle()}
+									/>
+								</button>
+							</Tooltip>
+						</div>
+
+						<WorkspaceSelector />
+
+						{this.props.timeline}
+
+						<GcodeEditorOverlay />
+					</div>
+				</Widget.Content>
+			</Widget>
+		);
 	}
 }
 

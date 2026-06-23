@@ -21,32 +21,15 @@
  *
  */
 
-import React from "react";
-import bitImage from "./images/dustbit11.png";
-import bitEffect from "./images/effect.png";
-import styles from "./loader.module.styl";
+import { FaCube } from "react-icons/fa";
 
-const LoadingAnimation = () => {
-	return (
-		<div className={styles.bitContainer}>
-			<div>
-				<img
-					src={bitEffect}
-					width="33px"
-					height="60px"
-					alt=""
-					className={styles.bitEffect}
-				/>
-				<img
-					src={bitImage}
-					width="26px"
-					height="60px"
-					alt=""
-					className={styles.bit}
-				/>
-			</div>
+const Rendering = () => (
+	<div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[40vw] h-[25vh] z-40 bg-gray-100">
+		<div className="flex flex-col items-center justify-center w-full h-full">
+			<FaCube className="animate-spin w-5 h-5 mb-2" />
+			<span>Rendering</span>
 		</div>
-	);
-};
+	</div>
+);
 
-export default LoadingAnimation;
+export default Rendering;

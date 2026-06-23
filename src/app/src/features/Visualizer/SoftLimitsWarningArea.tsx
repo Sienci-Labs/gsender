@@ -21,27 +21,30 @@
  *
  */
 
-import classnames from "classnames";
 import get from "lodash/get";
 import pubsub from "pubsub-js";
-import React, { Component } from "react";
+import { Component } from "react";
 import { connect } from "react-redux";
 
-/**
- * Control Area component displaying Soft Limits Warning
- * @param {Object} state Default state given from parent component
- * @param {Object} actions Actions object given from parent component
- */
-class ControlArea extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			showWarning: false,
-			$20: 0,
-		};
-	}
+interface Props {
+	softLimitsEnabled?: boolean;
+}
 
-	pubsubTokens = [];
+interface ControlAreaState {
+	showWarning: boolean;
+	$20: number;
+}
+
+/**
+ * Control Area component displaying Soft Limits Warning.
+ */
+class ControlArea extends Component<Props, ControlAreaState> {
+	pubsubTokens: string[] = [];
+
+	state: ControlAreaState = {
+		showWarning: false,
+		$20: 0,
+	};
 
 	componentDidMount() {
 		this.subscribe();
@@ -53,15 +56,11 @@ class ControlArea extends Component {
 
 	subscribe() {
 		const tokens = [
-			pubsub.subscribe("softlimits:warning", (msg) => {
-				this.setState(() => {
-					return { showWarning: true };
-				});
+			pubsub.subscribe("softlimits:warning", () => {
+				this.setState({ showWarning: true });
 			}),
 			pubsub.subscribe("softlimits:ok", () => {
-				this.setState(() => {
-					return { showWarning: false };
-				});
+				this.setState({ showWarning: false });
 			}),
 		];
 		this.pubsubTokens = this.pubsubTokens.concat(tokens);
