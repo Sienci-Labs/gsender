@@ -362,8 +362,6 @@ const LONGMILL_MK3_DEFAULTS = {
     $734: "0.0",
     $735: "0.0",
     $736: "100.0",
-    $744: "0",
-    $745: "0",
 };
 
 const MK3_CONSTANTS = {
