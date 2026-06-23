@@ -17,7 +17,7 @@ const RUNTIME_ENTRY_PATHS = [
 	"src/electron-app",
 	"src/app/src/entry-server.tsx",
 	"src/app/src/AppServer.tsx",
-	"src/app/src/sentry-config.ts",
+	"src/app/src/sentry-config.tsx",
 ];
 
 const SCANNABLE_EXTENSIONS = new Set([
