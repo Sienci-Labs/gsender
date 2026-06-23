@@ -1,171 +1,184 @@
-import { Confirm } from "app/components/ConfirmationDialog/ConfirmationDialogLib.ts";
-import Tooltip from "app/components/Tooltip";
-import { GRBLHAL } from "app/constants";
-import type { EEPROM } from "app/definitions/firmware";
-import { ToolLink } from "app/features/Config/components/wizards/SquaringToolWizard.tsx";
-import { getDatatypeInput } from "app/features/Config/utils/EEPROM.ts";
+import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
+import { getDatatypeInput } from 'app/features/Config/utils/EEPROM.ts';
+import get from 'lodash/get';
+import { BiReset } from 'react-icons/bi';
+import cn from 'classnames';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
+import { FaMicrochip } from 'react-icons/fa6';
+import { ToolLink } from 'app/features/Config/components/wizards/SquaringToolWizard.tsx';
+import Tooltip from 'app/components/Tooltip';
+import { EEPROM } from 'app/definitions/firmware';
+import { RootState } from 'app/store/redux';
+import { useSelector } from 'react-redux';
 import {
-	resolveGrblCoreDefaults,
-	translateGrblCoreKey,
-} from "app/features/Config/utils/grblCoreMigration.ts";
-import { useSettings } from "app/features/Config/utils/SettingsContext.tsx";
-import type { RootState } from "app/store/redux";
-import cn from "classnames";
-import get from "lodash/get";
-import { BiReset } from "react-icons/bi";
-import { FaMicrochip } from "react-icons/fa6";
-import { useSelector } from "react-redux";
+    resolveGrblCoreDefaults,
+    translateGrblCoreKey,
+} from 'app/features/Config/utils/grblCoreMigration.ts';
+import { GRBLHAL } from 'app/constants';
 
 interface EEPROMSettingRowProps {
-	eID: string;
-	changeHandler: (value: number) => void;
-	resetHandler: (setting: EEPROM, value: string | number) => void;
-	link?: string;
-	linkLabel?: string;
+    eID: string;
+    changeHandler: (value: number) => void;
+    resetHandler: (setting: EEPROM, value: string | number) => void;
+    link?: string;
+    linkLabel?: string;
 }
 
-function filterNewlines(data = "") {
-	if (!data) {
-		return "";
-	}
-	return data.replace(/\\n/gim, "\n");
+function filterNewlines(data = '') {
+    if (!data) {
+        return '';
+    }
+    return data.replace(/\\n/gim, '\n');
 }
 
 export function EEPROMSettingRow({
-	eID,
-	changeHandler,
-	resetHandler,
-	link = null,
-	linkLabel = null,
+    eID,
+    changeHandler,
+    resetHandler,
+    link = null,
+    linkLabel = null,
 }: EEPROMSettingRowProps) {
-	const { EEPROM, eepromMap, machineProfile, firmwareType, eepromIsDefault } =
-		useSettings();
-	const firmwareSemver = useSelector(
-		(state: RootState) => state.controller.settings.version?.semver,
-	);
-	if (!EEPROM) {
-		return;
-	}
+    const { EEPROM, eepromMap, machineProfile, firmwareType, eepromIsDefault } =
+        useSettings();
+    const firmwareSemver = useSelector(
+        (state: RootState) => state.controller.settings.version?.semver,
+    );
+    const boardId = useSelector(
+        (state: RootState) => state.controller.settings.info?.BOARD,
+    );
+    if (!EEPROM) {
+        return;
+    }
 
-	const effectiveEID =
-		firmwareType === GRBLHAL
-			? translateGrblCoreKey(eID as EEPROM, firmwareSemver)
-			: eID;
-	const EEPROMData = eepromMap.get(effectiveEID as EEPROM);
+    const effectiveEID =
+        firmwareType === GRBLHAL
+            ? translateGrblCoreKey(eID as EEPROM, firmwareSemver, boardId)
+            : eID;
+    const EEPROMData = eepromMap.get(effectiveEID as EEPROM);
 
-	if (EEPROMData) {
-		const isDefault = eepromIsDefault(EEPROMData);
-		const profileDefaults =
-			firmwareType === "Grbl"
-				? machineProfile.eepromSettings
-				: resolveGrblCoreDefaults({
-						firmwareSemver,
-						baseDefaults: machineProfile.grblHALeepromSettings || {},
-					}).defaults;
+    if (EEPROMData) {
+        const isDefault = eepromIsDefault(EEPROMData);
+        const profileDefaults =
+            firmwareType === 'Grbl'
+                ? machineProfile.eepromSettings
+                : resolveGrblCoreDefaults({
+                      firmwareSemver,
+                      baseDefaults: machineProfile.grblHALeepromSettings || {},
+                      boardId,
+                  }).defaults;
 
-		const InputElement = getDatatypeInput(EEPROMData.dataType, firmwareType);
+        const InputElement = getDatatypeInput(
+            EEPROMData.dataType,
+            firmwareType,
+        );
 
-		const inputDefault = get(profileDefaults, effectiveEID, "-");
+        const inputDefault = get(profileDefaults, effectiveEID, '-');
 
-		//const matchesSearch = matchesSearchTerm(EEPROMData, searchTerm);
+        //const matchesSearch = matchesSearchTerm(EEPROMData, searchTerm);
 
-		const detailString = (
-			<span>
-				{filterNewlines(EEPROMData.details)}
-				<span>
-					{" "}
-					({EEPROMData.setting}, Default {inputDefault})
-				</span>
-			</span>
-		);
+        const detailString = (
+            <span>
+                {filterNewlines(EEPROMData.details)}
+                <span>
+                    {' '}
+                    ({EEPROMData.setting}, Default {inputDefault})
+                </span>
+            </span>
+        );
 
-		return (
-			<div
-				key={`eSetting-${EEPROMData.key}`}
-				className={cn(
-					"p-2 flex flex-row flex-wrap items-center border-b border-gray-200",
-					{
-						"odd:bg-yellow-50 even:bg-yellow-50 dark:bg-blue-900 dark:text-white":
-							!isDefault,
-					},
-				)}
-			>
-				<div className="w-full sm:w-1/5 flex flex-row gap-2 items-center justify-between sm:justify-start text-gray-700 relative dark:text-gray-400 mb-2 sm:mb-0">
-					<span>{EEPROMData.description}</span>
-					<span className="flex flex-row gap-2 sm:hidden">
-						{!isDefault && (
-							<Tooltip content="Reset to default value">
-								<button
-									className="text-3xl"
-									onClick={() => {
-										Confirm({
-											title: "Reset Single EEPROM Value",
-											content:
-												"Are you sure you want to reset this value to default?",
-											confirmLabel: "Yes",
-											onConfirm: () => {
-												resetHandler(EEPROMData.setting, inputDefault);
-											},
-										});
-									}}
-								>
-									<BiReset />
-								</button>
-							</Tooltip>
-						)}
-						<Tooltip content="Machine setting">
-							<span className="text-robin-500 text-4xl">
-								<FaMicrochip />
-							</span>
-						</Tooltip>
-					</span>
-				</div>
-				<span className="w-full sm:w-2/5 text-gray-500 text-sm mb-2 max-sm:mb-4 order-4">
-					{detailString}
-				</span>
-				<div
-					className="w-full sm:w-1/5 text-xs px-4 gap-2 flex flex-col mb-0 sm:mb-0 max-sm:mb-2 sm:order-2 order-2"
-					key={`input-${EEPROMData.key}`}
-				>
-					<InputElement
-						info={EEPROMData}
-						setting={EEPROMData}
-						onChange={changeHandler(EEPROMData.globalIndex)}
-					/>
-					{link && (
-						<div>
-							<ToolLink link={link} label={linkLabel} />
-						</div>
-					)}
-				</div>
-				<span className="hidden sm:flex w-1/5 text-xs px-4 flex-row gap-2 order-3 justify-end">
-					{!isDefault && (
-						<Tooltip content="Reset to default value">
-							<button
-								className="text-3xl"
-								onClick={() => {
-									Confirm({
-										title: "Reset Single EEPROM Value",
-										content:
-											"Are you sure you want to reset this value to default?",
-										confirmLabel: "Yes",
-										onConfirm: () => {
-											resetHandler(EEPROMData.setting, inputDefault);
-										},
-									});
-								}}
-							>
-								<BiReset />
-							</button>
-						</Tooltip>
-					)}
-					<Tooltip content="Machine setting">
-						<span className="text-robin-500 text-4xl">
-							<FaMicrochip />
-						</span>
-					</Tooltip>
-				</span>
-			</div>
-		);
-	}
+        return (
+            <div
+                key={`eSetting-${EEPROMData.key}`}
+                className={cn(
+                    'p-2 flex flex-row flex-wrap items-center border-b border-gray-200',
+                    {
+                        'odd:bg-yellow-50 even:bg-yellow-50 dark:bg-blue-900 dark:text-white':
+                            !isDefault,
+                    },
+                )}
+            >
+                <div className="w-full sm:w-1/5 flex flex-row gap-2 items-center justify-between sm:justify-start text-gray-700 relative dark:text-gray-400 mb-2 sm:mb-0">
+                    <span>{EEPROMData.description}</span>
+                    <span className="flex flex-row gap-2 sm:hidden">
+                        {!isDefault && (
+                            <Tooltip content="Reset to default value">
+                                <button
+                                    className="text-3xl"
+                                    onClick={() => {
+                                        Confirm({
+                                            title: 'Reset Single EEPROM Value',
+                                            content:
+                                                'Are you sure you want to reset this value to default?',
+                                            confirmLabel: 'Yes',
+                                            onConfirm: () => {
+                                                resetHandler(
+                                                    EEPROMData.setting,
+                                                    inputDefault,
+                                                );
+                                            },
+                                        });
+                                    }}
+                                >
+                                    <BiReset />
+                                </button>
+                            </Tooltip>
+                        )}
+                        <Tooltip content="Machine setting">
+                            <span className="text-robin-500 text-4xl">
+                                <FaMicrochip />
+                            </span>
+                        </Tooltip>
+                    </span>
+                </div>
+                <span className="w-full sm:w-2/5 text-gray-500 text-sm mb-2 max-sm:mb-4 order-4">
+                    {detailString}
+                </span>
+                <div
+                    className="w-full sm:w-1/5 text-xs px-4 gap-2 flex flex-col mb-0 sm:mb-0 max-sm:mb-2 sm:order-2 order-2"
+                    key={`input-${EEPROMData.key}`}
+                >
+                    <InputElement
+                        info={EEPROMData}
+                        setting={EEPROMData}
+                        onChange={changeHandler(EEPROMData.globalIndex)}
+                    />
+                    {link && (
+                        <div>
+                            <ToolLink link={link} label={linkLabel} />
+                        </div>
+                    )}
+                </div>
+                <span className="hidden sm:flex w-1/5 text-xs px-4 flex-row gap-2 order-3 justify-end">
+                    {!isDefault && (
+                        <Tooltip content="Reset to default value">
+                            <button
+                                className="text-3xl"
+                                onClick={() => {
+                                    Confirm({
+                                        title: 'Reset Single EEPROM Value',
+                                        content:
+                                            'Are you sure you want to reset this value to default?',
+                                        confirmLabel: 'Yes',
+                                        onConfirm: () => {
+                                            resetHandler(
+                                                EEPROMData.setting,
+                                                inputDefault,
+                                            );
+                                        },
+                                    });
+                                }}
+                            >
+                                <BiReset />
+                            </button>
+                        </Tooltip>
+                    )}
+                    <Tooltip content="Machine setting">
+                        <span className="text-robin-500 text-4xl">
+                            <FaMicrochip />
+                        </span>
+                    </Tooltip>
+                </span>
+            </div>
+        );
+    }
 }
