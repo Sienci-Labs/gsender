@@ -44,10 +44,7 @@ import app from "./app";
 import settings from "./config/settings";
 import { ensureString } from "./lib/ensure-type";
 import logger, { setLevel } from "./lib/logger";
-import {
-	captureServerException,
-	setupServerSentry,
-} from "./lib/sentryServer";
+import { captureServerException, setupServerSentry } from "./lib/sentryServer";
 import urljoin from "./lib/urljoin";
 import cncengine from "./services/cncengine";
 import config from "./services/configstore";
