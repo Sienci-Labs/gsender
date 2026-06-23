@@ -1,5 +1,5 @@
 import { StepProps } from "app/components/Wizard/types";
-import { StepActionButton } from "app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx";
+import { StepActionButton } from "app/components/Wizard/StepActionButton.tsx";
 import { useEffect, useRef, useState } from "react";
 import { PositionSetter } from "app/features/AccessoryInstaller/Wizards/atc/components/PositionSetter.tsx";
 import { useSelector } from "react-redux";

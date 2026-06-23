@@ -1,9 +1,9 @@
 /** biome-ignore-all lint/a11y/noRedundantAlt: <> */
 /** biome-ignore-all lint/a11y/useButtonType: <> */
-import { ValidationBanner } from "./ValidationBanner";
 import { ArrowLeft, ArrowRight, HelpCircle } from "lucide-react";
 import DefaultImage from "./assets/placeholder.png";
 import type { SubWizard, ValidationResult } from "./types/wizard";
+import { ValidationBanner } from "./ValidationBanner";
 
 interface WizardLandingProps {
 	title: string;

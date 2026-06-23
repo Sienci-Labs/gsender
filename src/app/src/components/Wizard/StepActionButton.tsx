@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/a11y/useButtonType: <> */
 import { AlertCircle, Check, CheckCircle, Loader2 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";

@@ -1,5 +1,5 @@
+import { StepActionButton } from "app/components/Wizard/StepActionButton.tsx";
 import type { StepProps } from "app/components/Wizard/types";
-import { StepActionButton } from "app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx";
 import controller from "app/lib/controller.ts";
 import store from "app/store";
 import { useState } from "react";
