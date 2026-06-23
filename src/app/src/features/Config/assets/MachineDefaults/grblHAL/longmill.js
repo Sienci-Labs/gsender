@@ -395,7 +395,7 @@ export const LONGMILL_MK3_48x30 = {
 
 export const MK3_ORDERED = new Map()
 
-MK3_ORDERED.set('$23', '1');
+MK3_ORDERED.set('$23', '9');
 MK3_ORDERED.set('$22', '79');
 MK3_ORDERED.set('$21', '1');
 MK3_ORDERED.set('$20', '1');
