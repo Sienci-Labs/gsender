@@ -59,6 +59,7 @@ import * as api from "./api";
 import settings from "./config/settings";
 import { ERR_FORBIDDEN } from "./constants";
 import logger from "./lib/logger";
+import { setupExpressSentryHandler } from "./lib/sentryServer";
 import urljoin from "./lib/urljoin";
 // import errclient from './lib/middleware/errclient';
 // import errlog from './lib/middleware/errlog';
@@ -453,77 +454,19 @@ const appMain = () => {
 			urljoin(settings.route, "api/preferences"),
 			api.preferences.replace,
 		);
-	}
 
-	// app.get(urljoin(settings.route, '/'), async (req, res) => {
-	//     // Serve HTML
-	//     try {
-	//         const url = req.originalUrl.replace(base, '');
-
-	//         let template;
-	//         let render;
-	//         if (!isProduction) {
-	//             // Always read fresh template in development
-	//             template = await fs.promises.readFile(path.resolve(__dirname, '../../src/app/index.html'), 'utf-8');
-	//             template = await vite.transformIndexHtml(url, template);
-	//             render = (await vite.ssrLoadModule(path.resolve(__dirname, '../../src/app/src/entry-server.tsx'))).render;
-	//         } else {
-	//             template = templateHtml;
-	//             // eslint-disable-next-line import/extensions, import/no-unresolved
-	//             render = (await import(path.resolve(__dirname, '../../output/server/index.js'))).render;
-	//         }
-
-	//         console.log(__dirname);
-
-	//         const rendered = await render(url, ssrManifest);
-
-	//         const html = template
-	//             .replace('<!--app-head-->', rendered.head ?? '')
-	//             .replace('<!--app-html-->', rendered.html ?? '');
-
-	//         res.status(200).set({ 'Content-Type': 'text/html' }).send(html);
-	//     } catch (e) {
-	//         // eslint-disable-next-line no-unused-expressions
-	//         vite?.ssrFixStacktrace(e);
-	//         console.log(e.stack);
-	//         res.status(500).end(e.stack);
-	//     }
-	// });
-
-	// // page
-	// app.get(urljoin(settings.route, '/'), renderPage('index.hbs', (req, res) => {
-	//     const webroot = _get(settings, 'assets.app.routes[0]', ''); // with trailing slash
-	//     const lng = req.language;
-	//     const t = req.t;
-
-	//     return {
-	//         webroot: webroot,
-	//         lang: lng,
-	//         title: `${t('title')} ${settings.version}`,
-	//         loading: t('loading')
-	//     };
-	// }));
-
-	{
-		// Error handling
-		// app.use(errlog());
-		// app.use(errclient({
-		//     error: 'XHR error'
-		// }));
-		// // app.use(errnotfound({
-		// //     view: path.join('common', '404.hogan'),
-		// //     error: 'Not found'
-		// // }));
-		// app.use(errserver({
-		//     view: path.join('common', '500.hogan'),
-		//     error: 'Internal server error'
-		// }));
+		// Manually throw an error on server side
+		app.get(urljoin(settings.route, "api/test/server-error"), (req, res) => {
+			throw new Error("Manually thrown error from server side");
+		});
 	}
 
 	const { viteServer } = require("./vite-server");
 	viteServer(app).catch((err) => {
 		log.error("Failed to initialize vite server:", err);
 	});
+
+	setupExpressSentryHandler(app);
 
 	return app;
 };

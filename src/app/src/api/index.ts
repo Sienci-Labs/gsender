@@ -455,6 +455,15 @@ const preferences = {
 	},
 };
 
+//
+// Test server side error
+//
+const testServerError = {
+	serverError: (): Promise<AxiosResponse> => {
+		return authrequest.get("/api/test/server-error");
+	},
+};
+
 export default {
 	signin,
 	getLatestVersion,
@@ -481,4 +490,5 @@ export default {
 	alarmList,
 	releaseNotes,
 	preferences,
+	testServerError,
 };

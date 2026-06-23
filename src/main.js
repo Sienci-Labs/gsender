@@ -574,6 +574,11 @@ const main = () => {
 				app.relaunch(); // flags are handled in server/index.js
 				app.exit(0);
 			});
+
+			// Manually throw an error on main process
+			ipcMain.on("test/main-error", () => {
+				throw new Error("Manually thrown error from main process");
+			});
 		} catch (err) {
 			log.error(err);
 			log.err(err.name);

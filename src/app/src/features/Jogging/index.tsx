@@ -1,3 +1,4 @@
+import api from "app/api/index.ts";
 import {
 	GRBL_ACTIVE_STATE_IDLE,
 	GRBL_ACTIVE_STATE_JOG,
@@ -1054,6 +1055,22 @@ export function Jogging({ hideRotary = false }) {
 				className="bg-red-400 text-white px-4 py-2 rounded-md"
 			>
 				Manually Throw Error
+			</button>
+			<button
+				onClick={() => {
+					window.ipcRenderer.send("test/main-error");
+				}}
+				className="bg-red-400 text-white px-4 py-2 rounded-md"
+			>
+				Manually Throw Error from Main Process
+			</button>
+			<button
+				onClick={() => {
+					api.testServerError.serverError();
+				}}
+				className="bg-red-400 text-white px-4 py-2 rounded-md"
+			>
+				Manually Throw Error from Server Side
 			</button>
 		</>
 	);
