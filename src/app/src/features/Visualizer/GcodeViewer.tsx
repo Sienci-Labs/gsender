@@ -105,7 +105,11 @@ class GcodeViewer extends Component<Props> {
 
 	outlineRunning = false;
 
-	lastSeekedLine = -1;
+	lastHiddenLine = -1;
+
+	lastWposKey = "";
+
+	lastConnected: boolean | null = null;
 
 	componentDidMount() {
 		this.createViewer();
@@ -197,9 +201,8 @@ class GcodeViewer extends Component<Props> {
 	buildOptions(): Partial<GCodeViewerOptions> {
 		const { state } = this.props;
 		const laser = isLaserMode();
-		const toolVisible = state.liteMode
-			? state.objects.cuttingTool.visibleLite
-			: state.objects.cuttingTool.visible;
+		const isConnected = !!_get(reduxStore.getState(), "connection.isConnected");
+		const toolVisible = this.cuttingToolVisible();
 		const hideProcessed = store.get(
 			"widgets.visualizer.hideProcessedLines",
 			false,
@@ -209,13 +212,16 @@ class GcodeViewer extends Component<Props> {
 			units: state.units === METRIC_UNITS ? "mm" : "in",
 			mode: { laser, sim3d: false },
 			bit: {
-				enabled: toolVisible,
+				// Bit only shows while connected, matching the old visualizer.
+				enabled: isConnected && toolVisible,
 				type: laser ? "laser" : "drill",
-				size: 4.05,
+				// Matches the old bit.stl (68.67mm) scaled 0.5 → ~34mm tall; gviewer
+				// scales the drill so largestDim = size * 1.6.
+				size: 21.5,
 				opacity: 0.9,
 				tweenMs: 100,
-				colorSource: "cutting",
-				color: "#ffffff",
+				colorSource: "custom",
+				color: "#caf0f8",
 			},
 			progress: { mode: hideProcessed ? "hide" : "grey" },
 			boundingBox: { visible: state.objects.limits.visible, labels: true },
@@ -253,6 +259,7 @@ class GcodeViewer extends Component<Props> {
 
 	applyWorkerData(data: WorkerGeometryData) {
 		this.lastWorkerData = data;
+		this.lastHiddenLine = -1;
 
 		if (this.mode === "svg" && this.viewerSvg) {
 			this.viewerSvg.loadFromWorkerData(data);
@@ -340,7 +347,7 @@ class GcodeViewer extends Component<Props> {
 
 	unload() {
 		this.lastWorkerData = null;
-		this.lastSeekedLine = -1;
+		this.lastHiddenLine = -1;
 		this.viewer3d?.unload();
 		this.viewerSvg?.clear();
 		controller.context = {
@@ -428,7 +435,7 @@ class GcodeViewer extends Component<Props> {
 			pubsub.subscribe("job:end", () => {
 				this.viewer3d?.showAll();
 				this.viewer3d?.resetColors();
-				this.lastSeekedLine = -1;
+				this.lastHiddenLine = -1;
 			}),
 			pubsub.subscribe("gcode:unload", () => {
 				this.unload();
@@ -441,23 +448,56 @@ class GcodeViewer extends Component<Props> {
 			}),
 		];
 
-		// Drive "hide processed lines" from live sender status.
+		// Mirror the old (redux-connected) visualizer: drive the bit position,
+		// bit visibility and run-time progress greying from live controller state.
 		this.reduxUnsub = reduxStore.subscribe(() => {
 			const st = reduxStore.getState();
-			if (_get(st, "controller.workflow.state") !== WORKFLOW_STATE_RUNNING) {
-				return;
+
+			// Bit follows the live work position (DRO) — jogging and running alike.
+			const wpos = _get(st, "controller.wpos");
+			if (wpos) {
+				const key = `${wpos.x},${wpos.y},${wpos.z},${wpos.a ?? 0}`;
+				if (key !== this.lastWposKey) {
+					this.lastWposKey = key;
+					this.lastPosition = {
+						x: Number(wpos.x) || 0,
+						y: Number(wpos.y) || 0,
+						z: Number(wpos.z) || 0,
+						a: Number(wpos.a) || 0,
+					};
+					this.viewer3d?.setBitPosition(this.lastPosition);
+					this.viewerSvg?.setBitPosition(this.lastPosition);
+				}
 			}
-			if (!store.get("widgets.visualizer.hideProcessedLines", false)) {
-				return;
+
+			// Bit is only shown while connected (matches the old behaviour).
+			const connected = !!_get(st, "connection.isConnected");
+			if (connected !== this.lastConnected) {
+				this.lastConnected = connected;
+				this.viewer3d?.setBitVisible(connected && this.cuttingToolVisible());
 			}
-			const line =
-				_get(st, "controller.sender.status.currentLineRunning", 0) ||
-				_get(st, "controller.sender.status.received", 0);
-			if (line !== this.lastSeekedLine && this.viewer3d) {
-				this.lastSeekedLine = line;
-				this.viewer3d.seekToLine(line, "hide");
+
+			// Progress greying/hiding while a job runs: always grey, hide only when
+			// the hideProcessedLines setting is on. Use hideUntilLine (not seekToLine)
+			// so it never fights the DRO-driven bit position above.
+			if (_get(st, "controller.workflow.state") === WORKFLOW_STATE_RUNNING) {
+				const line =
+					_get(st, "controller.sender.status.currentLineRunning", 0) ||
+					_get(st, "controller.sender.status.received", 0);
+				if (line !== this.lastHiddenLine && this.viewer3d) {
+					this.lastHiddenLine = line;
+					const mode = store.get("widgets.visualizer.hideProcessedLines", false)
+						? "hide"
+						: "grey";
+					this.viewer3d.hideUntilLine(line, mode);
+				}
 			}
 		});
+	}
+
+	cuttingToolVisible(): boolean {
+		const { objects, liteMode } = this.props.state;
+		return liteMode ? objects.cuttingTool.visibleLite : objects.cuttingTool.visible;
 	}
 
 	unsubscribe() {
