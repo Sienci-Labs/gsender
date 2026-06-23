@@ -12,6 +12,7 @@ import { HashRouter } from "react-router";
 import { Toaster } from "./components/shadcn/Sonner";
 import { AccessibilitySettingsHandler } from "./features/Helper/AccessibilitySettingsHandler";
 import { ReactRoutes } from "./react-routes";
+import { updateSentryConsent } from "./sentry-config";
 
 function App() {
 	useEffect(() => {
@@ -38,10 +39,14 @@ function App() {
 		);
 
 		if (shouldSendUsageData === "accepted") {
-			console.log("Collecting usage data through PostHog");
+			console.log("Collecting usage data through PostHog and Sentry");
 			posthog.opt_in_capturing();
+			updateSentryConsent("accepted");
 		} else {
 			posthog.opt_out_capturing();
+			updateSentryConsent(
+				shouldSendUsageData === "denied" ? "denied" : "pending",
+			);
 		}
 
 		if (isElectron()) {
