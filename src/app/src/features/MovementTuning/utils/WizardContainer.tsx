@@ -2,7 +2,7 @@
 /** biome-ignore-all lint/suspicious/noExplicitAny: <> */
 /** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
 /** biome-ignore-all lint/a11y/noSvgWithoutTitle: <> */
-import type { SubWizard } from "app/features/AccessoryInstaller/types/wizard";
+import type { SubWizard } from "app/components/Wizard/types";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Fragment, useContext, useEffect, useState } from "react";
 import { MovementTuningContext } from "./MovementTuningContext";

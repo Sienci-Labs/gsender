@@ -4,7 +4,7 @@ import { ValidationBanner } from "app/features/AccessoryInstaller/components/wiz
 import type {
 	SubWizard,
 	ValidationResult,
-} from "app/features/AccessoryInstaller/types/wizard";
+} from "app/components/Wizard/types/wizard";
 import DefaultImage from "app/features/AccessoryInstaller/Wizards/assets/placeholder.png";
 import { ArrowLeft, ArrowRight, HelpCircle } from "lucide-react";
 

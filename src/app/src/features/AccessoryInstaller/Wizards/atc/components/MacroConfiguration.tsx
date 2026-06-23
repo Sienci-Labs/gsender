@@ -1,5 +1,5 @@
+import type { StepProps } from "app/components/Wizard/types";
 import { StepActionButton } from "app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx";
-import type { StepProps } from "app/features/AccessoryInstaller/types";
 import { generateAllMacros } from "app/features/ATC/components/Configuration/utils/ConfigUtils.ts";
 import controller from "app/lib/controller.ts";
 import store from "app/store";

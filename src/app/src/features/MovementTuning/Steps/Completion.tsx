@@ -14,15 +14,12 @@ import { useTypedSelector } from "app/hooks/useTypedSelector";
 import { useWorkspaceState } from "app/hooks/useWorkspaceState";
 import controller from "app/lib/controller";
 import { toFixedIfNecessary } from "app/lib/rounding";
-import { useContext } from "react";
 import { toast } from "sonner";
 import { calculateNewStepsPerMM, getEEPROMSettingKey } from "../utils";
-import { MovementTuningContext } from "../utils/MovementTuningContext";
+import { useMovementTuning } from "../utils/MovementTuningContext";
 
 const Completion = () => {
-	const { moveDistance, measuredDistance, selectedAxis } = useContext(
-		MovementTuningContext,
-	);
+	const { moveDistance, measuredDistance, selectedAxis } = useMovementTuning();
 	const { units } = useWorkspaceState();
 	const { settings } = useTypedSelector((state) => state.controller.settings);
 

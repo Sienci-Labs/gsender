@@ -1,16 +1,14 @@
 import { Button } from "app/components/Button";
-import { useContext } from "react";
 import { FaClipboardCheck, FaClipboardList } from "react-icons/fa";
-import { MovementTuningContext } from "../utils/MovementTuningContext";
+import { useMovementTuning } from "../utils/MovementTuningContext";
 
 interface Props {
 	onComplete: () => void;
 }
 
 const MarkFirstLocation = ({ onComplete }: Props) => {
-	const { markLocationCompleted, setMarkLocationCompleted } = useContext(
-		MovementTuningContext,
-	);
+	const { markLocationCompleted, setMarkLocationCompleted } =
+		useMovementTuning();
 	return (
 		<div className="flex flex-col gap-4">
 			<div className="space-y-1">

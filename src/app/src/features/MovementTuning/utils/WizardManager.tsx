@@ -1,5 +1,5 @@
 /** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
-import type { SubWizard } from "app/features/AccessoryInstaller/types/wizard";
+import type { SubWizard } from "app/components/Wizard/types/wizard";
 import { useState } from "react";
 import { useMovementTuningWizard } from "../Steps/MovementTuning";
 import { WizardContainer } from "./WizardContainer";

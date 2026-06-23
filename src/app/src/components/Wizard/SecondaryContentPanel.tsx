@@ -6,16 +6,20 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "app/components/shadcn/Popover";
-import type { SecondaryContent } from "./types/wizard";
 import { ExternalLink, QrCode } from "lucide-react";
-import { type ComponentType } from "react";
+import type { ComponentType } from "react";
 import QRCodeComponent from "react-qr-code";
+import type { SecondaryContent } from "./types/wizard";
 
 interface SecondaryContentPanelProps {
 	content: SecondaryContent[];
+	getItemParams: () => any;
 }
 
-export function SecondaryContentPanel({ content }: SecondaryContentPanelProps) {
+export function SecondaryContentPanel({
+	content,
+	getItemParams,
+}: SecondaryContentPanelProps) {
 	if (!content || content.length === 0) {
 		return (
 			<div className="flex items-center justify-center h-full">
@@ -44,7 +48,9 @@ export function SecondaryContentPanel({ content }: SecondaryContentPanelProps) {
 			? "flex-1 min-h-0 overflow-hidden portrait:min-w-0 portrait:h-full"
 			: "flex-shrink-0 portrait:flex-1 portrait:min-w-0 portrait:overflow-hidden";
 
-		let itemContent = item.function ? item.function(item) : item.content;
+		const itemContent = item.function
+			? item.function(item, getItemParams())
+			: item.content;
 
 		if (item.type === "image") {
 			const imageContainerClass =

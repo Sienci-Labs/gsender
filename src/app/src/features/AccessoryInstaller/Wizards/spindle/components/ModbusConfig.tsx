@@ -3,7 +3,7 @@ import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
 import { RootState } from "app/store/redux";
 import controller from "app/lib/controller.ts";
 import { StepActionButton } from "app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx";
-import { StepProps } from "app/features/AccessoryInstaller/types";
+import { StepProps } from "app/components/Wizard/types";
 import { firmwarePastVersion } from "app/lib/firmwareSemver.ts";
 import { ATCI_SUPPORTED_VERSION } from "app/features/ATC/utils/ATCiConstants.ts";
 

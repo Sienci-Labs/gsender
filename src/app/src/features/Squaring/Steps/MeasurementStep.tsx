@@ -1,18 +1,23 @@
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
 import Button from "app/components/Button";
 import { ControlledInput } from "app/components/ControlledInput";
 import { useWorkspaceState } from "app/hooks/useWorkspaceState";
 import { useEffect, useState } from "react";
 import { FaClipboard, FaClipboardCheck, FaClipboardList } from "react-icons/fa";
-import TriangleDiagram from "../components/TriangleDiagram";
 import { useSquaring } from "../context/SquaringContext";
 
-const MeasurementStep = () => {
+interface Props {
+	onComplete: () => void;
+}
+
+const MeasurementStep = ({ onComplete }: Props) => {
 	const {
 		mainSteps,
 		currentMainStep,
 		currentSubStep,
 		completeStep,
 		updateTriangle,
+		isCurrentStepComplete,
 	} = useSquaring();
 	const { units } = useWorkspaceState();
 
@@ -29,6 +34,12 @@ const MeasurementStep = () => {
 			"1-3": "",
 		});
 	}, [currentMainStep]);
+
+	useEffect(() => {
+		if (isCurrentStepComplete) {
+			onComplete();
+		}
+	}, [isCurrentStepComplete]);
 
 	const currentMainStepData = mainSteps[currentMainStep];
 	const currentSubStepData = currentMainStepData.subSteps[currentSubStep];
@@ -119,7 +130,7 @@ const MeasurementStep = () => {
 													onClick={() =>
 														handleMeasurementComplete(step.buttonLabel)
 													}
-													testId={"confirm " + measurementKey}
+													testId={`confirm ${measurementKey}`}
 												>
 													{step.completed ? "Update" : "Confirm"}
 												</Button>
@@ -133,10 +144,10 @@ const MeasurementStep = () => {
 				</div>
 			</div>
 
-			<div className="flex flex-col items-center gap-4">
+			{/* <div className="flex flex-col items-center gap-4">
 				<h3 className="text-lg font-semibold">Diagram</h3>
 				<TriangleDiagram />
-			</div>
+			</div> */}
 		</div>
 	);
 };

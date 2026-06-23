@@ -1,4 +1,4 @@
-import { StepProps } from "app/features/AccessoryInstaller/types";
+import { StepProps } from "app/components/Wizard/types";
 import { StepActionButton } from "app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx";
 import { useEffect, useRef, useState } from "react";
 import { PositionSetter } from "app/features/AccessoryInstaller/Wizards/atc/components/PositionSetter.tsx";

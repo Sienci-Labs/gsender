@@ -9,7 +9,6 @@ import { WizardLanding } from "./WizardLanding";
 interface WizardManagerProps {
 	wizard: Wizard;
 	onExit?: () => void;
-	onReset?: () => void;
 	isHub?: boolean;
 	initialSubWizardId?: string;
 }
@@ -17,7 +16,6 @@ interface WizardManagerProps {
 export function WizardManager({
 	wizard,
 	onExit,
-	onReset,
 	isHub = false,
 	initialSubWizardId,
 }: WizardManagerProps) {
@@ -66,7 +64,6 @@ export function WizardManager({
 				<WizardContainer
 					subWizard={selectedSubWizard}
 					onWizardExit={handleExitWizard}
-					onWizardReset={onReset}
 				/>
 			) : (
 				<WizardLanding

@@ -1,9 +1,11 @@
 import { useWorkspaceState } from "app/hooks/useWorkspaceState";
+import { noop } from "lodash";
 import {
 	createContext,
 	type Dispatch,
 	type ReactNode,
 	type SetStateAction,
+	useContext,
 	useState,
 } from "react";
 
@@ -22,7 +24,10 @@ const initialState: {
 	setSetTravelCompleted?: Dispatch<SetStateAction<boolean>>;
 	setMoveDistance?: Dispatch<SetStateAction<number>>;
 	setMeasuredDistance?: Dispatch<SetStateAction<number>>;
-	reset?: () => void;
+	reset: () => void;
+	onNext: () => void;
+	onPrevious: () => void;
+	getItemParams: () => string;
 } = {
 	status: "initial",
 	selectedAxis: "x",
@@ -31,9 +36,15 @@ const initialState: {
 	setTravelCompleted: false,
 	moveDistance: 0,
 	measuredDistance: 0,
+	reset: noop,
+	onNext: noop,
+	onPrevious: noop,
+	getItemParams: () => {
+		return "";
+	},
 };
 
-export const MovementTuningContext = createContext(initialState);
+const MovementTuningContext = createContext(initialState);
 
 export function MovementTuningProvider({ children }: { children: ReactNode }) {
 	const [status, setStatus] = useState<"initial" | "started">("initial");
@@ -57,6 +68,22 @@ export function MovementTuningProvider({ children }: { children: ReactNode }) {
 		setMeasuredDistance(units === "mm" ? 100 : 4);
 	};
 
+	const onNext = noop;
+
+	const onPrevious = () => {
+		if (moveAxisCompleted) {
+			setMoveAxisCompleted(false);
+			return;
+		}
+		if (markLocationCompleted) {
+			setMarkLocationCompleted(false);
+		}
+	};
+
+	const getItemParams = () => {
+		return selectedAxis;
+	};
+
 	const payload = {
 		status,
 		selectedAxis,
@@ -73,6 +100,9 @@ export function MovementTuningProvider({ children }: { children: ReactNode }) {
 		setSetTravelCompleted,
 		setMoveDistance,
 		setMeasuredDistance,
+		onNext,
+		onPrevious,
+		getItemParams,
 	};
 
 	return (
@@ -81,3 +111,11 @@ export function MovementTuningProvider({ children }: { children: ReactNode }) {
 		</MovementTuningContext.Provider>
 	);
 }
+
+export const useMovementTuning = () => {
+	const context = useContext(MovementTuningContext);
+	if (context === undefined) {
+		throw new Error("useSquaring must be used within a SquaringProvider");
+	}
+	return context;
+};

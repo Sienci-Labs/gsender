@@ -82,7 +82,7 @@ export function useValidations() {
 		[firmwareType],
 	);
 
-	const activeStateMovementTuning = useMemo(
+	const activeStateCheck = useMemo(
 		() => () => ({
 			success: activeState === GRBL_ACTIVE_STATE_IDLE,
 			reason: "Your machine must be idle or jogging to use this wizard.",
@@ -96,6 +96,6 @@ export function useValidations() {
 		coreFirmwareValidation,
 		grblHAlValidator,
 		grblValidator,
-		activeStateMovementTuning,
+		activeStateCheck,
 	};
 }

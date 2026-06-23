@@ -1,9 +1,8 @@
 import { Button } from "app/components/Button";
 import { ControlledInput } from "app/components/ControlledInput";
 import { useWorkspaceState } from "app/hooks/useWorkspaceState";
-import { useContext } from "react";
 import { FaClipboardCheck, FaClipboardList } from "react-icons/fa";
-import { MovementTuningContext } from "../utils/MovementTuningContext";
+import { useMovementTuning } from "../utils/MovementTuningContext";
 
 interface Props {
 	onComplete: () => void;
@@ -15,7 +14,7 @@ const DistanceTravelled = ({ onComplete }: Props) => {
 		setSetTravelCompleted,
 		measuredDistance,
 		setMeasuredDistance,
-	} = useContext(MovementTuningContext);
+	} = useMovementTuning();
 	const { units } = useWorkspaceState();
 
 	return (

@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
 import Button from "app/components/Button";
 import { ControlledInput } from "app/components/ControlledInput";
 import {
@@ -6,11 +7,15 @@ import {
 } from "app/constants";
 import { useTypedSelector } from "app/hooks/useTypedSelector";
 import { useWorkspaceState } from "app/hooks/useWorkspaceState";
+import { useEffect } from "react";
 import { FaClipboard, FaClipboardCheck, FaClipboardList } from "react-icons/fa";
-import TriangleDiagram from "../components/TriangleDiagram";
 import { useSquaring } from "../context/SquaringContext";
 
-const MarkingStep = () => {
+interface Props {
+	onComplete: () => void;
+}
+
+const MarkingStep = ({ onComplete }: Props) => {
 	const {
 		mainSteps,
 		currentMainStep,
@@ -18,6 +23,7 @@ const MarkingStep = () => {
 		completeStep,
 		updateStepValue,
 		jogMachine,
+		isCurrentStepComplete,
 	} = useSquaring();
 	const { units } = useWorkspaceState();
 	const status = useTypedSelector((state) => state.controller.state.status);
@@ -28,8 +34,17 @@ const MarkingStep = () => {
 	const currentMainStepData = mainSteps[currentMainStep];
 	const currentSubStepData = currentMainStepData.subSteps[currentSubStep];
 
+	useEffect(() => {
+		if (isCurrentStepComplete) {
+			onComplete();
+		}
+	}, [isCurrentStepComplete]);
+
 	const handleStepComplete = (buttonLabel: string) => {
 		completeStep(buttonLabel);
+		// if (isCurrentStepComplete()) {
+		// 	onComplete();
+		// }
 	};
 
 	const handleJog = (buttonLabel: string, value: number, axis: string) => {
@@ -38,7 +53,7 @@ const MarkingStep = () => {
 	};
 
 	return (
-		<div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-2 items-start">
+		<div className="w-full grid gap-4 grid-cols-1 items-start">
 			<div className="flex flex-col gap-4">
 				<div className="space-y-1">
 					<h3 className="text-lg font-semibold dark:text-white">
@@ -58,7 +73,7 @@ const MarkingStep = () => {
 						return (
 							<div
 								key={step.buttonLabel}
-								className={`flex items-center gap-4 p-2 rounded-lg transition-colors ${
+								className={`flex items-center gap-4 p-2 rounded-lg transition-colors w-1/2 ${
 									isCurrentStep
 										? "bg-blue-50 border border-blue-200 bg-opacity-40"
 										: isPastStep
@@ -126,10 +141,10 @@ const MarkingStep = () => {
 				</div>
 			</div>
 
-			<div className="flex flex-col items-center gap-4">
+			{/* <div className="flex flex-col items-center gap-4">
 				<h3 className="text-lg font-semibold dark:text-white">Diagram</h3>
 				<TriangleDiagram />
-			</div>
+			</div> */}
 		</div>
 	);
 };

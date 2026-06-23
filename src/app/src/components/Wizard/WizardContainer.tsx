@@ -2,23 +2,18 @@
 /** biome-ignore-all lint/suspicious/noExplicitAny: <> */
 /** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
 /** biome-ignore-all lint/a11y/noSvgWithoutTitle: <> */
-import type { SubWizard } from "./types/wizard";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Fragment, useEffect, useState } from "react";
 import ProgressBar from "./ProgressBar";
 import { SecondaryContentPanel } from "./SecondaryContentPanel";
+import type { SubWizard } from "./types/wizard";
 
 interface Props {
 	subWizard: SubWizard;
 	onWizardExit: () => void;
-	onWizardReset?: () => void;
 }
 
-export function WizardContainer({
-	subWizard,
-	onWizardExit,
-	onWizardReset,
-}: Props) {
+export function WizardContainer({ subWizard, onWizardExit }: Props) {
 	const [currentStepIndex, setCurrentStepIndex] = useState(0);
 	const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
 	const [stepData, setStepData] = useState<Record<string, any>>({});
@@ -26,6 +21,7 @@ export function WizardContainer({
 
 	const currentStep = subWizard.steps[currentStepIndex];
 	const StepContextProvider = currentStep.contextProvider || Fragment;
+	const { reset, onPrevious, onNext, getItemParams } = subWizard.context();
 	const fillPrimaryContent = currentStep.fillPrimaryContent === true;
 	const isFirstStep = currentStepIndex === 0;
 	const isLastStep = currentStepIndex === subWizard.steps.length - 1;
@@ -44,6 +40,13 @@ export function WizardContainer({
 	const handleNext = () => {
 		if (!isLastStep && isCurrentStepComplete) {
 			setCurrentStepIndex(currentStepIndex + 1);
+			onNext?.();
+		} else if (
+			isLastStep &&
+			isCurrentStepComplete &&
+			subWizard.completionPage
+		) {
+			setShowCompletion(true);
 		}
 	};
 
@@ -54,20 +57,13 @@ export function WizardContainer({
 				prevIndex--;
 			}
 			setCurrentStepIndex(prevIndex);
+			onPrevious?.();
 		}
 	};
 
 	const handleStepComplete = () => {
 		const newCompletedSteps = new Set(completedSteps).add(currentStepIndex);
 		setCompletedSteps(newCompletedSteps);
-
-		if (
-			isLastStep &&
-			newCompletedSteps.size === subWizard.steps.length &&
-			subWizard.completionPage
-		) {
-			setShowCompletion(true);
-		}
 	};
 
 	const handleStepUncomplete = () => {
@@ -92,6 +88,7 @@ export function WizardContainer({
 		setStepData({});
 		setShowCompletion(false);
 		onWizardExit();
+		reset?.();
 	};
 
 	const resetWizard = () => {
@@ -99,7 +96,7 @@ export function WizardContainer({
 		setCompletedSteps(new Set());
 		setStepData({});
 		setShowCompletion(false);
-		onWizardReset?.();
+		reset?.();
 	};
 
 	const StepComponent = currentStep.component;
@@ -186,6 +183,7 @@ export function WizardContainer({
 								content={
 									showCompletion ? [] : currentStep.secondaryContent || []
 								}
+								getItemParams={getItemParams}
 							/>
 						</div>
 					)}
@@ -229,11 +227,11 @@ export function WizardContainer({
 
 							<button
 								onClick={handleNext}
-								disabled={!isCurrentStepComplete || isLastStep}
+								disabled={!isCurrentStepComplete}
 								className={`
                 flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors
                 ${
-									!isCurrentStepComplete || isLastStep
+									!isCurrentStepComplete
 										? "bg-gray-300 text-gray-500 cursor-not-allowed"
 										: "bg-gray-900 text-white hover:bg-gray-800"
 								}

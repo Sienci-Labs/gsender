@@ -3,9 +3,9 @@
 import { GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG } from "app/constants";
 import { useTypedSelector } from "app/hooks/useTypedSelector";
 import { useWorkspaceState } from "app/hooks/useWorkspaceState";
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 import Select from "react-select";
-import { MovementTuningContext } from "../utils/MovementTuningContext";
+import { useMovementTuning } from "../utils/MovementTuningContext";
 
 interface Props {
 	onComplete: () => void;
@@ -17,7 +17,7 @@ const AxisSelection = ({ onComplete }: Props) => {
 		setSelectedAxis,
 		setMoveDistance,
 		setMeasuredDistance,
-	} = useContext(MovementTuningContext);
+	} = useMovementTuning();
 	const { units } = useWorkspaceState();
 	const isConnected = useTypedSelector((state) => state.connection.isConnected);
 	const controllerStatus = useTypedSelector(

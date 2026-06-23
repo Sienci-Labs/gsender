@@ -1,21 +1,20 @@
-import { useValidations } from "app/features/AccessoryInstaller/hooks/UseValidations.tsx";
-import type { Wizard } from "app/features/AccessoryInstaller/types";
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
+import { useValidations } from "app/components/Wizard/hooks/UseValidations.tsx";
+import type { SecondaryContent, Wizard } from "app/components/Wizard/types";
 import { Jogging } from "app/features/Jogging";
-// import { useTypedSelector } from "app/hooks/useTypedSelector";
-import { useContext, useMemo } from "react";
-import AxisSelection from "./AxisSelection";
-import Completion from "./Completion";
-import DistanceTravelled from "./DistanceTravelled";
-import MarkFirstLocation from "./MarkFirstLocation";
-import MoveAxis from "./MoveAxis";
-import { MovementTuningContext } from "../utils//MovementTuningContext";
+import { useMemo } from "react";
 import xAxisCalibrationImage1 from "../assets/X_axis-calibration_1.png";
 import xAxisCalibrationImage2 from "../assets/X_axis-calibration_2.png";
 import yAxisCalibrationImage1 from "../assets/Y_axis-calibration_1.png";
 import yAxisCalibrationImage2 from "../assets/Y_axis-calibration_2.png";
 import zAxisCalibrationImage1 from "../assets/Z_axis-calibration_1.png";
 import zAxisCalibrationImage2 from "../assets/Z_axis-calibration_2.png";
-import { SecondaryContent } from "app/components/Wizard/types";
+import { useMovementTuning } from "../utils/MovementTuningContext";
+import AxisSelection from "./AxisSelection";
+import Completion from "./Completion";
+import DistanceTravelled from "./DistanceTravelled";
+import MarkFirstLocation from "./MarkFirstLocation";
+import MoveAxis from "./MoveAxis";
 
 const imageDict: Record<string, string> = {
 	x1: xAxisCalibrationImage1,
@@ -27,17 +26,17 @@ const imageDict: Record<string, string> = {
 };
 
 export function useMovementTuningWizard(): Wizard {
-	const { connectionValidation, activeStateMovementTuning } = useValidations();
-	const { selectedAxis } = useContext(MovementTuningContext);
+	const { connectionValidation, activeStateCheck } = useValidations();
+	// const { selectedAxis } = useMovementTuning();
 
 	const validations = useMemo(
-		() => [connectionValidation, activeStateMovementTuning],
-		[connectionValidation, activeStateMovementTuning],
+		() => [connectionValidation, activeStateCheck],
+		[connectionValidation, activeStateCheck],
 	);
 
-	const getImage = (item: SecondaryContent) => {
+	const getImage = (item: SecondaryContent, selectedAxis: string) => {
 		return imageDict[`${selectedAxis}${item.content}`];
-	}
+	};
 
 	return useMemo<Wizard>(
 		() => ({
@@ -50,9 +49,31 @@ export function useMovementTuningWizard(): Wizard {
 				{
 					id: "initial-setup",
 					title: "Movement Tuning",
-					description: "Configure your axes to account for small inaccuracies",
+					description: (
+						<>
+							<p className="mb-2">
+								If you're looking to use your CNC for more accurate work and
+								notice a specific axis is always off by a small amount - say
+								102mm instead of 100 - then use this tool.
+							</p>
+
+							<p className="mb-2">
+								Since CNC firmware needs to understand its hardware to make
+								exact movements, small manufacturing variations in the motors,
+								lead screws, pulleys, or incorrect firmware will create
+								inaccuracies over longer distances.
+							</p>
+
+							<p className="mb-2">
+								By testing for this difference using a marker or tape and a
+								measuring tape, this tool will better tune the firmware to your
+								machine.
+							</p>
+						</>
+					),
 					estimatedTime: "5 - 10 minutes",
 					completionPage: Completion,
+					context: useMovementTuning,
 					steps: [
 						{
 							id: "landing",
@@ -62,6 +83,7 @@ export function useMovementTuningWizard(): Wizard {
 								{
 									type: "image",
 									content: "1",
+									function: getImage,
 								},
 								{
 									type: "component",
@@ -77,7 +99,6 @@ export function useMovementTuningWizard(): Wizard {
 									url: "https://resources.sienci.com/view/gs-calibration-tools/",
 								},
 							],
-							function: getImage
 						},
 						{
 							id: "first-location",
@@ -87,6 +108,7 @@ export function useMovementTuningWizard(): Wizard {
 								{
 									type: "image",
 									content: "1",
+									function: getImage,
 								},
 								{
 									type: "link",
@@ -95,7 +117,6 @@ export function useMovementTuningWizard(): Wizard {
 									url: "https://resources.sienci.com/view/gs-calibration-tools/",
 								},
 							],
-							function: getImage
 						},
 						{
 							id: "move-axis",
@@ -105,6 +126,7 @@ export function useMovementTuningWizard(): Wizard {
 								{
 									type: "image",
 									content: "2",
+									function: getImage,
 								},
 								{
 									type: "link",
@@ -113,7 +135,6 @@ export function useMovementTuningWizard(): Wizard {
 									url: "https://resources.sienci.com/view/gs-calibration-tools/",
 								},
 							],
-							function: getImage
 						},
 						{
 							id: "distance-travelled",
@@ -123,6 +144,7 @@ export function useMovementTuningWizard(): Wizard {
 								{
 									type: "image",
 									content: "2",
+									function: getImage,
 								},
 								{
 									type: "link",
@@ -131,7 +153,6 @@ export function useMovementTuningWizard(): Wizard {
 									url: "https://resources.sienci.com/view/atc-software/",
 								},
 							],
-							function: getImage
 						},
 					],
 				},

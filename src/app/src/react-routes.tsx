@@ -146,14 +146,7 @@ export const ReactRoutes = () => {
 						}
 					/>
 					<Route path="movement-tuning" element={<MovementTuning />} />
-					<Route
-						path="squaring"
-						element={
-							<Page title="XY Squaring" withGoBackButton withFixedArea>
-								<Squaring />
-							</Page>
-						}
-					/>
+					<Route path="squaring" element={<Squaring />} />
 					<Route
 						path="surfacing"
 						element={

@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/a11y/noSvgWithoutTitle: <> */
 import { useWorkspaceState } from "app/hooks/useWorkspaceState";
 import React from "react";
 import { useSquaring } from "../context/SquaringContext";
@@ -24,7 +25,7 @@ const TriangleDiagram = () => {
 
 	// Determine which points should be shown based on the current step
 	const getPointVisibility = (index: number) => {
-		if (currentMainStep === 0) {
+		if (currentMainStep === 1) {
 			// In marking phase, show points only after they've been marked
 			const markedPoints = currentMainStepData.subSteps.reduce(
 				(count, step, stepIndex) => {
@@ -47,7 +48,7 @@ const TriangleDiagram = () => {
 	// Check if a point should be pulsing (during marking steps)
 	const shouldPointPulse = (index: number) => {
 		if (
-			currentMainStep === 0 &&
+			currentMainStep === 1 &&
 			currentSubStepData?.buttonLabel.includes("Mark Point") &&
 			!currentSubStepData.completed
 		) {
@@ -59,7 +60,7 @@ const TriangleDiagram = () => {
 
 	// Check if a measurement line should be pulsing
 	const shouldLinePulse = (lineIndex: number) => {
-		if (currentMainStep === 1) {
+		if (currentMainStep === 2) {
 			if (currentSubStepData?.buttonLabel.includes("1-2"))
 				return lineIndex === 0;
 			if (currentSubStepData?.buttonLabel.includes("2-3"))
@@ -104,7 +105,7 @@ const TriangleDiagram = () => {
 
 	// Show movement arrows during marking phase
 	const showMovementArrow =
-		currentMainStep === 0 && currentSubStepData?.buttonLabel?.includes("Move");
+		currentMainStep === 1 && currentSubStepData?.buttonLabel?.includes("Move");
 	const getArrowDirection = () => {
 		if (!showMovementArrow) return null;
 		if (currentSubStepData.buttonLabel.includes("X")) return "horizontal";
@@ -116,7 +117,7 @@ const TriangleDiagram = () => {
 
 	// Get measurement labels for lines
 	const getMeasurementLabel = (lineIndex: number) => {
-		if (currentMainStep !== 1) return null;
+		if (currentMainStep !== 2) return null;
 		const distances = [
 			{ points: "1-2", value: triangle.a, key: "a" as const },
 			{ points: "2-3", value: triangle.b, key: "b" as const },
@@ -134,7 +135,7 @@ const TriangleDiagram = () => {
 				{lines.map((d, i) => (
 					<g key={d}>
 						<path d={d} className={`stroke-2 ${lineStyles[i]} fill-none`} />
-						{currentMainStep === 1 && (
+						{currentMainStep === 2 && (
 							<text
 								x={
 									i === 0
@@ -256,7 +257,7 @@ const TriangleDiagram = () => {
 								className={`absolute text-lg w-10 h-10 -ml-5 -mt-5 [transform:rotate(45deg)] [-ms-transform:rotate(45deg)] [-webkit-transform:rotate(45deg)] before:absolute before:-z-1 before:left-1/2 before:w-1/3 before:-ml-[15%] before:h-full after:absolute after:-z-1 after:top-1/2 after:h-1/3 after:-mt-[15%] after:w-full flex items-center justify-center font-bold text-white transition-colors ${
 									shouldPointPulse(index)
 										? "before:bg-blue-500 after:bg-blue-500 animate-pulse"
-										: currentMainStep === 0 && index === currentSubStep
+										: currentMainStep === 1 && index === currentSubStep
 											? "before:bg-blue-500 after:bg-blue-500"
 											: "before:bg-green-500 after:bg-green-500"
 								}`}

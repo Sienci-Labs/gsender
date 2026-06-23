@@ -6,7 +6,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "app/components/shadcn/Popover";
-import type { SecondaryContent } from "app/features/AccessoryInstaller/types/wizard";
+import type { SecondaryContent } from "app/components/Wizard/types/wizard";
 import { ExternalLink, QrCode } from "lucide-react";
 import { type ComponentType, useContext } from "react";
 import QRCodeComponent from "react-qr-code";

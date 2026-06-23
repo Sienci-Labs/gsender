@@ -1,4 +1,5 @@
-import type { ComponentType, ReactNode } from "react";
+/** biome-ignore-all lint/suspicious/noExplicitAny: <> */
+import { type ComponentType, type ContextType, createContext, type ReactNode } from "react";
 
 export interface WizardStep {
 	id: string;
@@ -24,13 +25,20 @@ export interface SecondaryContent {
 	url?: string;
 	props?: Record<string, any>;
 	fill?: boolean;
-	function?: (item: SecondaryContent) => void;
+	function?: (item: SecondaryContent, params: any) => string;
 }
+
+export const GeneralWizardContext = createContext({
+	reset: () => {},
+	onPrevious: () => {},
+	onNext: () => {},
+	getItemParams: () => {},
+})
 
 export interface SubWizard {
 	id: string;
 	title: string;
-	description?: string;
+	description?: string | ReactNode;
 	estimatedTime?: string;
 	configVersion?: string;
 	steps: WizardStep[];
@@ -39,6 +47,7 @@ export interface SubWizard {
 	completionImage?: string;
 	secondaryContentLeft?: boolean;
 	hideVersionPrintout?: boolean;
+	context?: () => ContextType<typeof GeneralWizardContext>
 }
 
 export interface ValidationResult {

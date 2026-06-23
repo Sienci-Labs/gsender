@@ -2,9 +2,8 @@ import { Button } from "app/components/Button";
 import { ControlledInput } from "app/components/ControlledInput";
 import { jogAxis } from "app/features/Jogging/utils/Jogging";
 import { useWorkspaceState } from "app/hooks/useWorkspaceState";
-import { useContext } from "react";
 import { FaClipboardCheck, FaClipboardList } from "react-icons/fa";
-import { MovementTuningContext } from "../utils/MovementTuningContext";
+import { useMovementTuning } from "../utils/MovementTuningContext";
 
 interface Props {
 	onComplete: () => void;
@@ -17,7 +16,7 @@ const MoveAxis = ({ onComplete }: Props) => {
 		selectedAxis,
 		moveDistance,
 		setMoveDistance,
-	} = useContext(MovementTuningContext);
+	} = useMovementTuning();
 	const { units } = useWorkspaceState();
 
 	return (
@@ -48,7 +47,7 @@ const MoveAxis = ({ onComplete }: Props) => {
 					<div className="flex flex-col gap-2 flex-1">
 						<div className="flex items-center gap-4">
 							<Button
-								// disabled={moveAxisCompleted}
+								disabled={moveAxisCompleted}
 								onClick={() => {
 									jogAxis(
 										{
