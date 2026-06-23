@@ -1,3 +1,6 @@
-module.exports = new Proxy({}, {
-  get: () => () => null
-});
+module.exports = new Proxy(
+	{},
+	{
+		get: () => () => null,
+	},
+);

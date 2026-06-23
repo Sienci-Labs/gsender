@@ -1,6 +1,4 @@
 import { useTypedSelector } from "app/hooks/useTypedSelector";
-import pubsub from "pubsub-js";
-import { useEffect, useState } from "react";
 import KeyboardShortcuts from "./Keyboard";
 
 const Shortcuts = () => {

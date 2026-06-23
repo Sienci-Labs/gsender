@@ -1,25 +1,25 @@
-import isElectron from "is-electron";
-import debounce from "lodash/debounce";
-import difference from "lodash/difference";
-import get from "lodash/get";
-import set from "lodash/set";
-import uniq from "lodash/uniq";
-import isEmpty from "lodash/isEmpty";
-import semver from "semver";
-import settings from "../config/settings";
-import ImmutableStore from "app/lib/immutable-store";
-import log from "app/lib/log";
-import defaultState from "./defaultState";
-import { MACRO_CATEGORY, METRIC_UNITS } from "../constants";
+import api from "app/api";
+import defaultMachineProfiles from "app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts";
 import {
 	TOUCHPLATE_TYPE_AUTOZERO,
 	TOUCHPLATE_TYPE_STANDARD,
 } from "app/lib/constants.ts";
-import defaultMachineProfiles from "app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts";
-import { defaultATCIMacros } from "../features/ATC/assets/defaultATCIMacros";
-import api from "app/api";
+import ImmutableStore from "app/lib/immutable-store";
+import log from "app/lib/log";
+import type { BackupFrequencies } from "app/workspace/definitions";
+import isElectron from "is-electron";
+import debounce from "lodash/debounce";
+import difference from "lodash/difference";
+import get from "lodash/get";
+import isEmpty from "lodash/isEmpty";
+import set from "lodash/set";
+import uniq from "lodash/uniq";
 import pubsub from "pubsub-js";
-import { BackupFrequencies } from "app/workspace/definitions";
+import semver from "semver";
+import settings from "../config/settings";
+import { MACRO_CATEGORY, METRIC_UNITS } from "../constants";
+import { defaultATCIMacros } from "../features/ATC/assets/defaultATCIMacros";
+import defaultState from "./defaultState";
 
 interface UserData {
 	path: string;

@@ -1,4 +1,4 @@
-import { ATCUnavailablePayload } from "../definitions";
+import type { ATCUnavailablePayload } from "../definitions";
 
 export const getATCUnavailablePayload = ({
 	isConnected,

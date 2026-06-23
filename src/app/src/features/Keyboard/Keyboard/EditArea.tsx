@@ -22,22 +22,32 @@
  */
 
 import { Button } from "app/components/Button";
+import type {
+	CommandKey,
+	CommandKeys,
+	ShuttleEvent,
+} from "app/lib/definitions/shortcuts";
 import shuttleEvents from "app/lib/shuttleEvents";
 import { cn } from "app/lib/utils";
-import PropTypes from "prop-types";
 import React, { useEffect, useState } from "react";
 import {
 	FaCheckCircle,
 	FaExclamationCircle,
 	FaInfoCircle,
 } from "react-icons/fa";
-
 import { formatShortcut, shouldHideShiftForKey } from "../helpers";
 
 const triggerKeys = ["Meta", "Alt", "Shift", "Control"];
 const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
 
-const EditArea = ({ shortcut, shortcuts, edit, onClose }) => {
+interface EditProps {
+	shortcut: CommandKey;
+	shortcuts: CommandKeys;
+	edit: (shortcut: any, showToast?: boolean) => void;
+	onClose: () => void;
+}
+
+const EditArea = ({ shortcut, shortcuts, edit, onClose }: EditProps) => {
 	const [state, setState] = useState({
 		pressed: false,
 		singleKey: "",
@@ -49,8 +59,8 @@ const EditArea = ({ shortcut, shortcuts, edit, onClose }) => {
 		status: { available: false, error: false, message: "" },
 	});
 
-	const buildCombo = (e) => {
-		const keyMap = {
+	const buildCombo = (e: KeyboardEvent) => {
+		const keyMap: Record<string, string> = {
 			Backspace: "backspace",
 			Tab: "tab",
 			Enter: "enter",
@@ -103,7 +113,7 @@ const EditArea = ({ shortcut, shortcuts, edit, onClose }) => {
 		return [key, keyCombo];
 	};
 
-	const outputKeys = (e) => {
+	const outputKeys = (e: KeyboardEvent) => {
 		e.preventDefault();
 		const [singleKey, keyCombo] = buildCombo(e);
 
@@ -124,9 +134,11 @@ const EditArea = ({ shortcut, shortcuts, edit, onClose }) => {
 
 		if (foundShortcut) {
 			if (foundShortcut[1].keys !== shortcut.keys) {
+				console.log(foundShortcut[1]);
 				const title = allShuttleControlEvents[foundShortcut[1].cmd]
-					? allShuttleControlEvents[foundShortcut[1].cmd].title
-					: foundShortcut[1].title;
+					? (allShuttleControlEvents[foundShortcut[1].cmd] as ShuttleEvent)
+							.title
+					: (foundShortcut[1] as ShuttleEvent).title; // in this case, it is a macro shuttle event
 				setState((prev) => ({
 					...prev,
 					...keyState,
@@ -187,8 +199,8 @@ const EditArea = ({ shortcut, shortcuts, edit, onClose }) => {
 	};
 
 	const title = allShuttleControlEvents[shortcut.cmd]
-		? allShuttleControlEvents[shortcut.cmd].title
-		: shortcut.title;
+		? (allShuttleControlEvents[shortcut.cmd] as ShuttleEvent).title
+		: (shortcut as ShuttleEvent).title;
 
 	const renderNewShortcut = () => {
 		if (!state.pressed) {

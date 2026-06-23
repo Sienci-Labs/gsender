@@ -1,31 +1,29 @@
-import { useEffect, useState } from "react";
-import pubsub from "pubsub-js";
-
-import { useTypedSelector } from "app/hooks/useTypedSelector";
+import api from "app/api";
+import { ScrollArea } from "app/components/shadcn/ScrollArea";
 import { Switch } from "app/components/shadcn/Switch";
-
-import Size from "./Size";
-import Info from "./Info";
-import LoadingAnimation from "./LoadingAnimation";
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
 } from "app/components/shadcn/Tooltip";
-import { getRecentFiles } from "../utils/recentfiles";
-import { RecentFile } from "../definitions";
-import { Job } from "app/features/Stats/utils/StatContext";
-import { MdInfoOutline } from "react-icons/md";
-import { LuFileCode2 } from "react-icons/lu";
-import { FiClock } from "react-icons/fi";
-import cx from "classnames";
 import { JOB_STATUS } from "app/constants";
+import type { Job } from "app/features/Stats/utils/StatContext";
+import { useTypedSelector } from "app/hooks/useTypedSelector";
 import { convertMillisecondsToTimeStamp } from "app/lib/datetime";
-import api from "app/api";
+import cx from "classnames";
 import isElectron from "is-electron";
-import { ScrollArea } from "app/components/shadcn/ScrollArea";
+import pubsub from "pubsub-js";
+import { useEffect, useState } from "react";
+import { FiClock } from "react-icons/fi";
 import { LiaFileUploadSolid } from "react-icons/lia";
+import { LuFileCode2 } from "react-icons/lu";
+import { MdInfoOutline } from "react-icons/md";
+import type { RecentFile } from "../definitions";
+import { getRecentFiles } from "../utils/recentfiles";
+import Info from "./Info";
+import LoadingAnimation from "./LoadingAnimation";
+import Size from "./Size";
 
 interface Props {
 	handleRecentFileUpload: (file: RecentFile, isRecentFile?: boolean) => void;

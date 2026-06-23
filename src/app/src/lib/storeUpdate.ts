@@ -1,14 +1,14 @@
-import store, { merge } from "../store";
-import defaultState from "../store/defaultState";
-import api from "../api";
 import { toast } from "app/lib/toaster";
 import pubsub from "pubsub-js";
+import api from "../api";
+import store, { merge } from "../store";
+import defaultState from "../store/defaultState";
 import {
-	TOUCHPLATE_TYPE_STANDARD,
-	TOUCHPLATE_TYPE_AUTOZERO,
-	TOUCHPLATE_TYPE_ZERO,
 	TOUCHPLATE_TYPE_3D,
+	TOUCHPLATE_TYPE_AUTOZERO,
 	TOUCHPLATE_TYPE_BITZERO,
+	TOUCHPLATE_TYPE_STANDARD,
+	TOUCHPLATE_TYPE_ZERO,
 } from "./constants";
 
 export const restoreDefault = async (): Promise<void> => {
@@ -70,18 +70,20 @@ export const storeUpdate = async (
 				TOUCHPLATE_TYPE_STANDARD;
 		}
 
-        const currentTheme = store.get('widgets.visualizer.theme');
-        const nextTheme = mergedSettings?.widgets?.visualizer?.theme;
+		const currentTheme = store.get("widgets.visualizer.theme");
+		const nextTheme = mergedSettings?.widgets?.visualizer?.theme;
 
 		restoreSettings(mergedSettings, isSync);
 
-        pubsub.publish('theme:change');
-    } catch (error) {
-        console.error(error);
-        /**
-         *  Possible errors:
-         *  1. JSON.parse(content) could not execute
-         */
-        return;
-    }
+		if (nextTheme && nextTheme !== currentTheme) {
+			pubsub.publish("theme:change", nextTheme);
+		}
+	} catch (error) {
+		console.error(error);
+		/**
+		 *  Possible errors:
+		 *  1. JSON.parse(content) could not execute
+		 */
+		return;
+	}
 };

@@ -9,23 +9,23 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 } from "app/components/shadcn/AlertDialog.tsx";
-import { ActionButton } from "app/features/Config/components/ActionButton.tsx";
-import { GrRevert } from "react-icons/gr";
-import store from "app/store";
-import { useSelector } from "react-redux";
-import { RootState } from "app/store/redux";
-import machineProfiles from "app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts";
-import { toast } from "app/lib/toaster";
-import controller from "app/lib/controller.ts";
-import { resolveGrblCoreDefaults } from "app/features/Config/utils/grblCoreMigration.ts";
-import { useSettings } from "app/features/Config/utils/SettingsContext.tsx";
-import { cn } from "app/lib/utils.ts";
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
 } from "app/components/shadcn/Tooltip.tsx";
+import machineProfiles from "app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts";
+import { ActionButton } from "app/features/Config/components/ActionButton.tsx";
+import { resolveGrblCoreDefaults } from "app/features/Config/utils/grblCoreMigration.ts";
+import { useSettings } from "app/features/Config/utils/SettingsContext.tsx";
+import controller from "app/lib/controller.ts";
+import { toast } from "app/lib/toaster";
+import { cn } from "app/lib/utils.ts";
+import store from "app/store";
+import type { RootState } from "app/store/redux";
+import { GrRevert } from "react-icons/gr";
+import { useSelector } from "react-redux";
 
 function getMachineProfile(id: number) {
 	const profile = machineProfiles.find((profile) => profile.id === id);
@@ -59,7 +59,7 @@ function restoreEEPROMDefaults(type = "", firmwareSemver: number | undefined) {
 
 	const values = [];
 
-	for (let [key, value] of Object.entries(eepromSettings)) {
+	for (const [key, value] of Object.entries(eepromSettings)) {
 		if (hasOrderedSettings && orderedSettings.has(key)) {
 			continue;
 		}

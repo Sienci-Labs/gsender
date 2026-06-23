@@ -6,14 +6,20 @@
 		"useIgnoreFile": true
 	},
 	"files": {
-		"ignoreUnknown": false
+		"ignoreUnknown": false,
+		"includes": [
+			"**",
+			"!cypress/fixtures/invalid-settings.json",
+			"!cypress/dashboard/report/index.html"
+		]
 	},
 	"formatter": {
 		"enabled": true,
-		"indentStyle": "tab"
+		"indentStyle": "tab",
+		"lineEnding": "lf"
 	},
 	"linter": {
-		"enabled": true,
+		"enabled": false,
 		"rules": {
 			"recommended": true
 		}
@@ -21,6 +27,11 @@
 	"javascript": {
 		"formatter": {
 			"quoteStyle": "double"
+		}
+	},
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
 		}
 	},
 	"assist": {

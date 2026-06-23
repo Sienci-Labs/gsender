@@ -1,25 +1,38 @@
 module.exports = {
-    testEnvironment: "jsdom",
-    setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
-    automock: false,
-    transform: {
-        "^.+\\.[jt]sx?$": ["babel-jest", { configFile: "./babel.config.js" }],
-    },
-    transformIgnorePatterns: [
-        "/node_modules/(?!(three|refractor|hastscript|hast-util-to-html|property-information)/)",
-    ],
-    testPathIgnorePatterns: ["/node_modules/", "App.test.tsx"],
-    moduleNameMapper: {
-        "\\.(css|less|scss|sass|styl)$": "<rootDir>/__mocks__/styleMock.js",
-        "\\.(jpg|jpeg|png|gif|svg)$": "<rootDir>/__mocks__/fileMock.js",
-        "^app/(.*)$": "<rootDir>/src/app/src/$1",
-        "^(\\.{1,2}/)*config/settings$": "<rootDir>/src/app/src/config/__mocks__/settings.ts",
-        "^react-syntax-highlighter$": "<rootDir>/src/app/src/mocks/reactSyntaxHighlighterMock.js",
-        "^react-syntax-highlighter/(.*)$": "<rootDir>/src/app/src/mocks/reactSyntaxHighlighterMock.js",
-        "^refractor(.*)$": "<rootDir>/src/app/src/mocks/reactSyntaxHighlighterMock.js",
-    },
-    testMatch: ["**/__tests__/**/*.[jt]s?(x)", "**/*.test.[jt]s?(x)"],
-    haste: {
-        forceNodeFilesystemAPI: true,
-    },
+	testEnvironment: "jsdom",
+	setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
+	automock: false,
+	transform: {
+		"^.+\\.[jt]sx?$": [
+			"babel-jest",
+			{ configFile: `${__dirname}/babel.config.js` },
+		],
+	},
+	transformIgnorePatterns: [
+		"/node_modules/(?!(three|@react-pdf|@react-pdf/renderer)/)",
+	],
+	testPathIgnorePatterns: ["/node_modules/"],
+	moduleNameMapper: {
+		"\\.(css|less|scss|sass|styl)$":
+			"<rootDir>/src/app/src/__mocks__/styleMock.js",
+		"\\.(jpg|jpeg|png|gif|svg)$": "<rootDir>/src/app/src/__mocks__/fileMock.js",
+		"^app/(.*)$": "<rootDir>/src/app/src/$1",
+		"^(\\.{1,2}/)*config/settings$":
+			"<rootDir>/src/app/src/config/__mocks__/settings.ts",
+		"react-syntax-highlighter":
+			"<rootDir>/src/app/src/__mocks__/reactSyntaxHighlighterMock.js",
+		"^react-markdown$": "<rootDir>/src/app/src/__mocks__/reactMarkdownMock.js",
+		"^app-root/(.*)$": "<rootDir>/$1",
+		"^react-icons/(.*)$": "<rootDir>/src/app/src/__mocks__/reactIconsMock.js",
+		"^@/(.*)$": "<rootDir>/src/app/src/$1",
+		"^react$": "<rootDir>/node_modules/react",
+		"^react-dom$": "<rootDir>/node_modules/react-dom",
+		"^react-dom/(.*)$": "<rootDir>/node_modules/react-dom/$1",
+		"^react-redux$": "<rootDir>/node_modules/react-redux",
+		"^@react-pdf/renderer$": "<rootDir>/src/app/src/__mocks__/reactPdfMock.js",
+	},
+	testMatch: ["**/__tests__/**/*.[jt]s?(x)", "**/*.test.[jt]s?(x)"],
+	haste: {
+		forceNodeFilesystemAPI: true,
+	},
 };

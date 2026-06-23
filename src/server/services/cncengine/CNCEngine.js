@@ -206,6 +206,14 @@ class CNCEngine {
 						callback = noop;
 					}
 
+					// Connection may have been closed before delayed firmware detection resolves.
+					if (!this.connection) {
+						const err = `Cannot initialize controller "${controllerType}" on "${port}" because the connection is no longer available`;
+						log.warn(err);
+						callback(new Error(err));
+						return;
+					}
+
 					let controller = store.get(`controllers["${port}"]`);
 					if (!controller) {
 						log.debug("making new controller");

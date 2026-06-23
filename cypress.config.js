@@ -1,55 +1,43 @@
 const { defineConfig } = require("cypress");
-const fs = require("fs");
 
 module.exports = defineConfig({
-  reporter: "cypress-mochawesome-reporter",
-  reporterOptions: {
-    reportDir: "cypress/reports/mochawesome",
-    overwrite: false,
-    html: true,
-    json: true,
-    charts: true,
-    embeddedScreenshots: true,
-    inlineAssets: true,
-    reportFilename: "mochawesome",
-  },
-  e2e: {
-    baseUrl: process.env.BASE_URL || 'http://localhost:8000',
-    env: {
-      deviceName: process.env.CYPRESS_DEVICE_NAME || 'COM',
-    },
-    setupNodeEvents(on, config) {
-      require('cypress-mochawesome-reporter/plugin')(on);
+	reporter: "cypress-multi-reporters",
+	reporterOptions: {
+		configFile: "reporter-config.json",
+	},
 
-      on('after:run', () => {
-        const src = 'cypress/reports/mochawesome/mochawesome.json';
-        const dst = 'cypress/reports/mochawesome/merged.json';
-        if (fs.existsSync(src)) {
-          fs.copyFileSync(src, dst);
-          console.log('✓ Copied mochawesome.json → merged.json for dashboard');
-        } else {
-          console.warn('⚠ mochawesome.json not found, dashboard will have no test data');
-        }
-      });
+	e2e: {
+		specPattern: "cypress/e2e/grblHal/A_grblHal_master_spec.cy.js",
+		baseUrl: process.env.BASE_URL || "http://localhost:8000",
 
-  on('before:browser:launch', (browser, launchOptions) => {
-    if (browser.name === 'chrome') {
-        launchOptions.args.push('--no-sandbox');
-        launchOptions.args.push('--disable-dev-shm-usage');
-        launchOptions.args.push('--enable-webgl');
-        launchOptions.args.push('--ignore-gpu-blocklist');
-        launchOptions.args.push('--enable-gpu-rasterization');
-        launchOptions.args.push('--use-gl=swiftshader');
-    }
-    return launchOptions;
-});
+		// Timeouts
 
-      return config;
-    },
-    chromeWebSecurity: false,
-    experimentalModifyObstructiveThirdPartyCode: true,
-    pageLoadTimeout: 120000,
-    defaultCommandTimeout: 15000,
-    supportFile: "cypress/support/e2e.js",
-  },
+		pageLoadTimeout: 60000,
+		defaultCommandTimeout: 10000,
+
+		// Environment Variables
+		env: {
+			deviceName: process.env.CYPRESS_DEVICE_NAME || "COM",
+		},
+		setupNodeEvents(on, config) {
+			// Terminal Logging Task
+			on("task", {
+				log(message) {
+					console.log(`[gSender] ${message}`);
+					return null;
+				},
+			});
+
+			on("before:browser:launch", (browser = {}, launchOptions) => {
+				return launchOptions;
+			});
+
+			return config;
+		},
+
+		chromeWebSecurity: false,
+		experimentalModifyObstructiveThirdPartyCode: true,
+
+		supportFile: "cypress/support/e2e.js",
+	},
 });

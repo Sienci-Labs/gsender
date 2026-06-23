@@ -21,6 +21,7 @@
  *
  */
 
+import type { CommandKey, ShuttleEvent } from "app/lib/definitions/shortcuts";
 import shuttleEvents from "app/lib/shuttleEvents";
 
 import store from "app/store";
@@ -28,8 +29,10 @@ import React, { useMemo } from "react";
 
 const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
 
-const PrintableShortcuts = React.forwardRef((_, ref) => {
-	const shortcutsList = Object.entries(store.get("commandKeys", {}));
+const PrintableShortcuts = React.forwardRef<HTMLDivElement>((_, ref) => {
+	const shortcutsList: [string, CommandKey][] = Object.entries(
+		store.get("commandKeys", {}),
+	);
 
 	const keys = useMemo(
 		() =>
@@ -37,8 +40,8 @@ const PrintableShortcuts = React.forwardRef((_, ref) => {
 				.filter(([, shortcut]) => shortcut.isActive && shortcut.keys !== "")
 				.map(([key, shortcut]) => {
 					const title = allShuttleControlEvents[key]
-						? allShuttleControlEvents[key].title
-						: shortcut.title;
+						? (allShuttleControlEvents[key] as ShuttleEvent).title
+						: (shortcut as ShuttleEvent).title;
 
 					return (
 						<tr key={shortcut.cmd}>

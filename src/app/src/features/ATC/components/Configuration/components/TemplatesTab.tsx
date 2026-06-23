@@ -1,4 +1,26 @@
-import React, {
+import { Button } from "app/components/Button";
+import GcodeViewer from "app/components/GcodeViewer";
+import { Badge } from "app/components/shadcn/Badge";
+import type {
+	ATCIMacroConfig,
+	Macro,
+} from "app/features/ATC/assets/defaultATCIMacros.ts";
+import {
+	mapDefaultsToValues,
+	useConfigContext,
+} from "app/features/ATC/components/Configuration/hooks/useConfigStore.tsx";
+import store from "app/store";
+import cn from "classnames";
+import {
+	AlertCircle,
+	AlertTriangle,
+	CheckCircle2,
+	CircleHelp,
+	FileText,
+	Upload,
+} from "lucide-react";
+import type React from "react";
+import {
 	createContext,
 	useContext,
 	useEffect,
@@ -6,27 +28,6 @@ import React, {
 	useRef,
 	useState,
 } from "react";
-import { Button } from "app/components/Button";
-import { Badge } from "app/components/shadcn/Badge";
-import {
-	Upload,
-	FileText,
-	AlertCircle,
-	CheckCircle2,
-	AlertTriangle,
-	CircleHelp,
-} from "lucide-react";
-import cn from "classnames";
-import {
-	useConfigContext,
-	mapDefaultsToValues,
-} from "app/features/ATC/components/Configuration/hooks/useConfigStore.tsx";
-import {
-	ATCIMacroConfig,
-	Macro,
-} from "app/features/ATC/assets/defaultATCIMacros.ts";
-import GcodeViewer from "app/components/GcodeViewer";
-import store from "app/store";
 
 type TemplateUploadData = Pick<ATCIMacroConfig, "version" | "macros"> &
 	Partial<ATCIMacroConfig>;

@@ -22,9 +22,9 @@
  */
 
 import { cn } from "app/lib/utils";
-import React, { Fragment } from "react";
+import { Fragment } from "react";
 
-export const formatShortcut = (shortcut = [], isActive = true) => {
+export const formatShortcut = (shortcut: string[] = [], isActive = true) => {
 	const baseClass = "px-2 py-1 rounded";
 	const opacityClass = !isActive ? "opacity-40" : "opacity-100";
 	const output = [];
@@ -50,7 +50,7 @@ export const formatShortcut = (shortcut = [], isActive = true) => {
 };
 
 // Helper function to determine if a key should hide the shift key
-export const shouldHideShiftForKey = (key) => {
+export const shouldHideShiftForKey = (key: string) => {
 	// Special characters that are secondary to number keys
 	const specialChars = [
 		"!",

@@ -1,7 +1,7 @@
-import { FIRMWARE_TYPES_T } from "app/definitions/firmware";
-import { UNITS_EN, BasicPosition } from "app/definitions/general";
-import { PROBE_TYPES, TOUCHPLATE_TYPES } from "app/lib/constants";
-import { probeDirections } from "app/lib/Probing";
+import type { FIRMWARE_TYPES_T } from "app/definitions/firmware";
+import type { BasicPosition, UNITS_EN } from "app/definitions/general";
+import type { PROBE_TYPES, TOUCHPLATE_TYPES } from "app/lib/constants";
+import type { probeDirections } from "app/lib/Probing";
 
 // Types
 

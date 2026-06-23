@@ -31,10 +31,26 @@ import {
 } from "app/components/shadcn/Dialog";
 import {
 	ALL_CATEGORY,
+	CARVING_CATEGORY,
+	COOLANT_CATEGORY,
+	GENERAL_CATEGORY,
+	JOGGING_CATEGORY,
+	LOCATION_CATEGORY,
+	MACRO_CATEGORY,
+	OVERRIDES_CATEGORY,
+	PROBING_CATEGORY,
 	SHORTCUT_CATEGORY,
-	USAGE_TOOL_NAME,
+	SPINDLE_LASER_CATEGORY,
+	TOOLBAR_CATEGORY,
+	VISUALIZER_CATEGORY,
 } from "app/constants";
 import combokeys from "app/lib/combokeys";
+import type {
+	CommandKey,
+	CommandKeys,
+	Macro,
+	ShuttleEvent,
+} from "app/lib/definitions/shortcuts";
 import shuttleEvents from "app/lib/shuttleEvents";
 import { toast } from "app/lib/toaster";
 import store from "app/store";
@@ -53,20 +69,21 @@ import {
 import Mousetrap from "mousetrap";
 import PropTypes from "prop-types";
 import pubsub from "pubsub-js";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import CategoryFilter from "../CategoryFilter";
-import { formatShortcut } from "../helpers";
 import ShortcutsTable from "../ShortcutsTable";
 import { generateList } from "../utils";
 import EditArea from "./EditArea";
+
+type ShortcutByCategory = CommandKey & { title: string; category: string };
 
 /**
  * Keybinding settings page
  * @prop {Boolean} active Check if this page is currently active or not
  */
 const Keyboard = () => {
-	const [shortcutsList, setShortcutsList] = useState(
+	const [shortcutsList, setShortcutsList] = useState<CommandKeys>(
 		store.get("commandKeys", {}),
 	);
 	const [dataSet, setDataSet] = useState(shortcutsList);
@@ -78,7 +95,7 @@ const Keyboard = () => {
 	const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
 	const stopCallbackFunc = Mousetrap.prototype.stopCallback;
 
-	const formatShortcutForPrint = (shortcut) => {
+	const formatShortcutForPrint = (shortcut: string) => {
 		if (!shortcut) return "";
 		return shortcut
 			.split("+")
@@ -86,24 +103,28 @@ const Keyboard = () => {
 			.join(" + ");
 	};
 
-	const getCategoryData = (category) => {
+	const getCategoryData = (category: string) => {
 		const categoryColors = {
-			GENERAL_CATEGORY: "bg-blue-100 text-blue-800",
-			JOGGING_CATEGORY: "bg-green-100 text-green-800",
-			VISUALIZER_CATEGORY: "bg-orange-100 text-orange-800",
-			TOOLBAR_CATEGORY: "bg-pink-100 text-pink-800",
-			COOLANT_CATEGORY: "bg-cyan-100 text-cyan-800",
-			MACRO_CATEGORY: "bg-purple-100 text-purple-800",
-			PROBING_CATEGORY: "bg-red-100 text-red-800",
-			SPINDLE_LASER_CATEGORY: "bg-yellow-100 text-yellow-800",
-			CARVING_CATEGORY: "bg-green-100 text-green-800",
-			OVERRIDES_CATEGORY: "bg-blue-100 text-blue-800",
-			LOCATION_CATEGORY: "bg-gray-100 text-gray-800",
+			[GENERAL_CATEGORY]: "bg-blue-100 text-blue-800",
+			[JOGGING_CATEGORY]: "bg-green-100 text-green-800",
+			[VISUALIZER_CATEGORY]: "bg-orange-100 text-orange-800",
+			[TOOLBAR_CATEGORY]: "bg-pink-100 text-pink-800",
+			[COOLANT_CATEGORY]: "bg-cyan-100 text-cyan-800",
+			[MACRO_CATEGORY]: "bg-purple-100 text-purple-800",
+			[PROBING_CATEGORY]: "bg-red-100 text-red-800",
+			[SPINDLE_LASER_CATEGORY]: "bg-yellow-100 text-yellow-800",
+			[CARVING_CATEGORY]: "bg-green-100 text-green-800",
+			[OVERRIDES_CATEGORY]: "bg-blue-100 text-blue-800",
+			[LOCATION_CATEGORY]: "bg-gray-100 text-gray-800",
 		};
 
 		return {
-			color: categoryColors[category] || "bg-gray-100 text-gray-800",
-			label: SHORTCUT_CATEGORY[category] || category,
+			color:
+				categoryColors[category as keyof typeof categoryColors] ||
+				"bg-gray-100 text-gray-800",
+			label:
+				SHORTCUT_CATEGORY[category as keyof typeof SHORTCUT_CATEGORY] ||
+				category,
 		};
 	};
 
@@ -119,15 +140,16 @@ const Keyboard = () => {
 				key !== "STOP_CONT_JOG" &&
 				!updatedShortcuts[key]
 			) {
+				const eventS = event as ShuttleEvent;
 				updatedShortcuts[key] = {
-					cmd: event.cmd,
-					keys: event.keys || "",
-					isActive: event.isActive ?? true,
-					category: event.category,
-					title: event.title,
-					preventDefault: event.preventDefault ?? false,
-					payload: event.payload,
-					callback: event.callback,
+					cmd: eventS.cmd,
+					keys: eventS.keys || "",
+					isActive: eventS.isActive ?? true,
+					category: eventS.category,
+					title: eventS.title,
+					preventDefault: eventS.preventDefault ?? false,
+					payload: eventS.payload,
+					callback: eventS.callback,
 				};
 			}
 		});
@@ -143,7 +165,7 @@ const Keyboard = () => {
 		}
 	}, [allShuttleControlEvents]);
 
-	const filter = (category, shortcuts) => {
+	const filter = (category: string, shortcuts: CommandKeys) => {
 		const allShortcuts = shortcuts || shortcutsList;
 		const filteredData =
 			category === ALL_CATEGORY
@@ -151,7 +173,10 @@ const Keyboard = () => {
 				: Object.fromEntries(
 						Object.entries(allShortcuts).filter(([key, entry]) => {
 							if (allShuttleControlEvents[key]) {
-								return allShuttleControlEvents[key].category === category;
+								return (
+									(allShuttleControlEvents[key] as ShuttleEvent).category ===
+									category
+								);
 							}
 							return entry.category === category;
 						}),
@@ -168,7 +193,7 @@ const Keyboard = () => {
 		combokeys.reload();
 		// pubsub.publish('removeshortcutsListener');
 
-		const token = pubsub.subscribe("keybindingsUpdated", (msg, shortcuts) => {
+		const token = pubsub.subscribe("keybindingsUpdated", (_msg, shortcuts) => {
 			if (shortcuts) {
 				// if shortcuts not sent, updateKeybindings published it
 				updateKeybindings(shortcuts);
@@ -196,12 +221,14 @@ const Keyboard = () => {
 		{ trailing: false },
 	);
 
-	const handleEdit = (currentShortcut) => {
+	const handleEdit = (currentShortcut: CommandKey | Macro) => {
 		setShowEditModal(true);
-		setCurrentShortcut(currentShortcut.cmd || currentShortcut.id);
+		setCurrentShortcut(
+			(currentShortcut as CommandKey).cmd || (currentShortcut as Macro).id,
+		);
 	};
 
-	const handleDelete = (shortcut) => {
+	const handleDelete = (shortcut: CommandKey) => {
 		const updatedShortcuts = _.cloneDeep(shortcutsList);
 		updatedShortcuts[shortcut.cmd].keys = "";
 		updateKeybindings(updatedShortcuts, false);
@@ -213,7 +240,7 @@ const Keyboard = () => {
 	 * Function to edit the stores commandKeys array
 	 * @param {Object} shortcut The shortcut that was modifed
 	 */
-	const editKeybinding = (shortcut, showToast = true) => {
+	const editKeybinding = (shortcut: CommandKey, showToast = true) => {
 		//Replace old keybinding item with new one
 		const updatedShortcuts = _.cloneDeep(shortcutsList);
 		updatedShortcuts[shortcut.cmd] = shortcut;
@@ -221,17 +248,20 @@ const Keyboard = () => {
 		updateKeybindings(updatedShortcuts, showToast);
 	};
 
-	const toggleKeybinding = (shortcut, showToast) => {
+	const toggleKeybinding = (shortcut: CommandKey, showToast?: boolean) => {
 		const updatedShortcutsList = _.cloneDeep(shortcutsList);
-		const shortcutInUse = Object.entries(updatedShortcutsList)
-			.filter(([key, keybinding]) => keybinding.cmd !== shortcut.cmd)
-			.find(([key, keybinding]) => keybinding.keys === shortcut.keys);
+		// const shortcutInUse = Object.entries(updatedShortcutsList)
+		//     .filter(([key, keybinding]) => keybinding.cmd !== shortcut.cmd)
+		//     .find(([key, keybinding]) => keybinding.keys === shortcut.keys);
 
 		updatedShortcutsList[shortcut.cmd] = shortcut;
 		updateKeybindings(updatedShortcutsList, showToast);
 	};
 
-	const updateKeybindings = (shortcuts, shouldShowToast) => {
+	const updateKeybindings = (
+		shortcuts: CommandKeys,
+		shouldShowToast?: boolean,
+	) => {
 		store.replace("commandKeys", shortcuts);
 		setShortcutsList(shortcuts);
 		filter(filterCategory, shortcuts);
@@ -254,7 +284,7 @@ const Keyboard = () => {
 	const enableAllShortcuts = () => {
 		let enabledKeybindings = _.cloneDeep(shortcutsList);
 		const enabledArr = Object.entries(enabledKeybindings);
-		enabledArr.forEach(([key, keybinding]) => {
+		enabledArr.forEach(([_key, keybinding]) => {
 			keybinding.isActive = true;
 		});
 		enabledKeybindings = Object.fromEntries(enabledArr);
@@ -265,7 +295,7 @@ const Keyboard = () => {
 	const disableAllShortcuts = () => {
 		let disabledShortcuts = _.cloneDeep(shortcutsList);
 		const disabledArr = Object.entries(disabledShortcuts);
-		disabledArr.forEach(([key, keybinding]) => {
+		disabledArr.forEach(([_key, keybinding]) => {
 			keybinding.isActive = false;
 		});
 		disabledShortcuts = Object.fromEntries(disabledArr);
@@ -286,14 +316,14 @@ const Keyboard = () => {
 	const allShortcutsEnabled = useMemo(
 		() =>
 			Object.entries(shortcutsList).every(
-				([key, shortcut]) => shortcut.isActive,
+				([_key, shortcut]) => shortcut.isActive,
 			),
 		[shortcutsList],
 	);
 	const allShortcutsDisabled = useMemo(
 		() =>
 			Object.entries(shortcutsList).every(
-				([key, shortcut]) => !shortcut.isActive,
+				([_key, shortcut]) => !shortcut.isActive,
 			),
 		[shortcutsList],
 	);
@@ -337,13 +367,15 @@ const Keyboard = () => {
 		input.accept = "application/json,.json";
 
 		input.onchange = (e) => {
-			const file = e.target.files[0];
+			const file = (e.target as HTMLInputElement).files[0];
 			if (!file) return;
 
 			const reader = new FileReader();
 			reader.onload = (event) => {
 				try {
-					const importData = JSON.parse(event.target.result);
+					const importData: { shortcuts: CommandKeys } = JSON.parse(
+						event.target.result as string,
+					);
 
 					// Validate the imported data
 					if (!importData.shortcuts) {
@@ -388,23 +420,24 @@ const Keyboard = () => {
 
 	const handlePrintShortcuts = () => {
 		// Group shortcuts by category
-		const shortcutsByCategory = {};
+		const shortcutsByCategory: {
+			[key: string]: ShortcutByCategory[];
+		} = {};
 
 		Object.values(shortcutsList)
 			.filter((s) => s.isActive && s.keys)
 			.forEach((shortcut) => {
 				// Get the shortcut data from allShuttleControlEvents if available
 				const shortcutData = allShuttleControlEvents[shortcut.cmd] || shortcut;
-				const categoryKey = shortcutData.category;
+				const categoryKey = (shortcutData as ShuttleEvent).category;
 				const categoryName = getCategoryData(categoryKey).label;
 
 				if (!shortcutsByCategory[categoryName]) {
 					shortcutsByCategory[categoryName] = [];
 				}
-
 				shortcutsByCategory[categoryName].push({
 					...shortcut,
-					title: shortcutData.title || shortcut.cmd,
+					title: (shortcutData as ShuttleEvent).title || shortcut.cmd, // title is a migration
 					category: categoryKey,
 				});
 			});
@@ -454,7 +487,6 @@ const Keyboard = () => {
                         <div class="shortcut">
                             <div class="shortcut-info">
                                 <div class="shortcut-title">${shortcut.title}</div>
-                                ${shortcut.description ? `<div class="shortcut-description">${shortcut.description}</div>` : ""}
                             </div>
                             <div class="shortcut-keys">${keys}</div>
                         </div>
@@ -640,11 +672,7 @@ const Keyboard = () => {
 
 	return (
 		<div className="flex flex-col gap-4 h-full dark:text-white">
-			<CategoryFilter
-				onChange={filter}
-				filterCategory={filterCategory}
-				datasetList={datasetList}
-			/>
+			<CategoryFilter onChange={filter} filterCategory={filterCategory} />
 			<div className="overflow-auto relative h-full border border-gray-200 rounded">
 				<ShortcutsTable
 					dataSet={datasetList}

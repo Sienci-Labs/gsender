@@ -1,13 +1,13 @@
-import store from "app/store";
 import {
-	LIGHT_THEME,
-	DARK_THEME,
 	CUSTOMIZABLE_THEMES,
-	LIGHT_THEME_VALUES,
+	DARK_THEME,
 	DARK_THEME_VALUES,
+	LIGHT_THEME,
+	LIGHT_THEME_VALUES,
 	PARTS_LIST,
 } from "app/features/Visualizer/constants";
-import { THEMES_T } from "app/features/Visualizer/definitions";
+import type { THEMES_T } from "app/features/Visualizer/definitions";
+import store from "app/store";
 
 export function getVisualizerTheme(themeType?: THEMES_T): Map<string, string> {
 	const theme = themeType || store.get("widgets.visualizer.theme");
