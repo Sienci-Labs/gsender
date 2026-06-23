@@ -43,13 +43,16 @@ export function EEPROMSettingRow({
     const firmwareSemver = useSelector(
         (state: RootState) => state.controller.settings.version?.semver,
     );
+    const boardId = useSelector(
+        (state: RootState) => state.controller.settings.info?.BOARD,
+    );
     if (!EEPROM) {
         return;
     }
 
     const effectiveEID =
         firmwareType === GRBLHAL
-            ? translateGrblCoreKey(eID as EEPROM, firmwareSemver)
+            ? translateGrblCoreKey(eID as EEPROM, firmwareSemver, boardId)
             : eID;
     const EEPROMData = eepromMap.get(effectiveEID as EEPROM);
 
@@ -61,6 +64,7 @@ export function EEPROMSettingRow({
                 : resolveGrblCoreDefaults({
                       firmwareSemver,
                       baseDefaults: machineProfile.grblHALeepromSettings || {},
+                      boardId,
                   }).defaults;
 
         const InputElement = getDatatypeInput(

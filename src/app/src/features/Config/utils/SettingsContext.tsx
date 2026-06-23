@@ -169,6 +169,7 @@ function applyEEPROMDescriptions(
     descriptions: EEPROMDescriptions,
     ctrlType: string,
     fwVersion: string,
+    boardId: string | undefined,
     firmwareCurrent: boolean,
 ): SettingsMenuSection[] {
     return settings.map((ss) => {
@@ -190,7 +191,7 @@ function applyEEPROMDescriptions(
                         remapped = true;
                     }
                     if (ctrlType === GRBLHAL && eID) {
-                        eID = translateGrblCoreKey(eID as EEPROM, fwVersion);
+                        eID = translateGrblCoreKey(eID as EEPROM, fwVersion, boardId);
                     }
                     if (!eID) {
                         return remapped ? { ...o, remapped: true } : o;
@@ -239,6 +240,10 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
 
     const firmwareVersion = useTypedSelector(
         (state: RootState) => state.controller.settings.version?.semver,
+    );
+
+    const boardId = useTypedSelector(
+        (state: RootState) => state.controller.settings.info?.BOARD,
     );
 
     useEffect(() => {
@@ -385,6 +390,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
                 detectedEEPROMDescriptions: EEPROMDescriptions,
                 ctrlType: string,
                 fwVersion: string,
+                currentBoardId: string | undefined,
             ) => {
                 if (!currentSettings.length || !detectedEEPROMDescriptions) {
                     return;
@@ -398,6 +404,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
                         detectedEEPROMDescriptions,
                         ctrlType,
                         fwVersion,
+                        currentBoardId,
                         firmwareCurrent,
                     ),
                 );
@@ -438,6 +445,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             detectedEEPROMDescriptions,
             controllerType,
             firmwareVersion,
+            boardId,
         );
     }, [detectedEEPROMDescriptions]);
 
@@ -480,6 +488,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
                 idToUse = translateGrblCoreKey(
                     idToUse as EEPROM,
                     firmwareVersion,
+                    boardId,
                 );
             }
             searchChecker = eepromMap.get(idToUse as EEPROM);
@@ -525,6 +534,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
                     idToUse = translateGrblCoreKey(
                         idToUse as EEPROM,
                         firmwareVersion,
+                        boardId,
                     );
                 }
                 if (v.type === 'eeprom') {
@@ -558,6 +568,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
             isFirmwareCurrent,
             controllerType,
             firmwareVersion,
+            boardId,
             searchTerm,
             filterNonDefault,
             settingsValues,
@@ -572,6 +583,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
                 : resolveGrblCoreDefaults({
                       firmwareSemver: firmwareVersion,
                       baseDefaults: machineProfile.grblHALeepromSettings || {},
+                      boardId,
                   }).defaults;
 
         const settingKey =
@@ -580,7 +592,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
                 : (settingData as FilteredEEPROM).setting;
         const lookupKey =
             controllerType === GRBLHAL
-                ? translateGrblCoreKey(settingKey as EEPROM, firmwareVersion)
+                ? translateGrblCoreKey(settingKey as EEPROM, firmwareVersion, boardId)
                 : settingKey;
 
         const inputDefault = get(profileDefaults, lookupKey, '-');
@@ -642,10 +654,11 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
                 : resolveGrblCoreDefaults({
                       firmwareSemver: firmwareVersion,
                       baseDefaults: machineProfile.grblHALeepromSettings || {},
+                      boardId,
                   }).defaults;
         const lookupKey =
             controllerType === GRBLHAL
-                ? translateGrblCoreKey(key, firmwareVersion)
+                ? translateGrblCoreKey(key, firmwareVersion, boardId)
                 : key;
 
         return get(profileDefaults, lookupKey, '-');

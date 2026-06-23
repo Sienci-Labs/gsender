@@ -9,8 +9,7 @@ export interface BoardProfile {
 
 // Board IDs are exact strings from firmware [BOARD:...] response — casing matters
 export const BOARD_PROFILES: BoardProfile[] = [
-    { boardId: 'SLB-Lite', skipGrblCoreMigration: true },
-    { boardId: 'SLB_EXT2', skipGrblCoreMigration: true },
+    { boardId: 'SLB lite', skipGrblCoreMigration: true },
 ];
 
 export function getBoardProfile(boardId: string | undefined): BoardProfile | undefined {
