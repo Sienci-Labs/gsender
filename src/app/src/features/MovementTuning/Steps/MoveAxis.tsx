@@ -59,6 +59,7 @@ const MoveAxis = ({ onComplete }: Props) => {
 									onComplete();
 								}}
 								variant="alt"
+								testId="mt-move-axis"
 							>
 								Move {selectedAxis.toUpperCase()}
 								-axis
@@ -71,6 +72,7 @@ const MoveAxis = ({ onComplete }: Props) => {
 									onChange={(e) => setMoveDistance(Number(e.target.value))}
 									className="w-28"
 									suffix={units ?? "mm"}
+									data-testid="mt-move-distance-input"
 								/>
 							</div>
 						</div>

@@ -50,6 +50,7 @@ const DistanceTravelled = ({ onComplete }: Props) => {
 									setSetTravelCompleted(true);
 									onComplete();
 								}}
+								testId="mt-set-distance"
 							>
 								Set Distance Travelled
 							</Button>
@@ -61,6 +62,7 @@ const DistanceTravelled = ({ onComplete }: Props) => {
 									onChange={(e) => setMeasuredDistance(Number(e.target.value))}
 									className="w-28"
 									suffix={units ?? "mm"}
+									data-testid="mt-distance-input"
 								/>
 							</div>
 						</div>

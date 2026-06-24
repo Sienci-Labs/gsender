@@ -109,6 +109,7 @@ const MarkingStep = ({ onComplete }: Props) => {
 												}
 											}}
 											variant={step.buttonVariant}
+											testId={`sq-mark-location-${step}-${index}`}
 										>
 											{step.buttonLabel}
 										</Button>
@@ -127,6 +128,7 @@ const MarkingStep = ({ onComplete }: Props) => {
 														}
 														disabled={!isCurrentStep}
 														suffix={units ?? "mm"}
+														data-testid={`sq-move-distance-input-${index}`}
 													/>
 												</div>
 											) : (

@@ -4,11 +4,8 @@ import controller from "app/lib/controller.ts";
 import store from "app/store";
 import { useState } from "react";
 
-export function ControllerConfiguration({
-	onComplete,
-	onUncomplete,
-}: StepProps) {
-	const [error, setError] = useState<string>("");
+export function ControllerConfiguration({ onComplete }: StepProps) {
+	const [error, _setError] = useState<string>("");
 	const [isComplete, setIsComplete] = useState<boolean>(false);
 
 	const applySettings = async () => {
@@ -51,6 +48,7 @@ export function ControllerConfiguration({
 				onApply={applySettings}
 				isComplete={isComplete}
 				error={error}
+				data-testid="atc-apply-controller-config"
 			/>
 		</div>
 	);

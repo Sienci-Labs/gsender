@@ -80,6 +80,7 @@ const AxisSelection = ({ onComplete }: Props) => {
 						}}
 						placeholder="Select Axis"
 						className="w-full"
+						testId="mt-axis-selection"
 					/>
 				</div>
 

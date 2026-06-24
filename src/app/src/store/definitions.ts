@@ -8,6 +8,7 @@ import type {
 	BasicObject,
 	BasicPosition,
 	BBox,
+	GRBL_ACTIVE_STATES_T,
 	MDI,
 	Shuttle,
 } from "app/definitions/general";
@@ -87,7 +88,7 @@ export interface Axes {
 }
 
 export interface ControllerSettings {
-	toolTable?: any;
+	toolTable?: BasicObject;
 	//TODO
 	parameters: BasicObject;
 	settings: EEPROMSettings;
@@ -98,6 +99,10 @@ export interface ControllerSettings {
 	version?: {
 		semver: number;
 	};
+	atci?: {
+		rack_set: string;
+		macro_aborted: number;
+	}
 }
 
 export interface gSenderInfo {
@@ -111,10 +116,44 @@ export interface SDCardFile {
 	unusable?: boolean;
 }
 
+export interface ControllerStateState {
+	status: {
+		activeState: GRBL_ACTIVE_STATES_T;
+		mpos: BasicPosition;
+		wpos: BasicPosition;
+		ov: [number, number, number];
+		sdFiles: [];
+		alarmCode: string;
+		subState: number;
+		probeActive: boolean;
+		pinState: {
+			P: boolean
+		};
+		currentTool: number;
+		hasHomed: boolean;
+		buf: {
+			planner: number;
+			rx: number;
+		};
+		feedrate: number;
+		spindle: number;
+		ovTimestamp: number;
+		keepout: {
+			flags: string[];
+		};
+		SD: {
+			name: string;
+			percentage: number;
+		};
+		wco: BasicPosition;
+		sdCard: boolean;
+	}
+}
+
 export interface ControllerState {
 	type: FIRMWARE_TYPES_T;
 	settings: ControllerSettings;
-	state: any;
+	state: ControllerStateState;
 	modal: Modal;
 	mpos: BasicPosition;
 	wpos: BasicPosition;

@@ -100,6 +100,7 @@ export function SpindleConfig({ onComplete }: Props) {
 				isComplete={hasSetupSpindle}
 				error={error}
 				disabled={!canSetupSpindle}
+				data-testid="ss-setup-spindle-reboot"
 			/>
 		</div>
 	);

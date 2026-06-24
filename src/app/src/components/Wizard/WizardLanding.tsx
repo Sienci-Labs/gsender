@@ -1,6 +1,7 @@
 /** biome-ignore-all lint/a11y/noRedundantAlt: <> */
 /** biome-ignore-all lint/a11y/useButtonType: <> */
 import { ArrowLeft, ArrowRight, HelpCircle } from "lucide-react";
+import Button from "../Button";
 import DefaultImage from "./assets/placeholder.png";
 import type { SubWizard, ValidationResult } from "./types/wizard";
 import { ValidationBanner } from "./ValidationBanner";
@@ -46,13 +47,15 @@ export function WizardLanding({
 		isActive: boolean,
 		isDisabled: boolean,
 	) => (
-		<button
+		<Button
 			key={subWizard.id}
+			testId={`sub-wizard-selection-${subWizard.id}`}
 			onClick={() => !isDisabled && onSelectSubWizard(subWizard)}
 			disabled={isDisabled}
+			variant="nothing"
 			className={`
 				flex items-center justify-between px-6 py-4 rounded-lg text-left
-				transition-all duration-200 font-medium text-lg
+				transition-all duration-200 font-medium text-lg h-full
 				${
 					isDisabled
 						? "bg-gray-200 text-gray-400 cursor-not-allowed"
@@ -64,20 +67,23 @@ export function WizardLanding({
 		>
 			<span>{subWizard.title}</span>
 			<ArrowRight size={20} />
-		</button>
+		</Button>
 	);
 
 	return (
 		<div className="h-full min-h-0 bg-gray-50 dark:bg-slate-800 flex overflow-hidden portrait:flex-col-reverse portrait:w-full">
 			<div className="w-3/5 portrait:w-full portrait:h-3/5 p-12 flex flex-col overflow-y-auto">
 				{onBack && (
-					<button
+					<Button
 						onClick={onBack}
+						testId="wizard-back"
+						size="custom"
+						variant="nothing"
 						className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 mb-8 self-start"
 					>
 						<ArrowLeft size={20} />
 						Back to Wizards
-					</button>
+					</Button>
 				)}
 
 				<div className="flex-1">

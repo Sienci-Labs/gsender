@@ -13,7 +13,7 @@ import type { RootState } from "app/store/redux";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
-export function RackPosition({ onComplete, onUncomplete }: StepProps) {
+export function RackPosition({ onComplete }: StepProps) {
 	const [rackPositionMethod, setRackPositionMethod] =
 		useState<string>("utility");
 	const [isComplete, setIsComplete] = useState<boolean>(false);
@@ -62,6 +62,7 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
 
 	useEffect(() => {
 		if (isManuallyEditing.current) return;
+		// biome-ignore lint/complexity/useOptionalChain: <>
 		if (!mpos || !mpos.x || !mpos.y || !mpos.z) return;
 		const { x, y, z } = mpos;
 		setPosition({
@@ -78,7 +79,11 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
 		}
 	}, [rackless]);
 
-	const [position, setPosition] = useState({ x: "0", y: "0", z: "0" });
+	const [position, setPosition] = useState<{
+		x: string;
+		y: string;
+		z?: string;
+	}>({ x: "0", y: "0", z: "0" });
 
 	const handleUseUtility = () => {
 		controller.command("gcode", "G65 P302");
@@ -195,6 +200,7 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
 								onApply={setPositionViaPositionSetting}
 								isComplete={isComplete}
 								error={error}
+								data-testid="atc-set-position"
 							/>
 						}
 					/>

@@ -246,6 +246,7 @@ const ResultsStep = () => {
 												<AlertDialogAction
 													className="border border-blue-500"
 													onClick={handleUpdateEEPROM}
+													data-testid="sq-update-step-per-mm"
 												>
 													Update Firmware
 												</AlertDialogAction>

@@ -19,6 +19,7 @@ export const buttonStyle = tv({
 			ghost: "text-gray-600 dark:text-gray-300 border-none shadow-none",
 			active:
 				"border-robin-500 hover:bg-gray-200 text-gray-600 bg-white dark:bg-dark dark:text-gray-200",
+			nothing: "border-none bg-transparent shadow-none",
 		},
 		disabled: {
 			true: "bg-gray-300 border-gray-400 text-gray-500 hover:bg-gray-300 dark:bg-dark cursor-not-allowed",

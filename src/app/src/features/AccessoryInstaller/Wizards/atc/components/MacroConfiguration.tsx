@@ -1,11 +1,12 @@
+/** biome-ignore-all lint/a11y/noLabelWithoutControl: <> */
 import { StepActionButton } from "app/components/Wizard/StepActionButton.tsx";
 import type { StepProps } from "app/components/Wizard/types";
 import { generateAllMacros } from "app/features/ATC/components/Configuration/utils/ConfigUtils.ts";
 import controller from "app/lib/controller.ts";
 import store from "app/store";
-import { useEffect, useState } from "react";
+import { type SetStateAction, useEffect, useState } from "react";
 
-export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
+export function MacroConfiguration({ onComplete }: StepProps) {
 	const [rackSize, setRackSize] = useState<number | string>(6);
 	const [isComplete, setIsComplete] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
@@ -21,7 +22,7 @@ export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
 				setIsComplete(false);
 			}, 2000);
 		};
-		const handleYmodemError = (err) => {
+		const handleYmodemError = (err: SetStateAction<string>) => {
 			setError(err);
 			setTimeout(() => {
 				setIsComplete(false);

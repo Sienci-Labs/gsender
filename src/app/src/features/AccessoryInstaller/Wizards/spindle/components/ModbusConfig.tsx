@@ -60,6 +60,7 @@ export function ModbusConfig({ onComplete, onUncomplete }: StepProps) {
 				isComplete={hasConfiguredModbus}
 				error={error}
 				disabled={!isConnected}
+				data-testid="ss-configure-modbus"
 			/>
 		</div>
 	);

@@ -55,7 +55,11 @@ const Completion = () => {
 
 					<AlertDialog>
 						<AlertDialogTrigger asChild>
-							<Button className="bg-white text-black" variant="outline">
+							<Button
+								className="bg-white text-black"
+								variant="outline"
+								testId="mt-update-step-per-mm"
+							>
 								Update step/mm
 							</Button>
 						</AlertDialogTrigger>

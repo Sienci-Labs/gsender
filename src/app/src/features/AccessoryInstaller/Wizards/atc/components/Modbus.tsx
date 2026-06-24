@@ -5,10 +5,10 @@ import controller from "app/lib/controller.ts";
 import type { RootState } from "app/store/redux";
 import { useState } from "react";
 
-export function Modbus({ onComplete, onUncomplete }: StepProps) {
+export function Modbus({ onComplete }: StepProps) {
 	const [hasConfiguredModbus, setHasConfiguredModbus] =
 		useState<boolean>(false);
-	const [error, setError] = useState<string | null>(null);
+	const [error, _setError] = useState<string | null>(null);
 
 	const isConnected = useTypedSelector(
 		(state: RootState) => state.connection.isConnected,
@@ -52,6 +52,7 @@ export function Modbus({ onComplete, onUncomplete }: StepProps) {
 				isComplete={hasConfiguredModbus}
 				error={error}
 				disabled={!isConnected}
+				data-testid="atc-configure-modbus"
 			/>
 		</div>
 	);

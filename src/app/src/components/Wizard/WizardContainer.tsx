@@ -4,6 +4,7 @@
 /** biome-ignore-all lint/a11y/noSvgWithoutTitle: <> */
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Fragment, useEffect, useState } from "react";
+import Button from "../Button";
 import { useDefaultContext } from "./DefaultContext";
 import ProgressBar from "./ProgressBar";
 import { SecondaryContentPanel } from "./SecondaryContentPanel";
@@ -111,8 +112,10 @@ export function WizardContainer({ subWizard, onWizardExit }: Props) {
 					<span className="text-sm font-medium text-gray-700 dark:text-gray-300">
 						{currentStep.title}
 					</span>
-					<button
+					<Button
 						onClick={onExit}
+						testId="wizard-exit"
+						variant="nothing"
 						className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
 					>
 						<svg
@@ -127,7 +130,7 @@ export function WizardContainer({ subWizard, onWizardExit }: Props) {
 							<path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
 						</svg>
 						Exit
-					</button>
+					</Button>
 				</div>
 			) : (
 				<ProgressBar
@@ -196,26 +199,32 @@ export function WizardContainer({ subWizard, onWizardExit }: Props) {
 				<div className="bg-white dark:bg-dark-darker border-t border-gray-200 dark:border-gray-800 px-8 py-4 flex items-center justify-between">
 					{showCompletion ? (
 						<div className="flex w-full flex-row justify-between">
-							<button
+							<Button
 								onClick={onExit}
-								className="flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors bg-gray-900 text-white hover:bg-gray-800"
+								testId="wizard-ending-exit"
+								variant="nothing"
+								className="flex h-full items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors bg-gray-900 text-white hover:bg-gray-800"
 							>
 								Exit Wizard
-							</button>
-							<button
+							</Button>
+							<Button
 								onClick={resetWizard}
-								className="flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors text-gray-900 bg-gray-200 hover:bg-gray-100"
+								testId="wizard-reset"
+								variant="nothing"
+								className="flex h-full items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors text-gray-900 bg-gray-200 hover:bg-gray-100"
 							>
 								Restart Wizard
-							</button>
+							</Button>
 						</div>
 					) : (
 						<>
-							<button
+							<Button
 								onClick={handlePrevious}
 								disabled={isFirstStep}
+								testId="wizard-previous"
+								variant="nothing"
 								className={`
-                flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors
+                flex h-full items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors
                 ${
 									isFirstStep
 										? "text-gray-400 cursor-not-allowed"
@@ -225,13 +234,15 @@ export function WizardContainer({ subWizard, onWizardExit }: Props) {
 							>
 								<ChevronLeft size={20} />
 								Previous
-							</button>
+							</Button>
 
-							<button
+							<Button
 								onClick={handleNext}
 								disabled={!isCurrentStepComplete}
+								testId="wizard-previous"
+								variant="nothing"
 								className={`
-                flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors
+                flex h-full items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors
                 ${
 									!isCurrentStepComplete
 										? "bg-gray-300 text-gray-500 cursor-not-allowed"
@@ -241,7 +252,7 @@ export function WizardContainer({ subWizard, onWizardExit }: Props) {
 							>
 								Next
 								<ChevronRight size={20} />
-							</button>
+							</Button>
 						</>
 					)}
 				</div>

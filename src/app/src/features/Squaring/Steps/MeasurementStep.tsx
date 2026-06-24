@@ -121,6 +121,7 @@ const MeasurementStep = ({ onComplete }: Props) => {
 														}));
 													}}
 													suffix={units ?? "mm"}
+													data-testid={`sq-measure-distance-input-${measurementKey}`}
 												/>
 												<Button
 													disabled={
@@ -130,7 +131,7 @@ const MeasurementStep = ({ onComplete }: Props) => {
 													onClick={() =>
 														handleMeasurementComplete(step.buttonLabel)
 													}
-													testId={`confirm ${measurementKey}`}
+													testId={`sq-confirm-${measurementKey}`}
 												>
 													{step.completed ? "Update" : "Confirm"}
 												</Button>

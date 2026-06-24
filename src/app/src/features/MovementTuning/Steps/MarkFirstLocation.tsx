@@ -42,6 +42,7 @@ const MarkFirstLocation = ({ onComplete }: Props) => {
 									onComplete();
 								}}
 								variant="secondary"
+								testId="mt-mark-first-location"
 							>
 								Mark First Location
 							</Button>
