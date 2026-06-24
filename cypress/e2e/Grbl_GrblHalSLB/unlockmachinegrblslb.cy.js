@@ -1,4 +1,3 @@
-import '../support/commands';
 
 
   beforeEach(() => {

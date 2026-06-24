@@ -62,13 +62,7 @@ describe("CNC Machine Tests", () => {
 			});
 
 		// Step 5: Disconnect from CNC
-		cy.log("Machine is Idle — disconnecting...");
-
-		cy.get("button.bg-red-600.text-white")
-			.contains(/^disconnect$/i)
-			.click({ force: true });
-
-		cy.log("Disconnect clicked — verifying status...");
+		cy.disconnectIfIdle();
 
 		// Step 6: Verify the machine is disconnected
 		cy.contains(/(Connect to CNC|Disconnected)/i, { timeout: 10000 })

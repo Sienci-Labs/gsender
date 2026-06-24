@@ -1138,32 +1138,57 @@ Cypress.Commands.add('searchInSettings', (searchText, options = {}) => {
     .clear()
     .type(searchText);
 });
-// Apply settings { cy.applySettings(); }
-Cypress.Commands.add("applySettings", (options = {}) => {
-	const { timeout = 10000, waitAfterApply = 3000 } = options;
 
-	cy.log("Applying settings (if changes exist)...");
+// 27. Search items in settings { cy.searchInSettings('search item name'); }
+Cypress.Commands.add('searchInSettings', (searchText, options = {}) => {
+  const { timeout = 10000 } = options;
 
-	cy.contains("button", "Apply Settings", { timeout })
-		.should("exist")
-		.then(($button) => {
-			if ($button.is(":disabled")) {
-				cy.log("No settings changes detected");
-				return;
-			}
+  cy.log(`Searching for: ${searchText}`);
 
-			cy.log("Applying settings...");
-			cy.wrap($button).click();
-
-			cy.wait(waitAfterApply);
-
-			// Unlock machine if prompted
-			cy.unlockMachineIfNeeded();
-
-			cy.log("Settings applied successfully");
-		});
+  cy.get('#simple-search', { timeout })
+    .should('exist')
+    .scrollIntoView()
+    .should('be.visible')
+    .clear()
+    .type(searchText);
 });
+// 27. Search items in settings { cy.searchInSettings('search item name'); }
+Cypress.Commands.add('searchInSettings', (searchText, options = {}) => {
+  const { timeout = 10000 } = options;
 
+  cy.log(`Searching for: ${searchText}`);
+
+  cy.get('#simple-search', { timeout })
+    .should('exist')
+    .scrollIntoView()
+    .should('be.visible')
+    .clear()
+    .type(searchText);
+});
+// Apply settings { cy.applySettings(); }
+Cypress.Commands.add('applySettings', (options = {}) => {
+  const { timeout = 10000, waitAfterApply = 3000 } = options;
+
+  cy.log('Applying settings (if changes exist)...');
+
+  cy.contains('button', 'Apply Settings', { timeout })
+    .should('exist')
+    .then(($button) => {
+      if ($button.is(':disabled')) {
+        cy.log('No settings changes detected');
+        return;
+      }
+
+      cy.log('Applying settings...');
+      cy.wrap($button).click();
+
+      cy.wait(waitAfterApply);
+
+      cy.unlockMachineIfNeeded();
+
+      cy.log('Settings applied successfully');
+    });
+});
 // Simple URL Navigation Commands
 // ==============================
 
