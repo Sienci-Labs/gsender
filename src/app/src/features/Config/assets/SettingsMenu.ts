@@ -339,7 +339,15 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						key: "widgets.visualizer.theme",
 						description: "Independent colour control for the visualizer.",
 						type: "select",
-						options: [THEMES.LIGHT_THEME, THEMES.DARK_THEME],
+						options: [
+							THEMES.LIGHT_THEME,
+							THEMES.DARK_THEME,
+							THEMES.FLEXOKI_DARK_THEME,
+							THEMES.TOKYO_NIGHT_THEME,
+							THEMES.GRUVBOX_LIGHT_THEME,
+							THEMES.AYU_DARK_THEME,
+							THEMES.AYU_LIGHT_THEME,
+						],
 						onChange: (theme: THEMES_T) => {
 							pubsub.publish("theme:change", theme);
 						},

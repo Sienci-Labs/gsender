@@ -32,6 +32,7 @@ import type {
 	GCodeViewerCameraView,
 	GCodeViewerOptions,
 	GCodeViewerTheme,
+	GCodeViewerThemePresetName,
 	WorkerGeometryData,
 } from "@sienci/gviewer/viewer";
 import "@sienci/gviewer/viewer/viewcube.css";
@@ -47,14 +48,37 @@ import _get from "lodash/get";
 import pubsub from "pubsub-js";
 import { Component } from "react";
 import {
+	AYU_DARK_THEME,
+	AYU_LIGHT_THEME,
+	DARK_THEME,
+	FLEXOKI_DARK_THEME,
+	GRBL,
+	GRBL_ACTIVE_STATE_CHECK,
+	GRBL_ACTIVE_STATE_RUN,
+	GRBLHAL,
+	GRUVBOX_LIGHT_THEME,
 	LASER_MODE,
 	LIGHT_THEME,
+	MARLIN,
 	METRIC_UNITS,
 	OUTLINE_MODE_RAPIDLESS_SQUARE,
+	SMOOTHIE,
+	TINYG,
+	TOKYO_NIGHT_THEME,
 	VISUALIZER_PRIMARY,
 	VISUALIZER_SECONDARY,
 	WORKFLOW_STATE_RUNNING,
 } from "../../constants";
+
+const THEME_NAME_TO_PRESET: Record<string, GCodeViewerThemePresetName> = {
+	[LIGHT_THEME]: "light",
+	[DARK_THEME]: "dark",
+	[FLEXOKI_DARK_THEME]: "flexoki-dark",
+	[TOKYO_NIGHT_THEME]: "tokyo-night",
+	[GRUVBOX_LIGHT_THEME]: "gruvbox-light",
+	[AYU_DARK_THEME]: "ayu-dark",
+	[AYU_LIGHT_THEME]: "ayu-light",
+};
 import { outlineResponse } from "../../workers/Outline.response";
 import type { Actions, CAMERA_POSITIONS_T, State } from "./definitions";
 
@@ -107,9 +131,17 @@ class GcodeViewer extends Component<Props> {
 
 	lastHiddenLine = -1;
 
+	// Theme selection in Settings only writes to the store once "Save" is
+	// clicked, but the dropdown fires "theme:change" immediately for a live
+	// preview. Track the previewed name here so the preview doesn't lag a
+	// step behind the (not-yet-persisted) store value.
+	previewThemeName: string | null = null;
+
 	lastWposKey = "";
 
 	lastConnected: boolean | null = null;
+
+	lastSpinning: boolean | null = null;
 
 	componentDidMount() {
 		this.createViewer();
@@ -189,13 +221,15 @@ class GcodeViewer extends Component<Props> {
 	// --- option/theme mapping ----------------------------------------------
 
 	currentThemeName(): string {
-		return store.get("widgets.visualizer.theme", this.props.state.theme);
+		return (
+			this.previewThemeName ??
+			store.get("widgets.visualizer.theme", this.props.state.theme)
+		);
 	}
 
 	buildTheme(themeName?: string): GCodeViewerTheme {
-		return themeName === LIGHT_THEME
-			? gCodeViewerThemePresets.light
-			: gCodeViewerThemePresets.dark;
+		const preset = THEME_NAME_TO_PRESET[themeName ?? ""] ?? "dark";
+		return gCodeViewerThemePresets[preset];
 	}
 
 	buildOptions(): Partial<GCodeViewerOptions> {
@@ -219,7 +253,10 @@ class GcodeViewer extends Component<Props> {
 				// scales the drill so largestDim = size * 1.6.
 				size: 21.5,
 				opacity: 0.9,
-				tweenMs: 100,
+				// Position updates (jog + job run) arrive on the controller's
+				// 250ms status-report poll. Tween duration needs to overlap
+				// that cadence or the bit visibly pauses between updates.
+				tweenMs: 260,
 				colorSource: "custom",
 				color: "#caf0f8",
 			},
@@ -348,6 +385,8 @@ class GcodeViewer extends Component<Props> {
 	unload() {
 		this.lastWorkerData = null;
 		this.lastHiddenLine = -1;
+		this.lastSpinning = false;
+		this.viewer3d?.setBitSpinning(false);
 		this.viewer3d?.unload();
 		this.viewerSvg?.clear();
 		controller.context = {
@@ -417,7 +456,8 @@ class GcodeViewer extends Component<Props> {
 				this.viewer3d?.setBitPosition(this.lastPosition);
 				this.viewerSvg?.setBitPosition(this.lastPosition);
 			}),
-			pubsub.subscribe("theme:change", () => {
+			pubsub.subscribe("theme:change", (_msg, theme) => {
+				this.previewThemeName = (theme as string) ?? null;
 				this.applyOptionsFromState();
 			}),
 			pubsub.subscribe("visualizer:redraw", () => {
@@ -492,7 +532,42 @@ class GcodeViewer extends Component<Props> {
 					this.viewer3d.hideUntilLine(line, mode);
 				}
 			}
+
+			// Spin the bit to simulate a running spindle.
+			const spinning = this.computeShouldSpin(st, connected);
+			if (spinning !== this.lastSpinning) {
+				this.lastSpinning = spinning;
+				this.viewer3d?.setBitSpinning(spinning);
+			}
 		});
+	}
+
+	computeShouldSpin(st: unknown, isConnected: boolean): boolean {
+		if (!isConnected || !this.cuttingToolVisible()) {
+			return false;
+		}
+
+		const controllerType = _get(st, "controller.type");
+		if (controllerType === GRBL || controllerType === GRBLHAL) {
+			// Trust the machine's own reported state, not the sender's workflow
+			// state — the sender can finish queueing lines (workflow -> idle)
+			// while grbl is still physically finishing buffered moves.
+			const activeState = _get(st, "controller.state.status.activeState");
+			return (
+				activeState === GRBL_ACTIVE_STATE_RUN ||
+				activeState === GRBL_ACTIVE_STATE_CHECK
+			);
+		}
+		if (
+			controllerType === MARLIN ||
+			controllerType === SMOOTHIE ||
+			controllerType === TINYG
+		) {
+			// No granular machine-state field available for these — fall back
+			// to workflow state, matching the old visualizer's behaviour.
+			return _get(st, "controller.workflow.state") === WORKFLOW_STATE_RUNNING;
+		}
+		return false;
 	}
 
 	cuttingToolVisible(): boolean {

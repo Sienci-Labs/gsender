@@ -1,3 +1,4 @@
+import { AYU_LIGHT_THEME, GRUVBOX_LIGHT_THEME } from "app/constants";
 import {
 	CUSTOMIZABLE_THEMES,
 	DARK_THEME,
@@ -8,6 +9,11 @@ import {
 } from "app/features/Visualizer/constants";
 import type { THEMES_T } from "app/features/Visualizer/definitions";
 import store from "app/store";
+
+// Themes not natively understood by this legacy DRO/axis-label colour
+// system fall back to LIGHT_THEME_VALUES or DARK_THEME_VALUES based on
+// how the corresponding gviewer preset looks, instead of always dark.
+const LIGHT_LIKE_THEMES: string[] = [LIGHT_THEME, GRUVBOX_LIGHT_THEME, AYU_LIGHT_THEME];
 
 export function getVisualizerTheme(themeType?: THEMES_T): Map<string, string> {
 	const theme = themeType || store.get("widgets.visualizer.theme");
@@ -30,5 +36,7 @@ export function getVisualizerTheme(themeType?: THEMES_T): Map<string, string> {
 		);
 		return colourMap;
 	}
-	return DARK_THEME_VALUES as Map<string, string>;
+	return LIGHT_LIKE_THEMES.includes(theme)
+		? (LIGHT_THEME_VALUES as Map<string, string>)
+		: (DARK_THEME_VALUES as Map<string, string>);
 }
