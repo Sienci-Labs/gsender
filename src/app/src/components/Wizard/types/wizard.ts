@@ -1,5 +1,6 @@
 /** biome-ignore-all lint/suspicious/noExplicitAny: <> */
-import { type ComponentType, type ContextType, createContext, type ReactNode } from "react";
+import type { ComponentType, ContextType, ReactNode } from "react";
+import type { GeneralWizardContext } from "../DefaultContext";
 
 export interface WizardStep {
 	id: string;
@@ -27,13 +28,6 @@ export interface SecondaryContent {
 	fill?: boolean;
 	function?: (item: SecondaryContent, params: any) => string;
 }
-
-export const GeneralWizardContext = createContext({
-	reset: () => {},
-	onPrevious: () => {},
-	onNext: () => {},
-	getItemParams: () => {},
-})
 
 export interface SubWizard {
 	id: string;

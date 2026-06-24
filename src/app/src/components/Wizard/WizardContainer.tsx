@@ -4,6 +4,7 @@
 /** biome-ignore-all lint/a11y/noSvgWithoutTitle: <> */
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Fragment, useEffect, useState } from "react";
+import { useDefaultContext } from "./DefaultContext";
 import ProgressBar from "./ProgressBar";
 import { SecondaryContentPanel } from "./SecondaryContentPanel";
 import type { SubWizard } from "./types/wizard";
@@ -21,7 +22,8 @@ export function WizardContainer({ subWizard, onWizardExit }: Props) {
 
 	const currentStep = subWizard.steps[currentStepIndex];
 	const StepContextProvider = currentStep.contextProvider || Fragment;
-	const { reset, onPrevious, onNext, getItemParams } = subWizard.context();
+	const subWizardContext = subWizard.context || useDefaultContext;
+	const { reset, onPrevious, onNext, getItemParams } = subWizardContext();
 	const fillPrimaryContent = currentStep.fillPrimaryContent === true;
 	const isFirstStep = currentStepIndex === 0;
 	const isLastStep = currentStepIndex === subWizard.steps.length - 1;
