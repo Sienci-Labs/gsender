@@ -48,6 +48,7 @@ import urljoin from "./lib/urljoin";
 import cncengine from "./services/cncengine";
 import config from "./services/configstore";
 import monitor from "./services/monitor";
+import pluginRegistry from "./services/pluginregistry";
 
 const log = logger("init");
 
@@ -174,6 +175,7 @@ const createServer = (options, callback) => {
 		[
 			...ensureArray(options.mountPoints),
 			...ensureArray(config.get("mountPoints")),
+			...pluginRegistry.getMountPointsFromPlugins(),
 		],
 		isEqual,
 	).filter((mount) => {
