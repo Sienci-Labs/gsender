@@ -21,17 +21,17 @@
  *
  */
 
-import classNames from 'classnames';
-import { WidgetProps } from './definitions';
+import classNames from "classnames";
+import type { WidgetProps } from "./definitions";
 
 const Footer: React.FC<WidgetProps> = ({ className, ...props }) => (
-    <div
-        {...props}
-        className={classNames(
-            className,
-            'border-solid border border-gray-400' + 'bg-white text-gray-900',
-        )}
-    />
+	<div
+		{...props}
+		className={classNames(
+			className,
+			"border-solid border border-gray-400" + "bg-white text-gray-900",
+		)}
+	/>
 );
 
 export default Footer;

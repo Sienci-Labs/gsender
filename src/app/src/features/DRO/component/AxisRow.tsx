@@ -1,45 +1,45 @@
+import { Button } from "app/components/Button";
 import {
-    Axis,
-    handleManualOffset,
-    homeAxis,
-} from 'app/features/DRO/utils/DRO.ts';
-import { Button } from 'app/components/Button';
-import { zeroWCS, gotoZero } from '../utils/DRO.ts';
-import { WCSInput } from 'app/features/DRO/component/WCSInput.tsx';
-import { useWorkspaceState } from 'app/hooks/useWorkspaceState.ts';
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "app/components/shadcn/AlertDialog";
+import { WCSInput } from "app/features/DRO/component/WCSInput.tsx";
 import {
-    AlertDialog,
-    AlertDialogTrigger,
-    AlertDialogContent,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogCancel,
-    AlertDialogAction,
-} from 'app/components/shadcn/AlertDialog';
+	type Axis,
+	handleManualOffset,
+	homeAxis,
+} from "app/features/DRO/utils/DRO.ts";
+import { useWorkspaceState } from "app/hooks/useWorkspaceState.ts";
 import { usePostHog } from '@posthog/react';
+import { gotoZero, zeroWCS } from "../utils/DRO.ts";
 
 interface AxisRowProps {
-    label: string;
-    axis: Axis;
-    mpos: string | number;
-    wpos: string | number;
-    disabled: boolean;
-    homingMode: boolean;
-    disablePositionUpdate?: boolean;
-    disableGotoZero?: boolean;
+	label: string;
+	axis: Axis;
+	mpos: string | number;
+	wpos: string | number;
+	disabled: boolean;
+	homingMode: boolean;
+	disablePositionUpdate?: boolean;
+	disableGotoZero?: boolean;
 }
 
 export function AxisRow({
-    label,
-    axis,
-    mpos,
-    wpos,
-    disabled,
-    homingMode,
-    disablePositionUpdate,
-    disableGotoZero,
+	label,
+	axis,
+	mpos,
+	wpos,
+	disabled,
+	homingMode,
+	disablePositionUpdate,
+	disableGotoZero,
 }: AxisRowProps) {
     const { shouldWarnZero } = useWorkspaceState();
     const posthog = usePostHog();
@@ -121,12 +121,12 @@ export function AxisRow({
                 </AlertDialog>
             )}
 
-            <WCSInput
-                disabled={disabled}
-                value={disablePositionUpdate ? undefined : (wpos as string)}
-                axis={axis}
-                movementHandler={handleManualOffset}
-            />
+			<WCSInput
+				disabled={disabled}
+				value={disablePositionUpdate ? undefined : (wpos as string)}
+				axis={axis}
+				movementHandler={handleManualOffset}
+			/>
 
             <span
                 className="font-mono flex items-center text-sm text-gray-400 w-[9ch] text-center"

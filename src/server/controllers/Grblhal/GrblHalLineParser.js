@@ -21,142 +21,142 @@
  *
  */
 
-import _ from 'lodash';
-import GrblHalLineParserResultStatus from './GrblHalLineParserResultStatus';
-import GrblHalLineParserResultOk from './GrblHalLineParserResultOk';
-import GrblHalLineParserResultError from './GrblHalLineParserResultError';
-import GrblHalLineParserResultAlarm from './GrblHalLineParserResultAlarm';
-import GrbHalLineParserResultParserState from './GrblHalLineParserResultParserState';
-import GrblHalLineParserResultParameters from './GrblHalLineParserResultParameters';
-import GrblHalLineParserResultHelp from './GrblHalLineParserResultHelp';
-import GrblHalLineParserResultVersion from './GrblHalLineParserResultVersion';
-import GrblHalLineParserResultEcho from './GrblHalLineParserResultEcho';
-import GrblHalLineParserResultFeedback from './GrblHalLineParserResultFeedback';
-import GrblHalLineParserResultSettings from './GrblHalLineParserResultSettings';
-import GrblHalLineParserResultStartup from './GrblHalLineParserResultStartup';
+import _ from "lodash";
+import GrblHalLineParserResultATCI from "server/controllers/Grblhal/GrblHalLineParserResultATCI";
+import GrblHalLineParserResultCompleteStatus from "server/controllers/Grblhal/GrblHalLineParserResultCompleteStatus";
+import GrblHalLineParserResultJSON from "server/controllers/Grblhal/GrblHalLineParserResultJSON";
+import GrblHalLineParserResultSettingDetails from "server/controllers/Grblhal/GrblHalLineParserResultSettingDetails";
+import GrblHalLineParserResultSpindle from "server/controllers/Grblhal/GrblHalLineParserResultSpindle";
+import GrblHalErrorDescription from "./GrblHalErrorDescription";
+import GrblHalLineParserResultAlarm from "./GrblHalLineParserResultAlarm";
+import GrblHalLineParserResultAlarmDetails from "./GrblHalLineParserResultAlarmDetails";
+import GrblHalLineParserResultAXS from "./GrblHalLineParserResultAXS";
+import GrblHalLineParserResultEcho from "./GrblHalLineParserResultEcho";
+import GrblHalLineParserResultError from "./GrblHalLineParserResultError";
+import GrblHalLineParserResultFeedback from "./GrblHalLineParserResultFeedback";
+import GrblHalLineParserResultGroupDetail from "./GrblHalLineParserResultGroupDetail";
+import GrblHalLineParserResultHelp from "./GrblHalLineParserResultHelp";
 //import GrblHalLineParserResultCode from './GrblHalLineParserResultCode';
-import GrblHalLineParserResultInfo from './GrblHalLineParserResultInfo';
-import GrblHalLineParserResultSettingDescription from './GrblHalLineParserResultSettingDescription';
-import GrblHalLineParserResultSettingDetails from 'server/controllers/Grblhal/GrblHalLineParserResultSettingDetails';
-import GrblHalLineParserResultCompleteStatus from 'server/controllers/Grblhal/GrblHalLineParserResultCompleteStatus';
-import GrblHalLineParserResultAXS from './GrblHalLineParserResultAXS';
-import GrblHalLineParserResultGroupDetail from './GrblHalLineParserResultGroupDetail';
-import GrblHalLineParserResultAlarmDetails from './GrblHalLineParserResultAlarmDetails';
-import GrblHalLineParserResultSpindle from 'server/controllers/Grblhal/GrblHalLineParserResultSpindle';
-import GrblHalLineParserResultTool from './GrblHalLineParserResultTool';
-import GbrlHalLineParserResultSDCard from './GrblHalLineParserResultSDCard';
-import GrblHalLineParserResultATCI from 'server/controllers/Grblhal/GrblHalLineParserResultATCI';
-import GrblHalLineParserResultJSON from 'server/controllers/Grblhal/GrblHalLineParserResultJSON';
-import GrblHalErrorDescription from './GrblHalErrorDescription';
+import GrblHalLineParserResultInfo from "./GrblHalLineParserResultInfo";
+import GrblHalLineParserResultOk from "./GrblHalLineParserResultOk";
+import GrblHalLineParserResultParameters from "./GrblHalLineParserResultParameters";
+import GrbHalLineParserResultParserState from "./GrblHalLineParserResultParserState";
+import GbrlHalLineParserResultSDCard from "./GrblHalLineParserResultSDCard";
+import GrblHalLineParserResultSettingDescription from "./GrblHalLineParserResultSettingDescription";
+import GrblHalLineParserResultSettings from "./GrblHalLineParserResultSettings";
+import GrblHalLineParserResultStartup from "./GrblHalLineParserResultStartup";
+import GrblHalLineParserResultStatus from "./GrblHalLineParserResultStatus";
+import GrblHalLineParserResultTool from "./GrblHalLineParserResultTool";
+import GrblHalLineParserResultVersion from "./GrblHalLineParserResultVersion";
 
 class GrblHalLineParser {
-    parse(line) {
-        const parsers = [
-            // <Alarm:11|MPos:0.000,0.000,0.000|Bf:128,1024|FS:0,0|Pn:PXYZHS|WCO:10.000,0.000,0.000|WCS:G54|A:|Sc:|MPG:0|H:0|T:0|TLR:0|FW:grblHAL>
-            GrblHalLineParserResultCompleteStatus,
-            // <Alarm:#|[...]>
-            //GrblHalLineParserResultCode,
+	parse(line) {
+		const parsers = [
+			// <Alarm:11|MPos:0.000,0.000,0.000|Bf:128,1024|FS:0,0|Pn:PXYZHS|WCO:10.000,0.000,0.000|WCS:G54|A:|Sc:|MPG:0|H:0|T:0|TLR:0|FW:grblHAL>
+			GrblHalLineParserResultCompleteStatus,
+			// <Alarm:#|[...]>
+			//GrblHalLineParserResultCode,
 
-            // <>
-            GrblHalLineParserResultStatus,
+			// <>
+			GrblHalLineParserResultStatus,
 
-            // ok
-            GrblHalLineParserResultOk,
+			// ok
+			GrblHalLineParserResultOk,
 
-            // error:x
-            GrblHalLineParserResultError,
+			// error:x
+			GrblHalLineParserResultError,
 
-            // ALARM:
-            GrblHalLineParserResultAlarm,
+			// ALARM:
+			GrblHalLineParserResultAlarm,
 
-            // [MSG:ATCI:key:value|another_key:value]
-            GrblHalLineParserResultATCI,
+			// [MSG:ATCI:key:value|another_key:value]
+			GrblHalLineParserResultATCI,
 
-            // [G38.2 G54 G17 G21 G91 G94 M0 M5 M9 T0 F20. S0.] (v0.9)
-            // [GC:G38.2 G54 G17 G21 G91 G94 M0 M5 M9 T0 F20. S0.] (v1.1)
-            GrbHalLineParserResultParserState,
+			// [G38.2 G54 G17 G21 G91 G94 M0 M5 M9 T0 F20. S0.] (v0.9)
+			// [GC:G38.2 G54 G17 G21 G91 G94 M0 M5 M9 T0 F20. S0.] (v1.1)
+			GrbHalLineParserResultParserState,
 
-            // [G54:0.000,0.000,0.000]
-            // [G55:0.000,0.000,0.000]
-            // [G56:0.000,0.000,0.000]
-            // [G57:0.000,0.000,0.000]
-            // [G58:0.000,0.000,0.000]
-            // [G59:0.000,0.000,0.000]
-            // [G28:0.000,0.000,0.000]
-            // [G30:0.000,0.000,0.000]
-            // [G92:0.000,0.000,0.000]
-            // [TLO:0.000]
-            // [PRB:0.000,0.000,0.000:0]
-            GrblHalLineParserResultParameters,
+			// [G54:0.000,0.000,0.000]
+			// [G55:0.000,0.000,0.000]
+			// [G56:0.000,0.000,0.000]
+			// [G57:0.000,0.000,0.000]
+			// [G58:0.000,0.000,0.000]
+			// [G59:0.000,0.000,0.000]
+			// [G28:0.000,0.000,0.000]
+			// [G30:0.000,0.000,0.000]
+			// [G92:0.000,0.000,0.000]
+			// [TLO:0.000]
+			// [PRB:0.000,0.000,0.000:0]
+			GrblHalLineParserResultParameters,
 
-            // [HLP:] (v1.1)
-            GrblHalLineParserResultHelp,
+			// [HLP:] (v1.1)
+			GrblHalLineParserResultHelp,
 
-            // [VER:] (v1.1)
-            GrblHalLineParserResultVersion,
+			// [VER:] (v1.1)
+			GrblHalLineParserResultVersion,
 
-            // [AXS:]
-            GrblHalLineParserResultAXS,
+			// [AXS:]
+			GrblHalLineParserResultAXS,
 
-            // [SETTING:1|27|Step idle delay|milliseconds|5|####0||65535|0|0]
-            GrblHalLineParserResultSettingDescription,
+			// [SETTING:1|27|Step idle delay|milliseconds|5|####0||65535|0|0]
+			GrblHalLineParserResultSettingDescription,
 
-            // 7 - SLB_LASER, enabled as spindle 0, DLIRV, current
-            GrblHalLineParserResultSpindle,
+			// 7 - SLB_LASER, enabled as spindle 0, DLIRV, current
+			GrblHalLineParserResultSpindle,
 
-            // "120","X-axis acceleration","mm/sec^2","Acceleration. Used for motion planning to not exceed motor torque and lose steps.",
-            GrblHalLineParserResultSettingDetails,
+			// "120","X-axis acceleration","mm/sec^2","Acceleration. Used for motion planning to not exceed motor torque and lose steps.",
+			GrblHalLineParserResultSettingDetails,
 
-            //[SETTINGGROUP:5|0|Coolant]
-            GrblHalLineParserResultGroupDetail,
+			//[SETTINGGROUP:5|0|Coolant]
+			GrblHalLineParserResultGroupDetail,
 
-            //[ALARMCODE:16||Power on selftest (POS) failed.]
-            GrblHalLineParserResultAlarmDetails,
+			//[ALARMCODE:16||Power on selftest (POS) failed.]
+			GrblHalLineParserResultAlarmDetails,
 
-            // [ERRORCODE:62||Directory listing failed.]
-            GrblHalErrorDescription,
+			// [ERRORCODE:62||Directory listing failed.]
+			GrblHalErrorDescription,
 
-            // Tool
-            GrblHalLineParserResultTool,
+			// Tool
+			GrblHalLineParserResultTool,
 
-            // [FILE:/test.gcode|SIZE:100]
-            GbrlHalLineParserResultSDCard,
+			// [FILE:/test.gcode|SIZE:100]
+			GbrlHalLineParserResultSDCard,
 
-            // [XXXX:] (v1.1)
-            GrblHalLineParserResultInfo,
+			// [XXXX:] (v1.1)
+			GrblHalLineParserResultInfo,
 
-            // [echo:] (v1.1)
-            GrblHalLineParserResultEcho,
+			// [echo:] (v1.1)
+			GrblHalLineParserResultEcho,
 
-            // [] (v0.9)
-            // [MSG:] (v1.1)
-            GrblHalLineParserResultFeedback,
+			// [] (v0.9)
+			// [MSG:] (v1.1)
+			GrblHalLineParserResultFeedback,
 
-            // $xx
-            GrblHalLineParserResultSettings,
+			// $xx
+			GrblHalLineParserResultSettings,
 
-            // Grbl X.Xx ['$' for help]
-            GrblHalLineParserResultStartup,
+			// Grbl X.Xx ['$' for help]
+			GrblHalLineParserResultStartup,
 
-            /// {...} json blob
-            GrblHalLineParserResultJSON
-        ];
+			/// {...} json blob
+			GrblHalLineParserResultJSON,
+		];
 
-        for (let parser of parsers) {
-            const result = parser.parse(line);
-            if (result) {
-                _.set(result, 'payload.raw', line);
-                return result;
-            }
-        }
+		for (const parser of parsers) {
+			const result = parser.parse(line);
+			if (result) {
+				_.set(result, "payload.raw", line);
+				return result;
+			}
+		}
 
-        return {
-            type: null,
-            payload: {
-                raw: line
-            }
-        };
-    }
+		return {
+			type: null,
+			payload: {
+				raw: line,
+			},
+		};
+	}
 }
 
 export default GrblHalLineParser;

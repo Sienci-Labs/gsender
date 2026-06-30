@@ -1,61 +1,60 @@
-import Select from 'react-select';
-import cx from 'classnames';
+import Tooltip from "app/components/Tooltip";
+import cx from "classnames";
+import Select from "react-select";
 
-import Tooltip from 'app/components/Tooltip';
-
-import { Spindle } from '../definitions';
+import type { Spindle } from "../definitions";
 
 type FormattedSpindle = {
-    label: string;
-    value: string | number;
+	label: string;
+	value: string | number;
 };
 
 type Props = {
-    spindles: Spindle[];
-    onChange: (selectedOption: FormattedSpindle | null) => void;
-    onMenuOpen: () => void;
-    spindle: Spindle | null;
-    disabled: boolean;
+	spindles: Spindle[];
+	onChange: (selectedOption: FormattedSpindle | null) => void;
+	onMenuOpen: () => void;
+	spindle: Spindle | null;
+	disabled: boolean;
 };
 
 const formatSpindles = (spindles: Spindle[] = []): FormattedSpindle[] => {
-    return spindles.map((spindle) => ({
-        label: `${spindle.label} (${spindle.capabilities})`,
-        value: spindle.id,
-    }));
+	return spindles.map((spindle) => ({
+		label: `${spindle.label} (${spindle.capabilities})`,
+		value: spindle.id,
+	}));
 };
 
 const SpindleSelector = ({
-    spindles,
-    onChange,
-    onMenuOpen,
-    spindle,
-    disabled,
+	spindles,
+	onChange,
+	onMenuOpen,
+	spindle,
+	disabled,
 }: Props) => {
-    const spindleFormatted = { label: spindle.label, value: spindle.id };
-    const formattedSpindles = formatSpindles(spindles);
+	const spindleFormatted = { label: spindle.label, value: spindle.id };
+	const formattedSpindles = formatSpindles(spindles);
 
-    return (
-        <Tooltip content="Select a spindle">
-            <div
-                className={cx('flex gap-1 justify-center w-full items-center', {
-                    'cursor-not-allowed': disabled,
-                })}
-            >
-                <Select<FormattedSpindle>
-                    options={formattedSpindles}
-                    placeholder="Default Spindle"
-                    value={spindleFormatted}
-                    onChange={onChange}
-                    onMenuOpen={onMenuOpen}
-                    className="w-full z-10"
-                    menuPlacement="top"
-                    isDisabled={disabled}
-                    aria-label="Select spindle"
-                />
-            </div>
-        </Tooltip>
-    );
+	return (
+		<Tooltip content="Select a spindle">
+			<div
+				className={cx("flex gap-1 justify-center w-full items-center", {
+					"cursor-not-allowed": disabled,
+				})}
+			>
+				<Select<FormattedSpindle>
+					options={formattedSpindles}
+					placeholder="Default Spindle"
+					value={spindleFormatted}
+					onChange={onChange}
+					onMenuOpen={onMenuOpen}
+					className="w-full z-10"
+					menuPlacement="top"
+					isDisabled={disabled}
+					aria-label="Select spindle"
+				/>
+			</div>
+		</Tooltip>
+	);
 };
 
 export default SpindleSelector;

@@ -21,204 +21,193 @@
  *
  */
 
-import React, { useCallback, useRef, useEffect } from 'react';
-import cx from 'classnames';
-
-import { Button as ShadcnButton } from 'app/components/shadcn/Button';
-import { Button } from 'app/components/Button';
+import { Button } from "app/components/Button";
+import { Button as ShadcnButton } from "app/components/shadcn/Button";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from 'app/components/shadcn/Dropdown';
-
-import { METRIC_UNITS, PROBING_CATEGORY } from '../../constants';
-import ProbeImage from './ProbeImage';
-import ProbeDiameter from './ProbeDiameter';
-import ProbeDirectionSelection from './ProbeDirectionSelection';
-import { Actions, State } from './definitions';
-import useKeybinding from 'app/lib/useKeybinding';
-import useShuttleEvents from 'app/hooks/useShuttleEvents';
-import Tooltip from 'app/components/Tooltip';
-import { TOUCHPLATE_TYPES } from 'app/lib/constants';
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "app/components/shadcn/Dropdown";
+import Tooltip from "app/components/Tooltip";
+import useShuttleEvents from "app/hooks/useShuttleEvents";
+import { TOUCHPLATE_TYPES } from "app/lib/constants";
+import useKeybinding from "app/lib/useKeybinding";
+import cx from "classnames";
+import React, { useCallback, useEffect, useRef } from "react";
+import { METRIC_UNITS, PROBING_CATEGORY } from "../../constants";
+import type { Actions, State } from "./definitions";
+import ProbeDiameter from "./ProbeDiameter";
+import ProbeDirectionSelection from "./ProbeDirectionSelection";
+import ProbeImage from "./ProbeImage";
 
 type ProbeProps = {
-    state: State;
-    actions: Actions;
+	state: State;
+	actions: Actions;
 };
 
 const Probe = ({ state, actions }: ProbeProps) => {
-    // Use a ref to always have access to the latest state
-    const stateRef = useRef(state);
-    const actionsRef = useRef(actions);
+	// Use a ref to always have access to the latest state
+	const stateRef = useRef(state);
+	const actionsRef = useRef(actions);
 
-    // Update the refs when state or actions change
-    useEffect(() => {
-        stateRef.current = state;
-        actionsRef.current = actions;
-    }, [state, actions]);
+	// Update the refs when state or actions change
+	useEffect(() => {
+		stateRef.current = state;
+		actionsRef.current = actions;
+	}, [state, actions]);
 
-    // Create stable callbacks that always access the latest state via the ref
-    const toggleProbeDialog = useCallback(() => {
-        const { show } = stateRef.current;
-        actionsRef.current.onOpenChange(!show);
-    }, []);
+	// Create stable callbacks that always access the latest state via the ref
+	const toggleProbeDialog = useCallback(() => {
+		const { show } = stateRef.current;
+		actionsRef.current.onOpenChange(!show);
+	}, []);
 
-    const probeRoutineScrollRight = useCallback(() => {
-        const { availableProbeCommands, selectedProbeCommand } =
-            stateRef.current;
-        let newIndex = selectedProbeCommand + 1;
-        if (availableProbeCommands.length <= newIndex) {
-            newIndex = 0;
-        }
-        actionsRef.current.handleProbeCommandChange(newIndex);
-    }, []);
+	const probeRoutineScrollRight = useCallback(() => {
+		const { availableProbeCommands, selectedProbeCommand } = stateRef.current;
+		let newIndex = selectedProbeCommand + 1;
+		if (availableProbeCommands.length <= newIndex) {
+			newIndex = 0;
+		}
+		actionsRef.current.handleProbeCommandChange(newIndex);
+	}, []);
 
-    const probeRoutineScrollLeft = useCallback(() => {
-        const { availableProbeCommands, selectedProbeCommand } =
-            stateRef.current;
-        let newIndex = selectedProbeCommand - 1;
-        if (newIndex < 0) {
-            newIndex = availableProbeCommands.length - 1;
-        }
-        actionsRef.current.handleProbeCommandChange(newIndex);
-    }, []);
+	const probeRoutineScrollLeft = useCallback(() => {
+		const { availableProbeCommands, selectedProbeCommand } = stateRef.current;
+		let newIndex = selectedProbeCommand - 1;
+		if (newIndex < 0) {
+			newIndex = availableProbeCommands.length - 1;
+		}
+		actionsRef.current.handleProbeCommandChange(newIndex);
+	}, []);
 
-    const shuttleControlEvents = {
-        OPEN_PROBE: {
-            title: 'Display probe popup',
-            keys: '',
-            cmd: 'OPEN_PROBE',
-            preventDefault: false,
-            isActive: true,
-            category: PROBING_CATEGORY,
-            callback: toggleProbeDialog,
-        },
-        PROBE_ROUTINE_SCROLL_RIGHT: {
-            title: 'Probe Routine scroll right',
-            keys: '',
-            cmd: 'PROBE_ROUTINE_SCROLL_RIGHT',
-            preventDefault: false,
-            isActive: true,
-            category: PROBING_CATEGORY,
-            callback: probeRoutineScrollRight,
-        },
-        PROBE_ROUTINE_SCROLL_LEFT: {
-            title: 'Probe Routine scroll left',
-            keys: '',
-            cmd: 'PROBE_ROUTINE_SCROLL_LEFT',
-            preventDefault: false,
-            isActive: true,
-            category: PROBING_CATEGORY,
-            callback: probeRoutineScrollLeft,
-        },
-    };
+	const shuttleControlEvents = {
+		OPEN_PROBE: {
+			title: "Display probe popup",
+			keys: "",
+			cmd: "OPEN_PROBE",
+			preventDefault: false,
+			isActive: true,
+			category: PROBING_CATEGORY,
+			callback: toggleProbeDialog,
+		},
+		PROBE_ROUTINE_SCROLL_RIGHT: {
+			title: "Probe Routine scroll right",
+			keys: "",
+			cmd: "PROBE_ROUTINE_SCROLL_RIGHT",
+			preventDefault: false,
+			isActive: true,
+			category: PROBING_CATEGORY,
+			callback: probeRoutineScrollRight,
+		},
+		PROBE_ROUTINE_SCROLL_LEFT: {
+			title: "Probe Routine scroll left",
+			keys: "",
+			cmd: "PROBE_ROUTINE_SCROLL_LEFT",
+			preventDefault: false,
+			isActive: true,
+			category: PROBING_CATEGORY,
+			callback: probeRoutineScrollLeft,
+		},
+	};
 
-    useShuttleEvents(shuttleControlEvents);
-    useEffect(() => {
-        useKeybinding(shuttleControlEvents);
-    }, []);
+	useShuttleEvents(shuttleControlEvents);
+	useEffect(() => {
+		useKeybinding(shuttleControlEvents);
+	}, []);
 
-    const {
-        canClick,
-        availableProbeCommands,
-        selectedProbeCommand,
-        touchplate,
-        touchplateTypeSwitcher,
-        direction,
-    } = state;
+	const {
+		canClick,
+		availableProbeCommands,
+		selectedProbeCommand,
+		touchplate,
+		touchplateTypeSwitcher,
+		direction,
+	} = state;
 
-    const { touchplateType } = touchplate;
+	const { touchplateType } = touchplate;
 
-    const probeCommand = availableProbeCommands[selectedProbeCommand];
+	const probeCommand = availableProbeCommands[selectedProbeCommand];
 
-    return (
-        <div className="w-full h-full max-xl:pt-1">
-            <div className="grid grid-cols-[5fr_3fr] w-full h-full max-xl:max-h-[144px]">
-                {/* <div className="w-full h-full m-auto grid gap-4">
+	return (
+		<div className="w-full h-full max-xl:pt-1">
+			<div className="grid grid-cols-[5fr_3fr] w-full h-full max-xl:max-h-[144px]">
+				{/* <div className="w-full h-full m-auto grid gap-4">
                     <div className="h-full grid grid-rows[4fr_2fr] self-center gap-2"> */}
-                <div className="grid grid-rows-[1fr_1fr_1fr] gap-0.5 items-center justify-center">
-                    { touchplateTypeSwitcher &&
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button  aria-label="Change Probe Type" size="sm">{touchplateType}</Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-56 bg-white">
-                                { Object.values(TOUCHPLATE_TYPES).map((tpt) =>
-                                    <DropdownMenuItem
-                                        key={tpt}
-                                        onClick={() => actions.changeTouchPlateType(tpt)}
-                                        className="flex items-center hover:bg-blue-100 transition-colors duration-200 cursor-pointer dark:hover:bg-dark-lighter"
-                                    >
-                                        {tpt}
-                                    </DropdownMenuItem>)
-                                }
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    }
-                    <div className="flex w-full bg-white dark:bg-dark rounded-md border-solid border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-200 p-[2px]">
-                        {availableProbeCommands.map((command, index) => (
-                            <Tooltip
-                                content={`Probe using ${command.id}`}
-                                key={command.id}
-                            >
-                                <ShadcnButton
-                                    key={command.id}
-                                    onClick={() =>
-                                        actions.handleProbeCommandChange(index)
-                                    }
-                                    size="icon"
-                                    aria-label={`Select probing routine ${command.id}`}
-                                    aria-pressed={index === selectedProbeCommand}
-                                    className={cx(
-                                        'rounded-md relative h-[calc(4vh+3px)]',
-                                        {
-                                            'bg-blue-400 bg-opacity-30':
-                                                index === selectedProbeCommand,
-                                        },
-                                    )}
-                                >
-                                    {command.id.split(' ')[0]}
-                                </ShadcnButton>
-                            </Tooltip>
-                        ))}
-                    </div>
-                    <div
-                        className={cx('flex items-center max-xl:px-6', {
-                            hidden: !probeCommand?.tool,
-                        })}
-                    >
-                        <ProbeDiameter
-                            actions={actions}
-                            state={state}
-                            probeCommand={probeCommand}
-                        />
-                    </div>
-                    <div className="flex items-center justify-center">
-                        <Button
-                            onClick={() => actions.onOpenChange(true)}
-                            disabled={!canClick}
-                        >
-                            Probe
-                        </Button>
-                    </div>
-                </div>
-                <div className="flex w-full h-full min-h-full max-xl:pt-2">
-                    <ProbeImage
-                        touchplateType={touchplateType}
-                        probeCommand={probeCommand}
-                    />
-                </div>
-            </div>
-            {touchplateType !== 'Z Probe' && (
-                <ProbeDirectionSelection
-                    direction={direction}
-                    onClick={actions.nextProbeDirection}
-                />
-            )}
-        </div>
-    );
+				<div className="grid grid-rows-[1fr_1fr_1fr] gap-0.5 items-center justify-center">
+					{touchplateTypeSwitcher && (
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<Button aria-label="Change Probe Type" size="sm">
+									{touchplateType}
+								</Button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent className="w-56 bg-white">
+								{Object.values(TOUCHPLATE_TYPES).map((tpt) => (
+									<DropdownMenuItem
+										key={tpt}
+										onClick={() => actions.changeTouchPlateType(tpt)}
+										className="flex items-center hover:bg-blue-100 transition-colors duration-200 cursor-pointer dark:hover:bg-dark-lighter"
+									>
+										{tpt}
+									</DropdownMenuItem>
+								))}
+							</DropdownMenuContent>
+						</DropdownMenu>
+					)}
+					<div className="flex w-full bg-white dark:bg-dark rounded-md border-solid border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-200 p-[2px]">
+						{availableProbeCommands.map((command, index) => (
+							<Tooltip content={`Probe using ${command.id}`} key={command.id}>
+								<ShadcnButton
+									key={command.id}
+									onClick={() => actions.handleProbeCommandChange(index)}
+									size="icon"
+									aria-label={`Select probing routine ${command.id}`}
+									aria-pressed={index === selectedProbeCommand}
+									className={cx("rounded-md relative h-[calc(4vh+3px)]", {
+										"bg-blue-400 bg-opacity-30": index === selectedProbeCommand,
+									})}
+								>
+									{command.id.split(" ")[0]}
+								</ShadcnButton>
+							</Tooltip>
+						))}
+					</div>
+					<div
+						className={cx("flex items-center max-xl:px-6", {
+							hidden: !probeCommand?.tool,
+						})}
+					>
+						<ProbeDiameter
+							actions={actions}
+							state={state}
+							probeCommand={probeCommand}
+						/>
+					</div>
+					<div className="flex items-center justify-center">
+						<Button
+							onClick={() => actions.onOpenChange(true)}
+							disabled={!canClick}
+						>
+							Probe
+						</Button>
+					</div>
+				</div>
+				<div className="flex w-full h-full min-h-full max-xl:pt-2">
+					<ProbeImage
+						touchplateType={touchplateType}
+						probeCommand={probeCommand}
+					/>
+				</div>
+			</div>
+			{touchplateType !== "Z Probe" && (
+				<ProbeDirectionSelection
+					direction={direction}
+					onClick={actions.nextProbeDirection}
+				/>
+			)}
+		</div>
+	);
 };
 
 export default Probe;

@@ -1,57 +1,55 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from "react";
 
-import GamepadManager from '../gamepad';
-import { GamepadDetail } from '../gamepad/definitions';
+import GamepadManager from "../gamepad";
+import type { GamepadDetail } from "../gamepad/definitions";
 
 export const useGamepadListener = ({
-    profile,
-    axisThreshold,
+	profile,
+	axisThreshold,
 }: {
-    profile: string[];
-    axisThreshold: number;
+	profile: string[];
+	axisThreshold: number;
 }) => {
-    const [buttons, setButtons] = useState<Array<GamepadButton>>([]);
-    const [axes, setAxes] = useState(null);
+	const [buttons, setButtons] = useState<Array<GamepadButton>>([]);
+	const [axes, setAxes] = useState(null);
 
-    useEffect(() => {
-        const gamepad = GamepadManager.getInstance();
+	useEffect(() => {
+		const gamepad = GamepadManager.getInstance();
 
-        gamepad.on('gamepad:button', buttonListener);
-        gamepad.on('gamepad:axis', axisListener);
+		gamepad.on("gamepad:button", buttonListener);
+		gamepad.on("gamepad:axis", axisListener);
 
-        return () => {
-            gamepad.off('gamepad:button', buttonListener);
-            gamepad.off('gamepad:axis', axisListener);
-        };
-    }, []);
+		return () => {
+			gamepad.off("gamepad:button", buttonListener);
+			gamepad.off("gamepad:axis", axisListener);
+		};
+	}, []);
 
-    const buttonListener = ({ detail }: GamepadDetail): void => {
-        const { gamepad } = detail;
+	const buttonListener = ({ detail }: GamepadDetail): void => {
+		const { gamepad } = detail;
 
-        if (profile && !profile.includes(gamepad.id)) {
-            console.error('Gamepad profile not found');
-            return;
-        }
+		if (profile && !profile.includes(gamepad.id)) {
+			console.error("Gamepad profile not found");
+			return;
+		}
 
-        setButtons([...detail.gamepad.buttons]);
-    };
+		setButtons([...detail.gamepad.buttons]);
+	};
 
-    const axisListener = ({ detail }: { detail: GamepadDetail }): void => {
-        const { gamepad } = detail.detail;
+	const axisListener = ({ detail }: { detail: GamepadDetail }): void => {
+		const { gamepad } = detail.detail;
 
-        if (profile && !profile.includes(gamepad.id)) {
-            console.error('Gamepad profile not found');
-            return;
-        }
+		if (profile && !profile.includes(gamepad.id)) {
+			console.error("Gamepad profile not found");
+			return;
+		}
 
-        // Map values under threshold to zero for easier hook usage when determining whether
-        // that certain axis was changed or not
-        setAxes(
-            gamepad.axes.map((axis) =>
-                Math.abs(axis) < axisThreshold ? 0 : axis,
-            ),
-        );
-    };
+		// Map values under threshold to zero for easier hook usage when determining whether
+		// that certain axis was changed or not
+		setAxes(
+			gamepad.axes.map((axis) => (Math.abs(axis) < axisThreshold ? 0 : axis)),
+		);
+	};
 
-    return { buttons, axes };
+	return { buttons, axes };
 };

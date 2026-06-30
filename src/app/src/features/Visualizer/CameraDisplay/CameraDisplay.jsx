@@ -26,7 +26,7 @@ import PropTypes from 'prop-types';
 import i18n from 'app/lib/i18n';
 import { posthog } from 'posthog-js';
 
-import styles from './index.module.styl';
+import styles from "./index.module.styl";
 
 /**
  * CameraDisplay component used to allow changing of camera angles
@@ -34,10 +34,10 @@ import styles from './index.module.styl';
  */
 
 class CameraDisplay extends PureComponent {
-    static propTypes = {
-        camera: PropTypes.object,
-        cameraPosition: PropTypes.string,
-    };
+	static propTypes = {
+		camera: PropTypes.object,
+		cameraPosition: PropTypes.string,
+	};
 
     handleCameraChange = (cameraPosition, changeCameraView) => {
         changeCameraView();
@@ -49,7 +49,7 @@ class CameraDisplay extends PureComponent {
     }
 
     render = () => {
-        let { camera, cameraPosition } = this.props;
+        const { camera, cameraPosition } = this.props;
         return (
             <div className="rounded bg-opacity-50 bg-gray-600 w-24 absolute bottom-5 portrait:right-5 portrait:left-auto left-5">
                 <h3 className={styles.viewTitle}>{cameraPosition}</h3>
@@ -137,15 +137,15 @@ class CameraDisplay extends PureComponent {
                         }}
                     />
 
-                    <button
-                        type="button"
-                        tabIndex={0}
-                        className={styles.cornerC3}
-                        aria-hidden="true"
-                    />
-                </div>
-            </div>
-        );
-    };
+					<button
+						type="button"
+						tabIndex={0}
+						className={styles.cornerC3}
+						aria-hidden="true"
+					/>
+				</div>
+			</div>
+		);
+	};
 }
 export default CameraDisplay;

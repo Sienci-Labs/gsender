@@ -1,34 +1,34 @@
-import { USER_DATA_COLLECTION } from 'app/constants';
+import type { USER_DATA_COLLECTION } from "app/constants";
 
 // Types
 
 export type USER_DATA_COLLECTION_T =
-    (typeof USER_DATA_COLLECTION)[keyof typeof USER_DATA_COLLECTION];
+	(typeof USER_DATA_COLLECTION)[keyof typeof USER_DATA_COLLECTION];
 
 // Interfaces
 
 export interface SigninOptions {
-    token?: string;
-    name?: string;
-    password?: string;
+	token?: string;
+	name?: string;
+	password?: string;
 }
 
 export interface StateOptions {
-    key?: string;
+	key?: string;
 }
 
 export interface GCodeOptions {
-    port?: string;
-    name?: string;
-    gcode?: string;
-    context?: Record<string, unknown>;
+	port?: string;
+	name?: string;
+	gcode?: string;
+	context?: Record<string, unknown>;
 }
 
 export interface FetchOptions {
-    [key: string]: any;
+	[key: string]: any;
 }
 
 export interface WatchOptions {
-    path?: string;
-    file?: string;
+	path?: string;
+	file?: string;
 }

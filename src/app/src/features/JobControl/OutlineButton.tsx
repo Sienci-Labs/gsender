@@ -11,7 +11,7 @@ import get from 'lodash/get';
 import { usePostHog } from '@posthog/react';
 
 interface OutlineButtonProps {
-    disabled: boolean;
+	disabled: boolean;
 }
 
 let outlineRunning = false;
@@ -40,13 +40,11 @@ const OutlineButton: React.FC<OutlineButtonProps> = ({ disabled }) => {
                 const isLaser = laserOnOutline && spindleMode === LASER_MODE;
                 const outlineSpeed = store.get('workspace.outlineSpeed', null);
 
-                const maxRuntime = setTimeout(() => {
-                    outlineWorker.terminate();
-                    toast.error(
-                        'Outline generation timed out. Please try again.',
-                    );
-                    outlineRunning = false;
-                }, 15000);
+				const maxRuntime = setTimeout(() => {
+					outlineWorker.terminate();
+					toast.error("Outline generation timed out. Please try again.");
+					outlineRunning = false;
+				}, 15000);
 
                 outlineWorker.onmessage = ({ data }) => {
                     clearTimeout(maxRuntime);
@@ -73,22 +71,22 @@ const OutlineButton: React.FC<OutlineButtonProps> = ({ disabled }) => {
         });
     };
 
-    return (
-        <Button
-            disabled={disabled}
-            className={cx(
-                'rounded-[0.2rem] border-solid border-2 text-base px-3 portrait:px-6 portrait:text-lg',
-                {
-                    'border-blue-500 bg-blue-500 text-white [box-shadow:_2px_2px_5px_0px_var(--tw-shadow-color)] shadow-gray-400':
-                        !disabled,
-                    'border-gray-500 bg-gray-400': disabled,
-                },
-            )}
-            onClick={runOutline}
-        >
-            <TbVector className="text-2xl mr-1" /> Outline
-        </Button>
-    );
+	return (
+		<Button
+			disabled={disabled}
+			className={cx(
+				"rounded-[0.2rem] border-solid border-2 text-base px-3 portrait:px-6 portrait:text-lg",
+				{
+					"border-blue-500 bg-blue-500 text-white [box-shadow:_2px_2px_5px_0px_var(--tw-shadow-color)] shadow-gray-400":
+						!disabled,
+					"border-gray-500 bg-gray-400": disabled,
+				},
+			)}
+			onClick={runOutline}
+		>
+			<TbVector className="text-2xl mr-1" /> Outline
+		</Button>
+	);
 };
 
 export default OutlineButton;

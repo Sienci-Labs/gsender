@@ -21,41 +21,43 @@
  *
  */
 
-import AvrgirlArduino from '@sienci/avrgirl-arduino';
-import mk1Image from './mk1_20220214.hex';
-import mk2Image from './mk2_20220214.hex';
-import logger from '../../logger';
+import AvrgirlArduino from "@sienci/avrgirl-arduino";
+import logger from "../../logger";
+import mk1Image from "./mk1_20220214.hex";
+import mk2Image from "./mk2_20220214.hex";
 
-const log = logger('FlashLib: ');
-const FlashingFirmware = (flashPort, imageType = 'MK1', socket) => {
-    if (!flashPort) {
-        log.error('No port specified');
-        return;
-    }
+const log = logger("FlashLib: ");
+const FlashingFirmware = (flashPort, imageType = "MK1", socket) => {
+	if (!flashPort) {
+		log.error("No port specified");
+		return;
+	}
 
-    try {
-        let avrgirl = new AvrgirlArduino({
-            board: 'uno',
-            port: flashPort,
-        });
+	try {
+		const avrgirl = new AvrgirlArduino({
+			board: "uno",
+			port: flashPort,
+		});
 
-        let imageHex = (imageType === 'MK2') ? mk2Image : mk1Image;
-        socket.emit('flash:message', { type: 'Info', content: `Starting Arduino flash on port ${flashPort}.` });
-        avrgirl.flash(imageHex, (error) => {
-            if (error) {
-                socket.emit('task:error', error);
-                log.debug(`${error} Error flashing board`);
-            } else {
-                socket.emit('flash:end', flashPort);
-                log.debug('Flash successful');
-            }
-        });
-    } catch (error) {
-        const message = 'An error occurred while flashing';
-        log.debug(`${error} ${message}`);
-        socket.emit('task:error', message);
-    }
+		const imageHex = imageType === "MK2" ? mk2Image : mk1Image;
+		socket.emit("flash:message", {
+			type: "Info",
+			content: `Starting Arduino flash on port ${flashPort}.`,
+		});
+		avrgirl.flash(imageHex, (error) => {
+			if (error) {
+				socket.emit("task:error", error);
+				log.debug(`${error} Error flashing board`);
+			} else {
+				socket.emit("flash:end", flashPort);
+				log.debug("Flash successful");
+			}
+		});
+	} catch (error) {
+		const message = "An error occurred while flashing";
+		log.debug(`${error} ${message}`);
+		socket.emit("task:error", message);
+	}
 };
-
 
 export default FlashingFirmware;

@@ -1,5 +1,3 @@
-import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 import {
     Select,
     SelectContent,
@@ -13,40 +11,42 @@ import { RootState } from 'app/store/redux';
 import Tooltip from 'app/components/Tooltip';
 import { GRBL_ACTIVE_STATE_RUN, WORKFLOW_STATE_RUNNING } from 'app/constants';
 import posthog from 'posthog-js';
+import { useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
 
 const availableWorkspaces = {
-    G54: 'P1',
-    G55: 'P2',
-    G56: 'P3',
-    G57: 'P4',
-    G58: 'P5',
-    G59: 'P6',
+	G54: "P1",
+	G55: "P2",
+	G56: "P3",
+	G57: "P4",
+	G58: "P5",
+	G59: "P6",
 };
 
-export type GrblWorkspace = 'G54' | 'G55' | 'G56' | 'G57' | 'G58' | 'G59';
+export type GrblWorkspace = "G54" | "G55" | "G56" | "G57" | "G58" | "G59";
 
 export function WorkspaceSelector() {
-    const activeWorkspace = useSelector(
-        (state: RootState) => state.controller.modal.wcs,
-    );
-    const isConnected = useSelector(
-        (state: RootState) => state.connection.isConnected,
-    );
+	const activeWorkspace = useSelector(
+		(state: RootState) => state.controller.modal.wcs,
+	);
+	const isConnected = useSelector(
+		(state: RootState) => state.connection.isConnected,
+	);
 
-    const activeState = useSelector(
-        (state: RootState) => state.controller.state.status?.activeState,
-    );
+	const activeState = useSelector(
+		(state: RootState) => state.controller.state.status?.activeState,
+	);
 
     const workflowState = useSelector(
         (state: RootState) => state.controller.workflow.state,
     );
 
-    const [workspace, setWorkspace] = useState<GrblWorkspace>('G54');
+	const [workspace, setWorkspace] = useState<GrblWorkspace>("G54");
 
-    // Update selected workspace if it changes elsewhere
-    useEffect(() => {
-        setWorkspace(activeWorkspace);
-    }, [activeWorkspace]);
+	// Update selected workspace if it changes elsewhere
+	useEffect(() => {
+		setWorkspace(activeWorkspace);
+	}, [activeWorkspace]);
 
     function onWorkspaceSelect(value: GrblWorkspace) {
         setWorkspace(value);
