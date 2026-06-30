@@ -142,6 +142,8 @@ class GcodeViewer extends Component<Props> {
 
 	lastWposKey = "";
 
+	isRotaryFile = false;
+
 	lastConnected: boolean | null = null;
 
 	lastSpinning: boolean | null = null;
@@ -466,6 +468,7 @@ class GcodeViewer extends Component<Props> {
 				this.lastPosition = { ...this.lastPosition, ...(data as object) };
 				this.viewer3d?.setBitPosition(this.lastPosition);
 				this.viewerSvg?.setBitPosition(this.lastPosition);
+				this.viewer3d?.setToolpathRotationA(this.isRotaryFile ? (this.lastPosition.a ?? 0) : 0);
 			}),
 			pubsub.subscribe("theme:change", (_msg, theme) => {
 				this.previewThemeName = (theme as string) ?? null;
@@ -504,6 +507,12 @@ class GcodeViewer extends Component<Props> {
 		this.reduxUnsub = reduxStore.subscribe(() => {
 			const st = reduxStore.getState();
 
+			// Track whether the loaded file uses the A axis — gates rotary rotation.
+			const fileType: string | undefined = _get(st, "file.fileType");
+			if (fileType !== undefined) {
+				this.isRotaryFile = fileType === "ROTARY" || fileType === "FOUR_AXIS";
+			}
+
 			// Bit follows the live work position (DRO) — jogging and running alike.
 			const wpos = _get(st, "controller.wpos");
 			if (wpos) {
@@ -518,6 +527,7 @@ class GcodeViewer extends Component<Props> {
 					};
 					this.viewer3d?.setBitPosition(this.lastPosition);
 					this.viewerSvg?.setBitPosition(this.lastPosition);
+					this.viewer3d?.setToolpathRotationA(this.isRotaryFile ? (this.lastPosition.a ?? 0) : 0);
 				}
 			}
 
