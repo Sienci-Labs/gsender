@@ -25,6 +25,7 @@ import { getProbeSettings, getToolString } from "app/lib/toolChangeUtils";
 import store from "app/store";
 import { store as reduxStore } from "app/store/redux";
 import get from "lodash/get";
+import type { WizardInstructions } from "./definitions";
 
 // $132 is max z travel, if soft limits ($20) enabled we need to make sure probe distance will not exceed max limits
 const calculateMaxZProbeDistance = (_zProbeDistance = 30) => {
@@ -96,7 +97,7 @@ const getMoveToToolchangePositionSubstep = () => ({
 	],
 });
 
-const createWizard = (count: number) => {
+const createWizard = (count: number): WizardInstructions => {
 	const hasManualToolchangePosition = store.get(
 		"workspace.toolChange.moveToManualPosition",
 		false,

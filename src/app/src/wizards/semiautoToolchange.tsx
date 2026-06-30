@@ -28,6 +28,7 @@ import {
 } from "app/lib/toolChangeUtils";
 import { store as reduxStore } from "app/store/redux";
 import get from "lodash/get";
+import type { WizardInstructions } from "./definitions";
 
 const getMoveAmount = () => {
 	const $13 = get(
@@ -90,7 +91,7 @@ const probeInitialToolStep = [
 	},
 ];
 
-const createWizard = (count: number) => {
+const createWizard = (count: number): WizardInstructions => {
 	return {
 		intro: {
 			icon: "fas fa-caution",

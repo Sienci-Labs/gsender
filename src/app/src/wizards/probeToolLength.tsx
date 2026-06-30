@@ -25,6 +25,7 @@ import { getProbeSettings } from "app/lib/toolChangeUtils";
 import store from "app/store";
 import { store as reduxStore } from "app/store/redux";
 import get from "lodash/get";
+import type { WizardInstructions } from "./definitions";
 
 // $132 is max z travel, if soft limits ($20) enabled we need to make sure probe distance will not exceed max limits
 const calculateMaxZProbeDistance = (_zProbeDistance = 30) => {
@@ -37,7 +38,7 @@ const calculateMaxZProbeDistance = (_zProbeDistance = 30) => {
 	return (maxZTravel - curZPos - 2).toFixed(3);
 };
 
-const createWizard = () => {
+const createWizard = (): WizardInstructions => {
 	return {
 		intro: {
 			icon: "fas fa-ruler-vertical",

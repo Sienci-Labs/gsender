@@ -20,37 +20,189 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
+/** biome-ignore-all lint/complexity/useOptionalChain: <> */
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
 
+import type { BasicObject } from "app/definitions/general";
 import { Toaster } from "app/lib/toaster/ToasterLib";
 import reduxStore from "app/store/redux";
 import { disableWizard } from "app/store/redux/slices/helper.slice";
+import type { WizardInstructions, WizardStep } from "app/wizards/definitions";
 import _ from "lodash";
-import React, {
+import {
 	createContext,
+	type Dispatch,
+	type JSX,
+	type SetStateAction,
 	useContext,
 	useEffect,
 	useMemo,
 	useState,
 } from "react";
 
-const WizardContext = createContext({});
-const WizardAPI = createContext({});
+interface ActiveValues {
+	activeStep: number;
+	activeSubstep: number;
+}
+
+const initialState: {
+	completedStep: number;
+	setCompletedStep?: Dispatch<SetStateAction<number>>;
+	completedSubStep: number;
+	setCompletedSubStep?: Dispatch<SetStateAction<number>>;
+	intro: string;
+	setIntro?: Dispatch<SetStateAction<string>>;
+	toolchangeContext: BasicObject;
+	setToolchangeContext?: Dispatch<SetStateAction<BasicObject>>;
+	toolchangeComment: string;
+	setToolchangeComment?: Dispatch<SetStateAction<string>>;
+	activeStep: number;
+	setActiveStep?: Dispatch<SetStateAction<number>>;
+	activeSubstep: number;
+	setActiveSubstep?: Dispatch<SetStateAction<number>>;
+	title: string;
+	setTitle?: Dispatch<SetStateAction<string>>;
+	steps: WizardStep[];
+	setSteps?: Dispatch<SetStateAction<WizardStep[]>>;
+	visible: boolean;
+	setVisible?: Dispatch<SetStateAction<boolean>>;
+	stepCount: number;
+	setStepCount?: Dispatch<SetStateAction<number>>;
+	minimized: boolean;
+	setMinimized?: Dispatch<SetStateAction<boolean>>;
+	isLoading: boolean;
+	setIsLoading?: Dispatch<SetStateAction<boolean>>;
+	overlay: boolean;
+	setOverlay?: Dispatch<SetStateAction<boolean>>;
+	load: (
+		instructions: WizardInstructions,
+		title: string,
+		metadata?: BasicObject,
+	) => void;
+} = {
+	steps: [
+		{
+			title: "",
+			substeps: [],
+		},
+	],
+	activeStep: 0,
+	activeSubstep: 0,
+	completedStep: -1,
+	completedSubStep: -1,
+	title: "",
+	visible: false,
+	load: () => {},
+	stepCount: 0,
+	minimized: false,
+	isLoading: false,
+	overlay: false,
+	intro: "",
+	toolchangeContext: {},
+	toolchangeComment: "",
+};
+
+const initialAPI: {
+	setWizardSteps: (steps: WizardStep[]) => void;
+	setTitle: (title: string) => void;
+	setVisible: (b: boolean) => void;
+	setIsLoading: (state: boolean) => void;
+	updateSubstepOverlay: (
+		activeValues: ActiveValues,
+		stepsList?: WizardStep[],
+	) => boolean;
+	getStepTitle: (index: number) => string;
+	getIntro: () => string;
+	getSubsteps: (index: number) => {
+		title: string;
+		description: string | (() => JSX.Element) | (() => string);
+		overlay: boolean;
+		toolBanner?: boolean;
+		actions?: {
+			label: string;
+			gcodeLines?: string[];
+			cb?: () => void;
+		}[];
+		actionTaken?: boolean;
+	}[];
+	incrementStep: () => void;
+	decrementStep: () => ActiveValues | BasicObject;
+	toggleMinimized: (state: boolean) => void;
+	completeSubStep: (stepIndex?: number, substepIndex?: number) => BasicObject;
+	isSubstepCompleted: (stepIndex: number, substepIndex: number) => boolean;
+	load: (
+		instructions: WizardInstructions,
+		title: string,
+		metadata?: BasicObject & { context?: BasicObject; comment?: string },
+	) => void;
+	scrollToActiveStep: (activeValues: ActiveValues) => void;
+	markActionAsComplete: (stepIndex: number, substepIndex: number) => void;
+	hasIncompleteActions: () => boolean;
+	cancelToolchange: () => void;
+} = {
+	setWizardSteps: () => {},
+	setTitle: () => {},
+	setVisible: () => {},
+	setIsLoading: () => {},
+	updateSubstepOverlay: () => {
+		return false;
+	},
+	getStepTitle: () => {
+		return "";
+	},
+	getIntro: () => {
+		return "";
+	},
+	getSubsteps: () => {
+		return null;
+	},
+	incrementStep: () => {},
+	decrementStep: () => {
+		return {};
+	},
+	toggleMinimized: () => {},
+	completeSubStep: () => {
+		return {};
+	},
+	isSubstepCompleted: () => {
+		return false;
+	},
+	load: () => {},
+	scrollToActiveStep: () => {},
+	markActionAsComplete: () => {},
+	hasIncompleteActions: () => {
+		return false;
+	},
+	cancelToolchange: () => {},
+};
+
+const WizardContext = createContext(initialState);
+const WizardAPI = createContext(initialAPI);
 
 /**
  * Wizard Context Provider
  * @param children child elements
  * @returns {JSX.Element}
  */
-export const WizardProvider = ({ children }) => {
+export const WizardProvider = ({
+	children,
+}: {
+	children: JSX.Element;
+}): JSX.Element => {
 	const [completedStep, setCompletedStep] = useState(-1);
 	const [completedSubStep, setCompletedSubStep] = useState(-1);
 	const [intro, setIntro] = useState(null);
-	const [toolchangeContext, setToolchangeContext] = useState(null);
+	const [toolchangeContext, setToolchangeContext] = useState<BasicObject>(null);
 	const [toolchangeComment, setToolchangeComment] = useState("");
 	const [activeStep, setActiveStep] = useState(0);
 	const [activeSubstep, setActiveSubstep] = useState(0);
 	const [title, setTitle] = useState("Wizard");
-	const [steps, setSteps] = useState([]);
+	const [steps, setSteps] = useState<WizardStep[]>([
+		{
+			title: "",
+			substeps: [],
+		},
+	]);
 	const [visible, setVisible] = useState(false);
 	const [stepCount, setStepCount] = useState(0);
 	const [minimized, setMinimized] = useState(false);
@@ -81,11 +233,11 @@ export const WizardProvider = ({ children }) => {
 	// Memoized API for context, can be fetched separate to data context
 	const api = useMemo(
 		() => ({
-			setWizardSteps: (steps) => setSteps(steps),
-			setTitle: (title) => setTitle(title),
-			setVisible: (b) => setVisible(b),
-			setIsLoading: (state) => setIsLoading(state),
-			updateSubstepOverlay: (activeValues, stepsList = steps) => {
+			setWizardSteps: (steps: WizardStep[]) => setSteps(steps),
+			setTitle: (title: string) => setTitle(title),
+			setVisible: (b: boolean) => setVisible(b),
+			setIsLoading: (state: boolean) => setIsLoading(state),
+			updateSubstepOverlay: (activeValues: ActiveValues, stepsList = steps) => {
 				const { activeStep, activeSubstep } = activeValues;
 				const step = stepsList[activeStep];
 				if (!step) {
@@ -98,7 +250,7 @@ export const WizardProvider = ({ children }) => {
 				setOverlay(substep.overlay);
 				return substep.overlay;
 			},
-			getStepTitle: (index) => {
+			getStepTitle: (index: number) => {
 				const step = steps[index];
 				if (!step) {
 					return "";
@@ -108,7 +260,7 @@ export const WizardProvider = ({ children }) => {
 			getIntro: () => {
 				return intro;
 			},
-			getSubsteps: (index) => {
+			getSubsteps: (index: number) => {
 				const step = steps[index];
 				if (!step) {
 					return [];
@@ -121,7 +273,7 @@ export const WizardProvider = ({ children }) => {
 					setActiveStep(activeStep + 1);
 				}
 			},
-			decrementStep: () => {
+			decrementStep: (): ActiveValues | BasicObject => {
 				// first check if we have substeps
 				if (activeSubstep > 0) {
 					const decrementedSubStep = activeSubstep - 1;
@@ -148,7 +300,7 @@ export const WizardProvider = ({ children }) => {
 				}
 				return {};
 			},
-			toggleMinimized: (state) => {
+			toggleMinimized: (state: boolean) => {
 				setMinimized(!state);
 			},
 			completeSubStep: (
@@ -236,13 +388,17 @@ export const WizardProvider = ({ children }) => {
 				}
 				return returnValues;
 			},
-			isSubstepCompleted: (stepIndex, substepIndex) => {
+			isSubstepCompleted: (stepIndex: number, substepIndex: number) => {
 				if (completedStep > stepIndex) {
 					return true;
 				}
 				return completedSubStep > substepIndex && stepIndex === completedStep;
 			},
-			load: (instructions, title, metadata = {}) => {
+			load: (
+				instructions: WizardInstructions,
+				title: string,
+				metadata?: BasicObject & { context?: BasicObject; comment?: string },
+			) => {
 				if (!instructions || !instructions.steps) {
 					return;
 				}
@@ -268,7 +424,7 @@ export const WizardProvider = ({ children }) => {
 			// this is bc if you change those values before running this function, they won't update in time,
 			// and you will get the old values.
 			// completeSubStep and decrementStep both return the new values they set that can then be passed to this function
-			scrollToActiveStep: (activeValues) => {
+			scrollToActiveStep: (activeValues: ActiveValues) => {
 				if (_.isEmpty(activeValues)) {
 					return;
 				}
@@ -287,7 +443,7 @@ export const WizardProvider = ({ children }) => {
 					});
 				});
 			},
-			markActionAsComplete: (stepIndex, substepIndex) => {
+			markActionAsComplete: (stepIndex: number, substepIndex: number) => {
 				const nextSteps = [...steps];
 				nextSteps[stepIndex].substeps[substepIndex].actionTaken = true;
 				setSteps(nextSteps);

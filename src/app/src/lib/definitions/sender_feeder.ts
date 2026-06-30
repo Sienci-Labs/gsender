@@ -4,7 +4,7 @@ export interface Feeder {
 
 export interface Sender {
 	status: SenderStatus;
-	progress: number;
+	progress?: number;
 }
 
 export interface FeederStatus {

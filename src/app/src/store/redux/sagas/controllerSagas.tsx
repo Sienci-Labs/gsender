@@ -55,11 +55,17 @@ import type {
 import { KeepoutToggle } from "app/features/ATC/components/KeepOut/KeepOutToggle.tsx";
 import { updateToolchangeContext } from "app/features/Helper/Wizard.tsx";
 import type { Spindle } from "app/features/Spindle/definitions";
-import type { Job } from "app/features/Stats/utils/StatContext";
+import type {
+	Job,
+	MaintenanceTask,
+} from "app/features/Stats/utils/StatContext";
 import { connectToLastDevice } from "app/lib/connection";
 import controller from "app/lib/controller";
 import type { TOOL } from "app/lib/definitions/gcode_virtualization";
-import type { FeederStatus } from "app/lib/definitions/sender_feeder";
+import type {
+	FeederStatus,
+	SenderStatus,
+} from "app/lib/definitions/sender_feeder";
 import { getVisualizerTheme } from "app/lib/getVisualizerTheme";
 import { isLaserMode } from "app/lib/laserMode";
 import { updateWorkspaceMode } from "app/lib/rotary";
@@ -67,6 +73,7 @@ import { toast } from "app/lib/toaster";
 import { determineFixedSensorInstructions } from "app/lib/toolChangeUtils";
 import store from "app/store";
 import { store as reduxStore } from "app/store/redux";
+import type { WizardInstructions } from "app/wizards/definitions";
 import manualToolChange from "app/wizards/manualToolchange";
 import semiautoToolChange from "app/wizards/semiautoToolchange";
 import {
@@ -84,7 +91,9 @@ import get from "lodash/get";
 import _throttle from "lodash/throttle";
 import pubsub from "pubsub-js";
 import type {
+	AlarmsData,
 	ControllerSettings,
+	ControllerStateState,
 	FILE_TYPE_T,
 	PortInfo,
 	SDCardFile,
@@ -123,13 +132,23 @@ import {
 import { setIpList } from "../slices/preferences.slice";
 import { updateJobOverrides } from "../slices/visualizer.slice";
 
-export function* initialize(): Generator<any, void, any> {
+interface Error {
+	type: typeof ALARM | typeof ERROR;
+	lineNumber: number;
+	code: number;
+	line: string;
+	description: string;
+	origin: string;
+	controller: "grblHAL" | "GRBL";
+}
+
+export function* initialize(): Generator<null, void, unknown> {
 	let visualizeWorker: typeof VisualizeWorker | null = null;
 	let visualizeJobId = 0;
 	// let estimateWorker: EstimateWorker | null = null;
 	let currentState: GRBL_ACTIVE_STATES_T = GRBL_ACTIVE_STATE_IDLE;
 	let prevState: GRBL_ACTIVE_STATES_T = GRBL_ACTIVE_STATE_IDLE;
-	let errors: any[] = [];
+	let errors: string[] = [];
 	let latestEstimateData: { estimates: number[]; estimatedTime: number } = {
 		estimates: [],
 		estimatedTime: 0,
@@ -152,7 +171,7 @@ export function* initialize(): Generator<any, void, any> {
 		1000 * 60 * 3,
 	);
 
-	const updateJobStats = async (status: any) => {
+	const updateJobStats = async (status: SenderStatus) => {
 		const controllerType = _get(reduxStore.getState(), "controller.type");
 		const port = _get(reduxStore.getState(), "connection.port");
 		const path = _get(reduxStore.getState(), "file.path");
@@ -188,11 +207,11 @@ export function* initialize(): Generator<any, void, any> {
 		}
 	};
 
-	const updateMaintenanceTasks = async (status: any) => {
+	const updateMaintenanceTasks = async (status: SenderStatus) => {
 		try {
 			const res = await api.maintenance.fetch();
-			const tasks = res.data;
-			const newTasks = tasks.map((task: any) => {
+			const tasks: MaintenanceTask[] = res.data;
+			const newTasks = tasks.map((task: MaintenanceTask) => {
 				const newTask = task;
 				newTask.currentTime += status.timeRunning / 1000 / 3600;
 				return newTask;
@@ -374,7 +393,7 @@ export function* initialize(): Generator<any, void, any> {
 		});
 	};
 
-	const updateAlarmsErrors = async (error: any) => {
+	const updateAlarmsErrors = async (error: Error) => {
 		try {
 			const res = await api.alarmList.fetch();
 			const alarmList = res.data;
@@ -410,7 +429,7 @@ export function* initialize(): Generator<any, void, any> {
 
 	controller.addListener(
 		"controller:state",
-		(type: string, state: any, tool: TOOL) => {
+		(type: string, state: ControllerStateState, tool: TOOL) => {
 			// if state is the same, don't update the prev and current state
 			if (currentState !== state.status.activeState) {
 				prevState = currentState;
@@ -427,7 +446,7 @@ export function* initialize(): Generator<any, void, any> {
 		reduxStore.dispatch(updateFeederStatus({ status }));
 	});
 
-	controller.addListener("sender:status", (status: any) => {
+	controller.addListener("sender:status", (status: SenderStatus) => {
 		// finished job or cancelled job
 		// because elapsed time and time running only update on sender.next(), they may not be entirely accurate for stopped jobs
 		if (
@@ -608,7 +627,7 @@ export function* initialize(): Generator<any, void, any> {
 
 	controller.addListener(
 		"gcode:toolChange",
-		async (context: any, comment = "") => {
+		async (context: BasicObject, comment = "") => {
 			const payload = {
 				context,
 				comment,
@@ -617,22 +636,25 @@ export function* initialize(): Generator<any, void, any> {
 
 			const { option, count } = context;
 			if (option === "Pause") {
-				const msg = "Toolchange pause" + (comment ? ` - ${comment}` : "");
+				const msg = `Toolchange pause${comment ? ` - ${comment}` : ""}`;
 				if (!skipDialog) {
 					toast.info(msg, { position: "bottom-right" });
 				}
 			} else {
-				let title, instructions;
+				let title: string, instructions: WizardInstructions;
 
 				if (option === "Standard Re-zero") {
 					title = "Standard Re-zero Tool Change";
 					instructions = manualToolChange;
 				} else if (option === "Flexible Re-zero") {
 					title = "Flexible Re-zero Tool Change";
-					instructions = semiautoToolChange(count);
+					instructions = semiautoToolChange(count as number);
 				} else if (option === "Fixed Tool Sensor") {
 					title = "Fixed Tool Sensor Tool Change";
-					instructions = await determineFixedSensorInstructions(count, comment);
+					instructions = await determineFixedSensorInstructions(
+						count as number,
+						comment,
+					);
 				} else {
 					console.error("Invalid toolchange option passed");
 					return;
@@ -843,58 +865,47 @@ export function* initialize(): Generator<any, void, any> {
 		pubsub.publish("firmware:update", status);
 	});
 
-	controller.addListener(
-		"error",
-		(
-			error: {
-				type: typeof ALARM | typeof ERROR;
-				lineNumber: number;
-				code: number;
-				line: string;
-			},
-			_wasRunning: boolean,
-		) => {
-			// const homingEnabled = _get(
-			//     reduxStore.getState(),
-			//     'controller.settings.settings.$22',
-			// );
+	controller.addListener("error", (error: Error, _wasRunning: boolean) => {
+		// const homingEnabled = _get(
+		//     reduxStore.getState(),
+		//     'controller.settings.settings.$22',
+		// );
 
-			const showLineWarnings = store.get(
-				"widgets.visualizer.showLineWarnings",
-				false,
-			);
-			if (showLineWarnings && error.type === ERROR) {
-				pubsub.publish("helper:info", {
-					title: "Invalid Line",
-					description: (
-						<div className="flex flex-col gap-2">
-							<p>
-								The following line caused an <b>error {error.code}</b>:{" "}
-								<i>'{error.line}'</i>
-							</p>
-							<p>Press Start to resume the job.</p>
-						</div>
-					),
-				});
-			}
+		const showLineWarnings = store.get(
+			"widgets.visualizer.showLineWarnings",
+			false,
+		);
+		if (showLineWarnings && error.type === ERROR) {
+			pubsub.publish("helper:info", {
+				title: "Invalid Line",
+				description: (
+					<div className="flex flex-col gap-2">
+						<p>
+							The following line caused an <b>error {error.code}</b>:{" "}
+							<i>'{error.line}'</i>
+						</p>
+						<p>Press Start to resume the job.</p>
+					</div>
+				),
+			});
+		}
 
-			if (ALARM_ERROR_TYPES.includes(error.type)) {
-				updateAlarmsErrors(error);
-			}
+		if (ALARM_ERROR_TYPES.includes(error.type)) {
+			updateAlarmsErrors(error);
+		}
 
-			pubsub.publish("error", error);
+		pubsub.publish("error", error);
 
-			// TODO: utilize this if needed, currently not used in new app, try not to use pubsubs
-			// set need recovery for start from line when alarm happens
-			// if (error.type === ALARM && wasRunning) {
-			//     pubsub.publish(
-			//         'disconnect:recovery',
-			//         error.lineNumber,
-			//         homingEnabled,
-			//     );
-			// }
-		},
-	);
+		// TODO: utilize this if needed, currently not used in new app, try not to use pubsubs
+		// set need recovery for start from line when alarm happens
+		// if (error.type === ALARM && wasRunning) {
+		//     pubsub.publish(
+		//         'disconnect:recovery',
+		//         error.lineNumber,
+		//         homingEnabled,
+		//     );
+		// }
+	});
 
 	controller.addListener(
 		"wizard:next",
@@ -952,7 +963,7 @@ export function* initialize(): Generator<any, void, any> {
 		reduxStore.dispatch(updateSettingsDescriptions({ descriptions: data }));
 	});
 
-	controller.addListener("settings:alarms", (data: BasicObject) => {
+	controller.addListener("settings:alarms", (data: AlarmsData) => {
 		reduxStore.dispatch(updateAlarmDescriptions({ alarms: data }));
 	});
 
@@ -1017,7 +1028,7 @@ export function* initialize(): Generator<any, void, any> {
 					},
 					hideClose: true,
 				});
-			} else if ((payload.subtype = "10")) {
+			} else if (payload.subtype === "10") {
 				pubsub.publish("helper:info", {
 					title: "Jogging Inside Keepout Area",
 					content: (

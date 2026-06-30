@@ -21,8 +21,9 @@
  *
  */
 import { getProbeSettings, getToolString } from "app/lib/toolChangeUtils";
+import type { WizardInstructions } from "./definitions";
 
-const wizard = {
+const wizard: WizardInstructions = {
 	intro: {
 		icon: "fas fa-caution",
 		description:

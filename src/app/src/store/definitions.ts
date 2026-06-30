@@ -87,6 +87,10 @@ export interface Axes {
 	shuttle: Shuttle;
 }
 
+export interface AlarmsData {
+	[key: number]: { description: string; id: number } ;
+}
+
 export interface ControllerSettings {
 	toolTable?: BasicObject;
 	//TODO
@@ -95,7 +99,7 @@ export interface ControllerSettings {
 	info?: FirmwareOptions;
 	descriptions?: EEPROMDescriptions;
 	groups: BasicObject;
-	alarms?: { [key: number]: { description: string; id: number } };
+	alarms?: AlarmsData;
 	version?: {
 		semver: number;
 	};
@@ -147,6 +151,23 @@ export interface ControllerStateState {
 		};
 		wco: BasicPosition;
 		sdCard: boolean;
+	},
+	parserstate: {
+		modal: {
+			motion: "G0" | "G1" | "G2" | "G3" | "G38.2" | "G38.3" | "G38.4" | "G38.5" | "G80",
+			wcs: "G54" | "G55" | "G56" | "G57" | "G58" | "G59",
+			plane: "G17" | "G18" | "G19", // G17: xy-plane, G18: xz-plane, G19: yz-plane
+			units: "G20" | "G21", // G20: Inches, G21: Millimeters
+			distance: "G90" | "G91", // G90: Absolute, G91: Relative
+			feedrate: "G93" | "G94", // G93: Inverse time mode, G94: Units per minute
+			program: "M0" | "M1" | "M2" | "M30", // M0, M1, M2, M30
+			spindle: "M3" | "M4" | "M5", // M3: Spindle (cw), M4: Spindle (ccw), M5: Spindle off
+			coolant: "M7" | "M8" | "M9", // M7: Mist coolant, M8: Flood coolant, M9: Coolant off, [M7,M8]: Both on
+			tool: number | string, // Last non-0 parsed tool
+		},
+		tool: string,
+		feedrate: string,
+		spindle: string,
 	}
 }
 
