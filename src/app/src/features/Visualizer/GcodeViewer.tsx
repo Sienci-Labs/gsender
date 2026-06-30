@@ -508,9 +508,15 @@ class GcodeViewer extends Component<Props> {
 			const st = reduxStore.getState();
 
 			// Track whether the loaded file uses the A axis — gates rotary rotation.
+			// Fire setToolpathRotationA immediately on transition so the rotation
+			// updates as soon as the file loads or changes, not just on next wpos tick.
 			const fileType: string | undefined = _get(st, "file.fileType");
 			if (fileType !== undefined) {
-				this.isRotaryFile = fileType === "ROTARY" || fileType === "FOUR_AXIS";
+				const nextIsRotary = fileType === "ROTARY" || fileType === "FOUR_AXIS";
+				if (nextIsRotary !== this.isRotaryFile) {
+					this.isRotaryFile = nextIsRotary;
+					this.viewer3d?.setToolpathRotationA(this.isRotaryFile ? (this.lastPosition.a ?? 0) : 0);
+				}
 			}
 
 			// Bit follows the live work position (DRO) — jogging and running alike.
