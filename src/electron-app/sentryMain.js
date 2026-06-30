@@ -3,6 +3,7 @@ import fs from "fs";
 import {
 	getSentryEnvironment,
 	getUsageDataConsentFromStore,
+	isSentryRuntimeEnabled,
 	SENTRY_DSN,
 	scrubSentryEvent,
 } from "../sentryShared.js";
@@ -10,7 +11,7 @@ import {
 let sentryInitialized = false;
 
 export function initSentryMain({ release, userDataPath }) {
-	if (sentryInitialized || process.env.NODE_ENV !== "production") {
+	if (sentryInitialized || !isSentryRuntimeEnabled()) {
 		return;
 	}
 
