@@ -73,7 +73,7 @@ const externalRendererUrl =
 
 if (process.env.NODE_ENV === "production") {
 	Sentry.init({
-		dsn: "https://eeb4899f0415aa6bc9de477a7faeb720@o558751.ingest.us.sentry.io/4509479105986560",
+		dsn: process.env.SENTRY_DSN,
 		release: pkg.version,
 	});
 }
