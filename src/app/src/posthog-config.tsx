@@ -11,7 +11,6 @@ if (posthogToken && posthogHost) {
         api_host: posthogHost,
         person_profiles: 'identified_only',
         debug: isInDevMode,
-        autocapture: false, // No need to capture everything automatically, manual events are more useful
         capture_pageview: !isInDevMode,
         capture_heatmaps: !isInDevMode,
         disable_session_recording: isInDevMode,
