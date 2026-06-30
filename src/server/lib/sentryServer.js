@@ -1,9 +1,11 @@
-import * as Sentry from "@sentry/node";
+import * as SentryElectron from "@sentry/electron/main";
+import * as SentryNode from "@sentry/node";
 import isElectron from "is-electron";
 import pkg from "../../package.json";
 import {
 	getSentryEnvironment,
 	getUsageDataConsentFromStore,
+	isSentryRuntimeEnabled,
 	resolveConsentStoreDirectory,
 	SENTRY_DSN,
 	scrubSentryEvent,
@@ -11,10 +13,16 @@ import {
 
 let sentryInitialized = false;
 
+function getActiveSentry() {
+	return isElectron() ? SentryElectron : SentryNode;
+}
+
 export function setupServerSentry() {
-	if (process.env.NODE_ENV !== "production") {
+	if (!isSentryRuntimeEnabled()) {
 		return false;
 	}
+
+	const Sentry = getActiveSentry();
 
 	// In Electron, @sentry/electron/main in the main process owns initialization.
 	if (isElectron()) {
@@ -32,7 +40,7 @@ export function setupServerSentry() {
 	}
 
 	const release = pkg.version;
-	Sentry.init({
+	SentryNode.init({
 		dsn: SENTRY_DSN,
 		release,
 		environment: getSentryEnvironment(release),
@@ -43,6 +51,7 @@ export function setupServerSentry() {
 }
 
 export function setupExpressSentryHandler(app) {
+	const Sentry = getActiveSentry();
 	if (!Sentry.isInitialized()) {
 		return;
 	}
@@ -51,6 +60,7 @@ export function setupExpressSentryHandler(app) {
 }
 
 export function captureServerException(error, context) {
+	const Sentry = getActiveSentry();
 	if (!Sentry.isInitialized()) {
 		return;
 	}

@@ -24,6 +24,27 @@ export function getSentryEnvironment(release) {
 	return "production";
 }
 
+export function isSentryRuntimeEnabled() {
+	if (process.env.NODE_ENV === "development") {
+		return false;
+	}
+	if (process.env.NODE_ENV === "production") {
+		return true;
+	}
+
+	try {
+		const { app } = require("electron");
+		if (app?.isPackaged) {
+			return true;
+		}
+	} catch {
+		// Not running inside Electron.
+	}
+
+	// Packaged/local production runs often omit NODE_ENV (e.g. `electron ./dist/gsender/main`).
+	return true;
+}
+
 export function getUsageDataConsentFromStore(userDataPath, fsModule = fs) {
 	try {
 		const storePath = `${userDataPath}/${STORE_FILENAME}`;

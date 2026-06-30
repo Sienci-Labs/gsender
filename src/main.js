@@ -161,6 +161,14 @@ const main = () => {
 
 	app.whenReady().then(async () => {
 		try {
+			ipcMain.handle("sentry-consent", (_event, status) => {
+				updateSentryMainConsent({
+					status,
+					release: pkg.version,
+					userDataPath: userData,
+				});
+			});
+
 			await session.defaultSession.clearCache();
 
 			windowManager = new WindowManager();
@@ -297,14 +305,6 @@ const main = () => {
 					pendingFileToOpen = filePath;
 				}
 			}
-
-			ipcMain.handle("sentry-consent", (_event, status) => {
-				updateSentryMainConsent({
-					status,
-					release: pkg.version,
-					userDataPath: userData,
-				});
-			});
 
 			ipcMain.on("file-association-ready", () => {
 				isRendererReady = true;
