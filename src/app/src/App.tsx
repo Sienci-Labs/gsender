@@ -1,7 +1,6 @@
 import controller from "app/lib/controller";
 import * as user from "app/lib/user";
 import store from "app/store";
-
 import { store as reduxStore } from "app/store/redux";
 import rootSaga, { sagaMiddleware } from "app/store/redux/sagas";
 import isElectron from "is-electron";
@@ -11,6 +10,7 @@ import { Provider as ReduxProvider } from "react-redux";
 import { HashRouter } from "react-router";
 import { Toaster } from "./components/shadcn/Sonner";
 import { AccessibilitySettingsHandler } from "./features/Helper/AccessibilitySettingsHandler";
+import { installPluginBridgeListener } from "./features/Plugins/utils/pluginBridge";
 import { ReactRoutes } from "./react-routes";
 
 function App() {
@@ -32,6 +32,8 @@ function App() {
 
 		sagaMiddleware.run(rootSaga);
 
+		const removePluginBridge = installPluginBridgeListener();
+
 		const shouldSendUsageData = store.get(
 			"workspace.collectUsageDataStatus",
 			"pending",
@@ -52,6 +54,10 @@ function App() {
 					posthog.register({ isBundled: value });
 				});
 		}
+
+		return () => {
+			removePluginBridge();
+		};
 	}, []);
 
 	return (
