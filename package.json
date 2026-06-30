@@ -141,7 +141,7 @@
 			"target": [
 				"dmg"
 			],
-			"icon": "electron-build/icon.icns",
+			"icon": "electron-build/icon-round.png",
 			"electronUpdaterCompatibility": ">=2.16",
 			"darkModeSupport": true,
 			"mergeASARs": false,
@@ -151,7 +151,7 @@
 		},
 		"dmg": {
 			"background": "electron-build/background.png",
-			"icon": "electron-build/icon.icns",
+			"icon": "electron-build/icon-round.png",
 			"iconSize": 80,
 			"iconTextSize": 12,
 			"writeUpdateInfo": false,
