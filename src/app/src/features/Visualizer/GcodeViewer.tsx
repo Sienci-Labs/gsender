@@ -204,6 +204,7 @@ class GcodeViewer extends Component<Props> {
 		if (this.isSVGMode() && !this.props.isSecondary) {
 			this.mode = "svg";
 			this.viewerSvg = new GViewerSVG(this.containerRef, this.buildSvgOptions());
+			this.containerRef.style.backgroundColor = this.buildTheme(this.currentThemeName()).background;
 		} else {
 			this.mode = "3d";
 			this.viewer3d = new GViewer3D({
@@ -311,6 +312,11 @@ class GcodeViewer extends Component<Props> {
 		if (this.viewerSvg) {
 			this.viewerSvg.setOptions(this.buildSvgOptions());
 		}
+		// SVG mode has no canvas clear color — sync the container background
+		// so the theme's background shows instead of the page default.
+		if (this.containerRef) {
+			this.containerRef.style.backgroundColor = this.buildTheme(this.currentThemeName()).background;
+		}
 	}
 
 	isSVGMode(): boolean {
@@ -326,15 +332,23 @@ class GcodeViewer extends Component<Props> {
 		this.lastWorkerData = data;
 		this.lastHiddenLine = -1;
 
+		// Augment with toolchange count so gviewer only locks cut stream colors
+		// when the file actually has toolchange palette assignments.
+		const raw = data as any;
+		const toolchangeCount: number = Array.isArray(raw.info?.toolchanges)
+			? raw.info.toolchanges.length
+			: 0;
+		const augmented: WorkerGeometryData = { ...data, toolchangeCount };
+
 		if (this.mode === "svg" && this.viewerSvg) {
-			this.viewerSvg.loadFromWorkerData(data);
+			this.viewerSvg.loadFromWorkerData(augmented);
 			this.firePostLoad();
 			return;
 		}
 
 		if (this.viewer3d) {
 			this.viewer3d
-				.loadFromWorkerData(data)
+				.loadFromWorkerData(augmented)
 				.then(() => {
 					if (!this.skipNextCameraFocus) {
 						this.viewer3d?.focusToModel();

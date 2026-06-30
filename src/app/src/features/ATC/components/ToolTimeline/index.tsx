@@ -3,14 +3,19 @@ import type { ToolChange } from "app/features/ATC/components/ToolTimeline/compon
 import { getToolpathColor } from "app/features/ATC/utils/ATCFunctions.ts";
 import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
 import controller from "app/lib/controller.ts";
+import { G1_PART } from "app/features/Visualizer/constants.ts";
+import { getVisualizerTheme } from "app/lib/getVisualizerTheme.ts";
 import type { RootState } from "app/store/redux";
 import get from "lodash/get";
 import pubsub from "pubsub-js";
 import { useEffect, useState } from "react";
 
-function buildToolArray(toolEvents, fileLength) {
-	let count = 0;
-	const toolArray: ToolChange[] = [];
+function buildToolArray(toolEvents, fileLength, cuttingColor: string) {
+	// Palette starts at 1 — index 0 is visually similar to the default cutting
+	// color and would be confusing as a "different tool" color.
+	let paletteIdx = 1;
+	let displayIdx = 2; // initial tool segment takes display index 1
+	const toolchangeArray: ToolChange[] = [];
 
 	Object.entries(toolEvents).forEach(([line, value]) => {
 		if (Object.hasOwn(value, "M") && Object.hasOwn(value, "T")) {
@@ -19,27 +24,35 @@ function buildToolArray(toolEvents, fileLength) {
 			newTool.startLine = Number(line);
 			newTool.label = `T${value.T}`;
 			if (value.comment) newTool.comment = value.comment;
-			const legendColor = getToolpathColor(count);
+			const legendColor = getToolpathColor(paletteIdx);
 			newTool.color = `#${legendColor.getHexString()}`;
-			newTool.index = count + 1;
-			toolArray.push(newTool);
-
-			count++;
+			newTool.index = displayIdx;
+			toolchangeArray.push(newTool);
+			paletteIdx++;
+			displayIdx++;
 		}
 	});
 
-	if (toolArray.length === 0) {
+	if (toolchangeArray.length === 0) {
 		return [];
-	} else if (toolArray.length === 1) {
-		toolArray[0].endLine = fileLength;
-	} else {
-		toolArray[toolArray.length - 1].endLine = fileLength;
-		for (let i = toolArray.length - 2; i >= 0; i--) {
-			toolArray[i].endLine = toolArray[i + 1].startLine - 1;
-		}
 	}
 
-	return toolArray;
+	toolchangeArray[toolchangeArray.length - 1].endLine = fileLength;
+	for (let i = toolchangeArray.length - 2; i >= 0; i--) {
+		toolchangeArray[i].endLine = toolchangeArray[i + 1].startLine - 1;
+	}
+
+	// Prepend an entry for the initial tool segment (before the first toolchange).
+	const initialTool: ToolChange = {
+		index: 1,
+		toolNumber: 0,
+		label: "Initial",
+		color: cuttingColor,
+		startLine: 0,
+		endLine: (toolchangeArray[0].startLine ?? 1) - 1,
+	};
+
+	return [initialTool, ...toolchangeArray];
 }
 
 export function ToolTimelineWrapper() {
@@ -68,7 +81,8 @@ export function ToolTimelineWrapper() {
 
 	useEffect(() => {
 		pubsub.subscribe("file:toolchanges", (k, { toolEvents, total }) => {
-			const toolArray = buildToolArray(toolEvents, total);
+			const cuttingColor = getVisualizerTheme().get(G1_PART) ?? "#3e85c7";
+			const toolArray = buildToolArray(toolEvents, total, cuttingColor);
 
 			if (toolArray.length === 0) {
 				setShow(false);
