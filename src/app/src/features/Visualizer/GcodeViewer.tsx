@@ -144,6 +144,8 @@ class GcodeViewer extends Component<Props> {
 
 	isRotaryFile = false;
 
+	skipNextCameraFocus = false;
+
 	lastConnected: boolean | null = null;
 
 	lastSpinning: boolean | null = null;
@@ -321,7 +323,10 @@ class GcodeViewer extends Component<Props> {
 			this.viewer3d
 				.loadFromWorkerData(data)
 				.then(() => {
-					this.viewer3d?.focusToModel();
+					if (!this.skipNextCameraFocus) {
+						this.viewer3d?.focusToModel();
+					}
+					this.skipNextCameraFocus = false;
 					this.viewer3d?.setBitPosition(this.lastPosition, { immediate: true });
 					this.firePostLoad();
 				})
@@ -481,6 +486,7 @@ class GcodeViewer extends Component<Props> {
 				this.applyOptionsFromState();
 			}),
 			pubsub.subscribe("spindle:mode", () => {
+				this.skipNextCameraFocus = true;
 				this.applyOptionsFromState();
 			}),
 			pubsub.subscribe("litemode:change", () => {
