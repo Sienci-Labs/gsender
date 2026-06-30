@@ -79,7 +79,7 @@ describe('Gsender testing preset create update', () => {
     // ── Step 3-4: Go to config, search jog 
     cy.log('Step 3: Navigating to config page...');
     cy.goToConfig();
-    cy.wait(5000);
+    cy.wait(2000);
 
     cy.log('Step 4: Searching for "jog"...');
     cy.searchInSettings('jog');

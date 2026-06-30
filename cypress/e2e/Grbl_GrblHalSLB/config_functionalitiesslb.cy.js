@@ -1,4 +1,4 @@
-describe('gSender Configuration and Firmware Test Suite on SLB Board', () => {
+describe('gSender Configuration and Firmware Test Suite', () => {
 
     beforeEach(() => {
         cy.viewport(2844, 1450);

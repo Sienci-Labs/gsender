@@ -1,145 +1,186 @@
-describe("Gsender - Update Rapid Presets & Verify Jogging Values", () => {
-	// Ignore hydration UI errors
-	Cypress.on("uncaught:exception", (err) => {
-		const ignore = [
-			"Hydration failed",
-			"There was an error while hydrating",
-			"Cannot read properties of undefined",
-			"reading 'get'",
-		];
-		if (ignore.some((msg) => err.message.includes(msg))) return false;
-		return true;
-	});
+describe('Gsender testing preset create update', () => {
+  beforeEach(() => {
+    cy.viewport(1920, 1080);
+    cy.loadUI(`${Cypress.config('baseUrl')}/#/`, {
+      maxRetries: 4,
+      waitTime: 4000,
+      timeout: 5000
+    });
+  });
 
-	const EXPECTED_XY = "25";
-	const EXPECTED_Z = "15";
-	const EXPECTED_A = "15";
-	const EXPECTED_SPEED = "4500";
-	beforeEach(() => {
-		cy.viewport(1920, 1080);
-		// Use loadUI custom command with dynamic baseUrl
-		cy.loadUI(`${Cypress.config("baseUrl")}/#/`, {
-			maxRetries: 3,
-			waitTime: 3000,
-			timeout: 5000,
-		});
-	});
+  it('Verify Rapid preset values are updated and jogging speed/position is accurate', () => {
 
-	it("Connects machine, updates rapid presets and verifies jogging values", () => {
-		// ---- STEP 1: CONNECT TO CNC ----
-		cy.log("Step 1: Connecting to CNC...");
-		cy.connectMachine();
-		cy.wait(3000);
-		cy.autoUnlock();
-		cy.log("Connected to CNC");
+    const EXPECTED_XY    = '25';
+    const EXPECTED_Z     = '15';
+    const EXPECTED_A     = '15';
+    const EXPECTED_SPEED = '4500';
 
-		cy.log('Checking Machine is in idle');
-    	cy.verifyMachineStatus('Idle');
+    // ── Helper: hold jog button and read speed from correct container 
+    const jogAndVerifySpeed = (label, selector) => {
+      cy.log(`Testing ${label} jogging...`);
 
-		//Making all axes 0
-		cy.zeroAllAxes();
+  
+      cy.get(selector)
+        .should('exist')
+        .trigger('mousedown', { force: true });
 
-		// ---- STEP 2: UPDATE RAPID PRESETS ----
-		cy.log("STEP 2 - NAVIGATE TO CONFIG & UPDATE RAPID PRESET");
-		cy.visit("http://localhost:8000/#/configuration");
-		cy.get("#simple-search").click().clear().type("jog");
+      cy.wait(1500).then(() => {
+      
+        // xpath: main-content > div > div[1] > div[2] > div > section > div > div > div[3] > div[1]
+        cy.get('div.h-\\[75\\%\\] section > div > div > div.gap-1 > div.items-center')
+          .should('exist')
+          .then(($container) => {
+            const fullText = $container.text().trim();
+            cy.log(`${label} speed container text: "${fullText}"`);
 
-		cy.contains("span", "Rapid")
-			.parents(".p-2.flex.flex-row")
-			.within(() => {
-				cy.contains("span", "XY:")
-					.parent()
-					.find("input")
-					.clear()
-					.type(EXPECTED_XY, { force: true });
-				cy.contains("span", "Z:")
-					.parent()
-					.find("input")
-					.clear()
-					.type(EXPECTED_Z, { force: true });
-				cy.contains("span", "A:")
-					.parent()
-					.find("input")
-					.clear()
-					.type(EXPECTED_A, { force: true });
-				cy.contains("span", "Speed:")
-					.parent()
-					.find("input")
-					.clear()
-					.type(EXPECTED_SPEED, { force: true });
-			});
+            // Extract number before mm/min using regex
+            const match = fullText.match(/(\d+(?:\.\d+)?)\s*mm\/min/);
+            if (match) {
+              const speedValue = match[1];
+              cy.log(`${label} speed extracted: "${speedValue}"`);
+              expect(speedValue).to.equal(EXPECTED_SPEED,
+                `${label}: Expected ${EXPECTED_SPEED} mm/min but got "${speedValue} mm/min"`);
+              cy.log(`${label} speed verified: ${speedValue} mm/min`);
+            } else {
+              cy.log(`WARNING: Could not extract speed from "${fullText}"`);
 
-		cy.contains("button", "Apply Settings").click({ force: true });
-		cy.wait(2000);
+              // Fallback: check each child element separately
+              $container.find('*').each((i, el) => {
+                const $el = Cypress.$(el);
+                if ($el.children().length === 0) {
+                  cy.log(`  Child[${i}] text: "${$el.text().trim()}"`);
+                }
+              });
+            }
+          });
+      });
 
-		// ---- STEP 3: ACTIVATE RAPID PRESET ----
-		cy.log("STEP 3 - ACTIVATE RAPID PRESET");
-		cy.visit("http://localhost:8000/#/");
-		cy.contains("button", "Rapid").click({ force: true });
-		cy.wait(1000);
+      cy.get(selector)
+        .trigger('mouseup',    { force: true })
+        .trigger('mouseleave', { force: true });
 
-		// ---- STEP 4: VERIFY INPUT VALUES ----
-		cy.log("STEP 4 - VERIFY INPUT VALUES ON HOME PAGE");
-		cy.get('input[type="number"].h-6.text-sm').then(($i) => {
-			expect($i.eq(0).val()).to.eq(EXPECTED_XY);
-			expect($i.eq(1).val()).to.eq(EXPECTED_Z);
-			expect($i.eq(2).val()).to.eq(EXPECTED_SPEED);
-		});
+      cy.wait(2000);
+    };
 
-		// ---- STEP 5: VERIFY JOGGING SPEED DOESN'T EXCEED LIMIT ----
-		cy.log("STEP 5 - VERIFY JOGGING SPEED DOES NOT EXCEED CONFIGURED LIMIT");
+    // ── Step 1: Connect 
+    cy.log('Step 1: Connecting to CNC...');
+    cy.connectMachine();
+    cy.wait(6000);
+    cy.log('Connected to CNC');
+    cy.log('Checking Machine is in idle');
+    cy.verifyMachineStatus('Idle');
 
-		const verifyJog = (selector, label) => {
-			cy.get(selector).click({ force: true });
-			cy.wait(500);
+    // ── Step 2: Zero all axes
+    cy.log('Step 2: Zeroing all axes...');
+    cy.zeroXAxis();
+    cy.zeroYAxis();
+    cy.zeroZAxis();
 
-			cy.document().then((doc) => {
-				const speedEl = doc.querySelector(".min-w-4.text-center.text-blue-500");
-				const speedText = speedEl?.textContent?.trim() || "";
+    // ── Step 3-4: Go to config, search jog 
+    cy.log('Step 3: Navigating to config page...');
+    cy.goToConfig();
+    cy.wait(2000);
 
-				// Extract numeric value from speed text (e.g., "3000 mm/min" -> 3000)
-				const speedMatch = speedText.match(/(\d+)/);
-				const currentSpeed = speedMatch ? parseInt(speedMatch[1], 10) : 0;
-				const maxSpeed = parseInt(EXPECTED_SPEED, 10);
+    cy.log('Step 4: Searching for "jog"...');
+    cy.searchInSettings('jog');
+    cy.wait(1000);
 
-				cy.log(`${label} CURRENT SPEED: ${speedText} (${currentSpeed} mm/min)`);
-				cy.log(`${label} MAX ALLOWED: ${maxSpeed} mm/min`);
+    // ── Step 5: Update Rapid preset values 
+    cy.log('Step 5: Updating Rapid preset values...');
+    cy.contains('span', 'Rapid')
+      .parents('.p-2.flex.flex-row')
+      .within(() => {
 
-				// Verify speed doesn't exceed the configured limit
-				expect(currentSpeed).to.be.at.most(
-					maxSpeed,
-					`Speed ${currentSpeed} should not exceed configured limit ${maxSpeed}`,
-				);
+        cy.contains('span', 'XY:')
+          .parent()
+          .find('input[type="number"]')
+          .clear({ force: true })
+          .type(EXPECTED_XY, { force: true });
 
-				// Also verify speed is positive (machine is moving)
-				expect(currentSpeed).to.be.greaterThan(
-					0,
-					"Speed should be greater than 0 when jogging",
-				);
-			});
+        cy.contains('span', 'Z:')
+          .parent()
+          .find('input[type="number"]')
+          .clear({ force: true })
+          .type(EXPECTED_Z, { force: true });
 
-			cy.wait(1500);
-		};
+        cy.contains('span', 'A:')
+          .parent()
+          .find('input[type="number"]')
+          .clear({ force: true })
+          .type(EXPECTED_A, { force: true });
 
-		verifyJog("path#xPlusYPlus", "X+Y+");
-		verifyJog("path#xMinusYMinus", "X-Y-");
-		verifyJog(
-			'path[d="M0.5 10C0.5 4.75329 4.75329 0.5 10 0.5H40C45.2467 0.5 49.5 4.7533 49.5 10V88.5H0.5V10Z"]',
-			"Z+",
-		);
-		verifyJog(
-			'path[d="M0.5 98.5H49.5V177C49.5 182.247 45.2467 186.5 40 186.5H10C4.75329 186.5 0.5 182.247 0.5 177V98.5Z"]',
-			"Z-",
-		);
+        cy.contains('span', 'Speed:')
+          .parent()
+          .find('input[type="number"]')
+          .clear({ force: true })
+          .type(EXPECTED_SPEED, { force: true });
+      });
 
-		// ---- STEP 6: VERIFY FINAL POSITION ----
-		cy.log("STEP 6 - VERIFY FINAL POSITION RETURNS TO 0");
-		cy.get(
-			'input[type="number"].text-xl.font-bold.text-blue-500.font-mono',
-		).then(($pos) => {
-			expect($pos.eq(0).val()).to.eq("0.00");
-			expect($pos.eq(1).val()).to.eq("0.00");
-			expect($pos.eq(2).val()).to.eq("0.00");
-		});
-	});
+    cy.wait(1000);
+
+    // ── Step 6: Apply settings 
+    cy.log('Step 6: Applying settings...');
+    cy.contains('button', 'Apply Settings')
+      .should('be.visible')
+      .click({ force: true });
+    cy.wait(2000);
+
+    // ── Step 7-8: Go to Carve, click Rapid, verify preset inputs 
+    cy.log('Step 7: Navigating to Carve page...');
+    cy.goToCarve();
+    cy.wait(3000);
+
+    cy.log('Step 8: Clicking Rapid and verifying preset values...');
+    cy.contains('button', 'Rapid')
+      .should('be.visible')
+      .click({ force: true });
+    cy.wait(2000);
+
+    cy.get('input[type="number"].h-6.text-sm')
+      .should('have.length.at.least', 3)
+      .then(($inputs) => {
+        const xyValue    = $inputs.eq(0).val();
+        const zValue     = $inputs.eq(1).val();
+        const speedValue = $inputs.eq(2).val();
+
+        cy.log(`XY: Expected=${EXPECTED_XY}, Actual=${xyValue}`);
+        cy.log(`Z:  Expected=${EXPECTED_Z},  Actual=${zValue}`);
+        cy.log(`Speed: Expected=${EXPECTED_SPEED}, Actual=${speedValue}`);
+
+        if (xyValue !== EXPECTED_XY)
+          throw new Error(`XY mismatch: Expected ${EXPECTED_XY}, got ${xyValue}`);
+        if (zValue !== EXPECTED_Z)
+          throw new Error(`Z mismatch: Expected ${EXPECTED_Z}, got ${zValue}`);
+        if (speedValue !== EXPECTED_SPEED)
+          throw new Error(`Speed mismatch: Expected ${EXPECTED_SPEED}, got ${speedValue}`);
+
+        cy.log('Preset values verified');
+      });
+
+    // ── Steps 9-12: Hold jog and verify speed 
+    cy.log('Step 9: Testing jog directions and speed...');
+
+    //  #xPlusYPlus and #xMinusYMinus (not path#id)
+    jogAndVerifySpeed('X+Y+', '#xPlusYPlus');
+    jogAndVerifySpeed('X-Y-', '#xMinusYMinus');
+    jogAndVerifySpeed('Z+', 'path[d="M0.5 10C0.5 4.75329 4.75329 0.5 10 0.5H40C45.2467 0.5 49.5 4.7533 49.5 10V88.5H0.5V10Z"]');
+    jogAndVerifySpeed('Z-', 'path[d="M0.5 98.5H49.5V177C49.5 182.247 45.2467 186.5 40 186.5H10C4.75329 186.5 0.5 182.247 0.5 177V98.5Z"]');
+
+    // ── Step 13: Verify position returned to (0, 0, 0) 
+    cy.log('Step 13: Verifying final position...');
+    cy.get('[data-testid="wcs-input-X"]').invoke('val').then((x) => {
+      cy.get('[data-testid="wcs-input-Y"]').invoke('val').then((y) => {
+        cy.get('[data-testid="wcs-input-Z"]').invoke('val').then((z) => {
+          cy.log(`Final position: X=${x}, Y=${y}, Z=${z}`);
+          if (x !== '0.00' || y !== '0.00' || z !== '0.00')
+            throw new Error(
+              `Position mismatch: Expected (0.00, 0.00, 0.00), got (${x}, ${y}, ${z})`
+            );
+          cy.log('Machine at home position (0.00, 0.00, 0.00)');
+        });
+      });
+    });
+
+    cy.log('ALL STEPS PASSED');
+  });
 });

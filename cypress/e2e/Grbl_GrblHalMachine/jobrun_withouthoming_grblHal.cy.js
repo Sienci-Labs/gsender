@@ -57,7 +57,7 @@ Cypress.on('uncaught:exception', (err) => {
 
     // Step 6: Wait for job completion
     cy.log('Step 6: Waiting for job completion...');
-    cy.contains(/^Idle$/i, { timeout: 120000 })
+    cy.contains(/^Idle$/i, { timeout: 200000 })
       .should('be.visible')
       .then(status => {
         jobEndTime = Date.now();

@@ -1,0 +1,166 @@
+{
+  "version": "1.0",
+  "exportDate": "2026-06-26T12:52:07.312Z",
+  "profile": {
+    "id": [
+      "Xbox One Game Controller (STANDARD GAMEPAD)"
+    ],
+    "name": "Xbox One Game Controller (STANDARD GAMEPAD)",
+    "mapping": "standard",
+    "buttons": [
+      {
+        "label": "A",
+        "value": 0,
+        "primaryAction": "SET_R_JOG_PRESET",
+        "secondaryAction": "SET_N_JOG_PRESET"
+      },
+      {
+        "label": "    B",
+        "value": 1,
+        "primaryAction": "CYCLE_JOG_PRESETS",
+        "secondaryAction": "JOG_A_PLUS"
+      },
+      {
+        "label": "X",
+        "value": 2,
+        "primaryAction": "JOG_A_MINUS",
+        "secondaryAction": "JOG_X_P"
+      },
+      {
+        "label": "Y",
+        "value": 3,
+        "primaryAction": "JOG_X_M",
+        "secondaryAction": "JOG_Y_P"
+      },
+      {
+        "label": "LB",
+        "value": 4,
+        "primaryAction": "JOG_Y_M",
+        "secondaryAction": "JOG_Z_P"
+      },
+      {
+        "label": "RB",
+        "value": 5,
+        "primaryAction": "JOG_Z_M",
+        "secondaryAction": "JOG_X_P_Y_M"
+      },
+      {
+        "label": "LT",
+        "value": 6,
+        "primaryAction": "JOG_X_M_Y_P",
+        "secondaryAction": "JOG_X_Y_P"
+      },
+      {
+        "label": "RT",
+        "value": 7,
+        "primaryAction": "JOG_X_Y_M",
+        "secondaryAction": "HOMING_PARK"
+      },
+      {
+        "label": "Back",
+        "value": 8,
+        "primaryAction": "ZERO_X_AXIS",
+        "secondaryAction": "ZERO_Y_AXIS"
+      },
+      {
+        "label": "Start",
+        "value": 9,
+        "primaryAction": "ZERO_Z_AXIS",
+        "secondaryAction": "ZERO_A_AXIS"
+      },
+      {
+        "label": "L3",
+        "value": 10,
+        "primaryAction": "ZERO_ALL_AXIS",
+        "secondaryAction": "GO_TO_A_AXIS_ZERO"
+      },
+      {
+        "label": "R3",
+        "value": 11,
+        "primaryAction": "GO_TO_A_AXIS_ZERO",
+        "secondaryAction": "GO_TO_X_AXIS_ZERO"
+      },
+      {
+        "label": "Up",
+        "value": 12,
+        "primaryAction": "GO_TO_Y_AXIS_ZERO",
+        "secondaryAction": "GO_TO_Z_AXIS_ZERO"
+      },
+      {
+        "label": "Down",
+        "value": 13,
+        "primaryAction": "GO_TO_XY_AXIS_ZERO",
+        "secondaryAction": "HOMING_GO_TO_BACK_LEFT_CORNER"
+      },
+      {
+        "label": "Left",
+        "value": 14,
+        "primaryAction": "HOMING_GO_TO_BACK_RIGHT_CORNER",
+        "secondaryAction": "HOMING_GO_TO_FRONT_LEFT_CORNER"
+      },
+      {
+        "label": "Right",
+        "value": 15,
+        "primaryAction": "HOMING_GO_TO_FRONT_RIGHT_CORNER",
+        "secondaryAction": "HOMING_GO_TO_FRONT_LEFT_CORNER"
+      },
+      {
+        "label": "Home",
+        "value": 16,
+        "primaryAction": "CONTROLLER_COMMAND_HOMING",
+        "secondaryAction": "START_PROBE"
+      }
+    ],
+    "axes": [
+      0.015579461356526991,
+      -0.01768520637827109,
+      -0.039383535515373436,
+      -0.010025177386129513
+    ],
+    "joystickOptions": {
+      "stick1": {
+        "horizontal": {
+          "primaryAction": "x",
+          "secondaryAction": "y",
+          "isReversed": false
+        },
+        "vertical": {
+          "primaryAction": "x",
+          "secondaryAction": "z",
+          "isReversed": false
+        },
+        "mpgMode": {
+          "primaryAction": "x",
+          "secondaryAction": "x",
+          "isReversed": true
+        }
+      },
+      "stick2": {
+        "horizontal": {
+          "primaryAction": "y",
+          "secondaryAction": "z",
+          "isReversed": true
+        },
+        "vertical": {
+          "primaryAction": "z",
+          "secondaryAction": "x",
+          "isReversed": true
+        },
+        "mpgMode": {
+          "primaryAction": "a",
+          "secondaryAction": null,
+          "isReversed": true
+        }
+      },
+      "zeroThreshold": 30,
+      "movementDistanceOverride": 100,
+      "fixedSpeedMode": true
+    },
+    "lockout": {
+      "button": 16
+    },
+    "modifier": {
+      "button": 15
+    }
+  }
+}
