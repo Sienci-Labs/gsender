@@ -222,6 +222,11 @@ class GcodeViewer extends Component<Props> {
 		this.viewer3d = null;
 		this.viewerSvg = null;
 		this.createViewer();
+		// Restore the last known bit position on the fresh viewer. The redux wpos
+		// subscription won't re-fire because the position key hasn't changed, so
+		// the new viewer would otherwise start at origin.
+		this.viewer3d?.setBitPosition(this.lastPosition, { immediate: true });
+		this.viewerSvg?.setBitPosition(this.lastPosition);
 		if (this.lastWorkerData) {
 			this.applyWorkerData(this.lastWorkerData);
 		}
