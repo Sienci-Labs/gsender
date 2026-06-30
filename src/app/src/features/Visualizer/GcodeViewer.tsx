@@ -79,8 +79,10 @@ const THEME_NAME_TO_PRESET: Record<string, GCodeViewerThemePresetName> = {
 	[AYU_DARK_THEME]: "ayu-dark",
 	[AYU_LIGHT_THEME]: "ayu-light",
 };
+import { getVisualizerTheme } from "../../lib/getVisualizerTheme";
 import { outlineResponse } from "../../workers/Outline.response";
-import type { Actions, CAMERA_POSITIONS_T, State } from "./definitions";
+import type { Actions, CAMERA_POSITIONS_T, State, THEMES_T } from "./definitions";
+import { LIMIT_PART } from "./constants";
 
 // Maps gSender's camera positions onto gviewer ViewCube presets.
 const VIEW_MAP: Partial<Record<string, GCodeViewerCameraView>> = {
@@ -229,7 +231,15 @@ class GcodeViewer extends Component<Props> {
 
 	buildTheme(themeName?: string): GCodeViewerTheme {
 		const preset = THEME_NAME_TO_PRESET[themeName ?? ""] ?? "dark";
-		return gCodeViewerThemePresets[preset];
+		const base = gCodeViewerThemePresets[preset];
+		const themeMap = getVisualizerTheme(themeName as THEMES_T | undefined);
+		return {
+			...base,
+			colors: {
+				...base.colors,
+				boundingBox: themeMap.get(LIMIT_PART) ?? base.colors.boundingBox,
+			},
+		};
 	}
 
 	buildOptions(): Partial<GCodeViewerOptions> {
@@ -261,7 +271,10 @@ class GcodeViewer extends Component<Props> {
 				color: "#caf0f8",
 			},
 			progress: { mode: hideProcessed ? "hide" : "grey" },
-			boundingBox: { visible: state.objects.limits.visible, labels: true },
+			boundingBox: {
+				visible: store.get("widgets.visualizer.objects.limits.visible", true),
+				labels: store.get("widgets.visualizer.boundingBoxLabels", true),
+			},
 			render: { antialias: true, theme: this.buildTheme(this.currentThemeName()) },
 		};
 	}

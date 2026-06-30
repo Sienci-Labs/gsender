@@ -353,6 +353,20 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						},
 					},
 					{
+						label: "Show bounding box",
+						key: "widgets.visualizer.objects.limits.visible",
+						description: "Draw a wireframe around the extents of the loaded G-code file.",
+						type: "boolean",
+						onChange: () => { pubsub.publish("visualizer:settings"); },
+					},
+					{
+						label: "Show bounding box labels",
+						key: "widgets.visualizer.boundingBoxLabels",
+						description: "Show X/Y/Z dimension labels on the bounding box.",
+						type: "boolean",
+						onChange: () => { pubsub.publish("visualizer:settings"); },
+					},
+					{
 						label: "Hide processed lines",
 						key: "widgets.visualizer.hideProcessedLines",
 						description: "Hide processed g-code lines in the visualizer.",
