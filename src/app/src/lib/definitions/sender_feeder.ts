@@ -76,4 +76,5 @@ export interface SenderStatus {
 	ovF: number;
 	isRotaryFile: boolean;
 	currentLineRunning: number;
+	timeRunning: number;
 }
