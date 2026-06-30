@@ -494,10 +494,9 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
 		}
 		lastToolchangeColorIndex = colorVertexCount;
 
-		// The first tool keeps the theme's cutting color (no palette swap). Index 0
-		// is reserved (visually similar to the cutting color), so the palette swap
-		// for the second tool onward starts at index 1, matching ToolTimeline's
-		// getToolpathColor(count).
+		// The first tool keeps the theme's cutting color (no palette swap), acting
+		// as palette index 0; the array proper starts at index 1 for the second
+		// tool onward, matching ToolTimeline's getToolpathColor(count).
 		const isFirstToolChange = toolChangeIndex === 0;
 		toolChangeIndex++;
 		if (isFirstToolChange) {

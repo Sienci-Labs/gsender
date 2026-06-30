@@ -21,12 +21,11 @@ function buildToolArray(toolEvents, fileLength, cuttingColor: string) {
 			newTool.startLine = Number(line);
 			newTool.label = `T${value.T}`;
 			if (value.comment) newTool.comment = value.comment;
-			// The first tool uses the theme's cutting color; the palette starts
-			// fresh at the second tool so N tools always produce N distinct colors.
+			// The first tool uses the theme's cutting color (acting as palette index
+			// 0); the array proper starts at index 1 for the second tool onward.
 			if (count === 0) {
 				newTool.color = cuttingColor;
 			} else {
-				// Index 0 is reserved — it's visually similar to the cutting color.
 				const legendColor = getToolpathColor(count);
 				newTool.color = `#${legendColor.getHexString()}`;
 			}
