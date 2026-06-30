@@ -1,10 +1,10 @@
 import * as Sentry from "@sentry/electron/main";
 import fs from "fs";
 import {
+	getSentryDsn,
 	getSentryEnvironment,
 	getUsageDataConsentFromStore,
 	isSentryRuntimeEnabled,
-	SENTRY_DSN,
 	scrubSentryEvent,
 } from "../sentryShared.js";
 
@@ -16,7 +16,7 @@ export function initSentryMain({ release, userDataPath }) {
 	}
 
 	Sentry.init({
-		dsn: SENTRY_DSN,
+		dsn: getSentryDsn(),
 		release,
 		environment: getSentryEnvironment(release),
 		beforeSend: scrubSentryEvent,

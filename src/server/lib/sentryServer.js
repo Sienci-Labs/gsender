@@ -3,11 +3,11 @@ import * as SentryNode from "@sentry/node";
 import isElectron from "is-electron";
 import pkg from "../../package.json";
 import {
+	getSentryDsn,
 	getSentryEnvironment,
 	getUsageDataConsentFromStore,
 	isSentryRuntimeEnabled,
 	resolveConsentStoreDirectory,
-	SENTRY_DSN,
 	scrubSentryEvent,
 } from "../../sentryShared.js";
 
@@ -41,7 +41,7 @@ export function setupServerSentry() {
 
 	const release = pkg.version;
 	SentryNode.init({
-		dsn: SENTRY_DSN,
+		dsn: getSentryDsn(),
 		release,
 		environment: getSentryEnvironment(release),
 		beforeSend: scrubSentryEvent,

@@ -2,8 +2,13 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 
-export const SENTRY_DSN =
+/** Public ingest URL — safe to embed in client bundles. */
+const DEFAULT_SENTRY_DSN =
 	"https://eeb4899f0415aa6bc9de477a7faeb720@o558751.ingest.us.sentry.io/4509479105986560";
+
+export function getSentryDsn() {
+	return process.env.SENTRY_DSN || DEFAULT_SENTRY_DSN;
+}
 
 export const STORE_FILENAME = "gsender-0.5.6.json";
 

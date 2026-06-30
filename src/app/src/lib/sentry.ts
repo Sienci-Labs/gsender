@@ -13,8 +13,8 @@ import {
 	useNavigationType,
 } from "react-router";
 import {
+	getSentryDsn,
 	getSentryEnvironment,
-	SENTRY_DSN,
 	scrubSentryEvent,
 } from "../../../sentryShared.js";
 import pkg from "../../package.json";
@@ -63,7 +63,7 @@ async function initSentryRenderer() {
 		} else {
 			reactInit({
 				...initOptions,
-				dsn: SENTRY_DSN,
+				dsn: getSentryDsn(),
 				release,
 				environment,
 			});
