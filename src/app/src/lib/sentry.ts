@@ -39,6 +39,14 @@ function getInitOptions() {
 	};
 }
 
+async function syncElectronMainConsent() {
+	try {
+		await window.ipcRenderer.invoke("sentry-consent", "accepted");
+	} catch (error) {
+		console.error("Failed to sync Sentry consent with main process:", error);
+	}
+}
+
 async function initSentryRenderer() {
 	if (!import.meta.env.PROD || initialized) {
 		return;
@@ -48,19 +56,22 @@ async function initSentryRenderer() {
 	const environment = getSentryEnvironment(release);
 	const initOptions = getInitOptions();
 
-	if (isElectron()) {
-		await window.ipcRenderer.invoke("sentry-consent", "accepted");
-		electronInit(initOptions, reactInit);
-	} else {
-		reactInit({
-			...initOptions,
-			dsn: SENTRY_DSN,
-			release,
-			environment,
-		});
+	try {
+		if (isElectron()) {
+			await syncElectronMainConsent();
+			electronInit(initOptions, reactInit);
+		} else {
+			reactInit({
+				...initOptions,
+				dsn: SENTRY_DSN,
+				release,
+				environment,
+			});
+		}
+		initialized = true;
+	} catch (error) {
+		console.error("Failed to initialize Sentry:", error);
 	}
-
-	initialized = true;
 }
 
 async function closeSentryRenderer() {
@@ -68,12 +79,16 @@ async function closeSentryRenderer() {
 		return;
 	}
 
-	if (isElectron()) {
-		await window.ipcRenderer.invoke("sentry-consent", "denied");
+	try {
+		if (isElectron()) {
+			await window.ipcRenderer.invoke("sentry-consent", "denied");
+		}
+		await close();
+	} catch (error) {
+		console.error("Failed to close Sentry:", error);
+	} finally {
+		initialized = false;
 	}
-
-	await close();
-	initialized = false;
 }
 
 export function updateSentryConsent(status: UsageDataConsent): void {
