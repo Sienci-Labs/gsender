@@ -1407,6 +1407,14 @@ class Visualizer extends Component {
 					VISUALIZER_PRIMARY,
 				);
 			}),
+			pubsub.subscribe("gcode:plugin-commit", async (_, { gcode, name }) => {
+				const file = new File([gcode], name);
+				await uploadGcodeFileToServer(
+					file,
+					controller.port,
+					VISUALIZER_PRIMARY,
+				);
+			}),
 			pubsub.subscribe("file:content", (_, { content, size, name }) => {
 				this.setState({
 					gcode: {
