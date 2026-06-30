@@ -44,9 +44,9 @@ const DataCollection = () => {
 	}, [collectUsageDataStatus]);
 
 	const handleAccept = async () => {
+		store.replace("workspace.collectUsageDataStatus", "accepted");
 		posthog.opt_in_capturing();
 		updateSentryConsent("accepted");
-		store.replace("workspace.collectUsageDataStatus", "accepted");
 		setOpen(false);
 	};
 
