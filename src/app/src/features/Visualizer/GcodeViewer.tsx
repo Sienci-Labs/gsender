@@ -38,6 +38,7 @@ import type {
 import "@sienci/gviewer/viewer/viewcube.css";
 
 import type { BBox } from "app/definitions/general";
+import type { MachineProfile } from "app/definitions/firmware";
 import controller from "app/lib/controller";
 import { isLaserMode } from "app/lib/laserMode";
 import { getZUpTravel } from "app/lib/SoftLimits.js";
@@ -254,8 +255,15 @@ class GcodeViewer extends Component<Props> {
 			false,
 		);
 
+		const isMetric = state.units === METRIC_UNITS;
+		const unitScale = isMetric ? 1 : 1 / 25.4;
+		const machineProfile = store.get("workspace.machineProfile") as MachineProfile | undefined;
+		const machineWidth  = (machineProfile?.mm?.width  ?? 800) * unitScale;
+		const machineDepth  = (machineProfile?.mm?.depth  ?? 800) * unitScale;
+		const machineHeight = (machineProfile?.mm?.height ?? 200) * unitScale;
+
 		return {
-			units: state.units === METRIC_UNITS ? "mm" : "in",
+			units: isMetric ? "mm" : "in",
 			mode: { laser, sim3d: false },
 			bit: {
 				// Bit only shows while connected, matching the old visualizer.
@@ -276,6 +284,11 @@ class GcodeViewer extends Component<Props> {
 			boundingBox: {
 				visible: store.get("widgets.visualizer.objects.limits.visible", false),
 				labels: store.get("widgets.visualizer.boundingBoxLabels", false),
+			},
+			grid: {
+				size: 2 * Math.max(machineWidth, machineDepth),
+				axisDepth: machineHeight,
+				labels: true,
 			},
 			render: { antialias: true, theme: this.buildTheme(this.currentThemeName()) },
 		};
