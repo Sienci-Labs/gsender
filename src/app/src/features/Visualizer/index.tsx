@@ -49,41 +49,41 @@ import pubsub from "pubsub-js";
 import { Component } from "react";
 import { connect } from "react-redux";
 import {
-    // Units
-    METRIC_UNITS,
-    // Grbl
-    GRBL,
-    GRBLHAL,
-    GRBL_ACTIVE_STATE_RUN,
-    // Marlin
-    MARLIN,
-    // Smoothie
-    SMOOTHIE,
-    // TinyG
-    TINYG,
-    // Workflow
-    WORKFLOW_STATE_RUNNING,
-    WORKFLOW_STATE_PAUSED,
-    WORKFLOW_STATE_IDLE,
-    RENDER_RENDERING,
-    RENDER_LOADING,
-    GRBL_ACTIVE_STATE_HOLD,
-    GRBL_ACTIVE_STATE_IDLE,
-    VISUALIZER_PRIMARY,
-    VISUALIZER_SECONDARY,
-    GRBL_ACTIVE_STATE_CHECK,
-    GENERAL_CATEGORY,
-    VISUALIZER_CATEGORY,
-    OVERRIDES_CATEGORY,
-    LIGHTWEIGHT_OPTIONS,
-} from '../../constants';
-import { CAMERA_MODE_PAN, CAMERA_MODE_ROTATE } from './constants';
-import { getVisualizerTheme } from 'app/lib/getVisualizerTheme';
-import SecondaryVisualizer from './SecondaryVisualizer';
-import useKeybinding from '../../lib/useKeybinding';
-import { CommandKeys } from 'app/lib/definitions/shortcuts';
-import { Actions, State } from './definitions';
-import posthog from 'posthog-js';
+	// Units
+	METRIC_UNITS,
+	// Grbl
+	GRBL,
+	GRBLHAL,
+	GRBL_ACTIVE_STATE_RUN,
+	// Marlin
+	MARLIN,
+	// Smoothie
+	SMOOTHIE,
+	// TinyG
+	TINYG,
+	// Workflow
+	WORKFLOW_STATE_RUNNING,
+	WORKFLOW_STATE_PAUSED,
+	WORKFLOW_STATE_IDLE,
+	RENDER_RENDERING,
+	RENDER_LOADING,
+	GRBL_ACTIVE_STATE_HOLD,
+	GRBL_ACTIVE_STATE_IDLE,
+	VISUALIZER_PRIMARY,
+	VISUALIZER_SECONDARY,
+	GRBL_ACTIVE_STATE_CHECK,
+	GENERAL_CATEGORY,
+	VISUALIZER_CATEGORY,
+	OVERRIDES_CATEGORY,
+	LIGHTWEIGHT_OPTIONS,
+} from "../../constants";
+import { CAMERA_MODE_PAN, CAMERA_MODE_ROTATE } from "./constants";
+import { getVisualizerTheme } from "app/lib/getVisualizerTheme";
+import SecondaryVisualizer from "./SecondaryVisualizer";
+import useKeybinding from "../../lib/useKeybinding";
+import { CommandKeys } from "app/lib/definitions/shortcuts";
+import { Actions, State } from "./definitions";
+import posthog from "posthog-js";
 import WidgetConfig from "../WidgetConfig/WidgetConfig";
 
 interface Views {
@@ -578,38 +578,38 @@ class Visualizer extends Component {
 			// bottom-up lifecycle, before index.tsx's own componentDidUpdate updates the store).
 			this.config.set("liteMode", newLiteModeValue);
 
-            // instead of calling loadGCode right away,
-            // use this pubsub to invoke a refresh of the visualizer wrapper.
-            // this removes visual glitches that would otherwise appear.
-            const wasInEverythingMode =
-                liteMode && liteOption === LIGHTWEIGHT_OPTIONS.EVERYTHING;
-            pubsub.publish('litemode:change', {
-                isFileLoaded,
-                enteringLiteMode: newLiteModeValue,
-                wasInEverythingMode,
-            });
+			// instead of calling loadGCode right away,
+			// use this pubsub to invoke a refresh of the visualizer wrapper.
+			// this removes visual glitches that would otherwise appear.
+			const wasInEverythingMode =
+				liteMode && liteOption === LIGHTWEIGHT_OPTIONS.EVERYTHING;
+			pubsub.publish("litemode:change", {
+				isFileLoaded,
+				enteringLiteMode: newLiteModeValue,
+				wasInEverythingMode,
+			});
 
-            posthog.capture('visualizer_lite_mode_toggle', {
-                feature: 'Visualizer',
-                visualizer_type: !isSecondary ? 'primary' : 'secondary',
-                lite_mode: newLiteModeValue,
-            });
-        },
-        lineWarning: {
-            onContinue: () => {
-                this.setState((prev) => ({
-                    invalidLine: { ...prev.invalidLine, show: false, line: '' },
-                }));
-                this.actions.handleRun();
-            },
-            onIgnoreWarning: () => {
-                this.setState((prev) => ({
-                    invalidLine: {
-                        ...prev.invalidLine,
-                        show: false,
-                        line: '',
-                    },
-                }));
+			posthog.capture("visualizer_lite_mode_toggle", {
+				feature: "Visualizer",
+				visualizer_type: !isSecondary ? "primary" : "secondary",
+				lite_mode: newLiteModeValue,
+			});
+		},
+		lineWarning: {
+			onContinue: () => {
+				this.setState((prev) => ({
+					invalidLine: { ...prev.invalidLine, show: false, line: "" },
+				}));
+				this.actions.handleRun();
+			},
+			onIgnoreWarning: () => {
+				this.setState((prev) => ({
+					invalidLine: {
+						...prev.invalidLine,
+						show: false,
+						line: "",
+					},
+				}));
 
 				store.set("widgets.visualizer.showLineWarnings", false);
 				controller.command("settings:updated", {

@@ -2,19 +2,19 @@ import { Button } from "app/components/Button";
 import { ControlledInput } from "app/components/ControlledInput";
 import { Button as ShadButton } from "app/components/shadcn/Button";
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from 'app/components/shadcn/Dialog';
-import Tooltip from 'app/components/Tooltip';
-import { FaPlay } from 'react-icons/fa';
-import { toast } from 'app/lib/toaster';
-import { useWidgetState } from 'app/hooks/useWidgetState';
-import pubsub from 'pubsub-js';
-import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-import { convertToImperial } from 'app/lib/units';
-import { usePostHog } from '@posthog/react';
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+} from "app/components/shadcn/Dialog";
+import Tooltip from "app/components/Tooltip";
+import { FaPlay } from "react-icons/fa";
+import { toast } from "app/lib/toaster";
+import { useWidgetState } from "app/hooks/useWidgetState";
+import pubsub from "pubsub-js";
+import { useWorkspaceState } from "app/hooks/useWorkspaceState";
+import { convertToImperial } from "app/lib/units";
+import { usePostHog } from "@posthog/react";
 import { useTypedSelector } from "app/hooks/useTypedSelector";
 import controller from "app/lib/controller";
 import { IMPERIAL_UNITS, METRIC_UNITS } from "app/constants";
@@ -42,11 +42,11 @@ const StartFromLine = ({
 	lastLine,
 	atcValidator,
 }: StartFromLineProps) => {
-    const zMax = useTypedSelector((state) => state.file.bbox.max.z);
-    const { units, safeRetractHeight } = useWorkspaceState();
-    const { delay = 0 } = useWidgetState('spindle');
-    const lineTotal = useTypedSelector((state) => state.file.total);
-    const posthog = usePostHog();
+	const zMax = useTypedSelector((state) => state.file.bbox.max.z);
+	const { units, safeRetractHeight } = useWorkspaceState();
+	const { delay = 0 } = useWidgetState("spindle");
+	const lineTotal = useTypedSelector((state) => state.file.total);
+	const posthog = usePostHog();
 
 	const calculateSafeHeight = () => {
 		if (safeRetractHeight === 0) {
@@ -87,29 +87,29 @@ const StartFromLine = ({
 			needsRecovery: false,
 		}));
 
-        const newSafeHeight =
-            units === IMPERIAL_UNITS ? safeHeight * 25.4 : safeHeight;
-        controller.command(
-            'gcode:start',
-            startFromLine,
-            zMax,
-            newSafeHeight,
-            delay,
-        );
-        reduxStore.dispatch(
-            updateJobOverrides({ isChecked: true, toggleStatus: 'overrides' }),
-        );
-        toast.info('Running Start From Specific Line Command', {
-            position: 'bottom-right',
-        });
-        posthog.capture('start_from_line_run', {
-            feature: 'JobControl',
-            line: startFromLine,
-            safe_height: newSafeHeight,
-            z_max: zMax,
-            delay,
-        });
-    };
+		const newSafeHeight =
+			units === IMPERIAL_UNITS ? safeHeight * 25.4 : safeHeight;
+		controller.command(
+			"gcode:start",
+			startFromLine,
+			zMax,
+			newSafeHeight,
+			delay,
+		);
+		reduxStore.dispatch(
+			updateJobOverrides({ isChecked: true, toggleStatus: "overrides" }),
+		);
+		toast.info("Running Start From Specific Line Command", {
+			position: "bottom-right",
+		});
+		posthog.capture("start_from_line_run", {
+			feature: "JobControl",
+			line: startFromLine,
+			safe_height: newSafeHeight,
+			z_max: zMax,
+			delay,
+		});
+	};
 
 	return (
 		<>

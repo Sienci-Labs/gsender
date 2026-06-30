@@ -10,7 +10,7 @@ import {
 	OVERRIDE_VALUE_RANGES,
 	SPINDLE_MODE,
 } from "../../constants";
-import posthog from 'posthog-js';
+import posthog from "posthog-js";
 
 interface OverridesProps {
 	ovF: number;
@@ -33,23 +33,23 @@ let globalLocalOvFTimestamp = 0;
 let globalLocalOvSTimestamp = 0;
 
 const debouncedOvFUpdateHandler = debounce((ovF, setLocalOvF) => {
-    if (globalOvTimestamp > globalLocalOvFTimestamp) {
-        setLocalOvF(ovF);
-        posthog.capture('feed_override_changed', {
-            value: Number(ovF),
-            feature: 'JobControl',
-        });
-    }
+	if (globalOvTimestamp > globalLocalOvFTimestamp) {
+		setLocalOvF(ovF);
+		posthog.capture("feed_override_changed", {
+			value: Number(ovF),
+			feature: "JobControl",
+		});
+	}
 }, 1000);
 
 const debouncedOvSUpdateHandler = debounce((ovS, setLocalOvS) => {
-    if (globalOvTimestamp > globalLocalOvSTimestamp) {
-        setLocalOvS(ovS);
-        posthog.capture('spindle_override_changed', {
-            value: Number(ovS),
-            feature: 'JobControl',
-        });
-    }
+	if (globalOvTimestamp > globalLocalOvSTimestamp) {
+		setLocalOvS(ovS);
+		posthog.capture("spindle_override_changed", {
+			value: Number(ovS),
+			feature: "JobControl",
+		});
+	}
 }, 1000);
 
 const Overrides: React.FC<OverridesProps> = ({
@@ -60,8 +60,8 @@ const Overrides: React.FC<OverridesProps> = ({
 	spindle,
 	isConnected,
 }) => {
-    globalOvTimestamp = ovTimestamp;
-    const { units } = useWorkspaceState();
+	globalOvTimestamp = ovTimestamp;
+	const { units } = useWorkspaceState();
 
 	const [showSpindleOverride, setShowSpindleOverride] = useState(
 		store.get("workspace.spindleFunctions"),

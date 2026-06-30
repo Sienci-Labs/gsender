@@ -104,13 +104,13 @@ function DRO({
 	const homingDirectionRef = useRef(homingDirection);
 	const pullOffRef = useRef(pullOff);
 
-    const posthog = usePostHog();
+	const posthog = usePostHog();
 
-    useEffect(() => {
-        homingFlagRef.current = homingFlag;
-        homingDirectionRef.current = homingDirection;
-        pullOffRef.current = pullOff;
-    }, [homingFlag, homingDirection, pullOff]);
+	useEffect(() => {
+		homingFlagRef.current = homingFlag;
+		homingDirectionRef.current = homingDirection;
+		pullOffRef.current = pullOff;
+	}, [homingFlag, homingDirection, pullOff]);
 
 	useEffect(() => {
 		setRotaryFunctionsEnabled(store.get("widgets.rotary.tab.show", false));
@@ -135,13 +135,13 @@ function DRO({
 		controller.command("gcode", gcode);
 	}, []);
 
-    function toggleHoming() {
-        setHomingMode((prev) => !prev);
-        posthog.capture('homing_mode_toggled', {
-            homing_mode: homingMode,
-            feature: 'DRO',
-        });
-    }
+	function toggleHoming() {
+		setHomingMode((prev) => !prev);
+		posthog.capture("homing_mode_toggled", {
+			homing_mode: homingMode,
+			feature: "DRO",
+		});
+	}
 
 	const canClick = useCallback((): boolean => {
 		if (!isConnected) return false;

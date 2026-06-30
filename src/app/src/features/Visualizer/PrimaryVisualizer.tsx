@@ -1,22 +1,22 @@
-import React, { useState, useEffect, ReactNode } from 'react';
-import PropTypes from 'prop-types';
-import { FrownIcon } from 'lucide-react';
-import pubsub from 'pubsub-js';
+import React, { useState, useEffect, ReactNode } from "react";
+import PropTypes from "prop-types";
+import { FrownIcon } from "lucide-react";
+import pubsub from "pubsub-js";
 
-import * as WebGL from 'app/lib/three/WebGL';
-import { Widget } from 'app/components/Widget';
-import VisualizerWrapper from './VisualizerWrapper';
-import Loading from './Loading';
-import Rendering from './Rendering';
-import SoftLimitsWarningArea from './SoftLimitsWarningArea';
-import CameraDisplay from './CameraDisplay/CameraDisplay';
-import { WorkspaceSelector } from 'app/features/WorkspaceSelector/index.tsx';
-import { FaFeatherAlt } from 'react-icons/fa';
-import cx from 'classnames';
-import { Tooltip } from 'app/components/Tooltip';
-import GcodeEditor from './GcodeEditor';
-import { Actions, State } from './definitions';
-import posthog from 'posthog-js';
+import * as WebGL from "app/lib/three/WebGL";
+import { Widget } from "app/components/Widget";
+import VisualizerWrapper from "./VisualizerWrapper";
+import Loading from "./Loading";
+import Rendering from "./Rendering";
+import SoftLimitsWarningArea from "./SoftLimitsWarningArea";
+import CameraDisplay from "./CameraDisplay/CameraDisplay";
+import { WorkspaceSelector } from "app/features/WorkspaceSelector/index.tsx";
+import { FaFeatherAlt } from "react-icons/fa";
+import cx from "classnames";
+import { Tooltip } from "app/components/Tooltip";
+import GcodeEditor from "./GcodeEditor";
+import { Actions, State } from "./definitions";
+import posthog from "posthog-js";
 
 interface Props {
 	state: State;
@@ -114,28 +114,25 @@ const PrimaryVisualizer = ({
 						</div>
 					)}
 
-                    <div className="absolute portrait:right-5 portrait:left-auto left-5 bottom-44 text-4xl text-white flex flex-col gap-2">
-                        <Tooltip content="Toggle lightweight mode">
-                            <button className="bg-gray-600 bg-opacity-50 rounded-full p-3.5">
-                                <FaFeatherAlt
-                                    className={cx('cursor-pointer', {
-                                        'text-gray-400': !state.liteMode,
-                                        'text-green-400': state.liteMode,
-                                    })}
-                                    onClick={() => {
-                                        actions.handleLiteModeToggle();
-                                        posthog.capture(
-                                            'visualizer_lite_mode_toggle',
-                                            {
-                                                feature: 'Visualizer',
-                                                liteMode: state.liteMode,
-                                            },
-                                        );
-                                    }}
-                                />
-                            </button>
-                        </Tooltip>
-                    </div>
+					<div className="absolute portrait:right-5 portrait:left-auto left-5 bottom-44 text-4xl text-white flex flex-col gap-2">
+						<Tooltip content="Toggle lightweight mode">
+							<button className="bg-gray-600 bg-opacity-50 rounded-full p-3.5">
+								<FaFeatherAlt
+									className={cx("cursor-pointer", {
+										"text-gray-400": !state.liteMode,
+										"text-green-400": state.liteMode,
+									})}
+									onClick={() => {
+										actions.handleLiteModeToggle();
+										posthog.capture("visualizer_lite_mode_toggle", {
+											feature: "Visualizer",
+											liteMode: state.liteMode,
+										});
+									}}
+								/>
+							</button>
+						</Tooltip>
+					</div>
 
 					<CameraDisplay camera={camera} cameraPosition={cameraPosition} />
 					<WorkspaceSelector />

@@ -1,7 +1,7 @@
-import React, { useRef } from 'react';
+import React, { useRef } from "react";
 
-import { Axis } from 'app/features/DRO/utils/DRO.ts';
-import { usePostHog } from '@posthog/react';
+import { Axis } from "app/features/DRO/utils/DRO.ts";
+import { usePostHog } from "@posthog/react";
 
 export interface WCSInputProps {
 	value: string;
@@ -16,8 +16,8 @@ export function WCSInput({
 	movementHandler,
 	axis,
 }: WCSInputProps) {
-    const inputRef = useRef<HTMLInputElement>(null);
-    const posthog = usePostHog();
+	const inputRef = useRef<HTMLInputElement>(null);
+	const posthog = usePostHog();
 
 	const onKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === "Enter") {
@@ -27,19 +27,19 @@ export function WCSInput({
 				movementHandler(value, axis);
 			}
 
-            movementHandler(inputValue, axis);
+			movementHandler(inputValue, axis);
 
-            posthog.capture('axis_manual_offset_changed', {
-                axis,
-                value: inputValue,
-                feature: 'DRO',
-            });
-            return;
-        }
-        if (e.key === 'Escape') {
-            inputRef.current.blur();
-        }
-    };
+			posthog.capture("axis_manual_offset_changed", {
+				axis,
+				value: inputValue,
+				feature: "DRO",
+			});
+			return;
+		}
+		if (e.key === "Escape") {
+			inputRef.current.blur();
+		}
+	};
 
 	const onBlur = () => {
 		inputRef.current.value = String(value);
