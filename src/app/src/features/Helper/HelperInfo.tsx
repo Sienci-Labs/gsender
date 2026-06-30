@@ -38,15 +38,16 @@ interface Props {
 	payload: {
 		title: string;
 		description: string;
-		qrCode: string;
+		qrCode?: string;
 		content: JSX.Element;
+		resourceLink?: string;
 	};
 	infoVisible: boolean;
 	onClose: () => void;
 }
 
 const HelperInfo = ({ payload, infoVisible, onClose }: Props) => {
-	const { title, description, qrCode } = payload;
+	const { title, description, qrCode, resourceLink } = payload;
 	const [visible, setVisible] = useState(infoVisible);
 
 	useEffect(() => {
@@ -112,6 +113,20 @@ const HelperInfo = ({ payload, infoVisible, onClose }: Props) => {
 									</div>
 								</PopoverContent>
 							</Popover>
+						</div>
+					)}
+					{resourceLink && (
+						<div className="text-xs flex flex-col justify-center items-center text-center">
+							<p>Need Help?</p>
+							<p>Follow along in our</p>
+							<a
+								href={resourceLink}
+								target="_blank"
+								rel="noopener noreferrer"
+								className="text-blue-600 hover:text-blue-700 hover:underline"
+							>
+								online resources
+							</a>
 						</div>
 					)}
 				</div>

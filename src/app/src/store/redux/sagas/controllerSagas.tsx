@@ -1039,6 +1039,8 @@ export function* initialize(): Generator<null, void, unknown> {
 					),
 					description:
 						"You are attempting to jog inside the keepout area.  Disable keepout using the switch below and then re-enable to continue",
+					resourceLink:
+						"https://resources.sienci.com/view/atc-final-checks/#troubleshooting",
 				});
 			} else {
 				Confirm({
