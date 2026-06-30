@@ -12,10 +12,12 @@ import {
 	ZIG_ZAG_MOVEMENT,
 } from "app/constants";
 import controller from "app/lib/controller";
+import { convertToImperial } from "app/lib/units";
+import store from "app/store";
 import defaultState from "app/store/defaultState";
 import reduxStore from "app/store/redux";
-
-import { convertToImperial } from "../../Preferences/calculate";
+import get from "lodash/get";
+import Toolpath from "./gcode-toolpath";
 
 const [M3] = SPINDLE_MODES;
 
