@@ -393,6 +393,7 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
 	};
 	let colorVertexCount = 0;
 	let tcCounter = 1;
+	let toolChangeIndex = 0;
 	let lastToolchangeColorIndex = -1;
 	const frames: GrowableUint32Buffer = {
 		data: new Uint32Array(2048),
@@ -488,13 +489,20 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
 		}
 
 		toolchanges.push(colorVertexCount);
-		if (
-			colorVertexCount <= 20 ||
-			colorVertexCount === lastToolchangeColorIndex
-		) {
+		if (colorVertexCount === lastToolchangeColorIndex) {
 			return;
 		}
 		lastToolchangeColorIndex = colorVertexCount;
+
+		// The first tool keeps the theme's cutting color (no palette swap). Index 0
+		// is reserved (visually similar to the cutting color), so the palette swap
+		// for the second tool onward starts at index 1, matching ToolTimeline's
+		// getToolpathColor(count).
+		const isFirstToolChange = toolChangeIndex === 0;
+		toolChangeIndex++;
+		if (isFirstToolChange) {
+			return;
+		}
 
 		const paletteIndex = getComplementaryColour(tcCounter);
 		tcCounter++;

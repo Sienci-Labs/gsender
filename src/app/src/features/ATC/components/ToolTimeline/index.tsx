@@ -11,11 +11,8 @@ import pubsub from "pubsub-js";
 import { useEffect, useState } from "react";
 
 function buildToolArray(toolEvents, fileLength, cuttingColor: string) {
-	// Palette starts at 1 — index 0 is visually similar to the default cutting
-	// color and would be confusing as a "different tool" color.
-	let paletteIdx = 1;
-	let displayIdx = 2; // initial tool segment takes display index 1
-	const toolchangeArray: ToolChange[] = [];
+	let count = 0;
+	const toolArray: ToolChange[] = [];
 
 	Object.entries(toolEvents).forEach(([line, value]) => {
 		if (Object.hasOwn(value, "M") && Object.hasOwn(value, "T")) {
@@ -24,35 +21,34 @@ function buildToolArray(toolEvents, fileLength, cuttingColor: string) {
 			newTool.startLine = Number(line);
 			newTool.label = `T${value.T}`;
 			if (value.comment) newTool.comment = value.comment;
-			const legendColor = getToolpathColor(paletteIdx);
-			newTool.color = `#${legendColor.getHexString()}`;
-			newTool.index = displayIdx;
-			toolchangeArray.push(newTool);
-			paletteIdx++;
-			displayIdx++;
+			// The first tool uses the theme's cutting color; the palette starts
+			// fresh at the second tool so N tools always produce N distinct colors.
+			if (count === 0) {
+				newTool.color = cuttingColor;
+			} else {
+				// Index 0 is reserved — it's visually similar to the cutting color.
+				const legendColor = getToolpathColor(count);
+				newTool.color = `#${legendColor.getHexString()}`;
+			}
+			newTool.index = count + 1;
+			toolArray.push(newTool);
+
+			count++;
 		}
 	});
 
-	if (toolchangeArray.length === 0) {
+	if (toolArray.length === 0) {
 		return [];
+	} else if (toolArray.length === 1) {
+		toolArray[0].endLine = fileLength;
+	} else {
+		toolArray[toolArray.length - 1].endLine = fileLength;
+		for (let i = toolArray.length - 2; i >= 0; i--) {
+			toolArray[i].endLine = toolArray[i + 1].startLine - 1;
+		}
 	}
 
-	toolchangeArray[toolchangeArray.length - 1].endLine = fileLength;
-	for (let i = toolchangeArray.length - 2; i >= 0; i--) {
-		toolchangeArray[i].endLine = toolchangeArray[i + 1].startLine - 1;
-	}
-
-	// Prepend an entry for the initial tool segment (before the first toolchange).
-	const initialTool: ToolChange = {
-		index: 1,
-		toolNumber: 0,
-		label: "Initial",
-		color: cuttingColor,
-		startLine: 0,
-		endLine: (toolchangeArray[0].startLine ?? 1) - 1,
-	};
-
-	return [initialTool, ...toolchangeArray];
+	return toolArray;
 }
 
 export function ToolTimelineWrapper() {

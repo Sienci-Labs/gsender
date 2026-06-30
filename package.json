@@ -238,7 +238,7 @@
 		"@serialport/parser-byte-length": "^13.0.0",
 		"@serialport/parser-readline": "^13.0.0",
 		"@sienci/avrgirl-arduino": "^5.0.3",
-		"@sienci/gviewer": "^0.1.16",
+		"@sienci/gviewer": "^0.1.17",
 		"axios": "^1.2.4",
 		"basic-ftp": "^5.1.0",
 		"bcrypt-nodejs": "0.0.3",
