@@ -34,6 +34,29 @@ const secret = pkg.version;
 
 //const getUserHome = () => (process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME']);
 const getUserHome = () => os.homedir();
+
+// Electron app.getPath('userData') uses package.json "name", not build.productName.
+const getAppName = () => pkg.name || "gSender";
+
+// Mirror Electron app.getPath('userData') when the server runs outside Electron (CLI dev).
+const getDefaultUserDataPath = () => {
+	const home = getUserHome();
+	const appName = getAppName();
+
+	if (process.platform === "darwin") {
+		return path.join(home, "Library", "Application Support", appName);
+	}
+
+	if (process.platform === "win32") {
+		const appData =
+			process.env.APPDATA || path.join(home, "AppData", "Roaming");
+		return path.join(appData, appName);
+	}
+
+	const configHome = process.env.XDG_CONFIG_HOME || path.join(home, ".config");
+	return path.join(configHome, appName);
+};
+
 const getUserDataPath = () => {
 	if (process.env.GSENDER_USER_DATA) {
 		return process.env.GSENDER_USER_DATA;
@@ -46,11 +69,11 @@ const getUserDataPath = () => {
 				return app.getPath("userData");
 			}
 		} catch (err) {
-			// Fallback to homedir if electron is unavailable
+			// Fall through to the default userData path below.
 		}
 	}
 
-	return os.homedir();
+	return getDefaultUserDataPath();
 };
 
 export default {
@@ -213,4 +236,6 @@ export default {
 			jsonIndent: 4,
 		},
 	},
+
+	pluginsDir: path.resolve(getUserDataPath(), "plugins"),
 };
