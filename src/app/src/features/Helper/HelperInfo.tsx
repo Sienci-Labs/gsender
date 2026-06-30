@@ -21,14 +21,32 @@
  *
  */
 
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "app/components/shadcn/Popover";
 import cx from "classnames";
-import { useEffect, useState } from "react";
+import { type JSX, useEffect, useState } from "react";
 import { FaInfoCircle, FaTimes } from "react-icons/fa";
+import { MdOutlineQrCode2 } from "react-icons/md";
+import QRCode from "react-qr-code";
 import { CSSTransition } from "react-transition-group";
 import styles from "./index.module.styl";
 
-const HelperInfo = ({ payload, infoVisible, onClose }) => {
-	const { title, description } = payload;
+interface Props {
+	payload: {
+		title: string;
+		description: string;
+		qrCode: string;
+		content: JSX.Element;
+	};
+	infoVisible: boolean;
+	onClose: () => void;
+}
+
+const HelperInfo = ({ payload, infoVisible, onClose }: Props) => {
+	const { title, description, qrCode } = payload;
 	const [visible, setVisible] = useState(infoVisible);
 
 	useEffect(() => {
@@ -64,10 +82,38 @@ const HelperInfo = ({ payload, infoVisible, onClose }) => {
 			>
 				<div
 					id="wizContent"
-					className="flex p-4 justify-stretch items-stretch flex-grow flex-col"
+					className="grid p-4 grid-cols-[80%,20%] divide-x gap-2 justify-center items-center"
 				>
-					<span>{description}</span>
-					{payload.content && <div className="mt-2 p-2">{payload.content}</div>}
+					<div className="flex flex-col">
+						<span>{description}</span>
+						{payload.content && (
+							<div className="mt-2 p-2">{payload.content}</div>
+						)}
+					</div>
+					{qrCode && (
+						<div className="text-xs flex flex-col justify-center items-center text-center">
+							<p>Need Help?</p>
+							<p>Click Me!</p>
+							<Popover>
+								<PopoverTrigger className="w-20">
+									<h1 className="flex flex-row gap-2 items-center justify-center p-0 text-blue-600 font-bold text-xl">
+										<MdOutlineQrCode2 className="text-2xl" size={40} />
+									</h1>
+								</PopoverTrigger>
+								<PopoverContent className="w-80 text-sm" side="right">
+									<div className="flex flex-col items-center text-sm text-gray-600 gap-4 px-4 justify-center dark:text-white">
+										<h1 className="text-blue-500 text-2xl">Scan QR Code</h1>
+										<p>
+											Scan with your phone camera to go to our resources page:
+										</p>
+										<div className="border-8 border-gray-900 dark:border-white rounded-md bg-white p-2">
+											<QRCode value={qrCode} />
+										</div>
+									</div>
+								</PopoverContent>
+							</Popover>
+						</div>
+					)}
 				</div>
 			</CSSTransition>
 		</div>
