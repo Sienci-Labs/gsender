@@ -410,9 +410,10 @@ const defaultState: State = {
 			gcode: {
 				displayName: true,
 			},
+			boundingBoxLabels: false,
 			objects: {
 				limits: {
-					visible: true,
+					visible: false,
 				},
 				coordinateSystem: {
 					visible: true,

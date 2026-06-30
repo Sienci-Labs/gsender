@@ -1459,7 +1459,7 @@ class Visualizer extends Component {
 					units: store.get("workspace.units", METRIC_UNITS),
 					objects: {
 						limits: {
-							visible: this.config.get("objects.limits.visible", true),
+							visible: this.config.get("objects.limits.visible", false),
 						},
 						coordinateSystem: {
 							visible: this.config.get(
