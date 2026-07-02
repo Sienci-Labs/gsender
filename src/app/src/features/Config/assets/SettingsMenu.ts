@@ -339,9 +339,37 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						key: "widgets.visualizer.theme",
 						description: "Independent colour control for the visualizer.",
 						type: "select",
-						options: [THEMES.LIGHT_THEME, THEMES.DARK_THEME],
+						options: [
+							THEMES.LIGHT_THEME,
+							THEMES.DARK_THEME,
+							THEMES.FLEXOKI_DARK_THEME,
+							THEMES.TOKYO_NIGHT_THEME,
+							THEMES.GRUVBOX_LIGHT_THEME,
+							THEMES.AYU_DARK_THEME,
+							THEMES.AYU_LIGHT_THEME,
+						],
 						onChange: (theme: THEMES_T) => {
 							pubsub.publish("theme:change", theme);
+						},
+					},
+					{
+						label: "Show bounding box",
+						key: "widgets.visualizer.objects.limits.visible",
+						description: "Draw a wireframe around the extents of the loaded G-code file.",
+						type: "boolean",
+						onChange: (value: boolean) => {
+						store.set("widgets.visualizer.objects.limits.visible", value);
+						pubsub.publish("visualizer:settings");
+					},
+					},
+					{
+						label: "Show bounding box labels",
+						key: "widgets.visualizer.boundingBoxLabels",
+						description: "Show X/Y/Z dimension labels on the bounding box.",
+						type: "boolean",
+						onChange: (value: boolean) => {
+							store.set("widgets.visualizer.boundingBoxLabels", value);
+							pubsub.publish("visualizer:settings");
 						},
 					},
 					{

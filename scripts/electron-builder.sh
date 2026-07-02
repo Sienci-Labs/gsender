@@ -144,9 +144,6 @@ else
     EXTRA_ARGS+=("-c.mac.identity=null")
 fi
 
-# Extra args appended to the electron-builder invocation.
-EXTRA_ARGS=()
-
 # Windows-specific handling (building a Windows target, e.g. on a dev machine).
 if [[ " $* " == *" --windows "* ]] || [[ " $* " == *" --win "* ]]; then
     # Skip Windows code signing unless DigiCert KeyLocker credentials are present.
