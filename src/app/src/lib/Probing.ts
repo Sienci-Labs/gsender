@@ -199,7 +199,6 @@ const updateOptionsForDirection = (
 export const getSingleAxisStandardRoutine = (
     axis: AXES_T,
     useFinalZ = false,
-    probeMovementSpeed = 0,
 ): Array<string> => {
     axis = axis.toUpperCase();
     const p = 'P0';
@@ -207,19 +206,15 @@ export const getSingleAxisStandardRoutine = (
     let finalRetract = useFinalZ
         ? `Z_RETRACT_FINAL`
         : `${axis}_RETRACT_DISTANCE`;
-    const retractMove = (dist: string): string =>
-        probeMovementSpeed > 0
-            ? `G91 G1 ${axis}[${dist}] F[PROBE_MOVE_FEED]`
-            : `G91 G0 ${axis}[${dist}]`;
     const code = [
         `; ${axis}-probe`,
         `G38.2 ${axis}[${axis}_PROBE_DISTANCE] F[PROBE_FAST_FEED]`,
-        retractMove(axisRetract),
+        `G91 G0 ${axis}[${axisRetract}]`,
         `%retractSign=Math.sign(${axisRetract})`,
         `G38.2 ${axis}[(Math.abs(${axisRetract}) + 1) * (retractSign * -1)] F[PROBE_SLOW_FEED]`,
         'G4 P[PROBE_DELAY]',
         `G10 L20 ${p} ${axis}[${axis}_THICKNESS]`,
-        retractMove(finalRetract),
+        `G91 G0 ${axis}[${finalRetract}]`,
     ];
 
     return code;
@@ -243,10 +238,13 @@ export const get3AxisStandardRoutine = (
     let initialPositionAdjustment =
         units === METRIC_UNITS ? 6 : mm2in(6).toFixed(3);
 
+    const finalZeroMove = (coords: string): string =>
+        probeMovementSpeed > 0
+            ? `G90 G1 ${coords} F[PROBE_MOVE_FEED]`
+            : `G90 G0 ${coords}`;
+
     if (axes.z) {
-        code.push(
-            ...getSingleAxisStandardRoutine('Z', false, probeMovementSpeed),
-        );
+        code.push(...getSingleAxisStandardRoutine('Z'));
         // Z also handles positioning for next probe on X
         code.push(
             `G91 G0 X[(X_ADJUST + ${initialPositionAdjustment}) * X_RETRACT_DIRECTION]`,
@@ -264,9 +262,7 @@ export const get3AxisStandardRoutine = (
         }
 
         // Probe X
-        code.push(
-            ...getSingleAxisStandardRoutine('X', false, probeMovementSpeed),
-        );
+        code.push(...getSingleAxisStandardRoutine('X'));
     }
     if (axes.y) {
         // Move into position for Y
@@ -276,13 +272,14 @@ export const get3AxisStandardRoutine = (
         );
 
         // Probe Y
-        code.push(
-            ...getSingleAxisStandardRoutine('Y', false, probeMovementSpeed),
-        );
+        code.push(...getSingleAxisStandardRoutine('Y'));
     }
     if (axes.z) {
         // Move back to original XYZ position
-        code.push('G91 G0 Z[Z_ADJUST + Z_RETRACT_FINAL]', 'G90 G0 X0Y0');
+        code.push(
+            'G91 G0 Z[Z_ADJUST + Z_RETRACT_FINAL]',
+            finalZeroMove('X0Y0'),
+        );
     }
     return code;
 };
