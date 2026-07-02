@@ -44,9 +44,14 @@ class UF2Flasher extends events.EventEmitter {
         this.emit('info', `Found bootloader volume at ${volumePath}`);
 
         const total = this.data.length;
+        const target = path.join(volumePath, 'firmware.uf2');
+        this.emit('info', `Copying UF2 image (${total} bytes) to ${target}`);
         this.emit('progress', 0, total);
 
-        const target = path.join(volumePath, 'firmware.uf2');
+        // fs.writeFileSync blocks the event loop, so yield first to let the
+        // "Copying" message flush over the socket before the write begins.
+        await delay(0);
+
         try {
             fs.writeFileSync(target, this.data);
         } catch (err) {
