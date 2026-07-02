@@ -892,6 +892,23 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						},
 					},
 					{
+						label: 'Probe Movement Speed',
+						key: 'widgets.probe.probeMovementSpeed',
+						description:
+							'Feed rate for retract/reposition moves during probing. If 0, these moves use rapid (G0). If set, they use a controlled feed move (G1) at this speed instead. (Default 0)',
+						type: 'number',
+						min: 0,
+						unit: 'mm/min',
+						hidden: (getPending) => {
+							const probeType = getPending(
+								'workspace.probeProfile.touchplateType',
+								'',
+							);
+							// BitZero already always uses G1 for retracts, so this setting doesn't apply to it
+							return probeType === TOUCHPLATE_TYPE_BITZERO;
+						},
+					},
+					{
 						label: "Final Z retract",
 						key: "widgets.probe.zRetractNormal",
 						description:
