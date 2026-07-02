@@ -41,6 +41,7 @@ interface startFlashOptions {
     port: string;
     hex: ArrayBuffer;
     controllerType: string;
+    firmwareType?: string;
 }
 
 const SLB_DFU_PORT = {
@@ -49,10 +50,16 @@ const SLB_DFU_PORT = {
     inuse: false,
 };
 
+// Whether the selected firmware file is a .uf2 image (RP2350 / Pico 2350).
+function isUF2File(file: any): boolean {
+    return !!file?.name && file.name.toLowerCase().endsWith('.uf2');
+}
+
 function startFlash({
     port,
     hex = null,
     controllerType = '',
+    firmwareType = 'hex',
 }: startFlashOptions) {
     if (!port) {
         toast.error(
@@ -65,7 +72,7 @@ function startFlash({
     const machineVersion = get(selectedProfile, 'version', 'MK1');
     const isHal = controllerType === 'grblHAL';
 
-    controller.flashFirmware(port, machineVersion, isHal, hex);
+    controller.flashFirmware(port, machineVersion, isHal, hex, firmwareType);
 }
 
 const CONTROLLER_TYPES = ['grbl', 'grblHAL'];
@@ -87,13 +94,18 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
 
         const isHal = controllerType === 'grblHAL';
         const isDfuPort = port === SLB_DFU_PORT.port;
+        const isUF2 = isUF2File(file);
+        const firmwareType = isUF2 ? 'uf2' : 'hex';
+
         if (isHal && !isDfuPort) {
-            controller.command('gcode', '$DFU');
+            // UF2 boards (RP2350) enter the bootloader via $UF2; DFU boards use $DFU.
+            controller.command('gcode', isUF2 ? '$UF2' : '$DFU');
             setTimeout(() => {
                 startFlash({
                     port,
                     hex,
                     controllerType,
+                    firmwareType,
                 });
             }, 1500);
             return;
@@ -103,6 +115,7 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
             port,
             hex,
             controllerType,
+            firmwareType,
         });
     }
 
@@ -144,7 +157,13 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                     setHex(result);
                 }
             };
-            fileReader.readAsText(file);
+            // UF2 images are binary and must be read as an ArrayBuffer;
+            // Intel HEX (.hex) is text.
+            if (isUF2File(file)) {
+                fileReader.readAsArrayBuffer(file);
+            } else {
+                fileReader.readAsText(file);
+            }
         }
         return () => {
             isCancel = true;
@@ -256,11 +275,11 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                                 invisible: controllerType === 'grbl',
                             })}
                         >
-                            <h2 className="text-gray-600 text-sm dark:text-white">Hex File</h2>
+                            <h2 className="text-gray-600 text-sm dark:text-white">Firmware File</h2>
                             <input
                                 type="file"
                                 id="firmware_image"
-                                accept=".hex"
+                                accept=".hex,.uf2"
                                 ref={fileInputRef}
                                 onChange={handleFileUpload}
                             />

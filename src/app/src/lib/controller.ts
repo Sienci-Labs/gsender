@@ -466,11 +466,19 @@ class Controller {
         flashPort: string,
         imageType: string,
         isHal: boolean,
-        hex: string,
+        hex: string | ArrayBuffer,
+        firmwareType: string = 'hex',
     ): void {
         //TODO: not sure what type imageType is
         this.socket &&
-            this.socket.emit('flash:start', flashPort, imageType, isHal, hex);
+            this.socket.emit(
+                'flash:start',
+                flashPort,
+                imageType,
+                isHal,
+                hex,
+                firmwareType,
+            );
     }
 
     // Retrieves a list of available serial ports with metadata.
