@@ -337,6 +337,7 @@ const defaultState: State = {
             probeAxis: 'Z',
             tipDiameter3D: 2,
             xyRetract3D: 10,
+            probeMovementSpeed: 0,
         },
         rotary: {
             stockTurning: {

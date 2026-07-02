@@ -145,6 +145,9 @@ const ProbeWidget = () => {
     const [xyRetract3D, setXYRetract3D] = useState<number>(
         config.get('xyRetract3D') || {},
     );
+    const [probeMovementSpeed, setProbeMovementSpeed] = useState<number>(
+        config.get('probeMovementSpeed') || 0,
+    );
     const [touchplate, setTouchplate] = useState<ProbeProfile>(
         store.get('workspace.probeProfile', {}),
     );
@@ -468,7 +471,8 @@ const ProbeWidget = () => {
             retractDistance,
             zRetractNormal,
             tipDiameter,
-            xyRetract;
+            xyRetract,
+            movementSpeed;
         const modal = units === METRIC_UNITS ? '21' : '20';
         if (units === METRIC_UNITS) {
             zThickness = touchplate.zThickness;
@@ -479,6 +483,7 @@ const ProbeWidget = () => {
             zRetractNormal = zRetractDistance;
             tipDiameter = tipDiameter3D;
             xyRetract = xyRetract3D;
+            movementSpeed = probeMovementSpeed;
         } else {
             zThickness = {
                 autoZero: touchplate.zThickness.autoZero, // don't convert - this is the only user adjusted var in autozero, so everything else is in mm
@@ -495,6 +500,9 @@ const ProbeWidget = () => {
             zRetractNormal = convertToImperial(zRetractDistance);
             tipDiameter = convertToImperial(tipDiameter3D);
             xyRetract = convertToImperial(xyRetract3D);
+            movementSpeed = probeMovementSpeed
+                ? convertToImperial(probeMovementSpeed)
+                : 0;
         }
 
         const options: ProbingOptions = {
@@ -516,6 +524,10 @@ const ProbeWidget = () => {
             homingEnabled: $22 !== '0',
             tipDiameter3D: tipDiameter,
             xyRetract3D: xyRetract,
+            probeMovementSpeed: movementSpeed,
+            // AutoZero always runs in mm (forced G21), so pass the raw,
+            // unconverted mm/min value regardless of display units
+            probeMovementSpeedAuto: probeMovementSpeed,
             firmware: type,
         };
 
@@ -592,6 +604,7 @@ const ProbeWidget = () => {
             setZProbeDistance(config.get('zProbeDistance') || {});
             setTipDiameter3D(config.get('tipDiameter3D', 0));
             setXYRetract3D(config.get('xyRetract3D', 10));
+            setProbeMovementSpeed(config.get('probeMovementSpeed') || 0);
             setConnectivityTest(config.get('connectivityTest'));
             setZRetractDistance(config.get('zRetractNormal'));
             setZRetractDistanceAuto(config.get('zRetractAuto'));

@@ -65,6 +65,7 @@ export const getPreamble = (options: ProbingOptions): Array<string> => {
         zPositionAdjust,
         homingEnabled,
         plateType,
+        probeMovementSpeed = 0,
     } = options;
     let initialOffsets = 'G10 L20 P0 ';
 
@@ -110,6 +111,7 @@ export const getPreamble = (options: ProbingOptions): Array<string> => {
         `%PROBE_DELAY=${probeDelay}`,
         `%Y_RETRACT_DIRECTION=${yRetractModifier}`,
         `%X_RETRACT_DIRECTION=${xRetractModifier}`,
+        `%PROBE_MOVE_FEED=${probeMovementSpeed}`,
         `${initialOffsets}`,
         `G91 G${modal}`,
     ];
@@ -197,6 +199,7 @@ const updateOptionsForDirection = (
 export const getSingleAxisStandardRoutine = (
     axis: AXES_T,
     useFinalZ = false,
+    probeMovementSpeed = 0,
 ): Array<string> => {
     axis = axis.toUpperCase();
     const p = 'P0';
@@ -204,15 +207,19 @@ export const getSingleAxisStandardRoutine = (
     let finalRetract = useFinalZ
         ? `Z_RETRACT_FINAL`
         : `${axis}_RETRACT_DISTANCE`;
+    const retractMove = (dist: string): string =>
+        probeMovementSpeed > 0
+            ? `G91 G1 ${axis}[${dist}] F[PROBE_MOVE_FEED]`
+            : `G91 G0 ${axis}[${dist}]`;
     const code = [
         `; ${axis}-probe`,
         `G38.2 ${axis}[${axis}_PROBE_DISTANCE] F[PROBE_FAST_FEED]`,
-        `G91 G0 ${axis}[${axisRetract}]`,
+        retractMove(axisRetract),
         `%retractSign=Math.sign(${axisRetract})`,
         `G38.2 ${axis}[(Math.abs(${axisRetract}) + 1) * (retractSign * -1)] F[PROBE_SLOW_FEED]`,
         'G4 P[PROBE_DELAY]',
         `G10 L20 ${p} ${axis}[${axis}_THICKNESS]`,
-        `G91 G0 ${axis}[${finalRetract}]`,
+        retractMove(finalRetract),
     ];
 
     return code;
@@ -224,7 +231,7 @@ export const get3AxisStandardRoutine = (
     const code: Array<string> = [];
 
     code.push(...getPreamble(options));
-    const { axes, units } = options;
+    const { axes, units, probeMovementSpeed = 0 } = options;
 
     // invalid axes, we go next
     if (typeof axes !== 'object') {
@@ -237,7 +244,9 @@ export const get3AxisStandardRoutine = (
         units === METRIC_UNITS ? 6 : mm2in(6).toFixed(3);
 
     if (axes.z) {
-        code.push(...getSingleAxisStandardRoutine('Z'));
+        code.push(
+            ...getSingleAxisStandardRoutine('Z', false, probeMovementSpeed),
+        );
         // Z also handles positioning for next probe on X
         code.push(
             `G91 G0 X[(X_ADJUST + ${initialPositionAdjustment}) * X_RETRACT_DIRECTION]`,
@@ -255,7 +264,9 @@ export const get3AxisStandardRoutine = (
         }
 
         // Probe X
-        code.push(...getSingleAxisStandardRoutine('X'));
+        code.push(
+            ...getSingleAxisStandardRoutine('X', false, probeMovementSpeed),
+        );
     }
     if (axes.y) {
         // Move into position for Y
@@ -265,7 +276,9 @@ export const get3AxisStandardRoutine = (
         );
 
         // Probe Y
-        code.push(...getSingleAxisStandardRoutine('Y'));
+        code.push(
+            ...getSingleAxisStandardRoutine('Y', false, probeMovementSpeed),
+        );
     }
     if (axes.z) {
         // Move back to original XYZ position
@@ -309,6 +322,7 @@ export const get3AxisAutoRoutine = ({
     homingEnabled,
     zThickness,
     zRetractAuto,
+    probeMovementSpeedAuto = 0,
 }: ProbingOptions): Array<string> => {
     const code: Array<string> = [];
     const p = 'P0';
@@ -328,6 +342,11 @@ export const get3AxisAutoRoutine = ({
         //console.log(zDistance);
     }
 
+    const finalZeroMove = (coords: string): string =>
+        probeMovementSpeedAuto > 0
+            ? `G21 G90 G1 ${coords} F[PROBE_MOVE_FEED]`
+            : `G21 G90 G0 ${coords}`;
+
     if (axes.x && axes.y && axes.z) {
         code.push(
             `; AZ Probe XYZ Auto - direction: ${direction}`,
@@ -335,6 +354,7 @@ export const get3AxisAutoRoutine = ({
             `%Y_OFF = ${yOff}`,
             `%Z_THICKNESS = ${zThickness.autoZero}`,
             `%PROBE_DELAY=${probeDelay}`,
+            `%PROBE_MOVE_FEED=${probeMovementSpeedAuto}`,
             'G21 G91',
             `G38.2 Z-${zDistance} F200`,
             'G21 G91 G0 Z2',
@@ -372,7 +392,7 @@ export const get3AxisAutoRoutine = ({
             '%Y_CENTER = ((Y_TOP - Y_BOTTOM)/2) * -1',
             `${prependUnits} G0 Y[Y_CENTER]`,
             `G21 G10 L20 ${p} X[X_OFF] Y[Y_OFF]`,
-            'G21 G90 G0 X0 Y0',
+            finalZeroMove('X0 Y0'),
             `G21 G0 G90 Z${zRetractAuto}`,
         );
     } else if (axes.x && axes.y) {
@@ -381,6 +401,7 @@ export const get3AxisAutoRoutine = ({
             `%X_OFF = ${xOff}`,
             `%Y_OFF = ${yOff}`,
             `%PROBE_DELAY=${probeDelay}`,
+            `%PROBE_MOVE_FEED=${probeMovementSpeedAuto}`,
             'G21 G91',
             `G38.2 Z-${zDistance} F200`,
             'G21 G91 G0 Z3',
@@ -412,7 +433,7 @@ export const get3AxisAutoRoutine = ({
             'G21 G90 G0 X0 Y0',
             'G4 P[PROBE_DELAY]',
             `G21 G10 L20 ${p} X[X_OFF] Y[Y_OFF]`,
-            'G21 G90 G0 X0 Y0',
+            finalZeroMove('X0 Y0'),
         );
     } else if (axes.z) {
         code.push(
@@ -433,6 +454,7 @@ export const get3AxisAutoRoutine = ({
             '; AZ Probe X Auto',
             `%X_OFF = ${xOff}`,
             `%PROBE_DELAY=${probeDelay}`,
+            `%PROBE_MOVE_FEED=${probeMovementSpeedAuto}`,
             'G21 G91',
             `G38.2 Z-${zDistance} F200`,
             'G21 G91 G0 Z3',
@@ -448,7 +470,7 @@ export const get3AxisAutoRoutine = ({
             'G38.2 X5 F75',
             'G4 P[PROBE_DELAY]',
             `${prependUnits} G10 L20 ${p} X[posx/2]`,
-            'G21 G90 G0 X0',
+            finalZeroMove('X0'),
             'G4 P[PROBE_DELAY]',
             `G10 L20 ${p} X[X_OFF]`,
             'G4 P[PROBE_DELAY]',
@@ -459,6 +481,7 @@ export const get3AxisAutoRoutine = ({
             '; AZ Probe Y Auto',
             `%Y_OFF = ${yOff}`,
             `%PROBE_DELAY=${probeDelay}`,
+            `%PROBE_MOVE_FEED=${probeMovementSpeedAuto}`,
             'G21 G91',
             `G38.2 Z-${zDistance} F200`,
             'G21 G91 G0 Z3',
@@ -474,7 +497,7 @@ export const get3AxisAutoRoutine = ({
             'G38.2 Y5 F75',
             'G4 P[PROBE_DELAY]',
             `${prependUnits} G10 L20 ${p} Y[posy/2]`,
-            'G21 G90 G0 Y0',
+            finalZeroMove('Y0'),
             'G4 P[PROBE_DELAY]',
             `G10 L20 ${p} Y[Y_OFF]`,
             'G4 P[PROBE_DELAY]',
@@ -494,6 +517,7 @@ export const get3AxisAutoTipRoutine = ({
     homingEnabled,
     zThickness,
     zRetractAuto,
+    probeMovementSpeedAuto = 0,
 }: ProbingOptions): Array<string> => {
     const code: Array<string> = [];
     const p = 'P0';
@@ -511,6 +535,11 @@ export const get3AxisAutoTipRoutine = ({
         zDistance = getZDownTravel(zDistance);
     }
 
+    const finalZeroMove = (coords: string): string =>
+        probeMovementSpeedAuto > 0
+            ? `G21 G90 G1 ${coords} F[PROBE_MOVE_FEED]`
+            : `G21 G90 G0 ${coords}`;
+
     if (axes.x && axes.y && axes.z) {
         code.push(
             '; AZ Probe XYZ Tip',
@@ -518,6 +547,7 @@ export const get3AxisAutoTipRoutine = ({
             `%Y_OFF = ${yOff}`,
             `%Z_THICKNESS = ${zThickness.autoZero}`,
             `%PROBE_DELAY=${probeDelay}`,
+            `%PROBE_MOVE_FEED=${probeMovementSpeedAuto}`,
             'G21 G91',
             `G38.2 Z-${zDistance} F200`,
             'G21 G91 G0 Z2',
@@ -556,7 +586,7 @@ export const get3AxisAutoTipRoutine = ({
             '%Y_CENTER = ((Y_TOP - Y_BOTTOM)/2) * -1',
             `${prependUnits} G0 Y[Y_CENTER]`,
             `G21 G10 L20 ${p} X[X_OFF] Y[Y_OFF]`,
-            'G21 G90 G0 X0 Y0',
+            finalZeroMove('X0 Y0'),
             `G21 G0 G90 Z${zRetractAuto}`,
         );
     } else if (axes.x && axes.y) {
@@ -565,6 +595,7 @@ export const get3AxisAutoTipRoutine = ({
             `%X_OFF = ${xOff}`,
             `%Y_OFF = ${yOff}`,
             `%PROBE_DELAY=${probeDelay}`,
+            `%PROBE_MOVE_FEED=${probeMovementSpeedAuto}`,
             'G21 G91',
             `G38.2 Z-${zDistance} F200`,
             'G21 G91 G0 Z0.5',
@@ -596,7 +627,7 @@ export const get3AxisAutoTipRoutine = ({
             `${prependUnits} G90 G0 X0 Y0`,
             'G4 P[PROBE_DELAY]',
             `G21 G10 L20 ${p} X[X_OFF] Y[Y_OFF]`,
-            'G21 G90 G0 X0 Y0',
+            finalZeroMove('X0 Y0'),
         );
     } else if (axes.z) {
         code.push(
@@ -617,6 +648,7 @@ export const get3AxisAutoTipRoutine = ({
             '; AZ Probe X Tip',
             `%X_OFF = ${xOff}`,
             `%PROBE_DELAY=${probeDelay}`,
+            `%PROBE_MOVE_FEED=${probeMovementSpeedAuto}`,
             'G21 G91',
             `G38.2 Z-${zDistance} F200`,
             'G21 G91 G0 Z0.5',
@@ -632,7 +664,7 @@ export const get3AxisAutoTipRoutine = ({
             'G38.2 X5 F75',
             'G4 P[PROBE_DELAY]',
             `${prependUnits} G10 L20 ${p} X[posx/2]`,
-            'G21 G90 G0 X0',
+            finalZeroMove('X0'),
             'G4 P[PROBE_DELAY]',
             `G10 L20 ${p} X[X_OFF]`,
             'G4 P[PROBE_DELAY]',
@@ -643,6 +675,7 @@ export const get3AxisAutoTipRoutine = ({
             '; AZ Probe Y Tip',
             `%Y_OFF = ${yOff}`,
             `%PROBE_DELAY=${probeDelay}`,
+            `%PROBE_MOVE_FEED=${probeMovementSpeedAuto}`,
             'G21 G91',
             `G38.2 Z-${zDistance} F200`,
             'G21 G91 G0 Z0.5',
@@ -658,7 +691,7 @@ export const get3AxisAutoTipRoutine = ({
             'G38.2 Y5 F75',
             'G4 P[PROBE_DELAY]',
             `${prependUnits} G10 L20 ${p} Y[posy/2]`,
-            'G21 G90 G0 Y0',
+            finalZeroMove('Y0'),
             'G4 P[PROBE_DELAY]',
             `G10 L20 ${p} Y[Y_OFF]`,
             'G4 P[PROBE_DELAY]',
@@ -679,6 +712,7 @@ export const get3AxisAutoDiameterRoutine = ({
     zThickness,
     units,
     zRetractAuto,
+    probeMovementSpeedAuto = 0,
 }: ProbingOptions): Array<string> => {
     const code: Array<string> = [];
     const p = 'P0';
@@ -704,6 +738,11 @@ export const get3AxisAutoDiameterRoutine = ({
         (22.5 + toolCompensatedThickness).toFixed(3),
     );
 
+    const finalZeroMove = (coords: string): string =>
+        probeMovementSpeedAuto > 0
+            ? `G21 G90 G1 ${coords} F[PROBE_MOVE_FEED]`
+            : `G21 G90 G0 ${coords}`;
+
     if (axes.z && axes.y && axes.z) {
         code.push(
             '; AZ Probe XYZ specific dia',
@@ -711,6 +750,7 @@ export const get3AxisAutoDiameterRoutine = ({
             `%Y_OFF = ${yOff}`,
             `%Z_THICKNESS = ${zThickness.autoZero}`,
             `%PROBE_DELAY=${probeDelay}`,
+            `%PROBE_MOVE_FEED=${probeMovementSpeedAuto}`,
             'G21 G91',
             `G38.2 Z-${zDistance} F200`,
             'G21 G91 G0 Z2',
@@ -735,7 +775,7 @@ export const get3AxisAutoDiameterRoutine = ({
             'G21 G90 G0 X0 Y0',
             'G4 P[PROBE_DELAY]',
             `G21 G10 L20 ${p} X[X_OFF] Y[Y_OFF]`,
-            'G21 G90 G0 X0 Y0',
+            finalZeroMove('X0 Y0'),
             `G21 G90 G0 Z${zRetractAuto}`,
         );
     } else if (axes.x && axes.y) {
@@ -744,6 +784,7 @@ export const get3AxisAutoDiameterRoutine = ({
             `%X_OFF = ${xOff}`,
             `%Y_OFF = ${yOff}`,
             `%PROBE_DELAY=${probeDelay}`,
+            `%PROBE_MOVE_FEED=${probeMovementSpeedAuto}`,
             'G21 G91',
             `G38.2 Z-${zDistance} F200`,
             'G21 G91 G0 Z3',
@@ -764,7 +805,7 @@ export const get3AxisAutoDiameterRoutine = ({
             'G4 P[PROBE_DELAY]',
             `G21 G10 L20 ${p} X[X_OFF] Y[Y_OFF]`,
             'G4 P[PROBE_DELAY]',
-            'G21 G90 G0 X0 Y0',
+            finalZeroMove('X0 Y0'),
         );
     } else if (axes.z) {
         code.push(
@@ -785,6 +826,7 @@ export const get3AxisAutoDiameterRoutine = ({
             '; AZ Probe Y specific dia',
             `%Y_OFF = ${yOff}`,
             `%PROBE_DELAY=${probeDelay}`,
+            `%PROBE_MOVE_FEED=${probeMovementSpeedAuto}`,
             'G21 G91',
             `G38.2 Z-${zDistance} F200`,
             'G21 G91 G0 Z3',
@@ -794,7 +836,7 @@ export const get3AxisAutoDiameterRoutine = ({
             'G38.2 Y5 F75',
             'G4 P[PROBE_DELAY]',
             `G21 G10 L20 ${p} Y${compensatedValue}`,
-            'G21 G90 G0 Y0',
+            finalZeroMove('Y0'),
             'G4 P[PROBE_DELAY]',
             `G10 L20 ${p} Y[Y_OFF]`,
             'G4 P[PROBE_DELAY]',
@@ -805,6 +847,7 @@ export const get3AxisAutoDiameterRoutine = ({
             '; AZ Probe X specific dia',
             `%X_OFF = ${xOff}`,
             `%PROBE_DELAY=${probeDelay}`,
+            `%PROBE_MOVE_FEED=${probeMovementSpeedAuto}`,
             'G21 G91',
             `G38.2 Z-${zDistance} F200`,
             'G21 G91 G0 Z3',
@@ -814,7 +857,7 @@ export const get3AxisAutoDiameterRoutine = ({
             'G38.2 X5 F75',
             'G4 P[PROBE_DELAY]',
             `G21 G10 L20 ${p} X${compensatedValue}`,
-            'G21 G90 G0 X0',
+            finalZeroMove('X0'),
             'G4 P[PROBE_DELAY]',
             `G10 L20 ${p} X[X_OFF]`,
             'G4 P[PROBE_DELAY]',

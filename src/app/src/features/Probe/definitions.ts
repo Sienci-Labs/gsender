@@ -82,6 +82,10 @@ export interface ProbingOptions {
     xThickness?: number;
     yThickness?: number;
     xyThickness?: number;
+    probeMovementSpeed?: number;
+    // AutoZero routines always run in mm (forced G21) regardless of display units,
+    // so they need the raw mm/min value rather than the unit-converted one above.
+    probeMovementSpeedAuto?: number;
     firmware?: FIRMWARE_TYPES_T;
     xyPositionAdjust?: number;
     zPositionAdjust?: number;
@@ -119,6 +123,7 @@ export interface Probe {
     direction: number;
     tipDiameter3D: number;
     xyRetract3D: number;
+    probeMovementSpeed: number;
 }
 
 export interface Actions {
