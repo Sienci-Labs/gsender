@@ -99,70 +99,74 @@ const ProbeWidget = () => {
 		type: "",
 	};
 
-	const [touchplateType, setTouchplateType] = useState<TOUCHPLATE_TYPES_T>(
-		store.get("workspace.probeProfile.touchplateType"),
-	);
-	const [units, setUnits] = useState<UNITS_EN>(store.get("workspace.units"));
-	const testIntervalRef = useRef<NodeJS.Timeout>(null);
-	const [availableTools, setAvailableTools] = useState<AvailableTool[]>(
-		store.get("workspace.tools", []),
-	);
-	const [currentTool, setCurrentTool] = useState<AvailableTool>(
-		availableTools ? availableTools[0] : defaultTool,
-	);
-	// const [toolChangeActive, setToolChangeActive] = useState<boolean>(false);
-	// const [port, setPort] = useState<string>(controller.port);
-	const [modalIsOpen, setModalIsOpen] = useState(false);
-	// const [probeAxis, setProbeAxis] = useState<AXES_T>(config.get('probeAxis', 'Z'));
-	const [probeCommand, setProbeCommand] = useState<string>(
-		config.get("probeCommand", "G38.2"),
-	);
-	const [useTLO, setUseTLO] = useState<boolean>(config.get("useTLO"));
-	const [probeDepth, setProbeDepth] = useState<number>(
-		config.get("probeDepth") || {},
-	);
-	const [probeFeedrate, setProbeFeedrate] = useState<number>(
-		config.get("probeFeedrate") || {},
-	);
-	const [probeFastFeedrate, setProbeFastFeedrate] = useState<number>(
-		config.get("probeFastFeedrate") || {},
-	);
-	const [touchPlateHeight, setTouchPlateHeight] = useState<number>(
-		config.get("touchPlateHeight") || {},
-	);
-	const [retractionDistance, setRetractionDistance] = useState<number>(
-		config.get("retractionDistance") || {},
-	);
-	const [zRetractDistance, setZRetractDistance] = useState<number>(
-		config.get("zRetractNormal") || {},
-	);
-	const [zRetractDistanceAuto, setZRetractDistanceAuto] = useState<number>(
-		config.get("zRetractAuto") || {},
-	);
-	const [zProbeDistance, setZProbeDistance] = useState<number>(
-		config.get("zProbeDistance") || {},
-	);
-	const [tipDiameter3D, setTipDiameter3D] = useState<number>(
-		config.get("tipDiameter3D") || 2,
-	);
-	const [xyRetract3D, setXYRetract3D] = useState<number>(
-		config.get("xyRetract3D") || {},
-	);
-	const [touchplate, setTouchplate] = useState<ProbeProfile>(
-		store.get("workspace.probeProfile", {}),
-	);
-	const [useSafeProbeOption, setUseSafeProbeOption] = useState<boolean>(false);
-	const [selectedProbeCommand, setSelectedProbeCommand] = useState<number>(0);
-	const [touchplateTypeSwitcher, setTouchplateTypeSwitcher] = useState<boolean>(
-		config.get("touchplateTypeSwitcher"),
-	);
-	const [connectivityTest, setConnectivityTest] = useState<boolean>(
-		config.get("connectivityTest"),
-	);
-	const [connectionMade, setConnectionMade] = useState<boolean>(false);
-	const [direction, setDirection] = useState<number>(
-		config.get("direction", 0),
-	);
+    const [touchplateType, setTouchplateType] = useState<TOUCHPLATE_TYPES_T>(
+        store.get('workspace.probeProfile.touchplateType'),
+    );
+    const [units, setUnits] = useState<UNITS_EN>(store.get('workspace.units'));
+    const testIntervalRef = useRef<NodeJS.Timeout>(null);
+    const [availableTools, setAvailableTools] = useState<AvailableTool[]>(
+        store.get('workspace.tools', []),
+    );
+    const [currentTool, setCurrentTool] = useState<AvailableTool>(
+        availableTools ? availableTools[0] : defaultTool,
+    );
+    // const [toolChangeActive, setToolChangeActive] = useState<boolean>(false);
+    // const [port, setPort] = useState<string>(controller.port);
+    const [modalIsOpen, setModalIsOpen] = useState(false);
+    // const [probeAxis, setProbeAxis] = useState<AXES_T>(config.get('probeAxis', 'Z'));
+    const [probeCommand, setProbeCommand] = useState<string>(
+        config.get('probeCommand', 'G38.2'),
+    );
+    const [useTLO, setUseTLO] = useState<boolean>(config.get('useTLO'));
+    const [probeDepth, setProbeDepth] = useState<number>(
+        config.get('probeDepth') || {},
+    );
+    const [probeFeedrate, setProbeFeedrate] = useState<number>(
+        config.get('probeFeedrate') || {},
+    );
+    const [probeFastFeedrate, setProbeFastFeedrate] = useState<number>(
+        config.get('probeFastFeedrate') || {},
+    );
+    const [touchPlateHeight, setTouchPlateHeight] = useState<number>(
+        config.get('touchPlateHeight') || {},
+    );
+    const [retractionDistance, setRetractionDistance] = useState<number>(
+        config.get('retractionDistance') || {},
+    );
+    const [zRetractDistance, setZRetractDistance] = useState<number>(
+        config.get('zRetractNormal') || {},
+    );
+    const [zRetractDistanceAuto, setZRetractDistanceAuto] = useState<number>(
+        config.get('zRetractAuto') || {},
+    );
+    const [zProbeDistance, setZProbeDistance] = useState<number>(
+        config.get('zProbeDistance') || {},
+    );
+    const [tipDiameter3D, setTipDiameter3D] = useState<number>(
+        config.get('tipDiameter3D') || 2,
+    );
+    const [xyRetract3D, setXYRetract3D] = useState<number>(
+        config.get('xyRetract3D') || {},
+    );
+    const [probeMovementSpeed, setProbeMovementSpeed] = useState<number>(
+        config.get('probeMovementSpeed') || 0,
+    );
+    const [touchplate, setTouchplate] = useState<ProbeProfile>(
+        store.get('workspace.probeProfile', {}),
+    );
+    const [useSafeProbeOption, setUseSafeProbeOption] =
+        useState<boolean>(false);
+    const [selectedProbeCommand, setSelectedProbeCommand] = useState<number>(0);
+    const [touchplateTypeSwitcher, setTouchplateTypeSwitcher] = useState<boolean>(
+        config.get('touchplateTypeSwitcher')
+    );
+    const [connectivityTest, setConnectivityTest] = useState<boolean>(
+        config.get('connectivityTest'),
+    );
+    const [connectionMade, setConnectionMade] = useState<boolean>(false);
+    const [direction, setDirection] = useState<number>(
+        config.get('direction', 0),
+    );
 
 	const calcProbeType = (): PROBE_TYPES_T => {
 		let probeType: PROBE_TYPES_T;
@@ -446,68 +450,81 @@ const ProbeWidget = () => {
 		};
 	};
 
-	const generateProbeCommands = (): string[] => {
-		const { axes } = determineProbeOptions(
-			availableProbeCommands[selectedProbeCommand],
-		);
-		const probeDistances =
-			units === METRIC_UNITS ? PROBE_DISTANCE_METRIC : PROBE_DISTANCE_IMPERIAL;
-		// Grab units for correct modal
-		let zThickness,
-			xyThickness,
-			feedrate,
-			fastFeedrate,
-			retractDistance,
-			zRetractNormal,
-			tipDiameter,
-			xyRetract;
-		const modal = units === METRIC_UNITS ? "21" : "20";
-		if (units === METRIC_UNITS) {
-			zThickness = touchplate.zThickness;
-			xyThickness = touchplate.xyThickness;
-			feedrate = probeFeedrate;
-			fastFeedrate = probeFastFeedrate;
-			retractDistance = retractionDistance;
-			zRetractNormal = zRetractDistance;
-			tipDiameter = tipDiameter3D;
-			xyRetract = xyRetract3D;
-		} else {
-			zThickness = {
-				autoZero: touchplate.zThickness.autoZero, // don't convert - this is the only user adjusted var in autozero, so everything else is in mm
-				standardBlock: convertToImperial(touchplate.zThickness.standardBlock),
-				zProbe: convertToImperial(touchplate.zThickness.zProbe),
-				probe3D: convertToImperial(touchplate.zThickness.probe3D),
-			};
-			xyThickness = convertToImperial(touchplate.xyThickness);
-			feedrate = convertToImperial(probeFeedrate);
-			fastFeedrate = convertToImperial(probeFastFeedrate);
-			retractDistance = convertToImperial(retractionDistance);
-			zRetractNormal = convertToImperial(zRetractDistance);
-			tipDiameter = convertToImperial(tipDiameter3D);
-			xyRetract = convertToImperial(xyRetract3D);
-		}
+    const generateProbeCommands = (): string[] => {
+        const { axes } = determineProbeOptions(
+            availableProbeCommands[selectedProbeCommand],
+        );
+        let probeDistances =
+            units === METRIC_UNITS
+                ? PROBE_DISTANCE_METRIC
+                : PROBE_DISTANCE_IMPERIAL;
+        // Grab units for correct modal
+        let zThickness,
+            xyThickness,
+            feedrate,
+            fastFeedrate,
+            retractDistance,
+            zRetractNormal,
+            tipDiameter,
+            xyRetract,
+            movementSpeed;
+        const modal = units === METRIC_UNITS ? '21' : '20';
+        if (units === METRIC_UNITS) {
+            zThickness = touchplate.zThickness;
+            xyThickness = touchplate.xyThickness;
+            feedrate = probeFeedrate;
+            fastFeedrate = probeFastFeedrate;
+            retractDistance = retractionDistance;
+            zRetractNormal = zRetractDistance;
+            tipDiameter = tipDiameter3D;
+            xyRetract = xyRetract3D;
+            movementSpeed = probeMovementSpeed;
+        } else {
+            zThickness = {
+                autoZero: touchplate.zThickness.autoZero, // don't convert - this is the only user adjusted var in autozero, so everything else is in mm
+                standardBlock: convertToImperial(
+                    touchplate.zThickness.standardBlock,
+                ),
+                zProbe: convertToImperial(touchplate.zThickness.zProbe),
+                probe3D: convertToImperial(touchplate.zThickness.probe3D),
+            };
+            xyThickness = convertToImperial(touchplate.xyThickness);
+            feedrate = convertToImperial(probeFeedrate);
+            fastFeedrate = convertToImperial(probeFastFeedrate);
+            retractDistance = convertToImperial(retractionDistance);
+            zRetractNormal = convertToImperial(zRetractDistance);
+            tipDiameter = convertToImperial(tipDiameter3D);
+            xyRetract = convertToImperial(xyRetract3D);
+            movementSpeed = probeMovementSpeed
+                ? convertToImperial(probeMovementSpeed)
+                : 0;
+        }
 
-		const options: ProbingOptions = {
-			axes,
-			modal,
-			probeFast: fastFeedrate,
-			probeSlow: feedrate,
-			units,
-			retract: retractDistance,
-			zRetractNormal,
-			zRetractAuto: zRetractDistanceAuto,
-			toolDiameter,
-			zThickness,
-			xyThickness,
-			plateType: touchplate.touchplateType,
-			$13,
-			probeDistances,
-			probeType,
-			homingEnabled: $22 !== "0",
-			tipDiameter3D: tipDiameter,
-			xyRetract3D: xyRetract,
-			firmware: type,
-		};
+        const options: ProbingOptions = {
+            axes,
+            modal,
+            probeFast: fastFeedrate,
+            probeSlow: feedrate,
+            units,
+            retract: retractDistance,
+            zRetractNormal,
+            zRetractAuto: zRetractDistanceAuto,
+            toolDiameter,
+            zThickness,
+            xyThickness,
+            plateType: touchplate.touchplateType,
+            $13,
+            probeDistances,
+            probeType,
+            homingEnabled: $22 !== '0',
+            tipDiameter3D: tipDiameter,
+            xyRetract3D: xyRetract,
+            probeMovementSpeed: movementSpeed,
+            // AutoZero always runs in mm (forced G21), so pass the raw,
+            // unconverted mm/min value regardless of display units
+            probeMovementSpeedAuto: probeMovementSpeed,
+            firmware: type,
+        };
 
 		const code = getProbeCode(options, direction);
 		code.push(distance);
@@ -559,24 +576,27 @@ const ProbeWidget = () => {
 				setToolDiameter(calcToolDiamater(newUnits));
 			}
 
-			setUnits(store.get("workspace.units"));
-			setAvailableTools(store.get("workspace.tools", []));
-			setTouchplateType(store.get("workspace.probeProfile.touchplateType"));
-			setTouchplate(store.get("workspace.probeProfile", {}));
-			setTouchplateTypeSwitcher(config.get("touchplateTypeSwitcher"));
-			setProbeCommand(config.get("probeCommand", "G38.2"));
-			setUseTLO(config.get("useTLO"));
-			setProbeDepth(config.get("probeDepth") || {});
-			setProbeFeedrate(config.get("probeFeedrate") || {});
-			setProbeFastFeedrate(config.get("probeFastFeedrate") || {});
-			setTouchPlateHeight(config.get("touchPlateHeight") || {});
-			setRetractionDistance(config.get("retractionDistance") || {});
-			setZProbeDistance(config.get("zProbeDistance") || {});
-			setTipDiameter3D(config.get("tipDiameter3D", 0));
-			setXYRetract3D(config.get("xyRetract3D", 10));
-			setConnectivityTest(config.get("connectivityTest"));
-			setZRetractDistance(config.get("zRetractNormal"));
-			setZRetractDistanceAuto(config.get("zRetractAuto"));
+            setUnits(store.get('workspace.units'));
+            setAvailableTools(store.get('workspace.tools', []));
+            setTouchplateType(
+                store.get('workspace.probeProfile.touchplateType'),
+            );
+            setTouchplate(store.get('workspace.probeProfile', {}));
+            setTouchplateTypeSwitcher(config.get('touchplateTypeSwitcher'));
+            setProbeCommand(config.get('probeCommand', 'G38.2'));
+            setUseTLO(config.get('useTLO'));
+            setProbeDepth(config.get('probeDepth') || {});
+            setProbeFeedrate(config.get('probeFeedrate') || {});
+            setProbeFastFeedrate(config.get('probeFastFeedrate') || {});
+            setTouchPlateHeight(config.get('touchPlateHeight') || {});
+            setRetractionDistance(config.get('retractionDistance') || {});
+            setZProbeDistance(config.get('zProbeDistance') || {});
+            setTipDiameter3D(config.get('tipDiameter3D', 0));
+            setXYRetract3D(config.get('xyRetract3D', 10));
+            setProbeMovementSpeed(config.get('probeMovementSpeed') || 0);
+            setConnectivityTest(config.get('connectivityTest'));
+            setZRetractDistance(config.get('zRetractNormal'));
+            setZRetractDistanceAuto(config.get('zRetractAuto'));
 
 			const newZProbeDistance = config.get("zProbeDistance");
 			if (newZProbeDistance) {

@@ -3,12 +3,14 @@ import type { ToolChange } from "app/features/ATC/components/ToolTimeline/compon
 import { getToolpathColor } from "app/features/ATC/utils/ATCFunctions.ts";
 import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
 import controller from "app/lib/controller.ts";
+import { G1_PART } from "app/features/Visualizer/constants.ts";
+import { getVisualizerTheme } from "app/lib/getVisualizerTheme.ts";
 import type { RootState } from "app/store/redux";
 import get from "lodash/get";
 import pubsub from "pubsub-js";
 import { useEffect, useState } from "react";
 
-function buildToolArray(toolEvents, fileLength) {
+function buildToolArray(toolEvents, fileLength, cuttingColor: string) {
 	let count = 0;
 	const toolArray: ToolChange[] = [];
 
@@ -19,8 +21,14 @@ function buildToolArray(toolEvents, fileLength) {
 			newTool.startLine = Number(line);
 			newTool.label = `T${value.T}`;
 			if (value.comment) newTool.comment = value.comment;
-			const legendColor = getToolpathColor(count);
-			newTool.color = `#${legendColor.getHexString()}`;
+			// The first tool uses the theme's cutting color (acting as palette index
+			// 0); the array proper starts at index 1 for the second tool onward.
+			if (count === 0) {
+				newTool.color = cuttingColor;
+			} else {
+				const legendColor = getToolpathColor(count);
+				newTool.color = `#${legendColor.getHexString()}`;
+			}
 			newTool.index = count + 1;
 			toolArray.push(newTool);
 
@@ -68,7 +76,8 @@ export function ToolTimelineWrapper() {
 
 	useEffect(() => {
 		pubsub.subscribe("file:toolchanges", (k, { toolEvents, total }) => {
-			const toolArray = buildToolArray(toolEvents, total);
+			const cuttingColor = getVisualizerTheme().get(G1_PART) ?? "#3e85c7";
+			const toolArray = buildToolArray(toolEvents, total, cuttingColor);
 
 			if (toolArray.length === 0) {
 				setShow(false);

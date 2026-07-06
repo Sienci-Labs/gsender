@@ -38,9 +38,10 @@ enum FlashingState {
 }
 
 interface startFlashOptions {
-	port: string;
-	hex: ArrayBuffer;
-	controllerType: string;
+    port: string;
+    hex: ArrayBuffer;
+    controllerType: string;
+    firmwareType?: string;
 }
 
 const SLB_DFU_PORT = {
@@ -49,10 +50,16 @@ const SLB_DFU_PORT = {
 	inuse: false,
 };
 
+// Whether the selected firmware file is a .uf2 image (RP2350 / Pico 2350).
+function isUF2File(file: any): boolean {
+    return !!file?.name && file.name.toLowerCase().endsWith('.uf2');
+}
+
 function startFlash({
-	port,
-	hex = null,
-	controllerType = "",
+    port,
+    hex = null,
+    controllerType = '',
+    firmwareType = 'hex',
 }: startFlashOptions) {
 	if (!port) {
 		toast.error(
@@ -65,7 +72,7 @@ function startFlash({
 	const machineVersion = get(selectedProfile, "version", "MK1");
 	const isHal = controllerType === "grblHAL";
 
-	controller.flashFirmware(port, machineVersion, isHal, hex);
+    controller.flashFirmware(port, machineVersion, isHal, hex, firmwareType);
 }
 
 const CONTROLLER_TYPES = ["grbl", "grblHAL"];
@@ -88,26 +95,32 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
 	function flashPort() {
 		setFlashState(FlashingState.Flashing);
 
-		const isHal = controllerType === "grblHAL";
-		const isDfuPort = port === SLB_DFU_PORT.port;
-		if (isHal && !isDfuPort) {
-			controller.command("gcode", "$DFU");
-			setTimeout(() => {
-				startFlash({
-					port,
-					hex,
-					controllerType,
-				});
-			}, 1500);
-			return;
-		}
+        const isHal = controllerType === 'grblHAL';
+        const isDfuPort = port === SLB_DFU_PORT.port;
+        const isUF2 = isUF2File(file);
+        const firmwareType = isUF2 ? 'uf2' : 'hex';
 
-		startFlash({
-			port,
-			hex,
-			controllerType,
-		});
-	}
+        if (isHal && !isDfuPort) {
+            // UF2 boards (RP2350) enter the bootloader via $UF2; DFU boards use $DFU.
+            controller.command('gcode', isUF2 ? '$UF2' : '$DFU');
+            setTimeout(() => {
+                startFlash({
+                    port,
+                    hex,
+                    controllerType,
+                    firmwareType,
+                });
+            }, 1500);
+            return;
+        }
+
+        startFlash({
+            port,
+            hex,
+            controllerType,
+            firmwareType,
+        });
+    }
 
 	// On show, refresh ports
 	useEffect(() => {
@@ -135,27 +148,33 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
 		};
 	}, []);
 
-	// File Reader on file change
-	useEffect(() => {
-		let fileReader,
-			isCancel = false;
-		if (file) {
-			fileReader = new FileReader();
-			fileReader.onload = (e) => {
-				const { result } = e.target;
-				if (result && !isCancel) {
-					setHex(result);
-				}
-			};
-			fileReader.readAsText(file);
-		}
-		return () => {
-			isCancel = true;
-			if (fileReader && fileReader.readyState === 1) {
-				fileReader.abort();
-			}
-		};
-	}, [file]);
+    // File Reader on file change
+    useEffect(() => {
+        let fileReader,
+            isCancel = false;
+        if (file) {
+            fileReader = new FileReader();
+            fileReader.onload = (e) => {
+                const { result } = e.target;
+                if (result && !isCancel) {
+                    setHex(result);
+                }
+            };
+            // UF2 images are binary and must be read as an ArrayBuffer;
+            // Intel HEX (.hex) is text.
+            if (isUF2File(file)) {
+                fileReader.readAsArrayBuffer(file);
+            } else {
+                fileReader.readAsText(file);
+            }
+        }
+        return () => {
+            isCancel = true;
+            if (fileReader && fileReader.readyState === 1) {
+                fileReader.abort();
+            }
+        };
+    }, [file]);
 
 	function handlePortSelect(value) {
 		setPort(value);
@@ -184,91 +203,91 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
 		setFile(file);
 	}
 
-	return (
-		<Dialog open={show} onOpenChange={toggleShow}>
-			<DialogContent className="bg-gray-100 w-[650px] min-h-[450px] flex flex-col">
-				<DialogHeader>
-					<DialogTitle>Flash Firmware</DialogTitle>
-				</DialogHeader>
-				<div className="flex flex-col gap-4">
-					<p className="text-sm text-gray-700 dark:text-white">
-						This feature exists to flash firmware onto a compatible SLB or
-						Arduino-based device.
-					</p>
-					<div
-						className={cn("flex flex-col gap-4", {
-							hidden: flashState !== FlashingState.Idle,
-						})}
-					>
-						<div className="flex flex-col">
-							<h2 className="text-gray-600 text-sm dark:text-white">Port</h2>
-							<Select onValueChange={handlePortSelect} value={port}>
-								<SelectTrigger className="bg-white bg-opacity-100">
-									<SelectValue placeholder={port} />
-								</SelectTrigger>
-								<SelectContent className="bg-white bg-opacity-100 z-[10000]">
-									{ports.length > 0 && (
-										<SelectGroup>
-											<SelectLabel className="text-gray-500 text-sm">
-												Recognized Ports
-											</SelectLabel>
-											{ports.map((p) => (
-												<SelectItem key={p.port} value={p.port}>
-													{p.port}
-												</SelectItem>
-											))}
-											{unrecognizedPorts.length > 0 && <SelectSeparator />}
-										</SelectGroup>
-									)}
-									{unrecognizedPorts.length > 0 && (
-										<SelectGroup>
-											<SelectLabel className="text-gray-500 text-sm">
-												Unrecognized Ports
-											</SelectLabel>
-											{unrecognizedPorts.map((p) => (
-												<SelectItem key={p.port} value={p.port}>
-													{p.port}
-												</SelectItem>
-											))}
-										</SelectGroup>
-									)}
-								</SelectContent>
-							</Select>
-						</div>
-						<div className="flex flex-col">
-							<h2 className="text-gray-600 text-sm dark:text-white">
-								Controller Type
-							</h2>
-							<Select onValueChange={handleTypeSelect} value={controllerType}>
-								<SelectTrigger className="bg-white bg-opacity-100">
-									<SelectValue placeholder="Select board type" />
-								</SelectTrigger>
-								<SelectContent className="bg-white bg-opacity-100 z-[10000]">
-									{CONTROLLER_TYPES.map((p) => (
-										<SelectItem key={p} value={p}>
-											{p}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-						</div>
-						<div
-							className={cn("flex flex-col", {
-								invisible: controllerType === "grbl",
-							})}
-						>
-							<h2 className="text-gray-600 text-sm dark:text-white">
-								Hex File
-							</h2>
-							<input
-								type="file"
-								id="firmware_image"
-								accept=".hex"
-								ref={fileInputRef}
-								onChange={handleFileUpload}
-							/>
-						</div>
-					</div>
+    return (
+        <Dialog open={show} onOpenChange={toggleShow}>
+            <DialogContent className="bg-gray-100 w-[650px] min-h-[450px] flex flex-col">
+                <DialogHeader>
+                    <DialogTitle>Flash Firmware</DialogTitle>
+                </DialogHeader>
+                <div className="flex flex-col gap-4">
+                    <p className="text-sm text-gray-700 dark:text-white">
+                        This feature exists to flash firmware onto a compatible
+                        SLB or Arduino-based device.
+                    </p>
+                    <div
+                        className={cn('flex flex-col gap-4', {
+                            hidden: flashState !== FlashingState.Idle,
+                        })}
+                    >
+                        <div className="flex flex-col">
+                            <h2 className="text-gray-600 text-sm dark:text-white">Port</h2>
+                            <Select
+                                onValueChange={handlePortSelect}
+                                value={port}
+                            >
+                                <SelectTrigger className="bg-white bg-opacity-100">
+                                    <SelectValue placeholder={port} />
+                                </SelectTrigger>
+                                <SelectContent className="bg-white bg-opacity-100 z-[10000]">
+                                {ports.length > 0 && (
+                                        <SelectGroup>
+                                            <SelectLabel className="text-gray-500 text-sm">Recognized Ports</SelectLabel>
+                                            {ports.map((p) => (
+                                                <SelectItem key={p.port} value={p.port}>
+                                                    {p.port}
+                                                </SelectItem>
+                                            ))}
+                                            {unrecognizedPorts.length > 0 && <SelectSeparator />}
+                                        </SelectGroup>
+                                    )}
+                                    {unrecognizedPorts.length > 0 && (
+                                        <SelectGroup>
+                                            <SelectLabel className="text-gray-500 text-sm">Unrecognized Ports</SelectLabel>
+                                            {unrecognizedPorts.map((p) => (
+                                                <SelectItem key={p.port} value={p.port}>
+                                                    {p.port}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectGroup>
+                                    )}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="flex flex-col">
+                            <h2 className="text-gray-600 text-sm dark:text-white">
+                                Controller Type
+                            </h2>
+                            <Select
+                                onValueChange={handleTypeSelect}
+                                value={controllerType}
+                            >
+                                <SelectTrigger className="bg-white bg-opacity-100">
+                                    <SelectValue placeholder="Select board type" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-white bg-opacity-100 z-[10000]">
+                                    {CONTROLLER_TYPES.map((p) => (
+                                        <SelectItem key={p} value={p}>
+                                            {p}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div
+                            className={cn('flex flex-col', {
+                                invisible: controllerType === 'grbl',
+                            })}
+                        >
+                            <h2 className="text-gray-600 text-sm dark:text-white">Firmware File</h2>
+                            <input
+                                type="file"
+                                id="firmware_image"
+                                accept=".hex,.uf2"
+                                ref={fileInputRef}
+                                onChange={handleFileUpload}
+                            />
+                        </div>
+                    </div>
 
 					<div
 						className={cn(

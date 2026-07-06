@@ -21,6 +21,9 @@
  *
  */
 
+import { Tooltip } from "app/components/Tooltip";
+import { Widget } from "app/components/Widget";
+import { WorkspaceSelector } from "app/features/WorkspaceSelector/index.tsx";
 import combokeys from "app/lib/combokeys";
 import controller from "app/lib/controller";
 import type { CommandKeys } from "app/lib/definitions/shortcuts";
@@ -40,13 +43,16 @@ import {
 	updateFileInfo,
 	updateFileProcessing,
 } from "app/store/redux/slices/fileInfo.slice";
+import cx from "classnames";
 import _ from "lodash";
 import debounce from "lodash/debounce";
 import get from "lodash/get";
 import includes from "lodash/includes";
+import { FrownIcon } from "lucide-react";
 import PropTypes from "prop-types";
 import pubsub from "pubsub-js";
 import { Component } from "react";
+import { FaFeatherAlt } from "react-icons/fa";
 import { connect } from "react-redux";
 import {
 	GENERAL_CATEGORY,
@@ -67,6 +73,7 @@ import {
 	RENDER_RENDERING,
 	// Smoothie
 	SMOOTHIE,
+	SURFACING_VISUALIZER_CONTAINER_ID,
 	// TinyG
 	TINYG,
 	VISUALIZER_CATEGORY,
@@ -81,8 +88,12 @@ import useKeybinding from "../../lib/useKeybinding";
 import WidgetConfig from "../WidgetConfig/WidgetConfig";
 import { CAMERA_MODE_PAN, CAMERA_MODE_ROTATE } from "./constants";
 import type { Actions, State } from "./definitions";
-import PrimaryVisualizer from "./PrimaryVisualizer";
-import SecondaryVisualizer from "./SecondaryVisualizer";
+import GcodeEditorOverlay from "./GcodeEditorOverlay";
+import GcodeViewer from "./GcodeViewer";
+import Loading from "./Loading";
+import { VisualizerPlaceholder } from "./Placeholder";
+import Rendering from "./Rendering";
+import SoftLimitsWarningArea from "./SoftLimitsWarningArea";
 
 interface Views {
 	type: "isometric" | "top" | "front" | "right" | "left" | "default";
@@ -91,6 +102,14 @@ interface Views {
 const debouncedThemeChange = debounce(() => {
 	pubsub.publish("visualizer:redraw");
 }, 500);
+
+const VIEWCUBE_OFFSET_PX = 60;
+const VIEWCUBE_SIZE_PX = 84;
+const VIEWCUBE_CONTROL_GAP_PX = 12;
+const LIGHTWEIGHT_TOGGLE_POSITION = {
+	left: VIEWCUBE_OFFSET_PX + VIEWCUBE_SIZE_PX / 2,
+	bottom: VIEWCUBE_OFFSET_PX + VIEWCUBE_SIZE_PX + VIEWCUBE_CONTROL_GAP_PX,
+};
 
 class Visualizer extends Component {
 	static propTypes = {
@@ -1440,7 +1459,7 @@ class Visualizer extends Component {
 					units: store.get("workspace.units", METRIC_UNITS),
 					objects: {
 						limits: {
-							visible: this.config.get("objects.limits.visible", true),
+							visible: this.config.get("objects.limits.visible", false),
 						},
 						coordinateSystem: {
 							visible: this.config.get(
@@ -1490,7 +1509,6 @@ class Visualizer extends Component {
 		const {
 			renderState,
 			isSecondary,
-			gcode,
 			activeVisualizer,
 			activeState,
 			alarmCode,
@@ -1529,34 +1547,116 @@ class Visualizer extends Component {
 			capable.view3D &&
 			((isSecondary && activeVisualizer === VISUALIZER_SECONDARY) ||
 				(!isSecondary && activeVisualizer === VISUALIZER_PRIMARY));
+		const liteModeActionLabel = state.liteMode
+			? "Disable lightweight mode"
+			: "Enable lightweight mode";
 
-		const MainComponent = isSecondary ? (
-			<SecondaryVisualizer
-				state={state}
-				actions={actions}
-				showLoading={showLoading}
-				showRendering={showRendering}
-				showVisualizer={showVisualizer}
-				visualizerRef={(ref) => {
-					this.visualizer = ref?.visualizer;
-				}}
-				cameraPosition="3D"
-			/>
-		) : (
-			<PrimaryVisualizer
-				state={state}
-				actions={actions}
-				showLoading={showLoading}
-				showRendering={showRendering}
-				showVisualizer={showVisualizer}
-				visualizerRef={(ref) => {
-					this.visualizer = ref?.visualizer;
-				}}
-				timeline={this.props.timeline}
-			/>
+		const setVisualizerRef = (ref) => {
+			this.visualizer = ref;
+		};
+
+		const webGLAvailable = WebGL.isWebGLAvailable();
+
+		if (isSecondary) {
+			return (
+				<>
+					<div
+						className={cx(
+							"z-10 absolute w-[40vw] h-[25vh] top-1/2 right-1/4 translate-x-1/4 -translate-y-1/2",
+							{ hidden: !showLoading && !showRendering },
+						)}
+					>
+						{showLoading && <Loading />}
+						{showRendering && <Rendering />}
+					</div>
+
+					{webGLAvailable && (
+						<GcodeViewer
+							show={showVisualizer}
+							cameraPosition={state.cameraPosition}
+							ref={setVisualizerRef}
+							state={state}
+							actions={actions}
+							containerID={SURFACING_VISUALIZER_CONTAINER_ID}
+							isSecondary={true}
+						/>
+					)}
+				</>
+			);
+		}
+
+		const containerID = "visualizer_container";
+
+		return (
+			<Widget className="w-full p-1 max-xl:p-0.5">
+				<Widget.Content
+					id={containerID}
+					className="w-full bg-no-repeat bg-center"
+				>
+					{showLoading && (
+						<div className=" z-10 relative  w-[40vw] h-[25vh] top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+							<Loading />
+						</div>
+					)}
+
+					{showRendering && <Rendering />}
+
+					<div className="h-full w-full absolute top-0 left-0">
+						<SoftLimitsWarningArea />
+						{webGLAvailable ? (
+							<GcodeViewer
+								show={showVisualizer}
+								cameraPosition={state.cameraPosition}
+								ref={setVisualizerRef}
+								state={state}
+								actions={actions}
+								containerID={containerID}
+								isSecondary={false}
+							/>
+						) : (
+							<div>
+								<FrownIcon size={4} />
+								<span style={{ fontSize: "16px" }}>
+									{"It looks like your device doesn't support WebGL"}
+								</span>
+							</div>
+						)}
+
+						{!showVisualizer && webGLAvailable && <VisualizerPlaceholder />}
+
+						<Tooltip content={liteModeActionLabel} side="top">
+							<button
+								type="button"
+								style={LIGHTWEIGHT_TOGGLE_POSITION}
+								className={cx(
+									"absolute z-[10000] inline-flex h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full border bg-dark-darker/70 shadow-[0_10px_30px_rgba(0,_0,_0,_0.25)] transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-dark-darker active:scale-[0.98] active:bg-dark-darker/85 mb-5",
+									{
+										"border-[rgba(14,_246,_174,_0.95)] text-[rgba(14,_246,_174,_0.95)] shadow-[0_0_0_1px_rgba(14,_246,_174,_0.35),0_10px_30px_rgba(0,_0,_0,_0.35)] hover:border-[rgba(14,_246,_174,_0.95)] hover:text-[rgba(14,_246,_174,_0.95)] hover:shadow-[0_0_0_1px_rgba(14,_246,_174,_0.45),0_12px_32px_rgba(0,_0,_0,_0.4)]":
+											state.liteMode,
+										"border-gray-400/40 text-gray-300 hover:border-gray-200/70 hover:text-gray-100 hover:shadow-[0_12px_32px_rgba(0,_0,_0,_0.35)]":
+											!state.liteMode,
+									},
+								)}
+								aria-label={liteModeActionLabel}
+								aria-pressed={state.liteMode}
+								onClick={() => actions.handleLiteModeToggle()}
+							>
+								<FaFeatherAlt
+									aria-hidden="true"
+									className="pointer-events-none h-5 w-5 shrink-0"
+								/>
+							</button>
+						</Tooltip>
+
+						<WorkspaceSelector />
+
+						{this.props.timeline}
+
+						<GcodeEditorOverlay />
+					</div>
+				</Widget.Content>
+			</Widget>
 		);
-
-		return MainComponent;
 	}
 }
 

@@ -25,18 +25,19 @@ import { GRBL_ACTIVE_STATE_HOLD } from "app/constants";
 import controller from "app/lib/controller";
 import get from "lodash/get";
 import noop from "lodash/noop";
-import React, { useState } from "react";
+import { useState } from "react";
 import { connect } from "react-redux";
-import styles from "./UnlockButton.styl";
+import styles from "./UnlockButton.module.styl";
 
-const UnlockButton = ({ activeState, alarmCode }) => {
+interface Props {
+	activeState?: string;
+	alarmCode?: number;
+}
+
+const UnlockButton = ({ activeState }: Props) => {
 	const [isHovering, setIsHovering] = useState(false);
-	const onMouseOver = () => {
-		setIsHovering(true);
-	};
-	const onMouseOut = () => {
-		setIsHovering(false);
-	};
+	const onMouseOver = () => setIsHovering(true);
+	const onMouseOut = () => setIsHovering(false);
 
 	const getButtonText = () => {
 		if (activeState === GRBL_ACTIVE_STATE_HOLD) {
