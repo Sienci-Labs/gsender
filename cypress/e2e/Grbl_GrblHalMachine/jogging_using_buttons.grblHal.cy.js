@@ -22,7 +22,9 @@ describe('Gsender testing jogging using buttons', () => {
     cy.log('Checking Machine is in idle');
     cy.verifyMachineStatus('Idle');
 
-    // Step 3: Zero all axes (0, 0, 0)
+
+    // Step 3: Home the machine and make all axes 0 
+    cy.ensureHomingEnabledAndHome();
     cy.log('Step 3: Zero All axes');
     cy.zeroAllAxes();
     
@@ -75,24 +77,33 @@ describe('Gsender testing jogging using buttons', () => {
     cy.wait(3000);
     cy.log(' X- jog button clicked');
 
-    // Step 9: Test Z+ jogging
-    cy.log('Step 9: Testing Z+ jogging...');
+    // Step 9: Test Z-jogging
+    cy.log('Step 9: Testing Z- jogging...');
+        cy.get('path[d="M0.5 98.5H49.5V177C49.5 182.247 45.2467 186.5 40 186.5H10C4.75329 186.5 0.5 182.247 0.5 177V98.5Z"]')
+      .should('exist')
+      .click({ force: true });
+    cy.wait(3000);
+    cy.log(' Z- jog button clicked');
+    
+
+    // Step 10: Test Z+ jogging
+    cy.log('Step 10: Testing Z+ jogging...');
     cy.get('path[d="M0.5 10C0.5 4.75329 4.75329 0.5 10 0.5H40C45.2467 0.5 49.5 4.7533 49.5 10V88.5H0.5V10Z"]')
       .should('exist')
       .click({ force: true });
     cy.wait(3000);
     cy.log(' Z+ jog button clicked');
 
-    // Step 10: Test Z- jogging
-    cy.log('Step 10: Testing Z- jogging...');
-    cy.get('path[d="M0.5 98.5H49.5V177C49.5 182.247 45.2467 186.5 40 186.5H10C4.75329 186.5 0.5 182.247 0.5 177V98.5Z"]')
+
+    // Step 11: Test X+Y- jogging
+    cy.log('Step 11: Testing X+Y- jogging...');
+      cy.get('path#xPlusYMinus')
       .should('exist')
       .click({ force: true });
     cy.wait(3000);
-    cy.log(' Z- jog button clicked');
+    cy.log(' X+Y- jog button clicked');
 
-    // Step 11: Test X+Y+ jogging
-    cy.log('Step 11: Testing X+Y+ jogging...');
+    // Test X+Y+ jogging
     cy.get('path#xPlusYPlus')
       .should('exist')
       .click({ force: true });
@@ -101,19 +112,12 @@ describe('Gsender testing jogging using buttons', () => {
 
     // Step 12: Test X+Y- jogging
     cy.log('Step 12: Testing X+Y- jogging...');
-    cy.get('path#xPlusYMinus')
-      .should('exist')
-      .click({ force: true });
-    cy.wait(3000);
-    cy.log(' X+Y- jog button clicked');
-
-    // Step 13: Test X-Y- jogging
-    cy.log('Step 13: Testing X-Y- jogging...');
-    cy.get('path#xMinusYMinus')
+      cy.get('path#xMinusYMinus')
       .should('exist')
       .click({ force: true });
     cy.wait(3000);
     cy.log(' X-Y- jog button clicked');
+
 
     // Step 14: Test X-Y+ jogging
     cy.log('Step 14: Testing X-Y+ jogging...');

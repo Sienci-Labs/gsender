@@ -22,24 +22,20 @@ describe('gSender Accessory Installation Testing - ATC and Spindle', () => {
         cy.ensureHomingEnabledAndHome();
         cy.closeAccPopupIfVisible();
 
-        // Navigate to Tools
         cy.goToTools();
         cy.log('Disconnecting machine before accessory install...');
         cy.disconnectIfIdle();
 
-        // Navigate to Accessory Installation
         cy.log('Choose accessory installation');
         cy.contains("Install various").click();
         cy.wait(1000);
         cy.log('Accessory Installation page opened');
 
-        // Click Sienci ATC
         cy.log('Click on Sienci ATC');
         cy.contains("Sienci ATC").click();
         cy.wait(1000);
         cy.log('Sienci ATC Set up Wizard page opened');
 
-        // Check for connection error and connect if needed
         cy.get("body").then(($body) => {
             const hasAlertDialog = $body.find('[role="alertdialog"]').length > 0;
             const hasDialog = $body.find('[role="dialog"]').length > 0;
@@ -68,25 +64,21 @@ describe('gSender Accessory Installation Testing - ATC and Spindle', () => {
             }
         });
 
-        // Open Setup Wizard
         cy.log('Opening Set Up Wizard');
         cy.contains("button", "Setup Wizard").click();
         cy.wait(1000);
         cy.log('Set up Wizard opened');
 
-        // Select No Tool Rack
         cy.log('Selecting No Tool Rack from dropdown');
         cy.get("Select").select("0");
         cy.wait(500);
         cy.log('No Tool Rack selected');
 
-        // Upload Macros
         cy.log('Click on Upload Macros');
         cy.contains("button", "Upload Macros").click();
         cy.wait(12000);
         cy.log('Macros Uploaded');
 
-        // Verify upload success
         cy.log('Verifying upload process is successful');
         cy.contains("Success", { timeout: 10000 }).should("be.visible");
         cy.contains("Successfully uploaded macro configuration to the SD card.", { timeout: 10000 })
@@ -94,38 +86,29 @@ describe('gSender Accessory Installation Testing - ATC and Spindle', () => {
             .then(() => {
                 cy.log("Upload success confirmed");
 
-                // Step 10: Next
                 cy.log("Clicking Next...");
                 cy.contains("button", "Next").should("be.visible").click();
                 cy.wait(1000);
 
-                // Controller Set Up
                 cy.log('Controller Set Up - Apply settings');
                 cy.contains("button", "Apply").should("be.visible").click();
-                cy.log("Closing confirmation popup...");
-                cy.get('[role="alertdialog"]').contains("button", "OK").click();
-                cy.wait(500);
-                cy.log("Popup closed");
+                cy.wait(6000);
 
-                // Next
                 cy.contains("button", "Next").should("be.visible").click();
                 cy.wait(500);
 
-                // Re-home
                 cy.log('Selecting Re-homing to continue');
                 cy.contains("button", "Re-home").should("be.visible").click();
                 cy.wait(2000);
                 cy.verifyMachineStatus("Idle", { timeout: 30000 });
                 cy.log('Re-Home Completed');
 
-                // Next
                 cy.contains("button", "Next")
                     .should("be.visible")
                     .should("not.be.disabled")
                     .click();
                 cy.wait(1000);
 
-                // Wizard Step 4: Set Position
                 cy.log("--- Wizard Step 4: Set Position ---");
                 cy.get("div.w-3\\/5 div:nth-of-type(1) > input")
                     .first()
@@ -144,16 +127,13 @@ describe('gSender Accessory Installation Testing - ATC and Spindle', () => {
                 cy.contains("button", "Next").click();
                 cy.wait(1000);
 
-                // Wizard Step 5: Apply and Restart
                 cy.log("--- Wizard Step 5: Apply and Restart ---");
                 cy.contains("button", "Apply and Restart").click();
                 cy.wait(2000);
 
-                // Next
                 cy.contains("button", "Next").click();
                 cy.wait(1000);
 
-                // Reconnect Step 22
                 cy.log("Reconnect to machine");
                 cy.contains('span', 'Connect to CNC', { timeout: 15000 })
                     .should('exist')
@@ -189,14 +169,12 @@ describe('gSender Accessory Installation Testing - ATC and Spindle', () => {
                     });
             });
 
-        // Wizard Step 7: Final Apply and Restart
         cy.log("--- Wizard Step 7: Final Apply and Restart ---");
         cy.contains("button", "Apply and Restart").click();
         cy.wait(2000);
         cy.log("Final Apply and Restart clicked");
         cy.wait(3000);
 
-        // Exit Wizard
         cy.log('Exiting ATC wizard...');
         cy.window().then((win) => {
             win.document.body.removeAttribute('data-scroll-locked');
@@ -207,7 +185,6 @@ describe('gSender Accessory Installation Testing - ATC and Spindle', () => {
         cy.wait(1000);
         cy.log('ATC Wizard exited');
 
-        // Reconnect and home after ATC
         cy.log("Reconnecting after ATC wizard...");
         cy.connectMachineNUL();
         cy.log("Handling homing prompt...");
@@ -215,12 +192,83 @@ describe('gSender Accessory Installation Testing - ATC and Spindle', () => {
         cy.verifyMachineStatus("Idle", { timeout: 30000 });
         cy.log("Machine Idle — ATC installation complete");
 
+        cy.contains('button', 'ATC Options', { timeout: 10000 }).click();
+        cy.wait(1000);
+
+        cy.contains('button', 'Go to ATC Setup', { timeout: 10000 }).click();
+        cy.wait(3000);
+
+        cy.contains('button', 'Exit', { timeout: 10000 }).click();
+        cy.wait(1000);
+
+        cy.contains('button', 'ATC Options', { timeout: 10000 }).click();
+        cy.wait(1000);
+
+        cy.get('div.p-4 > div > div.items-start > div > div.flex > div:nth-of-type(1) input')
+            .clear()
+            .type('5');
+
+        cy.get('[aria-label="Jog X plus"]:visible:not([disabled])').first().click();
+        cy.wait(500);
+        cy.get('[aria-label="Jog Y minus"]:visible:not([disabled])').first().click();
+        cy.wait(500);
+
+        cy.get('div.w-3\\/5 > div > div > div.grid > div:nth-of-type(2) button').click();
+        cy.wait(500);
+
+        cy.get('div.w-3\\/5 > div > div > div.rounded-lg div.flex-wrap > div.items-start > div > div.flex > div:nth-of-type(1) input')
+            .click();
+        cy.wait(500);
+
+        cy.get('[aria-label="Jog X plus"]:visible:not([disabled])').first().click();
+        cy.wait(1000);
+        cy.get('[aria-label="Jog Y minus"]:visible:not([disabled])').first().click();
+        cy.wait(500);
+
+        cy.get('div.p-4 > div > div:nth-of-type(1) > div:nth-of-type(2) button').click();
+        cy.wait(500);
+
+        cy.get('div.space-y-3 > div:nth-of-type(1) button').click();
+        cy.wait(500);
+
+        cy.get('div.space-y-3 > div:nth-of-type(2) button').click();
+        cy.wait(500);
+
+        cy.get('div:nth-of-type(3) > div.rounded-md').click();
+        cy.wait(500);
+
+        cy.get('div.p-4 > div > div:nth-of-type(1) > div:nth-of-type(3) button').click();
+        cy.wait(500);
+
+        cy.get('div.p-4 > div > div:nth-of-type(2) input')
+            .clear()
+            .type('91');
+
+        cy.contains('button', 'Apply', { timeout: 10000 }).click();
+        cy.wait(5000);
+
+        cy.contains('span', 'Configuration applied', { timeout: 10000 })
+            .should('be.visible');
+
+        cy.get('[aria-label="Exit"]', { timeout: 10000 }).click();
+        cy.wait(1000);
+
+        cy.contains('button', 'Template Management', { timeout: 10000 }).click();
+        cy.wait(1000);
+
+        cy.contains('P300.macro', { timeout: 10000 }).click();
+        cy.wait(500);
+        cy.contains('In sync', { timeout: 10000 }).should('be.visible');
+
+        cy.contains('P301.macro', { timeout: 10000 }).click();
+        cy.wait(500);
+        cy.contains('In sync', { timeout: 10000 }).should('be.visible');
+
         // ============================================================
         // PART 2: Sienci Spindle Accessory Installation
         // ============================================================
         cy.log('=== PART 2: Sienci Spindle Accessory Installation ===');
 
-        // Navigate back to Accessory Installation
         cy.goToCarve();
         cy.wait(1000);
         cy.goToTools();
@@ -229,29 +277,27 @@ describe('gSender Accessory Installation Testing - ATC and Spindle', () => {
         cy.disconnectIfIdle();
 
         cy.log('Opening Accessory Installation page...');
-        // Close Radix alert popup if visible
-cy.wait(1000);
-cy.get("body").then(($body) => {
-    const hasPopup = $body.find('#radix-\\:rd\\:').length > 0 ||
-                     $body.find('[role="alertdialog"]').length > 0 ||
-                     $body.find('[role="dialog"]').length > 0;
+        cy.wait(1000);
+        cy.get("body").then(($body) => {
+            const hasPopup = $body.find('#radix-\\:rd\\:').length > 0 ||
+                             $body.find('[role="alertdialog"]').length > 0 ||
+                             $body.find('[role="dialog"]').length > 0;
 
-    if (hasPopup) {
-        cy.log("Popup detected — closing...");
-        cy.get('#radix-\\:rd\\: button, [role="alertdialog"] button, [role="dialog"] button')
-            .first()
-            .click({ force: true });
-        cy.wait(500);
-        cy.log("✓ Popup closed");
-    } else {
-        cy.log("No popup present — continuing...");
-    }
-});
+            if (hasPopup) {
+                cy.log("Popup detected — closing...");
+                cy.get('#radix-\\:rd\\: button, [role="alertdialog"] button, [role="dialog"] button')
+                    .first()
+                    .click({ force: true });
+                cy.wait(500);
+                cy.log("✓ Popup closed");
+            } else {
+                cy.log("No popup present — continuing...");
+            }
+        });
         cy.contains("Install various").click();
         cy.wait(1000);
         cy.log('Accessory Installation page opened');
 
-        // Click Sienci Spindle card
         cy.log('Selecting Sienci Spindle...');
         cy.get("button:nth-of-type(2) div:nth-of-type(3)")
             .should("be.visible")
@@ -259,17 +305,14 @@ cy.get("body").then(($body) => {
         cy.wait(1000);
         cy.log('Sienci Spindle page opened');
 
-        // Connect machine
         cy.log("Connecting to machine for Spindle wizard...");
         cy.connectMachine();
 
-        // Click Setup Spindle
         cy.log('Clicking Setup Spindle...');
         cy.contains("button", "Setup Spindle").should("be.visible").click();
         cy.wait(1000);
         cy.log('Setup Spindle wizard opened');
 
-        // Wizard Step 1: Next
         cy.log('--- Spindle Wizard Step 1: Next ---');
         cy.contains("button", "Next")
             .should("be.visible")
@@ -277,7 +320,6 @@ cy.get("body").then(($body) => {
             .click();
         cy.wait(1000);
 
-        // Wizard Step 2: Reconnect
         cy.log('--- Spindle Wizard Step 2: Reconnect ---');
         cy.contains('span', 'Connect to CNC', { timeout: 15000 })
             .should('exist')
@@ -313,19 +355,16 @@ cy.get("body").then(($body) => {
             });
         cy.wait(2000);
 
-        // Homing prompt after reconnect
         cy.log('Handling Click to Run Homing prompt...');
         cy.clickToRunHomingIfNeeded();
         cy.verifyMachineStatus("Idle", { timeout: 30000 });
         cy.log('Machine is Idle after homing');
 
-        // Wizard Step 3: Configure Modbus
         cy.log('--- Spindle Wizard Step 3: Configure Modbus ---');
         cy.contains("button", "Configure Modbus").should("be.visible").click();
         cy.wait(500);
         cy.closeAccPopupIfVisible();
 
-        // Exit Spindle Wizard
         cy.log('Exiting Spindle wizard...');
         cy.window().then((win) => {
             win.document.body.removeAttribute('data-scroll-locked');
@@ -336,7 +375,6 @@ cy.get("body").then(($body) => {
         cy.wait(1000);
         cy.log('Spindle Wizard exited');
 
-        // Reconnect after Exit Wizard
         cy.log('Reconnecting after Spindle Exit Wizard...');
         cy.contains('span', 'Connect to CNC', { timeout: 15000 })
             .should('exist')
@@ -372,7 +410,6 @@ cy.get("body").then(($body) => {
             });
         cy.wait(2000);
 
-        // Final homing prompt
         cy.log('Handling Click to Run Homing prompt after Exit Wizard...');
         cy.clickToRunHomingIfNeeded();
         cy.verifyMachineStatus("Idle", { timeout: 30000 });

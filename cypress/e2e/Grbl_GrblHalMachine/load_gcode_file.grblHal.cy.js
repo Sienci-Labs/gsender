@@ -1,7 +1,7 @@
 describe("Load file testing in grblHal", () => {
 	beforeEach(() => {
 		cy.viewport(1689, 810);
-		cy.visit("http://localhost:8000/#/");
+		cy.visit("/");
 		cy.wait(2000);
 	});
 	it("Complete workflow: Connect-> Upload-> Disconnect->Upload-> Connect->Disconnect", () => {

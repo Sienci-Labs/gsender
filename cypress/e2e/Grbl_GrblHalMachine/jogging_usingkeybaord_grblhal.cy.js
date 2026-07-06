@@ -153,8 +153,10 @@ describe('Dynamic Keyboard Jogging Test - All Axes', () => {
     cy.log('Checking Machine is in idle');
     cy.verifyMachineStatus('Idle');
 
-    cy.log('STEP 2: Zero All Axes');
+    cy.log('STEP 2: Home the machine and zero all axes');
+    cy.ensureHomingEnabledAndHome();
     cy.zeroAllAxes();
+    cy.wait(3000);
     cy.verifyAxes(0, 0, 0);
 
     cy.log('STEP 3: Test X+ and X- Jogging');
@@ -199,20 +201,22 @@ describe('Dynamic Keyboard Jogging Test - All Axes', () => {
             testJogDirection('X- (left)', /X-.*(left|←)/i, 1, -1, xyMove, zMove);
 
             goToKeyboardShortcuts();
-            cy.log('STEP 8: Test Y+ (Up)');
-            testJogDirection('Y+ (up)', /Y\+.*(up|↑)/i, 2, +1, xyMove, zMove);
-
-            goToKeyboardShortcuts();
-            cy.log('STEP 9: Test Y- (Down)');
+            cy.log('STEP 8: Test Y+ (Down)');
             testJogDirection('Y- (down)', /Y-.*(down|↓)/i, 2, -1, xyMove, zMove);
 
             goToKeyboardShortcuts();
-            cy.log('STEP 10: Test Z+ (Up)');
+            cy.log('STEP 9: Test Y+ (Up)');
+            testJogDirection('Y+ (up)', /Y\+.*(up|↑)/i, 2, +1, xyMove, zMove);
+
+            goToKeyboardShortcuts();
+            cy.log('STEP 10: Test Z- (Down)');
+            testJogDirection('Z- (down)', /Z-.*(down|↓)/i, 3, -1, xyMove, zMove);
+
+            goToKeyboardShortcuts();
+            cy.log('STEP 11: Test Z+ (Up)');
             testJogDirection('Z+ (up)', /Z\+.*(up|↑)/i, 3, +1, xyMove, zMove);
 
             goToKeyboardShortcuts();
-            cy.log('STEP 11: Test Z- (Down)');
-            testJogDirection('Z- (down)', /Z-.*(down|↓)/i, 3, -1, xyMove, zMove);
 
             cy.log('ALL TESTS COMPLETED');
           });

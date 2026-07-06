@@ -1,10 +1,13 @@
-// master_spec.cy.js
+// Machine 
 describe('Master Test Suite - All Tests', () => {
-  //Import and run each test context\
 
 import('./loadUI_grblHal.cy');
   
  import('./device_connection_grblhal.cy.js');
+
+ import('.unlock_machine.spec.grblhal.cy.js');
+
+ import('.disconnect.cy.js')
 
   import('./load_gcode_file.grblHal.cy.js');    
 

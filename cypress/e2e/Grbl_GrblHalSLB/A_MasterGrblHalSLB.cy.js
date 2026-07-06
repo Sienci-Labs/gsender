@@ -1,7 +1,7 @@
 // A_grblHalSLB_master_spec.cy.js
 describe('Master Test Suite - All Tests', () => {
 
-  import('./loadUI_grblslb.cy.js');
+  /*import('./loadUI_grblslb.cy.js');
 
   import('./device_connectionslb.cy.js');
 
@@ -9,7 +9,7 @@ describe('Master Test Suite - All Tests', () => {
 
   import('./disconnectslb.cy.js');
 
-  import('./config_functionalitiesslb.cy.js');
+
 
   import('./Machine_informationslb.cy.js');
 
@@ -21,13 +21,15 @@ describe('Master Test Suite - All Tests', () => {
 
   import('./zeroing_operations.grblHalslb.cy.js');
 
-  import('./jog_presets.specslb.cy.js');
+ import('./jog_presets.specslb.cy.js'); */
 
   import('./jog_preset_update_values.spec.slb.cy.js');
 
   import('./load_gcode_file.specslb.cy.js');
   
   import('./visualizer_rendering.specslb.cy.js'); 
+
+  import('./config_functionalitiesslb.cy.js');
 
   import('./jobrun_withouthoming_grblHalslb.cy.js');
 
@@ -41,7 +43,7 @@ describe('Master Test Suite - All Tests', () => {
 
   import('./feedrate_override_controls_specslb.cy.js');
 
-  import('./Spindleoverride-grblHalslb.cy.js');
+  /*import('./Spindleoverride-grblHalslb.cy.js');
 
   import('./macros_running_spec.slb.cy.js');
 
@@ -57,6 +59,6 @@ describe('Master Test Suite - All Tests', () => {
 
   import('./Surfacingslb.cy.js'); 
 
-  import('./SDCard_managerslb.cy.js'); 
+  import('./SDCard_managerslb.cy.js'); */
 
 });

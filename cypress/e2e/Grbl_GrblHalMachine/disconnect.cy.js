@@ -1,4 +1,4 @@
-describe("Connect and Disconnect from CNC SLB", () => {
+describe("Connect and Disconnect from CNC Machine", () => {
   beforeEach(() => {
     cy.viewport(1920, 1080);
     cy.loadUI(`${Cypress.config("baseUrl")}/#/`, {

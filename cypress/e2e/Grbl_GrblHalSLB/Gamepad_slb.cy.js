@@ -225,21 +225,12 @@ describe('Gamepad - Full Workflow', () => {
     cy.log(' All assignments still present');
 
     // ── Step 16: Import and Export gamepad profile
-    // ─────────────────────────────────────────────
-    // Step 15 ends inside the profile detail view — Import/Export
-    // live in the detail header, so we are already in the right place.
-    // Import is done FIRST so no export toast can overlap the header.
+
     cy.log('Step 16: Testing Import and Export of gamepad profile...');
     cy.contains('button', /back to profiles/i).should('be.visible');
     cy.log(' In profile detail view');
 
-    // ── Step 16a: Import the profile from the fixtures folder
-    // handleImportProfile() creates a DETACHED file input via
-    // document.createElement and calls .click() on it — it is never
-    // appended to the DOM, so cy.get('input[type="file"]') can never
-    // reach it. Instead we shadow HTMLInputElement.prototype.click to
-    // capture the input (and suppress the OS file dialog), then set
-    // .files ourselves and fire the handler's onchange.
+
     cy.log('Step 16a: Importing gamepad profile from fixture...');
     cy.window().then((win) => {
       win.__gamepadImportInput = null;
@@ -248,8 +239,7 @@ describe('Gamepad - Full Workflow', () => {
       };
     });
 
-    // Click Import — scoped to the detail header (the row that also
-    // contains "Back to Profiles") so no other Import button can match
+
     cy.contains('button', /back to profiles/i)
       .closest('div.flex.items-center.justify-between')
       .within(() => {
@@ -258,9 +248,7 @@ describe('Gamepad - Full Workflow', () => {
           .click({ force: true });
       });
 
-    // Wait (with retry) until the detached input has been captured.
-    // NOTE: the input is detached, so chai-jquery's `.exist` (which
-    // checks document presence) would wrongly fail — assert truthiness.
+ 
     cy.window({ timeout: 5000 }).should((win) => {
       expect(Boolean(win.__gamepadImportInput), 'gamepad import input captured').to.be.true;
     });
@@ -338,7 +326,7 @@ describe('Gamepad - Full Workflow', () => {
     cy.log(' Profile confirmed in list after import/export');
 
     // ── Step 17: Delete mock profile
-    /*cy.log('Step 17: Deleting mock gamepad profile...');
+    cy.log('Step 17: Deleting mock gamepad profile...');
     cy.get(`[aria-label="Delete gamepad profile ${MOCK_GAMEPAD_ID}"]`)
       .should('be.visible')
       .click({ force: true });
@@ -349,6 +337,6 @@ describe('Gamepad - Full Workflow', () => {
       .should('not.exist');
     cy.log(' Mock profile deleted successfully');
 
-    cy.log(' Full gamepad workflow test PASSED'); */
+    cy.log(' Full gamepad workflow test PASSED'); 
   });
 });

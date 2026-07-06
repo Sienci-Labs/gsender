@@ -548,7 +548,7 @@ Cypress.Commands.add("uploadGcodeFile", (fileName = "sample.gcode") => {
 
 		cy.log(`Going to location: X=${x}, Y=${y}, Z=${z}`);
 
-  // Step 1: Open Go To Location dialog — confirmed from recording
+  // Step 1: Open Go To Location dialog 
   cy.log('Opening Go To Location popup...');
   cy.get('div.min-h-10 > div:nth-of-type(1) > button', { timeout: 10000 })
     .filter(':visible')
@@ -808,57 +808,26 @@ Cypress.Commands.add("clearConsole", () => {
 // ----------------------
 //19.Verify axes for expected values (flexible with decimals)
 // ----------------------
-Cypress.Commands.add(
-	"verifyAxes",
-	(expectedX = 0, expectedY = 0, expectedZ = 0) => {
-		cy.log(
-			`Verifying axes positions: X=${expectedX}, Y=${expectedY}, Z=${expectedZ}...`,
-		);
+Cypress.Commands.add("verifyAxes",
+  (expectedX = 0, expectedY = 0, expectedZ = 0) => {
+    cy.log(
+      `Verifying axes positions: X=${expectedX}, Y=${expectedY}, Z=${expectedZ}...`,
+    );
 
-		// Convert expected values to strings with proper formatting
-		const formatValue = (val) => {
-			const num = parseFloat(val);
-			return num % 1 === 0 ? num.toFixed(0) : num.toString();
-		};
+    cy.get('[data-testid="wcs-input-X"]').invoke('val').then((xValue) => {
+      expect(parseFloat(xValue)).to.be.closeTo(parseFloat(expectedX), 0.01);
+    });
 
-		const expectedXStr = formatValue(expectedX);
-		const expectedYStr = formatValue(expectedY);
-		const expectedZStr = formatValue(expectedZ);
+    cy.get('[data-testid="wcs-input-Y"]').invoke('val').then((yValue) => {
+      expect(parseFloat(yValue)).to.be.closeTo(parseFloat(expectedY), 0.01);
+    });
 
-		// Get the position input fields that display current coordinates
-		cy.get('input[type="number"].text-xl.font-bold.text-blue-500.font-mono')
-			.should("have.length", 3)
-			.then(($inputs) => {
-				const xValue = $inputs.eq(0).val();
-				const yValue = $inputs.eq(1).val();
-				const zValue = $inputs.eq(2).val();
+    cy.get('[data-testid="wcs-input-Z"]').invoke('val').then((zValue) => {
+      expect(parseFloat(zValue)).to.be.closeTo(parseFloat(expectedZ), 0.01);
+    });
 
-				cy.log(`Current positions - X: ${xValue}, Y: ${yValue}, Z: ${zValue}`);
-				cy.log(
-					`Expected positions - X: ${expectedXStr}, Y: ${expectedYStr}, Z: ${expectedZStr}`,
-				);
-
-				// Verify X axis
-				expect(parseFloat(xValue)).to.be.closeTo(
-					parseFloat(expectedXStr),
-					0.01,
-				);
-
-				// Verify Y axis
-				expect(parseFloat(yValue)).to.be.closeTo(
-					parseFloat(expectedYStr),
-					0.01,
-				);
-
-				// Verify Z axis
-				expect(parseFloat(zValue)).to.be.closeTo(
-					parseFloat(expectedZStr),
-					0.01,
-				);
-			});
-
-		cy.log("Axes verified successfully");
-	},
+    cy.log("Axes verified successfully");
+  },
 );
 
 //23. Checking probing pin is active
@@ -1189,6 +1158,100 @@ Cypress.Commands.add('applySettings', (options = {}) => {
       cy.log('Settings applied successfully');
     });
 });
+//======================
+// Select ALtMill Profile 
+// =====================
+Cypress.Commands.add('selectAltMillProfile', () => {
+  cy.goToConfig();
+  cy.wait(1000);
+
+  // Open the profile combobox
+  cy.get('button[role="combobox"]:not([disabled])')
+    .filter((i, el) => /Mill/i.test(el.textContent))
+    .first()
+    .click();
+
+  // Select AltMill 4X4 (first AltMill option)
+  cy.get('[role="listbox"]', { timeout: 10000 })
+    .should('be.visible')
+    .within(() => {
+      cy.contains('[role="option"]', 'AltMill 4X4').click();
+    });
+
+  // Verify selection committed in the combobox before touching Defaults
+  cy.get('button[role="combobox"]:not([disabled])')
+    .filter((i, el) => /Mill/i.test(el.textContent))
+    .first()
+    .should('contain.text', 'AltMill');
+
+  // Click "Defaults"
+  cy.contains('span', 'Defaults').click();
+
+  // Confirm the dialog shows the CORRECT profile name before restoring
+  cy.contains(
+    /are you sure you want to restore your AltMill 4x4 back to its default state\?/i,
+    { timeout: 10000 }
+  ).should('be.visible');
+// Click on restore to defaults on the dialouge boxx
+  cy.get('button.bg-blue-500.bg-opacity-20.border-blue-500')
+  .contains('Restore Defaults')
+  .should('be.visible')
+  .click();
+
+  // Final check: profile is still AltMill 4X4 after everything
+  cy.get('button[role="combobox"]:not([disabled])')
+    .filter((i, el) => /Mill/i.test(el.textContent))
+    .first()
+    .should('contain.text', 'AltMill 4X4');
+});
+//==================================
+// Select Longmill Profile 
+//=================================
+
+Cypress.Commands.add('selectLongMillProfile', () => {
+  cy.goToConfig();
+  cy.wait(1000);
+
+  // Open the profile combobox
+  cy.get('button[role="combobox"]:not([disabled])')
+    .filter((i, el) => /Mill/i.test(el.textContent))
+    .first()
+    .click();
+
+  // Select LongMill MK2 12x30 (first LongMill option)
+  cy.get('[role="listbox"]', { timeout: 10000 })
+    .should('be.visible')
+    .within(() => {
+      cy.contains('[role="option"]', 'LongMill MK2 12x30 (MK2)').click();
+    });
+
+  // Verify selection committed in the combobox before touching Defaults
+  cy.get('button[role="combobox"]:not([disabled])')
+    .filter((i, el) => /Mill/i.test(el.textContent))
+    .first()
+    .should('contain.text', 'LongMill MK2 12x30 (MK2)');
+
+  // Click "Defaults"
+  cy.contains('span', 'Defaults').click();
+
+  // Confirm the dialog shows the CORRECT profile name before restoring
+  cy.get('[role="alertdialog"], [role="dialog"]', { timeout: 10000 })
+  .should('be.visible')
+  .and('contain.text', 'LongMill');
+
+
+  // Click on Restore Defaults in the dialog
+  cy.get('button.bg-blue-500.bg-opacity-20.border-blue-500')
+    .contains('Restore Defaults')
+    .should('be.visible')
+    .click();
+
+  // Final check: profile is still LongMill MK2 12x30 after everything
+  cy.get('button[role="combobox"]:not([disabled])')
+    .filter((i, el) => /Mill/i.test(el.textContent))
+    .first()
+    .should('contain.text', 'LongMill MK2 12x30 (MK2)');
+});
 // Simple URL Navigation Commands
 // ==============================
 
@@ -1210,7 +1273,9 @@ Cypress.Commands.add('applySettings', (options = {}) => {
         }
     });
 });
-
+//======================================
+// CLosing pop up if visible
+//======================================
 Cypress.Commands.add("closeAccPopupIfVisible", () => {
     cy.get("body").then(($body) => {
         if ($body.find('[role="alertdialog"]').length > 0) {
@@ -1226,7 +1291,63 @@ Cypress.Commands.add("closeAccPopupIfVisible", () => {
         }
     });
 });
+//=======================================================================
+// Check the profile to which gsender is connected and restore to defaults 
+//========================================================================
+Cypress.Commands.add('detectBoardAndSelectProfile', () => {
+  cy.get('#tab-Console').click();
+  cy.clearConsole();
+  cy.sendConsoleCommand('$i');
 
+  cy.get('#tabpanel-Console .xterm-rows', { timeout: 15000 })
+    .should('contain.text', 'ok');
+
+  cy.get('#tabpanel-Console .xterm-viewport').then(($viewport) => {
+    const viewportEl = $viewport[0];
+    const scrollHeight = viewportEl.scrollHeight;
+    const clientHeight = viewportEl.clientHeight;
+    const stepCount = Math.ceil(scrollHeight / clientHeight) + 1;
+
+    const seenLines = new Set();
+
+    const scrollStep = (i) => {
+      if (i > stepCount) {
+        const fullText = Array.from(seenLines).join('\n');
+        cy.log('FULL CAPTURED TEXT:', fullText);
+
+        if (/\[BOARD:SuperLongBoard Ext\]/i.test(fullText)) {
+          cy.log('Board is SuperLongBoard Ext - switching to AltMill profile');
+          cy.selectAltMillProfile();
+
+        } else if (/\[BOARD:SLB Lite\]/i.test(fullText)) {
+          cy.log('Board is SLB Lite - switching to LongMill profile');
+          cy.selectLongMillProfile();
+
+        } else {
+          throw new Error(`Unrecognized board type in console output: ${fullText}`);
+        }
+
+        return;
+      }
+
+      const scrollPos = i * clientHeight;
+      cy.get('#tabpanel-Console .xterm-viewport').scrollTo(0, scrollPos);
+      cy.wait(200);
+
+      cy.get('#tabpanel-Console .xterm-rows').invoke('text').then((text) => {
+        text.split('\n').forEach((line) => {
+          if (line.trim()) seenLines.add(line.trim());
+        });
+        scrollStep(i + 1);
+      });
+    };
+
+    scrollStep(0);
+  });
+});
+//================================
+// Click to Run homing if needed
+//==============================
 Cypress.Commands.add("clickToRunHomingIfNeeded", () => {
     cy.wait(3000); // Wait for machine to stabilize after connect
 
@@ -1262,9 +1383,9 @@ Cypress.Commands.add("clickToRunHomingIfNeeded", () => {
                     .should("be.visible")
                     .click();
                 cy.wait(1000);
-                cy.log("✓ Homing started — alertdialog dismissed");
+                cy.log(" Homing started — alertdialog dismissed");
             } else {
-                cy.log("✓ Homing started — no dialog to dismiss");
+                cy.log(" Homing started — no dialog to dismiss");
             }
         });
     });

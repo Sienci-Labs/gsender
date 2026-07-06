@@ -1,4 +1,4 @@
-describe('CNC Machine Tests Grbl', () => {
+describe('Go to locaiton test', () => {
 
   beforeEach(() => {
     cy.viewport(2844, 1450);

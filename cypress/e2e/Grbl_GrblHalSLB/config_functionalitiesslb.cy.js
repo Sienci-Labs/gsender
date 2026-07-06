@@ -23,13 +23,10 @@ describe('gSender Configuration and Firmware Test Suite', () => {
         cy.goToConfig();
 
         // Reset Settings
-        cy.get('[data-testid="gsender-settings-reset-button"] > span.text-sm').click();
-        // FIX: use cy.contains on button.bg-blue-500 — avoids hardcoded radix ID
-        cy.contains('button.bg-blue-500', 'Restore Settings', { timeout: 10000 })
-            .should('be.visible')
-            .click();
-        cy.get('section line:nth-of-type(1)').click({ force: true });
-
+        // Detects the board type and choose the profile to be restored 
+        cy.detectBoardAndSelectProfile();
+        
+    
         // Export Settings
         cy.get('[data-testid="gsender-settings-export-button"] > span.text-sm').click();
         cy.wait(3000);
@@ -39,7 +36,7 @@ describe('gSender Configuration and Firmware Test Suite', () => {
         cy.get('#section-0 div:nth-of-type(2) > button').click();
         cy.applySettings();
 
-        // Import Settings
+        //  Import Settings
         cy.get('[data-testid="gsender-settings-import-button"] > span.text-sm').click();
         cy.get('div.min-h-1\\/5 > fieldset input')
             .selectFile('cypress/fixtures/gSender-settings.json', { force: true });
@@ -47,7 +44,7 @@ describe('gSender Configuration and Firmware Test Suite', () => {
         cy.contains('button.bg-blue-500', 'Import Settings', { timeout: 10000 })
             .should('be.visible')
             .click();
-        cy.get('section line:nth-of-type(2)').click({ force: true });
+        cy.get('section line:nth-of-type(2)').click({ force: true }); 
 
         // Verify units reverted to mm
         cy.get('#section-0').within(() => {
@@ -63,7 +60,6 @@ describe('gSender Configuration and Firmware Test Suite', () => {
             });
         });
 
-        // Part 2: Firmware Settings
         // Part 2: Firmware Settings
 cy.log('Part 2: Firmware Settings');
 
