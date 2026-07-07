@@ -1,12 +1,3 @@
-import type { UNITS_GCODE } from "app/definitions/general";
-import type {
-	PROBE_DIRECTIONS,
-	PROBE_TYPES_T,
-	ProbingOptions,
-} from "app/features/Probe/definitions";
-import { getZDownTravel } from "app/lib/SoftLimits.js";
-import type { AXES_T } from "app/store/definitions";
-import { GRBLHAL, METRIC_UNITS } from "../constants";
 import {
 	PROBE_TYPE_AUTO,
 	PROBE_TYPE_TIP,
@@ -43,30 +34,31 @@ export const getProbeDirections = (
 
 // Setup variables for probing and
 export const getPreamble = (options: ProbingOptions): Array<string> => {
-	let {
-		modal,
-		xRetractModifier,
-		yRetractModifier,
-		axes,
-		xProbeDistance,
-		yProbeDistance,
-		zProbeDistance,
-		probeFast,
-		probeSlow,
-		zThickness: zThicknesses,
-		xThickness,
-		yThickness,
-		xRetract,
-		yRetract,
-		zRetract,
-		zRetractNormal,
-		firmware,
-		xyPositionAdjust,
-		zPositionAdjust,
-		homingEnabled,
-		plateType,
-	} = options;
-	let initialOffsets = "G10 L20 P0 ";
+    let {
+        modal,
+        xRetractModifier,
+        yRetractModifier,
+        axes,
+        xProbeDistance,
+        yProbeDistance,
+        zProbeDistance,
+        probeFast,
+        probeSlow,
+        zThickness: zThicknesses,
+        xThickness,
+        yThickness,
+        xRetract,
+        yRetract,
+        zRetract,
+        zRetractNormal,
+        firmware,
+        xyPositionAdjust,
+        zPositionAdjust,
+        homingEnabled,
+        plateType,
+        probeMovementSpeed = 0,
+    } = options;
+    let initialOffsets = 'G10 L20 P0 ';
 
 	const probeDelay = firmware === GRBLHAL ? 0.05 : 0.15;
 
@@ -89,30 +81,31 @@ export const getPreamble = (options: ProbingOptions): Array<string> => {
 		zProbeDistance = getZDownTravel(Math.abs(zProbeDistance)) * -1;
 	}
 
-	return [
-		"; Initial Probe setup",
-		"%UNITS=modal.units",
-		`%Z_ADJUST=${zPositionAdjust}`,
-		`%X_ADJUST=${xyPositionAdjust}`,
-		`%Y_ADJUST=${xyPositionAdjust}`,
-		`%X_PROBE_DISTANCE=${xProbeDistance}`,
-		`%Y_PROBE_DISTANCE=${yProbeDistance}`,
-		`%Z_PROBE_DISTANCE=${zProbeDistance}`,
-		`%PROBE_FAST_FEED=${probeFast}`,
-		`%PROBE_SLOW_FEED=${probeSlow}`,
-		`%X_RETRACT_DISTANCE=${xRetract}`,
-		`%Y_RETRACT_DISTANCE=${yRetract}`,
-		`%Z_RETRACT_DISTANCE=${zRetract}`,
-		`%Z_RETRACT_FINAL=${zRetractNormal}`,
-		`%Z_THICKNESS=${zThickness}`,
-		`%X_THICKNESS=${xThickness}`,
-		`%Y_THICKNESS=${yThickness}`,
-		`%PROBE_DELAY=${probeDelay}`,
-		`%Y_RETRACT_DIRECTION=${yRetractModifier}`,
-		`%X_RETRACT_DIRECTION=${xRetractModifier}`,
-		`${initialOffsets}`,
-		`G91 G${modal}`,
-	];
+    return [
+        '; Initial Probe setup',
+        '%UNITS=modal.units',
+        `%Z_ADJUST=${zPositionAdjust}`,
+        `%X_ADJUST=${xyPositionAdjust}`,
+        `%Y_ADJUST=${xyPositionAdjust}`,
+        `%X_PROBE_DISTANCE=${xProbeDistance}`,
+        `%Y_PROBE_DISTANCE=${yProbeDistance}`,
+        `%Z_PROBE_DISTANCE=${zProbeDistance}`,
+        `%PROBE_FAST_FEED=${probeFast}`,
+        `%PROBE_SLOW_FEED=${probeSlow}`,
+        `%X_RETRACT_DISTANCE=${xRetract}`,
+        `%Y_RETRACT_DISTANCE=${yRetract}`,
+        `%Z_RETRACT_DISTANCE=${zRetract}`,
+        `%Z_RETRACT_FINAL=${zRetractNormal}`,
+        `%Z_THICKNESS=${zThickness}`,
+        `%X_THICKNESS=${xThickness}`,
+        `%Y_THICKNESS=${yThickness}`,
+        `%PROBE_DELAY=${probeDelay}`,
+        `%Y_RETRACT_DIRECTION=${yRetractModifier}`,
+        `%X_RETRACT_DIRECTION=${xRetractModifier}`,
+        `%PROBE_MOVE_FEED=${probeMovementSpeed}`,
+        `${initialOffsets}`,
+        `G91 G${modal}`,
+    ];
 };
 
 /*
@@ -221,8 +214,8 @@ export const get3AxisStandardRoutine = (
 ): Array<string> => {
 	const code: Array<string> = [];
 
-	code.push(...getPreamble(options));
-	const { axes, units } = options;
+    code.push(...getPreamble(options));
+    const { axes, units, probeMovementSpeed = 0 } = options;
 
 	// invalid axes, we go next
 	if (typeof axes !== "object") {
@@ -234,23 +227,28 @@ export const get3AxisStandardRoutine = (
 	const initialPositionAdjustment =
 		units === METRIC_UNITS ? 6 : mm2in(6).toFixed(3);
 
-	if (axes.z) {
-		code.push(...getSingleAxisStandardRoutine("Z"));
-		// Z also handles positioning for next probe on X
-		code.push(
-			`G91 G0 X[(X_ADJUST + ${initialPositionAdjustment}) * X_RETRACT_DIRECTION]`,
-			"G91 G0 Z-[Z_ADJUST]",
-		);
-	}
-	if (axes.x) {
-		// Move into position for X
-		// We start at different location for XY probing
-		if (!axes.z) {
-			code.push(
-				"G91 G0 X[X_RETRACT_DISTANCE]",
-				"G91 G0 Y[Y_ADJUST * -1 * Y_RETRACT_DIRECTION]",
-			);
-		}
+    const finalZeroMove = (coords: string): string =>
+        probeMovementSpeed > 0
+            ? `G90 G1 ${coords} F[PROBE_MOVE_FEED]`
+            : `G90 G0 ${coords}`;
+
+    if (axes.z) {
+        code.push(...getSingleAxisStandardRoutine('Z'));
+        // Z also handles positioning for next probe on X
+        code.push(
+            `G91 G0 X[(X_ADJUST + ${initialPositionAdjustment}) * X_RETRACT_DIRECTION]`,
+            'G91 G0 Z-[Z_ADJUST]',
+        );
+    }
+    if (axes.x) {
+        // Move into position for X
+        // We start at different location for XY probing
+        if (!axes.z) {
+            code.push(
+                'G91 G0 X[X_RETRACT_DISTANCE]',
+                'G91 G0 Y[Y_ADJUST * -1 * Y_RETRACT_DIRECTION]',
+            );
+        }
 
 		// Probe X
 		code.push(...getSingleAxisStandardRoutine("X"));
@@ -262,14 +260,17 @@ export const get3AxisStandardRoutine = (
 			"G91 G0 X[X_ADJUST * -1 * X_RETRACT_DIRECTION]",
 		);
 
-		// Probe Y
-		code.push(...getSingleAxisStandardRoutine("Y"));
-	}
-	if (axes.z) {
-		// Move back to original XYZ position
-		code.push("G91 G0 Z[Z_ADJUST + Z_RETRACT_FINAL]", "G90 G0 X0Y0");
-	}
-	return code;
+        // Probe Y
+        code.push(...getSingleAxisStandardRoutine('Y'));
+    }
+    if (axes.z) {
+        // Move back to original XYZ position
+        code.push(
+            'G91 G0 Z[Z_ADJUST + Z_RETRACT_FINAL]',
+            finalZeroMove('X0Y0'),
+        );
+    }
+    return code;
 };
 
 const determineAutoPlateOffsetValues = (
@@ -300,13 +301,14 @@ const determineAutoPlateOffsetValues = (
 
 //Routines for AutoZero where auto is used
 export const get3AxisAutoRoutine = ({
-	axes,
-	$13,
-	direction,
-	firmware,
-	homingEnabled,
-	zThickness,
-	zRetractAuto,
+    axes,
+    $13,
+    direction,
+    firmware,
+    homingEnabled,
+    zThickness,
+    zRetractAuto,
+    probeMovementSpeedAuto = 0,
 }: ProbingOptions): Array<string> => {
 	const code: Array<string> = [];
 	const p = "P0";
@@ -326,172 +328,182 @@ export const get3AxisAutoRoutine = ({
 		//console.log(zDistance);
 	}
 
-	if (axes.x && axes.y && axes.z) {
-		code.push(
-			`; AZ Probe XYZ Auto - direction: ${direction}`,
-			`%X_OFF = ${xOff}`,
-			`%Y_OFF = ${yOff}`,
-			`%Z_THICKNESS = ${zThickness.autoZero}`,
-			`%PROBE_DELAY=${probeDelay}`,
-			"G21 G91",
-			`G38.2 Z-${zDistance} F200`,
-			"G21 G91 G0 Z2",
-			"G38.2 Z-5 F75",
-			"G4 P[PROBE_DELAY]",
-			`G10 L20 ${p} Z[Z_THICKNESS]`,
-			"G4 P[PROBE_DELAY]",
-			"G21 G91 G0 Z3",
-			"G21 G91 G0 X-13",
-			"G38.2 X-30 F150",
-			"G21 G91 G0 X2",
-			"G38.2 X-5 F75",
-			"G4 P[PROBE_DELAY]",
-			"%X_LEFT=posx",
-			"G21 G91 G0 X26",
-			"G38.2 X30 F150",
-			"G21 G91 G0 X-2",
-			"G38.2 X5 F75",
-			"G4 P[PROBE_DELAY]",
-			"%X_RIGHT=posx",
-			"%X_CENTER=((X_RIGHT - X_LEFT)/2)*-1",
-			`${prependUnits} G91 G0 X[X_CENTER]`,
-			"G21 G91 G0 Y-13",
-			"G38.2 Y-30 F250",
-			"G21 G91 G0 Y2",
-			"G38.2 Y-5 F75",
-			"G4 P[PROBE_DELAY]",
-			"%Y_BOTTOM = posy",
-			"G21 G91 G0 Y26",
-			"G38.2 Y30 F250",
-			"G21 G91 G0 Y-2",
-			"G38.2 Y5 F75",
-			"G4 P[PROBE_DELAY]",
-			"%Y_TOP = posy",
-			"%Y_CENTER = ((Y_TOP - Y_BOTTOM)/2) * -1",
-			`${prependUnits} G0 Y[Y_CENTER]`,
-			`G21 G10 L20 ${p} X[X_OFF] Y[Y_OFF]`,
-			"G21 G90 G0 X0 Y0",
-			`G21 G0 G90 Z${zRetractAuto}`,
-		);
-	} else if (axes.x && axes.y) {
-		code.push(
-			"; AZ Probe XY Auto",
-			`%X_OFF = ${xOff}`,
-			`%Y_OFF = ${yOff}`,
-			`%PROBE_DELAY=${probeDelay}`,
-			"G21 G91",
-			`G38.2 Z-${zDistance} F200`,
-			"G21 G91 G0 Z3",
-			"G21 G91 G0 X-13",
-			"G38.2 X-30 F150",
-			"G21 G91 G0 X2",
-			"G38.2 X-5 F75",
-			"G4 P[PROBE_DELAY]",
-			`G10 L20 ${p} X0`,
-			"G21 G91 G0 X26",
-			"G38.2 X30 F150",
-			"G21 G91 G0 X-2",
-			"G38.2 X5 F75",
-			"G4 P[PROBE_DELAY]",
-			`${prependUnits} G10 L20 ${p} X[posx/2]`,
-			`${prependUnits} G90 G0 X0`,
-			"G21 G91 G0 Y-13",
-			"G38.2 Y-30 F150",
-			"G21 G91 G0 Y2",
-			"G38.2 Y-5 F75",
-			"G4 P[PROBE_DELAY]",
-			`G10 L20 ${p} Y0`,
-			"G21 G91 G0 Y26",
-			"G38.2 Y30 F150",
-			"G21 G91 G0 Y-2",
-			"G38.2 Y5 F75",
-			"G4 P[PROBE_DELAY]",
-			`${prependUnits} G10 L20 ${p} Y[posy/2]`,
-			"G21 G90 G0 X0 Y0",
-			"G4 P[PROBE_DELAY]",
-			`G21 G10 L20 ${p} X[X_OFF] Y[Y_OFF]`,
-			"G21 G90 G0 X0 Y0",
-		);
-	} else if (axes.z) {
-		code.push(
-			"; AZ Probe Z Auto",
-			`%Z_THICKNESS = ${zThickness.autoZero}`,
-			`%PROBE_DELAY=${probeDelay}`,
-			"G21 G91",
-			`G38.2 Z-${zDistance} F200`,
-			"G21 G91 G0 Z2",
-			"G38.2 Z-5 F75",
-			"G4 P[PROBE_DELAY]",
-			`G10 L20 ${p} Z[Z_THICKNESS]`,
-			"G4 P[PROBE_DELAY]",
-			`G21 G91 G0 Z${zRetractAuto}`,
-		);
-	} else if (axes.x) {
-		code.push(
-			"; AZ Probe X Auto",
-			`%X_OFF = ${xOff}`,
-			`%PROBE_DELAY=${probeDelay}`,
-			"G21 G91",
-			`G38.2 Z-${zDistance} F200`,
-			"G21 G91 G0 Z3",
-			"G21 G91 G0 X-13",
-			"G38.2 X-30 F150",
-			"G21 G91 G0 X2",
-			"G38.2 X-5 F75",
-			"G4 P[PROBE_DELAY]",
-			`G10 L20 ${p} X0`,
-			"G21 G91 G0 X26",
-			"G38.2 X30 F150",
-			"G21 G91 G0 X-2",
-			"G38.2 X5 F75",
-			"G4 P[PROBE_DELAY]",
-			`${prependUnits} G10 L20 ${p} X[posx/2]`,
-			"G21 G90 G0 X0",
-			"G4 P[PROBE_DELAY]",
-			`G10 L20 ${p} X[X_OFF]`,
-			"G4 P[PROBE_DELAY]",
-			`G21 G91 G0 Z${zRetractAuto}`,
-		);
-	} else if (axes.y) {
-		code.push(
-			"; AZ Probe Y Auto",
-			`%Y_OFF = ${yOff}`,
-			`%PROBE_DELAY=${probeDelay}`,
-			"G21 G91",
-			`G38.2 Z-${zDistance} F200`,
-			"G21 G91 G0 Z3",
-			"G21 G91 G0 Y-13",
-			"G38.2 Y-30 F150",
-			"G21 G91 G0 Y2",
-			"G38.2 Y-5 F75",
-			"G4 P[PROBE_DELAY]",
-			`G10 L20 ${p} Y0`,
-			"G21 G91 G0 Y26",
-			"G38.2 Y30 F150",
-			"G21 G91 G0 Y-2",
-			"G38.2 Y5 F75",
-			"G4 P[PROBE_DELAY]",
-			`${prependUnits} G10 L20 ${p} Y[posy/2]`,
-			"G21 G90 G0 Y0",
-			"G4 P[PROBE_DELAY]",
-			`G10 L20 ${p} Y[Y_OFF]`,
-			"G4 P[PROBE_DELAY]",
-			`G21 G91 G0 Z${zRetractAuto}`,
-		);
-	}
+    const finalZeroMove = (coords: string): string =>
+        probeMovementSpeedAuto > 0
+            ? `G21 G90 G1 ${coords} F[PROBE_MOVE_FEED]`
+            : `G21 G90 G0 ${coords}`;
+
+    if (axes.x && axes.y && axes.z) {
+        code.push(
+            `; AZ Probe XYZ Auto - direction: ${direction}`,
+            `%X_OFF = ${xOff}`,
+            `%Y_OFF = ${yOff}`,
+            `%Z_THICKNESS = ${zThickness.autoZero}`,
+            `%PROBE_DELAY=${probeDelay}`,
+            `%PROBE_MOVE_FEED=${probeMovementSpeedAuto}`,
+            'G21 G91',
+            `G38.2 Z-${zDistance} F200`,
+            'G21 G91 G0 Z2',
+            'G38.2 Z-5 F75',
+            'G4 P[PROBE_DELAY]',
+            `G10 L20 ${p} Z[Z_THICKNESS]`,
+            'G4 P[PROBE_DELAY]',
+            'G21 G91 G0 Z3',
+            'G21 G91 G0 X-13',
+            'G38.2 X-30 F150',
+            'G21 G91 G0 X2',
+            'G38.2 X-5 F75',
+            'G4 P[PROBE_DELAY]',
+            '%X_LEFT=posx',
+            'G21 G91 G0 X26',
+            'G38.2 X30 F150',
+            'G21 G91 G0 X-2',
+            'G38.2 X5 F75',
+            'G4 P[PROBE_DELAY]',
+            '%X_RIGHT=posx',
+            '%X_CENTER=((X_RIGHT - X_LEFT)/2)*-1',
+            `${prependUnits} G91 G0 X[X_CENTER]`,
+            'G21 G91 G0 Y-13',
+            'G38.2 Y-30 F250',
+            'G21 G91 G0 Y2',
+            'G38.2 Y-5 F75',
+            'G4 P[PROBE_DELAY]',
+            '%Y_BOTTOM = posy',
+            'G21 G91 G0 Y26',
+            'G38.2 Y30 F250',
+            'G21 G91 G0 Y-2',
+            'G38.2 Y5 F75',
+            'G4 P[PROBE_DELAY]',
+            '%Y_TOP = posy',
+            '%Y_CENTER = ((Y_TOP - Y_BOTTOM)/2) * -1',
+            `${prependUnits} G0 Y[Y_CENTER]`,
+            `G21 G10 L20 ${p} X[X_OFF] Y[Y_OFF]`,
+            finalZeroMove('X0 Y0'),
+            `G21 G0 G90 Z${zRetractAuto}`,
+        );
+    } else if (axes.x && axes.y) {
+        code.push(
+            '; AZ Probe XY Auto',
+            `%X_OFF = ${xOff}`,
+            `%Y_OFF = ${yOff}`,
+            `%PROBE_DELAY=${probeDelay}`,
+            `%PROBE_MOVE_FEED=${probeMovementSpeedAuto}`,
+            'G21 G91',
+            `G38.2 Z-${zDistance} F200`,
+            'G21 G91 G0 Z3',
+            'G21 G91 G0 X-13',
+            'G38.2 X-30 F150',
+            'G21 G91 G0 X2',
+            'G38.2 X-5 F75',
+            'G4 P[PROBE_DELAY]',
+            `G10 L20 ${p} X0`,
+            'G21 G91 G0 X26',
+            'G38.2 X30 F150',
+            'G21 G91 G0 X-2',
+            'G38.2 X5 F75',
+            'G4 P[PROBE_DELAY]',
+            `${prependUnits} G10 L20 ${p} X[posx/2]`,
+            `${prependUnits} G90 G0 X0`,
+            'G21 G91 G0 Y-13',
+            'G38.2 Y-30 F150',
+            'G21 G91 G0 Y2',
+            'G38.2 Y-5 F75',
+            'G4 P[PROBE_DELAY]',
+            `G10 L20 ${p} Y0`,
+            'G21 G91 G0 Y26',
+            'G38.2 Y30 F150',
+            'G21 G91 G0 Y-2',
+            'G38.2 Y5 F75',
+            'G4 P[PROBE_DELAY]',
+            `${prependUnits} G10 L20 ${p} Y[posy/2]`,
+            'G21 G90 G0 X0 Y0',
+            'G4 P[PROBE_DELAY]',
+            `G21 G10 L20 ${p} X[X_OFF] Y[Y_OFF]`,
+            finalZeroMove('X0 Y0'),
+        );
+    } else if (axes.z) {
+        code.push(
+            '; AZ Probe Z Auto',
+            `%Z_THICKNESS = ${zThickness.autoZero}`,
+            `%PROBE_DELAY=${probeDelay}`,
+            'G21 G91',
+            `G38.2 Z-${zDistance} F200`,
+            'G21 G91 G0 Z2',
+            'G38.2 Z-5 F75',
+            'G4 P[PROBE_DELAY]',
+            `G10 L20 ${p} Z[Z_THICKNESS]`,
+            'G4 P[PROBE_DELAY]',
+            `G21 G91 G0 Z${zRetractAuto}`,
+        );
+    } else if (axes.x) {
+        code.push(
+            '; AZ Probe X Auto',
+            `%X_OFF = ${xOff}`,
+            `%PROBE_DELAY=${probeDelay}`,
+            `%PROBE_MOVE_FEED=${probeMovementSpeedAuto}`,
+            'G21 G91',
+            `G38.2 Z-${zDistance} F200`,
+            'G21 G91 G0 Z3',
+            'G21 G91 G0 X-13',
+            'G38.2 X-30 F150',
+            'G21 G91 G0 X2',
+            'G38.2 X-5 F75',
+            'G4 P[PROBE_DELAY]',
+            `G10 L20 ${p} X0`,
+            'G21 G91 G0 X26',
+            'G38.2 X30 F150',
+            'G21 G91 G0 X-2',
+            'G38.2 X5 F75',
+            'G4 P[PROBE_DELAY]',
+            `${prependUnits} G10 L20 ${p} X[posx/2]`,
+            finalZeroMove('X0'),
+            'G4 P[PROBE_DELAY]',
+            `G10 L20 ${p} X[X_OFF]`,
+            'G4 P[PROBE_DELAY]',
+            `G21 G91 G0 Z${zRetractAuto}`,
+        );
+    } else if (axes.y) {
+        code.push(
+            '; AZ Probe Y Auto',
+            `%Y_OFF = ${yOff}`,
+            `%PROBE_DELAY=${probeDelay}`,
+            `%PROBE_MOVE_FEED=${probeMovementSpeedAuto}`,
+            'G21 G91',
+            `G38.2 Z-${zDistance} F200`,
+            'G21 G91 G0 Z3',
+            'G21 G91 G0 Y-13',
+            'G38.2 Y-30 F150',
+            'G21 G91 G0 Y2',
+            'G38.2 Y-5 F75',
+            'G4 P[PROBE_DELAY]',
+            `G10 L20 ${p} Y0`,
+            'G21 G91 G0 Y26',
+            'G38.2 Y30 F150',
+            'G21 G91 G0 Y-2',
+            'G38.2 Y5 F75',
+            'G4 P[PROBE_DELAY]',
+            `${prependUnits} G10 L20 ${p} Y[posy/2]`,
+            finalZeroMove('Y0'),
+            'G4 P[PROBE_DELAY]',
+            `G10 L20 ${p} Y[Y_OFF]`,
+            'G4 P[PROBE_DELAY]',
+            `G21 G91 G0 Z${zRetractAuto}`,
+        );
+    }
 
 	return code;
 };
 
 //Routines for AutoZero where tip is used
 export const get3AxisAutoTipRoutine = ({
-	axes,
-	$13,
-	direction,
-	firmware,
-	homingEnabled,
-	zThickness,
-	zRetractAuto,
+    axes,
+    $13,
+    direction,
+    firmware,
+    homingEnabled,
+    zThickness,
+    zRetractAuto,
+    probeMovementSpeedAuto = 0,
 }: ProbingOptions): Array<string> => {
 	const code: Array<string> = [];
 	const p = "P0";
@@ -509,174 +521,184 @@ export const get3AxisAutoTipRoutine = ({
 		zDistance = getZDownTravel(zDistance);
 	}
 
-	if (axes.x && axes.y && axes.z) {
-		code.push(
-			"; AZ Probe XYZ Tip",
-			`%X_OFF = ${xOff}`,
-			`%Y_OFF = ${yOff}`,
-			`%Z_THICKNESS = ${zThickness.autoZero}`,
-			`%PROBE_DELAY=${probeDelay}`,
-			"G21 G91",
-			`G38.2 Z-${zDistance} F200`,
-			"G21 G91 G0 Z2",
-			"G38.2 Z-5 F75",
-			"G4 P[PROBE_DELAY]",
-			`G10 L20 ${p} Z[Z_THICKNESS]`,
-			"G4 P[PROBE_DELAY]",
-			"G21 G91 G0 Z0.5",
-			"G21 G91 G0 X-3",
-			"G38.2 X-30 F150",
-			"G21 G91 G0 X2",
-			"G38.2 X-5 F75",
-			"G4 P[PROBE_DELAY]",
-			"%X_LEFT=posx",
-			"G21 G91 G0 X14",
-			"G38.2 X15 F150",
-			"G21 G91 G0 X-2",
-			"G38.2 X5 F75",
-			"G4 P[PROBE_DELAY]",
-			"%X_RIGHT=posx",
-			"%X_CENTER=((X_RIGHT - X_LEFT)/2)*-1",
-			`${prependUnits} G91 G0 X[X_CENTER]`,
-			"G21 G91 G0 Y-3",
-			"G38.2 Y-15 F150",
-			"G21 G91 G0 Y2",
-			"G38.2 Y-5 F75",
-			"G4 P[PROBE_DELAY]",
-			"%Y_BOTTOM = posy",
-			//`G10 L20 ${p} Y0`,
-			"G21 G91 G0 Y14",
-			"G38.2 Y15 F150",
-			"G21 G91 G0 Y-2",
-			"G38.2 Y5 F75",
-			"G4 P[PROBE_DELAY]",
-			"%Y_TOP = posy",
-			"%Y_CENTER = ((Y_TOP - Y_BOTTOM)/2) * -1",
-			`${prependUnits} G0 Y[Y_CENTER]`,
-			`G21 G10 L20 ${p} X[X_OFF] Y[Y_OFF]`,
-			"G21 G90 G0 X0 Y0",
-			`G21 G0 G90 Z${zRetractAuto}`,
-		);
-	} else if (axes.x && axes.y) {
-		code.push(
-			"; AZ Probe XY Tip",
-			`%X_OFF = ${xOff}`,
-			`%Y_OFF = ${yOff}`,
-			`%PROBE_DELAY=${probeDelay}`,
-			"G21 G91",
-			`G38.2 Z-${zDistance} F200`,
-			"G21 G91 G0 Z0.5",
-			"G21 G91 G0 X-3",
-			"G38.2 X-30 F150",
-			"G21 G91 G0 X2",
-			"G38.2 X-5 F75",
-			"G4 P[PROBE_DELAY]",
-			`G10 L20 ${p} X0`,
-			"G21 G91 G0 X14",
-			"G38.2 X15 F150",
-			"G21 G91 G0 X-2",
-			"G38.2 X5 F75",
-			"G4 P[PROBE_DELAY]",
-			`${prependUnits} G10 L20 ${p} X[posx/2]`,
-			`${prependUnits} G90 G0 X0`,
-			"G21 G91 G0 Y-3",
-			"G38.2 Y-15 F150",
-			"G21 G91 G0 Y2",
-			"G38.2 Y-5 F75",
-			"G4 P[PROBE_DELAY]",
-			`G10 L20 ${p} Y0`,
-			"G21 G91 G0 Y14",
-			"G38.2 Y15 F150",
-			"G21 G91 G0 Y-2",
-			"G38.2 Y5 F75",
-			"G4 P[PROBE_DELAY]",
-			`${prependUnits} G10 L20 ${p} Y[posy/2]`,
-			`${prependUnits} G90 G0 X0 Y0`,
-			"G4 P[PROBE_DELAY]",
-			`G21 G10 L20 ${p} X[X_OFF] Y[Y_OFF]`,
-			"G21 G90 G0 X0 Y0",
-		);
-	} else if (axes.z) {
-		code.push(
-			"; AZ Probe Z Tip",
-			`%Z_THICKNESS = ${zThickness.autoZero}`,
-			`%PROBE_DELAY=${probeDelay}`,
-			"G21 G91",
-			`G38.2 Z-${zDistance} F200`,
-			"G21 G91 G0 Z2",
-			"G38.2 Z-5 F75",
-			"G4 P[PROBE_DELAY]",
-			`G10 L20 ${p} Z[Z_THICKNESS]`,
-			"G4 P[PROBE_DELAY]",
-			`G21 G91 G0 Z${zRetractAuto}`,
-		);
-	} else if (axes.x) {
-		code.push(
-			"; AZ Probe X Tip",
-			`%X_OFF = ${xOff}`,
-			`%PROBE_DELAY=${probeDelay}`,
-			"G21 G91",
-			`G38.2 Z-${zDistance} F200`,
-			"G21 G91 G0 Z0.5",
-			"G21 G91 G0 X-3",
-			"G38.2 X-30 F150",
-			"G21 G91 G0 X2",
-			"G38.2 X-5 F75",
-			"G4 P[PROBE_DELAY]",
-			`G10 L20 ${p} X0`,
-			"G21 G91 G0 X14",
-			"G38.2 X15 F150",
-			"G21 G91 G0 X-2",
-			"G38.2 X5 F75",
-			"G4 P[PROBE_DELAY]",
-			`${prependUnits} G10 L20 ${p} X[posx/2]`,
-			"G21 G90 G0 X0",
-			"G4 P[PROBE_DELAY]",
-			`G10 L20 ${p} X[X_OFF]`,
-			"G4 P[PROBE_DELAY]",
-			`G21 G91 G0 Z${zRetractAuto}`,
-		);
-	} else if (axes.y) {
-		code.push(
-			"; AZ Probe Y Tip",
-			`%Y_OFF = ${yOff}`,
-			`%PROBE_DELAY=${probeDelay}`,
-			"G21 G91",
-			`G38.2 Z-${zDistance} F200`,
-			"G21 G91 G0 Z0.5",
-			"G21 G91 G0 Y-3",
-			"G38.2 Y-15 F150",
-			"G21 G91 G0 Y2",
-			"G38.2 Y-5 F75",
-			"G4 P[PROBE_DELAY]",
-			`G10 L20 ${p} Y0`,
-			"G21 G91 G0 Y14",
-			"G38.2 Y15 F150",
-			"G21 G91 G0 Y-2",
-			"G38.2 Y5 F75",
-			"G4 P[PROBE_DELAY]",
-			`${prependUnits} G10 L20 ${p} Y[posy/2]`,
-			"G21 G90 G0 Y0",
-			"G4 P[PROBE_DELAY]",
-			`G10 L20 ${p} Y[Y_OFF]`,
-			"G4 P[PROBE_DELAY]",
-			`G21 G91 G0 Z${zRetractAuto}`,
-		);
-	}
+    const finalZeroMove = (coords: string): string =>
+        probeMovementSpeedAuto > 0
+            ? `G21 G90 G1 ${coords} F[PROBE_MOVE_FEED]`
+            : `G21 G90 G0 ${coords}`;
+
+    if (axes.x && axes.y && axes.z) {
+        code.push(
+            '; AZ Probe XYZ Tip',
+            `%X_OFF = ${xOff}`,
+            `%Y_OFF = ${yOff}`,
+            `%Z_THICKNESS = ${zThickness.autoZero}`,
+            `%PROBE_DELAY=${probeDelay}`,
+            `%PROBE_MOVE_FEED=${probeMovementSpeedAuto}`,
+            'G21 G91',
+            `G38.2 Z-${zDistance} F200`,
+            'G21 G91 G0 Z2',
+            'G38.2 Z-5 F75',
+            'G4 P[PROBE_DELAY]',
+            `G10 L20 ${p} Z[Z_THICKNESS]`,
+            'G4 P[PROBE_DELAY]',
+            'G21 G91 G0 Z0.5',
+            'G21 G91 G0 X-3',
+            'G38.2 X-30 F150',
+            'G21 G91 G0 X2',
+            'G38.2 X-5 F75',
+            'G4 P[PROBE_DELAY]',
+            '%X_LEFT=posx',
+            'G21 G91 G0 X14',
+            'G38.2 X15 F150',
+            'G21 G91 G0 X-2',
+            'G38.2 X5 F75',
+            'G4 P[PROBE_DELAY]',
+            '%X_RIGHT=posx',
+            '%X_CENTER=((X_RIGHT - X_LEFT)/2)*-1',
+            `${prependUnits} G91 G0 X[X_CENTER]`,
+            'G21 G91 G0 Y-3',
+            'G38.2 Y-15 F150',
+            'G21 G91 G0 Y2',
+            'G38.2 Y-5 F75',
+            'G4 P[PROBE_DELAY]',
+            '%Y_BOTTOM = posy',
+            //`G10 L20 ${p} Y0`,
+            'G21 G91 G0 Y14',
+            'G38.2 Y15 F150',
+            'G21 G91 G0 Y-2',
+            'G38.2 Y5 F75',
+            'G4 P[PROBE_DELAY]',
+            '%Y_TOP = posy',
+            '%Y_CENTER = ((Y_TOP - Y_BOTTOM)/2) * -1',
+            `${prependUnits} G0 Y[Y_CENTER]`,
+            `G21 G10 L20 ${p} X[X_OFF] Y[Y_OFF]`,
+            finalZeroMove('X0 Y0'),
+            `G21 G0 G90 Z${zRetractAuto}`,
+        );
+    } else if (axes.x && axes.y) {
+        code.push(
+            '; AZ Probe XY Tip',
+            `%X_OFF = ${xOff}`,
+            `%Y_OFF = ${yOff}`,
+            `%PROBE_DELAY=${probeDelay}`,
+            `%PROBE_MOVE_FEED=${probeMovementSpeedAuto}`,
+            'G21 G91',
+            `G38.2 Z-${zDistance} F200`,
+            'G21 G91 G0 Z0.5',
+            'G21 G91 G0 X-3',
+            'G38.2 X-30 F150',
+            'G21 G91 G0 X2',
+            'G38.2 X-5 F75',
+            'G4 P[PROBE_DELAY]',
+            `G10 L20 ${p} X0`,
+            'G21 G91 G0 X14',
+            'G38.2 X15 F150',
+            'G21 G91 G0 X-2',
+            'G38.2 X5 F75',
+            'G4 P[PROBE_DELAY]',
+            `${prependUnits} G10 L20 ${p} X[posx/2]`,
+            `${prependUnits} G90 G0 X0`,
+            'G21 G91 G0 Y-3',
+            'G38.2 Y-15 F150',
+            'G21 G91 G0 Y2',
+            'G38.2 Y-5 F75',
+            'G4 P[PROBE_DELAY]',
+            `G10 L20 ${p} Y0`,
+            'G21 G91 G0 Y14',
+            'G38.2 Y15 F150',
+            'G21 G91 G0 Y-2',
+            'G38.2 Y5 F75',
+            'G4 P[PROBE_DELAY]',
+            `${prependUnits} G10 L20 ${p} Y[posy/2]`,
+            `${prependUnits} G90 G0 X0 Y0`,
+            'G4 P[PROBE_DELAY]',
+            `G21 G10 L20 ${p} X[X_OFF] Y[Y_OFF]`,
+            finalZeroMove('X0 Y0'),
+        );
+    } else if (axes.z) {
+        code.push(
+            '; AZ Probe Z Tip',
+            `%Z_THICKNESS = ${zThickness.autoZero}`,
+            `%PROBE_DELAY=${probeDelay}`,
+            'G21 G91',
+            `G38.2 Z-${zDistance} F200`,
+            'G21 G91 G0 Z2',
+            'G38.2 Z-5 F75',
+            'G4 P[PROBE_DELAY]',
+            `G10 L20 ${p} Z[Z_THICKNESS]`,
+            'G4 P[PROBE_DELAY]',
+            `G21 G91 G0 Z${zRetractAuto}`,
+        );
+    } else if (axes.x) {
+        code.push(
+            '; AZ Probe X Tip',
+            `%X_OFF = ${xOff}`,
+            `%PROBE_DELAY=${probeDelay}`,
+            `%PROBE_MOVE_FEED=${probeMovementSpeedAuto}`,
+            'G21 G91',
+            `G38.2 Z-${zDistance} F200`,
+            'G21 G91 G0 Z0.5',
+            'G21 G91 G0 X-3',
+            'G38.2 X-30 F150',
+            'G21 G91 G0 X2',
+            'G38.2 X-5 F75',
+            'G4 P[PROBE_DELAY]',
+            `G10 L20 ${p} X0`,
+            'G21 G91 G0 X14',
+            'G38.2 X15 F150',
+            'G21 G91 G0 X-2',
+            'G38.2 X5 F75',
+            'G4 P[PROBE_DELAY]',
+            `${prependUnits} G10 L20 ${p} X[posx/2]`,
+            finalZeroMove('X0'),
+            'G4 P[PROBE_DELAY]',
+            `G10 L20 ${p} X[X_OFF]`,
+            'G4 P[PROBE_DELAY]',
+            `G21 G91 G0 Z${zRetractAuto}`,
+        );
+    } else if (axes.y) {
+        code.push(
+            '; AZ Probe Y Tip',
+            `%Y_OFF = ${yOff}`,
+            `%PROBE_DELAY=${probeDelay}`,
+            `%PROBE_MOVE_FEED=${probeMovementSpeedAuto}`,
+            'G21 G91',
+            `G38.2 Z-${zDistance} F200`,
+            'G21 G91 G0 Z0.5',
+            'G21 G91 G0 Y-3',
+            'G38.2 Y-15 F150',
+            'G21 G91 G0 Y2',
+            'G38.2 Y-5 F75',
+            'G4 P[PROBE_DELAY]',
+            `G10 L20 ${p} Y0`,
+            'G21 G91 G0 Y14',
+            'G38.2 Y15 F150',
+            'G21 G91 G0 Y-2',
+            'G38.2 Y5 F75',
+            'G4 P[PROBE_DELAY]',
+            `${prependUnits} G10 L20 ${p} Y[posy/2]`,
+            finalZeroMove('Y0'),
+            'G4 P[PROBE_DELAY]',
+            `G10 L20 ${p} Y[Y_OFF]`,
+            'G4 P[PROBE_DELAY]',
+            `G21 G91 G0 Z${zRetractAuto}`,
+        );
+    }
 
 	return code;
 };
 
 //Routines for AutoZero where tool dia is specified
 export const get3AxisAutoDiameterRoutine = ({
-	axes,
-	direction,
-	toolDiameter,
-	firmware,
-	homingEnabled,
-	zThickness,
-	units,
-	zRetractAuto,
+    axes,
+    direction,
+    toolDiameter,
+    firmware,
+    homingEnabled,
+    zThickness,
+    units,
+    zRetractAuto,
+    probeMovementSpeedAuto = 0,
 }: ProbingOptions): Array<string> => {
 	const code: Array<string> = [];
 	const p = "P0";
@@ -695,123 +717,132 @@ export const get3AxisAutoDiameterRoutine = ({
 	// Addition because it's already negative
 	const compensatedValue = Number((22.5 + toolCompensatedThickness).toFixed(3));
 
-	if (axes.z && axes.y && axes.z) {
-		code.push(
-			"; AZ Probe XYZ specific dia",
-			`%X_OFF = ${xOff}`,
-			`%Y_OFF = ${yOff}`,
-			`%Z_THICKNESS = ${zThickness.autoZero}`,
-			`%PROBE_DELAY=${probeDelay}`,
-			"G21 G91",
-			`G38.2 Z-${zDistance} F200`,
-			"G21 G91 G0 Z2",
-			"G38.2 Z-5 F75",
-			"G4 P[PROBE_DELAY]",
-			`G10 L20 ${p} Z[Z_THICKNESS]`,
-			"G4 P[PROBE_DELAY]", // for some reason we need this or the Z0 will be too high
-			"G21 G91 G0 Z3",
-			"G21 G91 G0 X13",
-			"G38.2 X20 F250",
-			"G21 G91 G0 X-2",
-			"G38.2 X5 F75",
-			"G4 P[PROBE_DELAY]",
-			`G21 G10 L20 ${p} X${compensatedValue}`,
-			"G21 G90 G0 X0",
-			"G21 G91 G0 Y13",
-			"G38.2 Y20 F250",
-			"G21 G91 G0 Y-2",
-			"G38.2 Y5 F75",
-			"G4 P[PROBE_DELAY]",
-			`G21 G10 L20 ${p} Y${compensatedValue}`,
-			"G21 G90 G0 X0 Y0",
-			"G4 P[PROBE_DELAY]",
-			`G21 G10 L20 ${p} X[X_OFF] Y[Y_OFF]`,
-			"G21 G90 G0 X0 Y0",
-			`G21 G90 G0 Z${zRetractAuto}`,
-		);
-	} else if (axes.x && axes.y) {
-		code.push(
-			"; AZ Probe XY specific dia",
-			`%X_OFF = ${xOff}`,
-			`%Y_OFF = ${yOff}`,
-			`%PROBE_DELAY=${probeDelay}`,
-			"G21 G91",
-			`G38.2 Z-${zDistance} F200`,
-			"G21 G91 G0 Z3",
-			"G21 G91 G0 X13",
-			"G38.2 X20 F250",
-			"G21 G91 G0 X-2",
-			"G38.2 X5 F75",
-			"G4 P[PROBE_DELAY]",
-			`G21 G10 L20 ${p} X${compensatedValue}`,
-			"G21 G90 G0 X0",
-			"G21 G91 G0 Y13",
-			"G38.2 Y20 F250",
-			"G21 G91 G0 Y-2",
-			"G38.2 Y5 F75",
-			"G4 P[PROBE_DELAY]",
-			`G21 G10 L20 ${p} Y${compensatedValue}`,
-			"G21 G90 G0 X0 Y0",
-			"G4 P[PROBE_DELAY]",
-			`G21 G10 L20 ${p} X[X_OFF] Y[Y_OFF]`,
-			"G4 P[PROBE_DELAY]",
-			"G21 G90 G0 X0 Y0",
-		);
-	} else if (axes.z) {
-		code.push(
-			"; AZ Probe Z specific dia",
-			`%Z_THICKNESS = ${zThickness.autoZero}`,
-			`%PROBE_DELAY=${probeDelay}`,
-			"G21 G91",
-			`G38.2 Z-${zDistance} F200`,
-			"G21 G91 G0 Z2",
-			"G38.2 Z-5 F75",
-			"G4 P[PROBE_DELAY]",
-			`G10 L20 ${p} Z[Z_THICKNESS]`,
-			"G4 P[PROBE_DELAY]",
-			`G21 G91 G0 Z${zRetractAuto}`,
-		);
-	} else if (axes.y) {
-		code.push(
-			"; AZ Probe Y specific dia",
-			`%Y_OFF = ${yOff}`,
-			`%PROBE_DELAY=${probeDelay}`,
-			"G21 G91",
-			`G38.2 Z-${zDistance} F200`,
-			"G21 G91 G0 Z3",
-			"G21 G91 G0 Y13",
-			"G38.2 Y20 F250",
-			"G21 G91 G0 Y-2",
-			"G38.2 Y5 F75",
-			"G4 P[PROBE_DELAY]",
-			`G21 G10 L20 ${p} Y${compensatedValue}`,
-			"G21 G90 G0 Y0",
-			"G4 P[PROBE_DELAY]",
-			`G10 L20 ${p} Y[Y_OFF]`,
-			"G4 P[PROBE_DELAY]",
-			`G21 G91 G0 Z${zRetractAuto}`,
-		);
-	} else if (axes.x) {
-		code.push(
-			"; AZ Probe X specific dia",
-			`%X_OFF = ${xOff}`,
-			`%PROBE_DELAY=${probeDelay}`,
-			"G21 G91",
-			`G38.2 Z-${zDistance} F200`,
-			"G21 G91 G0 Z3",
-			"G21 G91 G0 X13",
-			"G38.2 X20 F250",
-			"G21 G91 G0 X-2",
-			"G38.2 X5 F75",
-			"G4 P[PROBE_DELAY]",
-			`G21 G10 L20 ${p} X${compensatedValue}`,
-			"G21 G90 G0 X0",
-			"G4 P[PROBE_DELAY]",
-			`G10 L20 ${p} X[X_OFF]`,
-			"G4 P[PROBE_DELAY]",
-			`G21 G91 G0 Z${zRetractAuto}`,
-		);
-	}
+    const finalZeroMove = (coords: string): string =>
+        probeMovementSpeedAuto > 0
+            ? `G21 G90 G1 ${coords} F[PROBE_MOVE_FEED]`
+            : `G21 G90 G0 ${coords}`;
+
+    if (axes.z && axes.y && axes.z) {
+        code.push(
+            '; AZ Probe XYZ specific dia',
+            `%X_OFF = ${xOff}`,
+            `%Y_OFF = ${yOff}`,
+            `%Z_THICKNESS = ${zThickness.autoZero}`,
+            `%PROBE_DELAY=${probeDelay}`,
+            `%PROBE_MOVE_FEED=${probeMovementSpeedAuto}`,
+            'G21 G91',
+            `G38.2 Z-${zDistance} F200`,
+            'G21 G91 G0 Z2',
+            'G38.2 Z-5 F75',
+            'G4 P[PROBE_DELAY]',
+            `G10 L20 ${p} Z[Z_THICKNESS]`,
+            'G4 P[PROBE_DELAY]', // for some reason we need this or the Z0 will be too high
+            'G21 G91 G0 Z3',
+            'G21 G91 G0 X13',
+            'G38.2 X20 F250',
+            'G21 G91 G0 X-2',
+            'G38.2 X5 F75',
+            'G4 P[PROBE_DELAY]',
+            `G21 G10 L20 ${p} X${compensatedValue}`,
+            'G21 G90 G0 X0',
+            'G21 G91 G0 Y13',
+            'G38.2 Y20 F250',
+            'G21 G91 G0 Y-2',
+            'G38.2 Y5 F75',
+            'G4 P[PROBE_DELAY]',
+            `G21 G10 L20 ${p} Y${compensatedValue}`,
+            'G21 G90 G0 X0 Y0',
+            'G4 P[PROBE_DELAY]',
+            `G21 G10 L20 ${p} X[X_OFF] Y[Y_OFF]`,
+            finalZeroMove('X0 Y0'),
+            `G21 G90 G0 Z${zRetractAuto}`,
+        );
+    } else if (axes.x && axes.y) {
+        code.push(
+            '; AZ Probe XY specific dia',
+            `%X_OFF = ${xOff}`,
+            `%Y_OFF = ${yOff}`,
+            `%PROBE_DELAY=${probeDelay}`,
+            `%PROBE_MOVE_FEED=${probeMovementSpeedAuto}`,
+            'G21 G91',
+            `G38.2 Z-${zDistance} F200`,
+            'G21 G91 G0 Z3',
+            'G21 G91 G0 X13',
+            'G38.2 X20 F250',
+            'G21 G91 G0 X-2',
+            'G38.2 X5 F75',
+            'G4 P[PROBE_DELAY]',
+            `G21 G10 L20 ${p} X${compensatedValue}`,
+            'G21 G90 G0 X0',
+            'G21 G91 G0 Y13',
+            'G38.2 Y20 F250',
+            'G21 G91 G0 Y-2',
+            'G38.2 Y5 F75',
+            'G4 P[PROBE_DELAY]',
+            `G21 G10 L20 ${p} Y${compensatedValue}`,
+            'G21 G90 G0 X0 Y0',
+            'G4 P[PROBE_DELAY]',
+            `G21 G10 L20 ${p} X[X_OFF] Y[Y_OFF]`,
+            'G4 P[PROBE_DELAY]',
+            finalZeroMove('X0 Y0'),
+        );
+    } else if (axes.z) {
+        code.push(
+            '; AZ Probe Z specific dia',
+            `%Z_THICKNESS = ${zThickness.autoZero}`,
+            `%PROBE_DELAY=${probeDelay}`,
+            'G21 G91',
+            `G38.2 Z-${zDistance} F200`,
+            'G21 G91 G0 Z2',
+            'G38.2 Z-5 F75',
+            'G4 P[PROBE_DELAY]',
+            `G10 L20 ${p} Z[Z_THICKNESS]`,
+            'G4 P[PROBE_DELAY]',
+            `G21 G91 G0 Z${zRetractAuto}`,
+        );
+    } else if (axes.y) {
+        code.push(
+            '; AZ Probe Y specific dia',
+            `%Y_OFF = ${yOff}`,
+            `%PROBE_DELAY=${probeDelay}`,
+            `%PROBE_MOVE_FEED=${probeMovementSpeedAuto}`,
+            'G21 G91',
+            `G38.2 Z-${zDistance} F200`,
+            'G21 G91 G0 Z3',
+            'G21 G91 G0 Y13',
+            'G38.2 Y20 F250',
+            'G21 G91 G0 Y-2',
+            'G38.2 Y5 F75',
+            'G4 P[PROBE_DELAY]',
+            `G21 G10 L20 ${p} Y${compensatedValue}`,
+            finalZeroMove('Y0'),
+            'G4 P[PROBE_DELAY]',
+            `G10 L20 ${p} Y[Y_OFF]`,
+            'G4 P[PROBE_DELAY]',
+            `G21 G91 G0 Z${zRetractAuto}`,
+        );
+    } else if (axes.x) {
+        code.push(
+            '; AZ Probe X specific dia',
+            `%X_OFF = ${xOff}`,
+            `%PROBE_DELAY=${probeDelay}`,
+            `%PROBE_MOVE_FEED=${probeMovementSpeedAuto}`,
+            'G21 G91',
+            `G38.2 Z-${zDistance} F200`,
+            'G21 G91 G0 Z3',
+            'G21 G91 G0 X13',
+            'G38.2 X20 F250',
+            'G21 G91 G0 X-2',
+            'G38.2 X5 F75',
+            'G4 P[PROBE_DELAY]',
+            `G21 G10 L20 ${p} X${compensatedValue}`,
+            finalZeroMove('X0'),
+            'G4 P[PROBE_DELAY]',
+            `G10 L20 ${p} X[X_OFF]`,
+            'G4 P[PROBE_DELAY]',
+            `G21 G91 G0 Z${zRetractAuto}`,
+        );
+    }
 
 	return code;
 };

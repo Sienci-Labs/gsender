@@ -7,6 +7,7 @@ on:
       - master
       - dev
       - features/* # all feature branches
+      - bugfix/*
       - ci/* # all branches with the prefix 'ci/'
     # Sequence of patterns matched against refs/tags
     tags:

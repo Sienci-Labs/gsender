@@ -458,19 +458,27 @@ class Controller {
 		this.socket && this.socket.emit("close", port, callback);
 	}
 
-	//Sends an event to start flashing
-	//@param {string} flashPort The port to be flashed
-	//@param {string} imageType The type of image to be flashed to the port
-	flashFirmware(
-		flashPort: string,
-		imageType: string,
-		isHal: boolean,
-		hex: string,
-	): void {
-		//TODO: not sure what type imageType is
-		this.socket &&
-			this.socket.emit("flash:start", flashPort, imageType, isHal, hex);
-	}
+    //Sends an event to start flashing
+    //@param {string} flashPort The port to be flashed
+    //@param {string} imageType The type of image to be flashed to the port
+    flashFirmware(
+        flashPort: string,
+        imageType: string,
+        isHal: boolean,
+        hex: string | ArrayBuffer,
+        firmwareType: string = 'hex',
+    ): void {
+        //TODO: not sure what type imageType is
+        this.socket &&
+            this.socket.emit(
+                'flash:start',
+                flashPort,
+                imageType,
+                isHal,
+                hex,
+                firmwareType,
+            );
+    }
 
 	// Retrieves a list of available serial ports with metadata.
 	// @param {function} [callback] Called once completed.

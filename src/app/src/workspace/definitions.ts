@@ -47,6 +47,7 @@ export interface Workspace {
 	revertWorkspace: boolean;
 	promptExit: boolean;
 	backupFreq: BackupFrequencies;
+	backupLoc: string;
 	lastBackupTime: number;
 	powerSaving: boolean;
 	park: object;

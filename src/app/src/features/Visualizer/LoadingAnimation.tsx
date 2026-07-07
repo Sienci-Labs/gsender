@@ -21,25 +21,31 @@
  *
  */
 
-export const modalStyle = {
-	border: "none",
-	backgroundColor: "#d1d5db",
+import bitImage from "./images/dustbit11.png";
+import bitEffect from "./images/effect.png";
+import styles from "./loader.module.styl";
+
+const LoadingAnimation = () => {
+	return (
+		<div className={styles.bitContainer}>
+			<div>
+				<img
+					src={bitEffect}
+					width="33px"
+					height="60px"
+					alt=""
+					className={styles.bitEffect}
+				/>
+				<img
+					src={bitImage}
+					width="26px"
+					height="60px"
+					alt=""
+					className={styles.bit}
+				/>
+			</div>
+		</div>
+	);
 };
 
-export const modalHeaderStyle = {
-	backgroundColor: "#d1d5db",
-	border: "none",
-};
-
-export const modalTitleStyle = {
-	color: "#dc2626",
-	height: "22px",
-};
-
-export const modalBodyStyle = {
-	fontSize: "1.25rem",
-};
-
-export const modalFooterStyle = {
-	backgroundColor: "#d1d5db",
-};
+export default LoadingAnimation;

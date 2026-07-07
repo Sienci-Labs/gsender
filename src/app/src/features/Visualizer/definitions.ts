@@ -49,6 +49,10 @@ export interface Visualizer {
 		limits: {
 			visible: boolean;
 		};
+		machineBed: {
+			visible: boolean;
+			trimGridToBed: boolean;
+		};
 		coordinateSystem: {
 			visible: boolean;
 		};
@@ -72,6 +76,7 @@ export interface Visualizer {
 	showLineWarnings: boolean;
 	showSoftLimitWarning: boolean;
 	hideProcessedLines: boolean;
+	boundingBoxLabels: boolean;
 	rotaryDiameterOffsetEnabled: boolean;
 	debug: {
 		profileWorker: boolean;
@@ -121,6 +126,10 @@ export interface State {
 		limits: {
 			visible: boolean;
 		};
+		machineBed: {
+			visible: boolean;
+			trimGridToBed: boolean;
+		};
 		coordinateSystem: {
 			visible: boolean;
 		};
@@ -142,6 +151,8 @@ export interface State {
 	};
 	cameraMode: CAMERA_MODES_T;
 	cameraPosition: CAMERA_POSITIONS_T; // 'Top', '3D', 'Front', 'Left', 'Right'
+	moveToHere: boolean; // "Move To Here" placement mode is armed
+	isConnected?: boolean; // Injected at render from connection state
 	isAgitated: boolean; // Defaults to false
 	currentTheme: Map<string, string>;
 	currentTab: number;
@@ -203,6 +214,8 @@ export interface Actions {
 		toLeftSideView: () => void;
 		toRightSideView: () => void;
 		toFreeView: () => void;
+		toggleMoveToHere: () => void;
+		disableMoveToHere: () => void;
 	};
 	handleLiteModeToggle: () => void;
 	lineWarning: {

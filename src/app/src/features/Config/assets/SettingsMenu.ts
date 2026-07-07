@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noExplicitAny: <> */
 import {
 	GRBL,
 	GRBLHAL,
@@ -101,7 +102,8 @@ export type gSenderSettingType =
 	| "api"
 	| "jog"
 	| "location"
-	| "wizard";
+	| "wizard"
+	| "path";
 
 export type gSenderSettingsValues = number | string | boolean;
 
@@ -109,7 +111,7 @@ export interface gSenderSetting {
 	label?: string;
 	type: gSenderSettingType;
 	key?: string;
-	description?: string | any[];
+	description?: string;
 	options?: string[] | number[];
 	unit?: string;
 	eID?: EEPROM;
@@ -264,12 +266,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						description: "Allow screen to blank/sleep.",
 						onEnable: () => {
 							if (isElectron()) {
-								window.ipcRenderer.send("change-power-saving", true);
+								(window as any).ipcRenderer.send("change-power-saving", true);
 							}
 						},
 						onDisable: () => {
 							if (isElectron()) {
-								window.ipcRenderer.send("change-power-saving", false);
+								(window as any).ipcRenderer.send("change-power-saving", false);
 							}
 						},
 					},
@@ -281,12 +283,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
 							"Pop up a confirmation window when exiting the program.",
 						onEnable: () => {
 							if (isElectron()) {
-								window.ipcRenderer.send("assignPromptExit", true);
+								(window as any).ipcRenderer.send("assignPromptExit", true);
 							}
 						},
 						onDisable: () => {
 							if (isElectron()) {
-								window.ipcRenderer.send("assignPromptExit", false);
+								(window as any).ipcRenderer.send("assignPromptExit", false);
 							}
 						},
 					},
@@ -297,6 +299,19 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						description:
 							"Choose how often gSender will backup your settings. Useful in case you need to revert them in the future.",
 						options: ["On Update", "Daily", "Weekly", "Monthly"],
+						hidden: () => {
+							return !isElectron();
+						},
+					},
+					{
+						label: "Settings backup location",
+						key: "workspace.backupLoc",
+						type: "path",
+						description:
+							"Choose the location to backup your settings to. Leave it blank to use the default appData location.",
+						hidden: () => {
+							return !isElectron();
+						},
 					},
 					{
 						label: "Collect usage data",
@@ -335,13 +350,82 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						type: "boolean",
 					},
 					{
+						label: "DRO zeros",
+						key: "workspace.customDecimalPlaces",
+						description:
+							"Set the number of decimal places shown between 1-4. (Default 0 shows 2 for mm and 3 for inches)",
+						type: "number",
+						min: 0,
+						max: 4,
+					},
+				],
+			},
+			{
+				label: "Visualizer options",
+				settings: [
+					{
 						label: "Visualizer theme",
 						key: "widgets.visualizer.theme",
 						description: "Independent colour control for the visualizer.",
 						type: "select",
-						options: [THEMES.LIGHT_THEME, THEMES.DARK_THEME],
+						options: [
+							THEMES.LIGHT_THEME,
+							THEMES.DARK_THEME,
+							THEMES.FLEXOKI_DARK_THEME,
+							THEMES.TOKYO_NIGHT_THEME,
+							THEMES.GRUVBOX_LIGHT_THEME,
+							THEMES.AYU_DARK_THEME,
+							THEMES.AYU_LIGHT_THEME,
+						],
 						onChange: (theme: THEMES_T) => {
 							pubsub.publish("theme:change", theme);
+						},
+					},
+					{
+						label: "Show bounding box",
+						key: "widgets.visualizer.objects.limits.visible",
+						description: "Draw a wireframe around the extents of the loaded G-code file.",
+						type: "boolean",
+						onChange: (value: boolean) => {
+						store.set("widgets.visualizer.objects.limits.visible", value);
+						pubsub.publish("visualizer:settings");
+					},
+					},
+					{
+						label: "Show bounding box labels",
+						key: "widgets.visualizer.boundingBoxLabels",
+						description: "Show X/Y/Z dimension labels on the bounding box.",
+						type: "boolean",
+						onChange: (value: boolean) => {
+							store.set("widgets.visualizer.boundingBoxLabels", value);
+							pubsub.publish("visualizer:settings");
+						},
+					},
+					{
+						label: "Show machine bed indicator",
+						key: "widgets.visualizer.objects.machineBed.visible",
+						description:
+							"Draw an outline of the machine's homed work area once homing is complete.",
+						type: "boolean",
+						defaultValue: false,
+						onChange: (value: boolean) => {
+							store.set("widgets.visualizer.objects.machineBed.visible", value);
+							pubsub.publish("visualizer:settings");
+						},
+					},
+					{
+						label: "Trim grid to machine bed",
+						key: "widgets.visualizer.objects.machineBed.trimGridToBed",
+						description:
+							"When the machine bed indicator is shown, clip the background grid to just past the bed's edges instead of a fixed square.",
+						type: "boolean",
+						defaultValue: false,
+						onChange: (value: boolean) => {
+							store.set(
+								"widgets.visualizer.objects.machineBed.trimGridToBed",
+								value,
+							);
+							pubsub.publish("visualizer:settings");
 						},
 					},
 					{
@@ -360,15 +444,6 @@ export const SettingsMenu: SettingsMenuSection[] = [
 							LIGHTWEIGHT_OPTIONS.LIGHT,
 							LIGHTWEIGHT_OPTIONS.EVERYTHING,
 						],
-					},
-					{
-						label: "DRO zeros",
-						key: "workspace.customDecimalPlaces",
-						description:
-							"Set the number of decimal places shown between 1-4. (Default 0 shows 2 for mm and 3 for inches)",
-						type: "number",
-						min: 0,
-						max: 4,
 					},
 				],
 			},
@@ -861,6 +936,23 @@ export const SettingsMenu: SettingsMenuSection[] = [
 								probeType === TOUCHPLATE_TYPE_AUTOZERO ||
 								probeType === TOUCHPLATE_TYPE_BITZERO
 							);
+						},
+					},
+					{
+						label: 'Probe Movement Speed',
+						key: 'widgets.probe.probeMovementSpeed',
+						description:
+							'Feed rate for retract/reposition moves during probing. If 0, these moves use rapid (G0). If set, they use a controlled feed move (G1) at this speed instead. (Default 0)',
+						type: 'number',
+						min: 0,
+						unit: 'mm/min',
+						hidden: (getPending) => {
+							const probeType = getPending(
+								'workspace.probeProfile.touchplateType',
+								'',
+							);
+							// BitZero already always uses G1 for retracts, so this setting doesn't apply to it
+							return probeType === TOUCHPLATE_TYPE_BITZERO;
 						},
 					},
 					{

@@ -180,6 +180,7 @@
 		},
 		"linux": {
 			"category": "Utility",
+			"icon": "electron-build/icon-square.png",
 			"target": [
 				"AppImage",
 				"deb"
@@ -238,6 +239,7 @@
 		"@serialport/parser-byte-length": "^13.0.0",
 		"@serialport/parser-readline": "^13.0.0",
 		"@sienci/avrgirl-arduino": "^5.0.3",
+		"@sienci/gviewer": "^0.1.21",
 		"axios": "^1.2.4",
 		"basic-ftp": "^5.1.0",
 		"bcrypt-nodejs": "0.0.3",
@@ -386,7 +388,6 @@
 		"file-saver": "^2.0.5",
 		"gamepad.js": "^2.1.0",
 		"github-release-cli": "~1.1.0",
-		"gsap": "^3.11.5",
 		"html-react-parser": "^5.2.2",
 		"jest": "^30.2.0",
 		"jest-environment-jsdom": "^30.2.0",

@@ -1,11 +1,11 @@
-import Tooltip from "app/components/Tooltip";
+/** biome-ignore-all lint/a11y/useButtonType: <> */
 import store from "app/store";
 import cn from "classnames";
 import { type JSX, useEffect, useState } from "react";
 import { BsEthernet, BsUsbPlug } from "react-icons/bs";
 import { FaArrowAltCircleRight } from "react-icons/fa";
 import type { Port } from "../definitions";
-import { ConnectionType, FirmwareFlavour } from "../index";
+import { ConnectionType } from "../index";
 
 export interface PortListingsProps {
 	ports: Port[];
