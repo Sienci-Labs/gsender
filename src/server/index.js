@@ -333,6 +333,16 @@ const createServer = (options, callback) => {
 				options.controller || config.get("controller", ""),
 			);
 
+			// Dev-only: live-reload plugin iframes when their files change.
+			if (process.env.NODE_ENV === "development") {
+				pluginRegistry.watchPlugins(({ dir, filename }) => {
+					log.info(
+						`Plugin change detected in ${dir}${filename ? ` (${filename})` : ""}; notifying clients`,
+					);
+					cncengine.emit("plugins:changed", { dir, filename });
+				});
+			}
+
 			const address = server.address().address;
 			const port = server.address().port;
 

@@ -20,8 +20,8 @@ import fs from "fs";
 import path from "path";
 
 import settings from "../../config/settings";
-import config from "../configstore";
 import logger from "../../lib/logger";
+import config from "../configstore";
 
 const log = logger("service:pluginregistry");
 
@@ -35,6 +35,29 @@ const ensurePluginsDirectory = () => {
 		fs.mkdirSync(dir, { recursive: true });
 	}
 	return dir;
+};
+
+const getPluginDirectories = () => {
+	const extra = Array.isArray(settings.extraPluginsDirs)
+		? settings.extraPluginsDirs
+		: [];
+	const ordered = [...extra, getPluginsDirectory()];
+
+	const seen = new Set();
+	const dirs = [];
+	ordered.forEach((dir) => {
+		if (!dir) {
+			return;
+		}
+		const resolved = path.resolve(dir);
+		if (seen.has(resolved)) {
+			return;
+		}
+		seen.add(resolved);
+		dirs.push(resolved);
+	});
+
+	return dirs;
 };
 
 const readManifest = (pluginPath) => {
@@ -114,14 +137,17 @@ const setPluginEnabled = (pluginId, enabled) => {
 	config.set("pluginSettings", pluginSettings);
 };
 
-const discoverPlugins = () => {
-	const pluginsDir = ensurePluginsDirectory();
+const discoverPluginsInDir = (pluginsDir) => {
 	let entries = [];
 
 	try {
 		entries = fs.readdirSync(pluginsDir, { withFileTypes: true });
 	} catch (err) {
-		log.error(`Failed to read plugins directory: ${err.message}`);
+		if (err.code !== "ENOENT") {
+			log.error(
+				`Failed to read plugins directory ${pluginsDir}: ${err.message}`,
+			);
+		}
 		return [];
 	}
 
@@ -161,6 +187,38 @@ const discoverPlugins = () => {
 			contributions: manifest.ui.contributions || [],
 			pluginPath,
 			uiServePath,
+			sourceDir: pluginsDir,
+		});
+	});
+
+	return plugins;
+};
+
+const discoverPlugins = () => {
+	ensurePluginsDirectory();
+	const dirs = getPluginDirectories();
+
+	const seenIds = new Set();
+	const seenSlugs = new Set();
+	const plugins = [];
+
+	dirs.forEach((dir) => {
+		discoverPluginsInDir(dir).forEach((plugin) => {
+			if (seenIds.has(plugin.id)) {
+				log.debug(
+					`Skipping duplicate plugin id "${plugin.id}" from ${dir} (already loaded)`,
+				);
+				return;
+			}
+			if (seenSlugs.has(plugin.mountSlug)) {
+				log.debug(
+					`Skipping plugin "${plugin.id}" from ${dir}: mount slug "${plugin.mountSlug}" already in use`,
+				);
+				return;
+			}
+			seenIds.add(plugin.id);
+			seenSlugs.add(plugin.mountSlug);
+			plugins.push(plugin);
 		});
 	});
 
@@ -180,9 +238,87 @@ const getMountPointsFromPlugins = () => {
 		}));
 };
 
+// HMR for plugins
+let watchers = [];
+let watchDebounce = null;
+
+const stopWatchingPlugins = () => {
+	watchers.forEach((watcher) => {
+		try {
+			watcher.close();
+		} catch {
+			// ignore
+		}
+	});
+	watchers = [];
+	if (watchDebounce) {
+		clearTimeout(watchDebounce);
+		watchDebounce = null;
+	}
+};
+
+const watchPlugins = (onChange, { debounceMs = 200 } = {}) => {
+	stopWatchingPlugins();
+
+	const notify = (dir, filename) => {
+		if (watchDebounce) {
+			clearTimeout(watchDebounce);
+		}
+		watchDebounce = setTimeout(() => {
+			watchDebounce = null;
+			try {
+				onChange({ dir, filename });
+			} catch (err) {
+				log.error(`Plugin watch handler failed: ${err.message}`);
+			}
+		}, debounceMs);
+	};
+
+	const addWatch = (target, { recursive }) => {
+		if (!fs.existsSync(target)) {
+			return;
+		}
+		try {
+			const watcher = fs.watch(target, { recursive }, (_event, filename) =>
+				notify(target, filename),
+			);
+			watchers.push(watcher);
+		} catch (err) {
+			// Recursive watch isn't available on some platforms/Node versions.
+			try {
+				const watcher = fs.watch(target, (_event, filename) =>
+					notify(target, filename),
+				);
+				watchers.push(watcher);
+			} catch (innerErr) {
+				log.error(`Failed to watch ${target}: ${innerErr.message}`);
+			}
+		}
+	};
+
+	// Shallow-watch the roots so adding/removing a plugin folder is detected.
+	getPluginDirectories().forEach((dir) => addWatch(dir, { recursive: false }));
+
+	// Deep-watch each served `ui/` directory — this is exactly what the iframe
+	// loads, so it covers both source (vanilla) and built (Vite) plugins without
+	// watching node_modules or pre-build source.
+	const uiDirs = discoverPlugins()
+		.filter((plugin) => plugin.valid)
+		.map((plugin) => plugin.uiServePath);
+
+	uiDirs.forEach((uiDir) => addWatch(uiDir, { recursive: true }));
+
+	log.info(
+		`Watching ${uiDirs.length} plugin UI director${uiDirs.length === 1 ? "y" : "ies"} for changes`,
+	);
+
+	return stopWatchingPlugins;
+};
+
 export default {
 	MANIFEST_FILENAME,
 	getPluginsDirectory,
+	getPluginDirectories,
 	ensurePluginsDirectory,
 	discoverPlugins,
 	getEnabledPlugins,
@@ -190,4 +326,6 @@ export default {
 	setPluginEnabled,
 	isPluginEnabled,
 	validateManifest,
+	watchPlugins,
+	stopWatchingPlugins,
 };

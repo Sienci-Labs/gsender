@@ -76,6 +76,29 @@ const getUserDataPath = () => {
 	return getDefaultUserDataPath();
 };
 
+// Additional plugin directories scanned alongside the primary (user-data)
+// pluginsDir. Used so that, in development, plugins can be loaded straight from
+// the repo-root `plugins/` folder without copying them into Application Support.
+const getExtraPluginsDirs = () => {
+	const dirs = [];
+
+	// Explicit override: OS-native path list (":" on posix, ";" on win32).
+	if (process.env.GSENDER_PLUGINS_DIRS) {
+		process.env.GSENDER_PLUGINS_DIRS.split(path.delimiter)
+			.map((entry) => entry.trim())
+			.filter(Boolean)
+			.forEach((entry) => dirs.push(path.resolve(entry)));
+	}
+
+	// In development the server is launched from the repo root, so the source
+	// `plugins/` folder lives at cwd. The registry checks existence before use.
+	if (process.env.NODE_ENV === "development") {
+		dirs.push(path.resolve(process.cwd(), "plugins"));
+	}
+
+	return dirs;
+};
+
 export default {
 	rcfile: path.resolve(getUserHome(), RC_FILE),
 	verbosity: 0,
@@ -238,4 +261,5 @@ export default {
 	},
 
 	pluginsDir: path.resolve(getUserDataPath(), "plugins"),
+	extraPluginsDirs: getExtraPluginsDirs(),
 };
