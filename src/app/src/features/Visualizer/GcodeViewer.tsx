@@ -55,6 +55,7 @@ import {
 	FLEXOKI_DARK_THEME,
 	GRBL,
 	GRBL_ACTIVE_STATE_CHECK,
+	GRBL_ACTIVE_STATE_IDLE,
 	GRBL_ACTIVE_STATE_RUN,
 	GRBLHAL,
 	GRUVBOX_LIGHT_THEME,
@@ -84,7 +85,14 @@ const THEME_NAME_TO_PRESET: Record<string, GCodeViewerThemePresetName> = {
 const LIGHT_LIKE_PRESETS = new Set<GCodeViewerThemePresetName>(["light", "gruvbox-light", "ayu-light"]);
 
 import { outlineResponse } from "../../workers/Outline.response";
+import { getSafeXYMoveCode } from "app/features/DRO/utils/SafeMove";
+import { computeMachineBedWorkRect } from "app/features/DRO/utils/RapidPosition";
 import type { Actions, CAMERA_POSITIONS_T, State } from "./definitions";
+
+// "Move To Here": how long to hold before committing, and how far the pointer
+// may drift before the gesture is treated as a pan instead of a placement.
+const MOVE_TO_HERE_HOLD_MS = 500;
+const MOVE_TO_HERE_CANCEL_PX = 8;
 
 // Maps gSender's camera positions onto gviewer ViewCube presets.
 const VIEW_MAP: Partial<Record<string, GCodeViewerCameraView>> = {
@@ -143,6 +151,8 @@ class GcodeViewer extends Component<Props> {
 
 	lastWposKey = "";
 
+	lastMachineBedKey = "";
+
 	isRotaryFile = false;
 
 	skipNextCameraFocus = false;
@@ -150,6 +160,17 @@ class GcodeViewer extends Component<Props> {
 	lastConnected: boolean | null = null;
 
 	lastSpinning: boolean | null = null;
+
+	// "Move To Here" placement-mode state.
+	moveToHereActive = false;
+
+	mthPointerId: number | null = null;
+
+	mthStart: { x: number; y: number } | null = null;
+
+	mthTimer: ReturnType<typeof setTimeout> | null = null;
+
+	mthIndicator: HTMLDivElement | null = null;
 
 	componentDidMount() {
 		this.createViewer();
@@ -165,6 +186,7 @@ class GcodeViewer extends Component<Props> {
 	componentWillUnmount() {
 		this.unsubscribe();
 		this.reduxUnsub?.();
+		this.setMoveToHereMode(false);
 		this.viewer3d?.dispose();
 		this.viewerSvg?.dispose();
 		this.viewer3d = null;
@@ -172,8 +194,21 @@ class GcodeViewer extends Component<Props> {
 	}
 
 	componentDidUpdate(prevProps: Props) {
-		if (prevProps.cameraPosition !== this.props.cameraPosition) {
+		// Re-snap on every arm, not just when the camera position value
+		// itself changes, since re-arming after a manual camera rotation
+		// leaves `cameraPosition` unchanged (still "Top").
+		const armingMoveToHere =
+			!prevProps.state.moveToHere && this.props.state.moveToHere;
+		if (
+			prevProps.cameraPosition !== this.props.cameraPosition ||
+			armingMoveToHere
+		) {
 			this.snapToView();
+		}
+
+		// "Move To Here" placement mode armed/disarmed.
+		if (prevProps.state.moveToHere !== this.props.state.moveToHere) {
+			this.setMoveToHereMode(this.props.state.moveToHere);
 		}
 
 		if (!prevProps.show && this.props.show) {
@@ -245,9 +280,10 @@ class GcodeViewer extends Component<Props> {
 		const preset = THEME_NAME_TO_PRESET[themeName ?? ""] ?? "dark";
 		const base = gCodeViewerThemePresets[preset];
 		const boundingBox = LIGHT_LIKE_PRESETS.has(preset) ? "#1d4ed8" : "#93c5fd";
+		const machineBed = LIGHT_LIKE_PRESETS.has(preset) ? "#b45309" : "#fbbf24";
 		return {
 			...base,
-			colors: { ...base.colors, boundingBox },
+			colors: { ...base.colors, boundingBox, machineBed },
 		};
 	}
 
@@ -291,6 +327,7 @@ class GcodeViewer extends Component<Props> {
 				visible: store.get("widgets.visualizer.objects.limits.visible", false),
 				labels: store.get("widgets.visualizer.boundingBoxLabels", false),
 			},
+			machineBed: this.buildMachineBedOptions(),
 			grid: {
 				size: 2 * Math.max(machineWidth, machineDepth),
 				axisDepth: machineHeight,
@@ -298,6 +335,45 @@ class GcodeViewer extends Component<Props> {
 			},
 			render: { antialias: true, theme: this.buildTheme(this.currentThemeName()) },
 		};
+	}
+
+	buildMachineBedOptions(): {
+		visible: boolean;
+		min: { x: number; y: number } | null;
+		max: { x: number; y: number } | null;
+	} {
+		const state = reduxStore.getState();
+		const $22 = _get(state, "controller.settings.settings.$22", "0");
+		const $23 = _get(state, "controller.settings.settings.$23", "0");
+		const hasHomed = !!_get(state, "controller.hasHomed");
+		const homingEnabled = Number($22) > 0;
+		const bedIndicatorEnabled = store.get(
+			"widgets.visualizer.objects.machineBed.visible",
+			false,
+		);
+
+		if (!bedIndicatorEnabled || !homingEnabled || !hasHomed) {
+			return { visible: false, min: null, max: null };
+		}
+
+		const wco = _get(state, "controller.wco", { x: 0, y: 0 });
+		const machineProfile = store.get("workspace.machineProfile") as
+			| MachineProfile
+			| undefined;
+		const machineWidthMm = machineProfile?.mm?.width ?? 800;
+		const machineDepthMm = machineProfile?.mm?.depth ?? 800;
+
+		const { min, max } = computeMachineBedWorkRect({
+			homingMaskSetting: $23,
+			machineWidthMm,
+			machineDepthMm,
+			wcsOffset: {
+				x: Number(wco.x) || 0,
+				y: Number(wco.y) || 0,
+			},
+		});
+
+		return { visible: true, min, max };
 	}
 
 	buildSvgOptions(): Partial<GCodeSVGOptions> {
@@ -413,6 +489,255 @@ class GcodeViewer extends Component<Props> {
 		if (view && this.viewer3d) {
 			this.viewer3d.snapCameraToView(view);
 		}
+	}
+
+	// --- "Move To Here" placement mode --------------------------------------
+
+	// Arm/disarm the press-and-hold gesture. While armed, orbit rotation is
+	// locked (pan + zoom stay live) so the click maps predictably onto the XY
+	// plane, the cursor becomes a crosshair, and pointer listeners are live.
+	setMoveToHereMode(enabled: boolean) {
+		// Placement is a primary-visualizer concept; never arm on the secondary.
+		if (enabled && this.props.isSecondary) {
+			return;
+		}
+
+		this.moveToHereActive = enabled;
+		const dom = this.containerRef;
+
+		if (enabled) {
+			this.viewer3d?.setRotateEnabled(false);
+			if (dom) {
+				dom.style.cursor = "crosshair";
+				dom.addEventListener("pointerdown", this.handleMoveToHerePointerDown);
+			}
+			window.addEventListener("pointermove", this.handleMoveToHerePointerMove);
+			window.addEventListener("pointerup", this.handleMoveToHerePointerUp);
+			window.addEventListener("pointercancel", this.handleMoveToHerePointerUp);
+		} else {
+			this.viewer3d?.setRotateEnabled(true);
+			if (dom) {
+				dom.style.cursor = "";
+				dom.removeEventListener(
+					"pointerdown",
+					this.handleMoveToHerePointerDown,
+				);
+			}
+			window.removeEventListener(
+				"pointermove",
+				this.handleMoveToHerePointerMove,
+			);
+			window.removeEventListener("pointerup", this.handleMoveToHerePointerUp);
+			window.removeEventListener(
+				"pointercancel",
+				this.handleMoveToHerePointerUp,
+			);
+			this.cancelMoveToHereHold();
+		}
+	}
+
+	machineIsReadyToMove(): boolean {
+		const st = reduxStore.getState();
+		const isConnected = !!_get(st, "connection.isConnected");
+		const activeState = _get(st, "controller.state.status.activeState");
+		return isConnected && activeState === GRBL_ACTIVE_STATE_IDLE;
+	}
+
+	handleMoveToHerePointerDown = (e: PointerEvent) => {
+		if (!this.moveToHereActive) {
+			return;
+		}
+		// Primary (left mouse / touch) button only.
+		if (e.button !== undefined && e.button !== 0) {
+			return;
+		}
+		// Track a single pointer at a time (ignore multi-touch gestures).
+		if (this.mthPointerId !== null) {
+			return;
+		}
+		if (!this.machineIsReadyToMove()) {
+			toast.info("Machine must be connected and idle to move");
+			return;
+		}
+
+		this.mthPointerId = e.pointerId;
+		this.mthStart = { x: e.clientX, y: e.clientY };
+		this.showMoveToHereIndicator(e.clientX, e.clientY);
+
+		const { clientX, clientY } = e;
+		this.mthTimer = setTimeout(() => {
+			this.commitMoveToHere(clientX, clientY);
+		}, MOVE_TO_HERE_HOLD_MS);
+	};
+
+	handleMoveToHerePointerMove = (e: PointerEvent) => {
+		if (this.mthPointerId === null || e.pointerId !== this.mthPointerId) {
+			return;
+		}
+		if (!this.mthStart) {
+			return;
+		}
+		const dx = e.clientX - this.mthStart.x;
+		const dy = e.clientY - this.mthStart.y;
+		// Movement beyond the threshold means the user is panning, not placing.
+		if (Math.hypot(dx, dy) > MOVE_TO_HERE_CANCEL_PX) {
+			this.cancelMoveToHereHold();
+		}
+	};
+
+	handleMoveToHerePointerUp = (e: PointerEvent) => {
+		if (this.mthPointerId === null || e.pointerId !== this.mthPointerId) {
+			return;
+		}
+		// Released before the hold completed - cancel the placement.
+		this.cancelMoveToHereHold();
+	};
+
+	cancelMoveToHereHold() {
+		if (this.mthTimer) {
+			clearTimeout(this.mthTimer);
+			this.mthTimer = null;
+		}
+		this.removeMoveToHereIndicator();
+		this.mthPointerId = null;
+		this.mthStart = null;
+	}
+
+	commitMoveToHere(clientX: number, clientY: number) {
+		this.cancelMoveToHereHold();
+
+		if (!this.machineIsReadyToMove()) {
+			toast.info("Machine must be connected and idle to move");
+			this.props.actions.camera.disableMoveToHere();
+			return;
+		}
+
+		// gviewer renders rotary toolpaths on an X-rotated root, so the picked
+		// world XY is not a meaningful work coordinate for those files.
+		if (this.isRotaryFile) {
+			toast.info("Move To Here isn't available for rotary files");
+			this.props.actions.camera.disableMoveToHere();
+			return;
+		}
+
+		const target = this.getWorkCoordsFromClient(clientX, clientY);
+		if (!target) {
+			return;
+		}
+
+		const { units } = this.props.state;
+		const unitModal = units === METRIC_UNITS ? "G21" : "G20";
+		controller.command(
+			"gcode:safe",
+			getSafeXYMoveCode(target.x, target.y),
+			unitModal,
+		);
+
+		toast.success(
+			`Moving to X${target.x.toFixed(2)} Y${target.y.toFixed(2)}`,
+		);
+
+		// Auto-disarm after a successful move.
+		this.props.actions.camera.disableMoveToHere();
+	}
+
+	// Convert a viewport pixel into absolute work XY. gviewer raycasts the pixel
+	// onto the plane at the bit's current Z and returns scene coordinates, which
+	// equal work coordinates because the toolpath root sits at the origin.
+	getWorkCoordsFromClient(
+		clientX: number,
+		clientY: number,
+	): { x: number; y: number } | null {
+		if (!this.viewer3d) {
+			return null;
+		}
+		const hit = this.viewer3d.screenToWorld(clientX, clientY);
+		if (!hit) {
+			return null;
+		}
+		return {
+			x: Number(hit.x.toFixed(3)),
+			y: Number(hit.y.toFixed(3)),
+		};
+	}
+
+	showMoveToHereIndicator(clientX: number, clientY: number) {
+		this.removeMoveToHereIndicator();
+
+		const size = 48;
+		const r = size / 2 - 4;
+		const c = size / 2;
+		const circumference = 2 * Math.PI * r;
+		const ns = "http://www.w3.org/2000/svg";
+
+		// Fixed positioning relative to the viewport so the indicator lands
+		// exactly under the pointer regardless of ancestor positioning.
+		const wrapper = document.createElement("div");
+		wrapper.style.cssText = [
+			"position:fixed",
+			"pointer-events:none",
+			"z-index:9999",
+			`width:${size}px`,
+			`height:${size}px`,
+			"transform:translate(-50%,-50%)",
+			`left:${clientX}px`,
+			`top:${clientY}px`,
+		].join(";");
+
+		const svg = document.createElementNS(ns, "svg");
+		svg.setAttribute("width", String(size));
+		svg.setAttribute("height", String(size));
+
+		const bg = document.createElementNS(ns, "circle");
+		bg.setAttribute("cx", String(c));
+		bg.setAttribute("cy", String(c));
+		bg.setAttribute("r", String(r));
+		bg.setAttribute("fill", "rgba(0,0,0,0.35)");
+		bg.setAttribute("stroke", "rgba(255,255,255,0.4)");
+		bg.setAttribute("stroke-width", "3");
+
+		const progress = document.createElementNS(ns, "circle");
+		progress.setAttribute("cx", String(c));
+		progress.setAttribute("cy", String(c));
+		progress.setAttribute("r", String(r));
+		progress.setAttribute("fill", "none");
+		progress.setAttribute("stroke", "#4ade80");
+		progress.setAttribute("stroke-width", "3");
+		progress.setAttribute("stroke-linecap", "round");
+		progress.setAttribute("stroke-dasharray", `${circumference}`);
+		progress.setAttribute("stroke-dashoffset", `${circumference}`);
+		progress.setAttribute("transform", `rotate(-90 ${c} ${c})`);
+
+		const dot = document.createElementNS(ns, "circle");
+		dot.setAttribute("cx", String(c));
+		dot.setAttribute("cy", String(c));
+		dot.setAttribute("r", "2");
+		dot.setAttribute("fill", "#4ade80");
+
+		svg.appendChild(bg);
+		svg.appendChild(progress);
+		svg.appendChild(dot);
+		wrapper.appendChild(svg);
+		document.body.appendChild(wrapper);
+
+		if (typeof progress.animate === "function") {
+			progress.animate(
+				[
+					{ strokeDashoffset: circumference },
+					{ strokeDashoffset: 0 },
+				],
+				{ duration: MOVE_TO_HERE_HOLD_MS, fill: "forwards" },
+			);
+		}
+
+		this.mthIndicator = wrapper;
+	}
+
+	removeMoveToHereIndicator() {
+		if (this.mthIndicator && this.mthIndicator.parentElement) {
+			this.mthIndicator.parentElement.removeChild(this.mthIndicator);
+		}
+		this.mthIndicator = null;
 	}
 
 	// --- imperative API consumed by the connected container (index.tsx) -----
@@ -573,6 +898,21 @@ class GcodeViewer extends Component<Props> {
 					this.viewerSvg?.setBitPosition(this.lastPosition);
 					this.viewer3d?.setToolpathRotationA(this.isRotaryFile ? (this.lastPosition.a ?? 0) : 0);
 				}
+			}
+
+			// Machine bed indicator tracks homing state, homing corner, and the
+			// active WCS offset — all low-frequency changes, so gate the recompute
+			// behind a dedupe key rather than reacting to every controller tick.
+			const $22 = _get(st, "controller.settings.settings.$22", "0");
+			const $23 = _get(st, "controller.settings.settings.$23", "0");
+			const hasHomed = !!_get(st, "controller.hasHomed");
+			const wco = _get(st, "controller.wco", { x: 0, y: 0 });
+			const machineBedKey = `${$22},${$23},${hasHomed},${wco.x},${wco.y}`;
+			if (machineBedKey !== this.lastMachineBedKey) {
+				this.lastMachineBedKey = machineBedKey;
+				this.viewer3d?.setOptions({
+					machineBed: this.buildMachineBedOptions(),
+				});
 			}
 
 			// Bit is only shown while connected (matches the old behaviour).
