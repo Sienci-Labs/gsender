@@ -86,7 +86,10 @@ const LIGHT_LIKE_PRESETS = new Set<GCodeViewerThemePresetName>(["light", "gruvbo
 
 import { outlineResponse } from "../../workers/Outline.response";
 import { getSafeXYMoveCode } from "app/features/DRO/utils/SafeMove";
-import { computeMachineBedWorkRect } from "app/features/DRO/utils/RapidPosition";
+import {
+	computeKeepoutWorkRect,
+	computeMachineBedWorkRect,
+} from "app/features/DRO/utils/RapidPosition";
 import type { Actions, CAMERA_POSITIONS_T, State } from "./definitions";
 
 // "Move To Here": how long to hold before committing, and how far the pointer
@@ -152,6 +155,8 @@ class GcodeViewer extends Component<Props> {
 	lastWposKey = "";
 
 	lastMachineBedKey = "";
+
+	lastGridKey = "";
 
 	isRotaryFile = false;
 
@@ -298,11 +303,6 @@ class GcodeViewer extends Component<Props> {
 		);
 
 		const isMetric = state.units === METRIC_UNITS;
-		const unitScale = isMetric ? 1 : 1 / 25.4;
-		const machineProfile = store.get("workspace.machineProfile") as MachineProfile | undefined;
-		const machineWidth  = (machineProfile?.mm?.width  ?? 800) * unitScale;
-		const machineDepth  = (machineProfile?.mm?.depth  ?? 800) * unitScale;
-		const machineHeight = (machineProfile?.mm?.height ?? 200) * unitScale;
 
 		return {
 			units: isMetric ? "mm" : "in",
@@ -328,12 +328,38 @@ class GcodeViewer extends Component<Props> {
 				labels: store.get("widgets.visualizer.boundingBoxLabels", false),
 			},
 			machineBed: this.buildMachineBedOptions(),
-			grid: {
-				size: 2 * Math.max(machineWidth, machineDepth),
-				axisDepth: machineHeight,
-				labels: true,
-			},
+			grid: this.buildGridOptions(),
 			render: { antialias: true, theme: this.buildTheme(this.currentThemeName()) },
+		};
+	}
+
+	// Grid quadrant tracks the connected controller's configured X/Y travel
+	// ($130/$131), falling back to the machine profile until those settings
+	// arrive. Quadrant edge is 2x the axis size, so each quadrant covers the
+	// full bed regardless of which corner is "home".
+	buildGridOptions(): {
+		sizeX: number;
+		sizeY: number;
+		axisDepth: number;
+		labels: boolean;
+	} {
+		const { state } = this.props;
+		const isMetric = state.units === METRIC_UNITS;
+		const unitScale = isMetric ? 1 : 1 / 25.4;
+		const machineProfile = store.get("workspace.machineProfile") as
+			| MachineProfile
+			| undefined;
+		const $130 = _get(reduxStore.getState(), "controller.settings.settings.$130");
+		const $131 = _get(reduxStore.getState(), "controller.settings.settings.$131");
+		const widthMm = $130 !== undefined ? Number($130) : (machineProfile?.mm?.width ?? 800);
+		const depthMm = $131 !== undefined ? Number($131) : (machineProfile?.mm?.depth ?? 800);
+		const heightMm = machineProfile?.mm?.height ?? 200;
+
+		return {
+			sizeX: 2 * widthMm * unitScale,
+			sizeY: 2 * depthMm * unitScale,
+			axisDepth: heightMm * unitScale,
+			labels: true,
 		};
 	}
 
@@ -341,6 +367,7 @@ class GcodeViewer extends Component<Props> {
 		visible: boolean;
 		min: { x: number; y: number } | null;
 		max: { x: number; y: number } | null;
+		keepout: { min: { x: number; y: number }; max: { x: number; y: number } } | null;
 	} {
 		const state = reduxStore.getState();
 		const $22 = _get(state, "controller.settings.settings.$22", "0");
@@ -353,7 +380,7 @@ class GcodeViewer extends Component<Props> {
 		);
 
 		if (!bedIndicatorEnabled || !homingEnabled || !hasHomed) {
-			return { visible: false, min: null, max: null };
+			return { visible: false, min: null, max: null, keepout: null };
 		}
 
 		const wco = _get(state, "controller.wco", { x: 0, y: 0 });
@@ -373,7 +400,38 @@ class GcodeViewer extends Component<Props> {
 			},
 		});
 
-		return { visible: true, min, max };
+		const $683 = _get(state, "controller.settings.settings.$683");
+		const $684 = _get(state, "controller.settings.settings.$684");
+		const $685 = _get(state, "controller.settings.settings.$685");
+		const $686 = _get(state, "controller.settings.settings.$686");
+		const $687 = _get(state, "controller.settings.settings.$687");
+
+		let keepout: { min: { x: number; y: number }; max: { x: number; y: number } } | null = null;
+		const keepoutSettingsExist = [$683, $684, $685, $686, $687].every(
+			(value) => value !== undefined,
+		);
+		if (keepoutSettingsExist) {
+			const keepoutEnabled = Number($683) !== 0;
+			const xMin = Number($684);
+			const xMax = Number($686);
+			const yMin = Number($685);
+			const yMax = Number($687);
+			const isZeroSquare = xMax - xMin === 0 && yMax - yMin === 0;
+			if (keepoutEnabled && !isZeroSquare) {
+				keepout = computeKeepoutWorkRect({
+					xMin,
+					xMax,
+					yMin,
+					yMax,
+					wcsOffset: {
+						x: Number(wco.x) || 0,
+						y: Number(wco.y) || 0,
+					},
+				});
+			}
+		}
+
+		return { visible: true, min, max, keepout };
 	}
 
 	buildSvgOptions(): Partial<GCodeSVGOptions> {
@@ -912,6 +970,19 @@ class GcodeViewer extends Component<Props> {
 				this.lastMachineBedKey = machineBedKey;
 				this.viewer3d?.setOptions({
 					machineBed: this.buildMachineBedOptions(),
+				});
+			}
+
+			// Grid quadrant tracks the connected controller's X/Y travel settings
+			// as soon as they arrive, rather than staying pinned to the machine
+			// profile default until the next options rebuild.
+			const $130 = _get(st, "controller.settings.settings.$130");
+			const $131 = _get(st, "controller.settings.settings.$131");
+			const gridKey = `${$130},${$131}`;
+			if (gridKey !== this.lastGridKey) {
+				this.lastGridKey = gridKey;
+				this.viewer3d?.setOptions({
+					grid: this.buildGridOptions(),
 				});
 			}
 
