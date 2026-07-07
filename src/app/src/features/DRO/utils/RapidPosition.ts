@@ -84,6 +84,28 @@ export function computeMachineBedWorkRect(args: {
 	};
 }
 
+// ATC keepout rectangle in work-coordinate scene space (mm). Unlike the
+// machine bed rect, $684-$687 are already literal machine-coordinate min/max
+// positions (not homing-corner-relative), so no direction sign flip is needed.
+export function computeKeepoutWorkRect(args: {
+	xMin: number;
+	xMax: number;
+	yMin: number;
+	yMax: number;
+	wcsOffset: { x: number; y: number };
+}): { min: { x: number; y: number }; max: { x: number; y: number } } {
+	return {
+		min: {
+			x: args.xMin - args.wcsOffset.x,
+			y: args.yMin - args.wcsOffset.y,
+		},
+		max: {
+			x: args.xMax - args.wcsOffset.x,
+			y: args.yMax - args.wcsOffset.y,
+		},
+	};
+}
+
 // Get a single bit from integer at position.  It does not use 0 indexing so pretend that arrays start at 1 :)
 export function isBitSetInNumber(value: string, bitPosition: number) {
 	const number = Number(value);
