@@ -444,6 +444,7 @@ const defaultState: State = {
             showSoftLimitWarning: false,
             hideProcessedLines: false,
             boundingBoxLabels: false,
+            followToolDuringRuntime: false,
             debug: {
                 profileWorker: false,
                 profileSampleEvery: 10000,
