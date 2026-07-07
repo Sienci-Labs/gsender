@@ -1,28 +1,18 @@
 import { AccessoryInstaller } from "app/features/AccessoryInstaller";
 import Console from "app/features/Console";
 import { PluginManager, PluginPage } from "app/features/Plugins";
-import { usePlugins } from "app/features/Plugins/hooks/usePlugins";
 import SDCard from "app/features/SDCard";
 import { TopBar } from "app/workspace/TopBar";
 import noop from "lodash/noop";
-import { BiSolidCylinder } from "react-icons/bi";
-import { FaGamepad, FaKeyboard, FaSdCard } from "react-icons/fa";
-import { GiFlatPlatform } from "react-icons/gi";
-import { LuDrill } from "react-icons/lu";
-import { MdSquareFoot } from "react-icons/md";
-import { PiPuzzlePiece } from "react-icons/pi";
-import { TbRulerMeasure } from "react-icons/tb";
 import { Outlet, Route, Routes } from "react-router";
 import ConfirmationDialog from "./components/ConfirmationDialog/ConfirmationDialog";
 import Page from "./components/Page";
 import { RemoteWidget } from "./components/RemoteWidget";
-import ToolCard from "./components/ToolCard";
 import { Config } from "./features/Config";
 import Coolant from "./features/Coolant";
 import DRO from "./features/DRO";
 import FileControl from "./features/FileControl";
 import Gamepad from "./features/Gamepad";
-import Profile from "./features/Gamepad/Profile";
 import JobControl from "./features/JobControl";
 import { Jogging } from "./features/Jogging";
 import KeyboardShortcuts from "./features/Keyboard";
@@ -44,102 +34,8 @@ import { Maintenance } from "./features/Stats/Maintenance";
 import { StatParent } from "./features/Stats/StatParent";
 import Surfacing from "./features/Surfacing";
 import { WorkspaceSelector } from "./features/WorkspaceSelector";
+import ToolsPage from "./routes/tools";
 import Workspace from "./workspace";
-
-const ToolsIndex = () => {
-	const { toolsPagePlugins } = usePlugins();
-
-	return (
-		<div className="py-4 px-16 max-xl:px-8 fixed-content-area no-scrollbar">
-			<p className="text-lg font-semibold mb-4 dark:text-white">
-				Choose a tool to get started...
-			</p>
-
-			<div className="grid lg:grid-cols-3 grid-cols-2 gap-4 fixed-select-tool-area overflow-y-auto overflow-x-hidden">
-				<ToolCard
-					title="Surfacing"
-					description="Flatten your wasteboard or other non-flat stock"
-					icon={GiFlatPlatform}
-					link="/tools/surfacing"
-				/>
-
-				<ToolCard
-					title="Rotary Surfacing"
-					description="Turn square material into round stock for rotary cutting"
-					icon={BiSolidCylinder}
-					link="/tools/rotary-surfacing"
-				/>
-
-				<ToolCard
-					title="Movement Tuning"
-					description="Ensure that each axis of your machine is moving accurately"
-					icon={TbRulerMeasure}
-					link="/tools/movement-tuning"
-				/>
-
-				<ToolCard
-					title="XY Squaring"
-					description="Get your CNC accurately aligned to make square cuts"
-					icon={MdSquareFoot}
-					link="/tools/squaring"
-				/>
-
-				<ToolCard
-					title="Keyboard Shortcuts"
-					description="Set up keyboard shortcuts for easy navigation and control"
-					icon={FaKeyboard}
-					link="/tools/keyboard-shortcuts"
-				/>
-
-				<ToolCard
-					title="Gamepad"
-					description="Easy hand-held CNC control using pre-made or custom profiles"
-					icon={FaGamepad}
-					link="/tools/gamepad"
-				/>
-
-				<ToolCard
-					title={"SD Card Manager"}
-					description={"Manage and view files on your SD card"}
-					icon={FaSdCard}
-					link={"/tools/sd"}
-				/>
-				<ToolCard
-					title={"Accessory Installation"}
-					description={"Install various CNC Accessories"}
-					icon={LuDrill}
-					link={"/tools/accessoryInstall"}
-				/>
-
-				<ToolCard
-					title="Plugins"
-					description="Manage installed UI plugins"
-					icon={PiPuzzlePiece}
-					link="/tools/plugins"
-				/>
-
-				{toolsPagePlugins.map((plugin) => {
-					const contribution = plugin.contributions.find(
-						(c) => c.slot === "tools-page",
-					);
-					if (!contribution?.route) {
-						return null;
-					}
-
-					return (
-						<ToolCard
-							key={plugin.id}
-							title={contribution.label || plugin.name}
-							description={`Plugin · v${plugin.version}`}
-							icon={PiPuzzlePiece}
-							link={`/tools/plugin/${contribution.route}`}
-						/>
-					);
-				})}
-			</div>
-		</div>
-	);
-};
 
 export const ReactRoutes = () => {
 	return (
@@ -162,7 +58,7 @@ export const ReactRoutes = () => {
 						</>
 					}
 				>
-					<Route index element={<ToolsIndex />} />
+					<Route index element={<ToolsPage />} />
 					<Route path="plugins" element={<PluginManager />} />
 					<Route path="plugin/:pluginRoute" element={<PluginPage />} />
 					<Route
