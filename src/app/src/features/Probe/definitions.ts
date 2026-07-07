@@ -47,49 +47,53 @@ export interface ProbeCommand {
 }
 
 export interface ProbingOptions {
-	modal: string;
-	units: UNITS_EN;
-	toolDiameter: number;
-	tipDiameter3D: number;
-	xRetractModifier?: number;
-	yRetractModifier?: number;
-	xRetract?: number;
-	yRetract?: number;
-	zRetract?: number;
-	zRetractNormal: number;
-	zRetractAuto: number;
-	xyRetract3D?: number;
-	retract: number;
-	axes: {
-		x: boolean;
-		y: boolean;
-		z: boolean;
-	};
-	xProbeDistance?: number;
-	yProbeDistance?: number;
-	zProbeDistance?: number;
-	probeDistances: BasicPosition;
-	probeFast: number;
-	probeSlow: number;
-	zThickness: {
-		standardBlock: number;
-		autoZero: number;
-		zProbe: number;
-		probe3D: number;
-		bitZero: number;
-		bitZeroZOnly: number;
-	};
-	xThickness?: number;
-	yThickness?: number;
-	xyThickness?: number;
-	firmware?: FIRMWARE_TYPES_T;
-	xyPositionAdjust?: number;
-	zPositionAdjust?: number;
-	direction?: PROBE_DIRECTIONS;
-	$13: string;
-	plateType: TOUCHPLATE_TYPES_T;
-	probeType: PROBE_TYPES_T;
-	homingEnabled: boolean;
+    modal: string;
+    units: UNITS_EN;
+    toolDiameter: number;
+    tipDiameter3D: number;
+    xRetractModifier?: number;
+    yRetractModifier?: number;
+    xRetract?: number;
+    yRetract?: number;
+    zRetract?: number;
+    zRetractNormal: number;
+    zRetractAuto: number;
+    xyRetract3D?: number;
+    retract: number;
+    axes: {
+        x: boolean;
+        y: boolean;
+        z: boolean;
+    };
+    xProbeDistance?: number;
+    yProbeDistance?: number;
+    zProbeDistance?: number;
+    probeDistances: BasicPosition;
+    probeFast: number;
+    probeSlow: number;
+    zThickness: {
+        standardBlock: number;
+        autoZero: number;
+        zProbe: number;
+        probe3D: number;
+        bitZero: number;
+        bitZeroZOnly: number;
+    };
+    xThickness?: number;
+    yThickness?: number;
+    xyThickness?: number;
+    probeMovementSpeed?: number;
+    // AutoZero routines always run in mm (forced G21) regardless of display units,
+    // so they need the raw mm/min value rather than the unit-converted one above.
+    probeMovementSpeedAuto?: number;
+    firmware?: FIRMWARE_TYPES_T;
+    xyPositionAdjust?: number;
+    zPositionAdjust?: number;
+    direction?: PROBE_DIRECTIONS;
+    $13: string;
+    plateType: TOUCHPLATE_TYPES_T;
+    probeType: PROBE_TYPES_T;
+    homingEnabled: boolean;
 }
 
 export interface ProbeWidgetSettings {
@@ -101,24 +105,25 @@ export interface ProbeWidgetSettings {
 }
 
 export interface Probe {
-	minimized: boolean;
-	probeCommand: string;
-	connectivityTest: boolean;
-	useTLO: boolean;
-	probeDepth: number;
-	probeFeedrate: number;
-	probeFastFeedrate: number;
-	retractionDistance: number;
-	zRetractNormal: number;
-	zRetractAuto: number;
-	zProbeDistance: number;
-	touchPlateHeight: number;
-	probeType: string;
-	touchplateTypeSwitcher: boolean;
-	probeAxis: string;
-	direction: number;
-	tipDiameter3D: number;
-	xyRetract3D: number;
+    minimized: boolean;
+    probeCommand: string;
+    connectivityTest: boolean;
+    useTLO: boolean;
+    probeDepth: number;
+    probeFeedrate: number;
+    probeFastFeedrate: number;
+    retractionDistance: number;
+    zRetractNormal: number;
+    zRetractAuto: number;
+    zProbeDistance: number;
+    touchPlateHeight: number;
+    probeType: string;
+    touchplateTypeSwitcher: boolean;
+    probeAxis: string;
+    direction: number;
+    tipDiameter3D: number;
+    xyRetract3D: number;
+    probeMovementSpeed: number;
 }
 
 export interface Actions {

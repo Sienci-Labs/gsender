@@ -43,6 +43,7 @@ import { GRBL } from '../../controllers/Grbl/constants';
 import { GRBLHAL } from '../../controllers/Grblhal/constants';
 import { authorizeIPAddress } from '../../access-control';
 import DFUFlasher from '../../lib/Firmware/Flashing/DFUFlasher';
+import UF2Flasher from '../../lib/Firmware/Flashing/UF2Flasher';
 import delay from '../../lib/delay';
 import Connection from '../../lib/Connection';
 import { VISUALIZER_SECONDARY } from '../../../app/src/constants';
@@ -559,12 +560,42 @@ class CNCEngine {
                 controller.command.apply(controller, [cmd].concat(args));
             });
 
-            socket.on('flash:start', (flashPort, imageType, isHal = false, data = null) => {
-                log.debug(`Flashing ${flashPort}, isHal: ${isHal}, imageType: ${imageType}`);
+            socket.on('flash:start', (flashPort, imageType, isHal = false, data = null, firmwareType = 'hex') => {
+                log.debug(`Flashing ${flashPort}, isHal: ${isHal}, imageType: ${imageType}, firmwareType: ${firmwareType}`);
                 if (!flashPort) {
                     log.error('task:error', 'No port specified - make sure you connect to you device at least once before attempting flashing');
                     return;
                 }
+
+                // UF2 flashing (RP2350 / Pico 2350): board has been sent $UF2 and
+                // reboots as a USB mass-storage volume — copy the .uf2 onto it.
+                if (firmwareType === 'uf2') {
+                    const uf2Flasher = new UF2Flasher({ uf2: data });
+                    uf2Flasher.on('error', (err) => {
+                        this.emit('flash:message', { type: 'Error', content: err });
+                    });
+                    uf2Flasher.on('info', (msg) => {
+                        this.emit('flash:message', { type: 'Info', content: msg });
+                    });
+                    uf2Flasher.on('progress', (amount, total) => {
+                        this.emit('flash:progress', amount, total);
+                    });
+                    uf2Flasher.on('end', () => {
+                        this.emit('flash:end');
+                    });
+
+                    // Release the controller so the board can reboot into UF2 mode.
+                    const controller = store.get('controllers["' + flashPort + '"]');
+                    if (controller) {
+                        store.unset(`controllers[${JSON.stringify(flashPort)}]`);
+                    }
+
+                    uf2Flasher.flash().catch((err) => {
+                        this.emit('flash:message', { type: 'Error', content: err.message || err });
+                    });
+                    return;
+                }
+
                 let halFlasher;
                 if (isHal) {
                     halFlasher = new DFUFlasher({

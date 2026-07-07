@@ -1,3 +1,6 @@
+/** biome-ignore-all lint/a11y/useButtonType: <> */
+/** biome-ignore-all lint/suspicious/noExplicitAny: <> */
+/** biome-ignore-all lint/suspicious/noArrayIndexKey: <> */
 import { Confirm } from "app/components/ConfirmationDialog/ConfirmationDialogLib.ts";
 import Tooltip from "app/components/Tooltip";
 import { GRBLHAL } from "app/constants";
@@ -9,7 +12,6 @@ import type {
 import { EEPROMSettingRow } from "app/features/Config/components/EEPROMSettingRow.tsx";
 import { BooleanSettingInput } from "app/features/Config/components/SettingInputs/BooleanSettingInput.tsx";
 import { EventInput } from "app/features/Config/components/SettingInputs/EventInput.tsx";
-import { HybridNumber } from "app/features/Config/components/SettingInputs/HybridNumber.tsx";
 import { IPSettingInput } from "app/features/Config/components/SettingInputs/IP.tsx";
 import { JogInput } from "app/features/Config/components/SettingInputs/JogInput.tsx";
 import { LocationInput } from "app/features/Config/components/SettingInputs/LocationInput.tsx";
@@ -25,13 +27,13 @@ import cn from "classnames";
 import pubsub from "pubsub-js";
 import React, { type JSX } from "react";
 import { BiReset } from "react-icons/bi";
-import { FaMicrochip } from "react-icons/fa6";
+import PathSelection from "./SettingInputs/PathSelection";
 
 interface SettingRowProps {
 	setting: gSenderSetting;
 	index?: number;
 	subIndex?: number;
-	changeHandler: (v: any) => void;
+	changeHandler: (v: any) => any;
 }
 
 function returnSettingControl(
@@ -39,7 +41,7 @@ function returnSettingControl(
 	setting: gSenderSetting,
 	value: gSenderSettingsValues = 0,
 	index: number = -1,
-	handler,
+	handler: (v: any) => void,
 ) {
 	switch (setting.type) {
 		case "boolean":
@@ -128,6 +130,14 @@ function returnSettingControl(
 					onChange={handler}
 				/>
 			);
+		case "path":
+			return (
+				<PathSelection
+					value={value as string}
+					index={index}
+					onChange={handler}
+				/>
+			);
 		default:
 			return setting.type;
 	}
@@ -156,7 +166,7 @@ export const SettingRow = React.memo(function SettingRow({
 		setting.type === "hybrid" && firmwareType === GRBLHAL;
 	// Default function to not hidden
 	let isHidden = false;
-	if (setting && setting.hidden) {
+	if (setting?.hidden) {
 		isHidden = setting.hidden(getPendingOrStore);
 	}
 	if (setting.hideWhenFirmwareCurrent && isFirmwareCurrent) {
@@ -313,7 +323,7 @@ export const SettingRow = React.memo(function SettingRow({
 				</span>
 			</span>
 			<span className="w-full sm:w-2/5 order-2 sm:order-3 text-gray-500 text-sm flex flex-col gap-2 max-sm:mb-4 mb-2">
-				{setting.description.split("\n").map((line, index) => (
+				{setting.description.split("\n").map((line: string, index: number) => (
 					<p key={index}>{line}</p>
 				))}
 			</span>

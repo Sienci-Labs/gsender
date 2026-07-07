@@ -180,6 +180,7 @@
 		},
 		"linux": {
 			"category": "Utility",
+			"icon": "electron-build/icon-square.png",
 			"target": [
 				"AppImage",
 				"deb"

@@ -23,6 +23,7 @@ export const SettingSection = React.memo(function SettingSection({
 	const Wizard = wizard;
 
 	const changeHandler = useCallback(
+		// biome-ignore lint/suspicious/noExplicitAny: <>
 		(i: number) => (v: any) => {
 			setSettingsAreDirty(true);
 
