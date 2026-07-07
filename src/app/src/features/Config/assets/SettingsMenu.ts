@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noExplicitAny: <> */
 import {
 	GRBL,
 	GRBLHAL,
@@ -101,7 +102,8 @@ export type gSenderSettingType =
 	| "api"
 	| "jog"
 	| "location"
-	| "wizard";
+	| "wizard"
+	| "path";
 
 export type gSenderSettingsValues = number | string | boolean;
 
@@ -109,7 +111,7 @@ export interface gSenderSetting {
 	label?: string;
 	type: gSenderSettingType;
 	key?: string;
-	description?: string | any[];
+	description?: string;
 	options?: string[] | number[];
 	unit?: string;
 	eID?: EEPROM;
@@ -264,12 +266,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						description: "Allow screen to blank/sleep.",
 						onEnable: () => {
 							if (isElectron()) {
-								window.ipcRenderer.send("change-power-saving", true);
+								(window as any).ipcRenderer.send("change-power-saving", true);
 							}
 						},
 						onDisable: () => {
 							if (isElectron()) {
-								window.ipcRenderer.send("change-power-saving", false);
+								(window as any).ipcRenderer.send("change-power-saving", false);
 							}
 						},
 					},
@@ -281,12 +283,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
 							"Pop up a confirmation window when exiting the program.",
 						onEnable: () => {
 							if (isElectron()) {
-								window.ipcRenderer.send("assignPromptExit", true);
+								(window as any).ipcRenderer.send("assignPromptExit", true);
 							}
 						},
 						onDisable: () => {
 							if (isElectron()) {
-								window.ipcRenderer.send("assignPromptExit", false);
+								(window as any).ipcRenderer.send("assignPromptExit", false);
 							}
 						},
 					},
@@ -297,6 +299,19 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						description:
 							"Choose how often gSender will backup your settings. Useful in case you need to revert them in the future.",
 						options: ["On Update", "Daily", "Weekly", "Monthly"],
+						hidden: () => {
+							return !isElectron();
+						},
+					},
+					{
+						label: "Settings backup location",
+						key: "workspace.backupLoc",
+						type: "path",
+						description:
+							"Choose the location to backup your settings to. Leave it blank to use the default appData location.",
+						hidden: () => {
+							return !isElectron();
+						},
 					},
 					{
 						label: "Collect usage data",
