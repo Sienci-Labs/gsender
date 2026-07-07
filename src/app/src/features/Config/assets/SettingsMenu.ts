@@ -350,6 +350,20 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						type: "boolean",
 					},
 					{
+						label: "DRO zeros",
+						key: "workspace.customDecimalPlaces",
+						description:
+							"Set the number of decimal places shown between 1-4. (Default 0 shows 2 for mm and 3 for inches)",
+						type: "number",
+						min: 0,
+						max: 4,
+					},
+				],
+			},
+			{
+				label: "Visualizer options",
+				settings: [
+					{
 						label: "Visualizer theme",
 						key: "widgets.visualizer.theme",
 						description: "Independent colour control for the visualizer.",
@@ -430,15 +444,6 @@ export const SettingsMenu: SettingsMenuSection[] = [
 							LIGHTWEIGHT_OPTIONS.LIGHT,
 							LIGHTWEIGHT_OPTIONS.EVERYTHING,
 						],
-					},
-					{
-						label: "DRO zeros",
-						key: "workspace.customDecimalPlaces",
-						description:
-							"Set the number of decimal places shown between 1-4. (Default 0 shows 2 for mm and 3 for inches)",
-						type: "number",
-						min: 0,
-						max: 4,
 					},
 				],
 			},

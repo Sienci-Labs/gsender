@@ -443,6 +443,7 @@ const defaultState: State = {
             showLineWarnings: false,
             showSoftLimitWarning: false,
             hideProcessedLines: false,
+            boundingBoxLabels: false,
             debug: {
                 profileWorker: false,
                 profileSampleEvery: 10000,

@@ -76,6 +76,7 @@ export interface Visualizer {
 	showLineWarnings: boolean;
 	showSoftLimitWarning: boolean;
 	hideProcessedLines: boolean;
+	boundingBoxLabels: boolean;
 	rotaryDiameterOffsetEnabled: boolean;
 	debug: {
 		profileWorker: boolean;
