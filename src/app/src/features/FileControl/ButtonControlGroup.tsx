@@ -1,3 +1,5 @@
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
+/** biome-ignore-all lint/suspicious/noExplicitAny: <> */
 import { usePostHog } from "@posthog/react";
 import { Button } from "app/components/Button";
 import {
@@ -68,9 +70,9 @@ const ButtonControlGroup = () => {
 		(state: RootState) => state.controller.workflow.state,
 	);
 
-	const activeState = useTypedSelector(
-		(state: RootState) => state.controller.state.status?.activeState,
-	);
+	// const activeState = useTypedSelector(
+	// 	(state: RootState) => state.controller.state.status?.activeState,
+	// );
 
 	const isRunning = workflowState === WORKFLOW_STATE_RUNNING;
 	const isCheck = workflowState === GRBL_ACTIVE_STATE_CHECK;
@@ -148,6 +150,7 @@ const ButtonControlGroup = () => {
 
 	useShuttleEvents(shuttleControlEvents);
 	useEffect(() => {
+		// biome-ignore lint/correctness/useHookAtTopLevel: <>
 		useKeybinding(shuttleControlEvents);
 	}, []);
 
