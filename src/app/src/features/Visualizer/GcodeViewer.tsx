@@ -989,14 +989,23 @@ class GcodeViewer extends Component<Props> {
 				}
 			}
 
-			// Machine bed indicator tracks homing state, homing corner, and the
-			// active WCS offset — all low-frequency changes, so gate the recompute
+			// Machine bed indicator (rect + keepout) tracks homing state, homing
+			// corner, active WCS offset, machine travel limits, and keepout
+			// EEPROM settings — all low-frequency changes, so gate the recompute
 			// behind a dedupe key rather than reacting to every controller tick.
 			const $22 = _get(st, "controller.settings.settings.$22", "0");
 			const $23 = _get(st, "controller.settings.settings.$23", "0");
+			const $130 = _get(st, "controller.settings.settings.$130");
+			const $131 = _get(st, "controller.settings.settings.$131");
+			const $132 = _get(st, "controller.settings.settings.$132");
+			const $683 = _get(st, "controller.settings.settings.$683");
+			const $684 = _get(st, "controller.settings.settings.$684");
+			const $685 = _get(st, "controller.settings.settings.$685");
+			const $686 = _get(st, "controller.settings.settings.$686");
+			const $687 = _get(st, "controller.settings.settings.$687");
 			const hasHomed = !!_get(st, "controller.hasHomed");
 			const wco = _get(st, "controller.wco", { x: 0, y: 0 });
-			const machineBedKey = `${$22},${$23},${hasHomed},${wco.x},${wco.y}`;
+			const machineBedKey = `${$22},${$23},${$130},${$131},${$132},${$683},${$684},${$685},${$686},${$687},${hasHomed},${wco.x},${wco.y}`;
 			if (machineBedKey !== this.lastMachineBedKey) {
 				this.lastMachineBedKey = machineBedKey;
 				this.viewer3d?.setOptions({
@@ -1004,14 +1013,9 @@ class GcodeViewer extends Component<Props> {
 				});
 			}
 
-			// Grid quadrant tracks the connected controller's X/Y travel settings
-			// as soon as they arrive, rather than staying pinned to the machine
-			// profile default until the next options rebuild. When "trim grid to
-			// bed" is on, the grid also depends on the same homing/WCO state as
-			// the bed indicator, so machineBedKey is folded in too.
-			const $130 = _get(st, "controller.settings.settings.$130");
-			const $131 = _get(st, "controller.settings.settings.$131");
-			const gridKey = `${$130},${$131},${machineBedKey}`;
+			// Grid quadrant (and, when "trim grid to bed" is on, its bounds)
+			// depends on the same settings machineBedKey already tracks.
+			const gridKey = machineBedKey;
 			if (gridKey !== this.lastGridKey) {
 				this.lastGridKey = gridKey;
 				this.viewer3d?.setOptions({
