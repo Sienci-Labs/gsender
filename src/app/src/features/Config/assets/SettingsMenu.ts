@@ -388,6 +388,18 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						},
 					},
 					{
+						label: "Show machine bed indicator",
+						key: "widgets.visualizer.objects.machineBed.visible",
+						description:
+							"Draw an outline of the machine's homed work area once homing is complete.",
+						type: "boolean",
+						defaultValue: false,
+						onChange: (value: boolean) => {
+							store.set("widgets.visualizer.objects.machineBed.visible", value);
+							pubsub.publish("visualizer:settings");
+						},
+					},
+					{
 						label: "Hide processed lines",
 						key: "widgets.visualizer.hideProcessedLines",
 						description: "Hide processed g-code lines in the visualizer.",

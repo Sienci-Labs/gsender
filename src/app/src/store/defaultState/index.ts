@@ -416,6 +416,9 @@ const defaultState: State = {
                 limits: {
                     visible: true,
                 },
+                machineBed: {
+                    visible: false,
+                },
                 coordinateSystem: {
                     visible: true,
                 },
