@@ -418,6 +418,7 @@ const defaultState: State = {
                 },
                 machineBed: {
                     visible: false,
+                    trimGridToBed: false,
                 },
                 coordinateSystem: {
                     visible: true,

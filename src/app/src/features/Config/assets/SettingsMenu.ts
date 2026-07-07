@@ -400,6 +400,21 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						},
 					},
 					{
+						label: "Trim grid to machine bed",
+						key: "widgets.visualizer.objects.machineBed.trimGridToBed",
+						description:
+							"When the machine bed indicator is shown, clip the background grid to just past the bed's edges instead of a fixed square.",
+						type: "boolean",
+						defaultValue: false,
+						onChange: (value: boolean) => {
+							store.set(
+								"widgets.visualizer.objects.machineBed.trimGridToBed",
+								value,
+							);
+							pubsub.publish("visualizer:settings");
+						},
+					},
+					{
 						label: "Hide processed lines",
 						key: "widgets.visualizer.hideProcessedLines",
 						description: "Hide processed g-code lines in the visualizer.",

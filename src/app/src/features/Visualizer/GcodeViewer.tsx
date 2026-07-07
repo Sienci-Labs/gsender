@@ -336,12 +336,15 @@ class GcodeViewer extends Component<Props> {
 	// Grid quadrant tracks the connected controller's configured X/Y travel
 	// ($130/$131), falling back to the machine profile until those settings
 	// arrive. Quadrant edge is 2x the axis size, so each quadrant covers the
-	// full bed regardless of which corner is "home".
+	// full bed regardless of which corner is "home". When "trim grid to bed"
+	// is on and the bed indicator is actually shown, bounds override this
+	// symmetric sizing with a box hugging the (possibly WCO-offset) bed rect.
 	buildGridOptions(): {
 		sizeX: number;
 		sizeY: number;
 		axisDepth: number;
 		labels: boolean;
+		bounds: { min: { x: number; y: number }; max: { x: number; y: number } } | null;
 	} {
 		const { state } = this.props;
 		const isMetric = state.units === METRIC_UNITS;
@@ -355,11 +358,39 @@ class GcodeViewer extends Component<Props> {
 		const depthMm = $131 !== undefined ? Number($131) : (machineProfile?.mm?.depth ?? 800);
 		const heightMm = machineProfile?.mm?.height ?? 200;
 
+		let bounds: { min: { x: number; y: number }; max: { x: number; y: number } } | null = null;
+		const trimGridToBed = store.get(
+			"widgets.visualizer.objects.machineBed.trimGridToBed",
+			false,
+		);
+		if (trimGridToBed) {
+			const bed = this.buildMachineBedOptions();
+			if (bed.visible && bed.min && bed.max) {
+				// Round outward to the nearest major gridline spacing past each
+				// edge (10mm metric, 25.4mm/1" imperial) so the trimmed edge
+				// always lands exactly on a drawn gridline. A small epsilon
+				// keeps floating-point noise from pushing an already-flush edge
+				// out an extra step.
+				const roundStep = isMetric ? 10 : 25.4;
+				bounds = {
+					min: {
+						x: Math.floor((bed.min.x + 1e-6) / roundStep) * roundStep,
+						y: Math.floor((bed.min.y + 1e-6) / roundStep) * roundStep,
+					},
+					max: {
+						x: Math.ceil((bed.max.x - 1e-6) / roundStep) * roundStep,
+						y: Math.ceil((bed.max.y - 1e-6) / roundStep) * roundStep,
+					},
+				};
+			}
+		}
+
 		return {
 			sizeX: 2 * widthMm * unitScale,
 			sizeY: 2 * depthMm * unitScale,
 			axisDepth: heightMm * unitScale,
 			labels: true,
+			bounds,
 		};
 	}
 
@@ -975,10 +1006,12 @@ class GcodeViewer extends Component<Props> {
 
 			// Grid quadrant tracks the connected controller's X/Y travel settings
 			// as soon as they arrive, rather than staying pinned to the machine
-			// profile default until the next options rebuild.
+			// profile default until the next options rebuild. When "trim grid to
+			// bed" is on, the grid also depends on the same homing/WCO state as
+			// the bed indicator, so machineBedKey is folded in too.
 			const $130 = _get(st, "controller.settings.settings.$130");
 			const $131 = _get(st, "controller.settings.settings.$131");
-			const gridKey = `${$130},${$131}`;
+			const gridKey = `${$130},${$131},${machineBedKey}`;
 			if (gridKey !== this.lastGridKey) {
 				this.lastGridKey = gridKey;
 				this.viewer3d?.setOptions({

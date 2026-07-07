@@ -49,6 +49,10 @@ export interface Visualizer {
 		limits: {
 			visible: boolean;
 		};
+		machineBed: {
+			visible: boolean;
+			trimGridToBed: boolean;
+		};
 		coordinateSystem: {
 			visible: boolean;
 		};
@@ -120,6 +124,10 @@ export interface State {
 	objects: {
 		limits: {
 			visible: boolean;
+		};
+		machineBed: {
+			visible: boolean;
+			trimGridToBed: boolean;
 		};
 		coordinateSystem: {
 			visible: boolean;
