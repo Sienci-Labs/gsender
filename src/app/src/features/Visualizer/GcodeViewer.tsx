@@ -191,7 +191,15 @@ class GcodeViewer extends Component<Props> {
 	}
 
 	componentDidUpdate(prevProps: Props) {
-		if (prevProps.cameraPosition !== this.props.cameraPosition) {
+		// Re-snap on every arm, not just when the camera position value
+		// itself changes, since re-arming after a manual camera rotation
+		// leaves `cameraPosition` unchanged (still "Top").
+		const armingMoveToHere =
+			!prevProps.state.moveToHere && this.props.state.moveToHere;
+		if (
+			prevProps.cameraPosition !== this.props.cameraPosition ||
+			armingMoveToHere
+		) {
 			this.snapToView();
 		}
 
