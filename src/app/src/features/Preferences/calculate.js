@@ -20,40 +20,40 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-import { METRIC_UNITS } from '../../constants';
+import { METRIC_UNITS } from "../../constants";
 
 const CALC_UNIT = 25.4;
 
 export const convertToImperial = (val) => {
-    return Number((val / CALC_UNIT).toFixed(3));
+	return Number((val / CALC_UNIT).toFixed(3));
 };
 
 export const convertToMetric = (val) => {
-    return Number((val * CALC_UNIT).toFixed(2));
+	return Number((val * CALC_UNIT).toFixed(2));
 };
 
 export const convertPresetUnits = (units, preset) => {
-    const conversionFunc =
-        units === METRIC_UNITS ? convertToMetric : convertToImperial;
-    let convertedPreset = JSON.parse(JSON.stringify(preset));
-    for (const key of Object.keys(preset)) {
-        convertedPreset[key] = conversionFunc(preset[key]);
-        if (key === 'feedrate') {
-            convertedPreset[key] = Number(convertedPreset[key]).toFixed(0);
-        }
-    }
-    return convertedPreset;
+	const conversionFunc =
+		units === METRIC_UNITS ? convertToMetric : convertToImperial;
+	const convertedPreset = JSON.parse(JSON.stringify(preset));
+	for (const key of Object.keys(preset)) {
+		convertedPreset[key] = conversionFunc(preset[key]);
+		if (key === "feedrate") {
+			convertedPreset[key] = Number(convertedPreset[key]).toFixed(0);
+		}
+	}
+	return convertedPreset;
 };
 
 export const convertAllPresetsUnits = (units, jog) => {
-    const { rapid, normal, precise } = jog;
-    const convertedRapid = convertPresetUnits(units, rapid);
-    const convertedNormal = convertPresetUnits(units, normal);
-    const convertedPrecise = convertPresetUnits(units, precise);
+	const { rapid, normal, precise } = jog;
+	const convertedRapid = convertPresetUnits(units, rapid);
+	const convertedNormal = convertPresetUnits(units, normal);
+	const convertedPrecise = convertPresetUnits(units, precise);
 
-    return {
-        rapid: convertedRapid,
-        normal: convertedNormal,
-        precise: convertedPrecise,
-    };
+	return {
+		rapid: convertedRapid,
+		normal: convertedNormal,
+		precise: convertedPrecise,
+	};
 };

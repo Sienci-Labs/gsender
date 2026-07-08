@@ -3,11 +3,13 @@ import {
     GRBLCORE_MIGRATION,
     GrblCoreMigration,
 } from 'app/features/Config/assets/MachineDefaults/grblCore.ts';
+import { getBoardProfile } from 'app/features/Config/assets/MachineDefaults/boardProfiles.ts';
 
 export interface ResolveDefaultsOptions {
     firmwareSemver: number | undefined;
     baseDefaults: EEPROMSettings;
     orderedSettings?: Map<EEPROM, string>;
+    boardId?: string;
 }
 
 export interface ResolvedDefaults {
@@ -19,8 +21,12 @@ export interface ResolvedDefaults {
 
 export function usesGrblCoreMigration(
     firmwareSemver: number | undefined,
+    boardId?: string,
     migration: GrblCoreMigration = GRBLCORE_MIGRATION,
 ): boolean {
+    if (getBoardProfile(boardId)?.skipGrblCoreMigration) {
+        return false;
+    }
     if (firmwareSemver === undefined || firmwareSemver === null) {
         return false;
     }
@@ -34,9 +40,10 @@ export function usesGrblCoreMigration(
 export function translateGrblCoreKey(
     key: EEPROM,
     firmwareSemver: number | undefined,
+    boardId?: string,
     migration: GrblCoreMigration = GRBLCORE_MIGRATION,
 ): EEPROM {
-    if (!usesGrblCoreMigration(firmwareSemver, migration)) {
+    if (!usesGrblCoreMigration(firmwareSemver, boardId, migration)) {
         return key;
     }
     return migration.keyRemaps[key] ?? key;
@@ -45,9 +52,10 @@ export function translateGrblCoreKey(
 export function translateGrblCoreDefaults(
     baseDefaults: EEPROMSettings,
     firmwareSemver: number | undefined,
+    boardId?: string,
     migration: GrblCoreMigration = GRBLCORE_MIGRATION,
 ): EEPROMSettings {
-    if (!usesGrblCoreMigration(firmwareSemver, migration)) {
+    if (!usesGrblCoreMigration(firmwareSemver, boardId, migration)) {
         return baseDefaults;
     }
 
@@ -75,9 +83,10 @@ export function translateGrblCoreDefaults(
 export function translateGrblCoreOrderedSettings(
     ordered: Map<EEPROM, string> | undefined,
     firmwareSemver: number | undefined,
+    boardId?: string,
     migration: GrblCoreMigration = GRBLCORE_MIGRATION,
 ): Map<EEPROM, string> | undefined {
-    if (!ordered || !usesGrblCoreMigration(firmwareSemver, migration)) {
+    if (!ordered || !usesGrblCoreMigration(firmwareSemver, boardId, migration)) {
         return ordered;
     }
 
@@ -106,7 +115,11 @@ export function resolveGrblCoreDefaults(
     opts: ResolveDefaultsOptions,
     migration: GrblCoreMigration = GRBLCORE_MIGRATION,
 ): ResolvedDefaults {
-    const usesMigration = usesGrblCoreMigration(opts.firmwareSemver, migration);
+    const usesMigration = usesGrblCoreMigration(
+        opts.firmwareSemver,
+        opts.boardId,
+        migration,
+    );
 
     if (!usesMigration) {
         return {
@@ -128,11 +141,13 @@ export function resolveGrblCoreDefaults(
         defaults: translateGrblCoreDefaults(
             opts.baseDefaults,
             opts.firmwareSemver,
+            opts.boardId,
             migration,
         ),
         ordered: translateGrblCoreOrderedSettings(
             opts.orderedSettings,
             opts.firmwareSemver,
+            opts.boardId,
             migration,
         ),
         remappedFrom,

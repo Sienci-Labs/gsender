@@ -33,6 +33,7 @@ function getMachineProfile(id: number) {
 function restoreEEPROMDefaults(
     type = '',
     firmwareSemver: number | undefined,
+    boardId: string | undefined,
 ) {
     let eepromSettings = {};
     let orderedSettings: Map<string, string> | undefined;
@@ -45,6 +46,7 @@ function restoreEEPROMDefaults(
             firmwareSemver,
             baseDefaults: profile?.grblHALeepromSettings || {},
             orderedSettings: profile?.orderedSettings,
+            boardId,
         });
         eepromSettings = resolved.defaults;
         orderedSettings = resolved.ordered;
@@ -94,6 +96,9 @@ export function RestoreDefaultDialog({ isSienciMachine = false }: { isSienciMach
     const firmwareSemver = useSelector(
         (state: RootState) => state.controller.settings.version?.semver,
     );
+    const boardId = useSelector(
+        (state: RootState) => state.controller.settings.info?.BOARD,
+    );
 
     const { profileChangedSinceDefaults, setProfileChangedSinceDefaults } = useSettings();
 
@@ -130,7 +135,7 @@ export function RestoreDefaultDialog({ isSienciMachine = false }: { isSienciMach
                                     <AlertDialogCancel>No</AlertDialogCancel>
                                     <AlertDialogAction
                                         onClick={() => {
-                                            restoreEEPROMDefaults(controllerType, firmwareSemver);
+                                            restoreEEPROMDefaults(controllerType, firmwareSemver, boardId);
                                             setProfileChangedSinceDefaults(false);
                                         }}
                                     >

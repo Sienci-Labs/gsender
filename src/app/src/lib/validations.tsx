@@ -22,101 +22,101 @@
  */
 
 /* eslint react/prop-types: 0 */
-import { ReactElement } from 'react';
-import i18n from './i18n';
+import type { ReactElement } from "react";
+import i18n from "./i18n";
 
 export interface ValidationProps {
-    type: string;
-    name: string;
-    checked: boolean;
+	type: string;
+	name: string;
+	checked: boolean;
 }
 
 export interface ValidationComponent {
-    blurred: boolean;
-    changed: boolean;
-    value: string;
+	blurred: boolean;
+	changed: boolean;
+	value: string;
 }
 
 export interface ValidationComponents {
-    password: Array<ValidationComponent>;
-    confirm: Array<ValidationComponent>;
+	password: Array<ValidationComponent>;
+	confirm: Array<ValidationComponent>;
 }
 
 export interface RequiredComponent {
-    [key: string]: Array<{ checked: boolean; props: ValidationProps }>;
+	[key: string]: Array<{ checked: boolean; props: ValidationProps }>;
 }
 
 const Error = (props: any): ReactElement => (
-    <div {...props} style={{ color: '#A94442' }} />
+	<div {...props} style={{ color: "#A94442" }} />
 );
 
 const required = (
-    value: string,
-    props: ValidationProps,
-    components: RequiredComponent,
+	value: string,
+	props: ValidationProps,
+	components: RequiredComponent,
 ): ReactElement => {
-    if (props.type === 'radio') {
-        const name = props.name;
+	if (props.type === "radio") {
+		const name = props.name;
 
-        const component = (components[name] as Array<any>) || [];
-        if (component.length === 0) {
-            return null;
-        }
+		const component = (components[name] as Array<any>) || [];
+		if (component.length === 0) {
+			return null;
+		}
 
-        // Controls the placement of the error message for radio buttons
-        if (component[component.length - 1] !== props) {
-            return null;
-        }
+		// Controls the placement of the error message for radio buttons
+		if (component[component.length - 1] !== props) {
+			return null;
+		}
 
-        const checked = component.reduce(
-            (checked: boolean, props: ValidationProps) => {
-                return checked || props.checked;
-            },
-            false,
-        );
+		const checked = component.reduce(
+			(checked: boolean, props: ValidationProps) => {
+				return checked || props.checked;
+			},
+			false,
+		);
 
-        if (checked) {
-            return null;
-        }
+		if (checked) {
+			return null;
+		}
 
-        return <Error>{i18n._('This field is required.')}</Error>;
-    }
+		return <Error>{i18n._("This field is required.")}</Error>;
+	}
 
-    if (props.type === 'checkbox') {
-        if (props.checked) {
-            return null;
-        }
+	if (props.type === "checkbox") {
+		if (props.checked) {
+			return null;
+		}
 
-        return <Error>{i18n._('This field is required.')}</Error>;
-    }
+		return <Error>{i18n._("This field is required.")}</Error>;
+	}
 
-    value = ('' + value).trim();
-    if (!value) {
-        return <Error>{i18n._('This field is required.')}</Error>;
-    }
+	value = ("" + value).trim();
+	if (!value) {
+		return <Error>{i18n._("This field is required.")}</Error>;
+	}
 
-    return null;
+	return null;
 };
 
 const password = (
-    _value: string,
-    _props: ValidationProps,
-    components: ValidationComponents,
+	_value: string,
+	_props: ValidationProps,
+	components: ValidationComponents,
 ): ReactElement => {
-    const bothBlurred =
-        components.password[0].blurred && components.confirm[0].blurred;
-    const bothChanged =
-        components.password[0].changed && components.confirm[0].changed;
+	const bothBlurred =
+		components.password[0].blurred && components.confirm[0].blurred;
+	const bothChanged =
+		components.password[0].changed && components.confirm[0].changed;
 
-    if (
-        bothBlurred &&
-        bothChanged &&
-        components.password[0].value !== components.confirm[0].value
-    ) {
-        return <Error>{i18n._('Passwords should be equal.')}</Error>;
-    }
+	if (
+		bothBlurred &&
+		bothChanged &&
+		components.password[0].value !== components.confirm[0].value
+	) {
+		return <Error>{i18n._("Passwords should be equal.")}</Error>;
+	}
 
-    return null;
+	return null;
 };
 
-export { required, password };
+export { password, required };

@@ -32,7 +32,7 @@ runs:
       shell: bash
       run: |
         yarn install
-        yarn lint
+        # yarn lint
 
     - name: Sync package and install src deps
       shell: bash

@@ -1,5 +1,5 @@
 export function Checkbox(props) {
-    return <div></div>;
+	return <div></div>;
 }
 
 export default Checkbox;

@@ -440,12 +440,18 @@ const isEEPROMValueDifferent = (
         'controller.settings.version.semver',
         undefined,
     );
+    const boardId = get(
+        reduxStore.getState(),
+        'controller.settings.info.BOARD',
+        undefined,
+    );
     const profileDefaults =
         controllerType === 'Grbl'
             ? machineProfile.eepromSettings
             : resolveGrblCoreDefaults({
                   firmwareSemver,
                   baseDefaults: machineProfile.grblHALeepromSettings || {},
+                  boardId,
               }).defaults;
 
     if (!profileDefaults) {
@@ -484,12 +490,18 @@ const createTableRows = (
             'controller.settings.version.semver',
             undefined,
         );
+        const boardId = get(
+            reduxStore.getState(),
+            'controller.settings.info.BOARD',
+            undefined,
+        );
         const profileDefaults =
             controllerType === 'Grbl'
                 ? machineProfile.eepromSettings
                 : resolveGrblCoreDefaults({
                       firmwareSemver,
                       baseDefaults: machineProfile.grblHALeepromSettings || {},
+                      boardId,
                   }).defaults;
         const defaultValue = get(profileDefaults, key, '-');
 

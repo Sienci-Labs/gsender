@@ -21,63 +21,63 @@
  *
  */
 
-import { useEffect, useState } from 'react';
-import pubsub from 'pubsub-js';
-import { useWizardAPI } from 'app/features/Helper/context';
-import reduxStore from 'app/store/redux';
+import { useWizardAPI } from "app/features/Helper/context";
+import reduxStore from "app/store/redux";
 import {
-    disableInfoHelper,
-    enableInfoHelper,
-    enableWizard,
-} from 'app/store/redux/slices/helper.slice.ts';
-import Wizard from './Wizard';
-import HelperInfo from './HelperInfo';
+	disableInfoHelper,
+	enableInfoHelper,
+	enableWizard,
+} from "app/store/redux/slices/helper.slice.ts";
+import pubsub from "pubsub-js";
+import { useEffect, useState } from "react";
+import HelperInfo from "./HelperInfo";
+import Wizard from "./Wizard";
 
 const HelperWrapper = () => {
-    const { load, updateSubstepOverlay } = useWizardAPI();
-    const [infoPayload, setInfoPayload] = useState({});
-    const [infoVisible, setInfoVisible] = useState(false);
+	const { load, updateSubstepOverlay } = useWizardAPI();
+	const [infoPayload, setInfoPayload] = useState({});
+	const [infoVisible, setInfoVisible] = useState(false);
 
-    useEffect(() => {
-        const tokens = [
-            pubsub.subscribe('wizard:load', (_, payload) => {
-                const { instructions, title } = payload;
-                load(instructions, title);
-                updateSubstepOverlay(
-                    { activeStep: 0, activeSubstep: 0 },
-                    instructions.steps,
-                );
-                reduxStore.dispatch(enableWizard());
-            }),
-            pubsub.subscribe('helper:info', (_, payload) => {
-                setInfoPayload(payload);
-                setInfoVisible(true);
-                reduxStore.dispatch(enableInfoHelper());
-            }),
-        ];
+	useEffect(() => {
+		const tokens = [
+			pubsub.subscribe("wizard:load", (_, payload) => {
+				const { instructions, title, context, comment } = payload;
+				load(instructions, title, { context, comment });
+				updateSubstepOverlay(
+					{ activeStep: 0, activeSubstep: 0 },
+					instructions.steps,
+				);
+				reduxStore.dispatch(enableWizard());
+			}),
+			pubsub.subscribe("helper:info", (_, payload) => {
+				setInfoPayload(payload);
+				setInfoVisible(true);
+				reduxStore.dispatch(enableInfoHelper());
+			}),
+		];
 
-        return () => {
-            tokens.forEach((token) => {
-                pubsub.unsubscribe(token);
-            });
-        };
-    }, []);
+		return () => {
+			tokens.forEach((token) => {
+				pubsub.unsubscribe(token);
+			});
+		};
+	}, []);
 
-    const closeInfoHelper = () => {
-        setInfoVisible(false);
-        reduxStore.dispatch(disableInfoHelper());
-    };
+	const closeInfoHelper = () => {
+		setInfoVisible(false);
+		reduxStore.dispatch(disableInfoHelper());
+	};
 
-    return (
-        <>
-            <HelperInfo
-                payload={infoPayload}
-                infoVisible={infoVisible}
-                onClose={closeInfoHelper}
-            />
-            <Wizard />
-        </>
-    );
+	return (
+		<>
+			<HelperInfo
+				payload={infoPayload}
+				infoVisible={infoVisible}
+				onClose={closeInfoHelper}
+			/>
+			<Wizard />
+		</>
+	);
 };
 
 export default HelperWrapper;

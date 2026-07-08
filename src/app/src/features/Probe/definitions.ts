@@ -1,49 +1,49 @@
-import { FIRMWARE_TYPES_T } from 'app/definitions/firmware';
-import { UNITS_EN, BasicPosition } from 'app/definitions/general';
-import { PROBE_TYPES, TOUCHPLATE_TYPES } from 'app/lib/constants';
-import { probeDirections } from 'app/lib/Probing';
+import type { FIRMWARE_TYPES_T } from "app/definitions/firmware";
+import type { BasicPosition, UNITS_EN } from "app/definitions/general";
+import type { PROBE_TYPES, TOUCHPLATE_TYPES } from "app/lib/constants";
+import type { probeDirections } from "app/lib/Probing";
 
 // Types
 
 export type PROBE_DIRECTIONS =
-    (typeof probeDirections)[keyof typeof probeDirections];
+	(typeof probeDirections)[keyof typeof probeDirections];
 
 export type PROBE_TYPES_T = (typeof PROBE_TYPES)[keyof typeof PROBE_TYPES];
 
 export type TOUCHPLATE_TYPES_T =
-    (typeof TOUCHPLATE_TYPES)[keyof typeof TOUCHPLATE_TYPES];
+	(typeof TOUCHPLATE_TYPES)[keyof typeof TOUCHPLATE_TYPES];
 
 // Interfaces
 
 export interface ProbeProfile {
-    xyThickness: number;
-    zThickness: {
-        standardBlock: number;
-        autoZero: number;
-        zProbe: number;
-        probe3D: number;
-        bitZero: number;
-        bitZeroZOnly: number;
-    };
-    plateWidth: number;
-    plateLength: number;
-    functions: {
-        x: boolean;
-        y: boolean;
-        z: boolean;
-    };
-    touchplateType: TOUCHPLATE_TYPES_T;
+	xyThickness: number;
+	zThickness: {
+		standardBlock: number;
+		autoZero: number;
+		zProbe: number;
+		probe3D: number;
+		bitZero: number;
+		bitZeroZOnly: number;
+	};
+	plateWidth: number;
+	plateLength: number;
+	functions: {
+		x: boolean;
+		y: boolean;
+		z: boolean;
+	};
+	touchplateType: TOUCHPLATE_TYPES_T;
 }
 
 export interface ProbeCommand {
-    id: string;
-    safe: boolean;
-    tool: boolean;
-    axes: {
-        x: boolean;
-        y: boolean;
-        z: boolean;
-    };
+	id: string;
+	safe: boolean;
+	tool: boolean;
+	axes: {
+		x: boolean;
+		y: boolean;
+		z: boolean;
+	};
 }
 
 export interface ProbingOptions {
@@ -82,6 +82,10 @@ export interface ProbingOptions {
     xThickness?: number;
     yThickness?: number;
     xyThickness?: number;
+    probeMovementSpeed?: number;
+    // AutoZero routines always run in mm (forced G21) regardless of display units,
+    // so they need the raw mm/min value rather than the unit-converted one above.
+    probeMovementSpeedAuto?: number;
     firmware?: FIRMWARE_TYPES_T;
     xyPositionAdjust?: number;
     zPositionAdjust?: number;
@@ -93,11 +97,11 @@ export interface ProbingOptions {
 }
 
 export interface ProbeWidgetSettings {
-    slowSpeed: number;
-    fastSpeed: number;
-    retract: number;
-    zProbeDistance: number;
-    zProbeThickness: number;
+	slowSpeed: number;
+	fastSpeed: number;
+	retract: number;
+	zProbeDistance: number;
+	zProbeThickness: number;
 }
 
 export interface Probe {
@@ -119,51 +123,52 @@ export interface Probe {
     direction: number;
     tipDiameter3D: number;
     xyRetract3D: number;
+    probeMovementSpeed: number;
 }
 
 export interface Actions {
-    startConnectivityTest: () => void;
-    setProbeConnectivity: (connectionMade: boolean) => void;
-    onOpenChange: (isOpen: boolean) => void;
-    changeProbeCommand: (value: string) => void;
-    changeTouchPlateType: (value: TOUCHPLATE_TYPES_T) => void;
-    toggleUseTLO: () => void;
-    handleProbeDepthChange: (event: Event) => void;
-    handleProbeFeedrateChange: (event: Event) => void;
-    handleRetractionDistanceChange: (event: Event) => void;
-    handleZRetractDistanceChange: (event: Event) => void;
-    handleZRetractDistanceAutoChange: (event: Event) => void;
-    handleProbeCommandChange: (index: number) => void;
-    handleSafeProbeToggle: () => void;
-    generatePossibleProbeCommands: () => ProbeCommand[];
-    generateProbeCommands: () => string[];
-    runProbeCommands: (commands: string[]) => void;
-    returnProbeConnectivity: () => boolean;
-    _setToolDiameter: (selection: { value: number }) => void;
-    nextProbeDirection: () => void;
-    _setProbeType: (value: string) => void;
-    _setCurrentTool: (tool: AvailableTool) => void;
+	startConnectivityTest: () => void;
+	setProbeConnectivity: (connectionMade: boolean) => void;
+	onOpenChange: (isOpen: boolean) => void;
+	changeProbeCommand: (value: string) => void;
+	changeTouchPlateType: (value: TOUCHPLATE_TYPES_T) => void;
+	toggleUseTLO: () => void;
+	handleProbeDepthChange: (event: Event) => void;
+	handleProbeFeedrateChange: (event: Event) => void;
+	handleRetractionDistanceChange: (event: Event) => void;
+	handleZRetractDistanceChange: (event: Event) => void;
+	handleZRetractDistanceAutoChange: (event: Event) => void;
+	handleProbeCommandChange: (index: number) => void;
+	handleSafeProbeToggle: () => void;
+	generatePossibleProbeCommands: () => ProbeCommand[];
+	generateProbeCommands: () => string[];
+	runProbeCommands: (commands: string[]) => void;
+	returnProbeConnectivity: () => boolean;
+	_setToolDiameter: (selection: { value: number }) => void;
+	nextProbeDirection: () => void;
+	_setProbeType: (value: string) => void;
+	_setCurrentTool: (tool: AvailableTool) => void;
 }
 
 export interface AvailableTool {
-    metricDiameter: number;
-    imperialDiameter: number;
-    type: string;
+	metricDiameter: number;
+	imperialDiameter: number;
+	type: string;
 }
 
 export interface State {
-    connectionMade: boolean;
-    connectionMadeRef: React.MutableRefObject<boolean>;
-    canClick: boolean;
-    show: boolean;
-    availableProbeCommands: ProbeCommand[];
-    selectedProbeCommand: number;
-    touchplate: ProbeProfile;
-    touchplateTypeSwitcher: boolean;
-    toolDiameter: number;
-    availableTools: AvailableTool[];
-    units: UNITS_EN;
-    direction: number;
-    probeType: PROBE_TYPES_T;
-    connectivityTest: boolean;
+	connectionMade: boolean;
+	connectionMadeRef: React.MutableRefObject<boolean>;
+	canClick: boolean;
+	show: boolean;
+	availableProbeCommands: ProbeCommand[];
+	selectedProbeCommand: number;
+	touchplate: ProbeProfile;
+	touchplateTypeSwitcher: boolean;
+	toolDiameter: number;
+	availableTools: AvailableTool[];
+	units: UNITS_EN;
+	direction: number;
+	probeType: PROBE_TYPES_T;
+	connectivityTest: boolean;
 }

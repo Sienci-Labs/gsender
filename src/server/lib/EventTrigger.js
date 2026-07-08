@@ -21,77 +21,72 @@
  *
  */
 
-import config from '../services/configstore';
-import { PROGRAM_EVENTS } from '../../app/src/constants';
+import { PROGRAM_EVENTS } from "../../app/src/constants";
+import config from "../services/configstore";
 
 const noop = () => {};
 
 class EventTrigger {
-    constructor(callback = noop) {
-        this.callback = callback || noop;
-    }
+	constructor(callback = noop) {
+		this.callback = callback || noop;
+	}
 
-    trigger(eventKey, callback = null) {
-        if (!eventKey) {
-            return;
-        }
+	trigger(eventKey, callback = null) {
+		if (!eventKey) {
+			return;
+		}
 
-        const events = config.get('events', new Map());
+		const events = config.get("events", new Map());
 
-        const element = events.get(eventKey);
-        if (element) {
-            const {
-                enabled = false,
-                event,
-                trigger,
-                commands
-            } = { ...element };
+		const element = events.get(eventKey);
+		if (element) {
+			const { enabled = false, event, trigger, commands } = { ...element };
 
-            if (!enabled) {
-                return;
-            }
+			if (!enabled) {
+				return;
+			}
 
-            if (typeof this.callback === 'function') {
-                this.callback(event, trigger, commands);
-            }
-        }
-    }
+			if (typeof this.callback === "function") {
+				this.callback(event, trigger, commands);
+			}
+		}
+	}
 
-    hasEnabledEvent(eventType) {
-        if (!PROGRAM_EVENTS.includes(eventType)) {
-            return false;
-        }
+	hasEnabledEvent(eventType) {
+		if (!PROGRAM_EVENTS.includes(eventType)) {
+			return false;
+		}
 
-        let isEnabled = false;
-        const events = config.get('events', new Map());
-        const element = events.get(eventType);
+		let isEnabled = false;
+		const events = config.get("events", new Map());
+		const element = events.get(eventType);
 
-        if (element) {
-            const { enabled, commands } = { ...element };
-            if (enabled && commands.length > 0) {
-                isEnabled = true;
-            }
-        }
-        return isEnabled;
-    }
+		if (element) {
+			const { enabled, commands } = { ...element };
+			if (enabled && commands.length > 0) {
+				isEnabled = true;
+			}
+		}
+		return isEnabled;
+	}
 
-    getEventCode(eventType) {
-        if (!PROGRAM_EVENTS.includes(eventType)) {
-            return '';
-        }
+	getEventCode(eventType) {
+		if (!PROGRAM_EVENTS.includes(eventType)) {
+			return "";
+		}
 
-        let code = '';
-        const events = config.get('events', new Map());
-        const element = events.get(eventType);
+		let code = "";
+		const events = config.get("events", new Map());
+		const element = events.get(eventType);
 
-        if (element) {
-            const { enabled, commands } = { ...element };
-            if (enabled && commands.length > 0) {
-                code = commands;
-            }
-        }
-        return code;
-    }
+		if (element) {
+			const { enabled, commands } = { ...element };
+			if (enabled && commands.length > 0) {
+				code = commands;
+			}
+		}
+		return code;
+	}
 }
 
 export default EventTrigger;

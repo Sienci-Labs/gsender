@@ -20,28 +20,27 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-
+import type { MachineProfile } from 'app/definitions/firmware';
+import { defaultATCIMacros } from 'app/features/ATC/assets/defaultATCIMacros.ts';
+import machineProfiles from 'app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts';
+import type { SPINDLE } from 'app/lib/definitions/gcode_virtualization';
 import {
+    DEFAULT_FIRMWARE_SETTINGS,
+    GRBLHAL,
+    LIGHTWEIGHT_OPTIONS,
     METRIC_STEPS,
     METRIC_UNITS,
+    OUTLINE_MODE_DETAILED,
+    ROTARY_MODE_FIRMWARE_SETTINGS,
     SPINDLE_MODE,
+    SPINDLE_MODES,
     SPIRAL_MOVEMENT,
     START_POSITION_BACK_LEFT,
-    SPINDLE_MODES,
-    WORKSPACE_MODE,
-    ROTARY_MODE_FIRMWARE_SETTINGS,
-    DEFAULT_FIRMWARE_SETTINGS,
-    LIGHTWEIGHT_OPTIONS,
-    GRBLHAL,
-    OUTLINE_MODE_DETAILED,
+    WORKSPACE_MODE
 } from '../../constants';
 
-import machineProfiles from 'app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts';
+import type { State } from '../definitions';
 import { profiles } from './gamepad';
-import { State } from '../definitions';
-import { MachineProfile } from 'app/definitions/firmware';
-import { SPINDLE } from 'app/lib/definitions/gcode_virtualization';
-import { defaultATCIMacros } from 'app/features/ATC/assets/defaultATCIMacros.ts';
 
 const [M3] = SPINDLE_MODES;
 
@@ -68,9 +67,10 @@ const defaultState: State = {
         revertWorkspace: false,
         promptExit: false,
         backupFreq: 'On Update',
+        backupLoc: '',
         powerSaving: true,
         lastBackupTime: 0,
-        sendUsageData: false,
+        collectUsageDataStatus: 'pending',
         jobTimes: [],
         toolChange: {
             passthrough: false,
@@ -337,6 +337,7 @@ const defaultState: State = {
             probeAxis: 'Z',
             tipDiameter3D: 2,
             xyRetract3D: 10,
+            probeMovementSpeed: 0,
         },
         rotary: {
             stockTurning: {
@@ -415,6 +416,10 @@ const defaultState: State = {
                 limits: {
                     visible: true,
                 },
+                machineBed: {
+                    visible: false,
+                    trimGridToBed: false,
+                },
                 coordinateSystem: {
                     visible: true,
                 },
@@ -438,6 +443,8 @@ const defaultState: State = {
             showLineWarnings: false,
             showSoftLimitWarning: false,
             hideProcessedLines: false,
+            boundingBoxLabels: false,
+            followToolDuringRuntime: false,
             debug: {
                 profileWorker: false,
                 profileSampleEvery: 10000,

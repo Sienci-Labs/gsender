@@ -1,346 +1,354 @@
-import { useEffect, useState, useRef } from 'react';
-import cn from 'classnames';
-import { connect } from 'react-redux';
-import get from 'lodash/get';
-
-import controller from 'app/lib/controller';
-import store from 'app/store';
-import { GRBL } from 'app/constants';
-import { isIPv4 } from 'app/lib/utils';
-
-import { ConnectionStateIndicator } from './components/ConnectionStateIndicator';
-import { ConnectionInfo } from './components/ConnectionInfo';
-import { refreshPorts, refreshPortsOnParentEntry } from './utils/connection';
-import { PortListings } from './components/PortListings';
-import { DisconnectButton } from './components/DisconnectButton';
-import { Port } from './definitions';
-import WidgetConfig from '../WidgetConfig/WidgetConfig';
-import pubsub from 'pubsub-js';
+import { usePostHog } from "@posthog/react";
 import {
-    Popover,
-    PopoverTrigger,
-    PopoverContent,
-} from 'app/components/shadcn/Popover';
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "app/components/shadcn/Popover";
+import { GRBL } from "app/constants";
+import controller from "app/lib/controller";
+import { isIPv4 } from "app/lib/utils";
+import store from "app/store";
+import cn from "classnames";
+import get from "lodash/get";
+import pubsub from "pubsub-js";
+import { useEffect, useRef, useState } from "react";
+import { connect } from "react-redux";
+import WidgetConfig from "../WidgetConfig/WidgetConfig";
+import { ConnectionInfo } from "./components/ConnectionInfo";
+import { ConnectionStateIndicator } from "./components/ConnectionStateIndicator";
+import { DisconnectButton } from "./components/DisconnectButton";
+import { PortListings } from "./components/PortListings";
+import type { Port } from "./definitions";
+import { refreshPorts, refreshPortsOnParentEntry } from "./utils/connection";
 
 export enum ConnectionState {
-    DISCONNECTED,
-    CONNECTED,
-    CONNECTING,
-    ERROR,
+	DISCONNECTED,
+	CONNECTED,
+	CONNECTING,
+	ERROR,
 }
 
 export enum ConnectionType {
-    DISCONNECTED = 'DISCONNECTED',
-    ETHERNET = 'ETHERNET',
-    USB = 'USB',
-    REMOTE = 'REMOTE',
+	DISCONNECTED = "DISCONNECTED",
+	ETHERNET = "ETHERNET",
+	USB = "USB",
+	REMOTE = "REMOTE",
 }
 
 export interface ConnectionProps {
-    ports: Port[];
-    unrecognizedPorts: Port[];
-    reportedFirmware: FirmwareFlavour;
+	ports: Port[];
+	unrecognizedPorts: Port[];
+	reportedFirmware: FirmwareFlavour;
 }
 
-export type FirmwareFlavour = 'Grbl' | 'grblHAL' | '';
+export type FirmwareFlavour = "Grbl" | "grblHAL" | "";
 
 function Connection(props: ConnectionProps) {
-    const connectionConfig = new WidgetConfig('connection');
+	const connectionConfig = new WidgetConfig("connection");
+	const posthog = usePostHog();
 
-    // Add listener for reconnect request
-    useEffect(() => {
-        pubsub.subscribe('reconnect', () => {
-            attemptAutoConnect(true);
-        });
+	// Add listener for reconnect request
+	useEffect(() => {
+		pubsub.subscribe("reconnect", () => {
+			attemptAutoConnect(true);
+		});
 
-        return () => {
-            pubsub.unsubscribe('reconnect');
-        };
-    }, []);
+		return () => {
+			pubsub.unsubscribe("reconnect");
+		};
+	}, []);
 
-    const [connectionState, setConnectionState] = useState(
-        ConnectionState.DISCONNECTED,
-    );
-    const [connectionType, setConnectionType] = useState(
-        ConnectionType.DISCONNECTED,
-    );
+	const [connectionState, setConnectionState] = useState(
+		ConnectionState.DISCONNECTED,
+	);
+	const [connectionType, setConnectionType] = useState(
+		ConnectionType.DISCONNECTED,
+	);
 
-    const [firmware, setFirmware] = useState<FirmwareFlavour>('Grbl');
+	const [firmware, setFirmware] = useState<FirmwareFlavour>("Grbl");
 
-    const [activePort, setActivePort] = useState('');
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+	const [activePort, setActivePort] = useState("");
+	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-    const [isOpen, setIsOpen] = useState(false);
+	const [isOpen, setIsOpen] = useState(false);
 
-    const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-    const connectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-    const isHoveringRef = useRef(false);
+	const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+	const connectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+	const isHoveringRef = useRef(false);
 
-    useEffect(() => {
-        controller.addListener('serialport:close', () => {
-            onControllerDisconnect();
-        });
+	useEffect(() => {
+		controller.addListener("serialport:close", () => {
+			onControllerDisconnect();
+		});
 
-        const preferredFirmware = store.get(
-            'widgets.connection.controller.type',
-            'grbl',
-        );
-        setFirmware(preferredFirmware);
+		const preferredFirmware = store.get(
+			"widgets.connection.controller.type",
+			"grbl",
+		);
+		setFirmware(preferredFirmware);
 
-        refreshPorts();
+		refreshPorts();
 
-        setTimeout(() => attemptAutoConnect(), 500);
+		setTimeout(() => attemptAutoConnect(), 500);
 
-        return () => {
-            if (closeTimeoutRef.current) {
-                clearTimeout(closeTimeoutRef.current);
-            }
-            if (connectTimeoutRef.current) {
-                clearTimeout(connectTimeoutRef.current);
-            }
-        };
-    }, []);
+		return () => {
+			if (closeTimeoutRef.current) {
+				clearTimeout(closeTimeoutRef.current);
+			}
+			if (connectTimeoutRef.current) {
+				clearTimeout(connectTimeoutRef.current);
+			}
+		};
+	}, []);
 
-    useEffect(() => {
-        setFirmware(props.reportedFirmware);
-    }, [props.reportedFirmware]);
+	useEffect(() => {
+		setFirmware(props.reportedFirmware);
+	}, [props.reportedFirmware]);
 
-    function handleConnect(port: string, type: ConnectionType) {
-        if (!port) {
-            console.error('Connect called with empty port');
-        }
+	function handleConnect(port: string, type: ConnectionType) {
+		if (!port) {
+			console.error("Connect called with empty port");
+		}
 
-        const network = type === ConnectionType.ETHERNET;
-        const baud = Number(store.get('widgets.connection.baudrate'));
-        const defaultFirmware = store.get('workspace.defaultFirmware', GRBL);
+		const network = type === ConnectionType.ETHERNET;
+		const baud = Number(store.get("widgets.connection.baudrate"));
+		const defaultFirmware = store.get("workspace.defaultFirmware", GRBL);
 
-        let ethernetPort = store.get('widgets.connection.ethernetPort', 23);
+		const ethernetPort = store.get("widgets.connection.ethernetPort", 23);
 
-        // workflow - set element to connecting state, attempt to connect, and use callback to update state on end
-        setConnectionState(ConnectionState.CONNECTING);
-        setConnectionType(type);
-        setIsDropdownOpen(false);
+		// workflow - set element to connecting state, attempt to connect, and use callback to update state on end
+		setConnectionState(ConnectionState.CONNECTING);
+		setConnectionType(type);
+		setIsDropdownOpen(false);
 
-        // Safety net: if the backend callback never fires (e.g. silent hang),
-        // reset the UI to ERROR after 15 seconds for network connections.
-        if (connectTimeoutRef.current) {
-            clearTimeout(connectTimeoutRef.current);
-            connectTimeoutRef.current = null;
-        }
-        if (type === ConnectionType.ETHERNET) {
-            connectTimeoutRef.current = setTimeout(() => {
-                connectTimeoutRef.current = null;
-                setConnectionState(ConnectionState.ERROR);
-            }, 6000);
-        }
+		// Safety net: if the backend callback never fires (e.g. silent hang),
+		// reset the UI to ERROR after 15 seconds for network connections.
+		if (connectTimeoutRef.current) {
+			clearTimeout(connectTimeoutRef.current);
+			connectTimeoutRef.current = null;
+		}
+		if (type === ConnectionType.ETHERNET) {
+			connectTimeoutRef.current = setTimeout(() => {
+				connectTimeoutRef.current = null;
+				setConnectionState(ConnectionState.ERROR);
+			}, 6000);
+		}
 
-        // Attempt connect with callback
-        controller.openPort(
-            port,
-            // firmware,
-            {
-                baudrate: baud,
-                network,
-                defaultFirmware,
-                ethernetPort,
-            },
-            (err: string) => {
-                if (connectTimeoutRef.current) {
-                    clearTimeout(connectTimeoutRef.current);
-                    connectTimeoutRef.current = null;
-                }
-                if (err) {
-                    setConnectionState(ConnectionState.ERROR);
-                    return;
-                }
+		// Attempt connect with callback
+		controller.openPort(
+			port,
+			// firmware,
+			{
+				baudrate: baud,
+				network,
+				defaultFirmware,
+				ethernetPort,
+			},
+			(err: string) => {
+				if (connectTimeoutRef.current) {
+					clearTimeout(connectTimeoutRef.current);
+					connectTimeoutRef.current = null;
+				}
+				if (err) {
+					setConnectionState(ConnectionState.ERROR);
+					posthog?.capture("connection_failed", {
+						port,
+						connection_type: type,
+						error: err,
+					});
+					return;
+				}
 
-                setConnectionState(ConnectionState.CONNECTED);
-                setActivePort(port);
-            },
-        );
+				setConnectionState(ConnectionState.CONNECTED);
+				setActivePort(port);
+				posthog?.capture("machine_connected", {
+					port,
+					connection_type: type,
+					baudrate: baud,
+					firmware: defaultFirmware,
+				});
+			},
+		);
 
-        connectionConfig.set('port', port);
-        connectionConfig.set('baudrate', baud);
-    }
+		connectionConfig.set("port", port);
+		connectionConfig.set("baudrate", baud);
+	}
 
-    function onControllerDisconnect() {
-        setConnectionState(ConnectionState.DISCONNECTED);
-        setConnectionType(ConnectionType.DISCONNECTED);
-        setActivePort('');
-    }
+	function onControllerDisconnect() {
+		setConnectionState(ConnectionState.DISCONNECTED);
+		setConnectionType(ConnectionType.DISCONNECTED);
+		setActivePort("");
+	}
 
-    function onDisconnectClick() {
-        setConnectionState(ConnectionState.DISCONNECTED);
-        setConnectionType(ConnectionType.DISCONNECTED);
+	function onDisconnectClick() {
+		posthog?.capture("machine_disconnected", {
+			port: activePort,
+			connection_type: connectionType,
+		});
+		setConnectionState(ConnectionState.DISCONNECTED);
+		setConnectionType(ConnectionType.DISCONNECTED);
 
-        controller.closePort(activePort, (err: string) => {
-            if (err) {
-                console.error(err);
-            }
-            refreshPorts();
-        });
-    }
+		controller.closePort(activePort, (err: string) => {
+			if (err) {
+				console.error(err);
+			}
+			refreshPorts();
+		});
+	}
 
-    function attemptAutoConnect(force = false) {
-        const autoReconnect = connectionConfig.get('autoReconnect', false);
-        const port = connectionConfig.get('port', null);
+	function attemptAutoConnect(force = false) {
+		const autoReconnect = connectionConfig.get("autoReconnect", false);
+		const port = connectionConfig.get("port", null);
 
-        if (
-            connectionState !== ConnectionState.DISCONNECTED ||
-            (!autoReconnect && !force)
-        ) {
-            return;
-        }
+		if (
+			connectionState !== ConnectionState.DISCONNECTED ||
+			(!autoReconnect && !force)
+		) {
+			return;
+		}
 
-        // TODO: Add autoconnect for ethernet
-        if (isIPv4(port)) {
-            handleConnect(port, ConnectionType.ETHERNET);
-            return;
-        }
+		// TODO: Add autoconnect for ethernet
+		if (isIPv4(port)) {
+			handleConnect(port, ConnectionType.ETHERNET);
+			return;
+		}
 
-        handleConnect(port, ConnectionType.USB);
-    }
+		handleConnect(port, ConnectionType.USB);
+	}
 
-    const handleMouseEnter = () => {
-        // Cancel any pending close timeout
-        if (closeTimeoutRef.current) {
-            clearTimeout(closeTimeoutRef.current);
-            closeTimeoutRef.current = null;
-        }
-        isHoveringRef.current = true;
-        setIsOpen(true);
-    };
+	const handleMouseEnter = () => {
+		// Cancel any pending close timeout
+		if (closeTimeoutRef.current) {
+			clearTimeout(closeTimeoutRef.current);
+			closeTimeoutRef.current = null;
+		}
+		isHoveringRef.current = true;
+		setIsOpen(true);
+	};
 
-    const handleMouseLeave = () => {
-        // Debounce popover close - only set flag to false after delay
-        closeTimeoutRef.current = setTimeout(() => {
-            isHoveringRef.current = false;
-            setIsOpen(false);
-        }, 250);
-    };
+	const handleMouseLeave = () => {
+		// Debounce popover close - only set flag to false after delay
+		closeTimeoutRef.current = setTimeout(() => {
+			isHoveringRef.current = false;
+			setIsOpen(false);
+		}, 250);
+	};
 
-    const handleClick = () => {
-        setIsOpen((prev) => !prev);
-    };
+	const handleClick = () => {
+		setIsOpen((prev) => !prev);
+	};
 
-    const toggleDropdown = (e: React.MouseEvent | React.KeyboardEvent) => {
-        if (
-            connectionState === ConnectionState.DISCONNECTED ||
-            connectionState === ConnectionState.ERROR
-        ) {
-            e.stopPropagation();
-            refreshPorts();
-            setIsDropdownOpen(!isDropdownOpen);
-        }
-    };
+	const toggleDropdown = (e: React.MouseEvent | React.KeyboardEvent) => {
+		if (
+			connectionState === ConnectionState.DISCONNECTED ||
+			connectionState === ConnectionState.ERROR
+		) {
+			e.stopPropagation();
+			refreshPorts();
+			setIsDropdownOpen(!isDropdownOpen);
+		}
+	};
 
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            toggleDropdown(e);
-        } else if (e.key === 'Escape') {
-            setIsDropdownOpen(false);
-        }
-    };
+	const handleKeyDown = (e: React.KeyboardEvent) => {
+		if (e.key === "Enter" || e.key === " ") {
+			e.preventDefault();
+			toggleDropdown(e);
+		} else if (e.key === "Escape") {
+			setIsDropdownOpen(false);
+		}
+	};
 
-    return (
-        <Popover open={isOpen} onOpenChange={setIsOpen}>
-            <div
-                className="relative group z-50"
-                onMouseEnter={() => {
-                    refreshPortsOnParentEntry();
-                    handleMouseEnter();
-                }}
-                onMouseLeave={handleMouseLeave}
-                role="button"
-                aria-haspopup="true"
-                aria-expanded={isDropdownOpen}
-                aria-label="Connection menu"
-                tabIndex={0}
-            >
-                {connectionState !== ConnectionState.CONNECTED && (
-                    <div
-                        className={cn(
-                            'absolute -inset-0.5 bg-gradient-to-r from-blue-300 to-blue-800 rounded-lg blur opacity-70 group-hover:opacity-100 transition duration-1000 group-hover:duration-200',
-                        )}
-                    />
-                )}
-                <PopoverTrigger asChild>
-                    <button
-                        className="h-12 max-xl:h-10 relative border border-gray-400 bg-gray-100 font-bold px-4 py-2 max-sm:p-1 ring-1 ring-gray-900/5 gap-4 justify-between items-center rounded-lg leading-none flex flex-row items-top portrait:min-w-[170px] portrait:max-sm:min-w-max min-w-[250px] max-xl:min-w-[180px] max-sm:min-w-0 dark:bg-dark text-black dark:text-white cursor-pointer"
-                        onClick={handleClick}
-                    >
-                        <ConnectionStateIndicator
-                            state={connectionState}
-                            type={connectionType}
-                        />
-                        {connectionState === ConnectionState.DISCONNECTED && (
-                            <span className="max-sm:hidden portrait:hidden animate-pulse">
-                                Connect to CNC
-                            </span>
-                        )}
-                        {connectionState === ConnectionState.DISCONNECTED && (
-                            <span className="max-sm:hidden landscape:hidden animate-pulse">
-                                Connect
-                            </span>
-                        )}
-                        {connectionState === ConnectionState.CONNECTING && (
-                            <span className="max-sm:hidden">Connecting...</span>
-                        )}
-                        {connectionState === ConnectionState.ERROR && (
-                            <span className="max-sm:hidden">
-                                Unable to connect.
-                            </span>
-                        )}
-                        {connectionState == ConnectionState.CONNECTED && (
-                            <ConnectionInfo
-                                port={activePort}
-                                firmwareType={firmware}
-                            />
-                        )}
-                        {connectionState == ConnectionState.CONNECTED && (
-                            <DisconnectButton
-                                disconnectHandler={onDisconnectClick}
-                            />
-                        )}
-                    </button>
-                </PopoverTrigger>
-                {(connectionState == ConnectionState.DISCONNECTED ||
-                    connectionState === ConnectionState.ERROR) && (
-                    <PopoverContent
-                        align="start"
-                        sideOffset={0}
-                        className="w-auto p-0 min-w-[250px] mt-1"
-                        onOpenAutoFocus={(e) => e.preventDefault()}
-                    >
-                        <PortListings
-                            connectHandler={(port, type) => {
-                                handleConnect(port, type);
-                                setIsOpen(false);
-                            }}
-                            unrecognizedPorts={props.unrecognizedPorts}
-                            ports={props.ports}
-                        />
-                    </PopoverContent>
-                )}
-            </div>
-        </Popover>
-    );
+	return (
+		<Popover open={isOpen} onOpenChange={setIsOpen}>
+			<div
+				className="relative group z-50"
+				onMouseEnter={() => {
+					refreshPortsOnParentEntry();
+					handleMouseEnter();
+				}}
+				onMouseLeave={handleMouseLeave}
+				role="button"
+				aria-haspopup="true"
+				aria-expanded={isDropdownOpen}
+				aria-label="Connection menu"
+				tabIndex={0}
+			>
+				{connectionState !== ConnectionState.CONNECTED && (
+					<div
+						className={cn(
+							"absolute -inset-0.5 bg-gradient-to-r from-blue-300 to-blue-800 rounded-lg blur opacity-70 group-hover:opacity-100 transition duration-1000 group-hover:duration-200",
+						)}
+					/>
+				)}
+				<PopoverTrigger asChild>
+					<button
+						className="h-12 max-xl:h-10 relative border border-gray-400 bg-gray-100 font-bold px-4 py-2 max-sm:p-1 ring-1 ring-gray-900/5 gap-4 justify-between items-center rounded-lg leading-none flex flex-row items-top portrait:min-w-[170px] portrait:max-sm:min-w-max min-w-[250px] max-xl:min-w-[180px] max-sm:min-w-0 dark:bg-dark text-black dark:text-white cursor-pointer"
+						onClick={handleClick}
+					>
+						<ConnectionStateIndicator
+							state={connectionState}
+							type={connectionType}
+						/>
+						{connectionState === ConnectionState.DISCONNECTED && (
+							<span className="max-sm:hidden portrait:hidden animate-pulse">
+								Connect to CNC
+							</span>
+						)}
+						{connectionState === ConnectionState.DISCONNECTED && (
+							<span className="max-sm:hidden landscape:hidden animate-pulse">
+								Connect
+							</span>
+						)}
+						{connectionState === ConnectionState.CONNECTING && (
+							<span className="max-sm:hidden">Connecting...</span>
+						)}
+						{connectionState === ConnectionState.ERROR && (
+							<span className="max-sm:hidden">Unable to connect.</span>
+						)}
+						{connectionState == ConnectionState.CONNECTED && (
+							<ConnectionInfo port={activePort} firmwareType={firmware} />
+						)}
+						{connectionState == ConnectionState.CONNECTED && (
+							<DisconnectButton disconnectHandler={onDisconnectClick} />
+						)}
+					</button>
+				</PopoverTrigger>
+				{(connectionState == ConnectionState.DISCONNECTED ||
+					connectionState === ConnectionState.ERROR) && (
+					<PopoverContent
+						align="start"
+						sideOffset={0}
+						className="w-auto p-0 min-w-[250px] mt-1"
+						onOpenAutoFocus={(e) => e.preventDefault()}
+					>
+						<PortListings
+							connectHandler={(port, type) => {
+								handleConnect(port, type);
+								setIsOpen(false);
+							}}
+							unrecognizedPorts={props.unrecognizedPorts}
+							ports={props.ports}
+						/>
+					</PopoverContent>
+				)}
+			</div>
+		</Popover>
+	);
 }
 
 export default connect((store) => {
-    const connection = get(store, 'connection', {});
-    const ports: Port[] = get(connection, 'ports', []);
-    const unrecognizedPorts: Port[] = get(connection, 'unrecognizedPorts', []);
-    const reportedFirmware: FirmwareFlavour = get(
-        store,
-        'controller.type',
-        'Grbl',
-    );
+	const connection = get(store, "connection", {});
+	const ports: Port[] = get(connection, "ports", []);
+	const unrecognizedPorts: Port[] = get(connection, "unrecognizedPorts", []);
+	const reportedFirmware: FirmwareFlavour = get(
+		store,
+		"controller.type",
+		"Grbl",
+	);
 
-    return {
-        ports,
-        unrecognizedPorts,
-        reportedFirmware,
-    };
+	return {
+		ports,
+		unrecognizedPorts,
+		reportedFirmware,
+	};
 })(Connection);

@@ -1,99 +1,114 @@
+import { Button } from "app/components/Button";
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from 'app/components/shadcn/Dialog';
-import { useEffect, useRef, useState } from 'react';
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+} from "app/components/shadcn/Dialog";
 import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectSeparator,
-    SelectTrigger,
-    SelectValue,
-} from 'app/components/shadcn/Select.tsx';
-import { Button } from 'app/components/Button';
-import { toast } from 'app/lib/toaster';
-import controller from 'app/lib/controller.ts';
-import store from 'app/store';
-import get from 'lodash/get';
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectLabel,
+	SelectSeparator,
+	SelectTrigger,
+	SelectValue,
+} from "app/components/shadcn/Select.tsx";
+import { FlashingProgress } from "app/features/Config/components/FlashingProgress.tsx";
+import { useTypedSelector } from "app/hooks/useTypedSelector";
+import controller from "app/lib/controller.ts";
+import { toast } from "app/lib/toaster";
+import store from "app/store";
 
-import cn from 'classnames';
-import { FlashingProgress } from 'app/features/Config/components/FlashingProgress.tsx';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import cn from "classnames";
+import get from "lodash/get";
+import { useEffect, useRef, useState } from "react";
 
 interface flashDialogProps {
-    show: boolean;
-    toggleShow: (b: boolean) => void;
+	show: boolean;
+	toggleShow: (b: boolean) => void;
 }
 
 enum FlashingState {
-    Idle,
-    Flashing,
-    Complete,
-    Error,
+	Idle,
+	Flashing,
+	Complete,
+	Error,
 }
 
 interface startFlashOptions {
     port: string;
     hex: ArrayBuffer;
     controllerType: string;
+    firmwareType?: string;
 }
 
 const SLB_DFU_PORT = {
-    port: 'SLB_DFU',
-    manufacturer: '',
-    inuse: false,
+	port: "SLB_DFU",
+	manufacturer: "",
+	inuse: false,
 };
+
+// Whether the selected firmware file is a .uf2 image (RP2350 / Pico 2350).
+function isUF2File(file: any): boolean {
+    return !!file?.name && file.name.toLowerCase().endsWith('.uf2');
+}
 
 function startFlash({
     port,
     hex = null,
     controllerType = '',
+    firmwareType = 'hex',
 }: startFlashOptions) {
-    if (!port) {
-        toast.error(
-            'No port specified - please connect to the device to determine what is being flashed.',
-            { position: 'bottom-right' },
-        );
-    }
+	if (!port) {
+		toast.error(
+			"No port specified - please connect to the device to determine what is being flashed.",
+			{ position: "bottom-right" },
+		);
+	}
 
-    const selectedProfile = store.get('workspace.machineProfile', {});
-    const machineVersion = get(selectedProfile, 'version', 'MK1');
-    const isHal = controllerType === 'grblHAL';
+	const selectedProfile = store.get("workspace.machineProfile", {});
+	const machineVersion = get(selectedProfile, "version", "MK1");
+	const isHal = controllerType === "grblHAL";
 
-    controller.flashFirmware(port, machineVersion, isHal, hex);
+    controller.flashFirmware(port, machineVersion, isHal, hex, firmwareType);
 }
 
-const CONTROLLER_TYPES = ['grbl', 'grblHAL'];
+const CONTROLLER_TYPES = ["grbl", "grblHAL"];
 
 export function FlashDialog({ show, toggleShow }: flashDialogProps) {
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const [controllerType, setControllerType] = useState('grbl');
-    const [port, setPort] = useState('');
-    const [file, setFile] = useState('');
-    const [hex, setHex] = useState(new ArrayBuffer(1));
-    const [flashState, setFlashState] = useState<FlashingState>(
-        FlashingState.Idle,
-    );
+	const fileInputRef = useRef<HTMLInputElement>(null);
+	const [controllerType, setControllerType] = useState("grbl");
+	const [port, setPort] = useState("");
+	const [file, setFile] = useState("");
+	const [hex, setHex] = useState(new ArrayBuffer(1));
+	const [flashState, setFlashState] = useState<FlashingState>(
+		FlashingState.Idle,
+	);
 
-    const [ports, unrecognizedPorts] = useTypedSelector((state) => [state.connection.ports, [SLB_DFU_PORT, ...state.connection.unrecognizedPorts]]);
+	const [ports, unrecognizedPorts] = useTypedSelector((state) => [
+		state.connection.ports,
+		[SLB_DFU_PORT, ...state.connection.unrecognizedPorts],
+	]);
 
-    function flashPort() {
-        setFlashState(FlashingState.Flashing);
+	function flashPort() {
+		setFlashState(FlashingState.Flashing);
 
         const isHal = controllerType === 'grblHAL';
         const isDfuPort = port === SLB_DFU_PORT.port;
+        const isUF2 = isUF2File(file);
+        const firmwareType = isUF2 ? 'uf2' : 'hex';
+
         if (isHal && !isDfuPort) {
-            controller.command('gcode', '$DFU');
+            // UF2 boards (RP2350) enter the bootloader via $UF2; DFU boards use $DFU.
+            controller.command('gcode', isUF2 ? '$UF2' : '$DFU');
             setTimeout(() => {
                 startFlash({
                     port,
                     hex,
                     controllerType,
+                    firmwareType,
                 });
             }, 1500);
             return;
@@ -103,34 +118,35 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
             port,
             hex,
             controllerType,
+            firmwareType,
         });
     }
 
-    // On show, refresh ports
-    useEffect(() => {
-        controller.listPorts();
-        setFlashState(FlashingState.Idle);
-    }, [show]);
+	// On show, refresh ports
+	useEffect(() => {
+		controller.listPorts();
+		setFlashState(FlashingState.Idle);
+	}, [show]);
 
-    useEffect(() => {
-        controller.addListener('flash:end', () => {
-            setFlashState(FlashingState.Complete);
-        });
-        controller.addListener('task:error', () => {
-            setFlashState(FlashingState.Error);
-        });
-        controller.addListener('flash:message', (msg) => {
-            if (msg?.type === 'Error') {
-                setFlashState(FlashingState.Error);
-            }
-        });
+	useEffect(() => {
+		controller.addListener("flash:end", () => {
+			setFlashState(FlashingState.Complete);
+		});
+		controller.addListener("task:error", () => {
+			setFlashState(FlashingState.Error);
+		});
+		controller.addListener("flash:message", (msg) => {
+			if (msg?.type === "Error") {
+				setFlashState(FlashingState.Error);
+			}
+		});
 
-        return () => {
-            controller.removeListener('flash:end');
-            controller.removeListener('task:error');
-            controller.removeListener('flash:message');
-        };
-    }, []);
+		return () => {
+			controller.removeListener("flash:end");
+			controller.removeListener("task:error");
+			controller.removeListener("flash:message");
+		};
+	}, []);
 
     // File Reader on file change
     useEffect(() => {
@@ -144,7 +160,13 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                     setHex(result);
                 }
             };
-            fileReader.readAsText(file);
+            // UF2 images are binary and must be read as an ArrayBuffer;
+            // Intel HEX (.hex) is text.
+            if (isUF2File(file)) {
+                fileReader.readAsArrayBuffer(file);
+            } else {
+                fileReader.readAsText(file);
+            }
         }
         return () => {
             isCancel = true;
@@ -154,29 +176,32 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
         };
     }, [file]);
 
-    function handlePortSelect(value) {
-        setPort(value);
-    }
+	function handlePortSelect(value) {
+		setPort(value);
+		if (value === SLB_DFU_PORT.port) {
+			setControllerType("grblHAL");
+		}
+	}
 
-    function handleTypeSelect(value) {
-        setControllerType(value);
-    }
+	function handleTypeSelect(value) {
+		setControllerType(value);
+	}
 
-    function canClickFlash() {
-        if (controllerType === 'grbl') {
-            return port != '';
-        }
-        return port != '' && file != '';
-    }
+	function canClickFlash() {
+		if (controllerType === "grbl") {
+			return port != "";
+		}
+		return port != "" && file != "";
+	}
 
-    function handleFileUpload(e) {
-        const file = e.target.files[0];
-        if (!file) {
-            console.error('No file found');
-            return;
-        }
-        setFile(file);
-    }
+	function handleFileUpload(e) {
+		const file = e.target.files[0];
+		if (!file) {
+			console.error("No file found");
+			return;
+		}
+		setFile(file);
+	}
 
     return (
         <Dialog open={show} onOpenChange={toggleShow}>
@@ -253,66 +278,66 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                                 invisible: controllerType === 'grbl',
                             })}
                         >
-                            <h2 className="text-gray-600 text-sm dark:text-white">Hex File</h2>
+                            <h2 className="text-gray-600 text-sm dark:text-white">Firmware File</h2>
                             <input
                                 type="file"
                                 id="firmware_image"
-                                accept=".hex"
+                                accept=".hex,.uf2"
                                 ref={fileInputRef}
                                 onChange={handleFileUpload}
                             />
                         </div>
                     </div>
 
-                    <div
-                        className={cn(
-                            'bg-yellow-100 bg-opacity-60 border border-t border-b border-b-yellow-500 border-t-yellow-500 mt-8 p-4 flex flex-col gap-2',
-                            {
-                                hidden: flashState !== FlashingState.Idle,
-                            },
-                        )}
-                    >
-                        <p className="text-sm text-gray-600 text-center dark:text-white">
-                            This process will disconnect your machine, and may
-                            take a couple of minutes to complete.
-                            <br />
-                            <b>Continue?</b>
-                        </p>
-                        <div className="flex flex-row gap-4 items-center justify-center">
-                            <Button onClick={() => toggleShow(false)}>No</Button>
-                            <Button
-                                variant="primary"
-                                disabled={!canClickFlash()}
-                                onClick={flashPort}
-                            >
-                                Yes
-                            </Button>
-                        </div>
-                    </div>
-                    <div
-                        className={cn(
-                            { hidden: flashState === FlashingState.Idle },
-                            {
-                                'flex flex-col visible expand':
-                                    flashState === FlashingState.Flashing,
-                            },
-                        )}
-                    >
-                        <FlashingProgress type={controllerType} />
-                    </div>
-                    <div
-                        className={cn('flex items-center justify-center', {
-                            hidden:
-                                flashState !== FlashingState.Complete &&
-                                flashState !== FlashingState.Error,
-                        })}
-                    >
-                        <Button variant="primary" onClick={() => toggleShow(false)}>
-                            Close
-                        </Button>
-                    </div>
-                </div>
-            </DialogContent>
-        </Dialog>
-    );
+					<div
+						className={cn(
+							"bg-yellow-100 bg-opacity-60 border border-t border-b border-b-yellow-500 border-t-yellow-500 mt-8 p-4 flex flex-col gap-2",
+							{
+								hidden: flashState !== FlashingState.Idle,
+							},
+						)}
+					>
+						<p className="text-sm text-gray-600 text-center dark:text-white">
+							This process will disconnect your machine, and may take a couple
+							of minutes to complete.
+							<br />
+							<b>Continue?</b>
+						</p>
+						<div className="flex flex-row gap-4 items-center justify-center">
+							<Button onClick={() => toggleShow(false)}>No</Button>
+							<Button
+								variant="primary"
+								disabled={!canClickFlash()}
+								onClick={flashPort}
+							>
+								Yes
+							</Button>
+						</div>
+					</div>
+					<div
+						className={cn(
+							{ hidden: flashState === FlashingState.Idle },
+							{
+								"flex flex-col visible expand":
+									flashState === FlashingState.Flashing,
+							},
+						)}
+					>
+						<FlashingProgress type={controllerType} />
+					</div>
+					<div
+						className={cn("flex items-center justify-center", {
+							hidden:
+								flashState !== FlashingState.Complete &&
+								flashState !== FlashingState.Error,
+						})}
+					>
+						<Button variant="primary" onClick={() => toggleShow(false)}>
+							Close
+						</Button>
+					</div>
+				</div>
+			</DialogContent>
+		</Dialog>
+	);
 }

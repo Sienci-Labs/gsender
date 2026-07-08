@@ -21,81 +21,84 @@
  *
  */
 
-import React from 'react';
 import {
-    TOUCHPLATE_TYPE_STANDARD,
-    TOUCHPLATE_TYPE_AUTOZERO,
-    TOUCHPLATE_TYPE_BITZERO,
-    TOUCHPLATE_TYPE_ZERO,
-    TOUCHPLATE_TYPE_3D,
-} from 'app/lib/constants';
-import XProbe from './assets/Block-X.gif';
-import YProbe from './assets/Block-Y.gif';
-import XYProbe from './assets/Block-XY.gif';
-import XYZProbe from './assets/Block-XYZ.gif';
-import ZProbe from './assets/Block-Z.gif';
-import ZOnlyProbe from './assets/Probe-Z.gif';
-import AutoZProbe from './assets/AutoZero-Z.gif';
-import AutoXYZProbe from './assets/AutoZero-Rem.gif';
-import XY3D from './assets/3D-XY.gif';
-import XYZ3D from './assets/3D-XYZ.gif';
-import X3D from './assets/3D-X.gif';
-import Y3D from './assets/3D-Y.gif';
-import { ProbeCommand, TOUCHPLATE_TYPES_T } from './definitions';
+	TOUCHPLATE_TYPE_3D,
+	TOUCHPLATE_TYPE_AUTOZERO,
+	TOUCHPLATE_TYPE_BITZERO,
+	TOUCHPLATE_TYPE_STANDARD,
+	TOUCHPLATE_TYPE_ZERO,
+} from "app/lib/constants";
+import type React from "react";
+import X3D from "./assets/3D-X.gif";
+import XY3D from "./assets/3D-XY.gif";
+import XYZ3D from "./assets/3D-XYZ.gif";
+import Y3D from "./assets/3D-Y.gif";
+import AutoXYZProbe from "./assets/AutoZero-Rem.gif";
+import AutoZProbe from "./assets/AutoZero-Z.gif";
+import XProbe from "./assets/Block-X.gif";
+import XYProbe from "./assets/Block-XY.gif";
+import XYZProbe from "./assets/Block-XYZ.gif";
+import YProbe from "./assets/Block-Y.gif";
+import ZProbe from "./assets/Block-Z.gif";
+import ZOnlyProbe from "./assets/Probe-Z.gif";
+import type { ProbeCommand, TOUCHPLATE_TYPES_T } from "./definitions";
 
 interface Props {
-    probeCommand: ProbeCommand;
-    touchplateType: TOUCHPLATE_TYPES_T;
+	probeCommand: ProbeCommand;
+	touchplateType: TOUCHPLATE_TYPES_T;
 }
 
 const ProbeImage: React.FC<Props> = ({
-    probeCommand,
-    touchplateType = TOUCHPLATE_TYPE_STANDARD,
+	probeCommand,
+	touchplateType = TOUCHPLATE_TYPE_STANDARD,
 }) => {
-    const getProbeImage = () => {
-        const { id } = probeCommand;
-        if (touchplateType === TOUCHPLATE_TYPE_AUTOZERO || touchplateType === TOUCHPLATE_TYPE_BITZERO) {
-            if (id === 'Z Touch') {
-                return AutoZProbe;
-            }
-            return AutoXYZProbe;
-        }
-        if (touchplateType === TOUCHPLATE_TYPE_ZERO) {
-            return ZOnlyProbe;
-        }
-        if (touchplateType === TOUCHPLATE_TYPE_3D) {
-            if (id === 'X Touch') {
-                return X3D;
-            } else if (id === 'Y Touch') {
-                return Y3D;
-            } else if (id === 'XY Touch') {
-                return XY3D;
-            } else if (id === 'Z Touch' || id === 'XYZ Touch') {
-                return XYZ3D;
-            }
-        }
-        if (id === 'X Touch') {
-            return XProbe;
-        } else if (id === 'Y Touch') {
-            return YProbe;
-        } else if (id === 'XY Touch') {
-            return XYProbe;
-        } else if (id === 'Z Touch') {
-            return ZProbe;
-        }
-        return XYZProbe;
-    };
-    const imgSrc = getProbeImage();
+	const getProbeImage = () => {
+		const { id } = probeCommand;
+		if (
+			touchplateType === TOUCHPLATE_TYPE_AUTOZERO ||
+			touchplateType === TOUCHPLATE_TYPE_BITZERO
+		) {
+			if (id === "Z Touch") {
+				return AutoZProbe;
+			}
+			return AutoXYZProbe;
+		}
+		if (touchplateType === TOUCHPLATE_TYPE_ZERO) {
+			return ZOnlyProbe;
+		}
+		if (touchplateType === TOUCHPLATE_TYPE_3D) {
+			if (id === "X Touch") {
+				return X3D;
+			} else if (id === "Y Touch") {
+				return Y3D;
+			} else if (id === "XY Touch") {
+				return XY3D;
+			} else if (id === "Z Touch" || id === "XYZ Touch") {
+				return XYZ3D;
+			}
+		}
+		if (id === "X Touch") {
+			return XProbe;
+		} else if (id === "Y Touch") {
+			return YProbe;
+		} else if (id === "XY Touch") {
+			return XYProbe;
+		} else if (id === "Z Touch") {
+			return ZProbe;
+		}
+		return XYZProbe;
+	};
+	const imgSrc = getProbeImage();
 
-    return (
-        <div className="flex items-center justify-center">
-            <img
-                alt="Probe Block orientation guide image"
-                src={imgSrc}
-                className="w-[15vh] my-0 mx-auto dark:invert portrait:w-[10vh]"
-            />
-        </div>
-    );
+	return (
+		<div className="flex items-center justify-center">
+			<img
+				alt="Probe Block orientation guide image"
+				src={imgSrc}
+				className="w-[15vh] my-0 mx-auto dark:invert portrait:w-[10vh]"
+			/>
+		</div>
+	);
 };
 
 export default ProbeImage;
