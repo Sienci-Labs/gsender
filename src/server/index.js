@@ -47,6 +47,8 @@ import logger, { setLevel } from "./lib/logger";
 import urljoin from "./lib/urljoin";
 import cncengine from "./services/cncengine";
 import config from "./services/configstore";
+import errorConfig from "./services/configstore/alarmStore";
+import jobConfig from "./services/configstore/jobStore";
 import monitor from "./services/monitor";
 import pluginRegistry from "./services/pluginregistry";
 
@@ -75,11 +77,16 @@ const createServer = (options, callback) => {
 	}
 
 	const rcfile = path.resolve(options.configFile || settings.rcfile);
+	const errorFile = path.resolve(options.errorFile || settings.errorFile);
+	const jobFile = path.resolve(options.jobFile || settings.jobFile);
 
 	// configstore service
 	log.info(
 		`Loading configuration from ${chalk.yellow(JSON.stringify(rcfile))}`,
 	);
+
+	errorConfig.load(rcfile, errorFile);
+	jobConfig.load(rcfile, jobFile);
 	config.load(rcfile);
 
 	// rcfile

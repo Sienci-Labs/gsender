@@ -445,6 +445,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
 							LIGHTWEIGHT_OPTIONS.EVERYTHING,
 						],
 					},
+					{
+						label: "Follow tool during runtime",
+						key: "widgets.visualizer.followToolDuringRuntime",
+						description:
+							"While a job is running, pan the camera to track the tool in X/Y, keeping the same viewing angle and height.",
+						type: "boolean",
+						defaultValue: false,
+					},
 				],
 			},
 			{
