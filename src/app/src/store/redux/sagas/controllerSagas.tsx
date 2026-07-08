@@ -39,6 +39,7 @@ import {
 	RENDER_LOADING,
 	RENDER_NO_FILE,
 	RENDER_RENDERED,
+	VISUALIZER_PRIMARY,
 	VISUALIZER_SECONDARY,
 	WORKSPACE_MODE,
 } from "app/constants";
@@ -807,6 +808,16 @@ export function* initialize(): Generator<null, void, unknown> {
 			parseGCode(content, size, name, visualizer);
 		},
 	);
+
+	pubsub.subscribe("spindle:mode", () => {
+		const state = reduxStore.getState();
+		const content: string | undefined = _get(state, "file.content");
+		const size: number = _get(state, "file.size", 0);
+		const name: string = _get(state, "file.name", "");
+		if (content) {
+			parseGCode(content, size, name, VISUALIZER_PRIMARY);
+		}
+	});
 
 	controller.addListener("workflow:pause", (opts: { data: string }) => {
 		const { data } = opts;

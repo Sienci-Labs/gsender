@@ -423,9 +423,8 @@ const SpindleWidget = () => {
 		});
 		const { minPower, maxPower } = laser;
 
-		const SLBLaserExists =
-			controllerType === GRBLHAL &&
-			findIndex(availableSpindles, (o) => SLB_LASERS.includes(o.label)) !== -1;
+        const SLBLaserExists =
+            controllerType === GRBLHAL
 
 		// save current spindle values if laser spindle doesnt exist
 		if (!SLBLaserExists) {

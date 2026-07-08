@@ -21,26 +21,19 @@
  *
  */
 
-import cn from "classnames";
 import pubsub from "pubsub-js";
-import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
 
 const Loading = () => {
 	const [progress, setProgress] = useState(0);
-	const renderState = useSelector((state) => state.file.renderState);
-
-	const subscribe = () => {
-		const tokens = [
-			pubsub.subscribe("toolpath:progress", (msg, progress) => {
-				setProgress(progress);
-			}),
-		];
-		return tokens;
-	};
 
 	useEffect(() => {
-		const token = subscribe();
+		const token = pubsub.subscribe(
+			"toolpath:progress",
+			(_msg: string, value: number) => {
+				setProgress(value);
+			},
+		);
 		return () => {
 			pubsub.unsubscribe(token);
 		};

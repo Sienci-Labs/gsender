@@ -27,6 +27,10 @@ import path from "path";
 import pkg from "../../package.json";
 
 const RC_FILE = pkg.version.includes("EDGE") ? ".edge_rc" : ".sender_rc";
+const ERROR_FILE = pkg.version.includes("EDGE")
+	? ".edge_errorrc"
+	: ".sender_errorrc";
+const JOB_FILE = pkg.version.includes("EDGE") ? ".edge_jobrc" : ".sender_jobrc";
 const SESSION_PATH = ".sienci-sessions";
 
 // Secret
@@ -55,6 +59,8 @@ const getUserDataPath = () => {
 
 export default {
 	rcfile: path.resolve(getUserHome(), RC_FILE),
+	errorFile: path.resolve(getUserHome(), ERROR_FILE),
+	jobFile: path.resolve(getUserHome(), JOB_FILE),
 	verbosity: 0,
 	version: pkg.version,
 

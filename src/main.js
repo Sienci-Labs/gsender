@@ -503,6 +503,33 @@ const main = () => {
 				}
 			});
 
+			ipcMain.on("open-directory-dialog", async () => {
+				try {
+					const additionalOptions = {};
+					const gSenderWindow = windowManager.getWindow();
+
+					if (prevDirectory) {
+						additionalOptions.defaultPath = prevDirectory;
+					}
+					const directory = await dialog.showOpenDialog(gSenderWindow, {
+						properties: ["openDirectory"],
+					});
+
+					if (!directory) {
+						return;
+					}
+					if (directory.canceled) {
+						return;
+					}
+
+					const FULL_PATH = directory.filePaths[0];
+
+					window.webContents.send("returned-directory-dialog-data", FULL_PATH);
+				} catch (e) {
+					log.error(`Caught error in listener - ${e}`);
+				}
+			});
+
 			ipcMain.on("open-new-window", (msg, route) => {
 				const factor = screen.getPrimaryDisplay().scaleFactor;
 				const childOptions = {

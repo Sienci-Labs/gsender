@@ -1,6 +1,6 @@
 import { get } from "lodash";
 import { ERR_INTERNAL_SERVER_ERROR } from "../constants";
-import config from "../services/configstore";
+import config from "../services/configstore/alarmStore";
 
 // import logger from '../lib/logger';
 

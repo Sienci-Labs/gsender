@@ -21,6 +21,7 @@
  *
  */
 
+// @ts-ignore - namespace-constants ships no type declarations
 import constants from "namespace-constants";
 
 export const {
@@ -104,7 +105,7 @@ export const TOOLPATH_COLOR_HEXES = [
 	"#D74242",
 ];
 
-export const DARK_THEME_VALUES = new Map([
+export const DARK_THEME_VALUES = new Map<string, string>([
 	[BACKGROUND_PART, "#111827"], //Navy Blue
 	[GRID_PART, "#77a9d7"], // Turqoise / Light Blue
 	[XAXIS_PART, "#df3b3b"], //Indian Red
@@ -121,7 +122,7 @@ export const DARK_THEME_VALUES = new Map([
 	[LASER_PART, "#FF0000"], // Red
 ]);
 
-export const LIGHT_THEME_VALUES = new Map([
+export const LIGHT_THEME_VALUES = new Map<string, string>([
 	[BACKGROUND_PART, "#e5e7eb"], //Navy Blue
 	[GRID_PART, "#77a9d7"], // Turqoise / Light Blue
 	[XAXIS_PART, "#df3b3b"], //Indian Red

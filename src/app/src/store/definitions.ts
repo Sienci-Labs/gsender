@@ -178,6 +178,7 @@ export interface ControllerState {
 	modal: Modal;
 	mpos: BasicPosition;
 	wpos: BasicPosition;
+	wco: BasicPosition;
 	homingFlag: boolean;
 	hasHomed: boolean;
 	feeder: Feeder;
