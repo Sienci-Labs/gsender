@@ -13,41 +13,33 @@ import OffsetManagementWidget from "app/features/ATC/components/Configuration/co
 import { useConfigContext } from "app/features/ATC/components/Configuration/hooks/useConfigStore";
 import cn from "classnames";
 import {
-	AlertTriangle,
-	ArrowRight,
-	BookOpen,
-	CheckCircle2,
-	Crosshair,
-	Fingerprint,
-	Move,
-	ShieldCheck,
-	SlidersHorizontal,
-} from "lucide-react";
-import type React from "react";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
-import { PositionInput } from "./PositionInput";
+    AlertTriangle,
+    ArrowRight,
+    BookOpen,
+    CheckCircle2,
+    Crosshair,
+    Fingerprint,
+    Move,
+    ShieldCheck,
+    SlidersHorizontal,
+} from 'lucide-react';
 
 export interface ConfigTabProps {
-	uploading: boolean;
-	uploadError?: string;
-	macroReadFailed?: boolean;
+    uploading: boolean;
+    uploadError?: string;
+    macroReadFailed?: boolean;
 }
 
-export const ConfigTab: React.FC = ({
-	uploading,
-	uploadError,
-	macroReadFailed,
-}: ConfigTabProps) => {
-	const navigate = useNavigate();
-	const {
-		config,
-		updateConfig,
-		updatePosition,
-		applyConfig,
-		setWorkspacePosition,
-		status,
-	} = useConfigContext();
+export const ConfigTab: React.FC = ({ uploading, uploadError, macroReadFailed }: ConfigTabProps) => {
+    const navigate = useNavigate();
+    const {
+        config,
+        updateConfig,
+        updatePosition,
+        applyConfig,
+        setWorkspacePosition,
+        status,
+    } = useConfigContext();
 
 	const [forkSpacingStr, setForkSpacingStr] = useState<string>(() =>
 		String(config.variables._tc_slot_offset.value),
@@ -431,31 +423,29 @@ export const ConfigTab: React.FC = ({
 						</div>
 					)}
 
-					{uploadError && !uploading && (
-						<p className="text-xs font-bold text-red-600">{uploadError}</p>
-					)}
+                    {uploadError && !uploading && (
+                        <p className="text-xs font-bold text-red-600">
+                            {uploadError}
+                        </p>
+                    )}
 
-					{macroReadFailed && !uploading && (
-						<div className="flex items-start gap-2 rounded-md border border-amber-400 bg-amber-50 dark:bg-amber-950/40 dark:border-amber-700 px-3 py-2 text-xs text-amber-800 dark:text-amber-300">
-							<AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
-							<p>
-								Unable to read board config (<code>ATCI.macro</code>). Ensure
-								the file exists and SD card is installed — apply disabled.
-							</p>
-						</div>
-					)}
-				</div>
+                    {macroReadFailed && !uploading && (
+                        <div className="flex items-start gap-2 rounded-md border border-amber-400 bg-amber-50 dark:bg-amber-950/40 dark:border-amber-700 px-3 py-2 text-xs text-amber-800 dark:text-amber-300">
+                            <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+                            <p>
+                                Unable to read board config (<code>ATCI.macro</code>). Ensure the file exists and SD card is installed — apply disabled.
+                            </p>
+                        </div>
+                    )}
+                </div>
 
-				{/* Apply Button - 40% */}
-				<div className="w-2/5 flex items-center justify-end">
-					<Button
-						onClick={applyConfig}
-						disabled={uploading || !!macroReadFailed}
-					>
-						{uploading ? "Applying..." : "Apply"}
-					</Button>
-				</div>
-			</div>
-		</div>
-	);
+                {/* Apply Button - 40% */}
+                <div className="w-2/5 flex items-center justify-end">
+                    <Button onClick={applyConfig} disabled={uploading || !!macroReadFailed}>
+                        {uploading ? 'Applying...' : 'Apply'}
+                    </Button>
+                </div>
+            </div>
+        </div>
+    );
 };

@@ -13,6 +13,13 @@ describe("Button component", () => {
 		expect(screen.getByText("Hello")).toBeInTheDocument();
 	});
 
+test('renders with tooltip when tooltip prop is provided', () => {
+    render(<Button text="Hover me" tooltip={{ content: 'This is a tooltip' }} />);
+    expect(screen.getByText('Hover me')).toBeInTheDocument();
+    // Tooltip content is hidden until hover, just verify button renders inside tooltip wrapper
+    expect(screen.getByRole('button')).toBeInTheDocument();
+});
+
 	test("is disabled when disabled prop is true", () => {
 		render(<Button text="Disabled" disabled />);
 		expect(screen.getByRole("button")).toBeDisabled();

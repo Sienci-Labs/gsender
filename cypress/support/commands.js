@@ -32,55 +32,149 @@
 //=======//
 //2.Load UI//   cy.loadUI(`${Cypress.config('baseUrl')}/#/configuration`, {
 //=======//
-Cypress.Commands.add("loadUI", (options = {}) => {
-	const {
-		viewport = [1920, 1080],
-		visitTimeout = 30000,
-		elementTimeout = 15000,
-		expectedTitle = "gSender 1.6.0",
-	} = options;
+Cypress.Commands.add('loadUI', (url, options = {}) => {
+  const {
+    maxRetries = 3,
+    waitTime = 3000,
+    timeout = 5000,
+    viewport = { width: 1920, height: 1080 }
+  } = options;
 
-	cy.viewport(...viewport);
-	cy.visit("/", { timeout: visitTimeout });
-	cy.title({ timeout: elementTimeout }).should("eq", expectedTitle);
-	cy.get("body", { timeout: elementTimeout }).should("be.visible");
+  cy.viewport(viewport.width, viewport.height);
+
+  function tryLoadUI(attempt = 1) {
+    cy.log(`Loading attempt ${attempt} of ${maxRetries}`);
+
+    if (attempt === 1) {
+      cy.visit(url, {
+        failOnStatusCode: false,
+        timeout: 30000
+      });
+    } else {
+      cy.reload();
+    }
+
+    cy.wait(waitTime);
+
+    cy.get('body', { timeout }).then(($body) => {
+      const hasButton = $body.find('button').length > 0;
+      const hasCOM = $body.text().includes('COM');
+      const hasConnection =
+        $body.text().includes('Connect') ||
+        $body.text().includes('Connection');
+
+      const uiLoaded = hasButton && (hasCOM || hasConnection);
+
+      cy.log(
+        `Buttons found: ${hasButton}, COM text: ${hasCOM}, Connection text: ${hasConnection}`
+      );
+
+      if (uiLoaded) {
+        cy.log('UI loaded successfully');
+      } else if (attempt < maxRetries) {
+        cy.log('UI not loaded, refreshing...');
+        tryLoadUI(attempt + 1);
+      } else {
+        throw new Error(`Failed to load UI after ${maxRetries} attempts`);
+      }
+    });
+  }
+
+  tryLoadUI();
 });
+
 
 // ----------------------
 //3.Connect to CNC machine grbl cy.connectMachine();
 // ----------------------
 Cypress.Commands.add("connectMachine", () => {
-	// Step 1: Click "Connect to CNC" button
-	cy.contains("span", "Connect to CNC", { timeout: 10000 })
-		.should("be.visible")
-		.click({ force: true });
+    // Step 1: Click the parent button, not just the span
+    cy.contains('span', 'Connect to CNC', { timeout: 15000 })
+        .should('exist')
+        .scrollIntoView()
+        .parents('button')
+        .first()
+        .should('be.visible')
+        .should('not.be.disabled')
+        .click({ force: true });
 
-	// Step 2: Wait for the radix popper div to appear
-	cy.get("div[data-radix-popper-content-wrapper]", { timeout: 10000 })
-		.should("exist")
-		.and("be.visible")
-		.within(() => {
-			// Step 3: Get the first port button inside the popper
-			cy.get("button.m-0")
-				.should("have.length.greaterThan", 0)
-				.first()
-				.then(($btn) => {
-					// Step 4: Read and log the port label — no assertion on name
-					const $label = $btn.find("span.font-bold");
-					const portName =
-						$label.length > 0 ? $label.text().trim() : $btn.text().trim();
+    cy.wait(1500);
 
-					cy.log(`Selecting first available port: "${portName}"`);
+    // Step 2: If dropdown didn't open, retry click once
+    cy.get('body').then(($body) => {
+        if ($body.find('div[data-radix-popper-content-wrapper]').length === 0) {
+            cy.log('Dropdown not open - retrying click...');
+            cy.contains('span', 'Connect to CNC', { timeout: 5000 })
+                .parents('button')
+                .first()
+                .click({ force: true });
+            cy.wait(1500);
+        }
+    });
 
-					// Step 5: Click whatever port is listed first
-					cy.wrap($btn).click({ force: true });
-				});
-		});
+    // Step 3: Wait for the radix popper div to appear
+    cy.get("div[data-radix-popper-content-wrapper]", { timeout: 15000 })
+        .should("exist")
+        .within(() => {
+            cy.get("button.m-0")
+                .should("have.length.greaterThan", 0)
+                .first()
+                .then(($btn) => {
+                    const $label = $btn.find("span.font-bold");
+                    const portName =
+                        $label.length > 0 ? $label.text().trim() : $btn.text().trim();
+                    cy.log(`Selecting first available port: "${portName}"`);
+                    cy.wrap($btn).click({ force: true });
+                });
+        });
+		cy.log('Unlocking machine if needed')
+		cy.unlockMachineIfNeeded();
+    // Step 4: Confirm Idle state
+});
 
-	//  Step 6: Confirm machine reaches Idle state after connecting
-	cy.contains(/^Idle$/i, { timeout: 30000 })
-		.should("be.visible")
-		.then(() => cy.log("CNC machine connected and in Idle state"));
+// Without unlock 
+Cypress.Commands.add("connectMachineNUL", () => {
+    // Step 1: Click the parent button, not just the span
+    cy.contains('span', 'Connect to CNC', { timeout: 15000 })
+        .should('exist')
+        .scrollIntoView()
+        .parents('button')
+        .first()
+        .should('be.visible')
+        .should('not.be.disabled')
+        .click({ force: true });
+
+    cy.wait(1500);
+
+    // Step 2: If dropdown didn't open, retry click once
+    cy.get('body').then(($body) => {
+        if ($body.find('div[data-radix-popper-content-wrapper]').length === 0) {
+            cy.log('Dropdown not open - retrying click...');
+            cy.contains('span', 'Connect to CNC', { timeout: 5000 })
+                .parents('button')
+                .first()
+                .click({ force: true });
+            cy.wait(1500);
+        }
+    });
+
+    // Step 3: Wait for the radix popper div to appear
+    cy.get("div[data-radix-popper-content-wrapper]", { timeout: 15000 })
+        .should("exist")
+        .within(() => {
+            cy.get("button.m-0")
+                .should("have.length.greaterThan", 0)
+                .first()
+                .then(($btn) => {
+                    const $label = $btn.find("span.font-bold");
+                    const portName =
+                        $label.length > 0 ? $label.text().trim() : $btn.text().trim();
+                    cy.log(`Selecting first available port: "${portName}"`);
+                    cy.wrap($btn).click({ force: true });
+                });
+        });
+		
+   
 });
 //-----------------------
 //21.Axis Homing Z< Y & X
@@ -284,9 +378,6 @@ Cypress.Commands.add("ensureHomingEnabledAndHome", (options = {}) => {
 		// Perform homing sequence
 		cy.log("Performing homing sequence...");
 
-		// Open homing menu
-		cy.get("div.flex-shrink-0 > div > div > div > div").click();
-		cy.wait(500);
 
 		// Click Home button
 		cy.contains("button", "Home").click();
@@ -457,14 +548,14 @@ Cypress.Commands.add("uploadGcodeFile", (fileName = "sample.gcode") => {
 
 		cy.log(`Going to location: X=${x}, Y=${y}, Z=${z}`);
 
-		// Step 1: Open Go To Location dialog
-		cy.log("Opening Go To Location popup...");
-		cy.get("div.min-h-10 > div:nth-of-type(1) > button", { timeout: 10000 })
-			.filter(":visible")
-			.first()
-			.click({ force: true });
-		cy.wait(1500);
-		cy.log('"Go to Location" button clicked');
+  // Step 1: Open Go To Location dialog 
+  cy.log('Opening Go To Location popup...');
+  cy.get('div.min-h-10 > div:nth-of-type(1) > button', { timeout: 10000 })
+    .filter(':visible')
+    .first()
+    .click({ force: true });
+  cy.wait(1500);
+  cy.log('"Go to Location" button clicked');
 
 		// Step 2: Enter coordinates inside the Radix dialog
 		cy.get('[id^="radix-"]', { timeout: 10000 })
@@ -524,16 +615,62 @@ Cypress.Commands.add("uploadGcodeFile", (fileName = "sample.gcode") => {
 //10.Unlock Machine if Needed
 // ----------------------
 Cypress.Commands.add("unlockMachineIfNeeded", () => {
-	cy.get("body").then(($body) => {
-		if ($body.find("svg.hidden").length > 0) {
-			cy.log("Machine locked - unlocking...");
-			cy.get("svg.hidden").parent("button").click({ force: true });
-			cy.wait(1000);
-			cy.log("Machine unlocked");
-		} else {
-			cy.log("Machine already unlocked");
-		}
-	});
+  cy.wait(4000); // Wait for machine to stabilize
+
+  cy.get("body").then(($body) => {
+    const isAlreadyIdle = $body.text().match(/^Idle$/im);
+
+    if (isAlreadyIdle) {
+      cy.log("Machine is already Idle — no unlock needed");
+      return;
+    }
+
+    cy.log("Machine is not Idle — attempting unlock...");
+
+    // --- Option 1: Lock icon button in sidebar ---
+    const lockButtonSvg = $body.find(
+      "#app > div.flex > div.flex > div:nth-of-type(2) div > svg"
+    );
+
+    if (lockButtonSvg.length > 0) {
+      cy.log("Option 1: Lock icon found — clicking...");
+
+      cy.get("#app > div.flex > div.flex > div:nth-of-type(2) div > svg")
+        .should("exist")
+        .click({ force: true });
+
+      cy.wait(2000);
+
+      // --- Option 2 (fallback): "Click to Unlock" dialog button ---
+      cy.get("body").then(($bodyAfter) => {
+        const unlockDialogBtn = $bodyAfter.find("header div.mt-4 button");
+
+        if (unlockDialogBtn.length > 0) {
+          cy.log("Option 1 opened dialog — clicking 'Click to Unlock'...");
+
+          cy.get("header div.mt-4 button")
+            .contains(/click to unlock/i)
+            .should("be.visible")
+            .click({ force: true });
+
+          cy.wait(2000);
+          cy.log("Unlocked via Option 2 (dialog button)");
+        } else {
+          cy.log("Unlocked via Option 1 (lock icon)");
+        }
+      });
+
+    } else {
+      cy.log("No lock button found — machine may already be unlocked");
+    }
+
+    // Verify machine reaches Idle after unlock attempt
+    cy.contains(/^Idle$/i, { timeout: 30000 })
+      .should("be.visible")
+      .then(() => {
+        cy.log("Machine reached Idle state — unlock successful");
+      });
+  });
 });
 
 // ----------------------
@@ -550,64 +687,59 @@ Cypress.Commands.add("verifyConsoleContains", (text) => {
 			cy.log(`Console contains: "${text}"`);
 		});
 });
-//-----------------------
-// Zero X axis
-//-----------------------
-Cypress.Commands.add("zeroXAxis", () => {
-	cy.log("Zeroing X axis...");
-	cy.get(
-		"div.h-\\[75\\%\\] div.flex-col > div:nth-of-type(1) > div:nth-of-type(1) button",
-	)
-		.contains("X0")
-		.click();
-	cy.wait(500);
-	cy.log("X axis zeroed");
-});
-//-----------------------
-// Zero Y axis
-//-----------------------
 
-Cypress.Commands.add("zeroYAxis", () => {
-	cy.log("Zeroing Y axis...");
-	cy.get(
-		"div.h-\\[75\\%\\] div.flex-col > div:nth-of-type(2) > div:nth-of-type(1) button",
-	)
-		.contains("Y0")
-		.click();
-	cy.wait(500);
-	cy.log("Y axis zeroed");
+// ----------------------
+//12.Zero X Axis
+// ----------------------
+Cypress.Commands.add('zeroXAxis', () => {
+    cy.log('Zeroing X axis...');
+    cy.get('[aria-label="Zero X axis: Set current position as work zero"]')
+        .should('exist')
+        .click();
+    cy.wait(500);
+    cy.log('X axis zeroed');
 });
-//-----------------------
-// Zero Z axis
-//-----------------------
-Cypress.Commands.add("zeroZAxis", () => {
-	cy.log("Zeroing Z axis...");
-	cy.get(
-		"div.h-\\[75\\%\\] div.flex-col > div:nth-of-type(3) > div:nth-of-type(1) button",
-	)
-		.contains("Z0")
-		.click();
-	cy.wait(500);
-	cy.log("Z axis zeroed");
+
+Cypress.Commands.add('zeroYAxis', () => {
+  cy.log('Zeroing Y axis...');
+  cy.get('div.h-\\[75\\%\\] div.flex-col > div:nth-of-type(2) > div:nth-of-type(1) span')
+    .contains('Y0')
+    .click();
+  cy.wait(500);
+  cy.log('Y axis zeroed');
+});
+
+// ----------------------
+//14.Zero Z Axis
+// ----------------------
+Cypress.Commands.add('zeroZAxis', () => {
+  cy.log('Zeroing Z axis...');
+  cy.get('div.flex-shrink-0 > div > div > div > div > div.relative div:nth-of-type(3) > div:nth-of-type(1) span')
+    .contains('Z0')
+    .click();
+  cy.wait(1000);
+  cy.log('Z axis zeroed');
 });
 //-----------------------
 // Zero A axis
-Cypress.Commands.add("zeroAAxis", () => {
-	cy.log("Zeroing A axis");
-	cy.contains("button", "A0").click();
-	cy.log("A axis zeroed");
+Cypress.Commands.add('zeroZAxis', () => {
+  cy.log('Zeroing Z axis...');
+  cy.get('div > div.relative div:nth-of-type(3) > div:nth-of-type(1) span')
+    .contains('Z0')
+    .click();
+  cy.wait(1000);
+  cy.log('Z axis zeroed');
 });
 // ----------------------
 //15.Zero All Axes
 // ----------------------
 Cypress.Commands.add("zeroAllAxes", () => {
-	cy.log("Resetting all axes to zero...");
-	cy.zeroXAxis();
-	cy.zeroYAxis();
-	cy.zeroZAxis();
-	cy.log("All axes zeroed");
+    cy.log("Resetting all axes to zero...");
+    // Click the "Zero All" button
+    cy.get('div.relative > div.max-xl\\:scale-95 > div:nth-of-type(1) span')
+      .click();
+    cy.log("All axes zeroed");
 });
-
 // ----------------------
 //16.Force input into a field
 // ----------------------
@@ -676,57 +808,26 @@ Cypress.Commands.add("clearConsole", () => {
 // ----------------------
 //19.Verify axes for expected values (flexible with decimals)
 // ----------------------
-Cypress.Commands.add(
-	"verifyAxes",
-	(expectedX = 0, expectedY = 0, expectedZ = 0) => {
-		cy.log(
-			`Verifying axes positions: X=${expectedX}, Y=${expectedY}, Z=${expectedZ}...`,
-		);
+Cypress.Commands.add("verifyAxes",
+  (expectedX = 0, expectedY = 0, expectedZ = 0) => {
+    cy.log(
+      `Verifying axes positions: X=${expectedX}, Y=${expectedY}, Z=${expectedZ}...`,
+    );
 
-		// Convert expected values to strings with proper formatting
-		const formatValue = (val) => {
-			const num = parseFloat(val);
-			return num % 1 === 0 ? num.toFixed(0) : num.toString();
-		};
+    cy.get('[data-testid="wcs-input-X"]').invoke('val').then((xValue) => {
+      expect(parseFloat(xValue)).to.be.closeTo(parseFloat(expectedX), 0.01);
+    });
 
-		const expectedXStr = formatValue(expectedX);
-		const expectedYStr = formatValue(expectedY);
-		const expectedZStr = formatValue(expectedZ);
+    cy.get('[data-testid="wcs-input-Y"]').invoke('val').then((yValue) => {
+      expect(parseFloat(yValue)).to.be.closeTo(parseFloat(expectedY), 0.01);
+    });
 
-		// Get the position input fields that display current coordinates
-		cy.get('input[type="number"].text-xl.font-bold.text-blue-500.font-mono')
-			.should("have.length", 3)
-			.then(($inputs) => {
-				const xValue = $inputs.eq(0).val();
-				const yValue = $inputs.eq(1).val();
-				const zValue = $inputs.eq(2).val();
+    cy.get('[data-testid="wcs-input-Z"]').invoke('val').then((zValue) => {
+      expect(parseFloat(zValue)).to.be.closeTo(parseFloat(expectedZ), 0.01);
+    });
 
-				cy.log(`Current positions - X: ${xValue}, Y: ${yValue}, Z: ${zValue}`);
-				cy.log(
-					`Expected positions - X: ${expectedXStr}, Y: ${expectedYStr}, Z: ${expectedZStr}`,
-				);
-
-				// Verify X axis
-				expect(parseFloat(xValue)).to.be.closeTo(
-					parseFloat(expectedXStr),
-					0.01,
-				);
-
-				// Verify Y axis
-				expect(parseFloat(yValue)).to.be.closeTo(
-					parseFloat(expectedYStr),
-					0.01,
-				);
-
-				// Verify Z axis
-				expect(parseFloat(zValue)).to.be.closeTo(
-					parseFloat(expectedZStr),
-					0.01,
-				);
-			});
-
-		cy.log("Axes verified successfully");
-	},
+    cy.log("Axes verified successfully");
+  },
 );
 
 //23. Checking probing pin is active
@@ -972,6 +1073,7 @@ Cypress.Commands.add("verifyMachineStatus", (expectedStatus, options = {}) => {
 		"Disconnected",
 		"Running",
 		"Jogging",
+		"Homing",
 		"Hold",
 	];
 
@@ -993,120 +1095,315 @@ Cypress.Commands.add("verifyMachineStatus", (expectedStatus, options = {}) => {
 			expect(actualStatus.toLowerCase()).to.eq(expectedStatus.toLowerCase());
 		});
 });
-//------------------------------//
-// Search Elements in Config page
-//------------------------------//
-Cypress.Commands.add("searchInSettings", (searchText, options = {}) => {
-	const { timeout = 10000 } = options;
 
-	cy.log(`Searching for: ${searchText}`);
-	cy.get("#simple-search", { timeout })
-		.should("be.visible")
-		.click({ force: true })
-		.invoke("val", "") // force-clear React controlled input
-		.type(searchText, { force: true, delay: 50 });
+//27. Search items in settings {cy.searchInSettings('search item name');}
+Cypress.Commands.add('searchInSettings', (searchText, options = {}) => {
+  const { timeout = 10000 } = options;
 
-	cy.wait(500);
+  cy.log(`Searching for: ${searchText}`);
+
+  cy.get('#simple-search', { timeout })
+    .should('be.visible')
+    .clear()
+    .type(searchText);
+});
+
+// 27. Search items in settings { cy.searchInSettings('search item name'); }
+Cypress.Commands.add('searchInSettings', (searchText, options = {}) => {
+  const { timeout = 10000 } = options;
+
+  cy.log(`Searching for: ${searchText}`);
+
+  cy.get('#simple-search', { timeout })
+    .should('exist')
+    .scrollIntoView()
+    .should('be.visible')
+    .clear()
+    .type(searchText);
+});
+// 27. Search items in settings { cy.searchInSettings('search item name'); }
+Cypress.Commands.add('searchInSettings', (searchText, options = {}) => {
+  const { timeout = 10000 } = options;
+
+  cy.log(`Searching for: ${searchText}`);
+
+  cy.get('#simple-search', { timeout })
+    .should('exist')
+    .scrollIntoView()
+    .should('be.visible')
+    .clear()
+    .type(searchText);
 });
 // Apply settings { cy.applySettings(); }
-Cypress.Commands.add("applySettings", (options = {}) => {
-	const { timeout = 10000, waitAfterApply = 3000 } = options;
+Cypress.Commands.add('applySettings', (options = {}) => {
+  const { timeout = 10000, waitAfterApply = 3000 } = options;
 
-	cy.log("Applying settings (if changes exist)...");
+  cy.log('Applying settings (if changes exist)...');
 
-	cy.contains("button", "Apply Settings", { timeout })
-		.should("exist")
-		.then(($button) => {
-			if ($button.is(":disabled")) {
-				cy.log("No settings changes detected");
-				return;
-			}
+  cy.contains('button', 'Apply Settings', { timeout })
+    .should('exist')
+    .then(($button) => {
+      if ($button.is(':disabled')) {
+        cy.log('No settings changes detected');
+        return;
+      }
 
-			cy.log("Applying settings...");
-			cy.wrap($button).click();
+      cy.log('Applying settings...');
+      cy.wrap($button).click();
 
-			cy.wait(waitAfterApply);
+      cy.wait(waitAfterApply);
 
-			// Unlock machine if prompted
-			cy.unlockMachineIfNeeded();
+      cy.unlockMachineIfNeeded();
 
-			cy.log("Settings applied successfully");
-		});
+      cy.log('Settings applied successfully');
+    });
 });
+//======================
+// Select ALtMill Profile 
+// =====================
+Cypress.Commands.add('selectAltMillProfile', () => {
+  cy.goToConfig();
+  cy.wait(1000);
 
+  // Open the profile combobox
+  cy.get('button[role="combobox"]:not([disabled])')
+    .filter((i, el) => /Mill/i.test(el.textContent))
+    .first()
+    .click();
+
+  // Select AltMill 4X4 (first AltMill option)
+  cy.get('[role="listbox"]', { timeout: 10000 })
+    .should('be.visible')
+    .within(() => {
+      cy.contains('[role="option"]', 'AltMill 4X4').click();
+    });
+
+  // Verify selection committed in the combobox before touching Defaults
+  cy.get('button[role="combobox"]:not([disabled])')
+    .filter((i, el) => /Mill/i.test(el.textContent))
+    .first()
+    .should('contain.text', 'AltMill');
+
+  // Click "Defaults"
+  cy.contains('span', 'Defaults').click();
+
+  // Confirm the dialog shows the CORRECT profile name before restoring
+  cy.contains(
+    /are you sure you want to restore your AltMill 4x4 back to its default state\?/i,
+    { timeout: 10000 }
+  ).should('be.visible');
+// Click on restore to defaults on the dialouge boxx
+  cy.get('button.bg-blue-500.bg-opacity-20.border-blue-500')
+  .contains('Restore Defaults')
+  .should('be.visible')
+  .click();
+
+  // Final check: profile is still AltMill 4X4 after everything
+  cy.get('button[role="combobox"]:not([disabled])')
+    .filter((i, el) => /Mill/i.test(el.textContent))
+    .first()
+    .should('contain.text', 'AltMill 4X4');
+});
+//==================================
+// Select Longmill Profile 
+//=================================
+
+Cypress.Commands.add('selectLongMillProfile', () => {
+  cy.goToConfig();
+  cy.wait(1000);
+
+  // Open the profile combobox
+  cy.get('button[role="combobox"]:not([disabled])')
+    .filter((i, el) => /Mill/i.test(el.textContent))
+    .first()
+    .click();
+
+  // Select LongMill MK2 12x30 (first LongMill option)
+  cy.get('[role="listbox"]', { timeout: 10000 })
+    .should('be.visible')
+    .within(() => {
+      cy.contains('[role="option"]', 'LongMill MK2 12x30 (MK2)').click();
+    });
+
+  // Verify selection committed in the combobox before touching Defaults
+  cy.get('button[role="combobox"]:not([disabled])')
+    .filter((i, el) => /Mill/i.test(el.textContent))
+    .first()
+    .should('contain.text', 'LongMill MK2 12x30 (MK2)');
+
+  // Click "Defaults"
+  cy.contains('span', 'Defaults').click();
+
+  // Confirm the dialog shows the CORRECT profile name before restoring
+  cy.get('[role="alertdialog"], [role="dialog"]', { timeout: 10000 })
+  .should('be.visible')
+  .and('contain.text', 'LongMill');
+
+
+  // Click on Restore Defaults in the dialog
+  cy.get('button.bg-blue-500.bg-opacity-20.border-blue-500')
+    .contains('Restore Defaults')
+    .should('be.visible')
+    .click();
+
+  // Final check: profile is still LongMill MK2 12x30 after everything
+  cy.get('button[role="combobox"]:not([disabled])')
+    .filter((i, el) => /Mill/i.test(el.textContent))
+    .first()
+    .should('contain.text', 'LongMill MK2 12x30 (MK2)');
+});
 // Simple URL Navigation Commands
 // ==============================
 
 // URL Definitions
 
-Cypress.Commands.add("loadUI", (options = {}) => {
-	const { timeout = 20000, viewport = { width: 1920, height: 1080 } } = options;
+  Cypress.Commands.add('closePopupIfVisible', () => {
+    cy.get('body').then(($body) => {
+        if ($body.find('[role="dialog"]').length > 0) {
+            cy.log('Popup found - closing...');
+            cy.get('[role="dialog"]')
+                .find('button')
+                .filter('[aria-label="Close"], :last-of-type')
+                .first()
+                .click({ force: true });
+            cy.wait(500);
+            cy.log('Popup closed');
+        } else {
+            cy.log('No popup found - continuing...');
+        }
+    });
+});
+//======================================
+// CLosing pop up if visible
+//======================================
+Cypress.Commands.add("closeAccPopupIfVisible", () => {
+    cy.get("body").then(($body) => {
+        if ($body.find('[role="alertdialog"]').length > 0) {
+            cy.log("Popup detected - closing...");
+            cy.get('[role="alertdialog"]')
+                .contains("button", "OK")
+                .click();
 
-	let startTime;
+            cy.wait(500);
+            cy.log("Popup closed");
+        } else {
+            cy.log("No popup visible - continuing");
+        }
+    });
+});
+//=======================================================================
+// Check the profile to which gsender is connected and restore to defaults 
+//========================================================================
+Cypress.Commands.add('detectBoardAndSelectProfile', () => {
+  cy.get('#tab-Console').click();
+  cy.clearConsole();
+  cy.sendConsoleCommand('$i');
 
-	cy.viewport(viewport.width, viewport.height);
+  cy.get('#tabpanel-Console .xterm-rows', { timeout: 15000 })
+    .should('contain.text', 'ok');
 
-	cy.then(() => {
-		startTime = performance.now();
-		cy.log(`Load started at: ${new Date().toISOString()}`);
-	});
+  cy.get('#tabpanel-Console .xterm-viewport').then(($viewport) => {
+    const viewportEl = $viewport[0];
+    const scrollHeight = viewportEl.scrollHeight;
+    const clientHeight = viewportEl.clientHeight;
+    const stepCount = Math.ceil(scrollHeight / clientHeight) + 1;
 
-	// Uses baseUrl from cypress.config.js — no hardcoded URL
-	cy.visit("/", {
-		failOnStatusCode: false,
-		timeout: 30000,
-	});
+    const seenLines = new Set();
 
-	// Wait for real document readiness
-	cy.document().its("readyState").should("eq", "complete");
+    const scrollStep = (i) => {
+      if (i > stepCount) {
+        const fullText = Array.from(seenLines).join('\n');
+        cy.log('FULL CAPTURED TEXT:', fullText);
 
-	// Cypress retries this block automatically until timeout
-	cy.get("body", { timeout }).should(($body) => {
-		const hasButton = $body.find("button").length > 0;
-		const hasConnection =
-			$body.text().includes("Connect") || $body.text().includes("Connection");
+        if (/\[BOARD:SuperLongBoard Ext\]/i.test(fullText)) {
+          cy.log('Board is SuperLongBoard Ext - switching to AltMill profile');
+          cy.selectAltMillProfile();
 
-		expect(hasButton, "buttons should exist").to.be.true;
-		expect(hasConnection, "connection text should exist").to.be.true;
-	});
+        } else if (/\[BOARD:SLB Lite\]/i.test(fullText)) {
+          cy.log('Board is SLB Lite - switching to LongMill profile');
+          cy.selectLongMillProfile();
 
-	// Log load time after UI confirmed ready
-	cy.then(() => {
-		const endTime = performance.now();
-		const loadTime = ((endTime - startTime) / 1000).toFixed(2);
-		const status =
-			loadTime < 5 ? "FAST" : loadTime < 10 ? "ACCEPTABLE" : "SLOW";
+        } else {
+          throw new Error(`Unrecognized board type in console output: ${fullText}`);
+        }
 
-		cy.log(`[${status}] UI load time: ${loadTime}s`);
-		cy.task("log", `[${status}] UI Load Time: ${loadTime}s`);
-	});
+        return;
+      }
 
-	cy.waitUntilIdle();
+      const scrollPos = i * clientHeight;
+      cy.get('#tabpanel-Console .xterm-viewport').scrollTo(0, scrollPos);
+      cy.wait(200);
+
+      cy.get('#tabpanel-Console .xterm-rows').invoke('text').then((text) => {
+        text.split('\n').forEach((line) => {
+          if (line.trim()) seenLines.add(line.trim());
+        });
+        scrollStep(i + 1);
+      });
+    };
+
+    scrollStep(0);
+  });
+});
+//================================
+// Click to Run homing if needed
+//==============================
+Cypress.Commands.add("clickToRunHomingIfNeeded", () => {
+    cy.wait(3000); // Wait for machine to stabilize after connect
+
+    cy.get("body").then(($body) => {
+        const hasHomingButton = $body.find("header div.mt-4 button").length > 0;
+        const homingButtonText = hasHomingButton
+            ? $body.find("header div.mt-4 button").text()
+            : "";
+        const isHomingPrompt = /click to run homing/i.test(homingButtonText);
+
+        if (!hasHomingButton || !isHomingPrompt) {
+            cy.log("No 'Click to Run Homing' prompt found — skipping");
+            return;
+        }
+
+        cy.log("'Click to Run Homing' prompt detected — clicking...");
+
+        cy.get("header div.mt-4 button")
+            .contains(/click to run homing/i)
+            .should("be.visible")
+            .click({ force: true });
+
+        cy.wait(2000);
+
+        // Close the OK alertdialog that appears after homing starts
+        cy.get("body").then(($bodyAfter) => {
+            const hasAlertDialog = $bodyAfter.find('[role="alertdialog"]').length > 0;
+
+            if (hasAlertDialog) {
+                cy.log("Alertdialog appeared — clicking OK...");
+                cy.get('[role="alertdialog"]')
+                    .contains("button", "OK")
+                    .should("be.visible")
+                    .click();
+                cy.wait(1000);
+                cy.log(" Homing started — alertdialog dismissed");
+            } else {
+                cy.log(" Homing started — no dialog to dismiss");
+            }
+        });
+    });
 });
 
-Cypress.Commands.add("waitUntilIdle", () => {
-	cy.get("body").then(($body) => {
-		if ($body.find('[data-cy="loading-spinner"]').length > 0) {
-			cy.get('[data-cy="loading-spinner"]', { timeout: 10000 }).should(
-				"not.exist",
-			);
-		}
-		// If spinner never existed, skip silently
-	});
-});
 // Page URLs
 Cypress.Commands.add("goToCarve", () => {
-	cy.visit("http://localhost:8000/#/");
+    cy.visit("http://localhost:8000/#/");
 });
 
 Cypress.Commands.add("goToStats", () => {
-	cy.visit("http://localhost:8000/#/stats");
+    cy.visit("http://localhost:8000/#/stats");
 });
 
 Cypress.Commands.add("goToTools", () => {
-	cy.visit("http://localhost:8000/#/tools");
+    cy.visit("http://localhost:8000/#/tools");
 });
 
 Cypress.Commands.add("goToConfig", () => {
-	cy.visit("http://localhost:8000/#/configuration");
+    cy.visit("http://localhost:8000/#/configuration");
 });
