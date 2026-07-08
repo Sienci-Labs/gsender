@@ -1,6 +1,7 @@
 import { Button } from "app/components/Button";
-
 import Page from "app/components/Page";
+import Switch from "app/components/Switch";
+import { Tooltip } from "app/components/Tooltip"; // Ensure Tooltip exists
 import { useState } from "react";
 import { usePlugins } from "../hooks/usePlugins";
 
@@ -23,7 +24,7 @@ const PluginManager = () => {
 			withGoBackButton
 			withFullPadding
 		>
-			<div className="flex flex-col gap-4 max-w-3xl">
+			<div className="flex flex-col gap-4">
 				<p className="text-sm text-gray-600 dark:text-gray-300">
 					Plugins directory:{" "}
 					<code className="text-xs break-all">{pluginsDir}</code>
@@ -44,6 +45,9 @@ const PluginManager = () => {
 				)}
 
 				<div className="flex gap-2">
+					<Button onClick={() => {}}>
+						Import Plugin
+					</Button>
 					<Button onClick={refresh} disabled={loading}>
 						Refresh
 					</Button>
@@ -59,43 +63,55 @@ const PluginManager = () => {
 					<p className="text-sm text-gray-500">No plugins installed.</p>
 				)}
 
-				<ul className="flex flex-col gap-3">
+				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
 					{plugins.map((plugin) => (
-						<li
+						<div
 							key={plugin.id}
-							className="border border-gray-200 dark:border-dark-lighter rounded-md p-4"
+							className="border border-gray-200 dark:border-dark-lighter rounded-md p-4 flex flex-col h-full"
 						>
-							<div className="flex items-start justify-between gap-4">
-								<div>
-									<p className="font-semibold dark:text-white">{plugin.name}</p>
-									<p className="text-xs text-gray-500">
-										{plugin.id} · v{plugin.version}
+							<div className="flex-1">
+								<p className="font-semibold dark:text-white">{plugin.name}</p>
+								<p className="text-xs text-gray-500">
+									{plugin.id} · v{plugin.version}
+								</p>
+								{!plugin.valid && (
+									<ul className="mt-2 text-xs text-red-600 list-disc pl-4">
+										{plugin.errors.map((err) => (
+											<li key={err}>{err}</li>
+										))}
+									</ul>
+								)}
+								{plugin.contributions.length > 0 && (
+									<p className="mt-2 text-xs text-gray-500">
+										Slots:{" "}
+										{plugin.contributions.map((c) => c.slot).join(", ")}
 									</p>
-									{!plugin.valid && (
-										<ul className="mt-2 text-xs text-red-600 list-disc pl-4">
-											{plugin.errors.map((err) => (
-												<li key={err}>{err}</li>
-											))}
-										</ul>
-									)}
-									{plugin.contributions.length > 0 && (
-										<p className="mt-2 text-xs text-gray-500">
-											Slots:{" "}
-											{plugin.contributions.map((c) => c.slot).join(", ")}
-										</p>
-									)}
-								</div>
-								<Button
-									onClick={() => handleToggle(plugin.id, !plugin.enabled)}
-									disabled={!plugin.valid}
-									variant={plugin.enabled ? "outline" : "primary"}
-								>
-									{plugin.enabled ? "Disable" : "Enable"}
-								</Button>
+								)}
 							</div>
-						</li>
+							<div className="mt-4 flex justify-end">
+								<Tooltip
+									content={
+										plugin.enabled
+											? "Disable this plugin"
+											: "Enable this plugin"
+									}
+								>
+									<div>
+										<Switch
+											checked={plugin.enabled}
+											onChange={(checked, e) =>
+												handleToggle(plugin.id, checked)
+											}
+											disabled={!plugin.valid}
+											label={plugin.enabled ? "Enabled" : "Disabled"}
+											onColor="#22c55e" // Tailwind green-500
+										/>
+									</div>
+								</Tooltip>
+							</div>
+						</div>
 					))}
-				</ul>
+				</div>
 			</div>
 		</Page>
 	);
