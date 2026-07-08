@@ -47,6 +47,8 @@ import logger, { setLevel } from "./lib/logger";
 import urljoin from "./lib/urljoin";
 import cncengine from "./services/cncengine";
 import config from "./services/configstore";
+import errorConfig from "./services/configstore/alarmStore";
+import jobConfig from "./services/configstore/jobStore";
 import monitor from "./services/monitor";
 
 const log = logger("init");
