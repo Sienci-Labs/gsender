@@ -33,10 +33,11 @@ export type PluginsResponse = {
 };
 
 export type PluginBridgeRequestType =
-	| "machine.getContext"
-	| "cam.loadPreview"
-	| "cam.commitToJob"
-	| "machine.command";
+	| "machine:get:context"
+	| "machine:command"
+	| "workspace:get:state"
+	| "redux:get:state"
+	| "gcode:load:to:visualizer";
 
 export type PluginBridgeRequest = {
 	id: string;
@@ -49,6 +50,24 @@ export type PluginBridgeResponse = {
 	ok: boolean;
 	result?: unknown;
 	error?: string;
+};
+
+// Reactive state that plugins can subscribe to for live updates.
+export type PluginBridgeTopic = "workspace" | "redux";
+
+export type PluginBridgeSubscribe = {
+	id: string;
+	topic: PluginBridgeTopic;
+};
+
+export type PluginBridgeUnsubscribe = {
+	id: string;
+};
+
+export type PluginBridgeUpdate = {
+	id: string;
+	topic: PluginBridgeTopic;
+	snapshot: unknown;
 };
 
 export const PLUGIN_BRIDGE_CHANNEL = "gsender:plugin-bridge";
