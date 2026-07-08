@@ -1,16 +1,32 @@
-import { VISUALIZER_SECONDARY } from "app/constants";
+import { VISUALIZER_PRIMARY } from "app/constants";
 import controller from "app/lib/controller";
 import { uploadGcodeFileToServer } from "app/lib/fileupload";
 import store from "app/store";
 import reduxStore from "app/store/redux";
-import pubsub from "pubsub-js";
 import type {
 	PLUGIN_BRIDGE_CHANNEL,
 	PluginBridgeRequest,
 	PluginBridgeResponse,
+	PluginBridgeSubscribe,
+	PluginBridgeTopic,
 } from "../types";
 
 const BRIDGE_CHANNEL: typeof PLUGIN_BRIDGE_CHANNEL = "gsender:plugin-bridge";
+
+const getWorkspaceSnapshot = () => store.get("workspace", {});
+
+const getReduxSnapshot = () => reduxStore.getState();
+
+const getTopicSnapshot = (topic: PluginBridgeTopic): unknown => {
+	switch (topic) {
+		case "workspace":
+			return getWorkspaceSnapshot();
+		case "redux":
+			return getReduxSnapshot();
+		default:
+			return null;
+	}
+};
 
 const getMachineContext = () => {
 	const units = store.get("workspace.units", "mm");
@@ -26,34 +42,6 @@ const getMachineContext = () => {
 		position: controllerState?.state?.status?.mpos || null,
 		workPosition: controllerState?.state?.status?.wpos || null,
 	};
-};
-
-const loadGcodePreview = async (payload: Record<string, unknown> = {}) => {
-	const gcode = String(payload.gcode || "");
-	const filename = String(payload.filename || "plugin-preview.gcode");
-
-	if (!gcode) {
-		throw new Error("gcode is required");
-	}
-
-	const file = new File([gcode], filename);
-	await uploadGcodeFileToServer(file, controller.port, VISUALIZER_SECONDARY);
-
-	return { filename };
-};
-
-const commitGcodeToJob = async (payload: Record<string, unknown> = {}) => {
-	const gcode = String(payload.gcode || "");
-	const filename = String(payload.filename || "plugin-job.gcode");
-
-	if (!gcode) {
-		throw new Error("gcode is required");
-	}
-
-	const size = new Blob([gcode]).size;
-	pubsub.publish("gcode:plugin-commit", { gcode, name: filename, size });
-
-	return { filename };
 };
 
 const runMachineCommand = async (payload: Record<string, unknown> = {}) => {
@@ -75,18 +63,37 @@ const runMachineCommand = async (payload: Record<string, unknown> = {}) => {
 	});
 };
 
+const loadGCodeToVisualizer = async ({
+	gcode,
+	name,
+}: {
+	gcode: string;
+	name: string;
+}) => {
+	const file = new File([gcode], name);
+	await uploadGcodeFileToServer(file, controller.port, VISUALIZER_PRIMARY);
+	// The upload helper resolves with a raw axios response (functions, headers,
+	// etc.) which can't be structured-cloned back across postMessage. Return a
+	// plain, serializable ack instead.
+	return { ok: true, name };
+};
+
 const handleBridgeRequest = async (
 	request: PluginBridgeRequest,
 ): Promise<unknown> => {
 	switch (request.type) {
-		case "machine.getContext":
+		case "machine:get:context":
 			return getMachineContext();
-		case "cam.loadPreview":
-			return loadGcodePreview(request.payload);
-		case "cam.commitToJob":
-			return commitGcodeToJob(request.payload);
-		case "machine.command":
+		case "machine:command":
 			return runMachineCommand(request.payload);
+		case "workspace:get:state":
+			return getWorkspaceSnapshot();
+		case "redux:get:state":
+			return getReduxSnapshot();
+		case "gcode:load:to:visualizer":
+			return loadGCodeToVisualizer(
+				request.payload as { gcode: string; name: string },
+			);
 		default:
 			throw new Error(`Unknown bridge request: ${request.type}`);
 	}
@@ -117,8 +124,121 @@ export const handlePluginBridgeMessage = async (
 	}
 };
 
+// --- Reactive subscriptions ---------------------------------------------------
+// Plugins subscribe to a topic; the host pushes a fresh snapshot whenever the
+// underlying store changes. A single host-level listener per source fans out to
+// every active plugin subscription so we never attach/detach store listeners per
+// subscriber.
+
+type PluginSubscription = {
+	id: string;
+	topic: PluginBridgeTopic;
+	source: MessageEventSource;
+	origin: string;
+};
+
+const subscriptions = new Map<string, PluginSubscription>();
+let hostListenersInstalled = false;
+
+const pushUpdate = (sub: PluginSubscription, snapshot: unknown) => {
+	try {
+		sub.source.postMessage(
+			{
+				channel: BRIDGE_CHANNEL,
+				update: { id: sub.id, topic: sub.topic, snapshot },
+			},
+			{ targetOrigin: sub.origin },
+		);
+	} catch {
+		// The iframe is gone (navigated/unmounted) — drop the dead subscription.
+		subscriptions.delete(sub.id);
+	}
+};
+
+const broadcast = (topic: PluginBridgeTopic) => {
+	if (subscriptions.size === 0) {
+		return;
+	}
+
+	// Compute the snapshot once per broadcast, shared across subscribers.
+	let snapshot: unknown;
+	let computed = false;
+
+	subscriptions.forEach((sub) => {
+		if (sub.topic !== topic) {
+			return;
+		}
+		if (!computed) {
+			snapshot = getTopicSnapshot(topic);
+			computed = true;
+		}
+		pushUpdate(sub, snapshot);
+	});
+};
+
+const ensureHostListeners = () => {
+	if (hostListenersInstalled) {
+		return;
+	}
+	hostListenersInstalled = true;
+
+	store.on("change", () => broadcast("workspace"));
+	// NOTE: redux subscribe fires on every action; the snapshot is only computed
+	// when there is at least one active redux subscriber.
+	reduxStore.subscribe(() => broadcast("redux"));
+};
+
+const addSubscription = (
+	source: MessageEventSource,
+	origin: string,
+	subscribe: PluginBridgeSubscribe,
+) => {
+	ensureHostListeners();
+
+	const sub: PluginSubscription = {
+		id: subscribe.id,
+		topic: subscribe.topic,
+		source,
+		origin,
+	};
+
+	subscriptions.set(sub.id, sub);
+
+	// Push the current value immediately so the hook renders without waiting for
+	// the next store change.
+	pushUpdate(sub, getTopicSnapshot(sub.topic));
+};
+
+const removeSubscription = (id: string) => {
+	subscriptions.delete(id);
+};
+
 export const installPluginBridgeListener = () => {
 	const listener = async (event: MessageEvent) => {
+		const data = event.data;
+
+		if (!data || data.channel !== BRIDGE_CHANNEL) {
+			return;
+		}
+
+		if (data.subscribe && event.source) {
+			addSubscription(
+				event.source,
+				event.origin,
+				data.subscribe as PluginBridgeSubscribe,
+			);
+			return;
+		}
+
+		if (data.unsubscribe) {
+			removeSubscription(data.unsubscribe.id);
+			return;
+		}
+
+		if (!data.request) {
+			return;
+		}
+
 		const response = await handlePluginBridgeMessage(event);
 
 		if (
