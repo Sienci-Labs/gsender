@@ -1424,6 +1424,16 @@ class GrblHalController {
             c: posc
         } = this.runner.getWorkPosition();
 
+        // Positions are raw firmware values - convert to mm if firmware is
+        // configured to report in inches ($13=1), to keep macro variables
+        // consistent with mm regardless of firmware reporting units.
+        const { $13 } = this.settings.settings;
+        const isReportingInches = $13 === '1';
+        const toMachineUnits = (val) => {
+            const num = Number(val) || 0;
+            return (isReportingInches ? num * 25.4 : num).toFixed(3);
+        };
+
         // Modal group
         const modal = this.runner.getModalGroup();
 
@@ -1449,20 +1459,20 @@ class GrblHalController {
             zmax: Number(context.zmax) || 0,
 
             // Machine position
-            mposx: Number(mposx).toFixed(3) || 0,
-            mposy: Number(mposy).toFixed(3) || 0,
-            mposz: Number(mposz).toFixed(3) || 0,
-            mposa: Number(mposa).toFixed(3) || 0,
-            mposb: Number(mposb).toFixed(3) || 0,
-            mposc: Number(mposc).toFixed(3) || 0,
+            mposx: toMachineUnits(mposx),
+            mposy: toMachineUnits(mposy),
+            mposz: toMachineUnits(mposz),
+            mposa: toMachineUnits(mposa),
+            mposb: toMachineUnits(mposb),
+            mposc: toMachineUnits(mposc),
 
             // Work position
-            posx: Number(posx).toFixed(3) || 0,
-            posy: Number(posy).toFixed(3) || 0,
-            posz: Number(posz).toFixed(3) || 0,
-            posa: Number(posa).toFixed(3) || 0,
-            posb: Number(posb).toFixed(3) || 0,
-            posc: Number(posc).toFixed(3) || 0,
+            posx: toMachineUnits(posx),
+            posy: toMachineUnits(posy),
+            posz: toMachineUnits(posz),
+            posa: toMachineUnits(posa),
+            posb: toMachineUnits(posb),
+            posc: toMachineUnits(posc),
 
             // Modal group
             modal: {
