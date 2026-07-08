@@ -1,4 +1,5 @@
 import api from "app/api";
+import controller from "app/lib/controller";
 import { useCallback, useEffect, useState } from "react";
 import type { PluginRecord, PluginsResponse } from "../types";
 
@@ -27,6 +28,14 @@ export const usePlugins = () => {
 
 	useEffect(() => {
 		refresh();
+	}, [refresh]);
+
+	useEffect(() => {
+		const onPluginsChanged = () => refresh();
+		controller.addListener("plugins:changed", onPluginsChanged);
+		return () => {
+			controller.removeListener("plugins:changed", onPluginsChanged);
+		};
 	}, [refresh]);
 
 	const setEnabled = useCallback(
