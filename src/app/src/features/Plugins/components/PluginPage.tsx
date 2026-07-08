@@ -21,7 +21,7 @@ const PluginPage = () => {
 
 	if (loading) {
 		return (
-			<Page title="Plugin" withGoBackButton withFullPadding>
+			<Page title="Plugin" withGoBackButton>
 				<p className="text-gray-500">Loading plugin...</p>
 			</Page>
 		);
@@ -29,7 +29,7 @@ const PluginPage = () => {
 
 	if (!plugin) {
 		return (
-			<Page title="Plugin" withGoBackButton withFullPadding>
+			<Page title="Plugin" withGoBackButton>
 				<p className="text-gray-500">
 					Plugin not found or disabled. Install plugins to{" "}
 					<code className="text-sm">plugins</code> folder and restart gSender.
@@ -46,7 +46,6 @@ const PluginPage = () => {
 		<Page
 			title={contribution?.label || plugin.name}
 			withGoBackButton
-			withFixedArea
 		>
 			<PluginPanel plugin={plugin} className="h-full" />
 		</Page>
