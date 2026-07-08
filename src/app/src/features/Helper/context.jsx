@@ -21,11 +21,14 @@
  *
  */
 
-import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
+import React, { createContext, useContext, useState, useMemo, useEffect, useRef } from 'react';
+import { useSelector } from 'react-redux';
+import get from 'lodash/get';
 import _ from 'lodash';
 
 import { Toaster } from 'app/lib/toaster/ToasterLib';
 import { disableWizard } from 'app/store/redux/slices/helper.slice';
+import { GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
 import reduxStore from 'app/store/redux';
 
 const WizardContext = createContext({});
@@ -51,6 +54,26 @@ export const WizardProvider = ({ children }) => {
     const [minimized, setMinimized] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [overlay, setOverlay] = useState(false);
+    const [pendingToolchangeNotice, setPendingToolchangeNotice] = useState(false);
+
+    // Mirrors the machine's active state so `load()` can read the current
+    // value without pulling `activeState` into the `api` useMemo deps below
+    // (which would otherwise recreate the whole API on every status report).
+    const activeState = useSelector((state) =>
+        get(state, 'controller.state.status.activeState', ''),
+    );
+    const activeStateRef = useRef(activeState);
+    useEffect(() => {
+        activeStateRef.current = activeState;
+    }, [activeState]);
+
+    // Once shown, auto-hide the pending notice as soon as the machine goes
+    // idle again. One-directional: never re-shows itself for this session.
+    useEffect(() => {
+        if (pendingToolchangeNotice && activeState === GRBL_ACTIVE_STATE_IDLE) {
+            setPendingToolchangeNotice(false);
+        }
+    }, [activeState, pendingToolchangeNotice]);
 
     // Auto-close when activeStep reaches or exceeds stepCount.
     // completeSubStep sets activeStep = lastStep+1 before setVisible(false);
@@ -69,6 +92,7 @@ export const WizardProvider = ({ children }) => {
             setToolchangeComment('');
             setStepCount(0);
             setMinimized(false);
+            setPendingToolchangeNotice(false);
             reduxStore.dispatch(disableWizard());
         }
     }, [activeStep, stepCount, visible]);
@@ -184,6 +208,7 @@ export const WizardProvider = ({ children }) => {
                         setToolchangeComment('');
                         setStepCount(0);
                         setMinimized(false);
+                        setPendingToolchangeNotice(false);
                         reduxStore.dispatch(disableWizard());
                         return {};
                     }
@@ -211,6 +236,7 @@ export const WizardProvider = ({ children }) => {
                     setToolchangeComment('');
                     setStepCount(0);
                     setMinimized(false);
+                    setPendingToolchangeNotice(false);
                     return {};
                 }
 
@@ -259,6 +285,9 @@ export const WizardProvider = ({ children }) => {
                 setIntro(instructions.intro?.description ?? null);
                 setToolchangeContext(metadata.context ?? null);
                 setToolchangeComment(metadata.comment ?? '');
+                setPendingToolchangeNotice(
+                    activeStateRef.current !== GRBL_ACTIVE_STATE_IDLE,
+                );
 
                 setActiveStep(0);
                 setVisible(true);
@@ -322,6 +351,7 @@ export const WizardProvider = ({ children }) => {
                 setStepCount(0);
                 setMinimized(false);
                 setIsLoading(false);
+                setPendingToolchangeNotice(false);
                 reduxStore.dispatch(disableWizard());
 
                 Toaster.clear();
@@ -363,6 +393,7 @@ export const WizardProvider = ({ children }) => {
                 intro,
                 toolchangeContext,
                 toolchangeComment,
+                pendingToolchangeNotice,
             }}
         >
             <WizardAPI.Provider value={api}>{children}</WizardAPI.Provider>
