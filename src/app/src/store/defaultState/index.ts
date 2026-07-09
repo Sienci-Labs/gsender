@@ -68,7 +68,7 @@ const defaultState: State = {
         revertWorkspace: false,
         promptExit: false,
         backupFreq: 'On Update',
-        powerSaving: true,
+        powerSaving: false,
         lastBackupTime: 0,
         collectUsageDataStatus: 'pending',
         jobTimes: [],
