@@ -56,96 +56,96 @@ const createWizard = () => {
 				settings.zProbeDistance,
 			);
 
-			controller.command("gcode", [
-				"%wait",
-				`%global.toolchange.PROBE_THICKNESS_MM=${settings.zProbeThickness}`,
-				`%global.toolchange.PROBE_DISTANCE=${zProbeDistance}`,
-				`%global.toolchange.PROBE_FEEDRATE=${settings.fastSpeed}`,
-				`%global.toolchange.PROBE_SLOW_FEEDRATE=${settings.slowSpeed}`,
-				`%global.toolchange.RETRACT=${settings.retract}`,
-				`%global.toolchange.PROBE_POS_X=${position.x}`,
-				`%global.toolchange.PROBE_POS_Y=${position.y}`,
-				`%global.toolchange.PROBE_POS_Z=${position.z}`,
-				`%global.toolchange.Z_SAFE_HEIGHT=${zSafe}`,
-				"%global.toolchange.UNITS=modal.units",
-				"%global.toolchange.SPINDLE=modal.spindle",
-				"%global.toolchange.DISTANCE=modal.distance",
-				"%global.toolchange.FEEDRATE=programFeedrate",
-				"%global.toolchange.SPINDLE_RATE=spindleRate",
-				"(STORED: [global.toolchange.SPINDLE] S[global.toolchange.SPINDLE_RATE])",
-				"M5 S0",
-				"%wait",
-				"%global.toolchange.XPOS=posx",
-				"%global.toolchange.YPOS=posy",
-				"%global.toolchange.ZPOS=posz",
-				"G91 G21",
-				"G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]",
-				"(Tool probe initiated)",
-			]);
-		},
-		steps: [
-			{
-				title: "Probe Initial Tool",
-				substeps: [
-					{
-						title: "Measure Tool Length",
-						description:
-							"Ensure that your router/spindle is turned off and has fully stopped spinning. Click the button below to probe the length of the current tool.",
-						overlay: false,
-						actions: [
-							{
-								label: "Probe Tool Length",
-								gcodeLines: [
-									"G91 G21",
-									"G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]",
-									"G53 G0 X[global.toolchange.PROBE_POS_X] Y[global.toolchange.PROBE_POS_Y]",
-									"G53 G0 Z[global.toolchange.PROBE_POS_Z]",
-									"G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]",
-									"G0 Z[global.toolchange.RETRACT]",
-									"G38.2 Z-10 F[global.toolchange.PROBE_SLOW_FEEDRATE]",
-									"G4 P0.3",
-									"%global.toolchange.TOOL_OFFSET=posz",
-									"(TLO set: [global.toolchange.TOOL_OFFSET])",
-									"G0 Z[global.toolchange.RETRACT]",
-									"G90 G21",
-									"G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]",
-								],
-							},
-						],
-					},
-				],
-			},
-			{
-				title: "Resume",
-				substeps: [
-					{
-						title: "Resume Operation",
-						description:
-							"Tool length has been probed and set. Click the button below to continue with your operation. Turn on your router if you have one.",
-						overlay: false,
-						actions: [
-							{
-								label: "Resume",
-								gcodeLines: [
-									"(Restart Spindle)",
-									"([global.toolchange.SPINDLE] S[global.toolchange.SPINDLE_RATE])",
-									"[global.toolchange.SPINDLE] S[global.toolchange.SPINDLE_RATE]",
-									"(Returning to initial position)",
-									"G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]",
-									"G90 [global.toolchange.UNITS] G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]",
-									"G90 [global.toolchange.UNITS] G0 Z[global.toolchange.ZPOS]",
-									"(Restore initial modals)",
-									"[global.toolchange.UNITS] [global.toolchange.DISTANCE] [global.toolchange.FEEDRATE]",
-									"%wait",
-									"%toolchange_complete",
-								],
-							},
-						],
-					},
-				],
-			},
-		],
-	};
+            controller.command('gcode', [
+                '%wait',
+                `%global.toolchange.PROBE_THICKNESS_MM=${settings.zProbeThickness}`,
+                `%global.toolchange.PROBE_DISTANCE=${zProbeDistance}`,
+                `%global.toolchange.PROBE_FEEDRATE=${settings.fastSpeed}`,
+                `%global.toolchange.PROBE_SLOW_FEEDRATE=${settings.slowSpeed}`,
+                `%global.toolchange.RETRACT=${settings.retract}`,
+                `%global.toolchange.PROBE_POS_X=${position.x}`,
+                `%global.toolchange.PROBE_POS_Y=${position.y}`,
+                `%global.toolchange.PROBE_POS_Z=${position.z}`,
+                `%global.toolchange.Z_SAFE_HEIGHT=${zSafe}`,
+                '%global.toolchange.UNITS=modal.units',
+                '%global.toolchange.SPINDLE=modal.spindle',
+                '%global.toolchange.DISTANCE=modal.distance',
+                '%global.toolchange.FEEDRATE=programFeedrate',
+                '%global.toolchange.SPINDLE_RATE=spindleRate',
+                '(STORED: [global.toolchange.SPINDLE] S[global.toolchange.SPINDLE_RATE])',
+                'M5 S0',
+                '%wait',
+                '%global.toolchange.XPOS=posx',
+                '%global.toolchange.YPOS=posy',
+                '%global.toolchange.ZPOS=posz',
+                'G91 G21',
+                'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                '(Tool probe initiated)',
+            ]);
+        },
+        steps: [
+            {
+                title: 'Probe Initial Tool',
+                substeps: [
+                    {
+                        title: 'Measure Tool Length',
+                        description:
+                            'Ensure that your router/spindle is turned off and has fully stopped spinning. Click the button below to probe the length of the current tool.',
+                        overlay: false,
+                        actions: [
+                            {
+                                label: 'Probe Tool Length',
+                                gcodeLines: [
+                                    'G91 G21',
+                                    'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                                    'G53 G0 X[global.toolchange.PROBE_POS_X] Y[global.toolchange.PROBE_POS_Y]',
+                                    'G53 G0 Z[global.toolchange.PROBE_POS_Z]',
+                                    'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
+                                    'G0 Z[global.toolchange.RETRACT]',
+                                    'G38.2 Z-10 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
+                                    'G4 P0.3',
+                                    '%global.toolchange.TOOL_OFFSET=posz',
+                                    '(TLO set: [global.toolchange.TOOL_OFFSET])',
+                                    'G0 Z[global.toolchange.RETRACT]',
+                                    'G90 G21',
+                                    'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                                ],
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                title: 'Resume',
+                substeps: [
+                    {
+                        title: 'Resume Operation',
+                        description:
+                            'Tool length has been probed and set. Click the button below to continue with your operation. Turn on your router if you have one.',
+                        overlay: false,
+                        actions: [
+                            {
+                                label: 'Resume',
+                                gcodeLines: [
+                                    '(Restart Spindle)',
+                                    '([global.toolchange.SPINDLE] S[global.toolchange.SPINDLE_RATE])',
+                                    '[global.toolchange.SPINDLE] S[global.toolchange.SPINDLE_RATE]',
+                                    '(Returning to initial position)',
+                                    'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                                    'G90 G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]',
+                                    'G90 G0 Z[global.toolchange.ZPOS]',
+                                    '(Restore initial modals)',
+                                    '[global.toolchange.UNITS] [global.toolchange.DISTANCE] [global.toolchange.FEEDRATE]',
+                                    '%wait',
+                                    '%toolchange_complete',
+                                ],
+                            },
+                        ],
+                    },
+                ],
+            },
+        ],
+    };
 };
 
 export default createWizard;
