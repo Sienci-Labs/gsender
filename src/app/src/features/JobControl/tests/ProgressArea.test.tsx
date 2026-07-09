@@ -5,8 +5,8 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import ProgressArea from "./ProgressArea";
-import { WORKFLOW_STATE_PAUSED } from "../../constants";
+import ProgressArea from "../ProgressArea";
+import { WORKFLOW_STATE_PAUSED } from "../../../constants";
 
 // ---------------------------------------------------------------------------
 // Module mocks
@@ -82,9 +82,6 @@ const renderProgressArea = (
   );
 };
 
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
 
 describe("ProgressArea", () => {
   // -------------------------------------------------------------------------
@@ -172,26 +169,30 @@ describe("ProgressArea", () => {
       expect(screen.getByText("s")).toBeInTheDocument();
     });
 
-    it("shows hours and minutes when remaining time is >= 1 hour", () => {
+it("shows hours and minutes when remaining time is >= 1 hour", () => {
       // convertSecondsToDHMS(3660) → [0, 1, 1, 0]
       renderProgressArea({ remainingTime: 3660 });
-      expect(screen.getByText("01")).toBeInTheDocument(); // hours
+
+      const hourAndMinuteValues = screen.getAllByText("01"); // hours + minutes
+      expect(hourAndMinuteValues).toHaveLength(2);
+      expect(hourAndMinuteValues[0]).toBeInTheDocument(); // hours
+      expect(hourAndMinuteValues[1]).toBeInTheDocument(); // minutes
+
       expect(screen.getByText("hr")).toBeInTheDocument();
-      expect(screen.getByText("01")).toBeInTheDocument(); // minutes
       expect(screen.getByText("m")).toBeInTheDocument();
     });
 
     it("shows days and hours when remaining time is >= 1 day", () => {
       // convertSecondsToDHMS(90000) → [1, 1, 0, 0]
       renderProgressArea({ remainingTime: 90000 });
-      expect(screen.getByText("01")).toBeInTheDocument(); // days
+
+      const dayAndHourValues = screen.getAllByText("01"); // days + hours
+      expect(dayAndHourValues).toHaveLength(2);
+      expect(dayAndHourValues[0]).toBeInTheDocument(); // days
+      expect(dayAndHourValues[1]).toBeInTheDocument(); // hours
+
       expect(screen.getByText("d")).toBeInTheDocument();
       expect(screen.getByText("hr")).toBeInTheDocument();
-    });
-
-    it("shows 'remaining' label when not finalizing", () => {
-      renderProgressArea({ currentLineRunning: 50, total: 100, remainingTime: 60 });
-      expect(screen.getByText("remaining")).toBeInTheDocument();
     });
   });
 

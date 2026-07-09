@@ -758,21 +758,27 @@ Cypress.Commands.add("forceInput", (selector, value) => {
 Cypress.Commands.add("sendConsoleCommand", (command) => {
 	cy.log(`Sending console command: ${command}`);
 
-	// Find the visible console input field
-	cy.get("div.block input")
+	cy.get("#tabpanel-Console")
+		.should("be.visible")
+		.and("not.have.class", "hidden");
+
+	cy.get("#tabpanel-Console input")
 		.filter(":visible")
+		.should("have.length.at.least", 1)
 		.first()
 		.clear({ force: true })
 		.type(command, { force: true });
 
-	// Click the Run button
-	cy.get("div.block button")
-		.contains(/Run/i)
+	// Click the Run button - fall back to text match for resilience,
+
+	cy.get("#tabpanel-Console")
+		.contains("button", /^Run$/i)
+		.filter(":visible")
 		.should("be.visible")
 		.click({ force: true });
 
 	cy.wait(1000);
-	cy.log(` Command sent: ${command}`);
+	cy.log(`Command sent: ${command}`);
 });
 // ----------------------
 //18.Clear Console Command
@@ -780,16 +786,20 @@ Cypress.Commands.add("sendConsoleCommand", (command) => {
 Cypress.Commands.add("clearConsole", () => {
 	cy.log("Clearing console...");
 
-	// Step 1: Click on Console tab to ensure it's active
-	cy.get("div.h-\\[25\\%\\] button:nth-of-type(4)")
-		.contains(/Console/i)
+	// Step 1: Click on Console tab (stable selector)
+	cy.get("#tab-Console")
 		.click({ force: true });
 
-	cy.wait(500);
+	cy.get("#tabpanel-Console")
+		.should("be.visible")
+		.and("not.have.class", "hidden");
+
 	cy.log("Console tab activated");
 
 	// Step 2: Click the console options button (three dots icon)
-	cy.get("div.block > div.grid > div.flex svg")
+
+	cy.get("#tabpanel-Console > div.grid > div.flex svg")
+		.filter(":visible")
 		.should("be.visible")
 		.click({ force: true });
 
@@ -799,6 +809,7 @@ Cypress.Commands.add("clearConsole", () => {
 	// Step 3: Click "Clear Console" from the dropdown
 	cy.get("body > div:nth-of-type(2) div > div:nth-of-type(2) span")
 		.contains(/Clear Console/i)
+		.filter(":visible")
 		.should("be.visible")
 		.click({ force: true });
 
@@ -1297,6 +1308,7 @@ Cypress.Commands.add("closeAccPopupIfVisible", () => {
 Cypress.Commands.add('detectBoardAndSelectProfile', () => {
   cy.get('#tab-Console').click();
   cy.clearConsole();
+  cy.wait(3000);
   cy.sendConsoleCommand('$i');
 
   cy.get('#tabpanel-Console .xterm-rows', { timeout: 15000 })

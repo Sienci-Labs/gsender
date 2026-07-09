@@ -77,11 +77,15 @@ cy.wait(2000);
 cy.log('File uploaded successfully');
 
 // --- Click Run on first file in the list ---
-cy.log('Clicking Run on first file...');
-cy.get('tr:nth-of-type(1) button.bg-blue-500 > span')
+cy.log('Clicking Run on sample.gcode...');
+cy.contains('tr', 'sample.gcode')
+  .find('button.bg-blue-500')
   .click({ force: true });
-
 cy.wait(1000);
+
+cy.get('table tbody tr').each(($row, i) => {
+  cy.log(`Row ${i + 1}: ${$row.text()}`);
+});
 
 // --- Wait for Running status ---
 cy.log('Waiting for machine to start running...');      //Custom command is not used because of wait time is high

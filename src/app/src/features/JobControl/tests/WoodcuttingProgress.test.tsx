@@ -8,20 +8,6 @@ import "@testing-library/jest-dom";
 import WoodcuttingProgress from "../WoodcuttingProgress";
 
 // ---------------------------------------------------------------------------
-// Asset mocks — Jest can't process binary files; return stable string paths
-// ---------------------------------------------------------------------------
-jest.mock("./assets/loading-spinning-bit.gif", () => "spinning-drill.gif");
-jest.mock(
-  "./assets/loading-spinning-bit-paused.gif",
-  () => "spinning-drill-paused.gif"
-);
-jest.mock(
-  "./assets/loading-wood-block-lines.png",
-  () => "wood-block-before.png"
-);
-jest.mock("./assets/loading-wood-dust-pile.gif", () => "wood-block-after.gif");
-
-// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
@@ -95,18 +81,16 @@ describe("WoodcuttingProgress", () => {
   // -------------------------------------------------------------------------
   // Background images
   // -------------------------------------------------------------------------
-    describe("background images", () => {
-  it("applies background image to the dust layer", () => {
-    const { container } = render(<WoodcuttingProgress percentage={50} />);
-    const { dustDiv } = getDecorationDivs(container);
-    expect(dustDiv.style.backgroundImage).toBe("url(test-file-stub)");
-  });
+it("applies background image to the dust layer", () => {
+  const { container } = render(<WoodcuttingProgress percentage={50} />);
+  const { dustDiv } = getDecorationDivs(container);
+  expect(dustDiv.style.backgroundImage).toBe('url("test-file-stub")');
+});
 
-  it("applies background image to the wood block layer", () => {
-    const { container } = render(<WoodcuttingProgress percentage={50} />);
-    const { woodDiv } = getDecorationDivs(container);
-    expect(woodDiv.style.backgroundImage).toBe("url(test-file-stub)");
-  });
+it("applies background image to the wood block layer", () => {
+  const { container } = render(<WoodcuttingProgress percentage={50} />);
+  const { woodDiv } = getDecorationDivs(container);
+  expect(woodDiv.style.backgroundImage).toBe('url("test-file-stub")');
 });
 
   // -------------------------------------------------------------------------
@@ -196,9 +180,9 @@ describe("WoodcuttingProgress", () => {
     });
   });
 
-  // -------------------------------------------------------------------------
+  // --------------------------------------------------------
   // Transition style on drill image
-  // -------------------------------------------------------------------------
+  // -------------------------------------------------
   describe("drill image transition", () => {
     it("has the opacity transition style applied", () => {
       render(<WoodcuttingProgress percentage={50} />);
@@ -206,9 +190,9 @@ describe("WoodcuttingProgress", () => {
     });
   });
 
-  // -------------------------------------------------------------------------
+  // -----------------------------------------------
   // Edge cases
-  // -------------------------------------------------------------------------
+  // --------------------------------------------
   describe("edge cases", () => {
     it("renders at exactly 0% without errors", () => {
       expect(() =>
@@ -230,7 +214,7 @@ describe("WoodcuttingProgress", () => {
 
     it("renders when isPaused is not provided (defaults to false)", () => {
       render(<WoodcuttingProgress percentage={50} />);
-      expect(getDrillImg()).toHaveAttribute("src", "spinning-drill.gif");
+      expect(getDrillImg()).toHaveAttribute("src", "test-file-stub");
     });
   });
 });
