@@ -1,3 +1,5 @@
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
+/** biome-ignore-all lint/a11y/useButtonType: <> */
 import { IMPERIAL_UNITS, JOGGING_CATEGORY, METRIC_UNITS } from "app/constants";
 import type { JogValueObject } from "app/features/Jogging";
 import type { JoggingSpeedOptions } from "app/features/Jogging/utils/Jogging";
@@ -43,7 +45,7 @@ export function SpeedSelectButton({
 }
 
 interface SpeedSelectorProps {
-	handleClick: (values: JogValueObject) => void;
+	handleClick: (values: JogValueObject, speed: JoggingSpeedOptions) => void;
 }
 
 export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
@@ -66,6 +68,7 @@ export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
 	const rapidActive = selectedSpeed === "Rapid";
 	const normalActive = selectedSpeed === "Normal";
 	const preciseActive = selectedSpeed === "Precise";
+	const customActive = selectedSpeed === "Custom";
 
 	function handleSpeedChange(speed: JoggingSpeedOptions) {
 		if (speed === selectedSpeedRef.current) {
@@ -79,7 +82,8 @@ export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
 
 	function updateCurrentJogValues(speedOverride?: JoggingSpeedOptions) {
 		const jogValues = store.get("widgets.axes.jog", {});
-		const key = (speedOverride ?? selectedSpeedRef.current).toLowerCase();
+		const speedKey = speedOverride ?? selectedSpeedRef.current;
+		const key = speedKey.toLowerCase();
 		const newSpeeds = { ...get(jogValues, key, {}) };
 
 		// Only convert if the units have changed or we've selected a different speed
@@ -102,7 +106,7 @@ export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
 			);
 		}
 
-		handleClickRef.current(newSpeeds);
+		handleClickRef.current(newSpeeds, speedKey);
 		previousUnitsRef.current = units;
 	}
 
@@ -206,6 +210,7 @@ export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
 
 	useShuttleEvents(shuttleControlEvents);
 	useEffect(() => {
+		// biome-ignore lint/correctness/useHookAtTopLevel: <>
 		useKeybinding(shuttleControlEvents);
 	}, []);
 
@@ -228,6 +233,12 @@ export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
 				onClick={() => handleSpeedChange("Rapid")}
 				label="Rapid"
 				screenReaderLabel="Set to Rapid jog preset"
+			/>
+			<SpeedSelectButton
+				active={customActive}
+				onClick={() => handleSpeedChange("Custom")}
+				label="Custom"
+				screenReaderLabel="Set to Custom jog preset"
 			/>
 		</div>
 	);

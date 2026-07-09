@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noExplicitAny: <this is a definitions file. sometimes things just do be any> */
 import type { AXES } from "app/constants";
 import type {
 	EEPROMDescriptions,
@@ -78,6 +79,7 @@ export interface Axes {
 		rapid: JogSpeed;
 		normal: JogSpeed;
 		precise: JogSpeed;
+		custom: JogSpeed;
 		step: number;
 		threshold: number;
 		distances: number[];

@@ -236,6 +236,13 @@ const defaultState: State = {
                     xaStep: 0.5,
                     feedrate: 1000,
                 },
+                custom: {
+                    xyStep: 5,
+                    zStep: 2,
+                    aStep: 5,
+                    xaStep: 5,
+                    feedrate: 3000,
+                },
                 step: METRIC_STEPS.indexOf(1), // Defaults to 1 mm
                 distances: [],
                 threshold: 250,
