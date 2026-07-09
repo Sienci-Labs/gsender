@@ -1,0 +1,84 @@
+{
+	"name": "@sienci/gsender-plugin-sdk",
+	"version": "0.1.0",
+	"description": "SDK for gSender UI plugins — bridge client, React hooks, and G-code viewer",
+	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		},
+		"./react": {
+			"types": "./dist/react.d.ts",
+			"import": "./dist/react.js"
+		},
+		"./viewer": {
+			"types": "./dist/viewer.d.ts",
+			"import": "./dist/viewer.js"
+		}
+	},
+	"files": [
+		"dist",
+		"LICENSE",
+		"README.md"
+	],
+	"sideEffects": [
+		"**/*.css"
+	],
+	"scripts": {
+		"build": "tsc -p tsconfig.json",
+		"prepublishOnly": "npm run build"
+	},
+	"peerDependencies": {
+		"@sienci/gviewer": ">=0.1.21",
+		"react": ">=18",
+		"three": ">=0.168.0"
+	},
+	"peerDependenciesMeta": {
+		"@sienci/gviewer": {
+			"optional": true
+		},
+		"react": {
+			"optional": true
+		},
+		"three": {
+			"optional": true
+		}
+	},
+	"devDependencies": {
+		"@sienci/gviewer": "^0.1.21",
+		"@types/react": "^19.0.0",
+		"react": "^19.0.0",
+		"three": "^0.168.0",
+		"typescript": "^5.7.2"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"engines": {
+		"node": ">=18"
+	},
+	"keywords": [
+		"gsender",
+		"cnc",
+		"plugin",
+		"sdk",
+		"gcode"
+	],
+	"author": {
+		"name": "Sienci Labs",
+		"email": "hi@sienci.com"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Sienci-Labs/gsender.git",
+		"directory": "packages/plugin-sdk"
+	},
+	"bugs": {
+		"url": "https://github.com/Sienci-Labs/gsender/issues"
+	},
+	"homepage": "https://github.com/Sienci-Labs/gsender/tree/master/packages/plugin-sdk#readme",
+	"license": "MIT"
+}

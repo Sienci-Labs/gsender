@@ -158,6 +158,8 @@ class GcodeViewer extends Component<Props> {
 
 	lastGridKey = "";
 
+	lastCameraFollow = false;
+
 	isRotaryFile = false;
 
 	skipNextCameraFocus = false;
@@ -1021,6 +1023,22 @@ class GcodeViewer extends Component<Props> {
 				this.viewer3d?.setOptions({
 					grid: this.buildGridOptions(),
 				});
+			}
+
+			// Camera follow only matters while a job is actively running; toggling
+			// the setting or the workflow state both flow through this dedupe key.
+			// The actual panning happens inside gviewer as a side effect of the
+			// setBitPosition call above once follow is enabled — no per-tick call
+			// needed here beyond flipping the toggle when shouldFollow changes.
+			const followSettingOn = store.get(
+				"widgets.visualizer.followToolDuringRuntime",
+				false,
+			);
+			const isRunning = _get(st, "controller.workflow.state") === WORKFLOW_STATE_RUNNING;
+			const shouldFollow = followSettingOn && isRunning;
+			if (shouldFollow !== this.lastCameraFollow) {
+				this.lastCameraFollow = shouldFollow;
+				this.viewer3d?.setCameraFollowEnabled(shouldFollow);
 			}
 
 			// Bit is only shown while connected (matches the old behaviour).

@@ -47,7 +47,10 @@ import logger, { setLevel } from "./lib/logger";
 import urljoin from "./lib/urljoin";
 import cncengine from "./services/cncengine";
 import config from "./services/configstore";
+import errorConfig from "./services/configstore/alarmStore";
+import jobConfig from "./services/configstore/jobStore";
 import monitor from "./services/monitor";
+import pluginRegistry from "./services/pluginregistry";
 
 const log = logger("init");
 
@@ -74,11 +77,16 @@ const createServer = (options, callback) => {
 	}
 
 	const rcfile = path.resolve(options.configFile || settings.rcfile);
+	const errorFile = path.resolve(options.errorFile || settings.errorFile);
+	const jobFile = path.resolve(options.jobFile || settings.jobFile);
 
 	// configstore service
 	log.info(
 		`Loading configuration from ${chalk.yellow(JSON.stringify(rcfile))}`,
 	);
+
+	errorConfig.load(rcfile, errorFile);
+	jobConfig.load(rcfile, jobFile);
 	config.load(rcfile);
 
 	// rcfile
@@ -174,6 +182,7 @@ const createServer = (options, callback) => {
 		[
 			...ensureArray(options.mountPoints),
 			...ensureArray(config.get("mountPoints")),
+			...pluginRegistry.getMountPointsFromPlugins(),
 		],
 		isEqual,
 	).filter((mount) => {
@@ -330,6 +339,16 @@ const createServer = (options, callback) => {
 				server,
 				options.controller || config.get("controller", ""),
 			);
+
+			// Dev-only: live-reload plugin iframes when their files change.
+			if (process.env.NODE_ENV === "development") {
+				pluginRegistry.watchPlugins(({ dir, filename }) => {
+					log.info(
+						`Plugin change detected in ${dir}${filename ? ` (${filename})` : ""}; notifying clients`,
+					);
+					cncengine.emit("plugins:changed", { dir, filename });
+				});
+			}
 
 			const address = server.address().address;
 			const port = server.address().port;

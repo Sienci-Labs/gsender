@@ -67,8 +67,8 @@ const defaultState: State = {
         revertWorkspace: false,
         promptExit: false,
         backupFreq: 'On Update',
+        powerSaving: false,
         backupLoc: '',
-        powerSaving: true,
         lastBackupTime: 0,
         collectUsageDataStatus: 'pending',
         jobTimes: [],
@@ -444,6 +444,7 @@ const defaultState: State = {
             showSoftLimitWarning: false,
             hideProcessedLines: false,
             boundingBoxLabels: false,
+            followToolDuringRuntime: false,
             debug: {
                 profileWorker: false,
                 profileSampleEvery: 10000,

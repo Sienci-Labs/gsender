@@ -21,12 +21,13 @@
  *
  */
 
-import Substep from "app/features/Helper/components/Substep";
-import ToolRequirementBanner from "app/features/Helper/components/ToolRequirementBanner";
-import { useWizardContext } from "app/features/Helper/context";
-import { getToolString } from "app/lib/toolChangeUtils";
-import { CheckCircle } from "lucide-react";
-import React from "react";
+import React from 'react';
+import { CheckCircle } from 'lucide-react';
+import { getToolString } from 'app/lib/toolChangeUtils';
+import { useWizardContext } from 'app/features/Helper/context';
+import Substep from 'app/features/Helper/components/Substep';
+import ToolRequirementBanner from 'app/features/Helper/components/ToolRequirementBanner';
+import PendingToolchangeNotice from 'app/features/Helper/components/PendingToolchangeNotice';
 
 const getToolLabel = (
 	toolchangeContext: Record<string, unknown> | null,
@@ -50,19 +51,29 @@ const getToolLabel = (
 };
 
 const Instructions = () => {
-	const {
-		steps,
-		intro,
-		activeStep,
-		activeSubstep,
-		toolchangeContext,
-		toolchangeComment,
-	} = useWizardContext();
-	const step = steps[activeStep];
-	if (!step) return null;
-	const substep = step.substeps[activeSubstep];
-	if (!substep) return null;
-	const toolLabel = substep.toolBanner ? getToolLabel(toolchangeContext) : null;
+    const {
+        steps,
+        intro,
+        activeStep,
+        activeSubstep,
+        toolchangeContext,
+        toolchangeComment,
+        pendingToolchangeNotice,
+    } = useWizardContext();
+    const step = steps[activeStep];
+    if (!step) return null;
+    const substep = step.substeps[activeSubstep];
+    if (!substep) return null;
+
+    if (pendingToolchangeNotice && activeStep === 0 && activeSubstep === 0) {
+        return (
+            <div className="flex-1 overflow-y-auto p-4 flex flex-col bg-white dark:bg-[#18181f]">
+                <PendingToolchangeNotice />
+            </div>
+        );
+    }
+
+    const toolLabel = substep.toolBanner ? getToolLabel(toolchangeContext) : null;
 
 	return (
 		<div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3 bg-white dark:bg-[#18181f]">

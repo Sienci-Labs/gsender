@@ -146,37 +146,43 @@ const ProgressArea = ({ senderStatus, workflowState }: Props) => {
 						<span>%</span>
 					</div>
 
-					<WoodcuttingProgress
-						percentage={percentageValue}
-						isPaused={isPaused}
-					/>
-				</div>
-				<TooltipProvider>
-					<Tooltip>
-						<TooltipTrigger asChild>
-							<div className="flex flex-col  justify-center items-center w-32">
-								{isFinalizing ? (
-									<>
-										<span className="text-sm">Finalizing</span>
-									</>
-								) : (
-									<>
-										{timeComponent}
-										<span className="text-sm">remaining</span>
-									</>
-								)}
-							</div>
-						</TooltipTrigger>
-						<TooltipContent className="max-w-64">{updateTime()}</TooltipContent>
-					</Tooltip>
-				</TooltipProvider>
-			</div>
-			<div className="w-full flex flex-row justify-between gap-2 text-gray-400 text-sm whitespace-nowrap">
-				<span>{`${currentLineRunning} / ${total} Lines`}</span>
-				<span>{convertMillisecondsToTimeStamp(elapsedTime, true)} cutting</span>
-			</div>
-		</div>
-	);
+                    <WoodcuttingProgress
+                        percentage={percentageValue}
+                        isPaused={isPaused}
+                    />
+                </div>
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <div className="flex flex-col  justify-center items-center w-32">
+                                {isFinalizing ? (
+                                    <>
+                                        <span className="text-sm">Finalizing</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        {timeComponent}
+                                        <span className="text-sm">remaining</span>
+                                    </>
+                                )}
+                            </div>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-64">
+                            {updateTime()}
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+            </div>
+            <div className="w-full flex flex-row justify-between gap-2 text-sm whitespace-nowrap mt-1.5">
+                <span className="px-2 py-0.5 rounded-md bg-gray-900/60 dark:bg-gray-100/70 text-gray-100 dark:text-gray-900">
+                    {`${currentLineRunning} / ${total} Lines`}
+                </span>
+                <span className="px-2 py-0.5 rounded-md bg-gray-900/60 dark:bg-gray-100/70 text-gray-100 dark:text-gray-900">
+                    {convertMillisecondsToTimeStamp(elapsedTime, true)} cutting
+                </span>
+            </div>
+        </div>
+    );
 };
 
 export default ProgressArea;
