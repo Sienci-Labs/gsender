@@ -207,8 +207,9 @@ const SurfacingTool = () => {
 										suffix={units}
 										min={0.00001}
 										max={10000}
+										invalid={isCutDepthExceedingMax}
 										className={cx("rounded", inputStyle, {
-											"text-red-500 border-red-500": isCutDepthExceedingMax,
+											"text-red-500": isCutDepthExceedingMax,
 										})}
 										wrapperClassName="w-full"
 										value={surfacing.skimDepth}
@@ -228,8 +229,9 @@ const SurfacingTool = () => {
 										suffix={units}
 										min={0.00001}
 										max={10000}
+										invalid={isCutDepthExceedingMax}
 										className={cx(inputStyle, {
-											"text-red-500 border-red-500": isCutDepthExceedingMax,
+											"text-red-500": isCutDepthExceedingMax,
 										})}
 										wrapperClassName="w-full"
 										value={surfacing.maxDepth}
