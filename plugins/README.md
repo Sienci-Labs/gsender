@@ -54,6 +54,22 @@ automatically. So the dev loop is:
 Note: **adding a brand-new plugin folder** still needs a server restart (its
 static route is mounted at startup); edits to already-loaded plugins hot-reload.
 
+## Default plugins in production builds
+
+Production builds can bundle selected default plugins into
+`dist/gsender/plugins` via:
+
+```bash
+npm run prepare-default-plugins
+```
+
+`build-prod` and `build-latest` already run this automatically (including CI).
+By default it bundles `basic-cam`; override with:
+
+```bash
+GSENDER_DEFAULT_PLUGINS=basic-cam,another-plugin npm run prepare-default-plugins
+```
+
 ## Plugin SDK
 
 Install [`@sienci/gsender-plugin-sdk`](../packages/plugin-sdk) (or `file:../../packages/plugin-sdk` while developing in this repo).
