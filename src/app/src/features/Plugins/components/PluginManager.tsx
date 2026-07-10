@@ -2,6 +2,7 @@ import { Button } from "app/components/Button";
 import Page from "app/components/Page";
 import Switch from "app/components/Switch";
 import { Tooltip } from "app/components/Tooltip"; // Ensure Tooltip exists
+import isElectron from "is-electron";
 import { useState } from "react";
 import { usePlugins } from "../hooks/usePlugins";
 
@@ -24,6 +25,11 @@ const PluginManager = () => {
 		}
 	};
 
+	// The plugins folder lives on the machine running the gSender server. Opening
+	// it in a file manager only makes sense from the local desktop app — when the
+	// UI is loaded remotely in a web browser there is no local folder to reveal.
+	const canOpenDir = isElectron();
+
 	const handleOpenDir = async () => {
 		try {
 			await openPluginsDir();
@@ -42,16 +48,20 @@ const PluginManager = () => {
 			<div className="flex flex-col gap-4">
 				<p className="text-sm text-gray-600 dark:text-gray-300">
 					Plugins directory:{" "}
-					<Tooltip content="Open this folder in your file manager">
-						<button
-							type="button"
-							onClick={handleOpenDir}
-							disabled={!pluginsDir}
-							className="text-xs break-all font-mono text-blue-600 underline underline-offset-2 hover:text-blue-800 disabled:cursor-not-allowed disabled:text-gray-400 disabled:no-underline dark:text-blue-400 dark:hover:text-blue-300"
-						>
-							{pluginsDir}
-						</button>
-					</Tooltip>
+					{canOpenDir ? (
+						<Tooltip content="Open this folder in your file manager">
+							<button
+								type="button"
+								onClick={handleOpenDir}
+								disabled={!pluginsDir}
+								className="text-xs break-all font-mono text-blue-600 underline underline-offset-2 hover:text-blue-800 disabled:cursor-not-allowed disabled:text-gray-400 disabled:no-underline dark:text-blue-400 dark:hover:text-blue-300"
+							>
+								{pluginsDir}
+							</button>
+						</Tooltip>
+					) : (
+						<code className="text-xs break-all">{pluginsDir}</code>
+					)}
 				</p>
 
 				<p className="text-sm text-gray-500 dark:text-gray-400">
