@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noExplicitAny: <> */
 import {
 	GRBL,
 	GRBLHAL,
@@ -101,7 +102,8 @@ export type gSenderSettingType =
 	| "api"
 	| "jog"
 	| "location"
-	| "wizard";
+	| "wizard"
+	| "path";
 
 export type gSenderSettingsValues = number | string | boolean;
 
@@ -109,7 +111,7 @@ export interface gSenderSetting {
 	label?: string;
 	type: gSenderSettingType;
 	key?: string;
-	description?: string | any[];
+	description?: string;
 	options?: string[] | number[];
 	unit?: string;
 	eID?: EEPROM;
@@ -264,12 +266,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						description: "Allow screen to blank/sleep.",
 						onEnable: () => {
 							if (isElectron()) {
-								window.ipcRenderer.send("change-power-saving", true);
+								(window as any).ipcRenderer.send("change-power-saving", true);
 							}
 						},
 						onDisable: () => {
 							if (isElectron()) {
-								window.ipcRenderer.send("change-power-saving", false);
+								(window as any).ipcRenderer.send("change-power-saving", false);
 							}
 						},
 					},
@@ -281,12 +283,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
 							"Pop up a confirmation window when exiting the program.",
 						onEnable: () => {
 							if (isElectron()) {
-								window.ipcRenderer.send("assignPromptExit", true);
+								(window as any).ipcRenderer.send("assignPromptExit", true);
 							}
 						},
 						onDisable: () => {
 							if (isElectron()) {
-								window.ipcRenderer.send("assignPromptExit", false);
+								(window as any).ipcRenderer.send("assignPromptExit", false);
 							}
 						},
 					},
@@ -297,6 +299,19 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						description:
 							"Choose how often gSender will backup your settings. Useful in case you need to revert them in the future.",
 						options: ["On Update", "Daily", "Weekly", "Monthly"],
+						hidden: () => {
+							return !isElectron();
+						},
+					},
+					{
+						label: "Settings backup location",
+						key: "workspace.backupLoc",
+						type: "path",
+						description:
+							"Choose the location to backup your settings to. Leave it blank to use the default appData location.",
+						hidden: () => {
+							return !isElectron();
+						},
 					},
 					{
 						label: "Collect usage data",
@@ -334,6 +349,20 @@ export const SettingsMenu: SettingsMenuSection[] = [
 							"Change the app colours for reduced eye strain, better contrast, or just for fun!",
 						type: "boolean",
 					},
+					{
+						label: "DRO zeros",
+						key: "workspace.customDecimalPlaces",
+						description:
+							"Set the number of decimal places shown between 1-4. (Default 0 shows 2 for mm and 3 for inches)",
+						type: "number",
+						min: 0,
+						max: 4,
+					},
+				],
+			},
+			{
+				label: "Visualizer options",
+				settings: [
 					{
 						label: "Visualizer theme",
 						key: "widgets.visualizer.theme",
@@ -373,6 +402,33 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						},
 					},
 					{
+						label: "Show machine bed indicator",
+						key: "widgets.visualizer.objects.machineBed.visible",
+						description:
+							"Draw an outline of the machine's homed work area once homing is complete.",
+						type: "boolean",
+						defaultValue: false,
+						onChange: (value: boolean) => {
+							store.set("widgets.visualizer.objects.machineBed.visible", value);
+							pubsub.publish("visualizer:settings");
+						},
+					},
+					{
+						label: "Trim grid to machine bed",
+						key: "widgets.visualizer.objects.machineBed.trimGridToBed",
+						description:
+							"When the machine bed indicator is shown, clip the background grid to just past the bed's edges instead of a fixed square.",
+						type: "boolean",
+						defaultValue: false,
+						onChange: (value: boolean) => {
+							store.set(
+								"widgets.visualizer.objects.machineBed.trimGridToBed",
+								value,
+							);
+							pubsub.publish("visualizer:settings");
+						},
+					},
+					{
 						label: "Hide processed lines",
 						key: "widgets.visualizer.hideProcessedLines",
 						description: "Hide processed g-code lines in the visualizer.",
@@ -390,13 +446,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						],
 					},
 					{
-						label: "DRO zeros",
-						key: "workspace.customDecimalPlaces",
+						label: "Follow tool during runtime",
+						key: "widgets.visualizer.followToolDuringRuntime",
 						description:
-							"Set the number of decimal places shown between 1-4. (Default 0 shows 2 for mm and 3 for inches)",
-						type: "number",
-						min: 0,
-						max: 4,
+							"While a job is running, pan the camera to track the tool in X/Y, keeping the same viewing angle and height.",
+						type: "boolean",
+						defaultValue: false,
 					},
 				],
 			},

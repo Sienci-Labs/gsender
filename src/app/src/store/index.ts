@@ -237,6 +237,8 @@ export const merge = (base: any, saved: any): any => {
 
 // Save backup
 const backupPreviousState = (data: any): void => {
+	const fs = window.require("fs"); // Use window.require to require fs module in Electron
+	const backupLoc: string = get(cnc.state, "workspace.backupLoc", "");
 	const value = JSON.stringify(
 		{ state: data, version: settings.version },
 		null,
@@ -247,13 +249,18 @@ const backupPreviousState = (data: any): void => {
 	if (isElectron()) {
 		const { app } = window.require("@electron/remote");
 		const path = window.require("path"); // Require the path module within Electron
+		let directory = app.getPath("userData");
+
+		if (backupLoc !== "" && fs.existsSync(backupLoc)) {
+			directory = backupLoc;
+		}
+		backupLoc.length !== 0 ? backupLoc : app.getPath("userData");
 
 		const backupPath = path.join(
-			app.getPath("userData"),
-			"preferences-backup-" + now + ".json",
+			directory,
+			`preferences-backup-${now}.json`,
 		);
 
-		const fs = window.require("fs"); // Use window.require to require fs module in Electron
 		fs.writeFileSync(backupPath, value);
 	}
 };

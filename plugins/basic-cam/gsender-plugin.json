@@ -1,0 +1,17 @@
+{
+	"id": "com.sienci.basic-cam",
+	"name": "Basic CAM",
+	"version": "0.1.0",
+	"engine": ">=1.6.0",
+	"ui": {
+		"entry": "ui/index.html",
+		"contributions": [
+			{
+				"slot": "tools-page",
+				"route": "basic-cam",
+				"label": "Basic CAM"
+			}
+		]
+	},
+	"permissions": ["machine:read", "files:read"]
+}

@@ -1,5 +1,5 @@
 import { ERR_INTERNAL_SERVER_ERROR } from "../constants";
-import config from "../services/configstore";
+import config from "../services/configstore/jobStore";
 
 const CONFIG_KEY = "jobStats";
 const DEFAULT_JOB_STATS = {

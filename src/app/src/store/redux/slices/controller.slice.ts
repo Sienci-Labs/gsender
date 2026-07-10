@@ -54,6 +54,14 @@ const initialState: ControllerState = {
 		b: 0.0,
 		c: 0.0,
 	},
+	wco: {
+		x: 0.0,
+		y: 0.0,
+		z: 0.0,
+		a: 0.0,
+		b: 0.0,
+		c: 0.0,
+	},
 	homingFlag: false,
 	hasHomed: false,
 	feeder: {
@@ -186,6 +194,10 @@ const controllerSlice = createSlice({
 				_get(state.state, "status.mpos"),
 				settings,
 			);
+			const wco = mapPosToFeedbackUnits(
+				_get(state.state, "status.wco"),
+				settings,
+			);
 			const modal = consolidateModals(state.state);
 			updateMachineLimitsFromEEPROM({ settings: settings.settings });
 
@@ -193,6 +205,7 @@ const controllerSlice = createSlice({
 			state.settings = settings;
 			state.mpos = mpos;
 			state.wpos = wpos;
+			state.wco = wco;
 			state.modal = modal;
 		},
 		updatePartialControllerSettings: (
@@ -218,6 +231,10 @@ const controllerSlice = createSlice({
 				_get(newState, "status.mpos"),
 				state.settings,
 			);
+			const wco = mapPosToFeedbackUnits(
+				_get(newState, "status.wco"),
+				state.settings,
+			);
 			const mappedFeedrate = mapFeedrateToFeedbackUnits(
 				_get(newState, "status.feedrate"),
 				state.settings,
@@ -234,6 +251,7 @@ const controllerSlice = createSlice({
 			state.modal = modal;
 			state.wpos = wpos;
 			state.mpos = mpos;
+			state.wco = wco;
 		},
 
 		updateFeederStatus: (state, action: PayloadAction<Feeder>) => {

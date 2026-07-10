@@ -12,6 +12,7 @@ type InputProps = ComponentProps<"input"> & {
 	label?: string | ReactNode;
 	sizing?: "xs" | "sm" | "md" | "lg";
 	wrapperClassName?: string;
+	invalid?: boolean;
 	clearOnEnter?: boolean;
 	immediateOnChange?: boolean; // New prop to enable immediate onChange calls
 };
@@ -60,7 +61,7 @@ const ControlledInput = forwardRef<HTMLInputElement, InputProps>(
 
 			if (isDeferredNumeric) {
 				const parsed = parseFloat(current);
-				if (current.trim() === "" || isNaN(parsed)) {
+				if (current.trim() === "" || Number.isNaN(parsed)) {
 					// Revert to original and notify parent so its state stays consistent
 					restoreOriginalValue();
 					if (onChange) onChange(e);
@@ -154,7 +155,7 @@ const ControlledInput = forwardRef<HTMLInputElement, InputProps>(
 				if (isDeferredNumeric) {
 					// Only propagate valid numbers; allow intermediate states like "" or "." to display
 					const parsed = parseFloat(e.target.value);
-					if (!isNaN(parsed) && e.target.value.trim() !== "") {
+					if (!Number.isNaN(parsed) && e.target.value.trim() !== "") {
 						onChange(e);
 					}
 				} else {

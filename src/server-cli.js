@@ -89,6 +89,14 @@ program
 	.option("-b, --backlog <backlog>", "Set listen backlog (default: 511)", 511)
 	.option("-c, --config <filename>", "Set config file (default: ~/.cncrc)")
 	.option(
+		"--error-file, --error-file <filename>",
+		"Set errors file (default: ~/.errorrc)",
+	)
+	.option(
+		"--job-file, --job-file <filename>",
+		"Set job file (default: ~/.jobrc)",
+	)
+	.option(
 		"-v, --verbose",
 		"Increase the verbosity level (-v, -vv, -vvv)",
 		increaseVerbosityLevel,
@@ -149,6 +157,8 @@ module.exports = () =>
 				host: options.host,
 				backlog: options.backlog,
 				configFile: options.config,
+				errorFile: options.errorFile,
+				jobFile: options.jobFile,
 				verbosity: options.verbose,
 				mountPoints: options.mount,
 				watchDirectory: options.watchDirectory,

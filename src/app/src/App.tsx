@@ -1,17 +1,17 @@
-import { store as reduxStore } from 'app/store/redux';
-import rootSaga from 'app/store/redux/sagas';
-import { sagaMiddleware } from 'app/store/redux/sagas';
-import store from 'app/store';
-import * as user from 'app/lib/user';
-import controller from 'app/lib/controller';
-import { Toaster } from './components/shadcn/Sonner';
-import { ReactRoutes } from './react-routes';
-import { AccessibilitySettingsHandler } from './features/Helper/AccessibilitySettingsHandler';
-import { posthog } from 'posthog-js';
-import { useEffect } from 'react';
-import { Provider as ReduxProvider } from 'react-redux';
-import { HashRouter } from 'react-router';
-import isElectron from 'is-electron';
+import controller from "app/lib/controller";
+import * as user from "app/lib/user";
+import store from "app/store";
+import { store as reduxStore } from "app/store/redux";
+import rootSaga, { sagaMiddleware } from "app/store/redux/sagas";
+import isElectron from "is-electron";
+import { posthog } from "posthog-js";
+import { useEffect } from "react";
+import { Provider as ReduxProvider } from "react-redux";
+import { HashRouter } from "react-router";
+import { Toaster } from "./components/shadcn/Sonner";
+import { AccessibilitySettingsHandler } from "./features/Helper/AccessibilitySettingsHandler";
+import { installPluginBridgeListener } from "./features/Plugins/utils/pluginBridge";
+import { ReactRoutes } from "./react-routes";
 
 function App() {
 	useEffect(() => {
@@ -30,27 +30,35 @@ function App() {
 			controller.connect(host, options);
 		});
 
-        sagaMiddleware.run(rootSaga);
+		sagaMiddleware.run(rootSaga);
 
-        const shouldSendUsageData = store.get(
-            'workspace.collectUsageDataStatus',
-            'pending',
-        );
+		const removePluginBridge = installPluginBridgeListener();
 
-        if (shouldSendUsageData === 'accepted') {
-            console.log('Collecting usage data through PostHog');
-            posthog.opt_in_capturing();
-        } else {
-            posthog.opt_out_capturing();
-        }
+		const shouldSendUsageData = store.get(
+			"workspace.collectUsageDataStatus",
+			"pending",
+		);
 
-        if (isElectron()) {
-            console.log('Getting windows registry');
-            window.ipcRenderer.invoke('get-windows-registry').then((value: boolean) => {
-                posthog.register({ isBundled: value });
-            });
-        }
-    }, []);
+		if (shouldSendUsageData === "accepted") {
+			console.log("Collecting usage data through PostHog");
+			posthog.opt_in_capturing();
+		} else {
+			posthog.opt_out_capturing();
+		}
+
+		if (isElectron()) {
+			console.log("Getting windows registry");
+			window.ipcRenderer
+				.invoke("get-windows-registry")
+				.then((value: boolean) => {
+					posthog.register({ isBundled: value });
+				});
+		}
+
+		return () => {
+			removePluginBridge();
+		};
+	}, []);
 
 	return (
 		<>

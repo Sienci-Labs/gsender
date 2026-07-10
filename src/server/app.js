@@ -70,39 +70,42 @@ const log = logger("app");
 
 const appMain = () => {
 	const app = express();
-	// Settings
-	if (process.env.NODE_ENV === "development") {
-		// Error handler - https://github.com/expressjs/errorhandler
-		// Development error handler, providing stack traces and error message responses
-		// for requests accepting text, html, or json.
-		app.use(errorhandler());
 
-		// a custom "verbose errors" setting which can be used in the templates via settings['verbose errors']
-		app.enable("verbose errors"); // Enables verbose errors in development
-		app.disable("view cache"); // Disables view template compilation caching in development
-	} else {
-		// a custom "verbose errors" setting which can be used in the templates via settings['verbose errors']
-		app.disable("verbose errors"); // Disables verbose errors in production
-		app.enable("view cache"); // Enables view template compilation caching in production
+	{
+		// Settings
+		if (process.env.NODE_ENV === "development") {
+			// Error handler - https://github.com/expressjs/errorhandler
+			// Development error handler, providing stack traces and error message responses
+			// for requests accepting text, html, or json.
+			app.use(errorhandler());
+
+			// a custom "verbose errors" setting which can be used in the templates via settings['verbose errors']
+			app.enable("verbose errors"); // Enables verbose errors in development
+			app.disable("view cache"); // Disables view template compilation caching in development
+		} else {
+			// a custom "verbose errors" setting which can be used in the templates via settings['verbose errors']
+			app.disable("verbose errors"); // Disables verbose errors in production
+			app.enable("view cache"); // Enables view template compilation caching in production
+		}
+
+		app.enable("trust proxy"); // Enables reverse proxy support, disabled by default
+		app.enable("case sensitive routing"); // Enable case sensitivity, disabled by default, treating "/Foo" and "/foo" as the same
+		app.disable("strict routing"); // Enable strict routing, by default "/foo" and "/foo/" are treated the same by the router
+		app.disable("x-powered-by"); // Enables the X-Powered-By: Express HTTP header, enabled by default
+
+		for (let i = 0; i < settings.view.engines.length; ++i) {
+			const extension = settings.view.engines[i].extension;
+			const template = settings.view.engines[i].template;
+			app.engine(extension, engines[template]);
+		}
+		app.set("view engine", settings.view.defaultExtension); // The default engine extension to use when omitted
+		app.set("views", [
+			path.resolve(__dirname, "../app"),
+			path.resolve(__dirname, "views"),
+		]); // The view directory path
+
+		log.debug("app.settings: %j", app.settings);
 	}
-
-	app.enable("trust proxy"); // Enables reverse proxy support, disabled by default
-	app.enable("case sensitive routing"); // Enable case sensitivity, disabled by default, treating "/Foo" and "/foo" as the same
-	app.disable("strict routing"); // Enable strict routing, by default "/foo" and "/foo/" are treated the same by the router
-	app.disable("x-powered-by"); // Enables the X-Powered-By: Express HTTP header, enabled by default
-
-	for (let i = 0; i < settings.view.engines.length; ++i) {
-		const extension = settings.view.engines[i].extension;
-		const template = settings.view.engines[i].template;
-		app.engine(extension, engines[template]);
-	}
-	app.set("view engine", settings.view.defaultExtension); // The default engine extension to use when omitted
-	app.set("views", [
-		path.resolve(__dirname, "../app"),
-		path.resolve(__dirname, "views"),
-	]); // The view directory path
-
-	log.debug("app.settings: %j", app.settings);
 
 	// Cors
 	app.use(cors());
@@ -244,59 +247,65 @@ const appMain = () => {
 	});
 
 	app.use(i18nextHandle(i18next, {}));
-	// Secure API Access
-	app.use(
-		urljoin(settings.route, "api"),
-		expressJwt({
-			secret: config.get("secret"),
-			credentialsRequired: true,
-		}),
-	);
 
-	app.use((err, req, res, next) => {
-		let bypass = !(err && err.name === "UnauthorizedError");
+	{
+		// Secure API Access
+		app.use(
+			urljoin(settings.route, "api"),
+			expressJwt({
+				secret: config.get("secret"),
+				credentialsRequired: true,
+			}),
+		);
 
-		// Check whether the app is running in development mode
-		bypass = bypass || process.env.NODE_ENV === "development";
+		app.use((err, req, res, next) => {
+			let bypass = !(err && err.name === "UnauthorizedError");
 
-		// Check whether the request path is not restricted
-		const whitelist = [
-			// Also see "src/app/api/index.js"
-			urljoin(settings.route, "api/signin"),
-		];
-		bypass =
-			bypass ||
-			whitelist.some((path) => {
-				return req.path.indexOf(path) === 0;
-			});
+			// Check whether the app is running in development mode
+			bypass = bypass || process.env.NODE_ENV === "development";
 
-		if (!bypass) {
-			// Check whether the provided credential is correct
-			//const token = _get(req, 'query.token') || _get(req, 'body.token');
-			try {
-				// User Validation
-				//const user = jwt.verify(token, settings.secret) || {};
-				//await validateUser(user);
-				bypass = true;
-			} catch (err) {
-				log.warn(err);
+			// Check whether the request path is not restricted
+			const whitelist = [
+				// Also see "src/app/api/index.js"
+				urljoin(settings.route, "api/signin"),
+			];
+			bypass =
+				bypass ||
+				whitelist.some((path) => {
+					return req.path.indexOf(path) === 0;
+				});
+
+			if (!bypass) {
+				// Check whether the provided credential is correct
+				//const token = _get(req, 'query.token') || _get(req, 'body.token');
+				try {
+					// User Validation
+					//const user = jwt.verify(token, settings.secret) || {};
+					//await validateUser(user);
+					bypass = true;
+				} catch (err) {
+					log.warn(err);
+				}
 			}
-		}
 
-		if (!bypass) {
-			const ipaddr = req.ip || req.connection.remoteAddress;
-			log.warn(
-				`Forbidden: ipaddr=${ipaddr}, code="${err.code}", message="${err.message}"`,
-			);
-			res.status(ERR_FORBIDDEN).end("Forbidden Access");
-			return;
-		}
+			if (!bypass) {
+				const ipaddr = req.ip || req.connection.remoteAddress;
+				log.warn(
+					`Forbidden: ipaddr=${ipaddr}, code="${err.code}", message="${err.message}"`,
+				);
+				res.status(ERR_FORBIDDEN).end("Forbidden Access");
+				return;
+			}
 
-		next();
-	});
-	// Register API routes with public access
-	// Also see "src/app/app.js"
-	app.post(urljoin(settings.route, "api/signin"), api.users.signin);
+			next();
+		});
+	}
+
+	{
+		// Register API routes with public access
+		// Also see "src/app/app.js"
+		app.post(urljoin(settings.route, "api/signin"), api.users.signin);
+	}
 
 	{
 		// Register API routes with authorized access
@@ -453,6 +462,10 @@ const appMain = () => {
 			urljoin(settings.route, "api/preferences"),
 			api.preferences.replace,
 		);
+
+		// Plugins
+		app.get(urljoin(settings.route, "api/plugins"), api.plugins.fetch);
+		app.put(urljoin(settings.route, "api/plugins/:id"), api.plugins.update);
 	}
 
 	// app.get(urljoin(settings.route, '/'), async (req, res) => {

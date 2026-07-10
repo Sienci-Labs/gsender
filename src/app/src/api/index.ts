@@ -455,6 +455,21 @@ const preferences = {
 	},
 };
 
+//
+// Plugins
+//
+const plugins = {
+	fetch: (): Promise<AxiosResponse> => {
+		return authrequest.get("/api/plugins");
+	},
+	update: (
+		id: string,
+		options: { enabled: boolean },
+	): Promise<AxiosResponse> => {
+		return authrequest.put(`/api/plugins/${encodeURIComponent(id)}`, options);
+	},
+};
+
 export default {
 	signin,
 	getLatestVersion,
@@ -481,4 +496,5 @@ export default {
 	alarmList,
 	releaseNotes,
 	preferences,
+	plugins,
 };

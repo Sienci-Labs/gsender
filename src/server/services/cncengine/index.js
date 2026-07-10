@@ -41,9 +41,14 @@ const unload = () => {
 	cncengine.unload();
 };
 
+const emit = (msg, ...args) => {
+	cncengine.emit(msg, ...args);
+};
+
 export default {
 	start,
 	stop,
 	load,
 	unload,
+	emit,
 };

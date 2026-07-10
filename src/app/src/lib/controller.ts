@@ -116,6 +116,8 @@ export interface ControllerListeners {
 	"sdcard:files": Array<Function>;
 	"sdcard:clear": Array<Function>;
 	"sdcard:json": Array<Function>;
+	// Dev-only: emitted by the server when a plugin's files are updated.
+	"plugins:changed": Array<Function>;
 }
 
 const ensureArray = (...args: Array<any>) => {
@@ -229,6 +231,7 @@ class Controller {
 		"ymodem:progress": [],
 		"ymodem:error": [],
 		"job:stop": [],
+		"plugins:changed": [],
 	};
 
 	context = {

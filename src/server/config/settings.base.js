@@ -27,6 +27,10 @@ import path from "path";
 import pkg from "../../package.json";
 
 const RC_FILE = pkg.version.includes("EDGE") ? ".edge_rc" : ".sender_rc";
+const ERROR_FILE = pkg.version.includes("EDGE")
+	? ".edge_errorrc"
+	: ".sender_errorrc";
+const JOB_FILE = pkg.version.includes("EDGE") ? ".edge_jobrc" : ".sender_jobrc";
 const SESSION_PATH = ".sienci-sessions";
 
 // Secret
@@ -34,6 +38,29 @@ const secret = pkg.version;
 
 //const getUserHome = () => (process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME']);
 const getUserHome = () => os.homedir();
+
+// Electron app.getPath('userData') uses package.json "name", not build.productName.
+const getAppName = () => pkg.name || "gSender";
+
+// Mirror Electron app.getPath('userData') when the server runs outside Electron (CLI dev).
+const getDefaultUserDataPath = () => {
+	const home = getUserHome();
+	const appName = getAppName();
+
+	if (process.platform === "darwin") {
+		return path.join(home, "Library", "Application Support", appName);
+	}
+
+	if (process.platform === "win32") {
+		const appData =
+			process.env.APPDATA || path.join(home, "AppData", "Roaming");
+		return path.join(appData, appName);
+	}
+
+	const configHome = process.env.XDG_CONFIG_HOME || path.join(home, ".config");
+	return path.join(configHome, appName);
+};
+
 const getUserDataPath = () => {
 	if (process.env.GSENDER_USER_DATA) {
 		return process.env.GSENDER_USER_DATA;
@@ -46,15 +73,40 @@ const getUserDataPath = () => {
 				return app.getPath("userData");
 			}
 		} catch (err) {
-			// Fallback to homedir if electron is unavailable
+			// Fall through to the default userData path below.
 		}
 	}
 
-	return os.homedir();
+	return getDefaultUserDataPath();
+};
+
+// Additional plugin directories scanned alongside the primary (user-data)
+// pluginsDir. Used so that, in development, plugins can be loaded straight from
+// the repo-root `plugins/` folder without copying them into Application Support.
+const getExtraPluginsDirs = () => {
+	const dirs = [];
+
+	// Explicit override: OS-native path list (":" on posix, ";" on win32).
+	if (process.env.GSENDER_PLUGINS_DIRS) {
+		process.env.GSENDER_PLUGINS_DIRS.split(path.delimiter)
+			.map((entry) => entry.trim())
+			.filter(Boolean)
+			.forEach((entry) => dirs.push(path.resolve(entry)));
+	}
+
+	// In development the server is launched from the repo root, so the source
+	// `plugins/` folder lives at cwd. The registry checks existence before use.
+	if (process.env.NODE_ENV === "development") {
+		dirs.push(path.resolve(process.cwd(), "plugins"));
+	}
+
+	return dirs;
 };
 
 export default {
 	rcfile: path.resolve(getUserHome(), RC_FILE),
+	errorFile: path.resolve(getUserHome(), ERROR_FILE),
+	jobFile: path.resolve(getUserHome(), JOB_FILE),
 	verbosity: 0,
 	version: pkg.version,
 
@@ -213,4 +265,7 @@ export default {
 			jsonIndent: 4,
 		},
 	},
+
+	pluginsDir: path.resolve(getUserDataPath(), "plugins"),
+	extraPluginsDirs: getExtraPluginsDirs(),
 };

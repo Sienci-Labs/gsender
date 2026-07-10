@@ -16,7 +16,7 @@ export interface JogSpeeds {
 	feedrate: number;
 }
 
-export type JoggingSpeedOptions = "Rapid" | "Normal" | "Precise";
+export type JoggingSpeedOptions = "Rapid" | "Normal" | "Precise" | "Custom";
 
 export function jogAxis(params: JogDistances, feedrate: number) {
 	const preventJoggingPastLimits = store.get(
@@ -49,9 +49,9 @@ export function jogAxis(params: JogDistances, feedrate: number) {
 	const modal = units === "mm" ? "G21" : "G20";
 	const s = map(
 		params,
-		(value, letter) => "" + letter.toUpperCase() + value,
+		(value, letter) => `${letter.toUpperCase()}${value}`,
 	).join(" ");
-	const commands = [`$J=${modal} G91 ` + s + ` F${feedrate}`];
+	const commands = [`$J=${modal} G91 ${s} F${feedrate}`];
 	controller.command("gcode", commands);
 }
 

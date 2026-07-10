@@ -441,7 +441,7 @@ const Steps = () => {
 													setMoveDistance(Number(e.target.value))
 												}
 												disabled={currentStep !== 1}
-												className="w-28"
+												wrapperClassName="w-28"
 												suffix={units ?? "mm"}
 											/>
 										</div>
@@ -489,7 +489,7 @@ const Steps = () => {
 													setMeasuredDistance(Number(e.target.value))
 												}
 												disabled={currentStep !== 2}
-												className="w-28"
+												wrapperClassName="w-28"
 												suffix={units ?? "mm"}
 											/>
 										</div>
