@@ -100,6 +100,13 @@ const getExtraPluginsDirs = () => {
 		dirs.push(path.resolve(process.cwd(), "plugins"));
 	}
 
+	// In production builds we bundle selected default plugins under the app
+	// output root at "<build>/plugins". settings.base.js is loaded from
+	// "<build>/server/config", so two levels up lands at "<build>".
+	if (process.env.NODE_ENV === "production") {
+		dirs.push(path.resolve(__dirname, "..", "..", "plugins"));
+	}
+
 	return dirs;
 };
 
