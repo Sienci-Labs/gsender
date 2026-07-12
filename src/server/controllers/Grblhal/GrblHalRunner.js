@@ -310,69 +310,28 @@ class GrblHalRunner extends events.EventEmitter {
             return;
         }
         if (type === GrblHalLineParserResultTool) {
-            delete payload.raw;
+            const { raw, ...tool } = payload;
             const nextSettings = {
                 ...this.settings,
                 toolTable: {
                     ...this.settings.toolTable,
-                    [payload.id]: payload
+                    [tool.id]: tool
                 }
             };
             if (!_.isEqual(this.settings.toolTable, nextSettings.toolTable)) {
                 this.settings = nextSettings;
             }
+            this.emit('tool', { ...tool, raw });
             return;
         }
         if (type === GrblHalLineParserResultParameters) {
             const { name, value } = payload;
-            // Update tool offsets for current tool based on PRB results
-            // This is necessary in order to update offsets mid tool change or toolpath
-            // Ignore prb output for tool 0 (empty) since nothing to update
-            // Ignore PRB if no success on probe
-            const currentTool = this.state.status.currentTool;
-            const isProbeSuccess = name === 'PRB' && value.result === 1;
-            const isCurrentToolSet = currentTool > 0;
-            const toolTable = _.get(this.settings, 'toolTable', {});
-            const isToolTablePopulated = !_.isEmpty(toolTable);
-            const hasCurrentToolEntry = _.has(toolTable, currentTool);
-            const shouldUpdateToolOffsets = isProbeSuccess &&
-                isCurrentToolSet &&
-                isToolTablePopulated &&
-                hasCurrentToolEntry;
-
-            if (isProbeSuccess && isCurrentToolSet && !shouldUpdateToolOffsets) {
-                log.warn(
-                    `[PRB] Skipping tool offset update for current tool T${currentTool}. ` +
-                        `isToolTablePopulated=${isToolTablePopulated}, ` +
-                        `hasCurrentToolEntry=${hasCurrentToolEntry}`
-                );
-            }
-
-            if (shouldUpdateToolOffsets) {
-                const currentToolData = toolTable[currentTool] || {};
-                const currentToolOffsets = _.isPlainObject(currentToolData.toolOffsets)
-                    ? currentToolData.toolOffsets
-                    : {};
-                const nextSettings = {
-                    ...this.settings,
-                    toolTable: {
-                        ...this.settings.toolTable,
-                        [currentTool]: {
-                            ...currentToolData,
-                            toolOffsets: {
-                                ...currentToolOffsets,
-                                x: Number(value.x),
-                                y: Number(value.y),
-                                z: Number(value.z)
-                            }
-                        }
-                    }
-                };
-
-                if (!_.isEqual(this.settings.toolTable, nextSettings.toolTable)) {
-                    this.settings = nextSettings;
-                }
-            }
+            // A [PRB:] result is a machine coordinate, not a tool offset - the two
+            // only coincide when the tool change macro happens to store the raw
+            // trigger position. Writing it into the tool table clobbered the real
+            // offset on any successful probe, including an ordinary workpiece
+            // touch off. The tool table is refreshed from $# after every tool
+            // change and probe, so let that be the source of truth.
             const nextSettings = {
                 ...this.settings,
                 parameters: {

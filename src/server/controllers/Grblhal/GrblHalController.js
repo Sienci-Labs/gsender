@@ -1006,6 +1006,10 @@ class GrblHalController {
             this.emit('serialport:read', res.raw);
         });
 
+        this.runner.on('tool', (res) => {
+            this.emit('serialport:read', res.raw);
+        });
+
         this.runner.on('feedback', (res) => {
             this.emit('serialport:read', res.raw);
         });
