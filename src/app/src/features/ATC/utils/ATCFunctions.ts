@@ -121,7 +121,9 @@ export function releaseToolFromSpindle() {
 }
 
 export function loadTool(toolID) {
-    controller.command('gcode', [`M6 T${toolID}`]);
+    // M6 runs the tool change macro, which probes the tool and writes its offset
+    // with G10 L1, so the tool table has to be re-read afterwards.
+    controller.command('gcode', [`M6 T${toolID}`, '$#']);
 }
 
 export function loadAndSaveToRack(toolID) {
