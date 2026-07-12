@@ -79,13 +79,15 @@ export default class Generator {
         ];
 
         function processGcode(arr, depth, count, maxDepth) {
+            const isLastLayer = depth >= maxDepth;
             const gcodeLayer = generateGcode({
                 depth: depth < maxDepth ? depth : maxDepth,
                 count,
+                isLastLayer,
             });
             arr.push(...gcodeLayer);
 
-            if (depth >= maxDepth) {
+            if (isLastLayer) {
                 return arr;
             }
 
@@ -98,13 +100,9 @@ export default class Generator {
 
         const m9 = mist || flood ? ['M9 ;Turn off Coolant'] : [];
 
-        gcodeArr.push(
-            '(Footer)',
-            ...m9,
-            'M5 ;Turn off spindle',
-            ...dwell,
-            '(End of Footer)',
-        );
+        // Note: the spindle is stopped before the final rapid back to the
+        // start position (see returnToZero), not here in the footer.
+        gcodeArr.push('(Footer)', ...m9, '(End of Footer)');
 
         if (returnArray) {
             return gcodeArr;
@@ -122,7 +120,7 @@ export default class Generator {
      * @param {number} count - Count value keeping track of the number of layers
      * @returns {array} - Returns the generated gcode set in an array
      */
-    generateGcode = ({ depth, count }) => {
+    generateGcode = ({ depth, count, isLastLayer = false }) => {
         const {
             bitDiameter,
             stepover,
@@ -164,6 +162,7 @@ export default class Generator {
             axisFactors,
             cutDirectionFlipped,
             startPosition,
+            isLastLayer,
         };
 
         const executeSurfacing = {
@@ -330,12 +329,24 @@ export default class Generator {
         return zVal;
     }
 
-    returnToZero = () => {
+    returnToZero = (stopSpindle = false) => {
         const z = this.getSafeZValue();
+        const { shouldDwell } = this.surfacing;
+
+        // Stop the spindle once we've retracted to the safe Z height (so it
+        // isn't stopped while the bit is still touching the surface) but
+        // before rapiding back home in X/Y.
+        const spindleStop = stopSpindle
+            ? [
+                  'M5 ;Turn off spindle',
+                  ...(shouldDwell ? [`G04 P${SURFACING_DWELL_DURATION}`] : []),
+              ]
+            : [];
 
         return [
             '(Returning to Zero)',
             `G0 Z${z}`,
+            ...spindleStop,
             'G0 X0 Y0',
             '(End of Returning to Zero)',
             '',
@@ -510,7 +521,7 @@ export default class Generator {
             getNewStartPos,
             getNewEndPos,
         );
-        const returnToStart = returnToZero();
+        const returnToStart = returnToZero(options.isLastLayer);
         const spiralStartArea = enterSpiralStartArea(
             stepoverAmount * xFactor,
             stepoverAmount * yFactor,
@@ -843,7 +854,7 @@ export default class Generator {
             getNewStartPos,
             getNewEndPos,
         );
-        const returnToStart = returnToZero();
+        const returnToStart = returnToZero(options.isLastLayer);
 
         const startArea = [
             '(Entering Start Area)',
