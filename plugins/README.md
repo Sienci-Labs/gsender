@@ -14,19 +14,35 @@ Then restart gSender.
 
 ## Included examples
 
-| Folder | Description |
-|--------|-------------|
-| `example-hello/` | Minimal bridge test — fetches machine context |
-| `basic-cam/` | Reference CAM plugin — rectangle profile + drill grid |
-| `react-ts-app/` | React + TypeScript + Vite example — run `npm install && npm run build` before installing |
+| Folder | Stack | What it demonstrates |
+|--------|-------|----------------------|
+| `example-hello/` | Plain JS + Vite | Bridge client — `gsender`, `subscribeWorkspaceState`, `subscribeSelector` |
+| `react-ts-app/` | React + TypeScript + Vite | React hooks — `useWorkspaceState`, `useTypedSelector` |
+| `example-viewer/` | Plain JS + Vite | Embedded G-code preview — `GCodeViewer`, `gsender.gcode.loadToVisualizer` |
+| `basic-cam/` | React + TypeScript + Vite + Tailwind | Full reference CAM plugin — combines all SDK entry points |
 
 Each folder must contain `gsender-plugin.json` and a `ui/` directory with the built SPA entry file.
 
-### React / TypeScript plugins
+### Building a plugin
 
-1. `cd plugins/react-ts-app && npm install && npm run build`
-2. Copy the whole `react-ts-app` folder (including built `ui/`) into your plugins directory
-3. Restart gSender
+From the plugin folder:
+
+```bash
+npm install
+npm run build
+```
+
+This writes the production bundle to `ui/` (gitignored — build before copying or shipping).
+
+For local dev in this repo you can skip copying: gSender loads `plugins/` directly when `NODE_ENV=development`.
+
+### Starting from a template
+
+1. Copy the example closest to your stack (`example-hello`, `react-ts-app`, or `example-viewer`).
+2. Edit `gsender-plugin.json` — change `id`, `name`, `route`, and `label`.
+3. Rename the folder (optional; the manifest `id` is what matters).
+4. `npm install && npm run build`
+5. Restart gSender (or rely on dev hot-reload for edits to an already-loaded plugin).
 
 ## Local development
 
@@ -44,11 +60,9 @@ list — `:`-separated on macOS/Linux, `;`-separated on Windows).
 
 In development the server watches each plugin's served `ui/` directory and
 pushes a `plugins:changed` event over Socket.IO; open plugin iframes reload
-automatically. So the dev loop is:
+automatically. The dev loop:
 
-- **Vanilla plugins** (`example-hello`, `basic-cam`): edit files under `ui/` →
-  the iframe reloads instantly.
-- **Built plugins** (`react-ts-app`): run `npm run build -- --watch` so Vite
+- **Built plugins**: run `npm run build -- --watch` in the plugin folder so Vite
   rewrites `ui/` on save → the iframe reloads.
 
 Note: **adding a brand-new plugin folder** still needs a server restart (its
@@ -64,11 +78,15 @@ npm run prepare-default-plugins
 ```
 
 `build-prod` and `build-latest` already run this automatically (including CI).
-By default it bundles `basic-cam`; override with:
+By default only `basic-cam` is bundled; override with:
 
 ```bash
 GSENDER_DEFAULT_PLUGINS=basic-cam,another-plugin npm run prepare-default-plugins
 ```
+
+Example plugins (`example-hello`, `react-ts-app`, `example-viewer`) are for
+reference and local dev — they are **not** included in production builds unless
+you add them to `GSENDER_DEFAULT_PLUGINS`.
 
 ## Plugin SDK
 
@@ -90,7 +108,7 @@ The SDK re-exports the same G-code viewer engine gSender uses
 single, version-pinned import. It lives on a separate entry point
 (`@sienci/gsender-plugin-sdk/viewer`) so the three.js/gviewer bundle only loads
 for plugins that use it. This requires a bundler, so the plugin must be built
-(like `react-ts-app`) and depend on `@sienci/gviewer` + `three`.
+(like `example-viewer` or `basic-cam`) and depend on `@sienci/gviewer` + `three`.
 
 The viewer is loaded imperatively via its ref (`loadFromText`, `focusToModel`,
 `setOptions`, `snapCameraToView`, …) — see the
