@@ -103,6 +103,9 @@ class GcodeToolpath {
         a: 0,
     };
 
+    // Whether an M6 command has been parsed, as opposed to a bare T word
+    sawM6 = false;
+
     modal = {
         // Moton Mode
         // G0, G1, G2, G3, G38.2, G38.3, G38.4, G38.5, G80
@@ -681,6 +684,7 @@ class GcodeToolpath {
         },
         // M6: Tool Change
         'M6': (params) => {
+            this.sawM6 = true;
             if (params && params.T !== undefined) {
                 this.setModal({ tool: params.T });
             }
@@ -759,6 +763,7 @@ class GcodeToolpath {
         const toolpath = new Interpreter({ handlers: this.handlers });
         toolpath.getPosition = () => ({ ...this.position });
         toolpath.getModal = () => ({ ...this.modal });
+        toolpath.hasSeenM6 = () => this.sawM6;
         toolpath.setPosition = (...pos) => {
             return this.setPosition(...pos);
         };
