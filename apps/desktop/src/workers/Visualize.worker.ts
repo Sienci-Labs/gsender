@@ -53,6 +53,7 @@ interface WorkerData {
     rapidOpacity?: number;
     shouldIncludeSVG?: boolean;
     needsVisualization?: boolean;
+    svgOnly?: boolean;
     accelerations?: any;
     maxFeedrates?: any;
     atcEnabled?: boolean;
@@ -348,6 +349,7 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
         rapidOpacity = 0.5,
         shouldIncludeSVG = false,
         needsVisualization = true,
+        svgOnly: svgOnlyRequested = false,
         // parsedData = {},
         // isNewFile = false,
         accelerations,
@@ -395,7 +397,10 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
     };
     let currentTool = 0;
     const toolchanges: number[] = [];
-    const shouldBuildColors = needsVisualization && Boolean(theme);
+    // svgOnly: pendant top-down mode — stream deduplicated 2D segment groups
+    // during parsing and skip the 3D vertex/color/frame buffers entirely.
+    const svgOnly = svgOnlyRequested && needsVisualization && !isSecondary;
+    const shouldBuildColors = needsVisualization && Boolean(theme) && !svgOnly;
     const asRgb = (color: THREE.Color): [number, number, number] => [
         color.r,
         color.g,
@@ -427,6 +432,99 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
 
         const [r, g, b] = getMotionColor(motion);
         pushFloat32_4Repeat(colorValues, r, g, b, opacity, count);
+    };
+
+    // svgOnly state: color-keyed groups of 2D segments [x1,y1,x2,y2], deduped
+    // on a 0.01mm grid so repeated depth passes and pure-Z moves are dropped.
+    type Svg2DGroup = {
+        hexColor: string;
+        opacity: number;
+        positions: GrowableFloat32Buffer;
+        seen: Set<number>;
+    };
+    const svg2DGroups = new Map<string, Svg2DGroup>();
+    let svg2DKept = 0;
+    let svg2DDupeDrops = 0;
+    let svg2DDegenerateDrops = 0;
+    let svg2DCachedRgb: [number, number, number] | null = null;
+    let svg2DCachedOpacity = -1;
+    let svg2DCachedGroup: Svg2DGroup | null = null;
+    const rgbToHex = (rgb: [number, number, number]): string => {
+        const ch = (v: number) =>
+            Math.round(Math.min(1, Math.max(0, v)) * 255)
+                .toString(16)
+                .padStart(2, '0');
+        return `#${ch(rgb[0])}${ch(rgb[1])}${ch(rgb[2])}`;
+    };
+    const getSvg2DGroup = (motion: string, opacity: number): Svg2DGroup => {
+        const rgb = getMotionColor(motion);
+        // Motion colors change only on toolchange, so a one-entry cache keyed
+        // by array identity avoids per-segment hex/map work.
+        if (rgb === svg2DCachedRgb && opacity === svg2DCachedOpacity) {
+            return svg2DCachedGroup!;
+        }
+        const hexColor = rgbToHex(rgb);
+        const key = `${hexColor}|${Math.round(opacity * 100)}`;
+        let group = svg2DGroups.get(key);
+        if (!group) {
+            group = {
+                hexColor,
+                opacity,
+                positions: { data: new Float32Array(4096), length: 0 },
+                seen: new Set(),
+            };
+            svg2DGroups.set(key, group);
+        }
+        svg2DCachedRgb = rgb;
+        svg2DCachedOpacity = opacity;
+        svg2DCachedGroup = group;
+        return group;
+    };
+    const mixHash2 = (a: number, b: number): number => {
+        let h = Math.imul(a, 0x85ebca6b) ^ Math.imul(b, 0xc2b2ae35);
+        h ^= h >>> 15;
+        h = Math.imul(h, 0x27d4eb2f);
+        h ^= h >>> 13;
+        return h >>> 0;
+    };
+    const emitSvg2DSegment = (
+        motion: string,
+        opacity: number,
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+    ): void => {
+        let qx1 = Math.round(x1 * 100);
+        let qy1 = Math.round(y1 * 100);
+        let qx2 = Math.round(x2 * 100);
+        let qy2 = Math.round(y2 * 100);
+        // No XY extent (plunge/retract/micro-move) — invisible from above
+        if (qx1 === qx2 && qy1 === qy2) {
+            svg2DDegenerateDrops++;
+            return;
+        }
+        // Canonical endpoint order so opposite-direction passes dedupe too
+        if (qx1 > qx2 || (qx1 === qx2 && qy1 > qy2)) {
+            let t = qx1;
+            qx1 = qx2;
+            qx2 = t;
+            t = qy1;
+            qy1 = qy2;
+            qy2 = t;
+        }
+        const group = getSvg2DGroup(motion, opacity);
+        // 53-bit key: 32 bits from one endpoint hash + 21 from the other.
+        // A collision only drops one segment from an already-overdrawn preview.
+        const key =
+            mixHash2(qx1, qy1) * 0x200000 + (mixHash2(qx2, qy2) >>> 11);
+        if (group.seen.has(key)) {
+            svg2DDupeDrops++;
+            return;
+        }
+        group.seen.add(key);
+        svg2DKept++;
+        pushFloat32_4Repeat(group.positions, x1, y1, x2, y2, 1);
     };
 
     // Laser specific state variables
@@ -543,8 +641,10 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
     };
 
     const onData = () => {
-        const vertexIndex = vertices.length / 3;
-        pushUint32_1(frames, vertexIndex);
+        if (!svgOnly) {
+            const vertexIndex = vertices.length / 3;
+            pushUint32_1(frames, vertexIndex);
+        }
 
         currentLines++;
         if (
@@ -613,15 +713,19 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                             if (i > 0) {
                                 // Add line segment from previous point to current point
                                 pushMotionColor(motion, opacity, 2);
-                                pushFloat32_6(
-                                    vertices,
-                                    prevX,
-                                    prevY,
-                                    prevZ,
-                                    currX,
-                                    currY,
-                                    currZ,
-                                );
+                                if (svgOnly) {
+                                    emitSvg2DSegment(motion, opacity, prevX, prevY, currX, currY);
+                                } else {
+                                    pushFloat32_6(
+                                        vertices,
+                                        prevX,
+                                        prevY,
+                                        prevZ,
+                                        currX,
+                                        currY,
+                                        currZ,
+                                    );
+                                }
 
                                 // SVG
                                 if (shouldIncludeSVG) {
@@ -666,15 +770,19 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                         // normal
                         const opacity = motion === 'G0' ? rapidOpacity : 1;
                         pushMotionColor(motion, opacity, 2);
-                        pushFloat32_6(
-                            vertices,
-                            v1.x,
-                            v1.y,
-                            v1.z,
-                            v2.x,
-                            v2.y,
-                            v2.z,
-                        );
+                        if (svgOnly) {
+                            emitSvg2DSegment(motion, opacity, v1.x, v1.y, v2.x, v2.y);
+                        } else {
+                            pushFloat32_6(
+                                vertices,
+                                v1.x,
+                                v1.y,
+                                v1.z,
+                                v2.x,
+                                v2.y,
+                                v2.z,
+                            );
+                        }
 
                         // svg
                         if (shouldIncludeSVG) {
@@ -731,15 +839,19 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                         if (i > 0) {
                             // Add line segment from previous point to current point
                             pushMotionColor(motion, 1, 2);
-                            pushFloat32_6(
-                                vertices,
-                                prevX,
-                                prevY,
-                                prevZ,
-                                currX,
-                                currY,
-                                currZ,
-                            );
+                            if (svgOnly) {
+                                emitSvg2DSegment(motion, 1, prevX, prevY, currX, currY);
+                            } else {
+                                pushFloat32_6(
+                                    vertices,
+                                    prevX,
+                                    prevY,
+                                    prevZ,
+                                    currX,
+                                    currY,
+                                    currZ,
+                                );
+                            }
                         }
 
                         prevX = currX;
@@ -785,7 +897,14 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
 
                     for (let i = 0; i < points.length; ++i) {
                         const point = points[i];
-                        pushFloat32_3(vertices, v2.x, point.x, point.y);
+                        if (svgOnly) {
+                            if (i > 0) {
+                                // 3D vertex is (v2.x, point.x, point.y) — top-down XY is (v2.x, point.x)
+                                emitSvg2DSegment(motion, 1, v2.x, points[i - 1].x, v2.x, point.x);
+                            }
+                        } else {
+                            pushFloat32_3(vertices, v2.x, point.x, point.y);
+                        }
                         pushMotionColor(motion, 1);
                     }
                 }
@@ -838,10 +957,17 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                         const pointA = points[i - 1];
                         const pointB = points[i];
                         const z = ((v2.z - v1.z) / pointCount) * i + v1.z;
+                        const zA = ((v2.z - v1.z) / pointCount) * (i - 1) + v1.z;
 
                         if (plane === 'G17') {
                             // XY-plane
-                            pushFloat32_3(vertices, point.x, point.y, z);
+                            if (svgOnly) {
+                                if (i > 0) {
+                                    emitSvg2DSegment(motion, 1, pointA.x, pointA.y, pointB.x, pointB.y);
+                                }
+                            } else {
+                                pushFloat32_3(vertices, point.x, point.y, z);
+                            }
                             if (shouldIncludeSVG && i > 0) {
                                 SVGVertices.push({
                                     x1: pointA.x * multiplier,
@@ -852,7 +978,14 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                             }
                         } else if (plane === 'G18') {
                             // ZX-plane
-                            pushFloat32_3(vertices, point.y, z, point.x);
+                            if (svgOnly) {
+                                if (i > 0) {
+                                    // 3D vertex is (point.y, z, point.x) — top-down XY is (point.y, z)
+                                    emitSvg2DSegment(motion, 1, pointA.y, zA, pointB.y, z);
+                                }
+                            } else {
+                                pushFloat32_3(vertices, point.y, z, point.x);
+                            }
                             if (shouldIncludeSVG && i > 0) {
                                 SVGVertices.push({
                                     x1: pointA.y * multiplier,
@@ -863,7 +996,14 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                             }
                         } else if (plane === 'G19') {
                             // YZ-plane
-                            pushFloat32_3(vertices, z, point.x, point.y);
+                            if (svgOnly) {
+                                if (i > 0) {
+                                    // 3D vertex is (z, point.x, point.y) — top-down XY is (z, point.x)
+                                    emitSvg2DSegment(motion, 1, zA, pointA.x, z, pointB.x);
+                                }
+                            } else {
+                                pushFloat32_3(vertices, z, point.x, point.y);
+                            }
                             if (shouldIncludeSVG && i > 0) {
                                 if (i > 0) {
                                     SVGVertices.push({
@@ -1026,7 +1166,7 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                 (profiler.counts.vm_data_events || 0) + 1;
         }
 
-        if (isLaser && needsVisualization) {
+        if (isLaser && needsVisualization && !svgOnly) {
             updateSpindleStateFromLine(data);
             const spindleIsOn = vm.modal.spindle === 'M3' || vm.modal.spindle === 'M4';
             pushFloat32_1(spindleFrameSpeeds, spindleIsOn ? spindleSpeed : 0);
@@ -1161,6 +1301,9 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
         profiler.counts.color_values_len = colorValues.length;
         profiler.counts.color_vertices_len = colorVertexCount;
         profiler.counts.toolchanges_len = toolchanges.length;
+        profiler.counts.svg2d_segments_kept = svg2DKept;
+        profiler.counts.svg2d_dupe_drops = svg2DDupeDrops;
+        profiler.counts.svg2d_degenerate_drops = svg2DDegenerateDrops;
         profiler.counts.spindle_frame_speeds_len = spindleFrameSpeeds.length;
         profiler.counts.paths_len = paths.length;
         profiler.counts.estimates_len = estimates.length;
@@ -1238,7 +1381,8 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
         isLaser?: boolean;
         isSecondary?: boolean;
         activeVisualizer?: VISUALIZER_TYPES_T;
-        svgSegmentGroups?: { hexColor: string; opacity: number; positionsBuffer: ArrayBuffer; positionsLen: number }[];
+        svgSegmentGroups?: { hexColor: string; opacity: number; positionsBuffer: ArrayBuffer; positionsLen: number; stride?: 4 | 6 }[];
+        svgMeta?: { minZ: number; maxZ: number };
     } = {
         type: 'geometryReady',
         jobId,
@@ -1268,10 +1412,29 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
         geometryMessage.isLaser = isLaser;
     }
 
-    const svgGroups = needsVisualization && !isSecondary
-        ? buildSvgGroups(compactVertices, compactFrames, compactColorArray, tVertices.length, tFrames.length)
-        : [];
+    const svgGroups = svgOnly
+        ? Array.from(svg2DGroups.values()).map((group) => {
+              const positions = toCompactFloat32Array(
+                  toUsedFloat32View(group.positions),
+              );
+              return {
+                  hexColor: group.hexColor,
+                  opacity: group.opacity,
+                  positionsBuffer: positions.buffer,
+                  positionsLen: positions.length,
+                  stride: 4 as const,
+              };
+          })
+        : needsVisualization && !isSecondary
+          ? buildSvgGroups(compactVertices, compactFrames, compactColorArray, tVertices.length, tFrames.length)
+          : [];
     geometryMessage.svgSegmentGroups = svgGroups;
+    if (svgOnly) {
+        geometryMessage.svgMeta = {
+            minZ: fileInfo.bbox?.min?.z ?? 0,
+            maxZ: fileInfo.bbox?.max?.z ?? 0,
+        };
+    }
 
     const transferList: ArrayBuffer[] = [
         compactVertices.buffer,

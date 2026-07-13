@@ -67,7 +67,8 @@ type VisualizeWorkerGeometryMessage = {
     isLaser?: boolean;
     isSecondary?: boolean;
     activeVisualizer?: string;
-    svgSegmentGroups?: { hexColor: string; opacity: number; positionsBuffer: ArrayBuffer; positionsLen: number }[];
+    svgSegmentGroups?: { hexColor: string; opacity: number; positionsBuffer: ArrayBuffer; positionsLen: number; stride?: 4 | 6 }[];
+    svgMeta?: { minZ: number; maxZ: number };
 };
 
 type VisualizeWorkerMetadataMessage = {
@@ -226,6 +227,9 @@ const buildWorkerRequest = (payload: GcodeLoadPayload, jobId: number) => {
         rapidOpacity: PENDANT_RAPID_OPACITY,
         shouldIncludeSVG: false,
         needsVisualization: true,
+        // Top-down SVG mode: worker streams deduplicated 2D segment groups and
+        // skips the 3D vertex/color/frame buffers entirely.
+        svgOnly: true,
         isNewFile,
         accelerations,
         maxFeedrates,

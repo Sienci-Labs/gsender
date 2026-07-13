@@ -21,7 +21,10 @@ export default function Visualizer() {
         const tokens = [
             pubsub.subscribe('file:load', (_msg, data) => {
                 if (data.svgSegmentGroups?.length) {
-                    svgRef.current?.loadFromPrecomputedGroups(data.svgSegmentGroups);
+                    svgRef.current?.loadFromPrecomputedGroups(
+                        data.svgSegmentGroups,
+                        data.svgMeta,
+                    );
                 } else {
                     svgRef.current?.loadFromWorkerData(data);
                 }
@@ -61,7 +64,7 @@ export default function Visualizer() {
                 rapidColor: PENDANT_RAPID_COLOR,
                 boundingBoxColor: PENDANT_BOUNDS_COLOR,
                 strokeWidth: 1,
-                projectionMode: 'isometric',
+                projectionMode: 'top',
                 padding: 8,
             }}
             className="w-full h-full"
