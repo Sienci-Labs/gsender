@@ -1,0 +1,17 @@
+{
+	"id": "com.sienci.example-viewer",
+	"name": "G-code Viewer Demo",
+	"version": "0.1.0",
+	"engine": ">=1.6.0",
+	"ui": {
+		"entry": "ui/index.html",
+		"contributions": [
+			{
+				"slot": "tools-page",
+				"route": "example-viewer",
+				"label": "Viewer Demo"
+			}
+		]
+	},
+	"permissions": ["machine:read", "files:read"]
+}

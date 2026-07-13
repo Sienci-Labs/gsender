@@ -1,0 +1,155 @@
+:root {
+	color-scheme: light dark;
+	font-family: system-ui, -apple-system, sans-serif;
+	line-height: 1.5;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	padding: 1rem;
+	background: #f4f4f5;
+	color: #18181b;
+}
+
+@media (prefers-color-scheme: dark) {
+	body {
+		background: #09090b;
+		color: #fafafa;
+	}
+}
+
+.app {
+	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+header h1 {
+	margin: 0 0 0.25rem;
+	font-size: 1.5rem;
+}
+
+.lede {
+	margin: 0;
+	color: #71717a;
+	font-size: 0.9rem;
+}
+
+.layout {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 1rem;
+	align-items: start;
+}
+
+@media (max-width: 48rem) {
+	.layout {
+		grid-template-columns: 1fr;
+	}
+}
+
+.card {
+	padding: 1rem;
+	border: 1px solid #e4e4e7;
+	border-radius: 0.5rem;
+	background: #fff;
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	min-height: 0;
+	height: 100%;
+}
+
+@media (prefers-color-scheme: dark) {
+	.card {
+		border-color: #27272a;
+		background: #18181b;
+	}
+}
+
+.card h2 {
+	margin: 0;
+	font-size: 1rem;
+}
+
+textarea {
+	flex: 1;
+	min-height: 14rem;
+	padding: 0.5rem;
+	border: 1px solid #d4d4d8;
+	border-radius: 0.375rem;
+	font-family: ui-monospace, monospace;
+	font-size: 0.8rem;
+	resize: vertical;
+	background: #fafafa;
+	color: inherit;
+}
+
+@media (prefers-color-scheme: dark) {
+	textarea {
+		border-color: #3f3f46;
+		background: #27272a;
+	}
+}
+
+.actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+button {
+	padding: 0.4rem 0.75rem;
+	border: 1px solid #d4d4d8;
+	border-radius: 0.375rem;
+	background: #fafafa;
+	cursor: pointer;
+	font: inherit;
+}
+
+button:hover {
+	background: #f4f4f5;
+}
+
+.status {
+	margin: 0;
+	font-size: 0.8rem;
+	color: #71717a;
+	min-height: 1.2em;
+}
+
+.card.preview {
+	overflow: hidden;
+}
+
+.viewer-container {
+	position: relative;
+	width: 100%;
+	height: 20rem;
+	border: 1px solid #e4e4e7;
+	border-radius: 0.375rem;
+	overflow: hidden;
+	background: #020617;
+	isolation: isolate;
+}
+
+.viewer-container canvas {
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
+@media (prefers-color-scheme: dark) {
+	.viewer-container {
+		border-color: #3f3f46;
+	}
+}
+
+code {
+	font-size: 0.85em;
+}

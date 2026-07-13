@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>G-code Viewer Demo</title>
+	</head>
+	<body>
+		<main class="app">
+			<header>
+				<h1>G-code Viewer Demo</h1>
+				<p class="lede">
+					Plain JavaScript plugin using
+					<code>@sienci/gsender-plugin-sdk/viewer</code> for an embedded
+					preview.
+				</p>
+			</header>
+
+			<div class="layout">
+				<section class="card editor">
+					<h2>G-Code</h2>
+					<textarea id="gcode-input" spellcheck="false"></textarea>
+					<div class="actions">
+						<button type="button" id="load-preview">Update preview</button>
+						<button type="button" id="load-main">Send to gSender</button>
+					</div>
+					<p id="status" class="status" aria-live="polite"></p>
+				</section>
+
+				<section class="card preview">
+					<h2>Embedded preview</h2>
+					<div id="viewer-container" class="viewer-container"></div>
+				</section>
+			</div>
+		</main>
+		<script type="module" src="/src/main.js"></script>
+	</body>
+</html>

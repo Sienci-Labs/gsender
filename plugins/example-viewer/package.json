@@ -1,0 +1,19 @@
+{
+	"name": "example-viewer",
+	"private": true,
+	"version": "0.1.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build",
+		"preview": "vite preview"
+	},
+	"dependencies": {
+		"@sienci/gsender-plugin-sdk": "file:../../packages/plugin-sdk",
+		"@sienci/gviewer": "^0.1.21",
+		"three": "^0.168.0"
+	},
+	"devDependencies": {
+		"vite": "^6.0.0"
+	}
+}
