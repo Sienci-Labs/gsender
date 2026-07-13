@@ -3,11 +3,51 @@ export const PLUGIN_BRIDGE_CHANNEL = "gsender:plugin-bridge";
 export type PluginBridgeRequestType =
 	| "machine:get:context"
 	| "machine:command"
+	| "machine:busy:set"
 	| "gcode:load:to:visualizer"
 	| "workspace:get:state"
-	| "redux:get:state";
+	| "redux:get:state"
+	| "viewer:screen-to-world"
+	| "viewer:world-to-screen"
+	| "viewer:camera:set"
+	| "viewer:camera:lock-rotate"
+	| "viewer:pick:arm"
+	| "viewer:pick:disarm"
+	| "viewer:overlay:set";
 
-export type PluginBridgeTopic = "workspace" | "redux";
+export type PluginBridgeTopic = "workspace" | "redux" | "viewer";
+
+// --- Viewer bridge types ------------------------------------------------------
+// Shared shapes for the `viewer:*` surface. The host defines identical types on
+// its end of the bridge — keep these exactly in sync with that contract.
+
+/** Camera presets accepted by `viewer:camera:set`. */
+export type CameraView = "top" | "3d" | "front" | "left" | "right";
+
+/**
+ * A marker drawn on the host visualizer's overlay via `viewer:overlay:set`.
+ * Coordinates are in world space (the same space `screenToWorld` returns).
+ */
+export interface OverlayMarker {
+	id: string;
+	x: number;
+	y: number;
+	z?: number; // world coordinates
+	shape?: "circle" | "cross" | "ring"; // default 'circle'
+	color?: string; // CSS color
+	size?: number; // px, default 6
+	label?: string;
+}
+
+/** Events pushed on the `"viewer"` topic while a pick is armed. */
+export type ViewerPickEvent =
+	| {
+			kind: "pick";
+			world: { x: number; y: number; z: number };
+			screen: { x: number; y: number };
+	  }
+	// 0..1 while a press-and-hold pick is in progress
+	| { kind: "hold-progress"; t: number };
 
 export type PluginBridgeRequest = {
 	id: string;

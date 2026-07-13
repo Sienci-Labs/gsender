@@ -55,7 +55,6 @@ import {
 	FLEXOKI_DARK_THEME,
 	GRBL,
 	GRBL_ACTIVE_STATE_CHECK,
-	GRBL_ACTIVE_STATE_IDLE,
 	GRBL_ACTIVE_STATE_RUN,
 	GRBLHAL,
 	GRUVBOX_LIGHT_THEME,
@@ -85,17 +84,25 @@ const THEME_NAME_TO_PRESET: Record<string, GCodeViewerThemePresetName> = {
 const LIGHT_LIKE_PRESETS = new Set<GCodeViewerThemePresetName>(["light", "gruvbox-light", "ayu-light"]);
 
 import { outlineResponse } from "../../workers/Outline.response";
-import { getSafeXYMoveCode } from "app/features/DRO/utils/SafeMove";
 import {
 	computeKeepoutWorkRect,
 	computeMachineBedWorkRect,
 } from "app/features/DRO/utils/RapidPosition";
+import type { OverlayMarker } from "app/features/Plugins/types";
 import type { Actions, CAMERA_POSITIONS_T, State } from "./definitions";
+import {
+	visualizerBridge,
+	type VisualizerBridgeHandle,
+} from "./visualizerBridge";
 
-// "Move To Here": how long to hold before committing, and how far the pointer
-// may drift before the gesture is treated as a pan instead of a placement.
-const MOVE_TO_HERE_HOLD_MS = 500;
-const MOVE_TO_HERE_CANCEL_PX = 8;
+// Press-and-hold pick gesture: how long to hold before committing, and how far
+// the pointer may drift before the gesture is treated as an orbit/pan instead of
+// a placement.
+const PICK_HOLD_MS = 500;
+const PICK_CANCEL_PX = 8;
+
+// Default marker color when an overlay marker doesn't specify one.
+const OVERLAY_DEFAULT_COLOR = "rgba(14, 246, 174, 0.95)";
 
 // Maps gSender's camera positions onto gviewer ViewCube presets.
 const VIEW_MAP: Partial<Record<string, GCodeViewerCameraView>> = {
@@ -168,20 +175,64 @@ class GcodeViewer extends Component<Props> {
 
 	lastSpinning: boolean | null = null;
 
-	// "Move To Here" placement-mode state.
-	moveToHereActive = false;
+	// Generic pick-gesture state (armed by plugins through the visualizer bridge).
+	pickMode: "click" | "hold" | null = null;
 
-	mthPointerId: number | null = null;
+	pickOnPick:
+		| ((p: {
+				world: { x: number; y: number; z: number };
+				screen: { x: number; y: number };
+		  }) => void)
+		| null = null;
 
-	mthStart: { x: number; y: number } | null = null;
+	pickOnHoldProgress: ((t: number) => void) | null = null;
 
-	mthTimer: ReturnType<typeof setTimeout> | null = null;
+	pickPointerId: number | null = null;
 
-	mthIndicator: HTMLDivElement | null = null;
+	pickStart: { x: number; y: number } | null = null;
+
+	pickMoved = false;
+
+	pickHoldTimer: ReturnType<typeof setTimeout> | null = null;
+
+	pickHoldStart = 0;
+
+	pickHoldRaf: number | null = null;
+
+	pickIndicator: HTMLDivElement | null = null;
+
+	pickPriorView: CAMERA_POSITIONS_T | null = null;
+
+	// Declarative overlay markers the host draws over the canvas for a plugin.
+	overlayMarkers: OverlayMarker[] = [];
+
+	overlaySvg: SVGSVGElement | null = null;
+
+	overlayRaf: number | null = null;
+
+	// Imperative surface exposed to the plugin bridge. Methods read `this.viewer3d`
+	// lazily so the handle survives viewer recreation (lite-mode toggles, etc.).
+	bridgeHandle: VisualizerBridgeHandle = {
+		screenToWorld: (px, py) => this.viewer3d?.screenToWorld(px, py) ?? null,
+		worldToScreen: (x, y, z) => this.viewer3d?.worldToScreen(x, y, z) ?? null,
+		setRotateEnabled: (on) => this.viewer3d?.setRotateEnabled(on),
+		setCameraView: (view) => this.setCameraView(view),
+		isRotaryFile: () => this.isRotaryFile,
+		armPick: (mode, onPick, onHoldProgress) =>
+			this.armPick(mode, onPick, onHoldProgress),
+		disarmPick: () => this.disarmPick(),
+		setOverlay: (markers) => this.setOverlay(markers),
+	};
 
 	componentDidMount() {
 		this.createViewer();
 		this.subscribe();
+
+		// Only the primary viewer exposes the plugin-facing bridge handle; the
+		// secondary (surfacing preview) never registers.
+		if (!this.props.isSecondary) {
+			visualizerBridge.register(this.bridgeHandle);
+		}
 
 		// Render any geometry that arrived before mount.
 		const existing = _get(this.props.state, "gcode.visualization");
@@ -193,7 +244,11 @@ class GcodeViewer extends Component<Props> {
 	componentWillUnmount() {
 		this.unsubscribe();
 		this.reduxUnsub?.();
-		this.setMoveToHereMode(false);
+		this.disarmPick();
+		this.stopOverlay();
+		if (!this.props.isSecondary) {
+			visualizerBridge.unregister(this.bridgeHandle);
+		}
 		this.viewer3d?.dispose();
 		this.viewerSvg?.dispose();
 		this.viewer3d = null;
@@ -201,21 +256,8 @@ class GcodeViewer extends Component<Props> {
 	}
 
 	componentDidUpdate(prevProps: Props) {
-		// Re-snap on every arm, not just when the camera position value
-		// itself changes, since re-arming after a manual camera rotation
-		// leaves `cameraPosition` unchanged (still "Top").
-		const armingMoveToHere =
-			!prevProps.state.moveToHere && this.props.state.moveToHere;
-		if (
-			prevProps.cameraPosition !== this.props.cameraPosition ||
-			armingMoveToHere
-		) {
+		if (prevProps.cameraPosition !== this.props.cameraPosition) {
 			this.snapToView();
-		}
-
-		// "Move To Here" placement mode armed/disarmed.
-		if (prevProps.state.moveToHere !== this.props.state.moveToHere) {
-			this.setMoveToHereMode(this.props.state.moveToHere);
 		}
 
 		if (!prevProps.show && this.props.show) {
@@ -582,60 +624,104 @@ class GcodeViewer extends Component<Props> {
 		}
 	}
 
-	// --- "Move To Here" placement mode --------------------------------------
+	// Maps a bridge camera view name onto the app's camera actions, which update
+	// React state and (via componentDidUpdate) snap the gviewer camera.
+	setCameraView(view: "top" | "3d" | "front" | "left" | "right") {
+		const cam = this.props.actions.camera;
+		const map: Record<typeof view, (() => void) | undefined> = {
+			top: cam.toTopView,
+			"3d": cam.to3DView,
+			front: cam.toFrontView,
+			left: cam.toLeftSideView,
+			right: cam.toRightSideView,
+		};
+		map[view]?.();
+	}
 
-	// Arm/disarm the press-and-hold gesture. While armed, orbit rotation is
-	// locked (pan + zoom stay live) so the click maps predictably onto the XY
-	// plane, the cursor becomes a crosshair, and pointer listeners are live.
-	setMoveToHereMode(enabled: boolean) {
-		// Placement is a primary-visualizer concept; never arm on the secondary.
-		if (enabled && this.props.isSecondary) {
+	// Restore a previously-saved camera position (used when a hold pick disarms).
+	restoreCameraView(pos: CAMERA_POSITIONS_T) {
+		const cam = this.props.actions.camera;
+		const map: Partial<Record<CAMERA_POSITIONS_T, () => void>> = {
+			Top: cam.toTopView,
+			"3D": cam.to3DView,
+			Front: cam.toFrontView,
+			Left: cam.toLeftSideView,
+			Right: cam.toRightSideView,
+		};
+		map[pos]?.();
+	}
+
+	// --- generic pick gesture (armed by plugins via the visualizer bridge) --
+
+	// Arm the pick gesture. 'hold' is a press-and-hold placement (camera pinned
+	// to Top + orbit locked so the press maps cleanly onto the XY plane); 'click'
+	// is a single click/tap with a small movement threshold so orbit-drags don't
+	// register as picks. Refuses to arm on rotary files (the toolpath root is
+	// X-rotated, so picked XY isn't a meaningful work coordinate) and never arms
+	// on the secondary viewer.
+	armPick(
+		mode: "click" | "hold",
+		onPick: (p: {
+			world: { x: number; y: number; z: number };
+			screen: { x: number; y: number };
+		}) => void,
+		onHoldProgress?: (t: number) => void,
+	) {
+		if (this.props.isSecondary || this.isRotaryFile) {
 			return;
 		}
+		// Re-arming cleanly replaces any prior armed gesture.
+		this.disarmPick();
 
-		this.moveToHereActive = enabled;
+		this.pickMode = mode;
+		this.pickOnPick = onPick;
+		this.pickOnHoldProgress = onHoldProgress ?? null;
+
 		const dom = this.containerRef;
+		if (dom) {
+			dom.style.cursor = "crosshair";
+			dom.addEventListener("pointerdown", this.handlePickPointerDown);
+		}
+		window.addEventListener("pointermove", this.handlePickPointerMove);
+		window.addEventListener("pointerup", this.handlePickPointerUp);
+		window.addEventListener("pointercancel", this.handlePickPointerUp);
 
-		if (enabled) {
+		if (mode === "hold") {
+			this.pickPriorView = this.props.cameraPosition;
+			this.props.actions.camera.toTopView();
 			this.viewer3d?.setRotateEnabled(false);
-			if (dom) {
-				dom.style.cursor = "crosshair";
-				dom.addEventListener("pointerdown", this.handleMoveToHerePointerDown);
-			}
-			window.addEventListener("pointermove", this.handleMoveToHerePointerMove);
-			window.addEventListener("pointerup", this.handleMoveToHerePointerUp);
-			window.addEventListener("pointercancel", this.handleMoveToHerePointerUp);
-		} else {
-			this.viewer3d?.setRotateEnabled(true);
-			if (dom) {
-				dom.style.cursor = "";
-				dom.removeEventListener(
-					"pointerdown",
-					this.handleMoveToHerePointerDown,
-				);
-			}
-			window.removeEventListener(
-				"pointermove",
-				this.handleMoveToHerePointerMove,
-			);
-			window.removeEventListener("pointerup", this.handleMoveToHerePointerUp);
-			window.removeEventListener(
-				"pointercancel",
-				this.handleMoveToHerePointerUp,
-			);
-			this.cancelMoveToHereHold();
 		}
 	}
 
-	machineIsReadyToMove(): boolean {
-		const st = reduxStore.getState();
-		const isConnected = !!_get(st, "connection.isConnected");
-		const activeState = _get(st, "controller.state.status.activeState");
-		return isConnected && activeState === GRBL_ACTIVE_STATE_IDLE;
+	disarmPick() {
+		const dom = this.containerRef;
+		if (dom) {
+			dom.style.cursor = "";
+			dom.removeEventListener("pointerdown", this.handlePickPointerDown);
+		}
+		window.removeEventListener("pointermove", this.handlePickPointerMove);
+		window.removeEventListener("pointerup", this.handlePickPointerUp);
+		window.removeEventListener("pointercancel", this.handlePickPointerUp);
+		this.cancelPickHold();
+
+		// Undo the camera/orbit lock a hold gesture applied.
+		if (this.pickMode === "hold") {
+			this.viewer3d?.setRotateEnabled(true);
+			if (this.pickPriorView) {
+				this.restoreCameraView(this.pickPriorView);
+			}
+		}
+		this.pickPriorView = null;
+		this.pickMode = null;
+		this.pickOnPick = null;
+		this.pickOnHoldProgress = null;
+		this.pickPointerId = null;
+		this.pickStart = null;
+		this.pickMoved = false;
 	}
 
-	handleMoveToHerePointerDown = (e: PointerEvent) => {
-		if (!this.moveToHereActive) {
+	handlePickPointerDown = (e: PointerEvent) => {
+		if (!this.pickMode) {
 			return;
 		}
 		// Primary (left mouse / touch) button only.
@@ -643,117 +729,119 @@ class GcodeViewer extends Component<Props> {
 			return;
 		}
 		// Track a single pointer at a time (ignore multi-touch gestures).
-		if (this.mthPointerId !== null) {
-			return;
-		}
-		if (!this.machineIsReadyToMove()) {
-			toast.info("Machine must be connected and idle to move");
+		if (this.pickPointerId !== null) {
 			return;
 		}
 
-		this.mthPointerId = e.pointerId;
-		this.mthStart = { x: e.clientX, y: e.clientY };
-		this.showMoveToHereIndicator(e.clientX, e.clientY);
+		this.pickPointerId = e.pointerId;
+		this.pickStart = { x: e.clientX, y: e.clientY };
+		this.pickMoved = false;
 
+		if (this.pickMode === "hold") {
+			const { clientX, clientY } = e;
+			this.showPickIndicator(clientX, clientY);
+			this.pickHoldStart = performance.now();
+			// Emit hold progress 0..1 each frame so the plugin can mirror the ring.
+			const tick = () => {
+				const t = Math.min(
+					1,
+					(performance.now() - this.pickHoldStart) / PICK_HOLD_MS,
+				);
+				this.pickOnHoldProgress?.(t);
+				if (t < 1) {
+					this.pickHoldRaf = requestAnimationFrame(tick);
+				}
+			};
+			this.pickHoldRaf = requestAnimationFrame(tick);
+			this.pickHoldTimer = setTimeout(() => {
+				this.commitPick(clientX, clientY);
+			}, PICK_HOLD_MS);
+		}
+	};
+
+	handlePickPointerMove = (e: PointerEvent) => {
+		if (this.pickPointerId === null || e.pointerId !== this.pickPointerId) {
+			return;
+		}
+		if (!this.pickStart) {
+			return;
+		}
+		const dx = e.clientX - this.pickStart.x;
+		const dy = e.clientY - this.pickStart.y;
+		// Drift beyond the threshold means the user is panning/orbiting, not picking.
+		if (Math.hypot(dx, dy) > PICK_CANCEL_PX) {
+			if (this.pickMode === "hold") {
+				this.cancelPickHold();
+			} else {
+				this.pickMoved = true;
+			}
+		}
+	};
+
+	handlePickPointerUp = (e: PointerEvent) => {
+		if (this.pickPointerId === null || e.pointerId !== this.pickPointerId) {
+			return;
+		}
 		const { clientX, clientY } = e;
-		this.mthTimer = setTimeout(() => {
-			this.commitMoveToHere(clientX, clientY);
-		}, MOVE_TO_HERE_HOLD_MS);
-	};
-
-	handleMoveToHerePointerMove = (e: PointerEvent) => {
-		if (this.mthPointerId === null || e.pointerId !== this.mthPointerId) {
+		if (this.pickMode === "click") {
+			const moved = this.pickMoved;
+			this.pickPointerId = null;
+			this.pickStart = null;
+			this.pickMoved = false;
+			// A drag was a pan/orbit; only a clean click fires a pick.
+			if (!moved) {
+				this.commitPick(clientX, clientY);
+			}
 			return;
 		}
-		if (!this.mthStart) {
-			return;
-		}
-		const dx = e.clientX - this.mthStart.x;
-		const dy = e.clientY - this.mthStart.y;
-		// Movement beyond the threshold means the user is panning, not placing.
-		if (Math.hypot(dx, dy) > MOVE_TO_HERE_CANCEL_PX) {
-			this.cancelMoveToHereHold();
-		}
+		// Hold released before the timer completed - cancel the placement.
+		this.cancelPickHold();
 	};
 
-	handleMoveToHerePointerUp = (e: PointerEvent) => {
-		if (this.mthPointerId === null || e.pointerId !== this.mthPointerId) {
-			return;
+	// Tear down the in-progress hold (timer + progress rAF + indicator) while
+	// leaving the gesture armed for another attempt.
+	cancelPickHold() {
+		const wasHolding =
+			this.pickHoldTimer !== null || this.pickHoldRaf !== null;
+		if (this.pickHoldTimer) {
+			clearTimeout(this.pickHoldTimer);
+			this.pickHoldTimer = null;
 		}
-		// Released before the hold completed - cancel the placement.
-		this.cancelMoveToHereHold();
-	};
-
-	cancelMoveToHereHold() {
-		if (this.mthTimer) {
-			clearTimeout(this.mthTimer);
-			this.mthTimer = null;
+		if (this.pickHoldRaf !== null) {
+			cancelAnimationFrame(this.pickHoldRaf);
+			this.pickHoldRaf = null;
 		}
-		this.removeMoveToHereIndicator();
-		this.mthPointerId = null;
-		this.mthStart = null;
+		this.removePickIndicator();
+		this.pickPointerId = null;
+		this.pickStart = null;
+		this.pickMoved = false;
+		if (wasHolding) {
+			this.pickOnHoldProgress?.(0);
+		}
 	}
 
-	commitMoveToHere(clientX: number, clientY: number) {
-		this.cancelMoveToHereHold();
-
-		if (!this.machineIsReadyToMove()) {
-			toast.info("Machine must be connected and idle to move");
-			this.props.actions.camera.disableMoveToHere();
+	commitPick(clientX: number, clientY: number) {
+		// A hold commit tears down its timer/indicator but stays armed so the
+		// plugin can decide whether to disarm.
+		if (this.pickMode === "hold") {
+			this.cancelPickHold();
+		}
+		if (this.isRotaryFile || !this.viewer3d) {
 			return;
 		}
-
-		// gviewer renders rotary toolpaths on an X-rotated root, so the picked
-		// world XY is not a meaningful work coordinate for those files.
-		if (this.isRotaryFile) {
-			toast.info("Move To Here isn't available for rotary files");
-			this.props.actions.camera.disableMoveToHere();
+		const world = this.viewer3d.screenToWorld(clientX, clientY);
+		if (!world) {
 			return;
 		}
-
-		const target = this.getWorkCoordsFromClient(clientX, clientY);
-		if (!target) {
-			return;
-		}
-
-		const { units } = this.props.state;
-		const unitModal = units === METRIC_UNITS ? "G21" : "G20";
-		controller.command(
-			"gcode:safe",
-			getSafeXYMoveCode(target.x, target.y),
-			unitModal,
-		);
-
-		toast.success(
-			`Moving to X${target.x.toFixed(2)} Y${target.y.toFixed(2)}`,
-		);
-
-		// Auto-disarm after a successful move.
-		this.props.actions.camera.disableMoveToHere();
-	}
-
-	// Convert a viewport pixel into absolute work XY. gviewer raycasts the pixel
-	// onto the plane at the bit's current Z and returns scene coordinates, which
-	// equal work coordinates because the toolpath root sits at the origin.
-	getWorkCoordsFromClient(
-		clientX: number,
-		clientY: number,
-	): { x: number; y: number } | null {
-		if (!this.viewer3d) {
-			return null;
-		}
-		const hit = this.viewer3d.screenToWorld(clientX, clientY);
-		if (!hit) {
-			return null;
-		}
-		return {
-			x: Number(hit.x.toFixed(3)),
-			y: Number(hit.y.toFixed(3)),
+		const screen = this.viewer3d.worldToScreen(world.x, world.y, world.z) ?? {
+			x: clientX,
+			y: clientY,
 		};
+		this.pickOnPick?.({ world, screen });
 	}
 
-	showMoveToHereIndicator(clientX: number, clientY: number) {
-		this.removeMoveToHereIndicator();
+	showPickIndicator(clientX: number, clientY: number) {
+		this.removePickIndicator();
 
 		const size = 48;
 		const r = size / 2 - 4;
@@ -817,18 +905,134 @@ class GcodeViewer extends Component<Props> {
 					{ strokeDashoffset: circumference },
 					{ strokeDashoffset: 0 },
 				],
-				{ duration: MOVE_TO_HERE_HOLD_MS, fill: "forwards" },
+				{ duration: PICK_HOLD_MS, fill: "forwards" },
 			);
 		}
 
-		this.mthIndicator = wrapper;
+		this.pickIndicator = wrapper;
 	}
 
-	removeMoveToHereIndicator() {
-		if (this.mthIndicator && this.mthIndicator.parentElement) {
-			this.mthIndicator.parentElement.removeChild(this.mthIndicator);
+	removePickIndicator() {
+		if (this.pickIndicator && this.pickIndicator.parentElement) {
+			this.pickIndicator.parentElement.removeChild(this.pickIndicator);
 		}
-		this.mthIndicator = null;
+		this.pickIndicator = null;
+	}
+
+	// --- plugin overlay layer ----------------------------------------------
+
+	// Replace the declarative marker list drawn over the canvas. The host owns
+	// this SVG layer (the sandboxed plugin can never draw on the canvas itself);
+	// markers are re-projected every frame so they track camera pan/zoom.
+	setOverlay(markers: OverlayMarker[]) {
+		this.overlayMarkers = Array.isArray(markers) ? markers : [];
+		if (this.overlayMarkers.length > 0) {
+			this.startOverlay();
+		} else {
+			this.stopOverlay();
+		}
+	}
+
+	startOverlay() {
+		if (this.overlayRaf !== null) {
+			return; // already running
+		}
+		if (!this.overlaySvg) {
+			const svg = document.createElementNS(
+				"http://www.w3.org/2000/svg",
+				"svg",
+			) as SVGSVGElement;
+			svg.style.cssText = [
+				"position:fixed",
+				"inset:0",
+				"width:100vw",
+				"height:100vh",
+				"pointer-events:none",
+				"z-index:10000",
+			].join(";");
+			document.body.appendChild(svg);
+			this.overlaySvg = svg;
+		}
+		const draw = () => {
+			this.drawOverlay();
+			this.overlayRaf = requestAnimationFrame(draw);
+		};
+		this.overlayRaf = requestAnimationFrame(draw);
+	}
+
+	stopOverlay() {
+		if (this.overlayRaf !== null) {
+			cancelAnimationFrame(this.overlayRaf);
+			this.overlayRaf = null;
+		}
+		if (this.overlaySvg?.parentElement) {
+			this.overlaySvg.parentElement.removeChild(this.overlaySvg);
+		}
+		this.overlaySvg = null;
+	}
+
+	drawOverlay() {
+		const svg = this.overlaySvg;
+		if (!svg || !this.viewer3d) {
+			return;
+		}
+		while (svg.firstChild) {
+			svg.removeChild(svg.firstChild);
+		}
+		const ns = "http://www.w3.org/2000/svg";
+
+		for (const marker of this.overlayMarkers) {
+			const s = this.viewer3d.worldToScreen(marker.x, marker.y, marker.z ?? 0);
+			if (!s) {
+				continue;
+			}
+			const color = marker.color ?? OVERLAY_DEFAULT_COLOR;
+			const size = marker.size ?? 6;
+			const shape = marker.shape ?? "circle";
+
+			if (shape === "ring") {
+				const c = document.createElementNS(ns, "circle");
+				c.setAttribute("cx", String(s.x));
+				c.setAttribute("cy", String(s.y));
+				c.setAttribute("r", String(size));
+				c.setAttribute("fill", "none");
+				c.setAttribute("stroke", color);
+				c.setAttribute("stroke-width", "1.5");
+				svg.appendChild(c);
+			} else if (shape === "cross") {
+				const line = (x1: number, y1: number, x2: number, y2: number) => {
+					const l = document.createElementNS(ns, "line");
+					l.setAttribute("x1", String(x1));
+					l.setAttribute("y1", String(y1));
+					l.setAttribute("x2", String(x2));
+					l.setAttribute("y2", String(y2));
+					l.setAttribute("stroke", color);
+					l.setAttribute("stroke-width", "1.5");
+					return l;
+				};
+				svg.appendChild(line(s.x - size, s.y, s.x + size, s.y));
+				svg.appendChild(line(s.x, s.y - size, s.x, s.y + size));
+			} else {
+				// Default: filled circle.
+				const c = document.createElementNS(ns, "circle");
+				c.setAttribute("cx", String(s.x));
+				c.setAttribute("cy", String(s.y));
+				c.setAttribute("r", String(size));
+				c.setAttribute("fill", color);
+				svg.appendChild(c);
+			}
+
+			if (marker.label) {
+				const t = document.createElementNS(ns, "text");
+				t.setAttribute("x", String(s.x + size + 4));
+				t.setAttribute("y", String(s.y + 4));
+				t.setAttribute("fill", color);
+				t.setAttribute("font-size", "12");
+				t.setAttribute("font-family", "sans-serif");
+				t.textContent = marker.label;
+				svg.appendChild(t);
+			}
+		}
 	}
 
 	// --- imperative API consumed by the connected container (index.tsx) -----

@@ -1,10 +1,18 @@
-import { useCallback, useRef, useSyncExternalStore } from "react";
+import {
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+	useSyncExternalStore,
+} from "react";
 
 import {
 	getTopicSnapshot,
 	type PluginBridgeTopic,
 	subscribeTopic,
+	type ViewerPickEvent,
 } from "./bridge.js";
+import { gsender } from "./index.js";
 
 // --- React hooks --------------------------------------------------------------
 // These run in the plugin's OWN React. They mirror gSender's `useWorkspaceState`
@@ -63,4 +71,70 @@ export const useTypedSelector = <Selected, State = unknown>(
 
 	lastSelected.current = { value: nextSelected };
 	return nextSelected;
+};
+
+/**
+ * Arm point-picking on the host visualizer for the lifetime of the component.
+ *
+ * Arms on mount (unless `opts.enabled === false`) and disarms on unmount or when
+ * disabled. The latest `handler` is kept in a ref, so re-renders that only change
+ * the handler don't re-arm the pick.
+ *
+ * @param mode `'click'` (single click) or `'hold'` (press-and-hold, which also
+ *   emits `hold-progress` events).
+ * @param handler Called with each `ViewerPickEvent` while armed.
+ * @param opts.enabled Set `false` to keep the pick disarmed (default `true`).
+ * @returns `armed` (whether the host accepted the arm) and `error` (the host's
+ *   rejection message, or `null`).
+ */
+export const useVisualizerPick = (
+	mode: "click" | "hold",
+	handler: (e: ViewerPickEvent) => void,
+	opts?: { enabled?: boolean },
+): { armed: boolean; error: string | null } => {
+	const enabled = opts?.enabled !== false;
+
+	const [armed, setArmed] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+
+	// Keep the latest handler without re-arming when it changes.
+	const handlerRef = useRef(handler);
+	handlerRef.current = handler;
+
+	useEffect(() => {
+		if (!enabled) {
+			return;
+		}
+
+		let cancelled = false;
+		let dispose: (() => void) | null = null;
+
+		gsender.viewer
+			.armPick(mode, (event) => handlerRef.current(event))
+			.then((disposer) => {
+				if (cancelled) {
+					// Unmounted/disabled before arming resolved — tear down now.
+					disposer();
+					return;
+				}
+				dispose = disposer;
+				setArmed(true);
+				setError(null);
+			})
+			.catch((err: unknown) => {
+				if (cancelled) {
+					return;
+				}
+				setArmed(false);
+				setError(err instanceof Error ? err.message : String(err));
+			});
+
+		return () => {
+			cancelled = true;
+			setArmed(false);
+			dispose?.();
+		};
+	}, [mode, enabled]);
+
+	return { armed, error };
 };
