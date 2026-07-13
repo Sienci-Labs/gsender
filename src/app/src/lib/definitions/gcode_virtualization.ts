@@ -20,7 +20,7 @@ export type FEEDRATE = 'G93' | 'G94' | 'G95';
 // Cutter Radius Compensation
 export type CUTTER = `G${string}`;
 // Tool Length Offset
-export type TLO = 'G43.1' | 'G49';
+export type TLO = 'G43' | 'G43.1' | 'G43.2' | 'G49';
 // Program Mode
 export type PROGRAM = 'M0' | 'M1' | 'M2' | 'M30';
 // Spingle State

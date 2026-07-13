@@ -82,6 +82,10 @@ export const GRBL_HAL_MODAL_GROUPS = [
         group: 'feedrate',
         modes: ['G93', 'G94']
     },
+    { // Tool Length Offset (Defaults to G49)
+        group: 'tlo',
+        modes: ['G43', 'G43.1', 'G43.2', 'G49']
+    },
     { // Program Mode (Defaults to M0)
         group: 'program',
         modes: ['M0', 'M1', 'M2', 'M30']
