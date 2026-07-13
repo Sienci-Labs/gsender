@@ -5,6 +5,8 @@ const { spawnSync } = require("child_process");
 const REPO_ROOT = path.resolve(__dirname, "..");
 const PLUGINS_ROOT = path.join(REPO_ROOT, "plugins");
 const OUTPUT_ROOT = path.join(REPO_ROOT, "dist", "gsender", "plugins");
+const PLUGIN_SDK_DIR = path.join(REPO_ROOT, "packages", "plugin-sdk");
+const PLUGIN_SDK_ENTRY = path.join(PLUGIN_SDK_DIR, "dist", "index.js");
 
 const DEFAULT_PLUGINS = (
 	process.env.GSENDER_DEFAULT_PLUGINS || "basic-cam"
@@ -29,6 +31,33 @@ const run = (command, args, cwd) => {
 
 const readJson = (filePath) => JSON.parse(fs.readFileSync(filePath, "utf8"));
 
+const ensureDependenciesInstalled = (packageDir) => {
+	const packageJsonPath = path.join(packageDir, "package.json");
+	if (!fs.existsSync(packageJsonPath)) {
+		return;
+	}
+
+	const nodeModulesPath = path.join(packageDir, "node_modules");
+	if (!fs.existsSync(nodeModulesPath)) {
+		run("npm", ["install"], packageDir);
+	}
+};
+
+const ensurePluginSdkBuilt = () => {
+	const packageJsonPath = path.join(PLUGIN_SDK_DIR, "package.json");
+	if (!fs.existsSync(packageJsonPath)) {
+		return;
+	}
+
+	if (fs.existsSync(PLUGIN_SDK_ENTRY)) {
+		return;
+	}
+
+	console.log("Building @sienci/gsender-plugin-sdk...");
+	ensureDependenciesInstalled(PLUGIN_SDK_DIR);
+	run("npm", ["run", "build"], PLUGIN_SDK_DIR);
+};
+
 const ensureBuiltUi = (pluginDir) => {
 	const packageJsonPath = path.join(pluginDir, "package.json");
 	if (!fs.existsSync(packageJsonPath)) {
@@ -40,11 +69,7 @@ const ensureBuiltUi = (pluginDir) => {
 		return;
 	}
 
-	const nodeModulesPath = path.join(pluginDir, "node_modules");
-	if (!fs.existsSync(nodeModulesPath)) {
-		run("npm", ["install"], pluginDir);
-	}
-
+	ensureDependenciesInstalled(pluginDir);
 	run("npm", ["run", "build"], pluginDir);
 };
 
@@ -94,6 +119,8 @@ const main = () => {
 
 	fs.rmSync(OUTPUT_ROOT, { recursive: true, force: true });
 	fs.mkdirSync(OUTPUT_ROOT, { recursive: true });
+
+	ensurePluginSdkBuilt();
 
 	DEFAULT_PLUGINS.forEach((pluginName) => {
 		console.log(`Preparing default plugin: ${pluginName}`);
