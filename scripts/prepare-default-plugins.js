@@ -15,18 +15,21 @@ const DEFAULT_PLUGINS = (
 	.map((name) => name.trim())
 	.filter(Boolean);
 
-const run = (command, args, cwd) => {
+const run = (command, args) => {
 	const result = spawnSync(command, args, {
-		cwd,
+		cwd: REPO_ROOT,
 		stdio: "inherit",
 		shell: process.platform === "win32",
 	});
 
 	if (result.status !== 0) {
-		throw new Error(
-			`Command failed: ${command} ${args.join(" ")} (cwd: ${cwd})`,
-		);
+		throw new Error(`Command failed: ${command} ${args.join(" ")}`);
 	}
+};
+
+const runYarn = (packageDir, args) => {
+	const relativeDir = path.relative(REPO_ROOT, packageDir);
+	run("yarn", ["--cwd", relativeDir, ...args]);
 };
 
 const readJson = (filePath) => JSON.parse(fs.readFileSync(filePath, "utf8"));
@@ -39,7 +42,7 @@ const ensureDependenciesInstalled = (packageDir) => {
 
 	const nodeModulesPath = path.join(packageDir, "node_modules");
 	if (!fs.existsSync(nodeModulesPath)) {
-		run("npm", ["install"], packageDir);
+		runYarn(packageDir, ["install", "--non-interactive"]);
 	}
 };
 
@@ -55,7 +58,7 @@ const ensurePluginSdkBuilt = () => {
 
 	console.log("Building @sienci/gsender-plugin-sdk...");
 	ensureDependenciesInstalled(PLUGIN_SDK_DIR);
-	run("npm", ["run", "build"], PLUGIN_SDK_DIR);
+	runYarn(PLUGIN_SDK_DIR, ["run", "build"]);
 };
 
 const ensureBuiltUi = (pluginDir) => {
@@ -70,7 +73,7 @@ const ensureBuiltUi = (pluginDir) => {
 	}
 
 	ensureDependenciesInstalled(pluginDir);
-	run("npm", ["run", "build"], pluginDir);
+	runYarn(pluginDir, ["run", "build"]);
 };
 
 const copyPlugin = (pluginName) => {
