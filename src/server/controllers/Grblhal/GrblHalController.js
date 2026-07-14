@@ -34,7 +34,6 @@ import {
 	ERROR,
 	FEED_HOLD,
 	FILE_UNLOAD,
-	GRBL_HAL_ACTIVE_STATE_TOOL,
 	HOMING,
 	MACRO_LOAD,
 	MACRO_RUN,
@@ -839,7 +838,6 @@ class GrblHalController {
 		});
 
 		this.runner.on("ok", (res) => {
-			log.debug(this.workflow.state);
 			// we only query when parser state option in $10 is disabled
 			if (this.actionMask.queryParserState.reply && !this.parserStateEnabled) {
 				if (this.actionMask.replyParserState) {

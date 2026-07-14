@@ -276,9 +276,6 @@ class Sender extends events.EventEmitter {
 	}
 
 	toJSON() {
-		log.debug(
-			`current line running: ${this.state.totalSentToQueue - this.state.countdownQueue.length}`,
-		);
 		return {
 			sp: this.sp.type,
 			hold: this.state.hold,
@@ -416,7 +413,6 @@ class Sender extends events.EventEmitter {
 		}
 
 		this.state.received++;
-		log.debug("ack");
 		this.emit("change");
 
 		return true;
@@ -435,8 +431,6 @@ class Sender extends events.EventEmitter {
 		if (!this.state.gcode) {
 			return false;
 		}
-
-		log.debug("next");
 
 		const now = Date.now();
 
@@ -493,18 +487,10 @@ class Sender extends events.EventEmitter {
 		// Elapsed Time
 		this.updateElapsedTime();
 
-		log.debug(`countdown queue: ${this.state.countdownQueue.length}`);
-		log.debug(`total sent to queue: ${this.state.totalSentToQueue}`);
-
 		if (this.state.received > 0) {
-			log.debug("recieved > 0");
 			if (this.state.estimatedTime > 0) {
-				log.debug("estimated time > 0");
 				// in case smth goes wrong with the estimate, don't want to show negative time
 				if (this.state.received < this.state.estimateData.length) {
-					log.debug("adding lines from queue");
-					log.debug(`total sent to queue: ${this.state.totalSentToQueue}`);
-					log.debug(`received: ${this.state.received}`);
 					// add the lines to the queue from where we left off to the current number received
 					for (
 						let i = this.state.totalSentToQueue;

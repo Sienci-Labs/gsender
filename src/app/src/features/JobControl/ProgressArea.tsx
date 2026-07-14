@@ -49,16 +49,8 @@ type Props = {
  *
  */
 const ProgressArea = ({ senderStatus, workflowState }: Props) => {
-	const {
-		total,
-		currentLineRunning,
-		elapsedTime,
-		remainingTime,
-		startTime,
-		received,
-	} = senderStatus || {};
-
-	console.log(received);
+	const { total, currentLineRunning, elapsedTime, remainingTime, startTime } =
+		senderStatus || {};
 
 	const getFinishTime = (givenTime: number): string => {
 		if (startTime === 0 || !givenTime || givenTime < 0) {
