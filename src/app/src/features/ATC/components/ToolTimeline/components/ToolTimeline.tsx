@@ -205,7 +205,9 @@ export function ToolTimeline({
                                             remapValue={remapValue}
                                             isManual={isManual}
                                             probeState={probeState}
-                                            showProbeStatus={hasToolTable}
+                                            showProbeStatus={
+                                                hasToolTable && atcAvailable
+                                            }
                                             canRemap={allowManualBadge}
                                             remapDisabled={remapDisabled}
                                         />
