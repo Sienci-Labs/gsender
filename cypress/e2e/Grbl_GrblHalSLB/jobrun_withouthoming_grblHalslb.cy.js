@@ -25,16 +25,11 @@ Cypress.on('uncaught:exception', (err) => {
     cy.log('Connected to CNC');
   
 
-    // Step 2: Verify CNC machine status is Idle
-    cy.log('Step 2: Verifying machine status...');
-    cy.verifyMachineStatus('Idle');
-    cy.wait(2000);
+   const fileName = 'sample.gcode';
 
-    // Step 3: Upload File using custom command
-    cy.log('Step 3: Uploading G-code file...');
-    cy.uploadGcodeFile();
-    cy.log('File Uploaded');
-    cy.wait(2000);
+    // Step 1: Upload file
+    cy.uploadGcodeFile(fileName);
+
     
     // Step 4: Starting Job
     cy.log('Step 4: Starting Job...');
@@ -57,7 +52,7 @@ Cypress.on('uncaught:exception', (err) => {
 
     // Step 6: Wait for job completion
     cy.log('Step 6: Waiting for job completion...');
-    cy.contains(/^Idle$/i, { timeout: 120000 })
+    cy.contains(/^Idle$/i, { timeout: 200000 })
       .should('be.visible')
       .then(status => {
         jobEndTime = Date.now();

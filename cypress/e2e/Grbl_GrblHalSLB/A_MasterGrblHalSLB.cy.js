@@ -51,13 +51,13 @@ describe('Master Test Suite - All Tests', () => {
 
   import('./rotary_operationsslb.cy.js');
 
-  import('./rotarysurfacing_surfacingslb.cy.js');
+  import('./rotarysurfacing_surfacingslb.cy.js'); 
+
+  import('./SDCard_managerslb.cy.js'); 
 
   import('./XY-Squaringslb.cy.js'); 
 
   import('./Surfacingslb.cy.js'); 
-
-  import('./SDCard_managerslb.cy.js'); 
 
   import('./Gamepad_slb.cy.js');
 
