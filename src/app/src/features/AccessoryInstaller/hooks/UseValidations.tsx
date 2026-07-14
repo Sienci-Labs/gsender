@@ -33,7 +33,7 @@ export function useValidations() {
     const homingValidation = useMemo(
         () => () => ({
             success: hasHomed,
-            reason: 'Machine not homed. Please home your machine before proceeding with ATC configuration.',
+            reason: 'Machine not homed. Please home your machine before proceeding with accessory configuration.',
         }),
         [hasHomed],
     );
