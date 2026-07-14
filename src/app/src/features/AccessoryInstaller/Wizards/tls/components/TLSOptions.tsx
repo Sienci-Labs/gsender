@@ -6,6 +6,8 @@ import { FirstToolBehavior } from 'app/workspace/definitions';
 import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
 import pubsub from 'pubsub-js';
 import controller from "app/lib/controller.ts";
+import { firmwarePastVersion } from 'app/lib/firmwareSemver.ts';
+import { ATCI_SUPPORTED_VERSION } from 'app/features/ATC/utils/ATCiConstants.ts';
 
 const FIRST_TOOL_BEHAVIOUR_OPTIONS: FirstToolBehavior[] = [
     'Always run full wizard',
@@ -33,7 +35,11 @@ export function TLSOptions({ onComplete, onUncomplete }: StepProps) {
 
     const applySettings = async () => {
         // TODO:  Determine what we need to swap for vanilla SLB wrt EEPROM
-        controller.command('gcode', '$6=1');
+        const code = ['$6=1'];
+        if (!firmwarePastVersion(ATCI_SUPPORTED_VERSION)) {
+            code.push('$668=0');
+        }
+        controller.command('gcode', code);
 
         store.set('workspace.toolChangeOption', 'Fixed Tool Sensor');
         store.set(
