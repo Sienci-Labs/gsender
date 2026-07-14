@@ -12,10 +12,10 @@ import store from 'app/store';
 const HELP_URL = 'https://resources.sienci.com/view/addons-tls/';
 
 export function useSienciTLSWizard(): Wizard {
-    const { connectionValidation, homingValidation } = useValidations();
+    const { connectionValidation, homingValidation, grblHAlValidator } = useValidations();
 
     const validations = useMemo(
-        () => [connectionValidation, homingValidation],
+        () => [connectionValidation, homingValidation, grblHAlValidator],
         [connectionValidation, homingValidation],
     );
 
