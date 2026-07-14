@@ -72,7 +72,7 @@ const Wizard = () => {
 	// Minimized: compact pill at top-center of visualizer
 	if (minimized) {
 		const pill = (
-			<div className="absolute top-2 left-1/2 -translate-x-1/2 z-50 pointer-events-auto flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/90 dark:bg-[#18181f]/90 backdrop-blur-sm border border-gray-200 dark:border-[#2a2a35] shadow-md">
+			<div className="absolute top-2 left-1/2 -translate-x-1/2 z-[10000] pointer-events-auto flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/90 dark:bg-[#18181f]/90 backdrop-blur-sm border border-gray-200 dark:border-[#2a2a35] shadow-md">
 				<Wrench
 					size={12}
 					className="text-gray-500 dark:text-gray-400 shrink-0"
@@ -90,7 +90,7 @@ const Wizard = () => {
 		}
 		// Fallback: fixed at top of visualizer area
 		return (
-			<div className="fixed top-14 max-xl:top-12 left-0 right-[33%] flex justify-center z-[200] pointer-events-none">
+			<div className="fixed top-14 max-xl:top-12 left-0 right-[33%] flex justify-center z-[10002] pointer-events-none">
 				{pill}
 			</div>
 		);
@@ -100,10 +100,10 @@ const Wizard = () => {
 		<>
 			{/* Backdrop — only when substep.overlay is true (blocks UI interaction) */}
 			{overlay && (
-				<div className="fixed inset-0 bg-black/55 z-[199] pointer-events-auto" />
+				<div className="fixed inset-0 bg-black/55 z-[10001] pointer-events-auto" />
 			)}
 
-			<div className="fixed inset-y-0 left-0 right-[33%] flex items-center justify-center z-[200] pointer-events-none">
+			<div className="fixed inset-y-0 left-0 right-[33%] flex items-center justify-center z-[10002] pointer-events-none">
 				<div className="pointer-events-auto w-[860px] rounded-lg overflow-hidden shadow-2xl border border-gray-300/50 dark:border-[#2a2a35] bg-white dark:bg-[#18181f]">
 					{/* Titlebar */}
 					<div className="flex items-center justify-between px-3 py-2 border-b border-gray-200 dark:border-[#2a2a35] bg-gray-100 dark:bg-[#111116]">
