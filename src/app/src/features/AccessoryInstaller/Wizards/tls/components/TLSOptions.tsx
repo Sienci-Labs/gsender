@@ -5,6 +5,7 @@ import store from 'app/store';
 import { FirstToolBehavior } from 'app/workspace/definitions';
 import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
 import pubsub from 'pubsub-js';
+import controller from "app/lib/controller.ts";
 
 const FIRST_TOOL_BEHAVIOUR_OPTIONS: FirstToolBehavior[] = [
     'Always run full wizard',
@@ -24,12 +25,16 @@ const FIRST_TOOL_BEHAVIOUR_EXPLANATIONS: Record<FirstToolBehavior, string> = {
 export function TLSOptions({ onComplete, onUncomplete }: StepProps) {
     const [error, setError] = useState<string>('');
     const [isComplete, setIsComplete] = useState<boolean>(false);
+    const [success, setSuccess] = useState<string | null>(null);
 
     const [customLocation, setCustomLocation] = useState<boolean>(true);
     const [firstToolBehaviour, setFirstToolBehaviour] =
         useState<FirstToolBehavior>('Prompt for first tool');
 
     const applySettings = async () => {
+        // TODO:  Determine what we need to swap for vanilla SLB wrt EEPROM
+        controller.command('gcode', '$6=1');
+
         store.set('workspace.toolChangeOption', 'Fixed Tool Sensor');
         store.set(
             'workspace.toolChange.moveToManualPosition',
@@ -42,6 +47,7 @@ export function TLSOptions({ onComplete, onUncomplete }: StepProps) {
         store.set('workspace.toolChange.passthrough', false);
         updateToolchangeContext();
         pubsub.publish('repopulate');
+        setSuccess('Tool change options configured.');
         setIsComplete(true);
         onComplete();
     };
@@ -106,6 +112,7 @@ export function TLSOptions({ onComplete, onUncomplete }: StepProps) {
                 onApply={applySettings}
                 isComplete={isComplete}
                 error={error}
+                success={success}
             />
         </div>
     );

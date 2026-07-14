@@ -13,6 +13,7 @@ import pubsub from 'pubsub-js';
 export function TLSLocation({ onComplete, onUncomplete }: StepProps) {
     const [isComplete, setIsComplete] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<string | null>(null);
 
     const { units } = useWorkspaceState();
     const mpos = useSelector((state: RootState) => state.controller.mpos);
@@ -40,6 +41,7 @@ export function TLSLocation({ onComplete, onUncomplete }: StepProps) {
             z: toMM(position.z),
         });
         pubsub.publish('repopulate');
+        setSuccess('TLS location set.');
         setIsComplete(true);
         onComplete();
     };
@@ -69,6 +71,7 @@ export function TLSLocation({ onComplete, onUncomplete }: StepProps) {
                         onApply={setTLSLocation}
                         isComplete={isComplete}
                         error={error}
+                        success={success}
                     />
                 }
             />
