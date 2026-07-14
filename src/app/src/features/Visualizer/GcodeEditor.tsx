@@ -498,8 +498,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
 			const container = scrollContainerRef.current;
-			// biome-ignore lint/complexity/useOptionalChain: <not the same meaning>
-			if (!container || !container.contains(document.activeElement)) {
+			if (!container?.contains(document.activeElement)) {
 				return;
 			}
 

@@ -23,7 +23,7 @@ export function TLSPosition({ onComplete, onUncomplete }: StepProps) {
 
 	useEffect(() => {
 		if (isManuallyEditing.current) return;
-		if (!mpos || !mpos.x || !mpos.y || !mpos.z) return;
+		if (!mpos?.x || !mpos.y || !mpos.z) return;
 		const { x, y, z } = mpos;
 		setPosition({
 			x: mapPositionToUnits(x, units),

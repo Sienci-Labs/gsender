@@ -186,7 +186,7 @@ const createServer = (options, callback) => {
 		],
 		isEqual,
 	).filter((mount) => {
-		if (!mount || !mount.route || mount.route === "/") {
+		if (!mount?.route || mount.route === "/") {
 			log.error(
 				`Must specify a valid route path ${JSON.stringify(mount.route)}.`,
 			);

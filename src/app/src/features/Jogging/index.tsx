@@ -263,8 +263,7 @@ export function Jogging({ hideRotary = false }) {
 					const { axis } = detail;
 
 					// Add checks for detail.gamepad and detail.gamepad.id
-					// biome-ignore lint/complexity/useOptionalChain: <not the same meaning>
-					if (!detail.gamepad || !detail.gamepad.id) {
+					if (!detail.gamepad?.id) {
 						return;
 					}
 
