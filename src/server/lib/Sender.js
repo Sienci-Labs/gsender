@@ -22,7 +22,7 @@
  */
 
 /* eslint max-classes-per-file: 0 */
-import events from "events";
+import events from "node:events";
 import logger from "./logger";
 import { checkIfRotaryFile } from "./rotary";
 
@@ -47,7 +47,7 @@ class SPSendResponse {
 	}
 
 	process() {
-		this.callback && this.callback(this);
+		this.callback?.(this);
 	}
 
 	clear() {
@@ -87,7 +87,7 @@ class SPCharCounting {
 	}
 
 	process(isOk) {
-		this.callback && this.callback(this, isOk);
+		this.callback?.(this, isOk);
 	}
 
 	reset() {
@@ -232,7 +232,7 @@ class Sender extends events.EventEmitter {
 						continue;
 					}
 
-					const line = sp.line + "\n";
+					const line = `${sp.line}\n`;
 					sp.line = "";
 					sp.dataLength += line.length;
 					sp.queue.push(line.length);
@@ -243,7 +243,7 @@ class Sender extends events.EventEmitter {
 
 		// send-response
 		if (type === SP_TYPE_SEND_RESPONSE) {
-			this.sp = new SPSendResponse(options, (sp) => {
+			this.sp = new SPSendResponse(options, (_sp) => {
 				while (!this.state.hold && this.state.sent < this.state.total) {
 					// Remove leading and trailing whitespace from both ends of a string
 					let line = this.state.lines[this.state.sent].trim();
@@ -260,7 +260,7 @@ class Sender extends events.EventEmitter {
 						continue;
 					}
 
-					this.emit("data", line + "\n", this.state.context);
+					this.emit("data", `${line}\n`, this.state.context);
 					break;
 				}
 			});
@@ -276,6 +276,9 @@ class Sender extends events.EventEmitter {
 	}
 
 	toJSON() {
+		log.debug(
+			`current line running: ${this.state.totalSentToQueue - this.state.countdownQueue.length}`,
+		);
 		return {
 			sp: this.sp.type,
 			hold: this.state.hold,
@@ -413,6 +416,7 @@ class Sender extends events.EventEmitter {
 		}
 
 		this.state.received++;
+		log.debug("ack");
 		this.emit("change");
 
 		return true;
@@ -432,7 +436,9 @@ class Sender extends events.EventEmitter {
 			return false;
 		}
 
-		const now = new Date().getTime();
+		log.debug("next");
+
+		const now = Date.now();
 
 		const handleStart = () => {
 			this.state.startTime = now;
@@ -487,10 +493,18 @@ class Sender extends events.EventEmitter {
 		// Elapsed Time
 		this.updateElapsedTime();
 
+		log.debug(`countdown queue: ${this.state.countdownQueue.length}`);
+		log.debug(`total sent to queue: ${this.state.totalSentToQueue}`);
+
 		if (this.state.received > 0) {
+			log.debug("recieved > 0");
 			if (this.state.estimatedTime > 0) {
+				log.debug("estimated time > 0");
 				// in case smth goes wrong with the estimate, don't want to show negative time
 				if (this.state.received < this.state.estimateData.length) {
+					log.debug("adding lines from queue");
+					log.debug(`total sent to queue: ${this.state.totalSentToQueue}`);
+					log.debug(`received: ${this.state.received}`);
 					// add the lines to the queue from where we left off to the current number received
 					for (
 						let i = this.state.totalSentToQueue;
@@ -634,7 +648,7 @@ class Sender extends events.EventEmitter {
 
 	updateElapsedTime() {
 		// Elapsed Time
-		const now = new Date().getTime();
+		const now = Date.now();
 		this.state.elapsedTime = now - this.state.startTime;
 		this.state.timeRunning = this.state.elapsedTime - this.state.timePaused;
 	}

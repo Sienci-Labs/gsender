@@ -34,6 +34,7 @@ import {
 	ERROR,
 	FEED_HOLD,
 	FILE_UNLOAD,
+	GRBL_HAL_ACTIVE_STATE_TOOL,
 	HOMING,
 	MACRO_LOAD,
 	MACRO_RUN,
@@ -838,6 +839,7 @@ class GrblHalController {
 		});
 
 		this.runner.on("ok", (res) => {
+			log.debug(this.workflow.state);
 			// we only query when parser state option in $10 is disabled
 			if (this.actionMask.queryParserState.reply && !this.parserStateEnabled) {
 				if (this.actionMask.replyParserState) {
@@ -1550,18 +1552,18 @@ class GrblHalController {
 			c: posc,
 		} = this.runner.getWorkPosition();
 
-        // Positions are raw firmware values - convert to mm if firmware is
-        // configured to report in inches ($13=1), to keep macro variables
-        // consistent with mm regardless of firmware reporting units.
-        const { $13 } = this.settings.settings;
-        const isReportingInches = $13 === '1';
-        const toMachineUnits = (val) => {
-            const num = Number(val) || 0;
-            return (isReportingInches ? num * 25.4 : num).toFixed(3);
-        };
+		// Positions are raw firmware values - convert to mm if firmware is
+		// configured to report in inches ($13=1), to keep macro variables
+		// consistent with mm regardless of firmware reporting units.
+		const { $13 } = this.settings.settings;
+		const isReportingInches = $13 === "1";
+		const toMachineUnits = (val) => {
+			const num = Number(val) || 0;
+			return (isReportingInches ? num * 25.4 : num).toFixed(3);
+		};
 
-        // Modal group
-        const modal = this.runner.getModalGroup();
+		// Modal group
+		const modal = this.runner.getModalGroup();
 
 		// Tool
 		const tool = this.runner.getTool();
@@ -1584,21 +1586,21 @@ class GrblHalController {
 			zmin: Number(context.zmin) || 0,
 			zmax: Number(context.zmax) || 0,
 
-            // Machine position
-            mposx: toMachineUnits(mposx),
-            mposy: toMachineUnits(mposy),
-            mposz: toMachineUnits(mposz),
-            mposa: toMachineUnits(mposa),
-            mposb: toMachineUnits(mposb),
-            mposc: toMachineUnits(mposc),
+			// Machine position
+			mposx: toMachineUnits(mposx),
+			mposy: toMachineUnits(mposy),
+			mposz: toMachineUnits(mposz),
+			mposa: toMachineUnits(mposa),
+			mposb: toMachineUnits(mposb),
+			mposc: toMachineUnits(mposc),
 
-            // Work position
-            posx: toMachineUnits(posx),
-            posy: toMachineUnits(posy),
-            posz: toMachineUnits(posz),
-            posa: toMachineUnits(posa),
-            posb: toMachineUnits(posb),
-            posc: toMachineUnits(posc),
+			// Work position
+			posx: toMachineUnits(posx),
+			posy: toMachineUnits(posy),
+			posz: toMachineUnits(posz),
+			posa: toMachineUnits(posa),
+			posb: toMachineUnits(posb),
+			posc: toMachineUnits(posc),
 
 			// Modal group
 			modal: {

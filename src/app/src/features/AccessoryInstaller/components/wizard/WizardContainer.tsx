@@ -1,3 +1,6 @@
+/** biome-ignore-all lint/a11y/noSvgWithoutTitle: <> */
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
+/** biome-ignore-all lint/a11y/useButtonType: <> */
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Fragment, useEffect, useState } from "react";
 import type { SubWizard } from "../../types/wizard";
@@ -12,6 +15,7 @@ interface WizardContainerProps {
 export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
 	const [currentStepIndex, setCurrentStepIndex] = useState(0);
 	const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
+	// biome-ignore lint/suspicious/noExplicitAny: <>
 	const [stepData, setStepData] = useState<Record<string, any>>({});
 	const [showCompletion, setShowCompletion] = useState(false);
 
@@ -77,6 +81,7 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
 		setShowCompletion(false);
 	};
 
+	// biome-ignore lint/suspicious/noExplicitAny: <it really is any>
 	const handleDataChange = (data: Record<string, any>) => {
 		setStepData((prev) => ({
 			...prev,
@@ -192,14 +197,12 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
 			{!isSingleStep && (
 				<div className="bg-white dark:bg-dark-darker border-t border-gray-200 dark:border-gray-800 px-8 py-4 flex items-center justify-between">
 					{showCompletion ? (
-						<>
-							<button
-								onClick={onExit}
-								className="flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors bg-gray-900 text-white hover:bg-gray-800"
-							>
-								Exit Wizard
-							</button>
-						</>
+						<button
+							onClick={onExit}
+							className="flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors bg-gray-900 text-white hover:bg-gray-800"
+						>
+							Exit Wizard
+						</button>
 					) : (
 						<>
 							<button
