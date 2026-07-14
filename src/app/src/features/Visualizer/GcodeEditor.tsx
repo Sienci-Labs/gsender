@@ -1,4 +1,5 @@
 /** biome-ignore-all lint/a11y/noStaticElementInteractions: <> */
+/** biome-ignore-all lint/a11y/useKeyWithClickEvents: <> */
 /** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
 import { Button } from "app/components/Button";
 import { Input } from "app/components/shadcn/Input";
@@ -18,9 +19,9 @@ import { store as reduxStore } from "app/store/redux";
 import { updateFileContent } from "app/store/redux/slices/fileInfo.slice";
 import {
 	ArrowUp,
-	BoxIcon,
 	Check,
 	ChevronDown,
+	ChevronLeft,
 	ChevronUp,
 	Copy,
 	CopyCheck,
@@ -37,6 +38,8 @@ import React, {
 	useRef,
 	useState,
 } from "react";
+import { PiMouseScroll } from "react-icons/pi";
+import { VscDebugStart } from "react-icons/vsc";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import {
 	a11yDark,
@@ -271,10 +274,13 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 	const [currentMatchIndex, setCurrentMatchIndex] = useState<number>(-1);
 	const [matchIndices, setMatchIndices] = useState<number[]>([]);
 	const [isSearchOpen, setIsSearchOpen] = useState(false);
+	const [jumpQuery, setJumpQuery] = useState<number>(null);
+	const [isJumpOpen, setIsJumpOpen] = useState(false);
 	const [editingLineIndex, setEditingLineIndex] = useState<number | null>(null);
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 	const lineInputsRef = useRef<Map<number, HTMLInputElement>>(new Map());
 	const searchInputRef = useRef<HTMLInputElement>(null);
+	const jumpInputRef = useRef<HTMLInputElement>(null);
 	const scrollTopRef = useRef(0);
 	const rafRef = useRef<number | null>(null);
 	const scrollEndTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -492,6 +498,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
 			const container = scrollContainerRef.current;
+			// biome-ignore lint/complexity/useOptionalChain: <not the same meaning>
 			if (!container || !container.contains(document.activeElement)) {
 				return;
 			}
@@ -552,6 +559,24 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 		currentMatchIndex,
 	]);
 
+	const handleJumpToLine = () => {
+		const lineTop = Number(jumpQuery) * LINE_HEIGHT;
+		const container = scrollContainerRef.current;
+		const scrollTop = container.scrollTop;
+		const scrollBottom = scrollTop + container.clientHeight;
+
+		if (lineTop < scrollTop || lineTop + LINE_HEIGHT > scrollBottom) {
+			const targetScroll =
+				lineTop - container.clientHeight / 2 + LINE_HEIGHT / 2;
+			const currentLine = Math.floor(container.scrollTop / LINE_HEIGHT);
+			const distance = Math.abs(Number(jumpQuery) - currentLine);
+			container.scrollTo({
+				top: Math.max(0, targetScroll),
+				behavior: distance > SMOOTH_SCROLL_THRESHOLD ? "auto" : "smooth",
+			});
+		}
+	};
+
 	const handleSearchNext = () => {
 		if (matchIndices.length === 0) return;
 		const nextIndex =
@@ -586,7 +611,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 					position: "bottom-right",
 				},
 			);
-		} catch (err) {
+		} catch (_err) {
 			toast.error("Could not copy G-code to clipboard", {
 				position: "bottom-right",
 			});
@@ -640,7 +665,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 			toast.success("G-code saved successfully", {
 				position: "bottom-right",
 			});
-		} catch (err) {
+		} catch (_err) {
 			toast.error("Failed to save G-code", {
 				position: "bottom-right",
 			});
@@ -714,6 +739,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 				className="relative w-full flex-1 overflow-auto line-container bg-gray-100 dark:bg-[#18181f]"
 				onScroll={handleScroll}
 				onClick={handleContainerClick}
+				// biome-ignore lint/a11y/noNoninteractiveTabindex: <>
 				tabIndex={0}
 				style={{
 					scrollbarColor: "grey transparent",
@@ -807,6 +833,55 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 						/>
 					</div>
 				)}
+				{isJumpOpen && (
+					<div className="fixed top-20 right-6 z-[10000] flex items-center gap-2 bg-gray-100 dark:bg-dark border border-gray-300 dark:border-dark-lighter p-3 rounded">
+						<span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+							Jump to line:
+						</span>
+						<Input
+							name="jump-gcode-lines"
+							sizing="sm"
+							type="number"
+							value={jumpQuery}
+							ref={jumpInputRef}
+							onChange={(e) => setJumpQuery(e.target.value)}
+							onKeyDown={(e) => {
+								if (e.key === "Enter") {
+									e.preventDefault();
+									handleJumpToLine();
+								}
+							}}
+						/>
+						<span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+							{`${Math.floor(
+								(scrollContainerRef.current?.scrollTop ?? 0) / LINE_HEIGHT +
+									scrollContainerRef.current?.clientHeight / 2 / LINE_HEIGHT,
+							)}/${gcodeLines.length}`}
+						</span>
+						<Button
+							size="icon"
+							onClick={handleJumpToLine}
+							disabled={jumpQuery === null}
+							className="h-6 w-6"
+							icon={<VscDebugStart className="h-3 w-3" />}
+							tooltip={{
+								content: "Jump To Line",
+							}}
+						/>
+						<Button
+							size="icon"
+							onClick={() => {
+								setJumpQuery(null);
+								setIsJumpOpen(false);
+							}}
+							className="h-6 w-6"
+							icon={<X className="h-3 w-3" />}
+							tooltip={{
+								content: "Close jump to line",
+							}}
+						/>
+					</div>
+				)}
 				<div
 					style={{ height: totalHeight, position: "relative" }}
 					className="font-mono text-sm flex-1"
@@ -859,6 +934,21 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 				</div>
 			</div>
 			<div className="flex gap-4 p-3 justify-end border-t border-gray-300 dark:border-dark-lighter">
+				<Button
+					variant={isJumpOpen ? "primary" : "outline"}
+					size="icon"
+					onClick={() => {
+						setIsJumpOpen((prev) => !prev);
+						setTimeout(() => {
+							jumpInputRef.current?.focus();
+						}, 100);
+					}}
+					className="border border-gray-500"
+					icon={<PiMouseScroll className="h-5 w-5" />}
+					tooltip={{
+						content: "Jump to Line",
+					}}
+				/>
 				<Button
 					variant={isSearchOpen ? "primary" : "outline"}
 					size="icon"
