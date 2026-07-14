@@ -628,6 +628,10 @@ class Sender extends events.EventEmitter {
 		this.state.remainingTime -= this.state.timer;
 	}
 
+	isCountdownRunning() {
+		return this.state.countdownIsPaused;
+	}
+
 	updateElapsedTime() {
 		// Elapsed Time
 		const now = new Date().getTime();
