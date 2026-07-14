@@ -8,6 +8,7 @@ import store from 'app/store';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { mapPositionToUnits, in2mm } from 'app/lib/units.ts';
 import { IMPERIAL_UNITS } from 'app/constants';
+import pubsub from 'pubsub-js';
 
 export function TLSLocation({ onComplete, onUncomplete }: StepProps) {
     const [isComplete, setIsComplete] = useState<boolean>(false);
@@ -38,6 +39,7 @@ export function TLSLocation({ onComplete, onUncomplete }: StepProps) {
             y: toMM(position.y),
             z: toMM(position.z),
         });
+        pubsub.publish('repopulate');
         setIsComplete(true);
         onComplete();
     };
