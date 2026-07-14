@@ -1853,6 +1853,7 @@ class GrblHalController {
                     });
 
                     const modal = toolpath.getModal();
+                    const hasSeenM6 = toolpath.hasSeenM6();
 
                     const position = toolpath.getPosition();
 
@@ -1895,7 +1896,9 @@ class GrblHalController {
                     modalGCode.push(this.event.getEventCode(PROGRAM_START));
                     modalGCode.push(`G0 G90 G21 Z${zMax + safeHeight}`);
                     // ATCI - add M6 before spindles turned on to get correct tool to spin up
-                    if (atci && modal.tool !== 0) {
+                    // Only insert if an M6 was actually parsed - a bare T word with no M6
+                    // (some CAM posts never emit M6) should not trigger a tool change here
+                    if (atci && modal.tool !== 0 && hasSeenM6) {
                         if (this.toolChangeContext.mappings) {
                             const remap = _.get(this.toolChangeContext.mappings, modal.tool, null);
                             if (remap) {
