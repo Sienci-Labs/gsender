@@ -118,7 +118,12 @@ export function ToolTimeline({
             })}
         >
             <div className="shadow-xl p-0.5">
-                <div className="flex items-center justify-between gap-3">
+                <div
+                    className={cn('flex items-center justify-between gap-3', {
+                        'cursor-pointer touch-manipulation': isCollapsed,
+                    })}
+                    onClick={isCollapsed ? onToggle : undefined}
+                >
                     <div className="flex items-center gap-2 pl-1">
                         {isCollapsed && activeTool && (
                             <>
@@ -135,7 +140,10 @@ export function ToolTimeline({
                     <Button
                         variant="ghost"
                         size="icon"
-                        onClick={onToggle}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onToggle?.();
+                        }}
                         className="h-7 w-7 rounded-lg hover:bg-white/50 text-gray-900 dark:hover:bg-gray-800/50"
                     >
                         {isCollapsed ? (
