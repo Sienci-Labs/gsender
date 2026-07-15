@@ -21,6 +21,8 @@
  *
  */
 
+import fs from 'fs';
+import path from 'path';
 import util from 'util';
 import chalk from 'chalk';
 import winston from 'winston';
@@ -35,12 +37,30 @@ const getStackTrace = () => {
 
 const VERBOSITY_MAX = 3; // -vvv
 
+// Resolve the log file next to main.log and grbl.log in the Electron user data
+// directory. A relative filename would resolve against the working directory,
+// which for an installed app is the read-only program directory.
+const resolveLogFile = () => {
+    try {
+        const { app } = require('electron');
+        if (app) {
+            const logDirectory = path.join(app.getPath('userData'), 'logs');
+            fs.mkdirSync(logDirectory, { recursive: true });
+            return path.join(logDirectory, 'server.log');
+        }
+    } catch (err) {
+        // Running outside of Electron
+    }
+
+    return 'gsender_server_log.txt';
+};
+
 const { combine, colorize, timestamp, printf } = winston.format;
 
 // https://github.com/winstonjs/winston/blob/master/README.md#creating-your-own-logger
 const logger = winston.createLogger({
     exitOnError: false,
-    level: settings.winston.level,
+    level: process.env.GSENDER_LOG_LEVEL || settings.winston.level,
     silent: false,
     transports: [
         new winston.transports.Console({
@@ -52,8 +72,15 @@ const logger = winston.createLogger({
             handleExceptions: true
         }),
         new winston.transports.File({
-            filename: 'gsender_server_log.txt',
-            level: 'info'
+            filename: resolveLogFile(),
+            format: combine(
+                timestamp(),
+                printf(log => `${log.timestamp} - ${log.level} ${log.message}`)
+            ),
+            maxsize: 5 * 1024 * 1024,
+            maxFiles: 3,
+            tailable: true,
+            handleExceptions: true
         })
     ]
 });
