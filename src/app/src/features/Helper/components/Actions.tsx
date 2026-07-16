@@ -28,7 +28,7 @@ import uniqueId from 'lodash/uniqueId';
 import get from 'lodash/get';
 import controller from 'app/lib/controller';
 import { useWizardAPI, useWizardContext } from 'app/features/Helper/context';
-import { Terminal } from 'lucide-react';
+import { Terminal, CheckCircle } from 'lucide-react';
 import { useSelector } from 'react-redux';
 
 interface WizardAction {
@@ -57,9 +57,13 @@ interface ActionsProps {
     substepIndex: number;
 }
 
+const AUTO_ADVANCE_DELAY_MS = 1500;
+
 const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
     const [tooltip, setTooltip] = useState<TooltipState | null>(null);
+    const [showSuccess, setShowSuccess] = useState(false);
     const tooltipTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const advanceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const loadingStartRef = useRef<number | null>(null);
     const {
         markActionAsComplete,
@@ -103,9 +107,17 @@ const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
                     setTimeout(() => {
                         cb.markActionAsComplete(cb.stepIndex, cb.substepIndex);
                         cb.setIsLoading(false);
-                        if (cb.isLastSubstep) {
+                        setShowSuccess(true);
+
+                        // Resuming the job is safety-critical — always
+                        // require an explicit click on "Complete" here,
+                        // never auto-advance/auto-close.
+                        if (cb.isLastSubstep) return;
+
+                        advanceTimerRef.current = setTimeout(() => {
+                            setShowSuccess(false);
                             cb.completeSubStep(cb.stepIndex, cb.substepIndex);
-                        }
+                        }, AUTO_ADVANCE_DELAY_MS);
                     }, delay);
                 }
             }),
@@ -119,11 +131,35 @@ const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
                 pubsub.unsubscribe(token);
             });
             if (tooltipTimer.current) clearTimeout(tooltipTimer.current);
+            if (advanceTimerRef.current) clearTimeout(advanceTimerRef.current);
         };
     }, []);
 
+    // If the rendered substep changes for any reason (our own auto-advance
+    // firing, or the user manually clicking Back mid-countdown), cancel any
+    // pending auto-advance left over from the substep we just left.
+    useEffect(() => {
+        return () => {
+            if (advanceTimerRef.current) {
+                clearTimeout(advanceTimerRef.current);
+                advanceTimerRef.current = null;
+            }
+            setShowSuccess(false);
+        };
+    }, [stepIndex, substepIndex]);
+
     return (
         <>
+            {showSuccess && (
+                <div
+                    role="status"
+                    aria-live="polite"
+                    className="flex items-center gap-2 px-3 py-2 mb-1 rounded bg-emerald-50 dark:bg-[#052e16] text-emerald-800 dark:text-[#6ee7b7] text-sm"
+                >
+                    <CheckCircle size={13} className="shrink-0" />
+                    Success
+                </div>
+            )}
             {actions.length > 0 && (
                 <div className="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-amber-400 mb-1">
                     Run G-Code
@@ -132,6 +168,11 @@ const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
             <div className="flex flex-col gap-2">
                 {actions.map((action, index) => {
                     const cbWithCompletion = () => {
+                        if (advanceTimerRef.current) {
+                            clearTimeout(advanceTimerRef.current);
+                            advanceTimerRef.current = null;
+                        }
+                        setShowSuccess(false);
                         loadingStartRef.current = Date.now();
                         setIsLoading(true);
                         controller.command(
