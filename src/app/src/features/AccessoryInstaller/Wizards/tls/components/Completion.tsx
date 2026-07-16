@@ -1,4 +1,4 @@
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, AlertTriangle } from 'lucide-react';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
 import { firmwareSemver } from 'app/lib/firmwareSemver.ts';
@@ -40,6 +40,18 @@ export function TLSCompletion() {
                     </ul>
                 </div>
             )}
+            <div className="flex items-center p-4 mt-6 text-sm text-yellow-800 border border-yellow-300 rounded-lg bg-yellow-50 max-w-2xl">
+                <AlertTriangle
+                    size={20}
+                    className="shrink-0 mr-3 text-yellow-600"
+                />
+                <span className="text-left">
+                    If you change your spindle or router's physical
+                    position (e.g. reinstalling it or a mounting bracket),
+                    you may need to update these settings in{' '}
+                    <b>Config</b> or run this installation wizard again.
+                </span>
+            </div>
         </div>
     );
 }

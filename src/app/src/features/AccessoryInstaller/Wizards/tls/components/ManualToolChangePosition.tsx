@@ -5,10 +5,19 @@ import { useSelector } from 'react-redux';
 import { RootState } from 'app/store/redux';
 import { useEffect, useRef, useState } from 'react';
 import store from 'app/store';
+import controller from 'app/lib/controller.ts';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { mapPositionToUnits, in2mm } from 'app/lib/units.ts';
 import { IMPERIAL_UNITS } from 'app/constants';
+import { getDefaultToolChangePositionMM } from 'app/features/AccessoryInstaller/Wizards/tls/utils/defaultToolChangePosition.ts';
 import pubsub from 'pubsub-js';
+
+type Position = { x?: number; y?: number; z?: number };
+
+function mposEquals(a: Position | undefined, b: Position | undefined) {
+    if (!a || !b) return a === b;
+    return a.x === b.x && a.y === b.y && a.z === b.z;
+}
 
 export function ManualToolChangePosition({
     onComplete,
@@ -21,10 +30,23 @@ export function ManualToolChangePosition({
     const { units } = useWorkspaceState();
     const mpos = useSelector((state: RootState) => state.controller.mpos);
     const isManuallyEditing = useRef(false);
+    const mposAtMountRef = useRef(mpos);
+
+    const [position, setPosition] = useState(() => {
+        const defaultXY = getDefaultToolChangePositionMM();
+        return {
+            x: defaultXY ? mapPositionToUnits(defaultXY.x, units) : '0',
+            y: defaultXY ? mapPositionToUnits(defaultXY.y, units) : '0',
+            z: '0',
+        };
+    });
 
     useEffect(() => {
         if (isManuallyEditing.current) return;
         if (!mpos || !mpos.x || !mpos.y || !mpos.z) return;
+        // No real jog has happened since entering the step yet — keep the
+        // computed default instead of clobbering it with the raw mpos.
+        if (mposEquals(mpos, mposAtMountRef.current)) return;
         const { x, y, z } = mpos;
         setPosition({
             x: mapPositionToUnits(x, units),
@@ -33,11 +55,10 @@ export function ManualToolChangePosition({
         });
     }, [mpos, units]);
 
-    const [position, setPosition] = useState({ x: '0', y: '0', z: '0' });
+    const toMM = (val: string) =>
+        units === IMPERIAL_UNITS ? in2mm(Number(val)) : Number(val);
 
     const setManualPosition = () => {
-        const toMM = (val: string) =>
-            units === IMPERIAL_UNITS ? in2mm(Number(val)) : Number(val);
         store.set('workspace.toolChange.manualPosition', {
             x: toMM(position.x),
             y: toMM(position.y),
@@ -47,6 +68,19 @@ export function ManualToolChangePosition({
         setSuccess('Tool change location set.');
         setIsComplete(true);
         onComplete();
+    };
+
+    const goToPosition = () => {
+        const target = {
+            x: toMM(position.x),
+            y: toMM(position.y),
+            z: toMM(position.z),
+        };
+        controller.command('gcode', [
+            'G53 G21 G0 Z-1',
+            `G53 G21 G0 X${target.x} Y${target.y}`,
+            `G53 G21 G0 Z${target.z}`,
+        ]);
     };
 
     return (
@@ -66,6 +100,8 @@ export function ManualToolChangePosition({
                     isManuallyEditing.current = true;
                     setPosition(positions);
                 }}
+                showGoTo={true}
+                onGoTo={goToPosition}
                 actionButton={
                     <StepActionButton
                         label={'Set Position'}

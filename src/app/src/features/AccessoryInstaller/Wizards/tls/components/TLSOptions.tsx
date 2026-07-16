@@ -51,6 +51,7 @@ export function TLSOptions({ onComplete, onUncomplete }: StepProps) {
             firstToolBehaviour,
         );
         store.set('workspace.toolChange.passthrough', false);
+        store.set('widgets.probe.probeFastFeedrate', 1000);
         updateToolchangeContext();
         pubsub.publish('repopulate');
         setSuccess('Tool change options configured.');
