@@ -11,9 +11,9 @@ import {
 } from 'app/features/DRO/utils/RapidPosition.ts';
 
 // Default tool change location: 2/3 of the way toward the front (Y),
-// 1/3 of the way toward the right (X), measured from the back/left edges
+// 1/3 of the way toward the right (X), measured from the right/back edges
 // of the machine's usable travel.
-const X_FRAC_FROM_LEFT = 1 / 3;
+const X_FRAC_FROM_RIGHT = 1 / 3;
 const Y_FRAC_FROM_BACK = 2 / 3;
 
 export function getDefaultToolChangePositionMM(): {
@@ -53,8 +53,8 @@ export function getDefaultToolChangePositionMM(): {
     const yLimit = Number(yMax);
 
     const x = isRightHome
-        ? -(xLimit * (1 - X_FRAC_FROM_LEFT))
-        : xLimit * X_FRAC_FROM_LEFT;
+        ? -(xLimit * X_FRAC_FROM_RIGHT)
+        : xLimit * (1 - X_FRAC_FROM_RIGHT);
     const y = isFrontHome
         ? yLimit * (1 - Y_FRAC_FROM_BACK)
         : -(yLimit * Y_FRAC_FROM_BACK);
