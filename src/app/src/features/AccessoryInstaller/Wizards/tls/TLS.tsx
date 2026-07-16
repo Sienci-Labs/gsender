@@ -6,6 +6,8 @@ import { TLSOptions } from 'app/features/AccessoryInstaller/Wizards/tls/componen
 import { TLSLocation } from 'app/features/AccessoryInstaller/Wizards/tls/components/TLSLocation.tsx';
 import { ManualToolChangePosition } from 'app/features/AccessoryInstaller/Wizards/tls/components/ManualToolChangePosition.tsx';
 import { TLSCompletion } from 'app/features/AccessoryInstaller/Wizards/tls/components/Completion.tsx';
+import { ContinuityCheck } from 'app/features/AccessoryInstaller/Wizards/tls/components/ContinuityCheck.tsx';
+import { TLSContinuitySidebar } from 'app/features/AccessoryInstaller/Wizards/tls/components/TLSContinuitySidebar.tsx';
 import { Jogging } from 'app/features/Jogging';
 import store from 'app/store';
 
@@ -84,6 +86,23 @@ export function useSienciTLSWizard(): Wizard {
                                     props: {
                                         hideRotary: true,
                                     },
+                                },
+                                {
+                                    type: 'link',
+                                    title: 'Need help?',
+                                    content: 'Follow along in our',
+                                    url: HELP_URL,
+                                },
+                            ],
+                        },
+                        {
+                            id: 'continuity-check',
+                            title: 'Verify TLS Continuity',
+                            component: ContinuityCheck,
+                            secondaryContent: [
+                                {
+                                    type: 'component',
+                                    content: TLSContinuitySidebar,
                                 },
                                 {
                                     type: 'link',
