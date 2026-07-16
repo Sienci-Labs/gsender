@@ -695,7 +695,6 @@ class GrblController {
 			}
 
 			this.timePaused = new Date().getTime();
-			this.sender.pauseCountdown();
 		});
 		this.workflow.on("resume", (...args) => {
 			this.emit("workflow:state", this.workflow.state);
@@ -1183,6 +1182,23 @@ class GrblController {
 
 			// Grbl state
 			if (this.state !== this.runner.state) {
+				const currentActiveState = _.get(this.state, "status.activeState", "");
+				// only pause countdown once machine is idle
+				if (
+					this.workflow.isPaused() &&
+					(currentActiveState === GRBL_ACTIVE_STATE_IDLE ||
+						currentActiveState === GRBL_ACTIVE_STATE_HOLD) &&
+					this.sender.isCountdownRunning()
+				) {
+					this.sender.pauseCountdown();
+				} else if (
+					// restart countdown if machine is still moving
+					currentActiveState === GRBL_ACTIVE_STATE_RUN &&
+					!this.sender.isCountdownRunning()
+				) {
+					this.sender.resumeCountdown();
+				}
+
 				this.state = this.runner.state;
 				this.emit("controller:state", GRBL, this.state);
 				this.emit("Grbl:state", this.state); // Backward compatibility
@@ -1249,18 +1265,18 @@ class GrblController {
 			c: posc,
 		} = this.runner.getWorkPosition();
 
-        // Positions are raw firmware values - convert to mm if firmware is
-        // configured to report in inches ($13=1), to keep macro variables
-        // consistent with mm regardless of firmware reporting units.
-        const { $13 } = this.settings.settings;
-        const isReportingInches = $13 === '1';
-        const toMachineUnits = (val) => {
-            const num = Number(val) || 0;
-            return (isReportingInches ? num * 25.4 : num).toFixed(3);
-        };
+		// Positions are raw firmware values - convert to mm if firmware is
+		// configured to report in inches ($13=1), to keep macro variables
+		// consistent with mm regardless of firmware reporting units.
+		const { $13 } = this.settings.settings;
+		const isReportingInches = $13 === "1";
+		const toMachineUnits = (val) => {
+			const num = Number(val) || 0;
+			return (isReportingInches ? num * 25.4 : num).toFixed(3);
+		};
 
-        // Modal group
-        const modal = this.runner.getModalGroup();
+		// Modal group
+		const modal = this.runner.getModalGroup();
 
 		// Tool
 		const tool = this.runner.getTool();
@@ -1286,21 +1302,21 @@ class GrblController {
 			zmin: Number(context.zmin) || 0,
 			zmax: Number(context.zmax) || 0,
 
-            // Machine position
-            mposx: toMachineUnits(mposx),
-            mposy: toMachineUnits(mposy),
-            mposz: toMachineUnits(mposz),
-            mposa: toMachineUnits(mposa),
-            mposb: toMachineUnits(mposb),
-            mposc: toMachineUnits(mposc),
+			// Machine position
+			mposx: toMachineUnits(mposx),
+			mposy: toMachineUnits(mposy),
+			mposz: toMachineUnits(mposz),
+			mposa: toMachineUnits(mposa),
+			mposb: toMachineUnits(mposb),
+			mposc: toMachineUnits(mposc),
 
-            // Work position
-            posx: toMachineUnits(posx),
-            posy: toMachineUnits(posy),
-            posz: toMachineUnits(posz),
-            posa: toMachineUnits(posa),
-            posb: toMachineUnits(posb),
-            posc: toMachineUnits(posc),
+			// Work position
+			posx: toMachineUnits(posx),
+			posy: toMachineUnits(posy),
+			posz: toMachineUnits(posz),
+			posa: toMachineUnits(posa),
+			posb: toMachineUnits(posb),
+			posc: toMachineUnits(posc),
 
 			// Modal group
 			modal: {
