@@ -27,7 +27,6 @@ import { GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
 import uniqueId from 'lodash/uniqueId';
 import get from 'lodash/get';
 import controller from 'app/lib/controller';
-import store from 'app/store';
 import cx from 'classnames';
 import { useWizardAPI, useWizardContext } from 'app/features/Helper/context';
 import { Terminal, CheckCircle } from 'lucide-react';
@@ -51,7 +50,6 @@ interface CbRef {
     markActionAsComplete: (stepIndex: number, substepIndex: number) => void;
     completeSubStep: (stepIndex: number, substepIndex: number) => Record<string, number>;
     setIsLoading: (loading: boolean) => void;
-    resumeJobAfterDelay: (delayMs: number) => void;
 }
 
 interface ActionsProps {
@@ -61,7 +59,6 @@ interface ActionsProps {
 }
 
 const AUTO_ADVANCE_DELAY_MS = 1500;
-const MIN_RESUME_SPINNER_MS = 1500;
 
 const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
     const [tooltip, setTooltip] = useState<TooltipState | null>(null);
@@ -73,7 +70,7 @@ const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
         markActionAsComplete,
         completeSubStep,
         setIsLoading,
-        resumeJobAfterDelay,
+        setResumingJob,
     } = useWizardAPI();
     const { isLoading, steps } = useWizardContext();
     const activeState = useSelector((state: Record<string, unknown>) =>
@@ -97,7 +94,6 @@ const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
         markActionAsComplete,
         completeSubStep,
         setIsLoading,
-        resumeJobAfterDelay,
     };
 
     useEffect(() => {
@@ -114,24 +110,12 @@ const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
                         cb.markActionAsComplete(cb.stepIndex, cb.substepIndex);
                         cb.setIsLoading(false);
 
-                        // Resuming spins the spindle back up before cutting
-                        // continues — swap the whole step body to a
-                        // dedicated spinner (handled in context/Instructions)
-                        // instead of the inline success flash, then close
-                        // the wizard automatically once it's had time to
-                        // reach speed.
-                        if (cb.isLastSubstep) {
-                            const spindleDelaySec = store.get(
-                                'widgets.spindle.delay',
-                                0,
-                            );
-                            const resumeDelay = Math.max(
-                                MIN_RESUME_SPINNER_MS,
-                                Number(spindleDelaySec) * 1000,
-                            );
-                            cb.resumeJobAfterDelay(resumeDelay);
-                            return;
-                        }
+                        // Handled by a persistent listener in context.jsx
+                        // instead — this component unmounts the instant
+                        // resumingJob flips true on click (see
+                        // cbWithCompletion below), well before this event
+                        // could arrive.
+                        if (cb.isLastSubstep) return;
 
                         setShowSuccess(true);
                         advanceTimerRef.current = setTimeout(() => {
@@ -185,6 +169,9 @@ const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
                         setShowSuccess(false);
                         loadingStartRef.current = Date.now();
                         setIsLoading(true);
+                        if (isLastSubstep) {
+                            setResumingJob(true);
+                        }
                         controller.command(
                             'wizard:step',
                             stepIndex,

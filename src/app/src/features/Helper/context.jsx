@@ -25,14 +25,17 @@ import React, { createContext, useContext, useState, useMemo, useEffect, useRef 
 import { useSelector } from 'react-redux';
 import get from 'lodash/get';
 import _ from 'lodash';
+import pubsub from 'pubsub-js';
 
 import { Toaster } from 'app/lib/toaster/ToasterLib';
 import { disableWizard } from 'app/store/redux/slices/helper.slice';
 import { GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
 import reduxStore from 'app/store/redux';
+import store from 'app/store';
 
 const WizardContext = createContext({});
 const WizardAPI = createContext({});
+const MIN_RESUME_SPINNER_MS = 1500;
 
 /**
  * Wizard Context Provider
@@ -275,6 +278,17 @@ export const WizardProvider = ({ children }) => {
                 setPendingToolchangeNotice(
                     activeStateRef.current !== GRBL_ACTIVE_STATE_IDLE,
                 );
+                // Defensive reset: guarantees a freshly-loaded wizard can
+                // never start already stuck on the resuming view or with a
+                // leftover "Running…" state, even if the previous wizard's
+                // last substep never got a chance to clear these itself
+                // (see the persistent listener's own guard below).
+                setResumingJob(false);
+                setIsLoading(false);
+                if (resumeTimerRef.current) {
+                    clearTimeout(resumeTimerRef.current);
+                    resumeTimerRef.current = null;
+                }
 
                 setActiveStep(0);
                 setVisible(true);
@@ -335,6 +349,7 @@ export const WizardProvider = ({ children }) => {
                     resetWizard();
                 }, delayMs);
             },
+            setResumingJob: (b) => setResumingJob(b),
         }),
         [
             setActiveStep,
@@ -353,6 +368,49 @@ export const WizardProvider = ({ children }) => {
             setActiveSubstep,
         ],
     );
+
+    // Actions.tsx's own wizard:next listener unsubscribes the instant the
+    // last substep's resumingJob flips true (Instructions swaps it out of
+    // the tree), so it can never see this event arrive. This listener is
+    // owned by the always-mounted provider instead, so the wizard still
+    // marks the resume action complete and auto-closes once grbl confirms
+    // it.
+    const resumeCompletionRef = useRef(null);
+    resumeCompletionRef.current = {
+        steps,
+        resumingJob,
+        markActionAsComplete: api.markActionAsComplete,
+        resumeJobAfterDelay: api.resumeJobAfterDelay,
+        setIsLoading,
+    };
+
+    useEffect(() => {
+        const token = pubsub.subscribe('wizard:next', (msg, indexes) => {
+            const { stepIndex: stepIn, substepIndex: subStepIn } = indexes;
+            const current = resumeCompletionRef.current;
+            // A stale event from an already-closed wizard (the backend's
+            // feeder-complete callback isn't scoped per wizard session) can
+            // otherwise land on a freshly-loaded wizard that hasn't reached
+            // Resume yet — only react if we're actually expecting one.
+            if (!current.resumingJob) return;
+            const step = current.steps[stepIn];
+            if (!step) return;
+            const isLast =
+                stepIn === current.steps.length - 1 &&
+                subStepIn === (step.substeps?.length ?? 1) - 1;
+            if (!isLast) return;
+
+            current.markActionAsComplete(stepIn, subStepIn);
+            current.setIsLoading(false);
+            const spindleDelaySec = store.get('widgets.spindle.delay', 0);
+            const resumeDelay = Math.max(
+                MIN_RESUME_SPINNER_MS,
+                Number(spindleDelaySec) * 1000,
+            );
+            current.resumeJobAfterDelay(resumeDelay);
+        });
+        return () => pubsub.unsubscribe(token);
+    }, []);
 
     return (
         <WizardContext.Provider

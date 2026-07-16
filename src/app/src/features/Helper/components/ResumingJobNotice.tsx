@@ -69,11 +69,12 @@ const ResumingJobNotice = () => {
                     Resuming Job
                 </div>
                 <div className="text-lg font-medium mt-1 mb-3 text-gray-900 dark:text-[#e5e5ea]">
-                    Waiting for spindle to reach speed
+                    Job resuming
                 </div>
                 <div className="text-sm leading-relaxed mb-6 text-gray-600 dark:text-gray-400">
-                    The job will continue automatically once the spindle has
-                    spun back up to speed.
+                    The machine needs to move back into position and may
+                    need to spin the spindle back up to speed. The job will
+                    continue automatically once this is complete.
                 </div>
 
                 <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-amber-50 dark:bg-orange-950/40 border border-orange-200 dark:border-orange-800">
