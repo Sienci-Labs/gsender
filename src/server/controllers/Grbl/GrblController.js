@@ -694,7 +694,6 @@ class GrblController {
 			}
 
 			this.timePaused = new Date().getTime();
-			this.sender.pauseCountdown();
 		});
 		this.workflow.on("resume", (...args) => {
 			this.emit("workflow:state", this.workflow.state);
@@ -1182,6 +1181,23 @@ class GrblController {
 
 			// Grbl state
 			if (this.state !== this.runner.state) {
+				const currentActiveState = _.get(this.state, "status.activeState", "");
+				// only pause countdown once machine is idle
+				if (
+					this.workflow.isPaused() &&
+					(currentActiveState === GRBL_HAL_ACTIVE_STATE_IDLE ||
+						currentActiveState === GRBL_HAL_ACTIVE_STATE_HOLD) &&
+					this.sender.isCountdownRunning()
+				) {
+					this.sender.pauseCountdown();
+				} else if (
+					// restart countdown if machine is still moving
+					currentActiveState === GRBL_HAL_ACTIVE_STATE_RUN &&
+					!this.sender.isCountdownRunning()
+				) {
+					this.sender.resumeCountdown();
+				}
+
 				this.state = this.runner.state;
 				this.emit("controller:state", GRBL, this.state);
 				this.emit("Grbl:state", this.state); // Backward compatibility
