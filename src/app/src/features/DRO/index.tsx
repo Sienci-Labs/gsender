@@ -46,6 +46,7 @@ import {
 } from 'app/components/shadcn/AlertDialog';
 import { UnitBadge } from 'app/features/DRO/component/UnitBadge.tsx';
 import { Parking } from 'app/features/DRO/component/Parking.tsx';
+import { ToolOffsetWarning } from 'app/features/DRO/component/ToolOffsetWarning.tsx';
 
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
@@ -434,6 +435,7 @@ function DRO({
                     homingEnabled={homingEnabled}
                 />
             </div>
+            <ToolOffsetWarning />
             <div className="w-full flex flex-row justify-between px-3 max-xl:px-5 max-xl:-mt-[4px] max-xl:-mb-[4px]">
                 <Label>{homingMode ? 'Home' : 'Zero'}</Label>
                 <Label>Go to</Label>

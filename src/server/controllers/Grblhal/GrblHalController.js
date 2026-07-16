@@ -2607,8 +2607,9 @@ class GrblHalController {
             (cmd === GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT) ||
             this.actionMask.replyStatusReport;
 
+        // GCODE_REPORT carries a trailing newline, so it can never match the trimmed command
         this.actionMask.replyParserState =
-            (cmd === GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT) ||
+            (cmd === GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT.trim()) ||
             this.actionMask.replyParserState;
 
         this.connection.write(data, {
