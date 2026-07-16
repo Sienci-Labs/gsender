@@ -84,6 +84,7 @@ import { calcOverrides } from "../runOverride";
 import {
 	GRBL,
 	GRBL_ACTIVE_STATE_ALARM,
+	GRBL_ACTIVE_STATE_HOLD,
 	GRBL_ACTIVE_STATE_HOME,
 	GRBL_ACTIVE_STATE_IDLE,
 	GRBL_ACTIVE_STATE_RUN,
