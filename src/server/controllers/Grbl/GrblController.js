@@ -58,6 +58,7 @@ import {
 	GRBL,
 	GRBL_ACTIVE_STATE_RUN,
 	GRBL_ACTIVE_STATE_HOME,
+	GRBL_ACTIVE_STATE_HOLD,
 	GRBL_ACTIVE_STATE_ALARM,
 	GRBL_ACTIVE_STATE_IDLE,
 	GRBL_REALTIME_COMMANDS,
@@ -1185,14 +1186,14 @@ class GrblController {
 				// only pause countdown once machine is idle
 				if (
 					this.workflow.isPaused() &&
-					(currentActiveState === GRBL_HAL_ACTIVE_STATE_IDLE ||
-						currentActiveState === GRBL_HAL_ACTIVE_STATE_HOLD) &&
+					(currentActiveState === GRBL_ACTIVE_STATE_IDLE ||
+						currentActiveState === GRBL_ACTIVE_STATE_HOLD) &&
 					this.sender.isCountdownRunning()
 				) {
 					this.sender.pauseCountdown();
 				} else if (
 					// restart countdown if machine is still moving
-					currentActiveState === GRBL_HAL_ACTIVE_STATE_RUN &&
+					currentActiveState === GRBL_ACTIVE_STATE_RUN &&
 					!this.sender.isCountdownRunning()
 				) {
 					this.sender.resumeCountdown();
