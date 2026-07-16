@@ -43,7 +43,7 @@ export function ManualToolChangePosition({
 
     useEffect(() => {
         if (isManuallyEditing.current) return;
-        if (!mpos || !mpos.x || !mpos.y || !mpos.z) return;
+        if (!mpos || mpos.x === undefined || mpos.y === undefined || mpos.z === undefined) return;
         // No real jog has happened since entering the step yet — keep the
         // computed default instead of clobbering it with the raw mpos.
         if (mposEquals(mpos, mposAtMountRef.current)) return;

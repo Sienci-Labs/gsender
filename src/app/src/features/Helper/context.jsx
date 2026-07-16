@@ -55,6 +55,8 @@ export const WizardProvider = ({ children }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [overlay, setOverlay] = useState(false);
     const [pendingToolchangeNotice, setPendingToolchangeNotice] = useState(false);
+    const [resumingJob, setResumingJob] = useState(false);
+    const resumeTimerRef = useRef(null);
 
     // Mirrors the machine's active state so `load()` can read the current
     // value without pulling `activeState` into the `api` useMemo deps below
@@ -75,25 +77,39 @@ export const WizardProvider = ({ children }) => {
         }
     }, [activeState, pendingToolchangeNotice]);
 
+    // Resets all wizard state and closes the modal. Shared by every
+    // "we're done" path: completeSubStep's final-step branch, the
+    // activeStep-overflow safety net below, cancelToolchange, and
+    // resumeJobAfterDelay's timer.
+    const resetWizard = () => {
+        document.getElementById('step-0-0')?.scrollIntoView();
+        setVisible(false);
+        setCompletedStep(-1);
+        setCompletedSubStep(-1);
+        setActiveStep(0);
+        setActiveSubstep(0);
+        setTitle('Wizard');
+        setSteps([]);
+        setIntro(null);
+        setToolchangeContext(null);
+        setToolchangeComment('');
+        setStepCount(0);
+        setMinimized(false);
+        setPendingToolchangeNotice(false);
+        setResumingJob(false);
+        if (resumeTimerRef.current) {
+            clearTimeout(resumeTimerRef.current);
+            resumeTimerRef.current = null;
+        }
+        reduxStore.dispatch(disableWizard());
+    };
+
     // Auto-close when activeStep reaches or exceeds stepCount.
     // completeSubStep sets activeStep = lastStep+1 before setVisible(false);
     // if the close branch is missed due to a stale closure, this catches it.
     useEffect(() => {
         if (visible && stepCount > 0 && activeStep >= stepCount) {
-            setVisible(false);
-            setCompletedStep(-1);
-            setCompletedSubStep(-1);
-            setActiveStep(0);
-            setActiveSubstep(0);
-            setTitle('Wizard');
-            setSteps([]);
-            setIntro(null);
-            setToolchangeContext(null);
-            setToolchangeComment('');
-            setStepCount(0);
-            setMinimized(false);
-            setPendingToolchangeNotice(false);
-            reduxStore.dispatch(disableWizard());
+            resetWizard();
         }
     }, [activeStep, stepCount, visible]);
 
@@ -194,22 +210,7 @@ export const WizardProvider = ({ children }) => {
                         activeSubstep: 0,
                     };
                     if (stepIndex >= maxStepIndex) {
-                        // reset values
-                        document.getElementById('step-0-0')?.scrollIntoView();
-                        setVisible(false);
-                        setCompletedStep(-1);
-                        setCompletedSubStep(-1);
-                        setActiveStep(0);
-                        setActiveSubstep(0);
-                        setTitle('Wizard');
-                        setSteps([]);
-                        setIntro(null);
-                        setToolchangeContext(null);
-                        setToolchangeComment('');
-                        setStepCount(0);
-                        setMinimized(false);
-                        setPendingToolchangeNotice(false);
-                        reduxStore.dispatch(disableWizard());
+                        resetWizard();
                         return {};
                     }
                 } else {
@@ -222,21 +223,7 @@ export const WizardProvider = ({ children }) => {
                 }
                 // close window on everything done.
                 if (activeStep >= maxStepIndex) {
-                    // reset values
-                    document.getElementById('step-0-0')?.scrollIntoView();
-                    setVisible(false);
-                    setCompletedStep(-1);
-                    setCompletedSubStep(-1);
-                    setActiveStep(0);
-                    setActiveSubstep(0);
-                    setTitle('Wizard');
-                    setSteps([]);
-                    setIntro(null);
-                    setToolchangeContext(null);
-                    setToolchangeComment('');
-                    setStepCount(0);
-                    setMinimized(false);
-                    setPendingToolchangeNotice(false);
+                    resetWizard();
                     return {};
                 }
 
@@ -337,24 +324,16 @@ export const WizardProvider = ({ children }) => {
                 );
             },
             cancelToolchange: () => {
-                document.getElementById('step-0-0')?.scrollIntoView();
-                setVisible(false);
-                setCompletedStep(-1);
-                setCompletedSubStep(-1);
-                setActiveStep(0);
-                setActiveSubstep(0);
-                setTitle('Wizard');
-                setSteps([]);
-                setIntro(null);
-                setToolchangeContext(null);
-                setToolchangeComment('');
-                setStepCount(0);
-                setMinimized(false);
+                resetWizard();
                 setIsLoading(false);
-                setPendingToolchangeNotice(false);
-                reduxStore.dispatch(disableWizard());
-
                 Toaster.clear();
+            },
+            resumeJobAfterDelay: (delayMs) => {
+                setResumingJob(true);
+                if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+                resumeTimerRef.current = setTimeout(() => {
+                    resetWizard();
+                }, delayMs);
             },
         }),
         [
@@ -394,6 +373,7 @@ export const WizardProvider = ({ children }) => {
                 toolchangeContext,
                 toolchangeComment,
                 pendingToolchangeNotice,
+                resumingJob,
             }}
         >
             <WizardAPI.Provider value={api}>{children}</WizardAPI.Provider>

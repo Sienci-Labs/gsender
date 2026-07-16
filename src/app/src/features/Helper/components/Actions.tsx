@@ -27,6 +27,8 @@ import { GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
 import uniqueId from 'lodash/uniqueId';
 import get from 'lodash/get';
 import controller from 'app/lib/controller';
+import store from 'app/store';
+import cx from 'classnames';
 import { useWizardAPI, useWizardContext } from 'app/features/Helper/context';
 import { Terminal, CheckCircle } from 'lucide-react';
 import { useSelector } from 'react-redux';
@@ -49,6 +51,7 @@ interface CbRef {
     markActionAsComplete: (stepIndex: number, substepIndex: number) => void;
     completeSubStep: (stepIndex: number, substepIndex: number) => Record<string, number>;
     setIsLoading: (loading: boolean) => void;
+    resumeJobAfterDelay: (delayMs: number) => void;
 }
 
 interface ActionsProps {
@@ -58,6 +61,7 @@ interface ActionsProps {
 }
 
 const AUTO_ADVANCE_DELAY_MS = 1500;
+const MIN_RESUME_SPINNER_MS = 1500;
 
 const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
     const [tooltip, setTooltip] = useState<TooltipState | null>(null);
@@ -69,6 +73,7 @@ const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
         markActionAsComplete,
         completeSubStep,
         setIsLoading,
+        resumeJobAfterDelay,
     } = useWizardAPI();
     const { isLoading, steps } = useWizardContext();
     const activeState = useSelector((state: Record<string, unknown>) =>
@@ -92,6 +97,7 @@ const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
         markActionAsComplete,
         completeSubStep,
         setIsLoading,
+        resumeJobAfterDelay,
     };
 
     useEffect(() => {
@@ -107,13 +113,27 @@ const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
                     setTimeout(() => {
                         cb.markActionAsComplete(cb.stepIndex, cb.substepIndex);
                         cb.setIsLoading(false);
+
+                        // Resuming spins the spindle back up before cutting
+                        // continues — swap the whole step body to a
+                        // dedicated spinner (handled in context/Instructions)
+                        // instead of the inline success flash, then close
+                        // the wizard automatically once it's had time to
+                        // reach speed.
+                        if (cb.isLastSubstep) {
+                            const spindleDelaySec = store.get(
+                                'widgets.spindle.delay',
+                                0,
+                            );
+                            const resumeDelay = Math.max(
+                                MIN_RESUME_SPINNER_MS,
+                                Number(spindleDelaySec) * 1000,
+                            );
+                            cb.resumeJobAfterDelay(resumeDelay);
+                            return;
+                        }
+
                         setShowSuccess(true);
-
-                        // Resuming the job is safety-critical — always
-                        // require an explicit click on "Complete" here,
-                        // never auto-advance/auto-close.
-                        if (cb.isLastSubstep) return;
-
                         advanceTimerRef.current = setTimeout(() => {
                             setShowSuccess(false);
                             cb.completeSubStep(cb.stepIndex, cb.substepIndex);
@@ -150,16 +170,6 @@ const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
 
     return (
         <>
-            {showSuccess && (
-                <div
-                    role="status"
-                    aria-live="polite"
-                    className="flex items-center gap-2 px-3 py-2 mb-1 rounded bg-emerald-50 dark:bg-[#052e16] text-emerald-800 dark:text-[#6ee7b7] text-sm"
-                >
-                    <CheckCircle size={13} className="shrink-0" />
-                    Success
-                </div>
-            )}
             {actions.length > 0 && (
                 <div className="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-amber-400 mb-1">
                     Run G-Code
@@ -198,7 +208,12 @@ const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
                             ) : !isLoading && (
                                 <>
                                     <div
-                                        className="flex items-center justify-between px-3 py-2 rounded border border-gray-200 dark:border-[#2a2a35] bg-gray-50 dark:bg-[#0d0d12]"
+                                        className={cx(
+                                            'flex items-center justify-between px-3 py-2 rounded border transition-colors duration-500',
+                                            showSuccess
+                                                ? 'border-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 dark:border-emerald-700'
+                                                : 'border-gray-200 dark:border-[#2a2a35] bg-gray-50 dark:bg-[#0d0d12]',
+                                        )}
                                         data-chip="true"
                                     >
                                         <div
@@ -217,7 +232,11 @@ const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
                                                 setTooltip(null);
                                             }}
                                         >
-                                            <Terminal size={13} className="shrink-0 text-gray-400 dark:text-cyan-400" />
+                                            {showSuccess ? (
+                                                <CheckCircle size={13} className="shrink-0 text-emerald-600 dark:text-emerald-400" />
+                                            ) : (
+                                                <Terminal size={13} className="shrink-0 text-gray-400 dark:text-cyan-400" />
+                                            )}
                                             <code className="text-sm font-mono text-sky-700 dark:text-cyan-400 truncate">
                                                 {action.label}
                                             </code>
