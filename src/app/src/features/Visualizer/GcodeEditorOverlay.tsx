@@ -73,7 +73,7 @@ const GcodeEditorOverlay = () => {
 	return (
 		<div
 			className={cx(
-				"absolute top-0 left-0 right-0 bottom-0 z-10 flex items-center justify-center p-4 rounded-md transition-opacity duration-200 ease-in-out",
+				"absolute top-0 left-0 right-0 bottom-0 z-[10000] flex items-center justify-center p-4 rounded-md transition-opacity duration-200 ease-in-out",
 				{
 					"opacity-0 pointer-events-none bg-transparent": !showEditor,
 					"opacity-100 bg-black bg-opacity-50": showEditor,
