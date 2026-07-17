@@ -77,14 +77,14 @@ it("Test Case: jogging using buttons and zeroing axes", () => {
 		);
 		cy.wait(500);
 
-		cy.get("#yPlus").click();
+		cy.get("#yMinus").click();
 		cy.wait(3000);
 		cy.unlockMachineIfNeeded();
 		cy.wait(1000);
 		cy.contains(/^Idle$/i, { timeout: 30000 }).should("be.visible");
 
-		cy.verifyAxes(0, 5, 0);
-		cy.log("Y moved to 5mm");
+		cy.verifyAxes(0, -5, 0);
+		cy.log("Y moved to -5mm");
 
 		// Zero Y axis
 		cy.log("Zeroing Y axis...");
@@ -108,18 +108,14 @@ it("Test Case: jogging using buttons and zeroing axes", () => {
 		);
 		cy.wait(500);
 
-		cy.get(
-			'path[d="M0.5 10C0.5 4.75329 4.75329 0.5 10 0.5H40C45.2467 0.5 49.5 4.7533 49.5 10V88.5H0.5V10Z"]',
-		)
-			.should("exist")
-			.click({ force: true });
+		cy.jogZMinusTimes(1);
 		cy.wait(3000);
 		cy.unlockMachineIfNeeded();
 		cy.wait(1000);
 		cy.contains(/^Idle$/i, { timeout: 30000 }).should("be.visible");
 
-		cy.verifyAxes(0, 0, 5);
-		cy.log("Z moved to 5mm");
+		cy.verifyAxes(0, 0, -5);
+		cy.log("Z moved to -5mm");
 
 		// Zero Z axis
 		cy.log("Zeroing Z axis...");

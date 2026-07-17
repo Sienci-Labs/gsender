@@ -44,9 +44,9 @@ describe('Job Run in grblHal', () => {
     cy.log("All axes are zero");
 
     // Step 4: Go to specific location
-    cy.log('Step 4: Moving to position (300, 100, -50)...');
-    cy.goToLocation(300, 100, -50);
-    cy.log('Machine is at location (300, 100, -50)');
+    cy.log('Step 4: Moving to position (300, -100, -50)...');
+    cy.goToLocation(300, -100, -50);
+    cy.log('Machine is at location (300, -100, -50)');
 
     // Step 5: Zero all the axes at new location
     cy.log('Step 5: Zeroing all axes at new location...');

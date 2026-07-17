@@ -176,24 +176,27 @@ Cypress.Commands.add("connectMachineNUL", () => {
 		
    
 });
-//-----------------------
-//21.Axis Homing Z< Y & X
-//-----------------------
+
+//-----------------------------
+//21. Axis Homing Z > Y > X
+//-----------------------------
 Cypress.Commands.add("enableAxisHomingAndHome", () => {
 	cy.log("Starting axis homing configuration and execution...");
 
 	// Step 1: Navigate to Config page
-	cy.log("Navigating to Config page...");
+	cy.log("Step 1: Navigating to Config page...");
 	cy.get("a:nth-of-type(4) span").click();
 	cy.wait(1000);
+	cy.log("Config page opened");
 
 	// Step 2: Navigate to Homing section
-	cy.log("Opening Homing settings...");
+	cy.log("Step 2: Opening Homing settings...");
 	cy.get("button:nth-of-type(6) > span:nth-of-type(2)").click();
 	cy.wait(500);
+	cy.log("Homing settings section opened");
 
 	// Step 3: Check and enable all required homing settings if disabled
-	cy.log("Checking axis homing conditions...");
+	cy.log("Step 3: Checking and enabling homing settings...");
 
 	const settingsToCheck = [
 		{ id: "$22-0-key", name: "Enable Homing" },
@@ -204,15 +207,12 @@ Cypress.Commands.add("enableAxisHomingAndHome", () => {
 		{ id: "$22-6-key", name: "Override locks" },
 	];
 
-	let changesDetected = false;
-
 	settingsToCheck.forEach((setting) => {
 		cy.get(`button#\\${setting.id}`).then(($toggle) => {
 			if ($toggle.attr("aria-checked") === "false") {
 				cy.log(`Enabling: ${setting.name}`);
 				cy.wrap($toggle).click();
 				cy.wait(300);
-				changesDetected = true;
 			} else {
 				cy.log(`${setting.name} already enabled - ignoring`);
 			}
@@ -220,84 +220,78 @@ Cypress.Commands.add("enableAxisHomingAndHome", () => {
 	});
 
 	// Step 4: Apply Settings only if changes were made
-	cy.log("Checking if settings need to be applied...");
+	cy.log("Step 4: Checking if settings need to be applied...");
 	cy.contains("button", "Apply Settings").then(($button) => {
 		if ($button.is(":disabled")) {
-			cy.log("No changes detected - ignoring Apply Settings");
+			cy.log("No changes detected - Apply Settings is disabled, continuing...");
 		} else {
 			cy.log("Applying settings...");
 			cy.wrap($button).click();
 			cy.wait(2000);
 			cy.unlockMachineIfNeeded();
 			cy.wait(1000);
+			cy.log("Settings applied");
 		}
 	});
 
-	// Step 5: Navigate back to main page
-	cy.log("Returning to main view...");
+	// Step 5: Navigate back to Carve/Main page
+	cy.log("Step 5: Returning to main view...");
 	cy.get("#app > div > div.h-full > div.flex img").click();
 	cy.wait(1000);
 	cy.unlockMachineIfNeeded();
 	cy.wait(1000);
+	cy.log("Returned to main view");
 
 	// Step 6: Enable Homing Toggle
-	cy.log("Enabling homing toggle button...");
-	cy.get(
-		"div.flex-shrink-0 > div > div > div > div > div.relative div.flex > button",
-	).click();
+
+	cy.log("Step 6: Enabling homing toggle button...");
+	cy.get('button[aria-label="Toggle single axis homing"]')
+  		.click();
 	cy.wait(1000);
+	cy.log('Homing toggle enabled');
 
-	// Step 7: Verify axes changed to homing mode
-	cy.log("Verifying homing mode activated...");
-	cy.get(
-		"div.flex-shrink-0 > div > div > div > div > div.relative > div.flex-col > div:nth-of-type(1) > div:nth-of-type(1) span",
-	).should("contain.text", "HX");
-	cy.get(
-		"div.h-\\[75\\%\\] div.flex-col > div:nth-of-type(2) > div:nth-of-type(1) span",
-	).should("contain.text", "HY");
-	cy.get(
-		"div.flex-shrink-0 > div > div > div > div > div.relative div:nth-of-type(3) > div:nth-of-type(1) span",
-	).should("contain.text", "HZ");
 
-	// Step 8: Execute Z-axis homing
-	cy.log("Homing Z-axis...");
+	
+	cy.log("Step 7: Executing Z-axis homing...");
 	cy.get(
 		"div.flex-shrink-0 > div > div > div > div > div.relative div:nth-of-type(3) > div:nth-of-type(1) span",
 	)
 		.contains("HZ")
 		.click();
 	cy.wait(2000);
+	cy.log("Waiting for Z-axis homing to complete...");
 	cy.contains(/^idle$/i, { timeout: 30000 }).should("be.visible");
-	cy.log("Z-axis homing completed");
+	cy.log("Z-axis homing completed - Machine is Idle");
 	cy.wait(1000);
 
-	// Step 9: Execute Y-axis homing
-	cy.log("Homing Y-axis...");
+	cy.log("Step 8: Executing Y-axis homing...");
 	cy.get(
 		"div.h-\\[75\\%\\] div.flex-col > div:nth-of-type(2) > div:nth-of-type(1) span",
 	)
 		.contains("HY")
 		.click();
 	cy.wait(2000);
+	cy.log("Waiting for Y-axis homing to complete...");
 	cy.contains(/^idle$/i, { timeout: 30000 }).should("be.visible");
-	cy.log("Y-axis homing completed");
+	cy.log("Y-axis homing completed - Machine is Idle");
 	cy.wait(1000);
 
-	// Step 10: Execute X-axis homing
-	cy.log("Homing X-axis...");
+	// Step 9: Execute X-axis homing
+
+	cy.log("Step 9: Executing X-axis homing...");
 	cy.get(
 		"div.flex-shrink-0 > div > div > div > div > div.relative > div.flex-col > div:nth-of-type(1) > div:nth-of-type(1) span",
 	)
 		.contains("HX")
 		.click();
 	cy.wait(2000);
+	cy.log("Waiting for X-axis homing to complete...");
 	cy.contains(/^idle$/i, { timeout: 30000 }).should("be.visible");
-	cy.log("X-axis homing completed");
+	cy.log("X-axis homing completed - Machine is Idle");
 	cy.wait(1000);
 
 	cy.log("Axis homing sequence completed successfully!");
 });
-
 // ----------------------
 // 17. Check Homing, Enable if Needed, and Perform Homing
 // ----------------------
