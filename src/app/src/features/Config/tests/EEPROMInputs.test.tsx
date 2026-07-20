@@ -718,7 +718,7 @@ it("Enter blurs the field, triggering the truncate-and-commit logic", () => {
         />,
     );
     const input = screen.getByRole("spinbutton");
-    input.focus();                                    // <-- make sure this line is here
+    input.focus();                                    
     fireEvent.change(input, { target: { value: "9.1234" } });
     fireEvent.keyDown(input, { key: "Enter" });
     // Number(9.1234).toFixed(3) -> "9.123" -> Number -> 9.123
