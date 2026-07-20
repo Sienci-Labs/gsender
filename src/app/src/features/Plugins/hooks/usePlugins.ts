@@ -47,6 +47,10 @@ export const usePlugins = () => {
 		[refresh],
 	);
 
+	const openPluginsDir = useCallback(async (pluginPath?: string) => {
+		await api.plugins.openDirectory(pluginPath);
+	}, []);
+
 	const activePlugins = plugins.filter((p) => p.valid && p.enabled);
 
 	const toolsPagePlugins = activePlugins.filter((p) =>
@@ -64,6 +68,7 @@ export const usePlugins = () => {
 		error,
 		refresh,
 		setEnabled,
+		openPluginsDir,
 		activePlugins,
 		toolsPagePlugins,
 		toolsTabPlugins,

@@ -465,6 +465,10 @@ const appMain = () => {
 
 		// Plugins
 		app.get(urljoin(settings.route, "api/plugins"), api.plugins.fetch);
+		app.post(
+			urljoin(settings.route, "api/plugins/open-directory"),
+			api.plugins.openDirectory,
+		);
 		app.put(urljoin(settings.route, "api/plugins/:id"), api.plugins.update);
 	}
 
