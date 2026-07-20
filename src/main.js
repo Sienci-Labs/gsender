@@ -244,6 +244,16 @@ const main = () => {
 
                 const { address, port, kiosk: resolvedKiosk } = { ...res };
                 kiosk = resolvedKiosk;
+
+                if (res.configRestored) {
+                    log.warn(`Corrupt settings file recovered — backup at ${res.configBackupPath}`);
+                    dialog.showMessageBoxSync(null, {
+                        title: 'Settings File Recovered',
+                        message: 'Your gSender settings file was corrupted and has been reset to defaults.',
+                        detail: `A backup of the corrupted file was saved to:\n${res.configBackupPath}`,
+                    });
+                }
+
                 log.info(`Returned - http://${address}:${port}`);
                 hostInformation = {
                     address,
