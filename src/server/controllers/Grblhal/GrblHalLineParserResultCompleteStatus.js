@@ -91,7 +91,6 @@ class GrblHalLineParserResultCompleteStatus {
         // Has Homed
         if (_.has(result, 'H')) {
             payload.hasHomed = Boolean(Number(result.H[0]));
-            // handle hasHomed
         }
 
         // SD Card
