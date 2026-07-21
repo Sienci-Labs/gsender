@@ -21,9 +21,9 @@
  *
  */
 
+import os from "node:os";
+import path from "node:path";
 import isElectron from "is-electron";
-import os from "os";
-import path from "path";
 import pkg from "../../package.json";
 
 const RC_FILE = pkg.version.includes("EDGE") ? ".edge_rc" : ".sender_rc";
