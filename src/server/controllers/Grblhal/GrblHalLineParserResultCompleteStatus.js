@@ -24,8 +24,10 @@ class GrblHalLineParserResultCompleteStatus {
         // Separate parameters and store them in results, further split by comma for sub values
         {
             r[3].split('|').forEach((param) => {
-                let parts = param.split(':');
-                result[parts[0]] = parts[1].split(',') || null;
+                const nv = param.match(/^([a-zA-Z]+):?(.*)$/);
+                if (nv) {
+                    result[nv[1]] = nv[2].split(',');
+                }
             });
         }
         {
@@ -91,7 +93,6 @@ class GrblHalLineParserResultCompleteStatus {
         // Has Homed
         if (_.has(result, 'H')) {
             payload.hasHomed = Boolean(Number(result.H[0]));
-            // handle hasHomed
         }
 
         // SD Card
