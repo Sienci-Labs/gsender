@@ -707,6 +707,11 @@ class GrblHalController {
 					this.command("gcode", "[global.state.testWCS]");
 				}, 200);
 				this.emit("gcode_error_checking_file", this.sender.state, "finished");
+			} else if (this.sender.state.toolChanges > 0) {
+				// A tool change macro probes the incoming tool and stores its
+				// offset with G10 L1, so the tool table is stale once a job with
+				// tool changes finishes. Nothing is streaming now, so re-read it.
+				this.command("gcode", "$#");
 			}
 		});
 		this.sender.on("requestData", () => {
@@ -1089,6 +1094,10 @@ class GrblHalController {
 		});
 
 		this.runner.on("parameters", (res) => {
+			this.emit("serialport:read", res.raw);
+		});
+
+		this.runner.on("tool", (res) => {
 			this.emit("serialport:read", res.raw);
 		});
 

@@ -310,17 +310,18 @@ class GrblHalRunner extends events.EventEmitter {
             return;
         }
         if (type === GrblHalLineParserResultTool) {
-            delete payload.raw;
+            const { raw, ...tool } = payload;
             const nextSettings = {
                 ...this.settings,
                 toolTable: {
                     ...this.settings.toolTable,
-                    [payload.id]: payload
+                    [tool.id]: tool
                 }
             };
             if (!_.isEqual(this.settings.toolTable, nextSettings.toolTable)) {
                 this.settings = nextSettings;
             }
+            this.emit('tool', { ...tool, raw });
             return;
         }
         if (type === GrblHalLineParserResultParameters) {

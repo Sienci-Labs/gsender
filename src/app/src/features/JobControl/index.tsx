@@ -19,6 +19,7 @@ import { SenderStatus } from 'app/lib/definitions/sender_feeder';
 import { JSX, useEffect, useState } from 'react';
 import pubsub from 'pubsub-js';
 import { SDCardProgress } from 'app/features/JobControl/SDCardProgress.tsx';
+import { isToolProbed } from 'app/features/ATC/utils/ATCFunctions.ts';
 import cx from 'classnames';
 
 interface JobControlProps {
@@ -149,7 +150,7 @@ const JobControl: React.FC<JobControlProps> = ({
             const zOffset = get(offsets, 'toolOffsets.z', 0);
 
             // Tool selected with Offsets
-            if (zOffset < 0) {
+            if (isToolProbed(zOffset)) {
                 return [
                     true,
                     {

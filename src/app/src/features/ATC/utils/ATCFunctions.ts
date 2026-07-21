@@ -30,12 +30,26 @@ export function mapToolNicknamesAndStatus(
     Object.values(tools).forEach((tool) => {
         tool = { ...tool };
         tool.nickname = lookupToolName(tool.id);
-        const flags = getToolFlags(tool.id, rackSize, tool.toolOffsets.z);
+        const flags = getToolFlags(
+            tool.id,
+            rackSize,
+            get(tool, 'toolOffsets.z', 0),
+        );
         tool.status = flags.probeState;
         tool.isManual = flags.isManual;
         toolsArray.push(tool);
     });
     return toolsArray;
+}
+
+// A tool that has never been probed has an offset of exactly zero, since the
+// controller zeroes unwritten tool table entries. The sign of a probed offset
+// depends on the tool change macro's reference scheme - it is negative when the
+// macro stores the raw machine Z of the tool setter trigger, and positive when
+// it stores tool length above a datum - so only zero/non-zero is meaningful.
+export function isToolProbed(zOffset: number): boolean {
+    const offset = Number(zOffset);
+    return Number.isFinite(offset) && offset !== 0;
 }
 
 export function getToolFlags(
@@ -44,13 +58,17 @@ export function getToolFlags(
     zOffset: number,
 ): ToolFlags {
     return {
-        probeState: zOffset < 0 ? 'probed' : 'unprobed',
+        probeState: isToolProbed(zOffset) ? 'probed' : 'unprobed',
         isManual: toolNumber > rackSize,
     };
 }
 
 function setToolStatus(tool: ToolInstance, rackSize): ToolInstance {
-    const flags = getToolFlags(tool.id, rackSize, tool.toolOffsets.z);
+    const flags = getToolFlags(
+        tool.id,
+        rackSize,
+        get(tool, 'toolOffsets.z', 0),
+    );
     tool.status = flags.probeState;
     tool.isManual = flags.isManual;
     return tool;
@@ -103,7 +121,9 @@ export function releaseToolFromSpindle() {
 }
 
 export function loadTool(toolID) {
-    controller.command('gcode', [`M6 T${toolID}`]);
+    // M6 runs the tool change macro, which probes the tool and writes its offset
+    // with G10 L1, so the tool table has to be re-read afterwards.
+    controller.command('gcode', [`M6 T${toolID}`, '$#']);
 }
 
 export function loadAndSaveToRack(toolID) {
