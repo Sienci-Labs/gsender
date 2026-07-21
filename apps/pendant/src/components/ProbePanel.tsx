@@ -19,30 +19,25 @@ import {
     TOUCHPLATE_TYPE_3D,
     PROBE_TYPE_AUTO,
     PROBE_TYPE_DIAMETER,
-    TOUCHPLATE_TYPES,
 } from 'app/lib/constants';
 import {
     GRBL, GRBLHAL, GRBL_ACTIVE_STATE_IDLE, METRIC_UNITS,
     WORKFLOW_STATE_RUNNING,
 } from 'app/constants';
 import { UNITS_EN } from 'app/definitions/general';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@gsender/ui/shadcn/Dropdown';
-import { Button } from '@gsender/ui/primitives/Button';
 
-import RunProbe from '@gsender/features/Probe/RunProbe';
-import ProbeConnectivityBadge from './ProbeConnectivityBadge';
-import ProbeImage from '@gsender/features/Probe/ProbeImage';
-import ProbeDirectionSelection from '@gsender/features/Probe/ProbeDirectionSelection';
-import ProbeDiameter from '@gsender/features/Probe/ProbeDiameter';
 import {
     Actions, AvailableTool, PROBE_TYPES_T, ProbeCommand,
     ProbeProfile, ProbingOptions, State, TOUCHPLATE_TYPES_T,
 } from '@gsender/features/Probe/definitions';
+import ProbeWizardDrawer from './probe-wizard/ProbeWizardDrawer';
+
+const CORNER_LABELS = ['Bottom left', 'Top left', 'Top right', 'Bottom right'];
+
+const formatDiameter = (diameter: number, units: string, probeType?: string | null): string => {
+    if (probeType === 'Auto' || probeType === 'Tip') return probeType;
+    return `${diameter}${units}`;
+};
 
 type DrawerMode = 'closed' | 'minimal' | 'expanded';
 interface Props { mode: DrawerMode }
@@ -101,6 +96,19 @@ export default function ProbePanel({ mode }: Props) {
     const [connectionMade, setConnectionMade] = useState<boolean>(false);
     const [direction, setDirection] = useState<number>(config.get('direction', 0));
     const connectionMadeRef = useRef<boolean>(false);
+
+    const [wizardStep, setWizardStep] = useState(0);
+    const [wizardMaxReached, setWizardMaxReached] = useState(0);
+    const [wizardSkipContinuity, setWizardSkipContinuity] = useState(false);
+    const [lastProbeCorner, setLastProbeCorner] = useState<number | null>(
+        config.get('lastProbeCorner', null),
+    );
+    const [lastProbeDiameter, setLastProbeDiameter] = useState<number | null>(
+        config.get('lastProbeDiameter', null),
+    );
+    const [lastProbeType, setLastProbeType] = useState<string | null>(
+        config.get('lastProbeType', null),
+    );
 
     const calcProbeType = (): PROBE_TYPES_T =>
         touchplateType === TOUCHPLATE_TYPE_AUTOZERO ? PROBE_TYPE_AUTO : PROBE_TYPE_DIAMETER;
@@ -338,12 +346,11 @@ export default function ProbePanel({ mode }: Props) {
     };
 
     const isZProbeOnly = touchplate.touchplateType === TOUCHPLATE_TYPE_ZERO;
-    const showRow2 = probeCmd?.tool || !isZProbeOnly;
 
     return (
         <div className="h-full flex flex-col px-3 py-2 gap-2 min-h-0 justify-center">
             {/* Control rows: flex-1 left section + fixed-width right column */}
-            <div className="flex gap-2 shrink-0">
+            <div className="flex gap-2 shrink-0 min-h-[96px]">
                 {/* Left section */}
                 <div className="flex-1 flex gap-2 min-w-0 items-stretch">
                     {/* Routine selector */}
@@ -364,25 +371,29 @@ export default function ProbePanel({ mode }: Props) {
                             </button>
                         ))}
                     </div>
-                    {/* Probe block label + diameter selector — hidden only for Z-only plates */}
-                    <div className={clsx('flex-1 flex flex-col gap-1', isZProbeOnly && 'invisible')}>
+                    {/* Read-only configuration summary — replaces the old probe block label */}
+                    <div className={clsx('flex-1 flex flex-col justify-center gap-0.5', isZProbeOnly && 'invisible')}>
                         <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide truncate">
-                            {touchplate.touchplateType ?? 'Standard Block'}
+                            Configuration
                         </span>
-                        <div className={clsx(!probeCmd?.tool && 'opacity-40 pointer-events-none')}>
-                            <ProbeDiameter actions={actions} state={state} probeCommand={probeCmd} />
-                        </div>
+                        <span className="text-xs font-semibold text-gray-700 dark:text-gray-200 truncate">
+                            {formatDiameter(toolDiameter, units, probeType)} · {probeCmd?.id?.split(' ')[0] ?? '—'} · {CORNER_LABELS[direction] ?? 'Unknown'}
+                        </span>
                     </div>
                 </div>
 
-                {/* Fixed-width right column — Probe button + Corner selector stacked */}
-                <div className="shrink-0 flex flex-col gap-2 w-24">
+                {/* Fixed-width right column — full-height Probe button */}
+                <div className="shrink-0 flex flex-col gap-1 w-24">
                     <button
                         type="button"
-                        onClick={() => actions.onOpenChange(true)}
+                        onClick={() => {
+                            setWizardSkipContinuity(false);
+                            setWizardStep(0);
+                            setWizardMaxReached(0);
+                        }}
                         disabled={!canClick()}
                         className={clsx(
-                            'w-full flex items-center justify-center gap-1.5 rounded-xl',
+                            'w-full flex-1 flex items-center justify-center gap-1.5 rounded-xl',
                             'font-semibold text-sm min-h-[44px]',
                             'bg-blue-500 hover:bg-blue-600 text-white',
                             'disabled:opacity-40 disabled:cursor-default transition-colors',
@@ -391,59 +402,53 @@ export default function ProbePanel({ mode }: Props) {
                         <Play size={13} fill="white" className="text-white" />
                         Probe
                     </button>
-                    {showRow2 && !isZProbeOnly && (
-                        <ProbeDirectionSelection
-                            direction={direction}
-                            onClick={actions.nextProbeDirection}
-                            isAbsolute={false}
-                            containerClassName="flex items-center justify-center min-h-[44px]"
-                        />
+                    {lastProbeCorner !== null && lastProbeDiameter !== null && (
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setDirection(lastProbeCorner);
+                                actions._setToolDiameter({ value: lastProbeDiameter });
+                                if (lastProbeType) actions._setProbeType(lastProbeType as PROBE_TYPES_T);
+                                setWizardSkipContinuity(true);
+                                setWizardStep(2);
+                                setWizardMaxReached(2);
+                            }}
+                            disabled={!canClick()}
+                            className="w-full text-[10px] leading-tight text-gray-500 dark:text-gray-400 border border-gray-300 dark:border-gray-700 rounded-lg px-1 py-1 disabled:opacity-40"
+                        >
+                            Repeat last: {CORNER_LABELS[lastProbeCorner]}, {formatDiameter(lastProbeDiameter, units, lastProbeType)}
+                        </button>
                     )}
                 </div>
             </div>
 
-            {/* Expanded: Probe Block dropdown + Image card */}
+            {/* Expanded: probe wizard — pendant-only touch-first guided flow */}
             {mode === 'expanded' && (
-                <>
-                    <div className="flex items-center gap-2 shrink-0">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 w-24 shrink-0">Probe Block</span>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button size="sm" className="flex-1 justify-between bg-white dark:bg-gray-800">
-                                    {touchplate.touchplateType ?? 'Standard Block'}
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-56 bg-white dark:bg-dark-darker">
-                                {Object.values(TOUCHPLATE_TYPES).map((tpt) => (
-                                    <DropdownMenuItem
-                                        key={tpt}
-                                        onClick={() => actions.changeTouchPlateType(tpt as TOUCHPLATE_TYPES_T)}
-                                        className="cursor-pointer hover:bg-blue-100 dark:hover:bg-dark-lighter transition-colors"
-                                    >
-                                        {tpt}
-                                    </DropdownMenuItem>
-                                ))}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-
-                    {/* Image card — connectivity badge replaces the corner overlay */}
-                    <div className="flex-1 relative rounded-xl border border-robin-200 dark:border-dark-lighter bg-white dark:bg-dark overflow-hidden flex items-center justify-center min-h-0 [&_img]:!w-auto [&_img]:!max-w-[85%] [&_img]:!max-h-[85%]">
-                        <ProbeImage
-                            probeCommand={probeCmd}
-                            touchplateType={touchplate.touchplateType}
-                        />
-                        <ProbeConnectivityBadge
-                            isConnected={isConnected}
-                            probeActive={probePinStatus}
-                            className="absolute top-2 right-2"
-                        />
-                    </div>
-                </>
+                <div className="flex-1 min-h-0">
+                    <ProbeWizardDrawer
+                        step={wizardStep}
+                        onStepChange={setWizardStep}
+                        maxReached={wizardMaxReached}
+                        onMaxReachedChange={setWizardMaxReached}
+                        direction={direction}
+                        onDirectionChange={setDirection}
+                        toolDiameter={toolDiameter}
+                        units={units}
+                        actions={actions}
+                        state={state}
+                        probeCmd={probeCmd}
+                        skipContinuity={wizardSkipContinuity}
+                        onRunComplete={(corner, diameter) => {
+                            config.set('lastProbeCorner', corner);
+                            config.set('lastProbeDiameter', diameter);
+                            config.set('lastProbeType', probeType);
+                            setLastProbeCorner(corner);
+                            setLastProbeDiameter(diameter);
+                            setLastProbeType(probeType);
+                        }}
+                    />
+                </div>
             )}
-
-            {/* RunProbe modal — always mounted, shows when state.show === true */}
-            <RunProbe state={state} actions={actions} />
         </div>
     );
 }

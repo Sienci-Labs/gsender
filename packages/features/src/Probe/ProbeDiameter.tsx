@@ -105,6 +105,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
     const [value, setValue] = useState(
         probeType === PROBE_TYPE_DIAMETER ? String(toolDiameter) : probeType,
     );
+    const [open, setOpen] = useState(false);
 
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -206,6 +207,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
             if (inputRef.current) {
                 inputRef.current.value = '';
             }
+            setOpen(false);
         },
         [actions],
     );
@@ -389,7 +391,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
     return (
         <div className={cx('w-full', { hidden: !probeCommand.tool })}>
             <div className="flex flex-col space-y-2">
-                <Popover>
+                <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
                         <Button
                             variant="ghost"

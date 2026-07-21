@@ -11,7 +11,7 @@
         "@serialport/parser-byte-length": "^13.0.0",
         "@serialport/parser-readline": "^13.0.0",
         "@sienci/avrgirl-arduino": "^5.0.3",
-        "@sienci/gviewer": "^0.1.7",
+        "@sienci/gviewer": "^0.1.25",
         "axios": "^1.2.4",
         "basic-ftp": "^5.1.0",
         "bcrypt-nodejs": "0.0.3",
@@ -1188,7 +1188,7 @@
 
     "@sienci/avrgirl-arduino": ["@sienci/avrgirl-arduino@5.0.3", "", { "dependencies": { "async": "^2.6.3", "awty": "^0.1.0", "browser-serialport": "git+https://github.com/noopkat/browser-serialport.git#c8628c41c11890d3058875994c15f83f2df8185b", "chip.avr.avr109": "^1.1.1", "colors": "^1.4.0", "graceful-fs": "^4.2.4", "intel-hex": "^0.1.2", "minimist": "^1.2.5", "process": "^0.11.10", "serialport": "^10.5.0", "stk500": "^2.0.3", "stk500-v2": "^1.0.4" }, "bin": { "avrgirl-arduino": "bin/cli.js" } }, "sha512-LKvyYYdU0adr5C8Y1Fdn4VP9Zoh5pSKldntK1m/R77zsGHXCOakI17BvXFNLOmGBGGNda8Xr4x+lJojXK0Z7jA=="],
 
-    "@sienci/gviewer": ["@sienci/gviewer@0.1.7", "", { "peerDependencies": { "react": ">=18", "react-dom": ">=18", "three": "^0.168.0" }, "optionalPeers": ["react", "react-dom", "three"] }, "sha512-vEVmYzpLf1K/nXOOcl6YsASfGYccDsMPNjw64YyDGsBWMhGyPrahsfDyXaRH3pI+bJFs9bUj3TX0skPyxL8wXQ=="],
+    "@sienci/gviewer": ["@sienci/gviewer@0.1.25", "", { "dependencies": { "gsap": "^3.15.0" }, "peerDependencies": { "react": ">=18", "react-dom": ">=18", "three": "^0.168.0" }, "optionalPeers": ["react", "react-dom", "three"] }, "sha512-m9ltzg8romNIlzON8wa5ps3QKL1+rIAwZ26KoJ2yPwWooKFOqqQVH+fLS93lj719vNuanJJwQFdcMQMU/ZvudQ=="],
 
     "@sinclair/typebox": ["@sinclair/typebox@0.34.48", "", {}, "sha512-kKJTNuK3AQOrgjjotVxMrCn1sUJwM76wMszfq1kdU4uYVJjvEWuFQ6HgvLt4Xz3fSmZlTOxJ/Ie13KnIcWQXFA=="],
 
@@ -4501,6 +4501,8 @@
     "@sienci/avrgirl-arduino/async": ["async@2.6.4", "", { "dependencies": { "lodash": "^4.17.14" } }, "sha512-mzo5dfJYwAn29PeiJ0zvwTo04zj8HDJj0Mn8TD7sno7q12prdbnasKJHhkm2c1LgrhlJ0teaea8860oxi51mGA=="],
 
     "@sienci/avrgirl-arduino/serialport": ["serialport@10.5.0", "", { "dependencies": { "@serialport/binding-mock": "10.2.2", "@serialport/bindings-cpp": "10.8.0", "@serialport/parser-byte-length": "10.5.0", "@serialport/parser-cctalk": "10.5.0", "@serialport/parser-delimiter": "10.5.0", "@serialport/parser-inter-byte-timeout": "10.5.0", "@serialport/parser-packet-length": "10.5.0", "@serialport/parser-readline": "10.5.0", "@serialport/parser-ready": "10.5.0", "@serialport/parser-regex": "10.5.0", "@serialport/parser-slip-encoder": "10.5.0", "@serialport/parser-spacepacket": "10.5.0", "@serialport/stream": "10.5.0", "debug": "^4.3.3" } }, "sha512-7OYLDsu5i6bbv3lU81pGy076xe0JwpK6b49G6RjNvGibstUqQkI+I3/X491yBGtf4gaqUdOgoU1/5KZ/XxL4dw=="],
+
+    "@sienci/gviewer/gsap": ["gsap@3.15.0", "", {}, "sha512-dMW4CWBTUK1AEEDeZc1g4xpPGIrSf9fJF960qbTZmN/QwZIWY5wgliS6JWl9/25fpTGJrMRtSjGtOmPnfjZB+A=="],
 
     "@tanstack/router-devtools-core/@tanstack/router-core": ["@tanstack/router-core@1.168.17", "", { "dependencies": { "@tanstack/history": "1.161.6", "cookie-es": "^3.0.0", "seroval": "^1.5.0", "seroval-plugins": "^1.5.0" }, "bin": { "intent": "bin/intent.js" } }, "sha512-VDq7HCqRK3sdpxoETwYoTXTaYi+OVQC197g1fdzaiZBUmhntfjn+PQc15OzTqNNhf8Menk6r6ftmuphybMKdig=="],
 
