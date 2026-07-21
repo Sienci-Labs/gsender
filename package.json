@@ -119,6 +119,12 @@
 			"**/*",
 			"!**/*.map"
 		],
+		"extraFiles": [
+			{
+				"from": "dist/gsender/plugins/",
+				"to": "plugins/"
+			}
+		],
 		"extraResources": [
 			"./node_modules/@electron/remote/**"
 		],
