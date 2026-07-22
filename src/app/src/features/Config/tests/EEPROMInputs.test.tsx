@@ -65,10 +65,6 @@ jest.mock("app/components/shadcn/Input", () => {
     };
 });
 
-// PATH CHECK: same as the utils.ts mock above - these need to match where
-// the components actually live relative to this test file. Test file is
-// at Config/tests/EEPROMInputs.test.tsx; components are assumed to be at
-// Config/components/EEPROMInputs/*.tsx. Adjust if your layout differs.
 import AxisMaskInput from "../components/EEPROMInputs/AxisMaskInput";
 import BitfieldInput from "../components/EEPROMInputs/BitfieldInput";
 import BitValueIndicator from "../components/EEPROMInputs/BitValueIndicator";
@@ -87,7 +83,7 @@ afterEach(() => {
 // ============================================================
 // AxisMaskInput
 // ============================================================
-//Note: This test creates a mock for redux store and renters the component.
+
 describe("AxisMaskInput", () => {
     function renderWithStore(state: any, ownProps: any) {
         const store = createStore(() => state);

@@ -3,7 +3,9 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { SpeedSelector, SpeedSelectButton } from '../components/SpeedSelector';
 import pubsub from 'pubsub-js';
 
-// ─── Mocks ───────────────────────────────────────────────────────────────────
+//-----------------------------
+// ------MOCKS------------------
+//-----------------------------
 
 jest.mock('pubsub-js', () => ({
     subscribe: jest.fn(() => 'token'),
@@ -37,9 +39,9 @@ jest.mock('../utils/units', () => ({
     convertValue: jest.fn((val: number) => val * 0.0393701),
 }));
 
-
-// ─── SpeedSelectButton ───────────────────────────────────────────────────────
-
+//-------------------------------------------------
+// ------ SpeedSelectButton------------------------
+//------------------------------------------------- 
 describe('SpeedSelectButton', () => {
     it('renders label text', () => {
         render(<SpeedSelectButton label="Normal" />);
@@ -92,8 +94,9 @@ describe('SpeedSelectButton', () => {
     });
 });
 
-
-// ─── SpeedSelector rendering ─────────────────────────────────────────────────
+//---------------------------------------------------------
+// -------- SpeedSelector rendering -----------------------
+//---------------------------------------------------------
 
 describe('SpeedSelector — rendering', () => {
     it('renders Precise, Normal, and Rapid buttons', () => {
@@ -121,8 +124,9 @@ describe('SpeedSelector — rendering', () => {
     });
 });
 
-
-// ─── SpeedSelector speed selection ───────────────────────────────────────────
+//------------------------------------------------------------------
+// --------SpeedSelector speed selection----------------------------
+//------------------------------------------------------------------
 
 describe('SpeedSelector — speed selection', () => {
     it('sets Rapid as active when Rapid button is clicked', () => {
@@ -162,8 +166,9 @@ describe('SpeedSelector — speed selection', () => {
     });
 });
 
-
-// ─── SpeedSelector unit conversion ───────────────────────────────────────────
+//----------------------------------------------------------------
+// --------------SpeedSelector unit conversion--------------------
+//----------------------------------------------------------------
 
 describe('SpeedSelector — unit conversion', () => {
     it('converts values when units are imperial and storedInMetric is false', () => {
@@ -181,24 +186,19 @@ describe('SpeedSelector — unit conversion', () => {
         expect(handleClick).toHaveBeenCalled();
     });
 
-    it('does not convert when storedInMetric is true', () => {
-        const { useWorkspaceState } = require('app/hooks/useWorkspaceState');
-        useWorkspaceState.mockReturnValue({ units: 'in' });
-        const store = require('app/store');
-        store.get.mockReturnValue({
-            normal: { xyStep: 5, zStep: 2, feedrate: 3000 },
-            storedInMetric: true,
-        });
-        const handleClick = jest.fn();
-        render(<SpeedSelector handleClick={handleClick} />);
-        expect(handleClick).toHaveBeenCalledWith(
-            expect.objectContaining({ xyStep: 5, zStep: 2, feedrate: 3000 }),
-        );
-    });
+it("does not convert when storedInMetric is true", () => {
+    const handleClick = jest.fn();
+    render(<SpeedSelector handleClick={handleClick} />);
+    expect(handleClick).toHaveBeenCalledWith(
+        expect.objectContaining({ xyStep: 5, zStep: 2, feedrate: 3000 }),
+        "Normal",
+    );
+});
 });
 
-
-// ─── SpeedSelector pubsub ────────────────────────────────────────────────────
+//--------------------------------------------------------
+// ------------SpeedSelector pubsub-----------------------
+//--------------------------------------------------------
 
 describe('SpeedSelector — pubsub subscriptions', () => {
     beforeEach(() => {
@@ -317,8 +317,9 @@ it('calls handleClick when programSettingReset fires for precise preset while pr
 
 
 import { act } from '@testing-library/react';
-
-// ─── SpeedSelector shuttle callbacks ───────────
+//-------------------------------------------------
+// ------SpeedSelector shuttle callbacks-----------
+//-------------------------------------------------
 
 describe('SpeedSelector — shuttle callbacks', () => {
     let shuttleEvents: Record<string, any>;

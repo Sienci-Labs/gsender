@@ -1,20 +1,4 @@
 describe("Gsender testing jogging using buttons", () => {
-	// Ignore known hydration-related UI errors
-	Cypress.on("uncaught:exception", (err) => {
-		console.log("Uncaught exception:", err.message);
-
-		const ignoreMessages = [
-			"Hydration failed",
-			"There was an error while hydrating",
-			"Cannot read properties of undefined",
-			"reading 'get'",
-		];
-
-		if (ignoreMessages.some((msg) => err.message.includes(msg))) {
-			return false;
-		}
-		return true;
-	});
 
 	beforeEach(() => {
 		cy.viewport(1920, 1080);

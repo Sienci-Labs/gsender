@@ -114,16 +114,7 @@ jest.mock("app/lib/units", () => ({
 	convertToMetric: jest.fn((v: number) => v * 25.4),
 }));
 
-// ---- app/components/ControlledInput mock (IPSettingInput, JogInput,
-// LocationInput, NumberSettingInput) ----
-// ASSUMPTION: this is a DIFFERENT ControlledInput than the local one
-// tested in EEPROMInputs.test.tsx (that one lives at
-// Config/components/EEPROMInputs/ControlledInput; this one is a shared
-// app-wide component at app/components/ControlledInput). Its exact
-// internals aren't available, so it's mocked here as a thin native
-// input that forwards the raw change event, since all six consumers
-// below extract what they need (e.target.value / e.target.valueAsNumber)
-// themselves rather than relying on any truncate-on-blur behavior.
+
 jest.mock("app/components/ControlledInput", () => {
 	const React = require("react");
 	return {

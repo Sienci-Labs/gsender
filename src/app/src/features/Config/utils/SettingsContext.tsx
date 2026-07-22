@@ -586,10 +586,8 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
 		const inputDefault = get(profileDefaults, lookupKey, "-");
 
 		if (inputDefault === "-") {
-			return true; // default in cases where we don't know the default
+			return true; 
 		}
-
-		// if we are checking default for numbers, we need to include decimals
 		if (
 			(settingData as gSenderSetting).type === "hybrid" ||
 			Number((settingData as FilteredEEPROM).dataType) === 5 || // integer
@@ -628,7 +626,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
 
 			return isEqual(v.value, v.defaultValue);
 		}
-		return true; // Default to true, so non-key settings aren't always highlighted.
+		return true; 
 	}
 
 	function toggleFilterNonDefault() {

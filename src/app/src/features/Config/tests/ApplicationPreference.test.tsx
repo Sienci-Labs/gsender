@@ -16,7 +16,6 @@ jest.mock("app/features/Config/utils/Settings.ts", () => ({
 	importSettings: jest.fn(),
 }));
 
-// ActionButton already has its own dedicated test file; mock it here so this
 // test focuses purely on ApplicationPreferences' own wiring.
 jest.mock("app/features/Config/components/ActionButton.tsx", () => ({
 	ActionButton: ({ label, icon, onClick, testId, disabled }: any) => (
