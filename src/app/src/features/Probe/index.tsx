@@ -154,9 +154,8 @@ const ProbeWidget = () => {
     const [useSafeProbeOption, setUseSafeProbeOption] =
         useState<boolean>(false);
     const [selectedProbeCommand, setSelectedProbeCommand] = useState<number>(0);
-    const [touchplateTypeSwitcher, setTouchplateTypeSwitcher] = useState<boolean>(
-        config.get('touchplateTypeSwitcher')
-    );
+    const [touchplateTypeSwitcher, setTouchplateTypeSwitcher] =
+        useState<boolean>(config.get('touchplateTypeSwitcher'));
     const [connectivityTest, setConnectivityTest] = useState<boolean>(
         config.get('connectivityTest'),
     );
@@ -387,11 +386,21 @@ const ProbeWidget = () => {
         },
         runProbeCommands: (commands: string[]): void => {
             controller.command('gcode:safe', commands, 'G21');
+            const directionLabels = [
+                'Bottom Left',
+                'Top Left',
+                'Top Right',
+                'Bottom Right',
+            ];
+            const directionLabel = directionLabels[direction] || 'Unknown';
+
             posthog?.capture('probe_run', {
-                probe_command_id: availableProbeCommands[selectedProbeCommand]?.id,
+                probe_command_id:
+                    availableProbeCommands[selectedProbeCommand]?.id,
                 touchplate_type: touchplateType,
                 units,
                 firmware: type,
+                direction: directionLabel,
             });
         },
         returnProbeConnectivity: (): boolean => {
