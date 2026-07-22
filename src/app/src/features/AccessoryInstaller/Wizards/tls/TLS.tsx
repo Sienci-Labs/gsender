@@ -31,7 +31,7 @@ export function useSienciTLSWizard(): Wizard {
     const { connectionValidation, homingValidation, grblHAlValidator } = useValidations();
 
     const validations = useMemo(
-        () => [connectionValidation, homingValidation, grblHAlValidator],
+        () => [connectionValidation, grblHAlValidator, homingValidation],
         [connectionValidation, homingValidation],
     );
 
