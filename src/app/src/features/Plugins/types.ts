@@ -3,13 +3,33 @@ export type PluginContributionSlot =
 	| "tools-page"
 	| "settings-section"
 	| "navbar"
-	| "standalone";
+	| "standalone"
+	| "visualizer-overlay";
+
+// A declarative marker the host draws over the visualizer canvas on behalf of
+// an overlay plugin. Coordinates are in world/scene space; the host re-projects
+// them to screen space every frame so they track camera pan/zoom. Plugins never
+// draw on the canvas themselves — they hand the host this list.
+export interface OverlayMarker {
+	id: string;
+	x: number;
+	y: number;
+	z?: number; // world coordinates
+	shape?: "circle" | "cross" | "ring"; // default 'circle'
+	color?: string; // CSS color
+	size?: number; // px, default 6
+	label?: string;
+}
 
 export type PluginContribution = {
 	slot: PluginContributionSlot;
 	label?: string;
 	route?: string;
 	icon?: string;
+	// For "visualizer-overlay" contributions that drive machine motion: when
+	// true, the host greys out and blocks the overlay toggle unless the machine
+	// is connected and idle (i.e. actually able to accept the command).
+	requiresIdle?: boolean;
 };
 
 export type PluginRecord = {
@@ -35,9 +55,17 @@ export type PluginsResponse = {
 export type PluginBridgeRequestType =
 	| "machine:get:context"
 	| "machine:command"
+	| "machine:busy:set"
 	| "workspace:get:state"
 	| "redux:get:state"
-	| "gcode:load:to:visualizer";
+	| "gcode:load:to:visualizer"
+	| "viewer:screen-to-world"
+	| "viewer:world-to-screen"
+	| "viewer:camera:set"
+	| "viewer:camera:lock-rotate"
+	| "viewer:pick:arm"
+	| "viewer:pick:disarm"
+	| "viewer:overlay:set";
 
 export type PluginBridgeRequest = {
 	id: string;
@@ -52,8 +80,10 @@ export type PluginBridgeResponse = {
 	error?: string;
 };
 
-// Reactive state that plugins can subscribe to for live updates.
-export type PluginBridgeTopic = "workspace" | "redux";
+// Reactive state that plugins can subscribe to for live updates. "viewer" is a
+// push-only event stream (pick/hold-progress events) rather than a state
+// snapshot topic.
+export type PluginBridgeTopic = "workspace" | "redux" | "viewer";
 
 export type PluginBridgeSubscribe = {
 	id: string;
