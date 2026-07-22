@@ -26,50 +26,22 @@ import ensureArray from "ensure-array";
 import * as parser from "gcode-parser";
 import _ from "lodash";
 import map from "lodash/map";
-import { YModem } from "server/lib/YModemUSB";
-import {
-	ALARM,
-	CONTROLLER_READY,
-	CYCLE_START,
-	ERROR,
-	FEED_HOLD,
-	FILE_UNLOAD,
-	HOMING,
-	MACRO_LOAD,
-	MACRO_RUN,
-	METRIC_UNITS,
-	PROGRAM_END,
-	PROGRAM_PAUSE,
-	PROGRAM_RESUME,
-	PROGRAM_START,
-	SLEEP,
-} from "../../../app/src/constants";
-import delay from "../../lib/delay";
-import EventTrigger from "../../lib/EventTrigger";
-import ensurePositiveNumber from "../../lib/ensure-positive-number";
-import evaluateAssignmentExpression from "../../lib/evaluate-assignment-expression";
-import { extractRealtimeCommands } from "../../lib/extract-realtime-commands";
-import Feeder from "../../lib/Feeder";
+
 import GcodeToolpath from "../../lib/GcodeToolpath";
-import { GrblHALFTP } from "../../lib/GrblHALFTP";
-import {
-	GCODE_TRANSLATION_TYPE,
-	translateGcode,
-} from "../../lib/gcode-translation";
-import {
-	determineHALMachineZeroFlag,
-	determineMaxMovement,
-	getAxisMaximumLocation,
-} from "../../lib/homing";
-import logger from "../../lib/logger";
+import EventTrigger from "../../lib/EventTrigger";
+import Feeder from "../../lib/Feeder";
 import Sender, { SP_TYPE_CHAR_COUNTING } from "../../lib/Sender";
-import ToolChanger from "../../lib/ToolChanger";
-import translateExpression from "../../lib/translate-expression";
 import Workflow, {
 	WORKFLOW_STATE_IDLE,
 	WORKFLOW_STATE_PAUSED,
 	WORKFLOW_STATE_RUNNING,
 } from "../../lib/Workflow";
+import delay from "../../lib/delay";
+import ensurePositiveNumber from "../../lib/ensure-positive-number";
+import evaluateAssignmentExpression from "../../lib/evaluate-assignment-expression";
+import logger from "../../lib/logger";
+import translateExpression from "../../lib/translate-expression";
+import { extractRealtimeCommands } from "../../lib/extract-realtime-commands";
 import config from "../../services/configstore";
 import monitor from "../../services/monitor";
 import taskRunner from "../../services/taskrunner";
@@ -81,23 +53,52 @@ import {
 	WRITE_SOURCE_FEEDER,
 	Y_AXIS_COMMANDS,
 } from "../constants";
-import { calcOverrides } from "../runOverride";
+import GrblHalRunner from "./GrblHalRunner";
 import {
-	ATCI_SUPPORTED_VERSION,
-	GRBL_HAL_ACTIVE_STATE_ALARM,
-	GRBL_HAL_ACTIVE_STATE_CHECK,
-	GRBL_HAL_ACTIVE_STATE_HOLD,
-	GRBL_HAL_ACTIVE_STATE_HOME,
-	GRBL_HAL_ACTIVE_STATE_IDLE,
-	GRBL_HAL_ACTIVE_STATE_RUN,
+	GRBLHAL,
+	GRBLHAL_REALTIME_COMMANDS,
 	GRBL_HAL_ALARMS,
 	GRBL_HAL_ERRORS,
 	GRBL_HAL_SETTINGS,
-	GRBLHAL,
-	GRBLHAL_REALTIME_COMMANDS,
+	GRBL_HAL_ACTIVE_STATE_HOME,
+	GRBL_HAL_ACTIVE_STATE_HOLD,
+	GRBL_HAL_ACTIVE_STATE_IDLE,
+	GRBL_HAL_ACTIVE_STATE_CHECK,
+	GRBL_HAL_ACTIVE_STATE_RUN,
+	GRBL_HAL_ACTIVE_STATE_ALARM,
+	ATCI_SUPPORTED_VERSION,
 } from "./constants";
-import GrblHalRunner from "./GrblHalRunner";
+import {
+	METRIC_UNITS,
+	PROGRAM_PAUSE,
+	PROGRAM_RESUME,
+	PROGRAM_START,
+	PROGRAM_END,
+	CONTROLLER_READY,
+	FEED_HOLD,
+	CYCLE_START,
+	HOMING,
+	SLEEP,
+	MACRO_RUN,
+	MACRO_LOAD,
+	FILE_UNLOAD,
+	ALARM,
+	ERROR,
+} from "../../../app/src/constants";
+import {
+	determineHALMachineZeroFlag,
+	determineMaxMovement,
+	getAxisMaximumLocation,
+} from "../../lib/homing";
+import { calcOverrides } from "../runOverride";
+import ToolChanger from "../../lib/ToolChanger";
+import {
+	GCODE_TRANSLATION_TYPE,
+	translateGcode,
+} from "../../lib/gcode-translation";
 
+import { YModem } from "server/lib/YModemUSB";
+import { GrblHALFTP } from "../../lib/GrblHALFTP";
 // % commands
 const WAIT = "%wait";
 const PREHOOK_COMPLETE = "%pre_complete";
@@ -283,7 +284,7 @@ class GrblHalController {
 
 			{
 				// Grbl settings: $0-$255
-				const r = line.match(/^(\$\d{1,3})=([\d.]+)$/);
+				const r = line.match(/^(\$\d{1,3})=([\d\.]+)$/);
 				if (r) {
 					const name = r[1];
 					const value = Number(r[2]);
@@ -317,8 +318,8 @@ class GrblHalController {
 		// Feeder
 		this.feeder = new Feeder({
 			dataFilter: (line, context) => {
-				const commentMatcher = /\s*;.*/g;
-				const comment = line.match(commentMatcher);
+				let commentMatcher = /\s*;.*/g;
+				let comment = line.match(commentMatcher);
 				const commentString =
 					comment && comment[0].length > 0
 						? comment[0].trim().replace(";", "")
@@ -492,9 +493,9 @@ class GrblHalController {
 			bufferSize: 1024 - 300, // TODO: Parse this out from OPT
 			dataFilter: (line, context) => {
 				// Remove comments that start with a semicolon `;`
-				const commentMatcher = /\s*;.*/g;
-				const bracketCommentLine = /\([^)]*\)/gm;
-				const toolCommand = /(T)(-?\d*\.?\d+\.?)/;
+				let commentMatcher = /\s*;.*/g;
+				let bracketCommentLine = /\([^\)]*\)/gm;
+				let toolCommand = /(T)(-?\d*\.?\d+\.?)/;
 				const commentRegex = /\(([^)]*)\)|;(.*)/g;
 				const commentParts = [];
 				let m;
@@ -502,7 +503,7 @@ class GrblHalController {
 					const text = (m[1] !== undefined ? m[1] : m[2]).trim();
 					if (text) commentParts.push(text);
 				}
-				const commentString = commentParts.join(" ");
+				let commentString = commentParts.join(" ");
 				if (line[0] !== "%") {
 					line = line.replace(bracketCommentLine, "").trim();
 					line = line.replace(commentMatcher, "").replace("/uFEFF", "").trim();
@@ -583,7 +584,7 @@ class GrblHalController {
 						return line.replace(/M0*6(?!\d)/i, "(M6)");
 					}
 
-					const tool = line.match(toolCommand);
+					let tool = line.match(toolCommand);
 					log.debug("Found tool");
 					let toolLabel = tool?.[0] || null;
 					let toolNumber = tool?.[2] || null;
@@ -741,7 +742,7 @@ class GrblHalController {
 		this.workflow.on("resume", (...args) => {
 			this.emit("workflow:state", this.workflow.state);
 
-			const pauseTime = new Date().getTime() - this.timePaused;
+			let pauseTime = new Date().getTime() - this.timePaused;
 
 			// if there was error and feeder was holding, don't reset
 			if (this.feeder.state.hold) {
@@ -1322,6 +1323,7 @@ class GrblHalController {
 					"status.activeState",
 					"",
 				);
+
 				// only pause countdown once machine is idle
 				if (
 					this.workflow.isPaused() &&
@@ -1879,7 +1881,7 @@ class GrblHalController {
 	command(cmd, ...args) {
 		const handler = {
 			"firmware:recievedProfiles": () => {
-				const [files] = args;
+				let [files] = args;
 				this.emit("task:finish", files);
 			},
 			"firmware:grabMachineProfile": () => {
@@ -1963,7 +1965,7 @@ class GrblHalController {
 					let spindleRate = 0;
 
 					const getWordValue = (token, words) => {
-						for (const wordPair of words) {
+						for (let wordPair of words) {
 							const [word, value] = wordPair;
 							if (word === token) {
 								return value;
@@ -1997,6 +1999,7 @@ class GrblHalController {
 					});
 
 					const modal = toolpath.getModal();
+					const hasSeenM6 = toolpath.hasSeenM6();
 
 					const position = toolpath.getPosition();
 
@@ -2037,7 +2040,9 @@ class GrblHalController {
 					modalGCode.push(this.event.getEventCode(PROGRAM_START));
 					modalGCode.push(`G0 G90 G21 Z${zMax + safeHeight}`);
 					// ATCI - add M6 before spindles turned on to get correct tool to spin up
-					if (atci && modal.tool !== 0) {
+					// Only insert if an M6 was actually parsed - a bare T word with no M6
+					// (some CAM posts never emit M6) should not trigger a tool change here
+					if (atci && modal.tool !== 0 && hasSeenM6) {
 						if (this.toolChangeContext.mappings) {
 							const remap = _.get(
 								this.toolChangeContext.mappings,
@@ -2288,7 +2293,7 @@ class GrblHalController {
 				const [value] = args;
 				const [feedOV] = this.state.status.ov;
 
-				const diff = value - feedOV;
+				let diff = value - feedOV;
 				if (value === 100) {
 					this.FOQueue.push(String.fromCharCode(0x90));
 				} else {
@@ -2429,7 +2434,7 @@ class GrblHalController {
 				let unitModal = units === METRIC_UNITS ? "G21" : "G20";
 				let { $20, $130, $131, $132, $23, $13, $40 } = this.settings.settings;
 
-				const jogFeedrate = unitModal === "G21" ? 3000 : 118;
+				let jogFeedrate = unitModal === "G21" ? 3000 : 118;
 				if ($20 === "1" && $40 === "0") {
 					// if 40 enabled, can just use non-soft limit logic
 					$130 = Number($130);
@@ -2467,7 +2472,7 @@ class GrblHalController {
 						}
 					};
 
-					const { mpos } = this.state.status;
+					let { mpos } = this.state.status;
 					Object.keys(mpos).forEach((axis) => {
 						const val = Number(mpos[axis]);
 

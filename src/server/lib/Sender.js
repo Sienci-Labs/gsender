@@ -22,7 +22,7 @@
  */
 
 /* eslint max-classes-per-file: 0 */
-import events from "node:events";
+import events from "events";
 import logger from "./logger";
 import { checkIfRotaryFile } from "./rotary";
 
@@ -47,7 +47,7 @@ class SPSendResponse {
 	}
 
 	process() {
-		this.callback?.(this);
+		this.callback && this.callback(this);
 	}
 
 	clear() {
@@ -87,7 +87,7 @@ class SPCharCounting {
 	}
 
 	process(isOk) {
-		this.callback?.(this, isOk);
+		this.callback && this.callback(this, isOk);
 	}
 
 	reset() {
@@ -232,7 +232,7 @@ class Sender extends events.EventEmitter {
 						continue;
 					}
 
-					const line = `${sp.line}\n`;
+					const line = sp.line + "\n";
 					sp.line = "";
 					sp.dataLength += line.length;
 					sp.queue.push(line.length);
@@ -243,7 +243,7 @@ class Sender extends events.EventEmitter {
 
 		// send-response
 		if (type === SP_TYPE_SEND_RESPONSE) {
-			this.sp = new SPSendResponse(options, (_sp) => {
+			this.sp = new SPSendResponse(options, (sp) => {
 				while (!this.state.hold && this.state.sent < this.state.total) {
 					// Remove leading and trailing whitespace from both ends of a string
 					let line = this.state.lines[this.state.sent].trim();
@@ -260,7 +260,7 @@ class Sender extends events.EventEmitter {
 						continue;
 					}
 
-					this.emit("data", `${line}\n`, this.state.context);
+					this.emit("data", line + "\n", this.state.context);
 					break;
 				}
 			});
@@ -432,7 +432,7 @@ class Sender extends events.EventEmitter {
 			return false;
 		}
 
-		const now = Date.now();
+		const now = new Date().getTime();
 
 		const handleStart = () => {
 			this.state.startTime = now;
@@ -634,7 +634,7 @@ class Sender extends events.EventEmitter {
 
 	updateElapsedTime() {
 		// Elapsed Time
-		const now = Date.now();
+		const now = new Date().getTime();
 		this.state.elapsedTime = now - this.state.startTime;
 		this.state.timeRunning = this.state.elapsedTime - this.state.timePaused;
 	}

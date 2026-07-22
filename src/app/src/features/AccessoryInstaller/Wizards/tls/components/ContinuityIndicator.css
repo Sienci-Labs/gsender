@@ -1,0 +1,209 @@
+.continuity-indicator {
+    /* gSender's dark mode is a manual `.dark` class on <html> (see
+       useDarkMode.ts), not the OS-level prefers-color-scheme — define plain
+       light-mode defaults here and override under `.dark` below, so the
+       indicator always matches the app's own toggle rather than the OS. */
+    --ring-idle: #64708a;
+    --ring-rest: #dbdee3;
+    --state-success: #12a150;
+    --state-danger: #d6362d;
+    --text-primary: #1a1d22;
+    --text-secondary: #5b6472;
+
+    --state-color: var(--ring-idle);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.dark .continuity-indicator {
+    --ring-idle: #7b879a;
+    --ring-rest: #2c323c;
+    --state-success: #38d68c;
+    --state-danger: #f1473f;
+    --text-primary: #eceef1;
+    --text-secondary: #8b92a0;
+}
+
+.continuity-indicator[data-phase='success'] {
+    --state-color: var(--state-success);
+}
+.continuity-indicator[data-phase='stuck-on'] {
+    --state-color: var(--state-danger);
+}
+
+.continuity-indicator__shell {
+    position: relative;
+    filter: drop-shadow(
+        0 0 16px color-mix(in srgb, var(--state-color) 32%, transparent)
+    );
+    transition: filter 0.4s ease;
+}
+.continuity-indicator[data-phase='stuck-on'] .continuity-indicator__shell {
+    animation: ciStrobeGlow 0.9s ease-in-out infinite;
+}
+@keyframes ciStrobeGlow {
+    0%,
+    100% {
+        filter: drop-shadow(
+            0 0 16px color-mix(in srgb, var(--state-color) 22%, transparent)
+        );
+    }
+    50% {
+        filter: drop-shadow(
+            0 0 36px color-mix(in srgb, var(--state-color) 62%, transparent)
+        );
+    }
+}
+
+.continuity-indicator__svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    overflow: visible;
+}
+
+.ci-bezel {
+    transform-box: fill-box;
+    transform-origin: 50% 50%;
+    stroke: var(--ring-rest);
+    stroke-width: 1.5;
+    transition:
+        stroke 0.3s ease,
+        stroke-width 0.3s ease,
+        stroke-dasharray 0.3s ease;
+}
+.continuity-indicator[data-phase='success'] .ci-bezel,
+.continuity-indicator[data-phase='stuck-on'] .ci-bezel {
+    stroke: var(--state-color);
+    stroke-width: 3;
+}
+.ci-ripple {
+    transform-box: fill-box;
+    transform-origin: 50% 50%;
+    stroke: var(--state-color);
+    opacity: 0;
+}
+.continuity-indicator[data-phase='checking-idle'] .ci-ripple,
+.continuity-indicator[data-phase='waiting'] .ci-ripple {
+    animation: ciSonarPing 2s ease-out infinite;
+}
+.ci-ripple--2 {
+    animation-delay: 1s;
+}
+@keyframes ciSonarPing {
+    0% {
+        transform: scale(0.6);
+        opacity: 0.6;
+    }
+    100% {
+        transform: scale(2.5);
+        opacity: 0;
+    }
+}
+
+.ci-core {
+    transform-box: fill-box;
+    transform-origin: 50% 50%;
+    fill: var(--state-color);
+    transition:
+        fill 0.3s ease,
+        opacity 0.2s ease;
+}
+/* Once a glyph is shown, the core dot would sit directly behind it in the
+   same color and make the icon unreadable — fade it out instead. */
+.continuity-indicator[data-phase='success'] .ci-core,
+.continuity-indicator[data-phase='stuck-on'] .ci-core {
+    opacity: 0;
+}
+.continuity-indicator[data-phase='success'] .ci-core {
+    animation: ciSonarPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes ciSonarPop {
+    0% {
+        transform: scale(0.6);
+    }
+    60% {
+        transform: scale(1.18);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+.continuity-indicator__glyph {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(0.55);
+    transition:
+        opacity 0.3s ease,
+        transform 0.3s ease;
+    pointer-events: none;
+    color: var(--state-color);
+}
+.continuity-indicator__glyph svg {
+    width: 30%;
+    height: 30%;
+}
+.continuity-indicator[data-phase='success']
+    .continuity-indicator__glyph--check {
+    opacity: 1;
+    transform: scale(1);
+}
+.continuity-indicator[data-phase='stuck-on']
+    .continuity-indicator__glyph--warning {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.continuity-indicator__readout {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-primary);
+}
+.continuity-indicator__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--state-color);
+    transition: background 0.3s ease;
+    flex-shrink: 0;
+}
+.continuity-indicator[data-phase='checking-idle'] .continuity-indicator__dot,
+.continuity-indicator[data-phase='waiting'] .continuity-indicator__dot {
+    animation: ciDotPulse 1.4s ease-in-out infinite;
+}
+@keyframes ciDotPulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.35;
+    }
+}
+
+.continuity-indicator__visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ci-ripple,
+    .continuity-indicator__shell,
+    .ci-bezel,
+    .continuity-indicator__dot {
+        animation: none !important;
+    }
+}
