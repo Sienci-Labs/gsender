@@ -39,6 +39,7 @@ export function TLSOptions({ onComplete, onUncomplete }: StepProps) {
         if (!firmwarePastVersion(ATCI_SUPPORTED_VERSION)) {
             code.push('$668=0');
         }
+        code.push('$$');
         controller.command('gcode', code);
 
         store.set('workspace.toolChangeOption', 'Fixed Tool Sensor');
