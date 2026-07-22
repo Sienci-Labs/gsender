@@ -1,7 +1,6 @@
 import { Wizard } from 'app/features/AccessoryInstaller/types';
 import { useValidations } from 'app/features/AccessoryInstaller/hooks/UseValidations.tsx';
 import { useMemo } from 'react';
-import TLSPlaceholder from './assets/tls_placeholder.png';
 import { TLSOptions } from 'app/features/AccessoryInstaller/Wizards/tls/components/TLSOptions.tsx';
 import { TLSLocation } from 'app/features/AccessoryInstaller/Wizards/tls/components/TLSLocation.tsx';
 import { ManualToolChangePosition } from 'app/features/AccessoryInstaller/Wizards/tls/components/ManualToolChangePosition.tsx';
@@ -10,6 +9,10 @@ import { ContinuityCheck } from 'app/features/AccessoryInstaller/Wizards/tls/com
 import { TLSContinuitySidebar } from 'app/features/AccessoryInstaller/Wizards/tls/components/TLSContinuitySidebar.tsx';
 import { Jogging } from 'app/features/Jogging';
 import store from 'app/store';
+
+import TLS_STEP_ONE from './assets/TLS_Step_01.png';
+import TLS_STEP_TWO from './assets/TLS_Step_02.png';
+import TLS_STEP_THREE from './assets/TLS_Step_02.png';
 
 const HELP_URL = 'https://resources.sienci.com/view/addons-tls/';
 
@@ -25,7 +28,7 @@ export function useSienciTLSWizard(): Wizard {
         () => ({
             id: 'sienci-tls',
             title: 'Sienci TLS',
-            image: TLSPlaceholder,
+            image: TLS_STEP_ONE,
             validations: [...validations],
             helpUrl: HELP_URL,
             subWizards: [
