@@ -112,6 +112,35 @@ You can both run gSender locally using the public code-base as well as compile i
 <details>
 <summary>Expand to see all version notes</summary>
 
+### 1.6.3 (July 23, 2026)
+- Added LongMill MK3 profiles.
+- Added flashing path for new SLB-Lite using `$UF2`.
+- Added TLS installation wizard to the accessory installation tool.
+- Added ability to specify feed rate on final probe movements — default `0` continues to use `G0`; any other value uses `G1 Fx` where `x` is the configured value.
+- SD tool now allows uploading multiple files at the same time.
+- Added pending toolchange state to the toolchange wizard while already-planned lines finish their motions, and delayed wizard appearance until closer to the actual `M6` command.
+- Updating the toolchange passthrough setting now updates the controller without reconnecting or reloading a file.
+- Updating the passthrough setting in Config updates that option without requiring a file reload or reconnect.
+- No longer swaps spindle min/max for grblHAL, so PWM can be used as a laser without issues.
+- `pos{axis}` and `mpos{axis}` feeder variables are now always returned in mm, regardless of report-in-inches (`$13`) status.
+- Homing status on connect for already-homed grblHAL devices is now more consistent.
+- Tool probe status now allows positive values — only `0` is considered unprobed.
+- Probe status badge in the tool timeline now only shows when using grblHAL with ATC=1 (tc.macro exists).
+- Added background to job progress line count for readability when the visualizer is disabled.
+- ATC options tool is now disabled if no SD card is mounted.
+- Improved reliability of Config Store truncation.
+- Added various updates to prevent the ConfigStore file (sender_rc) from becoming corrupted.
+- Corrupted ConfigStore files no longer block application startup.
+- Various firmware updates for the latest grblHAL core version.
+- Updated grblHAL profiles for the new firmware release — mostly related to laser/PWM2 behaviors.
+- Entering laser mode on grblHAL no longer swaps `$30` and `$31` with the laser equivalents.
+- Fixed tool timeline not reflecting the remapped tool number after minimizing.
+- Fixed issue where opening the run probe dialog with connectivity would cause all future connectivity tests to pass immediately.
+- Fixed issue where restoring an altered EEPROM value in Config without applying wouldn't update the UI with the correct value in the Config tool.
+- Fixed toggling single-axis homing on and then off in the on-state not showing the original "go to" buttons.
+- Fixed backwards logic on the park shortcut, allowing usage when homed.
+- Fixed job progress not updating correctly after a tool change was handled via one of the wizard strategies.
+
 ### 1.6.2 (May 26, 2026)
 
 - Updated firmware defaults to better account for TLS/probe misconfiguration scenarios

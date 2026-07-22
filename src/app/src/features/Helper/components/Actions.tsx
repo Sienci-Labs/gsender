@@ -27,8 +27,9 @@ import { GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
 import uniqueId from 'lodash/uniqueId';
 import get from 'lodash/get';
 import controller from 'app/lib/controller';
+import cx from 'classnames';
 import { useWizardAPI, useWizardContext } from 'app/features/Helper/context';
-import { Terminal } from 'lucide-react';
+import { Terminal, CheckCircle } from 'lucide-react';
 import { useSelector } from 'react-redux';
 
 interface WizardAction {
@@ -57,14 +58,19 @@ interface ActionsProps {
     substepIndex: number;
 }
 
+const AUTO_ADVANCE_DELAY_MS = 1500;
+
 const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
     const [tooltip, setTooltip] = useState<TooltipState | null>(null);
+    const [showSuccess, setShowSuccess] = useState(false);
     const tooltipTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const advanceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const loadingStartRef = useRef<number | null>(null);
     const {
         markActionAsComplete,
         completeSubStep,
         setIsLoading,
+        setResumingJob,
     } = useWizardAPI();
     const { isLoading, steps } = useWizardContext();
     const activeState = useSelector((state: Record<string, unknown>) =>
@@ -103,9 +109,19 @@ const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
                     setTimeout(() => {
                         cb.markActionAsComplete(cb.stepIndex, cb.substepIndex);
                         cb.setIsLoading(false);
-                        if (cb.isLastSubstep) {
+
+                        // Handled by a persistent listener in context.jsx
+                        // instead — this component unmounts the instant
+                        // resumingJob flips true on click (see
+                        // cbWithCompletion below), well before this event
+                        // could arrive.
+                        if (cb.isLastSubstep) return;
+
+                        setShowSuccess(true);
+                        advanceTimerRef.current = setTimeout(() => {
+                            setShowSuccess(false);
                             cb.completeSubStep(cb.stepIndex, cb.substepIndex);
-                        }
+                        }, AUTO_ADVANCE_DELAY_MS);
                     }, delay);
                 }
             }),
@@ -119,8 +135,22 @@ const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
                 pubsub.unsubscribe(token);
             });
             if (tooltipTimer.current) clearTimeout(tooltipTimer.current);
+            if (advanceTimerRef.current) clearTimeout(advanceTimerRef.current);
         };
     }, []);
+
+    // If the rendered substep changes for any reason (our own auto-advance
+    // firing, or the user manually clicking Back mid-countdown), cancel any
+    // pending auto-advance left over from the substep we just left.
+    useEffect(() => {
+        return () => {
+            if (advanceTimerRef.current) {
+                clearTimeout(advanceTimerRef.current);
+                advanceTimerRef.current = null;
+            }
+            setShowSuccess(false);
+        };
+    }, [stepIndex, substepIndex]);
 
     return (
         <>
@@ -132,8 +162,16 @@ const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
             <div className="flex flex-col gap-2">
                 {actions.map((action, index) => {
                     const cbWithCompletion = () => {
+                        if (advanceTimerRef.current) {
+                            clearTimeout(advanceTimerRef.current);
+                            advanceTimerRef.current = null;
+                        }
+                        setShowSuccess(false);
                         loadingStartRef.current = Date.now();
                         setIsLoading(true);
+                        if (isLastSubstep) {
+                            setResumingJob(true);
+                        }
                         controller.command(
                             'wizard:step',
                             stepIndex,
@@ -157,7 +195,12 @@ const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
                             ) : !isLoading && (
                                 <>
                                     <div
-                                        className="flex items-center justify-between px-3 py-2 rounded border border-gray-200 dark:border-[#2a2a35] bg-gray-50 dark:bg-[#0d0d12]"
+                                        className={cx(
+                                            'flex items-center justify-between px-3 py-2 rounded border transition-colors duration-500',
+                                            showSuccess
+                                                ? 'border-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 dark:border-emerald-700'
+                                                : 'border-gray-200 dark:border-[#2a2a35] bg-gray-50 dark:bg-[#0d0d12]',
+                                        )}
                                         data-chip="true"
                                     >
                                         <div
@@ -176,7 +219,11 @@ const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
                                                 setTooltip(null);
                                             }}
                                         >
-                                            <Terminal size={13} className="shrink-0 text-gray-400 dark:text-cyan-400" />
+                                            {showSuccess ? (
+                                                <CheckCircle size={13} className="shrink-0 text-emerald-600 dark:text-emerald-400" />
+                                            ) : (
+                                                <Terminal size={13} className="shrink-0 text-gray-400 dark:text-cyan-400" />
+                                            )}
                                             <code className="text-sm font-mono text-sky-700 dark:text-cyan-400 truncate">
                                                 {action.label}
                                             </code>
