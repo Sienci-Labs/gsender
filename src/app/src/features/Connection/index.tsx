@@ -161,14 +161,25 @@ function Connection(props: ConnectionProps) {
                     return;
                 }
 
-                setConnectionState(ConnectionState.CONNECTED);
-                setActivePort(port);
-                posthog?.capture('machine_connected', {
+                const firmwareVersion = get(
+                    controller.settings,
+                    'version.semver',
+                    'Unknown',
+                );
+
+                const payload = {
                     port,
                     connection_type: type,
                     baudrate: baud,
                     firmware: defaultFirmware,
-                });
+                    firmware_version: firmwareVersion,
+                };
+
+                console.log(payload);
+
+                setConnectionState(ConnectionState.CONNECTED);
+                setActivePort(port);
+                posthog?.capture('machine_connected', payload);
             },
         );
 
