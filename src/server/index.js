@@ -45,7 +45,7 @@ import settings from './config/settings';
 import app from './app';
 import cncengine from './services/cncengine';
 import monitor from './services/monitor';
-import config from './services/configstore';
+import config, { validateAndRepairConfigFile } from './services/configstore';
 import { ensureString } from './lib/ensure-type';
 import logger, { setLevel } from './lib/logger';
 import urljoin from './lib/urljoin';
@@ -74,6 +74,10 @@ const createServer = (options, callback) => {
     }
 
     const rcfile = path.resolve(options.configFile || settings.rcfile);
+
+    // Safeguard: if the config file is corrupted (unparseable), back it up and
+    // reset it to defaults before loading so startup can't crash on bad JSON.
+    const configRecovery = validateAndRepairConfigFile(rcfile);
 
     // configstore service
     log.info(`Loading configuration from ${chalk.yellow(JSON.stringify(rcfile))}`);
@@ -281,6 +285,8 @@ const createServer = (options, callback) => {
                 address,
                 port,
                 mountPoints,
+                configRestored: configRecovery.restored,
+                configBackupPath: configRecovery.backupPath,
             });
 
             if (address !== '0.0.0.0') {

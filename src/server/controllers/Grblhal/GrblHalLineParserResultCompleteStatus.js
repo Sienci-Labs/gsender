@@ -30,13 +30,14 @@ class GrblHalLineParserResultCompleteStatus {
                 }
             });
         }
+
         {
             // Active state (Idle, Jog, etc) and substate (mostly alarm/door)
             payload.activeState = state;
             payload.subState = subState || '';
         }
 
-        //console.log(result);
+        console.log(result);
 
         // Machine Position (v0.9, v1.1)
         if (_.has(result, 'MPos')) {

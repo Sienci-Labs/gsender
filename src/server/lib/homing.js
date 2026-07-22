@@ -102,7 +102,7 @@ export const determineMachineZeroFlagSet = (res, settings) => {
     return false;
 };
 
-// Get a single bit from integer at position.  It does not use 0 indexing so pretend that arrays start at 1 :)
+// Get a single bit from integer at position.
 export function isBitSetInNumber(number, bitPosition) {
     number = Number(number);
     // eslint-disable-next-line no-bitwise

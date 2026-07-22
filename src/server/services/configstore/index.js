@@ -102,12 +102,56 @@ const defaultMaintenance = [
     },
 ];
 
+// Atomically write `content` to `file`: fully write + fsync a temp file, then
+// rename it over the target. rename() on the same filesystem is atomic, so a
+// crash/reader never observes a half-written or zero-filled file — only the
+// complete old file or the complete new file. This prevents the "same byte
+// count, all blank" corruption produced by an interrupted direct overwrite.
+const writeFileAtomicSync = (file, content) => {
+    const tmpFile = `${file}.${process.pid}.tmp`;
+    const fd = fs.openSync(tmpFile, 'w');
+    try {
+        fs.writeFileSync(fd, content, 'utf8');
+        fs.fsyncSync(fd);
+    } finally {
+        fs.closeSync(fd);
+    }
+    fs.renameSync(tmpFile, file);
+};
+
+// Startup safeguard: if the config file exists but can't be parsed as JSON
+// (e.g. corrupted to all-spaces / all-NUL / any non-JSON garbage), back it up
+// to a timestamped `.corrupt-<ts>.bak` beside it and reset it to defaults so
+// the app can still start. Returns { restored, backupPath } for the caller to
+// surface a warning to the user.
+export function validateAndRepairConfigFile(file) {
+    try {
+        if (!fs.existsSync(file)) {
+            return { restored: false };
+        }
+        const raw = fs.readFileSync(file, 'utf8');
+        JSON.parse(raw); // throws on all-spaces / all-NUL / any non-JSON
+        return { restored: false };
+    } catch (err) {
+        try {
+            const backupPath = `${file}.corrupt-${Date.now()}.bak`;
+            fs.copyFileSync(file, backupPath);
+            // writeFileSync of a plain {} is sufficient — reload() backfills
+            // state/maintenance/jobStats defaults on the next load.
+            writeFileAtomicSync(file, JSON.stringify({}));
+            log.error(`Corrupt config "${file}" backed up to "${backupPath}" and reset to defaults`);
+            return { restored: true, backupPath };
+        } catch (repairErr) {
+            log.error(`Failed to repair corrupt config "${file}": ${repairErr}`);
+            return { restored: false, repairFailed: true };
+        }
+    }
+}
+
 class ConfigStore extends events.EventEmitter {
     file = '';
 
     config = {};
-
-    watcher = null;
 
     // @param {string} file The path to a filename.
     // @return {object} The config object.
@@ -116,27 +160,10 @@ class ConfigStore extends events.EventEmitter {
         this.reload();
         this.emit('load', this.config); // emit load event
 
-        if (this.watcher) {
-            // Stop watching for changes
-            this.watcher.close();
-            this.watcher = null;
-        }
-
         try {
             if (!fs.existsSync(this.file)) {
-                const content = JSON.stringify({});
-                fs.writeFileSync(this.file, content, 'utf8');
+                writeFileAtomicSync(this.file, JSON.stringify({}));
             }
-
-            this.watcher = fs.watch(this.file, (eventType, filename) => {
-                log.debug(`fs.watch(eventType='${eventType}', filename='${filename}')`);
-
-                if (eventType === 'change') {
-                    log.debug(`"${filename}" has been changed`);
-                    const ok = this.reload();
-                    ok && this.emit('change', this.config); // it is ok to emit change event
-                }
-            });
         } catch (err) {
             log.error(err);
             this.emit('error', err); // emit error event
@@ -204,7 +231,14 @@ class ConfigStore extends events.EventEmitter {
             const noEventsConfig = _.clone(this.config);
             noEventsConfig.events = Object.fromEntries(this.config.events);
             const content = JSON.stringify(noEventsConfig);
-            fs.writeFileSync(this.file, content, 'utf8');
+
+            // Never overwrite the live file with blank/unserializable content
+            if (!content || content.trim().length === 0) {
+                log.error(`Refusing to write empty config to "${this.file}"`);
+                return false;
+            }
+
+            writeFileAtomicSync(this.file, content);
         } catch (err) {
             log.error(`Unable to write data to "${this.file}"`);
             this.emit('error', err); // emit error event
