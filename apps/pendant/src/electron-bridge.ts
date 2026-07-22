@@ -15,7 +15,7 @@ interface PendantAPI {
     isElectron: true;
     getHost: () => Promise<string | undefined>;
     pickGcodeFile: () => Promise<GcodeFilePayload | undefined>;
-    readGcodeFile: (path: string) => Promise<GcodeFilePayload | undefined>;
+    readGcodeFile: (path: string) => Promise<  GcodeFilePayload | undefined>;
 }
 
 declare global {
