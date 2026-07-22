@@ -39,6 +39,7 @@ export function useSienciTLSWizard(): Wizard {
                         'Configure your Tool Length Sensor and tool change behaviour',
                     estimatedTime: '5 - 15 minutes',
                     completionPage: TLSCompletion,
+                    completionImage: TLS_STEP_ONE,
                     steps: [
                         {
                             id: 'options',
