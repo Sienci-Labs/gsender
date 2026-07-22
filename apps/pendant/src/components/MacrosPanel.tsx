@@ -31,38 +31,11 @@ interface Props {
 }
 
 // ── Colour tokens ──────────────────────────────────────────────────────────────
+// Neutral surfaces/borders/text come from the Workshop CSS variables (see
+// index.css) so nothing neutral is hardcoded here. Only the brand play/accent
+// blue is theme-specific.
 
-const tokens = {
-    dark: {
-        accent: '#4a9eff',
-        divider: 'rgba(255,255,255,0.07)',
-        btnBg: 'linear-gradient(180deg, #323b54 0%, #1a2035 100%)',
-        btnBorderTop: 'rgba(255,255,255,0.14)',
-        btnBorderSide: 'rgba(0,0,0,0.35)',
-        btnBorderBottom: 'rgba(0,0,0,0.55)',
-        btnShadow: '0 3px 0 #10151f, 0 4px 6px rgba(0,0,0,0.40)',
-        btnShadowPressed: '0 1px 0 #10151f, 0 1px 3px rgba(0,0,0,0.35)',
-        // Recessed circle: darker than button, dark top border (shadow edge)
-        circleBg: 'linear-gradient(180deg, #0f1525 0%, #0a1020 100%)',
-        circleBorderTop: 'rgba(0,0,0,0.70)',
-        circleBorderBottom: 'rgba(255,255,255,0.07)',
-        circleBorderSide: 'rgba(0,0,0,0.50)',
-    },
-    light: {
-        accent: '#1a6fc4',
-        divider: '#e8eaed',
-        btnBg: 'linear-gradient(180deg, #ffffff 0%, #e8ecf4 100%)',
-        btnBorderTop: 'rgba(255,255,255,0.95)',
-        btnBorderSide: 'rgba(0,0,0,0.10)',
-        btnBorderBottom: 'rgba(0,0,0,0.18)',
-        btnShadow: '0 3px 0 #c8ccd8, 0 4px 7px rgba(0,0,0,0.12)',
-        btnShadowPressed: '0 1px 0 #c8ccd8, 0 1px 3px rgba(0,0,0,0.12)',
-        circleBg: 'linear-gradient(180deg, #ffffff 0%, #eaeff8 100%)',
-        circleBorderTop: 'rgba(255,255,255,0.90)',
-        circleBorderBottom: 'rgba(0,0,0,0.15)',
-        circleBorderSide: 'rgba(0,0,0,0.10)',
-    },
-};
+const ACCENT = { dark: '#4a9eff', light: '#1a6fc4' };
 
 // ── ActionTile ─────────────────────────────────────────────────────────────────
 
@@ -86,9 +59,9 @@ function ActionTile({ label, Icon, onClick }: ActionTileProps) {
                 className={clsx(
                     'relative z-10 flex flex-col items-center justify-center gap-2 rounded-xl',
                     'min-h-[80px] px-2 py-4 border transition-colors',
-                    'bg-gray-100 dark:bg-dark border-gray-300 dark:border-dark-lighter',
-                    'text-[#7a8299] dark:text-white/50',
-                    'hover:bg-gray-200 dark:hover:bg-dark-lighter',
+                    'bg-gray-100 dark:bg-surface-raised border-gray-300 dark:border-outline',
+                    'text-gray-500 dark:text-content-muted',
+                    'hover:bg-gray-200 dark:hover:bg-surface-hover',
                 )}
             >
                 <Icon size={24} />
@@ -113,7 +86,7 @@ interface MacroButtonProps {
 }
 
 function MacroButton({ macro, isDark, disabled, onRun, onEdit, onDuplicate, onDelete, menuOpenId, onMenuOpen }: MacroButtonProps) {
-    const t = isDark ? tokens.dark : tokens.light;
+    const accent = isDark ? ACCENT.dark : ACCENT.light;
     const btnRef = useRef<HTMLDivElement>(null);
     const menuRef = useRef<HTMLDivElement>(null);
     const isMenuOpen = menuOpenId === macro.id;
@@ -155,8 +128,7 @@ function MacroButton({ macro, isDark, disabled, onRun, onEdit, onDuplicate, onDe
         return () => document.removeEventListener('mousedown', handler);
     }, [isMenuOpen, onMenuOpen]);
 
-    const btnShadow = disabled ? 'none' : pressed ? t.btnShadowPressed : t.btnShadow;
-    const btnTransform = pressed && !disabled ? 'translateY(2px)' : 'none';
+    const btnTransform = pressed && !disabled ? 'translateY(1px)' : 'none';
 
     return (
         <div style={{ position: 'relative' }}>
@@ -169,19 +141,17 @@ function MacroButton({ macro, isDark, disabled, onRun, onEdit, onDuplicate, onDe
                     gap: 7,
                     padding: '8px 9px',
                     borderRadius: 8,
+                    // Flat neutral control surface (doc §18: no decorative gradients).
                     background: disabled
-                        ? (isDark ? '#1c2030' : '#eef0f4')
-                        : t.btnBg,
-                    borderTop: `1px solid ${disabled ? 'transparent' : t.btnBorderTop}`,
-                    borderLeft: `1px solid ${disabled ? (isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.06)') : t.btnBorderSide}`,
-                    borderRight: `1px solid ${disabled ? (isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.06)') : t.btnBorderSide}`,
-                    borderBottom: `1px solid ${disabled ? (isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.06)') : pressed ? t.btnBorderSide : t.btnBorderBottom}`,
-                    boxShadow: btnShadow,
+                        ? 'var(--surface-disabled)'
+                        : pressed
+                            ? 'var(--surface-active)'
+                            : 'var(--surface-raised)',
+                    border: `1px solid ${disabled ? 'var(--outline-disabled)' : 'var(--outline-default)'}`,
                     transform: btnTransform,
-                    transition: 'box-shadow 0.08s ease, transform 0.08s ease',
+                    transition: 'background 0.08s ease, transform 0.08s ease',
                     cursor: disabled ? 'default' : 'pointer',
                     userSelect: 'none',
-                    opacity: disabled ? 0.5 : 1,
                 }}
                 onPointerDown={handlePointerDown}
                 onPointerUp={handlePointerUp}
@@ -199,15 +169,11 @@ function MacroButton({ macro, isDark, disabled, onRun, onEdit, onDuplicate, onDe
                         justifyContent: 'center',
                         position: 'relative',
                         zIndex: 2,
-                        background: t.circleBg,
-                        borderTop: `1px solid ${t.circleBorderTop}`,
-                        borderBottom: `1px solid ${t.circleBorderBottom}`,
-                        borderLeft: `1px solid ${t.circleBorderSide}`,
-                        borderRight: `1px solid ${t.circleBorderSide}`,
-                        boxShadow: `inset 0 2px 5px rgba(0,0,0,${isDark ? '0.55' : '0.15'}), inset 0 1px 2px rgba(0,0,0,0.15)`,
+                        background: 'var(--surface-sunken)',
+                        border: '1px solid var(--outline-subtle)',
                     }}
                 >
-                    <Play size={9} color={t.accent} fill={t.accent} />
+                    <Play size={9} color={accent} fill={accent} />
                 </div>
 
                 {/* Macro name */}
@@ -218,7 +184,7 @@ function MacroButton({ macro, isDark, disabled, onRun, onEdit, onDuplicate, onDe
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
-                    color: isDark ? 'rgba(255,255,255,0.85)' : '#374151',
+                    color: disabled ? 'var(--content-disabled)' : 'var(--content-primary)',
                     position: 'relative',
                     zIndex: 2,
                 }}>
@@ -233,7 +199,7 @@ function MacroButton({ macro, isDark, disabled, onRun, onEdit, onDuplicate, onDe
                         padding: '1px 5px',
                         borderRadius: 10,
                         background: isDark ? 'rgba(74,158,255,0.18)' : 'rgba(26,111,196,0.10)',
-                        color: t.accent,
+                        color: accent,
                         border: `1px solid ${isDark ? 'rgba(74,158,255,0.35)' : 'rgba(26,111,196,0.30)'}`,
                         flexShrink: 0,
                         letterSpacing: '0.02em',
@@ -264,7 +230,7 @@ function MacroButton({ macro, isDark, disabled, onRun, onEdit, onDuplicate, onDe
                         onMenuOpen(isMenuOpen ? null : macro.id);
                     }}
                 >
-                    <MoreHorizontal size={13} color={isDark ? 'rgba(255,255,255,0.40)' : '#9ca3af'} />
+                    <MoreHorizontal size={13} color="var(--content-muted)" />
                 </div>
             </div>
 
@@ -277,8 +243,8 @@ function MacroButton({ macro, isDark, disabled, onRun, onEdit, onDuplicate, onDe
                         right: 0,
                         top: 'calc(100% + 4px)',
                         zIndex: 50,
-                        background: isDark ? '#1e2436' : '#ffffff',
-                        border: `1px solid ${isDark ? 'rgba(255,255,255,0.10)' : '#e5e7eb'}`,
+                        background: 'var(--surface-elevated)',
+                        border: '1px solid var(--outline-default)',
                         borderRadius: 8,
                         boxShadow: isDark
                             ? '0 4px 16px rgba(0,0,0,0.55)'
@@ -307,7 +273,7 @@ function MacroButton({ macro, isDark, disabled, onRun, onEdit, onDuplicate, onDe
                                 cursor: 'pointer',
                                 color: danger
                                     ? (isDark ? '#f87171' : '#dc2626')
-                                    : (isDark ? 'rgba(255,255,255,0.80)' : '#374151'),
+                                    : 'var(--content-secondary)',
                             }}
                         >
                             {label}
@@ -333,7 +299,6 @@ export default function MacrosPanel({ mode }: Props) {
     const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
 
     const importInputRef = useRef<HTMLInputElement>(null);
-    const t = isDark ? tokens.dark : tokens.light;
 
     const fetchMacros = useCallback(async () => {
         try {
@@ -462,13 +427,13 @@ export default function MacrosPanel({ mode }: Props) {
             {mode === 'expanded' && (
                 <>
                     {/* Divider */}
-                    <div style={{ height: 1, margin: '0 10px', background: t.divider, flexShrink: 0 }} />
+                    <div style={{ height: 1, margin: '0 10px', background: 'var(--outline-subtle)', flexShrink: 0 }} />
 
                     {/* Macro grid */}
                     <div className="flex-1 overflow-y-auto min-h-0" style={{ padding: '8px 10px' }}>
                         {macros.length === 0 ? (
                             <div className="h-full flex flex-col items-center justify-center gap-2"
-                                style={{ color: isDark ? 'rgba(255,255,255,0.35)' : '#9ca3af' }}>
+                                style={{ color: 'var(--content-muted)' }}>
                                 <Command size={24} />
                                 <span style={{ fontSize: 12 }}>No macros yet</span>
                             </div>
@@ -533,13 +498,13 @@ export default function MacrosPanel({ mode }: Props) {
                     <DialogHeader>
                         <DialogTitle>Delete Macro</DialogTitle>
                     </DialogHeader>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-gray-600 dark:text-content-muted">
                         Delete <strong>{macroToDelete?.name}</strong>? This cannot be undone.
                     </p>
                     <DialogFooter>
                         <button
                             onClick={() => setConfirmDeleteId(null)}
-                            className="px-4 py-2 text-sm rounded border border-gray-300 dark:border-dark-lighter text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-lighter"
+                            className="px-4 py-2 text-sm rounded border border-gray-300 dark:border-outline text-gray-700 dark:text-content-secondary hover:bg-gray-50 dark:hover:bg-surface-hover"
                         >
                             Cancel
                         </button>

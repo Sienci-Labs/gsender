@@ -2,6 +2,66 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Workshop theme CSS-variable bridge — Tailwind-backed semantic tokens for
+   inline-style / CSS consumers that cannot use utility classes. Values resolve
+   from the shared Tailwind config (inherited via the desktop preset), so the
+   config stays the single source of truth. Light defaults preserve the existing
+   light look; the `.dark[data-dark-theme='workshop']` block supplies the
+   Workshop dark values. Keep in sync with apps/desktop/src/index.css. */
+@layer base {
+    :root {
+        --surface-base: theme('colors.gray.100');
+        --surface-sunken: theme('colors.gray.200');
+        --surface-raised: #ffffff;
+        --surface-elevated: #ffffff;
+        --surface-hover: theme('colors.gray.200');
+        --surface-active: theme('colors.gray.300');
+        --surface-disabled: theme('colors.gray.100');
+
+        --content-primary: theme('colors.gray.900');
+        --content-secondary: theme('colors.gray.700');
+        --content-muted: theme('colors.gray.500');
+        --content-disabled: theme('colors.gray.400');
+        --content-inverse: #ffffff;
+
+        --outline-subtle: theme('colors.gray.200');
+        --outline-default: theme('colors.gray.300');
+        --outline-strong: theme('colors.gray.400');
+        --outline-disabled: theme('colors.gray.200');
+
+        --overlay-hover: theme('colors.overlay.hover');
+        --overlay-active: theme('colors.overlay.active');
+        --overlay-disabled: theme('colors.overlay.disabled');
+        --overlay-scrim: theme('colors.overlay.scrim');
+    }
+
+    .dark[data-dark-theme='workshop'] {
+        --surface-base: theme('colors.surface.base');
+        --surface-sunken: theme('colors.surface.sunken');
+        --surface-raised: theme('colors.surface.raised');
+        --surface-elevated: theme('colors.surface.elevated');
+        --surface-hover: theme('colors.surface.hover');
+        --surface-active: theme('colors.surface.active');
+        --surface-disabled: theme('colors.surface.disabled');
+
+        --content-primary: theme('colors.content.primary');
+        --content-secondary: theme('colors.content.secondary');
+        --content-muted: theme('colors.content.muted');
+        --content-disabled: theme('colors.content.disabled');
+        --content-inverse: theme('colors.content.inverse');
+
+        --outline-subtle: theme('colors.outline.subtle');
+        --outline-default: theme('colors.outline.DEFAULT');
+        --outline-strong: theme('colors.outline.strong');
+        --outline-disabled: theme('colors.outline.disabled');
+
+        --overlay-hover: theme('colors.overlay.hover');
+        --overlay-active: theme('colors.overlay.active');
+        --overlay-disabled: theme('colors.overlay.disabled');
+        --overlay-scrim: theme('colors.overlay.scrim');
+    }
+}
+
 .status-badge {
     position: relative;
     overflow: hidden;
@@ -49,17 +109,10 @@
 
 .jog-btn:disabled,
 .jog-btn:disabled:hover {
-    background-color: rgb(229 231 235) !important;
-    border-color: rgb(229 231 235) !important;
-    color: rgb(156 163 175) !important;
+    background-color: var(--surface-disabled) !important;
+    border-color: var(--outline-disabled) !important;
+    color: var(--content-disabled) !important;
     cursor: default !important;
-}
-
-.dark .jog-btn:disabled,
-.dark .jog-btn:disabled:hover {
-    background-color: rgb(61 69 84) !important;
-    border-color: rgb(61 69 84) !important;
-    color: rgb(107 114 128) !important;
 }
 
 .jog-btn:disabled svg,

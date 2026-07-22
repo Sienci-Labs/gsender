@@ -18,13 +18,15 @@
     gap: 16px;
 }
 
-.dark .continuity-indicator {
-    --ring-idle: #7b879a;
-    --ring-rest: #2c323c;
+.dark[data-dark-theme='workshop'] .continuity-indicator {
+    /* Neutral ring/text vars resolve from the shared Workshop tokens; the
+       success/danger state colors are preserved unchanged. */
+    --ring-idle: theme('colors.content.disabled');
+    --ring-rest: theme('colors.outline.subtle');
     --state-success: #38d68c;
     --state-danger: #f1473f;
-    --text-primary: #eceef1;
-    --text-secondary: #8b92a0;
+    --text-primary: theme('colors.content.primary');
+    --text-secondary: theme('colors.content.muted');
 }
 
 .continuity-indicator[data-phase='success'] {

@@ -51,10 +51,44 @@ export default {
                 'content-area': 'calc(100vh-64px)',
             },
             colors: {
+                // Workshop High-Contrast dark theme — compat `dark` family remapped
+                // to Workshop neutrals so existing `dark:bg-dark*` usages pick up the
+                // new palette. Prefer the semantic surface/content/outline tokens below
+                // for new code (see docs/dark-mode-theme-instructions.md).
                 dark: {
-                    DEFAULT: '#0f172a',
-                    darker: '#020617',
-                    lighter: '#334155',
+                    DEFAULT: '#111317',
+                    darker: '#07090c',
+                    lighter: '#242931',
+                },
+                // Workshop semantic neutrals (single source of truth; pendant inherits
+                // these via `presets: [desktopConfig]`).
+                surface: {
+                    base: '#111317',
+                    sunken: '#07090c',
+                    raised: '#242931',
+                    elevated: '#30353d',
+                    hover: '#383e47',
+                    active: '#414853',
+                    disabled: '#262b32',
+                },
+                content: {
+                    primary: '#ffffff',
+                    secondary: '#dce1e7',
+                    muted: '#a6afba',
+                    disabled: '#7f8995',
+                    inverse: '#111317',
+                },
+                outline: {
+                    subtle: '#343a43',
+                    DEFAULT: '#4b535e',
+                    strong: '#687381',
+                    disabled: '#3b424b',
+                },
+                overlay: {
+                    hover: 'rgba(255, 255, 255, 0.07)',
+                    active: 'rgba(255, 255, 255, 0.12)',
+                    disabled: 'rgba(0, 0, 0, 0.20)',
+                    scrim: 'rgba(0, 0, 0, 0.72)',
                 },
                 robin: {
                     50: '#f6f9fc',

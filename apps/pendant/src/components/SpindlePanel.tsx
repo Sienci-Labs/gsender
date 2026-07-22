@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { clsx } from 'clsx';
 import debounce from 'lodash/debounce';
@@ -14,6 +14,7 @@ import { Slider } from '@gsender/ui/shadcn/Slider';
 
 import store from 'app/store';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { getThemeCssColor } from 'app/lib/getThemeCssColor';
 import controller from '@gsender/controller-client/controller';
 import WidgetConfig from 'app/features/WidgetConfig/WidgetConfig';
 import { convertToImperial } from 'app/lib/units';
@@ -420,6 +421,23 @@ export default function SpindlePanel({ mode }: Props) {
     const { enableDarkMode = false } = useWorkspaceState();
     const isDark = enableDarkMode;
 
+    // Neutral react-select colors come from the Tailwind-backed CSS variables
+    // (see index.css) so no neutral hex is hardcoded here. Keyed on isDark so it
+    // re-resolves when the theme toggles. The selected-blue stays a brand color.
+    const selectTheme = useMemo(
+        () => ({
+            controlBg: getThemeCssColor('--surface-sunken'),
+            controlBorder: getThemeCssColor('--outline-default'),
+            controlBorderHover: getThemeCssColor('--outline-strong'),
+            menuBg: getThemeCssColor('--surface-elevated'),
+            menuBorder: getThemeCssColor('--outline-default'),
+            optionFocusedBg: getThemeCssColor('--surface-hover'),
+            optionText: getThemeCssColor('--content-secondary'),
+            mutedText: getThemeCssColor('--content-muted'),
+        }),
+        [isDark],
+    );
+
     const enabledSpindles = availableSpindles.filter((s: any) => s.enabled);
     const hasSpindles = enabledSpindles.length > 0;
     const spindleOptions = enabledSpindles.map((s: any) => ({
@@ -436,18 +454,18 @@ export default function SpindlePanel({ mode }: Props) {
             fontSize: 11,
             fontWeight: 500,
             cursor: !hasSpindles || !clickable ? 'default' : 'pointer',
-            backgroundColor: isDark ? '#0d1117' : '#f3f4f6',
-            borderColor: isDark ? '#374151' : '#d1d5db',
+            backgroundColor: selectTheme.controlBg,
+            borderColor: selectTheme.controlBorder,
             borderRadius: 8,
             boxShadow: 'none',
-            '&:hover': { borderColor: isDark ? '#4b5563' : '#9ca3af' },
+            '&:hover': { borderColor: selectTheme.controlBorderHover },
         }),
         valueContainer: (base: any) => ({ ...base, padding: '0 8px' }),
         indicatorsContainer: (base: any) => ({ ...base, height: 32 }),
         menu: (base: any) => ({
             ...base,
-            backgroundColor: isDark ? '#1e2436' : '#ffffff',
-            border: `1px solid ${isDark ? 'rgba(255,255,255,0.10)' : '#e5e7eb'}`,
+            backgroundColor: selectTheme.menuBg,
+            border: `1px solid ${selectTheme.menuBorder}`,
             borderRadius: 8,
             boxShadow: isDark ? '0 4px 16px rgba(0,0,0,0.55)' : '0 4px 16px rgba(0,0,0,0.12)',
             zIndex: 100,
@@ -459,23 +477,23 @@ export default function SpindlePanel({ mode }: Props) {
             backgroundColor: state.isSelected
                 ? isDark ? '#2563eb' : '#3b82f6'
                 : state.isFocused
-                    ? isDark ? 'rgba(255,255,255,0.08)' : '#f3f4f6'
+                    ? selectTheme.optionFocusedBg
                     : 'transparent',
-            color: state.isSelected ? '#ffffff' : isDark ? 'rgba(255,255,255,0.75)' : '#374151',
+            color: state.isSelected ? '#ffffff' : selectTheme.optionText,
             cursor: 'pointer',
         }),
         singleValue: (base: any) => ({
             ...base,
-            color: isDark ? 'rgba(255,255,255,0.50)' : '#7a8299',
+            color: selectTheme.mutedText,
         }),
         placeholder: (base: any) => ({
             ...base,
-            color: isDark ? 'rgba(255,255,255,0.30)' : '#9ca3af',
+            color: selectTheme.mutedText,
             fontSize: 11,
         }),
         dropdownIndicator: (base: any) => ({
             ...base,
-            color: isDark ? 'rgba(255,255,255,0.30)' : '#9ca3af',
+            color: selectTheme.mutedText,
             padding: '0 6px',
         }),
         indicatorSeparator: () => ({ display: 'none' }),
