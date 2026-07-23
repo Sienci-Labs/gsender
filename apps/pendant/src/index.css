@@ -107,18 +107,24 @@
     animation: jog-press 220ms ease-out;
 }
 
-.jog-btn:disabled,
-.jog-btn:disabled:hover {
+/* Disabled jog buttons must read as a consistent neutral grey, never the
+   per-axis accent colour. Tailwind runs with `important: true`, so its utility
+   classes (e.g. `dark:border-green-400` → `.dark .dark\:border-green-400`,
+   specificity 0,2,0) are !important. To win we match that importance and beat
+   the specificity: `button.jog-btn:disabled` is 0,2,1, so it overrides the
+   accent border/fill/text in both light and dark. */
+button.jog-btn:disabled,
+button.jog-btn:disabled:hover {
     background-color: var(--surface-disabled) !important;
-    border-color: var(--outline-disabled) !important;
+    border-color: var(--outline-strong) !important;
     color: var(--content-disabled) !important;
     cursor: default !important;
 }
 
-.jog-btn:disabled svg,
-.jog-btn:disabled span,
-.jog-btn:disabled:hover svg,
-.jog-btn:disabled:hover span {
+button.jog-btn:disabled svg,
+button.jog-btn:disabled span,
+button.jog-btn:disabled:hover svg,
+button.jog-btn:disabled:hover span {
     color: inherit !important;
 }
 
