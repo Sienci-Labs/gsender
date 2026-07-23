@@ -45,12 +45,14 @@ const DataCollection = () => {
     const handleAccept = async () => {
         posthog.opt_in_capturing();
         store.replace('workspace.collectUsageDataStatus', 'accepted');
+        posthog?.capture('data_collection_accepted');
         setOpen(false);
     };
 
     const handleDecline = async () => {
         posthog.opt_out_capturing();
         store.replace('workspace.collectUsageDataStatus', 'denied');
+        posthog?.capture('data_collection_declined');
         setOpen(false);
     };
 

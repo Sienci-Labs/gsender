@@ -322,8 +322,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
 
                             if (toggle === true || toggle === 'accepted') {
                                 posthog.opt_in_capturing();
+                                posthog?.capture('data_collection_accepted');
                             } else {
                                 posthog.opt_out_capturing();
+                                posthog?.capture('data_collection_declined');
                             }
                         },
                         ignoreDefaultCheck: true,
