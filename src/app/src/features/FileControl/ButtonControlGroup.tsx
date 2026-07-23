@@ -13,7 +13,8 @@ import { RootState, store as reduxStore } from 'app/store/redux';
 import store from 'app/store';
 import controller from 'app/lib/controller';
 import {
-    CARVING_CATEGORY, GRBL_ACTIVE_STATE_CHECK,
+    CARVING_CATEGORY,
+    GRBL_ACTIVE_STATE_CHECK,
     VISUALIZER_PRIMARY,
     WORKFLOW_STATE_RUNNING,
 } from 'app/constants';
@@ -53,7 +54,8 @@ import { Tooltip } from 'app/components/Tooltip';
 
 const ButtonControlGroup = () => {
     const posthog = usePostHog();
-    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.platform) ||
+    const isIOSDevice =
+        /iPad|iPhone|iPod/.test(navigator.platform) ||
         (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const fileLoadedRef = useRef(false);
@@ -69,7 +71,9 @@ const ButtonControlGroup = () => {
         (state: RootState) => state.controller.workflow.state,
     );
 
-    const activeState = useTypedSelector((state: RootState) => state.controller.state.status?.activeState);
+    const activeState = useTypedSelector(
+        (state: RootState) => state.controller.state.status?.activeState,
+    );
 
     const isRunning = workflowState === WORKFLOW_STATE_RUNNING;
     const isCheck = workflowState === GRBL_ACTIVE_STATE_CHECK;
@@ -200,6 +204,8 @@ const ButtonControlGroup = () => {
         (window as any).ipcRenderer?.send('load-recent-file', {
             filePath: path,
         });
+
+        posthog?.capture('file_reloaded', { file_name: name });
     }, 300);
 
     const handleCloseFile = debounce(() => {
@@ -309,7 +315,11 @@ const ButtonControlGroup = () => {
                     className="hidden"
                     multiple={false}
                     onChange={handleLoadFile}
-                    accept={isIOSDevice ? "text/plain,application/octet-stream" : ".gcode,.gc,.nc,.tap,.cnc"}
+                    accept={
+                        isIOSDevice
+                            ? 'text/plain,application/octet-stream'
+                            : '.gcode,.gc,.nc,.tap,.cnc'
+                    }
                     id="fileInput"
                 />
             </div>

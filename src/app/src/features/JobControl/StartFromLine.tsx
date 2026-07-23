@@ -23,6 +23,7 @@ import { useWidgetState } from 'app/hooks/useWidgetState';
 import pubsub from 'pubsub-js';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { convertToImperial } from 'app/lib/units';
+import { usePostHog } from '@posthog/react';
 
 type StartFromLineProps = {
     disabled: boolean;
@@ -42,6 +43,7 @@ const StartFromLine = ({
     lastLine,
     atcValidator,
 }: StartFromLineProps) => {
+    const posthog = usePostHog();
     const zMax = useTypedSelector((state) => state.file.bbox.max.z);
     const { units, safeRetractHeight } = useWorkspaceState();
     const { delay = 0 } = useWidgetState('spindle');
@@ -100,6 +102,14 @@ const StartFromLine = ({
         );
         toast.info('Running Start From Specific Line Command', {
             position: 'bottom-right',
+        });
+
+        posthog?.capture('start_from_line', {
+            line: startFromLine,
+            safe_height: newSafeHeight,
+            z_max: zMax,
+            newSafeHeight,
+            delay,
         });
     };
 

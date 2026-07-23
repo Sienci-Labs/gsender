@@ -12,6 +12,7 @@ import controller from 'app/lib/controller.ts';
 import { RootState } from 'app/store/redux';
 import Tooltip from 'app/components/Tooltip';
 import { GRBL_ACTIVE_STATE_RUN, WORKFLOW_STATE_RUNNING } from 'app/constants';
+import { usePostHog } from '@posthog/react';
 
 const availableWorkspaces = {
     G54: 'P1',
@@ -25,6 +26,7 @@ const availableWorkspaces = {
 export type GrblWorkspace = 'G54' | 'G55' | 'G56' | 'G57' | 'G58' | 'G59';
 
 export function WorkspaceSelector() {
+    const posthog = usePostHog();
     const activeWorkspace = useSelector(
         (state: RootState) => state.controller.modal.wcs,
     );
@@ -36,7 +38,9 @@ export function WorkspaceSelector() {
         (state: RootState) => state.controller.state.status?.activeState,
     );
 
-    const workflowState = useSelector((state: RootState) => state.controller.workflow.state);
+    const workflowState = useSelector(
+        (state: RootState) => state.controller.workflow.state,
+    );
 
     const [workspace, setWorkspace] = useState<GrblWorkspace>('G54');
 
@@ -48,9 +52,13 @@ export function WorkspaceSelector() {
     function onWorkspaceSelect(value: GrblWorkspace) {
         setWorkspace(value);
         controller.command('gcode', value);
+        posthog?.capture('workspace_selected', { workspace: value });
     }
 
-    const disabled = !isConnected || activeState === GRBL_ACTIVE_STATE_RUN || workflowState === WORKFLOW_STATE_RUNNING;
+    const disabled =
+        !isConnected ||
+        activeState === GRBL_ACTIVE_STATE_RUN ||
+        workflowState === WORKFLOW_STATE_RUNNING;
 
     return (
         <div className="absolute top-4 right-4 w-56 flex flex-row items-center justify-end gap-2">
@@ -62,7 +70,7 @@ export function WorkspaceSelector() {
                         value={workspace}
                         disabled={disabled}
                     >
-                        <SelectTrigger 
+                        <SelectTrigger
                             className="max-w-24 h-7 bg-white rounded-md border-solid border border-gray-300"
                             aria-label="Select workspace"
                         >

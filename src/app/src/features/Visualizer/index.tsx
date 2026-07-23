@@ -85,6 +85,7 @@ import SecondaryVisualizer from './SecondaryVisualizer';
 import useKeybinding from '../../lib/useKeybinding';
 import { CommandKeys } from 'app/lib/definitions/shortcuts';
 import { Actions, State } from './definitions';
+import posthog from 'posthog-js';
 
 interface Views {
     type: 'isometric' | 'top' | 'front' | 'right' | 'left' | 'default';
@@ -600,6 +601,12 @@ class Visualizer extends Component {
                 isFileLoaded,
                 enteringLiteMode: newLiteModeValue,
                 wasInEverythingMode,
+            });
+
+            posthog?.capture('lite_mode_toggled', {
+                isFileLoaded,
+                new_value: newLiteModeValue,
+                was_in_everything_mode: wasInEverythingMode,
             });
         },
         lineWarning: {

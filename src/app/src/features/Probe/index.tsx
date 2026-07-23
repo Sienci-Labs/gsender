@@ -401,6 +401,7 @@ const ProbeWidget = () => {
                 units,
                 firmware: type,
                 direction: directionLabel,
+                type: probeType,
             });
         },
         returnProbeConnectivity: (): boolean => {

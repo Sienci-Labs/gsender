@@ -17,6 +17,7 @@ import { get, includes } from 'lodash';
 import reduxStore from 'app/store/redux';
 import { useSelector } from 'react-redux';
 import { RootState } from 'app/store/redux';
+import { usePostHog } from '@posthog/react';
 
 function goToParkLocation() {
     const park = store.get('workspace.park', {});
@@ -36,7 +37,9 @@ export function Parking({
     isConnected = false,
     homingEnabled = false,
 }) {
-    const hasHomed = useSelector((state: RootState) => state.controller.hasHomed);
+    const hasHomed = useSelector(
+        (state: RootState) => state.controller.hasHomed,
+    );
     const isDisabled = disabled || !hasHomed;
 
     const disabledRef = useRef(isDisabled);
@@ -44,6 +47,8 @@ export function Parking({
     useEffect(() => {
         disabledRef.current = isDisabled;
     }, [isDisabled]);
+
+    const posthog = usePostHog();
 
     const shortcutIsDisabled = () => {
         const isConnected = get(
@@ -98,7 +103,14 @@ export function Parking({
                 icon={<RiParkingFill className="w-4 h-4" />}
                 variant="alt"
                 size="responsive"
-                onClick={goToParkLocation}
+                onClick={() => {
+                    goToParkLocation();
+                    posthog?.capture('go_to_park_location', {
+                        homing_enabled: homingEnabled,
+                        is_connected: isConnected,
+                        is_disabled: isDisabled,
+                    });
+                }}
                 aria-label="Go to Park Location"
             />
         </Tooltip>

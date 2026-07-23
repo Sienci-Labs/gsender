@@ -12,6 +12,7 @@ import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 
 import { convertValue } from '../utils/units';
+import { usePostHog } from 'posthog-js/react';
 
 export interface SpeedSelectButtonProps {
     active?: boolean;
@@ -28,9 +29,12 @@ export function SpeedSelectButton({
 }: SpeedSelectButtonProps) {
     return (
         <button
-            className={cn('text-sm px-2 max-xl:px-1 max-xl:py-1 py-2 rounded h-full', {
-                'bg-blue-400 bg-opacity-30': active,
-            })}
+            className={cn(
+                'text-sm px-2 max-xl:px-1 max-xl:py-1 py-2 rounded h-full',
+                {
+                    'bg-blue-400 bg-opacity-30': active,
+                },
+            )}
             onClick={onClick}
             aria-label={screenReaderLabel || label}
             aria-pressed={active}
@@ -45,6 +49,7 @@ interface SpeedSelectorProps {
 }
 
 export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
+    const posthog = usePostHog();
     const [selectedSpeed, setSelectedSpeed] =
         useState<JoggingSpeedOptions>('Normal');
     const selectedSpeedRef = useRef<JoggingSpeedOptions>(selectedSpeed);
@@ -99,6 +104,14 @@ export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
                 IMPERIAL_UNITS,
             );
         }
+
+        posthog?.capture('jog_preset_selected', {
+            preset: key,
+            units,
+            xyStep: newSpeeds.xyStep,
+            zStep: newSpeeds.zStep,
+            feedrate: newSpeeds.feedrate,
+        });
 
         handleClickRef.current(newSpeeds);
         previousUnitsRef.current = units;
