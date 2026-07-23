@@ -167,8 +167,12 @@ function Connection(props: ConnectionProps) {
                 // Version isn't available until firmware startup arrives after port open
                 setTimeout(() => {
                     const version = get(controller.settings, 'version');
-                    const firmwareVersion = get(version, 'version');
-                    const firmwareVersionSemver = get(version, 'semver');
+                    const firmwareVersion = get(version, 'version', 'Unknown');
+                    const firmwareVersionSemver = get(
+                        version,
+                        'semver',
+                        'Unknown',
+                    );
 
                     const payload = {
                         port,
