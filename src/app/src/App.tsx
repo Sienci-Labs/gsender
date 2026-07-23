@@ -41,10 +41,8 @@ function App() {
         if (shouldSendUsageData === 'accepted') {
             console.log('Collecting usage data through PostHog');
             posthog.opt_in_capturing();
-            posthog?.capture('data_collection_accepted');
         } else {
             posthog.opt_out_capturing();
-            posthog?.capture('data_collection_declined');
         }
 
         if (isElectron()) {
