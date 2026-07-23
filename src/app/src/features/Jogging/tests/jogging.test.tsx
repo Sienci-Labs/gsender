@@ -123,7 +123,7 @@ describe('JogHelper', () => {
     jest.advanceTimersByTime(250); // > 200ms timeout
     expect(startContinuousJogCB).toHaveBeenCalledWith({ X: 1 }, 3000);
 });
-    it.skip('does not start continuous jog before timeout threshold', () => {
+    it.('does not start continuous jog before timeout threshold', () => {  // this is the failign tets case
         jogHelper.onKeyDown({ X: 1 }, 3000);
         jest.advanceTimersByTime(100);
         expect(startContinuousJogCB).not.toHaveBeenCalled();

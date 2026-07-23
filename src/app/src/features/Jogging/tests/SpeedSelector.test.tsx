@@ -186,14 +186,23 @@ describe('SpeedSelector — unit conversion', () => {
         expect(handleClick).toHaveBeenCalled();
     });
 
-it("does not convert when storedInMetric is true", () => {
-    const handleClick = jest.fn();
-    render(<SpeedSelector handleClick={handleClick} />);
-    expect(handleClick).toHaveBeenCalledWith(
-        expect.objectContaining({ xyStep: 5, zStep: 2, feedrate: 3000 }),
-        "Normal",
-    );
-});
+    it("does not convert when storedInMetric is true", () => {
+        const { useWorkspaceState } = require('app/hooks/useWorkspaceState');
+        useWorkspaceState.mockReturnValue({ units: 'mm' });
+        const store = require('app/store');
+        store.get.mockReturnValue({
+            rapid: { xyStep: 10, zStep: 5, feedrate: 5000 },
+            normal: { xyStep: 5, zStep: 2, feedrate: 3000 },
+            precise: { xyStep: 1, zStep: 0.5, feedrate: 1000 },
+            storedInMetric: true,
+        });
+        const handleClick = jest.fn();
+        render(<SpeedSelector handleClick={handleClick} />);
+        expect(handleClick).toHaveBeenCalledWith(
+            expect.objectContaining({ xyStep: 5, zStep: 2, feedrate: 3000 }),
+            "Normal",
+        );
+    });
 });
 
 //--------------------------------------------------------
