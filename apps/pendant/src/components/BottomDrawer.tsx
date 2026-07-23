@@ -296,13 +296,13 @@ export default function BottomDrawer() {
 
             {/* Sliding panel */}
             <div
-                className={`absolute left-0 right-0 bottom-0 z-30 overflow-hidden transition-all duration-300 bg-gray-100 dark:bg-dark-darker border-t-2 border-gray-400 dark:border-dark-lighter ${mode !== 'closed' ? 'shadow-[0_-8px_20px_rgba(0,0,0,0.12)] dark:shadow-[0_-8px_20px_rgba(0,0,0,0.55)]' : ''}`}
+                className={`absolute left-0 right-0 bottom-0 z-30 overflow-hidden transition-all duration-300 bg-gray-100 dark:bg-surface-raised border-t-2 border-gray-400 dark:border-outline ${mode !== 'closed' ? 'shadow-[0_-8px_20px_rgba(0,0,0,0.12)] dark:shadow-[0_-8px_20px_rgba(0,0,0,0.55)]' : ''}`}
                 style={{ height: panelHeight }}
             >
                 <div className="flex flex-col h-full">
                     {/* Header bar */}
                     <div
-                        className="w-full h-14 shrink-0 flex items-center gap-3 px-4 py-3 bg-gray-100 dark:bg-dark-darker border-b border-gray-200 dark:border-dark-lighter"
+                        className="w-full h-14 shrink-0 flex items-center gap-3 px-4 py-3 bg-gray-100 dark:bg-surface-raised border-b border-gray-200 dark:border-outline"
                         onClick={(e) => handleHeaderTap(e.target)}
                     >
                         <div className="flex items-center gap-1 flex-1 min-w-0">
@@ -313,21 +313,21 @@ export default function BottomDrawer() {
                                     className={`px-2.5 h-8 text-xs rounded border transition-colors ${
                                         activeTab === t
                                             ? 'border-robin-500 text-robin-600 dark:text-robin-400 bg-robin-50/60 dark:bg-robin-500/10'
-                                            : 'border-transparent text-gray-400 hover:text-gray-600 hover:bg-gray-50 dark:text-gray-500 dark:hover:text-gray-300 dark:hover:bg-dark-lighter/30'
+                                            : 'border-transparent text-gray-400 hover:text-gray-600 hover:bg-gray-50 dark:text-content-muted dark:hover:text-gray-300 dark:hover:bg-surface-hover/30'
                                     }`}
                                 >
                                     {t}
                                 </button>
                             ))}
                         </div>
-                        <div className="flex items-center gap-[8px] pl-[9px] pr-[7px] border-l border-gray-300 dark:border-dark-lighter self-stretch">
+                        <div className="flex items-center gap-[8px] pl-[9px] pr-[7px] border-l border-gray-300 dark:border-outline self-stretch">
                             <button
                                 onClick={() => setMode(mode === 'closed' ? 'minimal' : mode === 'minimal' ? 'expanded' : 'closed')}
                                 style={{ width: 40, height: 32, borderRadius: 6 }}
                                 className={`flex items-center justify-center border transition-colors ${
                                     mode === 'minimal' || mode === 'expanded'
                                         ? 'bg-[#ddeaf8] border-[#7aadd8] text-[#185FA5] dark:bg-[#0c2d4a] dark:border-[#2a6090] dark:text-[#5ba3e0]'
-                                        : 'border-gray-200 dark:border-dark-lighter text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-dark-lighter'
+                                        : 'border-gray-200 dark:border-outline text-gray-500 dark:text-content-muted hover:bg-gray-50 dark:hover:bg-surface-hover'
                                 }`}
                             >
                                 {mode === 'expanded' ? <ChevronsUp size={16} /> : <ChevronUp size={16} />}
@@ -335,7 +335,7 @@ export default function BottomDrawer() {
                             <button
                                 onClick={() => setMode('closed')}
                                 style={{ width: 32, height: 32, borderRadius: 6 }}
-                                className="flex items-center justify-center border border-gray-200 dark:border-dark-lighter text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-dark-lighter transition-colors"
+                                className="flex items-center justify-center border border-gray-200 dark:border-outline text-gray-500 dark:text-content-muted hover:bg-gray-50 dark:hover:bg-surface-hover transition-colors"
                             >
                                 <X size={16} />
                             </button>
@@ -348,7 +348,7 @@ export default function BottomDrawer() {
                             <div className="shrink-0 px-3 py-2 flex flex-col gap-2">
                                 <div className="flex items-center gap-3 bg-gray-200/70 dark:bg-dark rounded-lg px-3 py-2">
                                     <div className="w-8 h-8 rounded-lg bg-gray-300 dark:bg-dark-lighter flex items-center justify-center shrink-0">
-                                        <FileCode size={15} className="text-gray-600 dark:text-gray-400" />
+                                        <FileCode size={15} className="text-gray-600 dark:text-content-muted" />
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2">
@@ -366,7 +366,7 @@ export default function BottomDrawer() {
                                 </div>
                                 <div className="grid grid-cols-4 gap-1.5">
                                     {stats.map(({ label, Icon, value }) => (
-                                        <div key={label} className="bg-white dark:bg-dark rounded-lg border border-gray-200 dark:border-dark-lighter px-2 py-2">
+                                        <div key={label} className="bg-white dark:bg-dark rounded-lg border border-gray-200 dark:border-outline px-2 py-2">
                                             <div className="flex items-center gap-1 text-[8px] text-gray-400 uppercase tracking-wide mb-1 font-medium">
                                                 <Icon size={8} className="shrink-0" />{label}
                                             </div>
@@ -376,8 +376,8 @@ export default function BottomDrawer() {
                                 </div>
                             </div>
                         ) : (
-                            <div className="shrink-0 px-3 py-3 flex items-center justify-between gap-3 border-b border-gray-200 dark:border-dark-lighter">
-                                <span className="text-xs text-gray-500 dark:text-gray-400">No file loaded</span>
+                            <div className="shrink-0 px-3 py-3 flex items-center justify-between gap-3 border-b border-gray-200 dark:border-outline">
+                                <span className="text-xs text-gray-500 dark:text-content-muted">No file loaded</span>
                                 <button
                                     onClick={handleLoadClick}
                                     className="flex items-center gap-2 text-sm bg-robin-600 hover:bg-robin-500 rounded-lg px-4 py-2 text-white font-semibold shrink-0"
@@ -390,7 +390,7 @@ export default function BottomDrawer() {
                             <div className="flex-1 overflow-hidden min-h-0">
                                 {file.fileLoaded ? (
                                     <div className="h-full overflow-auto px-3 py-2">
-                                        <div className="h-full rounded-lg border border-gray-200 dark:border-dark-lighter bg-white dark:bg-dark overflow-hidden">
+                                        <div className="h-full rounded-lg border border-gray-200 dark:border-outline bg-white dark:bg-dark overflow-hidden">
                                             <GcodeEditor onClose={() => setMode('minimal')} />
                                         </div>
                                     </div>
@@ -400,8 +400,8 @@ export default function BottomDrawer() {
                                         {recentFiles.length === 0
                                             ? <p className="text-xs text-gray-400">No recent files.</p>
                                             : recentFiles.map((r, i) => (
-                                                <div key={i} className="flex items-center justify-between py-2 border-b border-gray-200 dark:border-dark-lighter last:border-0 gap-2">
-                                                    <span className="text-xs text-gray-700 dark:text-gray-300 truncate">{r.fileName}</span>
+                                                <div key={i} className="flex items-center justify-between py-2 border-b border-gray-200 dark:border-outline last:border-0 gap-2">
+                                                    <span className="text-xs text-gray-700 dark:text-content-secondary truncate">{r.fileName}</span>
                                                     <div className="flex items-center gap-2 shrink-0">
                                                         <span className="text-[10px] text-gray-400">{formatSize(r.fileSize)}</span>
                                                         <button
@@ -410,7 +410,7 @@ export default function BottomDrawer() {
                                                             className={`text-xs font-semibold rounded px-3 py-1.5 border transition-colors ${
                                                                 r.filePath
                                                                     ? 'text-robin-600 dark:text-robin-400 border-robin-300 dark:border-robin-600 hover:bg-robin-50 dark:hover:bg-robin-500/15'
-                                                                    : 'text-gray-400 dark:text-gray-500 border-gray-200 dark:border-dark-lighter cursor-default'
+                                                                    : 'text-gray-400 dark:text-content-muted border-gray-200 dark:border-outline cursor-default'
                                                             }`}
                                                         >
                                                             Load
@@ -430,10 +430,10 @@ export default function BottomDrawer() {
                         {mode !== 'expanded' ? (
                             <div className="flex-1 overflow-y-auto px-3 py-2 space-y-0.5 min-h-0">
                                 {consoleHistory.length === 0 ? (
-                                    <span className="font-mono text-xs text-gray-400 dark:text-gray-500 italic">No output yet</span>
+                                    <span className="font-mono text-xs text-gray-400 dark:text-content-muted italic">No output yet</span>
                                 ) : (
                                     consoleHistory.map((line, i) => (
-                                        <p key={i} className="font-mono text-xs text-gray-500 dark:text-gray-300 truncate">{line}</p>
+                                        <p key={i} className="font-mono text-xs text-gray-500 dark:text-content-secondary truncate">{line}</p>
                                     ))
                                 )}
                                 <div ref={consolePreviewBottomRef} />

@@ -45,13 +45,13 @@ function CoolantButton({ label, Icon, active, disabled, onClick }: CoolantButton
                     'min-h-[80px] px-2 py-4',
                     'border transition-colors',
                     'bg-gray-100 dark:bg-dark',
-                    'border-gray-300 dark:border-dark-lighter',
+                    'border-gray-300 dark:border-outline',
                     active
                         ? 'text-robin-500 shadow-[inset_7px_4px_6px_0px_rgba(59,130,246,0.12)] border-robin-400 dark:border-robin-600'
-                        : 'text-[#7a8299] dark:text-white/50',
+                        : 'text-gray-500 dark:text-content-muted',
                     {
                         'opacity-40': disabled,
-                        'hover:bg-gray-200 dark:hover:bg-dark-lighter': !disabled && !active,
+                        'hover:bg-gray-200 dark:hover:bg-surface-hover': !disabled && !active,
                     },
                 )}
             >

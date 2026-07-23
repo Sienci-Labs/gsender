@@ -68,7 +68,9 @@ function useIsDark() {
 }
 
 const DISC_COLORS = {
-    dark:  { border: 'rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.04)', iconBackground: 'rgba(255,255,255,0.08)', iconColor: 'rgba(255,255,255,0.3)',  divider: 'rgba(255,255,255,0.10)', color: 'rgba(255,255,255,0.30)' },
+    // Neutral (disconnected / no-state) badge — resolves from the Workshop
+    // semantic tokens in dark mode; light values preserved.
+    dark:  { border: 'var(--outline-default)', background: 'var(--surface-raised)', iconBackground: 'var(--surface-elevated)', iconColor: 'var(--content-muted)',  divider: 'var(--outline-subtle)', color: 'var(--content-muted)' },
     light: { border: '#cbd5e1',                background: '#f8fafc',                iconBackground: '#94a3b8',               iconColor: '#ffffff',                  divider: '#cbd5e1',                color: '#94a3b8' },
 };
 
@@ -189,7 +191,7 @@ export default function PendantTopBar() {
     };
 
     return (
-        <header className="h-14 px-3 flex items-center gap-3 bg-gray-50 border-b border-gray-200 dark:bg-dark-darker dark:border-dark-lighter shrink-0 select-none relative drag-region">
+        <header className="h-14 px-3 flex items-center gap-3 bg-gray-50 border-b border-gray-200 dark:bg-surface-base dark:border-outline shrink-0 select-none relative drag-region">
             {/* Logo */}
             <div className="flex items-center gap-2 shrink-0">
                 <img src={iconRound} alt="gSender" className="w-9 h-9" />
@@ -243,7 +245,7 @@ export default function PendantTopBar() {
                         ? (alarmCode === 11 || alarmCode === 'Homing'
                             ? 'bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white unlock-attention-home'
                             : 'bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white unlock-attention')
-                        : 'bg-gray-300 text-gray-600 dark:bg-dark-lighter dark:text-gray-400'
+                        : 'bg-gray-300 text-gray-600 dark:bg-surface-disabled dark:text-content-disabled'
                 }`}
             >
                 {alarmCode === 11 || alarmCode === 'Homing' ? <House className="w-4 h-4" /> : <LockOpen className="w-4 h-4" />}
@@ -253,7 +255,7 @@ export default function PendantTopBar() {
                 type="button"
                 onClick={handleEStop}
                 disabled={!isConnected}
-                className={`flex items-center gap-2 font-bold px-4 py-2 rounded-lg text-sm transition-colors no-drag ${isConnected ? 'bg-red-600 hover:bg-red-700 active:bg-red-800 text-white' : 'bg-gray-300 text-gray-600 dark:bg-dark-lighter dark:text-gray-400'}`}
+                className={`flex items-center gap-2 font-bold px-4 py-2 rounded-lg text-sm transition-colors no-drag ${isConnected ? 'bg-red-600 hover:bg-red-700 active:bg-red-800 text-white' : 'bg-gray-300 text-gray-600 dark:bg-surface-disabled dark:text-content-disabled'}`}
             >
                 <span>⊗</span> E-STOP
             </button>

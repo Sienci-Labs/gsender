@@ -507,6 +507,57 @@ video {
             transform: translateX(20px);
         }
     }
+    :root {
+        --surface-base: #f3f4f6;
+        --surface-sunken: #e5e7eb;
+        --surface-raised: #ffffff;
+        --surface-elevated: #ffffff;
+        --surface-hover: #e5e7eb;
+        --surface-active: #d1d5db;
+        --surface-disabled: #f3f4f6;
+
+        --content-primary: #111827;
+        --content-secondary: #374151;
+        --content-muted: #6b7280;
+        --content-disabled: #9ca3af;
+        --content-inverse: #ffffff;
+
+        --outline-subtle: #e5e7eb;
+        --outline-default: #d1d5db;
+        --outline-strong: #9ca3af;
+        --outline-disabled: #e5e7eb;
+
+        --overlay-hover: rgba(255, 255, 255, 0.07);
+        --overlay-active: rgba(255, 255, 255, 0.12);
+        --overlay-disabled: rgba(0, 0, 0, 0.20);
+        --overlay-scrim: rgba(0, 0, 0, 0.72);
+    }
+
+    .dark[data-dark-theme='workshop'] {
+        --surface-base: #111317;
+        --surface-sunken: #07090c;
+        --surface-raised: #242931;
+        --surface-elevated: #30353d;
+        --surface-hover: #383e47;
+        --surface-active: #414853;
+        --surface-disabled: #262b32;
+
+        --content-primary: #ffffff;
+        --content-secondary: #dce1e7;
+        --content-muted: #a6afba;
+        --content-disabled: #7f8995;
+        --content-inverse: #111317;
+
+        --outline-subtle: #343a43;
+        --outline-default: #4b535e;
+        --outline-strong: #687381;
+        --outline-disabled: #3b424b;
+
+        --overlay-hover: rgba(255, 255, 255, 0.07);
+        --overlay-active: rgba(255, 255, 255, 0.12);
+        --overlay-disabled: rgba(0, 0, 0, 0.20);
+        --overlay-scrim: rgba(0, 0, 0, 0.72);
+    }
 .\!container {
   width: 100% !important;
 }
@@ -2640,7 +2691,7 @@ video {
 }
 .border-dark-lighter {
   --tw-border-opacity: 1 !important;
-  border-color: rgb(51 65 85 / var(--tw-border-opacity, 1)) !important;
+  border-color: rgb(36 41 49 / var(--tw-border-opacity, 1)) !important;
 }
 .border-emerald-600 {
   --tw-border-opacity: 1 !important;
@@ -2923,7 +2974,7 @@ video {
 }
 .bg-dark {
   --tw-bg-opacity: 1 !important;
-  background-color: rgb(15 23 42 / var(--tw-bg-opacity, 1)) !important;
+  background-color: rgb(17 19 23 / var(--tw-bg-opacity, 1)) !important;
 }
 .bg-emerald-100\/70 {
   background-color: rgb(209 250 229 / 0.7) !important;
@@ -4500,6 +4551,13 @@ body.reduced-motion * {
     initial-value: 0deg;
     syntax: '<angle>';
 }
+
+/* Workshop theme CSS-variable bridge — Tailwind-backed semantic tokens for
+   runtime/inline consumers that cannot use utility classes (visualizer,
+   React Select, CSS pseudo-elements). Values resolve from the shared Tailwind
+   config, so the config remains the single source of truth. Light defaults
+   preserve the existing light look; the `.dark[data-dark-theme='workshop']`
+   block supplies the Workshop dark values. */
 
 .file\:border-0::file-selector-button {
   border-width: 0px !important;
@@ -6084,7 +6142,7 @@ body.reduced-motion * {
 
 .dark\:border-dark-lighter:is(.dark *) {
   --tw-border-opacity: 1 !important;
-  border-color: rgb(51 65 85 / var(--tw-border-opacity, 1)) !important;
+  border-color: rgb(36 41 49 / var(--tw-border-opacity, 1)) !important;
 }
 
 .dark\:border-emerald-400:is(.dark *) {
@@ -6196,7 +6254,7 @@ body.reduced-motion * {
 
 .dark\:border-b-dark-lighter:is(.dark *) {
   --tw-border-opacity: 1 !important;
-  border-bottom-color: rgb(51 65 85 / var(--tw-border-opacity, 1)) !important;
+  border-bottom-color: rgb(36 41 49 / var(--tw-border-opacity, 1)) !important;
 }
 
 .dark\:border-t-blue-500:is(.dark *) {
@@ -6232,17 +6290,17 @@ body.reduced-motion * {
 
 .dark\:bg-dark:is(.dark *) {
   --tw-bg-opacity: 1 !important;
-  background-color: rgb(15 23 42 / var(--tw-bg-opacity, 1)) !important;
+  background-color: rgb(17 19 23 / var(--tw-bg-opacity, 1)) !important;
 }
 
 .dark\:bg-dark-darker:is(.dark *) {
   --tw-bg-opacity: 1 !important;
-  background-color: rgb(2 6 23 / var(--tw-bg-opacity, 1)) !important;
+  background-color: rgb(7 9 12 / var(--tw-bg-opacity, 1)) !important;
 }
 
 .dark\:bg-dark-lighter:is(.dark *) {
   --tw-bg-opacity: 1 !important;
-  background-color: rgb(51 65 85 / var(--tw-bg-opacity, 1)) !important;
+  background-color: rgb(36 41 49 / var(--tw-bg-opacity, 1)) !important;
 }
 
 .dark\:bg-emerald-500:is(.dark *) {
@@ -6478,7 +6536,7 @@ body.reduced-motion * {
 
 .dark\:text-dark-lighter:is(.dark *) {
   --tw-text-opacity: 1 !important;
-  color: rgb(51 65 85 / var(--tw-text-opacity, 1)) !important;
+  color: rgb(36 41 49 / var(--tw-text-opacity, 1)) !important;
 }
 
 .dark\:text-emerald-200:is(.dark *) {
@@ -6640,21 +6698,21 @@ body.reduced-motion * {
 
 .dark\:odd\:bg-dark:nth-child(odd):is(.dark *) {
   --tw-bg-opacity: 1 !important;
-  background-color: rgb(15 23 42 / var(--tw-bg-opacity, 1)) !important;
+  background-color: rgb(17 19 23 / var(--tw-bg-opacity, 1)) !important;
 }
 
 .dark\:even\:bg-dark-lighter:nth-child(even):is(.dark *) {
   --tw-bg-opacity: 1 !important;
-  background-color: rgb(51 65 85 / var(--tw-bg-opacity, 1)) !important;
+  background-color: rgb(36 41 49 / var(--tw-bg-opacity, 1)) !important;
 }
 
 .dark\:hover\:bg-dark-lighter:hover:is(.dark *) {
   --tw-bg-opacity: 1 !important;
-  background-color: rgb(51 65 85 / var(--tw-bg-opacity, 1)) !important;
+  background-color: rgb(36 41 49 / var(--tw-bg-opacity, 1)) !important;
 }
 
 .dark\:hover\:bg-dark-lighter\/50:hover:is(.dark *) {
-  background-color: rgb(51 65 85 / 0.5) !important;
+  background-color: rgb(36 41 49 / 0.5) !important;
 }
 
 .dark\:hover\:bg-gray-600:hover:is(.dark *) {
@@ -6710,7 +6768,7 @@ body.reduced-motion * {
 
 .dark\:disabled\:bg-dark:disabled:is(.dark *) {
   --tw-bg-opacity: 1 !important;
-  background-color: rgb(15 23 42 / var(--tw-bg-opacity, 1)) !important;
+  background-color: rgb(17 19 23 / var(--tw-bg-opacity, 1)) !important;
 }
 
 .dark\:data-\[state\=checked\]\:border-robin-400[data-state="checked"]:is(.dark *) {
@@ -6720,7 +6778,7 @@ body.reduced-motion * {
 
 .dark\:data-\[state\=unchecked\]\:border-dark-lighter[data-state="unchecked"]:is(.dark *) {
   --tw-border-opacity: 1 !important;
-  border-color: rgb(51 65 85 / var(--tw-border-opacity, 1)) !important;
+  border-color: rgb(36 41 49 / var(--tw-border-opacity, 1)) !important;
 }
 
 .dark\:data-\[state\=checked\]\:bg-robin-400[data-state="checked"]:is(.dark *) {
@@ -6730,7 +6788,7 @@ body.reduced-motion * {
 
 .dark\:data-\[state\=unchecked\]\:bg-dark[data-state="unchecked"]:is(.dark *) {
   --tw-bg-opacity: 1 !important;
-  background-color: rgb(15 23 42 / var(--tw-bg-opacity, 1)) !important;
+  background-color: rgb(17 19 23 / var(--tw-bg-opacity, 1)) !important;
 }
 
 .dark\:data-\[state\=active\]\:text-robin-500[data-state="active"]:is(.dark *) {

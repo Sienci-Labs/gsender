@@ -75,14 +75,14 @@ function SpindleButton({ label, Icon, active = false, danger = false, disabled, 
                 'min-h-[80px] px-2 py-4 border transition-colors',
                 danger
                     ? 'bg-red-950/40 border-red-800/50'
-                    : 'bg-gray-100 dark:bg-dark border-gray-300 dark:border-dark-lighter',
+                    : 'bg-gray-100 dark:bg-dark border-gray-300 dark:border-outline',
                 active && !danger
                     ? 'text-robin-500 shadow-[inset_7px_4px_6px_0px_rgba(59,130,246,0.12)] border-robin-400 dark:border-robin-600'
                     : danger
                         ? 'text-red-400'
-                        : 'text-[#7a8299] dark:text-white/50',
+                        : 'text-gray-500 dark:text-content-muted',
                 { 'opacity-40': disabled },
-                !disabled && !active && !danger && 'hover:bg-gray-200 dark:hover:bg-dark-lighter',
+                !disabled && !active && !danger && 'hover:bg-gray-200 dark:hover:bg-surface-hover',
             )}>
                 <Icon size={24} />
                 <span className="text-[11px] font-semibold">{label}</span>
@@ -416,7 +416,7 @@ export default function SpindlePanel({ mode }: Props) {
     const spindleReverse = spindleModal === 'M4';
     const laserIsOn = spindleModal !== 'M5';
     const clickable = canClick();
-    const divider = <div className="mx-4 border-t border-gray-200 dark:border-dark-lighter shrink-0" />;
+    const divider = <div className="mx-4 border-t border-gray-200 dark:border-outline shrink-0" />;
 
     const { enableDarkMode = false } = useWorkspaceState();
     const isDark = enableDarkMode;
@@ -535,7 +535,7 @@ export default function SpindlePanel({ mode }: Props) {
 
                 <div className="flex-[1] flex items-center justify-center gap-1">
                     <span className={clsx('text-[10px] font-medium leading-none',
-                        !isLaserMode ? 'text-robin-500' : 'text-[#7a8299] dark:text-white/50')}>
+                        !isLaserMode ? 'text-robin-500' : 'text-gray-500 dark:text-content-muted')}>
                         Spindle
                     </span>
                     <button
@@ -553,7 +553,7 @@ export default function SpindlePanel({ mode }: Props) {
                         )} />
                     </button>
                     <span className={clsx('text-[10px] font-medium leading-none',
-                        isLaserMode ? 'text-robin-500' : 'text-[#7a8299] dark:text-white/50')}>
+                        isLaserMode ? 'text-robin-500' : 'text-gray-500 dark:text-content-muted')}>
                         Laser
                     </span>
                 </div>
@@ -564,7 +564,7 @@ export default function SpindlePanel({ mode }: Props) {
                     {divider}
 
                     <div className="flex items-center gap-3 px-4 pt-4 pb-2 shrink-0">
-                        <span className="text-xs text-[#7a8299] dark:text-white/50 w-14 shrink-0">
+                        <span className="text-xs text-gray-500 dark:text-content-muted w-14 shrink-0">
                             {isLaserMode ? 'Power' : 'Speed'}
                         </span>
                         <Slider
@@ -581,23 +581,23 @@ export default function SpindlePanel({ mode }: Props) {
                             rangeClassName="absolute h-full rounded-full bg-robin-400"
                             thumbClassName="block w-6 h-6 rounded-xl border-gray-500 border-solid border-2 bg-white outline-none cursor-pointer disabled:bg-gray-300 disabled:cursor-not-allowed"
                         />
-                        <span className="text-xs tabular-nums w-16 text-right shrink-0 text-gray-600 dark:text-gray-300">
+                        <span className="text-xs tabular-nums w-16 text-right shrink-0 text-gray-600 dark:text-content-secondary">
                             {isLaserMode ? `${state.laser.power}%` : `${state.spindleSpeed} RPM`}
                         </span>
                     </div>
 
                     {isLaserMode && (
                         <div className="flex items-center gap-3 px-4 py-2 shrink-0">
-                            <span className="text-xs text-[#7a8299] dark:text-white/50 w-14 shrink-0">Duration</span>
+                            <span className="text-xs text-gray-500 dark:text-content-muted w-14 shrink-0">Duration</span>
                             <input
                                 type="number"
                                 value={state.laser.duration}
                                 min={0.1}
                                 step={0.1}
                                 onChange={actions.handleLaserDurationChange}
-                                className="w-20 text-center rounded-lg border border-gray-300 dark:border-dark-lighter bg-white dark:bg-dark text-sm text-gray-700 dark:text-gray-200 px-2 py-1.5"
+                                className="w-20 text-center rounded-lg border border-gray-300 dark:border-outline bg-white dark:bg-dark text-sm text-gray-700 dark:text-content-secondary px-2 py-1.5"
                             />
-                            <span className="text-xs text-[#7a8299] dark:text-white/50">sec</span>
+                            <span className="text-xs text-gray-500 dark:text-content-muted">sec</span>
                         </div>
                     )}
                 </>

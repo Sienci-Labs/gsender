@@ -21,9 +21,9 @@ export default function VisualizerCard() {
     return (
         <div className="flex flex-col gap-3">
             {/* Visualizer canvas */}
-            <div className="rounded-xl border border-gray-300 dark:border-dark-lighter flex flex-col">
+            <div className="rounded-xl border border-gray-300 dark:border-outline dark:bg-surface-raised flex flex-col">
                 {/* Top toolbar */}
-                <div className="flex items-center px-3 py-2 bg-gray-100 dark:bg-dark-darker border-b border-gray-200 dark:border-dark-lighter rounded-t-xl">
+                <div className="flex items-center px-3 py-2 bg-gray-100 dark:bg-surface-raised border-b border-gray-200 dark:border-outline rounded-t-xl">
                     <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 flex-1">
                         <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full inline-block" style={{ backgroundColor: '#3e85c7' }} />Cut</span>
                         <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full inline-block" style={{ backgroundColor: '#0ef6ae' }} />Rapid</span>
@@ -32,7 +32,7 @@ export default function VisualizerCard() {
                     <WorkspaceSelector />
                 </div>
 
-                <div className="relative h-56 overflow-hidden rounded-b-xl">
+                <div className="relative h-56 overflow-hidden rounded-b-xl dark:bg-surface-sunken">
                     <Visualizer />
                     {fileProcessing && (
                         <div className="absolute inset-0 flex items-center justify-center p-3 bg-dark-darker/95">

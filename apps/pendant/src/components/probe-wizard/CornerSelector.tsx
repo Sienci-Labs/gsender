@@ -30,7 +30,7 @@ function BracketIcon({ rotation, selected }: { rotation: number; selected: boole
         >
             <path
                 d="M8 8 V20 H20"
-                stroke={selected ? '#4ade80' : '#9ca3af'}
+                stroke={selected ? '#4ade80' : 'var(--content-muted)'}
                 strokeWidth="3"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -58,7 +58,7 @@ export default function CornerSelector({ direction, onChange }: CornerSelectorPr
                                 'flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 py-2.5 transition-colors',
                                 selected
                                     ? 'border-green-400 bg-green-400/10'
-                                    : 'border-gray-300 dark:border-gray-700 bg-white dark:bg-dark',
+                                    : 'border-gray-300 dark:border-outline bg-white dark:bg-dark',
                             )}
                         >
                             <BracketIcon rotation={corner.rotation} selected={selected} />
@@ -67,7 +67,7 @@ export default function CornerSelector({ direction, onChange }: CornerSelectorPr
                                     'text-sm font-medium',
                                     selected
                                         ? 'text-green-600 dark:text-green-400'
-                                        : 'text-gray-600 dark:text-gray-300',
+                                        : 'text-gray-600 dark:text-content-secondary',
                                 )}
                             >
                                 {corner.label}
@@ -77,8 +77,8 @@ export default function CornerSelector({ direction, onChange }: CornerSelectorPr
                 })}
             </div>
 
-            <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
-                <span className="font-bold text-gray-700 dark:text-gray-200">
+            <p className="text-sm text-gray-500 dark:text-content-muted text-center">
+                <span className="font-bold text-gray-700 dark:text-content-secondary">
                     {selectedCorner?.label ?? 'Unknown'}
                 </span>{' '}
                 selected
