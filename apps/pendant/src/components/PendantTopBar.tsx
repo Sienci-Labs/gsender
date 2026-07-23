@@ -1,4 +1,4 @@
-import Connection from 'app/features/Connection';
+import ConnectionWidget from './ConnectionWidget';
 import { stopMachineMotion } from '@gsender/features/Jogging/utils/Jogging';
 import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
 import type { RootState } from '@gsender/controller-client/store/redux';
@@ -197,9 +197,9 @@ export default function PendantTopBar() {
                 <img src={iconRound} alt="gSender" className="w-9 h-9" />
             </div>
 
-            {/* Connection widget from desktop */}
+            {/* Touch-forward connection widget */}
             <div className="shrink-0 no-drag">
-                <Connection />
+                <ConnectionWidget />
             </div>
 
             {/* State badge — absolutely centred so Connection resizing doesn't shift it */}

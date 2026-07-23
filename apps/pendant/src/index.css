@@ -304,3 +304,39 @@ textarea,
     z-index: 1;
     animation: shimmer 0.65s ease forwards;
 }
+
+/* ── Connection widget ("Hold to Release") ─────────────────────────────── */
+/* Namespaced so they don't collide with the `.mbtn` shimmer above.        */
+
+@keyframes conn-pop-in {
+    0%   { opacity: 0; transform: scale(0.94) translateY(4px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+.conn-anim-pop-in { animation: conn-pop-in 320ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+@keyframes conn-dropdown-in {
+    0%   { opacity: 0; transform: scale(0.95) translateY(-6px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+.conn-anim-dropdown-in {
+    animation: conn-dropdown-in 190ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    transform-origin: top left;
+}
+
+/* Connecting-state shimmer sweep (yellow-600 tint) */
+@keyframes conn-shimmer {
+    0%   { background-position: 160% 0; }
+    100% { background-position: -60% 0; }
+}
+.conn-anim-shimmer {
+    background-image: linear-gradient(100deg, transparent 30%, rgba(202, 138, 4, 0.22) 50%, transparent 70%);
+    background-size: 240% 100%;
+    animation: conn-shimmer 1.7s linear infinite;
+}
+
+/* Pulsing halo on port-row icon badges while the dropdown is open */
+@keyframes conn-port-glow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.25); }
+    50%      { box-shadow: 0 0 0 6px rgba(56, 189, 248, 0); }
+}
+.conn-anim-port-glow { animation: conn-port-glow 2.6s ease-out infinite; }
