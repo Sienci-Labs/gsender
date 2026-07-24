@@ -38,6 +38,12 @@ const PluginManager = () => {
 		}
 	};
 
+	const handleImportPlugin = () => {
+		if (isElectron()) {
+			(window as any).ipcRenderer?.send("open-plugin-import-dialog");
+		}
+	};
+
 	return (
 		<Page
 			title="Plugins"
@@ -79,9 +85,7 @@ const PluginManager = () => {
 				)}
 
 				<div className="flex gap-2">
-					<Button onClick={() => {}}>
-						Import Plugin
-					</Button>
+					<Button onClick={handleImportPlugin}>Import Plugin</Button>
 					<Button onClick={refresh} disabled={loading}>
 						Refresh
 					</Button>
@@ -117,8 +121,7 @@ const PluginManager = () => {
 								)}
 								{plugin.contributions.length > 0 && (
 									<p className="mt-2 text-xs text-gray-500">
-										Slots:{" "}
-										{plugin.contributions.map((c) => c.slot).join(", ")}
+										Slots: {plugin.contributions.map((c) => c.slot).join(", ")}
 									</p>
 								)}
 							</div>
