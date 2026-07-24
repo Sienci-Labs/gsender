@@ -91,7 +91,7 @@ export function ManualToolChangePosition({
                 <b>"Set Position"</b> button.
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-300">
-                The fields below are prepopulated with a suggested position.
+                The fields below are already filled with a recommended position.
                 Hit <b>"Go To"</b> to send the machine there, then jog to
                 fine-tune it from that starting point before setting the
                 position.

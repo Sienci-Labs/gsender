@@ -1,128 +1,142 @@
-import { Widget } from "app/components/Widget";
-import { VISUALIZER_PRIMARY } from "app/constants";
-import controller from "app/lib/controller";
-import { uploadGcodeFileToServer } from "app/lib/fileupload";
-import { toast } from "app/lib/toaster";
-import { store as reduxStore } from "app/store/redux";
-import { updateFileInfo } from "app/store/redux/slices/fileInfo.slice";
-import isElectron from "is-electron";
-import { useEffect } from "react";
-import ButtonControlGroup from "./ButtonControlGroup";
-import type { RecentFile } from "./definitions";
-import FileInformation from "./FileInformation";
+import { useEffect } from 'react';
+import isElectron from 'is-electron';
+
+import { Widget } from 'app/components/Widget';
+import { store as reduxStore } from 'app/store/redux';
+import controller from 'app/lib/controller';
+import { VISUALIZER_PRIMARY } from 'app/constants';
+import { uploadGcodeFileToServer } from 'app/lib/fileupload';
+
+import ButtonControlGroup from './ButtonControlGroup';
+import FileInformation from './FileInformation';
+import { updateFileInfo } from 'app/store/redux/slices/fileInfo.slice';
 import {
-	addRecentFile,
-	createRecentFileFromRawPath,
-	deleteRecentFile,
-	loadRecentFile,
-} from "./utils/recentfiles";
+    addRecentFile,
+    createRecentFileFromRawPath,
+    deleteRecentFile,
+    loadRecentFile,
+} from './utils/recentfiles';
+import { toast } from 'app/lib/toaster';
+import { RecentFile } from './definitions';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { usePostHog } from '@posthog/react';
 
 export type FileData = {
-	data: string;
-	name: string;
-	path: string;
-	dir: string;
-	size: number;
+    data: string;
+    name: string;
+    path: string;
+    dir: string;
+    size: number;
 };
 
 const FileControl = () => {
-	useEffect(() => {
-		if (isElectron()) {
-			(window as any).ipcRenderer.on(
-				"returned-upload-dialog-data",
-				(_: any, file: FileData) => {
-					handleElectronFileUpload(file);
-				},
-			);
+    const posthog = usePostHog();
 
-			(window as any).ipcRenderer.on(
-				"loaded-recent-file",
-				(
-					_: any,
-					fileMetaData: {
-						result: string;
-						size: number;
-						name: string;
-						dir: string;
-						fullPath: any;
-					},
-				) => {
-					if (!fileMetaData) {
-						toast.error(
-							"Error loading recent file, it may have been deleted or moved to a different folder.",
-							{ position: "bottom-right" },
-						);
+    useEffect(() => {
+        if (isElectron()) {
+            (window as any).ipcRenderer.on(
+                'returned-upload-dialog-data',
+                (_: any, file: FileData) => {
+                    handleElectronFileUpload(file);
+                },
+            );
 
-						return;
-					}
+            (window as any).ipcRenderer.on(
+                'loaded-recent-file',
+                (
+                    _: any,
+                    fileMetaData: {
+                        result: string;
+                        size: number;
+                        name: string;
+                        dir: string;
+                        fullPath: any;
+                    },
+                ) => {
+                    if (!fileMetaData) {
+                        toast.error(
+                            'Error loading recent file, it may have been deleted or moved to a different folder.',
+                            { position: 'bottom-right' },
+                        );
 
-					const recentFile = {
-						data: fileMetaData.result,
-						name: fileMetaData.name,
-						path: fileMetaData.fullPath,
-						size: fileMetaData.size,
-						dir: fileMetaData.dir,
-					};
+                        return;
+                    }
 
-					handleElectronFileUpload(recentFile, true);
-				},
-			);
-			(window as any).ipcRenderer.on(
-				"remove-recent-file",
-				(
-					_: any,
-					data: {
-						err: string;
-						path: string;
-					},
-				) => {
-					toast.error(data.err, { position: "bottom-right" });
+                    const recentFile = {
+                        data: fileMetaData.result,
+                        name: fileMetaData.name,
+                        path: fileMetaData.fullPath,
+                        size: fileMetaData.size,
+                        dir: fileMetaData.dir,
+                    };
 
-					deleteRecentFile(data.path);
-				},
-			);
+                    handleElectronFileUpload(recentFile, true);
+                },
+            );
+            (window as any).ipcRenderer.on(
+                'remove-recent-file',
+                (
+                    _: any,
+                    data: {
+                        err: string;
+                        path: string;
+                    },
+                ) => {
+                    toast.error(data.err, { position: 'bottom-right' });
 
-			// Signal to main that we're ready to receive file association data
-			setTimeout(() => {
-				(window as any).ipcRenderer.send("file-association-ready");
-			}, 250);
-		}
-	}, []);
+                    deleteRecentFile(data.path);
+                },
+            );
 
-	const handleElectronFileUpload = async (
-		file: FileData,
-		isRecentFile = false,
-	) => {
-		const givenFile = new File([file.data], file.name);
+            // Signal to main that we're ready to receive file association data
+            setTimeout(() => {
+                (window as any).ipcRenderer.send('file-association-ready');
+            }, 250);
+        }
+    }, []);
 
-		if (isElectron() && !isRecentFile) {
-			const recentFile = createRecentFileFromRawPath(file);
-			addRecentFile(recentFile);
-		}
+    const handleElectronFileUpload = async (
+        file: FileData,
+        isRecentFile = false,
+    ) => {
+        const givenFile = new File([file.data], file.name);
 
-		await uploadGcodeFileToServer(
-			givenFile,
-			controller.port,
-			VISUALIZER_PRIMARY,
-		);
+        if (isElectron() && !isRecentFile) {
+            const recentFile = createRecentFileFromRawPath(file);
+            addRecentFile(recentFile);
+        }
 
-		reduxStore.dispatch(updateFileInfo({ path: file.path }));
-	};
+        await uploadGcodeFileToServer(
+            givenFile,
+            controller.port,
+            VISUALIZER_PRIMARY,
+        );
 
-	const handleRecentFileUpload = async (file: RecentFile) => {
-		loadRecentFile(file.filePath);
-	};
+        reduxStore.dispatch(updateFileInfo({ path: file.path }));
 
-	return (
-		<Widget>
-			<Widget.Content>
-				<div className="w-full flex flex-col items-center">
-					<ButtonControlGroup />
-					<FileInformation handleRecentFileUpload={handleRecentFileUpload} />
-				</div>
-			</Widget.Content>
-		</Widget>
-	);
+        posthog?.capture('file_uploaded', {
+            name: file.name,
+            size: file.size,
+            isRecentFile,
+        });
+    };
+
+    const handleRecentFileUpload = async (file: RecentFile) => {
+        loadRecentFile(file.filePath);
+    };
+
+    return (
+        <Widget>
+            <Widget.Content>
+                <div className="w-full flex flex-col items-center">
+                    <ButtonControlGroup />
+                    <FileInformation
+                        handleRecentFileUpload={handleRecentFileUpload}
+                    />
+                </div>
+            </Widget.Content>
+        </Widget>
+    );
 };
 
 export default FileControl;

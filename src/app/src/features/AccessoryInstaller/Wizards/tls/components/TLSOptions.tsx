@@ -100,7 +100,7 @@ export function TLSOptions({ onComplete, onUncomplete }: StepProps) {
                 />
                 <span>
                     <span className="block text-lg font-semibold text-gray-900 dark:text-white">
-                        Set custom tool change location
+                        Set manual tool change location
                     </span>
                     <span className="block text-sm text-gray-600 dark:text-gray-300">
                         Move the CNC to a more convenient location for manual
