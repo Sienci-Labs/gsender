@@ -87,12 +87,16 @@ describe('JogHelper', () => {
     let jogHelper: JogHelper;
 
     beforeEach(() => {
-    jest.useFakeTimers({ legacyFakeTimers: false });
-    jogCB = jest.fn();
-    startContinuousJogCB = jest.fn();
-    stopContinuousJogCB = jest.fn();
-    jogHelper = new JogHelper({ jogCB, startContinuousJogCB, stopContinuousJogCB });
-});
+        jest.useFakeTimers({ legacyFakeTimers: false });
+        jogCB = jest.fn();
+        startContinuousJogCB = jest.fn();
+        stopContinuousJogCB = jest.fn();
+        (store.get as jest.Mock).mockImplementation((key: string, defaultVal: any) => {
+            if (key === 'widgets.axes.jog.threshold') return 200;
+            return defaultVal;
+        });
+        jogHelper = new JogHelper({ jogCB, startContinuousJogCB, stopContinuousJogCB });
+    });
 
     afterEach(() => {
         jest.useRealTimers();
@@ -123,7 +127,7 @@ describe('JogHelper', () => {
     jest.advanceTimersByTime(250); // > 200ms timeout
     expect(startContinuousJogCB).toHaveBeenCalledWith({ X: 1 }, 3000);
 });
-    it.('does not start continuous jog before timeout threshold', () => {  // this is the failign tets case
+    it('does not start continuous jog before timeout threshold', () => {  // this is the failign tets case
         jogHelper.onKeyDown({ X: 1 }, 3000);
         jest.advanceTimersByTime(100);
         expect(startContinuousJogCB).not.toHaveBeenCalled();
@@ -163,7 +167,7 @@ describe('JogHelper', () => {
     const now = 1000000;
     jest.setSystemTime(now);
     jogHelper.onKeyDown({ Y: -1 }, 5000);
-    jest.setSystemTime(now + 100); // 100ms < 200ms timeout ✓
+    jest.setSystemTime(now + 100);
     jogHelper.onKeyUp();
     expect(jogCB).toHaveBeenCalledWith({ Y: -1 }, 5000);
 });
