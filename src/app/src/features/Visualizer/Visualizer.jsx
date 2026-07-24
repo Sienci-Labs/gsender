@@ -22,6 +22,12 @@
  */
 
 import { store as reduxStore } from 'app/store/redux';
+import {
+    isFollowEnabled as _isFollowEnabled,
+    getToolScenePosition as _getToolScenePosition,
+    startCameraFollow as _startCameraFollow,
+    stopCameraFollow as _stopCameraFollow,
+} from './cameraFollowHelpers';
 import gsap from 'gsap';
 import { connect } from 'react-redux';
 import _get from 'lodash/get';
@@ -120,6 +126,7 @@ class Visualizer extends Component {
             'Right',
             'Free',
         ]),
+        followTool: PropTypes.bool,
         state: PropTypes.object,
         isSecondary: PropTypes.bool,
     };
@@ -129,6 +136,9 @@ class Visualizer extends Component {
     pubsubTokens = [];
 
     outlineRunning = false;
+
+    // requestAnimationFrame handle for the smooth camera-follow loop (null = idle)
+    cameraFollowRAF = null;
 
     isAgitated = false;
 
@@ -603,6 +613,12 @@ class Visualizer extends Component {
                     prevProps.workPosition,
                     this.props.workPosition,
                 );
+                // Keep the camera following the tool while "follow tool" is on.
+                // Driven here (per position update) rather than via the gsap
+                // onUpdate inside updateCuttingToolPosition, which early-returns
+                // when the tool STL model hasn't loaded. startCameraFollow eases
+                // the camera toward the new position and self-gates when off.
+                this.startCameraFollow();
             }
         }
 
@@ -643,6 +659,17 @@ class Visualizer extends Component {
             if (this.props.cameraPosition === 'Right') {
                 this.toRightSideView();
             }
+        }
+
+        // Start/stop the smooth follow loop when "follow tool" is toggled.
+        const followNow =
+            this.props.followTool || this.props.state?.followTool;
+        const followPrev =
+            prevProps.followTool || prevProps.state?.followTool;
+        if (followNow && !followPrev) {
+            this.startCameraFollow();
+        } else if (!followNow && followPrev) {
+            this.stopCameraFollow();
         }
 
         if (activeState === GRBL_ACTIVE_STATE_CHECK && this.waitingForCheck) {
@@ -2088,6 +2115,10 @@ class Visualizer extends Component {
         if (this.controls) {
             this.controls.dispose();
         }
+        if (this.disposeFollowDragDetection) {
+            this.disposeFollowDragDetection();
+            this.disposeFollowDragDetection = null;
+        }
 
         // Update the scene
         this.updateScene();
@@ -2417,6 +2448,57 @@ class Visualizer extends Component {
             this.updateScene();
         });
 
+        // Turn off "follow tool" when the user actually DRAGS the view (pointer
+        // down + movement past a small threshold) — not on a plain click, and
+        // not on wheel-zoom (so the user can still zoom while following). The
+        // controls' own 'start' event fires for mousedown, wheel and touch
+        // alike and carries no movement info, so detect the drag here instead.
+        const DRAG_THRESHOLD_SQ = 16; // (4px)^2 before a press counts as a drag
+        let dragOrigin = null;
+        const onGrabStart = (event) => {
+            const p = event.touches ? event.touches[0] : event;
+            dragOrigin = p ? { x: p.clientX, y: p.clientY } : null;
+        };
+        const onGrabMove = (event) => {
+            if (!dragOrigin) {
+                return;
+            }
+            const p = event.touches ? event.touches[0] : event;
+            if (!p) {
+                return;
+            }
+            const dx = p.clientX - dragOrigin.x;
+            const dy = p.clientY - dragOrigin.y;
+            if (dx * dx + dy * dy >= DRAG_THRESHOLD_SQ) {
+                dragOrigin = null; // fire once per press
+                if (
+                    this.isFollowEnabled() &&
+                    this.props.actions?.camera?.toggleFollowTool
+                ) {
+                    this.props.actions.camera.toggleFollowTool();
+                }
+            }
+        };
+        const onGrabEnd = () => {
+            dragOrigin = null;
+        };
+        domElement.addEventListener('mousedown', onGrabStart);
+        domElement.addEventListener('mousemove', onGrabMove);
+        domElement.addEventListener('mouseup', onGrabEnd);
+        domElement.addEventListener('touchstart', onGrabStart, {
+            passive: true,
+        });
+        domElement.addEventListener('touchmove', onGrabMove, { passive: true });
+        domElement.addEventListener('touchend', onGrabEnd);
+        this.disposeFollowDragDetection = () => {
+            domElement.removeEventListener('mousedown', onGrabStart);
+            domElement.removeEventListener('mousemove', onGrabMove);
+            domElement.removeEventListener('mouseup', onGrabEnd);
+            domElement.removeEventListener('touchstart', onGrabStart);
+            domElement.removeEventListener('touchmove', onGrabMove);
+            domElement.removeEventListener('touchend', onGrabEnd);
+        };
+
         return controls;
     }
 
@@ -2622,6 +2704,22 @@ class Visualizer extends Component {
         this.controls.target.y = y;
         this.controls.target.z = z;
         this.controls.update();
+    }
+
+    isFollowEnabled() {
+        return _isFollowEnabled(this);
+    }
+
+    getToolScenePosition() {
+        return _getToolScenePosition(this);
+    }
+
+    startCameraFollow() {
+        _startCameraFollow(this);
+    }
+
+    stopCameraFollow() {
+        _stopCameraFollow(this);
     }
 
     // Make the controls look at the center position

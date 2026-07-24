@@ -576,6 +576,13 @@ class Visualizer extends Component {
             toFreeView: () => {
                 this.setState({ cameraPosition: 'Free' });
             },
+            toggleFollowTool: () => {
+                this.setState((state) => {
+                    const followTool = !state.followTool;
+                    this.config.set('followTool', followTool); // persist
+                    return { followTool };
+                });
+            },
         },
         handleLiteModeToggle: () => {
             const { liteMode, liteOption } = this.state;
@@ -905,6 +912,7 @@ class Visualizer extends Component {
                 },
             },
             cameraMode: this.config.get('cameraMode', CAMERA_MODE_PAN),
+            followTool: this.config.get('followTool', false),
             cameraPosition: '3D', // 'Top', '3D', 'Front', 'Left', 'Right'
             isAgitated: false, // Defaults to false
             currentTheme: getVisualizerTheme(),
