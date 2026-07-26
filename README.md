@@ -3,8 +3,9 @@
 
 > **Note:** This feature requires an active 3D touch probe connected to your machine.
 
-Added a custom interactive probing modal for quickly locating the precise geometric center of your material:
+Added a custom interactive probing feature for quickly locating the precise geometric center of your stock:
 
+* **New UI Access:** Includes a dedicated **Material Center Finder** button added directly inside the **Probe** tab, which opens the configuration popup modal.
 * **3D Probe Automated Workflow:** Probes Z height first, then probes all four material edges (-X, +X, -Y, +Y) using a 3D touch probe.
 * **Automated Centering:** Calculates the exact center point based on measured edges and your custom material dimensions, then repositions the spindle directly to center zero.
 * **Configurable Parameters:** Easily adjust Fast/Slow feedrates, Retract distances, and Safe Z heights directly inside the UI.
