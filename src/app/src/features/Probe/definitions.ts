@@ -130,6 +130,9 @@ export interface Actions {
     startConnectivityTest: () => void;
     setProbeConnectivity: (connectionMade: boolean) => void;
     onOpenChange: (isOpen: boolean) => void;
+    openMaterialCenterModal: () => void;
+    closeMaterialCenterModal: () => void;
+    runMaterialCenterMacro: (gcode: string) => void;
     changeProbeCommand: (value: string) => void;
     changeTouchPlateType: (value: TOUCHPLATE_TYPES_T) => void;
     toggleUseTLO: () => void;

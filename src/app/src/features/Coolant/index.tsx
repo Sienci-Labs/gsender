@@ -53,24 +53,24 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
         <div className="flex flex-col justify-around items-center h-full">
             <div className="flex flex-row justify-center w-full gap-2">
                 <ActiveStateButton
-                    text="Mist"
+                    text="Air"
                     icon={<FaShower />}
                     onClick={startMist}
                     className="h-16"
                     size="md"
                     active={isConnected && mistActive}
                     disabled={!canClick()}
-                    tooltip={{ content: 'Turn on mist coolant' }}
+                    tooltip={{ content: 'Turn on air' }}
                 />
                 <ActiveStateButton
-                    text="Flood"
+                    text="Mist"
                     icon={<FaWater />}
                     onClick={startFlood}
                     className="h-16"
                     size="md"
                     active={isConnected && floodActive}
                     disabled={!canClick()}
-                    tooltip={{ content: 'Turn on flood coolant' }}
+                    tooltip={{ content: 'Turn on mist' }}
                 />
                 <ActiveStateButton
                     text="Off"

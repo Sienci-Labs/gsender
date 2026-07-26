@@ -134,29 +134,27 @@ const Probe = ({ state, actions }: ProbeProps) => {
     const probeCommand = availableProbeCommands[selectedProbeCommand];
 
     return (
-        <div className="w-full h-full max-xl:pt-1">
-            <div className="grid grid-cols-[5fr_3fr] w-full h-full max-xl:max-h-[144px]">
-                {/* <div className="w-full h-full m-auto grid gap-4">
-                    <div className="h-full grid grid-rows[4fr_2fr] self-center gap-2"> */}
-                <div className="grid grid-rows-[1fr_1fr_1fr] gap-0.5 items-center justify-center">
-                    { touchplateTypeSwitcher &&
+        <div className="w-full h-full max-xl:pt-1 overflow-hidden">
+            <div className="grid grid-cols-[minmax(0,5fr)_minmax(0,3fr)] w-full h-full max-xl:max-h-[144px]">
+                <div className="grid grid-rows-[auto_auto_auto_auto] gap-2 items-center justify-center max-w-full min-w-0">
+                    {touchplateTypeSwitcher && (
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button  aria-label="Change Probe Type" size="sm">{touchplateType}</Button>
+                                <Button aria-label="Change Probe Type" size="sm">{touchplateType}</Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-56 bg-white">
-                                { Object.values(TOUCHPLATE_TYPES).map((tpt) =>
+                                {Object.values(TOUCHPLATE_TYPES).map((tpt) => (
                                     <DropdownMenuItem
                                         key={tpt}
                                         onClick={() => actions.changeTouchPlateType(tpt)}
                                         className="flex items-center hover:bg-blue-100 transition-colors duration-200 cursor-pointer dark:hover:bg-dark-lighter"
                                     >
                                         {tpt}
-                                    </DropdownMenuItem>)
-                                }
+                                    </DropdownMenuItem>
+                                ))}
                             </DropdownMenuContent>
                         </DropdownMenu>
-                    }
+                    )}
                     <div className="flex w-full bg-white dark:bg-dark rounded-md border-solid border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-200 p-[2px]">
                         {availableProbeCommands.map((command, index) => (
                             <Tooltip
@@ -195,13 +193,44 @@ const Probe = ({ state, actions }: ProbeProps) => {
                             probeCommand={probeCommand}
                         />
                     </div>
-                    <div className="flex items-center justify-center">
+                    <div className="flex flex-wrap items-center justify-center gap-2 max-w-full">
                         <Button
                             onClick={() => actions.onOpenChange(true)}
                             disabled={!canClick}
+                            className="whitespace-nowrap"
                         >
                             Probe
                         </Button>
+
+                        {/* Material Center Finder Icon-Only Button */}
+                        <Tooltip content="Find Material Center">
+                            <Button
+                                onClick={() => actions.openMaterialCenterModal()}
+                                disabled={!canClick}
+                                variant="secondary"
+                                size="icon"
+                                aria-label="Find Material Center"
+                                className="flex items-center justify-center p-2"
+                            >
+                                <svg
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2.2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                >
+                                    <circle cx="12" cy="12" r="9" />
+                                    <circle cx="12" cy="12" r="3" />
+                                    <line x1="12" y1="1" x2="12" y2="5" />
+                                    <line x1="12" y1="19" x2="12" y2="23" />
+                                    <line x1="1" y1="12" x2="5" y2="12" />
+                                    <line x1="19" y1="12" x2="23" y2="12" />
+                                </svg>
+                            </Button>
+                        </Tooltip>
                     </div>
                 </div>
                 <div className="flex w-full h-full min-h-full max-xl:pt-2">

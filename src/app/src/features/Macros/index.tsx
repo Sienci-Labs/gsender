@@ -331,7 +331,6 @@ const MacroWidget = ({
                     description,
                 } of importedMacros) {
                     if (name && content) {
-                        // Check if macro with same ID already exists
                         const isDuplicate = macros.some(
                             (existingMacro) => existingMacro.id === id,
                         );
@@ -461,7 +460,7 @@ const MacroWidget = ({
             )}
 
             <div className="flex flex-col h-full">
-                <div className="flex-grow overflow-auto relative">
+                <div className="flex-grow overflow-auto relative min-h-0">
                     <Macro
                         state={{
                             macros,

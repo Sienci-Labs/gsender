@@ -70,6 +70,7 @@ export interface ControllerListeners {
     'workflow:pause': Array<Function>;
     'sender:status': Array<Function>;
     'workflow:state': Array<Function>;
+    'material-center:complete': Array<Function>;
     'controller:settings': Array<Function>;
     'controller:state': Array<Function>;
     'settings:description': Array<Function>;
@@ -183,6 +184,7 @@ class Controller {
         'workflow:pause': [],
         'sender:status': [],
         'workflow:state': [],
+        'material-center:complete': [],
         'controller:settings': [],
         'controller:state': [],
         'settings:description': [],

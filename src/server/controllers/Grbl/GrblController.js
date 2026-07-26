@@ -470,6 +470,10 @@ class GrblController {
 				let commentMatcher = /\s*;.*/g;
 				let bracketCommentLine = /\s*\(.*\)*\)/gm;
 				let toolCommand = /(T)(-?\d*\.?\d+\.?)/;
+				if (line.includes("MATERIAL_CENTER_DONE")) {
+					this.emit("material-center:complete");
+					return "";
+				}
 				const commentRegex = /\(([^)]*)\)|;(.*)/g;
 				const commentParts = [];
 				let m;
