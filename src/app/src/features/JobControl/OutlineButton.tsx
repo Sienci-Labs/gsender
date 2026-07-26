@@ -8,6 +8,7 @@ import { outlineResponse } from 'app/workers/Outline.response';
 import { toast } from 'app/lib/toaster';
 import { store as reduxStore } from 'app/store/redux';
 import get from 'lodash/get';
+import { usePostHog } from '@posthog/react';
 
 interface OutlineButtonProps {
     disabled: boolean;
@@ -16,6 +17,7 @@ interface OutlineButtonProps {
 let outlineRunning = false;
 
 const OutlineButton: React.FC<OutlineButtonProps> = ({ disabled }) => {
+    const posthog = usePostHog();
     // TODO
     const runOutline = () => {
         const liteMode = store.get('widgets.visualizer.liteMode', false);
@@ -58,6 +60,13 @@ const OutlineButton: React.FC<OutlineButtonProps> = ({ disabled }) => {
                     mode: 'Square',
                     bbox: bbox,
                     outlineSpeed,
+                });
+
+                posthog?.capture('outline_run', {
+                    is_in_lite_mode: liteMode,
+                    is_laser: isLaser,
+                    outline_speed: outlineSpeed,
+                    bbox,
                 });
             } catch (e) {
                 console.log(e);

@@ -49,6 +49,7 @@ import { MPGJogManager } from './MPGJogManager.ts';
 import { convertValue } from './utils/units';
 import reduxStore from 'app/store/redux';
 import { UNITS_EN } from 'app/definitions/general';
+import { usePostHog } from '@posthog/react';
 
 export interface JogValueObject {
     xyStep: number;
@@ -127,6 +128,8 @@ export function Jogging({ hideRotary = false }) {
 
         return includes(states, activeState);
     }, [isConnected, workflowState, activeState])();
+
+    const posthog = usePostHog();
 
     const canClickShortcut = (): boolean => {
         const isConnected = get(
@@ -327,12 +330,10 @@ export function Jogging({ hideRotary = false }) {
                             mpgJogManagerRef.current = new MPGJogManager();
                         }
 
-                        const mpgCommand = mpgJogManagerRef.current.buildCommand(
-                            {
+                        const mpgCommand =
+                            mpgJogManagerRef.current.buildCommand({
                                 joystickOptions,
-                                activeStick: activeStick as
-                                    | 'stick1'
-                                    | 'stick2',
+                                activeStick: activeStick as 'stick1' | 'stick2',
                                 actionType: actionType as
                                     | 'primaryAction'
                                     | 'secondaryAction',
@@ -349,8 +350,7 @@ export function Jogging({ hideRotary = false }) {
                                     a: jogSpeedRef.current.aStep,
                                 },
                                 baseFeedrate: jogSpeedRef.current.feedrate,
-                            },
-                        );
+                            });
 
                         if (!mpgCommand) {
                             return;
@@ -729,7 +729,12 @@ export function Jogging({ hideRotary = false }) {
                 'workspace.rotaryAxis.useAaxisForGrbl',
                 false,
             );
-            if (controllerIsGrbl && axis.a && !isInRotaryMode && !useAaxisForGrblShortcut) {
+            if (
+                controllerIsGrbl &&
+                axis.a &&
+                !isInRotaryMode &&
+                !useAaxisForGrblShortcut
+            ) {
                 return;
             }
 
@@ -995,8 +1000,8 @@ export function Jogging({ hideRotary = false }) {
     );
     const showA =
         !hideRotary &&
-        ((firmwareType === 'grblHAL' || isRotaryMode) &&
-            rotaryWidgetState.tab.show ||
+        (((firmwareType === 'grblHAL' || isRotaryMode) &&
+            rotaryWidgetState.tab.show) ||
             useAaxisForGrbl);
 
     return (

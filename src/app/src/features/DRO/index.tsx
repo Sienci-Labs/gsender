@@ -60,6 +60,7 @@ import {
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import reduxStore from 'app/store/redux';
 import { cn } from 'app/lib/utils';
+import { usePostHog } from '@posthog/react';
 
 interface DROProps {
     axes: AxesArray;
@@ -126,6 +127,8 @@ function DRO({
         });
     }, []);
 
+    const posthog = usePostHog();
+
     const jogToCorner = useCallback((corner: string) => {
         const gcode = getMovementGCode(
             corner,
@@ -138,6 +141,7 @@ function DRO({
 
     function toggleHoming() {
         setHomingMode((prev) => !prev);
+        posthog?.capture('homing_mode_toggled', { value: !homingMode });
     }
 
     const canClick = useCallback((): boolean => {
@@ -484,7 +488,10 @@ function DRO({
                         tooltip={{ content: 'Zero all axes', side: 'left' }}
                         text="Zero"
                         icon={<VscTarget className="w-5 h-5" />}
-                        onClick={zeroAllAxes}
+                        onClick={() => {
+                            zeroAllAxes();
+                            posthog?.capture('zero_all_axes');
+                        }}
                         disabled={!canClick}
                         aria-label="Zero all axes: Set current position as work zero for all axes"
                         size="responsive"
@@ -511,7 +518,14 @@ function DRO({
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={zeroAllAxes}>
+                                <AlertDialogAction
+                                    onClick={() => {
+                                        zeroAllAxes();
+                                        posthog?.capture('zero_all_axes', {
+                                            with_warning: true,
+                                        });
+                                    }}
+                                >
                                     Continue
                                 </AlertDialogAction>
                             </AlertDialogFooter>
@@ -529,7 +543,12 @@ function DRO({
 
                 <Button
                     variant="alt"
-                    onClick={goXYAxes}
+                    onClick={() => {
+                        goXYAxes();
+                        posthog?.capture(
+                            isRotaryMode ? 'go_to_xa_axes' : 'go_to_xy_axes',
+                        );
+                    }}
                     disabled={!canClick}
                     tooltip={{ content: 'Go to XY zero', side: 'bottom' }}
                     aria-label={`Go to ${isRotaryMode ? 'XA' : 'XY'} zero: Move ${isRotaryMode ? 'X and A' : 'X and Y'} axes to their current work zero position`}

@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 
 import { Axis } from 'app/features/DRO/utils/DRO.ts';
+import { usePostHog } from '@posthog/react';
 
 export interface WCSInputProps {
     value: string;
@@ -16,6 +17,7 @@ export function WCSInput({
     axis,
 }: WCSInputProps) {
     const inputRef = useRef<HTMLInputElement>(null);
+    const posthog = usePostHog();
 
     const onKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
@@ -26,6 +28,10 @@ export function WCSInput({
             }
 
             movementHandler(inputValue, axis);
+            posthog?.capture('manual_wcs_offset_updated', {
+                axis,
+                value: inputValue,
+            });
             return;
         }
         if (e.key === 'Escape') {

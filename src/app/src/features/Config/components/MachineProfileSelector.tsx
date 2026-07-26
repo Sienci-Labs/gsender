@@ -11,6 +11,7 @@ import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import store from 'app/store';
 import find from 'lodash/find';
 import { useEffect, useRef } from 'react';
+import { usePostHog } from 'posthog-js/react';
 
 export function MachineProfileSelector() {
     const {
@@ -20,6 +21,7 @@ export function MachineProfileSelector() {
         profileChangedSinceDefaults,
     } = useSettings();
     const baselineProfileId = useRef<number | null>(null);
+    const posthog = usePostHog();
 
     if (
         baselineProfileId.current === null &&
@@ -46,6 +48,11 @@ export function MachineProfileSelector() {
         setProfileChangedSinceDefaults(
             isSienci && id !== baselineProfileId.current,
         );
+        posthog?.capture('machine_profile_selected', {
+            id: profile.id,
+            name: profile.name,
+            company: profile.company,
+        });
     }
 
     useEffect(() => {

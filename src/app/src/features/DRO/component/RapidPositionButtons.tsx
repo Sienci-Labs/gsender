@@ -13,6 +13,7 @@ import {
 } from 'app/features/DRO/utils/RapidPosition';
 import Tooltip from 'app/components/Tooltip';
 import cn from 'classnames';
+import { usePostHog } from '@posthog/react';
 export function RapidPositionButtons({ disabled = false }) {
     const homingFlag = useSelector(
         (state: RootState) => state.controller.homingFlag,
@@ -27,6 +28,8 @@ export function RapidPositionButtons({ disabled = false }) {
     const pullOff = useSelector((state: RootState) => {
         return get(state, 'controller.settings.settings.$27', 1);
     });
+
+    const posthog = usePostHog();
 
     const altColourClass = 'stroke-robin-500';
     const disabledColorClass = 'stroke-gray-400';
@@ -44,6 +47,12 @@ export function RapidPositionButtons({ disabled = false }) {
             Number(pullOff),
         );
         controller.command('gcode', gcode);
+        posthog?.capture('jog_to_corner', {
+            corner,
+            homing_direction: homingDirection,
+            homing_flag: homingFlag,
+            pull_off: Number(pullOff),
+        });
     }
 
     return (
@@ -73,7 +82,9 @@ export function RapidPositionButtons({ disabled = false }) {
                             d="M 32 0 H 0 V 32"
                             strokeWidth="20"
                             className={cn(
-                                isDisabled ? disabledColorClass : altColourClass,
+                                isDisabled
+                                    ? disabledColorClass
+                                    : altColourClass,
                             )}
                         />
                     </svg>
@@ -104,7 +115,9 @@ export function RapidPositionButtons({ disabled = false }) {
                             d="M 32 32 V 0 L 0 0"
                             strokeWidth="20"
                             className={cn(
-                                isDisabled ? disabledColorClass : altColourClass,
+                                isDisabled
+                                    ? disabledColorClass
+                                    : altColourClass,
                             )}
                         />
                     </svg>
@@ -135,7 +148,9 @@ export function RapidPositionButtons({ disabled = false }) {
                             d="M 0 0 L 0 32 L 32 32"
                             strokeWidth="20"
                             className={cn(
-                                isDisabled ? disabledColorClass : altColourClass,
+                                isDisabled
+                                    ? disabledColorClass
+                                    : altColourClass,
                             )}
                         />
                     </svg>
@@ -166,7 +181,9 @@ export function RapidPositionButtons({ disabled = false }) {
                             d="M 0 32 H 32 V 0"
                             strokeWidth="20"
                             className={cn(
-                                isDisabled ? disabledColorClass : altColourClass,
+                                isDisabled
+                                    ? disabledColorClass
+                                    : altColourClass,
                             )}
                         />
                     </svg>
