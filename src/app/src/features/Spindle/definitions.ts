@@ -1,5 +1,10 @@
 import { SPINDLE_LASER } from '../../constants';
 
+export type SendM5Type = {
+    type?: 'spindle' | 'laser';
+    ignorePosthog?: boolean;
+};
+
 // Types
 
 export type SPINDLE_LASER_T =
