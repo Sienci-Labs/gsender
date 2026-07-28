@@ -94,10 +94,10 @@ export default function DROCard() {
                         <button
                             onClick={() => zeroWCS(label, 0)}
                             disabled={!canZero}
-                            className={`text-sm font-semibold border rounded-md px-3 py-1.5 shrink-0 transition-colors ${
+                            className={`text-sm font-semibold border-[3px] border-gray-400 dark:border-gray-600 rounded-md px-3 py-1.5 shrink-0 transition-colors ${
                                 canZero
-                                    ? 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 border-gray-200 dark:border-dark-lighter'
-                                    : 'text-gray-400 dark:text-gray-500 border-gray-200 dark:border-dark-lighter cursor-default'
+                                    ? 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                                    : 'text-gray-400 dark:text-gray-500 cursor-default'
                             }`}
                         >
                             ZERO
@@ -133,14 +133,14 @@ export default function DROCard() {
                                     ? !isConnected
                                     : !canZero
                         }
-                        className={`flex items-center justify-center gap-2 rounded-lg h-12 text-sm border transition-colors ${
+                        className={`flex items-center justify-center gap-2 rounded-lg h-12 text-sm transition-colors ${
                             primary
                                 ? ((label === 'Home' ? canHome : label === 'Go to XY' ? canGoTo : isConnected)
-                                    ? 'bg-blue-500 hover:bg-blue-600 active:bg-blue-700 border-blue-500 text-white'
-                                    : 'bg-gray-200 border-gray-200 text-gray-400 dark:bg-dark-lighter dark:border-dark-lighter dark:text-gray-500')
+                                    ? 'border border-blue-500 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white'
+                                    : 'border border-gray-200 dark:border-dark-lighter bg-gray-200 text-gray-400 dark:bg-dark-lighter dark:text-gray-500')
                                 : (canZero
-                                    ? 'border-gray-200 dark:border-dark-lighter text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-lighter hover:text-gray-900 dark:hover:text-white'
-                                    : 'border-gray-200 dark:border-dark-lighter text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-dark cursor-default')
+                                    ? 'border-[3px] border-gray-400 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-lighter hover:text-gray-900 dark:hover:text-white'
+                                    : 'border-[3px] border-gray-400 dark:border-gray-600 text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-dark cursor-default')
                         }`}
                     >
                         <Icon size={16} />
