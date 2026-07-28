@@ -4,6 +4,7 @@ import { WORKSPACE_MODE } from 'app/constants';
 import { updateWorkspaceMode } from 'app/lib/rotary';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import Tooltip from 'app/components/Tooltip';
+import { usePostHog } from 'posthog-js/react';
 
 const Toggle = () => {
     const { mode } = useWorkspaceState();
@@ -11,11 +12,16 @@ const Toggle = () => {
         (state) => state.controller,
     );
     const connected = useTypedSelector((state) => state.connection.isConnected);
+    const posthog = usePostHog();
 
     const handleToggle = (checked: boolean) => {
-        updateWorkspaceMode(
-            checked ? WORKSPACE_MODE.ROTARY : WORKSPACE_MODE.DEFAULT,
-        );
+        const newMode = checked
+            ? WORKSPACE_MODE.ROTARY
+            : WORKSPACE_MODE.DEFAULT;
+
+        updateWorkspaceMode(newMode);
+
+        posthog.capture('rotary_mode_toggled', { mode: newMode });
     };
 
     const tooltipContent =

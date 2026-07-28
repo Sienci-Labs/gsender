@@ -27,6 +27,7 @@ import { HOLE_TYPES } from './utils/mountingSetupMacros';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import useKeybinding from 'app/lib/useKeybinding';
 import store from 'app/store';
+import { usePostHog } from 'posthog-js/react';
 
 const MountingSetup = ({ isDisabled = false }: { isDisabled?: boolean }) => {
     const [open, setOpen] = useState(false);
@@ -88,6 +89,8 @@ const MountingSetup = ({ isDisabled = false }: { isDisabled?: boolean }) => {
             value: 'four-hundred',
         },
     });
+
+    const posthog = usePostHog();
 
     const getIllustrationImage = () => {
         const {
@@ -185,6 +188,8 @@ const MountingSetup = ({ isDisabled = false }: { isDisabled?: boolean }) => {
         });
 
         setOpen(false);
+
+        posthog.capture('rotary_mounting_setup_loaded', { setup: setupKey });
     };
 
     const shuttleControlEvents = {

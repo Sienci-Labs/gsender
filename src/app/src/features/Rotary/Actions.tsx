@@ -15,6 +15,7 @@ import {
 } from 'app/constants';
 import { useNavigate } from 'react-router';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 
 const Actions = () => {
     const navigate = useNavigate();
@@ -52,7 +53,17 @@ const Actions = () => {
             <Button
                 size="sm"
                 variant="primary"
-                onClick={() => runProbing('Rotary Z-Axis', getZAxisProbing())}
+                onClick={() => {
+                    Confirm({
+                        title: 'Rotary Z-Axis probing',
+                        content:
+                            "Click 'Run' to start the Rotary Z-Axis probing cycle",
+                        confirmLabel: 'Run',
+                        onConfirm: () => {
+                            runProbing('Rotary Z-Axis', getZAxisProbing());
+                        },
+                    });
+                }}
                 disabled={
                     !isConnected ||
                     (firmwareType === GRBL && !isInRotaryMode) ||
@@ -69,9 +80,20 @@ const Actions = () => {
             <Button
                 size="sm"
                 variant="primary"
-                onClick={() =>
-                    runProbing('Y-Axis Alignment', getYAxisAlignmentProbing())
-                }
+                onClick={() => {
+                    Confirm({
+                        title: 'Rotary Y-Axis alignment',
+                        content:
+                            "Click 'Run' to start the Rotary Y-Axis alignment cycle",
+                        confirmLabel: 'Run',
+                        onConfirm: () => {
+                            runProbing(
+                                'Y-Axis Alignment',
+                                getYAxisAlignmentProbing(),
+                            );
+                        },
+                    });
+                }}
                 disabled={
                     !isConnected ||
                     isInRotaryMode ||
