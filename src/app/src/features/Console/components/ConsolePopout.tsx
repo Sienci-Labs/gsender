@@ -4,11 +4,16 @@ import isElectron from 'is-electron';
 import Tooltip from 'app/components/Tooltip';
 import { toast } from 'app/lib/toaster';
 
+import { usePostHog } from 'posthog-js/react';
+
 export function ConsolePopout() {
+    const posthog = usePostHog();
+
     function openWindow() {
         const route = `/console`;
         if (isElectron()) {
             window.ipcRenderer.send('open-new-window', route);
+            posthog.capture('console_popout_opened');
         } else {
             toast.info('This functionality is not available on web view.', {
                 position: 'bottom-right',
