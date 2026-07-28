@@ -20,6 +20,7 @@ import ensureArray from 'ensure-array';
 import includes from 'lodash/includes';
 import { useCallback } from 'react';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { usePostHog } from 'posthog-js/react';
 
 export interface CoolantProps {
     mistActive: boolean;
@@ -34,6 +35,8 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
             controllerState: state.controller.state ?? {},
             controllerType: state.controller.type ?? 'grbl',
         }));
+
+    const posthog = usePostHog();
 
     const canClick = useCallback((): boolean => {
         if (!isConnected) return false;
@@ -55,7 +58,10 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
                 <ActiveStateButton
                     text="Mist"
                     icon={<FaShower />}
-                    onClick={startMist}
+                    onClick={() => {
+                        startMist();
+                        posthog.capture('coolant_mist_started');
+                    }}
                     className="h-16"
                     size="md"
                     active={isConnected && mistActive}
@@ -65,7 +71,10 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
                 <ActiveStateButton
                     text="Flood"
                     icon={<FaWater />}
-                    onClick={startFlood}
+                    onClick={() => {
+                        startFlood();
+                        posthog.capture('coolant_flood_started');
+                    }}
                     className="h-16"
                     size="md"
                     active={isConnected && floodActive}
@@ -75,7 +84,10 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
                 <ActiveStateButton
                     text="Off"
                     icon={<FaBan />}
-                    onClick={stopCoolant}
+                    onClick={() => {
+                        stopCoolant();
+                        posthog.capture('coolant_off');
+                    }}
                     className="h-16"
                     size="md"
                     disabled={!canClick()}
