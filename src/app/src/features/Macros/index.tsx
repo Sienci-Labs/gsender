@@ -18,18 +18,12 @@ import pubsub from 'pubsub-js';
 import Macro from './Macro';
 import MacroForm from './MacroForm';
 import {
-    // Grbl
     GRBL,
     GRBLHAL,
     GRBL_ACTIVE_STATE_IDLE,
+    GRBL_HAL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_RUN,
-    // Marlin
-    MARLIN,
-    // Smoothie
-    SMOOTHIE,
-    // TinyG
-    TINYG,
-    // Workflow
+    GRBL_HAL_ACTIVE_STATE_RUN,
     WORKFLOW_STATE_RUNNING,
 } from '../../constants';
 import {
@@ -41,6 +35,7 @@ import {
 } from './constants';
 import { deleteGamepadMacro } from '../../lib/gamepad';
 import cx from 'classnames';
+import posthog from 'posthog-js';
 
 type MacroWidgetProps = {
     type: string;
@@ -116,6 +111,8 @@ const MacroWidget = ({
 
                 showToast({ msg: 'Added New Macro', type: 'success' });
                 actions.closeModal();
+
+                posthog.capture('macro:add', { name });
             } catch (err) {
                 showToast({
                     msg: 'Failed to add macro',
@@ -139,6 +136,8 @@ const MacroWidget = ({
                 deleteGamepadMacro(id);
 
                 showToast({ msg: 'Deleted Macro', type: 'success' });
+
+                posthog.capture('macro:delete');
             } catch (err) {
                 // Ignore error
             }
@@ -180,6 +179,8 @@ const MacroWidget = ({
                         position: 'bottom-right',
                     });
                 }
+
+                posthog.capture('macro:update', { name });
             } catch (err) {
                 // Ignore error
             }
@@ -224,6 +225,8 @@ const MacroWidget = ({
                 },
             );
             pubsub.publish('macro:run');
+
+            posthog.capture('macro:run', { name });
         },
         loadMacro: async (id: string) => {
             try {
@@ -309,6 +312,8 @@ const MacroWidget = ({
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+
+        posthog.capture('macros_export', { macros_count: macros.length });
     };
 
     const importMacros = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -369,6 +374,11 @@ const MacroWidget = ({
                         type: 'success',
                     });
                 }
+
+                posthog.capture('macros_import', {
+                    imported_count: importedCount,
+                    updated_count: updatedCount,
+                });
             };
             reader.onerror = () => {
                 showToast({
@@ -381,14 +391,6 @@ const MacroWidget = ({
 
     useEffect(() => {
         fetchMacros();
-        const configChangeHandler = async () => {
-            // await fetchMacros();
-        };
-        controller.addListener('config:change', configChangeHandler);
-
-        return () => {
-            controller.removeListener('config:change', configChangeHandler);
-        };
     }, []);
 
     const canClick = () => {
@@ -398,12 +400,17 @@ const MacroWidget = ({
         if (workflow.state === WORKFLOW_STATE_RUNNING) {
             return false;
         }
-        if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG, GRBLHAL], type)) {
+        if (!includes([GRBL, GRBLHAL], type)) {
             return false;
         }
 
         const activeState = get(state, 'status.activeState');
-        const states = [GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_RUN];
+        const states = [
+            GRBL_ACTIVE_STATE_IDLE,
+            GRBL_ACTIVE_STATE_RUN,
+            GRBL_HAL_ACTIVE_STATE_IDLE,
+            GRBL_HAL_ACTIVE_STATE_RUN,
+        ];
         return includes(states, activeState);
     };
 
