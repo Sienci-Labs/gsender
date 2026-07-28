@@ -1,10 +1,12 @@
 /**
  * Minimal saga for the pendant: wires socket events → redux store.
- * Covers connection state, machine state/position, port listing.
- * Deliberately omits Electron IPC, visualizer workers, tool-change wizards.
+ * Covers connection state, machine state/position, port listing, ATCI confirm dialogs.
+ * Deliberately omits Electron IPC, visualizer workers, and the keepout-toggle
+ * banner (ATCI subtype '10'), which depends on the Helper/WizardProvider machinery.
  */
 import controller from '@gsender/controller-client/controller';
 import { store as reduxStore } from '@gsender/controller-client/store/redux';
+import { Confirm } from '@gsender/ui/primitives/ConfirmationDialog/ConfirmationDialogLib';
 import {
     openConnection,
     closeConnection,
@@ -129,4 +131,45 @@ export function* initialize() {
     controller.addListener('gcode:unload', () => {
         reduxStore.dispatch(unloadFileInfo());
     });
+
+    // ── ATC macro dialogs ───────────────────────────────────────────────────
+    controller.addListener(
+        'atci',
+        (payload: { subtype: string; message: string; description: string }) => {
+            if (payload.subtype === '0') {
+                Confirm({
+                    title: payload.message,
+                    content: payload.description,
+                    confirmLabel: 'Resume',
+                    cancelLabel: 'Reset',
+                    onConfirm: () => controller.command('cyclestart'),
+                    onClose: () => controller.command('reset'),
+                });
+            } else if (payload.subtype === '1') {
+                Confirm({
+                    title: payload.message,
+                    content: payload.description,
+                    confirmLabel: 'OK',
+                    cancelLabel: 'Reset',
+                    onConfirm: () => controller.command('cyclestart'),
+                    hideClose: true,
+                });
+            } else if (payload.subtype === '2') {
+                Confirm({
+                    title: payload.message,
+                    content: payload.description,
+                    confirmLabel: 'Reset',
+                    onConfirm: () => controller.command('reset'),
+                    hideClose: true,
+                });
+            } else {
+                Confirm({
+                    title: 'ATC requested a dialog.',
+                    content: 'Continue to unhold, Reset to stop action.',
+                    confirmLabel: 'Continue',
+                    cancelLabel: 'Reset',
+                });
+            }
+        },
+    );
 }

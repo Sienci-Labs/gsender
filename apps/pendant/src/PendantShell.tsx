@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useDarkMode } from 'app/hooks/useDarkMode';
+import ConfirmationDialog from '@gsender/ui/primitives/ConfirmationDialog/ConfirmationDialog';
 import PendantTopBar from './components/PendantTopBar';
 import InfoStrip from './components/InfoStrip';
 import CarveView from './components/CarveView';
@@ -33,6 +34,7 @@ export default function PendantShell() {
 
             <BottomNav active={activeTab} onChange={setActiveTab} />
             <JobCompletionAlert />
+            <ConfirmationDialog />
         </div>
     );
 }
