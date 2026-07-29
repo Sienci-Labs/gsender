@@ -21,65 +21,66 @@
  *
  */
 
-import url from 'url';
-import registryUrl from 'registry-url';
-import registryAuthToken from 'registry-auth-token';
-import request from 'superagent';
-import os from 'os';
-import {
-    ERR_INTERNAL_SERVER_ERROR
-} from '../constants';
+import os from "os";
+import registryAuthToken from "registry-auth-token";
+import registryUrl from "registry-url";
+import request from "superagent";
+import url from "url";
+import { ERR_INTERNAL_SERVER_ERROR } from "../constants";
 
-const pkgName = 'gsender';
+const pkgName = "gsender";
 
 export const getLatestVersion = (req, res) => {
-    const scope = pkgName.split('/')[0];
-    const regUrl = registryUrl(scope);
-    const pkgUrl = url.resolve(regUrl, encodeURIComponent(pkgName).replace(/^%40/, '@'));
-    const authInfo = registryAuthToken(regUrl);
-    const headers = {};
+	const scope = pkgName.split("/")[0];
+	const regUrl = registryUrl(scope);
+	const pkgUrl = url.resolve(
+		regUrl,
+		encodeURIComponent(pkgName).replace(/^%40/, "@"),
+	);
+	const authInfo = registryAuthToken(regUrl);
+	const headers = {};
 
-    if (authInfo) {
-        headers.Authorization = `${authInfo.type} ${authInfo.token}`;
-    }
+	if (authInfo) {
+		headers.Authorization = `${authInfo.type} ${authInfo.token}`;
+	}
 
-    request
-        .get(pkgUrl)
-        .set(headers)
-        .end((err, _res) => {
-            if (err) {
-                res.status(ERR_INTERNAL_SERVER_ERROR).send({
-                    msg: `Failed to connect to ${pkgUrl}: code=${err.code}`
-                });
-                return;
-            }
+	request
+		.get(pkgUrl)
+		.set(headers)
+		.end((err, _res) => {
+			if (err) {
+				res.status(ERR_INTERNAL_SERVER_ERROR).send({
+					msg: `Failed to connect to ${pkgUrl}: code=${err.code}`,
+				});
+				return;
+			}
 
-            const { body: data = {} } = { ..._res };
-            data.time = data.time || {};
-            data['dist-tags'] = data['dist-tags'] || {};
-            data.versions = data.versions || {};
+			const { body: data = {} } = { ..._res };
+			data.time = data.time || {};
+			data["dist-tags"] = data["dist-tags"] || {};
+			data.versions = data.versions || {};
 
-            const time = data.time[latest];
-            const latest = data['dist-tags'].latest;
-            const {
-                name,
-                version,
-                description,
-                homepage
-            } = { ...data.versions[latest] };
+			const time = data.time[latest];
+			const latest = data["dist-tags"].latest;
+			const { name, version, description, homepage } = {
+				...data.versions[latest],
+			};
 
-            res.send({ time, name, version, description, homepage });
-        });
+			res.send({ time, name, version, description, homepage });
+		});
 };
 
 export const getShouldInstallUpdates = (req, res) => {
-    let shouldUpdate = true;
-    //Check command line inputs for electron file extention
-    //Sample: C:\Program Files\gSender Edge\gSender Edge.exe
-    process.argv.forEach((consoleInput, index) => {
-        if (os.platform().toLocaleLowerCase().includes('linux') && !consoleInput.toLocaleLowerCase().includes('.appimage')) {
-            shouldUpdate = false;
-        }
-    });
-    res.send(shouldUpdate);
+	let shouldUpdate = true;
+	//Check command line inputs for electron file extention
+	//Sample: C:\Program Files\gSender Edge\gSender Edge.exe
+	process.argv.forEach((consoleInput, index) => {
+		if (
+			os.platform().toLocaleLowerCase().includes("linux") &&
+			!consoleInput.toLocaleLowerCase().includes(".appimage")
+		) {
+			shouldUpdate = false;
+		}
+	});
+	res.send(shouldUpdate);
 };

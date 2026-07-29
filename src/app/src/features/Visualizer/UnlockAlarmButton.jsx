@@ -21,56 +21,48 @@
  *
  */
 
-import React from 'react';
-import classnames from 'classnames';
-import styles from './index.styl';
+import classnames from "classnames";
+import React from "react";
+import styles from "./index.styl";
 
 const UnlockAlarmButton = ({ onClick, newMessage, alarmCode }) => {
-    let message = 'Click to Unlock Machine';
-    if (alarmCode === 'Homing' || alarmCode === 11) {
-        message = 'Click to Run Homing';
-    }
-    return newMessage ? (
-        <div className={styles.alarmButtonWrap}>
-            <button
-                type="button"
-                className={styles.alarmButton}
-                onClick={onClick}
-            >
-                <i
-                    className={classnames(
-                        'fas',
-                        alarmCode !== 'Homing' && alarmCode !== 11
-                            ? 'fa-unlock'
-                            : 'fa-home',
-                    )}
-                    role="button"
-                    tabIndex={-1}
-                />
-                {newMessage}
-            </button>
-        </div>
-    ) : (
-        <div className={styles.alarmButtonWrap}>
-            <button
-                type="button"
-                className={styles.alarmButton}
-                onClick={onClick}
-            >
-                <i
-                    className={classnames(
-                        'fas',
-                        alarmCode !== 'Homing' && alarmCode !== 11
-                            ? 'fa-unlock'
-                            : 'fa-home',
-                    )}
-                    role="button"
-                    tabIndex={-1}
-                />
-                {message}
-            </button>
-        </div>
-    );
+	let message = "Click to Unlock Machine";
+	if (alarmCode === "Homing" || alarmCode === 11) {
+		message = "Click to Run Homing";
+	}
+	return newMessage ? (
+		<div className={styles.alarmButtonWrap}>
+			<button type="button" className={styles.alarmButton} onClick={onClick}>
+				<i
+					className={classnames(
+						"fas",
+						alarmCode !== "Homing" && alarmCode !== 11
+							? "fa-unlock"
+							: "fa-home",
+					)}
+					role="button"
+					tabIndex={-1}
+				/>
+				{newMessage}
+			</button>
+		</div>
+	) : (
+		<div className={styles.alarmButtonWrap}>
+			<button type="button" className={styles.alarmButton} onClick={onClick}>
+				<i
+					className={classnames(
+						"fas",
+						alarmCode !== "Homing" && alarmCode !== 11
+							? "fa-unlock"
+							: "fa-home",
+					)}
+					role="button"
+					tabIndex={-1}
+				/>
+				{message}
+			</button>
+		</div>
+	);
 };
 
 export default UnlockAlarmButton;

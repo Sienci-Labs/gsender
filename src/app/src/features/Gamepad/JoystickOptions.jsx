@@ -1,575 +1,522 @@
-import React, { useContext } from 'react';
-import Select from 'react-select';
-import cloneDeep from 'lodash/cloneDeep';
-import set from 'lodash/set';
-import get from 'lodash/get';
-
-import { Switch } from 'app/components/shadcn/Switch';
-
-import { ControlledInput } from 'app/components/ControlledInput';
-import { GamepadContext } from './utils/context';
-import { arrayComparator } from './utils';
-import { setGamepadProfileList } from './utils/actions';
-import { useGamepadListener } from 'app/lib/hooks/useGamepadListener';
+import { ControlledInput } from "app/components/ControlledInput";
+import { Switch } from "app/components/shadcn/Switch";
+import { useGamepadListener } from "app/lib/hooks/useGamepadListener";
+import cloneDeep from "lodash/cloneDeep";
+import get from "lodash/get";
+import set from "lodash/set";
+import React, { useContext } from "react";
+import Select from "react-select";
+import { arrayComparator } from "./utils";
+import { setGamepadProfileList } from "./utils/actions";
+import { GamepadContext } from "./utils/context";
 
 const JoystickOptions = () => {
-    const {
-        state: {
-            currentProfile,
-            settings: { profiles },
-        },
-        actions: { getGamepadProfile },
-        dispatch,
-    } = useContext(GamepadContext);
+	const {
+		state: {
+			currentProfile,
+			settings: { profiles },
+		},
+		actions: { getGamepadProfile },
+		dispatch,
+	} = useContext(GamepadContext);
 
-    const { axes, buttons } = useGamepadListener({
-        profile: currentProfile,
-        axisThreshold: 0.4,
-    });
+	const { axes, buttons } = useGamepadListener({
+		profile: currentProfile,
+		axisThreshold: 0.4,
+	});
 
-    const handleChange = (key, value) => {
-        const updatedProfiles = profiles.map((profile) => {
-            const isCurrentProfile = arrayComparator(
-                profile.id,
-                currentProfile,
-            );
+	const handleChange = (key, value) => {
+		const updatedProfiles = profiles.map((profile) => {
+			const isCurrentProfile = arrayComparator(profile.id, currentProfile);
 
-            if (isCurrentProfile) {
-                const updatedProfileItem = cloneDeep(profile);
+			if (isCurrentProfile) {
+				const updatedProfileItem = cloneDeep(profile);
 
-                set(updatedProfileItem, `joystickOptions.${key}`, value);
+				set(updatedProfileItem, `joystickOptions.${key}`, value);
 
-                return updatedProfileItem;
-            }
+				return updatedProfileItem;
+			}
 
-            return profile;
-        });
+			return profile;
+		});
 
-        dispatch(setGamepadProfileList(updatedProfiles));
-    };
+		dispatch(setGamepadProfileList(updatedProfiles));
+	};
 
-    const axesOptions = [
-        { label: 'None', value: null },
-        { label: 'X', value: 'x' },
-        { label: 'Y', value: 'y' },
-        { label: 'Z', value: 'z' },
-        { label: 'A', value: 'a' },
-    ];
+	const axesOptions = [
+		{ label: "None", value: null },
+		{ label: "X", value: "x" },
+		{ label: "Y", value: "y" },
+		{ label: "Z", value: "z" },
+		{ label: "A", value: "a" },
+	];
 
-    const profile = getGamepadProfile(currentProfile);
+	const profile = getGamepadProfile(currentProfile);
 
-    const {
-        joystickOptions: {
-            stick1,
-            stick2,
-            zeroThreshold = 15,
-            movementDistanceOverride = 100,
-            fixedSpeedMode = false,
-        },
-    } = profile;
+	const {
+		joystickOptions: {
+			stick1,
+			stick2,
+			zeroThreshold = 15,
+			movementDistanceOverride = 100,
+			fixedSpeedMode = false,
+		},
+	} = profile;
 
-    const stick1PrimaryActionIsUsingMPG =
-        get(stick1, 'mpgMode.primaryAction', null) !== null;
-    const stick1SecondaryActionIsUsingMPG =
-        get(stick1, 'mpgMode.secondaryAction', null) !== null;
+	const stick1PrimaryActionIsUsingMPG =
+		get(stick1, "mpgMode.primaryAction", null) !== null;
+	const stick1SecondaryActionIsUsingMPG =
+		get(stick1, "mpgMode.secondaryAction", null) !== null;
 
-    const stick2PrimaryActionIsUsingMPG =
-        get(stick2, 'mpgMode.primaryAction', null) !== null;
-    const stick2SecondaryActionIsUsingMPG =
-        get(stick2, 'mpgMode.secondaryAction', null) !== null;
+	const stick2PrimaryActionIsUsingMPG =
+		get(stick2, "mpgMode.primaryAction", null) !== null;
+	const stick2SecondaryActionIsUsingMPG =
+		get(stick2, "mpgMode.secondaryAction", null) !== null;
 
-    const isHoldingModifierButton = buttons[profile.modifier?.button]?.pressed;
+	const isHoldingModifierButton = buttons[profile.modifier?.button]?.pressed;
 
-    const selectOverrideStyle = {
-        valueContainer: (provided) => ({
-            ...provided,
-            padding: 2,
-            justifyContent: 'center',
-        }),
-        dropdownIndicator: (provided) => ({ ...provided, padding: 2 }),
-        container: (provided) => ({ ...provided, padding: 0 }),
-    };
+	const selectOverrideStyle = {
+		valueContainer: (provided) => ({
+			...provided,
+			padding: 2,
+			justifyContent: "center",
+		}),
+		dropdownIndicator: (provided) => ({ ...provided, padding: 2 }),
+		container: (provided) => ({ ...provided, padding: 0 }),
+	};
 
-    const activeStyle = {
-        control: (provided) => ({
-            ...provided,
-            backgroundColor: '#059669',
-            borderColor: '#059669',
-        }),
-        singleValue: (provided) => ({ ...provided, color: 'white' }),
-        dropdownIndicator: (provided) => ({
-            ...provided,
-            padding: 2,
-            color: 'white',
-        }),
-        indicatorSeparator: (provided) => ({
-            ...provided,
-            backgroundColor: 'white',
-        }),
-    };
+	const activeStyle = {
+		control: (provided) => ({
+			...provided,
+			backgroundColor: "#059669",
+			borderColor: "#059669",
+		}),
+		singleValue: (provided) => ({ ...provided, color: "white" }),
+		dropdownIndicator: (provided) => ({
+			...provided,
+			padding: 2,
+			color: "white",
+		}),
+		indicatorSeparator: (provided) => ({
+			...provided,
+			backgroundColor: "white",
+		}),
+	};
 
-    return (
-        <div className="text-base border p-2 rounded">
-            <div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center gap-2">
-                <div />
-                <div className="font-bold dark:text-white">Action</div>
-                <div className="font-bold dark:text-white">2nd Action</div>
-                <div className="font-bold dark:text-white">Invert</div>
-            </div>
+	return (
+		<div className="text-base border p-2 rounded">
+			<div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center gap-2">
+				<div />
+				<div className="font-bold dark:text-white">Action</div>
+				<div className="font-bold dark:text-white">2nd Action</div>
+				<div className="font-bold dark:text-white">Invert</div>
+			</div>
 
-            <div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center mb-2 gap-2">
-                <div className="leading-[1.3] dark:text-white">
-                    Stick 1 left/right
-                </div>
-                <Select
-                    styles={
-                        !stick1PrimaryActionIsUsingMPG &&
-                        axes &&
-                        axes[0] !== 0 &&
-                        !isHoldingModifierButton
-                            ? { ...selectOverrideStyle, ...activeStyle }
-                            : selectOverrideStyle
-                    }
-                    options={axesOptions}
-                    placeholder={null}
-                    value={{
-                        label: get(stick1, 'horizontal.primaryAction', null)
-                            ? String(
-                                  get(stick1, 'horizontal.primaryAction'),
-                              ).toUpperCase()
-                            : 'None',
-                        value: get(stick1, 'horizontal.primaryAction', null),
-                    }}
-                    onChange={({ value }) =>
-                        handleChange('stick1.horizontal.primaryAction', value)
-                    }
-                    isDisabled={stick1PrimaryActionIsUsingMPG}
-                    aria-label="Stick 1 horizontal action"
-                />
-                <Select
-                    styles={
-                        !stick1SecondaryActionIsUsingMPG &&
-                        axes &&
-                        axes[0] !== 0 &&
-                        isHoldingModifierButton
-                            ? { ...selectOverrideStyle, ...activeStyle }
-                            : selectOverrideStyle
-                    }
-                    options={axesOptions}
-                    placeholder={null}
-                    value={{
-                        label: get(stick1, 'horizontal.secondaryAction', null)
-                            ? String(
-                                  get(stick1, 'horizontal.secondaryAction'),
-                              ).toUpperCase()
-                            : 'None',
-                        value: get(stick1, 'horizontal.secondaryAction', null),
-                    }}
-                    onChange={({ value }) =>
-                        handleChange('stick1.horizontal.secondaryAction', value)
-                    }
-                    isDisabled={stick1SecondaryActionIsUsingMPG}
-                    aria-label="Stick 1 horizontal 2nd action"
-                />
-                <Switch
-                    checked={stick1.horizontal.isReversed}
-                    onChange={(checked) =>
-                        handleChange('stick1.horizontal.isReversed', checked)
-                    }
-                    disabled={
-                        stick1PrimaryActionIsUsingMPG &&
-                        stick1SecondaryActionIsUsingMPG
-                    }
-                    aria-label="Invert stick 1 horizontal"
-                />
-            </div>
+			<div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center mb-2 gap-2">
+				<div className="leading-[1.3] dark:text-white">Stick 1 left/right</div>
+				<Select
+					styles={
+						!stick1PrimaryActionIsUsingMPG &&
+						axes &&
+						axes[0] !== 0 &&
+						!isHoldingModifierButton
+							? { ...selectOverrideStyle, ...activeStyle }
+							: selectOverrideStyle
+					}
+					options={axesOptions}
+					placeholder={null}
+					value={{
+						label: get(stick1, "horizontal.primaryAction", null)
+							? String(get(stick1, "horizontal.primaryAction")).toUpperCase()
+							: "None",
+						value: get(stick1, "horizontal.primaryAction", null),
+					}}
+					onChange={({ value }) =>
+						handleChange("stick1.horizontal.primaryAction", value)
+					}
+					isDisabled={stick1PrimaryActionIsUsingMPG}
+					aria-label="Stick 1 horizontal action"
+				/>
+				<Select
+					styles={
+						!stick1SecondaryActionIsUsingMPG &&
+						axes &&
+						axes[0] !== 0 &&
+						isHoldingModifierButton
+							? { ...selectOverrideStyle, ...activeStyle }
+							: selectOverrideStyle
+					}
+					options={axesOptions}
+					placeholder={null}
+					value={{
+						label: get(stick1, "horizontal.secondaryAction", null)
+							? String(get(stick1, "horizontal.secondaryAction")).toUpperCase()
+							: "None",
+						value: get(stick1, "horizontal.secondaryAction", null),
+					}}
+					onChange={({ value }) =>
+						handleChange("stick1.horizontal.secondaryAction", value)
+					}
+					isDisabled={stick1SecondaryActionIsUsingMPG}
+					aria-label="Stick 1 horizontal 2nd action"
+				/>
+				<Switch
+					checked={stick1.horizontal.isReversed}
+					onChange={(checked) =>
+						handleChange("stick1.horizontal.isReversed", checked)
+					}
+					disabled={
+						stick1PrimaryActionIsUsingMPG && stick1SecondaryActionIsUsingMPG
+					}
+					aria-label="Invert stick 1 horizontal"
+				/>
+			</div>
 
-            <div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center mb-2 gap-2">
-                <div className="leading-[1.3] dark:text-white">
-                    Stick 1 up/down
-                </div>
-                <Select
-                    styles={
-                        !stick1PrimaryActionIsUsingMPG &&
-                        axes &&
-                        axes[1] !== 0 &&
-                        !isHoldingModifierButton
-                            ? { ...selectOverrideStyle, ...activeStyle }
-                            : selectOverrideStyle
-                    }
-                    options={axesOptions}
-                    placeholder={null}
-                    value={{
-                        label: get(stick1, 'vertical.primaryAction', null)
-                            ? String(
-                                  get(stick1, 'vertical.primaryAction'),
-                              ).toUpperCase()
-                            : 'None',
-                        value: get(stick1, 'vertical.primaryAction', null),
-                    }}
-                    onChange={({ value }) =>
-                        handleChange('stick1.vertical.primaryAction', value)
-                    }
-                    isDisabled={stick1PrimaryActionIsUsingMPG}
-                    aria-label="Stick 1 vertical action"
-                />
-                <Select
-                    styles={
-                        !stick1SecondaryActionIsUsingMPG &&
-                        axes &&
-                        axes[1] !== 0 &&
-                        isHoldingModifierButton
-                            ? { ...selectOverrideStyle, ...activeStyle }
-                            : selectOverrideStyle
-                    }
-                    options={axesOptions}
-                    placeholder={null}
-                    value={{
-                        label: get(stick1, 'vertical.secondaryAction', null)
-                            ? String(
-                                  get(stick1, 'vertical.secondaryAction'),
-                              ).toUpperCase()
-                            : 'None',
-                        value: get(stick1, 'vertical.secondaryAction', null),
-                    }}
-                    onChange={({ value }) =>
-                        handleChange('stick1.vertical.secondaryAction', value)
-                    }
-                    isDisabled={stick1SecondaryActionIsUsingMPG}
-                    aria-label="Stick 1 vertical 2nd action"
-                />
-                <Switch
-                    checked={stick1.vertical.isReversed}
-                    onChange={(checked) =>
-                        handleChange('stick1.vertical.isReversed', checked)
-                    }
-                    disabled={
-                        stick1PrimaryActionIsUsingMPG &&
-                        stick1SecondaryActionIsUsingMPG
-                    }
-                    aria-label="Invert stick 1 vertical"
-                />
-            </div>
+			<div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center mb-2 gap-2">
+				<div className="leading-[1.3] dark:text-white">Stick 1 up/down</div>
+				<Select
+					styles={
+						!stick1PrimaryActionIsUsingMPG &&
+						axes &&
+						axes[1] !== 0 &&
+						!isHoldingModifierButton
+							? { ...selectOverrideStyle, ...activeStyle }
+							: selectOverrideStyle
+					}
+					options={axesOptions}
+					placeholder={null}
+					value={{
+						label: get(stick1, "vertical.primaryAction", null)
+							? String(get(stick1, "vertical.primaryAction")).toUpperCase()
+							: "None",
+						value: get(stick1, "vertical.primaryAction", null),
+					}}
+					onChange={({ value }) =>
+						handleChange("stick1.vertical.primaryAction", value)
+					}
+					isDisabled={stick1PrimaryActionIsUsingMPG}
+					aria-label="Stick 1 vertical action"
+				/>
+				<Select
+					styles={
+						!stick1SecondaryActionIsUsingMPG &&
+						axes &&
+						axes[1] !== 0 &&
+						isHoldingModifierButton
+							? { ...selectOverrideStyle, ...activeStyle }
+							: selectOverrideStyle
+					}
+					options={axesOptions}
+					placeholder={null}
+					value={{
+						label: get(stick1, "vertical.secondaryAction", null)
+							? String(get(stick1, "vertical.secondaryAction")).toUpperCase()
+							: "None",
+						value: get(stick1, "vertical.secondaryAction", null),
+					}}
+					onChange={({ value }) =>
+						handleChange("stick1.vertical.secondaryAction", value)
+					}
+					isDisabled={stick1SecondaryActionIsUsingMPG}
+					aria-label="Stick 1 vertical 2nd action"
+				/>
+				<Switch
+					checked={stick1.vertical.isReversed}
+					onChange={(checked) =>
+						handleChange("stick1.vertical.isReversed", checked)
+					}
+					disabled={
+						stick1PrimaryActionIsUsingMPG && stick1SecondaryActionIsUsingMPG
+					}
+					aria-label="Invert stick 1 vertical"
+				/>
+			</div>
 
-            <div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center mb-2 gap-2">
-                <div className="leading-[1.3] dark:text-white">Stick 1 MPG</div>
-                <Select
-                    styles={
-                        stick1PrimaryActionIsUsingMPG &&
-                        axes &&
-                        (axes[0] !== 0 || axes[1] !== 0) &&
-                        !isHoldingModifierButton
-                            ? { ...selectOverrideStyle, ...activeStyle }
-                            : selectOverrideStyle
-                    }
-                    options={axesOptions}
-                    placeholder={null}
-                    value={{
-                        label: get(stick1, 'mpgMode.primaryAction', null)
-                            ? String(
-                                  get(stick1, 'mpgMode.primaryAction'),
-                              ).toUpperCase()
-                            : 'None',
-                        value: get(stick1, 'mpgMode.primaryAction', null),
-                    }}
-                    onChange={({ value }) =>
-                        handleChange('stick1.mpgMode.primaryAction', value)
-                    }
-                    aria-label="Stick 1 MPG action"
-                />
-                <Select
-                    styles={
-                        stick1SecondaryActionIsUsingMPG &&
-                        axes &&
-                        (axes[0] !== 0 || axes[1] !== 0) &&
-                        isHoldingModifierButton
-                            ? { ...selectOverrideStyle, ...activeStyle }
-                            : selectOverrideStyle
-                    }
-                    options={axesOptions}
-                    placeholder={null}
-                    value={{
-                        label: get(stick1, 'mpgMode.secondaryAction', null)
-                            ? String(
-                                  get(stick1, 'mpgMode.secondaryAction'),
-                              ).toUpperCase()
-                            : 'None',
-                        value: get(stick1, 'mpgMode.secondaryAction', null),
-                    }}
-                    onChange={({ value }) =>
-                        handleChange('stick1.mpgMode.secondaryAction', value)
-                    }
-                    aria-label="Stick 1 MPG 2nd action"
-                />
-                <Switch
-                    checked={stick1.mpgMode.isReversed}
-                    onChange={(checked) =>
-                        handleChange('stick1.mpgMode.isReversed', checked)
-                    }
-                    aria-label="Invert stick 1 MPG"
-                />
-            </div>
+			<div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center mb-2 gap-2">
+				<div className="leading-[1.3] dark:text-white">Stick 1 MPG</div>
+				<Select
+					styles={
+						stick1PrimaryActionIsUsingMPG &&
+						axes &&
+						(axes[0] !== 0 || axes[1] !== 0) &&
+						!isHoldingModifierButton
+							? { ...selectOverrideStyle, ...activeStyle }
+							: selectOverrideStyle
+					}
+					options={axesOptions}
+					placeholder={null}
+					value={{
+						label: get(stick1, "mpgMode.primaryAction", null)
+							? String(get(stick1, "mpgMode.primaryAction")).toUpperCase()
+							: "None",
+						value: get(stick1, "mpgMode.primaryAction", null),
+					}}
+					onChange={({ value }) =>
+						handleChange("stick1.mpgMode.primaryAction", value)
+					}
+					aria-label="Stick 1 MPG action"
+				/>
+				<Select
+					styles={
+						stick1SecondaryActionIsUsingMPG &&
+						axes &&
+						(axes[0] !== 0 || axes[1] !== 0) &&
+						isHoldingModifierButton
+							? { ...selectOverrideStyle, ...activeStyle }
+							: selectOverrideStyle
+					}
+					options={axesOptions}
+					placeholder={null}
+					value={{
+						label: get(stick1, "mpgMode.secondaryAction", null)
+							? String(get(stick1, "mpgMode.secondaryAction")).toUpperCase()
+							: "None",
+						value: get(stick1, "mpgMode.secondaryAction", null),
+					}}
+					onChange={({ value }) =>
+						handleChange("stick1.mpgMode.secondaryAction", value)
+					}
+					aria-label="Stick 1 MPG 2nd action"
+				/>
+				<Switch
+					checked={stick1.mpgMode.isReversed}
+					onChange={(checked) =>
+						handleChange("stick1.mpgMode.isReversed", checked)
+					}
+					aria-label="Invert stick 1 MPG"
+				/>
+			</div>
 
-            <div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center mb-2 gap-2">
-                <div className="leading-[1.3] dark:text-white">
-                    Stick 2 left/right
-                </div>
-                <Select
-                    styles={
-                        !stick2PrimaryActionIsUsingMPG &&
-                        axes &&
-                        axes[2] !== 0 &&
-                        !isHoldingModifierButton
-                            ? { ...selectOverrideStyle, ...activeStyle }
-                            : selectOverrideStyle
-                    }
-                    options={axesOptions}
-                    placeholder={null}
-                    value={{
-                        label: get(stick2, 'horizontal.primaryAction', null)
-                            ? String(
-                                  get(stick2, 'horizontal.primaryAction'),
-                              ).toUpperCase()
-                            : 'None',
-                        value: get(stick2, 'horizontal.primaryAction'),
-                    }}
-                    onChange={({ value }) =>
-                        handleChange('stick2.horizontal.primaryAction', value)
-                    }
-                    isDisabled={stick2PrimaryActionIsUsingMPG}
-                    aria-label="Stick 2 horizontal action"
-                />
-                <Select
-                    styles={
-                        !stick2SecondaryActionIsUsingMPG &&
-                        axes &&
-                        axes[2] !== 0 &&
-                        isHoldingModifierButton
-                            ? { ...selectOverrideStyle, ...activeStyle }
-                            : selectOverrideStyle
-                    }
-                    options={axesOptions}
-                    placeholder={null}
-                    value={{
-                        label: get(stick2, 'horizontal.secondaryAction', null)
-                            ? String(
-                                  get(stick2, 'horizontal.secondaryAction'),
-                              ).toUpperCase()
-                            : 'None',
-                        value: get(stick2, 'horizontal.secondaryAction'),
-                    }}
-                    onChange={({ value }) =>
-                        handleChange('stick2.horizontal.secondaryAction', value)
-                    }
-                    isDisabled={stick2SecondaryActionIsUsingMPG}
-                    aria-label="Stick 2 horizontal 2nd action"
-                />
-                <Switch
-                    checked={stick2.horizontal.isReversed}
-                    onChange={(checked) =>
-                        handleChange('stick2.horizontal.isReversed', checked)
-                    }
-                    disabled={
-                        stick2PrimaryActionIsUsingMPG &&
-                        stick2SecondaryActionIsUsingMPG
-                    }
-                    aria-label="Invert stick 2 horizontal"
-                />
-            </div>
+			<div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center mb-2 gap-2">
+				<div className="leading-[1.3] dark:text-white">Stick 2 left/right</div>
+				<Select
+					styles={
+						!stick2PrimaryActionIsUsingMPG &&
+						axes &&
+						axes[2] !== 0 &&
+						!isHoldingModifierButton
+							? { ...selectOverrideStyle, ...activeStyle }
+							: selectOverrideStyle
+					}
+					options={axesOptions}
+					placeholder={null}
+					value={{
+						label: get(stick2, "horizontal.primaryAction", null)
+							? String(get(stick2, "horizontal.primaryAction")).toUpperCase()
+							: "None",
+						value: get(stick2, "horizontal.primaryAction"),
+					}}
+					onChange={({ value }) =>
+						handleChange("stick2.horizontal.primaryAction", value)
+					}
+					isDisabled={stick2PrimaryActionIsUsingMPG}
+					aria-label="Stick 2 horizontal action"
+				/>
+				<Select
+					styles={
+						!stick2SecondaryActionIsUsingMPG &&
+						axes &&
+						axes[2] !== 0 &&
+						isHoldingModifierButton
+							? { ...selectOverrideStyle, ...activeStyle }
+							: selectOverrideStyle
+					}
+					options={axesOptions}
+					placeholder={null}
+					value={{
+						label: get(stick2, "horizontal.secondaryAction", null)
+							? String(get(stick2, "horizontal.secondaryAction")).toUpperCase()
+							: "None",
+						value: get(stick2, "horizontal.secondaryAction"),
+					}}
+					onChange={({ value }) =>
+						handleChange("stick2.horizontal.secondaryAction", value)
+					}
+					isDisabled={stick2SecondaryActionIsUsingMPG}
+					aria-label="Stick 2 horizontal 2nd action"
+				/>
+				<Switch
+					checked={stick2.horizontal.isReversed}
+					onChange={(checked) =>
+						handleChange("stick2.horizontal.isReversed", checked)
+					}
+					disabled={
+						stick2PrimaryActionIsUsingMPG && stick2SecondaryActionIsUsingMPG
+					}
+					aria-label="Invert stick 2 horizontal"
+				/>
+			</div>
 
-            <div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center mb-2 gap-2">
-                <div className="leading-[1.3] dark:text-white">
-                    Stick 2 up/down
-                </div>
-                <Select
-                    styles={
-                        !stick2PrimaryActionIsUsingMPG &&
-                        axes &&
-                        axes[3] !== 0 &&
-                        !isHoldingModifierButton
-                            ? { ...selectOverrideStyle, ...activeStyle }
-                            : selectOverrideStyle
-                    }
-                    options={axesOptions}
-                    placeholder={null}
-                    value={{
-                        label: get(stick2, 'vertical.primaryAction', null)
-                            ? String(
-                                  get(stick2, 'vertical.primaryAction'),
-                              ).toUpperCase()
-                            : 'None',
-                        value: get(stick2, 'vertical.primaryAction'),
-                    }}
-                    onChange={({ value }) =>
-                        handleChange('stick2.vertical.primaryAction', value)
-                    }
-                    isDisabled={stick2PrimaryActionIsUsingMPG}
-                    aria-label="Stick 2 vertical action"
-                />
-                <Select
-                    styles={
-                        !stick2SecondaryActionIsUsingMPG &&
-                        axes &&
-                        axes[3] !== 0 &&
-                        isHoldingModifierButton
-                            ? { ...selectOverrideStyle, ...activeStyle }
-                            : selectOverrideStyle
-                    }
-                    options={axesOptions}
-                    placeholder={null}
-                    value={{
-                        label: get(stick2, 'vertical.secondaryAction', null)
-                            ? String(
-                                  get(stick2, 'vertical.secondaryAction'),
-                              ).toUpperCase()
-                            : 'None',
-                        value: get(stick2, 'vertical.secondaryAction'),
-                    }}
-                    onChange={({ value }) =>
-                        handleChange('stick2.vertical.secondaryAction', value)
-                    }
-                    isDisabled={stick2SecondaryActionIsUsingMPG}
-                    aria-label="Stick 2 vertical 2nd action"
-                />
-                <Switch
-                    checked={stick2.vertical.isReversed}
-                    onChange={(checked) =>
-                        handleChange('stick2.vertical.isReversed', checked)
-                    }
-                    disabled={
-                        stick2PrimaryActionIsUsingMPG &&
-                        stick2SecondaryActionIsUsingMPG
-                    }
-                    aria-label="Invert stick 2 vertical"
-                />
-            </div>
+			<div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center mb-2 gap-2">
+				<div className="leading-[1.3] dark:text-white">Stick 2 up/down</div>
+				<Select
+					styles={
+						!stick2PrimaryActionIsUsingMPG &&
+						axes &&
+						axes[3] !== 0 &&
+						!isHoldingModifierButton
+							? { ...selectOverrideStyle, ...activeStyle }
+							: selectOverrideStyle
+					}
+					options={axesOptions}
+					placeholder={null}
+					value={{
+						label: get(stick2, "vertical.primaryAction", null)
+							? String(get(stick2, "vertical.primaryAction")).toUpperCase()
+							: "None",
+						value: get(stick2, "vertical.primaryAction"),
+					}}
+					onChange={({ value }) =>
+						handleChange("stick2.vertical.primaryAction", value)
+					}
+					isDisabled={stick2PrimaryActionIsUsingMPG}
+					aria-label="Stick 2 vertical action"
+				/>
+				<Select
+					styles={
+						!stick2SecondaryActionIsUsingMPG &&
+						axes &&
+						axes[3] !== 0 &&
+						isHoldingModifierButton
+							? { ...selectOverrideStyle, ...activeStyle }
+							: selectOverrideStyle
+					}
+					options={axesOptions}
+					placeholder={null}
+					value={{
+						label: get(stick2, "vertical.secondaryAction", null)
+							? String(get(stick2, "vertical.secondaryAction")).toUpperCase()
+							: "None",
+						value: get(stick2, "vertical.secondaryAction"),
+					}}
+					onChange={({ value }) =>
+						handleChange("stick2.vertical.secondaryAction", value)
+					}
+					isDisabled={stick2SecondaryActionIsUsingMPG}
+					aria-label="Stick 2 vertical 2nd action"
+				/>
+				<Switch
+					checked={stick2.vertical.isReversed}
+					onChange={(checked) =>
+						handleChange("stick2.vertical.isReversed", checked)
+					}
+					disabled={
+						stick2PrimaryActionIsUsingMPG && stick2SecondaryActionIsUsingMPG
+					}
+					aria-label="Invert stick 2 vertical"
+				/>
+			</div>
 
-            <div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center mb-2 gap-2">
-                <div className="leading-[1.3] dark:text-white">Stick 2 MPG</div>
-                <Select
-                    styles={
-                        stick2PrimaryActionIsUsingMPG &&
-                        axes &&
-                        (axes[2] !== 0 || axes[3] !== 0) &&
-                        !isHoldingModifierButton
-                            ? { ...selectOverrideStyle, ...activeStyle }
-                            : selectOverrideStyle
-                    }
-                    menuPlacement="top"
-                    options={axesOptions}
-                    placeholder={null}
-                    value={{
-                        label: get(stick2, 'mpgMode.primaryAction', null)
-                            ? String(
-                                  get(stick2, 'mpgMode.primaryAction'),
-                              ).toUpperCase()
-                            : 'None',
-                        value: get(stick2, 'mpgMode.primaryAction'),
-                    }}
-                    onChange={({ value }) =>
-                        handleChange('stick2.mpgMode.primaryAction', value)
-                    }
-                    aria-label="Stick 2 MPG action"
-                />
-                <Select
-                    styles={
-                        stick2SecondaryActionIsUsingMPG &&
-                        axes &&
-                        (axes[2] !== 0 || axes[3] !== 0) &&
-                        isHoldingModifierButton
-                            ? { ...selectOverrideStyle, ...activeStyle }
-                            : selectOverrideStyle
-                    }
-                    menuPlacement="top"
-                    options={axesOptions}
-                    placeholder={null}
-                    value={{
-                        label: get(stick2, 'mpgMode.secondaryAction', null)
-                            ? String(
-                                  get(stick2, 'mpgMode.secondaryAction'),
-                              ).toUpperCase()
-                            : 'None',
-                        value: get(stick2, 'mpgMode.secondaryAction'),
-                    }}
-                    onChange={({ value }) =>
-                        handleChange('stick2.mpgMode.secondaryAction', value)
-                    }
-                    aria-label="Stick 2 MPG 2nd action"
-                />
-                <Switch
-                    checked={stick2.mpgMode.isReversed}
-                    onChange={(checked) =>
-                        handleChange('stick2.mpgMode.isReversed', checked)
-                    }
-                    aria-label="Invert stick 2 MPG"
-                />
-            </div>
+			<div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center mb-2 gap-2">
+				<div className="leading-[1.3] dark:text-white">Stick 2 MPG</div>
+				<Select
+					styles={
+						stick2PrimaryActionIsUsingMPG &&
+						axes &&
+						(axes[2] !== 0 || axes[3] !== 0) &&
+						!isHoldingModifierButton
+							? { ...selectOverrideStyle, ...activeStyle }
+							: selectOverrideStyle
+					}
+					menuPlacement="top"
+					options={axesOptions}
+					placeholder={null}
+					value={{
+						label: get(stick2, "mpgMode.primaryAction", null)
+							? String(get(stick2, "mpgMode.primaryAction")).toUpperCase()
+							: "None",
+						value: get(stick2, "mpgMode.primaryAction"),
+					}}
+					onChange={({ value }) =>
+						handleChange("stick2.mpgMode.primaryAction", value)
+					}
+					aria-label="Stick 2 MPG action"
+				/>
+				<Select
+					styles={
+						stick2SecondaryActionIsUsingMPG &&
+						axes &&
+						(axes[2] !== 0 || axes[3] !== 0) &&
+						isHoldingModifierButton
+							? { ...selectOverrideStyle, ...activeStyle }
+							: selectOverrideStyle
+					}
+					menuPlacement="top"
+					options={axesOptions}
+					placeholder={null}
+					value={{
+						label: get(stick2, "mpgMode.secondaryAction", null)
+							? String(get(stick2, "mpgMode.secondaryAction")).toUpperCase()
+							: "None",
+						value: get(stick2, "mpgMode.secondaryAction"),
+					}}
+					onChange={({ value }) =>
+						handleChange("stick2.mpgMode.secondaryAction", value)
+					}
+					aria-label="Stick 2 MPG 2nd action"
+				/>
+				<Switch
+					checked={stick2.mpgMode.isReversed}
+					onChange={(checked) =>
+						handleChange("stick2.mpgMode.isReversed", checked)
+					}
+					aria-label="Invert stick 2 MPG"
+				/>
+			</div>
 
-            <div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center mb-2 gap-2">
-                <div className="leading-[1.4] dark:text-white">
-                    Zero threshold
-                </div>
-                <ControlledInput
-                    value={zeroThreshold}
-                    type="number"
-                    min={0}
-                    max={99}
-                    step={5}
-                    onChange={(e) =>
-                        handleChange('zeroThreshold', Number(e.target.value))
-                    }
-                    className="p-1 w-full"
-                    suffix="%"
-                    aria-label="Zero threshold"
-                />
-            </div>
+			<div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center mb-2 gap-2">
+				<div className="leading-[1.4] dark:text-white">Zero threshold</div>
+				<ControlledInput
+					value={zeroThreshold}
+					type="number"
+					min={0}
+					max={99}
+					step={5}
+					onChange={(e) =>
+						handleChange("zeroThreshold", Number(e.target.value))
+					}
+					className="p-1 w-full"
+					suffix="%"
+					aria-label="Zero threshold"
+				/>
+			</div>
 
-            <div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center mb-2 gap-2">
-                <div className="leading-[1.4] dark:text-white">
-                    Movement override
-                </div>
-                <ControlledInput
-                    type="number"
-                    value={movementDistanceOverride}
-                    onChange={(e) => {
-                        if (
-                            e.target.valueAsNumber > 99999 ||
-                            e.target.valueAsNumber < 0.001
-                        ) {
-                            return;
-                        }
+			<div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center mb-2 gap-2">
+				<div className="leading-[1.4] dark:text-white">Movement override</div>
+				<ControlledInput
+					type="number"
+					value={movementDistanceOverride}
+					onChange={(e) => {
+						if (
+							e.target.valueAsNumber > 99999 ||
+							e.target.valueAsNumber < 0.001
+						) {
+							return;
+						}
 
-                        handleChange(
-                            'movementDistanceOverride',
-                            Number(e.target.value),
-                        );
-                    }}
-                    className="p-1 w-full"
-                    suffix="%"
-                    aria-label="Movement distance override"
-                />
-            </div>
+						handleChange("movementDistanceOverride", Number(e.target.value));
+					}}
+					className="p-1 w-full"
+					suffix="%"
+					aria-label="Movement distance override"
+				/>
+			</div>
 
-            <div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center gap-2">
-                <div className="leading-[1.4] dark:text-white">
-                    Fixed speed mode
-                </div>
-                <div className="col-span-3 flex gap-2 items-center">
-                    <Switch
-                        className="float-left mr-2"
-                        checked={fixedSpeedMode}
-                        onChange={(checked) =>
-                            handleChange('fixedSpeedMode', checked)
-                        }
-                    />
-                    <p className="text-gray-500 text-xs -mt-[5px]">
-                        For gamepads that don't work well with variable speed
-                        jogging
-                    </p>
-                </div>
-            </div>
-        </div>
-    );
+			<div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center gap-2">
+				<div className="leading-[1.4] dark:text-white">Fixed speed mode</div>
+				<div className="col-span-3 flex gap-2 items-center">
+					<Switch
+						className="float-left mr-2"
+						checked={fixedSpeedMode}
+						onChange={(checked) => handleChange("fixedSpeedMode", checked)}
+					/>
+					<p className="text-gray-500 text-xs -mt-[5px]">
+						For gamepads that don't work well with variable speed jogging
+					</p>
+				</div>
+			</div>
+		</div>
+	);
 };
 
 export default JoystickOptions;

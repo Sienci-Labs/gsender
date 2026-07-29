@@ -1,63 +1,62 @@
-import cx from 'classnames';
-import directionIcon from './assets/arrow-direction.svg';
-import Tooltip from 'app/components/Tooltip';
+import Tooltip from "app/components/Tooltip";
+import cx from "classnames";
+import directionIcon from "./assets/arrow-direction.svg";
 
 interface Props {
-    direction: number;
-    onClick: () => void;
-    containerClassName?: string;
-    isAbsolute?: boolean;
+	direction: number;
+	onClick: () => void;
+	containerClassName?: string;
+	isAbsolute?: boolean;
 }
 
 const ProbeDirectionSelection: React.FC<Props> = ({
-    direction,
-    onClick,
-    containerClassName,
-    isAbsolute = true,
+	direction,
+	onClick,
+	containerClassName,
+	isAbsolute = true,
 }) => {
-    const cornerLabels = [
-        'Front-Left corner',
-        'Top-Left corner',
-        'Top-Right corner',
-        'Front-Right corner',
-    ];
+	const cornerLabels = [
+		"Front-Left corner",
+		"Top-Left corner",
+		"Top-Right corner",
+		"Front-Right corner",
+	];
 
-    const currentLabel = cornerLabels[direction] || 'Unknown corner';
-        
-    return (
-        <Tooltip content={`Set probing corner: ${currentLabel}`}>
-            <div
-                className={cx(
-                    {
-                        'absolute top-0 right-0 max-xl:pt-1': isAbsolute,
-                    },
-                    containerClassName,
-                )}
-            >
-                <button
-                    type="button"
-                    className={cx(
-                        'border-0 outline-none rounded-xl [box-shadow:20px_20px_60px_#bebebe_-20px_-20px_60px_#ffffff] z-[100] dark:invert dark:hue-rotate-180',
-                        {
-                            'transition-none [transform:rotate(0deg)]':
-                                direction === 0,
-                            '[transform:rotate(90deg)]': direction === 1,
-                            '[transform:rotate(180deg)]': direction === 2,
-                            '[transform:rotate(270deg)]': direction === 3,
-                        },
-                    )}
-                    onClick={onClick}
-                    aria-label={`Current probing corner: ${currentLabel}. Click to cycle.`}
-                >
-                    <img
-                        className="min-w-7"
-                        alt={`Probing direction indicator for ${currentLabel}`}
-                        src={directionIcon}
-                    />
-                </button>
-            </div>
-        </Tooltip>
-    );
+	const currentLabel = cornerLabels[direction] || "Unknown corner";
+
+	return (
+		<Tooltip content={`Set probing corner: ${currentLabel}`}>
+			<div
+				className={cx(
+					{
+						"absolute top-0 right-0 max-xl:pt-1": isAbsolute,
+					},
+					containerClassName,
+				)}
+			>
+				<button
+					type="button"
+					className={cx(
+						"border-0 outline-none rounded-xl [box-shadow:20px_20px_60px_#bebebe_-20px_-20px_60px_#ffffff] z-[100] dark:invert dark:hue-rotate-180",
+						{
+							"transition-none [transform:rotate(0deg)]": direction === 0,
+							"[transform:rotate(90deg)]": direction === 1,
+							"[transform:rotate(180deg)]": direction === 2,
+							"[transform:rotate(270deg)]": direction === 3,
+						},
+					)}
+					onClick={onClick}
+					aria-label={`Current probing corner: ${currentLabel}. Click to cycle.`}
+				>
+					<img
+						className="min-w-7"
+						alt={`Probing direction indicator for ${currentLabel}`}
+						src={directionIcon}
+					/>
+				</button>
+			</div>
+		</Tooltip>
+	);
 };
 
 export default ProbeDirectionSelection;

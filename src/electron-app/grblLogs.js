@@ -21,32 +21,33 @@
  *
  */
 
-const fs = require('fs').promises;
+const fs = require("fs").promises;
 
 const getGRBLLog = async (logPath) => {
-    let content = '';
-    try {
-        content = await fs.readFile(logPath, 'utf-8');
-        if (content) {
-            content = content
-                .toString()
-                .split(/\r?\n/);
-            let tempContent = [];
-            content.forEach(record => {
-                if (record.toLowerCase().includes('error') || record.toLowerCase().includes('alarm')) {
-                    tempContent.push(record);
-                }
-            });
-            if (tempContent.length > 50) {
-                tempContent = tempContent.slice(0, 50);
-            }
-            content = tempContent.reverse();
-        }
-    } catch (error) {
-        console.log(error);
-    }
+	let content = "";
+	try {
+		content = await fs.readFile(logPath, "utf-8");
+		if (content) {
+			content = content.toString().split(/\r?\n/);
+			let tempContent = [];
+			content.forEach((record) => {
+				if (
+					record.toLowerCase().includes("error") ||
+					record.toLowerCase().includes("alarm")
+				) {
+					tempContent.push(record);
+				}
+			});
+			if (tempContent.length > 50) {
+				tempContent = tempContent.slice(0, 50);
+			}
+			content = tempContent.reverse();
+		}
+	} catch (error) {
+		console.log(error);
+	}
 
-    return content;
+	return content;
 };
 
 export { getGRBLLog };

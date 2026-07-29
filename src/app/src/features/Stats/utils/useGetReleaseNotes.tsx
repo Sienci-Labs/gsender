@@ -1,39 +1,38 @@
-import { useEffect, useState } from 'react';
-
-import api from 'app/api';
+import api from "app/api";
+import { useEffect, useState } from "react";
 
 type ReleaseNote = {
-    version: string;
-    date: string;
-    notes: string[];
+	version: string;
+	date: string;
+	notes: string[];
 };
 
 const useGetReleaseNotes = () => {
-    const [status, setStatus] = useState<
-        'idle' | 'loading' | 'error' | 'success'
-    >('idle');
-    const [releaseNotes, setReleaseNotes] = useState<ReleaseNote[]>([]);
+	const [status, setStatus] = useState<
+		"idle" | "loading" | "error" | "success"
+	>("idle");
+	const [releaseNotes, setReleaseNotes] = useState<ReleaseNote[]>([]);
 
-    const fetchReleaseNotes = () => {
-        setStatus('loading');
-        api.releaseNotes
-            .fetch()
-            .then((res) => {
-                setReleaseNotes(res.data);
-            })
-            .catch(() => {
-                setStatus('error');
-            })
-            .finally(() => {
-                setStatus('success');
-            });
-    };
+	const fetchReleaseNotes = () => {
+		setStatus("loading");
+		api.releaseNotes
+			.fetch()
+			.then((res) => {
+				setReleaseNotes(res.data);
+			})
+			.catch(() => {
+				setStatus("error");
+			})
+			.finally(() => {
+				setStatus("success");
+			});
+	};
 
-    useEffect(() => {
-        fetchReleaseNotes();
-    }, []);
+	useEffect(() => {
+		fetchReleaseNotes();
+	}, []);
 
-    return { releaseNotes, status, fetchReleaseNotes };
+	return { releaseNotes, status, fetchReleaseNotes };
 };
 
 export default useGetReleaseNotes;

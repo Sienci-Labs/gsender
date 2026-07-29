@@ -22,23 +22,23 @@
  */
 
 class GrblHalLineParserResultVersion {
-    static parse(line) {
-        // * Grbl v1.1
-        //   [VER:]
-        const r = line.match(/^\[(?:VER:)(.+)\]$/);
-        if (!r) {
-            return null;
-        }
+	static parse(line) {
+		// * Grbl v1.1
+		//   [VER:]
+		const r = line.match(/^\[(?:VER:)(.+)\]$/);
+		if (!r) {
+			return null;
+		}
 
-        const payload = {
-            version: r[1]
-        };
+		const payload = {
+			version: r[1],
+		};
 
-        return {
-            type: GrblHalLineParserResultVersion,
-            payload: payload
-        };
-    }
+		return {
+			type: GrblHalLineParserResultVersion,
+			payload: payload,
+		};
+	}
 }
 
 export default GrblHalLineParserResultVersion;

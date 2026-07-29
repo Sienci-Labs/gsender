@@ -21,12 +21,12 @@
  *
  */
 
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
-import i18n from 'app/lib/i18n';
-import posthog from 'posthog-js';
+import i18n from "app/lib/i18n";
+import posthog from "posthog-js";
+import PropTypes from "prop-types";
+import React, { PureComponent } from "react";
 
-import styles from './index.module.styl';
+import styles from "./index.module.styl";
 
 /**
  * CameraDisplay component used to allow changing of camera angles
@@ -34,122 +34,122 @@ import styles from './index.module.styl';
  */
 
 class CameraDisplay extends PureComponent {
-    static propTypes = {
-        camera: PropTypes.object,
-        cameraPosition: PropTypes.string,
-    };
+	static propTypes = {
+		camera: PropTypes.object,
+		cameraPosition: PropTypes.string,
+	};
 
-    render = () => {
-        let { camera, cameraPosition } = this.props;
+	render = () => {
+		let { camera, cameraPosition } = this.props;
 
-        const handleChangeCameraView = (view) => {
-            const cameraView = {
-                "Top": () => camera.toTopView(),
-                "Left": () => camera.toLeftSideView(),
-                "Front": () => camera.toFrontView(),
-                "3D": () => camera.to3DView(),
-                "Right": () => camera.toRightSideView(),
-            };
-            cameraView[view]();
-            posthog?.capture('camera_view_changed', { view });
-        };
+		const handleChangeCameraView = (view) => {
+			const cameraView = {
+				Top: () => camera.toTopView(),
+				Left: () => camera.toLeftSideView(),
+				Front: () => camera.toFrontView(),
+				"3D": () => camera.to3DView(),
+				Right: () => camera.toRightSideView(),
+			};
+			cameraView[view]();
+			posthog?.capture("camera_view_changed", { view });
+		};
 
-        return (
-            <div className="rounded bg-opacity-50 bg-gray-600 w-24 absolute bottom-5 portrait:right-5 portrait:left-auto left-5">
-                <h3 className={styles.viewTitle}>{cameraPosition}</h3>
-                <div className={styles.buttonContainer}>
-                    <button
-                        title={i18n._('Top')}
-                        aria-label="Top view"
-                        type="button"
-                        tabIndex={0}
-                        className={
-                            cameraPosition === 'Top'
-                                ? `${styles.faceTopActive}`
-                                : `${styles.faceTop}`
-                        }
-                        onClick={(event) => {
-                            handleChangeCameraView('Top');
-                        }}
-                    />
-                    <button
-                        title={i18n._('Left')}
-                        aria-label="Left view"
-                        type="button"
-                        tabIndex={0}
-                        className={
-                            cameraPosition === 'Left'
-                                ? `${styles.faceLeftActive}`
-                                : `${styles.faceLeft}`
-                        }
-                        onClick={(event) => {
-                            handleChangeCameraView('Left');
-                        }}
-                    />
-                    <button
-                        title={i18n._('Front')}
-                        aria-label="Front view"
-                        type="button"
-                        tabIndex={0}
-                        className={
-                            cameraPosition === 'Front'
-                                ? `${styles.faceFrontActive}`
-                                : `${styles.faceFront}`
-                        }
-                        onClick={(event) => {
-                            handleChangeCameraView('Front');
-                        }}
-                    />
-                    <button
-                        title={i18n._('3D')}
-                        aria-label="3D view"
-                        type="button"
-                        tabIndex={0}
-                        className={
-                            cameraPosition === '3D'
-                                ? `${styles.faceIsoActive}`
-                                : `${styles.faceIso}`
-                        }
-                        onClick={(event) => {
-                            handleChangeCameraView('3D');
-                        }}
-                    />
-                    <button
-                        type="button"
-                        tabIndex={0}
-                        className={styles.cornerC1}
-                        aria-hidden="true"
-                    />
-                    <button
-                        type="button"
-                        tabIndex={0}
-                        className={styles.cornerC2}
-                        aria-hidden="true"
-                    />
-                    <button
-                        title={i18n._('Right')}
-                        aria-label="Right view"
-                        type="button"
-                        tabIndex={0}
-                        className={
-                            cameraPosition === 'Right'
-                                ? `${styles.cornerC2Active}`
-                                : `${styles.cornerC2}`
-                        }
-                        onClick={(event) => {
-                            handleChangeCameraView('Right');
-                        }}
-                    />
+		return (
+			<div className="rounded bg-opacity-50 bg-gray-600 w-24 absolute bottom-5 portrait:right-5 portrait:left-auto left-5">
+				<h3 className={styles.viewTitle}>{cameraPosition}</h3>
+				<div className={styles.buttonContainer}>
+					<button
+						title={i18n._("Top")}
+						aria-label="Top view"
+						type="button"
+						tabIndex={0}
+						className={
+							cameraPosition === "Top"
+								? `${styles.faceTopActive}`
+								: `${styles.faceTop}`
+						}
+						onClick={(event) => {
+							handleChangeCameraView("Top");
+						}}
+					/>
+					<button
+						title={i18n._("Left")}
+						aria-label="Left view"
+						type="button"
+						tabIndex={0}
+						className={
+							cameraPosition === "Left"
+								? `${styles.faceLeftActive}`
+								: `${styles.faceLeft}`
+						}
+						onClick={(event) => {
+							handleChangeCameraView("Left");
+						}}
+					/>
+					<button
+						title={i18n._("Front")}
+						aria-label="Front view"
+						type="button"
+						tabIndex={0}
+						className={
+							cameraPosition === "Front"
+								? `${styles.faceFrontActive}`
+								: `${styles.faceFront}`
+						}
+						onClick={(event) => {
+							handleChangeCameraView("Front");
+						}}
+					/>
+					<button
+						title={i18n._("3D")}
+						aria-label="3D view"
+						type="button"
+						tabIndex={0}
+						className={
+							cameraPosition === "3D"
+								? `${styles.faceIsoActive}`
+								: `${styles.faceIso}`
+						}
+						onClick={(event) => {
+							handleChangeCameraView("3D");
+						}}
+					/>
+					<button
+						type="button"
+						tabIndex={0}
+						className={styles.cornerC1}
+						aria-hidden="true"
+					/>
+					<button
+						type="button"
+						tabIndex={0}
+						className={styles.cornerC2}
+						aria-hidden="true"
+					/>
+					<button
+						title={i18n._("Right")}
+						aria-label="Right view"
+						type="button"
+						tabIndex={0}
+						className={
+							cameraPosition === "Right"
+								? `${styles.cornerC2Active}`
+								: `${styles.cornerC2}`
+						}
+						onClick={(event) => {
+							handleChangeCameraView("Right");
+						}}
+					/>
 
-                    <button
-                        type="button"
-                        tabIndex={0}
-                        className={styles.cornerC3}
-                        aria-hidden="true"
-                    />
-                </div>
-            </div>
-        );
-    };
+					<button
+						type="button"
+						tabIndex={0}
+						className={styles.cornerC3}
+						aria-hidden="true"
+					/>
+				</div>
+			</div>
+		);
+	};
 }
 export default CameraDisplay;

@@ -1,7 +1,7 @@
 export type {
-    Wizard,
-    SubWizard,
-    WizardStep,
-    StepProps,
-    SecondaryContent,
-} from './wizard';
+	SecondaryContent,
+	StepProps,
+	SubWizard,
+	Wizard,
+	WizardStep,
+} from "./wizard";

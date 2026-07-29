@@ -21,70 +21,66 @@
  *
  */
 
-import React, { useState } from 'react';
-import { connect } from 'react-redux';
-import get from 'lodash/get';
-import noop from 'lodash/noop';
-import controller from 'app/lib/controller';
-import { GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
-import styles from './UnlockButton.styl';
+import { GRBL_ACTIVE_STATE_HOLD } from "app/constants";
+import controller from "app/lib/controller";
+import get from "lodash/get";
+import noop from "lodash/noop";
+import React, { useState } from "react";
+import { connect } from "react-redux";
+import styles from "./UnlockButton.styl";
 
 const UnlockButton = ({ activeState, alarmCode }) => {
-    const [isHovering, setIsHovering] = useState(false);
-    const onMouseOver = () => {
-        setIsHovering(true);
-    };
-    const onMouseOut = () => {
-        setIsHovering(false);
-    };
+	const [isHovering, setIsHovering] = useState(false);
+	const onMouseOver = () => {
+		setIsHovering(true);
+	};
+	const onMouseOut = () => {
+		setIsHovering(false);
+	};
 
-    const getButtonText = () => {
-        if (activeState === GRBL_ACTIVE_STATE_HOLD) {
-            return 'Cycle Start';
-        }
-        return 'Unlock Machine';
-    };
+	const getButtonText = () => {
+		if (activeState === GRBL_ACTIVE_STATE_HOLD) {
+			return "Cycle Start";
+		}
+		return "Unlock Machine";
+	};
 
-    const handleUnlock = () => {
-        if (activeState === GRBL_ACTIVE_STATE_HOLD) {
-            controller.command('cyclestart');
-            return;
-        }
-        controller.command('unlock');
-    };
+	const handleUnlock = () => {
+		if (activeState === GRBL_ACTIVE_STATE_HOLD) {
+			controller.command("cyclestart");
+			return;
+		}
+		controller.command("unlock");
+	};
 
-    return (
-        <button
-            type="button"
-            onClick={handleUnlock}
-            className={styles.unlockButton}
-            onMouseOver={onMouseOver}
-            onMouseLeave={onMouseOut}
-            onFocus={noop}
-            aria-label={getButtonText()}
-        >
-            <div className={styles.unlockIndicator}>
-                <i className="fas fa-caret-right" />
-            </div>
-            <i
-                className={
-                    isHovering
-                        ? 'fas fa-lock-open'
-                        : 'fas fa-unlock fa-flip-horizontal'
-                }
-            />
-            {isHovering && (
-                <div className={styles.unlockText}>{getButtonText()}</div>
-            )}
-        </button>
-    );
+	return (
+		<button
+			type="button"
+			onClick={handleUnlock}
+			className={styles.unlockButton}
+			onMouseOver={onMouseOver}
+			onMouseLeave={onMouseOut}
+			onFocus={noop}
+			aria-label={getButtonText()}
+		>
+			<div className={styles.unlockIndicator}>
+				<i className="fas fa-caret-right" />
+			</div>
+			<i
+				className={
+					isHovering ? "fas fa-lock-open" : "fas fa-unlock fa-flip-horizontal"
+				}
+			/>
+			{isHovering && <div className={styles.unlockText}>{getButtonText()}</div>}
+		</button>
+	);
 };
 
 export default connect((store) => {
-    const activeState = get(store, 'controller.state.status.activeState');
-    const alarmCode = get(store, 'controller.state.status.alarmCode');
-    return {
-        activeState,
-        alarmCode,
-    };
+	const activeState = get(store, "controller.state.status.activeState");
+	const alarmCode = get(store, "controller.state.status.alarmCode");
+	return {
+		activeState,
+		alarmCode,
+	};
 })(UnlockButton);

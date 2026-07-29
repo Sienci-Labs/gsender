@@ -21,47 +21,48 @@
  *
  */
 
-import os from 'os';
-import path from 'path';
-import urljoin from '../lib/urljoin';
+import os from "os";
+import path from "path";
+import urljoin from "../lib/urljoin";
 
-const publicPath = global.PUBLIC_PATH || ''; // see gulp/task/app.js
-const maxAge = (365 * 24 * 60 * 60 * 1000); // one year
+const publicPath = global.PUBLIC_PATH || ""; // see gulp/task/app.js
+const maxAge = 365 * 24 * 60 * 60 * 1000; // one year
 
 // Resolve paths relative to where the binary is located
 // In prod: dist/gsender/server-cli.js needs to find dist/gsender/app
 const getAppPath = () => {
-    // __dirname will be the bundled output location (dist/gsender)
-    // We need to go from dist/gsender/server-cli.js to dist/gsender/app
-    return path.resolve(__dirname, 'app');
+	// __dirname will be the bundled output location (dist/gsender)
+	// We need to go from dist/gsender/server-cli.js to dist/gsender/app
+	return path.resolve(__dirname, "app");
 };
 
 export default {
-    route: '/', // with trailing slash
-    assets: {
-        app: {
-            routes: [ // with trailing slash
-                urljoin(publicPath, '/'),
-                '/' // fallback
-            ],
-            // In production, app is in dist/gsender/app
-            path: getAppPath(),
-            maxAge: maxAge
-        }
-    },
-    backend: {
-        enable: false, // disable backend service in production
-        host: 'localhost',
-        port: 80,
-        route: 'api/'
-    },
-    cluster: {
-        // note. node-inspector cannot debug child (forked) process
-        enable: false,
-        maxWorkers: os.cpus().length || 1
-    },
-    winston: {
-        // https://github.com/winstonjs/winston#logging-levels
-        level: 'info'
-    }
+	route: "/", // with trailing slash
+	assets: {
+		app: {
+			routes: [
+				// with trailing slash
+				urljoin(publicPath, "/"),
+				"/", // fallback
+			],
+			// In production, app is in dist/gsender/app
+			path: getAppPath(),
+			maxAge: maxAge,
+		},
+	},
+	backend: {
+		enable: false, // disable backend service in production
+		host: "localhost",
+		port: 80,
+		route: "api/",
+	},
+	cluster: {
+		// note. node-inspector cannot debug child (forked) process
+		enable: false,
+		maxWorkers: os.cpus().length || 1,
+	},
+	winston: {
+		// https://github.com/winstonjs/winston#logging-levels
+		level: "info",
+	},
 };

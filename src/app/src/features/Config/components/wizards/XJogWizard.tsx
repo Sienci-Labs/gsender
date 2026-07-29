@@ -1,5 +1,5 @@
-import { JogWizard } from 'app/features/Config/components/wizards/JogWizard.tsx';
+import { JogWizard } from "app/features/Config/components/wizards/JogWizard.tsx";
 
 export function XJogWizard() {
-    return <JogWizard axis={'X'} disabled={false} />;
+	return <JogWizard axis={"X"} disabled={false} />;
 }

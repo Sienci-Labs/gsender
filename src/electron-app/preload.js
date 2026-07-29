@@ -20,10 +20,10 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-const fs = require('fs');
+const fs = require("fs");
 
-window.ipcRenderer = require('electron').ipcRenderer;
+window.ipcRenderer = require("electron").ipcRenderer;
 
 window.readFileSync = fs.readFileSync;
 window.writeFileSync = fs.writeFileSync;
-window.pathJoin = require('path').join;
+window.pathJoin = require("path").join;
