@@ -381,11 +381,21 @@ const ProbeWidget = () => {
 		},
 		runProbeCommands: (commands: string[]): void => {
 			controller.command("gcode:safe", commands, "G21");
+			const directionLabels = [
+				"Bottom Left",
+				"Top Left",
+				"Top Right",
+				"Bottom Right",
+			];
+			const directionLabel = directionLabels[direction] || "Unknown";
+
 			posthog?.capture("probe_run", {
 				probe_command_id: availableProbeCommands[selectedProbeCommand]?.id,
 				touchplate_type: touchplateType,
 				units,
 				firmware: type,
+				direction: directionLabel,
+				type: probeType,
 			});
 		},
 		returnProbeConnectivity: (): boolean => {

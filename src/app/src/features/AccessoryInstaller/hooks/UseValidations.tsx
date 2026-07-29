@@ -37,7 +37,7 @@ export function useValidations() {
 		() => () => ({
 			success: hasHomed,
 			reason:
-				"Machine not homed. Please home your machine before proceeding with ATC configuration.",
+				"Machine not homed. Please home your machine before proceeding with accessory configuration.",
 		}),
 		[hasHomed],
 	);

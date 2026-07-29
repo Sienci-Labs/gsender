@@ -46,7 +46,7 @@ import { ensureString } from "./lib/ensure-type";
 import logger, { setLevel } from "./lib/logger";
 import urljoin from "./lib/urljoin";
 import cncengine from "./services/cncengine";
-import config from "./services/configstore";
+import config, { validateAndRepairConfigFile } from "./services/configstore";
 import errorConfig from "./services/configstore/alarmStore";
 import jobConfig from "./services/configstore/jobStore";
 import monitor from "./services/monitor";
@@ -79,6 +79,10 @@ const createServer = (options, callback) => {
 	const rcfile = path.resolve(options.configFile || settings.rcfile);
 	const errorFile = path.resolve(options.errorFile || settings.errorFile);
 	const jobFile = path.resolve(options.jobFile || settings.jobFile);
+
+	// Safeguard: if the config file is corrupted (unparseable), back it up and
+	// reset it to defaults before loading so startup can't crash on bad JSON.
+	const configRecovery = validateAndRepairConfigFile(rcfile);
 
 	// configstore service
 	log.info(
@@ -358,6 +362,8 @@ const createServer = (options, callback) => {
 					address,
 					port,
 					mountPoints,
+					configRestored: configRecovery.restored,
+					configBackupPath: configRecovery.backupPath,
 				});
 
 			if (address !== "0.0.0.0") {

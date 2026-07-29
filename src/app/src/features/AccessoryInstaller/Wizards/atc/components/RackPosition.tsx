@@ -60,7 +60,13 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
 
 	useEffect(() => {
 		if (isManuallyEditing.current) return;
-		if (!mpos?.x || !mpos.y || !mpos.z) return;
+		if (
+			!mpos ||
+			mpos.x === undefined ||
+			mpos.y === undefined ||
+			mpos.z === undefined
+		)
+			return;
 		const { x, y, z } = mpos;
 		setPosition({
 			x: mapPositionToUnits(x, units),

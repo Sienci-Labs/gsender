@@ -161,12 +161,24 @@ function Connection(props: ConnectionProps) {
 
 				setConnectionState(ConnectionState.CONNECTED);
 				setActivePort(port);
-				posthog?.capture("machine_connected", {
-					port,
-					connection_type: type,
-					baudrate: baud,
-					firmware: defaultFirmware,
-				});
+
+				// Version isn't available until firmware startup arrives after port open
+				setTimeout(() => {
+					const version = get(controller.settings, "version");
+					const firmwareVersion = get(version, "version", "Unknown");
+					const firmwareVersionSemver = get(version, "semver", "Unknown");
+
+					const payload = {
+						port,
+						connection_type: type,
+						baudrate: baud,
+						firmware: controller.type || defaultFirmware,
+						firmware_version: firmwareVersion,
+						firmware_version_semver: firmwareVersionSemver,
+					};
+
+					posthog?.capture("machine_connected", payload);
+				}, 1500);
 			},
 		);
 

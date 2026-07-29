@@ -22,6 +22,7 @@
  */
 
 import PendingToolchangeNotice from "app/features/Helper/components/PendingToolchangeNotice";
+import ResumingJobNotice from "app/features/Helper/components/ResumingJobNotice";
 import Substep from "app/features/Helper/components/Substep";
 import ToolRequirementBanner from "app/features/Helper/components/ToolRequirementBanner";
 import { useWizardContext } from "app/features/Helper/context";
@@ -59,6 +60,7 @@ const Instructions = () => {
 		toolchangeContext,
 		toolchangeComment,
 		pendingToolchangeNotice,
+		resumingJob,
 	} = useWizardContext();
 	const step = steps[activeStep];
 	if (!step) return null;
@@ -69,6 +71,14 @@ const Instructions = () => {
 		return (
 			<div className="flex-1 overflow-y-auto p-4 flex flex-col bg-white dark:bg-[#18181f]">
 				<PendingToolchangeNotice />
+			</div>
+		);
+	}
+
+	if (resumingJob) {
+		return (
+			<div className="flex-1 overflow-y-auto p-4 flex flex-col bg-white dark:bg-[#18181f]">
+				<ResumingJobNotice />
 			</div>
 		);
 	}
