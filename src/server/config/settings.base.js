@@ -21,9 +21,9 @@
  *
  */
 
+import os from "node:os";
+import path from "node:path";
 import isElectron from "is-electron";
-import os from "os";
-import path from "path";
 import pkg from "../../package.json";
 
 const RC_FILE = pkg.version.includes("EDGE") ? ".edge_rc" : ".sender_rc";
@@ -98,6 +98,13 @@ const getExtraPluginsDirs = () => {
 	// `plugins/` folder lives at cwd. The registry checks existence before use.
 	if (process.env.NODE_ENV === "development") {
 		dirs.push(path.resolve(process.cwd(), "plugins"));
+	}
+
+	// In production builds we bundle selected default plugins under the app
+	// output root at "<build>/plugins". settings.base.js is loaded from
+	// "<build>/server/config", so two levels up lands at "<build>".
+	if (process.env.NODE_ENV === "production") {
+		dirs.push(path.resolve(__dirname, "..", "..", "plugins"));
 	}
 
 	return dirs;

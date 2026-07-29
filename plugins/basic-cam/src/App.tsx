@@ -1,8 +1,8 @@
 import { gsender } from "@sienci/gsender-plugin-sdk";
 import { useWorkspaceState } from "@sienci/gsender-plugin-sdk/react";
 import {
-	GCodeVisualizer,
 	type GCodeViewerHandle,
+	GCodeVisualizer,
 } from "@sienci/gsender-plugin-sdk/viewer";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -83,10 +83,10 @@ const App = () => {
 		viewerRef.current?.setOptions({ units });
 	}, [units]);
 
-	// "Load to job" hands the generated program to gSender's main visualizer via
+	// "Load to main visualizer" hands the generated program to gSender's main visualizer via
 	// the SDK. Basic CAM is just a plugin — it has no privileged host access, it
 	// composes gSender's generic SDK surface to do its work.
-	const loadToJob = async () => {
+	const loadToMainVisualizer = async () => {
 		setLoading(true);
 		setStatus("");
 		try {
@@ -222,11 +222,11 @@ const App = () => {
 					<div className="mt-4 flex flex-wrap gap-2">
 						<button
 							type="button"
-							onClick={loadToJob}
+							onClick={loadToMainVisualizer}
 							disabled={loading}
 							className="cursor-pointer rounded-md border border-blue-600 bg-blue-600 px-3.5 py-2 text-white disabled:cursor-not-allowed disabled:opacity-60"
 						>
-							{loading ? "Loading…" : "Load to job"}
+							{loading ? "Loading…" : "Load to main visualizer"}
 						</button>
 					</div>
 					{status && <p className="mt-2 text-sm text-gray-500">{status}</p>}

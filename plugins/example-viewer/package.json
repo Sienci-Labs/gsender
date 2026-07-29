@@ -1,5 +1,5 @@
 {
-	"name": "basic-cam",
+	"name": "example-viewer",
 	"private": true,
 	"version": "0.1.0",
 	"type": "module",
@@ -10,18 +10,10 @@
 	},
 	"dependencies": {
 		"@sienci/gsender-plugin-sdk": "file:../../packages/plugin-sdk",
-		"@sienci/gviewer": "^0.1.27",
-		"react": "^19.0.0",
-		"react-dom": "^19.0.0",
+		"@sienci/gviewer": "^0.1.21",
 		"three": "^0.168.0"
 	},
 	"devDependencies": {
-		"@tailwindcss/vite": "^4.0.0",
-		"@types/react": "^19.0.0",
-		"@types/react-dom": "^19.0.0",
-		"@vitejs/plugin-react": "^4.3.4",
-		"tailwindcss": "^4.0.0",
-		"typescript": "^5.7.2",
 		"vite": "^6.0.0"
 	}
 }

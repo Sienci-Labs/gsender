@@ -35,7 +35,6 @@ import type {
 	GCodeViewerThemePresetName,
 	WorkerGeometryData,
 } from "@sienci/gviewer/viewer";
-import "@sienci/gviewer/viewer/viewcube.css";
 
 import type { BBox } from "app/definitions/general";
 import type { MachineProfile } from "app/definitions/firmware";

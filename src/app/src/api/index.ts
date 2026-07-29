@@ -468,6 +468,12 @@ const plugins = {
 	): Promise<AxiosResponse> => {
 		return authrequest.put(`/api/plugins/${encodeURIComponent(id)}`, options);
 	},
+	openDirectory: (pluginPath?: string): Promise<AxiosResponse> => {
+		return authrequest.post(
+			"/api/plugins/open-directory",
+			pluginPath ? { pluginPath } : {},
+		);
+	},
 };
 
 export default {

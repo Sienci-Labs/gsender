@@ -32,7 +32,7 @@
 		"prepublishOnly": "npm run build"
 	},
 	"peerDependencies": {
-		"@sienci/gviewer": ">=0.1.21",
+		"@sienci/gviewer": ">=0.1.27",
 		"react": ">=18",
 		"three": ">=0.168.0"
 	},
@@ -48,7 +48,7 @@
 		}
 	},
 	"devDependencies": {
-		"@sienci/gviewer": "^0.1.21",
+		"@sienci/gviewer": "^0.1.27",
 		"@types/react": "^19.0.0",
 		"react": "^19.0.0",
 		"three": "^0.168.0",
