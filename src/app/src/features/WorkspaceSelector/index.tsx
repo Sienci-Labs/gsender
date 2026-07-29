@@ -1,3 +1,4 @@
+import { usePostHog } from "@posthog/react";
 import {
 	Select,
 	SelectContent,
@@ -25,6 +26,7 @@ const availableWorkspaces = {
 export type GrblWorkspace = "G54" | "G55" | "G56" | "G57" | "G58" | "G59";
 
 export function WorkspaceSelector() {
+	const posthog = usePostHog();
 	const activeWorkspace = useSelector(
 		(state: RootState) => state.controller.modal.wcs,
 	);
@@ -50,6 +52,7 @@ export function WorkspaceSelector() {
 	function onWorkspaceSelect(value: GrblWorkspace) {
 		setWorkspace(value);
 		controller.command("gcode", value);
+		posthog?.capture("workspace_selected", { workspace: value });
 	}
 
 	const disabled =

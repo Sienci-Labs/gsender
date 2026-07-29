@@ -331,8 +331,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
 
 							if (toggle === true || toggle === "accepted") {
 								posthog.opt_in_capturing();
+								posthog?.capture("data_collection_accepted");
 							} else {
 								posthog.opt_out_capturing();
+								posthog?.capture("data_collection_declined");
 							}
 						},
 						ignoreDefaultCheck: true,
@@ -384,12 +386,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
 					{
 						label: "Show bounding box",
 						key: "widgets.visualizer.objects.limits.visible",
-						description: "Draw a wireframe around the extents of the loaded G-code file.",
+						description:
+							"Draw a wireframe around the extents of the loaded G-code file.",
 						type: "boolean",
 						onChange: (value: boolean) => {
-						store.set("widgets.visualizer.objects.limits.visible", value);
-						pubsub.publish("visualizer:settings");
-					},
+							store.set("widgets.visualizer.objects.limits.visible", value);
+							pubsub.publish("visualizer:settings");
+						},
 					},
 					{
 						label: "Show bounding box labels",
@@ -947,17 +950,17 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						},
 					},
 					{
-						label: 'Probe Movement Speed',
-						key: 'widgets.probe.probeMovementSpeed',
+						label: "Probe Movement Speed",
+						key: "widgets.probe.probeMovementSpeed",
 						description:
-							'Feed rate for retract/reposition moves during probing. If 0, these moves use rapid (G0). If set, they use a controlled feed move (G1) at this speed instead. (Default 0)',
-						type: 'number',
+							"Feed rate for retract/reposition moves during probing. If 0, these moves use rapid (G0). If set, they use a controlled feed move (G1) at this speed instead. (Default 0)",
+						type: "number",
 						min: 0,
-						unit: 'mm/min',
+						unit: "mm/min",
 						hidden: (getPending) => {
 							const probeType = getPending(
-								'workspace.probeProfile.touchplateType',
-								'',
+								"workspace.probeProfile.touchplateType",
+								"",
 							);
 							// BitZero already always uses G1 for retracts, so this setting doesn't apply to it
 							return probeType === TOUCHPLATE_TYPE_BITZERO;

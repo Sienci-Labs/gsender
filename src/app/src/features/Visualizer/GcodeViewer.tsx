@@ -21,11 +21,6 @@
  *
  */
 
-import {
-	GCodeSVGRenderer as GViewerSVG,
-	GCodeViewer as GViewer3D,
-	gCodeViewerThemePresets,
-} from "@sienci/gviewer/viewer";
 import type {
 	GCodeSVGOptions,
 	GCodeViewerBitPosition,
@@ -35,9 +30,13 @@ import type {
 	GCodeViewerThemePresetName,
 	WorkerGeometryData,
 } from "@sienci/gviewer/viewer";
-
-import type { BBox } from "app/definitions/general";
+import {
+	GCodeViewer as GViewer3D,
+	GCodeSVGRenderer as GViewerSVG,
+	gCodeViewerThemePresets,
+} from "@sienci/gviewer/viewer";
 import type { MachineProfile } from "app/definitions/firmware";
+import type { BBox } from "app/definitions/general";
 import controller from "app/lib/controller";
 import { isLaserMode } from "app/lib/laserMode";
 import { getZUpTravel } from "app/lib/SoftLimits.js";
@@ -81,14 +80,18 @@ const THEME_NAME_TO_PRESET: Record<string, GCodeViewerThemePresetName> = {
 	[AYU_LIGHT_THEME]: "ayu-light",
 };
 
-const LIGHT_LIKE_PRESETS = new Set<GCodeViewerThemePresetName>(["light", "gruvbox-light", "ayu-light"]);
+const LIGHT_LIKE_PRESETS = new Set<GCodeViewerThemePresetName>([
+	"light",
+	"gruvbox-light",
+	"ayu-light",
+]);
 
-import { outlineResponse } from "../../workers/Outline.response";
-import { getSafeXYMoveCode } from "app/features/DRO/utils/SafeMove";
 import {
 	computeKeepoutWorkRect,
 	computeMachineBedWorkRect,
 } from "app/features/DRO/utils/RapidPosition";
+import { getSafeXYMoveCode } from "app/features/DRO/utils/SafeMove";
+import { outlineResponse } from "../../workers/Outline.response";
 import type { Actions, CAMERA_POSITIONS_T, State } from "./definitions";
 
 // "Move To Here": how long to hold before committing, and how far the pointer
@@ -244,8 +247,13 @@ class GcodeViewer extends Component<Props> {
 		// SVG/lite mode is primary-only; secondary previews are always 3D.
 		if (this.isSVGMode() && !this.props.isSecondary) {
 			this.mode = "svg";
-			this.viewerSvg = new GViewerSVG(this.containerRef, this.buildSvgOptions());
-			this.containerRef.style.backgroundColor = this.buildTheme(this.currentThemeName()).background;
+			this.viewerSvg = new GViewerSVG(
+				this.containerRef,
+				this.buildSvgOptions(),
+			);
+			this.containerRef.style.backgroundColor = this.buildTheme(
+				this.currentThemeName(),
+			).background;
 		} else {
 			this.mode = "3d";
 			this.viewer3d = new GViewer3D({
@@ -330,7 +338,10 @@ class GcodeViewer extends Component<Props> {
 			},
 			machineBed: this.buildMachineBedOptions(),
 			grid: this.buildGridOptions(),
-			render: { antialias: true, theme: this.buildTheme(this.currentThemeName()) },
+			render: {
+				antialias: true,
+				theme: this.buildTheme(this.currentThemeName()),
+			},
 		};
 	}
 
@@ -345,7 +356,10 @@ class GcodeViewer extends Component<Props> {
 		sizeY: number;
 		axisDepth: number;
 		labels: boolean;
-		bounds: { min: { x: number; y: number }; max: { x: number; y: number } } | null;
+		bounds: {
+			min: { x: number; y: number };
+			max: { x: number; y: number };
+		} | null;
 	} {
 		const { state } = this.props;
 		const isMetric = state.units === METRIC_UNITS;
@@ -353,13 +367,24 @@ class GcodeViewer extends Component<Props> {
 		const machineProfile = store.get("workspace.machineProfile") as
 			| MachineProfile
 			| undefined;
-		const $130 = _get(reduxStore.getState(), "controller.settings.settings.$130");
-		const $131 = _get(reduxStore.getState(), "controller.settings.settings.$131");
-		const widthMm = $130 !== undefined ? Number($130) : (machineProfile?.mm?.width ?? 800);
-		const depthMm = $131 !== undefined ? Number($131) : (machineProfile?.mm?.depth ?? 800);
+		const $130 = _get(
+			reduxStore.getState(),
+			"controller.settings.settings.$130",
+		);
+		const $131 = _get(
+			reduxStore.getState(),
+			"controller.settings.settings.$131",
+		);
+		const widthMm =
+			$130 !== undefined ? Number($130) : (machineProfile?.mm?.width ?? 800);
+		const depthMm =
+			$131 !== undefined ? Number($131) : (machineProfile?.mm?.depth ?? 800);
 		const heightMm = machineProfile?.mm?.height ?? 200;
 
-		let bounds: { min: { x: number; y: number }; max: { x: number; y: number } } | null = null;
+		let bounds: {
+			min: { x: number; y: number };
+			max: { x: number; y: number };
+		} | null = null;
 		const trimGridToBed = store.get(
 			"widgets.visualizer.objects.machineBed.trimGridToBed",
 			false,
@@ -399,7 +424,10 @@ class GcodeViewer extends Component<Props> {
 		visible: boolean;
 		min: { x: number; y: number } | null;
 		max: { x: number; y: number } | null;
-		keepout: { min: { x: number; y: number }; max: { x: number; y: number } } | null;
+		keepout: {
+			min: { x: number; y: number };
+			max: { x: number; y: number };
+		} | null;
 	} {
 		const state = reduxStore.getState();
 		const $22 = _get(state, "controller.settings.settings.$22", "0");
@@ -438,7 +466,10 @@ class GcodeViewer extends Component<Props> {
 		const $686 = _get(state, "controller.settings.settings.$686");
 		const $687 = _get(state, "controller.settings.settings.$687");
 
-		let keepout: { min: { x: number; y: number }; max: { x: number; y: number } } | null = null;
+		let keepout: {
+			min: { x: number; y: number };
+			max: { x: number; y: number };
+		} | null = null;
 		const keepoutSettingsExist = [$683, $684, $685, $686, $687].every(
 			(value) => value !== undefined,
 		);
@@ -486,7 +517,9 @@ class GcodeViewer extends Component<Props> {
 		// SVG mode has no canvas clear color — sync the container background
 		// so the theme's background shows instead of the page default.
 		if (this.containerRef) {
-			this.containerRef.style.backgroundColor = this.buildTheme(this.currentThemeName()).background;
+			this.containerRef.style.backgroundColor = this.buildTheme(
+				this.currentThemeName(),
+			).background;
 		}
 	}
 
@@ -723,9 +756,7 @@ class GcodeViewer extends Component<Props> {
 			unitModal,
 		);
 
-		toast.success(
-			`Moving to X${target.x.toFixed(2)} Y${target.y.toFixed(2)}`,
-		);
+		toast.success(`Moving to X${target.x.toFixed(2)} Y${target.y.toFixed(2)}`);
 
 		// Auto-disarm after a successful move.
 		this.props.actions.camera.disableMoveToHere();
@@ -812,10 +843,7 @@ class GcodeViewer extends Component<Props> {
 
 		if (typeof progress.animate === "function") {
 			progress.animate(
-				[
-					{ strokeDashoffset: circumference },
-					{ strokeDashoffset: 0 },
-				],
+				[{ strokeDashoffset: circumference }, { strokeDashoffset: 0 }],
 				{ duration: MOVE_TO_HERE_HOLD_MS, fill: "forwards" },
 			);
 		}
@@ -832,7 +860,11 @@ class GcodeViewer extends Component<Props> {
 
 	// --- imperative API consumed by the connected container (index.tsx) -----
 
-	load(_name: string, visualization: unknown, callback?: (arg: { bbox: BBox }) => void) {
+	load(
+		_name: string,
+		visualization: unknown,
+		callback?: (arg: { bbox: BBox }) => void,
+	) {
 		if (callback) {
 			this.pendingLoadCallback = callback;
 		}
@@ -920,7 +952,9 @@ class GcodeViewer extends Component<Props> {
 				this.lastPosition = { ...this.lastPosition, ...(data as object) };
 				this.viewer3d?.setBitPosition(this.lastPosition);
 				this.viewerSvg?.setBitPosition(this.lastPosition);
-				this.viewer3d?.setToolpathRotationA(this.isRotaryFile ? (this.lastPosition.a ?? 0) : 0);
+				this.viewer3d?.setToolpathRotationA(
+					this.isRotaryFile ? (this.lastPosition.a ?? 0) : 0,
+				);
 			}),
 			pubsub.subscribe("theme:change", (_msg, theme) => {
 				this.previewThemeName = (theme as string) ?? null;
@@ -968,7 +1002,9 @@ class GcodeViewer extends Component<Props> {
 				const nextIsRotary = fileType === "ROTARY" || fileType === "FOUR_AXIS";
 				if (nextIsRotary !== this.isRotaryFile) {
 					this.isRotaryFile = nextIsRotary;
-					this.viewer3d?.setToolpathRotationA(this.isRotaryFile ? (this.lastPosition.a ?? 0) : 0);
+					this.viewer3d?.setToolpathRotationA(
+						this.isRotaryFile ? (this.lastPosition.a ?? 0) : 0,
+					);
 				}
 			}
 
@@ -986,7 +1022,9 @@ class GcodeViewer extends Component<Props> {
 					};
 					this.viewer3d?.setBitPosition(this.lastPosition);
 					this.viewerSvg?.setBitPosition(this.lastPosition);
-					this.viewer3d?.setToolpathRotationA(this.isRotaryFile ? (this.lastPosition.a ?? 0) : 0);
+					this.viewer3d?.setToolpathRotationA(
+						this.isRotaryFile ? (this.lastPosition.a ?? 0) : 0,
+					);
 				}
 			}
 
@@ -1033,7 +1071,8 @@ class GcodeViewer extends Component<Props> {
 				"widgets.visualizer.followToolDuringRuntime",
 				false,
 			);
-			const isRunning = _get(st, "controller.workflow.state") === WORKFLOW_STATE_RUNNING;
+			const isRunning =
+				_get(st, "controller.workflow.state") === WORKFLOW_STATE_RUNNING;
 			const shouldFollow = followSettingOn && isRunning;
 			if (shouldFollow !== this.lastCameraFollow) {
 				this.lastCameraFollow = shouldFollow;
@@ -1102,7 +1141,9 @@ class GcodeViewer extends Component<Props> {
 
 	cuttingToolVisible(): boolean {
 		const { objects, liteMode } = this.props.state;
-		return liteMode ? objects.cuttingTool.visibleLite : objects.cuttingTool.visible;
+		return liteMode
+			? objects.cuttingTool.visibleLite
+			: objects.cuttingTool.visible;
 	}
 
 	unsubscribe() {
@@ -1122,8 +1163,8 @@ class GcodeViewer extends Component<Props> {
 		const description = (
 			<div className={"flex flex-col gap-2"}>
 				<p>
-					Detected {invalidLines.length} invalid lines on file load. Your job may
-					not run correctly.
+					Detected {invalidLines.length} invalid lines on file load. Your job
+					may not run correctly.
 				</p>
 				<p>Sample invalid lines found include:</p>
 				<ol>
@@ -1149,7 +1190,11 @@ class GcodeViewer extends Component<Props> {
 		this.outlineRunning = true;
 
 		const vertices = this.getToolpathHull();
-		const settings = _get(reduxStore.getState(), "controller.settings.settings", {});
+		const settings = _get(
+			reduxStore.getState(),
+			"controller.settings.settings",
+			{},
+		);
 		const homingEnabled = _get(settings, "$22", "0") !== "0";
 		const zTravel = homingEnabled ? getZUpTravel(5) : 5;
 

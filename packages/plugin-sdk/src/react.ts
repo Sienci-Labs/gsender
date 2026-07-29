@@ -16,10 +16,7 @@ const useTopicSnapshot = <T>(topic: PluginBridgeTopic): T | undefined => {
 		[topic],
 	);
 
-	const getSnapshot = useCallback(
-		() => getTopicSnapshot<T>(topic),
-		[topic],
-	);
+	const getSnapshot = useCallback(() => getTopicSnapshot<T>(topic), [topic]);
 
 	return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 };

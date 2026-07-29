@@ -1,3 +1,4 @@
+import { usePostHog } from "@posthog/react";
 import Tooltip from "app/components/Tooltip";
 import {
 	BACK_LEFT,
@@ -26,6 +27,8 @@ export function RapidPositionButtons({ disabled = false }) {
 		return get(state, "controller.settings.settings.$27", 1);
 	});
 
+	const posthog = usePostHog();
+
 	const altColourClass = "stroke-robin-500";
 	const disabledColorClass = "stroke-gray-400";
 
@@ -42,6 +45,12 @@ export function RapidPositionButtons({ disabled = false }) {
 			Number(pullOff),
 		);
 		controller.command("gcode", gcode);
+		posthog?.capture("jog_to_corner", {
+			corner,
+			homing_direction: homingDirection,
+			homing_flag: homingFlag,
+			pull_off: Number(pullOff),
+		});
 	}
 
 	return (

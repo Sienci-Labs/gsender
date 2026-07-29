@@ -1,3 +1,4 @@
+import { usePostHog } from "@posthog/react";
 import { Widget } from "app/components/Widget";
 import { VISUALIZER_PRIMARY } from "app/constants";
 import controller from "app/lib/controller";
@@ -26,6 +27,8 @@ export type FileData = {
 };
 
 const FileControl = () => {
+	const posthog = usePostHog();
+
 	useEffect(() => {
 		if (isElectron()) {
 			(window as any).ipcRenderer.on(
@@ -107,6 +110,12 @@ const FileControl = () => {
 		);
 
 		reduxStore.dispatch(updateFileInfo({ path: file.path }));
+
+		posthog?.capture("file_uploaded", {
+			name: file.name,
+			size: file.size,
+			isRecentFile,
+		});
 	};
 
 	const handleRecentFileUpload = async (file: RecentFile) => {

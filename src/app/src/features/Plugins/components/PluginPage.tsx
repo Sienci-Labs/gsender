@@ -43,10 +43,7 @@ const PluginPage = () => {
 	);
 
 	return (
-		<Page
-			title={contribution?.label || plugin.name}
-			withGoBackButton
-		>
+		<Page title={contribution?.label || plugin.name} withGoBackButton>
 			<PluginPanel plugin={plugin} className="h-full" />
 		</Page>
 	);

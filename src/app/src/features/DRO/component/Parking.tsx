@@ -1,3 +1,4 @@
+import { usePostHog } from "@posthog/react";
 import Button from "app/components/Button";
 import Tooltip from "app/components/Tooltip";
 import {
@@ -43,6 +44,8 @@ export function Parking({
 		disabledRef.current = isDisabled;
 	}, [isDisabled]);
 
+	const posthog = usePostHog();
+
 	const shortcutIsDisabled = () => {
 		const isConnected = get(reduxStore.getState(), "connection.isConnected");
 		const activeState = get(
@@ -71,7 +74,7 @@ export function Parking({
 			isActive: true,
 			category: LOCATION_CATEGORY,
 			callback: () => {
-				if (disabledRef.current || shortcutIsDisabled()) goToParkLocation();
+				if (!disabledRef.current && !shortcutIsDisabled()) goToParkLocation();
 			},
 		},
 	};
@@ -92,7 +95,14 @@ export function Parking({
 				icon={<RiParkingFill className="w-4 h-4" />}
 				variant="alt"
 				size="responsive"
-				onClick={goToParkLocation}
+				onClick={() => {
+					goToParkLocation();
+					posthog?.capture("go_to_park_location", {
+						homing_enabled: homingEnabled,
+						is_connected: isConnected,
+						is_disabled: isDisabled,
+					});
+				}}
 				aria-label="Go to Park Location"
 			/>
 		</Tooltip>

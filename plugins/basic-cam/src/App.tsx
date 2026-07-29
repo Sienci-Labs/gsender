@@ -21,7 +21,13 @@ type NumberFieldProps = {
 	onChange: (value: number) => void;
 };
 
-const NumberField = ({ label, value, step, min, onChange }: NumberFieldProps) => (
+const NumberField = ({
+	label,
+	value,
+	step,
+	min,
+	onChange,
+}: NumberFieldProps) => (
 	<label className="mb-3 flex flex-col gap-1 text-sm">
 		{label}
 		<input
@@ -242,7 +248,9 @@ const App = () => {
 						/>
 					</div>
 
-					<h2 className="mt-0 mb-2 text-base font-semibold">Generated G-code</h2>
+					<h2 className="mt-0 mb-2 text-base font-semibold">
+						Generated G-code
+					</h2>
 					<pre className="max-h-80 overflow-auto rounded-lg bg-gray-100 p-4 text-xs dark:bg-gray-800">
 						{gcode}
 					</pre>

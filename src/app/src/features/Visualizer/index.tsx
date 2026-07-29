@@ -49,6 +49,7 @@ import debounce from "lodash/debounce";
 import get from "lodash/get";
 import includes from "lodash/includes";
 import { Crosshair, FrownIcon } from "lucide-react";
+import posthog from "posthog-js";
 import PropTypes from "prop-types";
 import pubsub from "pubsub-js";
 import { Component } from "react";
@@ -628,6 +629,12 @@ class Visualizer extends Component {
 				isFileLoaded,
 				enteringLiteMode: newLiteModeValue,
 				wasInEverythingMode,
+			});
+
+			posthog?.capture("lite_mode_toggled", {
+				isFileLoaded,
+				new_value: newLiteModeValue,
+				was_in_everything_mode: wasInEverythingMode,
 			});
 		},
 		lineWarning: {

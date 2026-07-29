@@ -1,9 +1,9 @@
 import { ToolTimeline } from "app/features/ATC/components/ToolTimeline/components/ToolTimeline.tsx";
 import type { ToolChange } from "app/features/ATC/components/ToolTimeline/components/types.ts";
 import { getToolpathColor } from "app/features/ATC/utils/ATCFunctions.ts";
+import { G1_PART } from "app/features/Visualizer/constants.ts";
 import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
 import controller from "app/lib/controller.ts";
-import { G1_PART } from "app/features/Visualizer/constants.ts";
 import { getVisualizerTheme } from "app/lib/getVisualizerTheme.ts";
 import type { RootState } from "app/store/redux";
 import get from "lodash/get";

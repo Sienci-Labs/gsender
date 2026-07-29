@@ -8,9 +8,7 @@ const OUTPUT_ROOT = path.join(REPO_ROOT, "dist", "gsender", "plugins");
 const PLUGIN_SDK_DIR = path.join(REPO_ROOT, "packages", "plugin-sdk");
 const PLUGIN_SDK_ENTRY = path.join(PLUGIN_SDK_DIR, "dist", "index.js");
 
-const DEFAULT_PLUGINS = (
-	process.env.GSENDER_DEFAULT_PLUGINS || "basic-cam"
-)
+const DEFAULT_PLUGINS = (process.env.GSENDER_DEFAULT_PLUGINS || "basic-cam")
 	.split(",")
 	.map((name) => name.trim())
 	.filter(Boolean);
