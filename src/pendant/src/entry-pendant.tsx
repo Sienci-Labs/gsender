@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import { Provider as ReduxProvider } from "react-redux";
 
 import { store as reduxStore } from "app/store/redux";
-import { sagaMiddleware, createRootSaga } from "app/store/redux/sagas";
+import { sagaMiddleware } from "app/store/redux/sagas";
 import controller from "app/lib/controller";
 import { FocusTrappingProvider } from "app/lib/focus-trapping";
 import { getHost } from "./electron-bridge";
@@ -12,7 +12,7 @@ import PendantShell from "./PendantShell";
 
 import "./index.css";
 
-sagaMiddleware.run(createRootSaga([pendantSagas]));
+sagaMiddleware.run(pendantSagas.initialize);
 
 async function bootstrap() {
 	// In Electron, getHost() returns the embedded server's host.

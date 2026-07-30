@@ -1,5 +1,5 @@
 import ConnectionWidget from "./ConnectionWidget";
-import { stopMachineMotion } from "app/features/Jogging/utils/Jogging";
+import { cancelJog } from "app/features/Jogging/utils/Jogging";
 import { useTypedSelector } from "app/hooks/useTypedSelector";
 import type { RootState } from "app/store/redux";
 import { useState, useEffect } from "react";
@@ -383,7 +383,7 @@ export default function PendantTopBar() {
 	};
 	const handleEStop = () => {
 		if (!isConnected) return;
-		stopMachineMotion(activeState, controllerType);
+		cancelJog(activeState, controllerType);
 	};
 
 	return (
