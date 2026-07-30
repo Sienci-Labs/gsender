@@ -1,7 +1,7 @@
 export function Placeholder() {
-    return (
-        <div>
-            <p>Placeholder</p>
-        </div>
-    );
+	return (
+		<div>
+			<p>Placeholder</p>
+		</div>
+	);
 }

@@ -1,68 +1,63 @@
-import { ReactNode, useEffect } from 'react';
-import { Provider as ReduxProvider } from 'react-redux';
-import { HashRouter } from 'react-router';
+import { ReactNode, useEffect } from "react";
+import { Provider as ReduxProvider } from "react-redux";
+import { HashRouter } from "react-router";
 
-import { store as reduxStore, RootState } from 'app/store/redux';
-import { sagaMiddleware, createRootSaga } from 'app/store/redux/sagas';
-import * as controllerSagas from 'app/store/redux/sagas/controllerSagas';
-import store from 'app/store';
-import * as user from 'app/lib/user';
-import controller from 'app/lib/controller';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import { FocusTrappingProvider } from 'app/lib/focus-trapping';
-import { Toaster } from 'app/components/shadcn/Sonner';
-import { ReactRoutes } from './react-routes';
-import { AccessibilitySettingsHandler } from './features/Helper/AccessibilitySettingsHandler';
+import { store as reduxStore, RootState } from "app/store/redux";
+import { sagaMiddleware, createRootSaga } from "app/store/redux/sagas";
+import * as controllerSagas from "app/store/redux/sagas/controllerSagas";
+import store from "app/store";
+import * as user from "app/lib/user";
+import controller from "app/lib/controller";
+import { useTypedSelector } from "app/hooks/useTypedSelector";
+import { FocusTrappingProvider } from "app/lib/focus-trapping";
+import { Toaster } from "app/components/shadcn/Sonner";
+import { ReactRoutes } from "./react-routes";
+import { AccessibilitySettingsHandler } from "./features/Helper/AccessibilitySettingsHandler";
 
 function FocusTrappingBridge({ children }: { children: ReactNode }) {
-    const focusTrapping = useTypedSelector(
-        (state: RootState) => state.preferences.accessibility.focusTrapping,
-    );
-    return (
-        <FocusTrappingProvider value={focusTrapping}>
-            {children}
-        </FocusTrappingProvider>
-    );
+	const focusTrapping = useTypedSelector(
+		(state: RootState) => state.preferences.accessibility.focusTrapping,
+	);
+	return (
+		<FocusTrappingProvider value={focusTrapping}>
+			{children}
+		</FocusTrappingProvider>
+	);
 }
 
 function App() {
-    useEffect(() => {
-        const token = store.get('session.token');
-        user.signin({ token }).then((result) => {
-            const { authenticated, token } = result as {
-                authenticated: boolean;
-                token: string;
-            };
+	useEffect(() => {
+		const token = store.get("session.token");
+		user.signin({ token }).then((result) => {
+			const { authenticated, token } = result as {
+				authenticated: boolean;
+				token: string;
+			};
 
-            if (!authenticated) return;
+			if (!authenticated) return;
 
-            const host = '';
-            const options = { query: 'token=' + token };
+			const host = "";
+			const options = { query: "token=" + token };
 
-            controller.connect(host, options);
-        });
+			controller.connect(host, options);
+		});
 
-        sagaMiddleware.run(createRootSaga([controllerSagas]));
-    }, []);
+		sagaMiddleware.run(createRootSaga([controllerSagas]));
+	}, []);
 
-    return (
-        <>
-            <ReduxProvider store={reduxStore}>
-                <FocusTrappingBridge>
-                    <AccessibilitySettingsHandler />
-                    <Toaster
-                        richColors
-                        closeButton
-                        theme="light"
-                        visibleToasts={5}
-                    />
-                    <HashRouter>
-                        <ReactRoutes />
-                    </HashRouter>
-                </FocusTrappingBridge>
-            </ReduxProvider>
-        </>
-    );
+	return (
+		<>
+			<ReduxProvider store={reduxStore}>
+				<FocusTrappingBridge>
+					<AccessibilitySettingsHandler />
+					<Toaster richColors closeButton theme="light" visibleToasts={5} />
+					<HashRouter>
+						<ReactRoutes />
+					</HashRouter>
+				</FocusTrappingBridge>
+			</ReduxProvider>
+		</>
+	);
 }
 
 export default App;

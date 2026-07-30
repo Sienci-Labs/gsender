@@ -1,89 +1,89 @@
-import { Widget } from 'app/components/Widget';
-import { Tabs } from 'app/components/Tabs';
-import Console from '../Console';
-import Probe from 'app/features/Probe';
-import Spindle from 'app/features/Spindle';
-import Coolant from '../Coolant';
-import Rotary from '../Rotary';
-import Macros from 'app/features/Macros';
-import { useWidgetState } from 'app/hooks/useWidgetState';
-import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-import { ATCWidget } from 'app/features/ATC';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import { RootState } from 'app/store/redux';
+import { Widget } from "app/components/Widget";
+import { Tabs } from "app/components/Tabs";
+import Console from "../Console";
+import Probe from "app/features/Probe";
+import Spindle from "app/features/Spindle";
+import Coolant from "../Coolant";
+import Rotary from "../Rotary";
+import Macros from "app/features/Macros";
+import { useWidgetState } from "app/hooks/useWidgetState";
+import { useWorkspaceState } from "app/hooks/useWorkspaceState";
+import { ATCWidget } from "app/features/ATC";
+import { useTypedSelector } from "app/hooks/useTypedSelector";
+import { RootState } from "app/store/redux";
 
 export interface TabItem {
-    label: string;
-    content: React.ComponentType<{ isActive: boolean }>;
+	label: string;
+	content: React.ComponentType<{ isActive: boolean }>;
 }
 
 const tabs = [
-    {
-        label: 'Probe',
-        content: Probe,
-    },
-    {
-        label: 'Macros',
-        content: Macros,
-    },
-    {
-        label: 'Spindle/Laser',
-        content: Spindle,
-    },
-    {
-        label: 'ATC',
-        content: ATCWidget,
-    },
-    {
-        label: 'Coolant',
-        content: Coolant,
-    },
-    {
-        label: 'Rotary',
-        content: Rotary,
-    },
-    {
-        label: 'Console',
-        content: Console,
-    },
+	{
+		label: "Probe",
+		content: Probe,
+	},
+	{
+		label: "Macros",
+		content: Macros,
+	},
+	{
+		label: "Spindle/Laser",
+		content: Spindle,
+	},
+	{
+		label: "ATC",
+		content: ATCWidget,
+	},
+	{
+		label: "Coolant",
+		content: Coolant,
+	},
+	{
+		label: "Rotary",
+		content: Rotary,
+	},
+	{
+		label: "Console",
+		content: Console,
+	},
 ];
 
 const Tools = () => {
-    const rotary = useWidgetState('rotary');
-    const { spindleFunctions, coolantFunctions, atcEnabled } =
-        useWorkspaceState();
-    const atcReport = useTypedSelector(
-        (state: RootState) => state.controller.settings.info?.NEWOPT?.ATC,
-    );
+	const rotary = useWidgetState("rotary");
+	const { spindleFunctions, coolantFunctions, atcEnabled } =
+		useWorkspaceState();
+	const atcReport = useTypedSelector(
+		(state: RootState) => state.controller.settings.info?.NEWOPT?.ATC,
+	);
 
-    const atcEnabledOrCompiled = atcEnabled || atcReport === '1';
+	const atcEnabledOrCompiled = atcEnabled || atcReport === "1";
 
-    const filteredTabs = tabs.filter((tab) => {
-        if (tab.label === 'Rotary' && !rotary.tab.show) {
-            return false;
-        }
+	const filteredTabs = tabs.filter((tab) => {
+		if (tab.label === "Rotary" && !rotary.tab.show) {
+			return false;
+		}
 
-        if (tab.label === 'Spindle/Laser' && !spindleFunctions) {
-            return false;
-        }
-        if (tab.label === 'ATC' && !atcEnabledOrCompiled) {
-            return false;
-        }
+		if (tab.label === "Spindle/Laser" && !spindleFunctions) {
+			return false;
+		}
+		if (tab.label === "ATC" && !atcEnabledOrCompiled) {
+			return false;
+		}
 
-        if (tab.label === 'Coolant' && !coolantFunctions) {
-            return false;
-        }
+		if (tab.label === "Coolant" && !coolantFunctions) {
+			return false;
+		}
 
-        return true;
-    });
+		return true;
+	});
 
-    return (
-        <Widget>
-            <Widget.Content>
-                <Tabs items={filteredTabs as TabItem[]} />
-            </Widget.Content>
-        </Widget>
-    );
+	return (
+		<Widget>
+			<Widget.Content>
+				<Tabs items={filteredTabs as TabItem[]} />
+			</Widget.Content>
+		</Widget>
+	);
 };
 
 export default Tools;

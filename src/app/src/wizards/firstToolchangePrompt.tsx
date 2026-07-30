@@ -20,10 +20,10 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
+import { Confirm } from "app/components/ConfirmationDialog/ConfirmationDialogLib";
 
 interface FirstToolchangePromptOptions {
-    comment: string;
+	comment: string;
 }
 
 /**
@@ -32,34 +32,32 @@ interface FirstToolchangePromptOptions {
  * @returns A promise that resolves if confirmed, rejects if closed
  */
 export const showFirstToolchangePrompt = ({
-    comment,
+	comment,
 }: FirstToolchangePromptOptions): Promise<boolean> => {
-    return new Promise((resolve) => {
-        const promptContent = (
-            <div>
-                <p>
-                    A toolchange command was detected at the start of your file.
-                </p>
-                <p>
-                    If you already have the correct tool installed, you only
-                    need to probe your initial tool. Otherwise, run the
-                    toolchange routine to install and set up your initial tool.
-                </p>
-                {comment && (
-                    <p>
-                        Comment: <b>{comment}</b>
-                    </p>
-                )}
-            </div>
-        );
+	return new Promise((resolve) => {
+		const promptContent = (
+			<div>
+				<p>A toolchange command was detected at the start of your file.</p>
+				<p>
+					If you already have the correct tool installed, you only need to probe
+					your initial tool. Otherwise, run the toolchange routine to install
+					and set up your initial tool.
+				</p>
+				{comment && (
+					<p>
+						Comment: <b>{comment}</b>
+					</p>
+				)}
+			</div>
+		);
 
-        Confirm({
-            title: 'First Tool Change Detected',
-            content: promptContent,
-            confirmLabel: 'Run Full Toolchange Routine',
-            cancelLabel: 'Only Probe Tool Length',
-            onConfirm: () => resolve(true),
-            onClose: () => resolve(false),
-        });
-    });
+		Confirm({
+			title: "First Tool Change Detected",
+			content: promptContent,
+			confirmLabel: "Run Full Toolchange Routine",
+			cancelLabel: "Only Probe Tool Length",
+			onConfirm: () => resolve(true),
+			onClose: () => resolve(false),
+		});
+	});
 };

@@ -1,52 +1,44 @@
-import { Link, useLocation } from 'react-router';
-import { IoSpeedometerOutline } from 'react-icons/io5';
-import { FaTasks } from 'react-icons/fa';
-import { RiToolsFill } from 'react-icons/ri';
-import { RxDashboard } from 'react-icons/rx';
+import { Link, useLocation } from "react-router";
+import { IoSpeedometerOutline } from "react-icons/io5";
+import { FaTasks } from "react-icons/fa";
+import { RiToolsFill } from "react-icons/ri";
+import { RxDashboard } from "react-icons/rx";
 export function BottomNavLink({ label, icon, href }) {
-    return (
-        <Link
-            to={href}
-            className="inline-flex flex-col items-center justify-center border-gray-300 border-x hover:bg-gray-50 "
-        >
-            <span className="w-5 h-5 mb-2 text-gray-500  group-hover:text-blue-600 text-2xl">
-                {icon}
-            </span>
-            <span className="text-sm text-gray-500  group-hover:text-blue-600">
-                {label}
-            </span>
-        </Link>
-    );
+	return (
+		<Link
+			to={href}
+			className="inline-flex flex-col items-center justify-center border-gray-300 border-x hover:bg-gray-50 "
+		>
+			<span className="w-5 h-5 mb-2 text-gray-500  group-hover:text-blue-600 text-2xl">
+				{icon}
+			</span>
+			<span className="text-sm text-gray-500  group-hover:text-blue-600">
+				{label}
+			</span>
+		</Link>
+	);
 }
 
 export function BottomNav() {
-    const { pathname } = useLocation();
-    if (pathname.includes('/remote/config')) return null;
+	const { pathname } = useLocation();
+	if (pathname.includes("/remote/config")) return null;
 
-    return (
-        <div className="sticky bottom-0 left-0 z-50 w-full h-16 bg-gray-100 border-t border-gray-400">
-            <div className="grid h-full max-w-lg grid-cols-4 mx-auto font-medium">
-                <BottomNavLink
-                    href="/remote/"
-                    label="Control"
-                    icon={<RxDashboard />}
-                />
-                <BottomNavLink
-                    href="/remote/workflow"
-                    label="Workflow"
-                    icon={<IoSpeedometerOutline />}
-                />
-                <BottomNavLink
-                    href="/remote/tools"
-                    label="Tools"
-                    icon={<RiToolsFill />}
-                />
-                <BottomNavLink
-                    href="/remote/info"
-                    label="Info"
-                    icon={<FaTasks />}
-                />
-            </div>
-        </div>
-    );
+	return (
+		<div className="sticky bottom-0 left-0 z-50 w-full h-16 bg-gray-100 border-t border-gray-400">
+			<div className="grid h-full max-w-lg grid-cols-4 mx-auto font-medium">
+				<BottomNavLink href="/remote/" label="Control" icon={<RxDashboard />} />
+				<BottomNavLink
+					href="/remote/workflow"
+					label="Workflow"
+					icon={<IoSpeedometerOutline />}
+				/>
+				<BottomNavLink
+					href="/remote/tools"
+					label="Tools"
+					icon={<RiToolsFill />}
+				/>
+				<BottomNavLink href="/remote/info" label="Info" icon={<FaTasks />} />
+			</div>
+		</div>
+	);
 }

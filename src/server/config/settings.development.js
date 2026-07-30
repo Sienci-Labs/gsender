@@ -21,54 +21,54 @@
  *
  */
 
-import os from 'os';
-import path from 'path';
+import os from "os";
+import path from "path";
 
 const maxAge = 0;
 
 // Resolve paths relative to where the binary is executed from
 // In dev: output/server-cli.js, so __dirname = /path/to/workspace/output
 const getAppPath = () => {
-    // __dirname will be /path/to/workspace/output
-    // app is at /path/to/workspace/output/app
-    return path.resolve(__dirname, 'app');
+	// __dirname will be /path/to/workspace/output
+	// app is at /path/to/workspace/output/app
+	return path.resolve(__dirname, "app");
 };
 
 // In dev, __dirname = output/ — pendant is built to dist/gsender/pendant/ by vite:build:pendant
-const getPendantPath = () => path.resolve(__dirname, '../dist/gsender/pendant');
+const getPendantPath = () => path.resolve(__dirname, "../dist/gsender/pendant");
 
 export default {
-    route: '/', // with trailing slash
-    assets: {
-        // Pendant is registered first so its more-specific /pendant route
-        // is checked before the catch-all desktop fallback.
-        pendant: {
-            routes: ['/pendant'],
-            path: getPendantPath(),
-            maxAge: maxAge
-        },
-        app: {
-            routes: [
-                '' // empty path
-            ],
-            // In development, app is in output/app
-            path: getAppPath(),
-            maxAge: maxAge
-        }
-    },
-    backend: {
-        enable: true,
-        host: 'localhost',
-        port: 80,
-        route: 'api/'
-    },
-    cluster: {
-        // note. node-inspector cannot debug child (forked) process
-        enable: false,
-        maxWorkers: os.cpus().length || 1
-    },
-    winston: {
-        // https://github.com/winstonjs/winston#logging-levels
-        level: 'debug'
-    }
+	route: "/", // with trailing slash
+	assets: {
+		// Pendant is registered first so its more-specific /pendant route
+		// is checked before the catch-all desktop fallback.
+		pendant: {
+			routes: ["/pendant"],
+			path: getPendantPath(),
+			maxAge: maxAge,
+		},
+		app: {
+			routes: [
+				"", // empty path
+			],
+			// In development, app is in output/app
+			path: getAppPath(),
+			maxAge: maxAge,
+		},
+	},
+	backend: {
+		enable: true,
+		host: "localhost",
+		port: 80,
+		route: "api/",
+	},
+	cluster: {
+		// note. node-inspector cannot debug child (forked) process
+		enable: false,
+		maxWorkers: os.cpus().length || 1,
+	},
+	winston: {
+		// https://github.com/winstonjs/winston#logging-levels
+		level: "debug",
+	},
 };

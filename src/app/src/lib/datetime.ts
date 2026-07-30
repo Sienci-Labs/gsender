@@ -21,89 +21,89 @@
  *
  */
 
-import moment from 'moment';
+import moment from "moment";
 
 // solution found here: https://stackoverflow.com/a/59948911
 export const convertMillisecondsToTimeStamp = (
-    milliseconds: number,
-    short = false,
+	milliseconds: number,
+	short = false,
 ): string => {
-    if (milliseconds >= 0) {
-        let seconds = milliseconds / 1000;
-        const hours = Math.floor(seconds / 3600);
-        seconds %= 3600; // seconds remaining after extracting hours
-        const minutes = Math.floor(seconds / 60);
-        seconds %= 60; // keep only seconds not extracted to minutes
-        seconds = Math.floor(seconds);
+	if (milliseconds >= 0) {
+		let seconds = milliseconds / 1000;
+		const hours = Math.floor(seconds / 3600);
+		seconds %= 3600; // seconds remaining after extracting hours
+		const minutes = Math.floor(seconds / 60);
+		seconds %= 60; // keep only seconds not extracted to minutes
+		seconds = Math.floor(seconds);
 
-        if (hours >= 24) {
-            const days = Math.floor(hours / 24);
-            const newHours = Math.floor(hours % 24); // get remaining hours
-            return `${String(days).padStart(2, '0')}d ${String(newHours).padStart(2, '0')}h`;
-        }
+		if (hours >= 24) {
+			const days = Math.floor(hours / 24);
+			const newHours = Math.floor(hours % 24); // get remaining hours
+			return `${String(days).padStart(2, "0")}d ${String(newHours).padStart(2, "0")}h`;
+		}
 
-        if (short) {
-            if (hours !== 0) {
-                return `${String(hours).padStart(2, '0')}hr ${String(minutes).padStart(2, '0')}m`;
-            } else if (minutes !== 0) {
-                return `${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
-            } else {
-                return `${String(seconds).padStart(2, '0')}s`;
-            }
-        }
+		if (short) {
+			if (hours !== 0) {
+				return `${String(hours).padStart(2, "0")}hr ${String(minutes).padStart(2, "0")}m`;
+			} else if (minutes !== 0) {
+				return `${String(minutes).padStart(2, "0")}m ${String(seconds).padStart(2, "0")}s`;
+			} else {
+				return `${String(seconds).padStart(2, "0")}s`;
+			}
+		}
 
-        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    }
+		return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+	}
 
-    return '-';
+	return "-";
 };
 
 export const convertSecondsToDHMS = (
-    seconds: number,
+	seconds: number,
 ): [number, number, number, number] => {
-    if (seconds >= 0) {
-        let hours = Math.floor(seconds / 3600);
-        seconds %= 3600; // seconds remaining after extracting hours
-        const minutes = Math.floor(seconds / 60);
-        seconds %= 60; // keep only seconds not extracted to minutes
-        seconds = Math.floor(seconds);
+	if (seconds >= 0) {
+		let hours = Math.floor(seconds / 3600);
+		seconds %= 3600; // seconds remaining after extracting hours
+		const minutes = Math.floor(seconds / 60);
+		seconds %= 60; // keep only seconds not extracted to minutes
+		seconds = Math.floor(seconds);
 
-        let days = 0;
-        if (hours >= 24) {
-            days = Math.floor(hours / 24);
-            hours = Math.floor(hours % 24); // get remaining hours
-        }
+		let days = 0;
+		if (hours >= 24) {
+			days = Math.floor(hours / 24);
+			hours = Math.floor(hours % 24); // get remaining hours
+		}
 
-        return [days, hours, minutes, seconds];
-    }
+		return [days, hours, minutes, seconds];
+	}
 
-    return [0, 0, 0, 0];
+	return [0, 0, 0, 0];
 };
 
 export const convertSecondsToTimeStamp = (
-    seconds: number,
-    startTime: number,
+	seconds: number,
+	startTime: number,
 ): string => {
-    if (startTime === 0 || seconds === undefined) {
-        return '-';
-    } else if (seconds <= 0) {
-        return 'Finishing Soon';
-    }
+	if (startTime === 0 || seconds === undefined) {
+		return "-";
+	} else if (seconds <= 0) {
+		return "Finishing Soon";
+	}
 
-    return convertMillisecondsToTimeStamp(seconds * 1000);
+	return convertMillisecondsToTimeStamp(seconds * 1000);
 };
 
 export const convertISOStringToDateAndTime = (
-    ISOString: string,
+	ISOString: string,
 ): Array<string> => {
-    const dateFromString = moment(ISOString);
+	const dateFromString = moment(ISOString);
 
-    if (!dateFromString.isValid()) {
-        return ['-', '-'];
-    }
+	if (!dateFromString.isValid()) {
+		return ["-", "-"];
+	}
 
-    const date = dateFromString.format('YYYY-MM-DD');
-    const time = dateFromString.format('HH:mm:ss');
+	const date = dateFromString.format("YYYY-MM-DD");
+	const time = dateFromString.format("HH:mm:ss");
 
-    return [date, time];
+	return [date, time];
 };

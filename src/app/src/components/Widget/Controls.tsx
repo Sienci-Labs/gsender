@@ -21,20 +21,20 @@
  *
  */
 
-import classNames from 'classnames';
-import { WidgetProps } from './definitions';
+import classNames from "classnames";
+import { WidgetProps } from "./definitions";
 
 const Controls: React.FC<WidgetProps> = ({ className, ...props }) => {
-    return (
-        <div
-            {...props}
-            className={classNames(
-                className,
-                'absolute top-0 right-0 cursor-auto w-auto bg-transparent' +
-                    'widget-controls',
-            )}
-        />
-    );
+	return (
+		<div
+			{...props}
+			className={classNames(
+				className,
+				"absolute top-0 right-0 cursor-auto w-auto bg-transparent" +
+					"widget-controls",
+			)}
+		/>
+	);
 };
 
 export default Controls;

@@ -1,47 +1,47 @@
-import { Link } from 'react-router';
-import { IconType } from 'react-icons';
+import { Link } from "react-router";
+import { IconType } from "react-icons";
 
-import { Card, CardTitle, CardDescription } from 'app/components/shadcn/Card';
+import { Card, CardTitle, CardDescription } from "app/components/shadcn/Card";
 
 type ToolCardProps = {
-    title: string;
-    description?: string;
-    icon?: IconType;
-    link?: string;
-    onClick?: () => void;
+	title: string;
+	description?: string;
+	icon?: IconType;
+	link?: string;
+	onClick?: () => void;
 };
 
 const ToolCard = ({
-    title,
-    description,
-    icon: Icon,
-    link,
-    onClick,
+	title,
+	description,
+	icon: Icon,
+	link,
+	onClick,
 }: ToolCardProps) => {
-    const CardContent = (
-        <Card
-            className="hover:bg-gray-300 bg-gray-100 cursor-pointer p-4 
+	const CardContent = (
+		<Card
+			className="hover:bg-gray-300 bg-gray-100 cursor-pointer p-4 
             flex flex-col items-center justify-between text-center gap-4
             transition-all duration-300 ease-in-out h-full dark:bg-surface-raised"
-            onClick={onClick}
-        >
-            <CardTitle className="dark:text-content-primary">{title}</CardTitle>
+			onClick={onClick}
+		>
+			<CardTitle className="dark:text-content-primary">{title}</CardTitle>
 
-            {description && (
-                <CardDescription className="text-sm text-gray-500">
-                    {description}
-                </CardDescription>
-            )}
+			{description && (
+				<CardDescription className="text-sm text-gray-500">
+					{description}
+				</CardDescription>
+			)}
 
-            {Icon && <Icon className="w-14 h-14 dark:text-content-primary" />}
-        </Card>
-    );
+			{Icon && <Icon className="w-14 h-14 dark:text-content-primary" />}
+		</Card>
+	);
 
-    if (link) {
-        return <Link to={link}>{CardContent}</Link>;
-    }
+	if (link) {
+		return <Link to={link}>{CardContent}</Link>;
+	}
 
-    return CardContent;
+	return CardContent;
 };
 
 export default ToolCard;

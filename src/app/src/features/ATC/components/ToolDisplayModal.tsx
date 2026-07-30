@@ -1,48 +1,44 @@
-import { Dialog, DialogContent } from 'app/components/shadcn/Dialog.tsx';
-import { DialogTitle } from '@radix-ui/react-dialog';
-import { ToolTable } from 'app/features/ATC/components/ToolTable.tsx';
-import Button from 'app/components/Button';
-import { Table2 } from 'lucide-react';
-import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
-import controller from 'app/lib/controller';
+import { Dialog, DialogContent } from "app/components/shadcn/Dialog.tsx";
+import { DialogTitle } from "@radix-ui/react-dialog";
+import { ToolTable } from "app/features/ATC/components/ToolTable.tsx";
+import Button from "app/components/Button";
+import { Table2 } from "lucide-react";
+import { useToolChange } from "app/features/ATC/utils/ToolChangeContext.tsx";
+import controller from "app/lib/controller";
 
 export function ToolDisplayModal() {
-    const { connected, setShowTable, showTable, tools, disabled } =
-        useToolChange();
-    function onOpenChange(isOpen) {
-        if (!connected) {
-            return;
-        }
+	const { connected, setShowTable, showTable, tools, disabled } =
+		useToolChange();
+	function onOpenChange(isOpen) {
+		if (!connected) {
+			return;
+		}
 
-        if (isOpen) {
-            controller.command('gcode', ['$#']);
-        }
+		if (isOpen) {
+			controller.command("gcode", ["$#"]);
+		}
 
-        setShowTable(!showTable);
-    }
+		setShowTable(!showTable);
+	}
 
-    return (
-        <Dialog open={showTable} onOpenChange={onOpenChange}>
-            <DialogTitle className="flex justify-end">
-                <Button
-                    onClick={onOpenChange}
-                    className="flex flex-row items-center gap-2 w-auto px-3"
-                    disabled={disabled}
-                    size="sm"
-                >
-                    <Table2 className="h-4 w-4" />
-                    Tools
-                </Button>
-            </DialogTitle>
-            <DialogContent className="overflow-hidden p-0 shadow-lg w-3/5 portrait:w-4/5">
-                <div className="flex flex-col bg-white dark:bg-surface-raised overflow-y-auto h-full p-4 gap-4">
-                    <ToolTable
-                        tools={tools}
-                        hideFunctions={false}
-                        disabled={disabled}
-                    />
-                </div>
-            </DialogContent>
-        </Dialog>
-    );
+	return (
+		<Dialog open={showTable} onOpenChange={onOpenChange}>
+			<DialogTitle className="flex justify-end">
+				<Button
+					onClick={onOpenChange}
+					className="flex flex-row items-center gap-2 w-auto px-3"
+					disabled={disabled}
+					size="sm"
+				>
+					<Table2 className="h-4 w-4" />
+					Tools
+				</Button>
+			</DialogTitle>
+			<DialogContent className="overflow-hidden p-0 shadow-lg w-3/5 portrait:w-4/5">
+				<div className="flex flex-col bg-white dark:bg-surface-raised overflow-y-auto h-full p-4 gap-4">
+					<ToolTable tools={tools} hideFunctions={false} disabled={disabled} />
+				</div>
+			</DialogContent>
+		</Dialog>
+	);
 }
