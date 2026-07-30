@@ -21,8 +21,6 @@
  *
  */
 
-import { Button } from "app/components/Button";
-
 import {
     Dialog,
     DialogContent,
@@ -41,6 +39,7 @@ import { PROBING_CATEGORY } from 'app/constants';
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { TOUCHPLATE_TYPE_3D } from 'app/lib/constants';
+import {useEffect, useRef, useState, useCallback} from "react";
 
 interface RunProbeProps {
 	state: State;

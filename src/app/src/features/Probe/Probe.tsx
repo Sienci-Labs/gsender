@@ -30,7 +30,7 @@ import {
     DropdownMenuTrigger,
 } from 'app/components/shadcn/Dropdown';
 
-import { METRIC_UNITS, PROBING_CATEGORY } from '../../constants';
+import { PROBING_CATEGORY } from '../../constants';
 import ProbeImage from './ProbeImage';
 import ProbeDiameter from './ProbeDiameter';
 import { Actions, State } from './definitions';
@@ -38,6 +38,8 @@ import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import Tooltip from 'app/components/Tooltip';
 import { TOUCHPLATE_TYPES } from 'app/lib/constants';
+import {useCallback, useEffect, useRef} from "react";
+import cx from 'classnames';
 
 type ProbeProps = {
 	state: State;
