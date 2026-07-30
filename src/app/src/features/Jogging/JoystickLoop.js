@@ -1,11 +1,10 @@
-import throttle from "lodash/throttle";
-import inRange from "lodash/inRange";
-import get from "lodash/get";
-import reduxStore from "app/store/redux";
-
-import gamepad, { checkButtonHold } from "app/lib/gamepad";
 import controller from "app/lib/controller";
-import { GRBLHAL } from "app/constants";
+import gamepad, { checkButtonHold } from "app/lib/gamepad";
+import reduxStore from "app/store/redux";
+import get from "lodash/get";
+import inRange from "lodash/inRange";
+import throttle from "lodash/throttle";
+import { GRBLHAL } from "../../constants";
 
 export const checkThumbsticskAreIdle = (axes, profile) => {
 	const deadZone =

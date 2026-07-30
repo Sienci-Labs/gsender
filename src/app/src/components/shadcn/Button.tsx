@@ -1,10 +1,9 @@
 // https://ui.shadcn.com/docs/components/button
 
-import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
-import { cva, VariantProps } from "class-variance-authority";
-
+import { cva, type VariantProps } from "class-variance-authority";
 import cx from "classnames";
+import * as React from "react";
 
 const buttonVariants = cva(
 	"inline-flex items-center justify-center whitespace-nowrap rounded-md text-base font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:bg-opacity-70 active:shadow-[inset_7px_4px_6px_0px_rgba(59,_130,_246,_0.1)]",
@@ -22,12 +21,12 @@ const buttonVariants = cva(
 				ghost: "hover:bg-accent hover:text-accent-foreground",
 				link: "text-primary underline-offset-4 hover:underline",
 				confirm:
-					"bg-blue-500 bg-opacity-20 border border-blue-500 text-blue-500 dark:text-content-primary active:bg-opacity-10",
+					"bg-blue-500 bg-opacity-20 border border-blue-500 text-blue-500 dark:text-white active:bg-opacity-10",
 				cancel:
 					"bg-none border border-blue-500 text-gray-800 dark:text-blue-500",
 			},
 			disabled: {
-				true: "bg-gray-300 border-gray-400 text-gray-500 dark:bg-surface-raised",
+				true: "bg-gray-300 border-gray-400 text-gray-500 dark:bg-dark",
 			},
 			size: {
 				mini: "h-6 rounded-md px-[5px] w-full text-xs",

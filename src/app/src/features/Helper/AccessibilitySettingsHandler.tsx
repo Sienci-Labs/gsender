@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
 import { useTypedSelector } from "app/hooks/useTypedSelector";
-import { RootState } from "app/store/redux";
+import type { RootState } from "app/store/redux";
+import type React from "react";
+import { useEffect } from "react";
 
 export const AccessibilitySettingsHandler: React.FC = () => {
 	const { focusRings } = useTypedSelector(

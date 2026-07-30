@@ -1,5 +1,5 @@
-import { FIRMWARE_TYPES, HOMING_LOCATIONS } from "../constants";
-import { BasicType } from "./general";
+import type { FIRMWARE_TYPES, HOMING_LOCATIONS } from "../constants";
+import type { BasicType } from "./general";
 
 // Types
 

@@ -1,4 +1,4 @@
-import { ForwardedRef } from "react";
+import type { ForwardedRef } from "react";
 
 export interface WidgetProps {
 	[key: string]: any;

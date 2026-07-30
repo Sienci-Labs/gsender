@@ -22,25 +22,24 @@
  */
 
 import events from "events";
-import Mousetrap from "mousetrap";
-import get from "lodash/get";
 import cloneDeep from "lodash/cloneDeep";
-
-import reduxStore from "app/store/redux";
+import get from "lodash/get";
+import Mousetrap from "mousetrap";
 import api from "../api";
 import { MACRO_CATEGORY } from "../constants";
-import log from "./log";
-import { preventDefault } from "./dom-events";
-import { modifierKeys } from "./constants";
-import store from "../store";
 import shuttleEvents from "../lib/shuttleEvents";
-import {
+import store from "../store";
+import reduxStore from "../store/redux";
+import { modifierKeys } from "./constants";
+import type {
 	CommandKey,
 	CommandKeys,
 	Macro,
 	Shortcut,
 	ShuttleEvent,
 } from "./definitions/shortcuts";
+import { preventDefault } from "./dom-events";
+import log from "./log";
 
 const STOP_CMD = "STOP_CONT_JOG";
 const MACRO = "MACRO";
@@ -109,7 +108,7 @@ class Combokeys extends events.EventEmitter {
 				log.debug(
 					`combokeys: keys=${keys} cmd=${cmd} payload=${JSON.stringify(payload)}`,
 				);
-				if (!!preventDefaultBool) {
+				if (preventDefaultBool) {
 					preventDefault(event);
 				}
 				if (category === MACRO_CATEGORY) {
@@ -139,14 +138,14 @@ class Combokeys extends events.EventEmitter {
 					log.debug(
 						`combokeys: keys=${keys} cmd=${STOP_CMD} payload=${JSON.stringify(payload)}`,
 					);
-					if (!!preventDefaultBool) {
+					if (preventDefaultBool) {
 						preventDefault(event);
 					}
 					this.emit(STOP_CMD, event, payload);
 				};
 
 				const modiferKeyCB = (e: Event) => {
-					if (!!preventDefaultBool) {
+					if (preventDefaultBool) {
 						preventDefault(e);
 					}
 

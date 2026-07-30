@@ -1,22 +1,21 @@
-import React from "react";
-
 import { RadioGroup, RadioGroupItem } from "app/components/shadcn/RadioGroup";
 import { Switch } from "app/components/shadcn/Switch";
 import { Tooltip } from "app/components/Tooltip";
-import SpiralIcon from "../SVG/Spiral";
-import ZigZagIcon from "../SVG/ZigZag";
 import {
 	SPIRAL_MOVEMENT,
-	ZIG_ZAG_MOVEMENT,
 	START_POSITION_BACK_LEFT,
 	START_POSITION_BACK_RIGHT,
+	START_POSITION_CENTER,
 	START_POSITION_FRONT_LEFT,
 	START_POSITION_FRONT_RIGHT,
-	START_POSITION_CENTER,
+	ZIG_ZAG_MOVEMENT,
 } from "app/constants";
-
-import { Surfacing } from "../definitions";
 import { cx } from "class-variance-authority";
+import type React from "react";
+import type { Surfacing } from "../definitions";
+import SpiralIcon from "../SVG/Spiral";
+import ZigZagIcon from "../SVG/ZigZag";
+
 // import { Label } from 'app/components/shadcn/Label';
 
 interface Props {
@@ -127,7 +126,7 @@ const MachinePosition: React.FC<Props> = ({ surfacing, setSurfacing }) => {
 				</div>
 
 				<div className="flex mt-1 justify-between items-center">
-					<span className="leading-[1.3] font-light text-sm max-w-20 dark:text-content-primary">
+					<span className="leading-[1.3] font-light text-sm max-w-20 dark:text-white">
 						Flip Cut Direction
 					</span>
 					<Switch

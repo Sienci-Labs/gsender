@@ -1,7 +1,7 @@
 import { PinIndicator } from "app/features/MachineInfo/PinRow.tsx";
+import type { RootState } from "app/store/redux";
 import get from "lodash/get";
 import { useSelector } from "react-redux";
-import { RootState } from "app/store/redux";
 
 export function ProbePinStatus() {
 	const status = useSelector(
@@ -12,7 +12,7 @@ export function ProbePinStatus() {
 
 	return (
 		<div className="flex flex-row items-center gap-2">
-			<span className="dark:text-content-primary">Probe/TLS:</span>
+			<span className="dark:text-white">Probe/TLS:</span>
 			<PinIndicator on={probeOn} />
 		</div>
 	);

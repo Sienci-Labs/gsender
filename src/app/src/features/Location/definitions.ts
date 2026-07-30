@@ -1,5 +1,5 @@
-import { Shuttle } from "definitions/general";
-import { JogSpeed } from "../Jogging/definitions";
+import type { Shuttle } from "definitions/general";
+import type { JogSpeed } from "../Jogging/definitions";
 
 export interface Location {
 	minimized: boolean;

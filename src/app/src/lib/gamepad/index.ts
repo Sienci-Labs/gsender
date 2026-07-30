@@ -1,13 +1,17 @@
+import type { ShuttleEvent } from "app/lib/definitions/shortcuts";
+import GamepadListener from "app/lib/gamepad/gamepad.js/GamepadListener";
+
+import store from "app/store";
 import debounce from "lodash/debounce";
 import throttle from "lodash/throttle";
 
-import store from "app/store";
-import GamepadListener from "app/lib/gamepad/gamepad.js/GamepadListener";
-import { ShuttleEvent } from "app/lib/definitions/shortcuts";
-
 import shuttleEvents from "../shuttleEvents";
 import { toast } from "../toaster";
-import { GamepadConfig, GamepadDetail, GamepadProfile } from "./definitions";
+import type {
+	GamepadConfig,
+	GamepadDetail,
+	GamepadProfile,
+} from "./definitions";
 
 const macroCallbackDebounce = debounce(
 	(action: string) =>
@@ -306,7 +310,7 @@ class GamepadManager {
 		const instance = new Gamepad();
 
 		// Store references to the listeners so we can remove them later
-		this.connectedListener = ({ detail }: GamepadDetail) => {
+		GamepadManager.connectedListener = ({ detail }: GamepadDetail) => {
 			const { gamepad } = detail;
 
 			const profiles: GamepadProfile[] = store.get(
@@ -325,17 +329,17 @@ class GamepadManager {
 			toast.info(toastMessage, { position: "bottom-right" });
 		};
 
-		this.disconnectedListener = () => {
+		GamepadManager.disconnectedListener = () => {
 			toast.info("Gamepad disconnected", { position: "bottom-right" });
 		};
 
-		this.buttonListener = (event: GamepadDetail) => {
+		GamepadManager.buttonListener = (event: GamepadDetail) => {
 			runAction({ event });
 		};
 
-		instance.on("gamepad:connected", this.connectedListener);
-		instance.on("gamepad:disconnected", this.disconnectedListener);
-		instance.on("gamepad:button", this.buttonListener);
+		instance.on("gamepad:connected", GamepadManager.connectedListener);
+		instance.on("gamepad:disconnected", GamepadManager.disconnectedListener);
+		instance.on("gamepad:button", GamepadManager.buttonListener);
 
 		if (instance instanceof Gamepad) {
 			GamepadManager.instance = instance;
@@ -350,20 +354,23 @@ class GamepadManager {
 			if (GamepadManager.instance instanceof Gamepad) {
 				GamepadManager.instance.off(
 					"gamepad:connected",
-					this.connectedListener,
+					GamepadManager.connectedListener,
 				);
 				GamepadManager.instance.off(
 					"gamepad:disconnected",
-					this.disconnectedListener,
+					GamepadManager.disconnectedListener,
 				);
-				GamepadManager.instance.off("gamepad:button", this.buttonListener);
+				GamepadManager.instance.off(
+					"gamepad:button",
+					GamepadManager.buttonListener,
+				);
 			}
 			GamepadManager.instance = null;
 		}
 	}
 
 	static getInstance() {
-		return GamepadManager.instance || this.initialize();
+		return GamepadManager.instance || GamepadManager.initialize();
 	}
 }
 

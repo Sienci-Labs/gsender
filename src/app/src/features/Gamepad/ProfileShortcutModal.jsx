@@ -1,10 +1,3 @@
-import React, { useEffect, useState, useRef } from "react";
-import PropTypes from "prop-types";
-import _ from "lodash";
-
-import { Toaster, TOASTER_SUCCESS } from "app/lib/toaster/ToasterLib";
-import store from "app/store";
-import gamepad, { shortcutComboBuilder } from "app/lib/gamepad";
 import { Button } from "app/components/Button";
 import {
 	Dialog,
@@ -12,9 +5,14 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "app/components/shadcn/Dialog";
-import shuttleEvents from "app/lib/shuttleEvents";
-
 import { Input } from "app/components/shadcn/Input";
+import gamepad, { shortcutComboBuilder } from "app/lib/gamepad";
+import shuttleEvents from "app/lib/shuttleEvents";
+import { TOASTER_SUCCESS, Toaster } from "app/lib/toaster/ToasterLib";
+import store from "app/store";
+import _ from "lodash";
+import PropTypes from "prop-types";
+import React, { useEffect, useRef, useState } from "react";
 
 import { AVAILABILITY_TYPES } from "../utils";
 import Availability from "./Availability";
@@ -103,7 +101,7 @@ const ProfileShortcutModal = ({
 			shortcutName ||
 			gamepadShortcut.map((shortcut) => shortcut.buttonIndex).join(", ");
 
-		let newShortcuts = _.cloneDeep(profile.shortcuts);
+		const newShortcuts = _.cloneDeep(profile.shortcuts);
 		newShortcuts[shortcut.cmd].keys = newKeys;
 		newShortcuts[shortcut.cmd].keysName = newKeysName;
 		newShortcuts[shortcut.cmd].isActive = true;

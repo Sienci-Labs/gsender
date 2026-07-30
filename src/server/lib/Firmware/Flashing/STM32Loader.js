@@ -39,7 +39,7 @@ export class STM32Loader {
 			this.size += data.length;
 		}
 		if (this._reading && this._reading.size <= this.size) {
-			let { resolve, size } = this._reading;
+			const { resolve, size } = this._reading;
 			this._reading = undefined;
 			data =
 				this.buffer.length > 1 ? Buffer.concat(this.buffer) : this.buffer[0];
@@ -64,7 +64,7 @@ export class STM32Loader {
 	}
 
 	async waitForAck(timeout) {
-		let data = await this.read(1);
+		const data = await this.read(1);
 		if (data[0] !== 0x79) {
 			throw new Error("nack");
 		} else {

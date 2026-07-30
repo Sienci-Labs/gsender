@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import GamepadManager from "../gamepad";
-import { GamepadDetail } from "../gamepad/definitions";
+import type { GamepadDetail } from "../gamepad/definitions";
 
 export const useGamepadListener = ({
 	profile,

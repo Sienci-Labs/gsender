@@ -21,34 +21,36 @@
  *
  */
 
-import dns from "dns";
-import fs from "fs";
-import os from "os";
-import path from "path";
-import url from "url";
 import bcrypt from "bcrypt-nodejs";
 import chalk from "chalk";
+import dns from "dns";
 import ensureArray from "ensure-array";
 import expandTilde from "expand-tilde";
 import express from "express";
+import fs from "fs";
 import httpProxy from "http-proxy";
 import escapeRegExp from "lodash/escapeRegExp";
+import get from "lodash/get";
 import isEqual from "lodash/isEqual";
 import set from "lodash/set";
-import get from "lodash/get";
 import size from "lodash/size";
 import trimEnd from "lodash/trimEnd";
 import uniqWith from "lodash/uniqWith";
+import os from "os";
+import path from "path";
+import url from "url";
 import webappengine from "webappengine";
-
-import settings from "./config/settings";
 import app from "./app";
-import cncengine from "./services/cncengine";
-import monitor from "./services/monitor";
-import config from "./services/configstore";
+import settings from "./config/settings";
 import { ensureString } from "./lib/ensure-type";
 import logger, { setLevel } from "./lib/logger";
 import urljoin from "./lib/urljoin";
+import cncengine from "./services/cncengine";
+import config, { validateAndRepairConfigFile } from "./services/configstore";
+import errorConfig from "./services/configstore/alarmStore";
+import jobConfig from "./services/configstore/jobStore";
+import monitor from "./services/monitor";
+import pluginRegistry from "./services/pluginregistry";
 
 const log = logger("init");
 
@@ -75,26 +77,32 @@ const createServer = (options, callback) => {
 	}
 
 	const rcfile = path.resolve(options.configFile || settings.rcfile);
+	const errorFile = path.resolve(options.errorFile || settings.errorFile);
+	const jobFile = path.resolve(options.jobFile || settings.jobFile);
+
+	// Safeguard: if the config file is corrupted (unparseable), back it up and
+	// reset it to defaults before loading so startup can't crash on bad JSON.
+	const configRecovery = validateAndRepairConfigFile(rcfile);
 
 	// configstore service
 	log.info(
 		`Loading configuration from ${chalk.yellow(JSON.stringify(rcfile))}`,
 	);
+
+	errorConfig.load(rcfile, errorFile);
+	jobConfig.load(rcfile, jobFile);
 	config.load(rcfile);
 
 	// rcfile
 	settings.rcfile = rcfile;
-
-	{
-		// secret
-		if (!config.get("secret")) {
-			// generate a secret key
-			const secret = bcrypt.genSaltSync(); // TODO: use a strong secret
-			config.set("secret", secret);
-		}
-
-		settings.secret = config.get("secret", settings.secret);
+	// secret
+	if (!config.get("secret")) {
+		// generate a secret key
+		const secret = bcrypt.genSaltSync(); // TODO: use a strong secret
+		config.set("secret", secret);
 	}
+
+	settings.secret = config.get("secret", settings.secret);
 
 	{
 		// watchDirectory
@@ -178,10 +186,11 @@ const createServer = (options, callback) => {
 		[
 			...ensureArray(options.mountPoints),
 			...ensureArray(config.get("mountPoints")),
+			...pluginRegistry.getMountPointsFromPlugins(),
 		],
 		isEqual,
 	).filter((mount) => {
-		if (!mount || !mount.route || mount.route === "/") {
+		if (!mount?.route || mount.route === "/") {
 			log.error(
 				`Must specify a valid route path ${JSON.stringify(mount.route)}.`,
 			);
@@ -335,6 +344,16 @@ const createServer = (options, callback) => {
 				options.controller || config.get("controller", ""),
 			);
 
+			// Dev-only: live-reload plugin iframes when their files change.
+			if (process.env.NODE_ENV === "development") {
+				pluginRegistry.watchPlugins(({ dir, filename }) => {
+					log.info(
+						`Plugin change detected in ${dir}${filename ? ` (${filename})` : ""}; notifying clients`,
+					);
+					cncengine.emit("plugins:changed", { dir, filename });
+				});
+			}
+
 			const address = server.address().address;
 			const port = server.address().port;
 
@@ -343,6 +362,8 @@ const createServer = (options, callback) => {
 					address,
 					port,
 					mountPoints,
+					configRestored: configRecovery.restored,
+					configBackupPath: configRecovery.backupPath,
 				});
 
 			if (address !== "0.0.0.0") {
@@ -369,7 +390,7 @@ const createServer = (options, callback) => {
 		.on("error", (err) => {
 			log.error(err);
 			log.error(err.name);
-			let errData = {};
+			const errData = {};
 			// Handle invalid IP by disabling remote mode until enabled again and signaling error
 			if (
 				err.message.includes("address not available") ||

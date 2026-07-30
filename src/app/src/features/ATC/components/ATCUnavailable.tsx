@@ -1,4 +1,4 @@
-import { ATCUnavailablePayload } from "app/features/ATC/definitions";
+import type { ATCUnavailablePayload } from "app/features/ATC/definitions";
 
 export function ATCUnavailable({
 	payload,
@@ -14,17 +14,13 @@ export function ATCUnavailable({
 			}
 		>
 			<div>
-				<p className="text-gray-500 dark:text-content-muted text-sm">
-					ATC Unavailable
-				</p>
-				<h1 className="text-xl font-bold dark:text-content-primary">{title}</h1>
+				<p className="text-gray-500 text-sm">ATC Unavailable</p>
+				<h1 className="text-xl font-bold dark:text-white">{title}</h1>
 			</div>
-			<p className="dark:text-gray-200">{message}</p>
+			<p className="dark:text-white">{message}</p>
 
 			{additionalInfo && (
-				<p className="text-gray-500 dark:text-content-muted text-sm">
-					{additionalInfo}
-				</p>
+				<p className="text-gray-500 text-sm">{additionalInfo}</p>
 			)}
 		</div>
 	);

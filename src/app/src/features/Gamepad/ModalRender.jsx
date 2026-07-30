@@ -1,9 +1,9 @@
 import React, { useContext } from "react";
+import HelpModal from "./HelpModal";
+import ProfileModal from "./ProfileModal";
+import SetShortcut from "./SetShortcut";
 import { GAMEPAD_MODAL } from "./utils/constants";
 import { GamepadContext } from "./utils/context";
-import ProfileModal from "./ProfileModal";
-import HelpModal from "./HelpModal";
-import SetShortcut from "./SetShortcut";
 
 const ModalRender = () => {
 	const {

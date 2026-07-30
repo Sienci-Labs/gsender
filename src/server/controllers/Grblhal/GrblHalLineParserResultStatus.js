@@ -41,7 +41,7 @@ class GrblHalLineParserResultStatus {
 		const payload = {};
 		//const pattern = /[a-zA-Z]+(:[0-9\.\-]+(,[0-9\.\-]+){0,5})?/g;
 		//const pattern = /[a-zA-Z]+(:[a-zA-Z0-9\.\-]+(,[0-9\.\-[a]+){0,5})?/g;
-		const pattern = /[a-zA-Z]+(:[a-zA-Z0-9\.\-]+(,[0-9\.\-[a-zA-Z]+){0,5})?/g;
+		const pattern = /[a-zA-Z]+(:[a-zA-Z0-9.-]+(,[0-9.\-[a-zA-Z]+){0,5})?/g;
 		const params = r[1].match(pattern);
 		const result = {};
 
@@ -61,11 +61,11 @@ class GrblHalLineParserResultStatus {
 			payload.subState = Number(states[1] || "");
 		}
 
-		for (let param of params) {
+		for (const param of params) {
 			const nv = param.match(/^(.+):(.+)/);
 			if (nv) {
-				let type = nv[1];
-				let value = nv[2].split(",");
+				const type = nv[1];
+				const value = nv[2].split(",");
 				result[type] = value;
 			}
 		}

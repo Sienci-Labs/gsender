@@ -140,7 +140,7 @@ export const GRBL_HAL_ERRORS = [
 	{
 		code: 3,
 		message: "Invalid statement",
-		description: "Grbl \$' system command was not recognized or supported.",
+		description: "Grbl $' system command was not recognized or supported.",
 	},
 	{
 		code: 4,

@@ -21,51 +21,49 @@
  *
  */
 
-import React, { useState } from "react";
-import { PiFileZipFill } from "react-icons/pi";
-import isEmpty from "lodash/isEmpty";
-import get from "lodash/get";
-import { resolveGrblCoreDefaults } from "app/features/Config/utils/grblCoreMigration.ts";
-import partition from "lodash/partition";
-import uniqueId from "lodash/uniqueId";
-import isEqual from "lodash/isEqual";
 import {
-	pdf,
-	Page,
-	View,
-	Text,
-	Link,
 	Document,
+	Link,
+	Page,
+	pdf,
 	StyleSheet,
+	Text,
+	View,
 } from "@react-pdf/renderer";
-import saveAs from "file-saver";
-import JSZip from "jszip";
-
 import { Button } from "app/components/Button";
-import { toast } from "app/lib/toaster";
 import { AlarmsErrors } from "app/definitions/alarms_errors";
 import { EEPROMSettings, MachineProfile } from "app/definitions/firmware";
 import { UNITS_EN } from "app/definitions/general";
+import { resolveGrblCoreDefaults } from "app/features/Config/utils/grblCoreMigration.ts";
 import { JogSpeeds } from "app/features/Jogging/definitions";
 import { SPINDLE_LASER_T } from "app/features/Spindle/definitions";
+import controllerInstance from "app/lib/controller";
+import { toast } from "app/lib/toaster";
 import {
 	ConnectionState,
 	ControllerState,
 	FileInfoState,
 } from "app/store/definitions";
-import controllerInstance from "app/lib/controller";
-
-import store from "../store";
-import { store as reduxStore } from "app/store/redux";
+import saveAs from "file-saver";
+import JSZip from "jszip";
+import get from "lodash/get";
+import isEmpty from "lodash/isEmpty";
+import isEqual from "lodash/isEqual";
+import partition from "lodash/partition";
+import uniqueId from "lodash/uniqueId";
+import React, { useState } from "react";
+import { PiFileZipFill } from "react-icons/pi";
 import pkg from "../../package.json";
+import api from "../api";
 import {
 	GRBLHAL,
 	LASER_MODE,
 	METRIC_UNITS,
 	WORKSPACE_MODE,
 } from "../constants";
-import api from "../api";
 import { homingString } from "../lib/eeprom";
+import store from "../store";
+import { store as reduxStore } from "../store/redux";
 
 const styles = StyleSheet.create({
 	// Page layout
@@ -435,12 +433,18 @@ const isEEPROMValueDifferent = (
 		"controller.settings.version.semver",
 		undefined,
 	);
+	const boardId = get(
+		reduxStore.getState(),
+		"controller.settings.info.BOARD",
+		undefined,
+	);
 	const profileDefaults =
 		controllerType === "Grbl"
 			? machineProfile.eepromSettings
 			: resolveGrblCoreDefaults({
 					firmwareSemver,
 					baseDefaults: machineProfile.grblHALeepromSettings || {},
+					boardId,
 				}).defaults;
 
 	if (!profileDefaults) {
@@ -479,12 +483,18 @@ const createTableRows = (
 			"controller.settings.version.semver",
 			undefined,
 		);
+		const boardId = get(
+			reduxStore.getState(),
+			"controller.settings.info.BOARD",
+			undefined,
+		);
 		const profileDefaults =
 			controllerType === "Grbl"
 				? machineProfile.eepromSettings
 				: resolveGrblCoreDefaults({
 						firmwareSemver,
 						baseDefaults: machineProfile.grblHALeepromSettings || {},
+						boardId,
 					}).defaults;
 		const defaultValue = get(profileDefaults, key, "-");
 

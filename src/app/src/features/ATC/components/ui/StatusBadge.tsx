@@ -1,10 +1,10 @@
+import type { ToolStatus } from "app/features/ATC/components/ToolTable.tsx";
 import { Badge } from "app/features/ATC/components/ui/Badge";
-import { ToolStatus } from "app/features/ATC/components/ToolTable.tsx";
-import cn from "classnames";
 import {
 	getToolStateClasses,
 	toolStateThemes,
 } from "app/features/ATC/utils/ATCiConstants.ts";
+import cn from "classnames";
 
 export const StatusBadge = ({ status }: { status: ToolStatus }) => {
 	const config = toolStateThemes[status];

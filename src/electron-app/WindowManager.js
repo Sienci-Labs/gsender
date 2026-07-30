@@ -27,8 +27,8 @@ import {
 	BrowserWindow,
 	dialog,
 	ipcMain,
-	shell,
 	nativeImage,
+	shell,
 } from "electron";
 import path from "path";
 
@@ -114,9 +114,8 @@ class WindowManager {
 		const webContents = window.webContents;
 		// Enable remote API
 		remoteMain.enable(window.webContents);
-
 		// Show or hide window toolbar
-		// window.removeMenu();
+		window.removeMenu();
 		window.webContents.once("did-finish-load", () => {
 			window.setTitle(options.title);
 		});

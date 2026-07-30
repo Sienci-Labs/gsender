@@ -22,15 +22,13 @@
  */
 
 /* eslint prefer-arrow-callback: 0 */
-const promisify = (
-	fn: Function,
-	options: { errorFirst: boolean; thisArg: any },
-) =>
-	function (...args: Array<any>): Promise<any> {
+const promisify =
+	(fn: Function, options: { errorFirst: boolean; thisArg: any }) =>
+	(...args: Array<any>): Promise<any> => {
 		const { errorFirst = true, thisArg } = { ...options };
 
 		return new Promise((resolve, reject) => {
-			args.push(function (...results: Array<any>) {
+			args.push((...results: Array<any>) => {
 				if (errorFirst) {
 					const err = results.shift();
 					if (err) {

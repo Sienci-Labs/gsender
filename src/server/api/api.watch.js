@@ -21,8 +21,8 @@
  *
  */
 
+import { ERR_INTERNAL_SERVER_ERROR, ERR_NOT_FOUND } from "../constants";
 import monitor from "../services/monitor";
-import { ERR_NOT_FOUND, ERR_INTERNAL_SERVER_ERROR } from "../constants";
 
 export const getFiles = (req, res) => {
 	const path = req.body.path || req.query.path || "";

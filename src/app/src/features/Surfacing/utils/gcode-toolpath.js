@@ -644,7 +644,7 @@ class Toolpath {
 		// Modal
 		const nextModal = {};
 		Object.keys({ ...modal }).forEach((key) => {
-			if (!Object.prototype.hasOwnProperty.call(this.modal, key)) {
+			if (!Object.hasOwn(this.modal, key)) {
 				return;
 			}
 			nextModal[key] = modal[key];

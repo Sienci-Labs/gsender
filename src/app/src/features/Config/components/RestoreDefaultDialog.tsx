@@ -9,23 +9,23 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 } from "app/components/shadcn/AlertDialog.tsx";
-import { ActionButton } from "app/features/Config/components/ActionButton.tsx";
-import { GrRevert } from "react-icons/gr";
-import store from "app/store";
-import { useSelector } from "react-redux";
-import { RootState } from "app/store/redux";
-import machineProfiles from "app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts";
-import { toast } from "app/lib/toaster";
-import controller from "app/lib/controller";
-import { resolveGrblCoreDefaults } from "app/features/Config/utils/grblCoreMigration.ts";
-import { useSettings } from "app/features/Config/utils/SettingsContext.tsx";
-import { cn } from "app/lib/utils.ts";
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
 } from "app/components/shadcn/Tooltip.tsx";
+import machineProfiles from "app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts";
+import { ActionButton } from "app/features/Config/components/ActionButton.tsx";
+import { resolveGrblCoreDefaults } from "app/features/Config/utils/grblCoreMigration.ts";
+import { useSettings } from "app/features/Config/utils/SettingsContext.tsx";
+import controller from "app/lib/controller.ts";
+import { toast } from "app/lib/toaster";
+import { cn } from "app/lib/utils.ts";
+import store from "app/store";
+import { RootState } from "app/store/redux";
+import { GrRevert } from "react-icons/gr";
+import { useSelector } from "react-redux";
 
 function getMachineProfile(id: number) {
 	const profile = machineProfiles.find((profile) => profile.id === id);
@@ -35,7 +35,11 @@ function getMachineProfile(id: number) {
 	return profile;
 }
 
-function restoreEEPROMDefaults(type = "", firmwareSemver: number | undefined) {
+function restoreEEPROMDefaults(
+	type = "",
+	firmwareSemver: number | undefined,
+	boardId: string | undefined,
+) {
 	let eepromSettings = {};
 	let orderedSettings: Map<string, string> | undefined;
 
@@ -47,6 +51,7 @@ function restoreEEPROMDefaults(type = "", firmwareSemver: number | undefined) {
 			firmwareSemver,
 			baseDefaults: profile?.grblHALeepromSettings || {},
 			orderedSettings: profile?.orderedSettings,
+			boardId,
 		});
 		eepromSettings = resolved.defaults;
 		orderedSettings = resolved.ordered;
@@ -99,6 +104,9 @@ export function RestoreDefaultDialog({
 	const firmwareSemver = useSelector(
 		(state: RootState) => state.controller.settings.version?.semver,
 	);
+	const boardId = useSelector(
+		(state: RootState) => state.controller.settings.info?.BOARD,
+	);
 
 	const { profileChangedSinceDefaults, setProfileChangedSinceDefaults } =
 		useSettings();
@@ -138,7 +146,11 @@ export function RestoreDefaultDialog({
 									<AlertDialogCancel>No</AlertDialogCancel>
 									<AlertDialogAction
 										onClick={() => {
-											restoreEEPROMDefaults(controllerType, firmwareSemver);
+											restoreEEPROMDefaults(
+												controllerType,
+												firmwareSemver,
+												boardId,
+											);
 											setProfileChangedSinceDefaults(false);
 										}}
 									>

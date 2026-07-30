@@ -1,11 +1,11 @@
-import { useState } from "react";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-import { RootState } from "app/store/redux";
-import controller from "app/lib/controller";
 import { StepActionButton } from "app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx";
-import { StepProps } from "app/features/AccessoryInstaller/types";
-import { firmwarePastVersion } from "app/lib/firmwareSemver.ts";
+import type { StepProps } from "app/features/AccessoryInstaller/types";
 import { ATCI_SUPPORTED_VERSION } from "app/features/ATC/utils/ATCiConstants.ts";
+import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
+import controller from "app/lib/controller.ts";
+import { firmwarePastVersion } from "app/lib/firmwareSemver.ts";
+import type { RootState } from "app/store/redux";
+import { useState } from "react";
 
 export function ModbusConfig({ onComplete, onUncomplete }: StepProps) {
 	const [hasConfiguredModbus, setHasConfiguredModbus] =
@@ -36,13 +36,13 @@ export function ModbusConfig({ onComplete, onUncomplete }: StepProps) {
 
 	return (
 		<div className="flex flex-col gap-5 justify-start">
-			<p className="text-gray-900 dark:text-content-primary">
+			<p className="text-gray-900 dark:text-white">
 				<b>
 					You are able to complete this step while the controller is still
 					alarmed
 				</b>
 			</p>
-			<p className="dark:text-content-primary">
+			<p className="dark:text-white">
 				Additional spindle settings are applied in this step.
 			</p>
 			<ol className="list-decimal p-5 gap-4 space-y-2">

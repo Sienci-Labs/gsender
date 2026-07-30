@@ -1,4 +1,5 @@
-import React, { useContext } from "react";
+import type React from "react";
+import { useContext } from "react";
 import { WidgetConfigContext } from "./context";
 import { translateKey } from "./utils";
 import WidgetConfig from "./WidgetConfig";

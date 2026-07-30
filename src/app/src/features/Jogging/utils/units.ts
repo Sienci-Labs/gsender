@@ -1,5 +1,5 @@
 import { IMPERIAL_UNITS, METRIC_UNITS } from "app/constants";
-import { UNITS_EN } from "app/definitions/general";
+import type { UNITS_EN } from "app/definitions/general";
 
 const MM_TO_INCH = 1 / 25.4;
 const INCH_TO_MM = 25.4;

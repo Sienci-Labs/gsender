@@ -21,8 +21,6 @@
  *
  */
 
-import { useEffect, useState } from "react";
-import pubsub from "pubsub-js";
 import { useWizardAPI } from "app/features/Helper/context";
 import reduxStore from "app/store/redux";
 import {
@@ -30,8 +28,10 @@ import {
 	enableInfoHelper,
 	enableWizard,
 } from "app/store/redux/slices/helper.slice.ts";
-import Wizard from "./Wizard";
+import pubsub from "pubsub-js";
+import { useEffect, useState } from "react";
 import HelperInfo from "./HelperInfo";
+import Wizard from "./Wizard";
 
 const HelperWrapper = () => {
 	const { load, updateSubstepOverlay } = useWizardAPI();
@@ -41,8 +41,8 @@ const HelperWrapper = () => {
 	useEffect(() => {
 		const tokens = [
 			pubsub.subscribe("wizard:load", (_, payload) => {
-				const { instructions, title } = payload;
-				load(instructions, title);
+				const { instructions, title, context, comment } = payload;
+				load(instructions, title, { context, comment });
 				updateSubstepOverlay(
 					{ activeStep: 0, activeSubstep: 0 },
 					instructions.steps,

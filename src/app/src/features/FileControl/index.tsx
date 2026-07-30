@@ -1,23 +1,22 @@
-import { useEffect } from "react";
-import isElectron from "is-electron";
-
+import { usePostHog } from "@posthog/react";
 import { Widget } from "app/components/Widget";
-import { store as reduxStore } from "app/store/redux";
-import controller from "app/lib/controller";
 import { VISUALIZER_PRIMARY } from "app/constants";
+import controller from "app/lib/controller";
 import { uploadGcodeFileToServer } from "app/lib/fileupload";
-
-import ButtonControlGroup from "./ButtonControlGroup";
-import FileInformation from "./FileInformation";
+import { toast } from "app/lib/toaster";
+import { store as reduxStore } from "app/store/redux";
 import { updateFileInfo } from "app/store/redux/slices/fileInfo.slice";
+import isElectron from "is-electron";
+import { useEffect } from "react";
+import ButtonControlGroup from "./ButtonControlGroup";
+import type { RecentFile } from "./definitions";
+import FileInformation from "./FileInformation";
 import {
 	addRecentFile,
 	createRecentFileFromRawPath,
 	deleteRecentFile,
 	loadRecentFile,
 } from "./utils/recentfiles";
-import { toast } from "app/lib/toaster";
-import { RecentFile } from "./definitions";
 
 export type FileData = {
 	data: string;
@@ -28,6 +27,8 @@ export type FileData = {
 };
 
 const FileControl = () => {
+	const posthog = usePostHog();
+
 	useEffect(() => {
 		if (isElectron()) {
 			(window as any).ipcRenderer.on(
@@ -109,6 +110,12 @@ const FileControl = () => {
 		);
 
 		reduxStore.dispatch(updateFileInfo({ path: file.path }));
+
+		posthog?.capture("file_uploaded", {
+			name: file.name,
+			size: file.size,
+			isRecentFile,
+		});
 	};
 
 	const handleRecentFileUpload = async (file: RecentFile) => {

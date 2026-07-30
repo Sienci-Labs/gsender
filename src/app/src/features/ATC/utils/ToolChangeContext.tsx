@@ -1,13 +1,13 @@
-import React, { createContext, JSX, useEffect, useState } from "react";
+import type { ToolInstance } from "app/features/ATC/components/ToolTable.tsx";
 import {
-	LoadToolMode,
+	type LoadToolMode,
 	mapToolNicknamesAndStatus,
 } from "app/features/ATC/utils/ATCFunctions.ts";
-import { ToolInstance } from "app/features/ATC/components/ToolTable.tsx";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-import { RootState } from "app/store/redux";
+import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
+import type { RootState } from "app/store/redux";
 import get from "lodash/get";
 import pubsub from "pubsub-js";
+import React, { createContext, type JSX, useEffect, useState } from "react";
 
 export const ToolChangeContext = createContext<IToolChangeContext>({
 	mode: "load",

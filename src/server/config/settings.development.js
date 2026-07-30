@@ -34,19 +34,9 @@ const getAppPath = () => {
 	return path.resolve(__dirname, "app");
 };
 
-// In dev, __dirname = output/ — pendant is built to dist/gsender/pendant/ by vite:build:pendant
-const getPendantPath = () => path.resolve(__dirname, "../dist/gsender/pendant");
-
 export default {
 	route: "/", // with trailing slash
 	assets: {
-		// Pendant is registered first so its more-specific /pendant route
-		// is checked before the catch-all desktop fallback.
-		pendant: {
-			routes: ["/pendant"],
-			path: getPendantPath(),
-			maxAge: maxAge,
-		},
 		app: {
 			routes: [
 				"", // empty path

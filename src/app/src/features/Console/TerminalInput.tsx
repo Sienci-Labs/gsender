@@ -1,20 +1,19 @@
-import { useRef, useState } from "react";
-import { useDispatch } from "react-redux";
-import { LuCopy } from "react-icons/lu";
-import { LuPaintbrush } from "react-icons/lu";
-import { FaEllipsisH } from "react-icons/fa";
-
+import { usePostHog } from "@posthog/react";
 import { Button } from "app/components/Button";
 import { Input } from "app/components/shadcn/Input";
-import { addToInputHistory } from "app/store/redux/slices/console.slice";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-import controller from "app/lib/controller";
-import { toast } from "app/lib/toaster";
 import {
 	Popover,
 	PopoverContent,
 	PopoverTrigger,
 } from "app/components/shadcn/Popover";
+import { useTypedSelector } from "app/hooks/useTypedSelector";
+import controller from "app/lib/controller";
+import { toast } from "app/lib/toaster";
+import { addToInputHistory } from "app/store/redux/slices/console.slice";
+import { useRef, useState } from "react";
+import { FaEllipsisH } from "react-icons/fa";
+import { LuCopy, LuPaintbrush } from "react-icons/lu";
+import { useDispatch } from "react-redux";
 
 const COPY_HISTORY_LIMIT = 50;
 
@@ -27,6 +26,8 @@ const TerminalInput = ({ onClear }: Props) => {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const { inputHistory, history } = useTypedSelector((state) => state.console);
 	const [historyIndex, setHistoryIndex] = useState(-1);
+
+	const posthog = usePostHog();
 
 	const handleCommandExecute = () => {
 		const command = inputRef.current?.value;
@@ -41,6 +42,8 @@ const TerminalInput = ({ onClear }: Props) => {
 		dispatch(addToInputHistory(command));
 		setHistoryIndex(-1);
 		inputRef.current.value = "";
+
+		posthog?.capture("console_command_executed", { command });
 	};
 
 	const navigateHistory = (direction: "up" | "down") => {
@@ -81,6 +84,10 @@ const TerminalInput = ({ onClear }: Props) => {
 					position: "bottom-right",
 				},
 			);
+
+			posthog?.capture("console_history_copied", {
+				commands: lastCommands,
+			});
 		} catch (error) {
 			toast.error("Failed to copy commands to clipboard", {
 				duration: 3000,

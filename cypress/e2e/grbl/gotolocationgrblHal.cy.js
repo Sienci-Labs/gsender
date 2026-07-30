@@ -25,7 +25,7 @@ describe("CNC Machine Tests Grbl", () => {
 
 		cy.wait(2000);
 
-		// Step 3: Open Go To Location popup — selector confirmed from recording
+		// Step 3: Open Go To Location popup
 		cy.log("Step 3: Opening Go To Location popup...");
 		cy.get("div.min-h-10 > div:nth-of-type(1) > button", { timeout: 10000 })
 			.filter(":visible")

@@ -9,7 +9,7 @@ import {
 } from "app/components/shadcn/AlertDialog";
 import { Button } from "app/components/shadcn/Button";
 import { JOB_STATUS } from "app/constants";
-import { Job } from "app/features/Stats/utils/StatContext";
+import type { Job } from "app/features/Stats/utils/StatContext";
 import { convertMillisecondsToTimeStamp } from "app/lib/datetime";
 import cx from "classnames";
 import uniqueId from "lodash/uniqueId";

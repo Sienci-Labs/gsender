@@ -1,13 +1,7 @@
-import React, {
-	useCallback,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from "react";
-import { LongPressCallbackReason, useLongPress } from "use-long-press";
-
 import { cn } from "app/lib/utils";
+import type React from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { LongPressCallbackReason, useLongPress } from "use-long-press";
 
 export type LongPressButtonOptions = {
 	holdDurationMs: number;

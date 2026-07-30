@@ -1,29 +1,28 @@
 import {
-	useState,
-	useEffect,
-	useRef,
-	useImperativeHandle,
-	forwardRef,
-} from "react";
-import debounce from "lodash/debounce";
-import throttle from "lodash/throttle";
-import color from "cli-color";
-import reduxStore from "app/store/redux";
-import { useDispatch } from "react-redux";
-import uuidv4 from "uuid/v4";
-
+	TERMINAL_ALARM_RED,
+	TERMINAL_GREY,
+	TERMINAL_RED,
+	WORKSPACE_MODE,
+} from "app/constants";
 import controller, {
 	addControllerEvents,
 	removeControllerEvents,
 } from "app/lib/controller";
-import {
-	TERMINAL_GREY,
-	TERMINAL_RED,
-	TERMINAL_ALARM_RED,
-	WORKSPACE_MODE,
-} from "app/constants";
-import { addToHistory } from "app/store/redux/slices/console.slice";
 import store from "app/store";
+import reduxStore from "app/store/redux";
+import { addToHistory } from "app/store/redux/slices/console.slice";
+import color from "cli-color";
+import debounce from "lodash/debounce";
+import throttle from "lodash/throttle";
+import {
+	forwardRef,
+	useEffect,
+	useImperativeHandle,
+	useRef,
+	useState,
+} from "react";
+import { useDispatch } from "react-redux";
+import uuidv4 from "uuid/v4";
 
 import "@xterm/xterm/css/xterm.css";
 import { MAX_TERMINAL_INPUT_ARRAY_SIZE } from "app/lib/constants";

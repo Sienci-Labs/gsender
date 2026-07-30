@@ -1,14 +1,12 @@
-import cx from "classnames";
-import get from "lodash/get";
-import { IoLockClosedOutline } from "react-icons/io5";
-import { IoLockOpenOutline } from "react-icons/io5";
-
-import { RootState } from "app/store/redux";
+import Tooltip from "app/components/Tooltip";
 import { GRBL_ACTIVE_STATE_ALARM, GRBL_ACTIVE_STATE_HOLD } from "app/constants";
+import type { GRBL_ACTIVE_STATES_T } from "app/definitions/general";
 import { useTypedSelector } from "app/hooks/useTypedSelector";
 import controller from "app/lib/controller";
-import { GRBL_ACTIVE_STATES_T } from "app/definitions/general";
-import Tooltip from "app/components/Tooltip";
+import type { RootState } from "app/store/redux";
+import cx from "classnames";
+import get from "lodash/get";
+import { IoLockClosedOutline, IoLockOpenOutline } from "react-icons/io5";
 
 export function unlockFirmware(
 	state: GRBL_ACTIVE_STATES_T,

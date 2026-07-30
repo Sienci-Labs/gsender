@@ -22,7 +22,7 @@
  */
 
 /* eslint react/prop-types: 0 */
-import { ReactElement } from "react";
+import type { ReactElement } from "react";
 import i18n from "./i18n";
 
 export interface ValidationProps {
@@ -119,4 +119,4 @@ const password = (
 	return null;
 };
 
-export { required, password };
+export { password, required };

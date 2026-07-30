@@ -22,19 +22,19 @@
  */
 
 import _ from "lodash";
-import GrblLineParserResultStatus from "./GrblLineParserResultStatus";
-import GrblLineParserResultOk from "./GrblLineParserResultOk";
-import GrblLineParserResultError from "./GrblLineParserResultError";
 import GrblLineParserResultAlarm from "./GrblLineParserResultAlarm";
-import GrblLineParserResultParserState from "./GrblLineParserResultParserState";
-import GrblLineParserResultParameters from "./GrblLineParserResultParameters";
-import GrblLineParserResultHelp from "./GrblLineParserResultHelp";
-import GrblLineParserResultVersion from "./GrblLineParserResultVersion";
-import GrblLineParserResultOption from "./GrblLineParserResultOption";
 import GrblLineParserResultEcho from "./GrblLineParserResultEcho";
+import GrblLineParserResultError from "./GrblLineParserResultError";
 import GrblLineParserResultFeedback from "./GrblLineParserResultFeedback";
+import GrblLineParserResultHelp from "./GrblLineParserResultHelp";
+import GrblLineParserResultOk from "./GrblLineParserResultOk";
+import GrblLineParserResultOption from "./GrblLineParserResultOption";
+import GrblLineParserResultParameters from "./GrblLineParserResultParameters";
+import GrblLineParserResultParserState from "./GrblLineParserResultParserState";
 import GrblLineParserResultSettings from "./GrblLineParserResultSettings";
 import GrblLineParserResultStartup from "./GrblLineParserResultStartup";
+import GrblLineParserResultStatus from "./GrblLineParserResultStatus";
+import GrblLineParserResultVersion from "./GrblLineParserResultVersion";
 
 // Grbl v1.1
 // https://github.com/gnea/grbl/blob/edge/doc/markdown/interface.md
@@ -94,7 +94,7 @@ class GrblLineParser {
 			GrblLineParserResultStartup,
 		];
 
-		for (let parser of parsers) {
+		for (const parser of parsers) {
 			const result = parser.parse(line);
 			if (result) {
 				_.set(result, "payload.raw", line);

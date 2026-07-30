@@ -1,19 +1,19 @@
 import {
-	Job,
-	JobAggregate,
+	type Job,
+	type JobAggregate,
 	StatContext,
 } from "app/features/Stats/utils/StatContext.tsx";
+import { truncatePort } from "app/features/Stats/utils/statUtils.ts";
+import { ArcElement, Chart as ChartJS, Legend, Tooltip } from "chart.js";
 import { useContext } from "react";
 import { Pie } from "react-chartjs-2";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import { truncatePort } from "app/features/Stats/utils/statUtils.ts";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 function aggregatePortInfo(jobs: Job[]): [string[], number[]] {
 	const jobAggregate: JobAggregate = {};
 	jobs.forEach((job) => {
-		if (!jobAggregate.hasOwnProperty(job.port)) {
+		if (!Object.hasOwn(jobAggregate, job.port)) {
 			jobAggregate[job.port] = 1;
 			return;
 		}

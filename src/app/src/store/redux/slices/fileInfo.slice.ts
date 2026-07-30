@@ -1,14 +1,11 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-import { BBox } from "app/definitions/general";
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { METRIC_UNITS, RENDER_NO_FILE } from "app/constants";
-import { FileInfoState } from "app/store/definitions";
+import type { BBox } from "app/definitions/general";
+import type { FileInfoState } from "app/store/definitions";
 
 const initialState: FileInfoState = {
 	fileLoaded: false,
 	fileProcessing: false,
-	processingName: "",
-	processingProgress: 0,
 	renderState: RENDER_NO_FILE,
 	name: null,
 	path: "",
@@ -58,8 +55,6 @@ const fileInfoSlice = createSlice({
 				...action.payload,
 				fileLoaded: true,
 				fileProcessing: false,
-				processingName: "",
-				processingProgress: 0,
 				...bbox,
 			};
 		},
@@ -79,31 +74,9 @@ const fileInfoSlice = createSlice({
 		},
 		updateFileProcessing: (
 			state,
-			action: PayloadAction<
-				| boolean
-				| {
-						fileProcessing: boolean;
-						processingName?: string;
-						processingProgress?: number;
-				  }
-			>,
+			action: PayloadAction<{ fileProcessing: boolean }>,
 		) => {
-			const payload =
-				typeof action.payload === "boolean"
-					? { fileProcessing: action.payload }
-					: action.payload;
-
-			state.fileProcessing = payload.fileProcessing;
-
-			if (!payload.fileProcessing) {
-				state.processingName = "";
-				state.processingProgress = 0;
-				return;
-			}
-
-			state.processingName = payload.processingName ?? state.processingName;
-			state.processingProgress =
-				payload.processingProgress ?? state.processingProgress;
+			state.fileProcessing = action.payload.fileProcessing;
 		},
 		updateFileRenderState: (
 			state,

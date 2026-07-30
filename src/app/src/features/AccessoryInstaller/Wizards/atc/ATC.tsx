@@ -1,32 +1,32 @@
-import { Wizard } from "app/features/AccessoryInstaller/types";
 import { useValidations } from "app/features/AccessoryInstaller/hooks/UseValidations.tsx";
-import { useMemo } from "react";
+import type { Wizard } from "app/features/AccessoryInstaller/types";
 import ATCiLogo from "app/features/AccessoryInstaller/Wizards/atc/assets/ATC_1.webp";
-import SDImg from "./assets/Step_02_Macro_Configuration_Insert_SD_Card.webp";
-import ControllerConfigImg from "./assets/Step_03_Controller_Configuration.webp";
-import HomingImg from "./assets/Step_04_Homing.webp";
-import RackA from "./assets/Step_5A_Rack_Position_06.webp";
-// import RackB from './assets/Step_5B_Rack_Position_01.webp';
-import TLSPosImg from "./assets/Step_07_ToolLength_Sensor_Position.webp";
-import Spindle1Video from "./assets/spindle_1.mp4";
-import Spindle2Video from "./assets/spindle_2.mp4";
-import CompletionImg from "./assets/Step_10_Setup_Complete.webp";
-import { MacroConfiguration } from "app/features/AccessoryInstaller/Wizards/atc/components/MacroConfiguration.tsx";
-import { ControllerConfiguration } from "app/features/AccessoryInstaller/Wizards/atc/components/ControllerConfiguration.tsx";
-import { RackPosition } from "app/features/AccessoryInstaller/Wizards/atc/components/RackPosition.tsx";
-import { TLSPosition } from "app/features/AccessoryInstaller/Wizards/atc/components/TLSPosition.tsx";
-import { ATCCompletion } from "app/features/AccessoryInstaller/Wizards/atc/components/Completion.tsx";
-import { Jogging } from "app/features/Jogging";
-import { RestartAndRehome } from "app/features/AccessoryInstaller/Wizards/atc/components/RestartAndRehome.tsx";
-import store from "app/store";
-import { SpindleSetRestart } from "app/features/AccessoryInstaller/Wizards/atc/components/SpindleSetRestart.tsx";
-import { Modbus } from "app/features/AccessoryInstaller/Wizards/atc/components/Modbus.tsx";
 import { ATCConfigStep } from "app/features/AccessoryInstaller/Wizards/atc/components/ATCConfigStep.tsx";
+import { ATCCompletion } from "app/features/AccessoryInstaller/Wizards/atc/components/Completion.tsx";
+import { ControllerConfiguration } from "app/features/AccessoryInstaller/Wizards/atc/components/ControllerConfiguration.tsx";
+import { MacroConfiguration } from "app/features/AccessoryInstaller/Wizards/atc/components/MacroConfiguration.tsx";
+import { Modbus } from "app/features/AccessoryInstaller/Wizards/atc/components/Modbus.tsx";
+import { RackPosition } from "app/features/AccessoryInstaller/Wizards/atc/components/RackPosition.tsx";
+import { RestartAndRehome } from "app/features/AccessoryInstaller/Wizards/atc/components/RestartAndRehome.tsx";
+import { SpindleSetRestart } from "app/features/AccessoryInstaller/Wizards/atc/components/SpindleSetRestart.tsx";
 import {
 	TemplateManagementContextProvider,
 	TemplateManagementSecondaryContent,
 	TemplateManagementStep,
 } from "app/features/AccessoryInstaller/Wizards/atc/components/TemplateManagement.tsx";
+import { TLSPosition } from "app/features/AccessoryInstaller/Wizards/atc/components/TLSPosition.tsx";
+import { Jogging } from "app/features/Jogging";
+import store from "app/store";
+import { useMemo } from "react";
+import RackA from "./assets/Step_5A_Rack_Position_06.webp";
+import SDImg from "./assets/Step_02_Macro_Configuration_Insert_SD_Card.webp";
+import ControllerConfigImg from "./assets/Step_03_Controller_Configuration.webp";
+import HomingImg from "./assets/Step_04_Homing.webp";
+// import RackB from './assets/Step_5B_Rack_Position_01.webp';
+import TLSPosImg from "./assets/Step_07_ToolLength_Sensor_Position.webp";
+import CompletionImg from "./assets/Step_10_Setup_Complete.webp";
+import Spindle1Video from "./assets/spindle_1.mp4";
+import Spindle2Video from "./assets/spindle_2.mp4";
 
 export function useSienciATCWizard(): Wizard {
 	const { connectionValidation, coreFirmwareValidation } = useValidations();

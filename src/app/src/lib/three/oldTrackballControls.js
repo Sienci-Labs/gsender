@@ -157,7 +157,7 @@ const TrackballControls = function (object, domElement) {
 		}
 	};
 
-	var getMouseOnScreen = (function () {
+	var getMouseOnScreen = (() => {
 		var vector = new THREE.Vector2();
 
 		return function getMouseOnScreen(pageX, pageY) {
@@ -170,7 +170,7 @@ const TrackballControls = function (object, domElement) {
 		};
 	})();
 
-	var getMouseOnCircle = (function () {
+	var getMouseOnCircle = (() => {
 		var vector = new THREE.Vector2();
 
 		return function getMouseOnCircle(pageX, pageY) {
@@ -185,7 +185,7 @@ const TrackballControls = function (object, domElement) {
 		};
 	})();
 
-	this.rotateCamera = (function () {
+	this.rotateCamera = (() => {
 		var axis = new THREE.Vector3(),
 			quaternion = new THREE.Quaternion(),
 			eyeDirection = new THREE.Vector3(),
@@ -238,7 +238,7 @@ const TrackballControls = function (object, domElement) {
 		};
 	})();
 
-	this.zoomIn = function (delta) {
+	this.zoomIn = (delta) => {
 		if (!delta) {
 			return;
 		}
@@ -265,7 +265,7 @@ const TrackballControls = function (object, domElement) {
 		}
 	};
 
-	this.zoomOut = function (delta) {
+	this.zoomOut = (delta) => {
 		if (!delta) {
 			return;
 		}
@@ -319,7 +319,7 @@ const TrackballControls = function (object, domElement) {
 		}
 	};
 
-	this.panCamera = (function () {
+	this.panCamera = (() => {
 		var mouseChange = new THREE.Vector2(),
 			objectUp = new THREE.Vector3(),
 			pan = new THREE.Vector3();
@@ -349,7 +349,7 @@ const TrackballControls = function (object, domElement) {
 		};
 	})();
 
-	this.checkDistances = function () {
+	this.checkDistances = () => {
 		if (!_this.noZoom || !_this.noPan) {
 			if (_eye.lengthSq() > _this.maxDistance * _this.maxDistance) {
 				_this.object.position.addVectors(
@@ -369,7 +369,7 @@ const TrackballControls = function (object, domElement) {
 		}
 	};
 
-	this.update = function () {
+	this.update = () => {
 		_eye.subVectors(_this.object.position, _this.target);
 
 		if (!_this.noRotate) {
@@ -397,7 +397,7 @@ const TrackballControls = function (object, domElement) {
 		}
 	};
 
-	this.reset = function () {
+	this.reset = () => {
 		_state = STATE.NONE;
 		_prevState = STATE.NONE;
 
@@ -542,7 +542,8 @@ const TrackballControls = function (object, domElement) {
 				_movePrev.copy(_moveCurr);
 				break;
 
-			default: // 2 or more
+			default: {
+				// 2 or more
 				_state = STATE.TOUCH_ZOOM_PAN;
 				var dx = event.touches[0].pageX - event.touches[1].pageX;
 				var dy = event.touches[0].pageY - event.touches[1].pageY;
@@ -556,6 +557,7 @@ const TrackballControls = function (object, domElement) {
 				_panEnd.copy(_panStart);
 				_zoomStart.copy(getMouseOnScreen(x, y));
 				break;
+			}
 		}
 
 		_this.dispatchEvent(startEvent);
@@ -575,7 +577,8 @@ const TrackballControls = function (object, domElement) {
 				);
 				break;
 
-			default: // 2 or more
+			default: {
+				// 2 or more
 				var dx = event.touches[0].pageX - event.touches[1].pageX;
 				var dy = event.touches[0].pageY - event.touches[1].pageY;
 				_touchZoomDistanceEnd = Math.sqrt(dx * dx + dy * dy);
@@ -585,6 +588,7 @@ const TrackballControls = function (object, domElement) {
 				_panEnd.copy(getMouseOnScreen(x, y));
 				_zoomEnd.copy(getMouseOnCircle(x, y));
 				break;
+			}
 		}
 	}
 

@@ -1,17 +1,15 @@
-import { useEffect, useState } from "react";
-import cx from "classnames";
-import { Link } from "react-router";
-import { LuGamepad2 } from "react-icons/lu";
-import { FaRegKeyboard } from "react-icons/fa6";
-
+import Tooltip from "app/components/Tooltip";
+import NotificationsArea from "app/features/NotificationsArea";
 import { RemoteModeDialog } from "app/features/RemoteMode";
 import actions, {
-	HeadlessSettings,
+	type HeadlessSettings,
 } from "app/features/RemoteMode/apiActions.ts";
 import RemoteIndicator from "app/features/RemoteMode/components/RemoteIndicator.tsx";
-import Tooltip from "app/components/Tooltip";
-
-import NotificationsArea from "app/features/NotificationsArea";
+import cx from "classnames";
+import { useEffect, useState } from "react";
+import { FaRegKeyboard } from "react-icons/fa6";
+import { LuGamepad2 } from "react-icons/lu";
+import { Link } from "react-router";
 
 const StatusIcons = () => {
 	const [gamepadConnected, setGamePadConnected] = useState(false);

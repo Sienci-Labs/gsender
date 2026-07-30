@@ -22,7 +22,7 @@
  */
 
 import pubsub from "pubsub-js";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 export const DIALOG_CONFIRM = "confirm";
 export const DIALOG_CANCEL = "cancel";

@@ -1,8 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
-import isEqual from "lodash/isEqual";
-
 import store from "app/store";
-import { State } from "app/store/definitions";
+import type { State } from "app/store/definitions";
+import isEqual from "lodash/isEqual";
+import { useCallback, useEffect, useState } from "react";
 
 // Create a singleton subscription manager
 // This ensures we only have ONE listener to the store, regardless of how many components use the hook

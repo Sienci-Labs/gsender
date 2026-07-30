@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
 import cn from "classnames";
-import { TiWarning } from "react-icons/ti";
+import { useEffect, useState } from "react";
 import { FaCheckCircle } from "react-icons/fa";
+import { TiWarning } from "react-icons/ti";
 
 export enum TCStatus {
 	NO_OFFSET,

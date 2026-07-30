@@ -1,11 +1,9 @@
-import React from "react";
+import Button from "app/components/Button";
+import { toast } from "app/lib/toaster";
 import throttle from "lodash/throttle";
 import uniqueId from "lodash/uniqueId";
-
-import Button from "app/components/Button";
-
+import type React from "react";
 import Line from "./Line";
-import { toast } from "app/lib/toaster";
 
 interface GcodeViewerProps {
 	gcode: string;

@@ -1,8 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
-import isEqual from "lodash/isEqual";
-
 import store from "app/store";
-import { State } from "app/store/definitions";
+import type { State } from "app/store/definitions";
+import isEqual from "lodash/isEqual";
+import { useCallback, useEffect, useState } from "react";
 
 type WidgetKey = keyof State["widgets"];
 

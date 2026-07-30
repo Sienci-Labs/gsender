@@ -21,8 +21,8 @@
  *
  */
 
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ConnectionState, PortInfo } from "../../definitions";
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import type { ConnectionState, PortInfo } from "../../definitions";
 
 const initialState: ConnectionState = {
 	isConnected: false,

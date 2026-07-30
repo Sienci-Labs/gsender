@@ -18,7 +18,6 @@ describe("CNC Visualizer rendering test case", () => {
 
 	beforeEach(() => {
 		cy.viewport(1920, 1080);
-		// Use loadUI custom command with dynamic baseUrl
 		cy.loadUI(`${Cypress.config("baseUrl")}/#/`, {
 			maxRetries: 3,
 			waitTime: 3000,
@@ -54,9 +53,9 @@ describe("CNC Visualizer rendering test case", () => {
 		cy.log("Step 3: Checking visualizer UI before file upload...");
 		cy.get("#visualizer_container", { timeout: 10000 })
 			.should("be.visible")
-			.then(() => cy.log(" Visualizer container exists before upload"));
+			.then(() => cy.log("Visualizer container exists before upload"));
 
-		cy.get('#visualizer_container canvas[data-engine="three.js r146"]', {
+		cy.get('#visualizer_container canvas[data-engine^="three.js"]', {
 			timeout: 10000,
 		})
 			.should("be.visible")
@@ -109,9 +108,9 @@ describe("CNC Visualizer rendering test case", () => {
 		cy.log("Step 7: Checking visualizer UI after file upload...");
 		cy.get("#visualizer_container", { timeout: 10000 })
 			.should("be.visible")
-			.then(() => cy.log(" Visualizer container visible after upload"));
+			.then(() => cy.log("Visualizer container visible after upload"));
 
-		cy.get('#visualizer_container canvas[data-engine="three.js r146"]', {
+		cy.get('#visualizer_container canvas[data-engine^="three.js"]', {
 			timeout: 15000,
 		})
 			.should("be.visible")
@@ -119,7 +118,7 @@ describe("CNC Visualizer rendering test case", () => {
 				expect($canvas.attr("width")).to.exist;
 				expect($canvas.attr("height")).to.exist;
 			})
-			.then(() => cy.log(" Visualizer canvas loaded with file content"));
+			.then(() => cy.log("Visualizer canvas loaded with file content"));
 
 		// Step 8: Verify "Outline" button state after upload
 		cy.log("Step 8: Verifying Outline button state after upload...");
@@ -127,7 +126,7 @@ describe("CNC Visualizer rendering test case", () => {
 			.should("be.visible")
 			.and("not.be.disabled")
 			.then(($btn) => {
-				cy.log(" Outline button is visible and enabled after upload");
+				cy.log("Outline button is visible and enabled after upload");
 				cy.wrap($btn)
 					.parents()
 					.first()
@@ -157,7 +156,7 @@ describe("CNC Visualizer rendering test case", () => {
 
 		// Step 10: Final confirmation
 		cy.log("Step 10: Test Complete");
-		cy.log(" File uploaded and visualized in the UI");
+		cy.log("File uploaded and visualized in the UI");
 		cy.log("Outline button is visible and enabled after upload");
 		cy.log("Start From button is visible and enabled after upload");
 	});

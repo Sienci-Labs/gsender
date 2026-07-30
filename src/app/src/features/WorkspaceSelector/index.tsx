@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { usePostHog } from "@posthog/react";
 import {
 	Select,
 	SelectContent,
@@ -8,10 +7,12 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "app/components/shadcn/Select";
-import controller from "app/lib/controller";
-import { RootState } from "app/store/redux";
 import Tooltip from "app/components/Tooltip";
 import { GRBL_ACTIVE_STATE_RUN, WORKFLOW_STATE_RUNNING } from "app/constants";
+import controller from "app/lib/controller.ts";
+import type { RootState } from "app/store/redux";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 const availableWorkspaces = {
 	G54: "P1",
@@ -25,6 +26,7 @@ const availableWorkspaces = {
 export type GrblWorkspace = "G54" | "G55" | "G56" | "G57" | "G58" | "G59";
 
 export function WorkspaceSelector() {
+	const posthog = usePostHog();
 	const activeWorkspace = useSelector(
 		(state: RootState) => state.controller.modal.wcs,
 	);
@@ -50,6 +52,7 @@ export function WorkspaceSelector() {
 	function onWorkspaceSelect(value: GrblWorkspace) {
 		setWorkspace(value);
 		controller.command("gcode", value);
+		posthog?.capture("workspace_selected", { workspace: value });
 	}
 
 	const disabled =

@@ -1,9 +1,9 @@
-import { useMemo } from "react";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-import { RootState } from "app/store/redux";
-import { firmwareSemver } from "app/lib/firmwareSemver.ts";
-import { ATCI_SUPPORTED_VERSION } from "app/features/ATC/utils/ATCiConstants.ts";
 import { GRBL, GRBLHAL } from "app/constants";
+import { ATCI_SUPPORTED_VERSION } from "app/features/ATC/utils/ATCiConstants.ts";
+import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
+import { firmwareSemver } from "app/lib/firmwareSemver.ts";
+import type { RootState } from "app/store/redux";
+import { useMemo } from "react";
 
 export function useValidations() {
 	const isConnected = useTypedSelector(
@@ -37,7 +37,7 @@ export function useValidations() {
 		() => () => ({
 			success: hasHomed,
 			reason:
-				"Machine not homed. Please home your machine before proceeding with ATC configuration.",
+				"Machine not homed. Please home your machine before proceeding with accessory configuration.",
 		}),
 		[hasHomed],
 	);
@@ -52,6 +52,7 @@ export function useValidations() {
 						target="_blank"
 						className="text-blue-500 underline"
 						href="https://resources.sienci.com/view/slb-firmware-flashing/"
+						rel="noopener"
 					>
 						Learn More
 					</a>

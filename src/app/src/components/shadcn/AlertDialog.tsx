@@ -1,10 +1,12 @@
 // https://ui.shadcn.com/docs/components/alert-dialog
-import * as React from "react";
+
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
-import { IoIosWarning } from "react-icons/io";
+import { useTypedSelector } from "app/hooks/useTypedSelector";
+import type { RootState } from "app/store/redux";
 
 import cx from "classnames";
-import { useFocusTrapping } from "../../lib/focus-trapping";
+import * as React from "react";
+import { IoIosWarning } from "react-icons/io";
 import { buttonVariants } from "./Button";
 
 const AlertDialog = AlertDialogPrimitive.Root;
@@ -32,7 +34,9 @@ const AlertDialogContent = React.forwardRef<
 	React.ElementRef<typeof AlertDialogPrimitive.Content>,
 	React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Content>
 >(({ className, ...props }, ref) => {
-	const focusTrapping = useFocusTrapping();
+	const { focusTrapping } = useTypedSelector(
+		(state: RootState) => state.preferences.accessibility,
+	);
 
 	return (
 		<AlertDialogPortal>
@@ -42,7 +46,7 @@ const AlertDialogContent = React.forwardRef<
 				onOpenAutoFocus={focusTrapping ? undefined : (e) => e.preventDefault()}
 				onCloseAutoFocus={focusTrapping ? undefined : (e) => e.preventDefault()}
 				className={cx(
-					"fixed left-[50%] top-[50%] z-[9999] grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%]  border bg-white dark:bg-surface-raised p-0 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg dark:text-content-primary dark:border-outline",
+					"fixed left-[50%] top-[50%] z-[9999] grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%]  border bg-white dark:bg-dark-darker p-0 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg dark:text-white dark:border-dark-lighter",
 					className,
 				)}
 				{...props}
@@ -80,7 +84,7 @@ const AlertDialogFooter = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
 	<div
 		className={cx(
-			"flex flex-col-reverse sm:flex-row sm:justify-center sm:space-x-2 bg-gray-200 dark:bg-surface-raised rounded-bl-lg rounded-br-lg border-t border-t-gray-400 p-2",
+			"flex flex-col-reverse sm:flex-row sm:justify-center sm:space-x-2 bg-gray-200 dark:bg-dark rounded-bl-lg rounded-br-lg border-t border-t-gray-400 p-2",
 			className,
 		)}
 		{...props}
@@ -95,7 +99,7 @@ const AlertDialogTitle = React.forwardRef<
 	<AlertDialogPrimitive.Title
 		ref={ref}
 		className={cx(
-			"text-2xl font-semibold text-blue-500 dark:text-content-primary",
+			"text-2xl font-semibold text-blue-500 dark:text-white",
 			className,
 		)}
 		{...props}
@@ -111,7 +115,7 @@ const AlertDialogDescription = React.forwardRef<
 		<div
 			ref={ref}
 			className={cx(
-				"text-sm text-gray-700 dark:text-content-secondary text-muted-foreground",
+				"text-sm text-gray-700 dark:text-gray-300 text-muted-foreground",
 				className,
 			)}
 			{...props}
@@ -150,14 +154,14 @@ AlertDialogCancel.displayName = AlertDialogPrimitive.Cancel.displayName;
 
 export {
 	AlertDialog,
-	AlertDialogPortal,
-	AlertDialogOverlay,
-	AlertDialogTrigger,
-	AlertDialogContent,
-	AlertDialogHeader,
-	AlertDialogFooter,
-	AlertDialogTitle,
-	AlertDialogDescription,
 	AlertDialogAction,
 	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogOverlay,
+	AlertDialogPortal,
+	AlertDialogTitle,
+	AlertDialogTrigger,
 };

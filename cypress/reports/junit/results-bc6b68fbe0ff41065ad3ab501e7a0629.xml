@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="1219.632" tests="23" failures="4">
+  <testsuite name="Root Suite" timestamp="2026-04-15T19:52:47" tests="0" file="cypress\e2e\grblHal\A_grblHal_master_spec.cy.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="gSender UI Load Test" timestamp="2026-04-15T19:52:47" tests="1" time="3.630" failures="0">
+    <testcase name="gSender UI Load Test should navigate to gSender and verify the UI loads" time="3.066" classname="should navigate to gSender and verify the UI loads">
+    </testcase>
+  </testsuite>
+  <testsuite name="Device Connection" timestamp="2026-04-15T19:52:51" tests="1" time="23.674" failures="0">
+    <testcase name="Device Connection should connect to CNC machine by selecting the first available port" time="23.455" classname="should connect to CNC machine by selecting the first available port">
+    </testcase>
+  </testsuite>
+  <testsuite name="Load file testing in grblHal" timestamp="2026-04-15T19:53:14" tests="1" time="55.295" failures="0">
+    <testcase name="Load file testing in grblHal Complete workflow: Connect-&gt; Upload-&gt; Disconnect-&gt;Upload-&gt; Connect-&gt;Disconnect" time="55.137" classname="Complete workflow: Connect-&gt; Upload-&gt; Disconnect-&gt;Upload-&gt; Connect-&gt;Disconnect">
+    </testcase>
+  </testsuite>
+  <testsuite name="GrblHal Machine File Info Test" timestamp="2026-04-15T19:54:10" tests="1" time="13.050" failures="0">
+    <testcase name="GrblHal Machine File Info Test Uploads file, toggles, and prints file info" time="12.946" classname="Uploads file, toggles, and prints file info">
+    </testcase>
+  </testsuite>
+  <testsuite name="Gsender testing jogging using buttons" timestamp="2026-04-15T19:54:23" tests="1" time="23.545" failures="1">
+    <testcase name="Gsender testing jogging using buttons Test Case: jogging using buttons" time="0.000" classname="Test Case: jogging using buttons">
+      <failure message="Timed out retrying after 10000ms: Expected to find element: `:visible`, but never found it. Queried from:
+
+              &gt; cy.get(div:nth-of-type(2) input)" type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 10000ms: Expected to find element: `:visible`, but never found it. Queried from:
+
+              > cy.get(div:nth-of-type(2) input)
+    at Context.eval (webpack://gSender/./cypress/support/commands.js:475:9)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="Dynamic Keyboard Jogging Test - All Axes" timestamp="2026-04-15T19:54:46" tests="1" time="138.942" failures="0">
+    <testcase name="Dynamic Keyboard Jogging Test - All Axes Test all keyboard jog shortcuts dynamically" time="138.759" classname="Test all keyboard jog shortcuts dynamically">
+    </testcase>
+  </testsuite>
+  <testsuite name="Gsender testing preset create update" timestamp="2026-04-15T19:57:05" tests="1" time="40.007" failures="0">
+    <testcase name="Gsender testing preset create update Verify Rapid preset values are updated and jogging speed/position is accurate" time="39.724" classname="Verify Rapid preset values are updated and jogging speed/position is accurate">
+    </testcase>
+  </testsuite>
+  <testsuite name="Grblhal Zeroing axis and go to zero" timestamp="2026-04-15T19:57:45" tests="1" time="81.446" failures="0">
+    <testcase name="Grblhal Zeroing axis and go to zero Test Case: jogging using buttons and zeroing axes" time="81.116" classname="Test Case: jogging using buttons and zeroing axes">
+    </testcase>
+  </testsuite>
+  <testsuite name="CNC Visualizer rendering test case" timestamp="2026-04-15T19:59:07" tests="1" time="22.515" failures="0">
+    <testcase name="CNC Visualizer rendering test case Connects to CNC, uploads file, and verifies visualizer + file info" time="22.322" classname="Connects to CNC, uploads file, and verifies visualizer + file info">
+    </testcase>
+  </testsuite>
+  <testsuite name="Job Run Test in grblHal without homing" timestamp="2026-04-15T19:59:29" tests="1" time="61.361" failures="0">
+    <testcase name="Job Run Test in grblHal without homing Test Case: Connect, Upload File, Run Job and Collect Details" time="61.223" classname="Test Case: Connect, Upload File, Run Job and Collect Details">
+    </testcase>
+  </testsuite>
+  <testsuite name="Coolant Testing  " timestamp="2026-04-15T20:00:30" tests="1" time="43.604" failures="0">
+    <testcase name="Coolant Testing   Apply coolant mist, flood and Off option" time="43.288" classname="Apply coolant mist, flood and Off option">
+    </testcase>
+  </testsuite>
+  <testsuite name="Feedrate Performance Comparison Test" timestamp="2026-04-15T20:01:14" tests="1" time="106.223" failures="0">
+    <testcase name="Feedrate Performance Comparison Test Should compare job completion times with different feedrates" time="105.986" classname="Should compare job completion times with different feedrates">
+    </testcase>
+  </testsuite>
+  <testsuite name="Macros Upload, Execution and Verification Test" timestamp="2026-04-15T20:03:00" tests="1" time="113.929" failures="0">
+    <testcase name="Macros Upload, Execution and Verification Test Upload and run macro with success message verify the output" time="113.596" classname="Upload and run macro with success message verify the output">
+    </testcase>
+  </testsuite>
+  <testsuite name="Console commands testing " timestamp="2026-04-15T20:04:54" tests="1" time="33.840" failures="0">
+    <testcase name="Console commands testing  Connects machine and sets axes to zero" time="33.637" classname="Connects machine and sets axes to zero">
+    </testcase>
+  </testsuite>
+  <testsuite name="gSender Configuration and Firmware Test Suite" timestamp="2026-04-15T20:05:28" tests="1" time="47.335" failures="0">
+    <testcase name="gSender Configuration and Firmware Test Suite Should reset, export, import gSender settings, restore firmware defaults, and perform searches" time="47.016" classname="Should reset, export, import gSender settings, restore firmware defaults, and perform searches">
+    </testcase>
+  </testsuite>
+  <testsuite name="Gsender testing jogging using buttons" timestamp="2026-04-15T20:06:15" tests="1" time="34.942" failures="1">
+    <testcase name="Gsender testing jogging using buttons Test Case: jogging using buttons" time="0.000" classname="Test Case: jogging using buttons">
+      <failure message="Timed out retrying after 30000ms: Expected to find content: &apos;/^Idle$/i&apos; but never did." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 30000ms: Expected to find content: '/^Idle$/i' but never did.
+    at Context.eval (webpack://gSender/./cypress/support/commands.js:87:5)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="Invert and Check Pins Test with Stepper Motor Lock/Unlock" timestamp="2026-04-15T20:06:50" tests="1" time="44.983" failures="0">
+    <testcase name="Invert and Check Pins Test with Stepper Motor Lock/Unlock Checks machine information, verifies pin inversion, and tests stepper motor lock/unlock" time="44.794" classname="Checks machine information, verifies pin inversion, and tests stepper motor lock/unlock">
+    </testcase>
+  </testsuite>
+  <testsuite name="gSender Movement tuning test" timestamp="2026-04-15T20:07:35" tests="1" time="50.780" failures="0">
+    <testcase name="gSender Movement tuning test Should complete movement tuning for x axis and y axis" time="50.456" classname="Should complete movement tuning for x axis and y axis">
+    </testcase>
+  </testsuite>
+  <testsuite name="Rotary surfacing" timestamp="2026-04-15T20:08:26" tests="1" time="42.908" failures="0">
+    <testcase name="Rotary surfacing Rotary surfacing" time="42.640" classname="Rotary surfacing">
+    </testcase>
+  </testsuite>
+  <testsuite name="Spindle Configuration and Control Test - Decrease to 7500 RPM" timestamp="2026-04-15T20:09:09" tests="1" time="68.149" failures="0">
+    <testcase name="Spindle Configuration and Control Test - Decrease to 7500 RPM Connect, Configure Spindle, Upload File, Decrease to 7500 RPM, Reset, Increase to 24000 RPM, and Complete Job" time="67.940" classname="Connect, Configure Spindle, Upload File, Decrease to 7500 RPM, Reset, Increase to 24000 RPM, and Complete Job">
+    </testcase>
+  </testsuite>
+  <testsuite name="Surfacing Test" timestamp="2026-04-15T20:10:17" tests="1" time="88.701" failures="1">
+    <testcase name="Surfacing Test Should complete surfacing workflow successfully" time="0.000" classname="Should complete surfacing workflow successfully">
+      <failure message="Timed out retrying after 10000ms: Expected to find content: &apos;Job End&apos; within the selector: &apos;h2&apos; but never did." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 10000ms: Expected to find content: 'Job End' within the selector: 'h2' but never did.
+    at Context.eval (webpack://gSender/./cypress/e2e/grblHal/surfacing.cy.js:152:7)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="CNC Bit Position and Job Progress Tracking" timestamp="2026-04-15T20:11:46" tests="1" time="53.849" failures="0">
+    <testcase name="CNC Bit Position and Job Progress Tracking should connect, track bit positions, verify movement, and validate specific position values during job execution" time="53.599" classname="should connect, track bit positions, verify movement, and validate specific position values during job execution">
+    </testcase>
+  </testsuite>
+  <testsuite name="gSender XY Squaring Test" timestamp="2026-04-15T20:12:40" tests="1" time="26.899" failures="1">
+    <testcase name="gSender XY Squaring Test Should complete XY Squaring wizard with measurements and adjustments" time="0.000" classname="Should complete XY Squaring wizard with measurements and adjustments">
+      <failure message="Timed out retrying after 10050ms: `cy.click()` failed because this element:
+
+          `&lt;div class=&quot;rounded-lg border bg-card text-card-foreground shadow-sm hover:bg-gray-300 bg-gray-100 cursor-pointer p-4 
+            flex flex-col items-center justify-between text-center gap-4
+            transition-all duration-300 ease-in-out h-full dark:bg-dark&quot;&gt;...&lt;/div&gt;`
+
+          has CSS `pointer-events: none`, inherited from this element:
+
+`&lt;body data-scroll-locked=&quot;1&quot; style=&quot;pointer-events: none;&quot;&gt;...&lt;/body&gt;`
+
+          `pointer-events: none` prevents user mouse interaction.
+
+          Fix this problem, or use {force: true} to disable error checking.
+
+https://on.cypress.io/element-cannot-be-interacted-with" type="CypressError"><![CDATA[CypressError: Timed out retrying after 10050ms: `cy.click()` failed because this element:
+
+          `<div class="rounded-lg border bg-card text-card-foreground shadow-sm hover:bg-gray-300 bg-gray-100 cursor-pointer p-4 
+            flex flex-col items-center justify-between text-center gap-4
+            transition-all duration-300 ease-in-out h-full dark:bg-dark">...</div>`
+
+          has CSS `pointer-events: none`, inherited from this element:
+
+`<body data-scroll-locked="1" style="pointer-events: none;">...</body>`
+
+          `pointer-events: none` prevents user mouse interaction.
+
+          Fix this problem, or use {force: true} to disable error checking.
+
+https://on.cypress.io/element-cannot-be-interacted-with
+    at ensureElDoesNotHaveCSS (http://localhost:8000/__cypress/runner/cypress_runner.js:112856:66)
+    at ensureDescendents (http://localhost:8000/__cypress/runner/cypress_runner.js:112964:5)
+    at ensureDescendentsAndScroll (http://localhost:8000/__cypress/runner/cypress_runner.js:112972:14)
+    at ensureElIsNotCovered (http://localhost:8000/__cypress/runner/cypress_runner.js:113103:5)
+    at runAllChecks (http://localhost:8000/__cypress/runner/cypress_runner.js:113302:52)
+    at retryActionability (http://localhost:8000/__cypress/runner/cypress_runner.js:113339:16)
+    at tryCatcher (http://localhost:8000/__cypress/runner/cypress_runner.js:1830:23)
+    at Promise.attempt.Promise.try (http://localhost:8000/__cypress/runner/cypress_runner.js:4338:29)
+    at whenStable (http://localhost:8000/__cypress/runner/cypress_runner.js:143744:68)
+    at <unknown> (http://localhost:8000/__cypress/runner/cypress_runner.js:143685:14)
+    at tryCatcher (http://localhost:8000/__cypress/runner/cypress_runner.js:1830:23)
+    at Promise._settlePromiseFromHandler (http://localhost:8000/__cypress/runner/cypress_runner.js:1542:31)
+    at Promise._settlePromise (http://localhost:8000/__cypress/runner/cypress_runner.js:1599:18)
+    at Promise._settlePromise0 (http://localhost:8000/__cypress/runner/cypress_runner.js:1644:10)
+    at Promise._settlePromises (http://localhost:8000/__cypress/runner/cypress_runner.js:1724:18)
+    at Promise._fulfill (http://localhost:8000/__cypress/runner/cypress_runner.js:1668:18)
+    at <unknown> (http://localhost:8000/__cypress/runner/cypress_runner.js:5473:46)
+From Your Spec Code:
+    at Context.eval (webpack://gSender/./cypress/e2e/grblHal/XY-Squaring.cy.js:42:3)]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

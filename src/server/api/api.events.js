@@ -23,13 +23,13 @@
 
 import uuid from "uuid";
 import settings from "../config/settings";
-import logger from "../lib/logger";
-import config from "../services/configstore";
 import {
 	ERR_BAD_REQUEST,
-	ERR_NOT_FOUND,
 	ERR_INTERNAL_SERVER_ERROR,
+	ERR_NOT_FOUND,
 } from "../constants";
+import logger from "../lib/logger";
+import config from "../services/configstore";
 
 const log = logger("api:events");
 const CONFIG_KEY = "events";

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
 import combokeys from "../lib/combokeys";
-import {
+import type {
 	ShuttleControlEvents,
 	ShuttleEvent,
 } from "../lib/definitions/shortcuts";

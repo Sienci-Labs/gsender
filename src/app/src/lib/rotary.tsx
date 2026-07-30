@@ -1,24 +1,23 @@
-import get from "lodash/get";
-import pubsub from "pubsub-js";
-
-import { WORKSPACE_MODE_T } from "app/workspace/definitions";
-import {
+import type {
+	EEPROMSettings,
 	FIRMWARE_TYPES_T,
 	RotaryModeFirmwareSettings,
 } from "app/definitions/firmware";
-
-import store from "../store";
-import controller from "app/lib/controller";
-import { store as reduxStore } from "app/store/redux";
+import type { WORKSPACE_MODE_T } from "app/workspace/definitions";
+import get from "lodash/get";
+import pubsub from "pubsub-js";
+import { Confirm } from "../components/ConfirmationDialog/ConfirmationDialogLib";
 import {
-	WORKSPACE_MODE,
-	ROTARY_MODE_FIRMWARE_SETTINGS,
-	ROTARY_TOGGLE_MACRO,
 	DEFAULT_FIRMWARE_SETTINGS,
 	GRBL,
 	GRBLHAL,
+	ROTARY_MODE_FIRMWARE_SETTINGS,
+	ROTARY_TOGGLE_MACRO,
+	WORKSPACE_MODE,
 } from "../constants";
-import { Confirm } from "app/components/ConfirmationDialog/ConfirmationDialogLib";
+import store from "../store";
+import { store as reduxStore } from "../store/redux";
+import controller from "./controller";
 import { toast } from "./toaster";
 
 export const updateWorkspaceMode = (mode: WORKSPACE_MODE_T): void => {
@@ -26,6 +25,10 @@ export const updateWorkspaceMode = (mode: WORKSPACE_MODE_T): void => {
 	const firmwareType: FIRMWARE_TYPES_T = get(
 		reduxStore.getState(),
 		"controller.type",
+	);
+	const EEPROMSettings: EEPROMSettings = get(
+		reduxStore.getState(),
+		"controller.settings.settings",
 	);
 	const rotaryFirmwareSettings: RotaryModeFirmwareSettings = store.get(
 		"workspace.rotaryAxis.firmwareSettings",
@@ -83,6 +86,18 @@ export const updateWorkspaceMode = (mode: WORKSPACE_MODE_T): void => {
 		case ROTARY: {
 			// We only need to update the firmware settings on grbl machines
 			if (firmwareType === GRBL) {
+				// save default settings
+				const defaultFirmwareSettings = {
+					$101: EEPROMSettings.$101,
+					$111: EEPROMSettings.$111,
+					$20: EEPROMSettings.$20,
+					$21: EEPROMSettings.$21,
+				};
+				store.replace(
+					"workspace.rotaryAxis.defaultFirmwareSettings",
+					defaultFirmwareSettings,
+				);
+
 				// Convert to array to send to the controller, will look something like this: ["$101=26.667", ...]
 				const rotaryFirmwareSettingsArr = Object.entries(
 					rotaryFirmwareSettings,
@@ -228,7 +243,7 @@ export const updateWorkspaceMode = (mode: WORKSPACE_MODE_T): void => {
 
 export const checkIfRotaryFile = (gcode: string): boolean => {
 	const commentMatcher = /\s*;.*/g;
-	const bracketCommentLine = /\([^\)]*\)/gm;
+	const bracketCommentLine = /\([^)]*\)/gm;
 	const content = gcode
 		.replace(bracketCommentLine, "")
 		.trim()

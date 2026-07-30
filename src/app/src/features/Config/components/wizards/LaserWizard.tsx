@@ -1,5 +1,5 @@
 import Button from "app/components/Button";
-import controller from "app/lib/controller";
+import controller from "app/lib/controller.ts";
 
 function startLaser() {
 	controller.command("gcode", "G1F1 M3 S1");

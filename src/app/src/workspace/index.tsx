@@ -1,9 +1,4 @@
-import { useEffect } from "react";
-import { Outlet, useLocation } from "react-router";
-import get from "lodash/get";
-
-import controller from "app/lib/controller";
-import reduxStore from "app/store/redux";
+import ConfirmationDialog from "app/components/ConfirmationDialog/ConfirmationDialog";
 import {
 	COOLANT_CATEGORY,
 	GENERAL_CATEGORY,
@@ -17,35 +12,37 @@ import {
 	WORKFLOW_STATE_RUNNING,
 	WORKSPACE_MODE,
 } from "app/constants";
-import useKeybinding from "app/lib/useKeybinding";
-import useShuttleEvents from "app/hooks/useShuttleEvents";
-import { useDarkMode } from "app/hooks/useDarkMode";
-
-import { Sidebar } from "./Sidebar";
-import { TopBar } from "./TopBar";
-
-import { Carve } from "./Carve";
-import { Alerts } from "./Alerts";
-import DataCollection from "../features/DataCollection";
-import { AccessibilityAnnouncer } from "../features/Helper/AccessibilityAnnouncer";
-import { KeyboardMapOverlay } from "../features/Helper/KeyboardMapOverlay";
-import pkg from "../../package.json";
-import store from "app/store";
-import {
-	getYAxisAlignmentProbing,
-	getZAxisProbing,
-	runProbing,
-} from "app/features/Rotary/utils/probeCommands";
+import { SettingsProvider } from "app/features/Config/utils/SettingsContext";
 import {
 	canRunShortcut,
 	startFlood,
 	startMist,
 	stopCoolant,
 } from "app/features/Coolant/utils/actions";
-import pubsub from "pubsub-js";
-import ConfirmationDialog from "app/components/ConfirmationDialog/ConfirmationDialog";
-import { SettingsProvider } from "app/features/Config/utils/SettingsContext";
 import { Helper } from "app/features/Helper";
+import {
+	getYAxisAlignmentProbing,
+	getZAxisProbing,
+	runProbing,
+} from "app/features/Rotary/utils/probeCommands";
+import { useDarkMode } from "app/hooks/useDarkMode";
+import useShuttleEvents from "app/hooks/useShuttleEvents";
+import controller from "app/lib/controller";
+import useKeybinding from "app/lib/useKeybinding";
+import store from "app/store";
+import reduxStore from "app/store/redux";
+import get from "lodash/get";
+import pubsub from "pubsub-js";
+import { useEffect } from "react";
+import { Outlet, useLocation } from "react-router";
+import pkg from "../../package.json";
+import DataCollection from "../features/DataCollection";
+import { AccessibilityAnnouncer } from "../features/Helper/AccessibilityAnnouncer";
+import { KeyboardMapOverlay } from "../features/Helper/KeyboardMapOverlay";
+import { Alerts } from "./Alerts";
+import { Carve } from "./Carve";
+import { Sidebar } from "./Sidebar";
+import { TopBar } from "./TopBar";
 
 const Workspace = () => {
 	const location = useLocation();
@@ -386,7 +383,7 @@ const Workspace = () => {
 			>
 				Skip to main content
 			</a>
-			<div className="flex flex-col h-full dark:bg-surface-base">
+			<div className="flex flex-col h-full dark:bg-slate-800">
 				<header role="banner">
 					<TopBar />
 				</header>

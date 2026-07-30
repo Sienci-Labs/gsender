@@ -20,15 +20,8 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-import { useState, useEffect, ReactNode } from "react";
-import pubsub from "pubsub-js";
-import cx from "classnames";
-import { FaExclamationTriangle, FaRedo } from "react-icons/fa";
-import { Button } from "app/components/Button";
-import ConfirmationDialogButton from "./ConfirmationDialogButton";
-import { DIALOG_CONFIRM, DIALOG_CANCEL } from "./ConfirmationDialogLib";
 
-import styles from "./index.module.styl";
+import { Button } from "app/components/Button";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -40,6 +33,13 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 } from "app/components/shadcn/AlertDialog.tsx";
+import cx from "classnames";
+import pubsub from "pubsub-js";
+import { type ReactNode, useEffect, useState } from "react";
+import { FaExclamationTriangle, FaRedo } from "react-icons/fa";
+import ConfirmationDialogButton from "./ConfirmationDialogButton";
+import { DIALOG_CANCEL, DIALOG_CONFIRM } from "./ConfirmationDialogLib";
+import styles from "./index.module.styl";
 
 interface DialogOptions {
 	title: string;

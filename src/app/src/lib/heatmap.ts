@@ -1,5 +1,5 @@
 import api from "../api";
-import { USAGE_TOOL_NAME, USER_DATA_COLLECTION } from "../constants";
+import { type USAGE_TOOL_NAME, USER_DATA_COLLECTION } from "../constants";
 
 export const collectUserUsageData = async (
 	toolName: keyof typeof USAGE_TOOL_NAME,

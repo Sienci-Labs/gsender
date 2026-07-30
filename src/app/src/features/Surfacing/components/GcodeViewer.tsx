@@ -1,8 +1,7 @@
-import React from "react";
-import { Copy } from "lucide-react";
-
 import { Button } from "app/components/Button";
 import { toast } from "app/lib/toaster";
+import { Copy } from "lucide-react";
+import React from "react";
 
 interface GcodeViewerProps {
 	gcode: string;
@@ -45,7 +44,7 @@ export const GcodeViewer = ({ gcode }: GcodeViewerProps) => {
 							<div
 								key={Math.random().toString()}
 								className={`py-1 px-2 rounded-sm ${
-									index % 2 === 0 ? "bg-gray-200 dark:bg-surface-elevated" : ""
+									index % 2 === 0 ? "bg-gray-200 dark:bg-dark-lighter" : ""
 								}`}
 							>
 								<span className="text-muted-foreground mr-4">{index + 1}</span>

@@ -1,10 +1,10 @@
 import reduxStore from "app/store/redux";
 
-import { SquaringContextType } from "../context/SquaringContext";
+import type { SquaringContextType } from "../context/SquaringContext";
 
 export const calculateAngle = (triangle: SquaringContextType["triangle"]) => {
 	const { a, b, c } = triangle;
-	const cosC = (Math.pow(a, 2) + Math.pow(b, 2) - Math.pow(c, 2)) / (2 * a * b);
+	const cosC = (a ** 2 + b ** 2 - c ** 2) / (2 * a * b);
 	const angleInRadians = Math.acos(cosC);
 	const angleInDegrees = (angleInRadians * 180) / Math.PI;
 	return 90 - angleInDegrees;
@@ -15,7 +15,7 @@ export const calculateHypotenuse = (
 	triangle: SquaringContextType["triangle"],
 ) => {
 	const { a, b } = triangle;
-	return Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
+	return Math.sqrt(a ** 2 + b ** 2);
 };
 
 export const determineEEPROMAdjustment = (

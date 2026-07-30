@@ -1,14 +1,14 @@
 import Button from "app/components/Button";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-import { RootState } from "app/store/redux";
-import { GRBLHAL } from "app/constants";
-import { toast } from "sonner";
-import { ATCI_SUPPORTED_VERSION } from "app/features/ATC/utils/ATCiConstants.ts";
-import { firmwareSemver } from "app/lib/firmwareSemver.ts";
-import controller from "app/lib/controller";
-import { delay } from "lodash";
 import { Confirm } from "app/components/ConfirmationDialog/ConfirmationDialogLib.ts";
+import { GRBLHAL } from "app/constants";
+import { ATCI_SUPPORTED_VERSION } from "app/features/ATC/utils/ATCiConstants.ts";
+import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
+import controller from "app/lib/controller.ts";
+import { firmwareSemver } from "app/lib/firmwareSemver.ts";
 import store from "app/store";
+import type { RootState } from "app/store/redux";
+import { delay } from "lodash";
+import { toast } from "sonner";
 
 // Check firmware
 // Check firmware version

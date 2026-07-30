@@ -1,8 +1,9 @@
-import React, { useEffect, useState, useRef, useMemo } from "react";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-import { RootState } from "app/store/redux";
 import { GRBL_ACTIVE_STATE_ALARM } from "app/constants";
+import { useTypedSelector } from "app/hooks/useTypedSelector";
+import type { RootState } from "app/store/redux";
 import pubsub from "pubsub-js";
+import type React from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 export const AccessibilityAnnouncer: React.FC = () => {
 	const {

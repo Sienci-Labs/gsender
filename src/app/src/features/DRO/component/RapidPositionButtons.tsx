@@ -1,9 +1,5 @@
-import get from "lodash/get";
-import cx from "classnames";
-
-import controller from "app/lib/controller";
-import { useSelector } from "react-redux";
-import { RootState } from "app/store/redux";
+import { usePostHog } from "@posthog/react";
+import Tooltip from "app/components/Tooltip";
 import {
 	BACK_LEFT,
 	BACK_RIGHT,
@@ -11,8 +7,13 @@ import {
 	FRONT_RIGHT,
 	getMovementGCode,
 } from "app/features/DRO/utils/RapidPosition";
-import Tooltip from "app/components/Tooltip";
+
+import controller from "app/lib/controller.ts";
+import type { RootState } from "app/store/redux";
+import cx from "classnames";
 import cn from "classnames";
+import get from "lodash/get";
+import { useSelector } from "react-redux";
 export function RapidPositionButtons({ disabled = false }) {
 	const homingFlag = useSelector(
 		(state: RootState) => state.controller.homingFlag,
@@ -25,6 +26,8 @@ export function RapidPositionButtons({ disabled = false }) {
 	const pullOff = useSelector((state: RootState) => {
 		return get(state, "controller.settings.settings.$27", 1);
 	});
+
+	const posthog = usePostHog();
 
 	const altColourClass = "stroke-robin-500";
 	const disabledColorClass = "stroke-gray-400";
@@ -42,6 +45,12 @@ export function RapidPositionButtons({ disabled = false }) {
 			Number(pullOff),
 		);
 		controller.command("gcode", gcode);
+		posthog?.capture("jog_to_corner", {
+			corner,
+			homing_direction: homingDirection,
+			homing_flag: homingFlag,
+			pull_off: Number(pullOff),
+		});
 	}
 
 	return (

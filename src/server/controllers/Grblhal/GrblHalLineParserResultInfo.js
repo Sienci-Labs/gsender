@@ -31,10 +31,10 @@ class GrblHalLineParserResultInfo {
 		}
 
 		if (isEqual(r[1], "NEWOPT")) {
-			let values = {};
-			let opts = r[2].split(",");
+			const values = {};
+			const opts = r[2].split(",");
 			opts.forEach((opt) => {
-				let [key, value] = opt.split("=");
+				const [key, value] = opt.split("=");
 				values[key] = value || null;
 			});
 			r[2] = values;

@@ -1,22 +1,21 @@
-import { RiParkingFill } from "react-icons/ri";
-
+import { usePostHog } from "@posthog/react";
 import Button from "app/components/Button";
-import store from "app/store";
-import controller from "app/lib/controller";
+import Tooltip from "app/components/Tooltip";
 import {
 	GRBL_ACTIVE_STATE_IDLE,
 	GRBL_ACTIVE_STATE_JOG,
 	LOCATION_CATEGORY,
 	WORKFLOW_STATE_RUNNING,
 } from "app/constants";
-import useKeybinding from "app/lib/useKeybinding";
 import useShuttleEvents from "app/hooks/useShuttleEvents";
-import { useEffect, useRef } from "react";
-import Tooltip from "app/components/Tooltip";
+import controller from "app/lib/controller.ts";
+import useKeybinding from "app/lib/useKeybinding";
+import store from "app/store";
+import reduxStore, { type RootState } from "app/store/redux";
 import { get, includes } from "lodash";
-import reduxStore from "app/store/redux";
+import { useEffect, useRef } from "react";
+import { RiParkingFill } from "react-icons/ri";
 import { useSelector } from "react-redux";
-import { RootState } from "app/store/redux";
 
 function goToParkLocation() {
 	const park = store.get("workspace.park", {});
@@ -44,6 +43,8 @@ export function Parking({
 	useEffect(() => {
 		disabledRef.current = isDisabled;
 	}, [isDisabled]);
+
+	const posthog = usePostHog();
 
 	const shortcutIsDisabled = () => {
 		const isConnected = get(reduxStore.getState(), "connection.isConnected");
@@ -73,7 +74,7 @@ export function Parking({
 			isActive: true,
 			category: LOCATION_CATEGORY,
 			callback: () => {
-				if (disabledRef.current || shortcutIsDisabled()) goToParkLocation();
+				if (!disabledRef.current && !shortcutIsDisabled()) goToParkLocation();
 			},
 		},
 	};
@@ -94,7 +95,14 @@ export function Parking({
 				icon={<RiParkingFill className="w-4 h-4" />}
 				variant="alt"
 				size="responsive"
-				onClick={goToParkLocation}
+				onClick={() => {
+					goToParkLocation();
+					posthog?.capture("go_to_park_location", {
+						homing_enabled: homingEnabled,
+						is_connected: isConnected,
+						is_disabled: isDisabled,
+					});
+				}}
 				aria-label="Go to Park Location"
 			/>
 		</Tooltip>

@@ -1,12 +1,8 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
-import cx from "classnames";
-
 import { Button } from "app/components/Button";
 import { ControlledInput } from "app/components/ControlledInput";
 import { Switch } from "app/components/shadcn/Switch";
 import { Tabs, TabsList, TabsTrigger } from "app/components/shadcn/Tabs";
-import controller from "app/lib/controller";
+import { Tooltip } from "app/components/Tooltip";
 import {
 	GRBL_ACTIVE_STATE_IDLE,
 	GRBL_ACTIVE_STATE_JOG,
@@ -15,21 +11,23 @@ import {
 	VISUALIZER_PRIMARY,
 	VISUALIZER_SECONDARY,
 } from "app/constants";
-import { uploadGcodeFileToServer } from "app/lib/fileupload";
 import useShuttleEvents from "app/hooks/useShuttleEvents";
-import useKeybinding from "app/lib/useKeybinding";
-import { convertToImperial, convertToMetric } from "app/lib/units";
-import { useWorkspaceState } from "app/hooks/useWorkspaceState";
-import store from "app/store";
-import { Tooltip } from "app/components/Tooltip";
 import { useTypedSelector } from "app/hooks/useTypedSelector";
-
-import { RotarySurfacingOptions } from "./definitions";
+import { useWorkspaceState } from "app/hooks/useWorkspaceState";
+import controller from "app/lib/controller";
+import { uploadGcodeFileToServer } from "app/lib/fileupload";
+import { convertToImperial, convertToMetric } from "app/lib/units";
+import useKeybinding from "app/lib/useKeybinding";
+import store from "app/store";
+import cx from "classnames";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { GcodeViewer } from "../Surfacing/components/GcodeViewer";
-import VisualizerPreview from "./components/VisualizerPreview";
-import { StockTurningGenerator } from "./utils/Generator";
 import InputArea from "./components/InputArea";
+import VisualizerPreview from "./components/VisualizerPreview";
 import { DEFAULT_VALUES_MM } from "./constants";
+import type { RotarySurfacingOptions } from "./definitions";
+import { StockTurningGenerator } from "./utils/Generator";
 
 const RotarySurfacing = () => {
 	const navigate = useNavigate();
@@ -162,10 +160,10 @@ const RotarySurfacing = () => {
 
 	return (
 		<div>
-			<div className="bg-white dark:bg-transparent dark:text-content-primary w-full flex flex-col gap-2">
+			<div className="bg-white dark:bg-transparent dark:text-white w-full flex flex-col gap-2">
 				<div className="grid grid-cols-2 gap-4">
 					<div className="grid gap-4 xl:gap-2">
-						<p className="text-sm xl:text-base font-normal text-gray-500 dark:text-content-secondary">
+						<p className="text-sm xl:text-base font-normal text-gray-500 dark:text-gray-300">
 							Make sure that your tool clears the surface of your material
 							without running into the limits of your Z-axis. You should also
 							use the probing feature to zero your Z-axis to the centerline
@@ -390,7 +388,7 @@ const RotarySurfacing = () => {
 					</Button>
 					<Button
 						onClick={handleLoadToMainVisualizer}
-						disabled={!!!gcode || isDisabled}
+						disabled={!gcode || isDisabled}
 					>
 						Load to Main Visualizer
 					</Button>

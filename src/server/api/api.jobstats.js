@@ -1,5 +1,5 @@
-import config from "../services/configstore";
 import { ERR_INTERNAL_SERVER_ERROR } from "../constants";
+import config from "../services/configstore/jobStore";
 
 const CONFIG_KEY = "jobStats";
 const DEFAULT_JOB_STATS = {
@@ -29,7 +29,7 @@ export const update = (req, res) => {
 	const reqJobStats = req.body;
 	const jobStats = getJobStats();
 
-	let newJobStats = jobStats;
+	const newJobStats = jobStats;
 	if (reqJobStats.finishTime) {
 		newJobStats.jobsCompleted += 1;
 	} else {

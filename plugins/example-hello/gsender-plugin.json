@@ -1,0 +1,17 @@
+{
+	"id": "com.sienci.example-hello",
+	"name": "Hello Bridge",
+	"version": "0.1.0",
+	"engine": ">=1.6.0",
+	"ui": {
+		"entry": "ui/index.html",
+		"contributions": [
+			{
+				"slot": "tools-page",
+				"route": "example-hello",
+				"label": "Hello Bridge"
+			}
+		]
+	},
+	"permissions": ["machine:read"]
+}

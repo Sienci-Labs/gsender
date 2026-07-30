@@ -1,16 +1,14 @@
-import { FaClipboard, FaClipboardCheck, FaClipboardList } from "react-icons/fa";
-
 import Button from "app/components/Button";
 import { ControlledInput } from "app/components/ControlledInput";
-import { useWorkspaceState } from "app/hooks/useWorkspaceState";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
 import {
 	GRBL_ACTIVE_STATE_RUN,
 	GRBL_HAL_ACTIVE_STATE_RUN,
 } from "app/constants";
-
-import { useSquaring } from "../context/SquaringContext";
+import { useTypedSelector } from "app/hooks/useTypedSelector";
+import { useWorkspaceState } from "app/hooks/useWorkspaceState";
+import { FaClipboard, FaClipboardCheck, FaClipboardList } from "react-icons/fa";
 import TriangleDiagram from "../components/TriangleDiagram";
+import { useSquaring } from "../context/SquaringContext";
 
 const MarkingStep = () => {
 	const {
@@ -43,10 +41,10 @@ const MarkingStep = () => {
 		<div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-2 items-start">
 			<div className="flex flex-col gap-4">
 				<div className="space-y-1">
-					<h3 className="text-lg font-semibold dark:text-content-primary">
+					<h3 className="text-lg font-semibold dark:text-white">
 						Instructions
 					</h3>
-					<p className="text-gray-600 dark:text-content-primary h-20">
+					<p className="text-gray-600 dark:text-white h-20">
 						{currentSubStepData.description}
 					</p>
 				</div>
@@ -65,7 +63,7 @@ const MarkingStep = () => {
 										? "bg-blue-50 border border-blue-200 bg-opacity-40"
 										: isPastStep
 											? "bg-green-50 border border-green-200 bg-opacity-30"
-											: "bg-amber-600 border border-amber-600 bg-opacity-10 border-opacity-10 opacity-50 dark:bg-surface-raised dark:border-outline"
+											: "bg-amber-600 border border-amber-600 bg-opacity-10 border-opacity-10 opacity-50 dark:bg-dark dark:border-gray-700"
 								}`}
 							>
 								<div className={`min-w-8 min-h-8 text-white`}>
@@ -129,9 +127,7 @@ const MarkingStep = () => {
 			</div>
 
 			<div className="flex flex-col items-center gap-4">
-				<h3 className="text-lg font-semibold dark:text-content-primary">
-					Diagram
-				</h3>
+				<h3 className="text-lg font-semibold dark:text-white">Diagram</h3>
 				<TriangleDiagram />
 			</div>
 		</div>

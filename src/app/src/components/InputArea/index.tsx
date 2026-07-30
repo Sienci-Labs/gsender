@@ -1,5 +1,5 @@
-import React from "react";
-import { Label } from "app/components/shadcn/Label";
+import type React from "react";
+import { Label } from "../shadcn/Label";
 
 const InputArea = ({
 	children,

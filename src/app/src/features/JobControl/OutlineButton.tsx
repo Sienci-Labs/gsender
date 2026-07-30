@@ -1,13 +1,14 @@
-import cx from "classnames";
+import { usePostHog } from "@posthog/react";
 import { Button } from "app/components/shadcn/Button";
-import { TbVector } from "react-icons/tb";
-import pubsub from "pubsub-js";
-import store from "app/store";
 import { LASER_MODE } from "app/constants";
-import { outlineResponse } from "app/workers/Outline.response";
 import { toast } from "app/lib/toaster";
+import store from "app/store";
 import { store as reduxStore } from "app/store/redux";
+import { outlineResponse } from "app/workers/Outline.response";
+import cx from "classnames";
 import get from "lodash/get";
+import pubsub from "pubsub-js";
+import { TbVector } from "react-icons/tb";
 
 interface OutlineButtonProps {
 	disabled: boolean;
@@ -16,6 +17,7 @@ interface OutlineButtonProps {
 let outlineRunning = false;
 
 const OutlineButton: React.FC<OutlineButtonProps> = ({ disabled }) => {
+	const posthog = usePostHog();
 	// TODO
 	const runOutline = () => {
 		const liteMode = store.get("widgets.visualizer.liteMode", false);
@@ -56,6 +58,13 @@ const OutlineButton: React.FC<OutlineButtonProps> = ({ disabled }) => {
 					mode: "Square",
 					bbox: bbox,
 					outlineSpeed,
+				});
+
+				posthog?.capture("outline_run", {
+					is_in_lite_mode: liteMode,
+					is_laser: isLaser,
+					outline_speed: outlineSpeed,
+					bbox,
 				});
 			} catch (e) {
 				console.log(e);

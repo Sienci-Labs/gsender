@@ -1,9 +1,8 @@
 // https://ui.shadcn.com/docs/components/tabs
 
-import * as React from "react";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
-
 import cn from "classnames";
+import type * as React from "react";
 
 function Tabs({
 	className,
@@ -63,4 +62,4 @@ function TabsContent({
 	);
 }
 
-export { Tabs, TabsList, TabsTrigger, TabsContent };
+export { Tabs, TabsContent, TabsList, TabsTrigger };

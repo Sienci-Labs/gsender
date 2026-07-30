@@ -1,24 +1,21 @@
-import React, { useState, useContext, useEffect } from "react";
-import PropTypes from "prop-types";
-
-import store from "app/store";
+import { Button } from "app/components/Button";
 import GamepadManager from "app/lib/gamepad";
 import { toast } from "app/lib/toaster";
-import { Button } from "app/components/Button";
-
-import { GamepadContext } from "./utils/context";
+import store from "app/store";
+import { ArrowLeft, DownloadIcon, UploadIcon } from "lucide-react";
+import PropTypes from "prop-types";
+import React, { useContext, useEffect, useState } from "react";
+import ButtonActionsTable from "./components/ButtonActionsTable";
+import JoystickOptions from "./JoystickOptions";
+import { arrayComparator } from "./utils";
 import {
 	setCurrentGamepadProfile,
-	setGamepadProfileList,
 	setCurrentModal,
+	setGamepadProfileList,
 	setMacros,
 } from "./utils/actions";
-
-import ButtonActionsTable from "./components/ButtonActionsTable";
-import { arrayComparator } from "./utils";
-import JoystickOptions from "./JoystickOptions";
 import { GAMEPAD_MODAL } from "./utils/constants";
-import { ArrowLeft, DownloadIcon, UploadIcon } from "lucide-react";
+import { GamepadContext } from "./utils/context";
 
 const Profile = ({ data }) => {
 	const { dispatch } = useContext(GamepadContext);
@@ -184,7 +181,7 @@ const Profile = ({ data }) => {
 					<input
 						type="text"
 						value={name}
-						className="rounded text-2xl font-bold border p-1 text-center border-gray-200 focus:border-gray-400 dark:bg-surface-raised dark:text-content-primary transition-all duration-200 ease-in-out"
+						className="rounded text-2xl font-bold border p-1 text-center border-gray-200 focus:border-gray-400 dark:bg-dark dark:text-white transition-all duration-200 ease-in-out"
 						onChange={(e) => setName(e.target.value)}
 						onBlur={handleEditName}
 					/>
@@ -222,15 +219,13 @@ const Profile = ({ data }) => {
 
 			<div className="flex gap-4 mt-3">
 				<div className="w-3/5 flex flex-col gap-2">
-					<h3 className="text-xl font-bold dark:text-content-primary">
-						Button Actions
-					</h3>
-					<p className="dark:text-content-primary">
+					<h3 className="text-xl font-bold dark:text-white">Button Actions</h3>
+					<p className="dark:text-white">
 						Assign a &quot;Lockout&quot; button for gamepad safety, or a
 						&quot;2nd Action&quot; button to use like a Function key and give
 						your gamepad double the functions!
 					</p>
-					<div className="relative h-full bg-white rounded border border-gray-300 dark:bg-surface-raised dark:border-outline">
+					<div className="relative h-full bg-white rounded border border-gray-300 dark:bg-dark dark:border-gray-700">
 						<div className="overflow-y-auto absolute top-0 left-0 w-full h-full">
 							<ButtonActionsTable />
 						</div>
@@ -238,7 +233,7 @@ const Profile = ({ data }) => {
 				</div>
 
 				<div className="w-2/5">
-					<h3 className="text-xl font-bold dark:text-content-primary">
+					<h3 className="text-xl font-bold dark:text-white">
 						Joystick Options
 					</h3>
 					<JoystickOptions />

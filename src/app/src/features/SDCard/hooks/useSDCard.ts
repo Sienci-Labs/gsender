@@ -1,8 +1,8 @@
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-import { RootState } from "app/store/redux";
-import { useEffect, useState } from "react";
-import controller from "app/lib/controller";
 import { WORKFLOW_STATE_IDLE } from "app/constants";
+import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
+import controller from "app/lib/controller.ts";
+import type { RootState } from "app/store/redux";
+import { useEffect, useState } from "react";
 
 export type UploadState = "idle" | "uploading" | "complete" | "error";
 
@@ -48,15 +48,16 @@ export function useSDCard() {
 	const newOpts = useTypedSelector(
 		(state: RootState) => state.controller.settings.info?.NEWOPT,
 	);
-	const hasFTP =
-		newOpts !== undefined &&
-		Object.prototype.hasOwnProperty.call(newOpts, "FTP");
-	const hasYM =
-		newOpts !== undefined &&
-		Object.prototype.hasOwnProperty.call(newOpts, "YM");
+	const hasFTP = newOpts !== undefined && Object.hasOwn(newOpts, "FTP");
+	const hasYM = newOpts !== undefined && Object.hasOwn(newOpts, "YM");
 
-	const uploadFileToSDCard = (file) => {
-		controller.command("ymodem:upload", file);
+	const uploadFileToSDCard = (filesData) => {
+		// Support both single file and multiple files
+		if (Array.isArray(filesData)) {
+			controller.command("ymodem:uploadFiles", filesData);
+		} else {
+			controller.command("ymodem:upload", filesData);
+		}
 	};
 
 	const runSDFile = (path) => {

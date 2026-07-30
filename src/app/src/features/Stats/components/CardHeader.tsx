@@ -1,5 +1,5 @@
-import React from "react";
 import { StatLink } from "app/features/Stats/components/StatLink.tsx";
+import type React from "react";
 
 interface CardHeaderProps {
 	children?: React.ReactNode;

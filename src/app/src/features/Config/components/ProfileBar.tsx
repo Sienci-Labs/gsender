@@ -1,23 +1,26 @@
-import { PiLightning } from "react-icons/pi";
-import { PiUploadSimpleBold, PiDownloadSimpleBold } from "react-icons/pi";
+import type { EEPROM, EEPROMSettings } from "app/definitions/firmware";
+import { ActionButton } from "app/features/Config/components/ActionButton.tsx";
+import { FlashDialog } from "app/features/Config/components/FlashDialog.tsx";
 import { MachineProfileSelector } from "app/features/Config/components/MachineProfileSelector.tsx";
-import { useSettings } from "app/features/Config/utils/SettingsContext.tsx";
+import { RestoreDefaultDialog } from "app/features/Config/components/RestoreDefaultDialog.tsx";
+import { importFirmwareSettings } from "app/features/Config/utils/EEPROM.ts";
 import {
 	exportFirmwareSettings,
 	updateAllSettings,
 } from "app/features/Config/utils/Settings";
-import { importFirmwareSettings } from "app/features/Config/utils/EEPROM.ts";
-import { useRef, useState } from "react";
+import { useSettings } from "app/features/Config/utils/SettingsContext.tsx";
+import controller from "app/lib/controller.ts";
 import { toast } from "app/lib/toaster";
-import { RootState } from "app/store/redux";
-import { useSelector } from "react-redux";
+import type { RootState } from "app/store/redux";
 import cn from "classnames";
-import { ActionButton } from "app/features/Config/components/ActionButton.tsx";
-import { FlashDialog } from "app/features/Config/components/FlashDialog.tsx";
-import { RestoreDefaultDialog } from "app/features/Config/components/RestoreDefaultDialog.tsx";
-import controller from "app/lib/controller";
-import { EEPROM, EEPROMSettings } from "app/definitions/firmware";
 import cx from "classnames";
+import { useRef, useState } from "react";
+import {
+	PiDownloadSimpleBold,
+	PiLightning,
+	PiUploadSimpleBold,
+} from "react-icons/pi";
+import { useSelector } from "react-redux";
 
 export function ProfileBar() {
 	const {
@@ -112,7 +115,7 @@ export function ProfileBar() {
 	}
 
 	return (
-		<div className="fixed flex px-4 max-xl:px-2 bg-white z-50 flex-row items-center  max-w-5xl justify-center bottom-8 max-xl:bottom-4 right-14 max-xl:right-0 h-16 max-sm:right-2 max-sm:border-0  dark:bg-surface-raised">
+		<div className="fixed flex px-4 max-xl:px-2 bg-white z-50 flex-row items-center  max-w-5xl justify-center bottom-8 max-xl:bottom-4 right-14 max-xl:right-0 h-16 max-sm:right-2 max-sm:border-0  dark:bg-dark">
 			<FlashDialog show={flashOpen} toggleShow={toggleFlash} />
 			<div className="flex flex-row items-center border border-gray-200 h-12 rounded-lg justify-between">
 				<div className="w-1/4 min-w-64  mx-auto px-2 max-sm:hidden">
@@ -163,7 +166,7 @@ export function ProfileBar() {
 					disabled={!settingsAreDirty}
 					onClick={updateSettingsHandler}
 				>
-					Apply<span className="max-xl:hidden"> Settings</span>
+					Apply Settings
 				</button>
 				{settingsAreDirty && (
 					<span className="w-4 h-4 animate-ping absolute -top-2 -left-2 bg-blue-400 rounded-xl"></span>

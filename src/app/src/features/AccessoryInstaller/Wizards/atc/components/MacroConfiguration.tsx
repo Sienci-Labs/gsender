@@ -1,9 +1,9 @@
-import { StepProps } from "app/features/AccessoryInstaller/types";
 import { StepActionButton } from "app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx";
-import { useEffect, useState } from "react";
+import type { StepProps } from "app/features/AccessoryInstaller/types";
 import { generateAllMacros } from "app/features/ATC/components/Configuration/utils/ConfigUtils.ts";
-import controller from "app/lib/controller";
+import controller from "app/lib/controller.ts";
 import store from "app/store";
+import { useEffect, useState } from "react";
 
 export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
 	const [rackSize, setRackSize] = useState<number | string>(6);
@@ -66,7 +66,7 @@ export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
 	return (
 		<div className="flex flex-col gap-5 justify-start">
 			<div>
-				<label className="block text-sm font-semibold text-gray-900 dark:text-content-muted mb-2">
+				<label className="block text-sm font-semibold text-gray-900 dark:text-gray-400 mb-2">
 					Rack Size
 				</label>
 				<select
@@ -79,12 +79,12 @@ export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
 					<option value={12}>12 Tool Rack</option>
 				</select>
 			</div>
-			<p className="dark:text-content-primary">
+			<p className="dark:text-white">
 				Sienci ATC operates using a set of macro programs stored in the micro SD
 				card of your controller.
 			</p>
 
-			<p className="dark:text-content-primary">
+			<p className="dark:text-white">
 				Specify your rack size and press <b>“Upload Macros”</b> to upload the
 				relevant program files into the SD card. This can be changed later.
 			</p>

@@ -1,5 +1,5 @@
-import { Job, JobStats } from "app/features/Stats/utils/StatContext.tsx";
 import { JOB_STATUS } from "app/constants";
+import type { Job, JobStats } from "app/features/Stats/utils/StatContext.tsx";
 
 export function truncatePort(port: string) {
 	if (!port) {

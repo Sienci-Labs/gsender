@@ -21,15 +21,18 @@
  *
  */
 
-import axios, { InternalAxiosRequestConfig, AxiosResponse } from "axios";
-import {
+import type { MachineProfile } from "app/definitions/firmware";
+import axios, {
+	type AxiosResponse,
+	type InternalAxiosRequestConfig,
+} from "axios";
+import type {
 	FetchOptions,
 	GCodeOptions,
 	SigninOptions,
 	StateOptions,
 	WatchOptions,
 } from "./definitions";
-import { MachineProfile } from "app/definitions/firmware";
 
 // import store from "../store";
 
@@ -452,6 +455,27 @@ const preferences = {
 	},
 };
 
+//
+// Plugins
+//
+const plugins = {
+	fetch: (): Promise<AxiosResponse> => {
+		return authrequest.get("/api/plugins");
+	},
+	update: (
+		id: string,
+		options: { enabled: boolean },
+	): Promise<AxiosResponse> => {
+		return authrequest.put(`/api/plugins/${encodeURIComponent(id)}`, options);
+	},
+	openDirectory: (pluginPath?: string): Promise<AxiosResponse> => {
+		return authrequest.post(
+			"/api/plugins/open-directory",
+			pluginPath ? { pluginPath } : {},
+		);
+	},
+};
+
 export default {
 	signin,
 	getLatestVersion,
@@ -478,4 +502,5 @@ export default {
 	alarmList,
 	releaseNotes,
 	preferences,
+	plugins,
 };

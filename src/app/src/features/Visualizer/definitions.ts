@@ -1,14 +1,14 @@
-import { BasicPosition, BBox, UNITS_EN } from "app/definitions/general";
-import {
+import type { BasicPosition, BBox, UNITS_EN } from "app/definitions/general";
+import type { ATCIMacroConfig } from "app/features/ATC/assets/defaultATCIMacros.ts";
+import type { WORKFLOW_STATES_T } from "app/store/definitions";
+import type { WORKSPACE_MODE_T } from "app/workspace/definitions";
+import type {
 	CAMERA_MODES,
 	CAMERA_POSITIONS,
 	LIGHTWEIGHT_OPTIONS,
 	THEMES,
 	VISUALIZER_TYPES,
 } from "../../constants";
-import { ATCIMacroConfig } from "app/features/ATC/assets/defaultATCIMacros.ts";
-import { WORKFLOW_STATES_T } from "app/store/definitions";
-import { WORKSPACE_MODE_T } from "app/workspace/definitions";
 // Types
 
 export type VISUALIZER_TYPES_T =
@@ -49,6 +49,10 @@ export interface Visualizer {
 		limits: {
 			visible: boolean;
 		};
+		machineBed: {
+			visible: boolean;
+			trimGridToBed: boolean;
+		};
 		coordinateSystem: {
 			visible: boolean;
 		};
@@ -72,6 +76,8 @@ export interface Visualizer {
 	showLineWarnings: boolean;
 	showSoftLimitWarning: boolean;
 	hideProcessedLines: boolean;
+	boundingBoxLabels: boolean;
+	followToolDuringRuntime: boolean;
 	rotaryDiameterOffsetEnabled: boolean;
 	debug: {
 		profileWorker: boolean;
@@ -121,6 +127,10 @@ export interface State {
 		limits: {
 			visible: boolean;
 		};
+		machineBed: {
+			visible: boolean;
+			trimGridToBed: boolean;
+		};
 		coordinateSystem: {
 			visible: boolean;
 		};
@@ -142,6 +152,8 @@ export interface State {
 	};
 	cameraMode: CAMERA_MODES_T;
 	cameraPosition: CAMERA_POSITIONS_T; // 'Top', '3D', 'Front', 'Left', 'Right'
+	moveToHere: boolean; // "Move To Here" placement mode is armed
+	isConnected?: boolean; // Injected at render from connection state
 	isAgitated: boolean; // Defaults to false
 	currentTheme: Map<string, string>;
 	currentTab: number;
@@ -203,6 +215,8 @@ export interface Actions {
 		toLeftSideView: () => void;
 		toRightSideView: () => void;
 		toFreeView: () => void;
+		toggleMoveToHere: () => void;
+		disableMoveToHere: () => void;
 	};
 	handleLiteModeToggle: () => void;
 	lineWarning: {

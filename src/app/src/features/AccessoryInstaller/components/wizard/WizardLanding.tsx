@@ -1,6 +1,6 @@
-import { ArrowLeft, ArrowRight, HelpCircle } from "lucide-react";
-import { SubWizard, ValidationResult } from "../../types/wizard";
 import { ValidationBanner } from "app/features/AccessoryInstaller/components/wizard/ValidationBanner.tsx";
+import { ArrowLeft, ArrowRight, HelpCircle } from "lucide-react";
+import type { SubWizard, ValidationResult } from "../../types/wizard";
 import DefaultImage from "../../Wizards/atc/assets/placeholder_1.png";
 
 interface WizardLandingProps {
@@ -66,12 +66,12 @@ export function WizardLanding({
 	);
 
 	return (
-		<div className="h-full min-h-0 bg-gray-50 dark:bg-surface-base flex overflow-hidden portrait:flex-col-reverse portrait:w-full">
+		<div className="h-full min-h-0 bg-gray-50 dark:bg-slate-800 flex overflow-hidden portrait:flex-col-reverse portrait:w-full">
 			<div className="w-3/5 portrait:w-full portrait:h-3/5 p-12 flex flex-col overflow-y-auto">
 				{onBack && (
 					<button
 						onClick={onBack}
-						className="flex items-center gap-2 text-gray-600 dark:text-content-secondary hover:text-gray-900 dark:hover:text-gray-100 mb-8 self-start"
+						className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 mb-8 self-start"
 					>
 						<ArrowLeft size={20} />
 						Back to Wizards
@@ -79,17 +79,17 @@ export function WizardLanding({
 				)}
 
 				<div className="flex-1">
-					<h1 className="text-5xl font-bold text-gray-900 dark:text-content-primary mb-4">
+					<h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-4">
 						{title}
 					</h1>
 					{activeSubWizard?.estimatedTime && (
-						<p className="text-gray-700 dark:text-content-muted mb-1">
+						<p className="text-gray-700 dark:text-gray-400 mb-1">
 							<span className="font-semibold">Estimated time:</span>{" "}
 							{activeSubWizard.estimatedTime}
 						</p>
 					)}
 					{activeSubWizard?.configVersion && (
-						<p className="text-gray-700 dark:text-content-muted mb-8">
+						<p className="text-gray-700 dark:text-gray-400 mb-8">
 							Configuration File Version: {activeSubWizard.configVersion}
 						</p>
 					)}
@@ -111,7 +111,7 @@ export function WizardLanding({
 				</div>
 			</div>
 
-			<div className="w-2/5 portrait:w-full portrait:h-2/5 bg-gray-200 dark:bg-surface-raised p-12 flex flex-col justify-between overflow-y-auto">
+			<div className="w-2/5 portrait:w-full portrait:h-2/5 bg-gray-200 dark:bg-dark p-12 flex flex-col justify-between overflow-y-auto">
 				<div className="flex items-center justify-center flex-1">
 					<img
 						alt="Wizard image"
@@ -120,14 +120,14 @@ export function WizardLanding({
 					/>
 				</div>
 
-				<div className="border-2 border-blue-400 rounded-lg p-6 bg-white dark:bg-surface-raised">
+				<div className="border-2 border-blue-400 rounded-lg p-6 bg-white dark:bg-slate-800">
 					<div className="flex items-start gap-3">
 						<HelpCircle className="text-blue-500 flex-shrink-0" size={24} />
 						<div>
-							<h3 className="font-semibold text-lg text-gray-900 dark:text-content-primary mb-1">
+							<h3 className="font-semibold text-lg text-gray-900 dark:text-white mb-1">
 								Need Help?
 							</h3>
-							<p className="text-gray-600 dark:text-content-muted">
+							<p className="text-gray-600 dark:text-gray-400">
 								Follow along in our{" "}
 								<a
 									href={helpUrl ?? "https://resources.sienci.com/"}

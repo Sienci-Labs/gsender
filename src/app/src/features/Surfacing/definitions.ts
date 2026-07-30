@@ -1,4 +1,4 @@
-import { SPINDLE } from "app/lib/definitions/gcode_virtualization";
+import type { SPINDLE } from "app/lib/definitions/gcode_virtualization";
 
 export interface Surfacing {
 	bitDiameter: number;

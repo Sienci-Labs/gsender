@@ -62,5 +62,5 @@ export const REGEX_MATCHER = {
 	Y_AXIS_COMMAND_REGEX:
 		/Y(\d+\.\d+)|Y (\d+\.\d+)|Y(\d+)|Y (\d+)|Y-(\d+\.\d+)|Y-(\d+)/,
 	COMMENT_SEMI_COLON: /\s*;.*/g,
-	COMMENT_BRACKETS: /\([^\)]*\)/gm,
+	COMMENT_BRACKETS: /\([^)]*\)/gm,
 };

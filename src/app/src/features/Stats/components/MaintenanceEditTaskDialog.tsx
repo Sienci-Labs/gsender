@@ -1,17 +1,4 @@
 import {
-	Dialog,
-	DialogContent,
-	DialogHeader,
-	DialogTitle,
-} from "app/components/shadcn/Dialog.tsx";
-import { MaintenanceTaskForm } from "app/features/Stats/components/MaintenanceTaskForm.tsx";
-import { buttonStyle } from "app/features/Stats/components/MaintenanceAddTaskDialog.tsx";
-import { useContext, useEffect, useState } from "react";
-import {
-	MaintenanceTask,
-	StatContext,
-} from "app/features/Stats/utils/StatContext.tsx";
-import {
 	AlertDialog,
 	AlertDialogAction,
 	AlertDialogCancel,
@@ -21,6 +8,20 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from "app/components/shadcn/AlertDialog";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+} from "app/components/shadcn/Dialog.tsx";
+import { buttonStyle } from "app/features/Stats/components/MaintenanceAddTaskDialog.tsx";
+import { MaintenanceTaskForm } from "app/features/Stats/components/MaintenanceTaskForm.tsx";
+import {
+	type MaintenanceTask,
+	StatContext,
+} from "app/features/Stats/utils/StatContext.tsx";
+import { useContext, useEffect, useState } from "react";
+
 // import Button from 'app/components/Button';
 
 interface MaintenanceEditTaskDialogProps {

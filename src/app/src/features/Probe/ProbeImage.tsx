@@ -21,27 +21,27 @@
  *
  */
 
-import React from "react";
 import {
-	TOUCHPLATE_TYPE_STANDARD,
+	TOUCHPLATE_TYPE_3D,
 	TOUCHPLATE_TYPE_AUTOZERO,
 	TOUCHPLATE_TYPE_BITZERO,
+	TOUCHPLATE_TYPE_STANDARD,
 	TOUCHPLATE_TYPE_ZERO,
-	TOUCHPLATE_TYPE_3D,
 } from "app/lib/constants";
-import XProbe from "./assets/Block-X.gif";
-import YProbe from "./assets/Block-Y.gif";
-import XYProbe from "./assets/Block-XY.gif";
-import XYZProbe from "./assets/Block-XYZ.gif";
-import ZProbe from "./assets/Block-Z.gif";
-import ZOnlyProbe from "./assets/Probe-Z.gif";
-import AutoZProbe from "./assets/AutoZero-Z.gif";
-import AutoXYZProbe from "./assets/AutoZero-Rem.gif";
+import type React from "react";
+import X3D from "./assets/3D-X.gif";
 import XY3D from "./assets/3D-XY.gif";
 import XYZ3D from "./assets/3D-XYZ.gif";
-import X3D from "./assets/3D-X.gif";
 import Y3D from "./assets/3D-Y.gif";
-import { ProbeCommand, TOUCHPLATE_TYPES_T } from "./definitions";
+import AutoXYZProbe from "./assets/AutoZero-Rem.gif";
+import AutoZProbe from "./assets/AutoZero-Z.gif";
+import XProbe from "./assets/Block-X.gif";
+import XYProbe from "./assets/Block-XY.gif";
+import XYZProbe from "./assets/Block-XYZ.gif";
+import YProbe from "./assets/Block-Y.gif";
+import ZProbe from "./assets/Block-Z.gif";
+import ZOnlyProbe from "./assets/Probe-Z.gif";
+import type { ProbeCommand, TOUCHPLATE_TYPES_T } from "./definitions";
 
 interface Props {
 	probeCommand: ProbeCommand;

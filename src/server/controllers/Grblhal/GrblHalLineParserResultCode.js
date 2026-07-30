@@ -25,7 +25,7 @@ class GrblHalLineParserResultCode {
 	static parse(line) {
 		// * Grbl v1.1
 		//   <Alarm:#|[...]>
-		const r = line.match(/^\<(Alarm):([0-9]*)\|.*\>$/);
+		const r = line.match(/^<(Alarm):([0-9]*)\|.*>$/);
 		if (!r) {
 			return null;
 		}

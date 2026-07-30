@@ -1,10 +1,10 @@
 import React from "react";
-import styles from "./index.module.styl";
 import ControlledInput from "./ControlledInput";
+import styles from "./index.module.styl";
 
 const StringInput = ({ info, setting, onChange, disabled }) => {
 	const { unit = null } = info;
-	let { value } = setting;
+	const { value } = setting;
 
 	return (
 		<div className="ring-1 ring-gray-300 flex flex-row flex-1 relative items-center rounded-md">

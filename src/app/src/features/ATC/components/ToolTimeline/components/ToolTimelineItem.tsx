@@ -1,13 +1,13 @@
-import cn from "classnames";
-import { ToolChange } from "./types";
 import Button from "app/components/Button";
-import { TbSwitch3 } from "react-icons/tb";
-import { useEffect, useState } from "react";
-import { lookupToolName } from "app/features/ATC/utils/ATCFunctions.ts";
-import pubsub from "pubsub-js";
 import Tooltip from "app/components/Tooltip";
-import { ToolProbeState } from "app/features/ATC/types.ts";
 import { ToolStatusBadges } from "app/features/ATC/components/ui/ToolStatusBadges.tsx";
+import type { ToolProbeState } from "app/features/ATC/types.ts";
+import { lookupToolName } from "app/features/ATC/utils/ATCFunctions.ts";
+import cn from "classnames";
+import pubsub from "pubsub-js";
+import { useEffect, useState } from "react";
+import { TbSwitch3 } from "react-icons/tb";
+import type { ToolChange } from "./types";
 
 interface ToolTimelineItemProps {
 	tool: ToolChange;
@@ -20,6 +20,7 @@ interface ToolTimelineItemProps {
 	probeState?: ToolProbeState;
 	canRemap?: boolean;
 	remapDisabled?: boolean;
+	showProbeStatus?: boolean;
 	handleRemap?: (number) => void;
 }
 
@@ -34,6 +35,7 @@ export function ToolTimelineItem({
 	probeState = "unprobed",
 	canRemap = false,
 	remapDisabled = false,
+	showProbeStatus = true,
 }: ToolTimelineItemProps) {
 	const [label, setLabel] = useState("");
 
@@ -65,7 +67,7 @@ export function ToolTimelineItem({
 					"group relative flex w-full items-center gap-3 rounded-lg px-3 py-3 transition-colors border border-l-0 overflow-hidden",
 					isActive
 						? "bg-gray-50/80 border-2 dark:bg-gray-800/80"
-						: "bg-gray-50/80 border-gray-200 dark:bg-gray-800/80 dark:border-outline hover:bg-gray-100/80 dark:hover:bg-gray-800/80",
+						: "bg-gray-50/80 border-gray-200 dark:bg-gray-800/80 dark:border-gray-700 hover:bg-gray-100/80 dark:hover:bg-gray-800/80",
 				)}
 				style={{
 					borderColor: isActive ? tool.color : undefined,
@@ -95,7 +97,7 @@ export function ToolTimelineItem({
 					<div className="flex items-center gap-1.5 min-h-[1.25rem]">
 						{isRemapped ? (
 							<>
-								<span className="text-xs text-gray-500 dark:text-content-muted line-through">
+								<span className="text-xs text-gray-500 dark:text-gray-400 line-through">
 									{currentToolLabel}
 								</span>
 								<span className="font-mono text-sm font-semibold text-gray-900 dark:text-gray-100">
@@ -109,29 +111,39 @@ export function ToolTimelineItem({
 						)}
 						{hasNickname && (
 							<>
-								<span className="text-gray-500 dark:text-content-muted">·</span>
+								<span className="text-gray-500 dark:text-gray-400">·</span>
 								<Tooltip content={label} side="top">
-									<span className="text-xs text-gray-500 dark:text-content-muted">
+									<span className="text-xs text-gray-500 dark:text-gray-400">
 										{label}
 									</span>
 								</Tooltip>
 							</>
 						)}
+						{!hasNickname && tool.comment && (
+							<>
+								<span className="text-gray-500 dark:text-gray-400">·</span>
+								<span className="text-xs text-gray-500 dark:text-gray-400 truncate">
+									{tool.comment}
+								</span>
+							</>
+						)}
 					</div>
 
-					<div className="flex items-center gap-2">
-						<ToolStatusBadges
-							probeState={probeState}
-							isManual={isManual}
-							size="sm"
-							manualPosition="after"
-							className="[&>div:first-child]:min-w-[124px]"
-						/>
-					</div>
+					{showProbeStatus && (
+						<div className="flex items-center gap-2">
+							<ToolStatusBadges
+								probeState={probeState}
+								isManual={isManual}
+								size="sm"
+								manualPosition="after"
+								className="[&>div:first-child]:min-w-[124px]"
+							/>
+						</div>
+					)}
 				</div>
 
 				<div className="flex flex-shrink-0 items-center gap-3 self-stretch">
-					<span className="whitespace-nowrap font-mono text-xs text-gray-500 dark:text-content-muted">
+					<span className="whitespace-nowrap font-mono text-xs text-gray-500 dark:text-gray-400">
 						{lineRange}
 					</span>
 					{canRemap && (

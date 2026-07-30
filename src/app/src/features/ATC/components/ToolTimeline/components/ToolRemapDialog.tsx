@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import * as SelectPrimitive from "@radix-ui/react-select";
+import { Button } from "app/components/Button";
+import { Badge } from "app/components/shadcn/Badge";
 import {
 	Dialog,
 	DialogContent,
@@ -7,29 +9,27 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "app/components/shadcn/Dialog";
-import * as SelectPrimitive from "@radix-ui/react-select";
+import { Label } from "app/components/shadcn/Label";
 import {
 	Select,
 	SelectContent,
 	SelectTrigger,
 	SelectValue,
 } from "app/components/shadcn/Select";
-import { Button } from "app/components/Button";
-import { Label } from "app/components/shadcn/Label";
-import { Badge } from "app/components/shadcn/Badge";
-import { ArrowRight } from "lucide-react";
-import cn from "classnames";
-import { ToolInstance } from "app/features/ATC/components/ToolTable.tsx";
-import { toolStateThemes } from "app/features/ATC/utils/ATCiConstants.ts";
+import type { ToolInstance } from "app/features/ATC/components/ToolTable.tsx";
 import { ToolStatusBadges } from "app/features/ATC/components/ui/ToolStatusBadges.tsx";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-import { RootState } from "app/store/redux";
+import { toolStateThemes } from "app/features/ATC/utils/ATCiConstants.ts";
+import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
+import type { RootState } from "app/store/redux";
+import cn from "classnames";
 import get from "lodash/get";
+import { ArrowRight } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface ToolRemapDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	originalTool: Number;
+	originalTool: number;
 	allTools: ToolInstance[];
 	onConfirm: (fromTool: number, toTool: number) => void;
 }
@@ -139,7 +139,7 @@ export function ToolRemapDialog({
 									)}
 								</SelectValue>
 							</SelectTrigger>
-							<SelectContent className="z-[10000] bg-white dark:bg-surface-raised">
+							<SelectContent className="z-[10000] bg-white dark:bg-dark">
 								{allTools.map((tool) => {
 									tool = { ...tool };
 									const available = isToolAvailable(tool.id);
@@ -158,7 +158,7 @@ export function ToolRemapDialog({
 											value={tool.id.toString()}
 											disabled={!available}
 											className={cn(
-												"relative flex w-full bg-white dark:bg-surface-raised cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+												"relative flex w-full bg-white dark:bg-dark cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
 												"border-l-4",
 												stateStyle.borderColor,
 												!available && "cursor-not-allowed",

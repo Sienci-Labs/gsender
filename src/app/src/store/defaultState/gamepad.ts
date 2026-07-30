@@ -1,5 +1,5 @@
 import { AXIS_A, AXIS_X, AXIS_Y, AXIS_Z } from "../../constants";
-import {
+import type {
 	DefaultGamepadOptions,
 	GamepadProfile,
 } from "../../lib/gamepad/definitions";

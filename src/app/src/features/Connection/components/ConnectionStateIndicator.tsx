@@ -1,10 +1,9 @@
-import { ConnectionState, ConnectionType } from "../index";
-import { PiPlugLight } from "react-icons/pi";
-import { BsCheckCircleFill, BsEthernet } from "react-icons/bs";
-import { BsUsbPlug } from "react-icons/bs";
-import { GrSatellite } from "react-icons/gr";
-import { ReactElement } from "react";
 import cn from "classnames";
+import type { ReactElement } from "react";
+import { BsCheckCircleFill, BsEthernet, BsUsbPlug } from "react-icons/bs";
+import { GrSatellite } from "react-icons/gr";
+import { PiPlugLight } from "react-icons/pi";
+import { ConnectionState, ConnectionType } from "../index";
 
 interface ConnectionStateIndicatorProps {
 	state: ConnectionState;

@@ -1,4 +1,3 @@
-import React, { useEffect, useRef, useState } from "react";
 import { Dialog, DialogContent } from "app/components/shadcn/Dialog.tsx";
 import {
 	Tabs,
@@ -6,11 +5,13 @@ import {
 	TabsList,
 	TabsTrigger,
 } from "app/components/shadcn/Tabs";
+import { useConfigContext } from "app/features/ATC/components/Configuration/hooks/useConfigStore.tsx";
+import { repopulateFromSDCard } from "app/features/ATC/components/Configuration/utils/ConfigUtils.ts";
+import controller from "app/lib/controller.ts";
+import type React from "react";
+import { useEffect, useRef, useState } from "react";
 import { ConfigTab } from "./ConfigTab";
 import { TemplatesTab } from "./TemplatesTab";
-import controller from "app/lib/controller";
-import { repopulateFromSDCard } from "app/features/ATC/components/Configuration/utils/ConfigUtils.ts";
-import { useConfigContext } from "app/features/ATC/components/Configuration/hooks/useConfigStore.tsx";
 
 interface ConfigModalProps {
 	open: boolean;

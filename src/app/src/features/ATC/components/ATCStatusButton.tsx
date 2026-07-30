@@ -1,7 +1,7 @@
-import { JSX } from "react";
 import cn from "classnames";
-import { TiWarning } from "react-icons/ti";
+import type { JSX } from "react";
 import { GrStatusGood } from "react-icons/gr";
+import { TiWarning } from "react-icons/ti";
 export interface ATCStatusButtonProps {
 	statusPredicate: () => boolean;
 	children: JSX.Element;

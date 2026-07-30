@@ -20,7 +20,7 @@ export default class EventEmitter {
 	 * @param {Object} data
 	 */
 	emit(name, data) {
-		if (!Object.prototype.hasOwnProperty.call(this._events, name)) {
+		if (!Object.hasOwn(this._events, name)) {
 			return;
 		}
 
@@ -49,7 +49,7 @@ export default class EventEmitter {
 	 * @param {Function} callback
 	 */
 	addEventListener(name, callback) {
-		if (!Object.prototype.hasOwnProperty.call(this._events, name)) {
+		if (!Object.hasOwn(this._events, name)) {
 			this._events[name] = [];
 		}
 
@@ -65,7 +65,7 @@ export default class EventEmitter {
 	 * @param {Function} callback
 	 */
 	removeEventListener(name, callback) {
-		if (!Object.prototype.hasOwnProperty.call(this._events, name)) {
+		if (!Object.hasOwn(this._events, name)) {
 			return;
 		}
 

@@ -1,20 +1,19 @@
 import {
-	MaintenanceTaskForm,
-	MaintenanceTaskFormRef,
-} from "app/features/Stats/components/MaintenanceTaskForm.tsx";
-import {
 	Dialog,
 	DialogContent,
 	DialogHeader,
 	DialogTitle,
 } from "app/components/shadcn/Dialog.tsx";
-
-import { tv } from "tailwind-variants";
-import { useContext, useRef } from "react";
 import {
-	MaintenanceTask,
+	MaintenanceTaskForm,
+	type MaintenanceTaskFormRef,
+} from "app/features/Stats/components/MaintenanceTaskForm.tsx";
+import {
+	type MaintenanceTask,
 	StatContext,
 } from "app/features/Stats/utils/StatContext.tsx";
+import { useContext, useRef } from "react";
+import { tv } from "tailwind-variants";
 
 export const buttonStyle = tv({
 	base: "inline-flex items-center px-6 py-3 border text-base font-medium rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out",
@@ -22,7 +21,7 @@ export const buttonStyle = tv({
 		colors: {
 			primary: "border-transparent text-white bg-blue-500",
 			secondary:
-				"bg-white border-blue-500 text-blue-500 dark:bg-surface-raised dark:text-content-primary dark:border-outline",
+				"bg-white border-blue-500 text-blue-500 dark:bg-dark dark:text-white dark:border-dark-lighter",
 			danger: "text-white border-transparent bg-red-500",
 		},
 	},

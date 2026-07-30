@@ -1,5 +1,5 @@
-import { Notification } from "app/workspace/definitions";
 import { useTypedSelector } from "app/hooks/useTypedSelector";
+import type { Notification } from "app/workspace/definitions";
 
 import { NotificationItem } from "./NotificationItem";
 

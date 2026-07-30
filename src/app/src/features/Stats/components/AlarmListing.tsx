@@ -1,13 +1,12 @@
+import { EmptyAlarmList } from "app/features/Stats/components/EmptyAlarmList.tsx";
 import {
-	FirmwareEvent,
+	type FirmwareEvent,
 	StatContext,
 } from "app/features/Stats/utils/StatContext.tsx";
+import cx from "classnames";
 import { useContext } from "react";
-
 import { IoIosWarning } from "react-icons/io";
 import { MdCancel } from "react-icons/md";
-import cx from "classnames";
-import { EmptyAlarmList } from "app/features/Stats/components/EmptyAlarmList.tsx";
 
 // const colorCodes = {
 //     ALARM: '#d75f5f',
@@ -48,10 +47,10 @@ function AlarmItem({ alarm }: AlarmItemProps) {
 			>
 				{alarm.type} {alarm.CODE} - {alarm.source}
 			</h3>
-			<time className="block mb-2 text-sm font-normal leading-none text-gray-400 dark:text-content-muted">
+			<time className="block mb-2 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">
 				{`at ${dateString}`}
 			</time>
-			<p className="text-base font-normal text-gray-500 dark:text-content-secondary">
+			<p className="text-base font-normal text-gray-500 dark:text-gray-300">
 				{alarm.MESSAGE || "No associated message"}
 			</p>
 			<p className="text-base font-normal text-gray-500">

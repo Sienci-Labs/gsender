@@ -1,18 +1,15 @@
-import { useEffect, useState } from "react";
-
 import {
 	Popover,
 	PopoverContent,
 	PopoverTrigger,
 } from "app/components/shadcn/Popover";
-import useKeybinding from "app/lib/useKeybinding.ts";
-import useShuttleEvents from "app/hooks/useShuttleEvents.ts";
-import { TOOLBAR_CATEGORY } from "app/constants";
 import Tooltip from "app/components/Tooltip";
-
-import { MachineInfoDisplay } from "./MachineInfoDisplay.tsx";
-
+import { TOOLBAR_CATEGORY } from "app/constants";
+import useShuttleEvents from "app/hooks/useShuttleEvents.ts";
+import useKeybinding from "app/lib/useKeybinding.ts";
+import { useEffect, useState } from "react";
 import minfo from "./assets/minfo.svg";
+import { MachineInfoDisplay } from "./MachineInfoDisplay.tsx";
 
 const MachineInfo = () => {
 	const [open, setOpen] = useState(false);
@@ -54,7 +51,7 @@ const MachineInfo = () => {
 				</PopoverTrigger>
 			</Tooltip>
 			<PopoverContent
-				className="max-sm:block mt-4 p-4 pt-2 z-10 flex flex-col justify-center w-[400px] max-w-[calc(100vw-2rem)] min-h-[300px] rounded-md [box-shadow:_0px_0px_2px_1px_var(--tw-shadow-color)] shadow-gray-400 dark:border-outline"
+				className="max-sm:block mt-4 p-4 pt-2 z-10 flex flex-col justify-center w-[400px] max-w-[calc(100vw-2rem)] min-h-[300px] rounded-md [box-shadow:_0px_0px_2px_1px_var(--tw-shadow-color)] shadow-gray-400 dark:border-dark-lighter"
 				align="end"
 				sideOffset={8}
 				collisionPadding={16}

@@ -1,16 +1,16 @@
-import { StatCard } from "app/features/Stats/components/StatCard";
-import { Diagnostic } from "app/features/Stats/components/Diagnostic.tsx";
-import { ExternalLink } from "app/features/Stats/components/ExternalLink.tsx";
-import { FaBookBookmark } from "react-icons/fa6";
-import { ImBubbles4 } from "react-icons/im";
-import { FaGithub } from "react-icons/fa";
 import { AlarmPreview } from "app/features/Stats/components/AlarmPreview.tsx";
 import { CardHeader } from "app/features/Stats/components/CardHeader.tsx";
+import { Configuration } from "app/features/Stats/components/Configuration.tsx";
+import { Diagnostic } from "app/features/Stats/components/Diagnostic.tsx";
+import { ExternalLink } from "app/features/Stats/components/ExternalLink.tsx";
 import { JobPreviewList } from "app/features/Stats/components/JobPreviewList.tsx";
 import { MaintenancePreview } from "app/features/Stats/components/MaintenancePreview.tsx";
-import { Configuration } from "app/features/Stats/components/Configuration.tsx";
-import { JobResultsChart } from "app/features/Stats/JobResultsChart.tsx";
+import { StatCard } from "app/features/Stats/components/StatCard";
 import { StatTable } from "app/features/Stats/components/StatTable.tsx";
+import { JobResultsChart } from "app/features/Stats/JobResultsChart.tsx";
+import { FaGithub } from "react-icons/fa";
+import { FaBookBookmark } from "react-icons/fa6";
+import { ImBubbles4 } from "react-icons/im";
 
 export function Stats() {
 	return (
@@ -20,9 +20,7 @@ export function Stats() {
 					id="mainStats"
 					className="col-span-4 max-xl:col-span-6 row-span-6 pr-8 max-xl:pr-0 mb-2 gap-4 flex flex-col"
 				>
-					<h1 className="text-3xl font-bold dark:text-content-primary">
-						Your Machine
-					</h1>
+					<h1 className="text-3xl font-bold dark:text-white">Your Machine</h1>
 					<StatCard>
 						<div className="grid grid-cols-2 gap-2">
 							<div className="flex flex-col gap-2">
@@ -58,9 +56,7 @@ export function Stats() {
 					className="col-span-2 max-xl:col-span-6 max-xl:flex-row max-xl:grid max-xl:grid-cols-2 row-span-6 col-start-5 pl-8 max-xl:pl-0 flex flex-col gap-4"
 				>
 					<div className="flex flex-col gap-4">
-						<h1 className="text-3xl font-bold dark:text-content-primary">
-							Get Help
-						</h1>
+						<h1 className="text-3xl font-bold dark:text-white">Get Help</h1>
 						<StatCard>
 							<Diagnostic />
 						</StatCard>

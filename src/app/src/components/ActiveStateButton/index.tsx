@@ -1,6 +1,6 @@
 import Button from "app/components/Button";
+import type { TooltipProps } from "app/components/Tooltip";
 import cn from "classnames";
-import { TooltipProps } from "app/components/Tooltip";
 
 interface ActiveStateButtonProps {
 	icon: JSX.Element;

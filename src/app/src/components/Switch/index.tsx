@@ -1,7 +1,7 @@
-import React, { useId } from "react";
-
-import Toggle from "./Toggle";
 import { cn } from "app/lib/utils";
+import type React from "react";
+import { useId } from "react";
+import Toggle from "./Toggle";
 
 interface SwitchProps {
 	label?: string;
@@ -36,7 +36,7 @@ const Switch: React.FC<SwitchProps> = ({
 			{label && (
 				<label
 					htmlFor={switchId}
-					className="mr-2 cursor-pointer text-sm font-medium text-gray-900 dark:text-content-secondary"
+					className="mr-2 cursor-pointer text-sm font-medium text-gray-900 dark:text-gray-300"
 				>
 					{label}
 				</label>
@@ -57,7 +57,7 @@ const Switch: React.FC<SwitchProps> = ({
 			{secondaryLabel && (
 				<label
 					htmlFor={switchId}
-					className="ml-2 cursor-pointer text-sm font-medium text-gray-900 dark:text-content-secondary"
+					className="ml-2 cursor-pointer text-sm font-medium text-gray-900 dark:text-gray-300"
 				>
 					{secondaryLabel}
 				</label>

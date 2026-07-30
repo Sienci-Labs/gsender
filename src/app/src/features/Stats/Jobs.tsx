@@ -1,21 +1,22 @@
-import SortableTable, { CustomColumnDef } from "app/components/SortableTable";
-import { StatCard } from "app/features/Stats/components/StatCard.tsx";
-import { useContext } from "react";
-import {
-	Job,
-	JOB_STATUS_T,
-	StatContext,
-} from "app/features/Stats/utils/StatContext.tsx";
-import { GRBL, JOB_STATUS, JOB_TYPES } from "app/constants";
-import { CheckCircle, XCircle } from "lucide-react";
-import { CardHeader } from "app/features/Stats/components/CardHeader.tsx";
 import { Button } from "app/components/Button";
-import { FaTrash } from "react-icons/fa";
 import { Confirm } from "app/components/ConfirmationDialog/ConfirmationDialogLib.ts";
-
-import { convertMillisecondsToTimeStamp } from "app/lib/datetime";
+import SortableTable, {
+	type CustomColumnDef,
+} from "app/components/SortableTable";
+import { GRBL, JOB_STATUS, JOB_TYPES } from "app/constants";
+import { CardHeader } from "app/features/Stats/components/CardHeader.tsx";
 import { JobsPerComPort } from "app/features/Stats/components/JobsPerComPort.tsx";
 import { RunTimePerComPort } from "app/features/Stats/components/RunTimePerComPort.tsx";
+import { StatCard } from "app/features/Stats/components/StatCard.tsx";
+import {
+	type JOB_STATUS_T,
+	type Job,
+	StatContext,
+} from "app/features/Stats/utils/StatContext.tsx";
+import { convertMillisecondsToTimeStamp } from "app/lib/datetime";
+import { CheckCircle, XCircle } from "lucide-react";
+import { useContext } from "react";
+import { FaTrash } from "react-icons/fa";
 
 const defaultData: Job[] = [
 	{
@@ -132,11 +133,11 @@ export function Jobs() {
 				</StatCard>
 			</div>
 			<div className="col-span-2 row-span-6 col-start-5 pl-8 max-xl:pl-0 flex flex-col gap-2 justify-center items-center">
-				<div className="flex flex-col bg-white border border-gray-300 rounded p-2 h-full dark:bg-surface-raised dark:border-outline w-full justify-center items-center">
+				<div className="flex flex-col bg-white border border-gray-300 rounded p-2 h-full dark:bg-dark dark:border-dark-lighter w-full justify-center items-center">
 					<CardHeader>Jobs per CNC</CardHeader>
 					<JobsPerComPort />
 				</div>
-				<div className="flex flex-col bg-white border border-gray-300 rounded p-2 h-full dark:bg-surface-raised dark:border-outline w-full justify-center items-center">
+				<div className="flex flex-col bg-white border border-gray-300 rounded p-2 h-full dark:bg-dark dark:border-dark-lighter w-full justify-center items-center">
 					<CardHeader>Run Time per CNC</CardHeader>
 					<RunTimePerComPort />
 				</div>

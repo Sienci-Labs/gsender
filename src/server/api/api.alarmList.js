@@ -1,6 +1,7 @@
-import config from "../services/configstore";
-import { ERR_INTERNAL_SERVER_ERROR } from "../constants";
 import { get } from "lodash";
+import { ERR_INTERNAL_SERVER_ERROR } from "../constants";
+import config from "../services/configstore/alarmStore";
+
 // import logger from '../lib/logger';
 
 // const log = logger('api:alarmList');
@@ -45,7 +46,7 @@ export const fetchRecent = (req, res) => {
 
 export const update = (req, res) => {
 	const alarmError = req.body;
-	let alarmList = getAlarmList();
+	const alarmList = getAlarmList();
 	alarmList.list.push(alarmError);
 
 	try {
@@ -59,7 +60,7 @@ export const update = (req, res) => {
 };
 
 export const clearAll = (req, res) => {
-	let alarmList = getAlarmList();
+	const alarmList = getAlarmList();
 
 	try {
 		alarmList.list = [];

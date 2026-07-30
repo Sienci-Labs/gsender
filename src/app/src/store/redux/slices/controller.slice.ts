@@ -1,17 +1,19 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import _get from "lodash/get";
-
-import { MAX_TERMINAL_INPUT_ARRAY_SIZE } from "app/lib/constants";
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { WORKFLOW_STATE_IDLE } from "app/constants";
+import type {
+	EEPROMDescriptions,
+	EEPROMSettings,
+} from "app/definitions/firmware";
+import type { BasicPosition } from "app/definitions/general";
+import type { Spindle } from "app/features/Spindle/definitions";
+import { MAX_TERMINAL_INPUT_ARRAY_SIZE } from "app/lib/constants";
+import type { Modal } from "app/lib/definitions/gcode_virtualization";
+import type { Feeder, Sender } from "app/lib/definitions/sender_feeder";
 import { in2mm, mm2in } from "app/lib/units";
 import store from "app/store";
-import { EEPROMDescriptions, EEPROMSettings } from "app/definitions/firmware";
-import { Modal } from "app/lib/definitions/gcode_virtualization";
-import { Feeder, Sender } from "app/lib/definitions/sender_feeder";
-import { Spindle } from "app/features/Spindle/definitions";
-import { BasicPosition } from "app/definitions/general";
+import _get from "lodash/get";
 
-import {
+import type {
 	ControllerSettings,
 	ControllerState,
 	SDCardFile,
@@ -45,6 +47,14 @@ const initialState: ControllerState = {
 		c: 0.0,
 	},
 	wpos: {
+		x: 0.0,
+		y: 0.0,
+		z: 0.0,
+		a: 0.0,
+		b: 0.0,
+		c: 0.0,
+	},
+	wco: {
 		x: 0.0,
 		y: 0.0,
 		z: 0.0,
@@ -184,6 +194,10 @@ const controllerSlice = createSlice({
 				_get(state.state, "status.mpos"),
 				settings,
 			);
+			const wco = mapPosToFeedbackUnits(
+				_get(state.state, "status.wco"),
+				settings,
+			);
 			const modal = consolidateModals(state.state);
 			updateMachineLimitsFromEEPROM({ settings: settings.settings });
 
@@ -191,6 +205,7 @@ const controllerSlice = createSlice({
 			state.settings = settings;
 			state.mpos = mpos;
 			state.wpos = wpos;
+			state.wco = wco;
 			state.modal = modal;
 		},
 		updatePartialControllerSettings: (
@@ -216,6 +231,10 @@ const controllerSlice = createSlice({
 				_get(newState, "status.mpos"),
 				state.settings,
 			);
+			const wco = mapPosToFeedbackUnits(
+				_get(newState, "status.wco"),
+				state.settings,
+			);
 			const mappedFeedrate = mapFeedrateToFeedbackUnits(
 				_get(newState, "status.feedrate"),
 				state.settings,
@@ -232,6 +251,7 @@ const controllerSlice = createSlice({
 			state.modal = modal;
 			state.wpos = wpos;
 			state.mpos = mpos;
+			state.wco = wco;
 		},
 
 		updateFeederStatus: (state, action: PayloadAction<Feeder>) => {

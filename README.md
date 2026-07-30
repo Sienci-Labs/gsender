@@ -23,10 +23,10 @@ gSender is a feature-packed CNC interface software designed to be clean and easy
 
 gSender is available for the systems below and does not yet support headless Pi operation
 
-| ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x64)        | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/MAC.png)<br>Mac (Universal)          | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/LIN.png)<br>Linux (Intel)                | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/LIN.png)<br>Linux (ARM)              | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Pi (64 bit)                                                   |
-|-----------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
-|                                                                                                                             |                                                                                                                             |                                                                                                                                      |                                                                                                                               |                                                                                                                                   |
-| ```  Available  ```  [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.6.0/gSender-1.6.0-Windows-64Bit.exe) | ```  Available  ```  [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.6.0/gSender-1.6.0-Mac-Universal.dmg) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.6.0/gSender-1.6.0-Linux-Intel-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.6.0/gSender-1.6.0-Linux-ARM-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.6.0/gSender-1.6.0-PI-64Bit.deb) |
+| ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x64)        | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/MAC.png)<br>Mac (Intel)          | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/LIN.png)<br>Linux (Intel)              | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/LIN.png)<br>Linux (ARM)              | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Pi (64 bit)                                        |
+|-----------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
+|                                                                                                                             |                                                                                                                         |                                                                                                                                 |                                                                                                                               |                                                                                                                        |
+| ```  Available  ```  [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.6.2/gSender-1.6.2-Windows-64Bit.exe) | ```  Available  ```  [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.6.2/gSender-1.6.2-Mac-Intel.dmg) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.6.2/gSender-1.6.2-Linux-Intel-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.6.2/gSender-1.6.2-Linux-ARM-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.6.2/gSender-1.6.2-PI-64Bit.deb) |
      
 
 [Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
@@ -111,6 +111,58 @@ You can both run gSender locally using the public code-base as well as compile i
 ## 🕣 Development History
 <details>
 <summary>Expand to see all version notes</summary>
+
+### 1.6.3 (July 23, 2026)
+- Added LongMill MK3 profiles.
+- Added flashing path for new SLB-Lite using `$UF2`.
+- Added TLS installation wizard to the accessory installation tool.
+- Added ability to specify feed rate on final probe movements — default `0` continues to use `G0`; any other value uses `G1 Fx` where `x` is the configured value.
+- SD tool now allows uploading multiple files at the same time.
+- Added pending toolchange state to the toolchange wizard while already-planned lines finish their motions, and delayed wizard appearance until closer to the actual `M6` command.
+- Updating the toolchange passthrough setting now updates the controller without reconnecting or reloading a file.
+- Updating the passthrough setting in Config updates that option without requiring a file reload or reconnect.
+- No longer swaps spindle min/max for grblHAL, so PWM can be used as a laser without issues.
+- `pos{axis}` and `mpos{axis}` feeder variables are now always returned in mm, regardless of report-in-inches (`$13`) status.
+- Homing status on connect for already-homed grblHAL devices is now more consistent.
+- Tool probe status now allows positive values — only `0` is considered unprobed.
+- Probe status badge in the tool timeline now only shows when using grblHAL with ATC=1 (tc.macro exists).
+- Added background to job progress line count for readability when the visualizer is disabled.
+- ATC options tool is now disabled if no SD card is mounted.
+- Improved reliability of Config Store truncation.
+- Added various updates to prevent the ConfigStore file (sender_rc) from becoming corrupted.
+- Corrupted ConfigStore files no longer block application startup.
+- Various firmware updates for the latest grblHAL core version.
+- Updated grblHAL profiles for the new firmware release — mostly related to laser/PWM2 behaviors.
+- Entering laser mode on grblHAL no longer swaps `$30` and `$31` with the laser equivalents.
+- Fixed tool timeline not reflecting the remapped tool number after minimizing.
+- Fixed issue where opening the run probe dialog with connectivity would cause all future connectivity tests to pass immediately.
+- Fixed issue where restoring an altered EEPROM value in Config without applying wouldn't update the UI with the correct value in the Config tool.
+- Fixed toggling single-axis homing on and then off in the on-state not showing the original "go to" buttons.
+- Fixed backwards logic on the park shortcut, allowing usage when homed.
+- Fixed job progress not updating correctly after a tool change was handled via one of the wizard strategies.
+
+### 1.6.2 (May 26, 2026)
+
+- Updated firmware defaults to better account for TLS/probe misconfiguration scenarios
+- Various firmware default updates and compatibility improvements for newer firmware versions
+- Uploading to SD cards over ethernet is working correctly again
+- Laser power slider now behaves as expected on newer firmware
+- Spindle selector now works correctly on newer firmware
+- Laser offsets now map correctly to the updated Config key structure
+- Flash utility will now automatically select grblHAL firmware when `SLB_DFU` is detected
+- Exiting rotary mode will once again properly restore previous machine values
+- Spindle commands are no longer sent when the spindle list is empty
+- Non-enabled spindles will no longer appear in the spindle dropdown list
+- Spindle dropdown will now attempt to refresh itself automatically if empty in the Spindle/Laser drawer
+- Numerous visual and workflow improvements to the tool change wizard
+- Tool change wizard will now resume the spindle before returning to the previous XY position
+- Tool change wizard and tool timeline now display annotation comments when no ATC nickname is set
+- Removed probed/unprobed status on firmware versions without a tool table
+- ATC Config will now send default values on first install
+- ATC config will now warn when unable to read the stored configuration values.
+- Squaring and motor tuning workflows now share the same jog popover for a more consistent experience
+- Spindle delay behaviour has been updated and is now an explicit configurable option for forced insertion when needed
+- Macros can now send realtime commands
 
 ### 1.6.1 (April 30, 2026)
 - Added option to skip first tool change on fixed strategy or prompt use if they want to skip

@@ -1,10 +1,10 @@
-import { WORKSPACE_MODE } from "../constants";
-import { MachineProfile } from "app/definitions/firmware";
-import { UNITS_EN, BasicPosition } from "app/definitions/general";
-import { ProbeProfile } from "app/features/Probe/definitions";
-import { RotarySettings } from "app/features/Rotary/definitions";
-import { Tool } from "app/features/Tools/definitions";
-import { GamepadConfig } from "app/lib/gamepad/definitions";
+import type { MachineProfile } from "app/definitions/firmware";
+import type { BasicPosition, UNITS_EN } from "app/definitions/general";
+import type { ProbeProfile } from "app/features/Probe/definitions";
+import type { RotarySettings } from "app/features/Rotary/definitions";
+import type { Tool } from "app/features/Tools/definitions";
+import type { GamepadConfig } from "app/lib/gamepad/definitions";
+import type { WORKSPACE_MODE } from "../constants";
 
 // Types
 
@@ -34,7 +34,7 @@ export interface Workspace {
 	spindleFunctions: boolean;
 	coolantFunctions: boolean;
 	atcEnabled: boolean;
-	sendUsageData: boolean;
+	collectUsageDataStatus: "accepted" | "denied" | "pending";
 	safeRetractHeight: number;
 	customDecimalPlaces: number;
 	jobsFinished: number;
@@ -47,6 +47,7 @@ export interface Workspace {
 	revertWorkspace: boolean;
 	promptExit: boolean;
 	backupFreq: BackupFrequencies;
+	backupLoc: string;
 	lastBackupTime: number;
 	powerSaving: boolean;
 	park: object;

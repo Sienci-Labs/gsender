@@ -21,10 +21,10 @@
  *
  */
 
-import { EventEmitter } from "events";
-import { SerialPort } from "serialport";
 import { ReadlineParser } from "@serialport/parser-readline";
+import { EventEmitter } from "events";
 import net from "net";
+import { SerialPort } from "serialport";
 
 // Validation
 
@@ -179,7 +179,7 @@ class SerialConnection extends EventEmitter {
 		const { path, baudRate, network, ethernetPort, ...rest } = this.settings;
 
 		const ip = "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)";
-		const expr = new RegExp(`^${ip}\.${ip}\.${ip}\.${ip}$`, "g");
+		const expr = new RegExp(`^${ip}.${ip}.${ip}.${ip}$`, "g");
 		const looksLikeIP = path.match(expr);
 
 		if (this.port && !looksLikeIP) {

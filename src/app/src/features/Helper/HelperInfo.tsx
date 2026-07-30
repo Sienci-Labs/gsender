@@ -21,11 +21,11 @@
  *
  */
 
-import styles from "./index.module.styl";
 import cx from "classnames";
-import { CSSTransition } from "react-transition-group";
-import { FaInfoCircle, FaTimes } from "react-icons/fa";
 import { useEffect, useState } from "react";
+import { FaInfoCircle, FaTimes } from "react-icons/fa";
+import { CSSTransition } from "react-transition-group";
+import styles from "./index.module.styl";
 
 const HelperInfo = ({ payload, infoVisible, onClose }) => {
 	const { title, description } = payload;
@@ -38,7 +38,7 @@ const HelperInfo = ({ payload, infoVisible, onClose }) => {
 	return (
 		<div
 			className={cx(
-				"absolute bottom-2/3 xl:left-20 left-16 w-1/3 bg-white rounded flex flex-col content-end overflow-hidden z-50 border-2 border-orange-600",
+				"absolute bottom-2/3 xl:left-20 left-16 w-1/3 bg-white rounded flex flex-col content-end overflow-hidden z-[10000] border-2 border-orange-600",
 				{
 					hidden: !visible,
 				},

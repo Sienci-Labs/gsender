@@ -1,6 +1,3 @@
-import { useState, useRef, ChangeEvent, FormEvent } from "react";
-import Select from "react-select";
-
 import Button from "app/components/Button";
 import {
 	Dialog,
@@ -12,6 +9,8 @@ import {
 } from "app/components/shadcn/Dialog";
 import { Input } from "app/components/shadcn/Input";
 import Tooltip from "app/components/Tooltip";
+import { type ChangeEvent, type FormEvent, useRef, useState } from "react";
+import Select from "react-select";
 
 import { MACRO_VARIABLES } from "./constants";
 import insertAtCaret from "./insertAtCaret";
@@ -203,7 +202,7 @@ const MacroForm = ({
 							<textarea
 								ref={contentRef}
 								rows={10}
-								className="border border-gray-300 rounded-md p-2 dark:text-content-primary dark:bg-surface-raised dark:border-gray-500"
+								className="border border-gray-300 rounded-md p-2 dark:text-white dark:bg-dark dark:border-gray-500"
 								name="content"
 								value={macroState.content}
 								onChange={handleInputChange}
@@ -219,7 +218,7 @@ const MacroForm = ({
 								ref={descriptionRef}
 								rows={4}
 								maxLength={MAX_CHARACTERS}
-								className="border border-gray-300 rounded-md p-2 dark:text-content-primary dark:bg-surface-raised dark:border-gray-500"
+								className="border border-gray-300 rounded-md p-2 dark:text-white dark:bg-dark dark:border-gray-500"
 								name="description"
 								value={macroState.description}
 								onChange={handleInputChange}

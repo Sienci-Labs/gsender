@@ -1,40 +1,41 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
-import { useDispatch } from "react-redux";
-import debounce from "lodash/debounce";
-import pubsub from "pubsub-js";
-
+import Widget from "app/components/Widget";
+import type { UNITS_EN, UNITS_GCODE } from "app/definitions/general";
+import { ATCI_SUPPORTED_VERSION } from "app/features/ATC/utils/ATCiConstants.ts";
 import { useTypedSelector } from "app/hooks/useTypedSelector";
+import controller from "app/lib/controller";
+import { firmwarePastVersion } from "app/lib/firmwareSemver.ts";
+import { convertToImperial } from "app/lib/units";
+import store from "app/store";
+import reduxStore from "app/store/redux";
 import {
 	clearSpindles,
 	updatePartialControllerSettings,
 } from "app/store/redux/slices/controller.slice";
-import store from "app/store";
-import Widget from "app/components/Widget";
-import controller from "app/lib/controller";
-import { convertToImperial } from "app/lib/units";
-import { UNITS_EN, UNITS_GCODE } from "app/definitions/general";
-import WidgetConfig from "app/features/WidgetConfig/WidgetConfig";
+import debounce from "lodash/debounce";
+import findIndex from "lodash/findIndex";
+import get from "lodash/get";
+import posthog from "posthog-js";
+import pubsub from "pubsub-js";
+import type React from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
 import {
 	GRBL,
-	GRBLHAL,
 	GRBL_ACTIVE_STATE_IDLE,
+	GRBLHAL,
 	IMPERIAL_UNITS,
 	LASER_MODE,
 	SPINDLE_LASER_CATEGORY,
 	SPINDLE_MODE,
 	WORKFLOW_STATE_RUNNING,
-} from "app/constants";
-import SpindleControls from "./components/SpindleControls";
+} from "../../constants";
+import { round, roundMetric } from "../../lib/rounding";
+import WidgetConfig from "../WidgetConfig/WidgetConfig";
 import LaserControls from "./components/LaserControls";
 import ModalToggle from "./components/ModalToggle";
+import SpindleControls from "./components/SpindleControls";
 import SpindleSelector from "./components/SpindleSelector";
-import { roundMetric, round } from "app/lib/rounding";
-import findIndex from "lodash/findIndex";
-import get from "lodash/get";
-import reduxStore from "app/store/redux";
-import { SPINDLE_LASER_T } from "./definitions";
-import { firmwarePastVersion } from "app/lib/firmwareSemver.ts";
-import { ATCI_SUPPORTED_VERSION } from "app/features/ATC/utils/ATCiConstants.ts";
+import type { SendM5Type, SPINDLE_LASER_T } from "./definitions";
 
 interface SpindleState {
 	minimized: boolean;
@@ -50,6 +51,8 @@ interface SpindleState {
 	spindleMax: number;
 	spindleMin: number;
 }
+
+const SLB_LASERS = ["SLB_LASER", "PWM2"];
 
 const SpindleWidget = () => {
 	const dispatch = useDispatch();
@@ -102,8 +105,16 @@ const SpindleWidget = () => {
 		$13: state.controller.settings.settings.$13 ?? "0",
 		laserMax: Number(state.controller.settings.settings.$730 ?? 255),
 		laserMin: Number(state.controller.settings.settings.$731 ?? 0),
-		laserXOffset: Number(state.controller.settings.settings.$741 ?? 0),
-		laserYOffset: Number(state.controller.settings.settings.$742 ?? 0),
+		laserXOffset: Number(
+			state.controller.settings.settings.$770 ??
+				state.controller.settings.settings.$741 ??
+				0,
+		),
+		laserYOffset: Number(
+			state.controller.settings.settings.$771 ??
+				state.controller.settings.settings.$742 ??
+				0,
+		),
 	}));
 
 	const [isLaserOn, setIsLaserOn] = useState<boolean>(false);
@@ -351,13 +362,16 @@ const SpindleWidget = () => {
 		const prevSpindleMin = config.get("spindleMin", 0);
 		const prevSpindleMax = config.get("spindleMax", 0);
 
+		availableSpindles.forEach((o) => {
+			console.log(SLB_LASERS.includes(o.label));
+		});
 		const SLBLaserExists =
 			controllerType === GRBLHAL &&
-			findIndex(availableSpindles, (o) => o.label === "SLB_LASER") !== -1;
+			findIndex(availableSpindles, (o) => SLB_LASERS.includes(o.label)) !== -1;
 
 		// save current laser values if laser spindle doesnt exist
 		if (!SLBLaserExists) {
-			let laser = config.get("laser", {
+			const laser = config.get("laser", {
 				maxPower: 0,
 				minPower: 0,
 			});
@@ -410,9 +424,7 @@ const SpindleWidget = () => {
 		});
 		const { minPower, maxPower } = laser;
 
-		const SLBLaserExists =
-			controllerType === GRBLHAL &&
-			findIndex(availableSpindles, (o) => o.label === "SLB_LASER") !== -1;
+		const SLBLaserExists = controllerType === GRBLHAL;
 
 		// save current spindle values if laser spindle doesnt exist
 		if (!SLBLaserExists) {
@@ -450,6 +462,16 @@ const SpindleWidget = () => {
 		controller.command("gcode", commands);
 	};
 
+	// refresh spindle list if it didn't populate
+	const refreshSpindles = () => {
+		if (availableSpindles.length === 0) {
+			const spindleCommand = firmwarePastVersion(ATCI_SUPPORTED_VERSION)
+				? "$spindlesh"
+				: "$spindles";
+			controller.writeln(spindleCommand);
+		}
+	};
+
 	const actions = {
 		handleModeToggle: () => {
 			const newMode =
@@ -461,26 +483,39 @@ const SpindleWidget = () => {
 				enableLaserMode();
 			}
 			pubsub.publish("spindle:mode", newMode);
+
+			posthog?.capture("spindle_mode_changed", { mode: newMode });
 		},
 		sendM3: () => {
 			setIsSpindleOn(true);
 			controller.command("gcode", `M3 S${stateRef.current.spindleSpeed}`);
+
+			posthog?.capture("spindle_forward");
 		},
 		sendM4: () => {
 			setIsSpindleOn(true);
 			controller.command("gcode", `M4 S${stateRef.current.spindleSpeed}`);
+
+			posthog?.capture("spindle_reverse");
 		},
-		sendM5: () => {
+		sendM5: ({ type = "spindle", ignorePosthog = false }: SendM5Type = {}) => {
 			setIsLaserOn(false);
 			setIsSpindleOn(false);
 			controller.command("gcode", "M5 S0");
+
+			if (!ignorePosthog) posthog?.capture(`${type}_stopped`);
 		},
 		sendLaserM3: () => {
-			const laserPower =
-				stateRef.current.laser.maxPower * (stateRef.current.laser.power / 100);
+			const laserMaxx =
+				controller.type === GRBLHAL
+					? laserMax
+					: stateRef.current.laser.maxPower;
+			const laserPower = laserMaxx * (stateRef.current.laser.power / 100);
 
 			setIsLaserOn(true);
 			controller.command("gcode", `G1F1 M3 S${laserPower}`);
+
+			posthog?.capture("laser_on");
 		},
 		handleSpindleSpeedChange: (value: number) => {
 			if (isSpindleOn) {
@@ -492,7 +527,7 @@ const SpindleWidget = () => {
 			if (isLaserOn) {
 				debounceLaserPower(
 					value,
-					spindle.label === "SLB_LASER" ? laserMax : state.laser.maxPower,
+					controller.type === GRBLHAL ? laserMax : state.laser.maxPower,
 				);
 			}
 			setState((prevState) => ({
@@ -510,36 +545,24 @@ const SpindleWidget = () => {
 		runLaserTest: () => {
 			const { power, duration } = state.laser;
 			const maxPower =
-				spindle.label === "SLB_LASER" ? laserMax : state.laser.maxPower;
+				controller.type === GRBLHAL ? laserMax : state.laser.maxPower;
 			controller.command("lasertest:on", power, duration, maxPower);
 			setTimeout(() => {
-				actions.sendM5();
+				actions.sendM5({ type: "laser", ignorePosthog: true }); // ignore posthog capture, adds unecessary extra laser_stopped event
 			}, duration * 1000);
+
+			posthog?.capture("laser_test_run", { power, duration });
 		},
 		runShortcutLaserTest: () => {
-			const spindle = get(reduxStore.getState(), "controller.spindles").find(
-				(s) => s.enabled,
-			) ?? {
-				label: "Default Spindle",
-				id: "0",
-				enabled: true,
-				capabilities: "",
-				laser: false,
-				raw: "",
-				order: 0,
-			};
-			const laserMax = Number(
-				get(reduxStore.getState(), "controller.settings.settings.$730") ?? 255,
-			);
 			const { power, duration } = stateRef.current.laser;
 			const maxPower =
-				spindle.label === "SLB_LASER"
+				controller.type === GRBLHAL
 					? laserMax
 					: stateRef.current.laser.maxPower;
 
 			controller.command("lasertest:on", power, duration, maxPower);
 			setTimeout(() => {
-				actions.sendM5();
+				actions.sendM5({ type: "laser" });
 			}, duration * 1000);
 		},
 		handleHALSpindleSelect: (selectedSpindle: {
@@ -556,45 +579,10 @@ const SpindleWidget = () => {
 				`M104 Q${selectedSpindle.value}`,
 				`${spindleCommand}`,
 			]);
-		},
-		enableSpindleMode() {
-			const preferredUnits =
-				store.get("workspace.units") === IMPERIAL_UNITS ? "G20" : "G21";
-			const active = getSpindleActiveState();
 
-			// get previously saved spindle values
-			const spindleMin = config.get("spindleMin", 0);
-			const spindleMax = config.get("spindleMax", 0);
-
-			// save current laser values
-			let laser = config.get("laser", {
-				maxPower: 0,
-				minPower: 0,
+			posthog?.capture("spindle_selected", {
+				spindle: selectedSpindle.label,
 			});
-			laser.maxPower = laserMax;
-			laser.minPower = laserMin;
-
-			config.set("laser", laser);
-
-			const powerCommands =
-				spindle.label === "SLB_LASER"
-					? []
-					: [`$30=${spindleMax}`, `$31=${spindleMin}`];
-
-			if (active) {
-				setIsSpindleOn(false);
-				controller.command("gcode", "M5");
-				//this.setInactive();
-			}
-			const commands = [
-				preferredUnits,
-				...actions.getSpindleOffsetCode(preferredUnits),
-				...powerCommands,
-				"$32=0",
-				units,
-			];
-			updateControllerSettings(spindleMax, spindleMin, "0");
-			controller.command("gcode", commands);
 		},
 		getSpindleOffsetCode(preferredUnits: UNITS_GCODE | UNITS_EN): string[] {
 			const laser = config.get("laser", {
@@ -706,7 +694,7 @@ const SpindleWidget = () => {
 				if (!canClickShortcut()) {
 					return;
 				}
-				actions.sendM5();
+				actions.sendM5({ type: "laser" });
 			}),
 		];
 	};
@@ -735,6 +723,7 @@ const SpindleWidget = () => {
 					/>
 					{controllerType === GRBLHAL && (
 						<SpindleSelector
+							onMenuOpen={refreshSpindles}
 							spindles={availableSpindles}
 							onChange={actions.handleHALSpindleSelect}
 							spindle={spindle}

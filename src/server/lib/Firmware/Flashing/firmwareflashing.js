@@ -22,9 +22,9 @@
  */
 
 import AvrgirlArduino from "@sienci/avrgirl-arduino";
+import logger from "../../logger";
 import mk1Image from "./mk1_20220214.hex";
 import mk2Image from "./mk2_20220214.hex";
-import logger from "../../logger";
 
 const log = logger("FlashLib: ");
 const FlashingFirmware = (flashPort, imageType = "MK1", socket) => {
@@ -34,12 +34,12 @@ const FlashingFirmware = (flashPort, imageType = "MK1", socket) => {
 	}
 
 	try {
-		let avrgirl = new AvrgirlArduino({
+		const avrgirl = new AvrgirlArduino({
 			board: "uno",
 			port: flashPort,
 		});
 
-		let imageHex = imageType === "MK2" ? mk2Image : mk1Image;
+		const imageHex = imageType === "MK2" ? mk2Image : mk1Image;
 		socket.emit("flash:message", {
 			type: "Info",
 			content: `Starting Arduino flash on port ${flashPort}.`,

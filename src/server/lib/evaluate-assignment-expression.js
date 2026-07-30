@@ -21,8 +21,8 @@
  *
  */
 
-import _set from "lodash/set";
 import { parse } from "esprima";
+import _set from "lodash/set";
 import evaluateExpression from "./evaluate-expression";
 import logger from "./logger";
 

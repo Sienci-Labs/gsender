@@ -3,10 +3,10 @@
 /* eslint no-bitwise: 0 */
 /*eslint no-cond-assign: 0 */
 
-import { findByIds, WebUSBDevice } from "usb";
 import { get } from "lodash";
-import logger from "../../logger";
 import delay from "server/lib/delay";
+import { findByIds, WebUSBDevice } from "usb";
+import logger from "../../logger";
 
 const log = logger("DFU");
 
@@ -88,23 +88,24 @@ class DFU {
 			M: 1048576,
 		};
 
-		let contiguousSegmentRegex =
+		const contiguousSegmentRegex =
 			/\/\s*(0x[0-9a-fA-F]{1,8})\s*\/(\s*[0-9]+\s*\*\s*[0-9]+\s?[ BKM]\s*[abcdefg]\s*,?\s*)+/g;
 		let contiguousSegmentMatch;
 
 		while (
 			(contiguousSegmentMatch = contiguousSegmentRegex.exec(segmentString))
 		) {
-			let segmentRegex =
+			const segmentRegex =
 				/([0-9]+)\s*\*\s*([0-9]+)\s?([ BKM])\s*([abcdefg])\s*,?\s*/g;
 			let startAddress = parseInt(contiguousSegmentMatch[1], 16);
 			let segmentMatch;
 			while ((segmentMatch = segmentRegex.exec(contiguousSegmentMatch[0]))) {
-				let segment = {};
-				let sectorCount = parseInt(segmentMatch[1], 10);
-				let sectorSize =
+				const segment = {};
+				const sectorCount = parseInt(segmentMatch[1], 10);
+				const sectorSize =
 					parseInt(segmentMatch[2], 10) * sectorMultipliers[segmentMatch[3]];
-				let properties = segmentMatch[4].charCodeAt(0) - "a".charCodeAt(0) + 1;
+				const properties =
+					segmentMatch[4].charCodeAt(0) - "a".charCodeAt(0) + 1;
 				segment.start = startAddress;
 				segment.sectorSize = sectorSize;
 				segment.end = startAddress + sectorSize * sectorCount;
@@ -128,7 +129,7 @@ class DFU {
 	getSegment(addr) {
 		const { segments } = this.segments;
 
-		for (let segment of segments) {
+		for (const segment of segments) {
 			if (segment.start <= addr && addr < segment.end) {
 				return segment;
 			}

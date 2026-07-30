@@ -21,12 +21,12 @@
  *
  */
 
-import React, { PointerEventHandler } from "react";
-import { Slider } from "app/components/shadcn/Slider";
-import { FaMinus, FaPlus, FaUndo } from "react-icons/fa";
-import cx from "classnames";
-
 import Button from "app/components/Button";
+import cx from "classnames";
+import type React from "react";
+import type { PointerEventHandler } from "react";
+import { FaMinus, FaPlus, FaUndo } from "react-icons/fa";
+import { Slider } from "../shadcn/Slider";
 import Tooltip from "../Tooltip";
 
 export interface RangeSliderProps {
@@ -74,9 +74,9 @@ const RangeSlider = ({
 		<div></div>
 	);
 	return (
-		<div className="flex flex-col items-center gap-2 max-xl:gap-1 justify-center w-full text-gray-900 dark:text-content-secondary">
+		<div className="flex flex-col items-center gap-2 max-xl:gap-1 justify-center w-full text-gray-900 dark:text-gray-300">
 			{textComponent}
-			<div className="flex flex-row items-center gap-2 justify-center w-full rounded-md bg-gray-200 dark:bg-surface-raised shadow-inner">
+			<div className="flex flex-row items-center gap-2 justify-center w-full rounded-md bg-gray-200 dark:bg-dark shadow-inner">
 				<Tooltip content={`Reset override to 100%`}>
 					<Button
 						type="button"

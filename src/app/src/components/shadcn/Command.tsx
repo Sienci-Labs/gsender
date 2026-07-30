@@ -1,11 +1,10 @@
 // https://ui.shadcn.com/docs/components/command
 
-import * as React from "react";
-import { DialogProps } from "@radix-ui/react-dialog";
+import type { DialogProps } from "@radix-ui/react-dialog";
+import cx from "classnames";
 import { Command as CommandPrimitive } from "cmdk";
 import { Search } from "lucide-react";
-
-import cx from "classnames";
+import * as React from "react";
 import { Dialog, DialogContent } from "./Dialog";
 
 const Command = React.forwardRef<
@@ -145,11 +144,11 @@ CommandShortcut.displayName = "CommandShortcut";
 export {
 	Command,
 	CommandDialog,
-	CommandInput,
-	CommandList,
 	CommandEmpty,
 	CommandGroup,
+	CommandInput,
 	CommandItem,
-	CommandShortcut,
+	CommandList,
 	CommandSeparator,
+	CommandShortcut,
 };

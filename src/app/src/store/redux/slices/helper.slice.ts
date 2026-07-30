@@ -1,5 +1,5 @@
-import { HelperState } from "app/store/definitions.ts";
 import { createSlice } from "@reduxjs/toolkit";
+import type { HelperState } from "app/store/definitions.ts";
 
 const initialState: HelperState = {
 	wizardActive: false,

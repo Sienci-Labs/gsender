@@ -1,11 +1,11 @@
-import { defineConfig } from "vite";
-import path from "path";
+import { sentryVitePlugin } from "@sentry/vite-plugin";
 import react from "@vitejs/plugin-react";
+import path from "path";
 import tailwindcss from "tailwindcss";
-import tsconfigPaths from "vite-tsconfig-paths";
+import { defineConfig } from "vite";
 import { patchCssModules } from "vite-css-modules";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
-import { sentryVitePlugin } from "@sentry/vite-plugin";
+import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
 	root: path.resolve(__dirname, "./"), // Set root to the directory containing index.html
@@ -28,9 +28,9 @@ export default defineConfig({
 		patchCssModules(),
 		tailwindcss(),
 		nodePolyfills({
-			// To add only specific polyfills, add them here. If no option is passed, adds all polyfills
-			include: ["process"],
-			globals: { global: true, process: true },
+			// @react-pdf/renderer (js-md5) needs Buffer in the browser bundle
+			include: ["buffer", "process"],
+			globals: { Buffer: true, global: true, process: true },
 		}),
 		sentryVitePlugin({
 			org: process.env.SENTRY_ORG,
@@ -40,10 +40,10 @@ export default defineConfig({
 	],
 	resolve: {
 		alias: {
-			"app-root": path.resolve(__dirname, "../../"),
 			app: path.resolve(__dirname, "./src"),
 			"@": path.resolve(__dirname, "./src"),
 		},
+		dedupe: ["react", "react-dom"],
 	},
 	define: {},
 	server: {
@@ -55,6 +55,10 @@ export default defineConfig({
 				target: "http://127.0.0.1:8000",
 				changeOrigin: true,
 			},
+			"/plugins": {
+				target: "http://127.0.0.1:8000",
+				changeOrigin: true,
+			},
 			"/socket.io": {
 				target: "http://127.0.0.1:8000",
 				changeOrigin: true,
@@ -63,7 +67,7 @@ export default defineConfig({
 		},
 	},
 	optimizeDeps: {
-		include: ["**/*.styl"],
+		include: ["**/*.styl", "buffer", "@react-pdf/renderer"],
 	},
 	build: {
 		sourcemap: true,

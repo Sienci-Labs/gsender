@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 
 interface MultiInputBlockProps {
 	label?: string;
@@ -16,7 +16,7 @@ const MultiInputBlock: React.FC<MultiInputBlockProps> = ({
 	return (
 		<div className="grid gap-4 grid-cols-[1fr_2fr] w-full items-center">
 			{label && (
-				<label className="text-lg self-center font-light dark:text-content-primary">
+				<label className="text-lg self-center font-light dark:text-white">
 					{label}
 				</label>
 			)}
@@ -27,7 +27,7 @@ const MultiInputBlock: React.FC<MultiInputBlockProps> = ({
 				{firstComponent}
 
 				{divider && typeof divider === "string" ? (
-					<span className="text-center text-xl font-light dark:text-content-primary">
+					<span className="text-center text-xl font-light dark:text-white">
 						{divider}
 					</span>
 				) : (

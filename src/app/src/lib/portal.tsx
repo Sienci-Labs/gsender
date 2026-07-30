@@ -21,7 +21,7 @@
  *
  */
 
-import { ReactComponentLike } from "prop-types";
+import type { ReactComponentLike } from "prop-types";
 import ReactDOM from "react-dom";
 
 export default (Component: ReactComponentLike, node: Element = null) =>

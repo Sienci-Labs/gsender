@@ -21,8 +21,8 @@
  *
  */
 
-import React from "react";
 import cx from "classnames";
+import type React from "react";
 
 import { DIALOG_CANCEL, DIALOG_CONFIRM } from "./ConfirmationDialogLib";
 

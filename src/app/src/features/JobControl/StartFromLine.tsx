@@ -1,13 +1,7 @@
-import { JSX, useEffect, useState } from "react";
-import cx from "classnames";
-import { Button as ShadButton } from "app/components/shadcn/Button";
+import { usePostHog } from "@posthog/react";
 import { Button } from "app/components/Button";
-import { MdFormatListNumbered } from "react-icons/md";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-import { METRIC_UNITS, IMPERIAL_UNITS } from "app/constants";
-import { updateJobOverrides } from "app/store/redux/slices/visualizer.slice";
-import controller from "app/lib/controller";
-import { RootState, store as reduxStore } from "app/store/redux";
+import { ControlledInput } from "app/components/ControlledInput";
+import { Button as ShadButton } from "app/components/shadcn/Button";
 import {
 	Dialog,
 	DialogContent,
@@ -15,14 +9,21 @@ import {
 	DialogTitle,
 } from "app/components/shadcn/Dialog";
 import Tooltip from "app/components/Tooltip";
-import { ControlledInput } from "app/components/ControlledInput";
-import { FaPlay } from "react-icons/fa";
-import { toast } from "app/lib/toaster";
-import { useSelector } from "react-redux";
+import { IMPERIAL_UNITS, METRIC_UNITS } from "app/constants";
+import { useTypedSelector } from "app/hooks/useTypedSelector";
 import { useWidgetState } from "app/hooks/useWidgetState";
-import pubsub from "pubsub-js";
 import { useWorkspaceState } from "app/hooks/useWorkspaceState";
+import controller from "app/lib/controller";
+import { toast } from "app/lib/toaster";
 import { convertToImperial } from "app/lib/units";
+import { type RootState, store as reduxStore } from "app/store/redux";
+import { updateJobOverrides } from "app/store/redux/slices/visualizer.slice";
+import cx from "classnames";
+import pubsub from "pubsub-js";
+import { type JSX, useEffect, useState } from "react";
+import { FaPlay } from "react-icons/fa";
+import { MdFormatListNumbered } from "react-icons/md";
+import { useSelector } from "react-redux";
 
 type StartFromLineProps = {
 	disabled: boolean;
@@ -42,6 +43,7 @@ const StartFromLine = ({
 	lastLine,
 	atcValidator,
 }: StartFromLineProps) => {
+	const posthog = usePostHog();
 	const zMax = useTypedSelector((state) => state.file.bbox.max.z);
 	const { units, safeRetractHeight } = useWorkspaceState();
 	const { delay = 0 } = useWidgetState("spindle");
@@ -101,6 +103,14 @@ const StartFromLine = ({
 		toast.info("Running Start From Specific Line Command", {
 			position: "bottom-right",
 		});
+
+		posthog?.capture("start_from_line", {
+			line: startFromLine,
+			safe_height: safeHeight,
+			z_max: zMax,
+			newSafeHeight,
+			delay,
+		});
 	};
 
 	return (
@@ -108,9 +118,9 @@ const StartFromLine = ({
 			<ShadButton
 				disabled={disabled}
 				className={cx("rounded-[0.2rem] border-solid border-2 text-base px-2", {
-					"border-blue-400 bg-white dark:bg-surface-raised dark:text-content-secondary [box-shadow:_2px_2px_5px_0px_var(--tw-shadow-color)] shadow-gray-400":
+					"border-blue-400 bg-white dark:bg-dark dark:text-gray-300 [box-shadow:_2px_2px_5px_0px_var(--tw-shadow-color)] shadow-gray-400":
 						!disabled,
-					"border-gray-500 bg-gray-400 dark:bg-surface-raised dark:text-content-muted":
+					"border-gray-500 bg-gray-400 dark:bg-dark dark:text-gray-400":
 						disabled,
 				})}
 				onClick={() => {
@@ -147,7 +157,7 @@ const StartFromLine = ({
 								Recover a job after power loss, mechanical malfunction,
 								disconnection, or other failure.
 							</p>
-							<p className="mb-0 text-black dark:text-content-primary">
+							<p className="mb-0 text-black dark:text-white">
 								Your job of <b>{lineTotal}</b> lines was last stopped around
 								line: <b>{lastLine}</b>.
 							</p>

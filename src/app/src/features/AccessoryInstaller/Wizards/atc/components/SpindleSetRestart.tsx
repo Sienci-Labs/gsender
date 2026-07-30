@@ -1,9 +1,11 @@
 import { StepActionButton } from "app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx";
+import type { StepProps } from "app/features/AccessoryInstaller/types";
+import { SPINDLE_395_V7_VERSION } from "app/features/ATC/utils/ATCiConstants.ts";
+import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
+import controller from "app/lib/controller.ts";
+import { firmwarePastVersion } from "app/lib/firmwareSemver.ts";
+import type { RootState } from "app/store/redux";
 import { useState } from "react";
-import controller from "app/lib/controller";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-import { RootState } from "app/store/redux";
-import { StepProps } from "app/features/AccessoryInstaller/types";
 
 export function SpindleSetRestart({ onComplete, onUncomplete }: StepProps) {
 	const [isComplete, setIsComplete] = useState<boolean>(false);
@@ -27,7 +29,7 @@ export function SpindleSetRestart({ onComplete, onUncomplete }: StepProps) {
 			"$374=3",
 			"$375=50",
 			"$681=0",
-			"$395=2",
+			`$395=${firmwarePastVersion(SPINDLE_395_V7_VERSION) ? "7" : "2"}`,
 			"$REBOOT",
 		]);
 	}
@@ -42,7 +44,7 @@ export function SpindleSetRestart({ onComplete, onUncomplete }: StepProps) {
 
 	return (
 		<div className="flex flex-col gap-5 justify-start">
-			<p className="dark:text-content-primary">
+			<p className="dark:text-white">
 				Your spindle settings are applied in this step and the controller will
 				restart automatically.
 			</p>

@@ -1,5 +1,4 @@
 name: CI
-run-name: "Desktop — ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event.head_commit.message }}"
 
 on:
   push:
@@ -8,19 +7,19 @@ on:
       - master
       - dev
       - features/* # all feature branches
+      - bugfix/*
+      - ci/* # all branches with the prefix 'ci/'
     # Sequence of patterns matched against refs/tags
     tags:
       - '*'
   pull_request:
     branches: [ "master" ]
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
-
 env:
   GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
   NODE_OPTIONS: --max-old-space-size=8192
+  VITE_PUBLIC_POSTHOG_PROJECT_TOKEN: ${{ secrets.VITE_PUBLIC_POSTHOG_PROJECT_TOKEN }}
+  VITE_PUBLIC_POSTHOG_HOST: ${{ secrets.VITE_PUBLIC_POSTHOG_HOST }}
 
 jobs:
   build-linux:
@@ -35,28 +34,28 @@ jobs:
       - name: Setup and build
         uses: ./.github/actions/setup-build
       - name: Build Linux binaries
-        run: bun run build:linux
+        run: yarn run build:linux
       - name: Prepare release assets
         shell: bash
         run: |
           GIT_COMMIT_LOG=`git log -1 --format='%ci %H %s'`
-          PACKAGE_NAME=gSender
+          PACKAGE_NAME=`node -e "console.log(require('./src/package.json').name)"`
           PACKAGE_VERSION=`node -e "console.log(require('./src/package.json').version)"`
           mkdir -p releases/linux
           ls -al output
-          cp -af output/${PACKAGE_NAME}-${PACKAGE_VERSION}*x86_64.AppImage "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-Linux-Intel-64Bit.AppImage"
-          cp -af output/${PACKAGE_NAME}-${PACKAGE_VERSION}*amd64.deb "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-Linux-Intel-64Bit.deb"
-          cp -af output/${PACKAGE_NAME}-${PACKAGE_VERSION}*arm64.AppImage "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-Linux-ARM-64Bit.AppImage" || true
-          cp -af output/${PACKAGE_NAME}-${PACKAGE_VERSION}*arm64.deb "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-Linux-ARM-64Bit.deb" || true
+          cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-x86_64.AppImage" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-Linux-Intel-64Bit.AppImage"
+          cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-amd64.deb" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-Linux-Intel-64Bit.deb"
+          cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-arm64.AppImage" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-Linux-ARM-64Bit.AppImage"
+          cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-arm64.deb" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-Linux-ARM-64Bit.deb"
           ls -al output releases/linux
           if [[ "$GITHUB_REF_TYPE" == "branch" && "$GITHUB_REF_NAME" == "master" ]]; then
-            bun run github-release delete \
+            yarn github-release delete \
               --owner=gSender \
               --repo=gsender \
               --tag="${GITHUB_REF_NAME}-latest" \
               --release-name="${GITHUB_REF_NAME}" \
               "*-linux*";
-            bun run github-release upload \
+            yarn github-release upload \
               --owner=gSender \
               --repo=gsender \
               --tag="${GITHUB_REF_NAME}-latest" \
@@ -83,6 +82,8 @@ jobs:
       APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
       CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
       CSC_LINK: ${{ secrets.CSC_LINK }}
+      # Skip code signing for pull requests
+      CSC_IDENTITY_AUTO_DISCOVERY: ${{ github.event_name == 'pull_request' && 'false' || 'true' }}
     permissions:
       contents: write
     steps:
@@ -93,26 +94,26 @@ jobs:
       - name: Setup and build
         uses: ./.github/actions/setup-build
       - name: Build macOS binaries
-        run: bun run build:macos
+        run: yarn run build:macos
       - name: Prepare release assets
         shell: bash
         run: |
           GIT_COMMIT_LOG=`git log -1 --format='%ci %H %s'`
-          PACKAGE_NAME=gSender
+          PACKAGE_NAME=`node -e "console.log(require('./src/package.json').name)"`
           PACKAGE_VERSION=`node -e "console.log(require('./src/package.json').version)"`
           mkdir -p releases/macos
           ls -al output
-          cp -af output/${PACKAGE_NAME}-${PACKAGE_VERSION}*x64.dmg "releases/macos/gSender-${PACKAGE_VERSION}-Mac-Universal.dmg" || true
-          cp -af output/${PACKAGE_NAME}-${PACKAGE_VERSION}*arm64.dmg "releases/macos/gSender-${PACKAGE_VERSION}-Mac-Silicon.dmg" || true
+          cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-x64.dmg" "releases/macos/gSender-${PACKAGE_VERSION}-Mac-Intel.dmg"
+          cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-arm64.dmg" "releases/macos/gSender-${PACKAGE_VERSION}-Mac-Silicon.dmg"
           ls -al output releases/macos
           if [[ "$GITHUB_REF_TYPE" == "branch" && "$GITHUB_REF_NAME" == "master" ]]; then
-            bun run github-release delete \
+            yarn github-release delete \
               --owner=gSender \
               --repo=gsender \
               --tag="${GITHUB_REF_NAME}-latest" \
               --release-name="${GITHUB_REF_NAME}" \
               "*-macos*";
-            bun run github-release upload \
+            yarn github-release upload \
               --owner=gSender \
               --repo=gsender \
               --tag="${GITHUB_REF_NAME}-latest" \
@@ -199,25 +200,25 @@ jobs:
           SM_CLIENT_CERT_PASSWORD: ${{ startsWith(github.ref, 'refs/tags/') && secrets.SM_CLIENT_CERT_PASSWORD || '' }}
           SM_HOST: ${{ startsWith(github.ref, 'refs/tags/') && secrets.SM_HOST || '' }}
           SM_KEYPAIR_ALIAS: ${{ startsWith(github.ref, 'refs/tags/') && secrets.SM_KEYPAIR_ALIAS || '' }}
-        run: bun run build:windows
+        run: yarn run build:windows
       - name: Prepare release assets
         shell: bash
         run: |
           GIT_COMMIT_LOG=`git log -1 --format='%ci %H %s'`
-          PACKAGE_NAME=gSender
+          PACKAGE_NAME=`node -e "console.log(require('./src/package.json').name)"`
           PACKAGE_VERSION=`node -e "console.log(require('./src/package.json').version)"`
           mkdir -p releases/windows
           ls -al output
-          cp -af output/${PACKAGE_NAME}-${PACKAGE_VERSION}*x64.exe "releases/windows/gSender-${PACKAGE_VERSION}-Windows-64Bit.exe"
+          cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-x64.exe" "releases/windows/gSender-${PACKAGE_VERSION}-Windows-64Bit.exe"
           ls -al output releases/windows
           if [[ "$GITHUB_REF_TYPE" == "branch" && "$GITHUB_REF_NAME" == "master" ]]; then
-            bun run github-release delete \
+            yarn github-release delete \
               --owner=gSender \
               --repo=gsender \
               --tag="${GITHUB_REF_NAME}-latest" \
               --release-name="${GITHUB_REF_NAME}" \
               "*-windows*";
-            bun run github-release upload \
+            yarn github-release upload \
               --owner=gSender \
               --repo=gsender \
               --tag="${GITHUB_REF_NAME}-latest" \
@@ -239,7 +240,6 @@ jobs:
           path: releases/windows/*.exe
           compression-level: 0 # no compression
           retention-days: 2
-
   build-pi:
     name: Build Raspberry PI packages
     runs-on: ubuntu-24.04-arm

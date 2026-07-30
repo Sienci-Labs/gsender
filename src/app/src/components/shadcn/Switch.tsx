@@ -1,9 +1,8 @@
 // https://ui.shadcn.com/docs/components/switch
 
-import * as React from "react";
 import * as SwitchPrimitives from "@radix-ui/react-switch";
-
 import cx from "classnames";
+import * as React from "react";
 
 interface Props
 	extends Omit<

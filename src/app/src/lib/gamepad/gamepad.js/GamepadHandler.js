@@ -22,7 +22,7 @@ export default class GamepadHandler extends EventEmitter {
 		})
 		.setValidators({
 			deadZone: (value) => Math.max(Math.min(value, 1), 0),
-			precision: (value) => (value > 0 ? Math.pow(10, value) : 0),
+			precision: (value) => (value > 0 ? 10 ** value : 0),
 		});
 
 	constructor(index, gamepad, config = {}) {
@@ -49,8 +49,12 @@ export default class GamepadHandler extends EventEmitter {
 		const { axis, button } = config;
 
 		return {
-			axis: this.optionResolver.resolve(axis ?? button ?? config ?? {}),
-			button: this.optionResolver.resolve(button ?? axis ?? config ?? {}),
+			axis: GamepadHandler.optionResolver.resolve(
+				axis ?? button ?? config ?? {},
+			),
+			button: GamepadHandler.optionResolver.resolve(
+				button ?? axis ?? config ?? {},
+			),
 		};
 	}
 

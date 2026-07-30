@@ -20,7 +20,7 @@ export function NumberSettingInput({
 	onChange,
 }: NumberSettingInputProps) {
 	const { units } = useWorkspaceState();
-	let needsConvert = unit === "variable" && units === IMPERIAL_UNITS;
+	const needsConvert = unit === "variable" && units === IMPERIAL_UNITS;
 	let convertedValue = value;
 	if (needsConvert) {
 		convertedValue = convertToImperial(value);

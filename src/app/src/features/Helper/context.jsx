@@ -21,15 +21,27 @@
  *
  */
 
-import React, { createContext, useContext, useState, useMemo } from "react";
-import _ from "lodash";
-
+import { GRBL_ACTIVE_STATE_IDLE } from "app/constants";
 import { Toaster } from "app/lib/toaster/ToasterLib";
-import { disableWizard } from "app/store/redux/slices/helper.slice";
+import store from "app/store";
 import reduxStore from "app/store/redux";
+import { disableWizard } from "app/store/redux/slices/helper.slice";
+import _ from "lodash";
+import get from "lodash/get";
+import pubsub from "pubsub-js";
+import React, {
+	createContext,
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
+import { useSelector } from "react-redux";
 
 const WizardContext = createContext({});
 const WizardAPI = createContext({});
+const MIN_RESUME_SPINNER_MS = 1500;
 
 /**
  * Wizard Context Provider
@@ -40,6 +52,8 @@ export const WizardProvider = ({ children }) => {
 	const [completedStep, setCompletedStep] = useState(-1);
 	const [completedSubStep, setCompletedSubStep] = useState(-1);
 	const [intro, setIntro] = useState(null);
+	const [toolchangeContext, setToolchangeContext] = useState(null);
+	const [toolchangeComment, setToolchangeComment] = useState("");
 	const [activeStep, setActiveStep] = useState(0);
 	const [activeSubstep, setActiveSubstep] = useState(0);
 	const [title, setTitle] = useState("Wizard");
@@ -49,6 +63,64 @@ export const WizardProvider = ({ children }) => {
 	const [minimized, setMinimized] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 	const [overlay, setOverlay] = useState(false);
+	const [pendingToolchangeNotice, setPendingToolchangeNotice] = useState(false);
+	const [resumingJob, setResumingJob] = useState(false);
+	const resumeTimerRef = useRef(null);
+
+	// Mirrors the machine's active state so `load()` can read the current
+	// value without pulling `activeState` into the `api` useMemo deps below
+	// (which would otherwise recreate the whole API on every status report).
+	const activeState = useSelector((state) =>
+		get(state, "controller.state.status.activeState", ""),
+	);
+	const activeStateRef = useRef(activeState);
+	useEffect(() => {
+		activeStateRef.current = activeState;
+	}, [activeState]);
+
+	// Once shown, auto-hide the pending notice as soon as the machine goes
+	// idle again. One-directional: never re-shows itself for this session.
+	useEffect(() => {
+		if (pendingToolchangeNotice && activeState === GRBL_ACTIVE_STATE_IDLE) {
+			setPendingToolchangeNotice(false);
+		}
+	}, [activeState, pendingToolchangeNotice]);
+
+	// Resets all wizard state and closes the modal. Shared by every
+	// "we're done" path: completeSubStep's final-step branch, the
+	// activeStep-overflow safety net below, cancelToolchange, and
+	// resumeJobAfterDelay's timer.
+	const resetWizard = () => {
+		document.getElementById("step-0-0")?.scrollIntoView();
+		setVisible(false);
+		setCompletedStep(-1);
+		setCompletedSubStep(-1);
+		setActiveStep(0);
+		setActiveSubstep(0);
+		setTitle("Wizard");
+		setSteps([]);
+		setIntro(null);
+		setToolchangeContext(null);
+		setToolchangeComment("");
+		setStepCount(0);
+		setMinimized(false);
+		setPendingToolchangeNotice(false);
+		setResumingJob(false);
+		if (resumeTimerRef.current) {
+			clearTimeout(resumeTimerRef.current);
+			resumeTimerRef.current = null;
+		}
+		reduxStore.dispatch(disableWizard());
+	};
+
+	// Auto-close when activeStep reaches or exceeds stepCount.
+	// completeSubStep sets activeStep = lastStep+1 before setVisible(false);
+	// if the close branch is missed due to a stale closure, this catches it.
+	useEffect(() => {
+		if (visible && stepCount > 0 && activeStep >= stepCount) {
+			resetWizard();
+		}
+	}, [activeStep, stepCount, visible]);
 
 	// Memoized API for context, can be fetched separate to data context
 	const api = useMemo(
@@ -147,19 +219,7 @@ export const WizardProvider = ({ children }) => {
 						activeSubstep: 0,
 					};
 					if (stepIndex >= maxStepIndex) {
-						// reset values
-						const element = document.getElementById("step-0-0");
-						element.scrollIntoView();
-						setVisible(false);
-						setCompletedStep(-1);
-						setCompletedSubStep(-1);
-						setActiveStep(0);
-						setActiveSubstep(0);
-						setTitle("Wizard");
-						setSteps([]);
-						setStepCount(0);
-						setMinimized(false);
-						reduxStore.dispatch(disableWizard());
+						resetWizard();
 						return {};
 					}
 				} else {
@@ -172,18 +232,7 @@ export const WizardProvider = ({ children }) => {
 				}
 				// close window on everything done.
 				if (activeStep >= maxStepIndex) {
-					// reset values
-					const element = document.getElementById("step-0-0");
-					element.scrollIntoView();
-					setVisible(false);
-					setCompletedStep(-1);
-					setCompletedSubStep(-1);
-					setActiveStep(0);
-					setActiveSubstep(0);
-					setTitle("Wizard");
-					setSteps([]);
-					setStepCount(0);
-					setMinimized(false);
+					resetWizard();
 					return {};
 				}
 
@@ -210,8 +259,8 @@ export const WizardProvider = ({ children }) => {
 				}
 				return completedSubStep > substepIndex && stepIndex === completedStep;
 			},
-			load: (instructions, title) => {
-				if (!instructions || !instructions.steps) {
+			load: (instructions, title, metadata = {}) => {
+				if (!instructions?.steps) {
 					return;
 				}
 				instructions.steps.forEach((step) => {
@@ -225,8 +274,22 @@ export const WizardProvider = ({ children }) => {
 				setSteps([...instructions.steps]);
 				setStepCount(instructions.steps.length);
 				setTitle(title);
-				if (instructions.intro) {
-					setIntro(instructions.intro.description);
+				setIntro(instructions.intro?.description ?? null);
+				setToolchangeContext(metadata.context ?? null);
+				setToolchangeComment(metadata.comment ?? "");
+				setPendingToolchangeNotice(
+					activeStateRef.current !== GRBL_ACTIVE_STATE_IDLE,
+				);
+				// Defensive reset: guarantees a freshly-loaded wizard can
+				// never start already stuck on the resuming view or with a
+				// leftover "Running…" state, even if the previous wizard's
+				// last substep never got a chance to clear these itself
+				// (see the persistent listener's own guard below).
+				setResumingJob(false);
+				setIsLoading(false);
+				if (resumeTimerRef.current) {
+					clearTimeout(resumeTimerRef.current);
+					resumeTimerRef.current = null;
 				}
 
 				setActiveStep(0);
@@ -268,29 +331,25 @@ export const WizardProvider = ({ children }) => {
 					return false;
 				}
 				const substep = step.substeps[activeSubstep];
-				if (!substep || !substep.actions) {
+				if (!substep?.actions) {
 					return false;
 				}
 
 				return substep.actions.length > 0 && substep.actionTaken === false;
 			},
 			cancelToolchange: () => {
-				const element = document.getElementById("step-0-0");
-				element.scrollIntoView();
-				setVisible(false);
-				setCompletedStep(-1);
-				setCompletedSubStep(-1);
-				setActiveStep(0);
-				setActiveSubstep(0);
-				setTitle("Wizard");
-				setSteps([]);
-				setStepCount(0);
-				setMinimized(false);
+				resetWizard();
 				setIsLoading(false);
-				reduxStore.dispatch(disableWizard());
-
 				Toaster.clear();
 			},
+			resumeJobAfterDelay: (delayMs) => {
+				setResumingJob(true);
+				if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+				resumeTimerRef.current = setTimeout(() => {
+					resetWizard();
+				}, delayMs);
+			},
+			setResumingJob: (b) => setResumingJob(b),
 		}),
 		[
 			setActiveStep,
@@ -310,6 +369,49 @@ export const WizardProvider = ({ children }) => {
 		],
 	);
 
+	// Actions.tsx's own wizard:next listener unsubscribes the instant the
+	// last substep's resumingJob flips true (Instructions swaps it out of
+	// the tree), so it can never see this event arrive. This listener is
+	// owned by the always-mounted provider instead, so the wizard still
+	// marks the resume action complete and auto-closes once grbl confirms
+	// it.
+	const resumeCompletionRef = useRef(null);
+	resumeCompletionRef.current = {
+		steps,
+		resumingJob,
+		markActionAsComplete: api.markActionAsComplete,
+		resumeJobAfterDelay: api.resumeJobAfterDelay,
+		setIsLoading,
+	};
+
+	useEffect(() => {
+		const token = pubsub.subscribe("wizard:next", (msg, indexes) => {
+			const { stepIndex: stepIn, substepIndex: subStepIn } = indexes;
+			const current = resumeCompletionRef.current;
+			// A stale event from an already-closed wizard (the backend's
+			// feeder-complete callback isn't scoped per wizard session) can
+			// otherwise land on a freshly-loaded wizard that hasn't reached
+			// Resume yet — only react if we're actually expecting one.
+			if (!current.resumingJob) return;
+			const step = current.steps[stepIn];
+			if (!step) return;
+			const isLast =
+				stepIn === current.steps.length - 1 &&
+				subStepIn === (step.substeps?.length ?? 1) - 1;
+			if (!isLast) return;
+
+			current.markActionAsComplete(stepIn, subStepIn);
+			current.setIsLoading(false);
+			const spindleDelaySec = store.get("widgets.spindle.delay", 0);
+			const resumeDelay = Math.max(
+				MIN_RESUME_SPINNER_MS,
+				Number(spindleDelaySec) * 1000,
+			);
+			current.resumeJobAfterDelay(resumeDelay);
+		});
+		return () => pubsub.unsubscribe(token);
+	}, []);
+
 	return (
 		<WizardContext.Provider
 			value={{
@@ -326,6 +428,10 @@ export const WizardProvider = ({ children }) => {
 				isLoading,
 				overlay,
 				intro,
+				toolchangeContext,
+				toolchangeComment,
+				pendingToolchangeNotice,
+				resumingJob,
 			}}
 		>
 			<WizardAPI.Provider value={api}>{children}</WizardAPI.Provider>

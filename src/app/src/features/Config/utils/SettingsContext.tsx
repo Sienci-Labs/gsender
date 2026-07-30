@@ -1,41 +1,41 @@
+import { GRBLHAL } from "app/constants";
 import {
-	gSenderSetting,
-	SettingsMenu,
-	SettingsMenuSection,
-} from "app/features/Config/assets/SettingsMenu.ts";
-import store from "app/store";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
-import { RootState, store as reduxStore } from "app/store/redux";
+	EEPROM,
+	EEPROMDescriptions,
+	EEPROMSettings,
+	FIRMWARE_TYPES_T,
+	FilteredEEPROM,
+	MachineProfile,
+} from "app/definitions/firmware";
+import { BasicObject } from "app/definitions/general";
+import { ATCI_SUPPORTED_VERSION } from "app/features/ATC/utils/ATCiConstants.ts";
+import machineProfiles from "app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts";
 
 import {
 	GRBL_HAL_SETTINGS_MAP,
 	GRBL_SETTINGS_MAP,
 } from "app/features/Config/assets/SettingsDescriptions.ts";
-import { GRBLHAL } from "app/constants";
-import { getFilteredEEPROMSettings } from "app/features/Config/utils/EEPROM.ts";
-import get from "lodash/get";
-import defaultStoreState from "app/store/defaultState";
-import isEqual from "lodash/isEqual";
-import machineProfiles from "app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts";
 import {
-	EEPROM,
-	EEPROMDescriptions,
-	EEPROMSettings,
-	FilteredEEPROM,
-	FIRMWARE_TYPES_T,
-	MachineProfile,
-} from "app/definitions/firmware";
-import pubsub from "pubsub-js";
-import { firmwarePastVersion } from "app/lib/firmwareSemver.ts";
-import { ATCI_SUPPORTED_VERSION } from "app/features/ATC/utils/ATCiConstants.ts";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-import { debounce } from "lodash";
-import { BasicObject } from "app/definitions/general";
+	gSenderSetting,
+	SettingsMenu,
+	SettingsMenuSection,
+} from "app/features/Config/assets/SettingsMenu.ts";
+import { getFilteredEEPROMSettings } from "app/features/Config/utils/EEPROM.ts";
 import {
 	resolveGrblCoreDefaults,
 	translateGrblCoreKey,
 } from "app/features/Config/utils/grblCoreMigration.ts";
+import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
+import { firmwarePastVersion } from "app/lib/firmwareSemver.ts";
+import store from "app/store";
+import defaultStoreState from "app/store/defaultState";
+import { RootState, store as reduxStore } from "app/store/redux";
+import { debounce } from "lodash";
+import get from "lodash/get";
+import isEqual from "lodash/isEqual";
+import pubsub from "pubsub-js";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
 
 interface iSettingsContext {
 	settings: SettingsMenuSection[];
@@ -145,7 +145,7 @@ function populateSettingsValues(
 		return;
 	}
 	settingsSections.map((ss) => {
-		if (!ss || !ss.settings) {
+		if (!ss?.settings) {
 			return;
 		}
 		ss.settings.map((s) => {
@@ -169,10 +169,11 @@ function applyEEPROMDescriptions(
 	descriptions: EEPROMDescriptions,
 	ctrlType: string,
 	fwVersion: string,
+	boardId: string | undefined,
 	firmwareCurrent: boolean,
 ): SettingsMenuSection[] {
 	return settings.map((ss) => {
-		if (!ss || !ss.settings) {
+		if (!ss?.settings) {
 			return ss;
 		}
 		return {
@@ -190,7 +191,7 @@ function applyEEPROMDescriptions(
 						remapped = true;
 					}
 					if (ctrlType === GRBLHAL && eID) {
-						eID = translateGrblCoreKey(eID as EEPROM, fwVersion);
+						eID = translateGrblCoreKey(eID as EEPROM, fwVersion, boardId);
 					}
 					if (!eID) {
 						return remapped ? { ...o, remapped: true } : o;
@@ -238,6 +239,10 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
 
 	const firmwareVersion = useTypedSelector(
 		(state: RootState) => state.controller.settings.version?.semver,
+	);
+
+	const boardId = useTypedSelector(
+		(state: RootState) => state.controller.settings.info?.BOARD,
 	);
 
 	useEffect(() => {
@@ -381,6 +386,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
 				detectedEEPROMDescriptions: EEPROMDescriptions,
 				ctrlType: string,
 				fwVersion: string,
+				currentBoardId: string | undefined,
 			) => {
 				if (!currentSettings.length || !detectedEEPROMDescriptions) {
 					return;
@@ -392,6 +398,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
 						detectedEEPROMDescriptions,
 						ctrlType,
 						fwVersion,
+						currentBoardId,
 						firmwareCurrent,
 					),
 				);
@@ -432,6 +439,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
 			detectedEEPROMDescriptions,
 			controllerType,
 			firmwareVersion,
+			boardId,
 		);
 	}, [detectedEEPROMDescriptions]);
 
@@ -468,7 +476,11 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
 				idToUse = v.remap;
 			}
 			if (controllerType === GRBLHAL) {
-				idToUse = translateGrblCoreKey(idToUse as EEPROM, firmwareVersion);
+				idToUse = translateGrblCoreKey(
+					idToUse as EEPROM,
+					firmwareVersion,
+					boardId,
+				);
 			}
 			searchChecker = eepromMap.get(idToUse as EEPROM);
 		}
@@ -507,7 +519,11 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
 					idToUse = v.remap;
 				}
 				if (controllerType === GRBLHAL) {
-					idToUse = translateGrblCoreKey(idToUse as EEPROM, firmwareVersion);
+					idToUse = translateGrblCoreKey(
+						idToUse as EEPROM,
+						firmwareVersion,
+						boardId,
+					);
 				}
 				if (v.type === "eeprom") {
 					if (!eepromMap.has(idToUse as EEPROM)) {
@@ -540,6 +556,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
 			isFirmwareCurrent,
 			controllerType,
 			firmwareVersion,
+			boardId,
 			searchTerm,
 			filterNonDefault,
 			settingsValues,
@@ -554,6 +571,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
 				: resolveGrblCoreDefaults({
 						firmwareSemver: firmwareVersion,
 						baseDefaults: machineProfile.grblHALeepromSettings || {},
+						boardId,
 					}).defaults;
 
 		const settingKey =
@@ -562,7 +580,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
 				: (settingData as FilteredEEPROM).setting;
 		const lookupKey =
 			controllerType === GRBLHAL
-				? translateGrblCoreKey(settingKey as EEPROM, firmwareVersion)
+				? translateGrblCoreKey(settingKey as EEPROM, firmwareVersion, boardId)
 				: settingKey;
 
 		const inputDefault = get(profileDefaults, lookupKey, "-");
@@ -592,10 +610,22 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
 	}
 
 	function isSettingDefault(v: gSenderSetting) {
+		if (v.ignoreDefaultCheck) {
+			return true;
+		}
+
 		if (v.type === "hybrid" && connected && controllerType === GRBLHAL) {
 			return eepromIsDefault(v);
 		}
 		if ("key" in v) {
+			if (v.key === "workspace.collectUsageDataStatus") {
+				console.log({
+					key: v.key,
+					value: v.value,
+					defaultValue: v.defaultValue,
+				});
+			}
+
 			return isEqual(v.value, v.defaultValue);
 		}
 		return true; // Default to true, so non-key settings aren't always highlighted.
@@ -612,10 +642,11 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
 				: resolveGrblCoreDefaults({
 						firmwareSemver: firmwareVersion,
 						baseDefaults: machineProfile.grblHALeepromSettings || {},
+						boardId,
 					}).defaults;
 		const lookupKey =
 			controllerType === GRBLHAL
-				? translateGrblCoreKey(key, firmwareVersion)
+				? translateGrblCoreKey(key, firmwareVersion, boardId)
 				: key;
 
 		return get(profileDefaults, lookupKey, "-");

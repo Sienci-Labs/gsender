@@ -1,13 +1,13 @@
 import { EventEmitter } from "events";
-import SerialConnection from "./SerialConnection";
+import { includes, noop } from "lodash";
+import { WRITE_SOURCE_CLIENT } from "../controllers/constants";
+import { GRBL, GRBL_REALTIME_COMMANDS } from "../controllers/Grbl/constants";
 import {
 	GRBLHAL,
 	GRBLHAL_REALTIME_COMMANDS,
 } from "../controllers/Grblhal/constants";
-import { GRBL, GRBL_REALTIME_COMMANDS } from "../controllers/Grbl/constants";
 import logger from "./logger";
-import { noop, includes } from "lodash";
-import { WRITE_SOURCE_CLIENT } from "../controllers/constants";
+import SerialConnection from "./SerialConnection";
 
 const log = logger("connection");
 

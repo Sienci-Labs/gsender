@@ -1,23 +1,23 @@
-import React from "react";
-import { useDispatch } from "react-redux";
-import pubsub from "pubsub-js";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-import { RootState } from "app/store/redux";
-import { updateAccessibility } from "app/store/redux/slices/preferences.slice";
-import { useActiveShortcuts } from "app/lib/shortcutRegistry";
 import {
-	GENERAL_CATEGORY,
-	LOCATION_CATEGORY,
-	JOGGING_CATEGORY,
-	SPINDLE_LASER_CATEGORY,
-	COOLANT_CATEGORY,
-	TOOLBAR_CATEGORY,
 	CARVING_CATEGORY,
-	VISUALIZER_CATEGORY,
+	COOLANT_CATEGORY,
+	GENERAL_CATEGORY,
+	JOGGING_CATEGORY,
+	LOCATION_CATEGORY,
 	MACRO_CATEGORY,
 	OVERRIDES_CATEGORY,
 	PROBING_CATEGORY,
+	SPINDLE_LASER_CATEGORY,
+	TOOLBAR_CATEGORY,
+	VISUALIZER_CATEGORY,
 } from "app/constants";
+import { useTypedSelector } from "app/hooks/useTypedSelector";
+import { useActiveShortcuts } from "app/lib/shortcutRegistry";
+import type { RootState } from "app/store/redux";
+import { updateAccessibility } from "app/store/redux/slices/preferences.slice";
+import pubsub from "pubsub-js";
+import type React from "react";
+import { useDispatch } from "react-redux";
 
 export const KeyboardMapOverlay: React.FC = () => {
 	const dispatch = useDispatch();

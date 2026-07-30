@@ -1,9 +1,5 @@
 import type { Config } from "tailwindcss";
 import defaultTheme from "tailwindcss/defaultTheme";
-import path from "path";
-
-// __dirname provided by jiti (used by both Tailwind CLI and Vite's PostCSS pipeline)
-const root = path.resolve(__dirname, "../..");
 
 const { screens } = defaultTheme;
 const screensWithoutXl = {
@@ -21,14 +17,13 @@ function customScreenVariants({
 	addVariant("xl", "@media (min-width: 1280px) { & }");
 	addVariant("max-xl", "@media (max-width: 1280px), (max-height: 880px) { & }");
 	addVariant("short", "@media (max-height: 820px) { & }");
-	addVariant("portrait", "@media (orientation: portrait) { & }");
-	addVariant("landscape", "@media (orientation: landscape) { & }");
 }
 
 export default {
 	content: [
-		path.join(__dirname, "./src/**/*.{js,ts,jsx,tsx,html}"),
-		path.join(__dirname, "./index.html"),
+		"./src/**/*.{js,ts,jsx,tsx,html}",
+		"./index.html",
+		"!**/node_modules/**",
 	],
 	important: true,
 	darkMode: "class",
@@ -53,81 +48,11 @@ export default {
 				"content-area": "calc(100vh-64px)",
 			},
 			colors: {
-				// Workshop High-Contrast dark theme — compat `dark` family remapped
-				// to Workshop neutrals so existing `dark:bg-dark*` usages pick up the
-				// new palette. Prefer the semantic surface/content/outline tokens below
-				// for new code (see docs/dark-mode-theme-instructions.md).
 				dark: {
-					DEFAULT: "#111317",
-					darker: "#07090c",
-					lighter: "#242931",
+					DEFAULT: "#0f172a",
+					darker: "#020617",
+					lighter: "#334155",
 				},
-				// Workshop semantic neutrals (single source of truth; pendant inherits
-				// these via `presets: [desktopConfig]`).
-				surface: {
-					base: "#111317",
-					sunken: "#07090c",
-					raised: "#242931",
-					elevated: "#30353d",
-					hover: "#383e47",
-					active: "#414853",
-					disabled: "#262b32",
-				},
-				content: {
-					primary: "#ffffff",
-					secondary: "#dce1e7",
-					muted: "#a6afba",
-					disabled: "#7f8995",
-					inverse: "#111317",
-				},
-				outline: {
-					subtle: "#343a43",
-					DEFAULT: "#4b535e",
-					strong: "#687381",
-					disabled: "#3b424b",
-				},
-				overlay: {
-					hover: "rgba(255, 255, 255, 0.07)",
-					active: "rgba(255, 255, 255, 0.12)",
-					disabled: "rgba(0, 0, 0, 0.20)",
-					scrim: "rgba(0, 0, 0, 0.72)",
-				},
-				// shadcn/ui primitive tokens (src/components/shadcn/*) — resolved
-				// from CSS vars (see index.css) so bare classes like `bg-card` and
-				// `border` pick up the Workshop theme without a dark: prefix.
-				background: "var(--background)",
-				foreground: "var(--foreground)",
-				card: {
-					DEFAULT: "var(--card)",
-					foreground: "var(--card-foreground)",
-				},
-				popover: {
-					DEFAULT: "var(--popover)",
-					foreground: "var(--popover-foreground)",
-				},
-				primary: {
-					DEFAULT: "var(--primary)",
-					foreground: "var(--primary-foreground)",
-				},
-				secondary: {
-					DEFAULT: "var(--secondary)",
-					foreground: "var(--secondary-foreground)",
-				},
-				muted: {
-					DEFAULT: "var(--muted)",
-					foreground: "var(--muted-foreground)",
-				},
-				accent: {
-					DEFAULT: "var(--accent)",
-					foreground: "var(--accent-foreground)",
-				},
-				destructive: {
-					DEFAULT: "var(--destructive)",
-					foreground: "var(--destructive-foreground)",
-				},
-				border: "var(--border)",
-				input: "var(--input)",
-				ring: "var(--ring)",
 				robin: {
 					50: "#f6f9fc",
 					100: "#ecf2f8",
@@ -193,15 +118,6 @@ export default {
 					900: "#704007",
 					950: "#5e3506",
 				},
-			},
-			borderColor: {
-				DEFAULT: "var(--border)",
-			},
-			ringColor: {
-				DEFAULT: "var(--ring)",
-			},
-			ringOffsetColor: {
-				background: "var(--background)",
 			},
 			keyframes: {
 				attention: {

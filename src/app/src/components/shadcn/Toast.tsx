@@ -1,11 +1,10 @@
 // https://ui.shadcn.com/docs/components/toast
 
-import * as React from "react";
 import * as ToastPrimitives from "@radix-ui/react-toast";
-import { cva, VariantProps } from "class-variance-authority";
-import { X } from "lucide-react";
-
+import { cva, type VariantProps } from "class-variance-authority";
 import cx from "classnames";
+import { X } from "lucide-react";
+import * as React from "react";
 
 const ToastProvider = ToastPrimitives.Provider;
 
@@ -117,11 +116,11 @@ export type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>;
 export type ToastActionElement = React.ReactElement<typeof ToastAction>;
 
 export {
-	ToastProvider,
-	ToastViewport,
 	Toast,
-	ToastTitle,
-	ToastDescription,
-	ToastClose,
 	ToastAction,
+	ToastClose,
+	ToastDescription,
+	ToastProvider,
+	ToastTitle,
+	ToastViewport,
 };

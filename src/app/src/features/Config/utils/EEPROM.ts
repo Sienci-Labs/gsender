@@ -1,23 +1,23 @@
-import get from "lodash/get";
-import { GRBL_SETTINGS_MAP } from "app/features/Config/assets/SettingsDescriptions.ts";
-import BooleanInput from "app/features/Config/components/EEPROMInputs/BooleanInput.tsx";
-import BitfieldInput from "app/features/Config/components/EEPROMInputs/BitfieldInput.tsx";
-import ExclusiveBitfieldInput from "app/features/Config/components/EEPROMInputs/ExclusiveBitfieldInput.tsx";
-import RadioButtonInput from "app/features/Config/components/EEPROMInputs/RadioButtonInput.tsx";
-import AxisMaskInput from "app/features/Config/components/EEPROMInputs/AxisMaskInput.tsx";
-import IntegerInput from "app/features/Config/components/EEPROMInputs/IntegerInput.tsx";
-import DecimalInput from "app/features/Config/components/EEPROMInputs/DecimalInput.tsx";
-import StringInput from "app/features/Config/components/EEPROMInputs/StringInput.tsx";
-import PasswordInput from "app/features/Config/components/EEPROMInputs/PasswordInput.tsx";
-import Ipv4Input from "app/features/Config/components/EEPROMInputs/Ipv4Input.tsx";
-import {
+import type {
 	EEPROM,
 	EEPROMDescriptions,
 	EEPROMSettings,
-	FilteredEEPROM,
 	FIRMWARE_TYPES_T,
+	FilteredEEPROM,
 } from "app/definitions/firmware";
-import { BasicObject } from "app/definitions/general";
+import type { BasicObject } from "app/definitions/general";
+import { GRBL_SETTINGS_MAP } from "app/features/Config/assets/SettingsDescriptions.ts";
+import AxisMaskInput from "app/features/Config/components/EEPROMInputs/AxisMaskInput.tsx";
+import BitfieldInput from "app/features/Config/components/EEPROMInputs/BitfieldInput.tsx";
+import BooleanInput from "app/features/Config/components/EEPROMInputs/BooleanInput.tsx";
+import DecimalInput from "app/features/Config/components/EEPROMInputs/DecimalInput.tsx";
+import ExclusiveBitfieldInput from "app/features/Config/components/EEPROMInputs/ExclusiveBitfieldInput.tsx";
+import IntegerInput from "app/features/Config/components/EEPROMInputs/IntegerInput.tsx";
+import Ipv4Input from "app/features/Config/components/EEPROMInputs/Ipv4Input.tsx";
+import PasswordInput from "app/features/Config/components/EEPROMInputs/PasswordInput.tsx";
+import RadioButtonInput from "app/features/Config/components/EEPROMInputs/RadioButtonInput.tsx";
+import StringInput from "app/features/Config/components/EEPROMInputs/StringInput.tsx";
+import get from "lodash/get";
 export const BOOLEAN_ID = 0;
 export const BITFIELD_ID = 1;
 export const EXCLUSIVE_BITFIELD_ID = 2;

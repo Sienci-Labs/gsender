@@ -21,25 +21,25 @@
  *
  */
 
-import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt-nodejs";
 import ensureArray from "ensure-array";
-import isPlainObject from "lodash/isPlainObject";
+import jwt from "jsonwebtoken";
 import find from "lodash/find";
+import isPlainObject from "lodash/isPlainObject";
 import some from "lodash/some";
 import uuid from "uuid";
 import settings from "../config/settings";
+import {
+	ERR_BAD_REQUEST,
+	ERR_CONFLICT,
+	ERR_INTERNAL_SERVER_ERROR,
+	ERR_NOT_FOUND,
+	ERR_PRECONDITION_FAILED,
+	ERR_UNAUTHORIZED,
+} from "../constants";
 import logger from "../lib/logger";
 import config from "../services/configstore";
 import { getPagingRange } from "./paging";
-import {
-	ERR_BAD_REQUEST,
-	ERR_UNAUTHORIZED,
-	ERR_NOT_FOUND,
-	ERR_CONFLICT,
-	ERR_PRECONDITION_FAILED,
-	ERR_INTERNAL_SERVER_ERROR,
-} from "../constants";
 
 const log = logger("api:users");
 const CONFIG_KEY = "users";

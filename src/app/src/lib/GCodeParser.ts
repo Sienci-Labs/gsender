@@ -23,11 +23,11 @@ export interface FastLineScanScratch {
 	hasInvalidTokens: boolean;
 }
 
-const COMMENT_PARENS_RE = /\s*\([^\)]*\)/g;
+const COMMENT_PARENS_RE = /\s*\([^)]*\)/g;
 const COMMENT_SEMICOLON_RE = /\s*;.*/g;
 const WHITESPACE_RE = /\s+/g;
 const WORD_MATCH_RE =
-	/(%.*)|({.*)|((?:\$\$)|(?:\$[a-zA-Z0-9#]*))|([a-zA-Z][0-9\+\-\.]+)|(\*[0-9]+)/gim;
+	/(%.*)|({.*)|((?:\$\$)|(?:\$[a-zA-Z0-9#]*))|([a-zA-Z][0-9+\-.]+)|(\*[0-9]+)/gim;
 
 const ALLOWED_WORD_LETTERS = new Set<string>([
 	"N",

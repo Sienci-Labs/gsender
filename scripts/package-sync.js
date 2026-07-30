@@ -12,7 +12,6 @@ const pkgApp = require("../src/app/package.json");
 
 const RUNTIME_ENTRY_PATHS = [
 	"src/main.js",
-	"src/pendant-main.js",
 	"src/server-cli.js",
 	"src/server",
 	"src/electron-app",
@@ -200,7 +199,6 @@ pkgApp.dependencies = selectDependencies(
 
 const target = path.resolve(__dirname, "../src/app/package.json");
 const secondTarget = path.resolve(__dirname, "../src/package.json");
-const pendantTarget = path.resolve(__dirname, "../src/pendant-package.json");
 
 const content = JSON.stringify(pkgApp, null, 2);
 delete pkgApp.type;
@@ -208,23 +206,6 @@ const secondContent = JSON.stringify(pkgApp, null, 2);
 
 fs.writeFileSync(target, content + "\n", "utf8");
 fs.writeFileSync(secondTarget, secondContent + "\n", "utf8");
-
-// Keep the pendant electron package.json's deps in sync with desktop. Only
-// dependencies/version/repository/author/license are overwritten; pendant-specific
-// fields (name, main, scripts) are preserved.
-if (fs.existsSync(pendantTarget)) {
-	const pendantPkg = JSON.parse(fs.readFileSync(pendantTarget, "utf8"));
-	pendantPkg.version = pkg.version;
-	pendantPkg.author = pkg.author;
-	pendantPkg.license = pkg.license;
-	pendantPkg.repository = pkg.repository;
-	pendantPkg.dependencies = pkgApp.dependencies;
-	fs.writeFileSync(
-		pendantTarget,
-		JSON.stringify(pendantPkg, null, 2) + "\n",
-		"utf8",
-	);
-}
 
 // Update readme notes
 const readme = fs.readFileSync("README.md", "utf8");

@@ -1,10 +1,10 @@
 import Button from "app/components/Button";
-import { FiTarget } from "react-icons/fi";
 import { ControlledInput } from "app/components/ControlledInput";
-import { useSelector } from "react-redux";
-import { RootState } from "app/store/redux";
+import controller from "app/lib/controller.ts";
+import type { RootState } from "app/store/redux";
 import { FaChartLine } from "react-icons/fa";
-import controller from "app/lib/controller";
+import { FiTarget } from "react-icons/fi";
+import { useSelector } from "react-redux";
 
 export interface LocationInputProps {
 	value: object;

@@ -22,8 +22,8 @@
  */
 
 import get from "lodash/get";
-import store from "../store";
 import { ERR_BAD_REQUEST, ERR_INTERNAL_SERVER_ERROR } from "../constants";
+import store from "../store";
 
 export const upload = (req, res) => {
 	const { port, name, gcode, context = {} } = req.body;

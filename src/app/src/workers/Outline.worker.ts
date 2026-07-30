@@ -21,9 +21,9 @@
  *
  */
 
-import concaveman from "concaveman";
-import GCodeVirtualizer from "app/lib/GCodeVirtualizer";
 import { OUTLINE_MODE_RAPIDLESS_SQUARE } from "app/constants";
+import GCodeVirtualizer from "app/lib/GCodeVirtualizer";
+import concaveman from "concaveman";
 
 self.onmessage = ({ data }) => {
 	const {
@@ -117,7 +117,7 @@ self.onmessage = ({ data }) => {
 		}
 
 		// 3. Compute concave hull; remove duplicate closing point
-		let hull = concaveman(deduped, concavity).slice(0, -1);
+		const hull = concaveman(deduped, concavity).slice(0, -1);
 
 		// 4. Ensure clockwise winding (negative signed area in standard XY)
 		// Shoelace cross-product variant: sum of (x2-x1)*(y2+y1)

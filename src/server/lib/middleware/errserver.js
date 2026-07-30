@@ -53,7 +53,7 @@
 const errserver = (options) => {
 	options = options || {};
 
-	let view = options.view || "500",
+	const view = options.view || "500",
 		error = options.error || "";
 
 	return (err, req, res, next) => {

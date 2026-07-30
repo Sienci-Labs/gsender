@@ -23,8 +23,8 @@
 import controller from "app/lib/controller";
 import {
 	getProbeSettings,
-	getUnitModal,
 	getToolString,
+	getUnitModal,
 } from "app/lib/toolChangeUtils";
 import { store as reduxStore } from "app/store/redux";
 import get from "lodash/get";
@@ -166,6 +166,7 @@ const createWizard = (count: number) => {
 							);
 						},
 						overlay: false,
+						toolBanner: true,
 						actions: [
 							{
 								label: "Probe Changed Tool",

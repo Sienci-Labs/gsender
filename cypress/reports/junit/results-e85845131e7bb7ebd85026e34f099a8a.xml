@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="1136.049" tests="23" failures="2">
+  <testsuite name="Root Suite" timestamp="2026-04-16T17:16:43" tests="0" file="cypress\e2e\grblHal\A_grblHal_master_spec.cy.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="gSender UI Load Test" timestamp="2026-04-16T17:16:43" tests="1" time="1.869" failures="0">
+    <testcase name="gSender UI Load Test should navigate to gSender and verify the UI loads" time="1.621" classname="should navigate to gSender and verify the UI loads">
+    </testcase>
+  </testsuite>
+  <testsuite name="Device Connection" timestamp="2026-04-16T17:16:45" tests="1" time="9.028" failures="0">
+    <testcase name="Device Connection should connect to CNC machine by selecting the first available port" time="8.926" classname="should connect to CNC machine by selecting the first available port">
+    </testcase>
+  </testsuite>
+  <testsuite name="Load file testing in grblHal" timestamp="2026-04-16T17:16:54" tests="1" time="54.077" failures="0">
+    <testcase name="Load file testing in grblHal Complete workflow: Connect-&gt; Upload-&gt; Disconnect-&gt;Upload-&gt; Connect-&gt;Disconnect" time="53.971" classname="Complete workflow: Connect-&gt; Upload-&gt; Disconnect-&gt;Upload-&gt; Connect-&gt;Disconnect">
+    </testcase>
+  </testsuite>
+  <testsuite name="GrblHal Machine File Info Test" timestamp="2026-04-16T17:17:48" tests="1" time="11.234" failures="0">
+    <testcase name="GrblHal Machine File Info Test Uploads file, toggles, and prints file info" time="11.159" classname="Uploads file, toggles, and prints file info">
+    </testcase>
+  </testsuite>
+  <testsuite name="Gsender testing jogging using buttons" timestamp="2026-04-16T17:18:00" tests="1" time="49.985" failures="0">
+    <testcase name="Gsender testing jogging using buttons Test Case: jogging using buttons" time="49.874" classname="Test Case: jogging using buttons">
+    </testcase>
+  </testsuite>
+  <testsuite name="Dynamic Keyboard Jogging Test - All Axes" timestamp="2026-04-16T17:18:50" tests="1" time="135.634" failures="0">
+    <testcase name="Dynamic Keyboard Jogging Test - All Axes Test all keyboard jog shortcuts dynamically" time="135.490" classname="Test all keyboard jog shortcuts dynamically">
+    </testcase>
+  </testsuite>
+  <testsuite name="Gsender testing preset create update" timestamp="2026-04-16T17:21:05" tests="1" time="39.697" failures="0">
+    <testcase name="Gsender testing preset create update Verify Rapid preset values are updated and jogging speed/position is accurate" time="39.574" classname="Verify Rapid preset values are updated and jogging speed/position is accurate">
+    </testcase>
+  </testsuite>
+  <testsuite name="Grblhal Zeroing axis and go to zero" timestamp="2026-04-16T17:21:45" tests="1" time="77.371" failures="0">
+    <testcase name="Grblhal Zeroing axis and go to zero Test Case: jogging using buttons and zeroing axes" time="77.215" classname="Test Case: jogging using buttons and zeroing axes">
+    </testcase>
+  </testsuite>
+  <testsuite name="CNC Visualizer rendering test case" timestamp="2026-04-16T17:23:02" tests="1" time="21.133" failures="0">
+    <testcase name="CNC Visualizer rendering test case Connects to CNC, uploads file, and verifies visualizer + file info" time="21.010" classname="Connects to CNC, uploads file, and verifies visualizer + file info">
+    </testcase>
+  </testsuite>
+  <testsuite name="Job Run Test in grblHal without homing" timestamp="2026-04-16T17:23:23" tests="1" time="54.718" failures="0">
+    <testcase name="Job Run Test in grblHal without homing Test Case: Connect, Upload File, Run Job and Collect Details" time="54.632" classname="Test Case: Connect, Upload File, Run Job and Collect Details">
+    </testcase>
+  </testsuite>
+  <testsuite name="Coolant Testing  " timestamp="2026-04-16T17:24:18" tests="1" time="40.966" failures="0">
+    <testcase name="Coolant Testing   Apply coolant mist, flood and Off option" time="40.857" classname="Apply coolant mist, flood and Off option">
+    </testcase>
+  </testsuite>
+  <testsuite name="Feedrate Performance Comparison Test" timestamp="2026-04-16T17:24:59" tests="1" time="92.020" failures="0">
+    <testcase name="Feedrate Performance Comparison Test Should compare job completion times with different feedrates" time="91.908" classname="Should compare job completion times with different feedrates">
+    </testcase>
+  </testsuite>
+  <testsuite name="Macros Upload, Execution and Verification Test" timestamp="2026-04-16T17:26:31" tests="1" time="110.224" failures="0">
+    <testcase name="Macros Upload, Execution and Verification Test Upload and run macro with success message verify the output" time="110.056" classname="Upload and run macro with success message verify the output">
+    </testcase>
+  </testsuite>
+  <testsuite name="Console commands testing " timestamp="2026-04-16T17:28:21" tests="1" time="33.641" failures="0">
+    <testcase name="Console commands testing  Connects machine and sets axes to zero" time="33.541" classname="Connects machine and sets axes to zero">
+    </testcase>
+  </testsuite>
+  <testsuite name="gSender Configuration and Firmware Test Suite" timestamp="2026-04-16T17:28:55" tests="1" time="40.023" failures="0">
+    <testcase name="gSender Configuration and Firmware Test Suite Should reset, export, import gSender settings, restore firmware defaults, and perform searches" time="39.803" classname="Should reset, export, import gSender settings, restore firmware defaults, and perform searches">
+    </testcase>
+  </testsuite>
+  <testsuite name="Gsender testing jogging using buttons" timestamp="2026-04-16T17:29:35" tests="1" time="56.378" failures="0">
+    <testcase name="Gsender testing jogging using buttons Test Case: jogging using buttons" time="56.243" classname="Test Case: jogging using buttons">
+    </testcase>
+  </testsuite>
+  <testsuite name="Invert and Check Pins Test with Stepper Motor Lock/Unlock" timestamp="2026-04-16T17:30:31" tests="1" time="37.770" failures="0">
+    <testcase name="Invert and Check Pins Test with Stepper Motor Lock/Unlock Checks machine information, verifies pin inversion, and tests stepper motor lock/unlock" time="37.650" classname="Checks machine information, verifies pin inversion, and tests stepper motor lock/unlock">
+    </testcase>
+  </testsuite>
+  <testsuite name="gSender Movement tuning test" timestamp="2026-04-16T17:31:09" tests="1" time="48.445" failures="0">
+    <testcase name="gSender Movement tuning test Should complete movement tuning for x axis and y axis" time="48.353" classname="Should complete movement tuning for x axis and y axis">
+    </testcase>
+  </testsuite>
+  <testsuite name="Rotary surfacing" timestamp="2026-04-16T17:31:58" tests="1" time="38.731" failures="0">
+    <testcase name="Rotary surfacing Rotary surfacing" time="38.622" classname="Rotary surfacing">
+    </testcase>
+  </testsuite>
+  <testsuite name="Spindle Configuration and Control Test - Decrease to 7500 RPM" timestamp="2026-04-16T17:32:36" tests="1" time="66.849" failures="0">
+    <testcase name="Spindle Configuration and Control Test - Decrease to 7500 RPM Connect, Configure Spindle, Upload File, Decrease to 7500 RPM, Reset, Increase to 24000 RPM, and Complete Job" time="66.742" classname="Connect, Configure Spindle, Upload File, Decrease to 7500 RPM, Reset, Increase to 24000 RPM, and Complete Job">
+    </testcase>
+  </testsuite>
+  <testsuite name="Surfacing Test" timestamp="2026-04-16T17:33:43" tests="1" time="36.424" failures="1">
+    <testcase name="Surfacing Test Should complete surfacing workflow successfully" time="0.000" classname="Should complete surfacing workflow successfully">
+      <failure message="Timed out retrying after 10000ms: expected &apos;&lt;button.inline-flex.items-center.justify-center.whitespace-nowrap.rounded-md.text-base.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.active:bg-opacity-70.active:shadow-[inset_7px_4px_6px_0px_rgba(59,_130,_246,_0.1)].bg-primary.text-primary-foreground.hover:bg-primary/90.h-10.rounded-md.px-4.max-xl:px-3.py-2.max-xl:py-1.w-full.text-base.relative.border.rounded.hover:opacity-90.shadow.active:bg-opacity-70.active:shadow-[inset_7px_4px_6px_0px_rgba(59,_130,_246,_0.1)].border-blue-500.text-white.bg-blue-500.h-8.w-24.text-sm&gt;&apos; to be &apos;visible&apos;
+
+This element `&lt;button.inline-flex.items-center.justify-center.whitespace-nowrap.rounded-md.text-base.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.active:bg-opacity-70.active:shadow-[inset_7px_4px_6px_0px_rgba(59,_130,_246,_0.1)].bg-primary.text-primary-foreground.hover:bg-primary/90.h-10.rounded-md.px-4.max-xl:px-3.py-2.max-xl:py-1.w-full.text-base.relative.border.rounded.hover:opacity-90.shadow.active:bg-opacity-70.active:shadow-[inset_7px_4px_6px_0px_rgba(59,_130,_246,_0.1)].border-blue-500.text-white.bg-blue-500.h-8.w-24.text-sm&gt;` is not visible because its parent `&lt;div#tabpanel-Console.w-full.h-full.hidden&gt;` has CSS property: `display: none`" type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 10000ms: expected '<button.inline-flex.items-center.justify-center.whitespace-nowrap.rounded-md.text-base.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.active:bg-opacity-70.active:shadow-[inset_7px_4px_6px_0px_rgba(59,_130,_246,_0.1)].bg-primary.text-primary-foreground.hover:bg-primary/90.h-10.rounded-md.px-4.max-xl:px-3.py-2.max-xl:py-1.w-full.text-base.relative.border.rounded.hover:opacity-90.shadow.active:bg-opacity-70.active:shadow-[inset_7px_4px_6px_0px_rgba(59,_130,_246,_0.1)].border-blue-500.text-white.bg-blue-500.h-8.w-24.text-sm>' to be 'visible'
+
+This element `<button.inline-flex.items-center.justify-center.whitespace-nowrap.rounded-md.text-base.font-medium.ring-offset-background.transition-colors.focus-visible:outline-none.focus-visible:ring-2.focus-visible:ring-ring.focus-visible:ring-offset-2.disabled:pointer-events-none.disabled:opacity-50.active:bg-opacity-70.active:shadow-[inset_7px_4px_6px_0px_rgba(59,_130,_246,_0.1)].bg-primary.text-primary-foreground.hover:bg-primary/90.h-10.rounded-md.px-4.max-xl:px-3.py-2.max-xl:py-1.w-full.text-base.relative.border.rounded.hover:opacity-90.shadow.active:bg-opacity-70.active:shadow-[inset_7px_4px_6px_0px_rgba(59,_130,_246,_0.1)].border-blue-500.text-white.bg-blue-500.h-8.w-24.text-sm>` is not visible because its parent `<div#tabpanel-Console.w-full.h-full.hidden>` has CSS property: `display: none`
+    at Context.eval (webpack://gSender/./cypress/e2e/grblHal/surfacing.cy.js:133:7)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="CNC Bit Position and Job Progress Tracking" timestamp="2026-04-16T17:34:20" tests="1" time="52.715" failures="0">
+    <testcase name="CNC Bit Position and Job Progress Tracking should connect, track bit positions, verify movement, and validate specific position values during job execution" time="52.555" classname="should connect, track bit positions, verify movement, and validate specific position values during job execution">
+    </testcase>
+  </testsuite>
+  <testsuite name="gSender XY Squaring Test" timestamp="2026-04-16T17:35:12" tests="1" time="27.102" failures="1">
+    <testcase name="gSender XY Squaring Test Should complete XY Squaring wizard with measurements and adjustments" time="0.000" classname="Should complete XY Squaring wizard with measurements and adjustments">
+      <failure message="Timed out retrying after 10050ms: `cy.click()` failed because this element:
+
+          `&lt;div class=&quot;rounded-lg border bg-card text-card-foreground shadow-sm hover:bg-gray-300 bg-gray-100 cursor-pointer p-4 
+            flex flex-col items-center justify-between text-center gap-4
+            transition-all duration-300 ease-in-out h-full dark:bg-dark&quot;&gt;...&lt;/div&gt;`
+
+          has CSS `pointer-events: none`, inherited from this element:
+
+`&lt;body data-scroll-locked=&quot;1&quot; style=&quot;pointer-events: none;&quot;&gt;...&lt;/body&gt;`
+
+          `pointer-events: none` prevents user mouse interaction.
+
+          Fix this problem, or use {force: true} to disable error checking.
+
+https://on.cypress.io/element-cannot-be-interacted-with" type="CypressError"><![CDATA[CypressError: Timed out retrying after 10050ms: `cy.click()` failed because this element:
+
+          `<div class="rounded-lg border bg-card text-card-foreground shadow-sm hover:bg-gray-300 bg-gray-100 cursor-pointer p-4 
+            flex flex-col items-center justify-between text-center gap-4
+            transition-all duration-300 ease-in-out h-full dark:bg-dark">...</div>`
+
+          has CSS `pointer-events: none`, inherited from this element:
+
+`<body data-scroll-locked="1" style="pointer-events: none;">...</body>`
+
+          `pointer-events: none` prevents user mouse interaction.
+
+          Fix this problem, or use {force: true} to disable error checking.
+
+https://on.cypress.io/element-cannot-be-interacted-with
+    at ensureElDoesNotHaveCSS (http://localhost:8000/__cypress/runner/cypress_runner.js:112856:66)
+    at ensureDescendents (http://localhost:8000/__cypress/runner/cypress_runner.js:112964:5)
+    at ensureDescendentsAndScroll (http://localhost:8000/__cypress/runner/cypress_runner.js:112972:14)
+    at ensureElIsNotCovered (http://localhost:8000/__cypress/runner/cypress_runner.js:113103:5)
+    at runAllChecks (http://localhost:8000/__cypress/runner/cypress_runner.js:113302:52)
+    at retryActionability (http://localhost:8000/__cypress/runner/cypress_runner.js:113339:16)
+    at tryCatcher (http://localhost:8000/__cypress/runner/cypress_runner.js:1830:23)
+    at Promise.attempt.Promise.try (http://localhost:8000/__cypress/runner/cypress_runner.js:4338:29)
+    at whenStable (http://localhost:8000/__cypress/runner/cypress_runner.js:143744:68)
+    at <unknown> (http://localhost:8000/__cypress/runner/cypress_runner.js:143685:14)
+    at tryCatcher (http://localhost:8000/__cypress/runner/cypress_runner.js:1830:23)
+    at Promise._settlePromiseFromHandler (http://localhost:8000/__cypress/runner/cypress_runner.js:1542:31)
+    at Promise._settlePromise (http://localhost:8000/__cypress/runner/cypress_runner.js:1599:18)
+    at Promise._settlePromise0 (http://localhost:8000/__cypress/runner/cypress_runner.js:1644:10)
+    at Promise._settlePromises (http://localhost:8000/__cypress/runner/cypress_runner.js:1724:18)
+    at Promise._fulfill (http://localhost:8000/__cypress/runner/cypress_runner.js:1668:18)
+    at <unknown> (http://localhost:8000/__cypress/runner/cypress_runner.js:5473:46)
+From Your Spec Code:
+    at Context.eval (webpack://gSender/./cypress/e2e/grblHal/XY-Squaring.cy.js:42:3)]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

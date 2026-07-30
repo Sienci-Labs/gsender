@@ -1,22 +1,20 @@
-import { useEffect, useState } from "react";
-import { LuMove, LuRefreshCw } from "react-icons/lu";
-import { cx } from "class-variance-authority";
-
 import Button from "app/components/Button";
-import { Jogging } from "app/features/Jogging";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-import { GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG } from "app/constants";
 import {
 	Popover,
 	PopoverContent,
 	PopoverTrigger,
 } from "app/components/shadcn/Popover";
-
+import { GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG } from "app/constants";
+import { Jogging } from "app/features/Jogging";
+import { useTypedSelector } from "app/hooks/useTypedSelector";
+import { cx } from "class-variance-authority";
+import { useEffect, useState } from "react";
+import { LuMove, LuRefreshCw } from "react-icons/lu";
+import xySquaringImage from "../assets/XY_squaring_example.jpg";
 import { useSquaring } from "../context/SquaringContext";
 import MarkingStep from "./MarkingStep";
 import MeasurementStep from "./MeasurementStep";
 import ResultsStep from "./ResultsStep";
-import xySquaringImage from "../assets/XY_squaring_example.jpg";
 
 const Steps = () => {
 	const [started, setStarted] = useState(false);
@@ -54,16 +52,16 @@ const Steps = () => {
 
 	if (!started) {
 		return (
-			<div className="flex flex-col gap-2 dark:text-content-primary w-full">
+			<div className="flex flex-col gap-2 dark:text-white w-full">
 				<div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-[3fr_2fr]">
 					<div className="space-y-1 text-sm xl:text-base font-normal">
-						<p className="text-gray-500 dark:text-content-secondary">
+						<p className="text-gray-500 dark:text-gray-300">
 							If your CNC is making skewed cuts (pictured), it&apos;s because
 							the X and Y axes aren&apos;t squared to each other. This can be
 							fixed.
 						</p>
 
-						<div className="text-gray-500 dark:text-content-secondary">
+						<div className="text-gray-500 dark:text-gray-300">
 							To know how much adjustment is needed, follow the steps below.
 							Prepare:
 							<ul className="list-disc list-inside">
@@ -76,7 +74,7 @@ const Steps = () => {
 							</ul>
 						</div>
 
-						<p className="text-gray-500 dark:text-content-secondary">
+						<p className="text-gray-500 dark:text-gray-300">
 							Use the jog buttons to position your CNC near its front, left
 							corner with the pointed tip almost touching the wasteboard, then
 							continue below.
@@ -103,7 +101,7 @@ const Steps = () => {
 							className="w-[450px] h-auto border border-gray-200 rounded-lg"
 						/>
 
-						<p className="text-gray-600 font-bold dark:text-content-primary">
+						<p className="text-gray-600 font-bold dark:text-white">
 							If the X and Y axes aren't squared to each other on your CNC then
 							it will cause your cuts to end up skewed.
 						</p>

@@ -1,35 +1,4 @@
-import { BsEthernet } from "react-icons/bs";
-import { FaCog } from "react-icons/fa";
-import { PiEngine } from "react-icons/pi";
-import { MdTouchApp } from "react-icons/md";
-import { CiLight } from "react-icons/ci";
-import { FaHome } from "react-icons/fa";
-import { GiTargetLaser } from "react-icons/gi";
-import { FaRobot } from "react-icons/fa";
-import { RxButton } from "react-icons/rx";
-import { CiMapPin } from "react-icons/ci";
-import { IoIosSwap } from "react-icons/io";
-import { FaArrowsSpin } from "react-icons/fa6";
-import { MdSettingsApplications } from "react-icons/md";
-import { SiCoronaengine } from "react-icons/si";
-import { MdOutlineReadMore, MdAccessibility } from "react-icons/md";
-import { IconType } from "react-icons";
-import {
-	TOUCHPLATE_TYPE_3D,
-	TOUCHPLATE_TYPE_AUTOZERO,
-	TOUCHPLATE_TYPE_BITZERO,
-	TOUCHPLATE_TYPE_STANDARD,
-	TOUCHPLATE_TYPE_ZERO,
-} from "app/lib/constants";
-import { AJogWizard } from "app/features/Config/components/wizards/AJogWizard.tsx";
-import { ProbePinStatus } from "app/features/Config/components/wizards/ProbePinStatus.tsx";
-import { LimitSwitchIndicators } from "app/features/Config/components/wizards/LimitSwitchIndicators.tsx";
-import { SpindleWizard } from "app/features/Config/components/wizards/SpindleWizard.tsx";
-import { AccessoryOutputWizard } from "app/features/Config/components/wizards/AccessoryOutputWizard.tsx";
-import { SquaringToolWizard } from "app/features/Config/components/wizards/SquaringToolWizard.tsx";
-import { XJogWizard } from "app/features/Config/components/wizards/XJogWizard.tsx";
-import { YJogWizard } from "app/features/Config/components/wizards/YJogWizard.tsx";
-import { ZJogWizard } from "app/features/Config/components/wizards/ZJogWizard.tsx";
+/** biome-ignore-all lint/suspicious/noExplicitAny: <> */
 import {
 	GRBL,
 	GRBLHAL,
@@ -41,36 +10,74 @@ import {
 	THEMES,
 	WORKSPACE_MODE,
 } from "app/constants";
-import { LaserWizard } from "app/features/Config/components/wizards/LaserWizard.tsx";
+import type { EEPROM, FIRMWARE_TYPES_T } from "app/definitions/firmware";
+import type {
+	BasicPosition,
+	UNITS_EN,
+	UNITS_GCODE,
+} from "app/definitions/general";
 import {
 	GamepadLinkWizard,
 	KeyboardLinkWizard,
 } from "app/features/Config/components/ShortcutLinkWizards.tsx";
-import controller from "app/lib/controller";
-import get from "lodash/get";
-import store from "app/store";
-import reduxStore from "app/store/redux";
-import pubsub from "pubsub-js";
-import { EEPROM, FIRMWARE_TYPES_T } from "app/definitions/firmware";
-import { updatePartialControllerSettings } from "app/store/redux/slices/controller.slice";
-import findIndex from "lodash/findIndex";
-import { BasicPosition, UNITS_EN, UNITS_GCODE } from "app/definitions/general";
-import { convertToImperial } from "app/lib/units";
-import { round, roundMetric } from "app/lib/rounding";
-import {
+import { AccessoryOutputWizard } from "app/features/Config/components/wizards/AccessoryOutputWizard.tsx";
+import { AJogWizard } from "app/features/Config/components/wizards/AJogWizard.tsx";
+import { LaserWizard } from "app/features/Config/components/wizards/LaserWizard.tsx";
+import { LimitSwitchIndicators } from "app/features/Config/components/wizards/LimitSwitchIndicators.tsx";
+import { ProbePinStatus } from "app/features/Config/components/wizards/ProbePinStatus.tsx";
+import { SpindleWizard } from "app/features/Config/components/wizards/SpindleWizard.tsx";
+import { SquaringToolWizard } from "app/features/Config/components/wizards/SquaringToolWizard.tsx";
+import { XJogWizard } from "app/features/Config/components/wizards/XJogWizard.tsx";
+import { YJogWizard } from "app/features/Config/components/wizards/YJogWizard.tsx";
+import { ZJogWizard } from "app/features/Config/components/wizards/ZJogWizard.tsx";
+import { updateToolchangeContext } from "app/features/Helper/Wizard.tsx";
+import type {
 	LaserState,
-	Spindle,
 	SPINDLE_LASER_T,
+	Spindle,
 } from "app/features/Spindle/definitions";
+import type { THEMES_T } from "app/features/Visualizer/definitions";
+import {
+	TOUCHPLATE_TYPE_3D,
+	TOUCHPLATE_TYPE_AUTOZERO,
+	TOUCHPLATE_TYPE_BITZERO,
+	TOUCHPLATE_TYPE_STANDARD,
+	TOUCHPLATE_TYPE_ZERO,
+} from "app/lib/constants";
+import controller from "app/lib/controller.ts";
 import { updateWorkspaceMode } from "app/lib/rotary";
+import { round, roundMetric } from "app/lib/rounding";
 import {
 	TOASTER_DISABLED,
 	TOASTER_LONG,
 	TOASTER_UNTIL_CLOSE,
 } from "app/lib/toaster/ToasterLib";
+import { convertToImperial } from "app/lib/units";
+import store from "app/store";
+import reduxStore from "app/store/redux";
+import { updatePartialControllerSettings } from "app/store/redux/slices/controller.slice";
 import isElectron from "is-electron";
-import { THEMES_T } from "app/features/Visualizer/definitions";
-import { JSX } from "react";
+import findIndex from "lodash/findIndex";
+import get from "lodash/get";
+import posthog from "posthog-js";
+import pubsub from "pubsub-js";
+import type { JSX } from "react";
+import type { IconType } from "react-icons";
+import { BsEthernet } from "react-icons/bs";
+import { CiLight, CiMapPin } from "react-icons/ci";
+import { FaCog, FaHome, FaRobot } from "react-icons/fa";
+import { FaArrowsSpin } from "react-icons/fa6";
+import { GiTargetLaser } from "react-icons/gi";
+import { IoIosSwap } from "react-icons/io";
+import {
+	MdAccessibility,
+	MdOutlineReadMore,
+	MdSettingsApplications,
+	MdTouchApp,
+} from "react-icons/md";
+import { PiEngine } from "react-icons/pi";
+import { RxButton } from "react-icons/rx";
+import { SiCoronaengine } from "react-icons/si";
 
 export interface SettingsMenuSection {
 	label: string;
@@ -95,7 +102,8 @@ export type gSenderSettingType =
 	| "api"
 	| "jog"
 	| "location"
-	| "wizard";
+	| "wizard"
+	| "path";
 
 export type gSenderSettingsValues = number | string | boolean;
 
@@ -103,7 +111,7 @@ export interface gSenderSetting {
 	label?: string;
 	type: gSenderSettingType;
 	key?: string;
-	description?: string | any[];
+	description?: string;
 	options?: string[] | number[];
 	unit?: string;
 	eID?: EEPROM;
@@ -111,12 +119,14 @@ export interface gSenderSetting {
 	value?: gSenderSettingsValues;
 	defaultValue?: any;
 	dirty?: boolean;
+	ignoreDefaultCheck?: boolean;
 	eventType?: string;
 	wizard?: () => JSX.Element;
 	toolLink?: string;
 	toolLinkLabel?: string;
 	disabled?: () => boolean;
 	hidden?: (getPending: (key: string, defaultValue?: any) => any) => boolean;
+	valueTransform?: (v: any) => any;
 	onDisable?: () => void;
 	onEnable?: () => void;
 	onUpdate?: () => void;
@@ -256,12 +266,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						description: "Allow screen to blank/sleep.",
 						onEnable: () => {
 							if (isElectron()) {
-								window.ipcRenderer.send("change-power-saving", true);
+								(window as any).ipcRenderer.send("change-power-saving", true);
 							}
 						},
 						onDisable: () => {
 							if (isElectron()) {
-								window.ipcRenderer.send("change-power-saving", false);
+								(window as any).ipcRenderer.send("change-power-saving", false);
 							}
 						},
 					},
@@ -273,12 +283,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
 							"Pop up a confirmation window when exiting the program.",
 						onEnable: () => {
 							if (isElectron()) {
-								window.ipcRenderer.send("assignPromptExit", true);
+								(window as any).ipcRenderer.send("assignPromptExit", true);
 							}
 						},
 						onDisable: () => {
 							if (isElectron()) {
-								window.ipcRenderer.send("assignPromptExit", false);
+								(window as any).ipcRenderer.send("assignPromptExit", false);
 							}
 						},
 					},
@@ -289,13 +299,45 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						description:
 							"Choose how often gSender will backup your settings. Useful in case you need to revert them in the future.",
 						options: ["On Update", "Daily", "Weekly", "Monthly"],
+						hidden: () => {
+							return !isElectron();
+						},
 					},
 					{
-						label: "Send usage data",
-						key: "workspace.sendUsageData",
+						label: "Settings backup location",
+						key: "workspace.backupLoc",
+						type: "path",
 						description:
-							"This info is sent to us as an anonymous data point, but greatly helps us improve gSender by seeing how people use it.",
+							"Choose the location to backup your settings to. Leave it blank to use the default appData location.",
+						hidden: () => {
+							return !isElectron();
+						},
+					},
+					{
+						label: "Collect usage data",
+						key: "workspace.collectUsageDataStatus",
+						description:
+							"This info is collected anonymously to help us improve gSender by seeing how people use it.",
 						type: "boolean",
+						valueTransform: (v: any) => v === "accepted" || v === true,
+						onApply: () => {
+							const toggle = store.get("workspace.collectUsageDataStatus");
+							store.replace(
+								"workspace.collectUsageDataStatus",
+								toggle === true || toggle === "accepted"
+									? "accepted"
+									: "denied",
+							);
+
+							if (toggle === true || toggle === "accepted") {
+								posthog.opt_in_capturing();
+								posthog?.capture("data_collection_accepted");
+							} else {
+								posthog.opt_out_capturing();
+								posthog?.capture("data_collection_declined");
+							}
+						},
+						ignoreDefaultCheck: true,
 					},
 				],
 			},
@@ -310,13 +352,83 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						type: "boolean",
 					},
 					{
+						label: "DRO zeros",
+						key: "workspace.customDecimalPlaces",
+						description:
+							"Set the number of decimal places shown between 1-4. (Default 0 shows 2 for mm and 3 for inches)",
+						type: "number",
+						min: 0,
+						max: 4,
+					},
+				],
+			},
+			{
+				label: "Visualizer options",
+				settings: [
+					{
 						label: "Visualizer theme",
 						key: "widgets.visualizer.theme",
-						description: "Independant colour control for the visualizer.",
+						description: "Independent colour control for the visualizer.",
 						type: "select",
-						options: [THEMES.LIGHT_THEME, THEMES.DARK_THEME],
+						options: [
+							THEMES.LIGHT_THEME,
+							THEMES.DARK_THEME,
+							THEMES.FLEXOKI_DARK_THEME,
+							THEMES.TOKYO_NIGHT_THEME,
+							THEMES.GRUVBOX_LIGHT_THEME,
+							THEMES.AYU_DARK_THEME,
+							THEMES.AYU_LIGHT_THEME,
+						],
 						onChange: (theme: THEMES_T) => {
 							pubsub.publish("theme:change", theme);
+						},
+					},
+					{
+						label: "Show bounding box",
+						key: "widgets.visualizer.objects.limits.visible",
+						description:
+							"Draw a wireframe around the extents of the loaded G-code file.",
+						type: "boolean",
+						onChange: (value: boolean) => {
+							store.set("widgets.visualizer.objects.limits.visible", value);
+							pubsub.publish("visualizer:settings");
+						},
+					},
+					{
+						label: "Show bounding box labels",
+						key: "widgets.visualizer.boundingBoxLabels",
+						description: "Show X/Y/Z dimension labels on the bounding box.",
+						type: "boolean",
+						onChange: (value: boolean) => {
+							store.set("widgets.visualizer.boundingBoxLabels", value);
+							pubsub.publish("visualizer:settings");
+						},
+					},
+					{
+						label: "Show machine bed indicator",
+						key: "widgets.visualizer.objects.machineBed.visible",
+						description:
+							"Draw an outline of the machine's homed work area once homing is complete.",
+						type: "boolean",
+						defaultValue: false,
+						onChange: (value: boolean) => {
+							store.set("widgets.visualizer.objects.machineBed.visible", value);
+							pubsub.publish("visualizer:settings");
+						},
+					},
+					{
+						label: "Trim grid to machine bed",
+						key: "widgets.visualizer.objects.machineBed.trimGridToBed",
+						description:
+							"When the machine bed indicator is shown, clip the background grid to just past the bed's edges instead of a fixed square.",
+						type: "boolean",
+						defaultValue: false,
+						onChange: (value: boolean) => {
+							store.set(
+								"widgets.visualizer.objects.machineBed.trimGridToBed",
+								value,
+							);
+							pubsub.publish("visualizer:settings");
 						},
 					},
 					{
@@ -337,13 +449,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						],
 					},
 					{
-						label: "DRO zeros",
-						key: "workspace.customDecimalPlaces",
+						label: "Follow tool during runtime",
+						key: "widgets.visualizer.followToolDuringRuntime",
 						description:
-							"Set the number of decimal places shown between 1-4. (Default 0 shows 2 for mm and 3 for inches)",
-						type: "number",
-						min: 0,
-						max: 4,
+							"While a job is running, pan the camera to track the tool in X/Y, keeping the same viewing angle and height.",
+						type: "boolean",
+						defaultValue: false,
 					},
 				],
 			},
@@ -839,6 +950,23 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						},
 					},
 					{
+						label: "Probe Movement Speed",
+						key: "widgets.probe.probeMovementSpeed",
+						description:
+							"Feed rate for retract/reposition moves during probing. If 0, these moves use rapid (G0). If set, they use a controlled feed move (G1) at this speed instead. (Default 0)",
+						type: "number",
+						min: 0,
+						unit: "mm/min",
+						hidden: (getPending) => {
+							const probeType = getPending(
+								"workspace.probeProfile.touchplateType",
+								"",
+							);
+							// BitZero already always uses G1 for retracts, so this setting doesn't apply to it
+							return probeType === TOUCHPLATE_TYPE_BITZERO;
+						},
+					},
+					{
 						label: "Final Z retract",
 						key: "widgets.probe.zRetractNormal",
 						description:
@@ -1317,14 +1445,23 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						eID: "$394",
 					},
 					{
-						label: "Spindle on delay",
+						type: "eeprom",
+						eID: "$392",
+					},
+					{
+						label: "Insert dwell for spindle commands",
 						key: "widgets.spindle.delay",
 						description:
-							"Adds a delay to give the spindle time to spin up. ($392, Default 0)",
-						type: "hybrid",
-						eID: "$392",
+							"Adds a delay to give the spindle time to spin up.  This will insert a G4 command on every M3/M4 within the file, and is unnecessary if your firmware otherwise handles spindle-at-speed operations. (Default 0)",
+						type: "number",
 						unit: "s",
-						hideWhenFirmwareCurrent: true,
+						defaultValue: 0,
+						onUpdate: () => {
+							const delay = Number(store.get("widgets.spindle.delay", 0));
+							controller.command("settings:updated", {
+								spindleDelay: Number.isFinite(delay) ? delay : 0,
+							});
+						},
 					},
 
 					{
@@ -1536,6 +1673,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
 							"X-axis offset from the spindle. (Mark with a v-bit then track the laser movement to reach that mark, $741, Default 0)",
 						type: "hybrid",
 						eID: "$741",
+						remap: "$770",
 						unit: "mm",
 					},
 					{
@@ -1545,7 +1683,8 @@ export const SettingsMenu: SettingsMenuSection[] = [
 							"Y-axis offset from the spindle. (Mark with a v-bit then track the laser movement to reach that mark, $742, Default 0)",
 						type: "hybrid",
 						eID: "$742",
-						unit: "rpm",
+						remap: "$771",
+						unit: "mm",
 					},
 					{
 						type: "eeprom",
@@ -1756,6 +1895,9 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						key: "workspace.toolChange.passthrough",
 						description:
 							"Send tool change lines as-is, assuming your CNC can properly handle M6 and T commands.",
+						onApply: () => {
+							updateToolchangeContext();
+						},
 					},
 					{
 						label: "gSender strategy",
@@ -2216,7 +2358,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
 								);
 								// Normalize percentage to decimal (e.g., "100%" -> 1.0)
 								const scaleFactor = parseFloat(scaleFactorStr) / 100;
-								// @ts-ignore
+								// @ts-expect-error
 								window.ipcRenderer.send("save-display-scale", scaleFactor);
 							}
 						},

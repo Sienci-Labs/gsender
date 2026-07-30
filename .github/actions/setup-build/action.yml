@@ -22,29 +22,23 @@ runs:
         echo "RUNNER_TEMP=$RUNNER_TEMP"
         echo "RUNNER_TOOL_CACHE=$RUNNER_TOOL_CACHE"
 
-    - name: Install Linux native build dependencies
-      if: runner.os == 'Linux'
+    - name: Install Yarn and node-gyp
       shell: bash
-      run: sudo apt-get install -y libudev-dev
-
-    - name: Install Bun
-      uses: oven-sh/setup-bun@v2
-
-    - name: Install node-gyp
-      shell: bash
-      run: npm install -g node-gyp
+      run: |
+        npm install -g yarn
+        yarn global add node-gyp
 
     - name: Install dependencies and lint
       shell: bash
       run: |
-        bun install
-        bun run lint
+        yarn install
+        # yarn lint
 
     - name: Sync package and install src deps
       shell: bash
       run: |
         npm run package-sync
-        npm install --prefix src --production --ignore-scripts
+        yarn --cwd src install --production --ignore-scripts --non-interactive
 
     - name: Prebuild (tag)
       if: github.ref_type == 'tag'
@@ -59,9 +53,9 @@ runs:
     - name: Build renderer (tag)
       if: github.ref_type == 'tag'
       shell: bash
-      run: bun run build
+      run: yarn run build
 
     - name: Build renderer (branch)
       if: github.ref_type == 'branch'
       shell: bash
-      run: bun run build-latest
+      run: yarn run build-latest

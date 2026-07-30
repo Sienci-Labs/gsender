@@ -1,5 +1,5 @@
-import Steps from "./Steps";
 import { SquaringProvider } from "./context/SquaringContext";
+import Steps from "./Steps";
 
 const Squaring = () => {
 	return (

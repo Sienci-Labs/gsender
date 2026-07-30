@@ -1,0 +1,103 @@
+
+
+DevTools listening on ws://127.0.0.1:60694/devtools/browser/32c0c5f9-9e30-43f2-9d32-1c7fccf52ce2
+Couldn't find tsconfig.json. tsconfig-paths will be skipped
+Couldn't determine Mocha version
+Warning: We failed to trash the existing run results.
+
+This error will not affect or change the exit code.
+
+Error: Command failed: C:\Users\shilp\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\trash\lib\win-trash.exe C:\Users\shilp\Projects\gsender\cypress\screenshots\grbl
+
+    at ChildProcess.exithandler (node:child_process:419:12)
+    at ChildProcess.emit (node:events:514:28)
+    at maybeClose (node:internal/child_process:1091:16)
+    at Process.onexit (node:internal/child_process:302:5)
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Electron 118                                                                   │
+  │ Node Version:   v22.22.0 (C:\nvm4w\nodejs\node.exe)                                            │
+  │ Specs:          1 found (A_grblHal_master_spec.cy.js)                                          │
+  │ Searched:       C:\Users\shilp\Projects\gsender\cypress\e2e\grblHal\A_grblHal_master_spec.cy.j │
+  │                 s                                                                              │
+  │ Experiments:    experimentalModifyObstructiveThirdPartyCode=true                               │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  A_grblHal_master_spec.cy.js                                                     (1 of 1)
+Couldn't determine Mocha version
+
+
+  gSender UI Load Test
+[gSender] [SLOW] UI Load Time: 19.57s
+    √ should load gSender UI (19901ms)
+
+  Device Connection
+[gSender] [ACCEPTABLE] UI Load Time: 8.63s
+    √ should connect to CNC machine by selecting the first available port (17241ms)
+
+  Load file testing in grblHal
+    √ Complete workflow: Connect-> Upload-> Disconnect->Upload-> Connect->Disconnect (65455ms)
+
+  GrblHal Machine File Info Test
+[gSender] [ACCEPTABLE] UI Load Time: 7.38s
+    √ Uploads file, toggles, and prints file info (18494ms)
+
+  Gsender testing jogging using buttons
+[gSender] [ACCEPTABLE] UI Load Time: 6.26s
+    1) Test Case: jogging using buttons
+
+
+  4 passing (3m)
+  1 failing
+
+  1) Gsender testing jogging using buttons
+       Test Case: jogging using buttons:
+     AssertionError: Timed out retrying after 5000ms: Expected to find content: '/^Idle$/i' but never did.
+      at Context.eval (webpack://gSender/./cypress/support/commands.js:543:48)
+
+
+
+[mochawesome] Report JSON saved to C:\Users\shilp\Projects\gsender\cypress\reports\mochawesome\.jsons\mochawesome_002.json
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        5                                                                                │
+  │ Passing:      4                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     2 minutes, 31 seconds                                                            │
+  │ Spec Ran:     A_grblHal_master_spec.cy.js                                                      │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\shilp\Projects\gsender\cypress\screenshots\A_grblHal_master_spec.cy.js\    (3840x2025)
+     Gsender testing jogging using buttons -- Test Case jogging using buttons (failed               
+     ).png                                                                                          
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ✖  A_grblHal_master_spec.cy.js              02:31        5        4        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ✖  1 of 1 failed (100%)                     02:31        5        4        1        -        -  
+

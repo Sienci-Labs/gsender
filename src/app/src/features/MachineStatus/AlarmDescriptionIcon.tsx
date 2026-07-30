@@ -21,14 +21,14 @@
  *
  */
 
-import get from "lodash/get";
-import { FaQuestion } from "react-icons/fa6";
-import { store as reduxStore } from "app/store/redux";
 import { GRBLHAL } from "app/constants";
-import { GRBL_ALARMS } from "app-root/src/server/controllers/Grbl/constants";
-import { GRBL_HAL_ALARMS } from "app-root/src/server/controllers/Grblhal/constants";
-import { ALARM_CODE } from "./definitions";
+import get from "lodash/get";
 import pubsub from "pubsub-js";
+import { FaQuestion } from "react-icons/fa6";
+import { GRBL_ALARMS } from "../../../../server/controllers/Grbl/constants";
+import { GRBL_HAL_ALARMS } from "../../../../server/controllers/Grblhal/constants";
+import { store as reduxStore } from "../../store/redux";
+import type { ALARM_CODE } from "./definitions";
 
 const getCodeDescription = (code: number | "Homing" = 1): string => {
 	const controllerType: string = get(reduxStore.getState(), "controller.type");

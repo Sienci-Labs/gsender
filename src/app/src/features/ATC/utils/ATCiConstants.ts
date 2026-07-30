@@ -1,5 +1,8 @@
-import { IconType } from "react-icons";
+import type { IconType } from "react-icons";
 export const ATCI_SUPPORTED_VERSION = 20250627;
+
+// $395=7 applies to firmware strictly after + including 20260515
+export const SPINDLE_395_V7_VERSION = 20260515;
 
 export interface ToolStateTheme {
 	label: string;
@@ -21,9 +24,9 @@ export interface ToolStateThemes {
 	error: ToolStateTheme;
 }
 
-import { FaCheckCircle, FaExclamationCircle, FaBan } from "react-icons/fa";
-import { PiEmpty, PiHandTap } from "react-icons/pi";
+import { FaBan, FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
 import { IoFlash } from "react-icons/io5";
+import { PiEmpty, PiHandTap } from "react-icons/pi";
 
 export const toolStateThemes: ToolStateThemes = {
 	// Primary States
@@ -50,7 +53,7 @@ export const toolStateThemes: ToolStateThemes = {
 		label: "Empty",
 		backgroundColor: "bg-gray-400/20 dark:bg-gray-400/40",
 		borderColor: "border-gray-600",
-		textColor: "text-gray-600 dark:text-content-secondary",
+		textColor: "text-gray-600 dark:text-gray-300",
 		backgroundStyle: "solid",
 		icon: PiEmpty,
 	},

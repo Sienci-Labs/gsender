@@ -1,19 +1,24 @@
-import { Axis, handleManualOffset, homeAxis } from "../utils/DRO.ts";
+import { usePostHog } from "@posthog/react";
 import { Button } from "app/components/Button";
-import { zeroWCS, gotoZero } from "../utils/DRO.ts";
-import { WCSInput } from "./WCSInput.tsx";
-import { useWorkspaceState } from "app/hooks/useWorkspaceState.ts";
 import {
 	AlertDialog,
-	AlertDialogTrigger,
+	AlertDialogAction,
+	AlertDialogCancel,
 	AlertDialogContent,
-	AlertDialogHeader,
-	AlertDialogTitle,
 	AlertDialogDescription,
 	AlertDialogFooter,
-	AlertDialogCancel,
-	AlertDialogAction,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
 } from "app/components/shadcn/AlertDialog";
+import { WCSInput } from "app/features/DRO/component/WCSInput.tsx";
+import {
+	type Axis,
+	handleManualOffset,
+	homeAxis,
+} from "app/features/DRO/utils/DRO.ts";
+import { useWorkspaceState } from "app/hooks/useWorkspaceState.ts";
+import { gotoZero, zeroWCS } from "../utils/DRO.ts";
 
 interface AxisRowProps {
 	label: string;
@@ -37,16 +42,22 @@ export function AxisRow({
 	disableGotoZero,
 }: AxisRowProps) {
 	const { shouldWarnZero } = useWorkspaceState();
+	const posthog = usePostHog();
 
 	return (
-		<div className="border border-gray-200 dark:border-outline rounded-md w-full flex flex-row items-stretch justify-between flex-1 max-xl:scale-95">
+		<div className="border border-gray-200 dark:border-gray-700 rounded-md w-full flex flex-row items-stretch justify-between flex-1 max-xl:scale-95">
 			{homingMode || !shouldWarnZero ? (
 				<Button
 					onClick={() => {
 						if (homingMode) {
 							homeAxis(axis);
+							posthog?.capture("home_axis", { axis });
 						} else {
 							zeroWCS(axis, 0);
+							posthog?.capture("zero_axis", {
+								axis,
+								with_warning: false,
+							});
 						}
 					}}
 					size="responsive"
@@ -89,7 +100,15 @@ export function AxisRow({
 						</AlertDialogHeader>
 						<AlertDialogFooter>
 							<AlertDialogCancel>Cancel</AlertDialogCancel>
-							<AlertDialogAction onClick={() => zeroWCS(label, 0)}>
+							<AlertDialogAction
+								onClick={() => {
+									zeroWCS(label, 0);
+									posthog?.capture("zero_axis", {
+										axis: label,
+										with_warning: true,
+									});
+								}}
+							>
 								Continue
 							</AlertDialogAction>
 						</AlertDialogFooter>
@@ -113,7 +132,10 @@ export function AxisRow({
 
 			<Button
 				disabled={disabled || disableGotoZero}
-				onClick={() => gotoZero(axis)}
+				onClick={() => {
+					gotoZero(axis);
+					posthog?.capture("goto_zero_axis", { axis });
+				}}
 				variant="alt"
 				size="responsive"
 				tooltip={{

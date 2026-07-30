@@ -21,7 +21,7 @@
  *
  */
 import isElectron from "is-electron";
-import io, { Socket } from "socket.io-client";
+import io, { type Socket } from "socket.io-client";
 
 export interface ControllerListeners {
 	// Socket.IO Events
@@ -116,6 +116,8 @@ export interface ControllerListeners {
 	"sdcard:files": Array<Function>;
 	"sdcard:clear": Array<Function>;
 	"sdcard:json": Array<Function>;
+	// Dev-only: emitted by the server when a plugin's files are updated.
+	"plugins:changed": Array<Function>;
 }
 
 const ensureArray = (...args: Array<any>) => {
@@ -229,6 +231,7 @@ class Controller {
 		"ymodem:progress": [],
 		"ymodem:error": [],
 		"job:stop": [],
+		"plugins:changed": [],
 	};
 
 	context = {
@@ -358,6 +361,7 @@ class Controller {
 				loadedControllers = [],
 				baudrates = [],
 				ports = [],
+				activeConnection = null,
 			} = { ...data };
 
 			this.loadedControllers = ensureArray(loadedControllers);
@@ -376,6 +380,14 @@ class Controller {
 			// don't want to update store if it is electron
 			if (!isElectron()) {
 				this.socket && this.socket.emit("newConnection");
+
+				// A remote/browser client only ever talks to one controller at a
+				// time. If the desktop is already connected, join that session
+				// automatically instead of making the user click Connect — this
+				// takes priority over any locally-saved autoReconnect port.
+				if (activeConnection && activeConnection.port) {
+					this.addClient(activeConnection.port);
+				}
 			}
 		});
 	}
@@ -462,11 +474,19 @@ class Controller {
 		flashPort: string,
 		imageType: string,
 		isHal: boolean,
-		hex: string,
+		hex: string | ArrayBuffer,
+		firmwareType: string = "hex",
 	): void {
 		//TODO: not sure what type imageType is
 		this.socket &&
-			this.socket.emit("flash:start", flashPort, imageType, isHal, hex);
+			this.socket.emit(
+				"flash:start",
+				flashPort,
+				imageType,
+				isHal,
+				hex,
+				firmwareType,
+			);
 	}
 
 	// Retrieves a list of available serial ports with metadata.

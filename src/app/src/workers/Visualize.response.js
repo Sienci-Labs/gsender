@@ -1,20 +1,19 @@
-import pubsub from "pubsub-js";
-import { store as reduxStore } from "app/store/redux";
-import _get from "lodash/get";
-import isNumber from "lodash/isNumber";
-
-import store from "app/store";
 import {
 	LIGHTWEIGHT_OPTIONS,
 	RENDER_RENDERED,
 	RENDER_RENDERING,
 	VISUALIZER_SECONDARY,
 } from "app/constants";
+import store from "app/store";
+import { store as reduxStore } from "app/store/redux";
+import _get from "lodash/get";
+import isNumber from "lodash/isNumber";
+import pubsub from "pubsub-js";
 import {
 	updateFileInfo,
 	updateFileProcessing,
 	updateFileRenderState,
-} from "app/store/redux/slices/fileInfo.slice";
+} from "../store/redux/slices/fileInfo.slice";
 
 const VIS_PROFILE_LAST_KEY = "__vizProfile";
 const VIS_PROFILE_RUNS_KEY = "__vizRuns";

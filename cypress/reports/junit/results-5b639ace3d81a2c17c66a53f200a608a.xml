@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="0.237" tests="1" failures="1">
+  <testsuite name="Root Suite" timestamp="2026-04-16T18:00:16" tests="1" file="cypress\e2e\grblHal\A_grblHal_master_spec.cy.js" time="0.235" failures="1">
+    <testcase name="An uncaught error was detected outside of a test" time="0.000" classname="An uncaught error was detected outside of a test">
+      <failure message="The following error originated from your test code, not from Cypress.
+
+  &gt; Cannot find module &apos;./loadUI_grblHal.cy&apos;
+
+When Cypress detects uncaught errors originating from your test code it will automatically fail the current test.
+
+Cypress could not associate this error to any specific test.
+
+We dynamically generated a new test to display this failure." type="Error"><![CDATA[Error: The following error originated from your test code, not from Cypress.
+
+  > Cannot find module './loadUI_grblHal.cy'
+
+When Cypress detects uncaught errors originating from your test code it will automatically fail the current test.
+
+Cypress could not associate this error to any specific test.
+
+We dynamically generated a new test to display this failure.
+    at webpackEmptyContext (webpack://gSender/./cypress/e2e/grblHal/ sync:2:0)
+    at eval (webpack://gSender/./cypress/e2e/grblHal/A_grblHal_master_spec.cy.js:30:10)
+    at Array.forEach (<anonymous>)
+    at eval (webpack://gSender/./cypress/e2e/grblHal/A_grblHal_master_spec.cy.js:29:6)
+    at eval (http://localhost:8000/__cypress/tests?p=cypress\e2e\grblHal\A_grblHal_master_spec.cy.js:70:3)
+    at eval (http://localhost:8000/__cypress/tests?p=cypress\e2e\grblHal\A_grblHal_master_spec.cy.js:72:12)
+    at eval (<anonymous>)]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

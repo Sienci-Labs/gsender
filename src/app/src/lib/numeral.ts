@@ -21,7 +21,7 @@
  *
  */
 
-import { EEPROM } from "app/definitions/firmware";
+import type { EEPROM } from "app/definitions/firmware";
 
 // http://stackoverflow.com/questions/15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript
 export const formatBytes = (bytes: number, decimals = 3): string => {

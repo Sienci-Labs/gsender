@@ -69,15 +69,14 @@ class STLLoader {
 		onProgress: (event: ProgressEvent) => void,
 		onError: (err: unknown) => void,
 	): void {
-		let scope = this;
-		let loader = new THREE.FileLoader(scope.manager);
-		loader.setPath(scope.path);
+		const loader = new THREE.FileLoader(this.manager);
+		loader.setPath(this.path);
 		loader.setResponseType("arraybuffer");
 		loader.load(
 			url,
-			function (text) {
+			(text) => {
 				try {
-					onLoad(scope.parse(text));
+					onLoad(this.parse(text));
 				} catch (exception) {
 					if (onError) {
 						onError(exception);
@@ -113,7 +112,7 @@ class STLLoader {
 			// https://en.wikipedia.org/wiki/Byte_order_mark#Byte_order_marks_by_encoding
 			// Search for "solid" to start anywhere after those prefixes.
 			// US-ASCII ordinal values for 's', 'o', 'l', 'i', 'd'
-			let solid = [115, 111, 108, 105, 100];
+			const solid = [115, 111, 108, 105, 100];
 
 			for (let off = 0; off < 5; off++) {
 				// If "solid" text is matched to the current offset, declare it to be an ASCII STL.
@@ -137,8 +136,8 @@ class STLLoader {
 		};
 
 		const parseBinary = (data: ArrayBufferLike): THREE.BufferGeometry => {
-			let reader = new DataView(data);
-			let faces = reader.getUint32(80, true);
+			const reader = new DataView(data);
+			const faces = reader.getUint32(80, true);
 
 			let r: number;
 			let g: number;
@@ -168,22 +167,22 @@ class STLLoader {
 				}
 			}
 
-			let dataOffset = 84;
-			let faceLength = 12 * 4 + 2;
+			const dataOffset = 84;
+			const faceLength = 12 * 4 + 2;
 
-			let geometry = new THREE.BufferGeometry();
+			const geometry = new THREE.BufferGeometry();
 
-			let vertices = [];
-			let normals = [];
+			const vertices = [];
+			const normals = [];
 
 			for (let face = 0; face < faces; face++) {
-				let start = dataOffset + face * faceLength;
-				let normalX = reader.getFloat32(start, true);
-				let normalY = reader.getFloat32(start + 4, true);
-				let normalZ = reader.getFloat32(start + 8, true);
+				const start = dataOffset + face * faceLength;
+				const normalX = reader.getFloat32(start, true);
+				const normalY = reader.getFloat32(start + 4, true);
+				const normalZ = reader.getFloat32(start + 8, true);
 
 				if (hasColors) {
-					let packedColor = reader.getUint16(start + 48, true);
+					const packedColor = reader.getUint16(start + 48, true);
 
 					if ((packedColor & 0x8000) === 0) {
 						// facet has its own unique color
@@ -198,7 +197,7 @@ class STLLoader {
 				}
 
 				for (let i = 1; i <= 3; i++) {
-					let vertexstart = start + i * 12;
+					const vertexstart = start + i * 12;
 
 					vertices.push(reader.getFloat32(vertexstart, true));
 					vertices.push(reader.getFloat32(vertexstart + 4, true));
@@ -234,25 +233,25 @@ class STLLoader {
 		};
 
 		const parseASCII = (data: string): THREE.BufferGeometry => {
-			let geometry = new THREE.BufferGeometry();
-			let patternFace = /facet([\s\S]*?)endfacet/g;
+			const geometry = new THREE.BufferGeometry();
+			const patternFace = /facet([\s\S]*?)endfacet/g;
 			let faceCounter = 0;
 
-			let patternFloat = /[\s]+([+-]?(?:\d*)(?:\.\d*)?(?:[eE][+-]?\d+)?)/
+			const patternFloat = /[\s]+([+-]?(?:\d*)(?:\.\d*)?(?:[eE][+-]?\d+)?)/
 				.source;
-			let patternVertex = new RegExp(
+			const patternVertex = new RegExp(
 				"vertex" + patternFloat + patternFloat + patternFloat,
 				"g",
 			);
-			let patternNormal = new RegExp(
+			const patternNormal = new RegExp(
 				"normal" + patternFloat + patternFloat + patternFloat,
 				"g",
 			);
 
-			let vertices: Array<number> = [];
-			let normals: Array<number> = [];
+			const vertices: Array<number> = [];
+			const normals: Array<number> = [];
 
-			let normal = new THREE.Vector3();
+			const normal = new THREE.Vector3();
 
 			let result: RegExpExecArray | null;
 
@@ -260,7 +259,7 @@ class STLLoader {
 				let vertexCountPerFace = 0;
 				let normalCountPerFace = 0;
 
-				let text = result[0];
+				const text = result[0];
 
 				while ((result = patternNormal.exec(text)) !== null) {
 					normal.x = parseFloat(result[1]);
@@ -321,7 +320,7 @@ class STLLoader {
 			buffer: string | ArrayBuffer,
 		): ArrayBufferLike | Uint8Array => {
 			if (typeof buffer === "string") {
-				let array_buffer = new Uint8Array(buffer.length);
+				const array_buffer = new Uint8Array(buffer.length);
 				for (let i = 0; i < buffer.length; i++) {
 					array_buffer[i] = buffer.charCodeAt(i) & 0xff; // implicitly assumes little-endian
 				}
@@ -332,7 +331,7 @@ class STLLoader {
 		};
 
 		// start
-		let binData = ensureBinary(data);
+		const binData = ensureBinary(data);
 
 		return isBinary(binData)
 			? parseBinary(binData)

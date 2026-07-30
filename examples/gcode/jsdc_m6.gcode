@@ -1,7 +1,10 @@
 G21         ; Set units to mm
 G90         ; Absolute positioning
+
+M5 S0
+M6 T2 ; 1/8th upcut
+M3 S18000
 G1 Z1 F2540      ; Move to clearance level
-M6 T2
 ;
 ; Operation:    0
 ; Name:
@@ -16,6 +19,7 @@ M6 T2
 
 ; Path 0
 ; Rapid to initial position
+
 G1 X43.9090 Y-28.2880 F2540
 G1 Z0.0000
 ; plunge
@@ -1245,7 +1249,8 @@ G1 X57.1970 Y-28.8996
 ; Retract
 G1 Z1.0000 F2540
 
-M6 T5
+M6 T5 ; (1/8th upcut)
+M3 S18000
 ; Path 2
 ; Rapid to initial position
 G1 X62.8414 Y-33.4904 F2540
@@ -2424,6 +2429,7 @@ G1 X25.9629 Y-40.2852
 G1 X25.9644 Y-39.5994
 ; Retract
 G1 Z1.0000 F2540
-
+m5 s0
 ; Return to 0,0
 G0 X0 Y0 F2540
+

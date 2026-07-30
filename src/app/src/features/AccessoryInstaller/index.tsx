@@ -1,6 +1,6 @@
-import { useParams } from "react-router";
 import { WizardsManager } from "app/features/AccessoryInstaller/components/wizard";
 import { useAllWizards } from "app/features/AccessoryInstaller/Wizards";
+import { useParams } from "react-router";
 
 export function AccessoryInstaller() {
 	const wizards = useAllWizards();

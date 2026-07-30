@@ -1,14 +1,13 @@
-import map from "lodash/map";
-
-import controller from "app/lib/controller";
 import {
 	GRBL_ACTIVE_STATE_IDLE,
 	GRBL_ACTIVE_STATE_JOG,
 	GRBLHAL,
 } from "app/constants";
+import type { FIRMWARE_TYPES_T } from "app/definitions/firmware";
+import type { GRBL_ACTIVE_STATES_T } from "app/definitions/general";
+import controller from "app/lib/controller";
 import store from "app/store";
-import { FIRMWARE_TYPES_T } from "app/definitions/firmware";
-import { GRBL_ACTIVE_STATES_T } from "app/definitions/general";
+import map from "lodash/map";
 
 export interface JogSpeeds {
 	aStep: number;
@@ -17,7 +16,7 @@ export interface JogSpeeds {
 	feedrate: number;
 }
 
-export type JoggingSpeedOptions = "Rapid" | "Normal" | "Precise";
+export type JoggingSpeedOptions = "Rapid" | "Normal" | "Precise" | "Custom";
 
 export function jogAxis(params: JogDistances, feedrate: number) {
 	const preventJoggingPastLimits = store.get(
@@ -50,9 +49,9 @@ export function jogAxis(params: JogDistances, feedrate: number) {
 	const modal = units === "mm" ? "G21" : "G20";
 	const s = map(
 		params,
-		(value, letter) => "" + letter.toUpperCase() + value,
+		(value, letter) => `${letter.toUpperCase()}${value}`,
 	).join(" ");
-	const commands = [`$J=${modal} G91 ` + s + ` F${feedrate}`];
+	const commands = [`$J=${modal} G91 ${s} F${feedrate}`];
 	controller.command("gcode", commands);
 }
 
@@ -102,9 +101,9 @@ export interface JoggerProps {
 	threshold?: number;
 }
 
-export function stopMachineMotion(
-	state: GRBL_ACTIVE_STATES_T | string | null | undefined,
-	firmwareType: FIRMWARE_TYPES_T | string | null | undefined,
+export function cancelJog(
+	state: GRBL_ACTIVE_STATES_T,
+	firmwareType: FIRMWARE_TYPES_T,
 ) {
 	if (state) {
 		if (state === GRBL_ACTIVE_STATE_JOG) {
@@ -118,13 +117,6 @@ export function stopMachineMotion(
 		}
 		controller.command("reset");
 	}
-}
-
-export function cancelJog(
-	state: GRBL_ACTIVE_STATES_T | string | null | undefined,
-	firmwareType: FIRMWARE_TYPES_T | string | null | undefined,
-) {
-	return stopMachineMotion(state, firmwareType);
 }
 
 export function startJogCommand(

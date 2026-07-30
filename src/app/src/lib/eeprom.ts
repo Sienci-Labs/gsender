@@ -1,10 +1,10 @@
-import { HOMING_LOCATIONS_T } from "definitions/firmware";
 import {
-	getHomingLocation,
-	FRONT_RIGHT,
-	FRONT_LEFT,
 	BACK_LEFT,
+	FRONT_LEFT,
+	FRONT_RIGHT,
+	getHomingLocation,
 } from "app/features/DRO/utils/RapidPosition.ts";
+import type { HOMING_LOCATIONS_T } from "definitions/firmware";
 
 export const homingString = (mask: string): string => {
 	let location = "";

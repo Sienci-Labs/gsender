@@ -21,18 +21,18 @@
  *
  */
 
-import find from "lodash/find";
 import castArray from "lodash/castArray";
+import find from "lodash/find";
 import isPlainObject from "lodash/isPlainObject";
 import uuid from "uuid";
 import settings from "../config/settings";
-import config from "../services/configstore";
-import { getPagingRange } from "./paging";
 import {
 	ERR_BAD_REQUEST,
-	ERR_NOT_FOUND,
 	ERR_INTERNAL_SERVER_ERROR,
+	ERR_NOT_FOUND,
 } from "../constants";
+import config from "../services/configstore";
+import { getPagingRange } from "./paging";
 
 const CONFIG_KEY = "macros";
 

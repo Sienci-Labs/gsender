@@ -1,12 +1,13 @@
-import aLabels from "../assets/aLabels.svg";
-import TabJog from "./TabJog.tsx";
+import { usePostHog } from "@posthog/react";
+import aLabels from "app/features/Jogging/assets/aLabels.svg";
+import TabJog from "app/features/Jogging/components/TabJog.tsx";
 import {
 	aMinusJog,
 	aPlusJog,
 	continuousJogAxis,
-	JoggerProps,
+	type JoggerProps,
 	stopContinuousJog,
-} from "../utils/Jogging.ts";
+} from "app/features/Jogging/utils/Jogging.ts";
 import { useLongPress } from "use-long-press";
 
 export function AJog({
@@ -16,21 +17,55 @@ export function AJog({
 	isRotaryMode,
 	threshold = 200,
 }: JoggerProps) {
+	const posthog = usePostHog();
+
 	const axis = isRotaryMode ? "Y" : "A";
 
 	const aPlusJogHandlers = useLongPress(
-		() => continuousJogAxis({ [axis]: 1 }, feedrate),
+		() => {
+			continuousJogAxis({ [axis]: 1 }, feedrate);
+			posthog?.capture("jog_a_plus", {
+				distance,
+				feedrate,
+				continuous: true,
+				isRotaryMode,
+			});
+		},
 		{
 			threshold,
-			onCancel: () => aPlusJog(distance, feedrate, false),
+			onCancel: () => {
+				aPlusJog(distance, feedrate, false);
+				posthog?.capture("jog_a_plus", {
+					distance,
+					feedrate,
+					continuous: false,
+					isRotaryMode,
+				});
+			},
 			onFinish: stopContinuousJog,
 		},
 	)();
 	const aMinusJogHandlers = useLongPress(
-		() => continuousJogAxis({ [axis]: -1 }, feedrate),
+		() => {
+			continuousJogAxis({ [axis]: -1 }, feedrate);
+			posthog?.capture("jog_a_minus", {
+				distance,
+				feedrate,
+				continuous: true,
+				isRotaryMode,
+			});
+		},
 		{
 			threshold,
-			onCancel: () => aMinusJog(distance, feedrate, false),
+			onCancel: () => {
+				aMinusJog(distance, feedrate, false);
+				posthog?.capture("jog_a_minus", {
+					distance,
+					feedrate,
+					continuous: false,
+					isRotaryMode,
+				});
+			},
 			onFinish: stopContinuousJog,
 		},
 	)();

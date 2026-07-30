@@ -1,5 +1,5 @@
-import React from "react";
 import { cn } from "app/lib/utils";
+import type React from "react";
 
 type RadioButtonProps = React.InputHTMLAttributes<HTMLInputElement> & {
 	label?: string;

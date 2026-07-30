@@ -1,10 +1,10 @@
-import { TooltipContentProps } from "@radix-ui/react-tooltip";
+import type { TooltipContentProps } from "@radix-ui/react-tooltip";
 
 import {
-	Tooltip as TooltipWrapper,
-	TooltipTrigger,
 	TooltipContent,
 	TooltipProvider,
+	TooltipTrigger,
+	Tooltip as TooltipWrapper,
 } from "app/components/shadcn/Tooltip";
 
 export interface TooltipProps {

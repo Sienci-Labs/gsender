@@ -1,7 +1,6 @@
-import { useEffect } from "react";
-
-import { USAGE_TOOL_NAME } from "../constants";
 import { collectUserUsageData } from "app/lib/heatmap";
+import { useEffect } from "react";
+import type { USAGE_TOOL_NAME } from "../constants";
 
 type Feature = keyof typeof USAGE_TOOL_NAME;
 

@@ -1,5 +1,4 @@
-import React, { useMemo } from "react";
-import {
+import type {
 	gSenderEEEPROMSettings,
 	gSenderSettings,
 	gSenderSubSection,
@@ -7,6 +6,7 @@ import {
 import { SettingSection } from "app/features/Config/components/SettingSection.tsx";
 import { useSettings } from "app/features/Config/utils/SettingsContext.tsx";
 import cn from "classnames";
+import React, { useMemo } from "react";
 
 interface SectionProps {
 	title: string;
@@ -60,7 +60,7 @@ export const Section = React.forwardRef(
 					return (
 						<div
 							key={setting.label ?? index}
-							className="bg-gray-100 rounded-xl shadow p-6 max-xl:p-3 flex flex-col gap-6 dark:bg-surface-raised dark:text-content-primary"
+							className="bg-gray-100 rounded-xl shadow p-6 max-xl:p-3 flex flex-col gap-6 dark:bg-dark dark:text-white"
 						>
 							<SettingSection
 								connected={connected}
@@ -81,7 +81,7 @@ export const Section = React.forwardRef(
 			>
 				<div className="flex flex-row gap-8 py-2">
 					<h1
-						className="mb-2 text-3xl ml-4 font-sans dark:text-content-primary"
+						className="mb-2 text-3xl ml-4 font-sans dark:text-white"
 						id={`h-${id}`}
 						ref={ref}
 					>
@@ -89,7 +89,7 @@ export const Section = React.forwardRef(
 					</h1>
 					{connected && Wizard && <Wizard />}
 				</div>
-				<div className="bg-gray-100 rounded-xl shadow p-6 max-xl:p-3 flex flex-col gap-6 dark:bg-surface-raised dark:text-content-primary">
+				<div className="bg-gray-100 rounded-xl shadow p-6 max-xl:p-3 flex flex-col gap-6 dark:bg-dark dark:text-white">
 					{filteredSettings.map((setting: gSenderSubSection, index) => {
 						return (
 							<SettingSection

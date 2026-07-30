@@ -12,7 +12,7 @@ class GrblHalLineParserResultATCI {
 		let description = null;
 		const subtype = r[2] || null;
 		const valueString = r[3] || "";
-		let valueArray = valueString.split("|");
+		const valueArray = valueString.split("|");
 
 		// Pop title and message off values if subtype exists indicating a dialog
 		if (subtype) {
@@ -23,7 +23,7 @@ class GrblHalLineParserResultATCI {
 		const values = {};
 
 		valueArray.forEach((param) => {
-			let parts = param.split(":");
+			const parts = param.split(":");
 			values[parts[0]] = parts[1] || null;
 		});
 

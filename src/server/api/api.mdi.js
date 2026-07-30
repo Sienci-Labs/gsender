@@ -26,14 +26,14 @@ import find from "lodash/find";
 import isPlainObject from "lodash/isPlainObject";
 import uuid from "uuid";
 import settings from "../config/settings";
+import {
+	ERR_BAD_REQUEST,
+	ERR_INTERNAL_SERVER_ERROR,
+	ERR_NOT_FOUND,
+} from "../constants";
 import logger from "../lib/logger";
 import config from "../services/configstore";
 import { getPagingRange } from "./paging";
-import {
-	ERR_BAD_REQUEST,
-	ERR_NOT_FOUND,
-	ERR_INTERNAL_SERVER_ERROR,
-} from "../constants";
 
 const log = logger("api:mdi");
 const CONFIG_KEY = "mdi";

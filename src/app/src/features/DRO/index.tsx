@@ -1,65 +1,65 @@
-import { connect } from "react-redux";
-import {
-	AxesArray,
-	defaultDROPosition,
-	DROPosition,
-	zeroAllAxes,
-	goXYAxes,
-	zeroWCS,
-	gotoZero,
-} from "./utils/DRO";
-import { AxisRow } from "./component/AxisRow.tsx";
-import { VscTarget } from "react-icons/vsc";
+import { usePostHog } from "@posthog/react";
 import { Button } from "app/components/Button";
 import { Label } from "app/components/Label";
-import get from "lodash/get";
-import { GoTo } from "./component/GoTo.tsx";
-import store from "app/store";
 import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "app/components/shadcn/AlertDialog";
+import {
+	AXIS_A,
 	AXIS_X,
 	AXIS_Y,
 	AXIS_Z,
-	AXIS_A,
 	GRBL_ACTIVE_STATE_IDLE,
 	GRBL_ACTIVE_STATE_JOG,
 	LOCATION_CATEGORY,
 	METRIC_UNITS,
 	WORKFLOW_STATE_RUNNING,
 } from "app/constants";
-import mapValues from "lodash/mapValues";
-import { mapPositionToUnits } from "app/lib/units.ts";
-import { useCallback, useEffect, useRef, useState } from "react";
-import includes from "lodash/includes";
-import { HomingSwitch } from "./component/HomingSwitch.tsx";
-import { RapidPositionButtons } from "./component/RapidPositionButtons.tsx";
-import { useWorkspaceState } from "app/hooks/useWorkspaceState";
+import { AxisRow } from "app/features/DRO/component/AxisRow.tsx";
+import { GoTo } from "app/features/DRO/component/GoTo.tsx";
+import { HomingSwitch } from "app/features/DRO/component/HomingSwitch.tsx";
+import { Parking } from "app/features/DRO/component/Parking.tsx";
+import { RapidPositionButtons } from "app/features/DRO/component/RapidPositionButtons.tsx";
+import { UnitBadge } from "app/features/DRO/component/UnitBadge.tsx";
 import {
-	AlertDialog,
-	AlertDialogTrigger,
-	AlertDialogContent,
-	AlertDialogHeader,
-	AlertDialogTitle,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogCancel,
-	AlertDialogAction,
-} from "app/components/shadcn/AlertDialog";
-import { UnitBadge } from "./component/UnitBadge.tsx";
-import { Parking } from "./component/Parking.tsx";
-
-import useKeybinding from "app/lib/useKeybinding";
+	type AxesArray,
+	type DROPosition,
+	defaultDROPosition,
+	gotoZero,
+	goXYAxes,
+	zeroAllAxes,
+	zeroWCS,
+} from "app/features/DRO/utils/DRO";
 import useShuttleEvents from "app/hooks/useShuttleEvents";
+import { useTypedSelector } from "app/hooks/useTypedSelector";
+import { useWorkspaceState } from "app/hooks/useWorkspaceState";
 import controller from "app/lib/controller";
+import { mapPositionToUnits } from "app/lib/units.ts";
+import useKeybinding from "app/lib/useKeybinding";
+import { cn } from "app/lib/utils";
+import store from "app/store";
+import reduxStore from "app/store/redux";
+import get from "lodash/get";
+import includes from "lodash/includes";
+import mapValues from "lodash/mapValues";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { VscTarget } from "react-icons/vsc";
+import { connect } from "react-redux";
 import {
-	BACK_RIGHT,
 	BACK_LEFT,
-	FRONT_RIGHT,
+	BACK_RIGHT,
 	FRONT_LEFT,
+	FRONT_RIGHT,
 	getMovementGCode,
 } from "./utils/RapidPosition";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-import reduxStore from "app/store/redux";
-import { cn } from "app/lib/utils";
 
 interface DROProps {
 	axes: AxesArray;
@@ -134,8 +134,11 @@ function DRO({
 		controller.command("gcode", gcode);
 	}, []);
 
+	const posthog = usePostHog();
+
 	function toggleHoming() {
 		setHomingMode((prev) => !prev);
+		posthog?.capture("homing_mode_toggled", { value: !homingMode });
 	}
 
 	const canClick = useCallback((): boolean => {
@@ -479,7 +482,10 @@ function DRO({
 						tooltip={{ content: "Zero all axes", side: "left" }}
 						text="Zero"
 						icon={<VscTarget className="w-5 h-5" />}
-						onClick={zeroAllAxes}
+						onClick={() => {
+							zeroAllAxes();
+							posthog?.capture("zero_all_axes");
+						}}
 						disabled={!canClick}
 						aria-label="Zero all axes: Set current position as work zero for all axes"
 						size="responsive"
@@ -504,7 +510,14 @@ function DRO({
 							</AlertDialogHeader>
 							<AlertDialogFooter>
 								<AlertDialogCancel>Cancel</AlertDialogCancel>
-								<AlertDialogAction onClick={zeroAllAxes}>
+								<AlertDialogAction
+									onClick={() => {
+										zeroAllAxes();
+										posthog?.capture("zero_all_axes", {
+											with_warning: true,
+										});
+									}}
+								>
 									Continue
 								</AlertDialogAction>
 							</AlertDialogFooter>
@@ -522,7 +535,10 @@ function DRO({
 
 				<Button
 					variant="alt"
-					onClick={goXYAxes}
+					onClick={() => {
+						goXYAxes();
+						posthog?.capture(isRotaryMode ? "go_to_xa_axes" : "go_to_xy_axes");
+					}}
 					disabled={!canClick}
 					tooltip={{ content: "Go to XY zero", side: "bottom" }}
 					aria-label={`Go to ${isRotaryMode ? "XA" : "XY"} zero: Move ${isRotaryMode ? "X and A" : "X and Y"} axes to their current work zero position`}

@@ -21,16 +21,15 @@
  *
  */
 
-import uuid from "uuid";
-import os from "os";
 import axios from "axios";
 import isOnline from "is-online";
-
-import logger from "../lib/logger";
-import config from "../services/configstore";
+import os from "os";
+import uuid from "uuid";
+import { USER_DATA_COLLECTION } from "../../app/src/constants";
 import pkg from "../../package.json";
 import { ERR_BAD_REQUEST, ERR_INTERNAL_SERVER_ERROR } from "../constants";
-import { USER_DATA_COLLECTION } from "app/src/constants";
+import logger from "../lib/logger";
+import config from "../services/configstore";
 
 const CONFIG_KEY = "metrics";
 

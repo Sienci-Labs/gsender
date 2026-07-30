@@ -5,7 +5,7 @@ export async function copyToClipboard(
 ): Promise<{ success: boolean; error?: string }> {
 	try {
 		if (isElectron()) {
-			// @ts-ignore
+			// @ts-expect-error
 			const result = await window.ipcRenderer.invoke("copy-to-clipboard", text);
 
 			return { success: result.success, error: result.error };

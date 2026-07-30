@@ -1,31 +1,29 @@
-import { useEffect, useState } from "react";
-import pubsub from "pubsub-js";
-
-import { useTypedSelector } from "app/hooks/useTypedSelector";
+import api from "app/api";
+import { ScrollArea } from "app/components/shadcn/ScrollArea";
 import { Switch } from "app/components/shadcn/Switch";
-
-import Size from "./Size";
-import Info from "./Info";
-import LoadingAnimation from "./LoadingAnimation";
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
 } from "app/components/shadcn/Tooltip";
-import { getRecentFiles } from "../utils/recentfiles";
-import { RecentFile } from "../definitions";
-import { Job } from "app/features/Stats/utils/StatContext";
-import { MdInfoOutline } from "react-icons/md";
-import { LuFileCode2 } from "react-icons/lu";
-import { FiClock } from "react-icons/fi";
-import cx from "classnames";
 import { JOB_STATUS } from "app/constants";
+import type { Job } from "app/features/Stats/utils/StatContext";
+import { useTypedSelector } from "app/hooks/useTypedSelector";
 import { convertMillisecondsToTimeStamp } from "app/lib/datetime";
-import api from "app/api";
+import cx from "classnames";
 import isElectron from "is-electron";
-import { ScrollArea } from "app/components/shadcn/ScrollArea";
+import pubsub from "pubsub-js";
+import { useEffect, useState } from "react";
+import { FiClock } from "react-icons/fi";
 import { LiaFileUploadSolid } from "react-icons/lia";
+import { LuFileCode2 } from "react-icons/lu";
+import { MdInfoOutline } from "react-icons/md";
+import type { RecentFile } from "../definitions";
+import { getRecentFiles } from "../utils/recentfiles";
+import Info from "./Info";
+import LoadingAnimation from "./LoadingAnimation";
+import Size from "./Size";
 
 interface Props {
 	handleRecentFileUpload: (file: RecentFile, isRecentFile?: boolean) => void;
@@ -106,8 +104,8 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
 			>
 				{isElectron() && (
 					<div className="flex flex-col gap-2 max-xl:gap-1 portrait:w-3/4">
-						<span className="ml-6 dark:text-content-primary">Recent Files</span>
-						<ScrollArea className="ml-2 px-2 h-28 max-xl:h-[6.5rem] portrait:mb-5 bg-white dark:bg-surface-raised rounded-xl border-2 dark:border-outline">
+						<span className="ml-6 dark:text-white">Recent Files</span>
+						<ScrollArea className="ml-2 px-2 h-28 max-xl:h-[6.5rem] portrait:mb-5 bg-white dark:bg-dark rounded-xl border-2 dark:border-dark-lighter">
 							<div className="grid divide-y items-center mr-2">
 								{recentFiles.map(
 									(file, index) =>
@@ -135,14 +133,14 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
 													)
 												}
 											>
-												<div className="text-2xl float-right rounded-r dark:text-content-primary">
+												<div className="text-2xl float-right rounded-r dark:text-white">
 													<LiaFileUploadSolid />
 												</div>
 												<div className="grid items-start">
 													<TooltipProvider>
 														<Tooltip>
 															<TooltipTrigger asChild>
-																<span className="block text-ellipsis text-nowrap overflow-hidden whitespace-nowrap dark:text-content-primary">
+																<span className="block text-ellipsis text-nowrap overflow-hidden whitespace-nowrap dark:text-white">
 																	{file.fileName}
 																</span>
 															</TooltipTrigger>
@@ -164,7 +162,7 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
 				>
 					{lastJob && (
 						<>
-							<span className="text-base text-gray-900 dark:text-content-secondary">
+							<span className="text-base text-gray-900 dark:text-gray-300">
 								Last Job
 							</span>
 							<div className="grid grid-rows-3 gap-4 max-xl:gap-2 -ml-[2px] text-gray-500 font-bold">
@@ -237,7 +235,7 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
 	const [fileName, extension] = splitFileNameAndExtension(name);
 
 	return (
-		<div className="flex flex-col justify-center items-center text-sm max-w-full text-gray-900 dark:text-content-secondary h-full w-full">
+		<div className="flex flex-col justify-center items-center text-sm max-w-full text-gray-900 dark:text-gray-300 h-full w-full">
 			<TooltipProvider>
 				<Tooltip>
 					<TooltipTrigger asChild>

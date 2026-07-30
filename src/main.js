@@ -21,31 +21,32 @@
  *
  */
 
+import * as Sentry from "@sentry/electron/main";
+import chalk from "chalk";
 import {
 	app,
-	ipcMain,
+	clipboard,
 	dialog,
-	powerSaveBlocker,
+	ipcMain,
 	powerMonitor,
+	powerSaveBlocker,
 	screen,
 	session,
-	clipboard,
 } from "electron";
-import { autoUpdater } from "electron-updater";
-import Store from "electron-store";
-import chalk from "chalk";
-import mkdirp from "mkdirp";
-import isOnline from "is-online";
 import log from "electron-log";
-import path from "path";
+import Store from "electron-store";
+import { autoUpdater } from "electron-updater";
 import fs from "fs";
-import * as Sentry from "@sentry/electron/main";
-import WindowManager from "./electron-app/WindowManager";
-import launchServer from "./server-cli";
-import pkg from "./package.json";
-import { parseAndReturnGCode } from "./electron-app/RecentFiles";
+import isOnline from "is-online";
+import mkdirp from "mkdirp";
+import path from "path";
+import WinReg from "winreg";
 import { asyncCallWithTimeout } from "./electron-app/AsyncTimeout";
 import { getGRBLLog } from "./electron-app/grblLogs";
+import { parseAndReturnGCode } from "./electron-app/RecentFiles";
+import WindowManager from "./electron-app/WindowManager";
+import pkg from "./package.json";
+import launchServer from "./server-cli";
 
 // Hot reload in development
 if (process.env.NODE_ENV === "development") {
@@ -62,8 +63,9 @@ if (process.env.NODE_ENV === "development") {
 
 let windowManager = null;
 let hostInformation = {};
-let grblLog = log.create("grbl");
+const grblLog = log.create("grbl");
 let logPath;
+let pluginPath;
 let powerBlockerNum = 0;
 const externalRendererUrl =
 	process.env.NODE_ENV === "development"
@@ -146,6 +148,7 @@ const main = () => {
 	// Extra logging
 	logPath = path.join(app.getPath("userData"), "logs/grbl.log");
 	grblLog.transports.file.resolvePath = () => logPath;
+	pluginPath = path.join(app.getPath("userData"), "plugins");
 
 	const loadFileAssociation = async (filePath, window) => {
 		try {
@@ -158,6 +161,28 @@ const main = () => {
 			});
 		} catch (err) {
 			log.error(`Error loading file association: ${err}`);
+		}
+	};
+
+	const openDirectoryDialog = async () => {
+		try {
+			const gSenderWindow = windowManager.getWindow();
+			const directory = await dialog.showOpenDialog(gSenderWindow, {
+				properties: ["openDirectory"],
+			});
+
+			if (!directory) {
+				return;
+			}
+			if (directory.canceled) {
+				return;
+			}
+
+			const FULL_PATH = directory.filePaths[0];
+
+			return FULL_PATH;
+		} catch (e) {
+			log.error(`Caught error in listener - ${e}`);
 		}
 	};
 
@@ -251,6 +276,19 @@ const main = () => {
 
 				const { address, port, kiosk: resolvedKiosk } = { ...res };
 				kiosk = resolvedKiosk;
+
+				if (res.configRestored) {
+					log.warn(
+						`Corrupt settings file recovered — backup at ${res.configBackupPath}`,
+					);
+					dialog.showMessageBoxSync(null, {
+						title: "Settings File Recovered",
+						message:
+							"Your gSender settings file was corrupted and has been reset to defaults.",
+						detail: `A backup of the corrupted file was saved to:\n${res.configBackupPath}`,
+					});
+				}
+
 				log.info(`Returned - http://${address}:${port}`);
 				hostInformation = {
 					address,
@@ -414,13 +452,43 @@ const main = () => {
 				return hostInformation;
 			});
 
+			ipcMain.handle("get-windows-registry", async (channel) => {
+				if (process.platform !== "win32") {
+					return false;
+				}
+
+				try {
+					const registry = new WinReg({
+						hive: WinReg.HKLM,
+						key: "\\Software\\SienciLabs\\gSender",
+					});
+
+					const isBundledValue = await new Promise((resolve, reject) => {
+						registry.get("IsBundled", (err, item) => {
+							if (err) {
+								reject(err);
+								return;
+							}
+							resolve(item.value);
+						});
+					});
+
+					const isBundled = isBundledValue === "0x1";
+
+					return isBundled;
+				} catch (error) {
+					console.error(error);
+					return false;
+				}
+			});
+
 			/**
 			 * gSender config events - move electron store changes out of renderer process
 			 */
 			ipcMain.on("open-upload-dialog", async () => {
 				try {
-					let additionalOptions = {};
-					let gSenderWindow = windowManager.getWindow();
+					const additionalOptions = {};
+					const gSenderWindow = windowManager.getWindow();
 
 					if (prevDirectory) {
 						additionalOptions.defaultPath = prevDirectory;
@@ -453,7 +521,7 @@ const main = () => {
 
 					prevDirectory = filePath; // set previous directory
 
-					fs.readFile(FULL_FILE_PATH, "utf8", (err, data) => {
+					fs.readFile(FULL_FILE_PATH, "latin1", (err, data) => {
 						if (err) {
 							log.error(`Error in readFile: ${err}`);
 							return;
@@ -467,6 +535,30 @@ const main = () => {
 							path: FULL_FILE_PATH,
 						});
 					});
+				} catch (e) {
+					log.error(`Caught error in listener - ${e}`);
+				}
+			});
+
+			ipcMain.on("open-directory-dialog", async () => {
+				try {
+					const FULL_PATH = await openDirectoryDialog();
+					window.webContents.send("returned-directory-dialog-data", FULL_PATH);
+				} catch (e) {
+					log.error(`Caught error in listener - ${e}`);
+				}
+			});
+
+			ipcMain.on("open-plugin-import-dialog", async () => {
+				try {
+					const FULL_PATH = await openDirectoryDialog();
+					fs.cpSync(
+						FULL_PATH,
+						path.join(pluginPath, path.basename(FULL_PATH)),
+						{
+							recursive: true,
+						},
+					);
 				} catch (e) {
 					log.error(`Caught error in listener - ${e}`);
 				}

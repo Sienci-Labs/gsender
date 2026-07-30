@@ -89,7 +89,6 @@ class GrblLineParserResultParserState {
 			// S: spindle speed
 			if (word.indexOf("S") === 0) {
 				_set(payload, "spindle", word.substring(1));
-				continue;
 			}
 		}
 

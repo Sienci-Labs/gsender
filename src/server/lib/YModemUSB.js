@@ -1,12 +1,12 @@
-import * as events from "events";
 import { ByteLengthParser } from "@serialport/parser-byte-length";
 import { ReadlineParser } from "@serialport/parser-readline";
-import { CRC } from "crc-full";
 import bufferChunks from "buffer-chunks";
+import { CRC } from "crc-full";
+import * as events from "events";
 
 const SendSize = {
-	0x01: 128,
-	0x02: 1024,
+	1: 128,
+	2: 1024,
 };
 
 function sleep(ms) {
@@ -14,14 +14,14 @@ function sleep(ms) {
 }
 
 const DebugDict = {
-	0x01: "SOH",
-	0x02: "STX",
-	0x04: "EOT",
-	0x06: "ACK",
-	0x15: "NAK",
-	0x18: "CAN",
-	0x43: "C",
-	0x1a: "PADDING",
+	1: "SOH",
+	2: "STX",
+	4: "EOT",
+	6: "ACK",
+	21: "NAK",
+	24: "CAN",
+	67: "C",
+	26: "PADDING",
 };
 
 export class YModem extends events.EventEmitter {

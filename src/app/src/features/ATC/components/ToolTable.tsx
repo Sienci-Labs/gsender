@@ -1,14 +1,9 @@
-import controller from "app/lib/controller";
-import { useState } from "react";
+import Button from "app/components/Button";
 import {
 	Collapsible,
 	CollapsibleContent,
 	CollapsibleTrigger,
 } from "app/components/shadcn/Collapsible.tsx";
-import { Badge } from "app/features/ATC/components/ui/Badge.tsx";
-import { ChevronDown } from "lucide-react";
-import { ProbeButton } from "app/features/ATC/components/ui/ProbeButton.tsx";
-import { ToolStatusBadges } from "app/features/ATC/components/ui/ToolStatusBadges.tsx";
 import {
 	Table,
 	TableBody,
@@ -17,16 +12,20 @@ import {
 	TableHeader,
 	TableRow,
 } from "app/components/shadcn/Table";
-
 import { ToolNameInput } from "app/features/ATC/components/ToolNameInput.tsx";
-import Button from "app/components/Button";
-import partition from "lodash/partition";
+import { Badge } from "app/features/ATC/components/ui/Badge.tsx";
+import { ProbeButton } from "app/features/ATC/components/ui/ProbeButton.tsx";
+import { ToolStatusBadges } from "app/features/ATC/components/ui/ToolStatusBadges.tsx";
+import type { ToolProbeState } from "app/features/ATC/types.ts";
 import { useToolChange } from "app/features/ATC/utils/ToolChangeContext.tsx";
-import { ToolProbeState } from "app/features/ATC/types.ts";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
+import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
+import controller from "app/lib/controller.ts";
+import store from "app/store";
 import { RootState } from "app/store/redux";
 import get from "lodash/get";
-import store from "app/store";
+import partition from "lodash/partition";
+import { ChevronDown } from "lucide-react";
+import { useState } from "react";
 
 export type ToolStatus = ToolProbeState;
 

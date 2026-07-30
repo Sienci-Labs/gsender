@@ -1,10 +1,4 @@
-import { SHORTCUT_CATEGORY } from "../../constants";
-import { BasicObject } from "app/definitions/general";
-
-// Types
-
-export type SHORTCUT_CATEGORY_T =
-	(typeof SHORTCUT_CATEGORY)[keyof typeof SHORTCUT_CATEGORY];
+import type { BasicObject } from "app/definitions/general";
 
 // Interfaces
 
@@ -29,7 +23,7 @@ export interface ShuttleEvent {
 	payload?: BasicObject;
 	preventDefault: boolean;
 	isActive: boolean;
-	category: SHORTCUT_CATEGORY_T;
+	category: string;
 	callback: (...args: any) => void;
 }
 

@@ -1,42 +1,41 @@
-import { useState, useContext } from "react";
+import Button from "app/components/Button";
 import {
 	Dialog,
 	DialogContent,
 	DialogDescription,
+	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-	DialogFooter,
 } from "app/components/shadcn/Dialog";
-import {
-	CARVING_CATEGORY,
-	OVERRIDES_CATEGORY,
-	VISUALIZER_CATEGORY,
-	LOCATION_CATEGORY,
-	JOGGING_CATEGORY,
-	PROBING_CATEGORY,
-	SPINDLE_LASER_CATEGORY,
-	GENERAL_CATEGORY,
-	TOOLBAR_CATEGORY,
-	MACRO_CATEGORY,
-	COOLANT_CATEGORY,
-} from "app/constants";
-import shuttleEvents from "app/lib/shuttleEvents";
-import { Toaster, TOASTER_INFO } from "app/lib/toaster/ToasterLib";
 import { Switch } from "app/components/shadcn/Switch";
-import Button from "app/components/Button";
 import {
 	Table,
-	TableHeader,
-	TableRow,
-	TableHead,
 	TableBody,
 	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
 } from "app/components/shadcn/Table";
+import {
+	CARVING_CATEGORY,
+	COOLANT_CATEGORY,
+	GENERAL_CATEGORY,
+	JOGGING_CATEGORY,
+	LOCATION_CATEGORY,
+	MACRO_CATEGORY,
+	OVERRIDES_CATEGORY,
+	PROBING_CATEGORY,
+	SPINDLE_LASER_CATEGORY,
+	TOOLBAR_CATEGORY,
+	VISUALIZER_CATEGORY,
+} from "app/constants";
+import shuttleEvents from "app/lib/shuttleEvents";
+import { TOASTER_INFO, Toaster } from "app/lib/toaster/ToasterLib";
 import { cn } from "app/lib/utils";
-
-import { GamepadContext } from "./utils/context";
-import { setCurrentModal, setGamepadProfileList } from "./utils/actions";
+import { useContext, useState } from "react";
 import { arrayComparator } from "./utils";
+import { setCurrentModal, setGamepadProfileList } from "./utils/actions";
+import { GamepadContext } from "./utils/context";
 
 const SetShortcut = () => {
 	const {
@@ -144,7 +143,7 @@ const SetShortcut = () => {
 	};
 
 	const getData = () => {
-		let allEvents = { ...macros, ...shuttleEvents.allShuttleControlEvents };
+		const allEvents = { ...macros, ...shuttleEvents.allShuttleControlEvents };
 		delete allEvents.MACRO;
 		delete allEvents.STOP_CONT_JOG;
 
@@ -229,7 +228,7 @@ const SetShortcut = () => {
 							className={
 								action.cmd === currentShortcut
 									? "bg-blue-500 text-white px-3 py-1 rounded"
-									: "bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded dark:bg-surface-raised dark:hover:bg-surface-hover"
+									: "bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded dark:bg-dark-lighter"
 							}
 							onClick={() => handleActionPress(action.cmd)}
 							disabled={action.cmd === currentShortcut}
@@ -283,7 +282,7 @@ const SetShortcut = () => {
 
 							<div className="border rounded-md max-h-[600px] overflow-y-auto">
 								<Table>
-									<TableHeader className="sticky top-0 bg-white z-10 dark:bg-surface-elevated">
+									<TableHeader className="sticky top-0 bg-white z-10 dark:bg-dark-lighter">
 										<TableRow>
 											{columns.map((column) => (
 												<TableHead

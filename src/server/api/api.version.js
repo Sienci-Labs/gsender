@@ -21,11 +21,11 @@
  *
  */
 
-import url from "url";
-import registryUrl from "registry-url";
-import registryAuthToken from "registry-auth-token";
-import request from "superagent";
 import os from "os";
+import registryAuthToken from "registry-auth-token";
+import registryUrl from "registry-url";
+import request from "superagent";
+import url from "url";
 import { ERR_INTERNAL_SERVER_ERROR } from "../constants";
 
 const pkgName = "gsender";

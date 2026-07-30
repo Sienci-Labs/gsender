@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
 import ensureArray from "ensure-array";
+import React, { useEffect, useState } from "react";
 import styles from "./index.module.styl";
 
 const RadioButtonInput = ({ info, setting, onChange, disabled }) => {
@@ -9,7 +9,7 @@ const RadioButtonInput = ({ info, setting, onChange, disabled }) => {
 		let { value } = setting;
 		value = Number(value);
 		setLocalValue(value);
-	}, [setting]);
+	}, [setting.value]);
 
 	const rbOnClick = (e) => {
 		const value = e.target.value;
@@ -25,8 +25,8 @@ const RadioButtonInput = ({ info, setting, onChange, disabled }) => {
 	return (
 		<div className={styles.column}>
 			{format.map((opt, index) => {
-				let checked = index === localValue;
-				let key = `${setting.setting}-${index}-key`;
+				const checked = index === localValue;
+				const key = `${setting.setting}-${index}-key`;
 				return (
 					<div className={styles.row} key={key}>
 						<span>{opt}:</span>

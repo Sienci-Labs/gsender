@@ -1,5 +1,5 @@
 import { Button } from "app/components/Button";
-import controller from "app/lib/controller";
+import controller from "app/lib/controller.ts";
 
 export function AccessoryOutputWizard() {
 	function sendCommand(command) {

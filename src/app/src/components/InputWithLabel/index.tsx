@@ -1,7 +1,6 @@
-import React from "react";
-import classNames from "classnames";
-
 import Tooltip from "app/components/Tooltip";
+import classNames from "classnames";
+import type React from "react";
 
 interface InputProps {
 	value: string | number;

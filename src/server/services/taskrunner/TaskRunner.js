@@ -22,9 +22,9 @@
  */
 
 import events from "events";
-import defaultShell from "spawn-default-shell";
 import without from "lodash/without";
 import shortid from "shortid";
+import defaultShell from "spawn-default-shell";
 import logger from "../../lib/logger";
 
 const log = logger("service:taskrunner");

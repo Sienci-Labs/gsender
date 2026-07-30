@@ -1,5 +1,5 @@
+import type { FirmwareFlavour } from "app/features/Connection";
 import cn from "classnames";
-import { FirmwareFlavour } from "app/features/Connection";
 
 interface FirmwareSelectButtonProps {
 	label: string;

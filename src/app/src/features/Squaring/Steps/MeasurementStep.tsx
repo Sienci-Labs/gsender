@@ -1,10 +1,10 @@
 import Button from "app/components/Button";
 import { ControlledInput } from "app/components/ControlledInput";
-import { useSquaring } from "../context/SquaringContext";
-import TriangleDiagram from "../components/TriangleDiagram";
-import { useState, useEffect } from "react";
-import { FaClipboard, FaClipboardCheck, FaClipboardList } from "react-icons/fa";
 import { useWorkspaceState } from "app/hooks/useWorkspaceState";
+import { useEffect, useState } from "react";
+import { FaClipboard, FaClipboardCheck, FaClipboardList } from "react-icons/fa";
+import TriangleDiagram from "../components/TriangleDiagram";
+import { useSquaring } from "../context/SquaringContext";
 
 const MeasurementStep = () => {
 	const {
@@ -58,10 +58,10 @@ const MeasurementStep = () => {
 		<div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-2 items-start">
 			<div className="flex flex-col gap-4">
 				<div className="space-y-1">
-					<h3 className="text-lg font-semibold dark:text-content-primary">
+					<h3 className="text-lg font-semibold dark:text-white">
 						Instructions
 					</h3>
-					<p className="text-gray-600 dark:text-content-primary h-20">
+					<p className="text-gray-600 dark:text-white h-20">
 						{currentSubStepData.description}
 					</p>
 				</div>
@@ -80,7 +80,7 @@ const MeasurementStep = () => {
 										? "bg-blue-50 border border-blue-200 bg-opacity-40"
 										: isPastStep
 											? "bg-green-50 border border-green-200 bg-opacity-30"
-											: "bg-amber-600 border border-amber-600 bg-opacity-10 border-opacity-10 opacity-50 dark:bg-surface-raised dark:border-outline"
+											: "bg-amber-600 border border-amber-600 bg-opacity-10 border-opacity-10 opacity-50 dark:bg-dark dark:border-gray-700"
 								}`}
 							>
 								<div className={`min-w-8 min-h-8 text-white`}>

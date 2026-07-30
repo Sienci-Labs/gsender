@@ -1,9 +1,9 @@
 /* eslint no-await-in-loop: 0 */
 
-import DFU from "./DFU";
+import events from "events";
 import hexParser from "nrf-intel-hex";
 import logger from "../../logger";
-import events from "events";
+import DFU from "./DFU";
 
 //const VALID_VENDOR_IDS = [0x0483];
 //const VALID_DEVICE_ID = [0x441];
@@ -63,7 +63,7 @@ class DFUFlasher extends events.EventEmitter {
 		let startAddress = null;
 		let byteSize = 0;
 
-		for (let [address, dataBlock] of this.map) {
+		for (const [address, dataBlock] of this.map) {
 			if (!startAddress) {
 				startAddress = address;
 			}
@@ -84,7 +84,7 @@ class DFUFlasher extends events.EventEmitter {
 			return;
 		}
 
-		for (let [address, dataBlock] of this.map) {
+		for (const [address, dataBlock] of this.map) {
 			this.emit(
 				"info",
 				`Writing block of size ${dataBlock.byteLength} at address 0x${address.toString(16)}`,
@@ -137,7 +137,7 @@ class DFUFlasher extends events.EventEmitter {
 		log.info("Starting download to board");
 
 		let bytesSent = 0;
-		let expectedSize = data.byteLength;
+		const expectedSize = data.byteLength;
 		let chunks = 1;
 
 		let address = startAddress;
@@ -214,7 +214,7 @@ class DFUFlasher extends events.EventEmitter {
 			return false;
 		}
 		let addr = this.getSectorStart(startAddr, segment);
-		let endAddr = this.getSectorEnd(startAddr + length - 1, segment);
+		const endAddr = this.getSectorEnd(startAddr + length - 1, segment);
 		log.info(
 			`Starting erase at ${addr.toString(16)} and erasing until ${endAddr.toString(16)}`,
 		);
@@ -256,7 +256,7 @@ class DFUFlasher extends events.EventEmitter {
 
 	async sendDFUCommand(command, param = 0x00, len = 1) {
 		// Array buffer codec for command to send
-		let payload = new ArrayBuffer(len + 1);
+		const payload = new ArrayBuffer(len + 1);
 		const dv = new DataView(payload);
 		dv.setUint8(0, command);
 
@@ -278,7 +278,7 @@ class DFUFlasher extends events.EventEmitter {
 
 		// Poll status
 		log.info("Poll status");
-		let status = await this.dfu.pollUntil((state) => state !== DFU.dfuDNBUSY);
+		const status = await this.dfu.pollUntil((state) => state !== DFU.dfuDNBUSY);
 		if (status.status !== this.dfu.STATUS_OK) {
 			throw new Error(`Special DfuSe command 0x${command.toString(16)} failed`);
 		}

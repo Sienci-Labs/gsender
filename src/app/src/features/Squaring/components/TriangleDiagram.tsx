@@ -1,7 +1,6 @@
-import React from "react";
-
-import { useSquaring } from "../context/SquaringContext";
 import { useWorkspaceState } from "app/hooks/useWorkspaceState";
+import React from "react";
+import { useSquaring } from "../context/SquaringContext";
 
 const TriangleDiagram = () => {
 	const { currentMainStep, currentSubStep, mainSteps, triangle } =

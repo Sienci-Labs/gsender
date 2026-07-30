@@ -26,7 +26,7 @@ export function HybridNumber({
 		(connected && firmwareType === "grblHAL") || (connected && forceEEPROM);
 
 	const updateEEPROMObject = () => {
-		let eepromValue = EEPROM.filter((o) => o.setting === eepromKey)[0];
+		const eepromValue = EEPROM.filter((o) => o.setting === eepromKey)[0];
 		if (eepromValue && useEEPROM) {
 			value = Number(eepromValue.value);
 			return eepromValue;
@@ -42,7 +42,7 @@ export function HybridNumber({
 	function hybridOnChange(v) {
 		// if it's empty, then the value isnt reported in eeprom. so dont try to change the eeprom
 		if (useEEPROM && !isEmpty(eepromObject)) {
-			let payload = { ...eepromObject, value: v, dirty: true };
+			const payload = { ...eepromObject, value: v, dirty: true };
 			setEEPROM((prev) => {
 				const updated = [...prev];
 				// save the value from before we started editing

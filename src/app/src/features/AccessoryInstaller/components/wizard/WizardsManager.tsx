@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from "react";
-import { Wizard } from "../../types/wizard";
-import { WizardsHub } from "./WizardsHub";
+import { useEffect, useRef, useState } from "react";
+import type { Wizard } from "../../types/wizard";
 import { WizardManager } from "./WizardManager";
+import { WizardsHub } from "./WizardsHub";
 
 interface WizardsManagerProps {
 	wizards: Wizard[];

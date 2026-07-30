@@ -1,5 +1,8 @@
-import { useState, useEffect } from "react";
-import { ShuttleEvent, ShuttleControlEvents } from "./definitions/shortcuts";
+import { useEffect, useState } from "react";
+import type {
+	ShuttleControlEvents,
+	ShuttleEvent,
+} from "./definitions/shortcuts";
 
 class ShortcutRegistry {
 	private activeEvents: Map<string, ShuttleEvent> = new Map();

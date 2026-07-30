@@ -1,20 +1,19 @@
 import Button from "app/components/Button";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-
-import MountingSetup from "./MountingSetup";
-import {
-	getZAxisProbing,
-	getYAxisAlignmentProbing,
-	runProbing,
-} from "./utils/probeCommands";
 import {
 	GRBL,
 	GRBL_ACTIVE_STATE_IDLE,
 	WORKFLOW_STATE_RUNNING,
 	WORKSPACE_MODE,
 } from "app/constants";
-import { useNavigate } from "react-router";
+import { useTypedSelector } from "app/hooks/useTypedSelector";
 import { useWorkspaceState } from "app/hooks/useWorkspaceState";
+import { useNavigate } from "react-router";
+import MountingSetup from "./MountingSetup";
+import {
+	getYAxisAlignmentProbing,
+	getZAxisProbing,
+	runProbing,
+} from "./utils/probeCommands";
 
 const Actions = () => {
 	const navigate = useNavigate();

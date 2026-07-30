@@ -21,7 +21,7 @@
  *
  */
 
-import { BasicObject, BasicType } from "definitions/general";
+import type { BasicObject, BasicType } from "definitions/general";
 
 class GCodeBlock {
 	words: Array<Array<string>> = null;
@@ -38,9 +38,9 @@ class GCodeBlock {
 	toPairs(): void {
 		const result: BasicObject = {};
 		const flatResult: BasicObject = {};
-		for (let word of this.words) {
-			let letter = word[0];
-			let value = word[1];
+		for (const word of this.words) {
+			const letter = word[0];
+			const value = word[1];
 			flatResult[letter] = value;
 			if (letter === "G" || letter === "L") {
 				result[`${letter}${value}`] = true;

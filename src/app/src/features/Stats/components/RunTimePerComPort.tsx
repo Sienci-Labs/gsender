@@ -1,19 +1,19 @@
 import {
-	Job,
-	JobAggregate,
+	type Job,
+	type JobAggregate,
 	StatContext,
 } from "app/features/Stats/utils/StatContext.tsx";
-import { useContext } from "react";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import { Doughnut } from "react-chartjs-2";
 import { truncatePort } from "app/features/Stats/utils/statUtils.ts";
+import { ArcElement, Chart as ChartJS, Legend, Tooltip } from "chart.js";
+import { useContext } from "react";
+import { Doughnut } from "react-chartjs-2";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 function aggregateRunTime(jobs: Job[]): [string[], number[]] {
 	const aggregate: JobAggregate = {};
 	jobs.map((job) => {
-		if (!aggregate.hasOwnProperty(job.port)) {
+		if (!Object.hasOwn(aggregate, job.port)) {
 			aggregate[job.port] = job.duration;
 			return;
 		}
@@ -29,7 +29,7 @@ export function RunTimePerComPort() {
 	const [ports, runtimes] = aggregateRunTime(jobs);
 
 	runtimes.map((runtime) => runtime / 1000);
-	let labels = ports.map((p) => truncatePort(p));
+	const labels = ports.map((p) => truncatePort(p));
 
 	const data = {
 		labels: labels,

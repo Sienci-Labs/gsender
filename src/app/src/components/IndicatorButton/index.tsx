@@ -1,5 +1,5 @@
-import React from "react";
 import cn from "classnames";
+import type React from "react";
 
 export interface IndicatorButtonProps {
 	label: string;
@@ -32,7 +32,7 @@ export function IndicatorButton({
 		>
 			<span
 				className={cn("text-blue-300", {
-					"animate-pulse dark:text-content-primary": active,
+					"animate-pulse dark:text-white": active,
 				})}
 			>
 				{icon}

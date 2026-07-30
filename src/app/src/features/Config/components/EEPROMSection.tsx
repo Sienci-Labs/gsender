@@ -1,18 +1,18 @@
 import {
-	gSenderEEEPROMSettings,
+	type gSenderEEEPROMSettings,
 	gSenderEEPROMSetting,
 	gSenderEEPROMSettingSection,
 } from "app/features/Config/assets/SettingsMenu.ts";
-import { useSettings } from "app/features/Config/utils/SettingsContext.tsx";
 import { EEPROMNotConnectedWarning } from "app/features/Config/components/EEPROMNotConnectedWarning.tsx";
-import { RootState } from "app/store/redux";
-import { useSelector } from "react-redux";
+import { EEPROMSettingRow } from "app/features/Config/components/EEPROMSettingRow.tsx";
+import { getDatatypeInput } from "app/features/Config/utils/EEPROM.ts";
+import { useSettings } from "app/features/Config/utils/SettingsContext.tsx";
+import controller from "app/lib/controller.ts";
+import { toast } from "app/lib/toaster";
+import type { RootState } from "app/store/redux";
 import get from "lodash/get";
 import { BiReset } from "react-icons/bi";
-import { getDatatypeInput } from "app/features/Config/utils/EEPROM.ts";
-import { EEPROMSettingRow } from "app/features/Config/components/EEPROMSettingRow.tsx";
-import controller from "app/lib/controller";
-import { toast } from "app/lib/toaster";
+import { useSelector } from "react-redux";
 
 export function isEEPROMSettingsSection(s: gSenderEEEPROMSettings): boolean {
 	return "label" in s && "eeprom" in s;
@@ -46,6 +46,14 @@ export function EEPROMSection({
 	};
 
 	function handleSingleSettingReset(setting, value) {
+		setEEPROM((prev) => {
+			const updated = [...prev];
+			const idx = updated.findIndex((e) => e.setting === setting);
+			if (idx !== -1) {
+				updated[idx] = { ...updated[idx], dirty: false, value };
+			}
+			return updated;
+		});
 		controller.command("gcode", [`${setting}=${value}`, "$$"]);
 		toast.success(`Restored ${setting} to default value of ${value}`, {
 			position: "bottom-right",

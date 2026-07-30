@@ -1,4 +1,5 @@
-import { useState, useEffect, ReactNode } from "react";
+import { MapPin } from "lucide-react";
+import { type ReactNode, useEffect, useState } from "react";
 
 interface PositionSetterProps {
 	xPosition: string;
@@ -9,6 +10,8 @@ interface PositionSetterProps {
 	label?: string;
 	units?: string;
 	actionButton?: ReactNode;
+	showGoTo?: boolean;
+	onGoTo?: () => void;
 }
 
 export function PositionSetter({
@@ -20,6 +23,8 @@ export function PositionSetter({
 	label = "Position",
 	units = "mm",
 	actionButton,
+	showGoTo = false,
+	onGoTo,
 }: PositionSetterProps) {
 	const [x, setX] = useState(initialX);
 	const [y, setY] = useState(initialY);
@@ -57,12 +62,12 @@ export function PositionSetter({
 	return (
 		<div className="space-y-4">
 			<div>
-				<label className="block text-sm font-semibold text-gray-900 dark:text-content-primary mb-3">
+				<label className="block text-sm font-semibold text-gray-900 dark:text-white mb-3">
 					{label} ({units})
 				</label>
 				<div className={`grid gap-4 ${showZ ? "grid-cols-3" : "grid-cols-2"}`}>
 					<div>
-						<label className="block text-xs text-gray-600 dark:text-content-secondary mb-1">
+						<label className="block text-xs text-gray-600 dark:text-gray-300 mb-1">
 							X
 						</label>
 						<input
@@ -73,7 +78,7 @@ export function PositionSetter({
 						/>
 					</div>
 					<div>
-						<label className="block text-xs text-gray-600 dark:text-content-secondary mb-1">
+						<label className="block text-xs text-gray-600 dark:text-gray-300 mb-1">
 							Y
 						</label>
 						<input
@@ -85,7 +90,7 @@ export function PositionSetter({
 					</div>
 					{showZ && (
 						<div>
-							<label className="block text-xs text-gray-600 dark:text-content-secondary mb-1">
+							<label className="block text-xs text-gray-600 dark:text-gray-300 mb-1">
 								Z
 							</label>
 							<input
@@ -99,7 +104,20 @@ export function PositionSetter({
 				</div>
 			</div>
 
-			{actionButton && <div>{actionButton}</div>}
+			{(actionButton || (showGoTo && onGoTo)) && (
+				<div className="flex items-center gap-3">
+					{actionButton && <div className="flex-1 min-w-0">{actionButton}</div>}
+					{showGoTo && onGoTo && (
+						<button
+							onClick={onGoTo}
+							className="shrink-0 flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors bg-gray-200 text-gray-900 hover:bg-gray-300"
+						>
+							<MapPin size={18} />
+							Go To
+						</button>
+					)}
+				</div>
+			)}
 		</div>
 	);
 }

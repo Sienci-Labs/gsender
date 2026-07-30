@@ -35,9 +35,7 @@ describe("gSender XY Squaring Test", () => {
 
 		// Step 5: Click on XY Squaring tool
 		cy.log("Step 5: Opening XY Squaring tool...");
-		cy.get("div.w-full a:nth-of-type(4) > div").should("be.visible").click();
-		cy.wait(1500);
-		cy.log("XY Squaring tool opened");
+		cy.contains("div.rounded-lg", "XY Squaring").should("be.visible").click();
 
 		// Step 6: Click "Start XY Squaring" button
 		cy.log("Step 6: Starting XY Squaring wizard...");
@@ -136,11 +134,6 @@ describe("gSender XY Squaring Test", () => {
 			.type("424.26");
 		cy.wait(1000);
 		cy.log("Point 2 Y measurement entered: 424.26mm");
-
-		// Step 18: Click outside to ensure focus is removed
-		cy.log("Step 18: Confirming measurements...");
-		cy.get("div.p-4 > div.w-full").click({ force: true });
-		cy.wait(500);
 
 		// Step 19-21: Click all three Confirm buttons in sequence
 		cy.log("Step 19-21: Clicking all three Confirm buttons...");
@@ -242,10 +235,6 @@ describe("gSender XY Squaring Test", () => {
 			.type("300");
 		cy.wait(1000);
 		cy.log("Incorrect Point 2 Y measurement entered: 300mm");
-
-		// Click outside to confirm
-		cy.get("div.p-4 > div.w-full").click({ force: true });
-		cy.wait(500);
 
 		// Click all confirm buttons
 		cy.get('[testid="confirm 1-2"]').should("be.visible").click();

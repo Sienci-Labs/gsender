@@ -1,7 +1,7 @@
-import { FIRMWARE_TYPES_T } from "app/definitions/firmware";
-import { UNITS_EN, BasicPosition } from "app/definitions/general";
-import { PROBE_TYPES, TOUCHPLATE_TYPES } from "app/lib/constants";
-import { probeDirections } from "app/lib/Probing";
+import type { FIRMWARE_TYPES_T } from "app/definitions/firmware";
+import type { BasicPosition, UNITS_EN } from "app/definitions/general";
+import type { PROBE_TYPES, TOUCHPLATE_TYPES } from "app/lib/constants";
+import type { probeDirections } from "app/lib/Probing";
 
 // Types
 
@@ -82,6 +82,10 @@ export interface ProbingOptions {
 	xThickness?: number;
 	yThickness?: number;
 	xyThickness?: number;
+	probeMovementSpeed?: number;
+	// AutoZero routines always run in mm (forced G21) regardless of display units,
+	// so they need the raw mm/min value rather than the unit-converted one above.
+	probeMovementSpeedAuto?: number;
 	firmware?: FIRMWARE_TYPES_T;
 	xyPositionAdjust?: number;
 	zPositionAdjust?: number;
@@ -119,6 +123,7 @@ export interface Probe {
 	direction: number;
 	tipDiameter3D: number;
 	xyRetract3D: number;
+	probeMovementSpeed: number;
 }
 
 export interface Actions {

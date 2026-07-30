@@ -1,10 +1,10 @@
-import { firmwarePastVersion } from "app/lib/firmwareSemver.ts";
 import { ATCI_SUPPORTED_VERSION } from "app/features/ATC/utils/ATCiConstants.ts";
-import { grblCoreGcode, sienciHalGcode } from "./SpindleConfig.tsx";
+import { firmwarePastVersion } from "app/lib/firmwareSemver.ts";
+import { getGrblCoreGcode, sienciHalGcode } from "./SpindleConfig.tsx";
 
 export function SpindleGcodePreview() {
 	const isGrblCore = firmwarePastVersion(ATCI_SUPPORTED_VERSION);
-	const lines = isGrblCore ? grblCoreGcode : sienciHalGcode;
+	const lines = isGrblCore ? getGrblCoreGcode() : sienciHalGcode;
 	const label = isGrblCore
 		? `grblHAL (>${ATCI_SUPPORTED_VERSION})`
 		: `sienciHAL (< ${ATCI_SUPPORTED_VERSION})`;
@@ -17,16 +17,16 @@ export function SpindleGcodePreview() {
 				</span>
 			</div>
 			<div>
-				<div className="rounded-md bg-white dark:bg-surface-raised">
+				<div className="rounded-md bg-white dark:bg-dark-lighter">
 					<div className="font-mono text-sm">
 						{lines.map((line, index) => (
 							<div
 								key={index}
 								className={`py-1 px-2 text-gray-900 dark:text-gray-100 ${
-									index % 2 === 0 ? "bg-gray-100 dark:bg-surface-elevated" : ""
+									index % 2 === 0 ? "bg-gray-100 dark:bg-dark" : ""
 								}`}
 							>
-								<span className="text-gray-500 dark:text-content-muted mr-4">
+								<span className="text-gray-500 dark:text-gray-400 mr-4">
 									{index + 1}
 								</span>
 								{line}

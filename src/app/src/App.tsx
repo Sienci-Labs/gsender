@@ -1,29 +1,17 @@
-import { ReactNode, useEffect } from "react";
+import controller from "app/lib/controller";
+import * as user from "app/lib/user";
+import store from "app/store";
+import { store as reduxStore } from "app/store/redux";
+import rootSaga, { sagaMiddleware } from "app/store/redux/sagas";
+import isElectron from "is-electron";
+import { posthog } from "posthog-js";
+import { useEffect } from "react";
 import { Provider as ReduxProvider } from "react-redux";
 import { HashRouter } from "react-router";
-
-import { store as reduxStore, RootState } from "app/store/redux";
-import { sagaMiddleware, createRootSaga } from "app/store/redux/sagas";
-import * as controllerSagas from "app/store/redux/sagas/controllerSagas";
-import store from "app/store";
-import * as user from "app/lib/user";
-import controller from "app/lib/controller";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-import { FocusTrappingProvider } from "app/lib/focus-trapping";
-import { Toaster } from "app/components/shadcn/Sonner";
-import { ReactRoutes } from "./react-routes";
+import { Toaster } from "./components/shadcn/Sonner";
 import { AccessibilitySettingsHandler } from "./features/Helper/AccessibilitySettingsHandler";
-
-function FocusTrappingBridge({ children }: { children: ReactNode }) {
-	const focusTrapping = useTypedSelector(
-		(state: RootState) => state.preferences.accessibility.focusTrapping,
-	);
-	return (
-		<FocusTrappingProvider value={focusTrapping}>
-			{children}
-		</FocusTrappingProvider>
-	);
-}
+import { installPluginBridgeListener } from "./features/Plugins/utils/pluginBridge";
+import { ReactRoutes } from "./react-routes";
 
 function App() {
 	useEffect(() => {
@@ -42,19 +30,44 @@ function App() {
 			controller.connect(host, options);
 		});
 
-		sagaMiddleware.run(createRootSaga([controllerSagas]));
+		sagaMiddleware.run(rootSaga);
+
+		const removePluginBridge = installPluginBridgeListener();
+
+		const shouldSendUsageData = store.get(
+			"workspace.collectUsageDataStatus",
+			"pending",
+		);
+
+		if (shouldSendUsageData === "accepted") {
+			console.log("Collecting usage data through PostHog");
+			posthog.opt_in_capturing();
+		} else {
+			posthog.opt_out_capturing();
+		}
+
+		if (isElectron()) {
+			console.log("Getting windows registry");
+			window.ipcRenderer
+				.invoke("get-windows-registry")
+				.then((value: boolean) => {
+					posthog.register({ isBundled: value });
+				});
+		}
+
+		return () => {
+			removePluginBridge();
+		};
 	}, []);
 
 	return (
 		<>
 			<ReduxProvider store={reduxStore}>
-				<FocusTrappingBridge>
-					<AccessibilitySettingsHandler />
-					<Toaster richColors closeButton theme="light" visibleToasts={5} />
-					<HashRouter>
-						<ReactRoutes />
-					</HashRouter>
-				</FocusTrappingBridge>
+				<AccessibilitySettingsHandler />
+				<Toaster richColors closeButton theme="light" visibleToasts={5} />
+				<HashRouter>
+					<ReactRoutes />
+				</HashRouter>
 			</ReduxProvider>
 		</>
 	);

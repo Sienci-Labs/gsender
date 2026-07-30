@@ -1,18 +1,18 @@
-import { useRef } from "react";
-import { PiDownloadSimple, PiUploadSimple } from "react-icons/pi";
-import { GrPowerReset } from "react-icons/gr";
+import { ActionButton } from "app/features/Config/components/ActionButton.tsx";
 import {
 	exportSettings,
 	handleRestoreDefaultClick,
 	importSettings,
 } from "app/features/Config/utils/Settings.ts";
-import { ActionButton } from "app/features/Config/components/ActionButton.tsx";
+import { useRef } from "react";
+import { GrPowerReset } from "react-icons/gr";
+import { PiDownloadSimple, PiUploadSimple } from "react-icons/pi";
 
 export function ApplicationPreferences() {
 	const inputRef = useRef<HTMLInputElement>(null);
 	return (
-		<fieldset className="max-sm:hidden flex flex-row gap-x-2 mr-4 mb-1 border rounded border-gray-200 px-4 pb-2 dark:border-outline dark:text-content-primary">
-			<legend className="text-slate-600 dark:text-content-primary">
+		<fieldset className="max-sm:hidden flex flex-row gap-x-2 mr-4 mb-1 border rounded border-gray-200 px-4 pb-2 dark:border-gray-700 dark:text-white">
+			<legend className="text-slate-600 dark:text-white">
 				gSender Preferences
 			</legend>
 			<div className="-mx-4 grid grid-cols-3 divide-x">

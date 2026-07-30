@@ -1,17 +1,16 @@
-import cn from "classnames";
-import { RiSpeakLine } from "react-icons/ri";
-import {
-	toggleWizardVisibility,
-	toggleInfoHelperVisibility,
-} from "app/store/redux/slices/helper.slice";
-import { RootState } from "app/store/redux";
-import { useSelector } from "react-redux";
-import reduxStore from "app/store/redux";
+import { TOOLBAR_CATEGORY } from "app/constants";
 import useShuttleEvents from "app/hooks/useShuttleEvents";
 import useKeybinding from "app/lib/useKeybinding";
-import { TOOLBAR_CATEGORY } from "app/constants";
+import reduxStore, { type RootState } from "app/store/redux";
+import {
+	toggleInfoHelperVisibility,
+	toggleWizardVisibility,
+} from "app/store/redux/slices/helper.slice";
+import cn from "classnames";
 import get from "lodash/get";
 import { useEffect } from "react";
+import { RiSpeakLine } from "react-icons/ri";
+import { useSelector } from "react-redux";
 
 interface HelperToggleProps {
 	minimized: boolean;
@@ -77,7 +76,7 @@ export function HelperToggle({ minimized }: HelperToggleProps) {
 			onClick={handleToggle}
 			aria-label={helperTitle || "Help Assistant"}
 			className={cn(
-				"flex w-full flex-col gap-0.5 content-center items-center text-sm text-gray-500 group rounded-xl transition-all duration-1000 opacity-100 border border-transparent dark:text-content-muted",
+				"flex w-full flex-col gap-0.5 content-center items-center text-sm text-gray-500 group rounded-xl transition-all duration-1000 opacity-100 border border-transparent dark:text-gray-400",
 				{
 					"border bg-orange-200 bg-opacity-30 animate-bounce": helperEnabled,
 					"border-transparent bg-transparent bg-opacity-100": minimized,

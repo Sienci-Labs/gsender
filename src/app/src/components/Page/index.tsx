@@ -1,9 +1,8 @@
+import Button from "app/components/Button";
+import { cx } from "class-variance-authority";
 import cn from "classnames";
 import { LuArrowLeft } from "react-icons/lu";
 import { useNavigate } from "react-router";
-
-import Button from "app/components/Button";
-import { cx } from "class-variance-authority";
 
 type PageProps = {
 	children: React.ReactNode;
@@ -41,9 +40,7 @@ const Page = ({
 		>
 			<div className="flex items-center justify-between mb-2 pb-2 min-h-14 border-b border-gray-200 rounded-b-lg">
 				<div>
-					<h1 className="text-3xl font-bold dark:text-content-primary">
-						{title}
-					</h1>
+					<h1 className="text-3xl font-bold dark:text-white">{title}</h1>
 					{description && <p className="text-gray-500">{description}</p>}
 				</div>
 

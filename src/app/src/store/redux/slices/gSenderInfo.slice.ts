@@ -1,5 +1,5 @@
-import { gSenderInfo } from "app/store/definitions.ts";
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import type { gSenderInfo } from "app/store/definitions.ts";
 
 const initialState: gSenderInfo = {
 	releaseNotes: {

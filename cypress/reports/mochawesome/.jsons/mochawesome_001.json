@@ -1,0 +1,984 @@
+{
+  "stats": {
+    "suites": 23,
+    "tests": 23,
+    "passes": 18,
+    "pending": 0,
+    "failures": 5,
+    "start": "2026-04-21T13:59:38.184Z",
+    "end": "2026-04-21T14:19:35.928Z",
+    "duration": 1197744,
+    "testsRegistered": 23,
+    "passPercent": 78.26086956521739,
+    "pendingPercent": 0,
+    "other": 0,
+    "hasOther": false,
+    "skipped": 0,
+    "hasSkipped": false
+  },
+  "results": [
+    {
+      "uuid": "9dae9b17-a3a1-4d68-ac15-84b6f4c81891",
+      "title": "",
+      "fullFile": "cypress\\e2e\\grblHal\\A_grblHal_master_spec.cy.js",
+      "file": "cypress\\e2e\\grblHal\\A_grblHal_master_spec.cy.js",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "1067babd-070c-4e2e-9901-7c90a132dcc7",
+          "title": "gSender UI Load Test",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "should navigate to gSender and verify the UI loads",
+              "fullTitle": "gSender UI Load Test should navigate to gSender and verify the UI loads",
+              "timedOut": null,
+              "duration": 2549,
+              "state": "passed",
+              "speed": "fast",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "// Visit with timeout for slow load\ncy.visit('/', {\n  timeout: 40000\n});\n// Wait for title with timeout\ncy.title({\n  timeout: 15000\n}).should('eq', 'gSender 1.6.0');\n// Wait for body to be visible\ncy.get('body', {\n  timeout: 15000\n}).should('be.visible');",
+              "err": {},
+              "uuid": "edec5428-5c09-48d6-b2be-cb5f2ab73740",
+              "parentUUID": "1067babd-070c-4e2e-9901-7c90a132dcc7",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "edec5428-5c09-48d6-b2be-cb5f2ab73740"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 2549,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        },
+        {
+          "uuid": "abd5ab63-4fdd-4832-be06-e0b954e04aff",
+          "title": "Device Connection",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "should connect to CNC machine by selecting the first available port",
+              "fullTitle": "Device Connection should connect to CNC machine by selecting the first available port",
+              "timedOut": null,
+              "duration": 10164,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.wait(2000);\ncy.get('body').then($body => {\n  const bodyText = $body.text();\n  // ── Already connected and Idle\n  if (/\\bIdle\\b/i.test(bodyText)) {\n    cy.log('Machine is already connected and in Idle state');\n    return;\n  }\n  // ── Connected but not yet Idle\n  if (/\\bDisconnect\\b/i.test(bodyText)) {\n    cy.log('Machine connected — waiting for Idle...');\n    cy.contains(/^Idle$/i, {\n      timeout: 30000\n    }).should('be.visible');\n    return;\n  }\n  // ── Not connected — start flow\n  cy.log('Not connected. Starting connection flow...');\n  // Step 1: Click \"Connect to CNC\"\n  cy.contains('span', 'Connect to CNC', {\n    timeout: 10000\n  }).should('exist').scrollIntoView().click({\n    force: true\n  });\n  // Step 2: Wait for Radix dropdown to appear\n  cy.get('div[data-radix-popper-content-wrapper]', {\n    timeout: 10000\n  }).should('exist').within(() => {\n    // Step 3: Get all port buttons \n    cy.get('button.m-0').should('have.length.greaterThan', 0).then($buttons => {\n      // Step 4: Filter out non-port UI buttons\n      const NON_PORT_LABELS = ['back', 'refresh', 'cancel', 'close', 'ok', 'done', 'connect', 'disconnect', 'next', 'previous'];\n      const portButtons = $buttons.toArray().filter(btn => {\n        const text = (btn.textContent || '').trim().toLowerCase();\n        return text.length > 0 && !NON_PORT_LABELS.some(label => text === label);\n      });\n      expect(portButtons.length, 'No port buttons found in dropdown').to.be.greaterThan(0);\n      // Step 5: Select first port — works on all OS\n      // Windows → COM4, Linux → ttyUSB0, macOS → cu.usbmodem\n      const firstPort = portButtons[0];\n      const portName = (firstPort.textContent || '').trim();\n      cy.log(`Selecting first available port: \"${portName}\"`);\n      cy.wrap(firstPort).click({\n        force: true\n      });\n    });\n  });\n  // Step 6: Wait for Idle state\n  cy.log('Waiting for Idle state...');\n  cy.contains(/^Idle$/i, {\n    timeout: 30000\n  }).should('be.visible').then(() => cy.log('Machine connected and in Idle state'));\n  // Step 7: Verify firmware from connected device button\n  cy.get('div.group', {\n    timeout: 10000\n  }).should('exist').then($groups => {\n    // Find the div.group whose text contains grbl firmware info\n    const deviceGroup = $groups.toArray().find(el => {\n      const text = (el.textContent || '').trim();\n      return /grbl(hal)?/i.test(text);\n    });\n    expect(deviceGroup, 'Could not find a connected device button containing grbl/grblHAL firmware').to.not.be.undefined;\n    const fullText = (deviceGroup.textContent || '').trim();\n    cy.log(`Device button text: \"${fullText}\"`);\n    const firmwareMatch = fullText.match(/grbl(hal)?/i);\n    const firmware = firmwareMatch[0];\n    cy.log(`Firmware detected: \"${firmware}\"`);\n    expect(firmware).to.match(/^grbl(hal)?$/i, `Expected \"grbl\" or \"grblHAL\" but got \"${firmware}\"`);\n    cy.log(`Firmware \"${firmware}\" confirmed`);\n  });\n  // Step 8: Disconnect\n  cy.disconnectIfIdle();\n});",
+              "err": {},
+              "uuid": "ccf0e8b6-8e83-484e-a605-4d472aebee50",
+              "parentUUID": "abd5ab63-4fdd-4832-be06-e0b954e04aff",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "ccf0e8b6-8e83-484e-a605-4d472aebee50"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 10164,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        },
+        {
+          "uuid": "29fad2a0-3433-46f9-a572-eb08b4d52252",
+          "title": "Load file testing in grblHal",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Complete workflow: Connect-> Upload-> Disconnect->Upload-> Connect->Disconnect",
+              "fullTitle": "Load file testing in grblHal Complete workflow: Connect-> Upload-> Disconnect->Upload-> Connect->Disconnect",
+              "timedOut": null,
+              "duration": 55172,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "// ========== STEP 1: Connect to CNC ==========\ncy.log('STEP 1: Connecting to CNC...');\ncy.connectToGrblHAL();\ncy.wait(6000);\ncy.log('Connected to CNC');\n// Verify CNC machine status is Idle\ncy.contains(/^Idle$/i, {\n  timeout: 30000\n}).should('be.visible').then(status => {\n  cy.log(`Machine status: \"${status.text().trim()}\"`);\n});\n// ========== STEP 2: Upload file (while connected) ==========\ncy.log('STEP 2: Uploading file while connected...');\ncy.wait(5000);\ncy.contains('Load File').should('be.visible').click({\n  force: true\n});\ncy.get('#fileInput').selectFile('cypress/fixtures/sample.gcode', {\n  force: true\n});\ncy.wait(5000);\n// Verify uploaded file name\ncy.get('h2.inline-block.text-lg.font-bold', {\n  timeout: 15000\n}).should('be.visible').invoke('text').then(fileName => {\n  const trimmedName = fileName.trim();\n  cy.log(`Uploaded file name: \"${trimmedName}\"`);\n  expect(trimmedName).to.contain('.gcode');\n});\n// ========== STEP 3: Disconnect from CNC ==========\ncy.log('STEP 3: Disconnecting from CNC...');\ncy.disconnectIfIdle();\ncy.log('Disconnect clicked — verifying status...');\n// Verify the machine is disconnected\ncy.contains(/(Connect to CNC|Disconnected)/i, {\n  timeout: 10000\n}).should('be.visible').then(() => cy.log('Machine disconnected successfully'));\n// ========== STEP 4: Upload file (while disconnected) ==========\ncy.log('STEP 4: Uploading file while disconnected...');\ncy.wait(5000);\ncy.contains('Load File').should('be.visible').click({\n  force: true\n});\ncy.get('#fileInput').selectFile('cypress/fixtures/sample.gcode', {\n  force: true\n});\ncy.wait(5000);\n// Verify uploaded file name\ncy.get('h2.inline-block.text-lg.font-bold', {\n  timeout: 15000\n}).should('be.visible').invoke('text').then(fileName => {\n  const trimmedName = fileName.trim();\n  cy.log(`Uploaded file name: \"${trimmedName}\"`);\n  expect(trimmedName).to.contain('.gcode');\n});\n// ========== STEP 5: Connect to CNC again ==========\ncy.log('STEP 5: Connecting to CNC again...');\ncy.connectToGrblHAL();\ncy.wait(6000);\ncy.log('Connected to CNC');\n// Verify CNC machine status is Idle\ncy.contains(/^Idle$/i, {\n  timeout: 30000\n}).should('be.visible').then(status => {\n  cy.log(`Machine status: \"${status.text().trim()}\"`);\n});\n// ========== STEP 6: Final disconnect ==========\ncy.log('STEP 6: Final disconnect from CNC...');\ncy.disconnectIfIdle();\ncy.log('Disconnect clicked — verifying status...');\n// Verify the machine is disconnected\ncy.contains(/(Connect to CNC|Disconnected)/i, {\n  timeout: 10000\n}).should('be.visible').then(() => cy.log('Test completed successfully!'));",
+              "err": {},
+              "uuid": "c36547ec-3b2e-4a3d-a2d0-61bd02eb0e73",
+              "parentUUID": "29fad2a0-3433-46f9-a572-eb08b4d52252",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "c36547ec-3b2e-4a3d-a2d0-61bd02eb0e73"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 55172,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        },
+        {
+          "uuid": "5d4b0f2c-883b-4975-906f-b085dc0467da",
+          "title": "GrblHal Machine File Info Test",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Uploads file, toggles, and prints file info",
+              "fullTitle": "GrblHal Machine File Info Test Uploads file, toggles, and prints file info",
+              "timedOut": null,
+              "duration": 11366,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "const fileName = 'sample.gcode';\n// Step 1: Upload file\ncy.uploadGcodeFile(fileName);\n// Step 2: Verify uploaded file name and print\ncy.get('h2.inline-block.text-lg.font-bold', {\n  timeout: 15000\n}).should('be.visible').invoke('text').then(text => {\n  const trimmedName = text.trim();\n  cy.log(`Uploaded file: ${trimmedName}`);\n  expect(trimmedName).to.contain('.gcode');\n});\n// Step 3: Click the toggle button\n//cy.get('button[role=\"switch\"]').eq(0)\ncy.get('[data-testid=\"toggle-info\"]').click({\n  force: true\n}).then(() => cy.log('Toggle button clicked'));\n// Step 4: Print Estimated Time\ncy.contains('span.font-bold', 'Estimated Time').parent().invoke('text').then(val => cy.log(`Estimated Time: ${val.trim()}`));\n// Step 5: Print Feed\ncy.contains('span.font-bold', 'Feed').parent().invoke('text').then(val => cy.log(`Feed: ${val.trim()}`));\n// Step 6: Print Speed\ncy.contains('span.font-bold', 'Speed').parent().invoke('text').then(val => cy.log(`Speed: ${val.trim()}`));\n// Step 7: Print Tools\ncy.contains('span.font-bold', 'Tools').parent().invoke('text').then(val => cy.log(`Tools: ${val.trim()}`));\n// Step 8: Log full result\ncy.log(`Test Result: Uploaded file \"${fileName}\" and file information retrieved successfully`);",
+              "err": {},
+              "uuid": "fcb9c3ab-4c26-4e85-8781-99a65f12ed9d",
+              "parentUUID": "5d4b0f2c-883b-4975-906f-b085dc0467da",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "fcb9c3ab-4c26-4e85-8781-99a65f12ed9d"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 11366,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        },
+        {
+          "uuid": "cfa64e12-c5d7-4a44-a546-1d3ceb7e7183",
+          "title": "Gsender testing jogging using buttons",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Test Case: jogging using buttons",
+              "fullTitle": "Gsender testing jogging using buttons Test Case: jogging using buttons",
+              "timedOut": null,
+              "duration": 51380,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "// Step 1: Connect to CNC\ncy.log('Step 1: Connecting to CNC...');\ncy.connectMachine();\ncy.wait(6000);\ncy.log('Connected');\n// Step 2: Wait for Idle status\ncy.log('Step 2: Waiting for Idle status...');\ncy.contains(/^Idle$/i, {\n  timeout: 30000\n}).should('be.visible');\ncy.wait(2000);\ncy.log(' Machine is Idle');\n// Step 3: Move to position (0, 0, 0)\ncy.log('Step 3: Moving to position (0, 0, 0)...');\ncy.goToLocation({\n  x: 0,\n  y: 0,\n  z: 0\n});\n// Step 4: Check initial position\ncy.log('Step 4: Checking initial position...');\ncy.get('input[type=\"number\"].text-xl.font-bold.text-blue-500.font-mono').then($inputs => {\n  const xValue = $inputs.eq(0).val();\n  const yValue = $inputs.eq(1).val();\n  const zValue = $inputs.eq(2).val();\n  cy.log(`Initial position: X=${xValue}, Y=${yValue}, Z=${zValue}`);\n  if (xValue === '0.00' && yValue === '0.00' && zValue === '0.00') {\n    cy.log(' Machine is at home position (0.00, 0.00, 0.00)');\n  }\n});\ncy.wait(2000);\n// Step 5: Test Y+ jogging\ncy.log('Step 5: Testing Y+ jogging...');\ncy.get('path#yPlus').should('exist').click({\n  force: true\n});\ncy.wait(3000);\ncy.log(' Y+ jog button clicked');\n// Step 6: Test Y- jogging\ncy.log('Step 6: Testing Y- jogging...');\ncy.get('path#yMinus').should('exist').click({\n  force: true\n});\ncy.wait(3000);\ncy.log(' Y- jog button clicked');\n// Step 7: Test X+ jogging\ncy.log('Step 7: Testing X+ jogging...');\ncy.get('path#xPlus').should('exist').click({\n  force: true\n});\ncy.wait(3000);\ncy.log('X+ jog button clicked');\n// Step 8: Test X- jogging\ncy.log('Step 8: Testing X- jogging...');\ncy.get('path#xMinus').should('exist').click({\n  force: true\n});\ncy.wait(3000);\ncy.log(' X- jog button clicked');\n// Step 9: Test Z+ jogging\ncy.log('Step 9: Testing Z+ jogging...');\ncy.get('path[d=\"M0.5 10C0.5 4.75329 4.75329 0.5 10 0.5H40C45.2467 0.5 49.5 4.7533 49.5 10V88.5H0.5V10Z\"]').should('exist').click({\n  force: true\n});\ncy.wait(3000);\ncy.log(' Z+ jog button clicked');\n// Step 10: Test Z- jogging\ncy.log('Step 10: Testing Z- jogging...');\ncy.get('path[d=\"M0.5 98.5H49.5V177C49.5 182.247 45.2467 186.5 40 186.5H10C4.75329 186.5 0.5 182.247 0.5 177V98.5Z\"]').should('exist').click({\n  force: true\n});\ncy.wait(3000);\ncy.log(' Z- jog button clicked');\n// Step 11: Test X+Y+ jogging\ncy.log('Step 11: Testing X+Y+ jogging...');\ncy.get('path#xPlusYPlus').should('exist').click({\n  force: true\n});\ncy.wait(3000);\ncy.log(' X+Y+ jog button clicked');\n// Step 12: Test X+Y- jogging\ncy.log('Step 12: Testing X+Y- jogging...');\ncy.get('path#xPlusYMinus').should('exist').click({\n  force: true\n});\ncy.wait(3000);\ncy.log(' X+Y- jog button clicked');\n// Step 13: Test X-Y- jogging\ncy.log('Step 13: Testing X-Y- jogging...');\ncy.get('path#xMinusYMinus').should('exist').click({\n  force: true\n});\ncy.wait(3000);\ncy.log(' X-Y- jog button clicked');\n// Step 14: Test X-Y+ jogging\ncy.log('Step 14: Testing X-Y+ jogging...');\ncy.get('path#xMinusYPlus').should('exist').click({\n  force: true\n});\ncy.wait(3000);\ncy.log(' X-Y+ jog button clicked');\n// Step 15: Check final position\ncy.log('Step 15: Checking final position...');\ncy.get('input[type=\"number\"].text-xl.font-bold.text-blue-500.font-mono').then($inputs => {\n  const xValue = $inputs.eq(0).val();\n  const yValue = $inputs.eq(1).val();\n  const zValue = $inputs.eq(2).val();\n  cy.log(`Final position: X=${xValue}, Y=${yValue}, Z=${zValue}`);\n  if (xValue === '0.00' && yValue === '0.00' && zValue === '0.00') {\n    cy.log(' Machine is back at home position (0.00, 0.00, 0.00) ');\n  } else {\n    cy.log(` Machine position after jogging: (${xValue}, ${yValue}, ${zValue})`);\n  }\n});\ncy.log(' ALL JOGGING TESTS COMPLETED SUCCESSFULLY ');",
+              "err": {},
+              "uuid": "0fd4c587-b8da-4009-ae3d-f4b3b55029d4",
+              "parentUUID": "cfa64e12-c5d7-4a44-a546-1d3ceb7e7183",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "0fd4c587-b8da-4009-ae3d-f4b3b55029d4"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 51380,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        },
+        {
+          "uuid": "49dfedc0-d2d0-4952-aeed-835ba06ff623",
+          "title": "Dynamic Keyboard Jogging Test - All Axes",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Test all keyboard jog shortcuts dynamically",
+              "fullTitle": "Dynamic Keyboard Jogging Test - All Axes Test all keyboard jog shortcuts dynamically",
+              "timedOut": null,
+              "duration": 136958,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.log('DYNAMIC KEYBOARD JOGGING TEST');\ncy.log('STEP 1: Connect to CNC');\ncy.connectMachine();\ncy.wait(7000);\ncy.unlockMachineIfNeeded();\ncy.contains(/^Idle$/i, {\n  timeout: 30000\n}).should('be.visible');\ncy.log('STEP 2: Zero All Axes');\ncy.zeroAllAxes();\ncy.verifyAxes(0, 0, 0);\ncy.log('STEP 3: Test X+ and X- Jogging');\ncy.get('path#xPlus').should('exist').click({\n  force: true\n});\ncy.wait(3000);\ncy.get('path#xMinus').should('exist').click({\n  force: true\n});\ncy.wait(3000);\nconst goToKeyboardShortcuts = () => {\n  cy.get('div.flex > div.flex > div.flex a:nth-of-type(3) svg').click();\n  cy.wait(2000);\n  cy.contains('Keyboard Shortcuts').parent().click();\n  cy.wait(3000);\n};\ncy.log('STEP 4: Navigate to Keyboard Shortcuts');\ngoToKeyboardShortcuts();\ncy.log('STEP 5: Get Movement Presets');\ncy.get('#app > div.flex > div.flex > div.flex img').first().click();\ncy.wait(2000);\ncy.contains(/^Idle$/i, {\n  timeout: 10000\n}).should('be.visible');\ncy.get('div.gap-1 > div.items-center > div > div:nth-of-type(1) input').invoke('val').then(xyPreset => {\n  const xyMove = parseFloat(xyPreset);\n  cy.log(`XY Preset: ${xyMove} mm`);\n  cy.get('div.gap-1 > div.items-center > div > div:nth-of-type(2) input').invoke('val').then(zPreset => {\n    const zMove = parseFloat(zPreset);\n    cy.log(`Z Preset: ${zMove} mm`);\n    goToKeyboardShortcuts();\n    cy.log('STEP 6: Test X+ (Right)');\n    testJogDirection('X+ (right)', /X\\+.*(right|→)/i, 1, +1, xyMove, zMove);\n    goToKeyboardShortcuts();\n    cy.log('STEP 7: Test X- (Left)');\n    testJogDirection('X- (left)', /X-.*(left|←)/i, 1, -1, xyMove, zMove);\n    goToKeyboardShortcuts();\n    cy.log('STEP 8: Test Y+ (Up)');\n    testJogDirection('Y+ (up)', /Y\\+.*(up|↑)/i, 2, +1, xyMove, zMove);\n    goToKeyboardShortcuts();\n    cy.log('STEP 9: Test Y- (Down)');\n    testJogDirection('Y- (down)', /Y-.*(down|↓)/i, 2, -1, xyMove, zMove);\n    goToKeyboardShortcuts();\n    cy.log('STEP 10: Test Z+ (Up)');\n    testJogDirection('Z+ (up)', /Z\\+.*(up|↑)/i, 3, +1, xyMove, zMove);\n    goToKeyboardShortcuts();\n    cy.log('STEP 11: Test Z- (Down)');\n    testJogDirection('Z- (down)', /Z-.*(down|↓)/i, 3, -1, xyMove, zMove);\n    cy.log('ALL TESTS COMPLETED');\n  });\n});",
+              "err": {},
+              "uuid": "08ee411c-7c99-465c-8cdf-15d9a9418d90",
+              "parentUUID": "49dfedc0-d2d0-4952-aeed-835ba06ff623",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "08ee411c-7c99-465c-8cdf-15d9a9418d90"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 136958,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        },
+        {
+          "uuid": "0cee6ad0-a121-4230-9a40-20652afd0142",
+          "title": "Gsender testing preset create update",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Verify Rapid preset values are updated and jogging speed/position is accurate",
+              "fullTitle": "Gsender testing preset create update Verify Rapid preset values are updated and jogging speed/position is accurate",
+              "timedOut": null,
+              "duration": 39268,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "const EXPECTED_XY = '25';\nconst EXPECTED_Z = '15';\nconst EXPECTED_A = '15';\nconst EXPECTED_SPEED = '4500';\n// ── Helper: hold jog button and read speed from correct container \nconst jogAndVerifySpeed = (label, selector) => {\n  cy.log(`Testing ${label} jogging...`);\n  cy.get(selector).should('exist').trigger('mousedown', {\n    force: true\n  });\n  cy.wait(1500).then(() => {\n    // xpath: main-content > div > div[1] > div[2] > div > section > div > div > div[3] > div[1]\n    cy.get('div.h-\\\\[75\\\\%\\\\] section > div > div > div.gap-1 > div.items-center').should('exist').then($container => {\n      const fullText = $container.text().trim();\n      cy.log(`${label} speed container text: \"${fullText}\"`);\n      // Extract number before mm/min using regex\n      const match = fullText.match(/(\\d+(?:\\.\\d+)?)\\s*mm\\/min/);\n      if (match) {\n        const speedValue = match[1];\n        cy.log(`${label} speed extracted: \"${speedValue}\"`);\n        expect(speedValue).to.equal(EXPECTED_SPEED, `${label}: Expected ${EXPECTED_SPEED} mm/min but got \"${speedValue} mm/min\"`);\n        cy.log(`${label} speed verified: ${speedValue} mm/min`);\n      } else {\n        cy.log(`WARNING: Could not extract speed from \"${fullText}\"`);\n        // Fallback: check each child element separately\n        $container.find('*').each((i, el) => {\n          const $el = Cypress.$(el);\n          if ($el.children().length === 0) {\n            cy.log(`  Child[${i}] text: \"${$el.text().trim()}\"`);\n          }\n        });\n      }\n    });\n  });\n  cy.get(selector).trigger('mouseup', {\n    force: true\n  }).trigger('mouseleave', {\n    force: true\n  });\n  cy.wait(2000);\n};\n// ── Step 1: Connect \ncy.log('Step 1: Connecting to CNC...');\ncy.connectMachine();\ncy.wait(6000);\ncy.log('Connected to CNC');\n// ── Step 2: Zero all axes\ncy.log('Step 2: Zeroing all axes...');\ncy.zeroXAxis();\ncy.zeroYAxis();\ncy.zeroZAxis();\n// ── Step 3-4: Go to config, search jog \ncy.log('Step 3: Navigating to config page...');\ncy.goToConfig();\ncy.wait(2000);\ncy.log('Step 4: Searching for \"jog\"...');\ncy.get('#simple-search').click().clear().type('jog');\ncy.wait(1000);\n// ── Step 5: Update Rapid preset values \ncy.log('Step 5: Updating Rapid preset values...');\ncy.contains('span', 'Rapid').parents('.p-2.flex.flex-row').within(() => {\n  cy.contains('span', 'XY:').parent().find('input[type=\"number\"]').clear({\n    force: true\n  }).type(EXPECTED_XY, {\n    force: true\n  });\n  cy.contains('span', 'Z:').parent().find('input[type=\"number\"]').clear({\n    force: true\n  }).type(EXPECTED_Z, {\n    force: true\n  });\n  cy.contains('span', 'A:').parent().find('input[type=\"number\"]').clear({\n    force: true\n  }).type(EXPECTED_A, {\n    force: true\n  });\n  cy.contains('span', 'Speed:').parent().find('input[type=\"number\"]').clear({\n    force: true\n  }).type(EXPECTED_SPEED, {\n    force: true\n  });\n});\ncy.wait(1000);\n// ── Step 6: Apply settings \ncy.log('Step 6: Applying settings...');\ncy.contains('button', 'Apply Settings').should('be.visible').click({\n  force: true\n});\ncy.wait(2000);\n// ── Step 7-8: Go to Carve, click Rapid, verify preset inputs \ncy.log('Step 7: Navigating to Carve page...');\ncy.goToCarve();\ncy.wait(3000);\ncy.log('Step 8: Clicking Rapid and verifying preset values...');\ncy.contains('button', 'Rapid').should('be.visible').click({\n  force: true\n});\ncy.wait(2000);\ncy.get('input[type=\"number\"].h-6.text-sm').should('have.length.at.least', 3).then($inputs => {\n  const xyValue = $inputs.eq(0).val();\n  const zValue = $inputs.eq(1).val();\n  const speedValue = $inputs.eq(2).val();\n  cy.log(`XY: Expected=${EXPECTED_XY}, Actual=${xyValue}`);\n  cy.log(`Z:  Expected=${EXPECTED_Z},  Actual=${zValue}`);\n  cy.log(`Speed: Expected=${EXPECTED_SPEED}, Actual=${speedValue}`);\n  if (xyValue !== EXPECTED_XY) throw new Error(`XY mismatch: Expected ${EXPECTED_XY}, got ${xyValue}`);\n  if (zValue !== EXPECTED_Z) throw new Error(`Z mismatch: Expected ${EXPECTED_Z}, got ${zValue}`);\n  if (speedValue !== EXPECTED_SPEED) throw new Error(`Speed mismatch: Expected ${EXPECTED_SPEED}, got ${speedValue}`);\n  cy.log('Preset values verified');\n});\n// ── Steps 9-12: Hold jog and verify speed \ncy.log('Step 9: Testing jog directions and speed...');\n//  #xPlusYPlus and #xMinusYMinus (not path#id)\njogAndVerifySpeed('X+Y+', '#xPlusYPlus');\njogAndVerifySpeed('X-Y-', '#xMinusYMinus');\njogAndVerifySpeed('Z+', 'path[d=\"M0.5 10C0.5 4.75329 4.75329 0.5 10 0.5H40C45.2467 0.5 49.5 4.7533 49.5 10V88.5H0.5V10Z\"]');\njogAndVerifySpeed('Z-', 'path[d=\"M0.5 98.5H49.5V177C49.5 182.247 45.2467 186.5 40 186.5H10C4.75329 186.5 0.5 182.247 0.5 177V98.5Z\"]');\n// ── Step 13: Verify position returned to (0, 0, 0) \ncy.log('Step 13: Verifying final position...');\ncy.get('[data-testid=\"wcs-input-X\"]').invoke('val').then(x => {\n  cy.get('[data-testid=\"wcs-input-Y\"]').invoke('val').then(y => {\n    cy.get('[data-testid=\"wcs-input-Z\"]').invoke('val').then(z => {\n      cy.log(`Final position: X=${x}, Y=${y}, Z=${z}`);\n      if (x !== '0.00' || y !== '0.00' || z !== '0.00') throw new Error(`Position mismatch: Expected (0.00, 0.00, 0.00), got (${x}, ${y}, ${z})`);\n      cy.log('Machine at home position (0.00, 0.00, 0.00)');\n    });\n  });\n});\ncy.log('ALL STEPS PASSED');",
+              "err": {},
+              "uuid": "6369b94c-ddbe-4a86-a14a-498a90c8d58b",
+              "parentUUID": "0cee6ad0-a121-4230-9a40-20652afd0142",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "6369b94c-ddbe-4a86-a14a-498a90c8d58b"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 39268,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        },
+        {
+          "uuid": "1601d1ee-2cd5-485e-a779-71209badb78f",
+          "title": "Grblhal Zeroing axis and go to zero",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Test Case: jogging using buttons and zeroing axes",
+              "fullTitle": "Grblhal Zeroing axis and go to zero Test Case: jogging using buttons and zeroing axes",
+              "timedOut": null,
+              "duration": 78376,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "const waitAfter = 2000; // Define waitAfter variable\n// Step 1: Connect to CNC\ncy.log('Step 1: Connecting to CNC...');\ncy.connectMachine();\ncy.wait(3000);\ncy.unlockMachineIfNeeded();\ncy.wait(1000);\ncy.log('Connected');\n// Step 2: Wait for Idle status\ncy.log('Step 2: Waiting for Idle status...');\ncy.contains(/^Idle$/i, {\n  timeout: 30000\n}).should('be.visible');\ncy.wait(2000);\ncy.log('Machine is Idle');\n// Step 3: Move to position (0, 0, 0)\ncy.log('Step 3: Moving to position (0, 0, 0)...');\ncy.goToLocation({\n  x: 0,\n  y: 0,\n  z: 0\n});\ncy.wait(3000);\ncy.unlockMachineIfNeeded();\ncy.wait(1000);\ncy.contains(/^Idle$/i, {\n  timeout: 30000\n}).should('be.visible');\ncy.log('At position (0, 0, 0)');\n// Step 4: Test X-axis movement and zeroing\ncy.log('Step 4: Testing X-axis...');\ncy.contains('button', 'Normal').click();\ncy.wait(500);\ncy.forceInput('div.gap-1 > div.items-center > div > div:nth-of-type(1) input', '5');\ncy.wait(500);\ncy.get('#xPlus').click();\ncy.wait(3000);\ncy.unlockMachineIfNeeded();\ncy.wait(1000);\ncy.contains(/^Idle$/i, {\n  timeout: 30000\n}).should('be.visible');\ncy.verifyAxes(5, 0, 0);\ncy.log('X moved to 5mm');\n// Zero X axis\ncy.log('Zeroing X axis...');\ncy.get('button', {\n  timeout: 3000\n}).contains('span.font-mono', 'X0').parent().should('be.visible').scrollIntoView().click({\n  force: true\n});\ncy.wait(waitAfter);\ncy.unlockMachineIfNeeded();\ncy.wait(1000);\ncy.log('X axis zeroed');\n// Step 5: Test Y-axis movement and zeroing\ncy.log('Step 5: Testing Y-axis...');\ncy.forceInput('div.gap-1 > div.items-center > div > div:nth-of-type(1) input', '5');\ncy.wait(500);\ncy.get('#yPlus').click();\ncy.wait(3000);\ncy.unlockMachineIfNeeded();\ncy.wait(1000);\ncy.contains(/^Idle$/i, {\n  timeout: 30000\n}).should('be.visible');\ncy.verifyAxes(0, 5, 0);\ncy.log('Y moved to 5mm');\n// Zero Y axis\ncy.log('Zeroing Y axis...');\ncy.get('button', {\n  timeout: 3000\n}).contains('span.font-mono', 'Y0').parent().should('be.visible').scrollIntoView().click({\n  force: true\n});\ncy.wait(waitAfter);\ncy.unlockMachineIfNeeded();\ncy.wait(1000);\ncy.log('Y axis zeroed');\n// Step 6: Test Z-axis movement and zeroing\ncy.log('Step 6: Testing Z-axis...');\ncy.forceInput('div.gap-1 > div.items-center > div > div:nth-of-type(2) input', '5');\ncy.wait(500);\ncy.get('path[d=\"M0.5 10C0.5 4.75329 4.75329 0.5 10 0.5H40C45.2467 0.5 49.5 4.7533 49.5 10V88.5H0.5V10Z\"]').should('exist').click({\n  force: true\n});\ncy.wait(3000);\ncy.unlockMachineIfNeeded();\ncy.wait(1000);\ncy.contains(/^Idle$/i, {\n  timeout: 30000\n}).should('be.visible');\ncy.verifyAxes(0, 0, 5);\ncy.log('Z moved to 5mm');\n// Zero Z axis\ncy.log('Zeroing Z axis...');\ncy.get('button', {\n  timeout: 3000\n}).contains('span.font-mono', 'Z0').parent().should('be.visible').scrollIntoView().click({\n  force: true\n});\ncy.wait(waitAfter);\ncy.unlockMachineIfNeeded();\ncy.wait(1000);\ncy.log('Z axis zeroed');\ncy.log('All axes tested and zeroed successfully');\n// Testing go to X axis zero\n// Click on console tab \ncy.log('Step 7: Opening Console tab...');\ncy.get('button').contains('Console').should('be.visible').click();\ncy.wait(1000);\ncy.log(' Console tab opened');\n// Step 8: Click X button to go to X=0\ncy.log('Step 8: Clicking X button to go to X=0...');\ncy.get('button.bg-robin-500').find('span.font-mono').contains('X').parent().should('be.visible').click();\ncy.wait(3000);\ncy.unlockMachineIfNeeded();\ncy.wait(1000);\ncy.contains(/^Idle$/i, {\n  timeout: 30000\n}).should('be.visible');\ncy.log(' X button clicked');\n// Verify console lines has values for go to X axis 0 \ncy.log('Step 9: Verifying console contains details about moving to X zero axis...');\ncy.verifyConsoleContains('G90 G0 X0', 'ok');\ncy.log('X axis go to zero verified');\n// Step 10: Click Y button to go to Y=0\ncy.log('Step 10: Clicking Y button to go to Y=0...');\ncy.get('button.bg-robin-500').find('span.font-mono').contains('Y').parent().should('be.visible').click();\ncy.wait(3000);\ncy.unlockMachineIfNeeded();\ncy.wait(1000);\ncy.contains(/^Idle$/i, {\n  timeout: 30000\n}).should('be.visible');\ncy.log(' Y button clicked');\n// Verify console lines has values for go to Y axis 0 \ncy.log('Step 11: Verifying console contains details about moving to Y zero axis...');\ncy.verifyConsoleContains('G90 G0 Y0', 'ok');\ncy.log('Y axis go to zero verified');\n// Step 12: Click Z button to go to Z=0\ncy.log('Step 12: Clicking Z button to go to Z=0...');\ncy.get('button.bg-robin-500').find('span.font-mono').contains('Z').parent().should('be.visible').click();\ncy.wait(3000);\ncy.unlockMachineIfNeeded();\ncy.wait(1000);\ncy.contains(/^Idle$/i, {\n  timeout: 30000\n}).should('be.visible');\ncy.log('Z button clicked');\n// Verify console lines has values for go to Z axis 0 \ncy.log('Step 13: Verifying console contains details about moving to Z zero axis...');\ncy.verifyConsoleContains('G90 G0 Z0', 'ok');\ncy.log(' Z axis go to zero verified');\n// Step 14: Click XY button to go to XY=0\ncy.log('Step 14: Clicking XY button to go to XY=0...');\ncy.get('button.bg-robin-500').find('span.font-mono').contains('XY').parent().should('be.visible').click();\ncy.wait(3000);\ncy.unlockMachineIfNeeded();\ncy.wait(1000);\ncy.contains(/^Idle$/i, {\n  timeout: 30000\n}).should('be.visible');\ncy.log('XY button clicked');\n// Verify console lines has values for go to XY axis 0 \ncy.log('Step 15: Verifying console contains details about moving to XY zero axes...');\ncy.verifyConsoleContains('G90 G0 X0 Y0', 'ok');\ncy.log('XY axes go to zero verified');\ncy.log('All go-to-zero operations completed and verified successfully');",
+              "err": {},
+              "uuid": "7ededa53-d299-4e79-88d7-812722e91b5b",
+              "parentUUID": "1601d1ee-2cd5-485e-a779-71209badb78f",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "7ededa53-d299-4e79-88d7-812722e91b5b"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 78376,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        },
+        {
+          "uuid": "b2c465f0-226f-4e11-97ea-1a097106cdaa",
+          "title": "CNC Visualizer rendering test case",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Connects to CNC, uploads file, and verifies visualizer + file info",
+              "fullTitle": "CNC Visualizer rendering test case Connects to CNC, uploads file, and verifies visualizer + file info",
+              "timedOut": null,
+              "duration": 23154,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "const fileName = 'sample.gcode';\n// Step 1: Connect to CNC Machine\ncy.log('Step 1: Connecting to CNC machine...');\ncy.connectMachine();\ncy.wait(6000);\ncy.log('Connected to CNC');\n// Step 2: Check for unlock popup and click if present\ncy.log('Step 2: Checking for unlock popup...');\ncy.get('body').then($body => {\n  if ($body.find('#app > div > div.border div.mt-4 button').length > 0) {\n    cy.log('Unlock popup found - clicking to unlock...');\n    cy.get('#app > div > div.border div.mt-4 button').click({\n      force: true\n    });\n    cy.wait(2000);\n    cy.log('Machine unlocked');\n  } else {\n    cy.log('No unlock popup - machine ready');\n  }\n});\n// Step 3: Verify visualizer exists BEFORE file upload\ncy.log('Step 3: Checking visualizer UI before file upload...');\ncy.get('#visualizer-wrapper', {\n  timeout: 10000\n}).should('be.visible').then(() => cy.log('Visualizer container exists before upload'));\ncy.get('#visualizer-wrapper canvas', {\n  timeout: 10000\n}).should('be.visible').then(() => cy.log('Visualizer canvas exists before upload'));\ncy.contains('button', 'Outline').then($outlineBtn => {\n  if ($outlineBtn.length > 0) {\n    const isDisabled = $outlineBtn.is(':disabled') || $outlineBtn.hasClass('disabled');\n    const isVisible = $outlineBtn.is(':visible');\n    cy.log(`  BEFORE upload - Outline button: exists=true, visible=${isVisible}, disabled=${isDisabled}`);\n  }\n});\ncy.contains('button', 'Start From').then($startBtn => {\n  if ($startBtn.length > 0) {\n    const isDisabled = $startBtn.is(':disabled') || $startBtn.hasClass('disabled');\n    const isVisible = $startBtn.is(':visible');\n    cy.log(`  BEFORE upload - Start From button: exists=true, visible=${isVisible}, disabled=${isDisabled}`);\n  }\n});\n// Step 5: Upload file\ncy.log(`Step 5: Uploading file: ${fileName}...`);\ncy.uploadGcodeFile(fileName);\ncy.wait(3000);\n// Step 6: Verify uploaded file name\ncy.log('Step 6: Verifying uploaded file name...');\ncy.get('h2.inline-block.text-lg.font-bold', {\n  timeout: 15000\n}).should('be.visible').invoke('text').then(text => {\n  const trimmedName = text.trim();\n  cy.log(`Uploaded file: ${trimmedName}`);\n  expect(trimmedName).to.contain('.gcode');\n});\n// Step 7: Verify visualizer AFTER file upload\ncy.log('Step 7: Checking visualizer UI after file upload...');\ncy.get('#visualizer-wrapper', {\n  timeout: 10000\n}).should('be.visible').then(() => cy.log('Visualizer container visible after upload'));\ncy.get('#visualizer-wrapper canvas', {\n  timeout: 15000\n}).should('be.visible').and($canvas => {\n  expect($canvas.attr('width')).to.exist;\n  expect($canvas.attr('height')).to.exist;\n}).then(() => cy.log('Visualizer canvas loaded with file content'));\n// Step 8: Verify \"Outline\" button state after upload\ncy.log('Step 8: Verifying Outline button state after upload...');\ncy.contains('button', 'Outline', {\n  timeout: 10000\n}).should('be.visible').and('not.be.disabled').then($btn => {\n  cy.log(' Outline button is visible and enabled after upload');\n  cy.wrap($btn).parents().first().invoke('attr', 'id').then(parentId => {\n    cy.log(`  Outline button parent container: ${parentId || 'no ID'}`);\n  });\n});\n// Step 9: Verify \"Start From\" button state AFTER upload\ncy.log('Step 9: Verifying Start From button state after upload...');\ncy.contains('button', 'Start From', {\n  timeout: 10000\n}).should('be.visible').and('not.be.disabled').then($btn => {\n  cy.log('Start From button is visible and enabled after upload');\n  cy.wrap($btn).parents().first().invoke('attr', 'id').then(parentId => {\n    cy.log(`  Start From button parent container: ${parentId || 'no ID'}`);\n  });\n});\n// Step 10: Final confirmation\ncy.log('Step 10: Test Complete');\ncy.log(' File uploaded and visualized in the UI');\ncy.log('Outline button is visible and enabled after upload');\ncy.log('Start From button is visible and enabled after upload');",
+              "err": {},
+              "uuid": "a9192e29-9855-4222-99b3-e907f91c8052",
+              "parentUUID": "b2c465f0-226f-4e11-97ea-1a097106cdaa",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "a9192e29-9855-4222-99b3-e907f91c8052"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 23154,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        },
+        {
+          "uuid": "8cddf4bb-4c4d-422d-9e01-3ec07f1b1e3b",
+          "title": "Job Run Test in grblHal without homing",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Test Case: Connect, Upload File, Run Job and Collect Details",
+              "fullTitle": "Job Run Test in grblHal without homing Test Case: Connect, Upload File, Run Job and Collect Details",
+              "timedOut": null,
+              "duration": 60996,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "let jobStartTime = null;\nlet jobEndTime = null;\n// Step 1: Connect to CNC\ncy.log('Step 1: Connecting to CNC...');\ncy.connectMachine();\ncy.wait(6000);\ncy.log('Connected to CNC');\n// Handle unlock if needed\ncy.unlockMachineIfNeeded();\n// Step 2: Verify CNC machine status is Idle\ncy.log('Step 2: Verifying machine status...');\ncy.verifyMachineStatus('Idle');\ncy.wait(2000);\n// Step 3: Upload File using custom command\ncy.log('Step 3: Uploading G-code file...');\ncy.uploadGcodeFile();\ncy.log('File Uploaded');\ncy.wait(2000);\n// Step 4: Starting Job\ncy.log('Step 4: Starting Job...');\ncy.then(() => {\n  jobStartTime = Date.now();\n  cy.log(`Job Start Time: ${new Date(jobStartTime).toISOString()}`);\n});\ncy.get('div.top-\\\\[-30px\\\\] > div:nth-of-type(1) > button').contains('Start').should('be.visible').click({\n  force: true\n});\ncy.wait(2000);\ncy.log(' Job started');\n// Step 5: Verify job is running\ncy.log('Step 5: Verifying job is running...');\ncy.verifyMachineStatus('Running');\n// Step 6: Wait for job completion\ncy.log('Step 6: Waiting for job completion...');\ncy.contains(/^Idle$/i, {\n  timeout: 120000\n}).should('be.visible').then(status => {\n  jobEndTime = Date.now();\n  cy.log(`Job completed. Status: \"${status.text().trim()}\"`);\n  cy.log(`Job End Time: ${new Date(jobEndTime).toISOString()}`);\n  cy.log(`Total Job Duration: ${((jobEndTime - jobStartTime) / 1000).toFixed(2)}s`);\n});\ncy.wait(3000);\n// Step 7: Extract and verify job completion details from popup\ncy.log('Step 7: Extracting job completion details...');\n// Verify popup is visible\ncy.contains('h2', 'Job End').should('be.visible');\n// Extract Status (COMPLETE)\ncy.contains('strong', 'Status:').parent().find('span.text-green-500').should('be.visible').invoke('text').then(statusText => {\n  const status = statusText.trim();\n  cy.log(`Job Status: ${status}`);\n  expect(status).to.equal('COMPLETE');\n  cy.wrap(status).as('jobStatus');\n});\n// Extract Time taken\ncy.contains('strong', 'Time:').next('span').should('be.visible').invoke('text').then(timeText => {\n  const timeTaken = timeText.trim();\n  cy.log(`Time Taken: ${timeTaken}`);\n  cy.wrap(timeTaken).as('timeTaken');\n});\n// Verify no errors\ncy.contains('strong', 'Errors:').next('span').should('be.visible').invoke('text').then(errorText => {\n  const errors = errorText.trim();\n  cy.log(`Errors: ${errors}`);\n  expect(errors).to.equal('None');\n  cy.wrap(errors).as('jobErrors');\n});\ncy.wait(1000);\n// Step 8: Display final summary\ncy.log('Step 8: Final Job Summary...');\ncy.get('@jobStatus').then(status => {\n  cy.get('@timeTaken').then(time => {\n    cy.get('@jobErrors').then(errors => {\n      cy.log('       JOB COMPLETION SUMMARY       ');\n      cy.log(`Status: ${status}`);\n      cy.log(`Time Taken: ${time}`);\n      cy.log(`Errors: ${errors}`);\n      const duration = jobEndTime && jobStartTime ? ((jobEndTime - jobStartTime) / 1000).toFixed(2) : 'N/A';\n      cy.log(`Total Duration: ${duration}s`);\n    });\n  });\n});\n// Step 9: Close the job completion popup\ncy.log('Step 9: Closing job completion popup...');\ncy.contains('button', 'Close').should('be.visible').click({\n  force: true\n});\ncy.wait(1000);\ncy.log('Popup closed');\n// Step 10: Verify popup is closed\ncy.log('Step 10: Verifying popup is closed...');\ncy.contains('h2', 'Job End').should('not.exist');\ncy.log('Popup successfully closed');\n// Step 11: Save job details to file\ncy.log('Step 11: Saving job details...');\ncy.get('@jobStatus').then(status => {\n  cy.get('@timeTaken').then(time => {\n    cy.get('@jobErrors').then(errors => {\n      const jobDetails = {\n        testName: 'Simple Job Run Test',\n        timestamp: new Date().toISOString(),\n        jobStartTime: new Date(jobStartTime).toISOString(),\n        jobEndTime: new Date(jobEndTime).toISOString(),\n        jobDuration: jobEndTime && jobStartTime ? (jobEndTime - jobStartTime) / 1000 : 0,\n        status: status,\n        timeTaken: time,\n        errors: errors\n      };\n      cy.writeFile('cypress/results/job-run-details.json', jobDetails);\n      cy.log('Job details saved to: cypress/results/job-run-details.json');\n    });\n  });\n});\ncy.log('JOB RUN TEST COMPLETED SUCCESSFULLY');",
+              "err": {},
+              "uuid": "bff828df-0a9f-4bbb-9e53-1618ae88ac89",
+              "parentUUID": "8cddf4bb-4c4d-422d-9e01-3ec07f1b1e3b",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "bff828df-0a9f-4bbb-9e53-1618ae88ac89"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 60996,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        },
+        {
+          "uuid": "0064679a-5a76-4b97-8a5e-b263e7ea5b66",
+          "title": "Coolant Testing  ",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Apply coolant mist, flood and Off option",
+              "fullTitle": "Coolant Testing   Apply coolant mist, flood and Off option",
+              "timedOut": null,
+              "duration": 41142,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "// Step 1: Connect to CNC\ncy.log('Step 1: Connecting to CNC...');\ncy.connectMachine();\ncy.wait(6000);\ncy.log('Connected to CNC');\n// Handle unlock if needed\ncy.unlockMachineIfNeeded();\n// Step 2: Verify CNC machine status is Idle\ncy.log('Step 2: Verifying machine status...');\ncy.verifyMachineStatus('Idle');\ncy.wait(2000);\n// Step 3: Click on Coolant tab\ncy.log('Step 3: Opening Coolant tab...');\ncy.contains('button', 'Coolant', {\n  timeout: 10000\n}).should('be.visible').click();\ncy.wait(1000);\ncy.log('Coolant tab opened');\n// Step 4: Test Mist button\ncy.log('Step 4: Testing Mist coolant...');\ncy.contains('button', 'Mist').should('be.visible').click();\ncy.wait(1000);\n// Verify Mist button is active - log the actual state for debugging\ncy.contains('button', 'Mist').then($button => {\n  const classList = $button.attr('class');\n  const ariaPressed = $button.attr('aria-pressed');\n  const disabled = $button.attr('disabled');\n  cy.log(`Mist button classes: ${classList}`);\n  cy.log(`Mist button aria-pressed: ${ariaPressed}`);\n  cy.log(`Mist button disabled: ${disabled}`);\n  // Check for common active state indicators\n  const isActive = classList.includes('bg-blue') || classList.includes('active') || classList.includes('pressed') || classList.includes('selected') || ariaPressed === 'true';\n  cy.log(`Mist button is active: ${isActive}`);\n});\ncy.wait(2000);\n// Click Off button\ncy.log('Turning off Mist...');\ncy.contains('button', 'Off').should('be.visible').click();\ncy.wait(1000);\n// Verify Mist button state after turning off\ncy.contains('button', 'Mist').then($button => {\n  const classList = $button.attr('class');\n  cy.log(`Mist button classes after Off: ${classList}`);\n});\ncy.wait(2000);\n// Step 5: Test Flood button\ncy.log('Step 5: Testing Flood coolant...');\ncy.contains('button', 'Flood').should('be.visible').click();\ncy.wait(1000);\n// Verify Flood button is active\ncy.contains('button', 'Flood').then($button => {\n  const classList = $button.attr('class');\n  const ariaPressed = $button.attr('aria-pressed');\n  cy.log(`Flood button classes: ${classList}`);\n  cy.log(`Flood button aria-pressed: ${ariaPressed}`);\n  const isActive = classList.includes('bg-blue') || classList.includes('active') || classList.includes('pressed') || classList.includes('selected') || ariaPressed === 'true';\n  cy.log(`Flood button is active: ${isActive}`);\n});\ncy.wait(2000);\n// Click Off button\ncy.log('Turning off Flood...');\ncy.contains('button', 'Off').should('be.visible').click();\ncy.wait(1000);\n// Verify Flood button state after turning off\ncy.contains('button', 'Flood').then($button => {\n  const classList = $button.attr('class');\n  cy.log(`Flood button classes after Off: ${classList}`);\n});\ncy.wait(2000);\n// Step 6: Test Mist and Flood together\ncy.log('Step 6: Testing Mist and Flood together...');\n// Activate Mist\ncy.contains('button', 'Mist').should('be.visible').click();\ncy.wait(1000);\ncy.log('Mist activated');\n// Activate Flood\ncy.contains('button', 'Flood').should('be.visible').click();\ncy.wait(1000);\ncy.log('Flood activated');\n// Log both button states\ncy.contains('button', 'Mist').then($button => {\n  const classList = $button.attr('class');\n  cy.log(`Mist button classes (both active): ${classList}`);\n});\ncy.contains('button', 'Flood').then($button => {\n  const classList = $button.attr('class');\n  cy.log(`Flood button classes (both active): ${classList}`);\n});\ncy.wait(2000);\n// Click Off button to deactivate both\ncy.log('Turning off both Mist and Flood...');\ncy.contains('button', 'Off').should('be.visible').click();\ncy.wait(1000);\n// Verify both buttons are inactive\ncy.contains('button', 'Mist').then($button => {\n  const classList = $button.attr('class');\n  cy.log(`Mist button classes after Off: ${classList}`);\n});\ncy.contains('button', 'Flood').then($button => {\n  const classList = $button.attr('class');\n  cy.log(`Flood button classes after Off: ${classList}`);\n});\ncy.wait(2000);\n// Step 7: Disconnect the machine\ncy.log('Step 7: Disconnecting machine...');\ncy.disconnectIfIdle();\ncy.wait(3000);\ncy.log('Machine disconnected');\n// Step 8: Verify buttons are inactive after disconnection\ncy.log('Step 8: Verifying buttons are inactive after disconnection...');\n// Check Mist button is disabled/inactive\ncy.contains('button', 'Mist').then($button => {\n  const classList = $button.attr('class');\n  const disabled = $button.attr('disabled');\n  const ariaDisabled = $button.attr('aria-disabled');\n  cy.log(`Mist button classes after disconnect: ${classList}`);\n  cy.log(`Mist button disabled: ${disabled}`);\n  cy.log(`Mist button aria-disabled: ${ariaDisabled}`);\n  // Check if button is disabled or inactive\n  const isDisabled = disabled !== undefined || ariaDisabled === 'true' || classList.includes('disabled') || classList.includes('opacity-50') || classList.includes('cursor-not-allowed');\n  cy.log(`Mist button is disabled/inactive: ${isDisabled}`);\n});\n// Check Flood button is disabled/inactive\ncy.contains('button', 'Flood').then($button => {\n  const classList = $button.attr('class');\n  const disabled = $button.attr('disabled');\n  const ariaDisabled = $button.attr('aria-disabled');\n  cy.log(`Flood button classes after disconnect: ${classList}`);\n  cy.log(`Flood button disabled: ${disabled}`);\n  cy.log(`Flood button aria-disabled: ${ariaDisabled}`);\n  // Check if button is disabled or inactive\n  const isDisabled = disabled !== undefined || ariaDisabled === 'true' || classList.includes('disabled') || classList.includes('opacity-50') || classList.includes('cursor-not-allowed');\n  cy.log(`Flood button is disabled/inactive: ${isDisabled}`);\n});\n// Check Off button is disabled/inactive\ncy.contains('button', 'Off').then($button => {\n  const classList = $button.attr('class');\n  const disabled = $button.attr('disabled');\n  const ariaDisabled = $button.attr('aria-disabled');\n  cy.log(`Off button classes after disconnect: ${classList}`);\n  cy.log(`Off button disabled: ${disabled}`);\n  cy.log(`Off button aria-disabled: ${ariaDisabled}`);\n  // Check if button is disabled or inactive\n  const isDisabled = disabled !== undefined || ariaDisabled === 'true' || classList.includes('disabled') || classList.includes('opacity-50') || classList.includes('cursor-not-allowed');\n  cy.log(`Off button is disabled/inactive: ${isDisabled}`);\n});\ncy.log('Coolant test completed successfully');",
+              "err": {},
+              "uuid": "508b75da-3f92-4f63-82af-41a1815285e8",
+              "parentUUID": "0064679a-5a76-4b97-8a5e-b263e7ea5b66",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "508b75da-3f92-4f63-82af-41a1815285e8"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 41142,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        },
+        {
+          "uuid": "92e74174-9e44-453e-bfe3-cad80c469942",
+          "title": "Feedrate Performance Comparison Test",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Should compare job completion times with different feedrates",
+              "fullTitle": "Feedrate Performance Comparison Test Should compare job completion times with different feedrates",
+              "timedOut": null,
+              "duration": 105231,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "// Step 1: Connect to CNC Machine\ncy.log('Step 1: Connecting to CNC Machine');\ncy.connectMachine();\ncy.wait(6000);\ncy.log('Connected to CNC');\n// Handle unlock if needed\ncy.unlockMachineIfNeeded();\n// Verify machine status is Idle\ncy.log('Verifying machine status is Idle...');\ncy.verifyMachineStatus('Idle');\ncy.wait(2000);\n// Step 2: Upload G-code File\ncy.log('Step 2: Uploading G-code File');\ncy.uploadGcodeFile();\ncy.wait(2000);\ncy.log('File uploaded successfully');\n// FIRST JOB RUN - REDUCED FEEDRATE\ncy.log('');\ncy.log('FIRST JOB RUN - REDUCED FEEDRATE');\ncy.log('');\n// Step 3: Start First Job\ncy.log('Step 3: Starting First Job');\ncy.get('div.top-\\\\[-30px\\\\] > div:nth-of-type(1) > button').contains('Start').should('be.visible').click({\n  force: true\n});\ncy.log('First job started');\ncy.wait(2000);\n// Verify job is running\ncy.log('Verifying job is running...');\ncy.verifyMachineStatus('Running');\ncy.wait(2000);\n// Step 4: Capture initial feedrate\ncy.log('Step 4: Capturing Initial Feedrate');\ncy.get('span.w-12').contains(/\\d+%/).invoke('text').then(initialFeedrate => {\n  cy.log(`Initial Feedrate: ${initialFeedrate}`);\n  cy.wrap(initialFeedrate).as('firstJobInitialFeedrate');\n});\n// Step 5: Click Minus Button 5 Times\n// Step 5: Decrease feedrate\nfor (let i = 0; i < 5; i++) {\n  cy.get('div.order-2 section > div > div > div > div:nth-of-type(1) div:nth-of-type(2) > button').should('be.visible').click({\n    force: true\n  });\n  cy.wait(500);\n  cy.log(`Minus click ${i + 1}/5`);\n}\n// Wait for acceleration/deceleration to apply\ncy.log('Waiting for feedrate change to apply (acceleration/deceleration)...');\ncy.wait(3000);\n// Record feedrate after decrease\ncy.get('span.w-12').contains(/\\d+%/).invoke('text').then(reducedFeedrate => {\n  cy.log(`Feedrate after 5 minus clicks: ${reducedFeedrate}`);\n  cy.wrap(reducedFeedrate).as('firstJobFeedrate');\n});\ncy.wait(1000);\n// Step 6: Wait for First Job to Complete\ncy.log('Step 6: Waiting for First Job to Complete');\ncy.contains(/^Idle$/i, {\n  timeout: 300000\n}).should('be.visible').then(status => {\n  cy.log(`Machine status: \"${status.text().trim()}\" - First job completed`);\n});\ncy.wait(2000);\n// Step 7: Extract job details from popup\ncy.log('Step 7: Extracting First Job Details from Popup');\n// Verify popup is visible\ncy.contains('h2', 'Job End').should('be.visible');\n// Extract Status\ncy.contains('strong', 'Status:').parent().find('span.text-green-500').should('be.visible').invoke('text').then(statusText => {\n  const status = statusText.trim();\n  cy.log(`First Job Status: ${status}`);\n  expect(status).to.equal('COMPLETE');\n  cy.wrap(status).as('firstJobStatus');\n});\n// Extract Time taken from popup\ncy.contains('strong', 'Time:').next('span').should('be.visible').invoke('text').then(timeText => {\n  const timeTaken = timeText.trim();\n  cy.log(`FIRST JOB TIME TAKEN: ${timeTaken}`);\n  cy.wrap(timeTaken).as('firstJobTime');\n});\n// Verify no errors\ncy.contains('strong', 'Errors:').next('span').should('be.visible').invoke('text').then(errorText => {\n  const errors = errorText.trim();\n  cy.log(`First Job Errors: ${errors}`);\n  expect(errors).to.equal('None');\n});\ncy.wait(1000);\n// Close popup after first job completion\ncy.log('Closing first job completion popup...');\ncy.contains('button', 'Close').should('be.visible').click({\n  force: true\n});\ncy.wait(1000);\ncy.log('Popup closed');\n// Verify popup is closed\ncy.contains('h2', 'Job End').should('not.exist');\ncy.wait(2000);\n// SECOND JOB RUN - INCREASED FEEDRATE\ncy.log('');\ncy.log('SECOND JOB RUN - INCREASED FEEDRATE');\ncy.log('');\n// Step 8: Start Second Job\ncy.log('Step 8: Starting Second Job');\ncy.get('div.top-\\\\[-30px\\\\] > div:nth-of-type(1) > button').contains('Start').should('be.visible').click({\n  force: true\n});\ncy.log('Second job started');\ncy.wait(2000);\n// Verify job is running\ncy.verifyMachineStatus('Running');\ncy.wait(2000);\n// Capture initial feedrate for second job\ncy.log('Capturing initial feedrate for second job...');\ncy.get('span.w-12').contains(/\\d+%/).invoke('text').then(initialFeedrate => {\n  cy.log(`Initial Feedrate: ${initialFeedrate}`);\n  cy.wrap(initialFeedrate).as('secondJobInitialFeedrate');\n});\n// Step 9: Increase feedrate\nfor (let i = 0; i < 5; i++) {\n  cy.get('div.h-\\\\[25\\\\%\\\\] section > div > div > div > div:nth-of-type(1) div:nth-of-type(3) svg').should('be.visible').click({\n    force: true\n  });\n  cy.wait(500);\n  cy.log(`Plus click ${i + 1}/5`);\n}\n// Wait for acceleration/deceleration to apply\ncy.log('Waiting for feedrate change to apply (acceleration/deceleration)...');\ncy.wait(3000);\n// Record feedrate after increase\ncy.get('span.w-12').contains(/\\d+%/).invoke('text').then(increasedFeedrate => {\n  cy.log(`Feedrate after 5 plus clicks: ${increasedFeedrate}`);\n  cy.wrap(increasedFeedrate).as('secondJobFeedrate');\n});\ncy.wait(1000);\n// Step 10: Wait for Second Job to Complete\ncy.log('Step 10: Waiting for Second Job to Complete');\ncy.contains(/^Idle$/i, {\n  timeout: 300000\n}).should('be.visible').then(status => {\n  cy.log(`Machine status: \"${status.text().trim()}\" - Second job completed`);\n});\ncy.wait(2000);\n// Step 11: Extract second job details from popup\ncy.log('Step 11: Extracting Second Job Details from Popup');\n// Verify popup is visible\ncy.contains('h2', 'Job End').should('be.visible');\n// Extract Status\ncy.contains('strong', 'Status:').parent().find('span.text-green-500').should('be.visible').invoke('text').then(statusText => {\n  const status = statusText.trim();\n  cy.log(`Second Job Status: ${status}`);\n  expect(status).to.equal('COMPLETE');\n  cy.wrap(status).as('secondJobStatus');\n});\n// Extract Time taken from popup\ncy.contains('strong', 'Time:').next('span').should('be.visible').invoke('text').then(timeText => {\n  const timeTaken = timeText.trim();\n  cy.log(`SECOND JOB TIME TAKEN: ${timeTaken}`);\n  cy.wrap(timeTaken).as('secondJobTime');\n});\n// Verify no errors\ncy.contains('strong', 'Errors:').next('span').should('be.visible').invoke('text').then(errorText => {\n  const errors = errorText.trim();\n  cy.log(`Second Job Errors: ${errors}`);\n  expect(errors).to.equal('None');\n});\ncy.wait(1000);\n// Close popup after second job completion\ncy.log('Closing second job completion popup...');\ncy.contains('button', 'Close').should('be.visible').click({\n  force: true\n});\ncy.wait(1000);\ncy.log('Popup closed');\n// Verify popup is closed\ncy.contains('h2', 'Job End').should('not.exist');\n// FINAL COMPARISON AND CONCLUSION\ncy.log('');\ncy.log('FEEDRATE PERFORMANCE ANALYSIS');\ncy.log('');\n// Helper function to parse time string in HH:MM:SS format\nfunction parseTimeToSeconds(timeStr) {\n  cy.log(`Parsing time string: \"${timeStr}\"`);\n  let totalSeconds = 0;\n  // Handle HH:MM:SS or MM:SS format\n  if (timeStr.includes(':')) {\n    const parts = timeStr.split(':').map(p => parseInt(p.trim()));\n    if (parts.length === 3) {\n      // HH:MM:SS format\n      totalSeconds = parts[0] * 3600 + parts[1] * 60 + parts[2];\n      cy.log(`Parsed as HH:MM:SS: ${parts[0]}h ${parts[1]}m ${parts[2]}s`);\n    } else if (parts.length === 2) {\n      // MM:SS format\n      totalSeconds = parts[0] * 60 + parts[1];\n      cy.log(`Parsed as MM:SS: ${parts[0]}m ${parts[1]}s`);\n    }\n  }\n  // Fallback: Try format \"1m 23s\" or \"45s\"\n  else {\n    const minuteMatch = timeStr.match(/(\\d+)\\s*m/i);\n    const secondMatch = timeStr.match(/(\\d+)\\s*s/i);\n    if (minuteMatch) totalSeconds += parseInt(minuteMatch[1]) * 60;\n    if (secondMatch) totalSeconds += parseInt(secondMatch[1]);\n  }\n  if (totalSeconds === 0) {\n    cy.log(`WARNING: Could not parse time from \"${timeStr}\"`);\n  } else {\n    cy.log(`Total seconds: ${totalSeconds}`);\n  }\n  return totalSeconds;\n}\ncy.get('@firstJobInitialFeedrate').then(firstInitial => {\n  cy.get('@firstJobFeedrate').then(firstFeedrate => {\n    cy.get('@firstJobTime').then(firstTime => {\n      cy.get('@secondJobInitialFeedrate').then(secondInitial => {\n        cy.get('@secondJobFeedrate').then(secondFeedrate => {\n          cy.get('@secondJobTime').then(secondTime => {\n            const firstSeconds = parseTimeToSeconds(firstTime);\n            const secondSeconds = parseTimeToSeconds(secondTime);\n            // Validate parsing\n            if (firstSeconds === 0 || secondSeconds === 0) {\n              cy.log('ERROR: Failed to parse time values');\n              cy.log(`First job time: \"${firstTime}\" -> ${firstSeconds}s`);\n              cy.log(`Second job time: \"${secondTime}\" -> ${secondSeconds}s`);\n              return;\n            }\n            const timeDifference = Math.abs(firstSeconds - secondSeconds);\n            const percentageDiff = (timeDifference / Math.max(firstSeconds, secondSeconds) * 100).toFixed(2);\n            // Format time difference\n            const diffHours = Math.floor(timeDifference / 3600);\n            const diffMin = Math.floor(timeDifference % 3600 / 60);\n            const diffSec = timeDifference % 60;\n            let timeDiffStr = '';\n            if (diffHours > 0) timeDiffStr += `${diffHours}h `;\n            if (diffMin > 0) timeDiffStr += `${diffMin}m `;\n            timeDiffStr += `${diffSec}s`;\n            cy.log('');\n            cy.log('FIRST JOB (Reduced Feedrate):');\n            cy.log(`  Initial Feedrate: ${firstInitial}`);\n            cy.log(`  Final Feedrate: ${firstFeedrate}`);\n            cy.log(`  Time Taken: ${firstTime} (${firstSeconds} seconds)`);\n            cy.log('');\n            cy.log('SECOND JOB (Increased Feedrate):');\n            cy.log(`  Initial Feedrate: ${secondInitial}`);\n            cy.log(`  Final Feedrate: ${secondFeedrate}`);\n            cy.log(`  Time Taken: ${secondTime} (${secondSeconds} seconds)`);\n            cy.log('');\n            cy.log('TIME DIFFERENCE:');\n            cy.log(`  ${timeDiffStr}`);\n            cy.log(`  Percentage difference: ${percentageDiff}%`);\n            cy.log('');\n            // Determine which job completed first\n            if (secondSeconds < firstSeconds) {\n              cy.log('CONCLUSION:');\n              cy.log('SECOND JOB COMPLETED FIRST (Higher Feedrate)');\n              cy.log(`  Feedrate: ${secondFeedrate}`);\n              cy.log(`  Time: ${secondTime}`);\n              cy.log(`  Faster by: ${timeDiffStr} (${percentageDiff}% improvement)`);\n            } else if (firstSeconds < secondSeconds) {\n              cy.log('CONCLUSION:');\n              cy.log('FIRST JOB COMPLETED FIRST (Lower Feedrate)');\n              cy.log(`  Feedrate: ${firstFeedrate}`);\n              cy.log(`  Time: ${firstTime}`);\n              cy.log(`  Slower by: ${timeDiffStr} (${percentageDiff}% slower)`);\n              cy.log('  Note: This is unexpected - higher feedrate should be faster');\n            } else {\n              cy.log('CONCLUSION:');\n              cy.log('Both jobs completed in exactly the same time');\n            }\n            cy.log('');\n            cy.log('Feedrate performance comparison test completed successfully');\n            // Save comparison results to file\n            const comparisonResults = {\n              testName: 'Feedrate Performance Comparison',\n              timestamp: new Date().toISOString(),\n              firstJob: {\n                initialFeedrate: firstInitial,\n                finalFeedrate: firstFeedrate,\n                timeTaken: firstTime,\n                timeInSeconds: firstSeconds\n              },\n              secondJob: {\n                initialFeedrate: secondInitial,\n                finalFeedrate: secondFeedrate,\n                timeTaken: secondTime,\n                timeInSeconds: secondSeconds\n              },\n              comparison: {\n                timeDifferenceSeconds: timeDifference,\n                timeDifference: timeDiffStr,\n                percentageDifference: percentageDiff + '%',\n                fasterJob: secondSeconds < firstSeconds ? 'Second Job (Higher Feedrate)' : firstSeconds < secondSeconds ? 'First Job (Lower Feedrate)' : 'Tie',\n                conclusion: secondSeconds < firstSeconds ? 'Higher feedrate resulted in faster completion as expected' : firstSeconds < secondSeconds ? 'Unexpected result - lower feedrate was faster' : 'Both jobs took the same time'\n              }\n            };\n            cy.writeFile('cypress/results/feedrate-comparison.json', comparisonResults);\n            cy.log('Comparison results saved to: cypress/results/feedrate-comparison.json');\n          });\n        });\n      });\n    });\n  });\n});",
+              "err": {},
+              "uuid": "700b4b8e-939b-43f8-af79-9346ac7bfbb3",
+              "parentUUID": "92e74174-9e44-453e-bfe3-cad80c469942",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "700b4b8e-939b-43f8-af79-9346ac7bfbb3"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 105231,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        },
+        {
+          "uuid": "be0bf3bc-01df-485f-b126-6c7f32109e4a",
+          "title": "Macros Upload, Execution and Verification Test",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Upload and run macro with success message verify the output",
+              "fullTitle": "Macros Upload, Execution and Verification Test Upload and run macro with success message verify the output",
+              "timedOut": null,
+              "duration": 114330,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "// Step 1: Load the application and connect to CNC\ncy.log('STEP 1: Loading Application & Connecting to CNC ===');\n// Visit the main page directly\ncy.visit(`${Cypress.config('baseUrl')}/#/`, {\n  timeout: 30000,\n  failOnStatusCode: false\n});\n// Wait for page to be ready\ncy.wait(3000);\n// Connect to machine\ncy.connectMachine();\ncy.wait(6000);\ncy.log('Connected to CNC');\n// Handle unlock if needed after connection\ncy.unlockMachineIfNeeded();\ncy.wait(2000);\n// Verify machine is in Idle state\ncy.log('Verifying machine status...');\ncy.contains(/^Idle$/i, {\n  timeout: 30000\n}).should('be.visible').then(() => {\n  cy.log('Machine is Idle');\n});\n// Handle unlock again if alarm 11 occurred during idle\ncy.log('Checking for alarm during idle state...');\ncy.unlockMachineIfNeeded();\ncy.wait(1000);\ncy.log('Machine ready (alarm handled if present)');\n// Handle unlock if needed after navigation\ncy.unlockMachineIfNeeded();\ncy.wait(1000);\n// Make x axis zero \ncy.zeroXAxis();\n//Make y axis zero\ncy.zeroYAxis();\n// Step 5: Click on Macros tab\ncy.log('=== STEP 5: Open Macros Tab ===');\ncy.get('button', {\n  timeout: 15000\n}).contains(/Macros/i).should('be.visible').click();\ncy.wait(2000);\ncy.log('Macros tab opened');\n// Step 6: Upload macro file and verify success message\ncy.log('=== STEP 6: Upload Macro File ===');\n// Click Import button\ncy.get('button').contains(/Import/i).should('be.visible').click();\ncy.wait(1000);\ncy.log('Import dialog opened');\n// Upload the file\ncy.log('Uploading file: macrosample.json');\ncy.get('body').then($body => {\n  const fileInputs = $body.find('input[type=\"file\"]');\n  cy.log(`Found ${fileInputs.length} file input(s)`);\n});\ncy.get('input[type=\"file\"]').then($inputs => {\n  if ($inputs.length > 1) {\n    cy.log(`Multiple file inputs found (${$inputs.length}), using the last one`);\n    cy.wrap($inputs.last()).selectFile('cypress/fixtures/macrosample.json', {\n      force: true\n    });\n  } else {\n    cy.wrap($inputs.first()).selectFile('cypress/fixtures/macrosample.json', {\n      force: true\n    });\n  }\n});\ncy.wait(2000);\ncy.log('File upload initiated');\n// Check for success toast/popup message\ncy.log('Checking for success message...');\ncy.get('section ol li', {\n  timeout: 10000\n}).should('exist').and('be.visible').then($toast => {\n  const toastText = $toast.text().trim();\n  cy.log(`Success message displayed: \"${toastText}\"`);\n  const hasSuccessMessage = /uploaded|imported|success|added|macro/i.test(toastText.toLowerCase());\n  if (hasSuccessMessage) {\n    cy.log('Success message verified');\n  } else {\n    cy.log(`Warning: Unexpected message text: ${toastText}`);\n  }\n});\n// Close the toast notification\ncy.log('Closing success message popup...');\ncy.get('section button svg', {\n  timeout: 5000\n}).first().should('exist').click({\n  force: true\n});\ncy.wait(1000);\ncy.log('Success popup closed');\n// Verify the uploaded macro appears in the list\ncy.log('Verifying macro appears in list...');\ncy.get('div.flex-grow span', {\n  timeout: 10000\n}).contains(/X plus jogging/i).should('be.visible').then($macro => {\n  const macroName = $macro.text().trim();\n  cy.log(`Macro found in list: \"${macroName}\"`);\n  cy.wrap(macroName).as('macroName');\n});\n// Step 7: Click on macro name to run it and verify success\ncy.log('=== STEP 7: Run Macro and Verify Execution Success ===');\n// Handle unlock before running macro\ncy.unlockMachineIfNeeded();\ncy.wait(1000);\n// Click on the macro name to execute it\ncy.get('div.flex-grow span').contains(/X plus jogging/i).should('be.visible').click();\ncy.wait(2000);\ncy.log('Macro clicked to execute');\n// Check for execution success toast/popup message\ncy.log('Checking for execution success message...');\ncy.get('section ol li', {\n  timeout: 15000\n}).should('exist').and('be.visible').then($toast => {\n  const toastText = $toast.text().trim();\n  cy.log(`Execution message displayed: \"${toastText}\"`);\n  const hasExecutionMessage = /running|executed|started|success|completed|macro/i.test(toastText.toLowerCase());\n  if (hasExecutionMessage) {\n    cy.log('Execution message verified');\n  } else {\n    cy.log(`Warning: Unexpected execution message: ${toastText}`);\n  }\n});\n// Close the execution success popup\ncy.log('Closing execution success popup...');\ncy.get('section button svg', {\n  timeout: 5000\n}).first().should('exist').click({\n  force: true\n});\ncy.wait(1000);\ncy.log('Execution success popup closed');\ncy.log('MACRO TEST COMPLETED SUCCESSFULLY');\ncy.wait(2000);\n// Step 9: Navigate back to Macros tab to edit the macro\ncy.log('=== STEP 9: Navigate to Macros to Edit ===');\ncy.visit(`${Cypress.config('baseUrl')}/#/`, {\n  timeout: 20000,\n  failOnStatusCode: false\n});\ncy.wait(3000);\n// Handle unlock if needed\ncy.unlockMachineIfNeeded();\ncy.wait(1000);\n// Open Macros tab\ncy.get('button', {\n  timeout: 15000\n}).contains(/Macros/i).should('be.visible').click();\ncy.wait(2000);\ncy.log('Macros tab opened for editing');\n// Step 10: Click three dots menu and then Edit\ncy.log('=== STEP 10: Open Three Dots Menu and Click Edit ===');\n// Find the first macro row with the matching name\ncy.log('Looking for X plus jogging macro...');\ncy.get('div.flex-grow span').contains(/X plus jogging/i).should('be.visible').parents('div.flex.items-center.justify-between.rounded-md').first().within(() => {\n  // Click the three dots menu button (ellipsis icon)\n  cy.log('Clicking three dots menu...');\n  cy.get('svg[viewBox=\"0 0 512 512\"]').parent('button').should('be.visible').click({\n    force: true\n  });\n});\ncy.wait(1000);\ncy.log('Three dots menu opened');\n// Click on \"Edit\" option from the dropdown menu\ncy.log('Clicking Edit option...');\ncy.contains('span', /^Edit$/i, {\n  timeout: 10000\n}).should('be.visible').click();\ncy.wait(2000);\ncy.log('Edit dialog opened');\n// Step 11: Update macro fields\ncy.log('=== STEP 11: Update Macro Fields ===');\n// Update Name field\ncy.log('Updating macro name...');\ncy.get('div.my-4 input', {\n  timeout: 10000\n}).should('be.visible').clear().type('X Minus jogging Editing ');\ncy.wait(500);\ncy.log('Name updated to: X Minus jogging Editing');\n// Update G-code field\ncy.log('Updating G-code...');\ncy.get('div:nth-of-type(3) > textarea', {\n  timeout: 10000\n}).should('be.visible').clear().type('$J=G21 G91 X-10 F6000\\n$$', {\n  delay: 10\n});\ncy.wait(500);\ncy.log('G-code updated');\n// Update Description field\ncy.log('Updating description...');\ncy.get('div:nth-of-type(4) > textarea', {\n  timeout: 10000\n}).should('be.visible').clear().type('This is a test data');\ncy.wait(500);\ncy.log('Description updated to: This is a test data');\n// Save the changes\ncy.log('Saving macro changes...');\ncy.contains('button', /Update Macro/i, {\n  timeout: 10000\n}).should('be.visible').click();\ncy.wait(2000);\ncy.log('Macro changes saved');\n// Check for success message\ncy.log('Checking for update success message...');\ncy.get('body').then($body => {\n  if ($body.find('section ol li').length > 0) {\n    cy.get('section ol li', {\n      timeout: 10000\n    }).should('exist').and('be.visible').then($toast => {\n      const toastText = $toast.text().trim();\n      cy.log(`Update message displayed: \"${toastText}\"`);\n    });\n    // Close success popup if present\n    if ($body.find('section button svg').length > 0) {\n      cy.get('section button svg').first().click({\n        force: true\n      });\n      cy.wait(1000);\n      cy.log('Success popup closed');\n    }\n  }\n});\n// Step 12: Verify the edited macro name appears\ncy.log('=== STEP 12: Verify Edited Macro Name ===');\ncy.get('div.flex-grow span', {\n  timeout: 10000\n}).contains(/X Minus jogging Editing/i).should('be.visible').then($macro => {\n  const macroName = $macro.text().trim();\n  cy.log(`Edited macro found in list: \"${macroName}\"`);\n});\n// Step 13: Run the edited macro\ncy.log('=== STEP 13: Run Edited Macro ===');\n// Handle unlock before running\ncy.unlockMachineIfNeeded();\ncy.wait(1000);\n// Click on the edited macro to execute it\ncy.get('div.flex-grow span').contains(/X Minus jogging Editing/i).should('be.visible').click();\ncy.wait(2000);\ncy.log('Edited macro clicked to execute');\n// Check for execution success message\ncy.log('Checking for execution success message...');\ncy.get('section ol li', {\n  timeout: 15000\n}).should('exist').and('be.visible').then($toast => {\n  const toastText = $toast.text().trim();\n  cy.log(`Execution message: \"${toastText}\"`);\n});\n// Close execution popup\ncy.get('body').then($body => {\n  if ($body.find('section button svg').length > 0) {\n    cy.get('section button svg').first().click({\n      force: true\n    });\n    cy.wait(1000);\n    cy.log('Execution popup closed');\n  }\n});\n// Verify X-axis position is back to 0.00\ncy.log('Verifying X-axis position...');\ncy.get('input[type=\"number\"].text-xl.font-bold.text-blue-500.font-mono').first().should('have.value', '0.00').then($input => {\n  const xValue = $input.val();\n  cy.log(` X-axis position verified: ${xValue}`);\n});\ncy.log(' Macro edited successfully');\ncy.wait(2000);\n// Step 16: Delete all macros\ncy.log('=== STEP 16: Delete All Macros ===');\ndeleteAllMacros();\ncy.log('STEP 16: Verify no macros remain');\ncy.contains(/No Macros/i, {\n  timeout: 10000\n}).should('be.visible').then(() => {\n  cy.log('All macros deleted successfully');\n});\ncy.log('=== STEP 16 COMPLETED ===');\ncy.wait(2000);\n// Step 17: Add New Macro Manually\ncy.log('=== STEP 17: Add New Macro Manually ===');\n// Navigate to application\ncy.visit(`${Cypress.config('baseUrl')}/#/`, {\n  timeout: 20000,\n  failOnStatusCode: false\n});\ncy.wait(3000);\n// Handle unlock if needed\ncy.unlockMachineIfNeeded();\ncy.wait(1000);\n// Verify machine is in Idle state\ncy.contains(/^Idle$/i, {\n  timeout: 30000\n}).should('be.visible');\ncy.log('Machine is Idle');\n// Open Macros tab\ncy.get('button', {\n  timeout: 15000\n}).contains(/Macros/i).should('be.visible').click();\ncy.wait(2000);\ncy.log('Macros tab opened');\n// Click Add button\ncy.log('Clicking Add button...');\ncy.contains('button', /^Add$/i, {\n  timeout: 10000\n}).should('be.visible').click({\n  force: true\n});\ncy.wait(2000);\ncy.log(' Add button clicked');\n// Verify form is visible\ncy.log('Verifying Add Macro form...');\ncy.get('input[name=\"name\"][type=\"text\"][maxlength=\"128\"]', {\n  timeout: 10000\n}).should('be.visible').should('be.enabled');\ncy.log(' Add Macro form is visible');\n// Fill in Macro Name\nconst macroName = 'Jog Y axis plus and minus ';\ncy.log(`Entering macro name: ${macroName}`);\ncy.get('input[name=\"name\"][type=\"text\"][maxlength=\"128\"]').should('be.visible').clear({\n  force: true\n}).type(macroName, {\n  force: true\n});\ncy.wait(500);\ncy.log(`Name entered: ${macroName}`);\n// Fill in G-code\nconst gcode = '$J=G21 G91 Y10 F6000\\n$J=G21 G91 Y-10 F6000\\n$$';\ncy.log('Entering G-code...');\ncy.get('textarea[name=\"content\"][required]', {\n  timeout: 10000\n}).should('be.visible').clear({\n  force: true\n}).type(gcode, {\n  delay: 10,\n  force: true\n});\ncy.wait(500);\ncy.log('G-code entered');\n// Fill in Description\nconst description = 'TEST DATA FOR ADDING MACROS';\ncy.log(`Entering description: ${description}`);\ncy.get('textarea[name=\"description\"][maxlength=\"128\"]', {\n  timeout: 10000\n}).should('be.visible').clear({\n  force: true\n}).type(description, {\n  force: true\n});\ncy.wait(500);\ncy.log(` Description entered: ${description}`);\n// Click Add New Macro button\ncy.log('Clicking Add New Macro button...');\ncy.wait(1000);\ncy.get('[data-testid=\"add-macro-button\"]').click({\n  force: true\n});\ncy.wait(2000);\ncy.log('Add New Macro button clicked');\n// Verify success message or form closure\ncy.log('Checking for success indication...');\ncy.get('body').then($body => {\n  if ($body.find('section ol li').length > 0) {\n    cy.get('section ol li', {\n      timeout: 10000\n    }).should('exist').and('be.visible').then($toast => {\n      const toastText = $toast.text().trim();\n      cy.log(` Success message: \"${toastText}\"`);\n      const hasSuccess = /added|success|created|macro/i.test(toastText);\n      expect(hasSuccess).to.be.true;\n    });\n    // Close toast if present\n    if ($body.find('section button svg').length > 0) {\n      cy.get('section button svg', {\n        timeout: 5000\n      }).first().click({\n        force: true\n      });\n      cy.wait(1000);\n      cy.log('Toast closed');\n    }\n  } else {\n    cy.log('No toast found - checking for form closure');\n    cy.get('input[name=\"name\"][type=\"text\"]').should('not.exist');\n    cy.log('Form closed successfully');\n  }\n});\n// Step 18: Verify newly added macro in list\ncy.log('=== STEP 18: Verify Newly Added Macro ===');\ncy.get('div.flex-grow span', {\n  timeout: 10000\n}).contains(new RegExp(macroName, 'i')).should('be.visible').then($macro => {\n  const displayedName = $macro.text().trim();\n  cy.log(` Macro found: \"${displayedName}\"`);\n  expect(displayedName).to.include('Jog Y axis plus and minus');\n});\ncy.log('STEP 17-18 COMPLETED: Macro added and verified');\n// Step 19: Run the newly added macro\ncy.log('=== STEP 19: Run Newly Added Macro ===');\n// Handle unlock before running\ncy.unlockMachineIfNeeded();\ncy.wait(1000);\n// Click on the newly added macro to execute it\ncy.get('div.flex-grow span').contains(/Jog Y axis plus and minus/i).should('be.visible').click();\ncy.wait(2000);\ncy.log('Newly added macro clicked to execute');\n// Check for execution success message\ncy.log('Checking for execution success message...');\ncy.get('section ol li', {\n  timeout: 15000\n}).should('exist').and('be.visible').then($toast => {\n  const toastText = $toast.text().trim();\n  cy.log(` Execution message: \"${toastText}\"`);\n});\n// Close execution popup\ncy.get('body').then($body => {\n  if ($body.find('section button svg').length > 0) {\n    cy.get('section button svg').first().click({\n      force: true\n    });\n    cy.wait(1000);\n    cy.log(' Execution popup closed');\n  }\n});\n// Verify Y-axis position is back to 0.00\ncy.log('Verifying Y-axis position...');\ncy.get('input[type=\"number\"].text-xl.font-bold.text-blue-500.font-mono').eq(1) // Y-axis is the second input (0=X, 1=Y, 2=Z)\n.should('have.value', '0.00').then($input => {\n  const yValue = $input.val();\n  cy.log(` Y-axis position verified: ${yValue}`);\n});\ncy.log('STEP 19 COMPLETED: Newly added macro executed');\n// Final summary for newly added macro\ncy.log('NEWLY ADDED MACRO TEST SUMMARY ');\ncy.log(`Macro Name: ${macroName}`);\ncy.log(`Description: ${description}`);\ncy.log('Macro added manually via UI');\ncy.log(' Macro executed successfully');\ncy.wait(2000);\n// Step 21: Export the newly added macro\ncy.log('=== STEP 21: Export Newly Added Macro ===');\n// Navigate back to Macros tab\ncy.visit(`${Cypress.config('baseUrl')}/#/`, {\n  timeout: 20000,\n  failOnStatusCode: false\n});\ncy.wait(3000);\ncy.unlockMachineIfNeeded();\ncy.wait(1000);\n// Open Macros tab\ncy.get('button', {\n  timeout: 15000\n}).contains(/Macros/i).should('be.visible').click();\ncy.wait(2000);\n// Click with force\ncy.contains('button', /Export/i).should('be.visible').should('be.enabled').click({\n  force: true\n});\ncy.log('Export button was clicked successfully');\n// Step 22: Clean up - Delete the newly added macro\ncy.log('=== STEP 22: Clean Up - Delete Newly Added Macro ===');\n// Navigate back to Macros tab\ncy.visit(`${Cypress.config('baseUrl')}/#/`, {\n  timeout: 20000,\n  failOnStatusCode: false\n});\ncy.wait(3000);\ncy.unlockMachineIfNeeded();\ncy.wait(1000);\n// Open Macros tab\ncy.get('button', {\n  timeout: 15000\n}).contains(/Macros/i).should('be.visible').click();\ncy.wait(2000);\n// Delete all macros\ndeleteAllMacros();\ncy.log('Verify no macros remain after cleanup');\ncy.contains(/No Macros/i, {\n  timeout: 10000\n}).should('be.visible').then(() => {\n  cy.log(' All macros deleted successfully');\n});\ncy.log('=== STEP 22 COMPLETED ===');\n// Final complete test summary\ncy.log('ALL TESTS COMPLETED SUCCESSFULLY');",
+              "err": {},
+              "uuid": "c56049a3-62a6-4b7e-8cdb-b8bff640e6f8",
+              "parentUUID": "be0bf3bc-01df-485f-b126-6c7f32109e4a",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "c56049a3-62a6-4b7e-8cdb-b8bff640e6f8"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 114330,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        },
+        {
+          "uuid": "87200acb-d3fb-42b1-a63a-bd6dbe8826d0",
+          "title": "Console commands testing ",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Connects machine and sets axes to zero",
+              "fullTitle": "Console commands testing  Connects machine and sets axes to zero",
+              "timedOut": null,
+              "duration": 33454,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "//Connection\ncy.log('Step 1: Connecting to CNC...');\ncy.connectMachine();\ncy.wait(3000);\ncy.autoUnlock();\ncy.log('Connected to CNC');\n//Unlock machine if needed\ncy.unlockMachineIfNeeded();\n//Waiting until idle status \ncy.log('Step 2: Waiting for idle state...');\ncy.unlockMachineIfNeeded();\ncy.contains(/^idle$/i, {\n  timeout: 30000\n}).should('be.visible');\ncy.wait(1000);\n//Go to console and clear \ncy.log('Step 3: Clearing console...');\ncy.clearConsole();\ncy.log('Console cleared successfully');\ncy.wait(1000);\n//Input G-code commands to set axes using console\ncy.log('Step 4: Setting axes to zero...');\n// Set X axis to 0\ncy.sendConsoleCommand('G10 L20 P0 X0');\ncy.wait(1500);\n// Set Y axis to 0\ncy.sendConsoleCommand('G10 L20 P0 Y0');\ncy.wait(1500);\n// Set Z axis to 0\ncy.sendConsoleCommand('G10 L20 P0 Z0');\ncy.wait(1500);\ncy.log('All axes set to zero commands sent');\n//Verify axes are at 0\ncy.log('Step 5: Verifying axes positions...');\ncy.verifyAxes(0, 0, 0);\ncy.log('Test completed successfully - all axes verified at zero');\n// Go to axis 5,5,5\ncy.log('Step 4: Moving to position X5 Y5 Z5...');\ncy.sendConsoleCommand('G0 X5 Y5 Z5');\ncy.wait(5000); // Wait longer for machine to move\n//Verify axes are at 5,5,5\ncy.log('Step 5: Verifying axes positions...');\ncy.verifyAxes(5, 5, 5);\ncy.log('Test completed successfully - all axes verified at 5,5,5');\n//Disconnect machine \ncy.disconnectIfIdle();\ncy.log('Machine is disconnected');",
+              "err": {},
+              "uuid": "ab4c39b4-2379-409a-af67-fbc5b65d32ef",
+              "parentUUID": "87200acb-d3fb-42b1-a63a-bd6dbe8826d0",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "ab4c39b4-2379-409a-af67-fbc5b65d32ef"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 33454,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        },
+        {
+          "uuid": "b66418b7-9b3f-4052-a25c-8a2d22eb8a3d",
+          "title": "gSender Configuration and Firmware Test Suite",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Should reset, export, import gSender settings, restore firmware defaults, and perform searches",
+              "fullTitle": "gSender Configuration and Firmware Test Suite Should reset, export, import gSender settings, restore firmware defaults, and perform searches",
+              "timedOut": null,
+              "duration": 47888,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "// Part 1: gSender Configuration Settings\ncy.log('Part 1: gSender Configuration Settings');\ncy.connectMachine();\ncy.wait(6000);\ncy.verifyMachineStatus('Idle');\ncy.unlockMachineIfNeeded();\ncy.goToConfig();\n// Reset settings\ncy.log('Resetting gSender settings...');\ndismissToast();\ncy.get('[data-testid=\"gsender-settings-reset-button\"] > span.text-sm').click();\ncy.get('[data-state=\"open\"]', {\n  timeout: 10000\n}).find('button.bg-blue-500').contains(/restore settings/i).click();\ndismissToast();\n// Export settings\ncy.log('Exporting gSender settings...');\ndismissToast();\ncy.get('[data-testid=\"gsender-settings-export-button\"] > span.text-sm').click();\ncy.wait(3000);\ncy.get('#section-0 > div.flex-row').click({\n  force: true\n});\ncy.get('#section-0 div:nth-of-type(2) > button').click();\ncy.applySettings();\ndismissToast();\n// Import settings\ncy.log('Importing gSender settings...');\ndismissToast();\ncy.get('[data-testid=\"gsender-settings-import-button\"] > span.text-sm').click();\ncy.get('div.min-h-1\\\\/5 > fieldset input').selectFile('cypress/fixtures/gSender-settings.json', {\n  force: true\n});\ncy.get('[data-state=\"open\"]', {\n  timeout: 10000\n}).find('button.bg-blue-500').contains(/import settings/i).click();\ndismissToast();\n// Verify units\ncy.log('Verifying units reverted to MM...');\ncy.get('#section-0').within(() => {\n  cy.get('fieldset').first().within(() => {\n    cy.get('button[role=\"switch\"]').eq(0).should($toggle => {\n      const isMMSelected = $toggle.attr('data-state') === 'unchecked' || $toggle.attr('aria-checked') === 'false';\n      expect(isMMSelected).to.be.true;\n    });\n  });\n});\n/// Part 2: Firmware Settings\ncy.log('Part 2: Firmware Settings');\ndismissToast();\n// Restore defaults \ncy.get('#main-content > div.flex div.grid > div span.text-sm').contains(/defaults/i).click({\n  force: true\n});\ncy.get('[data-state=\"open\"]', {\n  timeout: 10000\n}).find('button.bg-blue-500').contains(/restore defaults/i).click({\n  force: true\n});\n// Dismiss all toasts after restore\ncy.get('body').then($body => {\n  const toasts = $body.find('#app > section button > svg');\n  if (toasts.length > 0) {\n    cy.get('#app > section button > svg').each($btn => {\n      cy.wrap($btn).click({\n        force: true\n      });\n    });\n  }\n});\ndismissToast();\ncy.wait(2000);\ncy.get('#main-content').should('be.visible');\n// Export firmware\ncy.log('Exporting firmware settings...');\ncy.get('[data-testid=\"firmware-settings-export-button\"]').click({\n  force: true\n});\ncy.wait(2000);\n// Dismiss any export toasts\ncy.get('body').then($body => {\n  const toasts = $body.find('#app > section button > svg');\n  if (toasts.length > 0) {\n    cy.get('#app > section button > svg').each($btn => {\n      cy.wrap($btn).click({\n        force: true\n      });\n    });\n  }\n});\ndismissToast();\n// Import firmware\ncy.log('Importing firmware settings...');\ncy.get('[data-testid=\"firmware-settings-import-button\"]').click();\ncy.get('div.fixed input').selectFile('cypress/fixtures/gSender-firmware-settings.json', {\n  force: true\n});\ncy.wait(2000);\n// Dismiss all toasts after import\ncy.get('body').then($body => {\n  const toasts = $body.find('#app > section button > svg');\n  if (toasts.length > 0) {\n    cy.get('#app > section button > svg').each($btn => {\n      cy.wrap($btn).click({\n        force: true\n      });\n    });\n  }\n});\ndismissToast();\n// Restore defaults \ncy.get('#main-content > div.flex div.grid > div span.text-sm').contains(/defaults/i).click({\n  force: true\n});\ncy.get('[data-state=\"open\"]', {\n  timeout: 10000\n}).find('button.bg-blue-500').contains(/restore defaults/i).click({\n  force: true\n});\ncy.get('body').then($body => {\n  const toasts = $body.find('#app > section button > svg');\n  if (toasts.length > 0) {\n    cy.get('#app > section button > svg').each($btn => {\n      cy.wrap($btn).click({\n        force: true\n      });\n    });\n  }\n});\ndismissToast();\ncy.wait(2000);\n// Part 3: Search\ncy.log('Searching settings...');\ncy.get('div.min-h-1\\\\/5 > div > button').click();\ncy.searchInSettings('Spindle');\ncy.searchInSettings('import');\ncy.searchInSettings('1000');\ncy.searchInSettings('$%&^$%*(&');\ncy.get('#simple-search').clear();\ncy.get('button[role=\"tab\"]').contains('EEPROM').click();\ncy.searchInSettings('spindle');\ncy.searchInSettings('import');\ncy.searchInSettings('100');\ncy.searchInSettings('$#@%');\ncy.get('#simple-search').clear();\ncy.log('All tests completed successfully.');",
+              "err": {},
+              "uuid": "f6bd9404-cb2f-4437-a649-ac587a783778",
+              "parentUUID": "b66418b7-9b3f-4052-a25c-8a2d22eb8a3d",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "f6bd9404-cb2f-4437-a649-ac587a783778"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 47888,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        },
+        {
+          "uuid": "a3606ef9-b622-4e5f-bddb-d0ec85b1de5c",
+          "title": "Gsender testing jogging using buttons",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Test Case: jogging using buttons",
+              "fullTitle": "Gsender testing jogging using buttons Test Case: jogging using buttons",
+              "timedOut": null,
+              "duration": 34176,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": "{\n  \"title\": \"cypress-mochawesome-reporter-screenshots\",\n  \"value\": [\n    [\n      \"\\\\A_grblHal_master_spec.cy.js\\\\Gsender testing jogging using buttons -- Test Case jogging using buttons (failed).png\"\n    ]\n  ]\n}",
+              "code": "// ── Step 1: Connect\ncy.log('Step 1: Connecting to CNC...');\ncy.connectMachine();\ncy.wait(6000);\n// ── Step 2: Verify Idle \ncy.log('Step 2: Waiting for Idle status...');\ncy.verifyMachineStatus('Idle');\n// ── Step 3: Zero all axes \ncy.log('Step 3: Zeroing all axes...');\ncy.zeroXAxis();\ncy.zeroYAxis();\ncy.zeroZAxis();\n// ── Step 4: Assert initial position is (0, 0, 0)\ncy.log('Step 4: Asserting initial position is (0.00, 0.00, 0.00)...');\ncy.get('[data-testid=\"wcs-input-X\"]').invoke('val').then(x => {\n  cy.get('[data-testid=\"wcs-input-Y\"]').invoke('val').then(y => {\n    cy.get('[data-testid=\"wcs-input-Z\"]').invoke('val').then(z => {\n      cy.log(`Initial position: X=${x}, Y=${y}, Z=${z}`);\n      expect(x, 'Initial X').to.equal('0.00');\n      expect(y, 'Initial Y').to.equal('0.00');\n      expect(z, 'Initial Z').to.equal('0.00');\n    });\n  });\n});\ncy.wait(2000);\n// ── Step 5: Read current XY and Z preset distances \ncy.log('Step 5: Reading jog preset distances...');\ncy.get('div.gap-1 > div.items-center > div > div:nth-of-type(1) input').invoke('val').then(xyPreset => {\n  const xyMove = parseFloat(xyPreset);\n  cy.log(`XY preset: ${xyMove} mm`);\n  cy.get('div.gap-1 > div.items-center > div > div:nth-of-type(2) input').invoke('val').then(zPreset => {\n    const zMove = parseFloat(zPreset);\n    cy.log(`Z preset: ${zMove} mm`);\n    // ── Helper: jog then assert position \n    const jogAndAssert = (label, action, expectedX, expectedY, expectedZ) => {\n      cy.log(`Testing ${label}...`);\n      action();\n      cy.wait(3000);\n      cy.get('[data-testid=\"wcs-input-X\"]').invoke('val').then(x => {\n        cy.get('[data-testid=\"wcs-input-Y\"]').invoke('val').then(y => {\n          cy.get('[data-testid=\"wcs-input-Z\"]').invoke('val').then(z => {\n            cy.log(`${label} → X=${x}, Y=${y}, Z=${z}`);\n            expect(Math.abs(parseFloat(x) - expectedX), `${label} X`).to.be.lessThan(0.01);\n            expect(Math.abs(parseFloat(y) - expectedY), `${label} Y`).to.be.lessThan(0.01);\n            expect(Math.abs(parseFloat(z) - expectedZ), `${label} Z`).to.be.lessThan(0.01);\n            cy.log(`${label} position verified`);\n          });\n        });\n      });\n    };\n    // ── Steps 6-9: Single axis jogs \n    // Y+ → position becomes (0, +xyMove, 0)\n    jogAndAssert('Y+', () => cy.jogYPlusTimes(1), 0, +xyMove, 0);\n    // Y- → back to (0, 0, 0)\n    jogAndAssert('Y-', () => cy.jogYMinusTimes(1), 0, 0, 0);\n    // X+ → position becomes (+xyMove, 0, 0)\n    jogAndAssert('X+', () => cy.jogXPlusTimes(1), +xyMove, 0, 0);\n    // X- → back to (0, 0, 0)\n    jogAndAssert('X-', () => cy.jogXMinusTimes(1), 0, 0, 0);\n    // Z+ → position becomes (0, 0, +zMove)\n    jogAndAssert('Z+', () => cy.jogZPlusTimes(1), 0, 0, +zMove);\n    // Z- → back to (0, 0, 0)\n    jogAndAssert('Z-', () => cy.jogZMinusTimes(1), 0, 0, 0);\n    // ── Steps 10-13: Diagonal jogs\n    // X+Y+ → (+xyMove, +xyMove, 0)\n    jogAndAssert('X+Y+', () => cy.get('#xPlusYPlus').should('exist').click({\n      force: true\n    }), +xyMove, +xyMove, 0);\n    // X+Y- → (+xyMove*2, 0, 0)  [relative: +x, -y]\n    jogAndAssert('X+Y-', () => cy.get('#xPlusYMinus').should('exist').click({\n      force: true\n    }), +xyMove * 2, 0, 0);\n    // X-Y- → (+xyMove, -xyMove, 0)\n    jogAndAssert('X-Y-', () => cy.get('#xMinusYMinus').should('exist').click({\n      force: true\n    }), +xyMove, -xyMove, 0);\n    // X-Y+ → back to (0, 0, 0)\n    jogAndAssert('X-Y+', () => cy.get('#xMinusYPlus').should('exist').click({\n      force: true\n    }), 0, 0, 0);\n    cy.log('ALL JOGGING TESTS COMPLETED SUCCESSFULLY');\n  });\n});",
+              "err": {
+                "message": "AssertionError: Timed out retrying after 30000ms: Expected to find content: '/^Idle$/i' but never did.",
+                "estack": "AssertionError: Timed out retrying after 30000ms: Expected to find content: '/^Idle$/i' but never did.\n    at Context.eval (webpack://gSender/./cypress/support/commands.js:87:5)",
+                "diff": null
+              },
+              "uuid": "7d80cb8c-13db-4b11-b68d-83ad2dcb35e0",
+              "parentUUID": "a3606ef9-b622-4e5f-bddb-d0ec85b1de5c",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [],
+          "failures": [
+            "7d80cb8c-13db-4b11-b68d-83ad2dcb35e0"
+          ],
+          "pending": [],
+          "skipped": [],
+          "duration": 34176,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        },
+        {
+          "uuid": "cbfca3db-01d6-4da2-80ca-29939b28ecad",
+          "title": "Invert and Check Pins Test with Stepper Motor Lock/Unlock",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Checks machine information, verifies pin inversion, and tests stepper motor lock/unlock",
+              "fullTitle": "Invert and Check Pins Test with Stepper Motor Lock/Unlock Checks machine information, verifies pin inversion, and tests stepper motor lock/unlock",
+              "timedOut": null,
+              "duration": 13386,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": "{\n  \"title\": \"cypress-mochawesome-reporter-screenshots\",\n  \"value\": [\n    [\n      \"\\\\A_grblHal_master_spec.cy.js\\\\Invert and Check Pins Test with Stepper Motor LockUnlock -- Checks machine information, verifies pin inversion, and tests stepper motor lockunlock (failed).png\"\n    ]\n  ]\n}",
+              "code": "// Step 1: Connect to CNC machine\ncy.log('Step 1: Connecting to CNC machine...');\ncy.connectMachine();\ncy.wait(6000);\ncy.unlockMachineIfNeeded();\ncy.wait(2000);\ncy.log('Connected to CNC');\n// Step 2: Verify machine status\ncy.log('Step 2: Verifying machine status...');\ncy.verifyMachineStatus('Idle');\ncy.log('Machine is Idle');\n// Step 3: Navigate to Configuration\ncy.log('Step 3: Navigating to Configuration page...');\ncy.goToConfig();\ncy.wait(3000);\ncy.log('Configuration page opened');\n// Step 4: Open and pin Machine Info\ncy.log('Step 4: Opening Machine Information popup...');\ncy.get('div.border > div.top-0 img').should('be.visible').click();\ncy.wait(2000);\n//Close machine information\ncy.log(' closing  Machine Information popup...');\ncy.get('path[d^=\"m289.94\"]').click({\n  force: true\n});\n// Step 5: Search for \"invert\"\ncy.log('Step 5: Searching for \"invert\" settings...');\ncy.get('#simple-search').should('be.visible').clear().type('invert');\ncy.wait(1500);\ncy.log('Search results displayed for \"invert\"');\n// Helper function to disable axis if enabled (toggle off if on)\nconst disableAxisIfEnabled = (axisId, axisName) => {\n  cy.log(`Step: Checking ${axisName} axis invert limit pin...`);\n  cy.get(`#${axisId}`).scrollIntoView().should('exist').then($switch => {\n    const isEnabled = $switch.attr('data-state') === 'checked' || $switch.attr('aria-checked') === 'true';\n    if (isEnabled) {\n      cy.log(`${axisName} axis is ENABLED - Disabling...`);\n      cy.wrap($switch).click({\n        force: true\n      });\n      cy.wait(500);\n      cy.log(`${axisName} axis toggled to DISABLED `);\n    } else {\n      cy.log(`${axisName} axis already DISABLED  - Skipping toggle`);\n    }\n  });\n};\n// Helper function to enable axis if disabled (toggle on if off)\nconst enableAxisIfDisabled = (axisId, axisName) => {\n  cy.log(`Step: Checking ${axisName} axis invert limit pin...`);\n  cy.get(`#${axisId}`).scrollIntoView().should('exist').then($switch => {\n    const isEnabled = $switch.attr('data-state') === 'checked' || $switch.attr('aria-checked') === 'true';\n    if (!isEnabled) {\n      cy.log(`${axisName} axis is DISABLED - Enabling...`);\n      cy.wrap($switch).click({\n        force: true\n      });\n      cy.wait(500);\n      cy.log(`${axisName} axis toggled to ENABLED `);\n    } else {\n      cy.log(`${axisName} axis already ENABLED - Skipping toggle`);\n    }\n  });\n};\n// Disable X axis invert limit pin if enabled\ndisableAxisIfEnabled('\\\\$5-0-key', 'X');\n// Disable Y axis invert limit pin if enabled\ndisableAxisIfEnabled('\\\\$5-1-key', 'Y');\n// Disable Z axis invert limit pin if enabled\ndisableAxisIfEnabled('\\\\$5-2-key', 'Z');\n// Disable A axis invert limit pin if enabled\ndisableAxisIfEnabled('\\\\$5-3-key', 'A');\n// Apply settings\ncy.log('Step 6: Applying settings...');\ncy.contains('button', 'Apply Settings').should('be.visible').click();\ncy.wait(2000);\ncy.log('Settings applied');\n//  Open and pin Machine Info\ncy.log(' Opening Machine Information popup to view changes...');\ncy.get('div.border > div.top-0 img').should('be.visible').click();\ncy.wait(2000);\ncy.log('Step 7: Pinning popup...');\ncy.get('body > div:nth-of-type(2) svg').first().click({\n  force: true\n});\ncy.wait(1000);\ncy.log('Machine Info popup pinned');\n// Helper function to check if a specific limit is green\nconst checkLimitGreen = limitName => {\n  return cy.get('body').then($body => {\n    const $limit = $body.find(`div.text-gray-500:contains(\"${limitName}\")`);\n    if ($limit.length > 0) {\n      return $limit.closest('.relative').find('.bg-green-500').length > 0;\n    }\n    return false;\n  });\n};\n// Check all limits are green\ncy.log('Verifying all limit pins turned green...');\ncheckLimitGreen('X limit').then(isGreen => {\n  expect(isGreen, 'X limit should be green').to.be.true;\n});\ncheckLimitGreen('Y limit').then(isGreen => {\n  expect(isGreen, 'Y limit should be green').to.be.true;\n});\ncheckLimitGreen('Z limit').then(isGreen => {\n  expect(isGreen, 'Z limit should be green').to.be.true;\n});\ncheckLimitGreen('A limit').then(isGreen => {\n  expect(isGreen, 'A limit should be green').to.be.true;\n});\ncy.log('All limit pins verified as green');\n// ===== RE-ENABLE ALL AXES =====\ncy.log('Step 8: Re-enabling all axis invert limit pins...');\n// Enable X axis invert limit pin if disabled\nenableAxisIfDisabled('\\\\$5-0-key', 'X');\n// Enable Y axis invert limit pin if disabled\nenableAxisIfDisabled('\\\\$5-1-key', 'Y');\n// Enable Z axis invert limit pin if disabled\nenableAxisIfDisabled('\\\\$5-2-key', 'Z');\n// Enable A axis invert limit pin if disabled\nenableAxisIfDisabled('\\\\$5-3-key', 'A');\n// Apply settings again\ncy.log('Step 9: Applying settings after re-enabling axes...');\ncy.contains('button', 'Apply Settings').should('be.visible').click();\ncy.wait(2000);\ncy.log('Settings applied - All axes re-enabled');\n// ===== STEPPER MOTOR LOCK/UNLOCK TEST =====\ncy.log('Step 10: Testing Stepper Motor Lock/Unlock...');\n// Navigate back to machine info popup\ncy.log('Opening Machine Info popup...');\ncy.get('div.border > div.top-0 img').should('be.visible').click();\ncy.wait(1500);\n// Get the stepper motor toggle button\ncy.get('body > div:nth-of-type(2) button[role=\"switch\"]').should('be.visible').as('stepperToggle');\n// Test Lock (Enable stepper motor)\ncy.log('Step 10a: Locking Stepper Motors...');\ncy.get('@stepperToggle').then($toggle => {\n  const isLocked = $toggle.attr('data-state') === 'checked' || $toggle.attr('aria-checked') === 'true';\n  if (!isLocked) {\n    cy.log('Stepper motors currently UNLOCKED - Locking now...');\n    cy.get('@stepperToggle').click({\n      force: true\n    });\n    cy.wait(1000);\n  } else {\n    cy.log('Stepper motors already LOCKED - Skipping lock');\n  }\n});\n// Verify motors are locked\ncy.get('@stepperToggle').then($toggle => {\n  const isLocked = $toggle.attr('data-state') === 'checked' || $toggle.attr('aria-checked') === 'true';\n  expect(isLocked, 'Stepper motors should be LOCKED').to.be.true;\n});\ncy.log('Stepper motors LOCKED ');\ncy.wait(2000);\n// Test Unlock (Disable stepper motor)\ncy.log('Step 10b: Unlocking Stepper Motors...');\ncy.get('@stepperToggle').then($toggle => {\n  const isLocked = $toggle.attr('data-state') === 'checked' || $toggle.attr('aria-checked') === 'true';\n  if (isLocked) {\n    cy.log('Stepper motors currently LOCKED - Unlocking now...');\n    cy.get('@stepperToggle').click({\n      force: true\n    });\n    cy.wait(1000);\n  } else {\n    cy.log('Stepper motors already UNLOCKED - Skipping unlock');\n  }\n});\n// Verify motors are unlocked (toggle is disabled/unchecked)\ncy.get('@stepperToggle').then($toggle => {\n  const isLocked = $toggle.attr('data-state') === 'checked' || $toggle.attr('aria-checked') === 'true';\n  expect(isLocked, 'Stepper motors should be UNLOCKED').to.be.false;\n});\ncy.log('Stepper motors UNLOCKED ');\ncy.wait(1000);\n// Final verification: Ensure motor is NOT locked at the end\ncy.log('Step 11: Final verification - Ensuring stepper motor is unlocked...');\ncy.get('@stepperToggle').then($toggle => {\n  const isLocked = $toggle.attr('data-state') === 'checked' || $toggle.attr('aria-checked') === 'true';\n  expect(isLocked, 'Stepper motor should be UNLOCKED at test end').to.be.false;\n  cy.log(' Final state confirmed: Stepper motor is UNLOCKED');\n});\ncy.log('Test completed successfully - All checks passed ');",
+              "err": {
+                "message": "AssertionError: Timed out retrying after 10000ms: Expected to find element: `button.m-0`, but never found it.",
+                "estack": "AssertionError: Timed out retrying after 10000ms: Expected to find element: `button.m-0`, but never found it.\n    at Context.eval (webpack://gSender/./cypress/support/commands.js:68:9)",
+                "diff": null
+              },
+              "uuid": "4ac1a756-556b-4784-a45a-138e285e5dd7",
+              "parentUUID": "cbfca3db-01d6-4da2-80ca-29939b28ecad",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [],
+          "failures": [
+            "4ac1a756-556b-4784-a45a-138e285e5dd7"
+          ],
+          "pending": [],
+          "skipped": [],
+          "duration": 13386,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        },
+        {
+          "uuid": "dfc8f8fb-af07-47da-ae89-6dbfdee67e1f",
+          "title": "gSender Movement tuning test",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Should complete movement tuning for x axis and y axis",
+              "fullTitle": "gSender Movement tuning test Should complete movement tuning for x axis and y axis",
+              "timedOut": null,
+              "duration": 12691,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": "{\n  \"title\": \"cypress-mochawesome-reporter-screenshots\",\n  \"value\": [\n    [\n      \"\\\\A_grblHal_master_spec.cy.js\\\\gSender Movement tuning test -- Should complete movement tuning for x axis and y axis (failed).png\"\n    ]\n  ]\n}",
+              "code": "// ========== X-AXIS TESTING ==========\n// Step 1: Connect to CNC\ncy.log('Step 1: Connecting to CNC...');\ncy.connectMachine();\ncy.wait(6000);\ncy.log('✓ Connected to CNC');\n// Step 2: Verify CNC machine status is Idle\ncy.log('Step 2: Verifying machine status...');\ncy.verifyMachineStatus('Idle');\ncy.wait(2000);\ncy.log('✓ Machine is in idle status');\n// Step 3: Unlock machine if needed\ncy.unlockMachineIfNeeded();\ncy.wait(2000);\n// Step 4: Navigate to Tools page\ncy.log('Step 4: Navigating to Tools page...');\ncy.goToTools();\ncy.wait(1000);\ncy.log('✓ Tools page opened');\n// Step 5: Click on Movement Tuning tool\ncy.log('Step 5: Opening Movement Tuning tool...');\ncy.get('a:nth-of-type(3) p').contains('Ensure that each').should('be.visible').click();\ncy.wait(1500);\ncy.log('✓ Movement Tuning tool opened');\n// Step 6: Select X-axis from dropdown\ncy.log('Step 6: Selecting X-axis from dropdown...');\ncy.get('div.css-1hwfws3').should('be.visible').click();\ncy.wait(500);\ncy.get('#react-select-2-option-0').should('be.visible').click();\ncy.wait(1000);\ncy.log('✓ X-axis selected');\n// Step 7: Click \"Start Movement Tuning\" button\ncy.log('Step 7: Starting Movement Tuning wizard...');\ncy.get('button').contains('Start Movement Tuning').should('be.visible').click();\ncy.wait(1500);\ncy.log('✓ Movement Tuning wizard started');\n// Step 8: Mark First Location\ncy.log('Step 8: Marking first location...');\ncy.get('button').contains('Mark First Location').should('be.visible').click();\ncy.wait(1000);\ncy.log('✓ First location marked');\n// Step 9: Enter distance value\ncy.log('Step 9: Entering distance value: 100mm...');\ncy.get('input.text-robin-500[value=\"100\"]').first().should('be.visible').clear().type('100');\ncy.wait(500);\ncy.log('✓ Distance value entered: 100mm');\n// Step 10: Click \"Move X-axis\" button\ncy.log('Step 10: Clicking Move X-axis button...');\ncy.get('button.bg-robin-500').contains('Move X-axis').should('be.visible').should('not.be.disabled').click();\ncy.wait(2000);\ncy.log('✓ Move X-axis button clicked');\n// Step 11: Wait for machine to reach idle status after movement\ncy.log('Step 11: Waiting for machine to reach idle status...');\ncy.verifyMachineStatus('Idle', {\n  timeout: 30000\n});\ncy.wait(1000);\ncy.log('✓ Machine is idle after X-axis movement');\n// Step 12: Enter distance travelled (100mm)\ncy.log('Step 12: Entering distance travelled (100mm)...');\ncy.get('div.bg-blue-50 input').should('be.visible').clear().type('100');\ncy.wait(500);\ncy.log('✓ Distance entered: 100mm');\n// Step 13: Click \"Set Distance Travelled\" button to confirm\ncy.log('Step 13: Confirming distance travelled...');\ncy.get('button').contains('Set Distance Travelled').should('be.visible').click();\ncy.wait(1000);\ncy.log('✓ Distance confirmed');\n// Step 14: Verify X-axis accuracy success message\ncy.log('Step 14: Verifying X-axis accuracy message...');\ncy.get('div.text-green-800.bg-green-100').should('be.visible').should('contain.text', 'Your').should('contain.text', 'X').should('contain.text', '-axis looks accurate, so you should be good to go!');\ncy.log('✓ X-axis accuracy message confirmed');\ncy.log('✓ Movement Tuning test for X-axis completed successfully');\n// Restart wizard for Y-axis testing\ncy.log('Restarting wizard for Y-axis testing...');\ncy.contains('button', 'Restart Wizard').should('be.visible').click();\ncy.wait(2000);\n// ========== Y-AXIS TESTING ==========\n// Step 6: Select Y-axis from dropdown\ncy.log('Step 6: Selecting Y-axis...');\ncy.get('.css-1hwfws3').should('be.visible').click();\ncy.wait(500);\ncy.get('[id^=\"react-select-\"][id$=\"-option-1\"]').should('be.visible').click();\ncy.wait(1000);\ncy.log(' Y-axis selected');\n// Step 7: Click \"Start Movement Tuning\" button\ncy.log('Step 7: Starting Movement Tuning wizard...');\ncy.get('button').contains('Start Movement Tuning').should('be.visible').click();\ncy.wait(1500);\ncy.log('Movement Tuning wizard started');\n// Step 8: Mark First Location\ncy.log('Step 8: Marking first location...');\ncy.get('button').contains('Mark First Location').should('be.visible').click();\ncy.wait(1000);\ncy.log(' First location marked');\n// Step 9: Enter distance value\ncy.log('Step 9: Entering distance value: 50mm...');\ncy.get('input.text-robin-500[value=\"100\"]').first().should('be.visible').clear().type('50');\ncy.wait(500);\ncy.log(' Distance value entered: 50mm');\n// Step 10: Move Y-axis\ncy.log('Step 10: Moving Y-axis...');\ncy.contains('button', 'Move Y-axis').should('be.visible').click();\ncy.log(' Y-axis movement initiated');\n// Step 11: Monitor status transition from Jogging to Idle\ncy.log('Step 11: Monitoring machine status transition...');\ncy.wait(500);\ncy.window().then(win => {\n  cy.log('Waiting for Jogging status...');\n  cy.verifyMachineStatus('Jogging', {\n    timeout: 5000\n  }).then(() => {\n    cy.log('Machine is jogging');\n    cy.log('Waiting for machine to return to Idle...');\n    cy.verifyMachineStatus('Idle', {\n      timeout: 30000\n    }).then(() => {\n      cy.wait(1000);\n      cy.log(' Machine status changed: Jogging → Idle');\n    });\n  });\n});\n// Step 12: Enter distance travelled (100mm)\ncy.log('Step 12: Entering distance travelled (100mm)...');\ncy.get('div.bg-blue-50 input').should('be.visible').clear().type('100');\ncy.wait(500);\ncy.log('Distance entered: 100mm');\n// Step 13: Click \"Set Distance Travelled\" button to confirm\ncy.log('Step 13: Confirming distance travelled...');\ncy.get('button').contains('Set Distance Travelled').should('be.visible').click();\ncy.wait(1000);\ncy.log(' Distance confirmed');\n// Step 14: Verify Y-axis inaccuracy message\ncy.log('Step 14: Verifying Y-axis inaccuracy message...');\ncy.contains('button', 'Update step/mm').should('be.visible').click();\ncy.log(' Y-axis inaccuracy message confirmed');\ncy.log(' Movement Tuning test for Y-axis completed successfully');",
+              "err": {
+                "message": "AssertionError: Timed out retrying after 10000ms: Expected to find element: `button.m-0`, but never found it.",
+                "estack": "AssertionError: Timed out retrying after 10000ms: Expected to find element: `button.m-0`, but never found it.\n    at Context.eval (webpack://gSender/./cypress/support/commands.js:68:9)",
+                "diff": null
+              },
+              "uuid": "c8e59af9-122c-4ee0-bd3e-8f502e77ec9d",
+              "parentUUID": "dfc8f8fb-af07-47da-ae89-6dbfdee67e1f",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [],
+          "failures": [
+            "c8e59af9-122c-4ee0-bd3e-8f502e77ec9d"
+          ],
+          "pending": [],
+          "skipped": [],
+          "duration": 12691,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        },
+        {
+          "uuid": "4b476ada-3d20-419a-a1fd-84fe4917ab9f",
+          "title": "Rotary surfacing",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Rotary surfacing",
+              "fullTitle": "Rotary surfacing Rotary surfacing",
+              "timedOut": null,
+              "duration": 33651,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": "{\n  \"title\": \"cypress-mochawesome-reporter-screenshots\",\n  \"value\": [\n    [\n      \"\\\\A_grblHal_master_spec.cy.js\\\\Rotary surfacing -- Rotary surfacing (failed).png\"\n    ]\n  ]\n}",
+              "code": "// Step 1: Connect to CNC\ncy.log('Step 1: Connecting to CNC...');\ncy.connectMachine();\ncy.wait(6000);\ncy.log('Connected to CNC');\n// Step 2: Verify CNC machine status is Idle\ncy.log('Step 2: Verifying machine status...');\ncy.verifyMachineStatus('Idle');\ncy.wait(2000);\ncy.unlockMachineIfNeeded();\n//Go to Config and turn on rotary surfacing \ncy.goToConfig();\ncy.log('Search for rotary and enable');\ncy.searchInSettings('rotary');\ncy.log('Enabling Rotary controls toggle...');\n//Enabling rotary axis\ncy.contains('div', 'Rotary controls').find('button[role=\"switch\"]').then($toggle => {\n  if ($toggle.attr('aria-checked') === 'false') {\n    cy.log('  Enabling Rotary controls');\n    cy.wrap($toggle).click();\n    cy.wait(300);\n  } else {\n    cy.log('Rotary controls already enabled');\n  }\n});\n//Apply setting \ncy.applySettings();\n// Go to carve and do rotary surfacing \ncy.goToCarve();\ncy.log('Select Rotary tab ');\ncy.contains('button', 'Rotary').should('be.visible').click();\ncy.wait(500);\ncy.log('Rotary tab opened');\ncy.log('Click on rotary surfacing...');\ncy.contains('button', 'Rotary Surfacing').should('be.visible').click();\ncy.wait(500);\ncy.log('Rotary Surfacing opened');\n// Run rotary surfacing here\n// Step 3: Configure Stock Length\ncy.log('Step 3: Setting stock length to 100mm');\ncy.get('#stockLength').should('be.visible').clear().type('100');\n// Step 4: Configure Start Height\ncy.log('Step 4: Setting start height to 50mm');\ncy.get('#startHeight').should('be.visible').clear().type('50');\n// Step 5: Configure Final Height\ncy.log('Step 5: Setting final height to 47mm');\ncy.get('#finalHeight').should('be.visible').clear().type('47');\n// Step 6: Configure Stepdown (first value)\ncy.log('Step 6: Setting stepdown to 0.75mm');\ncy.get('#stepdown').should('be.visible').clear().type('0.75');\ncy.wait(300);\n// Step 7: Configure Bit Diameter\ncy.log('Step 7: Setting bit diameter to 6.35mm');\ncy.get('#bitDiameter').should('be.visible').clear().type('6.35');\n// Step 8: Configure Stepover\ncy.log('Step 8: Setting stepover to 15%');\ncy.get('#stepover').should('be.visible').clear().type('15');\n// Step 9: Configure Feedrate\ncy.log('Step 9: Setting feedrate to 3000 mm/min');\ncy.get('#feedrate').should('be.visible').clear().type('3000');\n// Step 10: Configure Spindle RPM\ncy.log('Step 10: Setting spindle RPM to 17000');\ncy.get('#spindleRPM').should('be.visible').clear().type('17000');\n// Step 12: Generate G-Code\ncy.log('Step 12: Generating G-Code');\ncy.contains('button', 'Generate G-Code').should('be.visible').click();\ncy.wait(1000);\ncy.log('G-Code generated successfully');\n// Step 13: Load to Main Visualizer\ncy.log('Step 13: Loading to main visualizer');\ncy.contains('button', 'Load to Main').should('be.visible').click();\ncy.wait(1000);\ncy.log('Loaded to main visualizer');\n// Step 14: Toggle info panel\ncy.log('Step 14: Opening info panel');\ncy.get('[data-testid=\"toggle-info\"]').should('be.visible').click();\ncy.wait(500);\n// Step 15: Start the job\ncy.get('div.top-\\\\[-30px\\\\] > div:nth-of-type(1) > button').contains('Start').should('be.visible').click({\n  force: true\n});\ncy.wait(2000);\ncy.log('Job started');\n//Wait for 10 seconds \ncy.log('Step 16: Waiting 10 seconds before pausing...');\ncy.wait(10000);\n// Step 16: Stop the job\ncy.log('Step 16: Stopping the job');\ncy.contains('button', 'Stop').should('be.visible').click();\ncy.wait(1000);\ncy.log('Job stopped');\n// Step 17: Close the dialog\ncy.log('Step 17: Closing dialog');\ncy.contains('button', 'Close').should('be.visible').click();\ncy.wait(500);\ncy.log('Test completed successfully');",
+              "err": {
+                "message": "AssertionError: Timed out retrying after 30000ms: Expected to find content: '/^Idle$/i' but never did.",
+                "estack": "AssertionError: Timed out retrying after 30000ms: Expected to find content: '/^Idle$/i' but never did.\n    at Context.eval (webpack://gSender/./cypress/support/commands.js:87:5)",
+                "diff": null
+              },
+              "uuid": "94312e92-be64-4561-bb87-4b8181e76c5a",
+              "parentUUID": "4b476ada-3d20-419a-a1fd-84fe4917ab9f",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [],
+          "failures": [
+            "94312e92-be64-4561-bb87-4b8181e76c5a"
+          ],
+          "pending": [],
+          "skipped": [],
+          "duration": 33651,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        },
+        {
+          "uuid": "54fe619b-4bb1-4110-9443-e727245690f1",
+          "title": "Spindle Configuration and Control Test - Decrease to 7500 RPM",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Connect, Configure Spindle, Upload File, Decrease to 7500 RPM, Reset, Increase to 24000 RPM, and Complete Job",
+              "fullTitle": "Spindle Configuration and Control Test - Decrease to 7500 RPM Connect, Configure Spindle, Upload File, Decrease to 7500 RPM, Reset, Increase to 24000 RPM, and Complete Job",
+              "timedOut": null,
+              "duration": 82604,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "let minSpindleSpeed = null;\nlet maxSpindleSpeed = null;\nlet jobStartTime = null;\nlet jobEndTime = null;\nlet initialSpindleOverride = null;\nlet initialSpindleRpm = null;\nlet targetSpindleRpm = 7500;\nlet currentSpindleRpm = null;\nlet decreaseClickCount = 0;\nlet increaseClickCount = 0;\nlet reducedOverride = 'N/A';\nlet resetOverride = 'N/A';\nlet increasedOverride = 'N/A';\nlet secondResetOverride = 'N/A';\nlet reducedSpindleRpm = 0;\nlet resetSpindleRpm = 0;\nlet increasedSpindleRpm = 0;\nlet secondResetSpindleRpm = 0;\nlet targetIncreaseRpm = 24000;\ncy.log('Step 1: Connect to CNC');\ncy.connectMachine();\ncy.wait(6000);\ncy.log('Connected to CNC');\ncy.unlockMachineIfNeeded();\ncy.log('Step 2: Verify machine status is Idle');\ncy.contains(/^Idle$/i, {\n  timeout: 30000\n}).should('be.visible').then(status => {\n  cy.log('Machine status: ' + status.text().trim());\n});\ncy.wait(2000);\ncy.log('Step 3: Go to config and Search for Spindle settings');\ncy.goToConfig();\ncy.searchInSettings('Spindle');\ncy.log('Search results displayed for \"Spindle\"');\ncy.wait(1000);\ncy.log('Step 4: Enable spindle toggle');\ncy.get('fieldset:nth-of-type(1) span.sm\\\\:order-none button').click({\n  force: true\n});\ncy.wait(1000);\ncy.log('Step 5: Record Maximum and Minimum Spindle Speed');\ncy.get('input[type=\"number\"]').then($inputs => {\n  $inputs.each((index, input) => {\n    const val = parseFloat(input.value);\n    if (!isNaN(val) && val > 0) {\n      if (!maxSpindleSpeed || val > maxSpindleSpeed) {\n        maxSpindleSpeed = val;\n      }\n      if (!minSpindleSpeed || val < minSpindleSpeed) {\n        minSpindleSpeed = val;\n      }\n    }\n  });\n  cy.log('Maximum Spindle Speed: ' + maxSpindleSpeed + ' RPM');\n  cy.log('Minimum Spindle Speed: ' + minSpindleSpeed + ' RPM');\n});\ncy.log('Step 6: Apply settings');\ncy.get('div.ring > button').contains('Apply Settings').click({\n  force: true\n});\ncy.wait(2000);\ncy.log('Step 7: Navigate to Carve page');\ncy.get('#app > div > div.h-full > div.flex img').first().click({\n  force: true\n});\ncy.wait(2000);\ncy.log('Step 8: Upload G-code file');\ncy.contains('Load File').should('be.visible').click({\n  force: true\n});\ncy.get('#fileInput').selectFile('cypress/fixtures/demo.gcode', {\n  force: true\n});\ncy.wait(5000);\ncy.log('Step 9: Start job');\ncy.then(() => {\n  jobStartTime = Date.now();\n  cy.log('Job Start Time: ' + new Date(jobStartTime).toISOString());\n});\ncy.get('div.top-\\\\[-30px\\\\] > div:nth-of-type(1) > button').contains('Start').should('be.visible').click({\n  force: true\n});\ncy.wait(2000);\ncy.log('Job started');\ncy.log('Step 10: Verify job is running');\ncy.contains(/running|run/i, {\n  timeout: 150000\n}).should('be.visible').then(status => {\n  cy.log('Job status: ' + status.text().trim());\n});\ncy.wait(2000);\ncy.log('Step 11: Capture initial spindle override and RPM');\ncy.get('#spindle-override').parent().then($parent => {\n  const allText = $parent.text();\n  cy.log('Spindle override container text: ' + allText);\n  const percentMatch = allText.match(/(\\d+)%/g);\n  if (percentMatch && percentMatch.length > 0) {\n    initialSpindleOverride = percentMatch[percentMatch.length - 1];\n    cy.log('Initial Spindle Override: ' + initialSpindleOverride);\n  }\n});\n// Capture initial RPM\ncy.contains(/\\d+\\s*RPM/i, {\n  timeout: 5000\n}).invoke('text').then(text => {\n  const match = text.match(/(\\d+)\\s*RPM/i);\n  initialSpindleRpm = match ? parseInt(match[1], 10) : null;\n  cy.log('Initial Spindle RPM: ' + initialSpindleRpm + ' RPM');\n});\ncy.wait(1000);\ncy.log('Step 12: Click decrease button until spindle reaches 7500 RPM');\ncy.log('Target RPM: ' + targetSpindleRpm);\n// Find the decrease button for spindle override\ncy.get('button[aria-label=\"Decrease Spindle override\"]').should('exist').as('decreaseButton');\n// Function to check current RPM and click decrease if needed\nconst decreaseUntilTarget = () => {\n  cy.contains(/\\d+\\s*RPM/i, {\n    timeout: 5000\n  }).invoke('text').then(text => {\n    const match = text.match(/(\\d+)\\s*RPM/i);\n    currentSpindleRpm = match ? parseInt(match[1], 10) : null;\n    cy.log(`Current RPM: ${currentSpindleRpm}, Target: ${targetSpindleRpm}, Clicks: ${decreaseClickCount}`);\n    // Check if we've reached or are below target\n    if (currentSpindleRpm > targetSpindleRpm) {\n      decreaseClickCount++;\n      // Click the decrease button\n      cy.get('@decreaseButton').click({\n        force: true\n      });\n      cy.wait(1500); // Wait for debounce (1000ms) + update\n      // Recursively check and click again if needed\n      decreaseUntilTarget();\n    } else {\n      cy.log(` Target RPM reached: ${currentSpindleRpm} RPM (after ${decreaseClickCount} clicks)`);\n    }\n  });\n};\n// Start the decrease process\ndecreaseUntilTarget();\ncy.log('Step 13: Verify spindle is at approximately 7500 RPM');\ncy.contains(/\\d+\\s*RPM/i).invoke('text').then(text => {\n  const match = text.match(/(\\d+)\\s*RPM/i);\n  const verifiedRpm = match ? parseInt(match[1], 10) : 0;\n  reducedSpindleRpm = verifiedRpm;\n  cy.log('Verified Spindle RPM: ' + verifiedRpm + ' RPM');\n  // Allow 10% tolerance (6750 - 8250 RPM)\n  if (verifiedRpm >= 6750 && verifiedRpm <= 8250) {\n    cy.log(' Spindle RPM is within acceptable range of 7500 RPM');\n  } else {\n    cy.log(` WARNING: Expected ~7500 RPM, got ${verifiedRpm} RPM`);\n  }\n  cy.wrap(verifiedRpm).as('reducedSpindleRpm');\n});\n// Capture the override percentage at this point\ncy.get('#spindle-override').parent().then($parent => {\n  const allText = $parent.text();\n  const percentMatch = allText.match(/(\\d+)%/g);\n  if (percentMatch && percentMatch.length > 0) {\n    reducedOverride = percentMatch[percentMatch.length - 1];\n    cy.log('Spindle Override at 7500 RPM: ' + reducedOverride);\n  }\n});\ncy.wait(2000);\ncy.log('Step 14: Click Reset button to return spindle to 100%');\n// The reset/plus button is in div:nth-of-type(1)\ncy.get('button[aria-label=\"Reset Spindle override to 100%\"]').click({\n  force: true\n});\ncy.wait(2000);\ncy.log('Reset button clicked - spindle should return to 100%');\ncy.log('Step 15: Verify spindle returned to 100% override');\ncy.get('#spindle-override').parent().then($parent => {\n  const allText = $parent.text();\n  const percentMatch = allText.match(/(\\d+)%/g);\n  if (percentMatch && percentMatch.length > 0) {\n    resetOverride = percentMatch[percentMatch.length - 1];\n    cy.log('Spindle Override after reset: ' + resetOverride);\n    const overrideValue = parseInt(resetOverride);\n    if (overrideValue >= 95 && overrideValue <= 105) {\n      cy.log(' Spindle successfully reset to 100%');\n    } else {\n      cy.log(` WARNING: Expected 100%, got ${overrideValue}%`);\n    }\n  }\n});\n// Verify RPM increased\ncy.contains(/\\d+\\s*RPM/i).invoke('text').then(text => {\n  const match = text.match(/(\\d+)\\s*RPM/i);\n  resetSpindleRpm = match ? parseInt(match[1], 10) : 0;\n  cy.log('Spindle RPM after reset: ' + resetSpindleRpm + ' RPM');\n  cy.wrap(resetSpindleRpm).as('resetSpindleRpm');\n});\ncy.wait(2000);\ncy.log('Step 16: Click increase button until spindle reaches 24000 RPM');\ncy.log('Target RPM: ' + targetIncreaseRpm);\n// targeting the + button\ncy.get('button[aria-label=\"Increase Spindle override\"]').should('exist').as('increaseButton');\n// Function to check current RPM and click increase if needed\nconst increaseUntilTarget = () => {\n  cy.contains(/\\d+\\s*RPM/i, {\n    timeout: 5000\n  }).invoke('text').then(text => {\n    const match = text.match(/(\\d+)\\s*RPM/i);\n    currentSpindleRpm = match ? parseInt(match[1], 10) : null;\n    cy.log(`Current RPM: ${currentSpindleRpm}, Target: ${targetIncreaseRpm}, Clicks: ${increaseClickCount}`);\n    // Check if we've reached target RPM\n    if (currentSpindleRpm < targetIncreaseRpm) {\n      increaseClickCount++;\n      // Click the increase button\n      cy.get('@increaseButton').click({\n        force: true\n      });\n      cy.wait(1500); // Wait for debounce (1000ms) + update\n      // Recursively check and click again if needed\n      increaseUntilTarget();\n    } else {\n      cy.log(` Target RPM reached: ${currentSpindleRpm} RPM (after ${increaseClickCount} clicks)`);\n    }\n  });\n};\n// Start the increase process\nincreaseUntilTarget();\ncy.log('Step 17: Verify spindle reached approximately 24000 RPM');\n// Capture the override percentage at this point\ncy.get('#spindle-override').parent().then($parent => {\n  const allText = $parent.text();\n  const percentMatch = allText.match(/(\\d+)%/g);\n  if (percentMatch && percentMatch.length > 0) {\n    increasedOverride = percentMatch[percentMatch.length - 1];\n    cy.log('Spindle Override at 24000 RPM: ' + increasedOverride);\n  }\n});\n// Verify RPM\ncy.contains(/\\d+\\s*RPM/i).invoke('text').then(text => {\n  const match = text.match(/(\\d+)\\s*RPM/i);\n  increasedSpindleRpm = match ? parseInt(match[1], 10) : 0;\n  cy.log('Verified Spindle RPM: ' + increasedSpindleRpm + ' RPM');\n  // Allow 10% tolerance (21600 - 26400 RPM)\n  if (increasedSpindleRpm >= 21600 && increasedSpindleRpm <= 26400) {\n    cy.log(' Spindle RPM is within acceptable range of 24000 RPM');\n  } else {\n    cy.log(` WARNING: Expected ~24000 RPM, got ${increasedSpindleRpm} RPM`);\n  }\n  cy.wrap(increasedSpindleRpm).as('increasedSpindleRpm');\n});\ncy.wait(2000);\ncy.log('Step 18: Click Reset button again to return spindle to 100%');\ncy.get('button[aria-label=\"Reset Spindle override to 100%\"]').click({\n  force: true\n});\ncy.wait(2000);\ncy.log('Second reset button clicked - spindle should return to 100%');\ncy.log('Step 19: Verify spindle returned to 100% override after increase');\ncy.get('#spindle-override').parent().then($parent => {\n  const allText = $parent.text();\n  const percentMatch = allText.match(/(\\d+)%/g);\n  if (percentMatch && percentMatch.length > 0) {\n    secondResetOverride = percentMatch[percentMatch.length - 1];\n    cy.log('Spindle Override after second reset: ' + secondResetOverride);\n    const overrideValue = parseInt(secondResetOverride);\n    if (overrideValue >= 95 && overrideValue <= 105) {\n      cy.log(' Spindle successfully reset to 100%');\n    } else {\n      cy.log(` WARNING: Expected 100%, got ${overrideValue}%`);\n    }\n  }\n});\n// Verify RPM returned\ncy.contains(/\\d+\\s*RPM/i).invoke('text').then(text => {\n  const match = text.match(/(\\d+)\\s*RPM/i);\n  secondResetSpindleRpm = match ? parseInt(match[1], 10) : 0;\n  cy.log('Spindle RPM after second reset: ' + secondResetSpindleRpm + ' RPM');\n  cy.wrap(secondResetSpindleRpm).as('secondResetSpindleRpm');\n});\ncy.wait(2000);\ncy.log('Step 20: Wait 5 seconds before stopping job');\ncy.wait(5000);\ncy.log('Step 21: Stop job and get details using custom command');\ncy.stopJobAndGetDetails();\ncy.get('@jobDetails').then(details => {\n  jobEndTime = Date.now();\n  cy.log('Job Details Retrieved:');\n  cy.log(`Status: ${details.status}`);\n  cy.log(`Time: ${details.time}`);\n  cy.log(`Errors: ${details.errors}`);\n  const durationSeconds = ((jobEndTime - jobStartTime) / 1000).toFixed(2);\n  cy.log('Total Job Duration: ' + durationSeconds + 's');\n  // Validate status doesn't contain error\n  expect(details.status.toLowerCase()).to.not.include('error');\n  // Store job details for later use\n  cy.wrap(details.status).as('jobStatus');\n  cy.wrap(details.time).as('timeTaken');\n  cy.wrap(details.errors).as('jobErrors');\n});\ncy.log('Step 22: Display final summary');\ncy.get('@jobStatus').then(status => {\n  cy.get('@timeTaken').then(time => {\n    cy.get('@jobErrors').then(errors => {\n      cy.log('');\n      cy.log('===============================================');\n      cy.log('SPINDLE TEST SUMMARY - DECREASE & INCREASE');\n      cy.log('===============================================');\n      cy.log('Configuration:');\n      cy.log('  Min Spindle Speed: ' + minSpindleSpeed + ' RPM');\n      cy.log('  Max Spindle Speed: ' + maxSpindleSpeed + ' RPM');\n      cy.log('');\n      cy.log('Spindle Override Changes:');\n      cy.log('  Initial Override: ' + (initialSpindleOverride || 'N/A'));\n      cy.log('  Initial RPM: ' + initialSpindleRpm + ' RPM');\n      cy.log('');\n      cy.log('  DECREASE Phase:');\n      cy.log('    Decrease Clicks: ' + decreaseClickCount);\n      cy.log('    Reduced Override: ' + reducedOverride);\n      cy.log('    Reduced RPM: ' + reducedSpindleRpm + ' RPM');\n      cy.log('    After 1st Reset Override: ' + resetOverride);\n      cy.log('    After 1st Reset RPM: ' + resetSpindleRpm + ' RPM');\n      cy.log('');\n      cy.log('  INCREASE Phase:');\n      cy.log('    Increase Clicks: ' + increaseClickCount);\n      cy.log('    Increased Override: ' + increasedOverride);\n      cy.log('    Increased RPM: ' + increasedSpindleRpm + ' RPM');\n      cy.log('    After 2nd Reset Override: ' + secondResetOverride);\n      cy.log('    After 2nd Reset RPM: ' + secondResetSpindleRpm + ' RPM');\n      cy.log('');\n      cy.log('Job Details:');\n      cy.log('  Status: ' + status);\n      cy.log('  Time Taken: ' + time);\n      cy.log('  Errors: ' + errors);\n      const duration = jobEndTime && jobStartTime ? ((jobEndTime - jobStartTime) / 1000).toFixed(2) : 'N/A';\n      cy.log('  Total Duration: ' + duration + 's');\n      cy.log('===============================================');\n    });\n  });\n});\ncy.log('Step 23: Close the job completion popup');\ncy.contains('button', 'Close').should('be.visible').click({\n  force: true\n});\ncy.wait(1000);\ncy.log('Popup closed');\ncy.log('Step 24: Verify popup is closed');\ncy.contains('h2', 'Job End').should('not.exist');\ncy.log('Popup successfully closed');\ncy.log('Step 25: Save comprehensive test results to file');\ncy.get('@jobStatus').then(status => {\n  cy.get('@timeTaken').then(time => {\n    cy.get('@jobErrors').then(errors => {\n      const testDetails = {\n        testName: 'Spindle Configuration and Control Test - Decrease & Increase (Stopped)',\n        timestamp: new Date().toISOString(),\n        spindleConfiguration: {\n          minSpindleSpeed: minSpindleSpeed,\n          maxSpindleSpeed: maxSpindleSpeed\n        },\n        spindleOverrideSequence: {\n          initial: {\n            override: initialSpindleOverride || 'N/A',\n            rpm: initialSpindleRpm\n          },\n          decreasePhase: {\n            targetRpm: targetSpindleRpm,\n            actualRpm: reducedSpindleRpm,\n            override: reducedOverride,\n            decreaseClicksRequired: decreaseClickCount,\n            firstResetOverride: resetOverride,\n            firstResetRpm: resetSpindleRpm\n          },\n          increasePhase: {\n            targetRpm: targetIncreaseRpm,\n            actualOverride: increasedOverride,\n            actualRpm: increasedSpindleRpm,\n            increaseClicksRequired: increaseClickCount,\n            secondResetOverride: secondResetOverride,\n            secondResetRpm: secondResetSpindleRpm\n          }\n        },\n        jobDetails: {\n          jobStartTime: new Date(jobStartTime).toISOString(),\n          jobEndTime: new Date(jobEndTime).toISOString(),\n          jobDurationSeconds: jobEndTime && jobStartTime ? (jobEndTime - jobStartTime) / 1000 : 0,\n          status: status,\n          timeTaken: time,\n          errors: errors,\n          stoppedManually: true\n        }\n      };\n      cy.writeFile('cypress/results/spindle-test-decrease-increase-stopped.json', testDetails);\n      cy.log('Test details saved to: cypress/results/spindle-test-decrease-increase-stopped.json');\n    });\n  });\n});\ncy.log('SPINDLE TEST COMPLETED SUCCESSFULLY');",
+              "err": {},
+              "uuid": "9094691c-c992-4326-bb99-0c236f3b7269",
+              "parentUUID": "54fe619b-4bb1-4110-9443-e727245690f1",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "9094691c-c992-4326-bb99-0c236f3b7269"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 82604,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        },
+        {
+          "uuid": "d46457de-eb63-49f4-ba3d-8511ea5c9012",
+          "title": "Surfacing Test",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Should complete surfacing workflow successfully",
+              "fullTitle": "Surfacing Test Should complete surfacing workflow successfully",
+              "timedOut": null,
+              "duration": 71622,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": "{\n  \"title\": \"cypress-mochawesome-reporter-screenshots\",\n  \"value\": [\n    [\n      \"\\\\A_grblHal_master_spec.cy.js\\\\Surfacing Test -- Should complete surfacing workflow successfully (failed).png\"\n    ]\n  ]\n}",
+              "code": "// Step 1: Connect to CNC\ncy.log('Step 1: Connecting to CNC...');\ncy.connectMachine();\ncy.wait(6000);\ncy.log('Connected to CNC');\n// Step 2: Verify CNC machine status is Idle\ncy.log('Step 2: Verifying machine status...');\ncy.verifyMachineStatus('Idle');\ncy.wait(2000);\ncy.log('Machine is in idle status');\ncy.unlockMachineIfNeeded();\ncy.wait(2000);\n// Step 3: Navigate to Tools\ncy.log('Step 3: Navigating to Tools page...');\ncy.contains('span', 'Tools').should('be.visible').click();\ncy.wait(1500);\ncy.log('Tools page opened');\n// Step 4: Click on Surfacing tool\ncy.contains('h3', 'Surfacing').closest('div.rounded-lg').should('be.visible').click();\n// Step 5: Configure Width\ncy.log('Step 5: Setting width to 75mm');\ncy.get('#width').should('be.visible').invoke('val', '').type('75');\ncy.wait(300);\n// Step 6: Configure Length\ncy.log('Step 6: Setting length to 75mm');\ncy.get('#length').should('be.visible').invoke('val', '').type('75');\ncy.wait(300);\n// Step 7: Configure Skim Depth\ncy.log('Step 7: Setting skim depth to 1mm');\ncy.get('#skimDepth').should('be.visible').clear().type('1');\ncy.wait(300);\n// Step 8: Configure Max Depth\ncy.log('Step 8: Setting max depth to 1mm');\ncy.get('#maxDepth').should('be.visible').clear().type('1');\ncy.wait(300);\n// Step 9: Configure Bit Diameter\ncy.log('Step 9: Setting bit diameter to 22mm');\ncy.get('div.px-8 div:nth-of-type(4) input').should('be.visible').clear().type('22');\ncy.wait(300);\n// Step 10: Configure Stepover\ncy.log('Step 10: Setting stepover to 40%');\ncy.get('div.px-8 div:nth-of-type(5) input').should('be.visible').clear().type('40');\ncy.wait(300);\n// Step 11: Configure Feedrate\ncy.log('Step 11: Setting feedrate to 2500 mm/min');\ncy.get('div:nth-of-type(6) input').invoke('val', '').type('2500');\ncy.wait(300);\n// Step 12: Configure Spindle RPM\ncy.log('Step 12: Setting spindle RPM to 17000');\ncy.get('div:nth-of-type(7) input').should('be.visible').clear().type('17000');\ncy.wait(500);\n// Step 13: Generate G-code\ncy.log('Step 13: Generating G-code...');\ncy.contains('button', 'Generate G-code').should('be.visible').click();\ncy.wait(1500);\ncy.log('G-code generated successfully');\n// Step 14: Load to Main Visualizer\ncy.log('Step 14: Loading to main visualizer...');\ncy.contains('button', 'Load to Main').should('be.visible').click();\ncy.wait(2000);\ncy.log('Loaded to main visualizer');\n// Step 15: Starting Job\ncy.log('Step 15: Starting Job...');\ncy.get('div.top-\\\\[-30px\\\\] > div:nth-of-type(1) > button').contains('Start').should('be.visible').click({\n  force: true\n});\ncy.wait(2000);\ncy.log('Job started');\n// Step 16: Verify job is running\ncy.log('Step 16: Verifying job is running...');\ncy.contains(/running|run/i, {\n  timeout: 10000\n}).should('be.visible').then(status => {\n  cy.log(`Job status: \"${status.text().trim()}\"`);\n});\n// Step 17: Wait for job completion\ncy.log('Step 17: Waiting for job completion...');\ncy.contains(/^Idle$/i, {\n  timeout: 120000\n}).should('be.visible').then(status => {\n  cy.log(`Job completed. Status: \"${status.text().trim()}\"`);\n});\ncy.wait(3000);\n// Step 18: Extract and verify job completion details from popup\ncy.log('Step 18: Extracting job completion details...');\n// Verify popup is visible\ncy.contains('h2', 'Job End').should('be.visible');\n// Extract Status (COMPLETE)\ncy.contains('strong', 'Status:').parent().find('span.text-green-500').should('be.visible').invoke('text').then(statusText => {\n  const status = statusText.trim();\n  cy.log(`Job Status: ${status}`);\n  expect(status).to.equal('COMPLETE');\n  // Store status for final summary\n  cy.wrap(status).as('jobStatus');\n});\n// Extract Time taken - Target the span directly after \"Time:\" strong tag\ncy.contains('strong', 'Time:').next('span').should('be.visible').invoke('text').then(timeText => {\n  const timeTaken = timeText.trim();\n  cy.log(`Time Taken: ${timeTaken}`);\n  // Store time for final summary\n  cy.wrap(timeTaken).as('timeTaken');\n});\n// Verify no errors - Fixed to use .next('span')\ncy.contains('strong', 'Errors:').next('span').should('be.visible').invoke('text').then(errorText => {\n  const errors = errorText.trim();\n  cy.log(`Errors: ${errors}`);\n  expect(errors).to.equal('None');\n  // Store errors for final summary\n  cy.wrap(errors).as('jobErrors');\n});\ncy.wait(1000);\n// Step 19: Display final summary\ncy.get('@jobStatus').then(status => {\n  cy.get('@timeTaken').then(time => {\n    cy.get('@jobErrors').then(errors => {\n      cy.log('JOB COMPLETION SUMMARY:');\n      cy.log(`Status: ${status}`);\n      cy.log(`Time Taken: ${time}`);\n      cy.log(`Errors: ${errors}`);\n    });\n  });\n});\n// Step 20: Close the job completion popup\ncy.log('Step 20: Closing job completion popup...');\ncy.contains('button', 'Close').should('be.visible').click({\n  force: true\n});\ncy.wait(1000);\ncy.log('Popup closed');\ncy.log('Surfacing test completed successfully!');",
+              "err": {
+                "message": "AssertionError: Timed out retrying after 10000ms: Expected to find content: 'Job End' within the selector: 'h2' but never did.",
+                "estack": "AssertionError: Timed out retrying after 10000ms: Expected to find content: 'Job End' within the selector: 'h2' but never did.\n    at Context.eval (webpack://gSender/./cypress/e2e/grblHal/surfacing.cy.js:152:7)",
+                "diff": null
+              },
+              "uuid": "46e70867-fd7e-410d-9b85-1ef5aedfb140",
+              "parentUUID": "d46457de-eb63-49f4-ba3d-8511ea5c9012",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [],
+          "failures": [
+            "46e70867-fd7e-410d-9b85-1ef5aedfb140"
+          ],
+          "pending": [],
+          "skipped": [],
+          "duration": 71622,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        },
+        {
+          "uuid": "e667ce5f-f977-4103-83a2-1b3b14e1634a",
+          "title": "CNC Bit Position and Job Progress Tracking",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "should connect, track bit positions, verify movement, and validate specific position values during job execution",
+              "fullTitle": "CNC Bit Position and Job Progress Tracking should connect, track bit positions, verify movement, and validate specific position values during job execution",
+              "timedOut": null,
+              "duration": 58480,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "// Store initial positions\nconst positionLog = {\n  work: {\n    x: [],\n    y: [],\n    z: []\n  },\n  machine: {\n    x: [],\n    y: []\n  },\n  timestamps: []\n};\n// Helper function to capture position values\nconst capturePositions = label => {\n  cy.log(`Capturing positions: ${label}`);\n  // Capture Work Position values (X, Y, Z inputs)\n  cy.get('input[type=\"number\"].text-blue-500').eq(0).invoke('val').then(xWork => {\n    positionLog.work.x.push({\n      value: parseFloat(xWork),\n      label\n    });\n  });\n  cy.get('input[type=\"number\"].text-blue-500').eq(1).invoke('val').then(yWork => {\n    positionLog.work.y.push({\n      value: parseFloat(yWork),\n      label\n    });\n  });\n  cy.get('input[type=\"number\"].text-blue-500').eq(2).invoke('val').then(zWork => {\n    positionLog.work.z.push({\n      value: parseFloat(zWork),\n      label\n    });\n  });\n  // Capture Machine Position values (X, Y spans)\n  cy.get('span.font-mono.text-gray-400').eq(0).invoke('text').then(xMachine => {\n    positionLog.machine.x.push({\n      value: parseFloat(xMachine),\n      label\n    });\n  });\n  cy.get('span.font-mono.text-gray-400').eq(1).invoke('text').then(yMachine => {\n    positionLog.machine.y.push({\n      value: parseFloat(yMachine),\n      label\n    });\n  });\n  positionLog.timestamps.push({\n    time: new Date().toISOString(),\n    label\n  });\n};\n// Step 1: Connect to CNC machine FIRST\ncy.log('Step 1: Connecting to CNC...');\ncy.connectMachine();\ncy.wait(6000); // Wait for connection to establish\ncy.log(' Connected to CNC');\n// Step 2: Handle unlock if needed\ncy.log('Step 2: Unlocking machine if needed...');\ncy.unlockMachineIfNeeded();\n// Step 3: Verify machine is in Idle state\ncy.log('Step 3: Verifying machine status...');\ncy.contains(/^Idle$/i, {\n  timeout: 30000\n}).should('be.visible').then(status => {\n  cy.log(` Machine status: \"${status.text().trim()}\"`);\n});\ncy.wait(2000);\n// Step 4: Load a G-code file (required before job can start)\ncy.log('Step 4: Loading G-code file...');\ncy.uploadGcodeFile();\ncy.wait(2000); // Wait for file to load and process\ncy.log('File Uploaded');\n// Step 5: Zero all axes (buttons should now be enabled)\ncy.log('Step 5: Zeroing all axes...');\n// Zero X axis - wait for it to be enabled\ncy.contains('button', 'X0', {\n  timeout: 10000\n}).should('not.be.disabled').click();\ncy.wait(500);\n// Zero Y axis\ncy.contains('button', 'Y0').should('not.be.disabled').click();\ncy.wait(500);\n// Zero Z axis\ncy.contains('button', 'Z0').should('not.be.disabled').click();\ncy.wait(1000);\n// Step 6: Verify axes are zeroed\ncy.log('Step 6: Verifying axes are zeroed...');\ncy.get('input[type=\"number\"].text-blue-500').eq(0).should('have.value', '0.00');\ncy.get('input[type=\"number\"].text-blue-500').eq(1).should('have.value', '0.00');\ncy.get('input[type=\"number\"].text-blue-500').eq(2).should('have.value', '0.00');\ncy.log('All axes zeroed successfully');\n// Capture initial zeroed positions\ncapturePositions('After Zeroing');\n// Step 7: Start the job\ncy.log('Step 7: Starting job run...');\n// Find and click the Start button\ncy.get('div.top-\\\\[-30px\\\\] > div:nth-of-type(1) > button').contains('Start').should('be.visible').click({\n  force: true\n});\ncy.wait(2000);\ncy.log('Job started');\n// Capture positions immediately after start\ncapturePositions('Job Started');\n// Step 8: Verify job is running\ncy.log('Step 8: Verifying job is running...');\ncy.contains(/running|run/i, {\n  timeout: 10000\n}).should('be.visible').then(status => {\n  cy.log(`Job status: \"${status.text().trim()}\"`);\n});\n// Step 9: Monitor position changes during job execution\ncy.log('Step 9: Monitoring position changes...');\n// Poll positions at intervals\nconst monitoringIntervals = [1000, 2000, 3000, 5000, 7000, 10000];\nmonitoringIntervals.forEach((interval, index) => {\n  cy.wait(interval - (index > 0 ? monitoringIntervals[index - 1] : 0));\n  capturePositions(`During Job - ${interval}ms`);\n  // Verify that positions are changing (not all zeros)\n  cy.get('input[type=\"number\"].text-blue-500').then($inputs => {\n    const values = [...$inputs].map(input => parseFloat(input.value));\n    const hasMovement = values.some(val => Math.abs(val) > 0.01);\n    if (hasMovement) {\n      cy.log(`Bit movement detected at ${interval}ms`);\n    }\n  });\n});\n// Step 10: Verify specific position values (Z-axis and machine positions)\ncy.log('Step 10: Verifying specific position values...');\n// Check Work Z-axis position\ncy.get('input[type=\"number\"].text-blue-500').eq(2).invoke('val').then(zValue => {\n  const z = parseFloat(zValue);\n  cy.log(`Work Z position: ${zValue} mm`);\n  // Z should have moved from 0 if job is running\n  if (Math.abs(z) > 0.01) {\n    expect(z).to.be.a('number');\n    cy.log('Z-axis is moving');\n  }\n});\n// Check Machine X position\ncy.get('span.font-mono.text-gray-400').eq(0).should('exist').invoke('text').then(text => {\n  cy.log(`Machine X: ${text} mm`);\n  expect(parseFloat(text)).to.be.a('number');\n  cy.log('Machine X position valid');\n});\n// Check Machine Y position\ncy.get('span.font-mono.text-gray-400').eq(1).should('exist').invoke('text').then(text => {\n  cy.log(`Machine Y: ${text} mm`);\n  expect(parseFloat(text)).to.be.a('number');\n  cy.log('Machine Y position valid');\n});\n// Step 11: Stop the job (or let it complete)\ncy.log('Step 11: Stopping job...');\ncy.get('body').then($body => {\n  if ($body.find('button[aria-label=\"Stop\"]').length > 0) {\n    cy.get('button[aria-label=\"Stop\"]').first().click();\n    cy.log('Job stopped manually');\n  } else if ($body.find('button[aria-label=\"Pause\"]').length > 0) {\n    cy.get('button[aria-label=\"Pause\"]').first().click();\n    cy.log('Job paused');\n  }\n});\ncy.wait(1000);\n// Capture final positions\ncapturePositions('Job Stopped/Paused');\n// Step 12: Analyze and verify position data\ncy.log('Step 12: Analyzing captured position data...');\ncy.then(() => {\n  var _positionLog$work$x$, _positionLog$work$y$, _positionLog$work$z$, _positionLog$work$x, _positionLog$work$y, _positionLog$work$z;\n  cy.log('       POSITION LOG SUMMARY       ');\n  cy.log(`Work X positions: ${JSON.stringify(positionLog.work.x)}`);\n  cy.log(`Work Y positions: ${JSON.stringify(positionLog.work.y)}`);\n  cy.log(`Work Z positions: ${JSON.stringify(positionLog.work.z)}`);\n  cy.log(`Machine X positions: ${JSON.stringify(positionLog.machine.x)}`);\n  cy.log(`Machine Y positions: ${JSON.stringify(positionLog.machine.y)}`);\n  // Assertions - verify we captured data\n  expect(positionLog.work.x.length).to.be.greaterThan(2);\n  expect(positionLog.work.y.length).to.be.greaterThan(2);\n  expect(positionLog.work.z.length).to.be.greaterThan(2);\n  // Calculate total movement\n  const xMovement = Math.abs(positionLog.work.x[positionLog.work.x.length - 1].value - positionLog.work.x[0].value);\n  const yMovement = Math.abs(positionLog.work.y[positionLog.work.y.length - 1].value - positionLog.work.y[0].value);\n  const zMovement = Math.abs(positionLog.work.z[positionLog.work.z.length - 1].value - positionLog.work.z[0].value);\n  cy.log('       MOVEMENT SUMMARY       ');\n  cy.log(`Total X movement: ${xMovement.toFixed(3)} mm`);\n  cy.log(`Total Y movement: ${yMovement.toFixed(3)} mm`);\n  cy.log(`Total Z movement: ${zMovement.toFixed(3)} mm`);\n  // Additional validation - verify movement occurred\n  const totalMovement = xMovement + yMovement + zMovement;\n  expect(totalMovement).to.be.greaterThan(0);\n  cy.log(`Total combined movement: ${totalMovement.toFixed(3)} mm`);\n  // Save position log to file\n  cy.writeFile('cypress/results/position-log.json', positionLog);\n  cy.log(' Position data saved to: cypress/results/position-log.json');\n  // Save movement summary to separate file\n  const movementSummary = {\n    testName: 'CNC Bit Position Tracking',\n    timestamp: new Date().toISOString(),\n    totalDataPoints: positionLog.work.x.length,\n    movement: {\n      x: xMovement,\n      y: yMovement,\n      z: zMovement,\n      total: totalMovement\n    },\n    positions: {\n      initial: {\n        x: ((_positionLog$work$x$ = positionLog.work.x[0]) === null || _positionLog$work$x$ === void 0 ? void 0 : _positionLog$work$x$.value) || 0,\n        y: ((_positionLog$work$y$ = positionLog.work.y[0]) === null || _positionLog$work$y$ === void 0 ? void 0 : _positionLog$work$y$.value) || 0,\n        z: ((_positionLog$work$z$ = positionLog.work.z[0]) === null || _positionLog$work$z$ === void 0 ? void 0 : _positionLog$work$z$.value) || 0\n      },\n      final: {\n        x: ((_positionLog$work$x = positionLog.work.x[positionLog.work.x.length - 1]) === null || _positionLog$work$x === void 0 ? void 0 : _positionLog$work$x.value) || 0,\n        y: ((_positionLog$work$y = positionLog.work.y[positionLog.work.y.length - 1]) === null || _positionLog$work$y === void 0 ? void 0 : _positionLog$work$y.value) || 0,\n        z: ((_positionLog$work$z = positionLog.work.z[positionLog.work.z.length - 1]) === null || _positionLog$work$z === void 0 ? void 0 : _positionLog$work$z.value) || 0\n      }\n    }\n  };\n  cy.writeFile('cypress/results/movement-summary.json', movementSummary);\n  cy.log(' Movement summary saved to: cypress/results/movement-summary.json');\n});\n// Step 13: Close any modal dialogs\ncy.log('Step 13: Closing any open dialogs...');\ncy.get('body').then($body => {\n  if ($body.find('button:contains(\"Close\")').length > 0) {\n    cy.contains('button', 'Close').click({\n      force: true\n    });\n    cy.log(' Dialog closed');\n  }\n});\ncy.log('POSITION TRACKING TEST COMPLETED SUCCESSFULLY');",
+              "err": {},
+              "uuid": "2c4c4015-bbc9-487a-8e8f-6307235df0e5",
+              "parentUUID": "e667ce5f-f977-4103-83a2-1b3b14e1634a",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "2c4c4015-bbc9-487a-8e8f-6307235df0e5"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 58480,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        },
+        {
+          "uuid": "ca57d313-b031-40f0-bee9-2e8b407b6dec",
+          "title": "gSender XY Squaring Test",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Should complete XY Squaring wizard with measurements and adjustments",
+              "fullTitle": "gSender XY Squaring Test Should complete XY Squaring wizard with measurements and adjustments",
+              "timedOut": null,
+              "duration": 74363,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "// ========== POSITIVE TEST CASE ==========\n// Step 1: Connect to CNC\ncy.log('Step 1: Connecting to CNC...');\ncy.connectMachine();\ncy.wait(6000);\ncy.log('Connected to CNC');\n// Step 2: Verify CNC machine status is Idle\ncy.log('Step 2: Verifying machine status...');\ncy.verifyMachineStatus('Idle');\ncy.wait(2000);\ncy.log('Machine is in idle status');\n// Step 3: Unlock machine if needed\ncy.unlockMachineIfNeeded();\ncy.wait(2000);\n// Step 4: Navigate to Tools page\ncy.log('Step 4: Navigating to Tools page...');\ncy.goToTools();\ncy.log('Tools page opened');\n// Step 5: Click on XY Squaring tool\ncy.log('Step 5: Opening XY Squaring tool...');\ncy.contains('div.rounded-lg', 'XY Squaring').should('be.visible').click();\n// Step 6: Click \"Start XY Squaring\" button\ncy.log('Step 6: Starting XY Squaring wizard...');\ncy.get('button').contains('Start XY Squaring').should('be.visible').click();\ncy.wait(1500);\ncy.log('XY Squaring wizard started');\n// Step 7: Open Jog Controls\ncy.log('Step 7: Opening Jog Controls...');\ncy.get('div.justify-start > div:nth-of-type(1) > div:nth-of-type(2) span').contains('Jog Controls').should('be.visible').click();\ncy.wait(1000);\ncy.log('Jog Controls opened');\n// Step 8: Set jog distance to 10mm\ncy.log('Step 8: Setting jog distance to 10mm...');\ncy.get('body > div:nth-of-type(2) div.gap-1 > div.items-center > div > div:nth-of-type(1) > div').should('be.visible').click();\ncy.wait(500);\ncy.get('body > div:nth-of-type(2) div.gap-1 > div.items-center > div > div:nth-of-type(1) input').clear().type('10');\ncy.wait(500);\ncy.log('✓ Jog distance set to 10mm');\n// Jogging x axis one time \ncy.get('#xPlus').click({\n  force: true\n});\ncy.log(\"X axis jogged one time\");\n// Step 10: Mark Point 1\ncy.log('Step 10: Marking Point 1...');\ncy.get('button').contains('Mark Point 1').should('be.visible').click();\ncy.wait(1000);\ncy.log('Point 1 marked');\n// Step 11: Move X-axis\ncy.log('Step 11: Moving X-axis...');\ncy.get('button').contains('Move X-axis').should('be.visible').click();\ncy.wait(2000);\ncy.log('X-axis moved');\n// Step 12: Mark Point 2\ncy.log('Step 12: Marking Point 2...');\ncy.get('button').contains('Mark Point 2').should('be.visible').click();\ncy.wait(1000);\ncy.log('Point 2 marked');\n// Step 13: Move Y-axis\ncy.log('Step 13: Moving Y-axis...');\ncy.get('button').contains('Move Y-axis').should('be.visible').click();\ncy.wait(2000);\ncy.log('Y-axis moved');\n// Step 14: Mark Point 3\ncy.log('Step 14: Marking Point 3...');\ncy.get('button').contains('Mark Point 3').should('be.visible').click();\ncy.wait(1000);\ncy.log('Point 3 marked');\n// Click on Next Step\ncy.log('Clicking next step');\ncy.contains('button', 'Next Step').click({\n  force: true\n});\n// Step 15: Enter Point 1 Y measurement\ncy.log('Step 15: Entering Point 1 Y measurement (300)...');\ncy.get('div.bg-blue-50 input').first().should('be.visible').clear().type('300{enter}');\ncy.wait(1000);\ncy.log('Point 1 Y measurement entered: 300mm');\n// Step 16: Enter X-axis movement distance\ncy.log('Step 16: Entering X-axis movement distance (300mm)...');\ncy.get('div.space-y-6 > div:nth-of-type(2) input').should('be.visible').clear().type('300{enter}');\ncy.wait(1000);\ncy.log('X-axis movement distance entered: 300mm');\n// Step 17: Enter Point 2 Y measurement\ncy.log('Step 17: Entering Point 2 Y measurement (424.26mm)...');\ncy.get('div.space-y-6 > div:nth-of-type(3) input').should('be.visible').clear().type('424.26');\ncy.wait(1000);\ncy.log('Point 2 Y measurement entered: 424.26mm');\n// Step 18: Click outside to ensure focus is removed\n/*cy.log('Step 18: Confirming measurements...');\ncy.get('div.p-4 > div.w-full')\n  .click({ force: true });\ncy.wait(500); */\n// Step 19-21: Click all three Confirm buttons in sequence\ncy.log('Step 19-21: Clicking all three Confirm buttons...');\n// First confirm\ncy.get('[testid=\"confirm 1-2\"]').should('be.visible').click();\ncy.wait(500);\ncy.log('Confirm button 1-2 clicked');\n// Second confirm  \ncy.get('[testid=\"confirm 2-3\"]').should('be.visible').click();\ncy.wait(500);\ncy.log('Confirm button 2-3 clicked');\n// Third confirm\ncy.get('[testid=\"confirm 1-3\"]').should('be.visible').click();\ncy.wait(500);\ncy.log('Confirm button 1-3 clicked');\n// Step 23: Click \"Next Step\" to proceed\ncy.log('Step 23: Proceeding to next step...');\ncy.get('button').contains('Next Step').should('be.visible').should('not.be.disabled').click();\ncy.wait(1500);\ncy.log('Proceeded to next step');\n// Step 24: Verify success message\ncy.log('Step 24: Verifying machine is properly squared...');\ncy.contains('Your machine is properly squared!').should('be.visible');\ncy.log('Machine is properly squared - Positive test completed!');\n// Find button Restart Wizard and click \ncy.contains('button', 'Restart Wizard').click();\n// ========== NEGATIVE TEST CASE ==========\ncy.log('STARTING NEGATIVE TEST CASE');\n// Step 25: Restart Wizard for negative testing\n// Step 6: Click \"Start XY Squaring\" button\ncy.log('Step 6: Starting XY Squaring wizard...');\ncy.get('button').contains('Start XY Squaring').should('be.visible').click();\ncy.wait(1500);\ncy.log('XY Squaring wizard started');\n// Repeat steps to mark points\ncy.log('Marking Point 1...');\ncy.get('button').contains('Mark Point 1').should('be.visible').click();\ncy.wait(1000);\ncy.log('Moving X-axis...');\ncy.get('button').contains('Move X-axis').should('be.visible').click();\ncy.wait(2000);\ncy.log('Marking Point 2...');\ncy.get('button').contains('Mark Point 2').should('be.visible').click();\ncy.wait(1000);\ncy.log('Moving Y-axis...');\ncy.get('button').contains('Move Y-axis').should('be.visible').click();\ncy.wait(2000);\ncy.log('Marking Point 3...');\ncy.get('button').contains('Mark Point 3').should('be.visible').click();\ncy.wait(1000);\ncy.log('Clicking Next Step...');\ncy.contains('button', 'Next Step').click({\n  force: true\n});\ncy.wait(1000);\n// Enter measurements with incorrect Point 2 value\ncy.log('NEGATIVE TEST: Entering Point 1 Y measurement (300mm)...');\ncy.get('div.bg-blue-50 input').first().should('be.visible').clear().type('300{enter}');\ncy.wait(1000);\ncy.log('NEGATIVE TEST: Entering X-axis movement distance (300mm)...');\ncy.get('div.space-y-6 > div:nth-of-type(2) input').should('be.visible').clear().type('300{enter}');\ncy.wait(1000);\n// Enter incorrect Point 2 value (300 instead of 424.26)\ncy.log('NEGATIVE TEST: Entering incorrect Point 2 Y measurement (300mm instead of 424.26mm)...');\ncy.get('div.space-y-6 > div:nth-of-type(3) input').should('be.visible').clear().type('300');\ncy.wait(1000);\ncy.log('Incorrect Point 2 Y measurement entered: 300mm');\n// Click all confirm buttons\ncy.get('[testid=\"confirm 1-2\"]').should('be.visible').click();\ncy.wait(500);\ncy.get('[testid=\"confirm 2-3\"]').should('be.visible').click();\ncy.wait(500);\ncy.get('[testid=\"confirm 1-3\"]').should('be.visible').click();\ncy.wait(500);\n// Click Next Step\ncy.get('button').contains('Next Step').should('be.visible').click();\ncy.wait(1500);\n// Verify \"Your machine needs adjustment\" message\ncy.log('NEGATIVE TEST: Verifying adjustment needed message...');\ncy.contains('Your machine needs adjustment').should('be.visible');\ncy.log('Machine needs adjustment message confirmed - Negative test passed!');\ncy.log(' ALL TESTS COMPLETED SUCCESSFULLY');",
+              "err": {},
+              "uuid": "054dc36f-1400-469c-8980-2c14d4095914",
+              "parentUUID": "ca57d313-b031-40f0-bee9-2e8b407b6dec",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "054dc36f-1400-469c-8980-2c14d4095914"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 74363,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 2000
+    }
+  ],
+  "meta": {
+    "mocha": {
+      "version": "7.0.1"
+    },
+    "mochawesome": {
+      "options": {
+        "quiet": false,
+        "reportFilename": "mochawesome",
+        "saveHtml": false,
+        "saveJson": true,
+        "consoleReporter": "spec",
+        "useInlineDiffs": false,
+        "code": true
+      },
+      "version": "7.1.4"
+    },
+    "marge": {
+      "options": {
+        "id": "default",
+        "reportDir": "cypress/reports/mochawesome/.jsons",
+        "overwrite": false,
+        "html": false,
+        "json": true
+      },
+      "version": "6.3.2"
+    }
+  }
+}

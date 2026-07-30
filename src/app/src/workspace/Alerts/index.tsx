@@ -1,10 +1,14 @@
+import { usePostHog } from "@posthog/react";
 import api from "app/api";
-import { Job, MaintenanceTask } from "app/features/Stats/utils/StatContext";
-import { useEffect, useState } from "react";
-import MaintenanceAlert from "./MaintenanceAlert";
-import pubsub from "pubsub-js";
-import JobEndModal from "./JobEndModal";
+import type {
+	Job,
+	MaintenanceTask,
+} from "app/features/Stats/utils/StatContext";
 import store from "app/store";
+import pubsub from "pubsub-js";
+import { useEffect, useState } from "react";
+import JobEndModal from "./JobEndModal";
+import MaintenanceAlert from "./MaintenanceAlert";
 
 export const Alerts = () => {
 	const [maintenanceAlertsEnabled, setMaintenanceAlertsEnabled] = useState(
@@ -18,6 +22,8 @@ export const Alerts = () => {
 	const [tasks, setTasks] = useState<MaintenanceTask[]>([]);
 	const [job, setJob] = useState<Job>(null);
 	const [errors, setErrors] = useState([]);
+
+	const posthog = usePostHog();
 
 	const handleStoreChange = () => {
 		setShowJobEndModal(false);
@@ -53,6 +59,8 @@ export const Alerts = () => {
 			pubsub.subscribe("lastJob", (_, job) => {
 				setJob(job);
 				setShowJobEndModal(true);
+
+				posthog?.capture("job:end", { job });
 			}),
 		];
 

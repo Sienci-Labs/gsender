@@ -21,12 +21,12 @@
  *
  */
 
-import pubsub from "pubsub-js";
+import { toast } from "app/lib/toaster";
 
 import store from "app/store";
-import { toast } from "app/lib/toaster";
-import { RecentFile } from "../definitions";
-import { FileData } from "..";
+import pubsub from "pubsub-js";
+import type { FileData } from "..";
+import type { RecentFile } from "../definitions";
 
 export const RECENT_FILE_LIMIT = 8;
 
@@ -132,8 +132,8 @@ export const loadRecentFile = (filePath: string) => {
 };
 
 export const deleteRecentFile = (filePath: string) => {
-	let savedFiles: RecentFile[] = store.get("workspace.recentFiles", []);
-	let updatedFiles = savedFiles.slice();
+	const savedFiles: RecentFile[] = store.get("workspace.recentFiles", []);
+	const updatedFiles = savedFiles.slice();
 	const indexToDelete = updatedFiles.findIndex(
 		(file, _index) => file.filePath === filePath,
 	);

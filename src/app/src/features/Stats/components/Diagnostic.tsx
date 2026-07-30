@@ -12,7 +12,7 @@ export function Diagnostic({ compactOnSmall = false }: DiagnosticProps) {
 			}`}
 		>
 			<p
-				className={`text-gray-600 text-sm dark:text-content-primary ${
+				className={`text-gray-600 text-sm dark:text-white ${
 					compactOnSmall ? "max-xl:hidden" : ""
 				}`}
 			>

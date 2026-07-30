@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-import React from "react";
-import { toast } from "app/lib/toaster";
 import api from "app/api";
 import { Switch } from "app/components/shadcn/Switch";
 import MacroForm from "app/features/Macros/MacroForm";
+import { toast } from "app/lib/toaster";
+import type React from "react";
+import { useEffect, useState } from "react";
 
 interface EventInputProps {
 	eventType: string;
@@ -108,10 +108,10 @@ export function EventInput({ eventType }: EventInputProps): React.ReactElement {
 				tabIndex={-1}
 				rows={4}
 				value={eventCommands || "; No commands set"}
-				className="ring-1 ring-gray-300 rounded-md font-mono block w-full p-2 text-sm bg-gray-50 text-gray-500 resize-none pointer-events-none dark:bg-surface-sunken dark:text-content-muted dark:ring-outline"
+				className="ring-1 ring-gray-300 rounded-md font-mono block w-full p-2 text-sm bg-gray-50 text-gray-500 resize-none pointer-events-none dark:bg-dark-lighter dark:text-gray-400 dark:ring-gray-600"
 			/>
 			<button
-				className="bg-white shadow p-2 text-sm rounded border border-blue-500 text-gray-700 hover:bg-gray-100 dark:bg-surface-raised dark:text-content-primary dark:hover:bg-surface-hover"
+				className="bg-white shadow p-2 text-sm rounded border border-blue-500 text-gray-700 hover:bg-gray-100 dark:bg-dark dark:text-white dark:hover:bg-dark-lighter"
 				onClick={() => setIsEditing(true)}
 			>
 				Edit Event

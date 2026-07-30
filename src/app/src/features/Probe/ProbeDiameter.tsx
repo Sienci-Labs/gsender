@@ -21,46 +21,47 @@
  *
  */
 
-import {
-	useState,
-	useEffect,
-	KeyboardEvent,
-	useCallback,
-	useRef,
-	useMemo,
-} from "react";
-import cx from "classnames";
-import { X, Plus, ChevronDown } from "lucide-react";
-
-import {
-	TOUCHPLATE_TYPE_AUTOZERO,
-	TOUCHPLATE_TYPE_BITZERO,
-	PROBE_TYPE_AUTO,
-	PROBE_TYPE_TIP,
-	PROBE_TYPE_DIAMETER,
-} from "app/lib/constants";
-import { UNITS_EN } from "app/definitions/general";
+import { Button } from "app/components/Button";
+import { Input } from "app/components/shadcn/Input";
 import {
 	Popover,
 	PopoverContent,
 	PopoverTrigger,
 } from "app/components/shadcn/Popover";
-
-import { Input } from "app/components/shadcn/Input";
-import { Button } from "app/components/Button";
-
-import { IMPERIAL_UNITS, METRIC_UNITS, PROBING_CATEGORY } from "app/constants";
+import Tooltip from "app/components/Tooltip";
+import type { UNITS_EN } from "app/definitions/general";
+import useShuttleEvents from "app/hooks/useShuttleEvents";
 import {
+	PROBE_TYPE_AUTO,
+	PROBE_TYPE_DIAMETER,
+	PROBE_TYPE_TIP,
+	TOUCHPLATE_TYPE_AUTOZERO,
+	TOUCHPLATE_TYPE_BITZERO,
+} from "app/lib/constants";
+import useKeybinding from "app/lib/useKeybinding";
+import store from "app/store";
+import cx from "classnames";
+import { ChevronDown, Plus, X } from "lucide-react";
+import {
+	type KeyboardEvent,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
+import {
+	IMPERIAL_UNITS,
+	METRIC_UNITS,
+	PROBING_CATEGORY,
+} from "../../constants";
+import type {
 	Actions,
 	AvailableTool,
 	PROBE_TYPES_T,
 	ProbeCommand,
 	State,
 } from "./definitions";
-import useShuttleEvents from "app/hooks/useShuttleEvents";
-import useKeybinding from "app/lib/useKeybinding";
-import store from "app/store";
-import Tooltip from "app/components/Tooltip";
 
 type Props = {
 	actions: Actions;
@@ -97,7 +98,6 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
 	const [value, setValue] = useState(
 		probeType === PROBE_TYPE_DIAMETER ? String(toolDiameter) : probeType,
 	);
-	const [open, setOpen] = useState(false);
 
 	const inputRef = useRef<HTMLInputElement>(null);
 
@@ -198,7 +198,6 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
 			if (inputRef.current) {
 				inputRef.current.value = "";
 			}
-			setOpen(false);
 		},
 		[actions],
 	);
@@ -377,7 +376,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
 	return (
 		<div className={cx("w-full", { hidden: !probeCommand.tool })}>
 			<div className="flex flex-col space-y-2">
-				<Popover open={open} onOpenChange={setOpen}>
+				<Popover>
 					<PopoverTrigger asChild>
 						<Button
 							variant="ghost"

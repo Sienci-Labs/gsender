@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
 import { Switch } from "app/components/shadcn/Switch";
 import ensureArray from "ensure-array";
+import { useEffect, useState } from "react";
+import BitValueIndicator from "./BitValueIndicator";
 import styles from "./index.module.styl";
 import { convertBitfieldToValue, getBitfieldArr } from "./utils.ts";
-import BitValueIndicator from "./BitValueIndicator";
 
 const BitfieldInput = ({
 	info,
@@ -23,7 +23,7 @@ const BitfieldInput = ({
 	const [bitMap, setBitMap] = useState([]);
 
 	useEffect(() => {
-		let map = getBitfieldArr(setting.value);
+		const map = getBitfieldArr(setting.value);
 		setBitMap(map);
 	}, [setting]);
 
@@ -43,10 +43,10 @@ const BitfieldInput = ({
 	return (
 		<div className={styles.column}>
 			{format.map((opt, index) => {
-				let key = `${setting.setting}-${index}-key`;
+				const key = `${setting.setting}-${index}-key`;
 				const notNA = opt !== "N/A";
-				let checked = bitMap[index] === 1;
-				let isDisabled =
+				const checked = bitMap[index] === 1;
+				const isDisabled =
 					disabled || (index > 0 && isExclusive && bitMap[0] !== 1);
 				const id = `${setting.setting}-${index}-key`;
 				return (

@@ -21,28 +21,29 @@
  *
  */
 
+import { app } from "electron";
 import ensureArray from "ensure-array";
+import fs from "fs";
 import noop from "lodash/noop";
 import partition from "lodash/partition";
+import path from "path";
 import { SerialPort } from "serialport";
 import socketIO from "socket.io";
-import { app } from "electron";
-import fs from "fs";
-import path from "path";
+import { VISUALIZER_SECONDARY } from "../../../app/src/constants";
+import { authorizeIPAddress } from "../../access-control";
+import { GrblController, GrblHalController } from "../../controllers";
+import { GRBL } from "../../controllers/Grbl/constants";
+import { GRBLHAL } from "../../controllers/Grblhal/constants";
+import Connection from "../../lib/Connection";
+import delay from "../../lib/delay";
 import EventTrigger from "../../lib/EventTrigger";
+import DFUFlasher from "../../lib/Firmware/Flashing/DFUFlasher";
+import FlashingFirmware from "../../lib/Firmware/Flashing/firmwareflashing";
+import UF2Flasher from "../../lib/Firmware/Flashing/UF2Flasher";
 import logger from "../../lib/logger";
 import store from "../../store";
 import config from "../configstore";
 import taskRunner from "../taskrunner";
-import FlashingFirmware from "../../lib/Firmware/Flashing/firmwareflashing";
-import { GrblController, GrblHalController } from "../../controllers";
-import { GRBL } from "../../controllers/Grbl/constants";
-import { GRBLHAL } from "../../controllers/Grblhal/constants";
-import { authorizeIPAddress } from "../../access-control";
-import DFUFlasher from "../../lib/Firmware/Flashing/DFUFlasher";
-import delay from "../../lib/delay";
-import Connection from "../../lib/Connection";
-import { VISUALIZER_SECONDARY } from "app/src/constants";
 
 const log = logger("service:cncengine");
 
@@ -186,6 +187,26 @@ class CNCEngine {
 				`New connection from ${address}: id=${socket.id}, user.id=${user.id}, user.name=${user.name}`,
 			);
 
+			// Joins targetSocket to an already-open connection without touching the
+			// serial port: registers it with Connection/Controller so it receives
+			// ongoing status pushes, then acks the join so its UI flips to
+			// "connected". The ack must fire *before* controller.addConnection
+			// populates fresh state — MachineStatus.tsx resets its "fresh state"
+			// flag on serialport:open, so a reset arriving after the fresh state
+			// would clobber it.
+			const joinSocketToConnection = (targetSocket, port, controller) => {
+				targetSocket.join(port);
+				targetSocket.emit("serialport:open", {
+					port,
+					baudrate: controller.options.baudrate,
+					controllerType: controller.type,
+					inuse: true,
+				});
+				targetSocket.emit("serialport:openController", controller.type);
+				this.connection.addConnection(targetSocket);
+				controller.addConnection(targetSocket);
+			};
+
 			const connectionListeners = {
 				"serialport:open": (port, baudrate, controllerType, inuse) => {
 					this.emit("serialport:open", port, baudrate, controllerType, inuse);
@@ -262,6 +283,19 @@ class CNCEngine {
 						}
 						store.set(`controllers[${JSON.stringify(port)}]`, controller);
 
+						// This is a brand-new connection (not a second client joining
+						// one that already existed) — auto-join every other socket
+						// already on the server (desktop, other remote tabs, Console
+						// popouts) so they show connected without anyone clicking
+						// Connect on their end too.
+						if (!refresh) {
+							this.sockets
+								.filter((otherSocket) => otherSocket !== socket)
+								.forEach((otherSocket) => {
+									joinSocketToConnection(otherSocket, port, controller);
+								});
+						}
+
 						callback(null);
 					});
 
@@ -292,6 +326,18 @@ class CNCEngine {
 				baudrates: ensureArray(config.get("baudrates", [])),
 				ports: ensureArray(config.get("ports", [])),
 				socketsLength: this.sockets.length,
+
+				// Lets a freshly-loaded client (e.g. a remote/tablet browser) know
+				// there's already a live connection it can join, without needing
+				// to open a port itself.
+				activeConnection:
+					this.connection && this.connection.isOpen()
+						? {
+								port: this.connection.options.port,
+								baudrate: this.connection.options.baudrate,
+								controllerType: this.connection.controllerType,
+							}
+						: null,
 			});
 
 			socket.on("newConnection", () => {
@@ -331,32 +377,22 @@ class CNCEngine {
 					this.io.emit("task:error", message);
 					return;
 				}
-				log.info(
-					`Reconnecting to open controller on port ${port} with socket ID ${socket.id}`,
-				);
-				this.connection.addConnection(socket);
-				if (this.connection.isOpen()) {
-					log.info("Joining port room on socket");
-					socket.join(port);
-				} else {
-					log.info("connection no longer open");
-				}
 
-				let controller = store.get(`controllers["${port}"]`);
+				const controller = store.get(`controllers["${port}"]`);
 				if (!controller) {
 					const message = `No controller found on port ${port} to reconnect to`;
 					log.info(message);
 					this.io.emit("task:error", message);
 					return;
 				}
+
 				log.info(
 					`Reconnecting to open controller on port ${port} with socket ID ${socket.id}`,
 				);
-				controller.addConnection(socket);
-				log.info(`Controller state: ${controller.isOpen()}`);
+
 				if (this.connection.isOpen()) {
 					log.info("Joining port room on socket");
-					socket.join(port);
+					joinSocketToConnection(socket, port, controller);
 				} else {
 					log.info("Connection no longer open");
 				}
@@ -367,22 +403,20 @@ class CNCEngine {
 					log.info("No connection object found to reconnect to");
 					return;
 				}
-				log.info(
-					`Adding new client to connection on port ${port} with socket ID ${socket.id}`,
-				);
-				this.connection.addConnection(socket);
-				log.info(`connection state: ${this.connection.isOpen()}`);
 
-				let controller = store.get(`controllers["${port}"]`);
+				const controller = store.get(`controllers["${port}"]`);
 				if (!controller) {
 					log.info(`No controller found on port ${port} to reconnect to`);
 					return;
 				}
+
 				log.info(
-					`Adding new client to controller on port ${port} with socket ID ${socket.id}`,
+					`Adding new client to connection on port ${port} with socket ID ${socket.id}`,
 				);
-				controller.addConnection(socket);
-				log.info(`Connection state: ${this.connection.isOpen()}`);
+
+				if (this.connection.isOpen()) {
+					joinSocketToConnection(socket, port, controller);
+				}
 			});
 
 			// List the available serial ports
@@ -401,6 +435,7 @@ class CNCEngine {
 
 						// Filter ports by productId to avoid non-arduino devices from appearing
 						const validProductIDs = [
+							"000A",
 							"0483",
 							"6015",
 							"6001",
@@ -419,6 +454,7 @@ class CNCEngine {
 							"0FA7",
 						];
 						const validVendorIDs = [
+							"2E8A",
 							"16C0",
 							"1D50",
 							"0403",
@@ -622,9 +658,15 @@ class CNCEngine {
 
 			socket.on(
 				"flash:start",
-				(flashPort, imageType, isHal = false, data = null) => {
+				(
+					flashPort,
+					imageType,
+					isHal = false,
+					data = null,
+					firmwareType = "hex",
+				) => {
 					log.debug(
-						`Flashing ${flashPort}, isHal: ${isHal}, imageType: ${imageType}`,
+						`Flashing ${flashPort}, isHal: ${isHal}, imageType: ${imageType}, firmwareType: ${firmwareType}`,
 					);
 					if (!flashPort) {
 						log.error(
@@ -633,6 +675,39 @@ class CNCEngine {
 						);
 						return;
 					}
+
+					// UF2 flashing (RP2350 / Pico 2350): board has been sent $UF2 and
+					// reboots as a USB mass-storage volume — copy the .uf2 onto it.
+					if (firmwareType === "uf2") {
+						const uf2Flasher = new UF2Flasher({ uf2: data });
+						uf2Flasher.on("error", (err) => {
+							this.emit("flash:message", { type: "Error", content: err });
+						});
+						uf2Flasher.on("info", (msg) => {
+							this.emit("flash:message", { type: "Info", content: msg });
+						});
+						uf2Flasher.on("progress", (amount, total) => {
+							this.emit("flash:progress", amount, total);
+						});
+						uf2Flasher.on("end", () => {
+							this.emit("flash:end");
+						});
+
+						// Release the controller so the board can reboot into UF2 mode.
+						const controller = store.get('controllers["' + flashPort + '"]');
+						if (controller) {
+							store.unset(`controllers[${JSON.stringify(flashPort)}]`);
+						}
+
+						uf2Flasher.flash().catch((err) => {
+							this.emit("flash:message", {
+								type: "Error",
+								content: err.message || err,
+							});
+						});
+						return;
+					}
+
 					let halFlasher;
 					if (isHal) {
 						halFlasher = new DFUFlasher({

@@ -1,4 +1,4 @@
-import { USER_DATA_COLLECTION } from "app/constants";
+import type { USER_DATA_COLLECTION } from "app/constants";
 
 // Types
 

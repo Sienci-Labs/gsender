@@ -21,8 +21,8 @@
  *
  */
 
-import _ from "lodash";
 import store from "app/store";
+import _ from "lodash";
 
 type JogHelperProps = {
 	jogCB: (coordinates: Record<string, number>, feedrate: number) => void;

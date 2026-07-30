@@ -1,12 +1,13 @@
-import zLabels from "../assets/zLabels.svg";
-import TabJog from "./TabJog.tsx";
+import { usePostHog } from "@posthog/react";
+import zLabels from "app/features/Jogging/assets/zLabels.svg";
+import TabJog from "app/features/Jogging/components/TabJog.tsx";
 import {
 	continuousJogAxis,
-	JoggerProps,
+	type JoggerProps,
 	stopContinuousJog,
 	zMinusJog,
 	zPlusJog,
-} from "../utils/Jogging.ts";
+} from "app/features/Jogging/utils/Jogging.ts";
 import { useLongPress } from "use-long-press";
 
 export function ZJog({
@@ -15,19 +16,49 @@ export function ZJog({
 	canClick,
 	threshold = 200,
 }: JoggerProps) {
+	const posthog = usePostHog();
+
 	const zPlusJogHandlers = useLongPress(
-		() => continuousJogAxis({ Z: 1 }, feedrate),
+		() => {
+			continuousJogAxis({ Z: 1 }, feedrate);
+			posthog?.capture("jog_z_plus", {
+				distance,
+				feedrate,
+				continuous: true,
+			});
+		},
 		{
 			threshold,
-			onCancel: () => zPlusJog(distance, feedrate, false),
+			onCancel: () => {
+				zPlusJog(distance, feedrate, false);
+				posthog?.capture("jog_z_plus", {
+					distance,
+					feedrate,
+					continuous: false,
+				});
+			},
 			onFinish: stopContinuousJog,
 		},
 	)();
 	const zMinusJogHandlers = useLongPress(
-		() => continuousJogAxis({ Z: -1 }, feedrate),
+		() => {
+			continuousJogAxis({ Z: -1 }, feedrate);
+			posthog?.capture("jog_z_minus", {
+				distance,
+				feedrate,
+				continuous: true,
+			});
+		},
 		{
 			threshold,
-			onCancel: () => zMinusJog(distance, feedrate, false),
+			onCancel: () => {
+				zMinusJog(distance, feedrate, false);
+				posthog?.capture("jog_z_minus", {
+					distance,
+					feedrate,
+					continuous: false,
+				});
+			},
 			onFinish: stopContinuousJog,
 		},
 	)();

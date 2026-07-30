@@ -1,18 +1,18 @@
-import { ToolInstance } from "app/features/ATC/components/ToolTable.tsx";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-import { RootState } from "app/store/redux";
-import { useEffect, useState } from "react";
-import { lookupSpecificTool } from "app/features/ATC/utils/ATCFunctions.ts";
-import controller from "app/lib/controller";
-import { useToolChange } from "app/features/ATC/utils/ToolChangeContext.tsx";
-import { Wrench } from "lucide-react";
 import Button from "app/components/Button";
-import { toolStateThemes } from "app/features/ATC/utils/ATCiConstants.ts";
-import pubsub from "pubsub-js";
-import { ToolStatusBadges } from "app/features/ATC/components/ui/ToolStatusBadges.tsx";
+import type { ToolInstance } from "app/features/ATC/components/ToolTable.tsx";
 import { Badge } from "app/features/ATC/components/ui/Badge.tsx";
-import cn from "classnames";
+import { ToolStatusBadges } from "app/features/ATC/components/ui/ToolStatusBadges.tsx";
+import { lookupSpecificTool } from "app/features/ATC/utils/ATCFunctions.ts";
+import { toolStateThemes } from "app/features/ATC/utils/ATCiConstants.ts";
+import { useToolChange } from "app/features/ATC/utils/ToolChangeContext.tsx";
+import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
+import controller from "app/lib/controller.ts";
 import store from "app/store";
+import type { RootState } from "app/store/redux";
+import cn from "classnames";
+import { Wrench } from "lucide-react";
+import pubsub from "pubsub-js";
+import { useEffect, useState } from "react";
 
 export function CurrentToolInfo({ disabled }: { disabled?: boolean }) {
 	const { rackSize, connected, atcAvailable } = useToolChange();
@@ -129,9 +129,9 @@ export function CurrentToolInfo({ disabled }: { disabled?: boolean }) {
 		"dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]",
 	);
 	const iconWrapperClassName =
-		"h-9 w-9 rounded-lg border border-gray-200 bg-white/80 dark:border-outline dark:bg-surface-elevated flex items-center justify-center";
+		"h-9 w-9 rounded-lg border border-gray-200 bg-white/80 dark:border-slate-600 dark:bg-slate-900/85 flex items-center justify-center";
 	const offsetWrapperClassName =
-		"rounded-lg px-2 py-1 border border-gray-200 bg-white shadow-inner pointer-events-none select-none dark:border-outline dark:bg-surface-elevated";
+		"rounded-lg px-2 py-1 border border-gray-200 bg-white shadow-inner pointer-events-none select-none dark:border-slate-600 dark:bg-slate-900/85";
 
 	return (
 		<div className="w-full h-full flex-1">
@@ -140,28 +140,25 @@ export function CurrentToolInfo({ disabled }: { disabled?: boolean }) {
 					<div className="flex items-center gap-3">
 						<div className={iconWrapperClassName}>
 							<Wrench
-								className={cn(
-									state.textColor,
-									"w-5 h-5 dark:text-content-primary",
-								)}
+								className={cn(state.textColor, "w-5 h-5 dark:text-white")}
 							/>
 						</div>
 						<div className="flex flex-col">
 							<span
 								className={cn(
 									state.textColor,
-									"font-semibold text-base dark:text-content-primary",
+									"font-semibold text-base dark:text-white",
 								)}
 							>
 								{isEmptyTool ? "Empty" : `T${selectedTool.id}`}
 							</span>
 							{!isEmptyTool && isRackTool && (
-								<span className="text-gray-600 text-xs dark:text-content-secondary">
+								<span className="text-gray-600 text-xs dark:text-gray-300">
 									Rack
 								</span>
 							)}
 							{!isEmptyTool && !isRackTool && allowManualBadge && (
-								<span className="text-gray-600 text-xs dark:text-content-secondary">
+								<span className="text-gray-600 text-xs dark:text-gray-300">
 									Manual
 								</span>
 							)}
@@ -193,7 +190,7 @@ export function CurrentToolInfo({ disabled }: { disabled?: boolean }) {
 						<div
 							className={cn(
 								state.textColor,
-								"font-mono text-lg font-bold text-center dark:text-content-primary",
+								"font-mono text-lg font-bold text-center dark:text-white",
 							)}
 						>
 							{formattedOffset}

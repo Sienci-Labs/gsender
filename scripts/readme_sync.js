@@ -1,5 +1,5 @@
 function parseLatestReadmeNotes(readme) {
-	let re = /### (\d.\d.\d) \((.*)\)/;
+	const re = /### (\d.\d.\d) \((.*)\)/;
 
 	const notes = readme.split(
 		"<summary>Expand to see all version notes</summary>",
@@ -21,7 +21,7 @@ function parseLatestReadmeNotes(readme) {
 		.map((line) => line.trim());
 
 	let currentVersion = null;
-	for (let line of latestReleaseNotes) {
+	for (const line of latestReleaseNotes) {
 		const match = line.match(re);
 		if (match) {
 			currentVersion && collectedNotes.push(currentVersion);

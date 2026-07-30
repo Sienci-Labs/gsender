@@ -24,10 +24,9 @@
 import endsWith from "lodash/endsWith";
 import mapKeys from "lodash/mapKeys";
 import sha1 from "sha1";
-
-import log from "../lib/log";
 import pkg from "../../package.json";
-import { ConfigSettings } from "./definitions";
+import log from "../lib/log";
+import type { ConfigSettings } from "./definitions";
 
 const webroot = "/";
 
@@ -115,7 +114,7 @@ const settings: ConfigSettings = {
 			allowMultiLoading: false,
 
 			// parse data after it has been fetched
-			parse: function (data: string, url: string) {
+			parse: (data: string, url: string) => {
 				log.debug(`Loading resource: url="${url}"`);
 
 				// gcode.json

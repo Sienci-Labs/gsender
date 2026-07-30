@@ -1,8 +1,8 @@
+import cn from "classnames";
 import { FaCheckCircle } from "react-icons/fa";
 import { FaCircleXmark } from "react-icons/fa6";
-import cn from "classnames";
 import { tv } from "tailwind-variants";
-import { JOB_STATUS_T } from "../utils/StatContext";
+import type { JOB_STATUS_T } from "../utils/StatContext";
 
 const statusBadge = tv({
 	base: "rounded-xl border bg-opacity-20 p-1 text-center",
@@ -30,7 +30,7 @@ export function JobPreview({
 	const jobComplete = jobStatus === "COMPLETE";
 	const statusMessage = jobComplete ? "Finished" : "Stopped";
 	return (
-		<div className="grid grid-cols-8 grid-rows-1 gap-4 items-center dark:text-content-primary">
+		<div className="grid grid-cols-8 grid-rows-1 gap-4 items-center dark:text-white">
 			<span
 				className={cn("opacity-70", {
 					"text-red-500": !jobComplete,

@@ -1,28 +1,27 @@
-import React, { useState, useEffect, useRef } from "react";
-import { connect } from "react-redux";
+import api from "app/api";
+import Button from "app/components/Button";
+import combokeys from "app/lib/combokeys";
+import controller from "app/lib/controller";
+import log from "app/lib/log";
+import { toast } from "app/lib/toaster";
+import store from "app/store";
+import cx from "classnames";
+import cloneDeep from "lodash/cloneDeep";
 import get from "lodash/get";
 import includes from "lodash/includes";
 import throttle from "lodash/throttle";
-import cloneDeep from "lodash/cloneDeep";
-import { FaPlus, FaFileImport, FaFileExport } from "react-icons/fa";
-
-import api from "app/api";
-import store from "app/store";
-import controller from "app/lib/controller";
-import combokeys from "app/lib/combokeys";
-import log from "app/lib/log";
-import Button from "app/components/Button";
-import { toast } from "app/lib/toaster";
+import posthog from "posthog-js";
 import pubsub from "pubsub-js";
-
-import Macro from "./Macro";
-import MacroForm from "./MacroForm";
+import type React from "react";
+import { useEffect, useRef, useState } from "react";
+import { FaFileExport, FaFileImport, FaPlus } from "react-icons/fa";
+import { connect } from "react-redux";
 import {
 	// Grbl
 	GRBL,
-	GRBLHAL,
 	GRBL_ACTIVE_STATE_IDLE,
 	GRBL_ACTIVE_STATE_RUN,
+	GRBLHAL,
 	// Marlin
 	MARLIN,
 	// Smoothie
@@ -31,16 +30,17 @@ import {
 	TINYG,
 	// Workflow
 	WORKFLOW_STATE_RUNNING,
-} from "app/constants";
+} from "../../constants";
+import { deleteGamepadMacro } from "../../lib/gamepad";
 import {
-	MODAL_NONE,
 	MODAL_ADD_MACRO,
 	MODAL_EDIT_MACRO,
+	MODAL_NONE,
 	MODAL_RUN_MACRO,
-	ModalType,
+	type ModalType,
 } from "./constants";
-import { deleteGamepadMacro } from "app/lib/gamepad";
-import cx from "classnames";
+import Macro from "./Macro";
+import MacroForm from "./MacroForm";
 
 type MacroWidgetProps = {
 	type: string;
@@ -97,7 +97,7 @@ const MacroWidget = ({
 			description: string;
 		}) => {
 			try {
-				let res = await api.macros.create({
+				const res = await api.macros.create({
 					name,
 					content,
 					description,
@@ -110,6 +110,8 @@ const MacroWidget = ({
 
 				showToast({ msg: "Added New Macro", type: "success" });
 				actions.closeModal();
+
+				posthog?.capture("macro:add", { name });
 			} catch (err) {
 				showToast({
 					msg: "Failed to add macro",
@@ -133,6 +135,8 @@ const MacroWidget = ({
 				deleteGamepadMacro(id);
 
 				showToast({ msg: "Deleted Macro", type: "success" });
+
+				posthog?.capture("macro:delete");
 			} catch (err) {
 				// Ignore error
 			}
@@ -174,6 +178,8 @@ const MacroWidget = ({
 						position: "bottom-right",
 					});
 				}
+
+				posthog?.capture("macro:update", { name });
 			} catch (err) {
 				// Ignore error
 			}
@@ -209,10 +215,12 @@ const MacroWidget = ({
 				},
 			);
 			pubsub.publish("macro:run");
+
+			posthog?.capture("macro:run", { name });
 		},
 		loadMacro: async (id: string) => {
 			try {
-				let res = await api.macros.read(id);
+				const res = await api.macros.read(id);
 				const { name } = res.data;
 				controller.command(
 					"macro:load",
@@ -257,7 +265,7 @@ const MacroWidget = ({
 
 	const fetchMacros = async () => {
 		try {
-			let res = await api.macros.fetch();
+			const res = await api.macros.fetch();
 			const { records: macros } = res.data;
 			setMacros(macros);
 		} catch (err) {
@@ -290,6 +298,8 @@ const MacroWidget = ({
 		document.body.appendChild(link);
 		link.click();
 		document.body.removeChild(link);
+
+		posthog?.capture("macros_export", { macros_count: macros.length });
 	};
 
 	const importMacros = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -343,6 +353,11 @@ const MacroWidget = ({
 						type: "success",
 					});
 				}
+
+				posthog?.capture("macros_import", {
+					imported_count: importedCount,
+					updated_count: updatedCount,
+				});
 			};
 			reader.onerror = () => {
 				showToast({

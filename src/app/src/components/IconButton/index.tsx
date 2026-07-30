@@ -1,5 +1,5 @@
-import { ButtonProps } from "app/components/Button";
-import { Button } from "app/components/shadcn/Button";
+import type { ButtonProps } from "app/components/Button";
+import { Button } from "../shadcn/Button";
 
 export interface IconButtonProps extends ButtonProps {
 	icon: JSX.Element;

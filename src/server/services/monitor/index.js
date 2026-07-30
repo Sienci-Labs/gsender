@@ -22,8 +22,8 @@
  */
 
 import fs from "fs";
-import path from "path";
 import minimatch from "minimatch";
+import path from "path";
 import FSMonitor from "./FSMonitor";
 
 const monitor = new FSMonitor();
@@ -50,7 +50,7 @@ const getFiles = (searchPath) => {
 
 		return {
 			name: path.basename(file),
-			type: (function () {
+			type: (() => {
 				if (stat.isFile()) {
 					return "f";
 				}

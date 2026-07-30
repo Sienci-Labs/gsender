@@ -1,4 +1,4 @@
-import { BasicPosition, UNITS_GCODE } from "app/definitions/general";
+import type { BasicPosition, UNITS_GCODE } from "app/definitions/general";
 
 // Types
 

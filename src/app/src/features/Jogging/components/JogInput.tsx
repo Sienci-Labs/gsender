@@ -1,8 +1,8 @@
-import { Label } from "app/components/Label";
-import { ControlledInput } from "app/components/ControlledInput";
-import { FaMinus, FaPlus } from "react-icons/fa";
 import Button from "app/components/Button";
+import { ControlledInput } from "app/components/ControlledInput";
+import { Label } from "app/components/Label";
 import { toFixedIfNecessary } from "app/lib/rounding";
+import { FaMinus, FaPlus } from "react-icons/fa";
 
 interface JogInputProps {
 	label: string;
@@ -91,7 +91,7 @@ export const JogInput = ({
 			<Label className="min-w-[2ch] text-right whitespace-nowrap">
 				{label}
 			</Label>
-			<div className="grid grid-cols-[1fr_5fr_1fr] max-w-28 items-center gap-0 rounded-full dark:bg-surface-sunken shadow-inner">
+			<div className="grid grid-cols-[1fr_5fr_1fr] max-w-28 items-center gap-0 rounded-full dark:bg-dark shadow-inner">
 				<Button
 					type="button"
 					onClick={(e) => {

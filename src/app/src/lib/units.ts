@@ -21,8 +21,8 @@
  *
  */
 
+import type { UNITS_EN } from "app/definitions/general";
 import { IMPERIAL_UNITS, METRIC_UNITS } from "../constants";
-import { UNITS_EN } from "app/definitions/general";
 import store from "../store";
 
 const CALC_UNIT = 25.4;
@@ -35,7 +35,7 @@ const setDecimalPlacesValue = (
 ): string => {
 	val = Number(val);
 	// This value is set by the user
-	let customDecimalPlace = Number(store.get("workspace.customDecimalPlaces"));
+	const customDecimalPlace = Number(store.get("workspace.customDecimalPlaces"));
 	if (customDecimalPlace === 0) {
 		return conversionType(val).toFixed(defaultPlace);
 	} else {
@@ -45,7 +45,7 @@ const setDecimalPlacesValue = (
 
 const determineCorrectedValue = (val: number, decimalPlaces: number) => {
 	const roundedVal = val.toFixed(decimalPlaces);
-	let num = Number(roundedVal);
+	const num = Number(roundedVal);
 	if (num === 0) {
 		return (0).toFixed(decimalPlaces);
 	}
@@ -59,7 +59,7 @@ const setDecimalPlacesPosition = (
 ): string => {
 	val = Number(val);
 	// This value is set by the user
-	let customDecimalPlace = Number(store.get("workspace.customDecimalPlaces"));
+	const customDecimalPlace = Number(store.get("workspace.customDecimalPlaces"));
 	if (customDecimalPlace === 0) {
 		return determineCorrectedValue(val, defaultPlace);
 	} else {
@@ -76,14 +76,14 @@ export const in2mm = (val = 0): number => val * 25.4;
 // Maps value to imperial units
 export const mapValueToImperialUnits = (val: string | number): string => {
 	val = Number(val) || 0;
-	let defaultDecimalPlace = 3;
+	const defaultDecimalPlace = 3;
 	return setDecimalPlacesValue(defaultDecimalPlace, val, mm2in);
 };
 
 // Maps value to metric units
 export const mapValueToMetricUnits = (val: string | number): string => {
 	val = Number(val) || 0;
-	let defaultPlace = 2;
+	const defaultPlace = 2;
 	return setDecimalPlacesPosition(defaultPlace, val);
 };
 
@@ -106,14 +106,14 @@ export const mapValueToUnits = (
 // Maps position to imperial units
 export const mapPositionToImperialUnits = (pos: string | number): string => {
 	pos = Number(pos) || 0;
-	let defaultDecimalPlace = 3;
+	const defaultDecimalPlace = 3;
 	return setDecimalPlacesValue(defaultDecimalPlace, pos, mm2in);
 };
 
 // Maps position to metric units
 export const mapPositionToMetricUnits = (pos: string | number): string => {
 	pos = Number(pos) || 0;
-	let defaultPlace = 2;
+	const defaultPlace = 2;
 	return setDecimalPlacesPosition(defaultPlace, pos);
 };
 
@@ -130,19 +130,19 @@ export const mapPositionToUnits = (
 	if (units === METRIC_UNITS) {
 		return mapPositionToMetricUnits(pos);
 	}
-	let defaultPlace = 2;
+	const defaultPlace = 2;
 	return setDecimalPlacesPosition(defaultPlace, pos);
 };
 
 export const convertValueToImperialUnits = (pos: string | number): string => {
 	pos = Number(pos) || 0;
-	let defaultDecimalPlace = 3;
+	const defaultDecimalPlace = 3;
 	return setDecimalPlacesValue(defaultDecimalPlace, pos, mm2in);
 };
 
 export const convertValueToMetricUnits = (pos: string | number): string => {
 	pos = Number(pos) || 0;
-	let defaultDecimalPlace = 3;
+	const defaultDecimalPlace = 3;
 	return setDecimalPlacesValue(defaultDecimalPlace, pos, in2mm);
 };
 
@@ -159,7 +159,7 @@ export const mapPositionToPreferredUnits = (
 			return convertValueToMetricUnits(pos);
 		}
 	}
-	let defaultPlace = 3;
+	const defaultPlace = 3;
 	return setDecimalPlacesPosition(defaultPlace, pos);
 };
 

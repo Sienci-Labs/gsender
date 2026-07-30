@@ -21,29 +21,30 @@
  *
  */
 
-import React, { useState, useEffect } from "react";
-import { connect } from "react-redux";
-import get from "lodash/get";
-import includes from "lodash/includes";
 import {
 	DndContext,
-	DragEndEvent,
+	type DragEndEvent,
+	type DragOverEvent,
 	DragOverlay,
-	DragStartEvent,
+	type DragStartEvent,
 	MouseSensor,
 	TouchSensor,
 	useSensor,
 	useSensors,
-	DragOverEvent,
 } from "@dnd-kit/core";
 import {
-	SortableContext,
 	arrayMove,
+	SortableContext,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import get from "lodash/get";
+import includes from "lodash/includes";
+import type React from "react";
+import { useEffect, useState } from "react";
+import { connect } from "react-redux";
 
-import { WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED } from "app/constants";
-import DroppableColumn, { Actions } from "./DroppableColumn";
+import { WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED } from "../../constants";
+import DroppableColumn, { type Actions } from "./DroppableColumn";
 
 type ContainerProps = {
 	children: React.ReactNode;
@@ -231,7 +232,7 @@ const Macro = ({ state, actions, workflow }: MacroProps) => {
 	if (macros.length === 0) {
 		return (
 			<div className="flex flex-col gap-1 p-1 h-full justify-center items-center">
-				<p className="text-center dark:text-content-primary">No Macros...</p>
+				<p className="text-center dark:text-white">No Macros...</p>
 			</div>
 		);
 	}
@@ -270,7 +271,7 @@ const Macro = ({ state, actions, workflow }: MacroProps) => {
 				</Container>
 				<DragOverlay>
 					{activeId ? (
-						<div className="bg-white border border-gray-200 rounded-md shadow-lg p-2 dark:bg-surface-raised dark:border-outline dark:text-content-primary">
+						<div className="bg-white border border-gray-200 rounded-md shadow-lg p-2 dark:bg-dark dark:border-dark-lighter dark:text-white">
 							{
 								[...column1.items, ...column2.items].find(
 									(item) => item.id === activeId,

@@ -22,32 +22,32 @@
  */
 
 import _ from "lodash";
-import GrblHalLineParserResultStatus from "./GrblHalLineParserResultStatus";
-import GrblHalLineParserResultOk from "./GrblHalLineParserResultOk";
-import GrblHalLineParserResultError from "./GrblHalLineParserResultError";
+import GrblHalLineParserResultATCI from "server/controllers/Grblhal/GrblHalLineParserResultATCI";
+import GrblHalLineParserResultCompleteStatus from "server/controllers/Grblhal/GrblHalLineParserResultCompleteStatus";
+import GrblHalLineParserResultJSON from "server/controllers/Grblhal/GrblHalLineParserResultJSON";
+import GrblHalLineParserResultSettingDetails from "server/controllers/Grblhal/GrblHalLineParserResultSettingDetails";
+import GrblHalLineParserResultSpindle from "server/controllers/Grblhal/GrblHalLineParserResultSpindle";
+import GrblHalErrorDescription from "./GrblHalErrorDescription";
 import GrblHalLineParserResultAlarm from "./GrblHalLineParserResultAlarm";
-import GrbHalLineParserResultParserState from "./GrblHalLineParserResultParserState";
-import GrblHalLineParserResultParameters from "./GrblHalLineParserResultParameters";
-import GrblHalLineParserResultHelp from "./GrblHalLineParserResultHelp";
-import GrblHalLineParserResultVersion from "./GrblHalLineParserResultVersion";
+import GrblHalLineParserResultAlarmDetails from "./GrblHalLineParserResultAlarmDetails";
+import GrblHalLineParserResultAXS from "./GrblHalLineParserResultAXS";
 import GrblHalLineParserResultEcho from "./GrblHalLineParserResultEcho";
+import GrblHalLineParserResultError from "./GrblHalLineParserResultError";
 import GrblHalLineParserResultFeedback from "./GrblHalLineParserResultFeedback";
-import GrblHalLineParserResultSettings from "./GrblHalLineParserResultSettings";
-import GrblHalLineParserResultStartup from "./GrblHalLineParserResultStartup";
+import GrblHalLineParserResultGroupDetail from "./GrblHalLineParserResultGroupDetail";
+import GrblHalLineParserResultHelp from "./GrblHalLineParserResultHelp";
 //import GrblHalLineParserResultCode from './GrblHalLineParserResultCode';
 import GrblHalLineParserResultInfo from "./GrblHalLineParserResultInfo";
-import GrblHalLineParserResultSettingDescription from "./GrblHalLineParserResultSettingDescription";
-import GrblHalLineParserResultSettingDetails from "server/controllers/Grblhal/GrblHalLineParserResultSettingDetails";
-import GrblHalLineParserResultCompleteStatus from "server/controllers/Grblhal/GrblHalLineParserResultCompleteStatus";
-import GrblHalLineParserResultAXS from "./GrblHalLineParserResultAXS";
-import GrblHalLineParserResultGroupDetail from "./GrblHalLineParserResultGroupDetail";
-import GrblHalLineParserResultAlarmDetails from "./GrblHalLineParserResultAlarmDetails";
-import GrblHalLineParserResultSpindle from "server/controllers/Grblhal/GrblHalLineParserResultSpindle";
-import GrblHalLineParserResultTool from "./GrblHalLineParserResultTool";
+import GrblHalLineParserResultOk from "./GrblHalLineParserResultOk";
+import GrblHalLineParserResultParameters from "./GrblHalLineParserResultParameters";
+import GrbHalLineParserResultParserState from "./GrblHalLineParserResultParserState";
 import GbrlHalLineParserResultSDCard from "./GrblHalLineParserResultSDCard";
-import GrblHalLineParserResultATCI from "server/controllers/Grblhal/GrblHalLineParserResultATCI";
-import GrblHalLineParserResultJSON from "server/controllers/Grblhal/GrblHalLineParserResultJSON";
-import GrblHalErrorDescription from "./GrblHalErrorDescription";
+import GrblHalLineParserResultSettingDescription from "./GrblHalLineParserResultSettingDescription";
+import GrblHalLineParserResultSettings from "./GrblHalLineParserResultSettings";
+import GrblHalLineParserResultStartup from "./GrblHalLineParserResultStartup";
+import GrblHalLineParserResultStatus from "./GrblHalLineParserResultStatus";
+import GrblHalLineParserResultTool from "./GrblHalLineParserResultTool";
+import GrblHalLineParserResultVersion from "./GrblHalLineParserResultVersion";
 
 class GrblHalLineParser {
 	parse(line) {
@@ -142,7 +142,7 @@ class GrblHalLineParser {
 			GrblHalLineParserResultJSON,
 		];
 
-		for (let parser of parsers) {
+		for (const parser of parsers) {
 			const result = parser.parse(line);
 			if (result) {
 				_.set(result, "payload.raw", line);

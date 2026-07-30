@@ -21,10 +21,6 @@
  *
  */
 
-import chainedFunction from "chained-function";
-import React from "react";
-import uniqueId from "lodash/uniqueId";
-import { MaintenanceTask } from "app/features/Stats/utils/StatContext";
 import api from "app/api";
 import {
 	AlertDialog,
@@ -37,7 +33,11 @@ import {
 	AlertDialogTitle,
 } from "app/components/shadcn/AlertDialog";
 import { Button } from "app/components/shadcn/Button";
+import type { MaintenanceTask } from "app/features/Stats/utils/StatContext";
 import { toast } from "app/lib/toaster";
+import chainedFunction from "chained-function";
+import uniqueId from "lodash/uniqueId";
+import type React from "react";
 
 interface Props {
 	tasks: MaintenanceTask[];
@@ -52,7 +52,7 @@ const MaintenanceAlert: React.FC<Props> = ({
 	setShowModal,
 	onClose,
 }) => {
-	let alertTasks: MaintenanceTask[] = [];
+	const alertTasks: MaintenanceTask[] = [];
 	tasks.forEach((task: MaintenanceTask) => {
 		const { rangeStart, currentTime } = task;
 		if (currentTime >= rangeStart) {
@@ -86,7 +86,7 @@ const MaintenanceAlert: React.FC<Props> = ({
 								const updatedTasks = tasks.map((task) => {
 									const { rangeStart, currentTime } = task;
 									if (currentTime >= rangeStart) {
-										let newTask = task;
+										const newTask = task;
 										newTask.currentTime = 0;
 										return newTask;
 									}

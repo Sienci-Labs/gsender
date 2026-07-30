@@ -22,9 +22,9 @@
  */
 
 import * as longMillGrblEEPROM from "./grbl/longmill";
-import * as longMillGrblHALEEPROM from "./grblHAL/longmill";
 import * as millOneGrblEEPROM from "./grbl/millone";
 import * as altmillSettings from "./grblHAL/Altmill";
+import * as longMillGrblHALEEPROM from "./grblHAL/longmill";
 
 export default [
 	{
@@ -71,6 +71,36 @@ export default [
 		eepromSettings: altmillSettings.DEFAULT_4X8,
 		grblHALeepromSettings: altmillSettings.DEFAULT_4X8,
 		orderedSettings: altmillSettings.ALTMILL_ORDERED,
+	},
+	{
+		id: 18,
+		company: "Sienci Labs",
+		name: "LongMill MK3",
+		type: "30x30",
+		version: "MK3",
+		mm: {
+			width: 792,
+			depth: 345,
+			height: 114.3,
+		},
+		eepromSettings: longMillGrblHALEEPROM.LONGMILL_MK3_30x30,
+		grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK3_30x30,
+		orderedSettings: longMillGrblHALEEPROM.MK3_ORDERED,
+	},
+	{
+		id: 19,
+		company: "Sienci Labs",
+		name: "LongMill MK3",
+		type: "48x30",
+		version: "MK3",
+		mm: {
+			width: 792,
+			depth: 345,
+			height: 114.3,
+		},
+		eepromSettings: longMillGrblHALEEPROM.LONGMILL_MK3_48x30,
+		grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK3_48x30,
+		orderedSettings: longMillGrblHALEEPROM.MK3_ORDERED,
 	},
 	{
 		id: 5,

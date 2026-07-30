@@ -1,10 +1,10 @@
 import {
-	MaintenanceTask as Task,
 	StatContext,
+	type MaintenanceTask as Task,
 } from "app/features/Stats/utils/StatContext.tsx";
+import cx from "classnames";
 import { useContext } from "react";
 import { FaCircle } from "react-icons/fa";
-import cx from "classnames";
 import { tv } from "tailwind-variants";
 
 function timeRemainingSortComparison(a: Task, b: Task) {
@@ -72,7 +72,7 @@ function MaintenanceTask({ task }: { task: Task }) {
 				<span className={reminderStyles({ color: reminderString })}>
 					{time} hrs
 				</span>
-				<span className="text-gray-700 max-xl:text-sm dark:text-content-muted">
+				<span className="text-gray-700 max-xl:text-sm dark:text-gray-400">
 					{task.name}
 				</span>
 			</div>

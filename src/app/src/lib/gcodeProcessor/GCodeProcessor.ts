@@ -1,20 +1,20 @@
-import objtools from "objtools";
+import type { BasicType, BBox } from "app/definitions/general";
+import type { AXES_T } from "app/store/definitions";
 import Interpreter from "gcode-interpreter";
-import GCodeBlock from "../gcodeProcessor/GCodeBlock";
+import objtools from "objtools";
 import { METRIC_UNITS } from "../../constants";
-import { BasicType, BBox } from "app/definitions/general";
-import {
+import GCodeBlock from "../gcodeProcessor/GCodeBlock";
+import type {
 	GCodeLine,
 	GcodeProcessorOptions,
+	MOTION_MODAL,
 	SyncMachineOptions,
 	VMState,
 	VMStateInfo,
 } from "./definitions";
-import { MOTION_MODAL } from "./definitions";
-import { AXES_T } from "app/features/Axes/definitions";
 
 export const INVALID_GCODE_REGEX =
-	/([^NGMXYZIJKFRS%\-?\.?\d+\.?\s])|((G28)|(G29)|(\$H))/gi;
+	/([^NGMXYZIJKFRS%\-?.?\d+.?\s])|((G28)|(G29)|(\$H))/gi;
 
 /**
  *
@@ -53,7 +53,7 @@ export class GCodeProcessor {
 	// Gets or sets an axis value in a coordinate array.
 	// If value is null, it returns the current value.  If value is numeric, it sets it.
 	coord(coords: Array<number>, axis: number | string, value: number): number {
-		let axisNum =
+		const axisNum =
 			typeof axis === "number"
 				? axis
 				: this.vmState.axisLabels.indexOf(axis.toLowerCase());
@@ -167,7 +167,7 @@ export class GCodeProcessor {
 			return false;
 		};
 
-		let controller = options.controller ||
+		const controller = options.controller ||
 			this.options.controller ||
 			(this.options.tightcnc && this.options.tightcnc.controller) || {
 				mpos: null,
@@ -192,7 +192,7 @@ export class GCodeProcessor {
 				axisLabels: null,
 				pos: null,
 			};
-		let vmState = options.vmState || this.vmState;
+		const vmState = options.vmState || this.vmState;
 
 		if (shouldInclude("axisLabels")) {
 			vmState.axisLabels = objtools.deepCopy(
@@ -292,25 +292,25 @@ export class GCodeProcessor {
 		if (words.length === 0) {
 			return null;
 		}
-		let gline = new GCodeBlock(words, line);
-		let vmState = this.vmState;
-		let origCoordSys = vmState.activeCoordSys;
-		let origTotalTime = vmState.totalTime;
+		const gline = new GCodeBlock(words, line);
+		const vmState = this.vmState;
+		const origCoordSys = vmState.activeCoordSys;
+		const origTotalTime = vmState.totalTime;
 		let changedCoordOffsets = false;
 
 		// Determine if this line represents motion
 		let motionCode: BasicType = null; // The G code on this line in the motion modal group (indicating some kind of machine motion)
-		let hasCoords: Array<AXES_T> = []; // A list of axis word letters present (eg. [ 'X', 'Z' ])
-		let coordPos: Array<number> = vmState.incremental
+		const hasCoords: Array<AXES_T> = []; // A list of axis word letters present (eg. [ 'X', 'Z' ])
+		const coordPos: Array<number> = vmState.incremental
 			? (this.zerocoord() as Array<number>)
 			: objtools.deepCopy(vmState.pos); // Position indicated by coordinates present, filling in missing ones with current pos; unless incremental, then all zeroes
-		let coordPosSparse = this.zerocoord(null) as Array<number>; // Position indicated by coordinates present, with missing axes filled in with nulls
-		let coordFlags = this.zerocoord(false) as Array<boolean>; // True in positions where coordinates are present
+		const coordPosSparse = this.zerocoord(null) as Array<number>; // Position indicated by coordinates present, with missing axes filled in with nulls
+		const coordFlags = this.zerocoord(false) as Array<boolean>; // True in positions where coordinates are present
 
 		// Determine which axis words are present and convert to coordinate arrays
 		for (let axisNum = 0; axisNum < vmState.axisLabels.length; axisNum++) {
-			let axis = vmState.axisLabels[axisNum].toUpperCase();
-			let val = gline.get(axis);
+			const axis = vmState.axisLabels[axisNum].toUpperCase();
+			const val = gline.get(axis);
 			if (typeof val === "number") {
 				hasCoords.push(axis);
 				coordPos[axisNum] = val;
@@ -336,9 +336,9 @@ export class GCodeProcessor {
 
 		// Check if this is simple motion that can skip extra checks (for efficiency in the most common case)
 		//let isSimpleMotion = motionCode && (motionCode === 'G0' || motionCode === 'G1') && (gline.has(motionCode) ? 1 : 0) + (gline.has('F') ? 1 : 0) + (gline.has('N') ? 1 : 0);
-		let isSimpleMotion = gline.isSimpleMotion();
+		const isSimpleMotion = gline.isSimpleMotion();
 		// Update seenWordSet
-		for (let word of gline.words) {
+		for (const word of gline.words) {
 			vmState.seenWordSet[word[0]] = true;
 		}
 
@@ -348,7 +348,7 @@ export class GCodeProcessor {
 
 		// Check for other codes that set modals
 		let tempCoordSys = false;
-		let wordF = gline.get("F");
+		const wordF = gline.get("F");
 		if (typeof wordF === "number") {
 			vmState.feed = wordF;
 			vmState.feedrates.add("F" + wordF);
@@ -403,7 +403,7 @@ export class GCodeProcessor {
 				vmState.units = METRIC_UNITS;
 				changedCoordOffsets = true;
 			}
-			let wordS = gline.get("S");
+			const wordS = gline.get("S");
 			if (typeof wordS === "number") {
 				vmState.spindleSpeed = wordS;
 				vmState.spindleRates.add("S" + wordS);
@@ -522,8 +522,8 @@ export class GCodeProcessor {
 				hasCoords.length
 			) {
 				this._updateMPosFromPos();
-				let newOffset = coordPosSparse.map((v) => v || 0);
-				let coordSys = (gline.get("P") as number) - 1;
+				const newOffset = coordPosSparse.map((v) => v || 0);
+				const coordSys = (gline.get("P") as number) - 1;
 				vmState.coordSysOffsets[coordSys] = newOffset;
 				this._updatePosFromMPos();
 				changedCoordOffsets = true;
@@ -536,10 +536,10 @@ export class GCodeProcessor {
 				hasCoords.length
 			) {
 				this._updateMPosFromPos();
-				let newOffset = coordPosSparse
+				const newOffset = coordPosSparse
 					.map((v) => v || 0)
 					.map((v, i) => (vmState.mpos[i] || 0) - v);
-				let coordSys = (gline.get("P") as number) - 1;
+				const coordSys = (gline.get("P") as number) - 1;
 				vmState.coordSysOffsets[coordSys] = newOffset;
 				this._updatePosFromMPos();
 				changedCoordOffsets = true;
@@ -609,7 +609,7 @@ export class GCodeProcessor {
 		}
 
 		// Handle line number
-		let lineNum = gline.get("N") as number;
+		const lineNum = gline.get("N") as number;
 		if (lineNum !== null) {
 			vmState.line = lineNum;
 		}
@@ -639,8 +639,8 @@ export class GCodeProcessor {
 		fromOffset: Array<number> = null,
 		toOffset: Array<number> = null,
 	): Array<number> {
-		let vmState = this.vmState;
-		let retPos: Array<number> = [];
+		const vmState = this.vmState;
+		const retPos: Array<number> = [];
 		for (let axisNum = 0; axisNum < pos.length; axisNum++) {
 			let fromTotalOffset = 0;
 			let toTotalOffset = 0;
@@ -689,7 +689,7 @@ export class GCodeProcessor {
 		axisFlags: Array<boolean>,
 	): void {
 		for (let axisNum = 0; axisNum < pos.length; axisNum++) {
-			let v = pos[axisNum];
+			const v = pos[axisNum];
 			if (typeof v !== "number" || (axisFlags && !axisFlags[axisNum])) {
 				continue;
 			}
@@ -707,7 +707,7 @@ export class GCodeProcessor {
 	}
 
 	zerocoord(val: number | boolean = 0): Array<number | boolean> {
-		let coords: Array<number | boolean> = [];
+		const coords: Array<number | boolean> = [];
 		for (let i = 0; i < this.vmState.axisLabels.length; i++) {
 			coords.push(val);
 		}
@@ -734,14 +734,12 @@ export class GCodeProcessor {
 				if (to[axisNum] === null || to[axisNum] === undefined) {
 					to[axisNum] = this.vmState.pos[axisNum];
 				}
-				travelSq += Math.pow(
-					(to[axisNum] || 0) - (this.vmState.pos[axisNum] || 0),
-					2,
-				);
+				travelSq +=
+					((to[axisNum] || 0) - (this.vmState.pos[axisNum] || 0)) ** 2;
 			}
 			travel = Math.sqrt(travelSq);
 		}
-		let from = this.vmState.pos;
+		const from = this.vmState.pos;
 		let moveTime: number;
 		if (this.vmState.inverseFeed && feed) {
 			// Handle time calc if inverse feed
@@ -752,11 +750,11 @@ export class GCodeProcessor {
 				axisNum < to.length && axisNum < from.length;
 				axisNum++
 			) {
-				let axisTravel = Math.abs(from[axisNum] - to[axisNum]);
-				let axisFeed = Array.isArray(this.options.maxFeed)
+				const axisTravel = Math.abs(from[axisNum] - to[axisNum]);
+				const axisFeed = Array.isArray(this.options.maxFeed)
 					? this.options.maxFeed[axisNum]
 					: this.options.maxFeed;
-				let travelTime = (axisTravel / (axisFeed || 1000)) * 60;
+				const travelTime = (axisTravel / (axisFeed || 1000)) * 60;
 				if (travelTime > minTime) {
 					minTime = travelTime;
 				}
@@ -780,22 +778,22 @@ export class GCodeProcessor {
 			// calculate linear distance travelled (this, and other parts of this method, will need to be adjusted for nonlinear moves)
 			let linearDist = 0;
 			for (let axisNum = 0; axisNum < to.length; axisNum++) {
-				let d = to[axisNum] - this.vmState.pos[axisNum];
+				const d = to[axisNum] - this.vmState.pos[axisNum];
 				linearDist += d * d;
 			}
 			linearDist = Math.sqrt(linearDist);
 			// Determine the axis that will require the most amount of time to change velocity
 			let maxAccelTime = 0; // minutes
-			let axisAccelTimes = [];
+			const axisAccelTimes = [];
 			let accelMin = null;
 			for (let axisNum = 0; axisNum < to.length; axisNum++) {
-				let accel = Array.isArray(this.options.acceleration)
+				const accel = Array.isArray(this.options.acceleration)
 					? this.options.acceleration[axisNum]
 					: this.options.acceleration;
 				if (accelMin === null || accel < accelMin) {
 					accelMin = accel;
 				}
-				let diff = to[axisNum] - this.vmState.pos[axisNum];
+				const diff = to[axisNum] - this.vmState.pos[axisNum];
 				// calculate feed component for this axis (may be negative to indicate negative direction)
 				let axisFeed: number;
 				if (!feed) {
@@ -807,10 +805,10 @@ export class GCodeProcessor {
 					axisFeed = (diff / linearDist) * feed; // in units/min
 				}
 				// Get and update the last move's axis feed rate
-				let lastMoveAxisFeed = this._lastMoveAxisFeeds[axisNum];
+				const lastMoveAxisFeed = this._lastMoveAxisFeeds[axisNum];
 				this._lastMoveAxisFeeds[axisNum] = axisFeed;
 				// calculate amount of time it would take to accelerate between the feeds
-				let accelTime = Math.abs(axisFeed - lastMoveAxisFeed) / accel; // min
+				const accelTime = Math.abs(axisFeed - lastMoveAxisFeed) / accel; // min
 				if (accelTime > maxAccelTime) {
 					maxAccelTime = accelTime;
 				}
@@ -832,10 +830,10 @@ export class GCodeProcessor {
 					axisNum < to.length && axisNum < from.length;
 					axisNum++
 				) {
-					let accel = Array.isArray(this.options.acceleration)
+					const accel = Array.isArray(this.options.acceleration)
 						? this.options.acceleration[axisNum]
 						: this.options.acceleration;
-					let axisAccelTime = axisAccelTimes[axisNum];
+					const axisAccelTime = axisAccelTimes[axisNum];
 					let axisAccelDist = Math.abs(
 						(1 / 2) * accel * (axisAccelTime * axisAccelTime),
 					);
@@ -844,7 +842,7 @@ export class GCodeProcessor {
 						axisAccelDist = axisTravel;
 					}
 					axisTravel -= axisAccelDist;
-					let axisFeed = Array.isArray(this.options.maxFeed)
+					const axisFeed = Array.isArray(this.options.maxFeed)
 						? this.options.maxFeed[axisNum]
 						: this.options.maxFeed;
 					let travelTime = axisTravel / (axisFeed || 1000); // minutes

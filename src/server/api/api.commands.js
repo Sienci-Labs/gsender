@@ -21,20 +21,20 @@
  *
  */
 
-import find from "lodash/find";
 import castArray from "lodash/castArray";
+import find from "lodash/find";
 import isPlainObject from "lodash/isPlainObject";
 import uuid from "uuid";
 import settings from "../config/settings";
-import logger from "../lib/logger";
-import taskRunner from "../services/taskrunner";
-import config from "../services/configstore";
-import { getPagingRange } from "./paging";
 import {
 	ERR_BAD_REQUEST,
-	ERR_NOT_FOUND,
 	ERR_INTERNAL_SERVER_ERROR,
+	ERR_NOT_FOUND,
 } from "../constants";
+import logger from "../lib/logger";
+import config from "../services/configstore";
+import taskRunner from "../services/taskrunner";
+import { getPagingRange } from "./paging";
 
 const log = logger("api:commands");
 const CONFIG_KEY = "commands";

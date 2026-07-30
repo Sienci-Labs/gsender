@@ -1,13 +1,12 @@
-import { ReactNode } from "react";
-import { useSelector } from "react-redux";
-import get from "lodash/get";
-
-import { RootState } from "app/store/redux";
-import { homingString } from "app/lib/eeprom.ts";
+import type { MachineProfile } from "app/definitions/firmware";
 import { truncatePort } from "app/features/Stats/utils/statUtils.ts";
-import store from "app/store";
-import { MachineProfile } from "app/definitions/firmware";
+import { homingString } from "app/lib/eeprom.ts";
 import { isIPv4 } from "app/lib/utils";
+import store from "app/store";
+import type { RootState } from "app/store/redux";
+import get from "lodash/get";
+import type { ReactNode } from "react";
+import { useSelector } from "react-redux";
 
 export function ConfigRow({
 	label,
@@ -19,11 +18,11 @@ export function ConfigRow({
 	connected: boolean;
 }) {
 	return (
-		<div className="relative flex flex-row justify-between w-full items-center leading-7 border-dotted border-b-gray-300 border-b-2 overflow-visible h-[3px] mt-3 mb-3 dark:text-content-primary dark:bg-surface-raised">
-			<div className="text-gray-700 bg-white pr-2 dark:text-content-primary dark:bg-surface-raised">
+		<div className="relative flex flex-row justify-between w-full items-center leading-7 border-dotted border-b-gray-300 border-b-2 overflow-visible h-[3px] mt-3 mb-3 dark:text-white dark:bg-dark">
+			<div className="text-gray-700 bg-white pr-2 dark:text-white dark:bg-dark">
 				{label}
 			</div>
-			<div className="pl-2 bg-white dark:text-content-primary dark:bg-surface-raised">
+			<div className="pl-2 bg-white dark:text-white dark:bg-dark">
 				{connected ? children : <b>-</b>}
 			</div>
 		</div>
@@ -63,7 +62,7 @@ export function Configuration() {
 
 	return (
 		<div className="flex flex-col gap-1">
-			<div className="font-bold mb-2 dark:text-content-primary">
+			<div className="font-bold mb-2 dark:text-white">
 				{machineProfile.company + " " + machineProfile.name + " "}
 				<span className="font-normal">{machineProfile.type}</span>
 			</div>

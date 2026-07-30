@@ -151,7 +151,7 @@ const evaluateExpression = (src, vars) => {
 		}
 
 		if (node.type === "Identifier") {
-			if (Object.hasOwnProperty.call(vars, node.name)) {
+			if (Object.hasOwn(vars, node.name)) {
 				let value = vars[node.name];
 				if (!Number.isNaN(Number(value))) {
 					value = Number(value);
@@ -162,7 +162,7 @@ const evaluateExpression = (src, vars) => {
 		}
 
 		if (node.type === "ThisExpression") {
-			if (Object.hasOwnProperty.call(vars, "this")) {
+			if (Object.hasOwn(vars, "this")) {
 				return vars["this"]; // eslint-disable-line dot-notation
 			}
 			return UNRESOLVED;
@@ -244,7 +244,7 @@ const evaluateExpression = (src, vars) => {
 				vars[key.name] = null;
 			}
 
-			for (let i in bodies) {
+			for (const i in bodies) {
 				if (walk(bodies[i]) === UNRESOLVED) {
 					return UNRESOLVED;
 				}

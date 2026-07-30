@@ -22,8 +22,8 @@
  */
 
 import classNames from "classnames";
-import React from "react";
-import { WidgetProps } from "./definitions";
+import type React from "react";
+import type { WidgetProps } from "./definitions";
 
 const Header: React.FC<WidgetProps> = ({
 	fixed,

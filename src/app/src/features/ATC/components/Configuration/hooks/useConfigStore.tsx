@@ -1,19 +1,20 @@
-import React, {
-	createContext,
-	useContext,
-	useState,
-	ReactNode,
-	useEffect,
-} from "react";
-import controller from "app/lib/controller";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-import { RootState } from "app/store/redux";
-import get from "lodash/get";
-import pick from "lodash/pick";
-import mapValues from "lodash/mapValues";
-import { ATCIMacroConfig } from "app/features/ATC/assets/defaultATCIMacros.ts";
-import store from "app/store";
+import type { ATCIMacroConfig } from "app/features/ATC/assets/defaultATCIMacros.ts";
 import { generateAllMacros } from "app/features/ATC/components/Configuration/utils/ConfigUtils.ts";
+import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
+import controller from "app/lib/controller.ts";
+import store from "app/store";
+import type { RootState } from "app/store/redux";
+import get from "lodash/get";
+import mapValues from "lodash/mapValues";
+import pick from "lodash/pick";
+import type React from "react";
+import {
+	createContext,
+	type ReactNode,
+	useContext,
+	useEffect,
+	useState,
+} from "react";
 import delay from "../../../../../../../server/lib/delay";
 
 export const defaultPosition: Position = {

@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import type { ReactNode } from "react";
 import { AlertCircle } from "lucide-react";
-import { ValidationResult } from "../../types/wizard";
+import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
+import type { ValidationResult } from "../../types/wizard";
 
 interface ValidationBannerProps {
 	validations?: (() => ValidationResult)[];

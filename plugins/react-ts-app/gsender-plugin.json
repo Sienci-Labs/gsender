@@ -1,0 +1,17 @@
+{
+	"id": "com.sienci.react-ts-app",
+	"name": "React SDK Demo",
+	"version": "0.1.0",
+	"engine": ">=1.6.0",
+	"ui": {
+		"entry": "ui/index.html",
+		"contributions": [
+			{
+				"slot": "tools-page",
+				"route": "react-sdk-demo",
+				"label": "React SDK Demo"
+			}
+		]
+	},
+	"permissions": ["machine:read"]
+}

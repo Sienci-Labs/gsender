@@ -1,5 +1,5 @@
-import config from "../services/configstore";
 import { ERR_INTERNAL_SERVER_ERROR } from "../constants";
+import config from "../services/configstore";
 
 const CONFIG_KEY = "maintenance";
 

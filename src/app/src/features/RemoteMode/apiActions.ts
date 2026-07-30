@@ -13,7 +13,7 @@ export const actions = {
 		setOldSettings?: (settings: HeadlessSettings) => void,
 	) => {
 		try {
-			let res = await api.remoteSetting.fetch();
+			const res = await api.remoteSetting.fetch();
 			const remote = res.data;
 			setHeadlessSettings(remote);
 
@@ -33,7 +33,7 @@ export const actions = {
 				if (isElectron()) {
 					//call the event that handles app restart with remote settings
 					setTimeout(() => {
-						// @ts-ignore
+						// @ts-expect-error
 						window.ipcRenderer.send("remoteMode-restart", headlessSettings);
 					}, 500);
 				}

@@ -1,11 +1,11 @@
+import { JobPreview } from "app/features/Stats/components/JobPreview.tsx";
 import { StatContext } from "app/features/Stats/utils/StatContext.tsx";
 import { useContext } from "react";
-import { JobPreview } from "app/features/Stats/components/JobPreview.tsx";
 import { FaRegListAlt } from "react-icons/fa";
 
 export function EmptyJobList() {
 	return (
-		<div className="flex flex-col gap-2 items-center justify-center text-gray-700 dark:text-content-primary h-full">
+		<div className="flex flex-col gap-2 items-center justify-center text-gray-700 dark:text-white h-full">
 			<span className="text-6xl">
 				<FaRegListAlt />
 			</span>

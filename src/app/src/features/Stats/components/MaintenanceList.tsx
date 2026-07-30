@@ -1,13 +1,8 @@
-import { useContext, useEffect, useState } from "react";
-import {
-	MaintenanceTask,
-	StatContext,
-} from "app/features/Stats/utils/StatContext.tsx";
 import { sortingFns } from "@tanstack/react-table";
-import { CheckCircle, Pen, AlertCircle } from "lucide-react";
-import SortableTable, { CustomColumnDef } from "app/components/SortableTable";
-import { MaintenanceAddTaskDialog } from "app/features/Stats/components/MaintenanceAddTaskDialog.tsx";
-import { MaintenanceEditTaskDialog } from "app/features/Stats/components/MaintenanceEditTaskDialog.tsx";
+import { Confirm } from "app/components/ConfirmationDialog/ConfirmationDialogLib";
+import SortableTable, {
+	type CustomColumnDef,
+} from "app/components/SortableTable";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -18,7 +13,14 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from "app/components/shadcn/AlertDialog";
-import { Confirm } from "app/components/ConfirmationDialog/ConfirmationDialogLib";
+import { MaintenanceAddTaskDialog } from "app/features/Stats/components/MaintenanceAddTaskDialog.tsx";
+import { MaintenanceEditTaskDialog } from "app/features/Stats/components/MaintenanceEditTaskDialog.tsx";
+import {
+	type MaintenanceTask,
+	StatContext,
+} from "app/features/Stats/utils/StatContext.tsx";
+import { AlertCircle, CheckCircle, Pen } from "lucide-react";
+import { useContext, useEffect, useState } from "react";
 
 interface FormattedTask {
 	id: number;
@@ -279,7 +281,7 @@ export function MaintenanceList() {
 								onClick={() => {
 									const updatedTasks = maintenanceTasks.map((obj) => {
 										if (obj.id === currentTask.id) {
-											let newObj = obj;
+											const newObj = obj;
 											newObj.currentTime = 0;
 											return newObj;
 										}

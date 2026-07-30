@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Button } from "app/components/Button";
 import {
 	Popover,
 	PopoverContent,
@@ -12,22 +11,24 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "app/components/shadcn/Select.tsx";
-import { Button } from "app/components/Button";
-import { cn } from "app/lib/utils";
-import {
+import type {
 	ToolInstance,
 	ToolStatus,
 } from "app/features/ATC/components/ToolTable.tsx";
-import { useToolChange } from "app/features/ATC/utils/ToolChangeContext.tsx";
+import { ToolStatusBadges } from "app/features/ATC/components/ui/ToolStatusBadges.tsx";
 import {
+	type LoadToolMode,
 	loadAndSaveToRack,
 	loadTool,
-	LoadToolMode,
 	releaseToolFromSpindle,
 	saveToRack,
 } from "app/features/ATC/utils/ATCFunctions.ts";
 import { toolStateThemes } from "app/features/ATC/utils/ATCiConstants.ts";
-import { ToolStatusBadges } from "app/features/ATC/components/ui/ToolStatusBadges.tsx";
+import { useToolChange } from "app/features/ATC/utils/ToolChangeContext.tsx";
+import { cn } from "app/lib/utils";
+import { Loader2 } from "lucide-react";
+import type React from "react";
+import { useState } from "react";
 
 interface ToolChangerPopoverProps {
 	isOpen: boolean;
@@ -139,7 +140,7 @@ const ToolChangerPopover: React.FC<ToolChangerPopoverProps> = ({
 			>
 				<div className="space-y-2">
 					<div>
-						<h3 className="text-lg font-semibold text-slate-800 dark:text-content-primary">
+						<h3 className="text-lg font-semibold text-slate-800 dark:text-white">
 							{getModeTitle(mode)}
 						</h3>
 					</div>
@@ -150,11 +151,11 @@ const ToolChangerPopover: React.FC<ToolChangerPopoverProps> = ({
 								<SelectTrigger className="w-full">
 									<SelectValue>
 										<div className="flex items-center gap-2 w-full min-w-0">
-											<span className="font-mono font-semibold text-slate-800 dark:text-content-primary shrink-0">
+											<span className="font-mono font-semibold text-slate-800 dark:text-white shrink-0">
 												{selectedTool?.id}
 											</span>
 											{selectedTool?.nickname && (
-												<span className="text-slate-600 dark:text-content-primary text-sm truncate flex-1 min-w-0">
+												<span className="text-slate-600 dark:text-white text-sm truncate flex-1 min-w-0">
 													{selectedTool.nickname}
 												</span>
 											)}
@@ -178,11 +179,11 @@ const ToolChangerPopover: React.FC<ToolChangerPopoverProps> = ({
 										return (
 											<SelectItem key={tool.id} value={tool.id}>
 												<div className="flex items-center gap-2 min-w-0 w-full">
-													<span className="font-mono font-semibold text-slate-800 dark:text-content-primary shrink-0">
+													<span className="font-mono font-semibold text-slate-800 dark:text-white shrink-0">
 														{tool?.id}
 													</span>
 													{tool?.nickname && (
-														<span className="text-slate-600 dark:text-content-primary text-sm truncate flex-1 min-w-0">
+														<span className="text-slate-600 dark:text-white text-sm truncate flex-1 min-w-0">
 															{tool.nickname}
 														</span>
 													)}

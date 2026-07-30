@@ -1,10 +1,10 @@
+import { Badge } from "app/components/shadcn/Badge";
 import {
-	Tooltip as TooltipWrapper,
-	TooltipTrigger,
 	TooltipContent,
 	TooltipProvider,
+	TooltipTrigger,
+	Tooltip as TooltipWrapper,
 } from "app/components/shadcn/Tooltip";
-import { Badge } from "app/components/shadcn/Badge";
 import { getBitfieldArr } from "./utils.ts";
 
 interface BitValueIndicatorProps {

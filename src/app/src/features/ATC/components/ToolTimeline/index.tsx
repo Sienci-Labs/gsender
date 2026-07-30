@@ -1,25 +1,34 @@
 import { ToolTimeline } from "app/features/ATC/components/ToolTimeline/components/ToolTimeline.tsx";
-import { ToolChange } from "app/features/ATC/components/ToolTimeline/components/types.ts";
-import { useEffect, useState } from "react";
-import pubsub from "pubsub-js";
-import { RootState } from "app/store/redux";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-import get from "lodash/get";
-import controller from "app/lib/controller";
+import type { ToolChange } from "app/features/ATC/components/ToolTimeline/components/types.ts";
 import { getToolpathColor } from "app/features/ATC/utils/ATCFunctions.ts";
+import { G1_PART } from "app/features/Visualizer/constants.ts";
+import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
+import controller from "app/lib/controller.ts";
+import { getVisualizerTheme } from "app/lib/getVisualizerTheme.ts";
+import type { RootState } from "app/store/redux";
+import get from "lodash/get";
+import pubsub from "pubsub-js";
+import { useEffect, useState } from "react";
 
-function buildToolArray(toolEvents, fileLength) {
+function buildToolArray(toolEvents, fileLength, cuttingColor: string) {
 	let count = 0;
 	const toolArray: ToolChange[] = [];
 
 	Object.entries(toolEvents).forEach(([line, value]) => {
 		if (Object.hasOwn(value, "M") && Object.hasOwn(value, "T")) {
-			let newTool: ToolChange = {};
+			const newTool: ToolChange = {};
 			newTool.toolNumber = value.T;
 			newTool.startLine = Number(line);
 			newTool.label = `T${value.T}`;
-			const legendColor = getToolpathColor(count);
-			newTool.color = `#${legendColor.getHexString()}`;
+			if (value.comment) newTool.comment = value.comment;
+			// The first tool uses the theme's cutting color (acting as palette index
+			// 0); the array proper starts at index 1 for the second tool onward.
+			if (count === 0) {
+				newTool.color = cuttingColor;
+			} else {
+				const legendColor = getToolpathColor(count);
+				newTool.color = `#${legendColor.getHexString()}`;
+			}
 			newTool.index = count + 1;
 			toolArray.push(newTool);
 
@@ -67,7 +76,8 @@ export function ToolTimelineWrapper() {
 
 	useEffect(() => {
 		pubsub.subscribe("file:toolchanges", (k, { toolEvents, total }) => {
-			const toolArray = buildToolArray(toolEvents, total);
+			const cuttingColor = getVisualizerTheme().get(G1_PART) ?? "#3e85c7";
+			const toolArray = buildToolArray(toolEvents, total, cuttingColor);
 
 			if (toolArray.length === 0) {
 				setShow(false);

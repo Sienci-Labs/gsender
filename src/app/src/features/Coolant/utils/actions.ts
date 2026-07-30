@@ -5,8 +5,8 @@ import {
 	WORKFLOW_STATE_RUNNING,
 } from "app/constants";
 import controller from "app/lib/controller";
-import { get } from "lodash";
 import reduxStore from "app/store/redux";
+import { get } from "lodash";
 
 export function startMist() {
 	controller.command("gcode", "M7");
