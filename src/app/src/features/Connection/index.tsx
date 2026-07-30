@@ -81,6 +81,24 @@ function Connection(props: ConnectionProps) {
 			onControllerDisconnect();
 		});
 
+		// A remote/browser client can be auto-joined to an already-open
+		// connection server-side (see lib/controller.ts's "startup" handler)
+		// without ever going through handleConnect(). Sync the local widget
+		// state so the header button reflects "Connected" in that case too.
+		controller.addListener("serialport:openController", () => {
+			setConnectionState((prevState) => {
+				if (prevState === ConnectionState.CONNECTED) {
+					return prevState;
+				}
+				const port = controller.port;
+				setActivePort(port);
+				setConnectionType(
+					isIPv4(port) ? ConnectionType.ETHERNET : ConnectionType.USB,
+				);
+				return ConnectionState.CONNECTED;
+			});
+		});
+
 		const preferredFirmware = store.get(
 			"widgets.connection.controller.type",
 			"grbl",

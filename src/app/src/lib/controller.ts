@@ -361,6 +361,7 @@ class Controller {
 				loadedControllers = [],
 				baudrates = [],
 				ports = [],
+				activeConnection = null,
 			} = { ...data };
 
 			this.loadedControllers = ensureArray(loadedControllers);
@@ -379,6 +380,14 @@ class Controller {
 			// don't want to update store if it is electron
 			if (!isElectron()) {
 				this.socket && this.socket.emit("newConnection");
+
+				// A remote/browser client only ever talks to one controller at a
+				// time. If the desktop is already connected, join that session
+				// automatically instead of making the user click Connect — this
+				// takes priority over any locally-saved autoReconnect port.
+				if (activeConnection && activeConnection.port) {
+					this.addClient(activeConnection.port);
+				}
 			}
 		});
 	}
