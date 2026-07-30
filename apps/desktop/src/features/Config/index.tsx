@@ -113,7 +113,7 @@ export function Config() {
     }
 
     return (
-        <div className="w-full flex flex-grow-0 shadow bg-white overflow-y-hidden box-border no-scrollbar dark:bg-dark">
+        <div className="w-full flex flex-grow-0 shadow bg-white overflow-y-hidden box-border no-scrollbar dark:bg-surface-raised">
             {activeTab === 'config' ? (
                 <Menu
                     menu={settings}
@@ -121,10 +121,10 @@ export function Config() {
                     activeSection={visibleSection}
                 />
             ) : (
-                <div className="flex flex-col w-1/5 border border-gray-200 border-l-0 pl-1 divide-y bg-white dark:bg-dark dark:border-gray-700 dark:text-white max-sm:hidden" />
+                <div className="flex flex-col w-1/5 border border-gray-200 border-l-0 pl-1 divide-y bg-white dark:bg-surface-raised dark:border-outline dark:text-content-primary max-sm:hidden" />
             )}
             <div className="flex flex-col fixed-content-area w-full">
-                <div className="min-h-1/5 bg-white border border-bottom border-gray-200 flex flex-row justify-between gap-2 items-center pl-24 max-xl:pl-5 max-sm:p-3 dark:bg-dark dark:border-gray-700">
+                <div className="min-h-1/5 bg-white border border-bottom border-gray-200 flex flex-row justify-between gap-2 items-center pl-24 max-xl:pl-5 max-sm:p-3 dark:bg-surface-raised dark:border-outline">
                     <Search />
                     <FilterDefaultToggle />
                     <ApplicationPreferences />
@@ -133,14 +133,14 @@ export function Config() {
                     <TabsList className="w-full pb-0 border-b rounded-b-none">
                         <TabsTrigger
                             value="config"
-                            className="w-full dark:text-white"
+                            className="w-full dark:text-content-primary"
                             onClick={() => setActiveTab('config')}
                         >
                             All Config
                         </TabsTrigger>
                         <TabsTrigger
                             value="eeprom"
-                            className="w-full dark:text-white"
+                            className="w-full dark:text-content-primary"
                             onClick={() => setActiveTab('eeprom')}
                         >
                             EEPROM

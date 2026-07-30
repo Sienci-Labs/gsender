@@ -46,7 +46,7 @@ export const GcodeViewer = ({ gcode }: GcodeViewerProps) => {
                                 key={Math.random().toString()}
                                 className={`py-1 px-2 rounded-sm ${
                                     index % 2 === 0
-                                        ? 'bg-gray-200 dark:bg-dark-lighter'
+                                        ? 'bg-gray-200 dark:bg-surface-elevated'
                                         : ''
                                 }`}
                             >

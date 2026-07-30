@@ -69,7 +69,7 @@ const Info = () => {
             : `${formatNumber(feedrateMin)}-${formatNumber(feedrateMax)} ${units === 'mm' ? 'mm/min' : 'in/min'}`;
 
     return (
-        <div className="text-gray-900 dark:text-gray-300">
+        <div className="text-gray-900 dark:text-content-secondary">
             <div className="flex gap-1">
                 <span className="font-bold">Estimated Time</span>
                 <span>{formattedEstimatedTime}</span>

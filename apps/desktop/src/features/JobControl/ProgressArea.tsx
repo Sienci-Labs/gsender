@@ -136,7 +136,7 @@ const ProgressArea = ({ senderStatus, workflowState }: Props) => {
             aria-valuemax={100}
             aria-label="Job Progress"
         >
-            <div className="border-solid border border-gray-500 dark:border-gray-700 rounded-sm bg-gray-100 dark:bg-dark gap-2 flex flex-row justify-between items-center pr-1 pt-1 text-gray-900 dark:text-gray-200">
+            <div className="border-solid border border-gray-500 dark:border-outline rounded-sm bg-gray-100 dark:bg-surface-raised gap-2 flex flex-row justify-between items-center pr-1 pt-1 text-gray-900 dark:text-gray-200">
                 <div className="flex flex-col gap-0 w-full h-full -mt-6">
                     <div
                         className="flex flex-row justify-start items-end px-3 -mb-1 whitespace-nowrap transition-transform duration-200"

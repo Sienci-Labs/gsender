@@ -36,7 +36,7 @@ const ModalToggle = ({ mode, onChange, ...props }: Props) => {
 
     return (
         <Tooltip content="Enable Spindle or Laser mode">
-            <div className="flex items-center gap-2 justify-center w-full dark:text-white">
+            <div className="flex items-center gap-2 justify-center w-full dark:text-content-primary">
                 <span>Spindle</span>
                 <Switch
                     checked={isToggled}

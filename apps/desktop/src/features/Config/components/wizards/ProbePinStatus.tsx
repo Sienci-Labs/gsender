@@ -12,7 +12,7 @@ export function ProbePinStatus() {
 
     return (
         <div className="flex flex-row items-center gap-2">
-            <span className="dark:text-white">Probe/TLS:</span>
+            <span className="dark:text-content-primary">Probe/TLS:</span>
             <PinIndicator on={probeOn} />
         </div>
     );

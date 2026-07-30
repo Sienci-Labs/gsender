@@ -53,7 +53,7 @@ export function Alarms() {
                             <div className="max-xl:hidden">
                                 <CardHeader>Clear Alarms & Errors</CardHeader>
                             </div>
-                            <p className="text-gray-600 text-sm dark:text-white max-xl:hidden">
+                            <p className="text-gray-600 text-sm dark:text-content-primary max-xl:hidden">
                             Clear all prior alarms and errors. This action
                             cannot be undone.
                             </p>

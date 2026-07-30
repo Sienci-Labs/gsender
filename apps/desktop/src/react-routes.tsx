@@ -69,7 +69,7 @@ export const ReactRoutes = () => {
                         index
                         element={
                             <div className="py-4 px-16 max-xl:px-8 fixed-content-area no-scrollbar">
-                                <p className="text-lg font-semibold mb-4 dark:text-white">
+                                <p className="text-lg font-semibold mb-4 dark:text-content-primary">
                                     Choose a tool to get started...
                                 </p>
 

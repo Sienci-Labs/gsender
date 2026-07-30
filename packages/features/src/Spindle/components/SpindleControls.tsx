@@ -129,7 +129,7 @@ const SpindleControls = ({ actions, state, canClick, isConnected }: Props) => {
                     aria-label="Stop spindle (M5)"
                 />
             </div>
-            <div className="grid grid-cols-[1fr_3fr_1fr] gap-2 justify-center items-center dark:text-white">
+            <div className="grid grid-cols-[1fr_3fr_1fr] gap-2 justify-center items-center dark:text-content-primary">
                 <span className="text-right">Speed</span>
                 {inputType === 'Slider' ? (
                     <Tooltip content="Adjust spindle speed" side="bottom">

@@ -27,11 +27,11 @@ import { Button } from 'app/components/Buttons';
 import PropTypes from 'prop-types';
 
 import {
-    modalStyle,
-    modalHeaderStyle,
+    getModalStyle,
+    getModalHeaderStyle,
     modalTitleStyle,
     modalBodyStyle,
-    modalFooterStyle,
+    getModalFooterStyle,
 } from './modalStyle';
 
 const WarningModal = ({
@@ -44,10 +44,10 @@ const WarningModal = ({
         <Modal
             size="md"
             onClose={onContinue}
-            style={modalStyle}
+            style={getModalStyle()}
             disableOverlayClick
         >
-            <Modal.Header style={modalHeaderStyle}>
+            <Modal.Header style={getModalHeaderStyle()}>
                 <Modal.Title style={modalTitleStyle}>
                     Invalid Line Warning
                 </Modal.Title>
@@ -63,7 +63,7 @@ const WarningModal = ({
 
                 <p>Your job might not run properly</p>
             </Modal.Body>
-            <Modal.Footer style={modalFooterStyle}>
+            <Modal.Footer style={getModalFooterStyle()}>
                 <Button
                     // style={{ backgroundColor: '#3e85c7', color: 'white', backgroundImage: 'none' }}
                     onClick={onCancel}

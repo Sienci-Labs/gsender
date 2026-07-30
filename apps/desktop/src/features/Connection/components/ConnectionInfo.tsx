@@ -13,7 +13,7 @@ export function ConnectionInfo(props: ConnectionInfoProps) {
             <div className="font-bold text-gray-900 dark:text-gray-100">
                 {truncatedPort}
             </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="text-sm text-gray-600 dark:text-content-muted">
                 {props.firmwareType}
             </div>
         </div>

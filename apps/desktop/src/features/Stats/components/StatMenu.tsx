@@ -2,10 +2,10 @@ import { NavLink } from 'react-router';
 import { tv } from 'tailwind-variants';
 
 const linkStyle = tv({
-    base: 'inline-block px-2 py-2 text-white bg-gray-600 rounded-lg active bg-white dark:text-white dark:bg-dark-lighter',
+    base: 'inline-block px-2 py-2 text-white bg-gray-600 rounded-lg active bg-white dark:text-content-primary dark:bg-surface-elevated',
     variants: {
         isActive: {
-            true: 'bg-blue-500 bg-opacity-30 text-blue-500 dark:bg-dark',
+            true: 'bg-blue-500 bg-opacity-30 text-blue-500 dark:bg-surface-raised',
             false: 'text-gray-600',
         },
     },
@@ -32,7 +32,7 @@ function StatMenuLink({ label, href, end = false }: StatMenuProps) {
 export function StatMenu() {
     return (
         <div className="w-fit mx-auto">
-            <ul className="fixed bottom-4 left-[55%] -translate-x-[55%] rounded-md flex text-sm font-medium text-center bg-white text-gray-500 items-center justify-center border-gray-200 ring-1 ring-gray-200 dark:ring-gray-800 p-1 dark:bg-dark-lighter dark:border-gray-800 dark:text-white">
+            <ul className="fixed bottom-4 left-[55%] -translate-x-[55%] rounded-md flex text-sm font-medium text-center bg-white text-gray-500 items-center justify-center border-gray-200 ring-1 ring-gray-200 dark:ring-outline p-1 dark:bg-surface-elevated dark:border-outline dark:text-content-primary">
                 <StatMenuLink label="Overview" href={'/stats'} end />
                 <StatMenuLink label="Jobs" href={'/stats/jobs'} />
                 <StatMenuLink label="Maintenance" href={'/stats/maintenance'} />

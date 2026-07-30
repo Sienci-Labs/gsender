@@ -23,11 +23,11 @@ const buttonVariants = cva(
                 ghost: 'hover:bg-accent hover:text-accent-foreground',
                 link: 'text-primary underline-offset-4 hover:underline',
                 confirm:
-                    'bg-blue-500 bg-opacity-20 border border-blue-500 text-blue-500 dark:text-white active:bg-opacity-10',
+                    'bg-blue-500 bg-opacity-20 border border-blue-500 text-blue-500 dark:text-content-primary active:bg-opacity-10',
                 cancel: 'bg-none border border-blue-500 text-gray-800 dark:text-blue-500',
             },
             disabled: {
-                true: 'bg-gray-300 border-gray-400 text-gray-500 dark:bg-dark',
+                true: 'bg-gray-300 border-gray-400 text-gray-500 dark:bg-surface-raised',
             },
             size: {
                 mini: 'h-6 rounded-md px-[5px] w-full text-xs',

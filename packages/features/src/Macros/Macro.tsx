@@ -240,7 +240,7 @@ const Macro = ({ state, actions, workflow }: MacroProps) => {
     if (macros.length === 0) {
         return (
             <div className="flex flex-col gap-1 p-1 h-full justify-center items-center">
-                <p className="text-center dark:text-white">
+                <p className="text-center dark:text-content-primary">
                     No Macros...
                 </p>
             </div>
@@ -281,7 +281,7 @@ const Macro = ({ state, actions, workflow }: MacroProps) => {
                     </Container>
                     <DragOverlay>
                         {activeId ? (
-                            <div className="bg-white border border-gray-200 rounded-md shadow-lg p-2 dark:bg-dark dark:border-dark-lighter dark:text-white">
+                            <div className="bg-white border border-gray-200 rounded-md shadow-lg p-2 dark:bg-surface-raised dark:border-outline dark:text-content-primary">
                                 {
                                     [...column1.items, ...column2.items].find(
                                         (item) => item.id === activeId,

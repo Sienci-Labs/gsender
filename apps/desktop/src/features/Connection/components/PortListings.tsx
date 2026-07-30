@@ -73,7 +73,7 @@ export function PortListings(props: PortListingsProps): JSX.Element {
     }
 
     return (
-        <div className="w-full bg-white dark:bg-dark divide-y divide-dotted divide-blue-300">
+        <div className="w-full bg-white dark:bg-surface-raised divide-y divide-dotted divide-blue-300">
             {props.ports.length === 0 && (
                 <p className="font-normal flex items-center justify-center p-2 mt-2">
                     No USB devices found
@@ -107,7 +107,7 @@ export function PortListings(props: PortListingsProps): JSX.Element {
             {props.unrecognizedPorts.length > 0 && (
                 <div className="flex flex-col overflow-hidden">
                     <button
-                        className="text-base text-gray-700 dark:text-gray-300 my-2 flex flex-row justify-between items-center px-2 outline-none"
+                        className="text-base text-gray-700 dark:text-content-secondary my-2 flex flex-row justify-between items-center px-2 outline-none"
                         onClick={toggleUnrecognizedPorts}
                     >
                         <span>Unrecognized Ports</span>

@@ -23,6 +23,8 @@
 
 import memoize from 'memoize-one';
 
+import { getThemeCssColor } from 'app/lib/getThemeCssColor';
+
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author mr.doob / http://mrdoob.com/
@@ -71,8 +73,11 @@ export const getErrorMessage = (version: number): HTMLDivElement => {
         2: window.WebGL2RenderingContext,
     };
 
-    let message =
-        'Your $0 does not seem to support <a href="http://khronos.org/webgl/wiki/Getting_a_WebGL_Implementation" style="color:#000">$1</a>';
+    const isDark = document.documentElement.classList.contains('dark');
+    const background = (isDark && getThemeCssColor('--surface-raised')) || '#fff';
+    const textColor = (isDark && getThemeCssColor('--content-primary')) || '#000';
+
+    let message = `Your $0 does not seem to support <a href="http://khronos.org/webgl/wiki/Getting_a_WebGL_Implementation" style="color:${textColor}">$1</a>`;
 
     const element = document.createElement('div');
     element.id = 'webglmessage';
@@ -80,8 +85,8 @@ export const getErrorMessage = (version: number): HTMLDivElement => {
     element.style.fontSize = '14px';
     element.style.fontWeight = 'normal';
     element.style.textAlign = 'center';
-    element.style.background = '#fff';
-    element.style.color = '#000';
+    element.style.background = background;
+    element.style.color = textColor;
     element.style.padding = '1.5em';
     element.style.width = '400px';
     element.style.margin = '5em auto 0';

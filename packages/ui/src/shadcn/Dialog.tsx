@@ -44,7 +44,7 @@ const DialogContent = React.forwardRef<
                 onOpenAutoFocus={focusTrapping ? undefined : (e) => e.preventDefault()}
                 onCloseAutoFocus={focusTrapping ? undefined : (e) => e.preventDefault()}
                 className={cx(
-                    'fixed left-[50%] text-sm dark:bg-dark-darker top-[50%] z-[9999] grid translate-x-[-50%] translate-y-[-50%]  border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg bg-white dark:border-gray-700 dark:text-white',
+                    'fixed left-[50%] text-sm dark:bg-surface-raised top-[50%] z-[9999] grid translate-x-[-50%] translate-y-[-50%]  border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg bg-white dark:border-outline dark:text-content-primary',
                     className,
                 )}
                 {...props}
@@ -92,7 +92,7 @@ const DialogTitle = React.forwardRef<
     <DialogPrimitive.Title
         ref={ref}
         className={cx(
-            'text-lg font-semibold leading-none tracking-tight text-blue-500 dark:text-white mb-2',
+            'text-lg font-semibold leading-none tracking-tight text-blue-500 dark:text-content-primary mb-2',
             className,
         )}
         {...props}

@@ -130,7 +130,7 @@ const ShortcutsTable = ({ onEdit, onDelete, onShortcutToggle, dataSet }) => {
         return (
             <div className="flex justify-between items-center">
                 {hasShortcut || '' ? (
-                    <div className="flex flex-wrap gap-2 items-center bg-gray-100 rounded-md p-1 dark:bg-dark">
+                    <div className="flex flex-wrap gap-2 items-center bg-gray-100 rounded-md p-1 dark:bg-surface-raised">
                         {output}
                     </div>
                 ) : null}

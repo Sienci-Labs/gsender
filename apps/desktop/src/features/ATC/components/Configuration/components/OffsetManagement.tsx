@@ -46,12 +46,12 @@ export default function OffsetManagementWidget({
                     disabled={disabled}
                 >
                     <SelectTrigger
-                        className="h-8 text-xs dark:border-slate-600 dark:bg-slate-900 dark:text-white"
+                        className="h-8 text-xs dark:border-outline dark:bg-surface-sunken dark:text-content-primary"
                         disabled={disabled}
                     >
                         <SelectValue placeholder="Select mode" />
                     </SelectTrigger>
-                    <SelectContent className="z-[10001] bg-white dark:bg-slate-900 dark:text-gray-100">
+                    <SelectContent className="z-[10001] bg-white dark:bg-surface-elevated dark:text-content-primary">
                         <SelectItem value="0">
                             Probe new offset after loading
                         </SelectItem>

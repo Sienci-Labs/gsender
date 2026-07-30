@@ -460,10 +460,10 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
     }
 
     return (
-        <div className="w-full h-full flex flex-col bg-white dark:bg-dark shadow-lg rounded-md overflow-hidden dark:border dark:border-dark-lighter">
-            <div className="flex justify-between items-center p-3 border-b border-gray-300 dark:border-dark-lighter gap-3">
+        <div className="w-full h-full flex flex-col bg-white dark:bg-surface-raised shadow-lg rounded-md overflow-hidden dark:border dark:border-outline">
+            <div className="flex justify-between items-center p-3 border-b border-gray-300 dark:border-outline gap-3">
                 <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <h3 className="text-lg font-semibold dark:text-white whitespace-nowrap">
+                    <h3 className="text-lg font-semibold dark:text-content-primary whitespace-nowrap">
                         G-code Editor
                     </h3>
                     {isJobRunning && (
@@ -490,7 +490,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                         </span>
                     )}
                     {gcodeLines.length > 0 && (
-                        <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                        <span className="text-xs text-gray-500 dark:text-content-muted whitespace-nowrap">
                             {gcodeLines.length.toLocaleString()} lines
                         </span>
                     )}
@@ -548,7 +548,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                 </div>
 
                 {isSearchOpen && (
-                    <div className="fixed top-20 right-6 z-10 flex items-center gap-2 bg-gray-100 dark:bg-dark border border-gray-300 dark:border-dark-lighter p-3 rounded">
+                    <div className="fixed top-20 right-6 z-10 flex items-center gap-2 bg-gray-100 dark:bg-surface-raised border border-gray-300 dark:border-outline p-3 rounded">
                         <Input
                             name="search-gcode-lines"
                             sizing="sm"
@@ -566,7 +566,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                                 }
                             }}
                         />
-                        <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                        <span className="text-xs text-gray-500 dark:text-content-muted whitespace-nowrap">
                             {matchIndices.length > 0
                                 ? `${currentMatchIndex + 1}/${matchIndices.length}`
                                 : '0/0'}
@@ -669,10 +669,10 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                                 }
 
                                 if (index % 2 === 0) {
-                                    return 'bg-gray-200 dark:bg-dark-lighter';
+                                    return 'bg-gray-200 dark:bg-surface-elevated';
                                 }
 
-                                return 'hover:bg-gray-100 dark:hover:bg-dark-lighter/50';
+                                return 'hover:bg-gray-100 dark:hover:bg-surface-hover';
                             };
 
                             const getInnerLineClassName = () => {
@@ -704,7 +704,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                                     return 'text-green-900 dark:text-green-100';
                                 }
 
-                                return 'dark:text-white';
+                                return 'dark:text-content-primary';
                             };
 
                             return (
@@ -764,7 +764,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                                     </div>
                                     <span
                                         className={cn(
-                                            'dark:text-white mr-4 min-w-10 text-right select-none',
+                                            'dark:text-content-primary mr-4 min-w-10 text-right select-none',
                                             getInnerLineClassName(),
                                         )}
                                     >
@@ -874,7 +874,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                         })}
                 </div>
             </div>
-            <div className="flex gap-4 p-3 justify-end border-t border-gray-300 dark:border-dark-lighter">
+            <div className="flex gap-4 p-3 justify-end border-t border-gray-300 dark:border-outline">
                 <Button
                     variant={isSearchOpen ? 'primary' : 'outline'}
                     size="icon"

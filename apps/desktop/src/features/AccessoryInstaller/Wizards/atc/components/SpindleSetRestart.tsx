@@ -46,7 +46,7 @@ export function SpindleSetRestart({ onComplete, onUncomplete }: StepProps) {
 
     return (
         <div className="flex flex-col gap-5 justify-start">
-            <p className="dark:text-white">
+            <p className="dark:text-content-primary">
                 Your spindle settings are applied in this step and the controller will restart automatically.
             </p>
             <ol className="list-decimal p-5 gap-4 space-y-2">

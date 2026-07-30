@@ -137,7 +137,7 @@ const ToolChangerPopover: React.FC<ToolChangerPopoverProps> = ({
             >
                 <div className="space-y-2">
                     <div>
-                        <h3 className="text-lg font-semibold text-slate-800 dark:text-white">
+                        <h3 className="text-lg font-semibold text-slate-800 dark:text-content-primary">
                             {getModeTitle(mode)}
                         </h3>
                     </div>
@@ -151,11 +151,11 @@ const ToolChangerPopover: React.FC<ToolChangerPopoverProps> = ({
                                 <SelectTrigger className="w-full">
                                     <SelectValue>
                                         <div className="flex items-center gap-2 w-full min-w-0">
-                                            <span className="font-mono font-semibold text-slate-800 dark:text-white shrink-0">
+                                            <span className="font-mono font-semibold text-slate-800 dark:text-content-primary shrink-0">
                                                 {selectedTool?.id}
                                             </span>
                                             {selectedTool?.nickname && (
-                                                <span className="text-slate-600 dark:text-white text-sm truncate flex-1 min-w-0">
+                                                <span className="text-slate-600 dark:text-content-primary text-sm truncate flex-1 min-w-0">
                                                     {selectedTool.nickname}
                                                 </span>
                                             )}
@@ -183,11 +183,11 @@ const ToolChangerPopover: React.FC<ToolChangerPopoverProps> = ({
                                                 value={tool.id}
                                             >
                                                 <div className="flex items-center gap-2 min-w-0 w-full">
-                                                    <span className="font-mono font-semibold text-slate-800 dark:text-white shrink-0">
+                                                    <span className="font-mono font-semibold text-slate-800 dark:text-content-primary shrink-0">
                                                         {tool?.id}
                                                     </span>
                                                     {tool?.nickname && (
-                                                        <span className="text-slate-600 dark:text-white text-sm truncate flex-1 min-w-0">
+                                                        <span className="text-slate-600 dark:text-content-primary text-sm truncate flex-1 min-w-0">
                                                             {tool.nickname}
                                                         </span>
                                                     )}

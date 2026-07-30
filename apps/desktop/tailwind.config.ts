@@ -90,6 +90,42 @@ export default {
                     disabled: 'rgba(0, 0, 0, 0.20)',
                     scrim: 'rgba(0, 0, 0, 0.72)',
                 },
+                // shadcn/ui primitive tokens (packages/ui/src/shadcn/*) — resolved
+                // from CSS vars (see index.css) so bare classes like `bg-card` and
+                // `border` pick up the Workshop theme without a dark: prefix.
+                background: 'var(--background)',
+                foreground: 'var(--foreground)',
+                card: {
+                    DEFAULT: 'var(--card)',
+                    foreground: 'var(--card-foreground)',
+                },
+                popover: {
+                    DEFAULT: 'var(--popover)',
+                    foreground: 'var(--popover-foreground)',
+                },
+                primary: {
+                    DEFAULT: 'var(--primary)',
+                    foreground: 'var(--primary-foreground)',
+                },
+                secondary: {
+                    DEFAULT: 'var(--secondary)',
+                    foreground: 'var(--secondary-foreground)',
+                },
+                muted: {
+                    DEFAULT: 'var(--muted)',
+                    foreground: 'var(--muted-foreground)',
+                },
+                accent: {
+                    DEFAULT: 'var(--accent)',
+                    foreground: 'var(--accent-foreground)',
+                },
+                destructive: {
+                    DEFAULT: 'var(--destructive)',
+                    foreground: 'var(--destructive-foreground)',
+                },
+                border: 'var(--border)',
+                input: 'var(--input)',
+                ring: 'var(--ring)',
                 robin: {
                     50: '#f6f9fc',
                     100: '#ecf2f8',
@@ -155,6 +191,15 @@ export default {
                     900: '#704007',
                     950: '#5e3506',
                 },
+            },
+            borderColor: {
+                DEFAULT: 'var(--border)',
+            },
+            ringColor: {
+                DEFAULT: 'var(--ring)',
+            },
+            ringOffsetColor: {
+                background: 'var(--background)',
             },
             keyframes: {
                 attention: {

@@ -185,7 +185,7 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                     <DialogTitle>Flash Firmware</DialogTitle>
                 </DialogHeader>
                 <div className="flex flex-col gap-4">
-                    <p className="text-sm text-gray-700 dark:text-white">
+                    <p className="text-sm text-gray-700 dark:text-content-primary">
                         This feature exists to flash firmware onto a compatible
                         SLB or Arduino-based device.
                     </p>
@@ -195,7 +195,7 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                         })}
                     >
                         <div className="flex flex-col">
-                            <h2 className="text-gray-600 text-sm dark:text-white">Port</h2>
+                            <h2 className="text-gray-600 text-sm dark:text-content-primary">Port</h2>
                             <Select
                                 onValueChange={handlePortSelect}
                                 value={port}
@@ -229,7 +229,7 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                             </Select>
                         </div>
                         <div className="flex flex-col">
-                            <h2 className="text-gray-600 text-sm dark:text-white">
+                            <h2 className="text-gray-600 text-sm dark:text-content-primary">
                                 Controller Type
                             </h2>
                             <Select
@@ -253,7 +253,7 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                                 invisible: controllerType === 'grbl',
                             })}
                         >
-                            <h2 className="text-gray-600 text-sm dark:text-white">Hex File</h2>
+                            <h2 className="text-gray-600 text-sm dark:text-content-primary">Hex File</h2>
                             <input
                                 type="file"
                                 id="firmware_image"
@@ -272,7 +272,7 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                             },
                         )}
                     >
-                        <p className="text-sm text-gray-600 text-center dark:text-white">
+                        <p className="text-sm text-gray-600 text-center dark:text-content-primary">
                             This process will disconnect your machine, and may
                             take a couple of minutes to complete.
                             <br />

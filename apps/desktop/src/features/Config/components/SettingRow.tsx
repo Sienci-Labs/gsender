@@ -282,12 +282,12 @@ export const SettingRow = React.memo(function SettingRow({
                 'p-2 flex flex-row flex-wrap items-center text-gray-700 border-b border-gray-200',
                 {
                     hidden: isHidden,
-                    'odd:bg-yellow-50 even:bg-yellow-50 dark:bg-blue-900 dark:text-white':
+                    'odd:bg-yellow-50 even:bg-yellow-50 dark:bg-blue-900 dark:text-content-primary':
                         !isDefault,
                 },
             )}
         >
-            <span className="w-full sm:w-1/5 font-xl sm:mb-0 mb-2 dark:text-gray-400 flex items-center justify-between sm:block ">
+            <span className="w-full sm:w-1/5 font-xl sm:mb-0 mb-2 dark:text-content-muted flex items-center justify-between sm:block ">
                 <span>{setting.label}</span>
                 <span className="sm:hidden flex flex-row gap-2">
                     {!isDefault && (

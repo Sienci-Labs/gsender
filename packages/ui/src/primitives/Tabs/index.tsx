@@ -94,8 +94,8 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                     <button
                         className={`flex-shrink-0 p-1 rounded-full bg-transparent portrait:bg-white transition-colors duration-200 ${
                             canScrollLeft
-                                ? 'hover:bg-gray-100 text-gray-400 hover:text-gray-600 dark:hover:bg-dark-lighter dark:text-gray-300 dark:hover:text-gray-100'
-                                : 'text-gray-200 cursor-not-allowed dark:text-gray-500'
+                                ? 'hover:bg-gray-100 text-gray-400 hover:text-gray-600 dark:hover:bg-dark-lighter dark:text-content-secondary dark:hover:text-gray-100'
+                                : 'text-gray-200 cursor-not-allowed dark:text-content-muted'
                         }`}
                         onClick={() => canScrollLeft && scrollTabs('left')}
                         disabled={!canScrollLeft}
@@ -126,7 +126,7 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                                     className={`flex-grow pt-1 px-4 max-xl:px-3 text-base font-medium max-xl:text-sm portrait:text-xl max-xl:pt-2 ${
                                         activeTab === item.label
                                             ? 'text-blue-600 border-b-2 border-blue-600 dark:text-blue-400 dark:border-blue-400'
-                                            : 'text-gray-600 border-b-2 border-transparent hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100'
+                                            : 'text-gray-600 border-b-2 border-transparent hover:text-gray-800 dark:text-content-secondary dark:hover:text-gray-100'
                                     }`}
                                     onClick={() =>
                                         handleTabClick(item.label, index)
@@ -139,8 +139,8 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                     <button
                         className={`flex-shrink-0 p-1 rounded-full bg-transparent transition-colors duration-200 max-xl:pt-2 ${
                             canScrollRight
-                                ? 'hover:bg-gray-100 text-gray-400 hover:text-gray-600 dark:hover:bg-dark-lighter dark:text-gray-300 dark:hover:text-gray-100'
-                                : 'text-gray-200 cursor-not-allowed dark:text-gray-500'
+                                ? 'hover:bg-gray-100 text-gray-400 hover:text-gray-600 dark:hover:bg-dark-lighter dark:text-content-secondary dark:hover:text-gray-100'
+                                : 'text-gray-200 cursor-not-allowed dark:text-content-muted'
                         }`}
                         onClick={() => canScrollRight && scrollTabs('right')}
                         disabled={!canScrollRight}

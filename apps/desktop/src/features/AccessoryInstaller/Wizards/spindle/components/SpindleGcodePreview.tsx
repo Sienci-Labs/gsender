@@ -15,18 +15,18 @@ export function SpindleGcodePreview() {
                 </span>
             </div>
             <div>
-                <div className="rounded-md bg-white dark:bg-dark-lighter">
+                <div className="rounded-md bg-white dark:bg-surface-raised">
                     <div className="font-mono text-sm">
                         {lines.map((line, index) => (
                             <div
                                 key={index}
                                 className={`py-1 px-2 text-gray-900 dark:text-gray-100 ${
                                     index % 2 === 0
-                                        ? 'bg-gray-100 dark:bg-dark'
+                                        ? 'bg-gray-100 dark:bg-surface-elevated'
                                         : ''
                                 }`}
                             >
-                                <span className="text-gray-500 dark:text-gray-400 mr-4">
+                                <span className="text-gray-500 dark:text-content-muted mr-4">
                                     {index + 1}
                                 </span>
                                 {line}

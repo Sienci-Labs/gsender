@@ -168,7 +168,7 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
 
                 <div className="grid grid-cols-[1.5fr_1fr] gap-2 w-[600px] min-h-[200px]">
                     <div className="flex flex-col justify-between pb-4">
-                        <div className="text-black leading-snug dark:text-white">
+                        <div className="text-black leading-snug dark:text-content-primary">
                             <div
                                 className={cx(
                                     'flex items-center p-4 text-sm text-yellow-800 border border-yellow-300 rounded-lg bg-yellow-50 w-full mb-3',

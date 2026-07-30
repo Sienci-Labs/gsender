@@ -10,18 +10,18 @@ export const buttonStyle = tv({
         variant: {
             primary: 'border-blue-500 text-white bg-blue-500',
             secondary:
-                'border-robin-500 hover:bg-gray-200 text-gray-600 bg-white dark:bg-dark dark:text-gray-200',
+                'border-robin-500 hover:bg-gray-200 text-gray-600 bg-white dark:bg-surface-raised dark:text-gray-200',
             alt: 'bg-robin-500 text-white border-robin-500',
             warning: 'bg-orange-500/90 text-white border-orange-300',
             error: 'bg-red-500 text-white border-red-700',
             success: 'bg-green-500 text-white border-green-700',
             outline:
-                'border-robin-500 hover:bg-gray-200 text-gray-600 bg-white dark:bg-dark text-black dark:text-white',
-            ghost: 'text-gray-600 dark:text-gray-300 border-none shadow-none',
-            active: 'border-robin-500 hover:bg-gray-200 text-gray-600 bg-white dark:bg-dark dark:text-gray-200',
+                'border-robin-500 hover:bg-gray-200 text-gray-600 bg-white dark:bg-surface-raised text-black dark:text-content-primary',
+            ghost: 'text-gray-600 dark:text-content-secondary border-none shadow-none',
+            active: 'border-robin-500 hover:bg-gray-200 text-gray-600 bg-white dark:bg-surface-raised dark:text-gray-200',
         },
         disabled: {
-            true: 'bg-gray-300 border-gray-400 text-gray-500 hover:bg-gray-300 dark:bg-dark cursor-not-allowed',
+            true: 'bg-gray-300 border-gray-400 text-gray-500 hover:bg-gray-300 dark:bg-surface-raised cursor-not-allowed',
         },
         active: {
             true: 'bg-gray-200 shadow-[inset_7px_4px_6px_0px_rgba(59,_130,_246,_0.1)]',

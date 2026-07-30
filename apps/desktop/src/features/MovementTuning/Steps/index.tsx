@@ -35,6 +35,39 @@ import { FaClipboard, FaClipboardCheck, FaClipboardList } from 'react-icons/fa';
 import { GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG } from 'app/constants';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { toFixedIfNecessary } from 'app/lib/rounding';
+import { getThemeCssColor } from 'app/lib/getThemeCssColor';
+
+// Neutral react-select colors come from the Tailwind-backed CSS variables
+// (see index.css) so no neutral hex is hardcoded here.
+const axisSelectStyles = {
+    control: (provided: Record<string, unknown>) => ({
+        ...provided,
+        backgroundColor:
+            getThemeCssColor('--surface-sunken') || provided.backgroundColor,
+        borderColor:
+            getThemeCssColor('--outline-default') || provided.borderColor,
+    }),
+    menu: (provided: Record<string, unknown>) => ({
+        ...provided,
+        backgroundColor:
+            getThemeCssColor('--surface-elevated') || provided.backgroundColor,
+        border: `1px solid ${getThemeCssColor('--outline-default') || 'transparent'}`,
+    }),
+    option: (
+        provided: Record<string, unknown>,
+        state: { isFocused: boolean },
+    ) => ({
+        ...provided,
+        backgroundColor: state.isFocused
+            ? getThemeCssColor('--surface-hover') || provided.backgroundColor
+            : 'transparent',
+        color: getThemeCssColor('--content-secondary') || provided.color,
+    }),
+    singleValue: (provided: Record<string, unknown>) => ({
+        ...provided,
+        color: getThemeCssColor('--content-primary') || provided.color,
+    }),
+};
 
 const Steps = () => {
     const [status, setStatus] = useState<'initial' | 'started'>('initial');
@@ -116,14 +149,14 @@ const Steps = () => {
             <div className="flex flex-col gap-4 xl:gap-0">
                 <div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-[3fr_2fr]">
                     <div className="space-y-1 text-sm xl:text-base font-normal">
-                        <p className="text-gray-500 dark:text-gray-300">
+                        <p className="text-gray-500 dark:text-content-secondary">
                             If you're looking to use your CNC for more accurate
                             work and notice a specific axis is always off by a
                             small amount - say 102mm instead of 100 - then use
                             this tool.
                         </p>
 
-                        <p className="text-gray-500 dark:text-gray-300">
+                        <p className="text-gray-500 dark:text-content-secondary">
                             Since CNC firmware needs to understand its hardware
                             to make exact movements, small manufacturing
                             variations in the motors, lead screws, pulleys, or
@@ -131,17 +164,18 @@ const Steps = () => {
                             longer distances.
                         </p>
 
-                        <p className="text-gray-500 dark:text-gray-300">
+                        <p className="text-gray-500 dark:text-content-secondary">
                             By testing for this difference using a marker or
                             tape and a measuring tape, this tool will better
                             tune the firmware to your machine.
                         </p>
 
                         <div className="flex gap-2 items-center">
-                            <label className="min-w-24 font-bold dark:text-white">
+                            <label className="min-w-24 font-bold dark:text-content-primary">
                                 Axis to Tune
                             </label>
                             <Select
+                                styles={axisSelectStyles}
                                 options={[
                                     {
                                         label: 'X-Axis',
@@ -208,7 +242,7 @@ const Steps = () => {
                             className="w-[440px] h-auto border border-gray-200 rounded-lg"
                         />
 
-                        <p className="text-gray-600 font-bold dark:text-white">
+                        <p className="text-gray-600 font-bold dark:text-content-primary">
                             Whichever axis you'll be tuning, please place it in
                             an initial location so that it'll have space to move
                             to the right (for X), backwards (for Y), and
@@ -234,7 +268,7 @@ const Steps = () => {
         if (moveDistance !== measuredDistance) {
             return (
                 <div className="flex flex-col gap-4">
-                    <div className="text-yellow-800 bg-yellow-100 p-4 rounded-lg border min-h-52 flex flex-col gap-4 justify-center items-center text-lg dark:bg-yellow-950 dark:text-white dark:border-yellow-950">
+                    <div className="text-yellow-800 bg-yellow-100 p-4 rounded-lg border min-h-52 flex flex-col gap-4 justify-center items-center text-lg dark:bg-yellow-950 dark:text-content-primary dark:border-yellow-950">
                         <span>
                             Your {selectedAxis.toUpperCase()}-axis movement was
                             off by{' '}
@@ -325,7 +359,7 @@ const Steps = () => {
 
         return (
             <div className="flex flex-col gap-4">
-                <div className="text-green-800 bg-green-100 p-4 rounded-lg border min-h-52 flex flex-col gap-4 justify-center items-center text-lg dark:bg-green-950 dark:text-white dark:border-green-950">
+                <div className="text-green-800 bg-green-100 p-4 rounded-lg border min-h-52 flex flex-col gap-4 justify-center items-center text-lg dark:bg-green-950 dark:text-content-primary dark:border-green-950">
                     <p>
                         Your {selectedAxis.toUpperCase()}-axis looks accurate,
                         so you should be good to go!
@@ -350,10 +384,10 @@ const Steps = () => {
                 <div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-2 items-start">
                     <div className="flex flex-col gap-4">
                         <div className="space-y-1">
-                            <h3 className="text-lg font-semibold dark:text-white">
+                            <h3 className="text-lg font-semibold dark:text-content-primary">
                                 Instructions
                             </h3>
-                            <p className="h-20 text-gray-600 dark:text-white">
+                            <p className="h-20 text-gray-600 dark:text-content-primary">
                                 {currentStep === 0 &&
                                     'First, mark next to the gantry in the location shown with your marker, pencil, or using a strip of tape.'}
                                 {currentStep === 1 &&
@@ -370,7 +404,7 @@ const Steps = () => {
                                         ? 'bg-blue-50 border border-blue-200 bg-opacity-40'
                                         : markLocationCompleted
                                           ? 'bg-green-50 border border-green-200 bg-opacity-30'
-                                          : 'bg-amber-600 border border-amber-600 bg-opacity-10 border-opacity-10 opacity-50 dark:bg-dark dark:border-gray-700 dark:text-white'
+                                          : 'bg-amber-600 border border-amber-600 bg-opacity-10 border-opacity-10 opacity-50 dark:bg-surface-raised dark:border-outline dark:text-content-primary'
                                 }`}
                             >
                                 <div className={`min-w-8 min-h-8 text-white`}>
@@ -405,12 +439,12 @@ const Steps = () => {
                             </div>
 
                             <div
-                                className={`flex items-center gap-4 p-4 rounded-lg transition-colors dark:bg-dark dark:border-gray-700 dark:text-white ${
+                                className={`flex items-center gap-4 p-4 rounded-lg transition-colors dark:bg-surface-raised dark:border-outline dark:text-content-primary ${
                                     currentStep === 1
                                         ? 'bg-blue-50 border border-blue-200 bg-opacity-40'
                                         : moveAxisCompleted
                                           ? 'bg-green-50 border border-green-200 bg-opacity-30'
-                                          : 'bg-amber-600 border border-amber-600 bg-opacity-10 border-opacity-10 opacity-50 dark:bg-dark dark:border-amber-700 dark:text-white'
+                                          : 'bg-amber-600 border border-amber-600 bg-opacity-10 border-opacity-10 opacity-50 dark:bg-surface-raised dark:border-amber-700 dark:text-content-primary'
                                 }`}
                             >
                                 <div className={`min-w-8 min-h-8 text-white`}>
@@ -473,7 +507,7 @@ const Steps = () => {
                                         ? 'bg-blue-50 border border-blue-200 bg-opacity-40'
                                         : setTravelCompleted
                                           ? 'bg-green-50 border border-green-200 bg-opacity-30'
-                                          : 'bg-amber-600 border border-amber-600 bg-opacity-10 border-opacity-10 opacity-50 dark:bg-dark dark:border-gray-700 dark:text-white'
+                                          : 'bg-amber-600 border border-amber-600 bg-opacity-10 border-opacity-10 opacity-50 dark:bg-surface-raised dark:border-outline dark:text-content-primary'
                                 }`}
                             >
                                 <div className={`min-w-8 min-h-8 text-white`}>
@@ -524,7 +558,7 @@ const Steps = () => {
                     </div>
 
                     <div className="flex flex-col items-center gap-4">
-                        <h3 className="text-lg font-semibold dark:text-white">
+                        <h3 className="text-lg font-semibold dark:text-content-primary">
                             Diagram
                         </h3>
                         <img

@@ -23,7 +23,7 @@ const SDCardElement = () => {
     }, []);
 
     return (
-        <div className="bg-gray-50 dark:bg-slate-800 h-full flex">
+        <div className="bg-gray-50 dark:bg-surface-base h-full flex">
             <div className="w-4/5 mx-auto py-6">
                 <div className="space-y-8 flex flex-col h-full">
                     <StatusIndicator isMounted={isMounted} />

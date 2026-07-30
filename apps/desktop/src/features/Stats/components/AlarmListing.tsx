@@ -48,10 +48,10 @@ function AlarmItem({ alarm }: AlarmItemProps) {
             >
                 {alarm.type} {alarm.CODE} - {alarm.source}
             </h3>
-            <time className="block mb-2 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">
+            <time className="block mb-2 text-sm font-normal leading-none text-gray-400 dark:text-content-muted">
                 {`at ${dateString}`}
             </time>
-            <p className="text-base font-normal text-gray-500 dark:text-gray-300">
+            <p className="text-base font-normal text-gray-500 dark:text-content-secondary">
                 {alarm.MESSAGE || 'No associated message'}
             </p>
             <p className="text-base font-normal text-gray-500">

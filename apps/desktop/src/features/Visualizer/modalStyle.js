@@ -21,15 +21,22 @@
  *
  */
 
-export const modalStyle = {
-    border: 'none',
-    backgroundColor: '#d1d5db',
-};
+import { getThemeCssColor } from 'app/lib/getThemeCssColor';
 
-export const modalHeaderStyle = {
-    backgroundColor: '#d1d5db',
+// Called at render time (not module load) so the value reflects the theme
+// active when the modal actually opens, not whatever was active at import.
+export const getModalBackground = () =>
+    getThemeCssColor('--surface-raised') || '#d1d5db';
+
+export const getModalStyle = () => ({
     border: 'none',
-};
+    backgroundColor: getModalBackground(),
+});
+
+export const getModalHeaderStyle = () => ({
+    backgroundColor: getModalBackground(),
+    border: 'none',
+});
 
 export const modalTitleStyle = {
     color: '#dc2626',
@@ -40,6 +47,6 @@ export const modalBodyStyle = {
     fontSize: '1.25rem',
 };
 
-export const modalFooterStyle = {
-    backgroundColor: '#d1d5db',
-};
+export const getModalFooterStyle = () => ({
+    backgroundColor: getModalBackground(),
+});

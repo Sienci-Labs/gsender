@@ -33,6 +33,30 @@
         --overlay-active: theme('colors.overlay.active');
         --overlay-disabled: theme('colors.overlay.disabled');
         --overlay-scrim: theme('colors.overlay.scrim');
+
+        /* shadcn/ui primitive tokens (Card, Dialog, Popover, Tabs, Select,
+           etc. in packages/ui/src/shadcn use these bare classes — bg-card,
+           bg-popover, bg-muted, border, ring — with no dark: prefix, so they
+           must resolve via CSS var rather than a Tailwind dark: variant. */
+        --background: #ffffff;
+        --foreground: theme('colors.gray.900');
+        --card: #ffffff;
+        --card-foreground: theme('colors.gray.900');
+        --popover: #ffffff;
+        --popover-foreground: theme('colors.gray.900');
+        --primary: theme('colors.blue.500');
+        --primary-foreground: #ffffff;
+        --secondary: theme('colors.gray.100');
+        --secondary-foreground: theme('colors.gray.900');
+        --muted: theme('colors.gray.100');
+        --muted-foreground: theme('colors.gray.500');
+        --accent: theme('colors.gray.100');
+        --accent-foreground: theme('colors.gray.900');
+        --destructive: theme('colors.red.500');
+        --destructive-foreground: #ffffff;
+        --border: theme('colors.gray.200');
+        --input: theme('colors.gray.300');
+        --ring: theme('colors.blue.500');
     }
 
     .dark[data-dark-theme='workshop'] {
@@ -59,6 +83,26 @@
         --overlay-active: theme('colors.overlay.active');
         --overlay-disabled: theme('colors.overlay.disabled');
         --overlay-scrim: theme('colors.overlay.scrim');
+
+        --background: theme('colors.surface.base');
+        --foreground: theme('colors.content.primary');
+        --card: theme('colors.surface.raised');
+        --card-foreground: theme('colors.content.primary');
+        --popover: theme('colors.surface.elevated');
+        --popover-foreground: theme('colors.content.primary');
+        --primary: theme('colors.blue.500');
+        --primary-foreground: #ffffff;
+        --secondary: theme('colors.surface.raised');
+        --secondary-foreground: theme('colors.content.primary');
+        --muted: theme('colors.surface.elevated');
+        --muted-foreground: theme('colors.content.muted');
+        --accent: theme('colors.surface.hover');
+        --accent-foreground: theme('colors.content.primary');
+        --destructive: theme('colors.red.500');
+        --destructive-foreground: #ffffff;
+        --border: theme('colors.outline.DEFAULT');
+        --input: theme('colors.outline.DEFAULT');
+        --ring: theme('colors.blue.500');
     }
 }
 

@@ -35,7 +35,7 @@ const VisualizerPreview = ({ gcode }: VisualizerPreviewProps) => {
 
     return (
         <div
-            className="flex flex-col h-full items-center justify-center border border-gray-200 rounded-md dark:border-dark-lighter"
+            className="flex flex-col h-full items-center justify-center border border-gray-200 rounded-md dark:border-outline"
             id={SURFACING_VISUALIZER_CONTAINER_ID}
         >
             <Visualizer isSecondary />

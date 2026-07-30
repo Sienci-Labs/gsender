@@ -210,7 +210,7 @@ const MacroForm = ({
                             <textarea
                                 ref={contentRef}
                                 rows={10}
-                                className="border border-gray-300 rounded-md p-2 dark:text-white dark:bg-dark dark:border-gray-500"
+                                className="border border-gray-300 rounded-md p-2 dark:text-content-primary dark:bg-surface-raised dark:border-gray-500"
                                 name="content"
                                 value={macroState.content}
                                 onChange={handleInputChange}
@@ -226,7 +226,7 @@ const MacroForm = ({
                                 ref={descriptionRef}
                                 rows={4}
                                 maxLength={MAX_CHARACTERS}
-                                className="border border-gray-300 rounded-md p-2 dark:text-white dark:bg-dark dark:border-gray-500"
+                                className="border border-gray-300 rounded-md p-2 dark:text-content-primary dark:bg-surface-raised dark:border-gray-500"
                                 name="description"
                                 value={macroState.description}
                                 onChange={handleInputChange}

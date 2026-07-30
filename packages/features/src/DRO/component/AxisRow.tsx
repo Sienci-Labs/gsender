@@ -43,7 +43,7 @@ export function AxisRow({
     const { shouldWarnZero } = useWorkspaceState();
 
     return (
-        <div className="border border-gray-200 dark:border-gray-700 rounded-md w-full flex flex-row items-stretch justify-between flex-1 max-xl:scale-95">
+        <div className="border border-gray-200 dark:border-outline rounded-md w-full flex flex-row items-stretch justify-between flex-1 max-xl:scale-95">
             {homingMode || !shouldWarnZero ? (
                 <Button
                     onClick={() => {

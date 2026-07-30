@@ -656,7 +656,7 @@ const Keyboard = () => {
     };
 
     return (
-        <div className="flex flex-col gap-4 h-full dark:text-white">
+        <div className="flex flex-col gap-4 h-full dark:text-content-primary">
             <CategoryFilter
                 onChange={filter}
                 filterCategory={filterCategory}

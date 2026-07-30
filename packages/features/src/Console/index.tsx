@@ -13,7 +13,7 @@ function lineColor(line: string): string {
     if (/error:/i.test(line) || /ALARM:/i.test(line)) {
         return 'text-red-400';
     }
-    return 'text-gray-500 dark:text-gray-300';
+    return 'text-gray-500 dark:text-content-secondary';
 }
 
 export default function ConsolePanel({ className = '' }: Props) {
@@ -44,7 +44,7 @@ export default function ConsolePanel({ className = '' }: Props) {
             {/* Output */}
             <div className="flex-1 overflow-y-auto px-3 py-2 space-y-0.5">
                 {history.length === 0 ? (
-                    <p className="font-mono text-xs text-gray-400 dark:text-gray-500 italic">
+                    <p className="font-mono text-xs text-gray-400 dark:text-content-muted italic">
                         No output yet
                     </p>
                 ) : (
@@ -79,7 +79,7 @@ export default function ConsolePanel({ className = '' }: Props) {
                 </button>
                 <button
                     onClick={clear}
-                    className="shrink-0 px-2 py-1 text-xs font-medium rounded text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                    className="shrink-0 px-2 py-1 text-xs font-medium rounded text-gray-500 dark:text-content-muted hover:text-gray-700 dark:hover:text-gray-200"
                 >
                     Clear
                 </button>

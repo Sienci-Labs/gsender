@@ -111,10 +111,10 @@ export function EventInput({ eventType }: EventInputProps): React.ReactElement {
                 tabIndex={-1}
                 rows={4}
                 value={eventCommands || '; No commands set'}
-                className="ring-1 ring-gray-300 rounded-md font-mono block w-full p-2 text-sm bg-gray-50 text-gray-500 resize-none pointer-events-none dark:bg-dark-lighter dark:text-gray-400 dark:ring-gray-600"
+                className="ring-1 ring-gray-300 rounded-md font-mono block w-full p-2 text-sm bg-gray-50 text-gray-500 resize-none pointer-events-none dark:bg-surface-sunken dark:text-content-muted dark:ring-outline"
             />
             <button
-                className="bg-white shadow p-2 text-sm rounded border border-blue-500 text-gray-700 hover:bg-gray-100 dark:bg-dark dark:text-white dark:hover:bg-dark-lighter"
+                className="bg-white shadow p-2 text-sm rounded border border-blue-500 text-gray-700 hover:bg-gray-100 dark:bg-surface-raised dark:text-content-primary dark:hover:bg-surface-hover"
                 onClick={() => setIsEditing(true)}
             >
                 Edit Event

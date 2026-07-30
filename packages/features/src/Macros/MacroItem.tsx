@@ -88,10 +88,10 @@ const MacroItem = ({
     const content = (
         <div
             className={cx(
-                'flex items-center justify-between rounded-md shadow-sm hover:shadow-md transition-shadow duration-200 p-1 border dark:text-white dark:bg-dark',
+                'flex items-center justify-between rounded-md shadow-sm hover:shadow-md transition-shadow duration-200 p-1 border dark:text-content-primary dark:bg-surface-raised',
                 {
                     'bg-gray-300 border-gray-400 cursor-not-allowed': disabled,
-                    'bg-white border-gray-200 dark:border-dark-lighter':
+                    'bg-white border-gray-200 dark:border-outline':
                         !disabled,
                 },
             )}

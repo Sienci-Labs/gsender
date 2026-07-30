@@ -124,7 +124,7 @@ const Console = ({ isActive, isChildWindow }: ConsoleProps) => {
     return (
         <>
             <div
-                className={`absolute top-0 left-0 rounded-lg w-full h-full bg-gray-50 z-10 transition-opacity dark:text-white dark:bg-dark
+                className={`absolute top-0 left-0 rounded-lg w-full h-full bg-gray-50 z-10 transition-opacity dark:text-content-primary dark:bg-surface-raised
                     duration-300 ${port !== '' ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
             >
                 <div className="flex justify-center items-center h-full ">
