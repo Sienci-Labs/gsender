@@ -3,7 +3,7 @@ import {
     Upload, X, ChevronUp, ChevronsUp,
     Clock, Hash, Move, HardDrive, FileCode,
 } from 'lucide-react';
-import ConsolePanel from '@gsender/features/Console';
+import ConsolePanel from './ConsolePanel';
 import MacrosPanel from './MacrosPanel';
 import CoolantPanel from './CoolantPanel';
 import SpindlePanel from './SpindlePanel';
