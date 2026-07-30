@@ -1,4 +1,4 @@
-import { Switch } from '@gsender/ui/shadcn/Switch';
+import { Switch } from 'app/components/shadcn/Switch';
 
 interface BooleanSettingInputProps {
     value: boolean | number;

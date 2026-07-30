@@ -1,6 +1,6 @@
 import { FileCode2 } from 'lucide-react';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
-import type { RootState } from '@gsender/controller-client/store/redux';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import type { RootState } from 'app/store/redux';
 import { openGcodeFile } from '../utils/fileLoader';
 import Visualizer from './Visualizer';
 import JobControls from './JobControls';

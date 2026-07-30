@@ -14,19 +14,19 @@ import {
     CopyCheck,
 } from 'lucide-react';
 
-import { Button } from '@gsender/ui/primitives/Button';
+import { Button } from 'app/components/Button';
 import { toast } from 'app/lib/toaster';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
-import controller from '@gsender/controller-client/controller';
+import controller from 'app/lib/controller';
 import {
     VISUALIZER_PRIMARY,
     WORKFLOW_STATE_RUNNING,
     WORKFLOW_STATE_PAUSED,
 } from 'app/constants';
-import { store as reduxStore } from '@gsender/controller-client/store/redux';
-import { updateFileContent } from '@gsender/controller-client/store/redux/slices/fileInfo.slice';
-import { RootState } from '@gsender/controller-client/store/redux';
+import { store as reduxStore } from 'app/store/redux';
+import { updateFileContent } from 'app/store/redux/slices/fileInfo.slice';
+import { RootState } from 'app/store/redux';
 import { cn } from 'app/lib/utils';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 
@@ -35,7 +35,7 @@ import {
     a11yLight,
     a11yDark,
 } from 'react-syntax-highlighter/dist/esm/styles/hljs';
-import { Input } from '@gsender/ui/shadcn/Input';
+import { Input } from 'app/components/shadcn/Input';
 
 type GcodeEditorProps = {
     onClose: () => void;

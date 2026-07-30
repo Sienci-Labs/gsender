@@ -1,5 +1,5 @@
-import Button from '@gsender/ui/primitives/Button';
-import controller from '@gsender/controller-client/controller';
+import Button from 'app/components/Button';
+import controller from 'app/lib/controller';
 
 function startLaser() {
     controller.command('gcode', 'G1F1 M3 S1');

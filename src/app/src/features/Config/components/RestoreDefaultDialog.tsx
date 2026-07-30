@@ -8,19 +8,19 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
     AlertDialogTrigger,
-} from '@gsender/ui/shadcn/AlertDialog.tsx';
+} from 'app/components/shadcn/AlertDialog.tsx';
 import { ActionButton } from 'app/features/Config/components/ActionButton.tsx';
 import { GrRevert } from 'react-icons/gr';
 import store from 'app/store';
 import { useSelector } from 'react-redux';
-import { RootState } from '@gsender/controller-client/store/redux';
+import { RootState } from 'app/store/redux';
 import machineProfiles from 'app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts';
 import { toast } from 'app/lib/toaster';
-import controller from '@gsender/controller-client/controller';
+import controller from 'app/lib/controller';
 import { resolveGrblCoreDefaults } from 'app/features/Config/utils/grblCoreMigration.ts';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import { cn } from 'app/lib/utils.ts';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@gsender/ui/shadcn/Tooltip.tsx';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'app/components/shadcn/Tooltip.tsx';
 
 function getMachineProfile(id: number) {
     const profile = machineProfiles.find((profile) => profile.id === id);

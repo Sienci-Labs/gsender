@@ -1,8 +1,8 @@
 import { useState } from 'react';
 
-import { store as reduxStore } from '@gsender/controller-client/store/redux';
-import Button from '@gsender/ui/primitives/Button';
-import controller from '@gsender/controller-client/controller';
+import { store as reduxStore } from 'app/store/redux';
+import Button from 'app/components/Button';
+import controller from 'app/lib/controller';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -12,7 +12,7 @@ import {
     AlertDialogHeader,
     AlertDialogContent,
     AlertDialogTrigger,
-} from '@gsender/ui/shadcn/AlertDialog';
+} from 'app/components/shadcn/AlertDialog';
 
 import { useSquaring } from '../context/SquaringContext';
 import {

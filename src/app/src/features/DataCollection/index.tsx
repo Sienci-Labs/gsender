@@ -6,10 +6,10 @@ import {
     SheetContent,
     SheetHeader,
     SheetTitle,
-} from '@gsender/ui/shadcn/Sheet';
+} from 'app/components/shadcn/Sheet';
 import api from 'app/api';
 import { USER_DATA_COLLECTION } from 'app/constants';
-import Button from '@gsender/ui/primitives/Button';
+import Button from 'app/components/Button';
 
 const DataCollection = () => {
     const [open, setOpen] = useState(false);

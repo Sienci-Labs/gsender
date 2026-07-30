@@ -5,16 +5,16 @@ import _ from 'lodash';
 import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import store from 'app/store';
 import gamepad, { shortcutComboBuilder } from 'app/lib/gamepad';
-import { Button } from '@gsender/ui/primitives/Button';
+import { Button } from 'app/components/Button';
 import {
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle,
-} from '@gsender/ui/shadcn/Dialog';
+} from 'app/components/shadcn/Dialog';
 import shuttleEvents from 'app/lib/shuttleEvents';
 
-import { Input } from '@gsender/ui/shadcn/Input';
+import { Input } from 'app/components/shadcn/Input';
 
 import { AVAILABILITY_TYPES } from '../utils';
 import Availability from './Availability';

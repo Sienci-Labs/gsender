@@ -1,7 +1,7 @@
 import Select from 'react-select';
 import cx from 'classnames';
 
-import Tooltip from '@gsender/ui/primitives/Tooltip';
+import Tooltip from 'app/components/Tooltip';
 
 import { Spindle } from '../definitions';
 

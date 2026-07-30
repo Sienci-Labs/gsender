@@ -1,6 +1,6 @@
 import get from 'lodash/get';
 import store from '../store';
-import { store as reduxStore } from '@gsender/controller-client/store/redux';
+import { store as reduxStore } from 'app/store/redux';
 import {
     TOUCHPLATE_TYPE_3D,
     TOUCHPLATE_TYPE_AUTOZERO,
@@ -13,8 +13,8 @@ import {
     ProbeProfile,
     ProbeWidgetSettings,
     TOUCHPLATE_TYPES_T,
-} from '@gsender/features/Probe/definitions';
-import { ReduxState } from '@gsender/controller-client/store/definitions';
+} from 'app/features/Probe/definitions';
+import { ReduxState } from 'app/store/definitions';
 import automaticToolChange from 'app/wizards/automaticToolchange';
 import probeToolLength from 'app/wizards/probeToolLength';
 import { showFirstToolchangePrompt } from 'app/wizards/firstToolchangePrompt';

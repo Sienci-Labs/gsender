@@ -1,4 +1,4 @@
-import { Widget } from '@gsender/ui/primitives/Widget';
+import { Widget } from 'app/components/Widget';
 import { Location } from 'app/features/Location';
 
 export const Column = () => {

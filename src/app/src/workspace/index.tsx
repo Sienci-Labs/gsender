@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router';
 import get from 'lodash/get';
 
-import controller from '@gsender/controller-client/controller';
-import reduxStore from '@gsender/controller-client/store/redux';
+import controller from 'app/lib/controller';
+import reduxStore from 'app/store/redux';
 import {
     COOLANT_CATEGORY,
     GENERAL_CATEGORY,
@@ -43,7 +43,7 @@ import {
     stopCoolant,
 } from 'app/features/Coolant/utils/actions';
 import pubsub from 'pubsub-js';
-import ConfirmationDialog from '@gsender/ui/primitives/ConfirmationDialog/ConfirmationDialog';
+import ConfirmationDialog from 'app/components/ConfirmationDialog/ConfirmationDialog';
 import { SettingsProvider } from 'app/features/Config/utils/SettingsContext';
 import { Helper } from 'app/features/Helper';
 

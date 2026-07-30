@@ -5,7 +5,7 @@ import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from '@gsender/ui/shadcn/Popover';
+} from 'app/components/shadcn/Popover';
 
 export function NavFlyoutLink({
     href,

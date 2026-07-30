@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 
-import { Input } from '@gsender/ui/shadcn/Input';
+import { Input } from 'app/components/shadcn/Input';
 
 interface InputProps extends React.ComponentProps<'input'> {
     className: string;

@@ -6,7 +6,7 @@ import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from '@gsender/ui/shadcn/Popover';
+} from 'app/components/shadcn/Popover';
 
 interface SecondaryContentPanelProps {
     content: SecondaryContent[];

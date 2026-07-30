@@ -4,17 +4,17 @@ import { LuCopy } from 'react-icons/lu';
 import { LuPaintbrush } from 'react-icons/lu';
 import { FaEllipsisH } from 'react-icons/fa';
 
-import { Button } from '@gsender/ui/primitives/Button';
-import { Input } from '@gsender/ui/shadcn/Input';
-import { addToInputHistory } from '@gsender/controller-client/store/redux/slices/console.slice';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
-import controller from '@gsender/controller-client/controller';
+import { Button } from 'app/components/Button';
+import { Input } from 'app/components/shadcn/Input';
+import { addToInputHistory } from 'app/store/redux/slices/console.slice';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import controller from 'app/lib/controller';
 import { toast } from 'app/lib/toaster';
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from '@gsender/ui/shadcn/Popover';
+} from 'app/components/shadcn/Popover';
 
 const COPY_HISTORY_LIMIT = 50;
 

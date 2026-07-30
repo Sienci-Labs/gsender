@@ -1,7 +1,7 @@
 import ConnectionWidget from './ConnectionWidget';
-import { stopMachineMotion } from '@gsender/features/Jogging/utils/Jogging';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
-import type { RootState } from '@gsender/controller-client/store/redux';
+import { stopMachineMotion } from 'app/features/Jogging/utils/Jogging';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import type { RootState } from 'app/store/redux';
 import { useState, useEffect } from 'react';
 import type { ComponentType } from 'react';
 import {
@@ -33,7 +33,7 @@ import {
     GRBL_ACTIVE_STATE_TESTING,
     GRBL_ACTIVE_STATE_TOOL,
 } from 'app/constants';
-import controller from '@gsender/controller-client/controller';
+import controller from 'app/lib/controller';
 import iconRound from '../assets/icon-round.png';
 
 interface StateColors {

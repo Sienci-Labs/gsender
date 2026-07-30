@@ -4,7 +4,7 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from '@gsender/ui/shadcn/Select.tsx';
+} from 'app/components/shadcn/Select.tsx';
 
 export interface SelectSettingInputProps {
     options: string[] | number[];

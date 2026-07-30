@@ -12,18 +12,18 @@ import { HybridNumber } from 'app/features/Config/components/SettingInputs/Hybri
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import { EEPROMSettingRow } from 'app/features/Config/components/EEPROMSettingRow.tsx';
 import { EventInput } from 'app/features/Config/components/SettingInputs/EventInput.tsx';
-import controller from '@gsender/controller-client/controller';
+import controller from 'app/lib/controller';
 import { toast } from 'app/lib/toaster';
 import { TextAreaInput } from 'app/features/Config/components/SettingInputs/TextAreaInput.tsx';
 import { LocationInput } from 'app/features/Config/components/SettingInputs/LocationInput.tsx';
 import cn from 'classnames';
 import { BiReset } from 'react-icons/bi';
-import { Confirm } from '@gsender/ui/primitives/ConfirmationDialog/ConfirmationDialogLib.ts';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 import store from 'app/store';
 import { FaMicrochip } from 'react-icons/fa6';
 import { GRBLHAL } from 'app/constants';
 import { JogInput } from 'app/features/Config/components/SettingInputs/JogInput.tsx';
-import Tooltip from '@gsender/ui/primitives/Tooltip';
+import Tooltip from 'app/components/Tooltip';
 import pubsub from 'pubsub-js';
 import { EEPROM } from 'app/definitions/firmware';
 

@@ -28,10 +28,10 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-} from '@gsender/ui/shadcn/Dialog';
-import { Button } from '@gsender/ui/primitives/Button';
+} from 'app/components/shadcn/Dialog';
+import { Button } from 'app/components/Button';
 import cx from 'classnames';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { toast } from 'app/lib/toaster';
 
 import ProbeCircuitStatus from './ProbeCircuitStatus';

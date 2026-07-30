@@ -1,6 +1,6 @@
 import pubsub from 'pubsub-js';
 import { toast } from 'app/lib/toaster';
-import controller from '@gsender/controller-client/controller';
+import controller from 'app/lib/controller';
 
 export const outlineResponse = ({ data }) => {
     controller.command('gcode', data.outlineGcode, controller.context);

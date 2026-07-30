@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import Button from '@gsender/ui/primitives/Button';
+import Button from 'app/components/Button';
 import { Settings } from 'lucide-react';
 import { ConfigModal } from 'app/features/ATC/components/Configuration/components/ConfigModal.tsx';
 import { ConfigProvider } from 'app/features/ATC/components/Configuration/hooks/useConfigStore.tsx';
-import controller from '@gsender/controller-client/controller';
+import controller from 'app/lib/controller';
 import { toast } from 'app/lib/toaster';
 
 export function ATCIConfiguration({ compact = false }: { compact?: boolean }) {

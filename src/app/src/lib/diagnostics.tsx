@@ -41,22 +41,22 @@ import {
 import saveAs from 'file-saver';
 import JSZip from 'jszip';
 
-import { Button } from '@gsender/ui/primitives/Button';
+import { Button } from 'app/components/Button';
 import { toast } from 'app/lib/toaster';
 import { AlarmsErrors } from 'app/definitions/alarms_errors';
 import { EEPROMSettings, MachineProfile } from 'app/definitions/firmware';
 import { UNITS_EN } from 'app/definitions/general';
-import { JogSpeeds } from '@gsender/features/Jogging/definitions';
-import { SPINDLE_LASER_T } from '@gsender/features/Spindle/definitions';
+import { JogSpeeds } from 'app/features/Jogging/definitions';
+import { SPINDLE_LASER_T } from 'app/features/Spindle/definitions';
 import {
     ConnectionState,
     ControllerState,
     FileInfoState,
-} from '@gsender/controller-client/store/definitions';
-import controllerInstance from '@gsender/controller-client/controller';
+} from 'app/store/definitions';
+import controllerInstance from 'app/lib/controller';
 
 import store from '../store';
-import { store as reduxStore } from '@gsender/controller-client/store/redux';
+import { store as reduxStore } from 'app/store/redux';
 import pkg from '../../package.json';
 import {
     GRBLHAL,

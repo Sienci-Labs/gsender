@@ -5,9 +5,9 @@ import { FaExternalLinkAlt } from 'react-icons/fa';
 import { version } from 'app-root/package.json';
 
 import useGetReleaseNotes from './utils/useGetReleaseNotes';
-import { Button } from '@gsender/ui/primitives/Button';
+import { Button } from 'app/components/Button';
 import { cn } from 'app/lib/utils';
-import { RootState } from '@gsender/controller-client/store/redux';
+import { RootState } from 'app/store/redux';
 import { useSelector } from 'react-redux';
 import { UpdateGSender } from 'app/features/Stats/components/UpdateGSender.tsx';
 

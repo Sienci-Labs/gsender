@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
-import type { RootState } from '@gsender/controller-client/store/redux';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import type { RootState } from 'app/store/redux';
 import { GRBLHAL, METRIC_UNITS } from 'app/constants';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { mapPositionToUnits } from 'app/lib/units';

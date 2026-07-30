@@ -4,9 +4,9 @@ import { Play } from 'lucide-react';
 import includes from 'lodash/includes';
 import get from 'lodash/get';
 
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
-import type { RootState } from '@gsender/controller-client/store/redux';
-import controller from '@gsender/controller-client/controller';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import type { RootState } from 'app/store/redux';
+import controller from 'app/lib/controller';
 
 import store from 'app/store';
 import WidgetConfig from 'app/features/WidgetConfig/WidgetConfig';
@@ -29,7 +29,7 @@ import { UNITS_EN } from 'app/definitions/general';
 import {
     Actions, AvailableTool, PROBE_TYPES_T, ProbeCommand,
     ProbeProfile, ProbingOptions, State, TOUCHPLATE_TYPES_T,
-} from '@gsender/features/Probe/definitions';
+} from 'app/features/Probe/definitions';
 import ProbeWizardDrawer from './probe-wizard/ProbeWizardDrawer';
 
 const CORNER_LABELS = ['Bottom left', 'Top left', 'Top right', 'Bottom right'];

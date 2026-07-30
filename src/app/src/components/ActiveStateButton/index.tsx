@@ -1,6 +1,6 @@
-import Button from '@gsender/ui/primitives/Button';
+import Button from 'app/components/Button';
 import cn from 'classnames';
-import { TooltipProps } from '@gsender/ui/primitives/Tooltip';
+import { TooltipProps } from 'app/components/Tooltip';
 
 interface ActiveStateButtonProps {
     icon: JSX.Element;

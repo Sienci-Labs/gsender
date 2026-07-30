@@ -25,7 +25,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { LuTrash, LuPencil, LuPlus } from 'react-icons/lu';
 
-import { Switch } from '@gsender/ui/shadcn/Switch';
+import { Switch } from 'app/components/shadcn/Switch';
 import shuttleEvents from 'app/lib/shuttleEvents';
 import {
     Table,
@@ -34,7 +34,7 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from '@gsender/ui/shadcn/Table';
+} from 'app/components/shadcn/Table';
 import {
     CARVING_CATEGORY,
     OVERRIDES_CATEGORY,
@@ -49,8 +49,8 @@ import {
     COOLANT_CATEGORY,
     GRBLHAL,
 } from 'app/constants';
-import Button from '@gsender/ui/primitives/Button';
-import { Tooltip } from '@gsender/ui/primitives/Tooltip';
+import Button from 'app/components/Button';
+import { Tooltip } from 'app/components/Tooltip';
 import { cn } from 'app/lib/utils';
 
 import { formatShortcut } from './helpers';

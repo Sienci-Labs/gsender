@@ -9,7 +9,7 @@ import actions, {
     HeadlessSettings,
 } from 'app/features/RemoteMode/apiActions.ts';
 import RemoteIndicator from 'app/features/RemoteMode/components/RemoteIndicator.tsx';
-import Tooltip from '@gsender/ui/primitives/Tooltip';
+import Tooltip from 'app/components/Tooltip';
 
 import NotificationsArea from 'app/features/NotificationsArea';
 

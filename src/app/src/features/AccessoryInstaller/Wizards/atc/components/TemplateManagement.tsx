@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useRef } from 'react';
 import { StepProps } from 'app/features/AccessoryInstaller/types';
-import controller from '@gsender/controller-client/controller';
+import controller from 'app/lib/controller';
 import {
     ConfigProvider,
     useConfigContext,

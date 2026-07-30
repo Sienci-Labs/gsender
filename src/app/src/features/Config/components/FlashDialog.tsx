@@ -3,7 +3,7 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-} from '@gsender/ui/shadcn/Dialog';
+} from 'app/components/shadcn/Dialog';
 import { useEffect, useRef, useState } from 'react';
 import {
     Select,
@@ -14,16 +14,16 @@ import {
     SelectSeparator,
     SelectTrigger,
     SelectValue,
-} from '@gsender/ui/shadcn/Select.tsx';
-import { Button } from '@gsender/ui/primitives/Button';
+} from 'app/components/shadcn/Select.tsx';
+import { Button } from 'app/components/Button';
 import { toast } from 'app/lib/toaster';
-import controller from '@gsender/controller-client/controller';
+import controller from 'app/lib/controller';
 import store from 'app/store';
 import get from 'lodash/get';
 
 import cn from 'classnames';
 import { FlashingProgress } from 'app/features/Config/components/FlashingProgress.tsx';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 
 interface flashDialogProps {
     show: boolean;

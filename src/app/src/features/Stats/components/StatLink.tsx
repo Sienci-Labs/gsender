@@ -1,7 +1,7 @@
 import { GoArrowUpRight } from 'react-icons/go';
 import { Link } from 'react-router';
 
-import { Button } from '@gsender/ui/primitives/Button';
+import { Button } from 'app/components/Button';
 
 interface StatLinkProps {
     link: string;

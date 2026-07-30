@@ -1,12 +1,12 @@
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import cn from 'classnames';
-import { Button } from '@gsender/ui/primitives/Button';
+import { Button } from 'app/components/Button';
 import { ToolTimelineItem } from './ToolTimelineItem';
 import { ToolMapping, ToolTimelineProps } from './types';
 import { useEffect, useRef, useState } from 'react';
 import { ToolRemapDialog } from 'app/features/ATC/components/ToolTimeline/components/ToolRemapDialog.tsx';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
-import { RootState } from '@gsender/controller-client/store/redux';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { RootState } from 'app/store/redux';
 import { mapToolNicknamesAndStatus } from 'app/features/ATC/utils/ATCFunctions.ts';
 import { ToolInstance } from 'app/features/ATC/components/ToolTable.tsx';
 import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';

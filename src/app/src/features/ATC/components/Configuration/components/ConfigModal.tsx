@@ -1,14 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Dialog, DialogContent } from '@gsender/ui/shadcn/Dialog.tsx';
+import { Dialog, DialogContent } from 'app/components/shadcn/Dialog.tsx';
 import {
     Tabs,
     TabsContent,
     TabsList,
     TabsTrigger,
-} from '@gsender/ui/shadcn/Tabs';
+} from 'app/components/shadcn/Tabs';
 import { ConfigTab } from './ConfigTab';
 import { TemplatesTab } from './TemplatesTab';
-import controller from '@gsender/controller-client/controller';
+import controller from 'app/lib/controller';
 import { repopulateFromSDCard } from 'app/features/ATC/components/Configuration/utils/ConfigUtils.ts';
 import { useConfigContext } from 'app/features/ATC/components/Configuration/hooks/useConfigStore.tsx';
 

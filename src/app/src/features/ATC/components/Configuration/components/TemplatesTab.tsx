@@ -6,8 +6,8 @@ import React, {
     useRef,
     useState,
 } from 'react';
-import { Button } from '@gsender/ui/primitives/Button';
-import { Badge } from '@gsender/ui/shadcn/Badge';
+import { Button } from 'app/components/Button';
+import { Badge } from 'app/components/shadcn/Badge';
 import {
     Upload,
     FileText,

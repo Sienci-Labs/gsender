@@ -1,10 +1,10 @@
-import { Dialog, DialogContent } from '@gsender/ui/shadcn/Dialog.tsx';
+import { Dialog, DialogContent } from 'app/components/shadcn/Dialog.tsx';
 import { DialogTitle } from '@radix-ui/react-dialog';
 import { ToolTable } from 'app/features/ATC/components/ToolTable.tsx';
-import Button from '@gsender/ui/primitives/Button';
+import Button from 'app/components/Button';
 import { Table2 } from 'lucide-react';
 import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
-import controller from '@gsender/controller-client/controller';
+import controller from 'app/lib/controller';
 
 export function ToolDisplayModal() {
     const { connected, setShowTable, showTable, tools, disabled } =

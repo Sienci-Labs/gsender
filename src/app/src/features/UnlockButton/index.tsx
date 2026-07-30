@@ -3,12 +3,12 @@ import get from 'lodash/get';
 import { IoLockClosedOutline } from 'react-icons/io5';
 import { IoLockOpenOutline } from 'react-icons/io5';
 
-import { RootState } from '@gsender/controller-client/store/redux';
+import { RootState } from 'app/store/redux';
 import { GRBL_ACTIVE_STATE_ALARM, GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
-import controller from '@gsender/controller-client/controller';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import controller from 'app/lib/controller';
 import { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
-import Tooltip from '@gsender/ui/primitives/Tooltip';
+import Tooltip from 'app/components/Tooltip';
 
 export function unlockFirmware(
     state: GRBL_ACTIVE_STATES_T,

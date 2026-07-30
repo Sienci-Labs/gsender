@@ -17,12 +17,12 @@ import {
     getToolpathColor, mapToolNicknamesAndStatus,
 } from 'app/features/ATC/utils/ATCFunctions.ts';
 import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
-import { LongPressButton } from '@gsender/ui/primitives/LongPressButton';
-import { Dialog, DialogContent } from '@gsender/ui/shadcn/Dialog.tsx';
+import { LongPressButton } from 'app/components/LongPressButton';
+import { Dialog, DialogContent } from 'app/components/shadcn/Dialog.tsx';
 import { DialogTitle } from '@radix-ui/react-dialog';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
-import { RootState } from '@gsender/controller-client/store/redux';
-import controller from '@gsender/controller-client/controller';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { RootState } from 'app/store/redux';
+import controller from 'app/lib/controller';
 import { WORKFLOW_STATE_IDLE } from 'app/constants';
 
 type DrawerMode = 'closed' | 'minimal' | 'expanded';

@@ -1,5 +1,5 @@
-import { ButtonProps } from '@gsender/ui/primitives/Button';
-import { Button } from '@gsender/ui/shadcn/Button';
+import { ButtonProps } from 'app/components/Button';
+import { Button } from 'app/components/shadcn/Button';
 
 export interface IconButtonProps extends ButtonProps {
     icon: JSX.Element;

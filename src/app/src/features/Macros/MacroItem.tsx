@@ -7,10 +7,10 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from '@gsender/ui/shadcn/Dropdown';
-import Tooltip from '@gsender/ui/primitives/Tooltip';
+} from 'app/components/shadcn/Dropdown';
+import Tooltip from 'app/components/Tooltip';
 import { toast } from 'app/lib/toaster';
-import Button from '@gsender/ui/primitives/Button';
+import Button from 'app/components/Button';
 import cx from 'classnames';
 
 type Macro = {

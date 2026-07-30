@@ -1,4 +1,4 @@
-import { Label } from '@gsender/ui/shadcn/Label';
+import { Label } from 'app/components/shadcn/Label';
 
 type InputAreaProps = {
     children: React.ReactNode;

@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { RadioGroup, RadioGroupItem } from '@gsender/ui/shadcn/RadioGroup';
-import { Switch } from '@gsender/ui/shadcn/Switch';
-import { Tooltip } from '@gsender/ui/primitives/Tooltip';
+import { RadioGroup, RadioGroupItem } from 'app/components/shadcn/RadioGroup';
+import { Switch } from 'app/components/shadcn/Switch';
+import { Tooltip } from 'app/components/Tooltip';
 import SpiralIcon from '../SVG/Spiral';
 import ZigZagIcon from '../SVG/ZigZag';
 import {
@@ -17,7 +17,7 @@ import {
 
 import { Surfacing } from '../definitions';
 import { cx } from 'class-variance-authority';
-// import { Label } from '@gsender/ui/shadcn/Label';
+// import { Label } from 'app/components/shadcn/Label';
 
 interface Props {
     surfacing: Surfacing;

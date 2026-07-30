@@ -1,10 +1,10 @@
-import controller from '@gsender/controller-client/controller';
+import controller from 'app/lib/controller';
 import { useState } from 'react';
 import {
     Collapsible,
     CollapsibleContent,
     CollapsibleTrigger,
-} from '@gsender/ui/shadcn/Collapsible.tsx';
+} from 'app/components/shadcn/Collapsible.tsx';
 import { Badge } from 'app/features/ATC/components/ui/Badge.tsx';
 import { ChevronDown } from 'lucide-react';
 import { ProbeButton } from 'app/features/ATC/components/ui/ProbeButton.tsx';
@@ -16,15 +16,15 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from '@gsender/ui/shadcn/Table';
+} from 'app/components/shadcn/Table';
 
 import { ToolNameInput } from 'app/features/ATC/components/ToolNameInput.tsx';
-import Button from '@gsender/ui/primitives/Button';
+import Button from 'app/components/Button';
 import partition from 'lodash/partition';
 import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
 import { ToolProbeState } from 'app/features/ATC/types.ts';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
-import { RootState } from '@gsender/controller-client/store/redux';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { RootState } from 'app/store/redux';
 import get from 'lodash/get';
 import store from "app/store";
 

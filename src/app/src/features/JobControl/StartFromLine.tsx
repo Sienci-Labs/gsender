@@ -1,21 +1,21 @@
 import { JSX, useEffect, useState } from 'react';
 import cx from 'classnames';
-import { Button as ShadButton } from '@gsender/ui/shadcn/Button';
-import { Button } from '@gsender/ui/primitives/Button';
+import { Button as ShadButton } from 'app/components/shadcn/Button';
+import { Button } from 'app/components/Button';
 import { MdFormatListNumbered } from 'react-icons/md';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { METRIC_UNITS, IMPERIAL_UNITS } from 'app/constants';
-import { updateJobOverrides } from '@gsender/controller-client/store/redux/slices/visualizer.slice';
-import controller from '@gsender/controller-client/controller';
-import { RootState, store as reduxStore } from '@gsender/controller-client/store/redux';
+import { updateJobOverrides } from 'app/store/redux/slices/visualizer.slice';
+import controller from 'app/lib/controller';
+import { RootState, store as reduxStore } from 'app/store/redux';
 import {
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle,
-} from '@gsender/ui/shadcn/Dialog';
-import Tooltip from '@gsender/ui/primitives/Tooltip';
-import { ControlledInput } from '@gsender/ui/form/ControlledInput';
+} from 'app/components/shadcn/Dialog';
+import Tooltip from 'app/components/Tooltip';
+import { ControlledInput } from 'app/components/ControlledInput';
 import { FaPlay } from 'react-icons/fa';
 import { toast } from 'app/lib/toaster';
 import { useSelector } from 'react-redux';

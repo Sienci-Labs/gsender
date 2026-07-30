@@ -7,24 +7,24 @@ import pubsub from 'pubsub-js';
 import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 
-import { Button } from '@gsender/ui/primitives/Button';
-import { RootState, store as reduxStore } from '@gsender/controller-client/store/redux';
+import { Button } from 'app/components/Button';
+import { RootState, store as reduxStore } from 'app/store/redux';
 import store from 'app/store';
-import controller from '@gsender/controller-client/controller';
+import controller from 'app/lib/controller';
 import {
     CARVING_CATEGORY, GRBL_ACTIVE_STATE_CHECK,
     VISUALIZER_PRIMARY,
     WORKFLOW_STATE_RUNNING,
 } from 'app/constants';
-import { unloadFileInfo } from '@gsender/controller-client/store/redux/slices/fileInfo.slice';
+import { unloadFileInfo } from 'app/store/redux/slices/fileInfo.slice';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuTrigger,
-} from '@gsender/ui/shadcn/Dropdown';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
+} from 'app/components/shadcn/Dropdown';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 import {
     AlertDialog,
@@ -36,7 +36,7 @@ import {
     AlertDialogFooter,
     AlertDialogCancel,
     AlertDialogAction,
-} from '@gsender/ui/shadcn/AlertDialog';
+} from 'app/components/shadcn/AlertDialog';
 
 import { getRecentFiles } from './utils/recentfiles';
 import { ReloadFileAlert } from 'app/features/FileControl/components/ReloadFileAlert.tsx';
@@ -48,7 +48,7 @@ import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
 import { useSelector } from 'react-redux';
 import { toast } from 'app/lib/toaster';
 import get from 'lodash/get';
-import { Tooltip } from '@gsender/ui/primitives/Tooltip';
+import { Tooltip } from 'app/components/Tooltip';
 
 const ButtonControlGroup = () => {
     const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.platform) ||

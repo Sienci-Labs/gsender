@@ -44,10 +44,10 @@ import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from '@gsender/ui/shadcn/Popover';
+} from 'app/components/shadcn/Popover';
 
-import { Input } from '@gsender/ui/shadcn/Input';
-import { Button } from '@gsender/ui/primitives/Button';
+import { Input } from 'app/components/shadcn/Input';
+import { Button } from 'app/components/Button';
 
 import {
     IMPERIAL_UNITS,
@@ -64,7 +64,7 @@ import {
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import useKeybinding from 'app/lib/useKeybinding';
 import store from 'app/store';
-import Tooltip from '@gsender/ui/primitives/Tooltip';
+import Tooltip from 'app/components/Tooltip';
 
 type Props = {
     actions: Actions;

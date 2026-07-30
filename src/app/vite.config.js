@@ -40,18 +40,6 @@ export default defineConfig({
     ],
     resolve: {
         alias: {
-            '@gsender/features': path.resolve(__dirname, '../../packages/features/src'),
-            '@gsender/controller-client/store/redux': path.resolve(__dirname, '../../packages/controller-client/src/store/redux'),
-            '@gsender/controller-client/store/definitions': path.resolve(__dirname, '../../packages/controller-client/src/store/definitions.ts'),
-            '@gsender/controller-client/store': path.resolve(__dirname, '../../packages/controller-client/src/store'),
-            '@gsender/controller-client/controller': path.resolve(__dirname, '../../packages/controller-client/src/controller.ts'),
-            '@gsender/controller-client/hooks': path.resolve(__dirname, '../../packages/controller-client/src/hooks'),
-            '@gsender/controller-client': path.resolve(__dirname, '../../packages/controller-client/src/index.ts'),
-            '@gsender/ui/shadcn': path.resolve(__dirname, '../../packages/ui/src/shadcn'),
-            '@gsender/ui/primitives': path.resolve(__dirname, '../../packages/ui/src/primitives'),
-            '@gsender/ui/form': path.resolve(__dirname, '../../packages/ui/src/form'),
-            '@gsender/ui/lib': path.resolve(__dirname, '../../packages/ui/src/lib'),
-            '@gsender/ui': path.resolve(__dirname, '../../packages/ui/src/index.ts'),
             'app-root': path.resolve(__dirname, '../../'),
             app: path.resolve(__dirname, './src'),
             '@': path.resolve(__dirname, './src'),

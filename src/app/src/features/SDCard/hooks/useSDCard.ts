@@ -1,7 +1,7 @@
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
-import { RootState } from '@gsender/controller-client/store/redux';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { RootState } from 'app/store/redux';
 import {useEffect, useState} from 'react';
-import controller from '@gsender/controller-client/controller';
+import controller from 'app/lib/controller';
 import {WORKFLOW_STATE_IDLE} from "app/constants";
 
 export type UploadState = 'idle' | 'uploading' | 'complete' | 'error';

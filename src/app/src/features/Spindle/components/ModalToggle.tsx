@@ -21,9 +21,9 @@
  *
  */
 
-import { Switch } from '@gsender/ui/shadcn/Switch';
+import { Switch } from 'app/components/shadcn/Switch';
 import { LASER_MODE } from 'app/constants';
-import Tooltip from '@gsender/ui/primitives/Tooltip';
+import Tooltip from 'app/components/Tooltip';
 
 type Props = {
     mode: string;

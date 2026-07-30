@@ -10,7 +10,7 @@ import SpindlePanel from './SpindlePanel';
 import ProbePanel from './ProbePanel';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import ATCPanel from './ATCPanel';
-import { addControllerEvents, removeControllerEvents } from '@gsender/controller-client/controller';
+import { addControllerEvents, removeControllerEvents } from 'app/lib/controller';
 import GcodeEditor from 'app/features/Visualizer/GcodeEditor';
 import {
     GcodeFilePayload,
@@ -20,11 +20,11 @@ import {
 } from '../electron-bridge';
 import { applyGcodeFile } from '../utils/fileLoader';
 import { cancelGcodeProcessing } from '../utils/gcodeProcessing';
-import { store as reduxStore } from '@gsender/controller-client/store/redux';
-import { unloadFileInfo } from '@gsender/controller-client/store/redux/slices/fileInfo.slice';
-import { addToHistory } from '@gsender/controller-client/store/redux/slices/console.slice';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
-import type { RootState } from '@gsender/controller-client/store/redux';
+import { store as reduxStore } from 'app/store/redux';
+import { unloadFileInfo } from 'app/store/redux/slices/fileInfo.slice';
+import { addToHistory } from 'app/store/redux/slices/console.slice';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import type { RootState } from 'app/store/redux';
 
 const ALL_TABS = ['File', 'Probe', 'Spindle', 'Macros', 'ATC', 'Coolant', 'Console'] as const;
 type DrawerTab = (typeof ALL_TABS)[number];

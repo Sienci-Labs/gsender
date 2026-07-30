@@ -5,7 +5,7 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from '@gsender/ui/shadcn/Select';
+} from 'app/components/shadcn/Select';
 interface OffsetManagementWidgetProps {
     value?: number;
     onChange?: (value: number) => void;

@@ -3,7 +3,7 @@ import {
     handleManualOffset,
     homeAxis,
 } from '../utils/DRO.ts';
-import { Button } from '@gsender/ui/primitives/Button';
+import { Button } from 'app/components/Button';
 import { zeroWCS, gotoZero } from '../utils/DRO.ts';
 import { WCSInput } from './WCSInput.tsx';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState.ts';
@@ -17,7 +17,7 @@ import {
     AlertDialogFooter,
     AlertDialogCancel,
     AlertDialogAction,
-} from '@gsender/ui/shadcn/AlertDialog';
+} from 'app/components/shadcn/AlertDialog';
 
 interface AxisRowProps {
     label: string;

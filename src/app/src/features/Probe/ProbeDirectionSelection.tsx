@@ -1,6 +1,6 @@
 import cx from 'classnames';
 import directionIcon from './assets/arrow-direction.svg';
-import Tooltip from '@gsender/ui/primitives/Tooltip';
+import Tooltip from 'app/components/Tooltip';
 
 interface Props {
     direction: number;

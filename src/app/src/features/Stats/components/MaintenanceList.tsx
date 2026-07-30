@@ -5,7 +5,7 @@ import {
 } from 'app/features/Stats/utils/StatContext.tsx';
 import { sortingFns } from '@tanstack/react-table';
 import { CheckCircle, Pen, AlertCircle } from 'lucide-react';
-import SortableTable, { CustomColumnDef } from '@gsender/ui/primitives/SortableTable';
+import SortableTable, { CustomColumnDef } from 'app/components/SortableTable';
 import { MaintenanceAddTaskDialog } from 'app/features/Stats/components/MaintenanceAddTaskDialog.tsx';
 import { MaintenanceEditTaskDialog } from 'app/features/Stats/components/MaintenanceEditTaskDialog.tsx';
 import {
@@ -17,8 +17,8 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
-} from '@gsender/ui/shadcn/AlertDialog';
-import { Confirm } from '@gsender/ui/primitives/ConfirmationDialog/ConfirmationDialogLib';
+} from 'app/components/shadcn/AlertDialog';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 
 interface FormattedTask {
     id: number;

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import KeyboardShortcuts from './Keyboard';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import pubsub from 'pubsub-js';
 
 const Shortcuts = () => {

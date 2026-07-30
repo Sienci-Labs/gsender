@@ -4,11 +4,11 @@ import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from '@gsender/ui/shadcn/Popover';
+} from 'app/components/shadcn/Popover';
 import useKeybinding from 'app/lib/useKeybinding.ts';
 import useShuttleEvents from 'app/hooks/useShuttleEvents.ts';
 import { TOOLBAR_CATEGORY } from 'app/constants';
-import Tooltip from '@gsender/ui/primitives/Tooltip';
+import Tooltip from 'app/components/Tooltip';
 
 import { MachineInfoDisplay } from './MachineInfoDisplay.tsx';
 

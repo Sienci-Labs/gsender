@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 
-import Tooltip from '@gsender/ui/primitives/Tooltip';
+import Tooltip from 'app/components/Tooltip';
 
 interface InputProps {
     value: string | number;

@@ -28,7 +28,7 @@ import {
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
-} from '@gsender/ui/shadcn/Tooltip';
+} from 'app/components/shadcn/Tooltip';
 import { SenderStatus } from 'app/lib/definitions/sender_feeder';
 import {
     convertMillisecondsToTimeStamp,

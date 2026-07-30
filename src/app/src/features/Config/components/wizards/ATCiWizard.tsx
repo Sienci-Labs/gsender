@@ -1,13 +1,13 @@
-import Button from "@gsender/ui/primitives/Button";
-import {useTypedSelector} from "@gsender/controller-client/hooks/useTypedSelector";
-import {RootState} from "@gsender/controller-client/store/redux";
+import Button from "app/components/Button";
+import {useTypedSelector} from "app/hooks/useTypedSelector";
+import {RootState} from "app/store/redux";
 import {GRBLHAL} from "app/constants";
 import {toast} from "sonner";
 import {ATCI_SUPPORTED_VERSION} from "app/features/ATC/utils/ATCiConstants.ts";
 import {firmwareSemver} from "app/lib/firmwareSemver.ts";
-import controller from "@gsender/controller-client/controller";
+import controller from "app/lib/controller";
 import {delay} from "lodash";
-import {Confirm} from "@gsender/ui/primitives/ConfirmationDialog/ConfirmationDialogLib.ts";
+import {Confirm} from "app/components/ConfirmationDialog/ConfirmationDialogLib.ts";
 import store from "app/store";
 
 

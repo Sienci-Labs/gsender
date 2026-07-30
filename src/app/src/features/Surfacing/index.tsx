@@ -13,17 +13,17 @@ import {
     VISUALIZER_SECONDARY,
 } from 'app/constants';
 import { convertToImperial, convertToMetric } from 'app/lib/units';
-import { Switch } from '@gsender/ui/shadcn/Switch';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
-import { ControlledInput } from '@gsender/ui/form/ControlledInput';
+import { Switch } from 'app/components/shadcn/Switch';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { ControlledInput } from 'app/components/ControlledInput';
 import defaultState from 'app/store/defaultState';
-import { Tabs, TabsList, TabsTrigger } from '@gsender/ui/shadcn/Tabs';
-import controller from '@gsender/controller-client/controller';
+import { Tabs, TabsList, TabsTrigger } from 'app/components/shadcn/Tabs';
+import controller from 'app/lib/controller';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
-import InputArea from '@gsender/ui/form/InputArea';
-import { Button } from '@gsender/ui/primitives/Button';
+import InputArea from 'app/components/InputArea';
+import { Button } from 'app/components/Button';
 import VisualizerPreview from './components/VisualizerPreview';
-import Tooltip from '@gsender/ui/primitives/Tooltip';
+import Tooltip from 'app/components/Tooltip';
 
 import { Surfacing } from './definitions';
 import MachinePosition from './components/MachinePosition';

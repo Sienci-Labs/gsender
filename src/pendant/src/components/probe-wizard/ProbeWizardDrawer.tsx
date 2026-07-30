@@ -3,8 +3,8 @@ import { clsx } from 'clsx';
 import { ChevronLeft, Play, Ruler, Move3D, Repeat } from 'lucide-react';
 
 import { toast } from 'app/lib/toaster';
-import ProbeDiameter from '@gsender/features/Probe/ProbeDiameter';
-import { Actions, ProbeCommand, State } from '@gsender/features/Probe/definitions';
+import ProbeDiameter from 'app/features/Probe/ProbeDiameter';
+import { Actions, ProbeCommand, State } from 'app/features/Probe/definitions';
 
 import { ContinuityCheck } from './ContinuityCheck';
 import { ContinuityPhase } from './ContinuityIndicator';

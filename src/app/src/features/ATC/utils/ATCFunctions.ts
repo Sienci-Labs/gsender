@@ -1,14 +1,14 @@
 import { toast } from 'app/lib/toaster';
 import store from 'app/store';
-import reduxStore from '@gsender/controller-client/store/redux';
+import reduxStore from 'app/store/redux';
 import get from 'lodash/get';
-import controller from '@gsender/controller-client/controller';
+import controller from 'app/lib/controller';
 import {
     IToolListing,
     ToolInstance,
 } from 'app/features/ATC/components/ToolTable.tsx';
 import { ToolFlags } from 'app/features/ATC/types.ts';
-import { Confirm } from '@gsender/ui/primitives/ConfirmationDialog/ConfirmationDialogLib.ts';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 import * as THREE from 'three';
 import { TOOLPATH_COLOR_HEXES } from 'app/features/Visualizer/constants';
 import pubsub from 'pubsub-js';

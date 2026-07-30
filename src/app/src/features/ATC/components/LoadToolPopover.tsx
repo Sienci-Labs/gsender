@@ -4,15 +4,15 @@ import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from '@gsender/ui/shadcn/Popover.tsx';
+} from 'app/components/shadcn/Popover.tsx';
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from '@gsender/ui/shadcn/Select.tsx';
-import { Button } from '@gsender/ui/primitives/Button';
+} from 'app/components/shadcn/Select.tsx';
+import { Button } from 'app/components/Button';
 import { cn } from 'app/lib/utils';
 import {
     ToolInstance,

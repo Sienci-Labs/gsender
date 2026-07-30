@@ -1,9 +1,9 @@
 import get from 'lodash/get';
 import includes from 'lodash/includes';
 import mapValues from 'lodash/mapValues';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-import { defaultDROPosition } from '@gsender/features/DRO/utils/DRO';
+import { defaultDROPosition } from 'app/features/DRO/utils/DRO';
 import { mapPositionToUnits } from 'app/lib/units.ts';
 import {
     GRBL_ACTIVE_STATE_IDLE,

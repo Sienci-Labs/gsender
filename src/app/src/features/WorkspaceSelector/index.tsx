@@ -7,10 +7,10 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from '@gsender/ui/shadcn/Select';
-import controller from '@gsender/controller-client/controller';
-import { RootState } from '@gsender/controller-client/store/redux';
-import Tooltip from '@gsender/ui/primitives/Tooltip';
+} from 'app/components/shadcn/Select';
+import controller from 'app/lib/controller';
+import { RootState } from 'app/store/redux';
+import Tooltip from 'app/components/Tooltip';
 import { GRBL_ACTIVE_STATE_RUN, WORKFLOW_STATE_RUNNING } from 'app/constants';
 
 const availableWorkspaces = {

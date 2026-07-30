@@ -34,7 +34,7 @@ import {
     SHORTCUT_CATEGORY,
 } from 'app/constants';
 import store from 'app/store';
-import Button from '@gsender/ui/primitives/Button';
+import Button from 'app/components/Button';
 import shuttleEvents from 'app/lib/shuttleEvents';
 import { toast } from 'app/lib/toaster';
 import {
@@ -43,12 +43,12 @@ import {
     DialogDescription,
     DialogHeader,
     DialogTitle,
-} from '@gsender/ui/shadcn/Dialog';
+} from 'app/components/shadcn/Dialog';
 import combokeys from 'app/lib/combokeys';
 import {
     holdShortcuts,
     unholdShortcuts,
-} from '@gsender/controller-client/store/redux/slices/preferences.slice';
+} from 'app/store/redux/slices/preferences.slice';
 
 import { formatShortcut } from '../helpers';
 import CategoryFilter from '../CategoryFilter';

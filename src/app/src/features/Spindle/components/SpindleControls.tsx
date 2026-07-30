@@ -21,12 +21,12 @@
  *
  */
 
-import { Slider } from '@gsender/ui/shadcn/Slider';
-import { Input } from '@gsender/ui/shadcn/Input';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
+import { Slider } from 'app/components/shadcn/Slider';
+import { Input } from 'app/components/shadcn/Input';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { FaBan, FaRedoAlt, FaUndoAlt } from 'react-icons/fa';
-import { ActiveStateButton } from '@gsender/ui/primitives/ActiveStateButton';
-import Tooltip from '@gsender/ui/primitives/Tooltip';
+import { ActiveStateButton } from 'app/components/ActiveStateButton';
+import Tooltip from 'app/components/Tooltip';
 import { useState, useEffect } from 'react';
 import store from 'app/store';
 

@@ -12,9 +12,9 @@ import {
     ChevronDown,
 } from 'lucide-react';
 
-import controller from '@gsender/controller-client/controller';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
-import type { RootState } from '@gsender/controller-client/store/redux';
+import controller from 'app/lib/controller';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import type { RootState } from 'app/store/redux';
 
 import store from 'app/store';
 import { GRBL } from 'app/constants';

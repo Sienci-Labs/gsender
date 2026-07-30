@@ -1,10 +1,10 @@
-import { Jogging } from '@gsender/features/Jogging';
+import { Jogging } from 'app/features/Jogging';
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from '@gsender/ui/shadcn/Popover';
-import Button from '@gsender/ui/primitives/Button';
+} from 'app/components/shadcn/Popover';
+import Button from 'app/components/Button';
 
 const ShowJogControls = () => {
     return (

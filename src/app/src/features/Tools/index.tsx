@@ -1,16 +1,16 @@
-import { Widget } from '@gsender/ui/primitives/Widget';
-import { Tabs } from '@gsender/ui/primitives/Tabs';
+import { Widget } from 'app/components/Widget';
+import { Tabs } from 'app/components/Tabs';
 import Console from '../Console';
-import Probe from '@gsender/features/Probe';
-import Spindle from '@gsender/features/Spindle';
+import Probe from 'app/features/Probe';
+import Spindle from 'app/features/Spindle';
 import Coolant from '../Coolant';
 import Rotary from '../Rotary';
-import Macros from '@gsender/features/Macros';
+import Macros from 'app/features/Macros';
 import { useWidgetState } from 'app/hooks/useWidgetState';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { ATCWidget } from 'app/features/ATC';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
-import { RootState } from '@gsender/controller-client/store/redux';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { RootState } from 'app/store/redux';
 
 export interface TabItem {
     label: string;

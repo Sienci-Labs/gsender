@@ -2,10 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Provider as ReduxProvider } from 'react-redux';
 
-import { store as reduxStore } from '@gsender/controller-client/store/redux';
-import { sagaMiddleware, createRootSaga } from '@gsender/controller-client/store/redux/sagas';
-import controller from '@gsender/controller-client/controller';
-import { FocusTrappingProvider } from '@gsender/ui/lib/focus-trapping';
+import { store as reduxStore } from 'app/store/redux';
+import { sagaMiddleware, createRootSaga } from 'app/store/redux/sagas';
+import controller from 'app/lib/controller';
+import { FocusTrappingProvider } from 'app/lib/focus-trapping';
 import { getHost } from './electron-bridge';
 import * as pendantSagas from './pendant-sagas';
 import PendantShell from './PendantShell';

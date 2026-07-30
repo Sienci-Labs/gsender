@@ -46,13 +46,13 @@ import {
     GamepadLinkWizard,
     KeyboardLinkWizard,
 } from 'app/features/Config/components/ShortcutLinkWizards.tsx';
-import controller from '@gsender/controller-client/controller';
+import controller from 'app/lib/controller';
 import get from 'lodash/get';
 import store from 'app/store';
-import reduxStore from '@gsender/controller-client/store/redux';
+import reduxStore from 'app/store/redux';
 import pubsub from 'pubsub-js';
 import { EEPROM, FIRMWARE_TYPES_T } from 'app/definitions/firmware';
-import { updatePartialControllerSettings } from '@gsender/controller-client/store/redux/slices/controller.slice';
+import { updatePartialControllerSettings } from 'app/store/redux/slices/controller.slice';
 import findIndex from 'lodash/findIndex';
 import { BasicPosition, UNITS_EN, UNITS_GCODE } from 'app/definitions/general';
 import { convertToImperial } from 'app/lib/units';
@@ -61,7 +61,7 @@ import {
     LaserState,
     Spindle,
     SPINDLE_LASER_T,
-} from '@gsender/features/Spindle/definitions';
+} from 'app/features/Spindle/definitions';
 import { updateWorkspaceMode } from 'app/lib/rotary';
 import {
     TOASTER_DISABLED,

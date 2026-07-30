@@ -2,9 +2,9 @@ import { useState } from 'react';
 import Select from 'react-select';
 import { LuRefreshCw } from 'react-icons/lu';
 
-import controller from '@gsender/controller-client/controller';
-import { Button } from '@gsender/ui/primitives/Button';
-import { ControlledInput } from '@gsender/ui/form/ControlledInput';
+import controller from 'app/lib/controller';
+import { Button } from 'app/components/Button';
+import { ControlledInput } from 'app/components/ControlledInput';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -14,7 +14,7 @@ import {
     AlertDialogHeader,
     AlertDialogContent,
     AlertDialogTrigger,
-} from '@gsender/ui/shadcn/AlertDialog';
+} from 'app/components/shadcn/AlertDialog';
 
 import xAxisCalibrationImage1 from '../assets/X_axis-calibration_1.png';
 import xAxisCalibrationImage2 from '../assets/X_axis-calibration_2.png';
@@ -25,11 +25,11 @@ import yAxisCalibrationImage2 from '../assets/Y_axis-calibration_2.png';
 import zAxisCalibrationImage1 from '../assets/Z_axis-calibration_1.png';
 import zAxisCalibrationImage2 from '../assets/Z_axis-calibration_2.png';
 
-import { Jogging } from '@gsender/features/Jogging';
+import { Jogging } from 'app/features/Jogging';
 import { getEEPROMSettingKey, calculateNewStepsPerMM } from '../utils';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { EEPROM } from 'app/definitions/firmware';
-import { jogAxis } from '@gsender/features/Jogging/utils/Jogging';
+import { jogAxis } from 'app/features/Jogging/utils/Jogging';
 import { toast } from 'app/lib/toaster';
 import { FaClipboard, FaClipboardCheck, FaClipboardList } from 'react-icons/fa';
 import { GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG } from 'app/constants';

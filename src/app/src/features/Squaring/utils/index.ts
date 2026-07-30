@@ -1,4 +1,4 @@
-import reduxStore from '@gsender/controller-client/store/redux';
+import reduxStore from 'app/store/redux';
 
 import { SquaringContextType } from '../context/SquaringContext';
 

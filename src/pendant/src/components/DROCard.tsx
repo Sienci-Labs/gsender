@@ -2,9 +2,9 @@ import { useState } from 'react';
 import cn from 'classnames';
 import { Home, Target, Crosshair } from 'lucide-react';
 import get from 'lodash/get';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
-import type { RootState } from '@gsender/controller-client/store/redux';
-import { goXYAxes, gotoZero, homeMachine, zeroAllAxes, zeroWCS } from '@gsender/features/DRO/utils/DRO';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import type { RootState } from 'app/store/redux';
+import { goXYAxes, gotoZero, homeMachine, zeroAllAxes, zeroWCS } from 'app/features/DRO/utils/DRO';
 import {
     GRBL_ACTIVE_STATE_ALARM,
     GRBL_ACTIVE_STATE_IDLE,

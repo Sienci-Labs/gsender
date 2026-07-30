@@ -7,15 +7,15 @@ import pubsub from 'pubsub-js';
 import { RotateCw, RotateCcw, Square, Lightbulb, Timer, LightbulbOff } from 'lucide-react';
 import Select from 'react-select';
 
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
-import type { RootState } from '@gsender/controller-client/store/redux';
-import { updatePartialControllerSettings, clearSpindles } from '@gsender/controller-client/store/redux/slices/controller.slice';
-import { Slider } from '@gsender/ui/shadcn/Slider';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import type { RootState } from 'app/store/redux';
+import { updatePartialControllerSettings, clearSpindles } from 'app/store/redux/slices/controller.slice';
+import { Slider } from 'app/components/shadcn/Slider';
 
 import store from 'app/store';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { getThemeCssColor } from 'app/lib/getThemeCssColor';
-import controller from '@gsender/controller-client/controller';
+import controller from 'app/lib/controller';
 import WidgetConfig from 'app/features/WidgetConfig/WidgetConfig';
 import { convertToImperial } from 'app/lib/units';
 import { roundMetric, round } from 'app/lib/rounding';

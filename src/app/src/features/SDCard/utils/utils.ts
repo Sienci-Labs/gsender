@@ -1,9 +1,9 @@
-import controller from '@gsender/controller-client/controller';
+import controller from 'app/lib/controller';
 import {
     emptyAllSDFiles,
     updateSDCardMountStatus,
-} from '@gsender/controller-client/store/redux/slices/controller.slice.ts';
-import reduxStore from '@gsender/controller-client/store/redux';
+} from 'app/store/redux/slices/controller.slice.ts';
+import reduxStore from 'app/store/redux';
 
 export const handleSDCardMount = () => {
     controller.command('sdcard:mount');

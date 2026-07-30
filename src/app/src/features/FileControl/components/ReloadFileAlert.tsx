@@ -8,11 +8,11 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
     AlertDialogTrigger,
-} from '@gsender/ui/shadcn/AlertDialog.tsx';
-import { Button } from '@gsender/ui/primitives/Button';
+} from 'app/components/shadcn/AlertDialog.tsx';
+import { Button } from 'app/components/Button';
 import { FaRedo } from 'react-icons/fa';
 
-import { Tooltip } from '@gsender/ui/primitives/Tooltip';
+import { Tooltip } from 'app/components/Tooltip';
 
 type ReloadFileAlertProps = {
     fileLoaded: boolean;

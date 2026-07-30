@@ -2,11 +2,11 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import cx from 'classnames';
 
-import { Button } from '@gsender/ui/primitives/Button';
-import { ControlledInput } from '@gsender/ui/form/ControlledInput';
-import { Switch } from '@gsender/ui/shadcn/Switch';
-import { Tabs, TabsList, TabsTrigger } from '@gsender/ui/shadcn/Tabs';
-import controller from '@gsender/controller-client/controller';
+import { Button } from 'app/components/Button';
+import { ControlledInput } from 'app/components/ControlledInput';
+import { Switch } from 'app/components/shadcn/Switch';
+import { Tabs, TabsList, TabsTrigger } from 'app/components/shadcn/Tabs';
+import controller from 'app/lib/controller';
 import {
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
@@ -21,8 +21,8 @@ import useKeybinding from 'app/lib/useKeybinding';
 import { convertToImperial, convertToMetric } from 'app/lib/units';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import store from 'app/store';
-import { Tooltip } from '@gsender/ui/primitives/Tooltip';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
+import { Tooltip } from 'app/components/Tooltip';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 
 import { RotarySurfacingOptions } from './definitions';
 import { GcodeViewer } from '../Surfacing/components/GcodeViewer';

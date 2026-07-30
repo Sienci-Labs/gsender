@@ -3,14 +3,14 @@ import { useDispatch } from 'react-redux';
 import debounce from 'lodash/debounce';
 import pubsub from 'pubsub-js';
 
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import {
     clearSpindles,
     updatePartialControllerSettings,
-} from '@gsender/controller-client/store/redux/slices/controller.slice';
+} from 'app/store/redux/slices/controller.slice';
 import store from 'app/store';
-import Widget from '@gsender/ui/primitives/Widget';
-import controller from '@gsender/controller-client/controller';
+import Widget from 'app/components/Widget';
+import controller from 'app/lib/controller';
 import { convertToImperial } from 'app/lib/units';
 import { UNITS_EN, UNITS_GCODE } from 'app/definitions/general';
 import WidgetConfig from 'app/features/WidgetConfig/WidgetConfig';
@@ -31,7 +31,7 @@ import SpindleSelector from './components/SpindleSelector';
 import { roundMetric, round } from 'app/lib/rounding';
 import findIndex from 'lodash/findIndex';
 import get from 'lodash/get';
-import reduxStore from '@gsender/controller-client/store/redux';
+import reduxStore from 'app/store/redux';
 import { SPINDLE_LASER_T } from './definitions';
 import { firmwarePastVersion } from 'app/lib/firmwareSemver.ts';
 import { ATCI_SUPPORTED_VERSION } from 'app/features/ATC/utils/ATCiConstants.ts';

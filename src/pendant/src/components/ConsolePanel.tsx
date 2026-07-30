@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, KeyboardEvent } from 'react';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
-import type { RootState } from '@gsender/controller-client/store/redux';
-import { store } from '@gsender/controller-client/store/redux';
-import { clearHistory, addToInputHistory } from '@gsender/controller-client/store/redux/slices/console.slice';
-import controller from '@gsender/controller-client/controller';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import type { RootState } from 'app/store/redux';
+import { store } from 'app/store/redux';
+import { clearHistory, addToInputHistory } from 'app/store/redux/slices/console.slice';
+import controller from 'app/lib/controller';
 
 type Props = {
     className?: string;

@@ -3,12 +3,12 @@ import { getDatatypeInput } from 'app/features/Config/utils/EEPROM.ts';
 import get from 'lodash/get';
 import { BiReset } from 'react-icons/bi';
 import cn from 'classnames';
-import { Confirm } from '@gsender/ui/primitives/ConfirmationDialog/ConfirmationDialogLib.ts';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 import { FaMicrochip } from 'react-icons/fa6';
 import { ToolLink } from 'app/features/Config/components/wizards/SquaringToolWizard.tsx';
-import Tooltip from '@gsender/ui/primitives/Tooltip';
+import Tooltip from 'app/components/Tooltip';
 import { EEPROM } from 'app/definitions/firmware';
-import { RootState } from '@gsender/controller-client/store/redux';
+import { RootState } from 'app/store/redux';
 import { useSelector } from 'react-redux';
 import {
     resolveGrblCoreDefaults,

@@ -2,8 +2,8 @@ import { useRef, useEffect } from 'react';
 import pubsub from 'pubsub-js';
 import { GCodeSVGVisualizer } from '@sienci/gviewer/react';
 import type { GCodeSVGRendererHandle } from '@sienci/gviewer/react';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
-import type { RootState } from '@gsender/controller-client/store/redux';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import type { RootState } from 'app/store/redux';
 import { WORKFLOW_STATE_RUNNING } from 'app/constants';
 import {
     PENDANT_BOUNDS_COLOR,

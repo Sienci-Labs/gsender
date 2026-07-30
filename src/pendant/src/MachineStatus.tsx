@@ -1,6 +1,6 @@
 import get from 'lodash/get';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
-import type { RootState } from '@gsender/controller-client/store/redux';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import type { RootState } from 'app/store/redux';
 
 const STATE_STYLES: Record<string, string> = {
     Idle:    'text-green-400  border-green-400/30  bg-green-400/10',

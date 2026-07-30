@@ -10,8 +10,8 @@ import {
 } from './utils/DRO';
 import { AxisRow } from './component/AxisRow.tsx';
 import { VscTarget } from 'react-icons/vsc';
-import { Button } from '@gsender/ui/primitives/Button';
-import { Label } from '@gsender/ui/primitives/Label';
+import { Button } from 'app/components/Button';
+import { Label } from 'app/components/Label';
 import get from 'lodash/get';
 import { GoTo } from './component/GoTo.tsx';
 import store from 'app/store';
@@ -43,13 +43,13 @@ import {
     AlertDialogFooter,
     AlertDialogCancel,
     AlertDialogAction,
-} from '@gsender/ui/shadcn/AlertDialog';
+} from 'app/components/shadcn/AlertDialog';
 import { UnitBadge } from './component/UnitBadge.tsx';
 import { Parking } from './component/Parking.tsx';
 
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
-import controller from '@gsender/controller-client/controller';
+import controller from 'app/lib/controller';
 import {
     BACK_RIGHT,
     BACK_LEFT,
@@ -57,8 +57,8 @@ import {
     FRONT_LEFT,
     getMovementGCode,
 } from './utils/RapidPosition';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
-import reduxStore from '@gsender/controller-client/store/redux';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import reduxStore from 'app/store/redux';
 import { cn } from 'app/lib/utils';
 
 interface DROProps {

@@ -1,10 +1,10 @@
-import Button from '@gsender/ui/primitives/Button';
+import Button from 'app/components/Button';
 import { FiTarget } from 'react-icons/fi';
-import { ControlledInput } from '@gsender/ui/form/ControlledInput';
+import { ControlledInput } from 'app/components/ControlledInput';
 import { useSelector } from 'react-redux';
-import { RootState } from '@gsender/controller-client/store/redux';
+import { RootState } from 'app/store/redux';
 import { FaChartLine } from 'react-icons/fa';
-import controller from '@gsender/controller-client/controller';
+import controller from 'app/lib/controller';
 
 export interface LocationInputProps {
     value: object;

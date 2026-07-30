@@ -1,12 +1,12 @@
 import cx from 'classnames';
-import { Button } from '@gsender/ui/shadcn/Button';
+import { Button } from 'app/components/shadcn/Button';
 import { TbVector } from 'react-icons/tb';
 import pubsub from 'pubsub-js';
 import store from 'app/store';
 import { LASER_MODE } from 'app/constants';
 import { outlineResponse } from 'app/workers/Outline.response';
 import { toast } from 'app/lib/toaster';
-import { store as reduxStore } from '@gsender/controller-client/store/redux';
+import { store as reduxStore } from 'app/store/redux';
 import get from 'lodash/get';
 
 interface OutlineButtonProps {

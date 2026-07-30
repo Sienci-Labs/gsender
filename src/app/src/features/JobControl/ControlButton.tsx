@@ -5,13 +5,13 @@ import pubsub from 'pubsub-js';
 import { PiPause } from 'react-icons/pi';
 import { FiOctagon } from 'react-icons/fi';
 import { IoPlayOutline } from 'react-icons/io5';
-import { stopMachineMotion } from '@gsender/features/Jogging/utils/Jogging';
+import { stopMachineMotion } from 'app/features/Jogging/utils/Jogging';
 
 import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
-import { WORKFLOW_STATES_T } from '@gsender/controller-client/store/definitions';
-import controller from '@gsender/controller-client/controller';
+import { WORKFLOW_STATES_T } from 'app/store/definitions';
+import controller from 'app/lib/controller';
 import {
     CARVING_CATEGORY,
     GRBL,
@@ -28,8 +28,8 @@ import {
     WORKFLOW_STATE_RUNNING,
 } from '../../constants';
 import get from 'lodash/get';
-import reduxStore, { RootState } from '@gsender/controller-client/store/redux';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
+import reduxStore, { RootState } from 'app/store/redux';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 
 type MACHINE_CONTROL_BUTTONS_T =
     (typeof MACHINE_CONTROL_BUTTONS)[keyof typeof MACHINE_CONTROL_BUTTONS];

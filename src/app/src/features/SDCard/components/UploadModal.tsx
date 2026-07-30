@@ -8,7 +8,7 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-} from '@gsender/ui/shadcn/Dialog';
+} from 'app/components/shadcn/Dialog';
 import { toast } from 'app/lib/toaster';
 
 interface UploadModalProps {

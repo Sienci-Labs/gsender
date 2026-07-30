@@ -6,21 +6,21 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-} from '@gsender/ui/shadcn/Dialog.tsx';
+} from 'app/components/shadcn/Dialog.tsx';
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from '@gsender/ui/shadcn/Select.tsx';
+} from 'app/components/shadcn/Select.tsx';
 import { QRCodeDisplay } from 'app/features/RemoteMode/components/QRCode.tsx';
-import Button from '@gsender/ui/primitives/Button';
-import { Switch } from '@gsender/ui/shadcn/Switch';
+import Button from 'app/components/Button';
+import { Switch } from 'app/components/shadcn/Switch';
 import { toast } from 'app/lib/toaster';
-import controller from '@gsender/controller-client/controller';
-import { RootState } from '@gsender/controller-client/store/redux';
-import { Confirm } from '@gsender/ui/primitives/ConfirmationDialog/ConfirmationDialogLib.ts';
+import controller from 'app/lib/controller';
+import { RootState } from 'app/store/redux';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 import { isIPv4 } from 'app/lib/utils';
 
 import { actions } from './apiActions.ts';

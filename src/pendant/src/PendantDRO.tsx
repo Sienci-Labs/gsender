@@ -1,5 +1,5 @@
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
-import type { RootState } from '@gsender/controller-client/store/redux';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import type { RootState } from 'app/store/redux';
 
 const AXES = ['X', 'Y', 'Z'] as const;
 type Axis = (typeof AXES)[number];

@@ -1,10 +1,10 @@
 import throttle from 'lodash/throttle';
 import inRange from 'lodash/inRange';
 import get from 'lodash/get';
-import reduxStore from '@gsender/controller-client/store/redux';
+import reduxStore from 'app/store/redux';
 
 import gamepad, { checkButtonHold } from 'app/lib/gamepad';
-import controller from '@gsender/controller-client/controller';
+import controller from 'app/lib/controller';
 import { GRBLHAL } from 'app/constants';
 
 export const checkThumbsticskAreIdle = (axes, profile) => {

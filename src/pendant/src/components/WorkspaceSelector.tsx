@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
-import type { RootState } from '@gsender/controller-client/store/redux';
-import controller from '@gsender/controller-client/controller';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import type { RootState } from 'app/store/redux';
+import controller from 'app/lib/controller';
 import { GRBL_ACTIVE_STATE_RUN, WORKFLOW_STATE_RUNNING } from 'app/constants';
 
 type GrblWorkspace = 'G54' | 'G55' | 'G56' | 'G57' | 'G58' | 'G59';

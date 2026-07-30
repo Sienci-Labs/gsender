@@ -1,9 +1,9 @@
 import {StepActionButton} from "app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx";
-import controller from "@gsender/controller-client/controller";
+import controller from "app/lib/controller";
 import {StepProps} from "app/features/AccessoryInstaller/types";
 import {useState} from "react";
-import {useTypedSelector} from "@gsender/controller-client/hooks/useTypedSelector";
-import {RootState} from "@gsender/controller-client/store/redux";
+import {useTypedSelector} from "app/hooks/useTypedSelector";
+import {RootState} from "app/store/redux";
 
 export function Modbus({ onComplete, onUncomplete }: StepProps) {
     const [hasConfiguredModbus, setHasConfiguredModbus] =

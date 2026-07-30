@@ -4,9 +4,9 @@ import cloneDeep from 'lodash/cloneDeep';
 import set from 'lodash/set';
 import get from 'lodash/get';
 
-import { Switch } from '@gsender/ui/shadcn/Switch';
+import { Switch } from 'app/components/shadcn/Switch';
 
-import { ControlledInput } from '@gsender/ui/form/ControlledInput';
+import { ControlledInput } from 'app/components/ControlledInput';
 import { GamepadContext } from './utils/context';
 import { arrayComparator } from './utils';
 import { setGamepadProfileList } from './utils/actions';

@@ -1,15 +1,15 @@
 import { useEffect } from 'react';
 import isElectron from 'is-electron';
 
-import { Widget } from '@gsender/ui/primitives/Widget';
-import { store as reduxStore } from '@gsender/controller-client/store/redux';
-import controller from '@gsender/controller-client/controller';
+import { Widget } from 'app/components/Widget';
+import { store as reduxStore } from 'app/store/redux';
+import controller from 'app/lib/controller';
 import { VISUALIZER_PRIMARY } from 'app/constants';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 
 import ButtonControlGroup from './ButtonControlGroup';
 import FileInformation from './FileInformation';
-import { updateFileInfo } from '@gsender/controller-client/store/redux/slices/fileInfo.slice';
+import { updateFileInfo } from 'app/store/redux/slices/fileInfo.slice';
 import {
     addRecentFile,
     createRecentFileFromRawPath,

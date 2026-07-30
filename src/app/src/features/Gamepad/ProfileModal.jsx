@@ -10,9 +10,9 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-} from '@gsender/ui/shadcn/Dialog';
-import { Button } from '@gsender/ui/primitives/Button';
-import { Input } from '@gsender/ui/shadcn/Input';
+} from 'app/components/shadcn/Dialog';
+import { Button } from 'app/components/Button';
+import { Input } from 'app/components/shadcn/Input';
 import { defaultOptions, gamepadMapping } from 'app/store/gamepad';
 
 import { AVAILABILITY_TYPES } from './utils';

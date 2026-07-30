@@ -2,18 +2,18 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { clsx } from 'clsx';
 import { Plus, Upload, Download, Play, MoreHorizontal, Command, type LucideIcon } from 'lucide-react';
 import api from 'app/api';
-import controller from '@gsender/controller-client/controller';
-import MacroForm from '@gsender/features/Macros/MacroForm';
+import controller from 'app/lib/controller';
+import MacroForm from 'app/features/Macros/MacroForm';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
-import type { RootState } from '@gsender/controller-client/store/redux';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import type { RootState } from 'app/store/redux';
 import {
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle,
     DialogFooter,
-} from '@gsender/ui/shadcn/Dialog';
+} from 'app/components/shadcn/Dialog';
 
 interface Macro {
     id: string;

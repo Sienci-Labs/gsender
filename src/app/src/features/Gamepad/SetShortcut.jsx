@@ -6,7 +6,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogFooter,
-} from '@gsender/ui/shadcn/Dialog';
+} from 'app/components/shadcn/Dialog';
 import {
     CARVING_CATEGORY,
     OVERRIDES_CATEGORY,
@@ -22,8 +22,8 @@ import {
 } from 'app/constants';
 import shuttleEvents from 'app/lib/shuttleEvents';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
-import { Switch } from '@gsender/ui/shadcn/Switch';
-import Button from '@gsender/ui/primitives/Button';
+import { Switch } from 'app/components/shadcn/Switch';
+import Button from 'app/components/Button';
 import {
     Table,
     TableHeader,
@@ -31,7 +31,7 @@ import {
     TableHead,
     TableBody,
     TableCell,
-} from '@gsender/ui/shadcn/Table';
+} from 'app/components/shadcn/Table';
 import { cn } from 'app/lib/utils';
 
 import { GamepadContext } from './utils/context';

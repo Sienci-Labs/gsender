@@ -20,7 +20,7 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-import controller from '@gsender/controller-client/controller';
+import controller from 'app/lib/controller';
 import {
     getProbeSettings,
     getUnitModal,

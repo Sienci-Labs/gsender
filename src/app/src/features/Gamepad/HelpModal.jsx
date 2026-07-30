@@ -5,7 +5,7 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-} from '@gsender/ui/shadcn/Dialog';
+} from 'app/components/shadcn/Dialog';
 import { GamepadContext } from './utils/context';
 import { setCurrentModal } from './utils/actions';
 

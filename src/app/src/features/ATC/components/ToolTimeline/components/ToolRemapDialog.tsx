@@ -6,17 +6,17 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-} from '@gsender/ui/shadcn/Dialog';
+} from 'app/components/shadcn/Dialog';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import {
     Select,
     SelectContent,
     SelectTrigger,
     SelectValue,
-} from '@gsender/ui/shadcn/Select';
-import { Button } from '@gsender/ui/primitives/Button';
-import { Label } from '@gsender/ui/shadcn/Label';
-import { Badge } from '@gsender/ui/shadcn/Badge';
+} from 'app/components/shadcn/Select';
+import { Button } from 'app/components/Button';
+import { Label } from 'app/components/shadcn/Label';
+import { Badge } from 'app/components/shadcn/Badge';
 import {
     ArrowRight,
 } from 'lucide-react';
@@ -26,8 +26,8 @@ import {
     toolStateThemes,
 } from 'app/features/ATC/utils/ATCiConstants.ts';
 import { ToolStatusBadges } from 'app/features/ATC/components/ui/ToolStatusBadges.tsx';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
-import { RootState } from '@gsender/controller-client/store/redux';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { RootState } from 'app/store/redux';
 import get from 'lodash/get';
 
 interface ToolRemapDialogProps {

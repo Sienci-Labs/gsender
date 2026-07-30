@@ -8,9 +8,9 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from '@gsender/ui/shadcn/Dialog';
-import Button from '@gsender/ui/primitives/Button';
-import { RadioGroup, RadioGroupItem } from '@gsender/ui/shadcn/RadioGroup';
+} from 'app/components/shadcn/Dialog';
+import Button from 'app/components/Button';
+import { RadioGroup, RadioGroupItem } from 'app/components/shadcn/RadioGroup';
 import { toast } from 'app/lib/toaster';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 import {
@@ -18,7 +18,7 @@ import {
     VISUALIZER_PRIMARY,
     WORKSPACE_MODE,
 } from 'app/constants';
-import controller from '@gsender/controller-client/controller';
+import controller from 'app/lib/controller';
 
 import standardTrackGraphic from './assets/standard-track-top-view.png';
 import extensionTrackGraphic from './assets/extension-track-top-view.png';

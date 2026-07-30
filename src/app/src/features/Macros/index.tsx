@@ -8,10 +8,10 @@ import { FaPlus, FaFileImport, FaFileExport } from 'react-icons/fa';
 
 import api from 'app/api';
 import store from 'app/store';
-import controller from '@gsender/controller-client/controller';
+import controller from 'app/lib/controller';
 import combokeys from 'app/lib/combokeys';
 import log from 'app/lib/log';
-import Button from '@gsender/ui/primitives/Button';
+import Button from 'app/components/Button';
 import { toast } from 'app/lib/toaster';
 import pubsub from 'pubsub-js';
 

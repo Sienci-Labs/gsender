@@ -1,5 +1,5 @@
-import controller from '@gsender/controller-client/controller';
-import Button from '@gsender/ui/primitives/Button';
+import controller from 'app/lib/controller';
+import Button from 'app/components/Button';
 
 interface JogWizardProps {
     axis: string;

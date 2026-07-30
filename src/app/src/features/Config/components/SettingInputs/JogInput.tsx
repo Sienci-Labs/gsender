@@ -1,4 +1,4 @@
-import { ControlledInput } from '@gsender/ui/form/ControlledInput';
+import { ControlledInput } from 'app/components/ControlledInput';
 import { IMPERIAL_UNITS } from 'app/constants';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { convertToImperial, convertToMetric } from 'app/lib/units';

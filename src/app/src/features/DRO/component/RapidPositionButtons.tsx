@@ -1,17 +1,17 @@
 import get from 'lodash/get';
 import cx from 'classnames';
 
-import controller from '@gsender/controller-client/controller';
+import controller from 'app/lib/controller';
 import { useSelector } from 'react-redux';
-import { RootState } from '@gsender/controller-client/store/redux';
+import { RootState } from 'app/store/redux';
 import {
     BACK_LEFT,
     BACK_RIGHT,
     FRONT_LEFT,
     FRONT_RIGHT,
     getMovementGCode,
-} from '@gsender/features/DRO/utils/RapidPosition';
-import Tooltip from '@gsender/ui/primitives/Tooltip';
+} from 'app/features/DRO/utils/RapidPosition';
+import Tooltip from 'app/components/Tooltip';
 import cn from 'classnames';
 export function RapidPositionButtons({ disabled = false }) {
     const homingFlag = useSelector(

@@ -31,7 +31,7 @@ import CancelButton from 'app/features/Helper/components/CancelButton';
 import { CSSTransition } from 'react-transition-group';
 import { FaHatWizard } from 'react-icons/fa';
 import store from 'app/store';
-import controller from '@gsender/controller-client/controller';
+import controller from 'app/lib/controller';
 
 // Fetch toolchange settings and send it to backend
 export function updateToolchangeContext(mappings = null) {

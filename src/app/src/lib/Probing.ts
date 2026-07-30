@@ -14,7 +14,7 @@ import {
     PROBE_DIRECTIONS,
     ProbingOptions,
     PROBE_TYPES_T,
-} from '@gsender/features/Probe/definitions';
+} from 'app/features/Probe/definitions';
 import { getZDownTravel } from 'app/lib/SoftLimits.js';
 
 export const BL = 0;

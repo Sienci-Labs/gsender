@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useDarkMode } from 'app/hooks/useDarkMode';
-import ConfirmationDialog from '@gsender/ui/primitives/ConfirmationDialog/ConfirmationDialog';
+import ConfirmationDialog from 'app/components/ConfirmationDialog/ConfirmationDialog';
 import PendantTopBar from './components/PendantTopBar';
 import InfoStrip from './components/InfoStrip';
 import CarveView from './components/CarveView';

@@ -26,7 +26,7 @@ import Mousetrap from 'mousetrap';
 import get from 'lodash/get';
 import cloneDeep from 'lodash/cloneDeep';
 
-import reduxStore from '@gsender/controller-client/store/redux';
+import reduxStore from 'app/store/redux';
 import api from '../api';
 import { MACRO_CATEGORY } from '../constants';
 import log from './log';

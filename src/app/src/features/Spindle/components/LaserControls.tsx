@@ -23,12 +23,12 @@
 
 import React from 'react';
 
-import { Slider } from '@gsender/ui/shadcn/Slider';
-import { ControlledInput } from '@gsender/ui/form/ControlledInput';
+import { Slider } from 'app/components/shadcn/Slider';
+import { ControlledInput } from 'app/components/ControlledInput';
 import { FaLightbulb, FaRegLightbulb, FaSatelliteDish } from 'react-icons/fa';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
-import { ActiveStateButton } from '@gsender/ui/primitives/ActiveStateButton';
-import Tooltip from '@gsender/ui/primitives/Tooltip';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { ActiveStateButton } from 'app/components/ActiveStateButton';
+import Tooltip from 'app/components/Tooltip';
 
 type Props = {
     actions: LaserActions;

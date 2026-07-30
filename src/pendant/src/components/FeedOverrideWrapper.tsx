@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import get from 'lodash/get';
 import debounce from 'lodash/debounce';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
-import type { RootState } from '@gsender/controller-client/store/redux';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import type { RootState } from 'app/store/redux';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-import RangeSlider from '@gsender/ui/primitives/RangeSlider';
-import controller from '@gsender/controller-client/controller';
+import RangeSlider from 'app/components/RangeSlider';
+import controller from 'app/lib/controller';
 import store from 'app/store';
 import { mapPositionToUnits } from 'app/lib/units';
 import {

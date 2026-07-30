@@ -13,8 +13,8 @@ import {
     RotateCw,
 } from 'lucide-react';
 import { LongPressCallbackReason, useLongPress } from 'use-long-press';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
-import type { RootState } from '@gsender/controller-client/store/redux';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import type { RootState } from 'app/store/redux';
 import {
     aMinusJog,
     aPlusJog,
@@ -30,8 +30,8 @@ import {
     yPlusJog,
     zMinusJog,
     zPlusJog,
-} from '@gsender/features/Jogging/utils/Jogging';
-import { convertValue } from '@gsender/features/Jogging/utils/units';
+} from 'app/features/Jogging/utils/Jogging';
+import { convertValue } from 'app/features/Jogging/utils/units';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import store from 'app/store';
 import {

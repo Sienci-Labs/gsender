@@ -1,9 +1,9 @@
 import { FaClipboard, FaClipboardCheck, FaClipboardList } from 'react-icons/fa';
 
-import Button from '@gsender/ui/primitives/Button';
-import { ControlledInput } from '@gsender/ui/form/ControlledInput';
+import Button from 'app/components/Button';
+import { ControlledInput } from 'app/components/ControlledInput';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { GRBL_ACTIVE_STATE_RUN, GRBL_HAL_ACTIVE_STATE_RUN } from 'app/constants';
 
 import { useSquaring } from '../context/SquaringContext';

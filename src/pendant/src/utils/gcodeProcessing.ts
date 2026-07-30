@@ -3,15 +3,15 @@ import pubsub from 'pubsub-js';
 
 import store from 'app/store';
 import type { BBox } from 'app/definitions/general';
-import controller from '@gsender/controller-client/controller';
-import { store as reduxStore } from '@gsender/controller-client/store/redux';
+import controller from 'app/lib/controller';
+import { store as reduxStore } from 'app/store/redux';
 import { isLaserMode } from 'app/lib/laserMode';
 import { VISUALIZER_PRIMARY } from 'app/constants';
 import {
     updateFileContent,
     updateFileInfo,
     updateFileProcessing,
-} from '@gsender/controller-client/store/redux/slices/fileInfo.slice';
+} from 'app/store/redux/slices/fileInfo.slice';
 import {
     getPendantWorkerTheme,
     PENDANT_RAPID_OPACITY,

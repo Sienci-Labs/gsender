@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { useTypedSelector } from '@gsender/controller-client/hooks/useTypedSelector';
-import type { RootState } from '@gsender/controller-client/store/redux';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import type { RootState } from 'app/store/redux';
 import { JOB_STATUS, JOB_TYPES, WORKFLOW_STATE_IDLE, WORKFLOW_STATE_RUNNING } from 'app/constants';
 import type { Job } from 'app/features/Stats/utils/StatContext';
 import JobEndModal from 'app/workspace/Alerts/JobEndModal';

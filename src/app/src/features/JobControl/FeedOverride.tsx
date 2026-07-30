@@ -1,10 +1,10 @@
-import RangeSlider from '@gsender/ui/primitives/RangeSlider';
+import RangeSlider from 'app/components/RangeSlider';
 import {
     METRIC_UNITS,
     OVERRIDE_VALUE_RANGES,
     SPINDLE_MODE,
 } from '../../constants';
-import controller from '@gsender/controller-client/controller';
+import controller from 'app/lib/controller';
 import debounce from 'lodash/debounce';
 import { useEffect, useState } from 'react';
 import store from 'app/store';

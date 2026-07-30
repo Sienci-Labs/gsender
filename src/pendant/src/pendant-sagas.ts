@@ -4,15 +4,15 @@
  * Deliberately omits Electron IPC, visualizer workers, and the keepout-toggle
  * banner (ATCI subtype '10'), which depends on the Helper/WizardProvider machinery.
  */
-import controller from '@gsender/controller-client/controller';
-import { store as reduxStore } from '@gsender/controller-client/store/redux';
-import { Confirm } from '@gsender/ui/primitives/ConfirmationDialog/ConfirmationDialogLib';
+import controller from 'app/lib/controller';
+import { store as reduxStore } from 'app/store/redux';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import {
     openConnection,
     closeConnection,
     setConnectionState,
     listPorts,
-} from '@gsender/controller-client/store/redux/slices/connection.slice';
+} from 'app/store/redux/slices/connection.slice';
 import {
     updateControllerSettings,
     updateControllerState,
@@ -21,16 +21,16 @@ import {
     updateFeederStatus,
     updateSenderStatus,
     addSpindle,
-} from '@gsender/controller-client/store/redux/slices/controller.slice';
+} from 'app/store/redux/slices/controller.slice';
 import {
     unloadFileInfo,
-} from '@gsender/controller-client/store/redux/slices/fileInfo.slice';
+} from 'app/store/redux/slices/fileInfo.slice';
 import {
     applyControllerGcodePayload,
     shouldIgnoreControllerGcodeLoad,
 } from './utils/gcodeProcessing';
 
-import type { PortInfo } from '@gsender/controller-client/store/definitions';
+import type { PortInfo } from 'app/store/definitions';
 import type { ControllerSettings, FIRMWARE_TYPES_T } from 'app/definitions/firmware';
 import type { WORKFLOW_STATES_T } from 'app/constants';
 

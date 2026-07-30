@@ -8,8 +8,8 @@ import {
 } from 'app/definitions/firmware';
 
 import store from '../store';
-import controller from '@gsender/controller-client/controller';
-import { store as reduxStore } from '@gsender/controller-client/store/redux';
+import controller from 'app/lib/controller';
+import { store as reduxStore } from 'app/store/redux';
 import {
     WORKSPACE_MODE,
     ROTARY_MODE_FIRMWARE_SETTINGS,
@@ -18,7 +18,7 @@ import {
     GRBL,
     GRBLHAL,
 } from '../constants';
-import { Confirm } from '@gsender/ui/primitives/ConfirmationDialog/ConfirmationDialogLib';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import { toast } from './toaster';
 
 export const updateWorkspaceMode = (mode: WORKSPACE_MODE_T): void => {
