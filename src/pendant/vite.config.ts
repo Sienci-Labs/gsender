@@ -12,10 +12,7 @@ const root = path.resolve(__dirname, '../..');
 function tailwindHmr(): Plugin {
     const contentDirs = [
         path.join(__dirname, 'src'),
-        path.join(root, 'apps/desktop/src'),
-        path.join(root, 'packages/ui/src'),
-        path.join(root, 'packages/features/src'),
-        path.join(root, 'packages/controller-client/src'),
+        path.join(root, 'src/app/src'),
     ];
     const cssEntry = path.join(__dirname, 'src/index.css');
 
@@ -44,23 +41,10 @@ export default defineConfig({
     plugins: [react(), tailwindHmr()],
     resolve: {
         alias: {
-            // Shared packages
-            '@gsender/features': path.join(root, 'packages/features/src'),
-            '@gsender/controller-client/store/redux': path.join(root, 'packages/controller-client/src/store/redux'),
-            '@gsender/controller-client/store/definitions': path.join(root, 'packages/controller-client/src/store/definitions.ts'),
-            '@gsender/controller-client/store': path.join(root, 'packages/controller-client/src/store'),
-            '@gsender/controller-client/controller': path.join(root, 'packages/controller-client/src/controller.ts'),
-            '@gsender/controller-client/hooks': path.join(root, 'packages/controller-client/src/hooks'),
-            '@gsender/controller-client': path.join(root, 'packages/controller-client/src/index.ts'),
-            '@gsender/ui/shadcn': path.join(root, 'packages/ui/src/shadcn'),
-            '@gsender/ui/primitives': path.join(root, 'packages/ui/src/primitives'),
-            '@gsender/ui/form': path.join(root, 'packages/ui/src/form'),
-            '@gsender/ui/lib': path.join(root, 'packages/ui/src/lib'),
-            '@gsender/ui': path.join(root, 'packages/ui/src/index.ts'),
-            // app/ → apps/desktop/src/ so features can resolve their app/* utilities
+            // app/ → src/app/src/ so shared features can resolve their app/* utilities
             'app-root': root,
-            'app': path.join(root, 'apps/desktop/src'),
-            '@': path.join(root, 'apps/desktop/src'),
+            'app': path.join(root, 'src/app/src'),
+            '@': path.join(root, 'src/app/src'),
         },
     },
     server: {
