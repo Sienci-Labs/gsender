@@ -50,9 +50,9 @@ const srcResolverPlugin = {
         });
 
         build.onResolve({ filter: /^app\// }, (args) => {
-            // app/ alias → apps/desktop/ (matches Vite alias in apps/desktop/vite.config.js)
+            // app/ alias → src/app/ (matches Vite alias in src/app/vite.config.js)
             const relativePath = args.path.replace(/^app\//, '');
-            const basePath = path.resolve(__dirname, 'apps/desktop', relativePath);
+            const basePath = path.resolve(__dirname, 'src/app', relativePath);
             const isFile = (p) => fs.existsSync(p) && fs.statSync(p).isFile();
             for (const ext of ['.js', '.ts', '/index.js', '/index.ts']) {
                 if (isFile(basePath + ext)) return { path: basePath + ext };
@@ -228,7 +228,7 @@ function prebuild(target) {
         fs.mkdirSync(path.join(baseDir, 'app'), { recursive: true });
         fs.mkdirSync(path.join(baseDir, 'app-server'), { recursive: true });
         for (const asset of ['favicon.ico', 'images', 'assets']) {
-            const src = path.join(__dirname, 'apps/desktop', asset);
+            const src = path.join(__dirname, 'src/app', asset);
             if (fs.existsSync(src)) {
                 fs.cpSync(src, path.join(baseDir, 'app', asset), { recursive: true });
             }

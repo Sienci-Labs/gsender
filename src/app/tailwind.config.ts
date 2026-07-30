@@ -24,9 +24,6 @@ export default {
     content: [
         path.join(__dirname, './src/**/*.{js,ts,jsx,tsx,html}'),
         path.join(__dirname, './index.html'),
-        path.join(root, 'packages/ui/src/**/*.{js,ts,jsx,tsx}'),
-        path.join(root, 'packages/features/src/**/*.{js,ts,jsx,tsx}'),
-        path.join(root, 'packages/controller-client/src/**/*.{js,ts,jsx,tsx}'),
     ],
     important: true,
     darkMode: 'class',
@@ -90,7 +87,7 @@ export default {
                     disabled: 'rgba(0, 0, 0, 0.20)',
                     scrim: 'rgba(0, 0, 0, 0.72)',
                 },
-                // shadcn/ui primitive tokens (packages/ui/src/shadcn/*) — resolved
+                // shadcn/ui primitive tokens (src/components/shadcn/*) — resolved
                 // from CSS vars (see index.css) so bare classes like `bg-card` and
                 // `border` pick up the Workshop theme without a dark: prefix.
                 background: 'var(--background)',

@@ -1,5 +1,5 @@
 {
-  "name": "@gsender/desktop",
+  "name": "gSender",
   "private": true,
   "type": "module",
   "scripts": {

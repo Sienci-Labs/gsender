@@ -22,7 +22,7 @@
  */
 
 // Pendant preload mirrors desktop's pattern (nodeIntegration on, contextIsolation off)
-// because the pendant SPA reuses shared code from apps/desktop/ that calls
+// because the pendant SPA reuses shared code from src/app/ that calls
 // window.require / window.ipcRenderer at module load time.
 const fs = require('fs');
 const { ipcRenderer } = require('electron');

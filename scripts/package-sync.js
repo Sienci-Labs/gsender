@@ -8,7 +8,7 @@ const { parseLatestReadmeNotes } = require('./readme_sync');
 
 // Copy necessary properties from 'package.json' to 'src/app/package.json'
 const pkg = require('../package.json');
-const pkgApp = require('../apps/desktop/package.json');
+const pkgApp = require('../src/app/package.json');
 
 const RUNTIME_ENTRY_PATHS = [
     'src/main.js',
@@ -16,9 +16,9 @@ const RUNTIME_ENTRY_PATHS = [
     'src/server-cli.js',
     'src/server',
     'src/electron-app',
-    'apps/desktop/src/entry-server.tsx',
-    'apps/desktop/src/AppServer.tsx',
-    'apps/desktop/src/sentry-config.ts',
+    'src/app/src/entry-server.tsx',
+    'src/app/src/AppServer.tsx',
+    'src/app/src/sentry-config.ts',
 ];
 
 const SCANNABLE_EXTENSIONS = new Set([
@@ -195,7 +195,7 @@ pkgApp.repository = pkg.repository;
 // Copy only Node.js dependencies to application package.json
 pkgApp.dependencies = selectDependencies(runtimeDependencyNames, dependencySources);
 
-const target = path.resolve(__dirname, '../apps/desktop/package.json');
+const target = path.resolve(__dirname, '../src/app/package.json');
 const secondTarget = path.resolve(__dirname, '../src/package.json');
 const pendantTarget = path.resolve(__dirname, '../src/pendant-package.json');
 
