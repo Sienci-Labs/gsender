@@ -4,7 +4,7 @@ import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog';
 import { IoIosWarning } from 'react-icons/io';
 
 import cx from 'classnames';
-import { useFocusTrapping } from '../lib/focus-trapping';
+import { useFocusTrapping } from '../../lib/focus-trapping';
 import { buttonVariants } from './Button';
 
 const AlertDialog = AlertDialogPrimitive.Root;

@@ -5,7 +5,7 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 
 import cx from 'classnames';
-import { useFocusTrapping } from '../lib/focus-trapping';
+import { useFocusTrapping } from '../../lib/focus-trapping';
 
 const Dialog = DialogPrimitive.Root;
 
