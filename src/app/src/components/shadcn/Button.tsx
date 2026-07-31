@@ -61,7 +61,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 				<Comp
 					className={cx(
 						!disabled && buttonVariants({ variant, size }),
-						disabled && buttonVariants({ disabled, size }),
+						disabled &&
+							buttonVariants({ variant: "ghost", disabled, size }),
 						className,
 					)}
 					ref={ref}

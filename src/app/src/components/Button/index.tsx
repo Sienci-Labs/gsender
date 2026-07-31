@@ -67,6 +67,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
 		const buttonContent = (
 			<ShadcnButton
+				variant="ghost"
 				className={buttonStyle({
 					variant,
 					disabled,

@@ -159,6 +159,7 @@ const Probe = ({ state, actions }: ProbeProps) => {
 							<Tooltip content={`Probe using ${command.id}`} key={command.id}>
 								<ShadcnButton
 									key={command.id}
+									variant="ghost"
 									onClick={() => actions.handleProbeCommandChange(index)}
 									size="icon"
 									aria-label={`Select probing routine ${command.id}`}
