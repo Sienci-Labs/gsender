@@ -1,10 +1,12 @@
-import { Dialog, DialogContent } from "app/components/shadcn/Dialog.tsx";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { ToolTable } from "app/features/ATC/components/ToolTable.tsx";
 import Button from "app/components/Button";
-import { Table2 } from "lucide-react";
+import { Dialog, DialogContent } from "app/components/shadcn/Dialog.tsx";
+import { ToolTable } from "app/features/ATC/components/ToolTable.tsx";
 import { useToolChange } from "app/features/ATC/utils/ToolChangeContext.tsx";
-import controller from "app/lib/controller";
+import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
+import controller from "app/lib/controller.ts";
+import { RootState } from "app/store/redux";
+import { Table2 } from "lucide-react";
 
 export function ToolDisplayModal() {
 	const { connected, setShowTable, showTable, tools, disabled } =

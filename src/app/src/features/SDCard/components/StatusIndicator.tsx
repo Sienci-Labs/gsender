@@ -1,11 +1,14 @@
-import { CheckCircle, HardDrive, XCircle } from "lucide-react";
 import { ActionButtons } from "app/features/SDCard/components/ActionButtons.tsx";
-import { UploadState, useSDCard } from "app/features/SDCard/hooks/useSDCard.ts";
 import { UploadProgressBar } from "app/features/SDCard/components/UploadProgressBar.tsx";
-import cn from "classnames";
-import { useEffect, useState } from "react";
-import controller from "app/lib/controller";
+import {
+	type UploadState,
+	useSDCard,
+} from "app/features/SDCard/hooks/useSDCard.ts";
+import controller from "app/lib/controller.ts";
 import { toast } from "app/lib/toaster";
+import cn from "classnames";
+import { CheckCircle, HardDrive, XCircle } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export function StatusIndicator({ isMounted }) {
 	const { isConnected } = useSDCard();

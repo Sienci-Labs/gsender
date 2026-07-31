@@ -1,25 +1,29 @@
-import { JSX, useEffect, useState } from "react";
+import { usePostHog } from "@posthog/react";
+import type { GRBL_ACTIVE_STATES_T } from "app/definitions/general";
+import useShuttleEvents from "app/hooks/useShuttleEvents";
+import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
+import controller from "app/lib/controller";
+import useKeybinding from "app/lib/useKeybinding";
+import type { WORKFLOW_STATES_T } from "app/store/definitions";
+import reduxStore, { type RootState } from "app/store/redux";
 import cx from "classnames";
+import get from "lodash/get";
 import includes from "lodash/includes";
 import pubsub from "pubsub-js";
-import { PiPause } from "react-icons/pi";
+import { type JSX, useEffect, useState } from "react";
 import { FiOctagon } from "react-icons/fi";
 import { IoPlayOutline } from "react-icons/io5";
-import { cancelJog } from "app/features/Jogging/utils/Jogging";
-
-import useKeybinding from "app/lib/useKeybinding";
-import useShuttleEvents from "app/hooks/useShuttleEvents";
-import { GRBL_ACTIVE_STATES_T } from "app/definitions/general";
-import { WORKFLOW_STATES_T } from "app/store/definitions";
-import controller from "app/lib/controller";
+import { PiPause } from "react-icons/pi";
 import {
 	CARVING_CATEGORY,
 	GRBL,
 	GRBL_ACTIVE_STATE_CHECK,
 	GRBL_ACTIVE_STATE_HOLD,
 	GRBL_ACTIVE_STATE_IDLE,
+	GRBL_ACTIVE_STATE_JOG,
 	GRBL_ACTIVE_STATE_RUN,
-	MACHINE_CONTROL_BUTTONS,
+	GRBLHAL,
+	type MACHINE_CONTROL_BUTTONS,
 	PAUSE,
 	START,
 	STOP,
@@ -27,9 +31,6 @@ import {
 	WORKFLOW_STATE_PAUSED,
 	WORKFLOW_STATE_RUNNING,
 } from "../../constants";
-import get from "lodash/get";
-import reduxStore, { RootState } from "app/store/redux";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
 
 type MACHINE_CONTROL_BUTTONS_T =
 	(typeof MACHINE_CONTROL_BUTTONS)[keyof typeof MACHINE_CONTROL_BUTTONS];
@@ -72,6 +73,7 @@ const ControlButton: React.FC<ControlButtonProps> = ({
 	onStop,
 	validateATC,
 }) => {
+	const posthog = usePostHog();
 	const [isRunningSDFile, setIsRunningSDFile] = useState<boolean>(false);
 	// If we have a name, we a running a SD file - convert to boolean in following useEffect
 	const sdRunReported = useTypedSelector(
@@ -255,7 +257,7 @@ const ControlButton: React.FC<ControlButtonProps> = ({
 							);
 							// if shortcut is disabled (aka job isnt running) it works as a jog stop shortcut
 							if (shortcutIsDisabled()) {
-								return cancelJog(activeState, firmwareType);
+								return stopMachineMotion(activeState, firmwareType);
 							}
 							handleStop(activeState);
 						},
@@ -289,6 +291,7 @@ const ControlButton: React.FC<ControlButtonProps> = ({
 			currentActiveState === GRBL_ACTIVE_STATE_HOLD
 		) {
 			controller.command("gcode:resume");
+			posthog?.capture("job_resumed", { active_state: currentActiveState });
 			return;
 		}
 
@@ -302,16 +305,19 @@ const ControlButton: React.FC<ControlButtonProps> = ({
 				return;
 			}
 			controller.command("gcode:start");
+			posthog?.capture("job_started", { active_state: currentActiveState });
 			return;
 		}
 	};
 	const handlePause = (): void => {
 		controller.command("gcode:pause");
+		posthog?.capture("job_paused");
 	};
 	const handleStop = (reduxActiveState?: GRBL_ACTIVE_STATES_T): void => {
 		const currentActiveState = reduxActiveState || activeState;
 		onStop();
 		controller.command("gcode:stop", { force: true });
+		posthog?.capture("job_stopped", { active_state: currentActiveState });
 		if (currentActiveState === GRBL_ACTIVE_STATE_CHECK) {
 			controller.command("gcode", "$C");
 		}

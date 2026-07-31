@@ -1,11 +1,14 @@
 import { StepActionButton } from "app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx";
-import { useState } from "react";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-import { RootState } from "app/store/redux";
-import controller from "app/lib/controller";
+import {
+	ATCI_SUPPORTED_VERSION,
+	SPINDLE_395_V7_VERSION,
+} from "app/features/ATC/utils/ATCiConstants.ts";
+import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
+import controller from "app/lib/controller.ts";
 import { firmwarePastVersion } from "app/lib/firmwareSemver.ts";
-import { ATCI_SUPPORTED_VERSION } from "app/features/ATC/utils/ATCiConstants.ts";
 import store from "app/store";
+import type { RootState } from "app/store/redux";
+import { useState } from "react";
 
 export const sienciHalGcode = [
 	"$30=24000",
@@ -19,19 +22,22 @@ export const sienciHalGcode = [
 	"$$",
 ];
 
-export const grblCoreGcode = [
-	"$30=24000",
-	"$31=7500",
-	"$340=5",
-	"$374=3",
-	"$375=50",
-	"$394=11",
-	"$395=2",
-	"$539=11",
-	"$681=0",
-	"$$",
-	"$REBOOT",
-];
+export function getGrblCoreGcode(): string[] {
+	const value395 = firmwarePastVersion(SPINDLE_395_V7_VERSION) ? "7" : "2";
+	return [
+		"$30=24000",
+		"$31=7500",
+		"$340=5",
+		"$374=3",
+		"$375=50",
+		"$394=11",
+		`$395=${value395}`,
+		"$539=11",
+		"$681=0",
+		"$$",
+		"$REBOOT",
+	];
+}
 
 export function SpindleConfig({ onComplete, onUncomplete }) {
 	const [error, setError] = useState<string | null>(null);
@@ -49,7 +55,7 @@ export function SpindleConfig({ onComplete, onUncomplete }) {
 	}
 
 	function setupGrblCoreSpindle() {
-		controller.command("gcode", grblCoreGcode);
+		controller.command("gcode", getGrblCoreGcode());
 	}
 
 	async function setupSpindleAndReboot() {

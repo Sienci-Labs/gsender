@@ -1,35 +1,36 @@
-import React, { MouseEventHandler, useEffect, useMemo } from "react";
-import { Menu } from "./components/Menu";
-import { Section } from "./components/Section";
-import { Search } from "app/features/Config/components/Search.tsx";
-import { ApplicationPreferences } from "app/features/Config/components/ApplicationPreferences.tsx";
-import { useSettings } from "app/features/Config/utils/SettingsContext";
-import { ProfileBar } from "app/features/Config/components/ProfileBar.tsx";
-import { useInView, InView } from "react-intersection-observer";
-import { EEPROMNotConnectedWarning } from "app/features/Config/components/EEPROMNotConnectedWarning.tsx";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-import { RootState } from "app/store/redux";
-import { FilterDefaultToggle } from "app/features/Config/components/FilterDefaultToggle.tsx";
-import pubsub from "pubsub-js";
-import store from "app/store";
-import { useDispatch } from "react-redux";
-import { updateAccessibility } from "app/store/redux/slices/preferences.slice";
 import {
 	Tabs,
 	TabsContent,
 	TabsList,
 	TabsTrigger,
 } from "app/components/shadcn/Tabs";
-import { gSenderSetting, SettingsMenuSection } from "./assets/SettingsMenu";
-import { convertEIDToNumber } from "app/lib/numeral";
-import controller from "app/lib/controller";
-import { GRBLHAL, WORKFLOW_STATE_IDLE } from "app/constants";
-import { resolveGrblCoreDefaults } from "app/features/Config/utils/grblCoreMigration.ts";
+import { WORKFLOW_STATE_IDLE } from "app/constants";
+import { ApplicationPreferences } from "app/features/Config/components/ApplicationPreferences.tsx";
+import { EEPROMNotConnectedWarning } from "app/features/Config/components/EEPROMNotConnectedWarning.tsx";
+import { FilterDefaultToggle } from "app/features/Config/components/FilterDefaultToggle.tsx";
+import { ProfileBar } from "app/features/Config/components/ProfileBar.tsx";
+import { Search } from "app/features/Config/components/Search.tsx";
+import { useSettings } from "app/features/Config/utils/SettingsContext";
+import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
+import controller from "app/lib/controller.ts";
+import store from "app/store";
+import type { RootState } from "app/store/redux";
+import { updateAccessibility } from "app/store/redux/slices/preferences.slice";
+import pubsub from "pubsub-js";
+import React, { useEffect, useMemo } from "react";
+import { InView, useInView } from "react-intersection-observer";
+import { useDispatch } from "react-redux";
+import type {
+	gSenderSetting,
+	SettingsMenuSection,
+} from "./assets/SettingsMenu";
+import { Menu } from "./components/Menu";
+import { Section } from "./components/Section";
 
 export function Config() {
 	const dispatch = useDispatch();
-	const [activeSection, setActiveSection] = React.useState<number>(0);
-	const [showFlashDialog, setShowFlashDialog] = React.useState(false);
+	// const [activeSection, setActiveSection] = React.useState<number>(0);
+	// const [showFlashDialog, setShowFlashDialog] = React.useState(false);
 	const { ref: inViewRef } = useInView({
 		threshold: 0.2,
 	});
@@ -54,11 +55,18 @@ export function Config() {
 		(state: RootState) => state.controller.workflow.state,
 	);
 
-	const [visibleSection, setVisibleSection] = React.useState("h-section-0");
+	const [visibleSection, setVisibleSection] = React.useState<string>(
+		`h-section-${store.get("workspace.lastViewedConfigLocation")}`,
+	);
+
 	const [activeTab, setActiveTab] = React.useState("config");
 
 	function setInView(inView: any, entry: any) {
 		if (inView) {
+			store.set(
+				"workspace.lastViewedConfigLocation",
+				entry.target.getAttribute("id").split("-")[2],
+			);
 			setVisibleSection(entry.target.getAttribute("id"));
 		}
 	}
@@ -102,12 +110,17 @@ export function Config() {
 	);
 
 	function navigateToSection(
-		_e: MouseEventHandler<HTMLButtonElement>,
+		_e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
 		index: number,
 	) {
-		document
-			.getElementById(`section-${index}`)
-			.scrollIntoView({ behavior: "instant" });
+		const sectionElement = document.getElementById(`section-${index}`);
+
+		if (!sectionElement) {
+			return;
+		}
+
+		sectionElement.scrollIntoView({ behavior: "instant" });
+
 		setTimeout(() => {
 			setVisibleSection(`h-section-${index}`);
 		}, 50);

@@ -1,40 +1,40 @@
-import { useState } from "react";
-import Select from "react-select";
-import { LuRefreshCw } from "react-icons/lu";
-
-import controller from "app/lib/controller";
 import { Button } from "app/components/Button";
 import { ControlledInput } from "app/components/ControlledInput";
 import {
 	AlertDialog,
 	AlertDialogAction,
 	AlertDialogCancel,
-	AlertDialogFooter,
-	AlertDialogTitle,
-	AlertDialogHeader,
 	AlertDialogContent,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
 	AlertDialogTrigger,
 } from "app/components/shadcn/AlertDialog";
-
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "app/components/shadcn/Popover";
+import { GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG } from "app/constants";
+import type { EEPROM } from "app/definitions/firmware";
+import { jogAxis } from "app/features/Jogging/utils/Jogging";
+import { useTypedSelector } from "app/hooks/useTypedSelector";
+import { useWorkspaceState } from "app/hooks/useWorkspaceState";
+import controller from "app/lib/controller";
+import { toFixedIfNecessary } from "app/lib/rounding";
+import { toast } from "app/lib/toaster";
+import { useState } from "react";
+import { FaClipboard, FaClipboardCheck, FaClipboardList } from "react-icons/fa";
+import { LuMove, LuRefreshCw } from "react-icons/lu";
+import Select from "react-select";
+import { Jogging } from "../../Jogging";
 import xAxisCalibrationImage1 from "../assets/X_axis-calibration_1.png";
 import xAxisCalibrationImage2 from "../assets/X_axis-calibration_2.png";
-
 import yAxisCalibrationImage1 from "../assets/Y_axis-calibration_1.png";
 import yAxisCalibrationImage2 from "../assets/Y_axis-calibration_2.png";
-
 import zAxisCalibrationImage1 from "../assets/Z_axis-calibration_1.png";
 import zAxisCalibrationImage2 from "../assets/Z_axis-calibration_2.png";
-
-import { Jogging } from "app/features/Jogging";
-import { getEEPROMSettingKey, calculateNewStepsPerMM } from "../utils";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-import { EEPROM } from "app/definitions/firmware";
-import { jogAxis } from "app/features/Jogging/utils/Jogging";
-import { toast } from "app/lib/toaster";
-import { FaClipboard, FaClipboardCheck, FaClipboardList } from "react-icons/fa";
-import { GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_JOG } from "app/constants";
-import { useWorkspaceState } from "app/hooks/useWorkspaceState";
-import { toFixedIfNecessary } from "app/lib/rounding";
+import { calculateNewStepsPerMM, getEEPROMSettingKey } from "../utils";
 import { getThemeCssColor } from "app/lib/getThemeCssColor";
 
 // Neutral react-select colors come from the Tailwind-backed CSS variables
@@ -318,6 +318,19 @@ const Steps = () => {
 							icon={<LuRefreshCw className="w-4 h-4" />}
 							text="Restart Wizard"
 						/>
+						<Popover>
+							<PopoverTrigger asChild>
+								<Button
+									variant="outline"
+									icon={<LuMove className="w-4 h-4" />}
+									text="Jog Controls"
+								/>
+							</PopoverTrigger>
+
+							<PopoverContent className="w-auto">
+								<Jogging />
+							</PopoverContent>
+						</Popover>
 					</div>
 				</div>
 			);
@@ -339,6 +352,19 @@ const Steps = () => {
 						icon={<LuRefreshCw className="w-4 h-4" />}
 						text="Restart Wizard"
 					/>
+					<Popover>
+						<PopoverTrigger asChild>
+							<Button
+								variant="outline"
+								icon={<LuMove className="w-4 h-4" />}
+								text="Jog Controls"
+							/>
+						</PopoverTrigger>
+
+						<PopoverContent className="w-auto">
+							<Jogging />
+						</PopoverContent>
+					</Popover>
 				</div>
 			</div>
 		);
@@ -448,7 +474,7 @@ const Steps = () => {
 													setMoveDistance(Number(e.target.value))
 												}
 												disabled={currentStep !== 1}
-												className="w-28"
+												wrapperClassName="w-28"
 												suffix={units ?? "mm"}
 											/>
 										</div>
@@ -496,7 +522,7 @@ const Steps = () => {
 													setMeasuredDistance(Number(e.target.value))
 												}
 												disabled={currentStep !== 2}
-												className="w-28"
+												wrapperClassName="w-28"
 												suffix={units ?? "mm"}
 											/>
 										</div>
@@ -526,9 +552,23 @@ const Steps = () => {
 					icon={<LuRefreshCw className="w-4 h-4" />}
 					text="Restart Wizard"
 				/>
+				<Popover>
+					<PopoverTrigger asChild>
+						<Button
+							variant="outline"
+							icon={<LuMove className="w-4 h-4" />}
+							text="Jog Controls"
+						/>
+					</PopoverTrigger>
+
+					<PopoverContent className="w-auto">
+						<Jogging />
+					</PopoverContent>
+				</Popover>
 			</div>
 		</div>
 	);
 };
 
 export default Steps;
+export { calculateNewStepsPerMM } from "../utils";

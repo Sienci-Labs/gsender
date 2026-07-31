@@ -21,11 +21,8 @@
  *
  */
 
-import React, { useCallback, useRef, useEffect } from "react";
-import cx from "classnames";
-
-import { Button as ShadcnButton } from "app/components/shadcn/Button";
 import { Button } from "app/components/Button";
+import { Button as ShadcnButton } from "app/components/shadcn/Button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -42,6 +39,8 @@ import useKeybinding from "app/lib/useKeybinding";
 import useShuttleEvents from "app/hooks/useShuttleEvents";
 import Tooltip from "app/components/Tooltip";
 import { TOUCHPLATE_TYPES } from "app/lib/constants";
+import { useCallback, useEffect, useRef } from "react";
+import cx from "classnames";
 
 type ProbeProps = {
 	state: State;
