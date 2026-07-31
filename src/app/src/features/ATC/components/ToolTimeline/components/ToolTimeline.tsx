@@ -1,19 +1,19 @@
-import { Button } from "app/components/Button";
-import { WORKFLOW_STATE_IDLE } from "app/constants";
-import type { ToolInstance } from "app/features/ATC/components/ToolTable.tsx";
-import { ToolRemapDialog } from "app/features/ATC/components/ToolTimeline/components/ToolRemapDialog.tsx";
-import type { ToolProbeState } from "app/features/ATC/types.ts";
-import { mapToolNicknamesAndStatus } from "app/features/ATC/utils/ATCFunctions.ts";
-import { updateToolchangeContext } from "app/features/Helper/Wizard.tsx";
-import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
-import type { RootState } from "app/store/redux";
-import cn from "classnames";
-import get from "lodash/get";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import pubsub from "pubsub-js";
-import { useEffect, useRef, useState } from "react";
+import cn from "classnames";
+import { Button } from "app/components/Button";
 import { ToolTimelineItem } from "./ToolTimelineItem";
-import type { ToolMapping, ToolTimelineProps } from "./types";
+import { ToolMapping, ToolTimelineProps } from "./types";
+import { useEffect, useRef, useState } from "react";
+import { ToolRemapDialog } from "app/features/ATC/components/ToolTimeline/components/ToolRemapDialog.tsx";
+import { useTypedSelector } from "app/hooks/useTypedSelector";
+import { RootState } from "app/store/redux";
+import { mapToolNicknamesAndStatus } from "app/features/ATC/utils/ATCFunctions.ts";
+import { ToolInstance } from "app/features/ATC/components/ToolTable.tsx";
+import { updateToolchangeContext } from "app/features/Helper/Wizard.tsx";
+import pubsub from "pubsub-js";
+import get from "lodash/get";
+import { ToolProbeState } from "app/features/ATC/types.ts";
+import { WORKFLOW_STATE_IDLE } from "app/constants";
 
 export function ToolTimeline({
 	tools,
@@ -53,7 +53,6 @@ export function ToolTimeline({
 		reportedRackSize > 0
 			? reportedRackSize
 			: Object.values(toolTableData || {}).length;
-	const hasToolTable = Object.values(toolTableData || {}).length > 0;
 	useEffect(() => {
 		setToolTable(mapToolNicknamesAndStatus(toolTableData, rackSize));
 	}, [toolTableData, rackSize]);
@@ -116,12 +115,7 @@ export function ToolTimeline({
 			})}
 		>
 			<div className="shadow-xl p-0.5">
-				<div
-					className={cn("flex items-center justify-between gap-3", {
-						"cursor-pointer touch-manipulation": isCollapsed,
-					})}
-					onClick={isCollapsed ? onToggle : undefined}
-				>
+				<div className="flex items-center justify-between gap-3">
 					<div className="flex items-center gap-2 pl-1">
 						{isCollapsed && activeTool && (
 							<>
@@ -129,9 +123,8 @@ export function ToolTimeline({
 									className="h-6 w-6 rounded-md border-2 border-white shadow-sm"
 									style={{ backgroundColor: activeTool.color }}
 								/>
-								<span className="text-sm font-semibold text-gray-900 dark:text-white">
-									T
-									{mappings.get(activeTool.toolNumber) ?? activeTool.toolNumber}
+								<span className="text-sm font-semibold text-gray-900 dark:text-content-primary">
+									T{activeTool.toolNumber}
 								</span>
 							</>
 						)}
@@ -139,10 +132,7 @@ export function ToolTimeline({
 					<Button
 						variant="ghost"
 						size="icon"
-						onClick={(e) => {
-							e.stopPropagation();
-							onToggle?.();
-						}}
+						onClick={onToggle}
 						className="h-7 w-7 rounded-lg hover:bg-white/50 text-gray-900 dark:hover:bg-gray-800/50"
 					>
 						{isCollapsed ? (
@@ -200,7 +190,6 @@ export function ToolTimeline({
 											remapValue={remapValue}
 											isManual={isManual}
 											probeState={probeState}
-											showProbeStatus={hasToolTable && atcAvailable}
 											canRemap={allowManualBadge}
 											remapDisabled={remapDisabled}
 										/>

@@ -1,257 +1,48 @@
-/** biome-ignore-all lint/a11y/noStaticElementInteractions: <> */
-/** biome-ignore-all lint/a11y/useKeyWithClickEvents: <> */
-/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import {
+	Copy,
+	Save,
+	X,
+	Check,
+	RotateCcw,
+	Trash2,
+	ArrowUp,
+	Search,
+	ChevronUp,
+	ChevronDown,
+	BoxIcon,
+	CopyCheck,
+} from "lucide-react";
+
 import { Button } from "app/components/Button";
-import { Input } from "app/components/shadcn/Input";
+import { toast } from "app/lib/toaster";
+import { useTypedSelector } from "app/hooks/useTypedSelector";
+import { uploadGcodeFileToServer } from "app/lib/fileupload";
+import controller from "app/lib/controller";
 import {
 	VISUALIZER_PRIMARY,
-	WORKFLOW_STATE_PAUSED,
 	WORKFLOW_STATE_RUNNING,
+	WORKFLOW_STATE_PAUSED,
 } from "app/constants";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-import { useWorkspaceState } from "app/hooks/useWorkspaceState";
-import controller from "app/lib/controller";
-import { uploadGcodeFileToServer } from "app/lib/fileupload";
-import { toast } from "app/lib/toaster";
-import { cn } from "app/lib/utils";
-import type { RootState } from "app/store/redux";
 import { store as reduxStore } from "app/store/redux";
 import { updateFileContent } from "app/store/redux/slices/fileInfo.slice";
-import {
-	ArrowUp,
-	Check,
-	ChevronDown,
-	ChevronLeft,
-	ChevronUp,
-	Copy,
-	CopyCheck,
-	RotateCcw,
-	Save,
-	Search,
-	Trash2,
-	X,
-} from "lucide-react";
-import React, {
-	useCallback,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from "react";
-import { PiMouseScroll } from "react-icons/pi";
-import { VscDebugStart } from "react-icons/vsc";
+import { RootState } from "app/store/redux";
+import { cn } from "app/lib/utils";
+import { useWorkspaceState } from "app/hooks/useWorkspaceState";
+
 import SyntaxHighlighter from "react-syntax-highlighter";
 import {
-	a11yDark,
 	a11yLight,
+	a11yDark,
 } from "react-syntax-highlighter/dist/esm/styles/hljs";
-
-type LineStatus = "processed" | "current" | "upcoming" | "none";
-
-interface GcodeEditorLineProps {
-	line: string;
-	index: number;
-	isSelected: boolean;
-	isMatch: boolean;
-	isCurrentMatch: boolean;
-	lineStatus: LineStatus;
-	isEditing: boolean;
-	isJobRunning: boolean;
-	isScrolling: boolean;
-	enableDarkMode: boolean;
-	lineInputsRef: React.MutableRefObject<Map<number, HTMLInputElement>>;
-	handleCheckboxClick: (index: number, e: React.MouseEvent) => void;
-	handleLineChange: (index: number, value: string) => void;
-	setEditingLineIndex: React.Dispatch<React.SetStateAction<number | null>>;
-}
-
-const GcodeEditorLine = React.memo(
-	({
-		line,
-		index,
-		isSelected,
-		isMatch,
-		isCurrentMatch,
-		lineStatus,
-		isEditing,
-		isJobRunning,
-		isScrolling,
-		enableDarkMode,
-		lineInputsRef,
-		handleCheckboxClick,
-		handleLineChange,
-		setEditingLineIndex,
-	}: GcodeEditorLineProps) => {
-		const getLineStatusClass = () => {
-			if (!isJobRunning) return "";
-			switch (lineStatus) {
-				case "processed":
-					return "bg-green-50 dark:bg-green-900/20 border-l-2 border-green-500";
-				case "current":
-					return "bg-yellow-100 dark:bg-yellow-900/30 border-l-4 border-yellow-500 animate-pulse";
-				case "upcoming":
-					return "bg-blue-50 dark:bg-blue-900/10 border-l-2 border-blue-300";
-				default:
-					return "";
-			}
-		};
-
-		const getLineClassName = () => {
-			if (isCurrentMatch)
-				return "bg-yellow-200 dark:bg-yellow-900/40 ring-2 ring-yellow-500";
-			if (isMatch) return "bg-yellow-50 dark:bg-yellow-900/20";
-			if (isSelected) return "bg-blue-100 dark:bg-blue-900/30";
-			if (lineStatus !== "none") return getLineStatusClass();
-			if (index % 2 === 0) return "bg-gray-200 dark:bg-dark-lighter";
-			return "hover:bg-gray-100 dark:hover:bg-dark-lighter/50";
-		};
-
-		const getInnerLineClassName = () => {
-			if (isSelected) return "text-blue-700 dark:text-blue-300 font-medium";
-			if (lineStatus === "current")
-				return "text-yellow-900 dark:text-yellow-100 font-medium";
-			if (lineStatus === "processed")
-				return "text-green-700 dark:text-green-300";
-			return "text-muted-foreground";
-		};
-
-		const getInputClassName = () => {
-			if (isSelected) return "text-blue-900 dark:text-blue-100";
-			if (lineStatus === "current")
-				return "text-yellow-900 dark:text-yellow-100 font-medium";
-			if (lineStatus === "processed")
-				return "text-green-900 dark:text-green-100";
-			return "dark:text-white";
-		};
-
-		return (
-			<div
-				style={{
-					position: "absolute",
-					top: index * LINE_HEIGHT,
-					left: 0,
-					right: 0,
-					height: LINE_HEIGHT,
-				}}
-				className={cn("flex items-center py-1 px-2 group", getLineClassName(), {
-					"cursor-not-allowed": isJobRunning,
-				})}
-			>
-				<div
-					className={`flex items-center justify-center w-6 h-6 mr-3 rounded transition-colors flex-shrink-0 ${
-						isJobRunning ? "cursor-not-allowed opacity-50" : "cursor-pointer"
-					}`}
-					onClick={(e) => handleCheckboxClick(index, e)}
-					title={
-						isJobRunning
-							? "Editing disabled while job is running"
-							: "Click to toggle selection"
-					}
-					onMouseEnter={(e) => {
-						if (!isSelected)
-							e.currentTarget.classList.add("bg-gray-300", "dark:bg-gray-600");
-					}}
-					onMouseLeave={(e) => {
-						e.currentTarget.classList.remove("bg-gray-300", "dark:bg-gray-600");
-					}}
-				>
-					{isSelected ? (
-						<div className="w-5 h-5 bg-blue-500 rounded flex items-center justify-center">
-							<Check className="w-3 h-3 text-white" />
-						</div>
-					) : (
-						<div className="w-5 h-5 border-2 border-gray-400 dark:border-gray-500 rounded hover:border-blue-500" />
-					)}
-				</div>
-				<span
-					className={cn(
-						"dark:text-white mr-4 min-w-10 text-right select-none",
-						getInnerLineClassName(),
-					)}
-				>
-					{index + 1}
-					{lineStatus === "current" && <span className="ml-1 text-xs">▶</span>}
-				</span>
-				<div className="flex-1 min-w-0">
-					{isEditing ? (
-						<input
-							ref={(el) => {
-								if (el) {
-									lineInputsRef.current.set(index, el);
-									el.focus();
-								} else {
-									lineInputsRef.current.delete(index);
-								}
-							}}
-							type="text"
-							value={line}
-							onChange={(e) => handleLineChange(index, e.target.value)}
-							onBlur={() => setEditingLineIndex(null)}
-							onKeyDown={(e) => {
-								if (e.key === "Enter" || e.key === "Escape")
-									setEditingLineIndex(null);
-							}}
-							className={cn(
-								"w-full bg-transparent border-none outline-none focus:outline-none focus:ring-2 focus:ring-blue-400 rounded px-1",
-								getInputClassName(),
-							)}
-						/>
-					) : (
-						<div
-							onClick={(e) => {
-								if (!isJobRunning) {
-									e.stopPropagation();
-									setEditingLineIndex(index);
-								}
-							}}
-							onDoubleClick={(e) => {
-								if (!isJobRunning) {
-									e.stopPropagation();
-									setEditingLineIndex(index);
-								}
-							}}
-							className={cn("cursor-text px-1", {
-								"cursor-not-allowed": isJobRunning,
-							})}
-						>
-							{isScrolling || isJobRunning ? (
-								<span className={cn("truncate", getInputClassName())}>
-									{line || " "}
-								</span>
-							) : (
-								<SyntaxHighlighter
-									language="gcode"
-									style={enableDarkMode ? a11yDark : a11yLight}
-									customStyle={SYNTAX_CUSTOM_STYLE}
-									PreTag="span"
-									CodeTag="span"
-								>
-									{line || " "}
-								</SyntaxHighlighter>
-							)}
-						</div>
-					)}
-				</div>
-			</div>
-		);
-	},
-);
+import { Input } from "app/components/shadcn/Input";
 
 type GcodeEditorProps = {
 	onClose: () => void;
 };
 
 const LINE_HEIGHT = 32;
-const OVERSCAN = 20;
-const SMOOTH_SCROLL_THRESHOLD = 100;
-
-const SYNTAX_CUSTOM_STYLE = {
-	background: "transparent",
-	padding: 0,
-	margin: 0,
-	fontSize: "inherit",
-	lineHeight: "inherit",
-} as const;
+const OVERSCAN = 10;
 
 const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 	const { content, name } = useTypedSelector((state) => state.file);
@@ -274,17 +65,10 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 	const [currentMatchIndex, setCurrentMatchIndex] = useState<number>(-1);
 	const [matchIndices, setMatchIndices] = useState<number[]>([]);
 	const [isSearchOpen, setIsSearchOpen] = useState(false);
-	const [jumpQuery, setJumpQuery] = useState<number>(null);
-	const [isJumpOpen, setIsJumpOpen] = useState(false);
 	const [editingLineIndex, setEditingLineIndex] = useState<number | null>(null);
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 	const lineInputsRef = useRef<Map<number, HTMLInputElement>>(new Map());
 	const searchInputRef = useRef<HTMLInputElement>(null);
-	const jumpInputRef = useRef<HTMLInputElement>(null);
-	const scrollTopRef = useRef(0);
-	const rafRef = useRef<number | null>(null);
-	const scrollEndTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-	const [isScrolling, setIsScrolling] = useState(false);
 	const { enableDarkMode } = useWorkspaceState();
 	const isJobRunning =
 		workflowState === WORKFLOW_STATE_RUNNING ||
@@ -346,11 +130,9 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 			if (lineTop < scrollTop || lineTop + LINE_HEIGHT > scrollBottom) {
 				const targetScroll =
 					lineTop - container.clientHeight / 2 + LINE_HEIGHT / 2;
-				const currentLine = Math.floor(container.scrollTop / LINE_HEIGHT);
-				const distance = Math.abs(lineIndex - currentLine);
 				container.scrollTo({
 					top: Math.max(0, targetScroll),
-					behavior: distance > SMOOTH_SCROLL_THRESHOLD ? "auto" : "smooth",
+					behavior: "smooth",
 				});
 			}
 		}
@@ -366,16 +148,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 	}, [scrollTop, containerHeight, gcodeLines.length]);
 
 	const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
-		scrollTopRef.current = e.currentTarget.scrollTop;
-		if (rafRef.current === null) {
-			rafRef.current = requestAnimationFrame(() => {
-				setScrollTop(scrollTopRef.current);
-				rafRef.current = null;
-			});
-		}
-		setIsScrolling(true);
-		if (scrollEndTimerRef.current) clearTimeout(scrollEndTimerRef.current);
-		scrollEndTimerRef.current = setTimeout(() => setIsScrolling(false), 150);
+		setScrollTop(e.currentTarget.scrollTop);
 	}, []);
 
 	useEffect(() => {
@@ -409,30 +182,23 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 			if (lineTop < scrollTop || lineBottom > scrollBottom) {
 				const targetScroll =
 					lineTop - container.clientHeight / 2 + LINE_HEIGHT / 2;
-				const currentLine = Math.floor(container.scrollTop / LINE_HEIGHT);
-				const distance = Math.abs(currentLineRunning - currentLine);
 				container.scrollTo({
 					top: Math.max(0, targetScroll),
-					behavior: distance > SMOOTH_SCROLL_THRESHOLD ? "auto" : "smooth",
+					behavior: "smooth",
 				});
 			}
 		}
 	}, [currentLineRunning, isJobRunning]);
 
-	const handleLineChange = useCallback(
-		(index: number, value: string) => {
-			if (isJobRunning) {
-				return;
-			}
-			setGcodeLines((prev) => {
-				const newLines = [...prev];
-				newLines[index] = value;
-				return newLines;
-			});
-			setHasChanges(true);
-		},
-		[isJobRunning],
-	);
+	const handleLineChange = (index: number, value: string) => {
+		if (isJobRunning) {
+			return;
+		}
+		const newLines = [...gcodeLines];
+		newLines[index] = value;
+		setGcodeLines(newLines);
+		setHasChanges(true);
+	};
 
 	const handleCheckboxClick = useCallback(
 		(index: number, e: React.MouseEvent) => {
@@ -498,7 +264,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
 			const container = scrollContainerRef.current;
-			if (!container?.contains(document.activeElement)) {
+			if (!container || !container.contains(document.activeElement)) {
 				return;
 			}
 
@@ -558,24 +324,6 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 		currentMatchIndex,
 	]);
 
-	const handleJumpToLine = () => {
-		const lineTop = Number(jumpQuery) * LINE_HEIGHT;
-		const container = scrollContainerRef.current;
-		const scrollTop = container.scrollTop;
-		const scrollBottom = scrollTop + container.clientHeight;
-
-		if (lineTop < scrollTop || lineTop + LINE_HEIGHT > scrollBottom) {
-			const targetScroll =
-				lineTop - container.clientHeight / 2 + LINE_HEIGHT / 2;
-			const currentLine = Math.floor(container.scrollTop / LINE_HEIGHT);
-			const distance = Math.abs(Number(jumpQuery) - currentLine);
-			container.scrollTo({
-				top: Math.max(0, targetScroll),
-				behavior: distance > SMOOTH_SCROLL_THRESHOLD ? "auto" : "smooth",
-			});
-		}
-	};
-
 	const handleSearchNext = () => {
 		if (matchIndices.length === 0) return;
 		const nextIndex =
@@ -610,7 +358,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 					position: "bottom-right",
 				},
 			);
-		} catch (_err) {
+		} catch (err) {
 			toast.error("Could not copy G-code to clipboard", {
 				position: "bottom-right",
 			});
@@ -664,7 +412,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 			toast.success("G-code saved successfully", {
 				position: "bottom-right",
 			});
-		} catch (_err) {
+		} catch (err) {
 			toast.error("Failed to save G-code", {
 				position: "bottom-right",
 			});
@@ -688,10 +436,10 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 	}
 
 	return (
-		<div className="z-[10000] w-full h-full flex flex-col bg-white dark:bg-dark shadow-lg rounded-md overflow-hidden dark:border dark:border-dark-lighter">
-			<div className="flex justify-between items-center p-3 border-b border-gray-300 dark:border-dark-lighter gap-3">
+		<div className="w-full h-full flex flex-col bg-white dark:bg-surface-raised shadow-lg rounded-md overflow-hidden dark:border dark:border-outline">
+			<div className="flex justify-between items-center p-3 border-b border-gray-300 dark:border-outline gap-3">
 				<div className="flex items-center gap-3 min-w-0 flex-1">
-					<h3 className="text-lg font-semibold dark:text-white whitespace-nowrap">
+					<h3 className="text-lg font-semibold dark:text-content-primary whitespace-nowrap">
 						G-code Editor
 					</h3>
 					{isJobRunning && (
@@ -715,7 +463,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 						</span>
 					)}
 					{gcodeLines.length > 0 && (
-						<span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+						<span className="text-xs text-gray-500 dark:text-content-muted whitespace-nowrap">
 							{gcodeLines.length.toLocaleString()} lines
 						</span>
 					)}
@@ -735,17 +483,16 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 
 			<div
 				ref={scrollContainerRef}
-				className="relative w-full flex-1 overflow-auto line-container bg-gray-100 dark:bg-[#18181f]"
+				className="relative w-full flex-1 overflow-auto line-container"
 				onScroll={handleScroll}
 				onClick={handleContainerClick}
-				// biome-ignore lint/a11y/noNoninteractiveTabindex: <>
 				tabIndex={0}
 				style={{
 					scrollbarColor: "grey transparent",
 				}}
 			>
 				<div
-					className={`fixed bottom-20 right-8 z-[10000] transition-opacity ${scrollTop > 500 ? "pointer-events-auto" : "pointer-events-none"}`}
+					className={`fixed bottom-20 right-8 z-10 transition-opacity ${scrollTop > 500 ? "pointer-events-auto" : "pointer-events-none"}`}
 					style={{
 						opacity: scrollTop > 500 ? 1 : 0,
 						transform: scrollTop > 500 ? "translateY(0)" : "translateY(1rem)",
@@ -757,13 +504,9 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 						variant="outline"
 						size="icon"
 						onClick={() => {
-							const currentLine = Math.floor(
-								(scrollContainerRef.current?.scrollTop ?? 0) / LINE_HEIGHT,
-							);
 							scrollContainerRef.current?.scrollTo({
 								top: 0,
-								behavior:
-									currentLine > SMOOTH_SCROLL_THRESHOLD ? "auto" : "smooth",
+								behavior: "smooth",
 							});
 						}}
 						disabled={isJobRunning}
@@ -775,7 +518,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 				</div>
 
 				{isSearchOpen && (
-					<div className="fixed top-20 right-6 z-[10000] flex items-center gap-2 bg-gray-100 dark:bg-dark border border-gray-300 dark:border-dark-lighter p-3 rounded">
+					<div className="fixed top-20 right-6 z-10 flex items-center gap-2 bg-gray-100 dark:bg-surface-raised border border-gray-300 dark:border-outline p-3 rounded">
 						<Input
 							name="search-gcode-lines"
 							sizing="sm"
@@ -793,7 +536,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 								}
 							}}
 						/>
-						<span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+						<span className="text-xs text-gray-500 dark:text-content-muted whitespace-nowrap">
 							{matchIndices.length > 0
 								? `${currentMatchIndex + 1}/${matchIndices.length}`
 								: "0/0"}
@@ -832,55 +575,6 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 						/>
 					</div>
 				)}
-				{isJumpOpen && (
-					<div className="fixed top-20 right-6 z-[10000] flex items-center gap-2 bg-gray-100 dark:bg-dark border border-gray-300 dark:border-dark-lighter p-3 rounded">
-						<span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
-							Jump to line:
-						</span>
-						<Input
-							name="jump-gcode-lines"
-							sizing="sm"
-							type="number"
-							value={jumpQuery}
-							ref={jumpInputRef}
-							onChange={(e) => setJumpQuery(e.target.value)}
-							onKeyDown={(e) => {
-								if (e.key === "Enter") {
-									e.preventDefault();
-									handleJumpToLine();
-								}
-							}}
-						/>
-						<span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
-							{`${Math.floor(
-								(scrollContainerRef.current?.scrollTop ?? 0) / LINE_HEIGHT +
-									scrollContainerRef.current?.clientHeight / 2 / LINE_HEIGHT,
-							)}/${gcodeLines.length}`}
-						</span>
-						<Button
-							size="icon"
-							onClick={handleJumpToLine}
-							disabled={jumpQuery === null}
-							className="h-6 w-6"
-							icon={<VscDebugStart className="h-3 w-3" />}
-							tooltip={{
-								content: "Jump To Line",
-							}}
-						/>
-						<Button
-							size="icon"
-							onClick={() => {
-								setJumpQuery(null);
-								setIsJumpOpen(false);
-							}}
-							className="h-6 w-6"
-							icon={<X className="h-3 w-3" />}
-							tooltip={{
-								content: "Close jump to line",
-							}}
-						/>
-					</div>
-				)}
 				<div
 					style={{ height: totalHeight, position: "relative" }}
 					className="font-mono text-sm flex-1"
@@ -896,7 +590,9 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 								currentMatchIndex >= 0 &&
 								matchIndices[currentMatchIndex] === index;
 
-							let lineStatus: LineStatus = "none";
+							// Determine line status for job visualization
+							let lineStatus: "processed" | "current" | "upcoming" | "none" =
+								"none";
 							if (isJobRunning && currentLineRunning >= 0) {
 								if (index < currentLineRunning) {
 									lineStatus = "processed";
@@ -910,44 +606,211 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 								}
 							}
 
+							const getLineStatusClass = () => {
+								if (!isJobRunning) return "";
+								switch (lineStatus) {
+									case "processed":
+										return "bg-green-50 dark:bg-green-900/20 border-l-2 border-green-500";
+									case "current":
+										return "bg-yellow-100 dark:bg-yellow-900/30 border-l-4 border-yellow-500 animate-pulse";
+									case "upcoming":
+										return "bg-blue-50 dark:bg-blue-900/10 border-l-2 border-blue-300";
+									default:
+										return "";
+								}
+							};
+
+							const getLineClassName = () => {
+								if (isCurrentMatch) {
+									return "bg-yellow-200 dark:bg-yellow-900/40 ring-2 ring-yellow-500";
+								}
+								if (isMatch) {
+									return "bg-yellow-50 dark:bg-yellow-900/20";
+								}
+								if (isSelected) {
+									return "bg-blue-100 dark:bg-blue-900/30";
+								}
+
+								if (lineStatus !== "none") {
+									return getLineStatusClass();
+								}
+
+								if (index % 2 === 0) {
+									return "bg-gray-200 dark:bg-surface-elevated";
+								}
+
+								return "hover:bg-gray-100 dark:hover:bg-surface-hover";
+							};
+
+							const getInnerLineClassName = () => {
+								if (isSelected) {
+									return "text-blue-700 dark:text-blue-300 font-medium";
+								}
+
+								if (lineStatus === "current") {
+									return "text-yellow-900 dark:text-yellow-100 font-medium";
+								}
+
+								if (lineStatus === "processed") {
+									return "text-green-700 dark:text-green-300";
+								}
+
+								return "text-muted-foreground";
+							};
+
+							const getInputClassName = () => {
+								if (isSelected) {
+									return "text-blue-900 dark:text-blue-100";
+								}
+
+								if (lineStatus === "current") {
+									return "text-yellow-900 dark:text-yellow-100 font-medium";
+								}
+
+								if (lineStatus === "processed") {
+									return "text-green-900 dark:text-green-100";
+								}
+
+								return "dark:text-content-primary";
+							};
+
 							return (
-								<GcodeEditorLine
+								<div
 									key={index}
-									line={line}
-									index={index}
-									isSelected={isSelected}
-									isMatch={isMatch}
-									isCurrentMatch={isCurrentMatch}
-									lineStatus={lineStatus}
-									isEditing={editingLineIndex === index}
-									isJobRunning={isJobRunning}
-									isScrolling={isScrolling}
-									enableDarkMode={enableDarkMode}
-									lineInputsRef={lineInputsRef}
-									handleCheckboxClick={handleCheckboxClick}
-									handleLineChange={handleLineChange}
-									setEditingLineIndex={setEditingLineIndex}
-								/>
+									style={{
+										position: "absolute",
+										top: index * LINE_HEIGHT,
+										left: 0,
+										right: 0,
+										height: LINE_HEIGHT,
+									}}
+									className={cn(
+										"flex items-center py-1 px-2 transition-colors group",
+										getLineClassName(),
+										{
+											"cursor-not-allowed": isJobRunning,
+										},
+									)}
+								>
+									<div
+										className={`flex items-center justify-center w-6 h-6 mr-3 rounded transition-colors flex-shrink-0 ${
+											isJobRunning
+												? "cursor-not-allowed opacity-50"
+												: "cursor-pointer"
+										}`}
+										onClick={(e) => handleCheckboxClick(index, e)}
+										title={
+											isJobRunning
+												? "Editing disabled while job is running"
+												: "Click to toggle selection"
+										}
+										onMouseEnter={(e) => {
+											if (!isSelected) {
+												e.currentTarget.classList.add(
+													"bg-gray-300",
+													"dark:bg-gray-600",
+												);
+											}
+										}}
+										onMouseLeave={(e) => {
+											e.currentTarget.classList.remove(
+												"bg-gray-300",
+												"dark:bg-gray-600",
+											);
+										}}
+									>
+										{isSelected ? (
+											<div className="w-5 h-5 bg-blue-500 rounded flex items-center justify-center">
+												<Check className="w-3 h-3 text-white" />
+											</div>
+										) : (
+											<div className="w-5 h-5 border-2 border-gray-400 dark:border-gray-500 rounded hover:border-blue-500" />
+										)}
+									</div>
+									<span
+										className={cn(
+											"dark:text-content-primary mr-4 min-w-10 text-right select-none",
+											getInnerLineClassName(),
+										)}
+									>
+										{index + 1}
+										{lineStatus === "current" && (
+											<span className="ml-1 text-xs">▶</span>
+										)}
+									</span>
+									<div className="flex-1 min-w-0">
+										{editingLineIndex === index ? (
+											<input
+												ref={(el) => {
+													if (el) {
+														lineInputsRef.current.set(index, el);
+														el.focus();
+													} else {
+														lineInputsRef.current.delete(index);
+													}
+												}}
+												type="text"
+												value={line}
+												onChange={(e) =>
+													handleLineChange(index, e.target.value)
+												}
+												onBlur={() => {
+													setEditingLineIndex(null);
+												}}
+												onKeyDown={(e) => {
+													if (e.key === "Enter") {
+														setEditingLineIndex(null);
+													} else if (e.key === "Escape") {
+														setEditingLineIndex(null);
+													}
+												}}
+												className={cn(
+													"w-full bg-transparent border-none outline-none focus:outline-none focus:ring-2 focus:ring-blue-400 rounded px-1",
+													getInputClassName(),
+												)}
+											/>
+										) : (
+											<div
+												onClick={(e) => {
+													if (!isJobRunning) {
+														e.stopPropagation();
+														setEditingLineIndex(index);
+													}
+												}}
+												onDoubleClick={(e) => {
+													if (!isJobRunning) {
+														e.stopPropagation();
+														setEditingLineIndex(index);
+													}
+												}}
+												className={cn("cursor-text px-1", {
+													"cursor-not-allowed": isJobRunning,
+												})}
+											>
+												<SyntaxHighlighter
+													language="gcode"
+													style={enableDarkMode ? a11yDark : a11yLight}
+													customStyle={{
+														background: "transparent",
+														padding: 0,
+														margin: 0,
+														fontSize: "inherit",
+														lineHeight: "inherit",
+													}}
+													PreTag="span"
+													CodeTag="span"
+												>
+													{line || " "}
+												</SyntaxHighlighter>
+											</div>
+										)}
+									</div>
+								</div>
 							);
 						})}
 				</div>
 			</div>
-			<div className="flex gap-4 p-3 justify-end border-t border-gray-300 dark:border-dark-lighter">
-				<Button
-					variant={isJumpOpen ? "primary" : "outline"}
-					size="icon"
-					onClick={() => {
-						setIsJumpOpen((prev) => !prev);
-						setTimeout(() => {
-							jumpInputRef.current?.focus();
-						}, 100);
-					}}
-					className="border border-gray-500"
-					icon={<PiMouseScroll className="h-5 w-5" />}
-					tooltip={{
-						content: "Jump to Line",
-					}}
-				/>
+			<div className="flex gap-4 p-3 justify-end border-t border-gray-300 dark:border-outline">
 				<Button
 					variant={isSearchOpen ? "primary" : "outline"}
 					size="icon"

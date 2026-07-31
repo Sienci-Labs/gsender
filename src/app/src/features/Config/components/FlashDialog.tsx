@@ -1,10 +1,10 @@
-import { Button } from "app/components/Button";
 import {
 	Dialog,
 	DialogContent,
 	DialogHeader,
 	DialogTitle,
 } from "app/components/shadcn/Dialog";
+import { useEffect, useRef, useState } from "react";
 import {
 	Select,
 	SelectContent,
@@ -15,15 +15,15 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "app/components/shadcn/Select.tsx";
-import { FlashingProgress } from "app/features/Config/components/FlashingProgress.tsx";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-import controller from "app/lib/controller.ts";
+import { Button } from "app/components/Button";
 import { toast } from "app/lib/toaster";
+import controller from "app/lib/controller";
 import store from "app/store";
+import get from "lodash/get";
 
 import cn from "classnames";
-import get from "lodash/get";
-import { useEffect, useRef, useState } from "react";
+import { FlashingProgress } from "app/features/Config/components/FlashingProgress.tsx";
+import { useTypedSelector } from "app/hooks/useTypedSelector";
 
 interface flashDialogProps {
 	show: boolean;
@@ -41,7 +41,6 @@ interface startFlashOptions {
 	port: string;
 	hex: ArrayBuffer;
 	controllerType: string;
-	firmwareType?: string;
 }
 
 const SLB_DFU_PORT = {
@@ -50,16 +49,10 @@ const SLB_DFU_PORT = {
 	inuse: false,
 };
 
-// Whether the selected firmware file is a .uf2 image (RP2350 / Pico 2350).
-function isUF2File(file: any): boolean {
-	return !!file?.name && file.name.toLowerCase().endsWith(".uf2");
-}
-
 function startFlash({
 	port,
 	hex = null,
 	controllerType = "",
-	firmwareType = "hex",
 }: startFlashOptions) {
 	if (!port) {
 		toast.error(
@@ -72,7 +65,7 @@ function startFlash({
 	const machineVersion = get(selectedProfile, "version", "MK1");
 	const isHal = controllerType === "grblHAL";
 
-	controller.flashFirmware(port, machineVersion, isHal, hex, firmwareType);
+	controller.flashFirmware(port, machineVersion, isHal, hex);
 }
 
 const CONTROLLER_TYPES = ["grbl", "grblHAL"];
@@ -97,18 +90,13 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
 
 		const isHal = controllerType === "grblHAL";
 		const isDfuPort = port === SLB_DFU_PORT.port;
-		const isUF2 = isUF2File(file);
-		const firmwareType = isUF2 ? "uf2" : "hex";
-
 		if (isHal && !isDfuPort) {
-			// UF2 boards (RP2350) enter the bootloader via $UF2; DFU boards use $DFU.
-			controller.command("gcode", isUF2 ? "$UF2" : "$DFU");
+			controller.command("gcode", "$DFU");
 			setTimeout(() => {
 				startFlash({
 					port,
 					hex,
 					controllerType,
-					firmwareType,
 				});
 			}, 1500);
 			return;
@@ -118,7 +106,6 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
 			port,
 			hex,
 			controllerType,
-			firmwareType,
 		});
 	}
 
@@ -160,13 +147,7 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
 					setHex(result);
 				}
 			};
-			// UF2 images are binary and must be read as an ArrayBuffer;
-			// Intel HEX (.hex) is text.
-			if (isUF2File(file)) {
-				fileReader.readAsArrayBuffer(file);
-			} else {
-				fileReader.readAsText(file);
-			}
+			fileReader.readAsText(file);
 		}
 		return () => {
 			isCancel = true;
@@ -178,9 +159,6 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
 
 	function handlePortSelect(value) {
 		setPort(value);
-		if (value === SLB_DFU_PORT.port) {
-			setControllerType("grblHAL");
-		}
 	}
 
 	function handleTypeSelect(value) {
@@ -210,7 +188,7 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
 					<DialogTitle>Flash Firmware</DialogTitle>
 				</DialogHeader>
 				<div className="flex flex-col gap-4">
-					<p className="text-sm text-gray-700 dark:text-white">
+					<p className="text-sm text-gray-700 dark:text-content-primary">
 						This feature exists to flash firmware onto a compatible SLB or
 						Arduino-based device.
 					</p>
@@ -220,7 +198,9 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
 						})}
 					>
 						<div className="flex flex-col">
-							<h2 className="text-gray-600 text-sm dark:text-white">Port</h2>
+							<h2 className="text-gray-600 text-sm dark:text-content-primary">
+								Port
+							</h2>
 							<Select onValueChange={handlePortSelect} value={port}>
 								<SelectTrigger className="bg-white bg-opacity-100">
 									<SelectValue placeholder={port} />
@@ -255,7 +235,7 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
 							</Select>
 						</div>
 						<div className="flex flex-col">
-							<h2 className="text-gray-600 text-sm dark:text-white">
+							<h2 className="text-gray-600 text-sm dark:text-content-primary">
 								Controller Type
 							</h2>
 							<Select onValueChange={handleTypeSelect} value={controllerType}>
@@ -276,13 +256,13 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
 								invisible: controllerType === "grbl",
 							})}
 						>
-							<h2 className="text-gray-600 text-sm dark:text-white">
-								Firmware File
+							<h2 className="text-gray-600 text-sm dark:text-content-primary">
+								Hex File
 							</h2>
 							<input
 								type="file"
 								id="firmware_image"
-								accept=".hex,.uf2"
+								accept=".hex"
 								ref={fileInputRef}
 								onChange={handleFileUpload}
 							/>
@@ -297,7 +277,7 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
 							},
 						)}
 					>
-						<p className="text-sm text-gray-600 text-center dark:text-white">
+						<p className="text-sm text-gray-600 text-center dark:text-content-primary">
 							This process will disconnect your machine, and may take a couple
 							of minutes to complete.
 							<br />

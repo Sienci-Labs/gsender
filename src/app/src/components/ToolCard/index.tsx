@@ -1,6 +1,7 @@
-import { Card, CardDescription, CardTitle } from "app/components/shadcn/Card";
-import type { IconType } from "react-icons";
 import { Link } from "react-router";
+import { IconType } from "react-icons";
+
+import { Card, CardTitle, CardDescription } from "app/components/shadcn/Card";
 
 type ToolCardProps = {
 	title: string;
@@ -21,10 +22,10 @@ const ToolCard = ({
 		<Card
 			className="hover:bg-gray-300 bg-gray-100 cursor-pointer p-4 
             flex flex-col items-center justify-between text-center gap-4
-            transition-all duration-300 ease-in-out h-full dark:bg-dark min-h-56"
+            transition-all duration-300 ease-in-out h-full dark:bg-surface-raised"
 			onClick={onClick}
 		>
-			<CardTitle className="dark:text-white">{title}</CardTitle>
+			<CardTitle className="dark:text-content-primary">{title}</CardTitle>
 
 			{description && (
 				<CardDescription className="text-sm text-gray-500">
@@ -32,7 +33,7 @@ const ToolCard = ({
 				</CardDescription>
 			)}
 
-			{Icon && <Icon className="w-14 h-14 dark:text-white" />}
+			{Icon && <Icon className="w-14 h-14 dark:text-content-primary" />}
 		</Card>
 	);
 
