@@ -5,7 +5,7 @@ import pubsub from "pubsub-js";
 import { PiPause } from "react-icons/pi";
 import { FiOctagon } from "react-icons/fi";
 import { IoPlayOutline } from "react-icons/io5";
-import { stopMachineMotion } from "app/features/Jogging/utils/Jogging";
+import { cancelJog } from "app/features/Jogging/utils/Jogging";
 
 import useKeybinding from "app/lib/useKeybinding";
 import useShuttleEvents from "app/hooks/useShuttleEvents";
@@ -255,7 +255,7 @@ const ControlButton: React.FC<ControlButtonProps> = ({
 							);
 							// if shortcut is disabled (aka job isnt running) it works as a jog stop shortcut
 							if (shortcutIsDisabled()) {
-								return stopMachineMotion(activeState, firmwareType);
+								return cancelJog(activeState, firmwareType);
 							}
 							handleStop(activeState);
 						},
