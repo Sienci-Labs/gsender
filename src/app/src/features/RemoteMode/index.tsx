@@ -125,17 +125,17 @@ export function RemoteModeDialog({
 					<div className="grid grid-cols-2 text-gray-600 grid-">
 						<div className="flex flex-col gap-8 px-4">
 							<div className="flex flex-row gap-4 items-center">
-								<span className="font-bold dark:text-white">
+								<span className="font-bold dark:text-content-primary">
 									Enable Wireless Control
 								</span>
 								<Switch onChange={toggleRemoteMode} checked={remoteEnabled} />
 							</div>
-							<p className="dark:text-white">
+							<p className="dark:text-content-primary">
 								Choose your settings below. In most cases the default values
 								should work:
 							</p>
 							<div className="flex flex-row w-full justify-between items-center gap-4">
-								<span className="dark:text-white">Addr:</span>
+								<span className="dark:text-content-primary">Addr:</span>
 								<Select onValueChange={onIPSelect} value={ip}>
 									<SelectTrigger className="">
 										<SelectValue placeholder={ip} />
@@ -150,15 +150,15 @@ export function RemoteModeDialog({
 								</Select>
 							</div>
 							<div className="flex flex-row w-full justify-start items-center gap-4">
-								<span className="dark:text-white">Port:</span>
+								<span className="dark:text-content-primary">Port:</span>
 								<input
-									className="border border-gray-200 rounded p-2 focus:outline-none w-full dark:bg-dark dark:text-white"
+									className="border border-gray-200 rounded p-2 focus:outline-none w-full dark:bg-surface-raised dark:text-content-primary"
 									type="number"
 									value={port}
 									onChange={updatePort}
 								/>
 							</div>
-							<p className="dark:text-white text-sm">
+							<p className="dark:text-content-primary text-sm">
 								<b>Note:</b> Clicking "Save" will ask you to restart gSender so
 								that the settings can be updated.
 							</p>

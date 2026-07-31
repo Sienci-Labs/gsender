@@ -115,7 +115,7 @@ export function ProfileBar() {
 	}
 
 	return (
-		<div className="fixed flex px-4 max-xl:px-2 bg-white z-50 flex-row items-center  max-w-5xl justify-center bottom-8 max-xl:bottom-4 right-14 max-xl:right-0 h-16 max-sm:right-2 max-sm:border-0  dark:bg-dark">
+		<div className="fixed flex px-4 max-xl:px-2 bg-white z-50 flex-row items-center  max-w-5xl justify-center bottom-8 max-xl:bottom-4 right-14 max-xl:right-0 h-16 max-sm:right-2 max-sm:border-0  dark:bg-surface-raised">
 			<FlashDialog show={flashOpen} toggleShow={toggleFlash} />
 			<div className="flex flex-row items-center border border-gray-200 h-12 rounded-lg justify-between">
 				<div className="w-1/4 min-w-64  mx-auto px-2 max-sm:hidden">
@@ -166,7 +166,7 @@ export function ProfileBar() {
 					disabled={!settingsAreDirty}
 					onClick={updateSettingsHandler}
 				>
-					Apply Settings
+					Apply<span className="max-xl:hidden"> Settings</span>
 				</button>
 				{settingsAreDirty && (
 					<span className="w-4 h-4 animate-ping absolute -top-2 -left-2 bg-blue-400 rounded-xl"></span>

@@ -89,12 +89,12 @@ export function EEPROMSettingRow({
 				className={cn(
 					"p-2 flex flex-row flex-wrap items-center border-b border-gray-200",
 					{
-						"odd:bg-yellow-50 even:bg-yellow-50 dark:bg-blue-900 dark:text-white":
+						"odd:bg-yellow-50 even:bg-yellow-50 dark:bg-blue-900 dark:text-content-primary":
 							!isDefault,
 					},
 				)}
 			>
-				<div className="w-full sm:w-1/5 flex flex-row gap-2 items-center justify-between sm:justify-start text-gray-700 relative dark:text-gray-400 mb-2 sm:mb-0">
+				<div className="w-full sm:w-1/5 flex flex-row gap-2 items-center justify-between sm:justify-start text-gray-700 relative dark:text-content-muted mb-2 sm:mb-0">
 					<span>{EEPROMData.description}</span>
 					<span className="flex flex-row gap-2 sm:hidden">
 						{!isDefault && (

@@ -226,7 +226,7 @@ export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
 	}, []);
 
 	return (
-		<div className="flex flex-col bg-white dark:bg-dark dark:text-white rounded-md border-solid border border-gray-300 dark:border-gray-700 p-1 w-32 max-xl:w-28">
+		<div className="flex flex-col bg-white dark:bg-surface-raised dark:text-content-primary rounded-md border-solid border border-gray-300 dark:border-outline p-1 w-32 max-xl:w-28">
 			<SpeedSelectButton
 				active={preciseActive}
 				onClick={() => handleSpeedChange("Precise")}

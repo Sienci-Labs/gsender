@@ -383,7 +383,7 @@ const Workspace = () => {
 			>
 				Skip to main content
 			</a>
-			<div className="flex flex-col h-full dark:bg-slate-800">
+			<div className="flex flex-col h-full dark:bg-surface-base">
 				<header role="banner">
 					<TopBar />
 				</header>

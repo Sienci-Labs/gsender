@@ -116,7 +116,7 @@ export function ToolNameInput({
 				wrapperClassName="relative"
 			/>
 			{open && id >= 1 && (
-				<div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-56 overflow-auto rounded-md border border-gray-200 bg-white shadow-md dark:border-gray-600 dark:bg-dark">
+				<div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-56 overflow-auto rounded-md border border-gray-200 bg-white shadow-md dark:border-gray-600 dark:bg-surface-raised">
 					{filteredOptions.map((option) => (
 						<div
 							key={option}

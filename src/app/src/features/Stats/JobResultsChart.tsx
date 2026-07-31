@@ -8,7 +8,7 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 export function EmptyDataPlaceholder() {
 	return (
-		<div className="flex flex-col gap-2 items-center justify-center text-gray-700 dark:text-white">
+		<div className="flex flex-col gap-2 items-center justify-center text-gray-700 dark:text-content-primary">
 			<span className="text-6xl">
 				<FaChartPie />
 			</span>
@@ -83,7 +83,7 @@ export function JobResultsChart() {
     };
 
     return (
-            <Bar data={data} options={options} className="dark:text-white" />
+            <Bar data={data} options={options} className="dark:text-content-primary" />
         </div>
     );
 }

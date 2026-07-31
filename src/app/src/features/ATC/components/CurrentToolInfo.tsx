@@ -129,9 +129,9 @@ export function CurrentToolInfo({ disabled }: { disabled?: boolean }) {
 		"dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]",
 	);
 	const iconWrapperClassName =
-		"h-9 w-9 rounded-lg border border-gray-200 bg-white/80 dark:border-slate-600 dark:bg-slate-900/85 flex items-center justify-center";
+		"h-9 w-9 rounded-lg border border-gray-200 bg-white/80 dark:border-outline dark:bg-surface-elevated flex items-center justify-center";
 	const offsetWrapperClassName =
-		"rounded-lg px-2 py-1 border border-gray-200 bg-white shadow-inner pointer-events-none select-none dark:border-slate-600 dark:bg-slate-900/85";
+		"rounded-lg px-2 py-1 border border-gray-200 bg-white shadow-inner pointer-events-none select-none dark:border-outline dark:bg-surface-elevated";
 
 	return (
 		<div className="w-full h-full flex-1">
@@ -140,25 +140,28 @@ export function CurrentToolInfo({ disabled }: { disabled?: boolean }) {
 					<div className="flex items-center gap-3">
 						<div className={iconWrapperClassName}>
 							<Wrench
-								className={cn(state.textColor, "w-5 h-5 dark:text-white")}
+								className={cn(
+									state.textColor,
+									"w-5 h-5 dark:text-content-primary",
+								)}
 							/>
 						</div>
 						<div className="flex flex-col">
 							<span
 								className={cn(
 									state.textColor,
-									"font-semibold text-base dark:text-white",
+									"font-semibold text-base dark:text-content-primary",
 								)}
 							>
 								{isEmptyTool ? "Empty" : `T${selectedTool.id}`}
 							</span>
 							{!isEmptyTool && isRackTool && (
-								<span className="text-gray-600 text-xs dark:text-gray-300">
+								<span className="text-gray-600 text-xs dark:text-content-secondary">
 									Rack
 								</span>
 							)}
 							{!isEmptyTool && !isRackTool && allowManualBadge && (
-								<span className="text-gray-600 text-xs dark:text-gray-300">
+								<span className="text-gray-600 text-xs dark:text-content-secondary">
 									Manual
 								</span>
 							)}
@@ -190,7 +193,7 @@ export function CurrentToolInfo({ disabled }: { disabled?: boolean }) {
 						<div
 							className={cn(
 								state.textColor,
-								"font-mono text-lg font-bold text-center dark:text-white",
+								"font-mono text-lg font-bold text-center dark:text-content-primary",
 							)}
 						>
 							{formattedOffset}

@@ -312,7 +312,7 @@ function Connection(props: ConnectionProps) {
 				)}
 				<PopoverTrigger asChild>
 					<button
-						className="h-12 max-xl:h-10 relative border border-gray-400 bg-gray-100 font-bold px-4 py-2 max-sm:p-1 ring-1 ring-gray-900/5 gap-4 justify-between items-center rounded-lg leading-none flex flex-row items-top portrait:min-w-[170px] portrait:max-sm:min-w-max min-w-[250px] max-xl:min-w-[180px] max-sm:min-w-0 dark:bg-dark text-black dark:text-white cursor-pointer"
+						className="h-12 max-xl:h-10 relative border border-gray-400 bg-gray-100 font-bold px-4 py-2 max-sm:p-1 ring-1 ring-gray-900/5 gap-4 justify-between items-center rounded-lg leading-none flex flex-row items-top portrait:min-w-[170px] portrait:max-sm:min-w-max min-w-[250px] max-xl:min-w-[180px] max-sm:min-w-0 dark:bg-surface-raised text-black dark:text-content-primary cursor-pointer"
 						onClick={handleClick}
 					>
 						<ConnectionStateIndicator

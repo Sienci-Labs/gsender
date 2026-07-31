@@ -99,15 +99,15 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
 	const CompletionComponent = subWizard.completionPage;
 
 	return (
-		<div className="h-full min-h-0 bg-gray-50 dark:bg-slate-800 flex flex-col">
+		<div className="h-full min-h-0 bg-gray-50 dark:bg-surface-base flex flex-col">
 			{isSingleStep ? (
-				<div className="bg-white dark:bg-dark-darker border-b border-gray-200 px-4 py-2 flex items-center justify-between">
-					<span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+				<div className="bg-white dark:bg-surface-raised border-b border-gray-200 px-4 py-2 flex items-center justify-between">
+					<span className="text-sm font-medium text-gray-700 dark:text-content-secondary">
 						{currentStep.title}
 					</span>
 					<button
 						onClick={onExit}
-						className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+						className="flex items-center gap-2 text-gray-600 dark:text-content-muted hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
 					>
 						<svg
 							className="w-5 h-5"
@@ -152,13 +152,13 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
 						) : (
 							<>
 								{!isSingleStep && (
-									<h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+									<h1 className="text-4xl font-bold text-gray-900 dark:text-content-primary mb-2">
 										{currentStep.title}
 									</h1>
 								)}
 
 								{subWizard.configVersion && !subWizard.hideVersionPrintout && (
-									<p className="text-gray-600 dark:text-gray-400 mb-8">
+									<p className="text-gray-600 dark:text-content-muted mb-8">
 										Configuration File Version: {subWizard.configVersion}
 									</p>
 								)}
@@ -179,7 +179,7 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
 						)}
 					</div>
 
-					<div className="w-2/5 portrait:h-2/5 portrait:w-full bg-gray-200 dark:bg-dark px-12 py-4 portrait:p-4 flex flex-col overflow-hidden">
+					<div className="w-2/5 portrait:h-2/5 portrait:w-full bg-gray-200 dark:bg-surface-raised px-12 py-4 portrait:p-4 flex flex-col overflow-hidden">
 						{showCompletion && CompletionComponent ? (
 							<SecondaryContentPanel
 								content={[
@@ -201,7 +201,7 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
 			</StepContextProvider>
 
 			{!isSingleStep && (
-				<div className="bg-white dark:bg-dark-darker border-t border-gray-200 dark:border-gray-800 px-8 py-4 flex items-center justify-between">
+				<div className="bg-white dark:bg-surface-raised border-t border-gray-200 dark:border-outline px-8 py-4 flex items-center justify-between">
 					{showCompletion ? (
 						<button
 							onClick={onExit}
@@ -219,7 +219,7 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
                 ${
 									isFirstStep
 										? "text-gray-400 cursor-not-allowed"
-										: "text-gray-700 dark:text-gray-300 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700"
+										: "text-gray-700 dark:text-content-secondary dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700"
 								}
               `}
 							>

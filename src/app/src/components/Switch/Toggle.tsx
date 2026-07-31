@@ -57,7 +57,7 @@ const Toggle = ({
 				{label && (
 					<span
 						className={cn(
-							"text-sm font-medium text-gray-900 dark:text-gray-300",
+							"text-sm font-medium text-gray-900 dark:text-content-secondary",
 							isVertical ? "mt-3" : "ms-3",
 							disabled && "opacity-50",
 						)}

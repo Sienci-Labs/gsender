@@ -91,7 +91,7 @@ const LaserControls = ({ actions, state, canClick, isConnected }: Props) => {
 					tooltip={{ content: "Turn off laser" }}
 				/>
 			</div>
-			<div className="grid grid-cols-[1fr_3fr_1fr] gap-2 justify-center mt-2 items-center dark:text-white">
+			<div className="grid grid-cols-[1fr_3fr_1fr] gap-2 justify-center mt-2 items-center dark:text-content-primary">
 				<span className="text-right">Power</span>
 				<Tooltip content="Adjust laser power">
 					<Slider
@@ -107,7 +107,7 @@ const LaserControls = ({ actions, state, canClick, isConnected }: Props) => {
 				</Tooltip>
 				<span>{laser.power}%</span>
 			</div>
-			<div className="flex gap-2 justify-center items-center mt-1 dark:text-white">
+			<div className="flex gap-2 justify-center items-center mt-1 dark:text-content-primary">
 				<label htmlFor="laser-test-duration">Test Duration:</label>
 				<div className="flex gap-2">
 					<Tooltip content="Laser test duration">

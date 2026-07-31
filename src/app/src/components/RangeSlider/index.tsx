@@ -74,9 +74,9 @@ const RangeSlider = ({
 		<div></div>
 	);
 	return (
-		<div className="flex flex-col items-center gap-2 max-xl:gap-1 justify-center w-full text-gray-900 dark:text-gray-300">
+		<div className="flex flex-col items-center gap-2 max-xl:gap-1 justify-center w-full text-gray-900 dark:text-content-secondary">
 			{textComponent}
-			<div className="flex flex-row items-center gap-2 justify-center w-full rounded-md bg-gray-200 dark:bg-dark shadow-inner">
+			<div className="flex flex-row items-center gap-2 justify-center w-full rounded-md bg-gray-200 dark:bg-surface-raised shadow-inner">
 				<Tooltip content={`Reset override to 100%`}>
 					<Button
 						type="button"
