@@ -257,7 +257,17 @@ const ControlButton: React.FC<ControlButtonProps> = ({
 							);
 							// if shortcut is disabled (aka job isnt running) it works as a jog stop shortcut
 							if (shortcutIsDisabled()) {
-								return stopMachineMotion(activeState, firmwareType);
+								if (activeState === GRBL_ACTIVE_STATE_JOG) {
+									return controller.command("jog:cancel");
+								}
+								if (activeState === GRBL_ACTIVE_STATE_IDLE) {
+									return;
+								}
+								if (firmwareType === GRBLHAL) {
+									return controller.command("reset:soft");
+								}
+								controller.command("reset");
+								return;
 							}
 							handleStop(activeState);
 						},
