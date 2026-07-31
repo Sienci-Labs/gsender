@@ -1,8 +1,7 @@
 // https://ui.shadcn.com/docs/components/alert-dialog
 
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-import type { RootState } from "app/store/redux";
+import { useFocusTrapping } from "app/lib/focus-trapping";
 
 import cx from "classnames";
 import * as React from "react";
