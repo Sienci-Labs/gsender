@@ -14,7 +14,7 @@ const ToolsPage = () => {
 	return (
 		<div className="py-4 px-16 max-xl:px-8 pb-12 fixed-content-area w-full flex flex-col overflow-y-auto">
 			<h1 className="text-3xl font-bold dark:text-content-primary mb-2">Tools</h1>
-			<p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+			<p className="text-sm text-gray-500 dark:text-content-muted mb-4">
 				Tools are plugins that can be installed and used to extend the
 				functionality of gSender. Some are built in to gSender, some are third
 				party plugins.

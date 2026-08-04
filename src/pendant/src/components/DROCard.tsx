@@ -80,7 +80,7 @@ export default function DROCard() {
 	const canHome = (canGoTo && homingEnabled) || isHomingAlarm;
 
 	return (
-		<div className="rounded-xl bg-white border border-gray-300 dark:bg-dark-darker dark:border-dark-lighter p-2 flex flex-col gap-2">
+		<div className="rounded-xl bg-white border border-gray-300 dark:bg-surface-raised dark:border-outline p-2 flex flex-col gap-2">
 			{/* Work / Machine toggle */}
 			<div className="flex gap-1 self-end">
 				{(["work", "machine"] as const).map((m) => (
@@ -90,7 +90,7 @@ export default function DROCard() {
 						className={`px-3 py-1 rounded text-xs font-semibold uppercase tracking-wide transition-colors ${
 							mode === m
 								? "bg-robin-500 text-white"
-								: "text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
+								: "text-gray-400 hover:text-gray-600 dark:text-content-muted dark:hover:text-content-secondary"
 						}`}
 					>
 						{m}
@@ -103,7 +103,7 @@ export default function DROCard() {
 				{AXES.map(({ label, color }) => (
 					<div
 						key={label}
-						className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-gray-50 dark:bg-dark"
+						className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-gray-50 dark:bg-surface-elevated"
 					>
 						<button
 							type="button"
@@ -113,7 +113,7 @@ export default function DROCard() {
 							className={`w-9 h-9 rounded flex items-center justify-center text-base font-bold shrink-0 transition-colors ${
 								canGoTo
 									? `hover:brightness-95 active:brightness-90 ${color}`
-									: "bg-gray-200 text-gray-400 dark:bg-dark-lighter dark:text-gray-500 cursor-default"
+									: "bg-gray-200 text-gray-400 dark:bg-surface-disabled dark:text-content-disabled cursor-default"
 							}`}
 						>
 							{label}
@@ -123,7 +123,7 @@ export default function DROCard() {
 								"flex-1 min-w-0 text-right font-mono text-[2rem] tabular-nums leading-tight",
 								mode === "work"
 									? "text-blue-500"
-									: "text-gray-400 dark:text-gray-500",
+									: "text-gray-400 dark:text-content-muted",
 							)}
 						>
 							{formatAxisValue(
@@ -133,10 +133,10 @@ export default function DROCard() {
 						<button
 							onClick={() => zeroWCS(label, 0)}
 							disabled={!canZero}
-							className={`text-sm font-semibold border-[3px] border-gray-400 dark:border-gray-600 rounded-md px-3 py-1.5 shrink-0 transition-colors ${
+							className={`text-sm font-semibold border-[3px] border-gray-400 dark:border-outline rounded-md px-3 py-1.5 shrink-0 transition-colors ${
 								canZero
-									? "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-									: "text-gray-400 dark:text-gray-500 cursor-default"
+									? "text-gray-500 hover:text-gray-700 dark:text-content-muted dark:hover:text-content-secondary"
+									: "text-gray-400 dark:text-content-muted cursor-default"
 							}`}
 						>
 							ZERO
@@ -182,10 +182,10 @@ export default function DROCard() {
 												: isConnected
 									)
 									? "border border-blue-500 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white"
-									: "border border-gray-200 dark:border-dark-lighter bg-gray-200 text-gray-400 dark:bg-dark-lighter dark:text-gray-500"
+									: "border border-gray-200 dark:border-outline bg-gray-200 text-gray-400 dark:bg-surface-disabled dark:text-content-disabled"
 								: canZero
-									? "border-[3px] border-gray-400 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-lighter hover:text-gray-900 dark:hover:text-white"
-									: "border-[3px] border-gray-400 dark:border-gray-600 text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-dark cursor-default"
+									? "border-[3px] border-gray-400 dark:border-outline text-gray-600 dark:text-content-secondary hover:bg-gray-50 dark:hover:bg-surface-hover hover:text-gray-900 dark:hover:text-content-primary"
+									: "border-[3px] border-gray-400 dark:border-outline text-gray-400 dark:text-content-muted bg-gray-100 dark:bg-surface-elevated cursor-default"
 						}`}
 					>
 						<Icon size={16} />

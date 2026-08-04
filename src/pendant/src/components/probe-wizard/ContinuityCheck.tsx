@@ -63,7 +63,7 @@ export function ContinuityCheck({
 				<ContinuityIndicator phase={phase} size={220} />
 
 				{isWaiting && (
-					<p className="text-sm text-gray-600 dark:text-gray-300 text-center">
+					<p className="text-sm text-gray-600 dark:text-content-secondary text-center">
 						Touch the probe to the workpiece to verify the connection.
 					</p>
 				)}

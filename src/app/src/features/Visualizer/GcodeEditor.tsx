@@ -149,10 +149,10 @@ const GcodeEditorLine = React.memo(
 					}
 					onMouseEnter={(e) => {
 						if (!isSelected)
-							e.currentTarget.classList.add("bg-gray-300", "dark:bg-gray-600");
+							e.currentTarget.classList.add("bg-gray-300", "dark:bg-surface-hover");
 					}}
 					onMouseLeave={(e) => {
-						e.currentTarget.classList.remove("bg-gray-300", "dark:bg-gray-600");
+						e.currentTarget.classList.remove("bg-gray-300", "dark:bg-surface-hover");
 					}}
 				>
 					{isSelected ? (
@@ -160,7 +160,7 @@ const GcodeEditorLine = React.memo(
 							<Check className="w-3 h-3 text-white" />
 						</div>
 					) : (
-						<div className="w-5 h-5 border-2 border-gray-400 dark:border-gray-500 rounded hover:border-blue-500" />
+						<div className="w-5 h-5 border-2 border-gray-400 dark:border-outline rounded hover:border-blue-500" />
 					)}
 				</div>
 				<span
@@ -834,7 +834,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 				)}
 				{isJumpOpen && (
 					<div className="fixed top-20 right-6 z-[10000] flex items-center gap-2 bg-gray-100 dark:bg-surface-raised border border-gray-300 dark:border-outline p-3 rounded">
-						<span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+						<span className="text-xs text-gray-500 dark:text-content-muted whitespace-nowrap">
 							Jump to line:
 						</span>
 						<Input
@@ -851,7 +851,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 								}
 							}}
 						/>
-						<span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+						<span className="text-xs text-gray-500 dark:text-content-muted whitespace-nowrap">
 							{`${Math.floor(
 								(scrollContainerRef.current?.scrollTop ?? 0) / LINE_HEIGHT +
 									scrollContainerRef.current?.clientHeight / 2 / LINE_HEIGHT,

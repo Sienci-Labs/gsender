@@ -88,7 +88,7 @@ const MeasurementStep = () => {
 										<FaClipboardCheck className="min-w-8 min-h-8 text-green-500 " />
 									)}
 									{!isCurrentStep && !isPastStep && (
-										<FaClipboard className="min-w-8 min-h-8 text-amber-600 dark:text-dark-lighter" />
+										<FaClipboard className="min-w-8 min-h-8 text-amber-600 dark:text-content-muted" />
 									)}
 									{isCurrentStep && (
 										<FaClipboardList className="min-w-8 min-h-8 text-blue-500 " />

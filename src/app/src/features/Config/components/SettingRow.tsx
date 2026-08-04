@@ -327,7 +327,7 @@ export const SettingRow = React.memo(function SettingRow({
 					<p key={index}>{line}</p>
 				))}
 			</span>
-			<span className="w-full sm:w-1/5 sm:order-none order-3 text-xs px-4 dark:text-gray-200 sm:mb-0  max-sm:mb-2 mb-0">
+			<span className="w-full sm:w-1/5 sm:order-none order-3 text-xs px-4 dark:text-content-secondary sm:mb-0  max-sm:mb-2 mb-0">
 				{returnSettingControl(
 					connected,
 					displaySetting,

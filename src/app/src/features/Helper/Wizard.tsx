@@ -75,7 +75,7 @@ const Wizard = () => {
 			<div className="absolute top-2 left-1/2 -translate-x-1/2 z-[10000] pointer-events-auto flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/90 dark:bg-[#18181f]/90 backdrop-blur-sm border border-gray-200 dark:border-[#2a2a35] shadow-md">
 				<Wrench
 					size={12}
-					className="text-gray-500 dark:text-gray-400 shrink-0"
+					className="text-gray-500 dark:text-content-muted shrink-0"
 				/>
 				<span className="font-medium text-gray-700 dark:text-[#e5e5ea] text-xs whitespace-nowrap">
 					{title}
@@ -108,7 +108,7 @@ const Wizard = () => {
 					{/* Titlebar */}
 					<div className="flex items-center justify-between px-3 py-2 border-b border-gray-200 dark:border-[#2a2a35] bg-gray-100 dark:bg-[#111116]">
 						<div className="flex items-center gap-2">
-							<Wrench size={14} className="text-gray-500 dark:text-gray-400" />
+							<Wrench size={14} className="text-gray-500 dark:text-content-muted" />
 							<span className="font-semibold text-base text-gray-900 dark:text-[#e5e5ea]">
 								{title}
 							</span>

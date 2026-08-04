@@ -16,7 +16,7 @@ export default function ProbeConnectivityBadge({
 		<div
 			className={clsx(
 				"flex items-center gap-1.5 rounded-full px-2.5 py-1",
-				"bg-white/90 dark:bg-dark/90 border border-gray-200 dark:border-dark-lighter",
+				"bg-white/90 dark:bg-surface-elevated/90 border border-gray-200 dark:border-outline",
 				"text-[10px] font-semibold shadow-sm",
 				className,
 			)}

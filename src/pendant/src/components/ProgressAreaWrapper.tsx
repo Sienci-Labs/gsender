@@ -139,7 +139,7 @@ export default function ProgressAreaWrapper() {
 
 	return (
 		<div className="flex flex-col gap-1 px-1">
-			<div className="flex justify-between text-xs text-gray-400 dark:text-gray-400">
+			<div className="flex justify-between text-xs text-gray-400 dark:text-content-muted">
 				<span>Progress</span>
 				<span>{`Line ${displaySent} / ${totalLines}`}</span>
 			</div>
@@ -147,8 +147,8 @@ export default function ProgressAreaWrapper() {
 				<div
 					className={`relative w-full overflow-hidden transition-all duration-300 ease-out ${
 						showExpandedBar
-							? "h-7 rounded-md bg-gray-200 dark:bg-dark-lighter opacity-100 pendant-progress-track border border-gray-400/80 dark:border-gray-500"
-							: "h-2 rounded-full bg-gray-300 dark:bg-dark-lighter opacity-100 border border-gray-400/80 dark:border-gray-500"
+							? "h-7 rounded-md bg-gray-200 dark:bg-surface-raised opacity-100 pendant-progress-track border border-gray-400/80 dark:border-outline"
+							: "h-2 rounded-full bg-gray-300 dark:bg-surface-raised opacity-100 border border-gray-400/80 dark:border-outline"
 					}`}
 				>
 					<div
@@ -165,7 +165,7 @@ export default function ProgressAreaWrapper() {
 						}}
 					>
 						{progressPercent > 0 && (
-							<div className="absolute z-10 right-1 top-1/2 -translate-y-1/2 h-6 min-w-8 px-1 rounded-[5px] border border-white/80 bg-white/75 shadow-[0_1px_2px_rgba(0,0,0,0.2)] text-[11px] leading-none text-green-900 font-semibold tabular-nums flex items-center justify-center">
+							<div className="absolute z-10 right-1 top-1/2 -translate-y-1/2 h-6 min-w-8 px-1 rounded-[5px] border border-white/80 bg-white/75 shadow-[0_1px_2px_var(--overlay-disabled)] text-[11px] leading-none text-green-900 font-semibold tabular-nums flex items-center justify-center">
 								{roundedProgress}%
 							</div>
 						)}

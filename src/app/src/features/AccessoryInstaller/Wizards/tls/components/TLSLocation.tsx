@@ -70,12 +70,12 @@ export function TLSLocation({ onComplete, onUncomplete }: StepProps) {
 
 	return (
 		<div className="flex flex-col gap-5 justify-start">
-			<p className="dark:text-white">
+			<p className="dark:text-content-primary">
 				Install the tallest bit you own in your spindle or router. Jog until
 				it's positioned just above (10-20mm) the Tool Length Sensor, then set
 				the position using the <b>"Set Position"</b> button.
 			</p>
-			<p className="text-sm text-gray-600 dark:text-gray-300">
+			<p className="text-sm text-gray-600 dark:text-content-secondary">
 				Using your tallest tool gives the most Z-axis clearance above the
 				sensor, so its measured position ends up negative — this is what lets
 				gSender accurately probe tools of any length during a tool change

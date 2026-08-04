@@ -91,7 +91,7 @@ const Instructions = () => {
 			<div className="flex items-center gap-1 text-xs text-gray-400 dark:text-[#9ca3af]">
 				<span>{step.title}</span>
 				<span className="text-gray-300 dark:text-[#9ca3af]">›</span>
-				<span className="text-gray-600 dark:text-white">{substep.title}</span>
+				<span className="text-gray-600 dark:text-content-primary">{substep.title}</span>
 			</div>
 			{/* Warning banner — first step only */}
 			{intro &&

@@ -32,18 +32,18 @@ export default function VisualizerCard() {
 			<div className="rounded-xl border border-gray-300 dark:border-outline dark:bg-surface-raised flex flex-col">
 				{/* Top toolbar */}
 				<div className="flex items-center px-3 py-2 bg-gray-100 dark:bg-surface-raised border-b border-gray-200 dark:border-outline rounded-t-xl">
-					<div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 flex-1">
+					<div className="flex items-center gap-3 text-xs text-gray-500 dark:text-content-muted flex-1">
 						<span className="flex items-center gap-1">
 							<span
 								className="w-2 h-2 rounded-full inline-block"
-								style={{ backgroundColor: "#3e85c7" }}
+								style={{ backgroundColor: "#3F85C7" }}
 							/>
 							Cut
 						</span>
 						<span className="flex items-center gap-1">
 							<span
 								className="w-2 h-2 rounded-full inline-block"
-								style={{ backgroundColor: "#0ef6ae" }}
+								style={{ backgroundColor: "#059669" }}
 							/>
 							Rapid
 						</span>
@@ -76,10 +76,10 @@ export default function VisualizerCard() {
 								size={44}
 								className="text-gray-400/60 dark:text-blue-300/30"
 							/>
-							<span className="text-[13px] font-medium text-gray-400 dark:text-gray-500">
+							<span className="text-[13px] font-medium text-gray-400 dark:text-content-muted">
 								No file loaded
 							</span>
-							<span className="text-[11px] text-gray-500 dark:text-gray-600">
+							<span className="text-[11px] text-gray-500 dark:text-content-muted">
 								Tap here to open a G-code file
 							</span>
 						</button>

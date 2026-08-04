@@ -12,6 +12,7 @@ import Tooltip from "app/components/Tooltip";
 import { type ChangeEvent, type FormEvent, useRef, useState } from "react";
 import Select from "react-select";
 
+import { getThemeCssColor } from "app/lib/getThemeCssColor";
 import { MACRO_VARIABLES } from "./constants";
 import insertAtCaret from "./insertAtCaret";
 
@@ -190,8 +191,9 @@ const MacroForm = ({
 									groupHeading: (provided: any) => ({
 										...provided,
 										fontWeight: "bold",
-										color: "#333",
-										backgroundColor: "#e0e0e0",
+										color: getThemeCssColor("--content-secondary") || "#333",
+										backgroundColor:
+											getThemeCssColor("--surface-elevated") || "#e0e0e0",
 										margin: 0,
 									}),
 								}}
@@ -202,7 +204,7 @@ const MacroForm = ({
 							<textarea
 								ref={contentRef}
 								rows={10}
-								className="border border-gray-300 rounded-md p-2 dark:text-content-primary dark:bg-surface-raised dark:border-gray-500"
+								className="border border-gray-300 rounded-md p-2 dark:text-content-primary dark:bg-surface-raised dark:border-outline"
 								name="content"
 								value={macroState.content}
 								onChange={handleInputChange}
@@ -218,7 +220,7 @@ const MacroForm = ({
 								ref={descriptionRef}
 								rows={4}
 								maxLength={MAX_CHARACTERS}
-								className="border border-gray-300 rounded-md p-2 dark:text-content-primary dark:bg-surface-raised dark:border-gray-500"
+								className="border border-gray-300 rounded-md p-2 dark:text-content-primary dark:bg-surface-raised dark:border-outline"
 								name="description"
 								value={macroState.description}
 								onChange={handleInputChange}

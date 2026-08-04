@@ -58,7 +58,7 @@ export function Alarms() {
 							</p>
 							<Button
 								icon={
-									<FaTrash className="text-gray-600 w-4 h-4 dark:text-gray-200" />
+									<FaTrash className="text-gray-600 w-4 h-4 dark:text-content-secondary" />
 								}
 								onClick={deleteAlarms}
 								text="Clear Alarms & Errors"

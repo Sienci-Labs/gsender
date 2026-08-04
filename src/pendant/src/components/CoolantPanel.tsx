@@ -59,10 +59,10 @@ function CoolantButton({
 					"relative z-10 flex flex-col items-center justify-center gap-2 rounded-xl",
 					"min-h-[80px] px-2 py-4",
 					"border transition-colors",
-					"bg-gray-100 dark:bg-dark",
+					"bg-gray-100 dark:bg-surface-elevated",
 					"border-gray-300 dark:border-outline",
 					active
-						? "text-robin-500 shadow-[inset_7px_4px_6px_0px_rgba(59,130,246,0.12)] border-robin-400 dark:border-robin-600"
+						? "text-robin-500 shadow-[inset_7px_4px_6px_0px_rgba(104,154,201,0.12)] border-robin-400 dark:border-robin-600"
 						: "text-gray-500 dark:text-content-muted",
 					{
 						"opacity-40": disabled,

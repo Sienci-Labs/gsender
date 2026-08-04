@@ -86,6 +86,27 @@ const LIGHT_LIKE_PRESETS = new Set<GCodeViewerThemePresetName>([
 	"ayu-light",
 ]);
 
+// Workshop High-Contrast overrides for gSender's own "dark" preset (the app's
+// built-in dark mode). Other selectable schemes (tokyo-night, ayu-dark,
+// flexoki-dark) are left on their own preset colors. Hex values mirror the
+// Tailwind config's surface/outline/content tokens and brand color scales
+// (see apps/desktop/tailwind.config.ts) — the canvas can't consume Tailwind
+// classes, so the same configured hex is used literally here.
+const WORKSHOP_VISUALIZER_COLORS = {
+	background: "#090D12", // surface.sunken
+	gridMajor: "#72849D", // outline.strong
+	gridMinor: "#3F4B59", // outline.subtle
+	axisX: "#dc2626", // red.500
+	axisY: "#059669", // green.500
+	axisZ: "#3F85C7", // blue.500
+	rapid: "#059669", // green.500
+	cutting: "#3F85C7", // blue.500
+	processed: "#59687B", // outline.DEFAULT
+	boundingBox: "#659dd2", // blue.300
+	machineBed: "#c27924", // orange.400
+	bit: "#79aad8", // blue.200
+};
+
 import {
 	computeKeepoutWorkRect,
 	computeMachineBedWorkRect,
@@ -293,6 +314,25 @@ class GcodeViewer extends Component<Props> {
 	buildTheme(themeName?: string): GCodeViewerTheme {
 		const preset = THEME_NAME_TO_PRESET[themeName ?? ""] ?? "dark";
 		const base = gCodeViewerThemePresets[preset];
+
+		if (preset === "dark") {
+			const c = WORKSHOP_VISUALIZER_COLORS;
+			return {
+				...base,
+				background: c.background,
+				colors: {
+					...base.colors,
+					grid: { major: c.gridMajor, minor: c.gridMinor },
+					axes: { x: c.axisX, y: c.axisY, z: c.axisZ },
+					rapid: c.rapid,
+					cutting: c.cutting,
+					processed: c.processed,
+					boundingBox: c.boundingBox,
+					machineBed: c.machineBed,
+				},
+			};
+		}
+
 		const boundingBox = LIGHT_LIKE_PRESETS.has(preset) ? "#1d4ed8" : "#93c5fd";
 		const machineBed = LIGHT_LIKE_PRESETS.has(preset) ? "#b45309" : "#fbbf24";
 		return {
@@ -329,7 +369,7 @@ class GcodeViewer extends Component<Props> {
 				// that cadence or the bit visibly pauses between updates.
 				tweenMs: 260,
 				colorSource: "custom",
-				color: "#caf0f8",
+				color: WORKSHOP_VISUALIZER_COLORS.bit,
 			},
 			progress: { mode: hideProcessed ? "hide" : "grey" },
 			boundingBox: {

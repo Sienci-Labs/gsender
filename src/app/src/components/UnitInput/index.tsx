@@ -37,7 +37,7 @@ export function UnitInput({
 					onChange={onChange}
 					disabled={disabled}
 				/>
-				<span className="shrink-0 pl-1 text-xs text-gray-500 dark:text-white">
+				<span className="shrink-0 pl-1 text-xs text-gray-500 dark:text-content-primary">
 					{units}
 				</span>
 			</div>
