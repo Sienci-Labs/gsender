@@ -196,7 +196,7 @@ const cancelInFlightWork = (reason: string) => {
 const createVisualizeWorker = () =>
 	new Worker(
 		new URL(
-			"../../../desktop/src/workers/Visualize.worker.ts",
+			"../../../app/src/workers/Visualize.worker.ts",
 			import.meta.url,
 		),
 		{ type: "module" },
