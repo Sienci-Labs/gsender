@@ -41,9 +41,6 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-
       - name: Cache node_modules
         uses: actions/cache@v4
         with:
@@ -96,9 +93,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '24'
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
 
       - name: Install Linux build dependencies
         run: |
@@ -164,9 +158,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '24'
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
 
       - name: Cache node_modules
         uses: actions/cache@v4
