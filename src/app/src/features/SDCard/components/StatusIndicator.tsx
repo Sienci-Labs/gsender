@@ -67,7 +67,7 @@ export function StatusIndicator({ isMounted }) {
 				<div className="flex items-center justify-between">
 					<div className="flex items-center space-x-4">
 						<HardDrive className="w-6 h-6 text-gray-600 dark:text-content-secondary" />
-						<span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+						<span className="text-sm font-medium text-gray-700 dark:text-content-secondary">
 							SD Card Status:
 						</span>
 					</div>

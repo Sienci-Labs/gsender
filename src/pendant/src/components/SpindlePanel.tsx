@@ -104,7 +104,7 @@ function SpindleButton({
 					"min-h-[80px] px-2 py-4 border transition-colors",
 					danger
 						? "bg-red-950/40 border-red-800/50"
-						: "bg-gray-100 dark:bg-dark border-gray-300 dark:border-outline",
+						: "bg-gray-100 dark:bg-surface-elevated border-gray-300 dark:border-outline",
 					active && !danger
 						? "text-robin-500 shadow-[inset_7px_4px_6px_0px_rgba(59,130,246,0.12)] border-robin-400 dark:border-robin-600"
 						: danger
@@ -662,9 +662,7 @@ export default function SpindlePanel({ mode }: Props) {
 			fontSize: 11,
 			fontWeight: 500,
 			backgroundColor: state.isSelected
-				? isDark
-					? "#2563eb"
-					: "#3b82f6"
+				? getThemeCssColor("--primary")
 				: state.isFocused
 					? selectTheme.optionFocusedBg
 					: "transparent",
@@ -783,7 +781,7 @@ export default function SpindlePanel({ mode }: Props) {
 						disabled={!clickable}
 						className={clsx(
 							"relative w-9 h-5 rounded-full transition-colors shrink-0",
-							isLaserMode ? "bg-robin-500" : "bg-gray-300 dark:bg-dark-lighter",
+							isLaserMode ? "bg-robin-500" : "bg-gray-300 dark:bg-surface-raised",
 							!clickable && "opacity-40 cursor-default",
 						)}
 					>
@@ -827,7 +825,7 @@ export default function SpindlePanel({ mode }: Props) {
 									: actions.handleSpindleSpeedChange(v)
 							}
 							className="relative flex items-center w-full flex-1 h-7"
-							trackClassName="h-4 bg-gray-400 dark:bg-gray-700 rounded-full relative flex-grow"
+							trackClassName="h-4 bg-gray-400 dark:bg-surface-elevated rounded-full relative flex-grow"
 							rangeClassName="absolute h-full rounded-full bg-robin-400"
 							thumbClassName="block w-6 h-6 rounded-xl border-gray-500 border-solid border-2 bg-white outline-none cursor-pointer disabled:bg-gray-300 disabled:cursor-not-allowed"
 						/>
@@ -849,7 +847,7 @@ export default function SpindlePanel({ mode }: Props) {
 								min={0.1}
 								step={0.1}
 								onChange={actions.handleLaserDurationChange}
-								className="w-20 text-center rounded-lg border border-gray-300 dark:border-outline bg-white dark:bg-dark text-sm text-gray-700 dark:text-content-secondary px-2 py-1.5"
+								className="w-20 text-center rounded-lg border border-gray-300 dark:border-outline bg-white dark:bg-surface-elevated text-sm text-gray-700 dark:text-content-secondary px-2 py-1.5"
 							/>
 							<span className="text-xs text-gray-500 dark:text-content-muted">
 								sec

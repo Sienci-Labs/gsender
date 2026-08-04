@@ -55,33 +55,33 @@ export default {
 				// new palette. Prefer the semantic surface/content/outline tokens below
 				// for new code (see docs/dark-mode-theme-instructions.md).
 				dark: {
-					DEFAULT: "#111317",
-					darker: "#07090c",
-					lighter: "#242931",
+					DEFAULT: "#151B23",
+					darker: "#090D12",
+					lighter: "#202832",
 				},
 				// Workshop semantic neutrals (single source of truth; pendant inherits
 				// these via `presets: [desktopConfig]`).
 				surface: {
-					base: "#111317",
-					sunken: "#07090c",
-					raised: "#242931",
-					elevated: "#30353d",
-					hover: "#383e47",
-					active: "#414853",
-					disabled: "#262b32",
+					base: "#151B23",
+					sunken: "#090D12",
+					raised: "#202832",
+					elevated: "#2D3946",
+					hover: "#3A4857",
+					active: "#445261",
+					disabled: "#252D36",
 				},
 				content: {
-					primary: "#ffffff",
-					secondary: "#dce1e7",
-					muted: "#a6afba",
-					disabled: "#7f8995",
-					inverse: "#111317",
+					primary: "#F4F7FA",
+					secondary: "#CFD6DF",
+					muted: "#A0AABA",
+					disabled: "#778291",
+					inverse: "#151B23",
 				},
 				outline: {
-					subtle: "#343a43",
-					DEFAULT: "#4b535e",
-					strong: "#687381",
-					disabled: "#3b424b",
+					subtle: "#3F4B59",
+					DEFAULT: "#59687B",
+					strong: "#72849D",
+					disabled: "#3A444F",
 				},
 				overlay: {
 					hover: "rgba(255, 255, 255, 0.07)",

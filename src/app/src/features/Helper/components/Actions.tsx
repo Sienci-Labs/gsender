@@ -186,14 +186,14 @@ const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
 							{!isLoading && index > 0 && (
 								<div className="flex items-center gap-2 my-0.5 px-6">
 									<div className="flex-1 h-px bg-gray-200 dark:bg-[#2a2a35]" />
-									<span className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+									<span className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-content-muted">
 										or
 									</span>
 									<div className="flex-1 h-px bg-gray-200 dark:bg-[#2a2a35]" />
 								</div>
 							)}
 							{isLoading && index === 0 ? (
-								<span className="text-sm text-gray-400 dark:text-gray-500 animate-pulse">
+								<span className="text-sm text-gray-400 dark:text-content-muted animate-pulse">
 									Running…
 								</span>
 							) : (
@@ -270,7 +270,7 @@ const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
 												{tooltip.lines.map((line, i) => (
 													<div
 														key={i}
-														className="font-mono text-xs leading-5 text-gray-600 dark:text-gray-400"
+														className="font-mono text-xs leading-5 text-gray-600 dark:text-content-muted"
 													>
 														{line}
 													</div>

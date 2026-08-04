@@ -16,6 +16,17 @@ const WORKSPACE_VALUES: GrblWorkspace[] = [
 	"G59",
 ];
 
+// Matches the desktop WorkspaceSelector's P1-P6 labels (see
+// src/app/src/features/WorkspaceSelector/index.tsx).
+const WORKSPACE_LABELS: Record<GrblWorkspace, string> = {
+	G54: "P1",
+	G55: "P2",
+	G56: "P3",
+	G57: "P4",
+	G58: "P5",
+	G59: "P6",
+};
+
 const WORKSPACE_TEXT_COLORS: Record<GrblWorkspace, string> = {
 	G54: "text-blue-600 dark:text-blue-400",
 	G55: "text-emerald-600 dark:text-emerald-400",
@@ -97,15 +108,15 @@ export default function WorkspaceSelector() {
 				aria-haspopup="listbox"
 				aria-expanded={workspaceMenuOpen}
 				onClick={() => setWorkspaceMenuOpen((current) => !current)}
-				className={`h-7 min-w-[5.25rem] rounded-md border border-gray-200 dark:border-dark-lighter bg-white dark:bg-dark-darker px-2 text-xs font-semibold outline-none transition-colors flex items-center justify-between gap-1 ${WORKSPACE_TEXT_COLORS[workspace]} ${disabled ? "cursor-default" : "cursor-pointer hover:bg-gray-50 dark:hover:bg-dark-lighter"}`}
+				className={`h-7 min-w-[6.5rem] rounded-md border border-gray-200 dark:border-outline bg-white dark:bg-surface-elevated px-2 text-xs font-semibold outline-none transition-colors flex items-center justify-between gap-1 ${WORKSPACE_TEXT_COLORS[workspace]} ${disabled ? "cursor-default" : "cursor-pointer hover:bg-gray-50 dark:hover:bg-surface-hover"}`}
 			>
-				<span>{workspace}</span>
+				<span>{`${workspace} (${WORKSPACE_LABELS[workspace]})`}</span>
 				<ChevronDown
 					className={`w-3.5 h-3.5 transition-transform ${workspaceMenuOpen ? "rotate-180" : ""}`}
 				/>
 			</button>
 			{workspaceMenuOpen && (
-				<div className="absolute top-full right-0 mt-1 z-50 w-24 rounded-md border border-gray-200 dark:border-dark-lighter bg-white dark:bg-dark-darker shadow-lg p-1">
+				<div className="absolute top-full right-0 mt-1 z-50 w-28 rounded-md border border-gray-200 dark:border-outline bg-white dark:bg-surface-raised shadow-lg p-1">
 					{WORKSPACE_VALUES.map((value) => (
 						<button
 							key={value}
@@ -116,9 +127,9 @@ export default function WorkspaceSelector() {
 								onWorkspaceSelect(value);
 								setWorkspaceMenuOpen(false);
 							}}
-							className={`w-full h-7 rounded text-xs font-semibold transition-colors ${WORKSPACE_TEXT_COLORS[value]} ${workspace === value ? "bg-gray-100 dark:bg-dark-lighter" : "hover:bg-gray-100 dark:hover:bg-dark-lighter"} ${disabled ? "cursor-default" : "cursor-pointer"}`}
+							className={`w-full h-7 rounded text-xs font-semibold transition-colors ${WORKSPACE_TEXT_COLORS[value]} ${workspace === value ? "bg-gray-100 dark:bg-surface-hover" : "hover:bg-gray-100 dark:hover:bg-surface-hover"} ${disabled ? "cursor-default" : "cursor-pointer"}`}
 						>
-							{value}
+							{`${value} (${WORKSPACE_LABELS[value]})`}
 						</button>
 					))}
 				</div>

@@ -94,7 +94,7 @@ export default function ProbeWizardDrawer({
 	const canProceedStep2 = continuityPhase === "success";
 
 	return (
-		<div className="flex flex-col h-full rounded-xl border border-robin-200 dark:border-dark-lighter bg-white dark:bg-dark overflow-hidden">
+		<div className="flex flex-col h-full rounded-xl border border-robin-200 dark:border-outline bg-white dark:bg-surface-raised overflow-hidden">
 			{/* Header */}
 			<div className="shrink-0 px-4 pt-3 pb-2">
 				<p className="text-[10px] font-semibold uppercase tracking-wide text-robin-600 dark:text-robin-400">
@@ -109,7 +109,7 @@ export default function ProbeWizardDrawer({
 							disabled={i > maxReached}
 							className={clsx(
 								"h-1.5 flex-1 rounded-full transition-colors",
-								i <= step ? "bg-robin-500" : "bg-gray-200 dark:bg-gray-700",
+								i <= step ? "bg-robin-500" : "bg-gray-200 dark:bg-surface-elevated",
 								i > maxReached && "cursor-default",
 							)}
 						/>
@@ -130,7 +130,7 @@ export default function ProbeWizardDrawer({
 					{/* Step 1 */}
 					<div className="w-1/3 h-full overflow-y-auto px-5 py-4 flex flex-col gap-6">
 						<div>
-							<p className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
+							<p className="text-sm font-medium text-gray-600 dark:text-content-secondary mb-2">
 								Probe diameter
 							</p>
 							{probeCmd?.tool ? (
@@ -140,14 +140,14 @@ export default function ProbeWizardDrawer({
 									probeCommand={probeCmd}
 								/>
 							) : (
-								<p className="text-xs text-gray-400 dark:text-gray-500 italic">
+								<p className="text-xs text-gray-400 dark:text-content-muted italic">
 									Not needed for the {probeCmd?.id ?? "current"} routine. Choose
 									XY, XYZ, X, or Y in the routine selector to set a diameter.
 								</p>
 							)}
 						</div>
 						<div>
-							<p className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
+							<p className="text-sm font-medium text-gray-600 dark:text-content-secondary mb-2">
 								Corner
 							</p>
 							<CornerSelector
@@ -174,17 +174,17 @@ export default function ProbeWizardDrawer({
 							</span>
 						</div>
 
-						<div className="rounded-xl border border-gray-200 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700 overflow-hidden">
+						<div className="rounded-xl border border-gray-200 dark:border-outline divide-y divide-gray-200 dark:divide-outline overflow-hidden">
 							<button
 								type="button"
 								onClick={() => goToStep(0)}
 								className="w-full flex items-center gap-3 px-4 py-3 text-left"
 							>
 								<Ruler size={18} className="text-gray-400 shrink-0" />
-								<span className="flex-1 text-sm text-gray-600 dark:text-gray-300">
+								<span className="flex-1 text-sm text-gray-600 dark:text-content-secondary">
 									Probe diameter
 								</span>
-								<span className="text-sm font-semibold text-gray-900 dark:text-white">
+								<span className="text-sm font-semibold text-gray-900 dark:text-content-primary">
 									{formatDiameter(toolDiameter, units, state.probeType)}
 								</span>
 							</button>
@@ -194,19 +194,19 @@ export default function ProbeWizardDrawer({
 								className="w-full flex items-center gap-3 px-4 py-3 text-left"
 							>
 								<Move3D size={18} className="text-gray-400 shrink-0" />
-								<span className="flex-1 text-sm text-gray-600 dark:text-gray-300">
+								<span className="flex-1 text-sm text-gray-600 dark:text-content-secondary">
 									Corner
 								</span>
-								<span className="text-sm font-semibold text-gray-900 dark:text-white">
+								<span className="text-sm font-semibold text-gray-900 dark:text-content-primary">
 									{cornerLabel}
 								</span>
 							</button>
 							<div className="w-full flex items-center gap-3 px-4 py-3">
 								<Repeat size={18} className="text-gray-400 shrink-0" />
-								<span className="flex-1 text-sm text-gray-600 dark:text-gray-300">
+								<span className="flex-1 text-sm text-gray-600 dark:text-content-secondary">
 									Routine
 								</span>
-								<span className="text-sm font-semibold text-gray-900 dark:text-white">
+								<span className="text-sm font-semibold text-gray-900 dark:text-content-primary">
 									{probeCmd?.id ?? "—"}
 								</span>
 							</div>
@@ -230,12 +230,12 @@ export default function ProbeWizardDrawer({
 
 			{/* Footer */}
 			{step < 2 && (
-				<div className="shrink-0 px-5 py-3 flex items-center gap-3 border-t border-gray-200 dark:border-gray-700">
+				<div className="shrink-0 px-5 py-3 flex items-center gap-3 border-t border-gray-200 dark:border-outline">
 					<button
 						type="button"
 						onClick={handleBack}
 						disabled={step === 0}
-						className="w-11 h-11 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 disabled:opacity-30"
+						className="w-11 h-11 rounded-lg border border-gray-200 dark:border-outline flex items-center justify-center text-gray-500 dark:text-content-muted disabled:opacity-30"
 					>
 						<ChevronLeft size={20} />
 					</button>
@@ -260,11 +260,11 @@ export default function ProbeWizardDrawer({
 				</div>
 			)}
 			{step === 2 && (
-				<div className="shrink-0 px-5 py-3 flex items-center gap-3 border-t border-gray-200 dark:border-gray-700">
+				<div className="shrink-0 px-5 py-3 flex items-center gap-3 border-t border-gray-200 dark:border-outline">
 					<button
 						type="button"
 						onClick={handleBack}
-						className="w-11 h-11 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400"
+						className="w-11 h-11 rounded-lg border border-gray-200 dark:border-outline flex items-center justify-center text-gray-500 dark:text-content-muted"
 					>
 						<ChevronLeft size={20} />
 					</button>
@@ -273,8 +273,8 @@ export default function ProbeWizardDrawer({
 
 			<style>{`
                 @keyframes probe-start-glow {
-                    0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.35); }
-                    50% { box-shadow: 0 0 0 14px rgba(34, 197, 94, 0); }
+                    0%, 100% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.35); }
+                    50% { box-shadow: 0 0 0 14px rgba(5, 150, 105, 0); }
                 }
                 .probe-start-btn {
                     animation: probe-start-glow 2.4s ease-in-out infinite;

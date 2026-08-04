@@ -113,7 +113,7 @@ export function Jobs() {
 						<CardHeader>Job History</CardHeader>
 						<Button
 							icon={
-								<FaTrash className="text-gray-600 w-4 h-4 dark:text-gray-200" />
+								<FaTrash className="text-gray-600 w-4 h-4 dark:text-content-secondary" />
 							}
 							onClick={onClearJobHistory}
 							text="Clear"

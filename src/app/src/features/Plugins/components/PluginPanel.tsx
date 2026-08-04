@@ -32,7 +32,7 @@ const PluginPanel = ({ plugin, className = "", title }: PluginPanelProps) => {
 	return (
 		<div className={`flex flex-col w-full h-full min-h-0 ${className}`}>
 			{title && (
-				<p className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
+				<p className="text-sm font-medium text-gray-600 dark:text-content-secondary mb-2">
 					{title}
 				</p>
 			)}
@@ -40,7 +40,7 @@ const PluginPanel = ({ plugin, className = "", title }: PluginPanelProps) => {
 				key={reloadToken}
 				title={plugin.name}
 				src={iframeSrc}
-				className="flex-1 w-full min-h-[320px] border border-gray-200 rounded-md dark:border-dark-lighter bg-white dark:bg-dark"
+				className="flex-1 w-full min-h-[320px] border border-gray-200 rounded-md dark:border-outline bg-white dark:bg-surface-raised"
 				sandbox="allow-scripts allow-forms allow-same-origin"
 			/>
 		</div>

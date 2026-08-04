@@ -285,16 +285,16 @@ export default function JoggingCard() {
 
 	const toneClasses: Record<JogTone, string> = {
 		neutral:
-			"bg-white border-gray-400 text-gray-500 shadow-sm dark:bg-dark-lighter dark:border-gray-600 dark:text-gray-400 dark:shadow-none",
-		x: "bg-white border-red-600 text-red-700 shadow-sm dark:bg-dark-lighter dark:border-red-400 dark:text-red-400 dark:shadow-none",
-		y: "bg-white border-green-600 text-green-700 shadow-sm dark:bg-dark-lighter dark:border-green-400 dark:text-green-400 dark:shadow-none",
-		z: "bg-white border-blue-600 text-blue-700 shadow-sm dark:bg-dark-lighter dark:border-blue-400 dark:text-blue-400 dark:shadow-none",
-		a: "bg-white border-purple-500 text-purple-700 shadow-sm dark:bg-dark-lighter dark:border-purple-400 dark:text-purple-400 dark:shadow-none",
+			"bg-white border-gray-400 text-gray-500 shadow-sm dark:bg-surface-raised dark:border-outline dark:text-content-muted dark:shadow-none",
+		x: "bg-white border-red-600 text-red-700 shadow-sm dark:bg-surface-raised dark:border-red-400 dark:text-red-400 dark:shadow-none",
+		y: "bg-white border-green-600 text-green-700 shadow-sm dark:bg-surface-raised dark:border-green-400 dark:text-green-400 dark:shadow-none",
+		z: "bg-white border-blue-600 text-blue-700 shadow-sm dark:bg-surface-raised dark:border-blue-400 dark:text-blue-400 dark:shadow-none",
+		a: "bg-white border-purple-500 text-purple-700 shadow-sm dark:bg-surface-raised dark:border-purple-400 dark:text-purple-400 dark:shadow-none",
 	};
 
 	const activeClasses: Record<JogTone, string> = {
 		neutral:
-			"border-gray-400 bg-gray-200 text-gray-700 dark:border-gray-500 dark:bg-dark-lighter dark:text-gray-100",
+			"border-gray-400 bg-gray-200 text-gray-700 dark:border-outline dark:bg-surface-raised dark:text-content-primary",
 		x: "border-red-600 bg-red-600 text-white dark:border-red-400 dark:bg-red-600 dark:text-white",
 		y: "border-green-600 bg-green-600 text-white dark:border-green-400 dark:bg-green-600 dark:text-white",
 		z: "border-blue-600 bg-blue-600 text-white dark:border-blue-400 dark:bg-blue-600 dark:text-white",
@@ -387,7 +387,7 @@ export default function JoggingCard() {
 	);
 
 	return (
-		<div className="rounded-[20px] bg-gray-100 border border-gray-300 dark:bg-dark-darker dark:border-dark-lighter p-[max(0.375rem,min(0.75rem,1.75vh))] flex flex-col gap-[max(0.375rem,min(0.75rem,1.75vh))]">
+		<div className="rounded-[20px] bg-gray-100 border border-gray-300 dark:bg-surface-raised dark:border-outline p-[max(0.375rem,min(0.75rem,1.75vh))] flex flex-col gap-[max(0.375rem,min(0.75rem,1.75vh))]">
 			<div className="flex items-center justify-center gap-1.5">
 				{PRESET_META.map((preset) => (
 					<button
@@ -396,7 +396,7 @@ export default function JoggingCard() {
 						className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
 							stepPreset === preset.id
 								? "bg-robin-500 text-white border border-robin-500"
-								: "bg-white dark:bg-dark-lighter text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white border border-gray-300 dark:border-dark-lighter"
+								: "bg-white dark:bg-surface-raised text-gray-500 dark:text-content-muted hover:text-gray-700 dark:hover:text-content-primary border border-gray-300 dark:border-outline"
 						}`}
 					>
 						{preset.label}
@@ -516,7 +516,7 @@ export default function JoggingCard() {
 						aria-hidden="true"
 						className="h-[clamp(2.5rem,7vh,3.75rem)] flex items-center justify-center"
 					>
-						<Move className="w-[clamp(0.875rem,2vh,1.25rem)] h-[clamp(0.875rem,2vh,1.25rem)] text-gray-400/35 dark:text-gray-500/30" />
+						<Move className="w-[clamp(0.875rem,2vh,1.25rem)] h-[clamp(0.875rem,2vh,1.25rem)] text-gray-400/35 dark:text-content-muted/30" />
 					</div>
 
 					<JogActionButton
@@ -647,10 +647,10 @@ export default function JoggingCard() {
 								{(active) => (
 									<div className="h-full w-full flex flex-col items-center justify-center gap-0.5">
 										<ChevronUp
-											className={`w-[clamp(0.875rem,2vh,1.25rem)] h-[clamp(0.875rem,2vh,1.25rem)] ${active ? "text-white" : canJog ? "text-blue-600 dark:text-blue-400" : "text-gray-400 dark:text-gray-500"}`}
+											className={`w-[clamp(0.875rem,2vh,1.25rem)] h-[clamp(0.875rem,2vh,1.25rem)] ${active ? "text-white" : canJog ? "text-blue-600 dark:text-blue-400" : "text-gray-400 dark:text-content-muted"}`}
 										/>
 										<span
-											className={`text-[clamp(0.875rem,2.2vh,1.25rem)] font-semibold leading-none ${active ? "text-white" : canJog ? "text-blue-700 dark:text-blue-400" : "text-gray-400 dark:text-gray-500"}`}
+											className={`text-[clamp(0.875rem,2.2vh,1.25rem)] font-semibold leading-none ${active ? "text-white" : canJog ? "text-blue-700 dark:text-blue-400" : "text-gray-400 dark:text-content-muted"}`}
 										>
 											Z+
 										</span>
@@ -675,10 +675,10 @@ export default function JoggingCard() {
 								{(active) => (
 									<div className="h-full w-full flex flex-col items-center justify-center gap-0.5">
 										<ChevronDown
-											className={`w-[clamp(0.875rem,2vh,1.25rem)] h-[clamp(0.875rem,2vh,1.25rem)] ${active ? "text-white" : canJog ? "text-blue-600 dark:text-blue-400" : "text-gray-400 dark:text-gray-500"}`}
+											className={`w-[clamp(0.875rem,2vh,1.25rem)] h-[clamp(0.875rem,2vh,1.25rem)] ${active ? "text-white" : canJog ? "text-blue-600 dark:text-blue-400" : "text-gray-400 dark:text-content-muted"}`}
 										/>
 										<span
-											className={`text-[clamp(0.875rem,2.2vh,1.25rem)] font-semibold leading-none ${active ? "text-white" : canJog ? "text-blue-700 dark:text-blue-400" : "text-gray-400 dark:text-gray-500"}`}
+											className={`text-[clamp(0.875rem,2.2vh,1.25rem)] font-semibold leading-none ${active ? "text-white" : canJog ? "text-blue-700 dark:text-blue-400" : "text-gray-400 dark:text-content-muted"}`}
 										>
 											Z-
 										</span>
@@ -715,10 +715,10 @@ export default function JoggingCard() {
 								{(active) => (
 									<div className="h-full w-full flex flex-col items-center justify-center gap-0.5">
 										<RotateCw
-											className={`w-[clamp(0.875rem,2vh,1.25rem)] h-[clamp(0.875rem,2vh,1.25rem)] ${active ? "text-white" : canJog ? "text-purple-600 dark:text-purple-400" : "text-gray-400 dark:text-gray-500"}`}
+											className={`w-[clamp(0.875rem,2vh,1.25rem)] h-[clamp(0.875rem,2vh,1.25rem)] ${active ? "text-white" : canJog ? "text-purple-600 dark:text-purple-400" : "text-gray-400 dark:text-content-muted"}`}
 										/>
 										<span
-											className={`text-[clamp(0.875rem,2.2vh,1.25rem)] font-semibold leading-none ${active ? "text-white" : canJog ? "text-purple-700 dark:text-purple-400" : "text-gray-400 dark:text-gray-500"}`}
+											className={`text-[clamp(0.875rem,2.2vh,1.25rem)] font-semibold leading-none ${active ? "text-white" : canJog ? "text-purple-700 dark:text-purple-400" : "text-gray-400 dark:text-content-muted"}`}
 										>
 											A+
 										</span>
@@ -750,10 +750,10 @@ export default function JoggingCard() {
 								{(active) => (
 									<div className="h-full w-full flex flex-col items-center justify-center gap-0.5">
 										<RotateCcw
-											className={`w-[clamp(0.875rem,2vh,1.25rem)] h-[clamp(0.875rem,2vh,1.25rem)] ${active ? "text-white" : canJog ? "text-purple-600 dark:text-purple-400" : "text-gray-400 dark:text-gray-500"}`}
+											className={`w-[clamp(0.875rem,2vh,1.25rem)] h-[clamp(0.875rem,2vh,1.25rem)] ${active ? "text-white" : canJog ? "text-purple-600 dark:text-purple-400" : "text-gray-400 dark:text-content-muted"}`}
 										/>
 										<span
-											className={`text-[clamp(0.875rem,2.2vh,1.25rem)] font-semibold leading-none ${active ? "text-white" : canJog ? "text-purple-700 dark:text-purple-400" : "text-gray-400 dark:text-gray-500"}`}
+											className={`text-[clamp(0.875rem,2.2vh,1.25rem)] font-semibold leading-none ${active ? "text-white" : canJog ? "text-purple-700 dark:text-purple-400" : "text-gray-400 dark:text-content-muted"}`}
 										>
 											A-
 										</span>

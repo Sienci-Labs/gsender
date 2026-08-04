@@ -52,7 +52,7 @@ const PluginManager = () => {
 			withFullPadding
 		>
 			<div className="flex flex-col gap-4">
-				<p className="text-sm text-gray-600 dark:text-gray-300">
+				<p className="text-sm text-gray-600 dark:text-content-secondary">
 					Plugins directory:{" "}
 					{canOpenDir ? (
 						<Tooltip content="Open this folder in your file manager">
@@ -70,7 +70,7 @@ const PluginManager = () => {
 					)}
 				</p>
 
-				<p className="text-sm text-gray-500 dark:text-gray-400">
+				<p className="text-sm text-gray-500 dark:text-content-muted">
 					Each plugin is a folder containing{" "}
 					<code className="text-xs">gsender-plugin.json</code> and a{" "}
 					<code className="text-xs">ui/</code> build output. After installing or
@@ -105,10 +105,10 @@ const PluginManager = () => {
 					{plugins.map((plugin) => (
 						<div
 							key={plugin.id}
-							className="border border-gray-200 dark:border-dark-lighter rounded-md p-4 flex flex-col h-full"
+							className="border border-gray-200 dark:border-outline rounded-md p-4 flex flex-col h-full"
 						>
 							<div className="flex-1">
-								<p className="font-semibold dark:text-white">{plugin.name}</p>
+								<p className="font-semibold dark:text-content-primary">{plugin.name}</p>
 								<p className="text-xs text-gray-500">
 									{plugin.id} · v{plugin.version}
 								</p>

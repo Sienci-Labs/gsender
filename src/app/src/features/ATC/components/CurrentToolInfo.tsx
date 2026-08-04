@@ -184,7 +184,7 @@ export function CurrentToolInfo({ disabled }: { disabled?: boolean }) {
 					)}
 				</div>
 
-				<div className="text-left text-sm font-bold text-gray-700 dark:text-gray-200">
+				<div className="text-left text-sm font-bold text-gray-700 dark:text-content-secondary">
 					{isEmptyTool ? "" : (selectedTool.nickname ?? "")}
 				</div>
 

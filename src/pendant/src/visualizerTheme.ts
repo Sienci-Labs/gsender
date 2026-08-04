@@ -6,10 +6,14 @@ import {
 } from "app/features/Visualizer/constants";
 import { getVisualizerTheme } from "app/lib/getVisualizerTheme";
 
-export const PENDANT_CUT_COLOR = "#3e85c7";
-export const PENDANT_RAPID_COLOR = "#0ef6ae";
-export const PENDANT_BOUNDS_COLOR = "#9ca3af";
-export const PENDANT_RAPID_OPACITY = 0x0f / 0xff;
+// Aligned to the Tailwind config's configured scales (blue.500, green.500,
+// outline.strong) rather than one-off hex — see apps/desktop/tailwind.config.ts.
+export const PENDANT_CUT_COLOR = "#3F85C7"; // blue.500
+export const PENDANT_RAPID_COLOR = "#059669"; // green.500
+export const PENDANT_BOUNDS_COLOR = "#72849D"; // outline.strong
+// Raised from ~6% — rapid moves were nearly invisible on low-quality
+// pendant displays.
+export const PENDANT_RAPID_OPACITY = 0.35;
 
 export const getPendantWorkerTheme = () => {
 	const theme = new Map(getVisualizerTheme());

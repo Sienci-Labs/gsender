@@ -22,7 +22,7 @@ export function SpindleGcodePreview() {
 						{lines.map((line, index) => (
 							<div
 								key={index}
-								className={`py-1 px-2 text-gray-900 dark:text-gray-100 ${
+								className={`py-1 px-2 text-gray-900 dark:text-content-primary ${
 									index % 2 === 0 ? "bg-gray-100 dark:bg-surface-elevated" : ""
 								}`}
 							>

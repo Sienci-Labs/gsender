@@ -70,7 +70,7 @@ export function SecondaryContentPanel({ content }: SecondaryContentPanelProps) {
 							{item.title}
 						</h3>
 					)}
-					<div className="rounded-lg bg-gray-300 dark:bg-gray-700 p-1.5">
+					<div className="rounded-lg bg-gray-300 dark:bg-surface-elevated p-1.5">
 						<video
 							src={item.content as string}
 							className="w-full rounded-md shadow-sm"

@@ -9,7 +9,7 @@ export const buttonStyle = tv({
 		variant: {
 			primary: "border-blue-500 text-white bg-blue-500",
 			secondary:
-				"border-robin-500 hover:bg-gray-200 text-gray-600 bg-white dark:bg-surface-raised dark:text-gray-200",
+				"border-robin-500 hover:bg-gray-200 text-gray-600 bg-white dark:bg-surface-raised dark:text-content-secondary",
 			alt: "bg-robin-500 text-white border-robin-500",
 			warning: "bg-orange-500/90 text-white border-orange-300",
 			error: "bg-red-500 text-white border-red-700",
@@ -19,7 +19,7 @@ export const buttonStyle = tv({
 			ghost:
 				"text-gray-600 dark:text-content-secondary border-none shadow-none",
 			active:
-				"border-robin-500 hover:bg-gray-200 text-gray-600 bg-white dark:bg-surface-raised dark:text-gray-200",
+				"border-robin-500 hover:bg-gray-200 text-gray-600 bg-white dark:bg-surface-raised dark:text-content-secondary",
 		},
 		disabled: {
 			true: "bg-gray-300 border-gray-400 text-gray-500 hover:bg-gray-300 dark:bg-surface-raised cursor-not-allowed",

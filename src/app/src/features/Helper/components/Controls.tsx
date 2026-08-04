@@ -70,7 +70,7 @@ const Controls = () => {
 					updateSubstepOverlay(activeValues);
 					scrollToActiveStep(activeValues);
 				}}
-				className="flex items-center gap-1.5 text-xs px-3.5 py-1.5 rounded-md border border-gray-300 dark:border-[#3a3a48] text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 disabled:opacity-35 disabled:pointer-events-none transition-colors"
+				className="flex items-center gap-1.5 text-xs px-3.5 py-1.5 rounded-md border border-gray-300 dark:border-[#3a3a48] text-gray-600 dark:text-content-muted hover:bg-gray-100 dark:hover:bg-white/5 disabled:opacity-35 disabled:pointer-events-none transition-colors"
 			>
 				<ArrowLeft size={12} />
 				Back

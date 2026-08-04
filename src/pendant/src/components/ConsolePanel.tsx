@@ -71,7 +71,7 @@ export default function ConsolePanel({ className = "" }: Props) {
 					onChange={(e) => setInput(e.target.value)}
 					onKeyDown={onKey}
 					placeholder="Send command…"
-					className="flex-1 min-w-0 bg-transparent font-mono text-xs text-gray-800 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none"
+					className="flex-1 min-w-0 bg-transparent font-mono text-xs text-gray-800 dark:text-content-primary placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none"
 				/>
 				<button
 					onClick={send}

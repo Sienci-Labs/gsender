@@ -39,11 +39,8 @@ interface Props {
 }
 
 // ── Colour tokens ──────────────────────────────────────────────────────────────
-// Neutral surfaces/borders/text come from the Workshop CSS variables (see
-// index.css) so nothing neutral is hardcoded here. Only the brand play/accent
-// blue is theme-specific.
-
-const ACCENT = { dark: "#4a9eff", light: "#1a6fc4" };
+// Neutral surfaces/borders/text, and the accent/danger brand colors, all come
+// from the Workshop CSS variables (see index.css) — nothing is hardcoded here.
 
 // ── ActionTile ─────────────────────────────────────────────────────────────────
 
@@ -104,7 +101,7 @@ function MacroButton({
 	menuOpenId,
 	onMenuOpen,
 }: MacroButtonProps) {
-	const accent = isDark ? ACCENT.dark : ACCENT.light;
+	const accent = "var(--primary)";
 	const btnRef = useRef<HTMLDivElement>(null);
 	const menuRef = useRef<HTMLDivElement>(null);
 	const isMenuOpen = menuOpenId === macro.id;
@@ -223,11 +220,9 @@ function MacroButton({
 							fontWeight: 600,
 							padding: "1px 5px",
 							borderRadius: 10,
-							background: isDark
-								? "rgba(74,158,255,0.18)"
-								: "rgba(26,111,196,0.10)",
+							background: `color-mix(in srgb, var(--primary) ${isDark ? 18 : 10}%, transparent)`,
 							color: accent,
-							border: `1px solid ${isDark ? "rgba(74,158,255,0.35)" : "rgba(26,111,196,0.30)"}`,
+							border: `1px solid color-mix(in srgb, var(--primary) ${isDark ? 35 : 30}%, transparent)`,
 							flexShrink: 0,
 							letterSpacing: "0.02em",
 							position: "relative",
@@ -319,9 +314,7 @@ function MacroButton({
 								border: "none",
 								cursor: "pointer",
 								color: danger
-									? isDark
-										? "#f87171"
-										: "#dc2626"
+									? "var(--destructive)"
 									: "var(--content-secondary)",
 							}}
 						>

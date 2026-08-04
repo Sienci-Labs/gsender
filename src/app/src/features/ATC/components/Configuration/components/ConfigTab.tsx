@@ -108,7 +108,7 @@ export const ConfigTab: React.FC = ({
 							Go to ATC Setup
 							<ArrowRight className="h-4 w-4 ml-1" />
 						</Button>
-						<p className="text-sm text-gray-600 dark:text-gray-200">
+						<p className="text-sm text-gray-600 dark:text-content-secondary">
 							Tool rack configuration is managed through the ATC setup process.
 							Re-run setup to reconfigure your rack.
 						</p>

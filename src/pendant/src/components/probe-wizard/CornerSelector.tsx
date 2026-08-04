@@ -36,7 +36,7 @@ function BracketIcon({
 		>
 			<path
 				d="M8 8 V20 H20"
-				stroke={selected ? "#4ade80" : "var(--content-muted)"}
+				stroke={selected ? "#059669" : "var(--content-muted)"}
 				strokeWidth="3"
 				strokeLinecap="round"
 				strokeLinejoin="round"
@@ -67,7 +67,7 @@ export default function CornerSelector({
 								"flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 py-2.5 transition-colors",
 								selected
 									? "border-green-400 bg-green-400/10"
-									: "border-gray-300 dark:border-outline bg-white dark:bg-dark",
+									: "border-gray-300 dark:border-outline bg-white dark:bg-surface-elevated",
 							)}
 						>
 							<BracketIcon rotation={corner.rotation} selected={selected} />

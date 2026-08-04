@@ -54,7 +54,7 @@ export function ContinuityCheck({ onComplete, onUncomplete }: StepProps) {
 
 	return (
 		<div className="flex flex-col gap-5 justify-start">
-			<p className="dark:text-white">
+			<p className="dark:text-content-primary">
 				Let's confirm your Tool Length Sensor is wired correctly. Press the TLS
 				down when prompted below.
 			</p>
@@ -63,7 +63,7 @@ export function ContinuityCheck({ onComplete, onUncomplete }: StepProps) {
 				<ContinuityIndicator phase={phase} size={220} />
 
 				{isWaiting && (
-					<p className="text-sm text-gray-600 dark:text-gray-300 text-center">
+					<p className="text-sm text-gray-600 dark:text-content-secondary text-center">
 						Firmly press the TLS sensor to verify the connection.
 					</p>
 				)}

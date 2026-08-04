@@ -102,7 +102,7 @@ function Dropdown({
 			<div
 				className={cn(
 					"conn-anim-dropdown-in absolute top-full left-0 mt-3 z-50 rounded-lg shadow-2xl overflow-hidden border",
-					"bg-white dark:bg-dark border-gray-300 dark:border-outline",
+					"bg-white dark:bg-surface-elevated border-gray-300 dark:border-outline",
 					width,
 				)}
 			>
@@ -133,7 +133,7 @@ function PortRow({
 			<span
 				className={cn(
 					"conn-anim-port-glow flex items-center justify-center w-12 h-12 rounded-full shrink-0 bg-gray-100 dark:bg-slate-800",
-					muted ? "text-gray-500 dark:text-gray-400" : "text-blue-700",
+					muted ? "text-gray-500 dark:text-content-muted" : "text-blue-700",
 				)}
 			>
 				{row.kind === "eth" ? (
@@ -147,17 +147,17 @@ function PortRow({
 					className={cn(
 						"block text-sm font-semibold truncate",
 						muted
-							? "text-gray-500 dark:text-gray-400"
-							: "text-gray-700 dark:text-gray-300",
+							? "text-gray-500 dark:text-content-muted"
+							: "text-gray-700 dark:text-content-secondary",
 					)}
 				>
 					{row.label}
 				</span>
-				<span className="block text-xs font-mono mt-0.5 text-gray-500 dark:text-gray-400">
+				<span className="block text-xs font-mono mt-0.5 text-gray-500 dark:text-content-muted">
 					{row.meta}
 				</span>
 			</span>
-			<ChevronRight className="w-4 h-4 shrink-0 text-gray-500 dark:text-gray-400" />
+			<ChevronRight className="w-4 h-4 shrink-0 text-gray-500 dark:text-content-muted" />
 		</button>
 	);
 }
@@ -186,11 +186,11 @@ function PortDropdown({
 	return (
 		<Dropdown open={open} onClose={onClose} width="w-80">
 			<div className="px-3 py-3">
-				<p className="px-2 pb-1.5 text-xs font-medium uppercase tracking-widest text-gray-500 dark:text-gray-400">
+				<p className="px-2 pb-1.5 text-xs font-medium uppercase tracking-widest text-gray-500 dark:text-content-muted">
 					Recognized
 				</p>
 				{recognized.length === 0 ? (
-					<p className="px-2 py-3 text-sm text-gray-500 dark:text-gray-400">
+					<p className="px-2 py-3 text-sm text-gray-500 dark:text-content-muted">
 						No devices found
 					</p>
 				) : (
@@ -206,7 +206,7 @@ function PortDropdown({
 						<button
 							type="button"
 							onClick={() => setShowUnrecognized((v) => !v)}
-							className="w-full flex items-center justify-between px-2 py-2.5 text-xs font-medium uppercase tracking-widest text-gray-500 dark:text-gray-400 outline-none"
+							className="w-full flex items-center justify-between px-2 py-2.5 text-xs font-medium uppercase tracking-widest text-gray-500 dark:text-content-muted outline-none"
 						>
 							Unrecognized Ports
 							<ChevronDown
@@ -549,7 +549,7 @@ export default function ConnectionWidget() {
 						<span className="flex items-center justify-center w-11 h-11 shrink-0">
 							<Plug className={cn("w-6 h-6", status.icon)} />
 						</span>
-						<span className="flex-1 min-w-0 text-left truncate font-semibold text-sm text-black dark:text-white">
+						<span className="flex-1 min-w-0 text-left truncate font-semibold text-sm text-black dark:text-content-primary">
 							Connect to CNC
 						</span>
 					</button>
@@ -568,7 +568,7 @@ export default function ConnectionWidget() {
 						<span className="flex items-center justify-center w-11 h-11 shrink-0">
 							<Loader2 className={cn("w-6 h-6 animate-spin", status.icon)} />
 						</span>
-						<span className="flex-1 min-w-0 text-left truncate font-semibold text-sm text-black dark:text-white">
+						<span className="flex-1 min-w-0 text-left truncate font-semibold text-sm text-black dark:text-content-primary">
 							Connecting…
 						</span>
 					</div>
@@ -619,10 +619,10 @@ export default function ConnectionWidget() {
 							<PlugZap className={cn("w-6 h-6", status.icon)} />
 						</span>
 						<span className="relative flex-1 min-w-0 text-left leading-tight">
-							<span className="block text-sm font-semibold truncate text-gray-900 dark:text-gray-100">
+							<span className="block text-sm font-semibold truncate text-gray-900 dark:text-content-primary">
 								{firmware || "Connected"}
 							</span>
-							<span className="block text-xs font-mono truncate text-gray-600 dark:text-gray-400">
+							<span className="block text-xs font-mono truncate text-gray-600 dark:text-content-muted">
 								{displayPort}
 							</span>
 						</span>
@@ -633,13 +633,13 @@ export default function ConnectionWidget() {
 			{/* Info card — opened by a quick tap while connected. */}
 			<Dropdown open={infoOpen} onClose={() => setInfoOpen(false)} width="w-64">
 				<div className="p-4 text-sm space-y-2">
-					<p className="font-mono text-gray-700 dark:text-gray-300">
+					<p className="font-mono text-gray-700 dark:text-content-secondary">
 						Firmware: {firmware || "—"}
 					</p>
-					<p className="font-mono text-gray-700 dark:text-gray-300">
+					<p className="font-mono text-gray-700 dark:text-content-secondary">
 						Port: {displayPort || "—"} · {cfg.baud}
 					</p>
-					<p className="text-xs pt-2 border-t border-gray-300 dark:border-outline text-gray-500 dark:text-gray-400">
+					<p className="text-xs pt-2 border-t border-gray-300 dark:border-outline text-gray-500 dark:text-content-muted">
 						Hold the button to disconnect.
 					</p>
 				</div>

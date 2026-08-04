@@ -404,7 +404,7 @@ const Steps = () => {
 										<FaClipboardCheck className="min-w-8 min-h-8 text-green-500 " />
 									)}
 									{currentStep !== 0 && !markLocationCompleted && (
-										<FaClipboard className="min-w-8 min-h-8 text-amber-600 dark:text-dark-lighter" />
+										<FaClipboard className="min-w-8 min-h-8 text-amber-600 dark:text-content-muted" />
 									)}
 									{currentStep === 0 && (
 										<FaClipboardList className="min-w-8 min-h-8 text-blue-500 " />
@@ -440,7 +440,7 @@ const Steps = () => {
 										<FaClipboardCheck className="min-w-8 min-h-8 text-green-500 " />
 									)}
 									{currentStep !== 1 && !moveAxisCompleted && (
-										<FaClipboard className="min-w-8 min-h-8 text-amber-600 dark:text-dark-lighter" />
+										<FaClipboard className="min-w-8 min-h-8 text-amber-600 dark:text-content-muted" />
 									)}
 									{currentStep === 1 && (
 										<FaClipboardList className="min-w-8 min-h-8 text-blue-500 " />
@@ -496,7 +496,7 @@ const Steps = () => {
 										<FaClipboardCheck className="min-w-8 min-h-8 text-green-500 " />
 									)}
 									{currentStep !== 2 && !setTravelCompleted && (
-										<FaClipboard className="min-w-8 min-h-8 text-amber-600 dark:text-dark-lighter" />
+										<FaClipboard className="min-w-8 min-h-8 text-amber-600 dark:text-content-muted" />
 									)}
 									{currentStep === 2 && (
 										<FaClipboardList className="min-w-8 min-h-8 text-blue-500 " />

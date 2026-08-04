@@ -32,9 +32,10 @@ export function SpeedSelectButton({
 	return (
 		<button
 			className={cn(
-				"text-sm px-2 max-xl:px-1 max-xl:py-1 py-2 rounded h-full",
+				"text-sm px-2 max-xl:px-1 max-xl:py-1 py-2 rounded h-full border border-transparent",
 				{
-					"bg-blue-400 bg-opacity-30": active,
+					"bg-blue-400 bg-opacity-30 border-blue-500 font-semibold text-blue-700 dark:text-blue-300":
+						active,
 				},
 			)}
 			onClick={onClick}

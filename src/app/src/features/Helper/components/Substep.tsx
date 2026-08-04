@@ -52,7 +52,7 @@ const Substep = ({ step, index, stepIndex, firstRunOnly }: SubstepProps) => {
 				{step.title}
 			</div>
 
-			<div className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">
+			<div className="text-sm leading-relaxed text-gray-600 dark:text-content-muted">
 				{typeof step.description === "function"
 					? step.description()
 					: step.description}

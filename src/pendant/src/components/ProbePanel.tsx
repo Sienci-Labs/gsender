@@ -512,7 +512,7 @@ export default function ProbePanel({ mode }: Props) {
 				{/* Left section */}
 				<div className="flex-1 flex gap-2 min-w-0 items-stretch">
 					{/* Routine selector */}
-					<div className="flex-1 flex bg-white dark:bg-dark rounded-lg border border-gray-300 dark:border-gray-700 p-0.5">
+					<div className="flex-1 flex bg-white dark:bg-surface-elevated rounded-lg border border-gray-300 dark:border-outline p-0.5">
 						{availableProbeCommands.map((cmd, i) => (
 							<button
 								key={cmd.id}
@@ -522,7 +522,7 @@ export default function ProbePanel({ mode }: Props) {
 									"flex-1 text-xs font-semibold py-2.5 rounded-md transition-colors",
 									i === selectedProbeCommand
 										? "bg-blue-400/30 text-blue-600 dark:text-blue-400"
-										: "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-dark-lighter",
+										: "text-gray-600 dark:text-content-muted hover:bg-gray-100 dark:hover:bg-surface-hover",
 								)}
 							>
 								{cmd.id.split(" ")[0]}
@@ -536,10 +536,10 @@ export default function ProbePanel({ mode }: Props) {
 							isZProbeOnly && "invisible",
 						)}
 					>
-						<span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide truncate">
+						<span className="text-[10px] font-medium text-gray-400 dark:text-content-muted uppercase tracking-wide truncate">
 							Configuration
 						</span>
-						<span className="text-xs font-semibold text-gray-700 dark:text-gray-200 truncate">
+						<span className="text-xs font-semibold text-gray-700 dark:text-content-secondary truncate">
 							{formatDiameter(toolDiameter, units, probeType)} ·{" "}
 							{probeCmd?.id?.split(" ")[0] ?? "—"} ·{" "}
 							{CORNER_LABELS[direction] ?? "Unknown"}
@@ -580,7 +580,7 @@ export default function ProbePanel({ mode }: Props) {
 								setWizardMaxReached(2);
 							}}
 							disabled={!canClick()}
-							className="w-full text-[10px] leading-tight text-gray-500 dark:text-gray-400 border border-gray-300 dark:border-gray-700 rounded-lg px-1 py-1 disabled:opacity-40"
+							className="w-full text-[10px] leading-tight text-gray-500 dark:text-content-muted border border-gray-300 dark:border-outline rounded-lg px-1 py-1 disabled:opacity-40"
 						>
 							Repeat last: {CORNER_LABELS[lastProbeCorner]},{" "}
 							{formatDiameter(lastProbeDiameter, units, lastProbeType)}

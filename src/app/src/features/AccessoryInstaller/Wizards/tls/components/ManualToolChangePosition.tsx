@@ -100,11 +100,11 @@ export function ManualToolChangePosition({
 
 	return (
 		<div className="flex flex-col gap-5 justify-start">
-			<p className="dark:text-white">
+			<p className="dark:text-content-primary">
 				Jog to the location you'd like the machine to move to for manual tool
 				changes, then set the position using the <b>"Set Position"</b> button.
 			</p>
-			<p className="text-sm text-gray-600 dark:text-gray-300">
+			<p className="text-sm text-gray-600 dark:text-content-secondary">
 				The fields below are already filled with a recommended position. Hit{" "}
 				<b>"Go To"</b> to send the machine there, then jog to fine-tune it from
 				that starting point before setting the position.

@@ -224,7 +224,7 @@ function ATCContent({ mode }: { mode: DrawerMode }) {
 			>
 				<DialogTitle className="sr-only">Tool Table</DialogTitle>
 				<DialogContent className="overflow-hidden p-0 shadow-lg w-3/5 portrait:w-4/5">
-					<div className="flex flex-col bg-white dark:bg-dark-darker overflow-y-auto h-full p-4 gap-4">
+					<div className="flex flex-col bg-white dark:bg-surface-raised overflow-y-auto h-full p-4 gap-4">
 						<ToolTable tools={tools} disabled={disabled} />
 					</div>
 				</DialogContent>
@@ -248,7 +248,7 @@ function ATCContent({ mode }: { mode: DrawerMode }) {
 					type="button"
 					onClick={openToolTable}
 					disabled={disabled}
-					className="w-48 shrink-0 flex flex-col items-center justify-center gap-1.5 rounded-xl border border-gray-300 dark:border-dark-lighter bg-gray-50 dark:bg-dark text-gray-600 dark:text-gray-300 text-xs font-medium disabled:opacity-40 disabled:cursor-default transition-colors hover:bg-gray-100 dark:hover:bg-dark-lighter"
+					className="w-48 shrink-0 flex flex-col items-center justify-center gap-1.5 rounded-xl border border-gray-300 dark:border-outline bg-gray-50 dark:bg-surface-elevated text-gray-600 dark:text-content-secondary text-xs font-medium disabled:opacity-40 disabled:cursor-default transition-colors hover:bg-gray-100 dark:hover:bg-surface-hover"
 				>
 					<Table2 className="w-5 h-5" />
 					<span>Tools</span>
@@ -275,14 +275,14 @@ function ATCContent({ mode }: { mode: DrawerMode }) {
 						/>
 					</div>
 
-					<div className="border-t border-gray-200 dark:border-dark-lighter shrink-0" />
+					<div className="border-t border-gray-200 dark:border-outline shrink-0" />
 
-					<p className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide shrink-0">
+					<p className="text-[10px] font-medium text-gray-400 dark:text-content-muted uppercase tracking-wide shrink-0">
 						Tool Timeline
 					</p>
 
 					{timelineTools.length === 0 ? (
-						<p className="text-xs text-gray-400 dark:text-gray-500">
+						<p className="text-xs text-gray-400 dark:text-content-muted">
 							No tool changes in loaded file.
 						</p>
 					) : (

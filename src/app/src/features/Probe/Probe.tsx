@@ -154,7 +154,7 @@ const Probe = ({ state, actions }: ProbeProps) => {
 							</DropdownMenuContent>
 						</DropdownMenu>
 					)}
-					<div className="flex w-full bg-white dark:bg-surface-raised rounded-md border-solid border border-gray-300 dark:border-outline text-gray-900 dark:text-gray-200 p-[2px]">
+					<div className="flex w-full bg-white dark:bg-surface-raised rounded-md border-solid border border-gray-300 dark:border-outline text-gray-900 dark:text-content-secondary p-[2px]">
 						{availableProbeCommands.map((command, index) => (
 							<Tooltip content={`Probe using ${command.id}`} key={command.id}>
 								<ShadcnButton

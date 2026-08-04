@@ -244,3 +244,42 @@ body.reduced-motion * {
 		--ring: theme("colors.blue.500");
 	}
 }
+
+/* Workshop High-Contrast: raise the gviewer orientation-cube (ViewCube)
+   border/label contrast. Class names come from the vendored @sienci/gviewer
+   package (no source access), so this overrides via CSS specificity rather
+   than editing the widget itself. Kept inside @layer base like the CSS-var
+   bridge above — theme() outside a layer isn't reliably resolved by every
+   PostCSS/Tailwind entry point this file goes through (Vite's inline
+   css.postcss config vs. the standalone tailwind-dev CLI watcher). */
+@layer base {
+	.dark[data-dark-theme="workshop"] .gViewer-viewcube__face {
+		color: theme("colors.content.primary");
+		background: theme("colors.surface.raised");
+		border-color: theme("colors.outline.strong");
+	}
+
+	.dark[data-dark-theme="workshop"] .gViewer-viewcube__face:hover {
+		background: theme("colors.surface.hover");
+		border-color: theme("colors.outline.strong");
+	}
+
+	.dark[data-dark-theme="workshop"] .gViewer-viewcube__face.is-active {
+		border-color: theme("colors.blue.400");
+		color: theme("colors.content.primary");
+		box-shadow: 0 0 0 1px theme("colors.blue.400");
+	}
+}
+
+/* WorkspaceSelector's radix SelectTrigger keeps focus after a selection
+   closes the popover, which leaves the shared shadcn Select's focus ring
+   (focus:ring-2, see components/shadcn/Select.tsx) showing on a control
+   that doesn't need one. `important: true` makes every Tailwind utility
+   !important, so a same-specificity focus:ring-0 override isn't guaranteed
+   to win on class order alone — this plain rule (declared after the
+   Tailwind layers) settles it. */
+.workspace-select-trigger:focus,
+.workspace-select-trigger:focus-visible {
+	outline: none !important;
+	box-shadow: none !important;
+}

@@ -391,7 +391,7 @@ export default function BottomDrawer() {
 								style={{ width: 40, height: 32, borderRadius: 6 }}
 								className={`flex items-center justify-center border transition-colors ${
 									mode === "minimal" || mode === "expanded"
-										? "bg-[#ddeaf8] border-[#7aadd8] text-[#185FA5] dark:bg-[#0c2d4a] dark:border-[#2a6090] dark:text-[#5ba3e0]"
+										? "bg-[#ddeaf8] border-[#7aadd8] text-[#185FA5] dark:bg-blue-950 dark:border-blue-700 dark:text-blue-300"
 										: "border-gray-200 dark:border-outline text-gray-500 dark:text-content-muted hover:bg-gray-50 dark:hover:bg-surface-hover"
 								}`}
 							>
@@ -421,8 +421,8 @@ export default function BottomDrawer() {
 					>
 						{file.fileLoaded ? (
 							<div className="shrink-0 px-3 py-2 flex flex-col gap-2">
-								<div className="flex items-center gap-3 bg-gray-200/70 dark:bg-dark rounded-lg px-3 py-2">
-									<div className="w-8 h-8 rounded-lg bg-gray-300 dark:bg-dark-lighter flex items-center justify-center shrink-0">
+								<div className="flex items-center gap-3 bg-gray-200/70 dark:bg-surface-elevated rounded-lg px-3 py-2">
+									<div className="w-8 h-8 rounded-lg bg-gray-300 dark:bg-surface-raised flex items-center justify-center shrink-0">
 										<FileCode
 											size={15}
 											className="text-gray-600 dark:text-content-muted"
@@ -430,7 +430,7 @@ export default function BottomDrawer() {
 									</div>
 									<div className="flex-1 min-w-0">
 										<div className="flex items-center gap-2">
-											<span className="text-xs font-semibold text-gray-800 dark:text-white truncate">
+											<span className="text-xs font-semibold text-gray-800 dark:text-content-primary truncate">
 												{file.name}
 											</span>
 										</div>
@@ -450,13 +450,13 @@ export default function BottomDrawer() {
 									{stats.map(({ label, Icon, value }) => (
 										<div
 											key={label}
-											className="bg-white dark:bg-dark rounded-lg border border-gray-200 dark:border-outline px-2 py-2"
+											className="bg-white dark:bg-surface-elevated rounded-lg border border-gray-200 dark:border-outline px-2 py-2"
 										>
 											<div className="flex items-center gap-1 text-[8px] text-gray-400 uppercase tracking-wide mb-1 font-medium">
 												<Icon size={8} className="shrink-0" />
 												{label}
 											</div>
-											<span className="text-xs font-bold text-gray-800 dark:text-white leading-none">
+											<span className="text-xs font-bold text-gray-800 dark:text-content-primary leading-none">
 												{value}
 											</span>
 										</div>
@@ -480,7 +480,7 @@ export default function BottomDrawer() {
 							<div className="flex-1 overflow-hidden min-h-0">
 								{file.fileLoaded ? (
 									<div className="h-full overflow-auto px-3 py-2">
-										<div className="h-full rounded-lg border border-gray-200 dark:border-outline bg-white dark:bg-dark overflow-hidden">
+										<div className="h-full rounded-lg border border-gray-200 dark:border-outline bg-white dark:bg-surface-elevated overflow-hidden">
 											<GcodeEditor onClose={() => setMode("minimal")} />
 										</div>
 									</div>
