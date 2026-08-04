@@ -124,7 +124,7 @@ export function EEPROMSettingRow({
 						</Tooltip>
 					</span>
 				</div>
-				<span className="w-full sm:w-2/5 text-gray-500 text-sm mb-2 max-sm:mb-4 order-4">
+				<span className="w-full sm:w-2/5 text-gray-500 dark:text-content-secondary text-sm mb-2 max-sm:mb-4 order-4">
 					{detailString}
 				</span>
 				<div

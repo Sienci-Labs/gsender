@@ -322,7 +322,7 @@ export const SettingRow = React.memo(function SettingRow({
 					<span className="text-robin-500 min-w-9" />
 				</span>
 			</span>
-			<span className="w-full sm:w-2/5 order-2 sm:order-3 text-gray-500 text-sm flex flex-col gap-2 max-sm:mb-4 mb-2">
+			<span className="w-full sm:w-2/5 order-2 sm:order-3 text-gray-500 dark:text-content-secondary text-sm flex flex-col gap-2 max-sm:mb-4 mb-2">
 				{setting.description.split("\n").map((line: string, index: number) => (
 					<p key={index}>{line}</p>
 				))}
