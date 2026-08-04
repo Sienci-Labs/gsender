@@ -245,6 +245,109 @@ body.reduced-motion * {
 	}
 }
 
+/* Toast notifications (sonner, wrapped by components/shadcn/Sonner.tsx).
+   The wrapper sets toastOptions.unstyled so it owns the full visual layer;
+   these rules key off sonner's own [data-sonner-toast]/[data-type]
+   attributes since sonner doesn't expose a rail slot or a way to vary
+   font-weight by whether a description is present. */
+@layer base {
+	/* Sonner's built-in close icon is a fixed 12px SVG; size it up toward the
+	   spec's 18-20px visible icon within the 36x36 hit target. */
+	[data-close-button] svg {
+		width: 18px;
+		height: 18px;
+	}
+
+	/* Accent rail. inset-inline-start (not left) so it flips for RTL. */
+	[data-sonner-toast]::before {
+		content: "";
+		position: absolute;
+		inset-block: 0;
+		inset-inline-start: 0;
+		width: 4px;
+		border-start-start-radius: inherit;
+		border-end-start-radius: inherit;
+		background: theme("colors.gray.400");
+	}
+	[data-sonner-toast][data-type="success"]::before {
+		background: theme("colors.green.500");
+	}
+	[data-sonner-toast][data-type="info"]::before,
+	[data-sonner-toast][data-type="loading"]::before {
+		background: theme("colors.blue.500");
+	}
+	[data-sonner-toast][data-type="warning"]::before {
+		background: theme("colors.orange.500");
+	}
+	[data-sonner-toast][data-type="error"]::before {
+		background: theme("colors.red.500");
+	}
+
+	/* Light mode: subtle variant-tinted surface, never a saturated fill. */
+	[data-sonner-toast][data-type="success"] {
+		border-color: theme("colors.green.500 / 25%");
+		background-image: linear-gradient(
+			theme("colors.green.500 / 5%"),
+			theme("colors.green.500 / 5%")
+		);
+	}
+	[data-sonner-toast][data-type="info"] {
+		border-color: theme("colors.blue.500 / 25%");
+		background-image: linear-gradient(
+			theme("colors.blue.500 / 5%"),
+			theme("colors.blue.500 / 5%")
+		);
+	}
+	[data-sonner-toast][data-type="warning"] {
+		border-color: theme("colors.orange.500 / 25%");
+		background-image: linear-gradient(
+			theme("colors.orange.500 / 5%"),
+			theme("colors.orange.500 / 5%")
+		);
+	}
+	[data-sonner-toast][data-type="error"] {
+		border-color: theme("colors.red.500 / 25%");
+		background-image: linear-gradient(
+			theme("colors.red.500 / 5%"),
+			theme("colors.red.500 / 5%")
+		);
+	}
+
+	/* Dark mode: elevated surface, never a black or saturated-filled card.
+	   Only the border gets a subtle variant tint; rail/icon stay full-strength. */
+	.dark[data-dark-theme="workshop"] [data-sonner-toast] {
+		background-color: theme("colors.surface.elevated");
+		background-image: none;
+		border-color: theme("colors.outline.DEFAULT");
+	}
+	.dark[data-dark-theme="workshop"] [data-sonner-toast][data-type="success"] {
+		border-color: theme("colors.green.500 / 40%");
+	}
+	.dark[data-dark-theme="workshop"] [data-sonner-toast][data-type="info"],
+	.dark[data-dark-theme="workshop"] [data-sonner-toast][data-type="loading"] {
+		border-color: theme("colors.blue.500 / 40%");
+	}
+	.dark[data-dark-theme="workshop"] [data-sonner-toast][data-type="warning"] {
+		border-color: theme("colors.orange.500 / 40%");
+	}
+	.dark[data-dark-theme="workshop"] [data-sonner-toast][data-type="error"] {
+		border-color: theme("colors.red.500 / 40%");
+	}
+
+	/* Optional heading: this app's toasts pass a single message as sonner's
+	   title with no description, so the "heading absent" case is title-only,
+	   not description-only. Demote it from a bold heading to a compact
+	   medium-weight message; promote to a bold heading only when a
+	   description is also present. */
+	[data-sonner-toast] [data-content]:not(:has([data-description])) [data-title] {
+		font-weight: 500;
+	}
+	[data-sonner-toast] [data-content]:has([data-description]) [data-title] {
+		font-weight: 600;
+		font-size: 14.5px;
+	}
+}
+
 /* Workshop High-Contrast: raise the gviewer orientation-cube (ViewCube)
    border/label contrast. Class names come from the vendored @sienci/gviewer
    package (no source access), so this overrides via CSS specificity rather

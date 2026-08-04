@@ -30,7 +30,7 @@ import {
 	VISUALIZER_CATEGORY,
 } from "app/constants";
 import shuttleEvents from "app/lib/shuttleEvents";
-import { TOASTER_INFO, Toaster } from "app/lib/toaster/ToasterLib";
+import { toast } from "app/lib/toaster";
 import { cn } from "app/lib/utils";
 import { useContext, useState } from "react";
 import { arrayComparator } from "./utils";
@@ -89,11 +89,7 @@ const SetShortcut = () => {
 
 		closeModal();
 
-		Toaster.pop({
-			msg: "Button Shortcut Set",
-			type: TOASTER_INFO,
-			duration: 3000,
-		});
+		toast.info("Button Shortcut Set", { duration: 3000 });
 	};
 
 	const handleActionPress = (action) => {

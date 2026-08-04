@@ -8,7 +8,7 @@ import {
 import { Input } from "app/components/shadcn/Input";
 import gamepad, { shortcutComboBuilder } from "app/lib/gamepad";
 import shuttleEvents from "app/lib/shuttleEvents";
-import { TOASTER_SUCCESS, Toaster } from "app/lib/toaster/ToasterLib";
+import { toast } from "app/lib/toaster";
 import store from "app/store";
 import _ from "lodash";
 import PropTypes from "prop-types";
@@ -124,11 +124,7 @@ const ProfileShortcutModal = ({
 
 		onClose();
 
-		Toaster.pop({
-			msg: "Updated Gamepad Action Shortcut",
-			type: TOASTER_SUCCESS,
-			duration: 2000,
-		});
+		toast.success("Updated Gamepad Action Shortcut", { duration: 2000 });
 	};
 
 	return (

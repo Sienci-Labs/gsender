@@ -78,7 +78,7 @@ function App() {
 			<ReduxProvider store={reduxStore}>
 				<FocusTrappingBridge>
 					<AccessibilitySettingsHandler />
-					<Toaster richColors closeButton theme="light" visibleToasts={5} />
+					<Toaster closeButton visibleToasts={5} />
 					<HashRouter>
 						<ReactRoutes />
 					</HashRouter>
