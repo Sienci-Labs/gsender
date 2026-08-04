@@ -21,6 +21,7 @@
  *
  */
 
+import fs from "fs";
 import os from "os";
 import path from "path";
 import urljoin from "../lib/urljoin";
@@ -36,6 +37,24 @@ const getAppPath = () => {
 	return path.resolve(__dirname, "app");
 };
 
+// Pendant assets, present when the desktop build was made with pendant
+// support (vite:build:pendant → dist/gsender/pendant). The standalone
+// pendant binary overrides this via GSENDER_PENDANT_PATH (see pendant-main.js).
+const getPendantPath = () => {
+	if (process.env.GSENDER_PENDANT_PATH) return process.env.GSENDER_PENDANT_PATH;
+	return path.resolve(__dirname, "pendant");
+};
+const pendantPath = getPendantPath();
+const pendantAssets = fs.existsSync(pendantPath)
+	? {
+			pendant: {
+				routes: [urljoin(publicPath, "/pendant/"), "/pendant/"],
+				path: pendantPath,
+				maxAge: maxAge,
+			},
+		}
+	: {};
+
 export default {
 	route: "/", // with trailing slash
 	assets: {
@@ -49,6 +68,7 @@ export default {
 			path: getAppPath(),
 			maxAge: maxAge,
 		},
+		...pendantAssets,
 	},
 	backend: {
 		enable: false, // disable backend service in production

@@ -105,6 +105,7 @@ export interface Workspace {
 	notifications: Notification[];
 	toastDuration: number;
 	enableDarkMode: boolean;
+	usePendantViewAsDefault: boolean;
 	accessibility: {
 		statusAnnouncements: boolean;
 		jobProgressAnnouncements: boolean;

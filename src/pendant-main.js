@@ -21,13 +21,13 @@
  *
  */
 
-import { app, BrowserWindow, ipcMain, dialog, session } from "electron";
+import { app, dialog, ipcMain, session } from "electron";
 import log from "electron-log";
+import fs from "fs";
 import mkdirp from "mkdirp";
 import path from "path";
-import fs from "fs";
+import { createPendantWindow } from "./electron-app/pendant-window";
 import launchServer from "./server-cli";
-import pkg from "./package.json";
 
 // Point the bundled server at the pendant UI directory inside this binary.
 // settings.production.js reads GSENDER_PENDANT_PATH (with __dirname fallback);
@@ -126,30 +126,10 @@ const main = () => {
 			}
 
 			const isDev = !!externalRendererUrl;
-			mainWindow = new BrowserWindow({
-				title: `gSender Pendant ${pkg.version}`,
-				kiosk: !isDev,
-				fullscreen: !isDev,
-				frame: !isDev,
-				autoHideMenuBar: true,
-				show: false,
-				width: isDev ? 768 : 800,
-				height: isDev ? 1024 : 1280,
-				webPreferences: {
-					// Shared code from src/app/ uses window.require + window.ipcRenderer
-					// at module load; matching desktop's preload posture avoids forking that.
-					nodeIntegration: true,
-					enableRemoteModule: true,
-					contextIsolation: false,
-					preload: path.join(__dirname, "preload-pendant.js"),
-				},
-			});
-			require("@electron/remote/main").enable(mainWindow.webContents);
-
-			mainWindow.once("ready-to-show", () => {
-				mainWindow.show();
-				if (isDev) mainWindow.webContents.openDevTools({ mode: "detach" });
-			});
+			mainWindow = createPendantWindow(
+				isDev,
+				path.join(__dirname, "preload-pendant.js"),
+			);
 
 			mainWindow.on("closed", () => {
 				mainWindow = null;

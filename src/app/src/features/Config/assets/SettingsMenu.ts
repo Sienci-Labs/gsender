@@ -352,6 +352,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						type: "boolean",
 					},
 					{
+						label: "Use pendant view as default UI",
+						key: "workspace.usePendantViewAsDefault",
+						description:
+							"Launch directly into the touch-friendly pendant interface in fullscreen kiosk mode instead of the standard desktop UI. Requires an app restart to take effect.",
+						type: "boolean",
+					},
+					{
 						label: "DRO zeros",
 						key: "workspace.customDecimalPlaces",
 						description:
