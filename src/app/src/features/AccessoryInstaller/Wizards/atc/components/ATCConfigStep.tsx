@@ -1,4 +1,4 @@
-import type { StepProps } from "app/features/AccessoryInstaller/types";
+import type { StepProps } from "app/components/Wizard/types";
 import { ConfigTab } from "app/features/ATC/components/Configuration/components/ConfigTab.tsx";
 import {
 	ConfigProvider,

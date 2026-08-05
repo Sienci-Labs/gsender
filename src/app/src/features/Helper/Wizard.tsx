@@ -34,7 +34,7 @@ import { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 
 // Fetch toolchange settings and send it to backend
-export function updateToolchangeContext(mappings = null) {
+export function updateToolchangeContext(mappings: Map<number, number> = null) {
 	const hooks = store.get("workspace.toolChangeHooks", {});
 	const options = store.get("workspace.toolChange", {});
 	const toolChangeOption = store.get("workspace.toolChangeOption", "Ignore");

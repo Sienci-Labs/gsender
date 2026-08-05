@@ -51,8 +51,10 @@ const getCodeDescription = (code: number | "Homing" = 1): string => {
 const AlarmDescriptionIcon = ({ code = 1 }: { code: ALARM_CODE }) => {
 	const sendAlarmDescription = () => {
 		pubsub.publish("helper:info", {
-			title: "Alarm Code " + code,
+			title: `Alarm Code ${code}`,
 			description: getCodeDescription(code),
+			qrCode:
+				"https://resources.sienci.com/view/gs-gsender-grbl-alarm-error-codes/#alarms",
 		});
 	};
 

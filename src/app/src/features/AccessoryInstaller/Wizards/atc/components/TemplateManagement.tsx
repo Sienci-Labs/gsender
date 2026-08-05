@@ -1,4 +1,4 @@
-import type { StepProps } from "app/features/AccessoryInstaller/types";
+import type { StepProps } from "app/components/Wizard/types";
 import {
 	TemplateManagerListContent,
 	TemplateManagerMainContent,

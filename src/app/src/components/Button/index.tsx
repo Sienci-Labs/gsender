@@ -20,6 +20,7 @@ export const buttonStyle = tv({
 				"text-gray-600 dark:text-content-secondary border-none shadow-none",
 			active:
 				"border-robin-500 hover:bg-gray-200 text-gray-600 bg-white dark:bg-surface-raised dark:text-content-secondary",
+			nothing: "border-none bg-transparent shadow-none",
 		},
 		disabled: {
 			true: "bg-gray-300 border-gray-400 text-gray-500 hover:bg-gray-300 dark:bg-surface-raised cursor-not-allowed",

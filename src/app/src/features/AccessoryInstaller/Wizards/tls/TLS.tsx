@@ -1,5 +1,5 @@
-import { useValidations } from "app/features/AccessoryInstaller/hooks/UseValidations.tsx";
-import { Wizard } from "app/features/AccessoryInstaller/types";
+import { useValidations } from "app/components/Wizard/hooks/UseValidations";
+import type { Wizard } from "app/components/Wizard/types";
 import { TLSCompletion } from "app/features/AccessoryInstaller/Wizards/tls/components/Completion.tsx";
 import { ContinuityCheck } from "app/features/AccessoryInstaller/Wizards/tls/components/ContinuityCheck.tsx";
 import { ManualToolChangePosition } from "app/features/AccessoryInstaller/Wizards/tls/components/ManualToolChangePosition.tsx";
