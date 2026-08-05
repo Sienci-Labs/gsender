@@ -35,6 +35,7 @@ export const fetch = (req, res) => {
 		id: plugin.id,
 		name: plugin.name,
 		version: plugin.version,
+		description: plugin.description,
 		engine: plugin.engine,
 		permissions: plugin.permissions,
 		enabled: plugin.enabled,

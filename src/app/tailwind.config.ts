@@ -190,6 +190,19 @@ export default {
 					900: "#704007",
 					950: "#5e3506",
 				},
+				teal: {
+					50: "#E1F5EE",
+					100: "#9FE1CB",
+					200: "#5DCAA5",
+					600: "#0F6E56",
+				},
+				purple: {
+					50: "#EEEDFE",
+					100: "#CECBF6",
+					200: "#AFA9EC",
+					400: "#7F77DD",
+					600: "#534AB7",
+				},
 			},
 			borderColor: {
 				DEFAULT: "var(--border)",

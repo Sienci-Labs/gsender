@@ -1,6 +1,7 @@
 {
 	"id": "com.sienci.example-hello",
 	"name": "Hello Bridge",
+	"description": "A minimal demo of the plugin bridge client — subscribes to workspace state and Redux selectors.",
 	"version": "0.1.0",
 	"engine": ">=1.6.0",
 	"ui": {

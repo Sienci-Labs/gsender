@@ -1,6 +1,7 @@
 {
 	"id": "com.sienci.basic-cam",
 	"name": "Basic CAM",
+	"description": "A full reference CAM plugin combining every SDK entry point — bridge, hooks, and G-code preview.",
 	"version": "0.1.0",
 	"engine": ">=1.6.0",
 	"ui": {

@@ -175,6 +175,7 @@ const discoverPluginsInDir = (pluginsDir) => {
 			id: manifest.id,
 			name: manifest.name,
 			version: manifest.version,
+			description: manifest.description || "",
 			engine: manifest.engine || null,
 			permissions: manifest.permissions || [],
 			enabled,

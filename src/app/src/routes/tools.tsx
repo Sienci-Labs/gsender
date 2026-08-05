@@ -1,3 +1,4 @@
+import PluginToolCard from "app/components/PluginToolCard";
 import ToolCard from "app/components/ToolCard";
 import { usePlugins } from "app/features/Plugins/hooks/usePlugins";
 import { BiSolidCylinder } from "react-icons/bi";
@@ -6,7 +7,7 @@ import { GiFlatPlatform } from "react-icons/gi";
 import { LuDrill } from "react-icons/lu";
 import { MdSquareFoot } from "react-icons/md";
 import { PiPuzzlePiece } from "react-icons/pi";
-import { TbRulerMeasure } from "react-icons/tb";
+import { TbPuzzle, TbRulerMeasure } from "react-icons/tb";
 
 const ToolsPage = () => {
 	const { toolsPagePlugins } = usePlugins();
@@ -92,12 +93,14 @@ const ToolsPage = () => {
 					}
 
 					return (
-						<ToolCard
+						<PluginToolCard
 							key={plugin.id}
 							title={contribution.label || plugin.name}
 							description={`Plugin · v${plugin.version}`}
-							icon={PiPuzzlePiece}
+							blurb={plugin.description}
+							icon={TbPuzzle}
 							link={`/tools/plugin/${contribution.route}`}
+							official={plugin.id.startsWith("com.sienci.")}
 						/>
 					);
 				})}

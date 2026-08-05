@@ -23,6 +23,19 @@ Then restart gSender.
 
 Each folder must contain `gsender-plugin.json` and a `ui/` directory with the built SPA entry file.
 
+### Manifest fields
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `id` | yes | Unique identifier, reverse-DNS style (e.g. `com.sienci.basic-cam`). Plugins with a `com.sienci.` id are shown as "Sienci official" on the Tools page; anything else is shown as "Community". |
+| `name` | yes | Display name. |
+| `version` | yes | Semver string. |
+| `description` | no | Short blurb (~1 sentence) shown on the plugin's Tools-page card. Falls back to no blurb if omitted. |
+| `engine` | no | Compatible gSender version range (e.g. `>=1.6.0`). |
+| `ui.entry` | yes | Path to the built SPA entry file, relative to the plugin folder. |
+| `ui.contributions` | no | Array of `{ slot, route, label }` describing where the plugin mounts (e.g. `tools-page`). |
+| `permissions` | no | Array of bridge permissions the plugin requests (e.g. `machine:read`, `files:read`). |
+
 ### Building a plugin
 
 From the plugin folder:
@@ -39,7 +52,7 @@ For local dev in this repo you can skip copying: gSender loads `plugins/` direct
 ### Starting from a template
 
 1. Copy the example closest to your stack (`example-hello`, `react-ts-app`, or `example-viewer`).
-2. Edit `gsender-plugin.json` — change `id`, `name`, `route`, and `label`.
+2. Edit `gsender-plugin.json` — change `id`, `name`, `description`, `route`, and `label`.
 3. Rename the folder (optional; the manifest `id` is what matters).
 4. `npm install && npm run build`
 5. Restart gSender (or rely on dev hot-reload for edits to an already-loaded plugin).
