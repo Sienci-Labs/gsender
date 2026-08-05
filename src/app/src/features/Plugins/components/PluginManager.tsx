@@ -8,9 +8,8 @@ import Switch from "app/components/Switch";
 import { Tooltip } from "app/components/Tooltip"; // Ensure Tooltip exists
 import { toast } from "app/lib/toaster";
 import isElectron from "is-electron";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { usePlugins } from "../hooks/usePlugins";
-import { AxiosResponse } from "axios";
 
 const permissionsMap = new Map<string, string[]>([
 	[
