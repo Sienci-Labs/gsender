@@ -568,6 +568,24 @@ class GrblController {
 					// Handle specific cases for macro and pause, ignore is default and comments line out with no other action
 					// If toolchange is at very beginning of file, ignore it
 					if (toolChangeOption !== "Ignore") {
+						// The M6 line itself carries no inline comment - fall
+						// back to the comment line(s) directly above it (many
+						// post processors put the tool description there),
+						// prefixed with the tool word so the dialog always
+						// identifies the tool.
+						if (!commentString) {
+							const preceding = this.getPrecedingComments(sent);
+							const hasToolWord =
+								toolLabel &&
+								(preceding === toolLabel ||
+									preceding.startsWith(`${toolLabel} `));
+							commentString = hasToolWord
+								? preceding
+								: [toolLabel, preceding]
+										.filter(Boolean)
+										.join(" - ");
+						}
+
 						this.workflow.pause({ data: "M6", comment: commentString });
 
 						if (toolChangeOption === "Code") {
@@ -2355,6 +2373,39 @@ class GrblController {
 		} else {
 			this.write(data + "\n", context);
 		}
+	}
+
+	/**
+	 * Collect the comment-only lines immediately preceding a sender line.
+	 * Many post processors (Fusion 360 among them) emit the tool/operation
+	 * description on its own comment line right above the M6 block instead
+	 * of inline, so an M6 line without an inline comment can still be
+	 * described to the user by walking back over the preceding comments.
+	 * Walks upward from lines[index - 1], stops at the first non-comment
+	 * line, and returns at most three comment lines joined in file order.
+	 */
+	getPrecedingComments(index) {
+		const lines = _.get(this.sender, "state.lines", []);
+		const parts = [];
+		for (let i = index - 1; i >= 0 && parts.length < 3; i--) {
+			const prev = String(lines[i]).trim();
+			const semi = prev.match(/^;(.*)$/);
+			const paren = prev.match(/^\(([^)]*)\)$/);
+			if (!semi && !paren) {
+				break;
+			}
+			const text = (semi ? semi[1] : paren[1]).trim();
+			if (text) {
+				parts.unshift(text);
+			}
+		}
+		// Control characters (a stray \r from mixed line endings, U+2028/29)
+		// would corrupt the "%pre_complete ;<comment>" feeder marker this
+		// string gets embedded into, so flatten them to spaces.
+		return parts
+			.join(" ")
+			.replace(/[\u0000-\u001f\u2028\u2029]+/g, " ")
+			.trim();
 	}
 
 	convertGcodeToArray(gcode) {
