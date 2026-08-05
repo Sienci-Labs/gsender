@@ -94,19 +94,28 @@ const HelperInfo = ({ payload, infoVisible, onClose }: Props) => {
 					{qrCode && (
 						<div className="text-xs flex flex-col justify-center items-center text-center">
 							<p>Need Help?</p>
-							<p>Click Me!</p>
+
 							<Popover>
 								<PopoverTrigger className="w-20">
-									<h1 className="flex flex-row gap-2 items-center justify-center p-0 text-blue-600 font-bold text-xl">
-										<MdOutlineQrCode2 className="text-2xl" size={40} />
-									</h1>
+									<p className="text-blue-500">Click Me!</p>
 								</PopoverTrigger>
-								<PopoverContent className="w-80 text-sm" side="right">
+								<PopoverContent className="w-80 text-sm ml-4" side="right">
 									<div className="flex flex-col items-center text-sm text-gray-600 gap-4 px-4 justify-center dark:text-white">
-										<h1 className="text-blue-500 text-2xl">Scan QR Code</h1>
-										<p>
-											Scan with your phone camera to go to our resources page:
-										</p>
+										<h1 className="text-blue-500 text-2xl">Sienci Resources</h1>
+										<div className="justify-center items-center">
+											{"Click "}
+											<a
+												href={qrCode}
+												target="_blank"
+												rel="noopener noreferrer"
+												className="font-bold text-blue-600 hover:text-blue-700 hover:underline"
+											>
+												here
+											</a>
+											{
+												" to go to our online resources, or scan the QR code with your phone camera:"
+											}
+										</div>
 										<div className="border-8 border-gray-900 dark:border-white rounded-md bg-white p-2">
 											<QRCode value={qrCode} />
 										</div>

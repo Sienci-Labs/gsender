@@ -1,11 +1,11 @@
-import { StepActionButton } from "app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx";
-import { StepProps } from "app/features/AccessoryInstaller/types";
+import { StepActionButton } from "app/components/Wizard/StepActionButton.tsx";
+import type { StepProps } from "app/components/Wizard/types";
 import { ATCI_SUPPORTED_VERSION } from "app/features/ATC/utils/ATCiConstants.ts";
 import { updateToolchangeContext } from "app/features/Helper/Wizard.tsx";
 import controller from "app/lib/controller.ts";
 import { firmwarePastVersion } from "app/lib/firmwareSemver.ts";
 import store from "app/store";
-import { FirstToolBehavior } from "app/workspace/definitions";
+import type { FirstToolBehavior } from "app/workspace/definitions";
 import pubsub from "pubsub-js";
 import { useState } from "react";
 
