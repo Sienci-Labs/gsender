@@ -113,7 +113,7 @@ export function Jobs() {
 						<CardHeader>Job History</CardHeader>
 						<Button
 							icon={
-								<FaTrash className="text-gray-600 w-4 h-4 dark:text-gray-200" />
+								<FaTrash className="text-gray-600 w-4 h-4 dark:text-content-secondary" />
 							}
 							onClick={onClearJobHistory}
 							text="Clear"
@@ -133,11 +133,11 @@ export function Jobs() {
 				</StatCard>
 			</div>
 			<div className="col-span-2 row-span-6 col-start-5 pl-8 max-xl:pl-0 flex flex-col gap-2 justify-center items-center">
-				<div className="flex flex-col bg-white border border-gray-300 rounded p-2 h-full dark:bg-dark dark:border-dark-lighter w-full justify-center items-center">
+				<div className="flex flex-col bg-white border border-gray-300 rounded p-2 h-full dark:bg-surface-raised dark:border-outline w-full justify-center items-center">
 					<CardHeader>Jobs per CNC</CardHeader>
 					<JobsPerComPort />
 				</div>
-				<div className="flex flex-col bg-white border border-gray-300 rounded p-2 h-full dark:bg-dark dark:border-dark-lighter w-full justify-center items-center">
+				<div className="flex flex-col bg-white border border-gray-300 rounded p-2 h-full dark:bg-surface-raised dark:border-outline w-full justify-center items-center">
 					<CardHeader>Run Time per CNC</CardHeader>
 					<RunTimePerComPort />
 				</div>

@@ -58,7 +58,7 @@ export function SecondaryContentPanel({
 			return (
 				<div key={index} className={imageContainerClass}>
 					{item.title && (
-						<h3 className="text-sm font-semibold text-gray-700 dark:text-white mb-2">
+						<h3 className="text-sm font-semibold text-gray-700 dark:text-content-primary mb-2">
 							{item.title}
 						</h3>
 					)}
@@ -77,11 +77,11 @@ export function SecondaryContentPanel({
 			return (
 				<div key={index} className={containerClassName}>
 					{item.title && (
-						<h3 className="text-sm font-semibold text-gray-700 dark:text-white mb-2">
+						<h3 className="text-sm font-semibold text-gray-700 dark:text-content-primary mb-2">
 							{item.title}
 						</h3>
 					)}
-					<div className="rounded-lg bg-gray-300 dark:bg-gray-700 p-1.5">
+					<div className="rounded-lg bg-gray-300 dark:bg-surface-elevated p-1.5">
 						<video
 							src={itemContent as string}
 							className="w-full rounded-md shadow-sm"
@@ -100,7 +100,7 @@ export function SecondaryContentPanel({
 			return (
 				<div key={index} className={containerClassName}>
 					{item.title && (
-						<h3 className="text-sm font-semibold text-gray-700 dark:text-white mb-2">
+						<h3 className="text-sm font-semibold text-gray-700 dark:text-content-primary mb-2">
 							{item.title}
 						</h3>
 					)}

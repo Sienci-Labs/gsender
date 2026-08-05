@@ -1,3 +1,6 @@
+/** biome-ignore-all lint/a11y/noStaticElementInteractions: <> */
+/** biome-ignore-all lint/a11y/useKeyWithClickEvents: <> */
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
 import { Button } from "app/components/Button";
 import { Input } from "app/components/shadcn/Input";
 import {
@@ -16,9 +19,9 @@ import { store as reduxStore } from "app/store/redux";
 import { updateFileContent } from "app/store/redux/slices/fileInfo.slice";
 import {
 	ArrowUp,
-	BoxIcon,
 	Check,
 	ChevronDown,
+	ChevronLeft,
 	ChevronUp,
 	Copy,
 	CopyCheck,
@@ -35,6 +38,8 @@ import React, {
 	useRef,
 	useState,
 } from "react";
+import { PiMouseScroll } from "react-icons/pi";
+import { VscDebugStart } from "react-icons/vsc";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import {
 	a11yDark,
@@ -97,8 +102,8 @@ const GcodeEditorLine = React.memo(
 			if (isMatch) return "bg-yellow-50 dark:bg-yellow-900/20";
 			if (isSelected) return "bg-blue-100 dark:bg-blue-900/30";
 			if (lineStatus !== "none") return getLineStatusClass();
-			if (index % 2 === 0) return "bg-gray-200 dark:bg-dark-lighter";
-			return "hover:bg-gray-100 dark:hover:bg-dark-lighter/50";
+			if (index % 2 === 0) return "bg-gray-200 dark:bg-surface-elevated";
+			return "hover:bg-gray-100 dark:hover:bg-surface-hover";
 		};
 
 		const getInnerLineClassName = () => {
@@ -116,7 +121,7 @@ const GcodeEditorLine = React.memo(
 				return "text-yellow-900 dark:text-yellow-100 font-medium";
 			if (lineStatus === "processed")
 				return "text-green-900 dark:text-green-100";
-			return "dark:text-white";
+			return "dark:text-content-primary";
 		};
 
 		return (
@@ -144,10 +149,10 @@ const GcodeEditorLine = React.memo(
 					}
 					onMouseEnter={(e) => {
 						if (!isSelected)
-							e.currentTarget.classList.add("bg-gray-300", "dark:bg-gray-600");
+							e.currentTarget.classList.add("bg-gray-300", "dark:bg-surface-hover");
 					}}
 					onMouseLeave={(e) => {
-						e.currentTarget.classList.remove("bg-gray-300", "dark:bg-gray-600");
+						e.currentTarget.classList.remove("bg-gray-300", "dark:bg-surface-hover");
 					}}
 				>
 					{isSelected ? (
@@ -155,12 +160,12 @@ const GcodeEditorLine = React.memo(
 							<Check className="w-3 h-3 text-white" />
 						</div>
 					) : (
-						<div className="w-5 h-5 border-2 border-gray-400 dark:border-gray-500 rounded hover:border-blue-500" />
+						<div className="w-5 h-5 border-2 border-gray-400 dark:border-outline rounded hover:border-blue-500" />
 					)}
 				</div>
 				<span
 					className={cn(
-						"dark:text-white mr-4 min-w-10 text-right select-none",
+						"dark:text-content-primary mr-4 min-w-10 text-right select-none",
 						getInnerLineClassName(),
 					)}
 				>
@@ -269,10 +274,13 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 	const [currentMatchIndex, setCurrentMatchIndex] = useState<number>(-1);
 	const [matchIndices, setMatchIndices] = useState<number[]>([]);
 	const [isSearchOpen, setIsSearchOpen] = useState(false);
+	const [jumpQuery, setJumpQuery] = useState<number>(null);
+	const [isJumpOpen, setIsJumpOpen] = useState(false);
 	const [editingLineIndex, setEditingLineIndex] = useState<number | null>(null);
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 	const lineInputsRef = useRef<Map<number, HTMLInputElement>>(new Map());
 	const searchInputRef = useRef<HTMLInputElement>(null);
+	const jumpInputRef = useRef<HTMLInputElement>(null);
 	const scrollTopRef = useRef(0);
 	const rafRef = useRef<number | null>(null);
 	const scrollEndTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -490,7 +498,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
 			const container = scrollContainerRef.current;
-			if (!container || !container.contains(document.activeElement)) {
+			if (!container?.contains(document.activeElement)) {
 				return;
 			}
 
@@ -550,6 +558,24 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 		currentMatchIndex,
 	]);
 
+	const handleJumpToLine = () => {
+		const lineTop = Number(jumpQuery) * LINE_HEIGHT;
+		const container = scrollContainerRef.current;
+		const scrollTop = container.scrollTop;
+		const scrollBottom = scrollTop + container.clientHeight;
+
+		if (lineTop < scrollTop || lineTop + LINE_HEIGHT > scrollBottom) {
+			const targetScroll =
+				lineTop - container.clientHeight / 2 + LINE_HEIGHT / 2;
+			const currentLine = Math.floor(container.scrollTop / LINE_HEIGHT);
+			const distance = Math.abs(Number(jumpQuery) - currentLine);
+			container.scrollTo({
+				top: Math.max(0, targetScroll),
+				behavior: distance > SMOOTH_SCROLL_THRESHOLD ? "auto" : "smooth",
+			});
+		}
+	};
+
 	const handleSearchNext = () => {
 		if (matchIndices.length === 0) return;
 		const nextIndex =
@@ -584,7 +610,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 					position: "bottom-right",
 				},
 			);
-		} catch (err) {
+		} catch (_err) {
 			toast.error("Could not copy G-code to clipboard", {
 				position: "bottom-right",
 			});
@@ -638,7 +664,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 			toast.success("G-code saved successfully", {
 				position: "bottom-right",
 			});
-		} catch (err) {
+		} catch (_err) {
 			toast.error("Failed to save G-code", {
 				position: "bottom-right",
 			});
@@ -662,10 +688,10 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 	}
 
 	return (
-		<div className="w-full h-full flex flex-col bg-white dark:bg-dark shadow-lg rounded-md overflow-hidden dark:border dark:border-dark-lighter">
-			<div className="flex justify-between items-center p-3 border-b border-gray-300 dark:border-dark-lighter gap-3">
+		<div className="z-[10000] w-full h-full flex flex-col bg-white dark:bg-surface-raised shadow-lg rounded-md overflow-hidden dark:border dark:border-outline">
+			<div className="flex justify-between items-center p-3 border-b border-gray-300 dark:border-outline gap-3">
 				<div className="flex items-center gap-3 min-w-0 flex-1">
-					<h3 className="text-lg font-semibold dark:text-white whitespace-nowrap">
+					<h3 className="text-lg font-semibold dark:text-content-primary whitespace-nowrap">
 						G-code Editor
 					</h3>
 					{isJobRunning && (
@@ -689,7 +715,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 						</span>
 					)}
 					{gcodeLines.length > 0 && (
-						<span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+						<span className="text-xs text-gray-500 dark:text-content-muted whitespace-nowrap">
 							{gcodeLines.length.toLocaleString()} lines
 						</span>
 					)}
@@ -712,13 +738,14 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 				className="relative w-full flex-1 overflow-auto line-container bg-gray-100 dark:bg-[#18181f]"
 				onScroll={handleScroll}
 				onClick={handleContainerClick}
+				// biome-ignore lint/a11y/noNoninteractiveTabindex: <>
 				tabIndex={0}
 				style={{
 					scrollbarColor: "grey transparent",
 				}}
 			>
 				<div
-					className={`fixed bottom-20 right-8 z-10 transition-opacity ${scrollTop > 500 ? "pointer-events-auto" : "pointer-events-none"}`}
+					className={`fixed bottom-20 right-8 z-[10000] transition-opacity ${scrollTop > 500 ? "pointer-events-auto" : "pointer-events-none"}`}
 					style={{
 						opacity: scrollTop > 500 ? 1 : 0,
 						transform: scrollTop > 500 ? "translateY(0)" : "translateY(1rem)",
@@ -748,7 +775,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 				</div>
 
 				{isSearchOpen && (
-					<div className="fixed top-20 right-6 z-10 flex items-center gap-2 bg-gray-100 dark:bg-dark border border-gray-300 dark:border-dark-lighter p-3 rounded">
+					<div className="fixed top-20 right-6 z-[10000] flex items-center gap-2 bg-gray-100 dark:bg-surface-raised border border-gray-300 dark:border-outline p-3 rounded">
 						<Input
 							name="search-gcode-lines"
 							sizing="sm"
@@ -766,7 +793,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 								}
 							}}
 						/>
-						<span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+						<span className="text-xs text-gray-500 dark:text-content-muted whitespace-nowrap">
 							{matchIndices.length > 0
 								? `${currentMatchIndex + 1}/${matchIndices.length}`
 								: "0/0"}
@@ -801,6 +828,55 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 							icon={<X className="h-3 w-3" />}
 							tooltip={{
 								content: "Close search",
+							}}
+						/>
+					</div>
+				)}
+				{isJumpOpen && (
+					<div className="fixed top-20 right-6 z-[10000] flex items-center gap-2 bg-gray-100 dark:bg-surface-raised border border-gray-300 dark:border-outline p-3 rounded">
+						<span className="text-xs text-gray-500 dark:text-content-muted whitespace-nowrap">
+							Jump to line:
+						</span>
+						<Input
+							name="jump-gcode-lines"
+							sizing="sm"
+							type="number"
+							value={jumpQuery}
+							ref={jumpInputRef}
+							onChange={(e) => setJumpQuery(e.target.value)}
+							onKeyDown={(e) => {
+								if (e.key === "Enter") {
+									e.preventDefault();
+									handleJumpToLine();
+								}
+							}}
+						/>
+						<span className="text-xs text-gray-500 dark:text-content-muted whitespace-nowrap">
+							{`${Math.floor(
+								(scrollContainerRef.current?.scrollTop ?? 0) / LINE_HEIGHT +
+									scrollContainerRef.current?.clientHeight / 2 / LINE_HEIGHT,
+							)}/${gcodeLines.length}`}
+						</span>
+						<Button
+							size="icon"
+							onClick={handleJumpToLine}
+							disabled={jumpQuery === null}
+							className="h-6 w-6"
+							icon={<VscDebugStart className="h-3 w-3" />}
+							tooltip={{
+								content: "Jump To Line",
+							}}
+						/>
+						<Button
+							size="icon"
+							onClick={() => {
+								setJumpQuery(null);
+								setIsJumpOpen(false);
+							}}
+							className="h-6 w-6"
+							icon={<X className="h-3 w-3" />}
+							tooltip={{
+								content: "Close jump to line",
 							}}
 						/>
 					</div>
@@ -856,7 +932,22 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 						})}
 				</div>
 			</div>
-			<div className="flex gap-4 p-3 justify-end border-t border-gray-300 dark:border-dark-lighter">
+			<div className="flex gap-4 p-3 justify-end border-t border-gray-300 dark:border-outline">
+				<Button
+					variant={isJumpOpen ? "primary" : "outline"}
+					size="icon"
+					onClick={() => {
+						setIsJumpOpen((prev) => !prev);
+						setTimeout(() => {
+							jumpInputRef.current?.focus();
+						}, 100);
+					}}
+					className="border border-gray-500"
+					icon={<PiMouseScroll className="h-5 w-5" />}
+					tooltip={{
+						content: "Jump to Line",
+					}}
+				/>
 				<Button
 					variant={isSearchOpen ? "primary" : "outline"}
 					size="icon"

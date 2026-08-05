@@ -1,3 +1,4 @@
+import { usePostHog } from "@posthog/react";
 import {
 	Select,
 	SelectContent,
@@ -20,6 +21,7 @@ export function MachineProfileSelector() {
 		profileChangedSinceDefaults,
 	} = useSettings();
 	const baselineProfileId = useRef<number | null>(null);
+	const posthog = usePostHog();
 
 	if (baselineProfileId.current === null && machineProfile?.id !== undefined) {
 		baselineProfileId.current = machineProfile.id;
@@ -43,6 +45,11 @@ export function MachineProfileSelector() {
 		setProfileChangedSinceDefaults(
 			isSienci && id !== baselineProfileId.current,
 		);
+		posthog?.capture("machine_profile_selected", {
+			id: profile.id,
+			name: profile.name,
+			company: profile.company,
+		});
 	}
 
 	useEffect(() => {

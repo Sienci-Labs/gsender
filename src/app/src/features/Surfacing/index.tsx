@@ -138,10 +138,10 @@ const SurfacingTool = () => {
 
 	return (
 		<>
-			<div className="bg-white dark:bg-transparent dark:text-white w-full flex flex-col gap-2">
+			<div className="bg-white dark:bg-transparent dark:text-content-primary w-full flex flex-col gap-2">
 				<div className="grid grid-cols-2 gap-4">
 					<div className="grid gap-4 max-xl:gap-3 xl:gap-2">
-						<p className="text-sm xl:text-base font-normal text-gray-500 dark:text-gray-300">
+						<p className="text-sm xl:text-base font-normal text-gray-500 dark:text-content-secondary">
 							<b>For ideal wasteboard surfacing:</b> know your CNCs exact
 							movement limits accounting for limit switches and other add-ons,
 							get nicer and faster cuts using your widest diameter bit, and
@@ -207,8 +207,9 @@ const SurfacingTool = () => {
 										suffix={units}
 										min={0.00001}
 										max={10000}
+										invalid={isCutDepthExceedingMax}
 										className={cx("rounded", inputStyle, {
-											"text-red-500 border-red-500": isCutDepthExceedingMax,
+											"text-red-500": isCutDepthExceedingMax,
 										})}
 										wrapperClassName="w-full"
 										value={surfacing.skimDepth}
@@ -228,8 +229,9 @@ const SurfacingTool = () => {
 										suffix={units}
 										min={0.00001}
 										max={10000}
+										invalid={isCutDepthExceedingMax}
 										className={cx(inputStyle, {
-											"text-red-500 border-red-500": isCutDepthExceedingMax,
+											"text-red-500": isCutDepthExceedingMax,
 										})}
 										wrapperClassName="w-full"
 										value={surfacing.maxDepth}
@@ -338,7 +340,7 @@ const SurfacingTool = () => {
 									content={`Default is ${convertedDefaultSurfacingState.mist ? "on" : "off"}`}
 								>
 									<div className="flex items-center gap-2 justify-center">
-										<span className="font-light text-sm max-w-20 dark:text-white">
+										<span className="font-light text-sm max-w-20 dark:text-content-primary">
 											Mist (M7)
 										</span>
 										<Switch
@@ -358,7 +360,7 @@ const SurfacingTool = () => {
 									content={`Default is ${convertedDefaultSurfacingState.flood ? "on" : "off"}`}
 								>
 									<div className="flex items-center gap-2 justify-center">
-										<span className="font-light text-sm max-w-20 dark:text-white">
+										<span className="font-light text-sm max-w-20 dark:text-content-primary">
 											Flood (M8)
 										</span>
 										<Switch

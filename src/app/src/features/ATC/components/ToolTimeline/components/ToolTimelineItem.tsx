@@ -66,8 +66,8 @@ export function ToolTimelineItem({
 				className={cn(
 					"group relative flex w-full items-center gap-3 rounded-lg px-3 py-3 transition-colors border border-l-0 overflow-hidden",
 					isActive
-						? "bg-gray-50/80 border-2 dark:bg-gray-800/80"
-						: "bg-gray-50/80 border-gray-200 dark:bg-gray-800/80 dark:border-gray-700 hover:bg-gray-100/80 dark:hover:bg-gray-800/80",
+						? "bg-gray-50/80 border-2 dark:bg-surface-raised/80"
+						: "bg-gray-50/80 border-gray-200 dark:bg-surface-raised/80 dark:border-outline hover:bg-gray-100/80 dark:hover:bg-surface-hover/80",
 				)}
 				style={{
 					borderColor: isActive ? tool.color : undefined,
@@ -97,23 +97,23 @@ export function ToolTimelineItem({
 					<div className="flex items-center gap-1.5 min-h-[1.25rem]">
 						{isRemapped ? (
 							<>
-								<span className="text-xs text-gray-500 dark:text-gray-400 line-through">
+								<span className="text-xs text-gray-500 dark:text-content-muted line-through">
 									{currentToolLabel}
 								</span>
-								<span className="font-mono text-sm font-semibold text-gray-900 dark:text-gray-100">
+								<span className="font-mono text-sm font-semibold text-gray-900 dark:text-content-primary">
 									{mappedToolLabel}
 								</span>
 							</>
 						) : (
-							<span className="font-mono text-sm font-semibold text-gray-900 dark:text-gray-100">
+							<span className="font-mono text-sm font-semibold text-gray-900 dark:text-content-primary">
 								{currentToolLabel}
 							</span>
 						)}
 						{hasNickname && (
 							<>
-								<span className="text-gray-500 dark:text-gray-400">·</span>
+								<span className="text-gray-500 dark:text-content-muted">·</span>
 								<Tooltip content={label} side="top">
-									<span className="text-xs text-gray-500 dark:text-gray-400">
+									<span className="text-xs text-gray-500 dark:text-content-muted">
 										{label}
 									</span>
 								</Tooltip>
@@ -121,8 +121,8 @@ export function ToolTimelineItem({
 						)}
 						{!hasNickname && tool.comment && (
 							<>
-								<span className="text-gray-500 dark:text-gray-400">·</span>
-								<span className="text-xs text-gray-500 dark:text-gray-400 truncate">
+								<span className="text-gray-500 dark:text-content-muted">·</span>
+								<span className="text-xs text-gray-500 dark:text-content-muted truncate">
 									{tool.comment}
 								</span>
 							</>
@@ -143,12 +143,12 @@ export function ToolTimelineItem({
 				</div>
 
 				<div className="flex flex-shrink-0 items-center gap-3 self-stretch">
-					<span className="whitespace-nowrap font-mono text-xs text-gray-500 dark:text-gray-400">
+					<span className="whitespace-nowrap font-mono text-xs text-gray-500 dark:text-content-muted">
 						{lineRange}
 					</span>
 					{canRemap && (
 						<Button
-							className="relative z-10 !h-full !w-11 self-stretch rounded-lg border border-gray-300/80 bg-gray-100 text-gray-600 hover:bg-gray-200 dark:border-gray-600/70 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+							className="relative z-10 !h-full !w-11 self-stretch rounded-lg border border-gray-300/80 bg-gray-100 text-gray-600 hover:bg-gray-200 dark:border-outline/70 dark:bg-surface-elevated dark:text-content-secondary dark:hover:bg-surface-hover"
 							onClick={handleRemap}
 							disabled={remapDisabled}
 							size="custom"
@@ -160,7 +160,7 @@ export function ToolTimelineItem({
 			</div>
 
 			{!isLast && (
-				<div className="h-4 w-px bg-gray-300/50 dark:bg-gray-600/50" />
+				<div className="h-4 w-px bg-gray-300/50 dark:bg-outline-subtle/50" />
 			)}
 		</div>
 	);

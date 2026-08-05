@@ -28,6 +28,7 @@ import Tooltip from "app/components/Tooltip";
 import { useTypedSelector } from "app/hooks/useTypedSelector";
 import type React from "react";
 import { FaLightbulb, FaRegLightbulb, FaSatelliteDish } from "react-icons/fa";
+import type { SendM5Type } from "../definitions";
 
 type Props = {
 	actions: LaserActions;
@@ -46,7 +47,7 @@ interface LaserState {
 interface LaserActions {
 	sendLaserM3: () => void;
 	runLaserTest: () => void;
-	sendM5: () => void;
+	sendM5: (sendM5Type: SendM5Type) => void;
 	handleLaserPowerChange: (value: number) => void;
 	handleLaserDurationChange: (
 		event: React.ChangeEvent<HTMLInputElement>,
@@ -82,7 +83,7 @@ const LaserControls = ({ actions, state, canClick, isConnected }: Props) => {
 					}}
 				/>
 				<ActiveStateButton
-					onClick={actions.sendM5}
+					onClick={() => actions.sendM5({ type: "laser" })}
 					icon={<FaRegLightbulb />}
 					text="Off"
 					size={"sm"}
@@ -90,7 +91,7 @@ const LaserControls = ({ actions, state, canClick, isConnected }: Props) => {
 					tooltip={{ content: "Turn off laser" }}
 				/>
 			</div>
-			<div className="grid grid-cols-[1fr_3fr_1fr] gap-2 justify-center mt-2 items-center dark:text-white">
+			<div className="grid grid-cols-[1fr_3fr_1fr] gap-2 justify-center mt-2 items-center dark:text-content-primary">
 				<span className="text-right">Power</span>
 				<Tooltip content="Adjust laser power">
 					<Slider
@@ -106,7 +107,7 @@ const LaserControls = ({ actions, state, canClick, isConnected }: Props) => {
 				</Tooltip>
 				<span>{laser.power}%</span>
 			</div>
-			<div className="flex gap-2 justify-center items-center mt-1 dark:text-white">
+			<div className="flex gap-2 justify-center items-center mt-1 dark:text-content-primary">
 				<label htmlFor="laser-test-duration">Test Duration:</label>
 				<div className="flex gap-2">
 					<Tooltip content="Laser test duration">

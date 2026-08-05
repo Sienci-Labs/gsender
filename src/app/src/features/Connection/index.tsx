@@ -81,6 +81,24 @@ function Connection(props: ConnectionProps) {
 			onControllerDisconnect();
 		});
 
+		// A remote/browser client can be auto-joined to an already-open
+		// connection server-side (see lib/controller.ts's "startup" handler)
+		// without ever going through handleConnect(). Sync the local widget
+		// state so the header button reflects "Connected" in that case too.
+		controller.addListener("serialport:openController", () => {
+			setConnectionState((prevState) => {
+				if (prevState === ConnectionState.CONNECTED) {
+					return prevState;
+				}
+				const port = controller.port;
+				setActivePort(port);
+				setConnectionType(
+					isIPv4(port) ? ConnectionType.ETHERNET : ConnectionType.USB,
+				);
+				return ConnectionState.CONNECTED;
+			});
+		});
+
 		const preferredFirmware = store.get(
 			"widgets.connection.controller.type",
 			"grbl",
@@ -161,12 +179,24 @@ function Connection(props: ConnectionProps) {
 
 				setConnectionState(ConnectionState.CONNECTED);
 				setActivePort(port);
-				posthog?.capture("machine_connected", {
-					port,
-					connection_type: type,
-					baudrate: baud,
-					firmware: defaultFirmware,
-				});
+
+				// Version isn't available until firmware startup arrives after port open
+				setTimeout(() => {
+					const version = get(controller.settings, "version");
+					const firmwareVersion = get(version, "version", "Unknown");
+					const firmwareVersionSemver = get(version, "semver", "Unknown");
+
+					const payload = {
+						port,
+						connection_type: type,
+						baudrate: baud,
+						firmware: controller.type || defaultFirmware,
+						firmware_version: firmwareVersion,
+						firmware_version_semver: firmwareVersionSemver,
+					};
+
+					posthog?.capture("machine_connected", payload);
+				}, 1500);
 			},
 		);
 
@@ -282,7 +312,7 @@ function Connection(props: ConnectionProps) {
 				)}
 				<PopoverTrigger asChild>
 					<button
-						className="h-12 max-xl:h-10 relative border border-gray-400 bg-gray-100 font-bold px-4 py-2 max-sm:p-1 ring-1 ring-gray-900/5 gap-4 justify-between items-center rounded-lg leading-none flex flex-row items-top portrait:min-w-[170px] portrait:max-sm:min-w-max min-w-[250px] max-xl:min-w-[180px] max-sm:min-w-0 dark:bg-dark text-black dark:text-white cursor-pointer"
+						className="h-12 max-xl:h-10 relative border border-gray-400 bg-gray-100 font-bold px-4 py-2 max-sm:p-1 ring-1 ring-gray-900/5 gap-4 justify-between items-center rounded-lg leading-none flex flex-row items-top portrait:min-w-[170px] portrait:max-sm:min-w-max min-w-[250px] max-xl:min-w-[180px] max-sm:min-w-0 dark:bg-surface-raised text-black dark:text-content-primary cursor-pointer"
 						onClick={handleClick}
 					>
 						<ConnectionStateIndicator

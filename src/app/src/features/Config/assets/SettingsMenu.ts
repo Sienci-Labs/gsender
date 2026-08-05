@@ -1,4 +1,5 @@
 /** biome-ignore-all lint/suspicious/noExplicitAny: <> */
+import { Confirm } from "app/components/ConfirmationDialog/ConfirmationDialogLib.ts";
 import {
 	GRBL,
 	GRBLHAL,
@@ -331,8 +332,10 @@ export const SettingsMenu: SettingsMenuSection[] = [
 
 							if (toggle === true || toggle === "accepted") {
 								posthog.opt_in_capturing();
+								posthog?.capture("data_collection_accepted");
 							} else {
 								posthog.opt_out_capturing();
+								posthog?.capture("data_collection_declined");
 							}
 						},
 						ignoreDefaultCheck: true,
@@ -348,6 +351,28 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						description:
 							"Change the app colours for reduced eye strain, better contrast, or just for fun!",
 						type: "boolean",
+					},
+					{
+						label: "Use pendant view as default UI",
+						key: "workspace.usePendantViewAsDefault",
+						description:
+							"Launch directly into the touch-friendly pendant interface in fullscreen kiosk mode instead of the standard desktop UI. Requires an app restart to take effect.",
+						type: "boolean",
+						onChange: (value: boolean) => {
+							store.set("workspace.usePendantViewAsDefault", value);
+							if (value && isElectron()) {
+								Confirm({
+									title: "Restart Required",
+									content:
+										"gSender needs to restart to switch to the pendant view.",
+									confirmLabel: "Restart Now",
+									cancelLabel: "Later",
+									onConfirm: () => {
+										(window as any).ipcRenderer.send("remoteMode-restart");
+									},
+								});
+							}
+						},
 					},
 					{
 						label: "DRO zeros",
@@ -384,12 +409,13 @@ export const SettingsMenu: SettingsMenuSection[] = [
 					{
 						label: "Show bounding box",
 						key: "widgets.visualizer.objects.limits.visible",
-						description: "Draw a wireframe around the extents of the loaded G-code file.",
+						description:
+							"Draw a wireframe around the extents of the loaded G-code file.",
 						type: "boolean",
 						onChange: (value: boolean) => {
-						store.set("widgets.visualizer.objects.limits.visible", value);
-						pubsub.publish("visualizer:settings");
-					},
+							store.set("widgets.visualizer.objects.limits.visible", value);
+							pubsub.publish("visualizer:settings");
+						},
 					},
 					{
 						label: "Show bounding box labels",
@@ -947,17 +973,17 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						},
 					},
 					{
-						label: 'Probe Movement Speed',
-						key: 'widgets.probe.probeMovementSpeed',
+						label: "Probe Movement Speed",
+						key: "widgets.probe.probeMovementSpeed",
 						description:
-							'Feed rate for retract/reposition moves during probing. If 0, these moves use rapid (G0). If set, they use a controlled feed move (G1) at this speed instead. (Default 0)',
-						type: 'number',
+							"Feed rate for retract/reposition moves during probing. If 0, these moves use rapid (G0). If set, they use a controlled feed move (G1) at this speed instead. (Default 0)",
+						type: "number",
 						min: 0,
-						unit: 'mm/min',
+						unit: "mm/min",
 						hidden: (getPending) => {
 							const probeType = getPending(
-								'workspace.probeProfile.touchplateType',
-								'',
+								"workspace.probeProfile.touchplateType",
+								"",
 							);
 							// BitZero already always uses G1 for retracts, so this setting doesn't apply to it
 							return probeType === TOUCHPLATE_TYPE_BITZERO;

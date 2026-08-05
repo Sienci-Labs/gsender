@@ -1,3 +1,4 @@
+import { usePostHog } from "@posthog/react";
 import { Button } from "app/components/shadcn/Button";
 import { LASER_MODE } from "app/constants";
 import { toast } from "app/lib/toaster";
@@ -16,6 +17,7 @@ interface OutlineButtonProps {
 let outlineRunning = false;
 
 const OutlineButton: React.FC<OutlineButtonProps> = ({ disabled }) => {
+	const posthog = usePostHog();
 	// TODO
 	const runOutline = () => {
 		const liteMode = store.get("widgets.visualizer.liteMode", false);
@@ -56,6 +58,13 @@ const OutlineButton: React.FC<OutlineButtonProps> = ({ disabled }) => {
 					mode: "Square",
 					bbox: bbox,
 					outlineSpeed,
+				});
+
+				posthog?.capture("outline_run", {
+					is_in_lite_mode: liteMode,
+					is_laser: isLaser,
+					outline_speed: outlineSpeed,
+					bbox,
 				});
 			} catch (e) {
 				console.log(e);

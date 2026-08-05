@@ -116,6 +116,8 @@ export interface ControllerListeners {
 	"sdcard:files": Array<Function>;
 	"sdcard:clear": Array<Function>;
 	"sdcard:json": Array<Function>;
+	// Dev-only: emitted by the server when a plugin's files are updated.
+	"plugins:changed": Array<Function>;
 }
 
 const ensureArray = (...args: Array<any>) => {
@@ -229,6 +231,7 @@ class Controller {
 		"ymodem:progress": [],
 		"ymodem:error": [],
 		"job:stop": [],
+		"plugins:changed": [],
 	};
 
 	context = {
@@ -358,6 +361,7 @@ class Controller {
 				loadedControllers = [],
 				baudrates = [],
 				ports = [],
+				activeConnection = null,
 			} = { ...data };
 
 			this.loadedControllers = ensureArray(loadedControllers);
@@ -376,6 +380,14 @@ class Controller {
 			// don't want to update store if it is electron
 			if (!isElectron()) {
 				this.socket && this.socket.emit("newConnection");
+
+				// A remote/browser client only ever talks to one controller at a
+				// time. If the desktop is already connected, join that session
+				// automatically instead of making the user click Connect — this
+				// takes priority over any locally-saved autoReconnect port.
+				if (activeConnection && activeConnection.port) {
+					this.addClient(activeConnection.port);
+				}
 			}
 		});
 	}
@@ -455,27 +467,27 @@ class Controller {
 		this.socket && this.socket.emit("close", port, callback);
 	}
 
-    //Sends an event to start flashing
-    //@param {string} flashPort The port to be flashed
-    //@param {string} imageType The type of image to be flashed to the port
-    flashFirmware(
-        flashPort: string,
-        imageType: string,
-        isHal: boolean,
-        hex: string | ArrayBuffer,
-        firmwareType: string = 'hex',
-    ): void {
-        //TODO: not sure what type imageType is
-        this.socket &&
-            this.socket.emit(
-                'flash:start',
-                flashPort,
-                imageType,
-                isHal,
-                hex,
-                firmwareType,
-            );
-    }
+	//Sends an event to start flashing
+	//@param {string} flashPort The port to be flashed
+	//@param {string} imageType The type of image to be flashed to the port
+	flashFirmware(
+		flashPort: string,
+		imageType: string,
+		isHal: boolean,
+		hex: string | ArrayBuffer,
+		firmwareType: string = "hex",
+	): void {
+		//TODO: not sure what type imageType is
+		this.socket &&
+			this.socket.emit(
+				"flash:start",
+				flashPort,
+				imageType,
+				isHal,
+				hex,
+				firmwareType,
+			);
+	}
 
 	// Retrieves a list of available serial ports with metadata.
 	// @param {function} [callback] Called once completed.

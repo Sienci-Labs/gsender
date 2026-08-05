@@ -68,7 +68,7 @@ export const PositionInput: React.FC<PositionInputProps> = ({
 	return (
 		<div className="flex flex-wrap items-start gap-3 py-1 w-full">
 			{!hideLabel && (
-				<Label className="text-xs font-medium text-gray-700 dark:text-white">
+				<Label className="text-xs font-medium text-gray-700 dark:text-content-primary">
 					{label}
 				</Label>
 			)}
@@ -78,7 +78,7 @@ export const PositionInput: React.FC<PositionInputProps> = ({
 						"flex flex-col gap-2 rounded-md border p-2 w-full flex-1",
 						hasZeroAxis
 							? "border-orange-400 bg-orange-50/10 dark:bg-orange-900/20"
-							: "border-gray-200 dark:border-slate-700 dark:bg-slate-800",
+							: "border-gray-200 dark:border-outline dark:bg-surface-elevated",
 					)}
 					style={
 						hasZeroAxis
@@ -91,7 +91,7 @@ export const PositionInput: React.FC<PositionInputProps> = ({
 				>
 					<div className="flex items-center gap-2 flex-wrap">
 						<div className="flex items-center gap-1 flex-1 min-w-[6.5rem]">
-							<Label className="text-xs text-muted-foreground dark:text-gray-300 w-4">
+							<Label className="text-xs text-muted-foreground dark:text-content-secondary w-4">
 								X:
 							</Label>
 							<Input
@@ -100,7 +100,7 @@ export const PositionInput: React.FC<PositionInputProps> = ({
 								value={unitPosition.x}
 								onChange={(e) => handleAxisChange("x", e.target.value)}
 								className={cn(
-									"w-full h-8 text-xs border-gray-300 dark:border-slate-600 dark:bg-slate-900 dark:text-white focus:border-blue-500 focus:ring-blue-500",
+									"w-full h-8 text-xs border-gray-300 dark:border-outline dark:bg-surface-sunken dark:text-content-primary focus:border-blue-500 focus:ring-blue-500",
 									hasZeroAxis &&
 										"border-orange-400 focus:border-orange-500 focus:ring-orange-500",
 								)}
@@ -108,7 +108,7 @@ export const PositionInput: React.FC<PositionInputProps> = ({
 							/>
 						</div>
 						<div className="flex items-center gap-1 flex-1 min-w-[6.5rem]">
-							<Label className="text-xs text-muted-foreground dark:text-gray-300 w-4">
+							<Label className="text-xs text-muted-foreground dark:text-content-secondary w-4">
 								Y:
 							</Label>
 							<Input
@@ -117,7 +117,7 @@ export const PositionInput: React.FC<PositionInputProps> = ({
 								value={unitPosition.y}
 								onChange={(e) => handleAxisChange("y", e.target.value)}
 								className={cn(
-									"w-full h-8 text-xs border-gray-300 dark:border-slate-600 dark:bg-slate-900 dark:text-white focus:border-blue-500 focus:ring-blue-500",
+									"w-full h-8 text-xs border-gray-300 dark:border-outline dark:bg-surface-sunken dark:text-content-primary focus:border-blue-500 focus:ring-blue-500",
 									hasZeroAxis &&
 										"border-orange-400 focus:border-orange-500 focus:ring-orange-500",
 								)}
@@ -131,7 +131,7 @@ export const PositionInput: React.FC<PositionInputProps> = ({
 									disableZ && "max-xl:hidden",
 								)}
 							>
-								<Label className="text-xs text-muted-foreground dark:text-gray-300 w-4">
+								<Label className="text-xs text-muted-foreground dark:text-content-secondary w-4">
 									Z:
 								</Label>
 								<Input
@@ -140,7 +140,7 @@ export const PositionInput: React.FC<PositionInputProps> = ({
 									value={unitPosition.z}
 									onChange={(e) => handleAxisChange("z", e.target.value)}
 									className={cn(
-										"w-full h-8 text-xs border-gray-300 dark:border-slate-600 dark:bg-slate-900 dark:text-white focus:border-blue-500 focus:ring-blue-500",
+										"w-full h-8 text-xs border-gray-300 dark:border-outline dark:bg-surface-sunken dark:text-content-primary focus:border-blue-500 focus:ring-blue-500",
 										hasZeroAxis &&
 											"border-orange-400 focus:border-orange-500 focus:ring-orange-500",
 									)}

@@ -1,3 +1,4 @@
+import { usePostHog } from "@posthog/react";
 import {
 	Select,
 	SelectContent,
@@ -24,7 +25,20 @@ const availableWorkspaces = {
 
 export type GrblWorkspace = "G54" | "G55" | "G56" | "G57" | "G58" | "G59";
 
+// Matches the pendant's per-workspace accent colors (see
+// src/pendant/src/components/WorkspaceSelector.tsx) so the two apps read
+// the same workspace as the same color.
+const WORKSPACE_TEXT_COLORS: Record<GrblWorkspace, string> = {
+	G54: "text-blue-600 dark:text-blue-400",
+	G55: "text-emerald-600 dark:text-emerald-400",
+	G56: "text-amber-600 dark:text-amber-400",
+	G57: "text-violet-600 dark:text-violet-400",
+	G58: "text-rose-600 dark:text-rose-400",
+	G59: "text-cyan-600 dark:text-cyan-400",
+};
+
 export function WorkspaceSelector() {
+	const posthog = usePostHog();
 	const activeWorkspace = useSelector(
 		(state: RootState) => state.controller.modal.wcs,
 	);
@@ -50,6 +64,7 @@ export function WorkspaceSelector() {
 	function onWorkspaceSelect(value: GrblWorkspace) {
 		setWorkspace(value);
 		controller.command("gcode", value);
+		posthog?.capture("workspace_selected", { workspace: value });
 	}
 
 	const disabled =
@@ -59,7 +74,9 @@ export function WorkspaceSelector() {
 
 	return (
 		<div className="absolute top-4 right-4 w-56 flex flex-row items-center justify-end gap-2">
-			<span className="text-gray-400 text-normal">Workspace:</span>
+			<span className="text-gray-400 dark:text-content-muted text-normal">
+				Workspace:
+			</span>
 			<Tooltip content="Select a workspace" side="left">
 				<div>
 					<Select
@@ -68,18 +85,24 @@ export function WorkspaceSelector() {
 						disabled={disabled}
 					>
 						<SelectTrigger
-							className="max-w-24 h-7 bg-white rounded-md border-solid border border-gray-300"
+							className="workspace-select-trigger max-w-24 h-7 bg-white dark:bg-surface-elevated dark:text-content-primary rounded-md border-solid border border-gray-300 dark:border-outline focus:ring-0 focus:ring-offset-0"
 							aria-label="Select workspace"
 						>
 							<SelectValue placeholder="G54" />
 						</SelectTrigger>
-						<SelectContent className="flex-1 bg-white">
-							<SelectGroup className="bg-white">
+						<SelectContent className="flex-1 bg-white dark:bg-surface-raised dark:border-outline">
+							<SelectGroup className="bg-white dark:bg-surface-raised">
 								{Object.entries(availableWorkspaces).map((option, _index) => {
-									const [key, value] = option;
+									const [key, value] = option as [GrblWorkspace, string];
 									return (
-										<SelectItem key={key} value={key} className="bg-white h-8">
-											{`${key} (${value})`}
+										<SelectItem
+											key={key}
+											value={key}
+											className="bg-white dark:bg-surface-raised dark:focus:bg-surface-hover h-8"
+										>
+											<span className={`font-semibold ${WORKSPACE_TEXT_COLORS[key]}`}>
+												{`${key} (${value})`}
+											</span>
 										</SelectItem>
 									);
 								})}

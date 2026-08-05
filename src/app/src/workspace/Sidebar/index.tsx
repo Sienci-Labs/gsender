@@ -11,7 +11,7 @@ export const Sidebar = () => {
 			)}
 			aria-label="Main Navigation"
 		>
-			<div className="border-r-2 border-gray-400 dark:border-gray-700 flex flex-col no-padding no-margin justify-end flex-grow self-stretch">
+			<div className="border-r-2 border-gray-400 dark:border-outline flex flex-col no-padding no-margin justify-end flex-grow self-stretch">
 				<HelperToggle minimized={false} />
 			</div>
 			<NavBar />

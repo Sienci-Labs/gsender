@@ -47,7 +47,7 @@ const ToolRequirementBanner = ({
 				{toolLabel}
 			</div>
 			{comment ? (
-				<div className="mt-4 rounded-[6px] border border-gray-200/90 bg-white/75 px-3 py-2 text-center font-mono text-xs leading-relaxed text-gray-500 whitespace-pre-wrap break-words dark:border-white/10 dark:bg-black/10 dark:text-gray-300">
+				<div className="mt-4 rounded-[6px] border border-gray-200/90 bg-white/75 px-3 py-2 text-center font-mono text-xs leading-relaxed text-gray-500 whitespace-pre-wrap break-words dark:border-white/10 dark:bg-black/10 dark:text-content-secondary">
 					{comment}
 				</div>
 			) : null}

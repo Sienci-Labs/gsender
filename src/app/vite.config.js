@@ -28,9 +28,9 @@ export default defineConfig({
 		patchCssModules(),
 		tailwindcss(),
 		nodePolyfills({
-			// To add only specific polyfills, add them here. If no option is passed, adds all polyfills
-			include: ["process"],
-			globals: { global: true, process: true },
+			// @react-pdf/renderer (js-md5) needs Buffer in the browser bundle
+			include: ["buffer", "process"],
+			globals: { Buffer: true, global: true, process: true },
 		}),
 		sentryVitePlugin({
 			org: process.env.SENTRY_ORG,
@@ -55,6 +55,10 @@ export default defineConfig({
 				target: "http://127.0.0.1:8000",
 				changeOrigin: true,
 			},
+			"/plugins": {
+				target: "http://127.0.0.1:8000",
+				changeOrigin: true,
+			},
 			"/socket.io": {
 				target: "http://127.0.0.1:8000",
 				changeOrigin: true,
@@ -63,7 +67,7 @@ export default defineConfig({
 		},
 	},
 	optimizeDeps: {
-		include: ["**/*.styl"],
+		include: ["**/*.styl", "buffer", "@react-pdf/renderer"],
 	},
 	build: {
 		sourcemap: true,

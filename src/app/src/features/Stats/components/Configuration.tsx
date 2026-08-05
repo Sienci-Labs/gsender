@@ -18,11 +18,11 @@ export function ConfigRow({
 	connected: boolean;
 }) {
 	return (
-		<div className="relative flex flex-row justify-between w-full items-center leading-7 border-dotted border-b-gray-300 border-b-2 overflow-visible h-[3px] mt-3 mb-3 dark:text-white dark:bg-dark">
-			<div className="text-gray-700 bg-white pr-2 dark:text-white dark:bg-dark">
+		<div className="relative flex flex-row justify-between w-full items-center leading-7 border-dotted border-b-gray-300 border-b-2 overflow-visible h-[3px] mt-3 mb-3 dark:text-content-primary dark:bg-surface-raised">
+			<div className="text-gray-700 bg-white pr-2 dark:text-content-primary dark:bg-surface-raised">
 				{label}
 			</div>
-			<div className="pl-2 bg-white dark:text-white dark:bg-dark">
+			<div className="pl-2 bg-white dark:text-content-primary dark:bg-surface-raised">
 				{connected ? children : <b>-</b>}
 			</div>
 		</div>
@@ -62,7 +62,7 @@ export function Configuration() {
 
 	return (
 		<div className="flex flex-col gap-1">
-			<div className="font-bold mb-2 dark:text-white">
+			<div className="font-bold mb-2 dark:text-content-primary">
 				{machineProfile.company + " " + machineProfile.name + " "}
 				<span className="font-normal">{machineProfile.type}</span>
 			</div>

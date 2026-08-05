@@ -28,13 +28,13 @@ export function Modbus({ onComplete }: StepProps) {
 
 	return (
 		<div className="flex flex-col gap-5 justify-start">
-			<p className="text-gray-900 dark:text-white">
+			<p className="text-gray-900 dark:text-content-primary">
 				<b>
 					You are able to complete this step while the controller is still
 					alarmed
 				</b>
 			</p>
-			<p className="dark:text-white">
+			<p className="dark:text-content-primary">
 				Additional spindle settings are applied in this step.
 			</p>
 			<ol className="list-decimal p-5 gap-4 space-y-2">

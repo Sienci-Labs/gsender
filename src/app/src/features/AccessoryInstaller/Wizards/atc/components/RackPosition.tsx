@@ -62,8 +62,13 @@ export function RackPosition({ onComplete }: StepProps) {
 
 	useEffect(() => {
 		if (isManuallyEditing.current) return;
-		// biome-ignore lint/complexity/useOptionalChain: <>
-		if (!mpos || !mpos.x || !mpos.y || !mpos.z) return;
+		if (
+			!mpos ||
+			mpos.x === undefined ||
+			mpos.y === undefined ||
+			mpos.z === undefined
+		)
+			return;
 		const { x, y, z } = mpos;
 		setPosition({
 			x: mapPositionToUnits(x, units),
@@ -105,11 +110,11 @@ export function RackPosition({ onComplete }: StepProps) {
 	if (rackless === 0 && slotCount === 0) {
 		return (
 			<div className="flex flex-col gap-5 justify-start">
-				<p className="dark:text-white">
+				<p className="dark:text-content-primary">
 					For ATC Configuration, you selected “No Tool Rack” and so do not need
 					to set a rack position.
 				</p>
-				<p className="dark:text-white">
+				<p className="dark:text-content-primary">
 					If you have a rack installed, please return to the previous step to
 					correct your selection.
 				</p>
@@ -120,7 +125,7 @@ export function RackPosition({ onComplete }: StepProps) {
 	return (
 		<div className="flex flex-col gap-5 justify-start">
 			<div>
-				<label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+				<label className="block text-sm font-semibold text-gray-900 dark:text-content-primary mb-2">
 					Find Rack Position Method
 				</label>
 				<select
@@ -135,20 +140,20 @@ export function RackPosition({ onComplete }: StepProps) {
 			{rackPositionMethod === "utility" && (
 				<>
 					<ol className="list-decimal p-5 gap-4 space-y-2">
-						<li className="dark:text-white">
+						<li className="dark:text-content-primary">
 							Populate your tool rack with tool holders
 						</li>
-						<li className="dark:text-white">
+						<li className="dark:text-content-primary">
 							Position the spindle so that the tool-stud sensor is directly over
 							the right most tool holder. Once in the proper position, the LED
 							on the sensor will light up.
 						</li>
-						<li className="dark:text-white">
+						<li className="dark:text-content-primary">
 							Press the <b>“Find Rack”</b> button for the wizard to determine
 							the precise position of your tool holders.
 						</li>
 					</ol>
-					<p className="dark:text-white">
+					<p className="dark:text-content-primary">
 						The machine will take a few minutes to check the position of the
 						left-most and right-most position of each tool rack.
 					</p>
@@ -164,7 +169,7 @@ export function RackPosition({ onComplete }: StepProps) {
 
 			{rackPositionMethod === "manual" && (
 				<>
-					<p className="text-gray-900 dark:text-white">
+					<p className="text-gray-900 dark:text-content-primary">
 						<b>
 							It is highly recommended that you use the automatic method, your
 							rack may be damaged if done incorrectly.

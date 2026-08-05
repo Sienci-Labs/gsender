@@ -106,7 +106,7 @@ export const TOOLPATH_COLOR_HEXES = [
 ];
 
 export const DARK_THEME_VALUES = new Map<string, string>([
-	[BACKGROUND_PART, "#111827"], //Navy Blue
+	[BACKGROUND_PART, "#090D12"], // Workshop surface.sunken
 	[GRID_PART, "#77a9d7"], // Turqoise / Light Blue
 	[XAXIS_PART, "#df3b3b"], //Indian Red
 	[YAXIS_PART, "#06b881"], //Light Green

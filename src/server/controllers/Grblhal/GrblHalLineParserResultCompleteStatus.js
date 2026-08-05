@@ -20,15 +20,22 @@ class GrblHalLineParserResultCompleteStatus {
 
 		const payload = {};
 		const result = {};
-		r[3].split("|").forEach((param) => {
-			const parts = param.split(":");
-			result[parts[0]] = parts[1].split(",") || null;
-		});
-		// Active state (Idle, Jog, etc) and substate (mostly alarm/door)
-		payload.activeState = state;
-		payload.subState = subState || "";
 
-		//console.log(result);
+		// Separate parameters and store them in results, further split by comma for sub values
+		{
+			r[3].split("|").forEach((param) => {
+				const nv = param.match(/^([a-zA-Z]+):?(.*)$/);
+				if (nv) {
+					result[nv[1]] = nv[2].split(",");
+				}
+			});
+		}
+
+		{
+			// Active state (Idle, Jog, etc) and substate (mostly alarm/door)
+			payload.activeState = state;
+			payload.subState = subState || "";
+		}
 
 		// Machine Position (v0.9, v1.1)
 		if (_.has(result, "MPos")) {

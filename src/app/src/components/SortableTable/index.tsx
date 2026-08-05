@@ -219,7 +219,7 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
 							setGlobalFilter(globalSearchText);
 						}
 					}}
-					className="font-lg border-block border p-2 shadow  dark:text-white dark:bg-dark dark:border-dark-lighter"
+					className="font-lg border-block border p-2 shadow  dark:text-content-primary dark:bg-surface-raised dark:border-outline"
 					placeholder={searchPlaceholder}
 				/>
 				{onAdd && (
@@ -272,7 +272,7 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
 				)}
 			>
 				<div className="w-full h-full mb-1 overflow-y-scroll">
-					<table className="min-w-full leading-normal border-collapse border border-gray-200 dark:border-dark-lighter">
+					<table className="min-w-full leading-normal border-collapse border border-gray-200 dark:border-outline">
 						<thead>
 							{table.getHeaderGroups().map((headerGroup) => (
 								<tr key={headerGroup.id}>
@@ -280,7 +280,7 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
 										<th
 											key={header.id}
 											colSpan={header.colSpan}
-											className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider dark:text-white dark:bg-dark-lighter"
+											className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider dark:text-content-primary dark:bg-surface-elevated"
 										>
 											{header.isPlaceholder ? null : (
 												<>
@@ -314,7 +314,7 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
 									<React.Fragment key={row.id + "parent"}>
 										<tr
 											key={row.id}
-											className="odd:bg-gray-50 even:bg-white dark:odd:bg-dark dark:even:bg-dark-lighter dark:text-white"
+											className="odd:bg-gray-50 even:bg-white dark:odd:bg-dark dark:even:bg-dark-lighter dark:text-content-primary"
 										>
 											{row.getVisibleCells().map((cell) => (
 												<td
@@ -329,7 +329,7 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
 														overflowWrap: "break-word",
 														width: cell.column.getSize(),
 													}}
-													className="px-5 py-5 border border-gray-200 text-sm dark:border-dark-lighter"
+													className="px-5 py-5 border border-gray-200 text-sm dark:border-outline"
 												>
 													{flexRender(
 														cell.column.columnDef.cell,
@@ -341,7 +341,7 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
 										{row.original.subRow && (
 											<tr
 												key={row.id + "subRow"}
-												className="odd:bg-gray-50 even:bg-white dark:odd:bg-dark dark:even:bg-dark-lighter dark:text-white"
+												className="odd:bg-gray-50 even:bg-white dark:odd:bg-dark dark:even:bg-dark-lighter dark:text-content-primary"
 											>
 												<td
 													colSpan={colSpanLength}
@@ -349,7 +349,7 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
 														whiteSpace: "pre-line",
 														overflowWrap: "break-word",
 													}}
-													className="px-5 py-5 border border-gray-200 text-sm dark:border-dark-lighter"
+													className="px-5 py-5 border border-gray-200 text-sm dark:border-outline"
 												>
 													{row.original.subRow}
 												</td>
@@ -369,7 +369,7 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
 						)}
 					>
 						<button
-							className={cx("rounded border p-1 dark:text-white", {
+							className={cx("rounded border p-1 dark:text-content-primary", {
 								block: currentPage > 1,
 								hidden: currentPage <= 1,
 							})}
@@ -380,7 +380,7 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
 							{"<<"}
 						</button>
 						<button
-							className={cx("rounded border p-1 dark:text-white", {
+							className={cx("rounded border p-1 dark:text-content-primary", {
 								block: currentPage > 1,
 								hidden: currentPage <= 1,
 							})}
@@ -391,7 +391,7 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
 							{"<"}
 						</button>
 						<button
-							className={cx("rounded border p-1 dark:text-white", {
+							className={cx("rounded border p-1 dark:text-content-primary", {
 								block: currentPage < maxPages,
 								hidden: currentPage >= maxPages,
 							})}
@@ -402,7 +402,7 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
 							{">"}
 						</button>
 						<button
-							className={cx("rounded border p-1 dark:text-white", {
+							className={cx("rounded border p-1 dark:text-content-primary", {
 								block: currentPage < maxPages,
 								hidden: currentPage >= maxPages,
 							})}
@@ -414,7 +414,7 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
 						</button>
 						{/* label */}
 						<span
-							className="flex items-center gap-1 dark:text-white"
+							className="flex items-center gap-1 dark:text-content-primary"
 							style={{ marginLeft: "10px" }}
 						>
 							{"Page "}
@@ -431,7 +431,10 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
 								float: "right",
 							}}
 						>
-							<span style={{ marginRight: "5px" }} className="dark:text-white">
+							<span
+								style={{ marginRight: "5px" }}
+								className="dark:text-content-primary"
+							>
 								{"Jump to page: "}
 								<input
 									type="number"
@@ -452,12 +455,17 @@ const SortableTable = <TData extends { subRow?: string }, TValue>(
 									style={{ minWidth: "60px" }}
 								/>
 							</span>
-							<div style={{ marginRight: "5px" }} className="dark:text-white">
+							<div
+								style={{ marginRight: "5px" }}
+								className="dark:text-content-primary"
+							>
 								|
 							</div>
 							{/*** PAGE SIZE ***/}
 							<div>
-								<span className="dark:text-white mr-1">Entries/Page:</span>
+								<span className="dark:text-content-primary mr-1">
+									Entries/Page:
+								</span>
 								<select
 									value={table.getState().pagination.pageSize}
 									onChange={(e) => {

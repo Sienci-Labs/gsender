@@ -4,6 +4,7 @@ import controller from "app/lib/controller";
 import { mapPositionToUnits } from "app/lib/units";
 import store from "app/store";
 import debounce from "lodash/debounce";
+import posthog from "posthog-js";
 import { useEffect, useState } from "react";
 import {
 	METRIC_UNITS,
@@ -35,12 +36,14 @@ const debouncedOvFUpdateHandler = debounce((ovF, setLocalOvF) => {
 	if (globalOvTimestamp > globalLocalOvFTimestamp) {
 		setLocalOvF(ovF);
 	}
+	posthog?.capture("feed_override_updated", { value: ovF });
 }, 1000);
 
 const debouncedOvSUpdateHandler = debounce((ovS, setLocalOvS) => {
 	if (globalOvTimestamp > globalLocalOvSTimestamp) {
 		setLocalOvS(ovS);
 	}
+	posthog?.capture("spindle_override_updated", { value: ovS });
 }, 1000);
 
 const Overrides: React.FC<OverridesProps> = ({

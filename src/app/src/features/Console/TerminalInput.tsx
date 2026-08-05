@@ -1,3 +1,4 @@
+import { usePostHog } from "@posthog/react";
 import { Button } from "app/components/Button";
 import { Input } from "app/components/shadcn/Input";
 import {
@@ -26,6 +27,8 @@ const TerminalInput = ({ onClear }: Props) => {
 	const { inputHistory, history } = useTypedSelector((state) => state.console);
 	const [historyIndex, setHistoryIndex] = useState(-1);
 
+	const posthog = usePostHog();
+
 	const handleCommandExecute = () => {
 		const command = inputRef.current?.value;
 
@@ -39,6 +42,8 @@ const TerminalInput = ({ onClear }: Props) => {
 		dispatch(addToInputHistory(command));
 		setHistoryIndex(-1);
 		inputRef.current.value = "";
+
+		posthog?.capture("console_command_executed", { command });
 	};
 
 	const navigateHistory = (direction: "up" | "down") => {
@@ -79,6 +84,10 @@ const TerminalInput = ({ onClear }: Props) => {
 					position: "bottom-right",
 				},
 			);
+
+			posthog?.capture("console_history_copied", {
+				commands: lastCommands,
+			});
 		} catch (error) {
 			toast.error("Failed to copy commands to clipboard", {
 				duration: 3000,

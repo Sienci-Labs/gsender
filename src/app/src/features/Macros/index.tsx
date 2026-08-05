@@ -10,6 +10,7 @@ import cloneDeep from "lodash/cloneDeep";
 import get from "lodash/get";
 import includes from "lodash/includes";
 import throttle from "lodash/throttle";
+import posthog from "posthog-js";
 import pubsub from "pubsub-js";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
@@ -109,6 +110,8 @@ const MacroWidget = ({
 
 				showToast({ msg: "Added New Macro", type: "success" });
 				actions.closeModal();
+
+				posthog?.capture("macro:add", { name });
 			} catch (err) {
 				showToast({
 					msg: "Failed to add macro",
@@ -132,6 +135,8 @@ const MacroWidget = ({
 				deleteGamepadMacro(id);
 
 				showToast({ msg: "Deleted Macro", type: "success" });
+
+				posthog?.capture("macro:delete");
 			} catch (err) {
 				// Ignore error
 			}
@@ -173,6 +178,8 @@ const MacroWidget = ({
 						position: "bottom-right",
 					});
 				}
+
+				posthog?.capture("macro:update", { name });
 			} catch (err) {
 				// Ignore error
 			}
@@ -208,6 +215,8 @@ const MacroWidget = ({
 				},
 			);
 			pubsub.publish("macro:run");
+
+			posthog?.capture("macro:run", { name });
 		},
 		loadMacro: async (id: string) => {
 			try {
@@ -289,6 +298,8 @@ const MacroWidget = ({
 		document.body.appendChild(link);
 		link.click();
 		document.body.removeChild(link);
+
+		posthog?.capture("macros_export", { macros_count: macros.length });
 	};
 
 	const importMacros = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -342,6 +353,11 @@ const MacroWidget = ({
 						type: "success",
 					});
 				}
+
+				posthog?.capture("macros_import", {
+					imported_count: importedCount,
+					updated_count: updatedCount,
+				});
 			};
 			reader.onerror = () => {
 				showToast({

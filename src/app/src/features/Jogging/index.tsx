@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
 import {
 	GRBL_ACTIVE_STATE_IDLE,
 	GRBL_ACTIVE_STATE_JOG,
@@ -20,6 +21,7 @@ import { StopButton } from "app/features/Jogging/components/StopButton";
 import { ZJog } from "app/features/Jogging/components/ZJog";
 import {
 	cancelJog,
+	type JoggingSpeedOptions,
 	jogAxis,
 	startJogCommand,
 } from "app/features/Jogging/utils/Jogging";
@@ -31,6 +33,7 @@ import { preventDefault } from "app/lib/dom-events";
 import gamepad, { checkButtonHold } from "app/lib/gamepad";
 import type { GamepadProfile } from "app/lib/gamepad/definitions";
 import { toast } from "app/lib/toaster";
+import { convertToMetric } from "app/lib/units.ts";
 import useKeybinding from "app/lib/useKeybinding";
 import store from "app/store";
 import reduxStore, { type RootState } from "app/store/redux";
@@ -74,6 +77,8 @@ export function Jogging({ hideRotary = false }) {
 		aStep: 0,
 		feedrate: 0,
 	});
+
+	const [isCustomSpeed, setIsCustomSpeed] = useState(false);
 
 	useEffect(() => {
 		store.on("change", () => {
@@ -258,7 +263,7 @@ export function Jogging({ hideRotary = false }) {
 					const { axis } = detail;
 
 					// Add checks for detail.gamepad and detail.gamepad.id
-					if (!detail.gamepad || !detail.gamepad.id) {
+					if (!detail.gamepad?.id) {
 						return;
 					}
 
@@ -269,10 +274,8 @@ export function Jogging({ hideRotary = false }) {
 
 					const currentProfile = gamepadProfiles.find(
 						(profile) =>
-							profile &&
-							profile.id &&
-							detail.gamepad &&
-							detail.gamepad.id &&
+							profile?.id &&
+							detail.gamepad?.id &&
 							profile.id.includes(detail.gamepad.id),
 					);
 
@@ -552,8 +555,25 @@ export function Jogging({ hideRotary = false }) {
 
 	const canJog = () =>
 		[WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED].includes(workflowState);
-
-	function updateJogValues(values: JogValueObject) {
+	function saveCustomValues(newJogSpeed: JogValueObject) {
+		const units = store.get("workspace.units");
+		if (units === IMPERIAL_UNITS) {
+			store.replace("widgets.axes.jog.custom", {
+				xyStep: convertToMetric(newJogSpeed.xyStep),
+				zStep: convertToMetric(newJogSpeed.zStep),
+				aStep: convertToMetric(newJogSpeed.aStep),
+				feedrate: convertToMetric(newJogSpeed.feedrate),
+			});
+		} else {
+			store.replace("widgets.axes.jog.custom", newJogSpeed);
+		}
+	}
+	function updateJogValues(values: JogValueObject, speed: JoggingSpeedOptions) {
+		if (speed === "Custom") {
+			setIsCustomSpeed(true);
+		} else {
+			setIsCustomSpeed(false);
+		}
 		setJogSpeed(values);
 	}
 	function updateXYStep(step: number) {
@@ -564,6 +584,9 @@ export function Jogging({ hideRotary = false }) {
 			feedrate: jogSpeed.feedrate,
 		};
 		setJogSpeed(newJogSpeed);
+		if (isCustomSpeed) {
+			saveCustomValues(newJogSpeed);
+		}
 	}
 	function updateZStep(step: number) {
 		const newJogSpeed = {
@@ -573,6 +596,9 @@ export function Jogging({ hideRotary = false }) {
 			feedrate: jogSpeed.feedrate,
 		};
 		setJogSpeed(newJogSpeed);
+		if (isCustomSpeed) {
+			saveCustomValues(newJogSpeed);
+		}
 	}
 	function updateAStep(step: number) {
 		const newJogSpeed = {
@@ -582,6 +608,9 @@ export function Jogging({ hideRotary = false }) {
 			feedrate: jogSpeed.feedrate,
 		};
 		setJogSpeed(newJogSpeed);
+		if (isCustomSpeed) {
+			saveCustomValues(newJogSpeed);
+		}
 	}
 	function updateFeedrate(frate: number) {
 		const newJogSpeed = {
@@ -591,6 +620,9 @@ export function Jogging({ hideRotary = false }) {
 			feedrate: frate,
 		};
 		setJogSpeed(newJogSpeed);
+		if (isCustomSpeed) {
+			saveCustomValues(newJogSpeed);
+		}
 	}
 
 	const stopContinuousJog = () => {
@@ -951,6 +983,7 @@ export function Jogging({ hideRotary = false }) {
 
 	useShuttleEvents(shuttleControlEvents);
 	useEffect(() => {
+		// biome-ignore lint/correctness/useHookAtTopLevel: <>
 		useKeybinding(shuttleControlEvents);
 	}, []);
 

@@ -1,5 +1,38 @@
 [
   {
+    "version": "1.6.3",
+    "date": "July 23, 2026",
+    "notes": [
+      "Added LongMill MK3 profiles.",
+      "Added flashing path for new SLB-Lite using `$UF2`.",
+      "Added TLS installation wizard to the accessory installation tool.",
+      "Added ability to specify feed rate on final probe movements — default `0` continues to use `G0`; any other value uses `G1 Fx` where `x` is the configured value.",
+      "SD tool now allows uploading multiple files at the same time.",
+      "Added pending toolchange state to the toolchange wizard while already-planned lines finish their motions, and delayed wizard appearance until closer to the actual `M6` command.",
+      "Updating the toolchange passthrough setting now updates the controller without reconnecting or reloading a file.",
+      "Updating the passthrough setting in Config updates that option without requiring a file reload or reconnect.",
+      "No longer swaps spindle min/max for grblHAL, so PWM can be used as a laser without issues.",
+      "`pos{axis}` and `mpos{axis}` feeder variables are now always returned in mm, regardless of report-in-inches (`$13`) status.",
+      "Homing status on connect for already-homed grblHAL devices is now more consistent.",
+      "Tool probe status now allows positive values — only `0` is considered unprobed.",
+      "Probe status badge in the tool timeline now only shows when using grblHAL with ATC=1 (tc.macro exists).",
+      "Added background to job progress line count for readability when the visualizer is disabled.",
+      "ATC options tool is now disabled if no SD card is mounted.",
+      "Improved reliability of Config Store truncation.",
+      "Added various updates to prevent the ConfigStore file (sender_rc) from becoming corrupted.",
+      "Corrupted ConfigStore files no longer block application startup.",
+      "Various firmware updates for the latest grblHAL core version.",
+      "Updated grblHAL profiles for the new firmware release — mostly related to laser/PWM2 behaviors.",
+      "Entering laser mode on grblHAL no longer swaps `$30` and `$31` with the laser equivalents.",
+      "Fixed tool timeline not reflecting the remapped tool number after minimizing.",
+      "Fixed issue where opening the run probe dialog with connectivity would cause all future connectivity tests to pass immediately.",
+      "Fixed issue where restoring an altered EEPROM value in Config without applying wouldn't update the UI with the correct value in the Config tool.",
+      "Fixed toggling single-axis homing on and then off in the on-state not showing the original \"go to\" buttons.",
+      "Fixed backwards logic on the park shortcut, allowing usage when homed.",
+      "Fixed job progress not updating correctly after a tool change was handled via one of the wizard strategies."
+    ]
+  },
+  {
     "version": "1.6.2",
     "date": "May 26, 2026",
     "notes": [
@@ -50,34 +83,6 @@
       "Lite mode toggle feather should be more obvious when it’s enabled or disabled",
       "Macros again show on remote mode",
       "Updates to 3d Probe text instructions to be more relevant to that probe type"
-    ]
-  },
-  {
-    "version": "1.6.0",
-    "date": "April 15, 2026",
-    "notes": [
-      "Expanded compatibility with newer grblHAL firmware, improving reliability with updated controllers and settings",
-      "Significantly faster startup times through optimized initialization and module loading",
-      "Build system improvements resulting in faster builds, smaller install size, and Mac silicon support with signing",
-      "Added built-in G-code editor with syntax highlighting, search, navigation, and inline editing",
-      "Expanded SD card file management with upload, run, delete, and progress tracking (yModem/FTP support)",
-      "Full Automatic Tool Changer (ATC) workflow support including tool table, timeline, remapping, and controls",
-      "Introduced ATC setup tool to simplify initial configuration and macro installation",
-      "Introduce Spindle setup tool, supporting sienciHAL and grblHAL core versions",
-      "Visualization improvements including faster parsing, reduced memory usage, rotary accuracy fixes, and tool-based coloring",
-      "Added option to hide processed lines for improved readability on long jobs",
-      "New EEPROM editor for viewing and modifying controller configuration values",
-      "Added Check Mode automation for pre-run file validation using GRBL check mode",
-      "Ethernet enhancements including custom ports and improved auto-reconnect",
-      "Improved UI responsiveness and layout for smaller screens and portrait mode",
-      "Remote mode improvements including synced settings and config access",
-      "Improved job time estimation, including rotary jobs and feed override scenarios",
-      "Added scheduled settings backup options",
-      "Improved handling of M0/M1 pauses with comment display",
-      "Added file associations for opening G-code files directly from the OS",
-      "Improved config tool performance and reactivity",
-      "Gamepad configuration updates and jogging behaviour improvements",
-      "Numerous bug fixes, dependency updates, and overall stability improvements"
     ]
   }
 ]

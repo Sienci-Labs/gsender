@@ -75,7 +75,38 @@ const JoystickOptions = () => {
 
 	const isHoldingModifierButton = buttons[profile.modifier?.button]?.pressed;
 
+	// Neutral react-select colors come from the Tailwind-backed CSS variables
+	// (see index.css) so no neutral hex is hardcoded here; the active-axis
+	// green stays a semantic highlight, applied on top in activeStyle.
+	const neutralStyle = {
+		control: (provided) => ({
+			...provided,
+			backgroundColor:
+				getThemeCssColor("--surface-sunken") || provided.backgroundColor,
+			borderColor:
+				getThemeCssColor("--outline-default") || provided.borderColor,
+		}),
+		menu: (provided) => ({
+			...provided,
+			backgroundColor:
+				getThemeCssColor("--surface-elevated") || provided.backgroundColor,
+			border: `1px solid ${getThemeCssColor("--outline-default") || "transparent"}`,
+		}),
+		option: (provided, state) => ({
+			...provided,
+			backgroundColor: state.isFocused
+				? getThemeCssColor("--surface-hover") || provided.backgroundColor
+				: "transparent",
+			color: getThemeCssColor("--content-secondary") || provided.color,
+		}),
+		singleValue: (provided) => ({
+			...provided,
+			color: getThemeCssColor("--content-primary") || provided.color,
+		}),
+	};
+
 	const selectOverrideStyle = {
+		...neutralStyle,
 		valueContainer: (provided) => ({
 			...provided,
 			padding: 2,
@@ -107,13 +138,15 @@ const JoystickOptions = () => {
 		<div className="text-base border p-2 rounded">
 			<div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center gap-2">
 				<div />
-				<div className="font-bold dark:text-white">Action</div>
-				<div className="font-bold dark:text-white">2nd Action</div>
-				<div className="font-bold dark:text-white">Invert</div>
+				<div className="font-bold dark:text-content-primary">Action</div>
+				<div className="font-bold dark:text-content-primary">2nd Action</div>
+				<div className="font-bold dark:text-content-primary">Invert</div>
 			</div>
 
 			<div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center mb-2 gap-2">
-				<div className="leading-[1.3] dark:text-white">Stick 1 left/right</div>
+				<div className="leading-[1.3] dark:text-content-primary">
+					Stick 1 left/right
+				</div>
 				<Select
 					styles={
 						!stick1PrimaryActionIsUsingMPG &&
@@ -173,7 +206,9 @@ const JoystickOptions = () => {
 			</div>
 
 			<div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center mb-2 gap-2">
-				<div className="leading-[1.3] dark:text-white">Stick 1 up/down</div>
+				<div className="leading-[1.3] dark:text-content-primary">
+					Stick 1 up/down
+				</div>
 				<Select
 					styles={
 						!stick1PrimaryActionIsUsingMPG &&
@@ -233,7 +268,9 @@ const JoystickOptions = () => {
 			</div>
 
 			<div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center mb-2 gap-2">
-				<div className="leading-[1.3] dark:text-white">Stick 1 MPG</div>
+				<div className="leading-[1.3] dark:text-content-primary">
+					Stick 1 MPG
+				</div>
 				<Select
 					styles={
 						stick1PrimaryActionIsUsingMPG &&
@@ -288,7 +325,9 @@ const JoystickOptions = () => {
 			</div>
 
 			<div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center mb-2 gap-2">
-				<div className="leading-[1.3] dark:text-white">Stick 2 left/right</div>
+				<div className="leading-[1.3] dark:text-content-primary">
+					Stick 2 left/right
+				</div>
 				<Select
 					styles={
 						!stick2PrimaryActionIsUsingMPG &&
@@ -348,7 +387,9 @@ const JoystickOptions = () => {
 			</div>
 
 			<div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center mb-2 gap-2">
-				<div className="leading-[1.3] dark:text-white">Stick 2 up/down</div>
+				<div className="leading-[1.3] dark:text-content-primary">
+					Stick 2 up/down
+				</div>
 				<Select
 					styles={
 						!stick2PrimaryActionIsUsingMPG &&
@@ -408,7 +449,9 @@ const JoystickOptions = () => {
 			</div>
 
 			<div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center mb-2 gap-2">
-				<div className="leading-[1.3] dark:text-white">Stick 2 MPG</div>
+				<div className="leading-[1.3] dark:text-content-primary">
+					Stick 2 MPG
+				</div>
 				<Select
 					styles={
 						stick2PrimaryActionIsUsingMPG &&
@@ -465,7 +508,9 @@ const JoystickOptions = () => {
 			</div>
 
 			<div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center mb-2 gap-2">
-				<div className="leading-[1.4] dark:text-white">Zero threshold</div>
+				<div className="leading-[1.4] dark:text-content-primary">
+					Zero threshold
+				</div>
 				<ControlledInput
 					value={zeroThreshold}
 					type="number"
@@ -482,7 +527,9 @@ const JoystickOptions = () => {
 			</div>
 
 			<div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center mb-2 gap-2">
-				<div className="leading-[1.4] dark:text-white">Movement override</div>
+				<div className="leading-[1.4] dark:text-content-primary">
+					Movement override
+				</div>
 				<ControlledInput
 					type="number"
 					value={movementDistanceOverride}
@@ -503,7 +550,9 @@ const JoystickOptions = () => {
 			</div>
 
 			<div className="grid grid-cols-[3fr_3fr_3fr_2fr] items-center gap-2">
-				<div className="leading-[1.4] dark:text-white">Fixed speed mode</div>
+				<div className="leading-[1.4] dark:text-content-primary">
+					Fixed speed mode
+				</div>
 				<div className="col-span-3 flex gap-2 items-center">
 					<Switch
 						className="float-left mr-2"

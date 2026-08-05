@@ -1,4 +1,6 @@
+import { usePostHog } from "@posthog/react";
 import { WORKSPACE_MODE } from "app/constants";
+
 import {
 	continuousJogAxis,
 	stopContinuousJog,
@@ -29,64 +31,183 @@ export function JogWheel({
 	threshold = 200,
 }: JogWheelProps) {
 	const { mode } = useWorkspaceState();
+	const posthog = usePostHog();
 
 	const isRotaryMode = mode === WORKSPACE_MODE.ROTARY;
 
 	const xPlusJogHandlers = useLongPress(
-		() => continuousJogAxis({ X: 1 }, feedrate),
+		() => {
+			continuousJogAxis({ X: 1 }, feedrate);
+			posthog?.capture("jog_x_plus", {
+				distance,
+				feedrate,
+				continuous: true,
+			});
+		},
 		{
 			threshold,
-			onCancel: () => xPlusJog(distance, feedrate, false),
+			onCancel: () => {
+				xPlusJog(distance, feedrate, false);
+				posthog?.capture("jog_x_plus", {
+					distance,
+					feedrate,
+					continuous: false,
+				});
+			},
+			onFinish: () => {
+				stopContinuousJog();
+			},
+		},
+	)();
+	const xMinusJogHandlers = useLongPress(
+		() => {
+			xMinusJog(1, feedrate, true);
+			posthog?.capture("jog_x_minus", {
+				distance,
+				feedrate,
+				continuous: true,
+			});
+		},
+		{
+			threshold,
+			onCancel: () => {
+				xMinusJog(distance, feedrate, false);
+			},
 			onFinish: stopContinuousJog,
 		},
 	)();
-	const xMinusJogHandlers = useLongPress(() => xMinusJog(1, feedrate, true), {
-		threshold,
-		onCancel: () => xMinusJog(distance, feedrate, false),
-		onFinish: stopContinuousJog,
-	})();
 
-	const yPlusJogHandlers = useLongPress(() => yPlusJog(1, feedrate, true), {
-		threshold,
-		onCancel: () => yPlusJog(distance, feedrate, false),
-		onFinish: stopContinuousJog,
-	})();
-	const yMinusJogHandlers = useLongPress(() => yMinusJog(1, feedrate, true), {
-		threshold,
-		onCancel: () => yMinusJog(distance, feedrate, false),
-		onFinish: stopContinuousJog,
-	})();
-
-	const xPlusYMinusHandlers = useLongPress(
-		() => continuousJogAxis({ X: 1, Y: -1 }, feedrate),
+	const yPlusJogHandlers = useLongPress(
+		() => {
+			yPlusJog(1, feedrate, true);
+			posthog?.capture("jog_y_plus", {
+				distance,
+				feedrate,
+				continuous: true,
+			});
+		},
 		{
 			threshold,
-			onCancel: () => xPlusYMinus(distance, feedrate, false),
+			onCancel: () => {
+				yPlusJog(distance, feedrate, false);
+				posthog?.capture("jog_y_plus", {
+					distance,
+					feedrate,
+					continuous: false,
+				});
+			},
+			onFinish: stopContinuousJog,
+		},
+	)();
+	const yMinusJogHandlers = useLongPress(
+		() => {
+			yMinusJog(1, feedrate, true);
+			posthog?.capture("jog_y_minus", {
+				distance,
+				feedrate,
+				continuous: true,
+			});
+		},
+		{
+			threshold,
+			onCancel: () => {
+				yMinusJog(distance, feedrate, false);
+				posthog?.capture("jog_y_minus", {
+					distance,
+					feedrate,
+					continuous: false,
+				});
+			},
+			onFinish: stopContinuousJog,
+		},
+	)();
+
+	const xPlusYMinusHandlers = useLongPress(
+		() => {
+			continuousJogAxis({ X: 1, Y: -1 }, feedrate);
+			posthog?.capture("jog_x_plus_y_minus", {
+				distance,
+				feedrate,
+				continuous: true,
+			});
+		},
+		{
+			threshold,
+			onCancel: () => {
+				xPlusYMinus(distance, feedrate, false);
+				posthog?.capture("jog_x_plus_y_minus", {
+					distance,
+					feedrate,
+					continuous: false,
+				});
+			},
 			onFinish: stopContinuousJog,
 		},
 	)();
 	const xPlusYPlusHandlers = useLongPress(
-		() => continuousJogAxis({ X: 1, Y: 1 }, feedrate),
+		() => {
+			continuousJogAxis({ X: 1, Y: 1 }, feedrate);
+			posthog?.capture("jog_x_plus_y_plus", {
+				distance,
+				feedrate,
+				continuous: true,
+			});
+		},
 		{
 			threshold,
-			onCancel: () => xPlusYPlus(distance, feedrate, false),
+			onCancel: () => {
+				xPlusYPlus(distance, feedrate, false);
+				posthog?.capture("jog_x_plus_y_plus", {
+					distance,
+					feedrate,
+					continuous: false,
+				});
+			},
 			onFinish: stopContinuousJog,
 		},
 	)();
 
 	const xMinusYPlusHandlers = useLongPress(
-		() => continuousJogAxis({ X: -1, Y: 1 }, feedrate),
+		() => {
+			continuousJogAxis({ X: -1, Y: 1 }, feedrate);
+			posthog?.capture("jog_x_minus_y_plus", {
+				distance,
+				feedrate,
+				continuous: true,
+			});
+		},
 		{
 			threshold,
-			onCancel: () => xMinusYPlus(distance, feedrate, false),
+			onCancel: () => {
+				xMinusYPlus(distance, feedrate, false);
+				posthog?.capture("jog_x_minus_y_plus", {
+					distance,
+					feedrate,
+					continuous: false,
+				});
+			},
 			onFinish: stopContinuousJog,
 		},
 	)();
 	const xMinusYMinusHandlers = useLongPress(
-		() => continuousJogAxis({ X: -1, Y: -1 }, feedrate),
+		() => {
+			continuousJogAxis({ X: -1, Y: -1 }, feedrate);
+			posthog?.capture("jog_x_minus_y_minus", {
+				distance,
+				feedrate,
+				continuous: true,
+			});
+		},
 		{
 			threshold,
-			onCancel: () => xMinusYMinus(distance, feedrate, false),
+			onCancel: () => {
+				xMinusYMinus(distance, feedrate, false);
+				posthog?.capture("jog_x_minus_y_minus", {
+					distance,
+					feedrate,
+					continuous: false,
+				});
+			},
 			onFinish: stopContinuousJog,
 		},
 	)();

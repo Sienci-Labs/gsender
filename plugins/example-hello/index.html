@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Hello Bridge</title>
+	</head>
+	<body>
+		<main class="app">
+			<header>
+				<h1>Hello Bridge</h1>
+				<p class="lede">
+					Plain JavaScript plugin using
+					<code>@sienci/gsender-plugin-sdk</code> — no React required.
+				</p>
+			</header>
+
+			<section class="card">
+				<h2>Machine context</h2>
+				<p class="hint">One-shot RPC via <code>gsender.machine.getContext()</code></p>
+				<button type="button" id="fetch-context">Fetch context</button>
+				<pre id="context-output" class="output">Click the button to fetch…</pre>
+			</section>
+
+			<section class="card">
+				<h2>Live workspace</h2>
+				<p class="hint">
+					Subscription via <code>subscribeWorkspaceState</code>
+				</p>
+				<dl class="stats">
+					<div>
+						<dt>Units</dt>
+						<dd id="workspace-units">—</dd>
+					</div>
+				</dl>
+			</section>
+
+			<section class="card">
+				<h2>Redux selector</h2>
+				<p class="hint">
+					Subscription via <code>subscribeSelector</code>
+				</p>
+				<dl class="stats">
+					<div>
+						<dt>Connected</dt>
+						<dd id="connection-status">—</dd>
+					</div>
+				</dl>
+			</section>
+		</main>
+		<script type="module" src="/src/main.js"></script>
+	</body>
+</html>

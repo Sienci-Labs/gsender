@@ -12,6 +12,7 @@ type InputProps = ComponentProps<"input"> & {
 	label?: string | ReactNode;
 	sizing?: "xs" | "sm" | "md" | "lg";
 	wrapperClassName?: string;
+	invalid?: boolean;
 	clearOnEnter?: boolean;
 	immediateOnChange?: boolean; // New prop to enable immediate onChange calls
 };

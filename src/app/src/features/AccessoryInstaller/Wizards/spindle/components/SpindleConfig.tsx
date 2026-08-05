@@ -78,7 +78,7 @@ export function SpindleConfig({ onComplete }: Props) {
 
 	return (
 		<div className="flex flex-col gap-5 justify-start">
-			<p className="dark:text-white">
+			<p className="dark:text-content-primary">
 				Your spindle settings are applied in this step and the controller will
 				restart automatically.
 			</p>

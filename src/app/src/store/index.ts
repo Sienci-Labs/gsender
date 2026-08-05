@@ -256,10 +256,7 @@ const backupPreviousState = (data: any): void => {
 		}
 		backupLoc.length !== 0 ? backupLoc : app.getPath("userData");
 
-		const backupPath = path.join(
-			directory,
-			`preferences-backup-${now}.json`,
-		);
+		const backupPath = path.join(directory, `preferences-backup-${now}.json`);
 
 		fs.writeFileSync(backupPath, value);
 	}
@@ -363,9 +360,13 @@ const migrateStore = (): void => {
 		return;
 	}
 
-	if (semver.lt(cnc.version, "1.6.2")) {
-		store.set("widgets.atc.templates", defaultATCIMacros);
-	}
+    if (semver.lt(cnc.version, '1.6.4')) {
+        store.set('widgets.probe.direction', defaultState.widgets.probe.direction);
+    }
+
+    if (semver.lt(cnc.version, '1.6.2')) {
+        store.set('widgets.atc.templates', defaultATCIMacros);
+    }
 
 	if (semver.lt(cnc.version, "1.6.0")) {
 		const machineProfileID = Number(

@@ -13,11 +13,10 @@ interface Props {
 
 const PathSelection = ({ value, onChange }: Props) => {
 	useEffect(() => {
-		if (isElectron()) {
+		if (isElectron() && (window as any).ipcRenderer) {
 			(window as any).ipcRenderer.on(
 				"returned-directory-dialog-data",
 				(_: any, directory: string) => {
-					console.log(directory);
 					onChange(directory);
 				},
 			);

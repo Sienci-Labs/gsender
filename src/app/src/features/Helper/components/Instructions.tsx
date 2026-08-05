@@ -21,6 +21,8 @@
  *
  */
 
+import PendingToolchangeNotice from "app/features/Helper/components/PendingToolchangeNotice";
+import ResumingJobNotice from "app/features/Helper/components/ResumingJobNotice";
 import Substep from "app/features/Helper/components/Substep";
 import ToolRequirementBanner from "app/features/Helper/components/ToolRequirementBanner";
 import { useWizardContext } from "app/features/Helper/context";
@@ -57,11 +59,30 @@ const Instructions = () => {
 		activeSubstep,
 		toolchangeContext,
 		toolchangeComment,
+		pendingToolchangeNotice,
+		resumingJob,
 	} = useWizardContext();
 	const step = steps[activeStep];
 	if (!step) return null;
 	const substep = step.substeps[activeSubstep];
 	if (!substep) return null;
+
+	if (pendingToolchangeNotice && activeStep === 0 && activeSubstep === 0) {
+		return (
+			<div className="flex-1 overflow-y-auto p-4 flex flex-col bg-white dark:bg-[#18181f]">
+				<PendingToolchangeNotice />
+			</div>
+		);
+	}
+
+	if (resumingJob) {
+		return (
+			<div className="flex-1 overflow-y-auto p-4 flex flex-col bg-white dark:bg-[#18181f]">
+				<ResumingJobNotice />
+			</div>
+		);
+	}
+
 	const toolLabel = substep.toolBanner ? getToolLabel(toolchangeContext) : null;
 
 	return (
@@ -70,7 +91,7 @@ const Instructions = () => {
 			<div className="flex items-center gap-1 text-xs text-gray-400 dark:text-[#9ca3af]">
 				<span>{step.title}</span>
 				<span className="text-gray-300 dark:text-[#9ca3af]">›</span>
-				<span className="text-gray-600 dark:text-white">{substep.title}</span>
+				<span className="text-gray-600 dark:text-content-primary">{substep.title}</span>
 			</div>
 			{/* Warning banner — first step only */}
 			{intro &&

@@ -1,8 +1,11 @@
 import { ATCWidget } from "app/features/ATC";
+import { PluginTabIframe } from "app/features/Plugins/components/PluginTabPanel";
+import { usePlugins } from "app/features/Plugins/hooks/usePlugins";
 import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
 import { useWidgetState } from "app/hooks/useWidgetState";
 import { useWorkspaceState } from "app/hooks/useWorkspaceState";
-import type { RootState } from "app/store/redux";
+import { RootState } from "app/store/redux";
+import { useMemo } from "react";
 import { Tabs } from "../../components/Tabs";
 import { Widget } from "../../components/Widget";
 import Console from "../Console";
@@ -52,13 +55,32 @@ const Tools = () => {
 	const rotary = useWidgetState("rotary");
 	const { spindleFunctions, coolantFunctions, atcEnabled } =
 		useWorkspaceState();
+	const { toolsTabPlugins } = usePlugins();
 	const atcReport = useTypedSelector(
 		(state: RootState) => state.controller.settings.info?.NEWOPT?.ATC,
 	);
 
+	const pluginTabs = useMemo(() => {
+		return toolsTabPlugins.flatMap((plugin) => {
+			const contribution = plugin.contributions.find(
+				(c) => c.slot === "tools-tab",
+			);
+			if (!contribution) {
+				return [];
+			}
+
+			const label = contribution.label || plugin.name;
+			const TabContent = ({ isActive }: { isActive: boolean }) => (
+				<PluginTabIframe pluginId={plugin.id} isActive={isActive} />
+			);
+
+			return [{ label, content: TabContent }];
+		});
+	}, [toolsTabPlugins]);
+
 	const atcEnabledOrCompiled = atcEnabled || atcReport === "1";
 
-	const filteredTabs = tabs.filter((tab) => {
+	const filteredTabs = [...tabs, ...pluginTabs].filter((tab) => {
 		if (tab.label === "Rotary" && !rotary.tab.show) {
 			return false;
 		}
