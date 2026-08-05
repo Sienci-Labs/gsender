@@ -16,12 +16,13 @@
  * along with gSender.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 
 import settings from "../../config/settings";
 import logger from "../../lib/logger";
 import config from "../configstore";
+import { scanPluginForSdkUsage } from "./pluginSecurity";
 
 const log = logger("service:pluginregistry");
 
@@ -94,7 +95,7 @@ const validateManifest = (manifest, pluginPath) => {
 		errors.push('Missing or invalid "ui.entry"');
 	}
 
-	const uiDir = path.join(pluginPath, path.dirname(manifest.ui?.entry || ""));
+	// const uiDir = path.join(pluginPath, path.dirname(manifest.ui?.entry || ""));
 	const entryPath = path.join(pluginPath, manifest.ui?.entry || "");
 	if (manifest.ui?.entry && !fs.existsSync(entryPath)) {
 		errors.push(`UI entry not found: ${manifest.ui.entry}`);
@@ -125,7 +126,7 @@ const getPluginSettings = () => config.get("pluginSettings", {});
 
 const isPluginEnabled = (pluginId) => {
 	const pluginSettings = getPluginSettings();
-	if (Object.prototype.hasOwnProperty.call(pluginSettings, pluginId)) {
+	if (Object.hasOwn(pluginSettings, pluginId)) {
 		return pluginSettings[pluginId]?.enabled !== false;
 	}
 	return true;
@@ -283,7 +284,7 @@ const watchPlugins = (onChange, { debounceMs = 200 } = {}) => {
 				notify(target, filename),
 			);
 			watchers.push(watcher);
-		} catch (err) {
+		} catch (_err) {
 			// Recursive watch isn't available on some platforms/Node versions.
 			try {
 				const watcher = fs.watch(target, (_event, filename) =>
@@ -297,7 +298,9 @@ const watchPlugins = (onChange, { debounceMs = 200 } = {}) => {
 	};
 
 	// Shallow-watch the roots so adding/removing a plugin folder is detected.
-	getPluginDirectories().forEach((dir) => addWatch(dir, { recursive: false }));
+	getPluginDirectories().forEach((dir) => {
+		addWatch(dir, { recursive: false });
+	});
 
 	// Deep-watch each served `ui/` directory — this is exactly what the iframe
 	// loads, so it covers both source (vanilla) and built (Vite) plugins without
@@ -306,13 +309,79 @@ const watchPlugins = (onChange, { debounceMs = 200 } = {}) => {
 		.filter((plugin) => plugin.valid)
 		.map((plugin) => plugin.uiServePath);
 
-	uiDirs.forEach((uiDir) => addWatch(uiDir, { recursive: true }));
+	uiDirs.forEach((uiDir) => {
+		addWatch(uiDir, { recursive: true });
+	});
 
 	log.info(
 		`Watching ${uiDirs.length} plugin UI director${uiDirs.length === 1 ? "y" : "ies"} for changes`,
 	);
 
 	return stopWatchingPlugins;
+};
+
+const readImportedManifest = (pluginPath) => {
+	const manifest = readManifest(pluginPath);
+	if (!manifest) {
+		return null;
+	}
+
+	const errors = validateManifest(manifest, pluginPath);
+	const plugin = {
+		id: manifest.id,
+		name: manifest.name,
+		version: manifest.version,
+		engine: manifest.engine || null,
+		permissions: manifest.permissions || [],
+		valid: errors.length === 0,
+		errors,
+		entry: manifest.ui.entry,
+		contributions: manifest.ui.contributions || [],
+		pluginPath,
+	};
+
+	return {
+		isValid: true,
+		plugin,
+	};
+};
+
+const changeManifestPermissions = (pluginPath, permissions) => {
+	const manifest = readManifest(pluginPath);
+	if (!manifest) {
+		log.error("no manifest");
+		return null;
+	}
+
+	const newManifest = {
+		permissions: permissions,
+		...manifest,
+	};
+
+	const manifestPath = path.join(pluginPath, MANIFEST_FILENAME);
+	try {
+		fs.writeFileSync(manifestPath, JSON.stringify(newManifest));
+		return 0;
+	} catch (err) {
+		log.error(`Failed to write manifest at ${manifestPath}: ${err.message}`);
+		return err;
+	}
+};
+
+const scanPlugin = scanPluginForSdkUsage;
+
+const pluginImport = (pluginsDir, pluginPath) => {
+	try {
+		const importPath = path.join(pluginsDir, path.basename(pluginPath));
+		log.debug(importPath);
+		fs.cpSync(pluginPath, importPath, {
+			recursive: true,
+		});
+		return 0;
+	} catch (err) {
+		log.error(`Failed to import plugin at ${pluginsDir}: ${err.message}`);
+		return err;
+	}
 };
 
 export default {
@@ -328,4 +397,8 @@ export default {
 	validateManifest,
 	watchPlugins,
 	stopWatchingPlugins,
+	readImportedManifest,
+	changeManifestPermissions,
+	scanPlugin,
+	pluginImport,
 };

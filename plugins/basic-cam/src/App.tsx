@@ -1,10 +1,10 @@
-import { gsender } from "@sienci/gsender-plugin-sdk";
 import { useWorkspaceState } from "@sienci/gsender-plugin-sdk/react";
 import {
 	type GCodeViewerHandle,
 	GCodeVisualizer,
 } from "@sienci/gsender-plugin-sdk/viewer";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { gcode as gcodeClient } from "../../../packages/plugin-sdk";
 
 import { generateGcode, type Operation, type Units } from "./gcode";
 
@@ -21,7 +21,13 @@ type NumberFieldProps = {
 	onChange: (value: number) => void;
 };
 
-const NumberField = ({ label, value, step, min, onChange }: NumberFieldProps) => (
+const NumberField = ({
+	label,
+	value,
+	step,
+	min,
+	onChange,
+}: NumberFieldProps) => (
 	<label className="mb-3 flex flex-col gap-1 text-sm">
 		{label}
 		<input
@@ -94,7 +100,7 @@ const App = () => {
 				operation === "drill-grid"
 					? "basic-cam-drill-grid.gcode"
 					: "basic-cam-rectangle.gcode";
-			await gsender.gcode.loadToVisualizer(gcode, name);
+			await gcodeClient.loadToVisualizer(gcode, name);
 			setStatus("G-code loaded into gSender.");
 		} catch (err) {
 			setStatus(err instanceof Error ? err.message : String(err));
@@ -242,7 +248,9 @@ const App = () => {
 						/>
 					</div>
 
-					<h2 className="mt-0 mb-2 text-base font-semibold">Generated G-code</h2>
+					<h2 className="mt-0 mb-2 text-base font-semibold">
+						Generated G-code
+					</h2>
 					<pre className="max-h-80 overflow-auto rounded-lg bg-gray-100 p-4 text-xs dark:bg-gray-800">
 						{gcode}
 					</pre>

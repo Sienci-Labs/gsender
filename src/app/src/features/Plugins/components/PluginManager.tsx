@@ -1,10 +1,50 @@
+/** biome-ignore-all lint/suspicious/noExplicitAny: <> */
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
+import api from "app/api";
 import { Button } from "app/components/Button";
+import { Confirm } from "app/components/ConfirmationDialog/ConfirmationDialogLib";
 import Page from "app/components/Page";
 import Switch from "app/components/Switch";
 import { Tooltip } from "app/components/Tooltip"; // Ensure Tooltip exists
+import { toast } from "app/lib/toaster";
 import isElectron from "is-electron";
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePlugins } from "../hooks/usePlugins";
+import { AxiosResponse } from "axios";
+
+const permissionsMap = new Map<string, string[]>([
+	[
+		"*require-whole-module*",
+		[
+			"machine:read",
+			"machine:write",
+			"visualizer:load",
+			"workspace:read",
+			"redux:read",
+		],
+	],
+	[
+		"gsender",
+		[
+			"machine:read",
+			"machine:write",
+			"visualizer:load",
+			"workspace:read",
+			"redux:read",
+		],
+	],
+	["machine", ["machine:read", "machine:write"]],
+	["gcode", ["visualizer:load"]],
+	["workspace", ["workspace:read"]],
+	["getWorkspaceState", ["workspace:read"]],
+	["subscribeWorkspaceState", ["workspace:read"]],
+	["useWorkspaceState", ["workspace:read"]],
+	["redux", ["redux:read"]],
+	["getReduxState", ["redux:read"]],
+	["getSelector", ["redux:read"]],
+	["subscribeSelector", ["redux:read"]],
+	["useTypedSelector", ["redux:read"]],
+]);
 
 const PluginManager = () => {
 	const {
@@ -17,6 +57,9 @@ const PluginManager = () => {
 		openPluginsDir,
 	} = usePlugins();
 	const [restartRequired, setRestartRequired] = useState(false);
+	const [importData, setImportData] = useState<{
+		directory?: string;
+	}>({});
 
 	const handleToggle = async (id: string, enabled: boolean) => {
 		const result = await setEnabled(id, enabled);
@@ -43,6 +86,127 @@ const PluginManager = () => {
 			(window as any).ipcRenderer?.send("open-plugin-import-dialog");
 		}
 	};
+
+	useEffect(() => {
+		if (isElectron()) {
+			(window as any).ipcRenderer.on(
+				"returned-plugin-directory-data",
+				async (_: any, directory: string, indexFile: string) => {
+					const res = await api.plugins.readImportedManifest(directory);
+					const { isValid, plugin } = res.data;
+
+					if (!isValid) {
+						Confirm({
+							title: "Plugin Error",
+							content:
+								"The imported plugin does not have a valid manifest. Please make sure the plugin is created for gSender.",
+							confirmLabel: "Ok",
+						});
+						return;
+					}
+
+					// do plugin checks
+					const result = await api.plugins.scanPluginForSDKUsage(indexFile, [
+						"@sienci/gsender-plugin-sdk",
+						"@sienci/gsender-plugin-sdk/react",
+						"../../../packages/plugin-sdk",
+					]);
+					if (result.status !== 200) {
+						console.error(result.data.msg);
+						toast.error("Oops. Something went wrong.", {
+							position: "bottom-right",
+						});
+						return;
+					}
+
+					const { capabilities, hasDynamicImport } = result.data;
+					let permissions: string[];
+
+					console.log(capabilities);
+
+					// if imported gsender client, needs all permissions
+					if (
+						capabilities.includes("gsender") ||
+						capabilities.includes("*require-whole-module*")
+					) {
+						permissions = [...permissionsMap.keys()];
+					} else {
+						// otherwise, figure out which clients they imported
+						permissions = [
+							...new Set<string>(
+								capabilities.map((capability: string) => {
+									return permissionsMap.get(capability);
+								}),
+							),
+						].flat();
+					}
+
+					Confirm({
+						title: "Plugin Permissions",
+						content: (
+							<div className="flex flex-col h-full">
+								{hasDynamicImport && (
+									<>
+										<p className="font-bold">
+											The actions this plugin runs cannot be verified.
+										</p>
+										<p className="font-bold">
+											Not all permissions needed may be listed here.
+										</p>
+										<p className="font-bold text-amber-500">
+											Please exercise caution.
+										</p>
+										<hr></hr>
+									</>
+								)}
+								<p>The plugin {plugin.name} needs the following permissions:</p>
+								<ul>
+									{permissions.map((permission) => (
+										<li key={permission}>- {permission}</li>
+									))}
+								</ul>
+								<p>Press Authorize to continue importing this plugin.</p>
+							</div>
+						),
+						confirmLabel: "Authorize",
+						cancelLabel: "Cancel",
+						onConfirm: async () => {
+							// write used permissions to manifest
+							api.plugins
+								.writePermissions(directory, permissions)
+								.then((res) => {
+									if (res.status !== 200) {
+										console.error(res.data.error);
+										toast.error("Failed to import plugin. Please try again.", {
+											position: "bottom-right",
+										});
+									} else {
+										setImportData({ directory });
+									}
+								});
+						},
+					});
+				},
+			);
+		}
+	}, []);
+
+	useEffect(() => {
+		const { directory } = importData;
+		console.log(pluginsDir);
+		// import the directory to the plugins directory
+		api.plugins.importPlugin(pluginsDir, directory).then((res) => {
+			if (res.status !== 200) {
+				console.error(res.data.error);
+				toast.error("Failed to import plugin. Please try again.", {
+					position: "bottom-right",
+				});
+			} else {
+				toast.success("Plugin imported.");
+				refresh();
+			}
+		});
+	}, [importData]);
 
 	return (
 		<Page
@@ -136,7 +300,7 @@ const PluginManager = () => {
 									<div>
 										<Switch
 											checked={plugin.enabled}
-											onChange={(checked, e) =>
+											onChange={(checked, _e) =>
 												handleToggle(plugin.id, checked)
 											}
 											disabled={!plugin.valid}

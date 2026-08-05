@@ -1,0 +1,1 @@
+{"permissions":["machine:read","files:read"],"id":"com.sienci.basic-cam-test","name":"Basic CAM Test","version":"0.1.0","engine":">=1.6.0","ui":{"entry":"ui/index.html","contributions":[{"slot":"tools-page","route":"basic-cam-test","label":"Basic CAM Test"}]}}

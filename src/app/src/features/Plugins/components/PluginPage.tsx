@@ -4,6 +4,14 @@ import { useParams } from "react-router";
 import { usePlugins } from "../hooks/usePlugins";
 import PluginPanel from "./PluginPanel";
 
+// const permissionsToFunctions = new Map<string, string[]>([
+// 	["machine:read", ["getMachineContext", "gsender"]],
+// 	["machine:write", ["machineCommand"]],
+// 	["visualizer:load", ["loadGCodeToVisualizer"]],
+// 	["workspace:read", ["getWorkspaceState", "workspace:read"]],
+// 	["redux:read", ["getReduxState", "getSelector", "subscribeSelector"]],
+// ]);
+
 const PluginPage = () => {
 	const { pluginRoute = "" } = useParams();
 	const { plugins, loading } = usePlugins();
@@ -43,10 +51,7 @@ const PluginPage = () => {
 	);
 
 	return (
-		<Page
-			title={contribution?.label || plugin.name}
-			withGoBackButton
-		>
+		<Page title={contribution?.label || plugin.name} withGoBackButton>
 			<PluginPanel plugin={plugin} className="h-full" />
 		</Page>
 	);
