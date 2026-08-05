@@ -53,6 +53,7 @@ import type {
 	BasicObject,
 	GRBL_ACTIVE_STATES_T,
 } from "app/definitions/general";
+import { showAccessoryConnectivityToast } from "app/features/AccessoryConnectivity/showAccessoryConnectivityToast";
 import { KeepoutToggle } from "app/features/ATC/components/KeepOut/KeepOutToggle.tsx";
 import { updateToolchangeContext } from "app/features/Helper/Wizard.tsx";
 import type { Spindle } from "app/features/Spindle/definitions";
@@ -1006,6 +1007,18 @@ export function* initialize(): Generator<null, void, unknown> {
 	controller.addListener(
 		"grblHal:autoconfig",
 		(payload: { values: Record<string, string> }) => {
+			const previousValues = reduxStore.getState().controller.autoconfig;
+
+			Object.entries(payload.values).forEach(([key, value]) => {
+				const previousValue = previousValues[key];
+				if (previousValue !== undefined && previousValue !== value) {
+					showAccessoryConnectivityToast(
+						key,
+						value === "1" ? "connected" : "disconnected",
+					);
+				}
+			});
+
 			reduxStore.dispatch(updateAutoconfig(payload));
 		},
 	);

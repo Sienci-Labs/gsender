@@ -16,10 +16,15 @@ const Toaster = ({ ...props }: ToasterProps) => {
 				unstyled: true,
 				closeButtonAriaLabel: "Dismiss notification",
 				classNames: {
+					// Chrome (background/border/padding/shadow/width) is gated behind
+					// data-styled=true so toast.custom() jsx toasts — which sonner
+					// marks unstyled by default — render exactly what they pass in,
+					// instead of being wrapped in this card's own chrome.
 					toast:
-						"group relative flex w-full items-center gap-3 overflow-hidden rounded-xl border border-border bg-background px-4 py-3.5 text-foreground shadow-[0_8px_20px_rgb(15_23_42_/_0.10),0_2px_6px_rgb(15_23_42_/_0.06)] dark:shadow-[0_10px_24px_rgb(0_0_0_/_0.28),0_2px_6px_rgb(0_0_0_/_0.20)]",
+						"group relative flex items-center gap-3 rounded-xl text-foreground data-[styled=true]:w-full data-[styled=true]:overflow-hidden data-[styled=true]:border data-[styled=true]:border-border data-[styled=true]:bg-background data-[styled=true]:px-4 data-[styled=true]:py-3.5 data-[styled=true]:shadow-[0_8px_20px_rgb(15_23_42_/_0.10),0_2px_6px_rgb(15_23_42_/_0.06)] dark:data-[styled=true]:shadow-[0_10px_24px_rgb(0_0_0_/_0.28),0_2px_6px_rgb(0_0_0_/_0.20)]",
 					title: "text-[14px] text-foreground leading-5",
-					description: "text-[14px] font-normal leading-5 text-muted-foreground",
+					description:
+						"text-[14px] font-normal leading-5 text-muted-foreground",
 					content: "flex min-w-0 flex-1 flex-col justify-center gap-0.5",
 					icon: "mx-0 flex size-11 shrink-0 items-center justify-center rounded-full",
 					closeButton:
