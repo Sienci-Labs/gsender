@@ -1,3 +1,6 @@
+/** biome-ignore-all lint/a11y/noSvgWithoutTitle: <> */
+/** biome-ignore-all lint/suspicious/noExplicitAny: <> */
+/** biome-ignore-all lint/a11y/useButtonType: <> */
 import {
 	Popover,
 	PopoverContent,
@@ -6,13 +9,17 @@ import {
 import { ExternalLink, QrCode } from "lucide-react";
 import type { ComponentType } from "react";
 import QRCodeComponent from "react-qr-code";
-import type { SecondaryContent } from "../../types/wizard";
+import type { SecondaryContent } from "./types/wizard";
 
 interface SecondaryContentPanelProps {
 	content: SecondaryContent[];
+	getItemParams: () => any;
 }
 
-export function SecondaryContentPanel({ content }: SecondaryContentPanelProps) {
+export function SecondaryContentPanel({
+	content,
+	getItemParams,
+}: SecondaryContentPanelProps) {
 	if (!content || content.length === 0) {
 		return (
 			<div className="flex items-center justify-center h-full">
@@ -41,6 +48,10 @@ export function SecondaryContentPanel({ content }: SecondaryContentPanelProps) {
 			? "flex-1 min-h-0 overflow-hidden portrait:min-w-0 portrait:h-full"
 			: "flex-shrink-0 portrait:flex-1 portrait:min-w-0 portrait:overflow-hidden";
 
+		const itemContent = item.function
+			? item.function(item, getItemParams())
+			: item.content;
+
 		if (item.type === "image") {
 			const imageContainerClass =
 				"flex flex-col flex-1 min-h-0 overflow-hidden portrait:min-w-0 portrait:h-full";
@@ -53,7 +64,7 @@ export function SecondaryContentPanel({ content }: SecondaryContentPanelProps) {
 					)}
 					<div className="flex-1 min-h-0 overflow-hidden flex items-center justify-center">
 						<img
-							src={item.content as string}
+							src={itemContent as string}
 							alt={item.title || "Secondary content"}
 							className="max-h-full max-w-full rounded-xl"
 						/>
@@ -72,7 +83,7 @@ export function SecondaryContentPanel({ content }: SecondaryContentPanelProps) {
 					)}
 					<div className="rounded-lg bg-gray-300 dark:bg-surface-elevated p-1.5">
 						<video
-							src={item.content as string}
+							src={itemContent as string}
 							className="w-full rounded-md shadow-sm"
 							autoPlay
 							muted
@@ -85,7 +96,7 @@ export function SecondaryContentPanel({ content }: SecondaryContentPanelProps) {
 		}
 
 		if (item.type === "component") {
-			const Component = item.content as ComponentType<any>;
+			const Component = itemContent as ComponentType<any>;
 			return (
 				<div key={index} className={containerClassName}>
 					{item.title && (

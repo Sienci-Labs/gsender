@@ -1,5 +1,6 @@
-import { useValidations } from "app/features/AccessoryInstaller/hooks/UseValidations.tsx";
-import type { Wizard } from "app/features/AccessoryInstaller/types";
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
+import { useValidations } from "app/components/Wizard/hooks/UseValidations.tsx";
+import type { Wizard } from "app/components/Wizard/types";
 import ATCiLogo from "app/features/AccessoryInstaller/Wizards/atc/assets/ATC_1.webp";
 import { ATCConfigStep } from "app/features/AccessoryInstaller/Wizards/atc/components/ATCConfigStep.tsx";
 import { ATCCompletion } from "app/features/AccessoryInstaller/Wizards/atc/components/Completion.tsx";

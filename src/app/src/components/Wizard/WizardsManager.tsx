@@ -1,5 +1,7 @@
+// if you have multiple wizards and need a hub, import this component
+
 import { useEffect, useRef, useState } from "react";
-import type { Wizard } from "../../types/wizard";
+import type { Wizard } from "./types/wizard";
 import { WizardManager } from "./WizardManager";
 import { WizardsHub } from "./WizardsHub";
 
@@ -53,6 +55,7 @@ export function WizardsManager({
 				<WizardManager
 					wizard={selectedWizard}
 					onExit={handleExitWizard}
+					isHub={true}
 					initialSubWizardId={initialSubWizardId}
 				/>
 			) : (

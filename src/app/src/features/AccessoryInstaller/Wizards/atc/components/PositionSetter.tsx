@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/a11y/noLabelWithoutControl: <> */
 import { MapPin } from "lucide-react";
 import { type ReactNode, useEffect, useState } from "react";
 
@@ -75,6 +76,7 @@ export function PositionSetter({
 							value={x}
 							onChange={(e) => handleXChange(e.target.value)}
 							className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+							data-testid="atc-position-x-change"
 						/>
 					</div>
 					<div>
@@ -86,6 +88,7 @@ export function PositionSetter({
 							value={y}
 							onChange={(e) => handleYChange(e.target.value)}
 							className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+							data-testid="atc-position-y-change"
 						/>
 					</div>
 					{showZ && (
@@ -98,6 +101,7 @@ export function PositionSetter({
 								value={z}
 								onChange={(e) => handleZChange(e.target.value)}
 								className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+								data-testid="atc-position-z-change"
 							/>
 						</div>
 					)}

@@ -1,18 +1,21 @@
-/** biome-ignore-all lint/a11y/noSvgWithoutTitle: <> */
-/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
 /** biome-ignore-all lint/a11y/useButtonType: <> */
+/** biome-ignore-all lint/suspicious/noExplicitAny: <> */
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
+/** biome-ignore-all lint/a11y/noSvgWithoutTitle: <> */
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Fragment, useEffect, useState } from "react";
-import type { SubWizard } from "../../types/wizard";
-import { ProgressBar } from "./ProgressBar";
+import Button from "../Button";
+import { useDefaultContext } from "./DefaultContext";
+import ProgressBar from "./ProgressBar";
 import { SecondaryContentPanel } from "./SecondaryContentPanel";
+import type { SubWizard } from "./types/wizard";
 
-interface WizardContainerProps {
+interface Props {
 	subWizard: SubWizard;
-	onExit: () => void;
+	onWizardExit: () => void;
 }
 
-export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
+export function WizardContainer({ subWizard, onWizardExit }: Props) {
 	const [currentStepIndex, setCurrentStepIndex] = useState(0);
 	const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
 	// biome-ignore lint/suspicious/noExplicitAny: <>
@@ -21,18 +24,13 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
 
 	const currentStep = subWizard.steps[currentStepIndex];
 	const StepContextProvider = currentStep.contextProvider || Fragment;
+	const subWizardContext = subWizard.context || useDefaultContext;
+	const { reset, onPrevious, onNext, getItemParams } = subWizardContext();
 	const fillPrimaryContent = currentStep.fillPrimaryContent === true;
 	const isFirstStep = currentStepIndex === 0;
 	const isLastStep = currentStepIndex === subWizard.steps.length - 1;
 	const isCurrentStepComplete = completedSteps.has(currentStepIndex);
 	const isSingleStep = subWizard.steps.length === 1;
-
-	useEffect(() => {
-		setCurrentStepIndex(0);
-		setCompletedSteps(new Set());
-		setStepData({});
-		setShowCompletion(false);
-	}, [subWizard.id]);
 
 	useEffect(() => {
 		if (!currentStep.autoComplete?.()) return;
@@ -47,11 +45,18 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
 		) {
 			setShowCompletion(true);
 		}
-	}, [currentStepIndex, subWizard.id]);
+	}, [currentStepIndex]);
 
 	const handleNext = () => {
 		if (!isLastStep && isCurrentStepComplete) {
 			setCurrentStepIndex(currentStepIndex + 1);
+			onNext?.();
+		} else if (
+			isLastStep &&
+			isCurrentStepComplete &&
+			subWizard.completionPage
+		) {
+			setShowCompletion(true);
 		}
 	};
 
@@ -62,20 +67,13 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
 				prevIndex--;
 			}
 			setCurrentStepIndex(prevIndex);
+			onPrevious?.();
 		}
 	};
 
 	const handleStepComplete = () => {
 		const newCompletedSteps = new Set(completedSteps).add(currentStepIndex);
 		setCompletedSteps(newCompletedSteps);
-
-		if (
-			isLastStep &&
-			newCompletedSteps.size === subWizard.steps.length &&
-			subWizard.completionPage
-		) {
-			setShowCompletion(true);
-		}
 	};
 
 	const handleStepUncomplete = () => {
@@ -95,18 +93,37 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
 		}));
 	};
 
+	const onExit = () => {
+		setCurrentStepIndex(0);
+		setCompletedSteps(new Set());
+		setStepData({});
+		setShowCompletion(false);
+		onWizardExit();
+		reset?.();
+	};
+
+	const resetWizard = () => {
+		setCurrentStepIndex(0);
+		setCompletedSteps(new Set());
+		setStepData({});
+		setShowCompletion(false);
+		reset?.();
+	};
+
 	const StepComponent = currentStep.component;
 	const CompletionComponent = subWizard.completionPage;
 
 	return (
-		<div className="h-full min-h-0 bg-gray-50 dark:bg-surface-base flex flex-col">
+		<div className="fixed-content-area min-h-0 bg-gray-50 dark:bg-surface-base flex flex-col">
 			{isSingleStep ? (
 				<div className="bg-white dark:bg-surface-raised border-b border-gray-200 px-4 py-2 flex items-center justify-between">
 					<span className="text-sm font-medium text-gray-700 dark:text-content-secondary">
 						{currentStep.title}
 					</span>
-					<button
+					<Button
 						onClick={onExit}
+						testId="wizard-exit"
+						variant="nothing"
 						className="flex items-center gap-2 text-gray-600 dark:text-content-muted hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
 					>
 						<svg
@@ -121,7 +138,7 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
 							<path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
 						</svg>
 						Exit
-					</button>
+					</Button>
 				</div>
 			) : (
 				<ProgressBar
@@ -141,11 +158,11 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
 					}
 				>
 					<div
-						className={`w-3/5 portrait:w-full portrait:text-xl portrait:h-3/5 p-12 portrait:p-6 ${
+						className={`portrait:w-full portrait:text-xl portrait:h-3/5 p-12 portrait:p-6 ${
 							fillPrimaryContent
 								? "flex flex-col min-h-0 overflow-hidden"
 								: "overflow-y-auto"
-						}`}
+						} ${showCompletion && CompletionComponent ? "w-full" : "w-3/5"}`}
 					>
 						{showCompletion && CompletionComponent ? (
 							<CompletionComponent />
@@ -179,43 +196,49 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
 						)}
 					</div>
 
-					<div className="w-2/5 portrait:h-2/5 portrait:w-full bg-gray-200 dark:bg-surface-raised px-12 py-4 portrait:p-4 flex flex-col overflow-hidden">
-						{showCompletion && CompletionComponent ? (
-							<SecondaryContentPanel
-								content={[
-									{
-										type: "image",
-										content: subWizard.completionImage,
-									},
-								]}
-							/>
-						) : (
+					{showCompletion && CompletionComponent ? null : (
+						<div className="w-2/5 portrait:h-2/5 portrait:w-full bg-gray-200 dark:bg-surface-raised px-12 py-4 portrait:p-4 flex flex-col overflow-hidden">
 							<SecondaryContentPanel
 								content={
 									showCompletion ? [] : currentStep.secondaryContent || []
 								}
+								getItemParams={getItemParams}
 							/>
-						)}
-					</div>
+						</div>
+					)}
 				</div>
 			</StepContextProvider>
 
 			{!isSingleStep && (
 				<div className="bg-white dark:bg-surface-raised border-t border-gray-200 dark:border-outline px-8 py-4 flex items-center justify-between">
 					{showCompletion ? (
-						<button
-							onClick={onExit}
-							className="flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors bg-gray-900 text-white hover:bg-gray-800"
-						>
-							Exit Wizard
-						</button>
+						<div className="flex w-full flex-row justify-between">
+							<Button
+								onClick={onExit}
+								testId="wizard-ending-exit"
+								variant="nothing"
+								className="flex h-full items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors bg-gray-900 text-white hover:bg-gray-800"
+							>
+								Exit Wizard
+							</Button>
+							<Button
+								onClick={resetWizard}
+								testId="wizard-reset"
+								variant="nothing"
+								className="flex h-full items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors text-gray-900 bg-gray-200 hover:bg-gray-100"
+							>
+								Restart Wizard
+							</Button>
+						</div>
 					) : (
 						<>
-							<button
+							<Button
 								onClick={handlePrevious}
 								disabled={isFirstStep}
+								testId="wizard-previous"
+								variant="nothing"
 								className={`
-                flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors
+                flex h-full items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors
                 ${
 									isFirstStep
 										? "text-gray-400 cursor-not-allowed"
@@ -225,15 +248,17 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
 							>
 								<ChevronLeft size={20} />
 								Previous
-							</button>
+							</Button>
 
-							<button
+							<Button
 								onClick={handleNext}
-								disabled={!isCurrentStepComplete || isLastStep}
+								disabled={!isCurrentStepComplete}
+								testId="wizard-previous"
+								variant="nothing"
 								className={`
-                flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors
+                flex h-full items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors
                 ${
-									!isCurrentStepComplete || isLastStep
+									!isCurrentStepComplete
 										? "bg-gray-300 text-gray-500 cursor-not-allowed"
 										: "bg-gray-900 text-white hover:bg-gray-800"
 								}
@@ -241,7 +266,7 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
 							>
 								Next
 								<ChevronRight size={20} />
-							</button>
+							</Button>
 						</>
 					)}
 				</div>

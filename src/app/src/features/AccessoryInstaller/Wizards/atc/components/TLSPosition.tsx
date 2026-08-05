@@ -1,6 +1,6 @@
+import { StepActionButton } from "app/components/Wizard/StepActionButton.tsx";
+import type { StepProps } from "app/components/Wizard/types";
 import { IMPERIAL_UNITS } from "app/constants";
-import { StepActionButton } from "app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx";
-import type { StepProps } from "app/features/AccessoryInstaller/types";
 import { PositionSetter } from "app/features/AccessoryInstaller/Wizards/atc/components/PositionSetter.tsx";
 import { useWorkspaceState } from "app/hooks/useWorkspaceState";
 import controller from "app/lib/controller.ts";

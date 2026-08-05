@@ -1,7 +1,10 @@
-import { ValidationBanner } from "app/features/AccessoryInstaller/components/wizard/ValidationBanner.tsx";
+/** biome-ignore-all lint/a11y/noRedundantAlt: <> */
+/** biome-ignore-all lint/a11y/useButtonType: <> */
 import { ArrowLeft, ArrowRight, HelpCircle } from "lucide-react";
-import type { SubWizard, ValidationResult } from "../../types/wizard";
-import DefaultImage from "../../Wizards/atc/assets/placeholder_1.png";
+import Button from "../Button";
+import DefaultImage from "./assets/placeholder.png";
+import type { SubWizard, ValidationResult } from "./types/wizard";
+import { ValidationBanner } from "./ValidationBanner";
 
 interface WizardLandingProps {
 	title: string;
@@ -44,38 +47,43 @@ export function WizardLanding({
 		isActive: boolean,
 		isDisabled: boolean,
 	) => (
-		<button
+		<Button
 			key={subWizard.id}
+			testId={`sub-wizard-selection-${subWizard.id}`}
 			onClick={() => !isDisabled && onSelectSubWizard(subWizard)}
 			disabled={isDisabled}
+			variant="nothing"
 			className={`
-                flex items-center justify-between px-6 py-4 rounded-lg text-left
-                transition-all duration-200 font-medium text-lg
-                ${
-									isDisabled
-										? "bg-gray-200 text-gray-400 cursor-not-allowed"
-										: isActive
-											? "bg-gray-900 text-white hover:bg-gray-800"
-											: "bg-gray-200 text-gray-700 hover:bg-gray-300"
-								}
-            `}
+				flex items-center justify-between px-6 py-4 rounded-lg text-left
+				transition-all duration-200 font-medium text-lg h-full
+				${
+					isDisabled
+						? "bg-gray-200 text-gray-400 cursor-not-allowed"
+						: isActive
+							? "bg-gray-900 text-white hover:bg-gray-800"
+							: "bg-gray-200 text-gray-700 hover:bg-gray-300"
+				}
+			`}
 		>
 			<span>{subWizard.title}</span>
 			<ArrowRight size={20} />
-		</button>
+		</Button>
 	);
 
 	return (
 		<div className="h-full min-h-0 bg-gray-50 dark:bg-surface-base flex overflow-hidden portrait:flex-col-reverse portrait:w-full">
 			<div className="w-3/5 portrait:w-full portrait:h-3/5 p-12 flex flex-col overflow-y-auto">
 				{onBack && (
-					<button
+					<Button
 						onClick={onBack}
+						testId="wizard-back"
+						size="custom"
+						variant="nothing"
 						className="flex items-center gap-2 text-gray-600 dark:text-content-secondary hover:text-gray-900 dark:hover:text-gray-100 mb-8 self-start"
 					>
 						<ArrowLeft size={20} />
 						Back to Wizards
-					</button>
+					</Button>
 				)}
 
 				<div className="flex-1">
@@ -92,6 +100,9 @@ export function WizardLanding({
 						<p className="text-gray-700 dark:text-content-muted mb-8">
 							Configuration File Version: {activeSubWizard.configVersion}
 						</p>
+					)}
+					{activeSubWizard?.description && (
+						<p className="mb-8">{activeSubWizard.description}</p>
 					)}
 					<ValidationBanner validations={validations} />
 					<div className="flex flex-col gap-3 mt-12 max-w-md">

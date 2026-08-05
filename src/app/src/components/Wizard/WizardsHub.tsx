@@ -1,5 +1,8 @@
+/** biome-ignore-all lint/a11y/useButtonType: <> */
+/** biome-ignore-all lint/a11y/noSvgWithoutTitle: <> */
 import { ArrowRight, Settings } from "lucide-react";
-import type { Wizard } from "../../types/wizard";
+import Button from "../Button";
+import type { Wizard } from "./types/wizard";
 
 interface WizardsHubProps {
 	wizards: Wizard[];
@@ -43,14 +46,16 @@ export function WizardsHub({
 						const estimatedTime = wizard.subWizards[0]?.estimatedTime;
 
 						return (
-							<button
+							<Button
 								key={wizard.id}
+								testId={`wizard-selection-${wizard.id}`}
 								onClick={() => onSelectWizard(wizard)}
-								className="group bg-white dark:bg-surface-raised rounded-xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 text-left border-2 border-gray-100 hover:border-blue-400 relative overflow-hidden"
+								size="custom"
+								className="group w-full bg-white dark:bg-surface-raised rounded-xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 text-left border-2 border-gray-100 hover:border-blue-400 relative overflow-hidden"
 							>
 								<div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-transparent rounded-bl-full transform translate-x-8 -translate-y-8 group-hover:translate-x-4 group-hover:-translate-y-4 transition-transform duration-300" />
 
-								<div className="relative">
+								<div className="relative w-full">
 									<h2 className="text-2xl font-bold text-gray-900 dark:text-content-primary mb-3 group-hover:text-blue-600 transition-colors">
 										{wizard.title}
 									</h2>
@@ -121,7 +126,7 @@ export function WizardsHub({
 										/>
 									</div>
 								</div>
-							</button>
+							</Button>
 						);
 					})}
 				</div>

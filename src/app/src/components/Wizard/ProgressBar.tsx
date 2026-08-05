@@ -1,3 +1,5 @@
+/** biome-ignore-all lint/a11y/noSvgWithoutTitle: <> */
+/** biome-ignore-all lint/a11y/useButtonType: <> */
 interface ProgressBarProps {
 	currentStep: number;
 	totalSteps: number;
@@ -57,3 +59,5 @@ export function ProgressBar({
 		</div>
 	);
 }
+
+export default ProgressBar;

@@ -1,17 +1,22 @@
+// if you only have one wizard and don't need a hub, import this component
+
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
 import { useEffect, useRef, useState } from "react";
-import type { SubWizard, Wizard } from "../../types/wizard";
+import type { SubWizard, Wizard } from "./types/wizard";
 import { WizardContainer } from "./WizardContainer";
 import { WizardLanding } from "./WizardLanding";
 
 interface WizardManagerProps {
 	wizard: Wizard;
 	onExit?: () => void;
+	isHub?: boolean;
 	initialSubWizardId?: string;
 }
 
 export function WizardManager({
 	wizard,
 	onExit,
+	isHub = false,
 	initialSubWizardId,
 }: WizardManagerProps) {
 	const [selectedSubWizard, setSelectedSubWizard] = useState<SubWizard | null>(
@@ -20,7 +25,7 @@ export function WizardManager({
 	const hasAutoSelected = useRef(false);
 
 	useEffect(() => {
-		if (wizard.subWizards.length === 1) {
+		if (isHub && wizard.subWizards.length === 1) {
 			const allValid =
 				!wizard.validations.length ||
 				wizard.validations.every((v) => v().success);
@@ -32,6 +37,7 @@ export function WizardManager({
 
 	useEffect(() => {
 		if (
+			!isHub ||
 			hasAutoSelected.current ||
 			!initialSubWizardId ||
 			!wizard.subWizards.length
@@ -57,7 +63,7 @@ export function WizardManager({
 			{selectedSubWizard ? (
 				<WizardContainer
 					subWizard={selectedSubWizard}
-					onExit={handleExitWizard}
+					onWizardExit={handleExitWizard}
 				/>
 			) : (
 				<WizardLanding

@@ -4,6 +4,7 @@ export interface Feeder {
 
 export interface Sender {
 	status: SenderStatus;
+	progress?: number;
 }
 
 export interface FeederStatus {
@@ -75,4 +76,5 @@ export interface SenderStatus {
 	ovF: number;
 	isRotaryFile: boolean;
 	currentLineRunning: number;
+	timeRunning: number;
 }

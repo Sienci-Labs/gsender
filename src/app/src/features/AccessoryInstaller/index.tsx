@@ -1,4 +1,4 @@
-import { WizardsManager } from "app/features/AccessoryInstaller/components/wizard";
+import { WizardsManager } from "app/components/Wizard/WizardsManager";
 import { useAllWizards } from "app/features/AccessoryInstaller/Wizards";
 import { useParams } from "react-router";
 

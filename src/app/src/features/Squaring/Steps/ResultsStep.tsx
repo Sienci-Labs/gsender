@@ -182,7 +182,7 @@ const ResultsStep = () => {
 						<h3 className="text-lg font-semibold dark:text-content-primary">
 							Other Recommendations
 						</h3>
-						<div className="space-y-1 text-yellow-800 bg-yellow-100 p-4 rounded-lg border min-h-52 flex flex-col justify-center items-start space-y-1 dark:bg-yellow-950 dark:text-content-primary dark:border-yellow-950">
+						<div className="text-yellow-800 bg-yellow-100 p-4 rounded-lg border min-h-52 flex flex-col justify-center items-start space-y-1 dark:bg-yellow-950 dark:text-content-primary dark:border-yellow-950">
 							<p>
 								We also noticed from the results that your motor movement
 								settings could be updated to improve your machines accuracy.
@@ -248,6 +248,7 @@ const ResultsStep = () => {
 												<AlertDialogAction
 													className="border border-blue-500"
 													onClick={handleUpdateEEPROM}
+													data-testid="sq-update-step-per-mm"
 												>
 													Update Firmware
 												</AlertDialogAction>
