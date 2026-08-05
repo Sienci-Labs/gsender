@@ -1189,6 +1189,11 @@ class GrblHalController {
 			}
 		});
 
+		this.runner.on("autoconfig", (payload) => {
+			this.emit("serialport:read", payload.raw);
+			this.emit("grblHal:autoconfig", payload);
+		});
+
 		const queryStatusReport = () => {
 			// Check the ready flag
 			if (!this.ready) {

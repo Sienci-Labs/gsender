@@ -200,6 +200,7 @@ export interface ControllerState {
 			fileSize: number;
 		}>;
 	};
+	autoconfig: Record<string, string>;
 }
 
 export interface PortInfo {

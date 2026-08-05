@@ -114,6 +114,7 @@ import {
 	clearSpindles,
 	resetHoming,
 	updateAlarmDescriptions,
+	updateAutoconfig,
 	updateControllerSettings,
 	updateControllerState,
 	updateControllerType,
@@ -1001,6 +1002,13 @@ export function* initialize(): Generator<null, void, unknown> {
 		if (!file) return;
 		reduxStore.dispatch(addSDCardFileToList({ file }));
 	});
+
+	controller.addListener(
+		"grblHal:autoconfig",
+		(payload: { values: Record<string, string> }) => {
+			reduxStore.dispatch(updateAutoconfig(payload));
+		},
+	);
 
 	controller.addListener(
 		"atci",

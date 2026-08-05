@@ -24,6 +24,7 @@
 import events from "events";
 import _ from "lodash";
 import GrblHalLineParserResultATCI from "server/controllers/Grblhal/GrblHalLineParserResultATCI";
+import GrblHalLineParserResultAutoconfig from "server/controllers/Grblhal/GrblHalLineParserResultAutoconfig";
 import GrblHalLineParserResultCompleteStatus from "server/controllers/Grblhal/GrblHalLineParserResultCompleteStatus";
 import GrblHalLineParserResultJSON from "server/controllers/Grblhal/GrblHalLineParserResultJSON";
 import GrblHalLineParserResultSpindle from "server/controllers/Grblhal/GrblHalLineParserResultSpindle";
@@ -197,6 +198,10 @@ class GrblHalRunner extends events.EventEmitter {
 			}
 
 			this.emit("atci", payload);
+			return;
+		}
+		if (type === GrblHalLineParserResultAutoconfig) {
+			this.emit("autoconfig", payload);
 			return;
 		}
 		if (type === GrblHalLineParserResultStartup) {

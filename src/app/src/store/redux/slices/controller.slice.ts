@@ -82,6 +82,7 @@ const initialState: ControllerState = {
 		isMounted: false,
 		files: [],
 	},
+	autoconfig: {},
 };
 
 function mapPosToFeedbackUnits(
@@ -354,6 +355,12 @@ const controllerSlice = createSlice({
 		emptyAllSDFiles: (state) => {
 			state.sdcard.files = [];
 		},
+		updateAutoconfig: (
+			state,
+			action: PayloadAction<{ values: Record<string, string> }>,
+		) => {
+			state.autoconfig = { ...state.autoconfig, ...action.payload.values };
+		},
 	},
 });
 
@@ -377,6 +384,7 @@ export const {
 	addSDCardFileToList,
 	clearSDCardFiles,
 	emptyAllSDFiles,
+	updateAutoconfig,
 } = controllerSlice.actions;
 
 export default controllerSlice.reducer;
