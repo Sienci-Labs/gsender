@@ -1,19 +1,17 @@
-import { toast as sonnerToast } from "sonner";
+import pubsub from "pubsub-js";
 
-import { AccessoryConnectivityToast } from "./AccessoryConnectivityToast";
+import type { AccessoryConnectivityToastEntry } from "./AccessoryConnectivityToastHost";
+
+let toastCounter = 0;
 
 export function showAccessoryConnectivityToast(
 	accessoryName: string,
 	status: "connected" | "disconnected",
 ): void {
-	sonnerToast.custom(
-		(id) => (
-			<AccessoryConnectivityToast
-				status={status}
-				accessoryName={accessoryName}
-				onDismiss={() => sonnerToast.dismiss(id)}
-			/>
-		),
-		{ position: "top-right" },
-	);
+	const entry: AccessoryConnectivityToastEntry = {
+		id: `accessory-toast-${++toastCounter}`,
+		accessoryName,
+		status,
+	};
+	pubsub.publish("accessoryConnectivity:toast", entry);
 }

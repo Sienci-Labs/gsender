@@ -3,7 +3,7 @@ import controller from "app/lib/controller";
 import { FocusTrappingProvider } from "app/lib/focus-trapping";
 import * as user from "app/lib/user";
 import store from "app/store";
-import { store as reduxStore, type RootState } from "app/store/redux";
+import { type RootState, store as reduxStore } from "app/store/redux";
 import rootSaga, { sagaMiddleware } from "app/store/redux/sagas";
 import isElectron from "is-electron";
 import { posthog } from "posthog-js";
@@ -11,6 +11,7 @@ import { type ReactNode, useEffect } from "react";
 import { Provider as ReduxProvider } from "react-redux";
 import { HashRouter } from "react-router";
 import { Toaster } from "./components/shadcn/Sonner";
+import { AccessoryConnectivityToastHost } from "./features/AccessoryConnectivity/AccessoryConnectivityToastHost";
 import { AccessibilitySettingsHandler } from "./features/Helper/AccessibilitySettingsHandler";
 import { installPluginBridgeListener } from "./features/Plugins/utils/pluginBridge";
 import { ReactRoutes } from "./react-routes";
@@ -79,6 +80,7 @@ function App() {
 				<FocusTrappingBridge>
 					<AccessibilitySettingsHandler />
 					<Toaster closeButton visibleToasts={5} />
+					<AccessoryConnectivityToastHost />
 					<HashRouter>
 						<ReactRoutes />
 					</HashRouter>

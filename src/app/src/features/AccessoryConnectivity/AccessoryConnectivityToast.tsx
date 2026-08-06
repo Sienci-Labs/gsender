@@ -135,11 +135,11 @@ export function AccessoryConnectivityToast({
 	return (
 		<article
 			className={cn(
-				// Positioned in the viewport directly (rather than relying on
-				// sonner's own toast-container box, which is sized/anchored for
-				// its default compact toasts) so this larger card always sits
-				// fully on-screen, "indented slightly" from the corner.
-				"fixed top-4 right-4 z-[100] isolate grid w-[calc(100vw-32px)] grid-cols-[86px_1fr] items-center gap-5 overflow-hidden rounded-[22px] border border-border bg-card py-5 pr-4 pl-6 shadow-[0_21px_42px_-23px_rgba(0,0,0,0.82)] sm:w-[552px] sm:grid-cols-[106px_1fr] sm:gap-8 sm:py-7 sm:pr-6 sm:pl-7",
+				// Positioning/stacking is owned by AccessoryConnectivityToastHost,
+				// which renders this outside sonner's toast pipeline entirely —
+				// sonner's toast-container box is sized/anchored for its default
+				// compact toasts and can't cleanly host a card this large.
+				"relative isolate grid w-[calc(100vw-32px)] grid-cols-[86px_1fr] items-center gap-5 overflow-hidden rounded-[22px] border border-border bg-card py-5 pr-4 pl-6 shadow-[0_21px_42px_-23px_rgba(0,0,0,0.82)] sm:w-[552px] sm:grid-cols-[106px_1fr] sm:gap-8 sm:py-7 sm:pr-6 sm:pl-7",
 			)}
 			style={{ ["--accent" as string]: accentColor }}
 			aria-label={title}
