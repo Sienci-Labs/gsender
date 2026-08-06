@@ -102,6 +102,7 @@ export interface ControllerListeners {
 	"spindle:add": Array<Function>;
 	atci: Array<Function>;
 	"grblHal:autoconfig": Array<Function>;
+	"grblHal:info": Array<Function>;
 	"ymodem:start": Array<Function>;
 	"ymodem:complete": Array<Function>;
 	"ymodem:progress": Array<Function>;
@@ -228,6 +229,7 @@ class Controller {
 		"sdcard:json": [],
 		atci: [],
 		"grblHal:autoconfig": [],
+		"grblHal:info": [],
 		"ymodem:start": [],
 		"ymodem:complete": [],
 		"ymodem:progress": [],

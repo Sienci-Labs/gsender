@@ -53,6 +53,11 @@ import type {
 	BasicObject,
 	GRBL_ACTIVE_STATES_T,
 } from "app/definitions/general";
+import {
+	ACCESSORY_AUTOCONFIG_KEYS,
+	type AccessoryAutoconfigKey,
+	isAccessoryConnected,
+} from "app/features/AccessoryConnectivity/accessoryAutoconfigKeys";
 import { showAccessoryConnectivityToast } from "app/features/AccessoryConnectivity/showAccessoryConnectivityToast";
 import { KeepoutToggle } from "app/features/ATC/components/KeepOut/KeepOutToggle.tsx";
 import { updateToolchangeContext } from "app/features/Helper/Wizard.tsx";
@@ -157,6 +162,12 @@ export function* initialize(): Generator<null, void, unknown> {
 		estimatedTime: 0,
 	};
 	let hasEstimateData = false;
+	// Seeded from [NEWOPT:...] on connect (via $I), then kept in sync with
+	// live [MSG:Info: Autoconfig: ...] updates — the reference point the
+	// accessory connectivity toast diffs against.
+	let accessoryBaselineConnected: Partial<
+		Record<AccessoryAutoconfigKey, boolean>
+	> = {};
 
 	const clearEstimateDataCache = () => {
 		latestEstimateData = {
@@ -563,6 +574,8 @@ export function* initialize(): Generator<null, void, unknown> {
 			// Reset homing run flag to prevent rapid position without running homing
 			reduxStore.dispatch(resetHoming());
 			reduxStore.dispatch(closeConnection());
+			// So a reconnect re-baselines cleanly from the next $I/NEWOPT response.
+			accessoryBaselineConnected = {};
 
 			pubsub.publish("machine:disconnected");
 		},
@@ -1005,18 +1018,55 @@ export function* initialize(): Generator<null, void, unknown> {
 	});
 
 	controller.addListener(
+		"grblHal:info",
+		(payload: { name: string; value: unknown }) => {
+			if (
+				payload.name !== "NEWOPT" ||
+				typeof payload.value !== "object" ||
+				!payload.value
+			) {
+				return;
+			}
+
+			const newopt = payload.value as Record<string, string | null>;
+			const accessoryValues: Record<string, string> = {};
+			ACCESSORY_AUTOCONFIG_KEYS.forEach((key) => {
+				if (key in newopt) {
+					accessoryBaselineConnected[key] = isAccessoryConnected(newopt[key]);
+					accessoryValues[key] = newopt[key] ?? "0";
+				}
+			});
+
+			if (Object.keys(accessoryValues).length > 0) {
+				reduxStore.dispatch(updateAutoconfig({ values: accessoryValues }));
+			}
+		},
+	);
+
+	controller.addListener(
 		"grblHal:autoconfig",
 		(payload: { values: Record<string, string> }) => {
-			const previousValues = reduxStore.getState().controller.autoconfig;
-
 			Object.entries(payload.values).forEach(([key, value]) => {
-				const previousValue = previousValues[key];
-				if (previousValue !== undefined && previousValue !== value) {
+				if (
+					!ACCESSORY_AUTOCONFIG_KEYS.includes(key as AccessoryAutoconfigKey)
+				) {
+					return;
+				}
+
+				const nowConnected = isAccessoryConnected(value);
+				const previouslyConnected =
+					accessoryBaselineConnected[key as AccessoryAutoconfigKey];
+				if (
+					previouslyConnected !== undefined &&
+					previouslyConnected !== nowConnected
+				) {
 					showAccessoryConnectivityToast(
 						key,
-						value === "1" ? "connected" : "disconnected",
+						nowConnected ? "connected" : "disconnected",
 					);
 				}
+				accessoryBaselineConnected[key as AccessoryAutoconfigKey] =
+					nowConnected;
 			});
 
 			reduxStore.dispatch(updateAutoconfig(payload));
