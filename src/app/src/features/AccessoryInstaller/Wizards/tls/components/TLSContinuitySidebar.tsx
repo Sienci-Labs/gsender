@@ -5,7 +5,7 @@ import { firmwarePastVersion } from 'app/lib/firmwareSemver.ts';
 import { ATCI_SUPPORTED_VERSION } from 'app/features/ATC/utils/ATCiConstants.ts';
 import cx from 'classnames';
 
-function SettingBadge({ label, ok }: { label: string; ok: boolean }) {
+export function SettingBadge({ label, ok }: { label: string; ok: boolean }) {
     return (
         <span
             className={cx('text-xs font-semibold px-2 py-0.5 rounded-full', {

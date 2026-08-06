@@ -7,6 +7,7 @@ import { ManualToolChangePosition } from 'app/features/AccessoryInstaller/Wizard
 import { TLSCompletion } from 'app/features/AccessoryInstaller/Wizards/tls/components/Completion.tsx';
 import { ContinuityCheck } from 'app/features/AccessoryInstaller/Wizards/tls/components/ContinuityCheck.tsx';
 import { TLSContinuitySidebar } from 'app/features/AccessoryInstaller/Wizards/tls/components/TLSContinuitySidebar.tsx';
+import { TLSInputEnable } from 'app/features/AccessoryInstaller/Wizards/tls/components/TLSInputEnable.tsx';
 import { Jogging } from 'app/features/Jogging';
 import store from 'app/store';
 
@@ -134,6 +135,10 @@ export function useSienciTLSWizard(): Wizard {
                                 {
                                     type: 'component',
                                     content: TLSContinuitySidebar,
+                                },
+                                {
+                                    type: 'component',
+                                    content: TLSInputEnable,
                                 },
                                 {
                                     type: 'link',

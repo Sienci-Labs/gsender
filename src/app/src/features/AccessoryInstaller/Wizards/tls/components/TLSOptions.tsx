@@ -54,6 +54,7 @@ export function TLSOptions({ onComplete, onUncomplete }: StepProps) {
             if (updated !== current) {
                 code.push(`$65=${updated}`);
             }
+            code.push('G65 P5 Q1');
         }
         code.push('$$');
         controller.command('gcode', code);
