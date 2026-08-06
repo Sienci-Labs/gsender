@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from 'app/store/redux';
 import { useEffect, useRef, useState } from 'react';
 import store from 'app/store';
+import controller from 'app/lib/controller.ts';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { mapPositionToUnits, in2mm } from 'app/lib/units.ts';
 import { IMPERIAL_UNITS } from 'app/constants';
@@ -55,6 +56,11 @@ export function TLSLocation({ onComplete, onUncomplete }: StepProps) {
             y: toMM(position.y),
             z: toMM(position.z),
         });
+        controller.command(
+            'gcode',
+            `G21 G10 L2 P9 X${toMM(position.x)} Y${toMM(position.y)}`,
+            '$#',
+        );
         pubsub.publish('repopulate');
         setSuccess('TLS location set.');
         setIsComplete(true);
