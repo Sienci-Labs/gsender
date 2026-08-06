@@ -135,9 +135,8 @@ export const PortraitMacroBar = () => {
 
         fetchMacros();
 
-        const onFocus = () => fetchMacros();
-        window.addEventListener('focus', onFocus);
-        return () => window.removeEventListener('focus', onFocus);
+        const interval = setInterval(fetchMacros, 3000);
+        return () => clearInterval(interval);
     }, [isPortrait, enabled]);
 
     const canRun = isConnected && (workflow.state === WORKFLOW_STATE_IDLE || workflow.state === WORKFLOW_STATE_PAUSED);
