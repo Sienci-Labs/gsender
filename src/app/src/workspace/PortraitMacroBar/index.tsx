@@ -136,8 +136,17 @@ export const PortraitMacroBar = () => {
         fetchMacros();
 
         const onFocus = () => fetchMacros();
+        const onVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                fetchMacros();
+            }
+        };
         window.addEventListener('focus', onFocus);
-        return () => window.removeEventListener('focus', onFocus);
+        document.addEventListener('visibilitychange', onVisibilityChange);
+        return () => {
+            window.removeEventListener('focus', onFocus);
+            document.removeEventListener('visibilitychange', onVisibilityChange);
+        };
     }, [isPortrait, enabled]);
 
     const canRun = isConnected && (workflow.state === WORKFLOW_STATE_IDLE || workflow.state === WORKFLOW_STATE_PAUSED);
