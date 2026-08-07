@@ -48,6 +48,12 @@ export interface HeightMapConfig {
     usePointCount: boolean; // Whether to use point count instead of spacing
     pointCountX: number;
     pointCountY: number;
+    /**
+     * Distance to pull the probe area in from the toolpath extents when
+     * deriving bounds from a loaded file. Keeps probe points off the edge of
+     * the stock, where a probe can miss the surface or drop off the board.
+     */
+    edgeInset: number;
 
     // Probing Safety
     zClearance: number; // Safety height to retract between probes
@@ -85,6 +91,7 @@ export const DEFAULT_HEIGHT_MAP_CONFIG: HeightMapConfig = {
     usePointCount: false,
     pointCountX: 5,
     pointCountY: 5,
+    edgeInset: 2,
     zClearance: 5,
     probeFeedRate: 100,
     maxProbeDepth: 10,

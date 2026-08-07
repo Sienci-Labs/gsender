@@ -47,7 +47,7 @@ import {
 } from './definitions';
 import GridVisualizer from './components/GridVisualizer';
 import ToolpathVisualizer from './components/ToolpathVisualizer';
-import { calculateProbeGrid } from './utils/interpolation';
+import { calculateProbeGrid, deriveProbeBounds } from './utils/interpolation';
 import {
     createHeightMapFromProbeResults,
     normalizeHeightMap,
@@ -67,6 +67,7 @@ const defaultHeightMapState = get(
 const MIN_VALUES = {
     metric: {
         gridSpacing: 1,
+        edgeInset: 0,
         zClearance: 1,
         probeFeedRate: 25,
         maxProbeDepth: 0.1,
@@ -74,6 +75,7 @@ const MIN_VALUES = {
     },
     imperial: {
         gridSpacing: 0.04,
+        edgeInset: 0,
         zClearance: 0.04,
         probeFeedRate: 1,
         maxProbeDepth: 0.004,
@@ -113,6 +115,7 @@ const HeightMapTool: React.FC = () => {
                 minY: convertToImperial(saved.minY),
                 maxY: convertToImperial(saved.maxY),
                 gridSpacing: convertToImperial(saved.gridSpacing),
+                edgeInset: convertToImperial(saved.edgeInset ?? 0),
                 zClearance: convertToImperial(saved.zClearance),
                 maxProbeDepth: convertToImperial(saved.maxProbeDepth),
                 segmentLength: convertToImperial(saved.segmentLength),
@@ -155,6 +158,7 @@ const HeightMapTool: React.FC = () => {
                       minY: convertToMetric(state.minY),
                       maxY: convertToMetric(state.maxY),
                       gridSpacing: convertToMetric(state.gridSpacing),
+                      edgeInset: convertToMetric(state.edgeInset ?? 0),
                       zClearance: convertToMetric(state.zClearance),
                       maxProbeDepth: convertToMetric(state.maxProbeDepth),
                       segmentLength: convertToMetric(state.segmentLength),
@@ -213,23 +217,38 @@ const HeightMapTool: React.FC = () => {
         [],
     );
 
-    // Use loaded file bounds
+    // Use loaded file bounds, pulled in by the edge inset so probe points stay
+    // clear of the edge of the stock.
     const useFileBounds = useCallback(() => {
         if (!fileInfo?.bbox) {
             setWarnings(['No file loaded or file has no bounds']);
             return;
         }
 
-        const { min, max } = fileInfo.bbox;
-        setState((prev) => ({
-            ...prev,
-            minX: min.x,
-            maxX: max.x,
-            minY: min.y,
-            maxY: max.y,
-        }));
-        setWarnings([]);
-    }, [fileInfo]);
+        const { bounds, applied, rejected } = deriveProbeBounds(
+            fileInfo.bbox,
+            state.edgeInset,
+        );
+
+        setState((prev) => ({ ...prev, ...bounds }));
+
+        if (rejected) {
+            const { min, max } = fileInfo.bbox;
+            setWarnings([
+                `An inset of ${state.edgeInset}${units} leaves no probe area for a ` +
+                    `${(max.x - min.x).toFixed(1)} x ${(max.y - min.y).toFixed(1)}${units} ` +
+                    'toolpath. Bounds were set to the full extents instead.',
+            ]);
+        } else if (applied > 0) {
+            setWarnings([
+                `Probe area set ${applied}${units} inside the toolpath extents. ` +
+                    'Toolpath outside the probed area is compensated by ' +
+                    'extrapolation from the nearest edge points.',
+            ]);
+        } else {
+            setWarnings([]);
+        }
+    }, [fileInfo, state.edgeInset, units]);
 
     // Complete probing and create height map
     // Note: Defined before handleSerialRead since it's used as a dependency
@@ -736,7 +755,34 @@ const HeightMapTool: React.FC = () => {
                             </div>
                         </InputArea>
 
-                        <div className="flex justify-end gap-2 mt-2">
+                        <div className="flex items-center justify-end gap-2 mt-2">
+                            <Tooltip content="Pull the probe area in from the toolpath extents by this much, so probe points stay clear of the edge of the stock. Applied when using file bounds.">
+                                <div className="flex items-center gap-1 mr-auto">
+                                    <span className="text-xs whitespace-nowrap">
+                                        Edge Inset
+                                    </span>
+                                    <input
+                                        type="number"
+                                        className="w-16 text-xs px-1 py-0.5 border rounded dark:bg-gray-700 dark:border-gray-600"
+                                        min={minValues.edgeInset}
+                                        step="any"
+                                        value={state.edgeInset}
+                                        onChange={(e) => {
+                                            const val = Number(e.target.value);
+                                            if (!isNaN(val)) {
+                                                updateField('edgeInset', val);
+                                            }
+                                        }}
+                                        onBlur={(e) => {
+                                            const val = Number(e.target.value);
+                                            if (isNaN(val) || val < 0) {
+                                                updateField('edgeInset', 0);
+                                            }
+                                        }}
+                                    />
+                                    <span className="text-xs">{units}</span>
+                                </div>
+                            </Tooltip>
                             <Tooltip content="Grab current X/Y position for min values">
                                 <button
                                     className="text-xs px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"

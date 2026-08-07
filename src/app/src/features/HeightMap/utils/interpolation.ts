@@ -213,3 +213,45 @@ export const calculateProbeGrid = (
 
     return points;
 };
+
+/**
+ * Derive probe bounds from a toolpath bounding box, pulled in by `inset` on
+ * every side.
+ *
+ * Probing at the exact toolpath extents puts probe points on the outermost
+ * edge of the stock, where a probe can miss the surface or drop off the board
+ * entirely. Insetting keeps them on solid material, at the cost of
+ * extrapolating compensation for the toolpath outside the probed area.
+ *
+ * An inset that would collapse the area in either axis is rejected rather than
+ * applied: a degenerate grid probes fewer points than the interpolator needs.
+ */
+export const deriveProbeBounds = (
+    bbox: { min: { x: number; y: number }; max: { x: number; y: number } },
+    inset: number,
+): {
+    bounds: { minX: number; maxX: number; minY: number; maxY: number };
+    applied: number;
+    rejected: boolean;
+} => {
+    const { min, max } = bbox;
+    const wanted = Math.max(inset || 0, 0);
+    const spanX = max.x - min.x;
+    const spanY = max.y - min.y;
+
+    const rejected = wanted > 0 && (wanted * 2 >= spanX || wanted * 2 >= spanY);
+    const applied = rejected ? 0 : wanted;
+
+    const round = (n: number): number => Number(n.toFixed(3));
+
+    return {
+        bounds: {
+            minX: round(min.x + applied),
+            maxX: round(max.x - applied),
+            minY: round(min.y + applied),
+            maxY: round(max.y - applied),
+        },
+        applied,
+        rejected,
+    };
+};

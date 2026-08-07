@@ -402,6 +402,7 @@ const defaultState: State = {
             usePointCount: false,
             pointCountX: 5,
             pointCountY: 5,
+            edgeInset: 2,
             zClearance: 5,
             probeFeedRate: 100,
             maxProbeDepth: 10,
