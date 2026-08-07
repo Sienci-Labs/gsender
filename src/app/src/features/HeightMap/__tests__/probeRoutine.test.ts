@@ -1,0 +1,339 @@
+/*
+ * Probe routine command generation.
+ *
+ * The probe command is the only thing standing between a configured probe
+ * depth and the machine driving the tool into the table. Two properties matter
+ * more than the exact text:
+ *
+ *   1. The G38.2 stroke is RELATIVE. The UI calls the field "Max Probe Depth"
+ *      with the tooltip "Max distance to travel down before alarming", and
+ *      gSender's own probing (src/app/src/lib/Probing.ts) sets G91 before every
+ *      G38.2. An absolute G38.2 makes the configured number mean a coordinate
+ *      rather than a distance, and the real stroke becomes zClearance deeper
+ *      than the operator asked for.
+ *
+ *   2. The distance modal is handed back as G90. The controller's 'gcode:safe'
+ *      handler (GrblController.js) wraps only the UNITS modal (G20/G21) -- it
+ *      knows nothing about G90/G91 -- so if this function leaves the machine in
+ *      incremental mode, nothing downstream puts it back.
+ */
+
+import {
+    generateSingleProbeCommand,
+    createHeightMapFromProbeResults,
+    resolveWorkOffsetZ,
+    validateProbeTravel,
+    describeLegacyNormalizedMap,
+} from '../utils/probeRoutine';
+import {
+    HeightMapConfig,
+    HeightMapData,
+    DEFAULT_HEIGHT_MAP_CONFIG,
+} from '../definitions';
+
+/** Strip comments and blanks so assertions read against real motion only. */
+const codeLines = (command: string): string[] =>
+    command
+        .split('\n')
+        .map((l) => l.trim())
+        .filter((l) => l.length > 0 && !l.startsWith(';') && !l.startsWith('('));
+
+/**
+ * Track the G90/G91 distance modal through a command stream the way a
+ * controller does: last one on a block wins, and it persists across blocks.
+ */
+const finalDistanceModal = (lines: string[]): string => {
+    let modal = 'G90';
+    for (const line of lines) {
+        const found = line.match(/\bG9([01])\b/g);
+        if (found) {
+            modal = found[found.length - 1];
+        }
+    }
+    return modal;
+};
+
+/** The block containing the probe move, as a controller would see it. */
+const probeBlock = (lines: string[]): string =>
+    lines.find((l) => /G38\.2/.test(l))!;
+
+/** Distance modal in force at the moment the G38.2 block executes. */
+const modalAtProbe = (lines: string[]): string => {
+    const idx = lines.findIndex((l) => /G38\.2/.test(l));
+    return finalDistanceModal(lines.slice(0, idx + 1));
+};
+
+describe('generateSingleProbeCommand', () => {
+    const zClearance = 5;
+    const feedRate = 100;
+    const maxProbeDepth = 10;
+
+    const command = generateSingleProbeCommand(
+        12.3456,
+        -7.891,
+        zClearance,
+        feedRate,
+        maxProbeDepth,
+    );
+    const lines = codeLines(command);
+
+    it('probes with a relative move, not an absolute one', () => {
+        // G38.2 under G90 would seek the absolute coordinate Z-maxProbeDepth.
+        // Under G91 it travels maxProbeDepth from wherever the tool is, which
+        // is what "Max distance to travel down" means.
+        expect(modalAtProbe(lines)).toBe('G91');
+    });
+
+    it('does not leave G90 in force on the probe block', () => {
+        // Guards the subtle failure where G91 is added somewhere earlier but a
+        // later G90 on the same block silently wins.
+        expect(probeBlock(lines)).not.toMatch(/\bG90\b/);
+    });
+
+    it('restores absolute mode after probing', () => {
+        expect(finalDistanceModal(lines)).toBe('G90');
+    });
+
+    it('keeps the clearance and positioning moves absolute', () => {
+        // zClearance is a height in work coordinates, not a distance to travel.
+        const clearance = lines.find((l) => /G0\b.*\bZ/.test(l))!;
+        expect(clearance).toMatch(/\bG90\b/);
+        expect(clearance).toMatch(/Z5\b/);
+
+        const xy = lines.find((l) => /G0\b.*X.*Y/.test(l))!;
+        expect(xy).toMatch(/\bG90\b/);
+    });
+
+    it('raises to clearance before moving in XY, and probes last', () => {
+        const zIdx = lines.findIndex((l) => /G0\b.*\bZ/.test(l));
+        const xyIdx = lines.findIndex((l) => /G0\b.*X.*Y/.test(l));
+        const probeIdx = lines.findIndex((l) => /G38\.2/.test(l));
+        expect(zIdx).toBeLessThan(xyIdx);
+        expect(xyIdx).toBeLessThan(probeIdx);
+    });
+
+    it('formats coordinates to three decimals and carries the feed rate', () => {
+        const xy = lines.find((l) => /G0\b.*X.*Y/.test(l))!;
+        expect(xy).toContain('X12.346');
+        expect(xy).toContain('Y-7.891');
+        expect(probeBlock(lines)).toMatch(/Z-10\b/);
+        expect(probeBlock(lines)).toMatch(/F100\b/);
+    });
+
+    it('does not set the units modal, which gcode:safe already wraps', () => {
+        // controller.command('gcode:safe', command, 'G21') prepends G21 and
+        // restores the device modal afterwards. Emitting G20/G21 here would
+        // fight that wrapper.
+        expect(command).not.toMatch(/\bG2[01]\b/);
+    });
+
+    it('leaves no state behind when several points are streamed back to back', () => {
+        // The probe cycle issues one of these per point (index.tsx:320). If a
+        // command ends incremental, the NEXT point's clearance and XY moves are
+        // interpreted as deltas and the tool walks off the workpiece.
+        const points = [
+            { x: 0, y: 0 },
+            { x: 10, y: 0 },
+            { x: 10, y: 10 },
+            { x: 0, y: 10 },
+        ];
+        const stream = points.map((p) =>
+            generateSingleProbeCommand(p.x, p.y, zClearance, feedRate, maxProbeDepth),
+        );
+
+        for (const single of stream) {
+            const singleLines = codeLines(single);
+            expect(modalAtProbe(singleLines)).toBe('G91');
+            expect(finalDistanceModal(singleLines)).toBe('G90');
+        }
+
+        // And the same holds for the concatenation, so no point depends on a
+        // neighbour to clean up after it.
+        const all = codeLines(stream.join('\n'));
+        expect(all.filter((l) => /G38\.2/.test(l))).toHaveLength(points.length);
+        expect(finalDistanceModal(all)).toBe('G90');
+    });
+});
+
+describe('createHeightMapFromProbeResults', () => {
+    const config: HeightMapConfig = {
+        ...DEFAULT_HEIGHT_MAP_CONFIG,
+        minX: 0,
+        maxX: 10,
+        minY: 0,
+        maxY: 10,
+        gridSpacing: 10,
+    };
+
+    const points = [
+        { x: 0, y: 0 },
+        { x: 10, y: 0 },
+        { x: 0, y: 10 },
+        { x: 10, y: 10 },
+    ];
+
+    it('converts probe readings from machine to work coordinates', () => {
+        // PRB is reported in machine coordinates; the map has to be referenced
+        // to work Z zero because the transformer adds it onto commanded Z.
+        const workHeights = [-0.4, 0.15, -0.05, 0.3];
+        const wcoZ = -85;
+        const prbReadings = workHeights.map((z) => z + wcoZ);
+
+        const map = createHeightMapFromProbeResults(
+            points,
+            prbReadings,
+            config,
+            'mm',
+            wcoZ,
+        );
+
+        map.points.forEach((p, i) => expect(p.z).toBeCloseTo(workHeights[i], 6));
+    });
+
+    it('is a no-op when work zero and machine zero coincide', () => {
+        const zValues = [-0.4, 0.15, -0.05, 0.3];
+        const map = createHeightMapFromProbeResults(points, zValues, config, 'mm', 0);
+        expect(map.points.map((p) => p.z)).toEqual(zValues);
+    });
+
+    it('rejects mismatched point and Z arrays', () => {
+        expect(() =>
+            createHeightMapFromProbeResults([{ x: 0, y: 0 }], [], config, 'mm', 0),
+        ).toThrow();
+    });
+
+    it('refuses to build a map without a usable work offset', () => {
+        // Defaulting to zero here would silently reintroduce a full-depth
+        // plunge, so an unusable offset has to be loud.
+        const zValues = [-0.4, 0.15, -0.05, 0.3];
+        expect(() =>
+            createHeightMapFromProbeResults(
+                points,
+                zValues,
+                config,
+                'mm',
+                undefined as unknown as number,
+            ),
+        ).toThrow(/work coordinate offset/i);
+    });
+});
+
+describe('resolveWorkOffsetZ', () => {
+    // The probe cycle cannot be referenced to work zero without this number, and
+    // guessing zero is the exact failure that drives the tool into the table, so
+    // an unusable status has to stop the cycle rather than degrade quietly.
+
+    it('reads wco.z from the raw controller status', () => {
+        expect(resolveWorkOffsetZ({ wco: { x: 1, y: 2, z: -85.25 } })).toEqual({
+            ok: true,
+            wcoZ: -85.25,
+        });
+    });
+
+    it('accepts the string form the runner emits', () => {
+        // GrblRunner writes positions back through toFixed(), so numeric fields
+        // arrive as strings often enough that rejecting them would be wrong.
+        expect(resolveWorkOffsetZ({ wco: { x: '0.000', y: '0.000', z: '-85.250' } })).toEqual({
+            ok: true,
+            wcoZ: -85.25,
+        });
+    });
+
+    it('accepts a genuine zero offset', () => {
+        // Falsy but completely valid: work zero coincident with machine zero.
+        expect(resolveWorkOffsetZ({ wco: { x: 0, y: 0, z: 0 } })).toEqual({
+            ok: true,
+            wcoZ: 0,
+        });
+    });
+
+    it.each([
+        ['no status at all', null],
+        ['status without wco', { activeState: 'Idle' }],
+        ['wco without z', { wco: { x: 1, y: 2 } }],
+        ['non-numeric z', { wco: { z: 'nope' } }],
+        ['null z', { wco: { z: null } }],
+        ['infinite z', { wco: { z: Infinity } }],
+    ])('refuses when %s', (_label, status) => {
+        const result = resolveWorkOffsetZ(status as never);
+        expect(result.ok).toBe(false);
+        expect((result as { error: string }).error).toMatch(/work coordinate offset/i);
+    });
+});
+
+describe('validateProbeTravel', () => {
+    // The probe starts at zClearance above work zero and travels maxProbeDepth
+    // down, so it only reaches a surface near Z=0 when maxProbeDepth exceeds
+    // zClearance. Below that the cycle cannot succeed at all -- better to say so
+    // before moving than to let the operator find out as an alarm mid-grid.
+
+    it('accepts travel that reaches past work zero', () => {
+        expect(validateProbeTravel(5, 10, 'mm')).toEqual({ valid: true });
+    });
+
+    it.each([
+        ['equal to clearance', 5, 5],
+        ['less than clearance', 5, 0.1],
+    ])('refuses travel %s', (_label, zClearance, maxProbeDepth) => {
+        const result = validateProbeTravel(zClearance, maxProbeDepth, 'mm');
+        expect(result.valid).toBe(false);
+        expect(result.error).toMatch(/max probe depth/i);
+    });
+
+    it('names both numbers and the units so the fix is obvious', () => {
+        const result = validateProbeTravel(5, 0.1, 'mm');
+        expect(result.error).toContain('0.1');
+        expect(result.error).toContain('5');
+        expect(result.error).toContain('mm');
+    });
+
+    it('works the same in imperial', () => {
+        expect(validateProbeTravel(0.2, 0.4, 'in')).toEqual({ valid: true });
+        expect(validateProbeTravel(0.2, 0.004, 'in').valid).toBe(false);
+    });
+});
+
+describe('describeLegacyNormalizedMap', () => {
+    const mapWith = (zValues: number[]): HeightMapData => ({
+        bounds: { minX: 0, maxX: 10, minY: 0, maxY: 10 },
+        resolution: { x: 10, y: 10 },
+        points: [
+            { x: 0, y: 0, z: zValues[0] },
+            { x: 10, y: 0, z: zValues[1] },
+            { x: 0, y: 10, z: zValues[2] },
+            { x: 10, y: 10, z: zValues[3] },
+        ],
+        units: 'mm',
+    });
+
+    it('flags a map whose lowest point is exactly zero', () => {
+        // The signature normalizeHeightMap left behind. The original datum is
+        // unrecoverable from the file, so a warning is all that is honest.
+        const warning = describeLegacyNormalizedMap(mapWith([0, 0.1, 0.25, 0.4]));
+        expect(warning).toMatch(/re-probe/i);
+    });
+
+    it('passes a map that straddles zero', () => {
+        expect(describeLegacyNormalizedMap(mapWith([-0.4, -0.1, 0.25, 0.4]))).toBeNull();
+    });
+
+    it('passes an all-negative map', () => {
+        expect(describeLegacyNormalizedMap(mapWith([-3, -2.9, -2.5, -1.44]))).toBeNull();
+    });
+
+    it('passes an entirely positive map that never touches zero', () => {
+        expect(describeLegacyNormalizedMap(mapWith([0.5, 0.9, 1.2, 2.06]))).toBeNull();
+    });
+
+    it('does not flag a genuinely flat map at work zero', () => {
+        // All zeros has no lowest point in the normalised sense -- there is no
+        // variation to have been shifted, so warning would be noise.
+        expect(describeLegacyNormalizedMap(mapWith([0, 0, 0, 0]))).toBeNull();
+    });
+
+    it('tolerates an empty map', () => {
+        expect(
+            describeLegacyNormalizedMap({ ...mapWith([0, 0, 0, 0]), points: [] }),
+        ).toBeNull();
+    });
+});

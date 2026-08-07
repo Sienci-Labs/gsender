@@ -50,9 +50,11 @@ import ToolpathVisualizer from './components/ToolpathVisualizer';
 import { calculateProbeGrid, deriveProbeBounds } from './utils/interpolation';
 import {
     createHeightMapFromProbeResults,
-    normalizeHeightMap,
     validateHeightMap,
     generateSingleProbeCommand,
+    resolveWorkOffsetZ,
+    validateProbeTravel,
+    describeLegacyNormalizedMap,
 } from './utils/probeRoutine';
 import { transformGcode } from './utils/gcodeTransformer';
 
@@ -140,6 +142,20 @@ const HeightMapTool: React.FC = () => {
     const probeZValuesRef = useRef<number[]>([]);
     const currentProbeIndexRef = useRef(0);
     const isAbortedRef = useRef(false);
+    // Work coordinate offset captured when the cycle starts. Sampled once, not
+    // per point, so the whole grid shares one datum -- a WCS switch or G92
+    // partway through would otherwise re-datum half the map with nothing to
+    // show for it. Raw PRB values are kept in probeZValuesRef and converted in
+    // one place at the end.
+    const probeWcoZRef = useRef<number | null>(null);
+    // Mirrors the live status without making the probe callbacks depend on it.
+    // The controller reports several times a second, and letting that rebuild
+    // handleSerialRead would tear down and re-add the serial listener at the
+    // same rate -- risking dropping the very PRB response it exists to catch.
+    const statusRef = useRef(status);
+    useEffect(() => {
+        statusRef.current = status;
+    }, [status]);
 
     // Reset transformedGcode when map data changes
     useEffect(() => {
@@ -256,18 +272,46 @@ const HeightMapTool: React.FC = () => {
         setProbeStatus('complete');
         setState((prev) => ({ ...prev, isProbing: false }));
 
-        // Create height map from probe results
+        const wcoZ = probeWcoZRef.current;
+        if (wcoZ === null) {
+            setProbeStatus('error');
+            setWarnings([
+                'Lost the work coordinate offset captured at the start of ' +
+                    'probing, so the results cannot be referenced to work zero. ' +
+                    'Re-run the probe routine.',
+            ]);
+            return;
+        }
+
+        // A WCS switch or G92 mid-cycle re-datums part of the grid, and there is
+        // no way to tell which points landed on which side of it. Say so rather
+        // than hand back a map that looks fine and cuts wrong.
+        const current = resolveWorkOffsetZ(statusRef.current);
+        if (current.ok && Math.abs(current.wcoZ - wcoZ) > 1e-4) {
+            setWarnings([
+                `Work Z zero moved during probing (${wcoZ} to ${current.wcoZ}). ` +
+                    'Points probed before and after the change use different ' +
+                    'datums, so this map is unreliable -- re-probe.',
+            ]);
+        }
+
+        // Create height map from probe results. The stored PRB values are in
+        // machine coordinates; the offset captured at the start of the cycle
+        // brings them back to the operator's work Z zero.
         const mapData = createHeightMapFromProbeResults(
             probePointsRef.current,
             probeZValuesRef.current,
             state,
             units,
+            wcoZ,
         );
 
-        // Normalize (make lowest point Z=0)
-        const normalizedMap = normalizeHeightMap(mapData);
-
-        setState((prev) => ({ ...prev, mapData: normalizedMap }));
+        // Store the probed heights as-is. A probe reading is the surface height
+        // in work coordinates, and the transformer adds it straight onto the
+        // commanded Z, so the offsets are already referenced to the operator's
+        // work Z zero. Re-datuming the map here -- to its own lowest point, or
+        // to anything else -- shifts every cut by that amount for the whole job.
+        setState((prev) => ({ ...prev, mapData }));
 
         // Retract to clearance height
         controller.command('gcode', `G90 G0 Z${state.zClearance}`);
@@ -366,6 +410,29 @@ const HeightMapTool: React.FC = () => {
             return;
         }
 
+        // Pre-flight. Both of these make the cycle impossible to complete
+        // correctly, and both are cheaper to catch here than as an alarm or a
+        // silently wrong map after several minutes of probing.
+        const travel = validateProbeTravel(
+            state.zClearance,
+            state.maxProbeDepth,
+            units,
+        );
+        if (!travel.valid) {
+            setWarnings([travel.error]);
+            return;
+        }
+
+        const workOffset = resolveWorkOffsetZ(statusRef.current);
+        if (!workOffset.ok) {
+            setWarnings([
+                `${workOffset.error} Probe results are reported in machine ` +
+                    'coordinates and cannot be referenced to your work zero without it.',
+            ]);
+            return;
+        }
+        probeWcoZRef.current = workOffset.wcoZ;
+
         // Reset state
         probePointsRef.current = points;
         probeZValuesRef.current = [];
@@ -394,7 +461,7 @@ const HeightMapTool: React.FC = () => {
             state.maxProbeDepth,
         );
         controller.command('gcode:safe', command, 'G21');
-    }, [state]);
+    }, [state, units]);
 
     // Abort probing
     const abortProbing = useCallback(() => {
@@ -494,7 +561,11 @@ const HeightMapTool: React.FC = () => {
                         // Transform settings
                         segmentLength: config?.segmentLength ?? prev.segmentLength,
                     }));
-                    setWarnings([]);
+
+                    // Map datum semantics changed, and old files are silently
+                    // wrong rather than obviously wrong, so say something.
+                    const legacy = describeLegacyNormalizedMap(data);
+                    setWarnings(legacy ? [legacy] : []);
                 } catch (err) {
                     setWarnings(['Failed to parse map file']);
                 }
