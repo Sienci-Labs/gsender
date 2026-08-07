@@ -24,6 +24,9 @@ import {
     resolveWorkOffsetZ,
     validateProbeTravel,
     describeLegacyNormalizedMap,
+    calculateProbeTimeoutMs,
+    DEFAULT_PROBE_TIMEOUT_MULTIPLIER,
+    MIN_PROBE_TIMEOUT_MS,
 } from '../utils/probeRoutine';
 import {
     HeightMapConfig,
@@ -335,5 +338,71 @@ describe('describeLegacyNormalizedMap', () => {
         expect(
             describeLegacyNormalizedMap({ ...mapWith([0, 0, 0, 0]), points: [] }),
         ).toBeNull();
+    });
+});
+
+describe('calculateProbeTimeoutMs', () => {
+    // A watchdog is the only thing that ends a cycle when the machine simply
+    // never answers. Too short is its own hazard -- aborting a valid slow probe
+    // mid-grid -- so the number is derived from the move and then given a lot of
+    // headroom, rather than picked.
+
+    const base = { zClearance: 5, maxProbeDepth: 10, probeFeedRate: 100 };
+
+    it('scales with the probe move', () => {
+        // 10mm at 100mm/min is 6s of probing; halving the feed doubles it.
+        const fast = calculateProbeTimeoutMs(base);
+        const slow = calculateProbeTimeoutMs({ ...base, probeFeedRate: 50 });
+        expect(slow).toBeGreaterThan(fast);
+        expect(slow - fast).toBeCloseTo(6000 * DEFAULT_PROBE_TIMEOUT_MULTIPLIER, -2);
+    });
+
+    it('scales with the probe depth', () => {
+        expect(
+            calculateProbeTimeoutMs({ ...base, maxProbeDepth: 20 }),
+        ).toBeGreaterThan(calculateProbeTimeoutMs(base));
+    });
+
+    it('covers the whole move with headroom to spare', () => {
+        // The actual worst case is the probe plunge plus the positioning rapid
+        // plus the settle delay; the timeout has to clear that comfortably.
+        const timeout = calculateProbeTimeoutMs(base);
+        const probeMs = (base.maxProbeDepth / base.probeFeedRate) * 60000;
+        expect(timeout).toBeGreaterThan(probeMs * 2);
+    });
+
+    it('is unit agnostic because depth and feed rate share units', () => {
+        // 0.4in at 4in/min is the same 6s as 10mm at 100mm/min.
+        expect(
+            calculateProbeTimeoutMs({
+                zClearance: 0.2,
+                maxProbeDepth: 0.4,
+                probeFeedRate: 4,
+            }),
+        ).toBe(calculateProbeTimeoutMs(base));
+    });
+
+    it('never returns something too short to be survivable', () => {
+        const instant = calculateProbeTimeoutMs({
+            zClearance: 0.1,
+            maxProbeDepth: 0.2,
+            probeFeedRate: 100000,
+        });
+        expect(instant).toBeGreaterThanOrEqual(MIN_PROBE_TIMEOUT_MS);
+    });
+
+    it.each([
+        ['zero feed rate', 0],
+        ['negative feed rate', -100],
+        ['non-numeric feed rate', NaN],
+    ])('falls back to a usable timeout on %s', (_label, probeFeedRate) => {
+        const timeout = calculateProbeTimeoutMs({ ...base, probeFeedRate });
+        expect(Number.isFinite(timeout)).toBe(true);
+        expect(timeout).toBeGreaterThanOrEqual(MIN_PROBE_TIMEOUT_MS);
+    });
+
+    it('returns whole milliseconds', () => {
+        const timeout = calculateProbeTimeoutMs({ ...base, probeFeedRate: 37 });
+        expect(Number.isInteger(timeout)).toBe(true);
     });
 });

@@ -108,6 +108,69 @@ export const createHeightMapFromProbeResults = (
 };
 
 /**
+ * Headroom on the computed probe duration.
+ *
+ * The computed figure is an ideal: constant velocity, no acceleration ramps, no
+ * controller buffering, no USB latency, and a rapid rate we cannot see from
+ * here. Four times covers all of that. The asymmetry matters -- a timeout that
+ * is too short aborts a valid slow probe partway through a grid, which is a
+ * hazard in itself, while one that is too long only delays reporting a machine
+ * that was never going to answer.
+ */
+export const DEFAULT_PROBE_TIMEOUT_MULTIPLIER = 4;
+
+/** Floor, so a fast shallow probe still gets a survivable window. */
+export const MIN_PROBE_TIMEOUT_MS = 10000;
+
+/**
+ * Allowance for the two positioning rapids before the probe move.
+ *
+ * G0 rate is not known to this widget -- it lives in $110-$112 and differs per
+ * machine and firmware -- so this is a deliberate allowance rather than a
+ * calculation, and the multiplier above is what actually absorbs the error.
+ */
+export const PROBE_RAPID_ALLOWANCE_MS = 5000;
+
+export interface ProbeTimeoutInputs {
+    zClearance: number;
+    maxProbeDepth: number;
+    probeFeedRate: number;
+    settleDelayMs?: number;
+    rapidAllowanceMs?: number;
+    multiplier?: number;
+}
+
+/**
+ * How long to wait for one point's [PRB:...] before declaring the cycle stuck.
+ *
+ * The probe starts at zClearance and travels at most maxProbeDepth at
+ * probeFeedRate, so the plunge is maxProbeDepth / probeFeedRate minutes. Depth
+ * and feed rate are always in the same unit system, so the ratio is unit
+ * agnostic and no conversion is needed here.
+ */
+export const calculateProbeTimeoutMs = ({
+    maxProbeDepth,
+    probeFeedRate,
+    settleDelayMs = 100,
+    rapidAllowanceMs = PROBE_RAPID_ALLOWANCE_MS,
+    multiplier = DEFAULT_PROBE_TIMEOUT_MULTIPLIER,
+}: ProbeTimeoutInputs): number => {
+    const usable =
+        Number.isFinite(maxProbeDepth) &&
+        Number.isFinite(probeFeedRate) &&
+        probeFeedRate > 0 &&
+        maxProbeDepth > 0;
+
+    // A bad feed rate is caught by the UI minimums, but falling back to the
+    // floor keeps a nonsense config from producing NaN or Infinity here and
+    // disarming the watchdog entirely.
+    const plungeMs = usable ? (maxProbeDepth / probeFeedRate) * 60000 : 0;
+    const expectedMs = plungeMs + rapidAllowanceMs + settleDelayMs;
+
+    return Math.max(MIN_PROBE_TIMEOUT_MS, Math.ceil(expectedMs * multiplier));
+};
+
+/**
  * Pull the Z work coordinate offset out of the raw controller status.
  *
  * Read from `controller.state.status`, NOT from the `mpos`/`wpos` on the redux

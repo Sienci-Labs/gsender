@@ -24,6 +24,7 @@ import controller, {
     removeControllerEvents,
 } from 'app/lib/controller';
 import {
+    GRBL_ACTIVE_STATE_ALARM,
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
     METRIC_UNITS,
@@ -55,7 +56,16 @@ import {
     resolveWorkOffsetZ,
     validateProbeTravel,
     describeLegacyNormalizedMap,
+    calculateProbeTimeoutMs,
 } from './utils/probeRoutine';
+import {
+    beginProbeCycle,
+    handleProbeResponse,
+    handleProbeTimeout,
+    parseProbeResponse,
+    ProbeCycleAction,
+    ProbeCycleState,
+} from './utils/probeCycle';
 import { transformGcode } from './utils/gcodeTransformer';
 
 // Default state for height map widget
@@ -64,6 +74,20 @@ const defaultHeightMapState = get(
     'widgets.heightMap',
     DEFAULT_HEIGHT_MAP_STATE,
 ) as HeightMapState;
+
+/** Pause between points so the machine is at rest before the next probe. */
+const PROBE_SETTLE_DELAY_MS = 100;
+
+/**
+ * How far the reported probe XY may sit from the commanded grid point.
+ *
+ * 0.1mm is roughly twenty times the step quantisation of a typical 200
+ * step/mm axis and two hundred times the rounding in the probe command, while
+ * being ten times smaller than the tightest grid spacing the UI permits (1mm).
+ * That gap is the point: comfortably loose for a real machine, far too tight to
+ * mistake one grid point for the next.
+ */
+const PROBE_XY_TOLERANCE_MM = 0.1;
 
 // Minimum values based on units
 const MIN_VALUES = {
@@ -139,14 +163,24 @@ const HeightMapTool: React.FC = () => {
 
     // Refs for probing
     const probePointsRef = useRef<{ x: number; y: number }[]>([]);
-    const probeZValuesRef = useRef<number[]>([]);
-    const currentProbeIndexRef = useRef(0);
+    const probeCycleRef = useRef<ProbeCycleState | null>(null);
     const isAbortedRef = useRef(false);
+    // Watchdog for the point currently outstanding, and the short settle delay
+    // between points. Both are held so they can be cleared on accept, abort,
+    // completion and unmount -- a stray timer here either fires into a finished
+    // cycle or keeps the process alive after the widget is gone.
+    const probeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const settleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    // Set when a cycle ends with the machine alarmed. The alarm flushes the
+    // planner buffer, taking the G90 that follows every G38.2 with it, and grbl
+    // rejects g-code while alarmed -- so the restore has to wait for the alarm
+    // to clear rather than be sent into the void.
+    const pendingModalRestoreRef = useRef(false);
     // Work coordinate offset captured when the cycle starts. Sampled once, not
     // per point, so the whole grid shares one datum -- a WCS switch or G92
     // partway through would otherwise re-datum half the map with nothing to
-    // show for it. Raw PRB values are kept in probeZValuesRef and converted in
-    // one place at the end.
+    // show for it. The cycle stores raw PRB values and they are converted in one
+    // place at the end.
     const probeWcoZRef = useRef<number | null>(null);
     // Mirrors the live status without making the probe callbacks depend on it.
     // The controller reports several times a second, and letting that rebuild
@@ -156,6 +190,14 @@ const HeightMapTool: React.FC = () => {
     useEffect(() => {
         statusRef.current = status;
     }, [status]);
+    // Everything the probe callbacks need from render scope, behind one ref.
+    // Reading config through this is what lets every probe callback be built
+    // once, which in turn lets the serial listener be registered once for the
+    // component's lifetime instead of once per point.
+    const configRef = useRef({ state, units });
+    useEffect(() => {
+        configRef.current = { state, units };
+    });
 
     // Reset transformedGcode when map data changes
     useEffect(() => {
@@ -266,122 +308,214 @@ const HeightMapTool: React.FC = () => {
         }
     }, [fileInfo, state.edgeInset, units]);
 
-    // Complete probing and create height map
-    // Note: Defined before handleSerialRead since it's used as a dependency
-    const completeProbing = useCallback(() => {
-        setProbeStatus('complete');
-        setState((prev) => ({ ...prev, isProbing: false }));
+    /** Drop any timer that could fire into a cycle that has moved on. */
+    const clearProbeTimers = useCallback(() => {
+        if (probeTimeoutRef.current !== null) {
+            clearTimeout(probeTimeoutRef.current);
+            probeTimeoutRef.current = null;
+        }
+        if (settleTimeoutRef.current !== null) {
+            clearTimeout(settleTimeoutRef.current);
+            settleTimeoutRef.current = null;
+        }
+    }, []);
 
-        const wcoZ = probeWcoZRef.current;
-        if (wcoZ === null) {
+    /** End the cycle without a map, leaving the operator something to act on. */
+    const failProbing = useCallback(
+        (message: string) => {
+            clearProbeTimers();
+            isAbortedRef.current = true;
+            probeCycleRef.current = null;
             setProbeStatus('error');
-            setWarnings([
-                'Lost the work coordinate offset captured at the start of ' +
-                    'probing, so the results cannot be referenced to work zero. ' +
-                    'Re-run the probe routine.',
-            ]);
-            return;
-        }
+            setState((prev) => ({ ...prev, isProbing: false, lastError: message }));
+            setWarnings([message]);
 
-        // A WCS switch or G92 mid-cycle re-datums part of the grid, and there is
-        // no way to tell which points landed on which side of it. Say so rather
-        // than hand back a map that looks fine and cuts wrong.
-        const current = resolveWorkOffsetZ(statusRef.current);
-        if (current.ok && Math.abs(current.wcoZ - wcoZ) > 1e-4) {
-            setWarnings([
-                `Work Z zero moved during probing (${wcoZ} to ${current.wcoZ}). ` +
-                    'Points probed before and after the change use different ' +
-                    'datums, so this map is unreliable -- re-probe.',
-            ]);
-        }
+            // Park the tool clear of the work. Skipped when alarmed because grbl
+            // rejects g-code in that state; the alarm handler restores modal
+            // state once it clears instead.
+            if (statusRef.current?.activeState !== GRBL_ACTIVE_STATE_ALARM) {
+                controller.command(
+                    'gcode',
+                    `G90 G0 Z${configRef.current.state.zClearance}`,
+                );
+            }
+        },
+        [clearProbeTimers],
+    );
 
-        // Create height map from probe results. The stored PRB values are in
-        // machine coordinates; the offset captured at the start of the cycle
-        // brings them back to the operator's work Z zero.
-        const mapData = createHeightMapFromProbeResults(
-            probePointsRef.current,
-            probeZValuesRef.current,
-            state,
-            units,
-            wcoZ,
-        );
+    // Complete probing and create height map
+    const completeProbing = useCallback(
+        (zValues: number[]) => {
+            clearProbeTimers();
+            const { state: current, units: currentUnits } = configRef.current;
 
-        // Store the probed heights as-is. A probe reading is the surface height
-        // in work coordinates, and the transformer adds it straight onto the
-        // commanded Z, so the offsets are already referenced to the operator's
-        // work Z zero. Re-datuming the map here -- to its own lowest point, or
-        // to anything else -- shifts every cut by that amount for the whole job.
-        setState((prev) => ({ ...prev, mapData }));
+            setProbeStatus('complete');
+            setState((prev) => ({ ...prev, isProbing: false }));
 
-        // Retract to clearance height
-        controller.command('gcode', `G90 G0 Z${state.zClearance}`);
-    }, [state, units]);
-
-    // Handle probe response from serial port
-    // PRB response format: [PRB:x.xxx,y.yyy,z.zzz:1] where :1 means probe succeeded
-    const handleSerialRead = useCallback(
-        (data: string) => {
-            // Only process if we're actively probing
-            if (!state.isProbing || isAbortedRef.current) return;
-
-            // Check for PRB response: [PRB:x.xxx,y.yyy,z.zzz:result]
-            const prbMatch = data.match(/\[PRB:([^,]+),([^,]+),([^:]+):(\d)\]/);
-            if (!prbMatch) return;
-
-            const zValue = parseFloat(prbMatch[3]);
-            const probeSuccess = prbMatch[4] === '1';
-
-            if (!probeSuccess) {
-                // Probe failed - abort
-                setWarnings(['Probe failed - probe did not make contact']);
-                isAbortedRef.current = true;
-                setState((prev) => ({ ...prev, isProbing: false }));
+            const wcoZ = probeWcoZRef.current;
+            if (wcoZ === null) {
                 setProbeStatus('error');
+                setWarnings([
+                    'Lost the work coordinate offset captured at the start of ' +
+                        'probing, so the results cannot be referenced to work zero. ' +
+                        'Re-run the probe routine.',
+                ]);
                 return;
             }
 
-            // Store the Z value
-            probeZValuesRef.current.push(zValue);
-
-            // Update progress
-            const newIndex = currentProbeIndexRef.current + 1;
-            setState((prev) => ({
-                ...prev,
-                probeProgress: (newIndex / probePointsRef.current.length) * 100,
-                currentProbeIndex: newIndex,
-            }));
-
-            // Move to next point or complete
-            currentProbeIndexRef.current = newIndex;
-            if (
-                currentProbeIndexRef.current < probePointsRef.current.length &&
-                !isAbortedRef.current
-            ) {
-                // Short delay before probing next point to allow machine to settle
-                setTimeout(() => {
-                    if (isAbortedRef.current) return;
-                    const nextPoint = probePointsRef.current[currentProbeIndexRef.current];
-                    const command = generateSingleProbeCommand(
-                        nextPoint.x,
-                        nextPoint.y,
-                        state.zClearance,
-                        state.probeFeedRate,
-                        state.maxProbeDepth,
-                    );
-                    controller.command('gcode:safe', command, 'G21');
-                }, 100);
-            } else if (!isAbortedRef.current) {
-                // Probing complete
-                completeProbing();
+            // A WCS switch or G92 mid-cycle re-datums part of the grid, and there
+            // is no way to tell which points landed on which side of it. Say so
+            // rather than hand back a map that looks fine and cuts wrong.
+            const live = resolveWorkOffsetZ(statusRef.current);
+            if (live.ok && Math.abs(live.wcoZ - wcoZ) > 1e-4) {
+                setWarnings([
+                    `Work Z zero moved during probing (${wcoZ} to ${live.wcoZ}). ` +
+                        'Points probed before and after the change use different ' +
+                        'datums, so this map is unreliable -- re-probe.',
+                ]);
             }
+
+            // Create height map from probe results. The stored PRB values are in
+            // machine coordinates; the offset captured at the start of the cycle
+            // brings them back to the operator's work Z zero.
+            const mapData = createHeightMapFromProbeResults(
+                probePointsRef.current,
+                zValues,
+                current,
+                currentUnits,
+                wcoZ,
+            );
+
+            // Store the probed heights as-is. A probe reading is the surface
+            // height in work coordinates, and the transformer adds it straight
+            // onto the commanded Z, so the offsets are already referenced to the
+            // operator's work Z zero. Re-datuming the map here -- to its own
+            // lowest point, or to anything else -- shifts every cut by that
+            // amount for the whole job.
+            setState((prev) => ({ ...prev, mapData }));
+            probeCycleRef.current = null;
+
+            // Retract to clearance height
+            controller.command('gcode', `G90 G0 Z${current.zClearance}`);
         },
-        [state.isProbing, state.zClearance, state.probeFeedRate, state.maxProbeDepth, completeProbing],
+        [clearProbeTimers],
     );
 
-    // Set up controller event listeners for probe results
+    /**
+     * Issue the probe for one point and start its watchdog.
+     *
+     * `settleFirst` covers the short pause between points that lets the machine
+     * come to rest; the first point of a cycle does not need it.
+     */
+    const issueProbe = useCallback(
+        (index: number, point: { x: number; y: number }, settleFirst: boolean) => {
+            const { state: current } = configRef.current;
+
+            const send = () => {
+                settleTimeoutRef.current = null;
+                if (isAbortedRef.current || probeCycleRef.current === null) return;
+
+                controller.command(
+                    'gcode:safe',
+                    generateSingleProbeCommand(
+                        point.x,
+                        point.y,
+                        current.zClearance,
+                        current.probeFeedRate,
+                        current.maxProbeDepth,
+                    ),
+                    'G21',
+                );
+
+                setState((prev) => ({
+                    ...prev,
+                    currentProbeIndex: index,
+                    probeProgress: (index / probePointsRef.current.length) * 100,
+                }));
+
+                // Armed only once the command is actually on the wire, so the
+                // settle delay is not counted against the machine's response.
+                probeTimeoutRef.current = setTimeout(() => {
+                    probeTimeoutRef.current = null;
+                    const cycle = probeCycleRef.current;
+                    if (!cycle) return;
+                    const step = handleProbeTimeout(cycle);
+                    probeCycleRef.current = step.state;
+                    if (step.action.type === 'fail') {
+                        failProbing(step.action.message);
+                    }
+                }, calculateProbeTimeoutMs(current));
+            };
+
+            if (settleFirst) {
+                settleTimeoutRef.current = setTimeout(send, PROBE_SETTLE_DELAY_MS);
+            } else {
+                send();
+            }
+        },
+        [failProbing],
+    );
+
+    /** Apply one state machine action to the machine and the UI. */
+    const applyProbeAction = useCallback(
+        (action: ProbeCycleAction, settleFirst: boolean) => {
+            switch (action.type) {
+                case 'probe':
+                    issueProbe(action.index, action.point, settleFirst);
+                    break;
+                case 'complete':
+                    completeProbing(action.zValues);
+                    break;
+                case 'fail':
+                    failProbing(action.message);
+                    break;
+                default:
+                    // 'ignore' -- a response that was not ours. The watchdog for
+                    // the outstanding point deliberately keeps running.
+                    break;
+            }
+        },
+        [issueProbe, completeProbing, failProbing],
+    );
+
+    // Handle probe response from serial port.
+    // Deliberately built once: this is what the serial listener closes over, and
+    // rebuilding it would re-register the listener mid-cycle.
+    const handleSerialRead = useCallback(
+        (data: string) => {
+            const cycle = probeCycleRef.current;
+            if (!cycle || isAbortedRef.current) return;
+
+            const response = parseProbeResponse(data);
+            if (!response) return;
+
+            const step = handleProbeResponse(cycle, response);
+            probeCycleRef.current = step.state;
+
+            if (step.action.type !== 'ignore') {
+                // The outstanding point answered, so its watchdog has done its
+                // job. A response we disowned leaves the timer alone.
+                clearProbeTimers();
+            }
+
+            applyProbeAction(step.action, true);
+        },
+        [applyProbeAction, clearProbeTimers],
+    );
+
+    // Keep the listener's behaviour current without re-subscribing.
+    const handleSerialReadRef = useRef(handleSerialRead);
+    useEffect(() => {
+        handleSerialReadRef.current = handleSerialRead;
+    }, [handleSerialRead]);
+
+    // Set up controller event listeners for probe results.
+    // Registered once for the component's lifetime: re-subscribing between
+    // points opens a window in which the PRB response is delivered to nobody,
+    // which presents as a cycle that hangs for no visible reason.
     useEffect(() => {
         const controllerEvents = {
-            'serialport:read': handleSerialRead,
+            'serialport:read': (data: string) => handleSerialReadRef.current(data),
         };
 
         addControllerEvents(controllerEvents);
@@ -389,7 +523,50 @@ const HeightMapTool: React.FC = () => {
         return () => {
             removeControllerEvents(controllerEvents);
         };
-    }, [handleSerialRead]);
+    }, []);
+
+    // Stop everything still pending when the widget goes away.
+    useEffect(
+        () => () => {
+            isAbortedRef.current = true;
+            probeCycleRef.current = null;
+            if (probeTimeoutRef.current !== null) clearTimeout(probeTimeoutRef.current);
+            if (settleTimeoutRef.current !== null) clearTimeout(settleTimeoutRef.current);
+        },
+        [],
+    );
+
+    // Watch for the machine alarming.
+    //
+    // No extra listener: activeState is already on the status this component
+    // subscribes to, and an alarm is a state the machine sits in rather than an
+    // event that can be missed.
+    useEffect(() => {
+        const activeState = status?.activeState;
+
+        if (activeState === GRBL_ACTIVE_STATE_ALARM) {
+            if (probeCycleRef.current !== null) {
+                // The alarm flushed the planner buffer, and the G90 that follows
+                // every G38.2 went with it. Nothing can be sent until the alarm
+                // clears, so note that the restore is owed.
+                pendingModalRestoreRef.current = true;
+                failProbing(
+                    'The machine alarmed during probing, so the cycle stopped. ' +
+                        'Clear the alarm and check the probe, the stock position ' +
+                        'and your soft limits before re-running.',
+                );
+            }
+            return;
+        }
+
+        if (pendingModalRestoreRef.current && activeState) {
+            pendingModalRestoreRef.current = false;
+            // Absolute mode is restored explicitly because a $X unlock keeps the
+            // modal state the alarm interrupted -- leaving the operator's next
+            // jog or MDI move to be interpreted incrementally.
+            controller.command('gcode', 'G90');
+        }
+    }, [status?.activeState, failProbing]);
 
     // Start probing routine
     const startProbing = useCallback(() => {
@@ -434,9 +611,8 @@ const HeightMapTool: React.FC = () => {
         probeWcoZRef.current = workOffset.wcoZ;
 
         // Reset state
+        clearProbeTimers();
         probePointsRef.current = points;
-        probeZValuesRef.current = [];
-        currentProbeIndexRef.current = 0;
         isAbortedRef.current = false;
 
         setState((prev) => ({
@@ -451,23 +627,38 @@ const HeightMapTool: React.FC = () => {
         setProbeStatus('probing');
         setWarnings([]);
 
-        // Start with first point
-        const firstPoint = points[0];
-        const command = generateSingleProbeCommand(
-            firstPoint.x,
-            firstPoint.y,
-            state.zClearance,
-            state.probeFeedRate,
-            state.maxProbeDepth,
-        );
-        controller.command('gcode:safe', command, 'G21');
-    }, [state, units]);
+        // The XY the controller reports is the position it was commanded to, not
+        // a measurement, so this only has to absorb step quantisation and the
+        // three decimals the command is written with. Keeping it far below the
+        // smallest grid spacing the UI allows is what makes it impossible to
+        // mistake one grid point for its neighbour.
+        const { wcoZ } = workOffset;
+        const step = beginProbeCycle({
+            points,
+            wco: {
+                x: Number(statusRef.current?.wco?.x ?? 0),
+                y: Number(statusRef.current?.wco?.y ?? 0),
+                z: wcoZ,
+            },
+            xyTolerance: isMetric
+                ? PROBE_XY_TOLERANCE_MM
+                : PROBE_XY_TOLERANCE_MM / 25.4,
+        });
+        probeCycleRef.current = step.state;
+        applyProbeAction(step.action, false);
+    }, [state, units, isMetric, clearProbeTimers, applyProbeAction]);
 
     // Abort probing
     const abortProbing = useCallback(() => {
+        clearProbeTimers();
         isAbortedRef.current = true;
+        probeCycleRef.current = null;
         controller.command('feedhold');
         controller.command('reset');
+        // A soft reset returns grbl to its defaults, which include G90, but the
+        // machine may land in alarm on the way. Owe the restore either way; it
+        // is a no-op if the reset already did it.
+        pendingModalRestoreRef.current = true;
 
         setProbeStatus('idle');
         setState((prev) => ({
@@ -475,7 +666,7 @@ const HeightMapTool: React.FC = () => {
             isProbing: false,
             lastError: 'Probing aborted by user',
         }));
-    }, []);
+    }, [clearProbeTimers]);
 
     // Save height map to file
     const saveMap = useCallback(() => {
@@ -578,7 +769,7 @@ const HeightMapTool: React.FC = () => {
     // Clear height map
     const clearMap = useCallback(() => {
         setState((prev) => ({ ...prev, mapData: null }));
-        probeZValuesRef.current = [];
+        probeCycleRef.current = null;
         setProbeStatus('idle');
         setTransformedGcode(null);
     }, []);
