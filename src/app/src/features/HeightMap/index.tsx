@@ -504,10 +504,20 @@ const HeightMapTool: React.FC = () => {
         }
 
         // Perform the transformation
-        const { transformedGcode: gcode } = transformGcode(fileInfo.content, state.mapData, {
-            segmentLength: state.segmentLength,
-            warnOutsideBounds: false,
-        });
+        const { transformedGcode: gcode, warnings: transformWarnings, errors } = transformGcode(
+            fileInfo.content,
+            state.mapData,
+            {
+                segmentLength: state.segmentLength,
+                warnOutsideBounds: true,
+            },
+        );
+
+        if (errors.length > 0) {
+            setTransformedGcode('');
+            setWarnings(errors);
+            return;
+        }
 
         setTransformedGcode(gcode);
 
@@ -516,7 +526,7 @@ const HeightMapTool: React.FC = () => {
         const file = new File([gcode], name, { type: 'text/plain' });
         await uploadGcodeFileToServer(file, controller.port, VISUALIZER_SECONDARY);
 
-        setWarnings([`Height map applied. Preview updated.`]);
+        setWarnings([`Height map applied. Preview updated.`, ...transformWarnings]);
     }, [state.mapData, state.segmentLength, fileInfo, mainVisualizerHasHeightMap]);
 
     // Confirm double-apply (user wants to proceed anyway)
@@ -527,10 +537,20 @@ const HeightMapTool: React.FC = () => {
 
         // Perform the transformation - this will compound the adjustment since
         // the file already has height map applied
-        const { transformedGcode: gcode } = transformGcode(fileInfo.content, state.mapData, {
-            segmentLength: state.segmentLength,
-            warnOutsideBounds: false,
-        });
+        const { transformedGcode: gcode, errors } = transformGcode(
+            fileInfo.content,
+            state.mapData,
+            {
+                segmentLength: state.segmentLength,
+                warnOutsideBounds: false,
+            },
+        );
+
+        if (errors.length > 0) {
+            setTransformedGcode('');
+            setWarnings(errors);
+            return;
+        }
 
         setTransformedGcode(gcode);
 
@@ -557,12 +577,19 @@ const HeightMapTool: React.FC = () => {
 
     // Export transformed G-code to file
     const exportTransformedGcode = useCallback(() => {
-        const gcodeToExport = transformedGcode || (state.mapData && fileInfo?.content
-            ? transformGcode(fileInfo.content, state.mapData, {
+        let gcodeToExport = transformedGcode;
+
+        if (!gcodeToExport && state.mapData && fileInfo?.content) {
+            const result = transformGcode(fileInfo.content, state.mapData, {
                 segmentLength: state.segmentLength,
                 warnOutsideBounds: false,
-            }).transformedGcode
-            : null);
+            });
+            if (result.errors.length > 0) {
+                setWarnings(result.errors);
+                return;
+            }
+            gcodeToExport = result.transformedGcode;
+        }
 
         if (!gcodeToExport) return;
 
