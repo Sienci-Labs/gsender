@@ -63,7 +63,12 @@ import _ from 'lodash';
 import store from 'app/store';
 
 import controller from '../../lib/controller';
-import { getBoundingBox, loadSTL, loadTexture } from './helpers';
+import {
+    getBoundingBox,
+    loadSTL,
+    loadTexture,
+    createToolOutline,
+} from './helpers';
 import Viewport from './Viewport';
 import CoordinateAxes from './CoordinateAxes';
 import Cuboid from './Cuboid';
@@ -1851,6 +1856,13 @@ class Visualizer extends Component {
                         const object = new THREE.Object3D();
                         object.add(mesh);
 
+                        // Black edge outline so the spinning tool reads as a
+                        // rotating fluted bit instead of a featureless grey blob.
+                        const outline = createToolOutline(geometry);
+                        if (outline) {
+                            object.add(outline);
+                        }
+
                         // unload the old one
                         this.group.remove(this.cuttingTool);
 
@@ -2240,6 +2252,13 @@ class Visualizer extends Component {
                     const mesh = new THREE.Mesh(geometry, material);
                     const object = new THREE.Object3D();
                     object.add(mesh);
+
+                    // Black edge outline so the spinning tool reads as a
+                    // rotating fluted bit instead of a featureless grey blob.
+                    const outline = createToolOutline(geometry);
+                    if (outline) {
+                        object.add(outline);
+                    }
 
                     this.group.remove(this.cuttingTool);
 
