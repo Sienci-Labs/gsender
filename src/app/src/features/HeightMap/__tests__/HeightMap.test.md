@@ -1,362 +1,151 @@
-# Height Map Tool Test Plan
+# Height Map Tool — verification
 
-## Overview
-This document outlines the comprehensive test plan for the Height Map Tool feature in gSender. The tool compensates for uneven stock surfaces by probing a grid and applying Z-offset adjustments to G-code files.
+The Height Map tool probes a grid of points on the workpiece and rewrites a
+G-code program's Z values so cut depth follows the real surface. It exists for
+work like PCB isolation milling, where 0.1 mm of surface variation is the
+difference between a clean trace and a dead board.
 
----
-
-## 1. Unit Tests
-
-### 1.1 Interpolation Module (`utils/interpolation.ts`)
-
-#### `calculateProbeGrid()`
-| Test ID | Description | Input | Expected Output |
-|---------|-------------|-------|-----------------|
-| INT-001 | Basic 3x3 grid with spacing | minX=0, maxX=20, minY=0, maxY=20, spacing=10, usePointCount=false | 9 points in zigzag pattern |
-| INT-002 | 2x2 grid with point count | minX=0, maxX=100, minY=0, maxY=100, usePointCount=true, pointCountX=2, pointCountY=2 | 4 corner points |
-| INT-003 | Non-divisible spacing | minX=0, maxX=25, minY=0, maxY=25, spacing=10 | Points at 0, 10, 20, 25 on each axis |
-| INT-004 | Single column grid | minX=0, maxX=0, minY=0, maxY=100, spacing=10 | Points along Y axis only |
-| INT-005 | Zigzag pattern verification | Any valid grid | Even rows L→R, odd rows R→L |
-
-#### `bilinearInterpolate()`
-| Test ID | Description | Input | Expected Output |
-|---------|-------------|-------|-----------------|
-| INT-010 | Center of 4 equal points | x=5, y=5, all Z=1.0 | Z=1.0 |
-| INT-011 | Linear gradient X | x=5, y=0, Z varies 0→1 along X | Z=0.5 |
-| INT-012 | Linear gradient Y | x=0, y=5, Z varies 0→1 along Y | Z=0.5 |
-| INT-013 | Corner point exact | x=0, y=0 (exact probe point) | Exact probe Z value |
-| INT-014 | Diagonal gradient | x=5, y=5, corners Z=0,1,1,2 | Z=1.0 (average) |
-| INT-015 | Point outside bounds | x=-5, y=0 | null |
-
-#### `getZOffset()`
-| Test ID | Description | Input | Expected Output |
-|---------|-------------|-------|-----------------|
-| INT-020 | Valid point inside map | Valid x,y within bounds | Interpolated Z value |
-| INT-021 | Null map data | mapData=null | 0 |
-| INT-022 | Empty points array | mapData.points=[] | 0 |
-| INT-023 | Point outside bounds | x,y outside map | 0 |
-
-#### `isWithinBounds()`
-| Test ID | Description | Input | Expected Output |
-|---------|-------------|-------|-----------------|
-| INT-030 | Point inside | x=50, y=50, bounds 0-100 | true |
-| INT-031 | Point on boundary | x=0, y=0, bounds 0-100 | true |
-| INT-032 | Point outside X | x=-1, y=50, bounds 0-100 | false |
-| INT-033 | Point outside Y | x=50, y=101, bounds 0-100 | false |
+This document covers **what cannot be asserted in software**. Everything that
+can be is an executable test — see the inventory below rather than duplicating
+it in prose. This file previously described the automated cases too, and drifted
+badly enough to document three defects as intended behaviour; keeping the
+descriptions in one place only is deliberate.
 
 ---
 
-### 1.2 Probe Routine Module (`utils/probeRoutine.ts`)
+## 1. Automated coverage
 
-#### `generateSingleProbeCommand()`
-| Test ID | Description | Input | Expected Output |
-|---------|-------------|-------|-----------------|
-| PRB-001 | Standard probe command | x=10, y=20, zClear=5, feed=100, depth=10 | Valid G-code with G38.2 |
-| PRB-002 | Metric coordinates | x=10.123, y=20.456 | Coordinates rounded to 3 decimals |
-| PRB-003 | Zero position probe | x=0, y=0 | Valid G-code at origin |
+176 tests across 9 suites, all under `src/app/src/features/HeightMap/__tests__/`.
 
-#### `createHeightMapFromProbeResults()`
-| Test ID | Description | Input | Expected Output |
-|---------|-------------|-------|-----------------|
-| PRB-010 | Valid 2x2 results | 4 points, 4 Z values | HeightMapData with bounds/resolution |
-| PRB-011 | Mismatched arrays | 4 points, 3 Z values | Error thrown |
-| PRB-012 | Resolution calculation | 3x3 grid, 9 Z values | Correct resolution.x and resolution.y |
+| Suite | Tests | Covers |
+|---|---|---|
+| `arcFlatten.test.ts` | 22 | Arc maths: sweep direction, ±π wraparound, full circles, sagitta↔segment count, plane un-swizzling, endpoint snapping, helical Z, radius-mismatch absorption |
+| `gcodeTransformer.defects.test.ts` | 23 | Regression guards for modal motion, arc position tracking, line numbers; arc compensation; G91 programs; position barriers; refusals; passthrough fidelity |
+| `gcodeTransformer.integration.test.ts` | 7 | A hostile program against a warped surface, checked on whole-program invariants |
+| `gcodeTransformer.stress.test.ts` | 29 | Property tests: the map affects Z only; zero-map identity; map+inverse round-trip; drift over 20k moves; malformed input; extreme surfaces; feed placement; probe bounds derivation |
+| `gcodeTransformer.realFiles.test.ts` | 1 | A local corpus of real Fusion output. Skips when the corpus is absent |
+| `probeRoutine.test.ts` | 41 | Probe command generation, datum conversion, work-offset resolution, travel validation, timeout calculation |
+| `probeCycle.test.ts` | 21 | Cycle state machine as pure functions: response parsing, point matching, mismatch policy, timeout handling |
+| `probeDatum.integration.test.ts` | 19 | The datum end to end — probe samples in machine coordinates through to compensated depth |
+| `probeStateMachine.test.tsx` | 13 | The mounted component: watchdog, stray responses, alarm handling, listener lifetime, timer teardown |
 
-#### `normalizeHeightMap()`
-| Test ID | Description | Input | Expected Output |
-|---------|-------------|-------|-----------------|
-| PRB-020 | Positive Z values | Z=[1, 2, 3, 4] | Z=[0, 1, 2, 3] |
-| PRB-021 | Negative Z values | Z=[-2, -1, 0, 1] | Z=[0, 1, 2, 3] |
-| PRB-022 | All same Z | Z=[5, 5, 5, 5] | Z=[0, 0, 0, 0] |
-| PRB-023 | Empty points | mapData.points=[] | Original map returned |
+### The invariants worth knowing
 
-#### `validateHeightMap()`
-| Test ID | Description | Input | Expected Output |
-|---------|-------------|-------|-----------------|
-| PRB-030 | Valid 3x3 map | 9 points, valid bounds | { valid: true } |
-| PRB-031 | Null map | null | { valid: false, error: "No height map data" } |
-| PRB-032 | Empty points | points=[] | { valid: false, error } |
-| PRB-033 | Less than 4 points | 3 points | { valid: false, error } |
-| PRB-034 | 1D grid (line) | 5 points on single X | { valid: false, error } |
+Most of the above reduces to three whole-program properties. If you change this
+feature, these are what must not break:
 
----
-
-### 1.3 G-code Transformer Module (`utils/gcodeTransformer.ts`)
-
-#### `transformGcode()`
-| Test ID | Description | Input | Expected Output |
-|---------|-------------|-------|-----------------|
-| GCT-001 | Simple G1 move | "G1 X10 Y10 Z0" | Z adjusted by interpolated offset |
-| GCT-002 | G0 rapid move | "G0 X10 Y10 Z5" | Z adjusted by interpolated offset |
-| GCT-003 | Comment lines preserved | "; This is a comment" | Unchanged |
-| GCT-004 | Empty lines preserved | "" | Unchanged |
-| GCT-005 | Non-move commands | "M3 S1000" | Unchanged |
-| GCT-006 | Long line segmentation | Line >segmentLength | Multiple segments generated |
-| GCT-007 | Header comment added | Any G-code | Header with map info prepended |
-| GCT-008 | G90/G91 mode tracking | Mixed abs/inc modes | Only absolute mode transformed |
-| GCT-009 | Feed rate preservation | "G1 X10 F500" | F500 on first segment only |
-| GCT-010 | Outside bounds warning | G-code outside map | Warning in result |
-
-#### Segmentation Tests
-| Test ID | Description | Input | Expected Output |
-|---------|-------------|-------|-----------------|
-| GCT-020 | Short line no segment | Line length < segmentLength | Single output line |
-| GCT-021 | Exact segment length | Line = 2*segmentLength | 2 segments |
-| GCT-022 | Fractional segments | Line = 2.5*segmentLength | 3 segments |
-| GCT-023 | Diagonal line | X and Y both change | Correct segment endpoints |
-
-#### `validateGcodeBounds()`
-| Test ID | Description | Input | Expected Output |
-|---------|-------------|-------|-----------------|
-| GCT-030 | G-code within bounds | X[0-50], Y[0-50], map[0-100] | valid=true |
-| GCT-031 | G-code exceeds X | X[0-150], map X[0-100] | valid=false |
-| GCT-032 | G-code exceeds Y | Y[0-150], map Y[0-100] | valid=false |
-| GCT-033 | Negative coordinates | X[-10-50], map[0-100] | valid=false |
-| GCT-034 | No coordinates | No X/Y in G-code | gcodeMinX/Y = 0 |
+1. **The map affects Z and nothing else.** Running one program through a flat
+   map and a warped map must produce bit-identical XY on every move, with Z
+   differing by exactly the interpolated map value.
+2. **The emitted path is continuous.** A positional discontinuity means the
+   transformer lost track of the tool, and the machine executes a full-depth
+   cutting move back through finished material.
+3. **Subtracting the map recovers a commanded depth.** For every emitted move,
+   `emittedZ − map(x,y)` must be a depth the source program actually asked for.
+   This is the strongest available statement that compensation was applied
+   exactly once, everywhere, and invented nothing.
 
 ---
 
-## 2. Integration Tests
+## 2. Behaviour that changed from the original plan
 
-### 2.1 UI Component Tests
+The first version of this document described the feature as first written. Four
+of those behaviours were defects and have been fixed. They are listed here
+because the old descriptions read as specifications, and anyone working from
+them would reintroduce the faults.
 
-#### Grid Configuration
-| Test ID | Description | Steps | Expected Result |
-|---------|-------------|-------|-----------------|
-| UI-001 | Min/Max X input | Enter values 0 and 100 | State updates, grid preview shows bounds |
-| UI-002 | Min/Max Y input | Enter values 0 and 100 | State updates, grid preview shows bounds |
-| UI-003 | Use Current WPos | Click Min X button | Field populated with current X WPos |
-| UI-004 | Use File Bounds | Click button with file loaded | All bounds set from file bbox |
-| UI-005 | Use File Bounds no file | Click button without file | Warning displayed |
-| UI-006 | Switch to point count mode | Toggle switch | Point count inputs appear |
-| UI-007 | Grid spacing input | Enter 10mm | Grid preview updates with correct spacing |
+| Was documented as | Actual behaviour | Why |
+|---|---|---|
+| Arcs preserved, not transformed | Arcs are flattened to segments and compensated | An uncompensated `G2` cuts at the programmed depth while everything around it is offset. Worse, the original parser did not track position across an arc, so every later move was segmented from a stale origin — a full-depth cutting move back through finished material |
+| `G91` sections skipped | Incremental moves are resolved to absolute and compensated | Skipping them left real cutting moves uncompensated |
+| `normalizeHeightMap` shifts the lowest point to zero | Removed | It made the low spot the datum instead of work Z zero, so every cut was off by a constant `hmin`. It was also accidentally load-bearing — see below |
+| Probe depth `G38.2 Z-{depth}` under `G90` | `G91` then `G38.2`, with `G90` restored | Absolute motion made "max probe depth" an absolute target rather than a travel distance, so real travel was `zClearance + maxProbeDepth` |
 
-#### Probing Safety
-| Test ID | Description | Steps | Expected Result |
-|---------|-------------|-------|-----------------|
-| UI-010 | Z Clearance input | Enter 5mm | Value stored in state |
-| UI-011 | Probe Feed Rate input | Enter 100mm/min | Value stored in state |
-| UI-012 | Max Probe Depth input | Enter 10mm | Value stored in state |
+Two further points, because they are easy to get wrong again:
 
-#### Map Management
-| Test ID | Description | Steps | Expected Result |
-|---------|-------------|-------|-----------------|
-| UI-020 | Save Map button | Click with valid map | JSON file downloaded |
-| UI-021 | Save Map disabled | No map data | Button disabled |
-| UI-022 | Load Map valid file | Select valid JSON | Map loaded, status updated |
-| UI-023 | Load Map invalid file | Select invalid JSON | Error warning displayed |
-| UI-024 | Clear Map button | Click with map data | Map cleared, status shows "Empty" |
-| UI-025 | Map status display | After successful probe | Shows "Valid (NxM, X points)" |
-
-#### Visualization
-| Test ID | Description | Steps | Expected Result |
-|---------|-------------|-------|-----------------|
-| UI-030 | Grid preview empty | No probing done | Gray dots at grid points |
-| UI-031 | Grid preview probed | After probing | Color-coded Z values |
-| UI-032 | Current probe indicator | During probing | Gold dot with border at current point |
-| UI-033 | Progress bar | During probing | Shows progress percentage |
-| UI-034 | Point count display | Any configuration | Shows total probe points |
+- **`[PRB:...]` reports machine coordinates, not work coordinates.** Both grbl
+  and grblHAL state "Report in terms of machine position" in `report.c`, and
+  gSender forwards the line untouched. Readings are converted with
+  `WPos = MPos − WCO` using the offset captured once at the start of the cycle.
+  The old normalisation hid this, because subtracting the minimum also cancelled
+  the work offset. Removing normalisation *without* converting turns a sub-
+  millimetre error into a full-depth plunge — on a Z-max-homed machine, a
+  commanded `Z-0.15` becomes `Z-85.15`.
+- **Interpolation extrapolates outside the probed area**, it does not return
+  `null` or `0`. Toolpath beyond the grid is compensated from the nearest edge
+  points, with a warning. This matters when the Edge Inset pulls the probe area
+  inside the toolpath extents, which is the normal case.
 
 ---
 
-### 2.2 Probing Workflow Tests
+## 3. Hardware verification
 
-| Test ID | Description | Steps | Expected Result |
-|---------|-------------|-------|-----------------|
-| PW-001 | Start probing | Click "Run Probe Routine" | Probing begins, progress shown |
-| PW-002 | Probing disabled when running | During active probe | Start button disabled |
-| PW-003 | Abort probing | Click "Stop Probing" | Probing stops, partial data retained |
-| PW-004 | Complete probing | Wait for all points | Map created, status shows "Valid" |
-| PW-005 | Insufficient points | Grid < 4 points | Warning displayed, probing not started |
-| PW-006 | Probe error handling | Probe fails to trigger | Error state, probing stops |
-| PW-007 | Machine not idle | Machine in Run state | Start button disabled |
+Nothing below is covered by the automated suite. Every test above synthesises
+probe responses; none of this code has seen a real controller.
 
----
+Work through these **in order**, with the spindle off and the bit clear of the
+stock, before trusting a probe cycle or cutting a compensated program.
 
-### 2.3 G-code Transformation Tests
+### 3.1 Datum — do this first, it needs no motion
 
-| Test ID | Description | Steps | Expected Result |
-|---------|-------------|-------|-----------------|
-| TF-001 | Apply to loaded file | Valid map, file loaded | Transformed G-code in secondary visualizer |
-| TF-002 | Apply without map | No map data | Warning "No height map data" |
-| TF-003 | Apply without file | No file loaded | Warning "No G-code file loaded" |
-| TF-004 | Bounds warning | G-code exceeds map | Warning about zero offset outside bounds |
-| TF-005 | Load to main visualizer | Click button | Transformed G-code loaded, navigate to main |
-| TF-006 | Multiple applications | Apply twice to different files | Both files transformed correctly |
-| TF-007 | Segment length effect | Change segment length | Different number of output lines |
+| # | Action | Expected | If it fails |
+|---|---|---|---|
+| 1 | Jog to a known point, zero Z on the surface | `wpos.z ≈ 0`, `mpos.z` large and negative | — |
+| 2 | Run a 2×2 probe | Every map value within a few hundredths of zero | **Values near ±85 mean the work-offset conversion is inverted. Stop.** |
 
----
+### 3.2 Refusals — should never reach the machine
 
-## 3. End-to-End Tests
+| # | Action | Expected |
+|---|---|---|
+| 3 | Set Max Probe Depth below Z Clearance, start probing | Refused before any motion, explaining the probe cannot reach |
+| 4 | Disconnect, start probing | Refused, citing the missing work coordinate offset |
+| 5 | Set an Edge Inset larger than half the toolpath, click Use File Bounds | Refused, bounds fall back to full extents |
 
-### 3.1 Complete Workflow - PCB Milling Scenario
+### 3.3 Fault paths — the ones that protect hardware
 
-| Step | Action | Verification |
-|------|--------|--------------|
-| 1 | Connect to machine | Connection established |
-| 2 | Navigate to Tools > Height Map | Height Map tool opens |
-| 3 | Set grid bounds: X[0-80], Y[0-100] | Values shown in inputs |
-| 4 | Set grid spacing: 10mm | 81 probe points shown |
-| 5 | Set Z clearance: 3mm | Value stored |
-| 6 | Set probe feed: 75mm/min | Value stored |
-| 7 | Set max depth: 5mm | Value stored |
-| 8 | Click "Run Probe Routine" | Machine begins probing |
-| 9 | Wait for completion | Progress reaches 100% |
-| 10 | Verify map status | Shows "Valid (9x11, 99 points)" |
-| 11 | Load PCB G-code file | File appears in visualizer |
-| 12 | Click "Apply to Loaded File" | Transformed G-code preview |
-| 13 | Click "Load to Main Visualizer" | Navigate to main, file loaded |
-| 14 | Run the job | Z heights adjusted during cut |
+| # | Action | Expected | Notes |
+|---|---|---|---|
+| 6 | Start a probe with the probe clip **off** | Cycle stops within ~45 s naming "point 1 of N"; tool retracts to clearance | Keep a hand on the E-stop. This is the watchdog, and it is the single most important check here |
+| 7 | Trip a limit or soft limit mid-probe | Cycle stops with the alarm reported | — |
+| 8 | After 7: `$X`, then jog Z a known 5 mm | Moves **5 mm**, not to `Z=5` | This is the G91 leak check. An alarm flushes the queued `G90`, and if the restore did not land the session is still incremental |
+| 9 | Abort mid-cycle with Stop, then jog Z 5 mm | Moves 5 mm | Same check, abort path |
+| 10 | Mid-cycle, trigger a probe from the Probe widget or a macro | Height map cycle continues and finishes with a sane surface | Cross-talk rejection |
+| 11 | Trigger three strays in a row | Cycle aborts naming expected vs received XY | Mismatch policy |
 
-### 3.2 Batch User Scenario - Saved Map Reuse
+### 3.4 Accuracy
 
-| Step | Action | Verification |
-|------|--------|--------------|
-| 1 | Complete probing workflow | Valid map created |
-| 2 | Click "Save Map" | JSON file downloaded |
-| 3 | Clear map | Status shows "Empty" |
-| 4 | Click "Load Map" | Select saved JSON |
-| 5 | Verify map loaded | Status shows original dimensions |
-| 6 | Load different G-code file | New file in visualizer |
-| 7 | Apply height map | Transformed correctly |
-| 8 | Repeat for multiple files | All files transformed with same map |
+| # | Action | Expected |
+|---|---|---|
+| 12 | Full 11×11 grid on real stock | Map range agrees with a dial indicator swept over the same area, to within probe repeatability |
+| 13 | Start a cycle, change WCS or issue `G92` partway | "Work Z zero moved during probing" warning appears rather than a silently mixed-datum map |
+
+### 3.5 First cut
+
+| # | Action | Expected |
+|---|---|---|
+| 14 | Generate compensated G-code, run it **5 mm above** the stock with a hand-applied Z offset | Z visibly tracks the surface shape |
+| 15 | Only then, cut a shallow test pattern | Depth consistent across the board |
+
+### 3.6 Imperial
+
+If you work in inches, repeat **1**, **2** and **6** with the workspace set to
+inches. The transformer normalises units internally and is tested both ways, but
+the probe path has only been exercised in software.
 
 ---
 
-## 4. Edge Cases and Error Handling
+## 4. Known gaps
 
-### 4.1 Input Validation
-| Test ID | Description | Input | Expected Behavior |
-|---------|-------------|-------|-------------------|
-| EC-001 | Negative grid bounds | minX = -10 | Accepted (valid for some setups) |
-| EC-002 | Min > Max | minX=100, maxX=0 | Grid inverted or warning |
-| EC-003 | Zero grid spacing | spacing=0 | Minimum enforced (0.1) |
-| EC-004 | Huge grid | 1000x1000 points | Performance warning or limit |
-| EC-005 | Point count = 1 | pointCountX=1 | Minimum enforced (2) |
-
-### 4.2 Machine States
-| Test ID | Description | Machine State | Expected Behavior |
-|---------|-------------|---------------|-------------------|
-| EC-010 | Idle machine | Idle | All functions enabled |
-| EC-011 | Jogging machine | Jog | Buttons enabled |
-| EC-012 | Running job | Run | Buttons disabled |
-| EC-013 | Alarm state | Alarm | Buttons disabled |
-| EC-014 | Disconnected | No connection | Buttons disabled |
-
-### 4.3 File Handling
-| Test ID | Description | Scenario | Expected Behavior |
-|---------|-------------|----------|-------------------|
-| EC-020 | Very large G-code | 100MB file | Async processing, no UI freeze |
-| EC-021 | G-code with arcs | G2/G3 commands | Arcs preserved (not transformed) |
-| EC-022 | Incremental mode | G91 sections | Sections skipped (warning optional) |
-| EC-023 | Mixed units | G20/G21 in file | Units tracked correctly |
-| EC-024 | No XY moves | Z-only file | File unchanged |
-
----
-
-## 5. Performance Tests
-
-| Test ID | Description | Metric | Target |
-|---------|-------------|--------|--------|
-| PF-001 | Grid calculation 10x10 | Time | < 10ms |
-| PF-002 | Grid calculation 50x50 | Time | < 100ms |
-| PF-003 | Interpolation 1000 calls | Time | < 50ms |
-| PF-004 | Transform 10K lines | Time | < 1s |
-| PF-005 | Transform 100K lines | Time | < 10s |
-| PF-006 | UI responsiveness during transform | Frame rate | > 30fps |
-| PF-007 | Memory usage large map | RAM | < 50MB additional |
-
----
-
-## 6. Regression Tests
-
-### 6.1 Existing Functionality
-| Test ID | Description | Verification |
-|---------|-------------|--------------|
-| RG-001 | Surfacing tool unaffected | Surfacing still works |
-| RG-002 | Probe tool unaffected | Standard probing works |
-| RG-003 | File loading unaffected | Files load normally |
-| RG-004 | Visualizer unaffected | 3D view renders correctly |
-| RG-005 | Settings persistence | Other settings preserved |
-
-### 6.2 Navigation
-| Test ID | Description | Verification |
-|---------|-------------|--------------|
-| RG-010 | Tools menu contains Height Map | Card visible |
-| RG-011 | Height Map route works | /tools/height-map loads |
-| RG-012 | Back button works | Returns to tools menu |
-| RG-013 | Direct URL access | Route loads correctly |
-
----
-
-## 7. Accessibility Tests
-
-| Test ID | Description | Verification |
-|---------|-------------|--------------|
-| AC-001 | Keyboard navigation | All inputs focusable via Tab |
-| AC-002 | Input labels | All inputs have visible labels |
-| AC-003 | Button states | Disabled buttons visually distinct |
-| AC-004 | Color contrast | Text readable in light/dark mode |
-| AC-005 | Progress announcements | Screen reader announces progress |
-
----
-
-## 8. Test Data
-
-### Sample Height Map JSON
-```json
-{
-  "bounds": {
-    "minX": 0,
-    "maxX": 100,
-    "minY": 0,
-    "maxY": 100
-  },
-  "resolution": {
-    "x": 50,
-    "y": 50
-  },
-  "points": [
-    { "x": 0, "y": 0, "z": 0.1 },
-    { "x": 50, "y": 0, "z": 0.2 },
-    { "x": 100, "y": 0, "z": 0.15 },
-    { "x": 100, "y": 50, "z": 0.3 },
-    { "x": 50, "y": 50, "z": 0.25 },
-    { "x": 0, "y": 50, "z": 0.2 },
-    { "x": 0, "y": 100, "z": 0.1 },
-    { "x": 50, "y": 100, "z": 0.15 },
-    { "x": 100, "y": 100, "z": 0.2 }
-  ],
-  "createdAt": "2024-01-15T10:30:00Z",
-  "units": "mm"
-}
-```
-
-### Sample G-code for Testing
-```gcode
-; Test file for height map
-G21 ; Metric
-G90 ; Absolute
-G0 Z5 ; Safe height
-G0 X0 Y0 ; Start position
-G1 Z0 F100 ; Plunge
-G1 X100 Y0 F500 ; Long line (should segment)
-G1 X100 Y100 ; Diagonal
-G1 X0 Y100
-G1 X0 Y0 ; Return
-G0 Z5 ; Retract
-M30 ; End
-```
-
----
-
-## 9. Sign-off Checklist
-
-- [ ] All unit tests passing
-- [ ] All integration tests passing
-- [ ] End-to-end workflows verified
-- [ ] Edge cases handled gracefully
-- [ ] Performance targets met
-- [ ] No regressions in existing functionality
-- [ ] Code review completed
-- [ ] Documentation updated
+- No part of the probe path has run against a real controller. Serial timing and
+  framing, `gcode:safe` unit wrapping on a genuinely imperial device, and
+  whether grbl really rejects `G90` with `error:9` while alarmed are all
+  reasoned from documentation rather than observed.
+- The real effect of `feedhold` + `reset` on modal state is unverified.
+- `GridVisualizer` rendering is untested.
+- `.gshmap` files saved before the datum fix cannot be migrated — the original
+  datum is unrecoverable once normalisation was applied. Loading one warns; it
+  should be re-probed.
+- The repository has no working typecheck or linter (`tsc` is 3.9.10 and fails
+  on modern `.d.ts` in `node_modules`; `eslint` fails to resolve
+  `eslint/use-at-your-own-risk`). Both predate this feature, so type errors are
+  caught only by the tests actually exercising a path.
