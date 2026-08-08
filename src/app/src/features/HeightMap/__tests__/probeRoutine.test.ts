@@ -27,7 +27,10 @@ import {
     calculateProbeTimeoutMs,
     DEFAULT_PROBE_TIMEOUT_MULTIPLIER,
     MIN_PROBE_TIMEOUT_MS,
+    probeConfigToMillimetres,
+    validateReportUnits,
 } from '../utils/probeRoutine';
+import { calculateProbeGrid } from '../utils/interpolation';
 import {
     HeightMapConfig,
     HeightMapData,
@@ -404,5 +407,147 @@ describe('calculateProbeTimeoutMs', () => {
     it('returns whole milliseconds', () => {
         const timeout = calculateProbeTimeoutMs({ ...base, probeFeedRate: 37 });
         expect(Number.isInteger(timeout)).toBe(true);
+    });
+});
+
+describe('probeConfigToMillimetres', () => {
+    // The widget holds its configuration in whatever units the workspace is set
+    // to, but everything downstream of it is millimetres: the probe command is
+    // issued under G21, and [PRB:]/WCO: are reported in millimetres whenever $13
+    // is 0 regardless of G20/G21. Converting once, here, is what keeps the
+    // command, the validator, the correlation check and the map stamp agreeing.
+
+    const imperial: HeightMapConfig = {
+        ...DEFAULT_HEIGHT_MAP_CONFIG,
+        minX: 0,
+        maxX: 100 / 25.4,
+        minY: 0,
+        maxY: 100 / 25.4,
+        gridSpacing: 10 / 25.4,
+        edgeInset: 2 / 25.4,
+        zClearance: 5 / 25.4,
+        probeFeedRate: 100 / 25.4,
+        maxProbeDepth: 10 / 25.4,
+        segmentLength: 1 / 25.4,
+    };
+
+    it('leaves a metric configuration untouched', () => {
+        const metric = { ...DEFAULT_HEIGHT_MAP_CONFIG };
+        expect(probeConfigToMillimetres(metric, true)).toEqual(metric);
+    });
+
+    it('scales every length to millimetres', () => {
+        const mm = probeConfigToMillimetres(imperial, false);
+        expect(mm.maxX).toBeCloseTo(100, 9);
+        expect(mm.maxY).toBeCloseTo(100, 9);
+        expect(mm.gridSpacing).toBeCloseTo(10, 9);
+        expect(mm.edgeInset).toBeCloseTo(2, 9);
+        expect(mm.zClearance).toBeCloseTo(5, 9);
+        expect(mm.maxProbeDepth).toBeCloseTo(10, 9);
+        expect(mm.segmentLength).toBeCloseTo(1, 9);
+    });
+
+    it('scales the feed rate, which is per-minute but still a length', () => {
+        // Omitted from the widget's own conversion list, so an imperial
+        // workspace displayed millimetres per minute and sent them as-is.
+        expect(probeConfigToMillimetres(imperial, false).probeFeedRate).toBeCloseTo(
+            100,
+            9,
+        );
+    });
+
+    it('converts exactly, not through the rounded display helpers', () => {
+        // convertToMetric rounds to two decimals and convertToImperial to three.
+        // A probe datum cannot afford either.
+        const mm = probeConfigToMillimetres(
+            { ...imperial, zClearance: 0.001 },
+            false,
+        );
+        expect(mm.zClearance).toBeCloseTo(0.0254, 12);
+    });
+
+    it('carries non-length fields through unchanged', () => {
+        const mm = probeConfigToMillimetres(
+            { ...imperial, usePointCount: true, pointCountX: 7, pointCountY: 9 },
+            false,
+        );
+        expect(mm.usePointCount).toBe(true);
+        expect(mm.pointCountX).toBe(7);
+        expect(mm.pointCountY).toBe(9);
+    });
+});
+
+describe('validateReportUnits', () => {
+    // $13 switches the controller's position REPORTS to inches, independently of
+    // G20/G21 which only affect program input. Every probe reading and work
+    // offset this feature consumes comes from a report, so $13=1 scales the
+    // whole datum by 25.4 with nothing else looking wrong.
+
+    it('accepts a controller reporting in millimetres', () => {
+        expect(validateReportUnits({ $13: '0' })).toEqual({ valid: true });
+        expect(validateReportUnits({ $13: 0 })).toEqual({ valid: true });
+    });
+
+    it('refuses a controller reporting in inches', () => {
+        const result = validateReportUnits({ $13: '1' });
+        expect(result.valid).toBe(false);
+        expect(result.error).toMatch(/\$13/);
+        expect(result.error).toMatch(/inch/i);
+    });
+
+    it('refuses when the setting is unknown rather than assuming', () => {
+        // Guessing wrong here is a 25.4x datum error, so an unread EEPROM is a
+        // reason to stop and reconnect, not to proceed hopefully.
+        for (const settings of [null, undefined, {}, { $110: '5000' }]) {
+            const result = validateReportUnits(settings as never);
+            expect(result.valid).toBe(false);
+            expect(result.error).toMatch(/\$13/);
+        }
+    });
+});
+
+describe('calculateProbeGrid boundary handling', () => {
+    // Found while converting the probe path to millimetres. The grid rounds each
+    // point to three decimals but compared the last one against an unrounded
+    // maxX, so any bound that is not exact at three decimals -- which is every
+    // bound that has been through a unit conversion -- produced a second column
+    // a fraction of a nanometre from the first. That gives the height map a
+    // zero-width cell, and bilinear interpolation across it divides by nothing.
+
+    const columns = (maxX: number) =>
+        [...new Set(calculateProbeGrid(0, maxX, 0, 20, 10, false, 0, 0).map((p) => p.x))].sort(
+            (a, b) => a - b,
+        );
+
+    it('does not duplicate a bound that is exact', () => {
+        expect(columns(20)).toEqual([0, 10, 20]);
+    });
+
+    it('does not duplicate a bound carrying floating point dust', () => {
+        // 60mm scaled to inches and back lands on 59.99999999999999. Written
+        // the way the widget really does it -- a reciprocal scale factor applied
+        // to the bound, then the conversion to millimetres.
+        const dusty = 60 * (1 / 25.4) * 25.4;
+        expect(dusty).not.toBe(60);
+        expect(
+            [
+                ...new Set(
+                    calculateProbeGrid(0, dusty, 0, 20, 20, false, 0, 0).map((p) => p.x),
+                ),
+            ].sort((a, b) => a - b),
+        ).toEqual([0, 20, 40, 60]);
+    });
+
+    it('still reaches a bound that the spacing does not divide', () => {
+        expect(columns(25)).toEqual([0, 10, 20, 25]);
+    });
+
+    it('never emits two columns closer together than a micron', () => {
+        for (const maxX of [20, 60 * (1 / 25.4) * 25.4, 25, 33.333, 59.9948]) {
+            const xs = columns(maxX);
+            for (let i = 1; i < xs.length; i++) {
+                expect(xs[i] - xs[i - 1]).toBeGreaterThan(1e-3);
+            }
+        }
     });
 });

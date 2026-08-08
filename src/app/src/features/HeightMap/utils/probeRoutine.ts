@@ -170,6 +170,104 @@ export const calculateProbeTimeoutMs = ({
     return Math.max(MIN_PROBE_TIMEOUT_MS, Math.ceil(expectedMs * multiplier));
 };
 
+/** Exact, unlike the display helpers in app/lib/units which round to 2-3 dp. */
+const MM_PER_INCH = 25.4;
+
+/**
+ * Configuration fields that are a length, or a length per minute.
+ *
+ * probeFeedRate is included deliberately. The widget's own display conversion
+ * omits it, so an imperial workspace showed millimetres per minute under an
+ * in/min label and then sent that number to the controller unchanged.
+ */
+const LENGTH_FIELDS = [
+    'minX',
+    'maxX',
+    'minY',
+    'maxY',
+    'gridSpacing',
+    'edgeInset',
+    'zClearance',
+    'maxProbeDepth',
+    'segmentLength',
+    'probeFeedRate',
+] as const;
+
+/**
+ * Convert a workspace-units configuration into millimetres.
+ *
+ * The widget holds its configuration in whatever units the workspace displays,
+ * but everything past this point is millimetres and has to be:
+ *
+ *   - the probe command is issued under G21;
+ *   - [PRB:] and WCO: are reported in millimetres whenever $13 is 0, which is
+ *     independent of G20/G21 -- those govern program input, not reports;
+ *   - the map is handed to the transformer, which scales by 25.4 if the map
+ *     claims inches, so a map carrying millimetre probe readings must say so.
+ *
+ * Converting in one place is what keeps the command, validateProbeTravel, the
+ * XY correlation check and the map stamp from disagreeing with each other.
+ * Persisted state is already millimetre-canonical, so this extends an existing
+ * convention rather than inventing one.
+ */
+export const probeConfigToMillimetres = <T extends HeightMapConfig>(
+    config: T,
+    isMetric: boolean,
+): T => {
+    if (isMetric) {
+        return config;
+    }
+
+    const scaled = { ...config };
+    for (const field of LENGTH_FIELDS) {
+        const value = scaled[field];
+        if (typeof value === 'number' && Number.isFinite(value)) {
+            (scaled as Record<string, unknown>)[field] = value * MM_PER_INCH;
+        }
+    }
+    return scaled;
+};
+
+/**
+ * Confirm the controller reports positions in millimetres.
+ *
+ * $13 switches status and parameter reports to inches on its own, without
+ * touching G20/G21. Every number this feature consumes from the controller --
+ * the probe Z, the work offset, the probe XY used for correlation -- comes from
+ * a report, so $13=1 scales the entire datum by 25.4 while the g-code side
+ * still looks correct. Supporting it properly is a larger job; refusing is the
+ * honest interim.
+ *
+ * An unread setting is refused too. Guessing costs a 25.4x datum error, and the
+ * remedy -- reconnect so the EEPROM is read -- is cheap.
+ */
+export const validateReportUnits = (
+    eeprom: Record<string, unknown> | null | undefined,
+): { valid: boolean; error?: string } => {
+    const raw = eeprom?.$13;
+
+    if (raw === undefined || raw === null || raw === '') {
+        return {
+            valid: false,
+            error:
+                'Cannot confirm the controller reports positions in millimetres ' +
+                '($13 has not been read). Reconnect to the machine and try again.',
+        };
+    }
+
+    if (Number(raw) !== 0) {
+        return {
+            valid: false,
+            error:
+                'The controller is set to report positions in inches ($13=1), ' +
+                'which the height map does not support. Set $13=0 and re-home ' +
+                'before probing.',
+        };
+    }
+
+    return { valid: true };
+};
+
 /**
  * Pull the Z work coordinate offset out of the raw controller status.
  *

@@ -32,7 +32,11 @@
  * serial handler really receives them.
  */
 
-import { createHeightMapFromProbeResults } from '../utils/probeRoutine';
+import {
+    createHeightMapFromProbeResults,
+    probeConfigToMillimetres,
+} from '../utils/probeRoutine';
+import { calculateProbeGrid } from '../utils/interpolation';
 import { transformGcode } from '../utils/gcodeTransformer';
 import { bilinearInterpolate } from '../utils/interpolation';
 import {
@@ -282,5 +286,222 @@ describe('compensation offsets', () => {
         for (const p of cuts) {
             expect(p.z).toBeCloseTo(0.2 - CUT_DEPTH, 3);
         }
+    });
+});
+
+describe('workspace units', () => {
+    /*
+     * The acceptance criterion for the imperial fault: the machine must do the
+     * same physical thing whichever units the workspace happens to be showing.
+     *
+     * The widget stores its configuration in display units, so an imperial
+     * workspace holds 0.19685 where a metric one holds 5. Everything downstream
+     * is millimetres -- the probe command goes out under G21, and [PRB:]/WCO:
+     * report millimetres whenever $13 is 0 -- so the whole chain is run here in
+     * both modes and the emitted depths compared.
+     */
+
+    const PHYSICAL = {
+        zClearance: 5,
+        maxProbeDepth: 10,
+        probeFeedRate: 100,
+        segmentLength: 1,
+        gridSpacing: 20,
+        maxXY: 60,
+    };
+
+    const stateFor = (isMetric: boolean): HeightMapConfig => {
+        const s = isMetric ? 1 : 1 / 25.4;
+        return {
+            ...DEFAULT_HEIGHT_MAP_CONFIG,
+            minX: 0,
+            maxX: PHYSICAL.maxXY * s,
+            minY: 0,
+            maxY: PHYSICAL.maxXY * s,
+            gridSpacing: PHYSICAL.gridSpacing * s,
+            usePointCount: false,
+            zClearance: PHYSICAL.zClearance * s,
+            maxProbeDepth: PHYSICAL.maxProbeDepth * s,
+            probeFeedRate: PHYSICAL.probeFeedRate * s,
+            segmentLength: PHYSICAL.segmentLength * s,
+        };
+    };
+
+    /** Probe the same physical surface and compensate the same program. */
+    const runChain = (isMetric: boolean) => {
+        const mm = probeConfigToMillimetres(stateFor(isMetric), isMetric);
+        const points = calculateProbeGrid(
+            mm.minX,
+            mm.maxX,
+            mm.minY,
+            mm.maxY,
+            mm.gridSpacing,
+            false,
+            0,
+            0,
+        );
+        const h = surfaceAt(-0.4);
+        const map = createHeightMapFromProbeResults(
+            points,
+            points.map((p) => h(p.x, p.y) + TYPICAL_WCO_Z),
+            mm,
+            'mm',
+            TYPICAL_WCO_Z,
+        );
+        const result = transformGcode(programAtDepth(CUT_DEPTH), map, {
+            segmentLength: mm.segmentLength,
+            warnOutsideBounds: true,
+        });
+        return { map, result, cuts: parseMotion(result.transformedGcode).filter((p) => !p.rapid) };
+    };
+
+    const metric = runChain(true);
+    const imperial = runChain(false);
+
+    it('probes the same grid in both modes', () => {
+        expect(imperial.map.points).toHaveLength(metric.map.points.length);
+        imperial.map.points.forEach((p, i) => {
+            expect(p.x).toBeCloseTo(metric.map.points[i].x, 6);
+            expect(p.y).toBeCloseTo(metric.map.points[i].y, 6);
+            expect(p.z).toBeCloseTo(metric.map.points[i].z, 6);
+        });
+    });
+
+    it('stamps the map in millimetres regardless of the workspace', () => {
+        // The Z values come from [PRB:] in millimetres. Stamping the map 'in'
+        // makes normalizeMapToMm multiply them by 25.4 on the way into the
+        // transformer, turning a 0.05mm deviation into 1.27mm of commanded Z.
+        expect(metric.map.units).toBe('mm');
+        expect(imperial.map.units).toBe('mm');
+    });
+
+    it('drives the same physical path in both modes', () => {
+        // Compared as geometry, not as samples. The imperial segment length
+        // round-trips to 0.9999999999999999 rather than 1, so the transformer
+        // lays down one extra subdivision on a long move -- floating-point dust
+        // in the fixture, and in real use an operator typing 0.039in genuinely
+        // asks for 0.9906mm and a different subdivision. Neither changes where
+        // the tool goes, which is the thing that must not differ.
+        const envelope = (cuts: typeof metric.cuts) => ({
+            minX: Math.min(...cuts.map((p) => p.x)),
+            maxX: Math.max(...cuts.map((p) => p.x)),
+            minY: Math.min(...cuts.map((p) => p.y)),
+            maxY: Math.max(...cuts.map((p) => p.y)),
+            minZ: Math.min(...cuts.map((p) => p.z)),
+            maxZ: Math.max(...cuts.map((p) => p.z)),
+        });
+
+        const a = envelope(metric.cuts);
+        const b = envelope(imperial.cuts);
+        (Object.keys(a) as (keyof typeof a)[]).forEach((k) => {
+            expect(b[k]).toBeCloseTo(a[k], 3);
+        });
+
+        // And the endpoints coincide, so it is the same path and not merely the
+        // same bounding box.
+        expect(imperial.cuts[0].x).toBeCloseTo(metric.cuts[0].x, 3);
+        expect(imperial.cuts[0].z).toBeCloseTo(metric.cuts[0].z, 3);
+        const lastI = imperial.cuts[imperial.cuts.length - 1];
+        const lastM = metric.cuts[metric.cuts.length - 1];
+        expect(lastI.x).toBeCloseTo(lastM.x, 3);
+        expect(lastI.z).toBeCloseTo(lastM.z, 3);
+    });
+
+    it('cuts the commanded depth below the local surface in both modes', () => {
+        const h = surfaceAt(-0.4);
+        for (const [label, run] of [
+            ['metric', metric],
+            ['imperial', imperial],
+        ] as const) {
+            expect(run.cuts.length).toBeGreaterThan(10);
+            const wrong = run.cuts
+                .map((p) => ({ p, depth: h(p.x, p.y) - p.z }))
+                .filter(({ depth }) => Math.abs(depth - CUT_DEPTH) > TOLERANCE)
+                .map(({ p, depth }) => `${label} (${p.x},${p.y}) cuts ${depth.toFixed(4)}`);
+            expect(wrong.slice(0, 5)).toEqual([]);
+        }
+    });
+});
+
+describe('a height map that declares itself imperial', () => {
+    /*
+     * The probe cycle now always stamps 'mm', so nothing this feature produces
+     * exercises the transformer's inch handling any more. It is still reachable:
+     * a .gshmap saved by an older build, or written by hand, can arrive stamped
+     * 'in', and loadMap feeds it straight to the transformer.
+     *
+     * Left uncovered, disabling normalizeMapToMm entirely changes nothing that
+     * any test can see -- which is exactly the state this suite was in.
+     */
+    const INCH = 1 / 25.4;
+
+    /** The same physical surface, described in inches. */
+    const inchMap = (): HeightMapData => {
+        const h = surfaceAt(-0.4);
+        const points = probeGrid().map((p) => ({
+            x: p.x * INCH,
+            y: p.y * INCH,
+            z: h(p.x, p.y) * INCH,
+        }));
+        return {
+            bounds: {
+                minX: 0,
+                maxX: 60 * INCH,
+                minY: 0,
+                maxY: 60 * INCH,
+            },
+            resolution: { x: 20 * INCH, y: 20 * INCH },
+            points,
+            units: 'in',
+        };
+    };
+
+    it('is scaled to millimetres before compensation is applied', () => {
+        const h = surfaceAt(-0.4);
+        const result = transformGcode(programAtDepth(CUT_DEPTH), inchMap(), {
+            // Also in inches, as the map's own units imply.
+            segmentLength: 5 * INCH,
+            warnOutsideBounds: true,
+        });
+        const cuts = parseMotion(result.transformedGcode).filter((p) => !p.rapid);
+
+        expect(result.errors).toEqual([]);
+        expect(cuts.length).toBeGreaterThan(10);
+
+        const wrong = cuts
+            .map((p) => ({ p, depth: h(p.x, p.y) - p.z }))
+            .filter(({ depth }) => Math.abs(depth - CUT_DEPTH) > TOLERANCE)
+            .map(({ p, depth }) => `(${p.x},${p.y}) cuts ${depth.toFixed(4)}`);
+        expect(wrong.slice(0, 5)).toEqual([]);
+    });
+
+    it('produces the same cut as the identical map stamped in millimetres', () => {
+        const opts = { warnOutsideBounds: true };
+        const asInches = parseMotion(
+            transformGcode(programAtDepth(CUT_DEPTH), inchMap(), {
+                ...opts,
+                segmentLength: 5 * INCH,
+            }).transformedGcode,
+        ).filter((p) => !p.rapid);
+
+        const asMm = parseMotion(
+            transformGcode(programAtDepth(CUT_DEPTH), mapStoredByProbeCycle(-0.4, 0), {
+                ...opts,
+                segmentLength: 5,
+            }).transformedGcode,
+        ).filter((p) => !p.rapid);
+
+        // Compared as geometry: 5in-worth of segment length round-trips to
+        // 4.999... so the two runs are sampled a few points apart, which does
+        // not change where the tool goes.
+        const zRange = (pts: typeof asMm) => [
+            Math.min(...pts.map((p) => p.z)),
+            Math.max(...pts.map((p) => p.z)),
+        ];
+
+        expect(zRange(asInches)[0]).toBeCloseTo(zRange(asMm)[0], 3);
+        expect(zRange(asInches)[1]).toBeCloseTo(zRange(asMm)[1], 3);
+        expect(asInches[0].z).toBeCloseTo(asMm[0].z, 3);
+        expect(asInches[asInches.length - 1].z).toBeCloseTo(asMm[asMm.length - 1].z, 3);
     });
 });

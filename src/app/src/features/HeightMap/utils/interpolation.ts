@@ -192,12 +192,23 @@ export const calculateProbeGrid = (
             Number(Math.min(minY + i * gridSpacing, maxY).toFixed(3)),
         );
 
-        // Ensure max values are included
-        if (xPoints[xPoints.length - 1] !== maxX) {
-            xPoints.push(maxX);
+        // Ensure max values are included.
+        //
+        // Compared with a tolerance, and pushed rounded, because the points
+        // above are rounded to three decimals while maxX/maxY are not. An exact
+        // comparison treats 60 and 59.99999999999999 as different and appends a
+        // second column a fraction of a nanometre from the first -- which gives
+        // the height map a zero-width cell and makes bilinear interpolation
+        // divide by nothing. Unreachable while every bound is typed in whole
+        // millimetres; routine once bounds arrive from a unit conversion.
+        const round = (v: number) => Number(v.toFixed(3));
+        const closeEnough = (a: number, b: number) => Math.abs(a - b) < 1e-6;
+
+        if (!closeEnough(xPoints[xPoints.length - 1], maxX)) {
+            xPoints.push(round(maxX));
         }
-        if (yPoints[yPoints.length - 1] !== maxY) {
-            yPoints.push(maxY);
+        if (!closeEnough(yPoints[yPoints.length - 1], maxY)) {
+            yPoints.push(round(maxY));
         }
     }
 

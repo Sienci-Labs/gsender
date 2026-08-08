@@ -57,6 +57,8 @@ import {
     validateProbeTravel,
     describeLegacyNormalizedMap,
     calculateProbeTimeoutMs,
+    probeConfigToMillimetres,
+    validateReportUnits,
 } from './utils/probeRoutine';
 import {
     beginProbeCycle,
@@ -126,6 +128,11 @@ const HeightMapTool: React.FC = () => {
     // Get current work position
     const wpos = useTypedSelector((state) => state?.controller.state?.status?.wpos);
 
+    // EEPROM settings, needed for $13 -- see validateReportUnits.
+    const eepromSettings = useTypedSelector(
+        (state) => state?.controller?.settings?.settings,
+    );
+
     // Get loaded file info
     const fileInfo = useTypedSelector((state) => state?.file);
 
@@ -143,6 +150,10 @@ const HeightMapTool: React.FC = () => {
                 gridSpacing: convertToImperial(saved.gridSpacing),
                 edgeInset: convertToImperial(saved.edgeInset ?? 0),
                 zClearance: convertToImperial(saved.zClearance),
+                // Per-minute, but still a length. Left out of this list the
+                // stored millimetres-per-minute were shown under an in/min
+                // label and then sent to the controller unchanged.
+                probeFeedRate: convertToImperial(saved.probeFeedRate),
                 maxProbeDepth: convertToImperial(saved.maxProbeDepth),
                 segmentLength: convertToImperial(saved.segmentLength),
             };
@@ -194,9 +205,21 @@ const HeightMapTool: React.FC = () => {
     // Reading config through this is what lets every probe callback be built
     // once, which in turn lets the serial listener be registered once for the
     // component's lifetime instead of once per point.
-    const configRef = useRef({ state, units });
+    //
+    // `mm` is the same configuration in millimetres. Everything the machine or
+    // the transformer sees comes from there; `state` is only what the operator
+    // is looking at. See probeConfigToMillimetres for why the boundary is here.
+    const configRef = useRef({
+        state,
+        units,
+        mm: probeConfigToMillimetres(state, isMetric),
+    });
     useEffect(() => {
-        configRef.current = { state, units };
+        configRef.current = {
+            state,
+            units,
+            mm: probeConfigToMillimetres(state, isMetric),
+        };
     });
 
     // Reset transformedGcode when map data changes
@@ -218,6 +241,7 @@ const HeightMapTool: React.FC = () => {
                       gridSpacing: convertToMetric(state.gridSpacing),
                       edgeInset: convertToMetric(state.edgeInset ?? 0),
                       zClearance: convertToMetric(state.zClearance),
+                      probeFeedRate: convertToMetric(state.probeFeedRate),
                       maxProbeDepth: convertToMetric(state.maxProbeDepth),
                       segmentLength: convertToMetric(state.segmentLength),
                   };
@@ -283,8 +307,30 @@ const HeightMapTool: React.FC = () => {
             return;
         }
 
+        // The bbox is always millimetres: GCodeVirtualizer runs every position
+        // through in2mm when the program is in G20, so the toolpath extents are
+        // metric even for an inch program. State is display units, so convert
+        // before the inset is applied -- otherwise an imperial workspace ends up
+        // holding an inch inset against a millimetre extent in the same field
+        // pair, and the probe area is out by 25.4 at one end only.
+        const bboxInDisplayUnits = isMetric
+            ? fileInfo.bbox
+            : {
+                  ...fileInfo.bbox,
+                  min: {
+                      ...fileInfo.bbox.min,
+                      x: convertToImperial(fileInfo.bbox.min.x),
+                      y: convertToImperial(fileInfo.bbox.min.y),
+                  },
+                  max: {
+                      ...fileInfo.bbox.max,
+                      x: convertToImperial(fileInfo.bbox.max.x),
+                      y: convertToImperial(fileInfo.bbox.max.y),
+                  },
+              };
+
         const { bounds, applied, rejected } = deriveProbeBounds(
-            fileInfo.bbox,
+            bboxInDisplayUnits,
             state.edgeInset,
         );
 
@@ -333,10 +379,16 @@ const HeightMapTool: React.FC = () => {
             // Park the tool clear of the work. Skipped when alarmed because grbl
             // rejects g-code in that state; the alarm handler restores modal
             // state once it clears instead.
+            // Through gcode:safe, not plain gcode. The clearance is in
+            // millimetres, and the device is left in whatever unit modal the
+            // last program set -- gcode:safe is itself what restores G20 after
+            // an inch job. Unwrapped, `Z5` becomes five inches: error:15 with
+            // soft limits on, and the top of the Z column without.
             if (statusRef.current?.activeState !== GRBL_ACTIVE_STATE_ALARM) {
                 controller.command(
-                    'gcode',
-                    `G90 G0 Z${configRef.current.state.zClearance}`,
+                    'gcode:safe',
+                    `G90 G0 Z${configRef.current.mm.zClearance}`,
+                    'G21',
                 );
             }
         },
@@ -347,7 +399,7 @@ const HeightMapTool: React.FC = () => {
     const completeProbing = useCallback(
         (zValues: number[]) => {
             clearProbeTimers();
-            const { state: current, units: currentUnits } = configRef.current;
+            const { mm } = configRef.current;
 
             setProbeStatus('complete');
             setState((prev) => ({ ...prev, isProbing: false }));
@@ -378,11 +430,15 @@ const HeightMapTool: React.FC = () => {
             // Create height map from probe results. The stored PRB values are in
             // machine coordinates; the offset captured at the start of the cycle
             // brings them back to the operator's work Z zero.
+            // Stamped 'mm' because that is what it holds: the grid was built
+            // from the millimetre configuration and the Z values came from
+            // [PRB:] in millimetres. Stamping it with the workspace units would
+            // make the transformer rescale readings that were never in inches.
             const mapData = createHeightMapFromProbeResults(
                 probePointsRef.current,
                 zValues,
-                current,
-                currentUnits,
+                mm,
+                'mm',
                 wcoZ,
             );
 
@@ -395,8 +451,8 @@ const HeightMapTool: React.FC = () => {
             setState((prev) => ({ ...prev, mapData }));
             probeCycleRef.current = null;
 
-            // Retract to clearance height
-            controller.command('gcode', `G90 G0 Z${current.zClearance}`);
+            // Retract to clearance height, in millimetres and said so.
+            controller.command('gcode:safe', `G90 G0 Z${mm.zClearance}`, 'G21');
         },
         [clearProbeTimers],
     );
@@ -409,7 +465,7 @@ const HeightMapTool: React.FC = () => {
      */
     const issueProbe = useCallback(
         (index: number, point: { x: number; y: number }, settleFirst: boolean) => {
-            const { state: current } = configRef.current;
+            const { mm } = configRef.current;
 
             const send = () => {
                 settleTimeoutRef.current = null;
@@ -420,9 +476,9 @@ const HeightMapTool: React.FC = () => {
                     generateSingleProbeCommand(
                         point.x,
                         point.y,
-                        current.zClearance,
-                        current.probeFeedRate,
-                        current.maxProbeDepth,
+                        mm.zClearance,
+                        mm.probeFeedRate,
+                        mm.maxProbeDepth,
                     ),
                     'G21',
                 );
@@ -444,7 +500,7 @@ const HeightMapTool: React.FC = () => {
                     if (step.action.type === 'fail') {
                         failProbing(step.action.message);
                     }
-                }, calculateProbeTimeoutMs(current));
+                }, calculateProbeTimeoutMs(mm));
             };
 
             if (settleFirst) {
@@ -564,22 +620,30 @@ const HeightMapTool: React.FC = () => {
             // Absolute mode is restored explicitly because a $X unlock keeps the
             // modal state the alarm interrupted -- leaving the operator's next
             // jog or MDI move to be interpreted incrementally.
-            controller.command('gcode', 'G90');
+            // G90 carries no length so the modal cannot misread it today, but
+            // it goes through the same wrapper as everything else rather than
+            // leaving a second, quieter channel for the next edit to reach for.
+            controller.command('gcode:safe', 'G90', 'G21');
         }
     }, [status?.activeState, failProbing]);
 
     // Start probing routine
     const startProbing = useCallback(() => {
+        // Everything from here on is millimetres: the grid, the pre-flight
+        // checks, the probe commands and the map. The operator's units only
+        // reach the screen.
+        const mm = probeConfigToMillimetres(state, isMetric);
+
         // Calculate probe points
         const points = calculateProbeGrid(
-            state.minX,
-            state.maxX,
-            state.minY,
-            state.maxY,
-            state.gridSpacing,
-            state.usePointCount,
-            state.pointCountX,
-            state.pointCountY,
+            mm.minX,
+            mm.maxX,
+            mm.minY,
+            mm.maxY,
+            mm.gridSpacing,
+            mm.usePointCount,
+            mm.pointCountX,
+            mm.pointCountY,
         );
 
         if (points.length < 4) {
@@ -587,14 +651,16 @@ const HeightMapTool: React.FC = () => {
             return;
         }
 
-        // Pre-flight. Both of these make the cycle impossible to complete
-        // correctly, and both are cheaper to catch here than as an alarm or a
-        // silently wrong map after several minutes of probing.
-        const travel = validateProbeTravel(
-            state.zClearance,
-            state.maxProbeDepth,
-            units,
-        );
+        // Pre-flight. Each of these makes the cycle impossible to complete
+        // correctly, and all are cheaper to catch here than as an alarm, a
+        // broken cutter, or a silently wrong map several minutes in.
+        const reportUnits = validateReportUnits(eepromSettings);
+        if (!reportUnits.valid) {
+            setWarnings([reportUnits.error]);
+            return;
+        }
+
+        const travel = validateProbeTravel(mm.zClearance, mm.maxProbeDepth, 'mm');
         if (!travel.valid) {
             setWarnings([travel.error]);
             return;
@@ -632,6 +698,9 @@ const HeightMapTool: React.FC = () => {
         // three decimals the command is written with. Keeping it far below the
         // smallest grid spacing the UI allows is what makes it impossible to
         // mistake one grid point for its neighbour.
+        //
+        // No unit branch: the grid is millimetres and so is WCO, because $13 is
+        // 0 -- which the pre-flight above has just confirmed.
         const { wcoZ } = workOffset;
         const step = beginProbeCycle({
             points,
@@ -640,13 +709,11 @@ const HeightMapTool: React.FC = () => {
                 y: Number(statusRef.current?.wco?.y ?? 0),
                 z: wcoZ,
             },
-            xyTolerance: isMetric
-                ? PROBE_XY_TOLERANCE_MM
-                : PROBE_XY_TOLERANCE_MM / 25.4,
+            xyTolerance: PROBE_XY_TOLERANCE_MM,
         });
         probeCycleRef.current = step.state;
         applyProbeAction(step.action, false);
-    }, [state, units, isMetric, clearProbeTimers, applyProbeAction]);
+    }, [state, isMetric, eepromSettings, clearProbeTimers, applyProbeAction]);
 
     // Abort probing
     const abortProbing = useCallback(() => {
@@ -681,6 +748,11 @@ const HeightMapTool: React.FC = () => {
                 zClearance: state.zClearance,
                 probeFeedRate: state.probeFeedRate,
                 maxProbeDepth: state.maxProbeDepth,
+                // Display units, not millimetres: loadMap restores this block
+                // straight into the on-screen state, so converting it here
+                // would rescale an imperial operator's settings on every
+                // save/load round trip. The map POINTS are millimetres; this
+                // block is only the UI configuration that produced them.
                 segmentLength: state.segmentLength,
             },
         };
@@ -766,10 +838,19 @@ const HeightMapTool: React.FC = () => {
         input.click();
     }, []);
 
-    // Clear height map
+    // Clear height map.
+    //
+    // Refuses while a cycle is running. Nulling the cycle here would strand it:
+    // no timers cleared, no abort, no retract, the in-flight G38.2 still
+    // executing and its response going nowhere, and the UI stuck on "Stop
+    // Probing". Stopping the machine is what the adjacent Stop Probing button
+    // is for; a button that discards data should not do it by accident. The
+    // button is disabled in the same condition, so this guard is belt and
+    // braces rather than the primary control.
     const clearMap = useCallback(() => {
+        if (probeCycleRef.current !== null) return;
+
         setState((prev) => ({ ...prev, mapData: null }));
-        probeCycleRef.current = null;
         setProbeStatus('idle');
         setTransformedGcode(null);
     }, []);
@@ -789,7 +870,10 @@ const HeightMapTool: React.FC = () => {
             fileInfo.content,
             state.mapData,
             {
-                segmentLength: state.segmentLength,
+                // Millimetres, to match the map's own units -- the
+                // transformer scales segmentLength by the map's unit stamp.
+                segmentLength: probeConfigToMillimetres(state, isMetric)
+                    .segmentLength,
                 warnOutsideBounds: true,
             },
         );
@@ -808,7 +892,7 @@ const HeightMapTool: React.FC = () => {
         await uploadGcodeFileToServer(file, controller.port, VISUALIZER_SECONDARY);
 
         setWarnings([`Height map applied. Preview updated.`, ...transformWarnings]);
-    }, [state.mapData, state.segmentLength, fileInfo, mainVisualizerHasHeightMap]);
+    }, [state, isMetric, fileInfo, mainVisualizerHasHeightMap]);
 
     // Confirm double-apply (user wants to proceed anyway)
     const confirmDoubleApply = useCallback(async () => {
@@ -822,7 +906,10 @@ const HeightMapTool: React.FC = () => {
             fileInfo.content,
             state.mapData,
             {
-                segmentLength: state.segmentLength,
+                // Millimetres, to match the map's own units -- the
+                // transformer scales segmentLength by the map's unit stamp.
+                segmentLength: probeConfigToMillimetres(state, isMetric)
+                    .segmentLength,
                 warnOutsideBounds: false,
             },
         );
@@ -862,7 +949,10 @@ const HeightMapTool: React.FC = () => {
 
         if (!gcodeToExport && state.mapData && fileInfo?.content) {
             const result = transformGcode(fileInfo.content, state.mapData, {
-                segmentLength: state.segmentLength,
+                // Millimetres, to match the map's own units -- the
+                // transformer scales segmentLength by the map's unit stamp.
+                segmentLength: probeConfigToMillimetres(state, isMetric)
+                    .segmentLength,
                 warnOutsideBounds: false,
             });
             if (result.errors.length > 0) {
@@ -1321,7 +1411,7 @@ const HeightMapTool: React.FC = () => {
                                     size="sm"
                                     variant="primary"
                                     onClick={clearMap}
-                                    disabled={!state.mapData && !state.isProbing}
+                                    disabled={!state.mapData || state.isProbing}
                                     icon={<Trash2 className="w-4 h-4" />}
                                     text="Clear Map"
                                 />
