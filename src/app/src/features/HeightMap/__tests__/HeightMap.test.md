@@ -126,11 +126,40 @@ stock, before trusting a probe cycle or cutting a compensated program.
 | 14 | Generate compensated G-code, run it **5 mm above** the stock with a hand-applied Z offset | Z visibly tracks the surface shape |
 | 15 | Only then, cut a shallow test pattern | Depth consistent across the board |
 
-### 3.6 Imperial
+### 3.6 Imperial — DO NOT. The probe path is broken in inches.
 
-If you work in inches, repeat **1**, **2** and **6** with the workspace set to
-inches. The transformer normalises units internally and is tested both ways, but
-the probe path has only been exercised in software.
+**Do not set the workspace to inches and probe.** An earlier revision of this
+document told you to; that instruction was wrong and would have damaged a tool.
+
+`getInitialState` converts the configuration to inches when the workspace is
+imperial (`index.tsx:136-149`), but the probe command is issued with a hardcoded
+`G21` (`index.tsx:427`, inherited from the upstream PR). The number is converted
+and the unit modal is not, so the value is interpreted as millimetres:
+
+| You set | Stored | Sent | Machine does |
+|---|---|---|---|
+| 5 mm clearance | 0.197 in | `G0 Z0.197` under `G21` | retracts **0.197 mm** |
+| 10 mm probe depth | 0.394 in | `G38.2 Z-0.394` | probes **0.394 mm** |
+
+Every inter-point rapid then crosses the workpiece 0.2 mm above work zero, on a
+board being height-mapped precisely because it deviates by more than that. With
+a V-bit as the probe that is a broken tool on the second point.
+
+Nothing catches it. `validateProbeTravel` compares the same two mis-scaled
+numbers and passes. The XY correlation check compares two values that carry the
+same error and matches. The resulting map is stamped `units: 'in'` while its Z
+values are millimetres, so `normalizeMapToMm` multiplies them by 25.4 — a 0.05 mm
+surface deviation becomes 1.27 mm of commanded offset.
+
+`probeFeedRate` is not converted at all (`index.tsx:139-147`), so it is displayed
+as in/min and sent as mm/min regardless.
+
+Until this is fixed, verify the workspace reads `mm` before probing.
+
+Also confirm `$13` is `0`. If the controller is set to report in inches, both
+`[PRB:...]` and `WCO:` arrive in inches while the map is stamped with the
+workspace units — a silent 25.4x error in the datum conversion, which is not
+handled anywhere.
 
 ---
 
