@@ -49,8 +49,14 @@ export default defineConfig({
 	},
 	server: {
 		port: 5174,
+		fs: {
+			// The visualize worker lives in src/app/src/workers, outside this
+			// project's root (src/pendant) — allow the dev server to serve it.
+			allow: [root],
+		},
 		proxy: {
 			"/api": { target: "http://127.0.0.1:8000", changeOrigin: true },
+			"/plugins": { target: "http://127.0.0.1:8000", changeOrigin: true },
 			"/socket.io": {
 				target: "http://127.0.0.1:8000",
 				changeOrigin: true,
