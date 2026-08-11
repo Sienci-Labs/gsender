@@ -60,7 +60,7 @@ export function WizardLanding({
 					isDisabled
 						? "bg-gray-200 text-gray-400 cursor-not-allowed"
 						: isActive
-							? "bg-gray-900 text-white hover:bg-gray-800"
+							? "bg-gray-900 text-white hover:bg-gray-800 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
 							: "bg-gray-200 text-gray-700 hover:bg-gray-300"
 				}
 			`}
@@ -102,7 +102,7 @@ export function WizardLanding({
 						</p>
 					)}
 					{activeSubWizard?.description && (
-						<p className="mb-8">{activeSubWizard.description}</p>
+						<p className="mb-8 dark:text-content-primary">{activeSubWizard.description}</p>
 					)}
 					<ValidationBanner validations={validations} />
 					<div className="flex flex-col gap-3 mt-12 max-w-md">

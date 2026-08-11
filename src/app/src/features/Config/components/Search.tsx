@@ -44,7 +44,7 @@ export function Search() {
 				<input
 					type="text"
 					id="simple-search"
-					className="bg-gray-50 focus:outline-none border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5"
+					className="bg-gray-50 focus:outline-none border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-surface-elevated dark:border-outline dark:text-content-primary"
 					placeholder="Search Config"
 					value={searchTerm}
 					onChange={onSearchChange}

@@ -183,7 +183,7 @@ const EditArea = ({ shortcut, shortcuts, edit, onClose }: EditProps) => {
 		let cleanedShortcut = null;
 
 		if (shortcut.keys === "") {
-			return <span className="text-gray-500">None</span>;
+			return <span className="text-gray-500 dark:text-gray-300">None</span>;
 		}
 
 		if (shortcutArray[shortcutArray.length - 1] === "") {
@@ -243,18 +243,18 @@ const EditArea = ({ shortcut, shortcuts, edit, onClose }: EditProps) => {
 
 	return (
 		<>
-			<div className="space-y-6">
+			<div className="mt-2 space-y-6">
 				{/* Header Section */}
-				<div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+				<div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-surface-elevated rounded-lg">
 					<div>
-						<h4 className="text-sm font-medium text-gray-500 mb-1">Action</h4>
-						<h4 className="text-lg font-semibold text-gray-900">{title}</h4>
+						<h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Action</h4>
+						<h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{title}</h4>
 					</div>
 					<div>
-						<h4 className="text-sm font-medium text-gray-500 mb-1">
+						<h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
 							Current Shortcut
 						</h4>
-						<h4 className="text-lg font-semibold text-gray-900">
+						<h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
 							{displayShortcut()}
 						</h4>
 					</div>

@@ -152,13 +152,13 @@ export function ProfileBar() {
 				className={cn(
 					"ring rounded relative ml-4",
 					{ "ring-green-600": settingsAreDirty },
-					{ "ring-gray-300": !settingsAreDirty },
+					{ "ring-gray-300 dark:ring-outline": !settingsAreDirty },
 				)}
 			>
 				<button
 					className={cn(
 						"p-3 text-lg rounded-sm border-gray-500",
-						{ "bg-gray-300 text-gray-500": !settingsAreDirty },
+						{ "bg-gray-300 text-gray-500 dark:bg-surface-elevated dark:text-content-secondary": !settingsAreDirty },
 						{
 							"bg-green-600 text-white": settingsAreDirty,
 						},

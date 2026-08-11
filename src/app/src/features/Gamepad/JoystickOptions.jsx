@@ -1,5 +1,6 @@
 import { ControlledInput } from "app/components/ControlledInput";
 import { Switch } from "app/components/shadcn/Switch";
+import { getThemeCssColor } from "app/lib/getThemeCssColor";
 import { useGamepadListener } from "app/lib/hooks/useGamepadListener";
 import cloneDeep from "lodash/cloneDeep";
 import get from "lodash/get";

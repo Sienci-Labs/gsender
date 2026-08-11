@@ -189,8 +189,8 @@ export function MachineInfoDisplay({
 			</div>
 			{currentTool >= 0 && (
 				<div className="text-gray-500 flex w-full gap-4">
-					<span>Current tool: </span>
-					<span className="text-black">T{currentTool}</span>
+					<span className="text-gray-500 dark:text-content-primary">Current tool: </span>
+					<span className="text-black dark:text-content-primary">T{currentTool}</span>
 				</div>
 			)}
 			<div className="flex flex-row gap-4 items-center mt-4">

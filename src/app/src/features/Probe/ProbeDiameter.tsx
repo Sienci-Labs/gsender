@@ -402,8 +402,8 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
 						<div className="max-h-[300px] overflow-y-auto">
 							{renderOptions()}
 						</div>
-						<div className="pt-2 border-t">
-							<div className="flex items-center space-x-2">
+						<div className="border-t">
+							<div className="flex items-center space-x-2 p-2">
 								<Tooltip
 									content="Create and use a custom probe diameter"
 									side="bottom"

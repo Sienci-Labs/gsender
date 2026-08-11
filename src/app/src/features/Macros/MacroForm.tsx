@@ -161,39 +161,95 @@ const MacroForm = ({
 								placeholder="Variables"
 								value={null}
 								styles={{
-									option: (provided: any, state: any) => ({
+									option: (
+										provided: Record<string, unknown>,
+										state: { isFocused: boolean },
+									) => ({
 										...provided,
 										fontSize: "0.875rem",
 										whiteSpace: "normal",
 										wordWrap: "break-word",
-										backgroundColor: state.isFocused ? "#f0f0f0" : "white",
-										color: state.isFocused ? "#333" : "#666",
+										backgroundColor: state.isFocused
+											? getThemeCssColor("--surface-hover") ||
+												provided.backgroundColor
+											: getThemeCssColor("--surface-elevated") ||
+												provided.backgroundColor,
+										color:
+											getThemeCssColor("--content-secondary") ||
+											provided.color,
 										padding: "10px",
-										borderBottom: "1px solid #e0e0e0",
+										borderBottom: `1px solid ${getThemeCssColor("--outline-default") || "transparent"}`,
 									}),
-									menu: (provided: any) => ({
+									menu: (provided: Record<string, unknown>) => ({
 										...provided,
 										width: "100%",
+										backgroundColor:
+											getThemeCssColor("--surface-elevated") ||
+											provided.backgroundColor,
+										border: `1px solid ${getThemeCssColor("--outline-default") || "transparent"}`,
 										boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
 										marginTop: 0,
 									}),
-									group: (provided: any) => ({
+									menuList: (provided: Record<string, unknown>) => ({
+										...provided,
+										scrollbarWidth: "thin",
+										scrollbarColor: `${getThemeCssColor("--outline-default") || "#59687B"} ${getThemeCssColor("--surface-sunken") || "transparent"}`,
+									}),
+									group: (provided: Record<string, unknown>) => ({
 										...provided,
 										padding: 0,
 									}),
-									control: (provided: any) => ({
+									control: (provided: Record<string, unknown>) => ({
 										...provided,
 										minWidth: "150px",
 										maxWidth: "100%",
-										border: "1px solid #ccc",
+										backgroundColor:
+											getThemeCssColor("--surface-raised") ||
+											provided.backgroundColor,
+										border: `1px solid ${getThemeCssColor("--outline-default") || provided.borderColor}`,
 										boxShadow: "none",
 									}),
-									groupHeading: (provided: any) => ({
+									placeholder: (provided: Record<string, unknown>) => ({
+										...provided,
+										color:
+											getThemeCssColor("--content-secondary") ||
+											provided.color,
+									}),
+									singleValue: (provided: Record<string, unknown>) => ({
+										...provided,
+										color:
+											getThemeCssColor("--content-primary") || provided.color,
+									}),
+									input: (provided: Record<string, unknown>) => ({
+										...provided,
+										color:
+											getThemeCssColor("--content-primary") || provided.color,
+									}),
+									dropdownIndicator: (
+										provided: Record<string, unknown>,
+									) => ({
+										...provided,
+										color:
+											getThemeCssColor("--content-secondary") ||
+											provided.color,
+									}),
+									indicatorSeparator: (
+										provided: Record<string, unknown>,
+									) => ({
+										...provided,
+										backgroundColor:
+											getThemeCssColor("--outline-default") ||
+											provided.backgroundColor,
+									}),
+									groupHeading: (provided: Record<string, unknown>) => ({
 										...provided,
 										fontWeight: "bold",
-										color: getThemeCssColor("--content-secondary") || "#333",
+										color:
+											getThemeCssColor("--content-secondary") ||
+											provided.color,
 										backgroundColor:
-											getThemeCssColor("--surface-elevated") || "#e0e0e0",
+											getThemeCssColor("--surface-sunken") ||
+											provided.backgroundColor,
 										margin: 0,
 									}),
 								}}

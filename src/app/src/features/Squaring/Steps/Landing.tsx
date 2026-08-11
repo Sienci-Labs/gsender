@@ -13,7 +13,7 @@ const Landing = ({ onComplete }: Props) => {
 	return (
 		<div className="flex flex-col gap-4 xl:gap-0">
 			<div className="space-y-12 text-sm xl:text-base font-normal">
-				<div className="mb-2">
+				<div className="mb-2 dark:text-content-primary">
 					To know how much adjustment is needed, follow the steps below.
 					Prepare:
 					<ul className="list-disc list-inside">
@@ -26,7 +26,7 @@ const Landing = ({ onComplete }: Props) => {
 					</ul>
 				</div>
 
-				<p className="mb-2">
+				<p className="mb-2 dark:text-content-primary">
 					Use the jog buttons to position your CNC near its front, left corner
 					with the pointed tip almost touching the wasteboard, then continue
 					below.

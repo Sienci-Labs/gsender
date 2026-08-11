@@ -122,12 +122,12 @@ export function SecondaryContentPanel({
 
 			{linkItem && (
 				<div className="flex-shrink-0 mt-auto pt-2">
-					<div className="bg-white rounded-lg border border-gray-200 px-3 py-2 shadow-sm">
+					<div className="bg-white dark:bg-surface-raised rounded-lg border border-gray-200 dark:border-gray-600 px-3 py-2 shadow-sm">
 						<div className="flex items-center gap-2">
 							<ExternalLink className="text-blue-500 flex-shrink-0" size={16} />
-							<span className="flex-1 text-sm text-gray-700">
+							<span className="flex-1 text-sm text-gray-700 dark:text-content-primary">
 								{linkItem.title && (
-									<span className="font-semibold text-gray-900">
+									<span className="font-semibold text-gray-900 dark:text-content-primary">
 										{linkItem.title}{" "}
 									</span>
 								)}
@@ -151,7 +151,7 @@ export function SecondaryContentPanel({
 								<Popover>
 									<PopoverTrigger asChild>
 										<button className="flex-shrink-0 p-1.5 rounded-md hover:bg-gray-100 transition-colors">
-											<QrCode className="text-gray-600" size={18} />
+											<QrCode className="text-gray-600 dark:text-content-primary" size={18} />
 										</button>
 									</PopoverTrigger>
 									<PopoverContent
@@ -161,10 +161,10 @@ export function SecondaryContentPanel({
 										align="end"
 									>
 										<div className="flex flex-col items-center gap-3">
-											<div className="text-sm font-semibold text-gray-900">
+											<div className="text-sm font-semibold text-gray-900 dark:text-content-primary">
 												Scan QR Code
 											</div>
-											<div className="bg-white p-2 rounded border border-gray-100">
+											<div className="bg-white dark:bg-surface-raised p-2 rounded border border-gray-100 dark:border-gray-600">
 												<QRCodeComponent
 													value={linkItem.url}
 													size={180}
