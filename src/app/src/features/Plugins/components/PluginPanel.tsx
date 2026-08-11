@@ -1,6 +1,7 @@
 import controller from "app/lib/controller";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
+import { usePluginIframeTheme } from "../hooks/usePluginIframeTheme";
 import type { PluginRecord } from "../types";
 
 type PluginPanelProps = {
@@ -12,6 +13,7 @@ type PluginPanelProps = {
 const PluginPanel = ({ plugin, className = "", title }: PluginPanelProps) => {
 	// Bumped on dev live-reload to force the iframe to re-fetch its content.
 	const [reloadToken, setReloadToken] = useState(0);
+	const iframeRef = useRef<HTMLIFrameElement>(null);
 
 	const iframeSrc = useMemo(() => {
 		const entry = plugin.uiUrl.startsWith("/")
@@ -29,6 +31,8 @@ const PluginPanel = ({ plugin, className = "", title }: PluginPanelProps) => {
 		};
 	}, []);
 
+	usePluginIframeTheme(iframeRef, reloadToken);
+
 	return (
 		<div className={`flex flex-col w-full h-full min-h-0 ${className}`}>
 			{title && (
@@ -37,6 +41,7 @@ const PluginPanel = ({ plugin, className = "", title }: PluginPanelProps) => {
 				</p>
 			)}
 			<iframe
+				ref={iframeRef}
 				key={reloadToken}
 				title={plugin.name}
 				src={iframeSrc}

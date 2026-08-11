@@ -1,3 +1,6 @@
+import { useRef } from "react";
+
+import { usePluginIframeTheme } from "../hooks/usePluginIframeTheme";
 import { usePlugins } from "../hooks/usePlugins";
 import type { PluginRecord } from "../types";
 
@@ -7,6 +10,9 @@ type PluginTabPanelProps = {
 };
 
 export const PluginTabPanel = ({ plugin, isActive }: PluginTabPanelProps) => {
+	const iframeRef = useRef<HTMLIFrameElement>(null);
+	usePluginIframeTheme(iframeRef, isActive);
+
 	if (!isActive) {
 		return null;
 	}
@@ -17,6 +23,7 @@ export const PluginTabPanel = ({ plugin, isActive }: PluginTabPanelProps) => {
 
 	return (
 		<iframe
+			ref={iframeRef}
 			title={plugin.name}
 			src={iframeSrc}
 			className="w-full h-full min-h-[280px] border-0"
