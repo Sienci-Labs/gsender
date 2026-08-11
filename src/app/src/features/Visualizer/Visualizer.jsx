@@ -267,6 +267,19 @@ class Visualizer extends Component {
         }
     };
 
+    // The point the run-progress coloring anchors its grey/orange split at:
+    // the reported machine (work) position, coerced to numbers. The on-screen
+    // cutter is drawn at the same position, so the split tracks the marker.
+    // Returns null when no position is available.
+    _getDisplayedCutterPos(workPos) {
+        if (!workPos) return null;
+        return {
+            x: Number(workPos.x) || 0,
+            y: Number(workPos.y) || 0,
+            z: Number(workPos.z) || 0,
+        };
+    }
+
     constructor(props) {
         super(props);
 
@@ -408,12 +421,28 @@ class Visualizer extends Component {
 
         // Update visualizer's frame index
         if (this.visualizer) {
+            // Keep the "hide processed lines" flag in sync with the live setting on every
+            // update, so processed lines are reliably hidden whenever the option is on —
+            // independent of pubsub / job-state timing.
+            const hideProcessedLines = store.get(
+                'widgets.visualizer.hideProcessedLines',
+                false,
+            );
+            if (this.visualizer.hideProcessedLines !== hideProcessedLines) {
+                this.visualizer.setHideProcessedLines(hideProcessedLines);
+            }
             const frameIndex = this.props.receivedLines;
             this.visualizer.setFrameIndex(frameIndex);
-            // grey lines
+            // run-progress coloring (grey behind the toolhead, orange lead,
+            // yellow buffer). Anchored at the reported machine position so the
+            // grey/orange split sits under the on-screen cutter.
             if (this.props.senderStatus) {
+                const cutterPos = this._getDisplayedCutterPos(
+                    this.props.workPosition,
+                );
                 this.visualizer.greyOutLines(
                     this.props.senderStatus.currentLineRunning,
+                    cutterPos,
                 );
             }
         }
@@ -1072,9 +1101,14 @@ class Visualizer extends Component {
                 this.updateScene({ forceUpdate: true });
             }),
             pubsub.subscribe('job:end', () => {
-                // Reset hidden lines when job finishes
+                // Respect the "hide processed lines" setting when the job finishes: keep
+                // processed lines hidden if it's on, otherwise show them again.
                 if (this.visualizer) {
-                    this.visualizer.setHideProcessedLines(false);
+                    const hideProcessedLines = store.get(
+                        'widgets.visualizer.hideProcessedLines',
+                        false,
+                    );
+                    this.visualizer.setHideProcessedLines(hideProcessedLines);
                     this.updateScene({ forceUpdate: true });
                 }
             }),
