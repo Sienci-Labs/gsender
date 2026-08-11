@@ -104,7 +104,34 @@ const UNSUPPORTED_PATTERNS: { pattern: RegExp; label: string }[] = [
     { pattern: /\bG10\b/i, label: 'G10 (coordinate system data)' },
     { pattern: /\bG7[36]\b/i, label: 'canned cycle (G73/G76)' },
     { pattern: /\bG8[1-9]\b/i, label: 'canned cycle (G81-G89)' },
+    { pattern: /\bG43(?:\.\d+)?(?![\d.])/i, label: 'G43 (tool length offset)' },
 ];
+
+/*
+ * G-words this transformer re-emits itself, and which therefore must not also
+ * survive as trailing text on a rewritten line.
+ *
+ * Deliberately a short list rather than "every G-word". Matching all of them
+ * meant G43 lost its G and left a bare `H3` standing on its own line, which
+ * grblHAL rejects mid-job; G64 would likewise leave a stray `P0.01`. Anything
+ * this transformer does not replace is the program's business and has to reach
+ * the controller intact.
+ *
+ * G0-G3 covers G0/G00/G1/G01/G2/G02/G3/G03 without touching G20/G21/G28/G30.
+ */
+const REPLACED_GWORDS = /\bG0*[0-3]\b|\bG(?:90|91|20|21)(?![\d.])/gi;
+
+/**
+ * Words on a motion line that are neither motion nor coordinates, and so have
+ * to be carried across to the rewritten output.
+ */
+const displacedFrom = (code: string): string =>
+    code
+        .replace(REPLACED_GWORDS, ' ')
+        .replace(/\b[XYZIJKRF](?:-?\d*\.?\d+)/gi, ' ')
+        .replace(/\bN\d+\b/gi, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
 
 /*
  * Position barriers.
@@ -341,8 +368,18 @@ export const transformGcode = (
         '',
     ];
 
-    let outsideBoundsWarned = false;
+    // How far the toolpath reached beyond the probed area, and the largest
+    // offset actually applied out there. Reported rather than a bare "extends
+    // outside": edgeInset defaults to 2mm so this fires on every ordinary job,
+    // and a warning that always fires and says nothing specific gets ignored.
+    let outsideDistanceMm = 0;
+    let outsideMaxOffsetMm = 0;
     const displacedWords: number[] = [];
+    // Moves emitted with no compensation because the tool position was still
+    // unknown after a barrier. Counted and reported: the transformer knowingly
+    // hands back raw depths here, and silence about it is how an operator finds
+    // out by cutting.
+    let uncompensatedMoves = 0;
 
     // Position trust. Starts true (the interpreter begins at a known origin) and
     // is revoked by any barrier until the program re-establishes every axis.
@@ -350,14 +387,14 @@ export const transformGcode = (
     const reestablished = new Set<string>();
 
     const emitPoint = (rapid: boolean, p: Vec3, feed: string | null): void => {
-        if (options.warnOutsideBounds && !outsideBoundsWarned && !isWithinBounds(p.x, p.y, map)) {
-            warnings.push(
-                'G-code extends outside the probed area. Z offsets there are ' +
-                    'extrapolated from the nearest edge points.',
-            );
-            outsideBoundsWarned = true;
+        const offset = getZOffset(p.x, p.y, map);
+        if (options.warnOutsideBounds && !isWithinBounds(p.x, p.y, map)) {
+            const dx = Math.max(map.bounds.minX - p.x, p.x - map.bounds.maxX, 0);
+            const dy = Math.max(map.bounds.minY - p.y, p.y - map.bounds.maxY, 0);
+            outsideDistanceMm = Math.max(outsideDistanceMm, Math.hypot(dx, dy));
+            outsideMaxOffsetMm = Math.max(outsideMaxOffsetMm, Math.abs(offset));
         }
-        const z = p.z + getZOffset(p.x, p.y, map);
+        const z = p.z + offset;
         out.push(
             `${rapid ? 'G0' : 'G1'} X${fmt(p.x)} Y${fmt(p.y)} Z${fmt(z)}${feed ? ` ${feed}` : ''}`,
         );
@@ -374,11 +411,22 @@ export const transformGcode = (
         to: Vec3,
         axes: Set<string>,
         feed: string | null,
+        /**
+         * Set on the line that completes the axis set. By then `to` is fully
+         * determined -- the axes this line commands are absolute, the ones it
+         * omits were commanded earlier in the same re-establishment -- so the
+         * offset at (to.x, to.y) is knowable and this move must carry it. It is
+         * typically the plunge to depth, and leaving it raw cuts the whole map
+         * offset too deep for the first pass of the new tool.
+         */
+        compensate: boolean = false,
     ): void => {
         const parts: string[] = [rapid ? 'G0' : 'G1'];
         if (axes.has('X')) parts.push(`X${fmt(to.x)}`);
         if (axes.has('Y')) parts.push(`Y${fmt(to.y)}`);
-        if (axes.has('Z')) parts.push(`Z${fmt(to.z)}`);
+        if (axes.has('Z')) {
+            parts.push(`Z${fmt(compensate ? to.z + getZOffset(to.x, to.y, map) : to.z)}`);
+        }
         if (parts.length === 1) {
             return;
         }
@@ -439,17 +487,37 @@ export const transformGcode = (
             }
 
             const feedMatch = code.match(/\bF(-?\d*\.?\d+)\b/i);
+            // Computed here as well as on the trusted path. Omitting it deleted
+            // M/S/T words outright on any motion line following a barrier --
+            // silently, because nothing recorded that it had happened.
+            const untrustedTrailing = displacedFrom(code);
+            if (untrustedTrailing) {
+                displacedWords.push(i + 1);
+            }
+
+            // Decided before emitting, not after: this line's own motion is
+            // compensable exactly when it is the one that completes the set.
+            const completesSet =
+                reestablished.has('X') && reestablished.has('Y') && reestablished.has('Z');
+
             if (comment) out.push(comment.trim());
             for (const motion of motions) {
+                if (!completesSet) {
+                    uncompensatedMoves++;
+                }
                 emitUncompensated(
                     motion.rapid,
                     motion.to,
                     axes,
                     feedMatch ? `F${feedMatch[1]}` : null,
+                    completesSet,
                 );
             }
+            if (untrustedTrailing) {
+                out.push(untrustedTrailing);
+            }
 
-            if (reestablished.has('X') && reestablished.has('Y') && reestablished.has('Z')) {
+            if (completesSet) {
                 trusted = true;
             }
             continue;
@@ -462,12 +530,7 @@ export const transformGcode = (
         // Words that are neither motion nor coordinates still have to reach the
         // controller. Emitting them after the move preserves the common
         // end-of-block cases (M5/M9/M30); flag it so the operator can check.
-        const trailing = code
-            .replace(/\bG\d+(?:\.\d+)?/gi, ' ')
-            .replace(/\b[XYZIJKRF](?:-?\d*\.?\d+)/gi, ' ')
-            .replace(/\bN\d+\b/gi, ' ')
-            .replace(/\s+/g, ' ')
-            .trim();
+        const trailing = displacedFrom(code);
         if (trailing) {
             displacedWords.push(i + 1);
         }
@@ -494,6 +557,24 @@ export const transformGcode = (
         if (trailing) {
             out.push(trailing);
         }
+    }
+
+    if (outsideDistanceMm > 0) {
+        warnings.push(
+            `G-code reaches up to ${outsideDistanceMm.toFixed(1)}mm outside the ` +
+                'probed area. There is no measurement there, so the nearest ' +
+                'probed edge height is held instead of being projected onward; ' +
+                `the largest offset applied outside was ${outsideMaxOffsetMm.toFixed(3)}mm.`,
+        );
+    }
+
+    if (uncompensatedMoves > 0) {
+        warnings.push(
+            `${uncompensatedMoves} move${uncompensatedMoves === 1 ? ' was' : 's were'} ` +
+                'emitted uncompensated while the tool position was unknown after a ' +
+                'G28/G30/G53. Height map compensation resumes once the program has ' +
+                'commanded X, Y and Z again.',
+        );
     }
 
     if (displacedWords.length > 0) {

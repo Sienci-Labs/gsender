@@ -7,7 +7,7 @@ import { HeightMapData, HeightMapPoint } from '../definitions';
 
 /**
  * Find the four surrounding points for a given XY coordinate
- * For out-of-bounds coordinates, clamps to the nearest edge points for extrapolation
+ * For out-of-bounds coordinates, selects the nearest edge cell
  */
 export const findSurroundingPoints = (
     x: number,
@@ -96,17 +96,29 @@ export const bilinearInterpolate = (
         return p00.z;
     }
 
-    // Calculate interpolation weights using actual (not clamped) coordinates
-    // This allows extrapolation beyond the grid - weights can be < 0 or > 1
+    // Weights are clamped to [0,1], which holds the nearest measured edge value
+    // outside the grid instead of projecting the last cell's gradient onward.
+    //
+    // Unclamped, the gradient runs without limit: on a 0.02mm/mm tilt that is
+    // 1.40mm of offset 50mm outside the map and 4.40mm at 200mm -- offsets far
+    // larger than anything the probe actually measured, applied to Z on the
+    // strength of two edge points. Outside the probed area there is no data;
+    // the honest assumption is that the surface continues at the height last
+    // seen, which also bounds the result by the map's own range and keeps it
+    // continuous with the interior.
+    //
+    // This is not a rare path. edgeInset defaults to 2mm so probe points stay
+    // clear of the edge of the stock, so a normal job cuts outside the map all
+    // the way round.
     const xRange = p10.x - p00.x;
     const yRange = p01.y - p00.y;
 
-    // Handle edge cases
-    const xWeight = xRange > 0 ? (x - p00.x) / xRange : 0;
-    const yWeight = yRange > 0 ? (y - p00.y) / yRange : 0;
+    const clamp01 = (v: number): number => Math.min(1, Math.max(0, v));
 
-    // Bilinear interpolation/extrapolation formula
-    // When weights are outside [0,1], this extrapolates based on the gradient
+    // Handle edge cases
+    const xWeight = xRange > 0 ? clamp01((x - p00.x) / xRange) : 0;
+    const yWeight = yRange > 0 ? clamp01((y - p00.y) / yRange) : 0;
+
     const z =
         p00.z * (1 - xWeight) * (1 - yWeight) +
         p10.z * xWeight * (1 - yWeight) +
