@@ -9,8 +9,5 @@
 //
 // Requires the plugin to install the peers: `@sienci/gviewer` and `three`.
 
-// Bundles the viewcube styles used by the 3D viewer's camera overlay.
-import "@sienci/gviewer/viewer/viewcube.css";
-
 export * from "@sienci/gviewer/react";
 export * from "@sienci/gviewer/viewer";

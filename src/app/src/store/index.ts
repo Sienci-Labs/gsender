@@ -256,10 +256,7 @@ const backupPreviousState = (data: any): void => {
 		}
 		backupLoc.length !== 0 ? backupLoc : app.getPath("userData");
 
-		const backupPath = path.join(
-			directory,
-			`preferences-backup-${now}.json`,
-		);
+		const backupPath = path.join(directory, `preferences-backup-${now}.json`);
 
 		fs.writeFileSync(backupPath, value);
 	}

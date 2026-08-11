@@ -45,7 +45,9 @@ const getMachineMovementLimits = (pullOff: number): number[] => {
 
 // Direction (in machine space) from the home corner toward the opposite
 // corner, per axis. Mirrors src/server/lib/homing.js's getAxisMaximumLocation.
-export const getAxisMaximumLocation = (homingMask: string): [number, number] => {
+export const getAxisMaximumLocation = (
+	homingMask: string,
+): [number, number] => {
 	const homingLocation = getHomingLocation(homingMask);
 	if (homingLocation === BACK_RIGHT) {
 		return [NEGATIVE_DIRECTION, NEGATIVE_DIRECTION];

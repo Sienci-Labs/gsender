@@ -1,3 +1,4 @@
+import { usePostHog } from "@posthog/react";
 import { ActiveStateButton } from "app/components/ActiveStateButton";
 import {
 	GRBL,
@@ -47,13 +48,18 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
 		controllerState?.status?.activeState,
 	]);
 
+	const posthog = usePostHog();
+
 	return (
 		<div className="flex flex-col justify-around items-center h-full">
 			<div className="flex flex-row justify-center w-full gap-2">
 				<ActiveStateButton
 					text="Mist"
 					icon={<FaShower />}
-					onClick={startMist}
+					onClick={() => {
+						startMist();
+						posthog?.capture("coolant_mist_started");
+					}}
 					className="h-16"
 					size="md"
 					active={isConnected && mistActive}
@@ -63,7 +69,10 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
 				<ActiveStateButton
 					text="Flood"
 					icon={<FaWater />}
-					onClick={startFlood}
+					onClick={() => {
+						startFlood();
+						posthog?.capture("coolant_flood_started");
+					}}
 					className="h-16"
 					size="md"
 					active={isConnected && floodActive}
@@ -73,7 +82,10 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
 				<ActiveStateButton
 					text="Off"
 					icon={<FaBan />}
-					onClick={stopCoolant}
+					onClick={() => {
+						stopCoolant();
+						posthog?.capture("coolant_off");
+					}}
 					className="h-16"
 					size="md"
 					disabled={!canClick()}

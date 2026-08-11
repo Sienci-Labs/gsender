@@ -1,3 +1,4 @@
+import { usePostHog } from "@posthog/react";
 import { Button } from "app/components/Button";
 import { ControlledInput } from "app/components/ControlledInput";
 import { Button as ShadButton } from "app/components/shadcn/Button";
@@ -42,6 +43,7 @@ const StartFromLine = ({
 	lastLine,
 	atcValidator,
 }: StartFromLineProps) => {
+	const posthog = usePostHog();
 	const zMax = useTypedSelector((state) => state.file.bbox.max.z);
 	const { units, safeRetractHeight } = useWorkspaceState();
 	const { delay = 0 } = useWidgetState("spindle");
@@ -100,6 +102,14 @@ const StartFromLine = ({
 		);
 		toast.info("Running Start From Specific Line Command", {
 			position: "bottom-right",
+		});
+
+		posthog?.capture("start_from_line", {
+			line: startFromLine,
+			safe_height: safeHeight,
+			z_max: zMax,
+			newSafeHeight,
+			delay,
 		});
 	};
 

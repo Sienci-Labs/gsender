@@ -3,6 +3,7 @@ import type {
 	BasicPosition,
 	GRBL_ACTIVE_STATES_T,
 } from "app/definitions/general";
+import { isToolProbed } from "app/features/ATC/utils/ATCFunctions.ts";
 import { SDCardProgress } from "app/features/JobControl/SDCardProgress.tsx";
 import type { SenderStatus } from "app/lib/definitions/sender_feeder";
 import type { WORKFLOW_STATES_T } from "app/store/definitions";
@@ -152,7 +153,7 @@ const JobControl: React.FC<JobControlProps> = ({
 			const zOffset = get(offsets, "toolOffsets.z", 0);
 
 			// Tool selected with Offsets
-			if (zOffset < 0) {
+			if (isToolProbed(zOffset)) {
 				return [
 					true,
 					{

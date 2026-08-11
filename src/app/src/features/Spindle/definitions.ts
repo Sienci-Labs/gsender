@@ -5,6 +5,11 @@ import type { SPINDLE_LASER } from "../../constants";
 export type SPINDLE_LASER_T =
 	(typeof SPINDLE_LASER)[keyof typeof SPINDLE_LASER];
 
+export type SendM5Type = {
+	type?: "spindle" | "laser";
+	ignorePosthog?: boolean;
+};
+
 // Interfaces
 
 export interface SpindleState {

@@ -198,6 +198,8 @@ const ButtonControlGroup = () => {
 		(window as any).ipcRenderer?.send("load-recent-file", {
 			filePath: path,
 		});
+
+		posthog?.capture("file_reloaded", { file_name: name });
 	}, 300);
 
 	const handleCloseFile = debounce(() => {

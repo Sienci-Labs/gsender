@@ -1,5 +1,6 @@
 import { GRBL } from "app/constants";
 import WidgetConfig from "app/features/WidgetConfig/WidgetConfig";
+import { toast } from "app/lib/toaster";
 import store from "app/store";
 import controller from "./controller";
 import { isIPv4 } from "./utils";
@@ -12,6 +13,7 @@ export const connectToLastDevice = (callback: () => any) => {
 	const defaultFirmware = store.get("workspace.defaultFirmware", GRBL);
 
 	const isNetwork = isIPv4(port); // Do we look like an IP address?
+	const ethernetPort = connectionConfig.get("ethernetPort", 23);
 
 	controller.openPort(
 		port,
@@ -21,9 +23,13 @@ export const connectToLastDevice = (callback: () => any) => {
 			rtscts: false,
 			network: isNetwork,
 			defaultFirmware,
+			ethernetPort,
 		},
 		(err: any) => {
 			if (err) {
+				toast.error(`Unable to reconnect to ${port} - ${err.message || err}`, {
+					position: "bottom-right",
+				});
 				return;
 			}
 			callback && callback();

@@ -1,3 +1,4 @@
+import { usePostHog } from "@posthog/react";
 import { Button } from "app/components/Button";
 import {
 	AlertDialog,
@@ -41,6 +42,7 @@ export function AxisRow({
 	disableGotoZero,
 }: AxisRowProps) {
 	const { shouldWarnZero } = useWorkspaceState();
+	const posthog = usePostHog();
 
 	return (
 		<div className="border border-gray-200 dark:border-gray-700 rounded-md w-full flex flex-row items-stretch justify-between flex-1 max-xl:scale-95">
@@ -49,8 +51,13 @@ export function AxisRow({
 					onClick={() => {
 						if (homingMode) {
 							homeAxis(axis);
+							posthog?.capture("home_axis", { axis });
 						} else {
 							zeroWCS(axis, 0);
+							posthog?.capture("zero_axis", {
+								axis,
+								with_warning: false,
+							});
 						}
 					}}
 					size="responsive"
@@ -93,7 +100,15 @@ export function AxisRow({
 						</AlertDialogHeader>
 						<AlertDialogFooter>
 							<AlertDialogCancel>Cancel</AlertDialogCancel>
-							<AlertDialogAction onClick={() => zeroWCS(label, 0)}>
+							<AlertDialogAction
+								onClick={() => {
+									zeroWCS(label, 0);
+									posthog?.capture("zero_axis", {
+										axis: label,
+										with_warning: true,
+									});
+								}}
+							>
 								Continue
 							</AlertDialogAction>
 						</AlertDialogFooter>
@@ -117,7 +132,10 @@ export function AxisRow({
 
 			<Button
 				disabled={disabled || disableGotoZero}
-				onClick={() => gotoZero(axis)}
+				onClick={() => {
+					gotoZero(axis);
+					posthog?.capture("goto_zero_axis", { axis });
+				}}
 				variant="alt"
 				size="responsive"
 				tooltip={{

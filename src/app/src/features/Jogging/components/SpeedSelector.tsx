@@ -1,5 +1,7 @@
 /** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
 /** biome-ignore-all lint/a11y/useButtonType: <> */
+
+import { usePostHog } from "@posthog/react";
 import { IMPERIAL_UNITS, JOGGING_CATEGORY, METRIC_UNITS } from "app/constants";
 import type { JogValueObject } from "app/features/Jogging";
 import type { JoggingSpeedOptions } from "app/features/Jogging/utils/Jogging";
@@ -49,6 +51,7 @@ interface SpeedSelectorProps {
 }
 
 export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
+	const posthog = usePostHog();
 	const [selectedSpeed, setSelectedSpeed] =
 		useState<JoggingSpeedOptions>("Normal");
 	const selectedSpeedRef = useRef<JoggingSpeedOptions>(selectedSpeed);
@@ -105,6 +108,14 @@ export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
 				IMPERIAL_UNITS,
 			);
 		}
+
+		posthog?.capture("jog_preset_selected", {
+			preset: key,
+			units,
+			xyStep: newSpeeds.xyStep,
+			zStep: newSpeeds.zStep,
+			feedrate: newSpeeds.feedrate,
+		});
 
 		handleClickRef.current(newSpeeds, speedKey);
 		previousUnitsRef.current = units;

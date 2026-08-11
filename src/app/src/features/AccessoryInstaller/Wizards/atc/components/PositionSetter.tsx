@@ -1,3 +1,4 @@
+import { MapPin } from "lucide-react";
 import { type ReactNode, useEffect, useState } from "react";
 
 interface PositionSetterProps {
@@ -9,6 +10,8 @@ interface PositionSetterProps {
 	label?: string;
 	units?: string;
 	actionButton?: ReactNode;
+	showGoTo?: boolean;
+	onGoTo?: () => void;
 }
 
 export function PositionSetter({
@@ -20,6 +23,8 @@ export function PositionSetter({
 	label = "Position",
 	units = "mm",
 	actionButton,
+	showGoTo = false,
+	onGoTo,
 }: PositionSetterProps) {
 	const [x, setX] = useState(initialX);
 	const [y, setY] = useState(initialY);
@@ -99,7 +104,20 @@ export function PositionSetter({
 				</div>
 			</div>
 
-			{actionButton && <div>{actionButton}</div>}
+			{(actionButton || (showGoTo && onGoTo)) && (
+				<div className="flex items-center gap-3">
+					{actionButton && <div className="flex-1 min-w-0">{actionButton}</div>}
+					{showGoTo && onGoTo && (
+						<button
+							onClick={onGoTo}
+							className="shrink-0 flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors bg-gray-200 text-gray-900 hover:bg-gray-300"
+						>
+							<MapPin size={18} />
+							Go To
+						</button>
+					)}
+				</div>
+			)}
 		</div>
 	);
 }

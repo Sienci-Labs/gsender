@@ -14,6 +14,7 @@ import {
 import debounce from "lodash/debounce";
 import findIndex from "lodash/findIndex";
 import get from "lodash/get";
+import posthog from "posthog-js";
 import pubsub from "pubsub-js";
 import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -34,7 +35,7 @@ import LaserControls from "./components/LaserControls";
 import ModalToggle from "./components/ModalToggle";
 import SpindleControls from "./components/SpindleControls";
 import SpindleSelector from "./components/SpindleSelector";
-import type { SPINDLE_LASER_T } from "./definitions";
+import type { SendM5Type, SPINDLE_LASER_T } from "./definitions";
 
 interface SpindleState {
 	minimized: boolean;
@@ -423,8 +424,7 @@ const SpindleWidget = () => {
 		});
 		const { minPower, maxPower } = laser;
 
-        const SLBLaserExists =
-            controllerType === GRBLHAL
+		const SLBLaserExists = controllerType === GRBLHAL;
 
 		// save current spindle values if laser spindle doesnt exist
 		if (!SLBLaserExists) {
@@ -483,19 +483,27 @@ const SpindleWidget = () => {
 				enableLaserMode();
 			}
 			pubsub.publish("spindle:mode", newMode);
+
+			posthog?.capture("spindle_mode_changed", { mode: newMode });
 		},
 		sendM3: () => {
 			setIsSpindleOn(true);
 			controller.command("gcode", `M3 S${stateRef.current.spindleSpeed}`);
+
+			posthog?.capture("spindle_forward");
 		},
 		sendM4: () => {
 			setIsSpindleOn(true);
 			controller.command("gcode", `M4 S${stateRef.current.spindleSpeed}`);
+
+			posthog?.capture("spindle_reverse");
 		},
-		sendM5: () => {
+		sendM5: ({ type = "spindle", ignorePosthog = false }: SendM5Type = {}) => {
 			setIsLaserOn(false);
 			setIsSpindleOn(false);
 			controller.command("gcode", "M5 S0");
+
+			if (!ignorePosthog) posthog?.capture(`${type}_stopped`);
 		},
 		sendLaserM3: () => {
 			const laserMaxx =
@@ -506,6 +514,8 @@ const SpindleWidget = () => {
 
 			setIsLaserOn(true);
 			controller.command("gcode", `G1F1 M3 S${laserPower}`);
+
+			posthog?.capture("laser_on");
 		},
 		handleSpindleSpeedChange: (value: number) => {
 			if (isSpindleOn) {
@@ -538,8 +548,10 @@ const SpindleWidget = () => {
 				controller.type === GRBLHAL ? laserMax : state.laser.maxPower;
 			controller.command("lasertest:on", power, duration, maxPower);
 			setTimeout(() => {
-				actions.sendM5();
+				actions.sendM5({ type: "laser", ignorePosthog: true }); // ignore posthog capture, adds unecessary extra laser_stopped event
 			}, duration * 1000);
+
+			posthog?.capture("laser_test_run", { power, duration });
 		},
 		runShortcutLaserTest: () => {
 			const { power, duration } = stateRef.current.laser;
@@ -550,7 +562,7 @@ const SpindleWidget = () => {
 
 			controller.command("lasertest:on", power, duration, maxPower);
 			setTimeout(() => {
-				actions.sendM5();
+				actions.sendM5({ type: "laser" });
 			}, duration * 1000);
 		},
 		handleHALSpindleSelect: (selectedSpindle: {
@@ -567,6 +579,10 @@ const SpindleWidget = () => {
 				`M104 Q${selectedSpindle.value}`,
 				`${spindleCommand}`,
 			]);
+
+			posthog?.capture("spindle_selected", {
+				spindle: selectedSpindle.label,
+			});
 		},
 		getSpindleOffsetCode(preferredUnits: UNITS_GCODE | UNITS_EN): string[] {
 			const laser = config.get("laser", {
@@ -678,7 +694,7 @@ const SpindleWidget = () => {
 				if (!canClickShortcut()) {
 					return;
 				}
-				actions.sendM5();
+				actions.sendM5({ type: "laser" });
 			}),
 		];
 	};

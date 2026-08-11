@@ -737,7 +737,6 @@ class GrblHalController {
 			}
 
 			this.timePaused = new Date().getTime();
-			this.sender.pauseCountdown();
 		});
 		this.workflow.on("resume", (...args) => {
 			this.emit("workflow:state", this.workflow.state);
@@ -1323,6 +1322,22 @@ class GrblHalController {
 					"status.activeState",
 					"",
 				);
+				// only pause countdown once machine is idle
+				if (
+					this.workflow.isPaused() &&
+					(currentActiveState === GRBL_HAL_ACTIVE_STATE_IDLE ||
+						currentActiveState === GRBL_HAL_ACTIVE_STATE_HOLD) &&
+					this.sender.isCountdownRunning()
+				) {
+					this.sender.pauseCountdown();
+				} else if (
+					// restart countdown if machine is still moving
+					currentActiveState === GRBL_HAL_ACTIVE_STATE_RUN &&
+					!this.sender.isCountdownRunning()
+				) {
+					this.sender.resumeCountdown();
+				}
+
 				if (
 					this.workflow.isPaused() &&
 					currentActiveState === GRBL_HAL_ACTIVE_STATE_HOLD &&
@@ -1535,18 +1550,18 @@ class GrblHalController {
 			c: posc,
 		} = this.runner.getWorkPosition();
 
-        // Positions are raw firmware values - convert to mm if firmware is
-        // configured to report in inches ($13=1), to keep macro variables
-        // consistent with mm regardless of firmware reporting units.
-        const { $13 } = this.settings.settings;
-        const isReportingInches = $13 === '1';
-        const toMachineUnits = (val) => {
-            const num = Number(val) || 0;
-            return (isReportingInches ? num * 25.4 : num).toFixed(3);
-        };
+		// Positions are raw firmware values - convert to mm if firmware is
+		// configured to report in inches ($13=1), to keep macro variables
+		// consistent with mm regardless of firmware reporting units.
+		const { $13 } = this.settings.settings;
+		const isReportingInches = $13 === "1";
+		const toMachineUnits = (val) => {
+			const num = Number(val) || 0;
+			return (isReportingInches ? num * 25.4 : num).toFixed(3);
+		};
 
-        // Modal group
-        const modal = this.runner.getModalGroup();
+		// Modal group
+		const modal = this.runner.getModalGroup();
 
 		// Tool
 		const tool = this.runner.getTool();
@@ -1569,21 +1584,21 @@ class GrblHalController {
 			zmin: Number(context.zmin) || 0,
 			zmax: Number(context.zmax) || 0,
 
-            // Machine position
-            mposx: toMachineUnits(mposx),
-            mposy: toMachineUnits(mposy),
-            mposz: toMachineUnits(mposz),
-            mposa: toMachineUnits(mposa),
-            mposb: toMachineUnits(mposb),
-            mposc: toMachineUnits(mposc),
+			// Machine position
+			mposx: toMachineUnits(mposx),
+			mposy: toMachineUnits(mposy),
+			mposz: toMachineUnits(mposz),
+			mposa: toMachineUnits(mposa),
+			mposb: toMachineUnits(mposb),
+			mposc: toMachineUnits(mposc),
 
-            // Work position
-            posx: toMachineUnits(posx),
-            posy: toMachineUnits(posy),
-            posz: toMachineUnits(posz),
-            posa: toMachineUnits(posa),
-            posb: toMachineUnits(posb),
-            posc: toMachineUnits(posc),
+			// Work position
+			posx: toMachineUnits(posx),
+			posy: toMachineUnits(posy),
+			posz: toMachineUnits(posz),
+			posa: toMachineUnits(posa),
+			posb: toMachineUnits(posb),
+			posc: toMachineUnits(posc),
 
 			// Modal group
 			modal: {
@@ -1982,6 +1997,7 @@ class GrblHalController {
 					});
 
 					const modal = toolpath.getModal();
+					const hasSeenM6 = toolpath.hasSeenM6();
 
 					const position = toolpath.getPosition();
 
@@ -2022,7 +2038,9 @@ class GrblHalController {
 					modalGCode.push(this.event.getEventCode(PROGRAM_START));
 					modalGCode.push(`G0 G90 G21 Z${zMax + safeHeight}`);
 					// ATCI - add M6 before spindles turned on to get correct tool to spin up
-					if (atci && modal.tool !== 0) {
+					// Only insert if an M6 was actually parsed - a bare T word with no M6
+					// (some CAM posts never emit M6) should not trigger a tool change here
+					if (atci && modal.tool !== 0 && hasSeenM6) {
 						if (this.toolChangeContext.mappings) {
 							const remap = _.get(
 								this.toolChangeContext.mappings,

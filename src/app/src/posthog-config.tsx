@@ -1,5 +1,6 @@
 import { PostHogErrorBoundary, PostHogProvider } from "@posthog/react";
 import posthog from "posthog-js";
+import { version } from "../package.json";
 
 const isInDevMode = import.meta.env.MODE === "development";
 const posthogToken = import.meta.env.VITE_PUBLIC_POSTHOG_PROJECT_TOKEN;
@@ -9,6 +10,10 @@ if (!isInDevMode && posthogToken && posthogHost) {
 	posthog.init(posthogToken, {
 		api_host: posthogHost,
 		person_profiles: "identified_only",
+	});
+
+	posthog.register({
+		app_version: version,
 	});
 } else {
 	console.warn(
