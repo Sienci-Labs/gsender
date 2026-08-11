@@ -1,11 +1,32 @@
 @import "tailwindcss";
 
+/* Match gSender: dark: utilities follow html.dark, not OS prefers-color-scheme. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-	color-scheme: light dark;
+	color-scheme: light;
+}
+
+html.dark {
+	color-scheme: dark;
+}
+
+html,
+body,
+#root {
+	height: 100%;
 }
 
 body {
 	margin: 0;
-	padding: 1rem 1.5rem 2rem;
+	padding: 1rem 1.5rem;
 	font-family: system-ui, sans-serif;
+	box-sizing: border-box;
+	background: #ffffff;
+	color: #111827;
+}
+
+html.dark body {
+	background: #030712;
+	color: #f3f4f6;
 }
