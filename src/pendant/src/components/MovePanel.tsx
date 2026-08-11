@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useLongPress } from "use-long-press";
 import { clsx } from "clsx";
 import get from "lodash/get";
 import {
@@ -142,54 +143,82 @@ function HoldCorner({
 	const rafRef = useRef<number | null>(null);
 	const startRef = useRef(0);
 	const settleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	// use-long-press invokes callbacks from closures captured at hook-call time,
+	// so latest disabled/settling need a ref rather than the stale render values.
+	const blockedRef = useRef(disabled || settling);
+	blockedRef.current = disabled || settling;
 
-	useEffect(
-		() => () => {
-			if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
-			if (settleTimeoutRef.current) clearTimeout(settleTimeoutRef.current);
-		},
-		[],
-	);
-
-	const cancelHold = useCallback(() => {
+	const clearRaf = useCallback(() => {
 		if (rafRef.current !== null) {
 			cancelAnimationFrame(rafRef.current);
 			rafRef.current = null;
 		}
-		setHolding(false);
-		setProgress(0);
 	}, []);
 
-	const startHold = useCallback(
-		(e: React.PointerEvent) => {
-			e.preventDefault();
-			if (disabled || settling) return;
-			setHolding(true);
-			startRef.current = performance.now();
-
-			const step = (now: number) => {
-				const elapsed = now - startRef.current;
-				const pct = Math.min(100, (elapsed / HOLD_MS) * 100);
-				setProgress(pct);
-				if (pct >= 100) {
-					setHolding(false);
-					setConfirmed(true);
-					setSettling(true);
-					onConfirm(corner.id);
-					if (navigator.vibrate) navigator.vibrate(12);
-					settleTimeoutRef.current = setTimeout(() => {
-						setConfirmed(false);
-						setSettling(false);
-						setProgress(0);
-					}, SETTLE_MS);
-				} else {
-					rafRef.current = requestAnimationFrame(step);
-				}
-			};
-			rafRef.current = requestAnimationFrame(step);
+	useEffect(
+		() => () => {
+			clearRaf();
+			if (settleTimeoutRef.current) clearTimeout(settleTimeoutRef.current);
 		},
-		[corner.id, disabled, onConfirm, settling],
+		[clearRaf],
 	);
+
+	const startProgressLoop = useCallback(() => {
+		const step = (now: number) => {
+			const elapsed = now - startRef.current;
+			const pct = Math.min(100, (elapsed / HOLD_MS) * 100);
+			setProgress(pct);
+			if (pct < 100) {
+				rafRef.current = requestAnimationFrame(step);
+			}
+		};
+		rafRef.current = requestAnimationFrame(step);
+	}, []);
+
+	const longPressHandlers = useLongPress(
+		() => {
+			if (blockedRef.current) return;
+			clearRaf();
+			setProgress(100);
+			setHolding(false);
+			setConfirmed(true);
+			setSettling(true);
+			onConfirm(corner.id);
+			if (navigator.vibrate) navigator.vibrate(12);
+			settleTimeoutRef.current = setTimeout(() => {
+				setConfirmed(false);
+				setSettling(false);
+				setProgress(0);
+			}, SETTLE_MS);
+		},
+		{
+			threshold: HOLD_MS,
+			cancelOnMovement: true,
+			filterEvents: (event) => {
+				if (blockedRef.current) return false;
+				if ("button" in event && typeof event.button === "number") {
+					return event.button === 0;
+				}
+				return true;
+			},
+			onStart: () => {
+				if (blockedRef.current) return;
+				startRef.current = performance.now();
+				setProgress(0);
+				setHolding(true);
+				startProgressLoop();
+			},
+			onCancel: () => {
+				clearRaf();
+				setHolding(false);
+				setProgress(0);
+			},
+			onFinish: () => {
+				clearRaf();
+				setHolding(false);
+			},
+		},
+	)();
 
 	return (
 		<button
@@ -206,10 +235,7 @@ function HoldCorner({
 			)}
 			style={{ width: corner.size, height: corner.size }}
 			disabled={disabled || settling}
-			onPointerDown={startHold}
-			onPointerUp={cancelHold}
-			onPointerLeave={cancelHold}
-			onPointerCancel={cancelHold}
+			{...longPressHandlers}
 			onContextMenu={(e) => e.preventDefault()}
 		>
 			{(holding || confirmed) && (
