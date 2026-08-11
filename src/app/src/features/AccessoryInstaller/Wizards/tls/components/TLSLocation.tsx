@@ -1,14 +1,15 @@
-import { StepActionButton } from "app/components/Wizard/StepActionButton.tsx";
-import type { StepProps } from "app/components/Wizard/types";
-import { IMPERIAL_UNITS } from "app/constants";
-import { PositionSetter } from "app/features/AccessoryInstaller/Wizards/atc/components/PositionSetter.tsx";
-import { useWorkspaceState } from "app/hooks/useWorkspaceState";
-import { in2mm, mapPositionToUnits } from "app/lib/units.ts";
-import store from "app/store";
-import type { RootState } from "app/store/redux";
-import pubsub from "pubsub-js";
-import { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { StepProps } from 'app/features/AccessoryInstaller/types';
+import { StepActionButton } from 'app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx';
+import { PositionSetter } from 'app/features/AccessoryInstaller/Wizards/atc/components/PositionSetter.tsx';
+import { useSelector } from 'react-redux';
+import { RootState } from 'app/store/redux';
+import { useEffect, useRef, useState } from 'react';
+import store from 'app/store';
+import controller from 'app/lib/controller.ts';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { mapPositionToUnits, in2mm } from 'app/lib/units.ts';
+import { IMPERIAL_UNITS } from 'app/constants';
+import pubsub from 'pubsub-js';
 
 type Position = { x?: number; y?: number; z?: number };
 
@@ -53,20 +54,25 @@ export function TLSLocation({ onComplete, onUncomplete }: StepProps) {
 
 	const [position, setPosition] = useState({ x: "0", y: "0", z: "0" });
 
-	const setTLSLocation = () => {
-		const toMM = (val: string) =>
-			units === IMPERIAL_UNITS ? in2mm(Number(val)) : Number(val);
-		store.set("workspace.toolChangePosition", {
-			x: toMM(position.x),
-			y: toMM(position.y),
-			z: toMM(position.z),
-		});
-		pubsub.publish("repopulate");
-		setSuccess("TLS location set.");
-		setIsComplete(true);
-		lastSetMposRef.current = mpos;
-		onComplete();
-	};
+    const setTLSLocation = () => {
+        const toMM = (val: string) =>
+            units === IMPERIAL_UNITS ? in2mm(Number(val)) : Number(val);
+        store.set('workspace.toolChangePosition', {
+            x: toMM(position.x),
+            y: toMM(position.y),
+            z: toMM(position.z),
+        });
+        controller.command(
+            'gcode',
+            `G21 G10 L2 P9 X${toMM(position.x)} Y${toMM(position.y)}`,
+            '$#',
+        );
+        pubsub.publish('repopulate');
+        setSuccess('TLS location set.');
+        setIsComplete(true);
+        lastSetMposRef.current = mpos;
+        onComplete();
+    };
 
 	return (
 		<div className="flex flex-col gap-5 justify-start">

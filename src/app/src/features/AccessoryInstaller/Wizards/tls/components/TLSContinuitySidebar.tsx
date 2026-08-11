@@ -5,17 +5,17 @@ import cx from "classnames";
 import get from "lodash/get";
 import { useSelector } from "react-redux";
 
-function SettingBadge({ label, ok }: { label: string; ok: boolean }) {
-	return (
-		<span
-			className={cx("text-xs font-semibold px-2 py-0.5 rounded-full", {
-				"bg-green-500/20 text-green-700 dark:text-green-400": ok,
-				"bg-red-500/20 text-red-700 dark:text-red-400": !ok,
-			})}
-		>
-			{label}
-		</span>
-	);
+export function SettingBadge({ label, ok }: { label: string; ok: boolean }) {
+    return (
+        <span
+            className={cx('text-xs font-semibold px-2 py-0.5 rounded-full', {
+                'bg-green-500/20 text-green-700 dark:text-green-400': ok,
+                'bg-red-500/20 text-red-700 dark:text-red-400': !ok,
+            })}
+        >
+            {label}
+        </span>
+    );
 }
 
 export function TLSContinuitySidebar() {

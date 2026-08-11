@@ -1,7 +1,13 @@
-import { StepActionButton } from "app/components/Wizard/StepActionButton.tsx";
-import type { StepProps } from "app/components/Wizard/types";
-import { ATCI_SUPPORTED_VERSION } from "app/features/ATC/utils/ATCiConstants.ts";
-import { updateToolchangeContext } from "app/features/Helper/Wizard.tsx";
+import { StepProps } from 'app/features/AccessoryInstaller/types';
+import { StepActionButton } from 'app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx';
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import get from 'lodash/get';
+import store from 'app/store';
+import { RootState } from 'app/store/redux';
+import { FirstToolBehavior } from 'app/workspace/definitions';
+import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
+import pubsub from 'pubsub-js';
 import controller from "app/lib/controller.ts";
 import { firmwarePastVersion } from "app/lib/firmwareSemver.ts";
 import store from "app/store";
@@ -33,14 +39,28 @@ export function TLSOptions({ onComplete, onUncomplete }: StepProps) {
 	const [firstToolBehaviour, setFirstToolBehaviour] =
 		useState<FirstToolBehavior>("Prompt for first tool");
 
-	const applySettings = async () => {
-		// TODO:  Determine what we need to swap for vanilla SLB wrt EEPROM
-		const code = ["$6=1"];
-		if (!firmwarePastVersion(ATCI_SUPPORTED_VERSION)) {
-			code.push("$668=0");
-		}
-		code.push("$$");
-		controller.command("gcode", code);
+    const boardId = useSelector(
+        (state: RootState) => state.controller.settings.info?.BOARD,
+    );
+    const eepromSettings = useSelector(
+        (state: RootState) => state.controller.settings.settings,
+    );
+
+    const applySettings = async () => {
+        const code = ['$6=1'];
+        if (!firmwarePastVersion(ATCI_SUPPORTED_VERSION)) {
+            code.push('$668=0');
+        }
+        if (boardId === 'SLB Lite') {
+            const current = Number(get(eepromSettings, '$65', 0)) || 0;
+            const updated = current | 8;
+            if (updated !== current) {
+                code.push(`$65=${updated}`);
+            }
+            code.push('G65 P5 Q1');
+        }
+        code.push('$$');
+        controller.command('gcode', code);
 
 		store.set("workspace.toolChangeOption", "Fixed Tool Sensor");
 		store.set("workspace.toolChange.moveToManualPosition", customLocation);
