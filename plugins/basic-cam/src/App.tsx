@@ -18,18 +18,30 @@ type NumberFieldProps = {
 	value: number;
 	step?: number;
 	min?: number;
+	unit?: string;
 	onChange: (value: number) => void;
 };
+
+type PreviewTab = "preview" | "gcode";
 
 const NumberField = ({
 	label,
 	value,
 	step,
 	min,
+	unit,
 	onChange,
 }: NumberFieldProps) => (
 	<label className="mb-3 flex flex-col gap-1 text-sm">
-		{label}
+		<span>
+			{label}
+			{unit ? (
+				<span className="font-normal text-gray-500 dark:text-gray-400">
+					{" "}
+					({unit})
+				</span>
+			) : null}
+		</span>
 		<input
 			type="number"
 			value={value}
@@ -63,6 +75,7 @@ const App = () => {
 
 	const [status, setStatus] = useState("");
 	const [loading, setLoading] = useState(false);
+	const [activeTab, setActiveTab] = useState<PreviewTab>("preview");
 
 	const gcode = useMemo(() => {
 		if (operation === "drill-grid") {
@@ -89,6 +102,18 @@ const App = () => {
 		viewerRef.current?.setOptions({ units });
 	}, [units]);
 
+	// Refit the camera when returning to the preview tab — the canvas may have
+	// been hidden while the gcode panel was active.
+	useEffect(() => {
+		if (activeTab !== "preview") {
+			return;
+		}
+		const frame = requestAnimationFrame(() => {
+			viewerRef.current?.focusToModel();
+		});
+		return () => cancelAnimationFrame(frame);
+	}, [activeTab]);
+
 	// "Load to main visualizer" hands the generated program to gSender's main visualizer via
 	// the SDK. Basic CAM is just a plugin — it has no privileged host access, it
 	// composes gSender's generic SDK surface to do its work.
@@ -112,13 +137,17 @@ const App = () => {
 	const fieldsetClass =
 		"mb-4 rounded-lg border border-gray-300 p-4 dark:border-gray-700";
 	const legendClass = "px-1 font-semibold";
+	const tabClass = (tab: PreviewTab) =>
+		[
+			"relative -mb-px cursor-pointer border-b-2 px-3.5 py-2.5 text-sm font-medium transition-colors",
+			activeTab === tab
+				? "border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
+				: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-800 dark:text-gray-400 dark:hover:border-gray-600 dark:hover:text-gray-200",
+		].join(" ");
 
 	return (
 		<div className="text-gray-900 dark:text-gray-100">
-			<h1 className="mt-0 text-xl font-semibold">Basic CAM</h1>
-			<p className="text-sm text-gray-500">Workspace units: {units}</p>
-
-			<div className="grid grid-cols-1 items-start gap-6 md:grid-cols-[minmax(280px,360px)_1fr]">
+			<div className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-[minmax(280px,360px)_1fr]">
 				<div>
 					<fieldset className={fieldsetClass}>
 						<legend className={legendClass}>Operation</legend>
@@ -142,18 +171,21 @@ const App = () => {
 							<legend className={legendClass}>Rectangle</legend>
 							<NumberField
 								label="Width"
+								unit={units}
 								value={rect.width}
 								step={0.1}
 								onChange={(width) => setRect((r) => ({ ...r, width }))}
 							/>
 							<NumberField
 								label="Height"
+								unit={units}
 								value={rect.height}
 								step={0.1}
 								onChange={(height) => setRect((r) => ({ ...r, height }))}
 							/>
 							<NumberField
 								label="Depth"
+								unit={units}
 								value={rect.depth}
 								step={0.1}
 								onChange={(depth) => setRect((r) => ({ ...r, depth }))}
@@ -178,18 +210,21 @@ const App = () => {
 							/>
 							<NumberField
 								label="Spacing X"
+								unit={units}
 								value={grid.spacingX}
 								step={0.1}
 								onChange={(spacingX) => setGrid((g) => ({ ...g, spacingX }))}
 							/>
 							<NumberField
 								label="Spacing Y"
+								unit={units}
 								value={grid.spacingY}
 								step={0.1}
 								onChange={(spacingY) => setGrid((g) => ({ ...g, spacingY }))}
 							/>
 							<NumberField
 								label="Depth"
+								unit={units}
 								value={grid.depth}
 								step={0.1}
 								onChange={(depth) => setGrid((g) => ({ ...g, depth }))}
@@ -201,12 +236,14 @@ const App = () => {
 						<legend className={legendClass}>Tool &amp; feeds</legend>
 						<NumberField
 							label="Feedrate"
+							unit={`${units}/min`}
 							value={tool.feedrate}
 							step={10}
 							onChange={(feedrate) => setTool((t) => ({ ...t, feedrate }))}
 						/>
 						<NumberField
 							label="Plunge rate"
+							unit={`${units}/min`}
 							value={tool.plungeRate}
 							step={10}
 							onChange={(plungeRate) => setTool((t) => ({ ...t, plungeRate }))}
@@ -219,6 +256,7 @@ const App = () => {
 						/>
 						<NumberField
 							label="Safe Z"
+							unit={units}
 							value={tool.safeZ}
 							step={0.1}
 							onChange={(safeZ) => setTool((t) => ({ ...t, safeZ }))}
@@ -238,22 +276,60 @@ const App = () => {
 					{status && <p className="mt-2 text-sm text-gray-500">{status}</p>}
 				</div>
 
-				<div>
-					<h2 className="mt-0 mb-2 text-base font-semibold">Preview</h2>
-					<div className="mb-4 h-80 overflow-hidden rounded-lg bg-slate-950">
-						<GCodeVisualizer
-							ref={viewerRef}
-							id="basic-cam-preview"
-							style={{ width: "100%", height: "100%" }}
-						/>
+				<div className="flex min-h-80 flex-col overflow-hidden md:min-h-0">
+					<div
+						className="flex shrink-0 gap-1 border-b border-gray-300 dark:border-gray-600"
+						role="tablist"
+						aria-label="Preview panels"
+					>
+						<button
+							type="button"
+							role="tab"
+							aria-selected={activeTab === "preview"}
+							className={tabClass("preview")}
+							onClick={() => setActiveTab("preview")}
+						>
+							Preview
+						</button>
+						<button
+							type="button"
+							role="tab"
+							aria-selected={activeTab === "gcode"}
+							className={tabClass("gcode")}
+							onClick={() => setActiveTab("gcode")}
+						>
+							Generated G-code
+						</button>
 					</div>
 
-					<h2 className="mt-0 mb-2 text-base font-semibold">
-						Generated G-code
-					</h2>
-					<pre className="max-h-80 overflow-auto rounded-lg bg-gray-100 p-4 text-xs dark:bg-gray-800">
-						{gcode}
-					</pre>
+					<div className="relative mt-3 min-h-0 flex-1">
+						{/* Keep the visualizer mounted (and sized) so WebGL state survives tab switches. */}
+						<div
+							role="tabpanel"
+							aria-hidden={activeTab !== "preview"}
+							className={`absolute inset-0 overflow-hidden rounded-lg bg-slate-950 ${
+								activeTab === "preview" ? "" : "invisible pointer-events-none"
+							}`}
+						>
+							<GCodeVisualizer
+								ref={viewerRef}
+								id="basic-cam-preview"
+								style={{ width: "100%", height: "100%" }}
+							/>
+						</div>
+
+						<div
+							role="tabpanel"
+							aria-hidden={activeTab !== "gcode"}
+							className={`absolute inset-0 overflow-hidden rounded-lg ${
+								activeTab === "gcode" ? "" : "invisible pointer-events-none"
+							}`}
+						>
+							<pre className="h-full overflow-auto rounded-lg bg-gray-100 p-4 text-xs dark:bg-gray-800">
+								{gcode}
+							</pre>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
