@@ -23,6 +23,7 @@
 /** biome-ignore-all lint/suspicious/noExplicitAny: <> */
 
 import type { MachineProfile } from "app/definitions/firmware";
+import type { PluginCapabilities } from "app/features/Plugins/types";
 import axios, {
 	type AxiosResponse,
 	type InternalAxiosRequestConfig,
@@ -481,11 +482,11 @@ const plugins = {
 			{ pluginPath },
 		);
 	},
-	writePermissions: (pluginPath: string, permissions: string[]): Promise<AxiosResponse> => {
+	writePermissions: (pluginPath: string, capabilities: PluginCapabilities): Promise<AxiosResponse> => {
 		console.log('hi');
 		return authrequest.post(
 			"/api/plugins/write-permissions",
-			{ pluginPath, permissions }
+			{ pluginPath, capabilities }
 		);
 	},
 	scanPluginForSDKUsage: (indexFile: string, sdks: string[]): Promise<AxiosResponse> => {

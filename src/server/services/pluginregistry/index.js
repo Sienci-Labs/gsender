@@ -346,7 +346,7 @@ const readImportedManifest = (pluginPath) => {
 	};
 };
 
-const changeManifestPermissions = (pluginPath, permissions) => {
+const changeManifestPermissions = (pluginPath, capabilities) => {
 	const manifest = readManifest(pluginPath);
 	if (!manifest) {
 		log.error("no manifest");
@@ -354,7 +354,7 @@ const changeManifestPermissions = (pluginPath, permissions) => {
 	}
 
 	const newManifest = {
-		permissions: permissions,
+		capabilities: capabilities,
 		...manifest,
 	};
 

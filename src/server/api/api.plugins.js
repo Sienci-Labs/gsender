@@ -187,7 +187,7 @@ export const readImportedManifest = (req, res) => {
 };
 
 export const writePermissions = (req, res) => {
-	const { pluginPath, permissions } = req.body;
+	const { pluginPath, capabilities } = req.body;
 
 	log.debug(pluginPath);
 	try {
@@ -205,7 +205,7 @@ export const writePermissions = (req, res) => {
 
 		const error = pluginRegistry.changeManifestPermissions(
 			pluginPath,
-			permissions,
+			capabilities,
 		);
 		if (error) {
 			return res

@@ -10,40 +10,13 @@ import { toast } from "app/lib/toaster";
 import isElectron from "is-electron";
 import { useEffect, useState } from "react";
 import { usePlugins } from "../hooks/usePlugins";
-
-export const permissionsMap = new Map<string, string[]>([
-	[
-		"*require-whole-module*",
-		[
-			"machine:read",
-			"machine:write",
-			"visualizer:load",
-			"workspace:read",
-			"redux:read",
-		],
-	],
-	[
-		"gsender",
-		[
-			"machine:read",
-			"machine:write",
-			"visualizer:load",
-			"workspace:read",
-			"redux:read",
-		],
-	],
-	["machine", ["machine:read", "machine:write"]],
-	["gcode", ["visualizer:load"]],
-	["workspace", ["workspace:read"]],
-	["getWorkspaceState", ["workspace:read"]],
-	["subscribeWorkspaceState", ["workspace:read"]],
-	["useWorkspaceState", ["workspace:read"]],
-	["redux", ["redux:read"]],
-	["getReduxState", ["redux:read"]],
-	["getSelector", ["redux:read"]],
-	["subscribeSelector", ["redux:read"]],
-	["useTypedSelector", ["redux:read"]],
-]);
+import {
+	type PluginBridgeRequestType,
+	type PluginBridgeTopic,
+	permissionsMap,
+	requestTypesMap,
+	topicsMap,
+} from "../types";
 
 const PluginManager = () => {
 	const {
@@ -119,24 +92,32 @@ const PluginManager = () => {
 					}
 
 					const { capabilities, hasDynamicImport } = result.data;
-					let permissions: string[];
 
-					// if imported gsender client, needs all permissions
-					if (
-						capabilities.includes("gsender") ||
-						capabilities.includes("*require-whole-module*")
-					) {
-						permissions = [...permissionsMap.keys()];
-					} else {
-						// otherwise, figure out which clients they imported
-						permissions = [
-							...new Set<string>(
-								capabilities.map((capability: string) => {
-									return permissionsMap.get(capability);
-								}),
-							),
-						].flat();
-					}
+					// figure out which clients they imported
+					const permissions = [
+						...new Set<string>(
+							capabilities.flatMap((capability: string) => {
+								return permissionsMap.get(capability);
+							}),
+						),
+					];
+					const allowedFunctions = capabilities.filter(
+						(capability: string) => capability !== "*require-whole-module*",
+					);
+					const requestTypes = new Set<PluginBridgeRequestType>(
+						capabilities
+							.filter((capability: string) => requestTypesMap.has(capability))
+							.flatMap((capability: string) => {
+								return requestTypesMap.get(capability);
+							}),
+					);
+					const topics = new Set<PluginBridgeTopic>(
+						capabilities
+							.filter((capability: string) => topicsMap.has(capability))
+							.flatMap((capability: string) => {
+								return topicsMap.get(capability);
+							}),
+					);
 
 					Confirm({
 						title: "Plugin Permissions",
@@ -170,7 +151,11 @@ const PluginManager = () => {
 						onConfirm: async () => {
 							// write used permissions to manifest
 							api.plugins
-								.writePermissions(directory, permissions)
+								.writePermissions(directory, {
+									allowedFunctions,
+									requestTypes,
+									topics,
+								})
 								.then((res) => {
 									if (res.status !== 200) {
 										console.error(res.data.error);

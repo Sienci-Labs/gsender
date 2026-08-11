@@ -100,7 +100,7 @@ export function scanPluginForSdkUsage(
             // Dynamic import: import('@yoursdk/plugin-api') or computed specifiers
             // Acorn represents dynamic import() as callee.type === 'Import'.
             if ((callNode.callee as { type: string }).type === 'Import') {
-                const arg = callNode.arguments[0] as { type: string; value?: string };
+                const arg = callNode.arguments[0] as { type: string; value: string };
                 if (arg && callNode.arguments.length === 1 && arg.type === 'Literal' && sdkPackageNames.includes(arg.value)) {
                     hasDynamicImport = true;
                     capabilities.add('*require-whole-module*');

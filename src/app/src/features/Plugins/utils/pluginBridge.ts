@@ -9,7 +9,12 @@ import type {
 	PluginBridgeResponse,
 	PluginBridgeSubscribe,
 	PluginBridgeTopic,
+	PluginCapabilities,
 } from "../types";
+import {
+	EMPTY_CAPABILITIES,
+	getCapabilitiesForSource,
+} from "./plugin-permissions";
 
 const BRIDGE_CHANNEL: typeof PLUGIN_BRIDGE_CHANNEL = "gsender:plugin-bridge";
 
@@ -44,13 +49,21 @@ const getMachineContext = () => {
 	};
 };
 
-const runMachineCommand = async (payload: Record<string, unknown> = {}) => {
+const runMachineCommand = async (
+	payload: Record<string, unknown> = {},
+	// capabilities: PluginCapabilities
+) => {
 	const cmd = String(payload.cmd || "");
 	const args = Array.isArray(payload.args) ? payload.args : [];
 
 	if (!cmd) {
 		throw new Error("cmd is required");
 	}
+
+	// TODO: add ability to differentiate between and give separate permissions for machine commands as some of them are very sensitive
+	// if (!capabilities.allowedCommands.has(cmd)) {
+	// 	throw new Error(`Plugin not authorized to run command '${cmd}'`);
+	// }
 
 	return new Promise((resolve, reject) => {
 		controller.command(cmd, ...args, (err: Error | null, data: unknown) => {
@@ -80,19 +93,25 @@ const loadGCodeToVisualizer = async ({
 
 const handleBridgeRequest = async (
 	request: PluginBridgeRequest,
+	capabilities: PluginCapabilities
 ): Promise<unknown> => {
+	// check if plugin is allowed to use this request type
+	if (!capabilities.requestTypes.has(request.type)) {
+		throw new Error(`Plugin not authorized to use '${request.type}'`);
+	}
+
 	switch (request.type) {
 		case "machine:get:context":
 			return getMachineContext();
 		case "machine:command":
-			return runMachineCommand(request.payload);
+			return runMachineCommand(request.payload, /*capabilities*/);
 		case "workspace:get:state":
 			return getWorkspaceSnapshot();
 		case "redux:get:state":
 			return getReduxSnapshot();
 		case "gcode:load:to:visualizer":
 			return loadGCodeToVisualizer(
-				request.payload as { gcode: string; name: string },
+				request.payload as { gcode: string; name: string }
 			);
 		default:
 			throw new Error(`Unknown bridge request: ${request.type}`);
@@ -100,7 +119,7 @@ const handleBridgeRequest = async (
 };
 
 export const handlePluginBridgeMessage = async (
-	event: MessageEvent,
+	event: MessageEvent
 ): Promise<PluginBridgeResponse | null> => {
 	if (event.data?.channel !== BRIDGE_CHANNEL || !event.data?.request) {
 		return null;
@@ -108,8 +127,13 @@ export const handlePluginBridgeMessage = async (
 
 	const request = event.data.request as PluginBridgeRequest;
 
+	// Unregistered source (a plugin who never registered it,
+	// or a message from something that isn't a known plugin iframe at all)
+	// gets zero capabilities
+	const capabilities = getCapabilitiesForSource(event.source) ?? EMPTY_CAPABILITIES;
+
 	try {
-		const result = await handleBridgeRequest(request);
+		const result = await handleBridgeRequest(request, capabilities);
 		return {
 			id: request.id,
 			ok: true,
@@ -192,7 +216,13 @@ const addSubscription = (
 	source: MessageEventSource,
 	origin: string,
 	subscribe: PluginBridgeSubscribe,
+	capabilities: PluginCapabilities
 ) => {
+	// check if plugin has subscription perms
+	if (!capabilities.topics.has(subscribe.topic)) {
+		throw new Error(`Plugin not authorized to subscribe to '${subscribe.topic}'`);
+	}
+
 	ensureHostListeners();
 
 	const sub: PluginSubscription = {
@@ -221,12 +251,25 @@ export const installPluginBridgeListener = () => {
 			return;
 		}
 
+		const capabilities = getCapabilitiesForSource(event.source) ?? EMPTY_CAPABILITIES;
+
 		if (data.subscribe && event.source) {
-			addSubscription(
-				event.source,
-				event.origin,
-				data.subscribe as PluginBridgeSubscribe,
-			);
+			try {
+				addSubscription(
+					event.source,
+					event.origin,
+					data.subscribe as PluginBridgeSubscribe,
+					capabilities
+				);
+			} catch(err) {
+				event.source.postMessage(
+					{
+						channel: BRIDGE_CHANNEL,
+						err,
+					},
+					{ targetOrigin: event.origin }
+				);
+			}
 			return;
 		}
 
@@ -254,7 +297,7 @@ export const installPluginBridgeListener = () => {
 				channel: BRIDGE_CHANNEL,
 				response,
 			},
-			{ targetOrigin: event.origin },
+			{ targetOrigin: event.origin }
 		);
 	};
 
