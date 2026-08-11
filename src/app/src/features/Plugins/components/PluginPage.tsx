@@ -1,5 +1,8 @@
 import Page from "app/components/Page";
-import { useMemo } from "react";
+import combokeys from "app/lib/combokeys";
+import { holdShortcuts, unholdShortcuts } from "app/store/redux/slices/preferences.slice";
+import { useEffect, useMemo } from "react";
+import { useDispatch } from "react-redux";
 import { useParams } from "react-router";
 import { usePlugins } from "../hooks/usePlugins";
 import PluginPanel from "./PluginPanel";
@@ -7,6 +10,7 @@ import PluginPanel from "./PluginPanel";
 const PluginPage = () => {
 	const { pluginRoute = "" } = useParams();
 	const { plugins, loading } = usePlugins();
+	const dispatch = useDispatch();
 
 	const plugin = useMemo(() => {
 		return plugins.find(
@@ -18,6 +22,16 @@ const PluginPage = () => {
 				),
 		);
 	}, [plugins, pluginRoute]);
+
+	useEffect(() => {
+		dispatch(holdShortcuts());
+		combokeys.reload();
+
+		return () => {
+			dispatch(unholdShortcuts());
+			combokeys.reload();
+		};
+	}, [plugin]);
 
 	if (loading) {
 		return (

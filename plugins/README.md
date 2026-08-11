@@ -111,6 +111,10 @@ Install [`@sienci/gsender-plugin-sdk`](../packages/plugin-sdk) (or `file:../../p
 | `@sienci/gsender-plugin-sdk/react` | `useWorkspaceState`, `useTypedSelector` |
 | `@sienci/gsender-plugin-sdk/viewer` | Embedded G-code preview (`@sienci/gviewer`) |
 
+gSender mirrors dark mode onto plugin iframes as `html.dark`. Use class-based
+dark styles (`html.dark …` or Tailwind `dark:` with a class strategy), not
+`prefers-color-scheme`.
+
 See the [package README](../packages/plugin-sdk/README.md) for the full API.
 
 ### G-code preview (visualizer)
