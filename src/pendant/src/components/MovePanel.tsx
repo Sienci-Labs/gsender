@@ -393,7 +393,7 @@ export default function MovePanel({ mode, setMode }: Props) {
 	return (
 		<div
 			className={clsx(
-				"flex-1 flex flex-col overflow-y-auto min-h-0 px-3 py-2 gap-3",
+				"flex-1 flex flex-col overflow-y-auto min-h-0 px-3 py-2 gap-2",
 				mode === "expanded" ? "justify-start" : "justify-center",
 			)}
 		>
@@ -436,8 +436,8 @@ export default function MovePanel({ mode, setMode }: Props) {
 					<div className="section-label text-[11px] font-semibold uppercase tracking-wide text-gray-400 dark:text-content-muted">
 						Corner Select
 					</div>
-					<div className="rounded-lg border border-gray-200 dark:border-outline bg-gray-50 dark:bg-surface-raised px-8 py-8">
-						<div className="relative w-full h-[98px] rounded-md border border-dashed border-gray-300 dark:border-outline-subtle bg-white/40 dark:bg-surface-sunken/40">
+					<div className="mx-3 rounded-lg border border-gray-200 dark:border-outline bg-gray-50 dark:bg-surface-raised px-8 py-8">
+						<div className="relative w-full h-[70px] rounded-md border border-dashed border-gray-300 dark:border-outline-subtle bg-white/40 dark:bg-surface-sunken/40">
 							{CORNERS.map((corner) => (
 								<HoldCorner
 									key={corner.id}
@@ -448,7 +448,7 @@ export default function MovePanel({ mode, setMode }: Props) {
 								/>
 							))}
 						</div>
-						<div className="mt-1 flex items-center justify-center gap-2 text-center">
+						<div className="mt-0.5 flex items-center justify-center gap-2 text-center">
 							<span className="font-mono text-xs text-blue-600 dark:text-blue-400">
 								Target: {cornerLabel}
 							</span>
@@ -523,7 +523,7 @@ export default function MovePanel({ mode, setMode }: Props) {
 							.map(({ axis, label }) => (
 								<div
 									key={axis}
-									className="flex items-center justify-between gap-2 rounded-lg border border-gray-200 dark:border-outline bg-gray-50 dark:bg-surface-raised px-2.5 py-2"
+									className="flex items-center justify-between gap-2 rounded-lg border border-gray-200 dark:border-outline bg-gray-50 dark:bg-surface-raised px-2 py-1.5"
 								>
 									<span className="text-xs font-bold text-blue-600 dark:text-blue-400 w-4">
 										{label}
@@ -556,13 +556,13 @@ export default function MovePanel({ mode, setMode }: Props) {
 						onClick={goToLocation}
 						disabled={!canAct}
 						className={clsx(
-							"w-full flex items-center justify-center gap-2 rounded-lg h-16 text-sm font-semibold uppercase tracking-wide transition-colors mb-2",
+							"w-full flex items-center justify-center gap-2 rounded-lg h-28 text-lg font-semibold uppercase tracking-wide transition-colors mb-2",
 							canAct
 								? "bg-robin-600 hover:bg-robin-500 active:bg-robin-700 text-white"
 								: "bg-gray-200 dark:bg-surface-disabled text-gray-400 dark:text-content-disabled cursor-default",
 						)}
 					>
-						<ArrowRight size={16} />
+						<ArrowRight size={24} />
 						Go to position
 					</button>
 				</>
