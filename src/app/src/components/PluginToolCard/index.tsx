@@ -9,6 +9,7 @@ type PluginToolCardProps = {
 	blurb?: string;
 	icon?: IconType;
 	link?: string;
+	onClick?: () => void;
 	official: boolean;
 };
 
@@ -18,10 +19,12 @@ const PluginToolCard = ({
 	blurb,
 	icon: Icon,
 	link,
+	onClick,
 	official,
 }: PluginToolCardProps) => {
 	const CardContent = (
 		<div
+			onClick={onClick}
 			className={cx(
 				"relative cursor-pointer rounded-lg shadow-sm p-4 pt-5",
 				"flex flex-col items-center justify-between text-center gap-4",

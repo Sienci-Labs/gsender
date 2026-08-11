@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useDarkMode } from "app/hooks/useDarkMode";
 import ConfirmationDialog from "app/components/ConfirmationDialog/ConfirmationDialog";
+import { installPluginBridgeListener } from "app/features/Plugins/utils/pluginBridge";
 import PendantTopBar from "./components/PendantTopBar";
 import InfoStrip from "./components/InfoStrip";
 import CarveView from "./components/CarveView";
-import PlaceholderView from "./components/PlaceholderView";
+import PendantToolsView from "./components/PendantToolsView";
 import PendantConfigView from "./components/PendantConfigView";
 import BottomNav from "./components/BottomNav";
 import JobCompletionAlert from "./components/JobCompletionAlert";
@@ -22,6 +23,11 @@ export default function PendantShell() {
 		};
 	}, []);
 
+	useEffect(() => {
+		const removePluginBridge = installPluginBridgeListener();
+		return () => removePluginBridge();
+	}, []);
+
 	return (
 		<div className="h-screen w-screen flex flex-col bg-gray-100 dark:bg-surface-base overflow-hidden">
 			<PendantTopBar />
@@ -35,7 +41,7 @@ export default function PendantShell() {
 			>
 				<CarveView />
 			</div>
-			{activeTab === "tools" && <PlaceholderView title="Tools" />}
+			{activeTab === "tools" && <PendantToolsView />}
 			{activeTab === "config" && <PendantConfigView />}
 
 			<BottomNav active={activeTab} onChange={setActiveTab} />
