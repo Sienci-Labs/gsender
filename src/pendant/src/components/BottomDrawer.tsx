@@ -17,6 +17,7 @@ import SpindlePanel from "./SpindlePanel";
 import ProbePanel from "./ProbePanel";
 import { useWorkspaceState } from "app/hooks/useWorkspaceState";
 import ATCPanel from "./ATCPanel";
+import MovePanel from "./MovePanel";
 import {
 	addControllerEvents,
 	removeControllerEvents,
@@ -38,6 +39,7 @@ import type { RootState } from "app/store/redux";
 
 const ALL_TABS = [
 	"File",
+	"Move",
 	"Probe",
 	"Spindle",
 	"Macros",
@@ -523,6 +525,17 @@ export default function BottomDrawer() {
 								)}
 							</div>
 						)}
+					</div>
+
+					{/* Move tab — always mounted */}
+					<div
+						className={
+							activeTab === "Move"
+								? "flex-1 flex flex-col overflow-hidden min-h-0"
+								: "hidden"
+						}
+					>
+						<MovePanel mode={mode} setMode={setMode} />
 					</div>
 
 					{/* Console tab — always mounted */}

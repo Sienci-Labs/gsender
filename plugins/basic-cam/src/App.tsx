@@ -268,7 +268,7 @@ const App = () => {
 							type="button"
 							onClick={loadToMainVisualizer}
 							disabled={loading}
-							className="cursor-pointer rounded-md border border-blue-600 bg-blue-600 px-3.5 py-2 text-white disabled:cursor-not-allowed disabled:opacity-60"
+							className="cursor-pointer rounded-md border border-blue-500 bg-blue-500 px-3.5 py-2 text-white disabled:cursor-not-allowed disabled:opacity-60"
 						>
 							{loading ? "Loading…" : "Load to main visualizer"}
 						</button>

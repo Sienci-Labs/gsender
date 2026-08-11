@@ -17,7 +17,7 @@ import { useEffect, useRef } from "react";
 import { RiParkingFill } from "react-icons/ri";
 import { useSelector } from "react-redux";
 
-function goToParkLocation() {
+export function goToParkLocation() {
 	const park = store.get("workspace.park", {});
 	const code = [];
 

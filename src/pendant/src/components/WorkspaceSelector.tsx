@@ -5,7 +5,7 @@ import type { RootState } from "app/store/redux";
 import controller from "app/lib/controller";
 import { GRBL_ACTIVE_STATE_RUN, WORKFLOW_STATE_RUNNING } from "app/constants";
 
-type GrblWorkspace = "G54" | "G55" | "G56" | "G57" | "G58" | "G59";
+export type GrblWorkspace = "G54" | "G55" | "G56" | "G57" | "G58" | "G59";
 
 const WORKSPACE_VALUES: GrblWorkspace[] = [
 	"G54",
@@ -27,7 +27,7 @@ const WORKSPACE_LABELS: Record<GrblWorkspace, string> = {
 	G59: "P6",
 };
 
-const WORKSPACE_TEXT_COLORS: Record<GrblWorkspace, string> = {
+export const WORKSPACE_TEXT_COLORS: Record<GrblWorkspace, string> = {
 	G54: "text-blue-600 dark:text-blue-400",
 	G55: "text-emerald-600 dark:text-emerald-400",
 	G56: "text-amber-600 dark:text-amber-400",
@@ -36,7 +36,7 @@ const WORKSPACE_TEXT_COLORS: Record<GrblWorkspace, string> = {
 	G59: "text-cyan-600 dark:text-cyan-400",
 };
 
-function isWorkspace(value: unknown): value is GrblWorkspace {
+export function isWorkspace(value: unknown): value is GrblWorkspace {
 	return (
 		typeof value === "string" &&
 		WORKSPACE_VALUES.includes(value as GrblWorkspace)

@@ -7,6 +7,7 @@ export const FRONT_RIGHT = "FR";
 export const FRONT_LEFT = "FL";
 export const BACK_RIGHT = "BR";
 export const BACK_LEFT = "BL";
+export const CENTER = "CT";
 export const OTHER = "OT";
 export const POSITIVE_DIRECTION = 1;
 export const NEGATIVE_DIRECTION = -1;
@@ -133,6 +134,20 @@ const getPositionMovements = (
 			{ position: "bottom-right" },
 		);
 		return [null, null];
+	}
+
+	if (requestedPosition === CENTER) {
+		// Center is halfway between the home corner and the far corner, using
+		// the same per-corner sign convention as getAxisMaximumLocation.
+		if (homingPosition === FRONT_RIGHT) {
+			return [(xLimit * -1) / 2, yLimit / 2];
+		} else if (homingPosition === FRONT_LEFT) {
+			return [xLimit / 2, yLimit / 2];
+		} else if (homingPosition === BACK_LEFT) {
+			return [xLimit / 2, (yLimit * -1) / 2];
+		}
+		// Back Right
+		return [(xLimit * -1) / 2, (yLimit * -1) / 2];
 	}
 
 	if (homingPosition === FRONT_RIGHT) {
