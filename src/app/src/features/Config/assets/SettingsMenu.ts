@@ -360,11 +360,12 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						type: "boolean",
 						onChange: (value: boolean) => {
 							store.set("workspace.usePendantViewAsDefault", value);
-							if (value && isElectron()) {
+							if (isElectron()) {
 								Confirm({
 									title: "Restart Required",
-									content:
-										"gSender needs to restart to switch to the pendant view.",
+									content: value
+										? "gSender needs to restart to switch to the pendant view."
+										: "gSender needs to restart to switch back to the desktop view.",
 									confirmLabel: "Restart Now",
 									cancelLabel: "Later",
 									onConfirm: () => {
