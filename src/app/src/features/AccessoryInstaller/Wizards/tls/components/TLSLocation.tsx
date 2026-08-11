@@ -1,5 +1,4 @@
-import { StepProps } from 'app/features/AccessoryInstaller/types';
-import { StepActionButton } from 'app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx';
+
 import { PositionSetter } from 'app/features/AccessoryInstaller/Wizards/atc/components/PositionSetter.tsx';
 import { useSelector } from 'react-redux';
 import { RootState } from 'app/store/redux';
@@ -10,6 +9,8 @@ import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { mapPositionToUnits, in2mm } from 'app/lib/units.ts';
 import { IMPERIAL_UNITS } from 'app/constants';
 import pubsub from 'pubsub-js';
+import {StepProps} from "app/components/Wizard/types";
+import {StepActionButton} from "app/components/Wizard/StepActionButton.tsx";
 
 type Position = { x?: number; y?: number; z?: number };
 

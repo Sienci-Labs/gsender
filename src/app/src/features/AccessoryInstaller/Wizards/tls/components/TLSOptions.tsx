@@ -1,19 +1,16 @@
-import { StepProps } from 'app/features/AccessoryInstaller/types';
-import { StepActionButton } from 'app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx';
-import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import get from 'lodash/get';
-import store from 'app/store';
 import { RootState } from 'app/store/redux';
 import { FirstToolBehavior } from 'app/workspace/definitions';
 import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
-import pubsub from 'pubsub-js';
 import controller from "app/lib/controller.ts";
 import { firmwarePastVersion } from "app/lib/firmwareSemver.ts";
 import store from "app/store";
-import type { FirstToolBehavior } from "app/workspace/definitions";
 import pubsub from "pubsub-js";
 import { useState } from "react";
+import {ATCI_SUPPORTED_VERSION} from "app/features/ATC/utils/ATCiConstants.ts";
+import {StepActionButton} from "app/components/Wizard/StepActionButton.tsx";
+import {StepProps} from "app/components/Wizard/types";
 
 const FIRST_TOOL_BEHAVIOUR_OPTIONS: FirstToolBehavior[] = [
 	"Always run full wizard",
