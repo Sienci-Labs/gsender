@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
+import cx from "classnames";
 import { useTypedSelector } from "app/hooks/useTypedSelector";
 import type { RootState } from "app/store/redux";
-import { GRBLHAL, METRIC_UNITS } from "app/constants";
-import { useWorkspaceState } from "app/hooks/useWorkspaceState";
-import { mapPositionToUnits } from "app/lib/units";
+import { GRBLHAL } from "app/constants";
 
 function Clock() {
 	const [time, setTime] = useState(() =>
@@ -30,90 +29,143 @@ function Clock() {
 	return <span>{time}</span>;
 }
 
-function formatReadout(value: unknown): string {
-	const parsed = Number(value);
-	if (!Number.isFinite(parsed)) return "0";
-	const rounded = Math.round(parsed * 100) / 100;
-	return Number.isInteger(rounded)
-		? String(rounded)
-		: String(rounded).replace(/(?:\.0+|(\.\d+?)0+)$/, "$1");
+function Field({ label, value }: { label: string; value: string }) {
+	return (
+		<span className="flex flex-col items-center leading-tight">
+			<span className="text-[9px] leading-[1.4] text-gray-400 dark:text-content-muted">
+				{label}
+			</span>
+			<span className="font-mono text-[11px] leading-[1.4] text-gray-700 dark:text-content-primary">
+				{value}
+			</span>
+		</span>
+	);
 }
 
+function Divider() {
+	return (
+		<span className="w-px self-stretch bg-gray-200 dark:bg-outline" />
+	);
+}
+
+function Pin({ label, on }: { label: string; on: boolean }) {
+	return (
+		<span className="flex flex-col items-center gap-[3px]">
+			<span
+				className={cx("h-[7px] w-[7px] rounded-full", {
+					"bg-green-500": on,
+					"bg-red-500": !on,
+				})}
+				aria-label={on ? "Asserted" : "Not asserted"}
+				title={`${label}: ${on ? "asserted" : "not asserted"}`}
+			/>
+			<span className="text-[9px] leading-none text-gray-400 dark:text-content-muted">
+				{label}
+			</span>
+		</span>
+	);
+}
+
+const UNITS_LABEL: Record<string, string> = { G20: "in", G21: "mm" };
+const DIST_LABEL: Record<string, string> = { G90: "abs", G91: "inc" };
+const COOLANT_LABEL: Record<string, string> = {
+	M9: "off",
+	M8: "flood",
+	M7: "mist",
+};
+const PIN_LABELS: { key: string; label: string }[] = [
+	{ key: "X", label: "X" },
+	{ key: "Y", label: "Y" },
+	{ key: "Z", label: "Z" },
+	{ key: "A", label: "A" },
+	{ key: "P", label: "Pb" },
+	{ key: "D", label: "Dr" },
+	{ key: "H", label: "Ho" },
+];
+
 export default function InfoStrip() {
-	const status = useTypedSelector(
-		(state: RootState) => state.controller.state.status,
-	) as any;
 	const controllerType = useTypedSelector(
 		(state: RootState) => state.controller.type,
 	);
 	const currentTool = useTypedSelector(
 		(state: RootState) => (state.controller.state.status as any)?.currentTool,
 	);
+	const pins = useTypedSelector(
+		(state: RootState) =>
+			(state.controller.state.status as any)?.pinState as
+				| Record<string, boolean>
+				| undefined,
+	);
+	const modal = useTypedSelector((state: RootState) => state.controller.modal);
+	const isConnected = useTypedSelector(
+		(state: RootState) => state.connection.isConnected,
+	);
 	const isLaserMode = useTypedSelector(
 		(state: RootState) =>
 			Number(state.controller.settings.settings.$32 ?? 0) === 1,
 	);
-	const spindleModal = useTypedSelector(
-		(state: RootState) => state.controller.modal.spindle ?? "M5",
-	);
-	const spindleActive = spindleModal !== "M5";
-	const { units } = useWorkspaceState();
+
 	const showTool =
 		controllerType === GRBLHAL &&
 		currentTool != null &&
 		Number(currentTool) >= 0;
 
-	let feedrate = status?.feedrate ?? "0";
-	const spindle = status?.spindle ?? "0";
-	if (units !== METRIC_UNITS) {
-		feedrate = mapPositionToUnits(feedrate, units);
-	}
-	const feedLabel = formatReadout(feedrate);
-	const spindleLabel = formatReadout(spindle);
+	const spindleModal = modal?.spindle ?? "M5";
+	const spindleActive = spindleModal !== "M5";
+	const spindleLabel =
+		spindleModal === "M3" ? "CW" : spindleModal === "M4" ? "CCW" : "off";
+
+	const v = (value: string) => (isConnected ? value : "-");
+
+	// TEMP: show all pins always (for A/B look comparison), instead of only
+	// ones actually reported by the firmware.
+	const activePins = PIN_LABELS;
 
 	return (
-		<div className="relative z-40 flex items-center gap-3 px-3 md:px-4 py-1.5 bg-white border-b border-gray-200 dark:bg-surface-base dark:border-outline shrink-0 text-xs sm:text-sm text-gray-500 dark:text-content-muted">
-			<div className="flex items-center rounded-md border border-gray-200 dark:border-outline overflow-hidden bg-gray-50/70 dark:bg-surface-raised/60">
-				<span className="whitespace-nowrap px-2.5 py-1">
-					Feed{" "}
-					<strong className="inline-block w-[5ch] text-right tabular-nums text-gray-900 dark:text-content-primary font-mono">
-						{feedLabel}
-					</strong>{" "}
-					{units}/min
-				</span>
-				<span className="h-5 w-px bg-gray-200 dark:bg-surface-raised" />
-				<span className="whitespace-nowrap px-2.5 py-1">
+		<div className="relative z-40 flex flex-wrap items-center gap-4 px-3 md:px-4 py-1.5 bg-white border-b border-gray-200 dark:bg-surface-base dark:border-outline shrink-0 text-xs sm:text-sm text-gray-500 dark:text-content-muted">
+			{showTool && (
+				<>
+					<Field label="tool" value={`T${currentTool}`} />
+					<Divider />
+				</>
+			)}
+
+			<span className="flex flex-wrap items-center gap-3.5">
+				<Field label="wcs" value={v(modal.wcs)} />
+				<Field label="plane" value={v(modal.plane)} />
+				<Field label="units" value={v(UNITS_LABEL[modal.units] ?? modal.units)} />
+				<Field label="dist" value={v(DIST_LABEL[modal.distance] ?? modal.distance)} />
+				<Field label="feed mode" value={v(modal.feedrate)} />
+				<Field
+					label="coolant"
+					value={v(COOLANT_LABEL[modal.coolant] ?? modal.coolant)}
+				/>
+				<span className="flex flex-col items-center leading-tight">
+					<span className="text-[9px] leading-[1.4] text-gray-400 dark:text-content-muted">
+						{isLaserMode ? "laser" : "spindle"}
+					</span>
 					<span
-						className={
-							spindleActive
-								? isLaserMode
-									? "text-purple-500 animate-pulse"
-									: "text-red-500 animate-pulse"
-								: ""
-						}
+						className={cx("font-mono text-[11px] leading-[1.4] text-gray-700 dark:text-content-primary", {
+							"text-red-500 dark:text-red-500 animate-pulse": spindleActive && !isLaserMode,
+							"text-purple-500 dark:text-purple-500 animate-pulse": spindleActive && isLaserMode,
+						})}
 					>
-						{isLaserMode ? "Laser" : "Spindle"}
-					</span>{" "}
-					<strong className="inline-block w-[5ch] text-right tabular-nums text-gray-900 dark:text-content-primary font-mono">
-						{spindleLabel}
-					</strong>{" "}
-					{isLaserMode ? "POW" : "RPM"}
+						{isConnected ? spindleLabel : "-"}
+					</span>
 				</span>
-				{showTool && (
-					<>
-						<span className="h-5 w-px bg-gray-200 dark:bg-surface-raised" />
-						<span className="whitespace-nowrap px-2.5 py-1">
-							Tool{" "}
-							<strong className="inline-block w-[3ch] text-right tabular-nums text-gray-900 dark:text-content-primary font-mono">
-								{currentTool}
-							</strong>
-						</span>
-					</>
+			</span>
+
+			<span className="flex items-center gap-3.5 ml-auto">
+				{activePins.length > 0 && (
+					<span className="flex items-center gap-2.5">
+						{activePins.map(({ key, label }) => (
+							<Pin key={key} label={label} on={!!pins?.[key]} />
+						))}
+					</span>
 				)}
-			</div>
-			<div className="flex-1" />
-			<span className="font-mono text-gray-400 dark:text-content-muted">
-				<Clock />
+				<span className="font-mono text-gray-400 dark:text-content-muted">
+					<Clock />
+				</span>
 			</span>
 		</div>
 	);
