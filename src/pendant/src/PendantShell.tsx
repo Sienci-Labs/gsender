@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useDarkMode } from "app/hooks/useDarkMode";
 import ConfirmationDialog from "app/components/ConfirmationDialog/ConfirmationDialog";
+import { Toaster } from "app/components/shadcn/Sonner";
 import { installPluginBridgeListener } from "app/features/Plugins/utils/pluginBridge";
 import PendantTopBar from "./components/PendantTopBar";
 import InfoStrip from "./components/InfoStrip";
@@ -47,6 +48,7 @@ export default function PendantShell() {
 			<BottomNav active={activeTab} onChange={setActiveTab} />
 			<JobCompletionAlert />
 			<ConfirmationDialog />
+			<Toaster closeButton visibleToasts={3} />
 		</div>
 	);
 }

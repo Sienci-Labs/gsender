@@ -272,6 +272,9 @@ export default function MovePanel({ mode, setMode }: Props) {
 	const homingSetting = useTypedSelector((s: RootState) =>
 		get(s, "controller.settings.settings.$22", "0"),
 	);
+	const homingDirection = useTypedSelector((s: RootState) =>
+		get(s, "controller.settings.settings.$23", "0"),
+	);
 	const pullOff = useTypedSelector((s: RootState) =>
 		Number(get(s, "controller.settings.settings.$27", 1)),
 	);
@@ -294,7 +297,12 @@ export default function MovePanel({ mode, setMode }: Props) {
 		workflowState !== WORKFLOW_STATE_RUNNING &&
 		(activeState === GRBL_ACTIVE_STATE_IDLE || activeState === GRBL_ACTIVE_STATE_JOG);
 	const canHome = (canAct && homingEnabled) || isHomingAlarm;
-	const canCorner = canAct && hasHomed && !homingFlag;
+	// Matches desktop's RapidPositionButtons.tsx: gated on hasHomed only.
+	// homingFlag reflects whether the machine is *currently sitting exactly*
+	// at machine-zero (0,0,0), not whether homing is in progress — it goes
+	// false as soon as the machine moves away from that exact spot, so it's
+	// not a valid gate for "can we rapid-position to a corner".
+	const canCorner = canAct && hasHomed;
 
 	const [selectedCorner, setSelectedCorner] = useState<CornerId>(CENTER);
 
@@ -302,12 +310,12 @@ export default function MovePanel({ mode, setMode }: Props) {
 		(id: CornerId) => {
 			if (!canCorner) return;
 			setSelectedCorner(id);
-			const gcode = getMovementGCode(id, homingSetting, homingFlag, pullOff);
+			const gcode = getMovementGCode(id, homingDirection, homingFlag, pullOff);
 			if (gcode.length) {
 				controller.command("gcode", gcode);
 			}
 		},
-		[canCorner, homingSetting, homingFlag, pullOff],
+		[canCorner, homingDirection, homingFlag, pullOff],
 	);
 
 	const cornerLabel =

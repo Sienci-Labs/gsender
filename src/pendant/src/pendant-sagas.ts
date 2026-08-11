@@ -21,6 +21,9 @@ import {
 	updateFeederStatus,
 	updateSenderStatus,
 	addSpindle,
+	updateHomingFlag,
+	updateHasHomed,
+	resetHoming,
 } from "app/store/redux/slices/controller.slice";
 import { unloadFileInfo } from "app/store/redux/slices/fileInfo.slice";
 import {
@@ -64,6 +67,15 @@ export function* initialize() {
 		reduxStore.dispatch(addSpindle(spindle));
 	});
 
+	// ── Homing state ───────────────────────────────────────────────────────
+	controller.addListener("homing:flag", (flag: boolean) => {
+		reduxStore.dispatch(updateHomingFlag({ homingFlag: flag }));
+	});
+
+	controller.addListener("homing:has-homed", (hasHomed: boolean) => {
+		reduxStore.dispatch(updateHasHomed({ hasHomed }));
+	});
+
 	// ── Connection lifecycle ───────────────────────────────────────────────
 	controller.addListener(
 		"serialport:open",
@@ -85,6 +97,8 @@ export function* initialize() {
 		"serialport:openController",
 		(controllerType: FIRMWARE_TYPES_T) => {
 			reduxStore.dispatch(updateControllerType({ type: controllerType }));
+			// Reset homing run flag to prevent rapid position without running homing
+			reduxStore.dispatch(resetHoming());
 			setTimeout(() => {
 				reduxStore.dispatch(setConnectionState({ isConnected: true }));
 			}, 300);
@@ -92,6 +106,7 @@ export function* initialize() {
 	);
 
 	controller.addListener("serialport:close", () => {
+		reduxStore.dispatch(resetHoming());
 		reduxStore.dispatch(closeConnection());
 	});
 
