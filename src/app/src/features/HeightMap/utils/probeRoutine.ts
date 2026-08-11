@@ -228,6 +228,95 @@ export const probeConfigToMillimetres = <T extends HeightMapConfig>(
     return scaled;
 };
 
+const isImperialUnits = (units?: string): boolean =>
+    typeof units === 'string' && units.toLowerCase().startsWith('in');
+
+/**
+ * Reconcile a loaded height map with the workspace's display units.
+ *
+ * A .gshmap carries two things measured differently. The points and bounds are
+ * millimetres, because that is what the probe cycle produces. The config block
+ * is whatever the workspace was showing when it was saved. Applying both
+ * verbatim -- which is what loading used to do -- restores bounds and settings
+ * 25.4 times out whenever the two do not happen to match.
+ *
+ * A config with no recorded units is applied unchanged and flagged. Guessing
+ * would be worse: the values are plausible in either system, so a wrong guess
+ * is silent and a missing guess is at least visible.
+ */
+export const restoreHeightMapSettings = (
+    map: HeightMapData,
+    isMetric: boolean,
+): {
+    bounds: { minX: number; maxX: number; minY: number; maxY: number };
+    config: Record<string, number | boolean>;
+    warning?: string;
+} => {
+    const toDisplay = (value: number, sourceIsImperial: boolean): number => {
+        if (sourceIsImperial === !isMetric) return value;
+        return sourceIsImperial ? value * MM_PER_INCH : value / MM_PER_INCH;
+    };
+
+    const pointsAreImperial = isImperialUnits(map.units);
+    const bounds = {
+        minX: toDisplay(map.bounds.minX, pointsAreImperial),
+        maxX: toDisplay(map.bounds.maxX, pointsAreImperial),
+        minY: toDisplay(map.bounds.minY, pointsAreImperial),
+        maxY: toDisplay(map.bounds.maxY, pointsAreImperial),
+    };
+
+    // Fallback grid spacing, taken from the gap between adjacent probe columns.
+    // Derived here rather than at the call site so it shares the points' unit
+    // basis and comes back already converted, like the bounds.
+    const derivedSpacing = (): number | undefined => {
+        const uniqueX = [...new Set(map.points.map((p) => p.x))].sort((a, b) => a - b);
+        if (uniqueX.length < 2) return undefined;
+        return toDisplay(uniqueX[1] - uniqueX[0], pointsAreImperial);
+    };
+
+    const saved = map.config as (Record<string, unknown> & { units?: string }) | undefined;
+    const config: Record<string, number | boolean> = {};
+    const spacing = derivedSpacing();
+    if (spacing !== undefined) {
+        config.gridSpacing = spacing;
+    }
+
+    if (!saved) {
+        return { bounds, config };
+    }
+
+    if (typeof saved.usePointCount === 'boolean') {
+        config.usePointCount = saved.usePointCount;
+    }
+
+    if (saved.units === undefined) {
+        for (const field of LENGTH_FIELDS) {
+            const value = saved[field];
+            if (typeof value === 'number' && Number.isFinite(value)) {
+                config[field] = value;
+            }
+        }
+        return {
+            bounds,
+            config,
+            warning:
+                'This map does not record which units its saved settings were in, ' +
+                'so they have been applied as they stand. Check the clearance, ' +
+                'probe depth and feed rate before probing.',
+        };
+    }
+
+    const configIsImperial = isImperialUnits(saved.units);
+    for (const field of LENGTH_FIELDS) {
+        const value = saved[field];
+        if (typeof value === 'number' && Number.isFinite(value)) {
+            config[field] = toDisplay(value, configIsImperial);
+        }
+    }
+
+    return { bounds, config };
+};
+
 /**
  * Confirm the controller reports positions in millimetres.
  *

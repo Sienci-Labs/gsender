@@ -712,3 +712,113 @@ describe('bounds taken from a loaded file', () => {
         expect(maxX).toBeLessThan(50 / 25.4);
     });
 });
+
+describe('an alarm the operator navigates away from', () => {
+    /*
+     * The probe issues G91 / G38.2 / G90. An alarm during the probe move flushes
+     * the planner buffer and the G90 goes with it, so the controller is left
+     * incremental. The restore is deferred until the alarm clears -- but it is
+     * held in a ref inside this component, and the Height Map is a route, so one
+     * back-button click discards it.
+     *
+     * Sending G90 during unmount is not the answer: a restore is only ever
+     * pending because the machine is STILL alarmed, and grbl rejects g-code in
+     * that state with error:9. The command is guaranteed not to land, and
+     * emitting it would put a confusing error on the console while leaving the
+     * operator believing the machine had been put right.
+     *
+     * So the alarm message itself has to carry the instruction, because that is
+     * the thing that survives navigating away.
+     */
+    const alarmThenLeave = () => {
+        const view = render(<HeightMapTool />);
+        startProbing();
+        emit(prbFor(0));
+        settle();
+        mockStatus = { ...idleStatus(), activeState: 'Alarm' };
+        act(() => view.rerender(<HeightMapTool />));
+        const warning = document.body.textContent || '';
+        mockCommands.length = 0;
+        act(() => view.unmount());
+        return warning;
+    };
+
+    it('tells the operator the controller was left in incremental mode', () => {
+        const warning = alarmThenLeave();
+        expect(warning).toMatch(/incremental/i);
+        expect(warning).toMatch(/G90/);
+    });
+
+    it('tells them how to put it right themselves', () => {
+        expect(alarmThenLeave()).toMatch(/clear the alarm/i);
+    });
+
+    it('sends nothing on unmount, because it could only be rejected', () => {
+        alarmThenLeave();
+        expect(
+            mockCommands.filter(
+                (c) => c.name === 'gcode' || c.name === 'gcode:safe',
+            ),
+        ).toEqual([]);
+    });
+
+    it('still restores automatically when the alarm clears with the tool open', () => {
+        // The deferred path is unchanged for the case it can actually serve.
+        const view = render(<HeightMapTool />);
+        startProbing();
+        emit(prbFor(0));
+        settle();
+        mockStatus = { ...idleStatus(), activeState: 'Alarm' };
+        act(() => view.rerender(<HeightMapTool />));
+
+        mockCommands.length = 0;
+        mockStatus = idleStatus();
+        act(() => view.rerender(<HeightMapTool />));
+
+        expect(allGcode()).toMatch(/^G90$/m);
+    });
+});
+
+describe('grabbing bounds from the current position', () => {
+    /*
+     * status.wpos is raw controller output, in the controller's own units --
+     * the same exposure as [PRB:] and WCO:. State is display units, so the two
+     * have to be reconciled here exactly as they are for the file bbox.
+     */
+    const wposAt = (x: number, y: number) => ({
+        ...idleStatus(),
+        wpos: { x: String(x), y: String(y), z: '0' },
+    });
+
+    const grabMinBounds = (): number[] => {
+        render(<HeightMapTool />);
+        act(() => {
+            screen.getByRole('button', { name: /grab/i }).click();
+        });
+        return Array.from(document.querySelectorAll('input'))
+            .slice(0, 4)
+            .map((i) => parseFloat((i as HTMLInputElement).value));
+    };
+
+    it('records the same physical position whichever units are shown', () => {
+        mockStatus = wposAt(50, 40);
+        const [metricMinX, , metricMinY] = grabMinBounds();
+
+        cleanup();
+        mockUnits = 'in';
+        mockStatus = wposAt(50, 40);
+        const [imperialMinX, , imperialMinY] = grabMinBounds();
+
+        expect(imperialMinX * 25.4).toBeCloseTo(metricMinX, 1);
+        expect(imperialMinY * 25.4).toBeCloseTo(metricMinY, 1);
+    });
+
+    it('does not put a millimetre reading into an inch field', () => {
+        mockUnits = 'in';
+        mockStatus = wposAt(50, 40);
+        const [minX, , minY] = grabMinBounds();
+
+        expect(minX).toBeCloseTo(50 / 25.4, 2);
+        expect(minY).toBeCloseTo(40 / 25.4, 2);
+    });
+});

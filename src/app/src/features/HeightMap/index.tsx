@@ -45,6 +45,7 @@ import {
     HeightMapState,
     HeightMapData,
     DEFAULT_HEIGHT_MAP_STATE,
+    MIN_VALUES,
 } from './definitions';
 import GridVisualizer from './components/GridVisualizer';
 import ToolpathVisualizer from './components/ToolpathVisualizer';
@@ -56,6 +57,7 @@ import {
     resolveWorkOffsetZ,
     validateProbeTravel,
     describeLegacyNormalizedMap,
+    restoreHeightMapSettings,
     calculateProbeTimeoutMs,
     probeConfigToMillimetres,
     validateReportUnits,
@@ -91,25 +93,6 @@ const PROBE_SETTLE_DELAY_MS = 100;
  */
 const PROBE_XY_TOLERANCE_MM = 0.1;
 
-// Minimum values based on units
-const MIN_VALUES = {
-    metric: {
-        gridSpacing: 1,
-        edgeInset: 0,
-        zClearance: 1,
-        probeFeedRate: 25,
-        maxProbeDepth: 0.1,
-        segmentLength: 0.01,
-    },
-    imperial: {
-        gridSpacing: 0.04,
-        edgeInset: 0,
-        zClearance: 0.04,
-        probeFeedRate: 1,
-        maxProbeDepth: 0.004,
-        segmentLength: 0.004,
-    },
-};
 
 const HeightMapTool: React.FC = () => {
     const navigate = useNavigate();
@@ -117,6 +100,18 @@ const HeightMapTool: React.FC = () => {
     const units = store.get('workspace.units', METRIC_UNITS);
     const isMetric = units === METRIC_UNITS;
     const minValues = isMetric ? MIN_VALUES.metric : MIN_VALUES.imperial;
+
+    /**
+     * Millimetres from the controller into whatever the workspace is showing.
+     *
+     * The counterpart to probeConfigToMillimetres: anything arriving FROM the
+     * machine or a parsed file is metric, anything held in state is display
+     * units, and every crossing has to say which way it is going.
+     */
+    const toDisplayUnits = useCallback(
+        (mm: number): number => (isMetric ? mm : convertToImperial(mm)),
+        [isMetric],
+    );
 
     // Controller status
     const status = useTypedSelector((state) => state?.controller.state?.status);
@@ -268,7 +263,11 @@ const HeightMapTool: React.FC = () => {
                 maxY: 'y',
             };
             const axis = axisMap[field];
-            const value = parseFloat(wpos[axis] || '0');
+            // wpos is raw controller output, in the controller's own units --
+            // millimetres while $13 is 0, which probing requires. State is
+            // display units, so this needs the same reconciliation as the file
+            // bbox or a millimetre reading lands in an inch-labelled field.
+            const value = toDisplayUnits(parseFloat(wpos[axis] || '0'));
 
             updateField(field, value);
         },
@@ -279,8 +278,8 @@ const HeightMapTool: React.FC = () => {
     const grabCurrentXYForMin = useCallback(() => {
         if (!wpos) return;
 
-        const xValue = parseFloat(wpos.x || '0');
-        const yValue = parseFloat(wpos.y || '0');
+        const xValue = toDisplayUnits(parseFloat(wpos.x || '0'));
+        const yValue = toDisplayUnits(parseFloat(wpos.y || '0'));
 
         setState((prev) => ({
             ...prev,
@@ -313,21 +312,19 @@ const HeightMapTool: React.FC = () => {
         // before the inset is applied -- otherwise an imperial workspace ends up
         // holding an inch inset against a millimetre extent in the same field
         // pair, and the probe area is out by 25.4 at one end only.
-        const bboxInDisplayUnits = isMetric
-            ? fileInfo.bbox
-            : {
-                  ...fileInfo.bbox,
-                  min: {
-                      ...fileInfo.bbox.min,
-                      x: convertToImperial(fileInfo.bbox.min.x),
-                      y: convertToImperial(fileInfo.bbox.min.y),
-                  },
-                  max: {
-                      ...fileInfo.bbox.max,
-                      x: convertToImperial(fileInfo.bbox.max.x),
-                      y: convertToImperial(fileInfo.bbox.max.y),
-                  },
-              };
+        const bboxInDisplayUnits = {
+            ...fileInfo.bbox,
+            min: {
+                ...fileInfo.bbox.min,
+                x: toDisplayUnits(fileInfo.bbox.min.x),
+                y: toDisplayUnits(fileInfo.bbox.min.y),
+            },
+            max: {
+                ...fileInfo.bbox.max,
+                x: toDisplayUnits(fileInfo.bbox.max.x),
+                y: toDisplayUnits(fileInfo.bbox.max.y),
+            },
+        };
 
         const { bounds, applied, rejected } = deriveProbeBounds(
             bboxInDisplayUnits,
@@ -352,7 +349,7 @@ const HeightMapTool: React.FC = () => {
         } else {
             setWarnings([]);
         }
-    }, [fileInfo, state.edgeInset, units]);
+    }, [fileInfo, state.edgeInset, units, toDisplayUnits]);
 
     /** Drop any timer that could fire into a cycle that has moved on. */
     const clearProbeTimers = useCallback(() => {
@@ -582,6 +579,14 @@ const HeightMapTool: React.FC = () => {
     }, []);
 
     // Stop everything still pending when the widget goes away.
+    //
+    // Deliberately sends nothing. A modal restore is only ever outstanding
+    // because the machine is still alarmed -- if the alarm had cleared, the
+    // effect above would already have sent it -- and grbl rejects g-code in the
+    // alarm state with error:9. Emitting G90 here would be guaranteed not to
+    // land while putting a confusing error on the console and suggesting the
+    // machine had been put right. The alarm message carries the instruction
+    // instead, since that is what the operator still has after navigating away.
     useEffect(
         () => () => {
             isAbortedRef.current = true;
@@ -606,10 +611,17 @@ const HeightMapTool: React.FC = () => {
                 // every G38.2 went with it. Nothing can be sent until the alarm
                 // clears, so note that the restore is owed.
                 pendingModalRestoreRef.current = true;
+                // The instruction is spelled out here rather than only deferred,
+                // because this message is what survives the operator navigating
+                // away. The restore below can only run while this component is
+                // mounted, and the Height Map is a route.
                 failProbing(
                     'The machine alarmed during probing, so the cycle stopped. ' +
-                        'Clear the alarm and check the probe, the stock position ' +
-                        'and your soft limits before re-running.',
+                        'The interrupted probe left the controller in incremental ' +
+                        '(G91) mode. Clear the alarm with this tool open and ' +
+                        'absolute mode is restored for you; otherwise send G90 ' +
+                        'before using MDI or Go To. Check the probe, the stock ' +
+                        'position and your soft limits before re-running.',
                 );
             }
             return;
@@ -748,12 +760,12 @@ const HeightMapTool: React.FC = () => {
                 zClearance: state.zClearance,
                 probeFeedRate: state.probeFeedRate,
                 maxProbeDepth: state.maxProbeDepth,
-                // Display units, not millimetres: loadMap restores this block
-                // straight into the on-screen state, so converting it here
-                // would rescale an imperial operator's settings on every
-                // save/load round trip. The map POINTS are millimetres; this
-                // block is only the UI configuration that produced them.
                 segmentLength: state.segmentLength,
+                // The block above is in display units while the map's points
+                // are millimetres, so the two need telling apart on load.
+                // Without this the same file restores different settings
+                // depending on which unit system happens to be selected.
+                units,
             },
         };
 
@@ -787,48 +799,43 @@ const HeightMapTool: React.FC = () => {
                         return;
                     }
 
-                    // Get config from file or calculate defaults
-                    const config = data.config;
-
-                    // Calculate grid spacing from the map points if not stored
-                    let gridSpacing = config?.gridSpacing ?? 10;
-                    if (!config?.gridSpacing && data.points.length > 1) {
-                        const uniqueX = [...new Set(data.points.map(p => p.x))].sort((a, b) => a - b);
-                        if (uniqueX.length > 1) {
-                            gridSpacing = uniqueX[1] - uniqueX[0];
-                        }
-                    }
-
                     // Calculate point counts from resolution or derive from points
                     const pointCountX = data.resolution?.x || [...new Set(data.points.map(p => p.x))].length;
                     const pointCountY = data.resolution?.y || [...new Set(data.points.map(p => p.y))].length;
+
+                    // Bounds follow the points (millimetres); the config block
+                    // follows whatever was on screen when it was saved.
+                    const restored = restoreHeightMapSettings(data, isMetric);
 
                     // Update state with map data AND all config values from the loaded map
                     setState((prev) => ({
                         ...prev,
                         mapData: data,
                         // Bounds
-                        minX: data.bounds.minX,
-                        maxX: data.bounds.maxX,
-                        minY: data.bounds.minY,
-                        maxY: data.bounds.maxY,
+                        ...restored.bounds,
                         // Grid resolution
-                        gridSpacing,
-                        usePointCount: config?.usePointCount ?? prev.usePointCount,
+                        gridSpacing: restored.config.gridSpacing ?? prev.gridSpacing,
+                        usePointCount:
+                            restored.config.usePointCount ?? prev.usePointCount,
                         pointCountX,
                         pointCountY,
                         // Probing safety
-                        zClearance: config?.zClearance ?? prev.zClearance,
-                        probeFeedRate: config?.probeFeedRate ?? prev.probeFeedRate,
-                        maxProbeDepth: config?.maxProbeDepth ?? prev.maxProbeDepth,
+                        zClearance: restored.config.zClearance ?? prev.zClearance,
+                        probeFeedRate:
+                            restored.config.probeFeedRate ?? prev.probeFeedRate,
+                        maxProbeDepth:
+                            restored.config.maxProbeDepth ?? prev.maxProbeDepth,
                         // Transform settings
-                        segmentLength: config?.segmentLength ?? prev.segmentLength,
+                        segmentLength:
+                            restored.config.segmentLength ?? prev.segmentLength,
                     }));
 
                     // Map datum semantics changed, and old files are silently
                     // wrong rather than obviously wrong, so say something.
                     const legacy = describeLegacyNormalizedMap(data);
-                    setWarnings(legacy ? [legacy] : []);
+                    setWarnings(
+                        [legacy, restored.warning].filter(Boolean) as string[],
+                    );
                 } catch (err) {
                     setWarnings(['Failed to parse map file']);
                 }

@@ -29,12 +29,15 @@ import {
     MIN_PROBE_TIMEOUT_MS,
     probeConfigToMillimetres,
     validateReportUnits,
+    restoreHeightMapSettings,
 } from '../utils/probeRoutine';
 import { calculateProbeGrid } from '../utils/interpolation';
+
 import {
     HeightMapConfig,
     HeightMapData,
     DEFAULT_HEIGHT_MAP_CONFIG,
+    MIN_VALUES,
 } from '../definitions';
 
 /** Strip comments and blanks so assertions read against real motion only. */
@@ -549,5 +552,126 @@ describe('calculateProbeGrid boundary handling', () => {
                 expect(xs[i] - xs[i - 1]).toBeGreaterThan(1e-3);
             }
         }
+    });
+});
+
+describe('MIN_VALUES parity between unit systems', () => {
+    // The imperial floors were written by hand and drifted: segmentLength was
+    // 0.004in against a metric 0.01mm, ten times looser, and probeFeedRate's 1
+    // in/min only matched the metric 25 mm/min by luck once the feed rate joined
+    // the display conversion. A floor is a physical statement -- "no smaller
+    // than this" -- so both systems have to mean the same thing.
+
+    it('states the same physical minimum in both systems', () => {
+        const metric = MIN_VALUES.metric as Record<string, number>;
+        const imperial = MIN_VALUES.imperial as Record<string, number>;
+
+        expect(Object.keys(imperial).sort()).toEqual(Object.keys(metric).sort());
+        for (const key of Object.keys(metric)) {
+            expect(imperial[key] * 25.4).toBeCloseTo(metric[key], 9);
+        }
+    });
+});
+
+describe('restoreHeightMapSettings', () => {
+    /*
+     * A .gshmap carries two things in different units, and used to say which for
+     * neither: the points and bounds are millimetres, while the config block is
+     * whatever the workspace was displaying when it was saved. Loading applied
+     * both verbatim, so a map saved in millimetres and opened on an imperial
+     * workspace restored bounds and settings 25.4 times too large.
+     */
+    const mapMm: HeightMapData = {
+        bounds: { minX: 0, maxX: 50, minY: 0, maxY: 40 },
+        resolution: { x: 25, y: 20 },
+        points: [
+            { x: 0, y: 0, z: 0 },
+            { x: 50, y: 0, z: 0.1 },
+            { x: 0, y: 40, z: 0.1 },
+            { x: 50, y: 40, z: 0.2 },
+        ],
+        units: 'mm',
+        config: {
+            gridSpacing: 25,
+            usePointCount: false,
+            zClearance: 5,
+            probeFeedRate: 100,
+            maxProbeDepth: 10,
+            segmentLength: 1,
+            units: 'mm',
+        },
+    } as HeightMapData;
+
+    it('leaves a millimetre map alone on a metric workspace', () => {
+        const restored = restoreHeightMapSettings(mapMm, true);
+        expect(restored.bounds).toEqual({ minX: 0, maxX: 50, minY: 0, maxY: 40 });
+        expect(restored.config.zClearance).toBeCloseTo(5, 9);
+        expect(restored.warning).toBeUndefined();
+    });
+
+    it('converts the bounds for an imperial workspace', () => {
+        // The points are millimetres whatever the workspace shows.
+        const restored = restoreHeightMapSettings(mapMm, false);
+        expect(restored.bounds.maxX).toBeCloseTo(50 / 25.4, 6);
+        expect(restored.bounds.maxY).toBeCloseTo(40 / 25.4, 6);
+    });
+
+    it('converts the configuration from the units it was saved in', () => {
+        const restored = restoreHeightMapSettings(mapMm, false);
+        expect(restored.config.zClearance).toBeCloseTo(5 / 25.4, 6);
+        expect(restored.config.probeFeedRate).toBeCloseTo(100 / 25.4, 6);
+        expect(restored.config.segmentLength).toBeCloseTo(1 / 25.4, 6);
+    });
+
+    it('round trips a configuration saved on an imperial workspace', () => {
+        const savedImperial = {
+            ...mapMm,
+            config: { ...mapMm.config, zClearance: 5 / 25.4, units: 'in' },
+        } as HeightMapData;
+
+        expect(restoreHeightMapSettings(savedImperial, false).config.zClearance).toBeCloseTo(
+            5 / 25.4,
+            6,
+        );
+        expect(restoreHeightMapSettings(savedImperial, true).config.zClearance).toBeCloseTo(
+            5,
+            6,
+        );
+    });
+
+    it('warns when the configuration does not record its units', () => {
+        const legacy = {
+            ...mapMm,
+            config: { ...mapMm.config, units: undefined },
+        } as HeightMapData;
+
+        const restored = restoreHeightMapSettings(legacy, false);
+        expect(restored.warning).toMatch(/unit/i);
+        // Applied as-is, since guessing would be worse than saying so.
+        expect(restored.config.zClearance).toBeCloseTo(5, 9);
+    });
+
+    it('handles a map with no config block at all', () => {
+        const bare = { ...mapMm, config: undefined } as HeightMapData;
+        const restored = restoreHeightMapSettings(bare, false);
+        expect(restored.bounds.maxX).toBeCloseTo(50 / 25.4, 6);
+        expect(restored.config.usePointCount).toBeUndefined();
+    });
+
+    it('derives a grid spacing in display units when none was stored', () => {
+        // Falling back to the gap between adjacent point X values takes it
+        // straight from the millimetre points, so it has to be converted like
+        // the bounds. This fixture has columns at x=0 and x=50, so the gap is
+        // 50mm -- not resolution.x, which the fallback deliberately ignores
+        // because a hand-written map may not have one.
+        const bare = { ...mapMm, config: undefined } as HeightMapData;
+        expect(restoreHeightMapSettings(bare, false).config.gridSpacing).toBeCloseTo(
+            50 / 25.4,
+            6,
+        );
+        expect(restoreHeightMapSettings(bare, true).config.gridSpacing).toBeCloseTo(
+            50,
+            6,
+        );
     });
 });

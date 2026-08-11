@@ -107,3 +107,29 @@ export const DEFAULT_HEIGHT_MAP_STATE: HeightMapState = {
     currentProbeIndex: 0,
     lastError: null,
 };
+
+/**
+ * Smallest sensible value for each configurable length.
+ *
+ * The imperial floors are derived rather than written out, so the two systems
+ * cannot drift into meaning different physical things. They had: segmentLength
+ * was 0.004in against a metric 0.01mm -- ten times looser -- and probeFeedRate's
+ * 1in/min matched the metric 25mm/min only by coincidence.
+ */
+const MIN_VALUES_METRIC = {
+    gridSpacing: 1,
+    edgeInset: 0,
+    zClearance: 1,
+    probeFeedRate: 25,
+    maxProbeDepth: 0.1,
+    segmentLength: 0.01,
+};
+
+const MM_PER_INCH = 25.4;
+
+export const MIN_VALUES = {
+    metric: MIN_VALUES_METRIC,
+    imperial: Object.fromEntries(
+        Object.entries(MIN_VALUES_METRIC).map(([key, mm]) => [key, mm / MM_PER_INCH]),
+    ) as typeof MIN_VALUES_METRIC,
+};
