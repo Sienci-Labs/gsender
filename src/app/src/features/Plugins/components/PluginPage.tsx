@@ -36,7 +36,15 @@ const PluginPage = () => {
 	if (loading) {
 		return (
 			<Page title="Plugin" withGoBackButton>
-				<p className="text-gray-500">Loading plugin...</p>
+				<div className="h-full flex items-center justify-center">
+					<div className="flex flex-col gap-2 justify-center items-center h-full">
+						<div className="flex gap-2">
+						<div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse" />
+						<div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse" />
+						<div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse" />
+					</div>
+				</div>
+			</div>
 			</Page>
 		);
 	}
@@ -44,10 +52,12 @@ const PluginPage = () => {
 	if (!plugin) {
 		return (
 			<Page title="Plugin" withGoBackButton>
-				<p className="text-gray-500">
-					Plugin not found or disabled. Install plugins to{" "}
-					<code className="text-sm">plugins</code> folder and restart gSender.
-				</p>
+				<div className="h-full flex items-center justify-center">
+					<p className="text-gray-500 dark:text-content-secondary">
+						Plugin not found or disabled. Install plugins to{" "}
+						<code className="text-sm">plugins</code> folder and restart gSender.
+					</p>
+				</div>
 			</Page>
 		);
 	}
