@@ -11,7 +11,7 @@ import isElectron from "is-electron";
 import { useEffect, useState } from "react";
 import { usePlugins } from "../hooks/usePlugins";
 
-const permissionsMap = new Map<string, string[]>([
+export const permissionsMap = new Map<string, string[]>([
 	[
 		"*require-whole-module*",
 		[
@@ -121,8 +121,6 @@ const PluginManager = () => {
 					const { capabilities, hasDynamicImport } = result.data;
 					let permissions: string[];
 
-					console.log(capabilities);
-
 					// if imported gsender client, needs all permissions
 					if (
 						capabilities.includes("gsender") ||
@@ -176,9 +174,12 @@ const PluginManager = () => {
 								.then((res) => {
 									if (res.status !== 200) {
 										console.error(res.data.error);
-										toast.error("Failed to import plugin. Please try again.", {
-											position: "bottom-right",
-										});
+										toast.error(
+											"Failed to write permissions for plugin. Please try again.",
+											{
+												position: "bottom-right",
+											},
+										);
 									} else {
 										setImportData({ directory });
 									}
