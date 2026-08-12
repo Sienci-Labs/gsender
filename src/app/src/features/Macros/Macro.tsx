@@ -136,11 +136,6 @@ const Macro = ({ state, actions, workflow }: MacroProps) => {
 		});
 	}, [macros]);
 
-	useEffect(() => {
-		const combined = [...columns.column1.items, ...columns.column2.items];
-		actions.updateMacros(combined);
-	}, [columns]);
-
 	const canRunMacro = (): boolean => {
 		const { canClick } = state;
 
@@ -215,6 +210,9 @@ const Macro = ({ state, actions, workflow }: MacroProps) => {
 				},
 			});
 		}
+
+		const combined = [...columns.column1.items, ...columns.column2.items];
+		actions.updateMacros(combined);
 
 		setActiveId(null);
 	};

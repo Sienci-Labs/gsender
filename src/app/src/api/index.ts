@@ -294,6 +294,10 @@ const macros = {
 		return authrequest.put("/api/macros/" + id, options);
 	},
 
+	bulkUpdate: (macros: any[]): Promise<AxiosResponse> => {
+		return authrequest.put("/api/macros", { macros });
+	},
+
 	delete: (id: string): Promise<AxiosResponse> => {
 		return authrequest.delete("/api/macros/" + id);
 	},

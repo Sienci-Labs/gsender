@@ -9,10 +9,9 @@ import {
 } from "app/components/shadcn/Dialog";
 import { Input } from "app/components/shadcn/Input";
 import Tooltip from "app/components/Tooltip";
+import { getThemeCssColor } from "app/lib/getThemeCssColor";
 import { type ChangeEvent, type FormEvent, useRef, useState } from "react";
 import Select from "react-select";
-
-import { getThemeCssColor } from "app/lib/getThemeCssColor";
 import { MACRO_VARIABLES } from "./constants";
 import insertAtCaret from "./insertAtCaret";
 

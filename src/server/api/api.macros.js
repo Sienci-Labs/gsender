@@ -200,22 +200,6 @@ export const update = (req, res) => {
 		rowIndex = record.rowIndex,
 	} = { ...req.body };
 
-	/*
-    if (!name) {
-        res.status(ERR_BAD_REQUEST).send({
-            msg: 'The "name" parameter must not be empty'
-        });
-        return;
-    }
-
-    if (!content) {
-        res.status(ERR_BAD_REQUEST).send({
-            msg: 'The "content" parameter must not be empty'
-        });
-        return;
-    }
-    */
-
 	try {
 		record.mtime = new Date().getTime();
 		record.name = String(name || "");
@@ -225,6 +209,36 @@ export const update = (req, res) => {
 		record.rowIndex = Number(rowIndex || 0);
 
 		config.set(CONFIG_KEY, records);
+
+		res.send({ err: null });
+	} catch (err) {
+		res.status(ERR_INTERNAL_SERVER_ERROR).send({
+			msg: "Failed to save " + JSON.stringify(settings.rcfile),
+		});
+	}
+};
+
+export const bulkUpdate = (req, res) => {
+	const { macros } = req.body;
+	const records = getSanitizedRecords();
+
+	if (!macros || macros.length === 0) {
+		res.status(ERR_BAD_REQUEST).send({
+			msg: "The 'macros' parameter must not be empty",
+		});
+		return;
+	}
+
+	try {
+		const updatedRecords = records.map((record) => {
+			const matchedRecord = macros.find((macro) => macro.id === record.id);
+
+			if (!matchedRecord) return record;
+
+			return matchedRecord;
+		});
+
+		config.set(CONFIG_KEY, updatedRecords);
 
 		res.send({ err: null });
 	} catch (err) {
