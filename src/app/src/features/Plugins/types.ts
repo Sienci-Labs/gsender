@@ -23,7 +23,6 @@ export type PluginRecord = {
 	name: string;
 	version: string;
 	engine: string | null;
-	permissions: string[];
 	capabilities: PluginCapabilities;
 	enabled: boolean;
 	valid: boolean;
@@ -104,10 +103,10 @@ export const permissionsMap = new Map<string, PluginPermissionsType[]>([
 	["workspace", ["workspace:read"]],
 	["getWorkspaceState", ["workspace:read"]],
 	["subscribeWorkspaceState", ["workspace:read"]],
-	["useWorkspaceState", ["workspace:read"]],
 	["redux", ["redux:read"]],
 	["getReduxState", ["redux:read"]],
 	["getSelector", ["redux:read"]],
+	["useWorkspaceState", ["workspace:read"]],
 	["subscribeSelector", ["redux:read"]],
 	["useTypedSelector", ["redux:read"]],
 ]);
@@ -145,4 +144,7 @@ export const requestTypesMap = new Map<string, PluginBridgeRequestType[]>([
 export const topicsMap = new Map<string, PluginTopicsType>([
 	["subscribeWorkspaceState", "workspace"],
 	["subscribeSelector", "redux"],
+	["useWorkspaceState", "workspace"],
+	["subscribeSelector", "redux"],
+	["useTypedSelector", "redux"],
 ]);

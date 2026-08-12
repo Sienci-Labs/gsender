@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noExplicitAny: <> */
 import controller from "app/lib/controller";
 import * as user from "app/lib/user";
 import store from "app/store";
@@ -48,7 +49,7 @@ function App() {
 
 		if (isElectron()) {
 			console.log("Getting windows registry");
-			window.ipcRenderer
+			(window as any).ipcRenderer
 				.invoke("get-windows-registry")
 				.then((value: boolean) => {
 					posthog.register({ isBundled: value });
@@ -61,15 +62,13 @@ function App() {
 	}, []);
 
 	return (
-		<>
-			<ReduxProvider store={reduxStore}>
-				<AccessibilitySettingsHandler />
-				<Toaster richColors closeButton theme="light" visibleToasts={5} />
-				<HashRouter>
-					<ReactRoutes />
-				</HashRouter>
-			</ReduxProvider>
-		</>
+		<ReduxProvider store={reduxStore}>
+			<AccessibilitySettingsHandler />
+			<Toaster richColors closeButton theme="light" visibleToasts={5} />
+			<HashRouter>
+				<ReactRoutes />
+			</HashRouter>
+		</ReduxProvider>
 	);
 }
 

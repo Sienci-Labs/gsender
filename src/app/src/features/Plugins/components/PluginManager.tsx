@@ -8,6 +8,7 @@ import Switch from "app/components/Switch";
 import { Tooltip } from "app/components/Tooltip"; // Ensure Tooltip exists
 import { toast } from "app/lib/toaster";
 import isElectron from "is-electron";
+import { isEmpty } from "lodash";
 import { useEffect, useState } from "react";
 import { usePlugins } from "../hooks/usePlugins";
 import {
@@ -177,20 +178,21 @@ const PluginManager = () => {
 	}, []);
 
 	useEffect(() => {
-		const { directory } = importData;
-		console.log(pluginsDir);
-		// import the directory to the plugins directory
-		api.plugins.importPlugin(pluginsDir, directory).then((res) => {
-			if (res.status !== 200) {
-				console.error(res.data.error);
-				toast.error("Failed to import plugin. Please try again.", {
-					position: "bottom-right",
-				});
-			} else {
-				toast.success("Plugin imported.");
-				refresh();
-			}
-		});
+		if (!isEmpty(importData)) {
+			const { directory } = importData;
+			// import the directory to the plugins directory
+			api.plugins.importPlugin(pluginsDir, directory).then((res) => {
+				if (res.status !== 200) {
+					console.error(res.data.error);
+					toast.error("Failed to import plugin. Please try again.", {
+						position: "bottom-right",
+					});
+				} else {
+					toast.success("Plugin imported.");
+					refresh();
+				}
+			});
+		}
 	}, [importData]);
 
 	return (

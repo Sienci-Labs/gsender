@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
 import controller from "app/lib/controller";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { PluginCapabilities, PluginRecord } from "../types";
@@ -13,6 +14,7 @@ type PluginPanelProps = {
 };
 
 const PluginPanel = ({ plugin, className = "", title }: PluginPanelProps) => {
+	console.log(plugin);
 	// Bumped on dev live-reload to force the iframe to re-fetch its content.
 	const [reloadToken, setReloadToken] = useState(0);
 	const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -45,9 +47,9 @@ const PluginPanel = ({ plugin, className = "", title }: PluginPanelProps) => {
 		if (!win) return;
 
 		const capabilities: PluginCapabilities = {
-			requestTypes: new Set(plugin.capabilities.requestTypes ?? []),
-			topics: new Set(plugin.capabilities.topics ?? []),
-			allowedFunctions: new Set(plugin.capabilities.allowedFunctions ?? []),
+			requestTypes: plugin.capabilities.requestTypes ?? new Set([]),
+			topics: plugin.capabilities.topics ?? new Set([]),
+			allowedFunctions: plugin.capabilities.allowedFunctions ?? new Set([]),
 		};
 
 		registerPluginWindow(win, capabilities);
@@ -68,7 +70,7 @@ const PluginPanel = ({ plugin, className = "", title }: PluginPanelProps) => {
 				title={plugin.name}
 				src={iframeSrc}
 				className="flex-1 w-full min-h-[320px] border border-gray-200 rounded-md dark:border-dark-lighter bg-white dark:bg-dark"
-				sandbox="allow-scripts allow-forms"
+				sandbox="allow-scripts allow-forms allow-same-origin"
 			/>
 		</div>
 	);

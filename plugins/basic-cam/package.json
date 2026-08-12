@@ -13,7 +13,8 @@
 		"@sienci/gviewer": "^0.1.27",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
-		"three": "^0.168.0"
+		"three": "^0.168.0",
+		"vite-plugin-static-copy": "^4.1.1"
 	},
 	"devDependencies": {
 		"@tailwindcss/vite": "^4.0.0",

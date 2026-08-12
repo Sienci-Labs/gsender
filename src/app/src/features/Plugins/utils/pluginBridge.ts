@@ -57,6 +57,7 @@ const runMachineCommand = async (
 	const args = Array.isArray(payload.args) ? payload.args : [];
 
 	if (!cmd) {
+		console.error("cmd is required");
 		throw new Error("cmd is required");
 	}
 
@@ -97,6 +98,7 @@ const handleBridgeRequest = async (
 ): Promise<unknown> => {
 	// check if plugin is allowed to use this request type
 	if (!capabilities.requestTypes.has(request.type)) {
+		console.error(`Plugin not authorized to use '${request.type}`)
 		throw new Error(`Plugin not authorized to use '${request.type}'`);
 	}
 
@@ -114,6 +116,7 @@ const handleBridgeRequest = async (
 				request.payload as { gcode: string; name: string }
 			);
 		default:
+			console.error(`Unknown bridge request: ${request.type}`);
 			throw new Error(`Unknown bridge request: ${request.type}`);
 	}
 };
@@ -220,6 +223,7 @@ const addSubscription = (
 ) => {
 	// check if plugin has subscription perms
 	if (!capabilities.topics.has(subscribe.topic)) {
+		console.error(`Plugin not authorized to subscribe to '${subscribe.topic}'`);
 		throw new Error(`Plugin not authorized to subscribe to '${subscribe.topic}'`);
 	}
 

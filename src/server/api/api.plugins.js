@@ -36,7 +36,7 @@ export const fetch = (_req, res) => {
 		name: plugin.name,
 		version: plugin.version,
 		engine: plugin.engine,
-		permissions: plugin.permissions,
+		capabilities: plugin.capabilities,
 		enabled: plugin.enabled,
 		valid: plugin.valid,
 		errors: plugin.errors,
@@ -189,7 +189,7 @@ export const readImportedManifest = (req, res) => {
 export const writePermissions = (req, res) => {
 	const { pluginPath, capabilities } = req.body;
 
-	log.debug(pluginPath);
+	log.error(capabilities);
 	try {
 		if (typeof pluginPath !== "string") {
 			return res.status(ERR_BAD_REQUEST).send({

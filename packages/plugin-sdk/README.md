@@ -30,6 +30,14 @@ npm install @sienci/gviewer three
 
 Framework-agnostic RPC + subscriptions. Safe for vanilla JS, Vue, Svelte, etc. — does **not** import React.
 
+Individual clients:
+- `machine`
+- `workspace`
+- `redux`
+- `gcode`
+
+`gsender` includes all these clients in one object.
+
 ```ts
 import {
   gsender,
@@ -97,11 +105,11 @@ viewer.focusToModel();
 
 | API | Description |
 |-----|-------------|
-| `gsender.machine.getContext()` | Current machine / controller context |
-| `gsender.machine.command(cmd, ...args)` | Run a host machine command |
-| `gsender.workspace.getState()` | One-shot workspace snapshot |
-| `gsender.redux.getState()` | One-shot full Redux state |
-| `gsender.gcode.loadToVisualizer(gcode, name?)` | Load G-code into the main visualizer/job |
+| `machine.getContext()` | Current machine / controller context |
+| `machine.command(cmd, ...args)` | Run a host machine command |
+| `workspace.getState()` | One-shot workspace snapshot |
+| `redux.getState()` | One-shot full Redux state |
+| `gcode.loadToVisualizer(gcode, name?)` | Load G-code into the main visualizer/job |
 | `subscribeWorkspaceState(cb)` | Live workspace updates |
 | `subscribeSelector(selector, cb, equalityFn?)` | Live Redux slice |
 | `useWorkspaceState()` | React hook for workspace |

@@ -86,6 +86,7 @@ const ensureListener = () => {
 				snapshot: unknown;
 			};
 			latestSnapshot.set(topic, snapshot);
+			// biome-ignore lint/suspicious/useIterableCallbackReturn: <>
 			topicListeners.get(topic)?.forEach((notify) => notify());
 		}
 	});
