@@ -29,6 +29,11 @@ const log = logger("service:pluginregistry");
 
 const MANIFEST_FILENAME = "gsender-plugin.json";
 
+const normalizePermissions = (permissions) =>
+	Array.isArray(permissions)
+		? permissions.filter((item) => typeof item === "string")
+		: [];
+
 const getPluginsDirectory = () => settings.pluginsDir;
 
 const ensurePluginsDirectory = () => {
@@ -180,6 +185,7 @@ const discoverPluginsInDir = (pluginsDir) => {
 			description: manifest.description || "",
 			engine: manifest.engine || null,
 			capabilities: normalizeCapabilities(manifest.capabilities),
+			permissions: normalizePermissions(manifest.permissions),
 			enabled,
 			valid: errors.length === 0,
 			errors,
@@ -335,6 +341,7 @@ const readImportedManifest = (pluginPath) => {
 		version: manifest.version,
 		engine: manifest.engine || null,
 		capabilities: normalizeCapabilities(manifest.capabilities),
+		permissions: normalizePermissions(manifest.permissions),
 		valid: errors.length === 0,
 		errors,
 		entry: manifest.ui.entry,

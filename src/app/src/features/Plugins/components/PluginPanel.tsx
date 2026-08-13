@@ -15,6 +15,20 @@ type PluginPanelProps = {
 	title?: string;
 };
 
+// Maps a manifest permission to the Permissions-Policy feature it delegates
+// to the plugin iframe. Only permissions with a browser-feature counterpart
+// belong here — most permissions (workspace:read, etc.) gate the message
+// bridge instead and have no iframe-level equivalent.
+const IFRAME_ALLOW_MAP: Partial<Record<string, string>> = {
+	"local-fonts": "local-fonts",
+};
+
+const buildIframeAllow = (permissions: PluginRecord["permissions"]): string =>
+	(permissions ?? [])
+		.map((permission) => IFRAME_ALLOW_MAP[permission])
+		.filter((feature): feature is string => Boolean(feature))
+		.join("; ");
+
 const PluginPanel = ({ plugin, className = "", title }: PluginPanelProps) => {
 	// Bumped on dev live-reload to force the iframe to re-fetch its content.
 	const [reloadToken, setReloadToken] = useState(0);
@@ -66,6 +80,7 @@ const PluginPanel = ({ plugin, className = "", title }: PluginPanelProps) => {
 				src={iframeSrc}
 				className="flex-1 w-full min-h-[320px] border border-gray-200 rounded-md dark:border-outline"
 				sandbox="allow-scripts allow-forms allow-same-origin"
+				allow={buildIframeAllow(plugin.permissions)}
 			/>
 		</div>
 	);

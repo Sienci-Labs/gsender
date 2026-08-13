@@ -205,6 +205,19 @@ const main = () => {
 		try {
 			await session.defaultSession.clearCache();
 
+			// Plugin iframes are same-origin with the app, so a single app-wide
+			// grant is enough — per-plugin scoping happens at the iframe's
+			// `allow="local-fonts"` attribute (see PluginPanel.tsx), which is only
+			// set for plugins that declare "local-fonts" in their manifest.
+			session.defaultSession.setPermissionCheckHandler(
+				(_webContents, permission) => permission === "local-fonts",
+			);
+			session.defaultSession.setPermissionRequestHandler(
+				(_webContents, permission, callback) => {
+					callback(permission === "local-fonts");
+				},
+			);
+
 			windowManager = new WindowManager();
 			// Create and show splash before server starts
 			const splashScreen = windowManager.createSplashScreen({

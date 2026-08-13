@@ -31,6 +31,7 @@ export type PluginRecord = {
 	description: string;
 	engine: string | null;
 	capabilities: PluginCapabilitiesWire;
+	permissions: PluginPermissionsType[];
 	enabled: boolean;
 	valid: boolean;
 	errors: string[];
@@ -45,12 +46,13 @@ export type PluginsResponse = {
 	plugins: PluginRecord[];
 };
 
-export type PluginPermissionsType = 
+export type PluginPermissionsType =
 	"machine:read"
 	| "machine:write"
 	| "visualizer:load"
 	| "workspace:read"
-	| "redux:read";
+	| "redux:read"
+	| "local-fonts";
 
 export type PluginTopicsType = "workspace" | "redux"
 
