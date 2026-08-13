@@ -11,13 +11,8 @@ import isElectron from "is-electron";
 import { isEmpty } from "lodash";
 import { useEffect, useState } from "react";
 import { usePlugins } from "../hooks/usePlugins";
-import {
-	type PluginBridgeRequestType,
-	type PluginBridgeTopic,
-	permissionsMap,
-	requestTypesMap,
-	topicsMap,
-} from "../types";
+import { SDK_SCAN_SPECIFIERS } from "../types";
+import { buildGrantFromScan } from "../utils/capabilities";
 
 const PluginManager = () => {
 	const {
@@ -41,9 +36,6 @@ const PluginManager = () => {
 		}
 	};
 
-	// The plugins folder lives on the machine running the gSender server. Opening
-	// it in a file manager only makes sense from the local desktop app — when the
-	// UI is loaded remotely in a web browser there is no local folder to reveal.
 	const canOpenDir = isElectron();
 
 	const handleOpenDir = async () => {
@@ -79,11 +71,10 @@ const PluginManager = () => {
 					}
 
 					// do plugin checks
-					const result = await api.plugins.scanPluginForSDKUsage(indexFile, [
-						"@sienci/gsender-plugin-sdk",
-						"@sienci/gsender-plugin-sdk/react",
-						"../../../packages/plugin-sdk",
-					]);
+					const result = await api.plugins.scanPluginForSDKUsage(
+						indexFile,
+						SDK_SCAN_SPECIFIERS,
+					);
 					if (result.status !== 200) {
 						console.error(result.data.msg);
 						toast.error("Oops. Something went wrong.", {
@@ -95,30 +86,7 @@ const PluginManager = () => {
 					const { capabilities, hasDynamicImport } = result.data;
 
 					// figure out which clients they imported
-					const permissions = [
-						...new Set<string>(
-							capabilities.flatMap((capability: string) => {
-								return permissionsMap.get(capability);
-							}),
-						),
-					];
-					const allowedFunctions = capabilities.filter(
-						(capability: string) => capability !== "*require-whole-module*",
-					);
-					const requestTypes = new Set<PluginBridgeRequestType>(
-						capabilities
-							.filter((capability: string) => requestTypesMap.has(capability))
-							.flatMap((capability: string) => {
-								return requestTypesMap.get(capability);
-							}),
-					);
-					const topics = new Set<PluginBridgeTopic>(
-						capabilities
-							.filter((capability: string) => topicsMap.has(capability))
-							.flatMap((capability: string) => {
-								return topicsMap.get(capability);
-							}),
-					);
+					const { permissions, wire } = buildGrantFromScan(capabilities);
 
 					Confirm({
 						title: "Plugin Permissions",
@@ -151,25 +119,19 @@ const PluginManager = () => {
 						cancelLabel: "Cancel",
 						onConfirm: async () => {
 							// write used permissions to manifest
-							api.plugins
-								.writePermissions(directory, {
-									allowedFunctions,
-									requestTypes,
-									topics,
-								})
-								.then((res) => {
-									if (res.status !== 200) {
-										console.error(res.data.error);
-										toast.error(
-											"Failed to write permissions for plugin. Please try again.",
-											{
-												position: "bottom-right",
-											},
-										);
-									} else {
-										setImportData({ directory });
-									}
-								});
+							api.plugins.writePermissions(directory, wire).then((res) => {
+								if (res.status !== 200) {
+									console.error(res.data.error);
+									toast.error(
+										"Failed to write permissions for plugin. Please try again.",
+										{
+											position: "bottom-right",
+										},
+									);
+								} else {
+									setImportData({ directory });
+								}
+							});
 						},
 					});
 				},

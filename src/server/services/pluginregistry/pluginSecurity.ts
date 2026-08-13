@@ -97,17 +97,22 @@ export function scanPluginForSdkUsage(
                 }
             }
 
-            // Dynamic import: import('@yoursdk/plugin-api') or computed specifiers
-            // Acorn represents dynamic import() as callee.type === 'Import'.
-            if ((callNode.callee as { type: string }).type === 'Import') {
-                const arg = callNode.arguments[0] as { type: string; value: string };
-                if (arg && callNode.arguments.length === 1 && arg.type === 'Literal' && sdkPackageNames.includes(arg.value)) {
+        },
+
+        // Dynamic import: import('@yoursdk/plugin-api') or computed specifiers.
+        // Acorn parses dynamic import() as its own ImportExpression node — it
+        // is NOT a CallExpression, so it must be visited separately or it is
+        // invisible to the scan.
+        ImportExpression(node) {
+            const source = (node as unknown as { source: { type: string; value?: unknown } }).source;
+            if (source.type === 'Literal') {
+                if (sdkPackageNames.includes(source.value as string)) {
                     hasDynamicImport = true;
                     capabilities.add('*require-whole-module*');
-                } else if (arg && arg.type !== 'Literal') {
-                    // Specifier isn't a plain string literal — can't resolve statically.
-                    hasDynamicImport = true;
                 }
+            } else {
+                // Computed specifier — can't resolve statically.
+                hasDynamicImport = true;
             }
         },
     });
@@ -118,27 +123,3 @@ export function scanPluginForSdkUsage(
         hasRequireCall,
     };
 }
-
-// // --- CLI usage: tsx scan-plugin.ts <bundle.js> <sdk-package-name> ---
-// const isMainModule =
-// typeof process !== 'undefined' &&
-// import.meta.url === `file://${process.argv[1]}`;
-
-// if (isMainModule) {
-//     const [, , filePath, sdkPackageName] = process.argv;
-//     if (!filePath || !sdkPackageName) {
-//         console.error('Usage: node scan-plugin.js <bundle.js> <sdk-package-name>');
-//         process.exit(1);
-//     }
-
-//     const result = scanPluginForSdkUsage(filePath, sdkPackageName);
-//     console.log(JSON.stringify(result, null, 2));
-
-//     if (result.hasDynamicImport) {
-//         console.warn(
-//         '\n⚠️  Dynamic import() detected. This plugin may load the SDK in a ' +
-//             'way static analysis cannot fully resolve. Do not rely on this scan ' +
-//             'alone for security decisions — enforce permissions at runtime too.'
-//         );
-//     }
-// }

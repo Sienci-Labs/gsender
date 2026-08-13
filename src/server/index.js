@@ -182,11 +182,26 @@ const createServer = (options, callback) => {
 		host = setIP;
 	}
 
+	// Serve the plugin SDK's built runtime so the import map in a plugin's
+	// index.html can resolve the bare @sienci/gsender-plugin-sdk specifiers
+	const pluginSdkMountPoints = [];
+	if (settings.pluginSdkDir && fs.existsSync(settings.pluginSdkDir)) {
+		pluginSdkMountPoints.push({
+			route: settings.pluginSdkRoute,
+			target: settings.pluginSdkDir,
+		});
+	} else {
+		log.warn(
+			`Plugin SDK runtime not found at ${chalk.yellow(JSON.stringify(settings.pluginSdkDir))}; plugins importing the SDK will fail to load. Build packages/plugin-sdk first.`,
+		);
+	}
+
 	const mountPoints = uniqWith(
 		[
 			...ensureArray(options.mountPoints),
 			...ensureArray(config.get("mountPoints")),
 			...pluginRegistry.getMountPointsFromPlugins(),
+			...pluginSdkMountPoints,
 		],
 		isEqual,
 	).filter((mount) => {

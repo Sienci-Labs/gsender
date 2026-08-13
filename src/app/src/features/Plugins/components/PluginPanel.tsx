@@ -1,7 +1,8 @@
 /** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
 import controller from "app/lib/controller";
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { PluginCapabilities, PluginRecord } from "../types";
+import type { PluginRecord } from "../types";
+import { toRuntimeCapabilities } from "../utils/capabilities";
 import {
 	registerPluginWindow,
 	unregisterPluginWindow,
@@ -14,7 +15,6 @@ type PluginPanelProps = {
 };
 
 const PluginPanel = ({ plugin, className = "", title }: PluginPanelProps) => {
-	console.log(plugin);
 	// Bumped on dev live-reload to force the iframe to re-fetch its content.
 	const [reloadToken, setReloadToken] = useState(0);
 	const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -35,24 +35,16 @@ const PluginPanel = ({ plugin, className = "", title }: PluginPanelProps) => {
 		};
 	}, []);
 
-	// Register this plugin's granted capabilities against its actual iframe
-	// window BEFORE the iframe can send its first bridge message, and
-	// deregister on unmount/reload. installPluginBridgeListener (mounted once,
-	// globally) looks up capabilities by event.source on every incoming
-	// message -- an iframe that was never registered here gets
-	// EMPTY_CAPABILITIES and every request/subscribe is denied.
+	// register this plugin's granted capabilities against its iframe window.
+	// an iframe that was never registered here gets EMPTY_CAPABILITIES
+	// and every request/subscribe is denied.
 	useEffect(() => {
 		const iframe = iframeRef.current;
 		const win = iframe?.contentWindow;
 		if (!win) return;
 
-		const capabilities: PluginCapabilities = {
-			requestTypes: plugin.capabilities.requestTypes ?? new Set([]),
-			topics: plugin.capabilities.topics ?? new Set([]),
-			allowedFunctions: plugin.capabilities.allowedFunctions ?? new Set([]),
-		};
-
-		registerPluginWindow(win, capabilities);
+		// convert the capabilities from arrays to sets
+		registerPluginWindow(win, toRuntimeCapabilities(plugin.capabilities));
 		return () => unregisterPluginWindow(win);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [plugin, reloadToken]);

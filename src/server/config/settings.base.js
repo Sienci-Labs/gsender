@@ -21,6 +21,7 @@
  *
  */
 
+import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import isElectron from "is-electron";
@@ -101,13 +102,45 @@ const getExtraPluginsDirs = () => {
 	}
 
 	// In production builds we bundle selected default plugins under the app
-	// output root at "<build>/plugins". settings.base.js is loaded from
-	// "<build>/server/config", so two levels up lands at "<build>".
+	// output root at "<build>/plugins". This settings code is BUNDLED into
+	// several entries whose __dirname differs at runtime: "<build>" for
+	// server-cli.js/main.js, "<build>/server" for server/index.js.
+	// Probe both.
 	if (process.env.NODE_ENV === "production") {
-		dirs.push(path.resolve(__dirname, "..", "..", "plugins"));
+		dirs.push(resolveBuildDir("plugins"));
 	}
 
 	return dirs;
+};
+
+// Resolve a directory that ships at the app build root ("<build>/<name>"),
+// from bundled code whose __dirname is either "<build>" or "<build>/server".
+const resolveBuildDir = (name) => {
+	const candidates = [
+		path.resolve(__dirname, name),
+		path.resolve(__dirname, "..", name),
+	];
+	return candidates.find((dir) => fs.existsSync(dir)) || candidates[0];
+};
+
+// Directory holding the plugin SDK's built ESM runtime ({index,react,
+// viewer}.js). Served at `pluginSdkRoute` so the import map a plugin's
+// build injects can resolve the bare @sienci/gsender-plugin-sdk
+// specifiers inside the plugin iframe. Keep the route in sync with
+// HOST_SDK_ROUTE in the sdk's vite-plugin.ts.
+const getPluginSdkDir = () => {
+	if (process.env.GSENDER_PLUGIN_SDK_DIR) {
+		return path.resolve(process.env.GSENDER_PLUGIN_SDK_DIR);
+	}
+
+	// In development the server is launched from the repo root; serve the
+	// workspace build output directly.
+	if (process.env.NODE_ENV === "development") {
+		return path.resolve(process.cwd(), "packages", "plugin-sdk", "dist");
+	}
+
+	// Production builds bundle the SDK dist at "<build>/plugin-sdk"
+	return resolveBuildDir("plugin-sdk");
 };
 
 export default {
@@ -275,4 +308,6 @@ export default {
 
 	pluginsDir: path.resolve(getUserDataPath(), "plugins"),
 	extraPluginsDirs: getExtraPluginsDirs(),
+	pluginSdkDir: getPluginSdkDir(),
+	pluginSdkRoute: "/plugin-sdk",
 };

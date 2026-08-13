@@ -22,6 +22,7 @@ import path from "node:path";
 import settings from "../../config/settings";
 import logger from "../../lib/logger";
 import config from "../configstore";
+import { normalizeCapabilities } from "./capabilities";
 import { scanPluginForSdkUsage } from "./pluginSecurity";
 
 const log = logger("service:pluginregistry");
@@ -177,7 +178,7 @@ const discoverPluginsInDir = (pluginsDir) => {
 			name: manifest.name,
 			version: manifest.version,
 			engine: manifest.engine || null,
-			capabilities: manifest.capabilities || [],
+			capabilities: normalizeCapabilities(manifest.capabilities),
 			enabled,
 			valid: errors.length === 0,
 			errors,
@@ -332,7 +333,7 @@ const readImportedManifest = (pluginPath) => {
 		name: manifest.name,
 		version: manifest.version,
 		engine: manifest.engine || null,
-		capabilities: manifest.capabilities || {},
+		capabilities: normalizeCapabilities(manifest.capabilities),
 		valid: errors.length === 0,
 		errors,
 		entry: manifest.ui.entry,
@@ -354,13 +355,13 @@ const changeManifestPermissions = (pluginPath, capabilities) => {
 	}
 
 	const newManifest = {
-		capabilities: capabilities,
 		...manifest,
+		capabilities: normalizeCapabilities(capabilities),
 	};
 
 	const manifestPath = path.join(pluginPath, MANIFEST_FILENAME);
 	try {
-		fs.writeFileSync(manifestPath, JSON.stringify(newManifest));
+		fs.writeFileSync(manifestPath, JSON.stringify(newManifest, null, "\t"));
 		return 0;
 	} catch (err) {
 		log.error(`Failed to write manifest at ${manifestPath}: ${err.message}`);

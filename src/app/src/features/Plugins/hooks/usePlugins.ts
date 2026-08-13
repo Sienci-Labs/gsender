@@ -16,7 +16,6 @@ export const usePlugins = () => {
 		try {
 			const { data } = await api.plugins.fetch();
 			const response = data as PluginsResponse;
-			console.log(response);
 			setPlugins(response.plugins || []);
 			setPluginsDir(response.pluginsDir || "");
 		} catch (err) {

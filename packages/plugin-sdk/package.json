@@ -1,6 +1,6 @@
 {
 	"name": "@sienci/gsender-plugin-sdk",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"description": "SDK for gSender UI plugins — bridge client, React hooks, and G-code viewer",
 	"type": "module",
 	"main": "./dist/index.js",
@@ -57,8 +57,10 @@
 	},
 	"devDependencies": {
 		"@sienci/gviewer": "^0.1.27",
+		"@types/node": "^26.2.0",
 		"@types/react": "^19.0.0",
 		"react": "^19.0.0",
+		"react-dom": "^19.2.8",
 		"three": "^0.168.0",
 		"tsup": "^8.3.0",
 		"typescript": "^5.7.2",

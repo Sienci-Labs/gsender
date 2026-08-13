@@ -189,7 +189,6 @@ export const readImportedManifest = (req, res) => {
 export const writePermissions = (req, res) => {
 	const { pluginPath, capabilities } = req.body;
 
-	log.error(capabilities);
 	try {
 		if (typeof pluginPath !== "string") {
 			return res.status(ERR_BAD_REQUEST).send({
@@ -239,7 +238,7 @@ export const importPlugin = (req, res) => {
 	if (error) {
 		return res
 			.status(ERR_INTERNAL_SERVER_ERROR)
-			.send({ msg: "Failed to import plugin", error: result.err });
+			.send({ msg: "Failed to import plugin", error });
 	}
 	res.send({ msg: "Successfully imported plugin" });
 };

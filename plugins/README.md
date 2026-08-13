@@ -23,6 +23,29 @@ Then restart gSender.
 
 Each folder must contain `gsender-plugin.json` and a `ui/` directory with the built SPA entry file.
 
+### Manifest capabilities
+
+The bridge denies everything a plugin was not granted. Grants live in the
+manifest's `capabilities` object, which is written during import after the user
+authorizes the scanned permissions, or hand-authored for gsender default plugins:
+
+```json
+"capabilities": {
+	"requestTypes": ["gcode:load:to:visualizer"],
+	"topics": ["workspace"],
+	"allowedFunctions": ["gcode", "useWorkspaceState"]
+}
+```
+
+`requestTypes` and `topics` are what the bridge enforces; `allowedFunctions` is the informational
+record of what the static scan found. A plugin with no `capabilities` runs
+but every bridge call is denied.
+
+Plugins that import the SDK should build with `gsenderPlugin()` from
+`@sienci/gsender-plugin-sdk/vite` (see `basic-cam/vite.config.ts` and the
+SDK README) — it keeps SDK imports scannable and wires the runtime import
+map.
+
 ### Building a plugin
 
 From the plugin folder:

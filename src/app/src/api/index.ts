@@ -23,7 +23,7 @@
 /** biome-ignore-all lint/suspicious/noExplicitAny: <> */
 
 import type { MachineProfile } from "app/definitions/firmware";
-import type { PluginCapabilities } from "app/features/Plugins/types";
+import type { PluginCapabilitiesWire } from "app/features/Plugins/types";
 import axios, {
 	type AxiosResponse,
 	type InternalAxiosRequestConfig,
@@ -482,8 +482,7 @@ const plugins = {
 			{ pluginPath },
 		);
 	},
-	writePermissions: (pluginPath: string, capabilities: PluginCapabilities): Promise<AxiosResponse> => {
-		console.log('hi');
+	writePermissions: (pluginPath: string, capabilities: PluginCapabilitiesWire): Promise<AxiosResponse> => {
 		return authrequest.post(
 			"/api/plugins/write-permissions",
 			{ pluginPath, capabilities }

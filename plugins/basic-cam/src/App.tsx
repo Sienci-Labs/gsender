@@ -1,9 +1,9 @@
-import { gcode as gcodeClient } from "../../../packages/plugin-sdk";
-import { useWorkspaceState } from "../../../packages/plugin-sdk/dist/react";
+import { gcode as gcodeClient } from "@sienci/gsender-plugin-sdk";
+import { useWorkspaceState } from "@sienci/gsender-plugin-sdk/react";
 import {
 	type GCodeViewerHandle,
 	GCodeVisualizer,
-} from "../../../packages/plugin-sdk/dist/viewer";
+} from "@sienci/gsender-plugin-sdk/viewer";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { generateGcode, type Operation, type Units } from "./gcode";

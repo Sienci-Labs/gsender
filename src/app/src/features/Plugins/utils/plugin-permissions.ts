@@ -1,14 +1,10 @@
 import type { PluginCapabilities } from "../types";
 
 export const EMPTY_CAPABILITIES: PluginCapabilities = {
-	allowedFunctions: new Set([]),
 	requestTypes: new Set([]),
 	topics: new Set([]),
 };
 
-// Keyed by the plugin iframe's window object (event.source identity), not by
-// origin/string -- works correctly for opaque-origin sandboxed iframes and
-// can't be spoofed by another frame requesting on the plugin's behalf.
 const registry = new Map<MessageEventSource, PluginCapabilities>();
 
 export const registerPluginWindow = (

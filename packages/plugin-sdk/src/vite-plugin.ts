@@ -1,39 +1,27 @@
 // src/vite-plugin.ts
-// Ships as the "@sienci/gsender-plugin-sdk/vite" export.
+// ships as the "@sienci/gsender-plugin-sdk/vite" export.
 //
-// Plugin authors add this to their vite.config and never need to know
-// the SDK is externalized — gSender's host page provides the real
-// SDK modules at runtime via its own import map.
-//
-// "react" is ALSO externalized here — but NOT resolved by gSender's host.
-// Each plugin gets its OWN single React instance (per the SDK's design),
-// shared between the plugin's own components and the SDK's hooks
-// (@sienci/gsender-plugin-sdk/react). If either side bundled its own copy
-// of React, hooks would break with "Invalid hook call" because they'd be
-// running against two different dispatcher instances. So this plugin
-// vendors one React build into the output and injects an import map
-// entry pointing "react" at it — all automatically, so plugin authors
-// never see any of this.
-import { mkdir } from "node:fs/promises";
+// plugin authors add this to their vite.config and never need to know
+// the SDK is externalized
+import { mkdir, rm, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { build } from "esbuild";
-import type { Plugin } from "vite";
+import type { PluginOption } from "vite";
 
-// Keep this in sync with the package.json "exports" map. These stay
-// external so gSender's host can statically scan a plugin's bundle for
-// which SDK functions it imports, before granting permission to load it.
+// these stay external so we can check which functions the plugin imports
 const SDK_SPECIFIERS = [
 	"@sienci/gsender-plugin-sdk",
 	"@sienci/gsender-plugin-sdk/react",
 	"@sienci/gsender-plugin-sdk/viewer",
 ];
 
-// Externalized so the app's own `import ... from "react"` (and React's
-// own JSX-runtime imports, and react-dom) stay bare specifiers too,
-// resolving to the SAME vendored files as the SDK's hooks. jsx-runtime is
-// used for production JSX output, jsx-dev-runtime for dev mode — both
-// need entries since @vitejs/plugin-react picks whichever mode applies.
+// where gSender's host serves the SDK's built runtime (dist/{index,react,viewer}.js)
+// keep in sync with `pluginSdkRoute` in the host's src/server/config/settings.base.js.
+const HOST_SDK_ROUTE = "/plugin-sdk";
+
+// since we externalized the sdk, these need externalizing to prevent 
+// having multiple react instances when running the plugins
 const REACT_EXTERNALS: Record<string, string> = {
 	react: "react",
 	"react-dom": "react-dom",
@@ -45,8 +33,9 @@ const REACT_EXTERNALS: Record<string, string> = {
 const isExternalSpecifier = (source: string) =>
 	SDK_SPECIFIERS.includes(source) || source in REACT_EXTERNALS;
 
-export default function gsenderPlugin(): Plugin {
+export default function gsenderPlugin(): PluginOption {
 	let outDir = "dist";
+	let root = process.cwd();
 	let mode: "development" | "production" = "production";
 
 	return {
@@ -83,85 +72,76 @@ export default function gsenderPlugin(): Plugin {
 			};
 		},
 		configResolved(config) {
-			outDir = config.build.outDir;
+			root = config.root;
+			outDir = path.resolve(root, config.build.outDir);
 			mode = config.mode === "development" ? "development" : "production";
 		},
-		// Bundle standalone ESM builds of react/react-dom/jsx-runtimes and
+		// bundle standalone ESM builds of react/react-dom/jsx-runtimes and
 		// drop them into the plugin's own output, so each externalized
 		// specifier has somewhere real to resolve to.
 		async closeBundle() {
 			const vendorDir = path.resolve(outDir, "vendor");
 			await mkdir(vendorDir, { recursive: true });
 
-			// `export * from "react"` doesn't reliably work here: React's own
-			// index.js reassigns `module.exports` to the return value of a
-			// NESTED require() call, and esbuild won't statically trace
-			// through that indirection to enumerate property names. Only
-			// `default` gets special-cased interop support automatically —
-			// everything else (useState, etc.) ends up copied onto the
-			// module at runtime, which is invisible to native ESM's static
-			// named-export resolution.
-			//
-			// The fix: enumerate each package's REAL exports ourselves via
-			// Node's require() (this plugin runs in Node, so we can just ask
-			// the actual installed package what it exports), then generate
-			// an explicit `import { a, b, c } from "x"; export { a, b, c };`
-			// list. Explicit named references like this work reliably
-			// because esbuild just treats them as property access + a
-			// normal local export, not a wildcard scan. This also stays
-			// correct automatically as React's API changes across versions,
-			// instead of drifting out of sync with a hardcoded list.
 			const nodeRequire = createRequire(import.meta.url);
-			const getExportNames = (specifier: string): string[] => {
-				const resolved = nodeRequire.resolve(specifier, {
-					paths: [process.cwd()],
-				});
-				const mod = nodeRequire(resolved);
-				return Object.keys(mod).filter((key) => key !== "default");
-			};
 
+			// all five specifiers are built in ONE esbuild call with code
+			// splitting, so react itself lands in a single shared chunk that
+			// every vendor file imports RELATIVELY
+			const entryDir = path.join(vendorDir, ".entries");
+			await mkdir(entryDir, { recursive: true });
+			const entryPoints: string[] = [];
 			for (const specifier of Object.keys(REACT_EXTERNALS)) {
-				const names = getExportNames(specifier);
+				const resolved = nodeRequire.resolve(specifier, {
+					paths: [root],
+				});
+				const names = Object.keys(nodeRequire(resolved)).filter(
+					(key) => key !== "default",
+				);
 				const namedList = names.join(", ");
+				const entryPath = JSON.stringify(resolved);
 				const contents = [
 					names.length > 0
-						? `import { ${namedList} } from "${specifier}"; export { ${namedList} };`
+						? `import { ${namedList} } from ${entryPath}; export { ${namedList} };`
 						: "",
-					`export { default } from "${specifier}";`,
+					`export { default } from ${entryPath};`,
 				]
 					.filter(Boolean)
 					.join("\n");
-
-				const outfile = path.join(
-					vendorDir,
+				const entryFile = path.join(
+					entryDir,
 					`${specifier.replace(/\//g, "-")}.js`,
 				);
-				await build({
-					stdin: {
-						contents,
-						resolveDir: process.cwd(),
-						loader: "js",
-					},
-					bundle: true,
-					format: "esm",
-					outfile,
-					define: {
-						"process.env.NODE_ENV": JSON.stringify(mode),
-					},
-				});
+				await writeFile(entryFile, contents);
+				entryPoints.push(entryFile);
 			}
+
+			await build({
+				entryPoints,
+				bundle: true,
+				format: "esm",
+				splitting: true,
+				outdir: vendorDir,
+				chunkNames: "chunk-[hash]",
+				define: {
+					"process.env.NODE_ENV": JSON.stringify(mode),
+				},
+			});
+
+			await rm(entryDir, { recursive: true, force: true });
 		},
-		// Inject the import map for react/react-dom/jsx-runtimes into the
-		// built index.html. The SDK specifiers are intentionally NOT added
-		// here — those are gSender's host page's responsibility to resolve,
-		// not the plugin's.
+		// inject the import map into the built index.html
 		transformIndexHtml() {
-			const imports = Object.fromEntries(
-				Object.keys(REACT_EXTERNALS).map((specifier) => [
+			const imports: Record<string, string> = Object.fromEntries(
+				SDK_SPECIFIERS.map((specifier) => [
 					specifier,
-					`./vendor/${specifier.replace(/\//g, "-")}.js`,
+					`${HOST_SDK_ROUTE}/${specifier === "@sienci/gsender-plugin-sdk" ? "index" : specifier.split("/").pop()}.js`,
 				]),
 			);
+			for (const specifier of Object.keys(REACT_EXTERNALS)) {
+				imports[specifier] =
+					`./vendor/${specifier.replace(/\//g, "-")}.js`;
+			}
 			return [
 				{
 					tag: "script",

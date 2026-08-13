@@ -1,28 +1,20 @@
 import { usePlugins } from "../hooks/usePlugins";
 import type { PluginRecord } from "../types";
+import PluginPanel from "./PluginPanel";
 
 type PluginTabPanelProps = {
 	plugin: PluginRecord;
 	isActive: boolean;
 };
 
+// reuses PluginPanel so the iframe window gets registered with the
+// plugin's granted capabilities
 export const PluginTabPanel = ({ plugin, isActive }: PluginTabPanelProps) => {
 	if (!isActive) {
 		return null;
 	}
 
-	const iframeSrc = plugin.uiUrl.startsWith("/")
-		? plugin.uiUrl
-		: `/${plugin.uiUrl}`;
-
-	return (
-		<iframe
-			title={plugin.name}
-			src={iframeSrc}
-			className="w-full h-full min-h-[280px] border-0"
-			sandbox="allow-scripts allow-forms allow-same-origin"
-		/>
-	);
+	return <PluginPanel plugin={plugin} className="min-h-[280px]" />;
 };
 
 type PluginTabIframeProps = {

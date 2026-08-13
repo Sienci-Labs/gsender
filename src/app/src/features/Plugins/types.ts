@@ -1,7 +1,13 @@
 export interface PluginCapabilities {
 	requestTypes: Set<PluginBridgeRequestType>;
 	topics: Set<PluginBridgeTopic>;
-	allowedFunctions: Set<string>;
+}
+
+// What travels over REST and lives in gsender-plugin.json
+export interface PluginCapabilitiesWire {
+	requestTypes: PluginBridgeRequestType[];
+	topics: PluginBridgeTopic[];
+	allowedFunctions?: string[];
 }
 
 export type PluginContributionSlot =
@@ -23,7 +29,7 @@ export type PluginRecord = {
 	name: string;
 	version: string;
 	engine: string | null;
-	capabilities: PluginCapabilities;
+	capabilities: PluginCapabilitiesWire;
 	enabled: boolean;
 	valid: boolean;
 	errors: string[];
@@ -141,10 +147,17 @@ export const requestTypesMap = new Map<string, PluginBridgeRequestType[]>([
 	["getSelector", ["redux:get:state"]],
 ]);
 
-export const topicsMap = new Map<string, PluginTopicsType>([
+export const topicsMap = new Map<string, PluginBridgeTopic>([
 	["subscribeWorkspaceState", "workspace"],
 	["subscribeSelector", "redux"],
 	["useWorkspaceState", "workspace"],
-	["subscribeSelector", "redux"],
 	["useTypedSelector", "redux"],
 ]);
+
+// the import specifiers the permission scanner looks for in a plugin's built bundle.
+// must stay in sync with SDK_SPECIFIERS in the sdk's config
+export const SDK_SCAN_SPECIFIERS = [
+	"@sienci/gsender-plugin-sdk",
+	"@sienci/gsender-plugin-sdk/react",
+	"@sienci/gsender-plugin-sdk/viewer",
+];
