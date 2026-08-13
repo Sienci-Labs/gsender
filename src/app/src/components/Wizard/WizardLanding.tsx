@@ -1,0 +1,158 @@
+/** biome-ignore-all lint/a11y/noRedundantAlt: <> */
+/** biome-ignore-all lint/a11y/useButtonType: <> */
+import { ArrowLeft, ArrowRight, HelpCircle } from "lucide-react";
+import Button from "../Button";
+import DefaultImage from "./assets/placeholder.png";
+import type { SubWizard, ValidationResult } from "./types/wizard";
+import { ValidationBanner } from "./ValidationBanner";
+
+interface WizardLandingProps {
+	title: string;
+	image?: string;
+	subWizards: SubWizard[];
+	onSelectSubWizard: (subWizard: SubWizard) => void;
+	onBack?: () => void;
+	validations?: (() => ValidationResult)[];
+	helpUrl?: string;
+}
+
+export function WizardLanding({
+	title,
+	image,
+	subWizards,
+	onSelectSubWizard,
+	onBack,
+	validations,
+	helpUrl,
+}: WizardLandingProps) {
+	const activeSubWizard = subWizards.find((sw) => sw.id === subWizards[0]?.id);
+
+	const hasValidationFailures = () => {
+		if (!validations || validations.length === 0) return false;
+
+		for (const validation of validations) {
+			const result = validation();
+			if (!result.success) {
+				return true;
+			}
+		}
+		return false;
+	};
+
+	const validationsFailed = hasValidationFailures();
+	const [primarySubWizard, ...secondarySubWizards] = subWizards;
+
+	const renderSubWizardButton = (
+		subWizard: SubWizard,
+		isActive: boolean,
+		isDisabled: boolean,
+	) => (
+		<Button
+			key={subWizard.id}
+			testId={`sub-wizard-selection-${subWizard.id}`}
+			onClick={() => !isDisabled && onSelectSubWizard(subWizard)}
+			disabled={isDisabled}
+			variant="nothing"
+			className={`
+				flex items-center justify-between px-6 py-4 rounded-lg text-left
+				transition-all duration-200 font-medium text-lg h-full
+				${
+					isDisabled
+						? "bg-gray-200 text-gray-400 cursor-not-allowed"
+						: isActive
+							? "bg-gray-900 text-white hover:bg-gray-800 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
+							: "bg-gray-200 text-gray-700 hover:bg-gray-300"
+				}
+			`}
+		>
+			<span>{subWizard.title}</span>
+			<ArrowRight size={20} />
+		</Button>
+	);
+
+	return (
+		<div className="h-full min-h-0 bg-gray-50 dark:bg-surface-base flex overflow-hidden portrait:flex-col-reverse portrait:w-full">
+			<div className="w-3/5 portrait:w-full portrait:h-3/5 p-12 flex flex-col overflow-y-auto">
+				{onBack && (
+					<Button
+						onClick={onBack}
+						testId="wizard-back"
+						size="custom"
+						variant="nothing"
+						className="flex items-center gap-2 text-gray-600 dark:text-content-secondary hover:text-gray-900 dark:hover:text-gray-100 mb-8 self-start"
+					>
+						<ArrowLeft size={20} />
+						Back to Wizards
+					</Button>
+				)}
+
+				<div className="flex-1">
+					<h1 className="text-5xl font-bold text-gray-900 dark:text-content-primary mb-4">
+						{title}
+					</h1>
+					{activeSubWizard?.estimatedTime && (
+						<p className="text-gray-700 dark:text-content-muted mb-1">
+							<span className="font-semibold">Estimated time:</span>{" "}
+							{activeSubWizard.estimatedTime}
+						</p>
+					)}
+					{activeSubWizard?.configVersion && (
+						<p className="text-gray-700 dark:text-content-muted mb-8">
+							Configuration File Version: {activeSubWizard.configVersion}
+						</p>
+					)}
+					{activeSubWizard?.description && (
+						<p className="mb-8 dark:text-content-primary">{activeSubWizard.description}</p>
+					)}
+					<ValidationBanner validations={validations} />
+					<div className="flex flex-col gap-3 mt-12 max-w-md">
+						{primarySubWizard &&
+							renderSubWizardButton(primarySubWizard, true, validationsFailed)}
+						{secondarySubWizards.length > 0 && (
+							<>
+								<div className="my-4 pt-4 pb-4" aria-hidden="true">
+									<hr className="h-px border-0 bg-gradient-to-r from-transparent via-gray-300 to-transparent dark:via-slate-600" />
+								</div>
+								{secondarySubWizards.map((subWizard) =>
+									renderSubWizardButton(subWizard, false, validationsFailed),
+								)}
+							</>
+						)}
+					</div>
+				</div>
+			</div>
+
+			<div className="w-2/5 portrait:w-full portrait:h-2/5 bg-gray-200 dark:bg-surface-raised p-12 flex flex-col justify-between overflow-y-auto">
+				<div className="flex items-center justify-center flex-1">
+					<img
+						alt="Wizard image"
+						src={image ?? DefaultImage}
+						className="rounded-2xl"
+					/>
+				</div>
+
+				<div className="border-2 border-blue-400 rounded-lg p-6 bg-white dark:bg-surface-raised">
+					<div className="flex items-start gap-3">
+						<HelpCircle className="text-blue-500 flex-shrink-0" size={24} />
+						<div>
+							<h3 className="font-semibold text-lg text-gray-900 dark:text-content-primary mb-1">
+								Need Help?
+							</h3>
+							<p className="text-gray-600 dark:text-content-muted">
+								Follow along in our{" "}
+								<a
+									href={helpUrl ?? "https://resources.sienci.com/"}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="text-blue-500 font-bold"
+								>
+									online resources
+								</a>
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+}

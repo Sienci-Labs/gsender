@@ -58,11 +58,15 @@ export const ConfigTab: React.FC = ({
 	}, [config.variables._tc_slot_offset.value]);
 
 	const nonDefaultStyling = "bg-yellow-50 dark:bg-yellow-900/20";
-	const labelClass = "text-xs font-semibold text-gray-500 dark:text-white";
-	const subLabelClass = "text-xs font-medium text-gray-500 dark:text-gray-300";
-	const rowLabelClass = "text-xs font-medium text-gray-700 dark:text-white";
-	const helperTextClass = "text-[10px] text-gray-400 dark:text-gray-300";
-	const iconClass = "h-4 w-4 text-muted-foreground dark:text-white";
+	const labelClass =
+		"text-xs font-semibold text-gray-500 dark:text-content-primary";
+	const subLabelClass =
+		"text-xs font-medium text-gray-500 dark:text-content-secondary";
+	const rowLabelClass =
+		"text-xs font-medium text-gray-700 dark:text-content-primary";
+	const helperTextClass =
+		"text-[10px] text-gray-400 dark:text-content-secondary";
+	const iconClass = "h-4 w-4 text-muted-foreground dark:text-content-primary";
 	const rackSize = config.variables._tc_slots.value || 0;
 	const rackEnabled = rackSize > 0;
 
@@ -83,8 +87,8 @@ export const ConfigTab: React.FC = ({
 		<div className="space-y-4 flex flex-col h-full">
 			<div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
 				{/* Tool Rack Section */}
-				<Card className="border border-border dark:border-slate-700 shadow-none w-full bg-white dark:bg-dark-darker">
-					<CardHeader className="px-4 py-3 border-b border-border dark:border-slate-700 bg-muted/30 dark:bg-slate-800/60">
+				<Card className="border border-border dark:border-outline shadow-none w-full bg-white dark:bg-surface-raised">
+					<CardHeader className="px-4 py-3 border-b border-border dark:border-outline bg-muted/30 dark:bg-surface-elevated">
 						<div className="flex items-center justify-between gap-2 w-full">
 							<CardTitle className="text-sm font-semibold text-foreground">
 								Tool Rack
@@ -104,7 +108,7 @@ export const ConfigTab: React.FC = ({
 							Go to ATC Setup
 							<ArrowRight className="h-4 w-4 ml-1" />
 						</Button>
-						<p className="text-sm text-gray-600 dark:text-gray-200">
+						<p className="text-sm text-gray-600 dark:text-content-secondary">
 							Tool rack configuration is managed through the ATC setup process.
 							Re-run setup to reconfigure your rack.
 						</p>
@@ -112,8 +116,8 @@ export const ConfigTab: React.FC = ({
 				</Card>
 
 				{/* Tool Length Sensor Section */}
-				<Card className="border border-border dark:border-slate-700 shadow-none w-full bg-white dark:bg-dark-darker">
-					<CardHeader className="px-4 py-3 border-b border-border dark:border-slate-700 bg-muted/30 dark:bg-slate-800/60">
+				<Card className="border border-border dark:border-outline shadow-none w-full bg-white dark:bg-surface-raised">
+					<CardHeader className="px-4 py-3 border-b border-border dark:border-outline bg-muted/30 dark:bg-surface-elevated">
 						<div className="flex items-center justify-between gap-2 w-full">
 							<CardTitle className="text-sm font-semibold text-foreground">
 								Tool Length Sensor
@@ -139,8 +143,8 @@ export const ConfigTab: React.FC = ({
 			</div>
 
 			{/* Advanced Section */}
-			<Card className="border border-border dark:border-slate-700 shadow-none w-full bg-white dark:bg-dark-darker">
-				<CardHeader className="px-4 py-3 border-b border-border dark:border-slate-700 bg-muted/30 dark:bg-slate-800/60">
+			<Card className="border border-border dark:border-outline shadow-none w-full bg-white dark:bg-surface-raised">
+				<CardHeader className="px-4 py-3 border-b border-border dark:border-outline bg-muted/30 dark:bg-surface-elevated">
 					<div className="flex items-center justify-between gap-2 w-full">
 						<CardTitle className="text-sm font-semibold text-foreground">
 							Advanced Settings
@@ -154,7 +158,7 @@ export const ConfigTab: React.FC = ({
 							<div className="space-y-1">
 								<div className="flex items-center gap-2">
 									<SlidersHorizontal className={iconClass} />
-									<Label className="text-xs font-semibold text-gray-900 dark:text-white">
+									<Label className="text-xs font-semibold text-gray-900 dark:text-content-primary">
 										Offset Management
 									</Label>
 								</div>
@@ -203,7 +207,7 @@ export const ConfigTab: React.FC = ({
 							<div className="space-y-1">
 								<div className="flex items-center gap-2">
 									<Move className={iconClass} />
-									<Label className="text-xs font-semibold text-gray-900 dark:text-white">
+									<Label className="text-xs font-semibold text-gray-900 dark:text-content-primary">
 										Manual Change Position
 									</Label>
 								</div>
@@ -222,13 +226,13 @@ export const ConfigTab: React.FC = ({
 							<div className="space-y-1">
 								<div className="flex items-center gap-2">
 									<SlidersHorizontal className={iconClass} />
-									<Label className="text-xs font-semibold text-gray-900 dark:text-white">
+									<Label className="text-xs font-semibold text-gray-900 dark:text-content-primary">
 										Advanced
 									</Label>
 								</div>
 								<div
 									className={cn(
-										"rounded-md px-2.5 py-1.5 bg-gray-50 dark:bg-slate-800 flex items-center justify-between gap-3 w-full",
+										"rounded-md px-2.5 py-1.5 bg-gray-50 dark:bg-surface-elevated flex items-center justify-between gap-3 w-full",
 										{
 											[nonDefaultStyling]:
 												config.variables._passthrough_offset_setting.value !==
@@ -236,7 +240,7 @@ export const ConfigTab: React.FC = ({
 										},
 									)}
 								>
-									<Label className="text-xs font-medium text-gray-700 dark:text-white flex-1">
+									<Label className="text-xs font-medium text-gray-700 dark:text-content-primary flex-1">
 										Retain tool table settings when rack removed
 									</Label>
 									<Switch
@@ -262,14 +266,14 @@ export const ConfigTab: React.FC = ({
 							<div className="space-y-1">
 								<div className="flex items-center gap-2">
 									<ShieldCheck className={iconClass} />
-									<Label className="text-xs font-semibold text-gray-900 dark:text-white">
+									<Label className="text-xs font-semibold text-gray-900 dark:text-content-primary">
 										Safety Checks
 									</Label>
 								</div>
 								<div className="space-y-3">
 									<div
 										className={cn(
-											"space-y-1 rounded-md px-2.5 py-1.5 bg-gray-50 dark:bg-slate-800",
+											"space-y-1 rounded-md px-2.5 py-1.5 bg-gray-50 dark:bg-surface-elevated",
 											{
 												[nonDefaultStyling]:
 													config.variables._pres_sense.value !==
@@ -302,7 +306,7 @@ export const ConfigTab: React.FC = ({
 									</div>
 									<div
 										className={cn(
-											"space-y-1 rounded-md px-2.5 py-1.5 bg-gray-50 dark:bg-slate-800",
+											"space-y-1 rounded-md px-2.5 py-1.5 bg-gray-50 dark:bg-surface-elevated",
 											{
 												[nonDefaultStyling]:
 													config.variables._holder_sense.value !==
@@ -340,13 +344,13 @@ export const ConfigTab: React.FC = ({
 							<div className="space-y-1">
 								<div className="flex items-center gap-2">
 									<SlidersHorizontal className={iconClass} />
-									<Label className="text-xs font-semibold text-gray-900 dark:text-white">
+									<Label className="text-xs font-semibold text-gray-900 dark:text-content-primary">
 										Other
 									</Label>
 								</div>
 								<div
 									className={cn(
-										"space-y-1 rounded-md px-2.5 py-1.5 bg-gray-50 dark:bg-slate-800",
+										"space-y-1 rounded-md px-2.5 py-1.5 bg-gray-50 dark:bg-surface-elevated",
 										{
 											[nonDefaultStyling]:
 												config.variables._tc_slot_offset.value !==
@@ -392,7 +396,7 @@ export const ConfigTab: React.FC = ({
 													e.currentTarget.blur();
 												}
 											}}
-											className="h-7 w-16 text-xs border-gray-300 dark:border-slate-600 dark:bg-slate-900 dark:text-white focus:border-blue-500 focus:ring-blue-500 shrink-0 ml-auto"
+											className="h-7 w-16 text-xs border-gray-300 dark:border-outline dark:bg-surface-sunken dark:text-content-primary focus:border-blue-500 focus:ring-blue-500 shrink-0 ml-auto"
 										/>
 									</div>
 								</div>
@@ -412,7 +416,7 @@ export const ConfigTab: React.FC = ({
 					{uploading && (
 						<div className="flex flex-row gap-2 items-center">
 							<Spinner className="h-4 w-4" />
-							<span className="text-gray-700 dark:text-gray-300">
+							<span className="text-gray-700 dark:text-content-secondary">
 								{status.message}
 							</span>
 						</div>

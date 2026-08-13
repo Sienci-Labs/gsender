@@ -29,17 +29,17 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "app/components/shadcn/Dropdown";
-import Tooltip from "app/components/Tooltip";
-import useShuttleEvents from "app/hooks/useShuttleEvents";
-import { TOUCHPLATE_TYPES } from "app/lib/constants";
-import useKeybinding from "app/lib/useKeybinding";
-import cx from "classnames";
-import React, { useCallback, useEffect, useRef } from "react";
-import { METRIC_UNITS, PROBING_CATEGORY } from "../../constants";
-import type { Actions, State } from "./definitions";
-import ProbeDiameter from "./ProbeDiameter";
-import ProbeDirectionSelection from "./ProbeDirectionSelection";
+
+import { PROBING_CATEGORY } from "../../constants";
 import ProbeImage from "./ProbeImage";
+import ProbeDiameter from "./ProbeDiameter";
+import { Actions, State } from "./definitions";
+import useKeybinding from "app/lib/useKeybinding";
+import useShuttleEvents from "app/hooks/useShuttleEvents";
+import Tooltip from "app/components/Tooltip";
+import { TOUCHPLATE_TYPES } from "app/lib/constants";
+import { useCallback, useEffect, useRef } from "react";
+import cx from "classnames";
 
 type ProbeProps = {
 	state: State;
@@ -122,7 +122,6 @@ const Probe = ({ state, actions }: ProbeProps) => {
 		selectedProbeCommand,
 		touchplate,
 		touchplateTypeSwitcher,
-		direction,
 	} = state;
 
 	const { touchplateType } = touchplate;
@@ -155,11 +154,12 @@ const Probe = ({ state, actions }: ProbeProps) => {
 							</DropdownMenuContent>
 						</DropdownMenu>
 					)}
-					<div className="flex w-full bg-white dark:bg-dark rounded-md border-solid border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-200 p-[2px]">
+					<div className="flex w-full bg-white dark:bg-surface-raised rounded-md border-solid border border-gray-300 dark:border-outline text-gray-900 dark:text-content-secondary p-[2px]">
 						{availableProbeCommands.map((command, index) => (
 							<Tooltip content={`Probe using ${command.id}`} key={command.id}>
 								<ShadcnButton
 									key={command.id}
+									variant="ghost"
 									onClick={() => actions.handleProbeCommandChange(index)}
 									size="icon"
 									aria-label={`Select probing routine ${command.id}`}
@@ -200,12 +200,6 @@ const Probe = ({ state, actions }: ProbeProps) => {
 					/>
 				</div>
 			</div>
-			{touchplateType !== "Z Probe" && (
-				<ProbeDirectionSelection
-					direction={direction}
-					onClick={actions.nextProbeDirection}
-				/>
-			)}
 		</div>
 	);
 };

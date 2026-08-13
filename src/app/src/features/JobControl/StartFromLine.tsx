@@ -117,10 +117,11 @@ const StartFromLine = ({
 		<>
 			<ShadButton
 				disabled={disabled}
+				variant="ghost"
 				className={cx("rounded-[0.2rem] border-solid border-2 text-base px-2", {
-					"border-blue-400 bg-white dark:bg-dark dark:text-gray-300 [box-shadow:_2px_2px_5px_0px_var(--tw-shadow-color)] shadow-gray-400":
+					"border-blue-400 bg-white text-blue-500 dark:bg-surface-raised dark:text-content-secondary [box-shadow:_2px_2px_5px_0px_var(--tw-shadow-color)] shadow-gray-400":
 						!disabled,
-					"border-gray-500 bg-gray-400 dark:bg-dark dark:text-gray-400":
+					"border-gray-500 bg-gray-400 dark:bg-surface-raised dark:text-content-muted":
 						disabled,
 				})}
 				onClick={() => {
@@ -157,7 +158,7 @@ const StartFromLine = ({
 								Recover a job after power loss, mechanical malfunction,
 								disconnection, or other failure.
 							</p>
-							<p className="mb-0 text-black dark:text-white">
+							<p className="mb-0 text-black dark:text-content-primary">
 								Your job of <b>{lineTotal}</b> lines was last stopped around
 								line: <b>{lastLine}</b>.
 							</p>

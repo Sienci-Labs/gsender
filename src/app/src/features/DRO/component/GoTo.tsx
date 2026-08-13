@@ -217,7 +217,7 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
 									key={key}
 									onClick={() => !isDisabled && onModeChange(key)}
 									className={`flex-1 py-1 text-xs font-medium transition-colors
-                                        ${isActive ? "bg-blue-600 text-white" : "text-gray-600 hover:bg-gray-100"}
+                                        ${isActive ? "bg-blue-600 text-white" : "text-gray-600 hover:bg-gray-100 dark:text-content-primary dark:hover:bg-surface-hover"}
                                         ${isDisabled ? "opacity-40 cursor-not-allowed" : ""}`}
 									disabled={isDisabled}
 									title={

@@ -1,3 +1,11 @@
+import { GRBLHAL, METRIC_UNITS } from "app/constants";
+import { UNITS_GCODE } from "app/definitions/general";
+import {
+	PROBE_DIRECTIONS,
+	PROBE_TYPES_T,
+	ProbingOptions,
+} from "app/features/Probe/definitions";
+import { AXES_T } from "app/store/definitions";
 import {
 	PROBE_TYPE_AUTO,
 	PROBE_TYPE_TIP,
@@ -6,6 +14,7 @@ import {
 	TOUCHPLATE_TYPE_BITZERO,
 	TOUCHPLATE_TYPE_ZERO,
 } from "./constants";
+import { getZDownTravel } from "./SoftLimits";
 import { convertToMetric, mm2in } from "./units";
 
 export const BL = 0;

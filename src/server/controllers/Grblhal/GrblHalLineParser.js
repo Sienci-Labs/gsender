@@ -23,6 +23,7 @@
 
 import _ from "lodash";
 import GrblHalLineParserResultATCI from "server/controllers/Grblhal/GrblHalLineParserResultATCI";
+import GrblHalLineParserResultAutoconfig from "server/controllers/Grblhal/GrblHalLineParserResultAutoconfig";
 import GrblHalLineParserResultCompleteStatus from "server/controllers/Grblhal/GrblHalLineParserResultCompleteStatus";
 import GrblHalLineParserResultJSON from "server/controllers/Grblhal/GrblHalLineParserResultJSON";
 import GrblHalLineParserResultSettingDetails from "server/controllers/Grblhal/GrblHalLineParserResultSettingDetails";
@@ -71,6 +72,9 @@ class GrblHalLineParser {
 
 			// [MSG:ATCI:key:value|another_key:value]
 			GrblHalLineParserResultATCI,
+
+			// [MSG:Info: Autoconfig: TLS=1, ATC=0]
+			GrblHalLineParserResultAutoconfig,
 
 			// [G38.2 G54 G17 G21 G91 G94 M0 M5 M9 T0 F20. S0.] (v0.9)
 			// [GC:G38.2 G54 G17 G21 G91 G94 M0 M5 M9 T0 F20. S0.] (v1.1)

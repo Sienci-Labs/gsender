@@ -75,7 +75,7 @@ const ResultsStep = () => {
 		// Tolerable if hypotenuse difference is less than 2mm
 		if (isWithinEEPROMThreshold) {
 			return (
-				<div className="text-yellow-800 bg-yellow-100 p-4 rounded-lg space-y-2 dark:bg-yellow-900 dark:text-white">
+				<div className="text-yellow-800 bg-yellow-100 p-4 rounded-lg space-y-2 dark:bg-yellow-900 dark:text-content-primary">
 					<p className="font-bold text-lg">
 						Your machine is slightly out of square
 					</p>
@@ -97,7 +97,7 @@ const ResultsStep = () => {
 
 		// Noticeably out of square
 		return (
-			<div className="text-red-950 bg-red-100 p-4 rounded-lg space-y-2 dark:bg-red-950 dark:text-white">
+			<div className="text-red-950 bg-red-100 p-4 rounded-lg space-y-2 dark:bg-red-950 dark:text-content-primary">
 				<p className="font-bold text-lg">Your machine needs adjustment</p>
 				<p>
 					The machine is off by {angle.toFixed(2)}° or{" "}
@@ -129,17 +129,19 @@ const ResultsStep = () => {
 			<div className="flex flex-col gap-4">
 				<div className="flex flex-row items-start gap-4">
 					<div className="space-y-1">
-						<h3 className="text-lg font-semibold dark:text-white">Results</h3>
+						<h3 className="text-lg font-semibold dark:text-content-primary">
+							Results
+						</h3>
 						{renderResult()}
 					</div>
 
 					<div className="space-y-1">
-						<h3 className="text-lg font-semibold dark:text-white">
+						<h3 className="text-lg font-semibold dark:text-content-primary">
 							Measured Dimensions
 						</h3>
 						<div className="grid grid-cols-2 gap-2">
-							<div className="p-2 bg-gray-50 rounded-lg dark:bg-dark dark:text-white">
-								<div className="text-sm text-gray-600 dark:text-white">
+							<div className="p-2 bg-gray-50 rounded-lg dark:bg-surface-raised dark:text-content-primary">
+								<div className="text-sm text-gray-600 dark:text-content-primary">
 									Bottom Edge (1-2)
 								</div>
 								<div className="text-xl font-bold">
@@ -147,8 +149,8 @@ const ResultsStep = () => {
 									{units}
 								</div>
 							</div>
-							<div className="p-2 bg-gray-50 rounded-lg dark:bg-dark dark:text-white">
-								<div className="text-sm text-gray-600 dark:text-white">
+							<div className="p-2 bg-gray-50 rounded-lg dark:bg-surface-raised dark:text-content-primary">
+								<div className="text-sm text-gray-600 dark:text-content-primary">
 									Right Edge (2-3)
 								</div>
 								<div className="text-xl font-bold">
@@ -156,8 +158,8 @@ const ResultsStep = () => {
 									{units}
 								</div>
 							</div>
-							<div className="p-2 bg-gray-50 rounded-lg dark:bg-dark dark:text-white">
-								<div className="text-sm text-gray-600 dark:text-white">
+							<div className="p-2 bg-gray-50 rounded-lg dark:bg-surface-raised dark:text-content-primary">
+								<div className="text-sm text-gray-600 dark:text-content-primary">
 									Diagonal (1-3)
 								</div>
 								<div className="text-xl font-bold">
@@ -165,8 +167,8 @@ const ResultsStep = () => {
 									{units}
 								</div>
 							</div>
-							<div className="p-2 bg-gray-50 rounded-lg dark:bg-dark dark:text-white">
-								<div className="text-sm text-gray-600 dark:text-white">
+							<div className="p-2 bg-gray-50 rounded-lg dark:bg-surface-raised dark:text-content-primary">
+								<div className="text-sm text-gray-600 dark:text-content-primary">
 									Angle Deviation
 								</div>
 								<div className="text-xl font-bold">{angle.toFixed(2)}°</div>
@@ -177,18 +179,18 @@ const ResultsStep = () => {
 
 				{needsEEPROMAdjustment && (
 					<div className="flex flex-col justify-center items-start space-y-1">
-						<h3 className="text-lg font-semibold dark:text-white">
+						<h3 className="text-lg font-semibold dark:text-content-primary">
 							Other Recommendations
 						</h3>
-						<div className="space-y-1 text-yellow-800 bg-yellow-100 p-4 rounded-lg border min-h-52 flex flex-col justify-center items-start space-y-1 dark:bg-yellow-950 dark:text-white dark:border-yellow-950">
+						<div className="text-yellow-800 bg-yellow-100 p-4 rounded-lg border min-h-52 flex flex-col justify-center items-start space-y-1 dark:bg-yellow-950 dark:text-content-primary dark:border-yellow-950">
 							<p>
 								We also noticed from the results that your motor movement
 								settings could be updated to improve your machines accuracy.
 							</p>
 							{/* <div className="grid grid-cols-2 gap-4"> */}
 							<div className="grid grid-cols-2 gap-2 mt-1">
-								<div className="p-2 bg-gray-50 rounded-lg dark:bg-dark">
-									<div className="text-sm text-gray-600 dark:text-white">
+								<div className="p-2 bg-gray-50 rounded-lg dark:bg-surface-raised">
+									<div className="text-sm text-gray-600 dark:text-content-primary">
 										X-axis step/mm
 									</div>
 									<div className="text-xl font-bold">
@@ -198,8 +200,8 @@ const ResultsStep = () => {
 										Recommended: {eepromAdjustment.x.amount.toFixed(3)}
 									</div>
 								</div>
-								<div className="p-2 bg-gray-50 rounded-lg dark:bg-dark">
-									<div className="text-sm text-gray-600 dark:text-white">
+								<div className="p-2 bg-gray-50 rounded-lg dark:bg-surface-raised">
+									<div className="text-sm text-gray-600 dark:text-content-primary">
 										Y-axis step/mm
 									</div>
 									<div className="text-xl font-bold">
@@ -246,6 +248,7 @@ const ResultsStep = () => {
 												<AlertDialogAction
 													className="border border-blue-500"
 													onClick={handleUpdateEEPROM}
+													data-testid="sq-update-step-per-mm"
 												>
 													Update Firmware
 												</AlertDialogAction>

@@ -17,6 +17,8 @@ function customScreenVariants({
 	addVariant("xl", "@media (min-width: 1280px) { & }");
 	addVariant("max-xl", "@media (max-width: 1280px), (max-height: 880px) { & }");
 	addVariant("short", "@media (max-height: 820px) { & }");
+	addVariant("portrait", "@media (orientation: portrait) { & }");
+	addVariant("landscape", "@media (orientation: landscape) { & }");
 }
 
 export default {
@@ -48,11 +50,81 @@ export default {
 				"content-area": "calc(100vh-64px)",
 			},
 			colors: {
+				// Workshop High-Contrast dark theme — compat `dark` family remapped
+				// to Workshop neutrals so existing `dark:bg-dark*` usages pick up the
+				// new palette. Prefer the semantic surface/content/outline tokens below
+				// for new code (see docs/dark-mode-theme-instructions.md).
 				dark: {
-					DEFAULT: "#0f172a",
-					darker: "#020617",
-					lighter: "#334155",
+					DEFAULT: "#151B23",
+					darker: "#090D12",
+					lighter: "#202832",
 				},
+				// Workshop semantic neutrals (single source of truth; pendant inherits
+				// these via `presets: [desktopConfig]`).
+				surface: {
+					base: "#151B23",
+					sunken: "#090D12",
+					raised: "#202832",
+					elevated: "#2D3946",
+					hover: "#3A4857",
+					active: "#445261",
+					disabled: "#252D36",
+				},
+				content: {
+					primary: "#F4F7FA",
+					secondary: "#CFD6DF",
+					muted: "#A0AABA",
+					disabled: "#778291",
+					inverse: "#151B23",
+				},
+				outline: {
+					subtle: "#3F4B59",
+					DEFAULT: "#59687B",
+					strong: "#72849D",
+					disabled: "#3A444F",
+				},
+				overlay: {
+					hover: "rgba(255, 255, 255, 0.07)",
+					active: "rgba(255, 255, 255, 0.12)",
+					disabled: "rgba(0, 0, 0, 0.20)",
+					scrim: "rgba(0, 0, 0, 0.72)",
+				},
+				// shadcn/ui primitive tokens (src/components/shadcn/*) — resolved
+				// from CSS vars (see index.css) so bare classes like `bg-card` and
+				// `border` pick up the Workshop theme without a dark: prefix.
+				background: "var(--background)",
+				foreground: "var(--foreground)",
+				card: {
+					DEFAULT: "var(--card)",
+					foreground: "var(--card-foreground)",
+				},
+				popover: {
+					DEFAULT: "var(--popover)",
+					foreground: "var(--popover-foreground)",
+				},
+				primary: {
+					DEFAULT: "var(--primary)",
+					foreground: "var(--primary-foreground)",
+				},
+				secondary: {
+					DEFAULT: "var(--secondary)",
+					foreground: "var(--secondary-foreground)",
+				},
+				muted: {
+					DEFAULT: "var(--muted)",
+					foreground: "var(--muted-foreground)",
+				},
+				accent: {
+					DEFAULT: "var(--accent)",
+					foreground: "var(--accent-foreground)",
+				},
+				destructive: {
+					DEFAULT: "var(--destructive)",
+					foreground: "var(--destructive-foreground)",
+				},
+				border: "var(--border)",
+				input: "var(--input)",
+				ring: "var(--ring)",
 				robin: {
 					50: "#f6f9fc",
 					100: "#ecf2f8",
@@ -118,6 +190,28 @@ export default {
 					900: "#704007",
 					950: "#5e3506",
 				},
+				teal: {
+					50: "#E1F5EE",
+					100: "#9FE1CB",
+					200: "#5DCAA5",
+					600: "#0F6E56",
+				},
+				purple: {
+					50: "#EEEDFE",
+					100: "#CECBF6",
+					200: "#AFA9EC",
+					400: "#7F77DD",
+					600: "#534AB7",
+				},
+			},
+			borderColor: {
+				DEFAULT: "var(--border)",
+			},
+			ringColor: {
+				DEFAULT: "var(--ring)",
+			},
+			ringOffsetColor: {
+				background: "var(--background)",
 			},
 			keyframes: {
 				attention: {

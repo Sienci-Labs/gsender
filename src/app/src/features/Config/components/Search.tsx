@@ -26,7 +26,7 @@ export function Search() {
 			<div className="relative w-full">
 				<div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
 					<svg
-						className="w-4 h-4 text-gray-500 dark:text-gray-400"
+						className="w-4 h-4 text-gray-500 dark:text-content-muted"
 						aria-hidden="true"
 						xmlns="http://www.w3.org/2000/svg"
 						fill="none"
@@ -44,7 +44,7 @@ export function Search() {
 				<input
 					type="text"
 					id="simple-search"
-					className="bg-gray-50 focus:outline-none border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5"
+					className="bg-gray-50 focus:outline-none border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-surface-elevated dark:border-outline dark:text-content-primary"
 					placeholder="Search Config"
 					value={searchTerm}
 					onChange={onSearchChange}

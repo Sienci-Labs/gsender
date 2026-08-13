@@ -160,10 +160,10 @@ const RotarySurfacing = () => {
 
 	return (
 		<div>
-			<div className="bg-white dark:bg-transparent dark:text-white w-full flex flex-col gap-2">
+			<div className="bg-white dark:bg-transparent dark:text-content-primary w-full flex flex-col gap-2">
 				<div className="grid grid-cols-2 gap-4">
 					<div className="grid gap-4 xl:gap-2">
-						<p className="text-sm xl:text-base font-normal text-gray-500 dark:text-gray-300">
+						<p className="text-sm xl:text-base font-normal text-gray-500 dark:text-content-secondary">
 							Make sure that your tool clears the surface of your material
 							without running into the limits of your Z-axis. You should also
 							use the probing feature to zero your Z-axis to the centerline

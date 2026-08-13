@@ -32,9 +32,10 @@ export function SpeedSelectButton({
 	return (
 		<button
 			className={cn(
-				"text-sm px-2 max-xl:px-1 max-xl:py-1 py-2 rounded h-full",
+				"text-sm px-2 max-xl:px-1 max-xl:py-1 py-2 rounded h-full border border-transparent",
 				{
-					"bg-blue-400 bg-opacity-30": active,
+					"bg-blue-400 bg-opacity-30 border-blue-500 font-semibold text-blue-700 dark:text-blue-300":
+						active,
 				},
 			)}
 			onClick={onClick}
@@ -226,7 +227,7 @@ export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
 	}, []);
 
 	return (
-		<div className="flex flex-col bg-white dark:bg-dark dark:text-white rounded-md border-solid border border-gray-300 dark:border-gray-700 p-1 w-32 max-xl:w-28">
+		<div className="flex flex-col bg-white dark:bg-surface-raised dark:text-content-primary rounded-md border-solid border border-gray-300 dark:border-outline p-1 w-32 max-xl:w-28">
 			<SpeedSelectButton
 				active={preciseActive}
 				onClick={() => handleSpeedChange("Precise")}

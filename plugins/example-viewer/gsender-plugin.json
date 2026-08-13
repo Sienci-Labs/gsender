@@ -1,6 +1,7 @@
 {
 	"id": "com.sienci.example-viewer",
 	"name": "G-code Viewer Demo",
+	"description": "An embedded G-code preview demo using the SDK's GCodeViewer to render loaded toolpaths.",
 	"version": "0.1.0",
 	"engine": ">=1.6.0",
 	"ui": {

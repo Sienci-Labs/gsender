@@ -61,17 +61,17 @@ const ResumingJobNotice = () => {
 					</svg>
 					<Zap
 						size={18}
-						className="absolute inset-0 m-auto text-gray-400 dark:text-gray-500"
+						className="absolute inset-0 m-auto text-gray-400 dark:text-content-muted"
 					/>
 				</div>
 
-				<div className="text-xs font-medium tracking-widest uppercase text-gray-400 dark:text-gray-500">
+				<div className="text-xs font-medium tracking-widest uppercase text-gray-400 dark:text-content-muted">
 					Resuming Job
 				</div>
 				<div className="text-lg font-medium mt-1 mb-3 text-gray-900 dark:text-[#e5e5ea]">
 					Job resuming
 				</div>
-				<div className="text-sm leading-relaxed mb-6 text-gray-600 dark:text-gray-400">
+				<div className="text-sm leading-relaxed mb-6 text-gray-600 dark:text-content-muted">
 					The machine needs to move back into position and may need to spin the
 					spindle back up to speed. The job will continue automatically once
 					this is complete.

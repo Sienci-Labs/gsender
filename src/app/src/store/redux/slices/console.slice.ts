@@ -24,10 +24,17 @@ const consoleSlice = createSlice({
 				-MAX_TERMINAL_INPUT_ARRAY_SIZE,
 			);
 		},
+		clearHistory(state) {
+			state.history = [];
+		},
 	},
 });
 
-export const { setInputHistory, addToInputHistory, addToHistory } =
-	consoleSlice.actions;
+export const {
+	setInputHistory,
+	addToInputHistory,
+	addToHistory,
+	clearHistory,
+} = consoleSlice.actions;
 
 export default consoleSlice.reducer;

@@ -1,14 +1,16 @@
-import { IMPERIAL_UNITS } from "app/constants";
-import { StepActionButton } from "app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx";
-import { StepProps } from "app/features/AccessoryInstaller/types";
-import { PositionSetter } from "app/features/AccessoryInstaller/Wizards/atc/components/PositionSetter.tsx";
-import { useWorkspaceState } from "app/hooks/useWorkspaceState";
-import { in2mm, mapPositionToUnits } from "app/lib/units.ts";
-import store from "app/store";
-import { RootState } from "app/store/redux";
-import pubsub from "pubsub-js";
-import { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+
+import { PositionSetter } from 'app/features/AccessoryInstaller/Wizards/atc/components/PositionSetter.tsx';
+import { useSelector } from 'react-redux';
+import { RootState } from 'app/store/redux';
+import { useEffect, useRef, useState } from 'react';
+import store from 'app/store';
+import controller from 'app/lib/controller.ts';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { mapPositionToUnits, in2mm } from 'app/lib/units.ts';
+import { IMPERIAL_UNITS } from 'app/constants';
+import pubsub from 'pubsub-js';
+import {StepProps} from "app/components/Wizard/types";
+import {StepActionButton} from "app/components/Wizard/StepActionButton.tsx";
 
 type Position = { x?: number; y?: number; z?: number };
 
@@ -53,29 +55,34 @@ export function TLSLocation({ onComplete, onUncomplete }: StepProps) {
 
 	const [position, setPosition] = useState({ x: "0", y: "0", z: "0" });
 
-	const setTLSLocation = () => {
-		const toMM = (val: string) =>
-			units === IMPERIAL_UNITS ? in2mm(Number(val)) : Number(val);
-		store.set("workspace.toolChangePosition", {
-			x: toMM(position.x),
-			y: toMM(position.y),
-			z: toMM(position.z),
-		});
-		pubsub.publish("repopulate");
-		setSuccess("TLS location set.");
-		setIsComplete(true);
-		lastSetMposRef.current = mpos;
-		onComplete();
-	};
+    const setTLSLocation = () => {
+        const toMM = (val: string) =>
+            units === IMPERIAL_UNITS ? in2mm(Number(val)) : Number(val);
+        store.set('workspace.toolChangePosition', {
+            x: toMM(position.x),
+            y: toMM(position.y),
+            z: toMM(position.z),
+        });
+        controller.command(
+            'gcode',
+            `G21 G10 L2 P9 X${toMM(position.x)} Y${toMM(position.y)}`,
+            '$#',
+        );
+        pubsub.publish('repopulate');
+        setSuccess('TLS location set.');
+        setIsComplete(true);
+        lastSetMposRef.current = mpos;
+        onComplete();
+    };
 
 	return (
 		<div className="flex flex-col gap-5 justify-start">
-			<p className="dark:text-white">
+			<p className="dark:text-content-primary">
 				Install the tallest bit you own in your spindle or router. Jog until
 				it's positioned just above (10-20mm) the Tool Length Sensor, then set
 				the position using the <b>"Set Position"</b> button.
 			</p>
-			<p className="text-sm text-gray-600 dark:text-gray-300">
+			<p className="text-sm text-gray-600 dark:text-content-secondary">
 				Using your tallest tool gives the most Z-axis clearance above the
 				sensor, so its measured position ends up negative — this is what lets
 				gSender accurately probe tools of any length during a tool change

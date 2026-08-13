@@ -52,7 +52,7 @@ function MenuItem({ label, active, onClick, icon, available }: MenuItemProps) {
 				{icon({
 					className: active
 						? "text-blue-500"
-						: "text-gray-600 group-hover:text-blue-500 hover:text-blue-500 dark:text-white",
+						: "text-gray-600 group-hover:text-blue-500 hover:text-blue-500 dark:text-content-primary",
 				})}
 			</span>
 			<span>{label}</span>
@@ -82,7 +82,7 @@ export function Menu({ menu, onClick, activeSection }: MenuProps) {
 
 	return (
 		<div
-			className="flex flex-col w-1/5 border border-gray-200 border-l-0 pl-1 divide-y bg-white max-sm:hidden dark:bg-dark dark:border-gray-700 dark:text-white"
+			className="flex flex-col w-1/5 border border-gray-200 border-l-0 pl-1 divide-y bg-white max-sm:hidden dark:bg-surface-raised dark:border-outline dark:text-content-primary"
 			style={
 				{
 					"--menu-col-length": originalMenuLength,

@@ -34,7 +34,7 @@ const Step = ({ step, index = 0, active }) => {
 					: "border-l-transparent",
 			)}
 		>
-			<div className="text-[10px] text-gray-400 dark:text-gray-500 mb-0.5">
+			<div className="text-[10px] text-gray-400 dark:text-content-muted mb-0.5">
 				Step {index + 1}
 			</div>
 			<div
@@ -42,7 +42,7 @@ const Step = ({ step, index = 0, active }) => {
 					"text-xs font-medium leading-snug",
 					active
 						? "text-blue-700 dark:text-blue-300"
-						: "text-gray-500 dark:text-gray-500",
+						: "text-gray-500 dark:text-content-muted",
 				)}
 			>
 				{step.title}

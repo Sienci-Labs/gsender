@@ -53,7 +53,7 @@ export const toolStateThemes: ToolStateThemes = {
 		label: "Empty",
 		backgroundColor: "bg-gray-400/20 dark:bg-gray-400/40",
 		borderColor: "border-gray-600",
-		textColor: "text-gray-600 dark:text-gray-300",
+		textColor: "text-gray-600 dark:text-content-secondary",
 		backgroundStyle: "solid",
 		icon: PiEmpty,
 	},

@@ -101,6 +101,8 @@ export interface ControllerListeners {
 	"flash:progress": Array<Function>;
 	"spindle:add": Array<Function>;
 	atci: Array<Function>;
+	"grblHal:autoconfig": Array<Function>;
+	"grblHal:info": Array<Function>;
 	"ymodem:start": Array<Function>;
 	"ymodem:complete": Array<Function>;
 	"ymodem:progress": Array<Function>;
@@ -226,6 +228,8 @@ class Controller {
 		"sdcard:clear": [],
 		"sdcard:json": [],
 		atci: [],
+		"grblHal:autoconfig": [],
+		"grblHal:info": [],
 		"ymodem:start": [],
 		"ymodem:complete": [],
 		"ymodem:progress": [],
@@ -361,6 +365,7 @@ class Controller {
 				loadedControllers = [],
 				baudrates = [],
 				ports = [],
+				activeConnection = null,
 			} = { ...data };
 
 			this.loadedControllers = ensureArray(loadedControllers);
@@ -379,6 +384,14 @@ class Controller {
 			// don't want to update store if it is electron
 			if (!isElectron()) {
 				this.socket && this.socket.emit("newConnection");
+
+				// A remote/browser client only ever talks to one controller at a
+				// time. If the desktop is already connected, join that session
+				// automatically instead of making the user click Connect — this
+				// takes priority over any locally-saved autoReconnect port.
+				if (activeConnection && activeConnection.port) {
+					this.addClient(activeConnection.port);
+				}
 			}
 		});
 	}

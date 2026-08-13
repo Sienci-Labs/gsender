@@ -1,6 +1,6 @@
+import { StepActionButton } from "app/components/Wizard/StepActionButton.tsx";
+import type { StepProps } from "app/components/Wizard/types";
 import { GRBL_ACTIVE_STATE_ALARM } from "app/constants";
-import { StepActionButton } from "app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx";
-import type { StepProps } from "app/features/AccessoryInstaller/types";
 import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
 import controller from "app/lib/controller.ts";
 import type { RootState } from "app/store/redux";
@@ -53,14 +53,14 @@ export function RestartAndRehome({ onComplete, onUncomplete }: StepProps) {
 
 	return (
 		<div className="flex flex-col gap-5 justify-start">
-			<label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+			<label className="block text-sm font-semibold text-gray-900 dark:text-content-primary mb-2">
 				Rehome
 			</label>
-			<p className="dark:text-white">
+			<p className="dark:text-content-primary">
 				Homing movements have been updated and require the machine to be
 				rehomed.
 			</p>
-			<p className="dark:text-white">
+			<p className="dark:text-content-primary">
 				Select <b>"Re-home"</b> to continue.
 			</p>
 

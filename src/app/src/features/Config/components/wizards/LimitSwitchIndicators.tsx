@@ -16,24 +16,24 @@ export function LimitSwitchIndicators() {
 	const zAxis = get(pinState, "Z", false);
 
 	return (
-		<div className="flex flex-row items-center gap-2 dark:text-white">
+		<div className="flex flex-row items-center gap-2 dark:text-content-primary">
 			<div className="flex flex-row gap-2 items-center">
-				<span className="dark:text-white">X:</span>
+				<span className="dark:text-content-primary">X:</span>
 				<PinIndicator on={xAxis} />
 			</div>
 			|
 			<div className="flex flex-row gap-2 items-center">
-				<span className="dark:text-white">Y:</span>
+				<span className="dark:text-content-primary">Y:</span>
 				<PinIndicator on={yAxis} />
 			</div>
 			|
 			<div className="flex flex-row gap-2 items-center">
-				<span className="dark:text-white">Z:</span>
+				<span className="dark:text-content-primary">Z:</span>
 				<PinIndicator on={zAxis} />
 			</div>
 			|
 			<div className="flex flex-row gap-2 items-center">
-				<span className="dark:text-white">A:</span>
+				<span className="dark:text-content-primary">A:</span>
 				<PinIndicator on={aAxis} />
 			</div>
 		</div>

@@ -186,18 +186,9 @@ const MacroWidget = ({
 		},
 		updateMacros: async (macros: any[] = []) => {
 			try {
-				if (macros.length > 0) {
-					for await (const macro of macros) {
-						const { id, name, content, column, description, rowIndex } = macro;
-						api.macros.update(id, {
-							name,
-							content,
-							description,
-							column,
-							rowIndex,
-						});
-					}
-				}
+				if (macros.length === 0) return;
+
+				await api.macros.bulkUpdate(macros);
 			} catch (err) {
 				// Ignore error
 			}
@@ -370,14 +361,6 @@ const MacroWidget = ({
 
 	useEffect(() => {
 		fetchMacros();
-		const configChangeHandler = async () => {
-			// await fetchMacros();
-		};
-		controller.addListener("config:change", configChangeHandler);
-
-		return () => {
-			controller.removeListener("config:change", configChangeHandler);
-		};
 	}, []);
 
 	const canClick = () => {

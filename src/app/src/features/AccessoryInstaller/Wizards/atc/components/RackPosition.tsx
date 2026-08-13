@@ -1,6 +1,8 @@
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
+/** biome-ignore-all lint/a11y/noLabelWithoutControl: <> */
+import { StepActionButton } from "app/components/Wizard/StepActionButton.tsx";
+import type { StepProps } from "app/components/Wizard/types";
 import { IMPERIAL_UNITS } from "app/constants";
-import { StepActionButton } from "app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx";
-import type { StepProps } from "app/features/AccessoryInstaller/types";
 import { PositionSetter } from "app/features/AccessoryInstaller/Wizards/atc/components/PositionSetter.tsx";
 import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
 import { useWorkspaceState } from "app/hooks/useWorkspaceState";
@@ -11,7 +13,7 @@ import type { RootState } from "app/store/redux";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
-export function RackPosition({ onComplete, onUncomplete }: StepProps) {
+export function RackPosition({ onComplete }: StepProps) {
 	const [rackPositionMethod, setRackPositionMethod] =
 		useState<string>("utility");
 	const [isComplete, setIsComplete] = useState<boolean>(false);
@@ -82,7 +84,11 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
 		}
 	}, [rackless]);
 
-	const [position, setPosition] = useState({ x: "0", y: "0", z: "0" });
+	const [position, setPosition] = useState<{
+		x: string;
+		y: string;
+		z?: string;
+	}>({ x: "0", y: "0", z: "0" });
 
 	const handleUseUtility = () => {
 		controller.command("gcode", "G65 P302");
@@ -104,11 +110,11 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
 	if (rackless === 0 && slotCount === 0) {
 		return (
 			<div className="flex flex-col gap-5 justify-start">
-				<p className="dark:text-white">
+				<p className="dark:text-content-primary">
 					For ATC Configuration, you selected “No Tool Rack” and so do not need
 					to set a rack position.
 				</p>
-				<p className="dark:text-white">
+				<p className="dark:text-content-primary">
 					If you have a rack installed, please return to the previous step to
 					correct your selection.
 				</p>
@@ -119,7 +125,7 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
 	return (
 		<div className="flex flex-col gap-5 justify-start">
 			<div>
-				<label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+				<label className="block text-sm font-semibold text-gray-900 dark:text-content-primary mb-2">
 					Find Rack Position Method
 				</label>
 				<select
@@ -134,20 +140,20 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
 			{rackPositionMethod === "utility" && (
 				<>
 					<ol className="list-decimal p-5 gap-4 space-y-2">
-						<li className="dark:text-white">
+						<li className="dark:text-content-primary">
 							Populate your tool rack with tool holders
 						</li>
-						<li className="dark:text-white">
+						<li className="dark:text-content-primary">
 							Position the spindle so that the tool-stud sensor is directly over
 							the right most tool holder. Once in the proper position, the LED
 							on the sensor will light up.
 						</li>
-						<li className="dark:text-white">
+						<li className="dark:text-content-primary">
 							Press the <b>“Find Rack”</b> button for the wizard to determine
 							the precise position of your tool holders.
 						</li>
 					</ol>
-					<p className="dark:text-white">
+					<p className="dark:text-content-primary">
 						The machine will take a few minutes to check the position of the
 						left-most and right-most position of each tool rack.
 					</p>
@@ -163,7 +169,7 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
 
 			{rackPositionMethod === "manual" && (
 				<>
-					<p className="text-gray-900 dark:text-white">
+					<p className="text-gray-900 dark:text-content-primary">
 						<b>
 							It is highly recommended that you use the automatic method, your
 							rack may be damaged if done incorrectly.
@@ -199,6 +205,7 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
 								onApply={setPositionViaPositionSetting}
 								isComplete={isComplete}
 								error={error}
+								data-testid="atc-set-position"
 							/>
 						}
 					/>

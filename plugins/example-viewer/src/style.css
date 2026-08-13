@@ -1,7 +1,11 @@
 :root {
-	color-scheme: light dark;
+	color-scheme: light;
 	font-family: system-ui, -apple-system, sans-serif;
 	line-height: 1.5;
+}
+
+html.dark {
+	color-scheme: dark;
 }
 
 * {
@@ -15,11 +19,9 @@ body {
 	color: #18181b;
 }
 
-@media (prefers-color-scheme: dark) {
-	body {
-		background: #09090b;
-		color: #fafafa;
-	}
+html.dark body {
+	background: #09090b;
+	color: #fafafa;
 }
 
 .app {
@@ -65,11 +67,9 @@ header h1 {
 	height: 100%;
 }
 
-@media (prefers-color-scheme: dark) {
-	.card {
-		border-color: #27272a;
-		background: #18181b;
-	}
+html.dark .card {
+	border-color: #27272a;
+	background: #18181b;
 }
 
 .card h2 {
@@ -90,11 +90,9 @@ textarea {
 	color: inherit;
 }
 
-@media (prefers-color-scheme: dark) {
-	textarea {
-		border-color: #3f3f46;
-		background: #27272a;
-	}
+html.dark textarea {
+	border-color: #3f3f46;
+	background: #27272a;
 }
 
 .actions {
@@ -110,10 +108,20 @@ button {
 	background: #fafafa;
 	cursor: pointer;
 	font: inherit;
+	color: inherit;
 }
 
 button:hover {
 	background: #f4f4f5;
+}
+
+html.dark button {
+	border-color: #3f3f46;
+	background: #27272a;
+}
+
+html.dark button:hover {
+	background: #3f3f46;
 }
 
 .status {
@@ -144,10 +152,8 @@ button:hover {
 	height: 100%;
 }
 
-@media (prefers-color-scheme: dark) {
-	.viewer-container {
-		border-color: #3f3f46;
-	}
+html.dark .viewer-container {
+	border-color: #3f3f46;
 }
 
 code {

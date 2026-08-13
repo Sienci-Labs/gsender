@@ -1,5 +1,5 @@
-import { StepActionButton } from "app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx";
-import type { StepProps } from "app/features/AccessoryInstaller/types";
+import { StepActionButton } from "app/components/Wizard/StepActionButton.tsx";
+import type { StepProps } from "app/components/Wizard/types";
 import { SPINDLE_395_V7_VERSION } from "app/features/ATC/utils/ATCiConstants.ts";
 import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
 import controller from "app/lib/controller.ts";
@@ -44,7 +44,7 @@ export function SpindleSetRestart({ onComplete, onUncomplete }: StepProps) {
 
 	return (
 		<div className="flex flex-col gap-5 justify-start">
-			<p className="dark:text-white">
+			<p className="dark:text-content-primary">
 				Your spindle settings are applied in this step and the controller will
 				restart automatically.
 			</p>

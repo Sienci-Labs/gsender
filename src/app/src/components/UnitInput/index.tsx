@@ -21,7 +21,7 @@ export function UnitInput({
 	return (
 		<div
 			className={cx(
-				"border border-gray-300 rounded flex flex-row items-center flex-1 justify-between pl-2 pr-2",
+				"border border-gray-300 rounded flex flex-row items-center flex-1 justify-between pl-2 pr-2 dark:border-outline",
 				{
 					"opacity-50": disabled,
 				},
@@ -37,7 +37,7 @@ export function UnitInput({
 					onChange={onChange}
 					disabled={disabled}
 				/>
-				<span className="shrink-0 pl-1 text-xs text-gray-500 dark:text-white">
+				<span className="shrink-0 pl-1 text-xs text-gray-500 dark:text-content-primary">
 					{units}
 				</span>
 			</div>

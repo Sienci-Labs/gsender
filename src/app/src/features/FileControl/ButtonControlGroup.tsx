@@ -217,7 +217,7 @@ const ButtonControlGroup = () => {
 	}, 100);
 
 	return (
-		<div className="flex rounded-md absolute top-[-35px] bg-white dark:bg-dark shadow-md z-40 border-blue-500 border-2 overflow-hidden h-12 max-xl:h-11 portrait:h-14 portrait:top-[-45px]">
+		<div className="flex rounded-md absolute top-[-35px] bg-white dark:bg-surface-raised shadow-md z-40 border-blue-500 border-2 overflow-hidden h-12 max-xl:h-11 portrait:h-14 portrait:top-[-45px]">
 			<Button
 				onClick={handleClickLoadFile}
 				icon={<FaFolderOpen className="w-5 h-5" />}

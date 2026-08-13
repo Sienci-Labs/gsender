@@ -1437,7 +1437,7 @@ function generateSupportFile() {
 	return (
 		<Button
 			icon={
-				<PiFileZipFill className="text-gray-600 w-8 h-8 dark:text-gray-200" />
+				<PiFileZipFill className="text-gray-600 w-8 h-8 dark:text-content-secondary" />
 			}
 			onClick={submitDiagnosticForm}
 			size="lg"

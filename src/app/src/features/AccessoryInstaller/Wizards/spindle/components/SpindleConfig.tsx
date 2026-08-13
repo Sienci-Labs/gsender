@@ -1,4 +1,4 @@
-import { StepActionButton } from "app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx";
+import { StepActionButton } from "app/components/Wizard/StepActionButton.tsx";
 import {
 	ATCI_SUPPORTED_VERSION,
 	SPINDLE_395_V7_VERSION,
@@ -39,7 +39,11 @@ export function getGrblCoreGcode(): string[] {
 	];
 }
 
-export function SpindleConfig({ onComplete, onUncomplete }) {
+interface Props {
+	onComplete: () => void;
+}
+
+export function SpindleConfig({ onComplete }: Props) {
 	const [error, setError] = useState<string | null>(null);
 
 	const [hasSetupSpindle, setHasSetupSpindle] = useState<boolean>(false);
@@ -74,7 +78,7 @@ export function SpindleConfig({ onComplete, onUncomplete }) {
 
 	return (
 		<div className="flex flex-col gap-5 justify-start">
-			<p className="dark:text-white">
+			<p className="dark:text-content-primary">
 				Your spindle settings are applied in this step and the controller will
 				restart automatically.
 			</p>
@@ -96,6 +100,7 @@ export function SpindleConfig({ onComplete, onUncomplete }) {
 				isComplete={hasSetupSpindle}
 				error={error}
 				disabled={!canSetupSpindle}
+				data-testid="ss-setup-spindle-reboot"
 			/>
 		</div>
 	);

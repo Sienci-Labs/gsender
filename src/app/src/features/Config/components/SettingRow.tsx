@@ -290,12 +290,12 @@ export const SettingRow = React.memo(function SettingRow({
 				"p-2 flex flex-row flex-wrap items-center text-gray-700 border-b border-gray-200",
 				{
 					hidden: isHidden,
-					"odd:bg-yellow-50 even:bg-yellow-50 dark:bg-blue-900 dark:text-white":
+					"odd:bg-yellow-50 even:bg-yellow-50 dark:bg-blue-900 dark:text-content-primary":
 						!isDefault,
 				},
 			)}
 		>
-			<span className="w-full sm:w-1/5 font-xl sm:mb-0 mb-2 dark:text-gray-400 flex items-center justify-between sm:block ">
+			<span className="w-full sm:w-1/5 font-xl sm:mb-0 mb-2 dark:text-content-muted flex items-center justify-between sm:block ">
 				<span>{setting.label}</span>
 				<span className="sm:hidden flex flex-row gap-2">
 					{!isDefault && (
@@ -322,12 +322,12 @@ export const SettingRow = React.memo(function SettingRow({
 					<span className="text-robin-500 min-w-9" />
 				</span>
 			</span>
-			<span className="w-full sm:w-2/5 order-2 sm:order-3 text-gray-500 text-sm flex flex-col gap-2 max-sm:mb-4 mb-2">
+			<span className="w-full sm:w-2/5 order-2 sm:order-3 text-gray-500 dark:text-content-secondary text-sm flex flex-col gap-2 max-sm:mb-4 mb-2">
 				{setting.description.split("\n").map((line: string, index: number) => (
 					<p key={index}>{line}</p>
 				))}
 			</span>
-			<span className="w-full sm:w-1/5 sm:order-none order-3 text-xs px-4 dark:text-gray-200 sm:mb-0  max-sm:mb-2 mb-0">
+			<span className="w-full sm:w-1/5 sm:order-none order-3 text-xs px-4 dark:text-content-secondary sm:mb-0  max-sm:mb-2 mb-0">
 				{returnSettingControl(
 					connected,
 					displaySetting,

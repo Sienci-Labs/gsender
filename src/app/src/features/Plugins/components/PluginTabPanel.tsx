@@ -1,3 +1,6 @@
+import { useRef } from "react";
+
+import { usePluginIframeTheme } from "../hooks/usePluginIframeTheme";
 import { usePlugins } from "../hooks/usePlugins";
 import type { PluginRecord } from "../types";
 import PluginPanel from "./PluginPanel";
@@ -10,6 +13,9 @@ type PluginTabPanelProps = {
 // reuses PluginPanel so the iframe window gets registered with the
 // plugin's granted capabilities
 export const PluginTabPanel = ({ plugin, isActive }: PluginTabPanelProps) => {
+	const iframeRef = useRef<HTMLIFrameElement>(null);
+	usePluginIframeTheme(iframeRef, isActive);
+
 	if (!isActive) {
 		return null;
 	}

@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/a11y/noLabelWithoutControl: <> */
 import { MapPin } from "lucide-react";
 import { type ReactNode, useEffect, useState } from "react";
 
@@ -62,12 +63,12 @@ export function PositionSetter({
 	return (
 		<div className="space-y-4">
 			<div>
-				<label className="block text-sm font-semibold text-gray-900 dark:text-white mb-3">
+				<label className="block text-sm font-semibold text-gray-900 dark:text-content-primary mb-3">
 					{label} ({units})
 				</label>
 				<div className={`grid gap-4 ${showZ ? "grid-cols-3" : "grid-cols-2"}`}>
 					<div>
-						<label className="block text-xs text-gray-600 dark:text-gray-300 mb-1">
+						<label className="block text-xs text-gray-600 dark:text-content-secondary mb-1">
 							X
 						</label>
 						<input
@@ -75,10 +76,11 @@ export function PositionSetter({
 							value={x}
 							onChange={(e) => handleXChange(e.target.value)}
 							className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+							data-testid="atc-position-x-change"
 						/>
 					</div>
 					<div>
-						<label className="block text-xs text-gray-600 dark:text-gray-300 mb-1">
+						<label className="block text-xs text-gray-600 dark:text-content-secondary mb-1">
 							Y
 						</label>
 						<input
@@ -86,11 +88,12 @@ export function PositionSetter({
 							value={y}
 							onChange={(e) => handleYChange(e.target.value)}
 							className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+							data-testid="atc-position-y-change"
 						/>
 					</div>
 					{showZ && (
 						<div>
-							<label className="block text-xs text-gray-600 dark:text-gray-300 mb-1">
+							<label className="block text-xs text-gray-600 dark:text-content-secondary mb-1">
 								Z
 							</label>
 							<input
@@ -98,6 +101,7 @@ export function PositionSetter({
 								value={z}
 								onChange={(e) => handleZChange(e.target.value)}
 								className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+								data-testid="atc-position-z-change"
 							/>
 						</div>
 					)}

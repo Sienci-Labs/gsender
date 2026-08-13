@@ -187,6 +187,26 @@ class CNCEngine {
 				`New connection from ${address}: id=${socket.id}, user.id=${user.id}, user.name=${user.name}`,
 			);
 
+			// Joins targetSocket to an already-open connection without touching the
+			// serial port: registers it with Connection/Controller so it receives
+			// ongoing status pushes, then acks the join so its UI flips to
+			// "connected". The ack must fire *before* controller.addConnection
+			// populates fresh state — MachineStatus.tsx resets its "fresh state"
+			// flag on serialport:open, so a reset arriving after the fresh state
+			// would clobber it.
+			const joinSocketToConnection = (targetSocket, port, controller) => {
+				targetSocket.join(port);
+				targetSocket.emit("serialport:open", {
+					port,
+					baudrate: controller.options.baudrate,
+					controllerType: controller.type,
+					inuse: true,
+				});
+				targetSocket.emit("serialport:openController", controller.type);
+				this.connection.addConnection(targetSocket);
+				controller.addConnection(targetSocket);
+			};
+
 			const connectionListeners = {
 				"serialport:open": (port, baudrate, controllerType, inuse) => {
 					this.emit("serialport:open", port, baudrate, controllerType, inuse);
@@ -263,6 +283,19 @@ class CNCEngine {
 						}
 						store.set(`controllers[${JSON.stringify(port)}]`, controller);
 
+						// This is a brand-new connection (not a second client joining
+						// one that already existed) — auto-join every other socket
+						// already on the server (desktop, other remote tabs, Console
+						// popouts) so they show connected without anyone clicking
+						// Connect on their end too.
+						if (!refresh) {
+							this.sockets
+								.filter((otherSocket) => otherSocket !== socket)
+								.forEach((otherSocket) => {
+									joinSocketToConnection(otherSocket, port, controller);
+								});
+						}
+
 						callback(null);
 					});
 
@@ -293,6 +326,18 @@ class CNCEngine {
 				baudrates: ensureArray(config.get("baudrates", [])),
 				ports: ensureArray(config.get("ports", [])),
 				socketsLength: this.sockets.length,
+
+				// Lets a freshly-loaded client (e.g. a remote/tablet browser) know
+				// there's already a live connection it can join, without needing
+				// to open a port itself.
+				activeConnection:
+					this.connection && this.connection.isOpen()
+						? {
+								port: this.connection.options.port,
+								baudrate: this.connection.options.baudrate,
+								controllerType: this.connection.controllerType,
+							}
+						: null,
 			});
 
 			socket.on("newConnection", () => {
@@ -332,32 +377,22 @@ class CNCEngine {
 					this.io.emit("task:error", message);
 					return;
 				}
-				log.info(
-					`Reconnecting to open controller on port ${port} with socket ID ${socket.id}`,
-				);
-				this.connection.addConnection(socket);
-				if (this.connection.isOpen()) {
-					log.info("Joining port room on socket");
-					socket.join(port);
-				} else {
-					log.info("connection no longer open");
-				}
 
-				let controller = store.get(`controllers["${port}"]`);
+				const controller = store.get(`controllers["${port}"]`);
 				if (!controller) {
 					const message = `No controller found on port ${port} to reconnect to`;
 					log.info(message);
 					this.io.emit("task:error", message);
 					return;
 				}
+
 				log.info(
 					`Reconnecting to open controller on port ${port} with socket ID ${socket.id}`,
 				);
-				controller.addConnection(socket);
-				log.info(`Controller state: ${controller.isOpen()}`);
+
 				if (this.connection.isOpen()) {
 					log.info("Joining port room on socket");
-					socket.join(port);
+					joinSocketToConnection(socket, port, controller);
 				} else {
 					log.info("Connection no longer open");
 				}
@@ -368,22 +403,20 @@ class CNCEngine {
 					log.info("No connection object found to reconnect to");
 					return;
 				}
-				log.info(
-					`Adding new client to connection on port ${port} with socket ID ${socket.id}`,
-				);
-				this.connection.addConnection(socket);
-				log.info(`connection state: ${this.connection.isOpen()}`);
 
-				let controller = store.get(`controllers["${port}"]`);
+				const controller = store.get(`controllers["${port}"]`);
 				if (!controller) {
 					log.info(`No controller found on port ${port} to reconnect to`);
 					return;
 				}
+
 				log.info(
-					`Adding new client to controller on port ${port} with socket ID ${socket.id}`,
+					`Adding new client to connection on port ${port} with socket ID ${socket.id}`,
 				);
-				controller.addConnection(socket);
-				log.info(`Connection state: ${this.connection.isOpen()}`);
+
+				if (this.connection.isOpen()) {
+					joinSocketToConnection(socket, port, controller);
+				}
 			});
 
 			// List the available serial ports

@@ -129,7 +129,7 @@ export function ToolTimeline({
 									className="h-6 w-6 rounded-md border-2 border-white shadow-sm"
 									style={{ backgroundColor: activeTool.color }}
 								/>
-								<span className="text-sm font-semibold text-gray-900 dark:text-white">
+								<span className="text-sm font-semibold text-gray-900 dark:text-content-primary">
 									T
 									{mappings.get(activeTool.toolNumber) ?? activeTool.toolNumber}
 								</span>

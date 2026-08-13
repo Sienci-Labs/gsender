@@ -1,14 +1,11 @@
-import { StepActionButton } from "app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx";
-import type { StepProps } from "app/features/AccessoryInstaller/types";
+import { StepActionButton } from "app/components/Wizard/StepActionButton.tsx";
+import type { StepProps } from "app/components/Wizard/types";
 import controller from "app/lib/controller.ts";
 import store from "app/store";
 import { useState } from "react";
 
-export function ControllerConfiguration({
-	onComplete,
-	onUncomplete,
-}: StepProps) {
-	const [error, setError] = useState<string>("");
+export function ControllerConfiguration({ onComplete }: StepProps) {
+	const [error, _setError] = useState<string>("");
 	const [isComplete, setIsComplete] = useState<boolean>(false);
 
 	const applySettings = async () => {
@@ -28,12 +25,12 @@ export function ControllerConfiguration({
 
 	return (
 		<div className="flex flex-col gap-5 justify-start">
-			<p className="dark:text-white">
+			<p className="dark:text-content-primary">
 				The following controller settings are being updated to ensure
 				compatibility with the ATC.
 			</p>
 			<ul
-				className="list-disc list-inside text-gray-900 dark:text-white"
+				className="list-disc list-inside text-gray-900 dark:text-content-primary"
 				style={{ fontSize: "1.1rem" }}
 			>
 				<li>Homing direction</li>
@@ -42,7 +39,7 @@ export function ControllerConfiguration({
 				<li>Startup g-code</li>
 			</ul>
 
-			<p className="dark:text-white">
+			<p className="dark:text-content-primary">
 				Select <b>“Apply”</b> to apply these changes.
 			</p>
 			<StepActionButton
@@ -51,6 +48,7 @@ export function ControllerConfiguration({
 				onApply={applySettings}
 				isComplete={isComplete}
 				error={error}
+				data-testid="atc-apply-controller-config"
 			/>
 		</div>
 	);

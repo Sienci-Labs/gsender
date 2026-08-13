@@ -28,6 +28,7 @@ export type PluginRecord = {
 	id: string;
 	name: string;
 	version: string;
+	description: string;
 	engine: string | null;
 	capabilities: PluginCapabilitiesWire;
 	enabled: boolean;

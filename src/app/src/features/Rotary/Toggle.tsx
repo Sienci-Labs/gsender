@@ -28,7 +28,7 @@ const Toggle = () => {
 			: "Toggle Rotary mode";
 
 	return (
-		<div className="flex items-center gap-2 dark:text-white">
+		<div className="flex items-center gap-2 dark:text-content-primary">
 			{controllerType === "grblHAL" && <span>4-Axis</span>}
 			<Tooltip content={tooltipContent}>
 				<div>

@@ -1,7 +1,11 @@
 :root {
-	color-scheme: light dark;
+	color-scheme: light;
 	font-family: system-ui, -apple-system, sans-serif;
 	line-height: 1.5;
+}
+
+html.dark {
+	color-scheme: dark;
 }
 
 * {
@@ -15,11 +19,9 @@ body {
 	color: #18181b;
 }
 
-@media (prefers-color-scheme: dark) {
-	body {
-		background: #09090b;
-		color: #fafafa;
-	}
+html.dark body {
+	background: #09090b;
+	color: #fafafa;
 }
 
 .app {
@@ -48,11 +50,9 @@ header h1 {
 	background: #fff;
 }
 
-@media (prefers-color-scheme: dark) {
-	.card {
-		border-color: #27272a;
-		background: #18181b;
-	}
+html.dark .card {
+	border-color: #27272a;
+	background: #18181b;
 }
 
 .card h2 {
@@ -99,11 +99,17 @@ button {
 	background: #fafafa;
 	cursor: pointer;
 	font: inherit;
+	color: inherit;
 }
 
 button:disabled {
 	opacity: 0.6;
 	cursor: not-allowed;
+}
+
+html.dark button {
+	border-color: #3f3f46;
+	background: #27272a;
 }
 
 .output {
@@ -118,10 +124,8 @@ button:disabled {
 	word-break: break-word;
 }
 
-@media (prefers-color-scheme: dark) {
-	.output {
-		background: #27272a;
-	}
+html.dark .output {
+	background: #27272a;
 }
 
 code {

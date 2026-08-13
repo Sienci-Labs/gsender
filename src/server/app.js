@@ -383,6 +383,7 @@ const appMain = () => {
 		app.post(urljoin(settings.route, "api/macros"), api.macros.create);
 		app.get(urljoin(settings.route, "api/macros/:id"), api.macros.read);
 		app.put(urljoin(settings.route, "api/macros/:id"), api.macros.update);
+		app.put(urljoin(settings.route, "api/macros"), api.macros.bulkUpdate);
 		app.delete(urljoin(settings.route, "api/macros/:id"), api.macros.__delete);
 
 		// MDI
@@ -486,71 +487,6 @@ const appMain = () => {
 			urljoin(settings.route, "api/plugins/import-plugin"),
 			api.plugins.importPlugin,
 		);
-	}
-
-	// app.get(urljoin(settings.route, '/'), async (req, res) => {
-	//     // Serve HTML
-	//     try {
-	//         const url = req.originalUrl.replace(base, '');
-
-	//         let template;
-	//         let render;
-	//         if (!isProduction) {
-	//             // Always read fresh template in development
-	//             template = await fs.promises.readFile(path.resolve(__dirname, '../../src/app/index.html'), 'utf-8');
-	//             template = await vite.transformIndexHtml(url, template);
-	//             render = (await vite.ssrLoadModule(path.resolve(__dirname, '../../src/app/src/entry-server.tsx'))).render;
-	//         } else {
-	//             template = templateHtml;
-	//             // eslint-disable-next-line import/extensions, import/no-unresolved
-	//             render = (await import(path.resolve(__dirname, '../../output/server/index.js'))).render;
-	//         }
-
-	//         console.log(__dirname);
-
-	//         const rendered = await render(url, ssrManifest);
-
-	//         const html = template
-	//             .replace('<!--app-head-->', rendered.head ?? '')
-	//             .replace('<!--app-html-->', rendered.html ?? '');
-
-	//         res.status(200).set({ 'Content-Type': 'text/html' }).send(html);
-	//     } catch (e) {
-	//         // eslint-disable-next-line no-unused-expressions
-	//         vite?.ssrFixStacktrace(e);
-	//         console.log(e.stack);
-	//         res.status(500).end(e.stack);
-	//     }
-	// });
-
-	// // page
-	// app.get(urljoin(settings.route, '/'), renderPage('index.hbs', (req, res) => {
-	//     const webroot = _get(settings, 'assets.app.routes[0]', ''); // with trailing slash
-	//     const lng = req.language;
-	//     const t = req.t;
-
-	//     return {
-	//         webroot: webroot,
-	//         lang: lng,
-	//         title: `${t('title')} ${settings.version}`,
-	//         loading: t('loading')
-	//     };
-	// }));
-
-	{
-		// Error handling
-		// app.use(errlog());
-		// app.use(errclient({
-		//     error: 'XHR error'
-		// }));
-		// // app.use(errnotfound({
-		// //     view: path.join('common', '404.hogan'),
-		// //     error: 'Not found'
-		// // }));
-		// app.use(errserver({
-		//     view: path.join('common', '500.hogan'),
-		//     error: 'Internal server error'
-		// }));
 	}
 
 	const { viteServer } = require("./vite-server");

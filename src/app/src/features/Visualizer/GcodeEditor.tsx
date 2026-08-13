@@ -102,8 +102,8 @@ const GcodeEditorLine = React.memo(
 			if (isMatch) return "bg-yellow-50 dark:bg-yellow-900/20";
 			if (isSelected) return "bg-blue-100 dark:bg-blue-900/30";
 			if (lineStatus !== "none") return getLineStatusClass();
-			if (index % 2 === 0) return "bg-gray-200 dark:bg-dark-lighter";
-			return "hover:bg-gray-100 dark:hover:bg-dark-lighter/50";
+			if (index % 2 === 0) return "bg-gray-200 dark:bg-surface-elevated";
+			return "hover:bg-gray-100 dark:hover:bg-surface-hover";
 		};
 
 		const getInnerLineClassName = () => {
@@ -121,7 +121,7 @@ const GcodeEditorLine = React.memo(
 				return "text-yellow-900 dark:text-yellow-100 font-medium";
 			if (lineStatus === "processed")
 				return "text-green-900 dark:text-green-100";
-			return "dark:text-white";
+			return "dark:text-content-primary";
 		};
 
 		return (
@@ -149,10 +149,10 @@ const GcodeEditorLine = React.memo(
 					}
 					onMouseEnter={(e) => {
 						if (!isSelected)
-							e.currentTarget.classList.add("bg-gray-300", "dark:bg-gray-600");
+							e.currentTarget.classList.add("bg-gray-300", "dark:bg-surface-hover");
 					}}
 					onMouseLeave={(e) => {
-						e.currentTarget.classList.remove("bg-gray-300", "dark:bg-gray-600");
+						e.currentTarget.classList.remove("bg-gray-300", "dark:bg-surface-hover");
 					}}
 				>
 					{isSelected ? (
@@ -160,12 +160,12 @@ const GcodeEditorLine = React.memo(
 							<Check className="w-3 h-3 text-white" />
 						</div>
 					) : (
-						<div className="w-5 h-5 border-2 border-gray-400 dark:border-gray-500 rounded hover:border-blue-500" />
+						<div className="w-5 h-5 border-2 border-gray-400 dark:border-outline rounded hover:border-blue-500" />
 					)}
 				</div>
 				<span
 					className={cn(
-						"dark:text-white mr-4 min-w-10 text-right select-none",
+						"dark:text-content-primary mr-4 min-w-10 text-right select-none",
 						getInnerLineClassName(),
 					)}
 				>
@@ -688,10 +688,10 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 	}
 
 	return (
-		<div className="z-[10000] w-full h-full flex flex-col bg-white dark:bg-dark shadow-lg rounded-md overflow-hidden dark:border dark:border-dark-lighter">
-			<div className="flex justify-between items-center p-3 border-b border-gray-300 dark:border-dark-lighter gap-3">
+		<div className="z-[10000] w-full h-full flex flex-col bg-white dark:bg-surface-raised shadow-lg rounded-md overflow-hidden dark:border dark:border-outline">
+			<div className="flex justify-between items-center p-3 border-b border-gray-300 dark:border-outline gap-3">
 				<div className="flex items-center gap-3 min-w-0 flex-1">
-					<h3 className="text-lg font-semibold dark:text-white whitespace-nowrap">
+					<h3 className="text-lg font-semibold dark:text-content-primary whitespace-nowrap">
 						G-code Editor
 					</h3>
 					{isJobRunning && (
@@ -715,7 +715,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 						</span>
 					)}
 					{gcodeLines.length > 0 && (
-						<span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+						<span className="text-xs text-gray-500 dark:text-content-muted whitespace-nowrap">
 							{gcodeLines.length.toLocaleString()} lines
 						</span>
 					)}
@@ -775,7 +775,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 				</div>
 
 				{isSearchOpen && (
-					<div className="fixed top-20 right-6 z-[10000] flex items-center gap-2 bg-gray-100 dark:bg-dark border border-gray-300 dark:border-dark-lighter p-3 rounded">
+					<div className="fixed top-20 right-6 z-[10000] flex items-center gap-2 bg-gray-100 dark:bg-surface-raised border border-gray-300 dark:border-outline p-3 rounded">
 						<Input
 							name="search-gcode-lines"
 							sizing="sm"
@@ -793,7 +793,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 								}
 							}}
 						/>
-						<span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+						<span className="text-xs text-gray-500 dark:text-content-muted whitespace-nowrap">
 							{matchIndices.length > 0
 								? `${currentMatchIndex + 1}/${matchIndices.length}`
 								: "0/0"}
@@ -833,8 +833,8 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 					</div>
 				)}
 				{isJumpOpen && (
-					<div className="fixed top-20 right-6 z-[10000] flex items-center gap-2 bg-gray-100 dark:bg-dark border border-gray-300 dark:border-dark-lighter p-3 rounded">
-						<span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+					<div className="fixed top-20 right-6 z-[10000] flex items-center gap-2 bg-gray-100 dark:bg-surface-raised border border-gray-300 dark:border-outline p-3 rounded">
+						<span className="text-xs text-gray-500 dark:text-content-muted whitespace-nowrap">
 							Jump to line:
 						</span>
 						<Input
@@ -851,7 +851,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 								}
 							}}
 						/>
-						<span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+						<span className="text-xs text-gray-500 dark:text-content-muted whitespace-nowrap">
 							{`${Math.floor(
 								(scrollContainerRef.current?.scrollTop ?? 0) / LINE_HEIGHT +
 									scrollContainerRef.current?.clientHeight / 2 / LINE_HEIGHT,
@@ -932,7 +932,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 						})}
 				</div>
 			</div>
-			<div className="flex gap-4 p-3 justify-end border-t border-gray-300 dark:border-dark-lighter">
+			<div className="flex gap-4 p-3 justify-end border-t border-gray-300 dark:border-outline">
 				<Button
 					variant={isJumpOpen ? "primary" : "outline"}
 					size="icon"

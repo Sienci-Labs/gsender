@@ -148,7 +148,7 @@ viewer.focusToModel();
 | `useWorkspaceState()` | React hook for workspace |
 | `useTypedSelector(selector, equalityFn?)` | React hook for Redux slice |
 
-Plugins run in an iframe; the SDK posts messages on the `gsender:plugin-bridge` channel to the parent window.
+Plugins run in an iframe; the SDK posts messages on the `gsender:plugin-bridge` channel to the parent window. gSender mirrors dark mode onto the iframe as `html.dark` — style plugins with class-based dark mode, not `prefers-color-scheme`.
 
 ## License
 

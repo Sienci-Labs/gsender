@@ -1189,6 +1189,11 @@ class GrblHalController {
 			}
 		});
 
+		this.runner.on("autoconfig", (payload) => {
+			this.emit("serialport:read", payload.raw);
+			this.emit("grblHal:autoconfig", payload);
+		});
+
 		const queryStatusReport = () => {
 			// Check the ready flag
 			if (!this.ready) {
@@ -1720,10 +1725,13 @@ class GrblHalController {
 
 		callback(); // register controller
 
-		// Nothing else here matters if connecting to existing instantiated controller
+		// Nothing else here matters if connecting to existing instantiated controller.
+		// Don't re-run the startup query sequence (initController) here — it writes
+		// directly to the serial line ($$, $ES, $EG, etc.) and can collide with an
+		// actively streaming job. The joining socket already gets current cached
+		// state via addConnection().
 		if (refresh) {
 			this.initialized = true;
-			this.initController(this.runner.settings?.version?.semver);
 			return;
 		}
 

@@ -1,6 +1,6 @@
+import { StepActionButton } from "app/components/Wizard/StepActionButton.tsx";
+import type { StepProps } from "app/components/Wizard/types";
 import { IMPERIAL_UNITS } from "app/constants";
-import { StepActionButton } from "app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx";
-import type { StepProps } from "app/features/AccessoryInstaller/types";
 import { PositionSetter } from "app/features/AccessoryInstaller/Wizards/atc/components/PositionSetter.tsx";
 import { useWorkspaceState } from "app/hooks/useWorkspaceState";
 import controller from "app/lib/controller.ts";
@@ -56,7 +56,7 @@ export function TLSPosition({ onComplete, onUncomplete }: StepProps) {
 
 	return (
 		<div className="flex flex-col gap-5 justify-start">
-			<p className="dark:text-white">
+			<p className="dark:text-content-primary">
 				Please jog until just above the Tool Length Sensor and set the position
 				of your tool length sensor using the <b>“Set Position”</b>
 				button.

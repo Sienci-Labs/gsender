@@ -340,7 +340,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
 				className={cx(
 					"flex items-center justify-between hover:bg-gray-200 dark:hover:bg-gray-800 px-2 py-1 cursor-pointer rounded min-h-10",
 					{
-						"bg-robin-200 dark:bg-gray-800 hover:bg-robin-200":
+						"bg-robin-200 dark:bg-surface-raised hover:bg-robin-200":
 							option.value === value,
 					},
 				)}
@@ -381,7 +381,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
 						<Button
 							variant="ghost"
 							role="combobox"
-							className="w-full justify-between bg-white dark:bg-gray-800"
+							className="w-full justify-between bg-white dark:bg-surface-raised"
 							disabled={!probeCommand.tool}
 							tooltip={{
 								content: "Select tool diameter",
@@ -402,8 +402,8 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
 						<div className="max-h-[300px] overflow-y-auto">
 							{renderOptions()}
 						</div>
-						<div className="pt-2 border-t">
-							<div className="flex items-center space-x-2">
+						<div className="border-t">
+							<div className="flex items-center space-x-2 p-2">
 								<Tooltip
 									content="Create and use a custom probe diameter"
 									side="bottom"

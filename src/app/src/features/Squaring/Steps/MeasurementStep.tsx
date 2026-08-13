@@ -1,18 +1,23 @@
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
 import Button from "app/components/Button";
 import { ControlledInput } from "app/components/ControlledInput";
 import { useWorkspaceState } from "app/hooks/useWorkspaceState";
 import { useEffect, useState } from "react";
 import { FaClipboard, FaClipboardCheck, FaClipboardList } from "react-icons/fa";
-import TriangleDiagram from "../components/TriangleDiagram";
 import { useSquaring } from "../context/SquaringContext";
 
-const MeasurementStep = () => {
+interface Props {
+	onComplete: () => void;
+}
+
+const MeasurementStep = ({ onComplete }: Props) => {
 	const {
 		mainSteps,
 		currentMainStep,
 		currentSubStep,
 		completeStep,
 		updateTriangle,
+		isCurrentStepComplete,
 	} = useSquaring();
 	const { units } = useWorkspaceState();
 
@@ -29,6 +34,12 @@ const MeasurementStep = () => {
 			"1-3": "",
 		});
 	}, [currentMainStep]);
+
+	useEffect(() => {
+		if (isCurrentStepComplete) {
+			onComplete();
+		}
+	}, [isCurrentStepComplete]);
 
 	const currentMainStepData = mainSteps[currentMainStep];
 	const currentSubStepData = currentMainStepData.subSteps[currentSubStep];
@@ -58,10 +69,10 @@ const MeasurementStep = () => {
 		<div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-2 items-start">
 			<div className="flex flex-col gap-4">
 				<div className="space-y-1">
-					<h3 className="text-lg font-semibold dark:text-white">
+					<h3 className="text-lg font-semibold dark:text-content-primary">
 						Instructions
 					</h3>
-					<p className="text-gray-600 dark:text-white h-20">
+					<p className="text-gray-600 dark:text-content-primary h-20">
 						{currentSubStepData.description}
 					</p>
 				</div>
@@ -80,7 +91,7 @@ const MeasurementStep = () => {
 										? "bg-blue-50 border border-blue-200 bg-opacity-40"
 										: isPastStep
 											? "bg-green-50 border border-green-200 bg-opacity-30"
-											: "bg-amber-600 border border-amber-600 bg-opacity-10 border-opacity-10 opacity-50 dark:bg-dark dark:border-gray-700"
+											: "bg-amber-600 border border-amber-600 bg-opacity-10 border-opacity-10 opacity-50 dark:bg-surface-raised dark:border-outline"
 								}`}
 							>
 								<div className={`min-w-8 min-h-8 text-white`}>
@@ -88,7 +99,7 @@ const MeasurementStep = () => {
 										<FaClipboardCheck className="min-w-8 min-h-8 text-green-500 " />
 									)}
 									{!isCurrentStep && !isPastStep && (
-										<FaClipboard className="min-w-8 min-h-8 text-amber-600 dark:text-dark-lighter" />
+										<FaClipboard className="min-w-8 min-h-8 text-amber-600 dark:text-content-muted" />
 									)}
 									{isCurrentStep && (
 										<FaClipboardList className="min-w-8 min-h-8 text-blue-500 " />
@@ -110,6 +121,7 @@ const MeasurementStep = () => {
 														}));
 													}}
 													suffix={units ?? "mm"}
+													data-testid={`sq-measure-distance-input-${measurementKey}`}
 												/>
 												<Button
 													disabled={
@@ -119,7 +131,7 @@ const MeasurementStep = () => {
 													onClick={() =>
 														handleMeasurementComplete(step.buttonLabel)
 													}
-													testId={"confirm " + measurementKey}
+													testId={`sq-confirm-${measurementKey}`}
 												>
 													{step.completed ? "Update" : "Confirm"}
 												</Button>
@@ -133,10 +145,10 @@ const MeasurementStep = () => {
 				</div>
 			</div>
 
-			<div className="flex flex-col items-center gap-4">
+			{/* <div className="flex flex-col items-center gap-4">
 				<h3 className="text-lg font-semibold">Diagram</h3>
 				<TriangleDiagram />
-			</div>
+			</div> */}
 		</div>
 	);
 };

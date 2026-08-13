@@ -99,7 +99,7 @@ export function ToolNameInput({
 	return (
 		<div className="text-xs text-muted w-full relative">
 			<Input
-				className="w-full h-7 bg-white bg-opacity-100 dark:border-gray-500 ring-1 ring-gray-300 rounded-md px-2 py-1 text-xs text-gray-700"
+				className="w-full h-7 bg-white bg-opacity-100 dark:border-outline ring-1 ring-gray-300 rounded-md px-2 py-1 text-xs text-gray-700"
 				type="text"
 				value={name}
 				onChange={handleNameRemap}
@@ -116,11 +116,11 @@ export function ToolNameInput({
 				wrapperClassName="relative"
 			/>
 			{open && id >= 1 && (
-				<div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-56 overflow-auto rounded-md border border-gray-200 bg-white shadow-md dark:border-gray-600 dark:bg-dark">
+				<div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-56 overflow-auto rounded-md border border-gray-200 bg-white shadow-md dark:border-outline dark:bg-surface-raised">
 					{filteredOptions.map((option) => (
 						<div
 							key={option}
-							className="cursor-pointer px-2 py-2 portrait:py-3 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
+							className="cursor-pointer px-2 py-2 portrait:py-3 text-sm text-gray-700 hover:bg-gray-100 dark:text-content-primary dark:hover:bg-gray-700"
 							onMouseDown={(e) => {
 								e.preventDefault();
 								setToolName(id, option);

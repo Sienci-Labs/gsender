@@ -1,6 +1,7 @@
 /** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
 import controller from "app/lib/controller";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { usePluginIframeTheme } from "../hooks/usePluginIframeTheme";
 import type { PluginRecord } from "../types";
 import { toRuntimeCapabilities } from "../utils/capabilities";
 import {
@@ -49,10 +50,12 @@ const PluginPanel = ({ plugin, className = "", title }: PluginPanelProps) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [plugin, reloadToken]);
 
+	usePluginIframeTheme(iframeRef, reloadToken);
+
 	return (
 		<div className={`flex flex-col w-full h-full min-h-0 ${className}`}>
 			{title && (
-				<p className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
+				<p className="text-sm font-medium text-gray-600 dark:text-content-secondary mb-2">
 					{title}
 				</p>
 			)}
@@ -61,7 +64,7 @@ const PluginPanel = ({ plugin, className = "", title }: PluginPanelProps) => {
 				key={reloadToken}
 				title={plugin.name}
 				src={iframeSrc}
-				className="flex-1 w-full min-h-[320px] border border-gray-200 rounded-md dark:border-dark-lighter bg-white dark:bg-dark"
+				className="flex-1 w-full min-h-[320px] border border-gray-200 rounded-md dark:border-outline"
 				sandbox="allow-scripts allow-forms allow-same-origin"
 			/>
 		</div>

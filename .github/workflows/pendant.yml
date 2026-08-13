@@ -1,0 +1,198 @@
+name: Pendant
+run-name: "Pendant — ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event.head_commit.message }}"
+
+on:
+  push:
+    branches:
+      - master
+      - dev
+    tags:
+      - '*'
+  pull_request:
+    branches: [ "master" ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+env:
+  NODE_OPTIONS: --max-old-space-size=8192
+
+jobs:
+  # ── macOS: Electron pendant .dmg ───────────────────────────────────────────
+  pendant-mac:
+    name: Pendant — macOS
+    runs-on: macos-latest
+    environment: CI
+    env:
+      GH_TOKEN: ${{ secrets.CI_TOKEN }}
+      CSC_LINK: ${{ secrets.CSC_LINK }}
+      CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: ${{ runner.os }}-npm-
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Build pendant macOS app
+        run: npm run build:pendant:mac
+
+      - name: Collect artifacts
+        run: |
+          mkdir -p releases/pendant-mac
+          cp output-pendant/*.dmg releases/pendant-mac/
+
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pendant-mac
+          path: releases/pendant-mac/*.dmg
+          compression-level: 0
+          retention-days: 7
+
+      - name: Release (tag only)
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: releases/pendant-mac/*.dmg
+          prerelease: true
+          draft: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
+
+  # ── Raspberry Pi ARM64: Electron pendant .deb ──────────────────────────────
+  pendant-pi:
+    name: Pendant — Raspberry Pi ARM64
+    runs-on: ubuntu-24.04-arm
+    environment: CI
+    env:
+      GH_TOKEN: ${{ secrets.CI_TOKEN }}
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install Linux build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libudev-dev \
+            build-essential \
+            libopenjp2-tools
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-${{ runner.arch }}-npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: ${{ runner.os }}-${{ runner.arch }}-npm-
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Build pendant Linux ARM64 app
+        run: npm run build:pendant:pi
+
+      - name: Collect artifacts
+        run: |
+          mkdir -p releases/pendant-pi
+          cp output-pendant/*.deb releases/pendant-pi/ || true
+          ls -la releases/pendant-pi/
+
+      - name: Upload Pi artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pendant-pi
+          path: releases/pendant-pi/*
+          compression-level: 0
+          retention-days: 7
+
+      - name: Release (tag only)
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: releases/pendant-pi/*
+          prerelease: true
+          draft: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
+
+  # ── Windows x64: Electron pendant .exe (unsigned) ─────────────────────────
+  pendant-win:
+    name: Pendant — Windows
+    runs-on: windows-latest
+    environment: CI
+    env:
+      GH_TOKEN: ${{ secrets.CI_TOKEN }}
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare VC++ Runtime
+        run: choco install -y vcredist2017
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: ${{ runner.os }}-npm-
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Build pendant Windows app
+        shell: bash
+        run: npm run build:pendant:win
+
+      - name: Collect artifacts
+        shell: bash
+        run: |
+          mkdir -p releases/pendant-win
+          cp output-pendant/*.exe releases/pendant-win/
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pendant-win
+          path: releases/pendant-win/*.exe
+          compression-level: 0
+          retention-days: 7
+
+      - name: Release (tag only)
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: releases/pendant-win/*.exe
+          prerelease: true
+          draft: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}

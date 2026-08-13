@@ -43,10 +43,25 @@ import path from "path";
 import WinReg from "winreg";
 import { asyncCallWithTimeout } from "./electron-app/AsyncTimeout";
 import { getGRBLLog } from "./electron-app/grblLogs";
+import { createPendantWindow } from "./electron-app/pendant-window";
 import { parseAndReturnGCode } from "./electron-app/RecentFiles";
 import WindowManager from "./electron-app/WindowManager";
 import pkg from "./package.json";
 import launchServer from "./server-cli";
+
+// Reads the renderer's persisted settings directly, since the main process
+// needs to know "use pendant view as default UI" before any window exists.
+const readUsePendantViewSetting = () => {
+	try {
+		const configPath = path.join(app.getPath("userData"), "gsender-0.5.6.json");
+		if (!fs.existsSync(configPath)) return false;
+		const raw = JSON.parse(fs.readFileSync(configPath, "utf8") || "{}");
+		return !!raw?.state?.workspace?.usePendantViewAsDefault;
+	} catch (err) {
+		log.error(`Failed to read pendant-view setting: ${err}`);
+		return false;
+	}
+};
 
 // Hot reload in development
 if (process.env.NODE_ENV === "development") {
@@ -214,6 +229,14 @@ const main = () => {
 			let url = "";
 			let kiosk = false;
 
+			let usePendantView = readUsePendantViewSetting();
+			if (usePendantView && externalRendererUrl) {
+				log.warn(
+					"Pendant-as-default-UI is not supported under electron:dev; falling back to the normal dev window.",
+				);
+				usePendantView = false;
+			}
+
 			if (externalRendererUrl) {
 				url = externalRendererUrl;
 				try {
@@ -315,12 +338,44 @@ const main = () => {
 				minHeight: 768,
 				...store.get("bounds"),
 			};
-			const options = {
-				...bounds,
-				title: `gSender ${pkg.version}`,
-				kiosk,
-			};
-			const window = await windowManager.openWindow(url, options, splashScreen);
+			if (usePendantView) {
+				const pendantAssetsPath = path.join(__dirname, "pendant");
+				if (!fs.existsSync(pendantAssetsPath)) {
+					log.error(
+						`Pendant view was requested but no pendant assets were found at ${pendantAssetsPath}; falling back to the standard UI.`,
+					);
+					dialog.showMessageBoxSync(null, {
+						type: "warning",
+						title: "Pendant View Unavailable",
+						message:
+							"gSender could not find the pendant interface in this build.",
+						detail: "Falling back to the standard desktop UI.",
+					});
+					usePendantView = false;
+				}
+			}
+
+			let window;
+			if (usePendantView) {
+				kiosk = true;
+				const pendantUrl = `${url}/pendant`;
+				window = createPendantWindow(
+					false,
+					path.join(__dirname, "electron-app/preload-pendant.js"),
+				);
+				window.once("ready-to-show", () => {
+					splashScreen.close();
+					splashScreen.destroy();
+				});
+				await window.loadURL(pendantUrl);
+			} else {
+				const options = {
+					...bounds,
+					title: `gSender ${pkg.version}`,
+					kiosk,
+				};
+				window = await windowManager.openWindow(url, options, splashScreen);
+			}
 
 			window.on("ready-to-show", () => {
 				const savedScaleFactor = Number(store.get("displayScaleFactor", 1.0));

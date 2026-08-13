@@ -1,3 +1,4 @@
+import PluginToolCard from "app/components/PluginToolCard";
 import ToolCard from "app/components/ToolCard";
 import { usePlugins } from "app/features/Plugins/hooks/usePlugins";
 import { BiSolidCylinder } from "react-icons/bi";
@@ -6,15 +7,15 @@ import { GiFlatPlatform } from "react-icons/gi";
 import { LuDrill } from "react-icons/lu";
 import { MdSquareFoot } from "react-icons/md";
 import { PiPuzzlePiece } from "react-icons/pi";
-import { TbRulerMeasure } from "react-icons/tb";
+import { TbPuzzle, TbRulerMeasure } from "react-icons/tb";
 
 const ToolsPage = () => {
 	const { toolsPagePlugins } = usePlugins();
 
 	return (
 		<div className="py-4 px-16 max-xl:px-8 pb-12 fixed-content-area w-full flex flex-col overflow-y-auto">
-			<h1 className="text-3xl font-bold dark:text-white mb-2">Tools</h1>
-			<p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+			<h1 className="text-3xl font-bold dark:text-content-primary mb-2">Tools</h1>
+			<p className="text-sm text-gray-500 dark:text-content-muted mb-4">
 				Tools are plugins that can be installed and used to extend the
 				functionality of gSender. Some are built in to gSender, some are third
 				party plugins.
@@ -92,12 +93,14 @@ const ToolsPage = () => {
 					}
 
 					return (
-						<ToolCard
+						<PluginToolCard
 							key={plugin.id}
 							title={contribution.label || plugin.name}
 							description={`Plugin · v${plugin.version}`}
-							icon={PiPuzzlePiece}
+							blurb={plugin.description}
+							icon={TbPuzzle}
 							link={`/tools/plugin/${contribution.route}`}
+							official={plugin.id.startsWith("com.sienci.")}
 						/>
 					);
 				})}

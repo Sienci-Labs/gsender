@@ -1,4 +1,5 @@
 /** biome-ignore-all lint/suspicious/noExplicitAny: <> */
+import { Confirm } from "app/components/ConfirmationDialog/ConfirmationDialogLib.ts";
 import {
 	GRBL,
 	GRBLHAL,
@@ -350,6 +351,29 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						description:
 							"Change the app colours for reduced eye strain, better contrast, or just for fun!",
 						type: "boolean",
+					},
+					{
+						label: "Use pendant view as default UI",
+						key: "workspace.usePendantViewAsDefault",
+						description:
+							"Launch directly into the touch-friendly pendant interface in fullscreen kiosk mode instead of the standard desktop UI. Requires an app restart to take effect.",
+						type: "boolean",
+						onChange: (value: boolean) => {
+							store.set("workspace.usePendantViewAsDefault", value);
+							if (isElectron()) {
+								Confirm({
+									title: "Restart Required",
+									content: value
+										? "gSender needs to restart to switch to the pendant view."
+										: "gSender needs to restart to switch back to the desktop view.",
+									confirmLabel: "Restart Now",
+									cancelLabel: "Later",
+									onConfirm: () => {
+										(window as any).ipcRenderer.send("remoteMode-restart");
+									},
+								});
+							}
+						},
 					},
 					{
 						label: "DRO zeros",

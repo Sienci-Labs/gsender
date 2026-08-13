@@ -76,7 +76,7 @@ export function HelperToggle({ minimized }: HelperToggleProps) {
 			onClick={handleToggle}
 			aria-label={helperTitle || "Help Assistant"}
 			className={cn(
-				"flex w-full flex-col gap-0.5 content-center items-center text-sm text-gray-500 group rounded-xl transition-all duration-1000 opacity-100 border border-transparent dark:text-gray-400",
+				"flex w-full flex-col gap-0.5 content-center items-center text-sm text-gray-500 group rounded-xl transition-all duration-1000 opacity-100 border border-transparent dark:text-content-muted",
 				{
 					"border bg-orange-200 bg-opacity-30 animate-bounce": helperEnabled,
 					"border-transparent bg-transparent bg-opacity-100": minimized,

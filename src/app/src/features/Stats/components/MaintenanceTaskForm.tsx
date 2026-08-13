@@ -118,15 +118,15 @@ export const MaintenanceTaskForm = forwardRef<MaintenanceTaskFormRef, Props>(
 					<div className="w-full mb-4 md:mb-0">
 						<label
 							className="block mb-2"
-							htmlFor="grid-task-name dark:text-white"
+							htmlFor="grid-task-name dark:text-content-primary"
 						>
 							Task Name
 						</label>
 						<ControlledInput
-							className={`border w-full rounded-md py-3 px-4 mb-1 dark:text-white text-black dark:bg-dark ${
+							className={`border w-full rounded-md py-3 px-4 mb-1 dark:text-content-primary text-black dark:bg-surface-raised ${
 								errors.name
 									? "border-red-500 dark:border-red-500"
-									: "border-gray-300 dark:border-dark-lighter"
+									: "border-gray-300 dark:border-outline"
 							}`}
 							id="grid-task-name"
 							name="taskName"
@@ -140,7 +140,7 @@ export const MaintenanceTaskForm = forwardRef<MaintenanceTaskFormRef, Props>(
 						{errors.name ? (
 							<p className="text-red-500 text-xs italic mb-2">{errors.name}</p>
 						) : (
-							<p className="text-gray-600 text-xs italic dark:text-white mb-2">
+							<p className="text-gray-600 text-xs italic dark:text-content-primary mb-2">
 								Keeping these unique makes it easier for you to remember what it
 								is you need to do.
 							</p>
@@ -150,16 +150,16 @@ export const MaintenanceTaskForm = forwardRef<MaintenanceTaskFormRef, Props>(
 				<div className="flex flex-wrap mb-2">
 					<div className="w-1/2 md:w-1/2 pr-3">
 						<label
-							className="block mb-2 dark:text-white"
+							className="block mb-2 dark:text-content-primary"
 							htmlFor="grid-start-range"
 						>
 							Task Start Range (Hrs)
 						</label>
 						<ControlledInput
-							className={`border w-full rounded-md py-3 px-4 mb-1 dark:text-white text-black dark:bg-dark ${
+							className={`border w-full rounded-md py-3 px-4 mb-1 dark:text-content-primary text-black dark:bg-surface-raised ${
 								errors.rangeStart
 									? "border-red-500 dark:border-red-500"
-									: "border-gray-300 dark:border-dark-lighter"
+									: "border-gray-300 dark:border-outline"
 							}`}
 							id="grid-start-range"
 							name="startRange"
@@ -179,16 +179,16 @@ export const MaintenanceTaskForm = forwardRef<MaintenanceTaskFormRef, Props>(
 					</div>
 					<div className="w-1/2 pl-3">
 						<label
-							className="block mb-2 dark:text-white"
+							className="block mb-2 dark:text-content-primary"
 							htmlFor="grid-end-range"
 						>
 							Task End Range (Hrs)
 						</label>
 						<ControlledInput
-							className={`border w-full rounded-md py-3 px-4 mb-1 dark:text-white text-black dark:bg-dark ${
+							className={`border w-full rounded-md py-3 px-4 mb-1 dark:text-content-primary text-black dark:bg-surface-raised ${
 								errors.rangeEnd
 									? "border-red-500 dark:border-red-500"
-									: "border-gray-300 dark:border-dark-lighter"
+									: "border-gray-300 dark:border-outline"
 							}`}
 							id="grid-end-range"
 							name="endRange"
@@ -211,7 +211,7 @@ export const MaintenanceTaskForm = forwardRef<MaintenanceTaskFormRef, Props>(
 				<div className="flex flex-wrap mb-2">
 					<div className="w-full mb-4 md:mb-0">
 						<label
-							className="block mb-2 dark:text-white"
+							className="block mb-2 dark:text-content-primary"
 							htmlFor="grid-description"
 						>
 							Task Description
@@ -219,7 +219,7 @@ export const MaintenanceTaskForm = forwardRef<MaintenanceTaskFormRef, Props>(
 						<textarea
 							name="description"
 							rows={10}
-							className="border border-gray-300 w-full rounded-md py-3 px-4 mb-3 dark:text-white dark:bg-dark dark:border-dark-lighter" //"appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+							className="border border-gray-300 w-full rounded-md py-3 px-4 mb-3 dark:text-content-primary dark:bg-surface-raised dark:border-outline" //"appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
 							id="grid-description"
 							value={description}
 							placeholder="What do I want to do"
