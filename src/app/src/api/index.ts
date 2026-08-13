@@ -20,8 +20,10 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
+/** biome-ignore-all lint/suspicious/noExplicitAny: <> */
 
 import type { MachineProfile } from "app/definitions/firmware";
+import type { PluginCapabilitiesWire } from "app/features/Plugins/types";
 import axios, {
 	type AxiosResponse,
 	type InternalAxiosRequestConfig,
@@ -478,6 +480,30 @@ const plugins = {
 			pluginPath ? { pluginPath } : {},
 		);
 	},
+	readImportedManifest: (pluginPath: string): Promise<AxiosResponse> => {
+		return authrequest.post(
+			"/api/plugins/read-imported-manifest",
+			{ pluginPath },
+		);
+	},
+	writePermissions: (pluginPath: string, capabilities: PluginCapabilitiesWire): Promise<AxiosResponse> => {
+		return authrequest.post(
+			"/api/plugins/write-permissions",
+			{ pluginPath, capabilities }
+		);
+	},
+	scanPluginForSDKUsage: (indexFile: string, sdks: string[]): Promise<AxiosResponse> => {
+		return authrequest.post(
+			"/api/plugins/scan-plugin-for-sdk-usage",
+			{ indexFile, sdks }
+		);
+	},
+	importPlugin: (pluginsDir: string, directory: string): Promise<AxiosResponse> => {
+		return authrequest.post(
+			"/api/plugins/import-plugin",
+			{ pluginsDir, directory }
+		);
+	}
 };
 
 export default {

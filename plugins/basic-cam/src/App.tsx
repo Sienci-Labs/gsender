@@ -1,4 +1,4 @@
-import { gsender } from "@sienci/gsender-plugin-sdk";
+import { gcode as gcodeClient } from "@sienci/gsender-plugin-sdk";
 import { useWorkspaceState } from "@sienci/gsender-plugin-sdk/react";
 import {
 	type GCodeViewerHandle,
@@ -125,7 +125,7 @@ const App = () => {
 				operation === "drill-grid"
 					? "basic-cam-drill-grid.gcode"
 					: "basic-cam-rectangle.gcode";
-			await gsender.gcode.loadToVisualizer(gcode, name);
+			await gcodeClient.loadToVisualizer(gcode, name);
 			setStatus("G-code loaded into gSender.");
 		} catch (err) {
 			setStatus(err instanceof Error ? err.message : String(err));

@@ -1,8 +1,13 @@
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
 import controller from "app/lib/controller";
 import { useEffect, useMemo, useRef, useState } from "react";
-
 import { usePluginIframeTheme } from "../hooks/usePluginIframeTheme";
 import type { PluginRecord } from "../types";
+import { toRuntimeCapabilities } from "../utils/capabilities";
+import {
+	registerPluginWindow,
+	unregisterPluginWindow,
+} from "../utils/plugin-permissions";
 
 type PluginPanelProps = {
 	plugin: PluginRecord;
@@ -30,6 +35,20 @@ const PluginPanel = ({ plugin, className = "", title }: PluginPanelProps) => {
 			controller.removeListener("plugins:changed", onPluginsChanged);
 		};
 	}, []);
+
+	// register this plugin's granted capabilities against its iframe window.
+	// an iframe that was never registered here gets EMPTY_CAPABILITIES
+	// and every request/subscribe is denied.
+	useEffect(() => {
+		const iframe = iframeRef.current;
+		const win = iframe?.contentWindow;
+		if (!win) return;
+
+		// convert the capabilities from arrays to sets
+		registerPluginWindow(win, toRuntimeCapabilities(plugin.capabilities));
+		return () => unregisterPluginWindow(win);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [plugin, reloadToken]);
 
 	usePluginIframeTheme(iframeRef, reloadToken);
 

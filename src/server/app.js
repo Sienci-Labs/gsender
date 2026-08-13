@@ -471,6 +471,22 @@ const appMain = () => {
 			api.plugins.openDirectory,
 		);
 		app.put(urljoin(settings.route, "api/plugins/:id"), api.plugins.update);
+		app.post(
+			urljoin(settings.route, "api/plugins/read-imported-manifest"),
+			api.plugins.readImportedManifest,
+		);
+		app.post(
+			urljoin(settings.route, "api/plugins/write-permissions"),
+			api.plugins.writePermissions,
+		);
+		app.post(
+			urljoin(settings.route, "api/plugins/scan-plugin-for-sdk-usage"),
+			api.plugins.scanPluginForSDKUsage,
+		);
+		app.post(
+			urljoin(settings.route, "api/plugins/import-plugin"),
+			api.plugins.importPlugin,
+		);
 	}
 
 	const { viteServer } = require("./vite-server");

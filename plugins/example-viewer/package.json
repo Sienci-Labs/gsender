@@ -10,7 +10,7 @@
 	},
 	"dependencies": {
 		"@sienci/gsender-plugin-sdk": "file:../../packages/plugin-sdk",
-		"@sienci/gviewer": "^0.1.21",
+		"@sienci/gviewer": "^0.1.27",
 		"three": "^0.168.0"
 	},
 	"devDependencies": {

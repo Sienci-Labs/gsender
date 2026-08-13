@@ -10,40 +10,52 @@ import { getTopicSnapshot, request, subscribeTopic } from "./bridge.js";
 
 // --- Imperative client --------------------------------------------------------
 
-export type GsenderClient = {
-	machine: {
-		getContext: () => Promise<unknown>;
-		command: (cmd: string, ...args: unknown[]) => Promise<unknown>;
-	};
-	workspace: {
-		getState: () => Promise<unknown>;
-	};
-	redux: {
-		getState: () => Promise<unknown>;
-	};
-	gcode: {
-		/** Load a raw G-code program into gSender's main visualizer/job. */
-		loadToVisualizer: (gcode: string, name?: string) => Promise<unknown>;
-	};
+type MachineClient = {
+	getContext: () => Promise<unknown>;
+	command: (cmd: string, ...args: unknown[]) => Promise<unknown>;
+}
+type WorkspaceClient = {
+	getState: () => Promise<unknown>;
+}
+type ReduxClient = {
+	getState: () => Promise<unknown>;
+}
+type GcodeClient = {
+	/** Load a raw G-code program into gSender's main visualizer/job. */
+	loadToVisualizer: (gcode: string, name?: string) => Promise<unknown>;
+}
+type GsenderClient = {
+	machine: MachineClient;
+	workspace: WorkspaceClient;
+	redux: ReduxClient;
+	gcode: GcodeClient;
 };
 
-export const createGsenderClient = (): GsenderClient => ({
-	machine: {
-		getContext: () => request("machine:get:context"),
-		command: (cmd, ...args) => request("machine:command", { cmd, args }),
-	},
-	workspace: {
-		getState: () => request("workspace:get:state"),
-	},
-	redux: {
-		getState: () => request("redux:get:state"),
-	},
-	gcode: {
-		loadToVisualizer: (gcode, name) =>
-			request("gcode:load:to:visualizer", { gcode, name }),
-	},
+const createMachineClient = (): MachineClient => ({
+	getContext: () => request("machine:get:context"),
+	command: (cmd, ...args) => request("machine:command", { cmd, args }),
 });
+const createWorkspaceClient = (): WorkspaceClient => ({
+	getState: () => request("workspace:get:state"),
+});
+const createReduxClient = (): ReduxClient => ({
+	getState: () => request("redux:get:state"),
+});
+const createGcodeClient = (): GcodeClient => ({
+	loadToVisualizer: (gcode, name) =>
+	request("gcode:load:to:visualizer", { gcode, name }),
+})
+export const machine = createMachineClient();
+export const workspace = createWorkspaceClient();
+export const redux = createReduxClient();
+export const gcode = createGcodeClient();
 
+const createGsenderClient = (): GsenderClient => ({
+	machine: machine,
+	workspace: workspace,
+	redux: redux,
+	gcode: gcode,
+});
 export const gsender = createGsenderClient();
 
 // --- Framework-agnostic helpers ----------------------------------------------

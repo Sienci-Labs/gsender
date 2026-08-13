@@ -14,5 +14,9 @@
 			}
 		]
 	},
-	"permissions": ["machine:read", "files:read"]
+	"capabilities": {
+		"requestTypes": ["gcode:load:to:visualizer"],
+		"topics": ["workspace"],
+		"allowedFunctions": ["gcode", "useWorkspaceState", "GCodeVisualizer"]
+	}
 }

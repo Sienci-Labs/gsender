@@ -7,6 +7,9 @@ const PLUGINS_ROOT = path.join(REPO_ROOT, "plugins");
 const OUTPUT_ROOT = path.join(REPO_ROOT, "dist", "gsender", "plugins");
 const PLUGIN_SDK_DIR = path.join(REPO_ROOT, "packages", "plugin-sdk");
 const PLUGIN_SDK_ENTRY = path.join(PLUGIN_SDK_DIR, "dist", "index.js");
+const SDK_OUTPUT_ROOT = path.join(REPO_ROOT, "dist", "gsender", "plugin-sdk");
+// The browser-facing SDK runtime, served by the app at /plugin-sdk (see settings.base.js)
+const SDK_BROWSER_FILES = ["index.js", "react.js", "viewer.js"];
 
 const DEFAULT_PLUGINS = (process.env.GSENDER_DEFAULT_PLUGINS || "basic-cam")
 	.split(",")
@@ -74,6 +77,18 @@ const ensureBuiltUi = (pluginDir) => {
 	runYarn(pluginDir, ["run", "build"]);
 };
 
+const copyPluginSdkDist = () => {
+	fs.rmSync(SDK_OUTPUT_ROOT, { recursive: true, force: true });
+	fs.mkdirSync(SDK_OUTPUT_ROOT, { recursive: true });
+	SDK_BROWSER_FILES.forEach((file) => {
+		const src = path.join(PLUGIN_SDK_DIR, "dist", file);
+		if (!fs.existsSync(src)) {
+			throw new Error(`Plugin SDK build output missing: ${file}`);
+		}
+		fs.copyFileSync(src, path.join(SDK_OUTPUT_ROOT, file));
+	});
+};
+
 const copyPlugin = (pluginName) => {
 	const pluginDir = path.join(PLUGINS_ROOT, pluginName);
 	if (!fs.existsSync(pluginDir)) {
@@ -113,6 +128,11 @@ const copyPlugin = (pluginName) => {
 };
 
 const main = () => {
+	// The SDK runtime ships even with no default plugins.
+	// imported plugins resolve their SDK imports against /plugin-sdk too.
+	ensurePluginSdkBuilt();
+	copyPluginSdkDist();
+
 	if (DEFAULT_PLUGINS.length === 0) {
 		console.log("No default plugins configured. Skipping.");
 		return;
@@ -120,8 +140,6 @@ const main = () => {
 
 	fs.rmSync(OUTPUT_ROOT, { recursive: true, force: true });
 	fs.mkdirSync(OUTPUT_ROOT, { recursive: true });
-
-	ensurePluginSdkBuilt();
 
 	DEFAULT_PLUGINS.forEach((pluginName) => {
 		console.log(`Preparing default plugin: ${pluginName}`);

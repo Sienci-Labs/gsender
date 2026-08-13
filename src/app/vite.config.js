@@ -59,6 +59,11 @@ export default defineConfig({
 				target: "http://127.0.0.1:8000",
 				changeOrigin: true,
 			},
+			// plugin SDK runtime resolved by the import map inside plugin iframes
+			"/plugin-sdk": {
+				target: "http://127.0.0.1:8000",
+				changeOrigin: true,
+			},
 			"/socket.io": {
 				target: "http://127.0.0.1:8000",
 				changeOrigin: true,

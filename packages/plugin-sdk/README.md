@@ -26,9 +26,50 @@ npm install @sienci/gviewer three
 
 ## Entries
 
+### Build plugin (`/vite`)
+
+Add the SDK's Vite plugin to your build — it is the only build config a
+plugin needs:
+
+```ts
+// vite.config.ts
+import gsenderPlugin from "@sienci/gsender-plugin-sdk/vite";
+import react from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
+
+export default defineConfig({
+	plugins: [react(), gsenderPlugin()],
+	base: "./",
+	build: { outDir: "ui", emptyOutDir: true },
+});
+```
+
+It handles everything the gSender host needs, automatically:
+
+- Keeps the SDK's specifiers **external** in your bundle, so gSender can
+  statically scan which SDK functions you import and show the user an
+  accurate permission prompt. At runtime they resolve (via an injected
+  import map) to the SDK copy **gSender itself serves** at
+  `/plugin-sdk/*.js` — the executing SDK always matches the host's bridge.
+- Keeps `react`/`react-dom`/JSX runtimes external too, and vendors one
+  shared React build into `ui/vendor/` (single React instance — hooks in
+  your components and in the SDK share the same dispatcher).
+- Injects the import map into your built `index.html`.
+
+Note the built `ui/` only runs inside gSender's plugin iframe (`vite preview` will
+not resolve the SDK imports).
+
 ### Bridge client (default)
 
 Framework-agnostic RPC + subscriptions. Safe for vanilla JS, Vue, Svelte, etc. — does **not** import React.
+
+Individual clients:
+- `machine`
+- `workspace`
+- `redux`
+- `gcode`
+
+`gsender` includes all these clients in one object.
 
 ```ts
 import {
@@ -97,11 +138,11 @@ viewer.focusToModel();
 
 | API | Description |
 |-----|-------------|
-| `gsender.machine.getContext()` | Current machine / controller context |
-| `gsender.machine.command(cmd, ...args)` | Run a host machine command |
-| `gsender.workspace.getState()` | One-shot workspace snapshot |
-| `gsender.redux.getState()` | One-shot full Redux state |
-| `gsender.gcode.loadToVisualizer(gcode, name?)` | Load G-code into the main visualizer/job |
+| `machine.getContext()` | Current machine / controller context |
+| `machine.command(cmd, ...args)` | Run a host machine command |
+| `workspace.getState()` | One-shot workspace snapshot |
+| `redux.getState()` | One-shot full Redux state |
+| `gcode.loadToVisualizer(gcode, name?)` | Load G-code into the main visualizer/job |
 | `subscribeWorkspaceState(cb)` | Live workspace updates |
 | `subscribeSelector(selector, cb, equalityFn?)` | Live Redux slice |
 | `useWorkspaceState()` | React hook for workspace |

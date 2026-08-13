@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noExplicitAny: <> */
 import { useTypedSelector } from "app/hooks/useTypedSelector";
 import controller from "app/lib/controller";
 import { FocusTrappingProvider } from "app/lib/focus-trapping";
@@ -62,7 +63,7 @@ function App() {
 
 		if (isElectron()) {
 			console.log("Getting windows registry");
-			window.ipcRenderer
+			(window as any).ipcRenderer
 				.invoke("get-windows-registry")
 				.then((value: boolean) => {
 					posthog.register({ isBundled: value });
@@ -75,18 +76,16 @@ function App() {
 	}, []);
 
 	return (
-		<>
-			<ReduxProvider store={reduxStore}>
-				<FocusTrappingBridge>
-					<AccessibilitySettingsHandler />
-					<Toaster closeButton visibleToasts={5} />
-					<AccessoryConnectivityToastHost />
-					<HashRouter>
-						<ReactRoutes />
-					</HashRouter>
-				</FocusTrappingBridge>
-			</ReduxProvider>
-		</>
+		<ReduxProvider store={reduxStore}>
+			<FocusTrappingBridge>
+				<AccessibilitySettingsHandler />
+				<Toaster closeButton visibleToasts={5} />
+				<AccessoryConnectivityToastHost />
+				<HashRouter>
+					<ReactRoutes />
+				</HashRouter>
+			</FocusTrappingBridge>
+		</ReduxProvider>
 	);
 }
 

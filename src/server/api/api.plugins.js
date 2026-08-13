@@ -16,9 +16,9 @@
  * along with gSender.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { spawn } from "child_process";
-import fs from "fs";
-import path from "path";
+import { spawn } from "node:child_process";
+import fs from "node:fs";
+import path from "node:path";
 
 import {
 	ERR_BAD_REQUEST,
@@ -30,14 +30,14 @@ import pluginRegistry from "../services/pluginregistry";
 
 const log = logger("api:plugins");
 
-export const fetch = (req, res) => {
+export const fetch = (_req, res) => {
 	const plugins = pluginRegistry.discoverPlugins().map((plugin) => ({
 		id: plugin.id,
 		name: plugin.name,
 		version: plugin.version,
 		description: plugin.description,
 		engine: plugin.engine,
-		permissions: plugin.permissions,
+		capabilities: plugin.capabilities,
 		enabled: plugin.enabled,
 		valid: plugin.valid,
 		errors: plugin.errors,
@@ -155,4 +155,91 @@ export const openDirectory = (req, res) => {
 	}
 
 	res.send({ msg: "Opened directory", path: target });
+};
+
+export const readImportedManifest = (req, res) => {
+	const { pluginPath } = req.body;
+
+	try {
+		if (typeof pluginPath !== "string") {
+			log.error("plugin path not string");
+			return res.status(ERR_BAD_REQUEST).send({
+				msg: '"pluginPath" must be a string',
+			});
+		}
+
+		if (!fs.existsSync(pluginPath)) {
+			log.error("directory not found");
+			return res.status(ERR_NOT_FOUND).send({
+				msg: `Directory not found: ${pluginPath}`,
+			});
+		}
+
+		const result = pluginRegistry.readImportedManifest(pluginPath);
+		if (!result) {
+			log.error("manifest not found");
+			return res.status(ERR_NOT_FOUND).send({ msg: "Manifest not found" });
+		}
+		res.send({ msg: "Manifest read", ...result });
+	} catch (err) {
+		log.error(err);
+		res.status(ERR_INTERNAL_SERVER_ERROR).send({ msg: err });
+	}
+};
+
+export const writePermissions = (req, res) => {
+	const { pluginPath, capabilities } = req.body;
+
+	try {
+		if (typeof pluginPath !== "string") {
+			return res.status(ERR_BAD_REQUEST).send({
+				msg: '"pluginPath" must be a string',
+			});
+		}
+
+		if (!fs.existsSync(pluginPath)) {
+			return res.status(ERR_NOT_FOUND).send({
+				msg: `Directory not found: ${pluginPath}`,
+			});
+		}
+
+		const error = pluginRegistry.changeManifestPermissions(
+			pluginPath,
+			capabilities,
+		);
+		if (error) {
+			return res
+				.status(ERR_INTERNAL_SERVER_ERROR)
+				.send({ msg: "Error writing manifest", error });
+		}
+		res.status(200).send({ msg: "Permissions written" });
+	} catch (err) {
+		log.error(err);
+		res
+			.status(ERR_INTERNAL_SERVER_ERROR)
+			.send({ msg: "Error writing manifest", error: err });
+	}
+};
+
+export const scanPluginForSDKUsage = (req, res) => {
+	const { indexFile, sdks } = req.body;
+	const result = pluginRegistry.scanPlugin(indexFile, sdks);
+	if (result.err) {
+		return res.status(ERR_NOT_FOUND).send({
+			msg: "Error scanning manifest for sdk usage",
+			error: result.err,
+		});
+	}
+	res.send({ msg: "Scanned for sdk usage", ...result });
+};
+
+export const importPlugin = (req, res) => {
+	const { pluginsDir, directory } = req.body;
+	const error = pluginRegistry.pluginImport(pluginsDir, directory);
+	if (error) {
+		return res
+			.status(ERR_INTERNAL_SERVER_ERROR)
+			.send({ msg: "Failed to import plugin", error });
+	}
+	res.send({ msg: "Successfully imported plugin" });
 };

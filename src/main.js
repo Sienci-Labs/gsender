@@ -600,22 +600,28 @@ const main = () => {
 					const FULL_PATH = await openDirectoryDialog();
 					window.webContents.send("returned-directory-dialog-data", FULL_PATH);
 				} catch (e) {
-					log.error(`Caught error in listener - ${e}`);
+					log.error(`Caught error in open-directory-dialog - ${e}`);
 				}
 			});
 
 			ipcMain.on("open-plugin-import-dialog", async () => {
 				try {
 					const FULL_PATH = await openDirectoryDialog();
-					fs.cpSync(
+					const assetsPath = path.join(FULL_PATH, "ui", "assets");
+					const allFiles = fs.readdirSync(assetsPath);
+					const indexFile = allFiles.filter(
+						(file) =>
+							path.extname(file).toLowerCase() === ".js" &&
+							file.includes("index"),
+					)[0];
+
+					window.webContents.send(
+						"returned-plugin-directory-data",
 						FULL_PATH,
-						path.join(pluginPath, path.basename(FULL_PATH)),
-						{
-							recursive: true,
-						},
+						path.join(assetsPath, indexFile),
 					);
 				} catch (e) {
-					log.error(`Caught error in listener - ${e}`);
+					log.error(`Caught error in open-plugin-import-dialog - ${e}`);
 				}
 			});
 
