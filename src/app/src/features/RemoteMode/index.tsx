@@ -10,17 +10,24 @@ import {
 import {
 	Select,
 	SelectContent,
+	SelectGroup,
 	SelectItem,
+	SelectLabel,
 	SelectTrigger,
 	SelectValue,
 } from "app/components/shadcn/Select.tsx";
 import { Switch } from "app/components/shadcn/Switch";
+import {
+	AddressOption,
+	AddressSummary,
+} from "app/features/RemoteMode/components/AddressOption.tsx";
 import { QRCodeDisplay } from "app/features/RemoteMode/components/QRCode.tsx";
 import controller from "app/lib/controller.ts";
 import { toast } from "app/lib/toaster";
 import { isIPv4 } from "app/lib/utils";
 import type { RootState } from "app/store/redux";
-import { useEffect, useState } from "react";
+import { TriangleAlert } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 
 import { actions } from "./apiActions.ts";
@@ -49,6 +56,21 @@ export function RemoteModeDialog({
 
 	const ipList = useSelector((state: RootState) => state.preferences.ipList);
 
+	// Addresses another device can actually reach come first; loopback and
+	// virtual adapters are kept but tucked away under "Other / advanced".
+	const { usableAddresses, otherAddresses, recommended } = useMemo(
+		() => ({
+			usableAddresses: ipList.filter((entry) => entry.usable),
+			otherAddresses: ipList.filter((entry) => !entry.usable),
+			recommended: ipList.find((entry) => entry.recommended) ?? null,
+		}),
+		[ipList],
+	);
+
+	const selectedEntry = ipList.find((entry) => entry.address === ip) ?? null;
+	// The saved address is gone - most often a laptop that has changed networks.
+	const savedAddressMissing = ipList.length > 0 && !selectedEntry;
+
 	useEffect(() => {
 		remoteIp && setIp(remoteIp);
 		remotePort && setPort(remotePort);
@@ -58,6 +80,26 @@ export function RemoteModeDialog({
 	useEffect(() => {
 		controller.listAllIps();
 	}, [showRemote]);
+
+	// Nothing saved yet - start on the address we recommend rather than on
+	// 127.0.0.1, which no other device can ever reach.
+	useEffect(() => {
+		if (remoteIp || dirty) {
+			return;
+		}
+
+		const preferred = recommended ?? usableAddresses[0];
+		if (preferred) {
+			setIp(preferred.address);
+		}
+	}, [remoteIp, dirty, recommended, usableAddresses]);
+
+	function applyRecommendedIp() {
+		if (recommended) {
+			setDirty(true);
+			setIp(recommended.address);
+		}
+	}
 
 	function toggleRemoteMode() {
 		setDirty(true);
@@ -131,32 +173,106 @@ export function RemoteModeDialog({
 								<Switch onChange={toggleRemoteMode} checked={remoteEnabled} />
 							</div>
 							<p className="dark:text-content-primary">
-								Choose your settings below. In most cases the default values
-								should work:
+								In most cases you'll want the recommended address and the
+								default port:
 							</p>
-							<div className="flex flex-row w-full justify-between items-center gap-4">
-								<span className="dark:text-content-primary">Addr:</span>
-								<Select onValueChange={onIPSelect} value={ip}>
-									<SelectTrigger className="">
-										<SelectValue placeholder={ip} />
-									</SelectTrigger>
-									<SelectContent className="bg-white z-[10000]">
-										{ipList.map((o) => (
-											<SelectItem key={`${o}`} value={`${o}`}>
-												{o}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-							</div>
-							<div className="flex flex-row w-full justify-start items-center gap-4">
-								<span className="dark:text-content-primary">Port:</span>
-								<input
-									className="border border-gray-200 rounded p-2 focus:outline-none w-full dark:bg-surface-raised dark:text-content-primary"
-									type="number"
-									value={port}
-									onChange={updatePort}
-								/>
+							{/* Addr and Port are one group, so they sit closer together than
+							    the column's gap-8 would otherwise put them. */}
+							<div className="flex flex-col w-full gap-4">
+								<div className="flex flex-col w-full gap-1">
+									<div className="flex flex-row w-full items-center gap-4">
+										<span className="w-12 shrink-0 dark:text-content-primary">
+											Addr:
+										</span>
+										<Select onValueChange={onIPSelect} value={ip}>
+											{/* The shared trigger line-clamps its value span, which turns
+										    it into a -webkit-box, and Radix's SelectValue drops any
+										    className it is given, so the span can only be reached from
+										    here. It needs full width to right-align the status marker. */}
+											<SelectTrigger className="min-w-0 gap-2 [&>span]:!line-clamp-none [&>span]:w-full">
+												<SelectValue>
+													<span className="flex items-center gap-2 w-full min-w-0 overflow-hidden">
+														<AddressSummary
+															address={ip}
+															entry={selectedEntry}
+														/>
+													</span>
+												</SelectValue>
+											</SelectTrigger>
+											{/* SelectContent pins itself to the trigger width, which is too
+										    narrow for an address plus its description. The `[&]` wrapper
+										    is deliberate: this config sets `important: true`, so a plain
+										    (or `!`-prefixed) width utility loses to the component's own
+										    `w-[var(--radix-select-trigger-width)]` on source order. */}
+											<SelectContent className="bg-white z-[10000] [&]:w-max min-w-[var(--radix-select-trigger-width)] max-w-[20rem]">
+												{usableAddresses.map((o) => (
+													<SelectItem key={o.address} value={o.address}>
+														<AddressOption entry={o} />
+													</SelectItem>
+												))}
+												{otherAddresses.length > 0 && (
+													<SelectGroup>
+														<SelectLabel className="pl-2 pt-2 text-xs font-normal text-gray-400 dark:text-content-muted border-t border-gray-100 dark:border-outline-subtle mt-1">
+															Other / advanced
+														</SelectLabel>
+														{otherAddresses.map((o) => (
+															<SelectItem key={o.address} value={o.address}>
+																<AddressOption entry={o} />
+															</SelectItem>
+														))}
+													</SelectGroup>
+												)}
+											</SelectContent>
+										</Select>
+									</div>
+									{/* Fixed height so switching addresses never shifts the dialog,
+								    sized to the tallest state (the two-line warning) and no more. */}
+									<div className="h-12 flex items-center text-xs leading-tight">
+										{savedAddressMissing ? (
+											<div className="flex flex-row w-full h-full gap-2 items-center text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/50 rounded p-1.5">
+												<TriangleAlert className="w-4 h-4 shrink-0" />
+												<div className="flex flex-col items-start min-w-0">
+													<span>
+														This computer no longer has{" "}
+														<b className="font-mono">{ip}</b>.
+													</span>
+													{recommended && (
+														<button
+															type="button"
+															className="underline font-semibold"
+															onClick={applyRecommendedIp}
+														>
+															Use {recommended.address} ({recommended.label})
+															instead
+														</button>
+													)}
+												</div>
+											</div>
+										) : selectedEntry?.usable === false ? (
+											<span className="text-amber-700 dark:text-amber-400">
+												Other devices can't reach gSender at this address — pick
+												the recommended one to use wireless control.
+											</span>
+										) : (
+											<span className="text-gray-500 dark:text-content-muted">
+												{selectedEntry ? `${selectedEntry.label} — ` : ""}other
+												devices on your network use this address to reach
+												gSender.
+											</span>
+										)}
+									</div>
+								</div>
+								<div className="flex flex-row w-full items-center gap-4">
+									<span className="w-12 shrink-0 dark:text-content-primary">
+										Port:
+									</span>
+									<input
+										className="border border-gray-200 rounded p-2 focus:outline-none w-full min-w-0 dark:bg-surface-raised dark:text-content-primary"
+										type="number"
+										value={port}
+										onChange={updatePort}
+									/>
+								</div>
 							</div>
 							<p className="dark:text-content-primary text-sm">
 								<b>Note:</b> Clicking "Save" will ask you to restart gSender so
