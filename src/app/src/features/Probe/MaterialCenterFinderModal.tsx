@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import controller from 'app/lib/controller';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { IMPERIAL_UNITS } from 'app/constants';
+import { in2mm } from 'app/lib/units';
 import './MaterialCenterFinderModal.css';
 
 interface ModalProps {
@@ -55,14 +58,34 @@ const MaterialCenterFinderModal: React.FC<ModalProps> = ({
     onClose,
     onRunGcode,
 }) => {
+    const { units } = useWorkspaceState();
+    const isImperial = units === IMPERIAL_UNITS;
+
+    const lengthUnit = isImperial ? 'in' : 'mm';
+    const feedUnit = isImperial ? 'in/min' : 'mm/min';
+
     const [sizeX, setSizeX] = useState<number | ''>('');
     const [sizeY, setSizeY] = useState<number | ''>('');
-    const [fastFeed, setFastFeed] = useState<number>(150.0);
-    const [slowFeed, setSlowFeed] = useState<number>(50.0);
-    const [retractDist, setRetractDist] = useState<number>(2.0);
-    const [safeZ, setSafeZ] = useState<number>(5.0);
+    const [fastFeed, setFastFeed] = useState<number>(isImperial ? 6.0 : 150.0);
+    const [slowFeed, setSlowFeed] = useState<number>(isImperial ? 2.0 : 50.0);
+    const [retractDist, setRetractDist] = useState<number>(isImperial ? 0.08 : 2.0);
+    const [safeZ, setSafeZ] = useState<number>(isImperial ? 0.2 : 5.0);
     const [isRunning, setIsRunning] = useState<boolean>(false);
     const [dialogState, setDialogState] = useState<'idle' | 'success' | 'failed'>('idle');
+
+    useEffect(() => {
+        if (isImperial) {
+            setFastFeed(6.0);
+            setSlowFeed(2.0);
+            setRetractDist(0.08);
+            setSafeZ(0.2);
+        } else {
+            setFastFeed(150.0);
+            setSlowFeed(50.0);
+            setRetractDist(2.0);
+            setSafeZ(5.0);
+        }
+    }, [isImperial]);
     const isRunningRef = useRef<boolean>(false);
     const cancelRequestedRef = useRef<boolean>(false);
     const hasCompletedRef = useRef<boolean>(false);
@@ -205,18 +228,25 @@ const MaterialCenterFinderModal: React.FC<ModalProps> = ({
         setIsRunning(true);
         setDialogState('idle');
 
+        const effectiveSizeX = isImperial ? in2mm(Number(sizeX)) : Number(sizeX);
+        const effectiveSizeY = isImperial ? in2mm(Number(sizeY)) : Number(sizeY);
+        const effectiveFastFeed = isImperial ? in2mm(Number(fastFeed)) : Number(fastFeed);
+        const effectiveSlowFeed = isImperial ? in2mm(Number(slowFeed)) : Number(slowFeed);
+        const effectiveRetract = isImperial ? in2mm(Number(retractDist)) : Number(retractDist);
+        const effectiveSafeZ = isImperial ? in2mm(Number(safeZ)) : Number(safeZ);
+
         const macroScript = `
 ; =========================================
 ; MATERIAL CENTER FINDER MACRO
 ; =========================================
 %wait
 
-%STOCK_X = ${sizeX}
-%STOCK_Y = ${sizeY}
-%PROBE_FEED_FAST = ${fastFeed}
-%PROBE_FEED_SLOW = ${slowFeed}
-%PROBE_RETRACT = ${retractDist}
-%Z_SAFE_LIFT = ${safeZ}
+%STOCK_X = ${Number(effectiveSizeX.toFixed(3))}
+%STOCK_Y = ${Number(effectiveSizeY.toFixed(3))}
+%PROBE_FEED_FAST = ${Number(effectiveFastFeed.toFixed(1))}
+%PROBE_FEED_SLOW = ${Number(effectiveSlowFeed.toFixed(1))}
+%PROBE_RETRACT = ${Number(effectiveRetract.toFixed(3))}
+%Z_SAFE_LIFT = ${Number(effectiveSafeZ.toFixed(3))}
 %Z_UNDER_SURFACE = -4
 %EDGE_MARGIN_MAJOR = 10 
 %EDGE_MARGIN = 5
@@ -382,20 +412,20 @@ G10 L20 P0 Y0
                         <div className="material-center-finder-form-panel">
                             <div className="material-center-finder-form-group">
                                 <div className="material-center-finder-form-group-label">Material Size (User Input)</div>
-                                <SettingInput label="Size in X (Width)" value={sizeX} setter={setSizeX} unit="mm" disabled={isRunning} />
-                                <SettingInput label="Size in Y (Length)" value={sizeY} setter={setSizeY} unit="mm" disabled={isRunning} />
+                                <SettingInput label="Size in X (Width)" value={sizeX} setter={setSizeX} unit={lengthUnit} step={isImperial ? "0.05" : "1"} disabled={isRunning} />
+                                <SettingInput label="Size in Y (Length)" value={sizeY} setter={setSizeY} unit={lengthUnit} step={isImperial ? "0.05" : "1"} disabled={isRunning} />
                             </div>
 
                             <div className="material-center-finder-form-group">
                                 <div className="material-center-finder-form-group-label">Probe Feedrates</div>
-                                <SettingInput label="Fast Feed" value={fastFeed} setter={setFastFeed} unit="mm/min" step="10" disabled={isRunning} />
-                                <SettingInput label="Slow Feed" value={slowFeed} setter={setSlowFeed} unit="mm/min" step="1" disabled={isRunning} />
+                                <SettingInput label="Fast Feed" value={fastFeed} setter={setFastFeed} unit={feedUnit} step={isImperial ? "0.5" : "10"} disabled={isRunning} />
+                                <SettingInput label="Slow Feed" value={slowFeed} setter={setSlowFeed} unit={feedUnit} step={isImperial ? "0.1" : "1"} disabled={isRunning} />
                             </div>
 
                             <div className="material-center-finder-form-group">
                                 <div className="material-center-finder-form-group-label">Probe Behavior</div>
-                                <SettingInput label="Retract Distance" value={retractDist} setter={setRetractDist} unit="mm" step="0.1" disabled={isRunning} />
-                                <SettingInput label="Safe Z" value={safeZ} setter={setSafeZ} unit="mm" step="0.5" disabled={isRunning} />
+                                <SettingInput label="Retract Distance" value={retractDist} setter={setRetractDist} unit={lengthUnit} step={isImperial ? "0.01" : "0.1"} disabled={isRunning} />
+                                <SettingInput label="Safe Z" value={safeZ} setter={setSafeZ} unit={lengthUnit} step={isImperial ? "0.05" : "0.5"} disabled={isRunning} />
                             </div>
                         </div>
                     </div>
