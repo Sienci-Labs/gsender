@@ -15,6 +15,7 @@ import { EventInput } from 'app/features/Config/components/SettingInputs/EventIn
 import controller from 'app/lib/controller.ts';
 import { toast } from 'app/lib/toaster';
 import { TextAreaInput } from 'app/features/Config/components/SettingInputs/TextAreaInput.tsx';
+import { TextSettingInput } from 'app/features/Config/components/SettingInputs/TextSettingInput.tsx';
 import { LocationInput } from 'app/features/Config/components/SettingInputs/LocationInput.tsx';
 import cn from 'classnames';
 import { BiReset } from 'react-icons/bi';
@@ -115,6 +116,16 @@ function returnSettingControl(
                 <TextAreaInput
                     value={value as string}
                     index={index}
+                    onChange={handler}
+                />
+            );
+        case 'text':
+            return (
+                <TextSettingInput
+                    value={value as string}
+                    index={index}
+                    placeholder={(setting as any).placeholder}
+                    disabled={(setting as any).disabled}
                     onChange={handler}
                 />
             );

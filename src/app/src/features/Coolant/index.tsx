@@ -1,8 +1,7 @@
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { FaShower } from 'react-icons/fa6';
+import { FaShower, FaBan, FaWind, FaFan, FaBolt } from 'react-icons/fa6';
 import { FaWater } from 'react-icons/fa';
-import { FaBan } from 'react-icons/fa6';
 
 import {
     startMist,
@@ -20,13 +19,47 @@ import ensureArray from 'ensure-array';
 import includes from 'lodash/includes';
 import { useCallback } from 'react';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 
 export interface CoolantProps {
     mistActive: boolean;
     floodActive: boolean;
 }
 
+const getAccessoryIcon = (label: string, defaultCommand: 'M7' | 'M8') => {
+    const normalized = (label || '').toLowerCase();
+    if (normalized.includes('air') || normalized.includes('blow') || normalized.includes('laser')) {
+        return <FaWind />;
+    }
+    if (normalized.includes('vac') || normalized.includes('dust') || normalized.includes('fan')) {
+        return <FaFan />;
+    }
+    if (normalized.includes('flood') || normalized.includes('coolant') || normalized.includes('pump')) {
+        return <FaWater />;
+    }
+    if (normalized.includes('mist') || normalized.includes('spray') || normalized.includes('drip')) {
+        return <FaShower />;
+    }
+    if (normalized.includes('aux')) {
+        return <FaBolt />;
+    }
+    return defaultCommand === 'M7' ? <FaShower /> : <FaWater />;
+};
+
 export function Coolant({ mistActive, floodActive }: CoolantProps) {
+    const {
+        m7Label = 'Mist',
+        m7CustomLabel = '',
+        m8Label = 'Flood',
+        m8CustomLabel = '',
+    } = useWorkspaceState();
+
+    const finalM7Label = m7Label === 'Custom' ? (m7CustomLabel.trim() || 'M7') : m7Label;
+    const finalM8Label = m8Label === 'Custom' ? (m8CustomLabel.trim() || 'M8') : m8Label;
+
+    const m7Icon = getAccessoryIcon(finalM7Label, 'M7');
+    const m8Icon = getAccessoryIcon(finalM8Label, 'M8');
+
     const { workflow, isConnected, controllerState, controllerType } =
         useTypedSelector((state) => ({
             workflow: state.controller.workflow,
@@ -53,24 +86,24 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
         <div className="flex flex-col justify-around items-center h-full">
             <div className="flex flex-row justify-center w-full gap-2">
                 <ActiveStateButton
-                    text="Air"
-                    icon={<FaShower />}
+                    text={finalM7Label}
+                    icon={m7Icon}
                     onClick={startMist}
                     className="h-16"
                     size="md"
                     active={isConnected && mistActive}
                     disabled={!canClick()}
-                    tooltip={{ content: 'Turn on air' }}
+                    tooltip={{ content: `Turn on ${finalM7Label.toLowerCase()} (M7)` }}
                 />
                 <ActiveStateButton
-                    text="Mist"
-                    icon={<FaWater />}
+                    text={finalM8Label}
+                    icon={m8Icon}
                     onClick={startFlood}
                     className="h-16"
                     size="md"
                     active={isConnected && floodActive}
                     disabled={!canClick()}
-                    tooltip={{ content: 'Turn on mist' }}
+                    tooltip={{ content: `Turn on ${finalM8Label.toLowerCase()} (M8)` }}
                 />
                 <ActiveStateButton
                     text="Off"
@@ -79,7 +112,7 @@ export function Coolant({ mistActive, floodActive }: CoolantProps) {
                     className="h-16"
                     size="md"
                     disabled={!canClick()}
-                    tooltip={{ content: 'Turn off coolant' }}
+                    tooltip={{ content: 'Turn off accessory outputs (M9)' }}
                 />
             </div>
         </div>

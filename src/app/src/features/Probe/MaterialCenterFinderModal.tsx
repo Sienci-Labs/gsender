@@ -11,43 +11,13 @@ interface ModalProps {
 
 interface SettingInputProps {
     label: string;
-    value: number;
-    setter: (v: number) => void;
+    value: number | '';
+    setter: (v: number | '') => void;
     unit: string;
     step?: string;
-    refKey: string;
+    placeholder?: string;
     disabled?: boolean;
-    inputRefs: React.MutableRefObject<{ [key: string]: HTMLInputElement | null }>;
 }
-
-export const estimateMacroDurationMs = (macroScript: string): number => {
-    const lines = macroScript.split(/\r?\n/);
-    let durationMs = 4000;
-
-    lines.forEach((line) => {
-        const trimmed = line.trim();
-        if (!trimmed) {
-            return;
-        }
-
-        const dwellMatch = trimmed.match(/^G4\s+P([0-9.]+)/i);
-        if (dwellMatch) {
-            durationMs += Number(dwellMatch[1]) * 1000;
-            return;
-        }
-
-        if (/^G(?:0|1|2|3|38(?:\.\d+)?)\b/i.test(trimmed)) {
-            durationMs += 1800;
-            return;
-        }
-
-        if (/^G10\b/i.test(trimmed)) {
-            durationMs += 500;
-        }
-    });
-
-    return durationMs;
-};
 
 const SettingInput = React.memo(
     ({
@@ -56,23 +26,21 @@ const SettingInput = React.memo(
         setter,
         unit,
         step = '1',
-        refKey,
+        placeholder = '—',
         disabled,
-        inputRefs,
     }: SettingInputProps) => (
         <div className="material-center-finder-input-field">
             <label className="material-center-finder-input-label">{label}</label>
             <div className="material-center-finder-input-wrapper">
                 <input
-                    ref={(el) => {
-                        if (el) {
-                            inputRefs.current[refKey] = el;
-                        }
-                    }}
                     type="number"
                     step={step}
+                    placeholder={placeholder}
                     value={value}
-                    onChange={(e) => setter(Number(e.target.value))}
+                    onChange={(e) => {
+                        const val = e.target.value;
+                        setter(val === '' ? '' : Number(val));
+                    }}
                     className="material-center-finder-input"
                     disabled={disabled}
                 />
@@ -87,16 +55,14 @@ const MaterialCenterFinderModal: React.FC<ModalProps> = ({
     onClose,
     onRunGcode,
 }) => {
-    const [sizeX, setSizeX] = useState<number>(100.0);
-    const [sizeY, setSizeY] = useState<number>(50.0);
+    const [sizeX, setSizeX] = useState<number | ''>('');
+    const [sizeY, setSizeY] = useState<number | ''>('');
     const [fastFeed, setFastFeed] = useState<number>(150.0);
     const [slowFeed, setSlowFeed] = useState<number>(50.0);
     const [retractDist, setRetractDist] = useState<number>(2.0);
     const [safeZ, setSafeZ] = useState<number>(5.0);
     const [isRunning, setIsRunning] = useState<boolean>(false);
     const [dialogState, setDialogState] = useState<'idle' | 'success' | 'failed'>('idle');
-
-    const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
     const isRunningRef = useRef<boolean>(false);
     const cancelRequestedRef = useRef<boolean>(false);
     const hasCompletedRef = useRef<boolean>(false);
@@ -219,7 +185,19 @@ const MaterialCenterFinderModal: React.FC<ModalProps> = ({
         return null;
     }
 
+    const isFormValid =
+        typeof sizeX === 'number' &&
+        !isNaN(sizeX) &&
+        sizeX > 0 &&
+        typeof sizeY === 'number' &&
+        !isNaN(sizeY) &&
+        sizeY > 0;
+
     const handleRun = () => {
+        if (!isFormValid) {
+            return;
+        }
+
         cancelRequestedRef.current = false;
         hasCompletedRef.current = false;
         isRunningRef.current = true;
@@ -404,20 +382,20 @@ G10 L20 P0 Y0
                         <div className="material-center-finder-form-panel">
                             <div className="material-center-finder-form-group">
                                 <div className="material-center-finder-form-group-label">Material Size (User Input)</div>
-                                <SettingInput label="Size in X (Width)" value={sizeX} setter={setSizeX} unit="mm" refKey="sizeX" disabled={isRunning} inputRefs={inputRefs} />
-                                <SettingInput label="Size in Y (Length)" value={sizeY} setter={setSizeY} unit="mm" refKey="sizeY" disabled={isRunning} inputRefs={inputRefs} />
+                                <SettingInput label="Size in X (Width)" value={sizeX} setter={setSizeX} unit="mm" disabled={isRunning} />
+                                <SettingInput label="Size in Y (Length)" value={sizeY} setter={setSizeY} unit="mm" disabled={isRunning} />
                             </div>
 
                             <div className="material-center-finder-form-group">
                                 <div className="material-center-finder-form-group-label">Probe Feedrates</div>
-                                <SettingInput label="Fast Feed" value={fastFeed} setter={setFastFeed} unit="mm/min" step="10" refKey="fastFeed" disabled={isRunning} inputRefs={inputRefs} />
-                                <SettingInput label="Slow Feed" value={slowFeed} setter={setSlowFeed} unit="mm/min" step="1" refKey="slowFeed" disabled={isRunning} inputRefs={inputRefs} />
+                                <SettingInput label="Fast Feed" value={fastFeed} setter={setFastFeed} unit="mm/min" step="10" disabled={isRunning} />
+                                <SettingInput label="Slow Feed" value={slowFeed} setter={setSlowFeed} unit="mm/min" step="1" disabled={isRunning} />
                             </div>
 
                             <div className="material-center-finder-form-group">
                                 <div className="material-center-finder-form-group-label">Probe Behavior</div>
-                                <SettingInput label="Retract Distance" value={retractDist} setter={setRetractDist} unit="mm" step="0.1" refKey="retractDist" disabled={isRunning} inputRefs={inputRefs} />
-                                <SettingInput label="Safe Z" value={safeZ} setter={setSafeZ} unit="mm" step="0.5" refKey="safeZ" disabled={isRunning} inputRefs={inputRefs} />
+                                <SettingInput label="Retract Distance" value={retractDist} setter={setRetractDist} unit="mm" step="0.1" disabled={isRunning} />
+                                <SettingInput label="Safe Z" value={safeZ} setter={setSafeZ} unit="mm" step="0.5" disabled={isRunning} />
                             </div>
                         </div>
                     </div>
@@ -438,7 +416,12 @@ G10 L20 P0 Y0
                                     ⏹ Stop Macro
                                 </button>
                             ) : (
-                                <button onClick={handleRun} className="material-center-finder-btn material-center-finder-btn-run">
+                                <button
+                                    onClick={handleRun}
+                                    disabled={!isFormValid || isRunning}
+                                    className="material-center-finder-btn material-center-finder-btn-run"
+                                    title={!isFormValid ? 'Please enter valid material dimensions for X and Y' : 'Find Material Center'}
+                                >
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                         <circle cx="12" cy="12" r="10"></circle>
                                         <line x1="22" y1="12" x2="18" y2="12"></line>

@@ -33,6 +33,10 @@ export interface Workspace {
     reverseWidgets: boolean;
     spindleFunctions: boolean;
     coolantFunctions: boolean;
+    m7Label?: string;
+    m7CustomLabel?: string;
+    m8Label?: string;
+    m8CustomLabel?: string;
     atcEnabled: boolean;
     collectUsageDataStatus: 'accepted' | 'denied' | 'pending';
     safeRetractHeight: number;

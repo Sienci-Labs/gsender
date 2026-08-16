@@ -253,6 +253,10 @@
   width: 100%;
 }
 
+.material-center-finder-input::placeholder {
+  color: #6b7280;
+}
+
 .material-center-finder-input:disabled {
   color: #9ca3af;
   cursor: not-allowed;
@@ -283,19 +287,6 @@
   flex-wrap: wrap;
 }
 
-.material-center-finder-checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-}
-
-.material-center-finder-checkbox-label input[type='checkbox'] {
-  width: 16px;
-  height: 16px;
-  accent-color: #3b82f6;
-  cursor: pointer;
-}
 
 .material-center-finder-running-status {
   display: flex;

@@ -41,6 +41,19 @@ import {
     THEMES,
     WORKSPACE_MODE,
 } from 'app/constants';
+
+export const ACCESSORY_LABEL_OPTIONS = [
+    'Mist',
+    'Flood',
+    'Air',
+    'Vacuum',
+    'Dust Collector',
+    'Coolant',
+    'Aux 1',
+    'Aux 2',
+    'Laser Air Assist',
+    'Custom',
+];
 import { LaserWizard } from 'app/features/Config/components/wizards/LaserWizard.tsx';
 import {
     GamepadLinkWizard,
@@ -131,6 +144,7 @@ export interface gSenderSetting {
     remap?: EEPROM;
     remapped?: boolean;
     forceEEPROM?: boolean;
+    placeholder?: string;
     hideWhenFirmwareCurrent?: boolean;
 }
 
@@ -1673,6 +1687,42 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'Show the coolant tab and related functions on the main Carve page.',
                         type: 'boolean',
+                    },
+                    {
+                        label: 'M7 output label',
+                        key: 'workspace.m7Label',
+                        description:
+                            'Choose the display label and icon style for the M7 accessory command (default: Mist).',
+                        type: 'select',
+                        options: ACCESSORY_LABEL_OPTIONS,
+                    },
+                    {
+                        label: 'M7 custom label',
+                        key: 'workspace.m7CustomLabel',
+                        description:
+                            'Enter a custom display label for the M7 button.',
+                        type: 'text',
+                        placeholder: 'e.g., Air Blast',
+                        hidden: (getPending) =>
+                            getPending('workspace.m7Label', 'Mist') !== 'Custom',
+                    },
+                    {
+                        label: 'M8 output label',
+                        key: 'workspace.m8Label',
+                        description:
+                            'Choose the display label and icon style for the M8 accessory command (default: Flood).',
+                        type: 'select',
+                        options: ACCESSORY_LABEL_OPTIONS,
+                    },
+                    {
+                        label: 'M8 custom label',
+                        key: 'workspace.m8CustomLabel',
+                        description:
+                            'Enter a custom display label for the M8 button.',
+                        type: 'text',
+                        placeholder: 'e.g., Coolant Pump',
+                        hidden: (getPending) =>
+                            getPending('workspace.m8Label', 'Flood') !== 'Custom',
                     },
                     {
                         type: 'eeprom',
