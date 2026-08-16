@@ -5,10 +5,18 @@ import { useSelector } from 'react-redux';
 import { RootState } from 'app/store/redux';
 import { useEffect, useRef, useState } from 'react';
 import store from 'app/store';
+import controller from 'app/lib/controller.ts';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { mapPositionToUnits, in2mm } from 'app/lib/units.ts';
 import { IMPERIAL_UNITS } from 'app/constants';
 import pubsub from 'pubsub-js';
+
+type Position = { x?: number; y?: number; z?: number };
+
+function mposEquals(a: Position | undefined, b: Position | undefined) {
+    if (!a || !b) return a === b;
+    return a.x === b.x && a.y === b.y && a.z === b.z;
+}
 
 export function TLSLocation({ onComplete, onUncomplete }: StepProps) {
     const [isComplete, setIsComplete] = useState<boolean>(false);
@@ -18,10 +26,18 @@ export function TLSLocation({ onComplete, onUncomplete }: StepProps) {
     const { units } = useWorkspaceState();
     const mpos = useSelector((state: RootState) => state.controller.mpos);
     const isManuallyEditing = useRef(false);
+    const lastSetMposRef = useRef<Position | undefined>(undefined);
 
     useEffect(() => {
         if (isManuallyEditing.current) return;
         if (!mpos || mpos.x === undefined || mpos.y === undefined || mpos.z === undefined) return;
+
+        if (isComplete && !mposEquals(mpos, lastSetMposRef.current)) {
+            setIsComplete(false);
+            setSuccess(null);
+            onUncomplete();
+        }
+
         const { x, y, z } = mpos;
         setPosition({
             x: mapPositionToUnits(x, units),
@@ -40,9 +56,15 @@ export function TLSLocation({ onComplete, onUncomplete }: StepProps) {
             y: toMM(position.y),
             z: toMM(position.z),
         });
+        controller.command(
+            'gcode',
+            `G21 G10 L2 P9 X${toMM(position.x)} Y${toMM(position.y)}`,
+            '$#',
+        );
         pubsub.publish('repopulate');
         setSuccess('TLS location set.');
         setIsComplete(true);
+        lastSetMposRef.current = mpos;
         onComplete();
     };
 
@@ -68,6 +90,11 @@ export function TLSLocation({ onComplete, onUncomplete }: StepProps) {
                 onPositionChange={(positions) => {
                     isManuallyEditing.current = true;
                     setPosition(positions);
+                    if (isComplete) {
+                        setIsComplete(false);
+                        setSuccess(null);
+                        onUncomplete();
+                    }
                 }}
                 actionButton={
                     <StepActionButton

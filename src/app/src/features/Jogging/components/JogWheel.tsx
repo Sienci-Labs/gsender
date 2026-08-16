@@ -48,7 +48,7 @@ export function JogWheel({
             threshold,
             onCancel: () => {
                 xPlusJog(distance, feedrate, false);
-                posthog?.capture('jog_x_plus_cancel', {
+                posthog?.capture('jog_x_plus', {
                     distance,
                     feedrate,
                     continuous: false,
@@ -56,11 +56,6 @@ export function JogWheel({
             },
             onFinish: () => {
                 stopContinuousJog();
-                posthog?.capture('jog_x_plus_finish', {
-                    distance,
-                    feedrate,
-                    continuous: true,
-                });
             },
         },
     )();
@@ -77,11 +72,6 @@ export function JogWheel({
             threshold,
             onCancel: () => {
                 xMinusJog(distance, feedrate, false);
-                posthog?.capture('jog_x_minus_cancel', {
-                    distance,
-                    feedrate,
-                    continuous: false,
-                });
             },
             onFinish: stopContinuousJog,
         },
@@ -100,7 +90,7 @@ export function JogWheel({
             threshold,
             onCancel: () => {
                 yPlusJog(distance, feedrate, false);
-                posthog?.capture('jog_y_plus_cancel', {
+                posthog?.capture('jog_y_plus', {
                     distance,
                     feedrate,
                     continuous: false,
@@ -122,7 +112,7 @@ export function JogWheel({
             threshold,
             onCancel: () => {
                 yMinusJog(distance, feedrate, false);
-                posthog?.capture('jog_y_minus_cancel', {
+                posthog?.capture('jog_y_minus', {
                     distance,
                     feedrate,
                     continuous: false,
@@ -145,7 +135,7 @@ export function JogWheel({
             threshold,
             onCancel: () => {
                 xPlusYMinus(distance, feedrate, false);
-                posthog?.capture('jog_x_plus_y_minus_cancel', {
+                posthog?.capture('jog_x_plus_y_minus', {
                     distance,
                     feedrate,
                     continuous: false,
@@ -167,7 +157,7 @@ export function JogWheel({
             threshold,
             onCancel: () => {
                 xPlusYPlus(distance, feedrate, false);
-                posthog?.capture('jog_x_plus_y_plus_cancel', {
+                posthog?.capture('jog_x_plus_y_plus', {
                     distance,
                     feedrate,
                     continuous: false,
@@ -190,7 +180,7 @@ export function JogWheel({
             threshold,
             onCancel: () => {
                 xMinusYPlus(distance, feedrate, false);
-                posthog?.capture('jog_x_minus_y_plus_cancel', {
+                posthog?.capture('jog_x_minus_y_plus', {
                     distance,
                     feedrate,
                     continuous: false,
@@ -212,7 +202,7 @@ export function JogWheel({
             threshold,
             onCancel: () => {
                 xMinusYMinus(distance, feedrate, false);
-                posthog?.capture('jog_x_minus_y_minus_cancel', {
+                posthog?.capture('jog_x_minus_y_minus', {
                     distance,
                     feedrate,
                     continuous: false,

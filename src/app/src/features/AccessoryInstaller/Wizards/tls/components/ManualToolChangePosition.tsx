@@ -31,6 +31,7 @@ export function ManualToolChangePosition({
     const mpos = useSelector((state: RootState) => state.controller.mpos);
     const isManuallyEditing = useRef(false);
     const mposAtMountRef = useRef(mpos);
+    const lastSetMposRef = useRef<Position | undefined>(undefined);
 
     const [position, setPosition] = useState(() => {
         const defaultXY = getDefaultToolChangePositionMM();
@@ -47,6 +48,13 @@ export function ManualToolChangePosition({
         // No real jog has happened since entering the step yet — keep the
         // computed default instead of clobbering it with the raw mpos.
         if (mposEquals(mpos, mposAtMountRef.current)) return;
+
+        if (isComplete && !mposEquals(mpos, lastSetMposRef.current)) {
+            setIsComplete(false);
+            setSuccess(null);
+            onUncomplete();
+        }
+
         const { x, y, z } = mpos;
         setPosition({
             x: mapPositionToUnits(x, units),
@@ -67,6 +75,7 @@ export function ManualToolChangePosition({
         pubsub.publish('repopulate');
         setSuccess('Tool change location set.');
         setIsComplete(true);
+        lastSetMposRef.current = mpos;
         onComplete();
     };
 
@@ -105,6 +114,11 @@ export function ManualToolChangePosition({
                 onPositionChange={(positions) => {
                     isManuallyEditing.current = true;
                     setPosition(positions);
+                    if (isComplete) {
+                        setIsComplete(false);
+                        setSuccess(null);
+                        onUncomplete();
+                    }
                 }}
                 showGoTo={true}
                 onGoTo={goToPosition}

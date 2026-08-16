@@ -15,6 +15,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from 'app/components/shadcn/Popover';
+import { usePostHog } from 'posthog-js/react';
 
 const COPY_HISTORY_LIMIT = 50;
 
@@ -30,6 +31,8 @@ const TerminalInput = ({ onClear }: Props) => {
     );
     const [historyIndex, setHistoryIndex] = useState(-1);
 
+    const posthog = usePostHog();
+
     const handleCommandExecute = () => {
         const command = inputRef.current?.value;
 
@@ -43,6 +46,8 @@ const TerminalInput = ({ onClear }: Props) => {
         dispatch(addToInputHistory(command));
         setHistoryIndex(-1);
         inputRef.current.value = '';
+
+        posthog.capture('console_command_executed', { command });
     };
 
     const navigateHistory = (direction: 'up' | 'down') => {
@@ -83,6 +88,10 @@ const TerminalInput = ({ onClear }: Props) => {
                     position: 'bottom-right',
                 },
             );
+
+            posthog.capture('console_history_copied', {
+                commands: lastCommands,
+            });
         } catch (error) {
             toast.error('Failed to copy commands to clipboard', {
                 duration: 3000,
@@ -138,7 +147,7 @@ const TerminalInput = ({ onClear }: Props) => {
 
             <Popover>
                 <PopoverTrigger asChild>
-                    <Button 
+                    <Button
                         variant="secondary"
                         className="h-8 text-sm"
                         aria-label="Console options"

@@ -24,6 +24,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import i18n from 'app/lib/i18n';
+import posthog from 'posthog-js';
 
 import styles from './index.module.styl';
 

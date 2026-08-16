@@ -7,6 +7,7 @@ import {
     zMinusJog,
     zPlusJog,
 } from 'app/features/Jogging/utils/Jogging.ts';
+import { usePostHog } from 'posthog-js/react';
 import { useLongPress } from 'use-long-press';
 
 export function ZJog({
@@ -15,26 +16,60 @@ export function ZJog({
     canClick,
     threshold = 200,
 }: JoggerProps) {
+    const posthog = usePostHog();
+
     const zPlusJogHandlers = useLongPress(
-        () => continuousJogAxis({ Z: 1 }, feedrate),
+        () => {
+            continuousJogAxis({ Z: 1 }, feedrate);
+            posthog.capture('jog_z_plus', {
+                distance,
+                feedrate,
+                continuous: true,
+            });
+        },
         {
             threshold,
-            onCancel: () => zPlusJog(distance, feedrate, false),
+            onCancel: () => {
+                zPlusJog(distance, feedrate, false);
+                posthog.capture('jog_z_plus', {
+                    distance,
+                    feedrate,
+                    continuous: false,
+                });
+            },
             onFinish: stopContinuousJog,
         },
     )();
     const zMinusJogHandlers = useLongPress(
-        () => continuousJogAxis({ Z: -1 }, feedrate),
+        () => {
+            continuousJogAxis({ Z: -1 }, feedrate);
+            posthog.capture('jog_z_minus', {
+                distance,
+                feedrate,
+                continuous: true,
+            });
+        },
         {
             threshold,
-            onCancel: () => zMinusJog(distance, feedrate, false),
+            onCancel: () => {
+                zMinusJog(distance, feedrate, false);
+                posthog.capture('jog_z_minus', {
+                    distance,
+                    feedrate,
+                    continuous: false,
+                });
+            },
             onFinish: stopContinuousJog,
         },
     )();
 
     const handleKeyDown = (
         e: React.KeyboardEvent,
-        action: (distance: number, feedrate: number, isContinuous: boolean) => void,
+        action: (
+            distance: number,
+            feedrate: number,
+            isContinuous: boolean,
+        ) => void,
     ) => {
         if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
@@ -43,7 +78,10 @@ export function ZJog({
     };
 
     return (
-        <div id="zJog" className="relative w-[45px] portrait:w-[52px] h-[168px] portrait:h-[195px]">
+        <div
+            id="zJog"
+            className="relative w-[45px] portrait:w-[52px] h-[168px] portrait:h-[195px]"
+        >
             <TabJog
                 topHandlers={zPlusJogHandlers}
                 bottomHandlers={zMinusJogHandlers}

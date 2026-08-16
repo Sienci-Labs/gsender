@@ -10,6 +10,7 @@ import { ConsolePopout } from 'app/features/Console/components/ConsolePopout.tsx
 import isElectron from 'is-electron';
 import controller from 'app/lib/controller';
 import { FIRMWARE_TYPES_T } from 'app/definitions/firmware';
+import { usePostHog } from 'posthog-js/react';
 
 type ConsoleProps = {
     isActive: boolean;
@@ -19,6 +20,7 @@ type ConsoleProps = {
 const Console = ({ isActive, isChildWindow }: ConsoleProps) => {
     const terminalRef = useRef<{ clear: () => void }>(null);
     const [port, setPort] = useState(controller.port);
+    const posthog = usePostHog();
 
     const controllerEvents: {
         [key: string]: Function;
@@ -45,6 +47,8 @@ const Console = ({ isActive, isChildWindow }: ConsoleProps) => {
             terminalRef.current.clear();
 
             toast.info('Console cleared', { position: 'bottom-right' });
+
+            posthog.capture('console_cleared');
         }
     };
 

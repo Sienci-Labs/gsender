@@ -1023,13 +1023,6 @@ export function Jogging({ hideRotary = false }) {
                         disabled={!isConnected}
                         onClick={() => cancelJog(activeState, firmware)}
                     />
-                    {/*<img
-                        src={stopSign}
-                        className="absolute top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 hover:fill-red-200"
-                        alt="E-Stop button"
-
-                        onClick={() => cancelJog(activeState, firmware)}
-                    />*/}
                 </div>
                 <div className="flex justify-center gap-4">
                     <ZJog

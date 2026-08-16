@@ -7,6 +7,7 @@ import {
     JoggerProps,
     stopContinuousJog,
 } from 'app/features/Jogging/utils/Jogging.ts';
+import { usePostHog } from 'posthog-js/react';
 import { useLongPress } from 'use-long-press';
 
 export function AJog({
@@ -16,28 +17,66 @@ export function AJog({
     isRotaryMode,
     threshold = 200,
 }: JoggerProps) {
+    const posthog = usePostHog();
+
     const axis = isRotaryMode ? 'Y' : 'A';
 
     const aPlusJogHandlers = useLongPress(
-        () => continuousJogAxis({ [axis]: 1 }, feedrate),
+        () => {
+            continuousJogAxis({ [axis]: 1 }, feedrate);
+            posthog.capture('jog_a_plus', {
+                distance,
+                feedrate,
+                continuous: true,
+                isRotaryMode,
+            });
+        },
         {
             threshold,
-            onCancel: () => aPlusJog(distance, feedrate, false),
+            onCancel: () => {
+                aPlusJog(distance, feedrate, false);
+                posthog.capture('jog_a_plus', {
+                    distance,
+                    feedrate,
+                    continuous: false,
+                    isRotaryMode,
+                });
+            },
             onFinish: stopContinuousJog,
         },
     )();
     const aMinusJogHandlers = useLongPress(
-        () => continuousJogAxis({ [axis]: -1 }, feedrate),
+        () => {
+            continuousJogAxis({ [axis]: -1 }, feedrate);
+            posthog.capture('jog_a_minus', {
+                distance,
+                feedrate,
+                continuous: true,
+                isRotaryMode,
+            });
+        },
         {
             threshold,
-            onCancel: () => aMinusJog(distance, feedrate, false),
+            onCancel: () => {
+                aMinusJog(distance, feedrate, false);
+                posthog.capture('jog_a_minus', {
+                    distance,
+                    feedrate,
+                    continuous: false,
+                    isRotaryMode,
+                });
+            },
             onFinish: stopContinuousJog,
         },
     )();
 
     const handleKeyDown = (
         e: React.KeyboardEvent,
-        action: (distance: number, feedrate: number, isContinuous: boolean) => void,
+        action: (
+            distance: number,
+            feedrate: number,
+            isContinuous: boolean,
+        ) => void,
     ) => {
         if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
@@ -46,7 +85,10 @@ export function AJog({
     };
 
     return (
-        <div id="aJog" className="relative w-[45px] portrait:w-[52px] h-[168px] portrait:h-[195px]">
+        <div
+            id="aJog"
+            className="relative w-[45px] portrait:w-[52px] h-[168px] portrait:h-[195px]"
+        >
             <TabJog
                 topHandlers={aPlusJogHandlers}
                 bottomHandlers={aMinusJogHandlers}

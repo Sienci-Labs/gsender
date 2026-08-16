@@ -29,6 +29,7 @@ import { FaLightbulb, FaRegLightbulb, FaSatelliteDish } from 'react-icons/fa';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { ActiveStateButton } from 'app/components/ActiveStateButton';
 import Tooltip from 'app/components/Tooltip';
+import { SendM5Type } from '../definitions';
 
 type Props = {
     actions: LaserActions;
@@ -47,7 +48,7 @@ interface LaserState {
 interface LaserActions {
     sendLaserM3: () => void;
     runLaserTest: () => void;
-    sendM5: () => void;
+    sendM5: (sendM5Type: SendM5Type) => void;
     handleLaserPowerChange: (value: number) => void;
     handleLaserDurationChange: (
         event: React.ChangeEvent<HTMLInputElement>,
@@ -83,7 +84,7 @@ const LaserControls = ({ actions, state, canClick, isConnected }: Props) => {
                     }}
                 />
                 <ActiveStateButton
-                    onClick={actions.sendM5}
+                    onClick={() => actions.sendM5({ type: 'laser' })}
                     icon={<FaRegLightbulb />}
                     text="Off"
                     size={'sm'}
