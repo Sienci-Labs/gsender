@@ -20,6 +20,7 @@ type NumberFieldProps = {
 	min?: number;
 	unit?: string;
 	onChange: (value: number) => void;
+	unitId?: string; // a testid for the units
 };
 
 type PreviewTab = "preview" | "gcode";
@@ -31,12 +32,16 @@ const NumberField = ({
 	min,
 	unit,
 	onChange,
+	unitId,
 }: NumberFieldProps) => (
 	<label className="mb-3 flex flex-col gap-1 text-sm">
 		<span>
 			{label}
 			{unit ? (
-				<span className="font-normal text-gray-500 dark:text-gray-400">
+				<span
+					className="font-normal text-gray-500 dark:text-gray-400"
+					id={unitId}
+				>
 					{" "}
 					({unit})
 				</span>
@@ -240,6 +245,7 @@ const App = () => {
 							value={tool.feedrate}
 							step={10}
 							onChange={(feedrate) => setTool((t) => ({ ...t, feedrate }))}
+							unitId="width-field"
 						/>
 						<NumberField
 							label="Plunge rate"
