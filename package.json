@@ -88,7 +88,7 @@
     "test:report": "npm run report:clean && (cypress run --spec cypress/e2e/grblHal/A_grblHal_master_spec.cy.js || true) && npm run report:merge && npm run report:generate && npm run dashboard:generate",
     "cypress:open": "cypress open",
     "vite:build": "cross-env NODE_OPTIONS='--max-old-space-size=8192' yarn --cwd ./src/app build",
-    "postvite:build": "bash -c \"mkdir -p dist/gsender/app; cp -af src/app/{favicon.ico,images,assets} dist/gsender/app/\"",
+    "postvite:build": "bash -c \"mkdir -p dist/gsender/app; cp -af src/app/{favicon.ico,images,assets} dist/gsender/app/\" && posthog-cli --dotenv-file src/app/.env sourcemap process --directory dist/gsender/app --release-name gSender",
     "install:packages": "yarn install && yarn install --prefix /src/app",
     "check-types": "tsc --noEmit -p ./src/app/src",
     "test:unit": "jest",
@@ -306,6 +306,7 @@
     "winston": "^3.19.0"
   },
   "devDependencies": {
+    "@posthog/cli": "latest",
     "@babel/core": "^7.29.0",
     "@babel/preset-env": "^7.25.8",
     "@babel/preset-react": "^7.25.8",

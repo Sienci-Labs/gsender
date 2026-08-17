@@ -88,6 +88,7 @@
         "@dnd-kit/utilities": "^3.2.2",
         "@electron/notarize": "^3.1.1",
         "@electron/rebuild": "^4.0.3",
+        "@posthog/cli": "latest",
         "@radix-ui/react-accordion": "^1.2.0",
         "@radix-ui/react-alert-dialog": "^1.1.1",
         "@radix-ui/react-checkbox": "^1.1.1",
@@ -800,6 +801,8 @@
     "@pkgr/core": ["@pkgr/core@0.2.9", "", {}, "sha512-QNqXyfVS2wm9hweSYD2O7F0G06uurj9kZ96TRQE5Y9hU7+tgdZwIkbAKc5Ocy1HxEY2kuDQa6cQ1WRs/O5LFKA=="],
 
     "@polka/url": ["@polka/url@1.0.0-next.29", "", {}, "sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww=="],
+
+    "@posthog/cli": ["@posthog/cli@0.10.0", "", { "dependencies": { "detect-libc": "^2.1.2" }, "bin": { "posthog-cli": "run-posthog-cli.js" } }, "sha512-lPL7kFwGD66h0am8nSffydhRnDyskRWM9GkZOJBZIFShLRmAUdRnBNHrM4k8G5Qmqm3OC2xQMNS0YUKkQXaBQw=="],
 
     "@posthog/core": ["@posthog/core@1.27.9", "", { "dependencies": { "@posthog/types": "1.372.5" } }, "sha512-7FFWWYWvRFxQqDXYzv8klCjk0Pox1IpuPr61eeOCBsKkmt6xvvHwH0jc3ObvwDXZj2NSAWg+V9N2E2F1ul2CRQ=="],
 
@@ -1870,6 +1873,8 @@
     "destroy": ["destroy@1.0.4", "", {}, "sha512-3NdhDuEXnfun/z7x9GOElY49LoqVHoGScmOKwmxhsS8N5Y+Z8KyPPDnaSzqWgYt/ji4mqwfTS34Htrk0zPIXVg=="],
 
     "detect-browser": ["detect-browser@4.4.0", "", {}, "sha512-wD1RDItw/aCnQ3fYSZNXZ/AVFwrqFDgLEsnSorLpgH3HC9YOjTC6Of+IeERrv28KbJ3B4bQd5ru1UFsGVCJM+g=="],
+
+    "detect-libc": ["detect-libc@2.1.2", "", {}, "sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ=="],
 
     "detect-newline": ["detect-newline@3.1.0", "", {}, "sha512-TLz+x/vEXm/Y7P7wn1EJFNLxYpUD4TgMosxY6fAVJUnJMbupHBOncxyWUG9OpTaH9EBD7uFI5LfEgmMOc54DsA=="],
 

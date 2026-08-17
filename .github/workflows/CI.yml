@@ -19,6 +19,11 @@ env:
   NODE_OPTIONS: --max-old-space-size=8192
   VITE_PUBLIC_POSTHOG_PROJECT_TOKEN: ${{ secrets.VITE_PUBLIC_POSTHOG_PROJECT_TOKEN }}
   VITE_PUBLIC_POSTHOG_HOST: ${{ secrets.VITE_PUBLIC_POSTHOG_HOST }}
+  # PostHog source map upload: POSTHOG_CLI_API_KEY, POSTHOG_CLI_PROJECT_ID, and
+  # POSTHOG_CLI_HOST must be set in Settings → Secrets and variables → Actions.
+  POSTHOG_CLI_API_KEY: ${{ secrets.POSTHOG_CLI_API_KEY }}
+  POSTHOG_CLI_PROJECT_ID: ${{ secrets.POSTHOG_CLI_PROJECT_ID }}
+  POSTHOG_CLI_HOST: ${{ secrets.POSTHOG_CLI_HOST }}
 
 jobs:
   build-linux:

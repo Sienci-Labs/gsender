@@ -23,4 +23,7 @@ docker buildx build  -f DockerfilePi . \
    --build-arg GITHUB_REF_NAME=$GITHUB_REF_NAME \
    --build-arg GITHUB_REF_TYPE=$GITHUB_REF_TYPE \
    --build-arg GIT_COMMIT_LOG="git log -1 --format='%ci %H %s'" \
+   --build-arg POSTHOG_CLI_API_KEY="$POSTHOG_CLI_API_KEY" \
+   --build-arg POSTHOG_CLI_PROJECT_ID="$POSTHOG_CLI_PROJECT_ID" \
+   --build-arg POSTHOG_CLI_HOST="$POSTHOG_CLI_HOST" \
    --no-cache
