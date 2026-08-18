@@ -70,6 +70,7 @@ const MaterialCenterFinderModal: React.FC<ModalProps> = ({
     const [slowFeed, setSlowFeed] = useState<number>(isImperial ? 2.0 : 50.0);
     const [retractDist, setRetractDist] = useState<number>(isImperial ? 0.08 : 2.0);
     const [safeZ, setSafeZ] = useState<number>(isImperial ? 0.2 : 5.0);
+    const [tipDia, setTipDia] = useState<number>(isImperial ? 0.08 : 2.0);
     const [isRunning, setIsRunning] = useState<boolean>(false);
     const [dialogState, setDialogState] = useState<'idle' | 'success' | 'failed'>('idle');
 
@@ -79,11 +80,13 @@ const MaterialCenterFinderModal: React.FC<ModalProps> = ({
             setSlowFeed(2.0);
             setRetractDist(0.08);
             setSafeZ(0.2);
+            setTipDia(0.08);
         } else {
             setFastFeed(150.0);
             setSlowFeed(50.0);
             setRetractDist(2.0);
             setSafeZ(5.0);
+            setTipDia(2.0);
         }
     }, [isImperial]);
     const isRunningRef = useRef<boolean>(false);
@@ -214,7 +217,10 @@ const MaterialCenterFinderModal: React.FC<ModalProps> = ({
         sizeX > 0 &&
         typeof sizeY === 'number' &&
         !isNaN(sizeY) &&
-        sizeY > 0;
+        sizeY > 0 &&
+        typeof tipDia === 'number' &&
+        !isNaN(tipDia) &&
+        tipDia > 0;
 
     const handleRun = () => {
         if (!isFormValid) {
@@ -234,6 +240,7 @@ const MaterialCenterFinderModal: React.FC<ModalProps> = ({
         const effectiveSlowFeed = isImperial ? in2mm(Number(slowFeed)) : Number(slowFeed);
         const effectiveRetract = isImperial ? in2mm(Number(retractDist)) : Number(retractDist);
         const effectiveSafeZ = isImperial ? in2mm(Number(safeZ)) : Number(safeZ);
+        const effectiveTipDia = isImperial ? in2mm(Number(tipDia)) : Number(tipDia);
 
         const macroScript = `
 ; =========================================
@@ -247,7 +254,7 @@ const MaterialCenterFinderModal: React.FC<ModalProps> = ({
 %PROBE_FEED_SLOW = ${Number(effectiveSlowFeed.toFixed(1))}
 %PROBE_RETRACT = ${Number(effectiveRetract.toFixed(3))}
 %Z_SAFE_LIFT = ${Number(effectiveSafeZ.toFixed(3))}
-%Z_UNDER_SURFACE = -4
+%Z_UNDER_SURFACE = -${Number(effectiveTipDia.toFixed(3))}
 %EDGE_MARGIN_MAJOR = 10 
 %EDGE_MARGIN = 5
 
@@ -424,6 +431,7 @@ G10 L20 P0 Y0
 
                             <div className="material-center-finder-form-group">
                                 <div className="material-center-finder-form-group-label">Probe Behavior</div>
+                                <SettingInput label="Probe Tip Diameter" value={tipDia} setter={setTipDia} unit={lengthUnit} step={isImperial ? "0.01" : "0.1"} disabled={isRunning} />
                                 <SettingInput label="Retract Distance" value={retractDist} setter={setRetractDist} unit={lengthUnit} step={isImperial ? "0.01" : "0.1"} disabled={isRunning} />
                                 <SettingInput label="Safe Z" value={safeZ} setter={setSafeZ} unit={lengthUnit} step={isImperial ? "0.05" : "0.5"} disabled={isRunning} />
                             </div>
