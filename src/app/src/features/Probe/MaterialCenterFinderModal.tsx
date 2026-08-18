@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import controller from 'app/lib/controller';
+import store from 'app/store';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { IMPERIAL_UNITS } from 'app/constants';
-import { in2mm } from 'app/lib/units';
+import { in2mm, mm2in } from 'app/lib/units';
 import './MaterialCenterFinderModal.css';
 
 interface ModalProps {
@@ -64,29 +65,43 @@ const MaterialCenterFinderModal: React.FC<ModalProps> = ({
     const lengthUnit = isImperial ? 'in' : 'mm';
     const feedUnit = isImperial ? 'in/min' : 'mm/min';
 
+    const getInitialTipDia = () => {
+        const stored = Number(store.get('workspace.probeTipDiameter', 2.0));
+        return isImperial ? Number(mm2in(stored).toFixed(3)) : stored;
+    };
+
     const [sizeX, setSizeX] = useState<number | ''>('');
     const [sizeY, setSizeY] = useState<number | ''>('');
     const [fastFeed, setFastFeed] = useState<number>(isImperial ? 6.0 : 150.0);
     const [slowFeed, setSlowFeed] = useState<number>(isImperial ? 2.0 : 50.0);
     const [retractDist, setRetractDist] = useState<number>(isImperial ? 0.08 : 2.0);
     const [safeZ, setSafeZ] = useState<number>(isImperial ? 0.2 : 5.0);
-    const [tipDia, setTipDia] = useState<number>(isImperial ? 0.08 : 2.0);
+    const [tipDia, setTipDia] = useState<number | ''>(getInitialTipDia);
     const [isRunning, setIsRunning] = useState<boolean>(false);
     const [dialogState, setDialogState] = useState<'idle' | 'success' | 'failed'>('idle');
 
+    const handleTipDiaChange = (val: number | '') => {
+        setTipDia(val);
+        if (typeof val === 'number' && !isNaN(val) && val > 0) {
+            const metricVal = isImperial ? in2mm(val) : val;
+            store.set('workspace.probeTipDiameter', metricVal);
+        }
+    };
+
     useEffect(() => {
+        const storedMetric = Number(store.get('workspace.probeTipDiameter', 2.0));
         if (isImperial) {
             setFastFeed(6.0);
             setSlowFeed(2.0);
             setRetractDist(0.08);
             setSafeZ(0.2);
-            setTipDia(0.08);
+            setTipDia(Number(mm2in(storedMetric).toFixed(3)));
         } else {
             setFastFeed(150.0);
             setSlowFeed(50.0);
             setRetractDist(2.0);
             setSafeZ(5.0);
-            setTipDia(2.0);
+            setTipDia(storedMetric);
         }
     }, [isImperial]);
     const isRunningRef = useRef<boolean>(false);
@@ -432,7 +447,7 @@ G10 L20 P0 Y0
 
                             <div className="material-center-finder-form-group">
                                 <div className="material-center-finder-form-group-label">Probe Behavior</div>
-                                <SettingInput label="Probe Tip Diameter" value={tipDia} setter={setTipDia} unit={lengthUnit} step={isImperial ? "0.01" : "0.1"} disabled={isRunning} />
+                                <SettingInput label="Probe Tip Diameter" value={tipDia} setter={handleTipDiaChange} unit={lengthUnit} step={isImperial ? "0.01" : "0.1"} disabled={isRunning} />
                                 <SettingInput label="Retract Distance" value={retractDist} setter={setRetractDist} unit={lengthUnit} step={isImperial ? "0.01" : "0.1"} disabled={isRunning} />
                                 <SettingInput label="Safe Z" value={safeZ} setter={setSafeZ} unit={lengthUnit} step={isImperial ? "0.05" : "0.5"} disabled={isRunning} />
                             </div>

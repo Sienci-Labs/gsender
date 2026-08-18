@@ -37,6 +37,7 @@ export interface Workspace {
     m7CustomLabel?: string;
     m8Label?: string;
     m8CustomLabel?: string;
+    probeTipDiameter?: number;
     atcEnabled: boolean;
     collectUsageDataStatus: 'accepted' | 'denied' | 'pending';
     safeRetractHeight: number;

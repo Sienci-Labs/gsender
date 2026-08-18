@@ -59,6 +59,7 @@ const defaultState: State = {
         m7CustomLabel: '',
         m8Label: 'Flood',
         m8CustomLabel: '',
+        probeTipDiameter: 2.0,
         atcEnabled: false,
         safeRetractHeight: 0,
         customDecimalPlaces: 0,
