@@ -214,6 +214,9 @@ const BoreCenterFinderModal: React.FC<ModalProps> = ({
         const effectiveSlowFeed = isImperial ? in2mm(Number(slowFeed)) : Number(slowFeed);
         const effectiveRetract = isImperial ? in2mm(Number(retractDist)) : Number(retractDist);
 
+        const isLargeBore = effectiveBoreDia >= 50.0;
+        const traverseCmd = isLargeBore ? 'G0' : 'G1 F800';
+
         const macroScript = `
 ; =========================================
 ; BORE / HOLE CENTER FINDER MACRO
@@ -232,6 +235,10 @@ const BoreCenterFinderModal: React.FC<ModalProps> = ({
 G91
 G21
 
+; --- RECORD START POINT (EYEBALLED CENTER) ---
+%X_START = posx
+%Y_START = posy
+
 ; --- 1. PROBE +X INSIDE WALL ---
 G38.2 X[ BORE_DIA/2 + MARGIN ] F[PROBE_FEED_FAST]
 G0 X-[PROBE_RETRACT]
@@ -239,18 +246,24 @@ G38.2 X5 F[PROBE_FEED_SLOW]
 %X_RIGHT = posx
 G0 X-[PROBE_RETRACT]
 
+; Return back to X start position
+${traverseCmd} X-[ posx - X_START ]
+
 ; --- 2. PROBE -X INSIDE WALL ---
-G38.2 X-[ BORE_DIA + 2*MARGIN ] F[PROBE_FEED_FAST]
+G38.2 X-[ BORE_DIA/2 + MARGIN ] F[PROBE_FEED_FAST]
 G0 X[PROBE_RETRACT]
 G38.2 X-5 F[PROBE_FEED_SLOW]
 %X_LEFT = posx
 G0 X[PROBE_RETRACT]
 
-; --- 3. RETURN TO TRUE X CENTER & ZERO X ---
-%X_CHORD = X_RIGHT - X_LEFT
-G0 X[ X_CHORD/2 - PROBE_RETRACT ]
+; --- 3. MOVE TO TRUE X CENTER & ZERO X ---
+%X_TRUE_CENTER = (X_RIGHT + X_LEFT)/2
+${traverseCmd} X[ X_TRUE_CENTER - posx ]
 G4 P0.5
 G10 L20 P0 X0
+
+; Update Y start at true X center
+%Y_START = posy
 
 ; --- 4. PROBE +Y INSIDE WALL ---
 G38.2 Y[ BORE_DIA/2 + MARGIN ] F[PROBE_FEED_FAST]
@@ -259,16 +272,19 @@ G38.2 Y5 F[PROBE_FEED_SLOW]
 %Y_TOP = posy
 G0 Y-[PROBE_RETRACT]
 
+; Return back to Y start position
+${traverseCmd} Y-[ posy - Y_START ]
+
 ; --- 5. PROBE -Y INSIDE WALL ---
-G38.2 Y-[ BORE_DIA + 2*MARGIN ] F[PROBE_FEED_FAST]
+G38.2 Y-[ BORE_DIA/2 + MARGIN ] F[PROBE_FEED_FAST]
 G0 Y[PROBE_RETRACT]
 G38.2 Y-5 F[PROBE_FEED_SLOW]
 %Y_BTM = posy
 G0 Y[PROBE_RETRACT]
 
-; --- 6. RETURN TO TRUE Y CENTER & ZERO Y ---
-%Y_CHORD = Y_TOP - Y_BTM
-G0 Y[ Y_CHORD/2 - PROBE_RETRACT ]
+; --- 6. MOVE TO TRUE Y CENTER & ZERO Y ---
+%Y_TRUE_CENTER = (Y_TOP + Y_BTM)/2
+${traverseCmd} Y[ Y_TRUE_CENTER - posy ]
 G4 P0.5
 G10 L20 P0 Y0
 
