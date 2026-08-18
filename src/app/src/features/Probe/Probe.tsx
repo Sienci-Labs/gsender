@@ -229,6 +229,34 @@ const Probe = ({ state, actions }: ProbeProps) => {
                                 </svg>
                             </Button>
                         </Tooltip>
+
+                        {/* Bore / Hole Center Finder Icon-Only Button */}
+                        <Tooltip content="Find Bore / Hole Center">
+                            <Button
+                                onClick={() => actions.openBoreCenterModal()}
+                                disabled={!canClick}
+                                variant="secondary"
+                                size="icon"
+                                aria-label="Find Bore / Hole Center"
+                                className="flex items-center justify-center p-2"
+                            >
+                                <svg
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2.2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                >
+                                    <circle cx="12" cy="12" r="9" />
+                                    <line x1="12" y1="7" x2="12" y2="17" />
+                                    <line x1="7" y1="12" x2="17" y2="12" />
+                                    <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+                                </svg>
+                            </Button>
+                        </Tooltip>
                     </div>
                 </div>
                 <div className="flex w-full h-full min-h-full max-xl:pt-2">

@@ -39,6 +39,7 @@ import { convertToImperial } from 'app/lib/units';
 import Probe from './Probe';
 import RunProbe from './RunProbe';
 import MaterialCenterFinderModal from './MaterialCenterFinderModal';
+import BoreCenterFinderModal from './BoreCenterFinderModal';
 import {
     // Units
     METRIC_UNITS,
@@ -112,6 +113,7 @@ const ProbeWidget = () => {
     // const [port, setPort] = useState<string>(controller.port);
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [materialCenterModalOpen, setMaterialCenterModalOpen] = useState(false);
+    const [boreCenterModalOpen, setBoreCenterModalOpen] = useState(false);
     // const [probeAxis, setProbeAxis] = useState<AXES_T>(config.get('probeAxis', 'Z'));
     const [probeCommand, setProbeCommand] = useState<string>(
         config.get('probeCommand', 'G38.2'),
@@ -266,6 +268,15 @@ const ProbeWidget = () => {
             setMaterialCenterModalOpen(false);
         },
         runMaterialCenterMacro: (gcode: string): void => {
+            controller.command('gcode:safe', gcode, 'G21');
+        },
+        openBoreCenterModal: (): void => {
+            setBoreCenterModalOpen(true);
+        },
+        closeBoreCenterModal: (): void => {
+            setBoreCenterModalOpen(false);
+        },
+        runBoreCenterMacro: (gcode: string): void => {
             controller.command('gcode:safe', gcode, 'G21');
         },
         changeProbeCommand: (value: string): void => {
@@ -666,6 +677,11 @@ const ProbeWidget = () => {
                     isOpen={materialCenterModalOpen}
                     onClose={() => actions.closeMaterialCenterModal()}
                     onRunGcode={(gcode) => actions.runMaterialCenterMacro(gcode)}
+                />
+                <BoreCenterFinderModal
+                    isOpen={boreCenterModalOpen}
+                    onClose={() => actions.closeBoreCenterModal()}
+                    onRunGcode={(gcode) => actions.runBoreCenterMacro(gcode)}
                 />
             </div>
         </>

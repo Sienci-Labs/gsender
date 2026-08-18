@@ -133,6 +133,9 @@ export interface Actions {
     openMaterialCenterModal: () => void;
     closeMaterialCenterModal: () => void;
     runMaterialCenterMacro: (gcode: string) => void;
+    openBoreCenterModal: () => void;
+    closeBoreCenterModal: () => void;
+    runBoreCenterMacro: (gcode: string) => void;
     changeProbeCommand: (value: string) => void;
     changeTouchPlateType: (value: TOUCHPLATE_TYPES_T) => void;
     toggleUseTLO: () => void;
