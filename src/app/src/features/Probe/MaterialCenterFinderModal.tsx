@@ -241,6 +241,7 @@ const MaterialCenterFinderModal: React.FC<ModalProps> = ({
         const effectiveRetract = isImperial ? in2mm(Number(retractDist)) : Number(retractDist);
         const effectiveSafeZ = isImperial ? in2mm(Number(safeZ)) : Number(safeZ);
         const effectiveTipDia = isImperial ? in2mm(Number(tipDia)) : Number(tipDia);
+        const effectiveZUnderSurface = -(effectiveRetract + effectiveTipDia);
 
         const macroScript = `
 ; =========================================
@@ -254,7 +255,7 @@ const MaterialCenterFinderModal: React.FC<ModalProps> = ({
 %PROBE_FEED_SLOW = ${Number(effectiveSlowFeed.toFixed(1))}
 %PROBE_RETRACT = ${Number(effectiveRetract.toFixed(3))}
 %Z_SAFE_LIFT = ${Number(effectiveSafeZ.toFixed(3))}
-%Z_UNDER_SURFACE = -${Number(effectiveTipDia.toFixed(3))}
+%Z_UNDER_SURFACE = ${Number(effectiveZUnderSurface.toFixed(3))}
 %EDGE_MARGIN_MAJOR = 10 
 %EDGE_MARGIN = 5
 
