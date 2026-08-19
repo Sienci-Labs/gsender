@@ -5,16 +5,14 @@
 
 ---
 
-### 🎯 3D Touch Probing Suite (Material Center & Bore Finder)
+## 🎯 3D Touch Probing Suite (Material Center & Bore Finder)
 
 > [!IMPORTANT]
-> ⚠️ **Hardware Requirement:** These probing routines are designed specifically for use with an active **3D Touch Probe** (electronic/kinematic probe capable of omnidirectional contact detection in X, Y, and Z).
+> ⚠️ **Hardware Requirement:** Probing routines are designed specifically for use with an active **3D Touch Probe** (electronic/kinematic probe capable of omnidirectional contact detection in X, Y, and Z).
 
 Added two dedicated, interactive 3D touch probing tools directly into the **Probe** widget for rapidly finding and zeroing the geometric center of both raw stock and pre-machined bores:
 
----
-
-#### 🔲 1. Material Center Finder (Rectangular Stock)
+### 🔲 1. Material Center Finder (Rectangular Stock)
 * **Direct UI Access:** Dedicated button in the Probe widget opening a rich configuration modal with real-time diagram illustration.
 * **5-Point Automated Probing Workflow:** Probes Z top surface, hops over the material boundary at a safe clearance height, and probes all four outer edges (+X, -X, +Y, -Y).
 * **Automatic Coordinate Zeroing:** Calculates the exact geometric center from measured touchpoints and sets `X0 Y0` on the active workspace coordinate system (`G10 L20 P0`).
@@ -23,7 +21,7 @@ Added two dedicated, interactive 3D touch probing tools directly into the **Prob
 
 ---
 
-#### 🔘 2. Bore / Hole Center Finder (Internal Cylindrical Bores)
+### 🔘 2. Bore / Hole Center Finder (Internal Cylindrical Bores)
 * **Direct UI Access:** Dedicated circular crosshair button in the Probe widget with visual internal probe diagram.
 * **4-Point Internal Probing Workflow:** Starts from inside the bore (roughly centered at probing depth) and probes the internal cylinder walls (+X, -X, +Y, -Y).
 * **Smart Motion & Kinematics:** 
@@ -33,14 +31,26 @@ Added two dedicated, interactive 3D touch probing tools directly into the **Prob
 
 ---
 
-#### 📏 Full Dynamic Metric & Imperial Unit Support
+### 📏 Full Dynamic Metric & Imperial Unit Support
 * Automatically detects and adapts to the active workspace unit mode (**`mm` / `mm/min`** or **`in` / `in/min`**).
 * Features high-precision background unit conversion ensuring sub-millimeter machine motion accuracy regardless of input unit selection.
 
 ---
 
-#### 🛡️ Enhanced Safety & UX Controls
+### 🛡️ Enhanced Safety & UX Controls
 * **Instant In-Modal Abort:** The modal stays open during execution with a prominent **⏹ Stop Macro** button directly under the cursor for immediate, zero-travel emergency aborts.
 * **Input Validation:** Prevents execution until valid, positive dimensions are entered.
 * **`G38.2` Contact Safety Guards:** Automatically triggers GRBL alarm and halts motion if contact is not made within the search margin, preventing runaway travel.
+
+---
+
+## ⚡ Configurable M7 / M8 Accessory Output Labels
+
+Added user-configurable labels and presets for M7 and M8 accessory relay outputs to match custom CNC post-processors and shop setups:
+
+* **Settings Integration:** Configurable under **Settings $\rightarrow$ Accessory Outputs**.
+* **Preset Dropdowns:** Select from common presets (`Mist`, `Flood`, `Air`, `Vacuum`, `Dust Collector`, `Coolant`, `Aux 1`, `Aux 2`, `Laser Air Assist`, `Custom`).
+* **Custom Text Inputs:** Selecting `Custom` reveals a dedicated text field for any user-defined label.
+* **Dynamic UI Controls:** Main interface coolant/accessory buttons dynamically update their text, tooltips, and contextual icons (fan, wind, water, bolt) in real-time.
+* **Workspace Persistence:** Custom labels persist across restarts within the workspace state.
 
