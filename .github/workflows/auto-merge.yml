@@ -41,13 +41,13 @@ jobs:
                   ${{ steps.merge_step.outputs.new_commits > 0 && format('🤖 **I''ve successfully merged master into dev.**
                   The daily sync completed. **{0}** new commit(s) from `master` have been merged into `dev`.
 
-                  🔗 [View the merge commit](https://github.com/Sienci-Labs/gsender/commit/{1})
-                  🔗 [View the dev branch](https://github.com/Sienci-Labs/gsender/tree/dev)
-                  🔗 [View the master branch](https://github.com/Sienci-Labs/gsender/tree/master)', steps.merge_step.outputs.new_commits, steps.merge_step.outputs.merge_sha) || '😴 **Everything Up to Date**
+                  🔗 [View the latest merge commit](<https://github.com/Sienci-Labs/gsender/commit/{1}>)
+                  🔗 [View the dev branch](<https://github.com/Sienci-Labs/gsender/tree/dev>)
+                  🔗 [View the master branch](<https://github.com/Sienci-Labs/gsender>)', steps.merge_step.outputs.new_commits, steps.merge_step.outputs.merge_sha) || '😴 **Everything Up to Date**
                   The daily sync checked `master` and `dev`, but no new changes were found. Branches are already in sync.
 
-                  🔗 [View the dev branch](https://github.com/Sienci-Labs/gsender/tree/dev)
-                  🔗 [View the master branch](https://github.com/Sienci-Labs/gsender/tree/master)' }}
+                  🔗 [View the dev branch](<https://github.com/Sienci-Labs/gsender/tree/dev>)
+                  🔗 [View the master branch](<https://github.com/Sienci-Labs/gsender>)' }}
             - name: Notify Discord about the failed merge
               if: failure()
               uses: appleboy/discord-action@v1.2.0
