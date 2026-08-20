@@ -39,6 +39,23 @@ describe("buildGrantFromScan", () => {
 	});
 });
 
+describe("buildGrantFromScan — viewer topic", () => {
+	it("grants the 'viewer' push topic for a 'viewer' import", () => {
+		const { wire } = buildGrantFromScan(["viewer"]);
+		expect(wire.topics).toEqual(["viewer"]);
+	});
+
+	it("grants the 'viewer' push topic for a 'useVisualizerPick' import", () => {
+		const { wire } = buildGrantFromScan(["useVisualizerPick"]);
+		expect(wire.topics).toEqual(["viewer"]);
+	});
+
+	it("grants machine:busy:set when importing the 'gsender' aggregate client", () => {
+		const { wire } = buildGrantFromScan(["gsender"]);
+		expect(wire.requestTypes).toContain("machine:busy:set");
+	});
+});
+
 describe("toRuntimeCapabilities", () => {
 	it("builds Sets from wire arrays", () => {
 		const capabilities = toRuntimeCapabilities({

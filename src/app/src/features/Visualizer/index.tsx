@@ -23,6 +23,7 @@
 
 import { Tooltip } from "app/components/Tooltip";
 import { Widget } from "app/components/Widget";
+import PluginVisualizerOverlayHost from "app/features/Plugins/components/PluginVisualizerOverlayHost";
 import { WorkspaceSelector } from "app/features/WorkspaceSelector/index.tsx";
 import combokeys from "app/lib/combokeys";
 import controller from "app/lib/controller";
@@ -32,11 +33,6 @@ import { getVisualizerTheme } from "app/lib/getVisualizerTheme";
 import log from "app/lib/log";
 import * as WebGL from "app/lib/three/WebGL";
 import { toast } from "app/lib/toaster";
-import {
-	TOASTER_LONG,
-	TOASTER_WARNING,
-	Toaster,
-} from "app/lib/toaster/ToasterLib";
 import store from "app/store";
 import { store as reduxStore } from "app/store/redux";
 import {
@@ -48,7 +44,7 @@ import _ from "lodash";
 import debounce from "lodash/debounce";
 import get from "lodash/get";
 import includes from "lodash/includes";
-import { Crosshair, FrownIcon } from "lucide-react";
+import { FrownIcon } from "lucide-react";
 import posthog from "posthog-js";
 import PropTypes from "prop-types";
 import pubsub from "pubsub-js";
@@ -110,15 +106,6 @@ const VIEWCUBE_CONTROL_GAP_PX = 12;
 const LIGHTWEIGHT_TOGGLE_POSITION = {
 	left: VIEWCUBE_OFFSET_PX + VIEWCUBE_SIZE_PX / 2,
 	bottom: VIEWCUBE_OFFSET_PX + VIEWCUBE_SIZE_PX + VIEWCUBE_CONTROL_GAP_PX,
-};
-// "Move To Here" toggle sits stacked directly above the lightweight toggle.
-const FLOATING_BUTTON_SIZE_PX = 44; // h-11 / w-11
-const MOVE_TO_HERE_TOGGLE_POSITION = {
-	left: LIGHTWEIGHT_TOGGLE_POSITION.left,
-	bottom:
-		LIGHTWEIGHT_TOGGLE_POSITION.bottom +
-		FLOATING_BUTTON_SIZE_PX +
-		VIEWCUBE_CONTROL_GAP_PX,
 };
 
 class Visualizer extends Component {
@@ -589,21 +576,6 @@ class Visualizer extends Component {
 			toFreeView: () => {
 				this.setState({ cameraPosition: "Free" });
 			},
-			// Arm/disarm "Move To Here": pressing-and-holding a spot in the
-			// viewport rapids the spindle there. Arming pins the camera to the
-			// Top view so the click maps cleanly onto the XY work plane.
-			toggleMoveToHere: () => {
-				this.setState((state) => {
-					const moveToHere = !state.moveToHere;
-					return {
-						moveToHere,
-						cameraPosition: moveToHere ? "Top" : state.cameraPosition,
-					};
-				});
-			},
-			disableMoveToHere: () => {
-				this.setState({ moveToHere: false });
-			},
 		},
 		handleLiteModeToggle: () => {
 			const { liteMode, liteOption } = this.state;
@@ -915,7 +887,6 @@ class Visualizer extends Component {
 			},
 			cameraMode: this.config.get("cameraMode", CAMERA_MODE_PAN),
 			cameraPosition: "3D", // 'Top', '3D', 'Front', 'Left', 'Right'
-			moveToHere: false, // "Move To Here" placement mode is armed
 			isAgitated: false, // Defaults to false
 			currentTheme: getVisualizerTheme(),
 			currentTab: 0,
@@ -1656,34 +1627,10 @@ class Visualizer extends Component {
 
 						{!showVisualizer && webGLAvailable && <VisualizerPlaceholder />}
 
-						{state.isConnected && (
-							<Tooltip
-								content="Move To Here: press and hold a spot to move the spindle there"
-								side="top"
-							>
-								<button
-									type="button"
-									style={MOVE_TO_HERE_TOGGLE_POSITION}
-									className={cx(
-										"absolute z-[9999] inline-flex h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full border bg-dark-darker/70 shadow-[0_10px_30px_rgba(0,_0,_0,_0.25)] transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-dark-darker active:scale-[0.98] active:bg-dark-darker/85 mb-5",
-										{
-											"border-[rgba(96,_165,_250,_0.95)] text-[rgba(96,_165,_250,_0.95)] shadow-[0_0_0_1px_rgba(96,_165,_250,_0.35),0_10px_30px_rgba(0,_0,_0,_0.35)] hover:border-[rgba(96,_165,_250,_0.95)] hover:text-[rgba(96,_165,_250,_0.95)] hover:shadow-[0_0_0_1px_rgba(96,_165,_250,_0.45),0_12px_32px_rgba(0,_0,_0,_0.4)]":
-												state.moveToHere,
-											"border-gray-400/40 text-gray-300 hover:border-gray-200/70 hover:text-gray-100 hover:shadow-[0_12px_32px_rgba(0,_0,_0,_0.35)]":
-												!state.moveToHere,
-										},
-									)}
-									aria-label="Move To Here"
-									aria-pressed={state.moveToHere}
-									onClick={() => actions.camera.toggleMoveToHere()}
-								>
-									<Crosshair
-										aria-hidden="true"
-										className="pointer-events-none h-5 w-5 shrink-0"
-									/>
-								</button>
-							</Tooltip>
-						)}
+						<PluginVisualizerOverlayHost
+							baseBottomPx={LIGHTWEIGHT_TOGGLE_POSITION.bottom}
+							leftPx={LIGHTWEIGHT_TOGGLE_POSITION.left}
+						/>
 
 						<Tooltip content={liteModeActionLabel} side="top">
 							<button
