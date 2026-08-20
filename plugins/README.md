@@ -20,6 +20,7 @@ Then restart gSender.
 | `react-ts-app/` | React + TypeScript + Vite | React hooks — `useWorkspaceState`, `useTypedSelector` |
 | `example-viewer/` | Plain JS + Vite | Embedded G-code preview — `GCodeViewer`, `gsender.gcode.loadToVisualizer` |
 | `basic-cam/` | React + TypeScript + Vite + Tailwind | Full reference CAM plugin — combines all SDK entry points |
+| `corner-finder/` | React + TypeScript + Vite | Host visualizer bridge — `gsender.viewer.*` (picking, camera, overlay markers) + `machine.setBusy` |
 
 Each folder must contain `gsender-plugin.json` and a `ui/` directory with the built SPA entry file.
 
@@ -202,10 +203,13 @@ contribution in `gsender-plugin.json`:
 ```json
 {
 	"contributions": [
-		{ "slot": "visualizer-overlay", "label": "Corner Finder", "icon": "target" }
+		{ "slot": "visualizer-overlay", "label": "Corner Finder", "icon": "🎯" }
 	]
 }
 ```
+
+`icon` is rendered as-is inside a small circular button (not looked up against an icon set) — use
+a single emoji, not a word.
 
 The host shows a floating toggle button (using your `label`/`icon`) on the main
 visualizer; clicking it opens the plugin panel docked over the canvas, where your

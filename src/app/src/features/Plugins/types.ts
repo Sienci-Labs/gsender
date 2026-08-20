@@ -67,14 +67,16 @@ export type PluginsResponse = {
 };
 
 export type PluginPermissionsType =
-	"machine:read"
+	| "machine:read"
 	| "machine:write"
 	| "visualizer:load"
+	| "viewer:camera"
+	| "viewer:draw"
 	| "workspace:read"
 	| "redux:read"
 	| "local-fonts";
 
-export type PluginTopicsType = "workspace" | "redux"
+export type PluginTopicsType = "workspace" | "redux";
 
 export type PluginBridgeRequestType =
 	| "machine:get:context"
@@ -139,6 +141,7 @@ export const permissionsMap = new Map<string, PluginPermissionsType[]>([
 	],
 	["machine", ["machine:read", "machine:write"]],
 	["gcode", ["visualizer:load"]],
+	["viewer", ["viewer:camera", "viewer:draw"]],
 	["workspace", ["workspace:read"]],
 	["getWorkspaceState", ["workspace:read"]],
 	["subscribeWorkspaceState", ["workspace:read"]],
@@ -156,9 +159,17 @@ export const requestTypesMap = new Map<string, PluginBridgeRequestType[]>([
 		[
 			"machine:get:context",
 			"machine:command",
+			"machine:busy:set",
 			"gcode:load:to:visualizer",
 			"workspace:get:state",
 			"redux:get:state",
+			"viewer:screen-to-world",
+			"viewer:world-to-screen",
+			"viewer:camera:set",
+			"viewer:camera:lock-rotate",
+			"viewer:pick:arm",
+			"viewer:pick:disarm",
+			"viewer:overlay:set",
 		],
 	],
 	[
@@ -166,13 +177,33 @@ export const requestTypesMap = new Map<string, PluginBridgeRequestType[]>([
 		[
 			"machine:get:context",
 			"machine:command",
+			"machine:busy:set",
 			"gcode:load:to:visualizer",
 			"workspace:get:state",
 			"redux:get:state",
+			"viewer:screen-to-world",
+			"viewer:world-to-screen",
+			"viewer:camera:set",
+			"viewer:camera:lock-rotate",
+			"viewer:pick:arm",
+			"viewer:pick:disarm",
+			"viewer:overlay:set",
 		],
 	],
-	["machine", ["machine:get:context", "machine:command"]],
+	["machine", ["machine:get:context", "machine:command", "machine:busy:set"]],
 	["gcode", ["gcode:load:to:visualizer"]],
+	[
+		"viewer",
+		[
+			"viewer:screen-to-world",
+			"viewer:world-to-screen",
+			"viewer:camera:set",
+			"viewer:camera:lock-rotate",
+			"viewer:pick:arm",
+			"viewer:pick:disarm",
+			"viewer:overlay:set",
+		],
+	],
 	["workspace", ["workspace:get:state"]],
 	["getWorkspaceState", ["workspace:get:state"]],
 	["redux", ["redux:get:state"]],
@@ -185,6 +216,8 @@ export const topicsMap = new Map<string, PluginBridgeTopic>([
 	["subscribeSelector", "redux"],
 	["useWorkspaceState", "workspace"],
 	["useTypedSelector", "redux"],
+	["viewer", "viewer"],
+	["useVisualizerPick", "viewer"],
 ]);
 
 // the import specifiers the permission scanner looks for in a plugin's built bundle.
