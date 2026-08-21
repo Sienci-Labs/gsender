@@ -64,7 +64,15 @@ export interface ProbeCycleStep {
  */
 export const MAX_CONSECUTIVE_MISMATCHES = 3;
 
-const PRB_PATTERN = /\[PRB:(-?[\d.]+),(-?[\d.]+),(-?[\d.]+):([01])\]/;
+/*
+ * grblHAL reports every configured axis, so the coordinate list is not always
+ * three long -- a machine with a fourth motor emits `[PRB:x,y,z,a:1]`. Anchoring
+ * the result flag directly after Z meant no response matched on those machines:
+ * every point timed out and the cycle died on point one with the tool left at
+ * the trigger position. gSender's own parameter parser accepts x,y,z,a,b,c, so
+ * trailing axes are consumed and ignored here rather than assumed absent.
+ */
+const PRB_PATTERN = /\[PRB:(-?[\d.]+),(-?[\d.]+),(-?[\d.]+)(?:,-?[\d.]+)*:([01])\]/;
 
 /**
  * Pull a probe report out of a serial line, or null if it is not one.

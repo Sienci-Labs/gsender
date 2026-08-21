@@ -73,6 +73,38 @@ describe('parseProbeResponse', () => {
             expect(parseProbeResponse(line)).toBeNull();
         }
     });
+
+    /*
+     * grblHAL reports every configured axis, not just three. A machine with a
+     * rotary or a fourth motor emits `[PRB:x,y,z,a:1]`, and the pattern used to
+     * require the result flag immediately after Z -- so on those machines no
+     * response ever matched, every point timed out, and the cycle died on point
+     * one with the tool left at the trigger position.
+     *
+     * Observed on a Sienci AltMill (SLB, grblHAL), which reports four axes:
+     *   [PRB:446.150,-888.491,-17.655,0.000:1]
+     *
+     * gSender's own parser accepts up to six (x,y,z,a,b,c), so we match that.
+     */
+    it('reads a four-axis report', () => {
+        expect(parseProbeResponse('[PRB:446.150,-888.491,-17.655,0.000:1]')).toEqual({
+            x: 446.15,
+            y: -888.491,
+            z: -17.655,
+            success: true,
+        });
+    });
+
+    it('reads a six-axis report', () => {
+        expect(
+            parseProbeResponse('[PRB:1.000,2.000,3.000,4.000,5.000,6.000:1]'),
+        ).toEqual({ x: 1, y: 2, z: 3, success: true });
+    });
+
+    it('reads the failure flag on a four-axis report', () => {
+        const parsed = parseProbeResponse('[PRB:1.000,2.000,3.000,0.000:0]');
+        expect(parsed?.success).toBe(false);
+    });
 });
 
 describe('beginProbeCycle', () => {
