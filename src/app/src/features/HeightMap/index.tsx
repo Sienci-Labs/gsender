@@ -17,6 +17,7 @@ import {
     Trash2,
     Square,
     AlertTriangle,
+    X,
 } from 'lucide-react';
 
 import store from 'app/store';
@@ -160,6 +161,29 @@ const HeightMapTool: React.FC = () => {
     const [state, setState] = useState<HeightMapState>(getInitialState());
     const [probeStatus, setProbeStatus] = useState<'idle' | 'probing' | 'complete' | 'error'>('idle');
     const [warnings, setWarnings] = useState<string[]>([]);
+
+    // Zero-first reminder dismissal. sessionStorage rather than the persisted
+    // store on purpose: dismissing it should hold while the app is open --
+    // across navigating away and back -- but return on restart, so a fresh
+    // session is always reminded before it probes.
+    const ZERO_REMINDER_KEY = 'heightMap.zeroReminderDismissed';
+    const [zeroReminderDismissed, setZeroReminderDismissed] = useState<boolean>(
+        () => {
+            try {
+                return sessionStorage.getItem(ZERO_REMINDER_KEY) === 'true';
+            } catch {
+                return false;
+            }
+        },
+    );
+    const dismissZeroReminder = () => {
+        try {
+            sessionStorage.setItem(ZERO_REMINDER_KEY, 'true');
+        } catch {
+            // sessionStorage unavailable -- dismiss for this mount at least.
+        }
+        setZeroReminderDismissed(true);
+    };
 
     // State for tracking height map application and generated G-code
     const [transformedGcode, setTransformedGcode] = useState<string | null>(null);
@@ -1056,18 +1080,31 @@ const HeightMapTool: React.FC = () => {
                     {/* Zero-first reminder. The map is measured relative to work
                         zero, so the datum must be set on the stock surface before
                         probing -- otherwise the surface is referenced to the wrong
-                        origin and every compensated cut is off by that error. */}
-                    <div className="flex items-start gap-2 rounded border border-amber-400 bg-amber-50 p-2 text-sm text-amber-800 dark:border-amber-500/60 dark:bg-amber-500/10 dark:text-amber-300">
-                        <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
-                        <div>
-                            <b>Set your work zero first.</b> Zero{' '}
-                            <b>Z on the stock surface</b> before probing — ideally
-                            zero <b>X, Y and Z</b> so the grid lines up with your
-                            program. The height map is measured relative to work
-                            zero; probing before it is set (or re-zeroing afterward)
-                            references the surface to the wrong origin.
+                        origin and every compensated cut is off by that error.
+                        Dismissable for the session (see zeroReminderDismissed). */}
+                    {!zeroReminderDismissed && (
+                        <div className="flex items-start gap-2 rounded border border-amber-400 bg-amber-50 p-2 text-sm text-amber-800 dark:border-amber-500/60 dark:bg-amber-500/10 dark:text-amber-300">
+                            <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
+                            <div className="flex-1">
+                                <b>Set your work zero first.</b> Zero{' '}
+                                <b>Z on the stock surface</b> before probing —
+                                ideally zero <b>X, Y and Z</b> so the grid lines up
+                                with your program. The height map is measured
+                                relative to work zero; probing before it is set (or
+                                re-zeroing afterward) references the surface to the
+                                wrong origin.
+                            </div>
+                            <button
+                                type="button"
+                                onClick={dismissZeroReminder}
+                                aria-label="Dismiss reminder"
+                                title="Dismiss until restart"
+                                className="shrink-0 -mr-0.5 -mt-0.5 rounded p-0.5 text-amber-700 hover:bg-amber-200/60 dark:text-amber-300 dark:hover:bg-amber-500/20"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
                         </div>
-                    </div>
+                    )}
 
                     {/* Grid Bounds */}
                     <div className="border rounded p-2 dark:border-gray-600">
