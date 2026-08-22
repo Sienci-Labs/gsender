@@ -1001,6 +1001,15 @@ const HeightMapTool: React.FC = () => {
     const inputStyle =
         'text-lg font-light z-0 align-center text-center text-blue-500 pl-1 pr-1 w-full';
 
+    // The paired X/Y range inputs are only ~79px wide -- too narrow to show a
+    // 7-character value like -32.498 AND an inline unit suffix without one
+    // overlapping the other. The suffix is dropped here and the unit shown once
+    // per row instead (see the range rows below); the unit is also present on
+    // the Edge Inset and Grid Spacing rows in the same card, so context is not
+    // lost.
+    const rangeInputStyle =
+        'text-lg font-light z-0 text-center text-blue-500 px-1 w-full';
+
     return (
         <div className="bg-white dark:bg-transparent dark:text-white w-full h-full flex flex-col gap-2">
             {/* Double-Apply Warning Dialog */}
@@ -1047,11 +1056,10 @@ const HeightMapTool: React.FC = () => {
                     <div className="border rounded p-2 dark:border-gray-600">
                         <div className="text-sm font-medium mb-1">Grid Bounds</div>
                         <InputArea label="X Range">
-                            <div className="grid grid-cols-[1fr_16px_1fr_auto] gap-1 col-span-3 items-center">
+                            <div className="grid grid-cols-[1fr_16px_1fr_auto_auto] gap-1 col-span-3 items-center">
                                 <ControlledInput
                                     type="number"
-                                    suffix={units}
-                                    className={inputStyle}
+                                    className={rangeInputStyle}
                                     value={state.minX}
                                     immediateOnChange
                                     onChange={(e) =>
@@ -1061,14 +1069,16 @@ const HeightMapTool: React.FC = () => {
                                 <span className="text-center text-sm">-</span>
                                 <ControlledInput
                                     type="number"
-                                    suffix={units}
-                                    className={inputStyle}
+                                    className={rangeInputStyle}
                                     value={state.maxX}
                                     immediateOnChange
                                     onChange={(e) =>
                                         updateField('maxX', Number(e.target.value))
                                     }
                                 />
+                                <span className="text-xs text-gray-500 dark:text-white px-0.5">
+                                    {units}
+                                </span>
                                 <Tooltip content="Use current X position for Max">
                                     <button
                                         className="text-xs px-1 py-0.5 bg-gray-200 dark:bg-gray-700 rounded"
@@ -1081,11 +1091,10 @@ const HeightMapTool: React.FC = () => {
                         </InputArea>
 
                         <InputArea label="Y Range">
-                            <div className="grid grid-cols-[1fr_16px_1fr_auto] gap-1 col-span-3 items-center">
+                            <div className="grid grid-cols-[1fr_16px_1fr_auto_auto] gap-1 col-span-3 items-center">
                                 <ControlledInput
                                     type="number"
-                                    suffix={units}
-                                    className={inputStyle}
+                                    className={rangeInputStyle}
                                     value={state.minY}
                                     immediateOnChange
                                     onChange={(e) =>
@@ -1095,14 +1104,16 @@ const HeightMapTool: React.FC = () => {
                                 <span className="text-center text-sm">-</span>
                                 <ControlledInput
                                     type="number"
-                                    suffix={units}
-                                    className={inputStyle}
+                                    className={rangeInputStyle}
                                     value={state.maxY}
                                     immediateOnChange
                                     onChange={(e) =>
                                         updateField('maxY', Number(e.target.value))
                                     }
                                 />
+                                <span className="text-xs text-gray-500 dark:text-white px-0.5">
+                                    {units}
+                                </span>
                                 <Tooltip content="Use current Y position for Max">
                                     <button
                                         className="text-xs px-1 py-0.5 bg-gray-200 dark:bg-gray-700 rounded"

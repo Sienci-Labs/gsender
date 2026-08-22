@@ -61,7 +61,11 @@ const ToolpathVisualizer: React.FC<ToolpathVisualizerProps> = ({ gcode }) => {
 
     return (
         <div
-            className="flex flex-col h-full items-center justify-center border border-gray-200 rounded-md dark:border-gray-600 overflow-hidden"
+            // `relative` anchors the CameraDisplay cube, which is positioned
+            // `absolute bottom-5 left-5`. The primary visualizer wraps it in a
+            // positioned div; the secondary does not, so without this the cube
+            // escapes to a distant ancestor and floats off the preview pane.
+            className="relative flex flex-col h-full items-center justify-center border border-gray-200 rounded-md dark:border-gray-600 overflow-hidden"
             id={SURFACING_VISUALIZER_CONTAINER_ID}
         >
             <Visualizer isSecondary />
