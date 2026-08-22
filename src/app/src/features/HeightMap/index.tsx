@@ -16,6 +16,7 @@ import {
     FolderOpen,
     Trash2,
     Square,
+    AlertTriangle,
 } from 'lucide-react';
 
 import store from 'app/store';
@@ -1051,6 +1052,22 @@ const HeightMapTool: React.FC = () => {
                         <b>Height Map Tool:</b> Compensate for uneven stock surfaces by
                         probing a grid and applying Z-offset adjustments to your G-code.
                     </p>
+
+                    {/* Zero-first reminder. The map is measured relative to work
+                        zero, so the datum must be set on the stock surface before
+                        probing -- otherwise the surface is referenced to the wrong
+                        origin and every compensated cut is off by that error. */}
+                    <div className="flex items-start gap-2 rounded border border-amber-400 bg-amber-50 p-2 text-sm text-amber-800 dark:border-amber-500/60 dark:bg-amber-500/10 dark:text-amber-300">
+                        <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
+                        <div>
+                            <b>Set your work zero first.</b> Zero{' '}
+                            <b>Z on the stock surface</b> before probing — ideally
+                            zero <b>X, Y and Z</b> so the grid lines up with your
+                            program. The height map is measured relative to work
+                            zero; probing before it is set (or re-zeroing afterward)
+                            references the surface to the wrong origin.
+                        </div>
+                    </div>
 
                     {/* Grid Bounds */}
                     <div className="border rounded p-2 dark:border-gray-600">
