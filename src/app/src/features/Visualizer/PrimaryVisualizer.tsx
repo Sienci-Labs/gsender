@@ -11,7 +11,7 @@ import Rendering from './Rendering';
 import SoftLimitsWarningArea from './SoftLimitsWarningArea';
 import CameraDisplay from './CameraDisplay/CameraDisplay';
 import { WorkspaceSelector } from 'app/features/WorkspaceSelector/index.tsx';
-import { FaFeatherAlt } from 'react-icons/fa';
+import { FaFeatherAlt, FaCrosshairs } from 'react-icons/fa';
 import cx from 'classnames';
 import { Tooltip } from 'app/components/Tooltip';
 import GcodeEditor from './GcodeEditor';
@@ -101,6 +101,7 @@ const PrimaryVisualizer = ({
                         <VisualizerWrapper
                             show={showVisualizer}
                             cameraPosition={cameraPosition}
+                            followTool={state.followTool}
                             ref={visualizerRef}
                             state={state}
                             actions={actions}
@@ -128,6 +129,19 @@ const PrimaryVisualizer = ({
                                     })}
                                     onClick={() =>
                                         actions.handleLiteModeToggle()
+                                    }
+                                />
+                            </button>
+                        </Tooltip>
+                        <Tooltip content="Follow tool with camera">
+                            <button className="bg-gray-600 bg-opacity-50 rounded-full p-3.5">
+                                <FaCrosshairs
+                                    className={cx('cursor-pointer', {
+                                        'text-gray-400': !state.followTool,
+                                        'text-green-400': state.followTool,
+                                    })}
+                                    onClick={() =>
+                                        actions.camera.toggleFollowTool()
                                     }
                                 />
                             </button>

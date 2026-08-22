@@ -142,6 +142,7 @@ class VisualizerWrapper extends Component {
             state,
             show,
             cameraPosition,
+            followTool,
             actions,
             containerID,
             isSecondary,
@@ -160,6 +161,7 @@ class VisualizerWrapper extends Component {
                     <Visualizer
                         show={show && show3D}
                         cameraPosition={cameraPosition}
+                        followTool={followTool}
                         ref={(visualizerRef) => {
                             this.threeVisualizer = visualizerRef;
                             this.visualizer = visualizerRef;
