@@ -72,6 +72,9 @@ npm run build
 This writes the production bundle to `ui/` (gitignored — build before copying or shipping).
 
 For local dev in this repo you can skip copying: gSender loads `plugins/` directly when `NODE_ENV=development`.
+`npm run dev`/`npm run dev:electron` also do this build for you automatically on startup (see
+"Local development" below) — the manual steps above are for building a single plugin on demand
+(e.g. after `npm install`ing a new dependency) without restarting the whole dev server.
 
 ### Starting from a template
 
@@ -92,6 +95,15 @@ When gSender runs in development (`NODE_ENV=development`, e.g. `npm run dev` or
 Repo plugins take precedence when two share the same `id`. You can point the
 server at additional folders with the `GSENDER_PLUGINS_DIRS` env var (OS path
 list — `:`-separated on macOS/Linux, `;`-separated on Windows).
+
+### Automatic SDK + plugin builds (dev)
+
+`npm run dev` and `npm run dev:electron` both run `npm run prepare-dev-plugins` before 
+starting the server. It builds the plugin SDK if it isn't already built,
+then builds every plugin folder under `plugins/` whose `ui/` output doesn't exist yet.
+
+It won't rebuild, so set `GSENDER_FORCE_PLUGIN_BUILD=1` to force a full rebuild of the
+SDK and every plugin.
 
 ### Live reload (dev)
 

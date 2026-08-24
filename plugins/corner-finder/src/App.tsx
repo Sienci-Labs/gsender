@@ -33,6 +33,7 @@ const App = () => {
 	const [worldFromScreen, setWorldFromScreen] = useState<Point3 | null>(null);
 	const [screenFromWorld, setScreenFromWorld] = useState<Point2 | null>(null);
 	const [pickingEnabled, setPickingEnabled] = useState(true);
+	const [quickLocateWaiting, setQuickLocateWaiting] = useState(false);
 	const [locked, setLocked] = useState(false);
 	const [busy, setBusy] = useState(false);
 	const [status, setStatus] = useState("");
@@ -67,7 +68,7 @@ const App = () => {
 		]);
 	};
 
-	// continuously armed while this panel is open (unless a one-shot flow below
+	// continuously armed while this panel is open (unless quick locate
 	// is borrowing the pick, in which case `pickingEnabled` disables it)
 	const { armed, error } = useVisualizerPick("click", addCorner, {
 		enabled: pickingEnabled,
@@ -98,45 +99,65 @@ const App = () => {
 		}
 	};
 
-	// a one-shot flow using the raw imperative client (not the hook): arm a
-	// single click, drop a marker, snap the camera to top, then dispose
-	const quickLocate = async () => {
+	// arm a single click, drop a marker, snap the camera to top, then dispose
+	const quickLocate = () => {
 		setPickingEnabled(false);
+		setQuickLocateWaiting(true);
 		setStatus("Click a point on the visualizer…");
-		try {
-			const dispose = await viewer.armPick("click", (event) => {
-				if (event.kind !== "pick") {
-					return;
-				}
-				setLastPick({ world: event.world, screen: event.screen });
-				setExtras((prev) => [
-					...prev,
-					{
-						id: `quick-${prev.length}`,
-						x: event.world.x,
-						y: event.world.y,
-						z: event.world.z,
-						shape: "cross",
-						color: "#f0f",
-						label: "quick",
-					},
-				]);
-				void viewer.camera.set("top");
-				dispose();
-				setPickingEnabled(true);
-				setStatus("Located.");
-			});
-		} catch (err) {
-			setStatus(errorMessage(err));
-			setPickingEnabled(true);
-		}
 	};
 
-	// round-trips the last pick's own screen/world pair through both
-	// projection methods — a self-checking demo that doesn't depend on
-	// guessing the host's viewport (the plugin runs in its own iframe, so it
-	// has no reliable way to know the main visualizer's screen coordinates
-	// except from a pick the host already gave us)
+	useEffect(() => {
+		// wait till visualizerPick lets go of the arm (aka arm is false) before doing this
+		// otherwise you will get a deadlock and you won't be able
+		// to put corners or quick locate anymore
+		if (!quickLocateWaiting || armed) {
+			return;
+		}
+		setQuickLocateWaiting(false);
+
+		let cancelled = false;
+
+		(async () => {
+			try {
+				const dispose = await viewer.armPick("click", (event) => {
+					if (event.kind !== "pick") {
+						return;
+					}
+					setLastPick({ world: event.world, screen: event.screen });
+					setExtras((prev) => [
+						...prev,
+						{
+							id: `quick-${prev.length}`,
+							x: event.world.x,
+							y: event.world.y,
+							z: event.world.z,
+							shape: "cross",
+							color: "#f0f",
+							label: "quick",
+						},
+					]);
+					void viewer.camera.set("top");
+					dispose();
+					setPickingEnabled(true);
+					setStatus("Located.");
+				});
+				if (cancelled) {
+					dispose();
+				}
+			} catch (err) {
+				if (!cancelled) {
+					setStatus(errorMessage(err));
+					setPickingEnabled(true);
+				}
+			}
+		})();
+
+		return () => {
+			cancelled = true;
+		};
+	}, [quickLocateWaiting, armed]);
+
+	// round-trips the last pick's own screen/world pair through both projection methods
 	const checkRoundTrip = async () => {
 		if (!lastPick) {
 			return;

@@ -31,8 +31,8 @@ const {
 		(
 			_mode: "click" | "hold",
 			_handler: (event: unknown) => void,
-			_opts?: { enabled?: boolean },
-		) => ({ armed: true, error: null as string | null }),
+			opts?: { enabled?: boolean },
+		) => ({ armed: opts?.enabled !== false, error: null as string | null }),
 	),
 }));
 
@@ -76,7 +76,6 @@ const lastContinuousPickHandler = () => {
 describe("Corner Finder", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
-		useVisualizerPickMock.mockReturnValue({ armed: true, error: null });
 		setOverlay.mockResolvedValue(undefined);
 		screenToWorld.mockResolvedValue({ x: 1, y: 2, z: 0 });
 		worldToScreen.mockResolvedValue({ x: 100, y: 200 });

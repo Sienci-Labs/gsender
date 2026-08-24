@@ -152,6 +152,7 @@ export interface State {
 	};
 	cameraMode: CAMERA_MODES_T;
 	cameraPosition: CAMERA_POSITIONS_T; // 'Top', '3D', 'Front', 'Left', 'Right'
+	cameraPositionNonce: number;
 	isConnected?: boolean; // Injected at render from connection state
 	isAgitated: boolean; // Defaults to false
 	currentTheme: Map<string, string>;

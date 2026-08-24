@@ -139,6 +139,7 @@ const VIEW_MAP: Partial<Record<string, GCodeViewerCameraView>> = {
 interface Props {
 	show: boolean;
 	cameraPosition: CAMERA_POSITIONS_T;
+	cameraPositionNonce: number;
 	state: State;
 	actions: Actions;
 	containerID: string;
@@ -279,7 +280,8 @@ class GcodeViewer extends Component<Props> {
 	}
 
 	componentDidUpdate(prevProps: Props) {
-		if (prevProps.cameraPosition !== this.props.cameraPosition) {
+		// check if nonce is different. if it is, then snap cam
+		if (prevProps.cameraPositionNonce !== this.props.cameraPositionNonce) {
 			this.snapToView();
 		}
 
@@ -1041,17 +1043,28 @@ class GcodeViewer extends Component<Props> {
 
 	drawOverlay() {
 		const svg = this.overlaySvg;
-		if (!svg || !this.viewer3d) {
+		const container = this.containerRef;
+		if (!svg || !this.viewer3d || !container) {
 			return;
 		}
 		while (svg.firstChild) {
 			svg.removeChild(svg.firstChild);
 		}
 		const ns = "http://www.w3.org/2000/svg";
+		// make sure any markers on the visualizer can't escape the visualizer view onto the rest of gsender
+		const bounds = container.getBoundingClientRect();
 
 		for (const marker of this.overlayMarkers) {
 			const s = this.viewer3d.worldToScreen(marker.x, marker.y, marker.z ?? 0);
 			if (!s) {
+				continue;
+			}
+			if (
+				s.x < bounds.left ||
+				s.x > bounds.right ||
+				s.y < bounds.top ||
+				s.y > bounds.bottom
+			) {
 				continue;
 			}
 			const color = marker.color ?? OVERLAY_DEFAULT_COLOR;

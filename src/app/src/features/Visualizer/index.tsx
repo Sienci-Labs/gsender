@@ -559,22 +559,40 @@ class Visualizer extends Component {
 				}
 			},
 			toTopView: () => {
-				this.setState({ cameraPosition: "Top" });
+				this.setState((prev) => ({
+					cameraPosition: "Top",
+					cameraPositionNonce: prev.cameraPositionNonce + 1,
+				}));
 			},
 			to3DView: () => {
-				this.setState({ cameraPosition: "3D" });
+				this.setState((prev) => ({
+					cameraPosition: "3D",
+					cameraPositionNonce: prev.cameraPositionNonce + 1,
+				}));
 			},
 			toFrontView: () => {
-				this.setState({ cameraPosition: "Front" });
+				this.setState((prev) => ({
+					cameraPosition: "Front",
+					cameraPositionNonce: prev.cameraPositionNonce + 1,
+				}));
 			},
 			toLeftSideView: () => {
-				this.setState({ cameraPosition: "Left" });
+				this.setState((prev) => ({
+					cameraPosition: "Left",
+					cameraPositionNonce: prev.cameraPositionNonce + 1,
+				}));
 			},
 			toRightSideView: () => {
-				this.setState({ cameraPosition: "Right" });
+				this.setState((prev) => ({
+					cameraPosition: "Right",
+					cameraPositionNonce: prev.cameraPositionNonce + 1,
+				}));
 			},
 			toFreeView: () => {
-				this.setState({ cameraPosition: "Free" });
+				this.setState((prev) => ({
+					cameraPosition: "Free",
+					cameraPositionNonce: prev.cameraPositionNonce + 1,
+				}));
 			},
 		},
 		handleLiteModeToggle: () => {
@@ -887,6 +905,8 @@ class Visualizer extends Component {
 			},
 			cameraMode: this.config.get("cameraMode", CAMERA_MODE_PAN),
 			cameraPosition: "3D", // 'Top', '3D', 'Front', 'Left', 'Right'
+			cameraPositionNonce: 0, // tracks how many repeat camera view requests have been made
+			// so that it can snap camera even if it's already in that view
 			isAgitated: false, // Defaults to false
 			currentTheme: getVisualizerTheme(),
 			currentTab: 0,
@@ -1577,6 +1597,7 @@ class Visualizer extends Component {
 						<GcodeViewer
 							show={showVisualizer}
 							cameraPosition={state.cameraPosition}
+							cameraPositionNonce={state.cameraPositionNonce}
 							ref={setVisualizerRef}
 							state={state}
 							actions={actions}
@@ -1610,6 +1631,7 @@ class Visualizer extends Component {
 							<GcodeViewer
 								show={showVisualizer}
 								cameraPosition={state.cameraPosition}
+								cameraPositionNonce={state.cameraPositionNonce}
 								ref={setVisualizerRef}
 								state={state}
 								actions={actions}
