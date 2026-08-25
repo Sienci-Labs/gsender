@@ -241,6 +241,14 @@ const appMain = () => {
 				route,
 				serveStatic(asset.path, {
 					maxAge: asset.maxAge,
+					setHeaders: (res, filePath) => {
+						// index.html isn't content-hashed like the JS/CSS chunks it
+						// references, so it must never be cached long-term or a stale
+						// entry point can keep loading a stale bundle indefinitely.
+						if (path.basename(filePath) === "index.html") {
+							res.setHeader("Cache-Control", "no-cache");
+						}
+					},
 				}),
 			);
 		});
