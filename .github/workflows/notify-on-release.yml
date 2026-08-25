@@ -1,0 +1,24 @@
+name: Notify on Release in Discord
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch: # Allow manual triggering of the workflow when needed
+
+jobs:
+  notify-on-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Notify on Release in Discord
+        uses: appleboy/discord-action@v1.2.0
+        with:
+          webhook_url: ${{ secrets.DISCORD_GSENDER_NOTIFICATIONS_WEBHOOK_URL }}
+          message: |
+            🤖 **A new release has been published:** ${GITHUB_REF_NAME}
+            Release URL: https://github.com/Sienci-Labs/gsender/releases/tag/${GITHUB_REF_NAME}
+            Release Notes: ${GITHUB_RELEASE_BODY}
+            Release Assets: ${GITHUB_RELEASE_ASSETS}
+            Release Assets URL: https://github.com/Sienci-Labs/gsender/releases/tag/${GITHUB_REF_NAME}
+            Release Assets URL: https://github.com/Sienci-Labs/gsender/releases/tag/${GITHUB_REF_NAME}
