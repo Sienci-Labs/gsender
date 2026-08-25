@@ -3,7 +3,16 @@ name: Notify on Release in Discord
 on:
   release:
     types: [published]
-  workflow_dispatch: # Allow manual triggering of the workflow when needed
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release Tag (e.g., v1.2.3)'
+        required: true
+        default: 'v1.0.0-test'
+      release_body:
+        description: 'Release Notes / Description'
+        required: false
+        default: 'This is a manual test of the Discord notification system.'
 
 jobs:
   notify-on-release:
