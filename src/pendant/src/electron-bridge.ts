@@ -16,6 +16,7 @@ interface PendantAPI {
 	getHost: () => Promise<string | undefined>;
 	pickGcodeFile: () => Promise<GcodeFilePayload | undefined>;
 	readGcodeFile: (path: string) => Promise<GcodeFilePayload | undefined>;
+	quitApp: () => void;
 }
 
 declare global {
@@ -45,4 +46,9 @@ export async function readGcodeFile(
 	path: string,
 ): Promise<GcodeFilePayload | undefined> {
 	return api()?.readGcodeFile(path);
+}
+
+/** Quits the Electron app (pendant binary or desktop app embedding the pendant view). */
+export function quitApp(): void {
+	api()?.quitApp();
 }

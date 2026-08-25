@@ -2,8 +2,11 @@ import ConnectionWidget from "./ConnectionWidget";
 import { cancelJog } from "app/features/Jogging/utils/Jogging";
 import { useTypedSelector } from "app/hooks/useTypedSelector";
 import type { RootState } from "app/store/redux";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import type { ComponentType } from "react";
+import { useLongPress } from "use-long-press";
+import { Confirm } from "app/components/ConfirmationDialog/ConfirmationDialogLib.ts";
+import { isElectron, quitApp } from "../electron-bridge";
 import {
 	Circle,
 	CircleCheck,
@@ -328,8 +331,82 @@ const STATE_BADGES: Record<string, BadgeConfig> = {
 	},
 };
 
+const QUIT_HOLD_MS = 1000;
+const QUIT_RING_RADIUS = 19;
+const QUIT_RING_CIRCUMFERENCE = 2 * Math.PI * QUIT_RING_RADIUS;
+
+function useLogoHoldToQuit() {
+	const [progress, setProgress] = useState(0);
+	const [isHolding, setIsHolding] = useState(false);
+	const startTimeRef = useRef(0);
+	const rafRef = useRef<number | null>(null);
+
+	const stopProgressLoop = useCallback(() => {
+		if (rafRef.current !== null) {
+			cancelAnimationFrame(rafRef.current);
+			rafRef.current = null;
+		}
+	}, []);
+
+	useEffect(() => stopProgressLoop, [stopProgressLoop]);
+
+	const startProgressLoop = useCallback(() => {
+		const update = (now: number) => {
+			const elapsed = now - startTimeRef.current;
+			setProgress(Math.min(elapsed / QUIT_HOLD_MS, 1));
+			rafRef.current = requestAnimationFrame(update);
+		};
+		rafRef.current = requestAnimationFrame(update);
+	}, []);
+
+	const bind = useLongPress(
+		() => {
+			setIsHolding(false);
+			stopProgressLoop();
+			setProgress(0);
+			Confirm({
+				title: "Quit gSender?",
+				content: "Are you sure you want to quit gSender?",
+				confirmLabel: "Quit",
+				cancelLabel: "Cancel",
+				onConfirm: () => quitApp(),
+			});
+		},
+		{
+			threshold: QUIT_HOLD_MS,
+			cancelOnMovement: true,
+			filterEvents: (event) => {
+				if (!isElectron()) {
+					return false;
+				}
+				if ("button" in event && typeof event.button === "number") {
+					return event.button === 0;
+				}
+				return true;
+			},
+			onStart: () => {
+				startTimeRef.current = performance.now();
+				setProgress(0);
+				setIsHolding(true);
+				startProgressLoop();
+			},
+			onCancel: () => {
+				stopProgressLoop();
+				setProgress(0);
+				setIsHolding(false);
+			},
+			onFinish: () => {
+				stopProgressLoop();
+			},
+		},
+	);
+
+	return { bind, progress, isHolding };
+}
+
 export default function PendantTopBar() {
 	const isDark = useIsDark();
+	const { bind, progress, isHolding } = useLogoHoldToQuit();
 	const isConnected = useTypedSelector(
 		(s: RootState) => s.connection.isConnected,
 	);
@@ -388,9 +465,36 @@ export default function PendantTopBar() {
 
 	return (
 		<header className="h-14 px-3 flex items-center gap-3 bg-gray-50 border-b border-gray-200 dark:bg-surface-base dark:border-outline shrink-0 select-none relative drag-region">
-			{/* Logo */}
-			<div className="flex items-center gap-2 shrink-0">
+			{/* Logo — hold to quit */}
+			<div
+				className="relative flex items-center gap-2 shrink-0 no-drag touch-manipulation"
+				onContextMenu={(event) => event.preventDefault()}
+				{...bind()}
+			>
 				<img src={iconRound} alt="gSender" className="w-9 h-9" />
+				{isHolding && (
+					<svg
+						width={44}
+						height={44}
+						viewBox="0 0 44 44"
+						className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none -rotate-90"
+						aria-hidden
+					>
+						<circle
+							cx={22}
+							cy={22}
+							r={QUIT_RING_RADIUS}
+							fill="none"
+							stroke="rgba(220,38,38,0.85)"
+							strokeWidth={3}
+							strokeLinecap="round"
+							strokeDasharray={QUIT_RING_CIRCUMFERENCE}
+							strokeDashoffset={
+								QUIT_RING_CIRCUMFERENCE * (1 - Math.min(Math.max(progress, 0), 1))
+							}
+						/>
+					</svg>
+				)}
 			</div>
 
 			{/* Touch-forward connection widget */}
