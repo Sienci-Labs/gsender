@@ -58,6 +58,7 @@ const defaultState: State = {
         atcEnabled: false,
         safeRetractHeight: 0,
         customDecimalPlaces: 0,
+        portraitMacroBar: false,
         jobsFinished: 0,
         jobsCancelled: 0,
         timeSpentRunning: 0,

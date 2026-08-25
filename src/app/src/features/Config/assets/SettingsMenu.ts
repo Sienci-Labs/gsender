@@ -380,6 +380,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         min: 0,
                         max: 4,
                     },
+                    {
+                        label: 'Portrait macro bar',
+                        key: 'workspace.portraitMacroBar',
+                        description:
+                            'Show a quick-access macro bar at the bottom of the screen in portrait mode.',
+                        type: 'boolean',
+                        defaultValue: false,
+                    },
                 ],
             },
             {

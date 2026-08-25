@@ -7,6 +7,7 @@ import Visualizer from 'app/features/Visualizer';
 import { Column } from '../Column';
 import { ToolArea } from '../ToolArea';
 import { ToolTimelineWrapper } from 'app/features/ATC/components/ToolTimeline';
+import { PortraitMacroBar } from '../PortraitMacroBar';
 
 export const Carve = () => {
     const { pathname } = useLocation();
@@ -15,7 +16,7 @@ export const Carve = () => {
     const shouldHide = pathname !== '/';
 
     return (
-        <div className={cx({ hidden: shouldHide }, 'h-full')}>
+        <div className={cx({ hidden: shouldHide }, 'relative h-full')}>
             <div
                 className={cx(
                     'flex',
@@ -42,21 +43,24 @@ export const Carve = () => {
 
             <div
                 className={cx(
-                    'flex',
+                    'flex flex-col',
                     isPortrait
                         ? 'h-[55%] min-h-0 max-h-[55%]'
                         : 'h-[25%] max-xl:h-[24%] max-xl:max-h-[24%] max-h-[25%] min-h-48 max-xl:min-h-max',
                 )}
             >
-                <div className={isPortrait ? 'w-2/3' : 'w-full'}>
-                    <ToolArea />
-                </div>
-
-                {isPortrait && (
-                    <div className="w-1/3 min-w-[400px]">
-                        <Column />
+                <div className="flex flex-1 min-h-0">
+                    <div className={isPortrait ? 'w-2/3' : 'w-full'}>
+                        <ToolArea />
                     </div>
-                )}
+
+                    {isPortrait && (
+                        <div className="w-1/3 min-w-[400px]">
+                            <Column />
+                        </div>
+                    )}
+                </div>
+                <PortraitMacroBar />
             </div>
         </div>
     );
