@@ -49,7 +49,7 @@ export const Carve = () => {
                         : 'h-[25%] max-xl:h-[24%] max-xl:max-h-[24%] max-h-[25%] min-h-48 max-xl:min-h-max',
                 )}
             >
-                <div className={cx('flex', isPortrait && 'flex-1 min-h-0')}>
+                <div className="flex flex-1 min-h-0">
                     <div className={isPortrait ? 'w-2/3' : 'w-full'}>
                         <ToolArea />
                     </div>
