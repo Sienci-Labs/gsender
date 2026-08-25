@@ -701,8 +701,30 @@ const main = () => {
 
 			//Handle app restart with remote settings
 			ipcMain.on("remoteMode-restart", (event, headlessSettings) => {
-				app.relaunch(); // flags are handled in server/index.js
-				app.exit(0);
+				let didRestart = false;
+				const finishRestart = () => {
+					if (didRestart) return;
+					didRestart = true;
+					app.relaunch(); // flags are handled in server/index.js
+					app.exit(0);
+				};
+
+				// The pendant view runs in native kiosk/fullscreen mode, which can
+				// block the process from exiting cleanly (macOS in particular) unless
+				// we leave fullscreen first. Fall back to a timeout in case the
+				// "leave-full-screen" event never fires.
+				if (
+					window &&
+					!window.isDestroyed() &&
+					(window.isKiosk() || window.isFullScreen())
+				) {
+					window.once("leave-full-screen", finishRestart);
+					window.setKiosk(false);
+					window.setFullScreen(false);
+					setTimeout(finishRestart, 1000);
+				} else {
+					finishRestart();
+				}
 			});
 		} catch (err) {
 			log.error(err);
