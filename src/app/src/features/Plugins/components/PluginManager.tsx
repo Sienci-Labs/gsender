@@ -106,12 +106,20 @@ const PluginManager = () => {
 										<hr></hr>
 									</>
 								)}
-								<p>The plugin {plugin.name} needs the following permissions:</p>
-								<ul>
-									{permissions.map((permission) => (
-										<li key={permission}>- {permission}</li>
-									))}
-								</ul>
+								{permissions.length > 0 ? (
+									<>
+										<p>
+											The plugin {plugin.name} needs the following permissions:
+										</p>
+										<ul>
+											{permissions.map((permission) => (
+												<li key={permission}>- {permission}</li>
+											))}
+										</ul>
+									</>
+								) : (
+									<p>The plugin {plugin.name} does not need any permissions.</p>
+								)}
 								<p>Press Authorize to continue importing this plugin.</p>
 							</div>
 						),
@@ -221,7 +229,9 @@ const PluginManager = () => {
 							className="border border-gray-200 dark:border-outline rounded-md p-4 flex flex-col h-full"
 						>
 							<div className="flex-1">
-								<p className="font-semibold dark:text-content-primary">{plugin.name}</p>
+								<p className="font-semibold dark:text-content-primary">
+									{plugin.name}
+								</p>
 								<p className="text-xs text-gray-500">
 									{plugin.id} · v{plugin.version}
 								</p>
