@@ -26,9 +26,9 @@ jobs:
         with:
           webhook_url: ${{ secrets.DISCORD_GSENDER_NOTIFICATIONS_WEBHOOK_URL }}
           message: |
-            🤖 **A new release has been published:** ${{ github.event.release.tag_name || github.ref_name }}
+            🤖 **A new release has been published:** ${{ github.event.release.tag_name || inputs.tag_name }}
             
-            Link to the release: https://github.com/Sienci-Labs/gsender/releases/tag/${{ github.event.release.tag_name || github.ref_name }}
+            Link to the release: https://github.com{{ github.event.release.tag_name || inputs.tag_name }}
             
             **Release Notes:**
-            ${{ github.event.release.body || 'No release notes provided (Manual Trigger).' }}
+            ${{ github.event.release.body || inputs.release_body }}
