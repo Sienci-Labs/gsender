@@ -4,7 +4,8 @@
 		"lib": ["ES2023"],
 		"module": "ESNext",
 		"skipLibCheck": true,
-		"moduleResolution": "bundler"
+		"moduleResolution": "bundler",
+		"composite": true
 	},
 	"include": ["vite.config.ts"]
 }
