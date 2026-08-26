@@ -21,7 +21,7 @@
  *
  */
 
-import { BrowserWindow } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 import pkg from "../package.json";
 
 // Shared by the standalone pendant binary (pendant-main.js) and the main
@@ -46,6 +46,8 @@ export function createPendantWindow(isDev, preloadPath) {
 		},
 	});
 	require("@electron/remote/main").enable(window.webContents);
+
+	ipcMain.on("pendant:quit-app", () => app.quit());
 
 	window.once("ready-to-show", () => {
 		window.show();

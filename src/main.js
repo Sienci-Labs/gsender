@@ -370,11 +370,59 @@ const main = () => {
 
 			let window;
 			if (usePendantView) {
+				// Registered before loadURL below: the pendant SPA (src/pendant/)
+				// invokes "pendant:get-host" as soon as its bootstrap script runs,
+				// which can happen before loadURL's promise resolves. Mirrors the
+				// standalone pendant binary's handlers in src/pendant-main.js.
+				ipcMain.handle("pendant:get-host", () => {
+					if (!hostInformation.address || !hostInformation.port) {
+						return undefined;
+					}
+					return `${hostInformation.address}:${hostInformation.port}`;
+				});
+
+				ipcMain.handle("pendant:pick-gcode-file", async () => {
+					const result = await dialog.showOpenDialog(window ?? undefined, {
+						properties: ["openFile"],
+						filters: [
+							{
+								name: "G-Code Files",
+								extensions: ["gcode", "gc", "nc", "tap", "cnc", "g"],
+							},
+							{ name: "All Files", extensions: ["*"] },
+						],
+					});
+
+					if (result.canceled || !result.filePaths.length) return undefined;
+
+					const filePath = result.filePaths[0];
+					const content = await fs.promises.readFile(filePath, "utf8");
+					const { size } = await fs.promises.stat(filePath);
+					return {
+						path: filePath,
+						name: path.basename(filePath),
+						size,
+						content,
+					};
+				});
+
+				ipcMain.handle("pendant:read-gcode-file", async (_event, filePath) => {
+					if (typeof filePath !== "string" || !filePath) return undefined;
+					const content = await fs.promises.readFile(filePath, "utf8");
+					const { size } = await fs.promises.stat(filePath);
+					return {
+						path: filePath,
+						name: path.basename(filePath),
+						size,
+						content,
+					};
+				});
+
 				kiosk = true;
 				const pendantUrl = `${url}/pendant`;
 				window = createPendantWindow(
 					false,
-					path.join(__dirname, "electron-app/preload-pendant.js"),
+					path.join(__dirname, "preload-pendant.js"),
 				);
 				window.once("ready-to-show", () => {
 					splashScreen.close();
@@ -701,8 +749,35 @@ const main = () => {
 
 			//Handle app restart with remote settings
 			ipcMain.on("remoteMode-restart", (event, headlessSettings) => {
-				app.relaunch(); // flags are handled in server/index.js
-				app.exit(0);
+				let didRestart = false;
+				const finishRestart = () => {
+					if (didRestart) return;
+					didRestart = true;
+					app.relaunch(); // flags are handled in server/index.js
+					app.exit(0);
+				};
+
+				// The pendant view runs in native kiosk/fullscreen mode, which can
+				// block the process from exiting cleanly (macOS in particular) unless
+				// we leave fullscreen first. Schedule the fallback timeout before
+				// touching kiosk/fullscreen state so a native exception there can't
+				// prevent the restart from ever happening.
+				if (
+					window &&
+					!window.isDestroyed() &&
+					(window.isKiosk() || window.isFullScreen())
+				) {
+					window.once("leave-full-screen", finishRestart);
+					setTimeout(finishRestart, 1000);
+					try {
+						window.setKiosk(false);
+						window.setFullScreen(false);
+					} catch (err) {
+						log.error(`Failed to leave kiosk/fullscreen before restart: ${err}`);
+					}
+				} else {
+					finishRestart();
+				}
 			});
 		} catch (err) {
 			log.error(err);

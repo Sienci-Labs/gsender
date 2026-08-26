@@ -35,6 +35,28 @@ const runYarn = (packageDir, args) => {
 
 const readJson = (filePath) => JSON.parse(fs.readFileSync(filePath, "utf8"));
 
+const isPluginSdkInstallStale = (packageDir) => {
+	const installedPackageJsonPath = path.join(
+		packageDir,
+		"node_modules",
+		"@sienci",
+		"gsender-plugin-sdk",
+		"package.json",
+	);
+	if (!fs.existsSync(installedPackageJsonPath)) {
+		return false;
+	}
+
+	const sdkPackageJsonPath = path.join(PLUGIN_SDK_DIR, "package.json");
+	if (!fs.existsSync(sdkPackageJsonPath)) {
+		return false;
+	}
+
+	const installedVersion = readJson(installedPackageJsonPath).version;
+	const expectedVersion = readJson(sdkPackageJsonPath).version;
+	return installedVersion !== expectedVersion;
+};
+
 const ensureDependenciesInstalled = (packageDir) => {
 	const packageJsonPath = path.join(packageDir, "package.json");
 	if (!fs.existsSync(packageJsonPath)) {
@@ -42,9 +64,29 @@ const ensureDependenciesInstalled = (packageDir) => {
 	}
 
 	const nodeModulesPath = path.join(packageDir, "node_modules");
-	if (!fs.existsSync(nodeModulesPath)) {
+	if (!fs.existsSync(nodeModulesPath) || isPluginSdkInstallStale(packageDir)) {
 		runYarn(packageDir, ["install", "--non-interactive"]);
 	}
+};
+
+const isPluginSdkDistComplete = () => {
+	const packageJsonPath = path.join(PLUGIN_SDK_DIR, "package.json");
+	if (!fs.existsSync(packageJsonPath)) {
+		return true;
+	}
+
+	const { exports: sdkExports } = readJson(packageJsonPath);
+	if (!sdkExports) {
+		return fs.existsSync(PLUGIN_SDK_ENTRY);
+	}
+
+	return Object.values(sdkExports).every((subpathExport) => {
+		const importPath = subpathExport?.import;
+		if (!importPath) {
+			return true;
+		}
+		return fs.existsSync(path.join(PLUGIN_SDK_DIR, importPath));
+	});
 };
 
 const ensurePluginSdkBuilt = () => {
@@ -53,7 +95,7 @@ const ensurePluginSdkBuilt = () => {
 		return;
 	}
 
-	if (fs.existsSync(PLUGIN_SDK_ENTRY)) {
+	if (isPluginSdkDistComplete()) {
 		return;
 	}
 

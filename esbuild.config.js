@@ -167,6 +167,18 @@ function copyPreloadFile(target) {
 	const dest = path.join(destDir, "preload.js");
 	fs.mkdirSync(destDir, { recursive: true });
 	fs.copyFileSync(src, dest);
+
+	// The desktop app also embeds the pendant view (main.js's "use pendant
+	// view as default UI" window), which needs preload-pendant.js alongside
+	// its own preload.js. copyPendantPreloadFile() only copies this into
+	// dist/gsender-pendant (the standalone pendant binary), so it's copied
+	// here too for the desktop build's dist/gsender.
+	const pendantSrc = path.join(
+		__dirname,
+		"src/electron-app/preload-pendant.js",
+	);
+	const pendantDest = path.join(destDir, "preload-pendant.js");
+	fs.copyFileSync(pendantSrc, pendantDest);
 }
 
 function copyPendantPreloadFile(target) {
