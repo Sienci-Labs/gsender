@@ -1,0 +1,60 @@
+name: Auto-merge master into dev
+
+on:
+    schedule:
+        - cron: '0 11 * * 1-5' # Runs at 11:00 AM UTC (7:00 AM EDT / 6:00 AM EST) on weekdays
+    workflow_dispatch: # Allow manual triggering of the workflow when needed
+
+# Allow the workflow to push to the repository
+permissions:
+    contents: write
+
+jobs:
+    sync-master-to-dev:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: "actions/checkout@v7"
+              with:
+                fetch-depth: 0
+
+            - name: Merge master into dev
+              id: merge_step
+              run: |
+                    git config user.name "github-actions[bot]"
+                    git config user.email "41898282+github-actions[bot]@users.noreply.github.com" # GitHub Actions bot email
+
+                    git checkout -B dev origin/dev
+
+                    # Count the number of new commits from master to dev
+                    COMMIT_COUNT=$(git log origin/dev..origin/master --oneline | wc -l)
+                    echo "Found $COMMIT_COUNT new commits to merge."
+                    echo "new_commits=$COMMIT_COUNT" >> $GITHUB_OUTPUT
+
+                    git merge --no-ff origin/master -m "Auto-merge: master → dev [skip ci]" # Skip CI to avoid infinite loops
+                    git push origin dev
+            - name: Notify Discord about the successful merge
+              if: success()
+              uses: appleboy/discord-action@v1.2.0
+              with:
+                webhook_url: ${{ secrets.DISCORD_GSENDER_NOTIFICATIONS_WEBHOOK_URL }}
+                message: |
+                  ${{ steps.merge_step.outputs.new_commits > 0 && format('🤖 **I''ve successfully merged master into dev.**
+                  The daily sync completed. **{0}** new commit(s) from `master` have been merged into `dev`.
+
+                  🔗 [View the merge commit on the dev branch](<https://github.com/Sienci-Labs/gsender/commit/dev/{1}>)
+                  🔗 [View the dev branch](<https://github.com/Sienci-Labs/gsender/tree/dev>)
+                  🔗 [View the master branch](<https://github.com/Sienci-Labs/gsender>)', steps.merge_step.outputs.new_commits, steps.merge_step.outputs.merge_sha) || '😴 **Everything Up to Date**
+                  The daily sync checked `master` and `dev`, but no new changes were found. Branches are already in sync.
+
+                  🔗 [View the dev branch](<https://github.com/Sienci-Labs/gsender/tree/dev>)
+                  🔗 [View the master branch](<https://github.com/Sienci-Labs/gsender>)' }}
+            - name: Notify Discord about the failed merge
+              if: failure()
+              uses: appleboy/discord-action@v1.2.0
+              with:
+                webhook_url: ${{ secrets.DISCORD_GSENDER_NOTIFICATIONS_WEBHOOK_URL }}
+                message: |
+                  🚨 **Auto-merge FAILED**
+                  The daily sync from `master` → `dev` failed, likely due to conflicts. 
+                  Please resolve manually or re-run the workflow if needed.

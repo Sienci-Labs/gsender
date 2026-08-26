@@ -529,7 +529,9 @@ export default function ConnectionWidget() {
 	};
 
 	const status = STATUS_CLASSES[connectionState];
-	const displayPort = truncatePortName(activePort) || activePort;
+	const displayPort = isIPv4(activePort)
+		? activePort
+		: truncatePortName(activePort) || activePort;
 
 	return (
 		<div className="relative">
