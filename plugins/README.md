@@ -59,6 +59,19 @@ Plugins that import the SDK should build with `gsenderPlugin()` from
 SDK README) — it keeps SDK imports scannable and wires the runtime import
 map.
 
+### Vite Config
+
+Make sure that your vite config includes these rollup options:
+```vite
+rollupOptions: {
+	external: [
+		"@sienci/gsender-plugin-sdk",
+		"@sienci/gsender-plugin-sdk/react",
+	],
+},
+```
+If it doesn't, gSender will assume there are no permissions needed and won't give your plugin access to the sdk at runtime.
+
 ### Building a plugin
 
 From the plugin folder:
