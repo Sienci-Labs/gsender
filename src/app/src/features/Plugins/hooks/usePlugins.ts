@@ -1,5 +1,6 @@
 import api from "app/api";
 import controller from "app/lib/controller";
+import store from "app/store";
 import { useCallback, useEffect, useState } from "react";
 import type { PluginRecord, PluginsResponse } from "../types";
 
@@ -17,7 +18,11 @@ export const usePlugins = () => {
 			const { data } = await api.plugins.fetch();
 			const response = data as PluginsResponse;
 			setPlugins(response.plugins || []);
-			setPluginsDir(response.pluginsDir || "");
+
+			const resolvedPluginsDir =
+				response.userPluginsDir || response.pluginsDir || "";
+			store.set("workspace.userPluginsDir", response.userPluginsDir || "");
+			setPluginsDir(resolvedPluginsDir);
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Failed to load plugins");
 			setPlugins([]);

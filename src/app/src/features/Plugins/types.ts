@@ -43,6 +43,7 @@ export type PluginRecord = {
 
 export type PluginsResponse = {
 	pluginsDir: string;
+	userPluginsDir: string;
 	plugins: PluginRecord[];
 };
 
