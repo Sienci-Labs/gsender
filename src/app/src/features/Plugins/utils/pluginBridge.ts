@@ -14,9 +14,89 @@ import type {
 import {
 	EMPTY_CAPABILITIES,
 	getCapabilitiesForSource,
+	getPluginIdForSource,
 } from "./plugin-permissions";
 
 const BRIDGE_CHANNEL: typeof PLUGIN_BRIDGE_CHANNEL = "gsender:plugin-bridge";
+
+// Serialized-size guard for a plugin's storage writes. This store is a single
+// shared JSON file rewritten in full on every change (debounced), so an
+// unbounded write from one plugin would degrade save performance for the
+// whole app, not just that plugin.
+const MAX_STORAGE_VALUE_BYTES = 256 * 1024;
+
+const assertWithinStorageSizeLimit = (value: unknown) => {
+	const size = new Blob([JSON.stringify(value) ?? ""]).size;
+	if (size > MAX_STORAGE_VALUE_BYTES) {
+		throw new Error(
+			`Plugin storage write exceeds the ${MAX_STORAGE_VALUE_BYTES} byte limit`
+		);
+	}
+};
+
+const getPluginData = (pluginId: string): Record<string, unknown> =>
+	store.get(["plugins", pluginId, "data"], {});
+
+const getStorageValue = (
+	pluginId: string,
+	payload: Record<string, unknown> = {}
+) => {
+	const key = String(payload.key ?? "");
+	if (!key) {
+		throw new Error("key is required");
+	}
+	return store.get(["plugins", pluginId, "data", key], payload.defaultValue);
+};
+
+const setStorageValue = (
+	pluginId: string,
+	payload: Record<string, unknown> = {}
+) => {
+	const key = String(payload.key ?? "");
+	if (!key) {
+		throw new Error("key is required");
+	}
+	assertWithinStorageSizeLimit(payload.value);
+	store.set(["plugins", pluginId, "data", key], payload.value);
+	return { ok: true };
+};
+
+const deleteStorageValue = (
+	pluginId: string,
+	payload: Record<string, unknown> = {}
+) => {
+	const key = String(payload.key ?? "");
+	if (!key) {
+		throw new Error("key is required");
+	}
+	const data = { ...getPluginData(pluginId) };
+	delete data[key];
+	// NOTE: ImmutableStore.unset() deliberately does not emit "change" (see
+	// its source), so a delete-only write would silently fail to persist to
+	// disk. Writing back the whole (now-shorter) data object via set()
+	// ensures the change is detected and persisted like any other write.
+	store.set(["plugins", pluginId, "data"], data);
+	return { ok: true };
+};
+
+const getAllStorageValues = (
+	pluginId: string,
+	payload: Record<string, unknown> = {}
+) => store.get(["plugins", pluginId, "data"], payload.defaultValue ?? {});
+
+const setAllStorageValues = (
+	pluginId: string,
+	payload: Record<string, unknown> = {}
+) => {
+	assertWithinStorageSizeLimit(payload.value);
+	store.set(["plugins", pluginId, "data"], payload.value ?? {});
+	return { ok: true };
+};
+
+const clearStorageValues = (pluginId: string) => {
+	store.set(["plugins", pluginId, "data"], {});
+	return { ok: true };
+};
 
 const getWorkspaceSnapshot = () => store.get("workspace", {});
 
@@ -92,14 +172,33 @@ const loadGCodeToVisualizer = async ({
 	return { ok: true, name };
 };
 
+const STORAGE_REQUEST_TYPES = new Set([
+	"storage:get",
+	"storage:set",
+	"storage:delete",
+	"storage:get:all",
+	"storage:set:all",
+	"storage:clear",
+]);
+
 const handleBridgeRequest = async (
 	request: PluginBridgeRequest,
-	capabilities: PluginCapabilities
+	capabilities: PluginCapabilities,
+	pluginId: string | null
 ): Promise<unknown> => {
 	// check if plugin is allowed to use this request type
 	if (!capabilities.requestTypes.has(request.type)) {
 		console.error(`Plugin not authorized to use '${request.type}`)
 		throw new Error(`Plugin not authorized to use '${request.type}'`);
+	}
+
+	// defense in depth: storage requests must resolve to a registered plugin
+	// identity (the source of the namespacing that keeps plugins from
+	// reading/writing each other's data). An unregistered source is already
+	// denied above via EMPTY_CAPABILITIES, so this should never trip in
+	// practice.
+	if (STORAGE_REQUEST_TYPES.has(request.type) && !pluginId) {
+		throw new Error("Unable to resolve plugin identity for storage request");
 	}
 
 	switch (request.type) {
@@ -115,6 +214,18 @@ const handleBridgeRequest = async (
 			return loadGCodeToVisualizer(
 				request.payload as { gcode: string; name: string }
 			);
+		case "storage:get":
+			return getStorageValue(pluginId as string, request.payload);
+		case "storage:set":
+			return setStorageValue(pluginId as string, request.payload);
+		case "storage:delete":
+			return deleteStorageValue(pluginId as string, request.payload);
+		case "storage:get:all":
+			return getAllStorageValues(pluginId as string, request.payload);
+		case "storage:set:all":
+			return setAllStorageValues(pluginId as string, request.payload);
+		case "storage:clear":
+			return clearStorageValues(pluginId as string);
 		default:
 			console.error(`Unknown bridge request: ${request.type}`);
 			throw new Error(`Unknown bridge request: ${request.type}`);
@@ -134,9 +245,10 @@ export const handlePluginBridgeMessage = async (
 	// or a message from something that isn't a known plugin iframe at all)
 	// gets zero capabilities
 	const capabilities = getCapabilitiesForSource(event.source) ?? EMPTY_CAPABILITIES;
+	const pluginId = getPluginIdForSource(event.source);
 
 	try {
-		const result = await handleBridgeRequest(request, capabilities);
+		const result = await handleBridgeRequest(request, capabilities, pluginId);
 		return {
 			id: request.id,
 			ok: true,

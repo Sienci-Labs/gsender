@@ -5,7 +5,13 @@ export type PluginBridgeRequestType =
 	| "machine:command"
 	| "gcode:load:to:visualizer"
 	| "workspace:get:state"
-	| "redux:get:state";
+	| "redux:get:state"
+	| "storage:get"
+	| "storage:set"
+	| "storage:delete"
+	| "storage:get:all"
+	| "storage:set:all"
+	| "storage:clear";
 
 export type PluginBridgeTopic = "workspace" | "redux";
 

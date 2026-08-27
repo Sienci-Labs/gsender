@@ -32,6 +32,8 @@ import unset from "lodash/unset";
 
 import { determineRoundedValue } from "./rounding";
 
+type StoreKey = string | Array<string | number>;
+
 class ImmutableStore<T extends object = object> extends events.EventEmitter {
 	state: T;
 
@@ -42,15 +44,15 @@ class ImmutableStore<T extends object = object> extends events.EventEmitter {
 	}
 
 	get(): T;
-	get<V = any>(key: string): V | undefined;
-	get<V = any>(key: string, defaultValue: V): any;
-	get<V = any>(key?: string, defaultValue?: V): T | V | undefined {
+	get<V = any>(key: StoreKey): V | undefined;
+	get<V = any>(key: StoreKey, defaultValue: V): any;
+	get<V = any>(key?: StoreKey, defaultValue?: V): T | V | undefined {
 		if (key === undefined) return this.state;
 
 		return get(this.state, key, defaultValue) as V | undefined;
 	}
 
-	set(key: string, value: any): T {
+	set(key: StoreKey, value: any): T {
 		const prevValue = this.get(key);
 		if (typeof value === "object" && isEqual(value, prevValue)) {
 			return this.state;
@@ -60,14 +62,15 @@ class ImmutableStore<T extends object = object> extends events.EventEmitter {
 		}
 
 		// round values that need to be rounded before storing
-		value = determineRoundedValue(key, value);
+		const roundingKey = Array.isArray(key) ? key.join(".") : key;
+		value = determineRoundedValue(roundingKey, value);
 
 		this.state = merge({}, this.state, set({}, key, value));
 		this.emit("change", this.state);
 		return this.state;
 	}
 
-	unset(key: string): T {
+	unset(key: StoreKey): T {
 		const state = extend({}, this.state);
 		unset(state, key);
 		this.state = state;
@@ -75,7 +78,7 @@ class ImmutableStore<T extends object = object> extends events.EventEmitter {
 		return this.state;
 	}
 
-	replace(key: string, value: any): T {
+	replace(key: StoreKey, value: any): T {
 		const prevValue = this.get(key);
 		if (typeof value === "object" && isEqual(value, prevValue)) {
 			return this.state;

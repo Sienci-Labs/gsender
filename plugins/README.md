@@ -20,6 +20,7 @@ Then restart gSender.
 | `react-ts-app/` | React + TypeScript + Vite | React hooks — `useWorkspaceState`, `useTypedSelector` |
 | `example-viewer/` | Plain JS + Vite | Embedded G-code preview — `GCodeViewer`, `gsender.gcode.loadToVisualizer` |
 | `basic-cam/` | React + TypeScript + Vite + Tailwind | Full reference CAM plugin — combines all SDK entry points |
+| `storage-test/` | Plain JS + Vite | Namespaced plugin storage — buttons for every `storage.*` method (get/set/delete/getAll/setAll/clear), for QA |
 
 Each folder must contain `gsender-plugin.json` and a `ui/` directory with the built SPA entry file.
 
@@ -53,6 +54,35 @@ authorizes the scanned permissions, or hand-authored for gsender default plugins
 `requestTypes` and `topics` are what the bridge enforces; `allowedFunctions` is the informational
 record of what the static scan found. A plugin with no `capabilities` runs
 but every bridge call is denied.
+
+#### `storage`: per-plugin persisted key/value storage
+
+Granted when a plugin imports `storage` from the SDK. Lets the plugin
+read/write its own slice of the host's preferences store, keyed by the
+plugin's manifest `id` — the bridge resolves this identity from the
+registered plugin iframe itself, never from anything the plugin sends, so a
+plugin can never read or write another plugin's data.
+
+```json
+"capabilities": {
+	"requestTypes": [
+		"storage:get",
+		"storage:set",
+		"storage:delete",
+		"storage:get:all",
+		"storage:set:all",
+		"storage:clear"
+	],
+	"topics": [],
+	"allowedFunctions": ["storage"]
+}
+```
+
+`storage` is intentionally separate from the `gsender` combined client — a
+plugin must `import { storage } from "@sienci/gsender-plugin-sdk"` directly
+to be scanned and granted this permission. See the [SDK README's storage
+section](../packages/plugin-sdk/README.md#plugin-storage) for the client
+API.
 
 Plugins that import the SDK should build with `gsenderPlugin()` from
 `@sienci/gsender-plugin-sdk/vite` (see `basic-cam/vite.config.ts` and the

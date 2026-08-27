@@ -7,12 +7,24 @@ jest.mock("app/lib/controller", () => ({
 jest.mock("app/lib/fileupload", () => ({
 	uploadGcodeFileToServer: jest.fn(async () => ({})),
 }));
-jest.mock("app/store", () => ({
-	get: jest.fn((key: string, fallback: unknown) =>
-		key === "workspace" ? { units: "mm" } : fallback,
-	),
-	on: jest.fn(),
-}));
+jest.mock("app/store", () => {
+	const data: Record<string, unknown> = {};
+	const path = (key: string | string[]) =>
+		Array.isArray(key) ? key.join(".") : key;
+	return {
+		get: jest.fn((key: string | string[], fallback: unknown) => {
+			if (Array.isArray(key) && key[0] === "plugins") {
+				const value = data[path(key)];
+				return value === undefined ? fallback : value;
+			}
+			return key === "workspace" ? { units: "mm" } : fallback;
+		}),
+		set: jest.fn((key: string | string[], value: unknown) => {
+			data[path(key)] = value;
+		}),
+		on: jest.fn(),
+	};
+});
 jest.mock("app/store/redux", () => ({
 	getState: jest.fn(() => ({ controller: {}, connection: {} })),
 	subscribe: jest.fn(),
@@ -30,7 +42,7 @@ const CHANNEL = "gsender:plugin-bridge";
 
 const makeEvent = (
 	source: object | null,
-	request: { id: string; type: string },
+	request: { id: string; type: string; payload?: Record<string, unknown> },
 ) =>
 	({
 		data: { channel: CHANNEL, request },
@@ -52,6 +64,7 @@ describe("plugin bridge request gate", () => {
 			toRuntimeCapabilities(
 				JSON.parse('{"requestTypes":["workspace:get:state"],"topics":[]}'),
 			),
+			"com.sienci.test-plugin",
 		);
 
 		const response = await handlePluginBridgeMessage(
@@ -69,6 +82,7 @@ describe("plugin bridge request gate", () => {
 		registerPluginWindow(
 			source,
 			toRuntimeCapabilities({ requestTypes: ["workspace:get:state"] }),
+			"com.sienci.test-plugin",
 		);
 
 		const response = await handlePluginBridgeMessage(
@@ -88,6 +102,105 @@ describe("plugin bridge request gate", () => {
 		);
 
 		expect(response).toMatchObject({ id: "3", ok: false });
+		expect(response?.error).toMatch(/not authorized/i);
+	});
+});
+
+describe("plugin storage isolation", () => {
+	const sourceA = {} as MessageEventSource;
+	const sourceB = {} as MessageEventSource;
+
+	const STORAGE_CAPABILITIES = toRuntimeCapabilities({
+		requestTypes: [
+			"storage:get",
+			"storage:set",
+			"storage:delete",
+			"storage:get:all",
+			"storage:set:all",
+			"storage:clear",
+		],
+	});
+
+	afterEach(() => {
+		unregisterPluginWindow(sourceA);
+		unregisterPluginWindow(sourceB);
+	});
+
+	it("round-trips a value under the calling plugin's own namespace", async () => {
+		registerPluginWindow(sourceA, STORAGE_CAPABILITIES, "com.sienci.plugin-a");
+
+		const setResponse = await handlePluginBridgeMessage(
+			makeEvent(sourceA, {
+				id: "1",
+				type: "storage:set",
+				payload: { key: "foo", value: 123 },
+			}),
+		);
+		expect(setResponse).toMatchObject({ id: "1", ok: true });
+
+		const getResponse = await handlePluginBridgeMessage(
+			makeEvent(sourceA, {
+				id: "2",
+				type: "storage:get",
+				payload: { key: "foo" },
+			}),
+		);
+		expect(getResponse).toEqual({ id: "2", ok: true, result: 123 });
+	});
+
+	it("does not leak one plugin's storage to another plugin", async () => {
+		registerPluginWindow(sourceA, STORAGE_CAPABILITIES, "com.sienci.plugin-a");
+		registerPluginWindow(sourceB, STORAGE_CAPABILITIES, "com.sienci.plugin-b");
+
+		await handlePluginBridgeMessage(
+			makeEvent(sourceA, {
+				id: "1",
+				type: "storage:set",
+				payload: { key: "shared-key", value: "plugin-a-value" },
+			}),
+		);
+
+		const responseFromB = await handlePluginBridgeMessage(
+			makeEvent(sourceB, {
+				id: "2",
+				type: "storage:get",
+				payload: { key: "shared-key", defaultValue: "default" },
+			}),
+		);
+
+		expect(responseFromB).toEqual({ id: "2", ok: true, result: "default" });
+	});
+
+	it("returns the provided default value for a missing key", async () => {
+		registerPluginWindow(sourceA, STORAGE_CAPABILITIES, "com.sienci.plugin-a");
+
+		const response = await handlePluginBridgeMessage(
+			makeEvent(sourceA, {
+				id: "1",
+				type: "storage:get",
+				payload: { key: "missing", defaultValue: "fallback" },
+			}),
+		);
+
+		expect(response).toEqual({ id: "1", ok: true, result: "fallback" });
+	});
+
+	it("denies storage requests without the storage permission", async () => {
+		registerPluginWindow(
+			sourceA,
+			toRuntimeCapabilities({ requestTypes: ["workspace:get:state"] }),
+			"com.sienci.plugin-a",
+		);
+
+		const response = await handlePluginBridgeMessage(
+			makeEvent(sourceA, {
+				id: "1",
+				type: "storage:get",
+				payload: { key: "foo" },
+			}),
+		);
+
+		expect(response).toMatchObject({ id: "1", ok: false });
 		expect(response?.error).toMatch(/not authorized/i);
 	});
 });
