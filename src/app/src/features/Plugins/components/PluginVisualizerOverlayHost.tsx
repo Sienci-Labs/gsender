@@ -49,7 +49,7 @@ const OverlayPanel = ({
 	}, []);
 
 	return (
-		<div className="absolute right-4 top-4 bottom-4 z-[10001] flex w-80 max-w-[calc(100%-2rem)] flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-[0_10px_30px_rgba(0,_0,_0,_0.35)] dark:border-dark-lighter dark:bg-dark">
+		<div className="absolute right-4 top-4 bottom-4 z-10 flex w-80 max-w-[calc(100%-2rem)] flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-[0_10px_30px_rgba(0,_0,_0,_0.35)] dark:border-dark-lighter dark:bg-dark">
 			<div className="flex items-center justify-between border-b border-gray-200 px-3 py-2 dark:border-dark-lighter">
 				<span className="truncate text-sm font-medium text-gray-700 dark:text-gray-200">
 					{title}
@@ -96,9 +96,7 @@ const PluginVisualizerOverlayHost = ({ baseBottomPx, leftPx }: Props) => {
 	// Drop open state if the open plugin is no longer available (disabled/removed).
 	useEffect(() => {
 		setOpenId((prev) =>
-			prev && visualizerOverlayPlugins.some((p) => p.id === prev)
-				? prev
-				: null,
+			prev && visualizerOverlayPlugins.some((p) => p.id === prev) ? prev : null,
 		);
 	}, [visualizerOverlayPlugins]);
 
@@ -135,7 +133,7 @@ const PluginVisualizerOverlayHost = ({ baseBottomPx, leftPx }: Props) => {
 								type="button"
 								style={{ left: leftPx, bottom }}
 								className={cx(
-									"absolute z-[10000] inline-flex h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full border bg-dark-darker/70 shadow-[0_10px_30px_rgba(0,_0,_0,_0.25)] transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-dark-darker active:scale-[0.98] active:bg-dark-darker/85 mb-5",
+									"absolute z-10 inline-flex h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full border bg-dark-darker/70 shadow-[0_10px_30px_rgba(0,_0,_0,_0.25)] transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-dark-darker active:scale-[0.98] active:bg-dark-darker/85 mb-5",
 									{
 										"border-[rgba(14,_246,_174,_0.95)] text-[rgba(14,_246,_174,_0.95)] shadow-[0_0_0_1px_rgba(14,_246,_174,_0.35),0_10px_30px_rgba(0,_0,_0,_0.35)] hover:border-[rgba(14,_246,_174,_0.95)] hover:text-[rgba(14,_246,_174,_0.95)] hover:shadow-[0_0_0_1px_rgba(14,_246,_174,_0.45),0_12px_32px_rgba(0,_0,_0,_0.4)]":
 											isOpen,

@@ -5,7 +5,10 @@
 		"module": "ESNext",
 		"skipLibCheck": true,
 		"moduleResolution": "bundler",
-		"composite": true
+		"composite": true,
+		"paths": {
+			"vite": ["./node_modules/vite"]
+		}
 	},
 	"include": ["vite.config.ts"]
 }

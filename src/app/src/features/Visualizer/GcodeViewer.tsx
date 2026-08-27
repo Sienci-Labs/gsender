@@ -1018,7 +1018,7 @@ class GcodeViewer extends Component<Props> {
 				"width:100vw",
 				"height:100vh",
 				"pointer-events:none",
-				"z-index:10000",
+				"z-index:10",
 			].join(";");
 			document.body.appendChild(svg);
 			this.overlaySvg = svg;
