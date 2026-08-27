@@ -39,4 +39,5 @@ window.pendantAPI = {
 	pickGcodeFile: () => ipcRenderer.invoke("pendant:pick-gcode-file"),
 	readGcodeFile: (filePath) =>
 		ipcRenderer.invoke("pendant:read-gcode-file", filePath),
+	quitApp: () => ipcRenderer.send("pendant:quit-app"),
 };

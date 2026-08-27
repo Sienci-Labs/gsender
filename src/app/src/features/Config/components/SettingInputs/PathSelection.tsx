@@ -17,7 +17,9 @@ const PathSelection = ({ value, onChange }: Props) => {
 			(window as any).ipcRenderer.on(
 				"returned-directory-dialog-data",
 				(_: any, directory: string) => {
-					onChange(directory);
+					if (directory) {
+						onChange(directory);
+					}
 				},
 			);
 		}
