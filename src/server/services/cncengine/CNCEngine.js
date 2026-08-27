@@ -41,6 +41,7 @@ import DFUFlasher from "../../lib/Firmware/Flashing/DFUFlasher";
 import FlashingFirmware from "../../lib/Firmware/Flashing/firmwareflashing";
 import UF2Flasher from "../../lib/Firmware/Flashing/UF2Flasher";
 import logger from "../../lib/logger";
+import { listNetworkAddresses } from "../../lib/network-interfaces";
 import store from "../../store";
 import config from "../configstore";
 import taskRunner from "../taskrunner";
@@ -521,24 +522,15 @@ class CNCEngine {
 					});
 			});
 
-			//Sends back a list of available IPs in the computer
-			socket.on("listAllIps", () => {
-				const { networkInterfaces } = require("os");
-				const _networkInterfaces = networkInterfaces();
-				const ipList = [];
-
-				//Create a list of network list name: [{IP1},{IP2}...]
-				for (const networkName of Object.keys(_networkInterfaces)) {
-					for (const ips of _networkInterfaces[networkName]) {
-						//Consider only IPV4 addresses
-						if (ips.family === "IPv4") {
-							if (ipList.indexOf(ips.address) < 0) {
-								ipList.push(ips.address);
-							}
-						}
-					}
+			// Sends back the available IPv4 addresses on this computer, annotated
+			// with the adapter they belong to and which one we recommend hosting on.
+			socket.on("listAllIps", async () => {
+				try {
+					socket.emit("ip:list", await listNetworkAddresses());
+				} catch (err) {
+					log.error(`Unable to list network addresses: ${err.message}`);
+					socket.emit("ip:list", []);
 				}
-				socket.emit("ip:list", ipList);
 			});
 
 			// Open serial port

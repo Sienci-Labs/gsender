@@ -3,7 +3,7 @@ import type { CommandKeys } from "app/lib/definitions/shortcuts";
 import store from "app/store";
 import type { Notification } from "app/workspace/definitions";
 
-import type { PreferencesState } from "../../definitions";
+import type { NetworkAddress, PreferencesState } from "../../definitions";
 
 const initialState: PreferencesState = {
 	shortcuts: {
@@ -48,7 +48,7 @@ const preferencesSlice = createSlice({
 		unholdShortcuts(state) {
 			state.shortcuts.shouldHold = false;
 		},
-		setIpList(state, action: PayloadAction<string[]>) {
+		setIpList(state, action: PayloadAction<NetworkAddress[]>) {
 			state.ipList = action.payload;
 		},
 		addNotification(state, action: PayloadAction<Notification>) {
