@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Parser Demo</title>
+		<style>
+			:root {
+				color-scheme: light dark;
+				font-family: system-ui, -apple-system, sans-serif;
+			}
+			body {
+				margin: 0;
+				padding: 1rem;
+				font-size: 14px;
+			}
+			section {
+				margin-bottom: 1.25rem;
+				padding-bottom: 1rem;
+				border-bottom: 1px solid rgba(128, 128, 128, 0.3);
+			}
+			h2 {
+				margin: 0 0 0.25rem;
+				font-size: 1rem;
+			}
+			p.hint {
+				margin: 0 0 0.5rem;
+				opacity: 0.7;
+				font-size: 0.85em;
+			}
+			pre {
+				margin: 0;
+				padding: 0.5rem;
+				background: rgba(128, 128, 128, 0.12);
+				border-radius: 4px;
+				overflow-x: auto;
+				font-size: 0.85em;
+				white-space: pre-wrap;
+			}
+			button,
+			input {
+				font: inherit;
+				padding: 0.35rem 0.6rem;
+			}
+			input[type="text"] {
+				width: min(300px, 55%);
+				font-family: ui-monospace, monospace;
+			}
+			input[type="number"] {
+				width: 6rem;
+			}
+			.presets {
+				display: inline-flex;
+				gap: 0.25rem;
+				margin-left: 0.5rem;
+			}
+			.preset {
+				padding: 0.2rem 0.45rem;
+				font-family: ui-monospace, monospace;
+				font-size: 0.85em;
+			}
+			.row {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: 0.5rem;
+				margin-bottom: 0.5rem;
+			}
+			fieldset {
+				margin: 0 0 0.5rem;
+				padding: 0.4rem 0.6rem;
+				border: 1px solid rgba(128, 128, 128, 0.35);
+				border-radius: 4px;
+			}
+			legend {
+				font-size: 0.8em;
+				opacity: 0.7;
+			}
+			fieldset label {
+				margin-right: 0.75rem;
+				font-size: 0.9em;
+			}
+		</style>
+	</head>
+	<body>
+		<section>
+			<h2>machine.command — send something to react to</h2>
+			<p class="hint">
+				Fire-and-forget: this resolves when the command has been
+				<em>delivered</em>, not when the machine has finished answering. The
+				response arrives through the parsers below, not as a return value.
+				Try <code>$$</code> for the settings block, <code>$#</code> for a
+				<code>[PRB:]</code> line.
+			</p>
+			<form id="send-form">
+				<div class="row">
+					<input id="send-cmd" type="text" value="$$" aria-label="Command" />
+					<button id="send-btn" type="submit">Send</button>
+					<span id="send-presets" class="presets"></span>
+				</div>
+			</form>
+			<pre id="send-out">— nothing yet —</pre>
+		</section>
+
+		<section>
+			<h2>Probe result — manifest parser, line mode</h2>
+			<p class="hint">
+				Declared in the manifest, so it has been watching since the port opened
+				— even if you had never opened this page. Run a probe.
+			</p>
+			<pre id="probe-out">— nothing yet —</pre>
+		</section>
+
+		<section>
+			<h2>Settings dump — manifest parser, block mode</h2>
+			<p class="hint">
+				Accumulates every <code>$n=</code> line until <code>ok</code>. Status
+				reports that land mid-dump are dropped without closing the block. Send
+				<code>$$</code> from the console.
+			</p>
+			<pre id="settings-out">— nothing yet —</pre>
+		</section>
+
+		<section>
+			<h2>machine.query — a command and its whole response</h2>
+			<p class="hint">
+				Sends the command and collects every line back until the terminator,
+				the line cap, or the timeout. Idle only — a query while a job is
+				streaming is rejected, because <code>ok</code> would be
+				indistinguishable from the running job's own responses.
+			</p>
+			<form id="query-form">
+				<div class="row">
+					<input id="query-cmd" type="text" value="$I" aria-label="Command" />
+					<button id="query-btn" type="submit">Query</button>
+					<span id="query-presets" class="presets"></span>
+				</div>
+
+				<fieldset>
+					<legend>until</legend>
+					<label>
+						<input type="radio" name="until" value="ok-or-error" checked />
+						ok-or-error
+					</label>
+					<label>
+						<input type="radio" name="until" value="ok" /> ok
+					</label>
+					<label>
+						<input type="radio" name="until" value="error" /> error
+					</label>
+					<label>
+						<input type="radio" name="until" value="custom" /> regex
+					</label>
+					<input
+						id="query-until-custom"
+						type="text"
+						placeholder="^\[VER:"
+						aria-label="Custom until pattern"
+					/>
+				</fieldset>
+
+				<div class="row">
+					<label>
+						timeout
+						<input id="query-timeout" type="number" value="5000" min="100" />
+						ms
+					</label>
+					<label>
+						<input id="query-status" type="checkbox" /> include status reports
+					</label>
+				</div>
+			</form>
+			<p class="hint">
+				To see a partial result, pick <strong>regex</strong> with a pattern that
+				never matches and a short timeout — it should come back
+				<code>complete: false, reason: "timeout"</code> rather than hanging.
+			</p>
+			<pre id="query-out">— nothing yet —</pre>
+		</section>
+
+		<section>
+			<h2>machine.onLine — ad-hoc tap</h2>
+			<p class="hint">
+				The last 10 <code>[MSG:…]</code> lines. Registered at runtime, so it
+				stops when you navigate away.
+			</p>
+			<pre id="messages-out">— nothing yet —</pre>
+		</section>
+
+		<section>
+			<h2>machine.registerParser — built at runtime</h2>
+			<p class="hint">
+				Any regex. Rejected patterns (catastrophic backtracking, for instance)
+				report below rather than being registered.
+			</p>
+			<form id="custom-form">
+				<input
+					id="custom-pattern"
+					type="text"
+					value="^ALARM:(\d+)$"
+					aria-label="Custom pattern"
+				/>
+				<button type="submit">Watch</button>
+			</form>
+			<pre id="custom-out">— nothing yet —</pre>
+		</section>
+
+		<section>
+			<h2>Parser errors</h2>
+			<pre id="errors-out">— none —</pre>
+		</section>
+
+		<script type="module" src="/src/main.js"></script>
+	</body>
+</html>
