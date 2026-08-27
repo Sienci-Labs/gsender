@@ -21,185 +21,182 @@
  *
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Button } from "app/components/Button";
 
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from 'app/components/shadcn/Dialog';
-import { Button } from 'app/components/Button';
-import cx from 'classnames';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import { toast } from 'app/lib/toaster';
-
-import ProbeCircuitStatus from './ProbeCircuitStatus';
-import ProbeImage from './ProbeImage';
-import { Actions, State } from './definitions';
-import { PROBING_CATEGORY } from 'app/constants';
-import useKeybinding from 'app/lib/useKeybinding';
-import useShuttleEvents from 'app/hooks/useShuttleEvents';
-import { TOUCHPLATE_TYPE_3D } from 'app/lib/constants';
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+} from "app/components/shadcn/Dialog";
+import { PROBING_CATEGORY } from "app/constants";
+import useShuttleEvents from "app/hooks/useShuttleEvents";
+import { useTypedSelector } from "app/hooks/useTypedSelector";
+import { TOUCHPLATE_TYPE_3D } from "app/lib/constants";
+import { toast } from "app/lib/toaster";
+import useKeybinding from "app/lib/useKeybinding";
+import cx from "classnames";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Actions, State } from "./definitions";
+import ProbeCircuitStatus from "./ProbeCircuitStatus";
+import ProbeImage from "./ProbeImage";
 
 interface RunProbeProps {
-    state: State;
-    actions: Actions;
+	state: State;
+	actions: Actions;
 }
 
 const RunProbe = ({ actions, state }: RunProbeProps) => {
-    const actionsRef = useRef(actions);
+	const actionsRef = useRef(actions);
 
-    useEffect(() => {
-        actionsRef.current = actions;
-    }, [actions]);
+	useEffect(() => {
+		actionsRef.current = actions;
+	}, [actions]);
 
-    const {
-        connectionMade,
-        connectionMadeRef,
-        canClick,
-        show,
-        availableProbeCommands,
-        selectedProbeCommand,
-        touchplate,
-        connectivityTest,
-    } = state;
-    const { probePinStatus } = useTypedSelector((state) => ({
-        probePinStatus: state.controller.state.status?.pinState.P ?? false,
-    }));
+	const {
+		connectionMade,
+		connectionMadeRef,
+		canClick,
+		show,
+		availableProbeCommands,
+		selectedProbeCommand,
+		touchplate,
+		connectivityTest,
+	} = state;
+	const { probePinStatus } = useTypedSelector((state) => ({
+		probePinStatus: state.controller.state.status?.pinState.P ?? false,
+	}));
 
-    useEffect(() => {
-        if (!connectivityTest) {
-            actionsRef.current.setProbeConnectivity(true);
-        } else if (probePinStatus) {
-            actionsRef.current.setProbeConnectivity(true);
-        }
-    }, [connectivityTest, probePinStatus]);
+	useEffect(() => {
+		if (!connectivityTest) {
+			actionsRef.current.setProbeConnectivity(true);
+		} else if (probePinStatus) {
+			actionsRef.current.setProbeConnectivity(true);
+		}
+	}, [connectivityTest, probePinStatus]);
 
-    const [testInterval, setTestInterval] = useState<NodeJS.Timeout>(null);
+	const [testInterval, setTestInterval] = useState<NodeJS.Timeout>(null);
 
-    const shuttleControlEvents = {
-        START_PROBE: {
-            title: 'Begin probing',
-            keys: '',
-            cmd: 'START_PROBE',
-            preventDefault: false,
-            isActive: true,
-            category: PROBING_CATEGORY,
-            callback: () => {
-                if (!connectionMadeRef.current) {
-                    return;
-                }
-                startProbe();
-            },
-        },
-        CONFIRM_PROBE: {
-            title: 'Confirm probe popup',
-            keys: '',
-            cmd: 'CONFIRM_PROBE',
-            preventDefault: false,
-            isActive: true,
-            category: PROBING_CATEGORY,
-            callback: () => {
-                if (connectionMadeRef.current) {
-                    return;
-                }
+	const shuttleControlEvents = {
+		START_PROBE: {
+			title: "Begin probing",
+			keys: "",
+			cmd: "START_PROBE",
+			preventDefault: false,
+			isActive: true,
+			category: PROBING_CATEGORY,
+			callback: () => {
+				if (!connectionMadeRef.current) {
+					return;
+				}
+				startProbe();
+			},
+		},
+		CONFIRM_PROBE: {
+			title: "Confirm probe popup",
+			keys: "",
+			cmd: "CONFIRM_PROBE",
+			preventDefault: false,
+			isActive: true,
+			category: PROBING_CATEGORY,
+			callback: () => {
+				if (connectionMadeRef.current) {
+					return;
+				}
 
-                toast.info('Probe Confirmed Manually', {
-                    position: 'bottom-right',
-                });
+				toast.info("Probe Confirmed Manually", {
+					position: "bottom-right",
+				});
 
-                actions.setProbeConnectivity(true);
-            },
-        },
-    };
+				actions.setProbeConnectivity(true);
+			},
+		},
+	};
 
-    useShuttleEvents(shuttleControlEvents);
-    useEffect(() => {
-        useKeybinding(shuttleControlEvents);
-    }, []);
+	useShuttleEvents(shuttleControlEvents);
+	useEffect(() => {
+		useKeybinding(shuttleControlEvents);
+	}, []);
 
-    const startProbe = useCallback((): void => {
-        const probeCommands = actionsRef.current.generateProbeCommands();
+	const startProbe = useCallback((): void => {
+		const probeCommands = actionsRef.current.generateProbeCommands();
 
-        actionsRef.current.runProbeCommands(probeCommands);
-        toast.info('Initiated probing cycle', { position: 'bottom-right' });
-        actionsRef.current.onOpenChange(false);
-    }, []);
+		actionsRef.current.runProbeCommands(probeCommands);
+		toast.info("Initiated probing cycle", { position: "bottom-right" });
+		actionsRef.current.onOpenChange(false);
+	}, []);
 
-    useEffect(() => {
-        return () => {
-            testInterval && clearInterval(testInterval);
-            setTestInterval(null);
-        };
-    }, []);
+	useEffect(() => {
+		return () => {
+			testInterval && clearInterval(testInterval);
+			setTestInterval(null);
+		};
+	}, []);
 
-    const { touchplateType } = touchplate;
-    //const probeCommands = actions.generateProbeCommands();
-    //console.log(probeCommands.length);
-    const probeCommand = availableProbeCommands[selectedProbeCommand];
-    const is3DProbe = touchplateType === TOUCHPLATE_TYPE_3D;
+	const { touchplateType } = touchplate;
+	//const probeCommands = actions.generateProbeCommands();
+	//console.log(probeCommands.length);
+	const probeCommand = availableProbeCommands[selectedProbeCommand];
+	const is3DProbe = touchplateType === TOUCHPLATE_TYPE_3D;
 
-    const probeActive = actions.returnProbeConnectivity();
+	const probeActive = actions.returnProbeConnectivity();
 
-    return (
-        <Dialog open={show} onOpenChange={actions.onOpenChange}>
-            <DialogContent
-                className={cx(
-                    'flex flex-col justify-center items-center bg-gray-100 w-[650px] min-h-[450px] p-4',
-                    {
-                        hidden: !show,
-                    },
-                )}
-            >
-                <DialogHeader className="text-robin-700 flex items-start justify-center">
-                    <DialogTitle>{`Probe - ${probeCommand.id}`}</DialogTitle>
-                </DialogHeader>
+	return (
+		<Dialog open={show} onOpenChange={actions.onOpenChange}>
+			<DialogContent
+				className={cx(
+					"flex flex-col justify-center items-center bg-gray-100 w-[650px] min-h-[450px] p-4",
+					{
+						hidden: !show,
+					},
+				)}
+			>
+				<DialogHeader className="text-robin-700 flex items-start justify-center">
+					<DialogTitle>{`Probe - ${probeCommand.id}`}</DialogTitle>
+				</DialogHeader>
 
-                <div className="grid grid-cols-[1.5fr_1fr] gap-2 w-[600px] min-h-[200px]">
-                    <div className="flex flex-col justify-between pb-4">
-                        <div className="text-black leading-snug dark:text-white">
-                            <p className="mb-3">
-                                1. Check the tool is positioned correctly
-                                (pictured).
-                            </p>
-                            <p className="mb-3">
-                                {is3DProbe
-                                    ? '2. Gently push the probe needle to check the circuit is triggered properly (indicated by a green light).'
-                                    : '2. Lift your touch plate to the tool to check the circuit is good (indicated by a green light), then put it back where it was.'}
-                            </p>
-                            {!is3DProbe && (
-                                <p className="mb-3">
-                                    3. In some cases, holding the touch plate
-                                    still while probing will give a more
-                                    consistent measurement.
-                                </p>
-                            )}
-                        </div>
-                        <Button
-                            variant="primary"
-                            disabled={!connectionMade}
-                            onClick={startProbe}
-                        >
-                            {connectionMade
-                                ? 'Start Probe'
-                                : 'Waiting for probe circuit check...'}
-                        </Button>
-                    </div>
-                    <div className="flex flex-col sm:m-auto sm:mb-4">
-                        <ProbeImage
-                            probeCommand={probeCommand}
-                            touchplateType={touchplateType}
-                        />
-                        <ProbeCircuitStatus
-                            connected={canClick}
-                            probeActive={probeActive}
-                        />
-                    </div>
-                </div>
-            </DialogContent>
-        </Dialog>
-    );
+				<div className="grid grid-cols-[1.5fr_1fr] gap-2 w-[600px] min-h-[200px]">
+					<div className="flex flex-col justify-between pb-4">
+						<div className="text-black leading-snug dark:text-white">
+							<p className="mb-3">
+								1. Check the tool is positioned correctly (pictured).
+							</p>
+							<p className="mb-3">
+								{is3DProbe
+									? "2. Gently push the probe needle to check the circuit is triggered properly (indicated by a green light)."
+									: "2. Lift your touch plate to the tool to check the circuit is good (indicated by a green light), then put it back where it was."}
+							</p>
+							{!is3DProbe && (
+								<p className="mb-3">
+									3. In some cases, holding the touch plate still while probing
+									will give a more consistent measurement.
+								</p>
+							)}
+						</div>
+						<Button
+							variant="primary"
+							disabled={!connectionMade}
+							onClick={startProbe}
+						>
+							{connectionMade
+								? "Start Probe"
+								: "Waiting for probe circuit check..."}
+						</Button>
+					</div>
+					<div className="flex flex-col sm:m-auto sm:mb-4">
+						<ProbeImage
+							probeCommand={probeCommand}
+							touchplateType={touchplateType}
+						/>
+						<ProbeCircuitStatus
+							connected={canClick}
+							probeActive={probeActive}
+						/>
+					</div>
+				</div>
+			</DialogContent>
+		</Dialog>
+	);
 };
 
 export default RunProbe;

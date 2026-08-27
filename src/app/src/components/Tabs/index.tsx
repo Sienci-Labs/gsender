@@ -1,174 +1,169 @@
-import { useState, useRef, useEffect } from 'react';
-import classNames from 'classnames';
+import classNames from "classnames";
+import { useEffect, useRef, useState } from "react";
 
-import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from 'react-icons/md';
-import { useLocation } from 'react-router';
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
+import { useLocation } from "react-router";
 
 interface TabItem {
-    label: string;
-    content: React.ComponentType<{ isActive: boolean }>;
+	label: string;
+	content: React.ComponentType<{ isActive: boolean }>;
 }
 
 interface TabbedProps {
-    items: TabItem[];
+	items: TabItem[];
 }
 
 export const Tabs = ({ items = [] }: TabbedProps) => {
-    const [activeTab, setActiveTab] = useState(items[0]?.label);
-    const tabsRef = useRef<HTMLDivElement>(null);
-    const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
-    const [canScrollLeft, setCanScrollLeft] = useState(false);
-    const [canScrollRight, setCanScrollRight] = useState(false);
-    const location = useLocation();
+	const [activeTab, setActiveTab] = useState(items[0]?.label);
+	const tabsRef = useRef<HTMLDivElement>(null);
+	const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+	const [canScrollLeft, setCanScrollLeft] = useState(false);
+	const [canScrollRight, setCanScrollRight] = useState(false);
+	const location = useLocation();
 
-    useEffect(() => {
-        const { pathname } = location;
-        if (pathname === '/') {
-            scrollToTab(items.findIndex((value) => value.label === activeTab)); // scroll to correct tab on navigating to carve
-        }
-    }, [location]);
+	useEffect(() => {
+		const { pathname } = location;
+		if (pathname === "/") {
+			scrollToTab(items.findIndex((value) => value.label === activeTab)); // scroll to correct tab on navigating to carve
+		}
+	}, [location]);
 
-    useEffect(() => {
-        tabRefs.current = tabRefs.current.slice(0, items.length);
-        checkScrollability();
+	useEffect(() => {
+		tabRefs.current = tabRefs.current.slice(0, items.length);
+		checkScrollability();
 
-        window.addEventListener('resize', checkScrollability);
+		window.addEventListener("resize", checkScrollability);
 
-        // if the active tab doesnt exist in the tabs list anymore, default to first tab
-        if (!items.find((value) => value.label === activeTab)) {
-            setActiveTab(items[0].label);
-        }
-    }, [items]);
+		// if the active tab doesnt exist in the tabs list anymore, default to first tab
+		if (!items.find((value) => value.label === activeTab)) {
+			setActiveTab(items[0].label);
+		}
+	}, [items]);
 
-    const checkScrollability = () => {
-        if (tabsRef.current) {
-            const { scrollLeft, scrollWidth, clientWidth } = tabsRef.current;
-            setCanScrollLeft(scrollLeft > 0);
-            setCanScrollRight(scrollLeft + clientWidth < scrollWidth);
-        }
-    };
+	const checkScrollability = () => {
+		if (tabsRef.current) {
+			const { scrollLeft, scrollWidth, clientWidth } = tabsRef.current;
+			setCanScrollLeft(scrollLeft > 0);
+			setCanScrollRight(scrollLeft + clientWidth < scrollWidth);
+		}
+	};
 
-    const scrollTabs = (direction: 'left' | 'right') => {
-        if (tabsRef.current) {
-            const scrollAmount = 100;
-            const newScrollLeft =
-                tabsRef.current.scrollLeft +
-                (direction === 'left' ? -scrollAmount : scrollAmount);
-            tabsRef.current.scrollTo({
-                left: newScrollLeft,
-                behavior: 'smooth',
-            });
-            checkScrollability();
-        }
-    };
+	const scrollTabs = (direction: "left" | "right") => {
+		if (tabsRef.current) {
+			const scrollAmount = 100;
+			const newScrollLeft =
+				tabsRef.current.scrollLeft +
+				(direction === "left" ? -scrollAmount : scrollAmount);
+			tabsRef.current.scrollTo({
+				left: newScrollLeft,
+				behavior: "smooth",
+			});
+			checkScrollability();
+		}
+	};
 
-    const scrollToTab = (index: number) => {
-        const tab = tabRefs.current[index];
-        if (tab && tabsRef.current) {
-            const tabsRect = tabsRef.current.getBoundingClientRect();
-            const tabRect = tab.getBoundingClientRect();
+	const scrollToTab = (index: number) => {
+		const tab = tabRefs.current[index];
+		if (tab && tabsRef.current) {
+			const tabsRect = tabsRef.current.getBoundingClientRect();
+			const tabRect = tab.getBoundingClientRect();
 
-            if (
-                tabRect.right > tabsRect.right ||
-                tabRect.left < tabsRect.left
-            ) {
-                const scrollLeft = tab.offsetLeft - tabsRef.current.offsetLeft;
-                tabsRef.current.scrollTo({
-                    left: scrollLeft,
-                    behavior: 'smooth',
-                });
-            }
-            checkScrollability();
-        }
-    };
+			if (tabRect.right > tabsRect.right || tabRect.left < tabsRect.left) {
+				const scrollLeft = tab.offsetLeft - tabsRef.current.offsetLeft;
+				tabsRef.current.scrollTo({
+					left: scrollLeft,
+					behavior: "smooth",
+				});
+			}
+			checkScrollability();
+		}
+	};
 
-    const handleTabClick = (label: string, index: number) => {
-        setActiveTab(label);
-        scrollToTab(index);
-    };
+	const handleTabClick = (label: string, index: number) => {
+		setActiveTab(label);
+		scrollToTab(index);
+	};
 
-    return (
-        <div className="w-full">
-            <div className="relative">
-                <div className="flex items-center absolute top-[-41px] max-xl:top-[-38px] portrait:top-[-62px] left-0 right-0 z-10">
-                    <button
-                        className={`flex-shrink-0 p-1 rounded-full bg-transparent portrait:bg-white transition-colors duration-200 ${
-                            canScrollLeft
-                                ? 'hover:bg-gray-100 text-gray-400 hover:text-gray-600 dark:hover:bg-dark-lighter dark:text-gray-300 dark:hover:text-gray-100'
-                                : 'text-gray-200 cursor-not-allowed dark:text-gray-500'
-                        }`}
-                        onClick={() => canScrollLeft && scrollTabs('left')}
-                        disabled={!canScrollLeft}
-                        aria-label="Scroll tabs left"
-                    >
-                        <MdKeyboardArrowLeft className="w-6 h-6 portrait:w-8 portrait:h-8" />
-                    </button>
-                    <div
-                        ref={tabsRef}
-                        className="flex overflow-x-auto flex-grow portrait:min-h-14"
-                        style={{
-                            scrollbarWidth: 'none',
-                            msOverflowStyle: 'none',
-                        }}
-                        onScroll={checkScrollability}
-                        role="tablist"
-                        aria-label="Widget Tabs"
-                    >
-                        {items &&
-                            items.map((item, index) => (
-                                <button
-                                    key={item.label}
-                                    ref={(el) => (tabRefs.current[index] = el)}
-                                    role="tab"
-                                    aria-selected={activeTab === item.label}
-                                    aria-controls={`tabpanel-${item.label}`}
-                                    id={`tab-${item.label}`}
-                                    className={`flex-grow pt-1 px-4 max-xl:px-3 text-base font-medium max-xl:text-sm portrait:text-xl max-xl:pt-2 ${
-                                        activeTab === item.label
-                                            ? 'text-blue-600 border-b-2 border-blue-600 dark:text-blue-400 dark:border-blue-400'
-                                            : 'text-gray-600 border-b-2 border-transparent hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100'
-                                    }`}
-                                    onClick={() =>
-                                        handleTabClick(item.label, index)
-                                    }
-                                >
-                                    {item.label}
-                                </button>
-                            ))}
-                    </div>
-                    <button
-                        className={`flex-shrink-0 p-1 rounded-full bg-transparent transition-colors duration-200 max-xl:pt-2 ${
-                            canScrollRight
-                                ? 'hover:bg-gray-100 text-gray-400 hover:text-gray-600 dark:hover:bg-dark-lighter dark:text-gray-300 dark:hover:text-gray-100'
-                                : 'text-gray-200 cursor-not-allowed dark:text-gray-500'
-                        }`}
-                        onClick={() => canScrollRight && scrollTabs('right')}
-                        disabled={!canScrollRight}
-                        aria-label="Scroll tabs right"
-                    >
-                        <MdKeyboardArrowRight className="w-6 h-6 portrait:w-8 portrait:h-8" />
-                    </button>
-                </div>
-            </div>
-            <div className="block w-full h-full">
-                {items &&
-                    items.map(({ label, content: Content }) => (
-                        <div
-                            key={label}
-                            role="tabpanel"
-                            id={`tabpanel-${label}`}
-                            aria-labelledby={`tab-${label}`}
-                            className={classNames(
-                                'w-full h-full',
-                                activeTab === label ? 'block' : 'hidden',
-                            )}
-                        >
-                            <Content isActive={activeTab === label} />
-                        </div>
-                    ))}
-            </div>
-        </div>
-    );
+	return (
+		<div className="w-full">
+			<div className="relative">
+				<div className="flex items-center absolute top-[-41px] max-xl:top-[-38px] portrait:top-[-62px] left-0 right-0 z-10">
+					<button
+						className={`flex-shrink-0 p-1 rounded-full bg-transparent portrait:bg-white transition-colors duration-200 ${
+							canScrollLeft
+								? "hover:bg-gray-100 text-gray-400 hover:text-gray-600 dark:hover:bg-dark-lighter dark:text-gray-300 dark:hover:text-gray-100"
+								: "text-gray-200 cursor-not-allowed dark:text-gray-500"
+						}`}
+						onClick={() => canScrollLeft && scrollTabs("left")}
+						disabled={!canScrollLeft}
+						aria-label="Scroll tabs left"
+					>
+						<MdKeyboardArrowLeft className="w-6 h-6 portrait:w-8 portrait:h-8" />
+					</button>
+					<div
+						ref={tabsRef}
+						className="flex overflow-x-auto flex-grow portrait:min-h-14"
+						style={{
+							scrollbarWidth: "none",
+							msOverflowStyle: "none",
+						}}
+						onScroll={checkScrollability}
+						role="tablist"
+						aria-label="Widget Tabs"
+					>
+						{items &&
+							items.map((item, index) => (
+								<button
+									key={item.label}
+									ref={(el) => (tabRefs.current[index] = el)}
+									role="tab"
+									aria-selected={activeTab === item.label}
+									aria-controls={`tabpanel-${item.label}`}
+									id={`tab-${item.label}`}
+									className={`flex-grow pt-1 px-4 max-xl:px-3 text-base font-medium max-xl:text-sm portrait:text-xl max-xl:pt-2 ${
+										activeTab === item.label
+											? "text-blue-600 border-b-2 border-blue-600 dark:text-blue-400 dark:border-blue-400"
+											: "text-gray-600 border-b-2 border-transparent hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100"
+									}`}
+									onClick={() => handleTabClick(item.label, index)}
+								>
+									{item.label}
+								</button>
+							))}
+					</div>
+					<button
+						className={`flex-shrink-0 p-1 rounded-full bg-transparent transition-colors duration-200 max-xl:pt-2 ${
+							canScrollRight
+								? "hover:bg-gray-100 text-gray-400 hover:text-gray-600 dark:hover:bg-dark-lighter dark:text-gray-300 dark:hover:text-gray-100"
+								: "text-gray-200 cursor-not-allowed dark:text-gray-500"
+						}`}
+						onClick={() => canScrollRight && scrollTabs("right")}
+						disabled={!canScrollRight}
+						aria-label="Scroll tabs right"
+					>
+						<MdKeyboardArrowRight className="w-6 h-6 portrait:w-8 portrait:h-8" />
+					</button>
+				</div>
+			</div>
+			<div className="block w-full h-full">
+				{items &&
+					items.map(({ label, content: Content }) => (
+						<div
+							key={label}
+							role="tabpanel"
+							id={`tabpanel-${label}`}
+							aria-labelledby={`tab-${label}`}
+							className={classNames(
+								"w-full h-full",
+								activeTab === label ? "block" : "hidden",
+							)}
+						>
+							<Content isActive={activeTab === label} />
+						</div>
+					))}
+			</div>
+		</div>
+	);
 };
 
 export default Tabs;

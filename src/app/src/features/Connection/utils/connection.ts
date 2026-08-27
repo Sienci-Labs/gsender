@@ -1,12 +1,12 @@
-import controller from 'app/lib/controller';
+import controller from "app/lib/controller";
 
 export function refreshPorts() {
-    if (!controller.connected) {
-        controller.reconnect();
-    }
-    controller.listPorts();
+	if (!controller.connected) {
+		controller.reconnect();
+	}
+	controller.listPorts();
 }
 
 export function refreshPortsOnParentEntry() {
-    refreshPorts();
+	refreshPorts();
 }

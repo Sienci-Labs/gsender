@@ -1,11 +1,11 @@
-import Steps from './Steps';
+import Steps from "./Steps";
 
 const MovementTuning = () => {
-    return (
-        <>
-            <Steps />
-        </>
-    );
+	return (
+		<>
+			<Steps />
+		</>
+	);
 };
 
 export default MovementTuning;

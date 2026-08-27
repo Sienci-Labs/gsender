@@ -1,17 +1,19 @@
 interface DisconnectButtonProps {
-    disconnectHandler: () => void;
+	disconnectHandler: () => void;
 }
 
 export function DisconnectButton({ disconnectHandler }: DisconnectButtonProps) {
-    return (
-        <div
-            role="button"
-            tabIndex={0}
-            className="w-full flex h-full transition-opacity duration-200 rounded items-center font-normal justify-center absolute top-0 left-0 opacity-0 hover:opacity-100 focus:opacity-100 bg-red-600 text-white z-20"
-            onClick={disconnectHandler}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') disconnectHandler(); }}
-        >
-            Disconnect
-        </div>
-    );
+	return (
+		<div
+			role="button"
+			tabIndex={0}
+			className="w-full flex h-full transition-opacity duration-200 rounded items-center font-normal justify-center absolute top-0 left-0 opacity-0 hover:opacity-100 focus:opacity-100 bg-red-600 text-white z-20"
+			onClick={disconnectHandler}
+			onKeyDown={(e) => {
+				if (e.key === "Enter" || e.key === " ") disconnectHandler();
+			}}
+		>
+			Disconnect
+		</div>
+	);
 }

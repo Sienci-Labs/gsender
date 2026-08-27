@@ -21,35 +21,38 @@
  *
  */
 
-import React from 'react';
+import React from "react";
 
 interface ToolRequirementBannerProps {
-    toolLabel: string | null;
-    comment?: string;
+	toolLabel: string | null;
+	comment?: string;
 }
 
-const ToolRequirementBanner = ({ toolLabel, comment }: ToolRequirementBannerProps) => {
-    if (!toolLabel) {
-        return null;
-    }
+const ToolRequirementBanner = ({
+	toolLabel,
+	comment,
+}: ToolRequirementBannerProps) => {
+	if (!toolLabel) {
+		return null;
+	}
 
-    console.log(comment);
+	console.log(comment);
 
-    return (
-        <div className="self-center w-full max-w-[320px] rounded-[8px] border border-emerald-300/80 bg-emerald-50 px-5 py-4 text-center shadow-sm dark:border-emerald-700/60 dark:bg-[#0d2518]">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700 dark:text-emerald-300">
-                Install New Tool
-            </div>
-            <div className="mt-2 text-5xl font-semibold leading-none text-emerald-700 dark:text-emerald-300">
-                {toolLabel}
-            </div>
-            {comment ? (
-                <div className="mt-4 rounded-[6px] border border-gray-200/90 bg-white/75 px-3 py-2 text-center font-mono text-xs leading-relaxed text-gray-500 whitespace-pre-wrap break-words dark:border-white/10 dark:bg-black/10 dark:text-gray-300">
-                    {comment}
-                </div>
-            ) : null}
-        </div>
-    );
+	return (
+		<div className="self-center w-full max-w-[320px] rounded-[8px] border border-emerald-300/80 bg-emerald-50 px-5 py-4 text-center shadow-sm dark:border-emerald-700/60 dark:bg-[#0d2518]">
+			<div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700 dark:text-emerald-300">
+				Install New Tool
+			</div>
+			<div className="mt-2 text-5xl font-semibold leading-none text-emerald-700 dark:text-emerald-300">
+				{toolLabel}
+			</div>
+			{comment ? (
+				<div className="mt-4 rounded-[6px] border border-gray-200/90 bg-white/75 px-3 py-2 text-center font-mono text-xs leading-relaxed text-gray-500 whitespace-pre-wrap break-words dark:border-white/10 dark:bg-black/10 dark:text-gray-300">
+					{comment}
+				</div>
+			) : null}
+		</div>
+	);
 };
 
 export default ToolRequirementBanner;

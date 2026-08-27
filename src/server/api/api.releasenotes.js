@@ -23,7 +23,7 @@
 
 // import fs from 'fs';
 // import path from 'path';
-import releases from './notes.json';
+import releases from "./notes.json";
 /*const releases = [
     {
         'version': '1.5.2',
@@ -112,18 +112,18 @@ import releases from './notes.json';
 ];*/
 
 export const fetchReleaseNotes = (req, res) => {
-    try {
-        // Use an absolute path to ensure we find the file
-        // const releasesPath = path.resolve(__dirname, '../lib/releases.json');
-        // console.log('Loading release notes from:', releasesPath);
-        // if (!fs.existsSync(releasesPath)) {
-        //     console.error('Release notes file not found at:', releasesPath);
-        //     return res.status(404).send({ error: 'Release notes file not found', releasesPath });
-        // }
-        // const releases = JSON.parse(fs.readFileSync(releasesPath, 'utf8'));
-        return res.send(releases);
-    } catch (error) {
-        console.error('Error reading release notes:', error);
-        return res.status(500).send({ error: 'Failed to fetch release notes' });
-    }
+	try {
+		// Use an absolute path to ensure we find the file
+		// const releasesPath = path.resolve(__dirname, '../lib/releases.json');
+		// console.log('Loading release notes from:', releasesPath);
+		// if (!fs.existsSync(releasesPath)) {
+		//     console.error('Release notes file not found at:', releasesPath);
+		//     return res.status(404).send({ error: 'Release notes file not found', releasesPath });
+		// }
+		// const releases = JSON.parse(fs.readFileSync(releasesPath, 'utf8'));
+		return res.send(releases);
+	} catch (error) {
+		console.error("Error reading release notes:", error);
+		return res.status(500).send({ error: "Failed to fetch release notes" });
+	}
 };

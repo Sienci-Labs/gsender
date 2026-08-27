@@ -1,41 +1,34 @@
+import { Label } from "app/components/shadcn/Label.tsx";
 import {
-    RadioGroup,
-    RadioGroupItem,
-} from 'app/components/shadcn/RadioGroup.tsx';
-import { Label } from 'app/components/shadcn/Label.tsx';
+	RadioGroup,
+	RadioGroupItem,
+} from "app/components/shadcn/RadioGroup.tsx";
 
 export interface RadioSettingInputProps {
-    options: string[] | number[];
-    value: string | number;
-    index: number;
-    subIndex?: number;
-    onChange: (v: any) => void;
+	options: string[] | number[];
+	value: string | number;
+	index: number;
+	subIndex?: number;
+	onChange: (v: any) => void;
 }
 
 export function RadioSettingInput({
-    options = [],
-    value,
-    onChange,
+	options = [],
+	value,
+	onChange,
 }: RadioSettingInputProps): React.ReactNode {
-    value = `${value}`;
-    const handler = (e: string) => {
-        onChange(e);
-    };
-    return (
-        <RadioGroup
-            defaultValue={`${value}`}
-            value={value}
-            onValueChange={handler}
-        >
-            {options.map((o) => (
-                <div
-                    key={`radio-${o}`}
-                    className="flex flex-row gap-2 items-center"
-                >
-                    <RadioGroupItem value={`${o}`} />
-                    <Label htmlFor={`radio-${o}`}>{o}</Label>
-                </div>
-            ))}
-        </RadioGroup>
-    );
+	value = `${value}`;
+	const handler = (e: string) => {
+		onChange(e);
+	};
+	return (
+		<RadioGroup defaultValue={`${value}`} value={value} onValueChange={handler}>
+			{options.map((o) => (
+				<div key={`radio-${o}`} className="flex flex-row gap-2 items-center">
+					<RadioGroupItem value={`${o}`} />
+					<Label htmlFor={`radio-${o}`}>{o}</Label>
+				</div>
+			))}
+		</RadioGroup>
+	);
 }

@@ -23,21 +23,21 @@
 
 // http://stackoverflow.com/questions/1064089/inserting-a-text-where-cursor-is-using-javascript-jquery
 const insertAtCaret = (
-    textarea: HTMLTextAreaElement,
-    text: string = '',
+	textarea: HTMLTextAreaElement,
+	text: string = "",
 ): void => {
-    const scrollPos = textarea.scrollTop;
-    const caretPos = textarea.selectionStart;
-    const front = textarea.value.substring(0, caretPos);
-    const back = textarea.value.substring(
-        textarea.selectionEnd,
-        textarea.value.length,
-    );
-    textarea.value = front + text + back;
-    textarea.selectionStart = caretPos + text.length;
-    textarea.selectionEnd = caretPos + text.length;
-    textarea.focus();
-    textarea.scrollTop = scrollPos;
+	const scrollPos = textarea.scrollTop;
+	const caretPos = textarea.selectionStart;
+	const front = textarea.value.substring(0, caretPos);
+	const back = textarea.value.substring(
+		textarea.selectionEnd,
+		textarea.value.length,
+	);
+	textarea.value = front + text + back;
+	textarea.selectionStart = caretPos + text.length;
+	textarea.selectionEnd = caretPos + text.length;
+	textarea.focus();
+	textarea.scrollTop = scrollPos;
 };
 
 export default insertAtCaret;

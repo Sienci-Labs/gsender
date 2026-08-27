@@ -24,45 +24,44 @@
 const noop = () => {};
 
 class ToolChanger {
-    intervalTimer = 200;
+	intervalTimer = 200;
 
-    onIdleInterval = null;
+	onIdleInterval = null;
 
-    isSenderIdle = noop;
+	isSenderIdle = noop;
 
-    strategy = null;
+	strategy = null;
 
-    constructor(options) {
-        if (typeof options.isIdle === 'function') {
-            this.isSenderIdle = options.isIdle;
-        }
-        if (options.intervalTimer) {
-            this.intervalTimer = options.intervalTimer;
-        }
-    }
+	constructor(options) {
+		if (typeof options.isIdle === "function") {
+			this.isSenderIdle = options.isIdle;
+		}
+		if (options.intervalTimer) {
+			this.intervalTimer = options.intervalTimer;
+		}
+	}
 
-    addInterval(cb) {
-        if (this.onIdleInterval !== null) {
-            clearInterval(this.onIdleInterval);
-        }
+	addInterval(cb) {
+		if (this.onIdleInterval !== null) {
+			clearInterval(this.onIdleInterval);
+		}
 
-        if (typeof cb !== 'function') {
-            return;
-        }
+		if (typeof cb !== "function") {
+			return;
+		}
 
-        this.onIdleInterval = setInterval(() => {
-            if (this.isSenderIdle()) {
-                cb();
-                this.clearInterval();
-            }
-        }, this.intervalTimer);
-    }
+		this.onIdleInterval = setInterval(() => {
+			if (this.isSenderIdle()) {
+				cb();
+				this.clearInterval();
+			}
+		}, this.intervalTimer);
+	}
 
-    clearInterval() {
-        clearInterval(this.onIdleInterval);
-        this.onIdleInterval = null;
-    }
+	clearInterval() {
+		clearInterval(this.onIdleInterval);
+		this.onIdleInterval = null;
+	}
 }
-
 
 export default ToolChanger;

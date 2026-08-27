@@ -1,27 +1,27 @@
-import { useState, useEffect } from 'react';
+import api from "app/api";
 
-import { USER_DATA_COLLECTION } from 'app/constants';
-import api from 'app/api';
+import { USER_DATA_COLLECTION } from "app/constants";
+import { useEffect, useState } from "react";
 
 export type UserDataCollectionStatus =
-    (typeof USER_DATA_COLLECTION)[keyof typeof USER_DATA_COLLECTION];
+	(typeof USER_DATA_COLLECTION)[keyof typeof USER_DATA_COLLECTION];
 
 export const useGetCollectDataStatus = () => {
-    const [data, setData] = useState<UserDataCollectionStatus>(
-        USER_DATA_COLLECTION.INITIAL,
-    );
+	const [data, setData] = useState<UserDataCollectionStatus>(
+		USER_DATA_COLLECTION.INITIAL,
+	);
 
-    const retrieveData = async () => {
-        const res = await api.metrics.getCollectDataStatus();
+	const retrieveData = async () => {
+		const res = await api.metrics.getCollectDataStatus();
 
-        const collectUserDataStatus = res.data.collectUserDataStatus;
+		const collectUserDataStatus = res.data.collectUserDataStatus;
 
-        setData(collectUserDataStatus);
-    };
+		setData(collectUserDataStatus);
+	};
 
-    useEffect(() => {
-        retrieveData();
-    }, []);
+	useEffect(() => {
+		retrieveData();
+	}, []);
 
-    return [data, setData];
+	return [data, setData];
 };
