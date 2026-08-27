@@ -12,7 +12,10 @@ import { isEmpty } from "lodash";
 import { useEffect, useState } from "react";
 import { usePlugins } from "../hooks/usePlugins";
 import { SDK_SCAN_SPECIFIERS } from "../types";
-import { buildGrantFromScan } from "../utils/capabilities";
+import {
+	buildGrantFromScan,
+	mergeManifestParserGrant,
+} from "../utils/capabilities";
 
 const PluginManager = () => {
 	const {
@@ -86,7 +89,19 @@ const PluginManager = () => {
 					const { capabilities, hasDynamicImport } = result.data;
 
 					// figure out which clients they imported
-					const { permissions, wire } = buildGrantFromScan(capabilities);
+					const scanned = buildGrantFromScan(capabilities);
+					// Manifest parsers involve no SDK import, so the bundle scan
+					// above cannot see them — fold them in explicitly.
+					const { permissions, wire } = mergeManifestParserGrant(
+						scanned,
+						plugin.parsers,
+					);
+					const declaredParsers = Array.isArray(plugin.parsers)
+						? plugin.parsers
+						: [];
+					const parserErrors = Array.isArray(plugin.parserErrors)
+						? plugin.parserErrors
+						: [];
 
 					Confirm({
 						title: "Plugin Permissions",
@@ -119,6 +134,43 @@ const PluginManager = () => {
 									</>
 								) : (
 									<p>The plugin {plugin.name} does not need any permissions.</p>
+								)}
+								{declaredParsers.length > 0 && (
+									<>
+										<hr />
+										<p>
+											It watches your machine's responses for these patterns:
+										</p>
+										<ul>
+											{declaredParsers.map((parser: any) => (
+												<li key={parser.id}>
+													- {parser.label || parser.id}{" "}
+													<code className="text-xs">
+														{[parser.begin, parser.match, parser.end]
+															.filter(Boolean)
+															.map((p: any) =>
+																typeof p === "string" ? p : p?.source,
+															)
+															.join("  …  ")}
+														{parser.until ? `  …  ${parser.until}` : ""}
+													</code>
+												</li>
+											))}
+										</ul>
+									</>
+								)}
+								{parserErrors.length > 0 && (
+									<>
+										<p className="font-bold text-amber-500">
+											Some of this plugin's parsers were rejected and will not
+											run:
+										</p>
+										<ul className="text-amber-500 text-xs">
+											{parserErrors.map((error: string) => (
+												<li key={error}>- {error}</li>
+											))}
+										</ul>
+									</>
 								)}
 								<p>Press Authorize to continue importing this plugin.</p>
 							</div>

@@ -62,6 +62,7 @@ import {
 	getAxisMaximumLocation,
 } from "../../lib/homing";
 import logger from "../../lib/logger";
+import { PluginParserChain } from "../../lib/plugin-parsers";
 import Sender, { SP_TYPE_CHAR_COUNTING } from "../../lib/Sender";
 import ToolChanger from "../../lib/ToolChanger";
 import translateExpression from "../../lib/translate-expression";
@@ -72,6 +73,7 @@ import Workflow, {
 } from "../../lib/Workflow";
 import config from "../../services/configstore";
 import monitor from "../../services/monitor";
+import pluginRegistry from "../../services/pluginregistry";
 import taskRunner from "../../services/taskrunner";
 import store from "../../store";
 import {
@@ -762,7 +764,25 @@ class GrblHalController {
 		// Grbl
 		this.runner = new GrblHalRunner();
 
-		this.runner.on("raw", noop);
+		// Plugin-defined parsers. Fed from "raw", which fires for every line
+		// before any built-in parsing, so a plugin can see lines that never make
+		// it to serialport:read (status, json, descriptions). Observe-only:
+		// nothing here can consume a line or affect built-in parsing.
+		this.pluginParsers = new PluginParserChain({
+			emit: (eventName, payload) => this.emit(eventName, payload),
+			getWorkflowState: () => this.workflow?.state,
+			log,
+		});
+
+		this.runner.on("raw", ({ raw }) => {
+			// feed() already swallows everything; this is the second belt so a
+			// plugin can never break the serial read path.
+			try {
+				this.pluginParsers.feed(raw);
+			} catch (err) {
+				log.error(`plugin parser chain failed: ${err.message}`);
+			}
+		});
 
 		this.runner.on("spindle", (spindle) => {
 			this.emit("spindle:add", spindle);
@@ -1665,6 +1685,11 @@ class GrblHalController {
 			this.runner = null;
 		}
 
+		if (this.pluginParsers) {
+			this.pluginParsers.destroy();
+			this.pluginParsers = null;
+		}
+
 		if (this.toolChanger) {
 			this.toolChanger.clearInterval();
 		}
@@ -1735,6 +1760,10 @@ class GrblHalController {
 			return;
 		}
 
+		// Manifest-declared parsers go live here, so they are watching from the
+		// moment the port opens regardless of whether any plugin UI is mounted.
+		this.reloadPluginParsers();
+
 		this.workflow.stop();
 
 		// Clear action values
@@ -1766,6 +1795,11 @@ class GrblHalController {
 
 		// Clear initialized flag
 		this.initialized = false;
+
+		// Flush any open plugin blocks with complete:false, so a subscriber that
+		// was waiting on a block the disconnect made impossible to finish gets a
+		// terminal result instead of hanging.
+		this.pluginParsers?.reset("close");
 
 		// Reset homing runtime state
 		if (this.hasHomedSet) {
@@ -1805,6 +1839,129 @@ class GrblHalController {
 		}
 		log.debug(`Loading file '${name}' to controller`);
 		this.command("gcode:load", name, gcode);
+	}
+
+	// --- Plugin parsers -------------------------------------------------------
+
+	/**
+	 * Rebuilds the manifest-declared parser chain from the plugin registry.
+	 * Called on port open and whenever plugins are enabled, disabled, or
+	 * imported. Runtime registrations are untouched.
+	 */
+	reloadPluginParsers() {
+		if (!this.pluginParsers) {
+			return;
+		}
+		try {
+			this.pluginParsers.setManifestParsers(
+				pluginRegistry.getPluginParserSpecs(),
+			);
+		} catch (err) {
+			log.error(`Failed to load plugin parsers: ${err.message}`);
+		}
+	}
+
+	/**
+	 * @param {string} ownerId Identifies the registering plugin iframe instance,
+	 *   so its parsers can be dropped when it unmounts.
+	 */
+	registerPluginParsers(ownerId, pluginId, specs) {
+		if (!this.pluginParsers) {
+			return { registered: [], errors: [], warnings: [] };
+		}
+		return this.pluginParsers.registerRuntime(ownerId, pluginId, specs);
+	}
+
+	unregisterPluginParsers(ownerId, parserId) {
+		if (!this.pluginParsers) {
+			return { ok: true };
+		}
+		return this.pluginParsers.unregisterRuntime(ownerId, parserId);
+	}
+
+	/**
+	 * Sends a command and collects every line the firmware sends back until a
+	 * terminator, giving plugins the request/response shape the event stream
+	 * cannot express.
+	 *
+	 * @param {(err: Error|null, result?: object) => void} callback
+	 */
+	pluginQuery(cmd, opts = {}, callback = noop) {
+		if (!this.isOpen()) {
+			callback(new Error("Serial port is not open"));
+			return;
+		}
+		if (!this.pluginParsers) {
+			callback(new Error("Plugin parsers are not available"));
+			return;
+		}
+		if (typeof cmd !== "string" || cmd.trim() === "") {
+			callback(new Error("A command is required"));
+			return;
+		}
+
+		const allowDuringJob = Boolean(opts.allowDuringJob);
+
+		if (!this.workflow.isIdle() && !allowDuringJob) {
+			callback(
+				Object.assign(new Error("Machine is busy running a job"), {
+					code: "EBUSY",
+				}),
+			);
+			return;
+		}
+
+		// While a job streams, the firmware emits an `ok` per accepted line, so
+		// `ok`/`error` are indistinguishable from the sender's own responses. A
+		// query that runs then MUST bring its own terminator.
+		if (allowDuringJob && typeof opts.until !== "object") {
+			callback(
+				new Error(
+					'A query with allowDuringJob needs an explicit "until" pattern — ' +
+						"ok/error cannot be told apart from the running job's responses",
+				),
+			);
+			return;
+		}
+
+		if (this.pluginQueryInFlight) {
+			callback(
+				Object.assign(new Error("Another query is already in flight"), {
+					code: "EBUSY",
+				}),
+			);
+			return;
+		}
+
+		let until = opts.until ?? "ok-or-error";
+		if (until && typeof until === "object" && until.source) {
+			try {
+				until = new RegExp(until.source, (until.flags || "").replace(/[gy]/g, ""));
+			} catch (err) {
+				callback(new Error(`Invalid "until" pattern: ${err.message}`));
+				return;
+			}
+		}
+
+		this.pluginQueryInFlight = true;
+
+		// Open the capture window BEFORE writing. The write goes synchronously
+		// into the serial stream and feed() is driven off runner.parse(), so no
+		// response line can slip between the two.
+		this.pluginParsers.beginCapture({
+			until,
+			maxLines: opts.maxLines,
+			timeout: opts.timeout,
+			includeStatusReports: Boolean(opts.includeStatusReports),
+			onDone: (result) => {
+				this.pluginQueryInFlight = false;
+				callback(null, result);
+			},
+		});
+
+		// emit=true so a plugin-issued write is visible to the operator in the
+		// console rather than happening invisibly.
+		this.writeln(cmd, {}, true);
 	}
 
 	addConnection(socket) {
