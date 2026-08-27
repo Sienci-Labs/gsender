@@ -129,7 +129,7 @@ opens, whether or not your UI is mounted:
   {
     "id": "probe",
     "mode": "line",
-    "match": { "source": "^\\[PRB:(?<x>[-\\d.]+),(?<y>[-\\d.]+),(?<z>[-\\d.]+):(?<ok>[01])\\]$" }
+    "match": { "source": "^\\[PRB:(?<x>[-\\d.]+),(?<y>[-\\d.]+),(?<z>[-\\d.]+)(?<rest>(?:,[-\\d.]+)*):(?<ok>[01])\\]$" }
   }
 ]
 ```

@@ -20,7 +20,7 @@
 			"label": "Probe result",
 			"mode": "line",
 			"match": {
-				"source": "^\\[PRB:(?<x>[-\\d.]+),(?<y>[-\\d.]+),(?<z>[-\\d.]+):(?<success>[01])\\]$"
+				"source": "^\\[PRB:(?<x>[-\\d.]+),(?<y>[-\\d.]+),(?<z>[-\\d.]+)(?<rest>(?:,[-\\d.]+)*):(?<success>[01])\\]$"
 			}
 		},
 		{

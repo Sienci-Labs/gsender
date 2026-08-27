@@ -41,9 +41,15 @@ addPresets("query-presets", "query-cmd");
 // fires immediately with the last result if one exists.
 
 machine.onParsed("probe", (result) => {
+	const { x, y, z, rest, success } = result.groups;
+	// `rest` holds any axes past Z — grblHAL reports up to six (A/B/C), so the
+	// pattern has to tolerate them or a rotary machine never matches at all.
+	const extraAxes = rest ? rest.split(",").filter(Boolean) : [];
+
 	render($("probe-out"), {
-		position: result.groups,
-		succeeded: result.groups.success === "1",
+		position: { x, y, z },
+		...(extraAxes.length ? { extraAxes } : {}),
+		succeeded: success === "1",
 		at: new Date(result.endedAt).toLocaleTimeString(),
 	});
 });
