@@ -102,6 +102,7 @@ import type {
 	ControllerSettings,
 	ControllerStateState,
 	FILE_TYPE_T,
+	NetworkAddress,
 	PortInfo,
 	SDCardFile,
 	SerialPortOptions,
@@ -740,7 +741,7 @@ export function* initialize(): Generator<null, void, unknown> {
 		store.set("electron-error-list", errorList);
 	});
 
-	controller.addListener("ip:list", (ipList: string[]) => {
+	controller.addListener("ip:list", (ipList: NetworkAddress[]) => {
 		reduxStore.dispatch(setIpList(ipList));
 	});
 
