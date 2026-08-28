@@ -21,6 +21,7 @@ Then restart gSender.
 | `example-viewer/` | Plain JS + Vite | Embedded G-code preview — `GCodeViewer`, `gsender.gcode.loadToVisualizer` |
 | `basic-cam/` | React + TypeScript + Vite + Tailwind | Full reference CAM plugin — combines all SDK entry points |
 | `corner-finder/` | React + TypeScript + Vite | Host visualizer bridge — `gsender.viewer.*` (picking, camera, overlay markers) + `machine.setBusy` |
+| `storage-test/` | Plain JS + Vite | Namespaced plugin storage — buttons for every `storage.*` method (get/set/delete/getAll/setAll/clear), for QA |
 
 Each folder must contain `gsender-plugin.json` and a `ui/` directory with the built SPA entry file.
 
@@ -54,6 +55,35 @@ authorizes the scanned permissions, or hand-authored for gsender default plugins
 `requestTypes` and `topics` are what the bridge enforces; `allowedFunctions` is the informational
 record of what the static scan found. A plugin with no `capabilities` runs
 but every bridge call is denied.
+
+#### `storage`: per-plugin persisted key/value storage
+
+Granted when a plugin imports `storage` from the SDK. Lets the plugin
+read/write its own slice of the host's preferences store, keyed by the
+plugin's manifest `id` — the bridge resolves this identity from the
+registered plugin iframe itself, never from anything the plugin sends, so a
+plugin can never read or write another plugin's data.
+
+```json
+"capabilities": {
+	"requestTypes": [
+		"storage:get",
+		"storage:set",
+		"storage:delete",
+		"storage:get:all",
+		"storage:set:all",
+		"storage:clear"
+	],
+	"topics": [],
+	"allowedFunctions": ["storage"]
+}
+```
+
+`storage` is intentionally separate from the `gsender` combined client — a
+plugin must `import { storage } from "@sienci/gsender-plugin-sdk"` directly
+to be scanned and granted this permission. See the [SDK README's storage
+section](../packages/plugin-sdk/README.md#plugin-storage) for the client
+API.
 
 Plugins that import the SDK should build with `gsenderPlugin()` from
 `@sienci/gsender-plugin-sdk/vite` (see `basic-cam/vite.config.ts` and the
@@ -112,11 +142,23 @@ list — `:`-separated on macOS/Linux, `;`-separated on Windows).
 ### Automatic SDK + plugin builds (dev)
 
 `npm run dev` and `npm run dev:electron` both run `npm run prepare-dev-plugins` before 
-starting the server. It builds the plugin SDK if it isn't already built,
-then builds every plugin folder under `plugins/` whose `ui/` output doesn't exist yet.
+starting the server. It builds the plugin SDK, then every plugin folder under `plugins/`,
+skipping whatever is already up to date.
 
-It won't rebuild, so set `GSENDER_FORCE_PLUGIN_BUILD=1` to force a full rebuild of the
-SDK and every plugin.
+"Up to date" is decided by timestamp, not just by whether the output exists: the SDK is
+rebuilt when anything under `packages/plugin-sdk/src/` (or its `package.json` /
+`tsup.config.ts`) is newer than `dist/index.js`, and a plugin is rebuilt when its own
+sources *or* the SDK's `dist/index.js` are newer than its `ui/` output. So pulling or
+merging a branch that changes the SDK rebuilds it and every plugin on the next dev start.
+
+The SDK is a `file:` dependency. npm symlinks it, but yarn copies it into the plugin's
+`node_modules/`, and that copy is frozen at install time — reinstalling won't refresh it,
+because the SDK version hasn't changed. `prepare-dev-plugins` detects those copies and
+re-copies `dist/` into them before building, so a plugin never compiles against an SDK
+bundle older than the one in `packages/plugin-sdk/dist/`.
+
+Set `GSENDER_FORCE_PLUGIN_BUILD=1` to skip all of those checks and force a full rebuild
+(and reinstall) of the SDK and every plugin.
 
 ### Live reload (dev)
 

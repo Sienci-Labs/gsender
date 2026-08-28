@@ -1,11 +1,27 @@
 const fs = require("fs");
 const path = require("path");
-const { run, readJson } = require("./lib/shell-utils");
+const { run, readJson, isStale } = require("./lib/shell-utils");
 
 const REPO_ROOT = path.resolve(__dirname, "..");
 const PLUGINS_ROOT = path.join(REPO_ROOT, "plugins");
 const PLUGIN_SDK_DIR = path.join(REPO_ROOT, "packages", "plugin-sdk");
 const PLUGIN_SDK_ENTRY = path.join(PLUGIN_SDK_DIR, "dist", "index.js");
+const PLUGIN_SDK_PACKAGE = "@sienci/gsender-plugin-sdk";
+
+// Inputs that invalidate the SDK's dist/ and a plugin's ui/ respectively.
+// Missing paths are ignored, so listing every vite config variant is safe.
+const PLUGIN_SDK_SOURCES = ["src", "package.json", "tsup.config.ts"].map(
+	(entry) => path.join(PLUGIN_SDK_DIR, entry),
+);
+const PLUGIN_SOURCES = [
+	"src",
+	"index.html",
+	"package.json",
+	"gsender-plugin.json",
+	"vite.config.js",
+	"vite.config.ts",
+	"vite.config.mjs",
+];
 
 const FORCE = process.env.GSENDER_FORCE_PLUGIN_BUILD === "1";
 const STRICT = process.env.GSENDER_STRICT_DEV_PLUGINS === "1";
@@ -41,9 +57,9 @@ const ensurePluginSdkBuilt = () => {
 		return;
 	}
 
-	if (!FORCE && fs.existsSync(PLUGIN_SDK_ENTRY)) {
+	if (!FORCE && !isStale(PLUGIN_SDK_ENTRY, PLUGIN_SDK_SOURCES)) {
 		console.log(
-			"Plugin SDK already built, skipping (set GSENDER_FORCE_PLUGIN_BUILD=1 to force).",
+			"Plugin SDK is up to date, skipping (set GSENDER_FORCE_PLUGIN_BUILD=1 to force).",
 		);
 		return;
 	}
@@ -51,6 +67,43 @@ const ensurePluginSdkBuilt = () => {
 	console.log("Building @sienci/gsender-plugin-sdk...");
 	ensureDependenciesInstalled(PLUGIN_SDK_DIR);
 	run(detectPackageManager(PLUGIN_SDK_DIR), ["run", "build"], PLUGIN_SDK_DIR);
+};
+
+// npm links the SDK's `file:` dependency, so those plugins always see the build
+// we just made. yarn (and npm in some setups) copies it instead, which freezes
+// whatever dist/ existed at install time — the copy then stays on a stale
+// bundle and the plugin fails to build against SDK exports added since.
+// Re-running the package manager doesn't help: the SDK version is unchanged, so
+// yarn just serves the same copy back out of its cache. Refresh it in place.
+const refreshCopiedPluginSdk = (pluginDir, name) => {
+	const installed = path.join(
+		pluginDir,
+		"node_modules",
+		...PLUGIN_SDK_PACKAGE.split("/"),
+	);
+
+	let stats;
+	try {
+		stats = fs.lstatSync(installed);
+	} catch {
+		return; // SDK isn't installed here
+	}
+	if (stats.isSymbolicLink()) {
+		return; // live link — already sees the current build
+	}
+
+	if (!isStale(path.join(installed, "dist", "index.js"), [PLUGIN_SDK_ENTRY])) {
+		return;
+	}
+
+	console.log(`${name}: refreshing copied plugin SDK.`);
+	fs.cpSync(path.join(PLUGIN_SDK_DIR, "dist"), path.join(installed, "dist"), {
+		recursive: true,
+	});
+	fs.copyFileSync(
+		path.join(PLUGIN_SDK_DIR, "package.json"),
+		path.join(installed, "package.json"),
+	);
 };
 
 const discoverPluginDirs = () => {
@@ -79,17 +132,25 @@ const buildPlugin = (name) => {
 		return;
 	}
 
+	ensureDependenciesInstalled(pluginDir);
+	refreshCopiedPluginSdk(pluginDir, name);
+
 	const manifest = readJson(path.join(pluginDir, "gsender-plugin.json"));
 	const entry = manifest?.ui?.entry;
 	const entryPath = entry ? path.join(pluginDir, entry) : null;
+	// The SDK's own output is an input here: a plugin that inlines the SDK
+	// carries a copy of it, so a fresh SDK means a stale plugin bundle.
+	const sources = [
+		...PLUGIN_SOURCES.map((source) => path.join(pluginDir, source)),
+		PLUGIN_SDK_ENTRY,
+	];
 
-	if (!FORCE && entryPath && fs.existsSync(entryPath)) {
-		console.log(`${name}: already built, skipping.`);
+	if (!FORCE && entryPath && !isStale(entryPath, sources)) {
+		console.log(`${name}: up to date, skipping.`);
 		return;
 	}
 
 	console.log(`Building plugin: ${name}`);
-	ensureDependenciesInstalled(pluginDir);
 	run(detectPackageManager(pluginDir), ["run", "build"], pluginDir);
 };
 

@@ -35,6 +35,20 @@ type GcodeClient = {
 	/** Load a raw G-code program into gSender's main visualizer/job. */
 	loadToVisualizer: (gcode: string, name?: string) => Promise<unknown>;
 }
+type StorageClient = {
+	/** Get a value from this plugin's own namespaced storage. */
+	get: <T = unknown>(key: string, defaultValue?: T) => Promise<T | undefined>;
+	/** Set a value in this plugin's own namespaced storage. */
+	set: (key: string, value: unknown) => Promise<void>;
+	/** Delete a key from this plugin's own namespaced storage. */
+	delete: (key: string) => Promise<void>;
+	/** Get this plugin's entire namespaced storage object. */
+	getAll: <T = Record<string, unknown>>(defaultValue?: T) => Promise<T>;
+	/** Replace this plugin's entire namespaced storage object. */
+	setAll: (value: Record<string, unknown>) => Promise<void>;
+	/** Clear this plugin's entire namespaced storage object. */
+	clear: () => Promise<void>;
+}
 type ViewerClient = {
 	/** Project a screen pixel onto the visualizer's work plane. */
 	screenToWorld: (
@@ -143,10 +157,26 @@ const createGcodeClient = (): GcodeClient => ({
 	loadToVisualizer: (gcode, name) =>
 	request("gcode:load:to:visualizer", { gcode, name }),
 })
+// Not part of `gsender`/`GsenderClient` on purpose: capability grants are
+// derived from a static scan of imported names, so `storage` must be its own
+// directly-imported export to get its own explicit, separately-approved
+// permission rather than riding along with the `gsender` bundle.
+const createStorageClient = (): StorageClient => ({
+	get: (key, defaultValue) => request("storage:get", { key, defaultValue }),
+	set: (key, value) =>
+		request("storage:set", { key, value }).then(() => undefined),
+	delete: (key) =>
+		request("storage:delete", { key }).then(() => undefined),
+	getAll: (defaultValue) => request("storage:get:all", { defaultValue }),
+	setAll: (value) =>
+		request("storage:set:all", { value }).then(() => undefined),
+	clear: () => request("storage:clear").then(() => undefined),
+});
 export const machine = createMachineClient();
 export const workspace = createWorkspaceClient();
 export const redux = createReduxClient();
 export const gcode = createGcodeClient();
+export const storage = createStorageClient();
 export const viewer = createViewerClient();
 
 const createGsenderClient = (): GsenderClient => ({

@@ -74,7 +74,8 @@ export type PluginPermissionsType =
 	| "viewer:draw"
 	| "workspace:read"
 	| "redux:read"
-	| "local-fonts";
+	| "local-fonts"
+	| "storage";
 
 export type PluginTopicsType = "workspace" | "redux";
 
@@ -91,7 +92,13 @@ export type PluginBridgeRequestType =
 	| "viewer:camera:lock-rotate"
 	| "viewer:pick:arm"
 	| "viewer:pick:disarm"
-	| "viewer:overlay:set";
+	| "viewer:overlay:set"
+	| "storage:get"
+	| "storage:set"
+	| "storage:delete"
+	| "storage:get:all"
+	| "storage:set:all"
+	| "storage:clear";
 
 export type PluginBridgeRequest = {
 	id: string;
@@ -151,6 +158,7 @@ export const permissionsMap = new Map<string, PluginPermissionsType[]>([
 	["useWorkspaceState", ["workspace:read"]],
 	["subscribeSelector", ["redux:read"]],
 	["useTypedSelector", ["redux:read"]],
+	["storage", ["storage"]],
 ]);
 
 export const requestTypesMap = new Map<string, PluginBridgeRequestType[]>([
@@ -209,6 +217,17 @@ export const requestTypesMap = new Map<string, PluginBridgeRequestType[]>([
 	["redux", ["redux:get:state"]],
 	["getReduxState", ["redux:get:state"]],
 	["getSelector", ["redux:get:state"]],
+	[
+		"storage",
+		[
+			"storage:get",
+			"storage:set",
+			"storage:delete",
+			"storage:get:all",
+			"storage:set:all",
+			"storage:clear",
+		],
+	],
 ]);
 
 export const topicsMap = new Map<string, PluginBridgeTopic>([

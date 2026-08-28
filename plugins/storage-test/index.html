@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Storage Test</title>
+	</head>
+	<body>
+		<main class="app">
+			<header>
+				<h1>Storage Test</h1>
+				<p class="lede">
+					Exercises every method on the plugin
+					<code>storage</code> client — namespaced to this plugin's own
+					<code>com.sienci.storage-test</code> id, backed by
+					<code>@sienci/gsender-plugin-sdk</code>.
+				</p>
+			</header>
+
+			<section class="card">
+				<h2>Single key</h2>
+				<p class="hint">
+					Value is JSON-parsed if possible (e.g. <code>123</code>,
+					<code>true</code>, <code>"text"</code>, <code>{"a":1}</code>),
+					otherwise stored as a raw string.
+				</p>
+				<div class="row">
+					<label>
+						Key
+						<input type="text" id="key-input" placeholder="foo" />
+					</label>
+					<label>
+						Value (for Set)
+						<input type="text" id="value-input" placeholder="123" />
+					</label>
+					<label>
+						Default value (for Get)
+						<input type="text" id="default-input" placeholder="fallback" />
+					</label>
+				</div>
+				<div class="row">
+					<button type="button" id="get-btn">Get</button>
+					<button type="button" id="set-btn">Set</button>
+					<button type="button" id="delete-btn">Delete</button>
+				</div>
+			</section>
+
+			<section class="card">
+				<h2>Whole object</h2>
+				<p class="hint">
+					A JSON object representing this plugin's entire namespaced storage.
+				</p>
+				<textarea id="whole-object-input" rows="6">{}</textarea>
+				<div class="row">
+					<button type="button" id="get-all-btn">Get All</button>
+					<button type="button" id="set-all-btn">Set All</button>
+					<button type="button" id="clear-btn">Clear</button>
+				</div>
+			</section>
+
+			<section class="card">
+				<h2>Last result</h2>
+				<pre id="output" class="output">Click a button above…</pre>
+			</section>
+
+			<section class="card">
+				<h2>Current storage (live)</h2>
+				<p class="hint">
+					Refreshed after every operation — reflects exactly what's persisted
+					under this plugin's namespace.
+				</p>
+				<pre id="current-storage" class="output">Loading…</pre>
+			</section>
+		</main>
+		<script type="module" src="/src/main.js"></script>
+	</body>
+</html>
