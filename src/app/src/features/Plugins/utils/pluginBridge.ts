@@ -75,11 +75,13 @@ const deleteStorageValue = (
 	}
 	const data = { ...getPluginData(pluginId) };
 	delete data[key];
-	// NOTE: ImmutableStore.unset() deliberately does not emit "change" (see
-	// its source), so a delete-only write would silently fail to persist to
-	// disk. Writing back the whole (now-shorter) data object via set()
-	// ensures the change is detected and persisted like any other write.
-	store.set(["plugins", pluginId, "data"], data);
+	// NOTE: this has to be replace(), not set(). ImmutableStore.set() writes
+	// via a lodash deep merge, so it can only add or overwrite keys — writing
+	// the shorter object back with it would leave the deleted key in place.
+	// replace() unsets the path first, so the stored object is exactly `data`.
+	// (unset() alone isn't enough: it deliberately does not emit "change", so
+	// the write would never be persisted to disk.)
+	store.replace(["plugins", pluginId, "data"], data);
 	return { ok: true };
 };
 
@@ -93,12 +95,15 @@ const setAllStorageValues = (
 	payload: Record<string, unknown> = {}
 ) => {
 	assertWithinStorageSizeLimit(payload.value);
-	store.set(["plugins", pluginId, "data"], payload.value ?? {});
+	// replace(), not set() — see deleteStorageValue: a merge would keep keys
+	// the caller left out instead of replacing the whole object.
+	store.replace(["plugins", pluginId, "data"], payload.value ?? {});
 	return { ok: true };
 };
 
 const clearStorageValues = (pluginId: string) => {
-	store.set(["plugins", pluginId, "data"], {});
+	// replace(), not set() — merging {} into the existing data is a no-op.
+	store.replace(["plugins", pluginId, "data"], {});
 	return { ok: true };
 };
 

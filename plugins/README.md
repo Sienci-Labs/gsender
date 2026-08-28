@@ -142,11 +142,23 @@ list — `:`-separated on macOS/Linux, `;`-separated on Windows).
 ### Automatic SDK + plugin builds (dev)
 
 `npm run dev` and `npm run dev:electron` both run `npm run prepare-dev-plugins` before 
-starting the server. It builds the plugin SDK if it isn't already built,
-then builds every plugin folder under `plugins/` whose `ui/` output doesn't exist yet.
+starting the server. It builds the plugin SDK, then every plugin folder under `plugins/`,
+skipping whatever is already up to date.
 
-It won't rebuild, so set `GSENDER_FORCE_PLUGIN_BUILD=1` to force a full rebuild of the
-SDK and every plugin.
+"Up to date" is decided by timestamp, not just by whether the output exists: the SDK is
+rebuilt when anything under `packages/plugin-sdk/src/` (or its `package.json` /
+`tsup.config.ts`) is newer than `dist/index.js`, and a plugin is rebuilt when its own
+sources *or* the SDK's `dist/index.js` are newer than its `ui/` output. So pulling or
+merging a branch that changes the SDK rebuilds it and every plugin on the next dev start.
+
+The SDK is a `file:` dependency. npm symlinks it, but yarn copies it into the plugin's
+`node_modules/`, and that copy is frozen at install time — reinstalling won't refresh it,
+because the SDK version hasn't changed. `prepare-dev-plugins` detects those copies and
+re-copies `dist/` into them before building, so a plugin never compiles against an SDK
+bundle older than the one in `packages/plugin-sdk/dist/`.
+
+Set `GSENDER_FORCE_PLUGIN_BUILD=1` to skip all of those checks and force a full rebuild
+(and reinstall) of the SDK and every plugin.
 
 ### Live reload (dev)
 
