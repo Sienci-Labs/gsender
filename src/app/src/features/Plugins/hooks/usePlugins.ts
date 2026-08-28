@@ -61,6 +61,10 @@ export const usePlugins = () => {
 		p.contributions.some((c) => c.slot === "tools-tab"),
 	);
 
+	const visualizerOverlayPlugins = activePlugins.filter((p) =>
+		p.contributions.some((c) => c.slot === "visualizer-overlay"),
+	);
+
 	return {
 		plugins,
 		pluginsDir,
@@ -72,5 +76,6 @@ export const usePlugins = () => {
 		activePlugins,
 		toolsPagePlugins,
 		toolsTabPlugins,
+		visualizerOverlayPlugins,
 	};
 };

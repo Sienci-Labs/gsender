@@ -167,6 +167,7 @@ viewer.focusToModel();
 |-----|-------------|
 | `machine.getContext()` | Current machine / controller context |
 | `machine.command(cmd, ...args)` | Run a host machine command |
+| `machine.setBusy(busy, label?)` | Flag the machine as busy for a feeder-driven op (stable status, host auto-releases) |
 | `workspace.getState()` | One-shot workspace snapshot |
 | `redux.getState()` | One-shot full Redux state |
 | `gcode.loadToVisualizer(gcode, name?)` | Load G-code into the main visualizer/job |
