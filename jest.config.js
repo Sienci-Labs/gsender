@@ -11,7 +11,9 @@ module.exports = {
 	transformIgnorePatterns: [
 		"/node_modules/(?!(three|@react-pdf|@react-pdf/renderer)/)",
 	],
-	testPathIgnorePatterns: ["/node_modules/"],
+	// plugins/* are standalone npm projects (own node_modules, ESM-only SDK
+	// dependency) with their own Vitest suites — see plugins/<name>/package.json.
+	testPathIgnorePatterns: ["/node_modules/", "<rootDir>/plugins/"],
 	moduleNameMapper: {
 		"\\.(css|less|scss|sass|styl)$":
 			"<rootDir>/src/app/src/__mocks__/styleMock.js",

@@ -37,4 +37,5 @@ cypress/downloads/
 
 plugins/*/ui
 
-
+/.claude
+*/CLAUDE.md

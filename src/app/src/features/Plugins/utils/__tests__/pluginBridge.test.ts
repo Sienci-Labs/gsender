@@ -90,4 +90,43 @@ describe("plugin bridge request gate", () => {
 		expect(response).toMatchObject({ id: "3", ok: false });
 		expect(response?.error).toMatch(/not authorized/i);
 	});
+
+	it("passes a granted viewer:* request through to the real handler (no primary visualizer mounted in this test env)", async () => {
+		registerPluginWindow(
+			source,
+			toRuntimeCapabilities({
+				requestTypes: ["viewer:screen-to-world"],
+				topics: [],
+			}),
+		);
+
+		const response = await handlePluginBridgeMessage(
+			makeEvent(source, { id: "4", type: "viewer:screen-to-world" }),
+		);
+
+		// The gate let it through — this is a domain error from the handler
+		// (no primary GcodeViewer registered), not an authorization error.
+		expect(response).toMatchObject({ id: "4", ok: false });
+		expect(response?.error).not.toMatch(/not authorized/i);
+		expect(response?.error).toMatch(/visualizer is not available/i);
+	});
+
+	it.each([
+		"viewer:camera:set",
+		"viewer:pick:arm",
+		"viewer:overlay:set",
+		"machine:busy:set",
+	] as const)("denies '%s' when not granted", async (type) => {
+		registerPluginWindow(
+			source,
+			toRuntimeCapabilities({ requestTypes: ["workspace:get:state"] }),
+		);
+
+		const response = await handlePluginBridgeMessage(
+			makeEvent(source, { id: type, type }),
+		);
+
+		expect(response).toMatchObject({ id: type, ok: false });
+		expect(response?.error).toMatch(/not authorized/i);
+	});
 });
