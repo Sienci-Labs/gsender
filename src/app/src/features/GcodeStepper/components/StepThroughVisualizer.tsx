@@ -21,7 +21,10 @@
  *
  */
 
-import type { WorkerGeometryData } from "@sienci/gviewer/viewer";
+import type {
+	LineRangeGroup,
+	WorkerGeometryData,
+} from "@sienci/gviewer/viewer";
 import { GCodeViewer } from "@sienci/gviewer/viewer";
 import { IMPERIAL_UNITS } from "app/constants";
 import {
@@ -33,6 +36,7 @@ import {
 	currentViewerThemeName,
 	WORKSHOP_VISUALIZER_COLORS,
 } from "app/features/Visualizer/viewerTheme";
+import { augmentWorkerGeometry } from "app/features/Visualizer/workerGeometry";
 import { isLaserMode } from "app/lib/laserMode";
 import store from "app/store";
 import type React from "react";
@@ -63,6 +67,15 @@ interface StepThroughVisualizerProps {
 	isRotaryFile: boolean;
 	units: string;
 	initialPosition: StepPosition;
+	/**
+	 * Frame ranges the toolpath is split into so they can be hidden separately —
+	 * one per tool, indexed the same way `hiddenGroups` is. Omit them and the
+	 * toolpath loads as a single pair of streams, where only a prefix can be
+	 * hidden.
+	 */
+	lineGroups?: readonly LineRangeGroup[];
+	/** Indices into `lineGroups` to hide. */
+	hiddenGroups?: ReadonlySet<number>;
 }
 
 /**
@@ -124,7 +137,15 @@ function topDownFitDistance(
 export const StepThroughVisualizer = forwardRef<
 	StepThroughVisualizerHandle,
 	StepThroughVisualizerProps
->(({ geometry, isRotaryFile, units, initialPosition }, ref) => {
+>((props, ref) => {
+	const {
+		geometry,
+		isRotaryFile,
+		units,
+		initialPosition,
+		lineGroups,
+		hiddenGroups,
+	} = props;
 	const containerRef = useRef<HTMLDivElement>(null);
 	const viewerRef = useRef<GCodeViewer | null>(null);
 	// Latest requested state, so it can be re-applied once an async load settles
@@ -142,6 +163,13 @@ export const StepThroughVisualizer = forwardRef<
 	// Frames queued to settle the camera after a load; cancelled if the modal
 	// closes first so nothing touches a disposed viewer.
 	const cameraRafRef = useRef<number | null>(null);
+	// Framing is a one-shot per open. The line groups arrive with the line index,
+	// well after the geometry does, so the toolpath is loaded a second time —
+	// which must not yank the camera back from wherever the user has put it.
+	const framedRef = useRef(false);
+	// Read inside the load callback, which does not re-run when a tool is
+	// toggled and would otherwise close over a stale set.
+	const hiddenGroupsRef = useRef(hiddenGroups);
 
 	const cancelCameraFrames = () => {
 		if (cameraRafRef.current !== null) {
@@ -183,6 +211,26 @@ export const StepThroughVisualizer = forwardRef<
 			rafRef.current = requestAnimationFrame(applyPending);
 		}
 	};
+
+	// A load rebuilds every stream visible, so this runs after each one as well
+	// as on every toggle.
+	const applyGroupVisibility = () => {
+		const viewer = viewerRef.current;
+		if (!viewer || !lineGroups) {
+			return;
+		}
+		const hidden = hiddenGroupsRef.current;
+		for (let i = 0; i < lineGroups.length; i++) {
+			viewer.setLineGroupVisible(i, !hidden?.has(i));
+		}
+	};
+
+	useEffect(() => {
+		hiddenGroupsRef.current = hiddenGroups;
+		applyGroupVisibility();
+		// applyGroupVisibility reads only the two values below plus the viewer ref.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [hiddenGroups, lineGroups]);
 
 	useImperativeHandle(ref, () => ({ seekTo }));
 
@@ -258,11 +306,26 @@ export const StepThroughVisualizer = forwardRef<
 
 		let cancelled = false;
 		viewer
-			.loadFromWorkerData(geometry)
+			// Must go through augmentWorkerGeometry: without the toolchange count
+			// gviewer discards the worker's per-tool colours and draws every cut in
+			// the theme's single cutting colour, so the Tools panel's colour chips
+			// would not match the toolpath.
+			.loadFromWorkerData(
+				augmentWorkerGeometry(geometry),
+				lineGroups ? { lineGroups } : undefined,
+			)
 			.then(() => {
 				if (cancelled || viewerRef.current !== viewer) {
 					return;
 				}
+
+				applyGroupVisibility();
+
+				if (framedRef.current) {
+					applyPending();
+					return;
+				}
+				framedRef.current = true;
 
 				// focusToModel() centres the camera's orbit target on the toolpath,
 				// but only advances it inside gviewer's animation loop — nothing is
@@ -305,7 +368,9 @@ export const StepThroughVisualizer = forwardRef<
 			cancelled = true;
 			cancelCameraFrames();
 		};
-	}, [geometry]);
+		// applyGroupVisibility and applyPending read refs, not render values.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [geometry, lineGroups]);
 
 	return (
 		<div

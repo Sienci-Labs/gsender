@@ -50,7 +50,11 @@ import {
 	modalsAtLine,
 	positionAtLine,
 } from "./utils/linePositionIndex";
-import { activeToolIndexForLine, buildStepperTools } from "./utils/tools";
+import {
+	activeToolIndexForLine,
+	buildStepperTools,
+	buildToolFrameGroups,
+} from "./utils/tools";
 
 interface GcodeStepperProps {
 	open: boolean;
@@ -187,6 +191,14 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
 		viewerRef.current?.seekTo(position, frame, hideProcessed ? "hide" : "grey");
 	}, [position, frame, hideProcessed]);
 
+	// Split the toolpath by tool so the Tools panel's eye buttons can hide one.
+	// Needs the line index, which lands after the geometry does, so the viewer
+	// reloads once when this becomes available.
+	const toolLineGroups = useMemo(
+		() => buildToolFrameGroups(tools, index),
+		[tools, index],
+	);
+
 	const activeToolIndex = activeToolIndexForLine(tools, currentLine);
 
 	const toggleTool = useCallback((toolIndex: number) => {
@@ -199,9 +211,9 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
 			}
 			return next;
 		});
-		// TODO: hide/show this tool's paths in gviewer once the package exposes
-		// per-tool stream visibility. Today it only supports whole-stream and
-		// line-range operations, so the toggle is state-only.
+		// hiddenTools is the single source of truth: StepThroughVisualizer takes it
+		// as a prop and re-applies it to gviewer, including after a reload, so
+		// nothing has to be pushed imperatively from here.
 	}, []);
 
 	const indexing = index === null && lines.length > 0;
@@ -245,6 +257,8 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
 								isRotaryFile={isRotaryFile}
 								units={units}
 								initialPosition={position}
+								lineGroups={toolLineGroups}
+								hiddenGroups={hiddenTools}
 							/>
 							{indexing && (
 								<div className="pointer-events-none absolute bottom-2 left-2 rounded bg-black/60 px-2 py-1 text-xs text-white">

@@ -208,11 +208,9 @@ const ToolVisibilityItem: React.FC<{
  * Tools used by the loaded file, with the one active at the current line
  * highlighted.
  *
- * The visibility buttons currently only drive local state: gviewer has no API
- * for hiding an individual tool's paths (only whole-stream and line-range
- * operations), so there is nothing to call through to yet. Once the package
- * exposes per-tool stream visibility, `onToggleTool` is the single place the
- * viewer call needs to be added.
+ * The visibility buttons report through `onToggleTool`; the modal owns the
+ * hidden set and hands it to the visualizer, which loads the toolpath split by
+ * tool so each one can be hidden on its own.
  */
 export const ToolVisibilityPanel: React.FC<ToolVisibilityPanelProps> = ({
 	tools,

@@ -21,10 +21,12 @@
  *
  */
 
+import type { LineRangeGroup } from "@sienci/gviewer/viewer";
 import { buildToolArray } from "app/features/ATC/components/ToolTimeline";
 import { G1_PART } from "app/features/Visualizer/constants";
 import { getVisualizerTheme } from "app/lib/getVisualizerTheme";
-import type { StepperTool } from "../definitions";
+import type { LinePositionIndex, StepperTool } from "../definitions";
+import { frameAtLine } from "./linePositionIndex";
 
 const MM_PER_INCH = 25.4;
 
@@ -168,6 +170,32 @@ export function buildStepperTools(
 			spindleSpeed: spindleSpeedForTool(events, startLine, endLine),
 		};
 	});
+}
+
+/**
+ * Converts each tool's line span into the frame ranges gviewer hides by.
+ *
+ * The two are not the same coordinate: the visualize worker emits a frame per
+ * line it actually parses, skipping comment-only lines, so a tool's 1-based
+ * line span drifts from its frame span by however many comments precede it.
+ * `frameForLine` (via `frameAtLine`) is the running frame *count* through a
+ * line, so the first frame of a tool is the count reached by the line before
+ * it, and its last is one below the count reached by its own final line.
+ *
+ * Returns undefined when there is nothing to group, so the viewer loads the
+ * toolpath as a single pair of streams exactly as it did before.
+ */
+export function buildToolFrameGroups(
+	tools: readonly StepperTool[],
+	index: LinePositionIndex | null,
+): LineRangeGroup[] | undefined {
+	if (!index || tools.length === 0) {
+		return undefined;
+	}
+	return tools.map((tool) => ({
+		start: tool.startLine <= 1 ? 0 : frameAtLine(index, tool.startLine - 1),
+		end: frameAtLine(index, tool.endLine) - 1,
+	}));
 }
 
 /** Index into `tools` of the tool active at `line`, or -1 when none is. */

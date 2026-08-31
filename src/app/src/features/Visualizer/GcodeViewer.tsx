@@ -67,6 +67,7 @@ import {
 	type VisualizerBridgeHandle,
 	visualizerBridge,
 } from "./visualizerBridge";
+import { augmentWorkerGeometry } from "./workerGeometry";
 
 // Press-and-hold pick gesture: how long to hold before committing, and how far
 // the pointer may drift before the gesture is treated as an orbit/pan instead of
@@ -392,13 +393,9 @@ class GcodeViewer extends Component<Props> {
 		this.lastWorkerData = data;
 		this.lastHiddenLine = -1;
 
-		// Augment with toolchange count so gviewer only locks cut stream colors
-		// when the file actually has toolchange palette assignments.
-		const raw = data as any;
-		const toolchangeCount: number = Array.isArray(raw.info?.toolchanges)
-			? raw.info.toolchanges.length
-			: 0;
-		const augmented: WorkerGeometryData = { ...data, toolchangeCount };
+		// Shared so every viewer keeps the worker's per-tool palette; see
+		// augmentWorkerGeometry for why gviewer drops it otherwise.
+		const augmented = augmentWorkerGeometry(data);
 
 		if (this.mode === "svg" && this.viewerSvg) {
 			this.viewerSvg.loadFromWorkerData(augmented);
