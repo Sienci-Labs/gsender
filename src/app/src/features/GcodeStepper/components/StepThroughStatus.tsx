@@ -23,14 +23,13 @@
 
 import { IMPERIAL_UNITS } from "app/constants";
 import { cn } from "app/lib/utils";
+import { EyeOff } from "lucide-react";
 import type React from "react";
 import type { LineModalState, StepPosition } from "../definitions";
 
 const MM_PER_INCH = 25.4;
 
 interface StepThroughStatusProps {
-	currentLine: number;
-	totalLines: number;
 	position: StepPosition;
 	/** A is only shown when the loaded file actually contains rotary movement. */
 	showAAxis: boolean;
@@ -39,6 +38,9 @@ interface StepThroughStatusProps {
 	modalState: LineModalState | null;
 	/** Modal state at the line before it, used to mark what this line changed. */
 	previousModalState: LineModalState | null;
+	/** Whether processed geometry is hidden outright rather than greyed. */
+	hideProcessed: boolean;
+	onToggleHideProcessed: () => void;
 }
 
 const Block: React.FC<{
@@ -67,109 +69,137 @@ const AxisReadout: React.FC<{ label: string; value: string }> = ({
 		<span className="text-xs text-gray-500 dark:text-content-muted">
 			{label}
 		</span>
-		<span className="font-mono tabular-nums text-gray-900 dark:text-content-primary">
+		{/* Fixed-width and right-aligned: without this the bar reflows on every
+		    step as values cross a digit or pick up a minus sign. `ch` is exact
+		    under font-mono, and 9 of them hold the widest realistic readout
+		    ("-9999.999", or "-360.000°" for A). */}
+		<span className="inline-block w-[9ch] text-right font-mono tabular-nums text-gray-900 dark:text-content-primary">
 			{value}
 		</span>
 	</div>
 );
 
 /**
- * One modal word. `changed` marks a value this line actually altered, so
+ * One modal group. `changed` marks a value this line actually altered, so
  * stepping onto a toolchange or a feed change is visible at a glance.
  */
-const ModalWord: React.FC<{ value: string; changed: boolean }> = ({
-	value,
-	changed,
-}) => (
-	<span
+const ModalCell: React.FC<{
+	label: string;
+	value: string;
+	changed: boolean;
+}> = ({ label, value, changed }) => (
+	<div
 		className={cn(
-			"font-mono tabular-nums",
+			"flex flex-col items-center rounded border px-1 py-0.5 transition-colors",
+			// The whole cell lights up, not just the value — a single bolded code
+			// among eleven is easy to miss while stepping.
 			changed
-				? "font-bold text-blue-600 dark:text-blue-300"
-				: "text-gray-700 dark:text-content-secondary",
+				? "border-blue-500 bg-blue-500/20"
+				: "border-gray-200 dark:border-outline/70",
 		)}
 	>
-		{value}
-	</span>
+		<span
+			className={cn(
+				"text-[10px] uppercase tracking-wide",
+				changed
+					? "text-blue-700 dark:text-blue-200"
+					: "text-gray-500 dark:text-content-muted",
+			)}
+		>
+			{label}
+		</span>
+		<span
+			className={cn(
+				"font-mono text-sm tabular-nums",
+				changed
+					? "font-bold text-blue-700 dark:text-blue-200"
+					: "text-gray-700 dark:text-content-secondary",
+			)}
+		>
+			{value}
+		</span>
+	</div>
 );
 
-/** A number the file may never have set — NaN and null both mean "not shown". */
+/** A number the file may never have set — NaN and null both mean "unset". */
 const isSet = (value: number | null | undefined): value is number =>
 	value !== null && value !== undefined && Number.isFinite(value);
 
+/**
+ * The modal state as GRBL's `$G` would report it.
+ *
+ * gviewer's DEFAULT_MODALS leaves spindle, coolant, tool, feed and speed null
+ * until the file sets them, but a real controller always has a value for each —
+ * `M5 M9 T0 F0 S0` at power-on. Substituting those keeps every group present
+ * instead of having cells appear and disappear as the file progresses.
+ */
+function grblModals(state: LineModalState | null) {
+	if (!state) {
+		return null;
+	}
+	const { modals, feedRate, spindleSpeed } = state;
+	return {
+		motion: modals.motion,
+		coordinateSystem: modals.coordinateSystem,
+		plane: modals.plane,
+		units: modals.units,
+		distance: modals.distance,
+		feedMode: modals.feedMode,
+		spindle: modals.spindle ?? "M5",
+		coolant: modals.coolant ?? "M9",
+		tool: `T${isSet(modals.tool) ? modals.tool : 0}`,
+		feedRate: `F${isSet(feedRate) ? feedRate : 0}`,
+		spindleSpeed: `S${isSet(spindleSpeed) ? spindleSpeed : 0}`,
+	};
+}
+
+type GrblModals = NonNullable<ReturnType<typeof grblModals>>;
+
+const MODAL_LABELS: [keyof GrblModals, string][] = [
+	["motion", "Motion"],
+	["coordinateSystem", "WCS"],
+	["plane", "Plane"],
+	["units", "Units"],
+	["distance", "Distance"],
+	["feedMode", "Feed mode"],
+	["spindle", "Spindle"],
+	["coolant", "Coolant"],
+	["tool", "Tool"],
+	["feedRate", "Feed"],
+	["spindleSpeed", "Speed"],
+];
+
+/**
+ * The modal's bottom bar: work position, the G-code modal state at the current
+ * line, and the processed-geometry control.
+ *
+ * The current line number deliberately isn't repeated here — the scrubber
+ * directly above already shows it.
+ */
 export const StepThroughStatus: React.FC<StepThroughStatusProps> = ({
-	currentLine,
-	totalLines,
 	position,
 	showAAxis,
 	units,
 	modalState,
 	previousModalState,
+	hideProcessed,
+	onToggleHideProcessed,
 }) => {
-	// Index positions are always mm; convert only for display.
+	// Index positions are always mm; convert only for display. Both unit systems
+	// use 3 decimals so the column width is constant across a units change.
 	const imperial = units === IMPERIAL_UNITS;
-	const linear = (mm: number) =>
-		imperial ? (mm / MM_PER_INCH).toFixed(4) : mm.toFixed(3);
+	const linear = (mm: number) => (imperial ? mm / MM_PER_INCH : mm).toFixed(3);
 
-	// Every word the file has actually set, paired with whether this line set it.
-	const words: { key: string; value: string; changed: boolean }[] = [];
-	if (modalState) {
-		const { modals, feedRate, spindleSpeed } = modalState;
-		const previous = previousModalState?.modals;
-
-		const push = (
-			key: string,
-			value: string | null | undefined,
-			changed: boolean,
-		) => {
-			if (value) {
-				words.push({ key, value, changed });
-			}
-		};
-		const differs = <K extends keyof typeof modals>(key: K) =>
-			!!previous && previous[key] !== modals[key];
-
-		push("motion", modals.motion, differs("motion"));
-		push("distance", modals.distance, differs("distance"));
-		push("units", modals.units, differs("units"));
-		push("plane", modals.plane, differs("plane"));
-		push("wcs", modals.coordinateSystem, differs("coordinateSystem"));
-		push("spindle", modals.spindle, differs("spindle"));
-		push("coolant", modals.coolant, differs("coolant"));
-		if (isSet(modals.tool)) {
-			push("tool", `T${modals.tool}`, differs("tool"));
-		}
-		if (isSet(feedRate)) {
-			push(
-				"feed",
-				`F${feedRate}`,
-				!!previousModalState && previousModalState.feedRate !== feedRate,
-			);
-		}
-		if (isSet(spindleSpeed)) {
-			push(
-				"speed",
-				`S${spindleSpeed}`,
-				!!previousModalState &&
-					previousModalState.spindleSpeed !== spindleSpeed,
-			);
-		}
-	}
+	const current = grblModals(modalState);
+	const previous = grblModals(previousModalState);
 
 	return (
 		<div className="flex flex-wrap items-stretch gap-2">
-			<Block label="Current line">
-				<span className="whitespace-nowrap font-mono tabular-nums text-gray-900 dark:text-content-primary">
-					{currentLine.toLocaleString()}
-					<span className="text-gray-500 dark:text-content-muted">
-						{" / "}
-						{totalLines.toLocaleString()}
-					</span>
-				</span>
-			</Block>
-
-			<Block label={`Position (Work, ${imperial ? "in" : "mm"})`}>
-				<div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+			<Block
+				label={`Position (Work, ${imperial ? "in" : "mm"})`}
+				className="flex-shrink-0"
+			>
+				<div className="flex items-center gap-x-3">
 					<AxisReadout label="X" value={linear(position.x)} />
 					<AxisReadout label="Y" value={linear(position.y)} />
 					<AxisReadout label="Z" value={linear(position.z)} />
@@ -179,23 +209,45 @@ export const StepThroughStatus: React.FC<StepThroughStatusProps> = ({
 				</div>
 			</Block>
 
-			<Block label="Modals" className="min-w-[14rem] flex-1">
-				{words.length === 0 ? (
+			<Block label="Modals" className="min-w-[18rem] flex-1">
+				{current === null ? (
 					<span className="text-xs text-gray-500 dark:text-content-muted">
 						—
 					</span>
 				) : (
-					<div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-						{words.map((word) => (
-							<ModalWord
-								key={word.key}
-								value={word.value}
-								changed={word.changed}
+					<div className="grid grid-cols-[repeat(auto-fit,minmax(4.5rem,1fr))] gap-1">
+						{MODAL_LABELS.map(([key, label]) => (
+							<ModalCell
+								key={key}
+								label={label}
+								value={current[key]}
+								changed={previous !== null && previous[key] !== current[key]}
 							/>
 						))}
 					</div>
 				)}
 			</Block>
+
+			<button
+				type="button"
+				role="switch"
+				aria-checked={hideProcessed}
+				onClick={onToggleHideProcessed}
+				className={cn(
+					"flex min-h-[2.75rem] flex-shrink-0 items-center gap-2 rounded-lg border px-3 text-xs transition-colors",
+					"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+					hideProcessed
+						? "border-blue-500 bg-blue-500 text-white hover:bg-blue-600"
+						: "border-gray-300 bg-white text-gray-600 hover:bg-gray-100 dark:border-outline dark:bg-surface-elevated dark:text-content-secondary dark:hover:bg-surface-hover",
+				)}
+			>
+				<EyeOff className="h-4 w-4 flex-shrink-0" />
+				<span className="text-left leading-tight">
+					Hide previous
+					<br />
+					lines
+				</span>
+			</button>
 		</div>
 	);
 };

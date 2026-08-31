@@ -31,6 +31,7 @@ import { FILE_TYPE, METRIC_UNITS } from "app/constants";
 import { getLastWorkerGeometry } from "app/features/Visualizer/lastWorkerGeometry";
 import { useTypedSelector } from "app/hooks/useTypedSelector";
 import { useWorkspaceState } from "app/hooks/useWorkspaceState";
+import store from "app/store";
 import { X } from "lucide-react";
 import type React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -80,6 +81,11 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
 	// True only while the scrubber thumb is held. Drives the source panel's
 	// deferred re-centring; everything else still tracks the drag live.
 	const [scrubbing, setScrubbing] = useState(false);
+	// Seeded from the app-wide setting so the modal opens matching the primary
+	// visualizer, but toggling here is modal-local and never writes back.
+	const [hideProcessed, setHideProcessed] = useState(() =>
+		store.get("widgets.visualizer.hideProcessedLines", false),
+	);
 
 	const viewerRef = useRef<StepThroughVisualizerHandle>(null);
 
@@ -120,6 +126,7 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
 		setCurrentLine(1);
 		setHiddenTools(new Set());
 		setScrubbing(false);
+		setHideProcessed(store.get("widgets.visualizer.hideProcessedLines", false));
 	}, [open]);
 
 	// Walk the file once per open to learn the position at every line.
@@ -174,10 +181,11 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
 	);
 
 	// currentLine (via the index) is what drives the cutter marker and how much
-	// of the toolpath is drawn as already processed.
+	// of the toolpath is drawn as already processed. hideProcessed is a dependency
+	// so flipping the toggle re-applies at the current line straight away.
 	useEffect(() => {
-		viewerRef.current?.seekTo(position, frame);
-	}, [position, frame]);
+		viewerRef.current?.seekTo(position, frame, hideProcessed ? "hide" : "grey");
+	}, [position, frame, hideProcessed]);
 
 	const activeToolIndex = activeToolIndexForLine(tools, currentLine);
 
@@ -274,13 +282,13 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
 							onStep={(delta) => goToLine(currentLine + delta)}
 						/>
 						<StepThroughStatus
-							currentLine={currentLine}
-							totalLines={totalLines}
 							position={position}
 							showAAxis={showAAxis}
 							units={units}
 							modalState={modalState}
 							previousModalState={previousModalState}
+							hideProcessed={hideProcessed}
+							onToggleHideProcessed={() => setHideProcessed((prev) => !prev)}
 						/>
 					</div>
 				</div>

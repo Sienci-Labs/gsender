@@ -39,15 +39,23 @@ import type React from "react";
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import type { StepPosition } from "../definitions";
 
+// Breathing room around the toolpath when framing it on open. gviewer's own
+// framing uses 1.25; this view wants to sit closer.
+const FIT_MARGIN = 1.05;
+
 export interface StepThroughVisualizerHandle {
 	/**
 	 * Move to the state for the current line: the cutter marker to `position`,
-	 * and the processed-geometry cursor to `frame`.
+	 * and the processed-geometry cursor to `frame`, drawn per `progressMode`.
 	 *
 	 * Rotary files spin the whole toolpath about A rather than pre-transforming
 	 * the point, matching how the primary visualizer places its bit.
 	 */
-	seekTo: (position: StepPosition, frame: number) => void;
+	seekTo: (
+		position: StepPosition,
+		frame: number,
+		progressMode: "hide" | "grey",
+	) => void;
 }
 
 interface StepThroughVisualizerProps {
@@ -58,12 +66,55 @@ interface StepThroughVisualizerProps {
 }
 
 /**
+ * Camera distance that fits the toolpath's XY footprint from directly above.
+ *
+ * gviewer's own framing (used by focusToModel and the ViewCube) is
+ * `max(dx, dy) / 2 / tan(fov/2) * 1.25 + dz`, which ignores the viewport's
+ * aspect ratio — fine for its angled default view, but too far out looking
+ * straight down a pane that is wider than it is tall. Solving each axis against
+ * the FOV that actually constrains it, with a tighter margin, fills the pane.
+ *
+ * Returns null when there is nothing to frame, so the caller can fall back to
+ * gviewer's own distance rather than invent one.
+ */
+function topDownFitDistance(
+	bounds: {
+		min: { x: number; y: number; z: number };
+		max: { x: number; y: number; z: number };
+	} | null,
+	fovDegrees: number,
+	viewportAspect: number,
+): number | null {
+	if (!bounds) {
+		return null;
+	}
+	const halfX = (bounds.max.x - bounds.min.x) / 2;
+	const halfY = (bounds.max.y - bounds.min.y) / 2;
+	const depth = bounds.max.z - bounds.min.z;
+	if (!(halfX > 0) && !(halfY > 0)) {
+		// A single point or an empty program — nothing meaningful to fit to.
+		return null;
+	}
+
+	const tan = Math.tan((fovDegrees * Math.PI) / 180 / 2);
+	if (!(tan > 0) || !(viewportAspect > 0)) {
+		return null;
+	}
+	// Vertical FOV constrains Y directly; X is constrained by the horizontal FOV,
+	// which is the vertical one widened by the aspect ratio.
+	const forY = halfY / tan;
+	const forX = halfX / (tan * viewportAspect);
+	const distance = Math.max(forY, forX) * FIT_MARGIN + Math.max(0, depth);
+	return Number.isFinite(distance) && distance > 0 ? distance : null;
+}
+
+/**
  * The step-through modal's own gviewer instance.
  *
  * Renders the geometry the visualize worker already produced for the primary
  * visualizer — same buffers, so the toolpath colours (including the per-tool
- * palette) match the Tools panel — with the camera pinned top-down on open and
- * the ViewCube left in place for reorientation.
+ * palette) match the Tools panel — framed top-down on the toolpath on open. The
+ * ViewCube is hidden here (see the container's class list); orbiting still works.
  *
  * Scene options are built from the same shared helpers the primary visualizer
  * uses, so the grid, axis extents and machine bed are identical for a given
@@ -78,9 +129,14 @@ export const StepThroughVisualizer = forwardRef<
 	const viewerRef = useRef<GCodeViewer | null>(null);
 	// Latest requested state, so it can be re-applied once an async load settles
 	// and so a burst of scrub events collapses into one frame of work.
-	const pendingRef = useRef<{ position: StepPosition; frame: number }>({
+	const pendingRef = useRef<{
+		position: StepPosition;
+		frame: number;
+		progressMode: "hide" | "grey";
+	}>({
 		position: initialPosition,
 		frame: 0,
+		progressMode: "grey",
 	});
 	const rafRef = useRef<number | null>(null);
 	// Frames queued to settle the camera after a load; cancelled if the modal
@@ -100,21 +156,26 @@ export const StepThroughVisualizer = forwardRef<
 		if (!viewer) {
 			return;
 		}
-		const { position, frame } = pendingRef.current;
+		const { position, frame, progressMode } = pendingRef.current;
 		viewer.setToolpathRotationA(isRotaryFile ? position.a : 0);
 		viewer.setBitPosition(
 			{ x: position.x, y: position.y, z: position.z, a: position.a },
 			{ immediate: true },
 		);
-		// No mode argument, so it follows options.progress.mode (the app's
-		// hideProcessedLines setting) exactly like a running job does. This only
-		// recolours the delta since the last cursor and restores the base colours
-		// when moving backwards, so scrubbing in reverse un-greys on its own.
-		viewer.hideUntilLine(frame);
+		// The mode is passed per call rather than through options, so the in-modal
+		// toggle takes effect immediately. This only recolours the delta since the
+		// last cursor and restores the base colours when moving backwards, so
+		// scrubbing in reverse un-greys on its own; "hide" never touches colours,
+		// so switching between the two stays consistent without a resetColors().
+		viewer.hideUntilLine(frame, progressMode);
 	};
 
-	const seekTo = (position: StepPosition, frame: number) => {
-		pendingRef.current = { position, frame };
+	const seekTo = (
+		position: StepPosition,
+		frame: number,
+		progressMode: "hide" | "grey",
+	) => {
+		pendingRef.current = { position, frame, progressMode };
 		// A long scrub drag can outpace the renderer — recolouring a big vertex
 		// range on every pointermove is the expensive part, so coalesce to one
 		// update per frame.
@@ -218,9 +279,20 @@ export const StepThroughVisualizer = forwardRef<
 						if (cancelled || viewerRef.current !== viewer) {
 							return;
 						}
-						// No distance override: focusToModel has already set the
-						// camera at gviewer's own framing distance for these bounds.
-						viewer.snapCameraToView("top", { durationMs: 0 });
+						// focusToModel has centred the target; now frame the XY
+						// footprint for this pane rather than inheriting the distance
+						// it computed for an angled view. Read the container here, not
+						// at load time, so the aspect reflects the laid-out canvas.
+						const el = containerRef.current;
+						const distance = topDownFitDistance(
+							viewer.getBounds(),
+							viewer.getOptions().camera.fov,
+							el ? el.clientWidth / Math.max(1, el.clientHeight) : 0,
+						);
+						viewer.snapCameraToView("top", {
+							durationMs: 0,
+							...(distance === null ? {} : { distance }),
+						});
 						applyPending();
 					});
 				});
