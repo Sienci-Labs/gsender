@@ -21,6 +21,8 @@
  *
  */
 
+import type { ModalState } from "@sienci/gviewer";
+
 /** Machine position at a single G-code line, in millimetres. */
 export interface StepPosition {
 	x: number;
@@ -36,8 +38,44 @@ export interface StepPosition {
  * index — holding the position the machine has reached once that line has run.
  * Non-motion lines carry the position from the last motion line before them.
  */
+/**
+ * The G-code modal state in effect at a line, plus the feed and spindle values
+ * that were current there.
+ *
+ * `modals` is the virtualizer's own ModalState; feed and speed are held apart
+ * from it because they change far too often to dedupe (see LinePositionIndex).
+ */
+export interface LineModalState {
+	modals: ModalState;
+	/** Feed rate for this line, or NaN when the file has not set one yet. */
+	feedRate: number;
+	/** Spindle speed for this line, or NaN when the file has not set one yet. */
+	spindleSpeed: number;
+}
+
 export interface LinePositionIndex {
 	positions: Float32Array;
+	/**
+	 * Index into the visualize worker's `frames` array for each 0-based line —
+	 * which is what gviewer's `hideUntilLine` counts in when geometry was loaded
+	 * with `loadFromWorkerData`, since the worker only emits a frame for lines
+	 * that reach GCodeVirtualizer's per-line callback.
+	 */
+	frameForLine: Int32Array;
+	/**
+	 * Distinct modal-group combinations seen in the file, in first-seen order.
+	 *
+	 * Real files use very few of these — a couple of thousand lines of CAM output
+	 * typically produces under ten — so one shared entry per combination plus an
+	 * index per line costs far less than a snapshot per line.
+	 */
+	modalTable: ModalState[];
+	/** Index into `modalTable` for each 0-based line. */
+	modalForLine: Uint16Array;
+	/** Feed rate per 0-based line; NaN until the file sets one. */
+	feedRates: Float32Array;
+	/** Spindle speed per 0-based line; NaN until the file sets one. */
+	spindleSpeeds: Float32Array;
 	lineCount: number;
 }
 

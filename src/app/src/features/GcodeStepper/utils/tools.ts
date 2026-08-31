@@ -183,3 +183,47 @@ export function activeToolIndexForLine(
 	// Before the first toolchange nothing is cutting yet.
 	return -1;
 }
+
+/** Linearise one 0-255 sRGB channel for the luminance sum. */
+const linearise = (channel: number): number => {
+	const c = channel / 255;
+	return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+};
+
+/**
+ * Black or white, whichever contrasts better on top of `hex`.
+ *
+ * The toolpath palette (TOOLPATH_COLOR_HEXES) is mostly mid-tones — oranges,
+ * mid blues, magentas — plus some genuinely light greens and golds. White alone
+ * clears 4.5:1 on none of it, so hard-coding a foreground is not an option.
+ * Rather than pick on a luminance threshold (easy to set wrong: anything above
+ * ~0.18 already favours black), compute the actual WCAG contrast ratio against
+ * both and take the winner. Over the full palette that never drops below 4.5:1.
+ */
+export function readableTextColor(hex: string): string {
+	const match = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(hex?.trim() ?? "");
+	if (!match) {
+		return "#ffffff";
+	}
+
+	let digits = match[1];
+	if (digits.length === 3) {
+		digits = digits
+			.split("")
+			.map((d) => d + d)
+			.join("");
+	}
+
+	const r = Number.parseInt(digits.slice(0, 2), 16);
+	const g = Number.parseInt(digits.slice(2, 4), 16);
+	const b = Number.parseInt(digits.slice(4, 6), 16);
+	const luminance =
+		0.2126 * linearise(r) + 0.7152 * linearise(g) + 0.0722 * linearise(b);
+
+	// WCAG contrast: (lighter + 0.05) / (darker + 0.05). White has luminance 1,
+	// black 0, so these reduce to the two expressions below.
+	const againstWhite = 1.05 / (luminance + 0.05);
+	const againstBlack = (luminance + 0.05) / 0.05;
+
+	return againstBlack >= againstWhite ? "#000000" : "#ffffff";
+}

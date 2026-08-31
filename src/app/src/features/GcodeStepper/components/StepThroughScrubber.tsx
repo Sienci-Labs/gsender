@@ -36,11 +36,18 @@ interface ScrubberProps {
 
 const TICK_COUNT = 40;
 
+// Half the thumb's 24px diameter: the row is inset by this so the thumb
+// stays fully visible at line 1 and at the last line.
+const THUMB_INSET = "px-3";
+
 /**
  * Media-timeline style scrubber over the whole file.
  *
- * The track itself is the drag surface and is padded out to a 44px-tall hit
- * area, so the thumb never has to be hit precisely on a touchscreen.
+ * The whole 44px-tall row is the drag surface, so the thumb never has to be hit
+ * precisely on a touchscreen. The row is inset by the thumb's radius and the
+ * pointer maths measures the inset track, so the thumb stays fully on screen at
+ * both ends of the file — these two have to move together or the rendered
+ * progress and the pointer position drift apart.
  */
 export const StepThroughScrubber: React.FC<ScrubberProps> = ({
 	currentLine,
@@ -121,10 +128,14 @@ export const StepThroughScrubber: React.FC<ScrubberProps> = ({
 	const progress =
 		totalLines > 1 ? ((currentLine - 1) / (totalLines - 1)) * 100 : 0;
 
+	// 0/25/50/75/100% of the file, lining up with the taller ticks below.
+	const quarterLabels = [0, 0.25, 0.5, 0.75, 1].map((fraction) =>
+		Math.max(1, Math.round(fraction * totalLines) || 1),
+	);
+
 	return (
 		<div className="flex flex-col gap-1">
 			<div
-				ref={trackRef}
 				role="slider"
 				tabIndex={0}
 				aria-label="G-code line"
@@ -136,15 +147,22 @@ export const StepThroughScrubber: React.FC<ScrubberProps> = ({
 				onPointerUp={endDrag}
 				onPointerCancel={endDrag}
 				onKeyDown={handleKeyDown}
-				className="relative flex h-11 cursor-pointer touch-none select-none items-center focus-visible:outline-none"
+				className={cn(
+					"relative flex h-11 cursor-pointer touch-none select-none items-center",
+					"focus-visible:outline-none",
+					THUMB_INSET,
+				)}
 			>
 				{/* Track */}
-				<div className="relative h-2 w-full rounded-full bg-gray-200 dark:bg-surface-sunken">
+				<div
+					ref={trackRef}
+					className="relative h-2 w-full rounded-full bg-gray-200 dark:bg-surface-sunken"
+				>
 					<div
 						className="absolute inset-y-0 left-0 rounded-full bg-blue-500"
 						style={{ width: `${progress}%` }}
 					/>
-					{/* Thumb — visual only; the whole track is the hit area. */}
+					{/* Thumb — visual only; the whole row is the hit area. */}
 					<div
 						className={cn(
 							"pointer-events-none absolute top-1/2 h-6 w-6 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 bg-white shadow",
@@ -156,10 +174,13 @@ export const StepThroughScrubber: React.FC<ScrubberProps> = ({
 				</div>
 			</div>
 
-			{/* Tick marks */}
+			{/* Tick marks — every tenth is taller and lands on a quarter label. */}
 			<div
 				aria-hidden="true"
-				className="flex h-2 w-full items-start justify-between px-[2px]"
+				className={cn(
+					"flex h-2 w-full items-start justify-between",
+					THUMB_INSET,
+				)}
 			>
 				{Array.from({ length: TICK_COUNT + 1 }, (_, i) => (
 					<span
@@ -172,18 +193,35 @@ export const StepThroughScrubber: React.FC<ScrubberProps> = ({
 				))}
 			</div>
 
-			<div className="flex items-baseline justify-between text-xs text-gray-500 dark:text-content-muted">
-				<span>1</span>
-				<span className="text-base text-gray-900 dark:text-content-primary">
-					<span className="font-bold tabular-nums">
-						{currentLine.toLocaleString()}
+			{/* Quarter labels, pinned to the same track positions as the ticks. The
+			    outer two are clamped inward so neither can clip. */}
+			<div className={cn("relative h-4", THUMB_INSET)}>
+				{quarterLabels.map((line, i) => (
+					<span
+						// Positional, not by value: a short file repeats line numbers
+						// across quarters.
+						key={i}
+						style={{ left: `${i * 25}%` }}
+						className={cn(
+							"absolute top-0 whitespace-nowrap text-xs tabular-nums text-gray-500 dark:text-content-muted",
+							i === 0 && "translate-x-0",
+							i > 0 && i < 4 && "-translate-x-1/2",
+							i === 4 && "-translate-x-full",
+						)}
+					>
+						{line.toLocaleString()}
 					</span>
-					<span className="text-gray-500 dark:text-content-muted">
-						{" / "}
-						{totalLines.toLocaleString()}
-					</span>
+				))}
+			</div>
+
+			<div className="text-center text-base text-gray-900 dark:text-content-primary">
+				<span className="font-bold tabular-nums">
+					{currentLine.toLocaleString()}
 				</span>
-				<span>{totalLines.toLocaleString()}</span>
+				<span className="text-gray-500 dark:text-content-muted">
+					{" / "}
+					{totalLines.toLocaleString()}
+				</span>
 			</div>
 
 			<span className="text-center text-xs text-gray-500 dark:text-content-muted">

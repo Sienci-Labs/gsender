@@ -21,10 +21,10 @@
  *
  */
 
+import { useWorkspaceState } from "app/hooks/useWorkspaceState";
 import { cn } from "app/lib/utils";
 import { ChevronRight, Search, X } from "lucide-react";
-import type React from "react";
-import {
+import React, {
 	useCallback,
 	useEffect,
 	useLayoutEffect,
@@ -32,35 +32,149 @@ import {
 	useRef,
 	useState,
 } from "react";
+import SyntaxHighlighter from "react-syntax-highlighter";
+import {
+	a11yDark,
+	a11yLight,
+} from "react-syntax-highlighter/dist/esm/styles/hljs";
 
 // Row height must stay in sync with the row's rendered height for the
 // windowing maths to line up.
 const LINE_HEIGHT = 28;
 const OVERSCAN = 12;
+// How long after the last scroll event the list is treated as settled and rows
+// go back to being syntax-highlighted.
+const SCROLL_IDLE_MS = 150;
+
+// Strips the highlighter's own box styling so tokens sit flush in the row and
+// the row's background (current line, search match) shows through behind them.
+const SYNTAX_CUSTOM_STYLE = {
+	background: "transparent",
+	padding: 0,
+	margin: 0,
+	fontSize: "inherit",
+	lineHeight: "inherit",
+	// The hljs themes' base style is `display: block; overflow-x: auto`, which
+	// gives every long line its own horizontal scrollbar. Going back to inline
+	// lets the row's `truncate` clip it with an ellipsis instead.
+	display: "inline",
+	overflowX: "hidden",
+} as const;
+
+interface GCodeSourceLineProps {
+	line: string;
+	lineNumber: number;
+	isCurrent: boolean;
+	isMatch: boolean;
+	/** Highlighting is skipped mid-scroll — see SCROLL_IDLE_MS. */
+	isScrolling: boolean;
+	/** Exact width of the line-number gutter, in `ch` of the row's mono font. */
+	gutterWidth: string;
+	enableDarkMode: boolean;
+	onSelect: (line: number) => void;
+}
+
+/**
+ * One source row. Memoised so a scrub only re-renders the two rows whose
+ * current/match state actually changed, not the whole window.
+ */
+const GCodeSourceLine = React.memo(
+	({
+		line,
+		lineNumber,
+		isCurrent,
+		isMatch,
+		isScrolling,
+		gutterWidth,
+		enableDarkMode,
+		onSelect,
+	}: GCodeSourceLineProps) => (
+		<button
+			type="button"
+			onClick={() => onSelect(lineNumber)}
+			style={{ top: (lineNumber - 1) * LINE_HEIGHT, height: LINE_HEIGHT }}
+			className={cn(
+				"absolute left-0 flex w-full items-center gap-1 px-2 text-left font-mono text-xs",
+				// Every row reserves the accent bar so nothing shifts horizontally
+				// when the current line moves.
+				"border-l-4 border-transparent",
+				isCurrent
+					? "border-blue-500 bg-blue-500/25"
+					: isMatch
+						? "bg-yellow-100 dark:bg-yellow-900/30"
+						: "hover:bg-gray-100 dark:hover:bg-surface-hover",
+			)}
+		>
+			<ChevronRight
+				className={cn(
+					"h-3 w-3 shrink-0 text-blue-600 dark:text-blue-300",
+					isCurrent ? "" : "invisible",
+				)}
+			/>
+			<span
+				style={{ width: gutterWidth }}
+				className={cn(
+					"shrink-0 text-right tabular-nums",
+					isCurrent
+						? "font-bold text-blue-700 dark:text-blue-200"
+						: "text-gray-400 dark:text-content-muted",
+				)}
+			>
+				{lineNumber}
+			</span>
+			<span className="ml-2 truncate text-gray-700 dark:text-content-secondary">
+				{isScrolling ? (
+					line || " "
+				) : (
+					<SyntaxHighlighter
+						language="gcode"
+						style={enableDarkMode ? a11yDark : a11yLight}
+						customStyle={SYNTAX_CUSTOM_STYLE}
+						PreTag="span"
+						CodeTag="span"
+					>
+						{line || " "}
+					</SyntaxHighlighter>
+				)}
+			</span>
+		</button>
+	),
+);
+GCodeSourceLine.displayName = "GCodeSourceLine";
 
 interface GCodeSourcePanelProps {
 	lines: string[];
 	currentLine: number;
 	onSelectLine: (line: number) => void;
+	/**
+	 * Hold the list still while the scrubber is being dragged — re-centring on
+	 * every pointermove blanks the window out faster than it can render.
+	 */
+	deferScroll?: boolean;
 }
 
 /**
  * The loaded file's source, windowed so only the visible rows exist in the DOM.
  *
  * Follows the same fixed-row-height approach as the visualizer's G-code editor
- * rather than pulling in a virtualization dependency.
+ * rather than pulling in a virtualization dependency, and reuses its
+ * highlighter setup so both views colour G-code identically.
  */
 export const GCodeSourcePanel: React.FC<GCodeSourcePanelProps> = ({
 	lines,
 	currentLine,
 	onSelectLine,
+	deferScroll = false,
 }) => {
 	const scrollRef = useRef<HTMLDivElement>(null);
 	const [scrollTop, setScrollTop] = useState(0);
 	const [viewportHeight, setViewportHeight] = useState(0);
 	const [query, setQuery] = useState("");
 	const [searchOpen, setSearchOpen] = useState(false);
+	const [isScrolling, setIsScrolling] = useState(false);
 	const rafRef = useRef<number | null>(null);
+	const scrollIdleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const { enableDarkMode } = useWorkspaceState();
 
 	// Track the viewport so the window covers exactly what's on screen.
 	useLayoutEffect(() => {
@@ -80,14 +194,19 @@ export const GCodeSourcePanel: React.FC<GCodeSourcePanelProps> = ({
 			if (rafRef.current !== null) {
 				cancelAnimationFrame(rafRef.current);
 			}
+			if (scrollIdleRef.current) {
+				clearTimeout(scrollIdleRef.current);
+			}
 		},
 		[],
 	);
 
 	// Keep the selected line on screen, centred where the file is long enough.
+	// Skipped mid-drag; because deferScroll is a dependency, releasing the
+	// scrubber runs this once with the final line.
 	useEffect(() => {
 		const el = scrollRef.current;
-		if (!el || viewportHeight === 0) {
+		if (!el || viewportHeight === 0 || deferScroll) {
 			return;
 		}
 		const rowTop = (currentLine - 1) * LINE_HEIGHT;
@@ -97,10 +216,18 @@ export const GCodeSourcePanel: React.FC<GCodeSourcePanelProps> = ({
 			return;
 		}
 		el.scrollTop = Math.max(0, rowTop - viewportHeight / 2 + LINE_HEIGHT / 2);
-	}, [currentLine, viewportHeight]);
+	}, [currentLine, viewportHeight, deferScroll]);
 
 	const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
 		const next = e.currentTarget.scrollTop;
+		setIsScrolling(true);
+		if (scrollIdleRef.current) {
+			clearTimeout(scrollIdleRef.current);
+		}
+		scrollIdleRef.current = setTimeout(
+			() => setIsScrolling(false),
+			SCROLL_IDLE_MS,
+		);
 		if (rafRef.current !== null) {
 			return;
 		}
@@ -146,38 +273,25 @@ export const GCodeSourcePanel: React.FC<GCodeSourcePanelProps> = ({
 		return { start: first, end: last };
 	}, [scrollTop, viewportHeight, lines.length]);
 
+	// Exactly as wide as the largest line number — `ch` is one character under the
+	// row's monospace font, so there is no dead space after the playhead.
+	const gutterWidth = `${String(lines.length).length}ch`;
+
 	const visible = [];
 	for (let i = start; i < end; i++) {
 		const lineNumber = i + 1;
-		const isCurrent = lineNumber === currentLine;
 		visible.push(
-			<button
+			<GCodeSourceLine
 				key={lineNumber}
-				type="button"
-				onClick={() => onSelectLine(lineNumber)}
-				style={{ top: i * LINE_HEIGHT, height: LINE_HEIGHT }}
-				className={cn(
-					"absolute left-0 flex w-full items-center gap-2 px-2 text-left font-mono text-xs",
-					isCurrent
-						? "bg-blue-500 text-white"
-						: matchSet.has(lineNumber)
-							? "bg-yellow-100 text-gray-900 dark:bg-yellow-900/30 dark:text-content-primary"
-							: "text-gray-700 hover:bg-gray-100 dark:text-content-secondary dark:hover:bg-surface-hover",
-				)}
-			>
-				<ChevronRight
-					className={cn("h-3 w-3 shrink-0", isCurrent ? "" : "invisible")}
-				/>
-				<span
-					className={cn(
-						"w-14 shrink-0 text-right tabular-nums",
-						isCurrent ? "text-white" : "text-gray-400 dark:text-content-muted",
-					)}
-				>
-					{lineNumber}
-				</span>
-				<span className="truncate">{lines[i]}</span>
-			</button>,
+				line={lines[i]}
+				lineNumber={lineNumber}
+				isCurrent={lineNumber === currentLine}
+				isMatch={matchSet.has(lineNumber)}
+				isScrolling={isScrolling}
+				gutterWidth={gutterWidth}
+				enableDarkMode={enableDarkMode}
+				onSelect={onSelectLine}
+			/>,
 		);
 	}
 

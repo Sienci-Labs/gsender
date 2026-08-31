@@ -45,6 +45,8 @@ import ToolVisibilityPanel from "./components/ToolVisibilityPanel";
 import type { LinePositionIndex } from "./definitions";
 import {
 	buildLinePositionIndex,
+	frameAtLine,
+	modalsAtLine,
 	positionAtLine,
 } from "./utils/linePositionIndex";
 import { activeToolIndexForLine, buildStepperTools } from "./utils/tools";
@@ -75,6 +77,9 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
 	const [index, setIndex] = useState<LinePositionIndex | null>(null);
 	const [indexProgress, setIndexProgress] = useState(0);
 	const [geometry, setGeometry] = useState<WorkerGeometryData | null>(null);
+	// True only while the scrubber thumb is held. Drives the source panel's
+	// deferred re-centring; everything else still tracks the drag live.
+	const [scrubbing, setScrubbing] = useState(false);
 
 	const viewerRef = useRef<StepThroughVisualizerHandle>(null);
 
@@ -114,6 +119,7 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
 		setGeometry(getLastWorkerGeometry());
 		setCurrentLine(1);
 		setHiddenTools(new Set());
+		setScrubbing(false);
 	}, [open]);
 
 	// Walk the file once per open to learn the position at every line.
@@ -127,6 +133,9 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
 		setIndexProgress(0);
 
 		buildLinePositionIndex(lines, {
+			// `lines` was split with CR stripped; tell the builder which ending the
+			// file actually used so its frame counter matches the worker's.
+			blankLineEmitsFrame: !content.includes("\r\n"),
 			onProgress: (processed, count) => {
 				if (!cancelled) {
 					setIndexProgress(count > 0 ? processed / count : 1);
@@ -144,17 +153,31 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
 		return () => {
 			cancelled = true;
 		};
-	}, [open, lines]);
+	}, [open, lines, content]);
 
 	const position = useMemo(
 		() => positionAtLine(index, currentLine),
 		[index, currentLine],
 	);
+	const frame = useMemo(
+		() => frameAtLine(index, currentLine),
+		[index, currentLine],
+	);
+	const modalState = useMemo(
+		() => modalsAtLine(index, currentLine),
+		[index, currentLine],
+	);
+	// The line before this one, so the status row can mark what this line changed.
+	const previousModalState = useMemo(
+		() => (currentLine > 1 ? modalsAtLine(index, currentLine - 1) : null),
+		[index, currentLine],
+	);
 
-	// currentLine (via the index) is what drives the cutter marker.
+	// currentLine (via the index) is what drives the cutter marker and how much
+	// of the toolpath is drawn as already processed.
 	useEffect(() => {
-		viewerRef.current?.setPosition(position);
-	}, [position]);
+		viewerRef.current?.seekTo(position, frame);
+	}, [position, frame]);
 
 	const activeToolIndex = activeToolIndexForLine(tools, currentLine);
 
@@ -204,6 +227,7 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
 							lines={lines}
 							currentLine={currentLine}
 							onSelectLine={goToLine}
+							deferScroll={scrubbing}
 						/>
 
 						<div className="relative min-h-0">
@@ -226,6 +250,7 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
 							activeToolIndex={activeToolIndex}
 							hiddenTools={hiddenTools}
 							onToggleTool={toggleTool}
+							onSelectLine={goToLine}
 							units={units}
 						/>
 					</div>
@@ -234,7 +259,14 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
 						<StepThroughScrubber
 							currentLine={currentLine}
 							totalLines={totalLines}
-							onScrub={goToLine}
+							onScrub={(line) => {
+								setScrubbing(true);
+								goToLine(line);
+							}}
+							onScrubEnd={(line) => {
+								goToLine(line);
+								setScrubbing(false);
+							}}
 						/>
 						<StepControls
 							currentLine={currentLine}
@@ -247,6 +279,8 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
 							position={position}
 							showAAxis={showAAxis}
 							units={units}
+							modalState={modalState}
+							previousModalState={previousModalState}
 						/>
 					</div>
 				</div>
