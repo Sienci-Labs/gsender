@@ -5,13 +5,19 @@ export const EMPTY_CAPABILITIES: PluginCapabilities = {
 	topics: new Set([]),
 };
 
-const registry = new Map<MessageEventSource, PluginCapabilities>();
+type PluginRegistration = {
+	capabilities: PluginCapabilities;
+	pluginId: string;
+};
+
+const registry = new Map<MessageEventSource, PluginRegistration>();
 
 export const registerPluginWindow = (
 	win: MessageEventSource,
-	capabilities: PluginCapabilities
+	capabilities: PluginCapabilities,
+	pluginId: string
 ): void => {
-	registry.set(win, capabilities);
+	registry.set(win, { capabilities, pluginId });
 };
 
 export const unregisterPluginWindow = (win: MessageEventSource): void => {
@@ -20,4 +26,9 @@ export const unregisterPluginWindow = (win: MessageEventSource): void => {
 
 export const getCapabilitiesForSource = (
 	source: MessageEventSource | null
-): PluginCapabilities | null => (source ? (registry.get(source) ?? null) : null);
+): PluginCapabilities | null =>
+	(source ? (registry.get(source)?.capabilities ?? null) : null);
+
+export const getPluginIdForSource = (
+	source: MessageEventSource | null
+): string | null => (source ? (registry.get(source)?.pluginId ?? null) : null);

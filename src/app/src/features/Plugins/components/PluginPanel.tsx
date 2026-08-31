@@ -59,7 +59,11 @@ const PluginPanel = ({ plugin, className = "", title }: PluginPanelProps) => {
 		if (!win) return;
 
 		// convert the capabilities from arrays to sets
-		registerPluginWindow(win, toRuntimeCapabilities(plugin.capabilities));
+		registerPluginWindow(
+			win,
+			toRuntimeCapabilities(plugin.capabilities),
+			plugin.id
+		);
 		return () => unregisterPluginWindow(win);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [plugin, reloadToken]);
