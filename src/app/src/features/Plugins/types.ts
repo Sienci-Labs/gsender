@@ -15,13 +15,33 @@ export type PluginContributionSlot =
 	| "tools-page"
 	| "settings-section"
 	| "navbar"
-	| "standalone";
+	| "standalone"
+	| "visualizer-overlay";
+
+// A declarative marker the host draws over the visualizer canvas on behalf of
+// an overlay plugin. Coordinates are in world/scene space; the host re-projects
+// them to screen space every frame so they track camera pan/zoom. Plugins never
+// draw on the canvas themselves — they hand the host this list.
+export interface OverlayMarker {
+	id: string;
+	x: number;
+	y: number;
+	z?: number; // world coordinates
+	shape?: "circle" | "cross" | "ring"; // default 'circle'
+	color?: string; // CSS color
+	size?: number; // px, default 6
+	label?: string;
+}
 
 export type PluginContribution = {
 	slot: PluginContributionSlot;
 	label?: string;
 	route?: string;
 	icon?: string;
+	// For "visualizer-overlay" contributions that drive machine motion: when
+	// true, the host greys out and blocks the overlay toggle unless the machine
+	// is connected and idle (i.e. actually able to accept the command).
+	requiresIdle?: boolean;
 };
 
 export type PluginRecord = {
@@ -47,7 +67,7 @@ export type PluginsResponse = {
 };
 
 export type PluginPermissionsType =
-	"machine:read"
+	| "machine:read"
 	| "machine:write"
 	// Reading the raw firmware stream through a plugin-supplied regex. NOT part
 	// of machine:read: that returns a curated context object, whereas a parser
@@ -56,12 +76,14 @@ export type PluginPermissionsType =
 	// Writing a command and capturing its response lines.
 	| "machine:query"
 	| "visualizer:load"
+	| "viewer:camera"
+	| "viewer:draw"
 	| "workspace:read"
 	| "redux:read"
 	| "local-fonts"
 	| "storage";
 
-export type PluginTopicsType = "workspace" | "redux" | "parser"
+export type PluginTopicsType = "workspace" | "redux" | "parser" | "viewer";
 
 export type PluginBridgeRequestType =
 	| "machine:get:context"
@@ -69,9 +91,17 @@ export type PluginBridgeRequestType =
 	| "machine:parser:register"
 	| "machine:parser:unregister"
 	| "machine:query"
+	| "machine:busy:set"
 	| "workspace:get:state"
 	| "redux:get:state"
 	| "gcode:load:to:visualizer"
+	| "viewer:screen-to-world"
+	| "viewer:world-to-screen"
+	| "viewer:camera:set"
+	| "viewer:camera:lock-rotate"
+	| "viewer:pick:arm"
+	| "viewer:pick:disarm"
+	| "viewer:overlay:set"
 	| "storage:get"
 	| "storage:set"
 	| "storage:delete"
@@ -152,8 +182,10 @@ export type PluginBridgeResponse = {
 	error?: string;
 };
 
-// Reactive state that plugins can subscribe to for live updates.
-export type PluginBridgeTopic = "workspace" | "redux" | "parser";
+// Reactive state that plugins can subscribe to for live updates. "viewer" is a
+// push-only event stream (pick/hold-progress events) rather than a state
+// snapshot topic.
+export type PluginBridgeTopic = "workspace" | "redux" | "parser" | "viewer";
 
 /**
  * A pushed event, as opposed to a topic snapshot.
@@ -210,6 +242,7 @@ export const permissionsMap = new Map<string, PluginPermissionsType[]>([
 	["onParserError", ["machine:parse"]],
 	["query", ["machine:query", "machine:parse"]],
 	["gcode", ["visualizer:load"]],
+	["viewer", ["viewer:camera", "viewer:draw"]],
 	["workspace", ["workspace:read"]],
 	["getWorkspaceState", ["workspace:read"]],
 	["subscribeWorkspaceState", ["workspace:read"]],
@@ -231,9 +264,17 @@ export const requestTypesMap = new Map<string, PluginBridgeRequestType[]>([
 			"machine:parser:register",
 			"machine:parser:unregister",
 			"machine:query",
+			"machine:busy:set",
 			"gcode:load:to:visualizer",
 			"workspace:get:state",
 			"redux:get:state",
+			"viewer:screen-to-world",
+			"viewer:world-to-screen",
+			"viewer:camera:set",
+			"viewer:camera:lock-rotate",
+			"viewer:pick:arm",
+			"viewer:pick:disarm",
+			"viewer:overlay:set",
 		],
 	],
 	[
@@ -244,9 +285,17 @@ export const requestTypesMap = new Map<string, PluginBridgeRequestType[]>([
 			"machine:parser:register",
 			"machine:parser:unregister",
 			"machine:query",
+			"machine:busy:set",
 			"gcode:load:to:visualizer",
 			"workspace:get:state",
 			"redux:get:state",
+			"viewer:screen-to-world",
+			"viewer:world-to-screen",
+			"viewer:camera:set",
+			"viewer:camera:lock-rotate",
+			"viewer:pick:arm",
+			"viewer:pick:disarm",
+			"viewer:overlay:set",
 		],
 	],
 	[
@@ -257,6 +306,7 @@ export const requestTypesMap = new Map<string, PluginBridgeRequestType[]>([
 			"machine:parser:register",
 			"machine:parser:unregister",
 			"machine:query",
+			"machine:busy:set",
 		],
 	],
 	["registerParser", ["machine:parser:register"]],
@@ -266,6 +316,18 @@ export const requestTypesMap = new Map<string, PluginBridgeRequestType[]>([
 	["onLine", ["machine:parser:register", "machine:parser:unregister"]],
 	["query", ["machine:query"]],
 	["gcode", ["gcode:load:to:visualizer"]],
+	[
+		"viewer",
+		[
+			"viewer:screen-to-world",
+			"viewer:world-to-screen",
+			"viewer:camera:set",
+			"viewer:camera:lock-rotate",
+			"viewer:pick:arm",
+			"viewer:pick:disarm",
+			"viewer:overlay:set",
+		],
+	],
 	["workspace", ["workspace:get:state"]],
 	["getWorkspaceState", ["workspace:get:state"]],
 	["redux", ["redux:get:state"]],
@@ -295,6 +357,8 @@ export const topicsMap = new Map<string, PluginBridgeTopic>([
 	["getLastParsed", "parser"],
 	["onParserError", "parser"],
 	["registerParser", "parser"],
+	["viewer", "viewer"],
+	["useVisualizerPick", "viewer"],
 ]);
 
 // the import specifiers the permission scanner looks for in a plugin's built bundle.

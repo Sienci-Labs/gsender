@@ -89,6 +89,7 @@ export interface State {
 	port: string;
 	units: UNITS_EN;
 	theme: THEMES_T;
+	isPortrait: boolean;
 	showSoftLimitsWarning: boolean;
 	workflow: {
 		state: WORKFLOW_STATES_T;
@@ -152,7 +153,7 @@ export interface State {
 	};
 	cameraMode: CAMERA_MODES_T;
 	cameraPosition: CAMERA_POSITIONS_T; // 'Top', '3D', 'Front', 'Left', 'Right'
-	moveToHere: boolean; // "Move To Here" placement mode is armed
+	cameraPositionNonce: number;
 	isConnected?: boolean; // Injected at render from connection state
 	isAgitated: boolean; // Defaults to false
 	currentTheme: Map<string, string>;
@@ -215,8 +216,6 @@ export interface Actions {
 		toLeftSideView: () => void;
 		toRightSideView: () => void;
 		toFreeView: () => void;
-		toggleMoveToHere: () => void;
-		disableMoveToHere: () => void;
 	};
 	handleLiteModeToggle: () => void;
 	lineWarning: {

@@ -20,6 +20,7 @@ Then restart gSender.
 | `react-ts-app/` | React + TypeScript + Vite | React hooks — `useWorkspaceState`, `useTypedSelector` |
 | `example-viewer/` | Plain JS + Vite | Embedded G-code preview — `GCodeViewer`, `gsender.gcode.loadToVisualizer` |
 | `basic-cam/` | React + TypeScript + Vite + Tailwind | Full reference CAM plugin — combines all SDK entry points |
+| `corner-finder/` | React + TypeScript + Vite | Host visualizer bridge — `gsender.viewer.*` (picking, camera, overlay markers) + `machine.setBusy` |
 | `storage-test/` | Plain JS + Vite | Namespaced plugin storage — buttons for every `storage.*` method (get/set/delete/getAll/setAll/clear), for QA |
 | `parser-demo/` | Plain JS + Vite | Firmware response parsers — manifest line/block parsers, runtime `registerParser`, `onLine`, `machine.query`, plus a command sender to drive them |
 
@@ -157,6 +158,9 @@ npm run build
 This writes the production bundle to `ui/` (gitignored — build before copying or shipping).
 
 For local dev in this repo you can skip copying: gSender loads `plugins/` directly when `NODE_ENV=development`.
+`npm run dev`/`npm run dev:electron` also do this build for you automatically on startup (see
+"Local development" below) — the manual steps above are for building a single plugin on demand
+(e.g. after `npm install`ing a new dependency) without restarting the whole dev server.
 
 ### Starting from a template
 
@@ -177,6 +181,27 @@ When gSender runs in development (`NODE_ENV=development`, e.g. `npm run dev` or
 Repo plugins take precedence when two share the same `id`. You can point the
 server at additional folders with the `GSENDER_PLUGINS_DIRS` env var (OS path
 list — `:`-separated on macOS/Linux, `;`-separated on Windows).
+
+### Automatic SDK + plugin builds (dev)
+
+`npm run dev` and `npm run dev:electron` both run `npm run prepare-dev-plugins` before 
+starting the server. It builds the plugin SDK, then every plugin folder under `plugins/`,
+skipping whatever is already up to date.
+
+"Up to date" is decided by timestamp, not just by whether the output exists: the SDK is
+rebuilt when anything under `packages/plugin-sdk/src/` (or its `package.json` /
+`tsup.config.ts`) is newer than `dist/index.js`, and a plugin is rebuilt when its own
+sources *or* the SDK's `dist/index.js` are newer than its `ui/` output. So pulling or
+merging a branch that changes the SDK rebuilds it and every plugin on the next dev start.
+
+The SDK is a `file:` dependency. npm symlinks it, but yarn copies it into the plugin's
+`node_modules/`, and that copy is frozen at install time — reinstalling won't refresh it,
+because the SDK version hasn't changed. `prepare-dev-plugins` detects those copies and
+re-copies `dist/` into them before building, so a plugin never compiles against an SDK
+bundle older than the one in `packages/plugin-sdk/dist/`.
+
+Set `GSENDER_FORCE_PLUGIN_BUILD=1` to skip all of those checks and force a full rebuild
+(and reinstall) of the SDK and every plugin.
 
 ### Live reload (dev)
 
@@ -272,3 +297,106 @@ viewer.focusToModel();
 ```
 
 Install the peers in the plugin: `npm install @sienci/gviewer three`.
+
+### Host visualizer bridge (`gsender.viewer`)
+
+Distinct from the embedded G-code preview above, the `gsender.viewer.*` API lets a
+plugin drive gSender's **main** visualizer over the bridge: pick points on the
+loaded toolpath, draw markers on it, and control the host camera. It's part of the
+base client (`@sienci/gsender-plugin-sdk`) — no bundler or extra peers required.
+
+#### `visualizer-overlay` contribution slot
+
+To surface a plugin over the main visualizer, declare a `visualizer-overlay`
+contribution in `gsender-plugin.json`:
+
+```json
+{
+	"contributions": [
+		{ "slot": "visualizer-overlay", "label": "Corner Finder", "icon": "🎯" }
+	]
+}
+```
+
+`icon` is rendered as-is inside a small circular button (not looked up against an icon set) — use
+a single emoji, not a word.
+
+The host shows a floating toggle button (using your `label`/`icon`) on the main
+visualizer; clicking it opens the plugin panel docked over the canvas, where your
+UI can call the `gsender.viewer.*` API against the visualizer behind it.
+
+#### API
+
+| Method | Description |
+|--------|-------------|
+| `viewer.screenToWorld(px, py)` | Project a screen pixel to world `{x,y,z}` (or `null`). |
+| `viewer.worldToScreen(x, y, z?)` | Project a world point to a screen pixel `{x,y}` (or `null`). |
+| `viewer.camera.set(view)` | Snap the camera to `'top' \| '3d' \| 'front' \| 'left' \| 'right'`. |
+| `viewer.camera.lockRotate(locked)` | Lock/unlock camera rotation. |
+| `viewer.armPick(mode, cb)` | Arm point-picking (`'click'` or `'hold'`); resolves to a disposer. |
+| `viewer.disarmPick()` | Disarm point-picking. |
+| `viewer.setOverlay(markers)` | Replace the overlay markers drawn on the visualizer. |
+
+`armPick` subscribes to pick events **before** arming (so none are missed) and
+resolves to a disposer that both disarms and unsubscribes — call it when you're
+done. The callback receives `ViewerPickEvent`s:
+
+- `{ kind: 'pick', world: {x,y,z}, screen: {x,y} }` — a point was picked.
+- `{ kind: 'hold-progress', t }` — `t` runs `0..1` while a press-and-hold is in progress.
+
+Overlay markers use the shared `OverlayMarker` shape (world coordinates):
+
+```ts
+interface OverlayMarker {
+	id: string;
+	x: number; y: number; z?: number;    // world coordinates
+	shape?: "circle" | "cross" | "ring"; // default "circle"
+	color?: string;                       // CSS color
+	size?: number;                        // px, default 6
+	label?: string;
+}
+```
+
+**Example** — arm a click pick, drop a marker where the user clicks, then jump the
+camera to top:
+
+```ts
+import { gsender } from "@sienci/gsender-plugin-sdk";
+
+const dispose = await gsender.viewer.armPick("click", async (e) => {
+	if (e.kind !== "pick") return;
+	await gsender.viewer.setOverlay([
+		{ id: "hit", x: e.world.x, y: e.world.y, shape: "cross", color: "#f0f" },
+	]);
+	await gsender.viewer.camera.set("top");
+	dispose(); // one-shot: disarm after the first pick
+});
+```
+
+#### `useVisualizerPick` (React)
+
+```tsx
+import { useVisualizerPick } from "@sienci/gsender-plugin-sdk/react";
+
+function CornerFinder() {
+	const { armed, error } = useVisualizerPick("click", (e) => {
+		if (e.kind === "pick") console.log("picked", e.world);
+	});
+
+	if (error) return <p>Can't pick: {error}</p>;
+	return <p>{armed ? "Click a point on the visualizer…" : "Arming…"}</p>;
+}
+```
+
+It arms on mount (unless `opts.enabled === false`), disarms on unmount/disable,
+keeps the latest `handler` in a ref (re-renders don't re-arm), and reports whether
+arming succeeded (`armed`) plus the host's rejection message (`error`).
+
+#### Arming preconditions
+
+`armPick` / `useVisualizerPick` **reject** unless all of the following hold. The
+rejection surfaces as the thrown/`error` message from the host:
+
+- the primary visualizer is mounted,
+- the loaded file is **not** rotary, and
+- the machine is **connected and idle**.

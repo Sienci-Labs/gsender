@@ -44,6 +44,23 @@ describe("buildGrantFromScan", () => {
 	});
 });
 
+describe("buildGrantFromScan — viewer topic", () => {
+	it("grants the 'viewer' push topic for a 'viewer' import", () => {
+		const { wire } = buildGrantFromScan(["viewer"]);
+		expect(wire.topics).toEqual(["viewer"]);
+	});
+
+	it("grants the 'viewer' push topic for a 'useVisualizerPick' import", () => {
+		const { wire } = buildGrantFromScan(["useVisualizerPick"]);
+		expect(wire.topics).toEqual(["viewer"]);
+	});
+
+	it("grants machine:busy:set when importing the 'gsender' aggregate client", () => {
+		const { wire } = buildGrantFromScan(["gsender"]);
+		expect(wire.requestTypes).toContain("machine:busy:set");
+	});
+});
+
 describe("toRuntimeCapabilities", () => {
 	it("builds Sets from wire arrays", () => {
 		const capabilities = toRuntimeCapabilities({
@@ -153,9 +170,17 @@ describe("wire type drift guard", () => {
 			"machine:parser:register",
 			"machine:parser:unregister",
 			"machine:query",
+			"machine:busy:set",
 			"workspace:get:state",
 			"redux:get:state",
 			"gcode:load:to:visualizer",
+			"viewer:screen-to-world",
+			"viewer:world-to-screen",
+			"viewer:camera:set",
+			"viewer:camera:lock-rotate",
+			"viewer:pick:arm",
+			"viewer:pick:disarm",
+			"viewer:overlay:set",
 			"storage:get",
 			"storage:set",
 			"storage:delete",
@@ -172,7 +197,7 @@ describe("wire type drift guard", () => {
 	});
 
 	it("only maps topics the host union declares", () => {
-		const declared = new Set(["workspace", "redux", "parser"]);
+		const declared = new Set(["workspace", "redux", "parser", "viewer"]);
 		for (const topic of topicsMap.values()) {
 			expect(declared.has(topic)).toBe(true);
 		}

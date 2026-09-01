@@ -7,21 +7,23 @@ jest.mock("app/lib/controller", () => ({
 jest.mock("app/lib/fileupload", () => ({
 	uploadGcodeFileToServer: jest.fn(async () => ({})),
 }));
+// Delegates to the real ImmutableStore rather than to a flat key/value fake:
+// its set() deep-merges, so a write that removes a key behaves very differently
+// from a plain assignment. A simplified fake would let such a write pass here
+// while silently failing in the app.
 jest.mock("app/store", () => {
-	const data: Record<string, unknown> = {};
-	const path = (key: string | string[]) =>
-		Array.isArray(key) ? key.join(".") : key;
+	const ImmutableStore = require("app/lib/immutable-store").default;
+	const store = new ImmutableStore({ workspace: { units: "mm" } });
 	return {
-		get: jest.fn((key: string | string[], fallback: unknown) => {
-			if (Array.isArray(key) && key[0] === "plugins") {
-				const value = data[path(key)];
-				return value === undefined ? fallback : value;
-			}
-			return key === "workspace" ? { units: "mm" } : fallback;
-		}),
-		set: jest.fn((key: string | string[], value: unknown) => {
-			data[path(key)] = value;
-		}),
+		get: jest.fn((key: string | string[], fallback: unknown) =>
+			store.get(key, fallback),
+		),
+		set: jest.fn((key: string | string[], value: unknown) =>
+			store.set(key, value),
+		),
+		replace: jest.fn((key: string | string[], value: unknown) =>
+			store.replace(key, value),
+		),
 		on: jest.fn(),
 	};
 });
@@ -108,6 +110,45 @@ describe("plugin bridge request gate", () => {
 		expect(response).toMatchObject({ id: "3", ok: false });
 		expect(response?.error).toMatch(/not authorized/i);
 	});
+
+	it("passes a granted viewer:* request through to the real handler (no primary visualizer mounted in this test env)", async () => {
+		registerPluginWindow(
+			source,
+			toRuntimeCapabilities({
+				requestTypes: ["viewer:screen-to-world"],
+				topics: [],
+			}),
+		);
+
+		const response = await handlePluginBridgeMessage(
+			makeEvent(source, { id: "4", type: "viewer:screen-to-world" }),
+		);
+
+		// The gate let it through — this is a domain error from the handler
+		// (no primary GcodeViewer registered), not an authorization error.
+		expect(response).toMatchObject({ id: "4", ok: false });
+		expect(response?.error).not.toMatch(/not authorized/i);
+		expect(response?.error).toMatch(/visualizer is not available/i);
+	});
+
+	it.each([
+		"viewer:camera:set",
+		"viewer:pick:arm",
+		"viewer:overlay:set",
+		"machine:busy:set",
+	] as const)("denies '%s' when not granted", async (type) => {
+		registerPluginWindow(
+			source,
+			toRuntimeCapabilities({ requestTypes: ["workspace:get:state"] }),
+		);
+
+		const response = await handlePluginBridgeMessage(
+			makeEvent(source, { id: type, type }),
+		);
+
+		expect(response).toMatchObject({ id: type, ok: false });
+		expect(response?.error).toMatch(/not authorized/i);
+	});
 });
 
 describe("plugin storage isolation", () => {
@@ -187,6 +228,151 @@ describe("plugin storage isolation", () => {
 		);
 
 		expect(response).toEqual({ id: "1", ok: true, result: "fallback" });
+	});
+
+	it("removes the key from storage on delete", async () => {
+		registerPluginWindow(
+			sourceA,
+			STORAGE_CAPABILITIES,
+			"com.sienci.plugin-delete",
+		);
+
+		await handlePluginBridgeMessage(
+			makeEvent(sourceA, {
+				id: "1",
+				type: "storage:set",
+				payload: { key: "foo", value: 123 },
+			}),
+		);
+		await handlePluginBridgeMessage(
+			makeEvent(sourceA, {
+				id: "2",
+				type: "storage:set",
+				payload: { key: "bar", value: "x" },
+			}),
+		);
+
+		const deleteResponse = await handlePluginBridgeMessage(
+			makeEvent(sourceA, {
+				id: "3",
+				type: "storage:delete",
+				payload: { key: "foo" },
+			}),
+		);
+		expect(deleteResponse).toMatchObject({ id: "3", ok: true });
+
+		const getResponse = await handlePluginBridgeMessage(
+			makeEvent(sourceA, {
+				id: "4",
+				type: "storage:get",
+				payload: { key: "foo", defaultValue: "gone" },
+			}),
+		);
+		expect(getResponse).toEqual({ id: "4", ok: true, result: "gone" });
+
+		const getAllResponse = await handlePluginBridgeMessage(
+			makeEvent(sourceA, { id: "5", type: "storage:get:all" }),
+		);
+		expect(getAllResponse).toEqual({
+			id: "5",
+			ok: true,
+			result: { bar: "x" },
+		});
+	});
+
+	it("replaces the whole namespace on setAll rather than merging", async () => {
+		registerPluginWindow(
+			sourceA,
+			STORAGE_CAPABILITIES,
+			"com.sienci.plugin-set-all",
+		);
+
+		await handlePluginBridgeMessage(
+			makeEvent(sourceA, {
+				id: "1",
+				type: "storage:set:all",
+				payload: { value: { a: 1, b: 2 } },
+			}),
+		);
+		await handlePluginBridgeMessage(
+			makeEvent(sourceA, {
+				id: "2",
+				type: "storage:set:all",
+				payload: { value: { c: 3 } },
+			}),
+		);
+
+		const response = await handlePluginBridgeMessage(
+			makeEvent(sourceA, { id: "3", type: "storage:get:all" }),
+		);
+		expect(response).toEqual({ id: "3", ok: true, result: { c: 3 } });
+	});
+
+	it("empties the namespace on clear", async () => {
+		registerPluginWindow(
+			sourceA,
+			STORAGE_CAPABILITIES,
+			"com.sienci.plugin-clear",
+		);
+
+		await handlePluginBridgeMessage(
+			makeEvent(sourceA, {
+				id: "1",
+				type: "storage:set",
+				payload: { key: "foo", value: 123 },
+			}),
+		);
+
+		const clearResponse = await handlePluginBridgeMessage(
+			makeEvent(sourceA, { id: "2", type: "storage:clear" }),
+		);
+		expect(clearResponse).toMatchObject({ id: "2", ok: true });
+
+		const response = await handlePluginBridgeMessage(
+			makeEvent(sourceA, { id: "3", type: "storage:get:all" }),
+		);
+		expect(response).toEqual({ id: "3", ok: true, result: {} });
+	});
+
+	it("clears only the calling plugin's namespace", async () => {
+		registerPluginWindow(
+			sourceA,
+			STORAGE_CAPABILITIES,
+			"com.sienci.plugin-clear-a",
+		);
+		registerPluginWindow(
+			sourceB,
+			STORAGE_CAPABILITIES,
+			"com.sienci.plugin-clear-b",
+		);
+
+		await handlePluginBridgeMessage(
+			makeEvent(sourceA, {
+				id: "1",
+				type: "storage:set",
+				payload: { key: "kept", value: "a-value" },
+			}),
+		);
+		await handlePluginBridgeMessage(
+			makeEvent(sourceB, {
+				id: "2",
+				type: "storage:set",
+				payload: { key: "kept", value: "b-value" },
+			}),
+		);
+
+		await handlePluginBridgeMessage(
+			makeEvent(sourceA, { id: "3", type: "storage:clear" }),
+		);
+
+		const responseFromB = await handlePluginBridgeMessage(
+			makeEvent(sourceB, { id: "4", type: "storage:get:all" }),
+		);
+		expect(responseFromB).toEqual({
+			id: "4",
+			ok: true,
+			result: { kept: "b-value" },
+		});
 	});
 
 	it("denies storage requests without the storage permission", async () => {

@@ -227,6 +227,7 @@ viewer.focusToModel();
 | `machine.unregisterParser(id)` | Remove a runtime parser |
 | `machine.onParsed(id, cb)` | Every match for a parser, losslessly; fires immediately with the last result if there is one |
 | `machine.onLine(pattern, cb)` | One-off line tap (sugar over an anonymous runtime parser) |
+| `machine.setBusy(busy, label?)` | Flag the machine as busy for a feeder-driven op (stable status, host auto-releases) |
 | `getLastParsed(id)` | Synchronous last result for a parser, or `undefined` |
 | `onParserError(cb)` | Parsers that were rejected, rate limited, or quarantined |
 | `workspace.getState()` | One-shot workspace snapshot |
