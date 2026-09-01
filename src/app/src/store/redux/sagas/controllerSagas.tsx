@@ -915,6 +915,10 @@ export function* initialize(): Generator<any, void, any> {
 
             if (ALARM_ERROR_TYPES.includes(error.type)) {
                 updateAlarmsErrors(error);
+                toast.error(
+                    `${error.type === ALARM ? "Alarm" : "Error"} ${error.code}: ${error.description}`,
+                    { position: "bottom-right" },
+                );
             }
 
             pubsub.publish('error', error);
