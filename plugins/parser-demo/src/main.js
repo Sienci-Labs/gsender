@@ -40,6 +40,11 @@ addPresets("query-presets", "query-cmd");
 // ever been mounted — so results are already waiting when you arrive. onParsed
 // fires immediately with the last result if one exists.
 
+// `$#` (view parameters) also emits a `[PRB:...]` line as part of its own
+// dump, alongside G54/G55/etc — it isn't only sent right after a real probe
+// cycle. So this panel updates on `$#` too, and the trailing flag reflects
+// the *last recorded* probe outcome (did the probe switch trigger?), not
+// whether whatever command was just sent succeeded.
 machine.onParsed("probe", (result) => {
 	const { x, y, z, rest, success } = result.groups;
 	// `rest` holds any axes past Z — grblHAL reports up to six (A/B/C), so the
@@ -49,7 +54,7 @@ machine.onParsed("probe", (result) => {
 	render($("probe-out"), {
 		position: { x, y, z },
 		...(extraAxes.length ? { extraAxes } : {}),
-		succeeded: success === "1",
+		lastProbeTriggered: success === "1",
 		at: new Date(result.endedAt).toLocaleTimeString(),
 	});
 });
