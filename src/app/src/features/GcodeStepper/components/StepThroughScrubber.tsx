@@ -36,9 +36,9 @@ interface ScrubberProps {
 
 const TICK_COUNT = 40;
 
-// Half the thumb's 24px diameter: the row is inset by this so the thumb
+// Half the handle's ~48px width: the row is inset by this so the handle
 // stays fully visible at line 1 and at the last line.
-const THUMB_INSET = "px-3";
+const THUMB_INSET = "px-6";
 
 /**
  * Media-timeline style scrubber over the whole file.
@@ -148,29 +148,48 @@ export const StepThroughScrubber: React.FC<ScrubberProps> = ({
 				onPointerCancel={endDrag}
 				onKeyDown={handleKeyDown}
 				className={cn(
-					"relative flex h-11 cursor-pointer touch-none select-none items-center",
+					"relative flex h-12 cursor-pointer touch-none select-none items-center",
 					"focus-visible:outline-none",
 					THUMB_INSET,
 				)}
 			>
-				{/* Track */}
+				{/* Track — thick rounded capsule, sized as a normal-flow child so it's
+				    naturally inset by the row's THUMB_INSET padding. It's also the
+				    positioning context for the handle below: percentages on an
+				    absolutely-positioned child resolve against a padded ancestor's
+				    full box (ignoring that ancestor's own padding), so the handle
+				    must be positioned relative to this un-padded track — not the
+				    padded row — or its 0%/100% ends up flush with the row's true
+				    outer edge instead of the track's inset edge. */}
 				<div
 					ref={trackRef}
-					className="relative h-2 w-full rounded-full bg-gray-200 dark:bg-surface-sunken"
+					className="relative h-6 w-full rounded-full border border-gray-300 bg-gray-200 dark:border-outline dark:bg-surface-sunken"
 				>
-					<div
-						className="absolute inset-y-0 left-0 rounded-full bg-blue-500"
-						style={{ width: `${progress}%` }}
-					/>
-					{/* Thumb — visual only; the whole row is the hit area. */}
+					{/* Clips only the fill's corners — an overflow-hidden here would
+					    also clip the taller handle. */}
+					<div className="absolute inset-0 overflow-hidden rounded-full">
+						<div
+							className="absolute inset-y-0 left-0 rounded-full bg-blue-500"
+							style={{ width: `${progress}%` }}
+						/>
+					</div>
+
+					{/* Handle — a vertical pill overlapping the track, not a circular
+					    thumb inside it. Taller than the track so it reads as the
+					    obvious grip target; the whole row is still the hit area, this
+					    is purely visual. */}
 					<div
 						className={cn(
-							"pointer-events-none absolute top-1/2 h-6 w-6 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 bg-white shadow",
-							"border-blue-500 dark:bg-content-primary",
-							dragging && "scale-110",
+							"pointer-events-none absolute top-1/2 h-12 w-11 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-blue-500 bg-white shadow dark:border-blue-400 dark:bg-white",
+							"flex items-center justify-center gap-1",
+							dragging && "shadow-md ring-2 ring-blue-500/30",
 						)}
 						style={{ left: `${progress}%` }}
-					/>
+					>
+						<span className="h-4 w-px bg-gray-400" />
+						<span className="h-4 w-px bg-gray-400" />
+						<span className="h-4 w-px bg-gray-400" />
+					</div>
 				</div>
 			</div>
 
@@ -214,19 +233,13 @@ export const StepThroughScrubber: React.FC<ScrubberProps> = ({
 				))}
 			</div>
 
-			<div className="text-center text-base text-gray-900 dark:text-content-primary">
-				<span className="font-bold tabular-nums">
+			<div className="text-center text-sm text-gray-500 dark:text-content-muted">
+				<span className="font-semibold tabular-nums text-gray-700 dark:text-content-secondary">
 					{currentLine.toLocaleString()}
 				</span>
-				<span className="text-gray-500 dark:text-content-muted">
-					{" / "}
-					{totalLines.toLocaleString()}
-				</span>
+				{" / "}
+				{totalLines.toLocaleString()}
 			</div>
-
-			<span className="text-center text-xs text-gray-500 dark:text-content-muted">
-				Scrub the timeline or use step controls to navigate through the file.
-			</span>
 		</div>
 	);
 };

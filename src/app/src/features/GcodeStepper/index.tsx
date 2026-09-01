@@ -31,6 +31,7 @@ import { FILE_TYPE, METRIC_UNITS } from "app/constants";
 import { getLastWorkerGeometry } from "app/features/Visualizer/lastWorkerGeometry";
 import { useTypedSelector } from "app/hooks/useTypedSelector";
 import { useWorkspaceState } from "app/hooks/useWorkspaceState";
+import { cn } from "app/lib/utils";
 import store from "app/store";
 import { X } from "lucide-react";
 import type React from "react";
@@ -240,17 +241,28 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
 						</button>
 					</div>
 
-					{/* Three columns: source | visualizer | tools. The visualizer keeps
-					    the space; the side panels shrink first. */}
-					<div className="grid min-h-0 flex-1 grid-cols-[minmax(170px,1fr)_minmax(0,3fr)_minmax(180px,1fr)] gap-3">
-						<GCodeSourcePanel
-							lines={lines}
-							currentLine={currentLine}
-							onSelectLine={goToLine}
-							deferScroll={scrubbing}
-						/>
+					{/* Landscape: three columns, source | visualizer | tools. Portrait:
+					    the visualizer moves to a full-width row on top, with source
+					    and tools sharing a row beneath it — the narrow dialog width in
+					    portrait can't fit all three side by side without squeezing
+					    each one into uselessness. */}
+					<div
+						className={cn(
+							"grid min-h-0 flex-1 gap-3",
+							"grid-cols-[minmax(170px,1fr)_minmax(0,3fr)_minmax(180px,1fr)]",
+							"portrait:grid-cols-2 portrait:grid-rows-[minmax(0,3fr)_minmax(180px,2fr)]",
+						)}
+					>
+						<div className="min-h-0 portrait:order-2">
+							<GCodeSourcePanel
+								lines={lines}
+								currentLine={currentLine}
+								onSelectLine={goToLine}
+								deferScroll={scrubbing}
+							/>
+						</div>
 
-						<div className="relative min-h-0">
+						<div className="relative min-h-0 portrait:order-1 portrait:col-span-2">
 							<StepThroughVisualizer
 								ref={viewerRef}
 								geometry={geometry}
@@ -267,14 +279,16 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
 							)}
 						</div>
 
-						<ToolVisibilityPanel
-							tools={tools}
-							activeToolIndex={activeToolIndex}
-							hiddenTools={hiddenTools}
-							onToggleTool={toggleTool}
-							onSelectLine={goToLine}
-							units={units}
-						/>
+						<div className="min-h-0 portrait:order-3">
+							<ToolVisibilityPanel
+								tools={tools}
+								activeToolIndex={activeToolIndex}
+								hiddenTools={hiddenTools}
+								onToggleTool={toggleTool}
+								onSelectLine={goToLine}
+								units={units}
+							/>
+						</div>
 					</div>
 
 					<div className="flex flex-shrink-0 flex-col gap-3">

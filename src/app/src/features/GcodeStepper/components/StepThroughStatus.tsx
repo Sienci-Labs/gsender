@@ -57,10 +57,7 @@ const Block: React.FC<{
 		<span className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-content-muted">
 			{label}
 		</span>
-		{/* flex-1 + items-center: lets single-row content (e.g. the position
-		    readout) center vertically when a taller sibling block stretches
-		    this card past its own content height. */}
-		<div className="flex flex-1 items-center">{children}</div>
+		{children}
 	</div>
 );
 
@@ -128,6 +125,12 @@ const ModalCell: React.FC<{
 const isSet = (value: number | null | undefined): value is number =>
 	value !== null && value !== undefined && Number.isFinite(value);
 
+// Feed/speed can arrive with long float-conversion tails (e.g. an imperial
+// file's mm-per-inch division) — round to 2 decimals and drop trailing zeros
+// so the modal cell shows a sane number instead of busting out of its box.
+const roundModalNumber = (value: number): number =>
+	Number(value.toFixed(2));
+
 /**
  * The modal state as GRBL's `$G` would report it.
  *
@@ -151,8 +154,8 @@ function grblModals(state: LineModalState | null) {
 		spindle: modals.spindle ?? "M5",
 		coolant: modals.coolant ?? "M9",
 		tool: `T${isSet(modals.tool) ? modals.tool : 0}`,
-		feedRate: `F${isSet(feedRate) ? feedRate : 0}`,
-		spindleSpeed: `S${isSet(spindleSpeed) ? spindleSpeed : 0}`,
+		feedRate: `F${isSet(feedRate) ? roundModalNumber(feedRate) : 0}`,
+		spindleSpeed: `S${isSet(spindleSpeed) ? roundModalNumber(spindleSpeed) : 0}`,
 	};
 }
 
@@ -202,7 +205,10 @@ export const StepThroughStatus: React.FC<StepThroughStatusProps> = ({
 				label={`Position (Work, ${imperial ? "in" : "mm"})`}
 				className="flex-shrink-0"
 			>
-				<div className="flex items-center gap-x-3">
+				{/* flex-1: grows to fill the card when a taller sibling (Modals)
+				    stretches this Block past its own content height, so the row
+				    centers vertically instead of sitting flush under the label. */}
+				<div className="flex flex-1 items-center gap-x-3">
 					<AxisReadout label="X" value={linear(position.x)} />
 					<AxisReadout label="Y" value={linear(position.y)} />
 					<AxisReadout label="Z" value={linear(position.z)} />
@@ -237,7 +243,10 @@ export const StepThroughStatus: React.FC<StepThroughStatusProps> = ({
 				aria-checked={hideProcessed}
 				onClick={onToggleHideProcessed}
 				className={cn(
-					"flex min-h-[2.75rem] flex-shrink-0 items-center gap-2 rounded-lg border px-3 text-xs transition-colors",
+					// w-36: fixed rather than content-sized, so the button doesn't
+					// resize when "Hide prior lines" and "Show prior lines" — same
+					// length but different letter widths — swap on toggle.
+					"flex min-h-[2.75rem] w-36 flex-shrink-0 items-center justify-center gap-2 rounded-lg border px-3 text-xs transition-colors",
 					"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
 					hideProcessed
 						? "border-blue-500 bg-blue-500 text-white hover:bg-blue-600"
