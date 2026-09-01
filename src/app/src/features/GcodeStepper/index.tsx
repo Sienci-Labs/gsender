@@ -360,6 +360,7 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
 							    full text of the current line is readable without scrolling
 							    that panel horizontally. */}
 							<div
+								data-testid="current-line-readout"
 								className={cn(
 									"flex max-h-24 flex-shrink-0 items-start gap-2 overflow-y-auto rounded-lg border border-gray-200 bg-white px-3 py-2 transition-opacity dark:border-outline dark:bg-surface-sunken",
 									!isIdle && "opacity-50",
