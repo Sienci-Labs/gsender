@@ -277,6 +277,21 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
 	}, []);
 
 	const indexing = index === null && lines.length > 0;
+	// Only refreshed at rest — while playing or scrubbing the line changes too
+	// fast for the text to be legible, so the box just holds its last value
+	// rather than racing to keep up (or disappearing, which made the layout
+	// jump every time playback/scrub state changed).
+	const isIdle = !isPlaying && !scrubbing;
+	const [displayedLine, setDisplayedLine] = useState({
+		number: currentLine,
+		text: lines[currentLine - 1] ?? "",
+	});
+	useEffect(() => {
+		if (isIdle) {
+			setDisplayedLine({ number: currentLine, text: lines[currentLine - 1] ?? "" });
+		}
+	}, [isIdle, currentLine, lines]);
+	const lineGutterWidth = `${String(totalLines).length}ch`;
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
@@ -321,21 +336,45 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
 							/>
 						</div>
 
-						<div className="relative min-h-0 portrait:order-1 portrait:col-span-2">
-							<StepThroughVisualizer
-								ref={viewerRef}
-								geometry={geometry}
-								isRotaryFile={isRotaryFile}
-								units={units}
-								initialPosition={position}
-								lineGroups={toolLineGroups}
-								hiddenGroups={hiddenTools}
-							/>
-							{indexing && (
-								<div className="pointer-events-none absolute bottom-2 left-2 rounded bg-black/60 px-2 py-1 text-xs text-white">
-									Reading positions… {Math.round(indexProgress * 100)}%
-								</div>
-							)}
+						<div className="flex min-h-0 flex-col gap-2 portrait:order-1 portrait:col-span-2">
+							<div className="relative min-h-0 flex-1">
+								<StepThroughVisualizer
+									ref={viewerRef}
+									geometry={geometry}
+									isRotaryFile={isRotaryFile}
+									units={units}
+									initialPosition={position}
+									lineGroups={toolLineGroups}
+									hiddenGroups={hiddenTools}
+								/>
+								{indexing && (
+									<div className="pointer-events-none absolute bottom-2 left-2 rounded bg-black/60 px-2 py-1 text-xs text-white">
+										Reading positions… {Math.round(indexProgress * 100)}%
+									</div>
+								)}
+							</div>
+							{/* Always mounted, even while playing/scrubbing, so this space
+							    doesn't jump in and out of the layout on every state change —
+							    it just stops refreshing (and dims) until idle again. The
+							    source panel truncates long lines; this is the one place the
+							    full text of the current line is readable without scrolling
+							    that panel horizontally. */}
+							<div
+								className={cn(
+									"flex max-h-24 flex-shrink-0 items-start gap-2 overflow-y-auto rounded-lg border border-gray-200 bg-white px-3 py-2 transition-opacity dark:border-outline dark:bg-surface-sunken",
+									!isIdle && "opacity-50",
+								)}
+							>
+								<span
+									className="flex-shrink-0 select-none text-right font-mono text-xs text-gray-400 dark:text-content-muted"
+									style={{ width: lineGutterWidth }}
+								>
+									{displayedLine.number}
+								</span>
+								<span className="whitespace-pre-wrap break-all font-mono text-xs text-gray-700 dark:text-content-secondary">
+									{displayedLine.text}
+								</span>
+							</div>
 						</div>
 
 						<div className="min-h-0 portrait:order-3">
