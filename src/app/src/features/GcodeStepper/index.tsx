@@ -74,8 +74,15 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
 	open,
 	onOpenChange,
 }) => {
-	const { content, total, usedAxes, fileType, toolSet, spindleToolEvents } =
-		useTypedSelector((state) => state.file);
+	const {
+		content,
+		total,
+		usedAxes,
+		fileType,
+		toolSet,
+		spindleToolEvents,
+		estimatedTime,
+	} = useTypedSelector((state) => state.file);
 	const { units = METRIC_UNITS } = useWorkspaceState();
 
 	const [currentLine, setCurrentLine] = useState(1);
@@ -91,6 +98,8 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
 	const [hideProcessed, setHideProcessed] = useState(() =>
 		store.get("widgets.visualizer.hideProcessedLines", false),
 	);
+	const [isPlaying, setIsPlaying] = useState(false);
+	const [playbackSpeed, setPlaybackSpeed] = useState(10);
 
 	const viewerRef = useRef<StepThroughVisualizerHandle>(null);
 
@@ -121,6 +130,16 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
 		[totalLines],
 	);
 
+	// Any manual navigation — scrubbing, a step button, clicking a source line
+	// or a tool card — interrupts playback rather than fighting it.
+	const goToLineManual = useCallback(
+		(line: number) => {
+			setIsPlaying(false);
+			goToLine(line);
+		},
+		[goToLine],
+	);
+
 	// Grab the geometry the visualize worker already produced, and reset
 	// navigation, each time the modal opens.
 	useEffect(() => {
@@ -131,6 +150,7 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
 		setCurrentLine(1);
 		setHiddenTools(new Set());
 		setScrubbing(false);
+		setIsPlaying(false);
 		setHideProcessed(store.get("widgets.visualizer.hideProcessedLines", false));
 	}, [open]);
 
@@ -191,6 +211,45 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
 	useEffect(() => {
 		viewerRef.current?.seekTo(position, frame, hideProcessed ? "hide" : "grey");
 	}, [position, frame, hideProcessed]);
+
+	// Kept in sync every render so the playback effect below can read "where we
+	// are right now" without depending on currentLine itself — depending on it
+	// directly would restart the RAF loop's anchor on every frame it produces.
+	const currentLineRef = useRef(currentLine);
+	currentLineRef.current = currentLine;
+
+	// Advances currentLine on its own while playing, at a pace derived from the
+	// file's own estimated run time so 10x (the default) reads as a fast but
+	// legible preview rather than a real-time wait. There's no per-line timing
+	// available (only a whole-file total), so the pace is one constant for the
+	// whole file rather than varying with feed rate per line.
+	useEffect(() => {
+		if (!isPlaying || totalLines === 0) {
+			return;
+		}
+		const FALLBACK_LINES_PER_SECOND = 100;
+		const basePace =
+			estimatedTime > 0 ? totalLines / estimatedTime : FALLBACK_LINES_PER_SECOND;
+		const linesPerSecond = basePace * playbackSpeed;
+		const startLine = currentLineRef.current;
+		const startTime = performance.now();
+		let rafId: number;
+
+		const tick = () => {
+			const elapsedSeconds = (performance.now() - startTime) / 1000;
+			const nextLine = startLine + elapsedSeconds * linesPerSecond;
+			if (nextLine >= totalLines) {
+				goToLine(totalLines);
+				setIsPlaying(false);
+				return;
+			}
+			goToLine(nextLine);
+			rafId = requestAnimationFrame(tick);
+		};
+		rafId = requestAnimationFrame(tick);
+
+		return () => cancelAnimationFrame(rafId);
+	}, [isPlaying, playbackSpeed, totalLines, estimatedTime, goToLine]);
 
 	// Split the toolpath by tool so the Tools panel's eye buttons can hide one.
 	// Needs the line index, which lands after the geometry does, so the viewer
@@ -257,7 +316,7 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
 							<GCodeSourcePanel
 								lines={lines}
 								currentLine={currentLine}
-								onSelectLine={goToLine}
+								onSelectLine={goToLineManual}
 								deferScroll={scrubbing}
 							/>
 						</div>
@@ -285,7 +344,7 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
 								activeToolIndex={activeToolIndex}
 								hiddenTools={hiddenTools}
 								onToggleTool={toggleTool}
-								onSelectLine={goToLine}
+								onSelectLine={goToLineManual}
 								units={units}
 							/>
 						</div>
@@ -296,6 +355,7 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
 							currentLine={currentLine}
 							totalLines={totalLines}
 							onScrub={(line) => {
+								setIsPlaying(false);
 								setScrubbing(true);
 								goToLine(line);
 							}}
@@ -307,7 +367,20 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
 						<StepControls
 							currentLine={currentLine}
 							totalLines={totalLines}
-							onStep={(delta) => goToLine(currentLine + delta)}
+							onStep={(delta) => goToLineManual(currentLine + delta)}
+							isPlaying={isPlaying}
+							speed={playbackSpeed}
+							onSpeedChange={setPlaybackSpeed}
+							onTogglePlay={() => {
+								if (!isPlaying && currentLine >= totalLines) {
+									goToLine(1);
+								}
+								setIsPlaying((prev) => !prev);
+							}}
+							onReset={() => {
+								setIsPlaying(false);
+								goToLine(1);
+							}}
 						/>
 						<StepThroughStatus
 							position={position}
