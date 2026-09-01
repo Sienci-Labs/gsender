@@ -22,8 +22,11 @@ const PathSelection = ({ value, index, onChange }: Props) => {
 		}
 
 		const handleReturnedDirectory = (_: any, directory: string) => {
-			if (waitingRef.current && directory) {
-				setWaiting(false);
+			if (!waitingRef.current) {
+				return;
+			}
+			setWaiting(false);
+			if (directory) {
 				onChange(directory);
 			}
 		};
