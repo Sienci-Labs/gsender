@@ -70,7 +70,7 @@ const AlertDialogHeader = ({
 				<IoIosWarning />
 			</span>
 		</div>
-		<div className="flex flex-col gap-2 p-4">{children}</div>
+		<div className="flex flex-col gap-2 p-4 min-w-0">{children}</div>
 	</div>
 );
 AlertDialogHeader.displayName = "AlertDialogHeader";
@@ -112,7 +112,7 @@ const AlertDialogDescription = React.forwardRef<
 		<div
 			ref={ref}
 			className={cx(
-				"text-sm text-gray-700 dark:text-content-secondary text-muted-foreground",
+				"text-sm text-gray-700 dark:text-content-secondary text-muted-foreground break-words",
 				className,
 			)}
 			{...props}
