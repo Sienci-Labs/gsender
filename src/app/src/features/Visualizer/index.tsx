@@ -1703,8 +1703,8 @@ class Visualizer extends Component {
 						{!showVisualizer && webGLAvailable && <VisualizerPlaceholder />}
 
 						<PluginVisualizerOverlayHost
-							baseBottomPx={LIGHTWEIGHT_TOGGLE_POSITION.bottom}
-							leftPx={LIGHTWEIGHT_TOGGLE_POSITION.left}
+							baseBottomPx={lightweightTogglePosition.bottom}
+							leftPx={lightweightTogglePosition.left}
 						/>
 
 						<Tooltip content={liteModeActionLabel} side="top">
