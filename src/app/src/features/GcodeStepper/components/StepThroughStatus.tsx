@@ -23,7 +23,7 @@
 
 import { IMPERIAL_UNITS } from "app/constants";
 import { cn } from "app/lib/utils";
-import { EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import type React from "react";
 import type { LineModalState, StepPosition } from "../definitions";
 
@@ -57,7 +57,10 @@ const Block: React.FC<{
 		<span className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-content-muted">
 			{label}
 		</span>
-		{children}
+		{/* flex-1 + items-center: lets single-row content (e.g. the position
+		    readout) center vertically when a taller sibling block stretches
+		    this card past its own content height. */}
+		<div className="flex flex-1 items-center">{children}</div>
 	</div>
 );
 
@@ -73,7 +76,7 @@ const AxisReadout: React.FC<{ label: string; value: string }> = ({
 		    step as values cross a digit or pick up a minus sign. `ch` is exact
 		    under font-mono, and 9 of them hold the widest realistic readout
 		    ("-9999.999", or "-360.000°" for A). */}
-		<span className="inline-block w-[9ch] text-right font-mono tabular-nums text-gray-900 dark:text-content-primary">
+		<span className="inline-block w-[9ch] text-right font-mono tabular-nums text-blue-500 dark:text-blue-400">
 			{value}
 		</span>
 	</div>
@@ -241,11 +244,13 @@ export const StepThroughStatus: React.FC<StepThroughStatusProps> = ({
 						: "border-gray-300 bg-white text-gray-600 hover:bg-gray-100 dark:border-outline dark:bg-surface-elevated dark:text-content-secondary dark:hover:bg-surface-hover",
 				)}
 			>
-				<EyeOff className="h-4 w-4 flex-shrink-0" />
-				<span className="text-left leading-tight">
-					Hide previous
-					<br />
-					lines
+				{hideProcessed ? (
+					<Eye className="h-4 w-4 flex-shrink-0" />
+				) : (
+					<EyeOff className="h-4 w-4 flex-shrink-0" />
+				)}
+				<span className="whitespace-nowrap">
+					{hideProcessed ? "Show prior lines" : "Hide prior lines"}
 				</span>
 			</button>
 		</div>

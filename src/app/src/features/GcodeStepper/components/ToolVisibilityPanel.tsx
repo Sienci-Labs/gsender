@@ -23,7 +23,7 @@
 
 import { IMPERIAL_UNITS } from "app/constants";
 import { cn } from "app/lib/utils";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Wrench } from "lucide-react";
 import type React from "react";
 import type { StepperTool } from "../definitions";
 import { readableTextColor } from "../utils/tools";
@@ -226,9 +226,10 @@ export const ToolVisibilityPanel: React.FC<ToolVisibilityPanelProps> = ({
 		</span>
 
 		{tools.length === 0 ? (
-			<span className="text-xs text-gray-500 dark:text-content-muted">
-				No tools found in this file.
-			</span>
+			<div className="flex flex-1 flex-col items-center justify-center gap-2 text-gray-500 dark:text-content-muted">
+				<Wrench className="h-12 w-12" />
+				<span className="text-xs">No tools found in this file.</span>
+			</div>
 		) : (
 			<div className="flex min-h-0 flex-1 flex-col overflow-y-auto pr-1">
 				{tools.map((tool, i) => (
