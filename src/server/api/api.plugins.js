@@ -119,8 +119,11 @@ const revealInFileManager = (target) => {
 export const openDirectory = (req, res) => {
 	const { pluginPath } = req.body || {};
 	const pluginsDir = pluginRegistry.getPluginsDirectory();
+	const userPluginsDir = pluginRegistry.getUserPluginsDir();
 
-	let target = pluginsDir;
+	const resolvedPluginsDir = userPluginsDir || pluginsDir || "";
+
+	let target = resolvedPluginsDir;
 
 	if (pluginPath) {
 		if (typeof pluginPath !== "string") {
