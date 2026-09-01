@@ -44,11 +44,23 @@ const ensurePluginsDirectory = () => {
 	return dir;
 };
 
+const getUserPluginsDir = () => config.get("userPluginsDir", "");
+
+const setUserPluginsDir = (dir) => {
+	const value = typeof dir === "string" ? dir.trim() : "";
+	config.set("userPluginsDir", value);
+	if (value) {
+		fs.mkdirSync(value, { recursive: true });
+	}
+	return value;
+};
+
 const getPluginDirectories = () => {
 	const extra = Array.isArray(settings.extraPluginsDirs)
 		? settings.extraPluginsDirs
 		: [];
-	const ordered = [...extra, getPluginsDirectory()];
+	// The user-chosen directory is additive alongside the default pluginsDir
+	const ordered = [...extra, getUserPluginsDir(), getPluginsDirectory()];
 
 	const seen = new Set();
 	const dirs = [];
@@ -397,6 +409,8 @@ export default {
 	MANIFEST_FILENAME,
 	getPluginsDirectory,
 	getPluginDirectories,
+	getUserPluginsDir,
+	setUserPluginsDir,
 	ensurePluginsDirectory,
 	discoverPlugins,
 	getEnabledPlugins,

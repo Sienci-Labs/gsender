@@ -49,6 +49,7 @@ export const fetch = (_req, res) => {
 
 	res.send({
 		pluginsDir: pluginRegistry.getPluginsDirectory(),
+		userPluginsDir: pluginRegistry.getUserPluginsDir(),
 		plugins,
 	});
 };
@@ -118,8 +119,11 @@ const revealInFileManager = (target) => {
 export const openDirectory = (req, res) => {
 	const { pluginPath } = req.body || {};
 	const pluginsDir = pluginRegistry.getPluginsDirectory();
+	const userPluginsDir = pluginRegistry.getUserPluginsDir();
 
-	let target = pluginsDir;
+	const resolvedPluginsDir = userPluginsDir || pluginsDir || "";
+
+	let target = resolvedPluginsDir;
 
 	if (pluginPath) {
 		if (typeof pluginPath !== "string") {
@@ -231,6 +235,32 @@ export const scanPluginForSDKUsage = (req, res) => {
 		});
 	}
 	res.send({ msg: "Scanned for sdk usage", ...result });
+};
+
+export const updateSettings = (req, res) => {
+	const { pluginsDir } = req.body || {};
+
+	if (pluginsDir !== undefined && typeof pluginsDir !== "string") {
+		return res.status(ERR_BAD_REQUEST).send({
+			msg: '"pluginsDir" must be a string',
+		});
+	}
+
+	try {
+		const previousUserPluginsDir = pluginRegistry.getUserPluginsDir();
+		const saved = pluginRegistry.setUserPluginsDir(pluginsDir || "");
+		res.send({
+			msg: "Plugin settings updated",
+			userPluginsDir: saved,
+			previousUserPluginsDir,
+			restartRequired: true,
+		});
+	} catch (err) {
+		log.error(err);
+		res.status(ERR_INTERNAL_SERVER_ERROR).send({
+			msg: `Failed to update plugin settings: ${err.message}`,
+		});
+	}
 };
 
 export const importPlugin = (req, res) => {

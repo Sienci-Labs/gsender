@@ -69,6 +69,7 @@ const defaultState: State = {
 		backupFreq: "On Update",
 		powerSaving: false,
 		backupLoc: "",
+		userPluginsDir: "",
 		lastBackupTime: 0,
 		collectUsageDataStatus: "pending",
 		jobTimes: [],
