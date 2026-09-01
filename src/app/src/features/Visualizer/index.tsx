@@ -100,13 +100,41 @@ const debouncedThemeChange = debounce(() => {
 	pubsub.publish("visualizer:redraw");
 }, 500);
 
-const VIEWCUBE_OFFSET_PX = 60;
+// Keep in sync with the view cube's own geometry in @sienci/gviewer's
+// src/viewer/viewcube.css (landscape vs. `@media (orientation: portrait)`).
+// `left` stays 60px in both orientations there — only `bottom`/size change in
+// portrait — so left/bottom offsets are tracked separately here.
+const VIEWCUBE_LEFT_PX = 60;
+const VIEWCUBE_BOTTOM_PX = 60;
 const VIEWCUBE_SIZE_PX = 84;
+const VIEWCUBE_LEFT_PX_PORTRAIT = 60;
+const VIEWCUBE_BOTTOM_PX_PORTRAIT = 110;
+const VIEWCUBE_SIZE_PX_PORTRAIT = 64;
 const VIEWCUBE_CONTROL_GAP_PX = 12;
-const LIGHTWEIGHT_TOGGLE_POSITION = {
-	left: VIEWCUBE_OFFSET_PX + VIEWCUBE_SIZE_PX / 2,
-	bottom: VIEWCUBE_OFFSET_PX + VIEWCUBE_SIZE_PX + VIEWCUBE_CONTROL_GAP_PX,
-};
+// "Move To Here" toggle sits stacked directly above the lightweight toggle.
+const FLOATING_BUTTON_SIZE_PX = 44; // h-11 / w-11
+
+function getViewCubeControlPositions(isPortrait: boolean) {
+	const viewCubeLeft = isPortrait ? VIEWCUBE_LEFT_PX_PORTRAIT : VIEWCUBE_LEFT_PX;
+	const viewCubeBottom = isPortrait
+		? VIEWCUBE_BOTTOM_PX_PORTRAIT
+		: VIEWCUBE_BOTTOM_PX;
+	const viewCubeSize = isPortrait ? VIEWCUBE_SIZE_PX_PORTRAIT : VIEWCUBE_SIZE_PX;
+
+	const lightweightTogglePosition = {
+		left: viewCubeLeft + viewCubeSize / 2,
+		bottom: viewCubeBottom + viewCubeSize + VIEWCUBE_CONTROL_GAP_PX,
+	};
+	const moveToHereTogglePosition = {
+		left: lightweightTogglePosition.left,
+		bottom:
+			lightweightTogglePosition.bottom +
+			FLOATING_BUTTON_SIZE_PX +
+			VIEWCUBE_CONTROL_GAP_PX,
+	};
+
+	return { lightweightTogglePosition, moveToHereTogglePosition };
+}
 
 class Visualizer extends Component {
 	static propTypes = {
@@ -720,8 +748,22 @@ class Visualizer extends Component {
 
 	workflowControl = null;
 
+	orientationMediaQueryList: MediaQueryList | null = null;
+
+	handleOrientationChange = (event: MediaQueryListEvent) => {
+		this.setState({ isPortrait: event.matches });
+	};
+
 	componentDidMount() {
 		this.subscribe();
+
+		this.orientationMediaQueryList = window.matchMedia(
+			"(orientation: portrait)",
+		);
+		this.orientationMediaQueryList.addEventListener(
+			"change",
+			this.handleOrientationChange,
+		);
 
 		/*store.on('change', () => {
             const { theme } = this.state;
@@ -757,6 +799,11 @@ class Visualizer extends Component {
 		this.unsubscribe();
 		this.removeShuttleControlEvents();
 		this.unsubscribe();
+
+		this.orientationMediaQueryList?.removeEventListener(
+			"change",
+			this.handleOrientationChange,
+		);
 	}
 
 	componentDidUpdate(prevProps, prevState) {
@@ -817,6 +864,9 @@ class Visualizer extends Component {
 			port: controller.port,
 			units: store.get("workspace.units", METRIC_UNITS),
 			theme: this.config.get("theme"),
+			isPortrait:
+				typeof window !== "undefined" &&
+				window.matchMedia("(orientation: portrait)").matches,
 			showSoftLimitsWarning: this.config.get("showSoftLimitsWarning", false),
 			workflow: {
 				state: controller.workflow.state,
@@ -1555,6 +1605,9 @@ class Visualizer extends Component {
 			...this.actions,
 		};
 
+		const { lightweightTogglePosition, moveToHereTogglePosition } =
+			getViewCubeControlPositions(state.isPortrait);
+
 		const showRendering = renderState === RENDER_RENDERING;
 		const showLoading = renderState === RENDER_LOADING;
 		// Handle visualizer render
@@ -1650,14 +1703,14 @@ class Visualizer extends Component {
 						{!showVisualizer && webGLAvailable && <VisualizerPlaceholder />}
 
 						<PluginVisualizerOverlayHost
-							baseBottomPx={LIGHTWEIGHT_TOGGLE_POSITION.bottom}
-							leftPx={LIGHTWEIGHT_TOGGLE_POSITION.left}
+							baseBottomPx={lightweightTogglePosition.bottom}
+							leftPx={lightweightTogglePosition.left}
 						/>
 
 						<Tooltip content={liteModeActionLabel} side="top">
 							<button
 								type="button"
-								style={LIGHTWEIGHT_TOGGLE_POSITION}
+								style={lightweightTogglePosition}
 								className={cx(
 									"absolute z-[9999] inline-flex h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full border bg-dark-darker/70 shadow-[0_10px_30px_rgba(0,_0,_0,_0.25)] transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-dark-darker active:scale-[0.98] active:bg-dark-darker/85 mb-5",
 									{
