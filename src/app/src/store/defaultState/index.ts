@@ -460,6 +460,13 @@ const defaultState: State = {
 		},
 	},
 	commandKeys: {},
+	// Must stay an empty object: store/index.ts's merge() only walks base's own
+	// keys, so a saved key absent from defaultState gets silently dropped on
+	// every reload UNLESS its defaultState value is `{}` (merge() then returns
+	// the saved value wholesale). Plugin ids are dynamic/unbounded, so this can
+	// never have real per-plugin defaults added to it — see `commandKeys: {}`
+	// above for the same pattern with dynamic macro-id keys.
+	plugins: {},
 };
 
 export default defaultState;

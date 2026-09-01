@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const { spawnSync } = require("child_process");
+const { run } = require("./lib/shell-utils");
 
 const REPO_ROOT = path.resolve(__dirname, "..");
 const PLUGINS_ROOT = path.join(REPO_ROOT, "plugins");
@@ -16,21 +16,9 @@ const DEFAULT_PLUGINS = (process.env.GSENDER_DEFAULT_PLUGINS || "basic-cam")
 	.map((name) => name.trim())
 	.filter(Boolean);
 
-const run = (command, args) => {
-	const result = spawnSync(command, args, {
-		cwd: REPO_ROOT,
-		stdio: "inherit",
-		shell: process.platform === "win32",
-	});
-
-	if (result.status !== 0) {
-		throw new Error(`Command failed: ${command} ${args.join(" ")}`);
-	}
-};
-
 const runYarn = (packageDir, args) => {
 	const relativeDir = path.relative(REPO_ROOT, packageDir);
-	run("yarn", ["--cwd", relativeDir, ...args]);
+	run("yarn", ["--cwd", relativeDir, ...args], REPO_ROOT);
 };
 
 const readJson = (filePath) => JSON.parse(fs.readFileSync(filePath, "utf8"));

@@ -23,6 +23,7 @@
 
 import { Tooltip } from "app/components/Tooltip";
 import { Widget } from "app/components/Widget";
+import PluginVisualizerOverlayHost from "app/features/Plugins/components/PluginVisualizerOverlayHost";
 import { WorkspaceSelector } from "app/features/WorkspaceSelector/index.tsx";
 import combokeys from "app/lib/combokeys";
 import controller from "app/lib/controller";
@@ -32,11 +33,6 @@ import { getVisualizerTheme } from "app/lib/getVisualizerTheme";
 import log from "app/lib/log";
 import * as WebGL from "app/lib/three/WebGL";
 import { toast } from "app/lib/toaster";
-import {
-	TOASTER_LONG,
-	TOASTER_WARNING,
-	Toaster,
-} from "app/lib/toaster/ToasterLib";
 import store from "app/store";
 import { store as reduxStore } from "app/store/redux";
 import {
@@ -48,7 +44,7 @@ import _ from "lodash";
 import debounce from "lodash/debounce";
 import get from "lodash/get";
 import includes from "lodash/includes";
-import { Crosshair, FrownIcon } from "lucide-react";
+import { FrownIcon } from "lucide-react";
 import posthog from "posthog-js";
 import PropTypes from "prop-types";
 import pubsub from "pubsub-js";
@@ -591,37 +587,40 @@ class Visualizer extends Component {
 				}
 			},
 			toTopView: () => {
-				this.setState({ cameraPosition: "Top" });
+				this.setState((prev) => ({
+					cameraPosition: "Top",
+					cameraPositionNonce: prev.cameraPositionNonce + 1,
+				}));
 			},
 			to3DView: () => {
-				this.setState({ cameraPosition: "3D" });
+				this.setState((prev) => ({
+					cameraPosition: "3D",
+					cameraPositionNonce: prev.cameraPositionNonce + 1,
+				}));
 			},
 			toFrontView: () => {
-				this.setState({ cameraPosition: "Front" });
+				this.setState((prev) => ({
+					cameraPosition: "Front",
+					cameraPositionNonce: prev.cameraPositionNonce + 1,
+				}));
 			},
 			toLeftSideView: () => {
-				this.setState({ cameraPosition: "Left" });
+				this.setState((prev) => ({
+					cameraPosition: "Left",
+					cameraPositionNonce: prev.cameraPositionNonce + 1,
+				}));
 			},
 			toRightSideView: () => {
-				this.setState({ cameraPosition: "Right" });
+				this.setState((prev) => ({
+					cameraPosition: "Right",
+					cameraPositionNonce: prev.cameraPositionNonce + 1,
+				}));
 			},
 			toFreeView: () => {
-				this.setState({ cameraPosition: "Free" });
-			},
-			// Arm/disarm "Move To Here": pressing-and-holding a spot in the
-			// viewport rapids the spindle there. Arming pins the camera to the
-			// Top view so the click maps cleanly onto the XY work plane.
-			toggleMoveToHere: () => {
-				this.setState((state) => {
-					const moveToHere = !state.moveToHere;
-					return {
-						moveToHere,
-						cameraPosition: moveToHere ? "Top" : state.cameraPosition,
-					};
-				});
-			},
-			disableMoveToHere: () => {
-				this.setState({ moveToHere: false });
+				this.setState((prev) => ({
+					cameraPosition: "Free",
+					cameraPositionNonce: prev.cameraPositionNonce + 1,
+				}));
 			},
 		},
 		handleLiteModeToggle: () => {
@@ -956,7 +955,8 @@ class Visualizer extends Component {
 			},
 			cameraMode: this.config.get("cameraMode", CAMERA_MODE_PAN),
 			cameraPosition: "3D", // 'Top', '3D', 'Front', 'Left', 'Right'
-			moveToHere: false, // "Move To Here" placement mode is armed
+			cameraPositionNonce: 0, // tracks how many repeat camera view requests have been made
+			// so that it can snap camera even if it's already in that view
 			isAgitated: false, // Defaults to false
 			currentTheme: getVisualizerTheme(),
 			currentTab: 0,
@@ -1650,6 +1650,7 @@ class Visualizer extends Component {
 						<GcodeViewer
 							show={showVisualizer}
 							cameraPosition={state.cameraPosition}
+							cameraPositionNonce={state.cameraPositionNonce}
 							ref={setVisualizerRef}
 							state={state}
 							actions={actions}
@@ -1683,6 +1684,7 @@ class Visualizer extends Component {
 							<GcodeViewer
 								show={showVisualizer}
 								cameraPosition={state.cameraPosition}
+								cameraPositionNonce={state.cameraPositionNonce}
 								ref={setVisualizerRef}
 								state={state}
 								actions={actions}
@@ -1700,34 +1702,10 @@ class Visualizer extends Component {
 
 						{!showVisualizer && webGLAvailable && <VisualizerPlaceholder />}
 
-						{state.isConnected && (
-							<Tooltip
-								content="Move To Here: press and hold a spot to move the spindle there"
-								side="top"
-							>
-								<button
-									type="button"
-									style={moveToHereTogglePosition}
-									className={cx(
-										"absolute z-[9999] inline-flex h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full border bg-dark-darker/70 shadow-[0_10px_30px_rgba(0,_0,_0,_0.25)] transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-dark-darker active:scale-[0.98] active:bg-dark-darker/85 mb-5",
-										{
-											"border-[rgba(96,_165,_250,_0.95)] text-[rgba(96,_165,_250,_0.95)] shadow-[0_0_0_1px_rgba(96,_165,_250,_0.35),0_10px_30px_rgba(0,_0,_0,_0.35)] hover:border-[rgba(96,_165,_250,_0.95)] hover:text-[rgba(96,_165,_250,_0.95)] hover:shadow-[0_0_0_1px_rgba(96,_165,_250,_0.45),0_12px_32px_rgba(0,_0,_0,_0.4)]":
-												state.moveToHere,
-											"border-gray-400/40 text-gray-300 hover:border-gray-200/70 hover:text-gray-100 hover:shadow-[0_12px_32px_rgba(0,_0,_0,_0.35)]":
-												!state.moveToHere,
-										},
-									)}
-									aria-label="Move To Here"
-									aria-pressed={state.moveToHere}
-									onClick={() => actions.camera.toggleMoveToHere()}
-								>
-									<Crosshair
-										aria-hidden="true"
-										className="pointer-events-none h-5 w-5 shrink-0"
-									/>
-								</button>
-							</Tooltip>
-						)}
+						<PluginVisualizerOverlayHost
+							baseBottomPx={LIGHTWEIGHT_TOGGLE_POSITION.bottom}
+							leftPx={LIGHTWEIGHT_TOGGLE_POSITION.left}
+						/>
 
 						<Tooltip content={liteModeActionLabel} side="top">
 							<button

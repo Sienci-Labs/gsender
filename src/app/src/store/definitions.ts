@@ -370,6 +370,9 @@ export interface State {
 		atc: ATC;
 	};
 	commandKeys: CommandKeys;
+	// Dynamic, per-plugin namespaced storage (keyed by manifest id). Must stay
+	// `{}` in defaultState — see the `plugins: {}` comment in defaultState/index.ts.
+	plugins: Record<string, unknown>;
 }
 
 export interface SerialPortOptions {
