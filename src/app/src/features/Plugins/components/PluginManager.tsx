@@ -231,6 +231,7 @@ const PluginManager = () => {
 				onClose={() => setShowInstall(false)}
 				onInstalled={refresh}
 				onRestartRequired={() => setRestartRequired(true)}
+				pluginsDir={pluginsDir}
 			/>
 
 			<AlertDialog

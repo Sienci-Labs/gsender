@@ -291,6 +291,107 @@ describe("InstallPluginDialog", () => {
 		).toBeInTheDocument();
 	});
 
+	// --- Layout ---------------------------------------------------------------
+	// The dialog used to be sized by its content, so it visibly jumped between
+	// steps and again whenever a plugin requested more permissions.
+
+	it("keeps the same panel size on every step", async () => {
+		plugins.installCommit.mockResolvedValue({
+			data: { ok: true, restartRequired: true, replaced: false, log: [] },
+		});
+		renderDialog();
+
+		const panel = screen.getByRole("dialog");
+		// Arbitrary-value class names are not valid CSS selectors, so scan instead.
+		const bodyOf = () =>
+			Array.from(panel.querySelectorAll("div")).find((element) =>
+				element.className.includes("h-[420px]"),
+			);
+
+		const sizeOnSource = panel.className;
+		expect(bodyOf()).toBeDefined();
+
+		await advanceToReview(
+			makePlan({
+				// A long permission list is exactly what used to stretch the panel.
+				permissions: ["machine:read", "machine:write", "storage", "redux:read"],
+				verifiedPermissions: ["machine:read"],
+				declaredOnlyPermissions: ["machine:write", "storage", "redux:read"],
+			}),
+		);
+		expect(panel.className).toBe(sizeOnSource);
+		expect(bodyOf()).toBeDefined();
+
+		await userEvent.click(screen.getByRole("button", { name: /^install$/i }));
+		await screen.findByText(/was installed/i);
+		expect(panel.className).toBe(sizeOnSource);
+		expect(bodyOf()).toBeDefined();
+	});
+
+	it("shows the activity log without needing a click", async () => {
+		renderDialog();
+
+		// Nothing to report before a plugin is chosen.
+		expect(
+			screen.queryByTestId("install-activity-log"),
+		).not.toBeInTheDocument();
+		expect(screen.getByText(/waiting for a plugin/i)).toBeInTheDocument();
+
+		plugins.installPrepare.mockResolvedValue({
+			data: {
+				ok: true,
+				sessionId: "session-1",
+				plan: makePlan(),
+				log: [
+					{ level: "info", message: "Extracting demo.zip", at: "t1" },
+					{ level: "warn", message: "Skipped 1 symlink entries", at: "t2" },
+				],
+			},
+		});
+		await userEvent.click(screen.getByRole("button", { name: /from folder/i }));
+		sourceHandler?.(null, { path: "/tmp/demo" });
+
+		const log = await screen.findByTestId("install-activity-log");
+		expect(log).toHaveTextContent("Extracting demo.zip");
+		expect(log).toHaveTextContent("Skipped 1 symlink entries");
+	});
+
+	it("summarises the version change in the info panel", async () => {
+		renderDialog();
+		await advanceToReview(
+			makePlan({
+				kind: "update",
+				installedVersion: "0.1.0",
+				incomingVersion: "0.2.0",
+			}),
+		);
+
+		const version = screen.getByText("Version").closest("div");
+		expect(version).toHaveTextContent("0.1.0");
+		expect(version).toHaveTextContent("0.2.0");
+		expect(screen.getByText("com.sienci.demo")).toBeInTheDocument();
+	});
+
+	it("offers no way out while the swap is in progress", async () => {
+		// Never resolves, so the wizard stays on the installing step.
+		plugins.installCommit.mockReturnValue(new Promise(() => {}));
+		renderDialog();
+		await advanceToReview(makePlan());
+
+		await userEvent.click(screen.getByRole("button", { name: /^install$/i }));
+
+		expect(
+			await screen.findByText(/Installing Demo Plugin/i),
+		).toBeInTheDocument();
+		expect(
+			screen.queryByRole("button", { name: /back/i }),
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole("button", { name: /^install$/i }),
+		).not.toBeInTheDocument();
+		expect(screen.getByRole("button", { name: /close/i })).toBeDisabled();
+	});
+
 	it("discards the staged copy when the wizard is closed mid-review", async () => {
 		const { rerender } = renderDialog();
 		await advanceToReview(makePlan());
