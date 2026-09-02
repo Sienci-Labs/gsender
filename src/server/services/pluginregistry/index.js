@@ -23,7 +23,6 @@ import settings from "../../config/settings";
 import logger from "../../lib/logger";
 import config from "../configstore";
 import { normalizeCapabilities } from "./capabilities";
-import { scanPluginForSdkUsage } from "./pluginSecurity";
 
 const log = logger("service:pluginregistry");
 
@@ -77,6 +76,18 @@ const getPluginDirectories = () => {
 	});
 
 	return dirs;
+};
+
+// Determine whether `target` lives inside one of the allowed plugin roots.
+// Every path we create, replace or delete is checked against this.
+const isWithinAllowedRoots = (target) => {
+	const resolved = path.resolve(target);
+	return getPluginDirectories().some((root) => {
+		// The root itself is allowed, as is anything beneath it. The trailing
+		// separator prevents a sibling like "/plugins-evil" matching "/plugins".
+		const rootWithSep = root.endsWith(path.sep) ? root : root + path.sep;
+		return resolved === root || resolved.startsWith(rootWithSep);
+	});
 };
 
 const readManifest = (pluginPath) => {
@@ -156,6 +167,12 @@ const setPluginEnabled = (pluginId, enabled) => {
 	config.set("pluginSettings", pluginSettings);
 };
 
+const forgetPluginSettings = (pluginId) => {
+	const pluginSettings = { ...getPluginSettings() };
+	delete pluginSettings[pluginId];
+	config.set("pluginSettings", pluginSettings);
+};
+
 const discoverPluginsInDir = (pluginsDir) => {
 	let entries = [];
 
@@ -174,6 +191,11 @@ const discoverPluginsInDir = (pluginsDir) => {
 
 	entries.forEach((entry) => {
 		if (!entry.isDirectory()) {
+			return;
+		}
+		// Dot-directories are ours (install staging, uninstall backups), never
+		// plugins.
+		if (entry.name.startsWith(".")) {
 			return;
 		}
 
@@ -340,34 +362,9 @@ const watchPlugins = (onChange, { debounceMs = 200 } = {}) => {
 	return stopWatchingPlugins;
 };
 
-const readImportedManifest = (pluginPath) => {
-	const manifest = readManifest(pluginPath);
-	if (!manifest) {
-		return null;
-	}
-
-	const errors = validateManifest(manifest, pluginPath);
-	const plugin = {
-		id: manifest.id,
-		name: manifest.name,
-		version: manifest.version,
-		engine: manifest.engine || null,
-		capabilities: normalizeCapabilities(manifest.capabilities),
-		permissions: normalizePermissions(manifest.permissions),
-		valid: errors.length === 0,
-		errors,
-		entry: manifest.ui.entry,
-		contributions: manifest.ui.contributions || [],
-		pluginPath,
-	};
-
-	return {
-		isValid: true,
-		plugin,
-	};
-};
-
-const changeManifestPermissions = (pluginPath, capabilities) => {
+// Records the permissions the user authorised. Called against the staged copy
+// during install, so the folder the user picked is never modified.
+const changeManifestPermissions = (pluginPath, grant) => {
 	const manifest = readManifest(pluginPath);
 	if (!manifest) {
 		log.error("no manifest");
@@ -376,7 +373,8 @@ const changeManifestPermissions = (pluginPath, capabilities) => {
 
 	const newManifest = {
 		...manifest,
-		capabilities: normalizeCapabilities(capabilities),
+		permissions: normalizePermissions(grant?.permissions),
+		capabilities: normalizeCapabilities(grant?.capabilities),
 	};
 
 	const manifestPath = path.join(pluginPath, MANIFEST_FILENAME);
@@ -385,22 +383,6 @@ const changeManifestPermissions = (pluginPath, capabilities) => {
 		return 0;
 	} catch (err) {
 		log.error(`Failed to write manifest at ${manifestPath}: ${err.message}`);
-		return err;
-	}
-};
-
-const scanPlugin = scanPluginForSdkUsage;
-
-const pluginImport = (pluginsDir, pluginPath) => {
-	try {
-		const importPath = path.join(pluginsDir, path.basename(pluginPath));
-		log.debug(importPath);
-		fs.cpSync(pluginPath, importPath, {
-			recursive: true,
-		});
-		return 0;
-	} catch (err) {
-		log.error(`Failed to import plugin at ${pluginsDir}: ${err.message}`);
 		return err;
 	}
 };
@@ -420,8 +402,8 @@ export default {
 	validateManifest,
 	watchPlugins,
 	stopWatchingPlugins,
-	readImportedManifest,
 	changeManifestPermissions,
-	scanPlugin,
-	pluginImport,
+	readManifest,
+	isWithinAllowedRoots,
+	forgetPluginSettings,
 };

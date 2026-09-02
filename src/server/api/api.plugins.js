@@ -27,8 +27,21 @@ import {
 } from "../constants";
 import logger from "../lib/logger";
 import pluginRegistry from "../services/pluginregistry";
+import pluginInstaller from "../services/pluginregistry/install";
 
 const log = logger("api:plugins");
+
+// Tell open clients the plugin list changed so they refetch. cncengine is
+// required lazily because importing it at module scope drags the whole
+// controller stack (serialport, shortid) into everything that imports this
+// file, tests included.
+const notifyPluginsChanged = (payload) => {
+	try {
+		require("../services/cncengine").default.emit("plugins:changed", payload);
+	} catch (err) {
+		log.error(`Failed to notify clients of plugin changes: ${err.message}`);
+	}
+};
 
 export const fetch = (_req, res) => {
 	const plugins = pluginRegistry.discoverPlugins().map((plugin) => ({
@@ -38,6 +51,7 @@ export const fetch = (_req, res) => {
 		description: plugin.description,
 		engine: plugin.engine,
 		capabilities: plugin.capabilities,
+		permissions: plugin.permissions,
 		enabled: plugin.enabled,
 		valid: plugin.valid,
 		errors: plugin.errors,
@@ -82,20 +96,6 @@ export const update = (req, res) => {
 	});
 };
 
-// Determine whether `target` lives inside one of the allowed plugin roots.
-const isWithinAllowedRoots = (target) => {
-	const roots = pluginRegistry
-		.getPluginDirectories()
-		.map((dir) => path.resolve(dir));
-
-	return roots.some((root) => {
-		// The root itself is allowed, as is anything beneath it. The trailing
-		// separator prevents a sibling like "/plugins-evil" matching "/plugins".
-		const rootWithSep = root.endsWith(path.sep) ? root : root + path.sep;
-		return target === root || target.startsWith(rootWithSep);
-	});
-};
-
 // Open a filesystem path in the OS file manager (Explorer/Finder/xdg-open).
 const revealInFileManager = (target) => {
 	const platform = process.platform;
@@ -133,7 +133,7 @@ export const openDirectory = (req, res) => {
 		}
 
 		const resolved = path.resolve(pluginPath);
-		if (!isWithinAllowedRoots(resolved)) {
+		if (!pluginRegistry.isWithinAllowedRoots(resolved)) {
 			return res.status(ERR_BAD_REQUEST).send({
 				msg: "Requested path is outside the plugins directory",
 			});
@@ -159,82 +159,6 @@ export const openDirectory = (req, res) => {
 	}
 
 	res.send({ msg: "Opened directory", path: target });
-};
-
-export const readImportedManifest = (req, res) => {
-	const { pluginPath } = req.body;
-
-	try {
-		if (typeof pluginPath !== "string") {
-			log.error("plugin path not string");
-			return res.status(ERR_BAD_REQUEST).send({
-				msg: '"pluginPath" must be a string',
-			});
-		}
-
-		if (!fs.existsSync(pluginPath)) {
-			log.error("directory not found");
-			return res.status(ERR_NOT_FOUND).send({
-				msg: `Directory not found: ${pluginPath}`,
-			});
-		}
-
-		const result = pluginRegistry.readImportedManifest(pluginPath);
-		if (!result) {
-			log.error("manifest not found");
-			return res.status(ERR_NOT_FOUND).send({ msg: "Manifest not found" });
-		}
-		res.send({ msg: "Manifest read", ...result });
-	} catch (err) {
-		log.error(err);
-		res.status(ERR_INTERNAL_SERVER_ERROR).send({ msg: err });
-	}
-};
-
-export const writePermissions = (req, res) => {
-	const { pluginPath, capabilities } = req.body;
-
-	try {
-		if (typeof pluginPath !== "string") {
-			return res.status(ERR_BAD_REQUEST).send({
-				msg: '"pluginPath" must be a string',
-			});
-		}
-
-		if (!fs.existsSync(pluginPath)) {
-			return res.status(ERR_NOT_FOUND).send({
-				msg: `Directory not found: ${pluginPath}`,
-			});
-		}
-
-		const error = pluginRegistry.changeManifestPermissions(
-			pluginPath,
-			capabilities,
-		);
-		if (error) {
-			return res
-				.status(ERR_INTERNAL_SERVER_ERROR)
-				.send({ msg: "Error writing manifest", error });
-		}
-		res.status(200).send({ msg: "Permissions written" });
-	} catch (err) {
-		log.error(err);
-		res
-			.status(ERR_INTERNAL_SERVER_ERROR)
-			.send({ msg: "Error writing manifest", error: err });
-	}
-};
-
-export const scanPluginForSDKUsage = (req, res) => {
-	const { indexFile, sdks } = req.body;
-	const result = pluginRegistry.scanPlugin(indexFile, sdks);
-	if (result.err) {
-		return res.status(ERR_NOT_FOUND).send({
-			msg: "Error scanning manifest for sdk usage",
-			error: result.err,
-		});
-	}
-	res.send({ msg: "Scanned for sdk usage", ...result });
 };
 
 export const updateSettings = (req, res) => {
@@ -263,13 +187,77 @@ export const updateSettings = (req, res) => {
 	}
 };
 
-export const importPlugin = (req, res) => {
-	const { pluginsDir, directory } = req.body;
-	const error = pluginRegistry.pluginImport(pluginsDir, directory);
-	if (error) {
-		return res
-			.status(ERR_INTERNAL_SERVER_ERROR)
-			.send({ msg: "Failed to import plugin", error });
+// ---------------------------------------------------------------------------
+// Guided install
+// ---------------------------------------------------------------------------
+
+// Stage the plugin and report back everything the review step shows: version
+// change, permissions, engine compatibility. Nothing under the live plugins
+// directory is touched until installCommit.
+export const installPrepare = async (req, res) => {
+	const { sourcePath } = req.body || {};
+
+	try {
+		const result = await pluginInstaller.prepare(sourcePath);
+		if (!result.ok) {
+			return res.status(ERR_BAD_REQUEST).send(result);
+		}
+		res.send(result);
+	} catch (err) {
+		log.error(`Failed to prepare plugin install: ${err.message}`);
+		res.status(ERR_INTERNAL_SERVER_ERROR).send({
+			ok: false,
+			error: `Something went wrong preparing the install: ${err.message}`,
+		});
 	}
-	res.send({ msg: "Successfully imported plugin" });
+};
+
+export const installCommit = (req, res) => {
+	const { sessionId } = req.body || {};
+
+	if (typeof sessionId !== "string") {
+		return res.status(ERR_BAD_REQUEST).send({
+			ok: false,
+			error: '"sessionId" must be a string',
+		});
+	}
+
+	try {
+		const result = pluginInstaller.commit(sessionId);
+		if (!result.ok) {
+			return res.status(ERR_INTERNAL_SERVER_ERROR).send(result);
+		}
+		notifyPluginsChanged({ pluginId: result.pluginId });
+		res.send(result);
+	} catch (err) {
+		log.error(`Failed to install plugin: ${err.message}`);
+		res.status(ERR_INTERNAL_SERVER_ERROR).send({
+			ok: false,
+			error: `Something went wrong installing the plugin: ${err.message}`,
+		});
+	}
+};
+
+export const installCancel = (req, res) => {
+	const { sessionId } = req.body || {};
+	res.send(pluginInstaller.cancel(sessionId));
+};
+
+export const uninstall = (req, res) => {
+	const { id } = req.params;
+
+	try {
+		const result = pluginInstaller.uninstall(id);
+		if (!result.ok) {
+			return res.status(ERR_NOT_FOUND).send(result);
+		}
+		notifyPluginsChanged({ pluginId: id });
+		res.send(result);
+	} catch (err) {
+		log.error(`Failed to uninstall plugin ${id}: ${err.message}`);
+		res.status(ERR_INTERNAL_SERVER_ERROR).send({
+			ok: false,
+			error: `Something went wrong removing the plugin: ${err.message}`,
+		});
+	}
 };
