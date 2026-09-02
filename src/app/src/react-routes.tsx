@@ -7,11 +7,12 @@ import MovementTuning from './features/MovementTuning';
 import Squaring from './features/Squaring';
 import { StatParent } from './features/Stats/StatParent';
 import Surfacing from './features/Surfacing';
+import HeightMap from './features/HeightMap';
 import ToolCard from './components/ToolCard';
 import { GiFlatPlatform } from 'react-icons/gi';
 import { FaGamepad, FaKeyboard } from 'react-icons/fa';
 import { TbRulerMeasure } from 'react-icons/tb';
-import { MdSquareFoot } from 'react-icons/md';
+import { MdSquareFoot, MdLandscape } from 'react-icons/md';
 import { Alarms } from './features/Stats/Alarms';
 import { Stats } from './features/Stats';
 import { Jobs } from './features/Stats/Jobs';
@@ -79,6 +80,13 @@ export const ReactRoutes = () => {
                                         description="Flatten your wasteboard or other non-flat stock"
                                         icon={GiFlatPlatform}
                                         link="/tools/surfacing"
+                                    />
+
+                                    <ToolCard
+                                        title="Height Map"
+                                        description="Compensate for uneven surfaces by probing and adjusting Z-height"
+                                        icon={MdLandscape}
+                                        link="/tools/height-map"
                                     />
 
                                     <ToolCard
@@ -182,6 +190,19 @@ export const ReactRoutes = () => {
                                 withFixedArea
                             >
                                 <Surfacing />
+                            </Page>
+                        }
+                    />
+                    <Route
+                        path="height-map"
+                        element={
+                            <Page
+                                title="Height Map"
+                                description="Compensate for uneven stock surfaces"
+                                withGoBackButton
+                                withFixedArea
+                            >
+                                <HeightMap />
                             </Page>
                         }
                     />
