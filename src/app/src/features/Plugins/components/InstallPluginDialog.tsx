@@ -1,4 +1,14 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "app/components/shadcn/AlertDialog";
 import { DialogOverlay } from "app/components/shadcn/Dialog";
 import cx from "classnames";
 import isElectron from "is-electron";
@@ -17,13 +27,9 @@ import {
 	X,
 	XCircle,
 } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { type InstallStep, usePluginInstall } from "../hooks/usePluginInstall";
-import type {
-	PluginInstallKind,
-	PluginInstallLogEntry,
-	PluginInstallPlan,
-} from "../types";
+import type { PluginInstallKind, PluginInstallPlan } from "../types";
 
 interface InstallPluginDialogProps {
 	show: boolean;
@@ -59,7 +65,7 @@ const CHROME = {
 	titlebarButton:
 		"flex items-center justify-center w-7 h-7 rounded border border-gray-300 dark:border-[#3a3a48] bg-transparent text-gray-500 dark:text-content-muted hover:bg-gray-200 dark:hover:bg-white/10 disabled:opacity-35 disabled:pointer-events-none transition-colors",
 	main: "flex-1 min-w-0 overflow-y-auto p-4 flex flex-col gap-3 bg-white dark:bg-[#18181f]",
-	side: "w-[280px] shrink-0 border-l border-gray-200 dark:border-[#2a2a35] bg-gray-50 dark:bg-[#141418] overflow-y-auto p-3 flex flex-col gap-3 portrait:w-full portrait:border-l-0 portrait:border-t",
+	side: "w-[280px] shrink-0 border-r border-gray-200 dark:border-[#2a2a35] bg-gray-50 dark:bg-[#141418] overflow-y-auto p-3 flex flex-col gap-3 portrait:w-full portrait:border-r-0 portrait:border-b",
 	footer:
 		"flex items-center justify-between px-4 py-3 border-t border-gray-200 dark:border-[#2a2a35] bg-gray-50 dark:bg-[#111116]",
 	ghostButton:
@@ -165,50 +171,11 @@ const Fact = ({ label, value }: { label: string; value: React.ReactNode }) => (
 	</div>
 );
 
-// Always expanded — the log is what you want the moment something goes wrong,
-// and hiding it behind a toggle also made the panel resize.
-const ActivityLog = ({ entries }: { entries: PluginInstallLogEntry[] }) => {
-	const endRef = useRef<HTMLDivElement>(null);
-
-	// Optional call: scrollIntoView is missing in some environments (jsdom, older
-	// embedded webviews) and an absent convenience must not take the panel down.
-	useEffect(() => {
-		endRef.current?.scrollIntoView?.({ block: "nearest" });
-	}, [entries.length]);
-
-	if (entries.length === 0) {
-		return <p className={CHROME.muted}>Waiting for a plugin&hellip;</p>;
-	}
-
-	return (
-		<ul
-			className={cx(CHROME.inset, "px-2 py-1.5 font-mono text-[11px]")}
-			data-testid="install-activity-log"
-		>
-			{entries.map((entry) => (
-				<li
-					key={`${entry.at}-${entry.message}`}
-					className={cx("break-words py-0.5", {
-						"text-gray-600 dark:text-content-muted": entry.level === "info",
-						"text-amber-700 dark:text-amber-400": entry.level === "warn",
-						"text-red-700 dark:text-red-400": entry.level === "error",
-					})}
-				>
-					{entry.message}
-				</li>
-			))}
-			<div ref={endRef} />
-		</ul>
-	);
-};
-
 const InfoPanel = ({
 	plan,
-	log,
 	pluginsDir,
 }: {
 	plan: PluginInstallPlan | null;
-	log: PluginInstallLogEntry[];
 	pluginsDir?: string;
 }) => (
 	<aside className={CHROME.side}>
@@ -258,10 +225,6 @@ const InfoPanel = ({
 					{pluginsDir && <Fact label="Installs into" value={pluginsDir} />}
 				</div>
 			)}
-		</SideSection>
-
-		<SideSection label="Activity">
-			<ActivityLog entries={log} />
 		</SideSection>
 	</aside>
 );
@@ -388,7 +351,6 @@ export const InstallPluginDialog = ({
 		step,
 		busy,
 		plan,
-		log,
 		error,
 		manifestErrors,
 		restored,
@@ -447,16 +409,6 @@ export const InstallPluginDialog = ({
 								disabled: busy,
 							}
 						: null,
-				};
-			case "done":
-				return {
-					back: { label: "Later", onClick: onClose },
-					primary: {
-						label: "Restart now",
-						onClick: restartNow,
-						disabled: !isElectron(),
-						icon: <RotateCw size={12} />,
-					},
 				};
 			case "error":
 				return {
@@ -524,6 +476,8 @@ export const InstallPluginDialog = ({
 					{/* Fixed body height: the left column scrolls so the panel never
 					    changes size as you move between steps. */}
 					<div className="flex h-[420px] portrait:h-auto portrait:flex-col">
+						<InfoPanel plan={plan} pluginsDir={pluginsDir} />
+
 						<div className={CHROME.main}>
 							<p className={CHROME.eyebrow}>{EYEBROW[step]}</p>
 
@@ -675,8 +629,6 @@ export const InstallPluginDialog = ({
 								</div>
 							)}
 						</div>
-
-						<InfoPanel plan={plan} log={log} pluginsDir={pluginsDir} />
 					</div>
 
 					<div className={CHROME.footer}>
@@ -725,6 +677,38 @@ export const InstallPluginDialog = ({
 					</div>
 				</DialogPrimitive.Content>
 			</DialogPrimitive.Portal>
+
+			<AlertDialog
+				open={step === "done"}
+				onOpenChange={(open) => {
+					if (!open) {
+						onClose();
+					}
+				}}
+			>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>Restart now?</AlertDialogTitle>
+						<AlertDialogDescription>
+							{plan?.plugin.name} v{plan?.incomingVersion} was{" "}
+							{result?.replaced ? "updated" : "installed"}. gSender needs a
+							restart before you can open it.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel onClick={onClose}>Later</AlertDialogCancel>
+						<AlertDialogAction
+							onClick={(event) => {
+								event.preventDefault();
+								restartNow();
+							}}
+							disabled={!isElectron()}
+						>
+							Restart now
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</DialogPrimitive.Root>
 	);
 };

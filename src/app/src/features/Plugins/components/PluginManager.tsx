@@ -192,10 +192,11 @@ const PluginManager = () => {
 								<Tooltip content={`Remove ${plugin.name} from this machine`}>
 									<div>
 										<Button
-											variant="ghost"
+											variant="outline"
 											size="sm"
 											onClick={() => setPendingRemoval(plugin)}
 											icon={<Trash2 className="h-4 w-4" />}
+											className="border-red-500 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
 										>
 											Uninstall
 										</Button>
