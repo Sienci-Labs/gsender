@@ -10,4 +10,5 @@ export const DEFAULT_VALUES_MM = {
 	feedrate: 3000,
 	enableRehoming: false,
 	shouldDwell: false,
+	toolNumber: 0,
 };

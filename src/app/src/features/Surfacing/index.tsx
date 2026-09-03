@@ -1,3 +1,5 @@
+/** biome-ignore-all lint/a11y/noLabelWithoutControl: <> */
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <explanation> */
 import { Button } from "app/components/Button";
 import { ControlledInput } from "app/components/ControlledInput";
 import InputArea from "app/components/InputArea";
@@ -94,7 +96,7 @@ const SurfacingTool = () => {
 	const handleGenerateGcode = async () => {
 		const generator = new Generator({ surfacing, units });
 
-		const gcode = generator.generate();
+		const gcode = generator.generate() as string;
 		setGcode(gcode);
 
 		const name = "gSender_Surfacing";
@@ -137,119 +139,117 @@ const SurfacingTool = () => {
 	const xyMin = units === IMPERIAL_UNITS ? convertToImperial(1) : 1;
 
 	return (
-		<>
-			<div className="bg-white dark:bg-transparent dark:text-content-primary w-full flex flex-col gap-2">
-				<div className="grid grid-cols-2 gap-4">
-					<div className="grid gap-4 max-xl:gap-3 xl:gap-2">
-						<p className="text-sm xl:text-base font-normal text-gray-500 dark:text-content-secondary">
-							<b>For ideal wasteboard surfacing:</b> know your CNCs exact
-							movement limits accounting for limit switches and other add-ons,
-							get nicer and faster cuts using your widest diameter bit, and
-							consider turning off hard and soft limits so you don&apos;t
-							encounter alarms or errors.
-						</p>
-						<div className="grid grid-cols-5 items-center gap-4">
-							<span className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 col-span-2">
-								Start Position
-							</span>
-							<div className="flex items-center col-span-3 justify-center">
-								<MachinePosition
-									surfacing={surfacing}
-									setSurfacing={setSurfacing}
-								/>
-							</div>
+		<div className="bg-white dark:bg-transparent dark:text-content-primary w-full flex flex-col gap-2">
+			<div className="grid grid-cols-2 gap-4">
+				<div className="grid gap-4 max-xl:gap-3 xl:gap-2">
+					<p className="text-sm xl:text-base font-normal text-gray-500 dark:text-content-secondary">
+						<b>For ideal wasteboard surfacing:</b> know your CNCs exact movement
+						limits accounting for limit switches and other add-ons, get nicer
+						and faster cuts using your widest diameter bit, and consider turning
+						off hard and soft limits so you don&apos;t encounter alarms or
+						errors.
+					</p>
+					<div className="grid grid-cols-5 items-center gap-4">
+						<span className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 col-span-2">
+							Start Position
+						</span>
+						<div className="flex items-center col-span-3 justify-center">
+							<MachinePosition
+								surfacing={surfacing}
+								setSurfacing={setSurfacing}
+							/>
 						</div>
-						<InputArea label="X & Y">
-							<div className="grid grid-cols-[3fr_10px_3fr] gap-2 col-span-3">
-								<Tooltip
-									content={`Default is ${convertedDefaultSurfacingState.width} ${units}`}
-								>
-									<ControlledInput
-										type="number"
-										id="width"
-										suffix={units}
-										min={xyMin}
-										max={50000}
-										className={inputStyle}
-										wrapperClassName="w-full"
-										value={surfacing.width}
-										immediateOnChange
-										onChange={(e) => onChange("width", Number(e.target.value))}
-									/>
-								</Tooltip>
-								<span className="flex justify-center items-center">&</span>
-								<Tooltip
-									content={`Default is ${convertedDefaultSurfacingState.length} ${units}`}
-								>
-									<ControlledInput
-										type="number"
-										id="length"
-										suffix={units}
-										min={xyMin}
-										max={50000}
-										className={inputStyle}
-										wrapperClassName="w-full"
-										value={surfacing.length}
-										immediateOnChange
-										onChange={(e) => onChange("length", Number(e.target.value))}
-									/>
-								</Tooltip>
-							</div>
-						</InputArea>
-						<InputArea label="Cut Depth & Max">
-							<div className="grid grid-cols-[3fr_10px_3fr] gap-x-2 gap-y-1 col-span-3">
-								<Tooltip
-									content={`Default is ${convertedDefaultSurfacingState.skimDepth} ${units}`}
-								>
-									<ControlledInput
-										type="number"
-										id="skimDepth"
-										suffix={units}
-										min={0.00001}
-										max={10000}
-										invalid={isCutDepthExceedingMax}
-										className={cx("rounded", inputStyle, {
-											"text-red-500": isCutDepthExceedingMax,
-										})}
-										wrapperClassName="w-full"
-										value={surfacing.skimDepth}
-										immediateOnChange
-										onChange={(e) =>
-											onChange("skimDepth", Number(e.target.value))
-										}
-									/>
-								</Tooltip>
-								<span className="flex justify-center items-center">&</span>
-								<Tooltip
-									content={`Default is ${convertedDefaultSurfacingState.maxDepth} ${units}`}
-								>
-									<ControlledInput
-										type="number"
-										id="maxDepth"
-										suffix={units}
-										min={0.00001}
-										max={10000}
-										invalid={isCutDepthExceedingMax}
-										className={cx(inputStyle, {
-											"text-red-500": isCutDepthExceedingMax,
-										})}
-										wrapperClassName="w-full"
-										value={surfacing.maxDepth}
-										immediateOnChange
-										onChange={(e) =>
-											onChange("maxDepth", Number(e.target.value))
-										}
-									/>
-								</Tooltip>
-							</div>
-							{isCutDepthExceedingMax && (
-								<p className="col-span-4 text-[10px] xl:text-xs text-red-500 leading-tight">
-									Warning: Cut depth ({surfacing.skimDepth} {units}) exceeds max
-									depth ({surfacing.maxDepth} {units})
-								</p>
-							)}
-						</InputArea>
-						<InputArea label="Bit Diameter">
+					</div>
+					<InputArea label="X & Y">
+						<div className="grid grid-cols-[3fr_10px_3fr] gap-2 col-span-3">
+							<Tooltip
+								content={`Default is ${convertedDefaultSurfacingState.width} ${units}`}
+							>
+								<ControlledInput
+									type="number"
+									id="width"
+									suffix={units}
+									min={xyMin}
+									max={50000}
+									className={inputStyle}
+									wrapperClassName="w-full"
+									value={surfacing.width}
+									immediateOnChange
+									onChange={(e) => onChange("width", Number(e.target.value))}
+								/>
+							</Tooltip>
+							<span className="flex justify-center items-center">&</span>
+							<Tooltip
+								content={`Default is ${convertedDefaultSurfacingState.length} ${units}`}
+							>
+								<ControlledInput
+									type="number"
+									id="length"
+									suffix={units}
+									min={xyMin}
+									max={50000}
+									className={inputStyle}
+									wrapperClassName="w-full"
+									value={surfacing.length}
+									immediateOnChange
+									onChange={(e) => onChange("length", Number(e.target.value))}
+								/>
+							</Tooltip>
+						</div>
+					</InputArea>
+					<InputArea label="Cut Depth & Max">
+						<div className="grid grid-cols-[3fr_10px_3fr] gap-x-2 gap-y-1 col-span-3">
+							<Tooltip
+								content={`Default is ${convertedDefaultSurfacingState.skimDepth} ${units}`}
+							>
+								<ControlledInput
+									type="number"
+									id="skimDepth"
+									suffix={units}
+									min={0.00001}
+									max={10000}
+									invalid={isCutDepthExceedingMax}
+									className={cx("rounded", inputStyle, {
+										"text-red-500": isCutDepthExceedingMax,
+									})}
+									wrapperClassName="w-full"
+									value={surfacing.skimDepth}
+									immediateOnChange
+									onChange={(e) =>
+										onChange("skimDepth", Number(e.target.value))
+									}
+								/>
+							</Tooltip>
+							<span className="flex justify-center items-center">&</span>
+							<Tooltip
+								content={`Default is ${convertedDefaultSurfacingState.maxDepth} ${units}`}
+							>
+								<ControlledInput
+									type="number"
+									id="maxDepth"
+									suffix={units}
+									min={0.00001}
+									max={10000}
+									invalid={isCutDepthExceedingMax}
+									className={cx(inputStyle, {
+										"text-red-500": isCutDepthExceedingMax,
+									})}
+									wrapperClassName="w-full"
+									value={surfacing.maxDepth}
+									immediateOnChange
+									onChange={(e) => onChange("maxDepth", Number(e.target.value))}
+								/>
+							</Tooltip>
+						</div>
+						{isCutDepthExceedingMax && (
+							<p className="col-span-4 text-[10px] xl:text-xs text-red-500 leading-tight">
+								Warning: Cut depth ({surfacing.skimDepth} {units}) exceeds max
+								depth ({surfacing.maxDepth} {units})
+							</p>
+						)}
+					</InputArea>
+					<InputArea label="Bit Diameter & Tool">
+						<div className="grid grid-cols-[3fr_10px_3fr] gap-2 col-span-3">
 							<Tooltip
 								content={`Default is ${convertedDefaultSurfacingState.bitDiameter} ${units}`}
 							>
@@ -257,185 +257,198 @@ const SurfacingTool = () => {
 									type="number"
 									suffix={units}
 									className={inputStyle}
+									wrapperClassName="w-full"
 									value={surfacing.bitDiameter}
-									wrapperClassName="col-span-3"
 									immediateOnChange
 									onChange={(e) =>
 										onChange("bitDiameter", Number(e.target.value))
 									}
 								/>
 							</Tooltip>
-						</InputArea>
-						<InputArea label="Stepover">
+							<span className="flex justify-center items-center">&</span>
 							<Tooltip
-								content={`Default is ${convertedDefaultSurfacingState.stepover}%`}
+								content={`Default is ${convertedDefaultSurfacingState.toolNumber}`}
 							>
 								<ControlledInput
 									type="number"
-									suffix="%"
-									className={inputStyle}
-									value={surfacing.stepover}
-									wrapperClassName="col-span-3"
+									min={0}
+									className={`${inputStyle} md:text-xl`}
+									wrapperClassName="w-full"
+									value={surfacing.toolNumber}
 									immediateOnChange
-									onChange={(e) => onChange("stepover", Number(e.target.value))}
+									onChange={(e) =>
+										onChange("toolNumber", Number(e.target.value))
+									}
 								/>
 							</Tooltip>
-						</InputArea>
-						<InputArea label="Feed Rate">
+						</div>
+					</InputArea>
+					<InputArea label="Stepover">
+						<Tooltip
+							content={`Default is ${convertedDefaultSurfacingState.stepover}%`}
+						>
+							<ControlledInput
+								type="number"
+								suffix="%"
+								className={inputStyle}
+								value={surfacing.stepover}
+								wrapperClassName="col-span-3"
+								immediateOnChange
+								onChange={(e) => onChange("stepover", Number(e.target.value))}
+							/>
+						</Tooltip>
+					</InputArea>
+					<InputArea label="Feed Rate">
+						<Tooltip
+							content={`Default is ${convertedDefaultSurfacingState.feedrate} ${units}/min`}
+						>
+							<ControlledInput
+								type="number"
+								suffix={`${units}/min`}
+								className={inputStyle}
+								value={surfacing.feedrate}
+								wrapperClassName="col-span-3"
+								immediateOnChange
+								onChange={(e) => onChange("feedrate", Number(e.target.value))}
+							/>
+						</Tooltip>
+					</InputArea>
+					<InputArea label="Spindle RPM">
+						<div className="grid grid-cols-2 gap-2 col-span-3">
 							<Tooltip
-								content={`Default is ${convertedDefaultSurfacingState.feedrate} ${units}/min`}
+								content={`Default is ${convertedDefaultSurfacingState.spindleRPM} RPM`}
 							>
 								<ControlledInput
 									type="number"
-									suffix={`${units}/min`}
 									className={inputStyle}
-									value={surfacing.feedrate}
-									wrapperClassName="col-span-3"
+									wrapperClassName="w-full"
+									value={surfacing.spindleRPM}
+									suffix={"RPM"}
 									immediateOnChange
-									onChange={(e) => onChange("feedrate", Number(e.target.value))}
+									onChange={(e) =>
+										onChange("spindleRPM", Number(e.target.value))
+									}
 								/>
 							</Tooltip>
-						</InputArea>
-						<InputArea label="Spindle RPM">
-							<div className="grid grid-cols-2 gap-2 col-span-3">
-								<Tooltip
-									content={`Default is ${convertedDefaultSurfacingState.spindleRPM} RPM`}
-								>
-									<ControlledInput
-										type="number"
-										className={inputStyle}
-										wrapperClassName="w-full"
-										value={surfacing.spindleRPM}
-										suffix={"RPM"}
-										immediateOnChange
-										onChange={(e) =>
-											onChange("spindleRPM", Number(e.target.value))
-										}
+							<Tooltip
+								content={`Default is ${convertedDefaultSurfacingState.shouldDwell ? "on" : "off"}`}
+							>
+								<div className="flex items-center gap-2 justify-center">
+									<label className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 col-span-2">
+										Delay
+									</label>
+									<Switch
+										checked={surfacing.shouldDwell}
+										onChange={(checked) => {
+											setSurfacing({
+												...surfacing,
+												shouldDwell: checked as boolean,
+											});
+										}}
+										aria-label="Toggle spindle delay"
 									/>
-								</Tooltip>
-								<Tooltip
-									content={`Default is ${convertedDefaultSurfacingState.shouldDwell ? "on" : "off"}`}
-								>
-									<div className="flex items-center gap-2 justify-center">
-										<label className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 col-span-2">
-											Delay
-										</label>
-										<Switch
-											checked={surfacing.shouldDwell}
-											onChange={(checked) => {
-												setSurfacing({
-													...surfacing,
-													shouldDwell: checked as boolean,
-												});
-											}}
-											aria-label="Toggle spindle delay"
-										/>
-									</div>
-								</Tooltip>
-							</div>
-						</InputArea>
-						<InputArea label="Coolant Control">
-							<div className="flex items-center gap-2 justify-center col-span-3">
-								<Tooltip
-									content={`Default is ${convertedDefaultSurfacingState.mist ? "on" : "off"}`}
-								>
-									<div className="flex items-center gap-2 justify-center">
-										<span className="font-light text-sm max-w-20 dark:text-content-primary">
-											Mist (M7)
-										</span>
-										<Switch
-											onChange={(value) =>
-												setSurfacing({
-													...surfacing,
-													mist: value,
-												})
-											}
-											checked={surfacing.mist ?? false}
-											className="h-20"
-											aria-label="Toggle Mist coolant"
-										/>
-									</div>
-								</Tooltip>
-								<Tooltip
-									content={`Default is ${convertedDefaultSurfacingState.flood ? "on" : "off"}`}
-								>
-									<div className="flex items-center gap-2 justify-center">
-										<span className="font-light text-sm max-w-20 dark:text-content-primary">
-											Flood (M8)
-										</span>
-										<Switch
-											onChange={(value) =>
-												setSurfacing({
-													...surfacing,
-													flood: value,
-												})
-											}
-											checked={surfacing.flood ?? false}
-											className="h-20"
-											aria-label="Toggle Flood coolant"
-										/>
-									</div>
-								</Tooltip>
-							</div>
-						</InputArea>
-					</div>
-					<div className="flex flex-col border border-gray-200 rounded-md">
-						<Tabs defaultValue="visualizer-preview">
-							<TabsList className="w-full pb-0 border-b rounded-b-none">
-								<TabsTrigger
-									value="visualizer-preview"
-									className="w-full"
-									onClick={() => setTabSwitch(false)}
-								>
-									Visualizer Preview
-								</TabsTrigger>
-								<TabsTrigger
-									value="gcode-viewer"
-									className="w-full"
-									onClick={() => setTabSwitch(true)}
-									disabled={!gcode}
-								>
-									G-Code{" "}
-									{gcode.length !== 0 ? (
-										<span className="text-xs text-gray-500">
-											({gcode.split("\n").length} lines)
-										</span>
-									) : null}
-								</TabsTrigger>
-							</TabsList>
-						</Tabs>
-						<div className="relative w-full h-full">
-							<div
-								className={cx(
-									"absolute w-full h-full top-0 left-0 rounded-md",
-									{
-										invisible: tabSwitch,
-									},
-								)}
+								</div>
+							</Tooltip>
+						</div>
+					</InputArea>
+					<InputArea label="Coolant Control">
+						<div className="flex items-center gap-2 justify-center col-span-3">
+							<Tooltip
+								content={`Default is ${convertedDefaultSurfacingState.mist ? "on" : "off"}`}
 							>
-								<VisualizerPreview gcode={gcode} />
-							</div>
-							<div
-								className={cx("h-full relative p-2", {
-									invisible: !tabSwitch,
-								})}
+								<div className="flex items-center gap-2 justify-center">
+									<span className="font-light text-sm max-w-20 dark:text-content-primary">
+										Mist (M7)
+									</span>
+									<Switch
+										onChange={(value) =>
+											setSurfacing({
+												...surfacing,
+												mist: value,
+											})
+										}
+										checked={surfacing.mist ?? false}
+										className="h-20"
+										aria-label="Toggle Mist coolant"
+									/>
+								</div>
+							</Tooltip>
+							<Tooltip
+								content={`Default is ${convertedDefaultSurfacingState.flood ? "on" : "off"}`}
 							>
-								<GcodeViewer gcode={gcode} />
-							</div>
+								<div className="flex items-center gap-2 justify-center">
+									<span className="font-light text-sm max-w-20 dark:text-content-primary">
+										Flood (M8)
+									</span>
+									<Switch
+										onChange={(value) =>
+											setSurfacing({
+												...surfacing,
+												flood: value,
+											})
+										}
+										checked={surfacing.flood ?? false}
+										className="h-20"
+										aria-label="Toggle Flood coolant"
+									/>
+								</div>
+							</Tooltip>
+						</div>
+					</InputArea>
+				</div>
+				<div className="flex flex-col border border-gray-200 rounded-md">
+					<Tabs defaultValue="visualizer-preview">
+						<TabsList className="w-full pb-0 border-b rounded-b-none">
+							<TabsTrigger
+								value="visualizer-preview"
+								className="w-full"
+								onClick={() => setTabSwitch(false)}
+							>
+								Visualizer Preview
+							</TabsTrigger>
+							<TabsTrigger
+								value="gcode-viewer"
+								className="w-full"
+								onClick={() => setTabSwitch(true)}
+								disabled={!gcode}
+							>
+								G-Code{" "}
+								{gcode.length !== 0 ? (
+									<span className="text-xs text-gray-500">
+										({gcode.split("\n").length} lines)
+									</span>
+								) : null}
+							</TabsTrigger>
+						</TabsList>
+					</Tabs>
+					<div className="relative w-full h-full">
+						<div
+							className={cx("absolute w-full h-full top-0 left-0 rounded-md", {
+								invisible: tabSwitch,
+							})}
+						>
+							<VisualizerPreview gcode={gcode} />
+						</div>
+						<div
+							className={cx("h-full relative p-2", {
+								invisible: !tabSwitch,
+							})}
+						>
+							<GcodeViewer gcode={gcode} />
 						</div>
 					</div>
 				</div>
-
-				<div className="flex flex-row gap-4">
-					<Button onClick={handleGenerateGcode} disabled={isDisabled}>
-						Generate G-code
-					</Button>
-					<Button disabled={!gcode || isDisabled} onClick={loadGcode}>
-						Load to Main Visualizer
-					</Button>
-				</div>
 			</div>
-		</>
+
+			<div className="flex flex-row gap-4">
+				<Button onClick={handleGenerateGcode} disabled={isDisabled}>
+					Generate G-code
+				</Button>
+				<Button disabled={!gcode || isDisabled} onClick={loadGcode}>
+					Load to Main Visualizer
+				</Button>
+			</div>
+		</div>
 	);
 };
 

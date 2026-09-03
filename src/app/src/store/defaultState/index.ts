@@ -361,6 +361,7 @@ const defaultState: State = {
 					finalHeight: 40,
 					enableRehoming: false,
 					shouldDwell: false,
+					toolNumber: 0,
 				},
 			},
 			tab: {
@@ -401,6 +402,7 @@ const defaultState: State = {
 			shouldDwell: false,
 			flood: false,
 			mist: false,
+			toolNumber: 0,
 		},
 		visualizer: {
 			minimized: false,

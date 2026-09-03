@@ -11,6 +11,7 @@ export interface Rotary {
 			finalHeight: number;
 			enableRehoming: boolean;
 			shouldDwell: boolean;
+			toolNumber: number;
 		};
 	};
 	tab: {

@@ -16,4 +16,5 @@ export interface Surfacing {
 	shouldDwell: boolean;
 	flood: boolean;
 	mist: boolean;
+	toolNumber: number;
 }
