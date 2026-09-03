@@ -209,12 +209,17 @@ const main = () => {
 			// grant is enough — per-plugin scoping happens at the iframe's
 			// `allow="local-fonts"` attribute (see PluginPanel.tsx), which is only
 			// set for plugins that declare "local-fonts" in their manifest.
+			// Clipboard write permission is required for navigator.clipboard.writeText()
+			// call sites throughout the renderer (Console copy history, gcode editor, etc).
+			const ALLOWED_SESSION_PERMISSIONS = ["local-fonts", "clipboard-sanitized-write"];
+
 			session.defaultSession.setPermissionCheckHandler(
-				(_webContents, permission) => permission === "local-fonts",
+				(_webContents, permission) =>
+					ALLOWED_SESSION_PERMISSIONS.includes(permission),
 			);
 			session.defaultSession.setPermissionRequestHandler(
 				(_webContents, permission, callback) => {
-					callback(permission === "local-fonts");
+					callback(ALLOWED_SESSION_PERMISSIONS.includes(permission));
 				},
 			);
 

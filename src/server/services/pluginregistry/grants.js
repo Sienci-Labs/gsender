@@ -33,6 +33,9 @@ const WHOLE_MODULE_SENTINEL = "*require-whole-module*";
 const ALL_REQUEST_TYPES = [
 	"machine:get:context",
 	"machine:command",
+	"machine:parser:register",
+	"machine:parser:unregister",
+	"machine:query",
 	"machine:busy:set",
 	"gcode:load:to:visualizer",
 	"workspace:get:state",
@@ -71,12 +74,22 @@ export const permissionsMap = new Map([
 		[
 			"machine:read",
 			"machine:write",
+			"machine:parse",
+			"machine:query",
 			"visualizer:load",
 			"workspace:read",
 			"redux:read",
 		],
 	],
-	["machine", ["machine:read", "machine:write"]],
+	["machine", ["machine:read", "machine:write", "machine:parse", "machine:query"]],
+	["registerParser", ["machine:parse"]],
+	["unregisterParser", ["machine:parse"]],
+	["onParsed", ["machine:parse"]],
+	["useParsed", ["machine:parse"]],
+	["onLine", ["machine:parse"]],
+	["getLastParsed", ["machine:parse"]],
+	["onParserError", ["machine:parse"]],
+	["query", ["machine:query", "machine:parse"]],
 	["gcode", ["visualizer:load"]],
 	["viewer", ["viewer:camera", "viewer:draw"]],
 	["workspace", ["workspace:read"]],
@@ -94,7 +107,23 @@ export const permissionsMap = new Map([
 export const requestTypesMap = new Map([
 	[WHOLE_MODULE_SENTINEL, ALL_REQUEST_TYPES],
 	["gsender", ALL_REQUEST_TYPES],
-	["machine", ["machine:get:context", "machine:command", "machine:busy:set"]],
+	[
+		"machine",
+		[
+			"machine:get:context",
+			"machine:command",
+			"machine:parser:register",
+			"machine:parser:unregister",
+			"machine:query",
+			"machine:busy:set",
+		],
+	],
+	["registerParser", ["machine:parser:register"]],
+	["unregisterParser", ["machine:parser:unregister"]],
+	// onParsed/onLine register an anonymous parser under the hood, so they need
+	// the register/unregister request types too, not just the topic.
+	["onLine", ["machine:parser:register", "machine:parser:unregister"]],
+	["query", ["machine:query"]],
 	["gcode", ["gcode:load:to:visualizer"]],
 	["viewer", VIEWER_REQUEST_TYPES],
 	["workspace", ["workspace:get:state"]],
@@ -110,6 +139,12 @@ export const topicsMap = new Map([
 	["subscribeSelector", "redux"],
 	["useWorkspaceState", "workspace"],
 	["useTypedSelector", "redux"],
+	["onParsed", "parser"],
+	["useParsed", "parser"],
+	["onLine", "parser"],
+	["getLastParsed", "parser"],
+	["onParserError", "parser"],
+	["registerParser", "parser"],
 	["viewer", "viewer"],
 	["useVisualizerPick", "viewer"],
 ]);
@@ -151,5 +186,27 @@ export const buildGrantFromScan = (scanned) => {
 	return {
 		permissions,
 		capabilities: { requestTypes, topics, allowedFunctions },
+	};
+};
+
+/**
+ * Folds manifest-declared parsers into a scanned grant.
+ *
+ * Manifest parsers run server-side and involve no SDK import at all, so
+ * buildGrantFromScan — which only ever sees the built bundle — cannot detect
+ * them. Without this, a plugin could read the raw firmware stream while the
+ * approval dialog showed no corresponding permission.
+ */
+export const mergeManifestParserGrant = (grant, parsers) => {
+	if (!Array.isArray(parsers) || parsers.length === 0) {
+		return grant;
+	}
+
+	return {
+		permissions: [...new Set([...grant.permissions, "machine:parse"])],
+		capabilities: {
+			...grant.capabilities,
+			topics: [...new Set([...(grant.capabilities?.topics ?? []), "parser"])],
+		},
 	};
 };

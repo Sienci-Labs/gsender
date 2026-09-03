@@ -37,6 +37,18 @@ export const useWorkspaceState = <T = unknown>(): T | undefined =>
 	useTopicSnapshot<T>("workspace");
 
 /**
+ * The latest result from one of your parsers, re-rendering when it fires.
+ *
+ * Returns immediately with the cached last result if one exists, so a view that
+ * mounts long after the match still shows it. Use `machine.onParsed` instead if
+ * you need to observe EVERY match — this hook holds only the most recent one.
+ */
+export const useParsed = <T = unknown>(id: string): T | undefined => {
+	const byId = useTopicSnapshot<Record<string, T>>("parser");
+	return byId?.[id];
+};
+
+/**
  * Select a slice of gSender's redux state, re-rendering when it changes.
  * Mirrors the host `useTypedSelector` hook.
  *

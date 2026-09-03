@@ -45,10 +45,15 @@ const emit = (msg, ...args) => {
 	cncengine.emit(msg, ...args);
 };
 
+const reloadPluginParsers = () => {
+	cncengine.reloadPluginParsers();
+};
+
 export default {
 	start,
 	stop,
 	load,
 	unload,
 	emit,
+	reloadPluginParsers,
 };

@@ -365,6 +365,11 @@ const createServer = (options, callback) => {
 					log.info(
 						`Plugin change detected in ${dir}${filename ? ` (${filename})` : ""}; notifying clients`,
 					);
+					// Dev only, and this fires on every file save — so any open
+					// plugin parser block is flushed with reason "reload" quite
+					// often here. That is expected in dev; it is logged at info so
+					// it isn't mistaken for a parser bug.
+					cncengine.reloadPluginParsers();
 					cncengine.emit("plugins:changed", { dir, filename });
 				});
 			}

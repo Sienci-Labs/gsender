@@ -114,6 +114,56 @@ await storage.delete("apiKey");
 await storage.clear(); // wipe this plugin's storage entirely
 ```
 
+### Firmware response parsers
+
+Define your own parsers for firmware responses and receive the results as
+events. Matching runs **server-side** against every raw line the controller
+reads — including lines that never reach the console — and only your matches
+cross the bridge.
+
+Declare parsers in your manifest and they are live from the moment the port
+opens, whether or not your UI is mounted:
+
+```json
+"parsers": [
+  {
+    "id": "probe",
+    "mode": "line",
+    "match": { "source": "^\\[PRB:(?<x>[-\\d.]+),(?<y>[-\\d.]+),(?<z>[-\\d.]+)(?<rest>(?:,[-\\d.]+)*):(?<ok>[01])\\]$" }
+  }
+]
+```
+
+```ts
+import { machine } from "@sienci/gsender-plugin-sdk";
+
+machine.onParsed("probe", (result) => {
+  console.log(result.groups); // { x, y, z, ok }
+});
+
+// Send a command and get its whole response back
+const info = await machine.query("$I");
+console.log(info.lines);
+```
+
+Two permissions, deliberately separate from `machine:read`:
+
+- **`machine:parse`** — read the raw firmware stream through a regex you
+  supply. `machine:read` only ever returns a curated context object, so this
+  is a categorically wider grant and is prompted for separately.
+- **`machine:query`** — send a command and capture its response. Separate
+  again, because it *writes*.
+
+Note that `gsender.machine.*` carries these methods too, so importing the
+combined `gsender` client requests `machine:parse` and `machine:query` along
+with everything else. Import `machine` on its own if you want a narrower
+prompt.
+
+Block mode (multi-line responses like `$$`), lifetimes, limits, and the full
+spec reference are in the **[plugin parsers
+guide](../../docs/plugin-parsers.md)**. `plugins/parser-demo` is a working
+example of every path.
+
 ### React hooks
 
 ```tsx
@@ -121,10 +171,15 @@ import { gsender } from "@sienci/gsender-plugin-sdk";
 import {
   useWorkspaceState,
   useTypedSelector,
+  useParsed,
 } from "@sienci/gsender-plugin-sdk/react";
 
 const workspace = useWorkspaceState();
 const isConnected = useTypedSelector((s) => s.connection?.isConnected);
+
+// Latest result from one of your parsers. Populated on mount if it has
+// already matched this session — see the parsers guide.
+const probe = useParsed("probe");
 ```
 
 ### G-code viewer
@@ -166,8 +221,15 @@ viewer.focusToModel();
 | API | Description |
 |-----|-------------|
 | `machine.getContext()` | Current machine / controller context |
-| `machine.command(cmd, ...args)` | Run a host machine command |
+| `machine.command(cmd, ...args)` | Run a host machine command. Resolves on **delivery**, not completion — most command handlers have no completion signal. Use `machine.query()` when you need the response. |
+| `machine.query(cmd, opts?)` | Send a command and collect its response lines until a terminator |
+| `machine.registerParser(spec)` | Register a firmware response parser for this view's lifetime |
+| `machine.unregisterParser(id)` | Remove a runtime parser |
+| `machine.onParsed(id, cb)` | Every match for a parser, losslessly; fires immediately with the last result if there is one |
+| `machine.onLine(pattern, cb)` | One-off line tap (sugar over an anonymous runtime parser) |
 | `machine.setBusy(busy, label?)` | Flag the machine as busy for a feeder-driven op (stable status, host auto-releases) |
+| `getLastParsed(id)` | Synchronous last result for a parser, or `undefined` |
+| `onParserError(cb)` | Parsers that were rejected, rate limited, or quarantined |
 | `workspace.getState()` | One-shot workspace snapshot |
 | `redux.getState()` | One-shot full Redux state |
 | `gcode.loadToVisualizer(gcode, name?)` | Load G-code into the main visualizer/job |
@@ -181,6 +243,7 @@ viewer.focusToModel();
 | `subscribeSelector(selector, cb, equalityFn?)` | Live Redux slice |
 | `useWorkspaceState()` | React hook for workspace |
 | `useTypedSelector(selector, equalityFn?)` | React hook for Redux slice |
+| `useParsed(id)` | React hook for a parser's latest result |
 
 Plugins run in an iframe; the SDK posts messages on the `gsender:plugin-bridge` channel to the parent window. gSender mirrors dark mode onto the iframe as `html.dark` — style plugins with class-based dark mode, not `prefers-color-scheme`.
 

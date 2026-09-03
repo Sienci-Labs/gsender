@@ -33,7 +33,11 @@ import semver from "semver";
 import settings from "../../config/settings";
 import logger from "../../lib/logger";
 import { normalizeCapabilities } from "./capabilities";
-import { buildGrantFromScan, SDK_SCAN_SPECIFIERS } from "./grants";
+import {
+	buildGrantFromScan,
+	mergeManifestParserGrant,
+	SDK_SCAN_SPECIFIERS,
+} from "./grants";
 import registry from "./index";
 import { scanPluginForSdkUsage } from "./pluginSecurity";
 
@@ -507,8 +511,8 @@ export const prepare = async (sourcePath) => {
 		}
 	}
 
-	const permissions = union(verifiedPermissions, declared.permissions);
-	const capabilities = {
+	let permissions = union(verifiedPermissions, declared.permissions);
+	let capabilities = {
 		requestTypes: union(
 			scannedCapabilities.requestTypes,
 			declared.capabilities.requestTypes,
@@ -519,6 +523,22 @@ export const prepare = async (sourcePath) => {
 			declared.capabilities.allowedFunctions,
 		),
 	};
+
+	// Manifest parsers involve no SDK import, so the bundle scan above cannot
+	// see them — fold them in explicitly, or a plugin with parsers would be
+	// installed without the machine:parse permission it needs at runtime.
+	const { parsers, parserErrors } = registry.normalizeParsers(
+		manifest,
+		manifest.id,
+	);
+	if (parsers.length > 0) {
+		const merged = mergeManifestParserGrant(
+			{ permissions, capabilities },
+			parsers,
+		);
+		permissions = merged.permissions;
+		capabilities = merged.capabilities;
+	}
 
 	// Asked for by the manifest but not corroborated by the code we could read.
 	const declaredOnlyPermissions = declared.permissions.filter(
@@ -599,6 +619,8 @@ export const prepare = async (sourcePath) => {
 			verifiedPermissions,
 			declaredOnlyPermissions,
 			capabilities,
+			parsers,
+			parserErrors,
 			scanned,
 			unverifiable,
 			engine,

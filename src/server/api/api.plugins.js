@@ -31,15 +31,27 @@ import pluginInstaller from "../services/pluginregistry/install";
 
 const log = logger("api:plugins");
 
-// Tell open clients the plugin list changed so they refetch. cncengine is
-// required lazily because importing it at module scope drags the whole
-// controller stack (serialport, shortid) into everything that imports this
-// file, tests included.
+// cncengine is required lazily throughout this file because importing it at
+// module scope drags the whole controller stack (serialport, shortid) into
+// everything that imports this file, tests included.
+
+// Tell open clients the plugin list changed so they refetch.
 const notifyPluginsChanged = (payload) => {
 	try {
 		require("../services/cncengine").default.emit("plugins:changed", payload);
 	} catch (err) {
 		log.error(`Failed to notify clients of plugin changes: ${err.message}`);
+	}
+};
+
+// Manifest parsers are owned by the registry, so a live controller needs to
+// be told to rebuild its chain — otherwise a disabled plugin keeps watching
+// (and an enabled/newly installed one stays silent) until the next reconnect.
+const reloadPluginParsers = () => {
+	try {
+		require("../services/cncengine").default.reloadPluginParsers();
+	} catch (err) {
+		log.error(`Failed to reload plugin parsers: ${err.message}`);
 	}
 };
 
@@ -87,6 +99,7 @@ export const update = (req, res) => {
 	}
 
 	pluginRegistry.setPluginEnabled(id, enabled);
+	reloadPluginParsers();
 
 	res.send({
 		id,
@@ -228,6 +241,7 @@ export const installCommit = (req, res) => {
 			return res.status(ERR_INTERNAL_SERVER_ERROR).send(result);
 		}
 		notifyPluginsChanged({ pluginId: result.pluginId });
+		reloadPluginParsers();
 		res.send(result);
 	} catch (err) {
 		log.error(`Failed to install plugin: ${err.message}`);
@@ -252,6 +266,7 @@ export const uninstall = (req, res) => {
 			return res.status(ERR_NOT_FOUND).send(result);
 		}
 		notifyPluginsChanged({ pluginId: id });
+		reloadPluginParsers();
 		res.send(result);
 	} catch (err) {
 		log.error(`Failed to uninstall plugin ${id}: ${err.message}`);
