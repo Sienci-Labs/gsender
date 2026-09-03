@@ -410,7 +410,7 @@ const defaultState: State = {
 			disabled: false,
 			disabledLite: false,
 			minimizeRenders: false,
-			projection: "orthographic", // 'perspective' or 'orthographic'
+			projection: "Perspective", // 'Perspective' or 'Orthographic'
 			cameraMode: "pan", // 'pan' or 'rotate',
 			theme: "Dark",
 			SVGEnabled: false,

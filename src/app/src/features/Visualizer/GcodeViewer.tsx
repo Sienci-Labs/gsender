@@ -422,6 +422,13 @@ class GcodeViewer extends Component<Props> {
 			},
 			machineBed: this.buildMachineBedOptions(),
 			grid: this.buildGridOptions(),
+			camera: {
+				projection:
+					store.get("widgets.visualizer.projection", "Perspective") ===
+					"Orthographic"
+						? "orthographic"
+						: "perspective",
+			},
 			render: {
 				antialias: true,
 				theme: this.buildTheme(this.currentThemeName()),

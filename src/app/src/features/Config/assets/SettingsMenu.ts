@@ -444,6 +444,18 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						},
 					},
 					{
+						label: "Camera projection",
+						key: "widgets.visualizer.projection",
+						description:
+							"Perspective (default) shows depth like a normal camera view. Orthographic removes that depth distortion, keeping parallel lines parallel — useful for lining up toolpaths precisely.",
+						type: "select",
+						options: ["Perspective", "Orthographic"],
+						onChange: (value: string) => {
+							store.set("widgets.visualizer.projection", value);
+							pubsub.publish("visualizer:settings");
+						},
+					},
+					{
 						label: "Show bounding box",
 						key: "widgets.visualizer.objects.limits.visible",
 						description:
