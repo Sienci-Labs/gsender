@@ -39,7 +39,8 @@
 		"machine:read",
 		"machine:write",
 		"machine:parse",
-		"machine:query"
+		"machine:query",
+		"machine:command"
 	],
 	"capabilities": {
 		"requestTypes": [
