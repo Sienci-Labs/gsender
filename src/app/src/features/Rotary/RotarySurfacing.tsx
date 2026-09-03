@@ -1,3 +1,5 @@
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
+/** biome-ignore-all lint/a11y/noLabelWithoutControl: <> */
 import { Button } from "app/components/Button";
 import { ControlledInput } from "app/components/ControlledInput";
 import { Switch } from "app/components/shadcn/Switch";
@@ -89,6 +91,7 @@ const RotarySurfacing = () => {
 			spindleRPM: +surfacingState.spindleRPM,
 			enableRehoming: surfacingState.enableRehoming,
 			shouldDwell: surfacingState.shouldDwell,
+			toolNumber: +surfacingState.toolNumber,
 		});
 
 		const gcode = generator.generate();
@@ -133,6 +136,7 @@ const RotarySurfacing = () => {
 
 	useShuttleEvents(shuttleControlEvents);
 	useEffect(() => {
+		// biome-ignore lint/correctness/useHookAtTopLevel: <>
 		useKeybinding(shuttleControlEvents);
 	}, []);
 
@@ -231,21 +235,34 @@ const RotarySurfacing = () => {
 								/>
 							</Tooltip>
 						</InputArea>
-						<InputArea label="Bit Diameter">
-							<Tooltip
-								content={`Default is ${defaultValue.bitDiameter} ${units}`}
-							>
-								<ControlledInput
-									id="bitDiameter"
-									value={surfacingState.bitDiameter}
-									onChange={handleChange}
-									wrapperClassName="col-span-3"
-									className={inputStyle}
-									suffix={units}
-									type="number"
-									immediateOnChange
-								/>
-							</Tooltip>
+						<InputArea label="Bit Diameter & Tool">
+							<div className="grid grid-cols-[3fr_10px_3fr] gap-2 col-span-3">
+								<Tooltip
+									content={`Default is ${defaultValue.bitDiameter} ${units}`}
+								>
+									<ControlledInput
+										id="bitDiameter"
+										value={surfacingState.bitDiameter}
+										onChange={handleChange}
+										className={inputStyle}
+										suffix={units}
+										type="number"
+										immediateOnChange
+									/>
+								</Tooltip>
+								<span className="flex justify-center items-center">&</span>
+								<Tooltip content={`Default is ${defaultValue.toolNumber}`}>
+									<ControlledInput
+										id="toolNumber"
+										value={surfacingState.toolNumber}
+										onChange={handleChange}
+										className={`${inputStyle} md:text-xl`}
+										min={0}
+										type="number"
+										immediateOnChange
+									/>
+								</Tooltip>
+							</div>
 						</InputArea>
 						<InputArea label="Stepover">
 							<Tooltip content={`Default is ${defaultValue.stepover}%`}>
