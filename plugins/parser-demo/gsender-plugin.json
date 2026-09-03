@@ -1,0 +1,56 @@
+{
+	"id": "com.sienci.parser-demo",
+	"name": "Parser Demo",
+	"description": "Demonstrates plugin-defined firmware response parsers: manifest-declared line and block parsers, runtime registration, and machine.query.",
+	"version": "0.1.0",
+	"engine": ">=1.6.0",
+	"ui": {
+		"entry": "ui/index.html",
+		"contributions": [
+			{
+				"slot": "tools-page",
+				"route": "parser-demo",
+				"label": "Parser Demo"
+			}
+		]
+	},
+	"parsers": [
+		{
+			"id": "probe",
+			"label": "Probe result",
+			"mode": "line",
+			"match": {
+				"source": "^\\[PRB:(?<x>[-\\d.]+),(?<y>[-\\d.]+),(?<z>[-\\d.]+)(?<rest>(?:,[-\\d.]+)*):(?<success>[01])\\]$"
+			}
+		},
+		{
+			"id": "settings",
+			"label": "Firmware settings dump",
+			"mode": "block",
+			"begin": { "source": "^\\$\\d+=" },
+			"match": { "source": "^\\$(?<key>\\d+)=(?<value>.*)$" },
+			"end": { "source": "^ok$" },
+			"whenWorkflow": "idle",
+			"maxLines": 300,
+			"timeout": 8000
+		}
+	],
+	"permissions": [
+		"machine:read",
+		"machine:write",
+		"machine:parse",
+		"machine:query",
+		"machine:command"
+	],
+	"capabilities": {
+		"requestTypes": [
+			"machine:get:context",
+			"machine:command",
+			"machine:parser:register",
+			"machine:parser:unregister",
+			"machine:query"
+		],
+		"topics": ["parser"],
+		"allowedFunctions": ["machine", "onParserError"]
+	}
+}

@@ -1,4 +1,5 @@
 /** biome-ignore-all lint/suspicious/noExplicitAny: <> */
+import api from "app/api";
 import { Confirm } from "app/components/ConfirmationDialog/ConfirmationDialogLib.ts";
 import {
 	GRBL,
@@ -48,6 +49,7 @@ import {
 import controller from "app/lib/controller.ts";
 import { updateWorkspaceMode } from "app/lib/rotary";
 import { round, roundMetric } from "app/lib/rounding";
+import { toast } from "app/lib/toaster";
 import {
 	TOASTER_DISABLED,
 	TOASTER_LONG,
@@ -309,7 +311,41 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						key: "workspace.backupLoc",
 						type: "path",
 						description:
-							"Choose the location to backup your settings to. Leave it blank to use the default appData location.",
+							"Choose the location to backup your settings to. Default: your OS's appData location.",
+						hidden: () => {
+							return !isElectron();
+						},
+					},
+					{
+						label: "Imported plugins location",
+						key: "workspace.userPluginsDir",
+						type: "path",
+						description:
+							"Choose the location to import your plugins to. Default: your OS's userData location.",
+						onApply: () => {
+							const value = store.get("workspace.userPluginsDir", "");
+							api.plugins
+								.updateSettings(value)
+								.then((res) => {
+									store.set(
+										"workspace.userPluginsDir",
+										res.data.userPluginsDir,
+									);
+									const { previousUserPluginsDir } = res.data;
+									const abandonedPreviousDir =
+										previousUserPluginsDir &&
+										previousUserPluginsDir !== res.data.userPluginsDir;
+									const message = abandonedPreviousDir
+										? `Restart gSender to load plugins from the new location. Plugins in "${previousUserPluginsDir}" will no longer be scanned until you set this back.`
+										: "Restart gSender to load plugins from the new location.";
+									toast.info(message, { duration: TOASTER_LONG });
+								})
+								.catch(() => {
+									toast.error(
+										"Failed to update the plugins location. Please try again.",
+									);
+								});
+						},
 						hidden: () => {
 							return !isElectron();
 						},

@@ -503,6 +503,12 @@ const plugins = {
 			"/api/plugins/import-plugin",
 			{ pluginsDir, directory }
 		);
+	},
+	updateSettings: (pluginsDir: string): Promise<AxiosResponse> => {
+		return authrequest.post(
+			"/api/plugins/settings",
+			{ pluginsDir }
+		);
 	}
 };
 

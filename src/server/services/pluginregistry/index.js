@@ -21,6 +21,7 @@ import path from "node:path";
 
 import settings from "../../config/settings";
 import logger from "../../lib/logger";
+import { validateParserSpecs } from "../../lib/plugin-parsers";
 import config from "../configstore";
 import { normalizeCapabilities } from "./capabilities";
 import { scanPluginForSdkUsage } from "./pluginSecurity";
@@ -29,10 +30,48 @@ const log = logger("service:pluginregistry");
 
 const MANIFEST_FILENAME = "gsender-plugin.json";
 
+// Across every enabled plugin. Each plugin is separately capped at
+// MAX_PARSERS_PER_PLUGIN by validateParserSpecs.
+const MAX_TOTAL_PARSERS = 64;
+
 const normalizePermissions = (permissions) =>
 	Array.isArray(permissions)
 		? permissions.filter((item) => typeof item === "string")
 		: [];
+
+/**
+ * Validates a manifest's "parsers" block.
+ *
+ * Deliberately non-fatal: a bad regex reports an error but leaves the plugin
+ * valid and mounted. One malformed parser should not take a working UI offline.
+ *
+ * The specs are kept in their raw (serializable) form here — the controller
+ * compiles them into a PluginParserChain when a port opens. Compiling now would
+ * mean holding RegExp objects in the registry that nothing can use yet.
+ */
+const normalizeParsers = (manifest, pluginId) => {
+	const raw = manifest?.parsers;
+	if (raw === undefined || raw === null) {
+		return { parsers: [], parserErrors: [] };
+	}
+
+	const { errors } = validateParserSpecs(raw, {
+		pluginId,
+		ownerId: `manifest:${pluginId}`,
+		origin: "manifest",
+	});
+
+	// Keep only the specs that compiled cleanly, matched back by id.
+	const failed = new Set(errors.map(({ id }) => id));
+	const parsers = (Array.isArray(raw) ? raw : []).filter(
+		(spec, index) => !failed.has(spec?.id ? String(spec.id) : `#${index}`),
+	);
+
+	return {
+		parsers,
+		parserErrors: errors.map(({ id, error }) => `parser "${id}": ${error}`),
+	};
+};
 
 const getPluginsDirectory = () => settings.pluginsDir;
 
@@ -44,11 +83,23 @@ const ensurePluginsDirectory = () => {
 	return dir;
 };
 
+const getUserPluginsDir = () => config.get("userPluginsDir", "");
+
+const setUserPluginsDir = (dir) => {
+	const value = typeof dir === "string" ? dir.trim() : "";
+	config.set("userPluginsDir", value);
+	if (value) {
+		fs.mkdirSync(value, { recursive: true });
+	}
+	return value;
+};
+
 const getPluginDirectories = () => {
 	const extra = Array.isArray(settings.extraPluginsDirs)
 		? settings.extraPluginsDirs
 		: [];
-	const ordered = [...extra, getPluginsDirectory()];
+	// The user-chosen directory is additive alongside the default pluginsDir
+	const ordered = [...extra, getUserPluginsDir(), getPluginsDirectory()];
 
 	const seen = new Set();
 	const dirs = [];
@@ -109,6 +160,17 @@ const validateManifest = (manifest, pluginPath) => {
 
 	if (manifest.ui?.contributions && !Array.isArray(manifest.ui.contributions)) {
 		errors.push('"ui.contributions" must be an array');
+	}
+
+	// Only the wrong SHAPE invalidates the plugin. Problems with individual
+	// parser specs are collected into parserErrors instead, so one bad regex
+	// cannot un-mount an otherwise working plugin.
+	if (
+		manifest.parsers !== undefined &&
+		manifest.parsers !== null &&
+		!Array.isArray(manifest.parsers)
+	) {
+		errors.push('"parsers" must be an array');
 	}
 
 	return errors;
@@ -177,6 +239,7 @@ const discoverPluginsInDir = (pluginsDir) => {
 		const mountRoute = `/plugins/${mountSlug}`;
 		const enabled = isPluginEnabled(manifest.id);
 		const uiServePath = path.join(pluginPath, "ui");
+		const { parsers, parserErrors } = normalizeParsers(manifest, manifest.id);
 
 		plugins.push({
 			id: manifest.id,
@@ -186,6 +249,8 @@ const discoverPluginsInDir = (pluginsDir) => {
 			engine: manifest.engine || null,
 			capabilities: normalizeCapabilities(manifest.capabilities),
 			permissions: normalizePermissions(manifest.permissions),
+			parsers,
+			parserErrors,
 			enabled,
 			valid: errors.length === 0,
 			errors,
@@ -236,6 +301,27 @@ const discoverPlugins = () => {
 
 const getEnabledPlugins = () =>
 	discoverPlugins().filter((p) => p.valid && p.enabled);
+
+/**
+ * Every manifest-declared parser spec across every enabled, valid plugin, each
+ * tagged with the plugin that owns it. This is what a controller reads when a
+ * port opens, so disabling a plugin removes its parsers on the next rebuild
+ * with no extra bookkeeping.
+ */
+const getPluginParserSpecs = () => {
+	const specs = getEnabledPlugins().flatMap((plugin) =>
+		(plugin.parsers || []).map((spec) => ({ ...spec, pluginId: plugin.id })),
+	);
+
+	if (specs.length > MAX_TOTAL_PARSERS) {
+		log.warn(
+			`${specs.length} plugin parsers declared; keeping the first ${MAX_TOTAL_PARSERS}`,
+		);
+		return specs.slice(0, MAX_TOTAL_PARSERS);
+	}
+
+	return specs;
+};
 
 const getMountPointsFromPlugins = () => {
 	return getEnabledPlugins()
@@ -335,6 +421,7 @@ const readImportedManifest = (pluginPath) => {
 	}
 
 	const errors = validateManifest(manifest, pluginPath);
+	const { parsers, parserErrors } = normalizeParsers(manifest, manifest.id);
 	const plugin = {
 		id: manifest.id,
 		name: manifest.name,
@@ -342,6 +429,11 @@ const readImportedManifest = (pluginPath) => {
 		engine: manifest.engine || null,
 		capabilities: normalizeCapabilities(manifest.capabilities),
 		permissions: normalizePermissions(manifest.permissions),
+		// Surfaced in the permissions dialog: manifest parsers involve no SDK
+		// import, so the bundle scan cannot see them and the user would otherwise
+		// approve raw-stream access without being shown what is being watched.
+		parsers,
+		parserErrors,
 		valid: errors.length === 0,
 		errors,
 		entry: manifest.ui.entry,
@@ -397,9 +489,12 @@ export default {
 	MANIFEST_FILENAME,
 	getPluginsDirectory,
 	getPluginDirectories,
+	getUserPluginsDir,
+	setUserPluginsDir,
 	ensurePluginsDirectory,
 	discoverPlugins,
 	getEnabledPlugins,
+	getPluginParserSpecs,
 	getMountPointsFromPlugins,
 	setPluginEnabled,
 	isPluginEnabled,

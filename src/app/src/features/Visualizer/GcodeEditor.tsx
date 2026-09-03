@@ -693,7 +693,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 	}
 
 	return (
-		<div className="z-[10000] w-full h-full flex flex-col bg-white dark:bg-surface-raised shadow-lg rounded-md overflow-hidden dark:border dark:border-outline">
+		<div className="z-[8999] w-full h-full flex flex-col bg-white dark:bg-surface-raised shadow-lg rounded-md overflow-hidden dark:border dark:border-outline">
 			<div className="flex justify-between items-center p-3 border-b border-gray-300 dark:border-outline gap-3">
 				<div className="flex items-center gap-3 min-w-0 flex-1">
 					<h3 className="text-lg font-semibold dark:text-content-primary whitespace-nowrap">
@@ -750,7 +750,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 				}}
 			>
 				<div
-					className={`fixed bottom-20 right-8 z-[10000] transition-opacity ${scrollTop > 500 ? "pointer-events-auto" : "pointer-events-none"}`}
+					className={`fixed bottom-20 right-8 z-[8999] transition-opacity ${scrollTop > 500 ? "pointer-events-auto" : "pointer-events-none"}`}
 					style={{
 						opacity: scrollTop > 500 ? 1 : 0,
 						transform: scrollTop > 500 ? "translateY(0)" : "translateY(1rem)",
@@ -780,7 +780,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 				</div>
 
 				{isSearchOpen && (
-					<div className="fixed top-20 right-6 z-[10000] flex items-center gap-2 bg-gray-100 dark:bg-surface-raised border border-gray-300 dark:border-outline p-3 rounded">
+					<div className="fixed top-20 right-6 z-[8999] flex items-center gap-2 bg-gray-100 dark:bg-surface-raised border border-gray-300 dark:border-outline p-3 rounded">
 						<Input
 							name="search-gcode-lines"
 							sizing="sm"
@@ -838,7 +838,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 					</div>
 				)}
 				{isJumpOpen && (
-					<div className="fixed top-20 right-6 z-[10000] flex items-center gap-2 bg-gray-100 dark:bg-surface-raised border border-gray-300 dark:border-outline p-3 rounded">
+					<div className="fixed top-20 right-6 z-[8999] flex items-center gap-2 bg-gray-100 dark:bg-surface-raised border border-gray-300 dark:border-outline p-3 rounded">
 						<span className="text-xs text-gray-500 dark:text-content-muted whitespace-nowrap">
 							Jump to line:
 						</span>

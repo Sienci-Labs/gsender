@@ -247,12 +247,35 @@ export const SettingRow = React.memo(function SettingRow({
 				});
 			}
 		}
+		// resetting to default is the same as clicking "Apply Settings", so
+		// run the same onApply side effect updateAllSettings would run
+		setting.onApply?.();
 		pubsub.publish("programSettingReset", setting.key);
 	}
 
 	const populatedValue = settingsValues[setting.globalIndex] || {
 		type: "text",
 	};
+
+	// switching this setting away from a folder stops gSender from scanning it, so warn the user
+	function getResetConfirmContent(setting: gSenderSetting) {
+		if (setting.key === "workspace.userPluginsDir" && setting.value) {
+			return (
+				<div className="flex flex-col gap-2 text-left">
+					<p>Resetting this will stop gSender from scanning:</p>
+					<p className="w-full break-all rounded-md ring-1 ring-gray-300 dark:ring-outline bg-gray-50 dark:bg-surface-sunken font-mono text-xs p-2">
+						{setting.value}
+					</p>
+					<p>
+						Plugins imported there will disappear from the Plugin Manager until
+						you set this back. Are you sure you want to reset this value to
+						default?
+					</p>
+				</div>
+			);
+		}
+		return "Are you sure you want to reset this value to default?";
+	}
 
 	// if EEPROM or Hybrid and not connected, show nothing
 	if ((setting.type === "eeprom" || setting.type === "hybrid") && !connected) {
@@ -306,8 +329,7 @@ export const SettingRow = React.memo(function SettingRow({
 								onClick={() => {
 									Confirm({
 										title: "Reset setting",
-										content:
-											"Are you sure you want to reset this value to default?",
+										content: getResetConfirmContent(populatedValue),
 										confirmLabel: "Yes",
 										onConfirm: () => {
 											handleProgramSettingReset(populatedValue);
@@ -347,8 +369,7 @@ export const SettingRow = React.memo(function SettingRow({
 							onClick={() => {
 								Confirm({
 									title: "Reset setting",
-									content:
-										"Are you sure you want to reset this value to default?",
+									content: getResetConfirmContent(populatedValue),
 									confirmLabel: "Yes",
 									onConfirm: () => {
 										handleProgramSettingReset(populatedValue);

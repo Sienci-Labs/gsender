@@ -1,8 +1,13 @@
 export const PLUGIN_BRIDGE_CHANNEL = "gsender:plugin-bridge";
 
+// NOTE: this union is duplicated in the host at
+// src/app/src/features/Plugins/types.ts and the two must stay in sync.
 export type PluginBridgeRequestType =
 	| "machine:get:context"
 	| "machine:command"
+	| "machine:parser:register"
+	| "machine:parser:unregister"
+	| "machine:query"
 	| "machine:busy:set"
 	| "gcode:load:to:visualizer"
 	| "workspace:get:state"
@@ -21,7 +26,7 @@ export type PluginBridgeRequestType =
 	| "viewer:pick:disarm"
 	| "viewer:overlay:set";
 
-export type PluginBridgeTopic = "workspace" | "redux" | "viewer";
+export type PluginBridgeTopic = "workspace" | "redux" | "parser" | "viewer";
 
 // --- Viewer bridge types ------------------------------------------------------
 // Shared shapes for the `viewer:*` surface. The host defines identical types on
@@ -81,10 +86,20 @@ const isBrowser = typeof window !== "undefined";
 type PendingResolver = {
 	resolve: (value: unknown) => void;
 	reject: (reason: unknown) => void;
+	timer: ReturnType<typeof setTimeout> | null;
 };
+
+// Without this, a request the host never answers (no port open, host listener
+// torn down, iframe outliving its handler) leaves an entry in `pending` and a
+// promise that never settles — both leak for the life of the plugin.
+const DEFAULT_REQUEST_TIMEOUT_MS = 30_000;
 
 const pending = new Map<string, PendingResolver>();
 const topicListeners = new Map<PluginBridgeTopic, Set<() => void>>();
+const eventListeners = new Map<
+	PluginBridgeTopic,
+	Set<(payload: unknown) => void>
+>();
 const topicSubscriptionId = new Map<PluginBridgeTopic, string>();
 const latestSnapshot = new Map<PluginBridgeTopic, unknown>();
 
@@ -116,6 +131,9 @@ const ensureListener = () => {
 				return;
 			}
 			pending.delete(response.id);
+			if (resolver.timer) {
+				clearTimeout(resolver.timer);
+			}
 			if (response.ok) {
 				resolver.resolve(response.result);
 			} else {
@@ -134,6 +152,19 @@ const ensureListener = () => {
 			latestSnapshot.set(topic, snapshot);
 			// biome-ignore lint/suspicious/useIterableCallbackReturn: <>
 			topicListeners.get(topic)?.forEach((notify) => notify());
+			return;
+		}
+
+		// Discrete events, as opposed to snapshots. A snapshot is last-value-only
+		// and useSyncExternalStore de-dupes by reference, so two parser matches in
+		// one tick would collapse into one — fine for state, wrong for events.
+		if (data.event) {
+			const { topic, event } = data.event as {
+				topic: PluginBridgeTopic;
+				event: unknown;
+			};
+			// biome-ignore lint/suspicious/useIterableCallbackReturn: <>
+			eventListeners.get(topic)?.forEach((notify) => notify(event));
 		}
 	});
 };
@@ -141,6 +172,7 @@ const ensureListener = () => {
 export const request = <T = unknown>(
 	type: PluginBridgeRequestType,
 	payload?: Record<string, unknown>,
+	opts?: { timeoutMs?: number },
 ): Promise<T> => {
 	ensureListener();
 
@@ -151,15 +183,56 @@ export const request = <T = unknown>(
 		}
 
 		const id = createRequestId();
+		const timeoutMs = opts?.timeoutMs ?? DEFAULT_REQUEST_TIMEOUT_MS;
+		const timer =
+			timeoutMs > 0
+				? setTimeout(() => {
+						pending.delete(id);
+						reject(new Error(`Bridge request '${type}' timed out`));
+					}, timeoutMs)
+				: null;
+
 		pending.set(id, {
 			resolve: resolve as (value: unknown) => void,
 			reject,
+			timer,
 		});
 		post({
 			channel: PLUGIN_BRIDGE_CHANNEL,
 			request: { id, type, payload } as PluginBridgeRequest,
 		});
 	});
+};
+
+// Snapshot listeners and event listeners share ONE host subscription per topic.
+// They have to participate in the same refcount: if only the snapshot listeners
+// were counted, the last of them unsubscribing would tear the subscription out
+// from under any event listeners still attached.
+const refCount = (topic: PluginBridgeTopic) =>
+	(topicListeners.get(topic)?.size ?? 0) +
+	(eventListeners.get(topic)?.size ?? 0);
+
+const openSubscription = (topic: PluginBridgeTopic) => {
+	if (topicSubscriptionId.has(topic)) {
+		return;
+	}
+	const id = createRequestId();
+	topicSubscriptionId.set(topic, id);
+	post({ channel: PLUGIN_BRIDGE_CHANNEL, subscribe: { id, topic } });
+};
+
+const closeSubscriptionIfIdle = (topic: PluginBridgeTopic) => {
+	if (refCount(topic) > 0) {
+		return;
+	}
+	topicListeners.delete(topic);
+	eventListeners.delete(topic);
+	latestSnapshot.delete(topic);
+	const id = topicSubscriptionId.get(topic);
+	topicSubscriptionId.delete(topic);
+	if (id) {
+		post({ channel: PLUGIN_BRIDGE_CHANNEL, unsubscribe: { id } });
+	}
 };
 
 // Fan out a single host subscription per topic to any number of hook instances.
@@ -176,30 +249,36 @@ export const subscribeTopic = (
 	}
 	listeners.add(notify);
 
-	// First subscriber for this topic opens the host-side subscription.
-	if (!topicSubscriptionId.has(topic)) {
-		const id = createRequestId();
-		topicSubscriptionId.set(topic, id);
-		post({ channel: PLUGIN_BRIDGE_CHANNEL, subscribe: { id, topic } });
-	}
+	openSubscription(topic);
 
 	return () => {
-		const set = topicListeners.get(topic);
-		if (!set) {
-			return;
-		}
-		set.delete(notify);
+		topicListeners.get(topic)?.delete(notify);
+		closeSubscriptionIfIdle(topic);
+	};
+};
 
-		// Last subscriber left — tear down the host-side subscription.
-		if (set.size === 0) {
-			topicListeners.delete(topic);
-			latestSnapshot.delete(topic);
-			const id = topicSubscriptionId.get(topic);
-			topicSubscriptionId.delete(topic);
-			if (id) {
-				post({ channel: PLUGIN_BRIDGE_CHANNEL, unsubscribe: { id } });
-			}
-		}
+/**
+ * Subscribe to the lossless event stream for a topic. Unlike subscribeTopic,
+ * every event is delivered — none are collapsed by de-duplication.
+ */
+export const subscribeEvents = (
+	topic: PluginBridgeTopic,
+	notify: (payload: unknown) => void,
+): (() => void) => {
+	ensureListener();
+
+	let listeners = eventListeners.get(topic);
+	if (!listeners) {
+		listeners = new Set();
+		eventListeners.set(topic, listeners);
+	}
+	listeners.add(notify);
+
+	openSubscription(topic);
+
+	return () => {
+		eventListeners.get(topic)?.delete(notify);
+		closeSubscriptionIfIdle(topic);
 	};
 };
 

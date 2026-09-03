@@ -495,6 +495,10 @@ const appMain = () => {
 			urljoin(settings.route, "api/plugins/import-plugin"),
 			api.plugins.importPlugin,
 		);
+		app.post(
+			urljoin(settings.route, "api/plugins/settings"),
+			api.plugins.updateSettings,
+		);
 	}
 
 	const { viteServer } = require("./vite-server");

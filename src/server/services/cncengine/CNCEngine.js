@@ -634,18 +634,118 @@ class CNCEngine {
 			socket.on("command", (port, cmd, ...args) => {
 				log.debug(`socket.command("${port}", "${cmd}"): id=${socket.id}`);
 
+				// socket.io appends the client's ack as the last argument. It is
+				// deliberately left IN `args`: handlers that support a completion
+				// callback ('gcode:load', 'macro:load', 'macro:run',
+				// 'watchdir:load') destructure it positionally and invoke it with
+				// their real result, which is what settles the client's promise.
+				// We only reach for it on the paths below, where the controller is
+				// never invoked and so nothing else could ever settle it.
+				const ack =
+					typeof args[args.length - 1] === "function"
+						? args[args.length - 1]
+						: null;
+
 				if (!this.connection || this.connection.isClose()) {
-					log.error(`Serial port "${port}" not accessible`);
+					const error = `Serial port "${port}" not accessible`;
+					log.error(error);
+					ack?.(new Error(error));
 					return;
 				}
 
 				const controller = store.get(`controllers["${port}"]`);
 				if (!controller) {
-					log.error(`controller on "${port}" not accessible`);
+					const error = `controller on "${port}" not accessible`;
+					log.error(error);
+					ack?.(new Error(error));
 					return;
 				}
 
-				controller.command.apply(controller, [cmd].concat(args));
+				try {
+					controller.command.apply(controller, [cmd].concat(args));
+				} catch (err) {
+					log.error(`socket.command("${port}", "${cmd}") failed: ${err.message}`);
+					ack?.(err);
+				}
+			});
+
+			// --- Plugin bridge ----------------------------------------------
+			// Unlike "command" above, these always invoke their ack on every
+			// path — the client side is promise-based and has nothing else to
+			// settle on. They also never let a callback travel inside the
+			// controller's args; see "plugin:command" below for why.
+
+			const withController = (port, ack, fn) => {
+				const controller = store.get(`controllers["${port}"]`);
+				if (!controller) {
+					ack?.({ ok: false, error: `controller on "${port}" not accessible` });
+					return;
+				}
+				try {
+					fn(controller);
+				} catch (err) {
+					ack?.({ ok: false, error: err.message });
+				}
+			};
+
+			// A plugin's machine.command(). Deliberately NOT routed through the
+			// legacy "command" handler: that one leaves the socket.io ack sitting
+			// in `args`, and handlers destructure positionally — so
+			// controller.command("gcode", "$$", ack) has the ack function read as
+			// `context` and handed to feeder.feed(), which expects a plain object.
+			// Nothing then invokes it and the plugin's promise hangs until the
+			// SDK's request timeout. Here the ack is a separate parameter and
+			// never enters the args array.
+			//
+			// The ack signals DELIVERY, not completion — most command handlers
+			// have no completion signal at all. machine.query() is the
+			// request/response primitive.
+			socket.on("plugin:command", (port, cmd, args, ack) => {
+				if (!this.connection || this.connection.isClose()) {
+					ack?.({ ok: false, error: `Serial port "${port}" not accessible` });
+					return;
+				}
+				if (typeof cmd !== "string" || cmd === "") {
+					ack?.({ ok: false, error: "A command is required" });
+					return;
+				}
+				withController(port, ack, (controller) => {
+					controller.command.apply(controller, [cmd].concat(args || []));
+					ack?.({ ok: true });
+				});
+			});
+
+			socket.on(
+				"plugin:parser:register",
+				(port, ownerId, pluginId, specs, ack) => {
+					withController(port, ack, (controller) => {
+						const result = controller.registerPluginParsers(
+							ownerId,
+							pluginId,
+							specs,
+						);
+						ack?.({ ok: true, ...result });
+					});
+				},
+			);
+
+			socket.on("plugin:parser:unregister", (port, ownerId, parserId, ack) => {
+				withController(port, ack, (controller) => {
+					controller.unregisterPluginParsers(ownerId, parserId);
+					ack?.({ ok: true });
+				});
+			});
+
+			socket.on("plugin:query", (port, cmd, opts, ack) => {
+				withController(port, ack, (controller) => {
+					controller.pluginQuery(cmd, opts, (err, result) => {
+						if (err) {
+							ack?.({ ok: false, error: err.message, code: err.code });
+							return;
+						}
+						ack?.({ ok: true, result });
+					});
+				});
 			});
 
 			socket.on(
@@ -850,6 +950,24 @@ class CNCEngine {
 	emit(msg, ...args) {
 		this.sockets.forEach((socket) => {
 			socket.emit(msg, ...args);
+		});
+	}
+
+	/**
+	 * Rebuilds every live controller's manifest-declared parser chain. Call this
+	 * whenever the set of enabled plugins changes (enable, disable, import) so
+	 * parsers start and stop without needing a reconnect or an app restart.
+	 */
+	reloadPluginParsers() {
+		const controllers = store.get("controllers", {});
+		Object.keys(controllers).forEach((port) => {
+			try {
+				controllers[port]?.reloadPluginParsers?.();
+			} catch (err) {
+				log.error(
+					`Failed to reload plugin parsers on "${port}": ${err.message}`,
+				);
+			}
 		});
 	}
 

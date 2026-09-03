@@ -22,6 +22,7 @@ Then restart gSender.
 | `basic-cam/` | React + TypeScript + Vite + Tailwind | Full reference CAM plugin — combines all SDK entry points |
 | `corner-finder/` | React + TypeScript + Vite | Host visualizer bridge — `gsender.viewer.*` (picking, camera, overlay markers) + `machine.setBusy` |
 | `storage-test/` | Plain JS + Vite | Namespaced plugin storage — buttons for every `storage.*` method (get/set/delete/getAll/setAll/clear), for QA |
+| `parser-demo/` | Plain JS + Vite | Firmware response parsers — manifest line/block parsers, runtime `registerParser`, `onLine`, `machine.query`, plus a command sender to drive them |
 
 Each folder must contain `gsender-plugin.json` and a `ui/` directory with the built SPA entry file.
 
@@ -37,6 +38,7 @@ Each folder must contain `gsender-plugin.json` and a `ui/` directory with the bu
 | `ui.entry` | yes | Path to the built SPA entry file, relative to the plugin folder. |
 | `ui.contributions` | no | Array of `{ slot, route, label }` describing where the plugin mounts (e.g. `tools-page`). |
 | `capabilities` | no | Object of bridge permissions the plugin requests (examples and explanation in the next section). |
+| `parsers` | no | Array of firmware response parser specs. Matched server-side and live from the moment the port opens — independent of whether the plugin's UI is mounted. See the [plugin parsers guide](../docs/plugin-parsers.md). |
 
 ### Manifest capabilities
 
@@ -84,6 +86,47 @@ plugin must `import { storage } from "@sienci/gsender-plugin-sdk"` directly
 to be scanned and granted this permission. See the [SDK README's storage
 section](../packages/plugin-sdk/README.md#plugin-storage) for the client
 API.
+
+#### `machine:parse` / `machine:query`: firmware response parsers
+
+`machine:parse` grants a plugin the ability to match the **raw firmware
+stream** with regexes it supplies, and receive the matches. It is deliberately
+*not* covered by `machine:read`: that returns a curated context object, whereas
+a parser sees more of the serial traffic than the console does. `machine:query`
+is separate again, because sending a command and capturing its response is a
+write.
+
+```json
+"parsers": [
+	{
+		"id": "settings",
+		"mode": "block",
+		"begin": { "source": "^\\$\\d+=" },
+		"match": { "source": "^\\$(?<key>\\d+)=(?<value>.*)$" },
+		"end": { "source": "^ok$" }
+	}
+],
+"permissions": ["machine:parse", "machine:query"],
+"capabilities": {
+	"requestTypes": [
+		"machine:parser:register",
+		"machine:parser:unregister",
+		"machine:query"
+	],
+	"topics": ["parser"],
+	"allowedFunctions": ["machine", "onParserError"]
+}
+```
+
+The `parser` topic is what delivers results to the plugin; the two
+`machine:parser:*` request types are only needed for *runtime* registration
+(`machine.registerParser`, `machine.onLine`).
+
+Manifest-declared parsers are a special case for the permission scan: they run
+server-side and involve **no SDK import at all**, so the static bundle scan
+cannot see them. The import dialog therefore adds `machine:parse` whenever a
+manifest declares `parsers`, and lists every declared pattern verbatim, so the
+user can see exactly what a plugin watches before authorizing it.
 
 Plugins that import the SDK should build with `gsenderPlugin()` from
 `@sienci/gsender-plugin-sdk/vite` (see `basic-cam/vite.config.ts` and the

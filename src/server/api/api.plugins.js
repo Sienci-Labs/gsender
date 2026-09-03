@@ -26,6 +26,7 @@ import {
 	ERR_NOT_FOUND,
 } from "../constants";
 import logger from "../lib/logger";
+import cncengine from "../services/cncengine";
 import pluginRegistry from "../services/pluginregistry";
 
 const log = logger("api:plugins");
@@ -49,6 +50,7 @@ export const fetch = (_req, res) => {
 
 	res.send({
 		pluginsDir: pluginRegistry.getPluginsDirectory(),
+		userPluginsDir: pluginRegistry.getUserPluginsDir(),
 		plugins,
 	});
 };
@@ -72,6 +74,11 @@ export const update = (req, res) => {
 	}
 
 	pluginRegistry.setPluginEnabled(id, enabled);
+
+	// Manifest parsers are owned by the registry, so a live controller needs to
+	// be told to rebuild its chain — otherwise a disabled plugin keeps watching
+	// (and an enabled one stays silent) until the next reconnect.
+	cncengine.reloadPluginParsers();
 
 	res.send({
 		id,
@@ -118,8 +125,11 @@ const revealInFileManager = (target) => {
 export const openDirectory = (req, res) => {
 	const { pluginPath } = req.body || {};
 	const pluginsDir = pluginRegistry.getPluginsDirectory();
+	const userPluginsDir = pluginRegistry.getUserPluginsDir();
 
-	let target = pluginsDir;
+	const resolvedPluginsDir = userPluginsDir || pluginsDir || "";
+
+	let target = resolvedPluginsDir;
 
 	if (pluginPath) {
 		if (typeof pluginPath !== "string") {
@@ -233,6 +243,32 @@ export const scanPluginForSDKUsage = (req, res) => {
 	res.send({ msg: "Scanned for sdk usage", ...result });
 };
 
+export const updateSettings = (req, res) => {
+	const { pluginsDir } = req.body || {};
+
+	if (pluginsDir !== undefined && typeof pluginsDir !== "string") {
+		return res.status(ERR_BAD_REQUEST).send({
+			msg: '"pluginsDir" must be a string',
+		});
+	}
+
+	try {
+		const previousUserPluginsDir = pluginRegistry.getUserPluginsDir();
+		const saved = pluginRegistry.setUserPluginsDir(pluginsDir || "");
+		res.send({
+			msg: "Plugin settings updated",
+			userPluginsDir: saved,
+			previousUserPluginsDir,
+			restartRequired: true,
+		});
+	} catch (err) {
+		log.error(err);
+		res.status(ERR_INTERNAL_SERVER_ERROR).send({
+			msg: `Failed to update plugin settings: ${err.message}`,
+		});
+	}
+};
+
 export const importPlugin = (req, res) => {
 	const { pluginsDir, directory } = req.body;
 	const error = pluginRegistry.pluginImport(pluginsDir, directory);
@@ -241,5 +277,9 @@ export const importPlugin = (req, res) => {
 			.status(ERR_INTERNAL_SERVER_ERROR)
 			.send({ msg: "Failed to import plugin", error });
 	}
+	// A newly imported plugin may declare parsers; pick them up without waiting
+	// for a reconnect.
+	cncengine.reloadPluginParsers();
+
 	res.send({ msg: "Successfully imported plugin" });
 };

@@ -48,6 +48,7 @@ export interface Workspace {
 	promptExit: boolean;
 	backupFreq: BackupFrequencies;
 	backupLoc: string;
+	userPluginsDir: string;
 	lastBackupTime: number;
 	powerSaving: boolean;
 	park: object;
