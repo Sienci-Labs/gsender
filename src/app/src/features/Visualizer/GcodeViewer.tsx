@@ -27,16 +27,14 @@ import type {
 	GCodeViewerCameraView,
 	GCodeViewerOptions,
 	GCodeViewerTheme,
-	GCodeViewerThemePresetName,
 	WorkerGeometryData,
 } from "@sienci/gviewer/viewer";
 import {
 	GCodeViewer as GViewer3D,
 	GCodeSVGRenderer as GViewerSVG,
-	gCodeViewerThemePresets,
 } from "@sienci/gviewer/viewer";
-import type { MachineProfile } from "app/definitions/firmware";
 import type { BBox } from "app/definitions/general";
+import type { OverlayMarker } from "app/features/Plugins/types";
 import controller from "app/lib/controller";
 import { isLaserMode } from "app/lib/laserMode";
 import { getZUpTravel } from "app/lib/SoftLimits.js";
@@ -47,76 +45,29 @@ import _get from "lodash/get";
 import pubsub from "pubsub-js";
 import { Component } from "react";
 import {
-	AYU_DARK_THEME,
-	AYU_LIGHT_THEME,
-	DARK_THEME,
-	FLEXOKI_DARK_THEME,
 	GRBL,
 	GRBL_ACTIVE_STATE_CHECK,
 	GRBL_ACTIVE_STATE_RUN,
 	GRBLHAL,
-	GRUVBOX_LIGHT_THEME,
 	LASER_MODE,
-	LIGHT_THEME,
 	MARLIN,
 	METRIC_UNITS,
 	OUTLINE_MODE_RAPIDLESS_SQUARE,
 	SMOOTHIE,
 	TINYG,
-	TOKYO_NIGHT_THEME,
 	VISUALIZER_PRIMARY,
 	VISUALIZER_SECONDARY,
 	WORKFLOW_STATE_RUNNING,
 } from "../../constants";
-
-const THEME_NAME_TO_PRESET: Record<string, GCodeViewerThemePresetName> = {
-	[LIGHT_THEME]: "light",
-	[DARK_THEME]: "dark",
-	[FLEXOKI_DARK_THEME]: "flexoki-dark",
-	[TOKYO_NIGHT_THEME]: "tokyo-night",
-	[GRUVBOX_LIGHT_THEME]: "gruvbox-light",
-	[AYU_DARK_THEME]: "ayu-dark",
-	[AYU_LIGHT_THEME]: "ayu-light",
-};
-
-const LIGHT_LIKE_PRESETS = new Set<GCodeViewerThemePresetName>([
-	"light",
-	"gruvbox-light",
-	"ayu-light",
-]);
-
-// Workshop High-Contrast overrides for gSender's own "dark" preset (the app's
-// built-in dark mode). Other selectable schemes (tokyo-night, ayu-dark,
-// flexoki-dark) are left on their own preset colors. Hex values mirror the
-// Tailwind config's surface/outline/content tokens and brand color scales
-// (see apps/desktop/tailwind.config.ts) — the canvas can't consume Tailwind
-// classes, so the same configured hex is used literally here.
-const WORKSHOP_VISUALIZER_COLORS = {
-	background: "#090D12", // surface.sunken
-	gridMajor: "#72849D", // outline.strong
-	gridMinor: "#3F4B59", // outline.subtle
-	axisX: "#dc2626", // red.500
-	axisY: "#059669", // green.500
-	axisZ: "#3F85C7", // blue.500
-	rapid: "#059669", // green.500
-	cutting: "#3F85C7", // blue.500
-	processed: "#59687B", // outline.DEFAULT
-	boundingBox: "#659dd2", // blue.300
-	machineBed: "#c27924", // orange.400
-	bit: "#79aad8", // blue.200
-};
-
-import {
-	computeKeepoutWorkRect,
-	computeMachineBedWorkRect,
-} from "app/features/DRO/utils/RapidPosition";
-import type { OverlayMarker } from "app/features/Plugins/types";
 import { outlineResponse } from "../../workers/Outline.response";
 import type { Actions, CAMERA_POSITIONS_T, State } from "./definitions";
+import { buildGridOptions, buildMachineBedOptions } from "./viewerOptions";
+import { buildViewerTheme, WORKSHOP_VISUALIZER_COLORS } from "./viewerTheme";
 import {
 	type VisualizerBridgeHandle,
 	visualizerBridge,
 } from "./visualizerBridge";
+import { augmentWorkerGeometry } from "./workerGeometry";
 
 // Press-and-hold pick gesture: how long to hold before committing, and how far
 // the pointer may drift before the gesture is treated as an orbit/pan instead of
@@ -356,33 +307,7 @@ class GcodeViewer extends Component<Props> {
 	}
 
 	buildTheme(themeName?: string): GCodeViewerTheme {
-		const preset = THEME_NAME_TO_PRESET[themeName ?? ""] ?? "dark";
-		const base = gCodeViewerThemePresets[preset];
-
-		if (preset === "dark") {
-			const c = WORKSHOP_VISUALIZER_COLORS;
-			return {
-				...base,
-				background: c.background,
-				colors: {
-					...base.colors,
-					grid: { major: c.gridMajor, minor: c.gridMinor },
-					axes: { x: c.axisX, y: c.axisY, z: c.axisZ },
-					rapid: c.rapid,
-					cutting: c.cutting,
-					processed: c.processed,
-					boundingBox: c.boundingBox,
-					machineBed: c.machineBed,
-				},
-			};
-		}
-
-		const boundingBox = LIGHT_LIKE_PRESETS.has(preset) ? "#1d4ed8" : "#93c5fd";
-		const machineBed = LIGHT_LIKE_PRESETS.has(preset) ? "#b45309" : "#fbbf24";
-		return {
-			...base,
-			colors: { ...base.colors, boundingBox, machineBed },
-		};
+		return buildViewerTheme(themeName);
 	}
 
 	buildOptions(): Partial<GCodeViewerOptions> {
@@ -420,165 +345,13 @@ class GcodeViewer extends Component<Props> {
 				visible: store.get("widgets.visualizer.objects.limits.visible", false),
 				labels: store.get("widgets.visualizer.boundingBoxLabels", false),
 			},
-			machineBed: this.buildMachineBedOptions(),
-			grid: this.buildGridOptions(),
+			machineBed: buildMachineBedOptions(),
+			grid: buildGridOptions(state.units),
 			render: {
 				antialias: true,
 				theme: this.buildTheme(this.currentThemeName()),
 			},
 		};
-	}
-
-	// Grid quadrant tracks the connected controller's configured X/Y travel
-	// ($130/$131), falling back to the machine profile until those settings
-	// arrive. Quadrant edge is 2x the axis size, so each quadrant covers the
-	// full bed regardless of which corner is "home". When "trim grid to bed"
-	// is on and the bed indicator is actually shown, bounds override this
-	// symmetric sizing with a box hugging the (possibly WCO-offset) bed rect.
-	buildGridOptions(): {
-		sizeX: number;
-		sizeY: number;
-		axisDepth: number;
-		labels: boolean;
-		bounds: {
-			min: { x: number; y: number };
-			max: { x: number; y: number };
-		} | null;
-	} {
-		const { state } = this.props;
-		const isMetric = state.units === METRIC_UNITS;
-		const unitScale = isMetric ? 1 : 1 / 25.4;
-		const machineProfile = store.get("workspace.machineProfile") as
-			| MachineProfile
-			| undefined;
-		const $130 = _get(
-			reduxStore.getState(),
-			"controller.settings.settings.$130",
-		);
-		const $131 = _get(
-			reduxStore.getState(),
-			"controller.settings.settings.$131",
-		);
-		const widthMm =
-			$130 !== undefined ? Number($130) : (machineProfile?.mm?.width ?? 800);
-		const depthMm =
-			$131 !== undefined ? Number($131) : (machineProfile?.mm?.depth ?? 800);
-		const heightMm = machineProfile?.mm?.height ?? 200;
-
-		let bounds: {
-			min: { x: number; y: number };
-			max: { x: number; y: number };
-		} | null = null;
-		const trimGridToBed = store.get(
-			"widgets.visualizer.objects.machineBed.trimGridToBed",
-			false,
-		);
-		if (trimGridToBed) {
-			const bed = this.buildMachineBedOptions();
-			if (bed.visible && bed.min && bed.max) {
-				// Round outward to the nearest major gridline spacing past each
-				// edge (10mm metric, 25.4mm/1" imperial) so the trimmed edge
-				// always lands exactly on a drawn gridline. A small epsilon
-				// keeps floating-point noise from pushing an already-flush edge
-				// out an extra step.
-				const roundStep = isMetric ? 10 : 25.4;
-				bounds = {
-					min: {
-						x: Math.floor((bed.min.x + 1e-6) / roundStep) * roundStep,
-						y: Math.floor((bed.min.y + 1e-6) / roundStep) * roundStep,
-					},
-					max: {
-						x: Math.ceil((bed.max.x - 1e-6) / roundStep) * roundStep,
-						y: Math.ceil((bed.max.y - 1e-6) / roundStep) * roundStep,
-					},
-				};
-			}
-		}
-
-		return {
-			sizeX: 2 * widthMm * unitScale,
-			sizeY: 2 * depthMm * unitScale,
-			axisDepth: heightMm * unitScale,
-			labels: true,
-			bounds,
-		};
-	}
-
-	buildMachineBedOptions(): {
-		visible: boolean;
-		min: { x: number; y: number } | null;
-		max: { x: number; y: number } | null;
-		keepout: {
-			min: { x: number; y: number };
-			max: { x: number; y: number };
-		} | null;
-	} {
-		const state = reduxStore.getState();
-		const $22 = _get(state, "controller.settings.settings.$22", "0");
-		const $23 = _get(state, "controller.settings.settings.$23", "0");
-		const hasHomed = !!_get(state, "controller.hasHomed");
-		const homingEnabled = Number($22) > 0;
-		const bedIndicatorEnabled = store.get(
-			"widgets.visualizer.objects.machineBed.visible",
-			false,
-		);
-
-		if (!bedIndicatorEnabled || !homingEnabled || !hasHomed) {
-			return { visible: false, min: null, max: null, keepout: null };
-		}
-
-		const wco = _get(state, "controller.wco", { x: 0, y: 0 });
-		const machineProfile = store.get("workspace.machineProfile") as
-			| MachineProfile
-			| undefined;
-		const machineWidthMm = machineProfile?.mm?.width ?? 800;
-		const machineDepthMm = machineProfile?.mm?.depth ?? 800;
-
-		const { min, max } = computeMachineBedWorkRect({
-			homingMaskSetting: $23,
-			machineWidthMm,
-			machineDepthMm,
-			wcsOffset: {
-				x: Number(wco.x) || 0,
-				y: Number(wco.y) || 0,
-			},
-		});
-
-		const $683 = _get(state, "controller.settings.settings.$683");
-		const $684 = _get(state, "controller.settings.settings.$684");
-		const $685 = _get(state, "controller.settings.settings.$685");
-		const $686 = _get(state, "controller.settings.settings.$686");
-		const $687 = _get(state, "controller.settings.settings.$687");
-
-		let keepout: {
-			min: { x: number; y: number };
-			max: { x: number; y: number };
-		} | null = null;
-		const keepoutSettingsExist = [$683, $684, $685, $686, $687].every(
-			(value) => value !== undefined,
-		);
-		if (keepoutSettingsExist) {
-			const keepoutEnabled = Number($683) !== 0;
-			const xMin = Number($684);
-			const xMax = Number($686);
-			const yMin = Number($685);
-			const yMax = Number($687);
-			const isZeroSquare = xMax - xMin === 0 && yMax - yMin === 0;
-			if (keepoutEnabled && !isZeroSquare) {
-				keepout = computeKeepoutWorkRect({
-					xMin,
-					xMax,
-					yMin,
-					yMax,
-					wcsOffset: {
-						x: Number(wco.x) || 0,
-						y: Number(wco.y) || 0,
-					},
-				});
-			}
-		}
-
-		return { visible: true, min, max, keepout };
 	}
 
 	buildSvgOptions(): Partial<GCodeSVGOptions> {
@@ -620,13 +393,9 @@ class GcodeViewer extends Component<Props> {
 		this.lastWorkerData = data;
 		this.lastHiddenLine = -1;
 
-		// Augment with toolchange count so gviewer only locks cut stream colors
-		// when the file actually has toolchange palette assignments.
-		const raw = data as any;
-		const toolchangeCount: number = Array.isArray(raw.info?.toolchanges)
-			? raw.info.toolchanges.length
-			: 0;
-		const augmented: WorkerGeometryData = { ...data, toolchangeCount };
+		// Shared so every viewer keeps the worker's per-tool palette; see
+		// augmentWorkerGeometry for why gviewer drops it otherwise.
+		const augmented = augmentWorkerGeometry(data);
 
 		if (this.mode === "svg" && this.viewerSvg) {
 			this.viewerSvg.loadFromWorkerData(augmented);
@@ -1306,7 +1075,7 @@ class GcodeViewer extends Component<Props> {
 			if (machineBedKey !== this.lastMachineBedKey) {
 				this.lastMachineBedKey = machineBedKey;
 				this.viewer3d?.setOptions({
-					machineBed: this.buildMachineBedOptions(),
+					machineBed: buildMachineBedOptions(),
 				});
 			}
 
@@ -1316,7 +1085,7 @@ class GcodeViewer extends Component<Props> {
 			if (gridKey !== this.lastGridKey) {
 				this.lastGridKey = gridKey;
 				this.viewer3d?.setOptions({
-					grid: this.buildGridOptions(),
+					grid: buildGridOptions(this.props.state.units),
 				});
 			}
 

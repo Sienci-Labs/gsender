@@ -10,7 +10,7 @@ import get from "lodash/get";
 import pubsub from "pubsub-js";
 import { useEffect, useState } from "react";
 
-function buildToolArray(toolEvents, fileLength, cuttingColor: string) {
+export function buildToolArray(toolEvents, fileLength, cuttingColor: string) {
 	let count = 0;
 	const toolArray: ToolChange[] = [];
 

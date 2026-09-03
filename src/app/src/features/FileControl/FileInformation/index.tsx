@@ -8,11 +8,13 @@ import {
 	TooltipTrigger,
 } from "app/components/shadcn/Tooltip";
 import { JOB_STATUS } from "app/constants";
+import GcodeStepper from "app/features/GcodeStepper";
 import type { Job } from "app/features/Stats/utils/StatContext";
 import { useTypedSelector } from "app/hooks/useTypedSelector";
 import { convertMillisecondsToTimeStamp } from "app/lib/datetime";
 import cx from "classnames";
 import isElectron from "is-electron";
+import { Footprints } from "lucide-react";
 import pubsub from "pubsub-js";
 import { useEffect, useState } from "react";
 import { FiClock } from "react-icons/fi";
@@ -35,6 +37,7 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
 
 	const [toggleInfo, setToggleInfo] = useState(false);
 	const [showEditor, setShowEditor] = useState(false);
+	const [showStepper, setShowStepper] = useState(false);
 	const [recentFiles, setRecentFiles] = useState<RecentFile[]>(
 		getRecentFiles(),
 	);
@@ -89,6 +92,12 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
 			setShowEditor(false);
 		}
 	}, [fileLoaded, showEditor]);
+
+	useEffect(() => {
+		if (!fileLoaded && showStepper) {
+			setShowStepper(false);
+		}
+	}, [fileLoaded, showStepper]);
 
 	if (fileProcessing) {
 		return <LoadingAnimation />;
@@ -290,7 +299,28 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
 						/>
 					</div>
 				)}
+
+				{fileLoaded && (
+					<TooltipProvider>
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<button
+									type="button"
+									onClick={() => setShowStepper(true)}
+									data-testid="open-gcode-stepper"
+									aria-label="Open G-code step through"
+									className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg border border-gray-300 bg-white text-gray-600 hover:bg-gray-100 dark:border-outline dark:bg-surface-raised dark:text-content-secondary dark:hover:bg-surface-hover"
+								>
+									<Footprints className="h-5 w-5" />
+								</button>
+							</TooltipTrigger>
+							<TooltipContent>G-code Step Through</TooltipContent>
+						</Tooltip>
+					</TooltipProvider>
+				)}
 			</div>
+
+			<GcodeStepper open={showStepper} onOpenChange={setShowStepper} />
 		</div>
 	);
 };
