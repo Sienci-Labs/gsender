@@ -38,7 +38,11 @@ import {
 	registerPluginWindow,
 	unregisterPluginWindow,
 } from "../plugin-permissions";
-import { handlePluginBridgeMessage } from "../pluginBridge";
+import controller from "app/lib/controller";
+import {
+	handlePluginBridgeMessage,
+	releaseRuntimeParsersForSource,
+} from "../pluginBridge";
 
 const CHANNEL = "gsender:plugin-bridge";
 
@@ -388,5 +392,255 @@ describe("plugin storage isolation", () => {
 
 		expect(response).toMatchObject({ id: "1", ok: false });
 		expect(response?.error).toMatch(/not authorized/i);
+	});
+});
+
+describe("plugin parsers", () => {
+	const source = {} as MessageEventSource;
+	const other = {} as MessageEventSource;
+
+	const grant = (
+		win: MessageEventSource,
+		pluginId: string,
+		requestTypes: string[],
+		topics: string[] = [],
+	) =>
+		registerPluginWindow(
+			win,
+			toRuntimeCapabilities({ requestTypes, topics }),
+			pluginId,
+		);
+
+	beforeEach(() => {
+		jest.clearAllMocks();
+		controller.registerPluginParsers = jest.fn(async () => ({
+			registered: ["probe"],
+			errors: [],
+		}));
+		controller.unregisterPluginParsers = jest.fn(async () => ({ ok: true }));
+		controller.pluginQuery = jest.fn(async () => ({ lines: ["ok"], ok: true }));
+	});
+
+	afterEach(() => {
+		unregisterPluginWindow(source);
+		unregisterPluginWindow(other);
+	});
+
+	it("denies parser registration without machine:parser:register", async () => {
+		grant(source, "com.sienci.a", ["workspace:get:state"]);
+
+		const response = await handlePluginBridgeMessage(
+			makeEvent(source, {
+				id: "1",
+				type: "machine:parser:register",
+				payload: { spec: { id: "probe", match: { source: "^ok$" } } },
+			}),
+		);
+
+		expect(response).toMatchObject({ id: "1", ok: false });
+		expect(response?.error).toMatch(/not authorized/i);
+		expect(controller.registerPluginParsers).not.toHaveBeenCalled();
+	});
+
+	it("forwards a granted registration to the controller with an owner id", async () => {
+		grant(source, "com.sienci.a", ["machine:parser:register"]);
+
+		const response = await handlePluginBridgeMessage(
+			makeEvent(source, {
+				id: "1",
+				type: "machine:parser:register",
+				payload: { spec: { id: "probe", match: { source: "^ok$" } } },
+			}),
+		);
+
+		expect(response).toMatchObject({ id: "1", ok: true });
+		const [ownerId, pluginId, specs] = (
+			controller.registerPluginParsers as jest.Mock
+		).mock.calls[0];
+		// Owner id is per-mount, so a remount cannot inherit the previous
+		// mount's server-side parsers.
+		expect(ownerId).toMatch(/^com\.sienci\.a#\d+$/);
+		expect(pluginId).toBe("com.sienci.a");
+		expect(specs).toEqual([{ id: "probe", match: { source: "^ok$" } }]);
+	});
+
+	it("rejects a registration with no spec id", async () => {
+		grant(source, "com.sienci.a", ["machine:parser:register"]);
+
+		const response = await handlePluginBridgeMessage(
+			makeEvent(source, {
+				id: "1",
+				type: "machine:parser:register",
+				payload: { spec: { match: { source: "^ok$" } } },
+			}),
+		);
+
+		expect(response).toMatchObject({ id: "1", ok: false });
+		expect(controller.registerPluginParsers).not.toHaveBeenCalled();
+	});
+
+	it("denies a registration from an unregistered source", async () => {
+		const response = await handlePluginBridgeMessage(
+			makeEvent({} as MessageEventSource, {
+				id: "1",
+				type: "machine:parser:register",
+				payload: { spec: { id: "probe", match: { source: "^ok$" } } },
+			}),
+		);
+
+		expect(response).toMatchObject({ id: "1", ok: false });
+		expect(controller.registerPluginParsers).not.toHaveBeenCalled();
+	});
+
+	it("denies machine:query without the query permission", async () => {
+		grant(source, "com.sienci.a", ["machine:parser:register"]);
+
+		const response = await handlePluginBridgeMessage(
+			makeEvent(source, {
+				id: "1",
+				type: "machine:query",
+				payload: { cmd: "$$" },
+			}),
+		);
+
+		expect(response).toMatchObject({ id: "1", ok: false });
+		expect(controller.pluginQuery).not.toHaveBeenCalled();
+	});
+
+	it("forwards a granted query to the controller", async () => {
+		grant(source, "com.sienci.a", ["machine:query"]);
+
+		const response = await handlePluginBridgeMessage(
+			makeEvent(source, {
+				id: "1",
+				type: "machine:query",
+				payload: { cmd: "$$", opts: { until: "ok" } },
+			}),
+		);
+
+		expect(response).toMatchObject({ id: "1", ok: true });
+		expect(controller.pluginQuery).toHaveBeenCalledWith("$$", { until: "ok" });
+	});
+
+	it("rejects a query with no command", async () => {
+		grant(source, "com.sienci.a", ["machine:query"]);
+
+		const response = await handlePluginBridgeMessage(
+			makeEvent(source, { id: "1", type: "machine:query", payload: {} }),
+		);
+
+		expect(response).toMatchObject({ id: "1", ok: false });
+		expect(controller.pluginQuery).not.toHaveBeenCalled();
+	});
+
+	it("releases a source's runtime parsers when its iframe unmounts", async () => {
+		grant(source, "com.sienci.a", ["machine:parser:register"]);
+		await handlePluginBridgeMessage(
+			makeEvent(source, {
+				id: "1",
+				type: "machine:parser:register",
+				payload: { spec: { id: "probe", match: { source: "^ok$" } } },
+			}),
+		);
+
+		releaseRuntimeParsersForSource(source);
+
+		expect(controller.unregisterPluginParsers).toHaveBeenCalledWith(
+			expect.stringMatching(/^com\.sienci\.a#\d+$/),
+		);
+	});
+
+	it("does not unregister anything for a source that registered none", () => {
+		grant(source, "com.sienci.a", ["machine:parser:register"]);
+
+		releaseRuntimeParsersForSource(source);
+
+		expect(controller.unregisterPluginParsers).not.toHaveBeenCalled();
+	});
+
+	it("gives each mount of the same plugin a distinct owner id", async () => {
+		grant(source, "com.sienci.a", ["machine:parser:register"]);
+		grant(other, "com.sienci.a", ["machine:parser:register"]);
+
+		const spec = { id: "probe", match: { source: "^ok$" } };
+		await handlePluginBridgeMessage(
+			makeEvent(source, { id: "1", type: "machine:parser:register", payload: { spec } }),
+		);
+		await handlePluginBridgeMessage(
+			makeEvent(other, { id: "2", type: "machine:parser:register", payload: { spec } }),
+		);
+
+		const owners = (controller.registerPluginParsers as jest.Mock).mock.calls.map(
+			([ownerId]) => ownerId,
+		);
+		expect(owners[0]).not.toBe(owners[1]);
+	});
+});
+
+describe("machine:command", () => {
+	const source = {} as MessageEventSource;
+
+	beforeEach(() => {
+		jest.clearAllMocks();
+		controller.pluginCommand = jest.fn(async () => ({ ok: true }));
+		registerPluginWindow(
+			source,
+			toRuntimeCapabilities({ requestTypes: ["machine:command"] }),
+			"com.sienci.a",
+		);
+	});
+
+	afterEach(() => {
+		unregisterPluginWindow(source);
+	});
+
+	it("forwards a granted command to the controller", async () => {
+		const response = await handlePluginBridgeMessage(
+			makeEvent(source, {
+				id: "1",
+				type: "machine:command",
+				payload: { cmd: "gcode", args: ["$$"] },
+			}),
+		);
+
+		expect(response).toMatchObject({ id: "1", ok: true });
+		expect(controller.pluginCommand).toHaveBeenCalledWith("gcode", ["$$"]);
+	});
+
+	it("never routes through controller.command", async () => {
+		// Regression guard. controller.command() settles by passing a callback
+		// through the controller's args, where the `gcode` handler destructures
+		// it as `context` and hands a function to feeder.feed() — so the promise
+		// hangs and the feeder gets a bad context. Keep this off that path.
+		await handlePluginBridgeMessage(
+			makeEvent(source, {
+				id: "1",
+				type: "machine:command",
+				payload: { cmd: "gcode", args: ["$$"] },
+			}),
+		);
+
+		expect(controller.command).not.toHaveBeenCalled();
+	});
+
+	it("defaults args to an empty array", async () => {
+		await handlePluginBridgeMessage(
+			makeEvent(source, {
+				id: "1",
+				type: "machine:command",
+				payload: { cmd: "homing" },
+			}),
+		);
+
+		expect(controller.pluginCommand).toHaveBeenCalledWith("homing", []);
+	});
+
+	it("rejects an empty command without touching the controller", async () => {
+		const response = await handlePluginBridgeMessage(
+			makeEvent(source, { id: "1", type: "machine:command", payload: {} }),
+		);
+
+		expect(response).toMatchObject({ id: "1", ok: false });
+		expect(controller.pluginCommand).not.toHaveBeenCalled();
 	});
 });

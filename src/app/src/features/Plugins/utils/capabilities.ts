@@ -49,6 +49,34 @@ export const buildGrantFromScan = (
 	};
 };
 
+/**
+ * Folds manifest-declared parsers into a scanned grant.
+ *
+ * Manifest parsers run server-side and involve no SDK import at all, so
+ * buildGrantFromScan — which only ever sees the built bundle — cannot detect
+ * them. Without this, a plugin could read the raw firmware stream while the
+ * approval dialog showed no corresponding permission.
+ */
+export const mergeManifestParserGrant = (
+	grant: {
+		permissions: PluginPermissionsType[];
+		wire: PluginCapabilitiesWire;
+	},
+	parsers: unknown,
+): { permissions: PluginPermissionsType[]; wire: PluginCapabilitiesWire } => {
+	if (!Array.isArray(parsers) || parsers.length === 0) {
+		return grant;
+	}
+
+	return {
+		permissions: [...new Set([...grant.permissions, "machine:parse" as const])],
+		wire: {
+			...grant.wire,
+			topics: [...new Set([...grant.wire.topics, "parser" as const])],
+		},
+	};
+};
+
 const toStringArray = (value: unknown): string[] =>
 	Array.isArray(value)
 		? value.filter((item): item is string => typeof item === "string")

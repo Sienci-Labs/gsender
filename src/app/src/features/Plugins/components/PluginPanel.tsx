@@ -8,6 +8,7 @@ import {
 	registerPluginWindow,
 	unregisterPluginWindow,
 } from "../utils/plugin-permissions";
+import { releaseRuntimeParsersForSource } from "../utils/pluginBridge";
 
 type PluginPanelProps = {
 	plugin: PluginRecord;
@@ -64,7 +65,14 @@ const PluginPanel = ({ plugin, className = "", title }: PluginPanelProps) => {
 			toRuntimeCapabilities(plugin.capabilities),
 			plugin.id
 		);
-		return () => unregisterPluginWindow(win);
+		return () => {
+			// Order matters: releasing resolves this iframe's owner id from the
+			// registry, so it has to run before the registry entry is removed.
+			// Manifest-declared parsers are unaffected — they belong to the
+			// server and keep running with no UI mounted.
+			releaseRuntimeParsersForSource(win);
+			unregisterPluginWindow(win);
+		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [plugin, reloadToken]);
 

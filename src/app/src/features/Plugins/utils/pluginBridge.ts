@@ -14,10 +14,13 @@ import type {
 	PluginBridgeSubscribe,
 	PluginBridgeTopic,
 	PluginCapabilities,
+	PluginParserError,
+	PluginParserMatch,
 } from "../types";
 import {
 	EMPTY_CAPABILITIES,
 	getCapabilitiesForSource,
+	getOwnerIdForSource,
 	getPluginIdForSource,
 } from "./plugin-permissions";
 
@@ -111,12 +114,18 @@ const getWorkspaceSnapshot = () => store.get("workspace", {});
 
 const getReduxSnapshot = () => reduxStore.getState();
 
-const getTopicSnapshot = (topic: PluginBridgeTopic): unknown => {
+const getTopicSnapshot = (
+	topic: PluginBridgeTopic,
+	pluginId: string | null = null
+): unknown => {
 	switch (topic) {
 		case "workspace":
 			return getWorkspaceSnapshot();
 		case "redux":
 			return getReduxSnapshot();
+		case "parser":
+			// Per-plugin, so a plugin never sees another plugin's matches.
+			return (pluginId && parserSnapshots.get(pluginId)) || {};
 		// "viewer" is a push-only event stream (pick/hold-progress); there is no
 		// meaningful initial snapshot, so subscribers get null until an event fires.
 		case "viewer":
@@ -176,14 +185,110 @@ const runMachineCommand = async (
 	// 	throw new Error(`Plugin not authorized to run command '${cmd}'`);
 	// }
 
-	return new Promise((resolve, reject) => {
-		controller.command(cmd, ...args, (err: Error | null, data: unknown) => {
-			if (err) {
-				reject(err);
-				return;
-			}
-			resolve(data);
+	// NOTE: this must NOT go through controller.command() with a trailing
+	// callback. That callback becomes the socket.io ack, the server leaves it in
+	// `args`, and handlers destructure positionally — so `gcode` reads it as
+	// `context` and passes a function into feeder.feed(). Nothing invokes it and
+	// this promise hangs until the SDK request times out. pluginCommand() keeps
+	// the ack out of the args entirely.
+	return controller.pluginCommand(cmd, args);
+};
+
+// --- Plugin parsers -----------------------------------------------------------
+// Matching runs server-side against every raw firmware line, so only matches
+// arrive here. Snapshots are kept per plugin, so one plugin can never observe
+// another's parser output.
+
+const parserSnapshots = new Map<string, Record<string, PluginParserMatch>>();
+
+/**
+ * Runtime (iframe-scoped) parser registrations, so they can be replayed after a
+ * reconnect and torn down when the iframe goes away. Manifest parsers are not
+ * tracked here — the server owns those.
+ */
+const runtimeParsers = new Map<
+	string,
+	{ pluginId: string; specs: Map<string, unknown> }
+>();
+
+const requireOwner = (source: MessageEventSource | null) => {
+	const ownerId = getOwnerIdForSource(source);
+	if (!ownerId) {
+		throw new Error("Unable to resolve plugin identity for parser request");
+	}
+	return ownerId;
+};
+
+const registerRuntimeParser = async (
+	source: MessageEventSource | null,
+	pluginId: string,
+	payload: Record<string, unknown> = {},
+) => {
+	const ownerId = requireOwner(source);
+	const spec = payload.spec as { id?: string } | undefined;
+	if (!spec || typeof spec.id !== "string") {
+		throw new Error("A parser spec with an id is required");
+	}
+
+	const entry = runtimeParsers.get(ownerId) ?? {
+		pluginId,
+		specs: new Map<string, unknown>(),
+	};
+	entry.specs.set(spec.id, spec);
+	runtimeParsers.set(ownerId, entry);
+
+	return controller.registerPluginParsers(ownerId, pluginId, [spec]);
+};
+
+const unregisterRuntimeParser = async (
+	source: MessageEventSource | null,
+	payload: Record<string, unknown> = {},
+) => {
+	const ownerId = requireOwner(source);
+	const parserId = typeof payload.id === "string" ? payload.id : undefined;
+
+	const entry = runtimeParsers.get(ownerId);
+	if (entry && parserId) {
+		entry.specs.delete(parserId);
+		if (entry.specs.size === 0) {
+			runtimeParsers.delete(ownerId);
+		}
+	} else if (!parserId) {
+		runtimeParsers.delete(ownerId);
+	}
+
+	return controller.unregisterPluginParsers(ownerId, parserId);
+};
+
+const runMachineQuery = async (payload: Record<string, unknown> = {}) => {
+	const cmd = String(payload.cmd || "");
+	if (!cmd) {
+		throw new Error("cmd is required");
+	}
+	return controller.pluginQuery(cmd, (payload.opts as object) ?? {});
+};
+
+/**
+ * Drops every runtime parser and live subscription belonging to one iframe.
+ *
+ * Must run BEFORE unregisterPluginWindow, which is what resolves the owner id.
+ */
+export const releaseRuntimeParsersForSource = (source: MessageEventSource) => {
+	const ownerId = getOwnerIdForSource(source);
+	if (ownerId && runtimeParsers.has(ownerId)) {
+		runtimeParsers.delete(ownerId);
+		controller.unregisterPluginParsers(ownerId).catch(() => {
+			// The port may already be closed; the server drops these on close too.
 		});
+	}
+
+	// Subscriptions were previously only reaped lazily, when a postMessage to a
+	// dead iframe threw — so an unmounted plugin leaked its subscription until
+	// the next broadcast happened to hit it.
+	subscriptions.forEach((sub, id) => {
+		if (sub.source === source) {
+			subscriptions.delete(id);
+		}
 	});
 	// // `controller.command` is fire-and-forget: it emits over the socket and the
 	// // server never acks (see CNCEngine `socket.on('command')`). Waiting on a
@@ -325,10 +430,16 @@ const STORAGE_REQUEST_TYPES = new Set([
 	"storage:clear",
 ]);
 
+const PARSER_REQUEST_TYPES = new Set([
+	"machine:parser:register",
+	"machine:parser:unregister",
+]);
+
 const handleBridgeRequest = async (
 	request: PluginBridgeRequest,
 	capabilities: PluginCapabilities,
-	pluginId: string | null
+	pluginId: string | null,
+	source: MessageEventSource | null
 ): Promise<unknown> => {
 	// check if plugin is allowed to use this request type
 	if (!capabilities.requestTypes.has(request.type)) {
@@ -345,11 +456,23 @@ const handleBridgeRequest = async (
 		throw new Error("Unable to resolve plugin identity for storage request");
 	}
 
+	// Same reasoning as storage: a runtime parser is owned by one iframe, and
+	// without a resolvable identity it could never be torn down.
+	if (PARSER_REQUEST_TYPES.has(request.type) && !pluginId) {
+		throw new Error("Unable to resolve plugin identity for parser request");
+	}
+
 	switch (request.type) {
 		case "machine:get:context":
 			return getMachineContext();
 		case "machine:command":
 			return runMachineCommand(request.payload, /*capabilities*/);
+		case "machine:parser:register":
+			return registerRuntimeParser(source, pluginId as string, request.payload);
+		case "machine:parser:unregister":
+			return unregisterRuntimeParser(source, request.payload);
+		case "machine:query":
+			return runMachineQuery(request.payload);
 		case "machine:busy:set":
 			return setMachineBusy(request.payload);
 		case "workspace:get:state":
@@ -458,7 +581,12 @@ export const handlePluginBridgeMessage = async (
 	const pluginId = getPluginIdForSource(event.source);
 
 	try {
-		const result = await handleBridgeRequest(request, capabilities, pluginId);
+		const result = await handleBridgeRequest(
+			request,
+			capabilities,
+			pluginId,
+			event.source
+		);
 		return {
 			id: request.id,
 			ok: true,
@@ -484,6 +612,7 @@ type PluginSubscription = {
 	topic: PluginBridgeTopic;
 	source: MessageEventSource;
 	origin: string;
+	pluginId: string | null;
 };
 
 const subscriptions = new Map<string, PluginSubscription>();
@@ -504,17 +633,25 @@ const pushUpdate = (sub: PluginSubscription, snapshot: unknown) => {
 	}
 };
 
-const broadcast = (topic: PluginBridgeTopic) => {
+const broadcast = (topic: PluginBridgeTopic, onlyPluginId?: string) => {
 	if (subscriptions.size === 0) {
 		return;
 	}
 
-	// Compute the snapshot once per broadcast, shared across subscribers.
+	// Compute the snapshot once per broadcast where it is shared. The "parser"
+	// topic is per-plugin, so it has to be computed per subscriber instead.
 	let snapshot: unknown;
 	let computed = false;
 
 	subscriptions.forEach((sub) => {
 		if (sub.topic !== topic) {
+			return;
+		}
+		if (onlyPluginId && sub.pluginId !== onlyPluginId) {
+			return;
+		}
+		if (topic === "parser") {
+			pushUpdate(sub, getTopicSnapshot(topic, sub.pluginId));
 			return;
 		}
 		if (!computed) {
@@ -525,9 +662,45 @@ const broadcast = (topic: PluginBridgeTopic) => {
 	});
 };
 
+/**
+ * Pushes a discrete event, as opposed to a snapshot.
+ *
+ * Needed alongside broadcast() because a snapshot is last-value-only and
+ * useSyncExternalStore de-dupes by reference — two matches arriving in one tick
+ * would collapse into one. Dropping a firmware match is a correctness bug, so
+ * onParsed rides this stream while useParsed reads the snapshot.
+ */
+const pushEvent = (sub: PluginSubscription, payload: unknown) => {
+	try {
+		sub.source.postMessage(
+			{
+				channel: BRIDGE_CHANNEL,
+				event: { id: sub.id, topic: sub.topic, event: payload },
+			},
+			{ targetOrigin: sub.origin },
+		);
+	} catch {
+		subscriptions.delete(sub.id);
+	}
+};
+
+const emitEvent = (
+	topic: PluginBridgeTopic,
+	pluginId: string,
+	payload: unknown,
+) => {
+	subscriptions.forEach((sub) => {
+		if (sub.topic === topic && sub.pluginId === pluginId) {
+			pushEvent(sub, payload);
+		}
+	});
+};
+
 // Push a one-off event (pick / hold-progress) to every "viewer"-topic
 // subscriber. Unlike broadcast(), the payload is the event itself rather than a
-// recomputed state snapshot, since "viewer" is a push-only event stream.
+// recomputed state snapshot, since "viewer" is a push-only event stream. Rides
+// the "update"/topic-snapshot channel (not the "parser"-style discrete-event
+// channel above) because the client reads it via getTopicSnapshot/subscribeTopic.
 const broadcastViewerEvent = (event: unknown) => {
 	if (subscriptions.size === 0) {
 		return;
@@ -550,13 +723,47 @@ const ensureHostListeners = () => {
 	// NOTE: redux subscribe fires on every action; the snapshot is only computed
 	// when there is at least one active redux subscriber.
 	reduxStore.subscribe(() => broadcast("redux"));
+
+	controller.addListener("plugin:parser:match", (match: PluginParserMatch) => {
+		if (!match?.pluginId) {
+			return;
+		}
+		// Replace the map so the topic snapshot changes identity, but keep every
+		// other parser's entry referentially stable — useParsed(id) then only
+		// re-renders for the parser that actually fired.
+		const forPlugin = { ...(parserSnapshots.get(match.pluginId) ?? {}) };
+		forPlugin[match.parserId] = match;
+		parserSnapshots.set(match.pluginId, forPlugin);
+
+		broadcast("parser", match.pluginId);
+		emitEvent("parser", match.pluginId, match);
+	});
+
+	controller.addListener("plugin:parser:error", (error: PluginParserError) => {
+		if (error?.pluginId) {
+			emitEvent("parser", error.pluginId, error);
+		}
+	});
+
+	// Server-side registrations die with the controller, so a reconnect has to
+	// replay them or a plugin silently stops receiving matches.
+	controller.addListener("serialport:open", () => {
+		runtimeParsers.forEach((entry, ownerId) => {
+			controller
+				.registerPluginParsers(ownerId, entry.pluginId, [...entry.specs.values()])
+				.catch(() => {
+					// Best effort — the plugin sees the gap via plugin:parser:error.
+				});
+		});
+	});
 };
 
 const addSubscription = (
 	source: MessageEventSource,
 	origin: string,
 	subscribe: PluginBridgeSubscribe,
-	capabilities: PluginCapabilities
+	capabilities: PluginCapabilities,
+	pluginId: string | null
 ) => {
 	// check if plugin has subscription perms
 	if (!capabilities.topics.has(subscribe.topic)) {
@@ -571,13 +778,16 @@ const addSubscription = (
 		topic: subscribe.topic,
 		source,
 		origin,
+		pluginId,
 	};
 
 	subscriptions.set(sub.id, sub);
 
 	// Push the current value immediately so the hook renders without waiting for
-	// the next store change.
-	pushUpdate(sub, getTopicSnapshot(sub.topic));
+	// the next store change. For "parser" this is what lets a widget mounting
+	// late — a carve-page widget, say — show the last match straight away
+	// instead of waiting for the machine to repeat itself.
+	pushUpdate(sub, getTopicSnapshot(sub.topic, sub.pluginId));
 };
 
 const removeSubscription = (id: string) => {
@@ -600,7 +810,8 @@ export const installPluginBridgeListener = () => {
 					event.source,
 					event.origin,
 					data.subscribe as PluginBridgeSubscribe,
-					capabilities
+					capabilities,
+					getPluginIdForSource(event.source)
 				);
 			} catch(err) {
 				event.source.postMessage(

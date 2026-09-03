@@ -26,6 +26,7 @@ import {
 	ERR_NOT_FOUND,
 } from "../constants";
 import logger from "../lib/logger";
+import cncengine from "../services/cncengine";
 import pluginRegistry from "../services/pluginregistry";
 
 const log = logger("api:plugins");
@@ -73,6 +74,11 @@ export const update = (req, res) => {
 	}
 
 	pluginRegistry.setPluginEnabled(id, enabled);
+
+	// Manifest parsers are owned by the registry, so a live controller needs to
+	// be told to rebuild its chain — otherwise a disabled plugin keeps watching
+	// (and an enabled one stays silent) until the next reconnect.
+	cncengine.reloadPluginParsers();
 
 	res.send({
 		id,
@@ -271,5 +277,9 @@ export const importPlugin = (req, res) => {
 			.status(ERR_INTERNAL_SERVER_ERROR)
 			.send({ msg: "Failed to import plugin", error });
 	}
+	// A newly imported plugin may declare parsers; pick them up without waiting
+	// for a reconnect.
+	cncengine.reloadPluginParsers();
+
 	res.send({ msg: "Successfully imported plugin" });
 };

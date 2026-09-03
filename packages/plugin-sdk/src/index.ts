@@ -14,16 +14,173 @@ import {
 	getTopicSnapshot,
 	type OverlayMarker,
 	request,
+	subscribeEvents,
 	subscribeTopic,
 	type ViewerPickEvent,
 } from "./bridge.js";
+
+// --- Firmware response parsers ------------------------------------------------
+
+/** A serialized regex. Matchers run server-side, so they can never be
+ * functions — pass a RegExp and the SDK converts it for you. */
+export type RegexSpec = { source: string; flags?: string };
+
+export type ParserPattern = RegExp | string | RegexSpec;
+
+export type ParserSpec = {
+	/** Unique within your plugin. This is what you pass to onParsed/useParsed. */
+	id: string;
+	/** "line" matches one line at a time; "block" accumulates a multi-line
+	 * response between `begin` and `end`/`until`. */
+	mode?: "line" | "block";
+	/** Required for "line". Optional for "block", where it extracts per-line
+	 * `entries` from within the block. */
+	match?: ParserPattern;
+	/** Block mode: opens the block. */
+	begin?: ParserPattern;
+	/** Block mode: closes the block. Prefer this over `until`. */
+	end?: ParserPattern;
+	/**
+	 * Block mode terminator shorthand. Only sound while the machine is idle —
+	 * during a job the firmware emits an `ok` per accepted line, so an `ok`
+	 * belongs to the running job, not to your block. Pair it with
+	 * `whenWorkflow: "idle"`, or use an explicit `end` pattern.
+	 */
+	until?: "ok" | "error" | "ok-or-error";
+	/** Lines dropped from a block without closing it. */
+	ignore?: ParserPattern;
+	/** Drop `<...>` status reports from blocks. Defaults to true: grblHAL polls
+	 * status every 250ms, so one lands inside almost every multi-line response. */
+	ignoreStatusReports?: boolean;
+	/** Close the block if a line matches neither `match` nor `end`. */
+	strict?: boolean;
+	/** Restart the block when `begin` matches again. Leave off when `begin`
+	 * matches every line of the block (a `$$` dump, say). */
+	restartOnBegin?: boolean;
+	/** Emit blocks that ended without their terminator. Default true. */
+	emitPartial?: boolean;
+	/** Max lines per block. Default 64, capped at 500. */
+	maxLines?: number;
+	/** Milliseconds before an unfinished block is flushed. Default 2000. */
+	timeout?: number;
+	/** Only run this parser while the machine is idle. */
+	whenWorkflow?: "any" | "idle";
+	/** Shown to the user in the permissions dialog. */
+	label?: string;
+};
+
+export type ParsedEntry = {
+	line: string;
+	groups: Record<string, string>;
+	captures: Array<string | null>;
+};
+
+export type ParsedResult = {
+	pluginId: string;
+	parserId: string;
+	mode: "line" | "block";
+	/** Monotonic per parser, so two identical results stay distinguishable. */
+	seq: number;
+	line: string | null;
+	lines: string[];
+	groups: Record<string, string>;
+	captures: Array<string | null>;
+	entries: ParsedEntry[];
+	/** False when the block ended without its terminator. */
+	complete: boolean;
+	reason:
+		| "match"
+		| "end"
+		| "until"
+		| "maxLines"
+		| "timeout"
+		| "strict"
+		| "restart"
+		| "close"
+		| "reload";
+	startedAt: number;
+	endedAt: number;
+};
+
+export type ParserErrorEvent = {
+	pluginId: string;
+	parserId: string;
+	reason: "quarantined" | "rate-limited" | "invalid-spec";
+	message: string;
+};
+
+export type QueryOptions = {
+	/** Defaults to "ok-or-error". Required as a RegExp when allowDuringJob. */
+	until?: "ok" | "error" | "ok-or-error" | RegExp | RegexSpec;
+	maxLines?: number;
+	timeout?: number;
+	/** Responses interleave with the running job's own. Use sparingly. */
+	allowDuringJob?: boolean;
+	includeStatusReports?: boolean;
+};
+
+export type QueryResult = {
+	lines: string[];
+	ok: boolean;
+	error?: string;
+	complete: boolean;
+	reason: "until" | "maxLines" | "timeout" | "close" | "busy";
+	durationMs: number;
+};
+
+/** Normalises a RegExp to the serialized form the wire requires. The g and y
+ * flags are dropped: their lastIndex persists between calls, which would make a
+ * parser match every other line. */
+const toRegexSpec = (pattern: ParserPattern): RegexSpec => {
+	if (typeof pattern === "string") {
+		return { source: pattern };
+	}
+	if (pattern instanceof RegExp) {
+		return { source: pattern.source, flags: pattern.flags.replace(/[gy]/g, "") };
+	}
+	return { source: pattern.source, flags: (pattern.flags ?? "").replace(/[gy]/g, "") };
+};
+
+const PATTERN_FIELDS = ["match", "begin", "end", "ignore"] as const;
+
+const serializeSpec = (spec: ParserSpec): Record<string, unknown> => {
+	const out: Record<string, unknown> = { ...spec };
+	for (const field of PATTERN_FIELDS) {
+		if (spec[field] !== undefined) {
+			out[field] = toRegexSpec(spec[field] as ParserPattern);
+		}
+	}
+	return out;
+};
+
+let anonymousParserSeq = 0;
 
 // --- Imperative client --------------------------------------------------------
 
 type MachineClient = {
 	getContext: () => Promise<unknown>;
 	command: (cmd: string, ...args: unknown[]) => Promise<unknown>;
-	setBusy: (busy: boolean, label?: string) => Promise<void>
+	/**
+	 * Registers a parser for the lifetime of this plugin view. For a parser that
+	 * should stay live even when your UI is not mounted — so a widget elsewhere
+	 * in gSender can read it the moment it appears — declare it in your
+	 * manifest's "parsers" array instead.
+	 */
+	registerParser: (
+		spec: ParserSpec,
+	) => Promise<{ registered: string[]; errors: Array<unknown> }>;
+	unregisterParser: (id: string) => Promise<void>;
+	/** Every match, losslessly. Fires immediately with the last result if one
+	 * has already arrived. Returns an unsubscribe function. */
+	onParsed: (id: string, callback: (result: ParsedResult) => void) => () => void;
+	/** Sugar for a one-off line parser. Returns an unsubscribe function. */
+	onLine: (
+		pattern: RegExp | string,
+		callback: (result: ParsedResult) => void,
+	) => () => void;
+	/** Sends a command and collects every response line until a terminator. */
+	query: (cmd: string, opts?: QueryOptions) => Promise<QueryResult>;
+	setBusy: (busy: boolean, label?: string) => Promise<void>;
 }
 type WorkspaceClient = {
 	getState: () => Promise<unknown>;
@@ -92,6 +249,65 @@ type GsenderClient = {
 const createMachineClient = (): MachineClient => ({
 	getContext: () => request("machine:get:context"),
 	command: (cmd, ...args) => request("machine:command", { cmd, args }),
+
+	registerParser: (spec) =>
+		request("machine:parser:register", { spec: serializeSpec(spec) }),
+
+	unregisterParser: (id) =>
+		request("machine:parser:unregister", { id }).then(() => undefined),
+
+	onParsed: (id, callback) => {
+		const unsubscribe = subscribeEvents("parser", (payload) => {
+			const result = payload as ParsedResult & { reason?: string };
+			// The same topic carries error events; those go to onParserError.
+			if (result?.parserId === id && Array.isArray(result?.lines)) {
+				callback(result);
+			}
+		});
+
+		// Mirrors subscribeWorkspaceState: deliver what we already know straight
+		// away, so a late-mounting view is populated without waiting for the
+		// machine to repeat itself.
+		const last = getLastParsed(id);
+		if (last) {
+			callback(last);
+		}
+
+		return unsubscribe;
+	},
+
+	onLine: (pattern, callback) => {
+		const id = `__anon${++anonymousParserSeq}`;
+		const off = machine.onParsed(id, callback);
+
+		void machine
+			.registerParser({ id, mode: "line", match: pattern })
+			.catch((err) => {
+				console.warn(`[gsender] onLine registration failed: ${err.message}`);
+			});
+
+		return () => {
+			off();
+			void machine.unregisterParser(id).catch(() => {});
+		};
+	},
+
+	query: (cmd, opts) =>
+		request<QueryResult>("machine:query", {
+			cmd,
+			opts: opts
+				? {
+						...opts,
+						until:
+							opts.until instanceof RegExp || typeof opts.until === "object"
+								? toRegexSpec(opts.until as ParserPattern)
+								: opts.until,
+					}
+				: {},
+			// A query waits on the machine, so give it room beyond its own timeout
+			// before the bridge gives up on it.
+		}, { timeoutMs: (opts?.timeout ?? 5000) + 15_000 }),
+
 	setBusy: async (busy, label) => {
 		await request("machine:busy:set", { busy, label });
 	},
@@ -193,6 +409,28 @@ export const gsender = createGsenderClient();
 // helpers return a one-shot snapshot (Promise). The `subscribe*` helpers deliver
 // the current value immediately and then on every change, returning an
 // unsubscribe function.
+
+/**
+ * The most recent result from one of your parsers, or undefined if it has not
+ * matched yet this session. Reads a cache the host keeps, so it is synchronous
+ * and safe to call the moment your view mounts.
+ */
+export const getLastParsed = (id: string): ParsedResult | undefined =>
+	(getTopicSnapshot<Record<string, ParsedResult>>("parser") ?? {})[id];
+
+/**
+ * Notified when one of your parsers is rejected, rate limited, or quarantined.
+ * @returns unsubscribe function
+ */
+export const onParserError = (
+	callback: (error: ParserErrorEvent) => void,
+): (() => void) =>
+	subscribeEvents("parser", (payload) => {
+		const event = payload as ParserErrorEvent;
+		if (event?.reason && !Array.isArray((payload as ParsedResult)?.lines)) {
+			callback(event);
+		}
+	});
 
 /** One-shot snapshot of gSender's workspace state. */
 export const getWorkspaceState = <T = unknown>(): Promise<T> =>

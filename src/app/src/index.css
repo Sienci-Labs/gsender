@@ -360,3 +360,11 @@ body.reduced-motion * {
 	outline: none !important;
 	box-shadow: none !important;
 }
+
+/* @sienci/gviewer bakes `z-index: 9999` into its own viewcube.css (can't
+   patch node_modules), which now outranks the gcode editor's z-[8999]
+   (see GcodeEditor.tsx/GcodeEditorOverlay.tsx). Pin it below the editor
+   here instead. */
+.gViewer-viewcube {
+	z-index: 8990 !important;
+}
