@@ -1,6 +1,16 @@
 const { notarize } = require('@electron/notarize');
+const { execFileSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
+
+function isAppSigned(appPath) {
+    try {
+        execFileSync('codesign', ['--verify', appPath], { stdio: 'pipe' });
+        return true;
+    } catch {
+        return false;
+    }
+}
 
 exports.default = async function notarizing(context) {
     const {
@@ -26,6 +36,17 @@ exports.default = async function notarizing(context) {
     if (!fs.existsSync(appPath)) {
         console.error(`App bundle not found at: ${appPath}`);
         console.error('Skipping notarization');
+        return;
+    }
+
+    // electron-builder skips signing on pull requests unless CSC_FOR_PULL_REQUEST=true
+    if (process.env.GITHUB_EVENT_NAME === 'pull_request') {
+        console.log('Skipping notarization: pull request builds are unsigned');
+        return;
+    }
+
+    if (!isAppSigned(appPath)) {
+        console.log('Skipping notarization: app is not signed');
         return;
     }
 
