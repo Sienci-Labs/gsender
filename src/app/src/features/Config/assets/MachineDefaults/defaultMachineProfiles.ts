@@ -407,4 +407,16 @@ export default [
             height: 465,
         },
     },
+    {
+        id: 60,
+        company: '',
+        name: 'Voron Cascade',
+        type: '',
+        version: '',
+        mm: {
+            width: 260,
+            depth: 220,
+            height: 100,
+        },
+    },
 ];
