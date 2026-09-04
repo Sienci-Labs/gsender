@@ -261,8 +261,12 @@ export const StepThroughVisualizer = forwardRef<
 					opacity: 1,
 					// Stepping should land instantly, not tween behind the scrubber.
 					tweenMs: 0,
+					// Needs a gviewer build whose resolveBitColor covers every solid
+					// bit type (src/viewer/bit/bit.ts). Up to 0.1.32 only the drill read
+					// bit.color and the circle was hardcoded to its #c9883d orange,
+					// which sat right next to the #F08A4F toolpath colour.
 					colorSource: "custom",
-					color: WORKSHOP_VISUALIZER_COLORS.bit,
+					color: WORKSHOP_VISUALIZER_COLORS.stepMarker,
 				},
 				progress: {
 					mode: store.get("widgets.visualizer.hideProcessedLines", false)

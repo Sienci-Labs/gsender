@@ -73,6 +73,12 @@ export const WORKSHOP_VISUALIZER_COLORS = {
 	boundingBox: "#659dd2", // blue.300
 	machineBed: "#c27924", // orange.400
 	bit: "#79aad8", // blue.200
+	// The step-through modal's position marker. Deliberately outside
+	// TOOLPATH_COLOR_HEXES (see Visualizer/constants.ts): that palette walks the
+	// hue wheel in mid-tones, and 187° is its widest gap — between #42D7BA (168°)
+	// and #4296D7 (205°) — at a saturation and brightness neither reaches, so the
+	// marker can't be mistaken for a tool's toolpath.
+	stepMarker: "#00E5FF",
 };
 
 /**

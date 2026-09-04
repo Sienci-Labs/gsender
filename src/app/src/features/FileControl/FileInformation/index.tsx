@@ -14,7 +14,7 @@ import { useTypedSelector } from "app/hooks/useTypedSelector";
 import { convertMillisecondsToTimeStamp } from "app/lib/datetime";
 import cx from "classnames";
 import isElectron from "is-electron";
-import { Footprints } from "lucide-react";
+import { Footprints, Pencil } from "lucide-react";
 import pubsub from "pubsub-js";
 import { useEffect, useState } from "react";
 import { FiClock } from "react-icons/fi";
@@ -26,6 +26,18 @@ import { getRecentFiles } from "../utils/recentfiles";
 import Info from "./Info";
 import LoadingAnimation from "./LoadingAnimation";
 import Size from "./Size";
+
+// The editor and step-through buttons are the two ways into the loaded file, so
+// they share one look. Idle/active colours are kept out of the base string
+// because Tailwind runs with `important: true` — two competing `border-*`
+// classes would be resolved by stylesheet order, not by which one is listed
+// last here.
+const filePanelButtonClass =
+	"flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg border bg-white hover:bg-gray-100 dark:bg-surface-raised dark:hover:bg-surface-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+const filePanelButtonIdleClass =
+	"border-gray-300 text-gray-600 dark:border-outline dark:text-content-secondary";
+const filePanelButtonActiveClass =
+	"border-robin-500 text-robin-500 dark:border-robin-400 dark:text-robin-400";
 
 interface Props {
 	handleRecentFileUpload: (file: RecentFile, isRecentFile?: boolean) => void;
@@ -67,6 +79,11 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
 				"gcode-editor:toggle",
 				(_: string, isVisible: boolean) => {
 					setShowEditor(isVisible);
+					// Handled here rather than in the switch so every path that opens
+					// the editor closes the stepper, not just this widget's toggle.
+					if (isVisible) {
+						setShowStepper(false);
+					}
 				},
 			),
 			pubsub.subscribe("outline:start", () => {
@@ -98,6 +115,16 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
 			setShowStepper(false);
 		}
 	}, [fileLoaded, showStepper]);
+
+	// The editor and the stepper are alternative full-screen views of the same
+	// file and overlap on screen, so only one is shown at a time. Closing the
+	// stepper doesn't bring the editor back.
+	const handleStepperOpenChange = (open: boolean) => {
+		setShowStepper(open);
+		if (open) {
+			setShowEditor(false);
+		}
+	};
 
 	if (fileProcessing) {
 		return <LoadingAnimation />;
@@ -289,38 +316,54 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
 				<ToggleOutput />
 
 				{fileLoaded && (
-					<div className="flex flex-col items-center mr-1">
-						<span className="text-gray-500">Editor</span>
-						<Switch
-							checked={showEditor}
-							onChange={() => setShowEditor((prev) => !prev)}
-							position="vertical"
-							data-testid="show-gcode-editor"
-						/>
-					</div>
-				)}
-
-				{fileLoaded && (
 					<TooltipProvider>
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<button
-									type="button"
-									onClick={() => setShowStepper(true)}
-									data-testid="open-gcode-stepper"
-									aria-label="Open G-code step through"
-									className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg border border-gray-300 bg-white text-gray-600 hover:bg-gray-100 dark:border-outline dark:bg-surface-raised dark:text-content-secondary dark:hover:bg-surface-hover"
-								>
-									<Footprints className="h-5 w-5" />
-								</button>
-							</TooltipTrigger>
-							<TooltipContent>G-code Step Through</TooltipContent>
-						</Tooltip>
+						{/* Side by side while there's room; stacked once the widget gets
+						    narrow, where the row would otherwise squeeze the size readout. */}
+						<div className="flex flex-row gap-2 max-lg:flex-col portrait:flex-col">
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<button
+										type="button"
+										onClick={() => setShowEditor((prev) => !prev)}
+										data-testid="show-gcode-editor"
+										aria-label="Toggle G-code editor"
+										aria-pressed={showEditor}
+										className={cx(
+											filePanelButtonClass,
+											showEditor
+												? filePanelButtonActiveClass
+												: filePanelButtonIdleClass,
+										)}
+									>
+										<Pencil className="h-5 w-5" />
+									</button>
+								</TooltipTrigger>
+								<TooltipContent>G-code Editor</TooltipContent>
+							</Tooltip>
+
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<button
+										type="button"
+										onClick={() => handleStepperOpenChange(true)}
+										data-testid="open-gcode-stepper"
+										aria-label="Open G-code step through"
+										className={cx(
+											filePanelButtonClass,
+											filePanelButtonIdleClass,
+										)}
+									>
+										<Footprints className="h-5 w-5" />
+									</button>
+								</TooltipTrigger>
+								<TooltipContent>G-code Step Through</TooltipContent>
+							</Tooltip>
+						</div>
 					</TooltipProvider>
 				)}
 			</div>
 
-			<GcodeStepper open={showStepper} onOpenChange={setShowStepper} />
+			<GcodeStepper open={showStepper} onOpenChange={handleStepperOpenChange} />
 		</div>
 	);
 };
