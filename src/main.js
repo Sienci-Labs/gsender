@@ -670,24 +670,36 @@ const main = () => {
 				}
 			});
 
-			ipcMain.on("open-plugin-import-dialog", async () => {
-				try {
-					const FULL_PATH = await openDirectoryDialog();
-					const assetsPath = path.join(FULL_PATH, "ui", "assets");
-					const allFiles = fs.readdirSync(assetsPath);
-					const indexFile = allFiles.filter(
-						(file) =>
-							path.extname(file).toLowerCase() === ".js" &&
-							file.includes("index"),
-					)[0];
+			// Pick a plugin to install: either a folder or a .zip. Windows and
+			// Linux cannot offer both in one native dialog, hence the mode.
+			// Always replies, so a cancel or failure never leaves the install
+			// wizard waiting on a message that never comes.
+			ipcMain.on("open-plugin-source-dialog", async (_event, mode) => {
+				const reply = (payload) =>
+					window.webContents.send("returned-plugin-source", payload);
 
-					window.webContents.send(
-						"returned-plugin-directory-data",
-						FULL_PATH,
-						path.join(assetsPath, indexFile),
-					);
+				try {
+					const gSenderWindow = windowManager.getWindow();
+					const isZip = mode === "zip";
+					const result = await dialog.showOpenDialog(gSenderWindow, {
+						title: isZip
+							? "Select a plugin .zip file"
+							: "Select a plugin folder",
+						properties: [isZip ? "openFile" : "openDirectory"],
+						filters: isZip
+							? [{ name: "Plugin Archives", extensions: ["zip"] }]
+							: undefined,
+					});
+
+					if (!result || result.canceled || result.filePaths.length === 0) {
+						reply({ canceled: true });
+						return;
+					}
+
+					reply({ path: result.filePaths[0] });
 				} catch (e) {
-					log.error(`Caught error in open-plugin-import-dialog - ${e}`);
+					log.error(`Caught error in open-plugin-source-dialog - ${e}`);
+					reply({ error: String(e?.message || e) });
 				}
 			});
 
@@ -752,8 +764,9 @@ const main = () => {
 				window.webContents.setZoomFactor(value);
 			});
 
-			//Handle app restart with remote settings
-			ipcMain.on("remoteMode-restart", (event, headlessSettings) => {
+			// Relaunch the app. Shared by remote-mode changes and by the plugin
+			// install wizard, which needs a restart for the new mount routes.
+			const restartApp = () => {
 				let didRestart = false;
 				const finishRestart = () => {
 					if (didRestart) return;
@@ -778,11 +791,22 @@ const main = () => {
 						window.setKiosk(false);
 						window.setFullScreen(false);
 					} catch (err) {
-						log.error(`Failed to leave kiosk/fullscreen before restart: ${err}`);
+						log.error(
+							`Failed to leave kiosk/fullscreen before restart: ${err}`,
+						);
 					}
 				} else {
 					finishRestart();
 				}
+			};
+
+			//Handle app restart with remote settings
+			ipcMain.on("remoteMode-restart", () => {
+				restartApp();
+			});
+
+			ipcMain.on("app-restart", () => {
+				restartApp();
 			});
 		} catch (err) {
 			log.error(err);

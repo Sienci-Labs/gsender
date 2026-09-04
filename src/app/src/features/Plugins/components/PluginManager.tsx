@@ -1,21 +1,26 @@
-/** biome-ignore-all lint/suspicious/noExplicitAny: <> */
-/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
 import api from "app/api";
 import { Button } from "app/components/Button";
-import { Confirm } from "app/components/ConfirmationDialog/ConfirmationDialogLib";
 import Page from "app/components/Page";
 import Switch from "app/components/Switch";
-import { Tooltip } from "app/components/Tooltip"; // Ensure Tooltip exists
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "app/components/shadcn/AlertDialog";
+import { Badge } from "app/components/shadcn/Badge";
+import { Tooltip } from "app/components/Tooltip";
 import { toast } from "app/lib/toaster";
 import isElectron from "is-electron";
-import { isEmpty } from "lodash";
-import { useEffect, useState } from "react";
+import { Trash2 } from "lucide-react";
+import { useState } from "react";
 import { usePlugins } from "../hooks/usePlugins";
-import { SDK_SCAN_SPECIFIERS } from "../types";
-import {
-	buildGrantFromScan,
-	mergeManifestParserGrant,
-} from "../utils/capabilities";
+import type { PluginRecord } from "../types";
+import InstallPluginDialog from "./InstallPluginDialog";
 
 const PluginManager = () => {
 	const {
@@ -28,9 +33,13 @@ const PluginManager = () => {
 		openPluginsDir,
 	} = usePlugins();
 	const [restartRequired, setRestartRequired] = useState(false);
-	const [importData, setImportData] = useState<{
-		directory?: string;
-	}>({});
+	const [showInstall, setShowInstall] = useState(false);
+	const [pendingRemoval, setPendingRemoval] = useState<PluginRecord | null>(
+		null,
+	);
+	const [removing, setRemoving] = useState(false);
+
+	const canOpenDir = isElectron();
 
 	const handleToggle = async (id: string, enabled: boolean) => {
 		const result = await setEnabled(id, enabled);
@@ -38,8 +47,6 @@ const PluginManager = () => {
 			setRestartRequired(true);
 		}
 	};
-
-	const canOpenDir = isElectron();
 
 	const handleOpenDir = async () => {
 		try {
@@ -49,173 +56,33 @@ const PluginManager = () => {
 		}
 	};
 
-	const handleImportPlugin = () => {
-		if (isElectron()) {
-			(window as any).ipcRenderer?.send("open-plugin-import-dialog");
-		}
+	const handleRestart = () => {
+		(window as unknown as { ipcRenderer?: any }).ipcRenderer?.send(
+			"app-restart",
+		);
 	};
 
-	useEffect(() => {
-		if (isElectron()) {
-			(window as any).ipcRenderer.on(
-				"returned-plugin-directory-data",
-				async (_: any, directory: string, indexFile: string) => {
-					const res = await api.plugins.readImportedManifest(directory);
-					const { isValid, plugin } = res.data;
-
-					if (!isValid) {
-						Confirm({
-							title: "Plugin Error",
-							content:
-								"The imported plugin does not have a valid manifest. Please make sure the plugin is created for gSender.",
-							confirmLabel: "Ok",
-						});
-						return;
-					}
-
-					// do plugin checks
-					const result = await api.plugins.scanPluginForSDKUsage(
-						indexFile,
-						SDK_SCAN_SPECIFIERS,
-					);
-					if (result.status !== 200) {
-						console.error(result.data.msg);
-						toast.error("Oops. Something went wrong.", {
-							position: "bottom-right",
-						});
-						return;
-					}
-
-					const { capabilities, hasDynamicImport } = result.data;
-
-					// figure out which clients they imported
-					const scanned = buildGrantFromScan(capabilities);
-					// Manifest parsers involve no SDK import, so the bundle scan
-					// above cannot see them — fold them in explicitly.
-					const { permissions, wire } = mergeManifestParserGrant(
-						scanned,
-						plugin.parsers,
-					);
-					const declaredParsers = Array.isArray(plugin.parsers)
-						? plugin.parsers
-						: [];
-					const parserErrors = Array.isArray(plugin.parserErrors)
-						? plugin.parserErrors
-						: [];
-
-					Confirm({
-						title: "Plugin Permissions",
-						content: (
-							<div className="flex flex-col h-full">
-								{hasDynamicImport && (
-									<>
-										<p className="font-bold">
-											The actions this plugin runs cannot be verified.
-										</p>
-										<p className="font-bold">
-											Not all permissions needed may be listed here.
-										</p>
-										<p className="font-bold text-amber-500">
-											Please exercise caution.
-										</p>
-										<hr></hr>
-									</>
-								)}
-								{permissions.length > 0 ? (
-									<>
-										<p>
-											The plugin {plugin.name} needs the following permissions:
-										</p>
-										<ul>
-											{permissions.map((permission) => (
-												<li key={permission}>- {permission}</li>
-											))}
-										</ul>
-									</>
-								) : (
-									<p>The plugin {plugin.name} does not need any permissions.</p>
-								)}
-								{declaredParsers.length > 0 && (
-									<>
-										<hr />
-										<p>
-											It watches your machine's responses for these patterns:
-										</p>
-										<ul>
-											{declaredParsers.map((parser: any) => (
-												<li key={parser.id}>
-													- {parser.label || parser.id}{" "}
-													<code className="text-xs">
-														{[parser.begin, parser.match, parser.end]
-															.filter(Boolean)
-															.map((p: any) =>
-																typeof p === "string" ? p : p?.source,
-															)
-															.join("  …  ")}
-														{parser.until ? `  …  ${parser.until}` : ""}
-													</code>
-												</li>
-											))}
-										</ul>
-									</>
-								)}
-								{parserErrors.length > 0 && (
-									<>
-										<p className="font-bold text-amber-500">
-											Some of this plugin's parsers were rejected and will not
-											run:
-										</p>
-										<ul className="text-amber-500 text-xs">
-											{parserErrors.map((error: string) => (
-												<li key={error}>- {error}</li>
-											))}
-										</ul>
-									</>
-								)}
-								<p>Press Authorize to continue importing this plugin.</p>
-							</div>
-						),
-						confirmLabel: "Authorize",
-						cancelLabel: "Cancel",
-						onConfirm: async () => {
-							// write used permissions to manifest
-							api.plugins.writePermissions(directory, wire).then((res) => {
-								if (res.status !== 200) {
-									console.error(res.data.error);
-									toast.error(
-										"Failed to write permissions for plugin. Please try again.",
-										{
-											position: "bottom-right",
-										},
-									);
-								} else {
-									setImportData({ directory });
-								}
-							});
-						},
-					});
-				},
-			);
+	const handleUninstall = async () => {
+		if (!pendingRemoval) {
+			return;
 		}
-	}, []);
 
-	useEffect(() => {
-		if (!isEmpty(importData)) {
-			const { directory } = importData;
-			// import the directory to the plugins directory
-			api.plugins.importPlugin(pluginsDir, directory).then((res) => {
-				if (res.status !== 200) {
-					console.error(res.data.error);
-					toast.error("Failed to import plugin. Please try again.", {
-						position: "bottom-right",
-					});
-				} else {
-					toast.success("Plugin imported.");
-					refresh();
-				}
-			});
+		setRemoving(true);
+		try {
+			await api.plugins.uninstall(pendingRemoval.id);
+			toast.success(`${pendingRemoval.name} was removed.`);
+			setRestartRequired(true);
+			setPendingRemoval(null);
+			await refresh();
+		} catch (err) {
+			const message =
+				(err as { response?: { data?: { error?: string } } })?.response?.data
+					?.error ?? "Could not remove the plugin. Please try again.";
+			toast.error(message, { position: "bottom-right" });
+		} finally {
+			setRemoving(false);
 		}
-	}, [importData]);
+	};
 
 	return (
 		<Page
@@ -246,19 +113,27 @@ const PluginManager = () => {
 				<p className="text-sm text-gray-500 dark:text-content-muted">
 					Each plugin is a folder containing{" "}
 					<code className="text-xs">gsender-plugin.json</code> and a{" "}
-					<code className="text-xs">ui/</code> build output. After installing or
-					enabling a plugin, restart gSender for mount routes to apply.
+					<code className="text-xs">ui/</code> build output. After installing,
+					removing or enabling a plugin, restart gSender for mount routes to
+					apply.
 				</p>
 
 				{restartRequired && (
-					<div className="rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-100">
-						Restart gSender to apply plugin changes. Mount routes are registered
-						when the server starts.
+					<div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-100">
+						<span>
+							Restart gSender to apply plugin changes. Mount routes are
+							registered when the server starts.
+						</span>
+						{isElectron() && (
+							<Button onClick={handleRestart} size="sm">
+								Restart now
+							</Button>
+						)}
 					</div>
 				)}
 
 				<div className="flex gap-2">
-					<Button onClick={handleImportPlugin}>Import Plugin</Button>
+					<Button onClick={() => setShowInstall(true)}>Install Plugin</Button>
 					<Button onClick={refresh} disabled={loading}>
 						Refresh
 					</Button>
@@ -299,8 +174,34 @@ const PluginManager = () => {
 										Slots: {plugin.contributions.map((c) => c.slot).join(", ")}
 									</p>
 								)}
+								{plugin.permissions?.length > 0 && (
+									<div className="mt-2 flex flex-wrap gap-1">
+										{plugin.permissions.map((permission) => (
+											<Badge
+												key={permission}
+												variant="secondary"
+												className="text-[10px]"
+											>
+												{permission}
+											</Badge>
+										))}
+									</div>
+								)}
 							</div>
-							<div className="mt-4 flex justify-end">
+							<div className="mt-4 flex items-center justify-between">
+								<Tooltip content={`Remove ${plugin.name} from this machine`}>
+									<div>
+										<Button
+											variant="outline"
+											size="sm"
+											onClick={() => setPendingRemoval(plugin)}
+											icon={<Trash2 className="h-4 w-4" />}
+											className="border-red-500 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+										>
+											Uninstall
+										</Button>
+									</div>
+								</Tooltip>
 								<Tooltip
 									content={
 										plugin.enabled
@@ -325,6 +226,48 @@ const PluginManager = () => {
 					))}
 				</div>
 			</div>
+
+			<InstallPluginDialog
+				show={showInstall}
+				onClose={() => setShowInstall(false)}
+				onInstalled={refresh}
+				onRestartRequired={() => setRestartRequired(true)}
+				pluginsDir={pluginsDir}
+			/>
+
+			<AlertDialog
+				open={Boolean(pendingRemoval)}
+				onOpenChange={(open) => {
+					if (!open && !removing) {
+						setPendingRemoval(null);
+					}
+				}}
+			>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>Remove {pendingRemoval?.name}?</AlertDialogTitle>
+						<AlertDialogDescription>
+							This deletes the plugin folder from your plugins directory. Any
+							data it stored is kept, but the plugin itself will be gone until
+							you install it again. gSender will need a restart afterwards.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel disabled={removing}>Cancel</AlertDialogCancel>
+						<AlertDialogAction
+							onClick={(event) => {
+								// Keep the dialog up while the request is in flight so the
+								// user sees it finish rather than a flash of nothing.
+								event.preventDefault();
+								handleUninstall();
+							}}
+							disabled={removing}
+						>
+							{removing ? "Removing..." : "Uninstall"}
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</Page>
 	);
 };

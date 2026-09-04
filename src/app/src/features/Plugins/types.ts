@@ -67,6 +67,97 @@ export type PluginsResponse = {
 	plugins: PluginRecord[];
 };
 
+// ---------------------------------------------------------------------------
+// Guided install
+// ---------------------------------------------------------------------------
+
+// Where a plugin comes from. Windows and Linux cannot offer a folder and a
+// file in one native dialog, so the user picks which.
+export type PluginSourceMode = "dir" | "zip";
+
+// What installing this plugin would do to what is already on disk.
+// "unknown" means one of the two versions is not valid semver.
+export type PluginInstallKind =
+	| "new"
+	| "update"
+	| "downgrade"
+	| "reinstall"
+	| "unknown";
+
+export type PluginInstallLogEntry = {
+	level: "info" | "warn" | "error";
+	message: string;
+	at: string;
+};
+
+export type PluginEngineCheck = {
+	// false when there is no engine field, or its range could not be parsed.
+	checked: boolean;
+	satisfied: boolean;
+	unreadable?: boolean;
+	appVersion?: string;
+	range: string | null;
+};
+
+// Everything the review step needs, computed server-side against a staged copy.
+export type PluginInstallPlan = {
+	kind: PluginInstallKind;
+	plugin: {
+		id: string;
+		name: string;
+		description: string;
+		version: string;
+		engine: string | null;
+		contributions: PluginContribution[];
+	};
+	installedVersion: string | null;
+	incomingVersion: string;
+	// Everything that will be granted: the union of what the bundle scan proved
+	// and what the manifest declares.
+	permissions: PluginPermissionsType[];
+	// The subset the static scan actually found in the plugin's code.
+	verifiedPermissions: PluginPermissionsType[];
+	// Declared by the manifest but not corroborated by the code we could read,
+	// e.g. because the plugin bundles the SDK instead of importing it.
+	declaredOnlyPermissions: PluginPermissionsType[];
+	capabilities: PluginCapabilitiesWire;
+	// Manifest-declared parsers, surfaced here for a future review-step UI.
+	parsers: unknown[];
+	parserErrors: string[];
+	// False when no bundle could be found to scan.
+	scanned: boolean;
+	// True when the plugin's SDK use could not be fully determined, so the
+	// permission list above may be incomplete.
+	unverifiable: boolean;
+	engine: PluginEngineCheck;
+	// Set when a copy in another plugins root would take priority over this one.
+	shadowedBy: string | null;
+	sourcePath: string;
+	targetDir: string;
+};
+
+export type PluginInstallPrepareResponse = {
+	ok: boolean;
+	sessionId?: string;
+	plan?: PluginInstallPlan;
+	error?: string;
+	manifestErrors?: string[];
+	log?: PluginInstallLogEntry[];
+};
+
+export type PluginInstallCommitResponse = {
+	ok: boolean;
+	error?: string;
+	log?: PluginInstallLogEntry[];
+	pluginId?: string;
+	targetDir?: string;
+	replaced?: boolean;
+	restartRequired?: boolean;
+	// After a failed swap: whether the previous version was put back.
+	restored?: boolean;
+	backupDir?: string | null;
+};
+
 export type PluginPermissionsType =
 	| "machine:read"
 	| "machine:write"
@@ -219,153 +310,3 @@ export type PluginBridgeUpdate = {
 };
 
 export const PLUGIN_BRIDGE_CHANNEL = "gsender:plugin-bridge";
-
-export const permissionsMap = new Map<string, PluginPermissionsType[]>([
-	[
-		"gsender",
-		[
-			"machine:read",
-			"machine:write",
-			"machine:parse",
-			"machine:query",
-			"visualizer:load",
-			"workspace:read",
-			"redux:read",
-		],
-	],
-	["machine", ["machine:read", "machine:write", "machine:parse", "machine:query"]],
-	["registerParser", ["machine:parse"]],
-	["unregisterParser", ["machine:parse"]],
-	["onParsed", ["machine:parse"]],
-	["useParsed", ["machine:parse"]],
-	["onLine", ["machine:parse"]],
-	["getLastParsed", ["machine:parse"]],
-	["onParserError", ["machine:parse"]],
-	["query", ["machine:query", "machine:parse"]],
-	["gcode", ["visualizer:load"]],
-	["viewer", ["viewer:camera", "viewer:draw"]],
-	["workspace", ["workspace:read"]],
-	["getWorkspaceState", ["workspace:read"]],
-	["subscribeWorkspaceState", ["workspace:read"]],
-	["redux", ["redux:read"]],
-	["getReduxState", ["redux:read"]],
-	["getSelector", ["redux:read"]],
-	["useWorkspaceState", ["workspace:read"]],
-	["subscribeSelector", ["redux:read"]],
-	["useTypedSelector", ["redux:read"]],
-	["storage", ["storage"]],
-]);
-
-export const requestTypesMap = new Map<string, PluginBridgeRequestType[]>([
-	[
-		"*require-whole-module*",
-		[
-			"machine:get:context",
-			"machine:command",
-			"machine:parser:register",
-			"machine:parser:unregister",
-			"machine:query",
-			"machine:busy:set",
-			"gcode:load:to:visualizer",
-			"workspace:get:state",
-			"redux:get:state",
-			"viewer:screen-to-world",
-			"viewer:world-to-screen",
-			"viewer:camera:set",
-			"viewer:camera:lock-rotate",
-			"viewer:pick:arm",
-			"viewer:pick:disarm",
-			"viewer:overlay:set",
-		],
-	],
-	[
-		"gsender",
-		[
-			"machine:get:context",
-			"machine:command",
-			"machine:parser:register",
-			"machine:parser:unregister",
-			"machine:query",
-			"machine:busy:set",
-			"gcode:load:to:visualizer",
-			"workspace:get:state",
-			"redux:get:state",
-			"viewer:screen-to-world",
-			"viewer:world-to-screen",
-			"viewer:camera:set",
-			"viewer:camera:lock-rotate",
-			"viewer:pick:arm",
-			"viewer:pick:disarm",
-			"viewer:overlay:set",
-		],
-	],
-	[
-		"machine",
-		[
-			"machine:get:context",
-			"machine:command",
-			"machine:parser:register",
-			"machine:parser:unregister",
-			"machine:query",
-			"machine:busy:set",
-		],
-	],
-	["registerParser", ["machine:parser:register"]],
-	["unregisterParser", ["machine:parser:unregister"]],
-	// onParsed/onLine register an anonymous parser under the hood, so they need
-	// the register/unregister request types too, not just the topic.
-	["onLine", ["machine:parser:register", "machine:parser:unregister"]],
-	["query", ["machine:query"]],
-	["gcode", ["gcode:load:to:visualizer"]],
-	[
-		"viewer",
-		[
-			"viewer:screen-to-world",
-			"viewer:world-to-screen",
-			"viewer:camera:set",
-			"viewer:camera:lock-rotate",
-			"viewer:pick:arm",
-			"viewer:pick:disarm",
-			"viewer:overlay:set",
-		],
-	],
-	["workspace", ["workspace:get:state"]],
-	["getWorkspaceState", ["workspace:get:state"]],
-	["redux", ["redux:get:state"]],
-	["getReduxState", ["redux:get:state"]],
-	["getSelector", ["redux:get:state"]],
-	[
-		"storage",
-		[
-			"storage:get",
-			"storage:set",
-			"storage:delete",
-			"storage:get:all",
-			"storage:set:all",
-			"storage:clear",
-		],
-	],
-]);
-
-export const topicsMap = new Map<string, PluginBridgeTopic>([
-	["subscribeWorkspaceState", "workspace"],
-	["subscribeSelector", "redux"],
-	["useWorkspaceState", "workspace"],
-	["useTypedSelector", "redux"],
-	["onParsed", "parser"],
-	["useParsed", "parser"],
-	["onLine", "parser"],
-	["getLastParsed", "parser"],
-	["onParserError", "parser"],
-	["registerParser", "parser"],
-	["viewer", "viewer"],
-	["useVisualizerPick", "viewer"],
-]);
-
-// the import specifiers the permission scanner looks for in a plugin's built bundle.
-// must stay in sync with SDK_SPECIFIERS in the sdk's config
-export const SDK_SCAN_SPECIFIERS = [
-	"@sienci/gsender-plugin-sdk",
-	"@sienci/gsender-plugin-sdk/react",
-	"@sienci/gsender-plugin-sdk/viewer",
-];
