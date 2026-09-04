@@ -406,7 +406,8 @@ export default [
             depth: 450,
             height: 465,
         },
-    },    {
+    },
+    {
         id: 60,
         company: '',
         name: 'Voron Cascade',
