@@ -22,6 +22,7 @@ export function useAutoSpinWizard() {
 			title: "AutoSpin",
 			image: AutoSpinIcon,
 			validations: [...validations],
+			helpUrl: "https://resources.sienci.com/view/as-er-collets/",
 			subWizards: [
 				{
 					id: "autospin-config",
