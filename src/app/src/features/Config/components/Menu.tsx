@@ -1,7 +1,7 @@
 import { useSettings } from "app/features/Config/utils/SettingsContext.tsx";
 import cn from "classnames";
 import type React from "react";
-import { type MouseEventHandler, useEffect } from "react";
+import type { MouseEventHandler } from "react";
 import type { IconType } from "react-icons";
 import type { SettingsMenuSection } from "../assets/SettingsMenu";
 
@@ -103,11 +103,6 @@ export function Menu({
 	activeSubsection,
 }: MenuProps) {
 	const { settingsFilter } = useSettings();
-
-	useEffect(() => {
-		const index = Number(activeSection.split("-")[2]);
-		onClick(null, index);
-	}, []);
 
 	const originalMenuLength = menu.length;
 

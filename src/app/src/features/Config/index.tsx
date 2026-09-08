@@ -26,7 +26,12 @@ import type {
 } from "./assets/SettingsMenu";
 import { Menu } from "./components/Menu";
 import { Section } from "./components/Section";
-import { getScrollPosition, setScrollPosition } from "./utils/scrollMemory";
+import {
+	getLastViewedConfigId,
+	getScrollPosition,
+	setLastViewedConfigId,
+	setScrollPosition,
+} from "./utils/scrollMemory";
 
 export function Config() {
 	const dispatch = useDispatch();
@@ -36,7 +41,6 @@ export function Config() {
 		threshold: 0.2,
 	});
 
-	const configScrollRef = React.useRef<HTMLDivElement | null>(null);
 	const eepromScrollRef = React.useRef<HTMLDivElement | null>(null);
 
 	useEffect(() => {
@@ -59,22 +63,23 @@ export function Config() {
 		(state: RootState) => state.controller.workflow.state,
 	);
 
-	const [visibleSection, setVisibleSection] = React.useState<string>(
-		`h-section-${store.get("workspace.lastViewedConfigLocation")}`,
-	);
+	const [visibleSection, setVisibleSection] = React.useState<string>("");
 
 	const [activeTab, setActiveTab] = React.useState("config");
 
 	const [visibleSubsection, setVisibleSubsection] = React.useState<string>("");
 
-	function setInView(inView: any, entry: any) {
+	function handleSectionInView(inView: any, entry: any) {
 		if (inView) {
-			store.set(
-				"workspace.lastViewedConfigLocation",
-				entry.target.getAttribute("id").split("-")[2],
-			);
+			const sectionIndex = entry.target.getAttribute("id").split("-")[2];
+			setLastViewedConfigId(`section-${sectionIndex}`);
 			setVisibleSection(entry.target.getAttribute("id"));
 		}
+	}
+
+	function handleSubsectionInView(id: string) {
+		setLastViewedConfigId(id);
+		setVisibleSubsection(id);
 	}
 
 	useEffect(() => {
@@ -84,13 +89,38 @@ export function Config() {
 	}, []);
 
 	useEffect(() => {
-		const container =
-			activeTab === "config" ? configScrollRef.current : eepromScrollRef.current;
+		if (activeTab !== "eeprom") {
+			return;
+		}
+		const container = eepromScrollRef.current;
 		if (!container) {
 			return;
 		}
 		const timeoutId = setTimeout(() => {
-			container.scrollTop = getScrollPosition(activeTab as "config" | "eeprom");
+			container.scrollTop = getScrollPosition("eeprom");
+		}, 50);
+		return () => clearTimeout(timeoutId);
+	}, [activeTab]);
+
+	useEffect(() => {
+		if (activeTab !== "config") {
+			return;
+		}
+		const targetId = getLastViewedConfigId();
+		if (!targetId) {
+			return;
+		}
+		const timeoutId = setTimeout(() => {
+			const target = document.getElementById(targetId);
+			if (!target) {
+				return;
+			}
+			target.scrollIntoView({ behavior: "instant" });
+			if (targetId.includes("-sub-")) {
+				setVisibleSubsection(targetId);
+			} else {
+				setVisibleSection(`h-${targetId}`);
+			}
 		}, 50);
 		return () => clearTimeout(timeoutId);
 	}, [activeTab]);
@@ -205,20 +235,14 @@ export function Config() {
 					>
 						<div
 							className="px-10 max-xl:px-2 gap-8 pt-4 mb-24 box-border flex flex-col overflow-y-scroll relative"
-							ref={(node) => {
-								configScrollRef.current = node;
-								inViewRef(node);
-							}}
-							onScroll={(e) =>
-								setScrollPosition("config", e.currentTarget.scrollTop)
-							}
+							ref={inViewRef}
 						>
 							<EEPROMNotConnectedWarning connected={connected} />
 							{settings.map((item, index) => {
 								return (
 									<InView
 										key={`IV-section-${index}`}
-										onChange={setInView}
+										onChange={handleSectionInView}
 										threshold={0}
 										rootMargin="0px 0px -75% 0px"
 										className={"bg-red-500"}
@@ -235,7 +259,7 @@ export function Config() {
 													ref={ref}
 													connected={connected}
 													wizard={item.wizard}
-													onSubsectionInView={setVisibleSubsection}
+													onSubsectionInView={handleSubsectionInView}
 												/>
 											);
 										}}
@@ -263,7 +287,6 @@ export function Config() {
 								return (
 									<InView
 										key={`IV-section-${index}`}
-										onChange={setInView}
 										threshold={0}
 										rootMargin="0px 0px -75% 0px"
 										className={"bg-red-500"}
