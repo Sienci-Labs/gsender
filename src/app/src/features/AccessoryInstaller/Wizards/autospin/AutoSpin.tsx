@@ -43,6 +43,12 @@ export function useAutoSpinWizard() {
 									title: "Commands to be sent",
 									fill: true,
 								},
+								{
+									type: "link",
+									title: "Need help?",
+									content: "Follow along in our",
+									url: "https://resources.sienci.com/view/as-er-collets/",
+								},
 							],
 						},
 						{
@@ -54,6 +60,12 @@ export function useAutoSpinWizard() {
 									type: "image",
 									content: PlaceholderImage,
 									title: "AutoSpin Dial",
+								},
+								{
+									type: "link",
+									title: "Need help?",
+									content: "Follow along in our",
+									url: "https://resources.sienci.com/view/as-er-collets/",
 								},
 							],
 						},
