@@ -248,7 +248,7 @@ const SurfacingTool = () => {
 							</p>
 						)}
 					</InputArea>
-					<InputArea label="Bit Diameter & Tool">
+					<InputArea label="Bit Diameter & Tool Number (optional)">
 						<div className="grid grid-cols-[3fr_10px_3fr] gap-2 col-span-3">
 							<Tooltip
 								content={`Default is ${convertedDefaultSurfacingState.bitDiameter} ${units}`}
