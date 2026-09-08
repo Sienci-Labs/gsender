@@ -9,6 +9,7 @@ import { ValidationBanner } from "./ValidationBanner";
 interface WizardLandingProps {
 	title: string;
 	image?: string;
+	invertImageInDarkMode?: boolean;
 	subWizards: SubWizard[];
 	onSelectSubWizard: (subWizard: SubWizard) => void;
 	onBack?: () => void;
@@ -19,6 +20,7 @@ interface WizardLandingProps {
 export function WizardLanding({
 	title,
 	image,
+	invertImageInDarkMode,
 	subWizards,
 	onSelectSubWizard,
 	onBack,
@@ -127,7 +129,7 @@ export function WizardLanding({
 					<img
 						alt="Wizard image"
 						src={image ?? DefaultImage}
-						className="rounded-2xl"
+						className={`rounded-2xl${invertImageInDarkMode ? " dark:invert" : ""}`}
 					/>
 				</div>
 

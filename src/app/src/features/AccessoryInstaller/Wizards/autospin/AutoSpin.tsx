@@ -21,6 +21,7 @@ export function useAutoSpinWizard() {
 			id: "autospin",
 			title: "AutoSpin",
 			image: AutoSpinIcon,
+			invertImageInDarkMode: true,
 			validations: [...validations],
 			helpUrl: "https://resources.sienci.com/view/as-er-collets/",
 			subWizards: [
