@@ -12,6 +12,12 @@ interface MenuProps {
 		n: number,
 	) => void;
 	activeSection: string;
+	onSubsectionClick?: (
+		e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+		sectionIndex: number,
+		subIndex: number,
+	) => void;
+	activeSubsection?: string;
 }
 
 interface MenuItemProps {
@@ -20,6 +26,12 @@ interface MenuItemProps {
 	onClick?: MouseEventHandler<HTMLButtonElement>;
 	icon: IconType;
 	available: number;
+}
+
+interface SubMenuItemProps {
+	label: string;
+	active?: boolean;
+	onClick?: MouseEventHandler<HTMLButtonElement>;
 }
 
 export function tallySettings(settings: SettingsMenuSection) {
@@ -60,7 +72,30 @@ function MenuItem({ label, active, onClick, icon, available }: MenuItemProps) {
 	);
 }
 
-export function Menu({ menu, onClick, activeSection }: MenuProps) {
+function SubMenuItem({ label, active, onClick }: SubMenuItemProps) {
+	return (
+		<button
+			className={cn(
+				"flex min-h-6 items-center justify-start gap-2 pl-11 pr-4 py-1 flex-1 border-l-2 border-transparent hover:border-l-blue-500 hover:text-blue-500 font-sans text-sm text-gray-600 dark:text-content-primary",
+				{
+					"text-blue-500 font-italic bg-blue-200 bg-opacity-30 border-l-blue-400":
+						active,
+				},
+			)}
+			onClick={onClick}
+		>
+			{label}
+		</button>
+	);
+}
+
+export function Menu({
+	menu,
+	onClick,
+	activeSection,
+	onSubsectionClick,
+	activeSubsection,
+}: MenuProps) {
 	const { settingsFilter } = useSettings();
 
 	useEffect(() => {
@@ -93,14 +128,38 @@ export function Menu({ menu, onClick, activeSection }: MenuProps) {
 				const availableSettings = tallySettings(item);
 				const active = `h-section-${index}` === activeSection;
 				return (
-					<MenuItem
-						key={`menu-item-${index}`}
-						available={availableSettings}
-						label={item.label}
-						active={active}
-						icon={item.icon}
-						onClick={(e) => onClick(e, index)}
-					/>
+					<div key={`menu-item-${index}`} className="flex flex-col">
+						<MenuItem
+							available={availableSettings}
+							label={item.label}
+							active={active}
+							icon={item.icon}
+							onClick={(e) => onClick(e, index)}
+						/>
+						{availableSettings > 0 && (
+							<div className="flex flex-col max-xl:hidden">
+								{item.settings.map((subsection, subIndex) => {
+									if (
+										!subsection.label ||
+										subsection.settings.length === 0
+									) {
+										return null;
+									}
+									const subsectionId = `section-${index}-sub-${subIndex}`;
+									return (
+										<SubMenuItem
+											key={subsectionId}
+											label={subsection.label}
+											active={subsectionId === activeSubsection}
+											onClick={(e) =>
+												onSubsectionClick?.(e, index, subIndex)
+											}
+										/>
+									);
+								})}
+							</div>
+						)}
+					</div>
 				);
 			})}
 		</div>
