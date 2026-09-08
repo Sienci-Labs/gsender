@@ -112,4 +112,37 @@ describe("Surfacing Output", () => {
 			]),
 		);
 	});
+
+	it("should not include a tool change when toolNumber is 0", () => {
+		const gcodeGenerator = new Generator({
+			surfacing: {
+				...defaultState.widgets.surfacing,
+				toolNumber: 0,
+			},
+			units: METRIC_UNITS,
+		});
+
+		const gcode = gcodeGenerator.generate({ returnArray: true }) as string[];
+
+		expect(gcode.some((line: string) => line.startsWith("M6"))).toBe(false);
+	});
+
+	it("should insert M6 Tx immediately before the spindle start when toolNumber is above 0", () => {
+		const gcodeGenerator = new Generator({
+			surfacing: {
+				...defaultState.widgets.surfacing,
+				toolNumber: 3,
+			},
+			units: METRIC_UNITS,
+		});
+
+		const gcode = gcodeGenerator.generate({ returnArray: true });
+
+		const toolChangeIndex = gcode.indexOf("M6 T3");
+		const spindleStartIndex = gcode.indexOf("M3 S17000");
+
+		expect(toolChangeIndex).toBeGreaterThan(-1);
+		expect(spindleStartIndex).toBeGreaterThan(-1);
+		expect(toolChangeIndex).toBe(spindleStartIndex - 1);
+	});
 });
