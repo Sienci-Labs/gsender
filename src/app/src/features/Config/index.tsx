@@ -26,6 +26,7 @@ import type {
 } from "./assets/SettingsMenu";
 import { Menu } from "./components/Menu";
 import { Section } from "./components/Section";
+import { getScrollPosition, setScrollPosition } from "./utils/scrollMemory";
 
 export function Config() {
 	const dispatch = useDispatch();
@@ -34,6 +35,9 @@ export function Config() {
 	const { ref: inViewRef } = useInView({
 		threshold: 0.2,
 	});
+
+	const configScrollRef = React.useRef<HTMLDivElement | null>(null);
+	const eepromScrollRef = React.useRef<HTMLDivElement | null>(null);
 
 	useEffect(() => {
 		const token = pubsub.subscribe("accessibility:update", () => {
@@ -61,6 +65,8 @@ export function Config() {
 
 	const [activeTab, setActiveTab] = React.useState("config");
 
+	const [visibleSubsection, setVisibleSubsection] = React.useState<string>("");
+
 	function setInView(inView: any, entry: any) {
 		if (inView) {
 			store.set(
@@ -76,6 +82,18 @@ export function Config() {
 			controller.command("gcode", ["$$"]);
 		}
 	}, []);
+
+	useEffect(() => {
+		const container =
+			activeTab === "config" ? configScrollRef.current : eepromScrollRef.current;
+		if (!container) {
+			return;
+		}
+		const timeoutId = setTimeout(() => {
+			container.scrollTop = getScrollPosition(activeTab as "config" | "eeprom");
+		}, 50);
+		return () => clearTimeout(timeoutId);
+	}, [activeTab]);
 
 	const { settings, EEPROM } = useSettings();
 
@@ -126,6 +144,25 @@ export function Config() {
 		}, 50);
 	}
 
+	function navigateToSubsection(
+		_e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+		sectionIndex: number,
+		subIndex: number,
+	) {
+		const subsectionId = `section-${sectionIndex}-sub-${subIndex}`;
+		const subsectionElement = document.getElementById(subsectionId);
+
+		if (!subsectionElement) {
+			return;
+		}
+
+		subsectionElement.scrollIntoView({ behavior: "instant" });
+
+		setTimeout(() => {
+			setVisibleSubsection(subsectionId);
+		}, 50);
+	}
+
 	return (
 		<div className="w-full flex flex-grow-0 shadow bg-white overflow-y-hidden box-border no-scrollbar dark:bg-surface-raised">
 			{activeTab === "config" ? (
@@ -133,6 +170,8 @@ export function Config() {
 					menu={settings}
 					onClick={navigateToSection}
 					activeSection={visibleSection}
+					onSubsectionClick={navigateToSubsection}
+					activeSubsection={visibleSubsection}
 				/>
 			) : (
 				<div className="flex flex-col w-1/5 border border-gray-200 border-l-0 pl-1 divide-y bg-white dark:bg-surface-raised dark:border-outline dark:text-content-primary max-sm:hidden" />
@@ -166,7 +205,13 @@ export function Config() {
 					>
 						<div
 							className="px-10 max-xl:px-2 gap-8 pt-4 mb-24 box-border flex flex-col overflow-y-scroll relative"
-							ref={inViewRef}
+							ref={(node) => {
+								configScrollRef.current = node;
+								inViewRef(node);
+							}}
+							onScroll={(e) =>
+								setScrollPosition("config", e.currentTarget.scrollTop)
+							}
 						>
 							<EEPROMNotConnectedWarning connected={connected} />
 							{settings.map((item, index) => {
@@ -190,6 +235,7 @@ export function Config() {
 													ref={ref}
 													connected={connected}
 													wizard={item.wizard}
+													onSubsectionInView={setVisibleSubsection}
 												/>
 											);
 										}}
@@ -204,7 +250,13 @@ export function Config() {
 					>
 						<div
 							className="px-10 max-xl:px-2 gap-8 pt-4 mb-24 box-border flex flex-col overflow-y-scroll relative"
-							ref={inViewRef}
+							ref={(node) => {
+								eepromScrollRef.current = node;
+								inViewRef(node);
+							}}
+							onScroll={(e) =>
+								setScrollPosition("eeprom", e.currentTarget.scrollTop)
+							}
 						>
 							<EEPROMNotConnectedWarning connected={connected} />
 							{eepromSettings.map((item, index) => {
