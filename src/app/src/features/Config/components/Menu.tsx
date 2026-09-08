@@ -23,6 +23,7 @@ interface MenuProps {
 interface MenuItemProps {
 	label: string;
 	active?: boolean;
+	expanded?: boolean;
 	onClick?: MouseEventHandler<HTMLButtonElement>;
 	icon: IconType;
 	available: number;
@@ -38,16 +39,21 @@ export function tallySettings(settings: SettingsMenuSection) {
 	return settings.settings.reduce((a, b) => a + b.settings.length, 0);
 }
 
-function MenuItem({ label, active, onClick, icon, available }: MenuItemProps) {
+function MenuItem({
+	label,
+	active,
+	expanded,
+	onClick,
+	icon,
+	available,
+}: MenuItemProps) {
 	return (
 		<button
 			className={cn(
-				"flex min-h-8 max-h-14 items-center justify-start gap-2 px-4 max-xl:px-1 max-xl:font-sm max-xl:gap-1 flex-1 border-l-2 border-transparent hover:border-l-blue-500 hover:text-blue-500 hover:fill-blue-500 border-b-border-b-2 border-b-gray-50 font-sans group group-hover:text-blue-500",
+				"flex min-h-8 items-center justify-start gap-2 px-4 max-xl:px-1 max-xl:font-sm max-xl:gap-1 hover:text-blue-500 hover:fill-blue-500 font-sans group group-hover:text-blue-500",
 				{
-					"text-blue-500 font-italic bg-blue-200 bg-opacity-30 border-l-blue-400":
-						active,
-				},
-				{
+					"flex-1": !expanded,
+					"text-blue-500 font-italic": active,
 					hidden: available === 0,
 				},
 			)}
@@ -76,7 +82,7 @@ function SubMenuItem({ label, active, onClick }: SubMenuItemProps) {
 	return (
 		<button
 			className={cn(
-				"flex min-h-6 items-center justify-start gap-2 pl-11 pr-4 py-1 flex-1 border-l-2 border-transparent hover:border-l-blue-500 hover:text-blue-500 font-sans text-sm text-gray-600 dark:text-content-primary",
+				"flex min-h-6 items-center justify-start gap-2 pl-11 pr-4 py-1 border-l-2 border-transparent hover:border-l-blue-500 hover:text-blue-500 font-sans text-sm text-gray-600 dark:text-content-primary",
 				{
 					"text-blue-500 font-italic bg-blue-200 bg-opacity-30 border-l-blue-400":
 						active,
@@ -127,24 +133,44 @@ export function Menu({
 			{filteredSettings.map((item, index) => {
 				const availableSettings = tallySettings(item);
 				const active = `h-section-${index}` === activeSection;
+				const visibleSubsections = item.settings
+					.map((subsection, subIndex) => ({ subsection, subIndex }))
+					.filter(
+						({ subsection }) =>
+							subsection.label && subsection.settings.length > 0,
+					);
+				const expanded = active && visibleSubsections.length > 0;
+
 				return (
-					<div key={`menu-item-${index}`} className="flex flex-col">
+					<div
+						key={`menu-item-${index}`}
+						className={cn(
+							"flex flex-col flex-1 border-l-2 border-transparent",
+							{
+								"bg-blue-200 bg-opacity-30 border-l-blue-400": active,
+								hidden: availableSettings === 0,
+							},
+						)}
+					>
 						<MenuItem
 							available={availableSettings}
 							label={item.label}
 							active={active}
+							expanded={expanded}
 							icon={item.icon}
 							onClick={(e) => onClick(e, index)}
 						/>
-						{availableSettings > 0 && (
-							<div className="flex flex-col max-xl:hidden">
-								{item.settings.map((subsection, subIndex) => {
-									if (
-										!subsection.label ||
-										subsection.settings.length === 0
-									) {
-										return null;
-									}
+						{visibleSubsections.length > 0 && (
+							<div
+								className={cn(
+									"flex flex-col overflow-hidden transition-all duration-300 delay-100 ease-in-out origin-top max-xl:hidden",
+									{
+										"max-h-0 opacity-0 scale-y-0": !active,
+										"max-h-[500px] opacity-100 scale-y-100": active,
+									},
+								)}
+							>
+								{visibleSubsections.map(({ subsection, subIndex }) => {
 									const subsectionId = `section-${index}-sub-${subIndex}`;
 									return (
 										<SubMenuItem
