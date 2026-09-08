@@ -154,6 +154,7 @@ export interface State {
 	cameraMode: CAMERA_MODES_T;
 	cameraPosition: CAMERA_POSITIONS_T; // 'Top', '3D', 'Front', 'Left', 'Right'
 	cameraPositionNonce: number;
+	moveToHere: boolean; // "Move To Here" placement mode is armed
 	isConnected?: boolean; // Injected at render from connection state
 	isAgitated: boolean; // Defaults to false
 	currentTheme: Map<string, string>;
@@ -217,6 +218,13 @@ export interface Actions {
 		toRightSideView: () => void;
 		toFreeView: () => void;
 	};
+	armMoveToHere: () => void;
+	disarmMoveToHere: () => void;
+	toggleMoveToHere: () => void;
+	moveToHereMachineReady: () => boolean;
+	handleMoveToHerePick: (p: {
+		world: { x: number; y: number; z: number };
+	}) => void;
 	handleLiteModeToggle: () => void;
 	lineWarning: {
 		onContinue: () => void;
