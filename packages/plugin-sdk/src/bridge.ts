@@ -26,7 +26,17 @@ export type PluginBridgeRequestType =
 	| "viewer:pick:disarm"
 	| "viewer:overlay:set";
 
-export type PluginBridgeTopic = "workspace" | "redux" | "parser" | "viewer";
+export type PluginBridgeTopic =
+	| "workspace"
+	| "redux"
+	| "parser"
+	| "viewer"
+	| "controller";
+
+/** A relayed controller event, as pushed over the `"controller"` topic. `args`
+ * are the exact arguments the host's own `controller.addListener` callback
+ * would have received. */
+export type ControllerEvent = { name: string; args: unknown[] };
 
 // --- Viewer bridge types ------------------------------------------------------
 // Shared shapes for the `viewer:*` surface. The host defines identical types on

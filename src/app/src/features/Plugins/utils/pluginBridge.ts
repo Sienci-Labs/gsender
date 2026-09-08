@@ -7,6 +7,7 @@ import store from "app/store";
 import reduxStore from "app/store/redux";
 import { setPluginBusy } from "app/store/redux/slices/pluginState.slice";
 import type {
+	ControllerEvent,
 	OverlayMarker,
 	PLUGIN_BRIDGE_CHANNEL,
 	PluginBridgeRequest,
@@ -36,7 +37,7 @@ const assertWithinStorageSizeLimit = (value: unknown) => {
 	const size = new Blob([JSON.stringify(value) ?? ""]).size;
 	if (size > MAX_STORAGE_VALUE_BYTES) {
 		throw new Error(
-			`Plugin storage write exceeds the ${MAX_STORAGE_VALUE_BYTES} byte limit`
+			`Plugin storage write exceeds the ${MAX_STORAGE_VALUE_BYTES} byte limit`,
 		);
 	}
 };
@@ -46,7 +47,7 @@ const getPluginData = (pluginId: string): Record<string, unknown> =>
 
 const getStorageValue = (
 	pluginId: string,
-	payload: Record<string, unknown> = {}
+	payload: Record<string, unknown> = {},
 ) => {
 	const key = String(payload.key ?? "");
 	if (!key) {
@@ -57,7 +58,7 @@ const getStorageValue = (
 
 const setStorageValue = (
 	pluginId: string,
-	payload: Record<string, unknown> = {}
+	payload: Record<string, unknown> = {},
 ) => {
 	const key = String(payload.key ?? "");
 	if (!key) {
@@ -70,7 +71,7 @@ const setStorageValue = (
 
 const deleteStorageValue = (
 	pluginId: string,
-	payload: Record<string, unknown> = {}
+	payload: Record<string, unknown> = {},
 ) => {
 	const key = String(payload.key ?? "");
 	if (!key) {
@@ -90,12 +91,12 @@ const deleteStorageValue = (
 
 const getAllStorageValues = (
 	pluginId: string,
-	payload: Record<string, unknown> = {}
+	payload: Record<string, unknown> = {},
 ) => store.get(["plugins", pluginId, "data"], payload.defaultValue ?? {});
 
 const setAllStorageValues = (
 	pluginId: string,
-	payload: Record<string, unknown> = {}
+	payload: Record<string, unknown> = {},
 ) => {
 	assertWithinStorageSizeLimit(payload.value);
 	// replace(), not set() — see deleteStorageValue: a merge would keep keys
@@ -116,7 +117,7 @@ const getReduxSnapshot = () => reduxStore.getState();
 
 const getTopicSnapshot = (
 	topic: PluginBridgeTopic,
-	pluginId: string | null = null
+	pluginId: string | null = null,
 ): unknown => {
 	switch (topic) {
 		case "workspace":
@@ -126,9 +127,10 @@ const getTopicSnapshot = (
 		case "parser":
 			// Per-plugin, so a plugin never sees another plugin's matches.
 			return (pluginId && parserSnapshots.get(pluginId)) || {};
-		// "viewer" is a push-only event stream (pick/hold-progress); there is no
-		// meaningful initial snapshot, so subscribers get null until an event fires.
+		// "viewer" and "controller" are push-only event streams.
+		// there is no meaningful initial snapshot, so subscribers get null until an event fires.
 		case "viewer":
+		case "controller":
 			return null;
 		default:
 			return null;
@@ -439,11 +441,11 @@ const handleBridgeRequest = async (
 	request: PluginBridgeRequest,
 	capabilities: PluginCapabilities,
 	pluginId: string | null,
-	source: MessageEventSource | null
+	source: MessageEventSource | null,
 ): Promise<unknown> => {
 	// check if plugin is allowed to use this request type
 	if (!capabilities.requestTypes.has(request.type)) {
-		console.error(`Plugin not authorized to use '${request.type}`)
+		console.error(`Plugin not authorized to use '${request.type}`);
 		throw new Error(`Plugin not authorized to use '${request.type}'`);
 	}
 
@@ -466,7 +468,7 @@ const handleBridgeRequest = async (
 		case "machine:get:context":
 			return getMachineContext();
 		case "machine:command":
-			return runMachineCommand(request.payload, /*capabilities*/);
+			return runMachineCommand(request.payload /*capabilities*/);
 		case "machine:parser:register":
 			return registerRuntimeParser(source, pluginId as string, request.payload);
 		case "machine:parser:unregister":
@@ -481,7 +483,7 @@ const handleBridgeRequest = async (
 			return getReduxSnapshot();
 		case "gcode:load:to:visualizer":
 			return loadGCodeToVisualizer(
-				request.payload as { gcode: string; name: string }
+				request.payload as { gcode: string; name: string },
 			);
 		case "viewer:screen-to-world": {
 			const handle = requireVisualizer();
@@ -566,7 +568,7 @@ const handleBridgeRequest = async (
 };
 
 export const handlePluginBridgeMessage = async (
-	event: MessageEvent
+	event: MessageEvent,
 ): Promise<PluginBridgeResponse | null> => {
 	if (event.data?.channel !== BRIDGE_CHANNEL || !event.data?.request) {
 		return null;
@@ -577,7 +579,8 @@ export const handlePluginBridgeMessage = async (
 	// Unregistered source (a plugin who never registered it,
 	// or a message from something that isn't a known plugin iframe at all)
 	// gets zero capabilities
-	const capabilities = getCapabilitiesForSource(event.source) ?? EMPTY_CAPABILITIES;
+	const capabilities =
+		getCapabilitiesForSource(event.source) ?? EMPTY_CAPABILITIES;
 	const pluginId = getPluginIdForSource(event.source);
 
 	try {
@@ -585,7 +588,7 @@ export const handlePluginBridgeMessage = async (
 			request,
 			capabilities,
 			pluginId,
-			event.source
+			event.source,
 		);
 		return {
 			id: request.id,
@@ -713,6 +716,29 @@ const broadcastViewerEvent = (event: unknown) => {
 	});
 };
 
+// push a discrete event to every subscriber of a topic
+const broadcastEvent = (topic: PluginBridgeTopic, payload: unknown) => {
+	if (subscriptions.size === 0) {
+		return;
+	}
+	subscriptions.forEach((sub) => {
+		if (sub.topic !== topic) {
+			return;
+		}
+		pushEvent(sub, payload);
+	});
+};
+
+// doesn't include "serialport:read"/"serialport:write" bc you get that permission from machine.parse
+// doesn't include "plugin:parser:match"/"plugin:parser:error" bc they are already delivered below,
+// and if they were included here, it would leak one plugin's parser matches/errors to every other plugin
+const EXCLUDED_CONTROLLER_RELAY_EVENTS = new Set([
+	"serialport:read",
+	"serialport:write",
+	"plugin:parser:match",
+	"plugin:parser:error",
+]);
+
 const ensureHostListeners = () => {
 	if (hostListenersInstalled) {
 		return;
@@ -745,12 +771,26 @@ const ensureHostListeners = () => {
 		}
 	});
 
+	// relay every controller event a plugin is allowed to see onto the
+	// "controller" topic, as { name, args }
+	Object.keys(controller.listeners ?? {}).forEach((eventName) => {
+		if (EXCLUDED_CONTROLLER_RELAY_EVENTS.has(eventName)) {
+			return;
+		}
+		controller.addListener(eventName, (...args: unknown[]) => {
+			const event: ControllerEvent = { name: eventName, args };
+			broadcastEvent("controller", event);
+		});
+	});
+
 	// Server-side registrations die with the controller, so a reconnect has to
 	// replay them or a plugin silently stops receiving matches.
 	controller.addListener("serialport:open", () => {
 		runtimeParsers.forEach((entry, ownerId) => {
 			controller
-				.registerPluginParsers(ownerId, entry.pluginId, [...entry.specs.values()])
+				.registerPluginParsers(ownerId, entry.pluginId, [
+					...entry.specs.values(),
+				])
 				.catch(() => {
 					// Best effort — the plugin sees the gap via plugin:parser:error.
 				});
@@ -763,12 +803,14 @@ const addSubscription = (
 	origin: string,
 	subscribe: PluginBridgeSubscribe,
 	capabilities: PluginCapabilities,
-	pluginId: string | null
+	pluginId: string | null,
 ) => {
 	// check if plugin has subscription perms
 	if (!capabilities.topics.has(subscribe.topic)) {
 		console.error(`Plugin not authorized to subscribe to '${subscribe.topic}'`);
-		throw new Error(`Plugin not authorized to subscribe to '${subscribe.topic}'`);
+		throw new Error(
+			`Plugin not authorized to subscribe to '${subscribe.topic}'`,
+		);
 	}
 
 	ensureHostListeners();
@@ -794,6 +836,43 @@ const removeSubscription = (id: string) => {
 	subscriptions.delete(id);
 };
 
+// handles a `subscribe`/`unsubscribe` bridge message
+export const handlePluginBridgeSubscription = (event: MessageEvent): void => {
+	const data = event.data;
+
+	if (!data || data.channel !== BRIDGE_CHANNEL) {
+		return;
+	}
+
+	const capabilities =
+		getCapabilitiesForSource(event.source) ?? EMPTY_CAPABILITIES;
+
+	if (data.subscribe && event.source) {
+		try {
+			addSubscription(
+				event.source,
+				event.origin,
+				data.subscribe as PluginBridgeSubscribe,
+				capabilities,
+				getPluginIdForSource(event.source),
+			);
+		} catch (err) {
+			event.source.postMessage(
+				{
+					channel: BRIDGE_CHANNEL,
+					err,
+				},
+				{ targetOrigin: event.origin },
+			);
+		}
+		return;
+	}
+
+	if (data.unsubscribe) {
+		removeSubscription(data.unsubscribe.id);
+	}
+};
+
 export const installPluginBridgeListener = () => {
 	const listener = async (event: MessageEvent) => {
 		const data = event.data;
@@ -802,31 +881,8 @@ export const installPluginBridgeListener = () => {
 			return;
 		}
 
-		const capabilities = getCapabilitiesForSource(event.source) ?? EMPTY_CAPABILITIES;
-
-		if (data.subscribe && event.source) {
-			try {
-				addSubscription(
-					event.source,
-					event.origin,
-					data.subscribe as PluginBridgeSubscribe,
-					capabilities,
-					getPluginIdForSource(event.source)
-				);
-			} catch(err) {
-				event.source.postMessage(
-					{
-						channel: BRIDGE_CHANNEL,
-						err,
-					},
-					{ targetOrigin: event.origin }
-				);
-			}
-			return;
-		}
-
-		if (data.unsubscribe) {
-			removeSubscription(data.unsubscribe.id);
+		if (data.subscribe || data.unsubscribe) {
+			handlePluginBridgeSubscription(event);
 			return;
 		}
 
@@ -849,7 +905,7 @@ export const installPluginBridgeListener = () => {
 				channel: BRIDGE_CHANNEL,
 				response,
 			},
-			{ targetOrigin: event.origin }
+			{ targetOrigin: event.origin },
 		);
 	};
 

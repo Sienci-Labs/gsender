@@ -197,9 +197,28 @@ describe("wire type drift guard", () => {
 	});
 
 	it("only maps topics the host union declares", () => {
-		const declared = new Set(["workspace", "redux", "parser", "viewer"]);
+		const declared = new Set([
+			"workspace",
+			"redux",
+			"parser",
+			"viewer",
+			"controller",
+		]);
 		for (const topic of topicsMap.values()) {
 			expect(declared.has(topic)).toBe(true);
 		}
+	});
+});
+
+describe("buildGrantFromScan — controller events topic", () => {
+	it("grants the 'controller' push topic for a 'machine' import", () => {
+		const { wire, permissions } = buildGrantFromScan(["machine"]);
+		expect(wire.topics).toContain("controller");
+		expect(permissions).toContain("machine:read");
+	});
+
+	it("does not grant the 'controller' topic from unrelated imports", () => {
+		const { wire } = buildGrantFromScan(["workspace"]);
+		expect(wire.topics).not.toContain("controller");
 	});
 });
