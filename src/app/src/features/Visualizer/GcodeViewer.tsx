@@ -24,6 +24,7 @@
 import type {
 	GCodeSVGOptions,
 	GCodeViewerBitPosition,
+	GCodeViewerCameraProjection,
 	GCodeViewerCameraView,
 	GCodeViewerOptions,
 	GCodeViewerTheme,
@@ -85,6 +86,7 @@ const VIEW_MAP: Partial<Record<string, GCodeViewerCameraView>> = {
 	Front: "front",
 	Left: "left",
 	Right: "right",
+	TopLeftCorner: "front-top-left",
 };
 
 interface Props {
@@ -177,6 +179,8 @@ class GcodeViewer extends Component<Props> {
 	pickIndicator: HTMLDivElement | null = null;
 
 	pickPriorView: CAMERA_POSITIONS_T | null = null;
+
+	pickPriorProjection: GCodeViewerCameraProjection | null = null;
 
 	// Declarative overlay markers the host draws over the canvas for a plugin.
 	overlayMarkers: OverlayMarker[] = [];
@@ -345,8 +349,15 @@ class GcodeViewer extends Component<Props> {
 				visible: store.get("widgets.visualizer.objects.limits.visible", false),
 				labels: store.get("widgets.visualizer.boundingBoxLabels", false),
 			},
-			machineBed: buildMachineBedOptions(),
-			grid: buildGridOptions(state.units),
+			machineBed: this.buildMachineBedOptions(),
+			grid: this.buildGridOptions(),
+			camera: {
+				projection:
+					store.get("widgets.visualizer.projection", "Perspective") ===
+					"Orthographic"
+						? "orthographic"
+						: "perspective",
+			},
 			render: {
 				antialias: true,
 				theme: this.buildTheme(this.currentThemeName()),
@@ -533,6 +544,10 @@ class GcodeViewer extends Component<Props> {
 			this.pickPriorView = this.props.cameraPosition;
 			this.props.actions.camera.toTopView();
 			this.viewer3d?.setRotateEnabled(false);
+			// Orthographic avoids perspective foreshortening skewing the picked
+			// XY; restored to whatever was active once the pick is disarmed.
+			this.pickPriorProjection = this.viewer3d?.getCameraProjection() ?? null;
+			this.viewer3d?.setCameraProjection("orthographic");
 		}
 	}
 
@@ -553,8 +568,12 @@ class GcodeViewer extends Component<Props> {
 			if (this.pickPriorView) {
 				this.restoreCameraView(this.pickPriorView);
 			}
+			if (this.pickPriorProjection) {
+				this.viewer3d?.setCameraProjection(this.pickPriorProjection);
+			}
 		}
 		this.pickPriorView = null;
+		this.pickPriorProjection = null;
 		this.pickMode = null;
 		this.pickOnPick = null;
 		this.pickOnHoldProgress = null;

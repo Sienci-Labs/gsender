@@ -7,6 +7,7 @@ import { SettingSection } from "app/features/Config/components/SettingSection.ts
 import { useSettings } from "app/features/Config/utils/SettingsContext.tsx";
 import cn from "classnames";
 import React, { useMemo } from "react";
+import { InView } from "react-intersection-observer";
 
 interface SectionProps {
 	title: string;
@@ -20,6 +21,7 @@ interface SectionProps {
 	eeprom?: gSenderEEEPROMSettings;
 	wizard?: () => JSX.Element;
 	showEEPROMOnly?: boolean;
+	onSubsectionInView?: (id: string) => void;
 }
 
 export const Section = React.forwardRef(
@@ -31,6 +33,7 @@ export const Section = React.forwardRef(
 			connected = false,
 			wizard = null,
 			showEEPROMOnly,
+			onSubsectionInView,
 		}: SectionProps,
 		ref,
 	) => {
@@ -91,14 +94,42 @@ export const Section = React.forwardRef(
 				</div>
 				<div className="bg-gray-100 rounded-xl shadow p-6 max-xl:p-3 flex flex-col gap-6 dark:bg-surface-raised dark:text-content-primary">
 					{filteredSettings.map((setting: gSenderSubSection, index) => {
+						if (!setting.label) {
+							return (
+								<SettingSection
+									key={index}
+									connected={connected}
+									settings={setting.settings}
+									label={setting.label}
+									wizard={setting.wizard}
+								/>
+							);
+						}
+
+						const subsectionId = `${id}-sub-${index}`;
+
 						return (
-							<SettingSection
-								key={setting.label ?? index}
-								connected={connected}
-								settings={setting.settings}
-								label={setting.label}
-								wizard={setting.wizard}
-							/>
+							<InView
+								key={subsectionId}
+								onChange={(inView) => {
+									if (inView) {
+										onSubsectionInView?.(subsectionId);
+									}
+								}}
+								threshold={0}
+								rootMargin="0px 0px -75% 0px"
+							>
+								{({ ref: subsectionRef }) => (
+									<SettingSection
+										id={subsectionId}
+										ref={subsectionRef}
+										connected={connected}
+										settings={setting.settings}
+										label={setting.label}
+										wizard={setting.wizard}
+									/>
+								)}
+							</InView>
 						);
 					})}
 				</div>

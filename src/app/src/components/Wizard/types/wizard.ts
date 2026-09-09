@@ -53,6 +53,7 @@ export interface Wizard {
 	id: string;
 	title: string;
 	image?: string;
+	invertImageInDarkMode?: boolean;
 	subWizards: SubWizard[];
 	validations: (() => ValidationResult)[];
 	helpUrl?: string;
