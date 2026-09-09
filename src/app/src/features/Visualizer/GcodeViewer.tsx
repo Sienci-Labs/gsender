@@ -134,6 +134,7 @@ const VIEW_MAP: Partial<Record<string, GCodeViewerCameraView>> = {
 	Front: "front",
 	Left: "left",
 	Right: "right",
+	TopLeftCorner: "front-top-left",
 };
 
 interface Props {

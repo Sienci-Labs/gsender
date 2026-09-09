@@ -194,6 +194,7 @@ export interface Actions {
 	toggle3DView: () => void;
 	toPerspectiveProjection: (projection: any) => void;
 	toOrthographicProjection: (projection: any) => void;
+	toggleProjection: () => void;
 	toggleGCodeFilename: () => void;
 	toggleLimitsVisibility: () => void;
 	toggleCoordinateSystemVisibility: () => void;
@@ -215,6 +216,7 @@ export interface Actions {
 		toFrontView: () => void;
 		toLeftSideView: () => void;
 		toRightSideView: () => void;
+		toTopLeftCornerView: () => void;
 		toFreeView: () => void;
 	};
 	handleLiteModeToggle: () => void;

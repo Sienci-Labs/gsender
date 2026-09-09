@@ -44,12 +44,12 @@ import _ from "lodash";
 import debounce from "lodash/debounce";
 import get from "lodash/get";
 import includes from "lodash/includes";
-import { FrownIcon } from "lucide-react";
+import { Box, FrownIcon, Square } from "lucide-react";
 import posthog from "posthog-js";
 import PropTypes from "prop-types";
 import pubsub from "pubsub-js";
 import { Component } from "react";
-import { FaFeatherAlt } from "react-icons/fa";
+import { FaCube, FaFeatherAlt } from "react-icons/fa";
 import { connect } from "react-redux";
 import {
 	GENERAL_CATEGORY,
@@ -113,6 +113,9 @@ const VIEWCUBE_SIZE_PX_PORTRAIT = 64;
 const VIEWCUBE_CONTROL_GAP_PX = 12;
 // "Move To Here" toggle sits stacked directly above the lightweight toggle.
 const FLOATING_BUTTON_SIZE_PX = 44; // h-11 / w-11
+// Corner-view and projection-toggle buttons sit in a row directly below the cube.
+const BELOW_CUBE_GAP_PX = 8;
+const BELOW_CUBE_BUTTON_GAP_PX = 8;
 
 function getViewCubeControlPositions(isPortrait: boolean) {
 	const viewCubeLeft = isPortrait ? VIEWCUBE_LEFT_PX_PORTRAIT : VIEWCUBE_LEFT_PX;
@@ -133,7 +136,23 @@ function getViewCubeControlPositions(isPortrait: boolean) {
 			VIEWCUBE_CONTROL_GAP_PX,
 	};
 
-	return { lightweightTogglePosition, moveToHereTogglePosition };
+	const cubeCenterX = viewCubeLeft + viewCubeSize / 2;
+	const belowCubeBottom = viewCubeBottom - BELOW_CUBE_GAP_PX - FLOATING_BUTTON_SIZE_PX;
+	const cornerViewButtonPosition = {
+		left: cubeCenterX - (FLOATING_BUTTON_SIZE_PX + BELOW_CUBE_BUTTON_GAP_PX) / 2,
+		bottom: belowCubeBottom,
+	};
+	const projectionTogglePosition = {
+		left: cubeCenterX + (FLOATING_BUTTON_SIZE_PX + BELOW_CUBE_BUTTON_GAP_PX) / 2,
+		bottom: belowCubeBottom,
+	};
+
+	return {
+		lightweightTogglePosition,
+		moveToHereTogglePosition,
+		cornerViewButtonPosition,
+		projectionTogglePosition,
+	};
 }
 
 class Visualizer extends Component {
@@ -483,6 +502,13 @@ class Visualizer extends Component {
 				projection: "orthographic",
 			}));
 		},
+		toggleProjection: () => {
+			const current = store.get("widgets.visualizer.projection", "Perspective");
+			const next = current === "Orthographic" ? "Perspective" : "Orthographic";
+			store.set("widgets.visualizer.projection", next);
+			pubsub.publish("visualizer:settings");
+			this.forceUpdate();
+		},
 		toggleGCodeFilename: () => {
 			this.setState((state) => ({
 				gcode: {
@@ -613,6 +639,12 @@ class Visualizer extends Component {
 			toRightSideView: () => {
 				this.setState((prev) => ({
 					cameraPosition: "Right",
+					cameraPositionNonce: prev.cameraPositionNonce + 1,
+				}));
+			},
+			toTopLeftCornerView: () => {
+				this.setState((prev) => ({
+					cameraPosition: "TopLeftCorner",
 					cameraPositionNonce: prev.cameraPositionNonce + 1,
 				}));
 			},
@@ -1605,8 +1637,16 @@ class Visualizer extends Component {
 			...this.actions,
 		};
 
-		const { lightweightTogglePosition, moveToHereTogglePosition } =
-			getViewCubeControlPositions(state.isPortrait);
+		const {
+			lightweightTogglePosition,
+			moveToHereTogglePosition,
+			cornerViewButtonPosition,
+			projectionTogglePosition,
+		} = getViewCubeControlPositions(state.isPortrait);
+
+		const isOrthographic =
+			store.get("widgets.visualizer.projection", "Perspective") ===
+			"Orthographic";
 
 		const showRendering = renderState === RENDER_RENDERING;
 		const showLoading = renderState === RENDER_LOADING;
@@ -1728,6 +1768,63 @@ class Visualizer extends Component {
 									aria-hidden="true"
 									className="pointer-events-none h-5 w-5 shrink-0"
 								/>
+							</button>
+						</Tooltip>
+
+						<Tooltip content="Go to iso view" side="top">
+							<button
+								type="button"
+								style={cornerViewButtonPosition}
+								className="absolute z-[8998] inline-flex h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full border border-gray-400/40 bg-dark-darker/70 text-gray-300 shadow-[0_10px_30px_rgba(0,_0,_0,_0.25)] transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out hover:border-gray-200/70 hover:text-gray-100 hover:shadow-[0_12px_32px_rgba(0,_0,_0,_0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-dark-darker active:scale-[0.98] active:bg-dark-darker/85"
+								aria-label="Go to iso view"
+								onClick={() => actions.camera.toTopLeftCornerView()}
+							>
+								<FaCube
+									aria-hidden="true"
+									className="pointer-events-none h-4 w-4 shrink-0"
+								/>
+							</button>
+						</Tooltip>
+
+						<Tooltip
+							content={
+								isOrthographic
+									? "Switch to perspective view"
+									: "Switch to orthographic view"
+							}
+							side="top"
+						>
+							<button
+								type="button"
+								style={projectionTogglePosition}
+								className={cx(
+									"absolute z-[8998] inline-flex h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full border bg-dark-darker/70 shadow-[0_10px_30px_rgba(0,_0,_0,_0.25)] transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-dark-darker active:scale-[0.98] active:bg-dark-darker/85",
+									{
+										"border-[rgba(96,_165,_250,_0.95)] text-[rgba(96,_165,_250,_0.95)] shadow-[0_0_0_1px_rgba(96,_165,_250,_0.35),0_10px_30px_rgba(0,_0,_0,_0.35)] hover:border-[rgba(96,_165,_250,_0.95)] hover:text-[rgba(96,_165,_250,_0.95)] hover:shadow-[0_0_0_1px_rgba(96,_165,_250,_0.45),0_12px_32px_rgba(0,_0,_0,_0.4)]":
+											isOrthographic,
+										"border-gray-400/40 text-gray-300 hover:border-gray-200/70 hover:text-gray-100 hover:shadow-[0_12px_32px_rgba(0,_0,_0,_0.35)]":
+											!isOrthographic,
+									},
+								)}
+								aria-label={
+									isOrthographic
+										? "Switch to perspective view"
+										: "Switch to orthographic view"
+								}
+								aria-pressed={isOrthographic}
+								onClick={() => actions.toggleProjection()}
+							>
+								{isOrthographic ? (
+									<Square
+										aria-hidden="true"
+										className="pointer-events-none h-4 w-4 shrink-0"
+									/>
+								) : (
+									<Box
+										aria-hidden="true"
+										className="pointer-events-none h-4 w-4 shrink-0"
+									/>
+								)}
 							</button>
 						</Tooltip>
 
