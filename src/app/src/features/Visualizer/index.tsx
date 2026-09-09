@@ -113,9 +113,14 @@ const VIEWCUBE_SIZE_PX_PORTRAIT = 64;
 const VIEWCUBE_CONTROL_GAP_PX = 12;
 // "Move To Here" toggle sits stacked directly above the lightweight toggle.
 const FLOATING_BUTTON_SIZE_PX = 44; // h-11 / w-11
-// Corner-view and projection-toggle buttons sit in a row directly below the cube.
-const BELOW_CUBE_GAP_PX = 8;
+// Corner-view and projection-toggle buttons sit in a row directly above the cube,
+// stacked below the lightweight toggle (which shifts up to make room). Sized
+// smaller than FLOATING_BUTTON_SIZE_PX to read as a secondary/utility row.
+const BELOW_CUBE_BUTTON_SIZE_PX = 36;
 const BELOW_CUBE_BUTTON_GAP_PX = 8;
+// Extra clearance between the cube and the row above it (wider than
+// VIEWCUBE_CONTROL_GAP_PX — see comment at cubeButtonsRowBottom below).
+const CUBE_TOP_GAP_PX = 24;
 
 function getViewCubeControlPositions(isPortrait: boolean) {
 	const viewCubeLeft = isPortrait ? VIEWCUBE_LEFT_PX_PORTRAIT : VIEWCUBE_LEFT_PX;
@@ -123,10 +128,28 @@ function getViewCubeControlPositions(isPortrait: boolean) {
 		? VIEWCUBE_BOTTOM_PX_PORTRAIT
 		: VIEWCUBE_BOTTOM_PX;
 	const viewCubeSize = isPortrait ? VIEWCUBE_SIZE_PX_PORTRAIT : VIEWCUBE_SIZE_PX;
+	const cubeCenterX = viewCubeLeft + viewCubeSize / 2;
 
+	// Cube-adjacent row (corner view + projection toggle) sits above the cube —
+	// the slot the lightweight toggle used to occupy. Gap is wider than
+	// VIEWCUBE_CONTROL_GAP_PX because the cube's rendered corners swing beyond
+	// its nominal bounding box as it rotates, so a plain stacking gap isn't
+	// enough clearance to avoid visually colliding with it.
+	const cubeButtonsRowBottom = viewCubeBottom + viewCubeSize + CUBE_TOP_GAP_PX;
+	const cornerViewButtonPosition = {
+		left: cubeCenterX - (BELOW_CUBE_BUTTON_SIZE_PX + BELOW_CUBE_BUTTON_GAP_PX) / 2,
+		bottom: cubeButtonsRowBottom,
+	};
+	const projectionTogglePosition = {
+		left: cubeCenterX + (BELOW_CUBE_BUTTON_SIZE_PX + BELOW_CUBE_BUTTON_GAP_PX) / 2,
+		bottom: cubeButtonsRowBottom,
+	};
+
+	// Lightweight toggle shifts up one slot to make room for the row below it.
 	const lightweightTogglePosition = {
-		left: viewCubeLeft + viewCubeSize / 2,
-		bottom: viewCubeBottom + viewCubeSize + VIEWCUBE_CONTROL_GAP_PX,
+		left: cubeCenterX,
+		bottom:
+			cubeButtonsRowBottom + BELOW_CUBE_BUTTON_SIZE_PX + VIEWCUBE_CONTROL_GAP_PX,
 	};
 	const moveToHereTogglePosition = {
 		left: lightweightTogglePosition.left,
@@ -134,17 +157,6 @@ function getViewCubeControlPositions(isPortrait: boolean) {
 			lightweightTogglePosition.bottom +
 			FLOATING_BUTTON_SIZE_PX +
 			VIEWCUBE_CONTROL_GAP_PX,
-	};
-
-	const cubeCenterX = viewCubeLeft + viewCubeSize / 2;
-	const belowCubeBottom = viewCubeBottom - BELOW_CUBE_GAP_PX - FLOATING_BUTTON_SIZE_PX;
-	const cornerViewButtonPosition = {
-		left: cubeCenterX - (FLOATING_BUTTON_SIZE_PX + BELOW_CUBE_BUTTON_GAP_PX) / 2,
-		bottom: belowCubeBottom,
-	};
-	const projectionTogglePosition = {
-		left: cubeCenterX + (FLOATING_BUTTON_SIZE_PX + BELOW_CUBE_BUTTON_GAP_PX) / 2,
-		bottom: belowCubeBottom,
 	};
 
 	return {
@@ -1775,7 +1787,7 @@ class Visualizer extends Component {
 							<button
 								type="button"
 								style={cornerViewButtonPosition}
-								className="absolute z-[8998] inline-flex h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full border border-gray-400/40 bg-dark-darker/70 text-gray-300 shadow-[0_10px_30px_rgba(0,_0,_0,_0.25)] transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out hover:border-gray-200/70 hover:text-gray-100 hover:shadow-[0_12px_32px_rgba(0,_0,_0,_0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-dark-darker active:scale-[0.98] active:bg-dark-darker/85"
+								className="absolute z-[8998] inline-flex h-9 w-9 -translate-x-1/2 items-center justify-center rounded-full border border-gray-400/40 bg-dark-darker/70 text-gray-300 shadow-[0_10px_30px_rgba(0,_0,_0,_0.25)] transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out hover:border-gray-200/70 hover:text-gray-100 hover:shadow-[0_12px_32px_rgba(0,_0,_0,_0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-dark-darker active:scale-[0.98] active:bg-dark-darker/85"
 								aria-label="Go to iso view"
 								onClick={() => actions.camera.toTopLeftCornerView()}
 							>
@@ -1798,7 +1810,7 @@ class Visualizer extends Component {
 								type="button"
 								style={projectionTogglePosition}
 								className={cx(
-									"absolute z-[8998] inline-flex h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full border bg-dark-darker/70 shadow-[0_10px_30px_rgba(0,_0,_0,_0.25)] transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-dark-darker active:scale-[0.98] active:bg-dark-darker/85",
+									"absolute z-[8998] inline-flex h-9 w-9 -translate-x-1/2 items-center justify-center rounded-full border bg-dark-darker/70 shadow-[0_10px_30px_rgba(0,_0,_0,_0.25)] transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-dark-darker active:scale-[0.98] active:bg-dark-darker/85",
 									{
 										"border-[rgba(96,_165,_250,_0.95)] text-[rgba(96,_165,_250,_0.95)] shadow-[0_0_0_1px_rgba(96,_165,_250,_0.35),0_10px_30px_rgba(0,_0,_0,_0.35)] hover:border-[rgba(96,_165,_250,_0.95)] hover:text-[rgba(96,_165,_250,_0.95)] hover:shadow-[0_0_0_1px_rgba(96,_165,_250,_0.45),0_12px_32px_rgba(0,_0,_0,_0.4)]":
 											isOrthographic,
