@@ -37,7 +37,10 @@ export function ProfileBar() {
         (state: RootState) => state.connection.isConnected,
     );
 
-    const isSienciMachine = machineProfile.company === 'Sienci Labs';
+    const canRestoreDefaults =
+    machineProfile.company === 'Sienci Labs' ||
+    !!machineProfile.grblHALeepromSettings ||
+    !!machineProfile.eepromSettings;
 
     function updateSettingsHandler() {
         updateAllSettings(settingsValues, EEPROM);
@@ -128,7 +131,7 @@ export function ProfileBar() {
                 </div>
 
                 <div className="grid grid-cols-4 h-full max-w-lg font-medium divide-x max-sm:divide-x-0 max-sm:hidden">
-                    <RestoreDefaultDialog isSienciMachine={isSienciMachine} />
+                    <RestoreDefaultDialog isSienciMachine={canRestoreDefaults} />
                     <ActionButton
                         icon={<PiLightning />}
                         label="Flash"
