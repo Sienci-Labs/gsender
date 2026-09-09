@@ -206,20 +206,48 @@ const main = () => {
 			await session.defaultSession.clearCache();
 
 			// Plugin iframes are same-origin with the app, so a single app-wide
-			// grant is enough — per-plugin scoping happens at the iframe's
-			// `allow="local-fonts"` attribute (see PluginPanel.tsx), which is only
-			// set for plugins that declare "local-fonts" in their manifest.
+			// grant is enough — per-plugin scoping happens at the iframe's `allow`
+			// attribute (see PluginPanel.tsx), which only delegates a permission to
+			// a given plugin's iframe when that plugin declared it in its manifest
+			// and the user approved it during install.
+			//
+			// There is deliberately no fixed list of permission names here: any
+			// browser permission (camera, microphone, geolocation, midi, etc.) a
+			// plugin declares and the user approves is allowed at the session
+			// level, same as we already did for "local-fonts". Adding support for
+			// a new browser feature to a plugin never requires a gSender code
+			// change — only the manifest and the install-review approval.
+			//
 			// Clipboard write permission is required for navigator.clipboard.writeText()
-			// call sites throughout the renderer (Console copy history, gcode editor, etc).
-			const ALLOWED_SESSION_PERMISSIONS = ["local-fonts", "clipboard-sanitized-write"];
+			// call sites throughout the renderer (Console copy history, gcode editor, etc),
+			// independent of any plugin, so it's always allowed.
+			const CORE_SESSION_PERMISSIONS = ["clipboard-sanitized-write"];
+
+			const isSessionPermissionAllowed = (permission) => {
+				if (CORE_SESSION_PERMISSIONS.includes(permission)) {
+					return true;
+				}
+				try {
+					// Lazily required: this module reads app.getPath()-derived config
+					// paths, so it must not load until Electron (and the rest of the
+					// app's startup sequence) is actually ready.
+					const pluginRegistry =
+						require("./server/services/pluginregistry").default;
+					return pluginRegistry
+						.getEnabledPlugins()
+						.some((plugin) => (plugin.permissions || []).includes(permission));
+				} catch (err) {
+					log.error(`Failed to resolve plugin permission "${permission}": ${err}`);
+					return false;
+				}
+			};
 
 			session.defaultSession.setPermissionCheckHandler(
-				(_webContents, permission) =>
-					ALLOWED_SESSION_PERMISSIONS.includes(permission),
+				(_webContents, permission) => isSessionPermissionAllowed(permission),
 			);
 			session.defaultSession.setPermissionRequestHandler(
 				(_webContents, permission, callback) => {
-					callback(ALLOWED_SESSION_PERMISSIONS.includes(permission));
+					callback(isSessionPermissionAllowed(permission));
 				},
 			);
 

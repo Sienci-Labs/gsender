@@ -158,6 +158,14 @@ export type PluginInstallCommitResponse = {
 	backupDir?: string | null;
 };
 
+// The gSender-specific capability names, which drive SDK grant derivation
+// (see grants.js) and the plugin bridge. This is NOT a whitelist of every
+// permission a plugin may request: a manifest may also declare any real
+// browser permission (e.g. "camera", "microphone", "geolocation", "midi")
+// and it flows through install review, the Electron session permission
+// handler, and the plugin iframe's Permissions-Policy untouched — see
+// main.js and PluginPanel.tsx. The `(string & {})` union member keeps
+// autocomplete for the known names below without rejecting anything else.
 export type PluginPermissionsType =
 	| "machine:read"
 	| "machine:write"
@@ -173,7 +181,8 @@ export type PluginPermissionsType =
 	| "workspace:read"
 	| "redux:read"
 	| "local-fonts"
-	| "storage";
+	| "storage"
+	| (string & {});
 
 export type PluginTopicsType = "workspace" | "redux" | "parser" | "viewer";
 

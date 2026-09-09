@@ -40,6 +40,26 @@ Each folder must contain `gsender-plugin.json` and a `ui/` directory with the bu
 | `capabilities` | no | Object of bridge permissions the plugin requests (examples and explanation in the next section). |
 | `parsers` | no | Array of firmware response parser specs. Matched server-side and live from the moment the port opens — independent of whether the plugin's UI is mounted. See the [plugin parsers guide](../docs/plugin-parsers.md). |
 
+### Browser permissions (camera, microphone, geolocation, midi, ...)
+
+A manifest's top-level `permissions` array isn't limited to the gSender SDK
+capabilities below — it can also list any real browser permission name, e.g.:
+
+```json
+"permissions": ["camera", "microphone"]
+```
+
+Anything you declare here is shown verbatim on the install review step for
+the user to approve, then delegated straight through to your plugin's
+iframe (via its `allow` Permissions-Policy) and to Electron's session
+permission handler. There's no fixed list of supported names to update on
+the gSender side — if the browser recognizes the permission, it works;
+`local-fonts` (used by the `basic-cam` example) is just the first plugin to
+use this. Because this class of permission has no gSender SDK counterpart,
+the static bundle scan can't confirm it from your code, so it will always
+show as "declared, not confirmed" on the review step — that's expected, not
+an error.
+
 ### Manifest capabilities
 
 The bridge denies everything a plugin was not granted. Grants live in the
