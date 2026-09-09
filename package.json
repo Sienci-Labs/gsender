@@ -218,31 +218,36 @@
 				"ext": "gcode",
 				"name": "G-Code File",
 				"description": "G-Code CNC machining file",
-				"role": "Viewer"
+				"role": "Viewer",
+				"icon": "file_association_icon"
 			},
 			{
 				"ext": "gc",
 				"name": "G-Code File",
 				"description": "G-Code CNC machining file",
-				"role": "Viewer"
+				"role": "Viewer",
+				"icon": "file_association_icon"
 			},
 			{
 				"ext": "nc",
 				"name": "G-Code File",
 				"description": "G-Code CNC machining file",
-				"role": "Viewer"
+				"role": "Viewer",
+				"icon": "file_association_icon"
 			},
 			{
 				"ext": "tap",
 				"name": "G-Code File",
 				"description": "G-Code CNC machining file",
-				"role": "Viewer"
+				"role": "Viewer",
+				"icon": "file_association_icon"
 			},
 			{
 				"ext": "cnc",
 				"name": "G-Code File",
 				"description": "G-Code CNC machining file",
-				"role": "Viewer"
+				"role": "Viewer",
+				"icon": "file_association_icon"
 			}
 		]
 	},
