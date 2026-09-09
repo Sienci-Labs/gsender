@@ -218,31 +218,36 @@
 				"ext": "gcode",
 				"name": "G-Code File",
 				"description": "G-Code CNC machining file",
-				"role": "Viewer"
+				"role": "Viewer",
+				"icon": "file_association_icon"
 			},
 			{
 				"ext": "gc",
 				"name": "G-Code File",
 				"description": "G-Code CNC machining file",
-				"role": "Viewer"
+				"role": "Viewer",
+				"icon": "file_association_icon"
 			},
 			{
 				"ext": "nc",
 				"name": "G-Code File",
 				"description": "G-Code CNC machining file",
-				"role": "Viewer"
+				"role": "Viewer",
+				"icon": "file_association_icon"
 			},
 			{
 				"ext": "tap",
 				"name": "G-Code File",
 				"description": "G-Code CNC machining file",
-				"role": "Viewer"
+				"role": "Viewer",
+				"icon": "file_association_icon"
 			},
 			{
 				"ext": "cnc",
 				"name": "G-Code File",
 				"description": "G-Code CNC machining file",
-				"role": "Viewer"
+				"role": "Viewer",
+				"icon": "file_association_icon"
 			}
 		]
 	},
@@ -266,7 +271,7 @@
 		"@serialport/parser-byte-length": "^13.0.0",
 		"@serialport/parser-readline": "^13.0.0",
 		"@sienci/avrgirl-arduino": "^5.0.3",
-		"@sienci/gviewer": "^0.1.29",
+		"@sienci/gviewer": "^0.1.36",
 		"@types/estree": "^1.0.9",
 		"acorn": "^8.18.0",
 		"acorn-walk": "^8.3.5",

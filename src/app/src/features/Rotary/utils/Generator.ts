@@ -50,9 +50,11 @@ export class StockTurningGenerator {
 		const units = store.get("workspace.units");
 		const safeHeight = this.getSafeZValue();
 
-		const { feedrate, spindleRPM, enableRehoming, shouldDwell } = this.options;
+		const { feedrate, spindleRPM, enableRehoming, shouldDwell, toolNumber } =
+			this.options;
 
 		const dwell = shouldDwell ? [`G04 P${SURFACING_DWELL_DURATION}`] : [];
+		const toolChange = toolNumber ? [`M6 T${toolNumber}`] : [];
 
 		const headerBlock = [
 			"(Header)",
@@ -60,6 +62,7 @@ export class StockTurningGenerator {
 			units === METRIC_UNITS ? "G21 ;mm" : "G20 ;inches",
 			`G1 F${feedrate}`,
 			"G90",
+			...toolChange,
 			`M3 S${spindleRPM}`,
 			...dwell,
 			"(Header End)",

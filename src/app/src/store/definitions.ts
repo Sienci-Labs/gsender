@@ -256,6 +256,12 @@ export interface FileInfoState {
 	content: string;
 	fileType: FILE_TYPE_T;
 	usedAxes: Array<string>;
+	// Line-number keyed record of the T/M/S words (and any trailing comment) seen
+	// on that line, produced by GCodeVirtualizer.generateFileStats().
+	spindleToolEvents: Record<
+		string,
+		{ T?: number; M?: number; S?: number; comment?: string }
+	>;
 }
 
 export type NetworkAddressKind =

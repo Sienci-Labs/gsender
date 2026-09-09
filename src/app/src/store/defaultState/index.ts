@@ -361,6 +361,7 @@ const defaultState: State = {
 					finalHeight: 40,
 					enableRehoming: false,
 					shouldDwell: false,
+					toolNumber: 0,
 				},
 			},
 			tab: {
@@ -401,6 +402,7 @@ const defaultState: State = {
 			shouldDwell: false,
 			flood: false,
 			mist: false,
+			toolNumber: 0,
 		},
 		visualizer: {
 			minimized: false,
@@ -410,7 +412,7 @@ const defaultState: State = {
 			disabled: false,
 			disabledLite: false,
 			minimizeRenders: false,
-			projection: "orthographic", // 'perspective' or 'orthographic'
+			projection: "Perspective", // 'Perspective' or 'Orthographic'
 			cameraMode: "pan", // 'pan' or 'rotate',
 			theme: "Dark",
 			SVGEnabled: false,

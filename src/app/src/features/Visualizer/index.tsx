@@ -23,6 +23,7 @@
 
 import { Tooltip } from "app/components/Tooltip";
 import { Widget } from "app/components/Widget";
+import { getSafeXYMoveCode } from "app/features/DRO/utils/SafeMove";
 import PluginVisualizerOverlayHost from "app/features/Plugins/components/PluginVisualizerOverlayHost";
 import { WorkspaceSelector } from "app/features/WorkspaceSelector/index.tsx";
 import combokeys from "app/lib/combokeys";
@@ -44,12 +45,12 @@ import _ from "lodash";
 import debounce from "lodash/debounce";
 import get from "lodash/get";
 import includes from "lodash/includes";
-import { FrownIcon } from "lucide-react";
+import { Box, Crosshair, FrownIcon, Square } from "lucide-react";
 import posthog from "posthog-js";
 import PropTypes from "prop-types";
 import pubsub from "pubsub-js";
 import { Component } from "react";
-import { FaFeatherAlt } from "react-icons/fa";
+import { FaCube, FaFeatherAlt } from "react-icons/fa";
 import { connect } from "react-redux";
 import {
 	GENERAL_CATEGORY,
@@ -91,6 +92,7 @@ import Loading from "./Loading";
 import { VisualizerPlaceholder } from "./Placeholder";
 import Rendering from "./Rendering";
 import SoftLimitsWarningArea from "./SoftLimitsWarningArea";
+import { visualizerBridge } from "./visualizerBridge";
 
 interface Views {
 	type: "isometric" | "top" | "front" | "right" | "left" | "default";
@@ -113,6 +115,14 @@ const VIEWCUBE_SIZE_PX_PORTRAIT = 64;
 const VIEWCUBE_CONTROL_GAP_PX = 12;
 // "Move To Here" toggle sits stacked directly above the lightweight toggle.
 const FLOATING_BUTTON_SIZE_PX = 44; // h-11 / w-11
+// Corner-view and projection-toggle buttons sit in a row directly above the cube,
+// stacked below the lightweight toggle (which shifts up to make room). Sized
+// smaller than FLOATING_BUTTON_SIZE_PX to read as a secondary/utility row.
+const BELOW_CUBE_BUTTON_SIZE_PX = 36;
+const BELOW_CUBE_BUTTON_GAP_PX = 8;
+// Extra clearance between the cube and the row above it (wider than
+// VIEWCUBE_CONTROL_GAP_PX — see comment at cubeButtonsRowBottom below).
+const CUBE_TOP_GAP_PX = 32;
 
 function getViewCubeControlPositions(isPortrait: boolean) {
 	const viewCubeLeft = isPortrait ? VIEWCUBE_LEFT_PX_PORTRAIT : VIEWCUBE_LEFT_PX;
@@ -120,10 +130,28 @@ function getViewCubeControlPositions(isPortrait: boolean) {
 		? VIEWCUBE_BOTTOM_PX_PORTRAIT
 		: VIEWCUBE_BOTTOM_PX;
 	const viewCubeSize = isPortrait ? VIEWCUBE_SIZE_PX_PORTRAIT : VIEWCUBE_SIZE_PX;
+	const cubeCenterX = viewCubeLeft + viewCubeSize / 2;
 
+	// Cube-adjacent row (corner view + projection toggle) sits above the cube —
+	// the slot the lightweight toggle used to occupy. Gap is wider than
+	// VIEWCUBE_CONTROL_GAP_PX because the cube's rendered corners swing beyond
+	// its nominal bounding box as it rotates, so a plain stacking gap isn't
+	// enough clearance to avoid visually colliding with it.
+	const cubeButtonsRowBottom = viewCubeBottom + viewCubeSize + CUBE_TOP_GAP_PX;
+	const cornerViewButtonPosition = {
+		left: cubeCenterX - (BELOW_CUBE_BUTTON_SIZE_PX + BELOW_CUBE_BUTTON_GAP_PX) / 2,
+		bottom: cubeButtonsRowBottom,
+	};
+	const projectionTogglePosition = {
+		left: cubeCenterX + (BELOW_CUBE_BUTTON_SIZE_PX + BELOW_CUBE_BUTTON_GAP_PX) / 2,
+		bottom: cubeButtonsRowBottom,
+	};
+
+	// Lightweight toggle shifts up one slot to make room for the row below it.
 	const lightweightTogglePosition = {
-		left: viewCubeLeft + viewCubeSize / 2,
-		bottom: viewCubeBottom + viewCubeSize + VIEWCUBE_CONTROL_GAP_PX,
+		left: cubeCenterX,
+		bottom:
+			cubeButtonsRowBottom + BELOW_CUBE_BUTTON_SIZE_PX + VIEWCUBE_CONTROL_GAP_PX,
 	};
 	const moveToHereTogglePosition = {
 		left: lightweightTogglePosition.left,
@@ -133,7 +161,12 @@ function getViewCubeControlPositions(isPortrait: boolean) {
 			VIEWCUBE_CONTROL_GAP_PX,
 	};
 
-	return { lightweightTogglePosition, moveToHereTogglePosition };
+	return {
+		lightweightTogglePosition,
+		moveToHereTogglePosition,
+		cornerViewButtonPosition,
+		projectionTogglePosition,
+	};
 }
 
 class Visualizer extends Component {
@@ -483,6 +516,13 @@ class Visualizer extends Component {
 				projection: "orthographic",
 			}));
 		},
+		toggleProjection: () => {
+			const current = store.get("widgets.visualizer.projection", "Perspective");
+			const next = current === "Orthographic" ? "Perspective" : "Orthographic";
+			store.set("widgets.visualizer.projection", next);
+			pubsub.publish("visualizer:settings");
+			this.forceUpdate();
+		},
 		toggleGCodeFilename: () => {
 			this.setState((state) => ({
 				gcode: {
@@ -616,12 +656,89 @@ class Visualizer extends Component {
 					cameraPositionNonce: prev.cameraPositionNonce + 1,
 				}));
 			},
+			toTopLeftCornerView: () => {
+				this.setState((prev) => ({
+					cameraPosition: "TopLeftCorner",
+					cameraPositionNonce: prev.cameraPositionNonce + 1,
+				}));
+			},
 			toFreeView: () => {
 				this.setState((prev) => ({
 					cameraPosition: "Free",
 					cameraPositionNonce: prev.cameraPositionNonce + 1,
 				}));
 			},
+		},
+		// Arm/disarm "Move To Here" via the visualizer bridge: pressing-and-
+		// holding a spot in the viewport rapids the spindle there. The bridge
+		// (GcodeViewer) owns the pointer gesture, hold indicator, and camera
+		// lock/restore; here we only decide when it's safe to arm and what to
+		// do with a committed pick.
+		armMoveToHere: () => {
+			const handle = visualizerBridge.get();
+			if (!handle) {
+				return;
+			}
+			if (handle.isRotaryFile()) {
+				toast.info("Move To Here isn't available for rotary files", {
+					position: "bottom-right",
+				});
+				return;
+			}
+			if (!this.actions.moveToHereMachineReady()) {
+				toast.info("Machine must be connected and idle to move", {
+					position: "bottom-right",
+				});
+				return;
+			}
+			handle.armPick("hold", this.actions.handleMoveToHerePick);
+			this.setState({ moveToHere: true });
+		},
+		disarmMoveToHere: () => {
+			visualizerBridge.get()?.disarmPick();
+			this.setState({ moveToHere: false });
+		},
+		toggleMoveToHere: () => {
+			if (this.state.moveToHere) {
+				this.actions.disarmMoveToHere();
+			} else {
+				this.actions.armMoveToHere();
+			}
+		},
+		moveToHereMachineReady: () => {
+			return (
+				!!this.props.isConnected &&
+				this.props.activeState === GRBL_ACTIVE_STATE_IDLE
+			);
+		},
+		handleMoveToHerePick: ({
+			world,
+		}: {
+			world: { x: number; y: number; z: number };
+		}) => {
+			if (!this.actions.moveToHereMachineReady()) {
+				toast.info("Machine must be connected and idle to move", {
+					position: "bottom-right",
+				});
+				this.actions.disarmMoveToHere();
+				return;
+			}
+
+			const x = Number(world.x.toFixed(3));
+			const y = Number(world.y.toFixed(3));
+			const unitModal = this.state.units === METRIC_UNITS ? "G21" : "G20";
+			controller.command(
+				"gcode:safe",
+				getSafeXYMoveCode(x, y),
+				unitModal,
+			);
+
+			toast.success(`Moving to X${x.toFixed(2)} Y${y.toFixed(2)}`, {
+				position: "bottom-right",
+			});
+
+			// Auto-disarm after a successful move.
+			this.actions.disarmMoveToHere();
 		},
 		handleLiteModeToggle: () => {
 			const { liteMode, liteOption } = this.state;
@@ -957,6 +1074,7 @@ class Visualizer extends Component {
 			cameraPosition: "3D", // 'Top', '3D', 'Front', 'Left', 'Right'
 			cameraPositionNonce: 0, // tracks how many repeat camera view requests have been made
 			// so that it can snap camera even if it's already in that view
+			moveToHere: false, // "Move To Here" placement mode is armed
 			isAgitated: false, // Defaults to false
 			currentTheme: getVisualizerTheme(),
 			currentTab: 0,
@@ -1605,8 +1723,16 @@ class Visualizer extends Component {
 			...this.actions,
 		};
 
-		const { lightweightTogglePosition, moveToHereTogglePosition } =
-			getViewCubeControlPositions(state.isPortrait);
+		const {
+			lightweightTogglePosition,
+			moveToHereTogglePosition,
+			cornerViewButtonPosition,
+			projectionTogglePosition,
+		} = getViewCubeControlPositions(state.isPortrait);
+
+		const isOrthographic =
+			store.get("widgets.visualizer.projection", "Perspective") ===
+			"Orthographic";
 
 		const showRendering = renderState === RENDER_RENDERING;
 		const showLoading = renderState === RENDER_LOADING;
@@ -1703,16 +1829,45 @@ class Visualizer extends Component {
 						{!showVisualizer && webGLAvailable && <VisualizerPlaceholder />}
 
 						<PluginVisualizerOverlayHost
-							baseBottomPx={lightweightTogglePosition.bottom}
-							leftPx={lightweightTogglePosition.left}
+							baseBottomPx={moveToHereTogglePosition.bottom}
+							leftPx={moveToHereTogglePosition.left}
 						/>
+
+						{state.isConnected && (
+							<Tooltip
+								content="Move To Here: press and hold a spot to move the spindle there"
+								side="top"
+							>
+								<button
+									type="button"
+									style={moveToHereTogglePosition}
+									className={cx(
+										"absolute z-[8998] inline-flex h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full border bg-dark-darker/70 shadow-[0_10px_30px_rgba(0,_0,_0,_0.25)] transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-dark-darker active:scale-[0.98] active:bg-dark-darker/85 mb-5",
+										{
+											"border-[rgba(14,_246,_174,_0.95)] text-[rgba(14,_246,_174,_0.95)] shadow-[0_0_0_1px_rgba(14,_246,_174,_0.35),0_10px_30px_rgba(0,_0,_0,_0.35)] hover:border-[rgba(14,_246,_174,_0.95)] hover:text-[rgba(14,_246,_174,_0.95)] hover:shadow-[0_0_0_1px_rgba(14,_246,_174,_0.45),0_12px_32px_rgba(0,_0,_0,_0.4)]":
+												state.moveToHere,
+											"border-gray-400/40 text-gray-300 hover:border-gray-200/70 hover:text-gray-100 hover:shadow-[0_12px_32px_rgba(0,_0,_0,_0.35)]":
+												!state.moveToHere,
+										},
+									)}
+									aria-label="Move To Here"
+									aria-pressed={state.moveToHere}
+									onClick={() => actions.toggleMoveToHere()}
+								>
+									<Crosshair
+										aria-hidden="true"
+										className="pointer-events-none h-5 w-5 shrink-0"
+									/>
+								</button>
+							</Tooltip>
+						)}
 
 						<Tooltip content={liteModeActionLabel} side="top">
 							<button
 								type="button"
 								style={lightweightTogglePosition}
 								className={cx(
-									"absolute z-[8998] inline-flex h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full border bg-dark-darker/70 shadow-[0_10px_30px_rgba(0,_0,_0,_0.25)] transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-dark-darker active:scale-[0.98] active:bg-dark-darker/85 mb-5",
+									"absolute z-[8998] inline-flex h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full border bg-dark-darker/70 shadow-[0_10px_30px_rgba(0,_0,_0,_0.25)] transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-dark-darker active:scale-[0.98] active:bg-dark-darker/85",
 									{
 										"border-[rgba(96,_165,_250,_0.95)] text-[rgba(96,_165,_250,_0.95)] shadow-[0_0_0_1px_rgba(96,_165,_250,_0.35),0_10px_30px_rgba(0,_0,_0,_0.35)] hover:border-[rgba(96,_165,_250,_0.95)] hover:text-[rgba(96,_165,_250,_0.95)] hover:shadow-[0_0_0_1px_rgba(96,_165,_250,_0.45),0_12px_32px_rgba(0,_0,_0,_0.4)]":
 											state.liteMode,
@@ -1728,6 +1883,63 @@ class Visualizer extends Component {
 									aria-hidden="true"
 									className="pointer-events-none h-5 w-5 shrink-0"
 								/>
+							</button>
+						</Tooltip>
+
+						<Tooltip content="Go to iso view" side="top">
+							<button
+								type="button"
+								style={cornerViewButtonPosition}
+								className="absolute z-[8998] inline-flex h-9 w-9 -translate-x-1/2 items-center justify-center rounded-full border border-gray-400/40 bg-dark-darker/70 text-gray-300 shadow-[0_10px_30px_rgba(0,_0,_0,_0.25)] transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out hover:border-gray-200/70 hover:text-gray-100 hover:shadow-[0_12px_32px_rgba(0,_0,_0,_0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-dark-darker active:scale-[0.98] active:bg-dark-darker/85"
+								aria-label="Go to iso view"
+								onClick={() => actions.camera.toTopLeftCornerView()}
+							>
+								<FaCube
+									aria-hidden="true"
+									className="pointer-events-none h-4 w-4 shrink-0"
+								/>
+							</button>
+						</Tooltip>
+
+						<Tooltip
+							content={
+								isOrthographic
+									? "Switch to perspective view"
+									: "Switch to orthographic view"
+							}
+							side="top"
+						>
+							<button
+								type="button"
+								style={projectionTogglePosition}
+								className={cx(
+									"absolute z-[8998] inline-flex h-9 w-9 -translate-x-1/2 items-center justify-center rounded-full border bg-dark-darker/70 shadow-[0_10px_30px_rgba(0,_0,_0,_0.25)] transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-dark-darker active:scale-[0.98] active:bg-dark-darker/85",
+									{
+										"border-[rgba(96,_165,_250,_0.95)] text-[rgba(96,_165,_250,_0.95)] shadow-[0_0_0_1px_rgba(96,_165,_250,_0.35),0_10px_30px_rgba(0,_0,_0,_0.35)] hover:border-[rgba(96,_165,_250,_0.95)] hover:text-[rgba(96,_165,_250,_0.95)] hover:shadow-[0_0_0_1px_rgba(96,_165,_250,_0.45),0_12px_32px_rgba(0,_0,_0,_0.4)]":
+											isOrthographic,
+										"border-gray-400/40 text-gray-300 hover:border-gray-200/70 hover:text-gray-100 hover:shadow-[0_12px_32px_rgba(0,_0,_0,_0.35)]":
+											!isOrthographic,
+									},
+								)}
+								aria-label={
+									isOrthographic
+										? "Switch to perspective view"
+										: "Switch to orthographic view"
+								}
+								aria-pressed={isOrthographic}
+								onClick={() => actions.toggleProjection()}
+							>
+								{isOrthographic ? (
+									<Square
+										aria-hidden="true"
+										className="pointer-events-none h-4 w-4 shrink-0"
+									/>
+								) : (
+									<Box
+										aria-hidden="true"
+										className="pointer-events-none h-4 w-4 shrink-0"
+									/>
+								)}
 							</button>
 						</Tooltip>
 

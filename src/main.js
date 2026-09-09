@@ -354,6 +354,8 @@ const main = () => {
 			const bounds = {
 				minWidth: 1044,
 				minHeight: 768,
+				width: 1280,
+				height: 800,
 				...store.get("bounds"),
 			};
 			if (usePendantView) {
@@ -440,7 +442,15 @@ const main = () => {
 					title: `gSender ${pkg.version}`,
 					kiosk,
 				};
-				window = await windowManager.openWindow(url, options, splashScreen);
+				// Don't force-maximize on launch (annoying on large monitors).
+				// Open at the saved bounds, or the sensible default above on first
+				// run; the close handler persists the last size/position.
+				window = await windowManager.openWindow(
+					url,
+					options,
+					splashScreen,
+					false,
+				);
 			}
 
 			window.on("ready-to-show", () => {
