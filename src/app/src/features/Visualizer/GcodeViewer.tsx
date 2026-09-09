@@ -349,8 +349,8 @@ class GcodeViewer extends Component<Props> {
 				visible: store.get("widgets.visualizer.objects.limits.visible", false),
 				labels: store.get("widgets.visualizer.boundingBoxLabels", false),
 			},
-			machineBed: this.buildMachineBedOptions(),
-			grid: this.buildGridOptions(),
+			machineBed: buildMachineBedOptions(),
+			grid: buildGridOptions(state.units),
 			camera: {
 				projection:
 					store.get("widgets.visualizer.projection", "Perspective") ===
