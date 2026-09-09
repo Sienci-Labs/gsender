@@ -122,7 +122,7 @@ const BELOW_CUBE_BUTTON_SIZE_PX = 36;
 const BELOW_CUBE_BUTTON_GAP_PX = 8;
 // Extra clearance between the cube and the row above it (wider than
 // VIEWCUBE_CONTROL_GAP_PX — see comment at cubeButtonsRowBottom below).
-const CUBE_TOP_GAP_PX = 24;
+const CUBE_TOP_GAP_PX = 32;
 
 function getViewCubeControlPositions(isPortrait: boolean) {
 	const viewCubeLeft = isPortrait ? VIEWCUBE_LEFT_PX_PORTRAIT : VIEWCUBE_LEFT_PX;
@@ -1867,7 +1867,7 @@ class Visualizer extends Component {
 								type="button"
 								style={lightweightTogglePosition}
 								className={cx(
-									"absolute z-[8998] inline-flex h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full border bg-dark-darker/70 shadow-[0_10px_30px_rgba(0,_0,_0,_0.25)] transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-dark-darker active:scale-[0.98] active:bg-dark-darker/85 mb-5",
+									"absolute z-[8998] inline-flex h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full border bg-dark-darker/70 shadow-[0_10px_30px_rgba(0,_0,_0,_0.25)] transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-dark-darker active:scale-[0.98] active:bg-dark-darker/85",
 									{
 										"border-[rgba(96,_165,_250,_0.95)] text-[rgba(96,_165,_250,_0.95)] shadow-[0_0_0_1px_rgba(96,_165,_250,_0.35),0_10px_30px_rgba(0,_0,_0,_0.35)] hover:border-[rgba(96,_165,_250,_0.95)] hover:text-[rgba(96,_165,_250,_0.95)] hover:shadow-[0_0_0_1px_rgba(96,_165,_250,_0.45),0_12px_32px_rgba(0,_0,_0,_0.4)]":
 											state.liteMode,
