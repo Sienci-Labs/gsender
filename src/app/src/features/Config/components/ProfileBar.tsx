@@ -38,9 +38,9 @@ export function ProfileBar() {
     );
 
     const canRestoreDefaults =
-    machineProfile.company === 'Sienci Labs' ||
-    !!machineProfile.grblHALeepromSettings ||
-    !!machineProfile.eepromSettings;
+        machineProfile.company === 'Sienci Labs' ||
+        !!machineProfile.grblHALeepromSettings ||
+        !!machineProfile.eepromSettings;
 
     function updateSettingsHandler() {
         updateAllSettings(settingsValues, EEPROM);
