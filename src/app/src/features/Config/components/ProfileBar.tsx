@@ -131,7 +131,7 @@ export function ProfileBar() {
                 </div>
 
                 <div className="grid grid-cols-4 h-full max-w-lg font-medium divide-x max-sm:divide-x-0 max-sm:hidden">
-                    <RestoreDefaultDialog isSienciMachine={canRestoreDefaults} />
+                    <RestoreDefaultDialog canRestoreDefaults={canRestoreDefaults} />
                     <ActionButton
                         icon={<PiLightning />}
                         label="Flash"
