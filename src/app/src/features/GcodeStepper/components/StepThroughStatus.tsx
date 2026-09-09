@@ -69,11 +69,13 @@ const AxisReadout: React.FC<{ label: string; value: string }> = ({
 		<span className="text-xs text-gray-500 dark:text-content-muted">
 			{label}
 		</span>
-		{/* Fixed-width and right-aligned: without this the bar reflows on every
-		    step as values cross a digit or pick up a minus sign. `ch` is exact
-		    under font-mono, and 9 of them hold the widest realistic readout
-		    ("-9999.999", or "-360.000°" for A). */}
-		<span className="inline-block w-[9ch] text-right font-mono tabular-nums text-blue-500 dark:text-blue-400">
+		{/* Minimum-width and right-aligned: keeps the bar from reflowing on
+		    every step as values cross a digit or pick up a minus sign, without
+		    clipping — A is a rotary axis and can accumulate well past ±360°
+		    over a multi-rotation job, so the box must grow for it rather than
+		    let the value overflow past a fixed width. `ch` is exact under
+		    font-mono; 7 covers the common case ("-9999.99"). */}
+		<span className="inline-block min-w-[7ch] text-right font-mono tabular-nums text-blue-500 dark:text-blue-400">
 			{value}
 		</span>
 	</div>
@@ -192,9 +194,9 @@ export const StepThroughStatus: React.FC<StepThroughStatusProps> = ({
 	onToggleHideProcessed,
 }) => {
 	// Index positions are always mm; convert only for display. Both unit systems
-	// use 3 decimals so the column width is constant across a units change.
+	// use 2 decimals so the column width is constant across a units change.
 	const imperial = units === IMPERIAL_UNITS;
-	const linear = (mm: number) => (imperial ? mm / MM_PER_INCH : mm).toFixed(3);
+	const linear = (mm: number) => (imperial ? mm / MM_PER_INCH : mm).toFixed(2);
 
 	const current = grblModals(modalState);
 	const previous = grblModals(previousModalState);
@@ -213,12 +215,12 @@ export const StepThroughStatus: React.FC<StepThroughStatusProps> = ({
 					<AxisReadout label="Y" value={linear(position.y)} />
 					<AxisReadout label="Z" value={linear(position.z)} />
 					{showAAxis && (
-						<AxisReadout label="A" value={`${position.a.toFixed(3)}°`} />
+						<AxisReadout label="A" value={`${position.a.toFixed(2)}°`} />
 					)}
 				</div>
 			</Block>
 
-			<Block label="Modals" className="min-w-[18rem] flex-1">
+			<Block label="Modals" className="min-w-[15rem] flex-1">
 				{current === null ? (
 					<span className="text-xs text-gray-500 dark:text-content-muted">
 						—
