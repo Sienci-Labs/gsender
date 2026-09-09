@@ -407,16 +407,18 @@ export default [
             height: 465,
         },
     },
-    {
-        id: 60,
-        company: '',
-        name: 'Voron Cascade',
-        type: '',
-        version: '',
-        mm: {
-            width: 260,
-            depth: 220,
-            height: 100,
-        },
+   {
+    id: 60,
+    company: '',
+    name: 'Voron Cascade',
+    type: 'BTT Scylla',
+    version: 'V1.0',
+    mm: {
+        width: 260,
+        depth: 220,
+        height: 100,
     },
+    grblHALeepromSettings: voronCascadeSettings.DEFAULT,
+    orderedSettings: voronCascadeSettings.ORDERED,
+},
 ];
