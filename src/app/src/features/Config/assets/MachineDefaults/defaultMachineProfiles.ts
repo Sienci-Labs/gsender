@@ -25,7 +25,7 @@ import * as longMillGrblEEPROM from './grbl/longmill';
 import * as longMillGrblHALEEPROM from './grblHAL/longmill';
 import * as millOneGrblEEPROM from './grbl/millone';
 import * as altmillSettings from './grblHAL/Altmill';
-
+import * as voronCascadeSettings from './grblHAL/voronCascade';
 export default [
     {
         id: 0,
