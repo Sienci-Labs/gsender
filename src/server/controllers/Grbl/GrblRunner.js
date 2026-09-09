@@ -27,13 +27,13 @@ import decimalPlaces from "../../lib/decimal-places";
 import logger from "../../lib/logger";
 import { GRBL_ACTIVE_STATE_ALARM, GRBL_ACTIVE_STATE_IDLE } from "./constants";
 import GrblLineParser from "./GrblLineParser";
-import GrblLineParserResultAlarm from "./GrblLineParserResultAlarm";
-import GrblLineParserResultError from "./GrblLineParserResultError";
-import GrblLineParserResultFeedback from "./GrblLineParserResultFeedback";
+import LineParserResultAlarm from "../shared/LineParserResultAlarm";
+import LineParserResultError from "../shared/LineParserResultError";
+import LineParserResultFeedback from "../shared/LineParserResultFeedback";
 import GrblLineParserResultOk from "./GrblLineParserResultOk";
 import GrblLineParserResultParameters from "./GrblLineParserResultParameters";
 import GrblLineParserResultParserState from "./GrblLineParserResultParserState";
-import GrblLineParserResultSettings from "./GrblLineParserResultSettings";
+import LineParserResultSettings from "../shared/LineParserResultSettings";
 import GrblLineParserResultStartup from "./GrblLineParserResultStartup";
 import GrblLineParserResultStatus from "./GrblLineParserResultStatus";
 
@@ -151,14 +151,14 @@ class GrblRunner extends events.EventEmitter {
 			this.emit("ok", payload);
 			return;
 		}
-		if (type === GrblLineParserResultError) {
+		if (type === LineParserResultError) {
 			// https://nodejs.org/api/events.html#events_error_events
 			// As a best practice, listeners should always be added for the 'error' events.
 			this.emit("error", payload);
-			log.error("Error found in GrblLineParserResultError");
+			log.error("Error found in LineParserResultError");
 			return;
 		}
-		if (type === GrblLineParserResultAlarm) {
+		if (type === LineParserResultAlarm) {
 			const nextState = {
 				...this.state,
 				status: {
@@ -219,11 +219,11 @@ class GrblRunner extends events.EventEmitter {
 			this.emit("parameters", payload);
 			return;
 		}
-		if (type === GrblLineParserResultFeedback) {
+		if (type === LineParserResultFeedback) {
 			this.emit("feedback", payload);
 			return;
 		}
-		if (type === GrblLineParserResultSettings) {
+		if (type === LineParserResultSettings) {
 			const { name, value } = payload;
 			const nextSettings = {
 				...this.settings,

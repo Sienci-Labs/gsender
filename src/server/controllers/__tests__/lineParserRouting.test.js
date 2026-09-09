@@ -112,8 +112,9 @@ describe("lines the two parsers route differently", () => {
 	});
 
 	test("[OPT:...] is Option on Grbl but Info on grblHAL", () => {
-		// GrblHalLineParserResultOption.js exists on disk but is never imported
-		// or registered by GrblHalLineParser - it is dead code.
+		// GrblHalLineParser has never registered an Option matcher, so [OPT:...]
+		// falls through to Info. The duplicate GrblHalLineParserResultOption.js
+		// was dead code and has been removed; Grbl's copy now lives in shared/.
 		expect(grbl("[OPT:VL,15,128]")).toEqual({
 			type: "LineParserResultOption",
 			payload: { message: "VL,15,128", raw: "[OPT:VL,15,128]" },

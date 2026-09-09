@@ -21,10 +21,11 @@
  *
  */
 
-// https://github.com/grbl/grbl/wiki/Interfacing-with-Grbl#alarms
-class GrblHalLineParserResultAlarm {
+class LineParserResultEcho {
 	static parse(line) {
-		const r = line.match(/^ALARM:\s*(.+)$/);
+		// * Grbl v1.1
+		//   [echo:]
+		const r = line.match(/^\[(?:echo:)(.+)\]$/);
 		if (!r) {
 			return null;
 		}
@@ -34,10 +35,10 @@ class GrblHalLineParserResultAlarm {
 		};
 
 		return {
-			type: GrblHalLineParserResultAlarm,
+			type: LineParserResultEcho,
 			payload: payload,
 		};
 	}
 }
 
-export default GrblHalLineParserResultAlarm;
+export default LineParserResultEcho;

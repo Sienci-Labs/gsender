@@ -22,7 +22,7 @@
  */
 
 // https://github.com/grbl/grbl/wiki/Interfacing-with-Grbl#grbl-response-meanings
-class GrblHalLineParserResultError {
+class LineParserResultError {
 	static parse(line) {
 		const r = line.match(/^error:\s*(.+)$/);
 		if (!r) {
@@ -34,10 +34,10 @@ class GrblHalLineParserResultError {
 		};
 
 		return {
-			type: GrblHalLineParserResultError,
+			type: LineParserResultError,
 			payload: payload,
 		};
 	}
 }
 
-export default GrblHalLineParserResultError;
+export default LineParserResultError;

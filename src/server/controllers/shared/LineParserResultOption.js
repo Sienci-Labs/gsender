@@ -21,11 +21,11 @@
  *
  */
 
-class GrblLineParserResultHelp {
+class LineParserResultOption {
 	static parse(line) {
 		// * Grbl v1.1
-		//   [HLP:]
-		const r = line.match(/^\[(?:HLP:)(.+)\]$/);
+		//   [OPT:]
+		const r = line.match(/^\[(?:OPT:)(.+)\]$/);
 		if (!r) {
 			return null;
 		}
@@ -35,10 +35,10 @@ class GrblLineParserResultHelp {
 		};
 
 		return {
-			type: GrblLineParserResultHelp,
+			type: LineParserResultOption,
 			payload: payload,
 		};
 	}
 }
 
-export default GrblLineParserResultHelp;
+export default LineParserResultOption;
