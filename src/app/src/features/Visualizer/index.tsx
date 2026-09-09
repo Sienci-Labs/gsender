@@ -23,6 +23,7 @@
 
 import { Tooltip } from "app/components/Tooltip";
 import { Widget } from "app/components/Widget";
+import { getSafeXYMoveCode } from "app/features/DRO/utils/SafeMove";
 import PluginVisualizerOverlayHost from "app/features/Plugins/components/PluginVisualizerOverlayHost";
 import { WorkspaceSelector } from "app/features/WorkspaceSelector/index.tsx";
 import combokeys from "app/lib/combokeys";
@@ -44,7 +45,7 @@ import _ from "lodash";
 import debounce from "lodash/debounce";
 import get from "lodash/get";
 import includes from "lodash/includes";
-import { Box, FrownIcon, Square } from "lucide-react";
+import { Box, Crosshair, FrownIcon, Square } from "lucide-react";
 import posthog from "posthog-js";
 import PropTypes from "prop-types";
 import pubsub from "pubsub-js";
@@ -91,6 +92,7 @@ import Loading from "./Loading";
 import { VisualizerPlaceholder } from "./Placeholder";
 import Rendering from "./Rendering";
 import SoftLimitsWarningArea from "./SoftLimitsWarningArea";
+import { visualizerBridge } from "./visualizerBridge";
 
 interface Views {
 	type: "isometric" | "top" | "front" | "right" | "left" | "default";
@@ -667,6 +669,77 @@ class Visualizer extends Component {
 				}));
 			},
 		},
+		// Arm/disarm "Move To Here" via the visualizer bridge: pressing-and-
+		// holding a spot in the viewport rapids the spindle there. The bridge
+		// (GcodeViewer) owns the pointer gesture, hold indicator, and camera
+		// lock/restore; here we only decide when it's safe to arm and what to
+		// do with a committed pick.
+		armMoveToHere: () => {
+			const handle = visualizerBridge.get();
+			if (!handle) {
+				return;
+			}
+			if (handle.isRotaryFile()) {
+				toast.info("Move To Here isn't available for rotary files", {
+					position: "bottom-right",
+				});
+				return;
+			}
+			if (!this.actions.moveToHereMachineReady()) {
+				toast.info("Machine must be connected and idle to move", {
+					position: "bottom-right",
+				});
+				return;
+			}
+			handle.armPick("hold", this.actions.handleMoveToHerePick);
+			this.setState({ moveToHere: true });
+		},
+		disarmMoveToHere: () => {
+			visualizerBridge.get()?.disarmPick();
+			this.setState({ moveToHere: false });
+		},
+		toggleMoveToHere: () => {
+			if (this.state.moveToHere) {
+				this.actions.disarmMoveToHere();
+			} else {
+				this.actions.armMoveToHere();
+			}
+		},
+		moveToHereMachineReady: () => {
+			return (
+				!!this.props.isConnected &&
+				this.props.activeState === GRBL_ACTIVE_STATE_IDLE
+			);
+		},
+		handleMoveToHerePick: ({
+			world,
+		}: {
+			world: { x: number; y: number; z: number };
+		}) => {
+			if (!this.actions.moveToHereMachineReady()) {
+				toast.info("Machine must be connected and idle to move", {
+					position: "bottom-right",
+				});
+				this.actions.disarmMoveToHere();
+				return;
+			}
+
+			const x = Number(world.x.toFixed(3));
+			const y = Number(world.y.toFixed(3));
+			const unitModal = this.state.units === METRIC_UNITS ? "G21" : "G20";
+			controller.command(
+				"gcode:safe",
+				getSafeXYMoveCode(x, y),
+				unitModal,
+			);
+
+			toast.success(`Moving to X${x.toFixed(2)} Y${y.toFixed(2)}`, {
+				position: "bottom-right",
+			});
+
+			// Auto-disarm after a successful move.
+			this.actions.disarmMoveToHere();
+		},
 		handleLiteModeToggle: () => {
 			const { liteMode, liteOption } = this.state;
 			const { isFileLoaded } = this.props;
@@ -1001,6 +1074,7 @@ class Visualizer extends Component {
 			cameraPosition: "3D", // 'Top', '3D', 'Front', 'Left', 'Right'
 			cameraPositionNonce: 0, // tracks how many repeat camera view requests have been made
 			// so that it can snap camera even if it's already in that view
+			moveToHere: false, // "Move To Here" placement mode is armed
 			isAgitated: false, // Defaults to false
 			currentTheme: getVisualizerTheme(),
 			currentTab: 0,
@@ -1755,9 +1829,38 @@ class Visualizer extends Component {
 						{!showVisualizer && webGLAvailable && <VisualizerPlaceholder />}
 
 						<PluginVisualizerOverlayHost
-							baseBottomPx={lightweightTogglePosition.bottom}
-							leftPx={lightweightTogglePosition.left}
+							baseBottomPx={moveToHereTogglePosition.bottom}
+							leftPx={moveToHereTogglePosition.left}
 						/>
+
+						{state.isConnected && (
+							<Tooltip
+								content="Move To Here: press and hold a spot to move the spindle there"
+								side="top"
+							>
+								<button
+									type="button"
+									style={moveToHereTogglePosition}
+									className={cx(
+										"absolute z-[8998] inline-flex h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full border bg-dark-darker/70 shadow-[0_10px_30px_rgba(0,_0,_0,_0.25)] transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-dark-darker active:scale-[0.98] active:bg-dark-darker/85 mb-5",
+										{
+											"border-[rgba(14,_246,_174,_0.95)] text-[rgba(14,_246,_174,_0.95)] shadow-[0_0_0_1px_rgba(14,_246,_174,_0.35),0_10px_30px_rgba(0,_0,_0,_0.35)] hover:border-[rgba(14,_246,_174,_0.95)] hover:text-[rgba(14,_246,_174,_0.95)] hover:shadow-[0_0_0_1px_rgba(14,_246,_174,_0.45),0_12px_32px_rgba(0,_0,_0,_0.4)]":
+												state.moveToHere,
+											"border-gray-400/40 text-gray-300 hover:border-gray-200/70 hover:text-gray-100 hover:shadow-[0_12px_32px_rgba(0,_0,_0,_0.35)]":
+												!state.moveToHere,
+										},
+									)}
+									aria-label="Move To Here"
+									aria-pressed={state.moveToHere}
+									onClick={() => actions.toggleMoveToHere()}
+								>
+									<Crosshair
+										aria-hidden="true"
+										className="pointer-events-none h-5 w-5 shrink-0"
+									/>
+								</button>
+							</Tooltip>
+						)}
 
 						<Tooltip content={liteModeActionLabel} side="top">
 							<button

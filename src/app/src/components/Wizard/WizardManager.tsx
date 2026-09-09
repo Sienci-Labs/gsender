@@ -69,6 +69,7 @@ export function WizardManager({
 				<WizardLanding
 					title={wizard.title}
 					image={wizard.image}
+					invertImageInDarkMode={wizard.invertImageInDarkMode}
 					subWizards={wizard.subWizards}
 					onSelectSubWizard={handleSelectSubWizard}
 					onBack={onExit}
