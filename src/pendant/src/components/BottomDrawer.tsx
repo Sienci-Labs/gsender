@@ -160,7 +160,11 @@ export default function BottomDrawer() {
 			"serialport:write": (data: string, context: { source?: string }) => {
 				const line = String(data).trim();
 				if (!line) return;
-				const prefix = context?.source ? `[${context.source}] ` : "";
+				// Server notices (the jog streamer's lifecycle, for one) are not
+				// machine traffic, so they read as plain lines rather than as
+				// something a source sent. Mirrors WRITE_SOURCE_SERVER.
+				const source = context?.source === "server" ? null : context?.source;
+				const prefix = source ? `[${source}] ` : "";
 				reduxStore.dispatch(addToHistory([`${prefix}${line}`]));
 			},
 			"serialport:open": ({

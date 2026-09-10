@@ -78,6 +78,7 @@ import {
 	GLOBAL_OBJECTS as globalObjects,
 	WRITE_SOURCE_CLIENT,
 	WRITE_SOURCE_FEEDER,
+	WRITE_SOURCE_SERVER,
 	Y_AXIS_COMMANDS,
 } from "../constants";
 import { calcOverrides } from "../runOverride";
@@ -806,6 +807,13 @@ class GrblHalController {
 			rxBufferSize: 256,
 			log,
 		});
+		// The jog streamer talks to the operator through the console as one
+		// message family, written as the server rather than as machine traffic.
+		const announceJog = (message) => {
+			this.emit("serialport:write", `${message}\n`, {
+				source: WRITE_SOURCE_SERVER,
+			});
+		};
 		// stop() drains and abort() can still fire mid-drain, so one jog may
 		// raise both events - only announce the end of the jog once.
 		this.jogAnnounced = false;
@@ -814,20 +822,15 @@ class GrblHalController {
 				return;
 			}
 			this.jogAnnounced = false;
-			const suffix = reason ? ` (${reason})` : "";
-			this.emit("serialport:write", `Jogging service stopped${suffix}\n`, {
-				source: WRITE_SOURCE_CLIENT,
-			});
+			announceJog(`Jogging service stopped${reason ? ` (${reason})` : ""}`);
 		};
 		// One console line for the whole jog, not one per segment.
 		this.jogStreamer.on("start", ({ summary }) => {
 			this.jogAnnounced = true;
-			this.emit("serialport:write", "Jogging service started\n", {
-				source: WRITE_SOURCE_CLIENT,
-			});
-			this.emit("serialport:write", `${summary}\n`, {
-				source: WRITE_SOURCE_CLIENT,
-			});
+			announceJog(summary);
+		});
+		this.jogStreamer.on("feedrate", ({ summary }) => {
+			announceJog(summary);
 		});
 		this.jogStreamer.on("stop", () => {
 			announceJogStopped();

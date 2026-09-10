@@ -77,6 +77,11 @@ export const MAX_STREAM_DURATION_MS = 30000;
 // How long we keep absorbing our own acks after a jog cancel.
 export const DRAIN_TIMEOUT_MS = 1500;
 
+// A joystick varies its feedrate continuously, so speed changes are announced
+// no more often than this. A keybind change, being one discrete step, always
+// lands on the first opportunity.
+export const FEEDRATE_ANNOUNCE_INTERVAL_MS = 1000;
+
 // Retained for parity with the previous jog handlers. Properly clamping the
 // feedrate against $112 makes this redundant, and it wrongly derates an XZ
 // move where Z is not the binding axis - remove it in a follow-up.
@@ -274,6 +279,8 @@ export default class JogStreamer extends events.EventEmitter {
 		this.deadlineAt = 0;
 		this.drainDeadlineAt = 0;
 		this.warnedStarved = false;
+		this.announcedFeedrate = 0;
+		this.announcedAt = 0;
 	}
 
 	isActive() {
@@ -326,7 +333,7 @@ export default class JogStreamer extends events.EventEmitter {
 			mode: this.mode,
 			direction,
 			feedrate: this.plan.feedrate,
-			summary: this._summary(),
+			summary: this._startedMessage(),
 		});
 		return true;
 	}
@@ -367,6 +374,7 @@ export default class JogStreamer extends events.EventEmitter {
 			this._refreshTravelBudget();
 		}
 		this._replan();
+		this._announceFeedrate();
 		this.deadlineAt = this.now() + MAX_STREAM_DURATION_MS;
 		return true;
 	}
@@ -434,7 +442,7 @@ export default class JogStreamer extends events.EventEmitter {
 			this.emit("start", {
 				mode: this.mode,
 				feedrate: this.plan.feedrate,
-				summary: this._summary(),
+				summary: this._startedMessage(),
 			});
 		} else {
 			this.deadlineAt = this.now() + MAX_STREAM_DURATION_MS;
@@ -613,6 +621,9 @@ export default class JogStreamer extends events.EventEmitter {
 		this.state = JOG_STATE_STREAMING;
 		this.startedAt = this.now();
 		this.deadlineAt = this.startedAt + MAX_STREAM_DURATION_MS;
+		// The start line already carries the speed, so it counts as announced.
+		this.announcedFeedrate = Math.round(this.plan.feedrate);
+		this.announcedAt = this.startedAt;
 		this.emittedUntil = this.startedAt;
 		this._pump();
 		this.tick = this.setIntervalFn(() => this._onTick(), TICK_MS);
@@ -874,12 +885,38 @@ export default class JogStreamer extends events.EventEmitter {
 		return `$J=G21G91${words}F${round(derated)}`;
 	}
 
-	_summary() {
-		const active = ALL_AXES.filter((axis) => this.dir[axis]).map(
-			(axis) => `${axis}${this.dir[axis] > 0 ? "+" : "-"}`,
-		);
+	/**
+	 * The console messages this service writes. One family, one prefix, so the
+	 * whole life of a jog reads as a single conversation in the terminal.
+	 */
+	_startedMessage() {
+		const active = ALL_AXES.filter((axis) => this.dir[axis])
+			.map((axis) => `${axis}${this.dir[axis] > 0 ? "+" : "-"}`)
+			.join(" ");
 		const feedrate = Math.round(this.plan?.feedrate ?? this.requestedFeedrate);
-		return `$J= (streaming ${active.join(" ") || "-"} F${feedrate})`;
+		return `Jogging service started ${active || "-"} at F${feedrate}`;
+	}
+
+	/**
+	 * Announce a change in the speed the machine is actually being given, which
+	 * is not always the speed that was asked for - it is clamped against each
+	 * axis' max rate first.
+	 */
+	_announceFeedrate() {
+		const feedrate = Math.round(this.plan.feedrate);
+		if (feedrate === this.announcedFeedrate) {
+			return;
+		}
+		const now = this.now();
+		if (now - this.announcedAt < FEEDRATE_ANNOUNCE_INTERVAL_MS) {
+			return;
+		}
+		this.announcedFeedrate = feedrate;
+		this.announcedAt = now;
+		this.emit("feedrate", {
+			feedrate,
+			summary: `Jogging service now at F${feedrate}`,
+		});
 	}
 
 	_warn(message) {

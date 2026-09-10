@@ -317,6 +317,36 @@ describe("JogStreamer velocity mode", () => {
 		expect(ctx.streamer.plan.feedrate).toBe(DEFAULT_FEEDRATE);
 	});
 
+	it("announces the jog it started, with the speed it settled on", () => {
+		const ctx = build();
+		const started = [];
+		ctx.streamer.on("start", ({ summary }) => started.push(summary));
+
+		ctx.streamer.start({ axes: { X: 1, Y: -1 }, feedrate: 1200 });
+
+		expect(started).toEqual(["Jogging service started X+ Y- at F1200"]);
+	});
+
+	it("announces a speed change, but not faster than once a second", () => {
+		const ctx = build();
+		const changes = [];
+		ctx.streamer.on("feedrate", ({ summary }) => changes.push(summary));
+
+		ctx.streamer.start({ axes: { X: 1 }, feedrate: 1200 });
+
+		// Same speed, and too soon after the start line: nothing to say.
+		ctx.streamer.update({ axes: { X: 1 }, feedrate: 1200 });
+		ctx.streamer.update({ axes: { X: 1 }, feedrate: 2400 });
+		expect(changes).toEqual([]);
+
+		// A joystick sweep past the interval announces once, at the speed it
+		// was last given.
+		ctx.clock.advance(1000);
+		ctx.streamer.update({ axes: { X: 1 }, feedrate: 2400 });
+		ctx.streamer.update({ axes: { X: 1 }, feedrate: 3000 });
+		expect(changes).toEqual(["Jogging service now at F2400"]);
+	});
+
 	it("applies the Z feedrate derate for parity with the old handlers", () => {
 		const ctx = build();
 		ctx.streamer.start({ axes: { Z: -1 }, feedrate: 1000 });
