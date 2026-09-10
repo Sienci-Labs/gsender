@@ -147,6 +147,7 @@ export const topicsMap = new Map([
 	["registerParser", "parser"],
 	["viewer", "viewer"],
 	["useVisualizerPick", "viewer"],
+	["machine", "controller"],
 ]);
 
 // The import specifiers the permission scanner looks for in a plugin's built

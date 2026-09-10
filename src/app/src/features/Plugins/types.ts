@@ -184,7 +184,12 @@ export type PluginPermissionsType =
 	| "storage"
 	| (string & {});
 
-export type PluginTopicsType = "workspace" | "redux" | "parser" | "viewer";
+export type PluginTopicsType =
+	| "workspace"
+	| "redux"
+	| "parser"
+	| "viewer"
+	| "controller";
 
 export type PluginBridgeRequestType =
 	| "machine:get:context"
@@ -270,6 +275,11 @@ export type PluginParserError = {
 	message: string;
 };
 
+// a relayed controller event, as pushed over the `"controller"` topic.
+// `args` are the exact arguments the host's own `controller.addListener`
+// callback would have received
+export type ControllerEvent = { name: string; args: unknown[] };
+
 export type PluginBridgeRequest = {
 	id: string;
 	type: PluginBridgeRequestType;
@@ -283,10 +293,14 @@ export type PluginBridgeResponse = {
 	error?: string;
 };
 
-// Reactive state that plugins can subscribe to for live updates. "viewer" is a
-// push-only event stream (pick/hold-progress events) rather than a state
-// snapshot topic.
-export type PluginBridgeTopic = "workspace" | "redux" | "parser" | "viewer";
+// reactive state that plugins can subscribe to for live updates.
+// "viewer" and "controller" are push-only event streams.
+export type PluginBridgeTopic =
+	| "workspace"
+	| "redux"
+	| "parser"
+	| "viewer"
+	| "controller";
 
 /**
  * A pushed event, as opposed to a topic snapshot.

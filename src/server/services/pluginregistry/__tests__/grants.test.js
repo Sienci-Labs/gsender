@@ -66,6 +66,19 @@ describe("buildGrantFromScan", () => {
 			expect(capabilities.requestTypes).toEqual([]);
 		}
 	});
+
+	it("grants the 'controller' push topic for a 'machine' import", () => {
+		const { permissions, capabilities } = buildGrantFromScan(["machine"]);
+
+		expect(capabilities.topics).toContain("controller");
+		expect(permissions).toContain("machine:read");
+	});
+
+	it("does not grant the 'controller' topic from unrelated imports", () => {
+		const { capabilities } = buildGrantFromScan(["workspace"]);
+
+		expect(capabilities.topics).not.toContain("controller");
+	});
 });
 
 describe("parser permissions", () => {
