@@ -29,14 +29,14 @@ import GrblHalLineParserResultJSON from "server/controllers/Grblhal/GrblHalLineP
 import GrblHalLineParserResultSettingDetails from "server/controllers/Grblhal/GrblHalLineParserResultSettingDetails";
 import GrblHalLineParserResultSpindle from "server/controllers/Grblhal/GrblHalLineParserResultSpindle";
 import GrblHalErrorDescription from "./GrblHalErrorDescription";
-import GrblHalLineParserResultAlarm from "./GrblHalLineParserResultAlarm";
+import LineParserResultAlarm from "../shared/LineParserResultAlarm";
 import GrblHalLineParserResultAlarmDetails from "./GrblHalLineParserResultAlarmDetails";
 import GrblHalLineParserResultAXS from "./GrblHalLineParserResultAXS";
-import GrblHalLineParserResultEcho from "./GrblHalLineParserResultEcho";
-import GrblHalLineParserResultError from "./GrblHalLineParserResultError";
-import GrblHalLineParserResultFeedback from "./GrblHalLineParserResultFeedback";
+import LineParserResultEcho from "../shared/LineParserResultEcho";
+import LineParserResultError from "../shared/LineParserResultError";
+import LineParserResultFeedback from "../shared/LineParserResultFeedback";
 import GrblHalLineParserResultGroupDetail from "./GrblHalLineParserResultGroupDetail";
-import GrblHalLineParserResultHelp from "./GrblHalLineParserResultHelp";
+import LineParserResultHelp from "../shared/LineParserResultHelp";
 //import GrblHalLineParserResultCode from './GrblHalLineParserResultCode';
 import GrblHalLineParserResultInfo from "./GrblHalLineParserResultInfo";
 import GrblHalLineParserResultOk from "./GrblHalLineParserResultOk";
@@ -44,7 +44,7 @@ import GrblHalLineParserResultParameters from "./GrblHalLineParserResultParamete
 import GrbHalLineParserResultParserState from "./GrblHalLineParserResultParserState";
 import GbrlHalLineParserResultSDCard from "./GrblHalLineParserResultSDCard";
 import GrblHalLineParserResultSettingDescription from "./GrblHalLineParserResultSettingDescription";
-import GrblHalLineParserResultSettings from "./GrblHalLineParserResultSettings";
+import LineParserResultSettings from "../shared/LineParserResultSettings";
 import GrblHalLineParserResultStartup from "./GrblHalLineParserResultStartup";
 import GrblHalLineParserResultStatus from "./GrblHalLineParserResultStatus";
 import GrblHalLineParserResultTool from "./GrblHalLineParserResultTool";
@@ -65,10 +65,10 @@ class GrblHalLineParser {
 			GrblHalLineParserResultOk,
 
 			// error:x
-			GrblHalLineParserResultError,
+			LineParserResultError,
 
 			// ALARM:
-			GrblHalLineParserResultAlarm,
+			LineParserResultAlarm,
 
 			// [MSG:ATCI:key:value|another_key:value]
 			GrblHalLineParserResultATCI,
@@ -94,7 +94,7 @@ class GrblHalLineParser {
 			GrblHalLineParserResultParameters,
 
 			// [HLP:] (v1.1)
-			GrblHalLineParserResultHelp,
+			LineParserResultHelp,
 
 			// [VER:] (v1.1)
 			GrblHalLineParserResultVersion,
@@ -130,14 +130,14 @@ class GrblHalLineParser {
 			GrblHalLineParserResultInfo,
 
 			// [echo:] (v1.1)
-			GrblHalLineParserResultEcho,
+			LineParserResultEcho,
 
 			// [] (v0.9)
 			// [MSG:] (v1.1)
-			GrblHalLineParserResultFeedback,
+			LineParserResultFeedback,
 
 			// $xx
-			GrblHalLineParserResultSettings,
+			LineParserResultSettings,
 
 			// Grbl X.Xx ['$' for help]
 			GrblHalLineParserResultStartup,

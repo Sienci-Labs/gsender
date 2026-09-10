@@ -21,26 +21,24 @@
  *
  */
 
-import _ from "lodash";
-
-class GrblLineParserResultSettings {
+class LineParserResultHelp {
 	static parse(line) {
-		const r = line.match(/^(\$[^=]+)=([^(]*)(\(.*\))*/);
+		// * Grbl v1.1
+		//   [HLP:]
+		const r = line.match(/^\[(?:HLP:)(.+)\]$/);
 		if (!r) {
 			return null;
 		}
 
 		const payload = {
-			name: r[1],
-			value: r[2].trim(), // need this trim as it may have a space at the end
-			message: _.trim(r[3], "()"),
+			message: r[1],
 		};
 
 		return {
-			type: GrblLineParserResultSettings,
+			type: LineParserResultHelp,
 			payload: payload,
 		};
 	}
 }
 
-export default GrblLineParserResultSettings;
+export default LineParserResultHelp;

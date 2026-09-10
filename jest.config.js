@@ -19,6 +19,7 @@ module.exports = {
 			"<rootDir>/src/app/src/__mocks__/styleMock.js",
 		"\\.(jpg|jpeg|png|gif|svg)$": "<rootDir>/src/app/src/__mocks__/fileMock.js",
 		"^app/(.*)$": "<rootDir>/src/app/src/$1",
+		"^server/(.*)$": "<rootDir>/src/server/$1",
 		"^(\\.{1,2}/)*config/settings$":
 			"<rootDir>/src/app/src/config/__mocks__/settings.ts",
 		"react-syntax-highlighter":

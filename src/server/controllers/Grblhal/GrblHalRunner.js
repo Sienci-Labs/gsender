@@ -37,12 +37,12 @@ import {
 } from "./constants";
 import GrblHalErrorDescription from "./GrblHalErrorDescription";
 import GrblHalLineParser from "./GrblHalLineParser";
-import GrblHalLineParserResultAlarm from "./GrblHalLineParserResultAlarm";
+import LineParserResultAlarm from "../shared/LineParserResultAlarm";
 import GrblHalLineParserResultAlarmDetails from "./GrblHalLineParserResultAlarmDetails";
 import GrblHalLineParserResultAXS from "./GrblHalLineParserResultAXS";
 import GrblHalLineParserResultCode from "./GrblHalLineParserResultCode";
-import GrblHalLineParserResultError from "./GrblHalLineParserResultError";
-import GrblHalLineParserResultFeedback from "./GrblHalLineParserResultFeedback";
+import LineParserResultError from "../shared/LineParserResultError";
+import LineParserResultFeedback from "../shared/LineParserResultFeedback";
 import GrblHalLineParserResultGroupDetail from "./GrblHalLineParserResultGroupDetail";
 import GrblHalLineParserResultInfo from "./GrblHalLineParserResultInfo";
 import GrblHalLineParserResultOk from "./GrblHalLineParserResultOk";
@@ -51,7 +51,7 @@ import GrbHalLineParserResultParserState from "./GrblHalLineParserResultParserSt
 import GrblHalLineParserResultSDCard from "./GrblHalLineParserResultSDCard";
 import GrblHalLineParserResultSettingDescription from "./GrblHalLineParserResultSettingDescription";
 import GrblHalLineParserResultSettingDetails from "./GrblHalLineParserResultSettingDetails";
-import GrblHalLineParserResultSettings from "./GrblHalLineParserResultSettings";
+import LineParserResultSettings from "../shared/LineParserResultSettings";
 import GrblHalLineParserResultStartup from "./GrblHalLineParserResultStartup";
 import GrblHalLineParserResultStatus from "./GrblHalLineParserResultStatus";
 import GrblHalLineParserResultTool from "./GrblHalLineParserResultTool";
@@ -257,7 +257,7 @@ class GrblHalRunner extends events.EventEmitter {
 			this.emit("ok", payload);
 			return;
 		}
-		if (type === GrblHalLineParserResultError) {
+		if (type === LineParserResultError) {
 			// https://nodejs.org/api/events.html#events_error_events
 			// As a best practice, listeners should always be added for the 'error' events.
 			this.emit("error", payload);
@@ -271,7 +271,7 @@ class GrblHalRunner extends events.EventEmitter {
 			this.emit("json", payload);
 			return;
 		}
-		if (type === GrblHalLineParserResultAlarm) {
+		if (type === LineParserResultAlarm) {
 			const nextState = {
 				...this.state,
 				status: {
@@ -426,11 +426,11 @@ class GrblHalRunner extends events.EventEmitter {
 			this.emit("groupDetail", payload);
 			return;
 		}
-		if (type === GrblHalLineParserResultFeedback) {
+		if (type === LineParserResultFeedback) {
 			this.emit("feedback", payload);
 			return;
 		}
-		if (type === GrblHalLineParserResultSettings) {
+		if (type === LineParserResultSettings) {
 			const { name, value } = payload;
 			const nextSettings = {
 				...this.settings,
