@@ -286,7 +286,7 @@ export function Jogging({ hideRotary = false }) {
 						return;
 					}
 
-					const { degrees, detail } = output;
+					const { degrees, detail, distance = {} } = output;
 
 					const { axis } = detail;
 
@@ -555,9 +555,13 @@ export function Jogging({ hideRotary = false }) {
 						feedrate: jogSpeedRef.current.feedrate,
 						activeAxis: axis,
 						axes: data,
+						// Stick deflection, 0..1. It lives on the event payload
+						// beside `degrees`, not on the raw gamepad detail - reading
+						// it from `detail` yielded undefined, which became a NaN
+						// feedrate and reached the firmware as F1.
 						multiplier: {
-							leftStick: detail.distance,
-							rightStick: detail.distance,
+							leftStick: distance.leftStick,
+							rightStick: distance.rightStick,
 						},
 						degrees: activeStickDegrees,
 					});

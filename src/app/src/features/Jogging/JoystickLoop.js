@@ -126,6 +126,12 @@ export class JoystickLoop {
 			return Math.round(feedrate);
 		}
 
+		// A missing or malformed stick scalar must read as "no jog", never as a
+		// NaN that the firmware ends up seeing as F1.
+		if (!Number.isFinite(stickValue)) {
+			return 0;
+		}
+
 		return Math.round(Math.abs(feedrate * stickValue));
 	};
 
@@ -376,7 +382,7 @@ export class JoystickLoop {
 				: multiplier,
 		);
 
-		if (feedrate === 0) {
+		if (!Number.isFinite(feedrate) || feedrate <= 0) {
 			return;
 		}
 

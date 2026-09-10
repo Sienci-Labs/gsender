@@ -1,5 +1,6 @@
 import JogStreamer, {
 	computeSegmentPlan,
+	DEFAULT_FEEDRATE,
 	DT_MIN,
 	JOG_STATE_DRAINING,
 	JOG_STATE_IDLE,
@@ -294,6 +295,26 @@ describe("JogStreamer velocity mode", () => {
 		expect(ctx.lines.length).toBeGreaterThan(before);
 		expect(parseLine(ctx.lines[ctx.lines.length - 1]).Y).toBeGreaterThan(0);
 		expect(parseLine(ctx.lines[ctx.lines.length - 1]).X).toBeUndefined();
+	});
+
+	it("keeps the current feedrate when a bad one arrives mid-stream", () => {
+		const ctx = build();
+		ctx.streamer.start({ axes: { X: 1 }, feedrate: 1200 });
+
+		// A NaN feedrate from the joystick arrives over the socket as null.
+		// Clamping it used to yield F1, which reads on the machine as a hang.
+		ctx.streamer.update({ axes: { X: 1, Y: 1 }, feedrate: null });
+
+		expect(ctx.streamer.plan.feedrate).toBe(1200);
+		runAcked(ctx, 100);
+		expect(parseLine(ctx.lines[ctx.lines.length - 1]).F).toBe(1200);
+	});
+
+	it("refuses to start at an unusable feedrate", () => {
+		const ctx = build();
+		ctx.streamer.start({ axes: { X: 1 }, feedrate: null });
+
+		expect(ctx.streamer.plan.feedrate).toBe(DEFAULT_FEEDRATE);
 	});
 
 	it("applies the Z feedrate derate for parity with the old handlers", () => {

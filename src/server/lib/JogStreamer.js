@@ -86,6 +86,7 @@ export const DECIMALS = 3;
 // Anything below half the output precision cannot be commanded at all.
 export const MIN_MOTION_MM = 0.5 * 10 ** -DECIMALS;
 export const MIN_FEEDRATE = 1;
+export const DEFAULT_FEEDRATE = 1000;
 export const DEFAULT_ACCEL = 500;
 
 const LINEAR_AXES = ["X", "Y", "Z"];
@@ -399,7 +400,7 @@ export default class JogStreamer extends events.EventEmitter {
 			this._resetState();
 			this.mode = JOG_MODE_DISPLACEMENT;
 			this.work = { X: 0, Y: 0, Z: 0, A: 0 };
-			this._setFeedrate(feedrate ?? 1000, units);
+			this._setFeedrate(feedrate ?? DEFAULT_FEEDRATE, units);
 		} else if (this.mode !== JOG_MODE_DISPLACEMENT) {
 			// A handwheel pulse arriving mid-velocity-jog is not meaningful.
 			return false;
@@ -545,7 +546,17 @@ export default class JogStreamer extends events.EventEmitter {
 
 	_setFeedrate(feedrate, units) {
 		this.units = units;
-		const value = toNumber(feedrate, 1000);
+		const value = toNumber(feedrate, NaN);
+		// A missing or non-positive feedrate used to fall through the clamp in
+		// computeSegmentPlan and come out as F1, which reads as a hang. Keep
+		// whatever we were already running at instead.
+		if (!Number.isFinite(value) || value <= 0) {
+			this._warn(`Ignoring invalid jog feedrate: ${feedrate}`);
+			if (!this.requestedFeedrate) {
+				this.requestedFeedrate = DEFAULT_FEEDRATE;
+			}
+			return;
+		}
 		// Everything downstream is millimetres, so convert once, here.
 		this.requestedFeedrate = units === "mm" ? value : value * 25.4;
 	}
