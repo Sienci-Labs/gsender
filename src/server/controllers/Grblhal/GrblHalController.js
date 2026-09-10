@@ -806,13 +806,34 @@ class GrblHalController {
 			rxBufferSize: 256,
 			log,
 		});
+		// stop() drains and abort() can still fire mid-drain, so one jog may
+		// raise both events - only announce the end of the jog once.
+		this.jogAnnounced = false;
+		const announceJogStopped = (reason) => {
+			if (!this.jogAnnounced) {
+				return;
+			}
+			this.jogAnnounced = false;
+			const suffix = reason ? ` (${reason})` : "";
+			this.emit("serialport:write", `Jogging service stopped${suffix}\n`, {
+				source: WRITE_SOURCE_CLIENT,
+			});
+		};
 		// One console line for the whole jog, not one per segment.
 		this.jogStreamer.on("start", ({ summary }) => {
+			this.jogAnnounced = true;
+			this.emit("serialport:write", "Jogging service started\n", {
+				source: WRITE_SOURCE_CLIENT,
+			});
 			this.emit("serialport:write", `${summary}\n`, {
 				source: WRITE_SOURCE_CLIENT,
 			});
 		});
+		this.jogStreamer.on("stop", () => {
+			announceJogStopped();
+		});
 		this.jogStreamer.on("abort", (reason) => {
+			announceJogStopped(reason);
 			const handledElsewhere = ["cancel", "close", "destroy", "reset"];
 			if (!handledElsewhere.includes(reason) && this.isOpen()) {
 				this.write("\x85");
