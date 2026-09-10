@@ -1,16 +1,18 @@
-import RangeSlider from "app/components/RangeSlider";
 import { ActiveStateButton } from "app/components/ActiveStateButton";
-import { OVERRIDE_VALUE_RANGES } from "app/constants";
+import { Slider } from "app/components/shadcn/Slider";
+import Tooltip from "app/components/Tooltip";
 import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
 import controller from "app/lib/controller.ts";
 import type { RootState } from "app/store/redux";
 import debounce from "lodash/debounce";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FaBan, FaPlay } from "react-icons/fa";
 
-const debouncedSpindleOverrideHandler = debounce((value: number) => {
-	controller.command("spindleOverride", Number(value));
-}, 1000);
+const SPINDLE_STEP = 100;
+
+const debouncedSpindleSpeedHandler = debounce((value: number) => {
+	controller.command("spindlespeed:change", Number(value));
+}, 300);
 
 interface Props {
 	onComplete: () => void;
@@ -20,29 +22,49 @@ export function TestAutoSpin({ onComplete }: Props) {
 	const isConnected = useTypedSelector(
 		(state: RootState) => state.connection.isConnected,
 	);
-	const spindle = useTypedSelector(
+	const spindleMin = useTypedSelector((state: RootState) =>
+		Number(state.controller.settings.settings.$31 ?? 1000),
+	);
+	const spindleMax = useTypedSelector((state: RootState) =>
+		Number(state.controller.settings.settings.$30 ?? 30000),
+	);
+	const spindleModal = useTypedSelector(
+		(state: RootState) => state.controller.modal.spindle ?? "M5",
+	);
+	const reportedSpindle = useTypedSelector(
 		(state: RootState) => state.controller.state?.status?.spindle,
 	);
-	const ovS = useTypedSelector(
-		(state: RootState) => state.controller.state?.status?.ov?.[2] ?? 100,
+
+	const spindleRunning = spindleModal !== "M5";
+
+	const clamp = useCallback(
+		(value: number) => Math.max(spindleMin, Math.min(spindleMax, value)),
+		[spindleMin, spindleMax],
 	);
 
-	const [localOvS, setLocalOvS] = useState(ovS);
-	const [spindleRunning, setSpindleRunning] = useState(false);
+	const [rpm, setRpm] = useState(() => clamp(spindleMin));
 
+	// Keep the selected speed inside the range when the firmware settings arrive
 	useEffect(() => {
-		setLocalOvS(ovS);
-	}, [ovS]);
+		setRpm((prev) => clamp(prev));
+	}, [clamp]);
+
+	function handleChange(values: number[]) {
+		const value = clamp(values[0]);
+		setRpm(value);
+		if (spindleRunning) {
+			debouncedSpindleSpeedHandler(value);
+		}
+	}
 
 	function handleStart() {
-		controller.command("gcode", `M3 S${spindle || 1000}`);
-		setSpindleRunning(true);
+		controller.command("gcode", `M3 S${rpm}`);
 		onComplete();
 	}
 
 	function handleStop() {
-		controller.command("gcode", "M5 S0");
-		setSpindleRunning(false);
+		debouncedSpindleSpeedHandler.cancel();
+		controller.command("gcode", "M5");
 	}
 
 	return (
@@ -53,30 +75,34 @@ export function TestAutoSpin({ onComplete }: Props) {
 			<ol className="list-decimal p-5 gap-4 space-y-2 text-gray-900 dark:text-content-primary">
 				<li>Turn the AutoSpin dial to "S"</li>
 				<li>Turn on the spindle using the power toggle</li>
+				<li>Choose a speed with the slider</li>
 				<li>
 					Press <b>"Start"</b> to run the spindle (M3)
 				</li>
 			</ol>
-			<RangeSlider
-				step={10}
-				min={OVERRIDE_VALUE_RANGES.MIN}
-				max={OVERRIDE_VALUE_RANGES.MAX}
-				value={String(spindle ?? 0)}
-				percentage={[localOvS]}
-				defaultPercentage={[100]}
-				showText={true}
-				title="Spindle"
-				unitString="RPM"
-				colour={isConnected ? "bg-red-400" : "bg-gray-500"}
-				disabled={!isConnected}
-				onChange={(values: number[]) => setLocalOvS(values[0])}
-				onButtonPress={(values: number[]) => {
-					setLocalOvS(values[0]);
-					debouncedSpindleOverrideHandler(values[0]);
-				}}
-				onPointerUp={() => debouncedSpindleOverrideHandler(localOvS)}
-				id="autospin-test-override"
-			/>
+			<div className="grid grid-cols-[1fr_3fr_1fr] gap-2 justify-center items-center text-gray-900 dark:text-content-primary">
+				<span className="text-right">Speed</span>
+				<Tooltip content="Adjust spindle speed" side="bottom">
+					<Slider
+						value={[rpm]}
+						min={spindleMin}
+						max={spindleMax}
+						step={SPINDLE_STEP}
+						className="h-8 w-full"
+						onValueChange={handleChange}
+						disabled={!isConnected}
+						aria-label="Adjust spindle speed"
+						id="autospin-test-speed"
+					/>
+				</Tooltip>
+				<div className="w-[10ch] text-left">{rpm} RPM</div>
+			</div>
+			<div className="text-center text-sm text-gray-500 dark:text-content-muted">
+				Range {spindleMin} - {spindleMax} RPM ($31 - $30)
+				{spindleRunning && reportedSpindle !== undefined
+					? ` · reporting ${reportedSpindle} RPM`
+					: ""}
+			</div>
 			<div className="flex flex-row gap-2 justify-center">
 				<ActiveStateButton
 					onClick={handleStart}
