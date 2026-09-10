@@ -1071,7 +1071,7 @@ class Visualizer extends Component {
 				},
 			},
 			cameraMode: this.config.get("cameraMode", CAMERA_MODE_PAN),
-			cameraPosition: "3D", // 'Top', '3D', 'Front', 'Left', 'Right'
+			cameraPosition: "TopLeftCorner", // 'Top', '3D', 'Front', 'Left', 'Right', 'TopLeftCorner'
 			cameraPositionNonce: 0, // tracks how many repeat camera view requests have been made
 			// so that it can snap camera even if it's already in that view
 			moveToHere: false, // "Move To Here" placement mode is armed
