@@ -82,7 +82,7 @@ function SubMenuItem({ label, active, onClick }: SubMenuItemProps) {
 	return (
 		<button
 			className={cn(
-				"flex min-h-6 items-center justify-start gap-2 pl-11 pr-4 py-1 border-l-2 border-transparent hover:border-l-blue-500 hover:text-blue-500 font-sans text-sm text-gray-600 dark:text-content-primary",
+				"flex min-h-6 items-center justify-start gap-2 pl-11 pr-4 py-1 max-xl:pl-6 max-xl:pr-2 max-xl:text-xs max-xl:gap-1 border-l-2 border-transparent hover:border-l-blue-500 hover:text-blue-500 font-sans text-sm text-gray-600 dark:text-content-primary",
 				{
 					"text-blue-500 font-italic bg-blue-200 bg-opacity-30 border-l-blue-400":
 						active,
@@ -158,7 +158,7 @@ export function Menu({
 						{visibleSubsections.length > 0 && (
 							<div
 								className={cn(
-									"flex flex-col overflow-hidden transition-all duration-300 delay-100 ease-in-out origin-top max-xl:hidden",
+									"flex flex-col overflow-hidden transition-all duration-300 delay-100 ease-in-out origin-top short:hidden",
 									{
 										"max-h-0 opacity-0 scale-y-0": !active,
 										"max-h-[500px] opacity-100 scale-y-100": active,
