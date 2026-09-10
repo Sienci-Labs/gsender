@@ -1,4 +1,5 @@
 import JogStreamer, {
+	ASSUMED_ACCEL,
 	computeSegmentPlan,
 	DEFAULT_FEEDRATE,
 	DT_MIN,
@@ -156,6 +157,43 @@ describe("computeSegmentPlan", () => {
 		});
 		expect(plan.requiredLook).toBeGreaterThan(T_LOOK_MAX);
 		expect(plan.starved).toBe(true);
+	});
+
+	it("falls back to an assumed acceleration when the firmware reports none", () => {
+		// A FluidNC board answers $$ in a dialect we don't parse, so the
+		// settings map is empty.
+		const plan = computeSegmentPlan({
+			dir: { X: 1 },
+			feedrate: 3000,
+			accelByAxis: {},
+			maxRateByAxis: {},
+		});
+
+		expect(plan.effectiveAccel).toBe(ASSUMED_ACCEL);
+		expect(plan.accelReported).toBe(false);
+		// Nothing to clamp against, so the requested speed stands.
+		expect(plan.feedrate).toBe(3000);
+	});
+
+	it("does not let a silent axis read as infinitely capable", () => {
+		// Y is missing. Skipping it used to drop its constraint entirely and
+		// yield 707 on the diagonal - a more capable answer than knowing both
+		// axes were 500, which is the wrong direction to be wrong in.
+		const partial = computeSegmentPlan({
+			dir: { X: 1, Y: 1 },
+			feedrate: 3000,
+			accelByAxis: { X: 500 },
+			maxRateByAxis,
+		});
+		const known = computeSegmentPlan({
+			dir: { X: 1, Y: 1 },
+			feedrate: 3000,
+			accelByAxis: { X: 500, Y: 500 },
+			maxRateByAxis,
+		});
+
+		expect(partial.effectiveAccel).toBeLessThanOrEqual(known.effectiveAccel);
+		expect(partial.accelReported).toBe(true);
 	});
 
 	it("never emits segments faster than the serial link can comfortably take", () => {
@@ -345,6 +383,31 @@ describe("JogStreamer velocity mode", () => {
 		ctx.streamer.update({ axes: { X: 1 }, feedrate: 2400 });
 		ctx.streamer.update({ axes: { X: 1 }, feedrate: 3000 });
 		expect(changes).toEqual(["Jogging service now at F2400"]);
+	});
+
+	it("does not warn about acceleration the firmware never reported", () => {
+		const warn = jest.fn();
+		const ctx = build({ settings: {}, options: { log: { warn, debug() {} } } });
+
+		// Fast enough that a 200 mm/s^2 machine could not hold it - but we only
+		// assumed that figure, so it is not the operator's problem to hear about.
+		ctx.streamer.start({ axes: { X: 1 }, feedrate: 10000 });
+
+		expect(ctx.streamer.plan.starved).toBe(true);
+		expect(warn).not.toHaveBeenCalled();
+	});
+
+	it("warns when a reported acceleration genuinely cannot hold the speed", () => {
+		const warn = jest.fn();
+		const ctx = build({
+			settings: { ...SETTINGS, $120: "50", $121: "50" },
+			options: { log: { warn, debug() {} } },
+		});
+
+		ctx.streamer.start({ axes: { X: 1 }, feedrate: 10000 });
+
+		expect(ctx.streamer.plan.starved).toBe(true);
+		expect(warn).toHaveBeenCalledWith(expect.stringContaining("acceleration"));
 	});
 
 	it("applies the Z feedrate derate for parity with the old handlers", () => {

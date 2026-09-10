@@ -92,7 +92,12 @@ export const DECIMALS = 3;
 export const MIN_MOTION_MM = 0.5 * 10 ** -DECIMALS;
 export const MIN_FEEDRATE = 1;
 export const DEFAULT_FEEDRATE = 1000;
-export const DEFAULT_ACCEL = 500;
+// Stand-in for an axis whose acceleration the firmware never reported - a
+// FluidNC board answers $$ in a dialect we don't parse, so the settings map
+// stays empty. Deliberately low: assuming too little costs only a longer lead,
+// capped at T_LOOK_MAX and flushed by the jog cancel on release, while
+// assuming too much starves the planner and the jog stutters.
+export const ASSUMED_ACCEL = 200;
 
 const LINEAR_AXES = ["X", "Y", "Z"];
 const ALL_AXES = ["X", "Y", "Z", "A"];
@@ -137,6 +142,11 @@ export function computeSegmentPlan({
 	// Clamp against each axis' max rate. A diagonal is limited by whichever
 	// axis reaches its own ceiling first, which the old max($110,$111,$112)
 	// clamp got wrong in both directions.
+	//
+	// An axis that reports nothing is left unclamped rather than given an
+	// assumed ceiling: the firmware clamps jog feedrate itself, and the
+	// backpressure gates stop the resulting overrun from growing, whereas a
+	// guessed ceiling would cap a fast machine that simply doesn't report.
 	let resolved = toNumber(feedrate, MIN_FEEDRATE);
 	LINEAR_AXES.forEach((axis) => {
 		if (!unit[axis]) {
@@ -158,26 +168,35 @@ export function computeSegmentPlan({
 	const v = resolved / 60;
 
 	// Acceleration available along the travel vector, limited per axis.
+	//
+	// Every axis on the vector contributes a constraint, whether or not the
+	// firmware told us about it. Skipping the unreported ones would read them
+	// as infinitely capable: X=500 with Y silent used to come out at 707 on a
+	// diagonal, a more confident answer than knowing both were 500.
 	let inverseSquares = 0;
+	let accelReported = false;
+	const axisAccel = (axis) => {
+		const accel = toNumber(accelByAxis[axis]);
+		if (accel > 0) {
+			accelReported = true;
+			return accel;
+		}
+		return ASSUMED_ACCEL;
+	};
+
 	LINEAR_AXES.forEach((axis) => {
 		if (!unit[axis]) {
 			return;
 		}
-		const accel = toNumber(accelByAxis[axis]);
-		if (accel > 0) {
-			inverseSquares += (unit[axis] / accel) ** 2;
-		}
+		inverseSquares += (unit[axis] / axisAccel(axis)) ** 2;
 	});
 	if (dir.A && magnitude === 0) {
-		const accel = toNumber(accelByAxis.A);
-		if (accel > 0) {
-			inverseSquares += (1 / accel) ** 2;
-		}
+		inverseSquares += (1 / axisAccel("A")) ** 2;
 	}
 	const effectiveAccel =
 		inverseSquares > 0
 			? Math.max(1 / Math.sqrt(inverseSquares), 1)
-			: DEFAULT_ACCEL;
+			: ASSUMED_ACCEL;
 
 	const requiredLook = (SAFETY_K * v) / (2 * effectiveAccel);
 	const tLook = clamp(requiredLook, T_LOOK_MIN, T_LOOK_MAX);
@@ -205,6 +224,9 @@ export function computeSegmentPlan({
 		tLook,
 		requiredLook,
 		effectiveAccel,
+		// False when every axis on this vector fell back to ASSUMED_ACCEL, so
+		// callers can tell a real limit from one we invented.
+		accelReported,
 		// True when the machine's acceleration is so low relative to the
 		// requested feedrate that no reachable queue depth can hold enough
 		// motion. The planner will decelerate; this is physics, not a bug.
@@ -534,6 +556,11 @@ export default class JogStreamer extends events.EventEmitter {
 
 		if (this.state === JOG_STATE_STREAMING) {
 			this._refreshTravelBudget();
+			// Settings can land mid-jog: Grbl re-issues $$ on every idle status
+			// until something parses, so a jog started before then would
+			// otherwise keep its assumed acceleration for its whole duration.
+			// Segments are independent, so a changed dt applies cleanly.
+			this._replan();
 		}
 	}
 
@@ -609,7 +636,10 @@ export default class JogStreamer extends events.EventEmitter {
 			rxBudget: this.rxBudget,
 		});
 
-		if (this.plan.starved && !this.warnedStarved) {
+		// Only complain about acceleration the firmware actually gave us -
+		// otherwise every board with an unparsed $$ is told off for figures it
+		// never supplied.
+		if (this.plan.starved && this.plan.accelReported && !this.warnedStarved) {
 			this.warnedStarved = true;
 			this._warn(
 				`Jog feedrate ${Math.round(this.plan.feedrate)} exceeds what this machine's acceleration can hold at a constant speed; the firmware will decelerate between segments.`,
