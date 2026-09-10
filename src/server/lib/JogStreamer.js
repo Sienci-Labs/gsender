@@ -97,7 +97,7 @@ export const DEFAULT_FEEDRATE = 1000;
 // stays empty. Deliberately low: assuming too little costs only a longer lead,
 // capped at T_LOOK_MAX and flushed by the jog cancel on release, while
 // assuming too much starves the planner and the jog stutters.
-export const ASSUMED_ACCEL = 200;
+export const ASSUMED_ACCEL = 1000;
 
 const LINEAR_AXES = ["X", "Y", "Z"];
 const ALL_AXES = ["X", "Y", "Z", "A"];
