@@ -118,6 +118,18 @@ export function stopContinuousJog() {
 	controller.command("jog:stop");
 }
 
+/**
+ * Only a primary-button press may start a jog. A right-click would otherwise
+ * start a continuous jog and then lose its release to the context menu,
+ * leaving the machine moving. The pendant already guards this way.
+ */
+export function isPrimaryPress(event: { button?: number }) {
+	if ("button" in event && typeof event.button === "number") {
+		return event.button === 0;
+	}
+	return true;
+}
+
 export interface JogDistances {
 	X?: number;
 	Y?: number;

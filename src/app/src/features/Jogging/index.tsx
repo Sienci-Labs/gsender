@@ -239,6 +239,30 @@ export function Jogging({ hideRotary = false }) {
 		[handleJoystickJog],
 	);
 
+	// Last line of defence for a hold whose release never arrives - the jog
+	// control unmounting under a finger, or the window going away mid-press.
+	// use-long-press only clears its own timer in that case, so nothing else
+	// would send the stop.
+	//
+	// Deliberately unconditional rather than gated on the last known machine
+	// state: a stop that arrives with nothing jogging is a no-op server-side
+	// and an ignored 0x85 at the firmware, while a stale "not jogging" reading
+	// would skip the stop in exactly the case this exists for.
+	useEffect(() => {
+		const stopIfHidden = () => {
+			if (document.hidden) {
+				stopContinuousJog();
+			}
+		};
+		document.addEventListener("visibilitychange", stopIfHidden);
+		window.addEventListener("blur", stopContinuousJog);
+		return () => {
+			document.removeEventListener("visibilitychange", stopIfHidden);
+			window.removeEventListener("blur", stopContinuousJog);
+			stopContinuousJog();
+		};
+	}, []);
+
 	useEffect(() => {
 		if (!initialized) {
 			const jogValues = store.get("widgets.axes.jog.normal", {});
@@ -660,10 +684,6 @@ export function Jogging({ hideRotary = false }) {
 			saveCustomValues(newJogSpeed);
 		}
 	}
-
-	const stopContinuousJog = () => {
-		controller.command("jog:stop");
-	};
 
 	const handleShortcutJog = ({
 		axis,

@@ -5,6 +5,7 @@ import {
 	aMinusJog,
 	aPlusJog,
 	continuousJogAxis,
+	isPrimaryPress,
 	type JoggerProps,
 	stopContinuousJog,
 } from "app/features/Jogging/utils/Jogging.ts";
@@ -33,6 +34,7 @@ export function AJog({
 		},
 		{
 			threshold,
+			filterEvents: isPrimaryPress,
 			onCancel: () => {
 				aPlusJog(distance, feedrate, false);
 				posthog?.capture("jog_a_plus", {
@@ -57,6 +59,7 @@ export function AJog({
 		},
 		{
 			threshold,
+			filterEvents: isPrimaryPress,
 			onCancel: () => {
 				aMinusJog(distance, feedrate, false);
 				posthog?.capture("jog_a_minus", {
@@ -94,6 +97,7 @@ export function AJog({
 				bottomLabel={`Jog ${axis} minus`}
 				onTopKeyDown={(e) => handleKeyDown(e, aPlusJog)}
 				onBottomKeyDown={(e) => handleKeyDown(e, aMinusJog)}
+				onPressCancel={stopContinuousJog}
 			/>
 			<img
 				src={aLabels}
