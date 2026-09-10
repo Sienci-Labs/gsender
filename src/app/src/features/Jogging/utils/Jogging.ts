@@ -18,32 +18,54 @@ export interface JogSpeeds {
 
 export type JoggingSpeedOptions = "Rapid" | "Normal" | "Precise" | "Custom";
 
-export function jogAxis(params: JogDistances, feedrate: number) {
+/**
+ * Drop any axis whose limit switch is already triggered in the direction we are
+ * about to move. Returns null when nothing is left to jog.
+ */
+export function filterAxesForLimits(axes: JogDistances): JogDistances | null {
 	const preventJoggingPastLimits = store.get(
 		"workspace.preventJoggingPastLimits",
 		false,
 	);
 
-	if (preventJoggingPastLimits) {
-		const pinState = (controller.state as any)?.status?.pinState || {};
-		const filteredParams: JogDistances = { ...params };
+	if (!preventJoggingPastLimits) {
+		return axes;
+	}
 
-		// Block jogging in the negative direction if X-, Y-, or A- limit is triggered
-		// Block jogging in the positive direction if Z+ limit is triggered (typical Z homing direction)
-		if (params.X !== undefined && pinState.X && params.X < 0)
-			delete filteredParams.X;
-		if (params.Y !== undefined && pinState.Y && params.Y < 0)
-			delete filteredParams.Y;
-		if (params.Z !== undefined && pinState.Z && params.Z > 0)
-			delete filteredParams.Z;
-		if (params.A !== undefined && pinState.A && params.A < 0)
-			delete filteredParams.A;
+	const pinState = (controller.state as any)?.status?.pinState || {};
+	const filtered: JogDistances = { ...axes };
 
-		if (Object.keys(filteredParams).length === 0) {
+	// Block jogging in the negative direction if X-, Y-, or A- limit is triggered
+	// Block jogging in the positive direction if Z+ limit is triggered (typical Z homing direction)
+	const blockedWhenNegative = ["X", "Y", "A"];
+
+	// Axis keys reach here in either case - the jog widgets send "X", the
+	// gamepad and MPG paths send "x" - so match on both or the protection
+	// silently does nothing.
+	Object.keys(filtered).forEach((key) => {
+		const axis = key.toUpperCase();
+		const value = (filtered as Record<string, number>)[key];
+
+		if (value === undefined || !pinState[axis]) {
 			return;
 		}
-		params = filteredParams;
+
+		const blocked = blockedWhenNegative.includes(axis) ? value < 0 : value > 0;
+
+		if (blocked) {
+			delete (filtered as Record<string, number>)[key];
+		}
+	});
+
+	return Object.keys(filtered).length === 0 ? null : filtered;
+}
+
+export function jogAxis(params: JogDistances, feedrate: number) {
+	const filtered = filterAxesForLimits(params);
+	if (!filtered) {
+		return;
 	}
+	params = filtered;
 
 	const units = store.get("workspace.units", "mm");
 	const modal = units === "mm" ? "G21" : "G20";
@@ -56,28 +78,40 @@ export function jogAxis(params: JogDistances, feedrate: number) {
 }
 
 export function continuousJogAxis(axes: JogDistances, feedrate: number) {
-	const preventJoggingPastLimits = store.get(
-		"workspace.preventJoggingPastLimits",
-		false,
-	);
-
-	if (preventJoggingPastLimits) {
-		const pinState = (controller.state as any)?.status?.pinState || {};
-		const filteredAxes: JogDistances = { ...axes };
-
-		if (axes.X !== undefined && pinState.X && axes.X < 0) delete filteredAxes.X;
-		if (axes.Y !== undefined && pinState.Y && axes.Y < 0) delete filteredAxes.Y;
-		if (axes.Z !== undefined && pinState.Z && axes.Z > 0) delete filteredAxes.Z;
-		if (axes.A !== undefined && pinState.A && axes.A < 0) delete filteredAxes.A;
-
-		if (Object.keys(filteredAxes).length === 0) {
-			return;
-		}
-		axes = filteredAxes;
+	const filtered = filterAxesForLimits(axes);
+	if (!filtered) {
+		return;
 	}
 
 	const units = store.get("workspace.units", "mm");
-	controller.command("jog:start", axes, feedrate, units);
+	controller.command("jog:start", filtered, feedrate, units);
+}
+
+/**
+ * Retarget a jog that is already streaming. Direction and speed change without
+ * a jog cancel, so a joystick can be swept around without the machine stopping.
+ */
+export function updateContinuousJog(axes: JogDistances, feedrate: number) {
+	const filtered = filterAxesForLimits(axes);
+	if (!filtered) {
+		return;
+	}
+
+	controller.command("jog:update", filtered, feedrate);
+}
+
+/**
+ * Add distance to an ongoing jog, as an MPG handwheel does. Successive pulses
+ * blend into continuous motion rather than each starting a fresh move.
+ */
+export function feedJog(axes: JogDistances, feedrate: number) {
+	const filtered = filterAxesForLimits(axes);
+	if (!filtered) {
+		return;
+	}
+
+	const units = store.get("workspace.units", "mm");
+	controller.command("jog:feed", filtered, feedrate, units);
 }
 
 export function stopContinuousJog() {

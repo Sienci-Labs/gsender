@@ -1,10 +1,16 @@
-import controller from "app/lib/controller";
 import gamepad, { checkButtonHold } from "app/lib/gamepad";
-import reduxStore from "app/store/redux";
 import get from "lodash/get";
 import inRange from "lodash/inRange";
 import throttle from "lodash/throttle";
-import { GRBLHAL } from "../../constants";
+import {
+	continuousJogAxis,
+	stopContinuousJog,
+	updateContinuousJog,
+} from "./utils/Jogging";
+
+// The stream is retargeted at the same rate the gamepad handler is throttled
+// to. There is no per-tick work left to justify anything faster.
+export const JOYSTICK_UPDATE_MS = 50;
 
 export const checkThumbsticskAreIdle = (axes, profile) => {
 	const deadZone =
@@ -29,34 +35,21 @@ export class JoystickLoop {
 
 	currentJogDirection = null;
 
-	constructor({
-		gamepadProfile,
-		jog,
-		standardJog,
-		cancelJog,
-		feedrate,
-		multiplier,
-	}) {
+	constructor({ gamepadProfile, jog, cancelJog, feedrate, multiplier }) {
 		this.isRunning = false;
 		this.gamepadProfile = gamepadProfile;
 		this.jog = jog;
-		this.standardJog = standardJog;
 		this.cancelJog = throttle(cancelJog, 50, {
 			leading: false,
 			trailing: true,
 		});
 		this.feedrate = feedrate;
 		this.multiplier = multiplier;
-		this.isReadyForNextCommand = true;
 		this.axisHistory = [[], [], [], []]; // Rolling history for 4 axes
 		this.currentDirection = null; // For direction hysteresis
 		this.pendingDirection = null; // For direction debouncing
 		this.pendingDirectionCount = 0; // How many frames the pending direction has been stable
-		this.continuousJogActive = false; // For fixed speed continuous jogging
-		this.continuousJogDirection = null; // Current direction of continuous jog
-		this.continuousJogStartTime = null; // When current jog command was sent
-		this.continuousJogDuration = null; // Expected duration of current jog
-		this.lastVariableJogCommandTime = 0; // Rate limiting for incremental jog
+		this.streamActive = false; // Whether the server is streaming a jog for us
 		this.variableAxisSmoothed = [0, 0, 0, 0]; // EMA smoothing for variable jog
 		this.horizontalDominantAxis = null; // Hysteresis for X/Y dominance
 	}
@@ -108,39 +101,20 @@ export class JoystickLoop {
 		return smoothed;
 	};
 
-	_computeJogMoveDuration = (axis, feedrate) => {
-		const v = Math.round(feedrate / 60); // Feedrate in mm/sec
-		const N = 15; // Number of planner blocks
-
-		const { settings } = controller.settings;
-
-		const axisAcceleration = Number(
-			{
-				x: settings.$120,
-				y: settings.$121,
-				z: settings.$122,
-				a: settings.$121,
-			}[axis] ?? settings.$120,
-		);
-
-		const T = v ** 2 / (2 * axisAcceleration * (N - 1));
-
-		return T;
-	};
-
+	// Only the requested speed. The server clamps it against each axis' own max
+	// rate, which a single max($110,$111,$112) here always got wrong for
+	// diagonals and for Z.
+	//
+	// The "movement override" setting used to scale the distance of each
+	// individual jog command. There is no per-command distance any more, so it
+	// scales speed instead - the same thing the operator was reaching for.
 	_computeFeedrate = (stickValue) => {
-		const givenFeedrate = this.feedrate;
-		const settings = get(controller.settings, "settings", null);
-
-		if (!settings) {
-			return 0;
-		}
-
-		const maxFeedrate = Math.max(
-			...[Number(settings.$110), Number(settings.$111), Number(settings.$112)],
+		const override = get(
+			this.gamepadProfile,
+			"joystickOptions.movementDistanceOverride",
+			100,
 		);
-
-		const feedrate = givenFeedrate > maxFeedrate ? maxFeedrate : givenFeedrate;
+		const feedrate = this.feedrate * (override / 100);
 
 		const fixedSpeedMode = get(
 			this.gamepadProfile,
@@ -153,40 +127,6 @@ export class JoystickLoop {
 		}
 
 		return Math.round(Math.abs(feedrate * stickValue));
-	};
-
-	_computeIncrementalDistance = ({ axis, feedrate: givenFeedrate }) => {
-		const controllerType = get(reduxStore.getState(), "controller.type");
-
-		const { settings } = controller.settings;
-
-		const {
-			joystickOptions: { movementDistanceOverride = 100 },
-		} = this.gamepadProfile;
-
-		const axisMaxFeedrate = Number(
-			{
-				x: settings.$110,
-				y: settings.$111,
-				z: settings.$112,
-				a: settings.$111,
-			}[axis] ?? settings.$110,
-		);
-
-		const feedrate =
-			givenFeedrate > axisMaxFeedrate ? axisMaxFeedrate : givenFeedrate;
-
-		const feedrateInMMPerSec = Math.round(feedrate / 60);
-
-		const COMMAND_EXECUTION_TIME_IN_SECONDS = 0.06;
-
-		const multiplier = 1;
-		const incrementalDistance =
-			feedrateInMMPerSec *
-			COMMAND_EXECUTION_TIME_IN_SECONDS *
-			((movementDistanceOverride * multiplier) / 100);
-
-		return +incrementalDistance.toFixed(2);
 	};
 
 	_getAxesAndDirection = ({ degrees, activeAxis }) => {
@@ -291,18 +231,6 @@ export class JoystickLoop {
 			multiplier: { leftStick, rightStick },
 		} = this;
 
-		const controllerType = get(reduxStore.getState(), "controller.type");
-
-		const timer = new Date() - this.jogMovementStartTime;
-
-		if (!this.isReadyForNextCommand) {
-			return;
-		}
-
-		if (this.jogMovementStartTime && timer <= this.jogMovementDuration) {
-			return;
-		}
-
 		const currentGamepad = this._getCurrentGamepad();
 
 		if (!currentGamepad) {
@@ -370,11 +298,6 @@ export class JoystickLoop {
 		const axesData =
 			activeAxis < 2 ? axesValues.slice(0, 2) : axesValues.slice(2, 4);
 
-		const movementDistanceOverride = get(
-			this.gamepad,
-			"joystickOptions.movementDistanceOverride",
-			100,
-		);
 		const lockoutButton = get(this.gamepadProfile, "lockout.button");
 		const isHoldingLockoutButton = get(
 			currentGamepad.buttons,
@@ -395,6 +318,8 @@ export class JoystickLoop {
 			return;
 		}
 
+		// Input conditioning stays here, where the raw stick values are. It now
+		// shapes the direction and the speed scalar rather than a distance.
 		let filteredAxesData = [...axesData];
 		if (!fixedSpeedMode && activeAxis < 2) {
 			const HORIZONTAL_EFFECTIVE_IDLE_THRESHOLD = 0.14;
@@ -451,160 +376,40 @@ export class JoystickLoop {
 				: multiplier,
 		);
 
-		const updatedAxes = filteredAxesData.reduce((acc, curr, index) => {
-			const axesData = axes[index];
-
-			if (!axesData) {
-				return acc;
-			}
-
-			const [axis, axisValue] = Object.entries(axesData)[0];
-
-			const feedrate = this._computeFeedrate(curr);
-
-			acc[axis] =
-				axisValue * this._computeIncrementalDistance({ axis, feedrate });
-
-			return acc;
-		}, {});
-
-		const updatedAxesWithOverride = Object.entries(updatedAxes).reduce(
-			(acc, curr) => {
-				const [axis, value] = curr;
-
-				const multiplier = 1;
-
-				acc[axis] = +(
-					value *
-					((movementDistanceOverride * multiplier) / 100)
-				).toFixed(3);
-
-				return acc;
-			},
-			{},
-		);
-
-		const largestAxisMovement = Object.entries(updatedAxes).reduce(
-			(acc, [key, value]) => {
-				const val = Math.abs(value);
-				if (acc === null || val > acc?.value) {
-					acc = {
-						axis: key,
-						value: val,
-					};
-				}
-
-				return acc;
-			},
-			null,
-		);
-
-		const updatedAxesMovementsAreZero = Object.values(updatedAxes).every(
-			(value) => value === 0,
-		);
-
-		if (updatedAxesMovementsAreZero) {
-			return;
-		}
-
 		if (feedrate === 0) {
 			return;
 		}
 
-		if (fixedSpeedMode) {
-			// Wait for direction to stabilize before starting continuous jog
-			if (!this.currentDirection) {
-				return;
-			}
-
-			const JOG_DISTANCE = 100; // mm - short for safety if disconnected
-			const directionChanged =
-				this.continuousJogDirection !== this.currentDirection;
-
-			// Check if we need to send a new jog command
-			let needsNewCommand = false;
-
-			if (!this.continuousJogActive) {
-				needsNewCommand = true;
-			} else if (directionChanged) {
-				// Direction changed, cancel current jog first
-				controller.command("jog:cancel");
-				this.continuousJogActive = false;
-				needsNewCommand = true;
-			} else if (this.continuousJogStartTime && this.continuousJogDuration) {
-				// Check if current jog is near completion (80% done)
-				const elapsed = Date.now() - this.continuousJogStartTime;
-				if (elapsed >= this.continuousJogDuration * 0.8) {
-					needsNewCommand = true;
-				}
-			}
-
-			if (!needsNewCommand) {
-				return;
-			}
-
-			// Send a continuous jog command
-			const longJogAxes = {};
-			Object.entries(updatedAxesWithOverride).forEach(([axis, value]) => {
-				longJogAxes[axis] = Math.sign(value) * JOG_DISTANCE;
-			});
-
-			this.jog(longJogAxes, feedrate);
-			this.continuousJogActive = true;
-			this.continuousJogDirection = this.currentDirection;
-			this.continuousJogStartTime = Date.now();
-			// Calculate expected duration: distance / (feedrate in mm/ms)
-			this.continuousJogDuration = (JOG_DISTANCE / (feedrate / 60)) * 1000;
+		// Fixed speed mode waits for the locked direction before committing.
+		if (fixedSpeedMode && !this.currentDirection) {
 			return;
 		}
 
-		// Variable speed mode - use incremental jog commands
-		// Normalize axis keys because profile mappings may use upper/lower case.
-		const axisKeys = Object.keys(updatedAxesWithOverride).map((key) =>
-			key.toLowerCase(),
-		);
-		const isHorizontalJog = axisKeys.includes("x") || axisKeys.includes("y");
-		const MIN_VARIABLE_HORIZONTAL_JOG_INTERVAL_MS = 90;
-		const now = Date.now();
+		// The two modes differ only in how the feedrate scalar above is worked
+		// out; from here they are the same jog.
+		const direction = filteredAxesData.reduce((acc, value, index) => {
+			const axisData = axes[index];
 
-		if (
-			isHorizontalJog &&
-			now - this.lastVariableJogCommandTime <
-				MIN_VARIABLE_HORIZONTAL_JOG_INTERVAL_MS
-		) {
-			return;
-		}
-
-		const MIN_HORIZONTAL_INCREMENT_MM = 0.1;
-		const normalizedAxesForJog = Object.entries(updatedAxesWithOverride).reduce(
-			(acc, [axis, value]) => {
-				const axisLowerCase = axis.toLowerCase();
-
-				if (
-					(axisLowerCase === "x" || axisLowerCase === "y") &&
-					value !== 0 &&
-					Math.abs(value) < MIN_HORIZONTAL_INCREMENT_MM
-				) {
-					acc[axis] = Math.sign(value) * MIN_HORIZONTAL_INCREMENT_MM;
-					return acc;
-				}
-
-				acc[axis] = value;
+			if (!axisData || !value) {
 				return acc;
-			},
-			{},
-		);
+			}
 
-		this.jog(normalizedAxesForJog, feedrate);
-		this.lastVariableJogCommandTime = now;
+			const [axis, axisDirection] = Object.entries(axisData)[0];
+			acc[axis.toUpperCase()] = Math.sign(axisDirection);
 
-		this.jogMovementStartTime = new Date();
+			return acc;
+		}, {});
 
-		this.jogMovementDuration = Math.abs(
-			(largestAxisMovement.value / (feedrate / 60)) * 1000,
-		);
+		if (Object.keys(direction).length === 0) {
+			return;
+		}
 
-		this.isReadyForNextCommand = false;
+		if (this.streamActive) {
+			updateContinuousJog(direction, feedrate);
+		} else {
+			continuousJogAxis(direction, feedrate);
+			this.streamActive = true;
+		}
 	};
 
 	_axesArrayToObject = (arr) => {
@@ -642,25 +447,15 @@ export class JoystickLoop {
 			return;
 		}
 
-		this.isListeningToController = true;
-
-		controller.addListener("serialport:read", (data) => {
-			if (data === "ok") {
-				this.isReadyForNextCommand = true;
-			}
-		});
-
 		this.isRunning = true;
 		this.startTime = new Date();
-
-		const INTERVAL_IN_MS = 0;
 
 		this.timeout = setTimeout(() => {
 			this._runJog({ activeAxis });
 
 			this.runLoop = setInterval(() => {
 				this._runJog({ activeAxis });
-			}, INTERVAL_IN_MS);
+			}, JOYSTICK_UPDATE_MS);
 		}, this.timeoutAmount);
 	};
 
@@ -671,29 +466,27 @@ export class JoystickLoop {
 
 		clearInterval(this.runLoop);
 		clearTimeout(this.timeout);
-		controller.removeListener("serialport:read");
 
 		// Reset smoothing state
 		this.axisHistory = [[], [], [], []];
 		this.currentDirection = null;
 		this.pendingDirection = null;
 		this.pendingDirectionCount = 0;
-		this.lastVariableJogCommandTime = 0;
 		this.variableAxisSmoothed = [0, 0, 0, 0];
 		this.horizontalDominantAxis = null;
 
-		// Cancel any active continuous jog
-		if (this.continuousJogActive) {
-			controller.command("jog:cancel");
-			this.continuousJogActive = false;
-			this.continuousJogDirection = null;
-			this.continuousJogStartTime = null;
-			this.continuousJogDuration = null;
-		}
+		const wasStreaming = this.streamActive;
+		this.streamActive = false;
 
 		const timer = new Date() - this.startTime;
 
+		// Released before the hold threshold: treat it as a tap and do a single
+		// step jog instead.
 		if (timer < this.timeoutAmount) {
+			if (wasStreaming) {
+				stopContinuousJog();
+			}
+
 			if (this.axes.every((item) => item === null)) {
 				this.isRunning = false;
 				return;
@@ -706,9 +499,12 @@ export class JoystickLoop {
 			return;
 		}
 
-		this.cancelJog();
+		if (wasStreaming) {
+			stopContinuousJog();
+		} else {
+			this.cancelJog();
+		}
 
 		this.isRunning = false;
-		this.isListeningToController = false;
 	};
 }

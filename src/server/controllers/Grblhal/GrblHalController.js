@@ -56,11 +56,8 @@ import {
 	GCODE_TRANSLATION_TYPE,
 	translateGcode,
 } from "../../lib/gcode-translation";
-import {
-	determineHALMachineZeroFlag,
-	determineMaxMovement,
-	getAxisMaximumLocation,
-} from "../../lib/homing";
+import { determineHALMachineZeroFlag } from "../../lib/homing";
+import JogStreamer from "../../lib/JogStreamer";
 import logger from "../../lib/logger";
 import { PluginParserChain } from "../../lib/plugin-parsers";
 import Sender, { SP_TYPE_CHAR_COUNTING } from "../../lib/Sender";
@@ -107,6 +104,22 @@ const POSTHOOK_COMPLETE = "%toolchange_complete";
 const PAUSE_START = "%pause_start";
 
 const log = logger("controller:grblHAL");
+
+// Commands the jog streamer either owns or can safely coexist with. Everything
+// else aborts an active stream before it runs.
+const JOG_COMMANDS = [
+	"jog:start",
+	"jog:update",
+	"jog:feed",
+	"jog:stop",
+	"jog:cancel",
+];
+const STREAM_SAFE_COMMANDS = [
+	"statusreport",
+	"reset",
+	"reset:soft",
+	"reset:quit",
+];
 const noop = _.noop;
 
 class GrblHalController {
@@ -718,6 +731,7 @@ class GrblHalController {
 		this.workflow = new Workflow();
 		this.workflow.on("start", (...args) => {
 			this.emit("workflow:state", this.workflow.state);
+			this.jogStreamer?.abort("workflow");
 			this.sender.rewind();
 			this.sender.resumeCountdown();
 		});
@@ -730,6 +744,7 @@ class GrblHalController {
 
 		this.workflow.on("pause", (...args) => {
 			this.emit("workflow:state", this.workflow.state);
+			this.jogStreamer?.abort("workflow");
 
 			if (args.length > 0) {
 				const reason = { ...args[0] };
@@ -762,6 +777,48 @@ class GrblHalController {
 		});
 
 		// Grbl
+		// Streams short incremental jog moves so the planner always has enough
+		// queued motion to hold a constant velocity. Owns the serial link for
+		// the duration of a jog - see the guards in command() below.
+		this.jogStreamer = new JogStreamer({
+			write: (line) =>
+				this.connection.write(line, { source: WRITE_SOURCE_CLIENT }),
+			getSettings: () => this.settings.settings || {},
+			getStatus: () => this.state.status || {},
+			getHomingFlag: () => this.homingFlagSet,
+			// The streamer consumes its own acks, so all it truly needs is that
+			// nobody else is waiting on one. Deliberately not gated on an idle
+			// workflow: jogging while a job is paused for a tool change is
+			// exactly when an operator reaches for the jog controls.
+			canStream: () =>
+				this.isOpen() &&
+				this.workflow.state !== WORKFLOW_STATE_RUNNING &&
+				!this.feeder.hasOutstanding() &&
+				this.sender.state.received >= this.sender.state.sent,
+			// $40 lets the firmware clamp jog targets itself, so we only work out
+			// a travel budget when it is off.
+			softLimitsEnabled: (settings) =>
+				settings.$20 === "1" && settings.$40 === "0",
+			// grblHAL handles A natively, so no rotary translation is needed.
+			lineFilter: (line) => line,
+			// A conservative floor; grblHAL reports its real buffer size in Bf:
+			// and the streamer raises this once it sees one.
+			rxBufferSize: 256,
+			log,
+		});
+		// One console line for the whole jog, not one per segment.
+		this.jogStreamer.on("start", ({ summary }) => {
+			this.emit("serialport:write", `${summary}\n`, {
+				source: WRITE_SOURCE_CLIENT,
+			});
+		});
+		this.jogStreamer.on("abort", (reason) => {
+			const handledElsewhere = ["cancel", "close", "destroy", "reset"];
+			if (!handledElsewhere.includes(reason) && this.isOpen()) {
+				this.write("\x85");
+			}
+		});
+
 		this.runner = new GrblHalRunner();
 
 		// Plugin-defined parsers. Fed from "raw", which fires for every line
@@ -826,6 +883,10 @@ class GrblHalController {
 
 			this.actionMask.queryStatusReport = false;
 
+			// The reported position is the truth the streamer's locally
+			// decremented travel budget is only estimating.
+			this.jogStreamer.onStatus(res);
+
 			if (this.actionMask.replyStatusReport) {
 				this.actionMask.replyStatusReport = false;
 				this.emit("serialport:read", res.raw);
@@ -881,6 +942,13 @@ class GrblHalController {
 				}
 			}
 
+			// A streamed jog owns the serial link while it runs, so any ok it is
+			// still waiting on is its own. Consume it silently - letting it reach
+			// the feeder would desync the feeder's one-outstanding accounting.
+			if (this.jogStreamer.isActive() && this.jogStreamer.ack()) {
+				return;
+			}
+
 			const { hold, sent, received } = this.sender.state;
 			if (this.workflow.state === WORKFLOW_STATE_RUNNING) {
 				this.emit("serialport:read", res.raw);
@@ -918,6 +986,31 @@ class GrblHalController {
 		});
 
 		this.runner.on("error", (res) => {
+			const errCode = Number(res.message) || undefined;
+
+			// An error on a streamed jog line belongs to the jog, not to the
+			// feeder or to whatever file happens to be loaded - and it must not
+			// pause a workflow that a jog cannot have been part of.
+			if (this.jogStreamer.isActive()) {
+				const wasJogError = this.jogStreamer.onError(res);
+				this.jogStreamer.abort("error");
+				if (wasJogError) {
+					const jogError =
+						_.find(this.settings.errors, { code: errCode }) || {};
+					this.emit("serialport:read", res.raw);
+					this.emit("error", {
+						type: ERROR,
+						code: `${errCode}`,
+						description: jogError.description ?? "",
+						line: "jog",
+						lineNumber: "",
+						origin: "Jog",
+						controller: GRBLHAL,
+					});
+					return;
+				}
+			}
+
 			// Only pause on workflow error with hold + sender halt
 			const isRunning = this.workflow.isRunning();
 			const firmwareIsAlarmed = this.runner.isAlarm();
@@ -1675,6 +1768,7 @@ class GrblHalController {
 	}
 
 	destroy() {
+		this.jogStreamer?.abort("destroy");
 		if (this.queryTimer) {
 			clearInterval(this.queryTimer);
 			this.queryTimer = null;
@@ -1792,6 +1886,9 @@ class GrblHalController {
 
 		// Stop status query
 		this.ready = false;
+
+		// A stream must never outlive the connection it is writing to.
+		this.jogStreamer.abort("close");
 
 		// Clear initialized flag
 		this.initialized = false;
@@ -1936,7 +2033,10 @@ class GrblHalController {
 		let until = opts.until ?? "ok-or-error";
 		if (until && typeof until === "object" && until.source) {
 			try {
-				until = new RegExp(until.source, (until.flags || "").replace(/[gy]/g, ""));
+				until = new RegExp(
+					until.source,
+					(until.flags || "").replace(/[gy]/g, ""),
+				);
 			} catch (err) {
 				callback(new Error(`Invalid "until" pattern: ${err.message}`));
 				return;
@@ -2591,132 +2691,27 @@ class GrblHalController {
 				this.command("gcode", code);
 			},
 			"jog:start": () => {
-				let [axes, feedrate = 1000, units = METRIC_UNITS] = args;
-
-				//const JOG_COMMAND_INTERVAL = 80;
-				let unitModal = units === METRIC_UNITS ? "G21" : "G20";
-				let { $20, $130, $131, $132, $23, $13, $40 } = this.settings.settings;
-
-				const jogFeedrate = unitModal === "G21" ? 3000 : 118;
-				if ($20 === "1" && $40 === "0") {
-					// if 40 enabled, can just use non-soft limit logic
-					$130 = Number($130);
-					$131 = Number($131);
-					$132 = Number($132);
-
-					// Update homing flag always, not just on homing
-					this.homingFlagSet = determineHALMachineZeroFlag({}, this.settings);
-
-					// Convert feedrate to metric if working in imperial - easier to convert feedrate and treat everything else as MM than opposite
-					if (units !== METRIC_UNITS) {
-						feedrate = (feedrate * 25.4).toFixed(2);
-						unitModal = "G21";
-					}
-
-					const FIXED = 2;
-
-					//If we are moving on the positive direction, we don't need to subtract
-					//the max travel by it as we are moving towards the zero position, but if
-					//we are moving in the negative direction we need to subtract the max travel
-					//by it to reach the maximum amount in that direction
-					const calculateAxisValue = ({ direction, position, maxTravel }) => {
-						const OFFSET = -1;
-
-						if (position === 0) {
-							return ((maxTravel + OFFSET) * direction).toFixed(FIXED);
-						}
-
-						if (direction === 1) {
-							return Number(position + OFFSET).toFixed(FIXED);
-						} else {
-							return Number(-1 * (maxTravel - position + OFFSET)).toFixed(
-								FIXED,
-							);
-						}
-					};
-
-					const { mpos } = this.state.status;
-					Object.keys(mpos).forEach((axis) => {
-						const val = Number(mpos[axis]);
-
-						// Need to convert to metric if machine is reporting in imperial and the UI is in a G21 metric state
-						if ($13 === "1" && unitModal === "G21") {
-							mpos[axis] = Number((val * 25.4).toFixed(FIXED));
-						} else {
-							mpos[axis] = Number(mpos[axis]);
-						}
-					});
-
-					if (this.homingFlagSet) {
-						const [xMaxLoc, yMaxLoc] = getAxisMaximumLocation($23);
-
-						if (axes.X) {
-							axes.X = determineMaxMovement(
-								Math.abs(mpos.x),
-								axes.X,
-								xMaxLoc,
-								$130,
-							);
-						}
-						if (axes.Y) {
-							axes.Y = determineMaxMovement(
-								Math.abs(mpos.y),
-								axes.Y,
-								yMaxLoc,
-								$131,
-							);
-						}
-					} else {
-						if (axes.X) {
-							axes.X = calculateAxisValue({
-								direction: Math.sign(axes.X),
-								position: Math.abs(mpos.x),
-								maxTravel: $130,
-							});
-						}
-						if (axes.Y) {
-							axes.Y = calculateAxisValue({
-								direction: Math.sign(axes.Y),
-								position: Math.abs(mpos.y),
-								maxTravel: $131,
-							});
-						}
-					}
-
-					if (axes.Z) {
-						axes.Z = calculateAxisValue({
-							direction: Math.sign(axes.Z),
-							position: Math.abs(mpos.z),
-							maxTravel: $132,
-						});
-					}
-					if (axes.A) {
-						axes.A *= jogFeedrate;
-					}
-				} else {
-					//jogFeedrate = 10000;
-					Object.keys(axes).forEach((axis) => {
-						axes[axis] *= jogFeedrate;
-					});
-				}
-
-				axes.F = feedrate;
-				if (axes.Z) {
-					axes.F *= 0.8;
-					axes.F = axes.F.toFixed(3);
-				}
-
-				const jogCommand =
-					`$J=${unitModal}G91 ` +
-					map(axes, (value, letter) => "" + letter.toUpperCase() + value).join(
-						" ",
-					);
-				this.writeln(jogCommand, {}, true);
+				const [axes, feedrate = 1000, units = METRIC_UNITS] = args;
+				// Keep the machine-zero flag current; the streamer reads it to work
+				// out how much travel is left.
+				this.homingFlagSet = determineHALMachineZeroFlag({}, this.settings);
+				this.jogStreamer.start({ axes, feedrate, units });
+			},
+			"jog:update": () => {
+				const [axes, feedrate] = args;
+				this.jogStreamer.update({ axes, feedrate });
+			},
+			"jog:feed": () => {
+				const [axes, feedrate, units = METRIC_UNITS] = args;
+				this.homingFlagSet = determineHALMachineZeroFlag({}, this.settings);
+				this.jogStreamer.feed({ axes, feedrate, units });
 			},
 			"jog:stop": () => {
+				this.jogStreamer.stop();
 				this.write("\x85");
 			},
 			"jog:cancel": () => {
+				this.jogStreamer.abort("cancel");
 				this.write("\x85");
 			},
 			"macro:run": () => {
@@ -2964,6 +2959,17 @@ class GrblHalController {
 		if (!handler) {
 			log.error(`Unknown command: ${cmd}`);
 			return;
+		}
+
+		// A jog stream consumes its own acks, which is only safe while it is the
+		// sole writer of ack-producing lines. Anything else claiming the link
+		// ends the stream first.
+		if (
+			this.jogStreamer.isActive() &&
+			!JOG_COMMANDS.includes(cmd) &&
+			!STREAM_SAFE_COMMANDS.includes(cmd)
+		) {
+			this.jogStreamer.abort(`command:${cmd}`);
 		}
 
 		handler();
