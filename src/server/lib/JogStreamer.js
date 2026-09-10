@@ -268,7 +268,7 @@ export default class JogStreamer extends events.EventEmitter {
 		this.pendingTime = 0;
 		this.plannerFree = null;
 		this.tick = null;
-		this.nextDue = 0;
+		this.emittedUntil = 0;
 		this.startedAt = 0;
 		this.deadlineAt = 0;
 		this.drainDeadlineAt = 0;
@@ -602,8 +602,8 @@ export default class JogStreamer extends events.EventEmitter {
 		this.state = JOG_STATE_STREAMING;
 		this.startedAt = this.now();
 		this.deadlineAt = this.startedAt + MAX_STREAM_DURATION_MS;
-		this.nextDue = this.startedAt;
-		this._emitSegment();
+		this.emittedUntil = this.startedAt;
+		this._pump();
 		this.tick = this.setIntervalFn(() => this._onTick(), TICK_MS);
 	}
 
@@ -651,15 +651,42 @@ export default class JogStreamer extends events.EventEmitter {
 			this.abort("watchdog");
 			return;
 		}
-		this._emitSegment();
+		this._pump();
 	}
 
+	/**
+	 * Emit segments until the commanded timeline runs tLook ahead of the wall
+	 * clock, or a backpressure gate stops us.
+	 *
+	 * The lead is the whole point: motion commanded at exactly 1x real time
+	 * leaves the planner with a single block, grbl plans a stop at the end of
+	 * it, and the jog stutters. Anything queued beyond the operator's release
+	 * is discarded by the 0x85 jog cancel the caller sends on stop().
+	 */
+	_pump() {
+		const leadMs = this.plan.tLook * 1000;
+		for (let i = 0; i < MAX_INFLIGHT_LINES; i += 1) {
+			if (this.state !== JOG_STATE_STREAMING) {
+				return;
+			}
+			if (this.emittedUntil - this.now() >= leadMs) {
+				return;
+			}
+			if (!this._emitSegment()) {
+				return;
+			}
+		}
+	}
+
+	/**
+	 * Emit one segment. Returns true when a line was scheduled, false when a
+	 * gate or the end of the work stopped us.
+	 */
 	_emitSegment() {
 		const now = this.now();
-		const owed = now - this.nextDue;
-		if (owed < 0) {
-			return;
-		}
+		// Time the schedule has fallen behind the wall clock, if any. A lead is
+		// the normal case and is not owed time.
+		const owed = Math.max(0, now - this.emittedUntil);
 
 		const { dt, feedrate } = this.plan;
 
@@ -668,20 +695,20 @@ export default class JogStreamer extends events.EventEmitter {
 		// motion the operator did not ask for.
 		const estimatedBytes = 40;
 		if (this.pendingBytes + estimatedBytes > this.rxBudget) {
-			this.nextDue = now;
-			return;
+			this.emittedUntil = Math.max(this.emittedUntil, now);
+			return false;
 		}
 		if (this.pendingTime > this.plan.tLook * OVERRUN_FACTOR) {
-			this.nextDue = now;
-			return;
+			this.emittedUntil = Math.max(this.emittedUntil, now);
+			return false;
 		}
 		if (this.pending.length >= this.plan.inflight) {
-			this.nextDue = now;
-			return;
+			this.emittedUntil = Math.max(this.emittedUntil, now);
+			return false;
 		}
 		if (this.plannerFree !== null && this.plannerFree < PLANNER_LOW_WATER) {
-			this.nextDue = now;
-			return;
+			this.emittedUntil = Math.max(this.emittedUntil, now);
+			return false;
 		}
 
 		// A late tick is covered by one longer segment. This is safe because
@@ -723,7 +750,7 @@ export default class JogStreamer extends events.EventEmitter {
 
 		if (exhausted) {
 			this._onExhausted();
-			return;
+			return false;
 		}
 
 		// Carry sub-precision remainders forward. Rounding each segment
@@ -746,14 +773,14 @@ export default class JogStreamer extends events.EventEmitter {
 
 		if (!hasMotion) {
 			// Everything rounded away; let it accumulate into the next tick.
-			return;
+			return false;
 		}
 
 		const line = this._formatLine(commanded, feedrate);
 		const filtered = this.lineFilter(line);
 		if (!filtered) {
-			this.nextDue = now + dtEff * 1000;
-			return;
+			this._advanceSchedule(now, dtEff);
+			return true;
 		}
 
 		this.write(`${filtered}\n`);
@@ -774,7 +801,15 @@ export default class JogStreamer extends events.EventEmitter {
 			}
 		});
 
-		this.nextDue = now + dtEff * 1000;
+		this._advanceSchedule(now, dtEff);
+		return true;
+	}
+
+	// Extend the commanded timeline. When we have fallen behind, the forfeited
+	// backlog is dropped rather than banked, so resuming never produces a burst
+	// of catch-up motion the operator did not ask for.
+	_advanceSchedule(now, dtEff) {
+		this.emittedUntil = Math.max(this.emittedUntil, now) + dtEff * 1000;
 	}
 
 	_onExhausted() {

@@ -110,6 +110,11 @@ const runAcked = ({ streamer, clock, lines }, ms) => {
 const totalDistance = (lines, axis) =>
 	lines.reduce((sum, line) => sum + (parseLine(line)[axis] || 0), 0);
 
+// The stream deliberately keeps tLook seconds of motion queued ahead of the
+// wall clock, so commanded distance always leads elapsed distance by this much.
+const leadDistance = (streamer) =>
+	(streamer.plan.tLook * streamer.plan.feedrate) / 60;
+
 describe("computeSegmentPlan", () => {
 	const accelByAxis = { X: 500, Y: 500, Z: 200 };
 	const maxRateByAxis = { X: 10000, Y: 10000, Z: 3000 };
@@ -203,9 +208,31 @@ describe("JogStreamer velocity mode", () => {
 		runAcked(ctx, 1000);
 
 		const segment = ctx.streamer.plan.segmentLength;
+		const lead = leadDistance(ctx.streamer);
 		const total = totalDistance(ctx.lines, "X");
-		expect(total).toBeGreaterThan(20 - 2 * segment);
-		expect(total).toBeLessThan(20 + 2 * segment);
+		expect(total).toBeGreaterThan(20 + lead - 2 * segment);
+		expect(total).toBeLessThan(20 + lead + 2 * segment);
+	});
+
+	it("keeps a queue of motion ahead of the wall clock", () => {
+		const ctx = build();
+		ctx.streamer.start({ axes: { X: 1 }, feedrate: 1200 });
+
+		// A stream paced at exactly 1x real time leaves grbl a single block and
+		// it plans a stop at the end of it, which is what makes a jog stutter.
+		// The queued motion must always outlast the deceleration it has to
+		// cover, acks or no acks.
+		const leads = [];
+		for (let elapsed = 0; elapsed < 500; elapsed += 1) {
+			ctx.clock.advance(1);
+			while (ctx.streamer.ack()) {
+				// grbl acks a jog line as soon as it parses it.
+			}
+			leads.push(ctx.streamer.emittedUntil - ctx.clock.time);
+		}
+
+		const required = ctx.streamer.plan.requiredLook * 1000;
+		expect(Math.min(...leads)).toBeGreaterThan(required);
 	});
 
 	it("holds the same velocity at a very low feedrate", () => {
@@ -214,9 +241,10 @@ describe("JogStreamer velocity mode", () => {
 		runAcked(ctx, 2000);
 
 		const segment = ctx.streamer.plan.segmentLength;
+		const lead = leadDistance(ctx.streamer);
 		const total = totalDistance(ctx.lines, "X");
-		expect(total).toBeGreaterThan(2 - 2 * segment);
-		expect(total).toBeLessThan(2 + 2 * segment);
+		expect(total).toBeGreaterThan(2 + lead - 2 * segment);
+		expect(total).toBeLessThan(2 + lead + 2 * segment);
 	});
 
 	it("splits a diagonal evenly and keeps the vector magnitude", () => {
@@ -230,9 +258,10 @@ describe("JogStreamer velocity mode", () => {
 		expect(y).toBeLessThan(0);
 
 		const segment = ctx.streamer.plan.segmentLength;
+		const lead = leadDistance(ctx.streamer);
 		const magnitude = Math.hypot(x, y);
-		expect(magnitude).toBeGreaterThan(20 - 2 * segment);
-		expect(magnitude).toBeLessThan(20 + 2 * segment);
+		expect(magnitude).toBeGreaterThan(20 + lead - 2 * segment);
+		expect(magnitude).toBeLessThan(20 + lead + 2 * segment);
 	});
 
 	it("carries sub-precision remainders instead of losing them", () => {
@@ -243,9 +272,10 @@ describe("JogStreamer velocity mode", () => {
 		// 10s at 0.1 mm/s, to within the one boundary segment the schedule can
 		// legitimately include.
 		const segment = ctx.streamer.plan.segmentLength;
+		const lead = leadDistance(ctx.streamer);
 		const total = totalDistance(ctx.lines, "X");
-		expect(total).toBeGreaterThan(1 - 2 * segment);
-		expect(total).toBeLessThan(1 + 2 * segment);
+		expect(total).toBeGreaterThan(1 + lead - 2 * segment);
+		expect(total).toBeLessThan(1 + lead + 2 * segment);
 		ctx.lines.forEach((line) => {
 			expect(parseLine(line).X).not.toBe(0);
 		});
@@ -297,7 +327,9 @@ describe("JogStreamer backpressure", () => {
 		const total = totalDistance(ctx.lines, "X");
 
 		// The forfeited time must not reappear as extra distance.
-		expect(total - stalled).toBeLessThan(20 + ctx.streamer.plan.segmentLength);
+		expect(total - stalled).toBeLessThan(
+			20 + leadDistance(ctx.streamer) + ctx.streamer.plan.segmentLength,
+		);
 	});
 
 	it("backs off when the firmware reports a nearly full planner", () => {
@@ -321,9 +353,14 @@ describe("JogStreamer acks", () => {
 		const ctx = build();
 		expect(ctx.streamer.ack()).toBe(false);
 
+		// Starting primes the queue with a lead, so there is more than one line
+		// outstanding straight away.
 		ctx.streamer.start({ axes: { X: 1 }, feedrate: 1200 });
-		expect(ctx.streamer.pending.length).toBe(1);
-		expect(ctx.streamer.ack()).toBe(true);
+		const primed = ctx.streamer.pending.length;
+		expect(primed).toBeGreaterThan(1);
+		for (let i = 0; i < primed; i += 1) {
+			expect(ctx.streamer.ack()).toBe(true);
+		}
 		expect(ctx.streamer.ack()).toBe(false);
 	});
 
