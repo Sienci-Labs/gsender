@@ -23,6 +23,7 @@ Then restart gSender.
 | `corner-finder/` | React + TypeScript + Vite | Host visualizer bridge — `gsender.viewer.*` (picking, camera, overlay markers) + `machine.setBusy` |
 | `storage-test/` | Plain JS + Vite | Namespaced plugin storage — buttons for every `storage.*` method (get/set/delete/getAll/setAll/clear), for QA |
 | `parser-demo/` | Plain JS + Vite | Firmware response parsers — manifest line/block parsers, runtime `registerParser`, `onLine`, `machine.query`, plus a command sender to drive them |
+| `controller-events-demo/` | React + TypeScript + Vite | `machine.addListener` — a live log of controller events (job start/stop, connection, etc.), plus Start/Stop buttons (`gcode.loadToVisualizer` + `machine.command`) to trigger a test job without leaving the page |
 
 Each folder must contain `gsender-plugin.json` and a `ui/` directory with the built SPA entry file.
 
@@ -132,6 +133,29 @@ Plugins that import the SDK should build with `gsenderPlugin()` from
 `@sienci/gsender-plugin-sdk/vite` (see `basic-cam/vite.config.ts` and the
 SDK README) — it keeps SDK imports scannable and wires the runtime import
 map.
+
+#### `machine:read`: controller events
+
+Importing `machine` also grants the `controller` topic, which
+`machine.addListener(eventName, callback)` subscribes to. This mirrors
+gSender's own `controller.addListener`.
+
+```json
+"capabilities": {
+	"requestTypes": [],
+	"topics": ["controller"],
+	"allowedFunctions": ["machine"]
+}
+```
+
+Two categories of controller event are never relayed over the `controller` topic: 
+- the raw firmware stream (`serialport:read`/`serialport:write`,
+gated behind `machine:parse` instead)
+- per-plugin parser events (`plugin:parser:match`/`plugin:parser:error`,
+delivered via `onParsed`/`onParserError` instead)
+
+Every other controller event name is relayed generically.
+See `controller-events-demo/` for a working example.
 
 ### Vite Config
 

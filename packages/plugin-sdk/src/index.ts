@@ -1,5 +1,6 @@
 export {
 	type CameraView,
+	type ControllerEvent,
 	type OverlayMarker,
 	PLUGIN_BRIDGE_CHANNEL,
 	type PluginBridgeRequest,
@@ -11,6 +12,7 @@ export {
 
 import {
 	type CameraView,
+	type ControllerEvent,
 	getTopicSnapshot,
 	type OverlayMarker,
 	request,
@@ -136,9 +138,15 @@ const toRegexSpec = (pattern: ParserPattern): RegexSpec => {
 		return { source: pattern };
 	}
 	if (pattern instanceof RegExp) {
-		return { source: pattern.source, flags: pattern.flags.replace(/[gy]/g, "") };
+		return {
+			source: pattern.source,
+			flags: pattern.flags.replace(/[gy]/g, ""),
+		};
 	}
-	return { source: pattern.source, flags: (pattern.flags ?? "").replace(/[gy]/g, "") };
+	return {
+		source: pattern.source,
+		flags: (pattern.flags ?? "").replace(/[gy]/g, ""),
+	};
 };
 
 const PATTERN_FIELDS = ["match", "begin", "end", "ignore"] as const;
@@ -172,7 +180,10 @@ type MachineClient = {
 	unregisterParser: (id: string) => Promise<void>;
 	/** Every match, losslessly. Fires immediately with the last result if one
 	 * has already arrived. Returns an unsubscribe function. */
-	onParsed: (id: string, callback: (result: ParsedResult) => void) => () => void;
+	onParsed: (
+		id: string,
+		callback: (result: ParsedResult) => void,
+	) => () => void;
 	/** Sugar for a one-off line parser. Returns an unsubscribe function. */
 	onLine: (
 		pattern: RegExp | string,
@@ -181,17 +192,32 @@ type MachineClient = {
 	/** Sends a command and collects every response line until a terminator. */
 	query: (cmd: string, opts?: QueryOptions) => Promise<QueryResult>;
 	setBusy: (busy: boolean, label?: string) => Promise<void>;
-}
+	/**
+	 * Listen for a controller event by name (e.g. `"job:start"`, `"job:stop"`,
+	 * `"workflow:state"`).
+	 *
+	 * A couple of events are never relayed: `"serialport:read"`/`"serialport:write"`
+	 * (the raw firmware stream, gated behind `machine.registerParser`/`onLine`
+	 * instead), and `"plugin:parser:match"`/`"plugin:parser:error"` (delivered
+	 * per-plugin via `onParsed`/`onParserError` instead).
+	 *
+	 * @returns unsubscribe function
+	 */
+	addListener: (
+		eventName: string,
+		callback: (...args: unknown[]) => void,
+	) => () => void;
+};
 type WorkspaceClient = {
 	getState: () => Promise<unknown>;
-}
+};
 type ReduxClient = {
 	getState: () => Promise<unknown>;
-}
+};
 type GcodeClient = {
 	/** Load a raw G-code program into gSender's main visualizer/job. */
 	loadToVisualizer: (gcode: string, name?: string) => Promise<unknown>;
-}
+};
 type StorageClient = {
 	/** Get a value from this plugin's own namespaced storage. */
 	get: <T = unknown>(key: string, defaultValue?: T) => Promise<T | undefined>;
@@ -205,7 +231,7 @@ type StorageClient = {
 	setAll: (value: Record<string, unknown>) => Promise<void>;
 	/** Clear this plugin's entire namespaced storage object. */
 	clear: () => Promise<void>;
-}
+};
 type ViewerClient = {
 	/** Project a screen pixel onto the visualizer's work plane. */
 	screenToWorld: (
@@ -237,7 +263,7 @@ type ViewerClient = {
 	disarmPick: () => Promise<void>;
 	/** Replace the overlay markers drawn on the host visualizer. */
 	setOverlay: (markers: OverlayMarker[]) => Promise<void>;
-}
+};
 type GsenderClient = {
 	machine: MachineClient;
 	workspace: WorkspaceClient;
@@ -293,24 +319,36 @@ const createMachineClient = (): MachineClient => ({
 	},
 
 	query: (cmd, opts) =>
-		request<QueryResult>("machine:query", {
-			cmd,
-			opts: opts
-				? {
-						...opts,
-						until:
-							opts.until instanceof RegExp || typeof opts.until === "object"
-								? toRegexSpec(opts.until as ParserPattern)
-								: opts.until,
-					}
-				: {},
-			// A query waits on the machine, so give it room beyond its own timeout
-			// before the bridge gives up on it.
-		}, { timeoutMs: (opts?.timeout ?? 5000) + 15_000 }),
+		request<QueryResult>(
+			"machine:query",
+			{
+				cmd,
+				opts: opts
+					? {
+							...opts,
+							until:
+								opts.until instanceof RegExp || typeof opts.until === "object"
+									? toRegexSpec(opts.until as ParserPattern)
+									: opts.until,
+						}
+					: {},
+				// A query waits on the machine, so give it room beyond its own timeout
+				// before the bridge gives up on it.
+			},
+			{ timeoutMs: (opts?.timeout ?? 5000) + 15_000 },
+		),
 
 	setBusy: async (busy, label) => {
 		await request("machine:busy:set", { busy, label });
 	},
+
+	addListener: (eventName, callback) =>
+		subscribeEvents("controller", (payload) => {
+			const event = payload as ControllerEvent;
+			if (event?.name === eventName) {
+				callback(...event.args);
+			}
+		}),
 });
 const createViewerClient = (): ViewerClient => ({
 	screenToWorld: (px, py) =>
@@ -371,8 +409,8 @@ const createReduxClient = (): ReduxClient => ({
 });
 const createGcodeClient = (): GcodeClient => ({
 	loadToVisualizer: (gcode, name) =>
-	request("gcode:load:to:visualizer", { gcode, name }),
-})
+		request("gcode:load:to:visualizer", { gcode, name }),
+});
 // Not part of `gsender`/`GsenderClient` on purpose: capability grants are
 // derived from a static scan of imported names, so `storage` must be its own
 // directly-imported export to get its own explicit, separately-approved
@@ -381,8 +419,7 @@ const createStorageClient = (): StorageClient => ({
 	get: (key, defaultValue) => request("storage:get", { key, defaultValue }),
 	set: (key, value) =>
 		request("storage:set", { key, value }).then(() => undefined),
-	delete: (key) =>
-		request("storage:delete", { key }).then(() => undefined),
+	delete: (key) => request("storage:delete", { key }).then(() => undefined),
 	getAll: (defaultValue) => request("storage:get:all", { defaultValue }),
 	setAll: (value) =>
 		request("storage:set:all", { value }).then(() => undefined),
@@ -400,7 +437,7 @@ const createGsenderClient = (): GsenderClient => ({
 	workspace: workspace,
 	redux: redux,
 	gcode: gcode,
-	viewer: viewer
+	viewer: viewer,
 });
 export const gsender = createGsenderClient();
 

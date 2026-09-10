@@ -3,6 +3,15 @@ jest.mock("app/lib/controller", () => ({
 	command: jest.fn(),
 	addListener: jest.fn(),
 	removeListener: jest.fn(),
+	// A couple of relayed event names, plus one from each excluded category —
+	// enough for the "controller events" describe block below without pulling
+	// in the real ~70-entry dispatch table.
+	listeners: {
+		"job:start": [],
+		"job:stop": [],
+		"serialport:read": [],
+		"plugin:parser:match": [],
+	},
 }));
 jest.mock("app/lib/fileupload", () => ({
 	uploadGcodeFileToServer: jest.fn(async () => ({})),
@@ -41,6 +50,7 @@ import {
 import controller from "app/lib/controller";
 import {
 	handlePluginBridgeMessage,
+	handlePluginBridgeSubscription,
 	releaseRuntimeParsersForSource,
 } from "../pluginBridge";
 
@@ -642,5 +652,119 @@ describe("machine:command", () => {
 
 		expect(response).toMatchObject({ id: "1", ok: false });
 		expect(controller.pluginCommand).not.toHaveBeenCalled();
+	});
+});
+
+describe("controller events", () => {
+	const CONTROLLER_CAPABILITIES = toRuntimeCapabilities({
+		requestTypes: [],
+		topics: ["controller"],
+	});
+
+	const makeSubscribeEvent = (
+		source: MessageEventSource,
+		subscribe: { id: string; topic: string },
+	) =>
+		({
+			data: { channel: CHANNEL, subscribe },
+			source,
+			origin: "http://localhost",
+		}) as unknown as MessageEvent;
+
+	const makeSpySource = () =>
+		({ postMessage: jest.fn() }) as unknown as MessageEventSource & {
+			postMessage: jest.Mock;
+		};
+
+	// ensureHostListeners() only ever runs once (guarded by a module-level
+	// flag), the first time anything subscribes — so the relay listeners are
+	// installed by whichever test in this block runs first.
+	const relayCallbackFor = (eventName: string) => {
+		const call = (controller.addListener as jest.Mock).mock.calls.find(
+			([name]) => name === eventName,
+		);
+		if (!call) {
+			throw new Error(
+				`controller.addListener was never called for '${eventName}'`,
+			);
+		}
+		return call[1] as (...args: unknown[]) => void;
+	};
+
+	it("relays a granted controller event to every subscriber, as { name, args }", () => {
+		const source = makeSpySource();
+		registerPluginWindow(source, CONTROLLER_CAPABILITIES, "com.sienci.a");
+
+		handlePluginBridgeSubscription(
+			makeSubscribeEvent(source, { id: "sub1", topic: "controller" }),
+		);
+		source.postMessage.mockClear(); // drop the initial null-snapshot push
+
+		relayCallbackFor("job:start")({ foo: "bar" });
+
+		expect(source.postMessage).toHaveBeenCalledWith(
+			{
+				channel: CHANNEL,
+				event: {
+					id: "sub1",
+					topic: "controller",
+					event: { name: "job:start", args: [{ foo: "bar" }] },
+				},
+			},
+			{ targetOrigin: "http://localhost" },
+		);
+
+		unregisterPluginWindow(source);
+	});
+
+	it("denies subscribing to the controller topic without the topic grant", () => {
+		const source = makeSpySource();
+		registerPluginWindow(
+			source,
+			toRuntimeCapabilities({ requestTypes: [], topics: [] }),
+			"com.sienci.a",
+		);
+
+		handlePluginBridgeSubscription(
+			makeSubscribeEvent(source, { id: "sub2", topic: "controller" }),
+		);
+
+		expect(source.postMessage).toHaveBeenCalledWith(
+			expect.objectContaining({ channel: CHANNEL, err: expect.any(Error) }),
+			{ targetOrigin: "http://localhost" },
+		);
+
+		unregisterPluginWindow(source);
+	});
+
+	it("never wires raw firmware traffic events into the relay", () => {
+		// Registered above, so the relay installation has already run by now.
+		expect(
+			(controller.addListener as jest.Mock).mock.calls.some(
+				([name]) => name === "serialport:read",
+			),
+		).toBe(false);
+	});
+
+	it("does not leak plugin:parser:match into the generic controller relay", () => {
+		const source = makeSpySource();
+		registerPluginWindow(source, CONTROLLER_CAPABILITIES, "com.sienci.b");
+
+		handlePluginBridgeSubscription(
+			makeSubscribeEvent(source, { id: "sub3", topic: "controller" }),
+		);
+		source.postMessage.mockClear();
+
+		// This listener is wired unconditionally for the "parser" topic
+		// (pre-existing behaviour) — it must not also reach a subscriber that
+		// only subscribed to "controller".
+		relayCallbackFor("plugin:parser:match")({
+			pluginId: "com.sienci.other",
+			parserId: "probe",
+		});
+
+		expect(source.postMessage).not.toHaveBeenCalled();
+
+		unregisterPluginWindow(source);
 	});
 });
