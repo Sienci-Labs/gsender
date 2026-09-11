@@ -1,8 +1,7 @@
-import reduxStore from 'app/store/redux';
-import prefStore from 'app/store';
-
-import get from 'lodash/get';
-import { toast } from 'app/lib/toaster';
+import { toast } from "app/lib/toaster";
+import prefStore from "app/store";
+import reduxStore from "app/store/redux";
+import get from "lodash/get";
 
 export const FRONT_RIGHT = 'FR';
 export const FRONT_LEFT = 'FL';
@@ -126,8 +125,16 @@ export const getMovementGCode = (
 ) => {
     const gcode = [];
 
-    gcode.push(`G53 G21 G0 Z-${OFFSET_DISTANCE}`); // Always move up to the limit of Z travel minus offset
-    const homingPosition = getHomingLocation(homingPositionSetting);
+	const settings = get(
+		reduxStore.getState(),
+		"controller.settings.settings",
+		{},
+	);
+	// if machine origin doesn't set to 0 on homing, we need to use the pulloff distance
+	const setMachineOrigin = isBitSetInNumber(get(settings, "$22", "0"), 3);
+	const zMove = setMachineOrigin ? -OFFSET_DISTANCE : -pullOff;
+	gcode.push(`G53 G21 G0 Z${zMove}`); // Move up to the limit of Z travel minus offset
+	const homingPosition = getHomingLocation(homingPositionSetting);
 
     // Change homing flag for grblHal specifically
     const controllerType = prefStore.get(
@@ -135,12 +142,9 @@ export const getMovementGCode = (
         'grbl',
     );
 
-    if (controllerType === 'grblHAL') {
-        const store = reduxStore.getState();
-        const settings = get(store, 'controller.settings.settings');
-        const { $22: homingValue } = settings;
-        homingFlag = isBitSetInNumber(homingValue, 3);
-    }
+	if (controllerType === "grblHAL") {
+		homingFlag = setMachineOrigin;
+	}
 
     const [xMovement, yMovement] = getPositionMovements(
         requestedPosition,

@@ -1,35 +1,44 @@
-import { RiParkingFill } from 'react-icons/ri';
-
-import Button from 'app/components/Button';
-import store from 'app/store';
-import controller from 'app/lib/controller.ts';
+import { usePostHog } from "@posthog/react";
+import Button from "app/components/Button";
+import Tooltip from "app/components/Tooltip";
 import {
-    GRBL_ACTIVE_STATE_IDLE,
-    GRBL_ACTIVE_STATE_JOG,
-    LOCATION_CATEGORY,
-    WORKFLOW_STATE_RUNNING,
-} from 'app/constants';
-import useKeybinding from 'app/lib/useKeybinding';
-import useShuttleEvents from 'app/hooks/useShuttleEvents';
-import { useEffect, useRef } from 'react';
-import Tooltip from 'app/components/Tooltip';
-import { get, includes } from 'lodash';
-import reduxStore from 'app/store/redux';
-import { useSelector } from 'react-redux';
-import { RootState } from 'app/store/redux';
-import { usePostHog } from '@posthog/react';
+	GRBL_ACTIVE_STATE_IDLE,
+	GRBL_ACTIVE_STATE_JOG,
+	LOCATION_CATEGORY,
+	WORKFLOW_STATE_RUNNING,
+} from "app/constants";
+import { isBitSetInNumber } from "app/features/DRO/utils/RapidPosition";
+import useShuttleEvents from "app/hooks/useShuttleEvents";
+import controller from "app/lib/controller.ts";
+import useKeybinding from "app/lib/useKeybinding";
+import store from "app/store";
+import reduxStore, { type RootState } from "app/store/redux";
+import { get, includes } from "lodash";
+import { useEffect, useRef } from "react";
+import { RiParkingFill } from "react-icons/ri";
+import { useSelector } from "react-redux";
 
-function goToParkLocation() {
-    const park = store.get('workspace.park', {});
-    const code = [];
+export function goToParkLocation() {
+	const park = store.get("workspace.park", {});
+	const code = [];
 
-    // Move up to safe height
-    code.push('G53 G21 G0 Z-1');
-    // Move to Park XY
-    code.push(`G53 G21 G0 X${park.x} Y${park.y}`);
-    //Move to Park Z
-    code.push(`G53 G21 G0 Z${park.z}`);
-    controller.command('gcode', code);
+	const settings = get(
+		reduxStore.getState(),
+		"controller.settings.settings",
+		{},
+	);
+	const setMachineOrigin = isBitSetInNumber(get(settings, "$22", "0"), 3);
+	const pulloffDistance = Number(get(settings, "$27", 1));
+	// if machine origin doesn't set to 0 on homing, we need to use the pulloff distance
+	const zMove = setMachineOrigin ? -1 : -pulloffDistance;
+
+	// Move up to safe height
+	code.push(`G53 G21 G0 Z${zMove}`);
+	// Move to Park XY
+	code.push(`G53 G21 G0 X${park.x} Y${park.y}`);
+	//Move to Park Z
+	code.push(`G53 G21 G0 Z${park.z}`);
+	controller.command("gcode", code);
 }
 
 export function Parking({

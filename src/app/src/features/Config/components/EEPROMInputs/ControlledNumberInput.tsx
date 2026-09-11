@@ -13,6 +13,8 @@ const ControlledNumberInput = ({
     value,
     type = 'decimal',
     externalOnChange = null,
+    min = -999999999999999,
+    max = 999999999999999,
     ...rest
 }: InputProps) => {
     const inputRef = useRef();
@@ -30,7 +32,19 @@ const ControlledNumberInput = ({
     };
 
     const onBlur = (e) => {
-        if (localValue && truncateDecimal(localValue) !== originalValue) {
+        const current = inputRef.current.value;
+        if (localValue && localValue !== originalValue) {
+            if (current < min) {
+                inputRef.current.value = min;
+                setLocalValue(min);
+            } else if (current > max) {
+                inputRef.current.value = max;
+                setLocalValue(max);
+            } else {
+                setLocalValue(current);
+            }
+            onChange(e);
+        } else if (localValue && truncateDecimal(localValue) !== originalValue) {
             onChange(e);
         } else {
             setLocalValue(originalValue);
@@ -73,6 +87,8 @@ const ControlledNumberInput = ({
             onKeyDown={onKeyDown}
             onChange={localChange}
             value={localValue}
+            min={min}
+            max={max}
             {...rest}
         />
     );

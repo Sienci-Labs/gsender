@@ -1,10 +1,11 @@
-import Button from 'app/components/Button';
-import { FiTarget } from 'react-icons/fi';
-import { ControlledInput } from 'app/components/ControlledInput';
-import { useSelector } from 'react-redux';
-import { RootState } from 'app/store/redux';
-import { FaChartLine } from 'react-icons/fa';
-import controller from 'app/lib/controller.ts';
+import Button from "app/components/Button";
+import { ControlledInput } from "app/components/ControlledInput";
+import { isBitSetInNumber } from "app/features/DRO/utils/RapidPosition";
+import controller from "app/lib/controller.ts";
+import type { RootState } from "app/store/redux";
+import { FaChartLine } from "react-icons/fa";
+import { FiTarget } from "react-icons/fi";
+import { useSelector } from "react-redux";
 
 export interface LocationInputProps {
     value: object;
@@ -21,10 +22,21 @@ export function LocationInput({
     onChange,
     unit,
 }: LocationInputProps) {
-    const mpos = useSelector((state: RootState) => state.controller.mpos);
-    const isConnected = useSelector(
-        (state: RootState) => state.connection.isConnected,
-    );
+	const mpos = useSelector((state: RootState) => state.controller.mpos);
+	const isConnected = useSelector(
+		(state: RootState) => state.connection.isConnected,
+	);
+	const setMachineOrigin = isBitSetInNumber(
+		useSelector(
+			(state: RootState) => state.controller.settings.settings.$22 ?? "0",
+		),
+		3,
+	);
+	const pulloffDistance = Number(
+		useSelector(
+			(state: RootState) => state.controller.settings.settings.$27 ?? 1,
+		),
+	);
 
     function grabLocation() {
         const location = {
@@ -35,16 +47,18 @@ export function LocationInput({
         onChange(location);
     }
 
-    function gotoLocation() {
-        const code = [];
-        const location = value;
-        code.push(
-            `G53 G0 Z-1`,
-            `G53 G0 X${location.x} Y${location.y}`,
-            `G53 G0 Z${location.z}`,
-        );
-        controller.command('gcode', code);
-    }
+	function gotoLocation() {
+		const code = [];
+		const location = value;
+		// if machine origin doesn't set to 0 on homing, we need to use the pulloff distance
+		const zMove = setMachineOrigin ? -1 : -pulloffDistance;
+		code.push(
+			`G53 G0 Z${zMove}`,
+			`G53 G0 X${location.x} Y${location.y}`,
+			`G53 G0 Z${location.z}`,
+		);
+		controller.command("gcode", code);
+	}
 
     function updateSpecificAxes(e, axis: string) {
         const loc = Number(e.target.value);
