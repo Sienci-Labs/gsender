@@ -23,7 +23,6 @@
 /** biome-ignore-all lint/suspicious/noExplicitAny: <> */
 
 import type { MachineProfile } from "app/definitions/firmware";
-import type { PluginCapabilitiesWire } from "app/features/Plugins/types";
 import axios, {
 	type AxiosResponse,
 	type InternalAxiosRequestConfig,
@@ -480,36 +479,23 @@ const plugins = {
 			pluginPath ? { pluginPath } : {},
 		);
 	},
-	readImportedManifest: (pluginPath: string): Promise<AxiosResponse> => {
-		return authrequest.post(
-			"/api/plugins/read-imported-manifest",
-			{ pluginPath },
-		);
+	// Guided install. prepare() stages the plugin and reports what installing
+	// it would do; nothing under the plugins directory changes until commit().
+	installPrepare: (sourcePath: string): Promise<AxiosResponse> => {
+		return authrequest.post("/api/plugins/install/prepare", { sourcePath });
 	},
-	writePermissions: (pluginPath: string, capabilities: PluginCapabilitiesWire): Promise<AxiosResponse> => {
-		return authrequest.post(
-			"/api/plugins/write-permissions",
-			{ pluginPath, capabilities }
-		);
+	installCommit: (sessionId: string): Promise<AxiosResponse> => {
+		return authrequest.post("/api/plugins/install/commit", { sessionId });
 	},
-	scanPluginForSDKUsage: (indexFile: string, sdks: string[]): Promise<AxiosResponse> => {
-		return authrequest.post(
-			"/api/plugins/scan-plugin-for-sdk-usage",
-			{ indexFile, sdks }
-		);
+	installCancel: (sessionId: string): Promise<AxiosResponse> => {
+		return authrequest.post("/api/plugins/install/cancel", { sessionId });
 	},
-	importPlugin: (pluginsDir: string, directory: string): Promise<AxiosResponse> => {
-		return authrequest.post(
-			"/api/plugins/import-plugin",
-			{ pluginsDir, directory }
-		);
+	uninstall: (id: string): Promise<AxiosResponse> => {
+		return authrequest.delete(`/api/plugins/${encodeURIComponent(id)}`);
 	},
 	updateSettings: (pluginsDir: string): Promise<AxiosResponse> => {
-		return authrequest.post(
-			"/api/plugins/settings",
-			{ pluginsDir }
-		);
-	}
+		return authrequest.post("/api/plugins/settings", { pluginsDir });
+	},
 };
 
 export default {

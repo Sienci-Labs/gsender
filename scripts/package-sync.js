@@ -29,6 +29,13 @@ const SCANNABLE_EXTENSIONS = new Set([
 	".cjs",
 ]);
 
+// Tests never ship, and their fixtures routinely contain strings that look
+// like imports (a fake plugin bundle, say), which would otherwise be mistaken
+// for runtime dependencies.
+const isTestPath = (filePath) =>
+	/(^|[\/])__tests__[\/]/.test(filePath) ||
+	/\.(test|spec)\.[cm]?[jt]sx?$/.test(filePath);
+
 const INTERNAL_PREFIXES = ["server/", "app/", "electron-app/"];
 
 const MANUAL_RUNTIME_DEPS = [
@@ -66,7 +73,10 @@ function collectSourceFiles(entryPath, acc) {
 
 	const stat = fs.statSync(absolutePath);
 	if (stat.isFile()) {
-		if (SCANNABLE_EXTENSIONS.has(path.extname(absolutePath))) {
+		if (
+			SCANNABLE_EXTENSIONS.has(path.extname(absolutePath)) &&
+			!isTestPath(absolutePath)
+		) {
 			acc.push(absolutePath);
 		}
 		return;
@@ -79,8 +89,13 @@ function collectSourceFiles(entryPath, acc) {
 		for (const entry of entries) {
 			const fullPath = path.join(currentDir, entry.name);
 			if (entry.isDirectory()) {
-				queue.push(fullPath);
-			} else if (SCANNABLE_EXTENSIONS.has(path.extname(entry.name))) {
+				if (entry.name !== "__tests__") {
+					queue.push(fullPath);
+				}
+			} else if (
+				SCANNABLE_EXTENSIONS.has(path.extname(entry.name)) &&
+				!isTestPath(fullPath)
+			) {
 				acc.push(fullPath);
 			}
 		}
