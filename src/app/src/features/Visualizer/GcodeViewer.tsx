@@ -22,53 +22,53 @@
  */
 
 import type {
-	GCodeSVGOptions,
-	GCodeViewerBitPosition,
-	GCodeViewerCameraProjection,
-	GCodeViewerCameraView,
-	GCodeViewerOptions,
-	GCodeViewerTheme,
-	WorkerGeometryData,
-} from "@sienci/gviewer/viewer";
+    GCodeSVGOptions,
+    GCodeViewerBitPosition,
+    GCodeViewerCameraProjection,
+    GCodeViewerCameraView,
+    GCodeViewerOptions,
+    GCodeViewerTheme,
+    WorkerGeometryData,
+} from '@sienci/gviewer/viewer';
 import {
-	GCodeViewer as GViewer3D,
-	GCodeSVGRenderer as GViewerSVG,
-} from "@sienci/gviewer/viewer";
-import type { BBox } from "app/definitions/general";
-import type { OverlayMarker } from "app/features/Plugins/types";
-import controller from "app/lib/controller";
-import { isLaserMode } from "app/lib/laserMode";
-import { getZUpTravel } from "app/lib/SoftLimits.js";
-import { toast } from "app/lib/toaster";
-import store from "app/store";
-import { store as reduxStore } from "app/store/redux";
-import _get from "lodash/get";
-import pubsub from "pubsub-js";
-import { Component } from "react";
+    GCodeViewer as GViewer3D,
+    GCodeSVGRenderer as GViewerSVG,
+} from '@sienci/gviewer/viewer';
+import type { BBox } from 'app/definitions/general';
+import type { OverlayMarker } from 'app/features/Plugins/types';
+import controller from 'app/lib/controller';
+import { isLaserMode } from 'app/lib/laserMode';
+import { getZUpTravel } from 'app/lib/SoftLimits.js';
+import { toast } from 'app/lib/toaster';
+import store from 'app/store';
+import { store as reduxStore } from 'app/store/redux';
+import _get from 'lodash/get';
+import pubsub from 'pubsub-js';
+import { Component } from 'react';
 import {
-	GRBL,
-	GRBL_ACTIVE_STATE_CHECK,
-	GRBL_ACTIVE_STATE_RUN,
-	GRBLHAL,
-	LASER_MODE,
-	MARLIN,
-	METRIC_UNITS,
-	OUTLINE_MODE_RAPIDLESS_SQUARE,
-	SMOOTHIE,
-	TINYG,
-	VISUALIZER_PRIMARY,
-	VISUALIZER_SECONDARY,
-	WORKFLOW_STATE_RUNNING,
-} from "../../constants";
-import { outlineResponse } from "../../workers/Outline.response";
-import type { Actions, CAMERA_POSITIONS_T, State } from "./definitions";
-import { buildGridOptions, buildMachineBedOptions } from "./viewerOptions";
-import { buildViewerTheme, WORKSHOP_VISUALIZER_COLORS } from "./viewerTheme";
+    GRBL,
+    GRBL_ACTIVE_STATE_CHECK,
+    GRBL_ACTIVE_STATE_RUN,
+    GRBLHAL,
+    LASER_MODE,
+    MARLIN,
+    METRIC_UNITS,
+    OUTLINE_MODE_RAPIDLESS_SQUARE,
+    SMOOTHIE,
+    TINYG,
+    VISUALIZER_PRIMARY,
+    VISUALIZER_SECONDARY,
+    WORKFLOW_STATE_RUNNING,
+} from '../../constants';
+import { outlineResponse } from '../../workers/Outline.response';
+import type { Actions, CAMERA_POSITIONS_T, State } from './definitions';
+import { buildGridOptions, buildMachineBedOptions } from './viewerOptions';
+import { buildViewerTheme, WORKSHOP_VISUALIZER_COLORS } from './viewerTheme';
 import {
-	type VisualizerBridgeHandle,
-	visualizerBridge,
-} from "./visualizerBridge";
-import { augmentWorkerGeometry } from "./workerGeometry";
+    type VisualizerBridgeHandle,
+    visualizerBridge,
+} from './visualizerBridge';
+import { augmentWorkerGeometry } from './workerGeometry';
 
 // Press-and-hold pick gesture: how long to hold before committing, and how far
 // the pointer may drift before the gesture is treated as an orbit/pan instead of
@@ -77,26 +77,26 @@ const PICK_HOLD_MS = 500;
 const PICK_CANCEL_PX = 8;
 
 // Default marker color when an overlay marker doesn't specify one.
-const OVERLAY_DEFAULT_COLOR = "rgba(14, 246, 174, 0.95)";
+const OVERLAY_DEFAULT_COLOR = 'rgba(14, 246, 174, 0.95)';
 
 // Maps gSender's camera positions onto gviewer ViewCube presets.
 const VIEW_MAP: Partial<Record<string, GCodeViewerCameraView>> = {
-	Top: "top",
-	"3D": "front-top-right",
-	Front: "front",
-	Left: "left",
-	Right: "right",
-	TopLeftCorner: "front-top-left",
+    Top: 'top',
+    '3D': 'front-top-right',
+    Front: 'front',
+    Left: 'left',
+    Right: 'right',
+    TopLeftCorner: 'front-top-left',
 };
 
 interface Props {
-	show: boolean;
-	cameraPosition: CAMERA_POSITIONS_T;
-	cameraPositionNonce: number;
-	state: State;
-	actions: Actions;
-	containerID: string;
-	isSecondary: boolean;
+    show: boolean;
+    cameraPosition: CAMERA_POSITIONS_T;
+    cameraPositionNonce: number;
+    state: State;
+    actions: Actions;
+    containerID: string;
+    isSecondary: boolean;
 }
 
 /**
@@ -108,1197 +108,1252 @@ interface Props {
  * feed straight into gviewer via loadFromWorkerData — no re-parsing here.
  */
 class GcodeViewer extends Component<Props> {
-	containerRef: HTMLDivElement | null = null;
+    containerRef: HTMLDivElement | null = null;
 
-	viewer3d: GViewer3D | null = null;
+    viewer3d: GViewer3D | null = null;
 
-	viewerSvg: GViewerSVG | null = null;
+    viewerSvg: GViewerSVG | null = null;
 
-	mode: "3d" | "svg" = "3d";
+    mode: '3d' | 'svg' = '3d';
 
-	lastWorkerData: WorkerGeometryData | null = null;
+    lastWorkerData: WorkerGeometryData | null = null;
 
-	lastPosition: GCodeViewerBitPosition = { x: 0, y: 0, z: 0, a: 0 };
+    lastPosition: GCodeViewerBitPosition = { x: 0, y: 0, z: 0, a: 0 };
 
-	pendingLoadCallback: ((arg: { bbox: BBox }) => void) | null = null;
+    pendingLoadCallback: ((arg: { bbox: BBox }) => void) | null = null;
 
-	pubsubTokens: string[] = [];
+    pubsubTokens: string[] = [];
 
-	reduxUnsub: (() => void) | null = null;
+    reduxUnsub: (() => void) | null = null;
 
-	outlineRunning = false;
+    outlineRunning = false;
 
-	lastHiddenLine = -1;
+    lastHiddenLine = -1;
 
-	// Theme selection in Settings only writes to the store once "Save" is
-	// clicked, but the dropdown fires "theme:change" immediately for a live
-	// preview. Track the previewed name here so the preview doesn't lag a
-	// step behind the (not-yet-persisted) store value.
-	previewThemeName: string | null = null;
+    // Theme selection in Settings only writes to the store once "Save" is
+    // clicked, but the dropdown fires "theme:change" immediately for a live
+    // preview. Track the previewed name here so the preview doesn't lag a
+    // step behind the (not-yet-persisted) store value.
+    previewThemeName: string | null = null;
 
-	lastWposKey = "";
+    lastWposKey = '';
 
-	lastMachineBedKey = "";
+    lastMachineBedKey = '';
 
-	lastGridKey = "";
+    lastGridKey = '';
 
-	lastCameraFollow = false;
+    lastCameraFollow = false;
 
-	isRotaryFile = false;
+    isRotaryFile = false;
 
-	skipNextCameraFocus = false;
+    skipNextCameraFocus = false;
 
-	lastConnected: boolean | null = null;
+    lastConnected: boolean | null = null;
 
-	lastSpinning: boolean | null = null;
+    lastSpinning: boolean | null = null;
 
-	// Generic pick-gesture state (armed by plugins through the visualizer bridge).
-	pickMode: "click" | "hold" | null = null;
+    // Generic pick-gesture state (armed by plugins through the visualizer bridge).
+    pickMode: 'click' | 'hold' | null = null;
 
-	pickOnPick:
-		| ((p: {
-				world: { x: number; y: number; z: number };
-				screen: { x: number; y: number };
-		  }) => void)
-		| null = null;
+    pickOnPick:
+        | ((p: {
+              world: { x: number; y: number; z: number };
+              screen: { x: number; y: number };
+          }) => void)
+        | null = null;
 
-	pickOnHoldProgress: ((t: number) => void) | null = null;
+    pickOnHoldProgress: ((t: number) => void) | null = null;
 
-	pickPointerId: number | null = null;
+    pickPointerId: number | null = null;
 
-	pickStart: { x: number; y: number } | null = null;
+    pickStart: { x: number; y: number } | null = null;
 
-	pickMoved = false;
+    pickMoved = false;
 
-	pickHoldTimer: ReturnType<typeof setTimeout> | null = null;
+    pickHoldTimer: ReturnType<typeof setTimeout> | null = null;
 
-	pickHoldStart = 0;
+    pickHoldStart = 0;
 
-	pickHoldRaf: number | null = null;
+    pickHoldRaf: number | null = null;
 
-	pickIndicator: HTMLDivElement | null = null;
+    pickIndicator: HTMLDivElement | null = null;
 
-	pickPriorView: CAMERA_POSITIONS_T | null = null;
+    pickPriorView: CAMERA_POSITIONS_T | null = null;
 
-	pickPriorProjection: GCodeViewerCameraProjection | null = null;
+    pickPriorProjection: GCodeViewerCameraProjection | null = null;
 
-	// Declarative overlay markers the host draws over the canvas for a plugin.
-	overlayMarkers: OverlayMarker[] = [];
+    // Declarative overlay markers the host draws over the canvas for a plugin.
+    overlayMarkers: OverlayMarker[] = [];
 
-	overlaySvg: SVGSVGElement | null = null;
+    overlaySvg: SVGSVGElement | null = null;
 
-	overlayRaf: number | null = null;
+    overlayRaf: number | null = null;
 
-	// Imperative surface exposed to the plugin bridge. Methods read `this.viewer3d`
-	// lazily so the handle survives viewer recreation (lite-mode toggles, etc.).
-	bridgeHandle: VisualizerBridgeHandle = {
-		screenToWorld: (px, py) => this.viewer3d?.screenToWorld(px, py) ?? null,
-		worldToScreen: (x, y, z) => this.viewer3d?.worldToScreen(x, y, z) ?? null,
-		setRotateEnabled: (on) => this.viewer3d?.setRotateEnabled(on),
-		setCameraView: (view) => this.setCameraView(view),
-		isRotaryFile: () => this.isRotaryFile,
-		armPick: (mode, onPick, onHoldProgress) =>
-			this.armPick(mode, onPick, onHoldProgress),
-		disarmPick: () => this.disarmPick(),
-		setOverlay: (markers) => this.setOverlay(markers),
-	};
-
-	componentDidMount() {
-		this.createViewer();
-		this.subscribe();
-
-		// Only the primary viewer exposes the plugin-facing bridge handle; the
-		// secondary (surfacing preview) never registers.
-		if (!this.props.isSecondary) {
-			visualizerBridge.register(this.bridgeHandle);
-		}
-
-		// Render any geometry that arrived before mount.
-		const existing = _get(this.props.state, "gcode.visualization");
-		if (existing && (existing as WorkerGeometryData).vertices) {
-			this.applyWorkerData(existing as WorkerGeometryData);
-		}
-	}
-
-	componentWillUnmount() {
-		this.unsubscribe();
-		this.reduxUnsub?.();
-		this.disarmPick();
-		this.stopOverlay();
-		if (!this.props.isSecondary) {
-			visualizerBridge.unregister(this.bridgeHandle);
-		}
-		this.viewer3d?.dispose();
-		this.viewerSvg?.dispose();
-		this.viewer3d = null;
-		this.viewerSvg = null;
-	}
-
-	componentDidUpdate(prevProps: Props) {
-		// check if nonce is different. if it is, then snap cam
-		if (prevProps.cameraPositionNonce !== this.props.cameraPositionNonce) {
-			this.snapToView();
-		}
-
-		if (!prevProps.show && this.props.show) {
-			this.viewer3d?.resize();
-		}
-
-		const prev = prevProps.state;
-		const cur = this.props.state;
-		if (
-			prev.units !== cur.units ||
-			prev.theme !== cur.theme ||
-			prev.liteMode !== cur.liteMode ||
-			prev.objects.cuttingTool.visible !== cur.objects.cuttingTool.visible ||
-			prev.objects.limits.visible !== cur.objects.limits.visible
-		) {
-			this.applyOptionsFromState();
-		}
-	}
-
-	// --- viewer lifecycle ---------------------------------------------------
-
-	createViewer() {
-		if (!this.containerRef) {
-			return;
-		}
-
-		// SVG/lite mode is primary-only; secondary previews are always 3D.
-		if (this.isSVGMode() && !this.props.isSecondary) {
-			this.mode = "svg";
-			this.viewerSvg = new GViewerSVG(
-				this.containerRef,
-				this.buildSvgOptions(),
-			);
-			this.containerRef.style.backgroundColor = this.buildTheme(
-				this.currentThemeName(),
-			).background;
-		} else {
-			this.mode = "3d";
-			this.viewer3d = new GViewer3D({
-				id: this.props.containerID,
-				container: this.containerRef,
-				options: this.buildOptions(),
-			});
-			this.snapToView();
-		}
-	}
-
-	recreateViewer() {
-		this.viewer3d?.dispose();
-		this.viewerSvg?.dispose();
-		this.viewer3d = null;
-		this.viewerSvg = null;
-		this.createViewer();
-		// Restore the last known bit position on the fresh viewer. The redux wpos
-		// subscription won't re-fire because the position key hasn't changed, so
-		// the new viewer would otherwise start at origin.
-		this.viewer3d?.setBitPosition(this.lastPosition, { immediate: true });
-		this.viewerSvg?.setBitPosition(this.lastPosition);
-		if (this.lastWorkerData) {
-			this.applyWorkerData(this.lastWorkerData);
-		}
-	}
-
-	// --- option/theme mapping ----------------------------------------------
-
-	currentThemeName(): string {
-		return (
-			this.previewThemeName ??
-			store.get("widgets.visualizer.theme", this.props.state.theme)
-		);
-	}
-
-	buildTheme(themeName?: string): GCodeViewerTheme {
-		return buildViewerTheme(themeName);
-	}
-
-	buildOptions(): Partial<GCodeViewerOptions> {
-		const { state } = this.props;
-		const laser = isLaserMode();
-		const isConnected = !!_get(reduxStore.getState(), "connection.isConnected");
-		const toolVisible = this.cuttingToolVisible();
-		const hideProcessed = store.get(
-			"widgets.visualizer.hideProcessedLines",
-			false,
-		);
-
-		const isMetric = state.units === METRIC_UNITS;
-
-		return {
-			units: isMetric ? "mm" : "in",
-			mode: { laser, sim3d: false },
-			bit: {
-				// Bit only shows while connected, matching the old visualizer.
-				enabled: isConnected && toolVisible,
-				type: laser ? "laser" : "drill",
-				// Matches the old bit.stl (68.67mm) scaled 0.5 → ~34mm tall; gviewer
-				// scales the drill so largestDim = size * 1.6.
-				size: 21.5,
-				opacity: 0.9,
-				// Position updates (jog + job run) arrive on the controller's
-				// 250ms status-report poll. Tween duration needs to overlap
-				// that cadence or the bit visibly pauses between updates.
-				tweenMs: 260,
-				colorSource: "custom",
-				color: WORKSHOP_VISUALIZER_COLORS.bit,
-			},
-			progress: { mode: hideProcessed ? "hide" : "grey" },
-			boundingBox: {
-				visible: store.get("widgets.visualizer.objects.limits.visible", false),
-				labels: store.get("widgets.visualizer.boundingBoxLabels", false),
-			},
-			machineBed: buildMachineBedOptions(),
-			grid: buildGridOptions(state.units),
-			camera: {
-				projection:
-					store.get("widgets.visualizer.projection", "Perspective") ===
-					"Orthographic"
-						? "orthographic"
-						: "perspective",
-			},
-			render: {
-				antialias: true,
-				theme: this.buildTheme(this.currentThemeName()),
-			},
-		};
-	}
-
-	buildSvgOptions(): Partial<GCodeSVGOptions> {
-		const theme = this.buildTheme(this.currentThemeName());
-		return {
-			rapidColor: theme.colors.rapid,
-			cutColor: theme.colors.cutting,
-			boundingBoxColor: theme.colors.boundingBox,
-			projectionMode: "isometric",
-		};
-	}
-
-	applyOptionsFromState() {
-		if (this.viewer3d) {
-			this.viewer3d.setOptions(this.buildOptions());
-		}
-		if (this.viewerSvg) {
-			this.viewerSvg.setOptions(this.buildSvgOptions());
-		}
-		// SVG mode has no canvas clear color — sync the container background
-		// so the theme's background shows instead of the page default.
-		if (this.containerRef) {
-			this.containerRef.style.backgroundColor = this.buildTheme(
-				this.currentThemeName(),
-			).background;
-		}
-	}
-
-	isSVGMode(): boolean {
-		const liteMode = store.get("widgets.visualizer.liteMode", false);
-		const svgEnabled =
-			store.get("widgets.visualizer.liteOption", "Light") === "Light";
-		return liteMode && svgEnabled;
-	}
-
-	// --- geometry -----------------------------------------------------------
-
-	applyWorkerData(data: WorkerGeometryData) {
-		this.lastWorkerData = data;
-		this.lastHiddenLine = -1;
-
-		// Shared so every viewer keeps the worker's per-tool palette; see
-		// augmentWorkerGeometry for why gviewer drops it otherwise.
-		const augmented = augmentWorkerGeometry(data);
-
-		if (this.mode === "svg" && this.viewerSvg) {
-			this.viewerSvg.loadFromWorkerData(augmented);
-			this.firePostLoad();
-			return;
-		}
-
-		if (this.viewer3d) {
-			this.viewer3d
-				.loadFromWorkerData(augmented)
-				.then(() => {
-					if (!this.skipNextCameraFocus) {
-						this.viewer3d?.focusToModel();
-					}
-					this.skipNextCameraFocus = false;
-					this.viewer3d?.setBitPosition(this.lastPosition, { immediate: true });
-					this.firePostLoad();
-				})
-				.catch((err) => console.error("gviewer load failed", err));
-		}
-	}
-
-	firePostLoad() {
-		const bbox = this.computeBBox();
-		controller.context = {
-			...controller.context,
-			xmin: bbox.min.x,
-			xmax: bbox.max.x,
-			ymin: bbox.min.y,
-			ymax: bbox.max.y,
-			zmin: bbox.min.z,
-			zmax: bbox.max.z,
-		};
-		pubsub.publish("gcode:bbox", bbox);
-		if (this.pendingLoadCallback) {
-			this.pendingLoadCallback({ bbox });
-			this.pendingLoadCallback = null;
-		}
-	}
-
-	computeBBox(): BBox {
-		const empty = { min: { x: 0, y: 0, z: 0 }, max: { x: 0, y: 0, z: 0 } };
-		const positions = this.getToolpathHull();
-		if (!positions.length) {
-			return empty;
-		}
-		const min = { x: Infinity, y: Infinity, z: Infinity };
-		const max = { x: -Infinity, y: -Infinity, z: -Infinity };
-		for (let i = 0; i < positions.length; i += 3) {
-			const x = positions[i];
-			const y = positions[i + 1];
-			const z = positions[i + 2];
-			if (x < min.x) min.x = x;
-			if (y < min.y) min.y = y;
-			if (z < min.z) min.z = z;
-			if (x > max.x) max.x = x;
-			if (y > max.y) max.y = y;
-			if (z > max.z) max.z = z;
-		}
-		return { min, max };
-	}
-
-	// --- camera -------------------------------------------------------------
-
-	snapToView() {
-		const view = VIEW_MAP[this.props.cameraPosition];
-		if (view && this.viewer3d) {
-			this.viewer3d.snapCameraToView(view);
-		}
-	}
-
-	// Maps a bridge camera view name onto the app's camera actions, which update
-	// React state and (via componentDidUpdate) snap the gviewer camera.
-	setCameraView(view: "top" | "3d" | "front" | "left" | "right") {
-		const cam = this.props.actions.camera;
-		const map: Record<typeof view, (() => void) | undefined> = {
-			top: cam.toTopView,
-			"3d": cam.to3DView,
-			front: cam.toFrontView,
-			left: cam.toLeftSideView,
-			right: cam.toRightSideView,
-		};
-		map[view]?.();
-	}
-
-	// Restore a previously-saved camera position (used when a hold pick disarms).
-	restoreCameraView(pos: CAMERA_POSITIONS_T) {
-		const cam = this.props.actions.camera;
-		const map: Partial<Record<CAMERA_POSITIONS_T, () => void>> = {
-			Top: cam.toTopView,
-			"3D": cam.to3DView,
-			Front: cam.toFrontView,
-			Left: cam.toLeftSideView,
-			Right: cam.toRightSideView,
-		};
-		map[pos]?.();
-	}
-
-	// --- generic pick gesture (armed by plugins via the visualizer bridge) --
-
-	// Arm the pick gesture. 'hold' is a press-and-hold placement (camera pinned
-	// to Top + orbit locked so the press maps cleanly onto the XY plane); 'click'
-	// is a single click/tap with a small movement threshold so orbit-drags don't
-	// register as picks. Refuses to arm on rotary files (the toolpath root is
-	// X-rotated, so picked XY isn't a meaningful work coordinate) and never arms
-	// on the secondary viewer.
-	armPick(
-		mode: "click" | "hold",
-		onPick: (p: {
-			world: { x: number; y: number; z: number };
-			screen: { x: number; y: number };
-		}) => void,
-		onHoldProgress?: (t: number) => void,
-	) {
-		if (this.props.isSecondary || this.isRotaryFile) {
-			return;
-		}
-		// Re-arming cleanly replaces any prior armed gesture.
-		this.disarmPick();
-
-		this.pickMode = mode;
-		this.pickOnPick = onPick;
-		this.pickOnHoldProgress = onHoldProgress ?? null;
-
-		const dom = this.containerRef;
-		if (dom) {
-			dom.style.cursor = "crosshair";
-			dom.addEventListener("pointerdown", this.handlePickPointerDown);
-		}
-		window.addEventListener("pointermove", this.handlePickPointerMove);
-		window.addEventListener("pointerup", this.handlePickPointerUp);
-		window.addEventListener("pointercancel", this.handlePickPointerUp);
-
-		if (mode === "hold") {
-			this.pickPriorView = this.props.cameraPosition;
-			this.props.actions.camera.toTopView();
-			this.viewer3d?.setRotateEnabled(false);
-			// Orthographic avoids perspective foreshortening skewing the picked
-			// XY; restored to whatever was active once the pick is disarmed.
-			this.pickPriorProjection = this.viewer3d?.getCameraProjection() ?? null;
-			this.viewer3d?.setCameraProjection("orthographic");
-		}
-	}
-
-	disarmPick() {
-		const dom = this.containerRef;
-		if (dom) {
-			dom.style.cursor = "";
-			dom.removeEventListener("pointerdown", this.handlePickPointerDown);
-		}
-		window.removeEventListener("pointermove", this.handlePickPointerMove);
-		window.removeEventListener("pointerup", this.handlePickPointerUp);
-		window.removeEventListener("pointercancel", this.handlePickPointerUp);
-		this.cancelPickHold();
-
-		// Undo the camera/orbit lock a hold gesture applied.
-		if (this.pickMode === "hold") {
-			this.viewer3d?.setRotateEnabled(true);
-			if (this.pickPriorView) {
-				this.restoreCameraView(this.pickPriorView);
-			}
-			if (this.pickPriorProjection) {
-				this.viewer3d?.setCameraProjection(this.pickPriorProjection);
-			}
-		}
-		this.pickPriorView = null;
-		this.pickPriorProjection = null;
-		this.pickMode = null;
-		this.pickOnPick = null;
-		this.pickOnHoldProgress = null;
-		this.pickPointerId = null;
-		this.pickStart = null;
-		this.pickMoved = false;
-	}
-
-	handlePickPointerDown = (e: PointerEvent) => {
-		if (!this.pickMode) {
-			return;
-		}
-		// Primary (left mouse / touch) button only.
-		if (e.button !== undefined && e.button !== 0) {
-			return;
-		}
-		// Track a single pointer at a time (ignore multi-touch gestures).
-		if (this.pickPointerId !== null) {
-			return;
-		}
-
-		this.pickPointerId = e.pointerId;
-		this.pickStart = { x: e.clientX, y: e.clientY };
-		this.pickMoved = false;
-
-		if (this.pickMode === "hold") {
-			const { clientX, clientY } = e;
-			this.showPickIndicator(clientX, clientY);
-			this.pickHoldStart = performance.now();
-			// Emit hold progress 0..1 each frame so the plugin can mirror the ring.
-			const tick = () => {
-				const t = Math.min(
-					1,
-					(performance.now() - this.pickHoldStart) / PICK_HOLD_MS,
-				);
-				this.pickOnHoldProgress?.(t);
-				if (t < 1) {
-					this.pickHoldRaf = requestAnimationFrame(tick);
-				}
-			};
-			this.pickHoldRaf = requestAnimationFrame(tick);
-			this.pickHoldTimer = setTimeout(() => {
-				this.commitPick(clientX, clientY);
-			}, PICK_HOLD_MS);
-		}
-	};
-
-	handlePickPointerMove = (e: PointerEvent) => {
-		if (this.pickPointerId === null || e.pointerId !== this.pickPointerId) {
-			return;
-		}
-		if (!this.pickStart) {
-			return;
-		}
-		const dx = e.clientX - this.pickStart.x;
-		const dy = e.clientY - this.pickStart.y;
-		// Drift beyond the threshold means the user is panning/orbiting, not picking.
-		if (Math.hypot(dx, dy) > PICK_CANCEL_PX) {
-			if (this.pickMode === "hold") {
-				this.cancelPickHold();
-			} else {
-				this.pickMoved = true;
-			}
-		}
-	};
-
-	handlePickPointerUp = (e: PointerEvent) => {
-		if (this.pickPointerId === null || e.pointerId !== this.pickPointerId) {
-			return;
-		}
-		const { clientX, clientY } = e;
-		if (this.pickMode === "click") {
-			const moved = this.pickMoved;
-			this.pickPointerId = null;
-			this.pickStart = null;
-			this.pickMoved = false;
-			// A drag was a pan/orbit; only a clean click fires a pick.
-			if (!moved) {
-				this.commitPick(clientX, clientY);
-			}
-			return;
-		}
-		// Hold released before the timer completed - cancel the placement.
-		this.cancelPickHold();
-	};
-
-	// Tear down the in-progress hold (timer + progress rAF + indicator) while
-	// leaving the gesture armed for another attempt.
-	cancelPickHold() {
-		const wasHolding = this.pickHoldTimer !== null || this.pickHoldRaf !== null;
-		if (this.pickHoldTimer) {
-			clearTimeout(this.pickHoldTimer);
-			this.pickHoldTimer = null;
-		}
-		if (this.pickHoldRaf !== null) {
-			cancelAnimationFrame(this.pickHoldRaf);
-			this.pickHoldRaf = null;
-		}
-		this.removePickIndicator();
-		this.pickPointerId = null;
-		this.pickStart = null;
-		this.pickMoved = false;
-		if (wasHolding) {
-			this.pickOnHoldProgress?.(0);
-		}
-	}
-
-	commitPick(clientX: number, clientY: number) {
-		// A hold commit tears down its timer/indicator but stays armed so the
-		// plugin can decide whether to disarm.
-		if (this.pickMode === "hold") {
-			this.cancelPickHold();
-		}
-		if (this.isRotaryFile || !this.viewer3d) {
-			return;
-		}
-		const world = this.viewer3d.screenToWorld(clientX, clientY);
-		if (!world) {
-			return;
-		}
-		const screen = this.viewer3d.worldToScreen(world.x, world.y, world.z) ?? {
-			x: clientX,
-			y: clientY,
-		};
-		this.pickOnPick?.({ world, screen });
-	}
-
-	showPickIndicator(clientX: number, clientY: number) {
-		this.removePickIndicator();
-
-		const size = 48;
-		const r = size / 2 - 4;
-		const c = size / 2;
-		const circumference = 2 * Math.PI * r;
-		const ns = "http://www.w3.org/2000/svg";
-
-		// Fixed positioning relative to the viewport so the indicator lands
-		// exactly under the pointer regardless of ancestor positioning.
-		const wrapper = document.createElement("div");
-		wrapper.style.cssText = [
-			"position:fixed",
-			"pointer-events:none",
-			"z-index:9999",
-			`width:${size}px`,
-			`height:${size}px`,
-			"transform:translate(-50%,-50%)",
-			`left:${clientX}px`,
-			`top:${clientY}px`,
-		].join(";");
-
-		const svg = document.createElementNS(ns, "svg");
-		svg.setAttribute("width", String(size));
-		svg.setAttribute("height", String(size));
-
-		const bg = document.createElementNS(ns, "circle");
-		bg.setAttribute("cx", String(c));
-		bg.setAttribute("cy", String(c));
-		bg.setAttribute("r", String(r));
-		bg.setAttribute("fill", "rgba(0,0,0,0.35)");
-		bg.setAttribute("stroke", "rgba(255,255,255,0.4)");
-		bg.setAttribute("stroke-width", "3");
-
-		const progress = document.createElementNS(ns, "circle");
-		progress.setAttribute("cx", String(c));
-		progress.setAttribute("cy", String(c));
-		progress.setAttribute("r", String(r));
-		progress.setAttribute("fill", "none");
-		progress.setAttribute("stroke", "#4ade80");
-		progress.setAttribute("stroke-width", "3");
-		progress.setAttribute("stroke-linecap", "round");
-		progress.setAttribute("stroke-dasharray", `${circumference}`);
-		progress.setAttribute("stroke-dashoffset", `${circumference}`);
-		progress.setAttribute("transform", `rotate(-90 ${c} ${c})`);
-
-		const dot = document.createElementNS(ns, "circle");
-		dot.setAttribute("cx", String(c));
-		dot.setAttribute("cy", String(c));
-		dot.setAttribute("r", "2");
-		dot.setAttribute("fill", "#4ade80");
-
-		svg.appendChild(bg);
-		svg.appendChild(progress);
-		svg.appendChild(dot);
-		wrapper.appendChild(svg);
-		document.body.appendChild(wrapper);
-
-		if (typeof progress.animate === "function") {
-			progress.animate(
-				[{ strokeDashoffset: circumference }, { strokeDashoffset: 0 }],
-				{ duration: PICK_HOLD_MS, fill: "forwards" },
-			);
-		}
-
-		this.pickIndicator = wrapper;
-	}
-
-	removePickIndicator() {
-		if (this.pickIndicator && this.pickIndicator.parentElement) {
-			this.pickIndicator.parentElement.removeChild(this.pickIndicator);
-		}
-		this.pickIndicator = null;
-	}
-
-	// --- plugin overlay layer ----------------------------------------------
-
-	// Replace the declarative marker list drawn over the canvas. The host owns
-	// this SVG layer (the sandboxed plugin can never draw on the canvas itself);
-	// markers are re-projected every frame so they track camera pan/zoom.
-	setOverlay(markers: OverlayMarker[]) {
-		this.overlayMarkers = Array.isArray(markers) ? markers : [];
-		if (this.overlayMarkers.length > 0) {
-			this.startOverlay();
-		} else {
-			this.stopOverlay();
-		}
-	}
-
-	startOverlay() {
-		if (this.overlayRaf !== null) {
-			return; // already running
-		}
-		if (!this.overlaySvg) {
-			const svg = document.createElementNS(
-				"http://www.w3.org/2000/svg",
-				"svg",
-			) as SVGSVGElement;
-			svg.style.cssText = [
-				"position:fixed",
-				"inset:0",
-				"width:100vw",
-				"height:100vh",
-				"pointer-events:none",
-				"z-index:10",
-			].join(";");
-			document.body.appendChild(svg);
-			this.overlaySvg = svg;
-		}
-		const draw = () => {
-			this.drawOverlay();
-			this.overlayRaf = requestAnimationFrame(draw);
-		};
-		this.overlayRaf = requestAnimationFrame(draw);
-	}
-
-	stopOverlay() {
-		if (this.overlayRaf !== null) {
-			cancelAnimationFrame(this.overlayRaf);
-			this.overlayRaf = null;
-		}
-		if (this.overlaySvg?.parentElement) {
-			this.overlaySvg.parentElement.removeChild(this.overlaySvg);
-		}
-		this.overlaySvg = null;
-	}
-
-	drawOverlay() {
-		const svg = this.overlaySvg;
-		const container = this.containerRef;
-		if (!svg || !this.viewer3d || !container) {
-			return;
-		}
-		while (svg.firstChild) {
-			svg.removeChild(svg.firstChild);
-		}
-		const ns = "http://www.w3.org/2000/svg";
-		// make sure any markers on the visualizer can't escape the visualizer view onto the rest of gsender
-		const bounds = container.getBoundingClientRect();
-
-		for (const marker of this.overlayMarkers) {
-			const s = this.viewer3d.worldToScreen(marker.x, marker.y, marker.z ?? 0);
-			if (!s) {
-				continue;
-			}
-			if (
-				s.x < bounds.left ||
-				s.x > bounds.right ||
-				s.y < bounds.top ||
-				s.y > bounds.bottom
-			) {
-				continue;
-			}
-			const color = marker.color ?? OVERLAY_DEFAULT_COLOR;
-			const size = marker.size ?? 6;
-			const shape = marker.shape ?? "circle";
-
-			if (shape === "ring") {
-				const c = document.createElementNS(ns, "circle");
-				c.setAttribute("cx", String(s.x));
-				c.setAttribute("cy", String(s.y));
-				c.setAttribute("r", String(size));
-				c.setAttribute("fill", "none");
-				c.setAttribute("stroke", color);
-				c.setAttribute("stroke-width", "1.5");
-				svg.appendChild(c);
-			} else if (shape === "cross") {
-				const line = (x1: number, y1: number, x2: number, y2: number) => {
-					const l = document.createElementNS(ns, "line");
-					l.setAttribute("x1", String(x1));
-					l.setAttribute("y1", String(y1));
-					l.setAttribute("x2", String(x2));
-					l.setAttribute("y2", String(y2));
-					l.setAttribute("stroke", color);
-					l.setAttribute("stroke-width", "1.5");
-					return l;
-				};
-				svg.appendChild(line(s.x - size, s.y, s.x + size, s.y));
-				svg.appendChild(line(s.x, s.y - size, s.x, s.y + size));
-			} else {
-				// Default: filled circle.
-				const c = document.createElementNS(ns, "circle");
-				c.setAttribute("cx", String(s.x));
-				c.setAttribute("cy", String(s.y));
-				c.setAttribute("r", String(size));
-				c.setAttribute("fill", color);
-				svg.appendChild(c);
-			}
-
-			if (marker.label) {
-				const t = document.createElementNS(ns, "text");
-				t.setAttribute("x", String(s.x + size + 4));
-				t.setAttribute("y", String(s.y + 4));
-				t.setAttribute("fill", color);
-				t.setAttribute("font-size", "12");
-				t.setAttribute("font-family", "sans-serif");
-				t.textContent = marker.label;
-				svg.appendChild(t);
-			}
-		}
-	}
-
-	// --- imperative API consumed by the connected container (index.tsx) -----
-
-	load(
-		_name: string,
-		visualization: unknown,
-		callback?: (arg: { bbox: BBox }) => void,
-	) {
-		if (callback) {
-			this.pendingLoadCallback = callback;
-		}
-		// Geometry is delivered authoritatively via the `file:load` pubsub, so
-		// only apply directly when we are handed worker data here.
-		if (
-			visualization &&
-			typeof visualization === "object" &&
-			(visualization as WorkerGeometryData).vertices
-		) {
-			this.applyWorkerData(visualization as WorkerGeometryData);
-		}
-	}
-
-	unload() {
-		this.lastWorkerData = null;
-		this.lastHiddenLine = -1;
-		this.lastSpinning = false;
-		this.viewer3d?.setBitSpinning(false);
-		this.viewer3d?.unload();
-		this.viewerSvg?.clear();
-		controller.context = {
-			...controller.context,
-			xmin: 0,
-			xmax: 0,
-			ymin: 0,
-			ymax: 0,
-			zmin: 0,
-			zmax: 0,
-		};
-	}
-
-	hasVisualization(): boolean {
-		return !!this.lastWorkerData;
-	}
-
-	rerenderGCode() {
-		if (this.lastWorkerData) {
-			this.applyWorkerData(this.lastWorkerData);
-		}
-	}
-
-	getToolpathHull(): Float32Array {
-		if (!this.lastWorkerData) {
-			return new Float32Array(0);
-		}
-		return new Float32Array(
-			this.lastWorkerData.vertices,
-			0,
-			this.lastWorkerData.verticesLen,
-		);
-	}
-
-	zoomFit = () => this.viewer3d?.focusToModel();
-	lookAtCenter = () => this.viewer3d?.focusToModel();
-	// gviewer drives zoom/pan through its orbit controls (mouse/touch); these
-	// stay as no-ops so the legacy shortcut wiring keeps resolving.
-	zoomIn = () => {};
-	zoomOut = () => {};
-	panUp = () => {};
-	panDown = () => {};
-	panLeft = () => {};
-	panRight = () => {};
-
-	// --- pubsub -------------------------------------------------------------
-
-	subscribe() {
-		this.pubsubTokens = [
-			pubsub.subscribe("file:load", (_msg, data) => {
-				const activeVisualizer = _get(
-					reduxStore.getState(),
-					"visualizer.activeVisualizer",
-				);
-				const isPrimaryActive =
-					!this.props.isSecondary && activeVisualizer === VISUALIZER_PRIMARY;
-				const isSecondaryActive =
-					this.props.isSecondary && activeVisualizer === VISUALIZER_SECONDARY;
-				if (!isPrimaryActive && !isSecondaryActive) {
-					return;
-				}
-				this.maybeWarnInvalidLines(data);
-				this.applyWorkerData(data as WorkerGeometryData);
-			}),
-			pubsub.subscribe("visualizer:updateposition", (_msg, data) => {
-				this.lastPosition = { ...this.lastPosition, ...(data as object) };
-				this.viewer3d?.setBitPosition(this.lastPosition);
-				this.viewerSvg?.setBitPosition(this.lastPosition);
-				this.viewer3d?.setToolpathRotationA(
-					this.isRotaryFile ? (this.lastPosition.a ?? 0) : 0,
-				);
-			}),
-			pubsub.subscribe("theme:change", (_msg, theme) => {
-				this.previewThemeName = (theme as string) ?? null;
-				this.applyOptionsFromState();
-			}),
-			pubsub.subscribe("visualizer:redraw", () => {
-				this.applyOptionsFromState();
-			}),
-			pubsub.subscribe("visualizer:settings", () => {
-				this.applyOptionsFromState();
-			}),
-			pubsub.subscribe("spindle:mode", () => {
-				this.skipNextCameraFocus = true;
-				this.applyOptionsFromState();
-			}),
-			pubsub.subscribe("litemode:change", () => {
-				this.recreateViewer();
-			}),
-			pubsub.subscribe("job:end", () => {
-				this.viewer3d?.showAll();
-				this.viewer3d?.resetColors();
-				this.lastHiddenLine = -1;
-			}),
-			pubsub.subscribe("gcode:unload", () => {
-				this.unload();
-			}),
-			pubsub.subscribe("unload:file", () => {
-				this.unload();
-			}),
-			pubsub.subscribe("outline:start", () => {
-				this.handleOutline();
-			}),
-		];
-
-		// Mirror the old (redux-connected) visualizer: drive the bit position,
-		// bit visibility and run-time progress greying from live controller state.
-		this.reduxUnsub = reduxStore.subscribe(() => {
-			const st = reduxStore.getState();
-
-			// Track whether the loaded file uses the A axis — gates rotary rotation.
-			// Fire setToolpathRotationA immediately on transition so the rotation
-			// updates as soon as the file loads or changes, not just on next wpos tick.
-			const fileType: string | undefined = _get(st, "file.fileType");
-			if (fileType !== undefined) {
-				const nextIsRotary = fileType === "ROTARY" || fileType === "FOUR_AXIS";
-				if (nextIsRotary !== this.isRotaryFile) {
-					this.isRotaryFile = nextIsRotary;
-					this.viewer3d?.setToolpathRotationA(
-						this.isRotaryFile ? (this.lastPosition.a ?? 0) : 0,
-					);
-				}
-			}
-
-			// Bit follows the live work position (DRO) — jogging and running alike.
-			const wpos = _get(st, "controller.wpos");
-			if (wpos) {
-				const key = `${wpos.x},${wpos.y},${wpos.z},${wpos.a ?? 0}`;
-				if (key !== this.lastWposKey) {
-					this.lastWposKey = key;
-					this.lastPosition = {
-						x: Number(wpos.x) || 0,
-						y: Number(wpos.y) || 0,
-						z: Number(wpos.z) || 0,
-						a: Number(wpos.a) || 0,
-					};
-					this.viewer3d?.setBitPosition(this.lastPosition);
-					this.viewerSvg?.setBitPosition(this.lastPosition);
-					this.viewer3d?.setToolpathRotationA(
-						this.isRotaryFile ? (this.lastPosition.a ?? 0) : 0,
-					);
-				}
-			}
-
-			// Machine bed indicator (rect + keepout) tracks homing state, homing
-			// corner, active WCS offset, machine travel limits, and keepout
-			// EEPROM settings — all low-frequency changes, so gate the recompute
-			// behind a dedupe key rather than reacting to every controller tick.
-			const $22 = _get(st, "controller.settings.settings.$22", "0");
-			const $23 = _get(st, "controller.settings.settings.$23", "0");
-			const $130 = _get(st, "controller.settings.settings.$130");
-			const $131 = _get(st, "controller.settings.settings.$131");
-			const $132 = _get(st, "controller.settings.settings.$132");
-			const $683 = _get(st, "controller.settings.settings.$683");
-			const $684 = _get(st, "controller.settings.settings.$684");
-			const $685 = _get(st, "controller.settings.settings.$685");
-			const $686 = _get(st, "controller.settings.settings.$686");
-			const $687 = _get(st, "controller.settings.settings.$687");
-			const hasHomed = !!_get(st, "controller.hasHomed");
-			const wco = _get(st, "controller.wco", { x: 0, y: 0 });
-			const machineBedKey = `${$22},${$23},${$130},${$131},${$132},${$683},${$684},${$685},${$686},${$687},${hasHomed},${wco.x},${wco.y}`;
-			if (machineBedKey !== this.lastMachineBedKey) {
-				this.lastMachineBedKey = machineBedKey;
-				this.viewer3d?.setOptions({
-					machineBed: buildMachineBedOptions(),
-				});
-			}
-
-			// Grid quadrant (and, when "trim grid to bed" is on, its bounds)
-			// depends on the same settings machineBedKey already tracks.
-			const gridKey = machineBedKey;
-			if (gridKey !== this.lastGridKey) {
-				this.lastGridKey = gridKey;
-				this.viewer3d?.setOptions({
-					grid: buildGridOptions(this.props.state.units),
-				});
-			}
-
-			// Camera follow only matters while a job is actively running; toggling
-			// the setting or the workflow state both flow through this dedupe key.
-			// The actual panning happens inside gviewer as a side effect of the
-			// setBitPosition call above once follow is enabled — no per-tick call
-			// needed here beyond flipping the toggle when shouldFollow changes.
-			const followSettingOn = store.get(
-				"widgets.visualizer.followToolDuringRuntime",
-				false,
-			);
-			const isRunning =
-				_get(st, "controller.workflow.state") === WORKFLOW_STATE_RUNNING;
-			const shouldFollow = followSettingOn && isRunning;
-			if (shouldFollow !== this.lastCameraFollow) {
-				this.lastCameraFollow = shouldFollow;
-				this.viewer3d?.setCameraFollowEnabled(shouldFollow);
-			}
-
-			// Bit is only shown while connected (matches the old behaviour).
-			const connected = !!_get(st, "connection.isConnected");
-			if (connected !== this.lastConnected) {
-				this.lastConnected = connected;
-				this.viewer3d?.setBitVisible(connected && this.cuttingToolVisible());
-			}
-
-			// Progress greying/hiding while a job runs: always grey, hide only when
-			// the hideProcessedLines setting is on. Use hideUntilLine (not seekToLine)
-			// so it never fights the DRO-driven bit position above.
-			if (_get(st, "controller.workflow.state") === WORKFLOW_STATE_RUNNING) {
-				const line =
-					_get(st, "controller.sender.status.currentLineRunning", 0) ||
-					_get(st, "controller.sender.status.received", 0);
-				if (line !== this.lastHiddenLine && this.viewer3d) {
-					this.lastHiddenLine = line;
-					const mode = store.get("widgets.visualizer.hideProcessedLines", false)
-						? "hide"
-						: "grey";
-					this.viewer3d.hideUntilLine(line, mode);
-				}
-			}
-
-			// Spin the bit to simulate a running spindle.
-			const spinning = this.computeShouldSpin(st, connected);
-			if (spinning !== this.lastSpinning) {
-				this.lastSpinning = spinning;
-				this.viewer3d?.setBitSpinning(spinning);
-			}
-		});
-	}
-
-	computeShouldSpin(st: unknown, isConnected: boolean): boolean {
-		if (!isConnected || !this.cuttingToolVisible()) {
-			return false;
-		}
-
-		const controllerType = _get(st, "controller.type");
-		if (controllerType === GRBL || controllerType === GRBLHAL) {
-			// Trust the machine's own reported state, not the sender's workflow
-			// state — the sender can finish queueing lines (workflow -> idle)
-			// while grbl is still physically finishing buffered moves.
-			const activeState = _get(st, "controller.state.status.activeState");
-			return (
-				activeState === GRBL_ACTIVE_STATE_RUN ||
-				activeState === GRBL_ACTIVE_STATE_CHECK
-			);
-		}
-		if (
-			controllerType === MARLIN ||
-			controllerType === SMOOTHIE ||
-			controllerType === TINYG
-		) {
-			// No granular machine-state field available for these — fall back
-			// to workflow state, matching the old visualizer's behaviour.
-			return _get(st, "controller.workflow.state") === WORKFLOW_STATE_RUNNING;
-		}
-		return false;
-	}
-
-	cuttingToolVisible(): boolean {
-		const { objects, liteMode } = this.props.state;
-		return liteMode
-			? objects.cuttingTool.visibleLite
-			: objects.cuttingTool.visible;
-	}
-
-	unsubscribe() {
-		this.pubsubTokens.forEach((token) => pubsub.unsubscribe(token));
-		this.pubsubTokens = [];
-	}
-
-	maybeWarnInvalidLines(data: unknown) {
-		if (!store.get("widgets.visualizer.showWarning", false)) {
-			return;
-		}
-		const invalidLines: string[] = _get(data, "parsedData.invalidLines", []);
-		if (invalidLines.length === 0) {
-			return;
-		}
-		const lineSample = invalidLines.slice(0, 5);
-		const description = (
-			<div className={"flex flex-col gap-2"}>
-				<p>
-					Detected {invalidLines.length} invalid lines on file load. Your job
-					may not run correctly.
-				</p>
-				<p>Sample invalid lines found include:</p>
-				<ol>
-					{lineSample.map((line, i) => (
-						<li className="text-xs" key={i}>
-							-<b> {line}</b>
-						</li>
-					))}
-				</ol>
-			</div>
-		);
-		pubsub.publish("helper:info", {
-			title: "Invalid Lines Detected",
-			description,
-		});
-	}
-
-	handleOutline() {
-		if (this.outlineRunning) {
-			return;
-		}
-		toast.info("Generating outline g-code...");
-		this.outlineRunning = true;
-
-		const vertices = this.getToolpathHull();
-		const settings = _get(
-			reduxStore.getState(),
-			"controller.settings.settings",
-			{},
-		);
-		const homingEnabled = _get(settings, "$22", "0") !== "0";
-		const zTravel = homingEnabled ? getZUpTravel(5) : 5;
-
-		try {
-			const outlineWorker = new Worker(
-				new URL("../../workers/Outline.worker.ts", import.meta.url),
-				{ type: "module" },
-			);
-
-			const laserOnOutline = store.get(
-				"widgets.spindle.laser.laserOnOutline",
-				false,
-			);
-			const spindleMode = store.get("widgets.spindle.mode");
-			const isLaser = laserOnOutline && spindleMode === LASER_MODE;
-
-			const outlineMode = store.get("workspace.outlineMode", "Detailed");
-			const outlineSpeed = store.get("workspace.outlineSpeed", null);
-
-			const isRapidless = outlineMode === OUTLINE_MODE_RAPIDLESS_SQUARE;
-			const content = isRapidless ? reduxStore.getState().file.content : null;
-
-			const maxRuntime = setTimeout(() => {
-				outlineWorker.terminate();
-				toast.error("Outline generation timed out. Please try again.");
-				this.outlineRunning = false;
-			}, 15000);
-
-			outlineWorker.onmessage = ({ data }) => {
-				clearTimeout(maxRuntime);
-				outlineResponse({ data });
-				this.outlineRunning = false;
-			};
-			outlineWorker.postMessage({
-				isLaser,
-				parsedData: isRapidless ? [] : vertices,
-				mode: outlineMode,
-				zTravel,
-				...(isRapidless && { content }),
-				outlineSpeed,
-			});
-		} catch (e) {
-			console.error(e);
-			this.outlineRunning = false;
-		}
-	}
-
-	render() {
-		return (
-			<div
-				ref={(el) => {
-					this.containerRef = el;
-				}}
-				className="w-full h-full overflow-hidden rounded-lg outline-none"
-				style={{ display: this.props.show ? undefined : "none" }}
-			/>
-		);
-	}
+    // Imperative surface exposed to the plugin bridge. Methods read `this.viewer3d`
+    // lazily so the handle survives viewer recreation (lite-mode toggles, etc.).
+    bridgeHandle: VisualizerBridgeHandle = {
+        screenToWorld: (px, py) => this.viewer3d?.screenToWorld(px, py) ?? null,
+        worldToScreen: (x, y, z) =>
+            this.viewer3d?.worldToScreen(x, y, z) ?? null,
+        setRotateEnabled: (on) => this.viewer3d?.setRotateEnabled(on),
+        setCameraView: (view) => this.setCameraView(view),
+        isRotaryFile: () => this.isRotaryFile,
+        armPick: (mode, onPick, onHoldProgress) =>
+            this.armPick(mode, onPick, onHoldProgress),
+        disarmPick: () => this.disarmPick(),
+        setOverlay: (markers) => this.setOverlay(markers),
+    };
+
+    componentDidMount() {
+        this.createViewer();
+        this.subscribe();
+
+        // Only the primary viewer exposes the plugin-facing bridge handle; the
+        // secondary (surfacing preview) never registers.
+        if (!this.props.isSecondary) {
+            visualizerBridge.register(this.bridgeHandle);
+        }
+
+        // Render any geometry that arrived before mount.
+        const existing = _get(this.props.state, 'gcode.visualization');
+        if (existing && (existing as WorkerGeometryData).vertices) {
+            this.applyWorkerData(existing as WorkerGeometryData);
+        }
+    }
+
+    componentWillUnmount() {
+        this.unsubscribe();
+        this.reduxUnsub?.();
+        this.disarmPick();
+        this.stopOverlay();
+        if (!this.props.isSecondary) {
+            visualizerBridge.unregister(this.bridgeHandle);
+        }
+        this.viewer3d?.dispose();
+        this.viewerSvg?.dispose();
+        this.viewer3d = null;
+        this.viewerSvg = null;
+    }
+
+    componentDidUpdate(prevProps: Props) {
+        // check if nonce is different. if it is, then snap cam
+        if (prevProps.cameraPositionNonce !== this.props.cameraPositionNonce) {
+            this.snapToView();
+        }
+
+        if (!prevProps.show && this.props.show) {
+            this.viewer3d?.resize();
+        }
+
+        const prev = prevProps.state;
+        const cur = this.props.state;
+        if (
+            prev.units !== cur.units ||
+            prev.theme !== cur.theme ||
+            prev.liteMode !== cur.liteMode ||
+            prev.objects.cuttingTool.visible !==
+                cur.objects.cuttingTool.visible ||
+            prev.objects.limits.visible !== cur.objects.limits.visible
+        ) {
+            this.applyOptionsFromState();
+        }
+    }
+
+    // --- viewer lifecycle ---------------------------------------------------
+
+    createViewer() {
+        if (!this.containerRef) {
+            return;
+        }
+
+        // SVG/lite mode is primary-only; secondary previews are always 3D.
+        if (this.isSVGMode() && !this.props.isSecondary) {
+            this.mode = 'svg';
+            this.viewerSvg = new GViewerSVG(
+                this.containerRef,
+                this.buildSvgOptions(),
+            );
+            this.containerRef.style.backgroundColor = this.buildTheme(
+                this.currentThemeName(),
+            ).background;
+        } else {
+            this.mode = '3d';
+            this.viewer3d = new GViewer3D({
+                id: this.props.containerID,
+                container: this.containerRef,
+                options: this.buildOptions(),
+            });
+            this.snapToView();
+        }
+    }
+
+    recreateViewer() {
+        this.viewer3d?.dispose();
+        this.viewerSvg?.dispose();
+        this.viewer3d = null;
+        this.viewerSvg = null;
+        this.createViewer();
+        // Restore the last known bit position on the fresh viewer. The redux wpos
+        // subscription won't re-fire because the position key hasn't changed, so
+        // the new viewer would otherwise start at origin.
+        this.viewer3d?.setBitPosition(this.lastPosition, { immediate: true });
+        this.viewerSvg?.setBitPosition(this.lastPosition);
+        if (this.lastWorkerData) {
+            this.applyWorkerData(this.lastWorkerData);
+        }
+    }
+
+    // --- option/theme mapping ----------------------------------------------
+
+    currentThemeName(): string {
+        return (
+            this.previewThemeName ??
+            store.get('widgets.visualizer.theme', this.props.state.theme)
+        );
+    }
+
+    buildTheme(themeName?: string): GCodeViewerTheme {
+        return buildViewerTheme(themeName);
+    }
+
+    buildOptions(): Partial<GCodeViewerOptions> {
+        const { state } = this.props;
+        const laser = isLaserMode();
+        const isConnected = !!_get(
+            reduxStore.getState(),
+            'connection.isConnected',
+        );
+        const toolVisible = this.cuttingToolVisible();
+        const hideProcessed = store.get(
+            'widgets.visualizer.hideProcessedLines',
+            false,
+        );
+
+        const isMetric = state.units === METRIC_UNITS;
+
+        return {
+            units: isMetric ? 'mm' : 'in',
+            mode: { laser, sim3d: false },
+            bit: {
+                // Bit only shows while connected, matching the old visualizer.
+                enabled: isConnected && toolVisible,
+                type: laser ? 'laser' : 'drill',
+                // Matches the old bit.stl (68.67mm) scaled 0.5 → ~34mm tall; gviewer
+                // scales the drill so largestDim = size * 1.6.
+                size: 21.5,
+                opacity: 0.9,
+                // Position updates (jog + job run) arrive on the controller's
+                // 250ms status-report poll. Tween duration needs to overlap
+                // that cadence or the bit visibly pauses between updates.
+                tweenMs: 260,
+                colorSource: 'custom',
+                color: WORKSHOP_VISUALIZER_COLORS.bit,
+            },
+            progress: { mode: hideProcessed ? 'hide' : 'grey' },
+            boundingBox: {
+                visible: store.get(
+                    'widgets.visualizer.objects.limits.visible',
+                    false,
+                ),
+                labels: store.get(
+                    'widgets.visualizer.boundingBoxLabels',
+                    false,
+                ),
+            },
+            machineBed: buildMachineBedOptions(),
+            grid: buildGridOptions(state.units),
+            camera: {
+                projection:
+                    store.get(
+                        'widgets.visualizer.projection',
+                        'Perspective',
+                    ) === 'Orthographic'
+                        ? 'orthographic'
+                        : 'perspective',
+            },
+            render: {
+                antialias: true,
+                theme: this.buildTheme(this.currentThemeName()),
+            },
+        };
+    }
+
+    buildSvgOptions(): Partial<GCodeSVGOptions> {
+        const theme = this.buildTheme(this.currentThemeName());
+        return {
+            rapidColor: theme.colors.rapid,
+            cutColor: theme.colors.cutting,
+            boundingBoxColor: theme.colors.boundingBox,
+            projectionMode: 'isometric',
+        };
+    }
+
+    applyOptionsFromState() {
+        if (this.viewer3d) {
+            this.viewer3d.setOptions(this.buildOptions());
+        }
+        if (this.viewerSvg) {
+            this.viewerSvg.setOptions(this.buildSvgOptions());
+        }
+        // SVG mode has no canvas clear color — sync the container background
+        // so the theme's background shows instead of the page default.
+        if (this.containerRef) {
+            this.containerRef.style.backgroundColor = this.buildTheme(
+                this.currentThemeName(),
+            ).background;
+        }
+    }
+
+    isSVGMode(): boolean {
+        const liteMode = store.get('widgets.visualizer.liteMode', false);
+        const svgEnabled =
+            store.get('widgets.visualizer.liteOption', 'Light') === 'Light';
+        return liteMode && svgEnabled;
+    }
+
+    // --- geometry -----------------------------------------------------------
+
+    applyWorkerData(data: WorkerGeometryData) {
+        this.lastWorkerData = data;
+        this.lastHiddenLine = -1;
+
+        // Shared so every viewer keeps the worker's per-tool palette; see
+        // augmentWorkerGeometry for why gviewer drops it otherwise.
+        const augmented = augmentWorkerGeometry(data);
+
+        if (this.mode === 'svg' && this.viewerSvg) {
+            this.viewerSvg.loadFromWorkerData(augmented);
+            this.firePostLoad();
+            return;
+        }
+
+        if (this.viewer3d) {
+            this.viewer3d
+                .loadFromWorkerData(augmented)
+                .then(() => {
+                    if (!this.skipNextCameraFocus) {
+                        this.viewer3d?.focusToModel();
+                    }
+                    this.skipNextCameraFocus = false;
+                    this.viewer3d?.setBitPosition(this.lastPosition, {
+                        immediate: true,
+                    });
+                    this.firePostLoad();
+                })
+                .catch((err) => console.error('gviewer load failed', err));
+        }
+    }
+
+    firePostLoad() {
+        const bbox = this.computeBBox();
+        controller.context = {
+            ...controller.context,
+            xmin: bbox.min.x,
+            xmax: bbox.max.x,
+            ymin: bbox.min.y,
+            ymax: bbox.max.y,
+            zmin: bbox.min.z,
+            zmax: bbox.max.z,
+        };
+        pubsub.publish('gcode:bbox', bbox);
+        if (this.pendingLoadCallback) {
+            this.pendingLoadCallback({ bbox });
+            this.pendingLoadCallback = null;
+        }
+    }
+
+    computeBBox(): BBox {
+        const empty = { min: { x: 0, y: 0, z: 0 }, max: { x: 0, y: 0, z: 0 } };
+        const positions = this.getToolpathHull();
+        if (!positions.length) {
+            return empty;
+        }
+        const min = { x: Infinity, y: Infinity, z: Infinity };
+        const max = { x: -Infinity, y: -Infinity, z: -Infinity };
+        for (let i = 0; i < positions.length; i += 3) {
+            const x = positions[i];
+            const y = positions[i + 1];
+            const z = positions[i + 2];
+            if (x < min.x) min.x = x;
+            if (y < min.y) min.y = y;
+            if (z < min.z) min.z = z;
+            if (x > max.x) max.x = x;
+            if (y > max.y) max.y = y;
+            if (z > max.z) max.z = z;
+        }
+        return { min, max };
+    }
+
+    // --- camera -------------------------------------------------------------
+
+    snapToView() {
+        const view = VIEW_MAP[this.props.cameraPosition];
+        if (view && this.viewer3d) {
+            this.viewer3d.snapCameraToView(view);
+        }
+    }
+
+    // Maps a bridge camera view name onto the app's camera actions, which update
+    // React state and (via componentDidUpdate) snap the gviewer camera.
+    setCameraView(view: 'top' | '3d' | 'front' | 'left' | 'right') {
+        const cam = this.props.actions.camera;
+        const map: Record<typeof view, (() => void) | undefined> = {
+            top: cam.toTopView,
+            '3d': cam.to3DView,
+            front: cam.toFrontView,
+            left: cam.toLeftSideView,
+            right: cam.toRightSideView,
+        };
+        map[view]?.();
+    }
+
+    // Restore a previously-saved camera position (used when a hold pick disarms).
+    restoreCameraView(pos: CAMERA_POSITIONS_T) {
+        const cam = this.props.actions.camera;
+        const map: Partial<Record<CAMERA_POSITIONS_T, () => void>> = {
+            Top: cam.toTopView,
+            '3D': cam.to3DView,
+            Front: cam.toFrontView,
+            Left: cam.toLeftSideView,
+            Right: cam.toRightSideView,
+        };
+        map[pos]?.();
+    }
+
+    // --- generic pick gesture (armed by plugins via the visualizer bridge) --
+
+    // Arm the pick gesture. 'hold' is a press-and-hold placement (camera pinned
+    // to Top + orbit locked so the press maps cleanly onto the XY plane); 'click'
+    // is a single click/tap with a small movement threshold so orbit-drags don't
+    // register as picks. Refuses to arm on rotary files (the toolpath root is
+    // X-rotated, so picked XY isn't a meaningful work coordinate) and never arms
+    // on the secondary viewer.
+    armPick(
+        mode: 'click' | 'hold',
+        onPick: (p: {
+            world: { x: number; y: number; z: number };
+            screen: { x: number; y: number };
+        }) => void,
+        onHoldProgress?: (t: number) => void,
+    ) {
+        if (this.props.isSecondary || this.isRotaryFile) {
+            return;
+        }
+        // Re-arming cleanly replaces any prior armed gesture.
+        this.disarmPick();
+
+        this.pickMode = mode;
+        this.pickOnPick = onPick;
+        this.pickOnHoldProgress = onHoldProgress ?? null;
+
+        const dom = this.containerRef;
+        if (dom) {
+            dom.style.cursor = 'crosshair';
+            dom.addEventListener('pointerdown', this.handlePickPointerDown);
+        }
+        window.addEventListener('pointermove', this.handlePickPointerMove);
+        window.addEventListener('pointerup', this.handlePickPointerUp);
+        window.addEventListener('pointercancel', this.handlePickPointerUp);
+
+        if (mode === 'hold') {
+            this.pickPriorView = this.props.cameraPosition;
+            this.props.actions.camera.toTopView();
+            this.viewer3d?.setRotateEnabled(false);
+            // Orthographic avoids perspective foreshortening skewing the picked
+            // XY; restored to whatever was active once the pick is disarmed.
+            this.pickPriorProjection =
+                this.viewer3d?.getCameraProjection() ?? null;
+            this.viewer3d?.setCameraProjection('orthographic');
+        }
+    }
+
+    disarmPick() {
+        const dom = this.containerRef;
+        if (dom) {
+            dom.style.cursor = '';
+            dom.removeEventListener('pointerdown', this.handlePickPointerDown);
+        }
+        window.removeEventListener('pointermove', this.handlePickPointerMove);
+        window.removeEventListener('pointerup', this.handlePickPointerUp);
+        window.removeEventListener('pointercancel', this.handlePickPointerUp);
+        this.cancelPickHold();
+
+        // Undo the camera/orbit lock a hold gesture applied.
+        if (this.pickMode === 'hold') {
+            this.viewer3d?.setRotateEnabled(true);
+            if (this.pickPriorView) {
+                this.restoreCameraView(this.pickPriorView);
+            }
+            if (this.pickPriorProjection) {
+                this.viewer3d?.setCameraProjection(this.pickPriorProjection);
+            }
+        }
+        this.pickPriorView = null;
+        this.pickPriorProjection = null;
+        this.pickMode = null;
+        this.pickOnPick = null;
+        this.pickOnHoldProgress = null;
+        this.pickPointerId = null;
+        this.pickStart = null;
+        this.pickMoved = false;
+    }
+
+    handlePickPointerDown = (e: PointerEvent) => {
+        if (!this.pickMode) {
+            return;
+        }
+        // Primary (left mouse / touch) button only.
+        if (e.button !== undefined && e.button !== 0) {
+            return;
+        }
+        // Track a single pointer at a time (ignore multi-touch gestures).
+        if (this.pickPointerId !== null) {
+            return;
+        }
+
+        this.pickPointerId = e.pointerId;
+        this.pickStart = { x: e.clientX, y: e.clientY };
+        this.pickMoved = false;
+
+        if (this.pickMode === 'hold') {
+            const { clientX, clientY } = e;
+            this.showPickIndicator(clientX, clientY);
+            this.pickHoldStart = performance.now();
+            // Emit hold progress 0..1 each frame so the plugin can mirror the ring.
+            const tick = () => {
+                const t = Math.min(
+                    1,
+                    (performance.now() - this.pickHoldStart) / PICK_HOLD_MS,
+                );
+                this.pickOnHoldProgress?.(t);
+                if (t < 1) {
+                    this.pickHoldRaf = requestAnimationFrame(tick);
+                }
+            };
+            this.pickHoldRaf = requestAnimationFrame(tick);
+            this.pickHoldTimer = setTimeout(() => {
+                this.commitPick(clientX, clientY);
+            }, PICK_HOLD_MS);
+        }
+    };
+
+    handlePickPointerMove = (e: PointerEvent) => {
+        if (this.pickPointerId === null || e.pointerId !== this.pickPointerId) {
+            return;
+        }
+        if (!this.pickStart) {
+            return;
+        }
+        const dx = e.clientX - this.pickStart.x;
+        const dy = e.clientY - this.pickStart.y;
+        // Drift beyond the threshold means the user is panning/orbiting, not picking.
+        if (Math.hypot(dx, dy) > PICK_CANCEL_PX) {
+            if (this.pickMode === 'hold') {
+                this.cancelPickHold();
+            } else {
+                this.pickMoved = true;
+            }
+        }
+    };
+
+    handlePickPointerUp = (e: PointerEvent) => {
+        if (this.pickPointerId === null || e.pointerId !== this.pickPointerId) {
+            return;
+        }
+        const { clientX, clientY } = e;
+        if (this.pickMode === 'click') {
+            const moved = this.pickMoved;
+            this.pickPointerId = null;
+            this.pickStart = null;
+            this.pickMoved = false;
+            // A drag was a pan/orbit; only a clean click fires a pick.
+            if (!moved) {
+                this.commitPick(clientX, clientY);
+            }
+            return;
+        }
+        // Hold released before the timer completed - cancel the placement.
+        this.cancelPickHold();
+    };
+
+    // Tear down the in-progress hold (timer + progress rAF + indicator) while
+    // leaving the gesture armed for another attempt.
+    cancelPickHold() {
+        const wasHolding =
+            this.pickHoldTimer !== null || this.pickHoldRaf !== null;
+        if (this.pickHoldTimer) {
+            clearTimeout(this.pickHoldTimer);
+            this.pickHoldTimer = null;
+        }
+        if (this.pickHoldRaf !== null) {
+            cancelAnimationFrame(this.pickHoldRaf);
+            this.pickHoldRaf = null;
+        }
+        this.removePickIndicator();
+        this.pickPointerId = null;
+        this.pickStart = null;
+        this.pickMoved = false;
+        if (wasHolding) {
+            this.pickOnHoldProgress?.(0);
+        }
+    }
+
+    commitPick(clientX: number, clientY: number) {
+        // A hold commit tears down its timer/indicator but stays armed so the
+        // plugin can decide whether to disarm.
+        if (this.pickMode === 'hold') {
+            this.cancelPickHold();
+        }
+        if (this.isRotaryFile || !this.viewer3d) {
+            return;
+        }
+        const world = this.viewer3d.screenToWorld(clientX, clientY);
+        if (!world) {
+            return;
+        }
+        const screen = this.viewer3d.worldToScreen(
+            world.x,
+            world.y,
+            world.z,
+        ) ?? {
+            x: clientX,
+            y: clientY,
+        };
+        this.pickOnPick?.({ world, screen });
+    }
+
+    showPickIndicator(clientX: number, clientY: number) {
+        this.removePickIndicator();
+
+        const size = 48;
+        const r = size / 2 - 4;
+        const c = size / 2;
+        const circumference = 2 * Math.PI * r;
+        const ns = 'http://www.w3.org/2000/svg';
+
+        // Fixed positioning relative to the viewport so the indicator lands
+        // exactly under the pointer regardless of ancestor positioning.
+        const wrapper = document.createElement('div');
+        wrapper.style.cssText = [
+            'position:fixed',
+            'pointer-events:none',
+            'z-index:9999',
+            `width:${size}px`,
+            `height:${size}px`,
+            'transform:translate(-50%,-50%)',
+            `left:${clientX}px`,
+            `top:${clientY}px`,
+        ].join(';');
+
+        const svg = document.createElementNS(ns, 'svg');
+        svg.setAttribute('width', String(size));
+        svg.setAttribute('height', String(size));
+
+        const bg = document.createElementNS(ns, 'circle');
+        bg.setAttribute('cx', String(c));
+        bg.setAttribute('cy', String(c));
+        bg.setAttribute('r', String(r));
+        bg.setAttribute('fill', 'rgba(0,0,0,0.35)');
+        bg.setAttribute('stroke', 'rgba(255,255,255,0.4)');
+        bg.setAttribute('stroke-width', '3');
+
+        const progress = document.createElementNS(ns, 'circle');
+        progress.setAttribute('cx', String(c));
+        progress.setAttribute('cy', String(c));
+        progress.setAttribute('r', String(r));
+        progress.setAttribute('fill', 'none');
+        progress.setAttribute('stroke', '#4ade80');
+        progress.setAttribute('stroke-width', '3');
+        progress.setAttribute('stroke-linecap', 'round');
+        progress.setAttribute('stroke-dasharray', `${circumference}`);
+        progress.setAttribute('stroke-dashoffset', `${circumference}`);
+        progress.setAttribute('transform', `rotate(-90 ${c} ${c})`);
+
+        const dot = document.createElementNS(ns, 'circle');
+        dot.setAttribute('cx', String(c));
+        dot.setAttribute('cy', String(c));
+        dot.setAttribute('r', '2');
+        dot.setAttribute('fill', '#4ade80');
+
+        svg.appendChild(bg);
+        svg.appendChild(progress);
+        svg.appendChild(dot);
+        wrapper.appendChild(svg);
+        document.body.appendChild(wrapper);
+
+        if (typeof progress.animate === 'function') {
+            progress.animate(
+                [{ strokeDashoffset: circumference }, { strokeDashoffset: 0 }],
+                { duration: PICK_HOLD_MS, fill: 'forwards' },
+            );
+        }
+
+        this.pickIndicator = wrapper;
+    }
+
+    removePickIndicator() {
+        if (this.pickIndicator && this.pickIndicator.parentElement) {
+            this.pickIndicator.parentElement.removeChild(this.pickIndicator);
+        }
+        this.pickIndicator = null;
+    }
+
+    // --- plugin overlay layer ----------------------------------------------
+
+    // Replace the declarative marker list drawn over the canvas. The host owns
+    // this SVG layer (the sandboxed plugin can never draw on the canvas itself);
+    // markers are re-projected every frame so they track camera pan/zoom.
+    setOverlay(markers: OverlayMarker[]) {
+        this.overlayMarkers = Array.isArray(markers) ? markers : [];
+        if (this.overlayMarkers.length > 0) {
+            this.startOverlay();
+        } else {
+            this.stopOverlay();
+        }
+    }
+
+    startOverlay() {
+        if (this.overlayRaf !== null) {
+            return; // already running
+        }
+        if (!this.overlaySvg) {
+            const svg = document.createElementNS(
+                'http://www.w3.org/2000/svg',
+                'svg',
+            ) as SVGSVGElement;
+            svg.style.cssText = [
+                'position:fixed',
+                'inset:0',
+                'width:100vw',
+                'height:100vh',
+                'pointer-events:none',
+                'z-index:10',
+            ].join(';');
+            document.body.appendChild(svg);
+            this.overlaySvg = svg;
+        }
+        const draw = () => {
+            this.drawOverlay();
+            this.overlayRaf = requestAnimationFrame(draw);
+        };
+        this.overlayRaf = requestAnimationFrame(draw);
+    }
+
+    stopOverlay() {
+        if (this.overlayRaf !== null) {
+            cancelAnimationFrame(this.overlayRaf);
+            this.overlayRaf = null;
+        }
+        if (this.overlaySvg?.parentElement) {
+            this.overlaySvg.parentElement.removeChild(this.overlaySvg);
+        }
+        this.overlaySvg = null;
+    }
+
+    drawOverlay() {
+        const svg = this.overlaySvg;
+        const container = this.containerRef;
+        if (!svg || !this.viewer3d || !container) {
+            return;
+        }
+        while (svg.firstChild) {
+            svg.removeChild(svg.firstChild);
+        }
+        const ns = 'http://www.w3.org/2000/svg';
+        // make sure any markers on the visualizer can't escape the visualizer view onto the rest of gsender
+        const bounds = container.getBoundingClientRect();
+
+        for (const marker of this.overlayMarkers) {
+            const s = this.viewer3d.worldToScreen(
+                marker.x,
+                marker.y,
+                marker.z ?? 0,
+            );
+            if (!s) {
+                continue;
+            }
+            if (
+                s.x < bounds.left ||
+                s.x > bounds.right ||
+                s.y < bounds.top ||
+                s.y > bounds.bottom
+            ) {
+                continue;
+            }
+            const color = marker.color ?? OVERLAY_DEFAULT_COLOR;
+            const size = marker.size ?? 6;
+            const shape = marker.shape ?? 'circle';
+
+            if (shape === 'ring') {
+                const c = document.createElementNS(ns, 'circle');
+                c.setAttribute('cx', String(s.x));
+                c.setAttribute('cy', String(s.y));
+                c.setAttribute('r', String(size));
+                c.setAttribute('fill', 'none');
+                c.setAttribute('stroke', color);
+                c.setAttribute('stroke-width', '1.5');
+                svg.appendChild(c);
+            } else if (shape === 'cross') {
+                const line = (
+                    x1: number,
+                    y1: number,
+                    x2: number,
+                    y2: number,
+                ) => {
+                    const l = document.createElementNS(ns, 'line');
+                    l.setAttribute('x1', String(x1));
+                    l.setAttribute('y1', String(y1));
+                    l.setAttribute('x2', String(x2));
+                    l.setAttribute('y2', String(y2));
+                    l.setAttribute('stroke', color);
+                    l.setAttribute('stroke-width', '1.5');
+                    return l;
+                };
+                svg.appendChild(line(s.x - size, s.y, s.x + size, s.y));
+                svg.appendChild(line(s.x, s.y - size, s.x, s.y + size));
+            } else {
+                // Default: filled circle.
+                const c = document.createElementNS(ns, 'circle');
+                c.setAttribute('cx', String(s.x));
+                c.setAttribute('cy', String(s.y));
+                c.setAttribute('r', String(size));
+                c.setAttribute('fill', color);
+                svg.appendChild(c);
+            }
+
+            if (marker.label) {
+                const t = document.createElementNS(ns, 'text');
+                t.setAttribute('x', String(s.x + size + 4));
+                t.setAttribute('y', String(s.y + 4));
+                t.setAttribute('fill', color);
+                t.setAttribute('font-size', '12');
+                t.setAttribute('font-family', 'sans-serif');
+                t.textContent = marker.label;
+                svg.appendChild(t);
+            }
+        }
+    }
+
+    // --- imperative API consumed by the connected container (index.tsx) -----
+
+    load(
+        _name: string,
+        visualization: unknown,
+        callback?: (arg: { bbox: BBox }) => void,
+    ) {
+        if (callback) {
+            this.pendingLoadCallback = callback;
+        }
+        // Geometry is delivered authoritatively via the `file:load` pubsub, so
+        // only apply directly when we are handed worker data here.
+        if (
+            visualization &&
+            typeof visualization === 'object' &&
+            (visualization as WorkerGeometryData).vertices
+        ) {
+            this.applyWorkerData(visualization as WorkerGeometryData);
+        }
+    }
+
+    unload() {
+        this.lastWorkerData = null;
+        this.lastHiddenLine = -1;
+        this.lastSpinning = false;
+        this.viewer3d?.setBitSpinning(false);
+        this.viewer3d?.unload();
+        this.viewerSvg?.clear();
+        controller.context = {
+            ...controller.context,
+            xmin: 0,
+            xmax: 0,
+            ymin: 0,
+            ymax: 0,
+            zmin: 0,
+            zmax: 0,
+        };
+    }
+
+    hasVisualization(): boolean {
+        return !!this.lastWorkerData;
+    }
+
+    rerenderGCode() {
+        if (this.lastWorkerData) {
+            this.applyWorkerData(this.lastWorkerData);
+        }
+    }
+
+    getToolpathHull(): Float32Array {
+        if (!this.lastWorkerData) {
+            return new Float32Array(0);
+        }
+        return new Float32Array(
+            this.lastWorkerData.vertices,
+            0,
+            this.lastWorkerData.verticesLen,
+        );
+    }
+
+    zoomFit = () => this.viewer3d?.focusToModel();
+    lookAtCenter = () => this.viewer3d?.focusToModel();
+    // gviewer drives zoom/pan through its orbit controls (mouse/touch); these
+    // stay as no-ops so the legacy shortcut wiring keeps resolving.
+    zoomIn = () => {};
+    zoomOut = () => {};
+    panUp = () => {};
+    panDown = () => {};
+    panLeft = () => {};
+    panRight = () => {};
+
+    // --- pubsub -------------------------------------------------------------
+
+    subscribe() {
+        this.pubsubTokens = [
+            pubsub.subscribe('file:load', (_msg, data) => {
+                const activeVisualizer = _get(
+                    reduxStore.getState(),
+                    'visualizer.activeVisualizer',
+                );
+                const isPrimaryActive =
+                    !this.props.isSecondary &&
+                    activeVisualizer === VISUALIZER_PRIMARY;
+                const isSecondaryActive =
+                    this.props.isSecondary &&
+                    activeVisualizer === VISUALIZER_SECONDARY;
+                if (!isPrimaryActive && !isSecondaryActive) {
+                    return;
+                }
+                this.maybeWarnInvalidLines(data);
+                this.applyWorkerData(data as WorkerGeometryData);
+            }),
+            pubsub.subscribe('visualizer:updateposition', (_msg, data) => {
+                this.lastPosition = {
+                    ...this.lastPosition,
+                    ...(data as object),
+                };
+                this.viewer3d?.setBitPosition(this.lastPosition);
+                this.viewerSvg?.setBitPosition(this.lastPosition);
+                this.viewer3d?.setToolpathRotationA(
+                    this.isRotaryFile ? (this.lastPosition.a ?? 0) : 0,
+                );
+            }),
+            pubsub.subscribe('theme:change', (_msg, theme) => {
+                this.previewThemeName = (theme as string) ?? null;
+                this.applyOptionsFromState();
+            }),
+            pubsub.subscribe('visualizer:redraw', () => {
+                this.applyOptionsFromState();
+            }),
+            pubsub.subscribe('visualizer:settings', () => {
+                this.applyOptionsFromState();
+            }),
+            pubsub.subscribe('spindle:mode', () => {
+                this.skipNextCameraFocus = true;
+                this.applyOptionsFromState();
+            }),
+            pubsub.subscribe('litemode:change', () => {
+                this.recreateViewer();
+            }),
+            pubsub.subscribe('job:end', () => {
+                this.viewer3d?.showAll();
+                this.viewer3d?.resetColors();
+                this.lastHiddenLine = -1;
+            }),
+            pubsub.subscribe('gcode:unload', () => {
+                this.unload();
+            }),
+            pubsub.subscribe('unload:file', () => {
+                this.unload();
+            }),
+            pubsub.subscribe('outline:start', () => {
+                this.handleOutline();
+            }),
+        ];
+
+        // Mirror the old (redux-connected) visualizer: drive the bit position,
+        // bit visibility and run-time progress greying from live controller state.
+        this.reduxUnsub = reduxStore.subscribe(() => {
+            const st = reduxStore.getState();
+
+            // Track whether the loaded file uses the A axis — gates rotary rotation.
+            // Fire setToolpathRotationA immediately on transition so the rotation
+            // updates as soon as the file loads or changes, not just on next wpos tick.
+            const fileType: string | undefined = _get(st, 'file.fileType');
+            if (fileType !== undefined) {
+                const nextIsRotary =
+                    fileType === 'ROTARY' || fileType === 'FOUR_AXIS';
+                if (nextIsRotary !== this.isRotaryFile) {
+                    this.isRotaryFile = nextIsRotary;
+                    this.viewer3d?.setToolpathRotationA(
+                        this.isRotaryFile ? (this.lastPosition.a ?? 0) : 0,
+                    );
+                }
+            }
+
+            // Bit follows the live work position (DRO) — jogging and running alike.
+            const wpos = _get(st, 'controller.wpos');
+            if (wpos) {
+                const key = `${wpos.x},${wpos.y},${wpos.z},${wpos.a ?? 0}`;
+                if (key !== this.lastWposKey) {
+                    this.lastWposKey = key;
+                    this.lastPosition = {
+                        x: Number(wpos.x) || 0,
+                        y: Number(wpos.y) || 0,
+                        z: Number(wpos.z) || 0,
+                        a: Number(wpos.a) || 0,
+                    };
+                    this.viewer3d?.setBitPosition(this.lastPosition);
+                    this.viewerSvg?.setBitPosition(this.lastPosition);
+                    this.viewer3d?.setToolpathRotationA(
+                        this.isRotaryFile ? (this.lastPosition.a ?? 0) : 0,
+                    );
+                }
+            }
+
+            // Machine bed indicator (rect + keepout) tracks homing state, homing
+            // corner, active WCS offset, machine travel limits, and keepout
+            // EEPROM settings — all low-frequency changes, so gate the recompute
+            // behind a dedupe key rather than reacting to every controller tick.
+            const $22 = _get(st, 'controller.settings.settings.$22', '0');
+            const $23 = _get(st, 'controller.settings.settings.$23', '0');
+            const $130 = _get(st, 'controller.settings.settings.$130');
+            const $131 = _get(st, 'controller.settings.settings.$131');
+            const $132 = _get(st, 'controller.settings.settings.$132');
+            const $683 = _get(st, 'controller.settings.settings.$683');
+            const $684 = _get(st, 'controller.settings.settings.$684');
+            const $685 = _get(st, 'controller.settings.settings.$685');
+            const $686 = _get(st, 'controller.settings.settings.$686');
+            const $687 = _get(st, 'controller.settings.settings.$687');
+            const hasHomed = !!_get(st, 'controller.hasHomed');
+            const wco = _get(st, 'controller.wco', { x: 0, y: 0 });
+            const machineBedKey = `${$22},${$23},${$130},${$131},${$132},${$683},${$684},${$685},${$686},${$687},${hasHomed},${wco.x},${wco.y}`;
+            if (machineBedKey !== this.lastMachineBedKey) {
+                this.lastMachineBedKey = machineBedKey;
+                this.viewer3d?.setOptions({
+                    machineBed: buildMachineBedOptions(),
+                });
+            }
+
+            // Grid quadrant (and, when "trim grid to bed" is on, its bounds)
+            // depends on the same settings machineBedKey already tracks.
+            const gridKey = machineBedKey;
+            if (gridKey !== this.lastGridKey) {
+                this.lastGridKey = gridKey;
+                this.viewer3d?.setOptions({
+                    grid: buildGridOptions(this.props.state.units),
+                });
+            }
+
+            // Camera follow only matters while a job is actively running; toggling
+            // the setting or the workflow state both flow through this dedupe key.
+            // The actual panning happens inside gviewer as a side effect of the
+            // setBitPosition call above once follow is enabled — no per-tick call
+            // needed here beyond flipping the toggle when shouldFollow changes.
+            const followSettingOn = store.get(
+                'widgets.visualizer.followToolDuringRuntime',
+                false,
+            );
+            const isRunning =
+                _get(st, 'controller.workflow.state') ===
+                WORKFLOW_STATE_RUNNING;
+            const shouldFollow = followSettingOn && isRunning;
+            if (shouldFollow !== this.lastCameraFollow) {
+                this.lastCameraFollow = shouldFollow;
+                this.viewer3d?.setCameraFollowEnabled(shouldFollow);
+            }
+
+            // Bit is only shown while connected (matches the old behaviour).
+            const connected = !!_get(st, 'connection.isConnected');
+            if (connected !== this.lastConnected) {
+                this.lastConnected = connected;
+                this.viewer3d?.setBitVisible(
+                    connected && this.cuttingToolVisible(),
+                );
+            }
+
+            // Progress greying/hiding while a job runs: always grey, hide only when
+            // the hideProcessedLines setting is on. Use hideUntilLine (not seekToLine)
+            // so it never fights the DRO-driven bit position above.
+            if (
+                _get(st, 'controller.workflow.state') === WORKFLOW_STATE_RUNNING
+            ) {
+                const line =
+                    _get(
+                        st,
+                        'controller.sender.status.currentLineRunning',
+                        0,
+                    ) || _get(st, 'controller.sender.status.received', 0);
+                if (line !== this.lastHiddenLine && this.viewer3d) {
+                    this.lastHiddenLine = line;
+                    const mode = store.get(
+                        'widgets.visualizer.hideProcessedLines',
+                        false,
+                    )
+                        ? 'hide'
+                        : 'grey';
+                    this.viewer3d.hideUntilLine(line, mode);
+                }
+            }
+
+            // Spin the bit to simulate a running spindle.
+            const spinning = this.computeShouldSpin(st, connected);
+            if (spinning !== this.lastSpinning) {
+                this.lastSpinning = spinning;
+                this.viewer3d?.setBitSpinning(spinning);
+            }
+        });
+    }
+
+    computeShouldSpin(st: unknown, isConnected: boolean): boolean {
+        if (!isConnected || !this.cuttingToolVisible()) {
+            return false;
+        }
+
+        const controllerType = _get(st, 'controller.type');
+        if (controllerType === GRBL || controllerType === GRBLHAL) {
+            // Trust the machine's own reported state, not the sender's workflow
+            // state — the sender can finish queueing lines (workflow -> idle)
+            // while grbl is still physically finishing buffered moves.
+            const activeState = _get(st, 'controller.state.status.activeState');
+            return (
+                activeState === GRBL_ACTIVE_STATE_RUN ||
+                activeState === GRBL_ACTIVE_STATE_CHECK
+            );
+        }
+        if (
+            controllerType === MARLIN ||
+            controllerType === SMOOTHIE ||
+            controllerType === TINYG
+        ) {
+            // No granular machine-state field available for these — fall back
+            // to workflow state, matching the old visualizer's behaviour.
+            return (
+                _get(st, 'controller.workflow.state') === WORKFLOW_STATE_RUNNING
+            );
+        }
+        return false;
+    }
+
+    cuttingToolVisible(): boolean {
+        const { objects, liteMode } = this.props.state;
+        return liteMode
+            ? objects.cuttingTool.visibleLite
+            : objects.cuttingTool.visible;
+    }
+
+    unsubscribe() {
+        this.pubsubTokens.forEach((token) => pubsub.unsubscribe(token));
+        this.pubsubTokens = [];
+    }
+
+    maybeWarnInvalidLines(data: unknown) {
+        if (!store.get('widgets.visualizer.showWarning', false)) {
+            return;
+        }
+        const invalidLines: string[] = _get(
+            data,
+            'parsedData.invalidLines',
+            [],
+        );
+        if (invalidLines.length === 0) {
+            return;
+        }
+        const lineSample = invalidLines.slice(0, 5);
+        const description = (
+            <div className={'flex flex-col gap-2'}>
+                <p>
+                    Detected {invalidLines.length} invalid lines on file load.
+                    Your job may not run correctly.
+                </p>
+                <p>Sample invalid lines found include:</p>
+                <ol>
+                    {lineSample.map((line, i) => (
+                        <li className="text-xs" key={i}>
+                            -<b> {line}</b>
+                        </li>
+                    ))}
+                </ol>
+            </div>
+        );
+        pubsub.publish('helper:info', {
+            title: 'Invalid Lines Detected',
+            description,
+        });
+    }
+
+    handleOutline() {
+        if (this.outlineRunning) {
+            return;
+        }
+        toast.info('Generating outline g-code...');
+        this.outlineRunning = true;
+
+        const vertices = this.getToolpathHull();
+        const settings = _get(
+            reduxStore.getState(),
+            'controller.settings.settings',
+            {},
+        );
+        const homingEnabled = _get(settings, '$22', '0') !== '0';
+        const zTravel = homingEnabled ? getZUpTravel(5) : 5;
+
+        try {
+            const outlineWorker = new Worker(
+                new URL('../../workers/Outline.worker.ts', import.meta.url),
+                { type: 'module' },
+            );
+
+            const laserOnOutline = store.get(
+                'widgets.spindle.laser.laserOnOutline',
+                false,
+            );
+            const spindleMode = store.get('widgets.spindle.mode');
+            const isLaser = laserOnOutline && spindleMode === LASER_MODE;
+
+            const outlineMode = store.get('workspace.outlineMode', 'Detailed');
+            const outlineSpeed = store.get('workspace.outlineSpeed', null);
+
+            const isRapidless = outlineMode === OUTLINE_MODE_RAPIDLESS_SQUARE;
+            const content = isRapidless
+                ? reduxStore.getState().file.content
+                : null;
+
+            const maxRuntime = setTimeout(() => {
+                outlineWorker.terminate();
+                toast.error('Outline generation timed out. Please try again.');
+                this.outlineRunning = false;
+            }, 15000);
+
+            outlineWorker.onmessage = ({ data }) => {
+                clearTimeout(maxRuntime);
+                outlineResponse({ data });
+                this.outlineRunning = false;
+            };
+            outlineWorker.postMessage({
+                isLaser,
+                parsedData: isRapidless ? [] : vertices,
+                mode: outlineMode,
+                zTravel,
+                ...(isRapidless && { content }),
+                outlineSpeed,
+            });
+        } catch (e) {
+            console.error(e);
+            this.outlineRunning = false;
+        }
+    }
+
+    render() {
+        return (
+            <div
+                ref={(el) => {
+                    this.containerRef = el;
+                }}
+                className="w-full h-full overflow-hidden rounded-lg outline-none"
+                style={{ display: this.props.show ? undefined : 'none' }}
+            />
+        );
+    }
 }
 
 export default GcodeViewer;

@@ -11,10 +11,10 @@
  * should fall back to their existing value in that case.
  */
 export function getThemeCssColor(variable: string): string {
-	if (typeof document === "undefined") {
-		return "";
-	}
-	return getComputedStyle(document.documentElement)
-		.getPropertyValue(variable)
-		.trim();
+    if (typeof document === 'undefined') {
+        return '';
+    }
+    return getComputedStyle(document.documentElement)
+        .getPropertyValue(variable)
+        .trim();
 }

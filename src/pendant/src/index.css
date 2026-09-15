@@ -9,167 +9,167 @@
    light look; the `.dark[data-dark-theme='workshop']` block supplies the
    Workshop dark values. Keep in sync with apps/desktop/src/index.css. */
 @layer base {
-	:root {
-		--surface-base: theme("colors.gray.100");
-		--surface-sunken: theme("colors.gray.200");
-		--surface-raised: #ffffff;
-		--surface-elevated: #ffffff;
-		--surface-hover: theme("colors.gray.200");
-		--surface-active: theme("colors.gray.300");
-		--surface-disabled: theme("colors.gray.100");
+    :root {
+        --surface-base: theme("colors.gray.100");
+        --surface-sunken: theme("colors.gray.200");
+        --surface-raised: #ffffff;
+        --surface-elevated: #ffffff;
+        --surface-hover: theme("colors.gray.200");
+        --surface-active: theme("colors.gray.300");
+        --surface-disabled: theme("colors.gray.100");
 
-		--content-primary: theme("colors.gray.900");
-		--content-secondary: theme("colors.gray.700");
-		--content-muted: theme("colors.gray.500");
-		--content-disabled: theme("colors.gray.400");
-		--content-inverse: #ffffff;
+        --content-primary: theme("colors.gray.900");
+        --content-secondary: theme("colors.gray.700");
+        --content-muted: theme("colors.gray.500");
+        --content-disabled: theme("colors.gray.400");
+        --content-inverse: #ffffff;
 
-		--outline-subtle: theme("colors.gray.200");
-		--outline-default: theme("colors.gray.300");
-		--outline-strong: theme("colors.gray.400");
-		--outline-disabled: theme("colors.gray.200");
+        --outline-subtle: theme("colors.gray.200");
+        --outline-default: theme("colors.gray.300");
+        --outline-strong: theme("colors.gray.400");
+        --outline-disabled: theme("colors.gray.200");
 
-		--overlay-hover: theme("colors.overlay.hover");
-		--overlay-active: theme("colors.overlay.active");
-		--overlay-disabled: theme("colors.overlay.disabled");
-		--overlay-scrim: theme("colors.overlay.scrim");
+        --overlay-hover: theme("colors.overlay.hover");
+        --overlay-active: theme("colors.overlay.active");
+        --overlay-disabled: theme("colors.overlay.disabled");
+        --overlay-scrim: theme("colors.overlay.scrim");
 
-		/* shadcn/ui primitive tokens (Card, Dialog, Popover, Tabs, Select,
+        /* shadcn/ui primitive tokens (Card, Dialog, Popover, Tabs, Select,
            etc. in packages/ui/src/shadcn use these bare classes — bg-card,
            bg-popover, bg-muted, border, ring — with no dark: prefix, so they
            must resolve via CSS var rather than a Tailwind dark: variant. */
-		--background: #ffffff;
-		--foreground: theme("colors.gray.900");
-		--card: #ffffff;
-		--card-foreground: theme("colors.gray.900");
-		--popover: #ffffff;
-		--popover-foreground: theme("colors.gray.900");
-		--primary: theme("colors.blue.500");
-		--primary-foreground: #ffffff;
-		--secondary: theme("colors.gray.100");
-		--secondary-foreground: theme("colors.gray.900");
-		--muted: theme("colors.gray.100");
-		--muted-foreground: theme("colors.gray.500");
-		--accent: theme("colors.gray.100");
-		--accent-foreground: theme("colors.gray.900");
-		--destructive: theme("colors.red.500");
-		--destructive-foreground: #ffffff;
-		--border: theme("colors.gray.200");
-		--input: theme("colors.gray.300");
-		--ring: theme("colors.blue.500");
-	}
+        --background: #ffffff;
+        --foreground: theme("colors.gray.900");
+        --card: #ffffff;
+        --card-foreground: theme("colors.gray.900");
+        --popover: #ffffff;
+        --popover-foreground: theme("colors.gray.900");
+        --primary: theme("colors.blue.500");
+        --primary-foreground: #ffffff;
+        --secondary: theme("colors.gray.100");
+        --secondary-foreground: theme("colors.gray.900");
+        --muted: theme("colors.gray.100");
+        --muted-foreground: theme("colors.gray.500");
+        --accent: theme("colors.gray.100");
+        --accent-foreground: theme("colors.gray.900");
+        --destructive: theme("colors.red.500");
+        --destructive-foreground: #ffffff;
+        --border: theme("colors.gray.200");
+        --input: theme("colors.gray.300");
+        --ring: theme("colors.blue.500");
+    }
 
-	.dark[data-dark-theme="workshop"] {
-		--surface-base: theme("colors.surface.base");
-		--surface-sunken: theme("colors.surface.sunken");
-		--surface-raised: theme("colors.surface.raised");
-		--surface-elevated: theme("colors.surface.elevated");
-		--surface-hover: theme("colors.surface.hover");
-		--surface-active: theme("colors.surface.active");
-		--surface-disabled: theme("colors.surface.disabled");
+    .dark[data-dark-theme="workshop"] {
+        --surface-base: theme("colors.surface.base");
+        --surface-sunken: theme("colors.surface.sunken");
+        --surface-raised: theme("colors.surface.raised");
+        --surface-elevated: theme("colors.surface.elevated");
+        --surface-hover: theme("colors.surface.hover");
+        --surface-active: theme("colors.surface.active");
+        --surface-disabled: theme("colors.surface.disabled");
 
-		--content-primary: theme("colors.content.primary");
-		--content-secondary: theme("colors.content.secondary");
-		--content-muted: theme("colors.content.muted");
-		--content-disabled: theme("colors.content.disabled");
-		--content-inverse: theme("colors.content.inverse");
+        --content-primary: theme("colors.content.primary");
+        --content-secondary: theme("colors.content.secondary");
+        --content-muted: theme("colors.content.muted");
+        --content-disabled: theme("colors.content.disabled");
+        --content-inverse: theme("colors.content.inverse");
 
-		--outline-subtle: theme("colors.outline.subtle");
-		--outline-default: theme("colors.outline.DEFAULT");
-		--outline-strong: theme("colors.outline.strong");
-		--outline-disabled: theme("colors.outline.disabled");
+        --outline-subtle: theme("colors.outline.subtle");
+        --outline-default: theme("colors.outline.DEFAULT");
+        --outline-strong: theme("colors.outline.strong");
+        --outline-disabled: theme("colors.outline.disabled");
 
-		--overlay-hover: theme("colors.overlay.hover");
-		--overlay-active: theme("colors.overlay.active");
-		--overlay-disabled: theme("colors.overlay.disabled");
-		--overlay-scrim: theme("colors.overlay.scrim");
+        --overlay-hover: theme("colors.overlay.hover");
+        --overlay-active: theme("colors.overlay.active");
+        --overlay-disabled: theme("colors.overlay.disabled");
+        --overlay-scrim: theme("colors.overlay.scrim");
 
-		--background: theme("colors.surface.base");
-		--foreground: theme("colors.content.primary");
-		--card: theme("colors.surface.raised");
-		--card-foreground: theme("colors.content.primary");
-		--popover: theme("colors.surface.elevated");
-		--popover-foreground: theme("colors.content.primary");
-		--primary: theme("colors.blue.500");
-		--primary-foreground: #ffffff;
-		--secondary: theme("colors.surface.raised");
-		--secondary-foreground: theme("colors.content.primary");
-		--muted: theme("colors.surface.elevated");
-		--muted-foreground: theme("colors.content.muted");
-		--accent: theme("colors.surface.hover");
-		--accent-foreground: theme("colors.content.primary");
-		--destructive: theme("colors.red.500");
-		--destructive-foreground: #ffffff;
-		--border: theme("colors.outline.DEFAULT");
-		--input: theme("colors.outline.DEFAULT");
-		--ring: theme("colors.blue.500");
-	}
+        --background: theme("colors.surface.base");
+        --foreground: theme("colors.content.primary");
+        --card: theme("colors.surface.raised");
+        --card-foreground: theme("colors.content.primary");
+        --popover: theme("colors.surface.elevated");
+        --popover-foreground: theme("colors.content.primary");
+        --primary: theme("colors.blue.500");
+        --primary-foreground: #ffffff;
+        --secondary: theme("colors.surface.raised");
+        --secondary-foreground: theme("colors.content.primary");
+        --muted: theme("colors.surface.elevated");
+        --muted-foreground: theme("colors.content.muted");
+        --accent: theme("colors.surface.hover");
+        --accent-foreground: theme("colors.content.primary");
+        --destructive: theme("colors.red.500");
+        --destructive-foreground: #ffffff;
+        --border: theme("colors.outline.DEFAULT");
+        --input: theme("colors.outline.DEFAULT");
+        --ring: theme("colors.blue.500");
+    }
 }
 
 .status-badge {
-	position: relative;
-	overflow: hidden;
+    position: relative;
+    overflow: hidden;
 }
 
 .status-badge > * {
-	position: relative;
-	z-index: 1;
+    position: relative;
+    z-index: 1;
 }
 
 @keyframes pulse-run {
-	0%,
-	100% {
-		box-shadow: 0 0 0 0 rgba(22, 163, 74, 0);
-	}
-	50% {
-		box-shadow: 0 0 0 5px rgba(22, 163, 74, 0.25);
-	}
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(22, 163, 74, 0);
+    }
+    50% {
+        box-shadow: 0 0 0 5px rgba(22, 163, 74, 0.25);
+    }
 }
 
 .badge-animate-run {
-	animation: pulse-run 2s ease-in-out infinite;
+    animation: pulse-run 2s ease-in-out infinite;
 }
 
 @keyframes pulse-alarm {
-	0%,
-	100% {
-		box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
-	}
-	50% {
-		box-shadow: 0 0 0 6px rgba(220, 38, 38, 0.35);
-	}
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
+    }
+    50% {
+        box-shadow: 0 0 0 6px rgba(220, 38, 38, 0.35);
+    }
 }
 
 .badge-animate-alarm {
-	animation: pulse-alarm 1s ease-in-out infinite;
+    animation: pulse-alarm 1s ease-in-out infinite;
 }
 
 @keyframes border-march {
-	0%,
-	100% {
-		outline-offset: 2px;
-		outline-width: 2px;
-	}
-	50% {
-		outline-offset: 5px;
-		outline-width: 2px;
-	}
+    0%,
+    100% {
+        outline-offset: 2px;
+        outline-width: 2px;
+    }
+    50% {
+        outline-offset: 5px;
+        outline-width: 2px;
+    }
 }
 .unlock-attention {
-	outline: 2px solid rgb(245, 158, 11);
-	animation: border-march 1.2s ease-in-out infinite;
+    outline: 2px solid rgb(245, 158, 11);
+    animation: border-march 1.2s ease-in-out infinite;
 }
 .unlock-attention-home {
-	outline: 2px solid rgb(59, 130, 246);
-	animation: border-march 1.2s ease-in-out infinite;
+    outline: 2px solid rgb(59, 130, 246);
+    animation: border-march 1.2s ease-in-out infinite;
 }
 
 .jog-btn-active {
-	transform: translateY(1px) scale(0.985);
-	box-shadow:
-		inset 0 0 0 1px rgba(255, 255, 255, 0.24),
-		0 0 0 2px rgba(59, 130, 246, 0.18);
-	animation: jog-press 220ms ease-out;
+    transform: translateY(1px) scale(0.985);
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.24),
+        0 0 0 2px rgba(59, 130, 246, 0.18);
+    animation: jog-press 220ms ease-out;
 }
 
 /* Disabled jog buttons must read as a consistent neutral grey, never the
@@ -180,82 +180,82 @@
    accent border/fill/text in both light and dark. */
 button.jog-btn:disabled,
 button.jog-btn:disabled:hover {
-	background-color: var(--surface-disabled) !important;
-	border-color: var(--outline-strong) !important;
-	color: var(--content-disabled) !important;
-	cursor: default !important;
+    background-color: var(--surface-disabled) !important;
+    border-color: var(--outline-strong) !important;
+    color: var(--content-disabled) !important;
+    cursor: default !important;
 }
 
 button.jog-btn:disabled svg,
 button.jog-btn:disabled span,
 button.jog-btn:disabled:hover svg,
 button.jog-btn:disabled:hover span {
-	color: inherit !important;
+    color: inherit !important;
 }
 
 @keyframes jog-press {
-	0% {
-		filter: brightness(1.12);
-	}
-	100% {
-		filter: brightness(1);
-	}
+    0% {
+        filter: brightness(1.12);
+    }
+    100% {
+        filter: brightness(1);
+    }
 }
 
 @keyframes pendant-progress-complete {
-	0%,
-	100% {
-		opacity: 1;
-	}
-	50% {
-		opacity: 0.3;
-	}
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.3;
+    }
 }
 
 .pendant-progress-complete {
-	animation: pendant-progress-complete 180ms ease-in-out 6;
+    animation: pendant-progress-complete 180ms ease-in-out 6;
 }
 
 .pendant-progress-track {
-	background-image: repeating-linear-gradient(
-		-62deg,
-		rgba(255, 255, 255, 0.35) 0 2px,
-		rgba(255, 255, 255, 0) 2px 8px
-	);
+    background-image: repeating-linear-gradient(
+        -62deg,
+        rgba(255, 255, 255, 0.35) 0 2px,
+        rgba(255, 255, 255, 0) 2px 8px
+    );
 }
 
 .dark .pendant-progress-track {
-	background-image: repeating-linear-gradient(
-		-62deg,
-		rgba(255, 255, 255, 0.16) 0 2px,
-		rgba(255, 255, 255, 0) 2px 8px
-	);
+    background-image: repeating-linear-gradient(
+        -62deg,
+        rgba(255, 255, 255, 0.16) 0 2px,
+        rgba(255, 255, 255, 0) 2px 8px
+    );
 }
 
 .drag-region {
-	-webkit-app-region: drag;
+    -webkit-app-region: drag;
 }
 .no-drag {
-	-webkit-app-region: no-drag;
+    -webkit-app-region: no-drag;
 }
 
 html,
 body,
 #root {
-	cursor: default;
-	-webkit-user-select: none;
-	user-select: none;
-	-webkit-touch-callout: none;
+    cursor: default;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
 }
 
 /* Hide native number spinners — desktop hides these in application.css which pendant doesn't import */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
-	-webkit-appearance: none !important;
-	margin: 0;
+    -webkit-appearance: none !important;
+    margin: 0;
 }
 input[type="number"] {
-	-moz-appearance: textfield !important;
+    -moz-appearance: textfield !important;
 }
 
 /* ======= Pendant Config: setting row layout =======
@@ -268,215 +268,215 @@ input[type="number"] {
 /* 1. All columns → full width */
 .pendant-config .sm\:w-1\/5,
 .pendant-config .sm\:w-2\/5 {
-	width: 100% !important;
+    width: 100% !important;
 }
 
 /* 2. Label column: restore flex-row justify-between
       SettingRow label has sm:block (turns off flex at sm+) — revert to flex row
       EEPROMSettingRow label has sm:justify-start — revert to justify-between */
 .pendant-config .sm\:block {
-	display: flex !important;
-	flex-direction: row !important;
-	align-items: center !important;
-	justify-content: space-between !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
 }
 .pendant-config .sm\:justify-start {
-	flex-direction: row !important;
-	justify-content: space-between !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
 }
 
 /* 3. Show the sm:hidden icons on the right of the label row */
 .pendant-config .sm\:block .sm\:hidden,
 .pendant-config .sm\:justify-start .sm\:hidden {
-	display: flex !important;
+    display: flex !important;
 }
 
 /* 4. Restore small-screen order: label(auto) → description(2) → input(3)
       SettingRow:     description has sm:order-3 (→2), input has sm:order-none (→3)
       EEPROMSettingRow: input has sm:order-2 (push to 3), description has order-4 (pull to 2) */
 .pendant-config .sm\:order-3 {
-	order: 2 !important;
+    order: 2 !important;
 }
 .pendant-config .sm\:order-none {
-	order: 3 !important;
+    order: 3 !important;
 }
 .pendant-config .sm\:order-2 {
-	order: 3 !important;
+    order: 3 !important;
 }
 .pendant-config .order-4 {
-	order: 2 !important;
+    order: 2 !important;
 }
 
 /* 5. Hide the dedicated right-side icons column — icons are now inline with the label */
 .pendant-config .sm\:flex.w-1\/5 {
-	display: none !important;
+    display: none !important;
 }
 
 /* Config view: override desktop-assumed heights for pendant chrome.
    Top chrome = PendantTopBar (56px) + InfoStrip (~32px) = 88px.
    BottomNav (64px) is a sibling below, not included here. */
 .pendant-config .fixed-content-area {
-	height: calc(100vh - 88px) !important;
-	max-height: calc(100vh - 88px) !important;
+    height: calc(100vh - 88px) !important;
+    max-height: calc(100vh - 88px) !important;
 }
 .pendant-config .fixed-config-area {
-	height: calc(100vh - 88px - 115px) !important;
-	max-height: calc(100vh - 88px - 115px) !important;
+    height: calc(100vh - 88px - 115px) !important;
+    max-height: calc(100vh - 88px - 115px) !important;
 }
 /* ProfileBar is position:fixed and escapes normal flow.
    Shift it up so it sits above BottomNav (h-16 = 64px). */
 body.pendant-mode .fixed.z-50 {
-	bottom: 72px !important;
+    bottom: 72px !important;
 }
 
 input,
 textarea,
 [contenteditable="true"] {
-	cursor: text;
-	-webkit-user-select: text;
-	user-select: text;
-	-webkit-touch-callout: default;
+    cursor: text;
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-touch-callout: default;
 }
 
 /* ── Macro button animations ──────────────────────────────────────────────── */
 
 :root {
-	--mbtn-flash-overlay: rgba(26, 111, 196, 0.15);
+    --mbtn-flash-overlay: rgba(26, 111, 196, 0.15);
 }
 .dark {
-	--mbtn-flash-overlay: rgba(74, 158, 255, 0.2);
+    --mbtn-flash-overlay: rgba(74, 158, 255, 0.2);
 }
 
 /* Opacity-only overlay — smooth because browsers interpolate opacity perfectly */
 @keyframes run-flash-overlay {
-	0% {
-		opacity: 0;
-	}
-	15% {
-		opacity: 1;
-	}
-	70% {
-		opacity: 1;
-	}
-	100% {
-		opacity: 0;
-	}
+    0% {
+        opacity: 0;
+    }
+    15% {
+        opacity: 1;
+    }
+    70% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
 }
 
 @keyframes shimmer {
-	0% {
-		transform: translateX(-120%);
-	}
-	60% {
-		transform: translateX(120%);
-	}
-	100% {
-		transform: translateX(120%);
-	}
+    0% {
+        transform: translateX(-120%);
+    }
+    60% {
+        transform: translateX(120%);
+    }
+    100% {
+        transform: translateX(120%);
+    }
 }
 
 .mbtn {
-	position: relative;
-	overflow: hidden;
+    position: relative;
+    overflow: hidden;
 }
 
 /* ::before — colour flash overlay, sits above button bg but below content */
 .mbtn::before {
-	content: "";
-	position: absolute;
-	inset: 0;
-	border-radius: inherit;
-	background: var(--mbtn-flash-overlay);
-	opacity: 0;
-	pointer-events: none;
-	z-index: 1;
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--mbtn-flash-overlay);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1;
 }
 .mbtn.running::before {
-	animation: run-flash-overlay 0.9s ease forwards;
+    animation: run-flash-overlay 0.9s ease forwards;
 }
 
 /* ::after — shimmer sweep */
 .mbtn.running::after {
-	content: "";
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 50%;
-	height: 100%;
-	background: linear-gradient(
-		90deg,
-		transparent,
-		rgba(255, 255, 255, 0.08),
-		transparent
-	);
-	transform: translateX(-120%);
-	pointer-events: none;
-	z-index: 1;
-	animation: shimmer 0.65s ease forwards;
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.08),
+        transparent
+    );
+    transform: translateX(-120%);
+    pointer-events: none;
+    z-index: 1;
+    animation: shimmer 0.65s ease forwards;
 }
 
 /* ── Connection widget ("Hold to Release") ─────────────────────────────── */
 /* Namespaced so they don't collide with the `.mbtn` shimmer above.        */
 
 @keyframes conn-pop-in {
-	0% {
-		opacity: 0;
-		transform: scale(0.94) translateY(4px);
-	}
-	100% {
-		opacity: 1;
-		transform: scale(1) translateY(0);
-	}
+    0% {
+        opacity: 0;
+        transform: scale(0.94) translateY(4px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
 }
 .conn-anim-pop-in {
-	animation: conn-pop-in 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: conn-pop-in 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 @keyframes conn-dropdown-in {
-	0% {
-		opacity: 0;
-		transform: scale(0.95) translateY(-6px);
-	}
-	100% {
-		opacity: 1;
-		transform: scale(1) translateY(0);
-	}
+    0% {
+        opacity: 0;
+        transform: scale(0.95) translateY(-6px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
 }
 .conn-anim-dropdown-in {
-	animation: conn-dropdown-in 190ms cubic-bezier(0.16, 1, 0.3, 1) both;
-	transform-origin: top left;
+    animation: conn-dropdown-in 190ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    transform-origin: top left;
 }
 
 /* Connecting-state shimmer sweep (yellow-600 tint) */
 @keyframes conn-shimmer {
-	0% {
-		background-position: 160% 0;
-	}
-	100% {
-		background-position: -60% 0;
-	}
+    0% {
+        background-position: 160% 0;
+    }
+    100% {
+        background-position: -60% 0;
+    }
 }
 .conn-anim-shimmer {
-	background-image: linear-gradient(
-		100deg,
-		transparent 30%,
-		rgba(202, 138, 4, 0.22) 50%,
-		transparent 70%
-	);
-	background-size: 240% 100%;
-	animation: conn-shimmer 1.7s linear infinite;
+    background-image: linear-gradient(
+        100deg,
+        transparent 30%,
+        rgba(202, 138, 4, 0.22) 50%,
+        transparent 70%
+    );
+    background-size: 240% 100%;
+    animation: conn-shimmer 1.7s linear infinite;
 }
 
 /* Pulsing halo on port-row icon badges while the dropdown is open */
 @keyframes conn-port-glow {
-	0%,
-	100% {
-		box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.25);
-	}
-	50% {
-		box-shadow: 0 0 0 6px rgba(56, 189, 248, 0);
-	}
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.25);
+    }
+    50% {
+        box-shadow: 0 0 0 6px rgba(56, 189, 248, 0);
+    }
 }
 .conn-anim-port-glow {
-	animation: conn-port-glow 2.6s ease-out infinite;
+    animation: conn-port-glow 2.6s ease-out infinite;
 }

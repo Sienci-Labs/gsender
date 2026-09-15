@@ -21,76 +21,76 @@
  *
  */
 
-import get from "lodash/get";
-import pubsub from "pubsub-js";
-import { Component } from "react";
-import { connect } from "react-redux";
+import get from 'lodash/get';
+import pubsub from 'pubsub-js';
+import { Component } from 'react';
+import { connect } from 'react-redux';
 
 interface Props {
-	softLimitsEnabled?: boolean;
+    softLimitsEnabled?: boolean;
 }
 
 interface ControlAreaState {
-	showWarning: boolean;
-	$20: number;
+    showWarning: boolean;
+    $20: number;
 }
 
 /**
  * Control Area component displaying Soft Limits Warning.
  */
 class ControlArea extends Component<Props, ControlAreaState> {
-	pubsubTokens: string[] = [];
+    pubsubTokens: string[] = [];
 
-	state: ControlAreaState = {
-		showWarning: false,
-		$20: 0,
-	};
+    state: ControlAreaState = {
+        showWarning: false,
+        $20: 0,
+    };
 
-	componentDidMount() {
-		this.subscribe();
-	}
+    componentDidMount() {
+        this.subscribe();
+    }
 
-	componentWillUnmount() {
-		this.unsubscribe();
-	}
+    componentWillUnmount() {
+        this.unsubscribe();
+    }
 
-	subscribe() {
-		const tokens = [
-			pubsub.subscribe("softlimits:warning", () => {
-				this.setState({ showWarning: true });
-			}),
-			pubsub.subscribe("softlimits:ok", () => {
-				this.setState({ showWarning: false });
-			}),
-		];
-		this.pubsubTokens = this.pubsubTokens.concat(tokens);
-	}
+    subscribe() {
+        const tokens = [
+            pubsub.subscribe('softlimits:warning', () => {
+                this.setState({ showWarning: true });
+            }),
+            pubsub.subscribe('softlimits:ok', () => {
+                this.setState({ showWarning: false });
+            }),
+        ];
+        this.pubsubTokens = this.pubsubTokens.concat(tokens);
+    }
 
-	unsubscribe() {
-		this.pubsubTokens.forEach((token) => {
-			pubsub.unsubscribe(token);
-		});
-		this.pubsubTokens = [];
-	}
+    unsubscribe() {
+        this.pubsubTokens.forEach((token) => {
+            pubsub.unsubscribe(token);
+        });
+        this.pubsubTokens = [];
+    }
 
-	render() {
-		const { softLimitsEnabled } = this.props;
-		return (
-			<div>
-				{this.state.showWarning && softLimitsEnabled ? (
-					<div>Warning: Cut will leave soft limits!</div>
-				) : (
-					<div />
-				)}
-			</div>
-		);
-	}
+    render() {
+        const { softLimitsEnabled } = this.props;
+        return (
+            <div>
+                {this.state.showWarning && softLimitsEnabled ? (
+                    <div>Warning: Cut will leave soft limits!</div>
+                ) : (
+                    <div />
+                )}
+            </div>
+        );
+    }
 }
 
 export default connect((store) => {
-	const softLimitsEnabled =
-		get(store, "controller.settings.settings.$20") === "1";
-	return {
-		softLimitsEnabled,
-	};
+    const softLimitsEnabled =
+        get(store, 'controller.settings.settings.$20') === '1';
+    return {
+        softLimitsEnabled,
+    };
 })(ControlArea);

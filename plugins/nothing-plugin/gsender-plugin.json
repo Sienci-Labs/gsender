@@ -1,18 +1,18 @@
 {
-	"id": "com.sienci.nothing-plugin",
-	"name": "Nothing",
-	"description": "Does nothing and shows nothing (test plugin)",
-	"version": "0.1.0",
-	"engine": ">=1.6.0",
-	"ui": {
-		"entry": "ui/index.html",
-		"contributions": [
-			{
-				"slot": "tools-page",
-				"route": "nothing-plugin",
-				"label": "Nothing Plugin"
-			}
-		]
-	},
-	"capabilities": {}
+  "id": "com.sienci.nothing-plugin",
+  "name": "Nothing",
+  "description": "Does nothing and shows nothing (test plugin)",
+  "version": "0.1.0",
+  "engine": ">=1.6.0",
+  "ui": {
+    "entry": "ui/index.html",
+    "contributions": [
+      {
+        "slot": "tools-page",
+        "route": "nothing-plugin",
+        "label": "Nothing Plugin"
+      }
+    ]
+  },
+  "capabilities": {}
 }

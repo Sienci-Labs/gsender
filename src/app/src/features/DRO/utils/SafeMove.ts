@@ -1,6 +1,6 @@
-import controller from "app/lib/controller";
-import store from "app/store";
-import get from "lodash/get";
+import controller from 'app/lib/controller';
+import store from 'app/store';
+import get from 'lodash/get';
 
 /**
  * Build the gcode lines required to retract Z to the user's configured safe
@@ -16,28 +16,28 @@ import get from "lodash/get";
  * Returns an empty array when no retract height is configured.
  */
 export function getSafeRetractCode(): string[] {
-	const code: string[] = [];
-	const retractHeight = Number(store.get("workspace.safeRetractHeight", -1));
+    const code: string[] = [];
+    const retractHeight = Number(store.get('workspace.safeRetractHeight', -1));
 
-	if (retractHeight === 0) {
-		return code;
-	}
+    if (retractHeight === 0) {
+        return code;
+    }
 
-	const settings = get(controller.settings, "settings", {});
-	const homingEnabled = Number(get(settings, "$22", 0)) !== 0;
+    const settings = get(controller.settings, 'settings', {});
+    const homingEnabled = Number(get(settings, '$22', 0)) !== 0;
 
-	if (homingEnabled) {
-		const currentZ = Number(get(controller, "state.status.mpos.z", 0));
-		const retract = Math.abs(retractHeight) * -1;
-		if (currentZ < retract) {
-			code.push(`G53 G0 Z${retract}`);
-		}
-	} else {
-		code.push("G91");
-		code.push(`G0Z${retractHeight}`);
-	}
+    if (homingEnabled) {
+        const currentZ = Number(get(controller, 'state.status.mpos.z', 0));
+        const retract = Math.abs(retractHeight) * -1;
+        if (currentZ < retract) {
+            code.push(`G53 G0 Z${retract}`);
+        }
+    } else {
+        code.push('G91');
+        code.push(`G0Z${retractHeight}`);
+    }
 
-	return code;
+    return code;
 }
 
 /**
@@ -47,7 +47,7 @@ export function getSafeRetractCode(): string[] {
  * plunged back down. Coordinates are absolute work coordinates in millimetres.
  */
 export function getSafeXYMoveCode(x: number, y: number): string[] {
-	const code = getSafeRetractCode();
-	code.push("G90", `G0 X${x} Y${y}`);
-	return code;
+    const code = getSafeRetractCode();
+    code.push('G90', `G0 X${x} Y${y}`);
+    return code;
 }

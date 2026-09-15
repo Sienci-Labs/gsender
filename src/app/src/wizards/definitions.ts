@@ -1,5 +1,5 @@
 /** biome-ignore-all lint/suspicious/noExplicitAny: <> */
-import type { JSX } from "react";
+import type { JSX } from 'react';
 
 export interface WizardStep {
     title: string;
@@ -11,11 +11,11 @@ export interface WizardStep {
         actions?: {
             label: string;
             gcodeLines?: string[];
-            cb?: () => void,
+            cb?: () => void;
         }[];
         actionTaken?: boolean;
     }[];
-};
+}
 
 export interface WizardInstructions {
     intro: {

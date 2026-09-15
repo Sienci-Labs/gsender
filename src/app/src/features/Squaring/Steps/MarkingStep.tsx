@@ -1,154 +1,176 @@
 /** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
-import Button from "app/components/Button";
-import { ControlledInput } from "app/components/ControlledInput";
+import Button from 'app/components/Button';
+import { ControlledInput } from 'app/components/ControlledInput';
 import {
-	GRBL_ACTIVE_STATE_RUN,
-	GRBL_HAL_ACTIVE_STATE_RUN,
-} from "app/constants";
-import { useTypedSelector } from "app/hooks/useTypedSelector";
-import { useWorkspaceState } from "app/hooks/useWorkspaceState";
-import { useEffect } from "react";
-import { FaClipboard, FaClipboardCheck, FaClipboardList } from "react-icons/fa";
-import { useSquaring } from "../context/SquaringContext";
+    GRBL_ACTIVE_STATE_RUN,
+    GRBL_HAL_ACTIVE_STATE_RUN,
+} from 'app/constants';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { useEffect } from 'react';
+import { FaClipboard, FaClipboardCheck, FaClipboardList } from 'react-icons/fa';
+import { useSquaring } from '../context/SquaringContext';
 
 interface Props {
-	onComplete: () => void;
+    onComplete: () => void;
 }
 
 const MarkingStep = ({ onComplete }: Props) => {
-	const {
-		mainSteps,
-		currentMainStep,
-		currentSubStep,
-		completeStep,
-		updateStepValue,
-		jogMachine,
-		isCurrentStepComplete,
-	} = useSquaring();
-	const { units } = useWorkspaceState();
-	const status = useTypedSelector((state) => state.controller.state.status);
+    const {
+        mainSteps,
+        currentMainStep,
+        currentSubStep,
+        completeStep,
+        updateStepValue,
+        jogMachine,
+        isCurrentStepComplete,
+    } = useSquaring();
+    const { units } = useWorkspaceState();
+    const status = useTypedSelector((state) => state.controller.state.status);
 
-	const machineIsMoving =
-		status?.activeState === GRBL_ACTIVE_STATE_RUN ||
-		status?.activeState === GRBL_HAL_ACTIVE_STATE_RUN;
-	const currentMainStepData = mainSteps[currentMainStep];
-	const currentSubStepData = currentMainStepData.subSteps[currentSubStep];
+    const machineIsMoving =
+        status?.activeState === GRBL_ACTIVE_STATE_RUN ||
+        status?.activeState === GRBL_HAL_ACTIVE_STATE_RUN;
+    const currentMainStepData = mainSteps[currentMainStep];
+    const currentSubStepData = currentMainStepData.subSteps[currentSubStep];
 
-	useEffect(() => {
-		if (isCurrentStepComplete) {
-			onComplete();
-		}
-	}, [isCurrentStepComplete]);
+    useEffect(() => {
+        if (isCurrentStepComplete) {
+            onComplete();
+        }
+    }, [isCurrentStepComplete]);
 
-	const handleStepComplete = (buttonLabel: string) => {
-		completeStep(buttonLabel);
-		// if (isCurrentStepComplete()) {
-		// 	onComplete();
-		// }
-	};
+    const handleStepComplete = (buttonLabel: string) => {
+        completeStep(buttonLabel);
+        // if (isCurrentStepComplete()) {
+        // 	onComplete();
+        // }
+    };
 
-	const handleJog = (buttonLabel: string, value: number, axis: string) => {
-		jogMachine(axis, value, units ?? "mm");
-		handleStepComplete(buttonLabel);
-	};
+    const handleJog = (buttonLabel: string, value: number, axis: string) => {
+        jogMachine(axis, value, units ?? 'mm');
+        handleStepComplete(buttonLabel);
+    };
 
-	return (
-		<div className="w-full grid gap-4 grid-cols-1 items-start">
-			<div className="flex flex-col gap-4">
-				<div className="space-y-1">
-					<h3 className="text-lg font-semibold dark:text-content-primary">
-						Instructions
-					</h3>
-					<p className="text-gray-600 dark:text-content-primary h-20">
-						{currentSubStepData.description}
-					</p>
-				</div>
+    return (
+        <div className="w-full grid gap-4 grid-cols-1 items-start">
+            <div className="flex flex-col gap-4">
+                <div className="space-y-1">
+                    <h3 className="text-lg font-semibold dark:text-content-primary">
+                        Instructions
+                    </h3>
+                    <p className="text-gray-600 dark:text-content-primary h-20">
+                        {currentSubStepData.description}
+                    </p>
+                </div>
 
-				<div className="space-y-1 xl:space-y-2">
-					{currentMainStepData.subSteps.map((step, index) => {
-						const isCurrentStep = index === currentSubStep && !step.completed;
-						const isPastStep = index < currentSubStep || step.completed;
-						const isMovementStep = step.buttonLabel.includes("Move");
+                <div className="space-y-1 xl:space-y-2">
+                    {currentMainStepData.subSteps.map((step, index) => {
+                        const isCurrentStep =
+                            index === currentSubStep && !step.completed;
+                        const isPastStep =
+                            index < currentSubStep || step.completed;
+                        const isMovementStep =
+                            step.buttonLabel.includes('Move');
 
-						return (
-							<div
-								key={step.buttonLabel}
-								className={`flex items-center gap-4 p-2 rounded-lg transition-colors w-1/2 ${
-									isCurrentStep
-										? "bg-blue-50 border border-blue-200 bg-opacity-40"
-										: isPastStep
-											? "bg-green-50 border border-green-200 bg-opacity-30"
-											: "bg-amber-600 border border-amber-600 bg-opacity-10 border-opacity-10 opacity-50 dark:bg-surface-raised dark:border-outline"
-								}`}
-							>
-								<div className={`min-w-8 min-h-8 text-white`}>
-									{isPastStep && (
-										<FaClipboardCheck className="min-w-8 min-h-8 text-green-500 " />
-									)}
-									{!isCurrentStep && !isPastStep && (
-										<FaClipboard className="min-w-8 min-h-8 text-amber-600 dark:text-content-muted" />
-									)}
-									{isCurrentStep && (
-										<FaClipboardList className="min-w-8 min-h-8 text-blue-500 " />
-									)}
-								</div>
-								<div className="flex flex-col gap-2 flex-1">
-									<div className="flex items-center gap-4">
-										<Button
-											disabled={
-												!isCurrentStep || step.completed || machineIsMoving
-											}
-											onClick={() => {
-												if (isMovementStep && step.value !== undefined) {
-													const axis = step.buttonLabel.includes("X")
-														? "X"
-														: "Y";
-													handleJog(step.buttonLabel, step.value, axis);
-												} else {
-													handleStepComplete(step.buttonLabel);
-												}
-											}}
-											variant={step.buttonVariant}
-											testId={`sq-mark-location-${step}-${index}`}
-										>
-											{step.buttonLabel}
-										</Button>
+                        return (
+                            <div
+                                key={step.buttonLabel}
+                                className={`flex items-center gap-4 p-2 rounded-lg transition-colors w-1/2 ${
+                                    isCurrentStep
+                                        ? 'bg-blue-50 border border-blue-200 bg-opacity-40'
+                                        : isPastStep
+                                          ? 'bg-green-50 border border-green-200 bg-opacity-30'
+                                          : 'bg-amber-600 border border-amber-600 bg-opacity-10 border-opacity-10 opacity-50 dark:bg-surface-raised dark:border-outline'
+                                }`}
+                            >
+                                <div className={`min-w-8 min-h-8 text-white`}>
+                                    {isPastStep && (
+                                        <FaClipboardCheck className="min-w-8 min-h-8 text-green-500 " />
+                                    )}
+                                    {!isCurrentStep && !isPastStep && (
+                                        <FaClipboard className="min-w-8 min-h-8 text-amber-600 dark:text-content-muted" />
+                                    )}
+                                    {isCurrentStep && (
+                                        <FaClipboardList className="min-w-8 min-h-8 text-blue-500 " />
+                                    )}
+                                </div>
+                                <div className="flex flex-col gap-2 flex-1">
+                                    <div className="flex items-center gap-4">
+                                        <Button
+                                            disabled={
+                                                !isCurrentStep ||
+                                                step.completed ||
+                                                machineIsMoving
+                                            }
+                                            onClick={() => {
+                                                if (
+                                                    isMovementStep &&
+                                                    step.value !== undefined
+                                                ) {
+                                                    const axis =
+                                                        step.buttonLabel.includes(
+                                                            'X',
+                                                        )
+                                                            ? 'X'
+                                                            : 'Y';
+                                                    handleJog(
+                                                        step.buttonLabel,
+                                                        step.value,
+                                                        axis,
+                                                    );
+                                                } else {
+                                                    handleStepComplete(
+                                                        step.buttonLabel,
+                                                    );
+                                                }
+                                            }}
+                                            variant={step.buttonVariant}
+                                            testId={`sq-mark-location-${step}-${index}`}
+                                        >
+                                            {step.buttonLabel}
+                                        </Button>
 
-										<div className="flex items-center gap-2">
-											{step.value !== undefined ? (
-												<div className="flex items-center gap-2">
-													<ControlledInput
-														type="number"
-														value={step.value}
-														onChange={(e) =>
-															updateStepValue(
-																step.buttonLabel,
-																Number(e.target.value),
-															)
-														}
-														disabled={!isCurrentStep}
-														suffix={units ?? "mm"}
-														data-testid={`sq-move-distance-input-${index}`}
-													/>
-												</div>
-											) : (
-												step.output
-											)}
-										</div>
-									</div>
-								</div>
-							</div>
-						);
-					})}
-				</div>
-			</div>
+                                        <div className="flex items-center gap-2">
+                                            {step.value !== undefined ? (
+                                                <div className="flex items-center gap-2">
+                                                    <ControlledInput
+                                                        type="number"
+                                                        value={step.value}
+                                                        onChange={(e) =>
+                                                            updateStepValue(
+                                                                step.buttonLabel,
+                                                                Number(
+                                                                    e.target
+                                                                        .value,
+                                                                ),
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            !isCurrentStep
+                                                        }
+                                                        suffix={units ?? 'mm'}
+                                                        data-testid={`sq-move-distance-input-${index}`}
+                                                    />
+                                                </div>
+                                            ) : (
+                                                step.output
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
 
-			{/* <div className="flex flex-col items-center gap-4">
+            {/* <div className="flex flex-col items-center gap-4">
 				<h3 className="text-lg font-semibold dark:text-content-primary">Diagram</h3>
 				<TriangleDiagram />
 			</div> */}
-		</div>
-	);
+        </div>
+    );
 };
 
 export default MarkingStep;

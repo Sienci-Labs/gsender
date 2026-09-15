@@ -1,67 +1,68 @@
-import { StepActionButton } from "app/components/Wizard/StepActionButton.tsx";
-import type { StepProps } from "app/components/Wizard/types";
-import { ATCI_SUPPORTED_VERSION } from "app/features/ATC/utils/ATCiConstants.ts";
-import { useTypedSelector } from "app/hooks/useTypedSelector.ts";
-import controller from "app/lib/controller.ts";
-import { firmwarePastVersion } from "app/lib/firmwareSemver.ts";
-import type { RootState } from "app/store/redux";
-import { useState } from "react";
+import { StepActionButton } from 'app/components/Wizard/StepActionButton.tsx';
+import type { StepProps } from 'app/components/Wizard/types';
+import { ATCI_SUPPORTED_VERSION } from 'app/features/ATC/utils/ATCiConstants.ts';
+import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import controller from 'app/lib/controller.ts';
+import { firmwarePastVersion } from 'app/lib/firmwareSemver.ts';
+import type { RootState } from 'app/store/redux';
+import { useState } from 'react';
 
 export function ModbusConfig({ onComplete, onUncomplete }: StepProps) {
-	const [hasConfiguredModbus, setHasConfiguredModbus] =
-		useState<boolean>(false);
-	const [error, setError] = useState<string | null>(null);
+    const [hasConfiguredModbus, setHasConfiguredModbus] =
+        useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
 
-	const isConnected = useTypedSelector(
-		(state: RootState) => state.connection.isConnected,
-	);
+    const isConnected = useTypedSelector(
+        (state: RootState) => state.connection.isConnected,
+    );
 
-	async function configureModbusEEPROM() {
-		const code = ["$476=2"];
+    async function configureModbusEEPROM() {
+        const code = ['$476=2'];
 
-		if (firmwarePastVersion(ATCI_SUPPORTED_VERSION)) {
-			code.push("$REBOOT");
-		}
+        if (firmwarePastVersion(ATCI_SUPPORTED_VERSION)) {
+            code.push('$REBOOT');
+        }
 
-		controller.command("gcode", code);
-	}
+        controller.command('gcode', code);
+    }
 
-	async function configureModbus() {
-		await configureModbusEEPROM();
-		setTimeout(() => {
-			setHasConfiguredModbus(true);
-			onComplete();
-		}, 1500);
-	}
+    async function configureModbus() {
+        await configureModbusEEPROM();
+        setTimeout(() => {
+            setHasConfiguredModbus(true);
+            onComplete();
+        }, 1500);
+    }
 
-	return (
-		<div className="flex flex-col gap-5 justify-start">
-			<p className="text-gray-900 dark:text-content-primary">
-				<b>
-					You are able to complete this step while the controller is still
-					alarmed
-				</b>
-			</p>
-			<p className="dark:text-content-primary">
-				Additional spindle settings are applied in this step.
-			</p>
-			<ol className="list-decimal p-5 gap-4 space-y-2">
-				<li>
-					Reconnect to your controller. Please ignore any alarms that pop-up.
-				</li>
-				<li>
-					Press <b>"Apply and Restart"</b>
-				</li>
-			</ol>
-			<StepActionButton
-				label="Configure Modbus"
-				runningLabel="Configuring..."
-				onApply={configureModbus}
-				isComplete={hasConfiguredModbus}
-				error={error}
-				disabled={!isConnected}
-				data-testid="ss-configure-modbus"
-			/>
-		</div>
-	);
+    return (
+        <div className="flex flex-col gap-5 justify-start">
+            <p className="text-gray-900 dark:text-content-primary">
+                <b>
+                    You are able to complete this step while the controller is
+                    still alarmed
+                </b>
+            </p>
+            <p className="dark:text-content-primary">
+                Additional spindle settings are applied in this step.
+            </p>
+            <ol className="list-decimal p-5 gap-4 space-y-2">
+                <li>
+                    Reconnect to your controller. Please ignore any alarms that
+                    pop-up.
+                </li>
+                <li>
+                    Press <b>"Apply and Restart"</b>
+                </li>
+            </ol>
+            <StepActionButton
+                label="Configure Modbus"
+                runningLabel="Configuring..."
+                onApply={configureModbus}
+                isComplete={hasConfiguredModbus}
+                error={error}
+                disabled={!isConnected}
+                data-testid="ss-configure-modbus"
+            />
+        </div>
+    );
 }

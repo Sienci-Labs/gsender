@@ -1,103 +1,112 @@
 /** biome-ignore-all lint/a11y/noLabelWithoutControl: <> */
-import { StepActionButton } from "app/components/Wizard/StepActionButton.tsx";
-import type { StepProps } from "app/components/Wizard/types";
-import { generateAllMacros } from "app/features/ATC/components/Configuration/utils/ConfigUtils.ts";
-import controller from "app/lib/controller";
-import store from "app/store";
-import { type SetStateAction, useEffect, useState } from "react";
+import { StepActionButton } from 'app/components/Wizard/StepActionButton.tsx';
+import type { StepProps } from 'app/components/Wizard/types';
+import { generateAllMacros } from 'app/features/ATC/components/Configuration/utils/ConfigUtils.ts';
+import controller from 'app/lib/controller';
+import store from 'app/store';
+import { type SetStateAction, useEffect, useState } from 'react';
 
 export function MacroConfiguration({ onComplete }: StepProps) {
-	const [rackSize, setRackSize] = useState<number | string>(6);
-	const [isComplete, setIsComplete] = useState<boolean>(false);
-	const [error, setError] = useState<string | null>(null);
-	const [success, setSuccess] = useState<string | null>(null);
+    const [rackSize, setRackSize] = useState<number | string>(6);
+    const [isComplete, setIsComplete] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<string | null>(null);
 
-	useEffect(() => {
-		const handleYmodemComplete = () => {
-			setIsComplete(true);
-			setError(null);
-			setSuccess("Successfully uploaded macro configuration to the SD card.");
-			onComplete();
-			setTimeout(() => {
-				setIsComplete(false);
-			}, 2000);
-		};
-		const handleYmodemError = (err: SetStateAction<string>) => {
-			setError(err);
-			setTimeout(() => {
-				setIsComplete(false);
-				setError(null);
-				setSuccess(null);
-			}, 5000);
-		};
+    useEffect(() => {
+        const handleYmodemComplete = () => {
+            setIsComplete(true);
+            setError(null);
+            setSuccess(
+                'Successfully uploaded macro configuration to the SD card.',
+            );
+            onComplete();
+            setTimeout(() => {
+                setIsComplete(false);
+            }, 2000);
+        };
+        const handleYmodemError = (err: SetStateAction<string>) => {
+            setError(err);
+            setTimeout(() => {
+                setIsComplete(false);
+                setError(null);
+                setSuccess(null);
+            }, 5000);
+        };
 
-		controller.addListener("ymodem:complete", handleYmodemComplete);
-		controller.addListener("ymodem:error", handleYmodemError);
+        controller.addListener('ymodem:complete', handleYmodemComplete);
+        controller.addListener('ymodem:error', handleYmodemError);
 
-		return () => {
-			controller.removeListener("ymodem:complete", handleYmodemComplete);
-			controller.removeListener("ymodem:error", handleYmodemError);
-		};
-	}, [onComplete]);
+        return () => {
+            controller.removeListener('ymodem:complete', handleYmodemComplete);
+            controller.removeListener('ymodem:error', handleYmodemError);
+        };
+    }, [onComplete]);
 
-	const handleUpload = async () => {
-		if (rackSize === "0") {
-			store.set("widgets.atc.templates.variables._tc_rack_enable.value", 0);
-			store.set("widgets.atc.templates.variables._tc_slots.value", 0);
-		} else {
-			// just set tool rack size to valid number, do we need to set TOOL_RACK = 1?
-			// No reason not to
-			store.set("widgets.atc.templates.variables._tc_rack_enable.value", 1);
-			store.set(
-				"widgets.atc.templates.variables._tc_slots.value",
-				Number(rackSize),
-			);
-		}
+    const handleUpload = async () => {
+        if (rackSize === '0') {
+            store.set(
+                'widgets.atc.templates.variables._tc_rack_enable.value',
+                0,
+            );
+            store.set('widgets.atc.templates.variables._tc_slots.value', 0);
+        } else {
+            // just set tool rack size to valid number, do we need to set TOOL_RACK = 1?
+            // No reason not to
+            store.set(
+                'widgets.atc.templates.variables._tc_rack_enable.value',
+                1,
+            );
+            store.set(
+                'widgets.atc.templates.variables._tc_slots.value',
+                Number(rackSize),
+            );
+        }
 
-		// start macros copying over
-		const config = store.get("widgets.atc.templates");
-		const content = generateAllMacros(config, false); // To Clarify with Johann - We can't just use defaults here
+        // start macros copying over
+        const config = store.get('widgets.atc.templates');
+        const content = generateAllMacros(config, false); // To Clarify with Johann - We can't just use defaults here
 
-		setSuccess(null);
-		setError(null);
-		controller.command("ymodem:uploadFiles", content);
-		//await new Promise((resolve) => setTimeout(resolve, 2000));
-	};
+        setSuccess(null);
+        setError(null);
+        controller.command('ymodem:uploadFiles', content);
+        //await new Promise((resolve) => setTimeout(resolve, 2000));
+    };
 
-	return (
-		<div className="flex flex-col gap-5 justify-start">
-			<div>
-				<label className="block text-sm font-semibold text-gray-900 dark:text-content-muted mb-2">
-					Rack Size
-				</label>
-				<select
-					value={rackSize}
-					onChange={(e) => setRackSize(e.target.value)}
-					className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-				>
-					<option value={0}>No tool rack</option>
-					<option value={6}>6 Tool Rack</option>
-					<option value={12}>12 Tool Rack</option>
-				</select>
-			</div>
-			<p className="dark:text-content-primary">
-				Sienci ATC operates using a set of macro programs stored in the micro SD
-				card of your controller.
-			</p>
+    return (
+        <div className="flex flex-col gap-5 justify-start">
+            <div>
+                <label className="block text-sm font-semibold text-gray-900 dark:text-content-muted mb-2">
+                    Rack Size
+                </label>
+                <select
+                    value={rackSize}
+                    onChange={(e) => setRackSize(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                    <option value={0}>No tool rack</option>
+                    <option value={6}>6 Tool Rack</option>
+                    <option value={12}>12 Tool Rack</option>
+                </select>
+            </div>
+            <p className="dark:text-content-primary">
+                Sienci ATC operates using a set of macro programs stored in the
+                micro SD card of your controller.
+            </p>
 
-			<p className="dark:text-content-primary">
-				Specify your rack size and press <b>“Upload Macros”</b> to upload the
-				relevant program files into the SD card. This can be changed later.
-			</p>
+            <p className="dark:text-content-primary">
+                Specify your rack size and press <b>“Upload Macros”</b> to
+                upload the relevant program files into the SD card. This can be
+                changed later.
+            </p>
 
-			<StepActionButton
-				label={"Upload Macros"}
-				runningLabel="Uploading..."
-				onApply={handleUpload}
-				isComplete={isComplete}
-				error={error}
-				success={success}
-			/>
-		</div>
-	);
+            <StepActionButton
+                label={'Upload Macros'}
+                runningLabel="Uploading..."
+                onApply={handleUpload}
+                isComplete={isComplete}
+                error={error}
+                success={success}
+            />
+        </div>
+    );
 }

@@ -5,50 +5,50 @@
  */
 
 export interface GcodeFilePayload {
-	path: string;
-	name: string;
-	size: number;
-	content: string;
+    path: string;
+    name: string;
+    size: number;
+    content: string;
 }
 
 interface PendantAPI {
-	isElectron: true;
-	getHost: () => Promise<string | undefined>;
-	pickGcodeFile: () => Promise<GcodeFilePayload | undefined>;
-	readGcodeFile: (path: string) => Promise<GcodeFilePayload | undefined>;
-	quitApp: () => void;
+    isElectron: true;
+    getHost: () => Promise<string | undefined>;
+    pickGcodeFile: () => Promise<GcodeFilePayload | undefined>;
+    readGcodeFile: (path: string) => Promise<GcodeFilePayload | undefined>;
+    quitApp: () => void;
 }
 
 declare global {
-	interface Window {
-		pendantAPI?: PendantAPI;
-	}
+    interface Window {
+        pendantAPI?: PendantAPI;
+    }
 }
 
 const api = (): PendantAPI | undefined =>
-	typeof window !== "undefined" ? window.pendantAPI : undefined;
+    typeof window !== 'undefined' ? window.pendantAPI : undefined;
 
 /** True when running inside the Electron pendant binary. */
 export const isElectron = (): boolean => !!api()?.isElectron;
 
 /** Returns the stored gSender host (e.g. "127.0.0.1:8000"), or undefined in browser. */
 export async function getHost(): Promise<string | undefined> {
-	return api()?.getHost();
+    return api()?.getHost();
 }
 
 /** Opens a native file picker and returns selected G-code file data. */
 export async function pickGcodeFile(): Promise<GcodeFilePayload | undefined> {
-	return api()?.pickGcodeFile();
+    return api()?.pickGcodeFile();
 }
 
 /** Reads a G-code file from an absolute path on disk (recent-file reload path). */
 export async function readGcodeFile(
-	path: string,
+    path: string,
 ): Promise<GcodeFilePayload | undefined> {
-	return api()?.readGcodeFile(path);
+    return api()?.readGcodeFile(path);
 }
 
 /** Quits the Electron app (pendant binary or desktop app embedding the pendant view). */
 export function quitApp(): void {
-	api()?.quitApp();
+    api()?.quitApp();
 }

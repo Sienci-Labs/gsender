@@ -21,7 +21,7 @@
  *
  */
 
-import type { OverlayMarker } from "app/features/Plugins/types";
+import type { OverlayMarker } from 'app/features/Plugins/types';
 
 // Imperative surface the primary visualizer exposes to the plugin bridge so
 // sandboxed plugin iframes (which can never touch the canvas directly) can pick
@@ -30,28 +30,28 @@ import type { OverlayMarker } from "app/features/Plugins/types";
 // bridge (`viewer:*` requests) resolves against whatever handle is currently
 // registered.
 export interface VisualizerBridgeHandle {
-	screenToWorld(
-		px: number,
-		py: number,
-	): { x: number; y: number; z: number } | null;
-	worldToScreen(
-		x: number,
-		y: number,
-		z?: number,
-	): { x: number; y: number } | null;
-	setRotateEnabled(on: boolean): void;
-	setCameraView(view: "top" | "3d" | "front" | "left" | "right"): void;
-	isRotaryFile(): boolean;
-	armPick(
-		mode: "click" | "hold",
-		onPick: (p: {
-			world: { x: number; y: number; z: number };
-			screen: { x: number; y: number };
-		}) => void,
-		onHoldProgress?: (t: number) => void,
-	): void;
-	disarmPick(): void;
-	setOverlay(markers: OverlayMarker[]): void;
+    screenToWorld(
+        px: number,
+        py: number,
+    ): { x: number; y: number; z: number } | null;
+    worldToScreen(
+        x: number,
+        y: number,
+        z?: number,
+    ): { x: number; y: number } | null;
+    setRotateEnabled(on: boolean): void;
+    setCameraView(view: 'top' | '3d' | 'front' | 'left' | 'right'): void;
+    isRotaryFile(): boolean;
+    armPick(
+        mode: 'click' | 'hold',
+        onPick: (p: {
+            world: { x: number; y: number; z: number };
+            screen: { x: number; y: number };
+        }) => void,
+        onHoldProgress?: (t: number) => void,
+    ): void;
+    disarmPick(): void;
+    setOverlay(markers: OverlayMarker[]): void;
 }
 
 // Only the PRIMARY viewer registers a handle; the secondary (surfacing preview)
@@ -59,17 +59,17 @@ export interface VisualizerBridgeHandle {
 let current: VisualizerBridgeHandle | null = null;
 
 export const visualizerBridge = {
-	register(handle: VisualizerBridgeHandle): void {
-		current = handle;
-	},
-	unregister(handle: VisualizerBridgeHandle): void {
-		// Guard against a late-unmounting stale viewer clobbering a freshly
-		// registered one.
-		if (current === handle) {
-			current = null;
-		}
-	},
-	get(): VisualizerBridgeHandle | null {
-		return current;
-	},
+    register(handle: VisualizerBridgeHandle): void {
+        current = handle;
+    },
+    unregister(handle: VisualizerBridgeHandle): void {
+        // Guard against a late-unmounting stale viewer clobbering a freshly
+        // registered one.
+        if (current === handle) {
+            current = null;
+        }
+    },
+    get(): VisualizerBridgeHandle | null {
+        return current;
+    },
 };

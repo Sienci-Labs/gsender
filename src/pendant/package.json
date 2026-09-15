@@ -1,11 +1,11 @@
 {
-	"name": "gsender-pendant",
-	"version": "0.1.0",
-	"private": true,
-	"type": "module",
-	"scripts": {
-		"dev": "vite",
-		"build": "npm run build:client",
-		"build:client": "vite build --outDir ../../dist/gsender/pendant --emptyOutDir"
-	}
+  "name": "gsender-pendant",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run build:client",
+    "build:client": "vite build --outDir ../../dist/gsender/pendant --emptyOutDir"
+  }
 }

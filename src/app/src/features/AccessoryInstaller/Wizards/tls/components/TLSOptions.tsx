@@ -1,40 +1,40 @@
-import { useSelector } from 'react-redux';
-import get from 'lodash/get';
+import { StepActionButton } from 'app/components/Wizard/StepActionButton.tsx';
+import { StepProps } from 'app/components/Wizard/types';
+import { ATCI_SUPPORTED_VERSION } from 'app/features/ATC/utils/ATCiConstants.ts';
+import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
+import controller from 'app/lib/controller.ts';
+import { firmwarePastVersion } from 'app/lib/firmwareSemver.ts';
+import store from 'app/store';
 import { RootState } from 'app/store/redux';
 import { FirstToolBehavior } from 'app/workspace/definitions';
-import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
-import controller from "app/lib/controller.ts";
-import { firmwarePastVersion } from "app/lib/firmwareSemver.ts";
-import store from "app/store";
-import pubsub from "pubsub-js";
-import { useState } from "react";
-import {ATCI_SUPPORTED_VERSION} from "app/features/ATC/utils/ATCiConstants.ts";
-import {StepActionButton} from "app/components/Wizard/StepActionButton.tsx";
-import {StepProps} from "app/components/Wizard/types";
+import get from 'lodash/get';
+import pubsub from 'pubsub-js';
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
 
 const FIRST_TOOL_BEHAVIOUR_OPTIONS: FirstToolBehavior[] = [
-	"Always run full wizard",
-	"Prompt for first tool",
-	"Always probe length only",
+    'Always run full wizard',
+    'Prompt for first tool',
+    'Always probe length only',
 ];
 
 const FIRST_TOOL_BEHAVIOUR_EXPLANATIONS: Record<FirstToolBehavior, string> = {
-	"Always run full wizard":
-		"Runs the complete tool change process every time, including for the first tool.",
-	"Prompt for first tool":
-		"Asks whether to run the full wizard or just probe the current tool length for the first tool change.",
-	"Always probe length only":
-		"Skips the tool change prompt and only measures the current tool for the first tool change.",
+    'Always run full wizard':
+        'Runs the complete tool change process every time, including for the first tool.',
+    'Prompt for first tool':
+        'Asks whether to run the full wizard or just probe the current tool length for the first tool change.',
+    'Always probe length only':
+        'Skips the tool change prompt and only measures the current tool for the first tool change.',
 };
 
 export function TLSOptions({ onComplete, onUncomplete }: StepProps) {
-	const [error, setError] = useState<string>("");
-	const [isComplete, setIsComplete] = useState<boolean>(false);
-	const [success, setSuccess] = useState<string | null>(null);
+    const [error, setError] = useState<string>('');
+    const [isComplete, setIsComplete] = useState<boolean>(false);
+    const [success, setSuccess] = useState<string | null>(null);
 
-	const [customLocation, setCustomLocation] = useState<boolean>(true);
-	const [firstToolBehaviour, setFirstToolBehaviour] =
-		useState<FirstToolBehavior>("Prompt for first tool");
+    const [customLocation, setCustomLocation] = useState<boolean>(true);
+    const [firstToolBehaviour, setFirstToolBehaviour] =
+        useState<FirstToolBehavior>('Prompt for first tool');
 
     const boardId = useSelector(
         (state: RootState) => state.controller.settings.info?.BOARD,
@@ -59,77 +59,83 @@ export function TLSOptions({ onComplete, onUncomplete }: StepProps) {
         code.push('$$');
         controller.command('gcode', code);
 
-		store.set("workspace.toolChangeOption", "Fixed Tool Sensor");
-		store.set("workspace.toolChange.moveToManualPosition", customLocation);
-		store.set("workspace.toolChange.firstToolBehaviour", firstToolBehaviour);
-		store.set("workspace.toolChange.passthrough", false);
-		store.set("widgets.probe.probeFastFeedrate", 1000);
-		updateToolchangeContext();
-		pubsub.publish("repopulate");
-		setSuccess("Tool change options configured.");
-		setIsComplete(true);
-		onComplete();
-	};
+        store.set('workspace.toolChangeOption', 'Fixed Tool Sensor');
+        store.set('workspace.toolChange.moveToManualPosition', customLocation);
+        store.set(
+            'workspace.toolChange.firstToolBehaviour',
+            firstToolBehaviour,
+        );
+        store.set('workspace.toolChange.passthrough', false);
+        store.set('widgets.probe.probeFastFeedrate', 1000);
+        updateToolchangeContext();
+        pubsub.publish('repopulate');
+        setSuccess('Tool change options configured.');
+        setIsComplete(true);
+        onComplete();
+    };
 
-	return (
-		<div className="flex flex-col gap-5 justify-start">
-			<p className="dark:text-content-primary">
-				Configure how gSender should handle tool changes with your Tool Length
-				Sensor (TLS).
-			</p>
+    return (
+        <div className="flex flex-col gap-5 justify-start">
+            <p className="dark:text-content-primary">
+                Configure how gSender should handle tool changes with your Tool
+                Length Sensor (TLS).
+            </p>
 
-			<div>
-				<label className="block text-sm font-semibold text-gray-900 dark:text-content-primary mb-2">
-					First tool behaviour
-				</label>
-				<select
-					value={firstToolBehaviour}
-					onChange={(e) =>
-						setFirstToolBehaviour(e.target.value as FirstToolBehavior)
-					}
-					className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-				>
-					{FIRST_TOOL_BEHAVIOUR_OPTIONS.map((option) => (
-						<option key={option} value={option}>
-							{option}
-						</option>
-					))}
-				</select>
-				<p className="text-sm text-gray-600 dark:text-content-secondary mt-2">
-					{FIRST_TOOL_BEHAVIOUR_EXPLANATIONS[firstToolBehaviour]}
-				</p>
-			</div>
+            <div>
+                <label className="block text-sm font-semibold text-gray-900 dark:text-content-primary mb-2">
+                    First tool behaviour
+                </label>
+                <select
+                    value={firstToolBehaviour}
+                    onChange={(e) =>
+                        setFirstToolBehaviour(
+                            e.target.value as FirstToolBehavior,
+                        )
+                    }
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                    {FIRST_TOOL_BEHAVIOUR_OPTIONS.map((option) => (
+                        <option key={option} value={option}>
+                            {option}
+                        </option>
+                    ))}
+                </select>
+                <p className="text-sm text-gray-600 dark:text-content-secondary mt-2">
+                    {FIRST_TOOL_BEHAVIOUR_EXPLANATIONS[firstToolBehaviour]}
+                </p>
+            </div>
 
-			<label className="flex items-start gap-3 cursor-pointer">
-				<input
-					type="checkbox"
-					checked={customLocation}
-					onChange={(e) => setCustomLocation(e.target.checked)}
-					className="w-6 h-6 mt-0.5 shrink-0 rounded-md border-2 border-gray-300 accent-blue-500 cursor-pointer transition-colors hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-				/>
-				<span>
-					<span className="block text-lg font-semibold text-gray-900 dark:text-content-primary">
-						Set manual tool change location
-					</span>
-					<span className="block text-sm text-gray-600 dark:text-content-secondary">
-						Move the CNC to a more convenient location for manual tool changes
-						instead of prompting to change over the sensor.
-					</span>
-				</span>
-			</label>
+            <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                    type="checkbox"
+                    checked={customLocation}
+                    onChange={(e) => setCustomLocation(e.target.checked)}
+                    className="w-6 h-6 mt-0.5 shrink-0 rounded-md border-2 border-gray-300 accent-blue-500 cursor-pointer transition-colors hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                />
+                <span>
+                    <span className="block text-lg font-semibold text-gray-900 dark:text-content-primary">
+                        Set manual tool change location
+                    </span>
+                    <span className="block text-sm text-gray-600 dark:text-content-secondary">
+                        Move the CNC to a more convenient location for manual
+                        tool changes instead of prompting to change over the
+                        sensor.
+                    </span>
+                </span>
+            </label>
 
-			<p className="dark:text-content-primary">
-				Select <b>"Apply"</b> to set your tool change strategy to Fixed Tool
-				Sensor and save these options.
-			</p>
-			<StepActionButton
-				label={"Apply"}
-				runningLabel="Applying..."
-				onApply={applySettings}
-				isComplete={isComplete}
-				error={error}
-				success={success}
-			/>
-		</div>
-	);
+            <p className="dark:text-content-primary">
+                Select <b>"Apply"</b> to set your tool change strategy to Fixed
+                Tool Sensor and save these options.
+            </p>
+            <StepActionButton
+                label={'Apply'}
+                runningLabel="Applying..."
+                onApply={applySettings}
+                isComplete={isComplete}
+                error={error}
+                success={success}
+            />
+        </div>
+    );
 }

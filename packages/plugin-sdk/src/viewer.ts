@@ -9,5 +9,5 @@
 //
 // Requires the plugin to install the peers: `@sienci/gviewer` and `three`.
 
-export * from "@sienci/gviewer/react";
-export * from "@sienci/gviewer/viewer";
+export * from '@sienci/gviewer/react';
+export * from '@sienci/gviewer/viewer';

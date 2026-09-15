@@ -1,770 +1,810 @@
-jest.mock("app/lib/controller", () => ({
-	port: "COM-TEST",
-	command: jest.fn(),
-	addListener: jest.fn(),
-	removeListener: jest.fn(),
-	// A couple of relayed event names, plus one from each excluded category —
-	// enough for the "controller events" describe block below without pulling
-	// in the real ~70-entry dispatch table.
-	listeners: {
-		"job:start": [],
-		"job:stop": [],
-		"serialport:read": [],
-		"plugin:parser:match": [],
-	},
+jest.mock('app/lib/controller', () => ({
+    port: 'COM-TEST',
+    command: jest.fn(),
+    addListener: jest.fn(),
+    removeListener: jest.fn(),
+    // A couple of relayed event names, plus one from each excluded category —
+    // enough for the "controller events" describe block below without pulling
+    // in the real ~70-entry dispatch table.
+    listeners: {
+        'job:start': [],
+        'job:stop': [],
+        'serialport:read': [],
+        'plugin:parser:match': [],
+    },
 }));
-jest.mock("app/lib/fileupload", () => ({
-	uploadGcodeFileToServer: jest.fn(async () => ({})),
+jest.mock('app/lib/fileupload', () => ({
+    uploadGcodeFileToServer: jest.fn(async () => ({})),
 }));
 // Delegates to the real ImmutableStore rather than to a flat key/value fake:
 // its set() deep-merges, so a write that removes a key behaves very differently
 // from a plain assignment. A simplified fake would let such a write pass here
 // while silently failing in the app.
-jest.mock("app/store", () => {
-	const ImmutableStore = require("app/lib/immutable-store").default;
-	const store = new ImmutableStore({ workspace: { units: "mm" } });
-	return {
-		get: jest.fn((key: string | string[], fallback: unknown) =>
-			store.get(key, fallback),
-		),
-		set: jest.fn((key: string | string[], value: unknown) =>
-			store.set(key, value),
-		),
-		replace: jest.fn((key: string | string[], value: unknown) =>
-			store.replace(key, value),
-		),
-		on: jest.fn(),
-	};
+jest.mock('app/store', () => {
+    const ImmutableStore = require('app/lib/immutable-store').default;
+    const store = new ImmutableStore({ workspace: { units: 'mm' } });
+    return {
+        get: jest.fn((key: string | string[], fallback: unknown) =>
+            store.get(key, fallback),
+        ),
+        set: jest.fn((key: string | string[], value: unknown) =>
+            store.set(key, value),
+        ),
+        replace: jest.fn((key: string | string[], value: unknown) =>
+            store.replace(key, value),
+        ),
+        on: jest.fn(),
+    };
 });
-jest.mock("app/store/redux", () => ({
-	getState: jest.fn(() => ({ controller: {}, connection: {} })),
-	subscribe: jest.fn(),
+jest.mock('app/store/redux', () => ({
+    getState: jest.fn(() => ({ controller: {}, connection: {} })),
+    subscribe: jest.fn(),
 }));
-jest.mock("app/constants", () => ({ VISUALIZER_PRIMARY: "primary" }));
+jest.mock('app/constants', () => ({ VISUALIZER_PRIMARY: 'primary' }));
 
-import { toRuntimeCapabilities } from "../capabilities";
+import controller from 'app/lib/controller';
+import { toRuntimeCapabilities } from '../capabilities';
 import {
-	registerPluginWindow,
-	unregisterPluginWindow,
-} from "../plugin-permissions";
-import controller from "app/lib/controller";
+    registerPluginWindow,
+    unregisterPluginWindow,
+} from '../plugin-permissions';
 import {
-	handlePluginBridgeMessage,
-	handlePluginBridgeSubscription,
-	releaseRuntimeParsersForSource,
-} from "../pluginBridge";
+    handlePluginBridgeMessage,
+    handlePluginBridgeSubscription,
+    releaseRuntimeParsersForSource,
+} from '../pluginBridge';
 
-const CHANNEL = "gsender:plugin-bridge";
+const CHANNEL = 'gsender:plugin-bridge';
 
 const makeEvent = (
-	source: object | null,
-	request: { id: string; type: string; payload?: Record<string, unknown> },
+    source: object | null,
+    request: { id: string; type: string; payload?: Record<string, unknown> },
 ) =>
-	({
-		data: { channel: CHANNEL, request },
-		source,
-		origin: "http://localhost",
-	}) as unknown as MessageEvent;
+    ({
+        data: { channel: CHANNEL, request },
+        source,
+        origin: 'http://localhost',
+    }) as unknown as MessageEvent;
 
-describe("plugin bridge request gate", () => {
-	const source = {} as MessageEventSource;
+describe('plugin bridge request gate', () => {
+    const source = {} as MessageEventSource;
 
-	afterEach(() => {
-		unregisterPluginWindow(source);
-	});
+    afterEach(() => {
+        unregisterPluginWindow(source);
+    });
 
-	it("allows a request type the plugin was granted", async () => {
-		registerPluginWindow(
-			source,
-			// Exactly what a manifest read off disk produces: JSON arrays.
-			toRuntimeCapabilities(
-				JSON.parse('{"requestTypes":["workspace:get:state"],"topics":[]}'),
-			),
-			"com.sienci.test-plugin",
-		);
+    it('allows a request type the plugin was granted', async () => {
+        registerPluginWindow(
+            source,
+            // Exactly what a manifest read off disk produces: JSON arrays.
+            toRuntimeCapabilities(
+                JSON.parse(
+                    '{"requestTypes":["workspace:get:state"],"topics":[]}',
+                ),
+            ),
+            'com.sienci.test-plugin',
+        );
 
-		const response = await handlePluginBridgeMessage(
-			makeEvent(source, { id: "1", type: "workspace:get:state" }),
-		);
+        const response = await handlePluginBridgeMessage(
+            makeEvent(source, { id: '1', type: 'workspace:get:state' }),
+        );
 
-		expect(response).toEqual({
-			id: "1",
-			ok: true,
-			result: { units: "mm" },
-		});
-	});
+        expect(response).toEqual({
+            id: '1',
+            ok: true,
+            result: { units: 'mm' },
+        });
+    });
 
-	it("denies a request type the plugin was NOT granted", async () => {
-		registerPluginWindow(
-			source,
-			toRuntimeCapabilities({ requestTypes: ["workspace:get:state"] }),
-			"com.sienci.test-plugin",
-		);
+    it('denies a request type the plugin was NOT granted', async () => {
+        registerPluginWindow(
+            source,
+            toRuntimeCapabilities({ requestTypes: ['workspace:get:state'] }),
+            'com.sienci.test-plugin',
+        );
 
-		const response = await handlePluginBridgeMessage(
-			makeEvent(source, { id: "2", type: "machine:command" }),
-		);
+        const response = await handlePluginBridgeMessage(
+            makeEvent(source, { id: '2', type: 'machine:command' }),
+        );
 
-		expect(response).toMatchObject({ id: "2", ok: false });
-		expect(response?.error).toMatch(/not authorized/i);
-	});
+        expect(response).toMatchObject({ id: '2', ok: false });
+        expect(response?.error).toMatch(/not authorized/i);
+    });
 
-	it("denies an unregistered source outright", async () => {
-		const response = await handlePluginBridgeMessage(
-			makeEvent({} as MessageEventSource, {
-				id: "3",
-				type: "workspace:get:state",
-			}),
-		);
+    it('denies an unregistered source outright', async () => {
+        const response = await handlePluginBridgeMessage(
+            makeEvent({} as MessageEventSource, {
+                id: '3',
+                type: 'workspace:get:state',
+            }),
+        );
 
-		expect(response).toMatchObject({ id: "3", ok: false });
-		expect(response?.error).toMatch(/not authorized/i);
-	});
+        expect(response).toMatchObject({ id: '3', ok: false });
+        expect(response?.error).toMatch(/not authorized/i);
+    });
 
-	it("passes a granted viewer:* request through to the real handler (no primary visualizer mounted in this test env)", async () => {
-		registerPluginWindow(
-			source,
-			toRuntimeCapabilities({
-				requestTypes: ["viewer:screen-to-world"],
-				topics: [],
-			}),
-		);
+    it('passes a granted viewer:* request through to the real handler (no primary visualizer mounted in this test env)', async () => {
+        registerPluginWindow(
+            source,
+            toRuntimeCapabilities({
+                requestTypes: ['viewer:screen-to-world'],
+                topics: [],
+            }),
+        );
 
-		const response = await handlePluginBridgeMessage(
-			makeEvent(source, { id: "4", type: "viewer:screen-to-world" }),
-		);
+        const response = await handlePluginBridgeMessage(
+            makeEvent(source, { id: '4', type: 'viewer:screen-to-world' }),
+        );
 
-		// The gate let it through — this is a domain error from the handler
-		// (no primary GcodeViewer registered), not an authorization error.
-		expect(response).toMatchObject({ id: "4", ok: false });
-		expect(response?.error).not.toMatch(/not authorized/i);
-		expect(response?.error).toMatch(/visualizer is not available/i);
-	});
+        // The gate let it through — this is a domain error from the handler
+        // (no primary GcodeViewer registered), not an authorization error.
+        expect(response).toMatchObject({ id: '4', ok: false });
+        expect(response?.error).not.toMatch(/not authorized/i);
+        expect(response?.error).toMatch(/visualizer is not available/i);
+    });
 
-	it.each([
-		"viewer:camera:set",
-		"viewer:pick:arm",
-		"viewer:overlay:set",
-		"machine:busy:set",
-	] as const)("denies '%s' when not granted", async (type) => {
-		registerPluginWindow(
-			source,
-			toRuntimeCapabilities({ requestTypes: ["workspace:get:state"] }),
-		);
+    it.each([
+        'viewer:camera:set',
+        'viewer:pick:arm',
+        'viewer:overlay:set',
+        'machine:busy:set',
+    ] as const)("denies '%s' when not granted", async (type) => {
+        registerPluginWindow(
+            source,
+            toRuntimeCapabilities({ requestTypes: ['workspace:get:state'] }),
+        );
 
-		const response = await handlePluginBridgeMessage(
-			makeEvent(source, { id: type, type }),
-		);
+        const response = await handlePluginBridgeMessage(
+            makeEvent(source, { id: type, type }),
+        );
 
-		expect(response).toMatchObject({ id: type, ok: false });
-		expect(response?.error).toMatch(/not authorized/i);
-	});
+        expect(response).toMatchObject({ id: type, ok: false });
+        expect(response?.error).toMatch(/not authorized/i);
+    });
 });
 
-describe("plugin storage isolation", () => {
-	const sourceA = {} as MessageEventSource;
-	const sourceB = {} as MessageEventSource;
+describe('plugin storage isolation', () => {
+    const sourceA = {} as MessageEventSource;
+    const sourceB = {} as MessageEventSource;
 
-	const STORAGE_CAPABILITIES = toRuntimeCapabilities({
-		requestTypes: [
-			"storage:get",
-			"storage:set",
-			"storage:delete",
-			"storage:get:all",
-			"storage:set:all",
-			"storage:clear",
-		],
-	});
+    const STORAGE_CAPABILITIES = toRuntimeCapabilities({
+        requestTypes: [
+            'storage:get',
+            'storage:set',
+            'storage:delete',
+            'storage:get:all',
+            'storage:set:all',
+            'storage:clear',
+        ],
+    });
 
-	afterEach(() => {
-		unregisterPluginWindow(sourceA);
-		unregisterPluginWindow(sourceB);
-	});
+    afterEach(() => {
+        unregisterPluginWindow(sourceA);
+        unregisterPluginWindow(sourceB);
+    });
 
-	it("round-trips a value under the calling plugin's own namespace", async () => {
-		registerPluginWindow(sourceA, STORAGE_CAPABILITIES, "com.sienci.plugin-a");
+    it("round-trips a value under the calling plugin's own namespace", async () => {
+        registerPluginWindow(
+            sourceA,
+            STORAGE_CAPABILITIES,
+            'com.sienci.plugin-a',
+        );
 
-		const setResponse = await handlePluginBridgeMessage(
-			makeEvent(sourceA, {
-				id: "1",
-				type: "storage:set",
-				payload: { key: "foo", value: 123 },
-			}),
-		);
-		expect(setResponse).toMatchObject({ id: "1", ok: true });
+        const setResponse = await handlePluginBridgeMessage(
+            makeEvent(sourceA, {
+                id: '1',
+                type: 'storage:set',
+                payload: { key: 'foo', value: 123 },
+            }),
+        );
+        expect(setResponse).toMatchObject({ id: '1', ok: true });
 
-		const getResponse = await handlePluginBridgeMessage(
-			makeEvent(sourceA, {
-				id: "2",
-				type: "storage:get",
-				payload: { key: "foo" },
-			}),
-		);
-		expect(getResponse).toEqual({ id: "2", ok: true, result: 123 });
-	});
+        const getResponse = await handlePluginBridgeMessage(
+            makeEvent(sourceA, {
+                id: '2',
+                type: 'storage:get',
+                payload: { key: 'foo' },
+            }),
+        );
+        expect(getResponse).toEqual({ id: '2', ok: true, result: 123 });
+    });
 
-	it("does not leak one plugin's storage to another plugin", async () => {
-		registerPluginWindow(sourceA, STORAGE_CAPABILITIES, "com.sienci.plugin-a");
-		registerPluginWindow(sourceB, STORAGE_CAPABILITIES, "com.sienci.plugin-b");
+    it("does not leak one plugin's storage to another plugin", async () => {
+        registerPluginWindow(
+            sourceA,
+            STORAGE_CAPABILITIES,
+            'com.sienci.plugin-a',
+        );
+        registerPluginWindow(
+            sourceB,
+            STORAGE_CAPABILITIES,
+            'com.sienci.plugin-b',
+        );
 
-		await handlePluginBridgeMessage(
-			makeEvent(sourceA, {
-				id: "1",
-				type: "storage:set",
-				payload: { key: "shared-key", value: "plugin-a-value" },
-			}),
-		);
+        await handlePluginBridgeMessage(
+            makeEvent(sourceA, {
+                id: '1',
+                type: 'storage:set',
+                payload: { key: 'shared-key', value: 'plugin-a-value' },
+            }),
+        );
 
-		const responseFromB = await handlePluginBridgeMessage(
-			makeEvent(sourceB, {
-				id: "2",
-				type: "storage:get",
-				payload: { key: "shared-key", defaultValue: "default" },
-			}),
-		);
+        const responseFromB = await handlePluginBridgeMessage(
+            makeEvent(sourceB, {
+                id: '2',
+                type: 'storage:get',
+                payload: { key: 'shared-key', defaultValue: 'default' },
+            }),
+        );
 
-		expect(responseFromB).toEqual({ id: "2", ok: true, result: "default" });
-	});
+        expect(responseFromB).toEqual({ id: '2', ok: true, result: 'default' });
+    });
 
-	it("returns the provided default value for a missing key", async () => {
-		registerPluginWindow(sourceA, STORAGE_CAPABILITIES, "com.sienci.plugin-a");
+    it('returns the provided default value for a missing key', async () => {
+        registerPluginWindow(
+            sourceA,
+            STORAGE_CAPABILITIES,
+            'com.sienci.plugin-a',
+        );
 
-		const response = await handlePluginBridgeMessage(
-			makeEvent(sourceA, {
-				id: "1",
-				type: "storage:get",
-				payload: { key: "missing", defaultValue: "fallback" },
-			}),
-		);
+        const response = await handlePluginBridgeMessage(
+            makeEvent(sourceA, {
+                id: '1',
+                type: 'storage:get',
+                payload: { key: 'missing', defaultValue: 'fallback' },
+            }),
+        );
 
-		expect(response).toEqual({ id: "1", ok: true, result: "fallback" });
-	});
+        expect(response).toEqual({ id: '1', ok: true, result: 'fallback' });
+    });
 
-	it("removes the key from storage on delete", async () => {
-		registerPluginWindow(
-			sourceA,
-			STORAGE_CAPABILITIES,
-			"com.sienci.plugin-delete",
-		);
+    it('removes the key from storage on delete', async () => {
+        registerPluginWindow(
+            sourceA,
+            STORAGE_CAPABILITIES,
+            'com.sienci.plugin-delete',
+        );
 
-		await handlePluginBridgeMessage(
-			makeEvent(sourceA, {
-				id: "1",
-				type: "storage:set",
-				payload: { key: "foo", value: 123 },
-			}),
-		);
-		await handlePluginBridgeMessage(
-			makeEvent(sourceA, {
-				id: "2",
-				type: "storage:set",
-				payload: { key: "bar", value: "x" },
-			}),
-		);
+        await handlePluginBridgeMessage(
+            makeEvent(sourceA, {
+                id: '1',
+                type: 'storage:set',
+                payload: { key: 'foo', value: 123 },
+            }),
+        );
+        await handlePluginBridgeMessage(
+            makeEvent(sourceA, {
+                id: '2',
+                type: 'storage:set',
+                payload: { key: 'bar', value: 'x' },
+            }),
+        );
 
-		const deleteResponse = await handlePluginBridgeMessage(
-			makeEvent(sourceA, {
-				id: "3",
-				type: "storage:delete",
-				payload: { key: "foo" },
-			}),
-		);
-		expect(deleteResponse).toMatchObject({ id: "3", ok: true });
+        const deleteResponse = await handlePluginBridgeMessage(
+            makeEvent(sourceA, {
+                id: '3',
+                type: 'storage:delete',
+                payload: { key: 'foo' },
+            }),
+        );
+        expect(deleteResponse).toMatchObject({ id: '3', ok: true });
 
-		const getResponse = await handlePluginBridgeMessage(
-			makeEvent(sourceA, {
-				id: "4",
-				type: "storage:get",
-				payload: { key: "foo", defaultValue: "gone" },
-			}),
-		);
-		expect(getResponse).toEqual({ id: "4", ok: true, result: "gone" });
+        const getResponse = await handlePluginBridgeMessage(
+            makeEvent(sourceA, {
+                id: '4',
+                type: 'storage:get',
+                payload: { key: 'foo', defaultValue: 'gone' },
+            }),
+        );
+        expect(getResponse).toEqual({ id: '4', ok: true, result: 'gone' });
 
-		const getAllResponse = await handlePluginBridgeMessage(
-			makeEvent(sourceA, { id: "5", type: "storage:get:all" }),
-		);
-		expect(getAllResponse).toEqual({
-			id: "5",
-			ok: true,
-			result: { bar: "x" },
-		});
-	});
+        const getAllResponse = await handlePluginBridgeMessage(
+            makeEvent(sourceA, { id: '5', type: 'storage:get:all' }),
+        );
+        expect(getAllResponse).toEqual({
+            id: '5',
+            ok: true,
+            result: { bar: 'x' },
+        });
+    });
 
-	it("replaces the whole namespace on setAll rather than merging", async () => {
-		registerPluginWindow(
-			sourceA,
-			STORAGE_CAPABILITIES,
-			"com.sienci.plugin-set-all",
-		);
+    it('replaces the whole namespace on setAll rather than merging', async () => {
+        registerPluginWindow(
+            sourceA,
+            STORAGE_CAPABILITIES,
+            'com.sienci.plugin-set-all',
+        );
 
-		await handlePluginBridgeMessage(
-			makeEvent(sourceA, {
-				id: "1",
-				type: "storage:set:all",
-				payload: { value: { a: 1, b: 2 } },
-			}),
-		);
-		await handlePluginBridgeMessage(
-			makeEvent(sourceA, {
-				id: "2",
-				type: "storage:set:all",
-				payload: { value: { c: 3 } },
-			}),
-		);
+        await handlePluginBridgeMessage(
+            makeEvent(sourceA, {
+                id: '1',
+                type: 'storage:set:all',
+                payload: { value: { a: 1, b: 2 } },
+            }),
+        );
+        await handlePluginBridgeMessage(
+            makeEvent(sourceA, {
+                id: '2',
+                type: 'storage:set:all',
+                payload: { value: { c: 3 } },
+            }),
+        );
 
-		const response = await handlePluginBridgeMessage(
-			makeEvent(sourceA, { id: "3", type: "storage:get:all" }),
-		);
-		expect(response).toEqual({ id: "3", ok: true, result: { c: 3 } });
-	});
+        const response = await handlePluginBridgeMessage(
+            makeEvent(sourceA, { id: '3', type: 'storage:get:all' }),
+        );
+        expect(response).toEqual({ id: '3', ok: true, result: { c: 3 } });
+    });
 
-	it("empties the namespace on clear", async () => {
-		registerPluginWindow(
-			sourceA,
-			STORAGE_CAPABILITIES,
-			"com.sienci.plugin-clear",
-		);
+    it('empties the namespace on clear', async () => {
+        registerPluginWindow(
+            sourceA,
+            STORAGE_CAPABILITIES,
+            'com.sienci.plugin-clear',
+        );
 
-		await handlePluginBridgeMessage(
-			makeEvent(sourceA, {
-				id: "1",
-				type: "storage:set",
-				payload: { key: "foo", value: 123 },
-			}),
-		);
+        await handlePluginBridgeMessage(
+            makeEvent(sourceA, {
+                id: '1',
+                type: 'storage:set',
+                payload: { key: 'foo', value: 123 },
+            }),
+        );
 
-		const clearResponse = await handlePluginBridgeMessage(
-			makeEvent(sourceA, { id: "2", type: "storage:clear" }),
-		);
-		expect(clearResponse).toMatchObject({ id: "2", ok: true });
+        const clearResponse = await handlePluginBridgeMessage(
+            makeEvent(sourceA, { id: '2', type: 'storage:clear' }),
+        );
+        expect(clearResponse).toMatchObject({ id: '2', ok: true });
 
-		const response = await handlePluginBridgeMessage(
-			makeEvent(sourceA, { id: "3", type: "storage:get:all" }),
-		);
-		expect(response).toEqual({ id: "3", ok: true, result: {} });
-	});
+        const response = await handlePluginBridgeMessage(
+            makeEvent(sourceA, { id: '3', type: 'storage:get:all' }),
+        );
+        expect(response).toEqual({ id: '3', ok: true, result: {} });
+    });
 
-	it("clears only the calling plugin's namespace", async () => {
-		registerPluginWindow(
-			sourceA,
-			STORAGE_CAPABILITIES,
-			"com.sienci.plugin-clear-a",
-		);
-		registerPluginWindow(
-			sourceB,
-			STORAGE_CAPABILITIES,
-			"com.sienci.plugin-clear-b",
-		);
+    it("clears only the calling plugin's namespace", async () => {
+        registerPluginWindow(
+            sourceA,
+            STORAGE_CAPABILITIES,
+            'com.sienci.plugin-clear-a',
+        );
+        registerPluginWindow(
+            sourceB,
+            STORAGE_CAPABILITIES,
+            'com.sienci.plugin-clear-b',
+        );
 
-		await handlePluginBridgeMessage(
-			makeEvent(sourceA, {
-				id: "1",
-				type: "storage:set",
-				payload: { key: "kept", value: "a-value" },
-			}),
-		);
-		await handlePluginBridgeMessage(
-			makeEvent(sourceB, {
-				id: "2",
-				type: "storage:set",
-				payload: { key: "kept", value: "b-value" },
-			}),
-		);
+        await handlePluginBridgeMessage(
+            makeEvent(sourceA, {
+                id: '1',
+                type: 'storage:set',
+                payload: { key: 'kept', value: 'a-value' },
+            }),
+        );
+        await handlePluginBridgeMessage(
+            makeEvent(sourceB, {
+                id: '2',
+                type: 'storage:set',
+                payload: { key: 'kept', value: 'b-value' },
+            }),
+        );
 
-		await handlePluginBridgeMessage(
-			makeEvent(sourceA, { id: "3", type: "storage:clear" }),
-		);
+        await handlePluginBridgeMessage(
+            makeEvent(sourceA, { id: '3', type: 'storage:clear' }),
+        );
 
-		const responseFromB = await handlePluginBridgeMessage(
-			makeEvent(sourceB, { id: "4", type: "storage:get:all" }),
-		);
-		expect(responseFromB).toEqual({
-			id: "4",
-			ok: true,
-			result: { kept: "b-value" },
-		});
-	});
+        const responseFromB = await handlePluginBridgeMessage(
+            makeEvent(sourceB, { id: '4', type: 'storage:get:all' }),
+        );
+        expect(responseFromB).toEqual({
+            id: '4',
+            ok: true,
+            result: { kept: 'b-value' },
+        });
+    });
 
-	it("denies storage requests without the storage permission", async () => {
-		registerPluginWindow(
-			sourceA,
-			toRuntimeCapabilities({ requestTypes: ["workspace:get:state"] }),
-			"com.sienci.plugin-a",
-		);
+    it('denies storage requests without the storage permission', async () => {
+        registerPluginWindow(
+            sourceA,
+            toRuntimeCapabilities({ requestTypes: ['workspace:get:state'] }),
+            'com.sienci.plugin-a',
+        );
 
-		const response = await handlePluginBridgeMessage(
-			makeEvent(sourceA, {
-				id: "1",
-				type: "storage:get",
-				payload: { key: "foo" },
-			}),
-		);
+        const response = await handlePluginBridgeMessage(
+            makeEvent(sourceA, {
+                id: '1',
+                type: 'storage:get',
+                payload: { key: 'foo' },
+            }),
+        );
 
-		expect(response).toMatchObject({ id: "1", ok: false });
-		expect(response?.error).toMatch(/not authorized/i);
-	});
+        expect(response).toMatchObject({ id: '1', ok: false });
+        expect(response?.error).toMatch(/not authorized/i);
+    });
 });
 
-describe("plugin parsers", () => {
-	const source = {} as MessageEventSource;
-	const other = {} as MessageEventSource;
+describe('plugin parsers', () => {
+    const source = {} as MessageEventSource;
+    const other = {} as MessageEventSource;
 
-	const grant = (
-		win: MessageEventSource,
-		pluginId: string,
-		requestTypes: string[],
-		topics: string[] = [],
-	) =>
-		registerPluginWindow(
-			win,
-			toRuntimeCapabilities({ requestTypes, topics }),
-			pluginId,
-		);
+    const grant = (
+        win: MessageEventSource,
+        pluginId: string,
+        requestTypes: string[],
+        topics: string[] = [],
+    ) =>
+        registerPluginWindow(
+            win,
+            toRuntimeCapabilities({ requestTypes, topics }),
+            pluginId,
+        );
 
-	beforeEach(() => {
-		jest.clearAllMocks();
-		controller.registerPluginParsers = jest.fn(async () => ({
-			registered: ["probe"],
-			errors: [],
-		}));
-		controller.unregisterPluginParsers = jest.fn(async () => ({ ok: true }));
-		controller.pluginQuery = jest.fn(async () => ({ lines: ["ok"], ok: true }));
-	});
+    beforeEach(() => {
+        jest.clearAllMocks();
+        controller.registerPluginParsers = jest.fn(async () => ({
+            registered: ['probe'],
+            errors: [],
+        }));
+        controller.unregisterPluginParsers = jest.fn(async () => ({
+            ok: true,
+        }));
+        controller.pluginQuery = jest.fn(async () => ({
+            lines: ['ok'],
+            ok: true,
+        }));
+    });
 
-	afterEach(() => {
-		unregisterPluginWindow(source);
-		unregisterPluginWindow(other);
-	});
+    afterEach(() => {
+        unregisterPluginWindow(source);
+        unregisterPluginWindow(other);
+    });
 
-	it("denies parser registration without machine:parser:register", async () => {
-		grant(source, "com.sienci.a", ["workspace:get:state"]);
+    it('denies parser registration without machine:parser:register', async () => {
+        grant(source, 'com.sienci.a', ['workspace:get:state']);
 
-		const response = await handlePluginBridgeMessage(
-			makeEvent(source, {
-				id: "1",
-				type: "machine:parser:register",
-				payload: { spec: { id: "probe", match: { source: "^ok$" } } },
-			}),
-		);
+        const response = await handlePluginBridgeMessage(
+            makeEvent(source, {
+                id: '1',
+                type: 'machine:parser:register',
+                payload: { spec: { id: 'probe', match: { source: '^ok$' } } },
+            }),
+        );
 
-		expect(response).toMatchObject({ id: "1", ok: false });
-		expect(response?.error).toMatch(/not authorized/i);
-		expect(controller.registerPluginParsers).not.toHaveBeenCalled();
-	});
+        expect(response).toMatchObject({ id: '1', ok: false });
+        expect(response?.error).toMatch(/not authorized/i);
+        expect(controller.registerPluginParsers).not.toHaveBeenCalled();
+    });
 
-	it("forwards a granted registration to the controller with an owner id", async () => {
-		grant(source, "com.sienci.a", ["machine:parser:register"]);
+    it('forwards a granted registration to the controller with an owner id', async () => {
+        grant(source, 'com.sienci.a', ['machine:parser:register']);
 
-		const response = await handlePluginBridgeMessage(
-			makeEvent(source, {
-				id: "1",
-				type: "machine:parser:register",
-				payload: { spec: { id: "probe", match: { source: "^ok$" } } },
-			}),
-		);
+        const response = await handlePluginBridgeMessage(
+            makeEvent(source, {
+                id: '1',
+                type: 'machine:parser:register',
+                payload: { spec: { id: 'probe', match: { source: '^ok$' } } },
+            }),
+        );
 
-		expect(response).toMatchObject({ id: "1", ok: true });
-		const [ownerId, pluginId, specs] = (
-			controller.registerPluginParsers as jest.Mock
-		).mock.calls[0];
-		// Owner id is per-mount, so a remount cannot inherit the previous
-		// mount's server-side parsers.
-		expect(ownerId).toMatch(/^com\.sienci\.a#\d+$/);
-		expect(pluginId).toBe("com.sienci.a");
-		expect(specs).toEqual([{ id: "probe", match: { source: "^ok$" } }]);
-	});
+        expect(response).toMatchObject({ id: '1', ok: true });
+        const [ownerId, pluginId, specs] = (
+            controller.registerPluginParsers as jest.Mock
+        ).mock.calls[0];
+        // Owner id is per-mount, so a remount cannot inherit the previous
+        // mount's server-side parsers.
+        expect(ownerId).toMatch(/^com\.sienci\.a#\d+$/);
+        expect(pluginId).toBe('com.sienci.a');
+        expect(specs).toEqual([{ id: 'probe', match: { source: '^ok$' } }]);
+    });
 
-	it("rejects a registration with no spec id", async () => {
-		grant(source, "com.sienci.a", ["machine:parser:register"]);
+    it('rejects a registration with no spec id', async () => {
+        grant(source, 'com.sienci.a', ['machine:parser:register']);
 
-		const response = await handlePluginBridgeMessage(
-			makeEvent(source, {
-				id: "1",
-				type: "machine:parser:register",
-				payload: { spec: { match: { source: "^ok$" } } },
-			}),
-		);
+        const response = await handlePluginBridgeMessage(
+            makeEvent(source, {
+                id: '1',
+                type: 'machine:parser:register',
+                payload: { spec: { match: { source: '^ok$' } } },
+            }),
+        );
 
-		expect(response).toMatchObject({ id: "1", ok: false });
-		expect(controller.registerPluginParsers).not.toHaveBeenCalled();
-	});
+        expect(response).toMatchObject({ id: '1', ok: false });
+        expect(controller.registerPluginParsers).not.toHaveBeenCalled();
+    });
 
-	it("denies a registration from an unregistered source", async () => {
-		const response = await handlePluginBridgeMessage(
-			makeEvent({} as MessageEventSource, {
-				id: "1",
-				type: "machine:parser:register",
-				payload: { spec: { id: "probe", match: { source: "^ok$" } } },
-			}),
-		);
+    it('denies a registration from an unregistered source', async () => {
+        const response = await handlePluginBridgeMessage(
+            makeEvent({} as MessageEventSource, {
+                id: '1',
+                type: 'machine:parser:register',
+                payload: { spec: { id: 'probe', match: { source: '^ok$' } } },
+            }),
+        );
 
-		expect(response).toMatchObject({ id: "1", ok: false });
-		expect(controller.registerPluginParsers).not.toHaveBeenCalled();
-	});
+        expect(response).toMatchObject({ id: '1', ok: false });
+        expect(controller.registerPluginParsers).not.toHaveBeenCalled();
+    });
 
-	it("denies machine:query without the query permission", async () => {
-		grant(source, "com.sienci.a", ["machine:parser:register"]);
+    it('denies machine:query without the query permission', async () => {
+        grant(source, 'com.sienci.a', ['machine:parser:register']);
 
-		const response = await handlePluginBridgeMessage(
-			makeEvent(source, {
-				id: "1",
-				type: "machine:query",
-				payload: { cmd: "$$" },
-			}),
-		);
+        const response = await handlePluginBridgeMessage(
+            makeEvent(source, {
+                id: '1',
+                type: 'machine:query',
+                payload: { cmd: '$$' },
+            }),
+        );
 
-		expect(response).toMatchObject({ id: "1", ok: false });
-		expect(controller.pluginQuery).not.toHaveBeenCalled();
-	});
+        expect(response).toMatchObject({ id: '1', ok: false });
+        expect(controller.pluginQuery).not.toHaveBeenCalled();
+    });
 
-	it("forwards a granted query to the controller", async () => {
-		grant(source, "com.sienci.a", ["machine:query"]);
+    it('forwards a granted query to the controller', async () => {
+        grant(source, 'com.sienci.a', ['machine:query']);
 
-		const response = await handlePluginBridgeMessage(
-			makeEvent(source, {
-				id: "1",
-				type: "machine:query",
-				payload: { cmd: "$$", opts: { until: "ok" } },
-			}),
-		);
+        const response = await handlePluginBridgeMessage(
+            makeEvent(source, {
+                id: '1',
+                type: 'machine:query',
+                payload: { cmd: '$$', opts: { until: 'ok' } },
+            }),
+        );
 
-		expect(response).toMatchObject({ id: "1", ok: true });
-		expect(controller.pluginQuery).toHaveBeenCalledWith("$$", { until: "ok" });
-	});
+        expect(response).toMatchObject({ id: '1', ok: true });
+        expect(controller.pluginQuery).toHaveBeenCalledWith('$$', {
+            until: 'ok',
+        });
+    });
 
-	it("rejects a query with no command", async () => {
-		grant(source, "com.sienci.a", ["machine:query"]);
+    it('rejects a query with no command', async () => {
+        grant(source, 'com.sienci.a', ['machine:query']);
 
-		const response = await handlePluginBridgeMessage(
-			makeEvent(source, { id: "1", type: "machine:query", payload: {} }),
-		);
+        const response = await handlePluginBridgeMessage(
+            makeEvent(source, { id: '1', type: 'machine:query', payload: {} }),
+        );
 
-		expect(response).toMatchObject({ id: "1", ok: false });
-		expect(controller.pluginQuery).not.toHaveBeenCalled();
-	});
+        expect(response).toMatchObject({ id: '1', ok: false });
+        expect(controller.pluginQuery).not.toHaveBeenCalled();
+    });
 
-	it("releases a source's runtime parsers when its iframe unmounts", async () => {
-		grant(source, "com.sienci.a", ["machine:parser:register"]);
-		await handlePluginBridgeMessage(
-			makeEvent(source, {
-				id: "1",
-				type: "machine:parser:register",
-				payload: { spec: { id: "probe", match: { source: "^ok$" } } },
-			}),
-		);
+    it("releases a source's runtime parsers when its iframe unmounts", async () => {
+        grant(source, 'com.sienci.a', ['machine:parser:register']);
+        await handlePluginBridgeMessage(
+            makeEvent(source, {
+                id: '1',
+                type: 'machine:parser:register',
+                payload: { spec: { id: 'probe', match: { source: '^ok$' } } },
+            }),
+        );
 
-		releaseRuntimeParsersForSource(source);
+        releaseRuntimeParsersForSource(source);
 
-		expect(controller.unregisterPluginParsers).toHaveBeenCalledWith(
-			expect.stringMatching(/^com\.sienci\.a#\d+$/),
-		);
-	});
+        expect(controller.unregisterPluginParsers).toHaveBeenCalledWith(
+            expect.stringMatching(/^com\.sienci\.a#\d+$/),
+        );
+    });
 
-	it("does not unregister anything for a source that registered none", () => {
-		grant(source, "com.sienci.a", ["machine:parser:register"]);
+    it('does not unregister anything for a source that registered none', () => {
+        grant(source, 'com.sienci.a', ['machine:parser:register']);
 
-		releaseRuntimeParsersForSource(source);
+        releaseRuntimeParsersForSource(source);
 
-		expect(controller.unregisterPluginParsers).not.toHaveBeenCalled();
-	});
+        expect(controller.unregisterPluginParsers).not.toHaveBeenCalled();
+    });
 
-	it("gives each mount of the same plugin a distinct owner id", async () => {
-		grant(source, "com.sienci.a", ["machine:parser:register"]);
-		grant(other, "com.sienci.a", ["machine:parser:register"]);
+    it('gives each mount of the same plugin a distinct owner id', async () => {
+        grant(source, 'com.sienci.a', ['machine:parser:register']);
+        grant(other, 'com.sienci.a', ['machine:parser:register']);
 
-		const spec = { id: "probe", match: { source: "^ok$" } };
-		await handlePluginBridgeMessage(
-			makeEvent(source, { id: "1", type: "machine:parser:register", payload: { spec } }),
-		);
-		await handlePluginBridgeMessage(
-			makeEvent(other, { id: "2", type: "machine:parser:register", payload: { spec } }),
-		);
+        const spec = { id: 'probe', match: { source: '^ok$' } };
+        await handlePluginBridgeMessage(
+            makeEvent(source, {
+                id: '1',
+                type: 'machine:parser:register',
+                payload: { spec },
+            }),
+        );
+        await handlePluginBridgeMessage(
+            makeEvent(other, {
+                id: '2',
+                type: 'machine:parser:register',
+                payload: { spec },
+            }),
+        );
 
-		const owners = (controller.registerPluginParsers as jest.Mock).mock.calls.map(
-			([ownerId]) => ownerId,
-		);
-		expect(owners[0]).not.toBe(owners[1]);
-	});
+        const owners = (
+            controller.registerPluginParsers as jest.Mock
+        ).mock.calls.map(([ownerId]) => ownerId);
+        expect(owners[0]).not.toBe(owners[1]);
+    });
 });
 
-describe("machine:command", () => {
-	const source = {} as MessageEventSource;
+describe('machine:command', () => {
+    const source = {} as MessageEventSource;
 
-	beforeEach(() => {
-		jest.clearAllMocks();
-		controller.pluginCommand = jest.fn(async () => ({ ok: true }));
-		registerPluginWindow(
-			source,
-			toRuntimeCapabilities({ requestTypes: ["machine:command"] }),
-			"com.sienci.a",
-		);
-	});
+    beforeEach(() => {
+        jest.clearAllMocks();
+        controller.pluginCommand = jest.fn(async () => ({ ok: true }));
+        registerPluginWindow(
+            source,
+            toRuntimeCapabilities({ requestTypes: ['machine:command'] }),
+            'com.sienci.a',
+        );
+    });
 
-	afterEach(() => {
-		unregisterPluginWindow(source);
-	});
+    afterEach(() => {
+        unregisterPluginWindow(source);
+    });
 
-	it("forwards a granted command to the controller", async () => {
-		const response = await handlePluginBridgeMessage(
-			makeEvent(source, {
-				id: "1",
-				type: "machine:command",
-				payload: { cmd: "gcode", args: ["$$"] },
-			}),
-		);
+    it('forwards a granted command to the controller', async () => {
+        const response = await handlePluginBridgeMessage(
+            makeEvent(source, {
+                id: '1',
+                type: 'machine:command',
+                payload: { cmd: 'gcode', args: ['$$'] },
+            }),
+        );
 
-		expect(response).toMatchObject({ id: "1", ok: true });
-		expect(controller.pluginCommand).toHaveBeenCalledWith("gcode", ["$$"]);
-	});
+        expect(response).toMatchObject({ id: '1', ok: true });
+        expect(controller.pluginCommand).toHaveBeenCalledWith('gcode', ['$$']);
+    });
 
-	it("never routes through controller.command", async () => {
-		// Regression guard. controller.command() settles by passing a callback
-		// through the controller's args, where the `gcode` handler destructures
-		// it as `context` and hands a function to feeder.feed() — so the promise
-		// hangs and the feeder gets a bad context. Keep this off that path.
-		await handlePluginBridgeMessage(
-			makeEvent(source, {
-				id: "1",
-				type: "machine:command",
-				payload: { cmd: "gcode", args: ["$$"] },
-			}),
-		);
+    it('never routes through controller.command', async () => {
+        // Regression guard. controller.command() settles by passing a callback
+        // through the controller's args, where the `gcode` handler destructures
+        // it as `context` and hands a function to feeder.feed() — so the promise
+        // hangs and the feeder gets a bad context. Keep this off that path.
+        await handlePluginBridgeMessage(
+            makeEvent(source, {
+                id: '1',
+                type: 'machine:command',
+                payload: { cmd: 'gcode', args: ['$$'] },
+            }),
+        );
 
-		expect(controller.command).not.toHaveBeenCalled();
-	});
+        expect(controller.command).not.toHaveBeenCalled();
+    });
 
-	it("defaults args to an empty array", async () => {
-		await handlePluginBridgeMessage(
-			makeEvent(source, {
-				id: "1",
-				type: "machine:command",
-				payload: { cmd: "homing" },
-			}),
-		);
+    it('defaults args to an empty array', async () => {
+        await handlePluginBridgeMessage(
+            makeEvent(source, {
+                id: '1',
+                type: 'machine:command',
+                payload: { cmd: 'homing' },
+            }),
+        );
 
-		expect(controller.pluginCommand).toHaveBeenCalledWith("homing", []);
-	});
+        expect(controller.pluginCommand).toHaveBeenCalledWith('homing', []);
+    });
 
-	it("rejects an empty command without touching the controller", async () => {
-		const response = await handlePluginBridgeMessage(
-			makeEvent(source, { id: "1", type: "machine:command", payload: {} }),
-		);
+    it('rejects an empty command without touching the controller', async () => {
+        const response = await handlePluginBridgeMessage(
+            makeEvent(source, {
+                id: '1',
+                type: 'machine:command',
+                payload: {},
+            }),
+        );
 
-		expect(response).toMatchObject({ id: "1", ok: false });
-		expect(controller.pluginCommand).not.toHaveBeenCalled();
-	});
+        expect(response).toMatchObject({ id: '1', ok: false });
+        expect(controller.pluginCommand).not.toHaveBeenCalled();
+    });
 });
 
-describe("controller events", () => {
-	const CONTROLLER_CAPABILITIES = toRuntimeCapabilities({
-		requestTypes: [],
-		topics: ["controller"],
-	});
+describe('controller events', () => {
+    const CONTROLLER_CAPABILITIES = toRuntimeCapabilities({
+        requestTypes: [],
+        topics: ['controller'],
+    });
 
-	const makeSubscribeEvent = (
-		source: MessageEventSource,
-		subscribe: { id: string; topic: string },
-	) =>
-		({
-			data: { channel: CHANNEL, subscribe },
-			source,
-			origin: "http://localhost",
-		}) as unknown as MessageEvent;
+    const makeSubscribeEvent = (
+        source: MessageEventSource,
+        subscribe: { id: string; topic: string },
+    ) =>
+        ({
+            data: { channel: CHANNEL, subscribe },
+            source,
+            origin: 'http://localhost',
+        }) as unknown as MessageEvent;
 
-	const makeSpySource = () =>
-		({ postMessage: jest.fn() }) as unknown as MessageEventSource & {
-			postMessage: jest.Mock;
-		};
+    const makeSpySource = () =>
+        ({ postMessage: jest.fn() }) as unknown as MessageEventSource & {
+            postMessage: jest.Mock;
+        };
 
-	// ensureHostListeners() only ever runs once (guarded by a module-level
-	// flag), the first time anything subscribes — so the relay listeners are
-	// installed by whichever test in this block runs first.
-	const relayCallbackFor = (eventName: string) => {
-		const call = (controller.addListener as jest.Mock).mock.calls.find(
-			([name]) => name === eventName,
-		);
-		if (!call) {
-			throw new Error(
-				`controller.addListener was never called for '${eventName}'`,
-			);
-		}
-		return call[1] as (...args: unknown[]) => void;
-	};
+    // ensureHostListeners() only ever runs once (guarded by a module-level
+    // flag), the first time anything subscribes — so the relay listeners are
+    // installed by whichever test in this block runs first.
+    const relayCallbackFor = (eventName: string) => {
+        const call = (controller.addListener as jest.Mock).mock.calls.find(
+            ([name]) => name === eventName,
+        );
+        if (!call) {
+            throw new Error(
+                `controller.addListener was never called for '${eventName}'`,
+            );
+        }
+        return call[1] as (...args: unknown[]) => void;
+    };
 
-	it("relays a granted controller event to every subscriber, as { name, args }", () => {
-		const source = makeSpySource();
-		registerPluginWindow(source, CONTROLLER_CAPABILITIES, "com.sienci.a");
+    it('relays a granted controller event to every subscriber, as { name, args }', () => {
+        const source = makeSpySource();
+        registerPluginWindow(source, CONTROLLER_CAPABILITIES, 'com.sienci.a');
 
-		handlePluginBridgeSubscription(
-			makeSubscribeEvent(source, { id: "sub1", topic: "controller" }),
-		);
-		source.postMessage.mockClear(); // drop the initial null-snapshot push
+        handlePluginBridgeSubscription(
+            makeSubscribeEvent(source, { id: 'sub1', topic: 'controller' }),
+        );
+        source.postMessage.mockClear(); // drop the initial null-snapshot push
 
-		relayCallbackFor("job:start")({ foo: "bar" });
+        relayCallbackFor('job:start')({ foo: 'bar' });
 
-		expect(source.postMessage).toHaveBeenCalledWith(
-			{
-				channel: CHANNEL,
-				event: {
-					id: "sub1",
-					topic: "controller",
-					event: { name: "job:start", args: [{ foo: "bar" }] },
-				},
-			},
-			{ targetOrigin: "http://localhost" },
-		);
+        expect(source.postMessage).toHaveBeenCalledWith(
+            {
+                channel: CHANNEL,
+                event: {
+                    id: 'sub1',
+                    topic: 'controller',
+                    event: { name: 'job:start', args: [{ foo: 'bar' }] },
+                },
+            },
+            { targetOrigin: 'http://localhost' },
+        );
 
-		unregisterPluginWindow(source);
-	});
+        unregisterPluginWindow(source);
+    });
 
-	it("denies subscribing to the controller topic without the topic grant", () => {
-		const source = makeSpySource();
-		registerPluginWindow(
-			source,
-			toRuntimeCapabilities({ requestTypes: [], topics: [] }),
-			"com.sienci.a",
-		);
+    it('denies subscribing to the controller topic without the topic grant', () => {
+        const source = makeSpySource();
+        registerPluginWindow(
+            source,
+            toRuntimeCapabilities({ requestTypes: [], topics: [] }),
+            'com.sienci.a',
+        );
 
-		handlePluginBridgeSubscription(
-			makeSubscribeEvent(source, { id: "sub2", topic: "controller" }),
-		);
+        handlePluginBridgeSubscription(
+            makeSubscribeEvent(source, { id: 'sub2', topic: 'controller' }),
+        );
 
-		expect(source.postMessage).toHaveBeenCalledWith(
-			expect.objectContaining({ channel: CHANNEL, err: expect.any(Error) }),
-			{ targetOrigin: "http://localhost" },
-		);
+        expect(source.postMessage).toHaveBeenCalledWith(
+            expect.objectContaining({
+                channel: CHANNEL,
+                err: expect.any(Error),
+            }),
+            { targetOrigin: 'http://localhost' },
+        );
 
-		unregisterPluginWindow(source);
-	});
+        unregisterPluginWindow(source);
+    });
 
-	it("never wires raw firmware traffic events into the relay", () => {
-		// Registered above, so the relay installation has already run by now.
-		expect(
-			(controller.addListener as jest.Mock).mock.calls.some(
-				([name]) => name === "serialport:read",
-			),
-		).toBe(false);
-	});
+    it('never wires raw firmware traffic events into the relay', () => {
+        // Registered above, so the relay installation has already run by now.
+        expect(
+            (controller.addListener as jest.Mock).mock.calls.some(
+                ([name]) => name === 'serialport:read',
+            ),
+        ).toBe(false);
+    });
 
-	it("does not leak plugin:parser:match into the generic controller relay", () => {
-		const source = makeSpySource();
-		registerPluginWindow(source, CONTROLLER_CAPABILITIES, "com.sienci.b");
+    it('does not leak plugin:parser:match into the generic controller relay', () => {
+        const source = makeSpySource();
+        registerPluginWindow(source, CONTROLLER_CAPABILITIES, 'com.sienci.b');
 
-		handlePluginBridgeSubscription(
-			makeSubscribeEvent(source, { id: "sub3", topic: "controller" }),
-		);
-		source.postMessage.mockClear();
+        handlePluginBridgeSubscription(
+            makeSubscribeEvent(source, { id: 'sub3', topic: 'controller' }),
+        );
+        source.postMessage.mockClear();
 
-		// This listener is wired unconditionally for the "parser" topic
-		// (pre-existing behaviour) — it must not also reach a subscriber that
-		// only subscribed to "controller".
-		relayCallbackFor("plugin:parser:match")({
-			pluginId: "com.sienci.other",
-			parserId: "probe",
-		});
+        // This listener is wired unconditionally for the "parser" topic
+        // (pre-existing behaviour) — it must not also reach a subscriber that
+        // only subscribed to "controller".
+        relayCallbackFor('plugin:parser:match')({
+            pluginId: 'com.sienci.other',
+            parserId: 'probe',
+        });
 
-		expect(source.postMessage).not.toHaveBeenCalled();
+        expect(source.postMessage).not.toHaveBeenCalled();
 
-		unregisterPluginWindow(source);
-	});
+        unregisterPluginWindow(source);
+    });
 });

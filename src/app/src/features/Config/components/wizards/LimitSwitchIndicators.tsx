@@ -1,41 +1,41 @@
-import { PinIndicator } from "app/features/MachineInfo/PinRow.tsx";
-import type { RootState } from "app/store/redux";
-import get from "lodash/get";
-import { useSelector } from "react-redux";
+import { PinIndicator } from 'app/features/MachineInfo/PinRow.tsx';
+import type { RootState } from 'app/store/redux';
+import get from 'lodash/get';
+import { useSelector } from 'react-redux';
 
 export function LimitSwitchIndicators() {
-	const status = useSelector(
-		(state: RootState) => state.controller.state.status,
-	);
+    const status = useSelector(
+        (state: RootState) => state.controller.state.status,
+    );
 
-	const pinState = get(status, "pinState", {});
-	// Pins we're using
-	const aAxis = get(pinState, "A", false);
-	const xAxis = get(pinState, "X", false);
-	const yAxis = get(pinState, "Y", false);
-	const zAxis = get(pinState, "Z", false);
+    const pinState = get(status, 'pinState', {});
+    // Pins we're using
+    const aAxis = get(pinState, 'A', false);
+    const xAxis = get(pinState, 'X', false);
+    const yAxis = get(pinState, 'Y', false);
+    const zAxis = get(pinState, 'Z', false);
 
-	return (
-		<div className="flex flex-row items-center gap-2 dark:text-content-primary">
-			<div className="flex flex-row gap-2 items-center">
-				<span className="dark:text-content-primary">X:</span>
-				<PinIndicator on={xAxis} />
-			</div>
-			|
-			<div className="flex flex-row gap-2 items-center">
-				<span className="dark:text-content-primary">Y:</span>
-				<PinIndicator on={yAxis} />
-			</div>
-			|
-			<div className="flex flex-row gap-2 items-center">
-				<span className="dark:text-content-primary">Z:</span>
-				<PinIndicator on={zAxis} />
-			</div>
-			|
-			<div className="flex flex-row gap-2 items-center">
-				<span className="dark:text-content-primary">A:</span>
-				<PinIndicator on={aAxis} />
-			</div>
-		</div>
-	);
+    return (
+        <div className="flex flex-row items-center gap-2 dark:text-content-primary">
+            <div className="flex flex-row gap-2 items-center">
+                <span className="dark:text-content-primary">X:</span>
+                <PinIndicator on={xAxis} />
+            </div>
+            |
+            <div className="flex flex-row gap-2 items-center">
+                <span className="dark:text-content-primary">Y:</span>
+                <PinIndicator on={yAxis} />
+            </div>
+            |
+            <div className="flex flex-row gap-2 items-center">
+                <span className="dark:text-content-primary">Z:</span>
+                <PinIndicator on={zAxis} />
+            </div>
+            |
+            <div className="flex flex-row gap-2 items-center">
+                <span className="dark:text-content-primary">A:</span>
+                <PinIndicator on={aAxis} />
+            </div>
+        </div>
+    );
 }

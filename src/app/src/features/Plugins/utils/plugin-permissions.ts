@@ -1,14 +1,14 @@
-import type { PluginCapabilities } from "../types";
+import type { PluginCapabilities } from '../types';
 
 export const EMPTY_CAPABILITIES: PluginCapabilities = {
-	requestTypes: new Set([]),
-	topics: new Set([]),
+    requestTypes: new Set([]),
+    topics: new Set([]),
 };
 
 type PluginRegistration = {
-	capabilities: PluginCapabilities;
-	pluginId: string;
-	windowId: number;
+    capabilities: PluginCapabilities;
+    pluginId: string;
+    windowId: number;
 };
 
 const registry = new Map<MessageEventSource, PluginRegistration>();
@@ -20,24 +20,24 @@ const registry = new Map<MessageEventSource, PluginRegistration>();
 let nextWindowId = 1;
 
 export const registerPluginWindow = (
-	win: MessageEventSource,
-	capabilities: PluginCapabilities,
-	pluginId: string
+    win: MessageEventSource,
+    capabilities: PluginCapabilities,
+    pluginId: string,
 ): void => {
-	registry.set(win, { capabilities, pluginId, windowId: nextWindowId++ });
+    registry.set(win, { capabilities, pluginId, windowId: nextWindowId++ });
 };
 
 export const unregisterPluginWindow = (win: MessageEventSource): void => {
-	registry.delete(win);
+    registry.delete(win);
 };
 
 export const getCapabilitiesForSource = (
-	source: MessageEventSource | null
+    source: MessageEventSource | null,
 ): PluginCapabilities | null =>
-	(source ? (registry.get(source)?.capabilities ?? null) : null);
+    source ? (registry.get(source)?.capabilities ?? null) : null;
 
 export const getPluginIdForSource = (
-	source: MessageEventSource | null
+    source: MessageEventSource | null,
 ): string | null => (source ? (registry.get(source)?.pluginId ?? null) : null);
 
 /**
@@ -46,10 +46,10 @@ export const getPluginIdForSource = (
  * that iframe unmounts.
  */
 export const getOwnerIdForSource = (
-	source: MessageEventSource | null
+    source: MessageEventSource | null,
 ): string | null => {
-	const registration = source ? registry.get(source) : undefined;
-	return registration
-		? `${registration.pluginId}#${registration.windowId}`
-		: null;
+    const registration = source ? registry.get(source) : undefined;
+    return registration
+        ? `${registration.pluginId}#${registration.windowId}`
+        : null;
 };
