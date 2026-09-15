@@ -91,9 +91,9 @@ function restoreEEPROMDefaults(
 }
 
 export function RestoreDefaultDialog({
-    isSienciMachine = false,
+    canRestoreDefaults = false,
 }: {
-    isSienciMachine?: boolean;
+    canRestoreDefaults?: boolean;
 }) {
     const isConnected = useSelector(
         (state: RootState) => state.connection.isConnected,
@@ -131,7 +131,9 @@ export function RestoreDefaultDialog({
                                 <ActionButton
                                     icon={<GrRevert />}
                                     label="Defaults"
-                                    disabled={!isConnected || !isSienciMachine}
+                                    disabled={
+                                        !isConnected || !canRestoreDefaults
+                                    }
                                 />
                             </AlertDialogTrigger>
                             <AlertDialogContent className="bg-white">

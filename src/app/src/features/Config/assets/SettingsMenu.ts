@@ -566,6 +566,14 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'boolean',
                         defaultValue: false,
                     },
+                    {
+                        label: 'Portrait macro bar',
+                        key: 'workspace.portraitMacroBar',
+                        description:
+                            'Show a quick-access macro bar at the bottom of the screen in portrait mode.',
+                        type: 'boolean',
+                        defaultValue: false,
+                    },
                 ],
             },
             {
@@ -1274,6 +1282,22 @@ export const SettingsMenu: SettingsMenuSection[] = [
                     {
                         type: 'eeprom',
                         eID: '$27',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$290',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$291',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$292',
+                    },
+                    {
+                        type: 'eeprom',
+                        eID: '$293',
                     },
                     {
                         type: 'eeprom',

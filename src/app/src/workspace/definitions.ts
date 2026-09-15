@@ -34,6 +34,7 @@ export interface Workspace {
     spindleFunctions: boolean;
     coolantFunctions: boolean;
     atcEnabled: boolean;
+    portraitMacroBar: boolean;
     collectUsageDataStatus: 'accepted' | 'denied' | 'pending';
     safeRetractHeight: number;
     customDecimalPlaces: number;

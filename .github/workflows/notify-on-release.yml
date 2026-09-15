@@ -1,0 +1,34 @@
+name: Notify on Release in Discord
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release Tag (e.g., v1.2.3)'
+        required: true
+        default: 'v1.0.0-test'
+      release_body:
+        description: 'Release Notes / Description'
+        required: false
+        default: 'This is a manual test of the Discord notification system.'
+
+jobs:
+  notify-on-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Notify on Release in Discord
+        uses: appleboy/discord-action@v1.2.0
+        with:
+          webhook_url: ${{ secrets.DISCORD_GSENDER_NOTIFICATIONS_WEBHOOK_URL }}
+          message: |
+            🤖 **A new release has been published:** ${{ github.event.release.tag_name || inputs.tag_name }}
+            
+            Link to the release: https://github.com{{ github.event.release.tag_name || inputs.tag_name }}
+            
+            **Release Notes:**
+            ${{ github.event.release.body || inputs.release_body }}

@@ -26,7 +26,7 @@ gSender is available for the systems below and does not yet support headless Pi 
 | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x64)        | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/MAC.png)<br>Mac (Intel)          | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/LIN.png)<br>Linux (Intel)              | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/LIN.png)<br>Linux (ARM)              | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Pi (64 bit)                                        |
 |-----------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
 |                                                                                                                             |                                                                                                                         |                                                                                                                                 |                                                                                                                               |                                                                                                                        |
-| ```  Available  ```  [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.6.2/gSender-1.6.2-Windows-64Bit.exe) | ```  Available  ```  [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.6.2/gSender-1.6.2-Mac-Intel.dmg) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.6.2/gSender-1.6.2-Linux-Intel-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.6.2/gSender-1.6.2-Linux-ARM-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.6.2/gSender-1.6.2-PI-64Bit.deb) |
+| ```  Available  ```  [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.6.3/gSender-1.6.3-Windows-64Bit.exe) | ```  Available  ```  [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.6.3/gSender-1.6.3-Mac-Intel.dmg) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.6.3/gSender-1.6.3-Linux-Intel-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.6.3/gSender-1.6.3-Linux-ARM-64Bit.deb) | ```  Available  ```  [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.6.3/gSender-1.6.3-PI-64Bit.deb) |
      
 
 [Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
@@ -111,6 +111,18 @@ You can both run gSender locally using the public code-base as well as compile i
 ## 🕣 Development History
 <details>
 <summary>Expand to see all version notes</summary>
+
+### 1.6.4 (September 15, 2026)
+- Removed corner selection on probing feature entirely.  All corners have been reset to bottom left.
+- Added $290, $291, $292, and $293 to config page for custom homing pulloffs when compiled in to grblHAL as option
+- Updated MK3 profiles
+- Notifications are again notifying on Alarms and Errors in the notification center.
+- Added Voron Cascade profile
+- Toolchange ack keybind no longer gated behind non-Tool state so should be usable again
+- Pulloff uses $27 if home on 0 bit not set for various Z actions instead of a fixed value in several places
+- TLS and Rack position steps in ATC setup have been swapped
+- Pause button now disabled when workflow already paused/in a hold state
+
 
 ### 1.6.3 (July 23, 2026)
 - Added LongMill MK3 profiles.
