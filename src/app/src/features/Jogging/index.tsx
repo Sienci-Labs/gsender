@@ -21,9 +21,11 @@ import { StopButton } from 'app/features/Jogging/components/StopButton';
 import { ZJog } from 'app/features/Jogging/components/ZJog';
 import {
     cancelJog,
+    feedJog,
     type JoggingSpeedOptions,
     jogAxis,
     startJogCommand,
+    stopContinuousJog,
 } from 'app/features/Jogging/utils/Jogging';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { useWidgetState } from 'app/hooks/useWidgetState';
@@ -160,7 +162,10 @@ export function Jogging({ hideRotary = false }) {
     const handleJoystickJog = useCallback(
         (
             params: Record<string, number>,
-            { doRegularJog }: { doRegularJog?: boolean } = {},
+            {
+                doRegularJog,
+                mode,
+            }: { doRegularJog?: boolean; mode?: 'feed' } = {},
         ) => {
             const isInRotaryMode =
                 store.get('workspace.mode', '') === WORKSPACE_MODE.ROTARY;
@@ -205,16 +210,66 @@ export function Jogging({ hideRotary = false }) {
             // If so, extract it and remove it from params to avoid duplication
             const paramFeedrate = params.F;
             const jogParams = { ...params };
+            delete jogParams.F;
 
-            if (paramFeedrate !== undefined) {
-                delete jogParams.F;
-                jogAxis(jogParams, paramFeedrate);
-            } else {
-                jogAxis(params, feedrate);
+            const resolvedFeedrate = paramFeedrate ?? feedrate;
+
+            // The handwheel tops up a distance budget the server is already
+            // draining, so a continuous spin produces continuous motion instead
+            // of one accel/decel cycle per pulse.
+            if (mode === 'feed') {
+                feedJog(jogParams, resolvedFeedrate);
+                return;
             }
+
+            jogAxis(jogParams, resolvedFeedrate);
         },
         [jogSpeed],
     );
+
+    // The handwheel has no "released" event, so an idle gap ends the stream and
+    // releases the server-side jog lock.
+    const mpgIdleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const MPG_IDLE_MS = 400;
+
+    const handleMPGJog = useCallback(
+        (params: Record<string, number>) => {
+            handleJoystickJog(params, { mode: 'feed' });
+
+            if (mpgIdleTimer.current) {
+                clearTimeout(mpgIdleTimer.current);
+            }
+            mpgIdleTimer.current = setTimeout(() => {
+                mpgIdleTimer.current = null;
+                stopContinuousJog();
+            }, MPG_IDLE_MS);
+        },
+        [handleJoystickJog],
+    );
+
+    // Last line of defence for a hold whose release never arrives - the jog
+    // control unmounting under a finger, or the window going away mid-press.
+    // use-long-press only clears its own timer in that case, so nothing else
+    // would send the stop.
+    //
+    // Deliberately unconditional rather than gated on the last known machine
+    // state: a stop that arrives with nothing jogging is a no-op server-side
+    // and an ignored 0x85 at the firmware, while a stale "not jogging" reading
+    // would skip the stop in exactly the case this exists for.
+    useEffect(() => {
+        const stopIfHidden = () => {
+            if (document.hidden) {
+                stopContinuousJog();
+            }
+        };
+        document.addEventListener('visibilitychange', stopIfHidden);
+        window.addEventListener('blur', stopContinuousJog);
+        return () => {
+            document.removeEventListener('visibilitychange', stopIfHidden);
+            window.removeEventListener('blur', stopContinuousJog);
+            stopContinuousJog();
+        };
+    }, []);
 
     useEffect(() => {
         if (!initialized) {
@@ -263,7 +318,7 @@ export function Jogging({ hideRotary = false }) {
                         return;
                     }
 
-                    const { degrees, detail } = output;
+                    const { degrees, detail, distance = {} } = output;
 
                     const { axis } = detail;
 
@@ -353,7 +408,7 @@ export function Jogging({ hideRotary = false }) {
                             return;
                         }
 
-                        handleJoystickJog(mpgCommand);
+                        handleMPGJog(mpgCommand);
                         return;
                     }
 
@@ -525,7 +580,6 @@ export function Jogging({ hideRotary = false }) {
                         joystickLoop.current = new JoystickLoop({
                             gamepadProfile: currentProfile,
                             jog: handleJoystickJog,
-                            standardJog: handleJoystickJog,
                             cancelJog: cancelJog,
                             feedrate: jogSpeedRef.current.feedrate,
                             multiplier: { leftStick: 1, rightStick: 1 },
@@ -561,9 +615,13 @@ export function Jogging({ hideRotary = false }) {
                         feedrate: jogSpeedRef.current.feedrate,
                         activeAxis: axis,
                         axes: data,
+                        // Stick deflection, 0..1. It lives on the event payload
+                        // beside `degrees`, not on the raw gamepad detail - reading
+                        // it from `detail` yielded undefined, which became a NaN
+                        // feedrate and reached the firmware as F1.
                         multiplier: {
-                            leftStick: detail.distance,
-                            rightStick: detail.distance,
+                            leftStick: distance.leftStick,
+                            rightStick: distance.rightStick,
                         },
                         degrees: activeStickDegrees,
                     });
@@ -581,8 +639,13 @@ export function Jogging({ hideRotary = false }) {
             }
             mpgJogManagerRef.current?.reset();
             mpgJogManagerRef.current = null;
+            if (mpgIdleTimer.current) {
+                clearTimeout(mpgIdleTimer.current);
+                mpgIdleTimer.current = null;
+                stopContinuousJog();
+            }
         };
-    }, [isConnected, handleJoystickJog]);
+    }, [isConnected, handleJoystickJog, handleMPGJog]);
 
     const jogHelper = useRef<JogHelper | null>(null);
 
@@ -660,10 +723,6 @@ export function Jogging({ hideRotary = false }) {
             saveCustomValues(newJogSpeed);
         }
     }
-
-    const stopContinuousJog = () => {
-        controller.command('jog:stop');
-    };
 
     const handleShortcutJog = ({
         axis,
