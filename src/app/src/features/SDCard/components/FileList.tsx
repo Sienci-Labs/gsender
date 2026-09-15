@@ -1,6 +1,4 @@
-import React, { useRef, useState } from 'react';
-import { Play, Trash2, File } from 'lucide-react';
-import { useSDCard } from '../hooks/useSDCard';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 import {
     Table,
     TableBody,
@@ -9,14 +7,19 @@ import {
     TableHeader,
     TableRow,
 } from 'app/components/shadcn/Table';
-import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
+import {
+    ACCEPTED_EXTENSIONS,
+    validateSDFilename,
+} from 'app/features/SDCard/components/UploadModal.tsx';
 import controller from 'app/lib/controller.ts';
+import { toast } from 'app/lib/toaster';
+import store from 'app/store';
 import reduxStore from 'app/store/redux';
 import { clearSDCardFiles } from 'app/store/redux/slices/controller.slice.ts';
 import cn from 'classnames';
-import { toast } from 'app/lib/toaster';
-import { ACCEPTED_EXTENSIONS, validateSDFilename } from 'app/features/SDCard/components/UploadModal.tsx';
-import store from 'app/store';
+import { File, Play, Trash2 } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { useSDCard } from '../hooks/useSDCard';
 
 const formatFileSize = (bytes: number): string => {
     const units = ['B', 'KB', 'MB', 'GB'];
@@ -32,7 +35,9 @@ const formatFileSize = (bytes: number): string => {
 };
 
 function getUnusableReason(filename: string): string {
-    return validateSDFilename(filename) ?? 'File flagged as unusable by firmware';
+    return (
+        validateSDFilename(filename) ?? 'File flagged as unusable by firmware'
+    );
 }
 
 export function isFileATCIRelated(filename, atciMacros) {
@@ -56,7 +61,7 @@ export const FileList: React.FC = () => {
         firmwareType,
         hasFTP,
         hasYM,
-        isWorkflowIdle
+        isWorkflowIdle,
     } = useSDCard();
     const [dragOver, setDragOver] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -286,7 +291,9 @@ export const FileList: React.FC = () => {
                                         {file.unusable && (
                                             <span
                                                 className="text-xs font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded"
-                                                title={getUnusableReason(file.name)}
+                                                title={getUnusableReason(
+                                                    file.name,
+                                                )}
                                             >
                                                 Unusable
                                             </span>
@@ -298,7 +305,13 @@ export const FileList: React.FC = () => {
                                                 onClick={() =>
                                                     runSDFile(file.name)
                                                 }
-                                                disabled={isRunningSDFile || !isWorkflowIdle || isLoading || isATCI || file.unusable}
+                                                disabled={
+                                                    isRunningSDFile ||
+                                                    !isWorkflowIdle ||
+                                                    isLoading ||
+                                                    isATCI ||
+                                                    file.unusable
+                                                }
                                                 className="flex items-center space-x-1 px-3 py-1.5 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                                             >
                                                 <Play className="w-3.5 h-3.5" />
@@ -309,7 +322,11 @@ export const FileList: React.FC = () => {
                                                 onClick={() =>
                                                     handleDelete(file.name)
                                                 }
-                                                disabled={isRunningSDFile || !isWorkflowIdle || isLoading}
+                                                disabled={
+                                                    isRunningSDFile ||
+                                                    !isWorkflowIdle ||
+                                                    isLoading
+                                                }
                                                 className="flex items-center space-x-1 px-3 py-1.5 text-sm bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                                             >
                                                 <Trash2 className="w-3.5 h-3.5" />

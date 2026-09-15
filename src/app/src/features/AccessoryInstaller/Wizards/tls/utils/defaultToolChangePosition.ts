@@ -1,14 +1,14 @@
-import get from 'lodash/get';
-import reduxStore from 'app/store/redux';
-import prefStore from 'app/store';
 import { EEPROMSettings } from 'app/definitions/firmware.ts';
 import {
+    BACK_RIGHT,
+    FRONT_LEFT,
+    FRONT_RIGHT,
     getHomingLocation,
     isBitSetInNumber,
-    FRONT_RIGHT,
-    FRONT_LEFT,
-    BACK_RIGHT,
 } from 'app/features/DRO/utils/RapidPosition.ts';
+import prefStore from 'app/store';
+import reduxStore from 'app/store/redux';
+import get from 'lodash/get';
 
 // Default tool change location: 2/3 of the way toward the front (Y),
 // 1/3 of the way toward the right (X), measured from the right/back edges

@@ -1,13 +1,12 @@
+import { MachineProfile } from 'app/definitions/firmware';
+import { truncatePort } from 'app/features/Stats/utils/statUtils.ts';
+import { homingString } from 'app/lib/eeprom.ts';
+import { isIPv4 } from 'app/lib/utils';
+import store from 'app/store';
+import { RootState } from 'app/store/redux';
+import get from 'lodash/get';
 import { ReactNode } from 'react';
 import { useSelector } from 'react-redux';
-import get from 'lodash/get';
-
-import { RootState } from 'app/store/redux';
-import { homingString } from 'app/lib/eeprom.ts';
-import { truncatePort } from 'app/features/Stats/utils/statUtils.ts';
-import store from 'app/store';
-import { MachineProfile } from 'app/definitions/firmware';
-import { isIPv4 } from 'app/lib/utils';
 
 export function ConfigRow({
     label,

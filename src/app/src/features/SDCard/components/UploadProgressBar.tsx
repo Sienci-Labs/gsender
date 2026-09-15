@@ -1,5 +1,5 @@
-import { CheckCircle2 } from 'lucide-react';
 import cn from 'classnames';
+import { CheckCircle2 } from 'lucide-react';
 import { UploadState } from '../hooks/useSDCard';
 
 interface UploadProgressBarProps {

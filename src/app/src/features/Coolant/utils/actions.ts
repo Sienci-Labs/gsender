@@ -1,7 +1,12 @@
-import { GRBL, GRBL_ACTIVE_STATE_IDLE, GRBLHAL, WORKFLOW_STATE_RUNNING } from 'app/constants';
+import {
+    GRBL,
+    GRBL_ACTIVE_STATE_IDLE,
+    GRBLHAL,
+    WORKFLOW_STATE_RUNNING,
+} from 'app/constants';
 import controller from 'app/lib/controller';
-import { get } from 'lodash';
 import reduxStore from 'app/store/redux';
+import { get } from 'lodash';
 
 export function startMist() {
     controller.command('gcode', 'M7');
@@ -16,10 +21,7 @@ export function stopCoolant() {
 }
 
 export const canRunShortcut = (): boolean => {
-    const isConnected = get(
-        reduxStore.getState(),
-        'connection.isConnected',
-    );
+    const isConnected = get(reduxStore.getState(), 'connection.isConnected');
     const workflow = get(reduxStore.getState(), 'controller.workflow');
     const controllerType = get(reduxStore.getState(), 'controller.type');
     const controllerState = get(reduxStore.getState(), 'controller.state');

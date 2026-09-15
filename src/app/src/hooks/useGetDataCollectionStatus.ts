@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import api from 'app/api';
 
 import { USER_DATA_COLLECTION } from 'app/constants';
-import api from 'app/api';
+import { useEffect, useState } from 'react';
 
 export type UserDataCollectionStatus =
     (typeof USER_DATA_COLLECTION)[keyof typeof USER_DATA_COLLECTION];

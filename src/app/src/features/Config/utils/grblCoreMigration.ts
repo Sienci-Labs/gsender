@@ -1,9 +1,9 @@
 import { EEPROM, EEPROMSettings } from 'app/definitions/firmware';
+import { getBoardProfile } from 'app/features/Config/assets/MachineDefaults/boardProfiles.ts';
 import {
     GRBLCORE_MIGRATION,
     GrblCoreMigration,
 } from 'app/features/Config/assets/MachineDefaults/grblCore.ts';
-import { getBoardProfile } from 'app/features/Config/assets/MachineDefaults/boardProfiles.ts';
 
 export interface ResolveDefaultsOptions {
     firmwareSemver: number | undefined;
@@ -86,7 +86,10 @@ export function translateGrblCoreOrderedSettings(
     boardId?: string,
     migration: GrblCoreMigration = GRBLCORE_MIGRATION,
 ): Map<EEPROM, string> | undefined {
-    if (!ordered || !usesGrblCoreMigration(firmwareSemver, boardId, migration)) {
+    if (
+        !ordered ||
+        !usesGrblCoreMigration(firmwareSemver, boardId, migration)
+    ) {
         return ordered;
     }
 

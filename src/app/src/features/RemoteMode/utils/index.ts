@@ -1,10 +1,15 @@
 import isElectron from 'is-electron';
 
-export async function copyToClipboard(text: string): Promise<{ success: boolean, error?: string }> {
+export async function copyToClipboard(
+    text: string,
+): Promise<{ success: boolean; error?: string }> {
     try {
         if (isElectron()) {
             // @ts-ignore
-            const result = await window.ipcRenderer.invoke('copy-to-clipboard', text);
+            const result = await window.ipcRenderer.invoke(
+                'copy-to-clipboard',
+                text,
+            );
 
             return { success: result.success, error: result.error };
         } else {

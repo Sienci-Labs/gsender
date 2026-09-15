@@ -1,19 +1,18 @@
-import { useEffect, useState } from 'react';
-import { LuBell } from 'react-icons/lu';
-
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from 'app/components/shadcn/Popover';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import { NotificationDisplay } from 'app/features/NotificationsArea/NotificationDisplay';
-import useKeybinding from 'app/lib/useKeybinding';
-import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import Tooltip from 'app/components/Tooltip';
 import { TOOLBAR_CATEGORY } from 'app/constants';
+import { NotificationDisplay } from 'app/features/NotificationsArea/NotificationDisplay';
+import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import useKeybinding from 'app/lib/useKeybinding';
 import reduxStore from 'app/store/redux';
 import { readAllNotifications } from 'app/store/redux/slices/preferences.slice.ts';
-import Tooltip from 'app/components/Tooltip';
+import { useEffect, useState } from 'react';
+import { LuBell } from 'react-icons/lu';
 
 const NotificationsArea = () => {
     const [open, setOpen] = useState(false);

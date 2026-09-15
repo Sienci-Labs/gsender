@@ -1,24 +1,20 @@
-import get from 'lodash/get';
-import includes from 'lodash/includes';
-import mapValues from 'lodash/mapValues';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-import { defaultDROPosition } from 'app/features/DRO/utils/DRO';
-import { mapPositionToUnits } from 'app/lib/units.ts';
 import {
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
     WORKFLOW_STATE_RUNNING,
 } from 'app/constants';
+import { defaultDROPosition } from 'app/features/DRO/utils/DRO';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { mapPositionToUnits } from 'app/lib/units.ts';
+import get from 'lodash/get';
+import includes from 'lodash/includes';
+import mapValues from 'lodash/mapValues';
 
 export function ATCConfigDRO() {
     const { units: preferredUnits } = useWorkspaceState();
-    const wposController = useTypedSelector(
-        (state) => state.controller.wpos,
-    );
-    const mposController = useTypedSelector(
-        (state) => state.controller.mpos,
-    );
+    const wposController = useTypedSelector((state) => state.controller.wpos);
+    const mposController = useTypedSelector((state) => state.controller.mpos);
     const workflowState = useTypedSelector(
         (state) => state.controller.workflow.state,
     );
@@ -29,9 +25,8 @@ export function ATCConfigDRO() {
         (state) => state.connection.isConnected,
     );
 
-    const wpos = mapValues(
-        wposController || defaultDROPosition,
-        (pos) => mapPositionToUnits(pos, preferredUnits),
+    const wpos = mapValues(wposController || defaultDROPosition, (pos) =>
+        mapPositionToUnits(pos, preferredUnits),
     );
 
     const canClick = (() => {

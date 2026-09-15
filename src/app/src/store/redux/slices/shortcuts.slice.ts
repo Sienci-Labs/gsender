@@ -1,5 +1,5 @@
-import { ShortcutSliceState } from 'app/store/definitions.ts';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ShortcutSliceState } from 'app/store/definitions.ts';
 
 const initialState: ShortcutSliceState = {
     isFinished: false,

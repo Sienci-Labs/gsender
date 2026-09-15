@@ -21,11 +21,8 @@
  *
  */
 import controller from 'app/lib/controller';
+import { getProbeSettings, getToolString } from 'app/lib/toolChangeUtils';
 import store from 'app/store';
-import {
-    getProbeSettings,
-    getToolString,
-} from 'app/lib/toolChangeUtils';
 import { store as reduxStore } from 'app/store/redux';
 import get from 'lodash/get';
 
@@ -41,46 +38,48 @@ const calculateMaxZProbeDistance = (_zProbeDistance = 30) => {
     return (maxZTravel - curZPos - 2).toFixed(3);
 };
 
-const probeInitialToolStep = [{
-    title: 'Starting Off',
-    firstRunOnly: true,
-    substeps: [
-        {
-            title: 'Safety First',
-            description:
-                'Ensure that your router/spindle is turned off and has fully stopped spinning and prepare to check the length of the current, initial cutting tool.',
-            overlay: false,
-            actions: [
-                {
-                    label: 'Probe Initial Tool',
-                    gcodeLines: [
-                        'G91 G21',
-                        'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
-                        'G53 G0 X[global.toolchange.PROBE_POS_X] Y[global.toolchange.PROBE_POS_Y]',
-                        'G53 G0 Z[global.toolchange.PROBE_POS_Z]',
-                        'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
-                        'G0 Z[global.toolchange.RETRACT]',
-                        'G38.2 Z-10 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
-                        'G4 P0.3',
-                        '%global.toolchange.TOOL_OFFSET=posz',
-                        '(TLO set: [global.toolchange.TOOL_OFFSET])',
-                        'G0 Z[global.toolchange.RETRACT]',
-                        'G90 G21',
-                        'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
-                    ],
-                },
-            ],
-        },
-    ],
-}];
+const probeInitialToolStep = [
+    {
+        title: 'Starting Off',
+        firstRunOnly: true,
+        substeps: [
+            {
+                title: 'Safety First',
+                description:
+                    'Ensure that your router/spindle is turned off and has fully stopped spinning and prepare to check the length of the current, initial cutting tool.',
+                overlay: false,
+                actions: [
+                    {
+                        label: 'Probe Initial Tool',
+                        gcodeLines: [
+                            'G91 G21',
+                            'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                            'G53 G0 X[global.toolchange.PROBE_POS_X] Y[global.toolchange.PROBE_POS_Y]',
+                            'G53 G0 Z[global.toolchange.PROBE_POS_Z]',
+                            'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
+                            'G0 Z[global.toolchange.RETRACT]',
+                            'G38.2 Z-10 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
+                            'G4 P0.3',
+                            '%global.toolchange.TOOL_OFFSET=posz',
+                            '(TLO set: [global.toolchange.TOOL_OFFSET])',
+                            'G0 Z[global.toolchange.RETRACT]',
+                            'G90 G21',
+                            'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                        ],
+                    },
+                ],
+            },
+        ],
+    },
+];
 
 const getMoveToToolchangePositionSubstep = () => ({
     title: 'Change Tool',
     description: () => (
         <div>
-            Ensure that your router/spindle is turned off
-            and has fully stopped spinning, and prepare to
-            change over to the next tool ({getToolString()}).
+            Ensure that your router/spindle is turned off and has fully stopped
+            spinning, and prepare to change over to the next tool (
+            {getToolString()}).
         </div>
     ),
     overlay: false,
@@ -99,7 +98,10 @@ const getMoveToToolchangePositionSubstep = () => ({
 });
 
 const createWizard = (count: number) => {
-    const hasManualToolchangePosition = store.get('workspace.toolChange.moveToManualPosition', false);
+    const hasManualToolchangePosition = store.get(
+        'workspace.toolChange.moveToManualPosition',
+        false,
+    );
     const manualPosition = store.get('workspace.toolChange.manualPosition', {
         x: 0,
         y: 0,
@@ -166,10 +168,12 @@ const createWizard = (count: number) => {
                         title: 'Measure New Tool',
                         description: () => (
                             <div>
-                                { hasManualToolchangePosition || 'Ensure that your router/spindle is turned off and has fully stopped spinning. ' }
-                                After you've switched to the new tool ({getToolString()}),
-                                click the button below to automatically probe and set the
-                                new tool's length offset.
+                                {hasManualToolchangePosition ||
+                                    'Ensure that your router/spindle is turned off and has fully stopped spinning. '}
+                                After you've switched to the new tool (
+                                {getToolString()}), click the button below to
+                                automatically probe and set the new tool's
+                                length offset.
                             </div>
                         ),
                         overlay: false,
@@ -228,7 +232,7 @@ const createWizard = (count: number) => {
                 ],
             },
         ],
-    }
+    };
 };
 
 export default createWizard;

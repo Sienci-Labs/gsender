@@ -21,13 +21,13 @@
  *
  */
 
-import React, { PureComponent } from 'react';
 import pubsub from 'pubsub-js';
+import React, { PureComponent } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import uuid from 'uuid';
-import styles from './toaster.styl';
 import Toast from './Toast';
 import { TOASTER_DEFAULT, TOASTER_UNTIL_CLOSE } from './ToasterLib';
+import styles from './toaster.styl';
 
 class Toaster extends PureComponent {
     pubsubTokens = [];

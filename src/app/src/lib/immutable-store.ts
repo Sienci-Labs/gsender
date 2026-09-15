@@ -21,14 +21,14 @@
  *
  */
 
+import events from 'events';
+import extend from 'lodash/extend';
 import get from 'lodash/get';
 import isEqual from 'lodash/isEqual';
 import merge from 'lodash/merge';
-import set from 'lodash/set';
-import extend from 'lodash/extend';
-import unset from 'lodash/unset';
 import noop from 'lodash/noop';
-import events from 'events';
+import set from 'lodash/set';
+import unset from 'lodash/unset';
 
 import { determineRoundedValue } from './rounding';
 

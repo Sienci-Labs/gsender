@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-import { ConsoleState } from '../../definitions';
 import { MAX_TERMINAL_INPUT_ARRAY_SIZE } from 'app/lib/constants';
+import { ConsoleState } from '../../definitions';
 
 const initialState: ConsoleState = {
     inputHistory: [],

@@ -1,14 +1,14 @@
-import store from 'app/store';
 import api from 'app/api';
-import { restoreDefault, storeUpdate } from 'app/lib/storeUpdate';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
-import { generateEEPROMSettings } from 'app/features/Config/utils/EEPROM.ts';
-import { toast } from 'sonner';
-import controller from 'app/lib/controller.ts';
-import pubsub from 'pubsub-js';
 import { EEPROM, FilteredEEPROM } from 'app/definitions/firmware';
-import { gSenderSetting, gSenderSettingsValues } from '../assets/SettingsMenu';
+import { generateEEPROMSettings } from 'app/features/Config/utils/EEPROM.ts';
+import controller from 'app/lib/controller.ts';
+import { restoreDefault, storeUpdate } from 'app/lib/storeUpdate';
+import store from 'app/store';
 import { State } from 'app/store/definitions';
+import pubsub from 'pubsub-js';
+import { toast } from 'sonner';
+import { gSenderSetting, gSenderSettingsValues } from '../assets/SettingsMenu';
 
 export function exportFirmwareSettings(settings: object) {
     const output = JSON.stringify(settings);

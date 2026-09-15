@@ -1,5 +1,5 @@
-import React from 'react';
 import get from 'lodash/get';
+import React from 'react';
 import { connect } from 'react-redux';
 import BitfieldInput from './BitfieldInput';
 

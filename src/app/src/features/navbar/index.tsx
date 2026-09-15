@@ -1,15 +1,14 @@
-import { FaTasks } from 'react-icons/fa';
-import { RiToolsFill } from 'react-icons/ri';
-import { IoSpeedometerOutline } from 'react-icons/io5';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 import cx from 'classnames';
-
-import Carve from './assets/Carve.svg';
-import { NavbarLink } from './components/NavbarLink.tsx';
+import pubsub from 'pubsub-js';
+import { FaTasks } from 'react-icons/fa';
+import { IoSpeedometerOutline } from 'react-icons/io5';
+import { RiToolsFill } from 'react-icons/ri';
 import { useLocation, useNavigate } from 'react-router';
 import { useSettings } from '../Config/utils/SettingsContext.tsx';
+import Carve from './assets/Carve.svg';
 import Blocker from './components/Blocker.tsx';
-import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
-import pubsub from 'pubsub-js';
+import { NavbarLink } from './components/NavbarLink.tsx';
 
 export const NavBar = () => {
     const { settingsAreDirty, setSettingsAreDirty } = useSettings();

@@ -21,10 +21,6 @@
  *
  */
 
-import chainedFunction from 'chained-function';
-import React from 'react';
-import uniqueId from 'lodash/uniqueId';
-import { MaintenanceTask } from 'app/features/Stats/utils/StatContext';
 import api from 'app/api';
 import {
     AlertDialog,
@@ -37,7 +33,11 @@ import {
     AlertDialogTitle,
 } from 'app/components/shadcn/AlertDialog';
 import { Button } from 'app/components/shadcn/Button';
+import { MaintenanceTask } from 'app/features/Stats/utils/StatContext';
 import { toast } from 'app/lib/toaster';
+import chainedFunction from 'chained-function';
+import uniqueId from 'lodash/uniqueId';
+import React from 'react';
 
 interface Props {
     tasks: MaintenanceTask[];

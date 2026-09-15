@@ -1,21 +1,19 @@
-import { useRef, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { LuCopy } from 'react-icons/lu';
-import { LuPaintbrush } from 'react-icons/lu';
-import { FaEllipsisH } from 'react-icons/fa';
-
 import { Button } from 'app/components/Button';
 import { Input } from 'app/components/shadcn/Input';
-import { addToInputHistory } from 'app/store/redux/slices/console.slice';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import controller from 'app/lib/controller';
-import { toast } from 'app/lib/toaster';
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from 'app/components/shadcn/Popover';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import controller from 'app/lib/controller';
+import { toast } from 'app/lib/toaster';
+import { addToInputHistory } from 'app/store/redux/slices/console.slice';
 import { usePostHog } from 'posthog-js/react';
+import { useRef, useState } from 'react';
+import { FaEllipsisH } from 'react-icons/fa';
+import { LuCopy, LuPaintbrush } from 'react-icons/lu';
+import { useDispatch } from 'react-redux';
 
 const COPY_HISTORY_LIMIT = 50;
 

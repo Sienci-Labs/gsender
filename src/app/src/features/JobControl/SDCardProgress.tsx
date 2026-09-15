@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import WoodcuttingProgress from 'app/features/JobControl/WoodcuttingProgress.tsx';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
-import WoodcuttingProgress from 'app/features/JobControl/WoodcuttingProgress.tsx';
+import { useEffect, useState } from 'react';
 
 export function SDCardProgress() {
     const [progress, setProgress] = useState({ name: null, percentage: 0 });

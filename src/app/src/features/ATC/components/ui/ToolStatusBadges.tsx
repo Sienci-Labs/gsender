@@ -1,11 +1,11 @@
-import cn from 'classnames';
 import { Badge } from 'app/features/ATC/components/ui/Badge';
+import { ToolProbeState } from 'app/features/ATC/types.ts';
 import {
     getToolStateClasses,
     manualChipTheme,
     toolStateThemes,
 } from 'app/features/ATC/utils/ATCiConstants.ts';
-import { ToolProbeState } from 'app/features/ATC/types.ts';
+import cn from 'classnames';
 
 const sizeClasses = {
     xs: {
@@ -86,7 +86,11 @@ export function ToolStatusBadges({
 
     return (
         <div
-            className={cn('inline-flex items-center', sizeConfig.container, className)}
+            className={cn(
+                'inline-flex items-center',
+                sizeConfig.container,
+                className,
+            )}
         >
             {manualPosition === 'before' ? manualBadge : null}
             {statusBadge}

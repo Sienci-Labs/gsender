@@ -21,12 +21,7 @@
  *
  */
 
-import * as THREE from 'three';
-import { ArcCurve } from 'three';
-
-import GCodeVirtualizer, { rotateAxis } from 'app/lib/GCodeVirtualizer';
 import { BasicPosition } from 'app/definitions/general';
-import { VISUALIZER_TYPES_T } from 'app/features/Visualizer/definitions';
 import {
     BACKGROUND_PART,
     G0_PART,
@@ -36,6 +31,10 @@ import {
     LASER_PART,
     TOOLPATH_COLOR_HEXES,
 } from 'app/features/Visualizer/constants';
+import { VISUALIZER_TYPES_T } from 'app/features/Visualizer/definitions';
+import GCodeVirtualizer, { rotateAxis } from 'app/lib/GCodeVirtualizer';
+import * as THREE from 'three';
+import { ArcCurve } from 'three';
 
 const toolpathColors = TOOLPATH_COLOR_HEXES.map((hex) => new THREE.Color(hex));
 
@@ -320,14 +319,22 @@ const parseRotaryMetadata = (raw: string): RotaryMetadata => {
     let inParenComment = false;
     for (let i = 0; i < raw.length && !hasYAxisMoves; i++) {
         const ch = raw.charCodeAt(i);
-        if (ch === 40) { inParenComment = true; continue; }   // '('
-        if (ch === 41) { inParenComment = false; continue; }  // ')'
-        if (ch === 59) {                                       // ';'
+        if (ch === 40) {
+            inParenComment = true;
+            continue;
+        } // '('
+        if (ch === 41) {
+            inParenComment = false;
+            continue;
+        } // ')'
+        if (ch === 59) {
+            // ';'
             while (i < raw.length && raw.charCodeAt(i) !== 10) i++;
             continue;
         }
         if (inParenComment) continue;
-        if (ch === 89 || ch === 121) {  // 'Y' or 'y'
+        if (ch === 89 || ch === 121) {
+            // 'Y' or 'y'
             const next = raw.charCodeAt(i + 1);
             if ((next >= 48 && next <= 57) || next === 43 || next === 45) {
                 hasYAxisMoves = true;
@@ -366,7 +373,8 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
         profiler.bytes.input_utf16_bytes = content.length * 2;
     }
 
-    const { radius: rotaryRadius, hasYAxisMoves } = parseRotaryMetadata(content);
+    const { radius: rotaryRadius, hasYAxisMoves } =
+        parseRotaryMetadata(content);
     markProfile(profiler, 'after_rotary_scan');
     sampleHeap(profiler, 'after_rotary_scan');
 
@@ -507,13 +515,13 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
         for (let i = 0; i < SVGVertices.length; i++) {
             parts.push(
                 SVGVertices[i].x1 +
-                ',' +
-                SVGVertices[i].y1 +
-                ',' +
-                SVGVertices[i].x2 +
-                ',' +
-                SVGVertices[i].y2 +
-                ',',
+                    ',' +
+                    SVGVertices[i].y1 +
+                    ',' +
+                    SVGVertices[i].x2 +
+                    ',' +
+                    SVGVertices[i].y2 +
+                    ',',
             );
         }
         paths.push({
@@ -587,7 +595,9 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                         const opacity = motion === 'G0' ? 0.5 : 1;
 
                         // Reusable scalars — no per-iteration object allocation
-                        let prevX = 0, prevY = 0, prevZ = 0;
+                        let prevX = 0,
+                            prevY = 0,
+                            prevZ = 0;
                         for (let i = 0; i <= segments; i++) {
                             const t = i / segments;
                             const interpolatedA =
@@ -605,8 +615,10 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                             const sinA = Math.sin(angle);
                             const cosA = Math.cos(angle);
                             const currX = interpolatedX;
-                            const currY = interpolatedY * cosA - interpolatedZ * sinA;
-                            const currZ = interpolatedY * sinA + interpolatedZ * cosA;
+                            const currY =
+                                interpolatedY * cosA - interpolatedZ * sinA;
+                            const currZ =
+                                interpolatedY * sinA + interpolatedZ * cosA;
 
                             if (i > 0) {
                                 // Add line segment from previous point to current point
@@ -705,7 +717,9 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                     );
 
                     // Reusable scalars — no per-iteration object allocation
-                    let prevX = 0, prevY = 0, prevZ = 0;
+                    let prevX = 0,
+                        prevY = 0,
+                        prevZ = 0;
                     for (let i = 0; i <= segments; i++) {
                         const t = i / segments;
                         const interpolatedA =
@@ -723,8 +737,10 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                         const sinA = Math.sin(angle);
                         const cosA = Math.cos(angle);
                         const currX = interpolatedX;
-                        const currY = interpolatedY * cosA - interpolatedZ * sinA;
-                        const currZ = interpolatedY * sinA + interpolatedZ * cosA;
+                        const currY =
+                            interpolatedY * cosA - interpolatedZ * sinA;
+                        const currZ =
+                            interpolatedY * sinA + interpolatedZ * cosA;
 
                         if (i > 0) {
                             // Add line segment from previous point to current point
@@ -822,7 +838,10 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                     // Adaptive tessellation: ~0.75mm per segment, clamped to [4, 25]
                     const arcSpan = Math.abs(endAngle - startAngle);
                     const arcLength = arcSpan * radius;
-                    const divisions = Math.max(4, Math.min(Math.ceil(arcLength / 0.75), 25));
+                    const divisions = Math.max(
+                        4,
+                        Math.min(Math.ceil(arcLength / 0.75), 25),
+                    );
                     const points = arcCurve.getPoints(divisions);
                     const pointCount = Math.max(points.length - 1, 1);
 
@@ -1026,7 +1045,8 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
 
         if (isLaser && needsVisualization) {
             updateSpindleStateFromLine(data);
-            const spindleIsOn = vm.modal.spindle === 'M3' || vm.modal.spindle === 'M4';
+            const spindleIsOn =
+                vm.modal.spindle === 'M3' || vm.modal.spindle === 'M4';
             pushFloat32_1(spindleFrameSpeeds, spindleIsOn ? spindleSpeed : 0);
         }
         onData();
@@ -1050,7 +1070,11 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
         vm.virtualize(line);
         virtualizedLines++;
 
-        if (ch === 13 && i + 1 < contentLength && content.charCodeAt(i + 1) === 10) {
+        if (
+            ch === 13 &&
+            i + 1 < contentLength &&
+            content.charCodeAt(i + 1) === 10
+        ) {
             i++;
         }
         lineStart = i + 1;
@@ -1099,8 +1123,12 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
         if (isLaser) {
             savedColorsArray = new Float32Array(colorArray);
             if (spindleFrameSpeeds.length > 0 && savedColorsArray.length > 0) {
-                const defaultColor = new THREE.Color(theme.get(LASER_PART) ?? '#FFF');
-                const fillColor = new THREE.Color(theme.get(BACKGROUND_PART) ?? '#FFF');
+                const defaultColor = new THREE.Color(
+                    theme.get(LASER_PART) ?? '#FFF',
+                );
+                const fillColor = new THREE.Color(
+                    theme.get(BACKGROUND_PART) ?? '#FFF',
+                );
                 const laserR = defaultColor.r;
                 const laserG = defaultColor.g;
                 const laserB = defaultColor.b;
@@ -1108,7 +1136,10 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                 const fillG = fillColor.g;
                 const fillB = fillColor.b;
                 const totalVertices = colorArray.length / 4;
-                const frameCount = Math.min(tFrames.length, spindleFrameSpeeds.length);
+                const frameCount = Math.min(
+                    tFrames.length,
+                    spindleFrameSpeeds.length,
+                );
                 const calculateOpacity = (speed: number) => {
                     if (maxSpindleSpeed <= 0) {
                         return 1;
@@ -1130,7 +1161,11 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                     const g = spindleIsOn ? laserG : fillG;
                     const b = spindleIsOn ? laserB : fillB;
 
-                    for (let vertexIndex = prevFrame; vertexIndex < frameEnd; vertexIndex++) {
+                    for (
+                        let vertexIndex = prevFrame;
+                        vertexIndex < frameEnd;
+                        vertexIndex++
+                    ) {
                         const offset = vertexIndex * 4;
                         savedColorsArray[offset] = r;
                         savedColorsArray[offset + 1] = g;
@@ -1170,11 +1205,13 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
         profiler.bytes.frames_bytes = compactFrames.byteLength;
         profiler.bytes.color_bytes = compactColorArray.byteLength;
         profiler.bytes.saved_color_bytes = compactSavedColorsArray.byteLength;
-        profiler.bytes.spindle_frame_speeds_bytes = compactSpindleFrameSpeeds.byteLength;
+        profiler.bytes.spindle_frame_speeds_bytes =
+            compactSpindleFrameSpeeds.byteLength;
         profiler.bytes.vertices_capacity_bytes = tVertices.buffer.byteLength;
         profiler.bytes.frames_capacity_bytes = tFrames.buffer.byteLength;
         profiler.bytes.color_capacity_bytes = colorArray.buffer.byteLength;
-        profiler.bytes.saved_color_capacity_bytes = savedColorsArray.buffer.byteLength;
+        profiler.bytes.saved_color_capacity_bytes =
+            savedColorsArray.buffer.byteLength;
     }
 
     const effectiveVisualizer = activeVisualizer ?? visualizer;
@@ -1310,13 +1347,22 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
         metadataMessage.profile = {
             durationsMs: {
                 rotaryScan: durationBetween('start', 'after_rotary_scan'),
-                lineSplit: durationBetween('before_line_split', 'after_line_split'),
-                parseLoop: durationBetween('before_parse_loop', 'after_parse_loop'),
+                lineSplit: durationBetween(
+                    'before_line_split',
+                    'after_line_split',
+                ),
+                parseLoop: durationBetween(
+                    'before_parse_loop',
+                    'after_parse_loop',
+                ),
                 typedArrayBuild: durationBetween(
                     'before_typed_array_build',
                     'after_typed_array_build',
                 ),
-                colorBuild: durationBetween('before_color_build', 'after_color_build'),
+                colorBuild: durationBetween(
+                    'before_color_build',
+                    'after_color_build',
+                ),
                 total: durationBetween('start', 'before_post_message'),
             },
             counts: profiler.counts,

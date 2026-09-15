@@ -1,4 +1,3 @@
-import React, { useMemo } from 'react';
 import {
     gSenderEEEPROMSettings,
     gSenderSettings,
@@ -7,6 +6,7 @@ import {
 import { SettingSection } from 'app/features/Config/components/SettingSection.tsx';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import cn from 'classnames';
+import React, { useMemo } from 'react';
 
 interface SectionProps {
     title: string;
@@ -58,7 +58,10 @@ export const Section = React.forwardRef(
             filteredSettings.length > 0 &&
                 filteredSettings.map((setting: gSenderSubSection, index) => {
                     return (
-                        <div key={setting.label ?? index} className="bg-gray-100 rounded-xl shadow p-6 max-xl:p-3 flex flex-col gap-6 dark:bg-dark dark:text-white">
+                        <div
+                            key={setting.label ?? index}
+                            className="bg-gray-100 rounded-xl shadow p-6 max-xl:p-3 flex flex-col gap-6 dark:bg-dark dark:text-white"
+                        >
                             <SettingSection
                                 connected={connected}
                                 settings={setting.settings}

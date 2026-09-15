@@ -1,16 +1,14 @@
-import React, { useContext } from 'react';
-import PropTypes from 'prop-types';
-import { FaGamepad, FaTimes } from 'react-icons/fa';
-
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
-import { toast } from 'app/lib/toaster';
 import ToolCard from 'app/components/ToolCard';
-
-import { GamepadContext } from './utils/context';
+import { toast } from 'app/lib/toaster';
+import PropTypes from 'prop-types';
+import React, { useContext } from 'react';
+import { FaGamepad, FaTimes } from 'react-icons/fa';
 import {
     removeGamepadProfileFromList,
     setCurrentGamepadProfile,
 } from './utils/actions';
+import { GamepadContext } from './utils/context';
 
 const ProfileItem = ({ title, icon, id }) => {
     const { dispatch } = useContext(GamepadContext);

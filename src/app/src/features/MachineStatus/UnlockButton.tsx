@@ -21,12 +21,11 @@
  *
  */
 
-import React, { MouseEventHandler } from 'react';
-import cx from 'classnames';
-import { FaHome, FaUnlock } from 'react-icons/fa';
-
 import { GRBL_ACTIVE_STATE_ALARM } from 'app/constants';
 import { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
+import cx from 'classnames';
+import React, { MouseEventHandler } from 'react';
+import { FaHome, FaUnlock } from 'react-icons/fa';
 import { ALARM_CODE } from './definitions';
 
 export interface UnlockProps {

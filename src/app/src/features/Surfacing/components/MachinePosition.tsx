@@ -1,22 +1,21 @@
-import React from 'react';
-
 import { RadioGroup, RadioGroupItem } from 'app/components/shadcn/RadioGroup';
 import { Switch } from 'app/components/shadcn/Switch';
 import { Tooltip } from 'app/components/Tooltip';
-import SpiralIcon from '../SVG/Spiral';
-import ZigZagIcon from '../SVG/ZigZag';
 import {
     SPIRAL_MOVEMENT,
-    ZIG_ZAG_MOVEMENT,
     START_POSITION_BACK_LEFT,
     START_POSITION_BACK_RIGHT,
+    START_POSITION_CENTER,
     START_POSITION_FRONT_LEFT,
     START_POSITION_FRONT_RIGHT,
-    START_POSITION_CENTER,
+    ZIG_ZAG_MOVEMENT,
 } from 'app/constants';
-
-import { Surfacing } from '../definitions';
 import { cx } from 'class-variance-authority';
+import React from 'react';
+import { Surfacing } from '../definitions';
+import SpiralIcon from '../SVG/Spiral';
+import ZigZagIcon from '../SVG/ZigZag';
+
 // import { Label } from 'app/components/shadcn/Label';
 
 interface Props {

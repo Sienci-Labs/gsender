@@ -1,12 +1,12 @@
 // https://ui.shadcn.com/docs/components/dialog
 
-import * as React from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
-import { X } from 'lucide-react';
-
-import cx from 'classnames';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { RootState } from 'app/store/redux';
+
+import cx from 'classnames';
+import { X } from 'lucide-react';
+import * as React from 'react';
 
 const Dialog = DialogPrimitive.Root;
 
@@ -44,8 +44,12 @@ const DialogContent = React.forwardRef<
             <DialogOverlay />
             <DialogPrimitive.Content
                 ref={ref}
-                onOpenAutoFocus={focusTrapping ? undefined : (e) => e.preventDefault()}
-                onCloseAutoFocus={focusTrapping ? undefined : (e) => e.preventDefault()}
+                onOpenAutoFocus={
+                    focusTrapping ? undefined : (e) => e.preventDefault()
+                }
+                onCloseAutoFocus={
+                    focusTrapping ? undefined : (e) => e.preventDefault()
+                }
                 className={cx(
                     'fixed left-[50%] text-sm dark:bg-dark-darker top-[50%] z-[9999] grid translate-x-[-50%] translate-y-[-50%]  border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg bg-white dark:border-gray-700 dark:text-white',
                     className,
@@ -117,13 +121,13 @@ DialogDescription.displayName = DialogPrimitive.Description.displayName;
 
 export {
     Dialog,
-    DialogPortal,
-    DialogOverlay,
     DialogClose,
-    DialogTrigger,
     DialogContent,
-    DialogHeader,
-    DialogFooter,
-    DialogTitle,
     DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogOverlay,
+    DialogPortal,
+    DialogTitle,
+    DialogTrigger,
 };

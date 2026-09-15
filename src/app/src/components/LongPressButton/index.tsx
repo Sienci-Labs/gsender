@@ -1,8 +1,12 @@
-
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { LongPressCallbackReason, useLongPress } from 'use-long-press';
-
 import { cn } from 'app/lib/utils';
+import React, {
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
+import { LongPressCallbackReason, useLongPress } from 'use-long-press';
 
 export type LongPressButtonOptions = {
     holdDurationMs: number;
@@ -75,8 +79,12 @@ export const LongPressButton: React.FC<LongPressButtonProps> = ({
 
     const startTimeRef = useRef(0);
     const rafRef = useRef<number | null>(null);
-    const progressDelayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-    const progressHideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const progressDelayTimeoutRef = useRef<ReturnType<
+        typeof setTimeout
+    > | null>(null);
+    const progressHideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+        null,
+    );
     const flashTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const pressCancelledRef = useRef(false);
 
@@ -213,7 +221,9 @@ export const LongPressButton: React.FC<LongPressButtonProps> = ({
                 if (disabled) {
                     return;
                 }
-                if (meta.reason !== LongPressCallbackReason.CancelledByRelease) {
+                if (
+                    meta.reason !== LongPressCallbackReason.CancelledByRelease
+                ) {
                     return;
                 }
 
@@ -234,7 +244,12 @@ export const LongPressButton: React.FC<LongPressButtonProps> = ({
     )();
 
     return (
-        <div className={cn('flex w-full flex-col items-center gap-2', containerClassName)}>
+        <div
+            className={cn(
+                'flex w-full flex-col items-center gap-2',
+                containerClassName,
+            )}
+        >
             <button
                 type="button"
                 className={cn(
@@ -256,7 +271,9 @@ export const LongPressButton: React.FC<LongPressButtonProps> = ({
                     <span
                         aria-hidden="true"
                         className="absolute inset-y-0 left-0 z-0 w-full origin-left bg-blue-600 will-change-transform"
-                        style={{ transform: `scaleX(${Math.min(Math.max(progress, 0), 1)})` }}
+                        style={{
+                            transform: `scaleX(${Math.min(Math.max(progress, 0), 1)})`,
+                        }}
                     />
                 )}
                 <span
@@ -272,10 +289,14 @@ export const LongPressButton: React.FC<LongPressButtonProps> = ({
                             {icon}
                         </span>
                     ) : null}
-                    <span className={cn(hasIcon ? 'text-center' : 'text-center')}>
+                    <span
+                        className={cn(hasIcon ? 'text-center' : 'text-center')}
+                    >
                         {label}
                     </span>
-                    {hasIcon ? <span aria-hidden="true" className="h-5 w-5" /> : null}
+                    {hasIcon ? (
+                        <span aria-hidden="true" className="h-5 w-5" />
+                    ) : null}
                 </span>
             </button>
             {secondaryLabel ? (

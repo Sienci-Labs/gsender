@@ -1,9 +1,9 @@
-import { StepProps } from 'app/features/AccessoryInstaller/types';
 import { StepActionButton } from 'app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx';
-import { useEffect, useState } from 'react';
+import { StepProps } from 'app/features/AccessoryInstaller/types';
 import { generateAllMacros } from 'app/features/ATC/components/Configuration/utils/ConfigUtils.ts';
 import controller from 'app/lib/controller.ts';
 import store from 'app/store';
+import { useEffect, useState } from 'react';
 
 export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
     const [rackSize, setRackSize] = useState<number | string>(6);
@@ -15,7 +15,9 @@ export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
         const handleYmodemComplete = () => {
             setIsComplete(true);
             setError(null);
-            setSuccess('Successfully uploaded macro configuration to the SD card.');
+            setSuccess(
+                'Successfully uploaded macro configuration to the SD card.',
+            );
             onComplete();
             setTimeout(() => {
                 setIsComplete(false);
@@ -91,9 +93,9 @@ export function MacroConfiguration({ onComplete, onUncomplete }: StepProps) {
             </p>
 
             <p className="dark:text-white">
-                Specify your rack size and press <b>“Upload Macros”</b> to upload the
-                relevant program files into the SD card. This can be changed
-                later.
+                Specify your rack size and press <b>“Upload Macros”</b> to
+                upload the relevant program files into the SD card. This can be
+                changed later.
             </p>
 
             <StepActionButton

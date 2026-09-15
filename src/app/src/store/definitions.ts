@@ -1,12 +1,6 @@
 import {
-    FILE_TYPE,
-    WORKFLOW_STATES,
-    RENDER_STATE,
-    TOGGLE_STATUS,
-} from '../constants';
-import {
-    EEPROMSettings,
     EEPROMDescriptions,
+    EEPROMSettings,
     FIRMWARE_TYPES_T,
 } from 'app/definitions/firmware';
 import { BasicObject, BasicPosition, BBox } from 'app/definitions/general';
@@ -20,14 +14,20 @@ import { Rotary } from 'app/features/Rotary/definitions';
 import { Spindle, SpindleState } from 'app/features/Spindle/definitions';
 import { Surfacing } from 'app/features/Surfacing/definitions';
 import {
+    ATC,
     VISUALIZER_TYPES_T,
     Visualizer,
-    ATC,
 } from 'app/features/Visualizer/definitions';
 import { Modal } from 'app/lib/definitions/gcode_virtualization';
 import { Feeder, Sender } from 'app/lib/definitions/sender_feeder';
 import { CommandKeys } from 'app/lib/definitions/shortcuts';
 import { Notification, Workspace } from 'app/workspace/definitions';
+import {
+    FILE_TYPE,
+    RENDER_STATE,
+    TOGGLE_STATUS,
+    WORKFLOW_STATES,
+} from '../constants';
 
 // Types
 

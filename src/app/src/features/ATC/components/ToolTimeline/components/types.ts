@@ -16,11 +16,7 @@ export interface ToolTimelineProps {
     isCollapsed?: boolean;
 }
 
-export type ToolStatus =
-    | 'probed'
-    | 'unprobed'
-    | 'current'
-    | 'error';
+export type ToolStatus = 'probed' | 'unprobed' | 'current' | 'error';
 
 export interface Tool {
     number: number;

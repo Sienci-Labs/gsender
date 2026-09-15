@@ -1,5 +1,5 @@
-import pubsub from 'pubsub-js';
 import { toast } from 'app/lib/toaster';
+import pubsub from 'pubsub-js';
 import controller from '../lib/controller';
 
 export const outlineResponse = ({ data }) => {

@@ -21,12 +21,12 @@
  *
  */
 
-import React from 'react';
-import get from 'lodash/get';
-import cx from 'classnames';
 import { GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
 import { useWizardAPI, useWizardContext } from 'app/features/Helper/context';
+import cx from 'classnames';
+import get from 'lodash/get';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import React from 'react';
 import { useSelector } from 'react-redux';
 
 const Controls = () => {
@@ -56,7 +56,8 @@ const Controls = () => {
         s.substeps.map((_: unknown, ssi: number) => ({ si, ssi })),
     );
     const flatCurrent = allSubsteps.findIndex(
-        ({ si, ssi }: { si: number; ssi: number }) => si === activeStep && ssi === activeSubstep,
+        ({ si, ssi }: { si: number; ssi: number }) =>
+            si === activeStep && ssi === activeSubstep,
     );
 
     return (
@@ -84,8 +85,8 @@ const Controls = () => {
                             i === flatCurrent
                                 ? 'w-[24px] bg-blue-600 dark:bg-blue-400'
                                 : i < flatCurrent
-                                    ? 'w-[18px] bg-blue-300 dark:bg-blue-700'
-                                    : 'w-[18px] bg-gray-300 dark:bg-[#2a2a35]',
+                                  ? 'w-[18px] bg-blue-300 dark:bg-blue-700'
+                                  : 'w-[18px] bg-gray-300 dark:bg-[#2a2a35]',
                         )}
                     />
                 ))}

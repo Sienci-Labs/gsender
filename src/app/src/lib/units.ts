@@ -21,8 +21,8 @@
  *
  */
 
-import { IMPERIAL_UNITS, METRIC_UNITS } from '../constants';
 import { UNITS_EN } from 'app/definitions/general';
+import { IMPERIAL_UNITS, METRIC_UNITS } from '../constants';
 import store from '../store';
 
 const CALC_UNIT = 25.4;

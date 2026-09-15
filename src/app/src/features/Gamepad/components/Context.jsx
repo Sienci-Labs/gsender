@@ -1,9 +1,8 @@
+import { defaultOptions } from 'app/store/gamepad';
 import React, { useReducer } from 'react';
-
+import { arrayComparator } from '../utils';
 import { GamepadContext } from '../utils/context';
 import { gamepadReducer } from '../utils/reducer';
-import { arrayComparator } from '../utils';
-import { defaultOptions } from 'app/store/gamepad';
 
 export const GamepadContextProvider = ({ children }) => {
     const [state, dispatch] = useReducer(

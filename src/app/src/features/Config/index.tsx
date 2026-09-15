@@ -1,30 +1,30 @@
-import React, { MouseEventHandler, useEffect, useMemo } from 'react';
-import { Menu } from './components/Menu';
-import { Section } from './components/Section';
-import { Search } from 'app/features/Config/components/Search.tsx';
-import { ApplicationPreferences } from 'app/features/Config/components/ApplicationPreferences.tsx';
-import { useSettings } from 'app/features/Config/utils/SettingsContext';
-import { ProfileBar } from 'app/features/Config/components/ProfileBar.tsx';
-import { useInView, InView } from 'react-intersection-observer';
-import { EEPROMNotConnectedWarning } from 'app/features/Config/components/EEPROMNotConnectedWarning.tsx';
-import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
-import { RootState } from 'app/store/redux';
-import { FilterDefaultToggle } from 'app/features/Config/components/FilterDefaultToggle.tsx';
-import pubsub from 'pubsub-js';
-import store from 'app/store';
-import { useDispatch } from 'react-redux';
-import { updateAccessibility } from 'app/store/redux/slices/preferences.slice';
 import {
     Tabs,
     TabsContent,
     TabsList,
     TabsTrigger,
 } from 'app/components/shadcn/Tabs';
-import { gSenderSetting, SettingsMenuSection } from './assets/SettingsMenu';
-import { convertEIDToNumber } from 'app/lib/numeral';
-import controller from 'app/lib/controller.ts';
-import {GRBLHAL, WORKFLOW_STATE_IDLE} from 'app/constants';
+import { GRBLHAL, WORKFLOW_STATE_IDLE } from 'app/constants';
+import { ApplicationPreferences } from 'app/features/Config/components/ApplicationPreferences.tsx';
+import { EEPROMNotConnectedWarning } from 'app/features/Config/components/EEPROMNotConnectedWarning.tsx';
+import { FilterDefaultToggle } from 'app/features/Config/components/FilterDefaultToggle.tsx';
+import { ProfileBar } from 'app/features/Config/components/ProfileBar.tsx';
+import { Search } from 'app/features/Config/components/Search.tsx';
 import { resolveGrblCoreDefaults } from 'app/features/Config/utils/grblCoreMigration.ts';
+import { useSettings } from 'app/features/Config/utils/SettingsContext';
+import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import controller from 'app/lib/controller.ts';
+import { convertEIDToNumber } from 'app/lib/numeral';
+import store from 'app/store';
+import { RootState } from 'app/store/redux';
+import { updateAccessibility } from 'app/store/redux/slices/preferences.slice';
+import pubsub from 'pubsub-js';
+import React, { MouseEventHandler, useEffect, useMemo } from 'react';
+import { InView, useInView } from 'react-intersection-observer';
+import { useDispatch } from 'react-redux';
+import { gSenderSetting, SettingsMenuSection } from './assets/SettingsMenu';
+import { Menu } from './components/Menu';
+import { Section } from './components/Section';
 
 export function Config() {
     const dispatch = useDispatch();
@@ -50,7 +50,9 @@ export function Config() {
         (state: RootState) => state.connection.isConnected,
     );
 
-    const workflowState = useTypedSelector((state: RootState) => state.controller.workflow.state);
+    const workflowState = useTypedSelector(
+        (state: RootState) => state.controller.workflow.state,
+    );
 
     const [visibleSection, setVisibleSection] = React.useState('h-section-0');
     const [activeTab, setActiveTab] = React.useState('config');
@@ -68,7 +70,6 @@ export function Config() {
     }, []);
 
     const { settings, EEPROM } = useSettings();
-
 
     // lets extract all the eeprom settingsd
     const allEEPROM: gSenderSetting[] = useMemo(

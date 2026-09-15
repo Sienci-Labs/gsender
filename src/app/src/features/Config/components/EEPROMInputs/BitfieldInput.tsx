@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
 import { Switch } from 'app/components/shadcn/Switch';
 import ensureArray from 'ensure-array';
+import { useEffect, useState } from 'react';
+import BitValueIndicator from './BitValueIndicator';
 import styles from './index.module.styl';
 import { convertBitfieldToValue, getBitfieldArr } from './utils.ts';
-import BitValueIndicator from './BitValueIndicator';
 
 const BitfieldInput = ({
     info,

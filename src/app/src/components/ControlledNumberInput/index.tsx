@@ -21,10 +21,10 @@
  *
  */
 
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { METRIC_UNITS } from '../../constants';
-import store from '../../store';
 import { round } from '../../lib/rounding';
+import store from '../../store';
 
 export interface ControlledNumberInputProps {
     className?: string;

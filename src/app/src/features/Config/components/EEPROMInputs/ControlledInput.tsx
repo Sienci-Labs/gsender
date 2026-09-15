@@ -1,6 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
-
 import { Input } from 'app/components/shadcn/Input';
+import { useEffect, useRef, useState } from 'react';
 
 interface InputProps extends React.ComponentProps<'input'> {
     className: string;

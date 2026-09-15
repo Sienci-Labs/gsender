@@ -1,5 +1,5 @@
-import { Link } from 'react-router';
 import { FaHatWizard } from 'react-icons/fa';
+import { Link } from 'react-router';
 
 interface ToolLinkProps {
     link: string;

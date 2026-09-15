@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
-import { Wizard, SubWizard } from '../../types/wizard';
-import { WizardLanding } from './WizardLanding';
+import { useEffect, useRef, useState } from 'react';
+import { SubWizard, Wizard } from '../../types/wizard';
 import { WizardContainer } from './WizardContainer';
+import { WizardLanding } from './WizardLanding';
 
 interface WizardManagerProps {
     wizard: Wizard;
@@ -9,7 +9,11 @@ interface WizardManagerProps {
     initialSubWizardId?: string;
 }
 
-export function WizardManager({ wizard, onExit, initialSubWizardId }: WizardManagerProps) {
+export function WizardManager({
+    wizard,
+    onExit,
+    initialSubWizardId,
+}: WizardManagerProps) {
     const [selectedSubWizard, setSelectedSubWizard] =
         useState<SubWizard | null>(null);
     const hasAutoSelected = useRef(false);
@@ -26,8 +30,15 @@ export function WizardManager({ wizard, onExit, initialSubWizardId }: WizardMana
     }, [wizard]);
 
     useEffect(() => {
-        if (hasAutoSelected.current || !initialSubWizardId || !wizard.subWizards.length) return;
-        const match = wizard.subWizards.find((sw) => sw.id === initialSubWizardId);
+        if (
+            hasAutoSelected.current ||
+            !initialSubWizardId ||
+            !wizard.subWizards.length
+        )
+            return;
+        const match = wizard.subWizards.find(
+            (sw) => sw.id === initialSubWizardId,
+        );
         if (match) {
             setSelectedSubWizard(match);
             hasAutoSelected.current = true;

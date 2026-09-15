@@ -1,6 +1,6 @@
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import React from 'react';
 
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
 interface Props {
     label: string;
     value: string;

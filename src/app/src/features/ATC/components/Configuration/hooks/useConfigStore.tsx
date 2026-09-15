@@ -1,19 +1,19 @@
-import React, {
-    createContext,
-    useContext,
-    useState,
-    ReactNode,
-    useEffect,
-} from 'react';
-import controller from 'app/lib/controller.ts';
+import { ATCIMacroConfig } from 'app/features/ATC/assets/defaultATCIMacros.ts';
+import { generateAllMacros } from 'app/features/ATC/components/Configuration/utils/ConfigUtils.ts';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import controller from 'app/lib/controller.ts';
+import store from 'app/store';
 import { RootState } from 'app/store/redux';
 import get from 'lodash/get';
-import pick from 'lodash/pick';
 import mapValues from 'lodash/mapValues';
-import { ATCIMacroConfig } from 'app/features/ATC/assets/defaultATCIMacros.ts';
-import store from 'app/store';
-import { generateAllMacros } from 'app/features/ATC/components/Configuration/utils/ConfigUtils.ts';
+import pick from 'lodash/pick';
+import React, {
+    createContext,
+    ReactNode,
+    useContext,
+    useEffect,
+    useState,
+} from 'react';
 import delay from '../../../../../../../server/lib/delay';
 
 export const defaultPosition: Position = {
@@ -73,7 +73,10 @@ export interface ConfigState {
 }*/
 
 function buildConfigFromStore(): ConfigState {
-    const storedVariables = store.get('widgets.atc.templates.variables', {}) as Record<string, ATCIVariable>;
+    const storedVariables = store.get(
+        'widgets.atc.templates.variables',
+        {},
+    ) as Record<string, ATCIVariable>;
     return {
         variables: Object.fromEntries(
             Object.entries(storedVariables).map(([key, v]) => [
@@ -218,7 +221,10 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
         const handleComplete = () => {
             controller.removeListener('ymodem:complete', handleComplete);
             controller.removeListener('ymodem:error', handleError);
-            setStatus({ type: 'success', message: 'Configuration applied successfully!' });
+            setStatus({
+                type: 'success',
+                message: 'Configuration applied successfully!',
+            });
             setTimeout(() => {
                 setStatus({ type: 'idle', message: '' });
             }, 5000);

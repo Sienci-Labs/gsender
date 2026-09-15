@@ -1,7 +1,6 @@
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
-
-import { SpindleLaserStatusVariant } from './SpindleLaserStatusVariant';
 import store from 'app/store';
+import { SpindleLaserStatusVariant } from './SpindleLaserStatusVariant';
 
 const SpindleLaserStatus = () => {
     const { isConnected } = useTypedSelector((state) => state.connection);

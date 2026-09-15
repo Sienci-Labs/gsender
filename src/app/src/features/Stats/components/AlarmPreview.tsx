@@ -1,9 +1,9 @@
+import { EmptyAlarmList } from 'app/features/Stats/components/EmptyAlarmList.tsx';
 import { StatCard } from 'app/features/Stats/components/StatCard.tsx';
-import { useContext } from 'react';
 import { StatContext } from 'app/features/Stats/utils/StatContext.tsx';
+import { useContext } from 'react';
 import { tv } from 'tailwind-variants';
 import { CardHeader } from './CardHeader.tsx';
-import { EmptyAlarmList } from 'app/features/Stats/components/EmptyAlarmList.tsx';
 
 const eventRow = tv({
     base: 'flex flex-row items-center justify-between p-2 rounded border-l-4',

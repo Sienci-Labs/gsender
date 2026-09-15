@@ -1,16 +1,16 @@
-import { ReactNode, useEffect, useRef } from 'react';
 import { StepProps } from 'app/features/AccessoryInstaller/types';
-import controller from 'app/lib/controller.ts';
-import {
-    ConfigProvider,
-    useConfigContext,
-} from 'app/features/ATC/components/Configuration/hooks/useConfigStore.tsx';
-import { repopulateFromSDCard } from 'app/features/ATC/components/Configuration/utils/ConfigUtils.ts';
 import {
     TemplateManagerListContent,
     TemplateManagerMainContent,
     TemplateManagerProvider,
 } from 'app/features/ATC/components/Configuration/components/TemplatesTab.tsx';
+import {
+    ConfigProvider,
+    useConfigContext,
+} from 'app/features/ATC/components/Configuration/hooks/useConfigStore.tsx';
+import { repopulateFromSDCard } from 'app/features/ATC/components/Configuration/utils/ConfigUtils.ts';
+import controller from 'app/lib/controller.ts';
+import { ReactNode, useEffect, useRef } from 'react';
 
 function TemplateManagerSyncListener() {
     const { setTemplates, updateConfig } = useConfigContext();

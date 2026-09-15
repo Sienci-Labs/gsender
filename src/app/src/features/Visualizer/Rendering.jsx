@@ -21,8 +21,8 @@
  *
  */
 
-import React from 'react';
 import i18n from 'app/lib/i18n';
+import React from 'react';
 import { FaCube } from 'react-icons/fa';
 
 export default () => (

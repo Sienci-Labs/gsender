@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import Button from 'app/components/Button';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 
 import {
     Dialog,
@@ -14,14 +14,14 @@ import {
     SelectTrigger,
     SelectValue,
 } from 'app/components/shadcn/Select.tsx';
-import { QRCodeDisplay } from 'app/features/RemoteMode/components/QRCode.tsx';
-import Button from 'app/components/Button';
 import { Switch } from 'app/components/shadcn/Switch';
-import { toast } from 'app/lib/toaster';
+import { QRCodeDisplay } from 'app/features/RemoteMode/components/QRCode.tsx';
 import controller from 'app/lib/controller.ts';
-import { RootState } from 'app/store/redux';
-import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
+import { toast } from 'app/lib/toaster';
 import { isIPv4 } from 'app/lib/utils';
+import { RootState } from 'app/store/redux';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 import { actions } from './apiActions.ts';
 

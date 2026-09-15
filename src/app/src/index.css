@@ -5,7 +5,7 @@
 @property --border-angle {
     inherits: false;
     initial-value: 0deg;
-    syntax: '<angle>';
+    syntax: "<angle>";
 }
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -17,7 +17,7 @@ html,
         @apply box-border;
         @apply select-none;
     }
-    input[type='number'] {
+    input[type="number"] {
         appearance: none !important;
     }
     label {
@@ -47,13 +47,13 @@ body.reduced-motion * {
 }
 
 @layer utilities {
-    input[type='number']::-webkit-inner-spin-button,
-    input[type='number']::-webkit-outer-spin-button {
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
         -webkit-appearance: none;
         margin: 0;
     }
 
-    input[type='number'] {
+    input[type="number"] {
         -moz-appearance: textfield;
     }
 }
@@ -61,7 +61,7 @@ body.reduced-motion * {
 @property --border-angle {
     inherits: false;
     initial-value: 0deg;
-    syntax: '<angle>';
+    syntax: "<angle>";
 }
 
 @layer utilities {
@@ -118,7 +118,7 @@ body.reduced-motion * {
         right: 0;
         height: 100%;
         width: calc(100% + 22px);
-        content: '';
+        content: "";
         background-image: linear-gradient(
             -45deg,
             #689ac9 5%,

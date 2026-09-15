@@ -21,9 +21,9 @@
  *
  */
 
-import * as THREE from 'three';
 import log from 'app/lib/log';
 import CombinedCamera from 'app/lib/three/oldCombinedCamera';
+import * as THREE from 'three';
 
 const FOV_MIN = 15;
 const TARGET0 = new THREE.Vector3(0, 0, 0);

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
     Select,
     SelectContent,
@@ -6,6 +5,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from 'app/components/shadcn/Select';
+import { useState } from 'react';
+
 interface OffsetManagementWidgetProps {
     value?: number;
     onChange?: (value: number) => void;

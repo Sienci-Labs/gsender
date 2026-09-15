@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
 import classNames from 'classnames';
+import { useEffect, useRef, useState } from 'react';
 
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from 'react-icons/md';
 import { useLocation } from 'react-router';

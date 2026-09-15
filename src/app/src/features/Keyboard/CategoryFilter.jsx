@@ -1,22 +1,22 @@
-import React, { useMemo } from 'react';
+import { Tabs, TabsList, TabsTrigger } from 'app/components/shadcn/Tabs';
 
 import {
+    ALL_CATEGORIES,
     ALL_CATEGORY,
     CARVING_CATEGORY,
-    OVERRIDES_CATEGORY,
-    VISUALIZER_CATEGORY,
-    LOCATION_CATEGORY,
+    COOLANT_CATEGORY,
+    GENERAL_CATEGORY,
     JOGGING_CATEGORY,
+    LOCATION_CATEGORY,
+    MACRO_CATEGORY,
+    OVERRIDES_CATEGORY,
     PROBING_CATEGORY,
     SPINDLE_LASER_CATEGORY,
-    GENERAL_CATEGORY,
     TOOLBAR_CATEGORY,
-    MACRO_CATEGORY,
-    COOLANT_CATEGORY,
-    ALL_CATEGORIES,
+    VISUALIZER_CATEGORY,
 } from 'app/constants';
-import { Tabs, TabsList, TabsTrigger } from 'app/components/shadcn/Tabs';
 import { cn } from 'app/lib/utils';
+import React, { useMemo } from 'react';
 
 const CategoryFilter = ({ onChange, filterCategory }) => {
     return (

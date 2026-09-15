@@ -21,15 +21,15 @@
  *
  */
 
-import React, { useEffect, useRef, useState } from 'react';
-import pubsub from 'pubsub-js';
 import { GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
-import uniqueId from 'lodash/uniqueId';
-import get from 'lodash/get';
+import { useWizardAPI, useWizardContext } from 'app/features/Helper/context';
 import controller from 'app/lib/controller';
 import cx from 'classnames';
-import { useWizardAPI, useWizardContext } from 'app/features/Helper/context';
-import { Terminal, CheckCircle } from 'lucide-react';
+import get from 'lodash/get';
+import uniqueId from 'lodash/uniqueId';
+import { CheckCircle, Terminal } from 'lucide-react';
+import pubsub from 'pubsub-js';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 interface WizardAction {
@@ -48,7 +48,10 @@ interface CbRef {
     substepIndex: number;
     isLastSubstep: boolean;
     markActionAsComplete: (stepIndex: number, substepIndex: number) => void;
-    completeSubStep: (stepIndex: number, substepIndex: number) => Record<string, number>;
+    completeSubStep: (
+        stepIndex: number,
+        substepIndex: number,
+    ) => Record<string, number>;
     setIsLoading: (loading: boolean) => void;
 }
 
@@ -98,33 +101,50 @@ const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
 
     useEffect(() => {
         const tokens = [
-            pubsub.subscribe('wizard:next', (msg: string, indexes: { stepIndex: number; substepIndex: number }) => {
-                const { stepIndex: stepIn, substepIndex: subStepIn } = indexes;
-                const cb = cbRef.current;
-                if (!cb) return;
-                if (stepIn === cb.stepIndex && subStepIn === cb.substepIndex) {
-                    const MIN_LOADING_MS = 1250;
-                    const elapsed = Date.now() - (loadingStartRef.current ?? 0);
-                    const delay = Math.max(0, MIN_LOADING_MS - elapsed);
-                    setTimeout(() => {
-                        cb.markActionAsComplete(cb.stepIndex, cb.substepIndex);
-                        cb.setIsLoading(false);
+            pubsub.subscribe(
+                'wizard:next',
+                (
+                    msg: string,
+                    indexes: { stepIndex: number; substepIndex: number },
+                ) => {
+                    const { stepIndex: stepIn, substepIndex: subStepIn } =
+                        indexes;
+                    const cb = cbRef.current;
+                    if (!cb) return;
+                    if (
+                        stepIn === cb.stepIndex &&
+                        subStepIn === cb.substepIndex
+                    ) {
+                        const MIN_LOADING_MS = 1250;
+                        const elapsed =
+                            Date.now() - (loadingStartRef.current ?? 0);
+                        const delay = Math.max(0, MIN_LOADING_MS - elapsed);
+                        setTimeout(() => {
+                            cb.markActionAsComplete(
+                                cb.stepIndex,
+                                cb.substepIndex,
+                            );
+                            cb.setIsLoading(false);
 
-                        // Handled by a persistent listener in context.jsx
-                        // instead — this component unmounts the instant
-                        // resumingJob flips true on click (see
-                        // cbWithCompletion below), well before this event
-                        // could arrive.
-                        if (cb.isLastSubstep) return;
+                            // Handled by a persistent listener in context.jsx
+                            // instead — this component unmounts the instant
+                            // resumingJob flips true on click (see
+                            // cbWithCompletion below), well before this event
+                            // could arrive.
+                            if (cb.isLastSubstep) return;
 
-                        setShowSuccess(true);
-                        advanceTimerRef.current = setTimeout(() => {
-                            setShowSuccess(false);
-                            cb.completeSubStep(cb.stepIndex, cb.substepIndex);
-                        }, AUTO_ADVANCE_DELAY_MS);
-                    }, delay);
-                }
-            }),
+                            setShowSuccess(true);
+                            advanceTimerRef.current = setTimeout(() => {
+                                setShowSuccess(false);
+                                cb.completeSubStep(
+                                    cb.stepIndex,
+                                    cb.substepIndex,
+                                );
+                            }, AUTO_ADVANCE_DELAY_MS);
+                        }, delay);
+                    }
+                },
+            ),
             pubsub.subscribe('error', () => {
                 cbRef.current?.setIsLoading(false);
             }),
@@ -184,7 +204,9 @@ const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
                             {!isLoading && index > 0 && (
                                 <div className="flex items-center gap-2 my-0.5 px-6">
                                     <div className="flex-1 h-px bg-gray-200 dark:bg-[#2a2a35]" />
-                                    <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">or</span>
+                                    <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+                                        or
+                                    </span>
                                     <div className="flex-1 h-px bg-gray-200 dark:bg-[#2a2a35]" />
                                 </div>
                             )}
@@ -192,71 +214,100 @@ const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
                                 <span className="text-sm text-gray-400 dark:text-gray-500 animate-pulse">
                                     Running…
                                 </span>
-                            ) : !isLoading && (
-                                <>
-                                    <div
-                                        className={cx(
-                                            'flex items-center justify-between px-3 py-2 rounded border transition-colors duration-500',
-                                            showSuccess
-                                                ? 'border-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 dark:border-emerald-700'
-                                                : 'border-gray-200 dark:border-[#2a2a35] bg-gray-50 dark:bg-[#0d0d12]',
-                                        )}
-                                        data-chip="true"
-                                    >
+                            ) : (
+                                !isLoading && (
+                                    <>
                                         <div
-                                            className="flex items-center gap-2 min-w-0 cursor-default"
-                                            onMouseEnter={(e) => {
-                                                if (!action.gcodeLines?.length) return;
-                                                const chipEl = (e.currentTarget as HTMLElement).closest('[data-chip]');
-                                                if (!chipEl) return;
-                                                tooltipTimer.current = setTimeout(() => {
-                                                    const rect = chipEl.getBoundingClientRect();
-                                                    setTooltip({ index, rect, lines: action.gcodeLines });
-                                                }, 1200);
-                                            }}
-                                            onMouseLeave={() => {
-                                                if (tooltipTimer.current) clearTimeout(tooltipTimer.current);
-                                                setTooltip(null);
-                                            }}
-                                        >
-                                            {showSuccess ? (
-                                                <CheckCircle size={13} className="shrink-0 text-emerald-600 dark:text-emerald-400" />
-                                            ) : (
-                                                <Terminal size={13} className="shrink-0 text-gray-400 dark:text-cyan-400" />
+                                            className={cx(
+                                                'flex items-center justify-between px-3 py-2 rounded border transition-colors duration-500',
+                                                showSuccess
+                                                    ? 'border-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 dark:border-emerald-700'
+                                                    : 'border-gray-200 dark:border-[#2a2a35] bg-gray-50 dark:bg-[#0d0d12]',
                                             )}
-                                            <code className="text-sm font-mono text-sky-700 dark:text-cyan-400 truncate">
-                                                {action.label}
-                                            </code>
-                                        </div>
-                                        <button
-                                            type="button"
-                                            disabled={isNotIdle()}
-                                            onClick={cbWithCompletion}
-                                            className="ml-3 shrink-0 text-sm font-medium px-3 py-1 rounded bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-600 text-white disabled:opacity-35 disabled:pointer-events-none transition-colors"
+                                            data-chip="true"
                                         >
-                                            Run
-                                        </button>
-                                    </div>
-                                    {tooltip?.index === index && (
-                                        <div
-                                            style={{
-                                                position: 'fixed',
-                                                top: tooltip.rect.bottom + 4,
-                                                left: tooltip.rect.left,
-                                                width: tooltip.rect.width,
-                                                zIndex: 9999,
-                                                pointerEvents: 'none',
-                                            }}
-                                            className="px-3 py-2.5 rounded border border-gray-200 dark:border-[#2a2a35] bg-white dark:bg-[#0d0d12] shadow-lg"
-                                        >
-                                            {tooltip.lines.map((line, i) => (
-                                                <div key={i} className="font-mono text-xs leading-5 text-gray-600 dark:text-gray-400">
-                                                    {line}
-                                                </div>
-                                            ))}
+                                            <div
+                                                className="flex items-center gap-2 min-w-0 cursor-default"
+                                                onMouseEnter={(e) => {
+                                                    if (
+                                                        !action.gcodeLines
+                                                            ?.length
+                                                    )
+                                                        return;
+                                                    const chipEl = (
+                                                        e.currentTarget as HTMLElement
+                                                    ).closest('[data-chip]');
+                                                    if (!chipEl) return;
+                                                    tooltipTimer.current =
+                                                        setTimeout(() => {
+                                                            const rect =
+                                                                chipEl.getBoundingClientRect();
+                                                            setTooltip({
+                                                                index,
+                                                                rect,
+                                                                lines: action.gcodeLines,
+                                                            });
+                                                        }, 1200);
+                                                }}
+                                                onMouseLeave={() => {
+                                                    if (tooltipTimer.current)
+                                                        clearTimeout(
+                                                            tooltipTimer.current,
+                                                        );
+                                                    setTooltip(null);
+                                                }}
+                                            >
+                                                {showSuccess ? (
+                                                    <CheckCircle
+                                                        size={13}
+                                                        className="shrink-0 text-emerald-600 dark:text-emerald-400"
+                                                    />
+                                                ) : (
+                                                    <Terminal
+                                                        size={13}
+                                                        className="shrink-0 text-gray-400 dark:text-cyan-400"
+                                                    />
+                                                )}
+                                                <code className="text-sm font-mono text-sky-700 dark:text-cyan-400 truncate">
+                                                    {action.label}
+                                                </code>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                disabled={isNotIdle()}
+                                                onClick={cbWithCompletion}
+                                                className="ml-3 shrink-0 text-sm font-medium px-3 py-1 rounded bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-600 text-white disabled:opacity-35 disabled:pointer-events-none transition-colors"
+                                            >
+                                                Run
+                                            </button>
                                         </div>
-                                    )}
-                                </>
+                                        {tooltip?.index === index && (
+                                            <div
+                                                style={{
+                                                    position: 'fixed',
+                                                    top:
+                                                        tooltip.rect.bottom + 4,
+                                                    left: tooltip.rect.left,
+                                                    width: tooltip.rect.width,
+                                                    zIndex: 9999,
+                                                    pointerEvents: 'none',
+                                                }}
+                                                className="px-3 py-2.5 rounded border border-gray-200 dark:border-[#2a2a35] bg-white dark:bg-[#0d0d12] shadow-lg"
+                                            >
+                                                {tooltip.lines.map(
+                                                    (line, i) => (
+                                                        <div
+                                                            key={i}
+                                                            className="font-mono text-xs leading-5 text-gray-600 dark:text-gray-400"
+                                                        >
+                                                            {line}
+                                                        </div>
+                                                    ),
+                                                )}
+                                            </div>
+                                        )}
+                                    </>
+                                )
                             )}
                         </React.Fragment>
                     );

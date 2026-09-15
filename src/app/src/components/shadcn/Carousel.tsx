@@ -1,10 +1,9 @@
 // https://ui.shadcn.com/docs/components/carousel
 
-import * as React from 'react';
+import cx from 'classnames';
 import useEmblaCarousel, { UseEmblaCarouselType } from 'embla-carousel-react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
-
-import cx from 'classnames';
+import * as React from 'react';
 import { Button } from './Button';
 
 export type CarouselApi = UseEmblaCarouselType[1];
@@ -255,6 +254,6 @@ export {
     Carousel,
     CarouselContent,
     CarouselItem,
-    CarouselPrevious,
     CarouselNext,
+    CarouselPrevious,
 };

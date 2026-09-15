@@ -1,5 +1,5 @@
-import shuttleEvents from 'app/lib/shuttleEvents';
 import { MACRO_CATEGORY } from 'app/constants';
+import shuttleEvents from 'app/lib/shuttleEvents';
 
 const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
 

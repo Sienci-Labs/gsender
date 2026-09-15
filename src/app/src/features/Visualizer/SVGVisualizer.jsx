@@ -21,23 +21,23 @@
  *
  */
 
-import { store as reduxStore } from 'app/store/redux';
 import api from 'app/api';
-import { connect } from 'react-redux';
-import _get from 'lodash/get';
-import store from 'app/store';
-import pubsub from 'pubsub-js';
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import {
     RENDER_RENDERED,
     VISUALIZER_PRIMARY,
     VISUALIZER_SECONDARY,
 } from 'app/constants';
+import { uploadGcodeFileToServer } from 'app/lib/fileupload';
+import store from 'app/store';
+import { store as reduxStore } from 'app/store/redux';
+import { updateFileRenderState } from 'app/store/redux/slices/fileInfo.slice';
+import _get from 'lodash/get';
+import PropTypes from 'prop-types';
+import pubsub from 'pubsub-js';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import controller from '../../lib/controller';
 import { BACKGROUND_PART, G0_PART, G1_PART } from './constants';
-import { updateFileRenderState } from 'app/store/redux/slices/fileInfo.slice';
-import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 
 class SVGVisualizer extends Component {
     static propTypes = {

@@ -1,18 +1,18 @@
-import { ToolInstance } from 'app/features/ATC/components/ToolTable.tsx';
-import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
-import { RootState } from 'app/store/redux';
-import { useEffect, useState } from 'react';
-import { lookupSpecificTool } from 'app/features/ATC/utils/ATCFunctions.ts';
-import controller from 'app/lib/controller.ts';
-import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
-import { Wrench } from 'lucide-react';
 import Button from 'app/components/Button';
-import { toolStateThemes } from 'app/features/ATC/utils/ATCiConstants.ts';
-import pubsub from 'pubsub-js';
-import { ToolStatusBadges } from 'app/features/ATC/components/ui/ToolStatusBadges.tsx';
+import { ToolInstance } from 'app/features/ATC/components/ToolTable.tsx';
 import { Badge } from 'app/features/ATC/components/ui/Badge.tsx';
-import cn from 'classnames';
+import { ToolStatusBadges } from 'app/features/ATC/components/ui/ToolStatusBadges.tsx';
+import { lookupSpecificTool } from 'app/features/ATC/utils/ATCFunctions.ts';
+import { toolStateThemes } from 'app/features/ATC/utils/ATCiConstants.ts';
+import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
+import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import controller from 'app/lib/controller.ts';
 import store from 'app/store';
+import { RootState } from 'app/store/redux';
+import cn from 'classnames';
+import { Wrench } from 'lucide-react';
+import pubsub from 'pubsub-js';
+import { useEffect, useState } from 'react';
 
 export function CurrentToolInfo({ disabled }: { disabled?: boolean }) {
     const { rackSize, connected, atcAvailable } = useToolChange();
@@ -119,7 +119,9 @@ export function CurrentToolInfo({ disabled }: { disabled?: boolean }) {
             (selectedTool.isManual ?? selectedTool.id > effectiveRackSize));
     const EmptyIcon = state.icon;
     const isRackTool =
-        !isEmptyTool && !isRackDisabledNoSlots && selectedTool.id <= effectiveRackSize;
+        !isEmptyTool &&
+        !isRackDisabledNoSlots &&
+        selectedTool.id <= effectiveRackSize;
     const wrapperClassName = cn(
         state.backgroundColor,
         state.borderColor,
@@ -158,11 +160,13 @@ export function CurrentToolInfo({ disabled }: { disabled?: boolean }) {
                                     Rack
                                 </span>
                             )}
-                            {!isEmptyTool && !isRackTool && allowManualBadge && (
-                                <span className="text-gray-600 text-xs dark:text-gray-300">
-                                    Manual
-                                </span>
-                            )}
+                            {!isEmptyTool &&
+                                !isRackTool &&
+                                allowManualBadge && (
+                                    <span className="text-gray-600 text-xs dark:text-gray-300">
+                                        Manual
+                                    </span>
+                                )}
                         </div>
                     </div>
 
@@ -183,7 +187,7 @@ export function CurrentToolInfo({ disabled }: { disabled?: boolean }) {
                 </div>
 
                 <div className="text-left text-sm font-bold text-gray-700 dark:text-gray-200">
-                    {isEmptyTool ? '' : selectedTool.nickname ?? ''}
+                    {isEmptyTool ? '' : (selectedTool.nickname ?? '')}
                 </div>
 
                 <div className="grid grid-cols-[1fr_auto] items-center gap-3">

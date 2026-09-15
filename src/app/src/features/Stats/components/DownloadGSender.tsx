@@ -1,7 +1,7 @@
 import { Button } from 'app/components/Button';
-import { FaDownload, FaExternalLinkAlt } from 'react-icons/fa';
-import { useState } from 'react';
 import isElectron from 'is-electron';
+import { useState } from 'react';
+import { FaDownload, FaExternalLinkAlt } from 'react-icons/fa';
 
 export function DownloadGSender({ version = '1.5.0', downloadPercent = 0 }) {
     const [canClick, setCanClick] = useState(true);

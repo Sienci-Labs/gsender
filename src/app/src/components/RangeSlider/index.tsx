@@ -21,12 +21,11 @@
  *
  */
 
-import React, { PointerEventHandler } from 'react';
-import { Slider } from '../shadcn/Slider';
-import { FaMinus, FaPlus, FaUndo } from 'react-icons/fa';
-import cx from 'classnames';
-
 import Button from 'app/components/Button';
+import cx from 'classnames';
+import React, { PointerEventHandler } from 'react';
+import { FaMinus, FaPlus, FaUndo } from 'react-icons/fa';
+import { Slider } from '../shadcn/Slider';
 import Tooltip from '../Tooltip';
 
 export interface RangeSliderProps {

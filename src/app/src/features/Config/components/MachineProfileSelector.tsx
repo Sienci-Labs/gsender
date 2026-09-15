@@ -5,13 +5,13 @@ import {
     SelectTrigger,
     SelectValue,
 } from 'app/components/shadcn/Select.tsx';
-import { humanReadableMachineName } from 'app/features/Config/utils/Settings.ts';
 import defaultMachineProfiles from 'app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts';
+import { humanReadableMachineName } from 'app/features/Config/utils/Settings.ts';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import store from 'app/store';
 import find from 'lodash/find';
-import { useEffect, useRef } from 'react';
 import { usePostHog } from 'posthog-js/react';
+import { useEffect, useRef } from 'react';
 
 export function MachineProfileSelector() {
     const {

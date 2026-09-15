@@ -1,11 +1,10 @@
-import { toast as sonnerToast } from 'sonner';
-import uuid from 'uuid';
-import get from 'lodash/get';
-
 import store from 'app/store';
-import { Notification } from 'app/workspace/definitions';
 import reduxStore from 'app/store/redux';
 import { setNotifications } from 'app/store/redux/slices/preferences.slice';
+import { Notification } from 'app/workspace/definitions';
+import get from 'lodash/get';
+import { toast as sonnerToast } from 'sonner';
+import uuid from 'uuid';
 import {
     TOASTER_DEFAULT,
     TOASTER_DISABLED,

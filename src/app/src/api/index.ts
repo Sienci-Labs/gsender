@@ -21,7 +21,8 @@
  *
  */
 
-import axios, { InternalAxiosRequestConfig, AxiosResponse } from 'axios';
+import { MachineProfile } from 'app/definitions/firmware';
+import axios, { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import {
     FetchOptions,
     GCodeOptions,
@@ -29,7 +30,6 @@ import {
     StateOptions,
     WatchOptions,
 } from './definitions';
-import { MachineProfile } from 'app/definitions/firmware';
 
 // import store from "../store";
 

@@ -1,6 +1,6 @@
 import React from 'react';
-import styles from './index.module.styl';
 import ControlledNumberInput from './ControlledNumberInput';
+import styles from './index.module.styl';
 
 const IntegerInput = ({ info, setting, onChange, disabled }) => {
     const { unit = null } = info;

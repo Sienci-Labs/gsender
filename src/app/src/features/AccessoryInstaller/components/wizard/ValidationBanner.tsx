@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import type { ReactNode } from 'react';
 import { AlertCircle } from 'lucide-react';
+import type { ReactNode } from 'react';
+import { useEffect, useState } from 'react';
 import { ValidationResult } from '../../types/wizard';
 
 interface ValidationBannerProps {
@@ -8,7 +8,9 @@ interface ValidationBannerProps {
 }
 
 export function ValidationBanner({ validations }: ValidationBannerProps) {
-    const [validationError, setValidationError] = useState<ReactNode | null>(null);
+    const [validationError, setValidationError] = useState<ReactNode | null>(
+        null,
+    );
 
     useEffect(() => {
         if (validations && validations.length > 0) {

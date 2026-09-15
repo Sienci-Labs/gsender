@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
 import ensureArray from 'ensure-array';
+import React, { useEffect, useState } from 'react';
 import styles from './index.module.styl';
 
 const RadioButtonInput = ({ info, setting, onChange, disabled }) => {

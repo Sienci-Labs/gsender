@@ -1,9 +1,9 @@
 import { GRBL } from 'app/constants';
 import WidgetConfig from 'app/features/WidgetConfig/WidgetConfig';
+import { toast } from 'app/lib/toaster';
+import store from 'app/store';
 import controller from './controller';
 import { isIPv4 } from './utils';
-import store from 'app/store';
-import { toast } from 'app/lib/toaster';
 
 export const connectToLastDevice = (callback: () => any) => {
     const connectionConfig = new WidgetConfig('connection');

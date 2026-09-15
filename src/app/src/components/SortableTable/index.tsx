@@ -1,23 +1,23 @@
+import { rankItem } from '@tanstack/match-sorter-utils';
 import {
-    flexRender,
-    getCoreRowModel,
-    useReactTable,
-    getSortedRowModel,
-    getPaginationRowModel,
-    getFilteredRowModel,
-    getFacetedRowModel,
-    getFacetedUniqueValues,
-    getFacetedMinMaxValues,
     ColumnDef,
     FilterFn,
+    flexRender,
+    getCoreRowModel,
+    getFacetedMinMaxValues,
+    getFacetedRowModel,
+    getFacetedUniqueValues,
+    getFilteredRowModel,
+    getPaginationRowModel,
+    getSortedRowModel,
+    useReactTable,
     VisibilityState,
 } from '@tanstack/react-table';
-import { rankItem } from '@tanstack/match-sorter-utils';
-import React, { useState } from 'react';
-import styles from './index.module.styl';
-import { FaPlus } from 'react-icons/fa';
-import { BiReset } from 'react-icons/bi';
 import cx from 'classnames';
+import React, { useState } from 'react';
+import { BiReset } from 'react-icons/bi';
+import { FaPlus } from 'react-icons/fa';
+import styles from './index.module.styl';
 
 /*
     Columns must be in the format:

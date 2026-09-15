@@ -1,8 +1,8 @@
-import { LuTrash } from 'react-icons/lu';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 
 import reduxStore from 'app/store/redux';
 import { clearNotifications } from 'app/store/redux/slices/preferences.slice';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { LuTrash } from 'react-icons/lu';
 
 const Header = () => {
     const notifications = useTypedSelector(

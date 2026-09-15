@@ -1,9 +1,9 @@
-import { useSelector } from 'react-redux';
-import get from 'lodash/get';
-import { RootState } from 'app/store/redux';
-import { firmwarePastVersion } from 'app/lib/firmwareSemver.ts';
 import { ATCI_SUPPORTED_VERSION } from 'app/features/ATC/utils/ATCiConstants.ts';
+import { firmwarePastVersion } from 'app/lib/firmwareSemver.ts';
+import { RootState } from 'app/store/redux';
 import cx from 'classnames';
+import get from 'lodash/get';
+import { useSelector } from 'react-redux';
 
 export function SettingBadge({ label, ok }: { label: string; ok: boolean }) {
     return (
@@ -24,7 +24,9 @@ export function TLSContinuitySidebar() {
     );
     // Selected for reactivity: firmwarePastVersion reads redux directly, but
     // this ensures the component re-renders once version info arrives/changes.
-    useSelector((state: RootState) => state.controller.settings.version?.semver);
+    useSelector(
+        (state: RootState) => state.controller.settings.version?.semver,
+    );
 
     const invertProbePin = get(eepromSettings, '$6', undefined);
     const legacyToolSensor = get(eepromSettings, '$668', undefined);

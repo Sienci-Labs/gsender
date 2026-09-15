@@ -12,7 +12,9 @@ export const BOARD_PROFILES: BoardProfile[] = [
     { boardId: 'SLB Lite', skipGrblCoreMigration: true },
 ];
 
-export function getBoardProfile(boardId: string | undefined): BoardProfile | undefined {
+export function getBoardProfile(
+    boardId: string | undefined,
+): BoardProfile | undefined {
     if (!boardId) return undefined;
     return BOARD_PROFILES.find((b) => b.boardId === boardId);
 }

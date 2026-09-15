@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 
 // Test 1: SettingsMenu contains the portrait macro bar toggle
@@ -6,10 +6,13 @@ describe('Portrait macro bar setting', () => {
     test('SettingsMenu includes portraitMacroBar toggle', () => {
         const fs = require('fs');
         const path = require('path');
-        const settingsPath = path.resolve(__dirname, '../../../features/Config/assets/SettingsMenu.ts');
+        const settingsPath = path.resolve(
+            __dirname,
+            '../../../features/Config/assets/SettingsMenu.ts',
+        );
         const content = fs.readFileSync(settingsPath, 'utf8');
         expect(content).toContain("key: 'workspace.portraitMacroBar'");
-        expect(content).toContain('type: \'boolean\'');
+        expect(content).toContain("type: 'boolean'");
         expect(content).toContain('portrait');
     });
 });
@@ -27,10 +30,7 @@ describe('Workspace TypeScript interface', () => {
     test('definitions.ts declares portraitMacroBar as boolean', () => {
         const fs = require('fs');
         const path = require('path');
-        const definitionsPath = path.resolve(
-            __dirname,
-            '../../definitions.ts',
-        );
+        const definitionsPath = path.resolve(__dirname, '../../definitions.ts');
         const content = fs.readFileSync(definitionsPath, 'utf8');
         expect(content).toContain('portraitMacroBar: boolean');
     });
@@ -49,22 +49,18 @@ describe('Carve component integration', () => {
     test('Carve imports PortraitMacroBar', () => {
         const fs = require('fs');
         const path = require('path');
-        const carvePath = path.resolve(
-            __dirname,
-            '../../Carve/index.tsx',
-        );
+        const carvePath = path.resolve(__dirname, '../../Carve/index.tsx');
         const content = fs.readFileSync(carvePath, 'utf8');
-        expect(content).toContain("import { PortraitMacroBar } from '../PortraitMacroBar'");
+        expect(content).toContain(
+            "import { PortraitMacroBar } from '../PortraitMacroBar'",
+        );
         expect(content).toContain('<PortraitMacroBar />');
     });
 
     test('Carve uses flex-col in bottom section for macro bar layout', () => {
         const fs = require('fs');
         const path = require('path');
-        const carvePath = path.resolve(
-            __dirname,
-            '../../Carve/index.tsx',
-        );
+        const carvePath = path.resolve(__dirname, '../../Carve/index.tsx');
         const content = fs.readFileSync(carvePath, 'utf8');
         expect(content).toContain('flex flex-col');
     });

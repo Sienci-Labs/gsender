@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useRef, useMemo } from 'react';
+import { GRBL_ACTIVE_STATE_ALARM } from 'app/constants';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { RootState } from 'app/store/redux';
-import { GRBL_ACTIVE_STATE_ALARM } from 'app/constants';
 import pubsub from 'pubsub-js';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 export const AccessibilityAnnouncer: React.FC = () => {
     const {
@@ -25,7 +25,7 @@ export const AccessibilityAnnouncer: React.FC = () => {
     const [statusMessage, setStatusMessage] = useState('');
     const [progressMessage, setProgressMessage] = useState('');
     const [summaryMessage, setSummaryMessage] = useState('');
-    
+
     const lastAnnouncedProgress = useRef(0);
     const prevStatus = useRef(activeState);
     const audioContext = useRef<AudioContext | null>(null);
@@ -33,21 +33,23 @@ export const AccessibilityAnnouncer: React.FC = () => {
     // Audio Cue helper
     const playSound = (type: 'success' | 'alarm' | 'info') => {
         if (!audioCues.enabled) return;
-        
+
         try {
             if (!audioContext.current) {
-                audioContext.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+                audioContext.current = new (
+                    window.AudioContext || (window as any).webkitAudioContext
+                )();
             }
-            
+
             const ctx = audioContext.current;
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
-            
+
             osc.connect(gain);
             gain.connect(ctx.destination);
-            
+
             const now = ctx.currentTime;
-            
+
             if (type === 'success') {
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(880, now);
@@ -88,9 +90,16 @@ export const AccessibilityAnnouncer: React.FC = () => {
 
             // Audio Cues
             if (audioCues.enabled) {
-                if (activeState === GRBL_ACTIVE_STATE_ALARM && audioCues.alarmTriggered) {
+                if (
+                    activeState === GRBL_ACTIVE_STATE_ALARM &&
+                    audioCues.alarmTriggered
+                ) {
                     playSound('alarm');
-                } else if (prevStatus.current === 'Run' && activeState === 'Idle' && audioCues.jobComplete) {
+                } else if (
+                    prevStatus.current === 'Run' &&
+                    activeState === 'Idle' &&
+                    audioCues.jobComplete
+                ) {
                     playSound('success');
                 }
             }
@@ -130,12 +139,18 @@ export const AccessibilityAnnouncer: React.FC = () => {
         if (!jobProgressAnnouncements) return;
 
         const currentProgress = Math.floor(progress);
-        const nextThreshold = lastAnnouncedProgress.current + jobProgressIncrement;
+        const nextThreshold =
+            lastAnnouncedProgress.current + jobProgressIncrement;
 
         if (currentProgress >= nextThreshold && currentProgress < 100) {
             setProgressMessage(`Job progress: ${currentProgress}%`);
-            lastAnnouncedProgress.current = Math.floor(currentProgress / jobProgressIncrement) * jobProgressIncrement;
-        } else if (currentProgress === 100 && lastAnnouncedProgress.current !== 100) {
+            lastAnnouncedProgress.current =
+                Math.floor(currentProgress / jobProgressIncrement) *
+                jobProgressIncrement;
+        } else if (
+            currentProgress === 100 &&
+            lastAnnouncedProgress.current !== 100
+        ) {
             setProgressMessage('Job complete: 100%');
             lastAnnouncedProgress.current = 100;
         } else if (currentProgress < lastAnnouncedProgress.current) {
@@ -144,7 +159,9 @@ export const AccessibilityAnnouncer: React.FC = () => {
     }, [progress, jobProgressAnnouncements, jobProgressIncrement]);
 
     // G-Code Summary
-    const { units } = useTypedSelector((state: RootState) => state.controller.state?.status || { units: 'mm' });
+    const { units } = useTypedSelector(
+        (state: RootState) => state.controller.state?.status || { units: 'mm' },
+    );
 
     useEffect(() => {
         if (!gcodeSummary.enabled || !file.name) {
@@ -165,7 +182,8 @@ export const AccessibilityAnnouncer: React.FC = () => {
 
         const formatTime = (seconds: number): string => {
             if (seconds < 60) return `${Math.ceil(seconds)} seconds`;
-            if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes and ${Math.ceil(seconds % 60)} seconds`;
+            if (seconds < 3600)
+                return `${Math.floor(seconds / 60)} minutes and ${Math.ceil(seconds % 60)} seconds`;
             return `${Math.floor(seconds / 3600)} hours and ${Math.floor((seconds % 3600) / 60)} minutes`;
         };
 
@@ -175,33 +193,48 @@ export const AccessibilityAnnouncer: React.FC = () => {
             const dx = (bbox.max.x - bbox.min.x).toFixed(2);
             const dy = (bbox.max.y - bbox.min.y).toFixed(2);
             const dz = (bbox.max.z - bbox.min.z).toFixed(2);
-            summaryParts.push(`Dimensions: ${dx} wide, ${dy} deep, and ${dz} high ${units}.`);
-            summaryParts.push(`X ranges from ${bbox.min.x.toFixed(2)} to ${bbox.max.x.toFixed(2)}.`);
-            summaryParts.push(`Y ranges from ${bbox.min.y.toFixed(2)} to ${bbox.max.y.toFixed(2)}.`);
-            summaryParts.push(`Minimum Z height is ${bbox.min.z.toFixed(2)} ${units}.`);
+            summaryParts.push(
+                `Dimensions: ${dx} wide, ${dy} deep, and ${dz} high ${units}.`,
+            );
+            summaryParts.push(
+                `X ranges from ${bbox.min.x.toFixed(2)} to ${bbox.max.x.toFixed(2)}.`,
+            );
+            summaryParts.push(
+                `Y ranges from ${bbox.min.y.toFixed(2)} to ${bbox.max.y.toFixed(2)}.`,
+            );
+            summaryParts.push(
+                `Minimum Z height is ${bbox.min.z.toFixed(2)} ${units}.`,
+            );
         }
 
         if (estimatedTime > 0) {
-            summaryParts.push(`Estimated completion time: ${formatTime(estimatedTime)}.`);
+            summaryParts.push(
+                `Estimated completion time: ${formatTime(estimatedTime)}.`,
+            );
         }
 
         if (toolSet && toolSet.length > 0) {
-            const tools = toolSet.map(t => t.replace('T', '')).join(', ');
-            summaryParts.push(`Uses ${toolSet.length} tool${toolSet.length > 1 ? 's' : ''}: ${tools}.`);
+            const tools = toolSet.map((t) => t.replace('T', '')).join(', ');
+            summaryParts.push(
+                `Uses ${toolSet.length} tool${toolSet.length > 1 ? 's' : ''}: ${tools}.`,
+            );
         }
 
         // Additional parsing from content
         const content = file.content || '';
-        
+
         // Parse CAM comments from first 100 lines
         const lines = content.split('\n').slice(0, 100);
         const camMetadata: string[] = [];
-        lines.forEach(line => {
+        lines.forEach((line) => {
             if (line.includes('(') || line.includes(';')) {
                 const comment = line.match(/\((.*)\)|;(.*)/);
                 if (comment) {
                     const text = (comment[1] || comment[2] || '').trim();
-                    if (text.toLowerCase().includes('tool') || text.toLowerCase().includes('stock')) {
+                    if (
+                        text.toLowerCase().includes('tool') ||
+                        text.toLowerCase().includes('stock')
+                    ) {
                         camMetadata.push(text);
                     }
                 }
@@ -214,7 +247,9 @@ export const AccessibilityAnnouncer: React.FC = () => {
 
         const stopCount = (content.match(/^M0|^M1/gm) || []).length;
         if (stopCount > 0) {
-            summaryParts.push(`Contains ${stopCount} program stop${stopCount > 1 ? 's' : ''} (M0/M1).`);
+            summaryParts.push(
+                `Contains ${stopCount} program stop${stopCount > 1 ? 's' : ''} (M0/M1).`,
+            );
         }
 
         const hasCoolant = content.match(/M7|M8/i);
@@ -223,29 +258,41 @@ export const AccessibilityAnnouncer: React.FC = () => {
         }
 
         if (spindleSet && spindleSet.length > 0) {
-            const speeds = spindleSet.map(s => Number(s.replace('S', ''))).sort((a, b) => a - b);
+            const speeds = spindleSet
+                .map((s) => Number(s.replace('S', '')))
+                .sort((a, b) => a - b);
             if (speeds[0] === speeds[speeds.length - 1]) {
                 summaryParts.push(`Spindle speed: ${speeds[0]} RPM.`);
             } else {
-                summaryParts.push(`Spindle speed range: ${speeds[0]} to ${speeds[speeds.length - 1]} RPM.`);
+                summaryParts.push(
+                    `Spindle speed range: ${speeds[0]} to ${speeds[speeds.length - 1]} RPM.`,
+                );
             }
         }
 
         if (movementSet && movementSet.length > 0) {
-            const feeds = movementSet.map(f => Number(f.replace('F', ''))).sort((a, b) => a - b);
+            const feeds = movementSet
+                .map((f) => Number(f.replace('F', '')))
+                .sort((a, b) => a - b);
             if (feeds[0] === feeds[feeds.length - 1]) {
                 summaryParts.push(`Feedrate: ${feeds[0]} ${units}/min.`);
             } else {
-                summaryParts.push(`Feedrate range: ${feeds[0]} to ${feeds[feeds.length - 1]} ${units}/min.`);
+                summaryParts.push(
+                    `Feedrate range: ${feeds[0]} to ${feeds[feeds.length - 1]} ${units}/min.`,
+                );
             }
         }
 
         if (usedAxes && usedAxes.length > 0) {
-            summaryParts.push(`Active axes: ${usedAxes.join(', ').toUpperCase()}.`);
+            summaryParts.push(
+                `Active axes: ${usedAxes.join(', ').toUpperCase()}.`,
+            );
         }
 
         if (invalidGcode && invalidGcode.length > 0) {
-            summaryParts.push(`WARNING: ${invalidGcode.length} invalid G-code lines detected.`);
+            summaryParts.push(
+                `WARNING: ${invalidGcode.length} invalid G-code lines detected.`,
+            );
         }
 
         setSummaryMessage(summaryParts.join(' '));
@@ -267,12 +314,14 @@ export const AccessibilityAnnouncer: React.FC = () => {
                 <div aria-live="polite">{progressMessage}</div>
                 <div aria-live="polite">{summaryMessage}</div>
             </div>
-            {gcodeSummary.enabled && gcodeSummary.showVisually && summaryMessage && (
-                <div className="bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-500 p-4 mb-4 mx-4 rounded-r-md text-sm text-blue-700 dark:text-blue-200">
-                    <p className="font-bold">Job Summary</p>
-                    <p>{summaryMessage}</p>
-                </div>
-            )}
+            {gcodeSummary.enabled &&
+                gcodeSummary.showVisually &&
+                summaryMessage && (
+                    <div className="bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-500 p-4 mb-4 mx-4 rounded-r-md text-sm text-blue-700 dark:text-blue-200">
+                        <p className="font-bold">Job Summary</p>
+                        <p>{summaryMessage}</p>
+                    </div>
+                )}
         </>
     );
 };

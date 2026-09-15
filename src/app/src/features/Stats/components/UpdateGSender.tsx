@@ -1,8 +1,8 @@
-import ReactParse from 'html-react-parser';
-import { useEffect, useState } from 'react';
 import { DownloadGSender } from 'app/features/Stats/components/DownloadGSender.tsx';
-import { FaExternalLinkAlt } from 'react-icons/fa';
+import ReactParse from 'html-react-parser';
 import isElectron from 'is-electron';
+import { useEffect, useState } from 'react';
+import { FaExternalLinkAlt } from 'react-icons/fa';
 
 export function UpdateGSender({
     notes = {

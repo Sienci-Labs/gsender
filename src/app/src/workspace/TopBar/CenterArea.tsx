@@ -1,5 +1,5 @@
-import MachineStatus from 'app/features/MachineStatus/MachineStatus';
 import MachineInfo from 'app/features/MachineInfo';
+import MachineStatus from 'app/features/MachineStatus/MachineStatus';
 
 const CenterArea = () => {
     return (

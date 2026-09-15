@@ -21,12 +21,10 @@
  *
  */
 
-import React from 'react';
 import cx from 'classnames';
+import React from 'react';
+import { FaClipboard, FaClipboardCheck, FaClipboardList } from 'react-icons/fa';
 import styles from '../index.module.styl';
-import { FaClipboardCheck } from 'react-icons/fa';
-import { FaClipboardList } from 'react-icons/fa';
-import { FaClipboard } from 'react-icons/fa';
 
 const SubstepCompletionIndicator = ({
     completed = false,

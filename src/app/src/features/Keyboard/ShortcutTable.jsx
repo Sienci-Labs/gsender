@@ -1,6 +1,6 @@
+import store from 'app/store';
 import uniqueId from 'lodash/uniqueId';
 import React, { useEffect, useState } from 'react';
-import store from 'app/store';
 
 function ShortcutTable({ forwardRef }) {
     const [shortcuts, setShortcuts] = useState([{}]);

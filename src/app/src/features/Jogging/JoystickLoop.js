@@ -1,10 +1,9 @@
-import throttle from 'lodash/throttle';
-import inRange from 'lodash/inRange';
-import get from 'lodash/get';
-import reduxStore from 'app/store/redux';
-
-import gamepad, { checkButtonHold } from 'app/lib/gamepad';
 import controller from 'app/lib/controller';
+import gamepad, { checkButtonHold } from 'app/lib/gamepad';
+import reduxStore from 'app/store/redux';
+import get from 'lodash/get';
+import inRange from 'lodash/inRange';
+import throttle from 'lodash/throttle';
 import { GRBLHAL } from '../../constants';
 
 export const checkThumbsticskAreIdle = (axes, profile) => {
@@ -455,9 +454,7 @@ export class JoystickLoop {
             const absY = Math.abs(yAxis);
 
             // Treat tiny XY stick movement as idle to avoid micro-jog spam.
-            if (
-                Math.max(absX, absY) < HORIZONTAL_EFFECTIVE_IDLE_THRESHOLD
-            ) {
+            if (Math.max(absX, absY) < HORIZONTAL_EFFECTIVE_IDLE_THRESHOLD) {
                 this.horizontalDominantAxis = null;
                 return;
             }

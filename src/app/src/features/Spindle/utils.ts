@@ -1,11 +1,11 @@
-import includes from 'lodash/includes';
-import get from 'lodash/get';
 import {
-    WORKFLOW_STATE_RUNNING,
     GRBL,
-    GRBLHAL,
     GRBL_ACTIVE_STATE_IDLE,
+    GRBLHAL,
+    WORKFLOW_STATE_RUNNING,
 } from 'app/constants';
+import get from 'lodash/get';
+import includes from 'lodash/includes';
 
 export const canClick = (
     isConnected: boolean,

@@ -1,15 +1,14 @@
-import Button from "app/components/Button";
-import {useTypedSelector} from "app/hooks/useTypedSelector.ts";
-import {RootState} from "app/store/redux";
-import {GRBLHAL} from "app/constants";
-import {toast} from "sonner";
-import {ATCI_SUPPORTED_VERSION} from "app/features/ATC/utils/ATCiConstants.ts";
-import {firmwareSemver} from "app/lib/firmwareSemver.ts";
-import controller from "app/lib/controller.ts";
-import {delay} from "lodash";
-import {Confirm} from "app/components/ConfirmationDialog/ConfirmationDialogLib.ts";
-import store from "app/store";
-
+import Button from 'app/components/Button';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
+import { GRBLHAL } from 'app/constants';
+import { ATCI_SUPPORTED_VERSION } from 'app/features/ATC/utils/ATCiConstants.ts';
+import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import controller from 'app/lib/controller.ts';
+import { firmwareSemver } from 'app/lib/firmwareSemver.ts';
+import store from 'app/store';
+import { RootState } from 'app/store/redux';
+import { delay } from 'lodash';
+import { toast } from 'sonner';
 
 // Check firmware
 // Check firmware version
@@ -18,10 +17,12 @@ import store from "app/store";
 // Prompt to restart
 function enableATCiWizard(firmware, version) {
     if (firmware !== GRBLHAL) {
-        toast.error("ATCi is only supported by boards running grblHAL.");
+        toast.error('ATCi is only supported by boards running grblHAL.');
     }
     if (!firmwareSemver(version.semver, ATCI_SUPPORTED_VERSION)) {
-        toast.error(`ATCi is only supported by grblHAL version ${ATCI_SUPPORTED_VERSION} or above.`);
+        toast.error(
+            `ATCi is only supported by grblHAL version ${ATCI_SUPPORTED_VERSION} or above.`,
+        );
     }
 
     const code = [
@@ -35,8 +36,8 @@ function enableATCiWizard(firmware, version) {
         '$762=2',
         '$763=3',
         '$650=1',
-        '$534=1'
-    ]
+        '$534=1',
+    ];
     controller.command('gcode', code);
     store.set('workspace.atcEnabled', true);
 
@@ -52,13 +53,20 @@ function enableATCiWizard(firmware, version) {
 }
 
 export function ATCIWizard() {
-    const controllerType = useTypedSelector((state: RootState) => state.controller.type)
-    const version = useTypedSelector((state: RootState) => state.controller.settings.version)
+    const controllerType = useTypedSelector(
+        (state: RootState) => state.controller.type,
+    );
+    const version = useTypedSelector(
+        (state: RootState) => state.controller.settings.version,
+    );
     return (
         <div className="flex flex-row gap-4 items-center">
-            <Button className={'flex flex-row justify-start'} onClick={()  => enableATCiWizard(controllerType, version)}>
+            <Button
+                className={'flex flex-row justify-start'}
+                onClick={() => enableATCiWizard(controllerType, version)}
+            >
                 <span>Configure Sienci ATCi</span>
             </Button>
         </div>
-    )
+    );
 }

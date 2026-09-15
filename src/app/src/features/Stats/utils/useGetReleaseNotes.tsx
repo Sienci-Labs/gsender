@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
-
 import api from 'app/api';
+import { useEffect, useState } from 'react';
 
 type ReleaseNote = {
     version: string;

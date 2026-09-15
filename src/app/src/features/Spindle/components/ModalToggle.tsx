@@ -22,8 +22,8 @@
  */
 
 import { Switch } from 'app/components/shadcn/Switch';
-import { LASER_MODE } from 'app/constants';
 import Tooltip from 'app/components/Tooltip';
+import { LASER_MODE } from 'app/constants';
 
 type Props = {
     mode: string;

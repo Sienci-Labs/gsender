@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { ShuttleEvent, ShuttleControlEvents } from './definitions/shortcuts';
+import { useEffect, useState } from 'react';
+import { ShuttleControlEvents, ShuttleEvent } from './definitions/shortcuts';
 
 class ShortcutRegistry {
     private activeEvents: Map<string, ShuttleEvent> = new Map();
@@ -38,7 +38,9 @@ class ShortcutRegistry {
 export const shortcutRegistry = new ShortcutRegistry();
 
 export const useActiveShortcuts = () => {
-    const [shortcuts, setShortcuts] = useState<ShuttleEvent[]>(shortcutRegistry.getActiveEvents());
+    const [shortcuts, setShortcuts] = useState<ShuttleEvent[]>(
+        shortcutRegistry.getActiveEvents(),
+    );
 
     useEffect(() => {
         return shortcutRegistry.subscribe(() => {

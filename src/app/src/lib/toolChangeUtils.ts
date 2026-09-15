@@ -1,12 +1,3 @@
-import get from 'lodash/get';
-import store from '../store';
-import { store as reduxStore } from '../store/redux';
-import {
-    TOUCHPLATE_TYPE_3D,
-    TOUCHPLATE_TYPE_AUTOZERO,
-    TOUCHPLATE_TYPE_BITZERO,
-    TOUCHPLATE_TYPE_ZERO,
-} from '../lib/constants';
 import { UNITS_GCODE } from 'app/definitions/general';
 import {
     Probe,
@@ -16,8 +7,17 @@ import {
 } from 'app/features/Probe/definitions';
 import { ReduxState } from 'app/store/definitions';
 import automaticToolChange from 'app/wizards/automaticToolchange';
-import probeToolLength from 'app/wizards/probeToolLength';
 import { showFirstToolchangePrompt } from 'app/wizards/firstToolchangePrompt';
+import probeToolLength from 'app/wizards/probeToolLength';
+import get from 'lodash/get';
+import {
+    TOUCHPLATE_TYPE_3D,
+    TOUCHPLATE_TYPE_AUTOZERO,
+    TOUCHPLATE_TYPE_BITZERO,
+    TOUCHPLATE_TYPE_ZERO,
+} from '../lib/constants';
+import store from '../store';
+import { store as reduxStore } from '../store/redux';
 
 export const getProbeSettings = (): ProbeWidgetSettings => {
     const probeProfile: ProbeProfile = store.get('workspace.probeProfile');

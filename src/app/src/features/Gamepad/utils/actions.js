@@ -1,7 +1,7 @@
-import store from 'app/store';
 import api from 'app/api';
-import shuttleEvents from 'app/lib/shuttleEvents';
 import { MACRO_CATEGORY } from 'app/constants';
+import shuttleEvents from 'app/lib/shuttleEvents';
+import store from 'app/store';
 
 export const SET_CURRENT_GAMEPAD_PROFILE = 'SET_CURRENT_GAMEPAD_PROFILE';
 export const SET_CURRENT_GAMEPAD_PROFILE_BUTTON =

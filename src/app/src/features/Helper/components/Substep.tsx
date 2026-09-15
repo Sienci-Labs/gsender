@@ -21,8 +21,8 @@
  *
  */
 
-import React from 'react';
 import { Info } from 'lucide-react';
+import React from 'react';
 import Actions from './Actions';
 
 interface WizardAction {
@@ -60,10 +60,14 @@ const Substep = ({ step, index, stepIndex, firstRunOnly }: SubstepProps) => {
 
             {firstRunOnly && (
                 <div className="flex items-start gap-2 px-3 py-2 rounded-md border border-orange-200 dark:border-orange-800 bg-amber-50 dark:bg-orange-950/40">
-                    <Info size={13} className="shrink-0 mt-0.5 text-orange-500 dark:text-orange-400" />
+                    <Info
+                        size={13}
+                        className="shrink-0 mt-0.5 text-orange-500 dark:text-orange-400"
+                    />
                     <span className="text-sm text-orange-800 dark:text-orange-300">
                         <span className="font-semibold">One-time setup:</span>{' '}
-                        measures the initial tool so subsequent tools can be compared against it.
+                        measures the initial tool so subsequent tools can be
+                        compared against it.
                     </span>
                 </div>
             )}

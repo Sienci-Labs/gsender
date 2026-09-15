@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
-import { Shield, ShieldOff } from 'lucide-react';
-import controller from 'app/lib/controller.ts';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import controller from 'app/lib/controller.ts';
 import { RootState } from 'app/store/redux';
+import { Shield, ShieldOff } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export function KeepoutToggle() {
     const [flags, setFlags] = useState<string[]>([]);

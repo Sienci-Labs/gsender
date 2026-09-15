@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from 'app/store/redux';
 import { StepProps } from 'app/features/AccessoryInstaller/types';
-import { AlertCircle, CheckCircle } from 'lucide-react';
 import {
     ContinuityIndicator,
     ContinuityPhase,
 } from 'app/features/AccessoryInstaller/Wizards/tls/components/ContinuityIndicator.tsx';
+import { RootState } from 'app/store/redux';
+import { AlertCircle, CheckCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 export const CONTINUITY_CHECK_SUCCESS_DELAY_MS = 1500;
 
@@ -14,7 +14,8 @@ export function ContinuityCheck({ onComplete, onUncomplete }: StepProps) {
     const [phase, setPhase] = useState<ContinuityPhase>('checking-idle');
 
     const probePinOn = useSelector(
-        (state: RootState) => state.controller.state.status?.pinState.P ?? false,
+        (state: RootState) =>
+            state.controller.state.status?.pinState.P ?? false,
     );
 
     // Detect an idle/stuck-on pin immediately, without waiting for a timeout.
@@ -55,8 +56,8 @@ export function ContinuityCheck({ onComplete, onUncomplete }: StepProps) {
     return (
         <div className="flex flex-col gap-5 justify-start">
             <p className="dark:text-white">
-                Let's confirm your Tool Length Sensor is wired correctly.
-                Press the TLS down when prompted below.
+                Let's confirm your Tool Length Sensor is wired correctly. Press
+                the TLS down when prompted below.
             </p>
 
             <div className="flex flex-col items-center justify-center gap-6 py-8">
@@ -86,8 +87,8 @@ export function ContinuityCheck({ onComplete, onUncomplete }: StepProps) {
                                     Success
                                 </p>
                                 <p className="text-base font-semibold text-green-900 dark:text-green-100">
-                                    Continuity check passed. Your TLS is
-                                    working correctly.
+                                    Continuity check passed. Your TLS is working
+                                    correctly.
                                 </p>
                             </div>
                         </div>
@@ -113,8 +114,8 @@ export function ContinuityCheck({ onComplete, onUncomplete }: StepProps) {
                                         Error
                                     </p>
                                     <p className="text-base font-semibold text-red-900 dark:text-red-100">
-                                        Probe pin immediately asserted.
-                                        Check your wiring or probe for a short and
+                                        Probe pin immediately asserted. Check
+                                        your wiring or probe for a short and
                                         confirm $6 (Invert Probe Pin) is set
                                         correctly.
                                     </p>

@@ -22,8 +22,8 @@
  */
 
 import store from 'app/store';
-import { translateKey } from './utils';
 import { State } from 'app/store/definitions';
+import { translateKey } from './utils';
 
 export interface WidgetConfigInterface {
     get<T = any>(key: string, defaultValue?: T): T;

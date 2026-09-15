@@ -1,15 +1,13 @@
-import PropTypes from 'prop-types';
-
-import * as WebGL from 'app/lib/three/WebGL';
 import { SURFACING_VISUALIZER_CONTAINER_ID } from 'app/constants';
 
-import VisualizerWrapper from './VisualizerWrapper';
+import * as WebGL from 'app/lib/three/WebGL';
+import cx from 'classnames';
+import PropTypes from 'prop-types';
+import CameraDisplay from './CameraDisplay/CameraDisplay';
+import { Actions, CAMERA_MODES_T, State } from './definitions';
 import Loading from './Loading';
 import Rendering from './Rendering';
-import CameraDisplay from './CameraDisplay/CameraDisplay';
-
-import cx from 'classnames';
-import { Actions, CAMERA_MODES_T, State } from './definitions';
+import VisualizerWrapper from './VisualizerWrapper';
 
 interface Props {
     state: State;

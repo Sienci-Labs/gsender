@@ -21,18 +21,30 @@
  *
  */
 
-import concaveman from 'concaveman';
-import GCodeVirtualizer from 'app/lib/GCodeVirtualizer';
 import { OUTLINE_MODE_RAPIDLESS_SQUARE } from 'app/constants';
+import GCodeVirtualizer from 'app/lib/GCodeVirtualizer';
+import concaveman from 'concaveman';
 
 self.onmessage = ({ data }) => {
-    const { isLaser = false, parsedData = [], mode, bbox, zTravel, content = '', outlineSpeed = null } = data;
+    const {
+        isLaser = false,
+        parsedData = [],
+        mode,
+        bbox,
+        zTravel,
+        content = '',
+        outlineSpeed = null,
+    } = data;
     const parsedOutlineSpeed = Number(outlineSpeed);
-    const hasCustomOutlineSpeed = Number.isFinite(parsedOutlineSpeed) && parsedOutlineSpeed > 0;
+    const hasCustomOutlineSpeed =
+        Number.isFinite(parsedOutlineSpeed) && parsedOutlineSpeed > 0;
     const movementModal = isLaser || hasCustomOutlineSpeed ? 'G1' : 'G0';
-    const movementFeed = movementModal === 'G1'
-        ? (hasCustomOutlineSpeed ? parsedOutlineSpeed : 3000)
-        : null;
+    const movementFeed =
+        movementModal === 'G1'
+            ? hasCustomOutlineSpeed
+                ? parsedOutlineSpeed
+                : 3000
+            : null;
 
     type OutlinePoint = [number | string, number | string];
 
@@ -41,7 +53,11 @@ self.onmessage = ({ data }) => {
         gCode.push('%MM=modal.distance');
         gCode.push(`G21 G91 G0 Z${zTravel}`);
         gCode.push('G21 G90');
-        gCode.push(movementFeed !== null ? `${movementModal} F${movementFeed}` : movementModal);
+        gCode.push(
+            movementFeed !== null
+                ? `${movementModal} F${movementFeed}`
+                : movementModal,
+        );
         if (isLaser) {
             gCode.push('M3 S1');
         }
@@ -63,7 +79,10 @@ self.onmessage = ({ data }) => {
         return gCode;
     };
 
-    const buildOutlineFromPoints = (points: OutlinePoint[], closeLoop = false) => {
+    const buildOutlineFromPoints = (
+        points: OutlinePoint[],
+        closeLoop = false,
+    ) => {
         const gCode = [];
         pushOutlinePreamble(gCode);
         pushOutlineMoves(gCode, points);
@@ -120,7 +139,10 @@ self.onmessage = ({ data }) => {
                 startIdx = i;
             }
         });
-        const orderedHull = [...hull.slice(startIdx), ...hull.slice(0, startIdx)];
+        const orderedHull = [
+            ...hull.slice(startIdx),
+            ...hull.slice(0, startIdx),
+        ];
 
         return convertPointsToGCode(orderedHull);
     };
@@ -146,7 +168,10 @@ self.onmessage = ({ data }) => {
     };
 
     const getRapidlessSquareOutline = (fileContent: string) => {
-        let xmin = Infinity, xmax = -Infinity, ymin = Infinity, ymax = -Infinity;
+        let xmin = Infinity,
+            xmax = -Infinity,
+            ymin = Infinity,
+            ymax = -Infinity;
 
         const updateBounds = (v1: any, v2: any) => {
             for (const v of [v1, v2]) {
@@ -170,28 +195,41 @@ self.onmessage = ({ data }) => {
                 if (r === 0) return;
 
                 const startAngle = Math.atan2(v1.y - v0.y, v1.x - v0.x);
-                const endAngle   = Math.atan2(v2.y - v0.y, v2.x - v0.x);
+                const endAngle = Math.atan2(v2.y - v0.y, v2.x - v0.x);
                 const isCCW = modal.motion === 'G3';
 
                 // Helper: is angle theta (normalized to [0, 2π)) within the arc sweep?
-                const normalize = (a: number) => ((a % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+                const normalize = (a: number) =>
+                    ((a % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
                 const sa = normalize(startAngle);
                 const ea = normalize(endAngle);
 
                 const inSweep = (theta: number): boolean => {
                     const t = normalize(theta);
                     if (isCCW) {
-                        return sa <= ea ? (t >= sa && t <= ea) : (t >= sa || t <= ea);
+                        return sa <= ea
+                            ? t >= sa && t <= ea
+                            : t >= sa || t <= ea;
                     } else {
                         // CW: sweep goes from sa down to ea
-                        return sa >= ea ? (t <= sa && t >= ea) : (t <= sa || t >= ea);
+                        return sa >= ea
+                            ? t <= sa && t >= ea
+                            : t <= sa || t >= ea;
                     }
                 };
 
                 // Check the 4 axis-aligned extrema
-                for (const theta of [0, Math.PI / 2, Math.PI, 3 * Math.PI / 2]) {
+                for (const theta of [
+                    0,
+                    Math.PI / 2,
+                    Math.PI,
+                    (3 * Math.PI) / 2,
+                ]) {
                     if (inSweep(theta)) {
-                        const ex = { x: v0.x + r * Math.cos(theta), y: v0.y + r * Math.sin(theta) };
+                        const ex = {
+                            x: v0.x + r * Math.cos(theta),
+                            y: v0.y + r * Math.sin(theta),
+                        };
                         updateBounds(ex, ex);
                     }
                 }
@@ -208,7 +246,12 @@ self.onmessage = ({ data }) => {
             const ch = fileContent.charCodeAt(i);
             if (ch !== 10 && ch !== 13) continue;
             vm.virtualize(fileContent.slice(lineStart, i));
-            if (ch === 13 && i + 1 < len && fileContent.charCodeAt(i + 1) === 10) i++;
+            if (
+                ch === 13 &&
+                i + 1 < len &&
+                fileContent.charCodeAt(i + 1) === 10
+            )
+                i++;
             lineStart = i + 1;
         }
         vm.virtualize(fileContent.slice(lineStart));

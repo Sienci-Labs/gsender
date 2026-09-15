@@ -21,8 +21,8 @@
  *
  */
 
-import React from 'react';
 import cx from 'classnames';
+import React from 'react';
 import { loadRecentFile } from './ClientRecentFiles';
 import styles from './RecentFileList.styl';
 

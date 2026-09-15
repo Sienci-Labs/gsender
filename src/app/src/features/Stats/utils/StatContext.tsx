@@ -1,14 +1,14 @@
-import { createContext, ReactNode, useEffect, useState } from 'react';
 import api from 'app/api';
-import { FIRMWARE_TYPES_T } from 'app/definitions/firmware';
 import { JOB_STATUS, JOB_TYPES } from 'app/constants';
-import { AxiosResponse } from 'axios';
-import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
-import { RootState } from 'app/store/redux';
+import { FIRMWARE_TYPES_T } from 'app/definitions/firmware';
 import {
     calculateJobStats,
     filterJobsByPort,
 } from 'app/features/Stats/utils/statUtils.ts';
+import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import { RootState } from 'app/store/redux';
+import { AxiosResponse } from 'axios';
+import { createContext, ReactNode, useEffect, useState } from 'react';
 
 type EventType = 'ALARM' | 'ERROR';
 export type JOB_TYPES_T = (typeof JOB_TYPES)[keyof typeof JOB_TYPES];

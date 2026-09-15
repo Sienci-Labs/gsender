@@ -1,21 +1,20 @@
-import SortableTable, { CustomColumnDef } from 'app/components/SortableTable';
-import { StatCard } from 'app/features/Stats/components/StatCard.tsx';
-import { useContext } from 'react';
-import {
-    Job,
-    JOB_STATUS_T,
-    StatContext,
-} from 'app/features/Stats/utils/StatContext.tsx';
-import { GRBL, JOB_STATUS, JOB_TYPES } from 'app/constants';
-import { CheckCircle, XCircle } from 'lucide-react';
-import { CardHeader } from 'app/features/Stats/components/CardHeader.tsx';
 import { Button } from 'app/components/Button';
-import { FaTrash } from 'react-icons/fa';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
-
-import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
+import SortableTable, { CustomColumnDef } from 'app/components/SortableTable';
+import { GRBL, JOB_STATUS, JOB_TYPES } from 'app/constants';
+import { CardHeader } from 'app/features/Stats/components/CardHeader.tsx';
 import { JobsPerComPort } from 'app/features/Stats/components/JobsPerComPort.tsx';
 import { RunTimePerComPort } from 'app/features/Stats/components/RunTimePerComPort.tsx';
+import { StatCard } from 'app/features/Stats/components/StatCard.tsx';
+import {
+    JOB_STATUS_T,
+    Job,
+    StatContext,
+} from 'app/features/Stats/utils/StatContext.tsx';
+import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
+import { CheckCircle, XCircle } from 'lucide-react';
+import { useContext } from 'react';
+import { FaTrash } from 'react-icons/fa';
 
 const defaultData: Job[] = [
     {

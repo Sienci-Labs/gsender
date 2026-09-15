@@ -21,10 +21,10 @@
  *
  */
 
-import React, { useMemo } from 'react';
+import shuttleEvents from 'app/lib/shuttleEvents';
 
 import store from 'app/store';
-import shuttleEvents from 'app/lib/shuttleEvents';
+import React, { useMemo } from 'react';
 
 const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
 

@@ -21,9 +21,8 @@
  *
  */
 
-import React, { Fragment } from 'react';
-
 import { cn } from 'app/lib/utils';
+import React, { Fragment } from 'react';
 
 export const formatShortcut = (shortcut = [], isActive = true) => {
     const baseClass = 'px-2 py-1 rounded';

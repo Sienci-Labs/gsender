@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Wizard } from '../../types/wizard';
-import { WizardsHub } from './WizardsHub';
 import { WizardManager } from './WizardManager';
+import { WizardsHub } from './WizardsHub';
 
 interface WizardsManagerProps {
     wizards: Wizard[];
@@ -33,7 +33,8 @@ export function WizardsManager({
     }, [wizards, selectedWizard]);
 
     useEffect(() => {
-        if (hasAutoSelected.current || !initialWizardId || !wizards.length) return;
+        if (hasAutoSelected.current || !initialWizardId || !wizards.length)
+            return;
         const match = wizards.find((w) => w.id === initialWizardId);
         if (match) {
             setSelectedWizard(match);

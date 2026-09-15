@@ -21,17 +21,16 @@
  *
  */
 
-import React, { useState, useEffect } from 'react';
+import { Button } from 'app/components/Button';
+import shuttleEvents from 'app/lib/shuttleEvents';
+import { cn } from 'app/lib/utils';
 import PropTypes from 'prop-types';
+import React, { useEffect, useState } from 'react';
 import {
     FaCheckCircle,
     FaExclamationCircle,
     FaInfoCircle,
 } from 'react-icons/fa';
-
-import { cn } from 'app/lib/utils';
-import { Button } from 'app/components/Button';
-import shuttleEvents from 'app/lib/shuttleEvents';
 
 import { formatShortcut, shouldHideShiftForKey } from '../helpers';
 

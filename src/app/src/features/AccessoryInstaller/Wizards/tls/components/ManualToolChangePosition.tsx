@@ -1,16 +1,16 @@
-import { StepProps } from 'app/features/AccessoryInstaller/types';
-import { StepActionButton } from 'app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx';
-import { PositionSetter } from 'app/features/AccessoryInstaller/Wizards/atc/components/PositionSetter.tsx';
-import { useSelector } from 'react-redux';
-import { RootState } from 'app/store/redux';
-import { useEffect, useRef, useState } from 'react';
-import store from 'app/store';
-import controller from 'app/lib/controller.ts';
-import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-import { mapPositionToUnits, in2mm } from 'app/lib/units.ts';
 import { IMPERIAL_UNITS } from 'app/constants';
+import { StepActionButton } from 'app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx';
+import { StepProps } from 'app/features/AccessoryInstaller/types';
+import { PositionSetter } from 'app/features/AccessoryInstaller/Wizards/atc/components/PositionSetter.tsx';
 import { getDefaultToolChangePositionMM } from 'app/features/AccessoryInstaller/Wizards/tls/utils/defaultToolChangePosition.ts';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import controller from 'app/lib/controller.ts';
+import { in2mm, mapPositionToUnits } from 'app/lib/units.ts';
+import store from 'app/store';
+import { RootState } from 'app/store/redux';
 import pubsub from 'pubsub-js';
+import { useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 type Position = { x?: number; y?: number; z?: number };
 
@@ -44,7 +44,13 @@ export function ManualToolChangePosition({
 
     useEffect(() => {
         if (isManuallyEditing.current) return;
-        if (!mpos || mpos.x === undefined || mpos.y === undefined || mpos.z === undefined) return;
+        if (
+            !mpos ||
+            mpos.x === undefined ||
+            mpos.y === undefined ||
+            mpos.z === undefined
+        )
+            return;
         // No real jog has happened since entering the step yet — keep the
         // computed default instead of clobbering it with the raw mpos.
         if (mposEquals(mpos, mposAtMountRef.current)) return;
@@ -95,8 +101,8 @@ export function ManualToolChangePosition({
     return (
         <div className="flex flex-col gap-5 justify-start">
             <p className="dark:text-white">
-                Jog to the location you'd like the machine to move to for
-                manual tool changes, then set the position using the{' '}
+                Jog to the location you'd like the machine to move to for manual
+                tool changes, then set the position using the{' '}
                 <b>"Set Position"</b> button.
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-300">

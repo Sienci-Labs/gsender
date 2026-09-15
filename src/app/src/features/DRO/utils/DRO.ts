@@ -1,12 +1,12 @@
-import controller from 'app/lib/controller';
-import store from 'app/store';
-import get from 'lodash/get';
 import { METRIC_UNITS } from 'app/constants';
-import { store as reduxStore } from 'app/store/redux';
 import {
     isATCAvailable,
     sendATCHomingDialog,
 } from 'app/features/ATC/utils/ATCFunctions.ts';
+import controller from 'app/lib/controller';
+import store from 'app/store';
+import { store as reduxStore } from 'app/store/redux';
+import get from 'lodash/get';
 export type Axis =
     | 'A'
     | 'B'

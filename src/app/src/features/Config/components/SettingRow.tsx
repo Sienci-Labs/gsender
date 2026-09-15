@@ -1,31 +1,31 @@
-import React, { JSX } from 'react';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
+import Tooltip from 'app/components/Tooltip';
+import { GRBLHAL } from 'app/constants';
+import { EEPROM } from 'app/definitions/firmware';
 import {
     gSenderSetting,
     gSenderSettingsValues,
 } from 'app/features/Config/assets/SettingsMenu.ts';
+import { EEPROMSettingRow } from 'app/features/Config/components/EEPROMSettingRow.tsx';
 import { BooleanSettingInput } from 'app/features/Config/components/SettingInputs/BooleanSettingInput.tsx';
-import { SelectSettingInput } from 'app/features/Config/components/SettingInputs/SelectSettingInput.tsx';
+import { EventInput } from 'app/features/Config/components/SettingInputs/EventInput.tsx';
+import { HybridNumber } from 'app/features/Config/components/SettingInputs/HybridNumber.tsx';
+import { IPSettingInput } from 'app/features/Config/components/SettingInputs/IP.tsx';
+import { JogInput } from 'app/features/Config/components/SettingInputs/JogInput.tsx';
+import { LocationInput } from 'app/features/Config/components/SettingInputs/LocationInput.tsx';
 import { NumberSettingInput } from 'app/features/Config/components/SettingInputs/NumberSettingInput.tsx';
 import { RadioSettingInput } from 'app/features/Config/components/SettingInputs/RadioSettingInput.tsx';
-import { IPSettingInput } from 'app/features/Config/components/SettingInputs/IP.tsx';
-import { HybridNumber } from 'app/features/Config/components/SettingInputs/HybridNumber.tsx';
+import { SelectSettingInput } from 'app/features/Config/components/SettingInputs/SelectSettingInput.tsx';
+import { TextAreaInput } from 'app/features/Config/components/SettingInputs/TextAreaInput.tsx';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
-import { EEPROMSettingRow } from 'app/features/Config/components/EEPROMSettingRow.tsx';
-import { EventInput } from 'app/features/Config/components/SettingInputs/EventInput.tsx';
 import controller from 'app/lib/controller.ts';
 import { toast } from 'app/lib/toaster';
-import { TextAreaInput } from 'app/features/Config/components/SettingInputs/TextAreaInput.tsx';
-import { LocationInput } from 'app/features/Config/components/SettingInputs/LocationInput.tsx';
-import cn from 'classnames';
-import { BiReset } from 'react-icons/bi';
-import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 import store from 'app/store';
-import { FaMicrochip } from 'react-icons/fa6';
-import { GRBLHAL } from 'app/constants';
-import { JogInput } from 'app/features/Config/components/SettingInputs/JogInput.tsx';
-import Tooltip from 'app/components/Tooltip';
+import cn from 'classnames';
 import pubsub from 'pubsub-js';
-import { EEPROM } from 'app/definitions/firmware';
+import React, { JSX } from 'react';
+import { BiReset } from 'react-icons/bi';
+import { FaMicrochip } from 'react-icons/fa6';
 
 interface SettingRowProps {
     setting: gSenderSetting;

@@ -1,9 +1,9 @@
-import debounce from 'lodash/debounce';
-import throttle from 'lodash/throttle';
+import { ShuttleEvent } from 'app/lib/definitions/shortcuts';
+import GamepadListener from 'app/lib/gamepad/gamepad.js/GamepadListener';
 
 import store from 'app/store';
-import GamepadListener from 'app/lib/gamepad/gamepad.js/GamepadListener';
-import { ShuttleEvent } from 'app/lib/definitions/shortcuts';
+import debounce from 'lodash/debounce';
+import throttle from 'lodash/throttle';
 
 import shuttleEvents from '../shuttleEvents';
 import { toast } from '../toaster';
@@ -254,12 +254,13 @@ export const runAction = ({ event }: { event: GamepadDetail }): void => {
                 throttle(
                     (payload: unknown) => {
                         // Get fresh callback reference in case it was updated
-                        const currentEvent = shuttleEvents.allShuttleControlEvents[action] as ShuttleEvent;
+                        const currentEvent = shuttleEvents
+                            .allShuttleControlEvents[action] as ShuttleEvent;
                         currentEvent?.callback?.(null, payload);
                     },
                     100,
-                    { trailing: false }
-                )
+                    { trailing: false },
+                ),
             );
         }
 

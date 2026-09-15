@@ -21,8 +21,8 @@
  *
  */
 
-import sha1 from 'sha1';
 import i18next from 'i18next';
+import sha1 from 'sha1';
 
 export interface i18n__Options {
     context?: object;

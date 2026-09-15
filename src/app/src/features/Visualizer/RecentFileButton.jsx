@@ -21,11 +21,11 @@
  *
  */
 
-import React, { useState, useEffect } from 'react';
 import pubsub from 'pubsub-js';
-import styles from './RecentFileList.styl';
-import RecentFileList from './RecentFileList';
+import React, { useEffect, useState } from 'react';
 import { getRecentFiles } from './ClientRecentFiles';
+import RecentFileList from './RecentFileList';
+import styles from './RecentFileList.styl';
 
 const RecentFileButton = () => {
     const [showPullout, setShowPullout] = useState(false);

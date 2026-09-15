@@ -1,6 +1,6 @@
+import { JobPreview } from 'app/features/Stats/components/JobPreview.tsx';
 import { StatContext } from 'app/features/Stats/utils/StatContext.tsx';
 import { useContext } from 'react';
-import { JobPreview } from 'app/features/Stats/components/JobPreview.tsx';
 import { FaRegListAlt } from 'react-icons/fa';
 
 export function EmptyJobList() {

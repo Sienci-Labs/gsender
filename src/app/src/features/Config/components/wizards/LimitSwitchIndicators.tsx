@@ -1,7 +1,7 @@
-import { useSelector } from 'react-redux';
+import { PinIndicator } from 'app/features/MachineInfo/PinRow.tsx';
 import { RootState } from 'app/store/redux';
 import get from 'lodash/get';
-import { PinIndicator } from 'app/features/MachineInfo/PinRow.tsx';
+import { useSelector } from 'react-redux';
 
 export function LimitSwitchIndicators() {
     const status = useSelector(

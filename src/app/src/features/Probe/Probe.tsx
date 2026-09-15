@@ -21,26 +21,24 @@
  *
  */
 
-import React, { useCallback, useRef, useEffect } from 'react';
-import cx from 'classnames';
-
-import { Button as ShadcnButton } from 'app/components/shadcn/Button';
 import { Button } from 'app/components/Button';
+import { Button as ShadcnButton } from 'app/components/shadcn/Button';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from 'app/components/shadcn/Dropdown';
-
-import { METRIC_UNITS, PROBING_CATEGORY } from '../../constants';
-import ProbeImage from './ProbeImage';
-import ProbeDiameter from './ProbeDiameter';
-import { Actions, State } from './definitions';
-import useKeybinding from 'app/lib/useKeybinding';
-import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import Tooltip from 'app/components/Tooltip';
+import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { TOUCHPLATE_TYPES } from 'app/lib/constants';
+import useKeybinding from 'app/lib/useKeybinding';
+import cx from 'classnames';
+import React, { useCallback, useEffect, useRef } from 'react';
+import { METRIC_UNITS, PROBING_CATEGORY } from '../../constants';
+import { Actions, State } from './definitions';
+import ProbeDiameter from './ProbeDiameter';
+import ProbeImage from './ProbeImage';
 
 type ProbeProps = {
     state: State;
@@ -137,24 +135,31 @@ const Probe = ({ state, actions }: ProbeProps) => {
                 {/* <div className="w-full h-full m-auto grid gap-4">
                     <div className="h-full grid grid-rows[4fr_2fr] self-center gap-2"> */}
                 <div className="grid grid-rows-[1fr_1fr_1fr] gap-0.5 items-center justify-center">
-                    { touchplateTypeSwitcher &&
+                    {touchplateTypeSwitcher && (
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button  aria-label="Change Probe Type" size="sm">{touchplateType}</Button>
+                                <Button
+                                    aria-label="Change Probe Type"
+                                    size="sm"
+                                >
+                                    {touchplateType}
+                                </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-56 bg-white">
-                                { Object.values(TOUCHPLATE_TYPES).map((tpt) =>
+                                {Object.values(TOUCHPLATE_TYPES).map((tpt) => (
                                     <DropdownMenuItem
                                         key={tpt}
-                                        onClick={() => actions.changeTouchPlateType(tpt)}
+                                        onClick={() =>
+                                            actions.changeTouchPlateType(tpt)
+                                        }
                                         className="flex items-center hover:bg-blue-100 transition-colors duration-200 cursor-pointer dark:hover:bg-dark-lighter"
                                     >
                                         {tpt}
-                                    </DropdownMenuItem>)
-                                }
+                                    </DropdownMenuItem>
+                                ))}
                             </DropdownMenuContent>
                         </DropdownMenu>
-                    }
+                    )}
                     <div className="flex w-full bg-white dark:bg-dark rounded-md border-solid border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-200 p-[2px]">
                         {availableProbeCommands.map((command, index) => (
                             <Tooltip
@@ -168,7 +173,9 @@ const Probe = ({ state, actions }: ProbeProps) => {
                                     }
                                     size="icon"
                                     aria-label={`Select probing routine ${command.id}`}
-                                    aria-pressed={index === selectedProbeCommand}
+                                    aria-pressed={
+                                        index === selectedProbeCommand
+                                    }
                                     className={cx(
                                         'rounded-md relative h-[calc(4vh+3px)]',
                                         {

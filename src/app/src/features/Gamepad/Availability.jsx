@@ -1,5 +1,5 @@
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 
 import { AVAILABILITY_TYPES } from '../utils';
 import Listener from './Listener';

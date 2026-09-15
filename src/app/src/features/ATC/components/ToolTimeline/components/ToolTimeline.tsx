@@ -1,19 +1,19 @@
-import { ChevronDown, ChevronUp } from 'lucide-react';
-import cn from 'classnames';
 import { Button } from 'app/components/Button';
-import { ToolTimelineItem } from './ToolTimelineItem';
-import { ToolMapping, ToolTimelineProps } from './types';
-import { useEffect, useRef, useState } from 'react';
+import { WORKFLOW_STATE_IDLE } from 'app/constants';
+import { ToolInstance } from 'app/features/ATC/components/ToolTable.tsx';
 import { ToolRemapDialog } from 'app/features/ATC/components/ToolTimeline/components/ToolRemapDialog.tsx';
+import { ToolProbeState } from 'app/features/ATC/types.ts';
+import { mapToolNicknamesAndStatus } from 'app/features/ATC/utils/ATCFunctions.ts';
+import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
-import { mapToolNicknamesAndStatus } from 'app/features/ATC/utils/ATCFunctions.ts';
-import { ToolInstance } from 'app/features/ATC/components/ToolTable.tsx';
-import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
-import pubsub from 'pubsub-js';
+import cn from 'classnames';
 import get from 'lodash/get';
-import { ToolProbeState } from 'app/features/ATC/types.ts';
-import { WORKFLOW_STATE_IDLE } from 'app/constants';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import pubsub from 'pubsub-js';
+import { useEffect, useRef, useState } from 'react';
+import { ToolTimelineItem } from './ToolTimelineItem';
+import { ToolMapping, ToolTimelineProps } from './types';
 
 export function ToolTimeline({
     tools,
@@ -129,10 +129,14 @@ export function ToolTimeline({
                             <>
                                 <div
                                     className="h-6 w-6 rounded-md border-2 border-white shadow-sm"
-                                    style={{ backgroundColor: activeTool.color }}
+                                    style={{
+                                        backgroundColor: activeTool.color,
+                                    }}
                                 />
                                 <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                                    T{mappings.get(activeTool.toolNumber) ?? activeTool.toolNumber}
+                                    T
+                                    {mappings.get(activeTool.toolNumber) ??
+                                        activeTool.toolNumber}
                                 </span>
                             </>
                         )}
@@ -184,10 +188,10 @@ export function ToolTimeline({
                                 const probeState: ToolProbeState =
                                     toolInfo?.status ?? 'unprobed';
                                 const isManual = allowManualBadge
-                                    ? toolInfo?.isManual ??
+                                    ? (toolInfo?.isManual ??
                                       (rackSize > 0
                                           ? toolLookupNumber > rackSize
-                                          : false)
+                                          : false))
                                     : false;
                                 const itemKey = `${tool.index}-${tool.toolNumber}-${tool.startLine ?? index}`;
                                 return (
@@ -207,7 +211,9 @@ export function ToolTimeline({
                                                     : 0
                                             }
                                             handleRemap={() =>
-                                                handleRemapClick(tool.toolNumber)
+                                                handleRemapClick(
+                                                    tool.toolNumber,
+                                                )
                                             }
                                             isRemapped={isRemapped}
                                             remapValue={remapValue}

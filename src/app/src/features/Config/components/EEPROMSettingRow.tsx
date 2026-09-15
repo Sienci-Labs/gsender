@@ -1,20 +1,20 @@
-import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
-import { getDatatypeInput } from 'app/features/Config/utils/EEPROM.ts';
-import get from 'lodash/get';
-import { BiReset } from 'react-icons/bi';
-import cn from 'classnames';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
-import { FaMicrochip } from 'react-icons/fa6';
-import { ToolLink } from 'app/features/Config/components/wizards/SquaringToolWizard.tsx';
 import Tooltip from 'app/components/Tooltip';
+import { GRBLHAL } from 'app/constants';
 import { EEPROM } from 'app/definitions/firmware';
-import { RootState } from 'app/store/redux';
-import { useSelector } from 'react-redux';
+import { ToolLink } from 'app/features/Config/components/wizards/SquaringToolWizard.tsx';
+import { getDatatypeInput } from 'app/features/Config/utils/EEPROM.ts';
 import {
     resolveGrblCoreDefaults,
     translateGrblCoreKey,
 } from 'app/features/Config/utils/grblCoreMigration.ts';
-import { GRBLHAL } from 'app/constants';
+import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
+import { RootState } from 'app/store/redux';
+import cn from 'classnames';
+import get from 'lodash/get';
+import { BiReset } from 'react-icons/bi';
+import { FaMicrochip } from 'react-icons/fa6';
+import { useSelector } from 'react-redux';
 
 interface EEPROMSettingRowProps {
     eID: string;

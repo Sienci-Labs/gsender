@@ -21,15 +21,15 @@
  *
  */
 
-import React, { Component } from 'react';
+import { VisualizerPlaceholder } from 'app/features/Visualizer/Placeholder.jsx';
 import pubsub from 'pubsub-js';
+import React, { Component } from 'react';
 import {
     shouldVisualize,
     shouldVisualizeSVG,
 } from '../../workers/Visualize.response';
 import SVGVisualizer from './SVGVisualizer';
 import Visualizer from './Visualizer';
-import { VisualizerPlaceholder } from 'app/features/Visualizer/Placeholder.jsx';
 
 class VisualizerWrapper extends Component {
     constructor(props) {
@@ -97,31 +97,38 @@ class VisualizerWrapper extends Component {
 
     subscribe() {
         const tokens = [
-            pubsub.subscribe('litemode:change', (msg, { isFileLoaded, enteringLiteMode, wasInEverythingMode }) => {
-                const enteringSVGMode = enteringLiteMode && shouldVisualizeSVG();
+            pubsub.subscribe(
+                'litemode:change',
+                (
+                    msg,
+                    { isFileLoaded, enteringLiteMode, wasInEverythingMode },
+                ) => {
+                    const enteringSVGMode =
+                        enteringLiteMode && shouldVisualizeSVG();
 
-                if (enteringLiteMode) {
-                    if (this.threeVisualizer) {
-                        this.threeVisualizer.disposeGeometries();
+                    if (enteringLiteMode) {
+                        if (this.threeVisualizer) {
+                            this.threeVisualizer.disposeGeometries();
+                        }
+                        if (isFileLoaded && enteringSVGMode) {
+                            // Ensure SVG visualizer reloads current file on 3D -> SVG switch.
+                            this.setNeedRefresh(true);
+                        }
                     }
-                    if (isFileLoaded && enteringSVGMode) {
-                        // Ensure SVG visualizer reloads current file on 3D -> SVG switch.
+                    if (!enteringLiteMode) {
+                        // Always rebuild scene structure when exiting lite mode —
+                        // disposeGeometries() orphaned this.group, stopped the animation loop,
+                        // and cleared lights/grids. rebuildSceneContents() restores all of this.
                         this.setNeedRefresh(true);
+                        if (isFileLoaded && wasInEverythingMode) {
+                            // Geometry was never parsed in EVERYTHING mode.
+                            // reparseGCode() runs after rebuildSceneContents() completes (next cycle).
+                            this.setNeedReload(true);
+                        }
                     }
-                }
-                if (!enteringLiteMode) {
-                    // Always rebuild scene structure when exiting lite mode —
-                    // disposeGeometries() orphaned this.group, stopped the animation loop,
-                    // and cleared lights/grids. rebuildSceneContents() restores all of this.
-                    this.setNeedRefresh(true);
-                    if (isFileLoaded && wasInEverythingMode) {
-                        // Geometry was never parsed in EVERYTHING mode.
-                        // reparseGCode() runs after rebuildSceneContents() completes (next cycle).
-                        this.setNeedReload(true);
-                    }
-                }
-                this.forceUpdate();
-            }),
+                    this.forceUpdate();
+                },
+            ),
             // currently, changing the settings requires reparsing of the gcode
             pubsub.subscribe('visualizer:settings', () => {
                 this.setNeedReload(true);
@@ -156,7 +163,10 @@ class VisualizerWrapper extends Component {
             <>
                 {/* Keep Visualizer always mounted to avoid WebGL renderer recreation on each toggle.
                     Hide with CSS when not active so the renderer instance is preserved. */}
-                <div style={{ display: show3D ? '' : 'none' }} className="w-full h-full">
+                <div
+                    style={{ display: show3D ? '' : 'none' }}
+                    className="w-full h-full"
+                >
                     <Visualizer
                         show={show && show3D}
                         cameraPosition={cameraPosition}

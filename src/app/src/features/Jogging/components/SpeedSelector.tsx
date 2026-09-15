@@ -1,18 +1,16 @@
-import { useEffect, useState, useRef } from 'react';
-import cn from 'classnames';
-import pubsub from 'pubsub-js';
-import get from 'lodash/get';
-
-import { JoggingSpeedOptions } from 'app/features/Jogging/utils/Jogging';
-import store from 'app/store';
-import { JogValueObject } from 'app/features/Jogging';
 import { IMPERIAL_UNITS, JOGGING_CATEGORY, METRIC_UNITS } from 'app/constants';
-import useKeybinding from 'app/lib/useKeybinding';
+import { JogValueObject } from 'app/features/Jogging';
+import { JoggingSpeedOptions } from 'app/features/Jogging/utils/Jogging';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-
-import { convertValue } from '../utils/units';
+import useKeybinding from 'app/lib/useKeybinding';
+import store from 'app/store';
+import cn from 'classnames';
+import get from 'lodash/get';
 import { usePostHog } from 'posthog-js/react';
+import pubsub from 'pubsub-js';
+import { useEffect, useRef, useState } from 'react';
+import { convertValue } from '../utils/units';
 
 export interface SpeedSelectButtonProps {
     active?: boolean;

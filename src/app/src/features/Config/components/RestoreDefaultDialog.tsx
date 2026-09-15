@@ -9,18 +9,23 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from 'app/components/shadcn/AlertDialog.tsx';
-import { ActionButton } from 'app/features/Config/components/ActionButton.tsx';
-import { GrRevert } from 'react-icons/gr';
-import store from 'app/store';
-import { useSelector } from 'react-redux';
-import { RootState } from 'app/store/redux';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from 'app/components/shadcn/Tooltip.tsx';
 import machineProfiles from 'app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts';
-import { toast } from 'app/lib/toaster';
-import controller from 'app/lib/controller.ts';
+import { ActionButton } from 'app/features/Config/components/ActionButton.tsx';
 import { resolveGrblCoreDefaults } from 'app/features/Config/utils/grblCoreMigration.ts';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
+import controller from 'app/lib/controller.ts';
+import { toast } from 'app/lib/toaster';
 import { cn } from 'app/lib/utils.ts';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'app/components/shadcn/Tooltip.tsx';
+import store from 'app/store';
+import { RootState } from 'app/store/redux';
+import { GrRevert } from 'react-icons/gr';
+import { useSelector } from 'react-redux';
 
 function getMachineProfile(id: number) {
     const profile = machineProfiles.find((profile) => profile.id === id);
@@ -80,13 +85,16 @@ function restoreEEPROMDefaults(
 
     controller.command('gcode', values);
 
-
     toast.success('Restored default settings for your machine.', {
         position: 'bottom-right',
     });
 }
 
-export function RestoreDefaultDialog({ canRestoreDefaults = false }: { canRestoreDefaults?: boolean }) {
+export function RestoreDefaultDialog({
+    canRestoreDefaults = false,
+}: {
+    canRestoreDefaults?: boolean;
+}) {
     const isConnected = useSelector(
         (state: RootState) => state.connection.isConnected,
     );
@@ -100,7 +108,8 @@ export function RestoreDefaultDialog({ canRestoreDefaults = false }: { canRestor
         (state: RootState) => state.controller.settings.info?.BOARD,
     );
 
-    const { profileChangedSinceDefaults, setProfileChangedSinceDefaults } = useSettings();
+    const { profileChangedSinceDefaults, setProfileChangedSinceDefaults } =
+        useSettings();
 
     const machineProfile = store.get('workspace.machineProfile', {});
     const machineName = `${machineProfile.name} ${machineProfile.type}`;
@@ -108,10 +117,12 @@ export function RestoreDefaultDialog({ canRestoreDefaults = false }: { canRestor
         <TooltipProvider>
             <Tooltip open={profileChangedSinceDefaults || undefined}>
                 <TooltipTrigger asChild>
-                    <div className={cn('ring rounded relative', {
-                        'ring-blue-400': profileChangedSinceDefaults,
-                        'ring-transparent': !profileChangedSinceDefaults,
-                    })}>
+                    <div
+                        className={cn('ring rounded relative', {
+                            'ring-blue-400': profileChangedSinceDefaults,
+                            'ring-transparent': !profileChangedSinceDefaults,
+                        })}
+                    >
                         {profileChangedSinceDefaults && (
                             <span className="w-4 h-4 animate-ping absolute -top-2 -left-2 bg-blue-400 rounded-xl z-10" />
                         )}
@@ -120,23 +131,34 @@ export function RestoreDefaultDialog({ canRestoreDefaults = false }: { canRestor
                                 <ActionButton
                                     icon={<GrRevert />}
                                     label="Defaults"
-                                    disabled={!isConnected || !canRestoreDefaults}
+                                    disabled={
+                                        !isConnected || !canRestoreDefaults
+                                    }
                                 />
                             </AlertDialogTrigger>
                             <AlertDialogContent className="bg-white">
                                 <AlertDialogHeader>
-                                    <AlertDialogTitle>Restore Defaults</AlertDialogTitle>
+                                    <AlertDialogTitle>
+                                        Restore Defaults
+                                    </AlertDialogTitle>
                                     <AlertDialogDescription>
                                         Are you sure you want to restore your{' '}
-                                        <b>{machineName}</b> back to its default state?
+                                        <b>{machineName}</b> back to its default
+                                        state?
                                     </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter className={'flex flex-col'}>
                                     <AlertDialogCancel>No</AlertDialogCancel>
                                     <AlertDialogAction
                                         onClick={() => {
-                                            restoreEEPROMDefaults(controllerType, firmwareSemver, boardId);
-                                            setProfileChangedSinceDefaults(false);
+                                            restoreEEPROMDefaults(
+                                                controllerType,
+                                                firmwareSemver,
+                                                boardId,
+                                            );
+                                            setProfileChangedSinceDefaults(
+                                                false,
+                                            );
                                         }}
                                     >
                                         Restore Defaults
@@ -147,7 +169,8 @@ export function RestoreDefaultDialog({ canRestoreDefaults = false }: { canRestor
                     </div>
                 </TooltipTrigger>
                 <TooltipContent side="top">
-                    Make sure you click to apply your defaults to your controller
+                    Make sure you click to apply your defaults to your
+                    controller
                 </TooltipContent>
             </Tooltip>
         </TooltipProvider>

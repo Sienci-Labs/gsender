@@ -1,13 +1,12 @@
+import { EmptyAlarmList } from 'app/features/Stats/components/EmptyAlarmList.tsx';
 import {
     FirmwareEvent,
     StatContext,
 } from 'app/features/Stats/utils/StatContext.tsx';
+import cx from 'classnames';
 import { useContext } from 'react';
-
 import { IoIosWarning } from 'react-icons/io';
 import { MdCancel } from 'react-icons/md';
-import cx from 'classnames';
-import { EmptyAlarmList } from 'app/features/Stats/components/EmptyAlarmList.tsx';
 
 // const colorCodes = {
 //     ALARM: '#d75f5f',

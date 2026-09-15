@@ -1,25 +1,23 @@
-import { useEffect } from 'react';
-import isElectron from 'is-electron';
-
+import { usePostHog } from '@posthog/react';
 import { Widget } from 'app/components/Widget';
-import { store as reduxStore } from 'app/store/redux';
-import controller from 'app/lib/controller';
 import { VISUALIZER_PRIMARY } from 'app/constants';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import controller from 'app/lib/controller';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
-
-import ButtonControlGroup from './ButtonControlGroup';
-import FileInformation from './FileInformation';
+import { toast } from 'app/lib/toaster';
+import { store as reduxStore } from 'app/store/redux';
 import { updateFileInfo } from 'app/store/redux/slices/fileInfo.slice';
+import isElectron from 'is-electron';
+import { useEffect } from 'react';
+import ButtonControlGroup from './ButtonControlGroup';
+import { RecentFile } from './definitions';
+import FileInformation from './FileInformation';
 import {
     addRecentFile,
     createRecentFileFromRawPath,
     deleteRecentFile,
     loadRecentFile,
 } from './utils/recentfiles';
-import { toast } from 'app/lib/toaster';
-import { RecentFile } from './definitions';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import { usePostHog } from '@posthog/react';
 
 export type FileData = {
     data: string;

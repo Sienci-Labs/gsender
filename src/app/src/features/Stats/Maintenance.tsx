@@ -1,7 +1,7 @@
-import { StatCard } from 'app/features/Stats/components/StatCard.tsx';
 import { CardHeader } from 'app/features/Stats/components/CardHeader.tsx';
-import { MaintenancePreview } from 'app/features/Stats/components/MaintenancePreview.tsx';
 import { MaintenanceList } from 'app/features/Stats/components/MaintenanceList.tsx';
+import { MaintenancePreview } from 'app/features/Stats/components/MaintenancePreview.tsx';
+import { StatCard } from 'app/features/Stats/components/StatCard.tsx';
 
 export function Maintenance() {
     return (

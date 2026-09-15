@@ -1,13 +1,13 @@
-import { TiPin, TiPinOutline } from 'react-icons/ti';
-import { IoClose } from 'react-icons/io5';
+import { Switch } from 'app/components/shadcn/Switch';
+import { KeepoutToggle } from 'app/features/ATC/components/KeepOut/KeepOutToggle.tsx';
 import ModalRow from 'app/features/MachineInfo/ModalRow.tsx';
 import PinRow from 'app/features/MachineInfo/PinRow.tsx';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
-import store from 'app/store';
-import { Switch } from 'app/components/shadcn/Switch';
 import controller from 'app/lib/controller.ts';
+import store from 'app/store';
 import get from 'lodash/get';
-import { KeepoutToggle } from 'app/features/ATC/components/KeepOut/KeepOutToggle.tsx';
+import { IoClose } from 'react-icons/io5';
+import { TiPin, TiPinOutline } from 'react-icons/ti';
 
 interface MachineInfoDisplayProps {
     pinned: boolean;
@@ -45,7 +45,10 @@ export function MachineInfoDisplay({
             return sanitizedVersion || disconnectedValue;
         }
 
-        if (reportedFirmwareVersion && typeof reportedFirmwareVersion === 'object') {
+        if (
+            reportedFirmwareVersion &&
+            typeof reportedFirmwareVersion === 'object'
+        ) {
             const semver = get(reportedFirmwareVersion, 'semver');
 
             if (typeof semver === 'string' || typeof semver === 'number') {
@@ -90,9 +93,11 @@ export function MachineInfoDisplay({
             <div className="flex flex-row w-full justify-between items-center mb-2">
                 <div>
                     <span className="font-bold text-2xl">
-                    Machine Information
-                </span>
-                    <div className="my-3"><b>Firmware version:</b> {firmwareVersion}</div>
+                        Machine Information
+                    </span>
+                    <div className="my-3">
+                        <b>Firmware version:</b> {firmwareVersion}
+                    </div>
                 </div>
 
                 <div className="flex flex-row items-center gap-2">
@@ -194,7 +199,10 @@ export function MachineInfoDisplay({
                 </div>
             )}
             <div className="flex flex-row gap-4 items-center mt-4">
-                <span className="text-gray-500 dark:text-white" id="lock-stepper-label">
+                <span
+                    className="text-gray-500 dark:text-white"
+                    id="lock-stepper-label"
+                >
                     Lock stepper motors
                 </span>
                 <Switch

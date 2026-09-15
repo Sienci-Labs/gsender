@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
 import { Switch } from 'app/components/shadcn/Switch';
+import { useEffect, useState } from 'react';
 import styles from './index.module.styl';
 
 const BooleanInput = ({ info, setting, onChange, disabled, ...props }) => {

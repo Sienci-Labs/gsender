@@ -21,8 +21,8 @@
  *
  */
 
-import * as THREE from 'three';
 import STLLoader from 'app/lib/three/STLLoader';
+import * as THREE from 'three';
 
 const getBoundingBox = (object) => {
     const box = new THREE.Box3().setFromObject(object);

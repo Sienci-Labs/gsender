@@ -1,3 +1,4 @@
+import { Button } from 'app/components/Button';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -9,10 +10,8 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from 'app/components/shadcn/AlertDialog.tsx';
-import { Button } from 'app/components/Button';
-import { FaRedo } from 'react-icons/fa';
-
 import { Tooltip } from 'app/components/Tooltip';
+import { FaRedo } from 'react-icons/fa';
 
 type ReloadFileAlertProps = {
     fileLoaded: boolean;

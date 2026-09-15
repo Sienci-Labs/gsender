@@ -1,13 +1,11 @@
 // https://ui.shadcn.com/docs/components/slider
 
-import * as React from 'react';
 import * as SliderPrimitive from '@radix-ui/react-slider';
-
 import cx from 'classnames';
+import * as React from 'react';
 
-interface Props extends React.ComponentPropsWithoutRef<
-    typeof SliderPrimitive.Root
-> {
+interface Props
+    extends React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root> {
     trackClassName?: string;
     rangeClassName?: string;
     thumbClassName?: string;

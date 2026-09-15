@@ -1,7 +1,4 @@
-import { useState, forwardRef } from 'react';
-import cn from 'classnames';
-import { FaEllipsisH, FaEdit, FaTrashAlt } from 'react-icons/fa';
-
+import Button from 'app/components/Button';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -10,8 +7,10 @@ import {
 } from 'app/components/shadcn/Dropdown';
 import Tooltip from 'app/components/Tooltip';
 import { toast } from 'app/lib/toaster';
-import Button from 'app/components/Button';
+import cn from 'classnames';
 import cx from 'classnames';
+import { forwardRef, useState } from 'react';
+import { FaEdit, FaEllipsisH, FaTrashAlt } from 'react-icons/fa';
 
 type Macro = {
     id: string;
@@ -103,7 +102,7 @@ const MacroItem = ({
             />
 
             <DropdownMenu>
-                <DropdownMenuTrigger 
+                <DropdownMenuTrigger
                     className="flex items-center justify-center w-10 h-8 cursor-pointer hover:bg-gray-200 rounded dark:hover:bg-dark-lighter"
                     aria-label={`Options for macro ${macro.name}`}
                 >

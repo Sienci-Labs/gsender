@@ -1,10 +1,10 @@
 import {
-    MaintenanceTask as Task,
     StatContext,
+    MaintenanceTask as Task,
 } from 'app/features/Stats/utils/StatContext.tsx';
+import cx from 'classnames';
 import { useContext } from 'react';
 import { FaCircle } from 'react-icons/fa';
-import cx from 'classnames';
 import { tv } from 'tailwind-variants';
 
 function timeRemainingSortComparison(a: Task, b: Task) {

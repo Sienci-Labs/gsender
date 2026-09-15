@@ -20,10 +20,7 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-import {
-    getProbeSettings,
-    getToolString,
-} from 'app/lib/toolChangeUtils';
+import { getProbeSettings, getToolString } from 'app/lib/toolChangeUtils';
 
 const wizard = {
     intro: {

@@ -21,12 +21,8 @@
  *
  */
 
-import React from 'react';
-import PropTypes from 'prop-types';
-import { LuTrash, LuPencil, LuPlus } from 'react-icons/lu';
-
+import Button from 'app/components/Button';
 import { Switch } from 'app/components/shadcn/Switch';
-import shuttleEvents from 'app/lib/shuttleEvents';
 import {
     Table,
     TableBody,
@@ -35,23 +31,26 @@ import {
     TableHeader,
     TableRow,
 } from 'app/components/shadcn/Table';
+import { Tooltip } from 'app/components/Tooltip';
 import {
     CARVING_CATEGORY,
-    OVERRIDES_CATEGORY,
-    VISUALIZER_CATEGORY,
-    LOCATION_CATEGORY,
+    COOLANT_CATEGORY,
+    GENERAL_CATEGORY,
+    GRBLHAL,
     JOGGING_CATEGORY,
+    LOCATION_CATEGORY,
+    MACRO_CATEGORY,
+    OVERRIDES_CATEGORY,
     PROBING_CATEGORY,
     SPINDLE_LASER_CATEGORY,
-    GENERAL_CATEGORY,
     TOOLBAR_CATEGORY,
-    MACRO_CATEGORY,
-    COOLANT_CATEGORY,
-    GRBLHAL,
+    VISUALIZER_CATEGORY,
 } from 'app/constants';
-import Button from 'app/components/Button';
-import { Tooltip } from 'app/components/Tooltip';
+import shuttleEvents from 'app/lib/shuttleEvents';
 import { cn } from 'app/lib/utils';
+import PropTypes from 'prop-types';
+import React from 'react';
+import { LuPencil, LuPlus, LuTrash } from 'react-icons/lu';
 
 import { formatShortcut } from './helpers';
 

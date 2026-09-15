@@ -1,18 +1,15 @@
-import { useEffect, useState } from 'react';
-
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from 'app/components/shadcn/Popover';
-import useKeybinding from 'app/lib/useKeybinding.ts';
-import useShuttleEvents from 'app/hooks/useShuttleEvents.ts';
-import { TOOLBAR_CATEGORY } from 'app/constants';
 import Tooltip from 'app/components/Tooltip';
-
-import { MachineInfoDisplay } from './MachineInfoDisplay.tsx';
-
+import { TOOLBAR_CATEGORY } from 'app/constants';
+import useShuttleEvents from 'app/hooks/useShuttleEvents.ts';
+import useKeybinding from 'app/lib/useKeybinding.ts';
+import { useEffect, useState } from 'react';
 import minfo from './assets/minfo.svg';
+import { MachineInfoDisplay } from './MachineInfoDisplay.tsx';
 
 const MachineInfo = () => {
     const [open, setOpen] = useState(false);

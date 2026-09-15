@@ -1,15 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
-
 import { toast } from 'app/lib/toaster';
+import { useEffect, useRef, useState } from 'react';
 
 import Terminal from './Terminal';
 import TerminalInput from './TerminalInput';
 
 import './styles.css';
-import { ConsolePopout } from 'app/features/Console/components/ConsolePopout.tsx';
-import isElectron from 'is-electron';
-import controller from 'app/lib/controller';
 import { FIRMWARE_TYPES_T } from 'app/definitions/firmware';
+import { ConsolePopout } from 'app/features/Console/components/ConsolePopout.tsx';
+import controller from 'app/lib/controller';
+import isElectron from 'is-electron';
 import { usePostHog } from 'posthog-js/react';
 
 type ConsoleProps = {

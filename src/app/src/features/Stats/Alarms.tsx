@@ -1,13 +1,13 @@
-import { Diagnostic } from 'app/features/Stats/components/Diagnostic.tsx';
-import { StatCard } from 'app/features/Stats/components/StatCard';
+import api from 'app/api';
+import { Button } from 'app/components/Button';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 import { AlarmListing } from 'app/features/Stats/components/AlarmListing.tsx';
 import { CardHeader } from 'app/features/Stats/components/CardHeader.tsx';
-import { FaTrash } from 'react-icons/fa';
-import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
-import api from 'app/api';
-import { useContext } from 'react';
+import { Diagnostic } from 'app/features/Stats/components/Diagnostic.tsx';
+import { StatCard } from 'app/features/Stats/components/StatCard';
 import { StatContext } from 'app/features/Stats/utils/StatContext.tsx';
-import { Button } from 'app/components/Button';
+import { useContext } from 'react';
+import { FaTrash } from 'react-icons/fa';
 
 export function Alarms() {
     const { setAlarms } = useContext(StatContext);
@@ -54,11 +54,13 @@ export function Alarms() {
                                 <CardHeader>Clear Alarms & Errors</CardHeader>
                             </div>
                             <p className="text-gray-600 text-sm dark:text-white max-xl:hidden">
-                            Clear all prior alarms and errors. This action
-                            cannot be undone.
+                                Clear all prior alarms and errors. This action
+                                cannot be undone.
                             </p>
                             <Button
-                                icon={<FaTrash className="text-gray-600 w-4 h-4 dark:text-gray-200" />}
+                                icon={
+                                    <FaTrash className="text-gray-600 w-4 h-4 dark:text-gray-200" />
+                                }
                                 onClick={deleteAlarms}
                                 text="Clear Alarms & Errors"
                                 size="lg"

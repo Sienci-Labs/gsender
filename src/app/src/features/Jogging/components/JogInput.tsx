@@ -1,8 +1,8 @@
-import { Label } from 'app/components/Label';
-import { ControlledInput } from 'app/components/ControlledInput';
-import { FaMinus, FaPlus } from 'react-icons/fa';
 import Button from 'app/components/Button';
+import { ControlledInput } from 'app/components/ControlledInput';
+import { Label } from 'app/components/Label';
 import { toFixedIfNecessary } from 'app/lib/rounding';
+import { FaMinus, FaPlus } from 'react-icons/fa';
 
 interface JogInputProps {
     label: string;

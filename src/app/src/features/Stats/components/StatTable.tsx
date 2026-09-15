@@ -1,6 +1,6 @@
-import { useContext } from 'react';
-import { StatContext } from 'app/features/Stats/utils/StatContext.tsx';
 import { ConfigRow } from 'app/features/Stats/components/Configuration.tsx';
+import { StatContext } from 'app/features/Stats/utils/StatContext.tsx';
+import { useContext } from 'react';
 
 export function StatRow({
     connected,

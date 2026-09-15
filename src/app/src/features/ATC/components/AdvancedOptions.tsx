@@ -1,18 +1,14 @@
-import { Download, Upload } from 'lucide-react';
-import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
-import { ToolDisplayModal } from 'app/features/ATC/components/ToolDisplayModal.tsx';
 import { LongPressButton } from 'app/components/LongPressButton';
+import { ToolDisplayModal } from 'app/features/ATC/components/ToolDisplayModal.tsx';
 import {
     releaseToolFromSpindle,
     unloadTool,
 } from 'app/features/ATC/utils/ATCFunctions.ts';
+import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
+import { Download, Upload } from 'lucide-react';
 
 export function AdvancedOptions() {
-    const {
-        disabled,
-        setLoadToolMode,
-        setLoadToolOpen,
-    } = useToolChange();
+    const { disabled, setLoadToolMode, setLoadToolOpen } = useToolChange();
 
     const handleManualLoad = () => {
         setLoadToolMode('manual');

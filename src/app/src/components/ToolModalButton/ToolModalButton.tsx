@@ -21,10 +21,10 @@
  *
  */
 
-import React from 'react';
 import cx from 'classnames';
-import { FaInfoCircle } from 'react-icons/fa';
+import React from 'react';
 import { IconType } from 'react-icons';
+import { FaInfoCircle } from 'react-icons/fa';
 
 interface Props {
     className: string;

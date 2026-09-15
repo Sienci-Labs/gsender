@@ -1,10 +1,10 @@
 import Button from 'app/components/Button';
 import { ControlledInput } from 'app/components/ControlledInput';
-import { useSquaring } from '../context/SquaringContext';
-import TriangleDiagram from '../components/TriangleDiagram';
-import { useState, useEffect } from 'react';
-import { FaClipboard, FaClipboardCheck, FaClipboardList } from 'react-icons/fa';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { useEffect, useState } from 'react';
+import { FaClipboard, FaClipboardCheck, FaClipboardList } from 'react-icons/fa';
+import TriangleDiagram from '../components/TriangleDiagram';
+import { useSquaring } from '../context/SquaringContext';
 
 const MeasurementStep = () => {
     const {

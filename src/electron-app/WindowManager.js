@@ -22,7 +22,14 @@
  */
 
 /* eslint import/no-unresolved: 0 */
-import { app, BrowserWindow, dialog, ipcMain, shell, nativeImage } from 'electron';
+import {
+    app,
+    BrowserWindow,
+    dialog,
+    ipcMain,
+    nativeImage,
+    shell,
+} from 'electron';
 import path from 'path';
 
 const remoteMain = require('@electron/remote/main');
@@ -115,7 +122,9 @@ class WindowManager {
 
         window.on('close', (e) => {
             if (this.shouldPromptExit) {
-                const image = nativeImage.createFromPath('../app/images/favicon.png');
+                const image = nativeImage.createFromPath(
+                    '../app/images/favicon.png',
+                );
                 const options = {
                     type: 'question',
                     buttons: ['No', 'Yes'],
@@ -170,10 +179,9 @@ class WindowManager {
         // Call `ses.setProxy` to ignore proxy settings
         // http://electron.atom.io/docs/latest/api/session/#sessetproxyconfig-callback
         const ses = webContents.session;
-        ses.setProxy({ proxyRules: 'direct://' })
-            .then(() => {
-                window.loadURL(url);
-            });
+        ses.setProxy({ proxyRules: 'direct://' }).then(() => {
+            window.loadURL(url);
+        });
 
         await ses.clearCache();
 

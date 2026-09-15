@@ -1,12 +1,12 @@
-import { useRef } from 'react';
-import { PiDownloadSimple, PiUploadSimple } from 'react-icons/pi';
-import { GrPowerReset } from 'react-icons/gr';
+import { ActionButton } from 'app/features/Config/components/ActionButton.tsx';
 import {
     exportSettings,
     handleRestoreDefaultClick,
     importSettings,
 } from 'app/features/Config/utils/Settings.ts';
-import { ActionButton } from 'app/features/Config/components/ActionButton.tsx';
+import { useRef } from 'react';
+import { GrPowerReset } from 'react-icons/gr';
+import { PiDownloadSimple, PiUploadSimple } from 'react-icons/pi';
 
 export function ApplicationPreferences() {
     const inputRef = useRef<HTMLInputElement>(null);

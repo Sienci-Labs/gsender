@@ -21,26 +21,26 @@
  *
  */
 
-import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
-import get from 'lodash/get';
-import includes from 'lodash/includes';
 import {
     DndContext,
     DragEndEvent,
+    DragOverEvent,
     DragOverlay,
     DragStartEvent,
     MouseSensor,
     TouchSensor,
     useSensor,
     useSensors,
-    DragOverEvent,
 } from '@dnd-kit/core';
 import {
-    SortableContext,
     arrayMove,
+    SortableContext,
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
+import get from 'lodash/get';
+import includes from 'lodash/includes';
+import React, { useEffect, useState } from 'react';
+import { connect } from 'react-redux';
 
 import { WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED } from '../../constants';
 import DroppableColumn, { Actions } from './DroppableColumn';
@@ -240,57 +240,55 @@ const Macro = ({ state, actions, workflow }: MacroProps) => {
     if (macros.length === 0) {
         return (
             <div className="flex flex-col gap-1 p-1 h-full justify-center items-center">
-                <p className="text-center dark:text-white">
-                    No Macros...
-                </p>
+                <p className="text-center dark:text-white">No Macros...</p>
             </div>
         );
     }
 
     return (
         <>
-                <DndContext
-                    sensors={sensors}
-                    onDragStart={handleDragStart}
-                    onDragOver={handleDragOver}
-                    onDragEnd={handleDragEnd}
-                >
-                    <Container>
-                        <SortableContext
-                            items={column1.items.map((item) => item.id)}
-                            strategy={verticalListSortingStrategy}
-                        >
-                            <DroppableColumn
-                                droppableId="column1"
-                                macros={column1.items}
-                                actions={actions as unknown as Actions}
-                                disabled={disabled}
-                            />
-                        </SortableContext>
-                        <SortableContext
-                            items={column2.items.map((item) => item.id)}
-                            strategy={verticalListSortingStrategy}
-                        >
-                            <DroppableColumn
-                                droppableId="column2"
-                                macros={column2.items}
-                                actions={actions as unknown as Actions}
-                                disabled={disabled}
-                            />
-                        </SortableContext>
-                    </Container>
-                    <DragOverlay>
-                        {activeId ? (
-                            <div className="bg-white border border-gray-200 rounded-md shadow-lg p-2 dark:bg-dark dark:border-dark-lighter dark:text-white">
-                                {
-                                    [...column1.items, ...column2.items].find(
-                                        (item) => item.id === activeId,
-                                    )?.name
-                                }
-                            </div>
-                        ) : null}
-                    </DragOverlay>
-                </DndContext>
+            <DndContext
+                sensors={sensors}
+                onDragStart={handleDragStart}
+                onDragOver={handleDragOver}
+                onDragEnd={handleDragEnd}
+            >
+                <Container>
+                    <SortableContext
+                        items={column1.items.map((item) => item.id)}
+                        strategy={verticalListSortingStrategy}
+                    >
+                        <DroppableColumn
+                            droppableId="column1"
+                            macros={column1.items}
+                            actions={actions as unknown as Actions}
+                            disabled={disabled}
+                        />
+                    </SortableContext>
+                    <SortableContext
+                        items={column2.items.map((item) => item.id)}
+                        strategy={verticalListSortingStrategy}
+                    >
+                        <DroppableColumn
+                            droppableId="column2"
+                            macros={column2.items}
+                            actions={actions as unknown as Actions}
+                            disabled={disabled}
+                        />
+                    </SortableContext>
+                </Container>
+                <DragOverlay>
+                    {activeId ? (
+                        <div className="bg-white border border-gray-200 rounded-md shadow-lg p-2 dark:bg-dark dark:border-dark-lighter dark:text-white">
+                            {
+                                [...column1.items, ...column2.items].find(
+                                    (item) => item.id === activeId,
+                                )?.name
+                            }
+                        </div>
+                    ) : null}
+                </DragOverlay>
+            </DndContext>
         </>
     );
 };

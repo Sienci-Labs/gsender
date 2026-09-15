@@ -21,7 +21,7 @@
  *
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Button } from 'app/components/Button';
 
 import {
     Dialog,
@@ -29,18 +29,17 @@ import {
     DialogHeader,
     DialogTitle,
 } from 'app/components/shadcn/Dialog';
-import { Button } from 'app/components/Button';
-import cx from 'classnames';
+import { PROBING_CATEGORY } from 'app/constants';
+import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { TOUCHPLATE_TYPE_3D } from 'app/lib/constants';
 import { toast } from 'app/lib/toaster';
-
+import useKeybinding from 'app/lib/useKeybinding';
+import cx from 'classnames';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Actions, State } from './definitions';
 import ProbeCircuitStatus from './ProbeCircuitStatus';
 import ProbeImage from './ProbeImage';
-import { Actions, State } from './definitions';
-import { PROBING_CATEGORY } from 'app/constants';
-import useKeybinding from 'app/lib/useKeybinding';
-import useShuttleEvents from 'app/hooks/useShuttleEvents';
-import { TOUCHPLATE_TYPE_3D } from 'app/lib/constants';
 
 interface RunProbeProps {
     state: State;

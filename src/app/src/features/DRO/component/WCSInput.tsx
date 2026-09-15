@@ -1,7 +1,7 @@
-import React, { useRef } from 'react';
+import { usePostHog } from '@posthog/react';
 
 import { Axis } from 'app/features/DRO/utils/DRO.ts';
-import { usePostHog } from '@posthog/react';
+import React, { useRef } from 'react';
 
 export interface WCSInputProps {
     value: string;

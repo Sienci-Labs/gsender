@@ -1,15 +1,13 @@
-import Markdown from 'react-markdown';
-import { ReactMarkdownProps } from 'react-markdown/lib/ast-to-react';
-import { FaExternalLinkAlt } from 'react-icons/fa';
-
-import { version } from 'app-root/package.json';
-
-import useGetReleaseNotes from './utils/useGetReleaseNotes';
 import { Button } from 'app/components/Button';
+import { UpdateGSender } from 'app/features/Stats/components/UpdateGSender.tsx';
 import { cn } from 'app/lib/utils';
 import { RootState } from 'app/store/redux';
+import { version } from 'app-root/package.json';
+import { FaExternalLinkAlt } from 'react-icons/fa';
+import Markdown from 'react-markdown';
+import { ReactMarkdownProps } from 'react-markdown/lib/ast-to-react';
 import { useSelector } from 'react-redux';
-import { UpdateGSender } from 'app/features/Stats/components/UpdateGSender.tsx';
+import useGetReleaseNotes from './utils/useGetReleaseNotes';
 
 const About = () => {
     const { releaseNotes, status, fetchReleaseNotes } = useGetReleaseNotes();
@@ -193,7 +191,9 @@ const About = () => {
             {!hasUpdate && (
                 <div className="h-full flex flex-col gap-2">
                     <div className="flex gap-2 items-center justify-between">
-                        <h2 className="text-2xl text-blue-500">Release Notes</h2>
+                        <h2 className="text-2xl text-blue-500">
+                            Release Notes
+                        </h2>
 
                         <a
                             className="text-sm text-blue-500 underline"

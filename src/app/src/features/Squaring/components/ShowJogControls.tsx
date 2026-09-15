@@ -1,10 +1,10 @@
-import { Jogging } from 'app/features/Jogging';
+import Button from 'app/components/Button';
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from 'app/components/shadcn/Popover';
-import Button from 'app/components/Button';
+import { Jogging } from 'app/features/Jogging';
 
 const ShowJogControls = () => {
     return (

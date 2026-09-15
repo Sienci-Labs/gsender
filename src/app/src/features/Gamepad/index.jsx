@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
-
-import Gamepad from './Gamepad';
 import { GamepadContextProvider } from './components/Context';
+import Gamepad from './Gamepad';
 import ModalRender from './ModalRender';
 
 const GamepadWrapper = () => {

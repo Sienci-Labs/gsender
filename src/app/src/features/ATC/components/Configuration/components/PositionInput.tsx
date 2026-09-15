@@ -1,15 +1,15 @@
-import React from 'react';
 import { Button } from 'app/components/Button';
 import { Input } from 'app/components/shadcn/Input';
 import { Label } from 'app/components/shadcn/Label';
 import { Position } from 'app/features/ATC/components/Configuration/hooks/useConfigStore';
-import { FiTarget } from 'react-icons/fi';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState.ts';
 import { mapPositionToUnits } from 'app/lib/units.ts';
+import cn from 'classnames';
 import map from 'lodash/map';
 import mapValues from 'lodash/mapValues';
-import cn from 'classnames';
 import { AlertCircle } from 'lucide-react';
+import React from 'react';
+import { FiTarget } from 'react-icons/fi';
 
 interface PositionInputProps {
     label: string;
@@ -41,7 +41,9 @@ export const PositionInput: React.FC<PositionInputProps> = ({
     hideLabel = false,
 }) => {
     const { units } = useWorkspaceState();
-    const hasSecondaryAction = Boolean(secondaryActionLabel && onSecondaryAction);
+    const hasSecondaryAction = Boolean(
+        secondaryActionLabel && onSecondaryAction,
+    );
     const validateZ = !disableZ && !hideZ;
     const hasZeroAxis =
         !disabled &&
@@ -186,10 +188,7 @@ export const PositionInput: React.FC<PositionInputProps> = ({
                 </div>
             </div>
             <div
-                className={cn(
-                    'h-9 w-9 shrink-0',
-                    !hasZeroAxis && 'invisible',
-                )}
+                className={cn('h-9 w-9 shrink-0', !hasZeroAxis && 'invisible')}
             >
                 <div className="h-9 w-9 rounded-full bg-orange-500 text-white flex items-center justify-center shadow-sm ring-2 ring-orange-200 dark:ring-orange-900/50">
                     <AlertCircle className="h-6 w-6" />

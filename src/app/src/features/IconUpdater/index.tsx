@@ -1,10 +1,10 @@
-import gSenderIcon from 'app/workspace/TopBar/assets/icon-round.png';
-import { useState, useEffect } from 'react';
-import { FaDownload } from 'react-icons/fa';
-import cn from 'classnames';
 import reduxStore from 'app/store/redux';
-import isElectron from 'is-electron';
 import { updateReleaseNotes } from 'app/store/redux/slices/gSenderInfo.slice.ts';
+import gSenderIcon from 'app/workspace/TopBar/assets/icon-round.png';
+import cn from 'classnames';
+import isElectron from 'is-electron';
+import { useEffect, useState } from 'react';
+import { FaDownload } from 'react-icons/fa';
 import { Link } from 'react-router';
 
 export function UpdateBadge({ hidden }) {
@@ -37,9 +37,8 @@ export function IconUpdater() {
             window.ipcRenderer.on('maximize-window', () => {
                 setTimeout(() => {
                     window.dispatchEvent(new Event('resize'));
-                }, 500)
+                }, 500);
             });
-
         }
     }, []);
 

@@ -1,9 +1,5 @@
-import get from 'lodash/get';
-import cx from 'classnames';
-
-import controller from 'app/lib/controller.ts';
-import { useSelector } from 'react-redux';
-import { RootState } from 'app/store/redux';
+import { usePostHog } from '@posthog/react';
+import Tooltip from 'app/components/Tooltip';
 import {
     BACK_LEFT,
     BACK_RIGHT,
@@ -11,9 +7,12 @@ import {
     FRONT_RIGHT,
     getMovementGCode,
 } from 'app/features/DRO/utils/RapidPosition';
-import Tooltip from 'app/components/Tooltip';
+import controller from 'app/lib/controller.ts';
+import { RootState } from 'app/store/redux';
+import cx from 'classnames';
 import cn from 'classnames';
-import { usePostHog } from '@posthog/react';
+import get from 'lodash/get';
+import { useSelector } from 'react-redux';
 export function RapidPositionButtons({ disabled = false }) {
     const homingFlag = useSelector(
         (state: RootState) => state.controller.homingFlag,

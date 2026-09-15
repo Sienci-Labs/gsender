@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
-import controller from 'app/lib/controller.ts';
-import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
-import { RootState } from 'app/store/redux';
+import { GRBL_ACTIVE_STATE_ALARM } from 'app/constants';
 import { StepActionButton } from 'app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx';
 import { StepProps } from 'app/features/AccessoryInstaller/types';
-import {GRBL_ACTIVE_STATE_ALARM} from "app/constants";
+import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import controller from 'app/lib/controller.ts';
+import { RootState } from 'app/store/redux';
+import { useEffect, useState } from 'react';
 
 export function RestartAndRehome({ onComplete, onUncomplete }: StepProps) {
     const [rehomed, setRehomed] = useState<boolean>(false);
@@ -19,12 +19,18 @@ export function RestartAndRehome({ onComplete, onUncomplete }: StepProps) {
         (state: RootState) => state.connection.isConnected,
     );
 
-    const activeState= useTypedSelector((state: RootState) => state.controller.state.status?.activeState);
-    const alarmCode = Number(useTypedSelector((state: RootState) => state.controller.state.status?.alarmCode));
+    const activeState = useTypedSelector(
+        (state: RootState) => state.controller.state.status?.activeState,
+    );
+    const alarmCode = Number(
+        useTypedSelector(
+            (state: RootState) => state.controller.state.status?.alarmCode,
+        ),
+    );
 
     useEffect(() => {
         if (clickedRehome && hasHomed) {
-            setRehomed(true)
+            setRehomed(true);
             onComplete(); // onComplete when we have clicked and rehoming is done
         }
     }, [hasHomed, clickedRehome]);
@@ -34,7 +40,7 @@ export function RestartAndRehome({ onComplete, onUncomplete }: StepProps) {
             setError('Homing failed.');
             setTimeout(() => {
                 setError(null);
-            }, 2500)
+            }, 2500);
         }
     }, [activeState, alarmCode]);
 
@@ -51,7 +57,8 @@ export function RestartAndRehome({ onComplete, onUncomplete }: StepProps) {
                 Rehome
             </label>
             <p className="dark:text-white">
-                Homing movements have been updated and require the machine to be rehomed.
+                Homing movements have been updated and require the machine to be
+                rehomed.
             </p>
             <p className="dark:text-white">
                 Select <b>"Re-home"</b> to continue.

@@ -21,58 +21,52 @@
  *
  */
 
-import { store as reduxStore } from 'app/store/redux';
-import gsap from 'gsap';
-import { connect } from 'react-redux';
-import _get from 'lodash/get';
-import _each from 'lodash/each';
-import _isEqual from 'lodash/isEqual';
-import _throttle from 'lodash/throttle';
-import colornames from 'colornames';
-import pubsub from 'pubsub-js';
-import PropTypes from 'prop-types';
-import React, { Component } from 'react';
-import * as THREE from 'three';
-import { degToRad } from 'three/src/math/MathUtils';
 import {
+    FILE_TYPE,
+    GRBL,
+    GRBL_ACTIVE_STATE_CHECK,
+    GRBLHAL,
     IMPERIAL_UNITS,
+    LASER_MODE,
+    LIGHTWEIGHT_OPTIONS,
     METRIC_UNITS,
+    OUTLINE_MODE_RAPIDLESS_SQUARE,
     RENDER_RENDERED,
     VISUALIZER_PRIMARY,
     VISUALIZER_SECONDARY,
-    FILE_TYPE,
     WORKSPACE_MODE,
-    GRBL,
-    GRBLHAL,
-    GRBL_ACTIVE_STATE_CHECK,
-    LASER_MODE,
-    OUTLINE_MODE_RAPIDLESS_SQUARE,
-    LIGHTWEIGHT_OPTIONS,
 } from 'app/constants';
 import CombinedCamera from 'app/lib/three/oldCombinedCamera';
+import TrackballControls from 'app/lib/three/oldTrackballControls';
+import * as WebGL from 'app/lib/three/WebGL';
+import store from 'app/store';
+import { store as reduxStore } from 'app/store/redux';
+import { updateFileRenderState } from 'app/store/redux/slices/fileInfo.slice';
+import colornames from 'colornames';
+import gsap from 'gsap';
+import _ from 'lodash';
+import _each from 'lodash/each';
+import _get from 'lodash/get';
+import _isEqual from 'lodash/isEqual';
+import _throttle from 'lodash/throttle';
+import PropTypes from 'prop-types';
+import pubsub from 'pubsub-js';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import * as THREE from 'three';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
 import { CopyShader } from 'three/examples/jsm/shaders/CopyShader';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader';
-import TrackballControls from 'app/lib/three/oldTrackballControls';
-import * as WebGL from 'app/lib/three/WebGL';
-
-import _ from 'lodash';
-import store from 'app/store';
-
+import { degToRad } from 'three/src/math/MathUtils';
 import controller from '../../lib/controller';
-import { getBoundingBox, loadSTL, loadTexture } from './helpers';
-import Viewport from './Viewport';
+import { isLaserMode } from '../../lib/laserMode';
+import WidgetConfig from '../WidgetConfig/WidgetConfig';
 import CoordinateAxes from './CoordinateAxes';
 import Cuboid from './Cuboid';
 import CuttingPointer from './CuttingPointer';
-import LaserPointer from './LaserPointer';
-import GridLine from './GridLine';
-import PivotPoint3 from './PivotPoint3';
-import TextSprite from './TextSprite';
-import GCodeVisualizer from './GCodeVisualizer';
 import {
     BACKGROUND_PART,
     CAMERA_MODE_PAN,
@@ -84,9 +78,13 @@ import {
     YAXIS_PART,
     ZAXIS_PART,
 } from './constants';
-import WidgetConfig from '../WidgetConfig/WidgetConfig';
-import { isLaserMode } from '../../lib/laserMode';
-import { updateFileRenderState } from 'app/store/redux/slices/fileInfo.slice';
+import GCodeVisualizer from './GCodeVisualizer';
+import GridLine from './GridLine';
+import { getBoundingBox, loadSTL, loadTexture } from './helpers';
+import LaserPointer from './LaserPointer';
+import PivotPoint3 from './PivotPoint3';
+import TextSprite from './TextSprite';
+import Viewport from './Viewport';
 
 const IMPERIAL_GRID_SPACING = 25.4; // 1 in
 const METRIC_GRID_SPACING = 10; // 10 mm
@@ -101,13 +99,14 @@ const ORTHOGRAPHIC_FAR = 7000;
 const CAMERA_DISTANCE = 1900; // Move the camera out a bit from the origin (0, 0, 0)
 const TRACKBALL_CONTROLS_MIN_DISTANCE = 1;
 const TRACKBALL_CONTROLS_MAX_DISTANCE = 7000;
+
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
+import { uploadGcodeFileToServer } from 'app/lib/fileupload';
+import { getZUpTravel } from 'app/lib/SoftLimits.js';
+import { toast } from 'app/lib/toaster';
+import { mm2in } from 'app/lib/units';
 import { outlineResponse } from '../../workers/Outline.response';
 import { shouldVisualizeSVG } from '../../workers/Visualize.response';
-import { uploadGcodeFileToServer } from 'app/lib/fileupload';
-import { toast } from 'app/lib/toaster';
-import { getZUpTravel } from 'app/lib/SoftLimits.js';
-import { mm2in } from 'app/lib/units';
-import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 
 class Visualizer extends Component {
     static propTypes = {
@@ -2109,7 +2108,9 @@ class Visualizer extends Component {
                     obj.geometry.dispose();
                 }
                 if (obj.material) {
-                    const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+                    const mats = Array.isArray(obj.material)
+                        ? obj.material
+                        : [obj.material];
                     mats.forEach((m) => {
                         if (m.map) m.map.dispose();
                         m.dispose();
@@ -2177,16 +2178,19 @@ class Visualizer extends Component {
         {
             // Imperial Coordinate System
             const visible = objects.coordinateSystem.visible;
-            const imperialCoordinateSystem = this.createCoordinateSystem(IMPERIAL_UNITS);
+            const imperialCoordinateSystem =
+                this.createCoordinateSystem(IMPERIAL_UNITS);
             imperialCoordinateSystem.name = 'ImperialCoordinateSystem';
-            imperialCoordinateSystem.visible = visible && units === IMPERIAL_UNITS;
+            imperialCoordinateSystem.visible =
+                visible && units === IMPERIAL_UNITS;
             this.group.add(imperialCoordinateSystem);
         }
 
         {
             // Metric Coordinate System
             const visible = objects.coordinateSystem.visible;
-            const metricCoordinateSystem = this.createCoordinateSystem(METRIC_UNITS);
+            const metricCoordinateSystem =
+                this.createCoordinateSystem(METRIC_UNITS);
             metricCoordinateSystem.name = 'MetricCoordinateSystem';
             metricCoordinateSystem.visible = visible && units === METRIC_UNITS;
             this.group.add(metricCoordinateSystem);
@@ -2195,16 +2199,19 @@ class Visualizer extends Component {
         {
             // Imperial Grid Line Numbers
             const visible = objects.gridLineNumbers.visible;
-            const imperialGridLineNumbers = this.createGridLineNumbers(IMPERIAL_UNITS);
+            const imperialGridLineNumbers =
+                this.createGridLineNumbers(IMPERIAL_UNITS);
             imperialGridLineNumbers.name = 'ImperialGridLineNumbers';
-            imperialGridLineNumbers.visible = visible && units === IMPERIAL_UNITS;
+            imperialGridLineNumbers.visible =
+                visible && units === IMPERIAL_UNITS;
             this.group.add(imperialGridLineNumbers);
         }
 
         {
             // Metric Grid Line Numbers
             const visible = objects.gridLineNumbers.visible;
-            const metricGridLineNumbers = this.createGridLineNumbers(METRIC_UNITS);
+            const metricGridLineNumbers =
+                this.createGridLineNumbers(METRIC_UNITS);
             metricGridLineNumbers.name = 'MetricGridLineNumbers';
             metricGridLineNumbers.visible = visible && units === METRIC_UNITS;
             this.group.add(metricGridLineNumbers);
@@ -2213,8 +2220,12 @@ class Visualizer extends Component {
         {
             // Cutting Tool (async STL load)
             Promise.all([
-                loadSTL('assets/models/stl/bit.stl').then((geometry) => geometry),
-                loadTexture('assets/textures/brushed-steel-texture.jpg').then((texture) => texture),
+                loadSTL('assets/models/stl/bit.stl').then(
+                    (geometry) => geometry,
+                ),
+                loadTexture('assets/textures/brushed-steel-texture.jpg').then(
+                    (texture) => texture,
+                ),
             ])
                 .then((result) => {
                     const [geometry, texture] = result;
@@ -2263,7 +2274,10 @@ class Visualizer extends Component {
                     this.updateScene();
                 })
                 .catch((error) => {
-                    console.error('Visualizer: Failed to load cutting tool assets during rebuild:', error);
+                    console.error(
+                        'Visualizer: Failed to load cutting tool assets during rebuild:',
+                        error,
+                    );
                 });
         }
 

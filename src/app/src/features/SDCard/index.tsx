@@ -1,19 +1,23 @@
-import { StatusIndicator } from 'app/features/SDCard/components/StatusIndicator.tsx';
+import { GRBL_ACTIVE_STATE_ALARM, GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
 import { FileList } from 'app/features/SDCard/components/FileList.tsx';
+import { StatusIndicator } from 'app/features/SDCard/components/StatusIndicator.tsx';
 import { useSDCard } from 'app/features/SDCard/hooks/useSDCard.ts';
-import { useEffect } from 'react';
+import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import controller from 'app/lib/controller.ts';
-import redux, {RootState} from 'app/store/redux';
+import redux, { RootState } from 'app/store/redux';
 import { emptyAllSDFiles } from 'app/store/redux/slices/controller.slice.ts';
-import {useTypedSelector} from "app/hooks/useTypedSelector.ts";
-import {GRBL_ACTIVE_STATE_ALARM, GRBL_ACTIVE_STATE_IDLE} from "app/constants";
+import { useEffect } from 'react';
 
 const SDCardElement = () => {
-    const { isMounted, isConnected } =
-        useSDCard();
+    const { isMounted, isConnected } = useSDCard();
 
-    const activeState = useTypedSelector((state: RootState) => controller.state.status?.activeState);
-    const canSendSystemCommands = [GRBL_ACTIVE_STATE_ALARM, GRBL_ACTIVE_STATE_IDLE].includes(activeState);
+    const activeState = useTypedSelector(
+        (state: RootState) => controller.state.status?.activeState,
+    );
+    const canSendSystemCommands = [
+        GRBL_ACTIVE_STATE_ALARM,
+        GRBL_ACTIVE_STATE_IDLE,
+    ].includes(activeState);
 
     useEffect(() => {
         if (isConnected && canSendSystemCommands) {

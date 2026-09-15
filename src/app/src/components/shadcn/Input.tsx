@@ -1,5 +1,5 @@
-import * as React from 'react';
 import { cn } from 'app/lib/utils';
+import * as React from 'react';
 
 type InputProps = React.ComponentProps<'input'> & {
     suffix?: React.ReactNode;

@@ -21,17 +21,17 @@
  *
  */
 
-import React from 'react';
-import Modal from 'app/components/Modal';
 import { Button } from 'app/components/Buttons';
+import Modal from 'app/components/Modal';
 import PropTypes from 'prop-types';
+import React from 'react';
 
 import {
-    modalStyle,
-    modalHeaderStyle,
-    modalTitleStyle,
     modalBodyStyle,
     modalFooterStyle,
+    modalHeaderStyle,
+    modalStyle,
+    modalTitleStyle,
 } from './modalStyle';
 
 const WarningModal = ({

@@ -1,9 +1,8 @@
+import Button from 'app/components/Button';
+import { cx } from 'class-variance-authority';
 import cn from 'classnames';
 import { LuArrowLeft } from 'react-icons/lu';
 import { useNavigate } from 'react-router';
-
-import Button from 'app/components/Button';
-import { cx } from 'class-variance-authority';
 
 type PageProps = {
     children: React.ReactNode;

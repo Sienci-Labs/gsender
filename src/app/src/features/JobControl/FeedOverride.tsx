@@ -1,16 +1,16 @@
 import RangeSlider from 'app/components/RangeSlider';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState.ts';
+import controller from 'app/lib/controller';
+import { mapPositionToUnits } from 'app/lib/units';
+import store from 'app/store';
+import debounce from 'lodash/debounce';
+import posthog from 'posthog-js';
+import { useEffect, useState } from 'react';
 import {
     METRIC_UNITS,
     OVERRIDE_VALUE_RANGES,
     SPINDLE_MODE,
 } from '../../constants';
-import controller from 'app/lib/controller';
-import debounce from 'lodash/debounce';
-import { useEffect, useState } from 'react';
-import store from 'app/store';
-import { mapPositionToUnits } from 'app/lib/units';
-import { useWorkspaceState } from 'app/hooks/useWorkspaceState.ts';
-import posthog from 'posthog-js';
 
 interface OverridesProps {
     ovF: number;

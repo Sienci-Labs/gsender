@@ -1,7 +1,6 @@
-import React, { useId } from 'react';
-
-import Toggle from './Toggle';
 import { cn } from 'app/lib/utils';
+import React, { useId } from 'react';
+import Toggle from './Toggle';
 
 interface SwitchProps {
     label?: string;

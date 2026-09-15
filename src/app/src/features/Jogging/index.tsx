@@ -1,24 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
-import includes from 'lodash/includes';
-import get from 'lodash/get';
-import inRange from 'lodash/inRange';
-import throttle from 'lodash/throttle';
-import cx from 'classnames';
-
-import { JogInput } from 'app/features/Jogging/components/JogInput';
-import { JogWheel } from 'app/features/Jogging/components/JogWheel';
-import { SpeedSelector } from 'app/features/Jogging/components/SpeedSelector';
-import { ZJog } from 'app/features/Jogging/components/ZJog';
-import { AJog } from 'app/features/Jogging/components/AJog';
-import store from 'app/store';
-import {
-    cancelJog,
-    jogAxis,
-    startJogCommand,
-} from 'app/features/Jogging/utils/Jogging';
-import { FirmwareFlavour } from 'app/features/Connection';
-import { RootState } from 'app/store/redux';
+import { usePostHog } from '@posthog/react';
 import {
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
@@ -31,25 +11,42 @@ import {
     WORKFLOW_STATE_RUNNING,
     WORKSPACE_MODE,
 } from 'app/constants';
-import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-import { toast } from 'app/lib/toaster';
-import controller from 'app/lib/controller';
-import useKeybinding from 'app/lib/useKeybinding';
+import { UNITS_EN } from 'app/definitions/general';
+import { FirmwareFlavour } from 'app/features/Connection';
+import { AJog } from 'app/features/Jogging/components/AJog';
+import { JogInput } from 'app/features/Jogging/components/JogInput';
+import { JogWheel } from 'app/features/Jogging/components/JogWheel';
+import { SpeedSelector } from 'app/features/Jogging/components/SpeedSelector';
+import { StopButton } from 'app/features/Jogging/components/StopButton';
+import { ZJog } from 'app/features/Jogging/components/ZJog';
+import {
+    cancelJog,
+    jogAxis,
+    startJogCommand,
+} from 'app/features/Jogging/utils/Jogging';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import { useWidgetState } from 'app/hooks/useWidgetState';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import controller from 'app/lib/controller';
+import { preventDefault } from 'app/lib/dom-events';
 import gamepad, { checkButtonHold } from 'app/lib/gamepad';
 import { GamepadProfile } from 'app/lib/gamepad/definitions';
-import { StopButton } from 'app/features/Jogging/components/StopButton';
-import { useWidgetState } from 'app/hooks/useWidgetState';
-
+import { toast } from 'app/lib/toaster';
+import useKeybinding from 'app/lib/useKeybinding';
+import store from 'app/store';
+import reduxStore, { RootState } from 'app/store/redux';
+import cx from 'classnames';
+import get from 'lodash/get';
+import includes from 'lodash/includes';
+import inRange from 'lodash/inRange';
+import throttle from 'lodash/throttle';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 import jogWheeelLabels from './assets/labels.svg';
-import JogHelper from './utils/jogHelper';
-import { preventDefault } from 'app/lib/dom-events';
 import { checkThumbsticskAreIdle, JoystickLoop } from './JoystickLoop';
 import { MPGJogManager } from './MPGJogManager.ts';
+import JogHelper from './utils/jogHelper';
 import { convertValue } from './utils/units';
-import reduxStore from 'app/store/redux';
-import { UNITS_EN } from 'app/definitions/general';
-import { usePostHog } from '@posthog/react';
 
 export interface JogValueObject {
     xyStep: number;

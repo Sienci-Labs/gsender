@@ -1,15 +1,14 @@
-import pubsub from 'pubsub-js';
-import { store as reduxStore } from 'app/store/redux';
-import _get from 'lodash/get';
-import isNumber from 'lodash/isNumber';
-
-import store from 'app/store';
 import {
     LIGHTWEIGHT_OPTIONS,
     RENDER_RENDERED,
     RENDER_RENDERING,
     VISUALIZER_SECONDARY,
 } from 'app/constants';
+import store from 'app/store';
+import { store as reduxStore } from 'app/store/redux';
+import _get from 'lodash/get';
+import isNumber from 'lodash/isNumber';
+import pubsub from 'pubsub-js';
 import {
     updateFileInfo,
     updateFileProcessing,
@@ -25,8 +24,8 @@ const storeVisualizerProfile = (profile) => {
         typeof window !== 'undefined'
             ? window
             : typeof globalThis !== 'undefined'
-                ? globalThis
-                : null;
+              ? globalThis
+              : null;
     if (!root) {
         return;
     }

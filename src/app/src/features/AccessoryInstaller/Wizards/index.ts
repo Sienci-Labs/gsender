@@ -1,7 +1,7 @@
 import { useSienciATCWizard } from 'app/features/AccessoryInstaller/Wizards/atc/ATC.tsx';
-import { useMemo } from 'react';
-import {useSienciSpindle} from "app/features/AccessoryInstaller/Wizards/spindle/Spindle.tsx";
+import { useSienciSpindle } from 'app/features/AccessoryInstaller/Wizards/spindle/Spindle.tsx';
 import { useSienciTLSWizard } from 'app/features/AccessoryInstaller/Wizards/tls/TLS.tsx';
+import { useMemo } from 'react';
 
 export function useAllWizards() {
     const atc = useSienciATCWizard();

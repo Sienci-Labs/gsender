@@ -1,10 +1,11 @@
-import { useContext } from 'react';
-import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
-
-import shuttleEvents from 'app/lib/shuttleEvents';
+import { Input } from 'app/components/shadcn/Input';
 import { useGamepadListener } from 'app/lib/hooks/useGamepadListener';
 
-import { GamepadContext } from '../../utils/context';
+import shuttleEvents from 'app/lib/shuttleEvents';
+import classNames from 'classnames';
+import get from 'lodash/get';
+import { useContext } from 'react';
+import { FaEdit, FaPlus, FaTrash } from 'react-icons/fa';
 import { arrayComparator } from '../../utils';
 import {
     setCurrentGamepadProfileButton,
@@ -12,10 +13,7 @@ import {
     setGamepadProfileList,
 } from '../../utils/actions';
 import { GAMEPAD_MODAL } from '../../utils/constants';
-
-import get from 'lodash/get';
-import classNames from 'classnames';
-import { Input } from 'app/components/shadcn/Input';
+import { GamepadContext } from '../../utils/context';
 
 const ButtonActionsTable = () => {
     const {

@@ -1,7 +1,7 @@
 // https://ui.shadcn.com/docs/components/radio-group
 
-import * as React from 'react';
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
+import * as React from 'react';
 // import { Circle } from 'lucide-react';
 
 import cx from 'classnames';

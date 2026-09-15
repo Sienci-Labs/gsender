@@ -1,8 +1,7 @@
-import cn from 'classnames';
-import { MouseEventHandler } from 'react';
-import { SettingsMenuSection } from '../assets/SettingsMenu';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
-import React from 'react';
+import cn from 'classnames';
+import React, { MouseEventHandler } from 'react';
+import { SettingsMenuSection } from '../assets/SettingsMenu';
 
 interface MenuProps {
     menu: SettingsMenuSection[];

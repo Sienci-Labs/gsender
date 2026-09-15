@@ -21,13 +21,13 @@
  *
  */
 
-import WidgetComponent from './Widget';
-import Header from './Header';
-import Content from './Content';
-import Footer from './Footer';
-import Title from './Title';
 import Button from './Button';
+import Content from './Content';
 import Controls from './Controls';
+import Footer from './Footer';
+import Header from './Header';
+import Title from './Title';
+import WidgetComponent from './Widget';
 
 export const Widget = Object.assign(WidgetComponent, {
     Header,

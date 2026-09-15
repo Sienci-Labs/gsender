@@ -21,12 +21,12 @@
  *
  */
 
-import pubsub from 'pubsub-js';
+import { toast } from 'app/lib/toaster';
 
 import store from 'app/store';
-import { toast } from 'app/lib/toaster';
-import { RecentFile } from '../definitions';
+import pubsub from 'pubsub-js';
 import { FileData } from '..';
+import { RecentFile } from '../definitions';
 
 export const RECENT_FILE_LIMIT = 8;
 
@@ -77,7 +77,7 @@ export const addRecentFile = (fileMetaData: RecentFile) => {
     if (fileMetaData === null) {
         toast.error(
             'Unable to load file - file may have been moved or deleted.',
-            { position: 'bottom-right' }
+            { position: 'bottom-right' },
         );
         return;
     }
@@ -135,8 +135,11 @@ export const loadRecentFile = (filePath: string) => {
 export const deleteRecentFile = (filePath: string) => {
     let savedFiles: RecentFile[] = store.get('workspace.recentFiles', []);
     let updatedFiles = savedFiles.slice();
-    const indexToDelete = updatedFiles.findIndex((file, _index) => file.filePath === filePath);
-    if (indexToDelete > -1) { // sanity check
+    const indexToDelete = updatedFiles.findIndex(
+        (file, _index) => file.filePath === filePath,
+    );
+    if (indexToDelete > -1) {
+        // sanity check
         updatedFiles.splice(indexToDelete, 1);
         updateStoredRecentFiles(updatedFiles);
         pubsub.publish('recent-files-updated', updatedFiles);

@@ -1,11 +1,10 @@
-import React, {
-    useState,
-    useEffect,
-    forwardRef,
-    useImperativeHandle,
-} from 'react';
-
 import { Tooltip } from 'app/components/Tooltip';
+import React, {
+    forwardRef,
+    useEffect,
+    useImperativeHandle,
+    useState,
+} from 'react';
 
 const queue = [];
 

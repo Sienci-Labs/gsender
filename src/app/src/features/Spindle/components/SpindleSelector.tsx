@@ -1,7 +1,6 @@
-import Select from 'react-select';
-import cx from 'classnames';
-
 import Tooltip from 'app/components/Tooltip';
+import cx from 'classnames';
+import Select from 'react-select';
 
 import { Spindle } from '../definitions';
 

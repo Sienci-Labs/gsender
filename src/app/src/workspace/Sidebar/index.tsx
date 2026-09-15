@@ -1,7 +1,7 @@
-import cx from 'classnames';
+import { HelperToggle } from 'app/features/Helper/components/HelperToggle.tsx';
 
 import { NavBar } from 'app/features/navbar';
-import { HelperToggle } from 'app/features/Helper/components/HelperToggle.tsx';
+import cx from 'classnames';
 
 export const Sidebar = () => {
     return (

@@ -1,9 +1,8 @@
 // https://ui.shadcn.com/docs/components/progress
 
-import * as React from 'react';
 import * as ProgressPrimitive from '@radix-ui/react-progress';
-
 import cx from 'classnames';
+import * as React from 'react';
 
 interface Props {
     Bit?: string;

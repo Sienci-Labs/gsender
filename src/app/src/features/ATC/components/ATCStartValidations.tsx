@@ -1,10 +1,10 @@
+import Button from 'app/components/Button';
 import {
     Dialog,
     DialogContent,
     DialogDescription,
     DialogTitle,
 } from 'app/components/shadcn/Dialog.tsx';
-import Button from 'app/components/Button';
 import controller from 'app/lib/controller.ts';
 import { FaPlay } from 'react-icons/fa';
 

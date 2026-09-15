@@ -1,41 +1,39 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { connect } from 'react-redux';
+import api from 'app/api';
+import Button from 'app/components/Button';
+import combokeys from 'app/lib/combokeys';
+import controller from 'app/lib/controller';
+import log from 'app/lib/log';
+import { toast } from 'app/lib/toaster';
+import store from 'app/store';
+import cx from 'classnames';
+import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
 import includes from 'lodash/includes';
 import throttle from 'lodash/throttle';
-import cloneDeep from 'lodash/cloneDeep';
-import { FaPlus, FaFileImport, FaFileExport } from 'react-icons/fa';
-
-import api from 'app/api';
-import store from 'app/store';
-import controller from 'app/lib/controller';
-import combokeys from 'app/lib/combokeys';
-import log from 'app/lib/log';
-import Button from 'app/components/Button';
-import { toast } from 'app/lib/toaster';
+import posthog from 'posthog-js';
 import pubsub from 'pubsub-js';
-
-import Macro from './Macro';
-import MacroForm from './MacroForm';
+import React, { useEffect, useRef, useState } from 'react';
+import { FaFileExport, FaFileImport, FaPlus } from 'react-icons/fa';
+import { connect } from 'react-redux';
 import {
     GRBL,
-    GRBLHAL,
     GRBL_ACTIVE_STATE_IDLE,
-    GRBL_HAL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_RUN,
+    GRBL_HAL_ACTIVE_STATE_IDLE,
     GRBL_HAL_ACTIVE_STATE_RUN,
+    GRBLHAL,
     WORKFLOW_STATE_RUNNING,
 } from '../../constants';
+import { deleteGamepadMacro } from '../../lib/gamepad';
 import {
-    MODAL_NONE,
     MODAL_ADD_MACRO,
     MODAL_EDIT_MACRO,
+    MODAL_NONE,
     MODAL_RUN_MACRO,
     ModalType,
 } from './constants';
-import { deleteGamepadMacro } from '../../lib/gamepad';
-import cx from 'classnames';
-import posthog from 'posthog-js';
+import Macro from './Macro';
+import MacroForm from './MacroForm';
 
 type MacroWidgetProps = {
     type: string;

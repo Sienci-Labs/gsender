@@ -1,8 +1,8 @@
 import { StepActionButton } from 'app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx';
 import { StepProps } from 'app/features/AccessoryInstaller/types';
-import { useState } from 'react';
 import controller from 'app/lib/controller.ts';
 import store from 'app/store';
+import { useState } from 'react';
 
 export function ControllerConfiguration({
     onComplete,
@@ -16,7 +16,7 @@ export function ControllerConfiguration({
         // Enable ATCI tab, enable spindle tab, set TC strategy to ignore
         store.set('workspace.atcEnabled', true);
         store.set('workspace.toolChangeOption', 'Ignore');
-        store.set('workspace.spindleFunctions', true)
+        store.set('workspace.spindleFunctions', true);
         store.set('workspace.toolChange.passthrough', true);
         // Use macro for controller settings
         controller.command('gcode', 'G65 P999');
@@ -29,7 +29,8 @@ export function ControllerConfiguration({
     return (
         <div className="flex flex-col gap-5 justify-start">
             <p className="dark:text-white">
-                The following controller settings are being updated to ensure compatibility with the ATC.
+                The following controller settings are being updated to ensure
+                compatibility with the ATC.
             </p>
             <ul
                 className="list-disc list-inside text-gray-900 dark:text-white"

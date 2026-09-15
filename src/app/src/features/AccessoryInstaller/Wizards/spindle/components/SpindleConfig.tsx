@@ -1,11 +1,14 @@
-import {StepActionButton} from "app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx";
-import {useState} from "react";
-import {useTypedSelector} from "app/hooks/useTypedSelector.ts";
-import {RootState} from "app/store/redux";
-import controller from "app/lib/controller.ts";
-import {firmwarePastVersion} from "app/lib/firmwareSemver.ts";
-import {ATCI_SUPPORTED_VERSION, SPINDLE_395_V7_VERSION} from "app/features/ATC/utils/ATCiConstants.ts";
-import store from "app/store";
+import { StepActionButton } from 'app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx';
+import {
+    ATCI_SUPPORTED_VERSION,
+    SPINDLE_395_V7_VERSION,
+} from 'app/features/ATC/utils/ATCiConstants.ts';
+import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import controller from 'app/lib/controller.ts';
+import { firmwarePastVersion } from 'app/lib/firmwareSemver.ts';
+import store from 'app/store';
+import { RootState } from 'app/store/redux';
+import { useState } from 'react';
 
 export const sienciHalGcode = [
     '$30=24000',
@@ -41,7 +44,6 @@ export function SpindleConfig({ onComplete, onUncomplete }) {
 
     const [hasSetupSpindle, setHasSetupSpindle] = useState<boolean>(false);
 
-
     const isConnected = useTypedSelector(
         (state: RootState) => state.connection.isConnected,
     );
@@ -49,42 +51,46 @@ export function SpindleConfig({ onComplete, onUncomplete }) {
     const canSetupSpindle = isConnected;
 
     function setupSienciHalSpindle() {
-        controller.command('gcode', sienciHalGcode)
+        controller.command('gcode', sienciHalGcode);
     }
 
     function setupGrblCoreSpindle() {
-        controller.command('gcode', getGrblCoreGcode())
+        controller.command('gcode', getGrblCoreGcode());
     }
 
     async function setupSpindleAndReboot() {
         if (firmwarePastVersion(ATCI_SUPPORTED_VERSION)) {
             setupGrblCoreSpindle();
         } else {
-            setupSienciHalSpindle()
+            setupSienciHalSpindle();
         }
 
         store.set('workspace.spindleFunctions', true);
         setTimeout(() => {
-            setHasSetupSpindle(true)
+            setHasSetupSpindle(true);
             onComplete();
-        }, 500)
+        }, 500);
     }
 
     return (
         <div className="flex flex-col gap-5 justify-start">
             <p className="dark:text-white">
-                Your spindle settings are applied in this step and the controller will restart automatically.
+                Your spindle settings are applied in this step and the
+                controller will restart automatically.
             </p>
             <ol className="list-decimal p-5 gap-4 space-y-2">
                 <li>
                     Press <b>"Apply And Restart"</b>
                 </li>
-                {
-                    !firmwarePastVersion(ATCI_SUPPORTED_VERSION) && (
-                        <li>Reboot your controller using the power switch and reconnect</li>
-                    )
-                }
-                <li>Click <b>"Next"</b></li>
+                {!firmwarePastVersion(ATCI_SUPPORTED_VERSION) && (
+                    <li>
+                        Reboot your controller using the power switch and
+                        reconnect
+                    </li>
+                )}
+                <li>
+                    Click <b>"Next"</b>
+                </li>
             </ol>
             <StepActionButton
                 label="Setup Spindle"
@@ -95,5 +101,5 @@ export function SpindleConfig({ onComplete, onUncomplete }) {
                 disabled={!canSetupSpindle}
             />
         </div>
-    )
+    );
 }

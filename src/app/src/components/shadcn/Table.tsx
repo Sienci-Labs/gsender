@@ -1,8 +1,7 @@
 // https://ui.shadcn.com/docs/components/table
 
-import * as React from 'react';
-
 import cx from 'classnames';
+import * as React from 'react';
 
 const Table = React.forwardRef<
     HTMLTableElement,
@@ -112,11 +111,11 @@ TableCaption.displayName = 'TableCaption';
 
 export {
     Table,
-    TableHeader,
     TableBody,
+    TableCaption,
+    TableCell,
     TableFooter,
     TableHead,
+    TableHeader,
     TableRow,
-    TableCell,
-    TableCaption,
 };

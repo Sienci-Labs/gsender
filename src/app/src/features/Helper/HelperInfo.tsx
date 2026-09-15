@@ -21,11 +21,11 @@
  *
  */
 
-import styles from './index.module.styl';
 import cx from 'classnames';
-import { CSSTransition } from 'react-transition-group';
-import { FaInfoCircle, FaTimes } from 'react-icons/fa';
 import { useEffect, useState } from 'react';
+import { FaInfoCircle, FaTimes } from 'react-icons/fa';
+import { CSSTransition } from 'react-transition-group';
+import styles from './index.module.styl';
 
 const HelperInfo = ({ payload, infoVisible, onClose }) => {
     const { title, description } = payload;

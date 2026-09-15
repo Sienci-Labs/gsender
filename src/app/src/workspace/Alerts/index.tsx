@@ -1,11 +1,11 @@
 import api from 'app/api';
 import { Job, MaintenanceTask } from 'app/features/Stats/utils/StatContext';
-import { useEffect, useState } from 'react';
-import MaintenanceAlert from './MaintenanceAlert';
-import pubsub from 'pubsub-js';
-import JobEndModal from './JobEndModal';
 import store from 'app/store';
 import { usePostHog } from 'posthog-js/react';
+import pubsub from 'pubsub-js';
+import { useEffect, useState } from 'react';
+import JobEndModal from './JobEndModal';
+import MaintenanceAlert from './MaintenanceAlert';
 
 export const Alerts = () => {
     const [maintenanceAlertsEnabled, setMaintenanceAlertsEnabled] = useState(

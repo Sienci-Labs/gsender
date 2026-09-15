@@ -1,5 +1,5 @@
-import React, { useRef } from 'react';
 import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
+import React, { useRef } from 'react';
 
 export function Search() {
     const { searchTerm, setSearchTerm } = useSettings();

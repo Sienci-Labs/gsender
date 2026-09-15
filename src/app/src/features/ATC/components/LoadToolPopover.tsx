@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Button } from 'app/components/Button';
 import {
     Popover,
     PopoverContent,
@@ -12,22 +11,23 @@ import {
     SelectTrigger,
     SelectValue,
 } from 'app/components/shadcn/Select.tsx';
-import { Button } from 'app/components/Button';
-import { cn } from 'app/lib/utils';
 import {
     ToolInstance,
     ToolStatus,
 } from 'app/features/ATC/components/ToolTable.tsx';
-import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
+import { ToolStatusBadges } from 'app/features/ATC/components/ui/ToolStatusBadges.tsx';
 import {
+    LoadToolMode,
     loadAndSaveToRack,
     loadTool,
-    LoadToolMode,
     releaseToolFromSpindle,
     saveToRack,
 } from 'app/features/ATC/utils/ATCFunctions.ts';
 import { toolStateThemes } from 'app/features/ATC/utils/ATCiConstants.ts';
-import { ToolStatusBadges } from 'app/features/ATC/components/ui/ToolStatusBadges.tsx';
+import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
+import { cn } from 'app/lib/utils';
+import { Loader2 } from 'lucide-react';
+import React, { useState } from 'react';
 
 interface ToolChangerPopoverProps {
     isOpen: boolean;
@@ -37,9 +37,13 @@ interface ToolChangerPopoverProps {
     trigger?: React.ReactNode;
     contentClassName?: string;
     contentAlign?: React.ComponentProps<typeof PopoverContent>['align'];
-    contentAlignOffset?: React.ComponentProps<typeof PopoverContent>['alignOffset'];
+    contentAlignOffset?: React.ComponentProps<
+        typeof PopoverContent
+    >['alignOffset'];
     contentSide?: React.ComponentProps<typeof PopoverContent>['side'];
-    contentSideOffset?: React.ComponentProps<typeof PopoverContent>['sideOffset'];
+    contentSideOffset?: React.ComponentProps<
+        typeof PopoverContent
+    >['sideOffset'];
 }
 
 const ToolChangerPopover: React.FC<ToolChangerPopoverProps> = ({
@@ -64,7 +68,7 @@ const ToolChangerPopover: React.FC<ToolChangerPopoverProps> = ({
     const allowManualBadge = connected && atcAvailable;
     const isManual = allowManualBadge
         ? selectedTool
-            ? selectedTool.isManual ?? selectedTool.id > rackSize
+            ? (selectedTool.isManual ?? selectedTool.id > rackSize)
             : false
         : false;
 
@@ -127,7 +131,9 @@ const ToolChangerPopover: React.FC<ToolChangerPopoverProps> = ({
 
     return (
         <Popover open={isOpen} onOpenChange={setIsOpen}>
-            {trigger ? <PopoverTrigger asChild>{trigger}</PopoverTrigger> : null}
+            {trigger ? (
+                <PopoverTrigger asChild>{trigger}</PopoverTrigger>
+            ) : null}
             <PopoverContent
                 className={cn('w-96 p-6', contentClassName)}
                 align={contentAlign ?? 'end'}
@@ -174,8 +180,8 @@ const ToolChangerPopover: React.FC<ToolChangerPopoverProps> = ({
                                 <SelectContent className="w-full flex-1 bg-white z-[10000]">
                                     {tools.map((tool) => {
                                         const toolIsManual = allowManualBadge
-                                            ? tool.isManual ??
-                                              tool.id > rackSize
+                                            ? (tool.isManual ??
+                                              tool.id > rackSize)
                                             : false;
                                         return (
                                             <SelectItem

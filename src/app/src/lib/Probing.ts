@@ -1,3 +1,12 @@
+import { UNITS_GCODE } from 'app/definitions/general';
+import { AXES_T } from 'app/features/Axes/definitions';
+import {
+    PROBE_DIRECTIONS,
+    PROBE_TYPES_T,
+    ProbingOptions,
+} from 'app/features/Probe/definitions';
+import { getZDownTravel } from 'app/lib/SoftLimits.js';
+import { GRBLHAL, METRIC_UNITS } from '../constants';
 import {
     PROBE_TYPE_AUTO,
     PROBE_TYPE_TIP,
@@ -6,16 +15,7 @@ import {
     TOUCHPLATE_TYPE_BITZERO,
     TOUCHPLATE_TYPE_ZERO,
 } from './constants';
-import { GRBLHAL, METRIC_UNITS } from '../constants';
 import { convertToMetric, mm2in } from './units';
-import { UNITS_GCODE } from 'app/definitions/general';
-import { AXES_T } from 'app/features/Axes/definitions';
-import {
-    PROBE_DIRECTIONS,
-    ProbingOptions,
-    PROBE_TYPES_T,
-} from 'app/features/Probe/definitions';
-import { getZDownTravel } from 'app/lib/SoftLimits.js';
 
 export const BL = 0;
 export const TL = 1;

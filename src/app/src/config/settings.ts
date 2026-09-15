@@ -24,9 +24,8 @@
 import endsWith from 'lodash/endsWith';
 import mapKeys from 'lodash/mapKeys';
 import sha1 from 'sha1';
-
-import log from '../lib/log';
 import pkg from '../../package.json';
+import log from '../lib/log';
 import { ConfigSettings } from './definitions';
 
 const webroot = '/';

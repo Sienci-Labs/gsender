@@ -1,17 +1,17 @@
-import objtools from 'objtools';
-import Interpreter from 'gcode-interpreter';
-import GCodeBlock from '../gcodeProcessor/GCodeBlock';
-import { METRIC_UNITS } from '../../constants';
 import { BasicType, BBox } from 'app/definitions/general';
+import { AXES_T } from 'app/features/Axes/definitions';
+import Interpreter from 'gcode-interpreter';
+import objtools from 'objtools';
+import { METRIC_UNITS } from '../../constants';
+import GCodeBlock from '../gcodeProcessor/GCodeBlock';
 import {
     GCodeLine,
     GcodeProcessorOptions,
+    MOTION_MODAL,
     SyncMachineOptions,
     VMState,
     VMStateInfo,
 } from './definitions';
-import { MOTION_MODAL } from './definitions';
-import { AXES_T } from 'app/features/Axes/definitions';
 
 export const INVALID_GCODE_REGEX =
     /([^NGMXYZIJKFRS%\-?\.?\d+\.?\s])|((G28)|(G29)|(\$H))/gi;

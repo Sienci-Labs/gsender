@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-import { BBox } from 'app/definitions/general';
 import { METRIC_UNITS, RENDER_NO_FILE } from 'app/constants';
+import { BBox } from 'app/definitions/general';
 import { FileInfoState } from 'app/store/definitions';
 
 const initialState: FileInfoState = {

@@ -1,12 +1,8 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router';
-import cx from 'classnames';
-
 import { Button } from 'app/components/Button';
 import { ControlledInput } from 'app/components/ControlledInput';
 import { Switch } from 'app/components/shadcn/Switch';
 import { Tabs, TabsList, TabsTrigger } from 'app/components/shadcn/Tabs';
-import controller from 'app/lib/controller';
+import { Tooltip } from 'app/components/Tooltip';
 import {
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
@@ -15,21 +11,23 @@ import {
     VISUALIZER_PRIMARY,
     VISUALIZER_SECONDARY,
 } from 'app/constants';
-import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
-import useKeybinding from 'app/lib/useKeybinding';
-import { convertToImperial, convertToMetric } from 'app/lib/units';
-import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-import store from 'app/store';
-import { Tooltip } from 'app/components/Tooltip';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
-
-import { RotarySurfacingOptions } from './definitions';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import controller from 'app/lib/controller';
+import { uploadGcodeFileToServer } from 'app/lib/fileupload';
+import { convertToImperial, convertToMetric } from 'app/lib/units';
+import useKeybinding from 'app/lib/useKeybinding';
+import store from 'app/store';
+import cx from 'classnames';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 import { GcodeViewer } from '../Surfacing/components/GcodeViewer';
-import VisualizerPreview from './components/VisualizerPreview';
-import { StockTurningGenerator } from './utils/Generator';
 import InputArea from './components/InputArea';
+import VisualizerPreview from './components/VisualizerPreview';
 import { DEFAULT_VALUES_MM } from './constants';
+import { RotarySurfacingOptions } from './definitions';
+import { StockTurningGenerator } from './utils/Generator';
 
 const RotarySurfacing = () => {
     const navigate = useNavigate();

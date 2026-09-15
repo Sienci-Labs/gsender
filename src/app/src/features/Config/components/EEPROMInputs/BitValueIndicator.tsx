@@ -1,10 +1,10 @@
+import { Badge } from 'app/components/shadcn/Badge';
 import {
-    Tooltip as TooltipWrapper,
-    TooltipTrigger,
     TooltipContent,
     TooltipProvider,
+    TooltipTrigger,
+    Tooltip as TooltipWrapper,
 } from 'app/components/shadcn/Tooltip';
-import { Badge } from 'app/components/shadcn/Badge';
 import { getBitfieldArr } from './utils.ts';
 
 interface BitValueIndicatorProps {
@@ -18,7 +18,12 @@ function toBinary(value: number, numBits = 8): string {
     return '0b' + value.toString(2).padStart(numBits, '0');
 }
 
-export function BitValueIndicator({ value, format, bits, numBits = 8 }: BitValueIndicatorProps) {
+export function BitValueIndicator({
+    value,
+    format,
+    bits,
+    numBits = 8,
+}: BitValueIndicatorProps) {
     const numericValue = Number(value);
     if (isNaN(numericValue)) return null;
 
@@ -45,7 +50,9 @@ export function BitValueIndicator({ value, format, bits, numBits = 8 }: BitValue
                 const on = bitArr[i] === 1;
                 return (
                     <div key={i} className="flex items-center gap-1.5">
-                        <span className={on ? 'text-green-400' : 'text-slate-400'}>
+                        <span
+                            className={on ? 'text-green-400' : 'text-slate-400'}
+                        >
                             {on ? '✓' : ' '}
                         </span>
                         <span className={on ? 'text-white' : 'text-slate-400'}>
@@ -62,8 +69,13 @@ export function BitValueIndicator({ value, format, bits, numBits = 8 }: BitValue
             <TooltipWrapper>
                 <TooltipTrigger asChild>
                     <span className="cursor-default w-fit inline-flex items-center gap-1.5">
-                        <span className="text-xs text-slate-400 font-medium">Value:</span>
-                        <Badge variant="outline" className="bg-gray-100 text-gray-600 border-gray-300 font-semibold text-sm px-2.5 py-0.5 rounded-full">
+                        <span className="text-xs text-slate-400 font-medium">
+                            Value:
+                        </span>
+                        <Badge
+                            variant="outline"
+                            className="bg-gray-100 text-gray-600 border-gray-300 font-semibold text-sm px-2.5 py-0.5 rounded-full"
+                        >
                             {numericValue}
                         </Badge>
                     </span>

@@ -1,6 +1,6 @@
-import { Outlet } from 'react-router';
-import { StatsProvider } from 'app/features/Stats/utils/StatContext.tsx';
 import { StatMenu } from 'app/features/Stats/components/StatMenu.tsx';
+import { StatsProvider } from 'app/features/Stats/utils/StatContext.tsx';
+import { Outlet } from 'react-router';
 
 export function StatParent() {
     return (

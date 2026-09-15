@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react';
+import * as SelectPrimitive from '@radix-ui/react-select';
+import { Button } from 'app/components/Button';
+import { Badge } from 'app/components/shadcn/Badge';
 import {
     Dialog,
     DialogContent,
@@ -7,28 +9,22 @@ import {
     DialogHeader,
     DialogTitle,
 } from 'app/components/shadcn/Dialog';
-import * as SelectPrimitive from '@radix-ui/react-select';
+import { Label } from 'app/components/shadcn/Label';
 import {
     Select,
     SelectContent,
     SelectTrigger,
     SelectValue,
 } from 'app/components/shadcn/Select';
-import { Button } from 'app/components/Button';
-import { Label } from 'app/components/shadcn/Label';
-import { Badge } from 'app/components/shadcn/Badge';
-import {
-    ArrowRight,
-} from 'lucide-react';
-import cn from 'classnames';
 import { ToolInstance } from 'app/features/ATC/components/ToolTable.tsx';
-import {
-    toolStateThemes,
-} from 'app/features/ATC/utils/ATCiConstants.ts';
 import { ToolStatusBadges } from 'app/features/ATC/components/ui/ToolStatusBadges.tsx';
+import { toolStateThemes } from 'app/features/ATC/utils/ATCiConstants.ts';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
+import cn from 'classnames';
 import get from 'lodash/get';
+import { ArrowRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface ToolRemapDialogProps {
     open: boolean;
@@ -82,7 +78,9 @@ export function ToolRemapDialog({
         return allTools.find((t) => t.id === toolNumber);
     };
 
-    const selectedToolNumber = selectedTool ? parseInt(selectedTool) : undefined;
+    const selectedToolNumber = selectedTool
+        ? parseInt(selectedTool)
+        : undefined;
     const selectedToolInfo = selectedToolNumber
         ? getToolInfo(selectedToolNumber)
         : undefined;
@@ -92,7 +90,8 @@ export function ToolRemapDialog({
         fallbackId?: number,
     ) => {
         if (!tool) return fallbackId ? `T${fallbackId}` : '';
-        const nickname = tool.nickname && tool.nickname !== '-' ? tool.nickname : '';
+        const nickname =
+            tool.nickname && tool.nickname !== '-' ? tool.nickname : '';
         return nickname ? `T${tool.id} - ${nickname}` : `T${tool.id}`;
     };
 
@@ -137,17 +136,17 @@ export function ToolRemapDialog({
                                                     selectedToolNumber,
                                                 )}
                                             </span>
-                                                <ToolStatusBadges
-                                                    probeState={
-                                                        selectedToolInfo.status
-                                                    }
-                                                    isManual={
-                                                        selectedToolInfo.isManual &&
-                                                        allowManualBadge
-                                                    }
-                                                    size="sm"
-                                                    className="ml-auto"
-                                                />
+                                            <ToolStatusBadges
+                                                probeState={
+                                                    selectedToolInfo.status
+                                                }
+                                                isManual={
+                                                    selectedToolInfo.isManual &&
+                                                    allowManualBadge
+                                                }
+                                                size="sm"
+                                                className="ml-auto"
+                                            />
                                         </div>
                                     ) : (
                                         <span className="text-muted-foreground">
@@ -167,7 +166,7 @@ export function ToolRemapDialog({
                                         toolStateThemes[tool.status];
 
                                     const toolIsManual = allowManualBadge
-                                        ? tool.isManual ?? false
+                                        ? (tool.isManual ?? false)
                                         : false;
 
                                     return (

@@ -1,11 +1,11 @@
+import { Input as ShadcnInput } from 'app/components/shadcn/Input';
 import {
-    ReactNode,
     ComponentProps,
     forwardRef,
+    ReactNode,
     useEffect,
     useState,
 } from 'react';
-import { Input as ShadcnInput } from 'app/components/shadcn/Input';
 
 type InputProps = ComponentProps<'input'> & {
     suffix?: ReactNode;

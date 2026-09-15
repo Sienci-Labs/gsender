@@ -1,12 +1,11 @@
+import { Button } from 'app/components/Button';
 import React, { useContext } from 'react';
 
-import { Button } from 'app/components/Button';
-
 import ProfileItem from './ProfileItem';
-import { GamepadContext } from './utils/context';
+import { setCurrentModal } from './utils/actions';
 
 import { GAMEPAD_MODAL } from './utils/constants';
-import { setCurrentModal } from './utils/actions';
+import { GamepadContext } from './utils/context';
 
 const ProfileList = () => {
     const {

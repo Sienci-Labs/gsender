@@ -17,7 +17,7 @@ export const GAMEPAD_BUTTON_MAP = {
         'Left',
         'Right',
         'Home',
-    ]
+    ],
 };
 
 export const GAMEPAD_MODAL = {

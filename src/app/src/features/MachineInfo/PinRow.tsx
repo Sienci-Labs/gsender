@@ -1,8 +1,7 @@
-import React from 'react';
-import cx from 'classnames';
-import { FaCheck, FaTimes } from 'react-icons/fa';
-
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import cx from 'classnames';
+import React from 'react';
+import { FaCheck, FaTimes } from 'react-icons/fa';
 
 interface Props {
     label: string;

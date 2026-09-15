@@ -1,8 +1,7 @@
-import QRCode from 'react-qr-code';
-import { FaCopy } from 'react-icons/fa';
-
 import Button from 'app/components/Button';
 import { toast } from 'app/lib/toaster';
+import { FaCopy } from 'react-icons/fa';
+import QRCode from 'react-qr-code';
 
 import { copyToClipboard } from '../utils';
 

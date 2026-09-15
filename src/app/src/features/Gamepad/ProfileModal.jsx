@@ -1,23 +1,22 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
-import PropTypes from 'prop-types';
-import throttle from 'lodash/throttle';
-
-import store from 'app/store';
-import GamepadManager from 'app/lib/gamepad';
-import { toast } from 'app/lib/toaster';
+import { Button } from 'app/components/Button';
 import {
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle,
 } from 'app/components/shadcn/Dialog';
-import { Button } from 'app/components/Button';
 import { Input } from 'app/components/shadcn/Input';
+import GamepadManager from 'app/lib/gamepad';
+import { toast } from 'app/lib/toaster';
+import store from 'app/store';
 import { defaultOptions, gamepadMapping } from 'app/store/gamepad';
+import throttle from 'lodash/throttle';
+import PropTypes from 'prop-types';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 
 import { AVAILABILITY_TYPES } from './utils';
-import { GamepadContext } from './utils/context';
 import { setCurrentModal, setGamepadProfileList } from './utils/actions';
+import { GamepadContext } from './utils/context';
 
 const { DEFAULT, AVAILABLE, UNAVAILABLE } = AVAILABILITY_TYPES;
 

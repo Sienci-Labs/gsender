@@ -1,15 +1,14 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import _get from 'lodash/get';
-
-import { MAX_TERMINAL_INPUT_ARRAY_SIZE } from 'app/lib/constants';
 import { WORKFLOW_STATE_IDLE } from 'app/constants';
-import { in2mm, mm2in } from 'app/lib/units';
-import store from 'app/store';
 import { EEPROMDescriptions, EEPROMSettings } from 'app/definitions/firmware';
+import { BasicPosition } from 'app/definitions/general';
+import { Spindle } from 'app/features/Spindle/definitions';
+import { MAX_TERMINAL_INPUT_ARRAY_SIZE } from 'app/lib/constants';
 import { Modal } from 'app/lib/definitions/gcode_virtualization';
 import { Feeder, Sender } from 'app/lib/definitions/sender_feeder';
-import { Spindle } from 'app/features/Spindle/definitions';
-import { BasicPosition } from 'app/definitions/general';
+import { in2mm, mm2in } from 'app/lib/units';
+import store from 'app/store';
+import _get from 'lodash/get';
 
 import {
     ControllerSettings,

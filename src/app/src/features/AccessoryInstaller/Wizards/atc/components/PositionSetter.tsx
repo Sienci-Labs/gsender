@@ -1,5 +1,5 @@
-import { useState, useEffect, ReactNode } from 'react';
 import { MapPin } from 'lucide-react';
+import { ReactNode, useEffect, useState } from 'react';
 
 interface PositionSetterProps {
     xPosition: string;

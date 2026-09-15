@@ -1,15 +1,15 @@
-import { StepProps } from 'app/features/AccessoryInstaller/types';
-import { StepActionButton } from 'app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx';
-import { PositionSetter } from 'app/features/AccessoryInstaller/Wizards/atc/components/PositionSetter.tsx';
-import { useSelector } from 'react-redux';
-import { RootState } from 'app/store/redux';
-import { useEffect, useRef, useState } from 'react';
-import store from 'app/store';
-import controller from 'app/lib/controller.ts';
-import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-import { mapPositionToUnits, in2mm } from 'app/lib/units.ts';
 import { IMPERIAL_UNITS } from 'app/constants';
+import { StepActionButton } from 'app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx';
+import { StepProps } from 'app/features/AccessoryInstaller/types';
+import { PositionSetter } from 'app/features/AccessoryInstaller/Wizards/atc/components/PositionSetter.tsx';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import controller from 'app/lib/controller.ts';
+import { in2mm, mapPositionToUnits } from 'app/lib/units.ts';
+import store from 'app/store';
+import { RootState } from 'app/store/redux';
 import pubsub from 'pubsub-js';
+import { useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 type Position = { x?: number; y?: number; z?: number };
 
@@ -30,7 +30,13 @@ export function TLSLocation({ onComplete, onUncomplete }: StepProps) {
 
     useEffect(() => {
         if (isManuallyEditing.current) return;
-        if (!mpos || mpos.x === undefined || mpos.y === undefined || mpos.z === undefined) return;
+        if (
+            !mpos ||
+            mpos.x === undefined ||
+            mpos.y === undefined ||
+            mpos.z === undefined
+        )
+            return;
 
         if (isComplete && !mposEquals(mpos, lastSetMposRef.current)) {
             setIsComplete(false);
@@ -71,15 +77,16 @@ export function TLSLocation({ onComplete, onUncomplete }: StepProps) {
     return (
         <div className="flex flex-col gap-5 justify-start">
             <p className="dark:text-white">
-                Install the tallest bit you own in your spindle or router.
-                Jog until it's positioned just above (10-20mm) the Tool Length Sensor,
-                then set the position using the <b>"Set Position"</b> button.
+                Install the tallest bit you own in your spindle or router. Jog
+                until it's positioned just above (10-20mm) the Tool Length
+                Sensor, then set the position using the <b>"Set Position"</b>{' '}
+                button.
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-300">
                 Using your tallest tool gives the most Z-axis clearance above
-                the sensor, so its measured position ends up negative — this
-                is what lets gSender accurately probe tools of any length
-                during a tool change without running out of travel.
+                the sensor, so its measured position ends up negative — this is
+                what lets gSender accurately probe tools of any length during a
+                tool change without running out of travel.
             </p>
             <PositionSetter
                 showZ={true}

@@ -21,10 +21,10 @@
  *
  */
 
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
 import i18n from 'app/lib/i18n';
 import posthog from 'posthog-js';
+import PropTypes from 'prop-types';
+import React, { PureComponent } from 'react';
 
 import styles from './index.module.styl';
 
@@ -44,11 +44,11 @@ class CameraDisplay extends PureComponent {
 
         const handleChangeCameraView = (view) => {
             const cameraView = {
-                "Top": () => camera.toTopView(),
-                "Left": () => camera.toLeftSideView(),
-                "Front": () => camera.toFrontView(),
-                "3D": () => camera.to3DView(),
-                "Right": () => camera.toRightSideView(),
+                Top: () => camera.toTopView(),
+                Left: () => camera.toLeftSideView(),
+                Front: () => camera.toFrontView(),
+                '3D': () => camera.to3DView(),
+                Right: () => camera.toRightSideView(),
             };
             cameraView[view]();
             posthog?.capture('camera_view_changed', { view });

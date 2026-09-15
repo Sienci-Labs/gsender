@@ -1,4 +1,4 @@
-import { UNITS_EN, BasicType } from 'app/definitions/general';
+import { BasicType, UNITS_EN } from 'app/definitions/general';
 import { AXES_T } from 'app/features/Axes/definitions';
 
 // Types

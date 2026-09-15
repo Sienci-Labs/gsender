@@ -1,23 +1,22 @@
-import { RiParkingFill } from 'react-icons/ri';
+import { usePostHog } from '@posthog/react';
 
 import Button from 'app/components/Button';
-import store from 'app/store';
-import controller from 'app/lib/controller.ts';
+import Tooltip from 'app/components/Tooltip';
 import {
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
     LOCATION_CATEGORY,
     WORKFLOW_STATE_RUNNING,
 } from 'app/constants';
-import useKeybinding from 'app/lib/useKeybinding';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
-import { useEffect, useRef } from 'react';
-import Tooltip from 'app/components/Tooltip';
+import controller from 'app/lib/controller.ts';
+import useKeybinding from 'app/lib/useKeybinding';
+import store from 'app/store';
+import reduxStore, { RootState } from 'app/store/redux';
 import { get, includes } from 'lodash';
-import reduxStore from 'app/store/redux';
+import { useEffect, useRef } from 'react';
+import { RiParkingFill } from 'react-icons/ri';
 import { useSelector } from 'react-redux';
-import { RootState } from 'app/store/redux';
-import { usePostHog } from '@posthog/react';
 
 function goToParkLocation() {
     const park = store.get('workspace.park', {});

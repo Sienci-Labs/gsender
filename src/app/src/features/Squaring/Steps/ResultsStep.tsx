@@ -1,29 +1,27 @@
-import { useState } from 'react';
-
-import { store as reduxStore } from 'app/store/redux';
 import Button from 'app/components/Button';
-import controller from 'app/lib/controller';
 import {
     AlertDialog,
     AlertDialogAction,
     AlertDialogCancel,
-    AlertDialogFooter,
-    AlertDialogTitle,
-    AlertDialogHeader,
     AlertDialogContent,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
     AlertDialogTrigger,
 } from 'app/components/shadcn/AlertDialog';
-
+import { METRIC_UNITS } from 'app/constants';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import controller from 'app/lib/controller';
+import { toast } from 'app/lib/toaster';
+import store from 'app/store';
+import { store as reduxStore } from 'app/store/redux';
+import { useState } from 'react';
 import { useSquaring } from '../context/SquaringContext';
 import {
-    calculateHypotenuse,
     calculateAngle,
+    calculateHypotenuse,
     determineEEPROMAdjustment,
 } from '../utils';
-import { toast } from 'app/lib/toaster';
-import { METRIC_UNITS } from 'app/constants';
-import store from 'app/store';
-import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 
 const FM_LOWER_OFFSET_THRESHOLD =
     store.get('workspace.units', METRIC_UNITS) === METRIC_UNITS ? 2 : 0.079;

@@ -1,12 +1,12 @@
-import { ExternalLink, QrCode } from 'lucide-react';
-import type { ComponentType } from 'react';
-import QRCodeComponent from 'react-qr-code';
-import { SecondaryContent } from '../../types/wizard';
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from 'app/components/shadcn/Popover';
+import { ExternalLink, QrCode } from 'lucide-react';
+import type { ComponentType } from 'react';
+import QRCodeComponent from 'react-qr-code';
+import { SecondaryContent } from '../../types/wizard';
 
 interface SecondaryContentPanelProps {
     content: SecondaryContent[];
@@ -136,7 +136,7 @@ export function SecondaryContentPanel({ content }: SecondaryContentPanelProps) {
                                         </a>
                                     </>
                                 ) : (
-                                    linkItem.content as string
+                                    (linkItem.content as string)
                                 )}
                             </span>
                             {linkItem.url && (

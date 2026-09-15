@@ -21,32 +21,32 @@
  *
  */
 
+import * as Sentry from '@sentry/electron/main';
+import chalk from 'chalk';
 import {
     app,
-    ipcMain,
+    clipboard,
     dialog,
-    powerSaveBlocker,
+    ipcMain,
     powerMonitor,
+    powerSaveBlocker,
     screen,
     session,
-    clipboard,
 } from 'electron';
-import { autoUpdater } from 'electron-updater';
-import Store from 'electron-store';
-import chalk from 'chalk';
-import mkdirp from 'mkdirp';
-import isOnline from 'is-online';
 import log from 'electron-log';
-import path from 'path';
+import Store from 'electron-store';
+import { autoUpdater } from 'electron-updater';
 import fs from 'fs';
-import * as Sentry from '@sentry/electron/main';
+import isOnline from 'is-online';
+import mkdirp from 'mkdirp';
+import path from 'path';
 import WinReg from 'winreg';
-import WindowManager from './electron-app/WindowManager';
-import launchServer from './server-cli';
-import pkg from './package.json';
-import { parseAndReturnGCode } from './electron-app/RecentFiles';
 import { asyncCallWithTimeout } from './electron-app/AsyncTimeout';
 import { getGRBLLog } from './electron-app/grblLogs';
+import { parseAndReturnGCode } from './electron-app/RecentFiles';
+import WindowManager from './electron-app/WindowManager';
+import pkg from './package.json';
+import launchServer from './server-cli';
 
 // Hot reload in development
 if (process.env.NODE_ENV === 'development') {
@@ -54,11 +54,7 @@ if (process.env.NODE_ENV === 'development') {
         require('electron-reloader')(module, {
             debug: false,
             watchRenderer: false, // Vite handles frontend
-            ignore: [
-                /node_modules/,
-                /output\/app/,
-                /\.map$/,
-            ],
+            ignore: [/node_modules/, /output\/app/, /\.map$/],
         });
     } catch (err) {
         // electron-reloader not available, continue without it
@@ -70,9 +66,10 @@ let hostInformation = {};
 let grblLog = log.create('grbl');
 let logPath;
 let powerBlockerNum = 0;
-const externalRendererUrl = process.env.NODE_ENV === 'development'
-    ? process.env.ELECTRON_RENDERER_URL
-    : '';
+const externalRendererUrl =
+    process.env.NODE_ENV === 'development'
+        ? process.env.ELECTRON_RENDERER_URL
+        : '';
 
 if (process.env.NODE_ENV === 'production') {
     Sentry.init({
@@ -99,7 +96,7 @@ const main = () => {
     }
 
     app.on('second-instance', (event, commandLine, workingDirectory) => {
-    // Someone tried to run a second instance, we should focus our window.
+        // Someone tried to run a second instance, we should focus our window.
         if (!windowManager) {
             return;
         }
@@ -110,8 +107,8 @@ const main = () => {
                 window.restore();
             }
             window.focus();
-            const filePath = commandLine.find(arg =>
-                /\.(gcode|gc|nc|tap|cnc)$/i.test(arg)
+            const filePath = commandLine.find((arg) =>
+                /\.(gcode|gc|nc|tap|cnc)$/i.test(arg),
             );
             if (filePath) {
                 loadFileAssociation(filePath, window);
@@ -199,14 +196,17 @@ const main = () => {
                     const parsedUrl = new URL(url);
                     hostInformation = {
                         address: parsedUrl.hostname,
-                        port: Number(parsedUrl.port) || (parsedUrl.protocol === 'https:' ? 443 : 80),
+                        port:
+                            Number(parsedUrl.port) ||
+                            (parsedUrl.protocol === 'https:' ? 443 : 80),
                     };
                 } catch (error) {
                     hostInformation = {};
                 }
                 log.info(`Using external renderer URL in development: ${url}`);
             } else if (process.env.NODE_ENV === 'development') {
-                const errorMessage = 'ELECTRON_RENDERER_URL is required in development mode';
+                const errorMessage =
+                    'ELECTRON_RENDERER_URL is required in development mode';
                 log.error(errorMessage);
                 await dialog.showMessageBox({
                     type: 'error',
@@ -220,21 +220,28 @@ const main = () => {
                 try {
                     res = await launchServer();
                 } catch (error) {
-                    const isBindingError = error.errData?.bindingErr ||
-                        /EADDR|address not available|address already in use/i.test(error.message);
+                    const isBindingError =
+                        error.errData?.bindingErr ||
+                        /EADDR|address not available|address already in use/i.test(
+                            error.message,
+                        );
 
                     if (isBindingError) {
-                        log.warn('Remote mode binding failed — remote config has been reset.');
+                        log.warn(
+                            'Remote mode binding failed — remote config has been reset.',
+                        );
                         dialog.showMessageBoxSync(null, {
                             title: 'Remote Mode Configuration Error',
-                            message: 'gSender could not connect to the configured remote address.',
+                            message:
+                                'gSender could not connect to the configured remote address.',
                             detail: 'Remote mode has been disabled and the configuration has been reset. Please restart gSender.',
                         });
                     } else {
                         log.error('Unexpected server startup error:', error);
                         dialog.showMessageBoxSync(null, {
                             title: 'Server Startup Error',
-                            message: 'gSender encountered an unexpected error while starting.',
+                            message:
+                                'gSender encountered an unexpected error while starting.',
                             detail: String(error.message),
                         });
                     }
@@ -246,10 +253,13 @@ const main = () => {
                 kiosk = resolvedKiosk;
 
                 if (res.configRestored) {
-                    log.warn(`Corrupt settings file recovered — backup at ${res.configBackupPath}`);
+                    log.warn(
+                        `Corrupt settings file recovered — backup at ${res.configBackupPath}`,
+                    );
                     dialog.showMessageBoxSync(null, {
                         title: 'Settings File Recovered',
-                        message: 'Your gSender settings file was corrupted and has been reset to defaults.',
+                        message:
+                            'Your gSender settings file was corrupted and has been reset to defaults.',
                         detail: `A backup of the corrupted file was saved to:\n${res.configBackupPath}`,
                     });
                 }
@@ -262,7 +272,7 @@ const main = () => {
                 if (!(address && port)) {
                     log.error(
                         'Unable to start the server at ' +
-                chalk.cyan(`http://${address}:${port}`),
+                            chalk.cyan(`http://${address}:${port}`),
                     );
                     return;
                 }
@@ -285,18 +295,24 @@ const main = () => {
                 title: `gSender ${pkg.version}`,
                 kiosk,
             };
-            const window = await windowManager.openWindow(url, options, splashScreen);
+            const window = await windowManager.openWindow(
+                url,
+                options,
+                splashScreen,
+            );
 
-            window.on("ready-to-show", () => {
-                const savedScaleFactor = Number(store.get("displayScaleFactor", 1.0));
+            window.on('ready-to-show', () => {
+                const savedScaleFactor = Number(
+                    store.get('displayScaleFactor', 1.0),
+                );
 
                 window.webContents.setZoomFactor(savedScaleFactor);
             });
 
             // Check argv for file path on Windows/Linux cold start
             if (process.platform !== 'darwin') {
-                const filePath = process.argv.find(arg =>
-                    /\.(gcode|gc|nc|tap|cnc)$/i.test(arg)
+                const filePath = process.argv.find((arg) =>
+                    /\.(gcode|gc|nc|tap|cnc)$/i.test(arg),
                 );
                 if (filePath) {
                     pendingFileToOpen = filePath;
@@ -314,14 +330,16 @@ const main = () => {
             ipcMain.on('change-power-saving', (_msg, enabled) => {
                 if (!enabled) {
                     // Power saver - display sleep higher precedence over app suspension
-                    powerBlockerNum = powerSaveBlocker.start('prevent-display-sleep');
+                    powerBlockerNum = powerSaveBlocker.start(
+                        'prevent-display-sleep',
+                    );
                     powerMonitor.on('lock-screen', () => {
                         powerSaveBlocker.start('prevent-display-sleep');
                     }),
-                    powerMonitor.on('suspend', () => {
-                        powerSaveBlocker.start('prevent-app-suspension');
-                        log.info('Prevented suspension');
-                    })
+                        powerMonitor.on('suspend', () => {
+                            powerSaveBlocker.start('prevent-app-suspension');
+                            log.info('Prevented suspension');
+                        });
                 } else {
                     if (powerSaveBlocker.isStarted(powerBlockerNum)) {
                         powerSaveBlocker.stop(powerBlockerNum);
@@ -347,11 +365,14 @@ const main = () => {
 
                 autoUpdater.on('error', (err) => {
                     window.webContents.send('updated_error', err);
-                    log.error((err));
+                    log.error(err);
                 });
 
                 autoUpdater.on('download-progress', (info) => {
-                    window.webContents.send('update_download_progress', info.percent);
+                    window.webContents.send(
+                        'update_download_progress',
+                        info.percent,
+                    );
                 });
 
                 ipcMain.once('restart_app', async () => {
@@ -381,19 +402,19 @@ const main = () => {
                 if (error.type.includes('GRBL_HAL')) {
                     error.type === 'GRBL_HAL_ERROR'
                         ? grblLog.error(
-                            `GRBL_HAL_ERROR:Error ${error.code} - ${error.description} Line ${error.lineNumber}: "${error.line.trim()}" Origin- ${error.origin.trim()}`,
-                        )
+                              `GRBL_HAL_ERROR:Error ${error.code} - ${error.description} Line ${error.lineNumber}: "${error.line.trim()}" Origin- ${error.origin.trim()}`,
+                          )
                         : grblLog.error(
-                            `GRBL_HAL_ALARM:Alarm ${error.code} - ${error.description}`,
-                        );
+                              `GRBL_HAL_ALARM:Alarm ${error.code} - ${error.description}`,
+                          );
                 } else {
                     error.type === 'GRBL_ERROR'
                         ? grblLog.error(
-                            `GRBL_ERROR:Error ${error.code} - ${error.description} Line ${error.lineNumber}: "${error.line.trim()}" Origin- ${error.origin.trim()}`,
-                        )
+                              `GRBL_ERROR:Error ${error.code} - ${error.description} Line ${error.lineNumber}: "${error.line.trim()}" Origin- ${error.origin.trim()}`,
+                          )
                         : grblLog.error(
-                            `GRBL_ALARM:Alarm ${error.code} - ${error.description}`,
-                        );
+                              `GRBL_ALARM:Alarm ${error.code} - ${error.description}`,
+                          );
                 }
             });
 
@@ -428,15 +449,17 @@ const main = () => {
                         key: '\\Software\\SienciLabs\\gSender',
                     });
 
-                    const isBundledValue = await new Promise((resolve, reject) => {
-                        registry.get('IsBundled', (err, item) => {
-                            if (err) {
-                                reject(err);
-                                return;
-                            }
-                            resolve(item.value);
-                        });
-                    });
+                    const isBundledValue = await new Promise(
+                        (resolve, reject) => {
+                            registry.get('IsBundled', (err, item) => {
+                                if (err) {
+                                    reject(err);
+                                    return;
+                                }
+                                resolve(item.value);
+                            });
+                        },
+                    );
 
                     const isBundled = isBundledValue === '0x1';
 
@@ -448,8 +471,8 @@ const main = () => {
             });
 
             /**
-            * gSender config events - move electron store changes out of renderer process
-            */
+             * gSender config events - move electron store changes out of renderer process
+             */
             ipcMain.on('open-upload-dialog', async () => {
                 try {
                     let additionalOptions = {};
@@ -482,7 +505,8 @@ const main = () => {
                         return [dir, base];
                     };
 
-                    const [filePath, fileName] = getFileInformation(FULL_FILE_PATH);
+                    const [filePath, fileName] =
+                        getFileInformation(FULL_FILE_PATH);
 
                     prevDirectory = filePath; // set previous directory
 
@@ -533,10 +557,14 @@ const main = () => {
             ipcMain.on('reconnect-main', (event, options) => {
                 let shouldReconnect = false;
                 try {
-                    if (event && event.sender && event.sender.browserWindowOptions) {
+                    if (
+                        event &&
+                        event.sender &&
+                        event.sender.browserWindowOptions
+                    ) {
                         shouldReconnect =
-              !event.sender.browserWindowOptions.parent &&
-              windowManager.childWindows.length > 0;
+                            !event.sender.browserWindowOptions.parent &&
+                            windowManager.childWindows.length > 0;
                     }
                 } catch (err) {
                     log.error(err);
@@ -559,10 +587,10 @@ const main = () => {
                 });
             });
 
-            ipcMain.on("save-display-scale", (_event, scaleFactor) => {
+            ipcMain.on('save-display-scale', (_event, scaleFactor) => {
                 const value = Number(scaleFactor) || 1.0;
 
-                store.set("displayScaleFactor", value);
+                store.set('displayScaleFactor', value);
                 window.webContents.setZoomFactor(value);
             });
 

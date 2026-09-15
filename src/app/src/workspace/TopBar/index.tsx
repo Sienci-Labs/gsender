@@ -1,11 +1,11 @@
-import Connection from 'app/features/Connection';
 import SpindleLaserStatus from 'app/components/SpindleLaserStatus';
-import StatusIcons from 'app/features/StatusIcons';
-import { RemoteMenuFlyout } from 'app/features/RemoteMode/components/RemoteMenuFlyout.tsx';
-import CenterArea from './CenterArea';
+import Connection from 'app/features/Connection';
 import { IconUpdater } from 'app/features/IconUpdater';
-import { useEffect } from 'react';
+import { RemoteMenuFlyout } from 'app/features/RemoteMode/components/RemoteMenuFlyout.tsx';
+import StatusIcons from 'app/features/StatusIcons';
 import store from 'app/store';
+import { useEffect } from 'react';
+import CenterArea from './CenterArea';
 
 interface Props {
     isRemoteWindow?: boolean;

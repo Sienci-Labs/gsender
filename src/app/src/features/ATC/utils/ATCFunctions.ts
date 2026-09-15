@@ -1,17 +1,17 @@
-import { toast } from 'app/lib/toaster';
-import store from 'app/store';
-import reduxStore from 'app/store/redux';
-import get from 'lodash/get';
-import controller from 'app/lib/controller.ts';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 import {
     IToolListing,
     ToolInstance,
 } from 'app/features/ATC/components/ToolTable.tsx';
 import { ToolFlags } from 'app/features/ATC/types.ts';
-import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
-import * as THREE from 'three';
 import { TOOLPATH_COLOR_HEXES } from 'app/features/Visualizer/constants';
+import controller from 'app/lib/controller.ts';
+import { toast } from 'app/lib/toaster';
+import store from 'app/store';
+import reduxStore from 'app/store/redux';
+import get from 'lodash/get';
 import pubsub from 'pubsub-js';
+import * as THREE from 'three';
 
 export function unimplemented() {
     toast.info('Unimplemented :(');
@@ -129,7 +129,6 @@ export function loadTool(toolID) {
 export function loadAndSaveToRack(toolID) {
     controller.command('gcode', [`G65 P901 Q${toolID}`, '$#']);
 }
-
 
 export type LoadToolMode = 'load' | 'manual' | 'unload' | 'loadAndSave';
 

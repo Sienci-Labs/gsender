@@ -1,9 +1,9 @@
 import { Switch } from 'app/components/shadcn/Switch';
-import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-import { WORKSPACE_MODE } from 'app/constants';
-import { updateWorkspaceMode } from 'app/lib/rotary';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import Tooltip from 'app/components/Tooltip';
+import { WORKSPACE_MODE } from 'app/constants';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { updateWorkspaceMode } from 'app/lib/rotary';
 import { usePostHog } from 'posthog-js/react';
 
 const Toggle = () => {

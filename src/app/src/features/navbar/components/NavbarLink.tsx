@@ -1,7 +1,7 @@
-import { NavLink } from 'react-router';
 import cn from 'classnames';
-import { IconType } from 'react-icons';
 import { noop } from 'lodash';
+import { IconType } from 'react-icons';
+import { NavLink } from 'react-router';
 
 interface NavbarLinkProps {
     href: string;

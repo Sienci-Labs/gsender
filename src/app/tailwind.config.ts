@@ -2,7 +2,12 @@ import type { Config } from 'tailwindcss';
 import defaultTheme from 'tailwindcss/defaultTheme';
 
 const { screens } = defaultTheme;
-const screensWithoutXl = { sm: screens.sm, md: screens.md, lg: screens.lg, '2xl': screens['2xl'] };
+const screensWithoutXl = {
+    sm: screens.sm,
+    md: screens.md,
+    lg: screens.lg,
+    '2xl': screens['2xl'],
+};
 
 function customScreenVariants({
     addVariant,
@@ -10,7 +15,10 @@ function customScreenVariants({
     addVariant: (name: string, value: string | string[]) => void;
 }) {
     addVariant('xl', '@media (min-width: 1280px) { & }');
-    addVariant('max-xl', '@media (max-width: 1280px), (max-height: 880px) { & }');
+    addVariant(
+        'max-xl',
+        '@media (max-width: 1280px), (max-height: 880px) { & }',
+    );
     addVariant('short', '@media (max-height: 820px) { & }');
 }
 

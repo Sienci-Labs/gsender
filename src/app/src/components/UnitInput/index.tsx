@@ -1,7 +1,7 @@
-import cx from 'classnames';
+import { ControlledInput } from 'app/components/ControlledInput';
 
 import { Label } from 'app/components/Label';
-import { ControlledInput } from 'app/components/ControlledInput';
+import cx from 'classnames';
 
 export interface UnitInputProps {
     units: string;

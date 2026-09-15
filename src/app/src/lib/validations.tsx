@@ -119,4 +119,4 @@ const password = (
     return null;
 };
 
-export { required, password };
+export { password, required };

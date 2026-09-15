@@ -21,34 +21,35 @@
  *
  */
 
-import {
-    useState,
-    useEffect,
-    KeyboardEvent,
-    useCallback,
-    useRef,
-    useMemo,
-} from 'react';
-import cx from 'classnames';
-import { X, Plus, ChevronDown } from 'lucide-react';
-
-import {
-    TOUCHPLATE_TYPE_AUTOZERO,
-    TOUCHPLATE_TYPE_BITZERO,
-    PROBE_TYPE_AUTO,
-    PROBE_TYPE_TIP,
-    PROBE_TYPE_DIAMETER,
-} from 'app/lib/constants';
-import { UNITS_EN } from 'app/definitions/general';
+import { Button } from 'app/components/Button';
+import { Input } from 'app/components/shadcn/Input';
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from 'app/components/shadcn/Popover';
-
-import { Input } from 'app/components/shadcn/Input';
-import { Button } from 'app/components/Button';
-
+import Tooltip from 'app/components/Tooltip';
+import { UNITS_EN } from 'app/definitions/general';
+import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import {
+    PROBE_TYPE_AUTO,
+    PROBE_TYPE_DIAMETER,
+    PROBE_TYPE_TIP,
+    TOUCHPLATE_TYPE_AUTOZERO,
+    TOUCHPLATE_TYPE_BITZERO,
+} from 'app/lib/constants';
+import useKeybinding from 'app/lib/useKeybinding';
+import store from 'app/store';
+import cx from 'classnames';
+import { ChevronDown, Plus, X } from 'lucide-react';
+import {
+    KeyboardEvent,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 import {
     IMPERIAL_UNITS,
     METRIC_UNITS,
@@ -61,10 +62,6 @@ import {
     ProbeCommand,
     State,
 } from './definitions';
-import useShuttleEvents from 'app/hooks/useShuttleEvents';
-import useKeybinding from 'app/lib/useKeybinding';
-import store from 'app/store';
-import Tooltip from 'app/components/Tooltip';
 
 type Props = {
     actions: Actions;
@@ -130,7 +127,10 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
         const baseOptions: Option[] = [];
         const toolsObjects = convertAvailableTools(availableTools, units);
 
-        if (touchplateType === TOUCHPLATE_TYPE_AUTOZERO || touchplateType === TOUCHPLATE_TYPE_BITZERO) {
+        if (
+            touchplateType === TOUCHPLATE_TYPE_AUTOZERO ||
+            touchplateType === TOUCHPLATE_TYPE_BITZERO
+        ) {
             baseOptions.push(
                 { value: PROBE_TYPE_AUTO, label: PROBE_TYPE_AUTO, tool: null },
                 { value: PROBE_TYPE_TIP, label: PROBE_TYPE_TIP, tool: null },

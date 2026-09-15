@@ -1,5 +1,5 @@
-import { useState, useEffect, Fragment } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Fragment, useEffect, useState } from 'react';
 import { SubWizard } from '../../types/wizard';
 import { ProgressBar } from './ProgressBar';
 import { SecondaryContentPanel } from './SecondaryContentPanel';
@@ -35,12 +35,10 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
     useEffect(() => {
         if (!currentStep.autoComplete?.()) return;
 
-        const newCompletedSteps = new Set(completedSteps).add(
-            currentStepIndex,
-        );
+        const newCompletedSteps = new Set(completedSteps).add(currentStepIndex);
         setCompletedSteps(newCompletedSteps);
         if (currentStepIndex < subWizard.steps.length - 1) {
-            setCurrentStepIndex(prev => prev + 1);
+            setCurrentStepIndex((prev) => prev + 1);
         } else if (
             newCompletedSteps.size === subWizard.steps.length &&
             subWizard.completionPage
@@ -58,7 +56,10 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
     const handlePrevious = () => {
         if (!isFirstStep) {
             let prevIndex = currentStepIndex - 1;
-            while (prevIndex > 0 && subWizard.steps[prevIndex].autoComplete?.()) {
+            while (
+                prevIndex > 0 &&
+                subWizard.steps[prevIndex].autoComplete?.()
+            ) {
                 prevIndex--;
             }
             setCurrentStepIndex(prevIndex);

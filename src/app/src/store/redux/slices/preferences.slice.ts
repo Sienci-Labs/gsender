@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-import store from 'app/store';
 import { CommandKeys } from 'app/lib/definitions/shortcuts';
+import store from 'app/store';
 import { Notification } from 'app/workspace/definitions';
 
 import { PreferencesState } from '../../definitions';

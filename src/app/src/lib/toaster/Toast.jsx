@@ -21,15 +21,16 @@
  *
  */
 
-import React from 'react';
 import cx from 'classnames';
-import styles from './toaster.styl';
+import React from 'react';
 import {
     TOASTER_DANGER,
     TOASTER_INFO,
     TOASTER_SUCCESS,
     /*TOASTER_UNTIL_CLOSE,*/ TOASTER_WARNING,
 } from './ToasterLib';
+import styles from './toaster.styl';
+
 //import ToastTimer from './ToastTimer';
 
 const Toast = ({

@@ -1,5 +1,5 @@
-import { IoReorderThreeOutline } from 'react-icons/io5';
 import cx from 'classnames';
+import { IoReorderThreeOutline } from 'react-icons/io5';
 
 interface MinimizeHandleProps {
     onClick?: () => void;

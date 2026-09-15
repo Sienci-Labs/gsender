@@ -21,14 +21,14 @@
  *
  */
 
-import { Slider } from 'app/components/shadcn/Slider';
-import { Input } from 'app/components/shadcn/Input';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import { FaBan, FaRedoAlt, FaUndoAlt } from 'react-icons/fa';
 import { ActiveStateButton } from 'app/components/ActiveStateButton';
+import { Input } from 'app/components/shadcn/Input';
+import { Slider } from 'app/components/shadcn/Slider';
 import Tooltip from 'app/components/Tooltip';
-import { useState, useEffect } from 'react';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import store from 'app/store';
+import { useEffect, useState } from 'react';
+import { FaBan, FaRedoAlt, FaUndoAlt } from 'react-icons/fa';
 
 type Props = {
     actions: {

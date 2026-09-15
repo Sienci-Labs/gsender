@@ -1,8 +1,9 @@
-import { useContext } from 'react';
 import { Job, StatContext } from 'app/features/Stats/utils/StatContext.tsx';
+import { ArcElement, Chart as ChartJS, Legend, Tooltip } from 'chart.js';
+import { useContext } from 'react';
 import { Pie } from 'react-chartjs-2';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { FaChartPie } from 'react-icons/fa';
+
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 export function EmptyDataPlaceholder() {

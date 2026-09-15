@@ -21,11 +21,11 @@
  *
  */
 
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import classnames from 'classnames';
 import get from 'lodash/get';
 import pubsub from 'pubsub-js';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
 
 /**
  * Control Area component displaying Soft Limits Warning

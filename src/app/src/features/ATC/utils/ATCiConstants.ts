@@ -24,9 +24,9 @@ export interface ToolStateThemes {
     error: ToolStateTheme;
 }
 
-import { FaCheckCircle, FaExclamationCircle, FaBan } from 'react-icons/fa';
-import { PiEmpty, PiHandTap } from 'react-icons/pi';
+import { FaBan, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
 import { IoFlash } from 'react-icons/io5';
+import { PiEmpty, PiHandTap } from 'react-icons/pi';
 
 export const toolStateThemes: ToolStateThemes = {
     // Primary States

@@ -22,9 +22,9 @@
  */
 
 import React from 'react';
-import styles from './loader.module.styl';
 import bitImage from './images/dustbit11.png';
 import bitEffect from './images/effect.png';
+import styles from './loader.module.styl';
 
 const LoadingAnimation = () => {
     return (

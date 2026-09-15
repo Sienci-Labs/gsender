@@ -1,6 +1,6 @@
+import cn from 'classnames';
 import { FaCheckCircle } from 'react-icons/fa';
 import { FaCircleXmark } from 'react-icons/fa6';
-import cn from 'classnames';
 import { tv } from 'tailwind-variants';
 import { JOB_STATUS_T } from '../utils/StatContext';
 

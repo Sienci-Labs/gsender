@@ -1,6 +1,6 @@
 import { Button } from 'app/components/Button/';
-import { Settings } from 'lucide-react';
 import cn from 'classnames';
+import { Settings } from 'lucide-react';
 
 export const ProbeButton = ({
     onProbe,

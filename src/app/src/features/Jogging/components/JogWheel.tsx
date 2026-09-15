@@ -1,21 +1,21 @@
-import { useLongPress } from 'use-long-press';
-import cn from 'classnames';
+import { usePostHog } from '@posthog/react';
+import { WORKSPACE_MODE } from 'app/constants';
 
 import {
-    stopContinuousJog,
-    xPlusJog,
-    yPlusJog,
-    xMinusJog,
-    yMinusJog,
     continuousJogAxis,
-    xPlusYMinus,
-    xPlusYPlus,
+    stopContinuousJog,
+    xMinusJog,
     xMinusYMinus,
     xMinusYPlus,
+    xPlusJog,
+    xPlusYMinus,
+    xPlusYPlus,
+    yMinusJog,
+    yPlusJog,
 } from 'app/features/Jogging/utils/Jogging.ts';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-import { WORKSPACE_MODE } from 'app/constants';
-import { usePostHog } from '@posthog/react';
+import cn from 'classnames';
+import { useLongPress } from 'use-long-press';
 
 export interface JogWheelProps {
     canClick?: boolean;

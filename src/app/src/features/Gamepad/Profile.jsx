@@ -1,24 +1,21 @@
-import React, { useState, useContext, useEffect } from 'react';
-import PropTypes from 'prop-types';
-
-import store from 'app/store';
+import { Button } from 'app/components/Button';
 import GamepadManager from 'app/lib/gamepad';
 import { toast } from 'app/lib/toaster';
-import { Button } from 'app/components/Button';
-
-import { GamepadContext } from './utils/context';
+import store from 'app/store';
+import { ArrowLeft, DownloadIcon, UploadIcon } from 'lucide-react';
+import PropTypes from 'prop-types';
+import React, { useContext, useEffect, useState } from 'react';
+import ButtonActionsTable from './components/ButtonActionsTable';
+import JoystickOptions from './JoystickOptions';
+import { arrayComparator } from './utils';
 import {
     setCurrentGamepadProfile,
-    setGamepadProfileList,
     setCurrentModal,
+    setGamepadProfileList,
     setMacros,
 } from './utils/actions';
-
-import ButtonActionsTable from './components/ButtonActionsTable';
-import { arrayComparator } from './utils';
-import JoystickOptions from './JoystickOptions';
 import { GAMEPAD_MODAL } from './utils/constants';
-import { ArrowLeft, DownloadIcon, UploadIcon } from 'lucide-react';
+import { GamepadContext } from './utils/context';
 
 const Profile = ({ data }) => {
     const { dispatch } = useContext(GamepadContext);

@@ -33,14 +33,16 @@ export const asyncCallWithTimeout = async (asyncPromise, timeLimit) => {
     const timeoutPromise = new Promise((_resolve, reject) => {
         timeoutHandle = setTimeout(
             () => reject(new Error('Async call timeout limit reached')),
-            timeLimit
+            timeLimit,
         );
     });
 
-    return Promise.race([asyncPromise, timeoutPromise]).then(result => {
-        clearTimeout(timeoutHandle);
-        return result;
-    }).catch(e => {
-        console.log(e);
-    });
+    return Promise.race([asyncPromise, timeoutPromise])
+        .then((result) => {
+            clearTimeout(timeoutHandle);
+            return result;
+        })
+        .catch((e) => {
+            console.log(e);
+        });
 };

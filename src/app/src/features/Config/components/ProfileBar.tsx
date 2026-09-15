@@ -1,23 +1,26 @@
-import { PiLightning } from 'react-icons/pi';
-import { PiUploadSimpleBold, PiDownloadSimpleBold } from 'react-icons/pi';
+import { EEPROM, EEPROMSettings } from 'app/definitions/firmware';
+import { ActionButton } from 'app/features/Config/components/ActionButton.tsx';
+import { FlashDialog } from 'app/features/Config/components/FlashDialog.tsx';
 import { MachineProfileSelector } from 'app/features/Config/components/MachineProfileSelector.tsx';
-import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
+import { RestoreDefaultDialog } from 'app/features/Config/components/RestoreDefaultDialog.tsx';
+import { importFirmwareSettings } from 'app/features/Config/utils/EEPROM.ts';
 import {
     exportFirmwareSettings,
     updateAllSettings,
 } from 'app/features/Config/utils/Settings';
-import { importFirmwareSettings } from 'app/features/Config/utils/EEPROM.ts';
-import { useRef, useState } from 'react';
+import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
+import controller from 'app/lib/controller.ts';
 import { toast } from 'app/lib/toaster';
 import { RootState } from 'app/store/redux';
-import { useSelector } from 'react-redux';
 import cn from 'classnames';
-import { ActionButton } from 'app/features/Config/components/ActionButton.tsx';
-import { FlashDialog } from 'app/features/Config/components/FlashDialog.tsx';
-import { RestoreDefaultDialog } from 'app/features/Config/components/RestoreDefaultDialog.tsx';
-import controller from 'app/lib/controller.ts';
-import { EEPROM, EEPROMSettings } from 'app/definitions/firmware';
 import cx from 'classnames';
+import { useRef, useState } from 'react';
+import {
+    PiDownloadSimpleBold,
+    PiLightning,
+    PiUploadSimpleBold,
+} from 'react-icons/pi';
+import { useSelector } from 'react-redux';
 
 export function ProfileBar() {
     const {
@@ -131,7 +134,9 @@ export function ProfileBar() {
                 </div>
 
                 <div className="grid grid-cols-4 h-full max-w-lg font-medium divide-x max-sm:divide-x-0 max-sm:hidden">
-                    <RestoreDefaultDialog canRestoreDefaults={canRestoreDefaults} />
+                    <RestoreDefaultDialog
+                        canRestoreDefaults={canRestoreDefaults}
+                    />
                     <ActionButton
                         icon={<PiLightning />}
                         label="Flash"

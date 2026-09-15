@@ -1,9 +1,8 @@
 // https://ui.shadcn.com/docs/components/scroll-area
 
-import * as React from 'react';
 import * as ScrollAreaPrimitive from '@radix-ui/react-scroll-area';
-
 import cx from 'classnames';
+import * as React from 'react';
 
 const ScrollArea = React.forwardRef<
     React.ElementRef<typeof ScrollAreaPrimitive.Root>,

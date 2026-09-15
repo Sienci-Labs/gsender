@@ -21,14 +21,13 @@
  *
  */
 
-import React from 'react';
-
-import { Slider } from 'app/components/shadcn/Slider';
-import { ControlledInput } from 'app/components/ControlledInput';
-import { FaLightbulb, FaRegLightbulb, FaSatelliteDish } from 'react-icons/fa';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { ActiveStateButton } from 'app/components/ActiveStateButton';
+import { ControlledInput } from 'app/components/ControlledInput';
+import { Slider } from 'app/components/shadcn/Slider';
 import Tooltip from 'app/components/Tooltip';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import React from 'react';
+import { FaLightbulb, FaRegLightbulb, FaSatelliteDish } from 'react-icons/fa';
 import { SendM5Type } from '../definitions';
 
 type Props = {

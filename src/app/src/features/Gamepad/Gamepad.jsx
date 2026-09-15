@@ -1,9 +1,8 @@
-import React, { useContext, useMemo, useEffect } from 'react';
-
-import { GamepadContext } from './utils/context';
+import GamepadManager from 'app/lib/gamepad';
+import React, { useContext, useEffect, useMemo } from 'react';
 import Profile from './Profile';
 import ProfileList from './ProfileList';
-import GamepadManager from 'app/lib/gamepad';
+import { GamepadContext } from './utils/context';
 
 const Gamepad = () => {
     useEffect(() => {

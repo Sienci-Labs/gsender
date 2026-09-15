@@ -1,13 +1,13 @@
-import { useEffect } from 'react';
-
-import Visualizer from 'app/features/Visualizer';
-import { useDispatch } from 'react-redux';
-import { setCurrentVisualizer } from 'app/store/redux/slices/visualizer.slice';
 import {
     SURFACING_VISUALIZER_CONTAINER_ID,
     VISUALIZER_PRIMARY,
     VISUALIZER_SECONDARY,
 } from 'app/constants';
+
+import Visualizer from 'app/features/Visualizer';
+import { setCurrentVisualizer } from 'app/store/redux/slices/visualizer.slice';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 
 type VisualizerPreviewProps = {
     gcode: string;

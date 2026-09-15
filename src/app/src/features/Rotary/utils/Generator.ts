@@ -1,7 +1,3 @@
-import get from 'lodash/get';
-
-import store from 'app/store';
-import reduxStore from 'app/store/redux';
 import {
     METRIC_UNITS,
     STOCK_TURNING_METHOD,
@@ -9,7 +5,10 @@ import {
     WORKSPACE_MODE,
 } from 'app/constants';
 import { Rotary } from 'app/features/Rotary/definitions';
+import store from 'app/store';
 import defaultState from 'app/store/defaultState';
+import reduxStore from 'app/store/redux';
+import get from 'lodash/get';
 
 type StockTurningGeneratorOptions = Rotary['stockTurning']['options'] & {
     method?: string;

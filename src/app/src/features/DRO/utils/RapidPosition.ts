@@ -1,8 +1,7 @@
-import reduxStore from 'app/store/redux';
-import prefStore from 'app/store';
-
-import get from 'lodash/get';
 import { toast } from 'app/lib/toaster';
+import prefStore from 'app/store';
+import reduxStore from 'app/store/redux';
+import get from 'lodash/get';
 
 export const FRONT_RIGHT = 'FR';
 export const FRONT_LEFT = 'FL';
@@ -64,7 +63,7 @@ const getPositionMovements = (
     if (!xLimit || !yLimit) {
         toast.error(
             "Unable to find machine limits - make sure they're set in preferences",
-            { position: 'bottom-right' }
+            { position: 'bottom-right' },
         );
         return [null, null];
     }
@@ -152,7 +151,7 @@ export const getMovementGCode = (
     if (xMovement === null || yMovement === null) {
         toast.error(
             'Unable to calculate position movements based on inputs - check arguments passed',
-            { position: 'bottom-right' }
+            { position: 'bottom-right' },
         );
         return [];
     }

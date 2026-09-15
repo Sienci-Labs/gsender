@@ -1,15 +1,23 @@
-import { useSDCard } from 'app/features/SDCard/hooks/useSDCard.ts';
-import { useState } from 'react';
+import Button from 'app/components/Button';
 import { UploadModal } from 'app/features/SDCard/components/UploadModal.tsx';
-import { HardDrive, RefreshCw, Upload } from 'lucide-react';
+import { useSDCard } from 'app/features/SDCard/hooks/useSDCard.ts';
 import {
     mountSDCard,
     refreshSDCardFiles,
 } from 'app/features/SDCard/utils/utils.ts';
-import Button from 'app/components/Button';
+import { HardDrive, RefreshCw, Upload } from 'lucide-react';
+import { useState } from 'react';
 
 export function ActionButtons() {
-    const { isMounted, isConnected, isLoading, setIsLoading, firmwareType, hasFTP, hasYM } = useSDCard();
+    const {
+        isMounted,
+        isConnected,
+        isLoading,
+        setIsLoading,
+        firmwareType,
+        hasFTP,
+        hasYM,
+    } = useSDCard();
     const [uploadModalOpen, setUploadModalOpen] = useState(false);
 
     const isGrblHAL = firmwareType === 'grblHAL';

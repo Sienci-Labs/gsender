@@ -1,8 +1,8 @@
+import { WORKFLOW_STATE_IDLE } from 'app/constants';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
-import { RootState } from 'app/store/redux';
-import {useEffect, useState} from 'react';
 import controller from 'app/lib/controller.ts';
-import {WORKFLOW_STATE_IDLE} from "app/constants";
+import { RootState } from 'app/store/redux';
+import { useEffect, useState } from 'react';
 
 export type UploadState = 'idle' | 'uploading' | 'complete' | 'error';
 
@@ -22,12 +22,14 @@ export function useSDCard() {
     );
 
     // If we have a name, we a running a SD file - convert to boolean in following useEffect
-    const sdRunReported = useTypedSelector((state: RootState) => state.controller.state.status?.SD?.name);
+    const sdRunReported = useTypedSelector(
+        (state: RootState) => state.controller.state.status?.SD?.name,
+    );
     useEffect(() => {
         if (sdRunReported !== null) {
             setIsRunningSDFile(true);
         } else {
-            setIsRunningSDFile(false)
+            setIsRunningSDFile(false);
         }
     }, [sdRunReported]);
 
@@ -35,15 +37,13 @@ export function useSDCard() {
         (state: RootState) => state.controller.type,
     );
 
-
     // Set/Check workflow state is idle for SD card actions
-    const workflowState = useTypedSelector((state: RootState) => state.controller.workflow.state);
+    const workflowState = useTypedSelector(
+        (state: RootState) => state.controller.workflow.state,
+    );
     useEffect(() => {
         setIsWorkflowIdle(workflowState === WORKFLOW_STATE_IDLE);
     }, [workflowState]);
-
-
-
 
     const newOpts = useTypedSelector(
         (state: RootState) => state.controller.settings.info?.NEWOPT,
@@ -85,6 +85,6 @@ export function useSDCard() {
         hasFTP,
         hasYM,
         isRunningSDFile,
-        isWorkflowIdle
+        isWorkflowIdle,
     };
 }

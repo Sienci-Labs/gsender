@@ -1,5 +1,5 @@
-import { AXES } from '../../constants';
 import { MDI, Shuttle } from 'definitions/general';
+import { AXES } from '../../constants';
 import { JogSpeed } from '../Jogging/definitions';
 
 export type AXES_T = (typeof AXES)[keyof typeof AXES];

@@ -21,22 +21,7 @@
  *
  */
 
-import React, { useState, useMemo, useEffect } from 'react';
-import PropTypes from 'prop-types';
-import pubsub from 'pubsub-js';
-import _ from 'lodash';
-import Mousetrap from 'mousetrap';
-import { useDispatch } from 'react-redux';
-
-import {
-    ALL_CATEGORY,
-    USAGE_TOOL_NAME,
-    SHORTCUT_CATEGORY,
-} from 'app/constants';
-import store from 'app/store';
 import Button from 'app/components/Button';
-import shuttleEvents from 'app/lib/shuttleEvents';
-import { toast } from 'app/lib/toaster';
 import {
     Dialog,
     DialogContent,
@@ -44,25 +29,37 @@ import {
     DialogHeader,
     DialogTitle,
 } from 'app/components/shadcn/Dialog';
+import {
+    ALL_CATEGORY,
+    SHORTCUT_CATEGORY,
+    USAGE_TOOL_NAME,
+} from 'app/constants';
 import combokeys from 'app/lib/combokeys';
+import shuttleEvents from 'app/lib/shuttleEvents';
+import { toast } from 'app/lib/toaster';
+import store from 'app/store';
 import {
     holdShortcuts,
     unholdShortcuts,
 } from 'app/store/redux/slices/preferences.slice';
-
-import { formatShortcut } from '../helpers';
-import CategoryFilter from '../CategoryFilter';
-import ShortcutsTable from '../ShortcutsTable';
-import EditArea from './EditArea';
-import { generateList } from '../utils';
-
+import _ from 'lodash';
 import {
     DownloadIcon,
-    UploadIcon,
     PrinterIcon,
     ToggleLeftIcon,
     ToggleRightIcon,
+    UploadIcon,
 } from 'lucide-react';
+import Mousetrap from 'mousetrap';
+import PropTypes from 'prop-types';
+import pubsub from 'pubsub-js';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import CategoryFilter from '../CategoryFilter';
+import { formatShortcut } from '../helpers';
+import ShortcutsTable from '../ShortcutsTable';
+import { generateList } from '../utils';
+import EditArea from './EditArea';
 
 /**
  * Keybinding settings page

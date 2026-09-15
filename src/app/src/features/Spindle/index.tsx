@@ -1,41 +1,40 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useDispatch } from 'react-redux';
-import debounce from 'lodash/debounce';
-import pubsub from 'pubsub-js';
-
+import Widget from 'app/components/Widget';
+import { UNITS_EN, UNITS_GCODE } from 'app/definitions/general';
+import { ATCI_SUPPORTED_VERSION } from 'app/features/ATC/utils/ATCiConstants.ts';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import controller from 'app/lib/controller';
+import { firmwarePastVersion } from 'app/lib/firmwareSemver.ts';
+import { convertToImperial } from 'app/lib/units';
+import store from 'app/store';
+import reduxStore from 'app/store/redux';
 import {
     clearSpindles,
     updatePartialControllerSettings,
 } from 'app/store/redux/slices/controller.slice';
-import store from 'app/store';
-import Widget from 'app/components/Widget';
-import controller from 'app/lib/controller';
-import { convertToImperial } from 'app/lib/units';
-import { UNITS_EN, UNITS_GCODE } from 'app/definitions/general';
-import WidgetConfig from '../WidgetConfig/WidgetConfig';
+import debounce from 'lodash/debounce';
+import findIndex from 'lodash/findIndex';
+import get from 'lodash/get';
+import posthog from 'posthog-js';
+import pubsub from 'pubsub-js';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import {
     GRBL,
-    GRBLHAL,
     GRBL_ACTIVE_STATE_IDLE,
+    GRBLHAL,
     IMPERIAL_UNITS,
     LASER_MODE,
     SPINDLE_LASER_CATEGORY,
     SPINDLE_MODE,
     WORKFLOW_STATE_RUNNING,
 } from '../../constants';
-import SpindleControls from './components/SpindleControls';
+import { round, roundMetric } from '../../lib/rounding';
+import WidgetConfig from '../WidgetConfig/WidgetConfig';
 import LaserControls from './components/LaserControls';
 import ModalToggle from './components/ModalToggle';
+import SpindleControls from './components/SpindleControls';
 import SpindleSelector from './components/SpindleSelector';
-import { roundMetric, round } from '../../lib/rounding';
-import findIndex from 'lodash/findIndex';
-import get from 'lodash/get';
-import reduxStore from 'app/store/redux';
-import { SPINDLE_LASER_T, SendM5Type } from './definitions';
-import { firmwarePastVersion } from 'app/lib/firmwareSemver.ts';
-import { ATCI_SUPPORTED_VERSION } from 'app/features/ATC/utils/ATCiConstants.ts';
-import posthog from 'posthog-js';
+import { SendM5Type, SPINDLE_LASER_T } from './definitions';
 
 interface SpindleState {
     minimized: boolean;

@@ -1,6 +1,6 @@
+import { ValidationBanner } from 'app/features/AccessoryInstaller/components/wizard/ValidationBanner.tsx';
 import { ArrowLeft, ArrowRight, HelpCircle } from 'lucide-react';
 import { SubWizard, ValidationResult } from '../../types/wizard';
-import { ValidationBanner } from 'app/features/AccessoryInstaller/components/wizard/ValidationBanner.tsx';
 import DefaultImage from '../../Wizards/atc/assets/placeholder_1.png';
 
 interface WizardLandingProps {
@@ -108,7 +108,10 @@ export function WizardLanding({
                             )}
                         {secondarySubWizards.length > 0 && (
                             <>
-                                <div className="my-4 pt-4 pb-4" aria-hidden="true">
+                                <div
+                                    className="my-4 pt-4 pb-4"
+                                    aria-hidden="true"
+                                >
                                     <hr className="h-px border-0 bg-gradient-to-r from-transparent via-gray-300 to-transparent dark:via-slate-600" />
                                 </div>
                                 {secondarySubWizards.map((subWizard) =>
@@ -146,7 +149,10 @@ export function WizardLanding({
                             <p className="text-gray-600 dark:text-gray-400">
                                 Follow along in our{' '}
                                 <a
-                                    href={helpUrl ?? 'https://resources.sienci.com/'}
+                                    href={
+                                        helpUrl ??
+                                        'https://resources.sienci.com/'
+                                    }
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="text-blue-500 font-bold"

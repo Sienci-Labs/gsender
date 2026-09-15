@@ -1,9 +1,14 @@
 import { Widget } from 'app/components/Widget';
 import { BasicPosition, GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
-import get from 'lodash/get';
-import { connect } from 'react-redux';
+import { isToolProbed } from 'app/features/ATC/utils/ATCFunctions.ts';
+import { SDCardProgress } from 'app/features/JobControl/SDCardProgress.tsx';
+import { SenderStatus } from 'app/lib/definitions/sender_feeder';
 import { WORKFLOW_STATES_T } from 'app/store/definitions';
-import ControlButton from './ControlButton';
+import cx from 'classnames';
+import get from 'lodash/get';
+import pubsub from 'pubsub-js';
+import { JSX, useEffect, useState } from 'react';
+import { connect } from 'react-redux';
 import {
     GRBL_ACTIVE_STATE_IDLE,
     PAUSE,
@@ -11,16 +16,11 @@ import {
     STOP,
     WORKFLOW_STATE_IDLE,
 } from '../../constants';
+import ControlButton from './ControlButton';
 import Overrides from './FeedOverride';
 import OutlineButton from './OutlineButton';
-import StartFromLine from './StartFromLine';
 import ProgressArea from './ProgressArea';
-import { SenderStatus } from 'app/lib/definitions/sender_feeder';
-import { JSX, useEffect, useState } from 'react';
-import pubsub from 'pubsub-js';
-import { SDCardProgress } from 'app/features/JobControl/SDCardProgress.tsx';
-import { isToolProbed } from 'app/features/ATC/utils/ATCFunctions.ts';
-import cx from 'classnames';
+import StartFromLine from './StartFromLine';
 
 interface JobControlProps {
     workflow: { state: WORKFLOW_STATES_T };

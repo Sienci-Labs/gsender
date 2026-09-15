@@ -21,7 +21,7 @@
  *
  */
 
-import { Wrench, Clock } from 'lucide-react';
+import { Clock, Wrench } from 'lucide-react';
 
 const PendingToolchangeNotice = () => {
     return (

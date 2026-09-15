@@ -1,8 +1,7 @@
-import React from 'react';
-import { Copy } from 'lucide-react';
-
 import { Button } from 'app/components/Button';
 import { toast } from 'app/lib/toaster';
+import { Copy } from 'lucide-react';
+import React from 'react';
 
 interface GcodeViewerProps {
     gcode: string;

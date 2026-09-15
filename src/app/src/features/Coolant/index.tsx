@@ -1,26 +1,24 @@
-import { connect } from 'react-redux';
-import get from 'lodash/get';
-import { FaShower } from 'react-icons/fa6';
-import { FaWater } from 'react-icons/fa';
-import { FaBan } from 'react-icons/fa6';
-
-import {
-    startMist,
-    startFlood,
-    stopCoolant,
-} from 'app/features/Coolant/utils/actions';
+import { ActiveStateButton } from 'app/components/ActiveStateButton';
 import {
     GRBL,
     GRBL_ACTIVE_STATE_IDLE,
     GRBLHAL,
     WORKFLOW_STATE_RUNNING,
 } from 'app/constants';
-import { ActiveStateButton } from 'app/components/ActiveStateButton';
-import ensureArray from 'ensure-array';
-import includes from 'lodash/includes';
-import { useCallback } from 'react';
+import {
+    startFlood,
+    startMist,
+    stopCoolant,
+} from 'app/features/Coolant/utils/actions';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import ensureArray from 'ensure-array';
+import get from 'lodash/get';
+import includes from 'lodash/includes';
 import { usePostHog } from 'posthog-js/react';
+import { useCallback } from 'react';
+import { FaWater } from 'react-icons/fa';
+import { FaBan, FaShower } from 'react-icons/fa6';
+import { connect } from 'react-redux';
 
 export interface CoolantProps {
     mistActive: boolean;

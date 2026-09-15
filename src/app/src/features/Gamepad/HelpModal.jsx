@@ -1,13 +1,12 @@
-import React, { useContext } from 'react';
-
 import {
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle,
 } from 'app/components/shadcn/Dialog';
-import { GamepadContext } from './utils/context';
+import React, { useContext } from 'react';
 import { setCurrentModal } from './utils/actions';
+import { GamepadContext } from './utils/context';
 
 const HelpModal = () => {
     const { dispatch } = useContext(GamepadContext);

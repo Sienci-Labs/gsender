@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { usePostHog } from '@posthog/react';
 import {
     Select,
     SelectContent,
@@ -8,11 +7,12 @@ import {
     SelectTrigger,
     SelectValue,
 } from 'app/components/shadcn/Select';
-import controller from 'app/lib/controller.ts';
-import { RootState } from 'app/store/redux';
 import Tooltip from 'app/components/Tooltip';
 import { GRBL_ACTIVE_STATE_RUN, WORKFLOW_STATE_RUNNING } from 'app/constants';
-import { usePostHog } from '@posthog/react';
+import controller from 'app/lib/controller.ts';
+import { RootState } from 'app/store/redux';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 const availableWorkspaces = {
     G54: 'P1',

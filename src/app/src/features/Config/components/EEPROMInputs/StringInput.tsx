@@ -1,6 +1,6 @@
 import React from 'react';
-import styles from './index.module.styl';
 import ControlledInput from './ControlledInput';
+import styles from './index.module.styl';
 
 const StringInput = ({ info, setting, onChange, disabled }) => {
     const { unit = null } = info;

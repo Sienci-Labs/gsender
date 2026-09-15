@@ -1,14 +1,14 @@
-import cx from 'classnames';
-import { Button } from 'app/components/shadcn/Button';
-import { TbVector } from 'react-icons/tb';
-import pubsub from 'pubsub-js';
-import store from 'app/store';
-import { LASER_MODE } from 'app/constants';
-import { outlineResponse } from 'app/workers/Outline.response';
-import { toast } from 'app/lib/toaster';
-import { store as reduxStore } from 'app/store/redux';
-import get from 'lodash/get';
 import { usePostHog } from '@posthog/react';
+import { Button } from 'app/components/shadcn/Button';
+import { LASER_MODE } from 'app/constants';
+import { toast } from 'app/lib/toaster';
+import store from 'app/store';
+import { store as reduxStore } from 'app/store/redux';
+import { outlineResponse } from 'app/workers/Outline.response';
+import cx from 'classnames';
+import get from 'lodash/get';
+import pubsub from 'pubsub-js';
+import { TbVector } from 'react-icons/tb';
 
 interface OutlineButtonProps {
     disabled: boolean;

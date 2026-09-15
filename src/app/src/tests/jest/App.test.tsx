@@ -1,10 +1,10 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import App from 'app/App';
 import * as user from 'app/lib/user';
-import * as sagaModule from 'app/store/redux/sagas';
 import store from 'app/store';
+import * as sagaModule from 'app/store/redux/sagas';
 
-// ─── Mocks 
+// ─── Mocks
 
 // Mock Redux store so App doesn't need real state or reducers
 jest.mock('app/store/redux', () => ({
@@ -31,9 +31,7 @@ jest.mock('app/store/redux/sagas', () => ({
 // Mock user auth so no real network/auth calls are made
 jest.mock('app/lib/user', () => ({
     __esModule: true,
-    signin: jest.fn(() =>
-        Promise.resolve({ authenticated: false, token: '' })
-    ),
+    signin: jest.fn(() => Promise.resolve({ authenticated: false, token: '' })),
 }));
 
 // Mock controller so no real serial/socket connections are attempted
@@ -57,7 +55,7 @@ jest.mock('app/components/shadcn/Sonner', () => ({
     Toaster: () => <div data-testid="toaster" />,
 }));
 
-// ─── Setup 
+// ─── Setup
 
 // Spy on store.get and return a stable token value
 // This also fixes the semver warning caused by undefined version in store/index.ts
@@ -116,6 +114,6 @@ it('starts Redux sagas on app startup', () => {
     // so all background Redux tasks are running when gSender loads
     renderApp();
     expect(sagaModule.sagaMiddleware.run).toHaveBeenCalledWith(
-        sagaModule.default
+        sagaModule.default,
     );
 });

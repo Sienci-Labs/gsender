@@ -1,10 +1,13 @@
-import { useParams } from 'react-router';
 import { WizardsManager } from 'app/features/AccessoryInstaller/components/wizard';
 import { useAllWizards } from 'app/features/AccessoryInstaller/Wizards';
+import { useParams } from 'react-router';
 
 export function AccessoryInstaller() {
     const wizards = useAllWizards();
-    const { wizardId, subWizardId } = useParams<{ wizardId?: string; subWizardId?: string }>();
+    const { wizardId, subWizardId } = useParams<{
+        wizardId?: string;
+        subWizardId?: string;
+    }>();
     return (
         <div className="fixed-content-area h-full max-h-full w-full overflow-hidden">
             <WizardsManager

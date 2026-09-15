@@ -1,16 +1,16 @@
-import { Widget } from '../../components/Widget';
-import { Tabs } from '../../components/Tabs';
-import Console from '../Console';
-import Probe from '../Probe';
-import Spindle from '../Spindle';
-import Coolant from '../Coolant';
-import Rotary from '../Rotary';
-import Macros from '../Macros';
-import { useWidgetState } from 'app/hooks/useWidgetState';
-import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { ATCWidget } from 'app/features/ATC';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import { useWidgetState } from 'app/hooks/useWidgetState';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { RootState } from 'app/store/redux';
+import { Tabs } from '../../components/Tabs';
+import { Widget } from '../../components/Widget';
+import Console from '../Console';
+import Coolant from '../Coolant';
+import Macros from '../Macros';
+import Probe from '../Probe';
+import Rotary from '../Rotary';
+import Spindle from '../Spindle';
 
 export interface TabItem {
     label: string;

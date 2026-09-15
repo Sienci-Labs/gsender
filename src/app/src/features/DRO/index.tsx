@@ -1,66 +1,65 @@
-import { connect } from 'react-redux';
-import {
-    AxesArray,
-    defaultDROPosition,
-    DROPosition,
-    zeroAllAxes,
-    goXYAxes,
-    zeroWCS,
-    gotoZero,
-} from 'app/features/DRO/utils/DRO';
-import { AxisRow } from 'app/features/DRO/component/AxisRow.tsx';
-import { VscTarget } from 'react-icons/vsc';
+import { usePostHog } from '@posthog/react';
 import { Button } from 'app/components/Button';
 import { Label } from 'app/components/Label';
-import get from 'lodash/get';
-import { GoTo } from 'app/features/DRO/component/GoTo.tsx';
-import store from 'app/store';
 import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from 'app/components/shadcn/AlertDialog';
+import {
+    AXIS_A,
     AXIS_X,
     AXIS_Y,
     AXIS_Z,
-    AXIS_A,
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
     LOCATION_CATEGORY,
     METRIC_UNITS,
     WORKFLOW_STATE_RUNNING,
 } from 'app/constants';
-import mapValues from 'lodash/mapValues';
-import { mapPositionToUnits } from 'app/lib/units.ts';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import includes from 'lodash/includes';
+import { AxisRow } from 'app/features/DRO/component/AxisRow.tsx';
+import { GoTo } from 'app/features/DRO/component/GoTo.tsx';
 import { HomingSwitch } from 'app/features/DRO/component/HomingSwitch.tsx';
-import { RapidPositionButtons } from 'app/features/DRO/component/RapidPositionButtons.tsx';
-import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-import {
-    AlertDialog,
-    AlertDialogTrigger,
-    AlertDialogContent,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogCancel,
-    AlertDialogAction,
-} from 'app/components/shadcn/AlertDialog';
-import { UnitBadge } from 'app/features/DRO/component/UnitBadge.tsx';
 import { Parking } from 'app/features/DRO/component/Parking.tsx';
-
-import useKeybinding from 'app/lib/useKeybinding';
-import useShuttleEvents from 'app/hooks/useShuttleEvents';
-import controller from 'app/lib/controller';
+import { RapidPositionButtons } from 'app/features/DRO/component/RapidPositionButtons.tsx';
+import { UnitBadge } from 'app/features/DRO/component/UnitBadge.tsx';
 import {
-    BACK_RIGHT,
+    AxesArray,
+    DROPosition,
+    defaultDROPosition,
+    gotoZero,
+    goXYAxes,
+    zeroAllAxes,
+    zeroWCS,
+} from 'app/features/DRO/utils/DRO';
+import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import controller from 'app/lib/controller';
+import { mapPositionToUnits } from 'app/lib/units.ts';
+import useKeybinding from 'app/lib/useKeybinding';
+import { cn } from 'app/lib/utils';
+import store from 'app/store';
+import reduxStore from 'app/store/redux';
+import get from 'lodash/get';
+import includes from 'lodash/includes';
+import mapValues from 'lodash/mapValues';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { VscTarget } from 'react-icons/vsc';
+import { connect } from 'react-redux';
+import {
     BACK_LEFT,
-    FRONT_RIGHT,
+    BACK_RIGHT,
     FRONT_LEFT,
+    FRONT_RIGHT,
     getMovementGCode,
 } from './utils/RapidPosition';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import reduxStore from 'app/store/redux';
-import { cn } from 'app/lib/utils';
-import { usePostHog } from '@posthog/react';
 
 interface DROProps {
     axes: AxesArray;

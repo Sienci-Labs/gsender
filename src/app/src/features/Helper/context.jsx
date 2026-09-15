@@ -21,17 +21,23 @@
  *
  */
 
-import React, { createContext, useContext, useState, useMemo, useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
-import get from 'lodash/get';
-import _ from 'lodash';
-import pubsub from 'pubsub-js';
-
-import { Toaster } from 'app/lib/toaster/ToasterLib';
-import { disableWizard } from 'app/store/redux/slices/helper.slice';
 import { GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
-import reduxStore from 'app/store/redux';
+import { Toaster } from 'app/lib/toaster/ToasterLib';
 import store from 'app/store';
+import reduxStore from 'app/store/redux';
+import { disableWizard } from 'app/store/redux/slices/helper.slice';
+import _ from 'lodash';
+import get from 'lodash/get';
+import pubsub from 'pubsub-js';
+import React, {
+    createContext,
+    useContext,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
+import { useSelector } from 'react-redux';
 
 const WizardContext = createContext({});
 const WizardAPI = createContext({});
@@ -57,7 +63,8 @@ export const WizardProvider = ({ children }) => {
     const [minimized, setMinimized] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [overlay, setOverlay] = useState(false);
-    const [pendingToolchangeNotice, setPendingToolchangeNotice] = useState(false);
+    const [pendingToolchangeNotice, setPendingToolchangeNotice] =
+        useState(false);
     const [resumingJob, setResumingJob] = useState(false);
     const resumeTimerRef = useRef(null);
 
@@ -344,7 +351,8 @@ export const WizardProvider = ({ children }) => {
             },
             resumeJobAfterDelay: (delayMs) => {
                 setResumingJob(true);
-                if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+                if (resumeTimerRef.current)
+                    clearTimeout(resumeTimerRef.current);
                 resumeTimerRef.current = setTimeout(() => {
                     resetWizard();
                 }, delayMs);

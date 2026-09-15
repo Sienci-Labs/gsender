@@ -1,9 +1,9 @@
-import {StepActionButton} from "app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx";
-import controller from "app/lib/controller.ts";
-import {StepProps} from "app/features/AccessoryInstaller/types";
-import {useState} from "react";
-import {useTypedSelector} from "app/hooks/useTypedSelector.ts";
-import {RootState} from "app/store/redux";
+import { StepActionButton } from 'app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx';
+import { StepProps } from 'app/features/AccessoryInstaller/types';
+import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import controller from 'app/lib/controller.ts';
+import { RootState } from 'app/store/redux';
+import { useState } from 'react';
 
 export function Modbus({ onComplete, onUncomplete }: StepProps) {
     const [hasConfiguredModbus, setHasConfiguredModbus] =
@@ -39,10 +39,12 @@ export function Modbus({ onComplete, onUncomplete }: StepProps) {
             </p>
             <ol className="list-decimal p-5 gap-4 space-y-2">
                 <li>
-                Reconnect to your controller.
-                Please ignore any alarms that pop-up.
+                    Reconnect to your controller. Please ignore any alarms that
+                    pop-up.
                 </li>
-                <li>Press <b>"Apply and Restart"</b></li>
+                <li>
+                    Press <b>"Apply and Restart"</b>
+                </li>
             </ol>
             <StepActionButton
                 label="Apply and Restart"

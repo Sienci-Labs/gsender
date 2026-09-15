@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { Link } from 'react-router';
-import cx from 'classnames';
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from 'app/components/shadcn/Popover';
+import cx from 'classnames';
+import { useState } from 'react';
+import { Link } from 'react-router';
 
 export function NavFlyoutLink({
     href,
@@ -15,7 +15,10 @@ export function NavFlyoutLink({
     label: string;
 }) {
     return (
-        <Link to={href} className="bg-gray-200 p-4 rounded-lg flex flex-row border border-gray-400">
+        <Link
+            to={href}
+            className="bg-gray-200 p-4 rounded-lg flex flex-row border border-gray-400"
+        >
             {label}
         </Link>
     );

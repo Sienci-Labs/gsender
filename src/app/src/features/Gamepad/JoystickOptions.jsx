@@ -1,16 +1,14 @@
+import { ControlledInput } from 'app/components/ControlledInput';
+import { Switch } from 'app/components/shadcn/Switch';
+import { useGamepadListener } from 'app/lib/hooks/useGamepadListener';
+import cloneDeep from 'lodash/cloneDeep';
+import get from 'lodash/get';
+import set from 'lodash/set';
 import React, { useContext } from 'react';
 import Select from 'react-select';
-import cloneDeep from 'lodash/cloneDeep';
-import set from 'lodash/set';
-import get from 'lodash/get';
-
-import { Switch } from 'app/components/shadcn/Switch';
-
-import { ControlledInput } from 'app/components/ControlledInput';
-import { GamepadContext } from './utils/context';
 import { arrayComparator } from './utils';
 import { setGamepadProfileList } from './utils/actions';
-import { useGamepadListener } from 'app/lib/hooks/useGamepadListener';
+import { GamepadContext } from './utils/context';
 
 const JoystickOptions = () => {
     const {

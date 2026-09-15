@@ -1,11 +1,11 @@
-import {useState} from "react";
-import {useTypedSelector} from "app/hooks/useTypedSelector.ts";
-import {RootState} from "app/store/redux";
-import controller from "app/lib/controller.ts";
-import {StepActionButton} from "app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx";
-import {StepProps} from "app/features/AccessoryInstaller/types";
-import {firmwarePastVersion} from "app/lib/firmwareSemver.ts";
-import {ATCI_SUPPORTED_VERSION} from "app/features/ATC/utils/ATCiConstants.ts";
+import { StepActionButton } from 'app/features/AccessoryInstaller/components/wizard/StepActionButton.tsx';
+import { StepProps } from 'app/features/AccessoryInstaller/types';
+import { ATCI_SUPPORTED_VERSION } from 'app/features/ATC/utils/ATCiConstants.ts';
+import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
+import controller from 'app/lib/controller.ts';
+import { firmwarePastVersion } from 'app/lib/firmwareSemver.ts';
+import { RootState } from 'app/store/redux';
+import { useState } from 'react';
 
 export function ModbusConfig({ onComplete, onUncomplete }: StepProps) {
     const [hasConfiguredModbus, setHasConfiguredModbus] =
@@ -17,12 +17,10 @@ export function ModbusConfig({ onComplete, onUncomplete }: StepProps) {
     );
 
     async function configureModbusEEPROM() {
-        const code = [
-            '$476=2'
-        ]
+        const code = ['$476=2'];
 
         if (firmwarePastVersion(ATCI_SUPPORTED_VERSION)) {
-            code.push('$REBOOT')
+            code.push('$REBOOT');
         }
 
         controller.command('gcode', code);
@@ -49,10 +47,12 @@ export function ModbusConfig({ onComplete, onUncomplete }: StepProps) {
             </p>
             <ol className="list-decimal p-5 gap-4 space-y-2">
                 <li>
-                    Reconnect to your controller.
-                    Please ignore any alarms that pop-up.
+                    Reconnect to your controller. Please ignore any alarms that
+                    pop-up.
                 </li>
-                <li>Press <b>"Apply and Restart"</b></li>
+                <li>
+                    Press <b>"Apply and Restart"</b>
+                </li>
             </ol>
             <StepActionButton
                 label="Configure Modbus"
@@ -63,5 +63,5 @@ export function ModbusConfig({ onComplete, onUncomplete }: StepProps) {
                 disabled={!isConnected}
             />
         </div>
-    )
+    );
 }

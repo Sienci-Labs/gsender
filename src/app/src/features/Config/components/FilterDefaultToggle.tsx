@@ -1,5 +1,5 @@
-import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 import { Switch } from 'app/components/shadcn/Switch';
+import { useSettings } from 'app/features/Config/utils/SettingsContext.tsx';
 
 export function FilterDefaultToggle() {
     const { filterNonDefault, toggleFilterNonDefault } = useSettings();

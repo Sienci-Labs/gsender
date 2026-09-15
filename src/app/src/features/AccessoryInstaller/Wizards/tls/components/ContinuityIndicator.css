@@ -27,10 +27,10 @@
     --text-secondary: #8b92a0;
 }
 
-.continuity-indicator[data-phase='success'] {
+.continuity-indicator[data-phase="success"] {
     --state-color: var(--state-success);
 }
-.continuity-indicator[data-phase='stuck-on'] {
+.continuity-indicator[data-phase="stuck-on"] {
     --state-color: var(--state-danger);
 }
 
@@ -41,7 +41,7 @@
     );
     transition: filter 0.4s ease;
 }
-.continuity-indicator[data-phase='stuck-on'] .continuity-indicator__shell {
+.continuity-indicator[data-phase="stuck-on"] .continuity-indicator__shell {
     animation: ciStrobeGlow 0.9s ease-in-out infinite;
 }
 @keyframes ciStrobeGlow {
@@ -75,8 +75,8 @@
         stroke-width 0.3s ease,
         stroke-dasharray 0.3s ease;
 }
-.continuity-indicator[data-phase='success'] .ci-bezel,
-.continuity-indicator[data-phase='stuck-on'] .ci-bezel {
+.continuity-indicator[data-phase="success"] .ci-bezel,
+.continuity-indicator[data-phase="stuck-on"] .ci-bezel {
     stroke: var(--state-color);
     stroke-width: 3;
 }
@@ -86,8 +86,8 @@
     stroke: var(--state-color);
     opacity: 0;
 }
-.continuity-indicator[data-phase='checking-idle'] .ci-ripple,
-.continuity-indicator[data-phase='waiting'] .ci-ripple {
+.continuity-indicator[data-phase="checking-idle"] .ci-ripple,
+.continuity-indicator[data-phase="waiting"] .ci-ripple {
     animation: ciSonarPing 2s ease-out infinite;
 }
 .ci-ripple--2 {
@@ -114,11 +114,11 @@
 }
 /* Once a glyph is shown, the core dot would sit directly behind it in the
    same color and make the icon unreadable — fade it out instead. */
-.continuity-indicator[data-phase='success'] .ci-core,
-.continuity-indicator[data-phase='stuck-on'] .ci-core {
+.continuity-indicator[data-phase="success"] .ci-core,
+.continuity-indicator[data-phase="stuck-on"] .ci-core {
     opacity: 0;
 }
-.continuity-indicator[data-phase='success'] .ci-core {
+.continuity-indicator[data-phase="success"] .ci-core {
     animation: ciSonarPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 @keyframes ciSonarPop {
@@ -150,12 +150,12 @@
     width: 30%;
     height: 30%;
 }
-.continuity-indicator[data-phase='success']
+.continuity-indicator[data-phase="success"]
     .continuity-indicator__glyph--check {
     opacity: 1;
     transform: scale(1);
 }
-.continuity-indicator[data-phase='stuck-on']
+.continuity-indicator[data-phase="stuck-on"]
     .continuity-indicator__glyph--warning {
     opacity: 1;
     transform: scale(1);
@@ -176,8 +176,8 @@
     transition: background 0.3s ease;
     flex-shrink: 0;
 }
-.continuity-indicator[data-phase='checking-idle'] .continuity-indicator__dot,
-.continuity-indicator[data-phase='waiting'] .continuity-indicator__dot {
+.continuity-indicator[data-phase="checking-idle"] .continuity-indicator__dot,
+.continuity-indicator[data-phase="waiting"] .continuity-indicator__dot {
     animation: ciDotPulse 1.4s ease-in-out infinite;
 }
 @keyframes ciDotPulse {

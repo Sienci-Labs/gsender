@@ -1,10 +1,9 @@
 // https://ui.shadcn.com/docs/components/checkbox
 
-import * as React from 'react';
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
-import { Check } from 'lucide-react';
-
 import cx from 'classnames';
+import { Check } from 'lucide-react';
+import * as React from 'react';
 
 const Checkbox = React.forwardRef<
     React.ElementRef<typeof CheckboxPrimitive.Root>,

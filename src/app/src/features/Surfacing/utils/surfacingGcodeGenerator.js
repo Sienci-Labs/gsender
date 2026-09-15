@@ -1,25 +1,24 @@
-import Toolpath from './gcode-toolpath';
-import get from 'lodash/get';
-
-import store from 'app/store';
 import {
-    METRIC_UNITS,
     IMPERIAL_UNITS,
+    METRIC_UNITS,
+    SPINDLE_MODES,
     SPIRAL_MOVEMENT,
-    ZIG_ZAG_MOVEMENT,
     START_POSITION_BACK_LEFT,
     START_POSITION_BACK_RIGHT,
+    START_POSITION_CENTER,
     START_POSITION_FRONT_LEFT,
     START_POSITION_FRONT_RIGHT,
-    START_POSITION_CENTER,
-    SPINDLE_MODES,
     SURFACING_DWELL_DURATION,
+    ZIG_ZAG_MOVEMENT,
 } from 'app/constants';
 import controller from 'app/lib/controller';
+
+import store from 'app/store';
 import defaultState from 'app/store/defaultState';
 import reduxStore from 'app/store/redux';
-
+import get from 'lodash/get';
 import { convertToImperial } from '../../Preferences/calculate';
+import Toolpath from './gcode-toolpath';
 
 const [M3] = SPINDLE_MODES;
 
@@ -56,10 +55,11 @@ export default class Generator {
         const dwell = shouldDwell ? [`G04 P${SURFACING_DWELL_DURATION}`] : [];
         const m7 = mist ? ['M7'] : [];
         const m8 = flood ? ['M8'] : [];
-        const setUnits = {
-            [METRIC_UNITS]: 'G21 ;mm',
-            [IMPERIAL_UNITS]: 'G20 ;inches',
-        }[units] ?? 'G21 ;mm';
+        const setUnits =
+            {
+                [METRIC_UNITS]: 'G21 ;mm',
+                [IMPERIAL_UNITS]: 'G20 ;inches',
+            }[units] ?? 'G21 ;mm';
 
         const depth = skimDepth;
         const gcodeArr = [

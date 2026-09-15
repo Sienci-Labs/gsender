@@ -22,9 +22,9 @@
  */
 
 import * as longMillGrblEEPROM from './grbl/longmill';
-import * as longMillGrblHALEEPROM from './grblHAL/longmill';
 import * as millOneGrblEEPROM from './grbl/millone';
 import * as altmillSettings from './grblHAL/Altmill';
+import * as longMillGrblHALEEPROM from './grblHAL/longmill';
 import * as voronCascadeSettings from './grblHAL/voronCascade';
 export default [
     {
@@ -85,7 +85,7 @@ export default [
         },
         eepromSettings: longMillGrblHALEEPROM.LONGMILL_MK3_30x30,
         grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK3_30x30,
-        orderedSettings: longMillGrblHALEEPROM.MK3_ORDERED
+        orderedSettings: longMillGrblHALEEPROM.MK3_ORDERED,
     },
     {
         id: 19,
@@ -99,8 +99,8 @@ export default [
             height: 114.3,
         },
         eepromSettings: longMillGrblHALEEPROM.LONGMILL_MK3_48x30,
-        grblHALeepromSettings:longMillGrblHALEEPROM.LONGMILL_MK3_48x30,
-        orderedSettings: longMillGrblHALEEPROM.MK3_ORDERED
+        grblHALeepromSettings: longMillGrblHALEEPROM.LONGMILL_MK3_48x30,
+        orderedSettings: longMillGrblHALEEPROM.MK3_ORDERED,
     },
     {
         id: 5,
@@ -407,18 +407,18 @@ export default [
             height: 465,
         },
     },
-   {
-    id: 60,
-    company: '',
-    name: 'Voron Cascade',
-    type: 'BTT Scylla',
-    version: 'V1.0',
-    mm: {
-        width: 260,
-        depth: 220,
-        height: 100,
+    {
+        id: 60,
+        company: '',
+        name: 'Voron Cascade',
+        type: 'BTT Scylla',
+        version: 'V1.0',
+        mm: {
+            width: 260,
+            depth: 220,
+            height: 100,
+        },
+        grblHALeepromSettings: voronCascadeSettings.DEFAULT,
+        orderedSettings: voronCascadeSettings.ORDERED,
     },
-    grblHALeepromSettings: voronCascadeSettings.DEFAULT,
-    orderedSettings: voronCascadeSettings.ORDERED,
-},
 ];

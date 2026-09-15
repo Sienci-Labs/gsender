@@ -1,12 +1,12 @@
 import {
+    ATCIJSON,
+    ATCIMacroConfig,
+} from 'app/features/ATC/assets/defaultATCIMacros.ts';
+import {
     ConfigState,
     OffsetManagement,
 } from 'app/features/ATC/components/Configuration/hooks/useConfigStore.tsx';
 import store from 'app/store';
-import {
-    ATCIJSON,
-    ATCIMacroConfig,
-} from 'app/features/ATC/assets/defaultATCIMacros.ts';
 
 export interface Macro {
     name: string;
@@ -111,7 +111,10 @@ export function populateATCIVariables(variables, config: ConfigState) {
     return populatedVariables;
 }
 
-export function generateATCIJSON(config: ConfigState, useValues = true): ATCIJSON {
+export function generateATCIJSON(
+    config: ConfigState,
+    useValues = true,
+): ATCIJSON {
     const templateConfig: ATCIMacroConfig = store.get(
         'widgets.atc.templates',
         {},
@@ -123,8 +126,8 @@ export function generateATCIJSON(config: ConfigState, useValues = true): ATCIJSO
         const excluded = ['_tc_slots', '_tc_rack_enable'];
         variables = Object.fromEntries(
             Object.entries(variables).map(([k, v]) =>
-                excluded.includes(k) ? [k, v] : [k, { ...v, value: v.default }]
-            )
+                excluded.includes(k) ? [k, v] : [k, { ...v, value: v.default }],
+            ),
         ) as typeof variables;
     }
 
