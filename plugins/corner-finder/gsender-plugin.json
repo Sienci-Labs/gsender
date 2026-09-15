@@ -1,32 +1,32 @@
 {
-	"id": "com.sienci.corner-finder",
-	"name": "Corner Finder",
-	"description": "Reference plugin for the host visualizer bridge — picking, camera control, overlay markers, and machine.setBusy.",
-	"version": "0.1.0",
-	"engine": ">=1.6.0",
-	"ui": {
-		"entry": "ui/index.html",
-		"contributions": [
-			{
-				"slot": "visualizer-overlay",
-				"label": "Corner Finder",
-				"icon": "🎯",
-				"requiresIdle": true
-			}
-		]
-	},
-	"capabilities": {
-		"requestTypes": [
-			"viewer:screen-to-world",
-			"viewer:world-to-screen",
-			"viewer:camera:set",
-			"viewer:camera:lock-rotate",
-			"viewer:pick:arm",
-			"viewer:pick:disarm",
-			"viewer:overlay:set",
-			"machine:busy:set"
-		],
-		"topics": ["viewer"],
-		"allowedFunctions": ["viewer", "machine", "useVisualizerPick"]
-	}
+  "id": "com.sienci.corner-finder",
+  "name": "Corner Finder",
+  "description": "Reference plugin for the host visualizer bridge — picking, camera control, overlay markers, and machine.setBusy.",
+  "version": "0.1.0",
+  "engine": ">=1.6.0",
+  "ui": {
+    "entry": "ui/index.html",
+    "contributions": [
+      {
+        "slot": "visualizer-overlay",
+        "label": "Corner Finder",
+        "icon": "🎯",
+        "requiresIdle": true
+      }
+    ]
+  },
+  "capabilities": {
+    "requestTypes": [
+      "viewer:screen-to-world",
+      "viewer:world-to-screen",
+      "viewer:camera:set",
+      "viewer:camera:lock-rotate",
+      "viewer:pick:arm",
+      "viewer:pick:disarm",
+      "viewer:overlay:set",
+      "machine:busy:set"
+    ],
+    "topics": ["viewer"],
+    "allowedFunctions": ["viewer", "machine", "useVisualizerPick"]
+  }
 }

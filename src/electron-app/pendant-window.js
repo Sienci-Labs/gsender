@@ -21,38 +21,38 @@
  *
  */
 
-import { app, BrowserWindow, ipcMain } from "electron";
-import pkg from "../package.json";
+import { app, BrowserWindow, ipcMain } from 'electron';
+import pkg from '../package.json';
 
 // Shared by the standalone pendant binary (pendant-main.js) and the main
 // desktop app (main.js, when "use pendant view as default UI" is enabled).
 export function createPendantWindow(isDev, preloadPath) {
-	const window = new BrowserWindow({
-		title: `gSender Pendant ${pkg.version}`,
-		kiosk: !isDev,
-		fullscreen: !isDev,
-		frame: !isDev,
-		autoHideMenuBar: true,
-		show: false,
-		width: isDev ? 768 : 800,
-		height: isDev ? 1024 : 1280,
-		webPreferences: {
-			// Shared code from src/app/ uses window.require + window.ipcRenderer
-			// at module load; matching desktop's preload posture avoids forking that.
-			nodeIntegration: true,
-			enableRemoteModule: true,
-			contextIsolation: false,
-			preload: preloadPath,
-		},
-	});
-	require("@electron/remote/main").enable(window.webContents);
+    const window = new BrowserWindow({
+        title: `gSender Pendant ${pkg.version}`,
+        kiosk: !isDev,
+        fullscreen: !isDev,
+        frame: !isDev,
+        autoHideMenuBar: true,
+        show: false,
+        width: isDev ? 768 : 800,
+        height: isDev ? 1024 : 1280,
+        webPreferences: {
+            // Shared code from src/app/ uses window.require + window.ipcRenderer
+            // at module load; matching desktop's preload posture avoids forking that.
+            nodeIntegration: true,
+            enableRemoteModule: true,
+            contextIsolation: false,
+            preload: preloadPath,
+        },
+    });
+    require('@electron/remote/main').enable(window.webContents);
 
-	ipcMain.on("pendant:quit-app", () => app.quit());
+    ipcMain.on('pendant:quit-app', () => app.quit());
 
-	window.once("ready-to-show", () => {
-		window.show();
-		if (isDev) window.webContents.openDevTools({ mode: "detach" });
-	});
+    window.once('ready-to-show', () => {
+        window.show();
+        if (isDev) window.webContents.openDevTools({ mode: 'detach' });
+    });
 
-	return window;
+    return window;
 }

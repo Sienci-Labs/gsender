@@ -1,127 +1,131 @@
 /** biome-ignore-all lint/a11y/noLabelWithoutControl: <> */
-import { MapPin } from "lucide-react";
-import { type ReactNode, useEffect, useState } from "react";
+import { MapPin } from 'lucide-react';
+import { type ReactNode, useEffect, useState } from 'react';
 
 interface PositionSetterProps {
-	xPosition: string;
-	yPosition: string;
-	zPosition?: string;
-	onPositionChange: (positions: { x: string; y: string; z?: string }) => void;
-	showZ?: boolean;
-	label?: string;
-	units?: string;
-	actionButton?: ReactNode;
-	showGoTo?: boolean;
-	onGoTo?: () => void;
+    xPosition: string;
+    yPosition: string;
+    zPosition?: string;
+    onPositionChange: (positions: { x: string; y: string; z?: string }) => void;
+    showZ?: boolean;
+    label?: string;
+    units?: string;
+    actionButton?: ReactNode;
+    showGoTo?: boolean;
+    onGoTo?: () => void;
 }
 
 export function PositionSetter({
-	xPosition: initialX,
-	yPosition: initialY,
-	zPosition: initialZ,
-	onPositionChange,
-	showZ = false,
-	label = "Position",
-	units = "mm",
-	actionButton,
-	showGoTo = false,
-	onGoTo,
+    xPosition: initialX,
+    yPosition: initialY,
+    zPosition: initialZ,
+    onPositionChange,
+    showZ = false,
+    label = 'Position',
+    units = 'mm',
+    actionButton,
+    showGoTo = false,
+    onGoTo,
 }: PositionSetterProps) {
-	const [x, setX] = useState(initialX);
-	const [y, setY] = useState(initialY);
-	const [z, setZ] = useState(initialZ || "0");
+    const [x, setX] = useState(initialX);
+    const [y, setY] = useState(initialY);
+    const [z, setZ] = useState(initialZ || '0');
 
-	useEffect(() => {
-		setX(initialX);
-	}, [initialX]);
+    useEffect(() => {
+        setX(initialX);
+    }, [initialX]);
 
-	useEffect(() => {
-		setY(initialY);
-	}, [initialY]);
+    useEffect(() => {
+        setY(initialY);
+    }, [initialY]);
 
-	useEffect(() => {
-		if (initialZ !== undefined) {
-			setZ(initialZ);
-		}
-	}, [initialZ]);
+    useEffect(() => {
+        if (initialZ !== undefined) {
+            setZ(initialZ);
+        }
+    }, [initialZ]);
 
-	const handleXChange = (value: string) => {
-		setX(value);
-		onPositionChange({ x: value, y, ...(showZ && { z }) });
-	};
+    const handleXChange = (value: string) => {
+        setX(value);
+        onPositionChange({ x: value, y, ...(showZ && { z }) });
+    };
 
-	const handleYChange = (value: string) => {
-		setY(value);
-		onPositionChange({ x, y: value, ...(showZ && { z }) });
-	};
+    const handleYChange = (value: string) => {
+        setY(value);
+        onPositionChange({ x, y: value, ...(showZ && { z }) });
+    };
 
-	const handleZChange = (value: string) => {
-		setZ(value);
-		onPositionChange({ x, y, z: value });
-	};
+    const handleZChange = (value: string) => {
+        setZ(value);
+        onPositionChange({ x, y, z: value });
+    };
 
-	return (
-		<div className="space-y-4">
-			<div>
-				<label className="block text-sm font-semibold text-gray-900 dark:text-content-primary mb-3">
-					{label} ({units})
-				</label>
-				<div className={`grid gap-4 ${showZ ? "grid-cols-3" : "grid-cols-2"}`}>
-					<div>
-						<label className="block text-xs text-gray-600 dark:text-content-secondary mb-1">
-							X
-						</label>
-						<input
-							type="text"
-							value={x}
-							onChange={(e) => handleXChange(e.target.value)}
-							className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-							data-testid="atc-position-x-change"
-						/>
-					</div>
-					<div>
-						<label className="block text-xs text-gray-600 dark:text-content-secondary mb-1">
-							Y
-						</label>
-						<input
-							type="text"
-							value={y}
-							onChange={(e) => handleYChange(e.target.value)}
-							className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-							data-testid="atc-position-y-change"
-						/>
-					</div>
-					{showZ && (
-						<div>
-							<label className="block text-xs text-gray-600 dark:text-content-secondary mb-1">
-								Z
-							</label>
-							<input
-								type="text"
-								value={z}
-								onChange={(e) => handleZChange(e.target.value)}
-								className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-								data-testid="atc-position-z-change"
-							/>
-						</div>
-					)}
-				</div>
-			</div>
+    return (
+        <div className="space-y-4">
+            <div>
+                <label className="block text-sm font-semibold text-gray-900 dark:text-content-primary mb-3">
+                    {label} ({units})
+                </label>
+                <div
+                    className={`grid gap-4 ${showZ ? 'grid-cols-3' : 'grid-cols-2'}`}
+                >
+                    <div>
+                        <label className="block text-xs text-gray-600 dark:text-content-secondary mb-1">
+                            X
+                        </label>
+                        <input
+                            type="text"
+                            value={x}
+                            onChange={(e) => handleXChange(e.target.value)}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            data-testid="atc-position-x-change"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-xs text-gray-600 dark:text-content-secondary mb-1">
+                            Y
+                        </label>
+                        <input
+                            type="text"
+                            value={y}
+                            onChange={(e) => handleYChange(e.target.value)}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            data-testid="atc-position-y-change"
+                        />
+                    </div>
+                    {showZ && (
+                        <div>
+                            <label className="block text-xs text-gray-600 dark:text-content-secondary mb-1">
+                                Z
+                            </label>
+                            <input
+                                type="text"
+                                value={z}
+                                onChange={(e) => handleZChange(e.target.value)}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                data-testid="atc-position-z-change"
+                            />
+                        </div>
+                    )}
+                </div>
+            </div>
 
-			{(actionButton || (showGoTo && onGoTo)) && (
-				<div className="flex items-center gap-3">
-					{actionButton && <div className="flex-1 min-w-0">{actionButton}</div>}
-					{showGoTo && onGoTo && (
-						<button
-							onClick={onGoTo}
-							className="shrink-0 flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors bg-gray-200 text-gray-900 hover:bg-gray-300"
-						>
-							<MapPin size={18} />
-							Go To
-						</button>
-					)}
-				</div>
-			)}
-		</div>
-	);
+            {(actionButton || (showGoTo && onGoTo)) && (
+                <div className="flex items-center gap-3">
+                    {actionButton && (
+                        <div className="flex-1 min-w-0">{actionButton}</div>
+                    )}
+                    {showGoTo && onGoTo && (
+                        <button
+                            onClick={onGoTo}
+                            className="shrink-0 flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors bg-gray-200 text-gray-900 hover:bg-gray-300"
+                        >
+                            <MapPin size={18} />
+                            Go To
+                        </button>
+                    )}
+                </div>
+            )}
+        </div>
+    );
 }

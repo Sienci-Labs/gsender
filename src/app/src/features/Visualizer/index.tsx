@@ -21,85 +21,85 @@
  *
  */
 
-import { Tooltip } from "app/components/Tooltip";
-import { Widget } from "app/components/Widget";
-import { getSafeXYMoveCode } from "app/features/DRO/utils/SafeMove";
-import PluginVisualizerOverlayHost from "app/features/Plugins/components/PluginVisualizerOverlayHost";
-import { WorkspaceSelector } from "app/features/WorkspaceSelector/index.tsx";
-import combokeys from "app/lib/combokeys";
-import controller from "app/lib/controller";
-import type { CommandKeys } from "app/lib/definitions/shortcuts";
-import { uploadGcodeFileToServer } from "app/lib/fileupload";
-import { getVisualizerTheme } from "app/lib/getVisualizerTheme";
-import log from "app/lib/log";
-import * as WebGL from "app/lib/three/WebGL";
-import { toast } from "app/lib/toaster";
-import store from "app/store";
-import { store as reduxStore } from "app/store/redux";
+import { Tooltip } from 'app/components/Tooltip';
+import { Widget } from 'app/components/Widget';
+import { getSafeXYMoveCode } from 'app/features/DRO/utils/SafeMove';
+import PluginVisualizerOverlayHost from 'app/features/Plugins/components/PluginVisualizerOverlayHost';
+import { WorkspaceSelector } from 'app/features/WorkspaceSelector/index.tsx';
+import combokeys from 'app/lib/combokeys';
+import controller from 'app/lib/controller';
+import type { CommandKeys } from 'app/lib/definitions/shortcuts';
+import { uploadGcodeFileToServer } from 'app/lib/fileupload';
+import { getVisualizerTheme } from 'app/lib/getVisualizerTheme';
+import log from 'app/lib/log';
+import * as WebGL from 'app/lib/three/WebGL';
+import { toast } from 'app/lib/toaster';
+import store from 'app/store';
+import { store as reduxStore } from 'app/store/redux';
 import {
-	updateFileInfo,
-	updateFileProcessing,
-} from "app/store/redux/slices/fileInfo.slice";
-import cx from "classnames";
-import _ from "lodash";
-import debounce from "lodash/debounce";
-import get from "lodash/get";
-import includes from "lodash/includes";
-import { Box, Crosshair, FrownIcon, Square } from "lucide-react";
-import posthog from "posthog-js";
-import PropTypes from "prop-types";
-import pubsub from "pubsub-js";
-import { Component } from "react";
-import { FaCube, FaFeatherAlt } from "react-icons/fa";
-import { connect } from "react-redux";
+    updateFileInfo,
+    updateFileProcessing,
+} from 'app/store/redux/slices/fileInfo.slice';
+import cx from 'classnames';
+import _ from 'lodash';
+import debounce from 'lodash/debounce';
+import get from 'lodash/get';
+import includes from 'lodash/includes';
+import { Box, Crosshair, FrownIcon, Square } from 'lucide-react';
+import posthog from 'posthog-js';
+import PropTypes from 'prop-types';
+import pubsub from 'pubsub-js';
+import { Component } from 'react';
+import { FaCube, FaFeatherAlt } from 'react-icons/fa';
+import { connect } from 'react-redux';
 import {
-	GENERAL_CATEGORY,
-	// Grbl
-	GRBL,
-	GRBL_ACTIVE_STATE_CHECK,
-	GRBL_ACTIVE_STATE_HOLD,
-	GRBL_ACTIVE_STATE_IDLE,
-	GRBL_ACTIVE_STATE_RUN,
-	GRBLHAL,
-	LIGHTWEIGHT_OPTIONS,
-	// Marlin
-	MARLIN,
-	// Units
-	METRIC_UNITS,
-	OVERRIDES_CATEGORY,
-	RENDER_LOADING,
-	RENDER_RENDERING,
-	// Smoothie
-	SMOOTHIE,
-	SURFACING_VISUALIZER_CONTAINER_ID,
-	// TinyG
-	TINYG,
-	VISUALIZER_CATEGORY,
-	VISUALIZER_PRIMARY,
-	VISUALIZER_SECONDARY,
-	WORKFLOW_STATE_IDLE,
-	WORKFLOW_STATE_PAUSED,
-	// Workflow
-	WORKFLOW_STATE_RUNNING,
-} from "../../constants";
-import useKeybinding from "../../lib/useKeybinding";
-import WidgetConfig from "../WidgetConfig/WidgetConfig";
-import { CAMERA_MODE_PAN, CAMERA_MODE_ROTATE } from "./constants";
-import type { Actions, State } from "./definitions";
-import GcodeEditorOverlay from "./GcodeEditorOverlay";
-import GcodeViewer from "./GcodeViewer";
-import Loading from "./Loading";
-import { VisualizerPlaceholder } from "./Placeholder";
-import Rendering from "./Rendering";
-import SoftLimitsWarningArea from "./SoftLimitsWarningArea";
-import { visualizerBridge } from "./visualizerBridge";
+    GENERAL_CATEGORY,
+    // Grbl
+    GRBL,
+    GRBL_ACTIVE_STATE_CHECK,
+    GRBL_ACTIVE_STATE_HOLD,
+    GRBL_ACTIVE_STATE_IDLE,
+    GRBL_ACTIVE_STATE_RUN,
+    GRBLHAL,
+    LIGHTWEIGHT_OPTIONS,
+    // Marlin
+    MARLIN,
+    // Units
+    METRIC_UNITS,
+    OVERRIDES_CATEGORY,
+    RENDER_LOADING,
+    RENDER_RENDERING,
+    // Smoothie
+    SMOOTHIE,
+    SURFACING_VISUALIZER_CONTAINER_ID,
+    // TinyG
+    TINYG,
+    VISUALIZER_CATEGORY,
+    VISUALIZER_PRIMARY,
+    VISUALIZER_SECONDARY,
+    WORKFLOW_STATE_IDLE,
+    WORKFLOW_STATE_PAUSED,
+    // Workflow
+    WORKFLOW_STATE_RUNNING,
+} from '../../constants';
+import useKeybinding from '../../lib/useKeybinding';
+import WidgetConfig from '../WidgetConfig/WidgetConfig';
+import { CAMERA_MODE_PAN, CAMERA_MODE_ROTATE } from './constants';
+import type { Actions, State } from './definitions';
+import GcodeEditorOverlay from './GcodeEditorOverlay';
+import GcodeViewer from './GcodeViewer';
+import Loading from './Loading';
+import { VisualizerPlaceholder } from './Placeholder';
+import Rendering from './Rendering';
+import SoftLimitsWarningArea from './SoftLimitsWarningArea';
+import { visualizerBridge } from './visualizerBridge';
 
 interface Views {
-	type: "isometric" | "top" | "front" | "right" | "left" | "default";
+    type: 'isometric' | 'top' | 'front' | 'right' | 'left' | 'default';
 }
 
 const debouncedThemeChange = debounce(() => {
-	pubsub.publish("visualizer:redraw");
+    pubsub.publish('visualizer:redraw');
 }, 500);
 
 // Keep in sync with the view cube's own geometry in @sienci/gviewer's
@@ -125,764 +125,792 @@ const BELOW_CUBE_BUTTON_GAP_PX = 8;
 const CUBE_TOP_GAP_PX = 32;
 
 function getViewCubeControlPositions(isPortrait: boolean) {
-	const viewCubeLeft = isPortrait ? VIEWCUBE_LEFT_PX_PORTRAIT : VIEWCUBE_LEFT_PX;
-	const viewCubeBottom = isPortrait
-		? VIEWCUBE_BOTTOM_PX_PORTRAIT
-		: VIEWCUBE_BOTTOM_PX;
-	const viewCubeSize = isPortrait ? VIEWCUBE_SIZE_PX_PORTRAIT : VIEWCUBE_SIZE_PX;
-	const cubeCenterX = viewCubeLeft + viewCubeSize / 2;
+    const viewCubeLeft = isPortrait
+        ? VIEWCUBE_LEFT_PX_PORTRAIT
+        : VIEWCUBE_LEFT_PX;
+    const viewCubeBottom = isPortrait
+        ? VIEWCUBE_BOTTOM_PX_PORTRAIT
+        : VIEWCUBE_BOTTOM_PX;
+    const viewCubeSize = isPortrait
+        ? VIEWCUBE_SIZE_PX_PORTRAIT
+        : VIEWCUBE_SIZE_PX;
+    const cubeCenterX = viewCubeLeft + viewCubeSize / 2;
 
-	// Cube-adjacent row (corner view + projection toggle) sits above the cube —
-	// the slot the lightweight toggle used to occupy. Gap is wider than
-	// VIEWCUBE_CONTROL_GAP_PX because the cube's rendered corners swing beyond
-	// its nominal bounding box as it rotates, so a plain stacking gap isn't
-	// enough clearance to avoid visually colliding with it.
-	const cubeButtonsRowBottom = viewCubeBottom + viewCubeSize + CUBE_TOP_GAP_PX;
-	const cornerViewButtonPosition = {
-		left: cubeCenterX - (BELOW_CUBE_BUTTON_SIZE_PX + BELOW_CUBE_BUTTON_GAP_PX) / 2,
-		bottom: cubeButtonsRowBottom,
-	};
-	const projectionTogglePosition = {
-		left: cubeCenterX + (BELOW_CUBE_BUTTON_SIZE_PX + BELOW_CUBE_BUTTON_GAP_PX) / 2,
-		bottom: cubeButtonsRowBottom,
-	};
+    // Cube-adjacent row (corner view + projection toggle) sits above the cube —
+    // the slot the lightweight toggle used to occupy. Gap is wider than
+    // VIEWCUBE_CONTROL_GAP_PX because the cube's rendered corners swing beyond
+    // its nominal bounding box as it rotates, so a plain stacking gap isn't
+    // enough clearance to avoid visually colliding with it.
+    const cubeButtonsRowBottom =
+        viewCubeBottom + viewCubeSize + CUBE_TOP_GAP_PX;
+    const cornerViewButtonPosition = {
+        left:
+            cubeCenterX -
+            (BELOW_CUBE_BUTTON_SIZE_PX + BELOW_CUBE_BUTTON_GAP_PX) / 2,
+        bottom: cubeButtonsRowBottom,
+    };
+    const projectionTogglePosition = {
+        left:
+            cubeCenterX +
+            (BELOW_CUBE_BUTTON_SIZE_PX + BELOW_CUBE_BUTTON_GAP_PX) / 2,
+        bottom: cubeButtonsRowBottom,
+    };
 
-	// Lightweight toggle shifts up one slot to make room for the row below it.
-	const lightweightTogglePosition = {
-		left: cubeCenterX,
-		bottom:
-			cubeButtonsRowBottom + BELOW_CUBE_BUTTON_SIZE_PX + VIEWCUBE_CONTROL_GAP_PX,
-	};
-	const moveToHereTogglePosition = {
-		left: lightweightTogglePosition.left,
-		bottom:
-			lightweightTogglePosition.bottom +
-			FLOATING_BUTTON_SIZE_PX +
-			VIEWCUBE_CONTROL_GAP_PX,
-	};
+    // Lightweight toggle shifts up one slot to make room for the row below it.
+    const lightweightTogglePosition = {
+        left: cubeCenterX,
+        bottom:
+            cubeButtonsRowBottom +
+            BELOW_CUBE_BUTTON_SIZE_PX +
+            VIEWCUBE_CONTROL_GAP_PX,
+    };
+    const moveToHereTogglePosition = {
+        left: lightweightTogglePosition.left,
+        bottom:
+            lightweightTogglePosition.bottom +
+            FLOATING_BUTTON_SIZE_PX +
+            VIEWCUBE_CONTROL_GAP_PX,
+    };
 
-	return {
-		lightweightTogglePosition,
-		moveToHereTogglePosition,
-		cornerViewButtonPosition,
-		projectionTogglePosition,
-	};
+    return {
+        lightweightTogglePosition,
+        moveToHereTogglePosition,
+        cornerViewButtonPosition,
+        projectionTogglePosition,
+    };
 }
 
 class Visualizer extends Component {
-	static propTypes = {
-		widgetId: PropTypes.string,
-		isSecondary: PropTypes.bool,
-	};
+    static propTypes = {
+        widgetId: PropTypes.string,
+        isSecondary: PropTypes.bool,
+    };
 
-	config = new WidgetConfig("visualizer");
+    config = new WidgetConfig('visualizer');
 
-	state: State = this.getInitialState();
+    state: State = this.getInitialState();
 
-	actions: Actions = {
-		dismissNotification: () => {
-			this.setState((state) => ({
-				notification: {
-					...state.notification,
-					type: "",
-					data: "",
-				},
-			}));
-		},
-		openModal: (name = "", params = {}) => {
-			this.setState((state) => ({
-				modal: {
-					name: name,
-					params: params,
-				},
-			}));
-		},
-		closeModal: () => {
-			this.setState((_state) => ({
-				modal: {
-					name: "",
-					params: {},
-				},
-			}));
-		},
-		updateModalParams: (params = {}) => {
-			this.setState((state) => ({
-				modal: {
-					...state.modal,
-					params: {
-						...state.modal.params,
-						...params,
-					},
-				},
-			}));
-		},
-		// Load file from watch directory
-		loadFile: (file) => {
-			this.setState((state) => ({
-				gcode: {
-					...state.gcode,
-					loading: true,
-					rendering: false,
-					ready: false,
-				},
-			}));
+    actions: Actions = {
+        dismissNotification: () => {
+            this.setState((state) => ({
+                notification: {
+                    ...state.notification,
+                    type: '',
+                    data: '',
+                },
+            }));
+        },
+        openModal: (name = '', params = {}) => {
+            this.setState((state) => ({
+                modal: {
+                    name: name,
+                    params: params,
+                },
+            }));
+        },
+        closeModal: () => {
+            this.setState((_state) => ({
+                modal: {
+                    name: '',
+                    params: {},
+                },
+            }));
+        },
+        updateModalParams: (params = {}) => {
+            this.setState((state) => ({
+                modal: {
+                    ...state.modal,
+                    params: {
+                        ...state.modal.params,
+                        ...params,
+                    },
+                },
+            }));
+        },
+        // Load file from watch directory
+        loadFile: (file) => {
+            this.setState((state) => ({
+                gcode: {
+                    ...state.gcode,
+                    loading: true,
+                    rendering: false,
+                    ready: false,
+                },
+            }));
 
-			controller.command("watchdir:load", file, (err, data) => {
-				if (err) {
-					this.setState((state) => ({
-						gcode: {
-							...state.gcode,
-							loading: false,
-							rendering: false,
-							ready: false,
-						},
-					}));
+            controller.command('watchdir:load', file, (err, data) => {
+                if (err) {
+                    this.setState((state) => ({
+                        gcode: {
+                            ...state.gcode,
+                            loading: false,
+                            rendering: false,
+                            ready: false,
+                        },
+                    }));
 
-					log.error(err);
-					return;
-				}
+                    log.error(err);
+                    return;
+                }
 
-				log.debug(data); // TODO
-			});
-		},
-		uploadFile: (gcode, meta) => {
-			const { name, size } = { ...meta };
-			// Send toolchange context on file load
-			const hooks = store.get("workspace.toolChangeHooks", {});
-			const context = {
-				toolChangeOption: store.get("workspace.toolChangeOption", "Ignore"),
-				...hooks,
-			};
+                log.debug(data); // TODO
+            });
+        },
+        uploadFile: (gcode, meta) => {
+            const { name, size } = { ...meta };
+            // Send toolchange context on file load
+            const hooks = store.get('workspace.toolChangeHooks', {});
+            const context = {
+                toolChangeOption: store.get(
+                    'workspace.toolChangeOption',
+                    'Ignore',
+                ),
+                ...hooks,
+            };
 
-			const { port, filename } = this.state;
+            const { port, filename } = this.state;
 
-			if (filename) {
-				this.visualizer.unload();
-			}
+            if (filename) {
+                this.visualizer.unload();
+            }
 
-			reduxStore.dispatch(updateFileProcessing({ fileProcessing: true }));
+            reduxStore.dispatch(updateFileProcessing({ fileProcessing: true }));
 
-			this.setState((state) => ({
-				gcode: {
-					...state.gcode,
-					loading: true,
-					rendering: false,
-					ready: false,
-				},
-			}));
+            this.setState((state) => ({
+                gcode: {
+                    ...state.gcode,
+                    loading: true,
+                    rendering: false,
+                    ready: false,
+                },
+            }));
 
-			//If we aren't connected to a device, only load the gcode
-			//to the visualizer and make no calls to the controller
-			if (!port) {
-				this.actions.loadGCode(name, gcode, size);
+            //If we aren't connected to a device, only load the gcode
+            //to the visualizer and make no calls to the controller
+            if (!port) {
+                this.actions.loadGCode(name, gcode, size);
 
-				return;
-			}
+                return;
+            }
 
-			controller.command("gcode:load", name, gcode, context, (err, data) => {
-				if (err) {
-					this.setState((state) => ({
-						gcode: {
-							...state.gcode,
-							loading: false,
-							rendering: false,
-							ready: false,
-						},
-					}));
+            controller.command(
+                'gcode:load',
+                name,
+                gcode,
+                context,
+                (err, data) => {
+                    if (err) {
+                        this.setState((state) => ({
+                            gcode: {
+                                ...state.gcode,
+                                loading: false,
+                                rendering: false,
+                                ready: false,
+                            },
+                        }));
 
-					log.error(err);
-					return;
-				}
+                        log.error(err);
+                        return;
+                    }
 
-				log.debug(data);
-			});
-		},
-		loadGCode: (name, vizualization, size) => {
-			const capable = {
-				view3D: !!this.visualizer,
-			};
+                    log.debug(data);
+                },
+            );
+        },
+        loadGCode: (name, vizualization, size) => {
+            const capable = {
+                view3D: !!this.visualizer,
+            };
 
-			const updater = (state) => {
-				return {
-					gcode: {
-						...state.gcode,
-						loading: false,
-						rendering: capable.view3D,
-						ready: !capable.view3D,
-						bbox: {
-							min: {
-								x: 0,
-								y: 0,
-								z: 0,
-							},
-							max: {
-								x: 0,
-								y: 0,
-								z: 0,
-							},
-						},
-						name: name,
-					},
-				};
-			};
-			const callback = () => {
-				// Clear gcode bounding box
-				controller.context = {
-					...controller.context,
-					xmin: 0,
-					xmax: 0,
-					ymin: 0,
-					ymax: 0,
-					zmin: 0,
-					zmax: 0,
-				};
+            const updater = (state) => {
+                return {
+                    gcode: {
+                        ...state.gcode,
+                        loading: false,
+                        rendering: capable.view3D,
+                        ready: !capable.view3D,
+                        bbox: {
+                            min: {
+                                x: 0,
+                                y: 0,
+                                z: 0,
+                            },
+                            max: {
+                                x: 0,
+                                y: 0,
+                                z: 0,
+                            },
+                        },
+                        name: name,
+                    },
+                };
+            };
+            const callback = () => {
+                // Clear gcode bounding box
+                controller.context = {
+                    ...controller.context,
+                    xmin: 0,
+                    xmax: 0,
+                    ymin: 0,
+                    ymax: 0,
+                    zmin: 0,
+                    zmax: 0,
+                };
 
-				if (!capable.view3D) {
-					const interval = setInterval(() => {
-						if (this.actions.checkVisualizerRef()) {
-							clearInterval(interval);
+                if (!capable.view3D) {
+                    const interval = setInterval(() => {
+                        if (this.actions.checkVisualizerRef()) {
+                            clearInterval(interval);
 
-							this.visualizer.load(name, vizualization, ({ bbox }) => {
-								// Set gcode bounding box
-								controller.context = {
-									...controller.context,
-									xmin: bbox.min.x,
-									xmax: bbox.max.x,
-									ymin: bbox.min.y,
-									ymax: bbox.max.y,
-									zmin: bbox.min.z,
-									zmax: bbox.max.z,
-								};
+                            this.visualizer.load(
+                                name,
+                                vizualization,
+                                ({ bbox }) => {
+                                    // Set gcode bounding box
+                                    controller.context = {
+                                        ...controller.context,
+                                        xmin: bbox.min.x,
+                                        xmax: bbox.max.x,
+                                        ymin: bbox.min.y,
+                                        ymax: bbox.max.y,
+                                        zmin: bbox.min.z,
+                                        zmax: bbox.max.z,
+                                    };
 
-								const { port } = this.state;
+                                    const { port } = this.state;
 
-								this.setState((state) => ({
-									gcode: {
-										...state.gcode,
-										loading: false,
-										rendering: false,
-										ready: true,
-										bbox: bbox,
-										loadedBeforeConnection: !port,
-									},
-									filename: name,
-									fileSize: size,
-								}));
-							});
-						}
-					}, 100);
-					return;
-				}
+                                    this.setState((state) => ({
+                                        gcode: {
+                                            ...state.gcode,
+                                            loading: false,
+                                            rendering: false,
+                                            ready: true,
+                                            bbox: bbox,
+                                            loadedBeforeConnection: !port,
+                                        },
+                                        filename: name,
+                                        fileSize: size,
+                                    }));
+                                },
+                            );
+                        }
+                    }, 100);
+                    return;
+                }
 
-				setTimeout(() => {
-					this.visualizer.load(name, vizualization, ({ bbox }) => {
-						// Set gcode bounding box
-						controller.context = {
-							...controller.context,
-							xmin: bbox.min.x,
-							xmax: bbox.max.x,
-							ymin: bbox.min.y,
-							ymax: bbox.max.y,
-							zmin: bbox.min.z,
-							zmax: bbox.max.z,
-						};
+                setTimeout(() => {
+                    this.visualizer.load(name, vizualization, ({ bbox }) => {
+                        // Set gcode bounding box
+                        controller.context = {
+                            ...controller.context,
+                            xmin: bbox.min.x,
+                            xmax: bbox.max.x,
+                            ymin: bbox.min.y,
+                            ymax: bbox.max.y,
+                            zmin: bbox.min.z,
+                            zmax: bbox.max.z,
+                        };
 
-						const { port } = this.state;
+                        const { port } = this.state;
 
-						this.setState((state) => ({
-							gcode: {
-								...state.gcode,
-								loading: false,
-								rendering: false,
-								ready: true,
-								bbox: bbox,
-								loadedBeforeConnection: !port,
-							},
-							filename: name,
-							fileSize: size,
-						}));
-					});
-				}, 0);
-			};
+                        this.setState((state) => ({
+                            gcode: {
+                                ...state.gcode,
+                                loading: false,
+                                rendering: false,
+                                ready: true,
+                                bbox: bbox,
+                                loadedBeforeConnection: !port,
+                            },
+                            filename: name,
+                            fileSize: size,
+                        }));
+                    });
+                }, 0);
+            };
 
-			this.setState(updater, callback);
-		},
-		unloadGCode: () => {
-			const visualizer = this.visualizer;
-			if (visualizer) {
-				visualizer.unload();
-			}
+            this.setState(updater, callback);
+        },
+        unloadGCode: () => {
+            const visualizer = this.visualizer;
+            if (visualizer) {
+                visualizer.unload();
+            }
 
-			// Clear gcode bounding box
-			controller.context = {
-				...controller.context,
-				xmin: 0,
-				xmax: 0,
-				ymin: 0,
-				ymax: 0,
-				zmin: 0,
-				zmax: 0,
-			};
+            // Clear gcode bounding box
+            controller.context = {
+                ...controller.context,
+                xmin: 0,
+                xmax: 0,
+                ymin: 0,
+                ymax: 0,
+                zmin: 0,
+                zmax: 0,
+            };
 
-			this.setState((state) => ({
-				gcode: {
-					...state.gcode,
-					loading: false,
-					rendering: false,
-					ready: false,
-					content: "",
-					bbox: {
-						min: {
-							x: 0,
-							y: 0,
-							z: 0,
-						},
-						max: {
-							x: 0,
-							y: 0,
-							z: 0,
-						},
-					},
-					visualization: {},
-				},
-			}));
-		},
-		onRunClick: () => {
-			this.actions.handleRun();
-		},
-		handleRun: () => {
-			const { workflow, activeState } = this.props;
-			console.assert(
-				includes(
-					[WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED],
-					workflow.state,
-				) || activeState === GRBL_ACTIVE_STATE_HOLD,
-			);
-			this.setState((prev) => ({
-				invalidGcode: { ...prev.invalidGcode, showModal: false },
-			}));
+            this.setState((state) => ({
+                gcode: {
+                    ...state.gcode,
+                    loading: false,
+                    rendering: false,
+                    ready: false,
+                    content: '',
+                    bbox: {
+                        min: {
+                            x: 0,
+                            y: 0,
+                            z: 0,
+                        },
+                        max: {
+                            x: 0,
+                            y: 0,
+                            z: 0,
+                        },
+                    },
+                    visualization: {},
+                },
+            }));
+        },
+        onRunClick: () => {
+            this.actions.handleRun();
+        },
+        handleRun: () => {
+            const { workflow, activeState } = this.props;
+            console.assert(
+                includes(
+                    [WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED],
+                    workflow.state,
+                ) || activeState === GRBL_ACTIVE_STATE_HOLD,
+            );
+            this.setState((prev) => ({
+                invalidGcode: { ...prev.invalidGcode, showModal: false },
+            }));
 
-			if (workflow.state === WORKFLOW_STATE_IDLE) {
-				controller.command("gcode:start");
-				return;
-			}
+            if (workflow.state === WORKFLOW_STATE_IDLE) {
+                controller.command('gcode:start');
+                return;
+            }
 
-			if (
-				workflow.state === WORKFLOW_STATE_PAUSED ||
-				activeState === GRBL_ACTIVE_STATE_HOLD
-			) {
-				controller.command("gcode:resume");
-			}
-		},
-		handlePause: () => {
-			controller.command("gcode:pause");
-		},
-		handleStop: () => {
-			controller.command("gcode:stop", { force: true });
-		},
-		handleClose: () => {
-			const { workflow } = this.props;
-			console.assert(includes([WORKFLOW_STATE_IDLE], workflow.state));
+            if (
+                workflow.state === WORKFLOW_STATE_PAUSED ||
+                activeState === GRBL_ACTIVE_STATE_HOLD
+            ) {
+                controller.command('gcode:resume');
+            }
+        },
+        handlePause: () => {
+            controller.command('gcode:pause');
+        },
+        handleStop: () => {
+            controller.command('gcode:stop', { force: true });
+        },
+        handleClose: () => {
+            const { workflow } = this.props;
+            console.assert(includes([WORKFLOW_STATE_IDLE], workflow.state));
 
-			controller.command("gcode:unload");
+            controller.command('gcode:unload');
 
-			pubsub.publish("gcode:unload"); // Unload the G-code
-		},
-		setBoundingBox: (bbox) => {
-			this.setState((state) => ({
-				gcode: {
-					...state.gcode,
-					bbox: bbox,
-				},
-			}));
-		},
-		toggle3DView: () => {
-			if (!WebGL.isWebGLAvailable() && this.state.disabled) {
-				displayWebGLErrorMessage();
-				return;
-			}
+            pubsub.publish('gcode:unload'); // Unload the G-code
+        },
+        setBoundingBox: (bbox) => {
+            this.setState((state) => ({
+                gcode: {
+                    ...state.gcode,
+                    bbox: bbox,
+                },
+            }));
+        },
+        toggle3DView: () => {
+            if (!WebGL.isWebGLAvailable() && this.state.disabled) {
+                displayWebGLErrorMessage();
+                return;
+            }
 
-			this.setState((state) => ({
-				disabled: !state.disabled,
-			}));
-		},
-		toPerspectiveProjection: (projection) => {
-			this.setState((state) => ({
-				projection: "perspective",
-			}));
-		},
-		toOrthographicProjection: (projection) => {
-			this.setState((state) => ({
-				projection: "orthographic",
-			}));
-		},
-		toggleProjection: () => {
-			const current = store.get("widgets.visualizer.projection", "Perspective");
-			const next = current === "Orthographic" ? "Perspective" : "Orthographic";
-			store.set("widgets.visualizer.projection", next);
-			pubsub.publish("visualizer:settings");
-			this.forceUpdate();
-		},
-		toggleGCodeFilename: () => {
-			this.setState((state) => ({
-				gcode: {
-					...state.gcode,
-					displayName: !state.gcode.displayName,
-				},
-			}));
-		},
-		toggleLimitsVisibility: () => {
-			this.setState((state) => ({
-				objects: {
-					...state.objects,
-					limits: {
-						...state.objects.limits,
-						visible: !state.objects.limits.visible,
-					},
-				},
-			}));
-		},
-		toggleCoordinateSystemVisibility: () => {
-			this.setState((state) => ({
-				objects: {
-					...state.objects,
-					coordinateSystem: {
-						...state.objects.coordinateSystem,
-						visible: !state.objects.coordinateSystem.visible,
-					},
-				},
-			}));
-		},
-		toggleGridLineNumbersVisibility: () => {
-			this.setState((state) => ({
-				objects: {
-					...state.objects,
-					gridLineNumbers: {
-						...state.objects.gridLineNumbers,
-						visible: !state.objects.gridLineNumbers.visible,
-					},
-				},
-			}));
-		},
-		toggleCuttingToolVisibility: () => {
-			this.setState((state) => ({
-				objects: {
-					...state.objects,
-					cuttingTool: {
-						...state.objects.cuttingTool,
-						visible: !state.objects.cuttingTool.visible,
-					},
-				},
-			}));
-		},
-		camera: {
-			toRotateMode: () => {
-				this.setState((state) => ({
-					cameraMode: CAMERA_MODE_ROTATE,
-				}));
-			},
-			toPanMode: () => {
-				this.setState((state) => ({
-					cameraMode: CAMERA_MODE_PAN,
-				}));
-			},
-			zoomFit: () => {
-				if (this.visualizer) {
-					this.visualizer.zoomFit();
-				}
-			},
-			zoomIn: () => {
-				if (this.visualizer) {
-					this.visualizer.zoomIn();
-				}
-			},
-			zoomOut: () => {
-				if (this.visualizer) {
-					this.visualizer.zoomOut();
-				}
-			},
-			panUp: () => {
-				if (this.visualizer) {
-					this.visualizer.panUp();
-				}
-			},
-			panDown: () => {
-				if (this.visualizer) {
-					this.visualizer.panDown();
-				}
-			},
-			panLeft: () => {
-				if (this.visualizer) {
-					this.visualizer.panLeft();
-				}
-			},
-			panRight: () => {
-				if (this.visualizer) {
-					this.visualizer.panRight();
-				}
-			},
-			lookAtCenter: () => {
-				if (this.visualizer) {
-					this.visualizer.lookAtCenter();
-				}
-			},
-			toTopView: () => {
-				this.setState((prev) => ({
-					cameraPosition: "Top",
-					cameraPositionNonce: prev.cameraPositionNonce + 1,
-				}));
-			},
-			to3DView: () => {
-				this.setState((prev) => ({
-					cameraPosition: "3D",
-					cameraPositionNonce: prev.cameraPositionNonce + 1,
-				}));
-			},
-			toFrontView: () => {
-				this.setState((prev) => ({
-					cameraPosition: "Front",
-					cameraPositionNonce: prev.cameraPositionNonce + 1,
-				}));
-			},
-			toLeftSideView: () => {
-				this.setState((prev) => ({
-					cameraPosition: "Left",
-					cameraPositionNonce: prev.cameraPositionNonce + 1,
-				}));
-			},
-			toRightSideView: () => {
-				this.setState((prev) => ({
-					cameraPosition: "Right",
-					cameraPositionNonce: prev.cameraPositionNonce + 1,
-				}));
-			},
-			toTopLeftCornerView: () => {
-				this.setState((prev) => ({
-					cameraPosition: "TopLeftCorner",
-					cameraPositionNonce: prev.cameraPositionNonce + 1,
-				}));
-			},
-			toFreeView: () => {
-				this.setState((prev) => ({
-					cameraPosition: "Free",
-					cameraPositionNonce: prev.cameraPositionNonce + 1,
-				}));
-			},
-		},
-		// Arm/disarm "Move To Here" via the visualizer bridge: pressing-and-
-		// holding a spot in the viewport rapids the spindle there. The bridge
-		// (GcodeViewer) owns the pointer gesture, hold indicator, and camera
-		// lock/restore; here we only decide when it's safe to arm and what to
-		// do with a committed pick.
-		armMoveToHere: () => {
-			const handle = visualizerBridge.get();
-			if (!handle) {
-				return;
-			}
-			if (handle.isRotaryFile()) {
-				toast.info("Move To Here isn't available for rotary files", {
-					position: "bottom-right",
-				});
-				return;
-			}
-			if (!this.actions.moveToHereMachineReady()) {
-				toast.info("Machine must be connected and idle to move", {
-					position: "bottom-right",
-				});
-				return;
-			}
-			handle.armPick("hold", this.actions.handleMoveToHerePick);
-			this.setState({ moveToHere: true });
-		},
-		disarmMoveToHere: () => {
-			visualizerBridge.get()?.disarmPick();
-			this.setState({ moveToHere: false });
-		},
-		toggleMoveToHere: () => {
-			if (this.state.moveToHere) {
-				this.actions.disarmMoveToHere();
-			} else {
-				this.actions.armMoveToHere();
-			}
-		},
-		moveToHereMachineReady: () => {
-			return (
-				!!this.props.isConnected &&
-				this.props.activeState === GRBL_ACTIVE_STATE_IDLE
-			);
-		},
-		handleMoveToHerePick: ({
-			world,
-		}: {
-			world: { x: number; y: number; z: number };
-		}) => {
-			if (!this.actions.moveToHereMachineReady()) {
-				toast.info("Machine must be connected and idle to move", {
-					position: "bottom-right",
-				});
-				this.actions.disarmMoveToHere();
-				return;
-			}
+            this.setState((state) => ({
+                disabled: !state.disabled,
+            }));
+        },
+        toPerspectiveProjection: (projection) => {
+            this.setState((state) => ({
+                projection: 'perspective',
+            }));
+        },
+        toOrthographicProjection: (projection) => {
+            this.setState((state) => ({
+                projection: 'orthographic',
+            }));
+        },
+        toggleProjection: () => {
+            const current = store.get(
+                'widgets.visualizer.projection',
+                'Perspective',
+            );
+            const next =
+                current === 'Orthographic' ? 'Perspective' : 'Orthographic';
+            store.set('widgets.visualizer.projection', next);
+            pubsub.publish('visualizer:settings');
+            this.forceUpdate();
+        },
+        toggleGCodeFilename: () => {
+            this.setState((state) => ({
+                gcode: {
+                    ...state.gcode,
+                    displayName: !state.gcode.displayName,
+                },
+            }));
+        },
+        toggleLimitsVisibility: () => {
+            this.setState((state) => ({
+                objects: {
+                    ...state.objects,
+                    limits: {
+                        ...state.objects.limits,
+                        visible: !state.objects.limits.visible,
+                    },
+                },
+            }));
+        },
+        toggleCoordinateSystemVisibility: () => {
+            this.setState((state) => ({
+                objects: {
+                    ...state.objects,
+                    coordinateSystem: {
+                        ...state.objects.coordinateSystem,
+                        visible: !state.objects.coordinateSystem.visible,
+                    },
+                },
+            }));
+        },
+        toggleGridLineNumbersVisibility: () => {
+            this.setState((state) => ({
+                objects: {
+                    ...state.objects,
+                    gridLineNumbers: {
+                        ...state.objects.gridLineNumbers,
+                        visible: !state.objects.gridLineNumbers.visible,
+                    },
+                },
+            }));
+        },
+        toggleCuttingToolVisibility: () => {
+            this.setState((state) => ({
+                objects: {
+                    ...state.objects,
+                    cuttingTool: {
+                        ...state.objects.cuttingTool,
+                        visible: !state.objects.cuttingTool.visible,
+                    },
+                },
+            }));
+        },
+        camera: {
+            toRotateMode: () => {
+                this.setState((state) => ({
+                    cameraMode: CAMERA_MODE_ROTATE,
+                }));
+            },
+            toPanMode: () => {
+                this.setState((state) => ({
+                    cameraMode: CAMERA_MODE_PAN,
+                }));
+            },
+            zoomFit: () => {
+                if (this.visualizer) {
+                    this.visualizer.zoomFit();
+                }
+            },
+            zoomIn: () => {
+                if (this.visualizer) {
+                    this.visualizer.zoomIn();
+                }
+            },
+            zoomOut: () => {
+                if (this.visualizer) {
+                    this.visualizer.zoomOut();
+                }
+            },
+            panUp: () => {
+                if (this.visualizer) {
+                    this.visualizer.panUp();
+                }
+            },
+            panDown: () => {
+                if (this.visualizer) {
+                    this.visualizer.panDown();
+                }
+            },
+            panLeft: () => {
+                if (this.visualizer) {
+                    this.visualizer.panLeft();
+                }
+            },
+            panRight: () => {
+                if (this.visualizer) {
+                    this.visualizer.panRight();
+                }
+            },
+            lookAtCenter: () => {
+                if (this.visualizer) {
+                    this.visualizer.lookAtCenter();
+                }
+            },
+            toTopView: () => {
+                this.setState((prev) => ({
+                    cameraPosition: 'Top',
+                    cameraPositionNonce: prev.cameraPositionNonce + 1,
+                }));
+            },
+            to3DView: () => {
+                this.setState((prev) => ({
+                    cameraPosition: '3D',
+                    cameraPositionNonce: prev.cameraPositionNonce + 1,
+                }));
+            },
+            toFrontView: () => {
+                this.setState((prev) => ({
+                    cameraPosition: 'Front',
+                    cameraPositionNonce: prev.cameraPositionNonce + 1,
+                }));
+            },
+            toLeftSideView: () => {
+                this.setState((prev) => ({
+                    cameraPosition: 'Left',
+                    cameraPositionNonce: prev.cameraPositionNonce + 1,
+                }));
+            },
+            toRightSideView: () => {
+                this.setState((prev) => ({
+                    cameraPosition: 'Right',
+                    cameraPositionNonce: prev.cameraPositionNonce + 1,
+                }));
+            },
+            toTopLeftCornerView: () => {
+                this.setState((prev) => ({
+                    cameraPosition: 'TopLeftCorner',
+                    cameraPositionNonce: prev.cameraPositionNonce + 1,
+                }));
+            },
+            toFreeView: () => {
+                this.setState((prev) => ({
+                    cameraPosition: 'Free',
+                    cameraPositionNonce: prev.cameraPositionNonce + 1,
+                }));
+            },
+        },
+        // Arm/disarm "Move To Here" via the visualizer bridge: pressing-and-
+        // holding a spot in the viewport rapids the spindle there. The bridge
+        // (GcodeViewer) owns the pointer gesture, hold indicator, and camera
+        // lock/restore; here we only decide when it's safe to arm and what to
+        // do with a committed pick.
+        armMoveToHere: () => {
+            const handle = visualizerBridge.get();
+            if (!handle) {
+                return;
+            }
+            if (handle.isRotaryFile()) {
+                toast.info("Move To Here isn't available for rotary files", {
+                    position: 'bottom-right',
+                });
+                return;
+            }
+            if (!this.actions.moveToHereMachineReady()) {
+                toast.info('Machine must be connected and idle to move', {
+                    position: 'bottom-right',
+                });
+                return;
+            }
+            handle.armPick('hold', this.actions.handleMoveToHerePick);
+            this.setState({ moveToHere: true });
+        },
+        disarmMoveToHere: () => {
+            visualizerBridge.get()?.disarmPick();
+            this.setState({ moveToHere: false });
+        },
+        toggleMoveToHere: () => {
+            if (this.state.moveToHere) {
+                this.actions.disarmMoveToHere();
+            } else {
+                this.actions.armMoveToHere();
+            }
+        },
+        moveToHereMachineReady: () => {
+            return (
+                !!this.props.isConnected &&
+                this.props.activeState === GRBL_ACTIVE_STATE_IDLE
+            );
+        },
+        handleMoveToHerePick: ({
+            world,
+        }: {
+            world: { x: number; y: number; z: number };
+        }) => {
+            if (!this.actions.moveToHereMachineReady()) {
+                toast.info('Machine must be connected and idle to move', {
+                    position: 'bottom-right',
+                });
+                this.actions.disarmMoveToHere();
+                return;
+            }
 
-			const x = Number(world.x.toFixed(3));
-			const y = Number(world.y.toFixed(3));
-			const unitModal = this.state.units === METRIC_UNITS ? "G21" : "G20";
-			controller.command(
-				"gcode:safe",
-				getSafeXYMoveCode(x, y),
-				unitModal,
-			);
+            const x = Number(world.x.toFixed(3));
+            const y = Number(world.y.toFixed(3));
+            const unitModal = this.state.units === METRIC_UNITS ? 'G21' : 'G20';
+            controller.command(
+                'gcode:safe',
+                getSafeXYMoveCode(x, y),
+                unitModal,
+            );
 
-			toast.success(`Moving to X${x.toFixed(2)} Y${y.toFixed(2)}`, {
-				position: "bottom-right",
-			});
+            toast.success(`Moving to X${x.toFixed(2)} Y${y.toFixed(2)}`, {
+                position: 'bottom-right',
+            });
 
-			// Auto-disarm after a successful move.
-			this.actions.disarmMoveToHere();
-		},
-		handleLiteModeToggle: () => {
-			const { liteMode, liteOption } = this.state;
-			const { isFileLoaded } = this.props;
-			const newLiteModeValue = !liteMode;
+            // Auto-disarm after a successful move.
+            this.actions.disarmMoveToHere();
+        },
+        handleLiteModeToggle: () => {
+            const { liteMode, liteOption } = this.state;
+            const { isFileLoaded } = this.props;
+            const newLiteModeValue = !liteMode;
 
-			this.setState({
-				liteMode: newLiteModeValue,
-				minimizeRenders: newLiteModeValue,
-			});
+            this.setState({
+                liteMode: newLiteModeValue,
+                minimizeRenders: newLiteModeValue,
+            });
 
-			// Write to store immediately so shouldVisualize() returns the correct value
-			// when VisualizerWrapper.componentDidUpdate fires (child before parent in React's
-			// bottom-up lifecycle, before index.tsx's own componentDidUpdate updates the store).
-			this.config.set("liteMode", newLiteModeValue);
+            // Write to store immediately so shouldVisualize() returns the correct value
+            // when VisualizerWrapper.componentDidUpdate fires (child before parent in React's
+            // bottom-up lifecycle, before index.tsx's own componentDidUpdate updates the store).
+            this.config.set('liteMode', newLiteModeValue);
 
-			// instead of calling loadGCode right away,
-			// use this pubsub to invoke a refresh of the visualizer wrapper.
-			// this removes visual glitches that would otherwise appear.
-			const wasInEverythingMode =
-				liteMode && liteOption === LIGHTWEIGHT_OPTIONS.EVERYTHING;
-			pubsub.publish("litemode:change", {
-				isFileLoaded,
-				enteringLiteMode: newLiteModeValue,
-				wasInEverythingMode,
-			});
+            // instead of calling loadGCode right away,
+            // use this pubsub to invoke a refresh of the visualizer wrapper.
+            // this removes visual glitches that would otherwise appear.
+            const wasInEverythingMode =
+                liteMode && liteOption === LIGHTWEIGHT_OPTIONS.EVERYTHING;
+            pubsub.publish('litemode:change', {
+                isFileLoaded,
+                enteringLiteMode: newLiteModeValue,
+                wasInEverythingMode,
+            });
 
-			posthog?.capture("lite_mode_toggled", {
-				isFileLoaded,
-				new_value: newLiteModeValue,
-				was_in_everything_mode: wasInEverythingMode,
-			});
-		},
-		lineWarning: {
-			onContinue: () => {
-				this.setState((prev) => ({
-					invalidLine: { ...prev.invalidLine, show: false, line: "" },
-				}));
-				this.actions.handleRun();
-			},
-			onIgnoreWarning: () => {
-				this.setState((prev) => ({
-					invalidLine: {
-						...prev.invalidLine,
-						show: false,
-						line: "",
-					},
-				}));
+            posthog?.capture('lite_mode_toggled', {
+                isFileLoaded,
+                new_value: newLiteModeValue,
+                was_in_everything_mode: wasInEverythingMode,
+            });
+        },
+        lineWarning: {
+            onContinue: () => {
+                this.setState((prev) => ({
+                    invalidLine: { ...prev.invalidLine, show: false, line: '' },
+                }));
+                this.actions.handleRun();
+            },
+            onIgnoreWarning: () => {
+                this.setState((prev) => ({
+                    invalidLine: {
+                        ...prev.invalidLine,
+                        show: false,
+                        line: '',
+                    },
+                }));
 
-				store.set("widgets.visualizer.showLineWarnings", false);
-				controller.command("settings:updated", {
-					showLineWarnings: false,
-				});
-				this.actions.handleRun();
-			},
-			onCancel: () => this.actions.reset(),
-		},
-		setVisualizerReady: () => {
-			this.setState((state) => ({
-				gcode: {
-					...state.gcode,
-					loading: false,
-					rendering: false,
-					ready: true,
-				},
-			}));
-		},
-		reset: () => {
-			this.actions.handleClose();
-			this.setState(this.getInitialState());
-			this.actions.unloadGCode();
-			pubsub.publish("gcode:fileInfo");
-			pubsub.publish("gcode:unload");
-		},
-		getHull: () => {
-			return this.visualizer.getToolpathHull();
-		},
-		checkVisualizerRef: () => {
-			return this.visualizer !== null;
-		},
-	};
+                store.set('widgets.visualizer.showLineWarnings', false);
+                controller.command('settings:updated', {
+                    showLineWarnings: false,
+                });
+                this.actions.handleRun();
+            },
+            onCancel: () => this.actions.reset(),
+        },
+        setVisualizerReady: () => {
+            this.setState((state) => ({
+                gcode: {
+                    ...state.gcode,
+                    loading: false,
+                    rendering: false,
+                    ready: true,
+                },
+            }));
+        },
+        reset: () => {
+            this.actions.handleClose();
+            this.setState(this.getInitialState());
+            this.actions.unloadGCode();
+            pubsub.publish('gcode:fileInfo');
+            pubsub.publish('gcode:unload');
+        },
+        getHull: () => {
+            return this.visualizer.getToolpathHull();
+        },
+        checkVisualizerRef: () => {
+            return this.visualizer !== null;
+        },
+    };
 
-	pubsubTokens = [];
+    pubsubTokens = [];
 
-	onProcessedGcode = ({ data }) => {
-		const { total, invalidGcode } = data;
+    onProcessedGcode = ({ data }) => {
+        const { total, invalidGcode } = data;
 
-		if (invalidGcode.size > 0) {
-			this.setState((prev) => ({
-				invalidGcode: { ...prev.invalidGcode, list: invalidGcode },
-			}));
-			if (this.state.invalidGcode.shouldShow) {
-				toast.info(
-					`Found ${invalidGcode.size} line(s) of non-GRBL-supported G-Code in this file.  Your job may not run properly.`,
-					{ position: "bottom-right" },
-				);
-			}
-		}
+        if (invalidGcode.size > 0) {
+            this.setState((prev) => ({
+                invalidGcode: { ...prev.invalidGcode, list: invalidGcode },
+            }));
+            if (this.state.invalidGcode.shouldShow) {
+                toast.info(
+                    `Found ${invalidGcode.size} line(s) of non-GRBL-supported G-Code in this file.  Your job may not run properly.`,
+                    { position: 'bottom-right' },
+                );
+            }
+        }
 
-		this.setState({ total });
+        this.setState({ total });
 
-		const reduxPayload = {
-			...data,
-			content: this.state.gcode.content,
-		};
+        const reduxPayload = {
+            ...data,
+            content: this.state.gcode.content,
+        };
 
-		// Emit events on response with relevant data from processor worker
-		reduxStore.dispatch(updateFileInfo(reduxPayload));
-	};
+        // Emit events on response with relevant data from processor worker
+        reduxStore.dispatch(updateFileInfo(reduxPayload));
+    };
 
-	processGCode = (gcode, name, size) => {};
+    processGCode = (gcode, name, size) => {};
 
-	unsubscribe() {
-		this.pubsubTokens.forEach((token) => {
-			pubsub.unsubscribe(token);
-		});
-		this.pubsubTokens = [];
-	}
+    unsubscribe() {
+        this.pubsubTokens.forEach((token) => {
+            pubsub.unsubscribe(token);
+        });
+        this.pubsubTokens = [];
+    }
 
-	// refs
-	widgetContent = null;
+    // refs
+    widgetContent = null;
 
-	visualizer = null;
+    visualizer = null;
 
-	workflowControl = null;
+    workflowControl = null;
 
-	orientationMediaQueryList: MediaQueryList | null = null;
+    orientationMediaQueryList: MediaQueryList | null = null;
 
-	handleOrientationChange = (event: MediaQueryListEvent) => {
-		this.setState({ isPortrait: event.matches });
-	};
+    handleOrientationChange = (event: MediaQueryListEvent) => {
+        this.setState({ isPortrait: event.matches });
+    };
 
-	componentDidMount() {
-		this.subscribe();
+    componentDidMount() {
+        this.subscribe();
 
-		this.orientationMediaQueryList = window.matchMedia(
-			"(orientation: portrait)",
-		);
-		this.orientationMediaQueryList.addEventListener(
-			"change",
-			this.handleOrientationChange,
-		);
+        this.orientationMediaQueryList = window.matchMedia(
+            '(orientation: portrait)',
+        );
+        this.orientationMediaQueryList.addEventListener(
+            'change',
+            this.handleOrientationChange,
+        );
 
-		/*store.on('change', () => {
+        /*store.on('change', () => {
             const { theme } = this.state;
             const { theme: storeTheme } = store.get('widgets.visualizer');
             if (theme !== storeTheme) {
@@ -890,1112 +918,1178 @@ class Visualizer extends Component {
             }
         })*/
 
-		store.on("change", () => {
-			const storeUnits = store.get("workspace.units");
-			const { units } = this.state;
-			if (units !== storeUnits) {
-				this.setState({ units: storeUnits });
-			}
-		});
-		this.addShuttleControlEvents();
-		useKeybinding(this.shuttleControlEvents);
-		this.subscribe();
+        store.on('change', () => {
+            const storeUnits = store.get('workspace.units');
+            const { units } = this.state;
+            if (units !== storeUnits) {
+                this.setState({ units: storeUnits });
+            }
+        });
+        this.addShuttleControlEvents();
+        useKeybinding(this.shuttleControlEvents);
+        this.subscribe();
 
-		if (!WebGL.isWebGLAvailable() && !this.state.disabled) {
-			displayWebGLErrorMessage();
+        if (!WebGL.isWebGLAvailable() && !this.state.disabled) {
+            displayWebGLErrorMessage();
 
-			setTimeout(() => {
-				this.setState((state) => ({
-					disabled: true,
-				}));
-			}, 0);
-		}
-	}
+            setTimeout(() => {
+                this.setState((state) => ({
+                    disabled: true,
+                }));
+            }, 0);
+        }
+    }
 
-	componentWillUnmount() {
-		this.unsubscribe();
-		this.removeShuttleControlEvents();
-		this.unsubscribe();
+    componentWillUnmount() {
+        this.unsubscribe();
+        this.removeShuttleControlEvents();
+        this.unsubscribe();
 
-		this.orientationMediaQueryList?.removeEventListener(
-			"change",
-			this.handleOrientationChange,
-		);
-	}
+        this.orientationMediaQueryList?.removeEventListener(
+            'change',
+            this.handleOrientationChange,
+        );
+    }
 
-	componentDidUpdate(prevProps, prevState) {
-		if (this.state.disabled !== prevState.disabled) {
-			this.config.set("disabled", this.state.disabled);
-		}
-		if (this.state.projection !== prevState.projection) {
-			this.config.set("projection", this.state.projection);
-		}
-		if (this.state.cameraMode !== prevState.cameraMode) {
-			this.config.set("cameraMode", this.state.cameraMode);
-		}
-		if (this.state.gcode.displayName !== prevState.gcode.displayName) {
-			this.config.set("gcode.displayName", this.state.gcode.displayName);
-		}
-		if (
-			this.state.objects.limits.visible !== prevState.objects.limits.visible
-		) {
-			this.config.set(
-				"objects.limits.visible",
-				this.state.objects.limits.visible,
-			);
-		}
-		if (
-			this.state.objects.coordinateSystem.visible !==
-			prevState.objects.coordinateSystem.visible
-		) {
-			this.config.set(
-				"objects.coordinateSystem.visible",
-				this.state.objects.coordinateSystem.visible,
-			);
-		}
-		if (
-			this.state.objects.gridLineNumbers.visible !==
-			prevState.objects.gridLineNumbers.visible
-		) {
-			this.config.set(
-				"objects.gridLineNumbers.visible",
-				this.state.objects.gridLineNumbers.visible,
-			);
-		}
-		if (
-			this.state.objects.cuttingTool.visible !==
-			prevState.objects.cuttingTool.visible
-		) {
-			this.config.set(
-				"objects.cuttingTool.visible",
-				this.state.objects.cuttingTool.visible,
-			);
-		}
-		if (this.state.liteMode !== prevState.liteMode) {
-			this.config.set("liteMode", this.state.liteMode);
-		}
-	}
+    componentDidUpdate(prevProps, prevState) {
+        if (this.state.disabled !== prevState.disabled) {
+            this.config.set('disabled', this.state.disabled);
+        }
+        if (this.state.projection !== prevState.projection) {
+            this.config.set('projection', this.state.projection);
+        }
+        if (this.state.cameraMode !== prevState.cameraMode) {
+            this.config.set('cameraMode', this.state.cameraMode);
+        }
+        if (this.state.gcode.displayName !== prevState.gcode.displayName) {
+            this.config.set('gcode.displayName', this.state.gcode.displayName);
+        }
+        if (
+            this.state.objects.limits.visible !==
+            prevState.objects.limits.visible
+        ) {
+            this.config.set(
+                'objects.limits.visible',
+                this.state.objects.limits.visible,
+            );
+        }
+        if (
+            this.state.objects.coordinateSystem.visible !==
+            prevState.objects.coordinateSystem.visible
+        ) {
+            this.config.set(
+                'objects.coordinateSystem.visible',
+                this.state.objects.coordinateSystem.visible,
+            );
+        }
+        if (
+            this.state.objects.gridLineNumbers.visible !==
+            prevState.objects.gridLineNumbers.visible
+        ) {
+            this.config.set(
+                'objects.gridLineNumbers.visible',
+                this.state.objects.gridLineNumbers.visible,
+            );
+        }
+        if (
+            this.state.objects.cuttingTool.visible !==
+            prevState.objects.cuttingTool.visible
+        ) {
+            this.config.set(
+                'objects.cuttingTool.visible',
+                this.state.objects.cuttingTool.visible,
+            );
+        }
+        if (this.state.liteMode !== prevState.liteMode) {
+            this.config.set('liteMode', this.state.liteMode);
+        }
+    }
 
-	getInitialState(): State {
-		return {
-			port: controller.port,
-			units: store.get("workspace.units", METRIC_UNITS),
-			theme: this.config.get("theme"),
-			isPortrait:
-				typeof window !== "undefined" &&
-				window.matchMedia("(orientation: portrait)").matches,
-			showSoftLimitsWarning: this.config.get("showSoftLimitsWarning", false),
-			workflow: {
-				state: controller.workflow.state,
-			},
-			notification: {
-				type: "",
-				data: "",
-			},
-			modal: {
-				name: "",
-				params: {},
-			},
-			machinePosition: {
-				// Machine position
-				x: "0.000",
-				y: "0.000",
-				z: "0.000",
-			},
-			workPosition: {
-				// Work position
-				x: "0.000",
-				y: "0.000",
-				z: "0.000",
-			},
-			gcode: {
-				displayName: this.config.get("gcode.displayName", true),
-				loading: false,
-				rendering: false,
-				ready: false,
-				content: "",
-				bbox: {
-					min: {
-						x: 0,
-						y: 0,
-						z: 0,
-					},
-					max: {
-						x: 0,
-						y: 0,
-						z: 0,
-					},
-				},
-				// Updates by the "sender:status" event
-				name: "",
-				size: 0,
-				total: 0,
-				sent: 0,
-				received: 0,
-				loadedBeforeConnection: false,
-				visualization: {},
-			},
-			disabled: this.config.get("disabled", false),
-			disabledLite: this.config.get("disabledLite"),
-			liteOption: this.config.get("liteOption"),
-			liteMode: this.config.get("liteMode"),
-			minimizeRenders: this.config.get("minimizeRenders"),
-			projection: this.config.get("projection", "orthographic"),
-			objects: {
-				limits: {
-					visible: this.config.get("objects.limits.visible", true),
-				},
-				coordinateSystem: {
-					visible: this.config.get("objects.coordinateSystem.visible", true),
-				},
-				gridLineNumbers: {
-					visible: this.config.get("objects.gridLineNumbers.visible", true),
-				},
-				cuttingTool: {
-					visible: this.config.get("objects.cuttingTool.visible", true),
-					visibleLite: this.config.get("objects.cuttingTool.visibleLite", true),
-				},
-				cuttingToolAnimation: {
-					visible: this.config.get(
-						"objects.cuttingToolAnimation.visible",
-						true,
-					),
-					visibleLite: this.config.get(
-						"objects.cuttingToolAnimation.visibleLite",
-						true,
-					),
-				},
-				cutPath: {
-					visible: this.config.get("objects.cutPath.visible", true),
-					visibleLite: this.config.get("objects.cutPath.visibleLite", true),
-				},
-			},
-			cameraMode: this.config.get("cameraMode", CAMERA_MODE_PAN),
-			cameraPosition: "TopLeftCorner", // 'Top', '3D', 'Front', 'Left', 'Right', 'TopLeftCorner'
-			cameraPositionNonce: 0, // tracks how many repeat camera view requests have been made
-			// so that it can snap camera even if it's already in that view
-			moveToHere: false, // "Move To Here" placement mode is armed
-			isAgitated: false, // Defaults to false
-			currentTheme: getVisualizerTheme(),
-			currentTab: 0,
-			filename: "",
-			fileSize: 0, //in bytes
-			total: 0,
-			invalidGcode: {
-				shouldShow: this.config.get("showWarning"),
-				showModal: false,
-				list: new Set([]),
-			},
-			invalidLine: {
-				shouldShow: this.config.get("showLineWarnings"),
-				show: false,
-				line: "",
-			},
-			layoutIsReversed: store.get("workspace.reverseWidgets"),
-			workspaceMode: store.get("workspace.mode"),
-			jobEndModal: this.config.get("jobEndModal"),
-		};
-	}
+    getInitialState(): State {
+        return {
+            port: controller.port,
+            units: store.get('workspace.units', METRIC_UNITS),
+            theme: this.config.get('theme'),
+            isPortrait:
+                typeof window !== 'undefined' &&
+                window.matchMedia('(orientation: portrait)').matches,
+            showSoftLimitsWarning: this.config.get(
+                'showSoftLimitsWarning',
+                false,
+            ),
+            workflow: {
+                state: controller.workflow.state,
+            },
+            notification: {
+                type: '',
+                data: '',
+            },
+            modal: {
+                name: '',
+                params: {},
+            },
+            machinePosition: {
+                // Machine position
+                x: '0.000',
+                y: '0.000',
+                z: '0.000',
+            },
+            workPosition: {
+                // Work position
+                x: '0.000',
+                y: '0.000',
+                z: '0.000',
+            },
+            gcode: {
+                displayName: this.config.get('gcode.displayName', true),
+                loading: false,
+                rendering: false,
+                ready: false,
+                content: '',
+                bbox: {
+                    min: {
+                        x: 0,
+                        y: 0,
+                        z: 0,
+                    },
+                    max: {
+                        x: 0,
+                        y: 0,
+                        z: 0,
+                    },
+                },
+                // Updates by the "sender:status" event
+                name: '',
+                size: 0,
+                total: 0,
+                sent: 0,
+                received: 0,
+                loadedBeforeConnection: false,
+                visualization: {},
+            },
+            disabled: this.config.get('disabled', false),
+            disabledLite: this.config.get('disabledLite'),
+            liteOption: this.config.get('liteOption'),
+            liteMode: this.config.get('liteMode'),
+            minimizeRenders: this.config.get('minimizeRenders'),
+            projection: this.config.get('projection', 'orthographic'),
+            objects: {
+                limits: {
+                    visible: this.config.get('objects.limits.visible', true),
+                },
+                coordinateSystem: {
+                    visible: this.config.get(
+                        'objects.coordinateSystem.visible',
+                        true,
+                    ),
+                },
+                gridLineNumbers: {
+                    visible: this.config.get(
+                        'objects.gridLineNumbers.visible',
+                        true,
+                    ),
+                },
+                cuttingTool: {
+                    visible: this.config.get(
+                        'objects.cuttingTool.visible',
+                        true,
+                    ),
+                    visibleLite: this.config.get(
+                        'objects.cuttingTool.visibleLite',
+                        true,
+                    ),
+                },
+                cuttingToolAnimation: {
+                    visible: this.config.get(
+                        'objects.cuttingToolAnimation.visible',
+                        true,
+                    ),
+                    visibleLite: this.config.get(
+                        'objects.cuttingToolAnimation.visibleLite',
+                        true,
+                    ),
+                },
+                cutPath: {
+                    visible: this.config.get('objects.cutPath.visible', true),
+                    visibleLite: this.config.get(
+                        'objects.cutPath.visibleLite',
+                        true,
+                    ),
+                },
+            },
+            cameraMode: this.config.get('cameraMode', CAMERA_MODE_PAN),
+            cameraPosition: 'TopLeftCorner', // 'Top', '3D', 'Front', 'Left', 'Right', 'TopLeftCorner'
+            cameraPositionNonce: 0, // tracks how many repeat camera view requests have been made
+            // so that it can snap camera even if it's already in that view
+            moveToHere: false, // "Move To Here" placement mode is armed
+            isAgitated: false, // Defaults to false
+            currentTheme: getVisualizerTheme(),
+            currentTab: 0,
+            filename: '',
+            fileSize: 0, //in bytes
+            total: 0,
+            invalidGcode: {
+                shouldShow: this.config.get('showWarning'),
+                showModal: false,
+                list: new Set([]),
+            },
+            invalidLine: {
+                shouldShow: this.config.get('showLineWarnings'),
+                show: false,
+                line: '',
+            },
+            layoutIsReversed: store.get('workspace.reverseWidgets'),
+            workspaceMode: store.get('workspace.mode'),
+            jobEndModal: this.config.get('jobEndModal'),
+        };
+    }
 
-	showToast = _.throttle(
-		() => {
-			toast.info("Unable to activate GrblHAL ONLY shortcut", {
-				position: "bottom-right",
-			});
-		},
-		3000,
-		{ trailing: false },
-	);
+    showToast = _.throttle(
+        () => {
+            toast.info('Unable to activate GrblHAL ONLY shortcut', {
+                position: 'bottom-right',
+            });
+        },
+        3000,
+        { trailing: false },
+    );
 
-	shuttleControlFunctions = {
-		FEEDRATE_OVERRIDE: (_, { amount }) => {
-			const isConnected = get(reduxStore.getState(), "connection.isConnected");
-			if (!isConnected) {
-				return;
-			}
-			switch (Number(amount)) {
-				case 1:
-					controller.write("\x93");
-					break;
-				case -1:
-					controller.write("\x94");
-					break;
-				case 10:
-					controller.write("\x91");
-					break;
-				case -10:
-					controller.write("\x92");
-					break;
-				case 0:
-					controller.write("\x90");
-					break;
-				default:
-					return;
-			}
-		},
-		SPINDLE_OVERRIDE: (_, { amount }) => {
-			const isConnected = get(reduxStore.getState(), "connection.isConnected");
-			if (!isConnected) {
-				return;
-			}
-			switch (Number(amount)) {
-				case 1:
-					controller.write("\x9C");
-					break;
-				case -1:
-					controller.write("\x9D");
-					break;
-				case 10:
-					controller.write("\x9A");
-					break;
-				case -10:
-					controller.write("\x9B");
-					break;
-				case 0:
-					controller.write("\x99");
-					break;
-				default:
-					return;
-			}
-		},
-		VISUALIZER_VIEW: (_, { type }: Views) => {
-			const {
-				to3DView,
-				toTopView,
-				toFrontView,
-				toRightSideView,
-				toLeftSideView,
-			} = this.actions.camera;
+    shuttleControlFunctions = {
+        FEEDRATE_OVERRIDE: (_, { amount }) => {
+            const isConnected = get(
+                reduxStore.getState(),
+                'connection.isConnected',
+            );
+            if (!isConnected) {
+                return;
+            }
+            switch (Number(amount)) {
+                case 1:
+                    controller.write('\x93');
+                    break;
+                case -1:
+                    controller.write('\x94');
+                    break;
+                case 10:
+                    controller.write('\x91');
+                    break;
+                case -10:
+                    controller.write('\x92');
+                    break;
+                case 0:
+                    controller.write('\x90');
+                    break;
+                default:
+                    return;
+            }
+        },
+        SPINDLE_OVERRIDE: (_, { amount }) => {
+            const isConnected = get(
+                reduxStore.getState(),
+                'connection.isConnected',
+            );
+            if (!isConnected) {
+                return;
+            }
+            switch (Number(amount)) {
+                case 1:
+                    controller.write('\x9C');
+                    break;
+                case -1:
+                    controller.write('\x9D');
+                    break;
+                case 10:
+                    controller.write('\x9A');
+                    break;
+                case -10:
+                    controller.write('\x9B');
+                    break;
+                case 0:
+                    controller.write('\x99');
+                    break;
+                default:
+                    return;
+            }
+        },
+        VISUALIZER_VIEW: (_, { type }: Views) => {
+            const {
+                to3DView,
+                toTopView,
+                toFrontView,
+                toRightSideView,
+                toLeftSideView,
+            } = this.actions.camera;
 
-			const changeCamera = {
-				isometric: to3DView,
-				top: toTopView,
-				front: toFrontView,
-				right: toRightSideView,
-				left: toLeftSideView,
-				default: () => {
-					const { cameraPosition } = this.getInitialState();
-					this.setState({ cameraPosition });
-				},
-			}[type];
+            const changeCamera = {
+                isometric: to3DView,
+                top: toTopView,
+                front: toFrontView,
+                right: toRightSideView,
+                left: toLeftSideView,
+                default: () => {
+                    const { cameraPosition } = this.getInitialState();
+                    this.setState({ cameraPosition });
+                },
+            }[type];
 
-			changeCamera();
-		},
-		VISUALIZER_VIEW_CYCLE: () => {
-			const {
-				to3DView,
-				toTopView,
-				toFrontView,
-				toRightSideView,
-				toLeftSideView,
-			} = this.actions.camera;
+            changeCamera();
+        },
+        VISUALIZER_VIEW_CYCLE: () => {
+            const {
+                to3DView,
+                toTopView,
+                toFrontView,
+                toRightSideView,
+                toLeftSideView,
+            } = this.actions.camera;
 
-			const cameraViews = ["3D", "Top", "Front", "Right", "Left", "Default"];
+            const cameraViews = [
+                '3D',
+                'Top',
+                'Front',
+                'Right',
+                'Left',
+                'Default',
+            ];
 
-			let currIndex = cameraViews.findIndex(
-				(view) => view === this.state.cameraPosition,
-			);
+            let currIndex = cameraViews.findIndex(
+                (view) => view === this.state.cameraPosition,
+            );
 
-			if (currIndex + 1 >= cameraViews.length) {
-				currIndex = 0;
-			} else {
-				currIndex += 1;
-			}
+            if (currIndex + 1 >= cameraViews.length) {
+                currIndex = 0;
+            } else {
+                currIndex += 1;
+            }
 
-			const currView = cameraViews[currIndex];
+            const currView = cameraViews[currIndex];
 
-			const changeCamera = {
-				"3D": to3DView,
-				Top: toTopView,
-				Front: toFrontView,
-				Right: toRightSideView,
-				Left: toLeftSideView,
-				Default: () => {
-					const { cameraPosition } = this.getInitialState();
-					this.setState({ cameraPosition });
-				},
-			}[currView];
+            const changeCamera = {
+                '3D': to3DView,
+                Top: toTopView,
+                Front: toFrontView,
+                Right: toRightSideView,
+                Left: toLeftSideView,
+                Default: () => {
+                    const { cameraPosition } = this.getInitialState();
+                    this.setState({ cameraPosition });
+                },
+            }[currView];
 
-			changeCamera();
-		},
-		VISUALIZER_ZOOM_IN: () => {
-			this.actions.camera.zoomIn();
-		},
-		VISUALIZER_ZOOM_OUT: () => {
-			this.actions.camera.zoomOut();
-		},
-		VISUALIZER_ZOOM_FIT: () => {
-			this.actions.camera.zoomFit();
-		},
-	};
+            changeCamera();
+        },
+        VISUALIZER_ZOOM_IN: () => {
+            this.actions.camera.zoomIn();
+        },
+        VISUALIZER_ZOOM_OUT: () => {
+            this.actions.camera.zoomOut();
+        },
+        VISUALIZER_ZOOM_FIT: () => {
+            this.actions.camera.zoomFit();
+        },
+    };
 
-	shuttleControlEvents = {
-		FEEDRATE_OVERRIDE_P: {
-			title: "Feed +",
-			keys: "",
-			gamepadKeys: "5",
-			keysName: "R1",
-			cmd: "FEEDRATE_OVERRIDE_P",
-			payload: { amount: 1 },
-			preventDefault: true,
-			isActive: true,
-			category: OVERRIDES_CATEGORY,
-			callback: this.shuttleControlFunctions.FEEDRATE_OVERRIDE,
-		},
-		FEEDRATE_OVERRIDE_PP: {
-			title: "Feed ++",
-			keys: "",
-			gamepadKeys: "",
-			keysName: "Feed ++",
-			cmd: "FEEDRATE_OVERRIDE_PP",
-			payload: { amount: 10 },
-			preventDefault: true,
-			isActive: true,
-			category: OVERRIDES_CATEGORY,
-			callback: this.shuttleControlFunctions.FEEDRATE_OVERRIDE,
-		},
-		FEEDRATE_OVERRIDE_M: {
-			title: "Feed -",
-			keys: "",
-			gamepadKeys: "7",
-			keysName: "R2",
-			cmd: "FEEDRATE_OVERRIDE_M",
-			payload: { amount: -1 },
-			preventDefault: true,
-			isActive: true,
-			category: OVERRIDES_CATEGORY,
-			callback: this.shuttleControlFunctions.FEEDRATE_OVERRIDE,
-		},
-		FEEDRATE_OVERRIDE_MM: {
-			title: "Feed --",
-			keys: "",
-			gamepadKeys: "",
-			keysName: "Feed --",
-			cmd: "FEEDRATE_OVERRIDE_MM",
-			payload: { amount: -10 },
-			preventDefault: true,
-			isActive: true,
-			category: OVERRIDES_CATEGORY,
-			callback: this.shuttleControlFunctions.FEEDRATE_OVERRIDE,
-		},
-		FEEDRATE_OVERRIDE_RESET: {
-			title: "Feed reset",
-			keys: "",
-			gamepadKeys: "",
-			keysName: "Feed Reset",
-			cmd: "FEEDRATE_OVERRIDE_RESET",
-			payload: { amount: 0 },
-			preventDefault: true,
-			isActive: true,
-			category: OVERRIDES_CATEGORY,
-			callback: this.shuttleControlFunctions.FEEDRATE_OVERRIDE,
-		},
-		SPINDLE_OVERRIDE_P: {
-			title: "Spindle/Laser +",
-			keys: "",
-			gamepadKeys: "4",
-			keysName: "L1",
-			cmd: "SPINDLE_OVERRIDE_P",
-			payload: { amount: 1 },
-			preventDefault: true,
-			isActive: true,
-			category: OVERRIDES_CATEGORY,
-			callback: this.shuttleControlFunctions.SPINDLE_OVERRIDE,
-		},
-		SPINDLE_OVERRIDE_PP: {
-			title: "Spindle/Laser ++",
-			keys: "",
-			gamepadKeys: "",
-			keysName: "Spindle/Laser ++",
-			cmd: "SPINDLE_OVERRIDE_PP",
-			payload: { amount: 10 },
-			preventDefault: true,
-			isActive: true,
-			category: OVERRIDES_CATEGORY,
-			callback: this.shuttleControlFunctions.SPINDLE_OVERRIDE,
-		},
-		SPINDLE_OVERRIDE_M: {
-			title: "Spindle/Laser -",
-			keys: "",
-			gamepadKeys: "6",
-			keysName: "L2",
-			cmd: "SPINDLE_OVERRIDE_M",
-			payload: { amount: -1 },
-			preventDefault: true,
-			isActive: true,
-			category: OVERRIDES_CATEGORY,
-			callback: this.shuttleControlFunctions.SPINDLE_OVERRIDE,
-		},
-		SPINDLE_OVERRIDE_MM: {
-			title: "Spindle/Laser --",
-			keys: "",
-			gamepadKeys: "",
-			keysName: "Spindle/Laser --",
-			cmd: "SPINDLE_OVERRIDE_MM",
-			payload: { amount: -10 },
-			preventDefault: true,
-			isActive: true,
-			category: OVERRIDES_CATEGORY,
-			callback: this.shuttleControlFunctions.SPINDLE_OVERRIDE,
-		},
-		SPINDLE_OVERRIDE_RESET: {
-			title: "Spindle/Laser reset",
-			keys: "",
-			gamepadKeys: "",
-			keysName: "Spindle/Laser Reset",
-			cmd: "SPINDLE_OVERRIDE_RESET",
-			payload: { amount: 0 },
-			preventDefault: true,
-			isActive: true,
-			category: OVERRIDES_CATEGORY,
-			callback: this.shuttleControlFunctions.SPINDLE_OVERRIDE,
-		},
-		VISUALIZER_VIEW_3D: {
-			title: "See 3D view",
-			keys: "",
-			cmd: "VISUALIZER_VIEW_3D",
-			payload: { type: "isometric" },
-			preventDefault: true,
-			isActive: true,
-			category: VISUALIZER_CATEGORY,
-			callback: this.shuttleControlFunctions.VISUALIZER_VIEW,
-		},
-		VISUALIZER_VIEW_TOP: {
-			title: "See Top view",
-			keys: "",
-			cmd: "VISUALIZER_VIEW_TOP",
-			payload: { type: "top" },
-			preventDefault: true,
-			isActive: true,
-			category: VISUALIZER_CATEGORY,
-			callback: this.shuttleControlFunctions.VISUALIZER_VIEW,
-		},
-		VISUALIZER_VIEW_FRONT: {
-			title: "See Front view",
-			keys: "",
-			cmd: "VISUALIZER_VIEW_FRONT",
-			payload: { type: "front" },
-			preventDefault: true,
-			isActive: true,
-			category: VISUALIZER_CATEGORY,
-			callback: this.shuttleControlFunctions.VISUALIZER_VIEW,
-		},
-		VISUALIZER_VIEW_RIGHT: {
-			title: "See Right view",
-			keys: "",
-			cmd: "VISUALIZER_VIEW_RIGHT",
-			payload: { type: "right" },
-			preventDefault: true,
-			isActive: true,
-			category: VISUALIZER_CATEGORY,
-			callback: this.shuttleControlFunctions.VISUALIZER_VIEW,
-		},
-		VISUALIZER_VIEW_LEFT: {
-			title: "See Left view",
-			keys: "",
-			cmd: "VISUALIZER_VIEW_LEFT",
-			payload: { type: "left" },
-			preventDefault: true,
-			isActive: true,
-			category: VISUALIZER_CATEGORY,
-			callback: this.shuttleControlFunctions.VISUALIZER_VIEW,
-		},
-		VISUALIZER_VIEW_RESET: {
-			title: "Reset view",
-			keys: ["shift", "n"].join("+"),
-			cmd: "VISUALIZER_VIEW_RESET",
-			payload: { type: "default" },
-			preventDefault: true,
-			isActive: true,
-			category: VISUALIZER_CATEGORY,
-			callback: this.shuttleControlFunctions.VISUALIZER_VIEW,
-		},
-		LIGHTWEIGHT_MODE: {
-			title: "Lightweight mode",
-			keys: ["shift", "m"].join("+"),
-			cmd: "LIGHTWEIGHT_MODE",
-			preventDefault: true,
-			isActive: true,
-			category: VISUALIZER_CATEGORY,
-			callback: () => this.actions.handleLiteModeToggle(),
-		},
-		TOGGLE_SHORTCUTS: {
-			title: "Toggle on/off shortcuts",
-			keys: "^",
-			cmd: "TOGGLE_SHORTCUTS",
-			preventDefault: false,
-			isActive: true,
-			category: GENERAL_CATEGORY,
-			callback: () => {
-				const shortcuts: CommandKeys = store.get("commandKeys", {});
+    shuttleControlEvents = {
+        FEEDRATE_OVERRIDE_P: {
+            title: 'Feed +',
+            keys: '',
+            gamepadKeys: '5',
+            keysName: 'R1',
+            cmd: 'FEEDRATE_OVERRIDE_P',
+            payload: { amount: 1 },
+            preventDefault: true,
+            isActive: true,
+            category: OVERRIDES_CATEGORY,
+            callback: this.shuttleControlFunctions.FEEDRATE_OVERRIDE,
+        },
+        FEEDRATE_OVERRIDE_PP: {
+            title: 'Feed ++',
+            keys: '',
+            gamepadKeys: '',
+            keysName: 'Feed ++',
+            cmd: 'FEEDRATE_OVERRIDE_PP',
+            payload: { amount: 10 },
+            preventDefault: true,
+            isActive: true,
+            category: OVERRIDES_CATEGORY,
+            callback: this.shuttleControlFunctions.FEEDRATE_OVERRIDE,
+        },
+        FEEDRATE_OVERRIDE_M: {
+            title: 'Feed -',
+            keys: '',
+            gamepadKeys: '7',
+            keysName: 'R2',
+            cmd: 'FEEDRATE_OVERRIDE_M',
+            payload: { amount: -1 },
+            preventDefault: true,
+            isActive: true,
+            category: OVERRIDES_CATEGORY,
+            callback: this.shuttleControlFunctions.FEEDRATE_OVERRIDE,
+        },
+        FEEDRATE_OVERRIDE_MM: {
+            title: 'Feed --',
+            keys: '',
+            gamepadKeys: '',
+            keysName: 'Feed --',
+            cmd: 'FEEDRATE_OVERRIDE_MM',
+            payload: { amount: -10 },
+            preventDefault: true,
+            isActive: true,
+            category: OVERRIDES_CATEGORY,
+            callback: this.shuttleControlFunctions.FEEDRATE_OVERRIDE,
+        },
+        FEEDRATE_OVERRIDE_RESET: {
+            title: 'Feed reset',
+            keys: '',
+            gamepadKeys: '',
+            keysName: 'Feed Reset',
+            cmd: 'FEEDRATE_OVERRIDE_RESET',
+            payload: { amount: 0 },
+            preventDefault: true,
+            isActive: true,
+            category: OVERRIDES_CATEGORY,
+            callback: this.shuttleControlFunctions.FEEDRATE_OVERRIDE,
+        },
+        SPINDLE_OVERRIDE_P: {
+            title: 'Spindle/Laser +',
+            keys: '',
+            gamepadKeys: '4',
+            keysName: 'L1',
+            cmd: 'SPINDLE_OVERRIDE_P',
+            payload: { amount: 1 },
+            preventDefault: true,
+            isActive: true,
+            category: OVERRIDES_CATEGORY,
+            callback: this.shuttleControlFunctions.SPINDLE_OVERRIDE,
+        },
+        SPINDLE_OVERRIDE_PP: {
+            title: 'Spindle/Laser ++',
+            keys: '',
+            gamepadKeys: '',
+            keysName: 'Spindle/Laser ++',
+            cmd: 'SPINDLE_OVERRIDE_PP',
+            payload: { amount: 10 },
+            preventDefault: true,
+            isActive: true,
+            category: OVERRIDES_CATEGORY,
+            callback: this.shuttleControlFunctions.SPINDLE_OVERRIDE,
+        },
+        SPINDLE_OVERRIDE_M: {
+            title: 'Spindle/Laser -',
+            keys: '',
+            gamepadKeys: '6',
+            keysName: 'L2',
+            cmd: 'SPINDLE_OVERRIDE_M',
+            payload: { amount: -1 },
+            preventDefault: true,
+            isActive: true,
+            category: OVERRIDES_CATEGORY,
+            callback: this.shuttleControlFunctions.SPINDLE_OVERRIDE,
+        },
+        SPINDLE_OVERRIDE_MM: {
+            title: 'Spindle/Laser --',
+            keys: '',
+            gamepadKeys: '',
+            keysName: 'Spindle/Laser --',
+            cmd: 'SPINDLE_OVERRIDE_MM',
+            payload: { amount: -10 },
+            preventDefault: true,
+            isActive: true,
+            category: OVERRIDES_CATEGORY,
+            callback: this.shuttleControlFunctions.SPINDLE_OVERRIDE,
+        },
+        SPINDLE_OVERRIDE_RESET: {
+            title: 'Spindle/Laser reset',
+            keys: '',
+            gamepadKeys: '',
+            keysName: 'Spindle/Laser Reset',
+            cmd: 'SPINDLE_OVERRIDE_RESET',
+            payload: { amount: 0 },
+            preventDefault: true,
+            isActive: true,
+            category: OVERRIDES_CATEGORY,
+            callback: this.shuttleControlFunctions.SPINDLE_OVERRIDE,
+        },
+        VISUALIZER_VIEW_3D: {
+            title: 'See 3D view',
+            keys: '',
+            cmd: 'VISUALIZER_VIEW_3D',
+            payload: { type: 'isometric' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_VIEW,
+        },
+        VISUALIZER_VIEW_TOP: {
+            title: 'See Top view',
+            keys: '',
+            cmd: 'VISUALIZER_VIEW_TOP',
+            payload: { type: 'top' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_VIEW,
+        },
+        VISUALIZER_VIEW_FRONT: {
+            title: 'See Front view',
+            keys: '',
+            cmd: 'VISUALIZER_VIEW_FRONT',
+            payload: { type: 'front' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_VIEW,
+        },
+        VISUALIZER_VIEW_RIGHT: {
+            title: 'See Right view',
+            keys: '',
+            cmd: 'VISUALIZER_VIEW_RIGHT',
+            payload: { type: 'right' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_VIEW,
+        },
+        VISUALIZER_VIEW_LEFT: {
+            title: 'See Left view',
+            keys: '',
+            cmd: 'VISUALIZER_VIEW_LEFT',
+            payload: { type: 'left' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_VIEW,
+        },
+        VISUALIZER_VIEW_RESET: {
+            title: 'Reset view',
+            keys: ['shift', 'n'].join('+'),
+            cmd: 'VISUALIZER_VIEW_RESET',
+            payload: { type: 'default' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_VIEW,
+        },
+        LIGHTWEIGHT_MODE: {
+            title: 'Lightweight mode',
+            keys: ['shift', 'm'].join('+'),
+            cmd: 'LIGHTWEIGHT_MODE',
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: () => this.actions.handleLiteModeToggle(),
+        },
+        TOGGLE_SHORTCUTS: {
+            title: 'Toggle on/off shortcuts',
+            keys: '^',
+            cmd: 'TOGGLE_SHORTCUTS',
+            preventDefault: false,
+            isActive: true,
+            category: GENERAL_CATEGORY,
+            callback: () => {
+                const shortcuts: CommandKeys = store.get('commandKeys', {});
 
-				// Ignore shortcut for toggling all other shortcuts to
-				// allow them to be turned on and off
-				const allDisabled = Object.entries(shortcuts)
-					.filter(([key, _shortcut]) => key !== "TOGGLE_SHORTCUTS")
-					.every(([_key, shortcut]) => !shortcut.isActive);
-				const keybindings = _.cloneDeep(shortcuts);
-				Object.entries(keybindings).forEach(([key, keybinding]) => {
-					if (key !== "TOGGLE_SHORTCUTS") {
-						keybinding.isActive = allDisabled;
-					}
-				});
+                // Ignore shortcut for toggling all other shortcuts to
+                // allow them to be turned on and off
+                const allDisabled = Object.entries(shortcuts)
+                    .filter(([key, _shortcut]) => key !== 'TOGGLE_SHORTCUTS')
+                    .every(([_key, shortcut]) => !shortcut.isActive);
+                const keybindings = _.cloneDeep(shortcuts);
+                Object.entries(keybindings).forEach(([key, keybinding]) => {
+                    if (key !== 'TOGGLE_SHORTCUTS') {
+                        keybinding.isActive = allDisabled;
+                    }
+                });
 
-				store.replace("commandKeys", keybindings);
-				pubsub.publish("keybindingsUpdated", keybindings);
-			},
-		},
-		MACRO: (_, { macroID }) => {
-			const { activeState } = this.props;
-			if (activeState === GRBL_ACTIVE_STATE_IDLE) {
-				controller.command("macro:run", macroID, controller.context);
-			}
-		},
-		VISUALIZER_VIEW_CYCLE: {
-			title: "Switch between views",
-			keys: ["shift", "b"].join("+"),
-			cmd: "VISUALIZER_VIEW_CYCLE",
-			payload: { type: "default" },
-			preventDefault: true,
-			isActive: true,
-			category: VISUALIZER_CATEGORY,
-			callback: this.shuttleControlFunctions.VISUALIZER_VIEW_CYCLE,
-		},
-		VISUALIZER_ZOOM_IN: {
-			title: "Zoom in",
-			keys: ["shift", "p"].join("+"),
-			cmd: "VISUALIZER_ZOOM_IN",
-			payload: { type: "default" },
-			preventDefault: true,
-			isActive: true,
-			category: VISUALIZER_CATEGORY,
-			callback: this.shuttleControlFunctions.VISUALIZER_ZOOM_IN,
-		},
-		VISUALIZER_ZOOM_OUT: {
-			title: "Zoom out",
-			keys: ["shift", "o"].join("+"),
-			cmd: "VISUALIZER_ZOOM_OUT",
-			payload: { type: "default" },
-			preventDefault: true,
-			isActive: true,
-			category: VISUALIZER_CATEGORY,
-			callback: this.shuttleControlFunctions.VISUALIZER_ZOOM_OUT,
-		},
-		VISUALIZER_ZOOM_FIT: {
-			title: "Zoom fit",
-			keys: ["shift", "i"].join("+"),
-			cmd: "VISUALIZER_ZOOM_FIT",
-			payload: { type: "default" },
-			preventDefault: true,
-			isActive: true,
-			category: VISUALIZER_CATEGORY,
-			callback: this.shuttleControlFunctions.VISUALIZER_ZOOM_FIT,
-		},
-	};
+                store.replace('commandKeys', keybindings);
+                pubsub.publish('keybindingsUpdated', keybindings);
+            },
+        },
+        MACRO: (_, { macroID }) => {
+            const { activeState } = this.props;
+            if (activeState === GRBL_ACTIVE_STATE_IDLE) {
+                controller.command('macro:run', macroID, controller.context);
+            }
+        },
+        VISUALIZER_VIEW_CYCLE: {
+            title: 'Switch between views',
+            keys: ['shift', 'b'].join('+'),
+            cmd: 'VISUALIZER_VIEW_CYCLE',
+            payload: { type: 'default' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_VIEW_CYCLE,
+        },
+        VISUALIZER_ZOOM_IN: {
+            title: 'Zoom in',
+            keys: ['shift', 'p'].join('+'),
+            cmd: 'VISUALIZER_ZOOM_IN',
+            payload: { type: 'default' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_ZOOM_IN,
+        },
+        VISUALIZER_ZOOM_OUT: {
+            title: 'Zoom out',
+            keys: ['shift', 'o'].join('+'),
+            cmd: 'VISUALIZER_ZOOM_OUT',
+            payload: { type: 'default' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_ZOOM_OUT,
+        },
+        VISUALIZER_ZOOM_FIT: {
+            title: 'Zoom fit',
+            keys: ['shift', 'i'].join('+'),
+            cmd: 'VISUALIZER_ZOOM_FIT',
+            payload: { type: 'default' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_ZOOM_FIT,
+        },
+    };
 
-	addShuttleControlEvents() {
-		combokeys.reload();
+    addShuttleControlEvents() {
+        combokeys.reload();
 
-		Object.keys(this.shuttleControlEvents).forEach((eventName) => {
-			const callback =
-				eventName === "MACRO"
-					? this.shuttleControlEvents[eventName]
-					: this.shuttleControlEvents[eventName].callback;
-			combokeys.on(eventName, callback);
-		});
-	}
+        Object.keys(this.shuttleControlEvents).forEach((eventName) => {
+            const callback =
+                eventName === 'MACRO'
+                    ? this.shuttleControlEvents[eventName]
+                    : this.shuttleControlEvents[eventName].callback;
+            combokeys.on(eventName, callback);
+        });
+    }
 
-	updateShuttleControlEvents = () => {
-		this.removeShuttleControlEvents();
-		this.addShuttleControlEvents();
-	};
+    updateShuttleControlEvents = () => {
+        this.removeShuttleControlEvents();
+        this.addShuttleControlEvents();
+    };
 
-	removeShuttleControlEvents() {
-		Object.keys(this.shuttleControlEvents).forEach((eventName) => {
-			const callback =
-				eventName === "MACRO"
-					? this.shuttleControlEvents[eventName]
-					: this.shuttleControlEvents[eventName].callback;
-			combokeys.removeListener(eventName, callback);
-		});
-	}
+    removeShuttleControlEvents() {
+        Object.keys(this.shuttleControlEvents).forEach((eventName) => {
+            const callback =
+                eventName === 'MACRO'
+                    ? this.shuttleControlEvents[eventName]
+                    : this.shuttleControlEvents[eventName].callback;
+            combokeys.removeListener(eventName, callback);
+        });
+    }
 
-	isAgitated() {
-		const { disabled, objects } = this.state;
-		const { workflow, controllerType, activeState } = this.props;
+    isAgitated() {
+        const { disabled, objects } = this.state;
+        const { workflow, controllerType, activeState } = this.props;
 
-		if (workflow.state !== WORKFLOW_STATE_RUNNING) {
-			return false;
-		}
-		// Return false when 3D view is disabled
-		if (disabled) {
-			return false;
-		}
-		// Return false when the cutting tool is not visible
-		if (!objects.cuttingTool.visible) {
-			return false;
-		}
-		if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG, GRBLHAL], controllerType)) {
-			return false;
-		}
-		if (controllerType === GRBL || controllerType === GRBLHAL) {
-			if (
-				activeState !== GRBL_ACTIVE_STATE_RUN &&
-				activeState !== GRBL_ACTIVE_STATE_CHECK
-			) {
-				return false;
-			}
-		}
+        if (workflow.state !== WORKFLOW_STATE_RUNNING) {
+            return false;
+        }
+        // Return false when 3D view is disabled
+        if (disabled) {
+            return false;
+        }
+        // Return false when the cutting tool is not visible
+        if (!objects.cuttingTool.visible) {
+            return false;
+        }
+        if (
+            !includes([GRBL, MARLIN, SMOOTHIE, TINYG, GRBLHAL], controllerType)
+        ) {
+            return false;
+        }
+        if (controllerType === GRBL || controllerType === GRBLHAL) {
+            if (
+                activeState !== GRBL_ACTIVE_STATE_RUN &&
+                activeState !== GRBL_ACTIVE_STATE_CHECK
+            ) {
+                return false;
+            }
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	setCurrentTab = (id = 0) => this.setState({ currentTab: id });
+    setCurrentTab = (id = 0) => this.setState({ currentTab: id });
 
-	subscribe() {
-		const tokens = [
-			pubsub.subscribe("theme:change", (_msg, themeType) => {
-				const theme = themeType || this.config.get("theme", "dark");
-				if (theme === this.state.theme) {
-					return;
-				}
-				this.setState(
-					{
-						theme: theme,
-						currentTheme: getVisualizerTheme(theme),
-					},
-					() => {
-						debouncedThemeChange();
-					},
-				);
-			}),
-			pubsub.subscribe("visualizer:settings", () => {
-				this.setState({
-					disabled: this.config.get("disabled"),
-					disabledLite: this.config.get("disabledLite"),
-					liteOption: this.config.get("liteOption"),
-					objects: this.config.get("objects"),
-					minimizeRenders: this.config.get("minimizeRenders"),
-					jobEndModal: this.config.get("jobEndModal"),
-				});
-			}),
-			pubsub.subscribe("units:change", (msg, units) => {
-				this.setState({
-					units: units,
-				});
-			}),
-			pubsub.subscribe("gcode:showWarning", (_, shouldShow) => {
-				this.setState({
-					invalidGcode: { shouldShow, showModal: false, list: [] },
-				});
-			}),
-			pubsub.subscribe("gcode:showLineWarnings", (_, shouldShow) => {
-				this.setState({
-					invalidLine: { shouldShow, show: false, line: "" },
-				});
-			}),
-			pubsub.subscribe("keybindingsUpdated", () => {
-				this.updateShuttleControlEvents();
-			}),
-			pubsub.subscribe("gcode:bbox", (msg, bbox) => {
-				const { gcode } = this.state;
-				this.setState({
-					gcode: {
-						...gcode,
-						bbox: bbox,
-					},
-				});
-			}),
-			pubsub.subscribe("widgets:reverse", (_, layoutIsReversed) => {
-				this.setState({ layoutIsReversed });
-			}),
-			pubsub.subscribe("gcode:surfacing", async (_, { gcode, name }) => {
-				const file = new File([gcode], name);
-				await uploadGcodeFileToServer(
-					file,
-					controller.port,
-					VISUALIZER_PRIMARY,
-				);
-			}),
-			pubsub.subscribe("file:content", (_, { content, size, name }) => {
-				this.setState({
-					gcode: {
-						...this.state.gcode,
-						content: content,
-						size: size,
-						name: name,
-					},
-				});
-			}),
-			pubsub.subscribe("file:load", (_, data) => {
-				this.setState({
-					gcode: {
-						...this.state.gcode,
-						visualization: data,
-					},
-				});
-			}),
-			pubsub.subscribe("gcode:rotarySetup", async (_, { setupFile, name }) => {
-				const file = new File([setupFile], name);
+    subscribe() {
+        const tokens = [
+            pubsub.subscribe('theme:change', (_msg, themeType) => {
+                const theme = themeType || this.config.get('theme', 'dark');
+                if (theme === this.state.theme) {
+                    return;
+                }
+                this.setState(
+                    {
+                        theme: theme,
+                        currentTheme: getVisualizerTheme(theme),
+                    },
+                    () => {
+                        debouncedThemeChange();
+                    },
+                );
+            }),
+            pubsub.subscribe('visualizer:settings', () => {
+                this.setState({
+                    disabled: this.config.get('disabled'),
+                    disabledLite: this.config.get('disabledLite'),
+                    liteOption: this.config.get('liteOption'),
+                    objects: this.config.get('objects'),
+                    minimizeRenders: this.config.get('minimizeRenders'),
+                    jobEndModal: this.config.get('jobEndModal'),
+                });
+            }),
+            pubsub.subscribe('units:change', (msg, units) => {
+                this.setState({
+                    units: units,
+                });
+            }),
+            pubsub.subscribe('gcode:showWarning', (_, shouldShow) => {
+                this.setState({
+                    invalidGcode: { shouldShow, showModal: false, list: [] },
+                });
+            }),
+            pubsub.subscribe('gcode:showLineWarnings', (_, shouldShow) => {
+                this.setState({
+                    invalidLine: { shouldShow, show: false, line: '' },
+                });
+            }),
+            pubsub.subscribe('keybindingsUpdated', () => {
+                this.updateShuttleControlEvents();
+            }),
+            pubsub.subscribe('gcode:bbox', (msg, bbox) => {
+                const { gcode } = this.state;
+                this.setState({
+                    gcode: {
+                        ...gcode,
+                        bbox: bbox,
+                    },
+                });
+            }),
+            pubsub.subscribe('widgets:reverse', (_, layoutIsReversed) => {
+                this.setState({ layoutIsReversed });
+            }),
+            pubsub.subscribe('gcode:surfacing', async (_, { gcode, name }) => {
+                const file = new File([gcode], name);
+                await uploadGcodeFileToServer(
+                    file,
+                    controller.port,
+                    VISUALIZER_PRIMARY,
+                );
+            }),
+            pubsub.subscribe('file:content', (_, { content, size, name }) => {
+                this.setState({
+                    gcode: {
+                        ...this.state.gcode,
+                        content: content,
+                        size: size,
+                        name: name,
+                    },
+                });
+            }),
+            pubsub.subscribe('file:load', (_, data) => {
+                this.setState({
+                    gcode: {
+                        ...this.state.gcode,
+                        visualization: data,
+                    },
+                });
+            }),
+            pubsub.subscribe(
+                'gcode:rotarySetup',
+                async (_, { setupFile, name }) => {
+                    const file = new File([setupFile], name);
 
-				await uploadGcodeFile(file, controller.port, VISUALIZER_PRIMARY);
-			}),
-			pubsub.subscribe("unload:file", () => {
-				this.actions.closeModal();
-				this.actions.unloadGCode();
-				this.actions.reset();
-			}),
-			pubsub.subscribe("repopulate", () => {
-				this.setState({
-					units: store.get("workspace.units", METRIC_UNITS),
-					objects: {
-						limits: {
-							visible: this.config.get("objects.limits.visible", false),
-						},
-						coordinateSystem: {
-							visible: this.config.get(
-								"objects.coordinateSystem.visible",
-								true,
-							),
-						},
-						gridLineNumbers: {
-							visible: this.config.get("objects.gridLineNumbers.visible", true),
-						},
-						cuttingTool: {
-							visible: this.config.get("objects.cuttingTool.visible", true),
-							visibleLite: this.config.get(
-								"objects.cuttingTool.visibleLite",
-								false,
-							),
-						},
-						cuttingToolAnimation: {
-							visible: this.config.get(
-								"objects.cuttingToolAnimation.visible",
-								true,
-							),
-							visibleLite: this.config.get(
-								"objects.cuttingToolAnimation.visibleLite",
-								false,
-							),
-						},
-						cutPath: {
-							visible: this.config.get("objects.cutPath.visible", true),
-							visibleLite: this.config.get("objects.cutPath.visibleLite", true),
-						},
-					},
-				});
-			}),
-		];
-		this.pubsubTokens = this.pubsubTokens.concat(tokens);
-	}
+                    await uploadGcodeFile(
+                        file,
+                        controller.port,
+                        VISUALIZER_PRIMARY,
+                    );
+                },
+            ),
+            pubsub.subscribe('unload:file', () => {
+                this.actions.closeModal();
+                this.actions.unloadGCode();
+                this.actions.reset();
+            }),
+            pubsub.subscribe('repopulate', () => {
+                this.setState({
+                    units: store.get('workspace.units', METRIC_UNITS),
+                    objects: {
+                        limits: {
+                            visible: this.config.get(
+                                'objects.limits.visible',
+                                false,
+                            ),
+                        },
+                        coordinateSystem: {
+                            visible: this.config.get(
+                                'objects.coordinateSystem.visible',
+                                true,
+                            ),
+                        },
+                        gridLineNumbers: {
+                            visible: this.config.get(
+                                'objects.gridLineNumbers.visible',
+                                true,
+                            ),
+                        },
+                        cuttingTool: {
+                            visible: this.config.get(
+                                'objects.cuttingTool.visible',
+                                true,
+                            ),
+                            visibleLite: this.config.get(
+                                'objects.cuttingTool.visibleLite',
+                                false,
+                            ),
+                        },
+                        cuttingToolAnimation: {
+                            visible: this.config.get(
+                                'objects.cuttingToolAnimation.visible',
+                                true,
+                            ),
+                            visibleLite: this.config.get(
+                                'objects.cuttingToolAnimation.visibleLite',
+                                false,
+                            ),
+                        },
+                        cutPath: {
+                            visible: this.config.get(
+                                'objects.cutPath.visible',
+                                true,
+                            ),
+                            visibleLite: this.config.get(
+                                'objects.cutPath.visibleLite',
+                                true,
+                            ),
+                        },
+                    },
+                });
+            }),
+        ];
+        this.pubsubTokens = this.pubsubTokens.concat(tokens);
+    }
 
-	renderIfNecessary(shouldRender) {
-		const hasVisualization = this.visualizer.hasVisualization();
-		if (shouldRender && !hasVisualization) {
-			this.visualizer.rerenderGCode();
-		}
-	}
+    renderIfNecessary(shouldRender) {
+        const hasVisualization = this.visualizer.hasVisualization();
+        if (shouldRender && !hasVisualization) {
+            this.visualizer.rerenderGCode();
+        }
+    }
 
-	render() {
-		const {
-			renderState,
-			isSecondary,
-			activeVisualizer,
-			activeState,
-			alarmCode,
-			workflow,
-			isConnected,
-		} = this.props;
-		const state = {
-			...this.state,
-			controller: {
-				type: controller.type,
-				settings: controller.settings,
-				state: controller.state,
-			},
-			alarmCode,
-			activeState,
-			workflow,
-			isConnected,
-			isAgitated: this.isAgitated(),
-		};
-		const actions = {
-			...this.actions,
-		};
+    render() {
+        const {
+            renderState,
+            isSecondary,
+            activeVisualizer,
+            activeState,
+            alarmCode,
+            workflow,
+            isConnected,
+        } = this.props;
+        const state = {
+            ...this.state,
+            controller: {
+                type: controller.type,
+                settings: controller.settings,
+                state: controller.state,
+            },
+            alarmCode,
+            activeState,
+            workflow,
+            isConnected,
+            isAgitated: this.isAgitated(),
+        };
+        const actions = {
+            ...this.actions,
+        };
 
-		const {
-			lightweightTogglePosition,
-			moveToHereTogglePosition,
-			cornerViewButtonPosition,
-			projectionTogglePosition,
-		} = getViewCubeControlPositions(state.isPortrait);
+        const {
+            lightweightTogglePosition,
+            moveToHereTogglePosition,
+            cornerViewButtonPosition,
+            projectionTogglePosition,
+        } = getViewCubeControlPositions(state.isPortrait);
 
-		const isOrthographic =
-			store.get("widgets.visualizer.projection", "Perspective") ===
-			"Orthographic";
+        const isOrthographic =
+            store.get('widgets.visualizer.projection', 'Perspective') ===
+            'Orthographic';
 
-		const showRendering = renderState === RENDER_RENDERING;
-		const showLoading = renderState === RENDER_LOADING;
-		// Handle visualizer render
-		const isVisualizerDisabled = state.liteMode
-			? state.disabledLite
-			: state.disabled;
+        const showRendering = renderState === RENDER_RENDERING;
+        const showLoading = renderState === RENDER_LOADING;
+        // Handle visualizer render
+        const isVisualizerDisabled = state.liteMode
+            ? state.disabledLite
+            : state.disabled;
 
-		const capable = {
-			view3D: WebGL.isWebGLAvailable() && !isVisualizerDisabled,
-		};
+        const capable = {
+            view3D: WebGL.isWebGLAvailable() && !isVisualizerDisabled,
+        };
 
-		const showVisualizer =
-			capable.view3D &&
-			((isSecondary && activeVisualizer === VISUALIZER_SECONDARY) ||
-				(!isSecondary && activeVisualizer === VISUALIZER_PRIMARY));
-		const liteModeActionLabel = state.liteMode
-			? "Disable lightweight mode"
-			: "Enable lightweight mode";
+        const showVisualizer =
+            capable.view3D &&
+            ((isSecondary && activeVisualizer === VISUALIZER_SECONDARY) ||
+                (!isSecondary && activeVisualizer === VISUALIZER_PRIMARY));
+        const liteModeActionLabel = state.liteMode
+            ? 'Disable lightweight mode'
+            : 'Enable lightweight mode';
 
-		const setVisualizerRef = (ref) => {
-			this.visualizer = ref;
-		};
+        const setVisualizerRef = (ref) => {
+            this.visualizer = ref;
+        };
 
-		const webGLAvailable = WebGL.isWebGLAvailable();
+        const webGLAvailable = WebGL.isWebGLAvailable();
 
-		if (isSecondary) {
-			return (
-				<>
-					<div
-						className={cx(
-							"z-10 absolute w-[40vw] h-[25vh] top-1/2 right-1/4 translate-x-1/4 -translate-y-1/2",
-							{ hidden: !showLoading && !showRendering },
-						)}
-					>
-						{showLoading && <Loading />}
-						{showRendering && <Rendering />}
-					</div>
+        if (isSecondary) {
+            return (
+                <>
+                    <div
+                        className={cx(
+                            'z-10 absolute w-[40vw] h-[25vh] top-1/2 right-1/4 translate-x-1/4 -translate-y-1/2',
+                            { hidden: !showLoading && !showRendering },
+                        )}
+                    >
+                        {showLoading && <Loading />}
+                        {showRendering && <Rendering />}
+                    </div>
 
-					{webGLAvailable && (
-						<GcodeViewer
-							show={showVisualizer}
-							cameraPosition={state.cameraPosition}
-							cameraPositionNonce={state.cameraPositionNonce}
-							ref={setVisualizerRef}
-							state={state}
-							actions={actions}
-							containerID={SURFACING_VISUALIZER_CONTAINER_ID}
-							isSecondary={true}
-						/>
-					)}
-				</>
-			);
-		}
+                    {webGLAvailable && (
+                        <GcodeViewer
+                            show={showVisualizer}
+                            cameraPosition={state.cameraPosition}
+                            cameraPositionNonce={state.cameraPositionNonce}
+                            ref={setVisualizerRef}
+                            state={state}
+                            actions={actions}
+                            containerID={SURFACING_VISUALIZER_CONTAINER_ID}
+                            isSecondary={true}
+                        />
+                    )}
+                </>
+            );
+        }
 
-		const containerID = "visualizer_container";
+        const containerID = 'visualizer_container';
 
-		return (
-			<Widget className="w-full p-1 max-xl:p-0.5">
-				<Widget.Content
-					id={containerID}
-					className="w-full bg-no-repeat bg-center"
-				>
-					{showLoading && (
-						<div className=" z-10 relative  w-[40vw] h-[25vh] top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-							<Loading />
-						</div>
-					)}
+        return (
+            <Widget className="w-full p-1 max-xl:p-0.5">
+                <Widget.Content
+                    id={containerID}
+                    className="w-full bg-no-repeat bg-center"
+                >
+                    {showLoading && (
+                        <div className=" z-10 relative  w-[40vw] h-[25vh] top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                            <Loading />
+                        </div>
+                    )}
 
-					{showRendering && <Rendering />}
+                    {showRendering && <Rendering />}
 
-					<div className="h-full w-full absolute top-0 left-0">
-						<SoftLimitsWarningArea />
-						{webGLAvailable ? (
-							<GcodeViewer
-								show={showVisualizer}
-								cameraPosition={state.cameraPosition}
-								cameraPositionNonce={state.cameraPositionNonce}
-								ref={setVisualizerRef}
-								state={state}
-								actions={actions}
-								containerID={containerID}
-								isSecondary={false}
-							/>
-						) : (
-							<div>
-								<FrownIcon size={4} />
-								<span style={{ fontSize: "16px" }}>
-									{"It looks like your device doesn't support WebGL"}
-								</span>
-							</div>
-						)}
+                    <div className="h-full w-full absolute top-0 left-0">
+                        <SoftLimitsWarningArea />
+                        {webGLAvailable ? (
+                            <GcodeViewer
+                                show={showVisualizer}
+                                cameraPosition={state.cameraPosition}
+                                cameraPositionNonce={state.cameraPositionNonce}
+                                ref={setVisualizerRef}
+                                state={state}
+                                actions={actions}
+                                containerID={containerID}
+                                isSecondary={false}
+                            />
+                        ) : (
+                            <div>
+                                <FrownIcon size={4} />
+                                <span style={{ fontSize: '16px' }}>
+                                    {
+                                        "It looks like your device doesn't support WebGL"
+                                    }
+                                </span>
+                            </div>
+                        )}
 
-						{!showVisualizer && webGLAvailable && <VisualizerPlaceholder />}
+                        {!showVisualizer && webGLAvailable && (
+                            <VisualizerPlaceholder />
+                        )}
 
-						<PluginVisualizerOverlayHost
-							baseBottomPx={moveToHereTogglePosition.bottom}
-							leftPx={moveToHereTogglePosition.left}
-						/>
+                        <PluginVisualizerOverlayHost
+                            baseBottomPx={moveToHereTogglePosition.bottom}
+                            leftPx={moveToHereTogglePosition.left}
+                        />
 
-						{state.isConnected && (
-							<Tooltip
-								content="Move To Here: press and hold a spot to move the spindle there"
-								side="top"
-							>
-								<button
-									type="button"
-									style={moveToHereTogglePosition}
-									className={cx(
-										"absolute z-[8998] inline-flex h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full border bg-dark-darker/70 shadow-[0_10px_30px_rgba(0,_0,_0,_0.25)] transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-dark-darker active:scale-[0.98] active:bg-dark-darker/85",
-										{
-											"border-[rgba(14,_246,_174,_0.95)] text-[rgba(14,_246,_174,_0.95)] shadow-[0_0_0_1px_rgba(14,_246,_174,_0.35),0_10px_30px_rgba(0,_0,_0,_0.35)] hover:border-[rgba(14,_246,_174,_0.95)] hover:text-[rgba(14,_246,_174,_0.95)] hover:shadow-[0_0_0_1px_rgba(14,_246,_174,_0.45),0_12px_32px_rgba(0,_0,_0,_0.4)]":
-												state.moveToHere,
-											"border-gray-400/40 text-gray-300 hover:border-gray-200/70 hover:text-gray-100 hover:shadow-[0_12px_32px_rgba(0,_0,_0,_0.35)]":
-												!state.moveToHere,
-										},
-									)}
-									aria-label="Move To Here"
-									aria-pressed={state.moveToHere}
-									onClick={() => actions.toggleMoveToHere()}
-								>
-									<Crosshair
-										aria-hidden="true"
-										className="pointer-events-none h-5 w-5 shrink-0"
-									/>
-								</button>
-							</Tooltip>
-						)}
+                        {state.isConnected && (
+                            <Tooltip
+                                content="Move To Here: press and hold a spot to move the spindle there"
+                                side="top"
+                            >
+                                <button
+                                    type="button"
+                                    style={moveToHereTogglePosition}
+                                    className={cx(
+                                        'absolute z-[8998] inline-flex h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full border bg-dark-darker/70 shadow-[0_10px_30px_rgba(0,_0,_0,_0.25)] transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-dark-darker active:scale-[0.98] active:bg-dark-darker/85',
+                                        {
+                                            'border-[rgba(14,_246,_174,_0.95)] text-[rgba(14,_246,_174,_0.95)] shadow-[0_0_0_1px_rgba(14,_246,_174,_0.35),0_10px_30px_rgba(0,_0,_0,_0.35)] hover:border-[rgba(14,_246,_174,_0.95)] hover:text-[rgba(14,_246,_174,_0.95)] hover:shadow-[0_0_0_1px_rgba(14,_246,_174,_0.45),0_12px_32px_rgba(0,_0,_0,_0.4)]':
+                                                state.moveToHere,
+                                            'border-gray-400/40 text-gray-300 hover:border-gray-200/70 hover:text-gray-100 hover:shadow-[0_12px_32px_rgba(0,_0,_0,_0.35)]':
+                                                !state.moveToHere,
+                                        },
+                                    )}
+                                    aria-label="Move To Here"
+                                    aria-pressed={state.moveToHere}
+                                    onClick={() => actions.toggleMoveToHere()}
+                                >
+                                    <Crosshair
+                                        aria-hidden="true"
+                                        className="pointer-events-none h-5 w-5 shrink-0"
+                                    />
+                                </button>
+                            </Tooltip>
+                        )}
 
-						<Tooltip content={liteModeActionLabel} side="top">
-							<button
-								type="button"
-								style={lightweightTogglePosition}
-								className={cx(
-									"absolute z-[8998] inline-flex h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full border bg-dark-darker/70 shadow-[0_10px_30px_rgba(0,_0,_0,_0.25)] transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-dark-darker active:scale-[0.98] active:bg-dark-darker/85",
-									{
-										"border-[rgba(96,_165,_250,_0.95)] text-[rgba(96,_165,_250,_0.95)] shadow-[0_0_0_1px_rgba(96,_165,_250,_0.35),0_10px_30px_rgba(0,_0,_0,_0.35)] hover:border-[rgba(96,_165,_250,_0.95)] hover:text-[rgba(96,_165,_250,_0.95)] hover:shadow-[0_0_0_1px_rgba(96,_165,_250,_0.45),0_12px_32px_rgba(0,_0,_0,_0.4)]":
-											state.liteMode,
-										"border-gray-400/40 text-gray-300 hover:border-gray-200/70 hover:text-gray-100 hover:shadow-[0_12px_32px_rgba(0,_0,_0,_0.35)]":
-											!state.liteMode,
-									},
-								)}
-								aria-label={liteModeActionLabel}
-								aria-pressed={state.liteMode}
-								onClick={() => actions.handleLiteModeToggle()}
-							>
-								<FaFeatherAlt
-									aria-hidden="true"
-									className="pointer-events-none h-5 w-5 shrink-0"
-								/>
-							</button>
-						</Tooltip>
+                        <Tooltip content={liteModeActionLabel} side="top">
+                            <button
+                                type="button"
+                                style={lightweightTogglePosition}
+                                className={cx(
+                                    'absolute z-[8998] inline-flex h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full border bg-dark-darker/70 shadow-[0_10px_30px_rgba(0,_0,_0,_0.25)] transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-dark-darker active:scale-[0.98] active:bg-dark-darker/85',
+                                    {
+                                        'border-[rgba(96,_165,_250,_0.95)] text-[rgba(96,_165,_250,_0.95)] shadow-[0_0_0_1px_rgba(96,_165,_250,_0.35),0_10px_30px_rgba(0,_0,_0,_0.35)] hover:border-[rgba(96,_165,_250,_0.95)] hover:text-[rgba(96,_165,_250,_0.95)] hover:shadow-[0_0_0_1px_rgba(96,_165,_250,_0.45),0_12px_32px_rgba(0,_0,_0,_0.4)]':
+                                            state.liteMode,
+                                        'border-gray-400/40 text-gray-300 hover:border-gray-200/70 hover:text-gray-100 hover:shadow-[0_12px_32px_rgba(0,_0,_0,_0.35)]':
+                                            !state.liteMode,
+                                    },
+                                )}
+                                aria-label={liteModeActionLabel}
+                                aria-pressed={state.liteMode}
+                                onClick={() => actions.handleLiteModeToggle()}
+                            >
+                                <FaFeatherAlt
+                                    aria-hidden="true"
+                                    className="pointer-events-none h-5 w-5 shrink-0"
+                                />
+                            </button>
+                        </Tooltip>
 
-						<Tooltip content="Go to iso view" side="top">
-							<button
-								type="button"
-								style={cornerViewButtonPosition}
-								className="absolute z-[8998] inline-flex h-9 w-9 -translate-x-1/2 items-center justify-center rounded-full border border-gray-400/40 bg-dark-darker/70 text-gray-300 shadow-[0_10px_30px_rgba(0,_0,_0,_0.25)] transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out hover:border-gray-200/70 hover:text-gray-100 hover:shadow-[0_12px_32px_rgba(0,_0,_0,_0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-dark-darker active:scale-[0.98] active:bg-dark-darker/85"
-								aria-label="Go to iso view"
-								onClick={() => actions.camera.toTopLeftCornerView()}
-							>
-								<FaCube
-									aria-hidden="true"
-									className="pointer-events-none h-4 w-4 shrink-0"
-								/>
-							</button>
-						</Tooltip>
+                        <Tooltip content="Go to iso view" side="top">
+                            <button
+                                type="button"
+                                style={cornerViewButtonPosition}
+                                className="absolute z-[8998] inline-flex h-9 w-9 -translate-x-1/2 items-center justify-center rounded-full border border-gray-400/40 bg-dark-darker/70 text-gray-300 shadow-[0_10px_30px_rgba(0,_0,_0,_0.25)] transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out hover:border-gray-200/70 hover:text-gray-100 hover:shadow-[0_12px_32px_rgba(0,_0,_0,_0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-dark-darker active:scale-[0.98] active:bg-dark-darker/85"
+                                aria-label="Go to iso view"
+                                onClick={() =>
+                                    actions.camera.toTopLeftCornerView()
+                                }
+                            >
+                                <FaCube
+                                    aria-hidden="true"
+                                    className="pointer-events-none h-4 w-4 shrink-0"
+                                />
+                            </button>
+                        </Tooltip>
 
-						<Tooltip
-							content={
-								isOrthographic
-									? "Switch to perspective view"
-									: "Switch to orthographic view"
-							}
-							side="top"
-						>
-							<button
-								type="button"
-								style={projectionTogglePosition}
-								className={cx(
-									"absolute z-[8998] inline-flex h-9 w-9 -translate-x-1/2 items-center justify-center rounded-full border bg-dark-darker/70 shadow-[0_10px_30px_rgba(0,_0,_0,_0.25)] transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-dark-darker active:scale-[0.98] active:bg-dark-darker/85",
-									{
-										"border-[rgba(96,_165,_250,_0.95)] text-[rgba(96,_165,_250,_0.95)] shadow-[0_0_0_1px_rgba(96,_165,_250,_0.35),0_10px_30px_rgba(0,_0,_0,_0.35)] hover:border-[rgba(96,_165,_250,_0.95)] hover:text-[rgba(96,_165,_250,_0.95)] hover:shadow-[0_0_0_1px_rgba(96,_165,_250,_0.45),0_12px_32px_rgba(0,_0,_0,_0.4)]":
-											isOrthographic,
-										"border-gray-400/40 text-gray-300 hover:border-gray-200/70 hover:text-gray-100 hover:shadow-[0_12px_32px_rgba(0,_0,_0,_0.35)]":
-											!isOrthographic,
-									},
-								)}
-								aria-label={
-									isOrthographic
-										? "Switch to perspective view"
-										: "Switch to orthographic view"
-								}
-								aria-pressed={isOrthographic}
-								onClick={() => actions.toggleProjection()}
-							>
-								{isOrthographic ? (
-									<Square
-										aria-hidden="true"
-										className="pointer-events-none h-4 w-4 shrink-0"
-									/>
-								) : (
-									<Box
-										aria-hidden="true"
-										className="pointer-events-none h-4 w-4 shrink-0"
-									/>
-								)}
-							</button>
-						</Tooltip>
+                        <Tooltip
+                            content={
+                                isOrthographic
+                                    ? 'Switch to perspective view'
+                                    : 'Switch to orthographic view'
+                            }
+                            side="top"
+                        >
+                            <button
+                                type="button"
+                                style={projectionTogglePosition}
+                                className={cx(
+                                    'absolute z-[8998] inline-flex h-9 w-9 -translate-x-1/2 items-center justify-center rounded-full border bg-dark-darker/70 shadow-[0_10px_30px_rgba(0,_0,_0,_0.25)] transition-[background-color,border-color,color,box-shadow,transform] duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-dark-darker active:scale-[0.98] active:bg-dark-darker/85',
+                                    {
+                                        'border-[rgba(96,_165,_250,_0.95)] text-[rgba(96,_165,_250,_0.95)] shadow-[0_0_0_1px_rgba(96,_165,_250,_0.35),0_10px_30px_rgba(0,_0,_0,_0.35)] hover:border-[rgba(96,_165,_250,_0.95)] hover:text-[rgba(96,_165,_250,_0.95)] hover:shadow-[0_0_0_1px_rgba(96,_165,_250,_0.45),0_12px_32px_rgba(0,_0,_0,_0.4)]':
+                                            isOrthographic,
+                                        'border-gray-400/40 text-gray-300 hover:border-gray-200/70 hover:text-gray-100 hover:shadow-[0_12px_32px_rgba(0,_0,_0,_0.35)]':
+                                            !isOrthographic,
+                                    },
+                                )}
+                                aria-label={
+                                    isOrthographic
+                                        ? 'Switch to perspective view'
+                                        : 'Switch to orthographic view'
+                                }
+                                aria-pressed={isOrthographic}
+                                onClick={() => actions.toggleProjection()}
+                            >
+                                {isOrthographic ? (
+                                    <Square
+                                        aria-hidden="true"
+                                        className="pointer-events-none h-4 w-4 shrink-0"
+                                    />
+                                ) : (
+                                    <Box
+                                        aria-hidden="true"
+                                        className="pointer-events-none h-4 w-4 shrink-0"
+                                    />
+                                )}
+                            </button>
+                        </Tooltip>
 
-						<WorkspaceSelector />
+                        <WorkspaceSelector />
 
-						{this.props.timeline}
+                        {this.props.timeline}
 
-						<GcodeEditorOverlay />
-					</div>
-				</Widget.Content>
-			</Widget>
-		);
-	}
+                        <GcodeEditorOverlay />
+                    </div>
+                </Widget.Content>
+            </Widget>
+        );
+    }
 }
 
 export default connect(
-	(store) => {
-		const settings = get(store, "controller.settings");
-		const xMaxFeed = Number(get(settings.settings, "$110", 1500));
-		const yMaxFeed = Number(get(settings.settings, "$111", 1500));
-		const zMaxFeed = Number(get(settings.settings, "$112", 1500));
-		const xMaxAccel = Number(get(settings.settings, "$120", 1800000));
-		const yMaxAccel = Number(get(settings.settings, "$121", 1800000));
-		const zMaxAccel = Number(get(settings.settings, "$122", 1800000));
-		const workflow = get(store, "controller.workflow");
-		const renderState = get(store, "file.renderState");
-		const isConnected = get(store, "connection.isConnected");
-		const controllerType = get(store, "controller.type");
-		const activeState = get(store, "controller.state.status.activeState");
-		const alarmCode = get(store, "controller.state.status.alarmCode");
-		const overrides = get(store, "controller.state.status.ov", [0, 0, 0]);
-		const isFileLoaded = get(store, "file.fileLoaded");
-		const { activeVisualizer } = store.visualizer;
+    (store) => {
+        const settings = get(store, 'controller.settings');
+        const xMaxFeed = Number(get(settings.settings, '$110', 1500));
+        const yMaxFeed = Number(get(settings.settings, '$111', 1500));
+        const zMaxFeed = Number(get(settings.settings, '$112', 1500));
+        const xMaxAccel = Number(get(settings.settings, '$120', 1800000));
+        const yMaxAccel = Number(get(settings.settings, '$121', 1800000));
+        const zMaxAccel = Number(get(settings.settings, '$122', 1800000));
+        const workflow = get(store, 'controller.workflow');
+        const renderState = get(store, 'file.renderState');
+        const isConnected = get(store, 'connection.isConnected');
+        const controllerType = get(store, 'controller.type');
+        const activeState = get(store, 'controller.state.status.activeState');
+        const alarmCode = get(store, 'controller.state.status.alarmCode');
+        const overrides = get(store, 'controller.state.status.ov', [0, 0, 0]);
+        const isFileLoaded = get(store, 'file.fileLoaded');
+        const { activeVisualizer } = store.visualizer;
 
-		const feedArray = [xMaxFeed, yMaxFeed, zMaxFeed];
-		const accelArray = [xMaxAccel * 3600, yMaxAccel * 3600, zMaxAccel * 3600];
+        const feedArray = [xMaxFeed, yMaxFeed, zMaxFeed];
+        const accelArray = [
+            xMaxAccel * 3600,
+            yMaxAccel * 3600,
+            zMaxAccel * 3600,
+        ];
 
-		const ovF = overrides[0];
-		const ovS = overrides[2];
+        const ovF = overrides[0];
+        const ovS = overrides[2];
 
-		return {
-			feedArray,
-			accelArray,
-			workflow,
-			renderState,
-			isConnected,
-			controllerType,
-			activeState,
-			activeVisualizer,
-			alarmCode,
-			isFileLoaded,
-			ovF,
-			ovS,
-		};
-	},
-	null,
-	null,
-	{ forwardRef: true },
+        return {
+            feedArray,
+            accelArray,
+            workflow,
+            renderState,
+            isConnected,
+            controllerType,
+            activeState,
+            activeVisualizer,
+            alarmCode,
+            isFileLoaded,
+            ovF,
+            ovS,
+        };
+    },
+    null,
+    null,
+    { forwardRef: true },
 )(Visualizer);

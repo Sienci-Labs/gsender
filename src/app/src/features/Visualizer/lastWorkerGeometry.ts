@@ -21,8 +21,8 @@
  *
  */
 
-import type { WorkerGeometryData } from "@sienci/gviewer/viewer";
-import pubsub from "pubsub-js";
+import type { WorkerGeometryData } from '@sienci/gviewer/viewer';
+import pubsub from 'pubsub-js';
 
 /**
  * Holds the most recent `geometryReady` payload from Visualize.worker.
@@ -40,13 +40,13 @@ import pubsub from "pubsub-js";
 let lastWorkerGeometry: WorkerGeometryData | null = null;
 
 export const setLastWorkerGeometry = (
-	data: WorkerGeometryData | null,
+    data: WorkerGeometryData | null,
 ): void => {
-	lastWorkerGeometry = data;
+    lastWorkerGeometry = data;
 };
 
 export const getLastWorkerGeometry = (): WorkerGeometryData | null =>
-	lastWorkerGeometry;
+    lastWorkerGeometry;
 
-pubsub.subscribe("gcode:unload", () => setLastWorkerGeometry(null));
-pubsub.subscribe("unload:file", () => setLastWorkerGeometry(null));
+pubsub.subscribe('gcode:unload', () => setLastWorkerGeometry(null));
+pubsub.subscribe('unload:file', () => setLastWorkerGeometry(null));

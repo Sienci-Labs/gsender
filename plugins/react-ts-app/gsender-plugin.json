@@ -1,18 +1,18 @@
 {
-	"id": "com.sienci.react-ts-app",
-	"name": "React SDK Demo",
-	"description": "A React + TypeScript starter showing the SDK's useWorkspaceState and useTypedSelector hooks.",
-	"version": "0.1.0",
-	"engine": ">=1.6.0",
-	"ui": {
-		"entry": "ui/index.html",
-		"contributions": [
-			{
-				"slot": "tools-page",
-				"route": "react-sdk-demo",
-				"label": "React SDK Demo"
-			}
-		]
-	},
-	"permissions": ["machine:read"]
+  "id": "com.sienci.react-ts-app",
+  "name": "React SDK Demo",
+  "description": "A React + TypeScript starter showing the SDK's useWorkspaceState and useTypedSelector hooks.",
+  "version": "0.1.0",
+  "engine": ">=1.6.0",
+  "ui": {
+    "entry": "ui/index.html",
+    "contributions": [
+      {
+        "slot": "tools-page",
+        "route": "react-sdk-demo",
+        "label": "React SDK Demo"
+      }
+    ]
+  },
+  "permissions": ["machine:read"]
 }

@@ -1,9 +1,9 @@
+import { SettingBadge } from 'app/features/AccessoryInstaller/Wizards/tls/components/TLSContinuitySidebar.tsx';
+import controller from 'app/lib/controller.ts';
+import { RootState } from 'app/store/redux';
+import get from 'lodash/get';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import get from 'lodash/get';
-import { RootState } from 'app/store/redux';
-import controller from 'app/lib/controller.ts';
-import { SettingBadge } from 'app/features/AccessoryInstaller/Wizards/tls/components/TLSContinuitySidebar.tsx';
 
 export function TLSInputEnable() {
     const [sent, setSent] = useState<boolean>(false);
@@ -18,8 +18,7 @@ export function TLSInputEnable() {
         (state: RootState) => state.controller.state.status?.probe?.type,
     );
 
-    const tlsInputEnabled =
-        (Number(get(eepromSettings, '$65', 0)) || 0) & 8;
+    const tlsInputEnabled = (Number(get(eepromSettings, '$65', 0)) || 0) & 8;
 
     if (boardId !== 'SLB Lite' || !tlsInputEnabled) {
         return null;

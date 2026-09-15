@@ -21,97 +21,97 @@
  *
  */
 
-import events from "events";
-import extend from "lodash/extend";
-import get from "lodash/get";
-import isEqual from "lodash/isEqual";
-import merge from "lodash/merge";
-import noop from "lodash/noop";
-import set from "lodash/set";
-import unset from "lodash/unset";
+import events from 'events';
+import extend from 'lodash/extend';
+import get from 'lodash/get';
+import isEqual from 'lodash/isEqual';
+import merge from 'lodash/merge';
+import noop from 'lodash/noop';
+import set from 'lodash/set';
+import unset from 'lodash/unset';
 
-import { determineRoundedValue } from "./rounding";
+import { determineRoundedValue } from './rounding';
 
 type StoreKey = string | Array<string | number>;
 
 class ImmutableStore<T extends object = object> extends events.EventEmitter {
-	state: T;
+    state: T;
 
-	constructor(state = {} as T) {
-		super();
+    constructor(state = {} as T) {
+        super();
 
-		this.state = state;
-	}
+        this.state = state;
+    }
 
-	get(): T;
-	get<V = any>(key: StoreKey): V | undefined;
-	get<V = any>(key: StoreKey, defaultValue: V): any;
-	get<V = any>(key?: StoreKey, defaultValue?: V): T | V | undefined {
-		if (key === undefined) return this.state;
+    get(): T;
+    get<V = any>(key: StoreKey): V | undefined;
+    get<V = any>(key: StoreKey, defaultValue: V): any;
+    get<V = any>(key?: StoreKey, defaultValue?: V): T | V | undefined {
+        if (key === undefined) return this.state;
 
-		return get(this.state, key, defaultValue) as V | undefined;
-	}
+        return get(this.state, key, defaultValue) as V | undefined;
+    }
 
-	set(key: StoreKey, value: any): T {
-		const prevValue = this.get(key);
-		if (typeof value === "object" && isEqual(value, prevValue)) {
-			return this.state;
-		}
-		if (value === prevValue) {
-			return this.state;
-		}
+    set(key: StoreKey, value: any): T {
+        const prevValue = this.get(key);
+        if (typeof value === 'object' && isEqual(value, prevValue)) {
+            return this.state;
+        }
+        if (value === prevValue) {
+            return this.state;
+        }
 
-		// round values that need to be rounded before storing
-		const roundingKey = Array.isArray(key) ? key.join(".") : key;
-		value = determineRoundedValue(roundingKey, value);
+        // round values that need to be rounded before storing
+        const roundingKey = Array.isArray(key) ? key.join('.') : key;
+        value = determineRoundedValue(roundingKey, value);
 
-		this.state = merge({}, this.state, set({}, key, value));
-		this.emit("change", this.state);
-		return this.state;
-	}
+        this.state = merge({}, this.state, set({}, key, value));
+        this.emit('change', this.state);
+        return this.state;
+    }
 
-	unset(key: StoreKey): T {
-		const state = extend({}, this.state);
-		unset(state, key);
-		this.state = state;
-		//this.emit('change', this.state);
-		return this.state;
-	}
+    unset(key: StoreKey): T {
+        const state = extend({}, this.state);
+        unset(state, key);
+        this.state = state;
+        //this.emit('change', this.state);
+        return this.state;
+    }
 
-	replace(key: StoreKey, value: any): T {
-		const prevValue = this.get(key);
-		if (typeof value === "object" && isEqual(value, prevValue)) {
-			return this.state;
-		}
-		if (value === prevValue) {
-			return this.state;
-		}
+    replace(key: StoreKey, value: any): T {
+        const prevValue = this.get(key);
+        if (typeof value === 'object' && isEqual(value, prevValue)) {
+            return this.state;
+        }
+        if (value === prevValue) {
+            return this.state;
+        }
 
-		this.unset(key);
-		this.set(key, value);
-		this.emit("replace", this.state);
-		return this.state;
-	}
+        this.unset(key);
+        this.set(key, value);
+        this.emit('replace', this.state);
+        return this.state;
+    }
 
-	restoreState(state: T, cb: () => void = null): void {
-		this.clear();
-		this.state = state;
+    restoreState(state: T, cb: () => void = null): void {
+        this.clear();
+        this.state = state;
 
-		if (cb) {
-			cb();
-		}
-		this.emit("change", this.state);
-	}
+        if (cb) {
+            cb();
+        }
+        this.emit('change', this.state);
+    }
 
-	clear(): T {
-		this.state = {} as T;
-		this.emit("change", this.state);
-		return this.state;
-	}
+    clear(): T {
+        this.state = {} as T;
+        this.emit('change', this.state);
+        return this.state;
+    }
 
-	persist = noop;
-	getConfig = noop;
-	syncPrefs = noop;
+    persist = noop;
+    getConfig = noop;
+    syncPrefs = noop;
 }
 
 export default ImmutableStore;

@@ -2,275 +2,286 @@
 /** biome-ignore-all lint/suspicious/noExplicitAny: <> */
 /** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
 /** biome-ignore-all lint/a11y/noSvgWithoutTitle: <> */
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Fragment, useEffect, useState } from "react";
-import Button from "../Button";
-import { useDefaultContext } from "./DefaultContext";
-import ProgressBar from "./ProgressBar";
-import { SecondaryContentPanel } from "./SecondaryContentPanel";
-import type { SubWizard } from "./types/wizard";
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Fragment, useEffect, useState } from 'react';
+import Button from '../Button';
+import { useDefaultContext } from './DefaultContext';
+import ProgressBar from './ProgressBar';
+import { SecondaryContentPanel } from './SecondaryContentPanel';
+import type { SubWizard } from './types/wizard';
 
 interface Props {
-	subWizard: SubWizard;
-	onWizardExit: () => void;
+    subWizard: SubWizard;
+    onWizardExit: () => void;
 }
 
 export function WizardContainer({ subWizard, onWizardExit }: Props) {
-	const [currentStepIndex, setCurrentStepIndex] = useState(0);
-	const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
-	// biome-ignore lint/suspicious/noExplicitAny: <>
-	const [stepData, setStepData] = useState<Record<string, any>>({});
-	const [showCompletion, setShowCompletion] = useState(false);
+    const [currentStepIndex, setCurrentStepIndex] = useState(0);
+    const [completedSteps, setCompletedSteps] = useState<Set<number>>(
+        new Set(),
+    );
+    // biome-ignore lint/suspicious/noExplicitAny: <>
+    const [stepData, setStepData] = useState<Record<string, any>>({});
+    const [showCompletion, setShowCompletion] = useState(false);
 
-	const currentStep = subWizard.steps[currentStepIndex];
-	const StepContextProvider = currentStep.contextProvider || Fragment;
-	const subWizardContext = subWizard.context || useDefaultContext;
-	const { reset, onPrevious, onNext, getItemParams } = subWizardContext();
-	const fillPrimaryContent = currentStep.fillPrimaryContent === true;
-	const isFirstStep = currentStepIndex === 0;
-	const isLastStep = currentStepIndex === subWizard.steps.length - 1;
-	const isCurrentStepComplete = completedSteps.has(currentStepIndex);
-	const isSingleStep = subWizard.steps.length === 1;
+    const currentStep = subWizard.steps[currentStepIndex];
+    const StepContextProvider = currentStep.contextProvider || Fragment;
+    const subWizardContext = subWizard.context || useDefaultContext;
+    const { reset, onPrevious, onNext, getItemParams } = subWizardContext();
+    const fillPrimaryContent = currentStep.fillPrimaryContent === true;
+    const isFirstStep = currentStepIndex === 0;
+    const isLastStep = currentStepIndex === subWizard.steps.length - 1;
+    const isCurrentStepComplete = completedSteps.has(currentStepIndex);
+    const isSingleStep = subWizard.steps.length === 1;
 
-	useEffect(() => {
-		if (!currentStep.autoComplete?.()) return;
+    useEffect(() => {
+        if (!currentStep.autoComplete?.()) return;
 
-		const newCompletedSteps = new Set(completedSteps).add(currentStepIndex);
-		setCompletedSteps(newCompletedSteps);
-		if (currentStepIndex < subWizard.steps.length - 1) {
-			setCurrentStepIndex((prev) => prev + 1);
-		} else if (
-			newCompletedSteps.size === subWizard.steps.length &&
-			subWizard.completionPage
-		) {
-			setShowCompletion(true);
-		}
-	}, [currentStepIndex]);
+        const newCompletedSteps = new Set(completedSteps).add(currentStepIndex);
+        setCompletedSteps(newCompletedSteps);
+        if (currentStepIndex < subWizard.steps.length - 1) {
+            setCurrentStepIndex((prev) => prev + 1);
+        } else if (
+            newCompletedSteps.size === subWizard.steps.length &&
+            subWizard.completionPage
+        ) {
+            setShowCompletion(true);
+        }
+    }, [currentStepIndex]);
 
-	const handleNext = () => {
-		if (!isLastStep && isCurrentStepComplete) {
-			setCurrentStepIndex(currentStepIndex + 1);
-			onNext?.();
-		} else if (
-			isLastStep &&
-			isCurrentStepComplete &&
-			subWizard.completionPage
-		) {
-			setShowCompletion(true);
-		}
-	};
+    const handleNext = () => {
+        if (!isLastStep && isCurrentStepComplete) {
+            setCurrentStepIndex(currentStepIndex + 1);
+            onNext?.();
+        } else if (
+            isLastStep &&
+            isCurrentStepComplete &&
+            subWizard.completionPage
+        ) {
+            setShowCompletion(true);
+        }
+    };
 
-	const handlePrevious = () => {
-		if (!isFirstStep) {
-			let prevIndex = currentStepIndex - 1;
-			while (prevIndex > 0 && subWizard.steps[prevIndex].autoComplete?.()) {
-				prevIndex--;
-			}
-			setCurrentStepIndex(prevIndex);
-			onPrevious?.();
-		}
-	};
+    const handlePrevious = () => {
+        if (!isFirstStep) {
+            let prevIndex = currentStepIndex - 1;
+            while (
+                prevIndex > 0 &&
+                subWizard.steps[prevIndex].autoComplete?.()
+            ) {
+                prevIndex--;
+            }
+            setCurrentStepIndex(prevIndex);
+            onPrevious?.();
+        }
+    };
 
-	const handleStepComplete = () => {
-		const newCompletedSteps = new Set(completedSteps).add(currentStepIndex);
-		setCompletedSteps(newCompletedSteps);
-	};
+    const handleStepComplete = () => {
+        const newCompletedSteps = new Set(completedSteps).add(currentStepIndex);
+        setCompletedSteps(newCompletedSteps);
+    };
 
-	const handleStepUncomplete = () => {
-		setCompletedSteps((prev) => {
-			const newSet = new Set(prev);
-			newSet.delete(currentStepIndex);
-			return newSet;
-		});
-		setShowCompletion(false);
-	};
+    const handleStepUncomplete = () => {
+        setCompletedSteps((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(currentStepIndex);
+            return newSet;
+        });
+        setShowCompletion(false);
+    };
 
-	// biome-ignore lint/suspicious/noExplicitAny: <it really is any>
-	const handleDataChange = (data: Record<string, any>) => {
-		setStepData((prev) => ({
-			...prev,
-			[currentStep.id]: data,
-		}));
-	};
+    // biome-ignore lint/suspicious/noExplicitAny: <it really is any>
+    const handleDataChange = (data: Record<string, any>) => {
+        setStepData((prev) => ({
+            ...prev,
+            [currentStep.id]: data,
+        }));
+    };
 
-	const onExit = () => {
-		setCurrentStepIndex(0);
-		setCompletedSteps(new Set());
-		setStepData({});
-		setShowCompletion(false);
-		onWizardExit();
-		reset?.();
-	};
+    const onExit = () => {
+        setCurrentStepIndex(0);
+        setCompletedSteps(new Set());
+        setStepData({});
+        setShowCompletion(false);
+        onWizardExit();
+        reset?.();
+    };
 
-	const resetWizard = () => {
-		setCurrentStepIndex(0);
-		setCompletedSteps(new Set());
-		setStepData({});
-		setShowCompletion(false);
-		reset?.();
-	};
+    const resetWizard = () => {
+        setCurrentStepIndex(0);
+        setCompletedSteps(new Set());
+        setStepData({});
+        setShowCompletion(false);
+        reset?.();
+    };
 
-	const StepComponent = currentStep.component;
-	const CompletionComponent = subWizard.completionPage;
+    const StepComponent = currentStep.component;
+    const CompletionComponent = subWizard.completionPage;
 
-	return (
-		<div className="fixed-content-area min-h-0 bg-gray-50 dark:bg-surface-base flex flex-col">
-			{isSingleStep ? (
-				<div className="bg-white dark:bg-surface-raised border-b border-gray-200 px-4 py-2 flex items-center justify-between">
-					<span className="text-sm font-medium text-gray-700 dark:text-content-secondary">
-						{currentStep.title}
-					</span>
-					<Button
-						onClick={onExit}
-						testId="wizard-exit"
-						variant="nothing"
-						className="flex items-center gap-2 text-gray-600 dark:text-content-muted hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
-					>
-						<svg
-							className="w-5 h-5"
-							fill="none"
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							strokeWidth="2"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-						</svg>
-						Exit
-					</Button>
-				</div>
-			) : (
-				<ProgressBar
-					currentStep={currentStepIndex + 1}
-					totalSteps={subWizard.steps.length}
-					onExit={onExit}
-					isCompleted={showCompletion}
-				/>
-			)}
+    return (
+        <div className="fixed-content-area min-h-0 bg-gray-50 dark:bg-surface-base flex flex-col">
+            {isSingleStep ? (
+                <div className="bg-white dark:bg-surface-raised border-b border-gray-200 px-4 py-2 flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-700 dark:text-content-secondary">
+                        {currentStep.title}
+                    </span>
+                    <Button
+                        onClick={onExit}
+                        testId="wizard-exit"
+                        variant="nothing"
+                        className="flex items-center gap-2 text-gray-600 dark:text-content-muted hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+                    >
+                        <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Exit
+                    </Button>
+                </div>
+            ) : (
+                <ProgressBar
+                    currentStep={currentStepIndex + 1}
+                    totalSteps={subWizard.steps.length}
+                    onExit={onExit}
+                    isCompleted={showCompletion}
+                />
+            )}
 
-			<StepContextProvider>
-				<div
-					className={
-						subWizard.secondaryContentLeft
-							? "flex flex-row-reverse flex-1 overflow-hidden portrait:flex-col"
-							: "flex flex-1 overflow-hidden portrait:flex-col-reverse"
-					}
-				>
-					<div
-						className={`portrait:w-full portrait:text-xl portrait:h-3/5 p-12 portrait:p-6 ${
-							fillPrimaryContent
-								? "flex flex-col min-h-0 overflow-hidden"
-								: "overflow-y-auto"
-						} ${showCompletion && CompletionComponent ? "w-full" : "w-3/5"}`}
-					>
-						{showCompletion && CompletionComponent ? (
-							<CompletionComponent />
-						) : (
-							<>
-								{!isSingleStep && (
-									<h1 className="text-4xl font-bold text-gray-900 dark:text-content-primary mb-2">
-										{currentStep.title}
-									</h1>
-								)}
+            <StepContextProvider>
+                <div
+                    className={
+                        subWizard.secondaryContentLeft
+                            ? 'flex flex-row-reverse flex-1 overflow-hidden portrait:flex-col'
+                            : 'flex flex-1 overflow-hidden portrait:flex-col-reverse'
+                    }
+                >
+                    <div
+                        className={`portrait:w-full portrait:text-xl portrait:h-3/5 p-12 portrait:p-6 ${
+                            fillPrimaryContent
+                                ? 'flex flex-col min-h-0 overflow-hidden'
+                                : 'overflow-y-auto'
+                        } ${showCompletion && CompletionComponent ? 'w-full' : 'w-3/5'}`}
+                    >
+                        {showCompletion && CompletionComponent ? (
+                            <CompletionComponent />
+                        ) : (
+                            <>
+                                {!isSingleStep && (
+                                    <h1 className="text-4xl font-bold text-gray-900 dark:text-content-primary mb-2">
+                                        {currentStep.title}
+                                    </h1>
+                                )}
 
-								{subWizard.configVersion && !subWizard.hideVersionPrintout && (
-									<p className="text-gray-600 dark:text-content-muted mb-8">
-										Configuration File Version: {subWizard.configVersion}
-									</p>
-								)}
+                                {subWizard.configVersion &&
+                                    !subWizard.hideVersionPrintout && (
+                                        <p className="text-gray-600 dark:text-content-muted mb-8">
+                                            Configuration File Version:{' '}
+                                            {subWizard.configVersion}
+                                        </p>
+                                    )}
 
-								<div
-									className={`${fillPrimaryContent ? "mt-0" : "mt-8"} ${
-										fillPrimaryContent ? "flex-1 min-h-0 overflow-hidden" : ""
-									}`}
-								>
-									<StepComponent
-										onComplete={handleStepComplete}
-										onUncomplete={handleStepUncomplete}
-										data={stepData[currentStep.id]}
-										onDataChange={handleDataChange}
-									/>
-								</div>
-							</>
-						)}
-					</div>
+                                <div
+                                    className={`${fillPrimaryContent ? 'mt-0' : 'mt-8'} ${
+                                        fillPrimaryContent
+                                            ? 'flex-1 min-h-0 overflow-hidden'
+                                            : ''
+                                    }`}
+                                >
+                                    <StepComponent
+                                        onComplete={handleStepComplete}
+                                        onUncomplete={handleStepUncomplete}
+                                        data={stepData[currentStep.id]}
+                                        onDataChange={handleDataChange}
+                                    />
+                                </div>
+                            </>
+                        )}
+                    </div>
 
-					{showCompletion && CompletionComponent ? null : (
-						<div className="w-2/5 portrait:h-2/5 portrait:w-full bg-gray-200 dark:bg-surface-raised px-12 py-4 portrait:p-4 flex flex-col overflow-hidden">
-							<SecondaryContentPanel
-								content={
-									showCompletion ? [] : currentStep.secondaryContent || []
-								}
-								getItemParams={getItemParams}
-							/>
-						</div>
-					)}
-				</div>
-			</StepContextProvider>
+                    {showCompletion && CompletionComponent ? null : (
+                        <div className="w-2/5 portrait:h-2/5 portrait:w-full bg-gray-200 dark:bg-surface-raised px-12 py-4 portrait:p-4 flex flex-col overflow-hidden">
+                            <SecondaryContentPanel
+                                content={
+                                    showCompletion
+                                        ? []
+                                        : currentStep.secondaryContent || []
+                                }
+                                getItemParams={getItemParams}
+                            />
+                        </div>
+                    )}
+                </div>
+            </StepContextProvider>
 
-			{!isSingleStep && (
-				<div className="bg-white dark:bg-surface-raised border-t border-gray-200 dark:border-outline px-8 py-4 flex items-center justify-between">
-					{showCompletion ? (
-						<div className="flex w-full flex-row justify-between">
-							<Button
-								onClick={onExit}
-								testId="wizard-ending-exit"
-								variant="nothing"
-								className="flex h-full items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors bg-gray-900 text-white hover:bg-gray-800"
-							>
-								Exit Wizard
-							</Button>
-							<Button
-								onClick={resetWizard}
-								testId="wizard-reset"
-								variant="nothing"
-								className="flex h-full items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors text-gray-900 bg-gray-200 hover:bg-gray-100"
-							>
-								Restart Wizard
-							</Button>
-						</div>
-					) : (
-						<>
-							<Button
-								onClick={handlePrevious}
-								disabled={isFirstStep}
-								testId="wizard-previous"
-								variant="nothing"
-								className={`
+            {!isSingleStep && (
+                <div className="bg-white dark:bg-surface-raised border-t border-gray-200 dark:border-outline px-8 py-4 flex items-center justify-between">
+                    {showCompletion ? (
+                        <div className="flex w-full flex-row justify-between">
+                            <Button
+                                onClick={onExit}
+                                testId="wizard-ending-exit"
+                                variant="nothing"
+                                className="flex h-full items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors bg-gray-900 text-white hover:bg-gray-800"
+                            >
+                                Exit Wizard
+                            </Button>
+                            <Button
+                                onClick={resetWizard}
+                                testId="wizard-reset"
+                                variant="nothing"
+                                className="flex h-full items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors text-gray-900 bg-gray-200 hover:bg-gray-100"
+                            >
+                                Restart Wizard
+                            </Button>
+                        </div>
+                    ) : (
+                        <>
+                            <Button
+                                onClick={handlePrevious}
+                                disabled={isFirstStep}
+                                testId="wizard-previous"
+                                variant="nothing"
+                                className={`
                 flex h-full items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors
                 ${
-									isFirstStep
-										? "text-gray-400 cursor-not-allowed"
-										: "text-gray-700 dark:text-content-secondary dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700"
-								}
+                    isFirstStep
+                        ? 'text-gray-400 cursor-not-allowed'
+                        : 'text-gray-700 dark:text-content-secondary dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700'
+                }
               `}
-							>
-								<ChevronLeft size={20} />
-								Previous
-							</Button>
+                            >
+                                <ChevronLeft size={20} />
+                                Previous
+                            </Button>
 
-							<Button
-								onClick={handleNext}
-								disabled={!isCurrentStepComplete}
-								testId="wizard-previous"
-								variant="nothing"
-								className={`
+                            <Button
+                                onClick={handleNext}
+                                disabled={!isCurrentStepComplete}
+                                testId="wizard-previous"
+                                variant="nothing"
+                                className={`
                 flex h-full items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors
                 ${
-									!isCurrentStepComplete
-										? "bg-gray-300 text-gray-500 cursor-not-allowed"
-										: "bg-gray-900 text-white hover:bg-gray-800"
-								}
+                    !isCurrentStepComplete
+                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        : 'bg-gray-900 text-white hover:bg-gray-800'
+                }
               `}
-							>
-								Next
-								<ChevronRight size={20} />
-							</Button>
-						</>
-					)}
-				</div>
-			)}
-		</div>
-	);
+                            >
+                                Next
+                                <ChevronRight size={20} />
+                            </Button>
+                        </>
+                    )}
+                </div>
+            )}
+        </div>
+    );
 }

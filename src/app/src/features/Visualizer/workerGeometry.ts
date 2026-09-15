@@ -21,7 +21,7 @@
  *
  */
 
-import type { WorkerGeometryData } from "@sienci/gviewer/viewer";
+import type { WorkerGeometryData } from '@sienci/gviewer/viewer';
 
 /**
  * Prepare a raw `geometryReady` payload for gviewer.
@@ -38,11 +38,11 @@ import type { WorkerGeometryData } from "@sienci/gviewer/viewer";
  * message loses the tool colours. Every consumer must go through here.
  */
 export function augmentWorkerGeometry(
-	data: WorkerGeometryData,
+    data: WorkerGeometryData,
 ): WorkerGeometryData {
-	const raw = data as unknown as { info?: { toolchanges?: unknown } };
-	const toolchangeCount = Array.isArray(raw.info?.toolchanges)
-		? raw.info.toolchanges.length
-		: 0;
-	return { ...data, toolchangeCount };
+    const raw = data as unknown as { info?: { toolchanges?: unknown } };
+    const toolchangeCount = Array.isArray(raw.info?.toolchanges)
+        ? raw.info.toolchanges.length
+        : 0;
+    return { ...data, toolchangeCount };
 }

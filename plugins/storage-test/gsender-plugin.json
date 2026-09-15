@@ -1,30 +1,30 @@
 {
-	"id": "com.sienci.storage-test",
-	"name": "Storage Test",
-	"description": "Exercises every plugin storage API method (get/set/delete/getAll/setAll/clear) for QA.",
-	"version": "0.1.0",
-	"engine": ">=1.6.0",
-	"ui": {
-		"entry": "ui/index.html",
-		"contributions": [
-			{
-				"slot": "tools-page",
-				"route": "storage-test",
-				"label": "Storage Test"
-			}
-		]
-	},
-	"permissions": ["storage"],
-	"capabilities": {
-		"requestTypes": [
-			"storage:get",
-			"storage:set",
-			"storage:delete",
-			"storage:get:all",
-			"storage:set:all",
-			"storage:clear"
-		],
-		"topics": [],
-		"allowedFunctions": ["storage"]
-	}
+  "id": "com.sienci.storage-test",
+  "name": "Storage Test",
+  "description": "Exercises every plugin storage API method (get/set/delete/getAll/setAll/clear) for QA.",
+  "version": "0.1.0",
+  "engine": ">=1.6.0",
+  "ui": {
+    "entry": "ui/index.html",
+    "contributions": [
+      {
+        "slot": "tools-page",
+        "route": "storage-test",
+        "label": "Storage Test"
+      }
+    ]
+  },
+  "permissions": ["storage"],
+  "capabilities": {
+    "requestTypes": [
+      "storage:get",
+      "storage:set",
+      "storage:delete",
+      "storage:get:all",
+      "storage:set:all",
+      "storage:clear"
+    ],
+    "topics": [],
+    "allowedFunctions": ["storage"]
+  }
 }

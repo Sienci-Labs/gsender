@@ -1,70 +1,70 @@
 export interface PluginCapabilities {
-	requestTypes: Set<PluginBridgeRequestType>;
-	topics: Set<PluginBridgeTopic>;
+    requestTypes: Set<PluginBridgeRequestType>;
+    topics: Set<PluginBridgeTopic>;
 }
 
 // What travels over REST and lives in gsender-plugin.json
 export interface PluginCapabilitiesWire {
-	requestTypes: PluginBridgeRequestType[];
-	topics: PluginBridgeTopic[];
-	allowedFunctions?: string[];
+    requestTypes: PluginBridgeRequestType[];
+    topics: PluginBridgeTopic[];
+    allowedFunctions?: string[];
 }
 
 export type PluginContributionSlot =
-	| "tools-tab"
-	| "tools-page"
-	| "settings-section"
-	| "navbar"
-	| "standalone"
-	| "visualizer-overlay";
+    | 'tools-tab'
+    | 'tools-page'
+    | 'settings-section'
+    | 'navbar'
+    | 'standalone'
+    | 'visualizer-overlay';
 
 // A declarative marker the host draws over the visualizer canvas on behalf of
 // an overlay plugin. Coordinates are in world/scene space; the host re-projects
 // them to screen space every frame so they track camera pan/zoom. Plugins never
 // draw on the canvas themselves — they hand the host this list.
 export interface OverlayMarker {
-	id: string;
-	x: number;
-	y: number;
-	z?: number; // world coordinates
-	shape?: "circle" | "cross" | "ring"; // default 'circle'
-	color?: string; // CSS color
-	size?: number; // px, default 6
-	label?: string;
+    id: string;
+    x: number;
+    y: number;
+    z?: number; // world coordinates
+    shape?: 'circle' | 'cross' | 'ring'; // default 'circle'
+    color?: string; // CSS color
+    size?: number; // px, default 6
+    label?: string;
 }
 
 export type PluginContribution = {
-	slot: PluginContributionSlot;
-	label?: string;
-	route?: string;
-	icon?: string;
-	// For "visualizer-overlay" contributions that drive machine motion: when
-	// true, the host greys out and blocks the overlay toggle unless the machine
-	// is connected and idle (i.e. actually able to accept the command).
-	requiresIdle?: boolean;
+    slot: PluginContributionSlot;
+    label?: string;
+    route?: string;
+    icon?: string;
+    // For "visualizer-overlay" contributions that drive machine motion: when
+    // true, the host greys out and blocks the overlay toggle unless the machine
+    // is connected and idle (i.e. actually able to accept the command).
+    requiresIdle?: boolean;
 };
 
 export type PluginRecord = {
-	id: string;
-	name: string;
-	version: string;
-	description: string;
-	engine: string | null;
-	capabilities: PluginCapabilitiesWire;
-	permissions: PluginPermissionsType[];
-	enabled: boolean;
-	valid: boolean;
-	errors: string[];
-	mountSlug: string;
-	mountRoute: string;
-	uiUrl: string;
-	contributions: PluginContribution[];
+    id: string;
+    name: string;
+    version: string;
+    description: string;
+    engine: string | null;
+    capabilities: PluginCapabilitiesWire;
+    permissions: PluginPermissionsType[];
+    enabled: boolean;
+    valid: boolean;
+    errors: string[];
+    mountSlug: string;
+    mountRoute: string;
+    uiUrl: string;
+    contributions: PluginContribution[];
 };
 
 export type PluginsResponse = {
-	pluginsDir: string;
-	userPluginsDir: string;
-	plugins: PluginRecord[];
+    pluginsDir: string;
+    userPluginsDir: string;
+    plugins: PluginRecord[];
 };
 
 // ---------------------------------------------------------------------------
@@ -73,89 +73,89 @@ export type PluginsResponse = {
 
 // Where a plugin comes from. Windows and Linux cannot offer a folder and a
 // file in one native dialog, so the user picks which.
-export type PluginSourceMode = "dir" | "zip";
+export type PluginSourceMode = 'dir' | 'zip';
 
 // What installing this plugin would do to what is already on disk.
 // "unknown" means one of the two versions is not valid semver.
 export type PluginInstallKind =
-	| "new"
-	| "update"
-	| "downgrade"
-	| "reinstall"
-	| "unknown";
+    | 'new'
+    | 'update'
+    | 'downgrade'
+    | 'reinstall'
+    | 'unknown';
 
 export type PluginInstallLogEntry = {
-	level: "info" | "warn" | "error";
-	message: string;
-	at: string;
+    level: 'info' | 'warn' | 'error';
+    message: string;
+    at: string;
 };
 
 export type PluginEngineCheck = {
-	// false when there is no engine field, or its range could not be parsed.
-	checked: boolean;
-	satisfied: boolean;
-	unreadable?: boolean;
-	appVersion?: string;
-	range: string | null;
+    // false when there is no engine field, or its range could not be parsed.
+    checked: boolean;
+    satisfied: boolean;
+    unreadable?: boolean;
+    appVersion?: string;
+    range: string | null;
 };
 
 // Everything the review step needs, computed server-side against a staged copy.
 export type PluginInstallPlan = {
-	kind: PluginInstallKind;
-	plugin: {
-		id: string;
-		name: string;
-		description: string;
-		version: string;
-		engine: string | null;
-		contributions: PluginContribution[];
-	};
-	installedVersion: string | null;
-	incomingVersion: string;
-	// Everything that will be granted: the union of what the bundle scan proved
-	// and what the manifest declares.
-	permissions: PluginPermissionsType[];
-	// The subset the static scan actually found in the plugin's code.
-	verifiedPermissions: PluginPermissionsType[];
-	// Declared by the manifest but not corroborated by the code we could read,
-	// e.g. because the plugin bundles the SDK instead of importing it.
-	declaredOnlyPermissions: PluginPermissionsType[];
-	capabilities: PluginCapabilitiesWire;
-	// Manifest-declared parsers, surfaced here for a future review-step UI.
-	parsers: unknown[];
-	parserErrors: string[];
-	// False when no bundle could be found to scan.
-	scanned: boolean;
-	// True when the plugin's SDK use could not be fully determined, so the
-	// permission list above may be incomplete.
-	unverifiable: boolean;
-	engine: PluginEngineCheck;
-	// Set when a copy in another plugins root would take priority over this one.
-	shadowedBy: string | null;
-	sourcePath: string;
-	targetDir: string;
+    kind: PluginInstallKind;
+    plugin: {
+        id: string;
+        name: string;
+        description: string;
+        version: string;
+        engine: string | null;
+        contributions: PluginContribution[];
+    };
+    installedVersion: string | null;
+    incomingVersion: string;
+    // Everything that will be granted: the union of what the bundle scan proved
+    // and what the manifest declares.
+    permissions: PluginPermissionsType[];
+    // The subset the static scan actually found in the plugin's code.
+    verifiedPermissions: PluginPermissionsType[];
+    // Declared by the manifest but not corroborated by the code we could read,
+    // e.g. because the plugin bundles the SDK instead of importing it.
+    declaredOnlyPermissions: PluginPermissionsType[];
+    capabilities: PluginCapabilitiesWire;
+    // Manifest-declared parsers, surfaced here for a future review-step UI.
+    parsers: unknown[];
+    parserErrors: string[];
+    // False when no bundle could be found to scan.
+    scanned: boolean;
+    // True when the plugin's SDK use could not be fully determined, so the
+    // permission list above may be incomplete.
+    unverifiable: boolean;
+    engine: PluginEngineCheck;
+    // Set when a copy in another plugins root would take priority over this one.
+    shadowedBy: string | null;
+    sourcePath: string;
+    targetDir: string;
 };
 
 export type PluginInstallPrepareResponse = {
-	ok: boolean;
-	sessionId?: string;
-	plan?: PluginInstallPlan;
-	error?: string;
-	manifestErrors?: string[];
-	log?: PluginInstallLogEntry[];
+    ok: boolean;
+    sessionId?: string;
+    plan?: PluginInstallPlan;
+    error?: string;
+    manifestErrors?: string[];
+    log?: PluginInstallLogEntry[];
 };
 
 export type PluginInstallCommitResponse = {
-	ok: boolean;
-	error?: string;
-	log?: PluginInstallLogEntry[];
-	pluginId?: string;
-	targetDir?: string;
-	replaced?: boolean;
-	restartRequired?: boolean;
-	// After a failed swap: whether the previous version was put back.
-	restored?: boolean;
-	backupDir?: string | null;
+    ok: boolean;
+    error?: string;
+    log?: PluginInstallLogEntry[];
+    pluginId?: string;
+    targetDir?: string;
+    replaced?: boolean;
+    restartRequired?: boolean;
+    // After a failed swap: whether the previous version was put back.
+    restored?: boolean;
+    backupDir?: string | null;
 };
 
 // The gSender-specific capability names, which drive SDK grant derivation
@@ -167,53 +167,53 @@ export type PluginInstallCommitResponse = {
 // main.js and PluginPanel.tsx. The `(string & {})` union member keeps
 // autocomplete for the known names below without rejecting anything else.
 export type PluginPermissionsType =
-	| "machine:read"
-	| "machine:write"
-	// Reading the raw firmware stream through a plugin-supplied regex. NOT part
-	// of machine:read: that returns a curated context object, whereas a parser
-	// matching "^" sees more of the serial line traffic than the console does.
-	| "machine:parse"
-	// Writing a command and capturing its response lines.
-	| "machine:query"
-	| "visualizer:load"
-	| "viewer:camera"
-	| "viewer:draw"
-	| "workspace:read"
-	| "redux:read"
-	| "local-fonts"
-	| "storage"
-	| (string & {});
+    | 'machine:read'
+    | 'machine:write'
+    // Reading the raw firmware stream through a plugin-supplied regex. NOT part
+    // of machine:read: that returns a curated context object, whereas a parser
+    // matching "^" sees more of the serial line traffic than the console does.
+    | 'machine:parse'
+    // Writing a command and capturing its response lines.
+    | 'machine:query'
+    | 'visualizer:load'
+    | 'viewer:camera'
+    | 'viewer:draw'
+    | 'workspace:read'
+    | 'redux:read'
+    | 'local-fonts'
+    | 'storage'
+    | (string & {});
 
 export type PluginTopicsType =
-	| "workspace"
-	| "redux"
-	| "parser"
-	| "viewer"
-	| "controller";
+    | 'workspace'
+    | 'redux'
+    | 'parser'
+    | 'viewer'
+    | 'controller';
 
 export type PluginBridgeRequestType =
-	| "machine:get:context"
-	| "machine:command"
-	| "machine:parser:register"
-	| "machine:parser:unregister"
-	| "machine:query"
-	| "machine:busy:set"
-	| "workspace:get:state"
-	| "redux:get:state"
-	| "gcode:load:to:visualizer"
-	| "viewer:screen-to-world"
-	| "viewer:world-to-screen"
-	| "viewer:camera:set"
-	| "viewer:camera:lock-rotate"
-	| "viewer:pick:arm"
-	| "viewer:pick:disarm"
-	| "viewer:overlay:set"
-	| "storage:get"
-	| "storage:set"
-	| "storage:delete"
-	| "storage:get:all"
-	| "storage:set:all"
-	| "storage:clear";
+    | 'machine:get:context'
+    | 'machine:command'
+    | 'machine:parser:register'
+    | 'machine:parser:unregister'
+    | 'machine:query'
+    | 'machine:busy:set'
+    | 'workspace:get:state'
+    | 'redux:get:state'
+    | 'gcode:load:to:visualizer'
+    | 'viewer:screen-to-world'
+    | 'viewer:world-to-screen'
+    | 'viewer:camera:set'
+    | 'viewer:camera:lock-rotate'
+    | 'viewer:pick:arm'
+    | 'viewer:pick:disarm'
+    | 'viewer:overlay:set'
+    | 'storage:get'
+    | 'storage:set'
+    | 'storage:delete'
+    | 'storage:get:all'
+    | 'storage:set:all'
+    | 'storage:clear';
 
 /** A serialized regex. Matchers cross postMessage and run server-side, so they
  * can never be functions. */
@@ -221,58 +221,58 @@ export type RegexSpec = { source: string; flags?: string };
 
 /** A parser as authored, in a manifest or via the runtime SDK call. */
 export type PluginParserSpec = {
-	id: string;
-	mode?: "line" | "block";
-	match?: RegexSpec | string;
-	begin?: RegexSpec | string;
-	end?: RegexSpec | string;
-	ignore?: RegexSpec | string;
-	until?: "ok" | "error" | "ok-or-error";
-	ignoreStatusReports?: boolean;
-	strict?: boolean;
-	restartOnBegin?: boolean;
-	emitPartial?: boolean;
-	maxLines?: number;
-	timeout?: number;
-	whenWorkflow?: "any" | "idle";
-	label?: string;
+    id: string;
+    mode?: 'line' | 'block';
+    match?: RegexSpec | string;
+    begin?: RegexSpec | string;
+    end?: RegexSpec | string;
+    ignore?: RegexSpec | string;
+    until?: 'ok' | 'error' | 'ok-or-error';
+    ignoreStatusReports?: boolean;
+    strict?: boolean;
+    restartOnBegin?: boolean;
+    emitPartial?: boolean;
+    maxLines?: number;
+    timeout?: number;
+    whenWorkflow?: 'any' | 'idle';
+    label?: string;
 };
 
 export type PluginParserMatch = {
-	pluginId: string;
-	parserId: string;
-	mode: "line" | "block";
-	/** Monotonic per parser, so two identical payloads stay distinguishable. */
-	seq: number;
-	line: string | null;
-	lines: string[];
-	groups: Record<string, string>;
-	captures: Array<string | null>;
-	entries: Array<{
-		line: string;
-		groups: Record<string, string>;
-		captures: Array<string | null>;
-	}>;
-	complete: boolean;
-	reason:
-		| "match"
-		| "end"
-		| "until"
-		| "maxLines"
-		| "timeout"
-		| "strict"
-		| "restart"
-		| "close"
-		| "reload";
-	startedAt: number;
-	endedAt: number;
+    pluginId: string;
+    parserId: string;
+    mode: 'line' | 'block';
+    /** Monotonic per parser, so two identical payloads stay distinguishable. */
+    seq: number;
+    line: string | null;
+    lines: string[];
+    groups: Record<string, string>;
+    captures: Array<string | null>;
+    entries: Array<{
+        line: string;
+        groups: Record<string, string>;
+        captures: Array<string | null>;
+    }>;
+    complete: boolean;
+    reason:
+        | 'match'
+        | 'end'
+        | 'until'
+        | 'maxLines'
+        | 'timeout'
+        | 'strict'
+        | 'restart'
+        | 'close'
+        | 'reload';
+    startedAt: number;
+    endedAt: number;
 };
 
 export type PluginParserError = {
-	pluginId: string;
-	parserId: string;
-	reason: "quarantined" | "rate-limited" | "invalid-spec";
-	message: string;
+    pluginId: string;
+    parserId: string;
+    reason: 'quarantined' | 'rate-limited' | 'invalid-spec';
+    message: string;
 };
 
 // a relayed controller event, as pushed over the `"controller"` topic.
@@ -281,26 +281,26 @@ export type PluginParserError = {
 export type ControllerEvent = { name: string; args: unknown[] };
 
 export type PluginBridgeRequest = {
-	id: string;
-	type: PluginBridgeRequestType;
-	payload?: Record<string, unknown>;
+    id: string;
+    type: PluginBridgeRequestType;
+    payload?: Record<string, unknown>;
 };
 
 export type PluginBridgeResponse = {
-	id: string;
-	ok: boolean;
-	result?: unknown;
-	error?: string;
+    id: string;
+    ok: boolean;
+    result?: unknown;
+    error?: string;
 };
 
 // reactive state that plugins can subscribe to for live updates.
 // "viewer" and "controller" are push-only event streams.
 export type PluginBridgeTopic =
-	| "workspace"
-	| "redux"
-	| "parser"
-	| "viewer"
-	| "controller";
+    | 'workspace'
+    | 'redux'
+    | 'parser'
+    | 'viewer'
+    | 'controller';
 
 /**
  * A pushed event, as opposed to a topic snapshot.
@@ -312,24 +312,24 @@ export type PluginBridgeTopic =
  * lossless stream (for onParsed).
  */
 export type PluginBridgeEvent = {
-	id: string;
-	topic: PluginBridgeTopic;
-	event: unknown;
+    id: string;
+    topic: PluginBridgeTopic;
+    event: unknown;
 };
 
 export type PluginBridgeSubscribe = {
-	id: string;
-	topic: PluginBridgeTopic;
+    id: string;
+    topic: PluginBridgeTopic;
 };
 
 export type PluginBridgeUnsubscribe = {
-	id: string;
+    id: string;
 };
 
 export type PluginBridgeUpdate = {
-	id: string;
-	topic: PluginBridgeTopic;
-	snapshot: unknown;
+    id: string;
+    topic: PluginBridgeTopic;
+    snapshot: unknown;
 };
 
-export const PLUGIN_BRIDGE_CHANNEL = "gsender:plugin-bridge";
+export const PLUGIN_BRIDGE_CHANNEL = 'gsender:plugin-bridge';

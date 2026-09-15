@@ -1,99 +1,99 @@
 {
-	"name": "@sienci/gsender-plugin-sdk",
-	"version": "0.2.1",
-	"description": "SDK for gSender UI plugins — bridge client, React hooks, and G-code viewer",
-	"type": "module",
-	"main": "./dist/index.js",
-	"types": "./dist/index.d.ts",
-	"exports": {
-		".": {
-			"types": "./dist/index.d.ts",
-			"import": "./dist/index.js"
-		},
-		"./react": {
-			"types": "./dist/react.d.ts",
-			"import": "./dist/react.js"
-		},
-		"./viewer": {
-			"types": "./dist/viewer.d.ts",
-			"import": "./dist/viewer.js"
-		},
-		"./vite": {
-			"types": "./dist/vite-plugin.d.ts",
-			"import": "./dist/vite-plugin.js"
-		}
-	},
-	"files": [
-		"dist",
-		"LICENSE",
-		"README.md"
-	],
-	"sideEffects": [
-		"**/*.css"
-	],
-	"scripts": {
-		"build": "tsup",
-		"prepublishOnly": "npm run build"
-	},
-	"peerDependencies": {
-		"@sienci/gviewer": ">=0.1.27",
-		"react": ">=18",
-		"three": ">=0.168.0",
-		"vite": ">=5"
-	},
-	"peerDependenciesMeta": {
-		"@sienci/gviewer": {
-			"optional": true
-		},
-		"react": {
-			"optional": true
-		},
-		"three": {
-			"optional": true
-		},
-		"vite": {
-			"optional": true
-		}
-	},
-	"devDependencies": {
-		"@sienci/gviewer": "^0.1.27",
-		"@types/node": "^26.2.0",
-		"@types/react": "^19.0.0",
-		"react": "^19.0.0",
-		"react-dom": "^19.2.8",
-		"three": "^0.168.0",
-		"tsup": "^8.3.0",
-		"typescript": "^5.7.2",
-		"vite": "^6.0.0"
-	},
-	"publishConfig": {
-		"access": "public"
-	},
-	"engines": {
-		"node": ">=18"
-	},
-	"keywords": [
-		"gsender",
-		"cnc",
-		"plugin",
-		"sdk",
-		"gcode"
-	],
-	"author": {
-		"name": "Sienci Labs",
-		"email": "hi@sienci.com"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/Sienci-Labs/gsender.git",
-		"directory": "packages/plugin-sdk"
-	},
-	"bugs": {
-		"url": "https://github.com/Sienci-Labs/gsender/issues"
-	},
-	"homepage": "https://github.com/Sienci-Labs/gsender/tree/master/packages/plugin-sdk#readme",
-	"license": "MIT",
-	"dependencies": {
-		"esbuild": "^0.28.2"
-	}
+  "name": "@sienci/gsender-plugin-sdk",
+  "version": "0.2.1",
+  "description": "SDK for gSender UI plugins — bridge client, React hooks, and G-code viewer",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js"
+    },
+    "./viewer": {
+      "types": "./dist/viewer.d.ts",
+      "import": "./dist/viewer.js"
+    },
+    "./vite": {
+      "types": "./dist/vite-plugin.d.ts",
+      "import": "./dist/vite-plugin.js"
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "@sienci/gviewer": ">=0.1.27",
+    "react": ">=18",
+    "three": ">=0.168.0",
+    "vite": ">=5"
+  },
+  "peerDependenciesMeta": {
+    "@sienci/gviewer": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "three": {
+      "optional": true
+    },
+    "vite": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@sienci/gviewer": "^0.1.27",
+    "@types/node": "^26.2.0",
+    "@types/react": "^19.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.2.8",
+    "three": "^0.168.0",
+    "tsup": "^8.3.0",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "gsender",
+    "cnc",
+    "plugin",
+    "sdk",
+    "gcode"
+  ],
+  "author": {
+    "name": "Sienci Labs",
+    "email": "hi@sienci.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sienci-Labs/gsender.git",
+    "directory": "packages/plugin-sdk"
+  },
+  "bugs": {
+    "url": "https://github.com/Sienci-Labs/gsender/issues"
+  },
+  "homepage": "https://github.com/Sienci-Labs/gsender/tree/master/packages/plugin-sdk#readme",
+  "license": "MIT",
+  "dependencies": {
+    "esbuild": "^0.28.2"
+  }
 }

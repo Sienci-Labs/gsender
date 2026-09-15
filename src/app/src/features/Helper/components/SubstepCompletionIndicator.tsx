@@ -21,28 +21,28 @@
  *
  */
 
-import cx from "classnames";
-import React from "react";
-import { FaClipboard, FaClipboardCheck, FaClipboardList } from "react-icons/fa";
-import styles from "../index.module.styl";
+import cx from 'classnames';
+import React from 'react';
+import { FaClipboard, FaClipboardCheck, FaClipboardList } from 'react-icons/fa';
+import styles from '../index.module.styl';
 
 const SubstepCompletionIndicator = ({
-	completed = false,
-	future = false,
-	active = false,
+    completed = false,
+    future = false,
+    active = false,
 }) => {
-	return (
-		<div
-			className={cx(styles.substepIndicator, {
-				[styles.substepIndicatorComplete]: completed,
-				[styles.substepIndicatorPending]: future,
-			})}
-		>
-			{completed && <FaClipboardCheck />}
-			{future && <FaClipboard />}
-			{active && <FaClipboardList />}
-		</div>
-	);
+    return (
+        <div
+            className={cx(styles.substepIndicator, {
+                [styles.substepIndicatorComplete]: completed,
+                [styles.substepIndicatorPending]: future,
+            })}
+        >
+            {completed && <FaClipboardCheck />}
+            {future && <FaClipboard />}
+            {active && <FaClipboardList />}
+        </div>
+    );
 };
 
 export default SubstepCompletionIndicator;

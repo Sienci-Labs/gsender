@@ -1,257 +1,257 @@
 /** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
 /** biome-ignore-all lint/a11y/useButtonType: <> */
 
-import { usePostHog } from "@posthog/react";
-import { IMPERIAL_UNITS, JOGGING_CATEGORY, METRIC_UNITS } from "app/constants";
-import type { JogValueObject } from "app/features/Jogging";
-import type { JoggingSpeedOptions } from "app/features/Jogging/utils/Jogging";
-import useShuttleEvents from "app/hooks/useShuttleEvents";
-import { useWorkspaceState } from "app/hooks/useWorkspaceState";
-import useKeybinding from "app/lib/useKeybinding";
-import store from "app/store";
-import cn from "classnames";
-import get from "lodash/get";
-import pubsub from "pubsub-js";
-import { useEffect, useRef, useState } from "react";
+import { usePostHog } from '@posthog/react';
+import { IMPERIAL_UNITS, JOGGING_CATEGORY, METRIC_UNITS } from 'app/constants';
+import type { JogValueObject } from 'app/features/Jogging';
+import type { JoggingSpeedOptions } from 'app/features/Jogging/utils/Jogging';
+import useShuttleEvents from 'app/hooks/useShuttleEvents';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import useKeybinding from 'app/lib/useKeybinding';
+import store from 'app/store';
+import cn from 'classnames';
+import get from 'lodash/get';
+import pubsub from 'pubsub-js';
+import { useEffect, useRef, useState } from 'react';
 
-import { convertValue } from "../utils/units";
+import { convertValue } from '../utils/units';
 
 export interface SpeedSelectButtonProps {
-	active?: boolean;
-	onClick?: () => void;
-	label: string;
-	screenReaderLabel?: string;
+    active?: boolean;
+    onClick?: () => void;
+    label: string;
+    screenReaderLabel?: string;
 }
 
 export function SpeedSelectButton({
-	label,
-	active,
-	onClick,
-	screenReaderLabel,
+    label,
+    active,
+    onClick,
+    screenReaderLabel,
 }: SpeedSelectButtonProps) {
-	return (
-		<button
-			className={cn(
-				"text-sm px-2 max-xl:px-1 max-xl:py-1 py-2 rounded h-full border border-transparent",
-				{
-					"bg-blue-400 bg-opacity-30 border-blue-500 font-semibold text-blue-700 dark:text-blue-300":
-						active,
-				},
-			)}
-			onClick={onClick}
-			aria-label={screenReaderLabel || label}
-			aria-pressed={active}
-		>
-			{label}
-		</button>
-	);
+    return (
+        <button
+            className={cn(
+                'text-sm px-2 max-xl:px-1 max-xl:py-1 py-2 rounded h-full border border-transparent',
+                {
+                    'bg-blue-400 bg-opacity-30 border-blue-500 font-semibold text-blue-700 dark:text-blue-300':
+                        active,
+                },
+            )}
+            onClick={onClick}
+            aria-label={screenReaderLabel || label}
+            aria-pressed={active}
+        >
+            {label}
+        </button>
+    );
 }
 
 interface SpeedSelectorProps {
-	handleClick: (values: JogValueObject, speed: JoggingSpeedOptions) => void;
+    handleClick: (values: JogValueObject, speed: JoggingSpeedOptions) => void;
 }
 
 export function SpeedSelector({ handleClick }: SpeedSelectorProps) {
-	const posthog = usePostHog();
-	const [selectedSpeed, setSelectedSpeed] =
-		useState<JoggingSpeedOptions>("Normal");
-	const selectedSpeedRef = useRef<JoggingSpeedOptions>(selectedSpeed);
-	const handleClickRef = useRef(handleClick);
-	const { units } = useWorkspaceState();
-	const previousUnitsRef = useRef(units);
+    const posthog = usePostHog();
+    const [selectedSpeed, setSelectedSpeed] =
+        useState<JoggingSpeedOptions>('Normal');
+    const selectedSpeedRef = useRef<JoggingSpeedOptions>(selectedSpeed);
+    const handleClickRef = useRef(handleClick);
+    const { units } = useWorkspaceState();
+    const previousUnitsRef = useRef(units);
 
-	// Update the ref when handleClick changes
-	useEffect(() => {
-		handleClickRef.current = handleClick;
-	}, [handleClick]);
+    // Update the ref when handleClick changes
+    useEffect(() => {
+        handleClickRef.current = handleClick;
+    }, [handleClick]);
 
-	useEffect(() => {
-		selectedSpeedRef.current = selectedSpeed;
-	}, [selectedSpeed]);
+    useEffect(() => {
+        selectedSpeedRef.current = selectedSpeed;
+    }, [selectedSpeed]);
 
-	const rapidActive = selectedSpeed === "Rapid";
-	const normalActive = selectedSpeed === "Normal";
-	const preciseActive = selectedSpeed === "Precise";
-	const customActive = selectedSpeed === "Custom";
+    const rapidActive = selectedSpeed === 'Rapid';
+    const normalActive = selectedSpeed === 'Normal';
+    const preciseActive = selectedSpeed === 'Precise';
+    const customActive = selectedSpeed === 'Custom';
 
-	function handleSpeedChange(speed: JoggingSpeedOptions) {
-		if (speed === selectedSpeedRef.current) {
-			updateCurrentJogValues(speed);
-			return;
-		}
+    function handleSpeedChange(speed: JoggingSpeedOptions) {
+        if (speed === selectedSpeedRef.current) {
+            updateCurrentJogValues(speed);
+            return;
+        }
 
-		setSelectedSpeed(speed);
-		selectedSpeedRef.current = speed;
-	}
+        setSelectedSpeed(speed);
+        selectedSpeedRef.current = speed;
+    }
 
-	function updateCurrentJogValues(speedOverride?: JoggingSpeedOptions) {
-		const jogValues = store.get("widgets.axes.jog", {});
-		const speedKey = speedOverride ?? selectedSpeedRef.current;
-		const key = speedKey.toLowerCase();
-		const newSpeeds = { ...get(jogValues, key, {}) };
+    function updateCurrentJogValues(speedOverride?: JoggingSpeedOptions) {
+        const jogValues = store.get('widgets.axes.jog', {});
+        const speedKey = speedOverride ?? selectedSpeedRef.current;
+        const key = speedKey.toLowerCase();
+        const newSpeeds = { ...get(jogValues, key, {}) };
 
-		// Only convert if the units have changed or we've selected a different speed
-		if (units === IMPERIAL_UNITS && !jogValues.storedInMetric) {
-			// Convert metric values to imperial for display
-			newSpeeds.xyStep = convertValue(
-				newSpeeds.xyStep,
-				METRIC_UNITS,
-				IMPERIAL_UNITS,
-			);
-			newSpeeds.zStep = convertValue(
-				newSpeeds.zStep,
-				METRIC_UNITS,
-				IMPERIAL_UNITS,
-			);
-			newSpeeds.feedrate = convertValue(
-				newSpeeds.feedrate,
-				METRIC_UNITS,
-				IMPERIAL_UNITS,
-			);
-		}
+        // Only convert if the units have changed or we've selected a different speed
+        if (units === IMPERIAL_UNITS && !jogValues.storedInMetric) {
+            // Convert metric values to imperial for display
+            newSpeeds.xyStep = convertValue(
+                newSpeeds.xyStep,
+                METRIC_UNITS,
+                IMPERIAL_UNITS,
+            );
+            newSpeeds.zStep = convertValue(
+                newSpeeds.zStep,
+                METRIC_UNITS,
+                IMPERIAL_UNITS,
+            );
+            newSpeeds.feedrate = convertValue(
+                newSpeeds.feedrate,
+                METRIC_UNITS,
+                IMPERIAL_UNITS,
+            );
+        }
 
-		posthog?.capture("jog_preset_selected", {
-			preset: key,
-			units,
-			xyStep: newSpeeds.xyStep,
-			zStep: newSpeeds.zStep,
-			feedrate: newSpeeds.feedrate,
-		});
+        posthog?.capture('jog_preset_selected', {
+            preset: key,
+            units,
+            xyStep: newSpeeds.xyStep,
+            zStep: newSpeeds.zStep,
+            feedrate: newSpeeds.feedrate,
+        });
 
-		handleClickRef.current(newSpeeds, speedKey);
-		previousUnitsRef.current = units;
-	}
+        handleClickRef.current(newSpeeds, speedKey);
+        previousUnitsRef.current = units;
+    }
 
-	// Any time the value swaps, fetch and update the parent
-	useEffect(() => {
-		// get speed, convert units, update UI
-		updateCurrentJogValues();
+    // Any time the value swaps, fetch and update the parent
+    useEffect(() => {
+        // get speed, convert units, update UI
+        updateCurrentJogValues();
 
-		const tokens = [
-			pubsub.subscribe("config:saved", (_, settingsToUpdate) => {
-				// check to see if the presets were updated
-				const reg = new RegExp(Object.keys(settingsToUpdate).join("|"));
-				const rapidCheck = reg.test("widgets.axes.jog.rapid");
-				const normalCheck = reg.test("widgets.axes.jog.normal");
-				const preciseCheck = reg.test("widgets.axes.jog.precise");
-				// only update if its the current selected speed
-				if (
-					(rapidActive && rapidCheck) ||
-					(normalActive && normalCheck) ||
-					(preciseActive && preciseCheck)
-				) {
-					updateCurrentJogValues();
-				}
-			}),
-			pubsub.subscribe("programSettingReset", (_, setting: string) => {
-				// check to see if the presets were updated
-				const reg = new RegExp(setting);
-				const rapidCheck = reg.test("widgets.axes.jog.rapid");
-				const normalCheck = reg.test("widgets.axes.jog.normal");
-				const preciseCheck = reg.test("widgets.axes.jog.precise");
-				// only update if its the current selected speed
-				if (
-					(rapidActive && rapidCheck) ||
-					(normalActive && normalCheck) ||
-					(preciseActive && preciseCheck)
-				) {
-					updateCurrentJogValues();
-				}
-			}),
-		];
+        const tokens = [
+            pubsub.subscribe('config:saved', (_, settingsToUpdate) => {
+                // check to see if the presets were updated
+                const reg = new RegExp(Object.keys(settingsToUpdate).join('|'));
+                const rapidCheck = reg.test('widgets.axes.jog.rapid');
+                const normalCheck = reg.test('widgets.axes.jog.normal');
+                const preciseCheck = reg.test('widgets.axes.jog.precise');
+                // only update if its the current selected speed
+                if (
+                    (rapidActive && rapidCheck) ||
+                    (normalActive && normalCheck) ||
+                    (preciseActive && preciseCheck)
+                ) {
+                    updateCurrentJogValues();
+                }
+            }),
+            pubsub.subscribe('programSettingReset', (_, setting: string) => {
+                // check to see if the presets were updated
+                const reg = new RegExp(setting);
+                const rapidCheck = reg.test('widgets.axes.jog.rapid');
+                const normalCheck = reg.test('widgets.axes.jog.normal');
+                const preciseCheck = reg.test('widgets.axes.jog.precise');
+                // only update if its the current selected speed
+                if (
+                    (rapidActive && rapidCheck) ||
+                    (normalActive && normalCheck) ||
+                    (preciseActive && preciseCheck)
+                ) {
+                    updateCurrentJogValues();
+                }
+            }),
+        ];
 
-		return () => {
-			tokens.forEach((token) => {
-				pubsub.unsubscribe(token);
-			});
-		};
-	}, [selectedSpeed, units]);
+        return () => {
+            tokens.forEach((token) => {
+                pubsub.unsubscribe(token);
+            });
+        };
+    }, [selectedSpeed, units]);
 
-	const shuttleControlEvents = {
-		SET_R_JOG_PRESET: {
-			title: "Set to Rapid Preset",
-			keys: ["shift", "v"].join("+"),
-			cmd: "SET_R_JOG_PRESET",
-			preventDefault: false,
-			isActive: true,
-			category: JOGGING_CATEGORY,
-			callback: () => handleSpeedChange("Rapid"),
-		},
-		SET_N_JOG_PRESET: {
-			title: "Set to Normal Preset",
-			keys: ["shift", "c"].join("+"),
-			cmd: "SET_N_JOG_PRESET",
-			preventDefault: false,
-			isActive: true,
-			category: JOGGING_CATEGORY,
-			callback: () => handleSpeedChange("Normal"),
-		},
-		SET_P_JOG_PRESET: {
-			title: "Set to Precise Preset",
-			keys: ["shift", "x"].join("+"),
-			cmd: "SET_P_JOG_PRESET",
-			preventDefault: false,
-			isActive: true,
-			category: JOGGING_CATEGORY,
-			callback: () => handleSpeedChange("Precise"),
-		},
-		CYCLE_JOG_PRESETS: {
-			title: "Switch between Presets",
-			keys: ["shift", "z"].join("+"),
-			cmd: "CYCLE_JOG_PRESETS",
-			preventDefault: false,
-			isActive: true,
-			category: JOGGING_CATEGORY,
-			callback: () => {
-				const jogSpeedOptionsList: JoggingSpeedOptions[] = [
-					"Rapid",
-					"Normal",
-					"Precise",
-				];
+    const shuttleControlEvents = {
+        SET_R_JOG_PRESET: {
+            title: 'Set to Rapid Preset',
+            keys: ['shift', 'v'].join('+'),
+            cmd: 'SET_R_JOG_PRESET',
+            preventDefault: false,
+            isActive: true,
+            category: JOGGING_CATEGORY,
+            callback: () => handleSpeedChange('Rapid'),
+        },
+        SET_N_JOG_PRESET: {
+            title: 'Set to Normal Preset',
+            keys: ['shift', 'c'].join('+'),
+            cmd: 'SET_N_JOG_PRESET',
+            preventDefault: false,
+            isActive: true,
+            category: JOGGING_CATEGORY,
+            callback: () => handleSpeedChange('Normal'),
+        },
+        SET_P_JOG_PRESET: {
+            title: 'Set to Precise Preset',
+            keys: ['shift', 'x'].join('+'),
+            cmd: 'SET_P_JOG_PRESET',
+            preventDefault: false,
+            isActive: true,
+            category: JOGGING_CATEGORY,
+            callback: () => handleSpeedChange('Precise'),
+        },
+        CYCLE_JOG_PRESETS: {
+            title: 'Switch between Presets',
+            keys: ['shift', 'z'].join('+'),
+            cmd: 'CYCLE_JOG_PRESETS',
+            preventDefault: false,
+            isActive: true,
+            category: JOGGING_CATEGORY,
+            callback: () => {
+                const jogSpeedOptionsList: JoggingSpeedOptions[] = [
+                    'Rapid',
+                    'Normal',
+                    'Precise',
+                ];
 
-				const currentIndex = jogSpeedOptionsList.findIndex(
-					(option) => option === selectedSpeedRef.current,
-				);
-				const nextIndex = currentIndex + 1;
-				const nextSpeed = jogSpeedOptionsList[nextIndex];
+                const currentIndex = jogSpeedOptionsList.findIndex(
+                    (option) => option === selectedSpeedRef.current,
+                );
+                const nextIndex = currentIndex + 1;
+                const nextSpeed = jogSpeedOptionsList[nextIndex];
 
-				handleSpeedChange(nextSpeed ?? jogSpeedOptionsList[0]);
-			},
-		},
-	};
+                handleSpeedChange(nextSpeed ?? jogSpeedOptionsList[0]);
+            },
+        },
+    };
 
-	useShuttleEvents(shuttleControlEvents);
-	useEffect(() => {
-		// biome-ignore lint/correctness/useHookAtTopLevel: <>
-		useKeybinding(shuttleControlEvents);
-	}, []);
+    useShuttleEvents(shuttleControlEvents);
+    useEffect(() => {
+        // biome-ignore lint/correctness/useHookAtTopLevel: <>
+        useKeybinding(shuttleControlEvents);
+    }, []);
 
-	return (
-		<div className="flex flex-col bg-white dark:bg-surface-raised dark:text-content-primary rounded-md border-solid border border-gray-300 dark:border-outline p-1 w-32 max-xl:w-28">
-			<SpeedSelectButton
-				active={preciseActive}
-				onClick={() => handleSpeedChange("Precise")}
-				label="Precise"
-				screenReaderLabel="Set to Precise jog preset"
-			/>
-			<SpeedSelectButton
-				active={normalActive}
-				onClick={() => handleSpeedChange("Normal")}
-				label="Normal"
-				screenReaderLabel="Set to Normal jog preset"
-			/>
-			<SpeedSelectButton
-				active={rapidActive}
-				onClick={() => handleSpeedChange("Rapid")}
-				label="Rapid"
-				screenReaderLabel="Set to Rapid jog preset"
-			/>
-			<SpeedSelectButton
-				active={customActive}
-				onClick={() => handleSpeedChange("Custom")}
-				label="Custom"
-				screenReaderLabel="Set to Custom jog preset"
-			/>
-		</div>
-	);
+    return (
+        <div className="flex flex-col bg-white dark:bg-surface-raised dark:text-content-primary rounded-md border-solid border border-gray-300 dark:border-outline p-1 w-32 max-xl:w-28">
+            <SpeedSelectButton
+                active={preciseActive}
+                onClick={() => handleSpeedChange('Precise')}
+                label="Precise"
+                screenReaderLabel="Set to Precise jog preset"
+            />
+            <SpeedSelectButton
+                active={normalActive}
+                onClick={() => handleSpeedChange('Normal')}
+                label="Normal"
+                screenReaderLabel="Set to Normal jog preset"
+            />
+            <SpeedSelectButton
+                active={rapidActive}
+                onClick={() => handleSpeedChange('Rapid')}
+                label="Rapid"
+                screenReaderLabel="Set to Rapid jog preset"
+            />
+            <SpeedSelectButton
+                active={customActive}
+                onClick={() => handleSpeedChange('Custom')}
+                label="Custom"
+                screenReaderLabel="Set to Custom jog preset"
+            />
+        </div>
+    );
 }

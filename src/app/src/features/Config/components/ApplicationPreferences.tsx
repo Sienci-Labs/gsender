@@ -1,52 +1,52 @@
-import { ActionButton } from "app/features/Config/components/ActionButton.tsx";
+import { ActionButton } from 'app/features/Config/components/ActionButton.tsx';
 import {
-	exportSettings,
-	handleRestoreDefaultClick,
-	importSettings,
-} from "app/features/Config/utils/Settings.ts";
-import { useRef } from "react";
-import { GrPowerReset } from "react-icons/gr";
-import { PiDownloadSimple, PiUploadSimple } from "react-icons/pi";
+    exportSettings,
+    handleRestoreDefaultClick,
+    importSettings,
+} from 'app/features/Config/utils/Settings.ts';
+import { useRef } from 'react';
+import { GrPowerReset } from 'react-icons/gr';
+import { PiDownloadSimple, PiUploadSimple } from 'react-icons/pi';
 
 export function ApplicationPreferences() {
-	const inputRef = useRef<HTMLInputElement>(null);
-	return (
-		<fieldset className="max-sm:hidden flex flex-row gap-x-2 mr-4 mb-1 border rounded border-gray-200 px-4 pb-2 dark:border-outline dark:text-content-primary">
-			<legend className="text-slate-600 dark:text-content-primary">
-				gSender Preferences
-			</legend>
-			<div className="-mx-4 grid grid-cols-3 divide-x">
-				<ActionButton
-					label="Reset"
-					icon={<GrPowerReset />}
-					onClick={handleRestoreDefaultClick}
-					testId="gsender-settings-reset-button"
-				/>
-				<ActionButton
-					label="Import"
-					icon={<PiDownloadSimple />}
-					onClick={() => {
-						inputRef.current.click();
-					}}
-					testId="gsender-settings-import-button"
-				/>
-				<ActionButton
-					label="Export"
-					icon={<PiUploadSimple />}
-					onClick={exportSettings}
-					testId="gsender-settings-export-button"
-				/>
-				<input
-					type="file"
-					onChange={importSettings}
-					onClick={(e) => {
-						(e.target as HTMLInputElement).value = "";
-					}}
-					accept=".json"
-					className="hidden"
-					ref={inputRef}
-				/>
-			</div>
-		</fieldset>
-	);
+    const inputRef = useRef<HTMLInputElement>(null);
+    return (
+        <fieldset className="max-sm:hidden flex flex-row gap-x-2 mr-4 mb-1 border rounded border-gray-200 px-4 pb-2 dark:border-outline dark:text-content-primary">
+            <legend className="text-slate-600 dark:text-content-primary">
+                gSender Preferences
+            </legend>
+            <div className="-mx-4 grid grid-cols-3 divide-x">
+                <ActionButton
+                    label="Reset"
+                    icon={<GrPowerReset />}
+                    onClick={handleRestoreDefaultClick}
+                    testId="gsender-settings-reset-button"
+                />
+                <ActionButton
+                    label="Import"
+                    icon={<PiDownloadSimple />}
+                    onClick={() => {
+                        inputRef.current.click();
+                    }}
+                    testId="gsender-settings-import-button"
+                />
+                <ActionButton
+                    label="Export"
+                    icon={<PiUploadSimple />}
+                    onClick={exportSettings}
+                    testId="gsender-settings-export-button"
+                />
+                <input
+                    type="file"
+                    onChange={importSettings}
+                    onClick={(e) => {
+                        (e.target as HTMLInputElement).value = '';
+                    }}
+                    accept=".json"
+                    className="hidden"
+                    ref={inputRef}
+                />
+            </div>
+        </fieldset>
+    );
 }

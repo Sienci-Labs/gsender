@@ -24,20 +24,20 @@
 // Pendant preload mirrors desktop's pattern (nodeIntegration on, contextIsolation off)
 // because the pendant SPA reuses shared code from src/app/ that calls
 // window.require / window.ipcRenderer at module load time.
-const fs = require("fs");
-const { ipcRenderer } = require("electron");
+const fs = require('fs');
+const { ipcRenderer } = require('electron');
 
 window.ipcRenderer = ipcRenderer;
 window.readFileSync = fs.readFileSync;
 window.writeFileSync = fs.writeFileSync;
-window.pathJoin = require("path").join;
+window.pathJoin = require('path').join;
 
 // Pendant-only bridge for IPC handlers defined in src/pendant-main.js.
 window.pendantAPI = {
-	isElectron: true,
-	getHost: () => ipcRenderer.invoke("pendant:get-host"),
-	pickGcodeFile: () => ipcRenderer.invoke("pendant:pick-gcode-file"),
-	readGcodeFile: (filePath) =>
-		ipcRenderer.invoke("pendant:read-gcode-file", filePath),
-	quitApp: () => ipcRenderer.send("pendant:quit-app"),
+    isElectron: true,
+    getHost: () => ipcRenderer.invoke('pendant:get-host'),
+    pickGcodeFile: () => ipcRenderer.invoke('pendant:pick-gcode-file'),
+    readGcodeFile: (filePath) =>
+        ipcRenderer.invoke('pendant:read-gcode-file', filePath),
+    quitApp: () => ipcRenderer.send('pendant:quit-app'),
 };
