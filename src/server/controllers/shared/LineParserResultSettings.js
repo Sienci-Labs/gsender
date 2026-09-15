@@ -21,27 +21,26 @@
  *
  */
 
-// https://github.com/grbl/grbl/wiki/Interfacing-with-Grbl#feedback-messages
-class GrblHalLineParserResultFeedback {
-	// * Grbl v0.9
-	//   []
-	// * Grbl v1.1
-	//   [MSG:]
+import _ from "lodash";
+
+class LineParserResultSettings {
 	static parse(line) {
-		const r = line.match(/^\[(?:MSG:)?(.+)\]$/);
+		const r = line.match(/^(\$[^=]+)=([^(]*)(\(.*\))*/);
 		if (!r) {
 			return null;
 		}
 
 		const payload = {
-			message: r[1],
+			name: r[1],
+			value: r[2].trim(), // need this trim as it may have a space at the end
+			message: _.trim(r[3], "()"),
 		};
 
 		return {
-			type: GrblHalLineParserResultFeedback,
+			type: LineParserResultSettings,
 			payload: payload,
 		};
 	}
 }
 
-export default GrblHalLineParserResultFeedback;
+export default LineParserResultSettings;

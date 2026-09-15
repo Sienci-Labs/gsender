@@ -22,16 +22,16 @@
  */
 
 import _ from "lodash";
-import GrblLineParserResultAlarm from "./GrblLineParserResultAlarm";
-import GrblLineParserResultEcho from "./GrblLineParserResultEcho";
-import GrblLineParserResultError from "./GrblLineParserResultError";
-import GrblLineParserResultFeedback from "./GrblLineParserResultFeedback";
-import GrblLineParserResultHelp from "./GrblLineParserResultHelp";
+import LineParserResultAlarm from "../shared/LineParserResultAlarm";
+import LineParserResultEcho from "../shared/LineParserResultEcho";
+import LineParserResultError from "../shared/LineParserResultError";
+import LineParserResultFeedback from "../shared/LineParserResultFeedback";
+import LineParserResultHelp from "../shared/LineParserResultHelp";
 import GrblLineParserResultOk from "./GrblLineParserResultOk";
-import GrblLineParserResultOption from "./GrblLineParserResultOption";
+import LineParserResultOption from "../shared/LineParserResultOption";
 import GrblLineParserResultParameters from "./GrblLineParserResultParameters";
 import GrblLineParserResultParserState from "./GrblLineParserResultParserState";
-import GrblLineParserResultSettings from "./GrblLineParserResultSettings";
+import LineParserResultSettings from "../shared/LineParserResultSettings";
 import GrblLineParserResultStartup from "./GrblLineParserResultStartup";
 import GrblLineParserResultStatus from "./GrblLineParserResultStatus";
 import GrblLineParserResultVersion from "./GrblLineParserResultVersion";
@@ -49,10 +49,10 @@ class GrblLineParser {
 			GrblLineParserResultOk,
 
 			// error:x
-			GrblLineParserResultError,
+			LineParserResultError,
 
 			// ALARM:
-			GrblLineParserResultAlarm,
+			LineParserResultAlarm,
 
 			// [G38.2 G54 G17 G21 G91 G94 M0 M5 M9 T0 F20. S0.] (v0.9)
 			// [GC:G38.2 G54 G17 G21 G91 G94 M0 M5 M9 T0 F20. S0.] (v1.1)
@@ -72,23 +72,23 @@ class GrblLineParser {
 			GrblLineParserResultParameters,
 
 			// [HLP:] (v1.1)
-			GrblLineParserResultHelp,
+			LineParserResultHelp,
 
 			// [VER:] (v1.1)
 			GrblLineParserResultVersion,
 
 			// [OPT:] (v1.1)
-			GrblLineParserResultOption,
+			LineParserResultOption,
 
 			// [echo:] (v1.1)
-			GrblLineParserResultEcho,
+			LineParserResultEcho,
 
 			// [] (v0.9)
 			// [MSG:] (v1.1)
-			GrblLineParserResultFeedback,
+			LineParserResultFeedback,
 
 			// $xx
-			GrblLineParserResultSettings,
+			LineParserResultSettings,
 
 			// Grbl X.Xx ['$' for help]
 			GrblLineParserResultStartup,
