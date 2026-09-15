@@ -417,7 +417,7 @@
 		"detect-browser": "~4.4.0",
 		"dotenv": "~7.0.0",
 		"electron": "^38.2.0",
-		"electron-builder": "^26.0.12",
+		"electron-builder": "^26.16.1",
 		"electron-reloader": "^1.2.3",
 		"embla-carousel-react": "^8.2.0",
 		"esbuild": "^0.25.10",
