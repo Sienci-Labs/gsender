@@ -9,7 +9,7 @@ module.exports = {
         ],
     },
     transformIgnorePatterns: [
-        '/node_modules/(?!(three|@react-pdf|@react-pdf/renderer)/)',
+        '/node_modules/(?!(three|@react-pdf|@react-pdf/renderer|nanoid)/)',
     ],
     // plugins/* are standalone npm projects (own node_modules, ESM-only SDK
     // dependency) with their own Vitest suites — see plugins/<name>/package.json.

@@ -284,6 +284,13 @@ class SerialConnection extends EventEmitter {
 	}
 
 	writeImmediate(data) {
+		// Same guard as write(): the port can be gone (unplugged, closed) while
+		// a caller's timer is still running, and throwing from inside a timer
+		// takes down the process.
+		if (!this.port) {
+			return;
+		}
+
 		this.port.write(data);
 	}
 

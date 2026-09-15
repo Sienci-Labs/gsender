@@ -33,6 +33,7 @@ import {
     GRBL_ACTIVE_STATE_HOLD,
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_RUN,
+    isHomingRequiredAlarm,
     JOB_STATUS,
     JOB_TYPES,
     LIGHTWEIGHT_OPTIONS,
@@ -951,7 +952,13 @@ export function* initialize(): Generator<null, void, unknown> {
             });
         }
 
-        if (ALARM_ERROR_TYPES.includes(error.type)) {
+        // A "homing required" alarm is an expected prompt on connect, not a
+        // fault, so it is ignored entirely: neither recorded in the alarm
+        // history nor toasted at the user.
+        if (
+            ALARM_ERROR_TYPES.includes(error.type) &&
+            !isHomingRequiredAlarm(error)
+        ) {
             updateAlarmsErrors(error);
             toast.error(
                 `${error.type === ALARM ? 'Alarm' : 'Error'} ${error.code}: ${error.description}`,

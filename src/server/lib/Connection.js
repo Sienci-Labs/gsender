@@ -11,6 +11,13 @@ import SerialConnection from "./SerialConnection";
 
 const log = logger("connection");
 
+// Firmware identification: $I is sent repeatedly until the reply identifies the
+// board as grbl or grblHAL. MAX_ATTEMPTS is the total number of $I sends,
+// including the immediate first one - so detection gets roughly
+// ATTEMPTS * INTERVAL ms before we fall back to the configured default.
+const FIRMWARE_DETECT_INTERVAL = 800;
+const FIRMWARE_DETECT_MAX_ATTEMPTS = 7;
+
 class Connection extends EventEmitter {
 	sockets = {};
 
@@ -46,12 +53,12 @@ class Connection extends EventEmitter {
 
 				if (grblHalR) {
 					this.controllerType = GRBLHAL;
+					this.stopFirmwareDetection();
 					this.emit("firmwareFound", GRBLHAL, this.options, this.callback);
-					clearInterval(this.timeout);
 				} else if (grblR) {
 					this.controllerType = GRBL;
+					this.stopFirmwareDetection();
 					this.emit("firmwareFound", GRBL, this.options, this.callback);
-					clearInterval(this.timeout);
 				}
 			} // we dont handle the runner
 		},
@@ -178,25 +185,64 @@ class Connection extends EventEmitter {
 
 			log.debug(`Connected to serial port "${port}"`);
 			if (!this.controllerType) {
-				this.connection.writeImmediate("$I\n");
-				this.timeout = setInterval(() => {
-					this.connection.writeImmediate("$I\n");
-					if (this.count >= 5) {
-						this.controllerType = this.options.defaultFirmware;
-						this.emit(
-							"firmwareFound",
-							this.options.defaultFirmware,
-							this.options,
-							this.callback,
-						);
-						clearInterval(this.timeout);
-						return;
-					}
-					this.count++;
-				}, 800);
+				this.startFirmwareDetection();
 			}
 		});
 	};
+
+	// Poll $I until the reply identifies the firmware (see the data listener),
+	// then fall back to the user's configured default.
+	startFirmwareDetection() {
+		this.stopFirmwareDetection();
+		this.count = 0;
+
+		this.sendFirmwareQuery();
+
+		this.timeout = setInterval(() => {
+			// The port can disappear mid-detection - unplugged, or an 'error'
+			// with no matching 'close'. SerialConnection.writeImmediate has no
+			// port guard of its own, so check here rather than letting it throw
+			// from inside the timer.
+			if (this.isClose()) {
+				log.warn(
+					`Port "${this.options.port}" closed during firmware detection`,
+				);
+				this.stopFirmwareDetection();
+				return;
+			}
+
+			if (this.count >= FIRMWARE_DETECT_MAX_ATTEMPTS) {
+				this.useDefaultFirmware();
+				return;
+			}
+
+			this.sendFirmwareQuery();
+		}, FIRMWARE_DETECT_INTERVAL);
+	}
+
+	sendFirmwareQuery() {
+		this.count++;
+		this.connection.writeImmediate("$I\n");
+	}
+
+	stopFirmwareDetection() {
+		clearInterval(this.timeout);
+		this.timeout = null;
+	}
+
+	useDefaultFirmware() {
+		// Stop before emitting: firmwareFound synchronously builds a controller
+		// which sends its own $I, and we do not want to race it.
+		this.stopFirmwareDetection();
+
+		// The app always supplies one, but never emit an undefined type.
+		const firmware = this.options.defaultFirmware || GRBL;
+		log.warn(
+			`No firmware identified after ${this.count} $I attempts; assuming ${firmware}`,
+		);
+		this.controllerType = firmware;
+		this.emit("firmwareFound", firmware, this.options, this.callback);
+	}
 
 	close(err) {
 		const { port } = this.options;
@@ -314,7 +360,10 @@ class Connection extends EventEmitter {
 	}
 
 	destroy() {
-		clearInterval(this.timeout);
+		this.stopFirmwareDetection();
+		// Reset the attempt budget with the rest of the detection state, so a
+		// reused Connection instance would start detection from scratch.
+		this.count = 0;
 
 		if (this.controller) {
 			this.controller = null;
@@ -328,10 +377,6 @@ class Connection extends EventEmitter {
 
 		if (this.controllerType) {
 			this.controllerType = null;
-		}
-
-		if (this.timeout) {
-			this.timeout = null;
 		}
 	}
 
