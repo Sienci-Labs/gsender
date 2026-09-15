@@ -209,12 +209,12 @@ class CNCEngine {
 			};
 
 			const connectionListeners = {
-				"serialport:open": (port, baudrate, controllerType, inuse) => {
-					this.emit("serialport:open", port, baudrate, controllerType, inuse);
+				"serialport:open": (options) => {
+					this.emit("serialport:open", options);
 				},
-				"serialport:close": (options, received) => {
+				"serialport:close": (options) => {
 					this.connection = null;
-					this.emit("serialport:close", options, received);
+					this.emit("serialport:close", options);
 				},
 				firmwareFound: (
 					controllerType = GRBL,
@@ -625,10 +625,6 @@ class CNCEngine {
 						callback(null);
 					});
 				}
-
-				socket.emit("serialport:close", {
-					port: port,
-				});
 			});
 
 			socket.on("command", (port, cmd, ...args) => {

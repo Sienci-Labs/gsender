@@ -251,6 +251,11 @@ const SYNTAX_CUSTOM_STYLE = {
 	margin: 0,
 	fontSize: "inherit",
 	lineHeight: "inherit",
+	// The hljs themes' base style is `display: block; overflow-x: auto`, which
+	// gives every long line its own horizontal scrollbar. Going back to inline
+	// lets the row clip the overflow instead.
+	display: "inline",
+	overflowX: "hidden",
 } as const;
 
 const GcodeEditor = ({ onClose }: GcodeEditorProps) => {

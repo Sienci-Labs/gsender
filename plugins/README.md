@@ -23,6 +23,7 @@ Then restart gSender.
 | `corner-finder/` | React + TypeScript + Vite | Host visualizer bridge — `gsender.viewer.*` (picking, camera, overlay markers) + `machine.setBusy` |
 | `storage-test/` | Plain JS + Vite | Namespaced plugin storage — buttons for every `storage.*` method (get/set/delete/getAll/setAll/clear), for QA |
 | `parser-demo/` | Plain JS + Vite | Firmware response parsers — manifest line/block parsers, runtime `registerParser`, `onLine`, `machine.query`, plus a command sender to drive them |
+| `controller-events-demo/` | React + TypeScript + Vite | `machine.addListener` — a live log of controller events (job start/stop, connection, etc.), plus Start/Stop buttons (`gcode.loadToVisualizer` + `machine.command`) to trigger a test job without leaving the page |
 
 Each folder must contain `gsender-plugin.json` and a `ui/` directory with the built SPA entry file.
 
@@ -39,6 +40,26 @@ Each folder must contain `gsender-plugin.json` and a `ui/` directory with the bu
 | `ui.contributions` | no | Array of `{ slot, route, label }` describing where the plugin mounts (e.g. `tools-page`). |
 | `capabilities` | no | Object of bridge permissions the plugin requests (examples and explanation in the next section). |
 | `parsers` | no | Array of firmware response parser specs. Matched server-side and live from the moment the port opens — independent of whether the plugin's UI is mounted. See the [plugin parsers guide](../docs/plugin-parsers.md). |
+
+### Browser permissions (camera, microphone, geolocation, midi, ...)
+
+A manifest's top-level `permissions` array isn't limited to the gSender SDK
+capabilities below — it can also list any real browser permission name, e.g.:
+
+```json
+"permissions": ["camera", "microphone"]
+```
+
+Anything you declare here is shown verbatim on the install review step for
+the user to approve, then delegated straight through to your plugin's
+iframe (via its `allow` Permissions-Policy) and to Electron's session
+permission handler. There's no fixed list of supported names to update on
+the gSender side — if the browser recognizes the permission, it works;
+`local-fonts` (used by the `basic-cam` example) is just the first plugin to
+use this. Because this class of permission has no gSender SDK counterpart,
+the static bundle scan can't confirm it from your code, so it will always
+show as "declared, not confirmed" on the review step — that's expected, not
+an error.
 
 ### Manifest capabilities
 
@@ -132,6 +153,29 @@ Plugins that import the SDK should build with `gsenderPlugin()` from
 `@sienci/gsender-plugin-sdk/vite` (see `basic-cam/vite.config.ts` and the
 SDK README) — it keeps SDK imports scannable and wires the runtime import
 map.
+
+#### `machine:read`: controller events
+
+Importing `machine` also grants the `controller` topic, which
+`machine.addListener(eventName, callback)` subscribes to. This mirrors
+gSender's own `controller.addListener`.
+
+```json
+"capabilities": {
+	"requestTypes": [],
+	"topics": ["controller"],
+	"allowedFunctions": ["machine"]
+}
+```
+
+Two categories of controller event are never relayed over the `controller` topic: 
+- the raw firmware stream (`serialport:read`/`serialport:write`,
+gated behind `machine:parse` instead)
+- per-plugin parser events (`plugin:parser:match`/`plugin:parser:error`,
+delivered via `onParsed`/`onParserError` instead)
+
+Every other controller event name is relayed generically.
+See `controller-events-demo/` for a working example.
 
 ### Vite Config
 

@@ -4,6 +4,7 @@ import {
 	RENDER_RENDERING,
 	VISUALIZER_SECONDARY,
 } from "app/constants";
+import { setLastWorkerGeometry } from "app/features/Visualizer/lastWorkerGeometry";
 import store from "app/store";
 import { store as reduxStore } from "app/store/redux";
 import _get from "lodash/get";
@@ -139,6 +140,9 @@ const handleGeometryReady = (data) => {
 		parsedData: parsedDataPreview,
 	};
 
+	// Park the geometry so UI opened after load (e.g. the step-through modal)
+	// can render the same buffers without re-parsing the file.
+	setLastWorkerGeometry(fileLoadPayload);
 	pubsub.publish("file:load", fileLoadPayload);
 	pubsub.publish(
 		"placeholder:invalidLines",

@@ -16,19 +16,16 @@ type PluginPanelProps = {
 	title?: string;
 };
 
-// Maps a manifest permission to the Permissions-Policy feature it delegates
-// to the plugin iframe. Only permissions with a browser-feature counterpart
-// belong here — most permissions (workspace:read, etc.) gate the message
-// bridge instead and have no iframe-level equivalent.
-const IFRAME_ALLOW_MAP: Partial<Record<string, string>> = {
-	"local-fonts": "local-fonts",
-};
-
+// Delegates every granted permission straight to the plugin iframe's
+// Permissions-Policy. Most permissions (workspace:read, machine:read, etc.)
+// have no browser-feature counterpart and gate the message bridge instead —
+// browsers silently ignore unrecognized Permissions-Policy feature names, so
+// passing those through here has no effect and needs no filtering. This is
+// what lets a plugin declare any real browser permission (camera,
+// microphone, geolocation, midi, ...) in its manifest and have it actually
+// delegated, without gSender maintaining a name-by-name allowlist.
 const buildIframeAllow = (permissions: PluginRecord["permissions"]): string =>
-	(permissions ?? [])
-		.map((permission) => IFRAME_ALLOW_MAP[permission])
-		.filter((feature): feature is string => Boolean(feature))
-		.join("; ");
+	(permissions ?? []).join("; ");
 
 const PluginPanel = ({ plugin, className = "", title }: PluginPanelProps) => {
 	// Bumped on dev live-reload to force the iframe to re-fetch its content.

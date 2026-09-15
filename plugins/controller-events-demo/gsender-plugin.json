@@ -1,0 +1,32 @@
+{
+	"id": "com.sienci.controller-events-demo",
+	"name": "Controller Events Demo",
+	"description": "Listens for controller events (job start/stop, connection, etc.) no matter who triggered them, using the SDK's machine.addListener.",
+	"version": "0.1.0",
+	"engine": ">=1.6.0",
+	"ui": {
+		"entry": "ui/index.html",
+		"contributions": [
+			{
+				"slot": "tools-page",
+				"route": "controller-events-demo",
+				"label": "Controller Events Demo"
+			}
+		]
+	},
+	"permissions": [
+		"machine:read",
+		"machine:write",
+		"visualizer:load",
+		"redux:read"
+	],
+	"capabilities": {
+		"requestTypes": [
+			"machine:command",
+			"gcode:load:to:visualizer",
+			"redux:get:state"
+		],
+		"topics": ["controller"],
+		"allowedFunctions": ["machine", "gcode", "getSelector"]
+	}
+}

@@ -26,6 +26,12 @@ import type {
 } from "./assets/SettingsMenu";
 import { Menu } from "./components/Menu";
 import { Section } from "./components/Section";
+import {
+	getLastViewedConfigId,
+	getScrollPosition,
+	setLastViewedConfigId,
+	setScrollPosition,
+} from "./utils/scrollMemory";
 
 export function Config() {
 	const dispatch = useDispatch();
@@ -34,6 +40,8 @@ export function Config() {
 	const { ref: inViewRef } = useInView({
 		threshold: 0.2,
 	});
+
+	const eepromScrollRef = React.useRef<HTMLDivElement | null>(null);
 
 	useEffect(() => {
 		const token = pubsub.subscribe("accessibility:update", () => {
@@ -55,20 +63,23 @@ export function Config() {
 		(state: RootState) => state.controller.workflow.state,
 	);
 
-	const [visibleSection, setVisibleSection] = React.useState<string>(
-		`h-section-${store.get("workspace.lastViewedConfigLocation")}`,
-	);
+	const [visibleSection, setVisibleSection] = React.useState<string>("");
 
 	const [activeTab, setActiveTab] = React.useState("config");
 
-	function setInView(inView: any, entry: any) {
+	const [visibleSubsection, setVisibleSubsection] = React.useState<string>("");
+
+	function handleSectionInView(inView: any, entry: any) {
 		if (inView) {
-			store.set(
-				"workspace.lastViewedConfigLocation",
-				entry.target.getAttribute("id").split("-")[2],
-			);
+			const sectionIndex = entry.target.getAttribute("id").split("-")[2];
+			setLastViewedConfigId(`section-${sectionIndex}`);
 			setVisibleSection(entry.target.getAttribute("id"));
 		}
+	}
+
+	function handleSubsectionInView(id: string) {
+		setLastViewedConfigId(id);
+		setVisibleSubsection(id);
 	}
 
 	useEffect(() => {
@@ -76,6 +87,43 @@ export function Config() {
 			controller.command("gcode", ["$$"]);
 		}
 	}, []);
+
+	useEffect(() => {
+		if (activeTab !== "eeprom") {
+			return;
+		}
+		const container = eepromScrollRef.current;
+		if (!container) {
+			return;
+		}
+		const timeoutId = setTimeout(() => {
+			container.scrollTop = getScrollPosition("eeprom");
+		}, 50);
+		return () => clearTimeout(timeoutId);
+	}, [activeTab]);
+
+	useEffect(() => {
+		if (activeTab !== "config") {
+			return;
+		}
+		const targetId = getLastViewedConfigId();
+		if (!targetId) {
+			return;
+		}
+		const timeoutId = setTimeout(() => {
+			const target = document.getElementById(targetId);
+			if (!target) {
+				return;
+			}
+			target.scrollIntoView({ behavior: "instant" });
+			if (targetId.includes("-sub-")) {
+				setVisibleSubsection(targetId);
+			} else {
+				setVisibleSection(`h-${targetId}`);
+			}
+		}, 50);
+		return () => clearTimeout(timeoutId);
+	}, [activeTab]);
 
 	const { settings, EEPROM } = useSettings();
 
@@ -126,6 +174,25 @@ export function Config() {
 		}, 50);
 	}
 
+	function navigateToSubsection(
+		_e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+		sectionIndex: number,
+		subIndex: number,
+	) {
+		const subsectionId = `section-${sectionIndex}-sub-${subIndex}`;
+		const subsectionElement = document.getElementById(subsectionId);
+
+		if (!subsectionElement) {
+			return;
+		}
+
+		subsectionElement.scrollIntoView({ behavior: "instant" });
+
+		setTimeout(() => {
+			setVisibleSubsection(subsectionId);
+		}, 50);
+	}
+
 	return (
 		<div className="w-full flex flex-grow-0 shadow bg-white overflow-y-hidden box-border no-scrollbar dark:bg-surface-raised">
 			{activeTab === "config" ? (
@@ -133,6 +200,8 @@ export function Config() {
 					menu={settings}
 					onClick={navigateToSection}
 					activeSection={visibleSection}
+					onSubsectionClick={navigateToSubsection}
+					activeSubsection={visibleSubsection}
 				/>
 			) : (
 				<div className="flex flex-col w-1/5 border border-gray-200 border-l-0 pl-1 divide-y bg-white dark:bg-surface-raised dark:border-outline dark:text-content-primary max-sm:hidden" />
@@ -173,7 +242,7 @@ export function Config() {
 								return (
 									<InView
 										key={`IV-section-${index}`}
-										onChange={setInView}
+										onChange={handleSectionInView}
 										threshold={0}
 										rootMargin="0px 0px -75% 0px"
 										className={"bg-red-500"}
@@ -190,6 +259,7 @@ export function Config() {
 													ref={ref}
 													connected={connected}
 													wizard={item.wizard}
+													onSubsectionInView={handleSubsectionInView}
 												/>
 											);
 										}}
@@ -204,14 +274,19 @@ export function Config() {
 					>
 						<div
 							className="px-10 max-xl:px-2 gap-8 pt-4 mb-24 box-border flex flex-col overflow-y-scroll relative"
-							ref={inViewRef}
+							ref={(node) => {
+								eepromScrollRef.current = node;
+								inViewRef(node);
+							}}
+							onScroll={(e) =>
+								setScrollPosition("eeprom", e.currentTarget.scrollTop)
+							}
 						>
 							<EEPROMNotConnectedWarning connected={connected} />
 							{eepromSettings.map((item, index) => {
 								return (
 									<InView
 										key={`IV-section-${index}`}
-										onChange={setInView}
 										threshold={0}
 										rootMargin="0px 0px -75% 0px"
 										className={"bg-red-500"}

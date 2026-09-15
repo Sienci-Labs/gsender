@@ -25,6 +25,7 @@ const initialState: FileInfoState = {
 	content: "",
 	fileType: null,
 	usedAxes: [],
+	spindleToolEvents: {},
 };
 
 const normalizeBBox = (bbox: Partial<BBox>): BBox => {

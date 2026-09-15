@@ -414,6 +414,7 @@ export const CAMERA_POSITIONS = {
 	Front: "Front",
 	Left: "Left",
 	Right: "Right",
+	TopLeftCorner: "TopLeftCorner",
 };
 
 export const DARK_THEME = "Dark";

@@ -164,6 +164,33 @@ spec reference are in the **[plugin parsers
 guide](../../docs/plugin-parsers.md)**. `plugins/parser-demo` is a working
 example of every path.
 
+### Controller events
+
+Listen for a controller event by name.
+
+```ts
+import { machine } from "@sienci/gsender-plugin-sdk";
+
+const unsubscribe = machine.addListener("job:start", () => {
+  console.log("a job started");
+});
+
+machine.addListener("workflow:state", (state) => {
+  console.log("workflow state:", state); // "idle" | "paused" | "running"
+});
+
+// later
+unsubscribe();
+```
+
+`machine.addListener` returns an unsubscribe function.
+
+Unavailable events:
+- `serialport:read`/`serialport:write`: use `machine.onParsed`/`onLine` instead
+- `plugin:parser:match`/`plugin:parser:error`: use `machine.onParsed`/`onParserError` instead
+
+See `plugins/controller-events-demo` for a working example.
+
 ### React hooks
 
 ```tsx
@@ -228,6 +255,7 @@ viewer.focusToModel();
 | `machine.onParsed(id, cb)` | Every match for a parser, losslessly; fires immediately with the last result if there is one |
 | `machine.onLine(pattern, cb)` | One-off line tap (sugar over an anonymous runtime parser) |
 | `machine.setBusy(busy, label?)` | Flag the machine as busy for a feeder-driven op (stable status, host auto-releases) |
+| `machine.addListener(eventName, cb)` | Listen for a controller event by name; returns an unsubscribe function |
 | `getLastParsed(id)` | Synchronous last result for a parser, or `undefined` |
 | `onParserError(cb)` | Parsers that were rejected, rate limited, or quarantined |
 | `workspace.getState()` | One-shot workspace snapshot |
