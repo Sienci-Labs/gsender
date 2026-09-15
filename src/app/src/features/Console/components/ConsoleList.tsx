@@ -4,7 +4,15 @@ import { Virtuoso, type VirtuosoHandle } from 'react-virtuoso';
 import type { ConsoleMessage } from '../definitions';
 import { MessageIcon } from './MessageIcon';
 
+/**
+ * A job alternates command/reply the whole way down, so the two highest-volume
+ * types are separated by weight rather than hue: what gSender sent reads as the
+ * anchor line, what the machine answered sits back. Adding a colour here would
+ * tint most of the console during a job.
+ */
 const TEXT_BY_TYPE: Record<string, string> = {
+    gcode: 'text-gray-900 dark:text-content-primary',
+    response: 'text-gray-500 dark:text-content-muted',
     warning: 'text-orange-600 dark:text-orange-300',
     error: 'text-red-600 dark:text-red-400',
     alarm: 'text-red-700 dark:text-red-500 font-medium',
