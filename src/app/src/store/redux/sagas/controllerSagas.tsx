@@ -54,6 +54,7 @@ import {
     RENDER_NO_FILE,
     ALARM_ERROR_TYPES,
     ALARM,
+    isHomingRequiredAlarm,
     ERROR,
     JOB_TYPES,
     JOB_STATUS,
@@ -913,11 +914,17 @@ export function* initialize(): Generator<any, void, any> {
                 });
             }
 
-            if (ALARM_ERROR_TYPES.includes(error.type)) {
+            // A "homing required" alarm is an expected prompt on connect, not a
+            // fault, so it is ignored entirely: neither recorded in the alarm
+            // history nor toasted at the user.
+            if (
+                ALARM_ERROR_TYPES.includes(error.type) &&
+                !isHomingRequiredAlarm(error)
+            ) {
                 updateAlarmsErrors(error);
                 toast.error(
-                    `${error.type === ALARM ? "Alarm" : "Error"} ${error.code}: ${error.description}`,
-                    { position: "bottom-right" },
+                    `${error.type === ALARM ? 'Alarm' : 'Error'} ${error.code}: ${error.description}`,
+                    { position: 'bottom-right' },
                 );
             }
 

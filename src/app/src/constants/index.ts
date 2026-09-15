@@ -333,6 +333,39 @@ export const ERROR = 'ERROR';
 
 export const ALARM_ERROR_TYPES = [ALARM, ERROR];
 
+// "Homing required" alarms fire on connect whenever homing is enabled and the
+// machine has not been homed yet. They are an expected prompt to run $H, not a
+// fault, so they are ignored entirely - neither toasted nor recorded in the
+// alarm history. The machine status area still prompts the user to home (see
+// UnlockButton), so nothing is lost by dropping them.
+//
+// grbl raises a synthetic string code 'Homing' (see GRBL_ALARMS / the
+// startupAlarm handler in GrblController); grblHAL reports a real ALARM:11.
+export const GRBL_HOMING_REQUIRED_ALARM_CODE = 'Homing';
+export const GRBL_HAL_HOMING_REQUIRED_ALARM_CODE = 11;
+
+export const isHomingRequiredAlarm = (error?: {
+    type?: string;
+    code?: number | string;
+    controller?: string;
+}): boolean => {
+    if (!error || error.type !== ALARM) {
+        return false;
+    }
+
+    // grbl's code is the literal string, and grblHAL's alarm table carries the
+    // same entry, so accept it from either controller.
+    if (String(error.code) === GRBL_HOMING_REQUIRED_ALARM_CODE) {
+        return true;
+    }
+
+    // Only grblHAL numbers this alarm 11 - grbl's numeric alarms stop at 9.
+    return (
+        error.controller === GRBLHAL &&
+        Number(error.code) === GRBL_HAL_HOMING_REQUIRED_ALARM_CODE
+    );
+};
+
 export const JOB_TYPES = {
     JOB: 'JOB',
     MAINTENANCE: 'MAINTENANCE',

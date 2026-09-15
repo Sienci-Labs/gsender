@@ -117,7 +117,7 @@ You can both run gSender locally using the public code-base as well as compile i
 - Flexible tool change routine again working as expected and not just silently completing each step.
 - Added $290, $291, $292, and $293 to config page for custom homing pulloffs when compiled in to grblHAL as option
 - Updated MK3 profiles
-- Notifications are again notifying on Alarms and Errors in the notification center.
+- Notifications are again notifying on Alarms and Errors in the notification center (apart from homing)
 - Added Voron Cascade profile
 - Toolchange ack keybind no longer gated behind non-Tool state so should be usable again
 - Pulloff uses $27 if home on 0 bit not set for various Z actions instead of a fixed value in several places
