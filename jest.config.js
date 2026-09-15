@@ -6,7 +6,7 @@ module.exports = {
     '^.+\\.[jt]sx?$': ['babel-jest', { configFile: `${__dirname}/babel.config.js` }],
   },
   transformIgnorePatterns: [
-  '/node_modules/(?!(three|@react-pdf|@react-pdf/renderer)/)',
+  '/node_modules/(?!(three|@react-pdf|@react-pdf/renderer|nanoid)/)',
 ],
  testPathIgnorePatterns: [
   '/node_modules/',
@@ -15,6 +15,8 @@ module.exports = {
   '\\.(css|less|scss|sass|styl)$': '<rootDir>/src/app/src/__mocks__/styleMock.js',
   '\\.(jpg|jpeg|png|gif|svg)$': '<rootDir>/src/app/src/__mocks__/fileMock.js',
   '^app/(.*)$': '<rootDir>/src/app/src/$1',
+  // Mirrors the 'server/...' -> 'src/server/...' resolution in esbuild.config.js
+  '^server/(.*)$': '<rootDir>/src/server/$1',
   '^(\\.{1,2}/)*config/settings$': '<rootDir>/src/app/src/config/__mocks__/settings.ts',
   'react-syntax-highlighter': '<rootDir>/src/app/src/__mocks__/reactSyntaxHighlighterMock.js',
   '^react-markdown$': '<rootDir>/src/app/src/__mocks__/reactMarkdownMock.js',

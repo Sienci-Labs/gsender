@@ -58,6 +58,10 @@ import GrblHalErrorDescription from './GrblHalErrorDescription';
 
 const log = logger('controller:grblHAL');
 
+// Conventional grblHAL axis order, used only to guess axis letters when the
+// firmware's $I reports no [AXS:] letters. See setInferredAxesFromStatus().
+const INFERRED_AXIS_ORDER = ['X', 'Y', 'Z', 'A', 'B', 'C'];
+
 class GrblHalRunner extends events.EventEmitter {
     state = {
         status: {
@@ -388,10 +392,27 @@ class GrblHalRunner extends events.EventEmitter {
             return;
         }
         if (type === GrblHalLineParserResultAXS) {
-            this.state.axes = {
-                count: payload.count,
-                axes: payload.axes
-            };
+            if (!_.isEmpty(payload.axes)) {
+                // Firmware-reported letters are authoritative - they replace any
+                // previously inferred list, dropping the inferred flag with it.
+                this.state = {
+                    ...this.state,
+                    axes: {
+                        count: payload.count,
+                        axes: payload.axes
+                    }
+                };
+            } else {
+                // Bare [AXS:n]: the count is authoritative but there are no
+                // letters, so keep any we already have rather than wiping them.
+                this.state = {
+                    ...this.state,
+                    axes: {
+                        ...this.state.axes,
+                        count: payload.count
+                    }
+                };
+            }
             return;
         }
         if (type === GrblHalLineParserResultAlarmDetails) {
@@ -611,6 +632,49 @@ class GrblHalRunner extends events.EventEmitter {
     hasAXS() {
         const axs = _.get(this.state, 'axes.axes', []);
         return !_.isEmpty(axs);
+    }
+
+    // Last-resort inference for firmware whose $I carries no usable [AXS:] line.
+    //
+    // CAVEAT: grblHAL can be built with arbitrary axis letters and ordering, and
+    // MPos is purely positional - it carries no letter information at all. So the
+    // letters here are a GUESS based on the conventional XYZABC order; only the
+    // count is trustworthy. Marked inferred:true so consumers, and anyone reading
+    // a bug report, can tell this did not come from the firmware.
+    //
+    // Only ever called once a completed $I reply block has been confirmed to
+    // contain no AXS letters - see resolveAxsProbe() in GrblHalController.
+    setInferredAxesFromStatus(status) {
+        if (this.hasAXS()) {
+            return null;
+        }
+
+        // Depending on $10 a report may carry MPos, WPos, or both.
+        const pos = _.get(status, 'mpos') || _.get(status, 'wpos') || {};
+        // A bare [AXS:n] with no letters still gives us an authoritative count.
+        const reportedCount = _.get(this.state, 'axes.count');
+        const count = Number.isFinite(reportedCount) && reportedCount > 0
+            ? reportedCount
+            : Object.keys(pos).length;
+
+        if (!count) {
+            return null;
+        }
+
+        const axes = INFERRED_AXIS_ORDER.slice(0, count);
+        // Replace state rather than mutating it: the controller only emits
+        // controller:state when the runner's state object identity changes, and
+        // an idle machine can report an unchanged status indefinitely.
+        this.state = {
+            ...this.state,
+            axes: {
+                count: axes.length,
+                axes,
+                inferred: true
+            }
+        };
+
+        return axes;
     }
 
     clearSDFiles() {

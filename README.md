@@ -121,8 +121,9 @@ You can both run gSender locally using the public code-base as well as compile i
 - Added Voron Cascade profile
 - Toolchange ack keybind no longer gated behind non-Tool state so should be usable again
 - Pulloff uses $27 if home on 0 bit not set for various Z actions instead of a fixed value in several places
-- TLS and Rack position steps in ATC setup have been swapped
 - Pause button now disabled when workflow already paused/in a hold state
+- Fix for $I polling running endlessly in situations where AXS is never reported by the controller.
+- In cases where AXS not parsed by controller for grblHAL, default to counting position values reported by firmware.
 
 
 ### 1.6.3 (July 23, 2026)

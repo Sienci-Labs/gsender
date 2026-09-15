@@ -108,6 +108,16 @@ const PAUSE_START = "%pause_start";
 const log = logger("controller:grblHAL");
 const noop = _.noop;
 
+// grblHAL only reports [AXS:] in its $I response on newer builds. When it is
+// missing we retry $I a small, bounded number of times before giving up.
+const AXS_QUERY_MAX_RETRIES = 2;
+const AXS_QUERY_RETRY_INTERVAL = 2000; // ms between retries
+const AXS_PROBE_TIMEOUT = 2000; // ms to wait for the $I reply's terminating ok
+
+const AXS_UNKNOWN = "unknown";
+const AXS_SUPPORTED = "supported";
+const AXS_UNSUPPORTED = "unsupported";
+
 class GrblHalController {
 	type = GRBLHAL;
 
@@ -182,7 +192,6 @@ class GrblHalController {
 		replyParserState: false, // $G
 		replyStatusReport: false, // ?
 		alarmCompleteReport: false, //0x87
-		axsReportCount: 0,
 		// Extra function queries
 		accessoryState: {
 			SD: false,
@@ -193,6 +202,20 @@ class GrblHalController {
 	alarmActive = false; // state to keep track of whether we have queried for the alarm code
 
 	parserStateEnabled = false;
+
+	// [AXS:] probe state. Deliberately NOT in actionMask: clearActionValues()
+	// runs on every startup/[VER:] message - including the ones our own probing
+	// $I provokes - so a retry budget kept there is reset by the very response it
+	// is counting, and the probe never stops. See clearActionValues().
+	axsQueryCount = 0; // $I retries spent looking for [AXS:]
+
+	axsQueryLastTime = 0; // timestamp of the last probing $I
+
+	axsProbePending = false; // a probing $I is in flight, awaiting its ok
+
+	axsProbeTimer = null; // safety net for a probe whose ok never arrives
+
+	axsSupport = AXS_UNKNOWN; // unknown | supported | unsupported
 
 	actionTime = {
 		queryParserState: 0,
@@ -785,14 +808,17 @@ class GrblHalController {
 				this.ready = true;
 			}
 
-			// Make sure we also have axs parsed - at most two times or we get endless loop
+			// Make sure we also have axs parsed. This only ever *starts* a probe -
+			// resolveAxsProbe() decides what to do once the $I reply has landed.
 			if (
 				!this.runner.hasAXS() &&
+				!this.axsProbePending &&
+				this.axsSupport === AXS_UNKNOWN &&
+				this.axsQueryCount < AXS_QUERY_MAX_RETRIES &&
 				res.activeState === GRBL_HAL_ACTIVE_STATE_IDLE &&
-				this.actionMask.axsReportCount < 2
+				Date.now() - this.axsQueryLastTime >= AXS_QUERY_RETRY_INTERVAL
 			) {
-				this.writeln("$I");
-				this.actionMask.axsReportCount++;
+				this.startAxsProbe();
 			}
 
 			//
@@ -844,6 +870,14 @@ class GrblHalController {
 		});
 
 		this.runner.on("ok", (res) => {
+			// The $I reply is a block ([VER:], [OPT:], [AXS:], [PLUGIN:] ...)
+			// terminated by a single ok, so by the time we get here the whole
+			// reply has been seen. Resolve before the branches below, since each
+			// of them can consume the ok and return.
+			if (this.axsProbePending) {
+				this.resolveAxsProbe();
+			}
+
 			// we only query when parser state option in $10 is disabled
 			if (this.actionMask.queryParserState.reply && !this.parserStateEnabled) {
 				if (this.actionMask.replyParserState) {
@@ -1642,6 +1676,80 @@ class GrblHalController {
 		});
 	}
 
+	// Reset [AXS:] probe state. Called once per connection, from open()/close().
+	resetAxsProbe() {
+		clearTimeout(this.axsProbeTimer);
+		this.axsProbeTimer = null;
+		this.axsProbePending = false;
+		this.axsQueryCount = 0;
+		this.axsQueryLastTime = 0;
+		this.axsSupport = AXS_UNKNOWN;
+	}
+
+	// Send a $I purely to look for an [AXS:] line, and wait for its reply.
+	startAxsProbe() {
+		this.axsQueryCount++;
+		this.axsQueryLastTime = Date.now();
+		this.axsProbePending = true;
+
+		// Safety net: the terminating ok can be swallowed (an error reply
+		// instead, or a job starting between the probe and the reply so that
+		// sender.ack() consumes it). Without this the probe would stay pending
+		// forever - which does stop the $I storm, but never populates the axes.
+		clearTimeout(this.axsProbeTimer);
+		this.axsProbeTimer = setTimeout(() => {
+			if (this.axsProbePending) {
+				log.debug("AXS probe timed out waiting for ok");
+				this.resolveAxsProbe();
+			}
+		}, AXS_PROBE_TIMEOUT);
+
+		this.writeln("$I");
+	}
+
+	// Decide what the completed $I reply told us about [AXS:] support.
+	resolveAxsProbe() {
+		this.axsProbePending = false;
+		clearTimeout(this.axsProbeTimer);
+		this.axsProbeTimer = null;
+
+		if (this.runner.hasAXS()) {
+			// Firmware reported its axes - never probe again.
+			this.axsSupport = AXS_SUPPORTED;
+			return;
+		}
+
+		if (this.axsQueryCount < AXS_QUERY_MAX_RETRIES) {
+			// Budget left; the status handler will start the next probe once
+			// AXS_QUERY_RETRY_INTERVAL has elapsed.
+			return;
+		}
+
+		// A full $I reply has now completed with no usable [AXS:] line, twice.
+		// This firmware does not report it, so stop asking and fall back.
+		this.axsSupport = AXS_UNSUPPORTED;
+
+		// Read the runner's status directly, not this.state: the controller only
+		// syncs this.state from the runner inside the 250ms queryTimer, so it lags
+		// and is empty before the first tick.
+		const axes = this.runner.setInferredAxesFromStatus(
+			this.runner.state.status,
+		);
+		if (axes) {
+			log.info(
+				`No [AXS:] in $I response; inferred axes from status report: ${axes.join("")}`,
+			);
+		} else {
+			log.info("No [AXS:] in $I response and no position to infer axes from");
+		}
+	}
+
+	// NOTE: this runs on every startup/reset message, which includes the [VER:]
+	// line of any $I reply - including ones this controller sends itself. So it
+	// can fire several times a second. Retry budgets and give-up flags must NOT
+	// live in actionMask, or they get reset by the very responses they count.
+	// Keep them as controller fields reset in open()/close() instead - see the
+	// axs* fields.
 	clearActionValues() {
 		this.actionMask.queryParserState.state = false;
 		this.actionMask.queryParserState.reply = false;
@@ -1653,8 +1761,6 @@ class GrblHalController {
 		this.actionMask.accessoryState.SD = false;
 		this.actionMask.ATCI = false;
 
-		this.actionMask.axsReportCount = 0;
-		this.actionMask.queryStatusCount = 0;
 		this.actionTime.queryParserState = 0;
 		this.actionTime.queryStatusReport = 0;
 		this.actionTime.senderFinishTime = 0;
@@ -1664,6 +1770,11 @@ class GrblHalController {
 		if (this.queryTimer) {
 			clearInterval(this.queryTimer);
 			this.queryTimer = null;
+		}
+
+		if (this.axsProbeTimer) {
+			clearTimeout(this.axsProbeTimer);
+			this.axsProbeTimer = null;
 		}
 
 		if (this.runner) {
@@ -1743,6 +1854,9 @@ class GrblHalController {
 		// Clear action values
 		this.clearActionValues();
 
+		// Fresh connection: start over on looking for [AXS:]
+		this.resetAxsProbe();
+
 		// Send $I to query firmware version; the startup event handler will take it from here.
 		// Also send 0x87 before $I as a raw realtime byte — this bypasses Hold state restrictions
 		// and triggers a status response that sets this.ready and populates activeState in the UI.
@@ -1769,6 +1883,9 @@ class GrblHalController {
 
 		// Clear initialized flag
 		this.initialized = false;
+
+		// Stop and reset any in-flight [AXS:] probe
+		this.resetAxsProbe();
 
 		// Reset homing runtime state
 		if (this.hasHomedSet) {
@@ -2829,8 +2946,11 @@ class GrblHalController {
 			cmd === GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT ||
 			this.actionMask.replyStatusReport;
 
+		// GCODE_REPORT is "$G\n" - the trailing newline is what makes the firmware
+		// execute it - but cmd is trimmed, so comparing the two raw would never
+		// match and a user-typed $G would get no reply echoed to the console.
 		this.actionMask.replyParserState =
-			cmd === GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT ||
+			cmd === GRBLHAL_REALTIME_COMMANDS.GCODE_REPORT.trim() ||
 			this.actionMask.replyParserState;
 
 		this.connection.write(data, {
