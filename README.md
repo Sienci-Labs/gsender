@@ -124,6 +124,7 @@ You can both run gSender locally using the public code-base as well as compile i
 - Pause button now disabled when workflow already paused/in a hold state
 - Fix for $I polling running endlessly in situations where AXS is never reported by the controller.
 - In cases where AXS not parsed by controller for grblHAL, default to counting position values reported by firmware.
+- $G types in console now correctly echoes the response in the console instead of being swallowed by the backend.
 
 
 ### 1.6.3 (July 23, 2026)
