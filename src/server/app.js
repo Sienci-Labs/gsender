@@ -478,26 +478,28 @@ const appMain = () => {
 			urljoin(settings.route, "api/plugins/open-directory"),
 			api.plugins.openDirectory,
 		);
-		app.put(urljoin(settings.route, "api/plugins/:id"), api.plugins.update);
-		app.post(
-			urljoin(settings.route, "api/plugins/read-imported-manifest"),
-			api.plugins.readImportedManifest,
-		);
-		app.post(
-			urljoin(settings.route, "api/plugins/write-permissions"),
-			api.plugins.writePermissions,
-		);
-		app.post(
-			urljoin(settings.route, "api/plugins/scan-plugin-for-sdk-usage"),
-			api.plugins.scanPluginForSDKUsage,
-		);
-		app.post(
-			urljoin(settings.route, "api/plugins/import-plugin"),
-			api.plugins.importPlugin,
-		);
 		app.post(
 			urljoin(settings.route, "api/plugins/settings"),
 			api.plugins.updateSettings,
+		);
+		// Guided install. Registered before the ":id" routes so "install" is
+		// never mistaken for a plugin id.
+		app.post(
+			urljoin(settings.route, "api/plugins/install/prepare"),
+			api.plugins.installPrepare,
+		);
+		app.post(
+			urljoin(settings.route, "api/plugins/install/commit"),
+			api.plugins.installCommit,
+		);
+		app.post(
+			urljoin(settings.route, "api/plugins/install/cancel"),
+			api.plugins.installCancel,
+		);
+		app.put(urljoin(settings.route, "api/plugins/:id"), api.plugins.update);
+		app.delete(
+			urljoin(settings.route, "api/plugins/:id"),
+			api.plugins.uninstall,
 		);
 	}
 
