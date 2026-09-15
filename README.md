@@ -114,6 +114,7 @@ You can both run gSender locally using the public code-base as well as compile i
 
 ### 1.6.4 (September 15, 2026)
 - Removed corner selection on probing feature entirely.  All corners have been reset to bottom left.
+- Flexible tool change routine again working as expected and not just silently completing each step.
 - Added $290, $291, $292, and $293 to config page for custom homing pulloffs when compiled in to grblHAL as option
 - Updated MK3 profiles
 - Notifications are again notifying on Alarms and Errors in the notification center.
