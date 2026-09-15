@@ -108,22 +108,13 @@ export function useSienciATCWizard(): Wizard {
 							],
 						},
 						{
-							id: "rack-position",
-							title: "Rack Position",
-							component: RackPosition,
-							autoComplete: () =>
-								store.get(
-									"widgets.atc.templates.variables._tc_rack_enable.value",
-									0,
-								) === 0 &&
-								store.get(
-									"widgets.atc.templates.variables._tc_slots.value",
-									0,
-								) === 0,
+							id: "tool-length-sensor",
+							title: "Tool Length Sensor Position",
+							component: TLSPosition,
 							secondaryContent: [
 								{
 									type: "image",
-									content: RackA,
+									content: TLSPosImg,
 								},
 								{
 									type: "component",
@@ -141,13 +132,22 @@ export function useSienciATCWizard(): Wizard {
 							],
 						},
 						{
-							id: "tool-length-sensor",
-							title: "Tool Length Sensor Position",
-							component: TLSPosition,
+							id: "rack-position",
+							title: "Rack Position",
+							component: RackPosition,
+							autoComplete: () =>
+								store.get(
+									"widgets.atc.templates.variables._tc_rack_enable.value",
+									0,
+								) === 0 &&
+								store.get(
+									"widgets.atc.templates.variables._tc_slots.value",
+									0,
+								) === 0,
 							secondaryContent: [
 								{
 									type: "image",
-									content: TLSPosImg,
+									content: RackA,
 								},
 								{
 									type: "component",
