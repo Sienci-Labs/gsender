@@ -56,7 +56,7 @@ import {
 	translateGcode,
 } from "../../lib/gcode-translation";
 import { determineMachineZeroFlagSet } from "../../lib/homing";
-import JogStreamer from "../../lib/JogStreamer";
+import JogStreamer, { describeJogStopReason } from "../../lib/JogStreamer";
 import logger from "../../lib/logger";
 import { PluginParserChain } from "../../lib/plugin-parsers";
 import Sender, { SP_TYPE_CHAR_COUNTING } from "../../lib/Sender";
@@ -747,7 +747,8 @@ class GrblController {
 				return;
 			}
 			this.jogAnnounced = false;
-			announceJog(`Jogging service stopped${reason ? ` (${reason})` : ""}`);
+			const why = describeJogStopReason(reason);
+			announceJog(`Stopped jogging${why ? ` - ${why}` : ""}`);
 		};
 		// One console line for the whole jog, not one per segment.
 		this.jogStreamer.on("start", ({ summary }) => {

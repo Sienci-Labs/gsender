@@ -362,7 +362,19 @@ describe("JogStreamer velocity mode", () => {
 
 		ctx.streamer.start({ axes: { X: 1, Y: -1 }, feedrate: 1200 });
 
-		expect(started).toEqual(["Jogging service started X+ Y- at F1200"]);
+		expect(started).toEqual([
+			"Started continuous jogging X+ Y- at 1200 mm/min",
+		]);
+	});
+
+	it("announces the jog in the units it was asked for", () => {
+		const ctx = build();
+		const started = [];
+		ctx.streamer.on("start", ({ summary }) => started.push(summary));
+
+		ctx.streamer.start({ axes: { X: 1 }, feedrate: 50, units: "in" });
+
+		expect(started).toEqual(["Started continuous jogging X+ at 50 in/min"]);
 	});
 
 	it("announces a speed change, but not faster than once a second", () => {
@@ -382,7 +394,7 @@ describe("JogStreamer velocity mode", () => {
 		ctx.clock.advance(1000);
 		ctx.streamer.update({ axes: { X: 1 }, feedrate: 2400 });
 		ctx.streamer.update({ axes: { X: 1 }, feedrate: 3000 });
-		expect(changes).toEqual(["Jogging service now at F2400"]);
+		expect(changes).toEqual(["Jog speed now 2400 mm/min"]);
 	});
 
 	it("does not warn about acceleration the firmware never reported", () => {

@@ -28,6 +28,34 @@ import { computeTravelBudget } from "./jog-limits";
 export const JOG_MODE_VELOCITY = "velocity";
 export const JOG_MODE_DISPLACEMENT = "displacement";
 
+/**
+ * Abort reasons are internal tags; the console gets plain language instead.
+ * Anything unrecognised is dropped rather than shown raw.
+ */
+const JOG_STOP_REASONS = {
+	cancel: "cancelled",
+	close: "connection closed",
+	destroy: "connection closed",
+	error: "the machine reported an error",
+	preconditions: "the machine was busy",
+	watchdog: "no response from the machine",
+	workflow: "a job started",
+	abort: null,
+};
+
+export function describeJogStopReason(reason) {
+	if (!reason) {
+		return null;
+	}
+	if (reason.startsWith("command:")) {
+		return "another command was sent";
+	}
+	if (reason.startsWith("state:")) {
+		return `the machine went into ${reason.slice("state:".length)}`;
+	}
+	return JOG_STOP_REASONS[reason] ?? null;
+}
+
 export const JOG_STATE_IDLE = "idle";
 export const JOG_STATE_STREAMING = "streaming";
 export const JOG_STATE_DRAINING = "draining";
@@ -916,15 +944,29 @@ export default class JogStreamer extends events.EventEmitter {
 	}
 
 	/**
-	 * The console messages this service writes. One family, one prefix, so the
-	 * whole life of a jog reads as a single conversation in the terminal.
+	 * Speeds are tracked in mm/min internally, but the console should speak the
+	 * units the user picked, so convert back on the way out.
+	 */
+	_formatSpeed(mmPerMin) {
+		if (this.units === "in") {
+			const inches = mmPerMin / 25.4;
+			return `${Math.round(inches * 10) / 10} in/min`;
+		}
+		return `${Math.round(mmPerMin)} mm/min`;
+	}
+
+	/**
+	 * The console messages this service writes. Plain language, so the whole
+	 * life of a jog reads as a single conversation in the terminal.
 	 */
 	_startedMessage() {
 		const active = ALL_AXES.filter((axis) => this.dir[axis])
 			.map((axis) => `${axis}${this.dir[axis] > 0 ? "+" : "-"}`)
 			.join(" ");
-		const feedrate = Math.round(this.plan?.feedrate ?? this.requestedFeedrate);
-		return `Jogging service started ${active || "-"} at F${feedrate}`;
+		const speed = this._formatSpeed(
+			this.plan?.feedrate ?? this.requestedFeedrate,
+		);
+		return `Started continuous jogging ${active || "-"} at ${speed}`;
 	}
 
 	/**
@@ -945,7 +987,7 @@ export default class JogStreamer extends events.EventEmitter {
 		this.announcedAt = now;
 		this.emit("feedrate", {
 			feedrate,
-			summary: `Jogging service now at F${feedrate}`,
+			summary: `Jog speed now ${this._formatSpeed(feedrate)}`,
 		});
 	}
 
