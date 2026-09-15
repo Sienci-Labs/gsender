@@ -163,7 +163,7 @@ class Connection extends EventEmitter {
                 this.connection.removeListener('error', this.connectionEventListener.error);*/
 				log.error(`Error opening serial port "${port}":`, err);
 				this.emit("serialport:error", { err: err, port: port });
-				this.emit("serialport:close", {}, 1);
+				this.emit("serialport:close", {});
 				callback(err); // notify error
 				return;
 			}
