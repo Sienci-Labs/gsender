@@ -1,5 +1,20 @@
 [
   {
+    "version": "1.6.4",
+    "date": "September 15, 2026",
+    "notes": [
+      "Removed corner selection on probing feature entirely.  All corners have been reset to bottom left.",
+      "Added $290, $291, $292, and $293 to config page for custom homing pulloffs when compiled in to grblHAL as option",
+      "Updated MK3 profiles",
+      "Notifications are again notifying on Alarms and Errors in the notification center.",
+      "Added Voron Cascade profile",
+      "Toolchange ack keybind no longer gated behind non-Tool state so should be usable again",
+      "Pulloff uses $27 if home on 0 bit not set for various Z actions instead of a fixed value in several places",
+      "TLS and Rack position steps in ATC setup have been swapped",
+      "Pause button now disabled when workflow already paused/in a hold state"
+    ]
+  },
+  {
     "version": "1.6.3",
     "date": "July 23, 2026",
     "notes": [
@@ -56,33 +71,6 @@
       "Squaring and motor tuning workflows now share the same jog popover for a more consistent experience",
       "Spindle delay behaviour has been updated and is now an explicit configurable option for forced insertion when needed",
       "Macros can now send realtime commands"
-    ]
-  },
-  {
-    "version": "1.6.1",
-    "date": "April 30, 2026",
-    "notes": [
-      "Added option to skip first tool change on fixed strategy or prompt use if they want to skip",
-      "Added application scaling for larger monitors and devices - in accessibility section in Config",
-      "Rapid Position and Park buttons now properly enabled after homing on grbl devices",
-      "Spindle Delay config should now be reading $392 correctly on older firmware versions",
-      "Go To Flyout widget can now move in machine coordinates if homing enabled - check out the new MCS option",
-      "Go To Flyout widget now uses the same safe height logic as several other Go To functionalities",
-      "Machine defaults selector will prompt to apply where necessary",
-      "Macro keybinds should persist",
-      "Gamepad - Park shortcut works as expected",
-      "Gamepad - Rapid position shortcut calculation fixed to not use stale position data",
-      "Macro keybindings should persist again",
-      "Further tweaks to rotary time estimation",
-      "Fixed issue where tool table was assumed to exist on PRB: output which is not the case for some grblHAL compilations",
-      "Laser test now calculates max values using $30 (grbl) or $730 (grblHAL) instead of depending on local state",
-      "Added application icon for IOS devices",
-      "Added Config option to let user toggle probe type selection directly in Probe drawer",
-      "Updates to Automations editor to include variables dropdown and general UX improvements",
-      "Config option - now possible to disable power saving on Electron to allow screen blanking",
-      "Lite mode toggle feather should be more obvious when it’s enabled or disabled",
-      "Macros again show on remote mode",
-      "Updates to 3d Probe text instructions to be more relevant to that probe type"
     ]
   }
 ]

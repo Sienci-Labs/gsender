@@ -162,6 +162,17 @@ const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
             <div className="flex flex-col gap-2">
                 {actions.map((action, index) => {
                     const cbWithCompletion = () => {
+                        // Guard against a malformed wizard action. Without this
+                        // we'd arm the server step callback and report success
+                        // while sending no g-code at all — the worst possible
+                        // failure mode here, since the operator believes the
+                        // machine probed/moved when it did not.
+                        if (!action.gcodeLines?.length) {
+                            console.error(
+                                `Wizard action "${action.label}" has no gcodeLines — nothing was sent.`,
+                            );
+                            return;
+                        }
                         if (advanceTimerRef.current) {
                             clearTimeout(advanceTimerRef.current);
                             advanceTimerRef.current = null;
