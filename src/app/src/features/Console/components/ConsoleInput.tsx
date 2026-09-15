@@ -63,7 +63,7 @@ export function ConsoleInput() {
     return (
         <div className="flex gap-2 w-full shrink-0">
             <Input
-                className="h-10 text-sm font-mono"
+                className="h-10 text-sm console-text"
                 placeholder="Enter G-code here..."
                 ref={inputRef}
                 type="text"

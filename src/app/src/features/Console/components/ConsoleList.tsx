@@ -23,7 +23,7 @@ function ConsoleRow({ message }: { message: ConsoleMessage }) {
                 <MessageIcon type={message.type} />
             </span>
             <span
-                className={`font-mono text-xs leading-[1.45] whitespace-pre-wrap break-words ${
+                className={`console-text text-xs leading-[1.45] whitespace-pre-wrap break-words ${
                     TEXT_BY_TYPE[message.type] ?? DEFAULT_TEXT
                 }`}
             >
@@ -104,7 +104,7 @@ export function ConsoleList({
     if (messages.length === 0) {
         return (
             <div className={`flex items-center justify-center ${SURFACE}`}>
-                <span className="font-mono text-xs italic text-gray-400 dark:text-content-muted">
+                <span className="console-text text-xs italic text-gray-400 dark:text-content-muted">
                     {isFiltered
                         ? 'No messages match this filter'
                         : 'No console output yet'}

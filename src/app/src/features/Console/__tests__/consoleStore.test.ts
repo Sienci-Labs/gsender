@@ -131,15 +131,21 @@ describe('matchesFilter', () => {
         expect(matchesFilter(message('gcode'), 'all')).toBe(true);
     });
 
-    it('groups warnings and errors under the warnings filter', () => {
-        expect(matchesFilter(message('warning'), 'warning')).toBe(true);
-        expect(matchesFilter(message('error'), 'warning')).toBe(true);
-        expect(matchesFilter(message('alarm'), 'warning')).toBe(false);
+    it('groups every problem type under the faults filter', () => {
+        expect(matchesFilter(message('warning'), 'faults')).toBe(true);
+        expect(matchesFilter(message('error'), 'faults')).toBe(true);
+        expect(matchesFilter(message('alarm'), 'faults')).toBe(true);
+    });
+
+    it('keeps ordinary traffic out of the faults filter', () => {
+        expect(matchesFilter(message('gcode'), 'faults')).toBe(false);
+        expect(matchesFilter(message('response'), 'faults')).toBe(false);
+        expect(matchesFilter(message('system'), 'faults')).toBe(false);
     });
 
     it('matches remaining types exactly', () => {
         expect(matchesFilter(message('gcode'), 'gcode')).toBe(true);
         expect(matchesFilter(message('response'), 'gcode')).toBe(false);
-        expect(matchesFilter(message('alarm'), 'alarm')).toBe(true);
+        expect(matchesFilter(message('system'), 'system')).toBe(true);
     });
 });

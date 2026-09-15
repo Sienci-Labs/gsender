@@ -1,21 +1,17 @@
 import Tooltip from 'app/components/Tooltip';
 import { Copy, Eraser, ExternalLink } from 'lucide-react';
-import {
-    CONSOLE_FILTERS,
-    type ConsoleFilter,
-    type ConsoleMessageType,
-} from '../definitions';
+import { CONSOLE_FILTERS, type ConsoleFilter } from '../definitions';
 
 /**
  * Dots echo the row icon colours so a filter reads as the same family as the
- * messages it shows. 'all' gets none.
+ * messages it shows. 'all' gets none; 'faults' takes the colour of the most
+ * severe thing it can contain.
  */
 const FILTER_DOT: Partial<Record<ConsoleFilter, string>> = {
     gcode: 'bg-blue-500',
     response: 'bg-gray-400',
     system: 'bg-green-500',
-    warning: 'bg-orange-500',
-    alarm: 'bg-red-600',
+    faults: 'bg-red-600',
 };
 
 type Props = {
@@ -42,8 +38,7 @@ function ToolbarAction({
                 type="button"
                 onClick={onClick}
                 aria-label={label}
-                // Icon is small, target is not.
-                className="flex items-center justify-center w-10 h-10 rounded text-gray-500 hover:text-gray-800 hover:bg-gray-100 active:bg-gray-200 dark:text-content-muted dark:hover:text-content-primary dark:hover:bg-overlay-hover dark:active:bg-overlay-active"
+                className="flex items-center justify-center w-8 h-8 rounded text-gray-500 hover:text-gray-800 hover:bg-gray-100 active:bg-gray-200 dark:text-content-muted dark:hover:text-content-primary dark:hover:bg-overlay-hover dark:active:bg-overlay-active"
             >
                 {children}
             </button>
@@ -77,7 +72,7 @@ export function ConsoleToolbar({
                             type="button"
                             onClick={() => onFilterChange(id)}
                             aria-pressed={selected}
-                            className={`flex items-center gap-1 shrink-0 h-10 px-2 rounded text-xs font-medium transition-colors ${
+                            className={`flex items-center gap-1 shrink-0 h-8 px-2 rounded text-xs font-medium transition-colors ${
                                 selected
                                     ? 'bg-blue-500 text-white'
                                     : 'text-gray-600 hover:bg-gray-100 dark:text-content-secondary dark:hover:bg-overlay-hover'
