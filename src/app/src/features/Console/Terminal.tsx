@@ -2,7 +2,9 @@ import {
 	TERMINAL_ALARM_RED,
 	TERMINAL_GREY,
 	TERMINAL_RED,
+	TERMINAL_SERVICE_CYAN,
 	WORKSPACE_MODE,
+	WRITE_SOURCE_SERVER,
 } from "app/constants";
 import controller, {
 	addControllerEvents,
@@ -153,6 +155,16 @@ const Terminal = (
 
 		if (data.includes("ALARM:")) {
 			terminalInstance.current?.writeln(color.xterm(TERMINAL_ALARM_RED)(data));
+			return;
+		}
+
+		// Notices the server writes about itself - the jog streamer's lifecycle,
+		// for one. They are not machine traffic, so they carry no source prefix
+		// and get their own colour rather than the grey used for sent commands.
+		if (source === WRITE_SOURCE_SERVER) {
+			terminalInstance.current?.writeln(
+				color.xterm(TERMINAL_SERVICE_CYAN)(data),
+			);
 			return;
 		}
 

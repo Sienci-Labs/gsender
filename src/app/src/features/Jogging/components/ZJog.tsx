@@ -3,6 +3,7 @@ import zLabels from "app/features/Jogging/assets/zLabels.svg";
 import TabJog from "app/features/Jogging/components/TabJog.tsx";
 import {
 	continuousJogAxis,
+	isPrimaryPress,
 	type JoggerProps,
 	stopContinuousJog,
 	zMinusJog,
@@ -29,6 +30,7 @@ export function ZJog({
 		},
 		{
 			threshold,
+			filterEvents: isPrimaryPress,
 			onCancel: () => {
 				zPlusJog(distance, feedrate, false);
 				posthog?.capture("jog_z_plus", {
@@ -51,6 +53,7 @@ export function ZJog({
 		},
 		{
 			threshold,
+			filterEvents: isPrimaryPress,
 			onCancel: () => {
 				zMinusJog(distance, feedrate, false);
 				posthog?.capture("jog_z_minus", {
@@ -87,6 +90,7 @@ export function ZJog({
 				bottomLabel="Jog Z minus"
 				onTopKeyDown={(e) => handleKeyDown(e, zPlusJog)}
 				onBottomKeyDown={(e) => handleKeyDown(e, zMinusJog)}
+				onPressCancel={stopContinuousJog}
 			/>
 			<img
 				src={zLabels}

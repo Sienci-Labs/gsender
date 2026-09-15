@@ -362,6 +362,16 @@ class CNCEngine {
 					`Disconnected from ${address}: id=${socket.id}, user.id=${user.id}, user.name=${user.name}`,
 				);
 
+				// Never leave a machine jogging because the client that was
+				// steering it went away.
+				const controllers = store.get("controllers", {});
+				Object.keys(controllers).forEach((port) => {
+					const streamer = controllers[port]?.jogStreamer;
+					if (streamer?.isActive() && streamer.ownerSocketId === socket.id) {
+						controllers[port].command("jog:cancel");
+					}
+				});
+
 				if (!this.connection) {
 					return;
 				}
@@ -642,6 +652,17 @@ class CNCEngine {
 						? args[args.length - 1]
 						: null;
 
+				// A jog stream keeps the machine moving for as long as it is fed.
+				// Remember who started it so a dropped socket can end it - unlike
+				// the single long move this replaced, a stream has no inherent
+				// bound of its own.
+				if (cmd === "jog:start" || cmd === "jog:feed") {
+					const controller = store.get(`controllers["${port}"]`);
+					if (controller?.jogStreamer) {
+						controller.jogStreamer.ownerSocketId = socket.id;
+					}
+				}
+
 				if (!this.connection || this.connection.isClose()) {
 					const error = `Serial port "${port}" not accessible`;
 					log.error(error);
@@ -660,7 +681,9 @@ class CNCEngine {
 				try {
 					controller.command.apply(controller, [cmd].concat(args));
 				} catch (err) {
-					log.error(`socket.command("${port}", "${cmd}") failed: ${err.message}`);
+					log.error(
+						`socket.command("${port}", "${cmd}") failed: ${err.message}`,
+					);
 					ack?.(err);
 				}
 			});
@@ -888,6 +911,9 @@ class CNCEngine {
 					return;
 				}
 
+				// No abort of an active jog stream here: this path only carries
+				// realtime bytes (overrides, feed hold), which produce no ok and
+				// so cannot desync the streamer's ack accounting.
 				controller.write(data, context);
 			});
 
@@ -906,6 +932,11 @@ class CNCEngine {
 					log.error(`Serial port "${port}" not accessible`);
 					return;
 				}
+
+				// Console input produces an ok, and the jog streamer consumes its
+				// own acks - it has to give up the link before anyone else writes
+				// a line to it.
+				controller.jogStreamer?.abort("writeln");
 
 				controller.writeln(data, context);
 			});

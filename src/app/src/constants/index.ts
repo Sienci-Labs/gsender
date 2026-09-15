@@ -450,6 +450,10 @@ export const CUSTOMIZABLE_THEMES = [CUST_THEME];
 export const TERMINAL_GREY = 249;
 export const TERMINAL_RED = 196;
 export const TERMINAL_ALARM_RED = 167;
+// Server-originated notices - not machine traffic, not operator input.
+export const TERMINAL_SERVICE_CYAN = 44;
+// Mirrors WRITE_SOURCE_SERVER in src/server/controllers/constants.js.
+export const WRITE_SOURCE_SERVER = "server";
 
 export const START = "START";
 export const PAUSE = "PAUSE";

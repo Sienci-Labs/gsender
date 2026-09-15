@@ -9,6 +9,12 @@ export interface TabJogProps {
 	bottomLabel?: string;
 	onTopKeyDown?: (e: React.KeyboardEvent) => void;
 	onBottomKeyDown?: (e: React.KeyboardEvent) => void;
+	/**
+	 * Called when the browser cancels a hold instead of releasing it. Owners
+	 * pass their jog-stop here - use-long-press binds neither pointercancel nor
+	 * touchcancel, so without this a cancelled hold keeps the machine moving.
+	 */
+	onPressCancel?: () => void;
 }
 
 const TabJog = (props: TabJogProps) => {
@@ -22,10 +28,18 @@ const TabJog = (props: TabJogProps) => {
 			viewBox="0 0 50 187"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
-			className={cn("w-[45px] portrait:w-[52px] h-[168px] portrait:h-[195px]", {
-				"cursor-pointer": props.canClick,
-				"cursor-not-allowed": !props.canClick,
-			})}
+			className={cn(
+				// touch-none keeps the browser from reclaiming a hold as a scroll,
+				// which would cancel the pointer rather than release it.
+				"touch-none w-[45px] portrait:w-[52px] h-[168px] portrait:h-[195px]",
+				{
+					"cursor-pointer": props.canClick,
+					"cursor-not-allowed": !props.canClick,
+				},
+			)}
+			onPointerCancel={props.onPressCancel}
+			onTouchCancel={props.onPressCancel}
+			onContextMenu={(event) => event.preventDefault()}
 		>
 			<path
 				role="button"

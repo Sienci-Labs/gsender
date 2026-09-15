@@ -3,6 +3,7 @@ import { WORKSPACE_MODE } from "app/constants";
 
 import {
 	continuousJogAxis,
+	isPrimaryPress,
 	stopContinuousJog,
 	xMinusJog,
 	xMinusYMinus,
@@ -46,6 +47,7 @@ export function JogWheel({
 		},
 		{
 			threshold,
+			filterEvents: isPrimaryPress,
 			onCancel: () => {
 				xPlusJog(distance, feedrate, false);
 				posthog?.capture("jog_x_plus", {
@@ -70,6 +72,7 @@ export function JogWheel({
 		},
 		{
 			threshold,
+			filterEvents: isPrimaryPress,
 			onCancel: () => {
 				xMinusJog(distance, feedrate, false);
 			},
@@ -88,6 +91,7 @@ export function JogWheel({
 		},
 		{
 			threshold,
+			filterEvents: isPrimaryPress,
 			onCancel: () => {
 				yPlusJog(distance, feedrate, false);
 				posthog?.capture("jog_y_plus", {
@@ -110,6 +114,7 @@ export function JogWheel({
 		},
 		{
 			threshold,
+			filterEvents: isPrimaryPress,
 			onCancel: () => {
 				yMinusJog(distance, feedrate, false);
 				posthog?.capture("jog_y_minus", {
@@ -133,6 +138,7 @@ export function JogWheel({
 		},
 		{
 			threshold,
+			filterEvents: isPrimaryPress,
 			onCancel: () => {
 				xPlusYMinus(distance, feedrate, false);
 				posthog?.capture("jog_x_plus_y_minus", {
@@ -155,6 +161,7 @@ export function JogWheel({
 		},
 		{
 			threshold,
+			filterEvents: isPrimaryPress,
 			onCancel: () => {
 				xPlusYPlus(distance, feedrate, false);
 				posthog?.capture("jog_x_plus_y_plus", {
@@ -178,6 +185,7 @@ export function JogWheel({
 		},
 		{
 			threshold,
+			filterEvents: isPrimaryPress,
 			onCancel: () => {
 				xMinusYPlus(distance, feedrate, false);
 				posthog?.capture("jog_x_minus_y_plus", {
@@ -200,6 +208,7 @@ export function JogWheel({
 		},
 		{
 			threshold,
+			filterEvents: isPrimaryPress,
 			onCancel: () => {
 				xMinusYMinus(distance, feedrate, false);
 				posthog?.capture("jog_x_minus_y_minus", {
@@ -229,18 +238,27 @@ export function JogWheel({
 		}
 	};
 
+	// A cancelled pointer never produces the release that stops the jog, and
+	// use-long-press binds neither pointercancel nor touchcancel. Both bubble,
+	// so one pair on the root covers every wedge below.
 	return (
 		<svg
 			viewBox="0 0 200 200"
 			fill="none"
 			className={cn(
-				"hover:transition-all duration-200 w-[180px] portrait:w-[210px] h-[180px] portrait:h-[210px]",
+				// touch-none keeps the browser from reclaiming a hold as a scroll.
+				// If it does, it sends pointercancel instead of pointerup and the
+				// long press never finishes - the jog would run on.
+				"touch-none hover:transition-all duration-200 w-[180px] portrait:w-[210px] h-[180px] portrait:h-[210px]",
 				{
 					"cursor-pointer": canClick,
 					"cursor-not-allowed": !canClick,
 				},
 			)}
 			xmlns="http://www.w3.org/2000/svg"
+			onPointerCancel={stopContinuousJog}
+			onTouchCancel={stopContinuousJog}
+			onContextMenu={(event) => event.preventDefault()}
 		>
 			<path
 				id="xPlusYMinus"
