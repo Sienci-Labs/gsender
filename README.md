@@ -112,6 +112,18 @@ You can both run gSender locally using the public code-base as well as compile i
 <details>
 <summary>Expand to see all version notes</summary>
 
+### 1.6.4 (September 15, 2026)
+- Removed corner selection on probing feature entirely.  All corners have been reset to bottom left.
+- Added $290, $291, $292, and $293 to config page for custom homing pulloffs when compiled in to grblHAL as option
+- Updated MK3 profiles
+- Notifications are again notifying on Alarms and Errors in the notification center.
+- Added Voron Cascade profile
+- Toolchange ack keybind no longer gated behind non-Tool state so should be usable again
+- Pulloff uses $27 if home on 0 bit not set for various Z actions instead of a fixed value in several places
+- TLS and Rack position steps in ATC setup have been swapped
+- Pause button now disabled when workflow already paused/in a hold state
+
+
 ### 1.6.3 (July 23, 2026)
 - Added LongMill MK3 profiles.
 - Added flashing path for new SLB-Lite using `$UF2`.
