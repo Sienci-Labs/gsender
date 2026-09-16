@@ -46,6 +46,7 @@ import {
     isATCAvailable,
     sendATCHomingDialog,
 } from 'app/features/ATC/utils/ATCFunctions.ts';
+import posthog from 'posthog-js';
 
 interface MachineStatusProps {
     alarmCode: ALARM_CODE;
@@ -100,7 +101,10 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
         return () => {
             controller.removeListener('serialport:open', handlePortOpen);
             controller.removeListener('serialport:close', handlePortClose);
-            controller.removeListener('controller:state', handleControllerState);
+            controller.removeListener(
+                'controller:state',
+                handleControllerState,
+            );
         };
     }, []);
 
@@ -113,6 +117,11 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
                 alarmCode === 14 ||
                 alarmCode === 17
             ) {
+                posthog.capture('machine_unlocked', {
+                    alarm_code: alarmCode,
+                    active_state: displayActiveState,
+                    method: 'reset_limit',
+                });
                 controller.command('reset:limit');
                 return;
             } else if (alarmCode === 'Homing' || alarmCode === 11) {
@@ -124,8 +133,18 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
                 return;
             }
         } else if (displayActiveState === GRBL_ACTIVE_STATE_HOLD) {
+            posthog.capture('machine_unlocked', {
+                alarm_code: alarmCode,
+                active_state: displayActiveState,
+                method: 'cycle_start',
+            });
             return controller.command('cyclestart');
         }
+        posthog.capture('machine_unlocked', {
+            alarm_code: alarmCode,
+            active_state: displayActiveState,
+            method: 'unlock',
+        });
         controller.command('unlock');
     };
 
@@ -158,8 +177,7 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
                     className={cx(
                         'transition-colors duration-100 ease-in-out flex max-sm:w-40 max-sm:text-normal w-72 h-[60px] justify-between items-center [clip-path:_polygon(0%_0%,_100%_0%,_85%_100%,_15%_100%)]',
                         {
-                            'text-white bg-gray-800':
-                                !displayActiveState,
+                            'text-white bg-gray-800': !displayActiveState,
                             'bg-gray-500 text-white':
                                 displayActiveState === GRBL_ACTIVE_STATE_IDLE,
                             'bg-green-600 text-white':
@@ -232,11 +250,7 @@ export default connect((store) => {
     const $22 = get(store, 'controller.settings.settings.$22', '0');
     const alarmCode = get(store, 'controller.state.status.alarmCode', 0);
 
-    const activeState = get(
-        store,
-        'controller.state.status.activeState',
-        null,
-    );
+    const activeState = get(store, 'controller.state.status.activeState', null);
     const isConnected = get(store, 'connection.isConnected', false);
     const port = get(store, 'connection.port', null);
     return {

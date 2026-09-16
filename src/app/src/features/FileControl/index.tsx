@@ -18,8 +18,6 @@ import {
 } from './utils/recentfiles';
 import { toast } from 'app/lib/toaster';
 import { RecentFile } from './definitions';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import { usePostHog } from '@posthog/react';
 
 export type FileData = {
     data: string;
@@ -30,8 +28,6 @@ export type FileData = {
 };
 
 const FileControl = () => {
-    const posthog = usePostHog();
-
     useEffect(() => {
         if (isElectron()) {
             (window as any).ipcRenderer.on(
@@ -113,12 +109,6 @@ const FileControl = () => {
         );
 
         reduxStore.dispatch(updateFileInfo({ path: file.path }));
-
-        posthog?.capture('file_uploaded', {
-            name: file.name,
-            size: file.size,
-            isRecentFile,
-        });
     };
 
     const handleRecentFileUpload = async (file: RecentFile) => {

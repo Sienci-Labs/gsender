@@ -49,6 +49,8 @@ import {
     GRBL_ACTIVE_STATE_RUN,
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_HOLD,
+    GRBL_ACTIVE_STATE_HOME,
+    GRBL_ACTIVE_STATE_ALARM,
     FILE_TYPE,
     WORKSPACE_MODE,
     RENDER_NO_FILE,
@@ -120,6 +122,7 @@ import { Spindle } from 'app/features/Spindle/definitions';
 import { AlarmsErrors } from 'app/definitions/alarms_errors';
 import { KeepoutToggle } from 'app/features/ATC/components/KeepOut/KeepOutToggle.tsx';
 import get from 'lodash/get';
+import posthog from 'posthog-js';
 
 export function* initialize(): Generator<any, void, any> {
     let visualizeWorker: typeof VisualizeWorker | null = null;
@@ -133,6 +136,15 @@ export function* initialize(): Generator<any, void, any> {
         estimatedTime: 0,
     };
     let hasEstimateData = false;
+
+    const getMachineAnalyticsContext = () => {
+        const state = reduxStore.getState();
+        return {
+            firmware: _get(state, 'controller.type') || null,
+            file_name: _get(state, 'file.name') || null,
+            total_lines: _get(state, 'file.total') || 0,
+        };
+    };
 
     const clearEstimateDataCache = () => {
         latestEstimateData = {
@@ -277,6 +289,14 @@ export function* initialize(): Generator<any, void, any> {
         } = fileData;
         if (content === prevContent && size === prevSize && name === prevName) {
             isNewFile = false;
+        }
+
+        if (isNewFile && visualizer !== VISUALIZER_SECONDARY) {
+            posthog.capture('file_loaded', {
+                file_name: name,
+                file_size_bytes: size,
+                firmware: _get(reduxState, 'controller.type') || null,
+            });
         }
 
         // Ensure a previous parse worker does not continue emitting stale messages.
@@ -435,6 +455,23 @@ export function* initialize(): Generator<any, void, any> {
             if (currentState !== state.status.activeState) {
                 prevState = currentState;
                 currentState = state.status.activeState;
+
+                if (currentState === GRBL_ACTIVE_STATE_HOME) {
+                    posthog.capture('homing_started', { firmware: type });
+                } else if (
+                    prevState === GRBL_ACTIVE_STATE_HOME &&
+                    currentState === GRBL_ACTIVE_STATE_IDLE
+                ) {
+                    posthog.capture('homing_completed', { firmware: type });
+                } else if (
+                    prevState === GRBL_ACTIVE_STATE_HOME &&
+                    currentState === GRBL_ACTIVE_STATE_ALARM
+                ) {
+                    posthog.capture('homing_failed', {
+                        firmware: type,
+                        alarm_code: state.status?.alarmCode,
+                    });
+                }
             }
             if (tool) {
                 state.parserstate.modal.tool = tool;
@@ -469,6 +506,15 @@ export function* initialize(): Generator<any, void, any> {
                 }),
             );
             pubsub.publish('job:end', { status, errors });
+
+            if (status.finishTime > 0) {
+                posthog.capture('job_completed', {
+                    ...getMachineAnalyticsContext(),
+                    duration_ms: status.elapsedTime,
+                    error_count: errors.length,
+                });
+            }
+
             errors = [];
         }
 
@@ -574,6 +620,10 @@ export function* initialize(): Generator<any, void, any> {
             // create a pop up so the user can connect to the last active port
             // and resume from the last line
             if (currentLineRunning) {
+                posthog.capture('connection_lost', {
+                    ...getMachineAnalyticsContext(),
+                    last_line: currentLineRunning,
+                });
                 const homingEnabled: string = _get(
                     reduxStore.getState(),
                     'controller.settings.settings.$22',
@@ -926,6 +976,14 @@ export function* initialize(): Generator<any, void, any> {
                     `${error.type === ALARM ? 'Alarm' : 'Error'} ${error.code}: ${error.description}`,
                     { position: 'bottom-right' },
                 );
+
+                posthog.capture(
+                    error.type === ALARM ? 'alarm_raised' : 'controller_error',
+                    {
+                        code: error.code,
+                        was_job_running: Boolean(_wasRunning),
+                    },
+                );
             }
 
             pubsub.publish('error', error);
@@ -1024,6 +1082,7 @@ export function* initialize(): Generator<any, void, any> {
 
     controller.addListener('job:start', () => {
         errors = [];
+        posthog.capture('job_started', getMachineAnalyticsContext());
     });
 
     controller.addListener('sdcard:files', (file: SDCardFile) => {

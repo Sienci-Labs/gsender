@@ -7,6 +7,7 @@ import { RootState } from 'app/store/redux';
 import { GRBL_ACTIVE_STATE_ALARM, GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import controller from 'app/lib/controller';
+import posthog from 'posthog-js';
 import { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
 import Tooltip from 'app/components/Tooltip';
 
@@ -16,8 +17,18 @@ export function unlockFirmware(
 ) {
     if (state === GRBL_ACTIVE_STATE_ALARM) {
         if (code === 17 || code === 10) {
+            posthog.capture('machine_unlocked', {
+                alarm_code: code,
+                active_state: state,
+                method: 'reset_limit',
+            });
             controller.command('reset:limit');
         } else {
+            posthog.capture('machine_unlocked', {
+                alarm_code: code,
+                active_state: state,
+                method: 'unlock',
+            });
             controller.command('unlock');
         }
 
@@ -26,6 +37,11 @@ export function unlockFirmware(
         }
         return;
     }
+    posthog.capture('machine_unlocked', {
+        alarm_code: code,
+        active_state: state,
+        method: 'cycle_start',
+    });
     controller.command('cyclestart');
 }
 

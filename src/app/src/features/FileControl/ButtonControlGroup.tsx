@@ -167,11 +167,6 @@ const ButtonControlGroup = () => {
             controller.port,
             VISUALIZER_PRIMARY,
         );
-        posthog?.capture('file_loaded', {
-            file_name: file.name,
-            file_size_bytes: file.size,
-            source: 'file_picker',
-        });
     };
 
     const handleClickLoadFile = () => {
