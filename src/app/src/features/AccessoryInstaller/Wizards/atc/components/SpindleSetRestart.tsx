@@ -51,7 +51,7 @@ export function SpindleSetRestart({ onComplete, onUncomplete }: StepProps) {
             <p className="dark:text-white">
                 Your spindle settings are applied in this step and the controller will restart automatically.
             </p>
-            <ol className="list-decimal p-5 gap-4 space-y-2">
+            <ol className="list-decimal p-5 gap-4 space-y-2 dark:text-white">
                 <li>
                     Press <b>"Apply And Restart"</b>
                 </li>

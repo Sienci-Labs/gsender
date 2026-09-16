@@ -213,7 +213,7 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
                         <>
                             <button
                                 onClick={onExit}
-                                className="flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors bg-gray-900 text-white hover:bg-gray-800"
+                                className="flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors bg-gray-900 text-white hover:bg-gray-800 dark:bg-blue-500 dark:hover:bg-blue-600"
                             >
                                 Exit Wizard
                             </button>
@@ -244,7 +244,7 @@ export function WizardContainer({ subWizard, onExit }: WizardContainerProps) {
                 ${
                     !isCurrentStepComplete || isLastStep
                         ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        : 'bg-gray-900 text-white hover:bg-gray-800'
+                        : 'bg-gray-900 text-white hover:bg-gray-800 dark:bg-blue-500 dark:hover:bg-blue-600'
                 }
               `}
                             >

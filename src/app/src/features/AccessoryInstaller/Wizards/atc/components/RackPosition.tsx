@@ -160,7 +160,7 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
                             It is highly recommended that you use the automatic method, your rack may be damaged if done incorrectly.
                         </b>
                     </p>
-                  <ol className="list-decimal p-5 gap-4 space-y-2">
+                  <ol className="list-decimal p-5 gap-4 space-y-2 dark:text-white">
                       <li>Install a tool holder (with pull-stud removed) into the left-most slot</li>
                       <li>Lower the spindle taper onto the tool holder until the tapers match</li>
                       <li>Press <b>“Set Position”</b></li>
