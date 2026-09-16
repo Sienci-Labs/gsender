@@ -2795,6 +2795,9 @@ class GrblHalController {
 				this.write("$");
 			},
 			"toolchange:acknowledge": () => {
+				this.emit("serialport:write", "Toolchange Ack sent", {
+					source: WRITE_SOURCE_FEEDER,
+				});
 				this.write(GRBLHAL_REALTIME_COMMANDS.TOOL_CHANGE_ACK);
 			},
 			virtual_stop_toggle: () => {

@@ -10,6 +10,7 @@ import {
     GRBL,
     GRBL_ACTIVE_STATE_ALARM,
     GRBL_ACTIVE_STATE_IDLE,
+    GRBL_ACTIVE_STATE_TOOL,
     GRBLHAL,
     LOCATION_CATEGORY,
     SPINDLE_LASER_CATEGORY,
@@ -75,9 +76,15 @@ const Workspace = () => {
                 'homing',
             ].includes(command);
             const isInAlarmState = activeState === GRBL_ACTIVE_STATE_ALARM;
-            // feedhold, cyclestart, homing, unlock, reset
+            const commandIsValidForToolState = ["toolchange:acknowledge"].includes(
+                command,
+            );
+            const isInToolState = activeState === GRBL_ACTIVE_STATE_TOOL;
+
+            // feedhold, cyclestart, homing, unlock, reset, tool
             if (
                 (commandIsValidForAlarmState && isInAlarmState) ||
+                (commandIsValidForToolState && isInToolState) ||
                 (command !== 'reset:limit' &&
                     activeState === GRBL_ACTIVE_STATE_IDLE)
             ) {
