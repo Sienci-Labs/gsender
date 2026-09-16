@@ -1,11 +1,11 @@
-import PlaceholderImage from 'app/components/Wizard/assets/placeholder.png';
 import { useValidations } from 'app/components/Wizard/hooks/UseValidations.tsx';
 import type { Wizard } from 'app/components/Wizard/types';
+import AutoSpinLandingImage from 'app/features/AccessoryInstaller/Wizards/autospin/assets/AutoSpin_landing.png';
+import AutoSpinStep2Video from 'app/features/AccessoryInstaller/Wizards/autospin/assets/AutoSpin_step2.webm';
 import { AutoSpinGcodePreview } from 'app/features/AccessoryInstaller/Wizards/autospin/components/AutoSpinGcodePreview.tsx';
 import { AutoSpinCompletion } from 'app/features/AccessoryInstaller/Wizards/autospin/components/Completion.tsx';
 import { EepromConfig } from 'app/features/AccessoryInstaller/Wizards/autospin/components/EepromConfig.tsx';
 import { TestAutoSpin } from 'app/features/AccessoryInstaller/Wizards/autospin/components/TestAutoSpin.tsx';
-import AutoSpinIcon from 'app/features/Config/assets/images/autospin.svg';
 import { useMemo } from 'react';
 
 export function useAutoSpinWizard() {
@@ -20,8 +20,7 @@ export function useAutoSpinWizard() {
         () => ({
             id: 'autospin',
             title: 'AutoSpin',
-            image: AutoSpinIcon,
-            invertImageInDarkMode: true,
+            image: AutoSpinLandingImage,
             validations: [...validations],
             helpUrl: 'https://resources.sienci.com/view/as-er-collets/',
             subWizards: [
@@ -58,8 +57,8 @@ export function useAutoSpinWizard() {
                             component: TestAutoSpin,
                             secondaryContent: [
                                 {
-                                    type: 'image',
-                                    content: PlaceholderImage,
+                                    type: 'video',
+                                    content: AutoSpinStep2Video,
                                     title: 'AutoSpin Dial',
                                 },
                                 {
