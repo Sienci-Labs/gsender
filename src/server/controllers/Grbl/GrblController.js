@@ -1678,7 +1678,10 @@ class GrblController {
 				const totalLines = this.sender.state.total;
 				const startEventEnabled = this.event.hasEnabledEvent(PROGRAM_START);
 				log.info(startEventEnabled);
-				this.emit("job:start");
+				this.emit(
+					"job:start",
+					Boolean(lineToStartFrom && lineToStartFrom <= totalLines),
+				);
 
 				this.command("gcode", "%global.state.workspace=modal.wcs");
 

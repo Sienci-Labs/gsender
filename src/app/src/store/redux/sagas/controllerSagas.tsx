@@ -63,6 +63,7 @@ import {
     GRBL,
     LIGHTWEIGHT_OPTIONS,
     GRBL_ACTIVE_STATE_CHECK,
+    METRIC_UNITS,
 } from 'app/constants';
 import {
     closeConnection,
@@ -137,10 +138,30 @@ export function* initialize(): Generator<any, void, any> {
     };
     let hasEstimateData = false;
 
+    const getFileType = () => {
+        if (isLaserMode()) return 'laser';
+
+        if (store.get('workspace.mode') === WORKSPACE_MODE.ROTARY)
+            return 'rotary';
+
+        return 'mill';
+    };
+
     const getMachineAnalyticsContext = () => {
         const state = reduxStore.getState();
+        const firmware = _get(state, 'controller.type') || null;
+        const machineProfile: MachineProfile | undefined = store.get(
+            'workspace.machineProfile',
+        );
+
+        posthog.register({
+            firmware,
+            units: store.get('workspace.units', METRIC_UNITS),
+            machine_profile: machineProfile?.name || null,
+        });
+
         return {
-            firmware: _get(state, 'controller.type') || null,
+            firmware,
             file_name: _get(state, 'file.name') || null,
             total_lines: _get(state, 'file.total') || 0,
         };
@@ -292,10 +313,12 @@ export function* initialize(): Generator<any, void, any> {
         }
 
         if (isNewFile && visualizer !== VISUALIZER_SECONDARY) {
+            const context = getMachineAnalyticsContext();
             posthog.capture('file_loaded', {
+                firmware: context.firmware,
                 file_name: name,
                 file_size_bytes: size,
-                firmware: _get(reduxState, 'controller.type') || null,
+                file_type: getFileType(),
             });
         }
 
@@ -1080,9 +1103,13 @@ export function* initialize(): Generator<any, void, any> {
         }
     });
 
-    controller.addListener('job:start', () => {
+    controller.addListener('job:start', (startFromLine = false) => {
         errors = [];
-        posthog.capture('job_started', getMachineAnalyticsContext());
+        posthog.capture('job_started', {
+            ...getMachineAnalyticsContext(),
+            check_mode: currentState === GRBL_ACTIVE_STATE_CHECK,
+            start_from_line: Boolean(startFromLine),
+        });
     });
 
     controller.addListener('sdcard:files', (file: SDCardFile) => {

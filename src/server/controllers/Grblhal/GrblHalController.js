@@ -2077,7 +2077,10 @@ class GrblHalController {
 				const [lineToStartFrom, zMax, safeHeight = 10] = args;
 				const totalLines = this.sender.state.total;
 				const startEventEnabled = this.event.hasEnabledEvent(PROGRAM_START);
-				this.emit("job:start");
+				this.emit(
+					"job:start",
+					Boolean(lineToStartFrom && lineToStartFrom <= totalLines),
+				);
 
 				const atci = _.get(this.settings, "info.NEWOPT.ATC", "0") === "1";
 
