@@ -126,7 +126,7 @@ You can both run gSender locally using the public code-base as well as compile i
 - In cases where AXS not parsed by controller for grblHAL, default to counting position values reported by firmware.
 - $G types in console now correctly echoes the response in the console instead of being swallowed by the backend.
 - Added new config option - portrait macro bar - which adds usable macros at the bottom of the screen in portrait mode
-
+- Update styling on next button and text in dark mode in Acessorry Install wizards
 
 ### 1.6.3 (July 23, 2026)
 - Added LongMill MK3 profiles.
