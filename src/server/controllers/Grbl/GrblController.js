@@ -2416,7 +2416,7 @@ class GrblController {
 						return;
 					}
 
-					this.command("gcode:load", file, data, context, callback);
+					this.command("gcode:load", { name: file }, data, context, callback);
 				});
 			},
 			"machineprofile:load": () => {
