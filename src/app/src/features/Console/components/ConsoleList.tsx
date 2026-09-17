@@ -46,6 +46,7 @@ function ConsoleLog({ messages }: { messages: ConsoleMessage[] }) {
     const [isAtBottom, setIsAtBottom] = useState(true);
 
     const scrollToLatest = useCallback(() => {
+        setIsAtBottom(true);
         virtuosoRef.current?.scrollToIndex({
             index: 'LAST',
             behavior: 'auto',
