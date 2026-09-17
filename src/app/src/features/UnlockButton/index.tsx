@@ -2,6 +2,7 @@ import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib
 import Tooltip from 'app/components/Tooltip';
 import { GRBL_ACTIVE_STATE_ALARM, GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
 import type { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
+import { homeMachine } from 'app/features/DRO/utils/DRO';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import controller from 'app/lib/controller';
 import type { RootState } from 'app/store/redux';
@@ -13,6 +14,10 @@ import { IoLockClosedOutline, IoLockOpenOutline } from 'react-icons/io5';
 // machine position cannot be trusted. Unlocking straight from this state lets
 // the operator jog/run G-code against a position that is likely wrong.
 const HOMING_FAILURE_ALARM_CODES = [6, 7, 8, 9];
+// ALARM 8/9 specifically mean a limit switch was not found or would not
+// release, so unlike 6/7 they won't be fixed by re-homing alone until the
+// switch/wiring itself is repaired.
+const LIMIT_SWITCH_FAULT_ALARM_CODES = [8, 9];
 
 export function isHomingFailureAlarm(code: string | number): boolean {
     return (
@@ -20,13 +25,39 @@ export function isHomingFailureAlarm(code: string | number): boolean {
     );
 }
 
-export function confirmUnlockAfterHomingFailure(onConfirm: () => void): void {
+export function isLimitSwitchFaultAlarm(code: string | number): boolean {
+    return (
+        typeof code === 'number' &&
+        LIMIT_SWITCH_FAULT_ALARM_CODES.includes(code)
+    );
+}
+
+export function confirmUnlockAfterHomingFailure(
+    code: string | number,
+    onConfirm: () => void,
+): void {
     Confirm({
-        title: 'Homing Failed',
-        content:
-            'Homing failed, so the machine position may be lost. Unlocking without re-homing can result in unexpected movement. Are you sure you want to unlock without re-homing?',
-        onConfirm,
-        confirmLabel: 'Unlock Anyway',
+        title: 'Homing Not Complete',
+        content: (
+            <>
+                <p>
+                    {
+                        'The last homing cycle failed, so the machine position is unknown. Re-home the machine before continuing. Unlocking without re-homing may let jogging or a job run past the limit switches.'
+                    }
+                </p>
+                {isLimitSwitchFaultAlarm(code) && (
+                    <p className="mt-2">
+                        {
+                            'ALARM:8 and ALARM:9 mean a limit switch was not found or would not release, so re-homing will keep failing until the switch or its wiring is fixed. To use the machine without homing until then: choose Unlock Anyway, open Config > Homing/Limits, turn off "Homing cycle enable" ($22) and click Apply Settings.'
+                        }
+                    </p>
+                )}
+            </>
+        ),
+        confirmLabel: 'Rehome',
+        cancelLabel: 'Unlock Anyway',
+        onConfirm: homeMachine,
+        onClose: onConfirm,
     });
 }
 
@@ -38,7 +69,7 @@ export function unlockFirmware(
         if (code === 17 || code === 10) {
             controller.command('reset:limit');
         } else if (isHomingFailureAlarm(code)) {
-            confirmUnlockAfterHomingFailure(() => {
+            confirmUnlockAfterHomingFailure(code, () => {
                 controller.command('unlock');
             });
         } else {

@@ -149,7 +149,7 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
                 }
                 return;
             } else if (isHomingFailureAlarm(alarmCode)) {
-                confirmUnlockAfterHomingFailure(() => {
+                confirmUnlockAfterHomingFailure(alarmCode, () => {
                     controller.command('unlock');
                 });
                 return;
