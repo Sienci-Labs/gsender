@@ -1,5 +1,5 @@
 import { ArrowDown } from 'lucide-react';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Virtuoso, type VirtuosoHandle } from 'react-virtuoso';
 import type { ConsoleMessage } from '../definitions';
 import { MessageIcon } from './MessageIcon';
@@ -41,17 +41,57 @@ function ConsoleRow({ message }: { message: ConsoleMessage }) {
     );
 }
 
+// A momentary not-at-bottom blip from remeasuring a freshly appended row
+// shouldn't flash the FAB, so its "show" transition is debounced below.
+const FAB_HIDE_DEBOUNCE_MS = 180;
+
+// Answered from Virtuoso's own live position rather than app state: a value
+// derived from React state reaches Virtuoso's internal follow-check one
+// commit late, which during rapid streaming can race a batch of appends and
+// leave the list stuck not-following.
+function followOutput(atBottom: boolean) {
+    return atBottom ? 'auto' : false;
+}
+
 function ConsoleLog({ messages }: { messages: ConsoleMessage[] }) {
     const virtuosoRef = useRef<VirtuosoHandle>(null);
     const [isAtBottom, setIsAtBottom] = useState(true);
+    const hideFabTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const clearHideFabTimeout = useCallback(() => {
+        if (hideFabTimeout.current !== null) {
+            clearTimeout(hideFabTimeout.current);
+            hideFabTimeout.current = null;
+        }
+    }, []);
+
+    const handleAtBottomStateChange = useCallback(
+        (atBottom: boolean) => {
+            clearHideFabTimeout();
+
+            if (atBottom) {
+                setIsAtBottom(true);
+                return;
+            }
+
+            hideFabTimeout.current = setTimeout(() => {
+                hideFabTimeout.current = null;
+                setIsAtBottom(false);
+            }, FAB_HIDE_DEBOUNCE_MS);
+        },
+        [clearHideFabTimeout],
+    );
 
     const scrollToLatest = useCallback(() => {
+        clearHideFabTimeout();
         setIsAtBottom(true);
         virtuosoRef.current?.scrollToIndex({
             index: 'LAST',
             behavior: 'auto',
         });
-    }, []);
+    }, [clearHideFabTimeout]);
+
+    useEffect(() => clearHideFabTimeout, [clearHideFabTimeout]);
 
     return (
         <div className={`relative overflow-hidden ${SURFACE}`}>
@@ -65,9 +105,9 @@ function ConsoleLog({ messages }: { messages: ConsoleMessage[] }) {
                 style={{ height: '100%' }}
                 // 'auto' rather than 'smooth': a streaming job appends
                 // continuously and animating every append is just noise.
-                followOutput={isAtBottom ? 'auto' : false}
-                atBottomStateChange={setIsAtBottom}
-                atBottomThreshold={24}
+                followOutput={followOutput}
+                atBottomStateChange={handleAtBottomStateChange}
+                atBottomThreshold={64}
                 // Open on the newest line, however much history is already
                 // buffered.
                 initialTopMostItemIndex={{ index: 'LAST', align: 'end' }}
