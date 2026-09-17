@@ -813,7 +813,10 @@ class GrblController {
 				this.homingFlagSet = determineMachineZeroFlagSet(res, this.settings);
 				this.emit("homing:flag", this.homingFlagSet);
 				this.homingStarted = false;
-				if (!this.hasHomedSet) {
+				if (
+					!this.hasHomedSet &&
+					res.activeState !== GRBL_ACTIVE_STATE_ALARM
+				) {
 					this.hasHomedSet = true;
 					this.emit("homing:has-homed", true);
 				}
@@ -1036,6 +1039,11 @@ class GrblController {
 		this.runner.on("alarm", (res) => {
 			const code = Number(res.message) || undefined;
 			const alarm = _.find(GRBL_ALARMS, { code: code });
+
+			if (code >= 6 && code <= 9 && this.hasHomedSet) {
+				this.hasHomedSet = false;
+				this.emit("homing:has-homed", false);
+			}
 
 			const { lines, received, name } = this.sender.state;
 			const { outstanding } = this.feeder.state;

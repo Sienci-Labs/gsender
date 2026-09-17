@@ -26,7 +26,11 @@ import {
     isATCAvailable,
     sendATCHomingDialog,
 } from 'app/features/ATC/utils/ATCFunctions.ts';
-import { UnlockButton as SmallUnlockButton } from 'app/features/UnlockButton';
+import {
+    confirmUnlockAfterHomingFailure,
+    isHomingFailureAlarm,
+    UnlockButton as SmallUnlockButton,
+} from 'app/features/UnlockButton';
 import cx from 'classnames';
 import get from 'lodash/get';
 import { useEffect, useState } from 'react';
@@ -143,6 +147,11 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
                 } else {
                     controller.command('homing');
                 }
+                return;
+            } else if (isHomingFailureAlarm(alarmCode)) {
+                confirmUnlockAfterHomingFailure(alarmCode, () => {
+                    controller.command('unlock');
+                });
                 return;
             }
         } else if (displayActiveState === GRBL_ACTIVE_STATE_HOLD) {
