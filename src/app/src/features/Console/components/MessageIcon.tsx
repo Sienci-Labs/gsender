@@ -34,7 +34,7 @@ const ICONS: Record<
     },
     error: {
         Icon: CircleAlert,
-        className: 'text-red-500 dark:text-red-400',
+        className: 'text-yellow-500 dark:text-yellow-400',
         label: 'Error',
     },
     alarm: {

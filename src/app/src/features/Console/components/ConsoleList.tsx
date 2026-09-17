@@ -14,7 +14,7 @@ const TEXT_BY_TYPE: Record<string, string> = {
     gcode: 'text-gray-900 dark:text-content-primary',
     response: 'text-gray-500 dark:text-content-muted',
     warning: 'text-orange-600 dark:text-orange-300',
-    error: 'text-red-600 dark:text-red-400',
+    error: 'text-yellow-600 dark:text-yellow-400',
     alarm: 'text-red-700 dark:text-red-500 font-medium',
     system: 'text-green-700 dark:text-green-300',
 };
@@ -26,8 +26,8 @@ const SURFACE =
 
 function ConsoleRow({ message }: { message: ConsoleMessage }) {
     return (
-        <div className="flex items-start gap-2 px-2 py-1 min-h-[34px] border-b border-gray-100 dark:border-white/5">
-            <span className="flex items-center justify-center w-4 shrink-0 pt-[3px]">
+        <div className="flex items-center gap-2 px-2 py-1 min-h-[34px] border-b border-gray-50 dark:border-white/[0.03]">
+            <span className="flex items-center justify-center w-4 shrink-0">
                 <MessageIcon type={message.type} />
             </span>
             <span
