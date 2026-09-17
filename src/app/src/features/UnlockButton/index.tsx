@@ -1,3 +1,4 @@
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 import Tooltip from 'app/components/Tooltip';
 import { GRBL_ACTIVE_STATE_ALARM, GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
 import type { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
@@ -8,6 +9,27 @@ import cx from 'classnames';
 import get from 'lodash/get';
 import { IoLockClosedOutline, IoLockOpenOutline } from 'react-icons/io5';
 
+// Grbl ALARM codes 6-9 mean the homing cycle itself failed, so the reported
+// machine position cannot be trusted. Unlocking straight from this state lets
+// the operator jog/run G-code against a position that is likely wrong.
+const HOMING_FAILURE_ALARM_CODES = [6, 7, 8, 9];
+
+export function isHomingFailureAlarm(code: string | number): boolean {
+    return (
+        typeof code === 'number' && HOMING_FAILURE_ALARM_CODES.includes(code)
+    );
+}
+
+export function confirmUnlockAfterHomingFailure(onConfirm: () => void): void {
+    Confirm({
+        title: 'Homing Failed',
+        content:
+            'Homing failed, so the machine position may be lost. Unlocking without re-homing can result in unexpected movement. Are you sure you want to unlock without re-homing?',
+        onConfirm,
+        confirmLabel: 'Unlock Anyway',
+    });
+}
+
 export function unlockFirmware(
     state: GRBL_ACTIVE_STATES_T,
     code: string | number,
@@ -15,6 +37,10 @@ export function unlockFirmware(
     if (state === GRBL_ACTIVE_STATE_ALARM) {
         if (code === 17 || code === 10) {
             controller.command('reset:limit');
+        } else if (isHomingFailureAlarm(code)) {
+            confirmUnlockAfterHomingFailure(() => {
+                controller.command('unlock');
+            });
         } else {
             controller.command('unlock');
         }
