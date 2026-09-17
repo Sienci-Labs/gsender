@@ -35,3 +35,8 @@ cypress/reports/
 cypress/Reports/
 cypress/downloads/
 
+plugins/**/ui/*
+packages/plugin-sdk/dist
+
+/.claude
+CLAUDE.md

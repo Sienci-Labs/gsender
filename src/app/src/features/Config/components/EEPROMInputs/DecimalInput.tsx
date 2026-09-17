@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './index.module.styl';
 import ControlledNumberInput from './ControlledNumberInput';
 
-const DecimalInput = ({ info, setting, onChange, disabled }) => {
+const DecimalInput = ({ info, setting, onChange, disabled, min, max }) => {
     const { unit = null } = info;
     let { value } = setting;
     value = Number(value);
@@ -15,6 +15,8 @@ const DecimalInput = ({ info, setting, onChange, disabled }) => {
                 value={value}
                 externalOnChange={onChange}
                 disabled={disabled}
+                min={min}
+                max={max}
             />
             {unit && (
                 <span className="absolute right-2 text-xs flex items-center pointer-events-none text-gray-500">
