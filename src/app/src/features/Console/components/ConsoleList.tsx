@@ -10,23 +10,24 @@ import { MessageIcon } from './MessageIcon';
  * anchor line, what the machine answered sits back. Adding a colour here would
  * tint most of the console during a job.
  */
+// The console content is always dark-styled, regardless of the app's
+// light/dark mode, so these are unconditional rather than `dark:` variants.
 const TEXT_BY_TYPE: Record<string, string> = {
-    gcode: 'text-gray-900 dark:text-content-primary',
-    response: 'text-gray-500 dark:text-content-muted',
-    warning: 'text-orange-600 dark:text-orange-300',
-    error: 'text-yellow-600 dark:text-yellow-400',
-    alarm: 'text-red-700 dark:text-red-500 font-medium',
-    system: 'text-green-700 dark:text-green-300',
+    gcode: 'text-content-primary',
+    response: 'text-content-muted',
+    warning: 'text-orange-300',
+    error: 'text-yellow-400',
+    alarm: 'text-red-500 font-medium',
+    system: 'text-green-300',
 };
 
-const DEFAULT_TEXT = 'text-gray-700 dark:text-content-secondary';
+const DEFAULT_TEXT = 'text-content-secondary';
 
-const SURFACE =
-    'h-full rounded bg-white dark:bg-surface-sunken border border-gray-200 dark:border-white/10';
+const SURFACE = 'h-full rounded bg-surface-sunken border border-white/10';
 
 function ConsoleRow({ message }: { message: ConsoleMessage }) {
     return (
-        <div className="flex items-center gap-2 px-2 py-1 min-h-[34px] border-b border-gray-50 dark:border-white/[0.03]">
+        <div className="flex items-center gap-2 px-2 py-1 min-h-[34px] border-b border-white/[0.03]">
             <span className="flex items-center justify-center w-4 shrink-0">
                 <MessageIcon type={message.type} />
             </span>
@@ -153,7 +154,7 @@ export function ConsoleList({
     if (messages.length === 0) {
         return (
             <div className={`flex items-center justify-center ${SURFACE}`}>
-                <span className="console-text text-xs italic text-gray-400 dark:text-content-muted">
+                <span className="console-text text-xs italic text-content-muted">
                     {isFiltered
                         ? 'No messages match this filter'
                         : 'No console output yet'}
