@@ -57,4 +57,5 @@ export interface Wizard {
     subWizards: SubWizard[];
     validations: (() => ValidationResult)[];
     helpUrl?: string;
+    provider?: ComponentType<{ children: ReactNode }>;
 }

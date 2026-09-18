@@ -2,6 +2,7 @@ import { useSienciATCWizard } from 'app/features/AccessoryInstaller/Wizards/atc/
 import { useAutoSpinWizard } from 'app/features/AccessoryInstaller/Wizards/autospin/AutoSpin.tsx';
 import { useSienciSpindle } from 'app/features/AccessoryInstaller/Wizards/spindle/Spindle.tsx';
 import { useSienciTLSWizard } from 'app/features/AccessoryInstaller/Wizards/tls/TLS.tsx';
+import { useVacuumTableWizard } from 'app/features/AccessoryInstaller/Wizards/vacuum-table/VacuumTable.tsx';
 import { useMemo } from 'react';
 
 export function useAllWizards() {
@@ -9,8 +10,9 @@ export function useAllWizards() {
     const spindle = useSienciSpindle();
     const tls = useSienciTLSWizard();
     const autospin = useAutoSpinWizard();
+    const vacuumTable = useVacuumTableWizard();
     return useMemo(
-        () => [atc, spindle, tls, autospin],
-        [atc, spindle, tls, autospin],
+        () => [atc, spindle, tls, autospin, vacuumTable],
+        [atc, spindle, tls, autospin, vacuumTable],
     );
 }

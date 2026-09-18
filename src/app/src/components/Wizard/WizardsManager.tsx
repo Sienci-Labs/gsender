@@ -1,6 +1,6 @@
 // if you have multiple wizards and need a hub, import this component
 
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import type { Wizard } from './types/wizard';
 import { WizardManager } from './WizardManager';
 import { WizardsHub } from './WizardsHub';
@@ -52,15 +52,19 @@ export function WizardsManager({
         setSelectedWizard(null);
     };
 
+    const Provider = selectedWizard?.provider ?? Fragment;
+
     return (
         <div className="h-full min-h-0 overflow-hidden">
             {selectedWizard ? (
-                <WizardManager
-                    wizard={selectedWizard}
-                    onExit={handleExitWizard}
-                    isHub={true}
-                    initialSubWizardId={initialSubWizardId}
-                />
+                <Provider>
+                    <WizardManager
+                        wizard={selectedWizard}
+                        onExit={handleExitWizard}
+                        isHub={true}
+                        initialSubWizardId={initialSubWizardId}
+                    />
+                </Provider>
             ) : (
                 <WizardsHub
                     wizards={wizards}
