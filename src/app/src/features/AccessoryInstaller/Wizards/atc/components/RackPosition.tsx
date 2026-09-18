@@ -179,7 +179,7 @@ export function RackPosition({ onComplete }: StepProps) {
                             incorrectly.
                         </b>
                     </p>
-                    <ol className="list-decimal p-5 gap-4 space-y-2">
+                    <ol className="list-decimal p-5 gap-4 space-y-2 dark:text-white">
                         <li>
                             Install a tool holder (with pull-stud removed) into
                             the left-most slot

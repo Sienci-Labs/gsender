@@ -108,7 +108,6 @@ const StartFromLine = ({
             line: startFromLine,
             safe_height: safeHeight,
             z_max: zMax,
-            newSafeHeight,
             delay,
         });
     };

@@ -319,9 +319,6 @@ const ControlButton: React.FC<ControlButtonProps> = ({
                 return;
             }
             controller.command('gcode:start');
-            posthog?.capture('job_started', {
-                active_state: currentActiveState,
-            });
             return;
         }
     };

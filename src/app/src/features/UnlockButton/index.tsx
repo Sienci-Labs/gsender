@@ -7,6 +7,7 @@ import type { RootState } from 'app/store/redux';
 import cx from 'classnames';
 import get from 'lodash/get';
 import { IoLockClosedOutline, IoLockOpenOutline } from 'react-icons/io5';
+import posthog from 'posthog-js';
 
 export function unlockFirmware(
     state: GRBL_ACTIVE_STATES_T,
@@ -14,8 +15,18 @@ export function unlockFirmware(
 ) {
     if (state === GRBL_ACTIVE_STATE_ALARM) {
         if (code === 17 || code === 10) {
+            posthog.capture('machine_unlocked', {
+                alarm_code: code,
+                active_state: state,
+                method: 'reset_limit',
+            });
             controller.command('reset:limit');
         } else {
+            posthog.capture('machine_unlocked', {
+                alarm_code: code,
+                active_state: state,
+                method: 'unlock',
+            });
             controller.command('unlock');
         }
 
@@ -24,6 +35,11 @@ export function unlockFirmware(
         }
         return;
     }
+    posthog.capture('machine_unlocked', {
+        alarm_code: code,
+        active_state: state,
+        method: 'cycle_start',
+    });
     controller.command('cyclestart');
 }
 

@@ -210,6 +210,14 @@ jobs:
           mkdir -p releases/windows
           ls -al output
           cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-x64.exe" "releases/windows/gSender-${PACKAGE_VERSION}-Windows-64Bit.exe"
+          # electron-updater's latest.yml references the artifact by electron-builder's
+          # original (un-renamed) filename, and validates it against the matching
+          # .blockmap for differential downloads. All three must be uploaded together,
+          # under their original names, or auto-update breaks even though the
+          # human-friendly renamed .exe above still downloads fine manually.
+          cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-x64.exe" "releases/windows/"
+          cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-x64.exe.blockmap" "releases/windows/"
+          cp -af "output/latest.yml" "releases/windows/"
           ls -al output releases/windows
           if [[ "$GITHUB_REF_TYPE" == "branch" && "$GITHUB_REF_NAME" == "master" ]]; then
             yarn github-release delete \
@@ -217,7 +225,7 @@ jobs:
               --repo=gsender \
               --tag="${GITHUB_REF_NAME}-latest" \
               --release-name="${GITHUB_REF_NAME}" \
-              "*-windows*";
+              "*-windows*" "*.exe" "*.blockmap" "latest.yml";
             yarn github-release upload \
               --owner=gSender \
               --repo=gsender \

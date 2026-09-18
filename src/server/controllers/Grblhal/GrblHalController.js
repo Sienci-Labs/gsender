@@ -2356,7 +2356,10 @@ class GrblHalController {
 				const [lineToStartFrom, zMax, safeHeight = 10] = args;
 				const totalLines = this.sender.state.total;
 				const startEventEnabled = this.event.hasEnabledEvent(PROGRAM_START);
-				this.emit("job:start");
+				this.emit(
+					"job:start",
+					Boolean(lineToStartFrom && lineToStartFrom <= totalLines),
+				);
 
 				const atci = _.get(this.settings, "info.NEWOPT.ATC", "0") === "1";
 
@@ -2966,6 +2969,9 @@ class GrblHalController {
 				this.write("$");
 			},
 			"toolchange:acknowledge": () => {
+				this.emit("serialport:write", "Toolchange Ack sent", {
+					source: WRITE_SOURCE_FEEDER,
+				});
 				this.write(GRBLHAL_REALTIME_COMMANDS.TOOL_CHANGE_ACK);
 			},
 			virtual_stop_toggle: () => {

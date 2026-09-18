@@ -45,7 +45,7 @@ export function ModbusConfig({ onComplete, onUncomplete }: StepProps) {
             <p className="dark:text-content-primary">
                 Additional spindle settings are applied in this step.
             </p>
-            <ol className="list-decimal p-5 gap-4 space-y-2">
+            <ol className="list-decimal p-5 gap-4 space-y-2 dark:text-white">
                 <li>
                     Reconnect to your controller. Please ignore any alarms that
                     pop-up.

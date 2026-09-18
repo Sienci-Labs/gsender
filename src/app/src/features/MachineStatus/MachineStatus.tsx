@@ -46,6 +46,7 @@ import controller from '../../lib/controller';
 import AlarmDescriptionIcon from './AlarmDescriptionIcon';
 import type { ALARM_CODE } from './definitions';
 import UnlockButton from './UnlockButton';
+import posthog from 'posthog-js';
 
 interface MachineStatusProps {
     alarmCode: ALARM_CODE;
@@ -135,6 +136,11 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
                 alarmCode === 14 ||
                 alarmCode === 17
             ) {
+                posthog.capture('machine_unlocked', {
+                    alarm_code: alarmCode,
+                    active_state: displayActiveState,
+                    method: 'reset_limit',
+                });
                 controller.command('reset:limit');
                 return;
             } else if (alarmCode === 'Homing' || alarmCode === 11) {
@@ -146,8 +152,18 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
                 return;
             }
         } else if (displayActiveState === GRBL_ACTIVE_STATE_HOLD) {
+            posthog.capture('machine_unlocked', {
+                alarm_code: alarmCode,
+                active_state: displayActiveState,
+                method: 'cycle_start',
+            });
             return controller.command('cyclestart');
         }
+        posthog.capture('machine_unlocked', {
+            alarm_code: alarmCode,
+            active_state: displayActiveState,
+            method: 'unlock',
+        });
         controller.command('unlock');
     };
 

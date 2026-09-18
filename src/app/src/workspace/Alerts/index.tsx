@@ -1,4 +1,3 @@
-import { usePostHog } from '@posthog/react';
 import api from 'app/api';
 import type {
     Job,
@@ -22,8 +21,6 @@ export const Alerts = () => {
     const [tasks, setTasks] = useState<MaintenanceTask[]>([]);
     const [job, setJob] = useState<Job>(null);
     const [errors, setErrors] = useState([]);
-
-    const posthog = usePostHog();
 
     const handleStoreChange = () => {
         setShowJobEndModal(false);
@@ -61,8 +58,6 @@ export const Alerts = () => {
             pubsub.subscribe('lastJob', (_, job) => {
                 setJob(job);
                 setShowJobEndModal(true);
-
-                posthog?.capture('job:end', { job });
             }),
         ];
 

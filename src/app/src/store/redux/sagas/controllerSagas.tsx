@@ -29,14 +29,17 @@ import {
     ERROR,
     FILE_TYPE,
     GRBL,
+    GRBL_ACTIVE_STATE_ALARM,
     GRBL_ACTIVE_STATE_CHECK,
     GRBL_ACTIVE_STATE_HOLD,
+    GRBL_ACTIVE_STATE_HOME,
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_RUN,
     isHomingRequiredAlarm,
     JOB_STATUS,
     JOB_TYPES,
     LIGHTWEIGHT_OPTIONS,
+    METRIC_UNITS,
     RENDER_LOADING,
     RENDER_NO_FILE,
     RENDER_RENDERED,
@@ -44,7 +47,6 @@ import {
     VISUALIZER_SECONDARY,
     WORKSPACE_MODE,
 } from 'app/constants';
-import type { AlarmsErrors } from 'app/definitions/alarms_errors';
 import type {
     EEPROMDescriptions,
     FIRMWARE_TYPES_T,
@@ -60,9 +62,6 @@ import {
     isAccessoryConnected,
 } from 'app/features/AccessoryConnectivity/accessoryAutoconfigKeys';
 import { showAccessoryConnectivityToast } from 'app/features/AccessoryConnectivity/showAccessoryConnectivityToast';
-import { KeepoutToggle } from 'app/features/ATC/components/KeepOut/KeepOutToggle.tsx';
-import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
-import type { Spindle } from 'app/features/Spindle/definitions';
 import type {
     Job,
     MaintenanceTask,
@@ -95,13 +94,12 @@ import type VisualizeWorker from 'app/workers/Visualize.worker';
 import type { WORKSPACE_MODE_T } from 'app/workspace/definitions';
 import isElectron from 'is-electron';
 import _get from 'lodash/get';
-import get from 'lodash/get';
 import _throttle from 'lodash/throttle';
 import pubsub from 'pubsub-js';
-import type {
-    AlarmsData,
-    ControllerSettings,
-    ControllerStateState,
+import {
+	AlarmsData,
+	ControllerSettings,
+	ControllerStateState,
     FILE_TYPE_T,
     NetworkAddress,
     PortInfo,
@@ -141,6 +139,12 @@ import {
 } from '../slices/fileInfo.slice';
 import { setIpList } from '../slices/preferences.slice';
 import { updateJobOverrides } from '../slices/visualizer.slice';
+import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
+import get from 'lodash/get';
+import posthog from 'posthog-js';
+import { AlarmsErrors } from 'app/definitions/alarms_errors';
+import { Spindle } from 'app/features/Spindle/definitions';
+import { KeepoutToggle } from 'app/features/ATC/components/KeepOut/KeepOutToggle';
 
 interface Error {
     type: typeof ALARM | typeof ERROR;
@@ -170,6 +174,35 @@ export function* initialize(): Generator<null, void, unknown> {
     let accessoryBaselineConnected: Partial<
         Record<AccessoryAutoconfigKey, boolean>
     > = {};
+
+    const getFileType = () => {
+        if (isLaserMode()) return 'laser';
+
+        if (store.get('workspace.mode') === WORKSPACE_MODE.ROTARY)
+            return 'rotary';
+
+        return 'mill';
+    };
+
+    const getMachineAnalyticsContext = () => {
+        const state = reduxStore.getState();
+        const firmware = _get(state, 'controller.type') || null;
+        const machineProfile: MachineProfile | undefined = store.get(
+            'workspace.machineProfile',
+        );
+
+        posthog.register({
+            firmware,
+            units: store.get('workspace.units', METRIC_UNITS),
+            machine_profile: machineProfile?.name || null,
+        });
+
+        return {
+            firmware,
+            file_name: _get(state, 'file.name') || null,
+            total_lines: _get(state, 'file.total') || 0,
+        };
+    };
 
     const clearEstimateDataCache = () => {
         latestEstimateData = {
@@ -314,6 +347,16 @@ export function* initialize(): Generator<null, void, unknown> {
         } = fileData;
         if (content === prevContent && size === prevSize && name === prevName) {
             isNewFile = false;
+        }
+
+        if (isNewFile && visualizer !== VISUALIZER_SECONDARY) {
+            const context = getMachineAnalyticsContext();
+            posthog.capture('file_loaded', {
+                firmware: context.firmware,
+                file_name: name,
+                file_size_bytes: size,
+                file_type: getFileType(),
+            });
         }
 
         // Ensure a previous parse worker does not continue emitting stale messages.
@@ -472,6 +515,23 @@ export function* initialize(): Generator<null, void, unknown> {
             if (currentState !== state.status.activeState) {
                 prevState = currentState;
                 currentState = state.status.activeState;
+
+                if (currentState === GRBL_ACTIVE_STATE_HOME) {
+                    posthog.capture('homing_started', { firmware: type });
+                } else if (
+                    prevState === GRBL_ACTIVE_STATE_HOME &&
+                    currentState === GRBL_ACTIVE_STATE_IDLE
+                ) {
+                    posthog.capture('homing_completed', { firmware: type });
+                } else if (
+                    prevState === GRBL_ACTIVE_STATE_HOME &&
+                    currentState === GRBL_ACTIVE_STATE_ALARM
+                ) {
+                    posthog.capture('homing_failed', {
+                        firmware: type,
+                        alarm_code: state.status?.alarmCode,
+                    });
+                }
             }
             if (tool) {
                 state.parserstate.modal.tool = tool;
@@ -506,6 +566,15 @@ export function* initialize(): Generator<null, void, unknown> {
                 }),
             );
             pubsub.publish('job:end', { status, errors });
+
+            if (status.finishTime > 0) {
+                posthog.capture('job_completed', {
+                    ...getMachineAnalyticsContext(),
+                    duration_ms: status.elapsedTime,
+                    error_count: errors.length,
+                });
+            }
+
             errors = [];
         }
 
@@ -613,6 +682,10 @@ export function* initialize(): Generator<null, void, unknown> {
             // create a pop up so the user can connect to the last active port
             // and resume from the last line
             if (currentLineRunning) {
+                posthog.capture('connection_lost', {
+                    ...getMachineAnalyticsContext(),
+                    last_line: currentLineRunning,
+                });
                 const homingEnabled: string = _get(
                     reduxStore.getState(),
                     'controller.settings.settings.$22',
@@ -964,6 +1037,14 @@ export function* initialize(): Generator<null, void, unknown> {
                 `${error.type === ALARM ? 'Alarm' : 'Error'} ${error.code}: ${error.description}`,
                 { position: 'bottom-right' },
             );
+
+			posthog.capture(
+				error.type === ALARM ? 'alarm_raised' : 'controller_error',
+				{
+					code: error.code,
+					was_job_running: Boolean(_wasRunning),
+				},
+			);
         }
 
         pubsub.publish('error', error);
@@ -1059,8 +1140,13 @@ export function* initialize(): Generator<null, void, unknown> {
         }
     });
 
-    controller.addListener('job:start', () => {
+    controller.addListener('job:start', (startFromLine = false) => {
         errors = [];
+        posthog.capture('job_started', {
+            ...getMachineAnalyticsContext(),
+            check_mode: currentState === GRBL_ACTIVE_STATE_CHECK,
+            start_from_line: Boolean(startFromLine),
+        });
     });
 
     controller.addListener('sdcard:files', (file: SDCardFile) => {
