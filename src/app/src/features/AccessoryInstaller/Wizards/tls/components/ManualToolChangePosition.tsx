@@ -3,6 +3,7 @@ import type { StepProps } from 'app/components/Wizard/types';
 import { IMPERIAL_UNITS } from 'app/constants';
 import { PositionSetter } from 'app/features/AccessoryInstaller/Wizards/atc/components/PositionSetter.tsx';
 import { getDefaultToolChangePositionMM } from 'app/features/AccessoryInstaller/Wizards/tls/utils/defaultToolChangePosition.ts';
+import { isBitSetInNumber } from 'app/features/DRO/utils/RapidPosition';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import controller from 'app/lib/controller.ts';
 import { in2mm, mapPositionToUnits } from 'app/lib/units.ts';
@@ -29,6 +30,17 @@ export function ManualToolChangePosition({
 
     const { units } = useWorkspaceState();
     const mpos = useSelector((state: RootState) => state.controller.mpos);
+    const setMachineOrigin = isBitSetInNumber(
+        useSelector(
+            (state: RootState) => state.controller.settings.settings.$22 ?? '0',
+        ),
+        3,
+    );
+    const pulloffDistance = Number(
+        useSelector(
+            (state: RootState) => state.controller.settings.settings.$27 ?? 1,
+        ),
+    );
     const isManuallyEditing = useRef(false);
     const mposAtMountRef = useRef(mpos);
     const lastSetMposRef = useRef<Position | undefined>(undefined);
@@ -91,8 +103,9 @@ export function ManualToolChangePosition({
             y: toMM(position.y),
             z: toMM(position.z),
         };
+        const zMove = setMachineOrigin ? -1 : -pulloffDistance;
         controller.command('gcode', [
-            'G53 G21 G0 Z-1',
+            `G53 G21 G0 Z${zMove}`,
             `G53 G21 G0 X${target.x} Y${target.y}`,
             `G53 G21 G0 Z${target.z}`,
         ]);

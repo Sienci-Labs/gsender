@@ -306,6 +306,8 @@ export const SettingRow = React.memo(function SettingRow({
                 resetHandler={handleSingleSettingReset}
                 linkLabel={setting.toolLink}
                 link={setting.toolLinkLabel}
+                min={setting.min}
+                max={setting.max}
             />
         );
     }
