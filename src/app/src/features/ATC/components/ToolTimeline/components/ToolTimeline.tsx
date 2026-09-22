@@ -3,7 +3,10 @@ import { WORKFLOW_STATE_IDLE } from 'app/constants';
 import type { ToolInstance } from 'app/features/ATC/components/ToolTable.tsx';
 import { ToolRemapDialog } from 'app/features/ATC/components/ToolTimeline/components/ToolRemapDialog.tsx';
 import type { ToolProbeState } from 'app/features/ATC/types.ts';
-import { mapToolNicknamesAndStatus } from 'app/features/ATC/utils/ATCFunctions.ts';
+import {
+    getRackConfig,
+    mapToolNicknamesAndStatus,
+} from 'app/features/ATC/utils/ATCFunctions.ts';
 import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import type { RootState } from 'app/store/redux';
@@ -47,15 +50,10 @@ export function ToolTimeline({
     const workflowState = useTypedSelector(
         (state: RootState) => state.controller.workflow.state,
     );
-    const reportedRackSize = Number(get(settings, 'atci.rack_size', -1));
     const atcAvailable = get(settings, 'info.NEWOPT.ATC', '0') === '1';
     const allowManualBadge = isConnected && atcAvailable;
     const remapDisabled = workflowState !== WORKFLOW_STATE_IDLE;
-    const rackSize =
-        reportedRackSize > 0
-            ? reportedRackSize
-            : Object.values(toolTableData || {}).length;
-    const hasToolTable = Object.values(toolTableData || {}).length > 0;
+    const { rackSize, toolTableSize, hasToolTable } = getRackConfig(settings);
     useEffect(() => {
         setToolTable(mapToolNicknamesAndStatus(toolTableData, rackSize));
     }, [toolTableData, rackSize]);
@@ -193,6 +191,15 @@ export function ToolTimeline({
                                           ? toolLookupNumber > rackSize
                                           : false))
                                     : false;
+                                // Gated the same as canRemap/isManual: if the
+                                // remap button isn't available (ATC off or
+                                // disconnected), flagging a tool as needing a
+                                // remap it can't perform is just noise.
+                                const isOutOfRange =
+                                    allowManualBadge &&
+                                    hasToolTable &&
+                                    toolTableSize > 0 &&
+                                    toolLookupNumber > toolTableSize;
                                 const itemKey = `${tool.index}-${tool.toolNumber}-${tool.startLine ?? index}`;
                                 return (
                                     <div
@@ -218,6 +225,7 @@ export function ToolTimeline({
                                             isRemapped={isRemapped}
                                             remapValue={remapValue}
                                             isManual={isManual}
+                                            isOutOfRange={isOutOfRange}
                                             probeState={probeState}
                                             showProbeStatus={
                                                 hasToolTable && atcAvailable

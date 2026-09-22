@@ -3,7 +3,7 @@ import type {
     IToolListing,
     ToolInstance,
 } from 'app/features/ATC/components/ToolTable.tsx';
-import type { ToolFlags } from 'app/features/ATC/types.ts';
+import type { RackConfig, ToolFlags } from 'app/features/ATC/types.ts';
 import { TOOLPATH_COLOR_HEXES } from 'app/features/Visualizer/constants';
 import controller from 'app/lib/controller.ts';
 import { toast } from 'app/lib/toaster';
@@ -61,6 +61,33 @@ export function getToolFlags(
         probeState: isToolProbed(zOffset) ? 'probed' : 'unprobed',
         isManual: toolNumber > rackSize,
     };
+}
+
+export function getRackConfig(settings: Record<string, any>): RackConfig {
+    const toolTableData = get(settings, 'toolTable', {});
+    const toolTableSize = Object.values(toolTableData || {}).length;
+    const reportedRackSize = Number(get(settings, 'atci.rack_size', -1));
+    // Rack size (physical ATC pockets) and tool table size (how many tool
+    // slots the firmware tracks offsets for) are independent settings - a
+    // machine can have more tools in its table than fit in the rack, with
+    // the excess loaded manually. Only fall back to the tool table size here
+    // when no rack size has been reported at all.
+    const rackSize = reportedRackSize > 0 ? reportedRackSize : toolTableSize;
+    return { rackSize, toolTableSize, hasToolTable: toolTableSize > 0 };
+}
+
+export function getOutOfRangeTools(
+    toolSet: (string | number)[],
+    toolTableSize: number,
+    hasToolTable: boolean,
+): number[] {
+    if (!hasToolTable || toolTableSize <= 0 || !toolSet?.length) {
+        return [];
+    }
+    const numbers = toolSet
+        .map((t) => Number(String(t).replace(/^T/i, '')))
+        .filter((n) => Number.isFinite(n) && n > toolTableSize);
+    return Array.from(new Set(numbers)).sort((a, b) => a - b);
 }
 
 function setToolStatus(tool: ToolInstance, rackSize): ToolInstance {

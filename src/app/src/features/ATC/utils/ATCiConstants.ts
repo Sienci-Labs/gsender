@@ -22,9 +22,15 @@ export interface ToolStateThemes {
     empty: ToolStateTheme;
     current: ToolStateTheme;
     error: ToolStateTheme;
+    warn: ToolStateTheme;
 }
 
-import { FaBan, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
+import {
+    FaBan,
+    FaCheckCircle,
+    FaExclamationCircle,
+    FaExclamationTriangle,
+} from 'react-icons/fa';
 import { IoFlash } from 'react-icons/io5';
 import { PiEmpty, PiHandTap } from 'react-icons/pi';
 
@@ -74,6 +80,15 @@ export const toolStateThemes: ToolStateThemes = {
         textColor: 'text-red-800 dark:text-red-500',
         backgroundStyle: 'striped-diagonal',
         icon: FaBan,
+    },
+
+    warn: {
+        label: 'Needs Remap',
+        backgroundColor: 'bg-orange-500/20 dark:bg-orange-500/40',
+        borderColor: 'border-orange-700',
+        textColor: 'text-orange-700 dark:text-orange-400',
+        backgroundStyle: 'striped-diagonal',
+        icon: FaExclamationTriangle,
     },
 };
 
