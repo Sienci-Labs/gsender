@@ -25,6 +25,7 @@ import {
 } from 'app/features/ATC/utils/ATCFunctions.ts';
 import { toolStateThemes } from 'app/features/ATC/utils/ATCiConstants.ts';
 import { useToolChange } from 'app/features/ATC/utils/ToolChangeContext.tsx';
+import { useOpenInteractionGuard } from 'app/hooks/useOpenInteractionGuard.ts';
 import { cn } from 'app/lib/utils';
 import { Loader2 } from 'lucide-react';
 import type React from 'react';
@@ -62,6 +63,7 @@ const ToolChangerPopover: React.FC<ToolChangerPopoverProps> = ({
     const { mode, rackSize, connected, atcAvailable } = useToolChange();
     const [selectedToolId, setSelectedToolId] = useState<string>('1');
     const [isLoading, setIsLoading] = useState(false);
+    const isInteractive = useOpenInteractionGuard(isOpen);
 
     const selectedTool =
         tools.find((tool) => tool.id === selectedToolId) || tools[0];
@@ -142,7 +144,12 @@ const ToolChangerPopover: React.FC<ToolChangerPopoverProps> = ({
                 side={contentSide}
                 sideOffset={contentSideOffset}
             >
-                <div className="space-y-2">
+                <div
+                    className={cn(
+                        'space-y-2',
+                        !isInteractive && 'pointer-events-none',
+                    )}
+                >
                     <div>
                         <h3 className="text-lg font-semibold text-slate-800 dark:text-content-primary">
                             {getModeTitle(mode)}
@@ -215,7 +222,7 @@ const ToolChangerPopover: React.FC<ToolChangerPopoverProps> = ({
 
                         <Button
                             onClick={handleLoad}
-                            disabled={disabled || isLoading}
+                            disabled={disabled || isLoading || !isInteractive}
                             variant="primary"
                             className="shrink-0"
                         >
