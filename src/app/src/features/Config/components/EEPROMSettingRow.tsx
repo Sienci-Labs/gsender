@@ -22,6 +22,8 @@ interface EEPROMSettingRowProps {
     resetHandler: (setting: EEPROM, value: string | number) => void;
     link?: string;
     linkLabel?: string;
+    min?: number;
+    max?: number;
 }
 
 function filterNewlines(data = '') {
@@ -37,6 +39,8 @@ export function EEPROMSettingRow({
     resetHandler,
     link = null,
     linkLabel = null,
+    min,
+    max
 }: EEPROMSettingRowProps) {
     const { EEPROM, eepromMap, machineProfile, firmwareType, eepromIsDefault } =
         useSettings();
@@ -141,6 +145,8 @@ export function EEPROMSettingRow({
                         info={EEPROMData}
                         setting={EEPROMData}
                         onChange={changeHandler(EEPROMData.globalIndex)}
+                        min={min}
+                        max={max}
                     />
                     {link && (
                         <div>

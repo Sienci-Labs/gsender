@@ -1,5 +1,6 @@
 import Button from 'app/components/Button';
 import { ControlledInput } from 'app/components/ControlledInput';
+import { isBitSetInNumber } from 'app/features/DRO/utils/RapidPosition';
 import controller from 'app/lib/controller.ts';
 import type { RootState } from 'app/store/redux';
 import { FaChartLine } from 'react-icons/fa';
@@ -25,6 +26,17 @@ export function LocationInput({
     const isConnected = useSelector(
         (state: RootState) => state.connection.isConnected,
     );
+    const setMachineOrigin = isBitSetInNumber(
+        useSelector(
+            (state: RootState) => state.controller.settings.settings.$22 ?? '0',
+        ),
+        3,
+    );
+    const pulloffDistance = Number(
+        useSelector(
+            (state: RootState) => state.controller.settings.settings.$27 ?? 1,
+        ),
+    );
 
     function grabLocation() {
         const location = {
@@ -38,8 +50,10 @@ export function LocationInput({
     function gotoLocation() {
         const code = [];
         const location = value;
+        // if machine origin doesn't set to 0 on homing, we need to use the pulloff distance
+        const zMove = setMachineOrigin ? -1 : -pulloffDistance;
         code.push(
-            `G53 G0 Z-1`,
+            `G53 G0 Z${zMove}`,
             `G53 G0 X${location.x} Y${location.y}`,
             `G53 G0 Z${location.z}`,
         );

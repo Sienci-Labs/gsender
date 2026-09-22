@@ -7,6 +7,7 @@ import {
     LOCATION_CATEGORY,
     WORKFLOW_STATE_RUNNING,
 } from 'app/constants';
+import { isBitSetInNumber } from 'app/features/DRO/utils/RapidPosition';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import controller from 'app/lib/controller.ts';
 import useKeybinding from 'app/lib/useKeybinding';
@@ -21,8 +22,18 @@ export function goToParkLocation() {
     const park = store.get('workspace.park', {});
     const code = [];
 
+    const settings = get(
+        reduxStore.getState(),
+        'controller.settings.settings',
+        {},
+    );
+    const setMachineOrigin = isBitSetInNumber(get(settings, '$22', '0'), 3);
+    const pulloffDistance = Number(get(settings, '$27', 1));
+    // if machine origin doesn't set to 0 on homing, we need to use the pulloff distance
+    const zMove = setMachineOrigin ? -1 : -pulloffDistance;
+
     // Move up to safe height
-    code.push('G53 G21 G0 Z-1');
+    code.push(`G53 G21 G0 Z${zMove}`);
     // Move to Park XY
     code.push(`G53 G21 G0 X${park.x} Y${park.y}`);
     //Move to Park Z

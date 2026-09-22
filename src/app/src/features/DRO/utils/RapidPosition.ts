@@ -207,7 +207,15 @@ export const getMovementGCode = (
 ) => {
     const gcode = [];
 
-    gcode.push(`G53 G21 G0 Z-${OFFSET_DISTANCE}`); // Always move up to the limit of Z travel minus offset
+    const settings = get(
+        reduxStore.getState(),
+        'controller.settings.settings',
+        {},
+    );
+    // if machine origin doesn't set to 0 on homing, we need to use the pulloff distance
+    const setMachineOrigin = isBitSetInNumber(get(settings, '$22', '0'), 3);
+    const zMove = setMachineOrigin ? -OFFSET_DISTANCE : -pullOff;
+    gcode.push(`G53 G21 G0 Z${zMove}`); // Move up to the limit of Z travel minus offset
     const homingPosition = getHomingLocation(homingPositionSetting);
 
     // Change homing flag for grblHal specifically
@@ -217,10 +225,7 @@ export const getMovementGCode = (
     );
 
     if (controllerType === 'grblHAL') {
-        const store = reduxStore.getState();
-        const settings = get(store, 'controller.settings.settings');
-        const { $22: homingValue } = settings;
-        homingFlag = isBitSetInNumber(homingValue, 3);
+        homingFlag = setMachineOrigin;
     }
 
     const [xMovement, yMovement] = getPositionMovements(
