@@ -65,23 +65,28 @@ export function getToolFlags(
 
 export function getRackConfig(settings: Record<string, any>): RackConfig {
     const toolTableData = get(settings, 'toolTable', {});
-    const toolTableCount = Object.values(toolTableData || {}).length;
+    const toolTableSize = Object.values(toolTableData || {}).length;
     const reportedRackSize = Number(get(settings, 'atci.rack_size', -1));
-    const rackSize = reportedRackSize > 0 ? reportedRackSize : toolTableCount;
-    return { rackSize, hasToolTable: toolTableCount > 0 };
+    // Rack size (physical ATC pockets) and tool table size (how many tool
+    // slots the firmware tracks offsets for) are independent settings - a
+    // machine can have more tools in its table than fit in the rack, with
+    // the excess loaded manually. Only fall back to the tool table size here
+    // when no rack size has been reported at all.
+    const rackSize = reportedRackSize > 0 ? reportedRackSize : toolTableSize;
+    return { rackSize, toolTableSize, hasToolTable: toolTableSize > 0 };
 }
 
 export function getOutOfRangeTools(
     toolSet: (string | number)[],
-    rackSize: number,
+    toolTableSize: number,
     hasToolTable: boolean,
 ): number[] {
-    if (!hasToolTable || rackSize <= 0 || !toolSet?.length) {
+    if (!hasToolTable || toolTableSize <= 0 || !toolSet?.length) {
         return [];
     }
     const numbers = toolSet
         .map((t) => Number(String(t).replace(/^T/i, '')))
-        .filter((n) => Number.isFinite(n) && n > rackSize);
+        .filter((n) => Number.isFinite(n) && n > toolTableSize);
     return Array.from(new Set(numbers)).sort((a, b) => a - b);
 }
 

@@ -52,7 +52,7 @@ interface JobControlProps {
     };
     atcEnabled: boolean;
     toolSet: string[];
-    rackSize: number;
+    toolTableSize: number;
     hasToolTable: boolean;
 }
 
@@ -73,7 +73,7 @@ const JobControl: React.FC<JobControlProps> = ({
     toolOffsets,
     atcEnabled,
     toolSet,
-    rackSize,
+    toolTableSize,
     hasToolTable,
 }) => {
     const [lastLine, setLastLine] = useState(1);
@@ -142,7 +142,7 @@ const JobControl: React.FC<JobControlProps> = ({
 
         const outOfRangeTools = getOutOfRangeTools(
             toolSet,
-            rackSize,
+            toolTableSize,
             hasToolTable,
         );
         if (outOfRangeTools.length > 0) {
@@ -150,7 +150,7 @@ const JobControl: React.FC<JobControlProps> = ({
                 true,
                 {
                     type: 'alert',
-                    title: 'Tool Number Exceeds Rack Size',
+                    title: 'Tool Number Exceeds Tool Table Size',
                     body: (
                         <>
                             <p>
@@ -161,7 +161,8 @@ const JobControl: React.FC<JobControlProps> = ({
                                     .join(', ')}
                                 , which exceed
                                 {outOfRangeTools.length === 1 ? 's' : ''} your
-                                configured rack size ({rackSize} tools).
+                                configured tool table size ({toolTableSize}{' '}
+                                tools).
                             </p>
                             <p>
                                 Remap{' '}
@@ -375,7 +376,7 @@ export default connect((store) => {
     );
     const atcEnabled = atcFlag === '1';
     const toolSet = get(store, 'file.toolSet', []);
-    const { rackSize, hasToolTable } = getRackConfig(
+    const { toolTableSize, hasToolTable } = getRackConfig(
         get(store, 'controller.settings', {}),
     );
 
@@ -396,7 +397,7 @@ export default connect((store) => {
         currentTool,
         atcEnabled,
         toolSet,
-        rackSize,
+        toolTableSize,
         hasToolTable,
     };
     return data;

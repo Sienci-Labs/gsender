@@ -130,14 +130,19 @@ const handleGeometryReady = (data) => {
     });
 
     const atcSettings = _get(reduxStore.getState(), 'controller.settings', {});
-    const { rackSize, hasToolTable } = getRackConfig(atcSettings);
+    const atcAvailable = _get(atcSettings, 'info.NEWOPT.ATC', '0') === '1';
+    const { toolTableSize, hasToolTable } = getRackConfig(atcSettings);
     const toolSet = _get(parsedDataPreview, 'info.toolSet', []);
-    const outOfRangeTools = getOutOfRangeTools(toolSet, rackSize, hasToolTable);
+    // If ATC isn't available, the user is on some other tool-change avenue
+    // and can't use the Tool Timeline's remap button anyway - skip the check.
+    const outOfRangeTools = atcAvailable
+        ? getOutOfRangeTools(toolSet, toolTableSize, hasToolTable)
+        : [];
 
     if (outOfRangeTools.length > 0) {
         const list = outOfRangeTools.map((n) => `T${n}`).join(', ');
         toast.warning(
-            `This file uses tool${outOfRangeTools.length > 1 ? 's' : ''} ${list} which exceed${outOfRangeTools.length === 1 ? 's' : ''} your ${rackSize}-slot ATC rack. Remap in the Tool Timeline before running.`,
+            `This file uses tool${outOfRangeTools.length > 1 ? 's' : ''} ${list} which exceed${outOfRangeTools.length === 1 ? 's' : ''} your ${toolTableSize}-slot tool table. Remap in the Tool Timeline before running.`,
         );
     }
 

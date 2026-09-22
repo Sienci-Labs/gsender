@@ -53,7 +53,7 @@ export function ToolTimeline({
     const atcAvailable = get(settings, 'info.NEWOPT.ATC', '0') === '1';
     const allowManualBadge = isConnected && atcAvailable;
     const remapDisabled = workflowState !== WORKFLOW_STATE_IDLE;
-    const { rackSize, hasToolTable } = getRackConfig(settings);
+    const { rackSize, toolTableSize, hasToolTable } = getRackConfig(settings);
     useEffect(() => {
         setToolTable(mapToolNicknamesAndStatus(toolTableData, rackSize));
     }, [toolTableData, rackSize]);
@@ -191,10 +191,15 @@ export function ToolTimeline({
                                           ? toolLookupNumber > rackSize
                                           : false))
                                     : false;
+                                // Gated the same as canRemap/isManual: if the
+                                // remap button isn't available (ATC off or
+                                // disconnected), flagging a tool as needing a
+                                // remap it can't perform is just noise.
                                 const isOutOfRange =
+                                    allowManualBadge &&
                                     hasToolTable &&
-                                    rackSize > 0 &&
-                                    toolLookupNumber > rackSize;
+                                    toolTableSize > 0 &&
+                                    toolLookupNumber > toolTableSize;
                                 const itemKey = `${tool.index}-${tool.toolNumber}-${tool.startLine ?? index}`;
                                 return (
                                     <div

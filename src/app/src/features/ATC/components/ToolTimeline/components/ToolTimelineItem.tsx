@@ -160,7 +160,7 @@ export function ToolTimelineItem({
                                     'justify-center gap-1 h-5 px-2 py-0 text-xs',
                                     getToolStateClasses('warn'),
                                 )}
-                                title={`T${tool.toolNumber} exceeds rack size — remap required`}
+                                title={`T${tool.toolNumber} exceeds tool table size — remap required`}
                             >
                                 <toolStateThemes.warn.icon size={14} />
                                 {toolStateThemes.warn.label}

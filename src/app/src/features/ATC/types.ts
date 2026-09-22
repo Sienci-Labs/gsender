@@ -7,5 +7,6 @@ export interface ToolFlags {
 
 export interface RackConfig {
     rackSize: number;
+    toolTableSize: number;
     hasToolTable: boolean;
 }
