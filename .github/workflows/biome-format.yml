@@ -1,0 +1,23 @@
+name: Biome format
+
+on:
+    pull_request:
+        branches: [master, dev]
+
+jobs:
+    format:
+        name: Check formatting of changed files
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Setup Biome
+              uses: biomejs/setup-biome@v2
+              with:
+                  version: 2.5.11
+
+            - name: Fail if changed files are not formatted with biome.json
+              run: biome format --changed --since=origin/${{ github.base_ref }}
