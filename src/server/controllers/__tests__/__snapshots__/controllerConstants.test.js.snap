@@ -1,0 +1,156 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Grbl constants preserves alarm codes, wording, and order 1`] = `
+[
+  {
+    "code": 1,
+    "description": "Hard limit has been triggered. Machine position is likely lost due to sudden halt. Re-homing is highly recommended.",
+    "message": "Hard limit",
+  },
+  {
+    "code": 2,
+    "description": "Soft limit alarm. G-code motion target exceeds machine travel. Machine position retained. Alarm may be safely unlocked.",
+    "message": "Soft limit",
+  },
+  {
+    "code": 3,
+    "description": "Reset while in motion. Machine position is likely lost due to sudden halt. Re-homing is highly recommended.",
+    "message": "Abort during cycle",
+  },
+  {
+    "code": 4,
+    "description": "Probe fail. Probe is not in the expected initial state before starting probe cycle when G38.2 and G38.3 is not triggered and G38.4 and G38.5 is triggered.",
+    "message": "Probe fail",
+  },
+  {
+    "code": 5,
+    "description": "Probe fail. Probe did not contact the workpiece within the programmed travel for G38.2 and G38.4.",
+    "message": "Probe fail",
+  },
+  {
+    "code": 6,
+    "description": "Homing fail. The active homing cycle was reset.",
+    "message": "Homing fail",
+  },
+  {
+    "code": 7,
+    "description": "Homing fail. Safety door was opened during homing cycle.",
+    "message": "Homing fail",
+  },
+  {
+    "code": 8,
+    "description": "Homing fail. Pull off travel failed to clear limit switch. Try increasing pull-off setting or check wiring.",
+    "message": "Homing fail",
+  },
+  {
+    "code": 9,
+    "description": "Homing fail. Could not find limit switch within search distances. Try increasing max travel, decreasing pull-off distance, or check wiring.",
+    "message": "Homing fail",
+  },
+  {
+    "code": "Homing",
+    "description": "Homing must be run if limit switches and homing cycle is enabled in EEPROM",
+    "message": "Homing required",
+  },
+]
+`;
+
+exports[`grblHAL constants preserves alarm codes, wording, and order 1`] = `
+[
+  {
+    "code": 1,
+    "description": "Hard limit has been triggered. Machine position is likely lost due to sudden halt. Re-homing is highly recommended.",
+    "message": "Hard limit",
+  },
+  {
+    "code": 2,
+    "description": "Soft limit alarm. G-code motion target exceeds machine travel. Machine position retained. Alarm may be safely unlocked.",
+    "message": "Soft limit",
+  },
+  {
+    "code": 3,
+    "description": "Reset while in motion. Machine position is likely lost due to sudden halt. Re-homing is highly recommended.",
+    "message": "Abort during cycle",
+  },
+  {
+    "code": 4,
+    "description": "Probe fail. Probe is not in the expected initial state before starting probe cycle when G38.2 and G38.3 is not triggered and G38.4 and G38.5 is triggered.",
+    "message": "Probe fail",
+  },
+  {
+    "code": 5,
+    "description": "Probe fail. Probe did not contact the workpiece within the programmed travel for G38.2 and G38.4.",
+    "message": "Probe fail",
+  },
+  {
+    "code": 6,
+    "description": "Homing fail. The active homing cycle was reset.",
+    "message": "Homing fail",
+  },
+  {
+    "code": 7,
+    "description": "Homing fail. Safety door was opened during homing cycle.",
+    "message": "Homing fail",
+  },
+  {
+    "code": 8,
+    "description": "Homing fail. Pull off travel failed to clear limit switch. Try increasing pull-off setting or check wiring.",
+    "message": "Homing fail",
+  },
+  {
+    "code": 9,
+    "description": "Homing fail. Could not find limit switch within search distances. Try increasing max travel, decreasing pull-off distance, or check wiring.",
+    "message": "Homing fail",
+  },
+  {
+    "code": 10,
+    "description": "EStop asserted. Clear and reset.",
+    "message": "EStop",
+  },
+  {
+    "code": 11,
+    "description": "Homing required. Execute homing command ($H) to continue.",
+    "message": "Homing required",
+  },
+  {
+    "code": 12,
+    "description": "Limit switch engaged. Clear before continuing.",
+    "message": "Limit switch engaged",
+  },
+  {
+    "code": 13,
+    "description": "Probe protection triggered. Clear before continuing.",
+    "message": "Probe protection triggered",
+  },
+  {
+    "code": 14,
+    "description": "Spindle at speed timeout. Clear before continuing.",
+    "message": "Spindle at speed timeout",
+  },
+  {
+    "code": 15,
+    "description": "Homing fail. Could not find second limit switch for auto squared axis within search distances. Try increasing max travel, decreasing pull-off distance, or check wiring.",
+    "message": "Homing fail",
+  },
+  {
+    "code": 16,
+    "description": "Power on selftest (POS) failed.",
+    "message": "Selftest failed",
+  },
+  {
+    "code": 17,
+    "description": "Motor fault.",
+    "message": "Motor fault",
+  },
+  {
+    "code": 19,
+    "description": "Modbus Exception.  Timeout or error message.",
+    "message": "Modbus Exception.",
+  },
+  {
+    "code": "Homing",
+    "description": "Homing must be run if limit switches and homing cycle is enabled in EEPROM",
+    "message": "Homing required",
+  },
+]
+`;
