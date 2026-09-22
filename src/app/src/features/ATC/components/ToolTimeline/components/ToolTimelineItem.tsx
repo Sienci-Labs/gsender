@@ -1,8 +1,13 @@
 import Button from 'app/components/Button';
 import Tooltip from 'app/components/Tooltip';
+import { Badge } from 'app/features/ATC/components/ui/Badge';
 import { ToolStatusBadges } from 'app/features/ATC/components/ui/ToolStatusBadges.tsx';
 import type { ToolProbeState } from 'app/features/ATC/types.ts';
 import { lookupToolName } from 'app/features/ATC/utils/ATCFunctions.ts';
+import {
+    getToolStateClasses,
+    toolStateThemes,
+} from 'app/features/ATC/utils/ATCiConstants.ts';
 import cn from 'classnames';
 import pubsub from 'pubsub-js';
 import { useEffect, useState } from 'react';
@@ -16,6 +21,7 @@ interface ToolTimelineItemProps {
     progress: number;
     isRemapped: boolean;
     isManual?: boolean;
+    isOutOfRange?: boolean;
     remapValue?: number;
     probeState?: ToolProbeState;
     canRemap?: boolean;
@@ -31,6 +37,7 @@ export function ToolTimelineItem({
     handleRemap,
     isRemapped,
     isManual = false,
+    isOutOfRange = false,
     remapValue,
     probeState = 'unprobed',
     canRemap = false,
@@ -144,6 +151,20 @@ export function ToolTimelineItem({
                                 manualPosition="after"
                                 className="[&>div:first-child]:min-w-[124px]"
                             />
+                        </div>
+                    )}
+                    {isOutOfRange && (
+                        <div className="flex items-center gap-2">
+                            <Badge
+                                className={cn(
+                                    'justify-center gap-1 h-5 px-2 py-0 text-xs',
+                                    getToolStateClasses('warn'),
+                                )}
+                                title={`T${tool.toolNumber} exceeds tool table size — remap required`}
+                            >
+                                <toolStateThemes.warn.icon size={14} />
+                                {toolStateThemes.warn.label}
+                            </Badge>
                         </div>
                     )}
                 </div>

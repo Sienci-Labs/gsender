@@ -648,7 +648,9 @@ class GrblController {
 				return;
 			}
 
-			this.emit("serialport:read", line);
+			this.emit("serialport:write", line + "\n", {
+				source: WRITE_SOURCE_FEEDER,
+			});
 
 			this.write(line + "\n");
 			log.silly(`> ${line}`);

@@ -323,6 +323,7 @@
     "range_check": "~1.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-virtuoso": "^4.18.13",
     "registry-auth-token": "~3.4.0",
     "registry-url": "~5.1.0",
     "rimraf": "~2.6.3",

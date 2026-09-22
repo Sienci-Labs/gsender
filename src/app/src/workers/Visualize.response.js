@@ -4,7 +4,12 @@ import {
     RENDER_RENDERING,
     VISUALIZER_SECONDARY,
 } from 'app/constants';
+import {
+    getOutOfRangeTools,
+    getRackConfig,
+} from 'app/features/ATC/utils/ATCFunctions.ts';
 import { setLastWorkerGeometry } from 'app/features/Visualizer/lastWorkerGeometry';
+import { toast } from 'app/lib/toaster';
 import store from 'app/store';
 import { store as reduxStore } from 'app/store/redux';
 import _get from 'lodash/get';
@@ -123,6 +128,23 @@ const handleGeometryReady = (data) => {
         toolEvents: _get(parsedDataPreview, 'info.spindleToolEvents', {}),
         total: _get(parsedDataPreview, 'info.total', 0),
     });
+
+    const atcSettings = _get(reduxStore.getState(), 'controller.settings', {});
+    const atcAvailable = _get(atcSettings, 'info.NEWOPT.ATC', '0') === '1';
+    const { toolTableSize, hasToolTable } = getRackConfig(atcSettings);
+    const toolSet = _get(parsedDataPreview, 'info.toolSet', []);
+    // If ATC isn't available, the user is on some other tool-change avenue
+    // and can't use the Tool Timeline's remap button anyway - skip the check.
+    const outOfRangeTools = atcAvailable
+        ? getOutOfRangeTools(toolSet, toolTableSize, hasToolTable)
+        : [];
+
+    if (outOfRangeTools.length > 0) {
+        const list = outOfRangeTools.map((n) => `T${n}`).join(', ');
+        toast.warning(
+            `This file uses tool${outOfRangeTools.length > 1 ? 's' : ''} ${list} which exceed${outOfRangeTools.length === 1 ? 's' : ''} your ${toolTableSize}-slot tool table. Remap in the Tool Timeline before running.`,
+        );
+    }
 
     const estimatePayload = {
         ...info,
