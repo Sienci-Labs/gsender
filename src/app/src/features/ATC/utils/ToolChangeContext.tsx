@@ -1,5 +1,6 @@
 import type { ToolInstance } from 'app/features/ATC/components/ToolTable.tsx';
 import {
+    getRackConfig,
     type LoadToolMode,
     mapToolNicknamesAndStatus,
 } from 'app/features/ATC/utils/ATCFunctions.ts';
@@ -72,7 +73,7 @@ export const ToolchangeProvider = ({ children }: { children: JSX.Element }) => {
         (state: RootState) => state.controller.settings,
     );
     const atc: string = get(settings, 'info.NEWOPT.ATC', '0');
-    const reportedRackSize = Number(get(settings, 'atci.rack_size', -1));
+    const { rackSize: computedRackSize } = getRackConfig(settings);
 
     const atcAvailable = atc === '1';
 
@@ -98,12 +99,8 @@ export const ToolchangeProvider = ({ children }: { children: JSX.Element }) => {
     }, [isConnected]);
 
     useEffect(() => {
-        if (reportedRackSize > 0) {
-            setRackSize(reportedRackSize);
-        } else {
-            setRackSize(tools.length);
-        }
-    }, [reportedRackSize, tools]);
+        setRackSize(computedRackSize);
+    }, [computedRackSize]);
 
     const payload = {
         mode: loadToolMode,

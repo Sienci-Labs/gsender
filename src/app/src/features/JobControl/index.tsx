@@ -3,7 +3,11 @@ import type {
     BasicPosition,
     GRBL_ACTIVE_STATES_T,
 } from 'app/definitions/general';
-import { isToolProbed } from 'app/features/ATC/utils/ATCFunctions.ts';
+import {
+    getOutOfRangeTools,
+    getRackConfig,
+    isToolProbed,
+} from 'app/features/ATC/utils/ATCFunctions.ts';
 import { SDCardProgress } from 'app/features/JobControl/SDCardProgress.tsx';
 import type { SenderStatus } from 'app/lib/definitions/sender_feeder';
 import type { WORKFLOW_STATES_T } from 'app/store/definitions';
@@ -47,6 +51,9 @@ interface JobControlProps {
         [key: number]: BasicPosition;
     };
     atcEnabled: boolean;
+    toolSet: string[];
+    rackSize: number;
+    hasToolTable: boolean;
 }
 
 const JobControl: React.FC<JobControlProps> = ({
@@ -65,6 +72,9 @@ const JobControl: React.FC<JobControlProps> = ({
     spindleToolEvents,
     toolOffsets,
     atcEnabled,
+    toolSet,
+    rackSize,
+    hasToolTable,
 }) => {
     const [lastLine, setLastLine] = useState(1);
     const [pubsubTokens, setPubsubTokens] = useState([]);
@@ -128,6 +138,43 @@ const JobControl: React.FC<JobControlProps> = ({
         // No ATC, always return a fine validation
         if (!atcEnabled) {
             return [false, null];
+        }
+
+        const outOfRangeTools = getOutOfRangeTools(
+            toolSet,
+            rackSize,
+            hasToolTable,
+        );
+        if (outOfRangeTools.length > 0) {
+            return [
+                true,
+                {
+                    type: 'alert',
+                    title: 'Tool Number Exceeds Rack Size',
+                    body: (
+                        <>
+                            <p>
+                                This file references tool
+                                {outOfRangeTools.length > 1 ? 's' : ''}{' '}
+                                {outOfRangeTools
+                                    .map((n) => `T${n}`)
+                                    .join(', ')}
+                                , which exceed
+                                {outOfRangeTools.length === 1 ? 's' : ''} your
+                                configured rack size ({rackSize} tools).
+                            </p>
+                            <p>
+                                Remap{' '}
+                                {outOfRangeTools.length > 1
+                                    ? 'these tools'
+                                    : 'this tool'}{' '}
+                                in the Tool Timeline before starting, or
+                                confirm to run anyway.
+                            </p>
+                        </>
+                    ),
+                },
+            ];
         }
 
         if (!spindleToolEvents) {
@@ -327,6 +374,10 @@ export default connect((store) => {
         '0',
     );
     const atcEnabled = atcFlag === '1';
+    const toolSet = get(store, 'file.toolSet', []);
+    const { rackSize, hasToolTable } = getRackConfig(
+        get(store, 'controller.settings', {}),
+    );
 
     const data: JobControlProps = {
         fileLoaded,
@@ -344,6 +395,9 @@ export default connect((store) => {
         toolOffsets,
         currentTool,
         atcEnabled,
+        toolSet,
+        rackSize,
+        hasToolTable,
     };
     return data;
 })(JobControl);

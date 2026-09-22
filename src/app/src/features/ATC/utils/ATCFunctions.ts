@@ -3,7 +3,7 @@ import type {
     IToolListing,
     ToolInstance,
 } from 'app/features/ATC/components/ToolTable.tsx';
-import type { ToolFlags } from 'app/features/ATC/types.ts';
+import type { RackConfig, ToolFlags } from 'app/features/ATC/types.ts';
 import { TOOLPATH_COLOR_HEXES } from 'app/features/Visualizer/constants';
 import controller from 'app/lib/controller.ts';
 import { toast } from 'app/lib/toaster';
@@ -61,6 +61,28 @@ export function getToolFlags(
         probeState: isToolProbed(zOffset) ? 'probed' : 'unprobed',
         isManual: toolNumber > rackSize,
     };
+}
+
+export function getRackConfig(settings: Record<string, any>): RackConfig {
+    const toolTableData = get(settings, 'toolTable', {});
+    const toolTableCount = Object.values(toolTableData || {}).length;
+    const reportedRackSize = Number(get(settings, 'atci.rack_size', -1));
+    const rackSize = reportedRackSize > 0 ? reportedRackSize : toolTableCount;
+    return { rackSize, hasToolTable: toolTableCount > 0 };
+}
+
+export function getOutOfRangeTools(
+    toolSet: (string | number)[],
+    rackSize: number,
+    hasToolTable: boolean,
+): number[] {
+    if (!hasToolTable || rackSize <= 0 || !toolSet?.length) {
+        return [];
+    }
+    const numbers = toolSet
+        .map((t) => Number(String(t).replace(/^T/i, '')))
+        .filter((n) => Number.isFinite(n) && n > rackSize);
+    return Array.from(new Set(numbers)).sort((a, b) => a - b);
 }
 
 function setToolStatus(tool: ToolInstance, rackSize): ToolInstance {
