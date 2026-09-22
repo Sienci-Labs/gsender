@@ -7,44 +7,46 @@ import type { RootState } from 'app/store/redux';
 import delay from 'lodash/delay';
 import { useState } from 'react';
 
-export const grblHalAutoSpinGcode = [
-    '$9 = 1',
-    'G4P0.1',
-    '$16 = 0',
-    'G4P0.1',
-    '$30 = 30000',
-    'G4P0.1',
-    '$31 = 10000',
-    'G4P0.1',
-    '$33 = 1000',
-    'G4P0.1',
-    '$34 = 0',
-    'G4P0.1',
-    '$35 = 30',
-    'G4P0.1',
-    '$36 = 90',
-    'G4P0.1',
-    '$395 = 0',
-    'G4P0.1',
-    ';Flash onboard LED to confirm',
-    'M356 P0 Q2',
-    'M356 P1 Q2',
-    'G4P0.1',
-    'M356 P0 Q1',
-    'M356 P1 Q1',
-    'M356 P0 Q2',
-    'M356 P1 Q2',
-    'G4P0.1',
-    'M356 P0 Q1',
-    'M356 P1 Q1',
-    'M356 P0 Q0',
-    'M356 P1 Q0',
-    '(End of Macro 1)',
-    '(Reset)',
-    'M2',
-    'G4P0.1',
-    '$$',
-];
+export function getGrblHalAutoSpinGcode(isSlbLite: boolean) {
+    return [
+        '$9 = 1',
+        'G4P0.1',
+        '$16 = 0',
+        'G4P0.1',
+        '$30 = 30000',
+        'G4P0.1',
+        '$31 = 10000',
+        'G4P0.1',
+        '$33 = 1000',
+        'G4P0.1',
+        '$34 = 0',
+        'G4P0.1',
+        `$35 = ${isSlbLite ? 32 : 30}`,
+        'G4P0.1',
+        `$36 = ${isSlbLite ? 96 : 90}`,
+        'G4P0.1',
+        '$395 = 0',
+        'G4P0.1',
+        ';Flash onboard LED to confirm',
+        'M356 P0 Q2',
+        'M356 P1 Q2',
+        'G4P0.1',
+        'M356 P0 Q1',
+        'M356 P1 Q1',
+        'M356 P0 Q2',
+        'M356 P1 Q2',
+        'G4P0.1',
+        'M356 P0 Q1',
+        'M356 P1 Q1',
+        'M356 P0 Q0',
+        'M356 P1 Q0',
+        '(End of Macro 1)',
+        '(Reset)',
+        'M2',
+        'G4P0.1',
+        '$$',
+    ];
+}
 
 export const genericAutoSpinGcode = [
     'G4P0.1',
@@ -68,11 +70,14 @@ export function EepromConfig({ onComplete }: Props) {
     const firmwareType = useTypedSelector(
         (state: RootState) => state.controller.type,
     );
+    const boardId = useTypedSelector(
+        (state: RootState) => state.controller.settings.info?.BOARD,
+    );
 
     function applyAutoSpinSettings() {
         const gcode =
             firmwareType === GRBLHAL
-                ? grblHalAutoSpinGcode
+                ? getGrblHalAutoSpinGcode(boardId === 'SLB Lite')
                 : genericAutoSpinGcode;
 
         controller.command('gcode', gcode);

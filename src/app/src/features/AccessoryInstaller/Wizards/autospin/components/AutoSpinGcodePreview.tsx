@@ -1,15 +1,25 @@
 import { GRBLHAL } from 'app/constants';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import type { RootState } from 'app/store/redux';
-import { genericAutoSpinGcode, grblHalAutoSpinGcode } from './EepromConfig.tsx';
+import { genericAutoSpinGcode, getGrblHalAutoSpinGcode } from './EepromConfig.tsx';
 
 export function AutoSpinGcodePreview() {
     const firmwareType = useTypedSelector(
         (state: RootState) => state.controller.type,
     );
+    const boardId = useTypedSelector(
+        (state: RootState) => state.controller.settings.info?.BOARD,
+    );
     const isGrblHal = firmwareType === GRBLHAL;
-    const lines = isGrblHal ? grblHalAutoSpinGcode : genericAutoSpinGcode;
-    const label = isGrblHal ? 'grblHAL' : 'Other Firmware';
+    const isSlbLite = boardId === 'SLB Lite';
+    const lines = isGrblHal
+        ? getGrblHalAutoSpinGcode(isSlbLite)
+        : genericAutoSpinGcode;
+    const label = isGrblHal
+        ? isSlbLite
+            ? 'grblHAL (slb-lite)'
+            : 'grblHAL'
+        : 'Other Firmware';
 
     return (
         <div className="w-full h-full flex flex-col gap-3 min-h-0">
