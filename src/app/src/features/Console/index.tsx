@@ -1,15 +1,21 @@
-import { toast } from 'app/lib/toaster';
-import { useEffect, useRef, useState } from 'react';
-
-import Terminal from './Terminal';
-import TerminalInput from './TerminalInput';
-
-import './styles.css';
 import { usePostHog } from '@posthog/react';
 import type { FIRMWARE_TYPES_T } from 'app/definitions/firmware';
-import { ConsolePopout } from 'app/features/Console/components/ConsolePopout.tsx';
 import controller from 'app/lib/controller';
+import { toast } from 'app/lib/toaster';
 import isElectron from 'is-electron';
+import { Unplug } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+
+import { ConsoleInput } from './components/ConsoleInput';
+import { ConsoleList } from './components/ConsoleList';
+import { ConsoleToolbar } from './components/ConsoleToolbar';
+import { clearConsole, getMessages } from './consoleStore';
+import { type ConsoleFilter, matchesFilter } from './definitions';
+import { useConsoleMessages } from './useConsoleMessages';
+
+import './styles.css';
+
+const COPY_HISTORY_LIMIT = 50;
 
 type ConsoleProps = {
     isActive: boolean;
@@ -17,9 +23,33 @@ type ConsoleProps = {
 };
 
 const Console = ({ isActive, isChildWindow }: ConsoleProps) => {
-    const terminalRef = useRef<{ clear: () => void }>(null);
     const [port, setPort] = useState(controller.port);
+    const [filter, setFilter] = useState<ConsoleFilter>('all');
     const posthog = usePostHog();
+
+    // Joining a port makes the server send this window another
+    // 'serialport:open', which would ask us to join again. Track what we have
+    // already joined so the pop-out settles after the first round trip.
+    const joinedPort = useRef<string | null>(null);
+
+    const joinPort = (nextPort: string) => {
+        if (!nextPort || joinedPort.current === nextPort) {
+            return;
+        }
+
+        joinedPort.current = nextPort;
+        controller.addClient(nextPort);
+    };
+
+    const messages = useConsoleMessages();
+
+    const visibleMessages = useMemo(
+        () =>
+            filter === 'all'
+                ? messages
+                : messages.filter((message) => matchesFilter(message, filter)),
+        [messages, filter],
+    );
 
     const controllerEvents: {
         [key: string]: Function;
@@ -33,22 +63,67 @@ const Console = ({ isActive, isChildWindow }: ConsoleProps) => {
             const { port } = options;
             setPort(port);
             if (isChildWindow) {
-                controller.addClient(port);
+                joinPort(port);
             }
         },
         'serialport:close': () => {
+            joinedPort.current = null;
             setPort('');
         },
     };
 
-    const handleTerminalClear = () => {
-        if (terminalRef.current) {
-            terminalRef.current.clear();
+    const handleClear = () => {
+        clearConsole();
 
-            toast.info('Console cleared', { position: 'bottom-right' });
+        toast.info('Console cleared', { position: 'bottom-right' });
 
-            posthog?.capture('console_cleared');
+        posthog?.capture('console_cleared');
+    };
+
+    // Copies the raw stream rather than the current view, so a filtered
+    // console still yields the last 50 lines the machine actually saw.
+    const handleCopy = async () => {
+        const lastMessages = getMessages().slice(-COPY_HISTORY_LIMIT);
+
+        if (lastMessages.length === 0) {
+            return;
         }
+
+        try {
+            await navigator.clipboard.writeText(
+                lastMessages.map((item) => item.message).join('\n'),
+            );
+
+            toast.success(
+                `Copied last ${lastMessages.length} commands to clipboard`,
+                {
+                    duration: 3000,
+                    position: 'bottom-right',
+                },
+            );
+
+            posthog?.capture('console_history_copied', {
+                commands: lastMessages.map((item) => item.message),
+            });
+        } catch (error) {
+            toast.error('Failed to copy commands to clipboard', {
+                duration: 3000,
+                position: 'bottom-right',
+            });
+            console.error('Failed to copy commands to clipboard:', error);
+        }
+    };
+
+    const handlePopout = () => {
+        if (!isElectron()) {
+            toast.info('This functionality is not available on web view.', {
+                position: 'bottom-right',
+            });
+            return;
+        }
+
+        window.ipcRenderer.send('open-new-window', '/console');
+        posthog?.capture('console_popout_opened');
     };
 
     function registerIPCListeners() {
@@ -70,7 +145,7 @@ const Console = ({ isActive, isChildWindow }: ConsoleProps) => {
                     // set port
                     controller.port = port;
                     // add client
-                    controller.addClient(port);
+                    joinPort(port);
 
                     setPort(port);
                 },
@@ -86,7 +161,7 @@ const Console = ({ isActive, isChildWindow }: ConsoleProps) => {
                     controller.port = port;
                     controller.type = type;
                     // add client
-                    controller.addClient(port);
+                    joinPort(port);
 
                     setPort(port);
                 },
@@ -130,16 +205,26 @@ const Console = ({ isActive, isChildWindow }: ConsoleProps) => {
                 className={`absolute top-0 left-0 rounded-lg w-full h-full bg-gray-50 z-10 transition-opacity dark:text-content-primary dark:bg-surface-raised
                     duration-300 ${port !== '' ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
             >
-                <div className="flex justify-center items-center h-full ">
-                    <h2 className="text-lg font-bold">
-                        Not connected to a device
-                    </h2>
+                <div className="flex flex-col justify-center items-center gap-2 h-full text-gray-500 dark:text-content-muted">
+                    <Unplug className="h-12 w-12" />
+                    <span className="text-sm">Not connected to a device</span>
                 </div>
             </div>
-            <div className="grid grid-rows-[1fr_auto] absolute gap-1 top-0 left-0 w-full h-full p-1">
-                <Terminal ref={terminalRef} isActive={isActive} />
-                <TerminalInput onClear={handleTerminalClear} />
-                <ConsolePopout />
+            <div className="grid grid-rows-[auto_1fr_auto] absolute gap-1 top-0 left-0 w-full h-full p-1">
+                <ConsoleToolbar
+                    filter={filter}
+                    onFilterChange={setFilter}
+                    onCopy={handleCopy}
+                    onClear={handleClear}
+                    onPopout={handlePopout}
+                    showPopout={!isChildWindow}
+                />
+                <ConsoleList
+                    messages={visibleMessages}
+                    isActive={isActive}
+                    isFiltered={filter !== 'all' && messages.length > 0}
+                />
+                <ConsoleInput />
             </div>
         </>
     );

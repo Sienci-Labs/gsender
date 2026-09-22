@@ -1,32 +1,17 @@
 import { usePostHog } from '@posthog/react';
 import { Button } from 'app/components/Button';
 import { Input } from 'app/components/shadcn/Input';
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from 'app/components/shadcn/Popover';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import controller from 'app/lib/controller';
-import { toast } from 'app/lib/toaster';
 import { addToInputHistory } from 'app/store/redux/slices/console.slice';
 import { useRef, useState } from 'react';
-import { FaEllipsisH } from 'react-icons/fa';
-import { LuCopy, LuPaintbrush } from 'react-icons/lu';
 import { useDispatch } from 'react-redux';
+import { consoleWrite } from '../consoleStore';
 
-const COPY_HISTORY_LIMIT = 50;
-
-type Props = {
-    onClear: () => void;
-};
-
-const TerminalInput = ({ onClear }: Props) => {
+export function ConsoleInput() {
     const dispatch = useDispatch();
     const inputRef = useRef<HTMLInputElement>(null);
-    const { inputHistory, history } = useTypedSelector(
-        (state) => state.console,
-    );
+    const { inputHistory } = useTypedSelector((state) => state.console);
     const [historyIndex, setHistoryIndex] = useState(-1);
 
     const posthog = usePostHog();
@@ -39,8 +24,10 @@ const TerminalInput = ({ onClear }: Props) => {
         }
 
         controller.writeln(command);
+        // The server does not echo commands written straight from a client,
+        // so the operator would otherwise only see the reply.
+        consoleWrite({ message: command, type: 'gcode' });
 
-        // Use addToInputHistory instead of setInputHistory
         dispatch(addToInputHistory(command));
         setHistoryIndex(-1);
         inputRef.current.value = '';
@@ -73,39 +60,14 @@ const TerminalInput = ({ onClear }: Props) => {
         inputRef.current.value = inputHistory[newIndex];
     };
 
-    const handleCopyHistory = async () => {
-        try {
-            const lastCommands = history.slice(-COPY_HISTORY_LIMIT);
-
-            await navigator.clipboard.writeText(lastCommands.join('\n'));
-
-            toast.success(
-                `Copied last ${lastCommands.length} commands to clipboard`,
-                {
-                    duration: 3000,
-                    position: 'bottom-right',
-                },
-            );
-
-            posthog?.capture('console_history_copied', {
-                commands: lastCommands,
-            });
-        } catch (error) {
-            toast.error('Failed to copy commands to clipboard', {
-                duration: 3000,
-                position: 'bottom-right',
-            });
-            console.error('Failed to copy commands to clipboard:', error);
-        }
-    };
-
     return (
-        <div className="flex gap-2 w-full flex-grow">
+        <div className="flex gap-2 w-full shrink-0">
             <Input
-                className="h-8 text-sm"
+                className="h-10 text-sm console-text"
                 placeholder="Enter G-code here..."
                 ref={inputRef}
                 type="text"
+                aria-label="Console command"
                 onKeyDown={(e) => {
                     switch (e.key) {
                         case 'Enter': {
@@ -137,43 +99,13 @@ const TerminalInput = ({ onClear }: Props) => {
 
             <Button
                 variant="primary"
-                className="h-8 w-24 text-sm"
+                className="h-10 w-24 text-sm"
                 onClick={handleCommandExecute}
             >
                 Run
             </Button>
-
-            <Popover>
-                <PopoverTrigger asChild>
-                    <Button
-                        variant="secondary"
-                        className="h-8 text-sm"
-                        aria-label="Console options"
-                    >
-                        <FaEllipsisH />
-                    </Button>
-                </PopoverTrigger>
-                <PopoverContent className="bg-white px-2 py-2 w-65">
-                    <div className="flex flex-col gap-2">
-                        <Button
-                            variant="outline"
-                            className="w-full flex gap-2 h-8 text-sm"
-                            onClick={handleCopyHistory}
-                            icon={<LuCopy />}
-                            text="Copy last 50 lines"
-                        />
-                        <Button
-                            variant="outline"
-                            className="w-full flex gap-2 h-8 text-sm"
-                            onClick={onClear}
-                            icon={<LuPaintbrush />}
-                            text="Clear Console"
-                        />
-                    </div>
-                </PopoverContent>
-            </Popover>
         </div>
     );
-};
+}
 
-export default TerminalInput;
+export default ConsoleInput;
