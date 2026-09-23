@@ -30,12 +30,12 @@ import { FaClipboard, FaClipboardCheck, FaClipboardList } from 'react-icons/fa';
 import { LuMove, LuRefreshCw } from 'react-icons/lu';
 import Select from 'react-select';
 import { Jogging } from '../../Jogging';
-import xAxisCalibrationImage1 from '../assets/X_axis-calibration_1.png';
-import xAxisCalibrationImage2 from '../assets/X_axis-calibration_2.png';
-import yAxisCalibrationImage1 from '../assets/Y_axis-calibration_1.png';
-import yAxisCalibrationImage2 from '../assets/Y_axis-calibration_2.png';
-import zAxisCalibrationImage1 from '../assets/Z_axis-calibration_1.png';
-import zAxisCalibrationImage2 from '../assets/Z_axis-calibration_2.png';
+import xAxisCalibrationImage1 from '../assets/X-Axis_Mark_01.png';
+import xAxisCalibrationImage2 from '../assets/X-Axis_Mark_02.png';
+import yAxisCalibrationImage1 from '../assets/Y-Axis_Mark_01.png';
+import yAxisCalibrationImage2 from '../assets/Y-Axis_Mark_02.png';
+import zAxisCalibrationImage1 from '../assets/Z-Axis_Mark_01.png';
+import zAxisCalibrationImage2 from '../assets/Z-Axis_Mark_02.png';
 import { calculateNewStepsPerMM, getEEPROMSettingKey } from '../utils';
 
 // Neutral react-select colors come from the Tailwind-backed CSS variables

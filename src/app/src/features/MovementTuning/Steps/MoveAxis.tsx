@@ -22,7 +22,7 @@ const MoveAxis = ({ onComplete }: Props) => {
     return (
         <div className="flex flex-col gap-4">
             <div className="space-y-1">
-                <p className="h-20 dark:text-white">
+                <p className="h-20 dark:text-content-primary">
                     Now move any distance you wish. A larger value will better
                     tune your movement, just make sure you don't hit your
                     machine limits. Once you are ready, clicked the Move Axis

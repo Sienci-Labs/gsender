@@ -143,11 +143,11 @@ export function WizardLanding({
             </div>
 
             <div className="w-2/5 portrait:w-full portrait:h-2/5 bg-gray-200 dark:bg-surface-raised p-12 flex flex-col justify-between overflow-y-auto">
-                <div className="flex items-center justify-center flex-1">
+                <div className="flex items-center justify-center flex-1 min-h-0">
                     <img
                         alt="Wizard image"
                         src={image ?? DefaultImage}
-                        className={`rounded-2xl${invertImageInDarkMode ? ' dark:invert' : ''}`}
+                        className={`max-h-full w-auto object-contain rounded-2xl${invertImageInDarkMode ? ' dark:invert' : ''}`}
                     />
                 </div>
 

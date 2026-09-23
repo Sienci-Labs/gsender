@@ -22,9 +22,9 @@ import { toast } from 'app/lib/toaster';
 import useKeybinding from 'app/lib/useKeybinding';
 import store from 'app/store';
 import { useEffect, useState } from 'react';
-import customTrackGraphic from './assets/custom-boring-track-top-view.png';
-import extensionTrackGraphic from './assets/extension-track-top-view.png';
-import standardTrackGraphic from './assets/standard-track-top-view.png';
+import customTrackGraphic from './assets/Vortex_Custom_Boring_Track_01.png';
+import extensionTrackGraphic from './assets/Vortex_Extension_Track_01.png';
+import standardTrackGraphic from './assets/Vortex_Standard_Track_01.png';
 import { HOLE_TYPES } from './utils/mountingSetupMacros';
 
 const MountingSetup = ({ isDisabled = false }: { isDisabled?: boolean }) => {

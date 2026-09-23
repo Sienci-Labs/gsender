@@ -20,7 +20,7 @@ const DistanceTravelled = ({ onComplete }: Props) => {
     return (
         <div className="flex flex-col gap-4">
             <div className="space-y-1">
-                <p className="h-20 dark:text-white">
+                <p className="h-20 dark:text-content-primary">
                     Lastly, measure the distance travelled between the original
                     mark and the current gantry location. Take your time when
                     entering this value, a more accurate measurement will give

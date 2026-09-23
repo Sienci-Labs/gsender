@@ -2,7 +2,7 @@ import { useValidations } from 'app/components/Wizard/hooks/UseValidations.tsx';
 import type { Wizard } from 'app/components/Wizard/types';
 import { Jogging } from 'app/features/Jogging';
 import { useMemo } from 'react';
-import XYSquaringExample from '../assets/XY_squaring_example.jpg';
+import XYSquaringExample from '../assets/X-Y_Squaring_01.png';
 import TriangleDiagram from '../components/TriangleDiagram';
 import { useSquaring } from '../context/SquaringContext';
 import Landing from './Landing';

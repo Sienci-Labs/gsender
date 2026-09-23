@@ -41,14 +41,14 @@ const AxisSelection = ({ onComplete }: Props) => {
         <div className="flex flex-col gap-4 xl:gap-0">
             {/* <div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-[3fr_2fr]"> */}
             <div className="space-y-12 text-sm xl:text-base font-normal">
-                <p className="font-bold">
+                <p className="font-bold dark:text-content-primary">
                     Whichever axis you'll be tuning, please place it in an
                     initial location so that it'll have space to move to the
                     right (for X), backwards (for Y), and downwards (for Z).
                 </p>
 
                 <div className="flex gap-2 items-center">
-                    <label className="min-w-24 font-bold dark:text-white">
+                    <label className="min-w-24 font-bold dark:text-content-primary">
                         Axis to Tune
                     </label>
                     <Select

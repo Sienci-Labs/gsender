@@ -1,9 +1,13 @@
-import { CheckCircle } from 'lucide-react';
+import SpindleImage from 'app/features/AccessoryInstaller/Wizards/spindle/assets/Spindle_01.png';
 
 export function SpindleCompletion() {
     return (
         <div className="flex flex-col items-center justify-center h-full text-center">
-            <CheckCircle size={80} className="text-green-500 mb-6" />
+            <img
+                alt="Sienci Spindle"
+                src={SpindleImage}
+                className="max-h-64 w-auto object-contain mb-6"
+            />
             <h1 className="text-4xl font-bold text-gray-900 dark:text-content-primary mb-4">
                 Setup Complete!
             </h1>

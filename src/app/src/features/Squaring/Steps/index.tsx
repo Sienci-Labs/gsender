@@ -10,7 +10,7 @@ import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { cx } from 'class-variance-authority';
 import { useEffect, useState } from 'react';
 import { LuMove, LuRefreshCw } from 'react-icons/lu';
-import xySquaringImage from '../assets/XY_squaring_example.jpg';
+import xySquaringImage from '../assets/X-Y_Squaring_01.png';
 import { useSquaring } from '../context/SquaringContext';
 import MarkingStep from './MarkingStep';
 import MeasurementStep from './MeasurementStep';
