@@ -33,6 +33,10 @@ import {
 } from 'app/features/Visualizer/constants';
 import type { VISUALIZER_TYPES_T } from 'app/features/Visualizer/definitions';
 import GCodeVirtualizer, { rotateAxis } from 'app/lib/GCodeVirtualizer';
+import MotionPlanner, {
+    type EstimatorConfig,
+    estimateLineCount,
+} from 'app/lib/timeEstimator/MotionPlanner';
 import * as THREE from 'three';
 import { ArcCurve } from 'three';
 
@@ -53,9 +57,7 @@ interface WorkerData {
     needsVisualization?: boolean;
     svgOnly?: boolean;
     rapidOpacity?: number;
-    accelerations?: any;
-    maxFeedrates?: any;
-    atcEnabled?: boolean;
+    estimatorConfig?: Partial<EstimatorConfig>;
     rotaryDiameterOffsetEnabled?: boolean;
     isSecondary: boolean;
     activeVisualizer: VISUALIZER_TYPES_T;
@@ -359,9 +361,7 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
         rapidOpacity = 0.5,
         // parsedData = {},
         // isNewFile = false,
-        accelerations,
-        maxFeedrates,
-        atcEnabled,
+        estimatorConfig = {},
         rotaryDiameterOffsetEnabled = true,
         isSecondary,
         activeVisualizer,
@@ -1231,9 +1231,10 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
         addArcCurve,
         addCurve,
         collate: true,
-        accelerations,
-        maxFeedrates,
-        atcEnabled,
+        estimator: new MotionPlanner(
+            { ...estimatorConfig, laserMode: isLaser },
+            estimateLineCount(content),
+        ),
     });
 
     vm.on('data', (data: any) => {
@@ -1287,12 +1288,13 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
     markProfile(profiler, 'after_parse_loop');
     sampleHeap(profiler, 'after_parse_loop');
 
-    const { estimates } = vm.getData();
+    const { lineTime, lineKind } = vm.getData();
     fileInfo = vm.generateFileStats();
     fileInfo.toolchanges = toolchanges;
 
     parsedDataToSend = {
-        estimates: estimates,
+        lineTime,
+        lineKind,
         info: fileInfo,
         modalChanges: [],
         feedrateChanges: [],
@@ -1398,7 +1400,7 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
         profiler.counts.svg2d_degenerate_drops = svg2DDegenerateDrops;
         profiler.counts.spindle_frame_speeds_len = spindleFrameSpeeds.length;
         profiler.counts.paths_len = paths.length;
-        profiler.counts.estimates_len = estimates.length;
+        profiler.counts.estimates_len = lineTime.length;
         profiler.counts.invalid_lines_len = fileInfo.invalidLines?.length || 0;
         profiler.counts.spindle_tool_event_count = Object.keys(
             fileInfo.spindleToolEvents || {},

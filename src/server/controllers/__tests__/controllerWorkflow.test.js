@@ -19,17 +19,19 @@ describe.each(FIRMWARES)(
 			c = f.controller;
 		});
 
-		test("workflow start rewinds Sender before resuming its countdown", () => {
+		test("workflow start aborts jogging then rewinds Sender", () => {
 			c.sender.load("job.nc", "G1 X1\nG1 X2");
 			c.sender.setStartLine(1);
 			c.sender.hold();
-			c.sender.pauseCountdown();
 			const order = [];
 			jest
 				.spyOn(c.jogStreamer, "abort")
 				.mockImplementation((reason) => order.push(reason));
-			jest.spyOn(c.sender, "resumeCountdown").mockImplementation(() => {
+			const rewind = c.sender.rewind.bind(c.sender);
+			jest.spyOn(c.sender, "rewind").mockImplementation(() => {
+				const result = rewind();
 				order.push([c.sender.state.sent, c.sender.state.hold]);
+				return result;
 			});
 			c.workflow.start();
 			expect(order).toEqual(["workflow", [0, false]]);

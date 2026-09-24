@@ -33,6 +33,56 @@ const log = logger("controller:Grbl");
 
 const noop = () => {};
 
+// Matches LINE_KIND_* in app/lib/timeEstimator/MotionPlanner
+const LINE_KIND_RAPID = 2;
+const LINE_KIND_FIXED = 3;
+const REMAINING_FEED = 0;
+const REMAINING_RAPID = 1;
+const REMAINING_FIXED = 2;
+
+const ACTIVE_STATE_RUN = "Run";
+const ACTIVE_STATE_IDLE = "Idle";
+
+const toArrayBuffer = (data) => {
+	if (data instanceof ArrayBuffer) {
+		return data;
+	}
+	if (ArrayBuffer.isView(data)) {
+		// Buffers from socket.io may be unaligned slices of a shared pool
+		return data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
+	}
+	return null;
+};
+
+// Accepts typed arrays / buffers from the estimator, or a legacy number[]
+const toLineTimes = (data) => {
+	if (Array.isArray(data)) {
+		return Float32Array.from(data, (v) => Number(v) || 0);
+	}
+	const buffer = toArrayBuffer(data);
+	if (!buffer) {
+		return new Float32Array(0);
+	}
+	return new Float32Array(buffer, 0, Math.floor(buffer.byteLength / 4));
+};
+
+const toLineKinds = (data, length) => {
+	const buffer = toArrayBuffer(data);
+	const kinds = buffer ? new Uint8Array(buffer) : new Uint8Array(0);
+	if (kinds.length >= length) {
+		return kinds;
+	}
+	const padded = new Uint8Array(length);
+	padded.set(kinds);
+	return padded;
+};
+
+const remainingIndexForKind = (kind) => {
+	if (kind === LINE_KIND_RAPID) return REMAINING_RAPID;
+	if (kind === LINE_KIND_FIXED) return REMAINING_FIXED;
+	return REMAINING_FEED;
+};
+
 class SPSendResponse {
 	callback = null;
 
@@ -166,13 +216,8 @@ class Sender extends events.EventEmitter {
 		remainingTime: 0,
 		toolChanges: 0,
 		estimatedTime: 0,
-		estimateData: [],
 		ovF: 100,
-		countdownQueue: [],
-		totalSentToQueue: 0,
-		queueDone: true,
-		timer: 0,
-		countdownIsPaused: false,
+		ovR: 100,
 		isRotaryFile: false,
 	};
 
@@ -180,9 +225,29 @@ class Sender extends events.EventEmitter {
 
 	dataFilter = null;
 
-	countDownID = null;
+	// Per sender line estimated seconds at 100% overrides, and the LINE_KIND of each
+	lineTime = new Float32Array(0);
 
-	checkIntervalID = null;
+	lineKind = new Uint8Array(0);
+
+	// Execution playhead: lines fully executed, plus progress through the next one
+	execLine = 0;
+
+	execFrac = 0;
+
+	// Unexecuted estimated seconds at 100%, split by how overrides scale them
+	remaining = [0, 0, 0];
+
+	lastProgressTick = 0;
+
+	// Largest planner "blocks available" seen, i.e. the empty-buffer count
+	plannerSize = 0;
+
+	// Consecutive Idle status reports during a job
+	idleReports = 0;
+
+	// Between job start and rewind (stop/finish) - progress only tracks then
+	jobActive = false;
 
 	// @param {number} [type] Streaming protocol type. 0 for send-response, 1 for character-counting.
 	// @param {object} [options] The options object.
@@ -298,8 +363,7 @@ class Sender extends events.EventEmitter {
 			estimatedTime: this.state.estimatedTime,
 			ovF: this.state.ovF,
 			isRotaryFile: this.state.isRotaryFile,
-			currentLineRunning:
-				this.state.totalSentToQueue - this.state.countdownQueue.length,
+			currentLineRunning: this.execLine,
 		};
 	}
 
@@ -331,7 +395,8 @@ class Sender extends events.EventEmitter {
 			return false;
 		}
 
-		let lines = gcode.split("\n");
+		// grbl treats a lone CR as end of line too; matches the estimator's split
+		let lines = gcode.split(/\r\n|\r|\n/);
 		lines = lines.filter((line) => line.trim().length > 0);
 
 		if (this.sp) {
@@ -354,10 +419,7 @@ class Sender extends events.EventEmitter {
 		this.state.remainingTime = 0;
 		this.state.toolChanges = 0;
 		this.state.estimatedTime = 0;
-		this.state.estimateData = [];
-		this.state.countdownQueue = [];
-		this.state.totalSentToQueue = 0;
-		this.state.queueDone = true;
+		this.clearEstimateData();
 
 		// check if file is rotary
 		this.state.isRotaryFile = checkIfRotaryFile(gcode);
@@ -391,10 +453,7 @@ class Sender extends events.EventEmitter {
 		this.state.remainingTime = 0;
 		this.state.toolChanges = 0;
 		this.state.estimatedTime = 0;
-		this.state.estimateData = [];
-		this.state.countdownQueue = [];
-		this.state.totalSentToQueue = 0;
-		this.state.queueDone = true;
+		this.clearEstimateData();
 		this.state.isRotaryFile = false;
 
 		this.emit("unload");
@@ -440,31 +499,14 @@ class Sender extends events.EventEmitter {
 			this.state.elapsedTime = 0;
 			this.state.timePaused = 0;
 			this.state.timeRunning = 0;
-			// make sure time is up to date will current ovF
-			this.state.remainingTime =
-				this.state.estimatedTime / (this.state.ovF / 100);
-			this.state.countdownQueue = [];
-			this.state.totalSentToQueue = 0;
-			this.state.queueDone = true;
-			this.state.countdownIsPaused = false;
-
-			// catch up time estimation for start from line
+			this.lastProgressTick = now;
+			this.jobActive = true;
+			this.resetPlayhead();
+			// Start from line: everything before the start line counts as done
 			if (startFromLine) {
-				this.state.totalSentToQueue = this.state.received;
-				for (let i = 0; i <= this.state.received; i++) {
-					this.state.remainingTime -=
-						Number(this.state.estimateData[i] || 0) / (this.state.ovF / 100);
-				}
+				this.advancePlayheadTo(this.state.received);
 			}
-			if (!this.isRotaryFile) {
-				// used to initially start the countdown, and also in case the queue finishes but lines still need to be sent
-				this.checkIntervalID = setInterval(() => {
-					if (this.state.countdownQueue.length > 0 && this.state.queueDone) {
-						this.state.queueDone = false;
-						this.fakeCountdown();
-					}
-				}, 100);
-			}
+			this.updateRemainingTime();
 
 			this.emit("start", this.state.startTime);
 			this.emit("change");
@@ -487,25 +529,6 @@ class Sender extends events.EventEmitter {
 		// Elapsed Time
 		this.updateElapsedTime();
 
-		if (this.state.received > 0) {
-			if (this.state.estimatedTime > 0) {
-				// in case smth goes wrong with the estimate, don't want to show negative time
-				if (this.state.received < this.state.estimateData.length) {
-					// add the lines to the queue from where we left off to the current number received
-					for (
-						let i = this.state.totalSentToQueue;
-						i <= this.state.received;
-						i++
-					) {
-						this.state.countdownQueue.push(
-							Number(this.state.estimateData[i] || 0),
-						);
-						this.state.totalSentToQueue++;
-					}
-				}
-			}
-		}
-
 		if (this.state.received >= this.state.total || forceEnd) {
 			if (this.state.finishTime === 0) {
 				// avoid issue 'end' multiple times
@@ -516,48 +539,6 @@ class Sender extends events.EventEmitter {
 		}
 
 		return true;
-	}
-
-	fakeCountdown() {
-		// skip lines that take no time
-		while (this.state.timer === 0) {
-			if (this.state.countdownQueue.length === 0) {
-				this.stopCountdown();
-				return;
-			}
-			this.state.timer =
-				this.state.countdownQueue.shift() / (this.state.ovF / 100);
-		}
-		// if less than 1 sec left, create timeout instead of interval
-		if (this.state.timer < 1) {
-			this.countDownID = setTimeout(() => {
-				if (!this.state.countdownIsPaused) {
-					this.state.remainingTime -= this.state.timer;
-					this.state.remainingTime = this.state.remainingTime.toFixed(4);
-					this.state.timer = 0;
-					this.updateElapsedTime();
-					this.emit("change");
-					this.fakeCountdown();
-				} else {
-					this.state.queueDone = true;
-				}
-			}, this.state.timer * 1000);
-		} else {
-			// if more than one second, make interval
-			this.countDownID = setInterval(() => {
-				if (!this.state.countdownIsPaused) {
-					this.state.timer--;
-					this.state.remainingTime--;
-					this.updateElapsedTime();
-
-					if (this.state.timer < 1) {
-						clearInterval(this.countDownID);
-						this.fakeCountdown();
-					}
-					this.emit("change");
-				}
-			}, 1000);
-		}
 	}
 
 	// Rewinds the internal array pointer.
@@ -575,9 +556,10 @@ class Sender extends events.EventEmitter {
 		this.state.sent = 0;
 		this.state.received = 0;
 		this.state.toolChanges = 0;
-		this.state.countdownQueue = [];
-		this.state.totalSentToQueue = 0;
-		clearInterval(this.checkIntervalID);
+		// remainingTime is left as-is so a finished job keeps showing 0
+		this.jobActive = false;
+		this.execLine = 0;
+		this.execFrac = 0;
 		this.emit("change");
 
 		return true;
@@ -597,39 +579,196 @@ class Sender extends events.EventEmitter {
 		return this.state.toolChanges;
 	}
 
-	setEstimateData(estimates) {
-		this.state.estimateData = estimates;
-	}
-
-	setEstimatedTime(estimatedTime) {
-		this.state.remainingTime = Number(estimatedTime);
-		this.state.estimatedTime = Number(estimatedTime);
-	}
-
-	setOvF(ovF) {
-		if (this.state.ovF !== 100) {
-			this.state.remainingTime *= this.state.ovF / 100; // reset to 100%
+	// @param {object} data { lineTime, lineKind, estimatedTime } from the estimator.
+	// lineTime/lineKind arrive as ArrayBuffers/Buffers (or a legacy number[]).
+	setEstimateData({ lineTime, lineKind, estimatedTime } = {}) {
+		this.lineTime = toLineTimes(lineTime);
+		this.lineKind = toLineKinds(lineKind, this.lineTime.length);
+		let total = 0;
+		for (let i = 0; i < this.lineTime.length; i++) {
+			total += this.lineTime[i];
 		}
-		this.state.remainingTime /= ovF / 100; // set to new time
-		this.state.ovF = ovF;
+		this.state.estimatedTime = Number(estimatedTime) || total;
+		this.resetPlayhead();
+		if (this.jobActive) {
+			this.advancePlayheadTo(this.state.received);
+		}
+		this.updateRemainingTime();
 	}
 
-	resumeCountdown() {
-		this.state.countdownIsPaused = false;
+	clearEstimateData() {
+		this.jobActive = false;
+		this.lineTime = new Float32Array(0);
+		this.lineKind = new Uint8Array(0);
+		this.resetPlayhead();
+		this.lastProgressTick = 0;
+		this.idleReports = 0;
 	}
 
-	pauseCountdown() {
-		this.state.countdownIsPaused = true;
+	// UI feed override command; status reports (Ov:) take over once they arrive
+	setOvF(ovF) {
+		const value = Number(ovF);
+		if (value > 0) {
+			this.state.ovF = value;
+			this.updateRemainingTime();
+		}
 	}
 
-	stopCountdown() {
-		clearInterval(this.countDownID);
-		this.state.queueDone = true;
-		this.state.remainingTime -= this.state.timer;
+	resetPlayhead() {
+		this.execLine = 0;
+		this.execFrac = 0;
+		this.remaining = [0, 0, 0];
+		for (let i = 0; i < this.lineTime.length; i++) {
+			this.remaining[remainingIndexForKind(this.lineKind[i])] +=
+				this.lineTime[i];
+		}
 	}
 
-	isCountdownRunning() {
-		return this.state.countdownIsPaused;
+	lineRate(kind) {
+		if (kind === LINE_KIND_FIXED) return 1;
+		const ov = kind === LINE_KIND_RAPID ? this.state.ovR : this.state.ovF;
+		return Math.max(Number(ov) || 100, 1) / 100;
+	}
+
+	// Mark `fraction` (0..1) of line i executed
+	consumeLine(i, fraction) {
+		const time = this.lineTime[i] || 0;
+		if (time > 0 && fraction > 0) {
+			const idx = remainingIndexForKind(this.lineKind[i]);
+			this.remaining[idx] = Math.max(0, this.remaining[idx] - time * fraction);
+		}
+	}
+
+	// Jump the playhead forward to the start of `line`
+	advancePlayheadTo(line) {
+		const target = Math.min(line, this.state.total);
+		if (target <= this.execLine) {
+			return;
+		}
+		this.consumeLine(this.execLine, 1 - this.execFrac);
+		for (let i = this.execLine + 1; i < target; i++) {
+			this.consumeLine(i, 1);
+		}
+		this.execLine = target;
+		this.execFrac = 0;
+	}
+
+	// Run the playhead for `seconds` of wall time, never past `limit` lines
+	advancePlayheadBy(seconds, limit) {
+		let dt = seconds;
+		while (dt > 0 && this.execLine < limit) {
+			const i = this.execLine;
+			const duration =
+				(this.lineTime[i] || 0) / this.lineRate(this.lineKind[i]);
+			const left = duration * (1 - this.execFrac);
+			if (dt >= left) {
+				dt -= left;
+				this.consumeLine(i, 1 - this.execFrac);
+				this.execLine++;
+				this.execFrac = 0;
+			} else {
+				const fraction = dt / duration;
+				this.consumeLine(i, fraction);
+				this.execFrac += fraction;
+				dt = 0;
+			}
+		}
+	}
+
+	// Highest line that must have finished executing, from planner occupancy:
+	// the last `queued` motion lines received may still be in the planner.
+	executedLowerBound(queuedBlocks) {
+		let line = this.state.received;
+		let queued = queuedBlocks;
+		while (queued > 0 && line > this.execLine) {
+			line--;
+			const kind = this.lineKind[line];
+			if (kind !== 0 && kind !== LINE_KIND_FIXED) {
+				queued--;
+			}
+		}
+		return line;
+	}
+
+	updateRemainingTime() {
+		const [feed, rapid, fixed] = this.remaining;
+		const remaining =
+			feed / this.lineRate(1) + rapid / this.lineRate(LINE_KIND_RAPID) + fixed;
+		this.state.remainingTime = Math.max(0, Number(remaining.toFixed(3)));
+	}
+
+	/**
+	 * Advance the execution playhead from a controller status report. Time only
+	 * passes while the machine is in Run; the playhead can't pass the last acked
+	 * line, and planner occupancy (Bf) pulls it forward if it falls behind.
+	 * @param {object} status parsed status report ({ activeState, ov, buf })
+	 * @param {number} [now]
+	 */
+	updateProgress(status = {}, now = Date.now()) {
+		const dtSeconds = this.lastProgressTick
+			? Math.max(0, (now - this.lastProgressTick) / 1000)
+			: 0;
+		this.lastProgressTick = now;
+
+		const [ovF, ovR] = Array.isArray(status.ov) ? status.ov : [];
+		if (Number(ovF) > 0) this.state.ovF = Number(ovF);
+		if (Number(ovR) > 0) this.state.ovR = Number(ovR);
+
+		const planner = status.buf ? Number(status.buf.planner) : Number.NaN;
+		if (Number.isFinite(planner) && planner > this.plannerSize) {
+			this.plannerSize = planner;
+		}
+
+		if (!this.jobActive) {
+			return;
+		}
+
+		const prevLine = this.execLine;
+		const prevRemaining = Math.round(this.state.remainingTime);
+		const prevElapsed = Math.floor(this.state.elapsedTime / 1000);
+
+		const received = Math.min(this.state.received, this.state.total);
+		this.idleReports =
+			status.activeState === ACTIVE_STATE_IDLE ? this.idleReports + 1 : 0;
+		if (status.activeState === ACTIVE_STATE_RUN) {
+			this.advancePlayheadBy(dtSeconds, received);
+		}
+		if (Number.isFinite(planner) && this.plannerSize > 0) {
+			const queued = Math.max(0, this.plannerSize - planner);
+			this.advancePlayheadTo(this.executedLowerBound(queued));
+		} else if (this.idleReports >= 2) {
+			// Without buffer reports, a sustained Idle means everything acked has
+			// run. A single Idle isn't enough: grbl acks lines into the planner
+			// before it starts the cycle.
+			this.advancePlayheadTo(received);
+		}
+		this.updateRemainingTime();
+
+		// Runs until the workflow stops, i.e. past the last ack while the
+		// machine finishes the buffered moves
+		this.updateElapsedTime();
+
+		if (
+			this.execLine !== prevLine ||
+			Math.round(this.state.remainingTime) !== prevRemaining ||
+			Math.floor(this.state.elapsedTime / 1000) !== prevElapsed
+		) {
+			this.emit("change");
+		}
+	}
+
+	// Real-world data for tuning the estimator
+	logEstimateAccuracy() {
+		if (!this.state.estimatedTime || !this.state.startTime) {
+			return;
+		}
+		this.updateElapsedTime();
+		const running = (this.state.timeRunning || 0) / 1000;
+		const paused = (this.state.timePaused || 0) / 1000;
+		const ratio = running > 0 ? this.state.estimatedTime / running : 0;
+		log.info(
+			`Job time: estimated=${this.state.estimatedTime.toFixed(1)}s actual=${running.toFixed(1)}s paused=${paused.toFixed(1)}s ratio=${ratio.toFixed(3)} ovF=${this.state.ovF} ovR=${this.state.ovR} lines=${this.state.total}`,
+		);
 	}
 
 	updateElapsedTime() {
