@@ -137,10 +137,10 @@ describe("discoverPlugins() caching", () => {
 
 	it("re-walks after changeManifestPermissions", async () => {
 		await expectsFreshWalk(() => {
-			pluginRegistry.changeManifestPermissions(path.join(pluginsDir, "demo"), {
-				permissions: ["workspace:read"],
-				capabilities: {},
-			});
+			pluginRegistry.changeManifestPermissions(
+				path.join(pluginsDir, "demo"),
+				{ permissions: ["workspace:read"], capabilities: {} },
+			);
 		});
 	});
 
@@ -149,7 +149,9 @@ describe("discoverPlugins() caching", () => {
 			id: "com.sienci.other",
 			ui: {
 				entry: "ui/index.html",
-				contributions: [{ slot: "tools-page", route: "other", label: "Other" }],
+				contributions: [
+					{ slot: "tools-page", route: "other", label: "Other" },
+				],
 			},
 		});
 
@@ -183,16 +185,16 @@ describe("discoverPlugins() caching", () => {
 		});
 
 		const specsBefore = pluginRegistry.getPluginParserSpecs();
-		expect(
-			specsBefore.some((s) => s.pluginId === "com.sienci.parser-demo"),
-		).toBe(true);
+		expect(specsBefore.some((s) => s.pluginId === "com.sienci.parser-demo")).toBe(
+			true,
+		);
 
 		pluginRegistry.setPluginEnabled("com.sienci.parser-demo", false);
 
 		const specsAfter = pluginRegistry.getPluginParserSpecs();
-		expect(
-			specsAfter.some((s) => s.pluginId === "com.sienci.parser-demo"),
-		).toBe(false);
+		expect(specsAfter.some((s) => s.pluginId === "com.sienci.parser-demo")).toBe(
+			false,
+		);
 	});
 
 	it("does not expire from time alone — only explicit invalidation forces a re-walk", () => {
