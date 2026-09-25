@@ -56,6 +56,8 @@ interface WorkerData {
     maxFeedrates?: any;
     atcEnabled?: boolean;
     rotaryDiameterOffsetEnabled?: boolean;
+    rotaryPreviewAxis?: 'X' | 'Y';
+    rotaryCenterlineZ?: number;
     isSecondary: boolean;
     activeVisualizer: VISUALIZER_TYPES_T;
     theme?: Map<string, string>;
@@ -86,7 +88,8 @@ interface Modal {
 
 type RotaryMetadata = {
     radius: number | null;
-    hasYAxisMoves: boolean;
+    hasTransverseAxisMoves: boolean;
+    hasAAxisMoves: boolean;
 };
 
 type HeapSample = {
@@ -301,7 +304,10 @@ const ROTARY_DIAMETER_PATTERNS = [
     /\(.*?Cylinder\s*Dia(?:meter)?\s*[=:]\s*([0-9]+[.,][0-9]+|[0-9]+)/i, // Matches when inside parens, e.g. "(Cylinder Dia: 64.38)"
 ];
 
-const parseRotaryMetadata = (raw: string): RotaryMetadata => {
+const parseRotaryMetadata = (
+    raw: string,
+    rotaryPreviewAxis: 'X' | 'Y',
+): RotaryMetadata => {
     let diameter = Number.NaN;
     for (const re of ROTARY_DIAMETER_PATTERNS) {
         const diameterMatch = raw.match(re);
@@ -315,10 +321,13 @@ const parseRotaryMetadata = (raw: string): RotaryMetadata => {
     const radius =
         Number.isFinite(diameter) && diameter > 0 ? diameter / 2 : null;
 
-    // Single-pass scan for Y-axis moves — avoids .split() which allocates a full line array
-    let hasYAxisMoves = false;
+    // Scan the axis perpendicular to the rotary centerline. Axial moves must
+    // not suppress the optional stock-radius offset for Y-aligned jobs.
+    const transverseAxisCode = rotaryPreviewAxis === 'Y' ? 88 : 89;
+    let hasTransverseAxisMoves = false;
+    let hasAAxisMoves = false;
     let inParenComment = false;
-    for (let i = 0; i < raw.length && !hasYAxisMoves; i++) {
+    for (let i = 0; i < raw.length && !(hasTransverseAxisMoves && hasAAxisMoves); i++) {
         const ch = raw.charCodeAt(i);
         if (ch === 40) { inParenComment = true; continue; }   // '('
         if (ch === 41) { inParenComment = false; continue; }  // ')'
@@ -327,15 +336,17 @@ const parseRotaryMetadata = (raw: string): RotaryMetadata => {
             continue;
         }
         if (inParenComment) continue;
-        if (ch === 89 || ch === 121) {  // 'Y' or 'y'
-            const next = raw.charCodeAt(i + 1);
-            if ((next >= 48 && next <= 57) || next === 43 || next === 45) {
-                hasYAxisMoves = true;
-            }
+        const isA = ch === 65 || ch === 97;
+        const isTransverse = ch === transverseAxisCode || ch === transverseAxisCode + 32;
+        if (!isA && !isTransverse) continue;
+        const next = raw.charCodeAt(i + 1);
+        if ((next >= 48 && next <= 57) || next === 43 || next === 45 || next === 46) {
+            if (isA) hasAAxisMoves = true;
+            if (isTransverse) hasTransverseAxisMoves = true;
         }
     }
 
-    return { radius, hasYAxisMoves };
+    return { radius, hasTransverseAxisMoves, hasAAxisMoves };
 };
 
 self.onmessage = function ({ data }: { data: WorkerData }) {
@@ -352,6 +363,8 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
         maxFeedrates,
         atcEnabled,
         rotaryDiameterOffsetEnabled = true,
+        rotaryPreviewAxis = 'X',
+        rotaryCenterlineZ: requestedCenterlineZ = 0,
         isSecondary,
         activeVisualizer,
         theme,
@@ -366,14 +379,23 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
         profiler.bytes.input_utf16_bytes = content.length * 2;
     }
 
-    const { radius: rotaryRadius, hasYAxisMoves } = parseRotaryMetadata(content);
+    const rotationAxis = rotaryPreviewAxis === 'Y' ? 'y' : 'x';
+    const { radius: rotaryRadius, hasTransverseAxisMoves, hasAAxisMoves } =
+        parseRotaryMetadata(content, rotaryPreviewAxis);
+    // G-code positions have already been converted to mm by the virtualizer.
+    // The explicit centerline is also in mm, independent of G20/G21.
+    const rotaryCenterlineZ = hasAAxisMoves && Number.isFinite(requestedCenterlineZ)
+        ? requestedCenterlineZ : 0;
     markProfile(profiler, 'after_rotary_scan');
     sampleHeap(profiler, 'after_rotary_scan');
 
     const shouldOffsetRotaryRadius =
-        rotaryDiameterOffsetEnabled && rotaryRadius !== null && !hasYAxisMoves;
+        rotaryDiameterOffsetEnabled &&
+        rotaryCenterlineZ === 0 &&
+        rotaryRadius !== null &&
+        !hasTransverseAxisMoves;
     const applyRotaryRadiusOffset = (value: number): number =>
-        shouldOffsetRotaryRadius ? value + (rotaryRadius as number) : value;
+        shouldOffsetRotaryRadius ? value + (rotaryRadius as number) : value - rotaryCenterlineZ;
 
     // Common state variables
     const vertices: GrowableFloat32Buffer = {
@@ -600,13 +622,22 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                                 v1.z + (v2.z - v1.z) * t,
                             );
 
-                            // Inline x-axis rotation: angle = toRadians(-a)
+                            // Inverse workpiece rotation, matching rotateAxis.
                             const angle = -interpolatedA * (Math.PI / 180);
                             const sinA = Math.sin(angle);
                             const cosA = Math.cos(angle);
-                            const currX = interpolatedX;
-                            const currY = interpolatedY * cosA - interpolatedZ * sinA;
-                            const currZ = interpolatedY * sinA + interpolatedZ * cosA;
+                            const currX =
+                                rotationAxis === 'y'
+                                    ? interpolatedX * cosA + interpolatedZ * sinA
+                                    : interpolatedX;
+                            const currY =
+                                rotationAxis === 'x'
+                                    ? interpolatedY * cosA - interpolatedZ * sinA
+                                    : interpolatedY;
+                            const currZ =
+                                rotationAxis === 'y'
+                                    ? interpolatedZ * cosA - interpolatedX * sinA
+                                    : interpolatedY * sinA + interpolatedZ * cosA;
 
                             if (i > 0) {
                                 // Add line segment from previous point to current point
@@ -641,7 +672,7 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                         }
                     } else {
                         // No A-axis rotation, use simple linear interpolation
-                        const newV1 = rotateAxis('x', {
+                        const newV1 = rotateAxis(rotationAxis, {
                             x: v1.x,
                             y: v1.y,
                             z: applyRotaryRadiusOffset(v1.z),
@@ -651,7 +682,7 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                         v1.y = newV1.y;
                         v1.z = newV1.z;
 
-                        const newV2 = rotateAxis('x', {
+                        const newV2 = rotateAxis(rotationAxis, {
                             x: v2.x,
                             y: v2.y,
                             z: applyRotaryRadiusOffset(v2.z),
@@ -688,105 +719,10 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
                     }
                 }
             },
-            // For rotary visualization
+            // Large A moves use the same interpolation and projection as short
+            // moves, including SVG output and the selected rotary centerline.
             addCurve: (modal: Modal, v1: BasicPosition, v2: BasicPosition) => {
-                const { motion, tool } = modal;
-                registerToolChange(tool);
-                // Check if A-axis rotation is involved
-                const hasARotation =
-                    Math.abs((v2.a || 0) - (v1.a || 0)) > 0.001;
-
-                if (hasARotation) {
-                    // Create helical curve with A-axis rotation
-                    // Use Math.max(1,...) — no artificial minimum; small-angle moves get 1 segment
-                    const segments = Math.max(
-                        1,
-                        Math.ceil(Math.abs((v2.a || 0) - (v1.a || 0)) / 5),
-                    );
-
-                    // Reusable scalars — no per-iteration object allocation
-                    let prevX = 0, prevY = 0, prevZ = 0;
-                    for (let i = 0; i <= segments; i++) {
-                        const t = i / segments;
-                        const interpolatedA =
-                            (v1.a || 0) + ((v2.a || 0) - (v1.a || 0)) * t;
-
-                        // Interpolate position
-                        const interpolatedX = v1.x + (v2.x - v1.x) * t;
-                        const interpolatedY = v1.y + (v2.y - v1.y) * t;
-                        const interpolatedZ = applyRotaryRadiusOffset(
-                            v1.z + (v2.z - v1.z) * t,
-                        );
-
-                        // Inline x-axis rotation: angle = toRadians(-a)
-                        const angle = -interpolatedA * (Math.PI / 180);
-                        const sinA = Math.sin(angle);
-                        const cosA = Math.cos(angle);
-                        const currX = interpolatedX;
-                        const currY = interpolatedY * cosA - interpolatedZ * sinA;
-                        const currZ = interpolatedY * sinA + interpolatedZ * cosA;
-
-                        if (i > 0) {
-                            // Add line segment from previous point to current point
-                            pushMotionColor(motion, 1, 2);
-                            pushFloat32_6(
-                                vertices,
-                                prevX,
-                                prevY,
-                                prevZ,
-                                currX,
-                                currY,
-                                currZ,
-                            );
-                        }
-
-                        prevX = currX;
-                        prevY = currY;
-                        prevZ = currZ;
-                    }
-                } else {
-                    // Original curve logic for non-A-axis rotation
-                    const updatedV1 = rotateAxis('x', {
-                        x: v1.x,
-                        y: v1.y,
-                        z: applyRotaryRadiusOffset(v1.z),
-                        a: v1.a || 0,
-                    });
-                    const updatedV2 = rotateAxis('x', {
-                        x: v2.x,
-                        y: v2.y,
-                        z: applyRotaryRadiusOffset(v2.z),
-                        a: v2.a || 0,
-                    });
-
-                    const radius = v2.z;
-                    let startAngle = Math.atan2(updatedV1.z, updatedV1.y);
-                    let endAngle = Math.atan2(updatedV2.z, updatedV2.y);
-                    const isClockwise = v2.z > v1.z;
-
-                    const arcCurve = new ArcCurve(
-                        0,
-                        0,
-                        radius,
-                        startAngle,
-                        endAngle,
-                        isClockwise,
-                    );
-
-                    const DEGREES_PER_LINE_SEGMENT = 5;
-
-                    const angleDiff = Math.abs(v2.z - v1.z);
-                    const divisions = Math.ceil(
-                        angleDiff / DEGREES_PER_LINE_SEGMENT,
-                    );
-                    const points = arcCurve.getPoints(divisions);
-
-                    for (let i = 0; i < points.length; ++i) {
-                        const point = points[i];
-                        pushFloat32_3(vertices, v2.x, point.x, point.y);
-                        pushMotionColor(motion, 1);
-                    }
-                }
+                handlers.normal.addLine(modal, v1, v2);
             },
             addArcCurve: (
                 modal: Modal,
@@ -1203,8 +1139,12 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
         isLaser?: boolean;
         isSecondary?: boolean;
         activeVisualizer?: VISUALIZER_TYPES_T;
+        rotaryPreviewAxis?: 'X' | 'Y';
+        rotaryCenterlineZ?: number;
     } = {
         type: 'geometryReady',
+        rotaryPreviewAxis,
+        rotaryCenterlineZ,
         jobId,
         visualizer: effectiveVisualizer,
         vertices: compactVertices.buffer,

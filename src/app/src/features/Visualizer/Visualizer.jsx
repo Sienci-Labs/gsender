@@ -33,7 +33,6 @@ import pubsub from 'pubsub-js';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import * as THREE from 'three';
-import { degToRad } from 'three/src/math/MathUtils';
 import {
     IMPERIAL_UNITS,
     METRIC_UNITS,
@@ -2487,8 +2486,6 @@ class Visualizer extends Component {
     }
 
     rotateGcodeModal(degrees) {
-        const radians = degToRad(degrees);
-
         if (!this.visualizer) {
             return;
         }
@@ -2496,7 +2493,7 @@ class Visualizer extends Component {
         // Always animate to the absolute rotation value
         // This ensures the visual stays in sync with the actual axis position
         gsap.to(this.visualizer.group.rotation, {
-            x: radians,
+            ...this.visualizer.getRotaryRotation(degrees),
             overwrite: true,
             onUpdate: () => this.updateScene({ forceUpdate: true }),
         });
