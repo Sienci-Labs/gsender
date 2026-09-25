@@ -34,10 +34,8 @@ import store from 'app/store';
 import cx from 'classnames';
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { ChecklistBlock } from './components/message/ChecklistBlock';
-import { CopyDetailsButton } from './components/message/CopyDetailsButton';
 import { MessageHeader } from './components/message/MessageHeader';
 import { ProgressBlock } from './components/message/ProgressBlock';
-import { RawCodeChip } from './components/message/RawCodeChip';
 import { ResourceBlock } from './components/message/ResourceBlock';
 import { StepsList } from './components/message/StepsList';
 import { getDismissStoreKey } from './messages/normalize';
@@ -61,7 +59,7 @@ const WIDTH: Record<HelperWeight, string> = {
 };
 
 // Order in which the dialog picks its initially focused control
-const FOCUS_ORDER = ['guide', 'primary', 'dismiss'];
+const FOCUS_ORDER = ['guide', 'primary', 'dismiss', 'close'];
 
 // Matches the shadcn DialogContent open/close animation
 const CONTENT_ANIMATION =
@@ -202,6 +200,24 @@ const HelperInfo = ({ payload, infoVisible, onClose }: Props) => {
                                 className="landscape:hidden"
                             />
                         )}
+                        {(payload.secondaryAction ||
+                            payload.primaryAction) && (
+                            <div className="flex flex-wrap items-center justify-end gap-3 pt-1">
+                                {payload.secondaryAction && (
+                                    <Button
+                                        variant="secondary"
+                                        size="custom"
+                                        className={FOOTER_BUTTON}
+                                        onClick={() =>
+                                            runAction(payload.secondaryAction)
+                                        }
+                                    >
+                                        {payload.secondaryAction.label}
+                                    </Button>
+                                )}
+                                {primaryButton}
+                            </div>
+                        )}
                     </div>
                     {resource && (
                         <ResourceBlock
@@ -211,26 +227,6 @@ const HelperInfo = ({ payload, infoVisible, onClose }: Props) => {
                         />
                     )}
                 </div>
-            </div>
-            <div
-                className={cx(
-                    'flex shrink-0 flex-wrap items-center gap-3 border-t px-6 py-3',
-                    neutral.divider,
-                )}
-            >
-                {payload.raw && <RawCodeChip raw={payload.raw} />}
-                <div className="flex-1" />
-                <CopyDetailsButton message={payload} />
-                <Button
-                    variant="secondary"
-                    size="custom"
-                    className={FOOTER_BUTTON}
-                    data-helper-focus="dismiss"
-                    onClick={() => runAction(payload.secondaryAction)}
-                >
-                    {payload.secondaryAction?.label ?? 'Dismiss'}
-                </Button>
-                {primaryButton}
             </div>
         </>
     );

@@ -40,8 +40,6 @@ export interface HelperMessage {
     kind?: HelperKind;
     weight?: HelperWeight;
     code?: string | number;
-    // Raw controller string ('ALARM:9', 'error:22'), shown in the footer chip
-    raw?: string;
     // Overrides the kind label in the eyebrow
     eyebrow?: string;
     title: string;

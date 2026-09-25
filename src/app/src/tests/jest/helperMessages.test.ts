@@ -1,6 +1,5 @@
 import { GRBL, GRBLHAL } from 'app/constants';
 import {
-    formatHelperDetails,
     getEyebrow,
     NO_DESCRIPTION,
     normalizeHelperMessage,
@@ -141,10 +140,15 @@ describe('alarm and error text lookup', () => {
 });
 
 describe('registry merge', () => {
+    let saved: typeof HELPER_REGISTRY;
+    beforeEach(() => {
+        saved = { ...HELPER_REGISTRY };
+    });
     afterEach(() => {
         Object.keys(HELPER_REGISTRY).forEach((key) => {
             delete HELPER_REGISTRY[key];
         });
+        Object.assign(HELPER_REGISTRY, saved);
     });
 
     it('overrides controller fields one at a time', () => {
@@ -167,6 +171,64 @@ describe('registry merge', () => {
         expect(normalize({ kind: 'alarm', code: 9 }, { controllerType: GRBL }).title).toBe(
             'Generic',
         );
+    });
+});
+
+describe('homing required alarm', () => {
+    const HOMING_URL =
+        'https://resources.sienci.com/view/cnc-machine-coordinates/#homing';
+
+    it('explains grblHAL alarm 11 and links the homing guide', () => {
+        const message = normalize(
+            { kind: 'alarm', code: 11 },
+            {
+                controllerType: GRBLHAL,
+                controllerAlarms: { 11: { description: 'From firmware' } },
+            },
+        );
+        expect(message.title).toBe('Homing required');
+        expect(message.description).toMatch(/^Nothing is wrong with your machine/);
+        expect(message.steps).toHaveLength(3);
+        expect(message.resource).toEqual({
+            label: 'Homing & machine coordinates',
+            url: HOMING_URL,
+            link: true,
+            qr: true,
+        });
+    });
+
+    it("gives grbl's 'Homing' alarm the same content", () => {
+        const message = normalize({ kind: 'alarm', code: 'Homing' }, { controllerType: GRBL });
+        expect(message.title).toBe('Homing required');
+        expect(message.resource?.url).toBe(HOMING_URL);
+    });
+
+    it('does not apply to a grbl alarm 11', () => {
+        const message = normalize({ kind: 'alarm', code: 11 }, { controllerType: GRBL });
+        expect(message.title).not.toBe('Homing required');
+        expect(message.steps).toBeUndefined();
+    });
+
+    it('leaves other alarms on the alarm codes page', () => {
+        const message = normalize({ kind: 'alarm', code: 9 }, { controllerType: GRBL });
+        expect(message.steps).toBeUndefined();
+        expect(message.resource).toMatchObject({
+            url: 'https://resources.sienci.com/view/gs-gsender-grbl-alarm-error-codes/#alarms',
+            link: true,
+            qr: true,
+        });
+    });
+
+    it('lets an explicit payload resource win over the default', () => {
+        const message = normalize(
+            { kind: 'alarm', code: 9, resource: { label: 'Mine', url: 'https://m' } },
+            { controllerType: GRBL },
+        );
+        expect(message.resource?.url).toBe('https://m');
+    });
+
+    it('gives non-alarm kinds no default resource', () => {
+        expect(normalize({ kind: 'error', code: 22 }, { controllerType: GRBL }).resource).toBeUndefined();
     });
 });
 
@@ -197,39 +259,5 @@ describe('display helpers', () => {
         expect(
             getEyebrow(normalize({ kind: 'info', eyebrow: 'Custom', title: 't', description: 'd' })),
         ).toBe('Custom');
-    });
-
-    it('formats copy details with raw code, plain-text description and context', () => {
-        const message = normalize({
-            kind: 'alarm',
-            code: 9,
-            raw: 'ALARM:9',
-            title: 'Homing fail',
-            description: createElement(
-                'div',
-                null,
-                createElement('p', null, 'First line.'),
-                createElement('p', null, 'Second ', createElement('b', null, 'bold'), '.'),
-            ),
-        });
-        const text = formatHelperDetails(
-            message,
-            GRBL,
-            new Date('2026-09-25T12:00:00.000Z'),
-        );
-        expect(text).toBe(
-            [
-                'ALARM:9 — Homing fail',
-                'First line. Second bold.',
-                'Controller: Grbl   Time: 2026-09-25T12:00:00.000Z',
-            ].join('\n'),
-        );
-    });
-
-    it('uses the eyebrow when there is no raw code', () => {
-        const message = normalize({ kind: 'error', title: 'Invalid lines detected', description: 'x' });
-        expect(formatHelperDetails(message, GRBL).split('\n')[0]).toBe(
-            'ERROR — Invalid lines detected',
-        );
     });
 });

@@ -1014,7 +1014,6 @@ export function* initialize(): Generator<null, void, unknown> {
             pubsub.publish('helper:info', {
                 kind: 'error',
                 code: error.code,
-                raw: `error:${error.code}`,
                 title: 'Invalid line',
                 description: (
                     <div className="flex flex-col gap-2">

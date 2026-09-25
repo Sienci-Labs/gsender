@@ -1,5 +1,4 @@
 import { GRBLHAL } from 'app/constants';
-import { isValidElement, type ReactNode } from 'react';
 import {
     GRBL_ALARMS,
     GRBL_ERRORS,
@@ -8,7 +7,7 @@ import {
     GRBL_HAL_ALARMS,
     GRBL_HAL_ERRORS,
 } from '../../../../../server/controllers/Grblhal/constants';
-import { HELPER_REGISTRY } from './registry';
+import { DEFAULT_RESOURCES, HELPER_REGISTRY } from './registry';
 import { KIND_META } from './styles';
 import type {
     ControllerCodeText,
@@ -139,7 +138,9 @@ export const normalizeHelperMessage = (
         weight: merged.weight ?? KIND_META[kind].defaultWeight,
         title: merged.title ?? '',
         description: merged.description ?? '',
-        resource: withResourceDefaults(merged.resource ?? legacyResource),
+        resource: withResourceDefaults(
+            merged.resource ?? legacyResource ?? DEFAULT_RESOURCES[kind],
+        ),
     };
 };
 
@@ -150,44 +151,6 @@ export const getEyebrow = (message: NormalizedHelperMessage): string => {
     }
     const label = KIND_META[message.kind].label;
     return message.code !== undefined ? `${label} ${message.code}` : label;
-};
-
-const BLOCK_TAGS = new Set(['div', 'p', 'li', 'ol', 'ul', 'br']);
-
-// Flattens a ReactNode description into plain text
-export const nodeToText = (node: ReactNode): string => {
-    if (node === null || node === undefined || typeof node === 'boolean') {
-        return '';
-    }
-    if (typeof node === 'string' || typeof node === 'number') {
-        return String(node);
-    }
-    if (Array.isArray(node)) {
-        return node.map(nodeToText).join('');
-    }
-    if (isValidElement<{ children?: ReactNode }>(node)) {
-        const text = nodeToText(node.props.children);
-        // Pad block elements so sibling paragraphs don't run together
-        return typeof node.type === 'string' && BLOCK_TAGS.has(node.type)
-            ? ` ${text} `
-            : text;
-    }
-    return '';
-};
-
-const collapse = (text: string) => text.replace(/\s+/g, ' ').trim();
-
-export const formatHelperDetails = (
-    message: NormalizedHelperMessage,
-    controllerType = 'Unknown',
-    now: Date = new Date(),
-): string => {
-    const heading = message.raw ?? getEyebrow(message).toUpperCase();
-    return [
-        `${heading} — ${message.title}`,
-        collapse(nodeToText(message.description)),
-        `Controller: ${controllerType}   Time: ${now.toISOString()}`,
-    ].join('\n');
 };
 
 export const getDismissStoreKey = (key: string) =>

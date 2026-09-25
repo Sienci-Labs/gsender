@@ -25,20 +25,13 @@ import pubsub from 'pubsub-js';
 import { FaQuestion } from 'react-icons/fa6';
 import type { ALARM_CODE } from './definitions';
 
-const ALARM_CODES_URL =
-    'https://resources.sienci.com/view/gs-gsender-grbl-alarm-error-codes/#alarms';
-
 const AlarmDescriptionIcon = ({ code = 1 }: { code: ALARM_CODE }) => {
-    // Title and description are filled in from the controller's alarm list
+    // Title, description and guide link are filled in by the helper from the
+    // controller's alarm list and the helper registry
     const sendAlarmDescription = () => {
         pubsub.publish('helper:info', {
             kind: 'alarm',
             code,
-            raw: `ALARM:${code}`,
-            resource: {
-                label: 'Alarm & error codes',
-                url: ALARM_CODES_URL,
-            },
         });
     };
 

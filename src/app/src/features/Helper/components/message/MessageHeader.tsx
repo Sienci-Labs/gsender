@@ -14,6 +14,7 @@ function CloseButton() {
     return (
         <DialogPrimitive.Close
             aria-label="Close"
+            data-helper-focus="close"
             className={cx(
                 'ml-auto flex h-11 w-11 shrink-0 items-center justify-center rounded-md hover:bg-black/5 dark:hover:bg-overlay-hover',
                 neutral.muted,
