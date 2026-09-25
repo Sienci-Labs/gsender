@@ -8,18 +8,6 @@
  * Electron main-process hot reload is handled by electron-reloader (wired
  * up in src/main.js) whenever esbuild rebuilds output/main.js; renderer hot
  * reload is handled by vite's own HMR.
- *
- * The one thing hot reload doesn't cover: the backend computes its plugin
- * mount routes once at startup (see getMountPointsFromPlugins() in
- * src/server/index.js), so installing a plugin needs the *backend process
- * itself* to restart, not just the Electron window. In a packaged app this
- * happens for free — the backend runs inside the Electron main process, so
- * app.relaunch() restarts both together. Here they're separate sibling
- * processes, so src/main.js's restartApp() sends this script an IPC message
- * (`gsender-dev-restart`) right before app.relaunch() so the backend can be
- * restarted specifically — see electron.on('exit', ...) below. A normal
- * window close (no such message) still ends the whole dev session exactly
- * as before.
  */
 
 const { spawn } = require('child_process');
@@ -27,7 +15,6 @@ const http = require('http');
 const path = require('path');
 
 const rootDir = path.join(__dirname, '..');
-// Absolute path to the real Electron binary, not the "electron" CLI shim.
 const electronPath = require('electron');
 const RENDERER_HOST = '127.0.0.1';
 const RENDERER_PORT = 5173;
