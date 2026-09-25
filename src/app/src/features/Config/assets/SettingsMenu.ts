@@ -1762,7 +1762,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						label: "Rotary centerline Z",
 						key: "widgets.visualizer.rotaryCenterlineZ",
 						description:
-							"Rotary centerline relative to work Z zero, for A-axis G0/G1 previews. Use a negative radius when Z zero is at the top of the stock. A nonzero value overrides the automatic diameter offset. Preview only. (Default 0)",
+							"Fallback rotary centerline relative to work Z zero, for A-axis G0/G1 previews. Valid RotatoCAM Z-zero metadata takes priority automatically. Otherwise, use a negative radius for stock-top zero. A nonzero value overrides the diameter offset. Preview only. (Default 0)",
 						type: "number",
 						unit: "mm",
 						onApply: () => {

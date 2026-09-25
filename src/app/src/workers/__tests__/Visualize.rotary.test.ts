@@ -29,6 +29,70 @@ function expectPoint(actual: number[], expected: number[]) {
 }
 
 describe('A-axis rotary preview alignment', () => {
+    test.each([10, 0, -10, 3.25])(
+        'posted datum %s overrides saved settings and diameter guesses',
+        (offset) => {
+            const options = {
+                rotaryPreviewAxis: 'Y',
+                rotaryCenterlineZ: -99,
+                rotaryDiameterOffsetEnabled: true,
+            };
+            const result = visualize(
+                `; rotatocam-meta: z_zero_offset=${offset} radial=z units=mm\r\n(Cylinder Dia: 100)\r\nG21 G90\r\nG0 Y20 Z${8 - offset} A90`,
+                options,
+            );
+            expect(result.rotaryCenterlineZ).toBe(offset === 0 ? 0 : -offset);
+            expectPoint(result.vertices.slice(-3), [-8, 20, 0]);
+            expect(result.info).toEqual(
+                visualize(
+                    `; datum omitted\n(Cylinder Dia: 100)\nG21 G90\nG0 Y20 Z${8 - offset} A90`,
+                ).info,
+            );
+        },
+    );
+
+    test('parenthesized metadata remains metric in G20 and is not retained for the next file', () => {
+        const result = visualize(
+            '(rotatocam-meta: units=mm radial=z z_zero_offset=25.4)\nG20 G90\nG0 Y1 Z-0.5 A90',
+            { rotaryPreviewAxis: 'Y' },
+        );
+        expect(result.rotaryCenterlineZ).toBe(-25.4);
+        expectPoint(result.vertices.slice(-3), [-12.7, 25.4, 0]);
+        expect(visualize('G21 G90\nG0 Y20 Z8 A90').rotaryCenterlineZ).toBe(0);
+    });
+
+    test.each([
+        '; rotatocam-meta: z_zero_offset=NaN radial=z units=mm',
+        '; rotatocam-meta: z_zero_offset=1e999 radial=z units=mm',
+        '; rotatocam-meta: z_zero_offset=10bad radial=z units=mm',
+        '; rotatocam-meta: z_zero_offset=10 radial=x units=mm',
+        '; rotatocam-meta: z_zero_offset=10 radial=z units=inch',
+        '; rotatocam-meta: z_zero_offset=10 radial=z',
+        '; rotatocam-meta: z_zero_offset=10 z_zero_offset=20 radial=z units=mm',
+        '; rotatocam-meta: z_zero_offset=10 radial=z units=mm\n; rotatocam-meta: z_zero_offset=20 radial=z units=mm',
+        '; example rotatocam-meta: z_zero_offset=10 radial=z units=mm',
+        'rotatocam-meta: z_zero_offset=10 radial=z units=mm',
+    ])(
+        'unsupported or malformed metadata uses the manual fallback: %s',
+        (header) => {
+            const result = visualize(`${header}\nG21 G90\nG0 Y20 Z-2 A90`, {
+                rotaryPreviewAxis: 'Y',
+                rotaryCenterlineZ: -10,
+            });
+            expect(result.rotaryCenterlineZ).toBe(-10);
+            expectPoint(result.vertices.slice(-3), [-8, 20, 0]);
+        },
+    );
+
+    test('posted metadata does not offset a non-rotary file', () => {
+        const code = 'G21 G90\nG0 X3 Y4 Z5\nG1 Z-2';
+        const result = visualize(
+            `; rotatocam-meta: z_zero_offset=10 radial=z units=mm\n${code}`,
+        );
+        expect(result.rotaryCenterlineZ).toBe(0);
+        expect(result.vertices).toEqual(visualize(code).vertices);
+    });
+
     test.each([0, 90, 180, 270])(
         'indexed surface-zero paths use the explicit centerline at A=%s',
         (a) => {

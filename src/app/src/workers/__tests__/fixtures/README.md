@@ -20,10 +20,29 @@ backward-compatible default. Preview coordinates use the existing inverse-angle
 convention: at A=+90, (X0,Y20,Z5) becomes (-5,20,0) for Y alignment. The live model
 rotates by +A around the same axis to return that point to machine coordinates.
 
-For stock-top Z zero, set **Rotary centerline Z** to the negative stock radius
+RotatoCAM files automatically supply their Z datum through a standalone comment:
+
+```gcode
+; rotatocam-meta: z_zero_offset=10.0000 radial=z units=mm
+```
+
+The centerline is the negative of `z_zero_offset`, because the post subtracts
+that offset from Z. Positive, negative, and zero values support top, bottom,
+center, and arbitrary stock-zero locations. The metadata is metric even in
+G20 programs. Semicolon and parenthesized comments are supported. Valid metadata
+takes priority over the saved manual setting and diameter heuristic, including
+an explicit zero; it is read afresh for each file. Missing, malformed,
+conflicting, or unsupported metadata uses the manual fallback. Only `radial=z`
+and `units=mm` are supported by this metadata contract.
+
+Open `rotary-y-posted-datum.nc` with Y alignment and any saved centerline value:
+its header automatically places the centerline at -10 mm. The final point at
+A=90 has centerline-relative coordinates (-8,20,0), work coordinates (-8,20,-10).
+
+For files without supported metadata, set **Rotary centerline Z** to the negative stock radius
 in millimeters (for example, -10 for 20 mm diameter stock). The worker subtracts
 this centerline before rotating, and the viewer restores the offset afterward.
-A nonzero value overrides the optional diameter-header offset and applies only
+A nonzero fallback overrides the optional diameter-header offset and applies only
 to files containing A words. It is stored in millimeters even for G20 input.
 Offline previews use A=0 when no machine position is available.
 

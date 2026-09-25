@@ -88,6 +88,7 @@ interface Modal {
 
 type RotaryMetadata = {
     radius: number | null;
+    centerlineZ: number | null;
     hasTransverseAxisMoves: boolean;
     hasAAxisMoves: boolean;
 };
@@ -304,6 +305,35 @@ const ROTARY_DIAMETER_PATTERNS = [
     /\(.*?Cylinder\s*Dia(?:meter)?\s*[=:]\s*([0-9]+[.,][0-9]+|[0-9]+)/i, // Matches when inside parens, e.g. "(Cylinder Dia: 64.38)"
 ];
 
+// RotatoCAM subtracts this datum from posted Z. Its metadata is explicitly
+// metric, including in G20 programs. Only consume the supported comment contract.
+const parsePostedCenterlineZ = (raw: string): number | null => {
+    const comments = /^[\t ]*(?:;[\t ]*([^\r\n]*)|\(([^\r\n)]*)\)[\t ]*)$/gm;
+    let centerlineZ: number | null = null;
+    for (const match of raw.matchAll(comments)) {
+        const comment = (match[1] ?? match[2]).trim();
+        if (!/^rotatocam-meta:/i.test(comment)) continue;
+        const fields = comment.slice(comment.indexOf(':') + 1).trim().split(/\s+/);
+        const values = new Map<string, string>();
+        for (const field of fields) {
+            const pair = field.split('=');
+            if (pair.length !== 2 || values.has(pair[0].toLowerCase())) return null;
+            values.set(pair[0].toLowerCase(), pair[1]);
+        }
+        const offset = values.get('z_zero_offset') ?? '';
+        if (
+            values.get('radial')?.toLowerCase() !== 'z' ||
+            values.get('units')?.toLowerCase() !== 'mm' ||
+            !/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i.test(offset)
+        ) return null;
+        const parsed = -Number(offset);
+        if (!Number.isFinite(parsed)) return null;
+        if (centerlineZ !== null && centerlineZ !== parsed) return null;
+        centerlineZ = parsed === 0 ? 0 : parsed;
+    }
+    return centerlineZ;
+};
+
 const parseRotaryMetadata = (
     raw: string,
     rotaryPreviewAxis: 'X' | 'Y',
@@ -346,7 +376,12 @@ const parseRotaryMetadata = (
         }
     }
 
-    return { radius, hasTransverseAxisMoves, hasAAxisMoves };
+    return {
+        radius,
+        centerlineZ: parsePostedCenterlineZ(raw),
+        hasTransverseAxisMoves,
+        hasAAxisMoves,
+    };
 };
 
 self.onmessage = function ({ data }: { data: WorkerData }) {
@@ -380,17 +415,20 @@ self.onmessage = function ({ data }: { data: WorkerData }) {
     }
 
     const rotationAxis = rotaryPreviewAxis === 'Y' ? 'y' : 'x';
-    const { radius: rotaryRadius, hasTransverseAxisMoves, hasAAxisMoves } =
+    const { radius: rotaryRadius, centerlineZ: postedCenterlineZ, hasTransverseAxisMoves, hasAAxisMoves } =
         parseRotaryMetadata(content, rotaryPreviewAxis);
     // G-code positions have already been converted to mm by the virtualizer.
     // The explicit centerline is also in mm, independent of G20/G21.
-    const rotaryCenterlineZ = hasAAxisMoves && Number.isFinite(requestedCenterlineZ)
-        ? requestedCenterlineZ : 0;
+    const hasPostedCenterline = hasAAxisMoves && postedCenterlineZ !== null;
+    const rotaryCenterlineZ = hasAAxisMoves
+        ? postedCenterlineZ ?? (Number.isFinite(requestedCenterlineZ) ? requestedCenterlineZ : 0)
+        : 0;
     markProfile(profiler, 'after_rotary_scan');
     sampleHeap(profiler, 'after_rotary_scan');
 
     const shouldOffsetRotaryRadius =
         rotaryDiameterOffsetEnabled &&
+        !hasPostedCenterline &&
         rotaryCenterlineZ === 0 &&
         rotaryRadius !== null &&
         !hasTransverseAxisMoves;
