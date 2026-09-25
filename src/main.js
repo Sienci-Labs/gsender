@@ -860,32 +860,82 @@ const main = () => {
                 const finishRestart = () => {
                     if (didRestart) return;
                     didRestart = true;
-                    app.relaunch(); // flags are handled in server/index.js
+                    // In npm run dev:electron, electron-hot.js owns
+                    // respawning Electron after a restart (see the
+                    // gsender-dev-restart message sent below) — calling
+                    // app.relaunch() here too would race it: the OS would
+                    // spawn a second instance independently, and since
+                    // gSender enforces a single-instance lock
+                    // (requestSingleInstanceLock() above), one of the two
+                    // duplicate instances just quits again immediately —
+                    // which, if it's the one electron-hot.js is tracking,
+                    // looks exactly like an unprompted window close and
+                    // tears the whole dev session back down. In production
+                    // there's no separate orchestrator, so app.relaunch() is
+                    // exactly what's needed there.
+                    if (process.env.NODE_ENV !== 'development') {
+                        app.relaunch(); // flags are handled in server/index.js
+                    }
                     app.exit(0);
                 };
 
-                // The pendant view runs in native kiosk/fullscreen mode, which can
-                // block the process from exiting cleanly (macOS in particular) unless
-                // we leave fullscreen first. Schedule the fallback timeout before
-                // touching kiosk/fullscreen state so a native exception there can't
-                // prevent the restart from ever happening.
-                if (
-                    window &&
-                    !window.isDestroyed() &&
-                    (window.isKiosk() || window.isFullScreen())
-                ) {
-                    window.once('leave-full-screen', finishRestart);
-                    setTimeout(finishRestart, 1000);
-                    try {
-                        window.setKiosk(false);
-                        window.setFullScreen(false);
-                    } catch (err) {
-                        log.error(
-                            `Failed to leave kiosk/fullscreen before restart: ${err}`,
-                        );
+                const proceedWithRestart = () => {
+                    // The pendant view runs in native kiosk/fullscreen mode, which can
+                    // block the process from exiting cleanly (macOS in particular) unless
+                    // we leave fullscreen first. Schedule the fallback timeout before
+                    // touching kiosk/fullscreen state so a native exception there can't
+                    // prevent the restart from ever happening.
+                    if (
+                        window &&
+                        !window.isDestroyed() &&
+                        (window.isKiosk() || window.isFullScreen())
+                    ) {
+                        window.once('leave-full-screen', finishRestart);
+                        setTimeout(finishRestart, 1000);
+                        try {
+                            window.setKiosk(false);
+                            window.setFullScreen(false);
+                        } catch (err) {
+                            log.error(
+                                `Failed to leave kiosk/fullscreen before restart: ${err}`,
+                            );
+                        }
+                    } else {
+                        finishRestart();
                     }
+                };
+
+                // In `npm run dev:electron`, the backend server is a separate
+                // process supervised by scripts/electron-hot.js, not something
+                // this Electron process embeds itself (see that file's
+                // launchServer() branch, which only runs in production).
+                // app.relaunch() only restarts this Electron process — it
+                // can't restart a sibling process it knows nothing about.
+                // process.send is only defined when electron-hot.js spawned us
+                // with an IPC channel, so this tells it a real restart (not
+                // just a window close) is happening and it needs to restart
+                // the backend too — see that file's electron.on('message',
+                // ...). It's undefined (safe, falls through immediately) in a
+                // packaged app or any other launch path. process.send() only
+                // queues the message for async delivery, so wait for its
+                // callback to confirm it was actually sent before tearing this
+                // process down — a fallback timer covers the unlikely case the
+                // callback never fires (e.g. the channel died) so a restart
+                // can never hang forever.
+                if (
+                    process.env.NODE_ENV === 'development' &&
+                    typeof process.send === 'function'
+                ) {
+                    let notified = false;
+                    const notifyOnce = () => {
+                        if (notified) return;
+                        notified = true;
+                        proceedWithRestart();
+                    };
+                    setTimeout(notifyOnce, 500);
+                    process.send({ type: 'gsender-dev-restart' }, notifyOnce);
                 } else {
-                    finishRestart();
+                    proceedWithRestart();
                 }
             };
 
