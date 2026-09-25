@@ -1012,12 +1012,15 @@ export function* initialize(): Generator<null, void, unknown> {
         );
         if (showLineWarnings && error.type === ERROR) {
             pubsub.publish('helper:info', {
-                title: 'Invalid Line',
+                kind: 'error',
+                code: error.code,
+                raw: `error:${error.code}`,
+                title: 'Invalid line',
                 description: (
                     <div className="flex flex-col gap-2">
                         <p>
-                            The following line caused an{' '}
-                            <b>error {error.code}</b>: <i>'{error.line}'</i>
+                            The controller rejected this line:{' '}
+                            <code className="font-mono">{error.line}</code>
                         </p>
                         <p>Press Start to resume the job.</p>
                     </div>
@@ -1259,17 +1262,23 @@ export function* initialize(): Generator<null, void, unknown> {
                 });
             } else if (payload.subtype === '10') {
                 pubsub.publish('helper:info', {
-                    title: 'Jogging Inside Keepout Area',
+                    kind: 'info',
+                    title: 'Jogging inside keepout area',
+                    description:
+                        'You are attempting to jog inside the keepout area. Disable keepout using the switch below, then re-enable it to continue.',
                     content: (
-                        <div className="flex flex-row gap-4 items-centerx`">
-                            <span>Keepout:</span>
+                        <div className="flex items-center justify-between gap-4 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-outline-subtle dark:bg-surface-base">
+                            <span className="text-base font-bold text-gray-900 dark:text-content-primary">
+                                Keepout
+                            </span>
                             <KeepoutToggle />
                         </div>
                     ),
-                    description:
-                        'You are attempting to jog inside the keepout area.  Disable keepout using the switch below and then re-enable to continue',
-                    resourceLink:
-                        'https://resources.sienci.com/view/atc-final-checks/#troubleshooting',
+                    resource: {
+                        label: 'Keepout areas',
+                        url: 'https://resources.sienci.com/view/atc-final-checks/#troubleshooting',
+                        qr: false,
+                    },
                 });
             } else {
                 Confirm({

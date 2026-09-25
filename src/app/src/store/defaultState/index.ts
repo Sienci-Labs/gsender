@@ -302,6 +302,10 @@ const defaultState: State = {
                 },
             },
         },
+        helper: {
+            // Helper messages the user asked not to see again, by dismissKey
+            dismissed: {},
+        },
         location: {
             minimized: false,
             axes: ['x', 'y', 'z'],

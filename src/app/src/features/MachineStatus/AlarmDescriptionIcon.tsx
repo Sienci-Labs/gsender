@@ -21,42 +21,24 @@
  *
  */
 
-import { GRBLHAL } from 'app/constants';
-import get from 'lodash/get';
 import pubsub from 'pubsub-js';
 import { FaQuestion } from 'react-icons/fa6';
-import { GRBL_ALARMS } from '../../../../server/controllers/Grbl/constants';
-import { GRBL_HAL_ALARMS } from '../../../../server/controllers/Grblhal/constants';
-import { store as reduxStore } from '../../store/redux';
 import type { ALARM_CODE } from './definitions';
 
-const getCodeDescription = (code: number | 'Homing' = 1): string => {
-    const controllerType: string = get(
-        reduxStore.getState(),
-        'controller.type',
-    );
-    let alarm;
-    if (controllerType === GRBLHAL) {
-        const alarms = get(reduxStore.getState(), 'controller.settings.alarms');
-        alarm = alarms?.[code as number]; // code will not be "homing" if grblhal
-        if (!alarm) {
-            alarm = GRBL_HAL_ALARMS.find((alarm) => alarm.code === code);
-        }
-    } else {
-        alarm = GRBL_ALARMS.find((alarm) => alarm.code === code);
-    }
-    if (alarm) {
-        return alarm.description;
-    }
-    return 'No matching description found';
-};
+const ALARM_CODES_URL =
+    'https://resources.sienci.com/view/gs-gsender-grbl-alarm-error-codes/#alarms';
 
 const AlarmDescriptionIcon = ({ code = 1 }: { code: ALARM_CODE }) => {
+    // Title and description are filled in from the controller's alarm list
     const sendAlarmDescription = () => {
         pubsub.publish('helper:info', {
-            title: `Alarm Code ${code}`,
-            description: getCodeDescription(code),
-            qrCode: 'https://resources.sienci.com/view/gs-gsender-grbl-alarm-error-codes/#alarms',
+            kind: 'alarm',
+            code,
+            raw: `ALARM:${code}`,
+            resource: {
+                label: 'Alarm & error codes',
+                url: ALARM_CODES_URL,
+            },
         });
     };
 
