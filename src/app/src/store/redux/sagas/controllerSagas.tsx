@@ -293,6 +293,14 @@ export function* initialize(): Generator<any, void, any> {
             'widgets.visualizer.rotaryDiameterOffsetEnabled',
             false,
         );
+        const rotaryPreviewAxis = store.get(
+            'widgets.visualizer.rotaryPreviewAxis',
+            'X',
+        );
+        const rotaryCenterlineZ = store.get(
+            'widgets.visualizer.rotaryCenterlineZ',
+            0,
+        );
         const atcFlag: string = get(
             reduxStore,
             'controller.settings.info.NEWOPT.ATC',
@@ -366,6 +374,8 @@ export function* initialize(): Generator<any, void, any> {
                     maxFeedrates,
                     atcEnabled,
                     rotaryDiameterOffsetEnabled,
+                    rotaryPreviewAxis,
+                    rotaryCenterlineZ,
                     theme: getVisualizerTheme(),
                     profile: profileWorker,
                     profileSampleEvery,
@@ -428,6 +438,8 @@ export function* initialize(): Generator<any, void, any> {
             maxFeedrates,
             atcEnabled,
             rotaryDiameterOffsetEnabled,
+            rotaryPreviewAxis,
+            rotaryCenterlineZ,
             theme: getVisualizerTheme(),
             profile: profileWorker,
             profileSampleEvery,

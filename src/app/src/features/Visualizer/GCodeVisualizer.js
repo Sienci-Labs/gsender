@@ -61,7 +61,18 @@ class GCodeVisualizer {
         return this;
     }
 
-    render({ vertices, frames, isLaser = false }, colorArray, savedColors) {
+    render(
+        { vertices, frames, isLaser = false, rotaryPreviewAxis = 'X', rotaryCenterlineZ = 0 },
+        colorArray,
+        savedColors,
+    ) {
+        // Keep live rotation paired with the geometry that is actually loaded,
+        // even while a settings change is being parsed by the worker.
+        this.rotaryPreviewAxis = rotaryPreviewAxis;
+        // Vertices are relative to the rotary centerline; place the rotation
+        // group back in work coordinates before the viewport centers it.
+        this.rotaryCenterlineZ = rotaryCenterlineZ;
+        this.group.position.z = rotaryCenterlineZ;
         this.vertices = new THREE.BufferAttribute(vertices, 3);
         this.frames = frames;
         this.isLaser = isLaser;
@@ -101,6 +112,16 @@ class GCodeVisualizer {
         this.group.add(workpiece);
 
         return this.group;
+    }
+
+    getRotaryRotation(degrees = 0) {
+        // A is unavailable when previewing a file without a connected machine.
+        const radians = THREE.MathUtils.degToRad(degrees);
+        return {
+            x: this.rotaryPreviewAxis === 'Y' ? 0 : radians,
+            y: this.rotaryPreviewAxis === 'Y' ? radians : 0,
+            z: 0,
+        };
     }
 
     _ensureOriginalColorsSnapshot() {

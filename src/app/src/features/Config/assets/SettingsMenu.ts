@@ -1748,6 +1748,28 @@ export const SettingsMenu: SettingsMenuSection[] = [
 						eID: "$538",
 					},
 					{
+						label: "Rotary preview axis",
+						key: "widgets.visualizer.rotaryPreviewAxis",
+						description:
+							"Axis parallel to the rotary centerline for A-axis G0/G1 previews. Changes the preview only. (Default X)",
+						type: "select",
+						options: ["X", "Y"],
+						onApply: () => {
+							pubsub.publish("visualizer:settings");
+						},
+					},
+					{
+						label: "Rotary centerline Z",
+						key: "widgets.visualizer.rotaryCenterlineZ",
+						description:
+							"Fallback rotary centerline relative to work Z zero, for A-axis G0/G1 previews. Valid RotatoCAM Z-zero metadata takes priority automatically. Otherwise, use a negative radius for stock-top zero. A nonzero value overrides the diameter offset. Preview only. (Default 0)",
+						type: "number",
+						unit: "mm",
+						onApply: () => {
+							pubsub.publish("visualizer:settings");
+						},
+					},
+					{
 						label: "Visualize non-center zeros",
 						key: "widgets.visualizer.rotaryDiameterOffsetEnabled",
 						description:

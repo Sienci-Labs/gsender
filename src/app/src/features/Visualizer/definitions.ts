@@ -73,6 +73,8 @@ export interface Visualizer {
     showSoftLimitWarning: boolean;
     hideProcessedLines: boolean;
     rotaryDiameterOffsetEnabled: boolean;
+    rotaryPreviewAxis: 'X' | 'Y';
+    rotaryCenterlineZ: number;
     debug: {
         profileWorker: boolean;
         profileSampleEvery: number;
