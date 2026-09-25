@@ -1,10 +1,11 @@
 import { ATCWidget } from 'app/features/ATC';
-import { PluginTabIframe } from 'app/features/Plugins/components/PluginTabPanel';
+import { PluginTabPanel } from 'app/features/Plugins/components/PluginTabPanel';
 import { usePlugins } from 'app/features/Plugins/hooks/usePlugins';
+import type { PluginRecord } from 'app/features/Plugins/types';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { useWidgetState } from 'app/hooks/useWidgetState';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-import { RootState } from 'app/store/redux';
+import type { RootState } from 'app/store/redux';
 import { useMemo } from 'react';
 import { Tabs } from '../../components/Tabs';
 import { Widget } from '../../components/Widget';
@@ -61,7 +62,7 @@ const Tools = () => {
     );
 
     const pluginTabs = useMemo(() => {
-        return toolsTabPlugins.flatMap((plugin) => {
+        return toolsTabPlugins.flatMap((plugin: PluginRecord) => {
             const contribution = plugin.contributions.find(
                 (c) => c.slot === 'tools-tab',
             );
@@ -71,7 +72,7 @@ const Tools = () => {
 
             const label = contribution.label || plugin.name;
             const TabContent = ({ isActive }: { isActive: boolean }) => (
-                <PluginTabIframe pluginId={plugin.id} isActive={isActive} />
+                <PluginTabPanel plugin={plugin} isActive={isActive} />
             );
 
             return [{ label, content: TabContent }];
@@ -80,24 +81,34 @@ const Tools = () => {
 
     const atcEnabledOrCompiled = atcEnabled || atcReport === '1';
 
-    const filteredTabs = [...tabs, ...pluginTabs].filter((tab) => {
-        if (tab.label === 'Rotary' && !rotary.tab.show) {
-            return false;
-        }
+    const filteredTabs = useMemo(
+        () =>
+            [...tabs, ...pluginTabs].filter((tab) => {
+                if (tab.label === 'Rotary' && !rotary.tab.show) {
+                    return false;
+                }
 
-        if (tab.label === 'Spindle/Laser' && !spindleFunctions) {
-            return false;
-        }
-        if (tab.label === 'ATC' && !atcEnabledOrCompiled) {
-            return false;
-        }
+                if (tab.label === 'Spindle/Laser' && !spindleFunctions) {
+                    return false;
+                }
+                if (tab.label === 'ATC' && !atcEnabledOrCompiled) {
+                    return false;
+                }
 
-        if (tab.label === 'Coolant' && !coolantFunctions) {
-            return false;
-        }
+                if (tab.label === 'Coolant' && !coolantFunctions) {
+                    return false;
+                }
 
-        return true;
-    });
+                return true;
+            }),
+        [
+            pluginTabs,
+            rotary.tab.show,
+            spindleFunctions,
+            atcEnabledOrCompiled,
+            coolantFunctions,
+        ],
+    );
 
     return (
         <Widget>

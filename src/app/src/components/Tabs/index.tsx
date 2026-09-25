@@ -1,5 +1,6 @@
+/** biome-ignore-all lint/a11y/useButtonType: <> */
 import classNames from 'classnames';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from 'react-icons/md';
 import { useLocation } from 'react-router';
@@ -21,6 +22,15 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
     const [canScrollRight, setCanScrollRight] = useState(false);
     const location = useLocation();
 
+    const checkScrollability = useCallback(() => {
+        if (tabsRef.current) {
+            const { scrollLeft, scrollWidth, clientWidth } = tabsRef.current;
+            setCanScrollLeft(scrollLeft > 0);
+            setCanScrollRight(scrollLeft + clientWidth < scrollWidth);
+        }
+    }, []);
+
+    // biome-ignore lint/correctness/useExhaustiveDependencies: <>
     useEffect(() => {
         const { pathname } = location;
         if (pathname === '/') {
@@ -28,25 +38,24 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
         }
     }, [location]);
 
+    // resize sub is by itself so it doesnt get refreshed when the items var changes
+    useEffect(() => {
+        window.addEventListener('resize', checkScrollability);
+        return () => window.removeEventListener('resize', checkScrollability);
+    }, [checkScrollability]);
+
     useEffect(() => {
         tabRefs.current = tabRefs.current.slice(0, items.length);
         checkScrollability();
 
-        window.addEventListener('resize', checkScrollability);
-
         // if the active tab doesnt exist in the tabs list anymore, default to first tab
-        if (!items.find((value) => value.label === activeTab)) {
+        if (
+            items.length > 0 &&
+            !items.find((value) => value.label === activeTab)
+        ) {
             setActiveTab(items[0].label);
         }
-    }, [items]);
-
-    const checkScrollability = () => {
-        if (tabsRef.current) {
-            const { scrollLeft, scrollWidth, clientWidth } = tabsRef.current;
-            setCanScrollLeft(scrollLeft > 0);
-            setCanScrollRight(scrollLeft + clientWidth < scrollWidth);
-        }
-    };
+    }, [items, activeTab, checkScrollability]);
 
     const scrollTabs = (direction: 'left' | 'right') => {
         if (tabsRef.current) {
@@ -114,27 +123,26 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                         role="tablist"
                         aria-label="Widget Tabs"
                     >
-                        {items &&
-                            items.map((item, index) => (
-                                <button
-                                    key={item.label}
-                                    ref={(el) => (tabRefs.current[index] = el)}
-                                    role="tab"
-                                    aria-selected={activeTab === item.label}
-                                    aria-controls={`tabpanel-${item.label}`}
-                                    id={`tab-${item.label}`}
-                                    className={`flex-grow pt-1 px-4 max-xl:px-3 text-base font-medium max-xl:text-sm portrait:text-xl max-xl:pt-2 ${
-                                        activeTab === item.label
-                                            ? 'text-blue-600 border-b-2 border-blue-600 dark:text-blue-400 dark:border-blue-400'
-                                            : 'text-gray-600 border-b-2 border-transparent hover:text-gray-800 dark:text-content-secondary dark:hover:text-gray-100'
-                                    }`}
-                                    onClick={() =>
-                                        handleTabClick(item.label, index)
-                                    }
-                                >
-                                    {item.label}
-                                </button>
-                            ))}
+                        {items?.map((item, index) => (
+                            <button
+                                key={item.label}
+                                ref={(el) => (tabRefs.current[index] = el)}
+                                role="tab"
+                                aria-selected={activeTab === item.label}
+                                aria-controls={`tabpanel-${item.label}`}
+                                id={`tab-${item.label}`}
+                                className={`flex-grow whitespace-nowrap pt-1 px-4 max-xl:px-3 text-base font-medium max-xl:text-sm portrait:text-xl max-xl:pt-2 ${
+                                    activeTab === item.label
+                                        ? 'text-blue-600 border-b-2 border-blue-600 dark:text-blue-400 dark:border-blue-400'
+                                        : 'text-gray-600 border-b-2 border-transparent hover:text-gray-800 dark:text-content-secondary dark:hover:text-gray-100'
+                                }`}
+                                onClick={() =>
+                                    handleTabClick(item.label, index)
+                                }
+                            >
+                                {item.label}
+                            </button>
+                        ))}
                     </div>
                     <button
                         className={`flex-shrink-0 p-1 rounded-full bg-transparent transition-colors duration-200 max-xl:pt-2 ${
@@ -151,21 +159,20 @@ export const Tabs = ({ items = [] }: TabbedProps) => {
                 </div>
             </div>
             <div className="block w-full h-full">
-                {items &&
-                    items.map(({ label, content: Content }) => (
-                        <div
-                            key={label}
-                            role="tabpanel"
-                            id={`tabpanel-${label}`}
-                            aria-labelledby={`tab-${label}`}
-                            className={classNames(
-                                'w-full h-full',
-                                activeTab === label ? 'block' : 'hidden',
-                            )}
-                        >
-                            <Content isActive={activeTab === label} />
-                        </div>
-                    ))}
+                {items?.map(({ label, content: Content }) => (
+                    <div
+                        key={label}
+                        role="tabpanel"
+                        id={`tabpanel-${label}`}
+                        aria-labelledby={`tab-${label}`}
+                        className={classNames(
+                            'w-full h-full',
+                            activeTab === label ? 'block' : 'hidden',
+                        )}
+                    >
+                        <Content isActive={activeTab === label} />
+                    </div>
+                ))}
             </div>
         </div>
     );

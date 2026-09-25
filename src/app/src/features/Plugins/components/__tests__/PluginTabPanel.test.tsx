@@ -7,9 +7,6 @@ jest.mock('app/lib/controller', () => ({
     addListener: jest.fn(),
     removeListener: jest.fn(),
 }));
-jest.mock('../../hooks/usePlugins', () => ({
-    usePlugins: () => ({ plugins: [] }),
-}));
 
 const pluginRecord: PluginRecord = {
     id: 'com.example.tab',
@@ -51,5 +48,16 @@ describe('PluginTabPanel', () => {
             true,
         );
         expect(capabilities?.topics.has('workspace')).toBe(true);
+    });
+
+    it('stays mounted while inactive — Tabs handles visibility, not this component', () => {
+        // Regression test: this used to `return null` when !isActive, which
+        // meant switching to a sibling tab and back tore the iframe down and
+        // rebuilt it, losing all of the plugin's state.
+        const { container } = render(
+            <PluginTabPanel plugin={pluginRecord} isActive={false} />,
+        );
+
+        expect(container.querySelector('iframe')).not.toBeNull();
     });
 });
