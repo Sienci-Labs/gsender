@@ -11,8 +11,7 @@
 - [ ] Unit tests added/updated
 - [ ] Cypress tests added/updated
 - [ ] Manually tested in Chrome
-- [ ] Manually tested in Safari
-- [ ] Manually tested in Firefox
+- [ ] Manually tested in desktop app (Electron)
 
 ## Screenshots (if UI change)
 <!-- Drag and drop screenshots here -->
