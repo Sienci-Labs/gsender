@@ -77,7 +77,7 @@ const MeasurementStep = ({ onComplete }: Props) => {
                     </p>
                 </div>
 
-                <div className="space-y-6">
+                <div className="space-y-6 w-min">
                     {currentMainStepData.subSteps.map((step, index) => {
                         const isCurrentStep =
                             index === currentSubStep && !step.completed;
@@ -90,7 +90,7 @@ const MeasurementStep = ({ onComplete }: Props) => {
                         return (
                             <div
                                 key={step.buttonLabel}
-                                className={`flex items-center gap-4 p-2 rounded-lg transition-colors ${
+                                className={`flex items-center gap-4 p-2 rounded-lg transition-colors w-full ${
                                     isCurrentStep
                                         ? 'bg-blue-50 border border-blue-200 bg-opacity-40'
                                         : isPastStep
@@ -112,7 +112,7 @@ const MeasurementStep = ({ onComplete }: Props) => {
                                 <div className="flex flex-col gap-2 flex-1">
                                     <div className="flex items-center gap-4">
                                         <div className="flex-1">
-                                            <h4 className="font-medium">
+                                            <h4 className="font-medium dark:text-white">
                                                 {step.buttonLabel}
                                             </h4>
                                             <div className="flex items-center gap-2 mt-2">
@@ -136,6 +136,10 @@ const MeasurementStep = ({ onComplete }: Props) => {
                                                     }}
                                                     suffix={units ?? 'mm'}
                                                     data-testid={`sq-measure-distance-input-${measurementKey}`}
+                                                    disabled={
+                                                        !isCurrentStep &&
+                                                        !isPastStep
+                                                    }
                                                 />
                                                 <Button
                                                     disabled={

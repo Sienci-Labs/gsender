@@ -26,6 +26,7 @@ export interface SecondaryContent {
     url?: string;
     props?: Record<string, any>;
     fill?: boolean;
+    centered?: boolean;
     function?: (item: SecondaryContent, params: any) => string;
 }
 

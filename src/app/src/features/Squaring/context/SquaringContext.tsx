@@ -179,6 +179,7 @@ const initialMainSteps = (): MainStep[] => {
                 },
                 {
                     buttonLabel: 'Mark Point 2',
+                    buttonVariant: 'secondary',
                     description:
                         'Now mark the second location with the second piece of tape.',
                     completed: false,
@@ -204,6 +205,7 @@ const initialMainSteps = (): MainStep[] => {
                 },
                 {
                     buttonLabel: 'Move Y-axis',
+                    buttonVariant: 'primary',
                     description:
                         'Input the farthest your CNC can move in the Y-axis to create a vertical line.',
                     value: units === 'mm' ? 300 : 12,
@@ -238,6 +240,7 @@ const initialMainSteps = (): MainStep[] => {
                 },
                 {
                     buttonLabel: 'Mark Point 3',
+                    buttonVariant: 'secondary',
                     description:
                         'Place the last piece of tape with an X mark at the current position.',
                     completed: false,

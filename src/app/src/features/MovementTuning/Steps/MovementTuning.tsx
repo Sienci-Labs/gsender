@@ -122,7 +122,7 @@ export function useMovementTuningWizard(): Wizard {
                         },
                         {
                             id: 'move-axis',
-                            title: 'Move X-Axis',
+                            title: 'Move Axis',
                             component: MoveAxis,
                             secondaryContent: [
                                 {

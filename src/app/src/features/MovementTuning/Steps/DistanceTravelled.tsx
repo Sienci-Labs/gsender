@@ -28,9 +28,9 @@ const DistanceTravelled = ({ onComplete }: Props) => {
                 </p>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-6 w-min">
                 <div
-                    className={`flex w-[450px] items-center gap-4 p-4 rounded-lg transition-colors ${
+                    className={`flex w-full items-center gap-4 p-4 rounded-lg transition-colors ${
                         setTravelCompleted
                             ? 'bg-green-50 border border-green-200 bg-opacity-30'
                             : 'bg-blue-50 border border-blue-200 bg-opacity-40'
