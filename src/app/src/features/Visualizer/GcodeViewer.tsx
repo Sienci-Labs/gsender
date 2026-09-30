@@ -61,6 +61,7 @@ import {
     WORKFLOW_STATE_RUNNING,
 } from '../../constants';
 import { outlineResponse } from '../../workers/Outline.response';
+import { shouldVisualize } from '../../workers/Visualize.response';
 import type { Actions, CAMERA_POSITIONS_T, State } from './definitions';
 import { buildGridOptions, buildMachineBedOptions } from './viewerOptions';
 import { buildViewerTheme, WORKSHOP_VISUALIZER_COLORS } from './viewerTheme';
@@ -298,8 +299,35 @@ class GcodeViewer extends Component<Props> {
         // the new viewer would otherwise start at origin.
         this.viewer3d?.setBitPosition(this.lastPosition, { immediate: true });
         this.viewerSvg?.setBitPosition(this.lastPosition);
-        if (this.lastWorkerData) {
+        // With visualization off ("Everything" lightweight mode) the fresh viewer
+        // stays empty. lastWorkerData is kept so turning it back on is instant.
+        if (this.lastWorkerData && shouldVisualize()) {
             this.applyWorkerData(this.lastWorkerData);
+        }
+    }
+
+    handleLiteModeChange() {
+        this.recreateViewer();
+
+        // A file loaded while visualization was off was parsed without geometry,
+        // so there is nothing to redraw: parse it again. Primary only — both
+        // viewers receive this event, and the reparse serves the main file.
+        const parsedWithoutGeometry =
+            _get(this.lastWorkerData, 'needsVisualization') === false;
+        if (
+            !this.props.isSecondary &&
+            parsedWithoutGeometry &&
+            shouldVisualize()
+        ) {
+            const { file } = reduxStore.getState();
+            if (file.content) {
+                pubsub.publish('reparseGCode', {
+                    content: file.content,
+                    size: file.size,
+                    name: file.name,
+                    visualizer: VISUALIZER_PRIMARY,
+                });
+            }
         }
     }
 
@@ -1052,7 +1080,7 @@ class GcodeViewer extends Component<Props> {
                 this.applyOptionsFromState();
             }),
             pubsub.subscribe('litemode:change', () => {
-                this.recreateViewer();
+                this.handleLiteModeChange();
             }),
             pubsub.subscribe('job:end', () => {
                 this.viewer3d?.showAll();
