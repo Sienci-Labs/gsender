@@ -27,8 +27,8 @@ export default function Visualizer() {
                         data.svgSegmentGroups,
                         data.svgMeta,
                     );
-                } else {
-                    svgRef.current?.loadFromWorkerData(data);
+                } else if (data.format === 'segments-v1') {
+                    svgRef.current?.loadFromSegments(data);
                 }
             }),
         ];

@@ -21,7 +21,7 @@
  *
  */
 
-import type { WorkerGeometryData } from '@sienci/gviewer/viewer';
+import type { WorkerSegmentsData } from '@sienci/gviewer/viewer';
 import {
     Dialog,
     DialogContent,
@@ -47,7 +47,7 @@ import ToolVisibilityPanel from './components/ToolVisibilityPanel';
 import type { LinePositionIndex } from './definitions';
 import {
     buildLinePositionIndex,
-    frameAtLine,
+    senderLineCountAt,
     modalsAtLine,
     positionAtLine,
 } from './utils/linePositionIndex';
@@ -89,7 +89,7 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
     const [hiddenTools, setHiddenTools] = useState<Set<number>>(new Set());
     const [index, setIndex] = useState<LinePositionIndex | null>(null);
     const [indexProgress, setIndexProgress] = useState(0);
-    const [geometry, setGeometry] = useState<WorkerGeometryData | null>(null);
+    const [geometry, setGeometry] = useState<WorkerSegmentsData | null>(null);
     // True only while the scrubber thumb is held. Drives the source panel's
     // deferred re-centring; everything else still tracks the drag live.
     const [scrubbing, setScrubbing] = useState(false);
@@ -167,9 +167,6 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
         setIndexProgress(0);
 
         buildLinePositionIndex(lines, {
-            // `lines` was split with CR stripped; tell the builder which ending the
-            // file actually used so its frame counter matches the worker's.
-            blankLineEmitsFrame: !content.includes('\r\n'),
             onProgress: (processed, count) => {
                 if (!cancelled) {
                     setIndexProgress(count > 0 ? processed / count : 1);
@@ -195,8 +192,9 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
         () => positionAtLine(index, currentLine),
         [index, currentLine],
     );
-    const frame = useMemo(
-        () => frameAtLine(index, currentLine),
+    // Sender lines processed once the current line has run.
+    const processedLines = useMemo(
+        () => senderLineCountAt(index, currentLine),
         [index, currentLine],
     );
     const modalState = useMemo(
@@ -215,10 +213,10 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
     useEffect(() => {
         viewerRef.current?.seekTo(
             position,
-            frame,
+            processedLines,
             hideProcessed ? 'hide' : 'grey',
         );
-    }, [position, frame, hideProcessed]);
+    }, [position, processedLines, hideProcessed]);
 
     // Kept in sync every render so the playback effect below can read "where we
     // are right now" without depending on currentLine itself — depending on it

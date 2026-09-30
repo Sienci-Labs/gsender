@@ -162,8 +162,14 @@ export function* initialize(): Generator<null, void, unknown> {
     let currentState: GRBL_ACTIVE_STATES_T = GRBL_ACTIVE_STATE_IDLE;
     let prevState: GRBL_ACTIVE_STATES_T = GRBL_ACTIVE_STATE_IDLE;
     let errors: string[] = [];
-    let latestEstimateData: { estimates: number[]; estimatedTime: number } = {
-        estimates: [],
+    // Per-line time estimates (one per Sender line) sent to the server, which
+    // counts down the job time from them. Sent as a Float32Array (binary over
+    // socket.io) rather than a JSON array.
+    let latestEstimateData: {
+        estimates: Float32Array | number[];
+        estimatedTime: number;
+    } = {
+        estimates: new Float32Array(0),
         estimatedTime: 0,
     };
     let hasEstimateData = false;
@@ -218,7 +224,7 @@ export function* initialize(): Generator<null, void, unknown> {
 
     const clearEstimateDataCache = () => {
         latestEstimateData = {
-            estimates: [],
+            estimates: new Float32Array(0),
             estimatedTime: 0,
         };
         hasEstimateData = false;
@@ -941,15 +947,17 @@ export function* initialize(): Generator<null, void, unknown> {
         (
             _msg,
             value: {
-                estimates?: number[];
+                estimates?: Float32Array | number[];
                 estimatedTime?: number;
                 jobId?: number;
             } = {},
         ) => {
             latestEstimateData = {
-                estimates: Array.isArray(value?.estimates)
-                    ? value.estimates
-                    : [],
+                estimates:
+                    value?.estimates instanceof Float32Array ||
+                    Array.isArray(value?.estimates)
+                        ? value.estimates
+                        : new Float32Array(0),
                 estimatedTime: Number(value?.estimatedTime) || 0,
             };
             hasEstimateData = true;

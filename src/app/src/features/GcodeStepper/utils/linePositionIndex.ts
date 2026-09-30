@@ -58,16 +58,6 @@ const LINES_PER_CHUNK = 20000;
 export interface BuildIndexOptions {
     onProgress?: (processed: number, total: number) => void;
     shouldAbort?: () => boolean;
-    /**
-     * Whether an empty line advances the worker's frame counter.
-     *
-     * The worker splits content on the newline character alone, so in a CRLF
-     * file a "blank" line is really a lone carriage return. That has no tokens,
-     * so it takes GCodeVirtualizer's early return and emits no frame — unlike a
-     * truly empty line in an LF file, which does. Callers that stripped the
-     * carriage return when splitting have to say which ending the file used.
-     */
-    blankLineEmitsFrame?: boolean;
 }
 
 /**
@@ -82,15 +72,11 @@ export interface BuildIndexOptions {
  */
 export async function buildLinePositionIndex(
     lines: string[],
-    {
-        onProgress,
-        shouldAbort,
-        blankLineEmitsFrame = true,
-    }: BuildIndexOptions = {},
+    { onProgress, shouldAbort }: BuildIndexOptions = {},
 ): Promise<LinePositionIndex | null> {
     const lineCount = lines.length;
     const positions = new Float32Array(lineCount * 4);
-    const frameForLine = new Int32Array(lineCount);
+    const senderLineCounts = new Int32Array(lineCount);
     const modalForLine = new Uint16Array(lineCount);
     const feedRates = new Float32Array(lineCount);
     const spindleSpeeds = new Float32Array(lineCount);
@@ -98,12 +84,10 @@ export async function buildLinePositionIndex(
     const modalIndexBySignature = new Map<string, number>();
     let lastModalIndex = 0;
     const virtualizer = new GCodeVirtualizer();
-    // Mirrors the visualize worker's frame counter: GCodeVirtualizer.virtualize()
-    // runs its per-line callback (which is what pushes a frame) for empty lines
-    // and for lines with at least one token, but returns early on a line whose
-    // tokens are all comment — so a raw line number would drift from the frame
-    // index by however many comment-only lines precede it.
-    let frames = 0;
+    // The worker's toolpath (and the server's progress) is indexed by the
+    // server Sender's lines: every line that isn't blank, comment-only lines
+    // included. Counting them here lets a raw line number map onto that index.
+    let senderLines = 0;
 
     for (let i = 0; i < lineCount; i++) {
         if (i > 0 && i % LINES_PER_CHUNK === 0) {
@@ -116,23 +100,20 @@ export async function buildLinePositionIndex(
         }
 
         const line = lines[i];
-        let emitsFrame = line === '' ? blankLineEmitsFrame : false;
         let modals: ModalState | null = null;
         if (line) {
             // A malformed line shouldn't abandon the rest of the index; the
             // position and modal state simply carry forward from the previous line.
             try {
-                const result = virtualizer.processLine(line);
-                emitsFrame = result.parsed.words.length > 0;
-                modals = result.modals;
+                modals = virtualizer.processLine(line).modals;
             } catch {
                 /* ignore unparseable line */
             }
         }
-        if (emitsFrame) {
-            frames++;
+        if (line.trim().length > 0) {
+            senderLines++;
         }
-        frameForLine[i] = frames;
+        senderLineCounts[i] = senderLines;
 
         if (modals) {
             // processLine returns a fresh snapshot each call, so the table can hold
@@ -169,7 +150,7 @@ export async function buildLinePositionIndex(
     onProgress?.(lineCount, lineCount);
     return {
         positions,
-        frameForLine,
+        senderLineCounts,
         modalTable,
         modalForLine,
         feedRates,
@@ -198,8 +179,12 @@ export function modalsAtLine(
     };
 }
 
-/** Worker frame index for a 1-based line number, clamped to the file. */
-export function frameAtLine(
+/**
+ * How many of the server Sender's (non-blank) lines there are up to and
+ * including a 1-based line number, clamped to the file. The Sender line index
+ * of a non-blank line is this minus one.
+ */
+export function senderLineCountAt(
     index: LinePositionIndex | null,
     line: number,
 ): number {
@@ -207,7 +192,7 @@ export function frameAtLine(
         return 0;
     }
     const i = Math.max(0, Math.min(Math.floor(line) - 1, index.lineCount - 1));
-    return index.frameForLine[i];
+    return index.senderLineCounts[i];
 }
 
 /** Position at a 1-based line number, clamped to the file. */

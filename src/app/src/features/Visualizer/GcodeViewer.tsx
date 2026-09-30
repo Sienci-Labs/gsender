@@ -28,7 +28,7 @@ import type {
     GCodeViewerCameraView,
     GCodeViewerOptions,
     GCodeViewerTheme,
-    WorkerGeometryData,
+    WorkerSegmentsData,
 } from '@sienci/gviewer/viewer';
 import {
     GCodeViewer as GViewer3D,
@@ -69,7 +69,11 @@ import {
     type VisualizerBridgeHandle,
     visualizerBridge,
 } from './visualizerBridge';
-import { augmentWorkerGeometry } from './workerGeometry';
+import {
+    augmentWorkerGeometry,
+    isWorkerSegments,
+    toolpathPositionChunks,
+} from './workerGeometry';
 
 // Press-and-hold pick gesture: how long to hold before committing, and how far
 // the pointer may drift before the gesture is treated as an orbit/pan instead of
@@ -105,8 +109,9 @@ interface Props {
  *
  * Replaces the legacy Visualizer.jsx / SVGVisualizer.jsx / VisualizerWrapper /
  * Primary+Secondary shells. The existing worker pipeline (Visualize.worker.ts)
- * still parses gcode and publishes `file:load` with WorkerGeometryData, which we
- * feed straight into gviewer via loadFromWorkerData — no re-parsing here.
+ * still parses gcode and publishes `file:load` with the toolpath already in
+ * gviewer's draw layout (WorkerSegmentsData), which we hand straight to
+ * loadFromSegments — no re-parsing or re-packing here.
  */
 class GcodeViewer extends Component<Props> {
     containerRef: HTMLDivElement | null = null;
@@ -117,7 +122,7 @@ class GcodeViewer extends Component<Props> {
 
     mode: '3d' | 'svg' = '3d';
 
-    lastWorkerData: WorkerGeometryData | null = null;
+    lastWorkerData: WorkerSegmentsData | null = null;
 
     lastPosition: GCodeViewerBitPosition = { x: 0, y: 0, z: 0, a: 0 };
 
@@ -217,8 +222,8 @@ class GcodeViewer extends Component<Props> {
 
         // Render any geometry that arrived before mount.
         const existing = _get(this.props.state, 'gcode.visualization');
-        if (existing && (existing as WorkerGeometryData).vertices) {
-            this.applyWorkerData(existing as WorkerGeometryData);
+        if (isWorkerSegments(existing)) {
+            this.applyWorkerData(existing);
         }
     }
 
@@ -441,7 +446,7 @@ class GcodeViewer extends Component<Props> {
 
     // --- geometry -----------------------------------------------------------
 
-    applyWorkerData(data: WorkerGeometryData) {
+    applyWorkerData(data: WorkerSegmentsData) {
         this.lastWorkerData = data;
         this.lastHiddenLine = -1;
 
@@ -450,14 +455,14 @@ class GcodeViewer extends Component<Props> {
         const augmented = augmentWorkerGeometry(data);
 
         if (this.mode === 'svg' && this.viewerSvg) {
-            this.viewerSvg.loadFromWorkerData(augmented);
+            this.viewerSvg.loadFromSegments(augmented);
             this.firePostLoad();
             return;
         }
 
         if (this.viewer3d) {
             this.viewer3d
-                .loadFromWorkerData(augmented)
+                .loadFromSegments(augmented)
                 .then(() => {
                     if (!this.skipNextCameraFocus) {
                         this.viewer3d?.focusToModel();
@@ -492,24 +497,25 @@ class GcodeViewer extends Component<Props> {
 
     computeBBox(): BBox {
         const empty = { min: { x: 0, y: 0, z: 0 }, max: { x: 0, y: 0, z: 0 } };
-        const positions = this.getToolpathHull();
-        if (!positions.length) {
-            return empty;
-        }
+        const chunks = this.getToolpathHull();
         const min = { x: Infinity, y: Infinity, z: Infinity };
         const max = { x: -Infinity, y: -Infinity, z: -Infinity };
-        for (let i = 0; i < positions.length; i += 3) {
-            const x = positions[i];
-            const y = positions[i + 1];
-            const z = positions[i + 2];
-            if (x < min.x) min.x = x;
-            if (y < min.y) min.y = y;
-            if (z < min.z) min.z = z;
-            if (x > max.x) max.x = x;
-            if (y > max.y) max.y = y;
-            if (z > max.z) max.z = z;
+        let any = false;
+        for (const positions of chunks) {
+            for (let i = 0; i < positions.length; i += 3) {
+                const x = positions[i];
+                const y = positions[i + 1];
+                const z = positions[i + 2];
+                if (x < min.x) min.x = x;
+                if (y < min.y) min.y = y;
+                if (z < min.z) min.z = z;
+                if (x > max.x) max.x = x;
+                if (y > max.y) max.y = y;
+                if (z > max.z) max.z = z;
+                any = true;
+            }
         }
-        return { min, max };
+        return any ? { min, max } : empty;
     }
 
     // --- camera -------------------------------------------------------------
@@ -974,12 +980,8 @@ class GcodeViewer extends Component<Props> {
         }
         // Geometry is delivered authoritatively via the `file:load` pubsub, so
         // only apply directly when we are handed worker data here.
-        if (
-            visualization &&
-            typeof visualization === 'object' &&
-            (visualization as WorkerGeometryData).vertices
-        ) {
-            this.applyWorkerData(visualization as WorkerGeometryData);
+        if (isWorkerSegments(visualization)) {
+            this.applyWorkerData(visualization);
         }
     }
 
@@ -1011,15 +1013,9 @@ class GcodeViewer extends Component<Props> {
         }
     }
 
-    getToolpathHull(): Float32Array {
-        if (!this.lastWorkerData) {
-            return new Float32Array(0);
-        }
-        return new Float32Array(
-            this.lastWorkerData.vertices,
-            0,
-            this.lastWorkerData.verticesLen,
-        );
+    // Toolpath vertex positions (x, y, z), one view per geometry chunk.
+    getToolpathHull(): Float32Array[] {
+        return toolpathPositionChunks(this.lastWorkerData);
     }
 
     zoomFit = () => this.viewer3d?.focusToModel();
@@ -1052,7 +1048,9 @@ class GcodeViewer extends Component<Props> {
                     return;
                 }
                 this.maybeWarnInvalidLines(data);
-                this.applyWorkerData(data as WorkerGeometryData);
+                if (isWorkerSegments(data)) {
+                    this.applyWorkerData(data);
+                }
             }),
             pubsub.subscribe('visualizer:updateposition', (_msg, data) => {
                 this.lastPosition = {
@@ -1219,7 +1217,9 @@ class GcodeViewer extends Component<Props> {
                     )
                         ? 'hide'
                         : 'grey';
-                    this.viewer3d.hideUntilLine(line, mode);
+                    // `line` counts Sender lines done; hideUntilLine takes the
+                    // index of the last one.
+                    this.viewer3d.hideUntilLine(line - 1, mode);
                 }
             }
 
@@ -1322,7 +1322,7 @@ class GcodeViewer extends Component<Props> {
         toast.info('Generating outline g-code...');
         this.outlineRunning = true;
 
-        const vertices = this.getToolpathHull();
+        const positionChunks = this.getToolpathHull();
         const settings = _get(
             reduxStore.getState(),
             'controller.settings.settings',
@@ -1365,7 +1365,7 @@ class GcodeViewer extends Component<Props> {
             };
             outlineWorker.postMessage({
                 isLaser,
-                parsedData: isRapidless ? [] : vertices,
+                parsedData: isRapidless ? [] : positionChunks,
                 mode: outlineMode,
                 zTravel,
                 ...(isRapidless && { content }),

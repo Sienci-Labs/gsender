@@ -33,6 +33,26 @@ const log = logger("controller:Grbl");
 
 const noop = () => {};
 
+// Per-line estimates arrive as a plain array (older clients), a Float32Array,
+// or — for a Float32Array sent over socket.io — a Buffer/Uint8Array of its
+// bytes. Normalize to something indexable by line.
+export const toEstimateArray = (estimates) => {
+	if (Array.isArray(estimates) || estimates instanceof Float32Array) {
+		return estimates;
+	}
+	if (estimates instanceof ArrayBuffer) {
+		return new Float32Array(estimates.slice(0));
+	}
+	if (ArrayBuffer.isView(estimates)) {
+		const count = Math.floor(estimates.byteLength / Float32Array.BYTES_PER_ELEMENT);
+		// Copy into a fresh buffer: a Buffer's byteOffset need not be 4-aligned.
+		const bytes = new Uint8Array(count * Float32Array.BYTES_PER_ELEMENT);
+		bytes.set(new Uint8Array(estimates.buffer, estimates.byteOffset, bytes.byteLength));
+		return new Float32Array(bytes.buffer);
+	}
+	return [];
+};
+
 class SPSendResponse {
 	callback = null;
 
@@ -597,8 +617,11 @@ class Sender extends events.EventEmitter {
 		return this.state.toolChanges;
 	}
 
+	// One estimate (seconds) per sender line. The client sends a Float32Array,
+	// which socket.io delivers here as a Buffer of its raw bytes; only indexing
+	// and .length are used, so any of these shapes works once decoded.
 	setEstimateData(estimates) {
-		this.state.estimateData = estimates;
+		this.state.estimateData = toEstimateArray(estimates);
 	}
 
 	setEstimatedTime(estimatedTime) {

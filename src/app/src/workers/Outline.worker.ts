@@ -96,23 +96,21 @@ self.onmessage = ({ data }) => {
     };
 
     const getOutlineGcode = (concavity = Infinity) => {
-        // 1. Extract 2D [x, y] points (parsedData is flat: x0,y0,z0,x1,y1,z1,...)
-        const points2D = [];
-        for (let i = 0; i < parsedData.length; i += 3) {
-            points2D.push([
-                parseFloat(parsedData[i].toFixed(3)),
-                parseFloat(parsedData[i + 1].toFixed(3)),
-            ]);
-        }
-
-        // 2. Deduplicate on 0.5mm grid for efficiency on large files
+        // 1+2. Extract 2D [x, y] points, deduplicated on a 0.5mm grid for
+        // efficiency on large files. parsedData is the toolpath's position
+        // chunks (each flat: x0,y0,z0,x1,y1,z1,...); deduping while reading
+        // avoids building an array per vertex first.
         const seen = new Set();
         const deduped = [];
-        for (const [x, y] of points2D) {
-            const key = `${Math.round(x * 2)},${Math.round(y * 2)}`;
-            if (!seen.has(key)) {
-                seen.add(key);
-                deduped.push([x, y]);
+        for (const positions of parsedData) {
+            for (let i = 0; i < positions.length; i += 3) {
+                const x = parseFloat(positions[i].toFixed(3));
+                const y = parseFloat(positions[i + 1].toFixed(3));
+                const key = `${Math.round(x * 2)},${Math.round(y * 2)}`;
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    deduped.push([x, y]);
+                }
             }
         }
 

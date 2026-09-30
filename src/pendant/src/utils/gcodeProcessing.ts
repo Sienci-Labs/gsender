@@ -33,14 +33,15 @@ type VisualizeWorkerGeometryMessage = {
     type: 'geometryReady';
     jobId: number;
     visualizer?: string;
-    vertices: ArrayBuffer;
-    frames: ArrayBuffer;
-    verticesLen: number;
-    framesLen: number;
-    colorArrayBuffer: ArrayBuffer;
-    colorLen: number;
-    savedColorsBuffer: ArrayBuffer;
-    savedColorLen: number;
+    format: 'segments-v1';
+    chunks: {
+        positions: ArrayBuffer;
+        attrs: ArrayBuffer;
+        power?: ArrayBuffer;
+        vertexCount: number;
+    }[];
+    totalVertices: number;
+    prefixEndVertex: ArrayBuffer;
     info: {
         fileModal: string;
         total: number;
@@ -60,8 +61,6 @@ type VisualizeWorkerGeometryMessage = {
         info: unknown;
         invalidLines: string[];
     };
-    spindleFrameSpeeds?: ArrayBuffer;
-    spindleFrameLen?: number;
     isLaser?: boolean;
     isSecondary?: boolean;
     activeVisualizer?: string;

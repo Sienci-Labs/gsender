@@ -23,12 +23,10 @@
 
 import type { BasicPosition } from 'app/definitions/general';
 import {
-    BACKGROUND_PART,
     G0_PART,
     G1_PART,
     G2_PART,
     G3_PART,
-    LASER_PART,
     TOOLPATH_COLOR_HEXES,
 } from 'app/features/Visualizer/constants';
 import type { VISUALIZER_TYPES_T } from 'app/features/Visualizer/definitions';
@@ -149,11 +147,6 @@ type GrowableFloat32Buffer = {
     length: number;
 };
 
-type GrowableUint32Buffer = {
-    data: Uint32Array;
-    length: number;
-};
-
 const growCapacity = (current: number, required: number): number => {
     let next = current > 0 ? current : 1;
     while (next < required) {
@@ -175,92 +168,23 @@ const ensureFloat32Capacity = (
     buffer.data = next;
 };
 
-const ensureUint32Capacity = (
-    buffer: GrowableUint32Buffer,
-    additional: number,
-): void => {
-    const required = buffer.length + additional;
-    if (required <= buffer.data.length) {
-        return;
-    }
-    const next = new Uint32Array(growCapacity(buffer.data.length, required));
-    next.set(buffer.data.subarray(0, buffer.length));
-    buffer.data = next;
-};
-
-const pushFloat32_3 = (
-    buffer: GrowableFloat32Buffer,
-    x: number,
-    y: number,
-    z: number,
-): void => {
-    ensureFloat32Capacity(buffer, 3);
-    const i = buffer.length;
-    buffer.data[i] = x;
-    buffer.data[i + 1] = y;
-    buffer.data[i + 2] = z;
-    buffer.length = i + 3;
-};
-
-const pushFloat32_6 = (
-    buffer: GrowableFloat32Buffer,
-    x1: number,
-    y1: number,
-    z1: number,
-    x2: number,
-    y2: number,
-    z2: number,
-): void => {
-    ensureFloat32Capacity(buffer, 6);
-    const i = buffer.length;
-    buffer.data[i] = x1;
-    buffer.data[i + 1] = y1;
-    buffer.data[i + 2] = z1;
-    buffer.data[i + 3] = x2;
-    buffer.data[i + 4] = y2;
-    buffer.data[i + 5] = z2;
-    buffer.length = i + 6;
-};
-
-const pushFloat32_4Repeat = (
+const pushFloat32_4 = (
     buffer: GrowableFloat32Buffer,
     a: number,
     b: number,
     c: number,
     d: number,
-    repeat: number,
 ): void => {
-    if (repeat <= 0) {
-        return;
-    }
-    ensureFloat32Capacity(buffer, repeat * 4);
-    let i = buffer.length;
-    for (let n = 0; n < repeat; n++) {
-        buffer.data[i] = a;
-        buffer.data[i + 1] = b;
-        buffer.data[i + 2] = c;
-        buffer.data[i + 3] = d;
-        i += 4;
-    }
-    buffer.length = i;
-};
-
-const pushUint32_1 = (buffer: GrowableUint32Buffer, value: number): void => {
-    ensureUint32Capacity(buffer, 1);
-    buffer.data[buffer.length] = value;
-    buffer.length += 1;
-};
-
-const pushFloat32_1 = (buffer: GrowableFloat32Buffer, value: number): void => {
-    ensureFloat32Capacity(buffer, 1);
-    buffer.data[buffer.length] = value;
-    buffer.length += 1;
+    ensureFloat32Capacity(buffer, 4);
+    const i = buffer.length;
+    buffer.data[i] = a;
+    buffer.data[i + 1] = b;
+    buffer.data[i + 2] = c;
+    buffer.data[i + 3] = d;
+    buffer.length = i + 4;
 };
 
 const toUsedFloat32View = (buffer: GrowableFloat32Buffer): Float32Array =>
-    buffer.data.subarray(0, buffer.length);
-
-const toUsedUint32View = (buffer: GrowableUint32Buffer): Uint32Array =>
     buffer.data.subarray(0, buffer.length);
 
 const toCompactFloat32Array = (view: Float32Array): Float32Array => {
@@ -271,13 +195,132 @@ const toCompactFloat32Array = (view: Float32Array): Float32Array => {
     return new Float32Array(view);
 };
 
-const toCompactUint32Array = (view: Uint32Array): Uint32Array => {
-    const fullLength = view.buffer.byteLength / Uint32Array.BYTES_PER_ELEMENT;
-    if (view.byteOffset === 0 && view.length === fullLength) {
-        return view;
-    }
-    return new Uint32Array(view);
+// --- "segments-v1" toolpath output ------------------------------------------
+//
+// The 3D toolpath leaves the worker in the exact layout gviewer draws
+// (loadFromSegments): segment-pair positions plus one attribute byte per vertex,
+// in chunks that are transferred and uploaded as-is. Colour, laser power
+// shading and progress greying are resolved in gviewer's shader, so the main
+// thread never copies or re-packs the geometry.
+
+// Mirrors @sienci/gviewer SEGMENT_ATTR_RAPID: set on rapid (G0) vertices; the
+// low 7 bits of a cutting vertex are its palette slot (0 = first tool).
+const SEGMENT_ATTR_RAPID = 0x80;
+
+// Chunks start small and double, so small files stay small and big files end
+// up in few draw calls; a chunk never splits a segment.
+const MIN_CHUNK_VERTICES = 1 << 16;
+const MAX_CHUNK_VERTICES = 1 << 20;
+
+type SegmentChunk = {
+    positions: Float32Array;
+    attrs: Uint8Array;
+    power: Float32Array | null;
+    count: number;
 };
+
+class SegmentWriter {
+    chunks: SegmentChunk[] = [];
+
+    totalVertices = 0;
+
+    private current: SegmentChunk | null = null;
+
+    private nextCapacity = MIN_CHUNK_VERTICES;
+
+    constructor(private readonly withPower: boolean) {}
+
+    private startChunk(): SegmentChunk {
+        const capacity = this.nextCapacity;
+        this.nextCapacity = Math.min(MAX_CHUNK_VERTICES, capacity * 2);
+        const chunk: SegmentChunk = {
+            positions: new Float32Array(capacity * 3),
+            attrs: new Uint8Array(capacity),
+            power: this.withPower ? new Float32Array(capacity) : null,
+            count: 0,
+        };
+        this.chunks.push(chunk);
+        this.current = chunk;
+        return chunk;
+    }
+
+    push(
+        x1: number,
+        y1: number,
+        z1: number,
+        x2: number,
+        y2: number,
+        z2: number,
+        attr: number,
+    ): void {
+        let chunk = this.current;
+        if (!chunk || chunk.count + 2 > chunk.attrs.length) {
+            chunk = this.startChunk();
+        }
+        const v = chunk.count;
+        const p = v * 3;
+        chunk.positions[p] = x1;
+        chunk.positions[p + 1] = y1;
+        chunk.positions[p + 2] = z1;
+        chunk.positions[p + 3] = x2;
+        chunk.positions[p + 4] = y2;
+        chunk.positions[p + 5] = z2;
+        chunk.attrs[v] = attr;
+        chunk.attrs[v + 1] = attr;
+        chunk.count = v + 2;
+        this.totalVertices += 2;
+    }
+
+    // Sets the power of every vertex written since `fromVertex` (the vertices of
+    // the line just finished; a line can span a chunk boundary).
+    fillPower(fromVertex: number, power: number): void {
+        if (!this.withPower || power === 0) {
+            return; // power arrays start zeroed
+        }
+        let remaining = this.totalVertices - fromVertex;
+        for (let c = this.chunks.length - 1; c >= 0 && remaining > 0; c--) {
+            const chunk = this.chunks[c];
+            const n = Math.min(remaining, chunk.count);
+            chunk.power!.fill(power, chunk.count - n, chunk.count);
+            remaining -= n;
+        }
+    }
+
+    // Chunks to transfer. Full chunks go as-is; a mostly empty last chunk is
+    // trimmed so its unused capacity isn't kept alive on the main thread.
+    finish(): SegmentChunk[] {
+        return this.chunks
+            .filter((chunk) => chunk.count > 0)
+            .map((chunk) => {
+                if (chunk.count >= chunk.attrs.length * 0.75) {
+                    return chunk;
+                }
+                return {
+                    positions: chunk.positions.slice(0, chunk.count * 3),
+                    attrs: chunk.attrs.slice(0, chunk.count),
+                    power: chunk.power
+                        ? chunk.power.slice(0, chunk.count)
+                        : null,
+                    count: chunk.count,
+                };
+            });
+    }
+}
+
+// The whitespace String.prototype.trim() strips. A line is one of the server
+// Sender's lines when it isn't all whitespace: `split("\n")` then `trim()`.
+const isTrimWhitespace = (code: number): boolean =>
+    code === 32 ||
+    (code >= 9 && code <= 13) ||
+    code === 0xa0 ||
+    code === 0x1680 ||
+    (code >= 0x2000 && code <= 0x200a) ||
+    code === 0x2028 ||
+    code === 0x2029 ||
+    code === 0x202f ||
+    code === 0x205f ||
+    code === 0x3000 ||
+    code === 0xfeff;
 
 // Patterns for cylinder diameter in NC/comment headers (e.g. DeskProto "(Cylinder Dia: 64.38)")
 const ROTARY_DIAMETER_PATTERNS = [
@@ -341,8 +384,6 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
         needsVisualization = true,
         svgOnly: svgOnlyRequested = false,
         rapidOpacity = 0.5,
-        // parsedData = {},
-        // isNewFile = false,
         accelerations,
         maxFeedrates,
         atcEnabled,
@@ -371,37 +412,36 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
     const applyRotaryRadiusOffset = (value: number): number =>
         shouldOffsetRotaryRadius ? value + (rotaryRadius as number) : value;
 
-    // Common state variables
-    const vertices: GrowableFloat32Buffer = {
-        data: new Float32Array(4096),
-        length: 0,
-    };
-    const colorValues: GrowableFloat32Buffer = {
-        data: new Float32Array(4096),
-        length: 0,
-    };
-    let colorVertexCount = 0;
+    // svgOnly: pendant top-down mode — stream deduplicated 2D segment groups
+    // during parsing and skip the 3D segments entirely.
+    const svgOnly = svgOnlyRequested && needsVisualization && !isSecondary;
+    const usePower = isLaser && needsVisualization && !svgOnly;
+    const segments = new SegmentWriter(usePower);
+
     let tcCounter = 1;
     let toolChangeIndex = 0;
-    let lastToolchangeColorIndex = -1;
-    const frames: GrowableUint32Buffer = {
-        data: new Uint32Array(2048),
-        length: 0,
-    };
+    let lastToolchangeVertex = -1;
     let currentTool = 0;
     const toolchanges: number[] = [];
-    // svgOnly: pendant top-down mode — stream deduplicated 2D segment groups
-    // during parsing and skip the 3D vertex/color/frame buffers entirely.
-    const svgOnly = svgOnlyRequested && needsVisualization && !isSecondary;
-    const shouldBuildColors = needsVisualization && Boolean(theme) && !svgOnly;
+    // Palette slot of cutting moves: 0 for the first tool, then 1 + palette index.
+    let paletteSlot = 0;
+
     const asRgb = (color: THREE.Color): [number, number, number] => [
         color.r,
         color.g,
         color.b,
     ];
+    const firstToolColor = new THREE.Color(theme?.get(G1_PART) ?? '#FFF');
+    // Slot k's colour for gviewer: slot 0 = the theme's cutting colour (what the
+    // ToolTimeline legend shows for tool 1), slots 1.. = TOOLPATH_COLOR_HEXES.
+    const paletteHex = [firstToolColor, ...toolpathColors].map(
+        (color) => `#${color.getHexString()}`,
+    );
+
+    // Per-motion colours, used for the pendant's 2D groups.
     const motionColor = {
         G0: asRgb(new THREE.Color(theme?.get(G0_PART) ?? '#FFF')),
-        G1: asRgb(new THREE.Color(theme?.get(G1_PART) ?? '#FFF')),
+        G1: asRgb(firstToolColor),
         G2: asRgb(new THREE.Color(theme?.get(G2_PART) ?? '#FFF')),
         G3: asRgb(new THREE.Color(theme?.get(G3_PART) ?? '#FFF')),
         default: asRgb(new THREE.Color('#FFF')),
@@ -412,19 +452,6 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
         if (motion === 'G2') return motionColor.G2;
         if (motion === 'G3') return motionColor.G3;
         return motionColor.default;
-    };
-    const pushMotionColor = (
-        motion: string,
-        opacity: number,
-        count = 1,
-    ): void => {
-        colorVertexCount += count;
-        if (!shouldBuildColors) {
-            return;
-        }
-
-        const [r, g, b] = getMotionColor(motion);
-        pushFloat32_4Repeat(colorValues, r, g, b, opacity, count);
     };
 
     // svgOnly state: color-keyed groups of 2D segments [x1,y1,x2,y2], deduped
@@ -509,22 +536,45 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
         const group = getSvg2DGroup(motion, opacity);
         // 53-bit key: 32 bits from one endpoint hash + 21 from the other.
         // A collision only drops one segment from an already-overdrawn preview.
-        const key =
-            mixHash2(qx1, qy1) * 0x200000 + (mixHash2(qx2, qy2) >>> 11);
+        const key = mixHash2(qx1, qy1) * 0x200000 + (mixHash2(qx2, qy2) >>> 11);
         if (group.seen.has(key)) {
             svg2DDupeDrops++;
             return;
         }
         group.seen.add(key);
         svg2DKept++;
-        pushFloat32_4Repeat(group.positions, x1, y1, x2, y2, 1);
+        pushFloat32_4(group.positions, x1, y1, x2, y2);
+    };
+
+    // Every drawn segment goes through here: 3D segments for the visualizer, or
+    // the top-down 2D projection (x, y) for the pendant.
+    const emitSegment = (
+        motion: string,
+        isRapid: boolean,
+        opacity: number,
+        x1: number,
+        y1: number,
+        z1: number,
+        x2: number,
+        y2: number,
+        z2: number,
+    ): void => {
+        if (svgOnly) {
+            emitSvg2DSegment(motion, opacity, x1, y1, x2, y2);
+            return;
+        }
+        segments.push(
+            x1,
+            y1,
+            z1,
+            x2,
+            y2,
+            z2,
+            isRapid ? SEGMENT_ATTR_RAPID : paletteSlot,
+        );
     };
 
     // Laser specific state variables
-    const spindleFrameSpeeds: GrowableFloat32Buffer = {
-        data: new Float32Array(4096),
-        length: 0,
-    };
     let maxSpindleSpeed = 0;
     let spindleSpeed = 0;
 
@@ -535,25 +585,13 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
         if (content.charCodeAt(i) === 10) totalLines++;
     }
 
-    /**
-     * Updates local state with any spindle changes in line
-     * @param words
-     */
-    const updateSpindleStateFromLine = (lineData: any) => {
-        if (typeof lineData === 'number' && Number.isFinite(lineData)) {
-            const nextSpindleSpeed = lineData;
-            spindleSpeed = nextSpindleSpeed;
-            maxSpindleSpeed = Math.max(maxSpindleSpeed, nextSpindleSpeed);
-            return;
-        }
-
-        const words = Array.isArray(lineData?.words) ? lineData.words : [];
-        const spindleMatches = words.filter((word) => word[0] === 'S');
-        const [spindleCommand, spindleValue] = spindleMatches[0] || [];
-        if (spindleCommand) {
-            const nextSpindleSpeed = Number(spindleValue);
-            spindleSpeed = nextSpindleSpeed;
-            maxSpindleSpeed = Math.max(maxSpindleSpeed, nextSpindleSpeed);
+    const updateSpindleState = (spindleSpeedUpdate: number | null) => {
+        if (
+            typeof spindleSpeedUpdate === 'number' &&
+            Number.isFinite(spindleSpeedUpdate)
+        ) {
+            spindleSpeed = spindleSpeedUpdate;
+            maxSpindleSpeed = Math.max(maxSpindleSpeed, spindleSpeedUpdate);
         }
     };
 
@@ -569,11 +607,11 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
             return;
         }
 
-        toolchanges.push(colorVertexCount);
-        if (colorVertexCount === lastToolchangeColorIndex) {
+        toolchanges.push(segments.totalVertices);
+        if (segments.totalVertices === lastToolchangeVertex) {
             return;
         }
-        lastToolchangeColorIndex = colorVertexCount;
+        lastToolchangeVertex = segments.totalVertices;
 
         // The first tool keeps the theme's cutting color (no palette swap), acting
         // as palette index 0; the array proper starts at index 1 for the second
@@ -590,17 +628,283 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
         if (!nextColor) {
             return;
         }
+        paletteSlot = 1 + paletteIndex;
         const rgb = asRgb(nextColor);
         motionColor.G1 = rgb;
         motionColor.G2 = rgb;
         motionColor.G3 = rgb;
     };
 
-    const onData = () => {
-        if (!svgOnly) {
-            const vertexIndex = vertices.length / 3;
-            pushUint32_1(frames, vertexIndex);
+    // A-axis moves are drawn as a helix of <= 5 degree steps around X.
+    const addHelix = (
+        motion: string,
+        isRapid: boolean,
+        opacity: number,
+        v1: BasicPosition,
+        v2: BasicPosition,
+    ) => {
+        // Use Math.max(1,...) — no artificial minimum; small-angle moves get 1 segment
+        const segmentCount = Math.max(
+            1,
+            Math.ceil(Math.abs((v2.a || 0) - (v1.a || 0)) / 5),
+        );
+
+        // Reusable scalars — no per-iteration object allocation
+        let prevX = 0,
+            prevY = 0,
+            prevZ = 0;
+        for (let i = 0; i <= segmentCount; i++) {
+            const t = i / segmentCount;
+            const interpolatedA = (v1.a || 0) + ((v2.a || 0) - (v1.a || 0)) * t;
+
+            // Interpolate position
+            const interpolatedX = v1.x + (v2.x - v1.x) * t;
+            const interpolatedY = v1.y + (v2.y - v1.y) * t;
+            const interpolatedZ = applyRotaryRadiusOffset(
+                v1.z + (v2.z - v1.z) * t,
+            );
+
+            // Inline x-axis rotation: angle = toRadians(-a)
+            const angle = -interpolatedA * (Math.PI / 180);
+            const sinA = Math.sin(angle);
+            const cosA = Math.cos(angle);
+            const currX = interpolatedX;
+            const currY = interpolatedY * cosA - interpolatedZ * sinA;
+            const currZ = interpolatedY * sinA + interpolatedZ * cosA;
+
+            if (i > 0) {
+                emitSegment(
+                    motion,
+                    isRapid,
+                    opacity,
+                    prevX,
+                    prevY,
+                    prevZ,
+                    currX,
+                    currY,
+                    currZ,
+                );
+            }
+
+            prevX = currX;
+            prevY = currY;
+            prevZ = currZ;
         }
+    };
+
+    const addLine = (modal: Modal, v1: BasicPosition, v2: BasicPosition) => {
+        if (!needsVisualization) {
+            return;
+        }
+        const { motion, tool } = modal;
+        registerToolChange(tool);
+
+        const isRapid = motion === 'G0';
+        const opacity = isRapid ? rapidOpacity : 1;
+
+        // Check if A-axis rotation is involved
+        if (Math.abs((v2.a || 0) - (v1.a || 0)) > 0.001) {
+            addHelix(motion, isRapid, opacity, v1, v2);
+            return;
+        }
+
+        // No A-axis rotation, use simple linear interpolation
+        const newV1 = rotateAxis('x', {
+            x: v1.x,
+            y: v1.y,
+            z: applyRotaryRadiusOffset(v1.z),
+            a: v1.a || 0,
+        });
+        const newV2 = rotateAxis('x', {
+            x: v2.x,
+            y: v2.y,
+            z: applyRotaryRadiusOffset(v2.z),
+            a: v2.a || 0,
+        });
+        emitSegment(
+            motion,
+            isRapid,
+            opacity,
+            newV1.x,
+            newV1.y,
+            newV1.z,
+            newV2.x,
+            newV2.y,
+            newV2.z,
+        );
+    };
+
+    // For rotary visualization
+    const addCurve = (modal: Modal, v1: BasicPosition, v2: BasicPosition) => {
+        if (!needsVisualization) {
+            return;
+        }
+        const { motion, tool } = modal;
+        registerToolChange(tool);
+
+        // Check if A-axis rotation is involved
+        if (Math.abs((v2.a || 0) - (v1.a || 0)) > 0.001) {
+            // Always drawn as a cut, whatever the motion
+            addHelix(motion, false, 1, v1, v2);
+            return;
+        }
+
+        // Original curve logic for non-A-axis rotation
+        const updatedV1 = rotateAxis('x', {
+            x: v1.x,
+            y: v1.y,
+            z: applyRotaryRadiusOffset(v1.z),
+            a: v1.a || 0,
+        });
+        const updatedV2 = rotateAxis('x', {
+            x: v2.x,
+            y: v2.y,
+            z: applyRotaryRadiusOffset(v2.z),
+            a: v2.a || 0,
+        });
+
+        const radius = v2.z;
+        const startAngle = Math.atan2(updatedV1.z, updatedV1.y);
+        const endAngle = Math.atan2(updatedV2.z, updatedV2.y);
+        const isClockwise = v2.z > v1.z;
+
+        const arcCurve = new ArcCurve(
+            0,
+            0,
+            radius,
+            startAngle,
+            endAngle,
+            isClockwise,
+        );
+
+        const DEGREES_PER_LINE_SEGMENT = 5;
+
+        const angleDiff = Math.abs(v2.z - v1.z);
+        const divisions = Math.ceil(angleDiff / DEGREES_PER_LINE_SEGMENT);
+        const points = arcCurve.getPoints(divisions);
+
+        for (let i = 1; i < points.length; ++i) {
+            const previous = points[i - 1];
+            const point = points[i];
+            // 3D vertex is (v2.x, point.x, point.y)
+            emitSegment(
+                motion,
+                false,
+                1,
+                v2.x,
+                previous.x,
+                previous.y,
+                v2.x,
+                point.x,
+                point.y,
+            );
+        }
+    };
+
+    const addArcCurve = (
+        modal: Modal,
+        v1: BasicPosition,
+        v2: BasicPosition,
+        v0: BasicPosition,
+    ) => {
+        if (!needsVisualization) {
+            return;
+        }
+        const { motion, plane, tool } = modal;
+        registerToolChange(tool);
+
+        const isClockwise = motion === 'G2';
+        const radius = Math.sqrt((v1.x - v0.x) ** 2 + (v1.y - v0.y) ** 2);
+        const startAngle = Math.atan2(v1.y - v0.y, v1.x - v0.x);
+        let endAngle = Math.atan2(v2.y - v0.y, v2.x - v0.x);
+
+        // Draw full circle if startAngle and endAngle are both zero
+        if (startAngle === endAngle) {
+            endAngle += 2 * Math.PI;
+        }
+
+        const arcCurve = new ArcCurve(
+            v0.x, // aX
+            v0.y, // aY
+            radius, // aRadius
+            startAngle, // aStartAngle
+            endAngle, // aEndAngle
+            isClockwise, // isClockwise
+        );
+        // Adaptive tessellation: ~0.75mm per segment, clamped to [4, 25]
+        const arcSpan = Math.abs(endAngle - startAngle);
+        const arcLength = arcSpan * radius;
+        const divisions = Math.max(
+            4,
+            Math.min(Math.ceil(arcLength / 0.75), 25),
+        );
+        const points = arcCurve.getPoints(divisions);
+        const pointCount = Math.max(points.length - 1, 1);
+
+        // Point i of the arc in 3D: XY-plane (x, y, z), ZX-plane (y, z, x),
+        // YZ-plane (z, x, y). Its first two components are the top-down view.
+        let prevA = 0,
+            prevB = 0,
+            prevC = 0;
+        for (let i = 0; i < points.length; ++i) {
+            const point = points[i];
+            const z = ((v2.z - v1.z) / pointCount) * i + v1.z;
+
+            let a: number, b: number, c: number;
+            if (plane === 'G17') {
+                a = point.x;
+                b = point.y;
+                c = z;
+            } else if (plane === 'G18') {
+                a = point.y;
+                b = z;
+                c = point.x;
+            } else if (plane === 'G19') {
+                a = z;
+                b = point.x;
+                c = point.y;
+            } else {
+                continue;
+            }
+
+            if (i > 0) {
+                emitSegment(motion, false, 1, prevA, prevB, prevC, a, b, c);
+            }
+            prevA = a;
+            prevB = b;
+            prevC = c;
+        }
+    };
+
+    let fileInfo = null;
+    const vm = new GCodeVirtualizer({
+        addLine,
+        addArcCurve,
+        addCurve,
+        collate: true,
+        accelerations,
+        maxFeedrates,
+        atcEnabled,
+    });
+
+    // Direct per-line hook rather than vm.on('data'): the EventEmitter polyfill
+    // allocates an arguments array on every emit. Runs after each line with
+    // tokens has been drawn.
+    let lineStartVertex = 0;
+    vm.onData = (spindleSpeedUpdate: number | null) => {
+        if (profiler) {
+            profiler.counts.vm_data_events =
+                (profiler.counts.vm_data_events || 0) + 1;
+        }
+
+        if (usePower) {
+            // A line's vertices take the spindle speed in effect after the line.
+            updateSpindleState(spindleSpeedUpdate);
+            const spindleIsOn =
+                vm.modal.spindle === 'M3' || vm.modal.spindle === 'M4';
+            segments.fillPower(lineStartVertex, spindleIsOn ? spindleSpeed : 0);
+        }
+        lineStartVertex = segments.totalVertices;
 
         currentLines++;
         if (
@@ -622,423 +926,38 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
         }
     };
 
-    // Split handlers for regular and laser visualization
-    // Each handle Line and Arc Curves differently
-    const handlers = {
-        normal: {
-            addLine: (modal: Modal, v1: BasicPosition, v2: BasicPosition) => {
-                if (needsVisualization) {
-                    const { motion, tool } = modal;
-                    registerToolChange(tool);
+    // Per-line output is indexed by the server Sender's lines (the non-blank
+    // lines of the file), which is what `received`/`currentLineRunning` count
+    // and what the server indexes estimates by. The virtualizer is still fed
+    // every CR/LF-separated piece, exactly as before.
+    const maxSenderLines = totalLines + 1;
+    const prefixEndVertex = new Uint32Array(svgOnly ? 0 : maxSenderLines);
+    const lineEstimates = new Float32Array(svgOnly ? 0 : maxSenderLines);
+    let senderLines = 0;
+    let senderLineHasContent = false;
+    let senderLineEstimate = 0;
 
-                    // Check if A-axis rotation is involved
-                    const hasARotation =
-                        Math.abs((v2.a || 0) - (v1.a || 0)) > 0.001;
-
-                    if (hasARotation) {
-                        // Create helical motion with intermediate points
-                        // Use Math.max(1,...) — no artificial minimum; small-angle moves get 1 segment
-                        const segments = Math.max(
-                            1,
-                            Math.ceil(Math.abs((v2.a || 0) - (v1.a || 0)) / 5),
-                        );
-                        const opacity = motion === 'G0' ? rapidOpacity : 1;
-
-                        // Reusable scalars — no per-iteration object allocation
-                        let prevX = 0,
-                            prevY = 0,
-                            prevZ = 0;
-                        for (let i = 0; i <= segments; i++) {
-                            const t = i / segments;
-                            const interpolatedA =
-                                (v1.a || 0) + ((v2.a || 0) - (v1.a || 0)) * t;
-
-                            // Interpolate position
-                            const interpolatedX = v1.x + (v2.x - v1.x) * t;
-                            const interpolatedY = v1.y + (v2.y - v1.y) * t;
-                            const interpolatedZ = applyRotaryRadiusOffset(
-                                v1.z + (v2.z - v1.z) * t,
-                            );
-
-                            // Inline x-axis rotation: angle = toRadians(-a)
-                            const angle = -interpolatedA * (Math.PI / 180);
-                            const sinA = Math.sin(angle);
-                            const cosA = Math.cos(angle);
-                            const currX = interpolatedX;
-                            const currY =
-                                interpolatedY * cosA - interpolatedZ * sinA;
-                            const currZ =
-                                interpolatedY * sinA + interpolatedZ * cosA;
-
-                            if (i > 0) {
-                                // Add line segment from previous point to current point
-                                pushMotionColor(motion, opacity, 2);
-                                if (svgOnly) {
-                                    emitSvg2DSegment(
-                                        motion,
-                                        opacity,
-                                        prevX,
-                                        prevY,
-                                        currX,
-                                        currY,
-                                    );
-                                } else {
-                                    pushFloat32_6(
-                                        vertices,
-                                        prevX,
-                                        prevY,
-                                        prevZ,
-                                        currX,
-                                        currY,
-                                        currZ,
-                                    );
-                                }
-                            }
-
-                            prevX = currX;
-                            prevY = currY;
-                            prevZ = currZ;
-                        }
-                    } else {
-                        // No A-axis rotation, use simple linear interpolation
-                        const newV1 = rotateAxis('x', {
-                            x: v1.x,
-                            y: v1.y,
-                            z: applyRotaryRadiusOffset(v1.z),
-                            a: v1.a || 0,
-                        });
-                        v1.x = newV1.x;
-                        v1.y = newV1.y;
-                        v1.z = newV1.z;
-
-                        const newV2 = rotateAxis('x', {
-                            x: v2.x,
-                            y: v2.y,
-                            z: applyRotaryRadiusOffset(v2.z),
-                            a: v2.a || 0,
-                        });
-                        v2.x = newV2.x;
-                        v2.y = newV2.y;
-                        v2.z = newV2.z;
-
-                        // normal
-                        const opacity = motion === 'G0' ? rapidOpacity : 1;
-                        pushMotionColor(motion, opacity, 2);
-                        if (svgOnly) {
-                            emitSvg2DSegment(
-                                motion,
-                                opacity,
-                                v1.x,
-                                v1.y,
-                                v2.x,
-                                v2.y,
-                            );
-                        } else {
-                            pushFloat32_6(
-                                vertices,
-                                v1.x,
-                                v1.y,
-                                v1.z,
-                                v2.x,
-                                v2.y,
-                                v2.z,
-                            );
-                        }
-                    }
-                }
-            },
-            // For rotary visualization
-            addCurve: (modal: Modal, v1: BasicPosition, v2: BasicPosition) => {
-                const { motion, tool } = modal;
-                registerToolChange(tool);
-                // Check if A-axis rotation is involved
-                const hasARotation =
-                    Math.abs((v2.a || 0) - (v1.a || 0)) > 0.001;
-
-                if (hasARotation) {
-                    // Create helical curve with A-axis rotation
-                    // Use Math.max(1,...) — no artificial minimum; small-angle moves get 1 segment
-                    const segments = Math.max(
-                        1,
-                        Math.ceil(Math.abs((v2.a || 0) - (v1.a || 0)) / 5),
-                    );
-
-                    // Reusable scalars — no per-iteration object allocation
-                    let prevX = 0,
-                        prevY = 0,
-                        prevZ = 0;
-                    for (let i = 0; i <= segments; i++) {
-                        const t = i / segments;
-                        const interpolatedA =
-                            (v1.a || 0) + ((v2.a || 0) - (v1.a || 0)) * t;
-
-                        // Interpolate position
-                        const interpolatedX = v1.x + (v2.x - v1.x) * t;
-                        const interpolatedY = v1.y + (v2.y - v1.y) * t;
-                        const interpolatedZ = applyRotaryRadiusOffset(
-                            v1.z + (v2.z - v1.z) * t,
-                        );
-
-                        // Inline x-axis rotation: angle = toRadians(-a)
-                        const angle = -interpolatedA * (Math.PI / 180);
-                        const sinA = Math.sin(angle);
-                        const cosA = Math.cos(angle);
-                        const currX = interpolatedX;
-                        const currY =
-                            interpolatedY * cosA - interpolatedZ * sinA;
-                        const currZ =
-                            interpolatedY * sinA + interpolatedZ * cosA;
-
-                        if (i > 0) {
-                            // Add line segment from previous point to current point
-                            pushMotionColor(motion, 1, 2);
-                            if (svgOnly) {
-                                emitSvg2DSegment(
-                                    motion,
-                                    1,
-                                    prevX,
-                                    prevY,
-                                    currX,
-                                    currY,
-                                );
-                            } else {
-                                pushFloat32_6(
-                                    vertices,
-                                    prevX,
-                                    prevY,
-                                    prevZ,
-                                    currX,
-                                    currY,
-                                    currZ,
-                                );
-                            }
-                        }
-
-                        prevX = currX;
-                        prevY = currY;
-                        prevZ = currZ;
-                    }
-                } else {
-                    // Original curve logic for non-A-axis rotation
-                    const updatedV1 = rotateAxis('x', {
-                        x: v1.x,
-                        y: v1.y,
-                        z: applyRotaryRadiusOffset(v1.z),
-                        a: v1.a || 0,
-                    });
-                    const updatedV2 = rotateAxis('x', {
-                        x: v2.x,
-                        y: v2.y,
-                        z: applyRotaryRadiusOffset(v2.z),
-                        a: v2.a || 0,
-                    });
-
-                    const radius = v2.z;
-                    const startAngle = Math.atan2(updatedV1.z, updatedV1.y);
-                    const endAngle = Math.atan2(updatedV2.z, updatedV2.y);
-                    const isClockwise = v2.z > v1.z;
-
-                    const arcCurve = new ArcCurve(
-                        0,
-                        0,
-                        radius,
-                        startAngle,
-                        endAngle,
-                        isClockwise,
-                    );
-
-                    const DEGREES_PER_LINE_SEGMENT = 5;
-
-                    const angleDiff = Math.abs(v2.z - v1.z);
-                    const divisions = Math.ceil(
-                        angleDiff / DEGREES_PER_LINE_SEGMENT,
-                    );
-                    const points = arcCurve.getPoints(divisions);
-
-                    for (let i = 0; i < points.length; ++i) {
-                        const point = points[i];
-                        if (svgOnly) {
-                            if (i > 0) {
-                                // 3D vertex is (v2.x, point.x, point.y) — top-down XY is (v2.x, point.x)
-                                emitSvg2DSegment(
-                                    motion,
-                                    1,
-                                    v2.x,
-                                    points[i - 1].x,
-                                    v2.x,
-                                    point.x,
-                                );
-                            }
-                        } else {
-                            pushFloat32_3(vertices, v2.x, point.x, point.y);
-                        }
-                        pushMotionColor(motion, 1);
-                    }
-                }
-            },
-            addArcCurve: (
-                modal: Modal,
-                v1: BasicPosition,
-                v2: BasicPosition,
-                v0: BasicPosition,
-            ) => {
-                if (needsVisualization) {
-                    const { motion, plane, tool } = modal;
-                    registerToolChange(tool);
-
-                    const isClockwise = motion === 'G2';
-                    const radius = Math.sqrt(
-                        (v1.x - v0.x) ** 2 + (v1.y - v0.y) ** 2,
-                    );
-                    const startAngle = Math.atan2(v1.y - v0.y, v1.x - v0.x);
-                    let endAngle = Math.atan2(v2.y - v0.y, v2.x - v0.x);
-
-                    // Draw full circle if startAngle and endAngle are both zero
-                    if (startAngle === endAngle) {
-                        endAngle += 2 * Math.PI;
-                    }
-
-                    const arcCurve = new ArcCurve(
-                        v0.x, // aX
-                        v0.y, // aY
-                        radius, // aRadius
-                        startAngle, // aStartAngle
-                        endAngle, // aEndAngle
-                        isClockwise, // isClockwise
-                    );
-                    // Adaptive tessellation: ~0.75mm per segment, clamped to [4, 25]
-                    const arcSpan = Math.abs(endAngle - startAngle);
-                    const arcLength = arcSpan * radius;
-                    const divisions = Math.max(
-                        4,
-                        Math.min(Math.ceil(arcLength / 0.75), 25),
-                    );
-                    const points = arcCurve.getPoints(divisions);
-                    const pointCount = Math.max(points.length - 1, 1);
-
-                    for (let i = 0; i < points.length; ++i) {
-                        const point = points[i];
-                        const pointA = points[i - 1];
-                        const pointB = points[i];
-                        const z = ((v2.z - v1.z) / pointCount) * i + v1.z;
-                        const zA =
-                            ((v2.z - v1.z) / pointCount) * (i - 1) + v1.z;
-
-                        if (plane === 'G17') {
-                            // XY-plane
-                            if (svgOnly) {
-                                if (i > 0) {
-                                    emitSvg2DSegment(
-                                        motion,
-                                        1,
-                                        pointA.x,
-                                        pointA.y,
-                                        pointB.x,
-                                        pointB.y,
-                                    );
-                                }
-                            } else {
-                                pushFloat32_3(vertices, point.x, point.y, z);
-                            }
-                        } else if (plane === 'G18') {
-                            // ZX-plane
-                            if (svgOnly) {
-                                if (i > 0) {
-                                    // 3D vertex is (point.y, z, point.x) — top-down XY is (point.y, z)
-                                    emitSvg2DSegment(
-                                        motion,
-                                        1,
-                                        pointA.y,
-                                        zA,
-                                        pointB.y,
-                                        z,
-                                    );
-                                }
-                            } else {
-                                pushFloat32_3(vertices, point.y, z, point.x);
-                            }
-                        } else if (plane === 'G19') {
-                            // YZ-plane
-                            if (svgOnly) {
-                                if (i > 0) {
-                                    // 3D vertex is (z, point.x, point.y) — top-down XY is (z, point.x)
-                                    emitSvg2DSegment(
-                                        motion,
-                                        1,
-                                        zA,
-                                        pointA.x,
-                                        z,
-                                        pointB.x,
-                                    );
-                                }
-                            } else {
-                                pushFloat32_3(vertices, z, point.x, point.y);
-                            }
-                        }
-                        pushMotionColor(motion, 1);
-                    }
-                }
-            },
-        },
-        laser: {
-            addLine: (modal: Modal, v1: BasicPosition, v2: BasicPosition) => {
-                const { addLine: dAddLine } = handlers.normal;
-                dAddLine(modal, v1, v2);
-            },
-            addArcCurve: (
-                modal: Modal,
-                v1: BasicPosition,
-                v2: BasicPosition,
-                v0: BasicPosition,
-            ) => {
-                const { addArcCurve: dAddArcCurve } = handlers.normal;
-                dAddArcCurve(modal, v1, v2, v0);
-            },
-        },
-    };
-
-    // Determine which handler to use - normal by default, then laser if selected
-    let handlerKey = 'normal';
-
-    if (isLaser) {
-        handlerKey = 'laser';
-    }
-
-    // @ts-expect-error
-    const { addLine, addArcCurve, addCurve } =
-        handlers[handlerKey as keyof typeof handlers];
-    let fileInfo = null;
-    let parsedDataToSend = null;
-    const vm = new GCodeVirtualizer({
-        addLine,
-        addArcCurve,
-        addCurve,
-        collate: true,
-        accelerations,
-        maxFeedrates,
-        atcEnabled,
-    });
-
-    // Direct per-line hook rather than vm.on('data'): the EventEmitter polyfill
-    // allocates an arguments array on every emit.
-    vm.onData = (data: number | null) => {
-        if (profiler) {
-            profiler.counts.vm_data_events =
-                (profiler.counts.vm_data_events || 0) + 1;
+    const virtualizePiece = (piece: string) => {
+        vm.virtualize(piece);
+        // Fold whatever the virtualizer estimated for this piece into the
+        // current Sender line, instead of keeping an array entry per data line.
+        const pending = vm.estimates;
+        for (let k = 0; k < pending.length; k++) {
+            senderLineEstimate += pending[k];
         }
-
-        if (isLaser && needsVisualization && !svgOnly) {
-            updateSpindleStateFromLine(data);
-            const spindleIsOn =
-                vm.modal.spindle === 'M3' || vm.modal.spindle === 'M4';
-            pushFloat32_1(spindleFrameSpeeds, spindleIsOn ? spindleSpeed : 0);
-        }
-        onData();
+        pending.length = 0;
     };
-
-    markProfile(profiler, 'before_line_split');
-    markProfile(profiler, 'after_line_split');
-    sampleHeap(profiler, 'after_line_split');
+    const finishSenderLine = () => {
+        if (senderLineHasContent && !svgOnly) {
+            prefixEndVertex[senderLines] = segments.totalVertices;
+            lineEstimates[senderLines] = senderLineEstimate;
+        }
+        if (senderLineHasContent) {
+            senderLines++;
+        }
+        senderLineHasContent = false;
+        senderLineEstimate = 0;
+    };
 
     markProfile(profiler, 'before_parse_loop');
     let virtualizedLines = 0;
@@ -1047,11 +966,13 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
     for (let i = 0; i < contentLength; i++) {
         const ch = content.charCodeAt(i);
         if (ch !== 10 && ch !== 13) {
+            if (!senderLineHasContent && !isTrimWhitespace(ch)) {
+                senderLineHasContent = true;
+            }
             continue;
         }
 
-        const line = content.slice(lineStart, i);
-        vm.virtualize(line);
+        virtualizePiece(content.slice(lineStart, i));
         virtualizedLines++;
 
         if (
@@ -1061,139 +982,47 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
         ) {
             i++;
         }
+        // The Sender only breaks lines on LF; a lone CR stays inside its line.
+        if (content.charCodeAt(i) === 10) {
+            finishSenderLine();
+        }
         lineStart = i + 1;
     }
 
     // Match split(/\r?\n/) behavior by emitting the final line, including
     // a trailing empty line when the content ends with a newline.
-    vm.virtualize(content.slice(lineStart, contentLength));
+    virtualizePiece(content.slice(lineStart, contentLength));
     virtualizedLines++;
+    finishSenderLine();
 
     markProfile(profiler, 'after_parse_loop');
     sampleHeap(profiler, 'after_parse_loop');
 
-    const { estimates } = vm.getData();
     fileInfo = vm.generateFileStats();
     fileInfo.toolchanges = toolchanges;
 
-    parsedDataToSend = {
-        estimates: estimates,
-        info: fileInfo,
-        modalChanges: [],
-        feedrateChanges: [],
-        invalidLines: fileInfo.invalidLines,
-    };
-
     markProfile(profiler, 'before_typed_array_build');
-    const tFrames = toUsedUint32View(frames);
-    const tVertices = toUsedFloat32View(vertices);
-    const compactSpindleFrameSpeeds = isLaser
-        ? toCompactFloat32Array(toUsedFloat32View(spindleFrameSpeeds))
-        : new Float32Array(0);
+    const chunks = segments.finish();
+    const linePrefix = prefixEndVertex.slice(0, senderLines);
+    const estimates = lineEstimates.slice(0, senderLines);
     markProfile(profiler, 'after_typed_array_build');
     sampleHeap(profiler, 'after_typed_array_build');
-
-    let colorArray = new Float32Array(0);
-    let savedColorsArray = new Float32Array(0);
-    markProfile(profiler, 'before_color_build');
-    if (needsVisualization && theme) {
-        colorArray = toUsedFloat32View(colorValues);
-
-        // Non-laser jobs can use colorArray directly; no duplicate saved buffer needed.
-        if (isLaser) {
-            savedColorsArray = new Float32Array(colorArray);
-            if (spindleFrameSpeeds.length > 0 && savedColorsArray.length > 0) {
-                const defaultColor = new THREE.Color(
-                    theme.get(LASER_PART) ?? '#FFF',
-                );
-                const fillColor = new THREE.Color(
-                    theme.get(BACKGROUND_PART) ?? '#FFF',
-                );
-                const laserR = defaultColor.r;
-                const laserG = defaultColor.g;
-                const laserB = defaultColor.b;
-                const fillR = fillColor.r;
-                const fillG = fillColor.g;
-                const fillB = fillColor.b;
-                const totalVertices = colorArray.length / 4;
-                const frameCount = Math.min(
-                    tFrames.length,
-                    spindleFrameSpeeds.length,
-                );
-                const calculateOpacity = (speed: number) => {
-                    if (maxSpindleSpeed <= 0) {
-                        return 1;
-                    }
-                    return Math.max(0, Math.min(speed / maxSpindleSpeed, 1));
-                };
-
-                let prevFrame = 0;
-                for (let i = 0; i < frameCount; i++) {
-                    const frameEnd = Math.min(tFrames[i], totalVertices);
-                    if (frameEnd <= prevFrame) {
-                        continue;
-                    }
-
-                    const speed = spindleFrameSpeeds.data[i];
-                    const spindleIsOn = speed > 0;
-                    const alpha = spindleIsOn ? calculateOpacity(speed) : 0.05;
-                    const r = spindleIsOn ? laserR : fillR;
-                    const g = spindleIsOn ? laserG : fillG;
-                    const b = spindleIsOn ? laserB : fillB;
-
-                    for (
-                        let vertexIndex = prevFrame;
-                        vertexIndex < frameEnd;
-                        vertexIndex++
-                    ) {
-                        const offset = vertexIndex * 4;
-                        savedColorsArray[offset] = r;
-                        savedColorsArray[offset + 1] = g;
-                        savedColorsArray[offset + 2] = b;
-                        savedColorsArray[offset + 3] = alpha;
-                    }
-
-                    prevFrame = frameEnd;
-                }
-            }
-        }
-    }
-    markProfile(profiler, 'after_color_build');
-    sampleHeap(profiler, 'after_color_build');
-
-    const compactVertices = toCompactFloat32Array(tVertices);
-    const compactFrames = toCompactUint32Array(tFrames);
-    const compactColorArray = toCompactFloat32Array(colorArray);
-    const compactSavedColorsArray = toCompactFloat32Array(savedColorsArray);
 
     if (profiler) {
         profiler.counts.virtualized_lines = virtualizedLines;
         profiler.counts.lines_with_data = currentLines;
-        profiler.counts.frames_len = frames.length;
-        profiler.counts.vertices_f32_len = tVertices.length;
-        profiler.counts.color_values_len = colorValues.length;
-        profiler.counts.color_vertices_len = colorVertexCount;
+        profiler.counts.sender_lines = senderLines;
+        profiler.counts.segment_vertices = segments.totalVertices;
+        profiler.counts.segment_chunks = chunks.length;
         profiler.counts.toolchanges_len = toolchanges.length;
         profiler.counts.svg2d_segments_kept = svg2DKept;
         profiler.counts.svg2d_dupe_drops = svg2DDupeDrops;
         profiler.counts.svg2d_degenerate_drops = svg2DDegenerateDrops;
-        profiler.counts.spindle_frame_speeds_len = spindleFrameSpeeds.length;
         profiler.counts.estimates_len = estimates.length;
         profiler.counts.invalid_lines_len = fileInfo.invalidLineCount ?? 0;
         profiler.counts.spindle_tool_event_count = Object.keys(
             fileInfo.spindleToolEvents || {},
         ).length;
-        profiler.bytes.vertices_bytes = compactVertices.byteLength;
-        profiler.bytes.frames_bytes = compactFrames.byteLength;
-        profiler.bytes.color_bytes = compactColorArray.byteLength;
-        profiler.bytes.saved_color_bytes = compactSavedColorsArray.byteLength;
-        profiler.bytes.spindle_frame_speeds_bytes =
-            compactSpindleFrameSpeeds.byteLength;
-        profiler.bytes.vertices_capacity_bytes = tVertices.buffer.byteLength;
-        profiler.bytes.frames_capacity_bytes = tFrames.buffer.byteLength;
-        profiler.bytes.color_capacity_bytes = colorArray.buffer.byteLength;
-        profiler.bytes.saved_color_capacity_bytes =
-            savedColorsArray.buffer.byteLength;
     }
 
     const effectiveVisualizer = activeVisualizer ?? visualizer;
@@ -1202,14 +1031,18 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
         type: 'geometryReady';
         jobId: number;
         visualizer?: VISUALIZER_TYPES_T;
-        vertices: ArrayBuffer;
-        frames: ArrayBuffer;
-        verticesLen: number;
-        framesLen: number;
-        colorArrayBuffer: ArrayBuffer;
-        colorLen: number;
-        savedColorsBuffer: ArrayBuffer;
-        savedColorLen: number;
+        format: 'segments-v1';
+        chunks: {
+            positions: ArrayBuffer;
+            attrs: ArrayBuffer;
+            power?: ArrayBuffer;
+            vertexCount: number;
+        }[];
+        totalVertices: number;
+        prefixEndVertex: ArrayBuffer;
+        paletteHex: string[];
+        isLaser: boolean;
+        maxPower: number;
         info: any;
         needsVisualization: boolean;
         parsedData: {
@@ -1217,9 +1050,6 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
             invalidLines: string[];
             invalidLineCount: number;
         };
-        spindleFrameSpeeds?: ArrayBuffer;
-        spindleFrameLen?: number;
-        isLaser?: boolean;
         isSecondary?: boolean;
         activeVisualizer?: VISUALIZER_TYPES_T;
         svgSegmentGroups?: {
@@ -1234,14 +1064,18 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
         type: 'geometryReady',
         jobId,
         visualizer: effectiveVisualizer,
-        vertices: compactVertices.buffer,
-        frames: compactFrames.buffer,
-        verticesLen: tVertices.length,
-        framesLen: tFrames.length,
-        colorArrayBuffer: compactColorArray.buffer,
-        colorLen: colorArray.length,
-        savedColorsBuffer: compactSavedColorsArray.buffer,
-        savedColorLen: savedColorsArray.length,
+        format: 'segments-v1',
+        chunks: chunks.map((chunk) => ({
+            positions: chunk.positions.buffer as ArrayBuffer,
+            attrs: chunk.attrs.buffer as ArrayBuffer,
+            power: chunk.power?.buffer as ArrayBuffer | undefined,
+            vertexCount: chunk.count,
+        })),
+        totalVertices: segments.totalVertices,
+        prefixEndVertex: linePrefix.buffer,
+        paletteHex,
+        isLaser,
+        maxPower: maxSpindleSpeed,
         info: fileInfo,
         needsVisualization,
         parsedData: {
@@ -1253,66 +1087,51 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
         activeVisualizer: effectiveVisualizer,
     };
 
-    if (isLaser) {
-        geometryMessage.spindleFrameSpeeds = compactSpindleFrameSpeeds.buffer;
-        geometryMessage.spindleFrameLen = compactSpindleFrameSpeeds.length;
-        geometryMessage.isLaser = isLaser;
-    }
-
-    const transferList: ArrayBuffer[] = [
-        compactVertices.buffer,
-        compactFrames.buffer,
-        compactColorArray.buffer,
-        compactSavedColorsArray.buffer,
-    ];
-    if (isLaser) {
-        transferList.push(compactSpindleFrameSpeeds.buffer);
+    const transferList: ArrayBuffer[] = [linePrefix.buffer];
+    for (const chunk of geometryMessage.chunks) {
+        transferList.push(chunk.positions, chunk.attrs);
+        if (chunk.power) {
+            transferList.push(chunk.power);
+        }
     }
 
     if (svgOnly) {
-        geometryMessage.svgSegmentGroups = Array.from(
-            svg2DGroups.values(),
-        ).map((group) => {
-            const positions = toCompactFloat32Array(
-                toUsedFloat32View(group.positions),
-            );
-            transferList.push(positions.buffer);
-            return {
-                hexColor: group.hexColor,
-                opacity: group.opacity,
-                positionsBuffer: positions.buffer,
-                positionsLen: positions.length,
-                stride: 4 as const,
-            };
-        });
+        geometryMessage.svgSegmentGroups = Array.from(svg2DGroups.values()).map(
+            (group) => {
+                const positions = toCompactFloat32Array(
+                    toUsedFloat32View(group.positions),
+                );
+                transferList.push(positions.buffer as ArrayBuffer);
+                return {
+                    hexColor: group.hexColor,
+                    opacity: group.opacity,
+                    positionsBuffer: positions.buffer as ArrayBuffer,
+                    positionsLen: positions.length,
+                    stride: 4 as const,
+                };
+            },
+        );
         geometryMessage.svgMeta = {
             minZ: fileInfo.bbox?.min?.z ?? 0,
             maxZ: fileInfo.bbox?.max?.z ?? 0,
         };
     }
 
+    // One estimate (seconds) per Sender line, transferred rather than copied.
+    const parsedDataToSend = {
+        estimates,
+        info: fileInfo,
+        invalidLines: fileInfo.invalidLines,
+    };
+    const metadataTransfer: ArrayBuffer[] = [estimates.buffer];
+
     markProfile(profiler, 'before_post_message');
     if (profiler) {
-        profiler.bytes.vertices_transfer_bytes = compactVertices.byteLength;
-        profiler.bytes.frames_transfer_bytes = compactFrames.byteLength;
-        profiler.bytes.color_transfer_bytes = compactColorArray.byteLength;
-        profiler.bytes.saved_color_transfer_bytes =
-            compactSavedColorsArray.byteLength;
-        profiler.bytes.spindle_frame_speeds_transfer_bytes =
-            compactSpindleFrameSpeeds.byteLength;
         profiler.bytes.transfer_total_bytes = transferList.reduce(
             (acc, buffer) => acc + buffer.byteLength,
             0,
         );
-        profiler.bytes.transfer_capacity_total_bytes =
-            tVertices.buffer.byteLength +
-            tFrames.buffer.byteLength +
-            colorArray.buffer.byteLength +
-            savedColorsArray.buffer.byteLength +
-            spindleFrameSpeeds.data.buffer.byteLength;
-        profiler.bytes.transfer_saved_bytes =
-            profiler.bytes.transfer_capacity_total_bytes -
-            profiler.bytes.transfer_total_bytes;
+        profiler.bytes.estimates_bytes = estimates.byteLength;
         const durationBetween = (start: string, end: string): number => {
             const s = profiler.marks[start];
             const e = profiler.marks[end];
@@ -1359,10 +1178,6 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
         metadataMessage.profile = {
             durationsMs: {
                 rotaryScan: durationBetween('start', 'after_rotary_scan'),
-                lineSplit: durationBetween(
-                    'before_line_split',
-                    'after_line_split',
-                ),
                 parseLoop: durationBetween(
                     'before_parse_loop',
                     'after_parse_loop',
@@ -1370,10 +1185,6 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
                 typedArrayBuild: durationBetween(
                     'before_typed_array_build',
                     'after_typed_array_build',
-                ),
-                colorBuild: durationBetween(
-                    'before_color_build',
-                    'after_color_build',
                 ),
                 total: durationBetween('start', 'before_post_message'),
             },
@@ -1388,7 +1199,7 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
         };
 
         postMessage(geometryMessage, transferList);
-        postMessage(metadataMessage);
+        postMessage(metadataMessage, metadataTransfer);
         return;
     }
 
@@ -1404,5 +1215,5 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
     };
 
     postMessage(geometryMessage, transferList);
-    postMessage(metadataMessage);
+    postMessage(metadataMessage, metadataTransfer);
 };

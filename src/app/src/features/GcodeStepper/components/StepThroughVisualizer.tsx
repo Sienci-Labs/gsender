@@ -23,7 +23,7 @@
 
 import type {
     LineRangeGroup,
-    WorkerGeometryData,
+    WorkerSegmentsData,
 } from '@sienci/gviewer/viewer';
 import { GCodeViewer } from '@sienci/gviewer/viewer';
 import { IMPERIAL_UNITS } from 'app/constants';
@@ -50,25 +50,26 @@ const FIT_MARGIN = 1.05;
 export interface StepThroughVisualizerHandle {
     /**
      * Move to the state for the current line: the cutter marker to `position`,
-     * and the processed-geometry cursor to `frame`, drawn per `progressMode`.
+     * and the processed-geometry cursor past the first `processedLines` Sender
+     * lines, drawn per `progressMode`.
      *
      * Rotary files spin the whole toolpath about A rather than pre-transforming
      * the point, matching how the primary visualizer places its bit.
      */
     seekTo: (
         position: StepPosition,
-        frame: number,
+        processedLines: number,
         progressMode: 'hide' | 'grey',
     ) => void;
 }
 
 interface StepThroughVisualizerProps {
-    geometry: WorkerGeometryData | null;
+    geometry: WorkerSegmentsData | null;
     isRotaryFile: boolean;
     units: string;
     initialPosition: StepPosition;
     /**
-     * Frame ranges the toolpath is split into so they can be hidden separately —
+     * Sender line ranges the toolpath is split into so they can be hidden separately —
      * one per tool, indexed the same way `hiddenGroups` is. Omit them and the
      * toolpath loads as a single pair of streams, where only a prefix can be
      * hidden.
@@ -152,11 +153,11 @@ export const StepThroughVisualizer = forwardRef<
     // and so a burst of scrub events collapses into one frame of work.
     const pendingRef = useRef<{
         position: StepPosition;
-        frame: number;
+        processedLines: number;
         progressMode: 'hide' | 'grey';
     }>({
         position: initialPosition,
-        frame: 0,
+        processedLines: 0,
         progressMode: 'grey',
     });
     const rafRef = useRef<number | null>(null);
@@ -184,26 +185,26 @@ export const StepThroughVisualizer = forwardRef<
         if (!viewer) {
             return;
         }
-        const { position, frame, progressMode } = pendingRef.current;
+        const { position, processedLines, progressMode } = pendingRef.current;
         viewer.setToolpathRotationA(isRotaryFile ? position.a : 0);
         viewer.setBitPosition(
             { x: position.x, y: position.y, z: position.z, a: position.a },
             { immediate: true },
         );
         // The mode is passed per call rather than through options, so the in-modal
-        // toggle takes effect immediately. This only recolours the delta since the
-        // last cursor and restores the base colours when moving backwards, so
-        // scrubbing in reverse un-greys on its own; "hide" never touches colours,
-        // so switching between the two stays consistent without a resetColors().
-        viewer.hideUntilLine(frame, progressMode);
+        // toggle takes effect immediately. Greying is a cursor the shader compares
+        // against, so scrubbing in reverse un-greys on its own; "hide" only moves
+        // the draw range, so switching between the two stays consistent without a
+        // resetColors(). hideUntilLine takes the index of the last processed line.
+        viewer.hideUntilLine(processedLines - 1, progressMode);
     };
 
     const seekTo = (
         position: StepPosition,
-        frame: number,
+        processedLines: number,
         progressMode: 'hide' | 'grey',
     ) => {
-        pendingRef.current = { position, frame, progressMode };
+        pendingRef.current = { position, processedLines, progressMode };
         // A long scrub drag can outpace the renderer — recolouring a big vertex
         // range on every pointermove is the expensive part, so coalesce to one
         // update per frame.
@@ -317,7 +318,7 @@ export const StepThroughVisualizer = forwardRef<
             // gviewer discards the worker's per-tool colours and draws every cut in
             // the theme's single cutting colour, so the Tools panel's colour chips
             // would not match the toolpath.
-            .loadFromWorkerData(
+            .loadFromSegments(
                 augmentWorkerGeometry(geometry),
                 lineGroups ? { lineGroups } : undefined,
             )

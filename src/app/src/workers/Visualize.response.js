@@ -185,10 +185,13 @@ const handleMetadataReady = async (data) => {
     logProfile(data.profile);
 
     const parsedData = data.parsedData || {};
+    // One estimate per Sender line, as a Float32Array from the worker.
     const estimateData = {
-        estimates: Array.isArray(parsedData.estimates)
-            ? parsedData.estimates
-            : [],
+        estimates:
+            parsedData.estimates instanceof Float32Array ||
+            Array.isArray(parsedData.estimates)
+                ? parsedData.estimates
+                : new Float32Array(0),
         estimatedTime: _get(parsedData, 'info.estimatedTime', 0),
         jobId: data.jobId,
     };
