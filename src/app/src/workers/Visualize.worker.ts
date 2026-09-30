@@ -1019,7 +1019,9 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
         atcEnabled,
     });
 
-    vm.on('data', (data: any) => {
+    // Direct per-line hook rather than vm.on('data'): the EventEmitter polyfill
+    // allocates an arguments array on every emit.
+    vm.onData = (data: number | null) => {
         if (profiler) {
             profiler.counts.vm_data_events =
                 (profiler.counts.vm_data_events || 0) + 1;
@@ -1032,7 +1034,7 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
             pushFloat32_1(spindleFrameSpeeds, spindleIsOn ? spindleSpeed : 0);
         }
         onData();
-    });
+    };
 
     markProfile(profiler, 'before_line_split');
     markProfile(profiler, 'after_line_split');

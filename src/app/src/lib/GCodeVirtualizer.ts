@@ -336,6 +336,28 @@ class GCodeVirtualizer extends EventEmitter {
 
     argsScratchKeys: string[] = [];
 
+    // Reused for every linear move so a line doesn't allocate its positions.
+    // Callbacks may read or mutate them, but must not keep a reference.
+    scratchV1: BasicPosition = { x: 0, y: 0, z: 0, a: 0 };
+    scratchV2: BasicPosition = { x: 0, y: 0, z: 0, a: 0 };
+    scratchTarget: BasicPosition = { x: 0, y: 0, z: 0, a: 0 };
+
+    // Raw F/S codes already collated, so a repeated word doesn't build a
+    // `F${code}` string just to find it is already in the set.
+    rawFeedCodes: Set<string> = new Set();
+    rawSpindleCodes: Set<string> = new Set();
+
+    // Per-line hook called in place of emit('data'); the events polyfill
+    // allocates an arguments array on every emit.
+    onData: ((spindleSpeed: number | null) => void) | null = null;
+
+    // S events kept for "closest S to a toolchange" lookups (see
+    // recordSpindleEvent): whether the next S is the first since the last
+    // toolchange, and the most recent S not yet recorded.
+    pendingFirstS = true;
+    pendingLastSLine = -1;
+    pendingLastSValue = 0;
+
     fn: {
         addLine: (modal: Modal, v1: BasicPosition, v2: BasicPosition) => void;
         addCurve: (modal: Modal, v1: BasicPosition, v2: BasicPosition) => void;
@@ -356,57 +378,7 @@ class GCodeVirtualizer extends EventEmitter {
     handlers: { [key: string]: (param: any) => void } = {
         // G0: Rapid Linear Move
         G0: (params: Record<string, any>): void => {
-            if (this.modal.motion !== 'G0') {
-                this.setModal({ motion: 'G0' });
-                // this.saveModal({ motion: 'G0' });
-            }
-
-            const v1: BasicPosition = {
-                x: this.position.x,
-                y: this.position.y,
-                z: this.position.z,
-                a: this.position.a,
-            };
-            const v2: BasicPosition = {
-                x: this.translateX(params.X),
-                y: this.translateY(params.Y),
-                z: this.translateZ(params.Z),
-                a: this.translateA(params.A),
-            };
-            const targetPosition: BasicPosition = {
-                x: v2.x,
-                y: v2.y,
-                z: v2.z,
-                a: v2.a,
-            };
-
-            const isCurvedLine: boolean = shouldRotate(v1, v2);
-            const ANGLE_THRESHOLD: number = 30;
-            const angleDiff: number = Math.abs(v2.a - v1.a);
-
-            if (isCurvedLine && angleDiff > ANGLE_THRESHOLD) {
-                this.fn.addCurve(
-                    this.modal,
-                    this.offsetG92(v1),
-                    this.offsetG92(v2),
-                );
-            } else {
-                this.fn.addLine(
-                    this.modal,
-                    this.offsetG92(v1),
-                    this.offsetG92(v2),
-                );
-            }
-
-            // Update position
-            this.calculateMachiningTime(targetPosition);
-            this.updateBounds(targetPosition);
-            this.setPosition(
-                targetPosition.x,
-                targetPosition.y,
-                targetPosition.z,
-                targetPosition.a,
-            );
+            this.linearMove('G0', params);
         },
         // G1: Linear Move
         // Usage
@@ -423,57 +395,7 @@ class GCodeVirtualizer extends EventEmitter {
         //   G1 X90.6 Y13.8 E22.4 (Move to 90.6mm on the X axis and 13.8mm on the Y axis while extruding 22.4mm of material)
         //
         G1: (params: Record<string, any>): void => {
-            if (this.modal.motion !== 'G1') {
-                this.setModal({ motion: 'G1' });
-                // this.saveModal({ motion: 'G1' });
-            }
-
-            const v1: BasicPosition = {
-                x: this.position.x,
-                y: this.position.y,
-                z: this.position.z,
-                a: this.position.a,
-            };
-            const v2: BasicPosition = {
-                x: this.translateX(params.X),
-                y: this.translateY(params.Y),
-                z: this.translateZ(params.Z),
-                a: this.translateA(params.A),
-            };
-            const targetPosition: BasicPosition = {
-                x: v2.x,
-                y: v2.y,
-                z: v2.z,
-                a: v2.a,
-            };
-
-            const isCurvedLine: boolean = shouldRotate(v1, v2);
-            const ANGLE_THRESHOLD: number = 30;
-            const angleDiff: number = Math.abs(v2.a - v1.a);
-
-            if (isCurvedLine && angleDiff > ANGLE_THRESHOLD) {
-                this.fn.addCurve(
-                    this.modal,
-                    this.offsetG92(v1),
-                    this.offsetG92(v2),
-                );
-            } else {
-                this.fn.addLine(
-                    this.modal,
-                    this.offsetG92(v1),
-                    this.offsetG92(v2),
-                );
-            }
-
-            // Update position + increment machining time
-            this.calculateMachiningTime(targetPosition);
-            this.updateBounds(targetPosition);
-            this.setPosition(
-                targetPosition.x,
-                targetPosition.y,
-                targetPosition.z,
-                targetPosition.a,
-            );
+            this.linearMove('G1', params);
         },
         // G2 & G3: Controlled Arc Move
         // Usage
@@ -1225,9 +1147,9 @@ class GCodeVirtualizer extends EventEmitter {
             args = code;
             this.updateSpindleToolEvents('T', Number(code));
         } else if (letter === 'S') {
+            // S events are recorded once per line by recordSpindleEvent.
             cmd = letter;
             args = code;
-            this.updateSpindleToolEvents('S', Number(code));
         } else if (AXIS_ARGUMENT_LETTERS.has(letter)) {
             // Use previous motion command if the line does not start with G-code or M-code.
             cmd = this.motionMode;
@@ -1275,6 +1197,8 @@ class GCodeVirtualizer extends EventEmitter {
         const letters = scan.letters;
         const values = scan.values;
         let spindleSpeedUpdate: number | null = null;
+        let lineHasS = false;
+        let lineSValue = 0;
 
         // collect spindle and feed rates
         for (let i = 0; i < scan.count; i++) {
@@ -1282,13 +1206,20 @@ class GCodeVirtualizer extends EventEmitter {
             const code = values[i];
             if (letter === 'F') {
                 this.feed = Number(code);
-                if (this.collate) this.vmState.feedrates.add(`F${code}`);
+                if (this.collate && !this.rawFeedCodes.has(code)) {
+                    this.rawFeedCodes.add(code);
+                    this.vmState.feedrates.add(`F${code}`);
+                }
                 // this.saveFeedrate(code);
             }
             if (letter === 'S') {
-                if (this.collate) this.vmState.spindle.add(`S${code}`);
+                if (this.collate && !this.rawSpindleCodes.has(code)) {
+                    this.rawSpindleCodes.add(code);
+                    this.vmState.spindle.add(`S${code}`);
+                }
                 const spindleSpeed = Number(code);
-                this.updateSpindleToolEvents('S', spindleSpeed);
+                lineHasS = true;
+                lineSValue = spindleSpeed;
                 if (!Number.isNaN(spindleSpeed)) {
                     spindleSpeedUpdate = spindleSpeed;
                 }
@@ -1313,6 +1244,8 @@ class GCodeVirtualizer extends EventEmitter {
             this.dispatchTokenGroup(letters, values, groupStart, scan.count);
         }
         this.profileStats.groupsSeen += groupCount;
+
+        this.recordSpindleEvent(lineHasS, lineSValue);
 
         const currentEvent = this.vmState.spindleToolEvents[this.totalLines];
         if (
@@ -1352,7 +1285,48 @@ class GCodeVirtualizer extends EventEmitter {
 
         this.fn.callback();
         this.profileStats.emitDataCount += 1;
-        this.emit('data', spindleSpeedUpdate);
+        if (this.onData) {
+            this.onData(spindleSpeedUpdate);
+        } else {
+            this.emit('data', spindleSpeedUpdate);
+        }
+    }
+
+    // spindleToolEvents used to get an entry for every line with an S word,
+    // which on a laser raster is nearly every line. Its readers need T/M lines
+    // (toolchanges, M6 checks) and, for S, only "the S closest to a toolchange
+    // line" (GcodeStepper spindleSpeedForTool). That can only ever be the first
+    // S in the file, an S on a T/M line, or the last S before / first S after a
+    // toolchange line, so only those are recorded.
+    recordSpindleEvent(lineHasS: boolean, lineSValue: number): void {
+        const line = this.totalLines;
+        const events = this.vmState.spindleToolEvents;
+        const event = events[line];
+
+        if (lineHasS) {
+            if (event) {
+                event.S = lineSValue;
+                this.pendingLastSLine = -1;
+                this.pendingFirstS = false;
+            } else if (this.pendingFirstS) {
+                events[line] = { S: lineSValue };
+                this.pendingLastSLine = -1;
+                this.pendingFirstS = false;
+            } else {
+                this.pendingLastSLine = line;
+                this.pendingLastSValue = lineSValue;
+            }
+        }
+
+        // A toolchange line (M and T together, as buildToolArray reads it):
+        // keep the last S before it, and record the first S after it.
+        if (event && event.M !== undefined && event.T !== undefined) {
+            if (this.pendingLastSLine > 0 && this.pendingLastSLine < line) {
+                events[this.pendingLastSLine] = { S: this.pendingLastSValue };
+            }
+            this.pendingLastSLine = -1;
+            this.pendingFirstS = true;
+        }
     }
 
     generateFileStats() {
@@ -1385,6 +1359,47 @@ class GCodeVirtualizer extends EventEmitter {
             toolchanges: this.vmState.toolchange,
             spindleToolEvents: this.vmState.spindleToolEvents,
         };
+    }
+
+    // G0/G1. Same maths as allocating v1/v2/target and two offsetG92 copies per
+    // move, but written into the reused scratch positions.
+    linearMove(motion: 'G0' | 'G1', params: Record<string, any>): void {
+        if (this.modal.motion !== motion) {
+            this.setModal({ motion });
+        }
+
+        const pos = this.position;
+        const target = this.scratchTarget;
+        target.x = this.translateX(params.X);
+        target.y = this.translateY(params.Y);
+        target.z = this.translateZ(params.Z);
+        target.a = this.translateA(params.A);
+
+        const offsets = this.offsets;
+        const v1 = this.scratchV1;
+        v1.x = pos.x + offsets.x;
+        v1.y = pos.y + offsets.y;
+        v1.z = pos.z + offsets.z;
+        v1.a = pos.a + offsets.a;
+        const v2 = this.scratchV2;
+        v2.x = target.x + offsets.x;
+        v2.y = target.y + offsets.y;
+        v2.z = target.z + offsets.z;
+        v2.a = target.a + offsets.a;
+
+        const ANGLE_THRESHOLD = 30;
+        if (
+            shouldRotate(pos, target) &&
+            Math.abs(target.a - pos.a) > ANGLE_THRESHOLD
+        ) {
+            this.fn.addCurve(this.modal, v1, v2);
+        } else {
+            this.fn.addLine(this.modal, v1, v2);
+        }
+
+        this.calculateMachiningTime(target);
+        this.updateBounds(target);
+        this.setPosition(target.x, target.y, target.z, target.a);
     }
 
     offsetG92 = (pos: BasicPosition): BasicPosition => {
@@ -1580,6 +1595,8 @@ class GCodeVirtualizer extends EventEmitter {
         };
     }
 
+    // Allocation-free: no per-move arrays or axis objects, no Math.min spread,
+    // and no toFixed string for the rounding.
     calculateMachiningTime(endPos: BasicPosition, v1?: BasicPosition): void {
         let moveDuration = 0;
         const currentPos = v1 || this.position;
@@ -1609,120 +1626,120 @@ class GCodeVirtualizer extends EventEmitter {
             rotaryTravel = (Math.abs(da) / 360) * circumference;
         }
 
-        // Determine which axes are moving and collect their constraints
-        const maxFeedArray = [];
-        const accelArray = [];
-        const axisMovements = [];
-
-        // For moves with both linear and rotary components, we need to consider both
-        // The machine will move all axes simultaneously, so time is determined by the slowest axis
-
-        if (dx !== 0) {
-            maxFeedArray.push(this.xMaxFeed);
-            accelArray.push(this.xAccel);
-            axisMovements.push({
-                distance: Math.abs(dx),
-                maxFeed: this.xMaxFeed,
-                accel: this.xAccel,
-            });
-        }
-        if (dy !== 0) {
-            maxFeedArray.push(this.yMaxFeed);
-            accelArray.push(this.yAccel);
-            axisMovements.push({
-                distance: Math.abs(dy),
-                maxFeed: this.yMaxFeed,
-                accel: this.yAccel,
-            });
-        }
-        if (dz !== 0) {
-            maxFeedArray.push(this.zMaxFeed);
-            accelArray.push(this.zAccel);
-            axisMovements.push({
-                distance: Math.abs(dz),
-                maxFeed: this.zMaxFeed,
-                accel: this.zAccel,
-            });
-        }
-        if (da !== 0) {
-            // A-axis feedrate is in degrees/min, not mm/min
-            // Convert it to equivalent mm/min based on the workpiece diameter
-            const aMaxFeedLinear =
-                (this.aMaxFeed / 360) * (Math.PI * this.rotaryDiameter);
-            const aAccelLinear =
-                (this.aAccel / 360) * (Math.PI * this.rotaryDiameter);
-
-            maxFeedArray.push(aMaxFeedLinear);
-            accelArray.push(aAccelLinear);
-            axisMovements.push({
-                distance: rotaryTravel,
-                maxFeed: aMaxFeedLinear,
-                accel: aAccelLinear,
-            });
-        }
+        const movingX = dx !== 0;
+        const movingY = dy !== 0;
+        const movingZ = dz !== 0;
+        const movingA = da !== 0;
 
         // If no movement, return early
-        if (axisMovements.length === 0) {
+        if (!movingX && !movingY && !movingZ && !movingA) {
             this.estimates.push(0);
             this.profileStats.estimatesPushCount += 1;
             this.setEstimate = true;
             return;
         }
 
+        // A-axis feedrate is in degrees/min, not mm/min
+        // Convert it to equivalent mm/min based on the workpiece diameter
+        const aMaxFeedLinear = movingA
+            ? (this.aMaxFeed / 360) * (Math.PI * this.rotaryDiameter)
+            : 0;
+        const aAccelLinear = movingA
+            ? (this.aAccel / 360) * (Math.PI * this.rotaryDiameter)
+            : 0;
+
         // For combined linear + rotary moves, calculate time based on each axis independently
         // and take the maximum (since all axes move simultaneously)
-        if (da !== 0 && (dx !== 0 || dy !== 0 || dz !== 0)) {
-            // Combined move: calculate time for each axis independently
-            let maxTime = 0;
-            const programmedFeed = this.modal.motion === 'G0' ? 0 : this.feed;
+        if (movingA && (movingX || movingY || movingZ)) {
+            const isRapid = this.modal.motion === 'G0';
+            const programmedFeed = isRapid ? 0 : this.feed;
             const programmedFeedMetric =
                 this.modal.units === 'G20'
                     ? programmedFeed * 25.4
                     : programmedFeed;
 
-            for (const axis of axisMovements) {
-                let axisFeed =
-                    this.modal.motion === 'G0'
-                        ? axis.maxFeed
-                        : programmedFeedMetric;
-
-                // Limit feed to max feed for this axis
-                if (axisFeed > axis.maxFeed) {
-                    axisFeed = axis.maxFeed;
+            // `time > maxTime` (not Math.max) so a NaN axis time is skipped, as before
+            let maxTime = 0;
+            const takeLonger = (time: number) => {
+                if (time > maxTime) {
+                    maxTime = time;
                 }
-
-                const f = axisFeed / 60; // Convert to mm/s
-                let axisTime = 0;
-
-                if (f > 0) {
-                    axisTime = this.getAcceleratedMove(
-                        axis.distance,
-                        f,
-                        axis.accel,
-                    );
-                }
-
-                if (axisTime > maxTime) {
-                    maxTime = axisTime;
-                }
+            };
+            if (movingX) {
+                takeLonger(
+                    this.getAxisMoveTime(
+                        Math.abs(dx),
+                        this.xMaxFeed,
+                        this.xAccel,
+                        isRapid,
+                        programmedFeedMetric,
+                    ),
+                );
             }
+            if (movingY) {
+                takeLonger(
+                    this.getAxisMoveTime(
+                        Math.abs(dy),
+                        this.yMaxFeed,
+                        this.yAccel,
+                        isRapid,
+                        programmedFeedMetric,
+                    ),
+                );
+            }
+            if (movingZ) {
+                takeLonger(
+                    this.getAxisMoveTime(
+                        Math.abs(dz),
+                        this.zMaxFeed,
+                        this.zAccel,
+                        isRapid,
+                        programmedFeedMetric,
+                    ),
+                );
+            }
+            takeLonger(
+                this.getAxisMoveTime(
+                    rotaryTravel,
+                    aMaxFeedLinear,
+                    aAccelLinear,
+                    isRapid,
+                    programmedFeedMetric,
+                ),
+            );
 
             moveDuration = maxTime;
         } else {
             // Pure linear or pure rotary move: use traditional calculation
-            const travel = da !== 0 ? rotaryTravel : linearTravel;
+            const travel = movingA ? rotaryTravel : linearTravel;
 
-            // find the lowest max feed/accel
-            const minMaxFeed = Math.min(...maxFeedArray);
-            const minAccel = Math.min(...accelArray);
+            // find the lowest max feed/accel of the moving axes. Pairwise
+            // Math.min keeps Math.min(...array)'s NaN propagation.
+            let minMaxFeed = Infinity;
+            let minAccel = Infinity;
+            if (movingX) {
+                minMaxFeed = Math.min(minMaxFeed, this.xMaxFeed);
+                minAccel = Math.min(minAccel, this.xAccel);
+            }
+            if (movingY) {
+                minMaxFeed = Math.min(minMaxFeed, this.yMaxFeed);
+                minAccel = Math.min(minAccel, this.yAccel);
+            }
+            if (movingZ) {
+                minMaxFeed = Math.min(minMaxFeed, this.zMaxFeed);
+                minAccel = Math.min(minAccel, this.zAccel);
+            }
+            if (movingA) {
+                minMaxFeed = Math.min(minMaxFeed, aMaxFeedLinear);
+                minAccel = Math.min(minAccel, aAccelLinear);
+            }
 
             // if motion is G0, use the max feed
             let feed = this.modal.motion === 'G0' ? minMaxFeed : this.feed;
 
             // For pure rotary moves (A-axis only), the feedrate (F value) is in degrees/min
             // Convert it to equivalent linear speed based on workpiece diameter
-            if (da !== 0 && dx === 0 && dy === 0 && dz === 0) {
-                // Pure rotary move: F is in degrees/min, convert to mm/min
+            if (movingA && !movingX && !movingY && !movingZ) {
                 const feedDegPerMin =
                     this.modal.units === 'G20' ? feed * 25.4 : feed;
                 feed = (feedDegPerMin / 360) * (Math.PI * this.rotaryDiameter);
@@ -1738,20 +1755,38 @@ class GCodeVirtualizer extends EventEmitter {
 
             // mm/s to mm/m
             const f = feed / 60;
-
             if (f === this.lastF && da === 0) {
                 moveDuration = f !== 0 ? travel / f : 0;
             } else {
                 moveDuration = this.getAcceleratedMove(travel, f, minAccel);
             }
-
             this.lastF = f;
         }
 
         this.totalTime += moveDuration;
-        this.estimates.push(Number(moveDuration.toFixed(4))); // round to avoid bad js math
+        this.estimates.push(Math.round(moveDuration * 1e4) / 1e4); // round to avoid bad js math
         this.profileStats.estimatesPushCount += 1;
         this.setEstimate = true;
+    }
+
+    // One axis of a combined linear + rotary move: rapids run at the axis max,
+    // feeds at the programmed rate, both capped at the axis max.
+    getAxisMoveTime(
+        distance: number,
+        maxFeed: number,
+        accel: number,
+        isRapid: boolean,
+        programmedFeedMetric: number,
+    ): number {
+        let axisFeed = isRapid ? maxFeed : programmedFeedMetric;
+
+        // Limit feed to max feed for this axis
+        if (axisFeed > maxFeed) {
+            axisFeed = maxFeed;
+        }
+
+        const f = axisFeed / 60; // Convert to mm/s
+        return f > 0 ? this.getAcceleratedMove(distance, f, accel) : 0;
     }
 
     // TODO: if we find something we need to account for that will make the times longer,
