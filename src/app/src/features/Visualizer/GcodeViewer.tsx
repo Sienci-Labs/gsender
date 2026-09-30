@@ -1255,15 +1255,21 @@ class GcodeViewer extends Component<Props> {
             'parsedData.invalidLines',
             [],
         );
-        if (invalidLines.length === 0) {
+        // The worker only keeps a sample of the lines; the count covers the whole file.
+        const invalidLineCount: number = _get(
+            data,
+            'parsedData.invalidLineCount',
+            invalidLines.length,
+        );
+        if (invalidLineCount === 0) {
             return;
         }
         const lineSample = invalidLines.slice(0, 5);
         const description = (
             <div className={'flex flex-col gap-2'}>
                 <p>
-                    Detected {invalidLines.length} invalid lines on file load.
-                    Your job may not run correctly.
+                    Detected {invalidLineCount} invalid lines on file load. Your
+                    job may not run correctly.
                 </p>
                 <p>Sample invalid lines found include:</p>
                 <ol>

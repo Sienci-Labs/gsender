@@ -34,7 +34,6 @@ type VisualizeWorkerGeometryMessage = {
     jobId: number;
     visualizer?: string;
     vertices: ArrayBuffer;
-    paths: unknown[];
     frames: ArrayBuffer;
     verticesLen: number;
     framesLen: number;
@@ -250,7 +249,6 @@ const buildWorkerRequest = (payload: GcodeLoadPayload, jobId: number) => {
         isSecondary: false,
         isLaser,
         rapidOpacity: PENDANT_RAPID_OPACITY,
-        shouldIncludeSVG: false,
         needsVisualization: true,
         // Top-down SVG mode: worker streams deduplicated 2D segment groups and
         // skips the 3D vertex/color/frame buffers entirely.

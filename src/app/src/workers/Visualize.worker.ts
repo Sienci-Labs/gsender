@@ -49,7 +49,6 @@ interface WorkerData {
     jobId?: number;
     visualizer?: VISUALIZER_TYPES_T;
     isLaser?: boolean;
-    shouldIncludeSVG?: boolean;
     needsVisualization?: boolean;
     svgOnly?: boolean;
     rapidOpacity?: number;
@@ -62,20 +61,6 @@ interface WorkerData {
     theme?: Map<string, string>;
     profile?: boolean;
     profileSampleEvery?: number;
-}
-
-interface SVGVertex {
-    x1: number;
-    y1: number;
-    x2: number;
-    y2: number;
-}
-
-interface Path {
-    motion: string;
-    path: string;
-    strokeWidth: number;
-    fill: string;
 }
 
 interface Modal {
@@ -353,7 +338,6 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
         jobId = 0,
         visualizer,
         isLaser = false,
-        shouldIncludeSVG = false,
         needsVisualization = true,
         svgOnly: svgOnlyRequested = false,
         rapidOpacity = 0.5,
@@ -544,10 +528,6 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
     let maxSpindleSpeed = 0;
     let spindleSpeed = 0;
 
-    // SVG specific state variables
-    let SVGVertices: SVGVertex[] = [];
-    const paths: Path[] = [];
-    let currentMotion = '';
     let progress = 0;
     let currentLines = 0;
     let totalLines = 0;
@@ -616,45 +596,6 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
         motionColor.G3 = rgb;
     };
 
-    // create path for the vertices of the last motion
-    const createPath = (motion: string) => {
-        const parts: string[] = ['M'];
-        for (let i = 0; i < SVGVertices.length; i++) {
-            parts.push(
-                SVGVertices[i].x1 +
-                    ',' +
-                    SVGVertices[i].y1 +
-                    ',' +
-                    SVGVertices[i].x2 +
-                    ',' +
-                    SVGVertices[i].y2 +
-                    ',',
-            );
-        }
-        paths.push({
-            motion: motion,
-            path: parts.join(''),
-            strokeWidth: 10,
-            fill: 'none',
-        });
-    };
-
-    const svgInitialization = (motion: string) => {
-        // initialize
-        if (currentMotion === '') {
-            currentMotion = motion;
-            // if the motion has changed, determine whether to create path
-        } else if (currentMotion !== motion) {
-            // treat G1-G3 as the same motion
-            if (currentMotion === 'G0' || motion === 'G0') {
-                createPath(currentMotion);
-                // reset
-                SVGVertices = [];
-                currentMotion = motion;
-            }
-        }
-    };
-
     const onData = () => {
         if (!svgOnly) {
             const vertexIndex = vertices.length / 3;
@@ -681,13 +622,13 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
         }
     };
 
-    // Split handlers for regular, laser, and SVG visualization
+    // Split handlers for regular and laser visualization
     // Each handle Line and Arc Curves differently
     const handlers = {
         normal: {
             addLine: (modal: Modal, v1: BasicPosition, v2: BasicPosition) => {
                 if (needsVisualization) {
-                    const { motion, units, tool } = modal;
+                    const { motion, tool } = modal;
                     registerToolChange(tool);
 
                     // Check if A-axis rotation is involved
@@ -752,19 +693,6 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
                                         currZ,
                                     );
                                 }
-
-                                // SVG
-                                if (shouldIncludeSVG) {
-                                    const multiplier =
-                                        units === 'G21' ? 1 : 25.4;
-                                    svgInitialization(motion);
-                                    SVGVertices.push({
-                                        x1: prevX * multiplier,
-                                        y1: prevY * multiplier,
-                                        x2: currX * multiplier,
-                                        y2: currY * multiplier,
-                                    });
-                                }
                             }
 
                             prevX = currX;
@@ -815,18 +743,6 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
                                 v2.y,
                                 v2.z,
                             );
-                        }
-
-                        // svg
-                        if (shouldIncludeSVG) {
-                            const multiplier = units === 'G21' ? 1 : 25.4; // We need to make path bigger for inches
-                            svgInitialization(motion);
-                            SVGVertices.push({
-                                x1: v1.x * multiplier,
-                                y1: v1.y * multiplier,
-                                x2: v2.x * multiplier,
-                                y2: v2.y * multiplier,
-                            });
                         }
                     }
                 }
@@ -967,10 +883,9 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
                 v0: BasicPosition,
             ) => {
                 if (needsVisualization) {
-                    const { motion, plane, units, tool } = modal;
+                    const { motion, plane, tool } = modal;
                     registerToolChange(tool);
 
-                    const multiplier = units === 'G21' ? 1 : 25.4;
                     const isClockwise = motion === 'G2';
                     const radius = Math.sqrt(
                         (v1.x - v0.x) ** 2 + (v1.y - v0.y) ** 2,
@@ -1001,11 +916,6 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
                     const points = arcCurve.getPoints(divisions);
                     const pointCount = Math.max(points.length - 1, 1);
 
-                    // svg
-                    if (shouldIncludeSVG) {
-                        svgInitialization(motion);
-                    }
-
                     for (let i = 0; i < points.length; ++i) {
                         const point = points[i];
                         const pointA = points[i - 1];
@@ -1030,14 +940,6 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
                             } else {
                                 pushFloat32_3(vertices, point.x, point.y, z);
                             }
-                            if (shouldIncludeSVG && i > 0) {
-                                SVGVertices.push({
-                                    x1: pointA.x * multiplier,
-                                    y1: pointA.y * multiplier,
-                                    x2: pointB.x * multiplier,
-                                    y2: pointB.y * multiplier,
-                                });
-                            }
                         } else if (plane === 'G18') {
                             // ZX-plane
                             if (svgOnly) {
@@ -1055,14 +957,6 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
                             } else {
                                 pushFloat32_3(vertices, point.y, z, point.x);
                             }
-                            if (shouldIncludeSVG && i > 0) {
-                                SVGVertices.push({
-                                    x1: pointA.y * multiplier,
-                                    y1: z * multiplier,
-                                    x2: pointB.y * multiplier,
-                                    y2: z * multiplier,
-                                });
-                            }
                         } else if (plane === 'G19') {
                             // YZ-plane
                             if (svgOnly) {
@@ -1079,16 +973,6 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
                                 }
                             } else {
                                 pushFloat32_3(vertices, z, point.x, point.y);
-                            }
-                            if (shouldIncludeSVG && i > 0) {
-                                if (i > 0) {
-                                    SVGVertices.push({
-                                        x1: z * multiplier,
-                                        y1: pointA.x * multiplier,
-                                        x2: z * multiplier,
-                                        y2: pointB.x * multiplier,
-                                    });
-                                }
                             }
                         }
                         pushMotionColor(motion, 1);
@@ -1109,107 +993,6 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
             ) => {
                 const { addArcCurve: dAddArcCurve } = handlers.normal;
                 dAddArcCurve(modal, v1, v2, v0);
-            },
-        },
-        svg: {
-            addLine: (modal: Modal, v1: BasicPosition, v2: BasicPosition) => {
-                const { motion, units } = modal;
-                const multiplier = units === 'G21' ? 1 : 25.4;
-                // initialize
-                if (currentMotion === '') {
-                    currentMotion = motion;
-                    // if the motion has changed, determine whether to create path
-                } else if (currentMotion !== motion) {
-                    // treat G1-G3 as the same motion
-                    if (currentMotion === 'G0' || motion === 'G0') {
-                        createPath(currentMotion);
-                        // reset
-                        SVGVertices = [];
-                        currentMotion = motion;
-                    }
-                }
-                SVGVertices.push({
-                    x1: v1.x * multiplier,
-                    y1: v1.y * multiplier,
-                    x2: v2.x * multiplier,
-                    y2: v2.y * multiplier,
-                });
-            },
-            addArcCurve: (
-                modal: Modal,
-                v1: BasicPosition,
-                v2: BasicPosition,
-                v0: BasicPosition,
-            ) => {
-                const { motion, plane, units } = modal;
-                const multiplier = units === 'G21' ? 1 : 25.4;
-                const isClockwise = motion === 'G2';
-                const radius = Math.sqrt(
-                    (v1.x - v0.x) ** 2 + (v1.y - v0.y) ** 2,
-                );
-                const startAngle = Math.atan2(v1.y - v0.y, v1.x - v0.x);
-                let endAngle = Math.atan2(v2.y - v0.y, v2.x - v0.x);
-
-                // Draw full circle if startAngle and endAngle are both zero
-                if (startAngle === endAngle) {
-                    endAngle += 2 * Math.PI;
-                }
-
-                const arcCurve = new ArcCurve(
-                    v0.x, // aX
-                    v0.y, // aY
-                    radius, // aRadius
-                    startAngle, // aStartAngle
-                    endAngle, // aEndAngle
-                    isClockwise, // isClockwise
-                );
-                const divisions = 30;
-                const points = arcCurve.getPoints(divisions);
-                const pointCount = Math.max(points.length - 1, 1);
-                // initialize
-                if (currentMotion === '') {
-                    currentMotion = motion;
-                    // if the motion has changed, determine whether to create path
-                } else if (currentMotion !== motion) {
-                    // treat G1-G3 as the same motion
-                    if (currentMotion === 'G0' || motion === 'G0') {
-                        createPath(currentMotion);
-                        // reset
-                        SVGVertices = [];
-                        currentMotion = motion;
-                    }
-                }
-                for (let i = 1; i < points.length; ++i) {
-                    const pointA = points[i - 1];
-                    const pointB = points[i];
-                    const z = ((v2.z - v1.z) / pointCount) * i + v1.z;
-
-                    if (plane === 'G17') {
-                        // XY-plane
-                        SVGVertices.push({
-                            x1: pointA.x * multiplier,
-                            y1: pointA.y * multiplier,
-                            x2: pointB.x * multiplier,
-                            y2: pointB.y * multiplier,
-                        });
-                    } else if (plane === 'G18') {
-                        // ZX-plane
-                        SVGVertices.push({
-                            x1: pointA.y * multiplier,
-                            y1: z * multiplier,
-                            x2: pointB.y * multiplier,
-                            y2: z * multiplier,
-                        });
-                    } else if (plane === 'G19') {
-                        // YZ-plane
-                        SVGVertices.push({
-                            x1: z * multiplier,
-                            y1: pointA.x * multiplier,
-                            x2: z * multiplier,
-                            y2: pointB.x * multiplier,
-                        });
-                    }
-                }
             },
         },
     };
@@ -1308,10 +1091,6 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
     markProfile(profiler, 'after_typed_array_build');
     sampleHeap(profiler, 'after_typed_array_build');
 
-    // create path for the last motion
-    if (shouldIncludeSVG) {
-        createPath(currentMotion);
-    }
     let colorArray = new Float32Array(0);
     let savedColorsArray = new Float32Array(0);
     markProfile(profiler, 'before_color_build');
@@ -1397,9 +1176,8 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
         profiler.counts.svg2d_dupe_drops = svg2DDupeDrops;
         profiler.counts.svg2d_degenerate_drops = svg2DDegenerateDrops;
         profiler.counts.spindle_frame_speeds_len = spindleFrameSpeeds.length;
-        profiler.counts.paths_len = paths.length;
         profiler.counts.estimates_len = estimates.length;
-        profiler.counts.invalid_lines_len = fileInfo.invalidLines?.length || 0;
+        profiler.counts.invalid_lines_len = fileInfo.invalidLineCount ?? 0;
         profiler.counts.spindle_tool_event_count = Object.keys(
             fileInfo.spindleToolEvents || {},
         ).length;
@@ -1423,7 +1201,6 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
         jobId: number;
         visualizer?: VISUALIZER_TYPES_T;
         vertices: ArrayBuffer;
-        paths: Path[];
         frames: ArrayBuffer;
         verticesLen: number;
         framesLen: number;
@@ -1436,6 +1213,7 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
         parsedData: {
             info: any;
             invalidLines: string[];
+            invalidLineCount: number;
         };
         spindleFrameSpeeds?: ArrayBuffer;
         spindleFrameLen?: number;
@@ -1455,7 +1233,6 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
         jobId,
         visualizer: effectiveVisualizer,
         vertices: compactVertices.buffer,
-        paths,
         frames: compactFrames.buffer,
         verticesLen: tVertices.length,
         framesLen: tFrames.length,
@@ -1468,6 +1245,7 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
         parsedData: {
             info: fileInfo,
             invalidLines: fileInfo.invalidLines || [],
+            invalidLineCount: fileInfo.invalidLineCount ?? 0,
         },
         isSecondary,
         activeVisualizer: effectiveVisualizer,

@@ -160,6 +160,7 @@ const MOTION_MODAL_CODES = new Set<string>([
     '38.5',
 ]);
 const AXIS_CONSUMING_G_CODES = new Set<string>(['10', '43.1', '92']);
+const MAX_STORED_INVALID_LINES = 100;
 const AXIS_ARGUMENT_LETTERS = new Set<string>([
     'X',
     'Y',
@@ -1260,7 +1261,11 @@ class GCodeVirtualizer extends EventEmitter {
         }
 
         if (scan.hasInvalidTokens) {
-            this.vmState.invalidLines.push(line);
+            // Keep a bounded sample: the UI shows the count and the first few lines,
+            // and a file with a bad word on every line would otherwise copy the whole file.
+            if (this.vmState.invalidLines.length < MAX_STORED_INVALID_LINES) {
+                this.vmState.invalidLines.push(line);
+            }
             this.profileStats.invalidLineCount += 1;
         }
 
@@ -1376,6 +1381,7 @@ class GCodeVirtualizer extends EventEmitter {
             fileType,
             usedAxes: Array.from(this.vmState.usedAxes),
             invalidLines: this.vmState.invalidLines,
+            invalidLineCount: this.profileStats.invalidLineCount,
             toolchanges: this.vmState.toolchange,
             spindleToolEvents: this.vmState.spindleToolEvents,
         };

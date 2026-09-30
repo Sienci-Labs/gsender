@@ -38,7 +38,6 @@ import {
     isHomingRequiredAlarm,
     JOB_STATUS,
     JOB_TYPES,
-    LIGHTWEIGHT_OPTIONS,
     METRIC_UNITS,
     RENDER_LOADING,
     RENDER_NO_FILE,
@@ -168,6 +167,19 @@ export function* initialize(): Generator<null, void, unknown> {
         estimatedTime: 0,
     };
     let hasEstimateData = false;
+    // The last primary parse that ran to completion, and the one in flight. A
+    // server file:load is re-emitted on every controller (re)connect; when the
+    // file and every input that shapes the worker's output are unchanged, what
+    // is on screen is already right and the parse can be skipped.
+    type PrimaryParseRecord = {
+        content: string;
+        size: number;
+        name: string;
+        inputsKey: string;
+    };
+    let lastPrimaryParse: PrimaryParseRecord | null = null;
+    let pendingPrimaryParse: (PrimaryParseRecord & { jobId: number }) | null =
+        null;
     // Seeded from [NEWOPT:...] on connect (via $I), then kept in sync with
     // live [MSG:Info: Autoconfig: ...] updates — the reference point the
     // accessory connectivity toast diffs against.
@@ -210,6 +222,8 @@ export function* initialize(): Generator<null, void, unknown> {
             estimatedTime: 0,
         };
         hasEstimateData = false;
+        lastPrimaryParse = null;
+        pendingPrimaryParse = null;
     };
 
     /* Health check - every 3 minutes */
@@ -279,26 +293,15 @@ export function* initialize(): Generator<null, void, unknown> {
         }
     };
 
-    const shouldVisualizeSVG = () => {
-        return (
-            store.get(
-                'widgets.visualizer.liteOption',
-                LIGHTWEIGHT_OPTIONS.LIGHT,
-            ) === LIGHTWEIGHT_OPTIONS.LIGHT
-        );
-    };
-
     const parseGCode = async (
         content: string,
         size: number,
         name: string,
         visualizer: string,
+        { skipIfUnchanged = false }: { skipIfUnchanged?: boolean } = {},
     ) => {
         const reduxState = reduxStore.getState();
         const isLaser = isLaserMode();
-        // Keep SVG path generation tied to lightweight option selection so
-        // users can switch to SVG view instantly after a file is loaded.
-        const shouldIncludeSVG = shouldVisualizeSVG();
         const profileWorker = store.get(
             'widgets.visualizer.debug.profileWorker',
             false,
@@ -349,7 +352,36 @@ export function* initialize(): Generator<null, void, unknown> {
             isNewFile = false;
         }
 
-        if (isNewFile && visualizer !== VISUALIZER_SECONDARY) {
+        const isPrimary = visualizer !== VISUALIZER_SECONDARY;
+        const parseInputsKey = JSON.stringify({
+            isLaser,
+            accelerations,
+            maxFeedrates,
+            atcEnabled,
+            rotaryDiameterOffsetEnabled,
+            needsVisualization: shouldVisualize(),
+            theme: Array.from(getVisualizerTheme()),
+        });
+
+        if (
+            skipIfUnchanged &&
+            isPrimary &&
+            !isNewFile &&
+            lastPrimaryParse !== null &&
+            lastPrimaryParse.inputsKey === parseInputsKey &&
+            lastPrimaryParse.size === size &&
+            lastPrimaryParse.name === name &&
+            lastPrimaryParse.content === content
+        ) {
+            // Same file, same inputs, and that parse finished: the viewer,
+            // file info and cached estimates are already correct.
+            return;
+        }
+        if (isPrimary) {
+            lastPrimaryParse = null;
+        }
+
+        if (isNewFile && isPrimary) {
             const context = getMachineAnalyticsContext();
             posthog.capture('file_loaded', {
                 firmware: context.firmware,
@@ -450,6 +482,13 @@ export function* initialize(): Generator<null, void, unknown> {
         visualizeWorker.onmessage = visualizeResponse;
         const jobId = ++visualizeJobId;
         setActiveVisualizeJobId(jobId);
+        pendingPrimaryParse = {
+            jobId,
+            content,
+            size,
+            name,
+            inputsKey: parseInputsKey,
+        };
         console.time('gSender:fileLoad');
         visualizeWorker.postMessage({
             jobId,
@@ -458,7 +497,6 @@ export function* initialize(): Generator<null, void, unknown> {
             activeVisualizer: visualizer,
             isSecondary: visualizer === VISUALIZER_SECONDARY,
             isLaser,
-            shouldIncludeSVG,
             needsVisualization,
             isNewFile,
             accelerations,
@@ -828,7 +866,9 @@ export function* initialize(): Generator<null, void, unknown> {
     controller.addListener(
         'file:load',
         (content: string, size: number, name: string, visualizer: string) => {
-            parseGCode(content, size, name, visualizer);
+            parseGCode(content, size, name, visualizer, {
+                skipIfUnchanged: true,
+            });
         },
     );
 
@@ -900,7 +940,11 @@ export function* initialize(): Generator<null, void, unknown> {
         'estimateData:ready',
         (
             _msg,
-            value: { estimates?: number[]; estimatedTime?: number } = {},
+            value: {
+                estimates?: number[];
+                estimatedTime?: number;
+                jobId?: number;
+            } = {},
         ) => {
             latestEstimateData = {
                 estimates: Array.isArray(value?.estimates)
@@ -909,6 +953,18 @@ export function* initialize(): Generator<null, void, unknown> {
                 estimatedTime: Number(value?.estimatedTime) || 0,
             };
             hasEstimateData = true;
+            if (
+                pendingPrimaryParse &&
+                value?.jobId === pendingPrimaryParse.jobId
+            ) {
+                const { jobId: _jobId, ...record } = pendingPrimaryParse;
+                lastPrimaryParse = record;
+                pendingPrimaryParse = null;
+            } else {
+                // Another job's estimates (e.g. a surfacing preview) replaced the
+                // cache, so the next file:load must reparse to restore the file's own.
+                lastPrimaryParse = null;
+            }
             controller.command('updateEstimateData', latestEstimateData);
         },
     );
