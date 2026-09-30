@@ -34,15 +34,15 @@ type VisualizeWorkerGeometryMessage = {
     type: 'geometryReady';
     jobId: number;
     visualizer?: string;
-    vertices: ArrayBuffer;
-    paths: unknown[];
-    frames: ArrayBuffer;
-    verticesLen: number;
-    framesLen: number;
-    colorArrayBuffer: ArrayBuffer;
-    colorLen: number;
-    savedColorsBuffer: ArrayBuffer;
-    savedColorLen: number;
+    format: 'segments-v1';
+    chunks: {
+        positions: ArrayBuffer;
+        attrs: ArrayBuffer;
+        power?: ArrayBuffer;
+        vertexCount: number;
+    }[];
+    totalVertices: number;
+    prefixEndVertex: ArrayBuffer;
     info: {
         fileModal: string;
         total: number;
@@ -62,8 +62,6 @@ type VisualizeWorkerGeometryMessage = {
         info: unknown;
         invalidLines: string[];
     };
-    spindleFrameSpeeds?: ArrayBuffer;
-    spindleFrameLen?: number;
     isLaser?: boolean;
     isSecondary?: boolean;
     activeVisualizer?: string;
@@ -224,7 +222,6 @@ const buildWorkerRequest = (payload: GcodeLoadPayload, jobId: number) => {
         isSecondary: false,
         isLaser,
         rapidOpacity: PENDANT_RAPID_OPACITY,
-        shouldIncludeSVG: false,
         needsVisualization: true,
         // Top-down SVG mode: worker streams deduplicated 2D segment groups and
         // skips the 3D vertex/color/frame buffers entirely.

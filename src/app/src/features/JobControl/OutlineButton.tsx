@@ -26,6 +26,7 @@ const OutlineButton: React.FC<OutlineButtonProps> = ({ disabled }) => {
             if (outlineRunning) {
                 return;
             }
+            let maxRuntime: ReturnType<typeof setTimeout> | undefined;
             try {
                 const outlineWorker = new Worker(
                     new URL('app/workers/Outline.worker.js', import.meta.url),
@@ -40,7 +41,7 @@ const OutlineButton: React.FC<OutlineButtonProps> = ({ disabled }) => {
                 const isLaser = laserOnOutline && spindleMode === LASER_MODE;
                 const outlineSpeed = store.get('workspace.outlineSpeed', null);
 
-                const maxRuntime = setTimeout(() => {
+                maxRuntime = setTimeout(() => {
                     outlineWorker.terminate();
                     toast.error(
                         'Outline generation timed out. Please try again.',
@@ -54,6 +55,17 @@ const OutlineButton: React.FC<OutlineButtonProps> = ({ disabled }) => {
                     // Enable the outline button again
                     outlineRunning = false;
                 };
+                // A worker that fails to load or throws never posts back; report
+                // it now instead of letting it surface as the 15 s timeout.
+                const onWorkerError = (event: Event) => {
+                    clearTimeout(maxRuntime);
+                    outlineWorker.terminate();
+                    console.error('Outline worker failed', event);
+                    toast.error('Outline generation failed. Please try again.');
+                    outlineRunning = false;
+                };
+                outlineWorker.onerror = onWorkerError;
+                outlineWorker.onmessageerror = onWorkerError;
                 outlineWorker.postMessage({
                     isLaser,
                     parsedData: [],
@@ -69,6 +81,7 @@ const OutlineButton: React.FC<OutlineButtonProps> = ({ disabled }) => {
                     bbox,
                 });
             } catch (e) {
+                clearTimeout(maxRuntime);
                 console.log(e);
             }
         } else {

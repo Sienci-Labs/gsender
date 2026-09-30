@@ -140,7 +140,7 @@ describe('buildToolFrameGroups', () => {
     const index: LinePositionIndex = {
         lineCount: 20,
         positions: new Float32Array(20 * 4),
-        frameForLine: Int32Array.from({ length: 20 }, (_, i) => i + 1),
+        senderLineCounts: Int32Array.from({ length: 20 }, (_, i) => i + 1),
         modalTable: [],
         modalForLine: new Uint16Array(20),
         feedRates: new Float32Array(20),
@@ -174,7 +174,7 @@ describe('buildToolFrameGroups', () => {
         const groups = buildToolFrameGroups(tools, index);
         expect(groups).toEqual([
             { start: 0, end: 9 }, // startLine 1 -> 0; endLine 10 -> frame 10 - 1
-            { start: 10, end: 19 }, // startLine 11 -> frameAtLine(10) = 10; endLine 20 -> 20-1
+            { start: 10, end: 19 }, // startLine 11 -> senderLineCountAt(10) = 10; endLine 20 -> 20-1
         ]);
     });
 });

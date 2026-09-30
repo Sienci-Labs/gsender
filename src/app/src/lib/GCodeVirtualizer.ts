@@ -154,17 +154,24 @@ const in2mm = (val: number = 0): number => val * 25.4;
 // noop
 const noop = (): void => {};
 
+// The whitespace String.prototype.trim() strips. A line is one of the server
+// Sender's lines when it isn't all whitespace (it filters on `trim()`).
+export const isTrimWhitespace = (code: number): boolean =>
+    code === 32 ||
+    (code >= 9 && code <= 13) ||
+    code === 0xa0 ||
+    code === 0x1680 ||
+    (code >= 0x2000 && code <= 0x200a) ||
+    code === 0x2028 ||
+    code === 0x2029 ||
+    code === 0x202f ||
+    code === 0x205f ||
+    code === 0x3000 ||
+    code === 0xfeff;
+
 const hasNonWhitespace = (line: string): boolean => {
     for (let i = 0; i < line.length; i++) {
-        const c = line.charCodeAt(i);
-        if (
-            c !== 32 &&
-            c !== 9 &&
-            c !== 13 &&
-            c !== 10 &&
-            c !== 11 &&
-            c !== 12
-        ) {
+        if (!isTrimWhitespace(line.charCodeAt(i))) {
             return true;
         }
     }
@@ -191,6 +198,7 @@ const PLANNER_SYNC_G_CODES = new Set<string>([
     '38.5',
 ]);
 const AXIS_CONSUMING_G_CODES = new Set<string>(['10', '43.1', '92']);
+const MAX_STORED_INVALID_LINES = 100;
 const AXIS_ARGUMENT_LETTERS = new Set<string>([
     'X',
     'Y',
@@ -344,6 +352,28 @@ class GCodeVirtualizer extends EventEmitter {
 
     argsScratchKeys: string[] = [];
 
+    // Reused for every linear move so a line doesn't allocate its positions.
+    // Callbacks may read or mutate them, but must not keep a reference.
+    scratchV1: BasicPosition = { x: 0, y: 0, z: 0, a: 0 };
+    scratchV2: BasicPosition = { x: 0, y: 0, z: 0, a: 0 };
+    scratchTarget: BasicPosition = { x: 0, y: 0, z: 0, a: 0 };
+
+    // Raw F/S codes already collated, so a repeated word doesn't build a
+    // `F${code}` string just to find it is already in the set.
+    rawFeedCodes: Set<string> = new Set();
+    rawSpindleCodes: Set<string> = new Set();
+
+    // Per-line hook called in place of emit('data'); the events polyfill
+    // allocates an arguments array on every emit.
+    onData: ((spindleSpeed: number | null) => void) | null = null;
+
+    // S events kept for "closest S to a toolchange" lookups (see
+    // recordSpindleEvent): whether the next S is the first since the last
+    // toolchange, and the most recent S not yet recorded.
+    pendingFirstS = true;
+    pendingLastSLine = -1;
+    pendingLastSValue = 0;
+
     fn: {
         addLine: (modal: Modal, v1: BasicPosition, v2: BasicPosition) => void;
         addCurve: (modal: Modal, v1: BasicPosition, v2: BasicPosition) => void;
@@ -364,57 +394,7 @@ class GCodeVirtualizer extends EventEmitter {
     handlers: { [key: string]: (param: any) => void } = {
         // G0: Rapid Linear Move
         G0: (params: Record<string, any>): void => {
-            if (this.modal.motion !== 'G0') {
-                this.setModal({ motion: 'G0' });
-                // this.saveModal({ motion: 'G0' });
-            }
-
-            const v1: BasicPosition = {
-                x: this.position.x,
-                y: this.position.y,
-                z: this.position.z,
-                a: this.position.a,
-            };
-            const v2: BasicPosition = {
-                x: this.translateX(params.X),
-                y: this.translateY(params.Y),
-                z: this.translateZ(params.Z),
-                a: this.translateA(params.A),
-            };
-            const targetPosition: BasicPosition = {
-                x: v2.x,
-                y: v2.y,
-                z: v2.z,
-                a: v2.a,
-            };
-
-            const isCurvedLine: boolean = shouldRotate(v1, v2);
-            const ANGLE_THRESHOLD: number = 30;
-            const angleDiff: number = Math.abs(v2.a - v1.a);
-
-            if (isCurvedLine && angleDiff > ANGLE_THRESHOLD) {
-                this.fn.addCurve(
-                    this.modal,
-                    this.offsetG92(v1),
-                    this.offsetG92(v2),
-                );
-            } else {
-                this.fn.addLine(
-                    this.modal,
-                    this.offsetG92(v1),
-                    this.offsetG92(v2),
-                );
-            }
-
-            // Update position
-            this.estimateLinear(targetPosition, MOTION_RAPID);
-            this.updateBounds(targetPosition);
-            this.setPosition(
-                targetPosition.x,
-                targetPosition.y,
-                targetPosition.z,
-                targetPosition.a,
-            );
+            this.linearMove('G0', params);
         },
         // G1: Linear Move
         // Usage
@@ -431,57 +411,7 @@ class GCodeVirtualizer extends EventEmitter {
         //   G1 X90.6 Y13.8 E22.4 (Move to 90.6mm on the X axis and 13.8mm on the Y axis while extruding 22.4mm of material)
         //
         G1: (params: Record<string, any>): void => {
-            if (this.modal.motion !== 'G1') {
-                this.setModal({ motion: 'G1' });
-                // this.saveModal({ motion: 'G1' });
-            }
-
-            const v1: BasicPosition = {
-                x: this.position.x,
-                y: this.position.y,
-                z: this.position.z,
-                a: this.position.a,
-            };
-            const v2: BasicPosition = {
-                x: this.translateX(params.X),
-                y: this.translateY(params.Y),
-                z: this.translateZ(params.Z),
-                a: this.translateA(params.A),
-            };
-            const targetPosition: BasicPosition = {
-                x: v2.x,
-                y: v2.y,
-                z: v2.z,
-                a: v2.a,
-            };
-
-            const isCurvedLine: boolean = shouldRotate(v1, v2);
-            const ANGLE_THRESHOLD: number = 30;
-            const angleDiff: number = Math.abs(v2.a - v1.a);
-
-            if (isCurvedLine && angleDiff > ANGLE_THRESHOLD) {
-                this.fn.addCurve(
-                    this.modal,
-                    this.offsetG92(v1),
-                    this.offsetG92(v2),
-                );
-            } else {
-                this.fn.addLine(
-                    this.modal,
-                    this.offsetG92(v1),
-                    this.offsetG92(v2),
-                );
-            }
-
-            // Update position + increment machining time
-            this.estimateLinear(targetPosition, MOTION_FEED);
-            this.updateBounds(targetPosition);
-            this.setPosition(
-                targetPosition.x,
-                targetPosition.y,
-                targetPosition.z,
-                targetPosition.a,
-            );
+            this.linearMove('G1', params);
         },
         // G2 & G3: Controlled Arc Move
         // Usage
@@ -1208,9 +1138,9 @@ class GCodeVirtualizer extends EventEmitter {
             args = code;
             this.updateSpindleToolEvents('T', Number(code));
         } else if (letter === 'S') {
+            // S events are recorded once per line by recordSpindleEvent.
             cmd = letter;
             args = code;
-            this.updateSpindleToolEvents('S', Number(code));
         } else if (AXIS_ARGUMENT_LETTERS.has(letter)) {
             // Use previous motion command if the line does not start with G-code or M-code.
             cmd = this.motionMode;
@@ -1252,7 +1182,11 @@ class GCodeVirtualizer extends EventEmitter {
         }
 
         if (scan.hasInvalidTokens) {
-            this.vmState.invalidLines.push(line);
+            // Keep a bounded sample: the UI shows the count and the first few lines,
+            // and a file with a bad word on every line would otherwise copy the whole file.
+            if (this.vmState.invalidLines.length < MAX_STORED_INVALID_LINES) {
+                this.vmState.invalidLines.push(line);
+            }
             this.profileStats.invalidLineCount += 1;
         }
 
@@ -1262,6 +1196,8 @@ class GCodeVirtualizer extends EventEmitter {
         const letters = scan.letters;
         const values = scan.values;
         let spindleSpeedUpdate: number | null = null;
+        let lineHasS = false;
+        let lineSValue = 0;
 
         // collect spindle and feed rates
         for (let i = 0; i < scan.count; i++) {
@@ -1269,13 +1205,20 @@ class GCodeVirtualizer extends EventEmitter {
             const code = values[i];
             if (letter === 'F') {
                 this.feed = Number(code);
-                if (this.collate) this.vmState.feedrates.add(`F${code}`);
+                if (this.collate && !this.rawFeedCodes.has(code)) {
+                    this.rawFeedCodes.add(code);
+                    this.vmState.feedrates.add(`F${code}`);
+                }
                 // this.saveFeedrate(code);
             }
             if (letter === 'S') {
-                if (this.collate) this.vmState.spindle.add(`S${code}`);
+                if (this.collate && !this.rawSpindleCodes.has(code)) {
+                    this.rawSpindleCodes.add(code);
+                    this.vmState.spindle.add(`S${code}`);
+                }
                 const spindleSpeed = Number(code);
-                this.updateSpindleToolEvents('S', spindleSpeed);
+                lineHasS = true;
+                lineSValue = spindleSpeed;
                 if (!Number.isNaN(spindleSpeed)) {
                     spindleSpeedUpdate = spindleSpeed;
                     // grbl syncs the planner on a speed change while the spindle runs
@@ -1311,6 +1254,8 @@ class GCodeVirtualizer extends EventEmitter {
         }
         this.profileStats.groupsSeen += groupCount;
 
+        this.recordSpindleEvent(lineHasS, lineSValue);
+
         const currentEvent = this.vmState.spindleToolEvents[this.totalLines];
         if (
             currentEvent &&
@@ -1339,7 +1284,48 @@ class GCodeVirtualizer extends EventEmitter {
 
         this.fn.callback();
         this.profileStats.emitDataCount += 1;
-        this.emit('data', spindleSpeedUpdate);
+        if (this.onData) {
+            this.onData(spindleSpeedUpdate);
+        } else {
+            this.emit('data', spindleSpeedUpdate);
+        }
+    }
+
+    // spindleToolEvents used to get an entry for every line with an S word,
+    // which on a laser raster is nearly every line. Its readers need T/M lines
+    // (toolchanges, M6 checks) and, for S, only "the S closest to a toolchange
+    // line" (GcodeStepper spindleSpeedForTool). That can only ever be the first
+    // S in the file, an S on a T/M line, or the last S before / first S after a
+    // toolchange line, so only those are recorded.
+    recordSpindleEvent(lineHasS: boolean, lineSValue: number): void {
+        const line = this.totalLines;
+        const events = this.vmState.spindleToolEvents;
+        const event = events[line];
+
+        if (lineHasS) {
+            if (event) {
+                event.S = lineSValue;
+                this.pendingLastSLine = -1;
+                this.pendingFirstS = false;
+            } else if (this.pendingFirstS) {
+                events[line] = { S: lineSValue };
+                this.pendingLastSLine = -1;
+                this.pendingFirstS = false;
+            } else {
+                this.pendingLastSLine = line;
+                this.pendingLastSValue = lineSValue;
+            }
+        }
+
+        // A toolchange line (M and T together, as buildToolArray reads it):
+        // keep the last S before it, and record the first S after it.
+        if (event && event.M !== undefined && event.T !== undefined) {
+            if (this.pendingLastSLine > 0 && this.pendingLastSLine < line) {
+                events[this.pendingLastSLine] = { S: this.pendingLastSValue };
+            }
+            this.pendingLastSLine = -1;
+            this.pendingFirstS = true;
+        }
     }
 
     generateFileStats() {
@@ -1370,9 +1356,52 @@ class GCodeVirtualizer extends EventEmitter {
             fileType,
             usedAxes: Array.from(this.vmState.usedAxes),
             invalidLines: this.vmState.invalidLines,
+            invalidLineCount: this.profileStats.invalidLineCount,
             toolchanges: this.vmState.toolchange,
             spindleToolEvents: this.vmState.spindleToolEvents,
         };
+    }
+
+    // G0/G1. Same maths as allocating v1/v2/target and two offsetG92 copies per
+    // move, but written into the reused scratch positions.
+    linearMove(motion: 'G0' | 'G1', params: Record<string, any>): void {
+        if (this.modal.motion !== motion) {
+            this.setModal({ motion });
+        }
+
+        const pos = this.position;
+        const target = this.scratchTarget;
+        target.x = this.translateX(params.X);
+        target.y = this.translateY(params.Y);
+        target.z = this.translateZ(params.Z);
+        target.a = this.translateA(params.A);
+
+        const offsets = this.offsets;
+        const v1 = this.scratchV1;
+        v1.x = pos.x + offsets.x;
+        v1.y = pos.y + offsets.y;
+        v1.z = pos.z + offsets.z;
+        v1.a = pos.a + offsets.a;
+        const v2 = this.scratchV2;
+        v2.x = target.x + offsets.x;
+        v2.y = target.y + offsets.y;
+        v2.z = target.z + offsets.z;
+        v2.a = target.a + offsets.a;
+
+        const ANGLE_THRESHOLD = 30;
+        if (
+            shouldRotate(pos, target) &&
+            Math.abs(target.a - pos.a) > ANGLE_THRESHOLD
+        ) {
+            this.fn.addCurve(this.modal, v1, v2);
+        } else {
+            this.fn.addLine(this.modal, v1, v2);
+        }
+
+        // Before setPosition: estimateLinear measures from this.position
+        this.estimateLinear(target, motion === 'G0' ? MOTION_RAPID : MOTION_FEED);
+        this.updateBounds(target);
+        this.setPosition(target.x, target.y, target.z, target.a);
     }
 
     offsetG92 = (pos: BasicPosition): BasicPosition => {

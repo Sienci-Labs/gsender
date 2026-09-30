@@ -1,7 +1,6 @@
 import {
     LIGHTWEIGHT_OPTIONS,
     RENDER_RENDERED,
-    RENDER_RENDERING,
     VISUALIZER_SECONDARY,
 } from 'app/constants';
 import {
@@ -117,11 +116,11 @@ const logProfile = (profile) => {
 };
 
 const handleGeometryReady = (data) => {
-    const { needsVisualization } = data;
     const info = data.info || {};
     const parsedDataPreview = data.parsedData || {
         info,
         invalidLines: info.invalidLines || [],
+        invalidLineCount: info.invalidLineCount ?? 0,
     };
 
     pubsub.publish('file:toolchanges', {
@@ -155,7 +154,7 @@ const handleGeometryReady = (data) => {
         reduxStore.dispatch(updateFileInfo(estimatePayload));
     }
 
-    reduxStore.dispatch(updateFileProcessing(false));
+    reduxStore.dispatch(updateFileProcessing({ fileProcessing: false }));
 
     const fileLoadPayload = {
         ...data,
@@ -163,30 +162,30 @@ const handleGeometryReady = (data) => {
     };
 
     // Park the geometry so UI opened after load (e.g. the step-through modal)
-    // can render the same buffers without re-parsing the file.
-    setLastWorkerGeometry(fileLoadPayload);
-    pubsub.publish('file:load', fileLoadPayload);
-    pubsub.publish(
-        'placeholder:invalidLines',
-        parsedDataPreview.invalidLines || [],
-    );
-
-    if (needsVisualization) {
-        setTimeout(() => {
-            const renderState = _get(reduxStore.getState(), 'file.renderState');
-            if (renderState !== RENDER_RENDERED) {
-                reduxStore.dispatch(updateFileRenderState(RENDER_RENDERING));
-            }
-        }, 250);
-    } else {
-        reduxStore.dispatch(updateFileRenderState(RENDER_RENDERED));
+    // can render the same buffers without re-parsing the file. Only the main
+    // file's geometry: a surfacing/rotary preview must not replace it.
+    if (data.visualizer !== VISUALIZER_SECONDARY) {
+        setLastWorkerGeometry(fileLoadPayload);
     }
+    pubsub.publish('file:load', fileLoadPayload);
+    pubsub.publish('placeholder:invalidLines', {
+        lines: parsedDataPreview.invalidLines || [],
+        count: parsedDataPreview.invalidLineCount ?? 0,
+    });
+
+    // The geometry has been handed to the viewer, which clears the loading
+    // overlay. (This used to dispatch a bare RENDER_RENDERING, which the reducer
+    // read as `undefined` — that accident was what hid the overlay.)
+    reduxStore.dispatch(
+        updateFileRenderState({ renderState: RENDER_RENDERED }),
+    );
 };
 
 const handleMetadataReady = async (data) => {
     logProfile(data.profile);
 
     const parsedData = data.parsedData || {};
+    // One time (seconds) and LINE_KIND per Sender line, as typed arrays from the worker.
     const estimateData = {
         lineTime: parsedData.lineTime || new Float32Array(0),
         lineKind: parsedData.lineKind || new Uint8Array(0),
@@ -244,14 +243,4 @@ export const shouldVisualize = () => {
           ) === LIGHTWEIGHT_OPTIONS.EVERYTHING
         : store.get('widgets.visualizer.disabled');
     return !isDisabled;
-};
-
-export const shouldVisualizeSVG = () => {
-    const liteMode = store.get('widgets.visualizer.liteMode', false);
-    const SVGEnabled =
-        store.get(
-            'widgets.visualizer.liteOption',
-            LIGHTWEIGHT_OPTIONS.LIGHT,
-        ) === LIGHTWEIGHT_OPTIONS.LIGHT;
-    return liteMode && SVGEnabled;
 };
