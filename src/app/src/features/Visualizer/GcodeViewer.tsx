@@ -1331,6 +1331,7 @@ class GcodeViewer extends Component<Props> {
         const homingEnabled = _get(settings, '$22', '0') !== '0';
         const zTravel = homingEnabled ? getZUpTravel(5) : 5;
 
+        let maxRuntime: ReturnType<typeof setTimeout> | undefined;
         try {
             const outlineWorker = new Worker(
                 new URL('../../workers/Outline.worker.ts', import.meta.url),
@@ -1352,7 +1353,7 @@ class GcodeViewer extends Component<Props> {
                 ? reduxStore.getState().file.content
                 : null;
 
-            const maxRuntime = setTimeout(() => {
+            maxRuntime = setTimeout(() => {
                 outlineWorker.terminate();
                 toast.error('Outline generation timed out. Please try again.');
                 this.outlineRunning = false;
@@ -1363,6 +1364,17 @@ class GcodeViewer extends Component<Props> {
                 outlineResponse({ data });
                 this.outlineRunning = false;
             };
+            // A worker that fails to load or throws never posts back; report it
+            // now instead of letting it surface as the 15 s timeout.
+            const onWorkerError = (event: Event) => {
+                clearTimeout(maxRuntime);
+                outlineWorker.terminate();
+                console.error('Outline worker failed', event);
+                toast.error('Outline generation failed. Please try again.');
+                this.outlineRunning = false;
+            };
+            outlineWorker.onerror = onWorkerError;
+            outlineWorker.onmessageerror = onWorkerError;
             outlineWorker.postMessage({
                 isLaser,
                 parsedData: isRapidless ? [] : positionChunks,
@@ -1372,6 +1384,7 @@ class GcodeViewer extends Component<Props> {
                 outlineSpeed,
             });
         } catch (e) {
+            clearTimeout(maxRuntime);
             console.error(e);
             this.outlineRunning = false;
         }
