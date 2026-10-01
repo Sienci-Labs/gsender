@@ -162,6 +162,13 @@ jobs:
           # 16 KB pages (Play requirement). NDK r28+ defaults to this; be explicit.
           export LDFLAGS="-Wl,-z,max-page-size=16384"
           python3 android_configure.py patch
+          # zlib's ARM CPU detection on OS=android calls android_getCpuFeatures()
+          # from the NDK's deprecated cpufeatures lib, which Node never builds
+          # (ld.lld: undefined symbol: android_getCpuFeatures). Bionic has had
+          # getauxval(AT_HWCAP) since API 18, so take zlib's Linux path instead.
+          n=$(grep -c "'ARMV8_OS_ANDROID'" deps/zlib/zlib.gyp || true)
+          echo "zlib.gyp: patching $n ARMV8_OS_ANDROID define(s) to ARMV8_OS_LINUX"
+          sed -i "s/'ARMV8_OS_ANDROID'/'ARMV8_OS_LINUX'/g" deps/zlib/zlib.gyp
           python3 android_configure.py "$NDK" "$MIN_SDK" "${{ matrix.arch }}"
           make -j"$(nproc)"
           mkdir -p ../out

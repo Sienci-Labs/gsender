@@ -49,7 +49,17 @@ const RUNTIME_ASSETS = [
     ['node_modules/errorhandler/public', 'public'],
 ];
 
-const unresolved = new Set();
+// consolidate require()s ~40 template engines lazily, inside each render
+// function; the server never renders with them, so they stay out of the bundle.
+// These are its top-level (eager) requires, which must be bundled.
+const CONSOLIDATE_EAGER = new Set(['bluebird', 'fs', 'path']);
+
+// Packages allowed to stay unresolved: optional native accelerators that `ws`
+// loads inside try/catch. Anything else unresolved fails the build, because a
+// silently-external dependency only breaks at runtime on the device.
+const OPTIONAL_UNRESOLVED = new Set(['bufferutil', 'utf-8-validate']);
+
+const unresolved = new Map(); // package → importer
 const lazy = new Set();
 
 const plugin = {
@@ -83,15 +93,14 @@ const plugin = {
         // template engines) stay as runtime require()s that only throw if called.
         build.onResolve({ filter: /^[^./]/ }, async (a) => {
             if (a.pluginData === 's1-probe' || /^[A-Za-z]:[\\/]/.test(a.path)) return undefined;
-            // consolidate lazily require()s ~40 optional template engines; the
-            // server never renders with them, so keep them all out of the bundle.
-            if (/[\\/]consolidate[\\/]/.test(a.importer)) {
+            if (/[\\/]consolidate[\\/]/.test(a.importer) && !CONSOLIDATE_EAGER.has(a.path)) {
                 lazy.add(a.path);
                 return { path: a.path, external: true };
             }
             const r = await build.resolve(a.path, { kind: 'require-call', importer: a.importer, resolveDir: a.resolveDir, pluginData: 's1-probe' });
             if (r.errors.length === 0) return { path: r.path, external: r.external, sideEffects: r.sideEffects };
-            unresolved.add(a.path.split('/').slice(0, a.path.startsWith('@') ? 2 : 1).join('/'));
+            const name = a.path.split('/').slice(0, a.path.startsWith('@') ? 2 : 1).join('/');
+            if (!unresolved.has(name)) unresolved.set(name, path.relative(REPO, a.importer));
             return { path: a.path, external: true };
         });
     },
@@ -136,7 +145,12 @@ const plugin = {
     fs.mkdirSync(path.join(outDir, 'app'), { recursive: true });
     fs.writeFileSync(path.join(outDir, 'app', 'index.html'), '<!doctype html><title>gSender S1</title><a href="/pendant/">pendant</a>\n');
     fs.writeFileSync(path.join(outDir, 'meta.json'), JSON.stringify(result.metafile));
-    console.log(`S1_UNRESOLVED_OPTIONAL ${[...unresolved].sort().join(',') || '(none)'}`);
+    const unexpected = [...unresolved].filter(([name]) => !OPTIONAL_UNRESOLVED.has(name));
+    console.log(`S1_UNRESOLVED_OPTIONAL ${[...unresolved.keys()].filter((n) => OPTIONAL_UNRESOLVED.has(n)).sort().join(',') || '(none)'}`);
+    if (unexpected.length) {
+        for (const [name, importer] of unexpected) console.error(`S1_UNRESOLVED ${name}  <- ${importer}`);
+        throw new Error(`${unexpected.length} required package(s) could not be resolved; is node_modules complete?`);
+    }
     console.log(`S1_CONSOLIDATE_LAZY ${lazy.size} engines left as runtime require()`);
     const bytes = fs.statSync(path.join(serverDir, 'server.js')).size;
     console.log(`S1_BUNDLE bytes=${bytes} mb=${(bytes / 1048576).toFixed(2)} inputs=${Object.keys(result.metafile.inputs).length} build_ms=${Date.now() - t0} pendant=${pendantSrc ? 'yes' : 'no'} out=${outDir}`);

@@ -22,12 +22,15 @@ To run locally (any OS, desktop Node 22+):
 
 ```sh
 npx vite build --config src/pendant/vite.config.ts --outDir /tmp/pendant --emptyOutDir
-node docs/android/s1/build-server-bundle.js --pendant /tmp/pendant      # → docs/android/s1/out (gitignored)
+node docs/android/s1/build-server-bundle.js --out /tmp/s1 --pendant /tmp/pendant
 HOME=/tmp/s1home GSENDER_USER_DATA=/tmp/s1home/userdata \
-  node docs/android/s1/out/server/server.js -p 8123 -H 127.0.0.1
+  node /tmp/s1/server/server.js -p 8123 -H 127.0.0.1
 ```
 
-Point `HOME` at a scratch directory. Otherwise the server reads and writes your real `~/.sender_rc`. On Windows, set `USERPROFILE` too.
+- **Build outside the repo.** Without `--out`, the bundle lands in `docs/android/s1/out`, inside the repo. Node then quietly resolves any package the bundle failed to include from the repo's `node_modules`, so the test passes locally and fails on the device. (The `bluebird` bug went unnoticed this way.)
+- **Fail-fast on missing packages.** The build fails on any unresolved package except the allowlisted optional ones.
+- **Point `HOME` at a scratch directory.** Otherwise the server reads and writes your real `~/.sender_rc`. On Windows, set `USERPROFILE` too.
+- **Reading `S1_READY`.** `ms` is measured from process start: runtime boot plus parsing the bundle. `wall` is measured from when the entry script started.
 
 ## The CI workflow (`android-s1-node.yml`)
 It runs on pushes to `features/android` that touch the workflow or this folder.
@@ -38,6 +41,13 @@ It runs on pushes to `features/android` that touch the workflow or this folder.
 2. **node:** cross-compiles Node for `arm64` (the target) and `x86_64` (for the emulator) using Node's own `android_configure.py` with the NDK. It links with `-z max-page-size=16384`, strips the binary, and checks the alignment of each PT_LOAD segment. The binary is cached by Node version, architecture, API level and NDK, so only the first run pays for the build (an hour or more).
 3. **smoke:** runs the x86_64 binary on an API 35 emulator twice: with 4 KB pages (`google_apis`) and with 16 KB pages (`google_apis_ps16k`).
 4. **report:** a pass/fail table against the exit criteria, written to the run summary.
+
+## Build patches needed so far
+These are part of what E1 would cost us to maintain. Each is applied in the workflow's *Configure and build* step.
+
+| Node | Arch | Symptom | Patch |
+|---|---|---|---|
+| v24.21.0 | arm64 | `ld.lld: error: undefined symbol: android_getCpuFeatures` (zlib `cpu_features.c`) | `deps/zlib/zlib.gyp`: define `ARMV8_OS_LINUX` in place of `ARMV8_OS_ANDROID`. zlib then detects CRC32/PMULL through `getauxval(AT_HWCAP)` (bionic, API 18+) and no longer needs the NDK's deprecated cpufeatures library. |
 
 ## What this does *not* cover yet
 - **Running from inside an app.** The workflow runs the binary from `/data/local/tmp` as the shell user. Inside an app it must run from `nativeLibraryDir`, packaged as `libnode_exec.so`, because of Android 10+ W^X rules. Testing that needs a minimal APK (the Kotlin shell).
