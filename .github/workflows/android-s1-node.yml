@@ -1,0 +1,314 @@
+# Spike S1 (docs/android): can we ship a current Node LTS inside an Android app?
+# Cross-compiles Node for android-arm64 (target) and android-x86_64 (emulator),
+# checks 16 KB page alignment, then boots the bundled gSender server + pendant
+# on 4 KB and 16 KB page emulators and measures startup.
+#
+# Branch-only spike: remove together with docs/android/s1 once S1 is decided.
+name: Android S1 — Node binary
+run-name: "Android S1 — Node ${{ inputs.node_major || '24' }}"
+
+on:
+  push:
+    branches: [features/android]
+    paths:
+      - .github/workflows/android-s1-node.yml
+      - docs/android/s1/**
+  workflow_dispatch:
+    inputs:
+      node_major:
+        description: Node major version (latest release of it is used)
+        default: '24'
+      min_sdk:
+        description: Android API level to compile against (minSdk)
+        default: '29'
+      ndk:
+        description: NDK release (nttld/setup-ndk)
+        default: r28c
+      rebuild:
+        description: Ignore the cached Node binary
+        type: boolean
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_MAJOR: ${{ inputs.node_major || '24' }}
+  MIN_SDK: ${{ inputs.min_sdk || '29' }}
+  NDK_VERSION: ${{ inputs.ndk || 'r28c' }}
+
+jobs:
+  # ── gSender server bundle + pendant UI (architecture-independent) ─────────
+  payload:
+    name: Server bundle + pendant
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      NODE_OPTIONS: --max-old-space-size=8192
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --non-interactive
+
+      - name: Build pendant UI
+        run: npx vite build --config src/pendant/vite.config.ts --outDir "$RUNNER_TEMP/pendant" --emptyOutDir
+
+      - name: Bundle server for Android
+        run: node docs/android/s1/build-server-bundle.js --out "$RUNNER_TEMP/payload" --pendant "$RUNNER_TEMP/pendant" | tee bundle.txt
+
+      - name: Smoke-test bundle on the runner's Node
+        run: |
+          export HOME="$RUNNER_TEMP/home" GSENDER_USER_DATA="$RUNNER_TEMP/home/userdata"
+          mkdir -p "$HOME"
+          node "$RUNNER_TEMP/payload/server/server.js" -p 8123 -H 127.0.0.1 > server.log 2>&1 &
+          for _ in $(seq 1 60); do grep -qE 'S1_READY|S1_FAILED' server.log && break; sleep 0.5; done
+          cat server.log
+          grep -q S1_READY server.log
+          curl -fsS -o /dev/null http://127.0.0.1:8123/api/state
+          curl -fsS -o /dev/null http://127.0.0.1:8123/pendant/
+
+      - name: Summary
+        run: |
+          {
+            echo "### Payload"
+            echo '```'
+            grep S1_ bundle.txt
+            grep S1_READY server.log
+            du -sh "$RUNNER_TEMP/payload/server/server.js" "$RUNNER_TEMP/payload/server/pendant" "$RUNNER_TEMP/payload"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: s1-payload
+          path: |
+            ${{ runner.temp }}/payload
+            !${{ runner.temp }}/payload/meta.json
+          retention-days: 7
+
+  # ── Node cross-compile (cached per version/arch/NDK) ──────────────────────
+  node:
+    name: Node ${{ matrix.arch }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: arm64
+            prefix: aarch64-linux-android
+          - arch: x86_64
+            prefix: x86_64-linux-android
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve Node version
+        id: ver
+        run: |
+          v=$(curl -fsSL https://nodejs.org/dist/index.json | jq -r --arg m "v${NODE_MAJOR}." '[.[] | select(.version | startswith($m))][0].version')
+          test -n "$v" && test "$v" != null
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+          echo "Node $v"
+
+      - name: Restore cached binary
+        id: cache
+        if: ${{ !inputs.rebuild }}
+        uses: actions/cache/restore@v4
+        with:
+          path: out
+          key: s1-node-${{ steps.ver.outputs.version }}-${{ matrix.arch }}-api${{ env.MIN_SDK }}-${{ env.NDK_VERSION }}-v1
+
+      - name: Set up NDK
+        id: ndk
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: ${{ env.NDK_VERSION }}
+          add-to-path: false
+
+      - name: Free disk space
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android/sdk/ndk /opt/ghc /usr/local/.ghcup && df -h /
+
+      - name: Download Node source
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          curl -fsSLO "https://nodejs.org/dist/${{ steps.ver.outputs.version }}/node-${{ steps.ver.outputs.version }}.tar.xz"
+          tar xf "node-${{ steps.ver.outputs.version }}.tar.xz"
+
+      - name: Configure and build
+        if: steps.cache.outputs.cache-hit != 'true'
+        working-directory: node-${{ steps.ver.outputs.version }}
+        env:
+          NDK: ${{ steps.ndk.outputs.ndk-path }}
+        run: |
+          set -x
+          TC="$NDK/toolchains/llvm/prebuilt/linux-x86_64"
+          # Same environment android_configure.py sets for ./configure; make
+          # needs it too, because the script doesn't export it to its caller.
+          export PATH="$PATH:$TC/bin"
+          export CC="$TC/bin/${{ matrix.prefix }}${MIN_SDK}-clang"
+          export CXX="$TC/bin/${{ matrix.prefix }}${MIN_SDK}-clang++"
+          export CC_host=gcc CXX_host=g++
+          gyp_arch=${{ matrix.arch == 'x86_64' && 'x64' || 'arm64' }}
+          export GYP_DEFINES="target_arch=$gyp_arch v8_target_arch=$gyp_arch android_target_arch=$gyp_arch host_os=linux OS=android android_ndk_path=$NDK"
+          # 16 KB pages (Play requirement). NDK r28+ defaults to this; be explicit.
+          export LDFLAGS="-Wl,-z,max-page-size=16384"
+          python3 android_configure.py patch
+          python3 android_configure.py "$NDK" "$MIN_SDK" "${{ matrix.arch }}"
+          make -j"$(nproc)"
+          mkdir -p ../out
+          cp out/Release/node ../out/node
+
+      - name: Strip and inspect
+        if: steps.cache.outputs.cache-hit != 'true'
+        env:
+          NDK: ${{ steps.ndk.outputs.ndk-path }}
+        run: |
+          TC="$NDK/toolchains/llvm/prebuilt/linux-x86_64"
+          cp out/node out/node.unstripped
+          "$TC/bin/llvm-strip" out/node
+          "$TC/bin/llvm-readelf" -hlWd out/node > out/readelf.txt
+          # Ship libc++_shared.so alongside if the binary needs it.
+          if grep -q 'libc++_shared.so' out/readelf.txt; then
+            triple=${{ matrix.prefix }}
+            cp "$TC/sysroot/usr/lib/$triple/libc++_shared.so" out/
+          fi
+          rm out/node.unstripped
+
+      - name: Save cached binary
+        if: steps.cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: out
+          key: s1-node-${{ steps.ver.outputs.version }}-${{ matrix.arch }}-api${{ env.MIN_SDK }}-${{ env.NDK_VERSION }}-v1
+
+      - name: 16 KB alignment check
+        run: |
+          # Every PT_LOAD segment must be aligned to at least 16 KB (0x4000).
+          aligns=$(awk '$1 == "LOAD" { print $NF }' out/readelf.txt)
+          bad=0
+          for a in $aligns; do [ $((a)) -ge 16384 ] || bad=1; done
+          size=$(stat -c %s out/node)
+          gz=$(gzip -9 -c out/node | wc -c)
+          {
+            echo "### Node ${{ steps.ver.outputs.version }} — android-${{ matrix.arch }} (API ${MIN_SDK}, NDK ${NDK_VERSION})"
+            echo ""
+            echo "- Stripped size: $((size / 1048576)) MB (deflate ≈ $((gz / 1048576)) MB in an APK)"
+            echo "- LOAD segment alignment: $(echo $aligns | tr '\n' ' ') → $([ $bad -eq 0 ] && echo '**16 KB OK**' || echo '**NOT 16 KB aligned**')"
+            echo "- Type: $(awk '/Type:/ {print $2; exit}' out/readelf.txt)"
+            echo "- NEEDED: $(grep -oE 'Shared library: \[[^]]+\]' out/readelf.txt | sed -E 's/.*\[(.*)\]/\1/' | tr '\n' ' ')"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+          printf '{"arch":"%s","version":"%s","bytes":%s,"deflate_bytes":%s,"aligned_16k":%s}\n' \
+            "${{ matrix.arch }}" "${{ steps.ver.outputs.version }}" "$size" "$gz" "$([ $bad -eq 0 ] && echo true || echo false)" > out/node-report.json
+          exit $bad
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: s1-node-${{ matrix.arch }}
+          path: out
+          retention-days: 7
+
+  # ── Boot the server on emulators (x86_64 binary; 4 KB and 16 KB pages) ────
+  smoke:
+    name: Emulator ${{ matrix.label }}
+    needs: [payload, node]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: api35-4k
+            target: google_apis
+          - label: api35-16k
+            target: google_apis_ps16k
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: s1-node-x86_64
+          path: ${{ runner.temp }}/s1
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: s1-payload
+          path: ${{ runner.temp }}/s1/payload
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Run on emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: ${{ matrix.target }}
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
+          script: bash docs/android/s1/emulator-smoke.sh "${{ runner.temp }}/s1" ${{ matrix.label }} "${{ runner.temp }}/results"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: s1-results-${{ matrix.label }}
+          path: ${{ runner.temp }}/results
+          retention-days: 7
+
+  # ── Pass/fail against the S1 exit criteria ────────────────────────────────
+  report:
+    name: S1 report
+    needs: [payload, node, smoke]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: art
+
+      - name: Evaluate exit criteria
+        run: |
+          set -u
+          arm=art/s1-node-arm64/node-report.json
+          payload=art/s1-payload
+          [ -f "$arm" ] && arm_deflate=$(jq .deflate_bytes "$arm") || arm_deflate=0
+          [ -f "$arm" ] && arm_aligned=$(jq .aligned_16k "$arm") || arm_aligned=missing
+          payload_deflate=$( [ -d "$payload" ] && (cd "$payload" && zip -qr9 - . | wc -c) || echo 0)
+          # APK contribution of what S1 adds; the Kotlin shell itself is small.
+          apk_mb=$(( (arm_deflate + payload_deflate) / 1048576 ))
+          results=$(cat art/s1-results-*/*.json 2>/dev/null | jq -s . || echo '[]')
+          echo "$results" > results.json
+          worst_cold=$(jq -r '[.[] | .cold_ready_ms // empty] | max // "n/a"' results.json)
+          all_http=$(jq 'length > 0 and all(.[]; .http_ok)' results.json)
+          ok() { [ "$1" = true ] && echo '✅' || echo '❌'; }
+          {
+            echo "## S1 exit criteria"
+            echo ""
+            echo "| Criterion | Target | Measured | |"
+            echo "|---|---|---|---|"
+            echo "| 16 KB alignment (arm64) | all LOAD ≥ 0x4000 | $arm_aligned | $(ok "$arm_aligned") |"
+            echo "| Server cold start (emulator, x86_64) | < 2000 ms | ${worst_cold} ms | $(ok "$([ "$worst_cold" != n/a ] && [ "$worst_cold" -lt 2000 ] && echo true || echo false)") |"
+            echo "| Pendant served, API + Socket.IO up | 200s | $all_http | $(ok "$all_http") |"
+            echo "| APK contribution (Node arm64 + payload, deflated) | < 120 MB total APK | ${apk_mb} MB | $(ok "$([ $apk_mb -gt 0 ] && [ $apk_mb -lt 120 ] && echo true || echo false)") |"
+            echo ""
+            echo "<details><summary>Emulator results</summary>"
+            echo ""
+            echo '```json'
+            cat results.json
+            echo '```'
+            echo "</details>"
+            echo ""
+            echo "Emulator timings run on KVM x86_64 and will be faster than a mid-range tablet; confirm on target hardware."
+            echo "Still to cover: executing from an APK's nativeLibraryDir (W^X), which needs the Kotlin shell."
+          } >> "$GITHUB_STEP_SUMMARY"
