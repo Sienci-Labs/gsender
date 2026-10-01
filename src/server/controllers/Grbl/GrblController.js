@@ -139,9 +139,7 @@ class GrblController {
 		},
 		close: (err) => {
 			this.ready = false;
-			const currentLineRunning =
-				this.sender?.state?.totalSentToQueue -
-				this.sender?.state?.countdownQueue.length;
+			const currentLineRunning = this.sender?.execLine ?? 0;
 			if (err) {
 				log.warn(`Disconnected from serial port "${this.options.port}":`, err);
 			}
@@ -674,13 +672,11 @@ class GrblController {
 			this.emit("workflow:state", this.workflow.state);
 			this.jogStreamer?.abort("workflow");
 			this.sender.rewind();
-			this.sender.resumeCountdown();
 		});
 		this.workflow.on("stop", (...args) => {
 			this.emit("workflow:state", this.workflow.state);
 			this.feeder.reset();
 			this.sender.rewind();
-			this.sender.stopCountdown();
 		});
 		this.workflow.on("pause", (...args) => {
 			this.emit("workflow:state", this.workflow.state);
@@ -705,8 +701,6 @@ class GrblController {
 
 			// Resume program execution
 			this.sender.unhold();
-
-			this.sender.resumeCountdown();
 
 			// subtract time paused
 			this.sender.next({ timePaused: pauseTime });
@@ -825,6 +819,9 @@ class GrblController {
 			}
 
 			this.actionMask.queryStatusReport = false;
+
+			// Advance the job's execution playhead / remaining time
+			this.sender.updateProgress(res);
 
 			// The reported position is the truth the streamer's locally
 			// decremented travel budget is only estimating.
@@ -1299,23 +1296,6 @@ class GrblController {
 
 			// Grbl state
 			if (this.state !== this.runner.state) {
-				const currentActiveState = _.get(this.state, "status.activeState", "");
-				// only pause countdown once machine is idle
-				if (
-					this.workflow.isPaused() &&
-					(currentActiveState === GRBL_ACTIVE_STATE_IDLE ||
-						currentActiveState === GRBL_ACTIVE_STATE_HOLD) &&
-					this.sender.isCountdownRunning()
-				) {
-					this.sender.pauseCountdown();
-				} else if (
-					// restart countdown if machine is still moving
-					currentActiveState === GRBL_ACTIVE_STATE_RUN &&
-					!this.sender.isCountdownRunning()
-				) {
-					this.sender.resumeCountdown();
-				}
-
 				this.state = this.runner.state;
 				this.emit("controller:state", GRBL, this.state);
 				this.emit("Grbl:state", this.state); // Backward compatibility
@@ -1345,6 +1325,7 @@ class GrblController {
 				} else if (timespan > toleranceTime) {
 					log.silly(`Finished sending G-code: timespan=${timespan}`);
 					this.actionTime.senderFinishTime = 0;
+					this.sender.logEstimateAccuracy();
 					// Stop workflow
 					this.command("gcode:stop");
 				}
@@ -2105,7 +2086,6 @@ class GrblController {
 				}
 				// Moved this to end so it triggers AFTER the reset on force stop
 				this.event.trigger(PROGRAM_END);
-				this.sender.stopCountdown();
 			},
 			pause: () => {
 				log.warn(
@@ -2478,8 +2458,7 @@ class GrblController {
 			},
 			updateEstimateData: () => {
 				const [estimateData] = args;
-				this.sender.setEstimateData(estimateData.estimates);
-				this.sender.setEstimatedTime(estimateData.estimatedTime);
+				this.sender.setEstimateData(estimateData);
 			},
 		}[cmd];
 

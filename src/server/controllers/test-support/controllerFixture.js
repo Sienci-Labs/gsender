@@ -72,7 +72,6 @@ export function useControllerFixture(Controller) {
 				.map(([, ...args]) => args);
 	});
 	afterEach(() => {
-		fixture.controller?.sender?.stopCountdown();
 		fixture.controller?.feeder?.clear();
 		fixture.controller?.destroy();
 		jest.clearAllTimers();

@@ -7,7 +7,8 @@ export const buttonStyle = tv({
     base: 'relative border rounded hover:opacity-90 shadow active:bg-opacity-70 active:shadow-[inset_7px_4px_6px_0px_rgba(59,_130,_246,_0.1)]',
     variants: {
         variant: {
-            primary: 'border-blue-500 text-white bg-blue-500',
+            primary:
+                'border-blue-500 text-white bg-blue-500 dark:text-content-secondary',
             secondary:
                 'border-robin-500 hover:bg-gray-200 text-gray-600 bg-white dark:bg-surface-raised dark:text-content-secondary',
             alt: 'bg-robin-500 text-white border-robin-500',

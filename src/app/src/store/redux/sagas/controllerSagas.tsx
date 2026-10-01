@@ -38,13 +38,13 @@ import {
     isHomingRequiredAlarm,
     JOB_STATUS,
     JOB_TYPES,
-    LIGHTWEIGHT_OPTIONS,
     METRIC_UNITS,
     RENDER_LOADING,
     RENDER_NO_FILE,
     RENDER_RENDERED,
     VISUALIZER_PRIMARY,
     VISUALIZER_SECONDARY,
+    WORKFLOW_STATE_RUNNING,
     WORKSPACE_MODE,
 } from 'app/constants';
 import type {
@@ -75,6 +75,10 @@ import type {
 } from 'app/lib/definitions/sender_feeder';
 import { getVisualizerTheme } from 'app/lib/getVisualizerTheme';
 import { isLaserMode } from 'app/lib/laserMode';
+import {
+    getEstimatorConfig,
+    getEstimatorSignature,
+} from 'app/lib/timeEstimator/getEstimatorConfig';
 import { updateWorkspaceMode } from 'app/lib/rotary';
 import { toast } from 'app/lib/toaster';
 import { determineFixedSensorInstructions } from 'app/lib/toolChangeUtils';
@@ -94,6 +98,7 @@ import type VisualizeWorker from 'app/workers/Visualize.worker';
 import type { WORKSPACE_MODE_T } from 'app/workspace/definitions';
 import isElectron from 'is-electron';
 import _get from 'lodash/get';
+import _debounce from 'lodash/debounce';
 import _throttle from 'lodash/throttle';
 import pubsub from 'pubsub-js';
 import {
@@ -134,13 +139,13 @@ import {
 import {
     unloadFileInfo,
     updateFileContent,
+    updateFileInfo,
     updateFileProcessing,
     updateFileRenderState,
 } from '../slices/fileInfo.slice';
 import { setIpList } from '../slices/preferences.slice';
 import { updateJobOverrides } from '../slices/visualizer.slice';
 import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
-import get from 'lodash/get';
 import posthog from 'posthog-js';
 import { AlarmsErrors } from 'app/definitions/alarms_errors';
 import { Spindle } from 'app/features/Spindle/definitions';
@@ -156,18 +161,54 @@ interface Error {
     controller: 'grblHAL' | 'GRBL';
 }
 
+interface EstimatePayload {
+    lineTime: ArrayBuffer;
+    lineKind: ArrayBuffer;
+    estimatedTime: number;
+}
+
+const toExactBuffer = (view?: ArrayBufferView): ArrayBuffer => {
+    if (!view || !ArrayBuffer.isView(view)) {
+        return new ArrayBuffer(0);
+    }
+    const { buffer, byteOffset, byteLength } = view;
+    if (byteOffset === 0 && byteLength === buffer.byteLength) {
+        return buffer as ArrayBuffer;
+    }
+    return buffer.slice(byteOffset, byteOffset + byteLength) as ArrayBuffer;
+};
+
 export function* initialize(): Generator<null, void, unknown> {
     let visualizeWorker: typeof VisualizeWorker | null = null;
     let visualizeJobId = 0;
-    // let estimateWorker: EstimateWorker | null = null;
+    let estimateWorker: Worker | null = null;
+    let estimateJobId = 0;
+    // Estimator inputs the current estimate was computed with
+    let lastEstimateSignature = '';
     let currentState: GRBL_ACTIVE_STATES_T = GRBL_ACTIVE_STATE_IDLE;
     let prevState: GRBL_ACTIVE_STATES_T = GRBL_ACTIVE_STATE_IDLE;
     let errors: string[] = [];
-    let latestEstimateData: { estimates: number[]; estimatedTime: number } = {
-        estimates: [],
+    // Per-line time estimates (one per Sender line) sent to the server, which
+    // tracks job progress from them.
+    let latestEstimateData: EstimatePayload = {
+        lineTime: new ArrayBuffer(0),
+        lineKind: new ArrayBuffer(0),
         estimatedTime: 0,
     };
     let hasEstimateData = false;
+    // The last primary parse that ran to completion, and the one in flight. A
+    // server file:load is re-emitted on every controller (re)connect; when the
+    // file and every input that shapes the worker's output are unchanged, what
+    // is on screen is already right and the parse can be skipped.
+    type PrimaryParseRecord = {
+        content: string;
+        size: number;
+        name: string;
+        inputsKey: string;
+    };
+    let lastPrimaryParse: PrimaryParseRecord | null = null;
+    let pendingPrimaryParse: (PrimaryParseRecord & { jobId: number }) | null =
+        null;
     // Seeded from [NEWOPT:...] on connect (via $I), then kept in sync with
     // live [MSG:Info: Autoconfig: ...] updates — the reference point the
     // accessory connectivity toast diffs against.
@@ -206,11 +247,64 @@ export function* initialize(): Generator<null, void, unknown> {
 
     const clearEstimateDataCache = () => {
         latestEstimateData = {
-            estimates: [],
+            lineTime: new ArrayBuffer(0),
+            lineKind: new ArrayBuffer(0),
             estimatedTime: 0,
         };
         hasEstimateData = false;
+        lastPrimaryParse = null;
+        pendingPrimaryParse = null;
     };
+
+    // Re-run the time estimate for the loaded file when machine settings that
+    // feed it change - most commonly connecting after the file was opened.
+    const scheduleReestimate = _debounce(() => {
+        const state = reduxStore.getState();
+        const content = _get(state, 'file.content');
+        if (!content || _get(state, 'file.fileProcessing')) {
+            return;
+        }
+        // Never swap estimates under a running job
+        if (
+            _get(state, 'controller.workflow.state') === WORKFLOW_STATE_RUNNING
+        ) {
+            return;
+        }
+        const signature = getEstimatorSignature();
+        if (signature === lastEstimateSignature) {
+            return;
+        }
+        lastEstimateSignature = signature;
+
+        estimateWorker?.terminate();
+        const jobId = ++estimateJobId;
+        const worker = new Worker(
+            new URL('../../../workers/Estimate.worker.ts', import.meta.url),
+            { type: 'module' },
+        );
+        estimateWorker = worker;
+        worker.onmessage = ({ data }) => {
+            worker.terminate();
+            if (estimateWorker === worker) {
+                estimateWorker = null;
+            }
+            if (data?.jobId !== estimateJobId) {
+                return;
+            }
+            reduxStore.dispatch(
+                updateFileInfo({ estimatedTime: data.estimatedTime }),
+            );
+            pubsub.publish('estimateData:ready', {
+                ...data,
+                source: 'reestimate',
+            });
+        };
+        worker.postMessage({
+            jobId,
+            content,
+            estimatorConfig: getEstimatorConfig(),
+        });
+    }, 750);
 
     /* Health check - every 3 minutes */
     setInterval(
@@ -279,26 +373,15 @@ export function* initialize(): Generator<null, void, unknown> {
         }
     };
 
-    const shouldVisualizeSVG = () => {
-        return (
-            store.get(
-                'widgets.visualizer.liteOption',
-                LIGHTWEIGHT_OPTIONS.LIGHT,
-            ) === LIGHTWEIGHT_OPTIONS.LIGHT
-        );
-    };
-
     const parseGCode = async (
         content: string,
         size: number,
         name: string,
         visualizer: string,
+        { skipIfUnchanged = false }: { skipIfUnchanged?: boolean } = {},
     ) => {
         const reduxState = reduxStore.getState();
         const isLaser = isLaserMode();
-        // Keep SVG path generation tied to lightweight option selection so
-        // users can switch to SVG view instantly after a file is loaded.
-        const shouldIncludeSVG = shouldVisualizeSVG();
         const profileWorker = store.get(
             'widgets.visualizer.debug.profileWorker',
             false,
@@ -306,36 +389,13 @@ export function* initialize(): Generator<null, void, unknown> {
         const profileSampleEvery = Number(
             store.get('widgets.visualizer.debug.profileSampleEvery', 10000),
         );
-        const accelerations = {
-            xAccel: _get(reduxState, 'controller.settings.settings.$120'),
-            yAccel: _get(reduxState, 'controller.settings.settings.$121'),
-            zAccel: _get(reduxState, 'controller.settings.settings.$122'),
-            aAccel: _get(reduxState, 'controller.settings.settings.$123'),
-        };
-        const maxFeedrates = {
-            xMaxFeed: Number(
-                _get(reduxState, 'controller.settings.settings.$110', 4000.0),
-            ),
-            yMaxFeed: Number(
-                _get(reduxState, 'controller.settings.settings.$111', 4000.0),
-            ),
-            zMaxFeed: Number(
-                _get(reduxState, 'controller.settings.settings.$112', 3000.0),
-            ),
-            aMaxFeed: Number(
-                _get(reduxState, 'controller.settings.settings.$113', 3000.0),
-            ),
-        };
         const rotaryDiameterOffsetEnabled = store.get(
             'widgets.visualizer.rotaryDiameterOffsetEnabled',
             false,
         );
-        const atcFlag: string = get(
-            reduxStore,
-            'controller.settings.info.NEWOPT.ATC',
-            '0',
-        );
-        const atcEnabled = atcFlag === '1';
+        const estimatorConfig = getEstimatorConfig();
+        const estimatorSignature = getEstimatorSignature();
+        lastEstimateSignature = estimatorSignature;
 
         // compare previous file data to see if it's a new file and we need to reparse
         let isNewFile = true;
@@ -349,7 +409,34 @@ export function* initialize(): Generator<null, void, unknown> {
             isNewFile = false;
         }
 
-        if (isNewFile && visualizer !== VISUALIZER_SECONDARY) {
+        const isPrimary = visualizer !== VISUALIZER_SECONDARY;
+        const parseInputsKey = JSON.stringify({
+            isLaser,
+            estimatorSignature,
+            rotaryDiameterOffsetEnabled,
+            needsVisualization: shouldVisualize(),
+            theme: Array.from(getVisualizerTheme()),
+        });
+
+        if (
+            skipIfUnchanged &&
+            isPrimary &&
+            !isNewFile &&
+            lastPrimaryParse !== null &&
+            lastPrimaryParse.inputsKey === parseInputsKey &&
+            lastPrimaryParse.size === size &&
+            lastPrimaryParse.name === name &&
+            lastPrimaryParse.content === content
+        ) {
+            // Same file, same inputs, and that parse finished: the viewer,
+            // file info and cached estimates are already correct.
+            return;
+        }
+        if (isPrimary) {
+            lastPrimaryParse = null;
+        }
+
+        if (isNewFile && isPrimary) {
             const context = getMachineAnalyticsContext();
             posthog.capture('file_loaded', {
                 firmware: context.firmware,
@@ -399,9 +486,7 @@ export function* initialize(): Generator<null, void, unknown> {
                     isSecondary: visualizer === VISUALIZER_SECONDARY,
                     isNewFile,
                     isLaser,
-                    accelerations,
-                    maxFeedrates,
-                    atcEnabled,
+                    estimatorConfig,
                     rotaryDiameterOffsetEnabled,
                     theme: getVisualizerTheme(),
                     profile: profileWorker,
@@ -450,6 +535,13 @@ export function* initialize(): Generator<null, void, unknown> {
         visualizeWorker.onmessage = visualizeResponse;
         const jobId = ++visualizeJobId;
         setActiveVisualizeJobId(jobId);
+        pendingPrimaryParse = {
+            jobId,
+            content,
+            size,
+            name,
+            inputsKey: parseInputsKey,
+        };
         console.time('gSender:fileLoad');
         visualizeWorker.postMessage({
             jobId,
@@ -458,12 +550,9 @@ export function* initialize(): Generator<null, void, unknown> {
             activeVisualizer: visualizer,
             isSecondary: visualizer === VISUALIZER_SECONDARY,
             isLaser,
-            shouldIncludeSVG,
             needsVisualization,
             isNewFile,
-            accelerations,
-            maxFeedrates,
-            atcEnabled,
+            estimatorConfig,
             rotaryDiameterOffsetEnabled,
             theme: getVisualizerTheme(),
             profile: profileWorker,
@@ -505,6 +594,7 @@ export function* initialize(): Generator<null, void, unknown> {
                     settings,
                 }),
             );
+            scheduleReestimate();
         },
     );
 
@@ -828,7 +918,9 @@ export function* initialize(): Generator<null, void, unknown> {
     controller.addListener(
         'file:load',
         (content: string, size: number, name: string, visualizer: string) => {
-            parseGCode(content, size, name, visualizer);
+            parseGCode(content, size, name, visualizer, {
+                skipIfUnchanged: true,
+            });
         },
     );
 
@@ -900,15 +992,38 @@ export function* initialize(): Generator<null, void, unknown> {
         'estimateData:ready',
         (
             _msg,
-            value: { estimates?: number[]; estimatedTime?: number } = {},
+            value: {
+                lineTime?: Float32Array;
+                lineKind?: Uint8Array;
+                estimatedTime?: number;
+                jobId?: number;
+                source?: 'reestimate';
+            } = {},
         ) => {
+            // Sent as raw buffers - socket.io carries binary without JSON-encoding
+            // one number per line.
             latestEstimateData = {
-                estimates: Array.isArray(value?.estimates)
-                    ? value.estimates
-                    : [],
+                lineTime: toExactBuffer(value?.lineTime),
+                lineKind: toExactBuffer(value?.lineKind),
                 estimatedTime: Number(value?.estimatedTime) || 0,
             };
             hasEstimateData = true;
+            if (value?.source === 'reestimate') {
+                // Same file re-estimated from new machine settings. Its jobId is
+                // from a separate counter, so it says nothing about the parse
+                // records; a stale inputsKey just means the next file:load reparses.
+            } else if (
+                pendingPrimaryParse &&
+                value?.jobId === pendingPrimaryParse.jobId
+            ) {
+                const { jobId: _jobId, ...record } = pendingPrimaryParse;
+                lastPrimaryParse = record;
+                pendingPrimaryParse = null;
+            } else {
+                // Another job's estimates (e.g. a surfacing preview) replaced the
+                // cache, so the next file:load must reparse to restore the file's own.
+                lastPrimaryParse = null;
+            }
             controller.command('updateEstimateData', latestEstimateData);
         },
     );
@@ -920,11 +1035,6 @@ export function* initialize(): Generator<null, void, unknown> {
     //         parseGCode(content, size, name, visualizer);
     //     },
     // );
-
-    // TODO: this is where the estimate worker should be terminated, estimate worker is not defined anywhere for some reason
-    pubsub.subscribe('estimate:done', (_msg, _data) => {
-        // estimateWorker?.terminate();
-    });
 
     pubsub.subscribe(
         'reparseGCode',

@@ -15,6 +15,7 @@ interface WizardLandingProps {
     onBack?: () => void;
     validations?: (() => ValidationResult)[];
     helpUrl?: string;
+    isHub?: boolean;
 }
 
 export function WizardLanding({
@@ -26,6 +27,7 @@ export function WizardLanding({
     onBack,
     validations,
     helpUrl,
+    isHub = false,
 }: WizardLandingProps) {
     const activeSubWizard = subWizards.find(
         (sw) => sw.id === subWizards[0]?.id,
@@ -86,7 +88,7 @@ export function WizardLanding({
                         className="flex items-center gap-2 text-gray-600 dark:text-content-secondary hover:text-gray-900 dark:hover:text-gray-100 mb-8 self-start"
                     >
                         <ArrowLeft size={20} />
-                        Back to Wizards
+                        {isHub ? 'Back to Wizards' : 'Back to Tools'}
                     </Button>
                 )}
 

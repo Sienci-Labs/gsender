@@ -25,7 +25,7 @@ import type { ModalState } from '@sienci/gviewer';
 import type { LinePositionIndex } from '../../definitions';
 import {
     buildLinePositionIndex,
-    frameAtLine,
+    senderLineCountAt,
     modalsAtLine,
     positionAtLine,
 } from '../linePositionIndex';
@@ -54,7 +54,7 @@ function makeFixtureIndex(): LinePositionIndex {
             0,
             0, // line 3
         ]),
-        frameForLine: Int32Array.from([1, 2, 3]),
+        senderLineCounts: Int32Array.from([1, 2, 3]),
         modalTable,
         modalForLine: Uint16Array.from([0, 1, 1]),
         feedRates: Float32Array.from([Number.NaN, 500, 500]),
@@ -62,10 +62,10 @@ function makeFixtureIndex(): LinePositionIndex {
     };
 }
 
-describe('modalsAtLine / frameAtLine / positionAtLine', () => {
+describe('modalsAtLine / senderLineCountAt / positionAtLine', () => {
     it('return the null/zero defaults when there is no index', () => {
         expect(modalsAtLine(null, 1)).toBeNull();
-        expect(frameAtLine(null, 1)).toBe(0);
+        expect(senderLineCountAt(null, 1)).toBe(0);
         expect(positionAtLine(null, 1)).toEqual({ x: 0, y: 0, z: 0, a: 0 });
     });
 
@@ -73,21 +73,21 @@ describe('modalsAtLine / frameAtLine / positionAtLine', () => {
         const empty: LinePositionIndex = {
             lineCount: 0,
             positions: new Float32Array(0),
-            frameForLine: new Int32Array(0),
+            senderLineCounts: new Int32Array(0),
             modalTable: [],
             modalForLine: new Uint16Array(0),
             feedRates: new Float32Array(0),
             spindleSpeeds: new Float32Array(0),
         };
         expect(modalsAtLine(empty, 1)).toBeNull();
-        expect(frameAtLine(empty, 1)).toBe(0);
+        expect(senderLineCountAt(empty, 1)).toBe(0);
         expect(positionAtLine(empty, 1)).toEqual({ x: 0, y: 0, z: 0, a: 0 });
     });
 
     it('looks up an in-range line correctly', () => {
         const index = makeFixtureIndex();
         expect(positionAtLine(index, 2)).toEqual({ x: 10, y: 0, z: 0, a: 0 });
-        expect(frameAtLine(index, 2)).toBe(2);
+        expect(senderLineCountAt(index, 2)).toBe(2);
         expect(modalsAtLine(index, 2)?.modals.motion).toBe('G1');
         expect(modalsAtLine(index, 2)?.feedRate).toBe(500);
     });
@@ -97,7 +97,7 @@ describe('modalsAtLine / frameAtLine / positionAtLine', () => {
         // Below range clamps to line 1.
         expect(positionAtLine(index, 0)).toEqual({ x: 0, y: 0, z: 0, a: 0 });
         expect(positionAtLine(index, -50)).toEqual({ x: 0, y: 0, z: 0, a: 0 });
-        expect(frameAtLine(index, 0)).toBe(1);
+        expect(senderLineCountAt(index, 0)).toBe(1);
         expect(modalsAtLine(index, 0)?.modals.motion).toBe('G0');
         // Above range clamps to the last line.
         expect(positionAtLine(index, 999)).toEqual({
@@ -106,7 +106,7 @@ describe('modalsAtLine / frameAtLine / positionAtLine', () => {
             z: 0,
             a: 0,
         });
-        expect(frameAtLine(index, 999)).toBe(3);
+        expect(senderLineCountAt(index, 999)).toBe(3);
         expect(modalsAtLine(index, 999)?.modals.motion).toBe('G1');
     });
 });
@@ -123,31 +123,24 @@ describe('buildLinePositionIndex', () => {
         expect(positionAtLine(index, 3)).toEqual({ x: 10, y: 10, z: 0, a: 0 });
     });
 
-    it('does not advance the frame counter for a comment-only line', async () => {
+    it('counts a comment-only line, as the server Sender does', async () => {
         const lines = ['G1 X10', '(just a comment)', 'G1 X20'];
         const index = await buildLinePositionIndex(lines);
 
         expect(index).not.toBeNull();
-        // Frame count reached at line 1 and line 3 differ by exactly one motion
-        // line's worth — the comment in between contributed nothing.
-        expect(frameAtLine(index, 1)).toBe(1);
-        expect(frameAtLine(index, 3)).toBe(2);
+        expect(senderLineCountAt(index, 1)).toBe(1);
+        expect(senderLineCountAt(index, 2)).toBe(2);
+        expect(senderLineCountAt(index, 3)).toBe(3);
     });
 
-    it('honors blankLineEmitsFrame for whether a blank line advances the frame count', async () => {
-        const lines = ['G1 X10', '', 'G1 X20'];
+    it('does not count blank or whitespace-only lines', async () => {
+        const lines = ['G1 X10', '', '   	', 'G1 X20'];
+        const index = await buildLinePositionIndex(lines);
 
-        const withBlankFrame = await buildLinePositionIndex(lines, {
-            blankLineEmitsFrame: true,
-        });
-        expect(frameAtLine(withBlankFrame, 2)).toBe(2);
-        expect(frameAtLine(withBlankFrame, 3)).toBe(3);
-
-        const withoutBlankFrame = await buildLinePositionIndex(lines, {
-            blankLineEmitsFrame: false,
-        });
-        expect(frameAtLine(withoutBlankFrame, 2)).toBe(1);
-        expect(frameAtLine(withoutBlankFrame, 3)).toBe(2);
+        expect(senderLineCountAt(index, 1)).toBe(1);
+        expect(senderLineCountAt(index, 2)).toBe(1);
+        expect(senderLineCountAt(index, 3)).toBe(1);
+        expect(senderLineCountAt(index, 4)).toBe(2);
     });
 
     it('carries state forward across a malformed line instead of throwing', async () => {

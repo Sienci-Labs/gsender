@@ -1821,8 +1821,13 @@ class Visualizer extends Component {
         const showRendering = renderState === RENDER_RENDERING;
         const showLoading = renderState === RENDER_LOADING;
         // Handle visualizer render
+        // Lightweight "Everything" disables the main visualizer outright: hide it
+        // and show the placeholder, as the pre-gviewer VisualizerWrapper did (it
+        // always kept the secondary/surfacing preview visible).
         const isVisualizerDisabled = state.liteMode
-            ? state.disabledLite
+            ? state.disabledLite ||
+              (!isSecondary &&
+                  state.liteOption === LIGHTWEIGHT_OPTIONS.EVERYTHING)
             : state.disabled;
 
         const capable = {

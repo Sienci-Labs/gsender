@@ -18,9 +18,9 @@ const MarkFirstLocation = ({ onComplete }: Props) => {
                 </p>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-6 w-min">
                 <div
-                    className={`flex w-80 items-center gap-4 p-4 rounded-lg transition-colors ${
+                    className={`flex items-center gap-4 p-4 rounded-lg transition-colors w-full ${
                         markLocationCompleted
                             ? 'bg-green-50 border border-green-200 bg-opacity-30'
                             : 'bg-blue-50 border border-blue-200 bg-opacity-40'

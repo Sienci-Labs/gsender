@@ -1,91 +1,28 @@
-import api from 'app/api';
-import controller from 'app/lib/controller';
-import store from 'app/store';
-import { useCallback, useEffect, useState } from 'react';
-import type { PluginRecord, PluginsResponse } from '../types';
+import { useSyncExternalStore } from 'react';
+import {
+    getSnapshot,
+    openPluginsDir,
+    refresh,
+    setEnabled,
+    subscribe,
+} from './pluginStore';
 
+// wrapper around the plugin store
+// data is fetched once by the store and shared to every component that uses this wrapper
 export const usePlugins = () => {
-    const [plugins, setPlugins] = useState<PluginRecord[]>([]);
-    const [pluginsDir, setPluginsDir] = useState('');
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    const refresh = useCallback(async () => {
-        setLoading(true);
-        setError(null);
-
-        try {
-            const { data } = await api.plugins.fetch();
-            const response = data as PluginsResponse;
-            setPlugins(response.plugins || []);
-
-            const resolvedPluginsDir =
-                response.userPluginsDir || response.pluginsDir || '';
-            store.set(
-                'workspace.userPluginsDir',
-                response.userPluginsDir || '',
-            );
-            setPluginsDir(resolvedPluginsDir);
-        } catch (err) {
-            setError(
-                err instanceof Error ? err.message : 'Failed to load plugins',
-            );
-            setPlugins([]);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    useEffect(() => {
-        refresh();
-    }, [refresh]);
-
-    useEffect(() => {
-        const onPluginsChanged = () => refresh();
-        controller.addListener('plugins:changed', onPluginsChanged);
-        return () => {
-            controller.removeListener('plugins:changed', onPluginsChanged);
-        };
-    }, [refresh]);
-
-    const setEnabled = useCallback(
-        async (id: string, enabled: boolean) => {
-            const { data } = await api.plugins.update(id, { enabled });
-            await refresh();
-            return data as { restartRequired?: boolean };
-        },
-        [refresh],
-    );
-
-    const openPluginsDir = useCallback(async (pluginPath?: string) => {
-        await api.plugins.openDirectory(pluginPath);
-    }, []);
-
-    const activePlugins = plugins.filter((p) => p.valid && p.enabled);
-
-    const toolsPagePlugins = activePlugins.filter((p) =>
-        p.contributions.some((c) => c.slot === 'tools-page'),
-    );
-
-    const toolsTabPlugins = activePlugins.filter((p) =>
-        p.contributions.some((c) => c.slot === 'tools-tab'),
-    );
-
-    const visualizerOverlayPlugins = activePlugins.filter((p) =>
-        p.contributions.some((c) => c.slot === 'visualizer-overlay'),
-    );
+    const state = useSyncExternalStore(subscribe, getSnapshot);
 
     return {
-        plugins,
-        pluginsDir,
-        loading,
-        error,
+        plugins: state.plugins,
+        pluginsDir: state.pluginsDir,
+        loading: state.loading,
+        error: state.error,
         refresh,
         setEnabled,
         openPluginsDir,
-        activePlugins,
-        toolsPagePlugins,
-        toolsTabPlugins,
-        visualizerOverlayPlugins,
+        activePlugins: state.activePlugins,
+        toolsPagePlugins: state.toolsPagePlugins,
+        toolsTabPlugins: state.toolsTabPlugins,
+        visualizerOverlayPlugins: state.visualizerOverlayPlugins,
     };
 };

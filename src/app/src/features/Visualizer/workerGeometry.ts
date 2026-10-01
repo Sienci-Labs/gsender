@@ -21,28 +21,47 @@
  *
  */
 
-import type { WorkerGeometryData } from '@sienci/gviewer/viewer';
+import type { WorkerSegmentsData } from '@sienci/gviewer/viewer';
 
 /**
  * Prepare a raw `geometryReady` payload for gviewer.
  *
- * gviewer keeps the worker's baked per-tool palette only when `toolchangeCount`
- * is greater than zero — otherwise it drops the per-vertex colours and draws
- * every cut in the theme's single cutting colour:
- *
- *     const hasToolchangeColors = (data.toolchangeCount ?? 0) > 0;
- *     cuts: [{ ..., colors: hasToolchangeColors ? cut.colors : undefined }]
- *
- * The worker reports the toolchange vertex boundaries as `info.toolchanges`, but
- * nothing sets the count on the payload itself, so any viewer handed the raw
+ * gviewer colours cuts by the worker's per-tool palette (`paletteHex`) only when
+ * `toolchangeCount` is greater than zero — otherwise every cut takes the theme's
+ * single cutting colour. The worker reports the toolchanges as `info.toolchanges`,
+ * but nothing sets the count on the payload itself, so any viewer handed the raw
  * message loses the tool colours. Every consumer must go through here.
  */
 export function augmentWorkerGeometry(
-    data: WorkerGeometryData,
-): WorkerGeometryData {
+    data: WorkerSegmentsData,
+): WorkerSegmentsData {
     const raw = data as unknown as { info?: { toolchanges?: unknown } };
     const toolchangeCount = Array.isArray(raw.info?.toolchanges)
         ? raw.info.toolchanges.length
         : 0;
     return { ...data, toolchangeCount };
+}
+
+/** Whether a payload is worker toolpath geometry gviewer can load. */
+export function isWorkerSegments(data: unknown): data is WorkerSegmentsData {
+    return (
+        !!data &&
+        typeof data === 'object' &&
+        (data as { format?: unknown }).format === 'segments-v1'
+    );
+}
+
+/**
+ * Views over the toolpath's vertex positions (x, y, z per vertex, one array
+ * per chunk). No copy is made.
+ */
+export function toolpathPositionChunks(
+    data: WorkerSegmentsData | null,
+): Float32Array[] {
+    if (!data) {
+        return [];
+    }
+    return data.chunks.map(
+        (chunk) => new Float32Array(chunk.positions, 0, chunk.vertexCount * 3),
+    );
 }

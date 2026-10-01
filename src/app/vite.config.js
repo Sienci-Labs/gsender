@@ -72,7 +72,11 @@ export default defineConfig({
         },
     },
     optimizeDeps: {
-        include: ['**/*.styl', 'buffer', '@react-pdf/renderer'],
+        // concaveman is imported only by Outline.worker. The startup dependency
+        // scan doesn't follow `new Worker(new URL(...))`, so without this it is
+        // discovered when the worker first loads, Vite re-optimizes mid-session,
+        // and the worker's import of it fails (outline then times out).
+        include: ['**/*.styl', 'buffer', '@react-pdf/renderer', 'concaveman'],
     },
     build: {
         sourcemap: true,

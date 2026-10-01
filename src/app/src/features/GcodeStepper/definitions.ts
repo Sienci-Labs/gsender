@@ -56,12 +56,11 @@ export interface LineModalState {
 export interface LinePositionIndex {
     positions: Float32Array;
     /**
-     * Index into the visualize worker's `frames` array for each 0-based line —
-     * which is what gviewer's `hideUntilLine` counts in when geometry was loaded
-     * with `loadFromWorkerData`, since the worker only emits a frame for lines
-     * that reach GCodeVirtualizer's per-line callback.
+     * Running count of the server Sender's lines (non-blank lines) through each
+     * 0-based line. The worker's toolpath is indexed by Sender line, so this is
+     * what maps a raw line number onto gviewer's `hideUntilLine` / `lineGroups`.
      */
-    frameForLine: Int32Array;
+    senderLineCounts: Int32Array;
     /**
      * Distinct modal-group combinations seen in the file, in first-seen order.
      *

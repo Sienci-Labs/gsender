@@ -26,7 +26,7 @@ import { buildToolArray } from 'app/features/ATC/components/ToolTimeline';
 import { G1_PART } from 'app/features/Visualizer/constants';
 import { getVisualizerTheme } from 'app/lib/getVisualizerTheme';
 import type { LinePositionIndex, StepperTool } from '../definitions';
-import { frameAtLine } from './linePositionIndex';
+import { senderLineCountAt } from './linePositionIndex';
 
 const MM_PER_INCH = 25.4;
 
@@ -173,14 +173,14 @@ export function buildStepperTools(
 }
 
 /**
- * Converts each tool's line span into the frame ranges gviewer hides by.
+ * Converts each tool's line span into the line ranges gviewer hides by.
  *
- * The two are not the same coordinate: the visualize worker emits a frame per
- * line it actually parses, skipping comment-only lines, so a tool's 1-based
- * line span drifts from its frame span by however many comments precede it.
- * `frameForLine` (via `frameAtLine`) is the running frame *count* through a
- * line, so the first frame of a tool is the count reached by the line before
- * it, and its last is one below the count reached by its own final line.
+ * The two are not the same coordinate: the toolpath is indexed by the server
+ * Sender's lines, which skip blank lines, so a tool's 1-based line span drifts
+ * from its Sender span by however many blank lines precede it.
+ * `senderLineCountAt` is the running Sender line *count* through a line, so a
+ * tool's first Sender line is the count reached by the line before it, and its
+ * last is one below the count reached by its own final line.
  *
  * Returns undefined when there is nothing to group, so the viewer loads the
  * toolpath as a single pair of streams exactly as it did before.
@@ -193,8 +193,11 @@ export function buildToolFrameGroups(
         return undefined;
     }
     return tools.map((tool) => ({
-        start: tool.startLine <= 1 ? 0 : frameAtLine(index, tool.startLine - 1),
-        end: frameAtLine(index, tool.endLine) - 1,
+        start:
+            tool.startLine <= 1
+                ? 0
+                : senderLineCountAt(index, tool.startLine - 1),
+        end: senderLineCountAt(index, tool.endLine) - 1,
     }));
 }
 

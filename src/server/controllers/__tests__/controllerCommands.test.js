@@ -75,7 +75,7 @@ describe.each(FIRMWARES)("%s command dispatch", (firmware, Controller) => {
 		["spindleOverride", 250, Array(13).fill(0x9a)],
 	])("%s %i queues ordered override bytes", async (command, value, bytes) => {
 		c.state.status.ov = [100, 100, 100];
-		c.sender.setEstimatedTime(112);
+		c.sender.setEstimateData({ lineTime: [112], estimatedTime: 112 });
 		c.command(command, value);
 		expect(f.immediateWrites()).toEqual([]);
 		await jest.advanceTimersByTimeAsync(1000);
@@ -270,8 +270,13 @@ describe.each(FIRMWARES)("%s command dispatch", (firmware, Controller) => {
 	});
 
 	test("updateEstimateData updates the real Sender estimates", () => {
-		c.command("updateEstimateData", { estimates: [1, 2], estimatedTime: 3 });
-		expect(c.sender.state.estimateData).toEqual([1, 2]);
+		c.command("updateEstimateData", {
+			lineTime: new Float32Array([1, 2]).buffer,
+			lineKind: new Uint8Array([1, 2]).buffer,
+			estimatedTime: 3,
+		});
+		expect(Array.from(c.sender.lineTime)).toEqual([1, 2]);
+		expect(Array.from(c.sender.lineKind)).toEqual([1, 2]);
 		expect(c.sender.state.estimatedTime).toBe(3);
 		expect(c.sender.state.remainingTime).toBe(3);
 	});

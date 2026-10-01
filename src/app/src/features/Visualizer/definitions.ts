@@ -122,6 +122,7 @@ export interface State {
     disabled: boolean;
     disabledLite: boolean;
     liteMode: boolean;
+    liteOption: LIGHTWEIGHT_OPTIONS_T;
     minimizeRenders: boolean;
     projection: 'perspective' | 'orthographic';
     objects: {

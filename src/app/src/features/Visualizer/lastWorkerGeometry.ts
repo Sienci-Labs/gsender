@@ -21,7 +21,7 @@
  *
  */
 
-import type { WorkerGeometryData } from '@sienci/gviewer/viewer';
+import type { WorkerSegmentsData } from '@sienci/gviewer/viewer';
 import pubsub from 'pubsub-js';
 
 /**
@@ -37,15 +37,15 @@ import pubsub from 'pubsub-js';
  * builds read-only views over them, so handing the same payload to a second
  * viewer is safe.
  */
-let lastWorkerGeometry: WorkerGeometryData | null = null;
+let lastWorkerGeometry: WorkerSegmentsData | null = null;
 
 export const setLastWorkerGeometry = (
-    data: WorkerGeometryData | null,
+    data: WorkerSegmentsData | null,
 ): void => {
     lastWorkerGeometry = data;
 };
 
-export const getLastWorkerGeometry = (): WorkerGeometryData | null =>
+export const getLastWorkerGeometry = (): WorkerSegmentsData | null =>
     lastWorkerGeometry;
 
 pubsub.subscribe('gcode:unload', () => setLastWorkerGeometry(null));

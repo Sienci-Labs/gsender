@@ -24,6 +24,7 @@ Then restart gSender.
 | `storage-test/` | Plain JS + Vite | Namespaced plugin storage — buttons for every `storage.*` method (get/set/delete/getAll/setAll/clear), for QA |
 | `parser-demo/` | Plain JS + Vite | Firmware response parsers — manifest line/block parsers, runtime `registerParser`, `onLine`, `machine.query`, plus a command sender to drive them |
 | `controller-events-demo/` | React + TypeScript + Vite | `machine.addListener` — a live log of controller events (job start/stop, connection, etc.), plus Start/Stop buttons (`gcode.loadToVisualizer` + `machine.command`) to trigger a test job without leaving the page |
+| `tools-tab-monitor/` | React + TypeScript + Vite | QA-only, no SDK calls — the only example with a `tools-tab` contribution. A mount counter (in `localStorage`, survives real reloads), a text box, and a live clock/log (plain React state, wiped by a remount), for manually verifying the Carve Tools-widget doesn't tear down and rebuild plugin tabs on unrelated re-renders |
 
 Each folder must contain `gsender-plugin.json` and a `ui/` directory with the built SPA entry file.
 

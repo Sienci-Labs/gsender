@@ -2,6 +2,7 @@ import { VISUALIZER_PRIMARY } from 'app/constants';
 import type { BBox } from 'app/definitions/general';
 import controller from 'app/lib/controller';
 import { isLaserMode } from 'app/lib/laserMode';
+import { getEstimatorConfig } from 'app/lib/timeEstimator/getEstimatorConfig';
 import store from 'app/store';
 import { store as reduxStore } from 'app/store/redux';
 import {
@@ -33,15 +34,15 @@ type VisualizeWorkerGeometryMessage = {
     type: 'geometryReady';
     jobId: number;
     visualizer?: string;
-    vertices: ArrayBuffer;
-    paths: unknown[];
-    frames: ArrayBuffer;
-    verticesLen: number;
-    framesLen: number;
-    colorArrayBuffer: ArrayBuffer;
-    colorLen: number;
-    savedColorsBuffer: ArrayBuffer;
-    savedColorLen: number;
+    format: 'segments-v1';
+    chunks: {
+        positions: ArrayBuffer;
+        attrs: ArrayBuffer;
+        power?: ArrayBuffer;
+        vertexCount: number;
+    }[];
+    totalVertices: number;
+    prefixEndVertex: ArrayBuffer;
     info: {
         fileModal: string;
         total: number;
@@ -61,8 +62,6 @@ type VisualizeWorkerGeometryMessage = {
         info: unknown;
         invalidLines: string[];
     };
-    spindleFrameSpeeds?: ArrayBuffer;
-    spindleFrameLen?: number;
     isLaser?: boolean;
     isSecondary?: boolean;
     activeVisualizer?: string;
@@ -204,37 +203,10 @@ const createVisualizeWorker = () =>
 const buildWorkerRequest = (payload: GcodeLoadPayload, jobId: number) => {
     const reduxState = reduxStore.getState();
     const isLaser = isLaserMode();
-    const accelerations = {
-        xAccel: _get(reduxState, 'controller.settings.settings.$120'),
-        yAccel: _get(reduxState, 'controller.settings.settings.$121'),
-        zAccel: _get(reduxState, 'controller.settings.settings.$122'),
-        aAccel: _get(reduxState, 'controller.settings.settings.$123'),
-    };
-    const maxFeedrates = {
-        xMaxFeed: Number(
-            _get(reduxState, 'controller.settings.settings.$110', 4000.0),
-        ),
-        yMaxFeed: Number(
-            _get(reduxState, 'controller.settings.settings.$111', 4000.0),
-        ),
-        zMaxFeed: Number(
-            _get(reduxState, 'controller.settings.settings.$112', 3000.0),
-        ),
-        aMaxFeed: Number(
-            _get(reduxState, 'controller.settings.settings.$113', 3000.0),
-        ),
-    };
     const rotaryDiameterOffsetEnabled = store.get(
         'widgets.visualizer.rotaryDiameterOffsetEnabled',
         false,
     );
-    const atcFlag: string = _get(
-        reduxState,
-        'controller.settings.info.NEWOPT.ATC',
-        '0',
-    );
-    const atcEnabled = atcFlag === '1';
-
     const previousFile = _get(reduxState, 'file', {});
     const isNewFile = !(
         payload.content === previousFile.content &&
@@ -250,15 +222,12 @@ const buildWorkerRequest = (payload: GcodeLoadPayload, jobId: number) => {
         isSecondary: false,
         isLaser,
         rapidOpacity: PENDANT_RAPID_OPACITY,
-        shouldIncludeSVG: false,
         needsVisualization: true,
         // Top-down SVG mode: worker streams deduplicated 2D segment groups and
         // skips the 3D vertex/color/frame buffers entirely.
         svgOnly: true,
         isNewFile,
-        accelerations,
-        maxFeedrates,
-        atcEnabled,
+        estimatorConfig: getEstimatorConfig(),
         rotaryDiameterOffsetEnabled,
         theme: getPendantWorkerTheme(),
     };
