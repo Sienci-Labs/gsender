@@ -42,6 +42,10 @@ log "- installed; native libs extracted: \`$(sh_dev "ls -l $LIBDIR/*/ 2>/dev/nul
 EXTRACT_MS=null
 READY=()
 PAGE=()
+# Per-phase timings (ms since onCreate unless noted), one entry per launch
+WEBVIEW=()  # WebView constructed
+SPAWN=()    # Node process started
+NODEMS=()   # Node's own time to ready (since its process start)
 for i in $(seq 1 "$RUNS"); do
     sh_dev "am force-stop $PKG" > /dev/null
     timeout 10 adb logcat -c
@@ -54,8 +58,10 @@ for i in $(seq 1 "$RUNS"); do
         sleep 0.5
     done
     r=$(field '^READY' t); p=$(field '^PAGE_FINISHED' t); e=$(field '^EXTRACT ms' ms)
+    w=$(field '^WEBVIEW_CREATED' t); s=$(field '^SPAWNED' t); n=$(field '^READY' ms)
     [ -n "$e" ] && EXTRACT_MS=$e
-    log "- launch $i: $state; extract ${e:-skipped} ms, Node ready at ${r:-?} ms, page loaded at ${p:-?} ms (since onCreate)"
+    log "- launch $i: $state; extract ${e:-skipped} ms; WebView built at ${w:-?}, Node spawned at ${s:-?}, Node ready at ${r:-?} (Node's own ${n:-?} ms), page loaded at ${p:-?} ms since onCreate"
+    WEBVIEW+=("$w"); SPAWN+=("$s"); NODEMS+=("$n")
     if [ "$state" != ok ]; then
         FAIL=1
         log '  ```'
@@ -89,7 +95,7 @@ sh_dev "am force-stop $PKG" > /dev/null
 first() { echo "${1:-null}"; }
 min_warm() { local v; v=$(printf '%s\n' "${@:2}" | sed '/^$/d' | sort -n | head -1); echo "${v:-null}"; }
 cat > "$JSON" <<EOF
-{"label":"$LABEL","apk_bytes":$(stat -c %s "$APK"),"extract_ms":$EXTRACT_MS,"first_ready_ms":$(first "${READY[0]:-}"),"warm_ready_ms":$(min_warm "${READY[@]}"),"first_page_ms":$(first "${PAGE[0]:-}"),"warm_page_ms":$(min_warm "${PAGE[@]}"),"untrusted_app":$(case "$PSLINE" in *untrusted_app*) echo true;; *) echo false;; esac),"http_ok":$([ "$API$PENDANT" = "200200" ] && echo true || echo false),"web_errors":$WEB_ERRORS,"fail":$FAIL}
+{"label":"$LABEL","apk_bytes":$(stat -c %s "$APK"),"extract_ms":$EXTRACT_MS,"first_ready_ms":$(first "${READY[0]:-}"),"warm_ready_ms":$(min_warm "${READY[@]}"),"first_page_ms":$(first "${PAGE[0]:-}"),"warm_page_ms":$(min_warm "${PAGE[@]}"),"warm_webview_ms":$(min_warm "${WEBVIEW[@]}"),"warm_spawn_ms":$(min_warm "${SPAWN[@]}"),"first_node_ms":$(first "${NODEMS[0]:-}"),"warm_node_ms":$(min_warm "${NODEMS[@]}"),"untrusted_app":$(case "$PSLINE" in *untrusted_app*) echo true;; *) echo false;; esac),"http_ok":$([ "$API$PENDANT" = "200200" ] && echo true || echo false),"web_errors":$WEB_ERRORS,"fail":$FAIL}
 EOF
 log ""
 log "Result: $([ $FAIL -eq 0 ] && echo PASS || echo FAIL)"

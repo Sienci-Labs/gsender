@@ -27,6 +27,11 @@ class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Start Node before building the WebView: the first WebView in a process
+        // loads Chromium (hundreds of ms on the main thread), and Node's startup
+        // should overlap that instead of waiting behind it. READY's loadUrl is
+        // posted to the main looper, so it always runs after onCreate returns.
+        Thread(::runNode, "s1-node").start()
         web = WebView(this).apply {
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
@@ -43,8 +48,7 @@ class MainActivity : Activity() {
             }
         }
         setContentView(web)
-        log("CREATED")
-        Thread(::runNode, "s1-node").start()
+        log("WEBVIEW_CREATED")
     }
 
     override fun onDestroy() {
