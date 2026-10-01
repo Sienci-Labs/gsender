@@ -717,6 +717,9 @@ export const commit = (sessionId) => {
 		}
 		sessions.delete(sessionId);
 		rmrf(stagingDir);
+		// The plugin dir moved at least once above even though the install
+		// failed, so a cached discovery result from before this call is stale.
+		registry.invalidatePluginCache();
 		return fail(installLog, `Install failed: ${err.message}`, {
 			restored,
 			backupDir: backedUp && !restored ? backupDir : null,
@@ -728,6 +731,7 @@ export const commit = (sessionId) => {
 	}
 	rmrf(stagingDir);
 	sessions.delete(sessionId);
+	registry.invalidatePluginCache();
 
 	installLog.info("Done - restart gSender to load the plugin");
 

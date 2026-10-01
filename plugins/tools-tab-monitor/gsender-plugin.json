@@ -1,0 +1,17 @@
+{
+  "id": "com.sienci.tools-tab-monitor",
+  "name": "Tools Tab Monitor",
+  "description": "Manual test aid for the Carve Tools-widget tab render fix: a mount counter, a text box, and a live clock that should all stay put while you switch tabs or navigate elsewhere.",
+  "version": "0.1.0",
+  "engine": ">=1.6.0",
+  "ui": {
+    "entry": "ui/index.html",
+    "contributions": [
+      {
+        "slot": "tools-tab",
+        "label": "Remount Check"
+      }
+    ]
+  },
+  "capabilities": {}
+}
