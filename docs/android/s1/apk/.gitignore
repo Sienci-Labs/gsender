@@ -1,0 +1,9 @@
+# Filled in by CI from the S1 build artifacts
+app/src/main/jniLibs/
+app/src/main/assets/
+# Gradle
+.gradle/
+build/
+app/build/
+local.properties
+.kotlin/

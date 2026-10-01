@@ -58,7 +58,33 @@ These are part of what E1 would cost us to maintain. Each is applied in the work
 | v24.21.0 | both | host `mksnapshot` link fails with `undefined reference to v8::internal::trap_handler::TryHandleSignal` / `RegisterDefaultTrapHandler` | `deps/v8/src/trap-handler/trap-handler.h`: replace the platform block with `#define V8_TRAP_HANDLER_SUPPORTED false` (nodejs/node#36287). Node ships `android-patches/trap-handler.h.patch` for this, but its context is stale for Node 24's V8, and `android_configure.py patch` ignores the failure. The workflow therefore patches the header directly and fails if the edit didn't apply. This only affects WebAssembly bounds checking, and the handler is already off on Android. |
 | v24.21.0 | arm64 | `ld.lld: error: undefined symbol: android_getCpuFeatures` (zlib `cpu_features.c`) | `deps/zlib/zlib.gyp`: define `ARMV8_OS_LINUX` in place of `ARMV8_OS_ANDROID`. zlib then detects CRC32/PMULL through `getauxval(AT_HWCAP)` (bionic, API 18+) and no longer needs the NDK's deprecated cpufeatures library. |
 
+## Step 3: the installed app (`apk/`, `apk-smoke.sh`)
+A minimal Kotlin app with no dependencies: one `Activity`, one `WebView`, no AndroidX. It answers the one question the shell-user tests can't: **can an installed app run Node from its `nativeLibraryDir` under Android 10+ W^X rules?**
+
+**What the APK contains** (CI fills `jniLibs/` and `assets/`, both gitignored):
+- **Node:** `jniLibs/<abi>/libnode_exec.so`, plus `libc++_shared.so`. Packaged with `useLegacyPackaging = true`, so Android extracts them to `nativeLibraryDir` on install.
+- **Payload:** `assets/payload/` holds the server bundle and pendant, minus source maps.
+
+**On launch,** `MainActivity`:
+1. Copies the payload to `filesDir` once per install, and times the copy.
+2. Starts `libnode_exec.so server/server.js` with `ProcessBuilder`.
+3. Logs Node's output under the logcat tag `S1APK-node`.
+4. Loads `http://127.0.0.1:8123/pendant/` when `S1_READY` appears.
+
+The app sets `HOME`, `GSENDER_USER_DATA`, `TMPDIR` and `NODE_COMPILE_CACHE` to app-private directories. Cleartext HTTP is allowed only to `127.0.0.1` and `localhost`.
+
+**`apk-smoke.sh`** installs the APK and launches it three times: first launch (with extraction), then two warm launches. It records:
+- the extraction time, the time until Node is ready, and the time until the page loads
+- the Node process's SELinux label, which must be `untrusted_app` (the normal app sandbox)
+- HTTP checks through `adb forward`
+- the pendant's console errors
+
+**Building locally** needs the Android SDK, JDK 17 and Gradle 8.11.1. Fill `jniLibs/` and `assets/payload/` the way the workflow's *Stage native libs and payload* step does, then run `gradle -p docs/android/s1/apk assembleDebug`.
+
+**Known risk this doesn't test yet:**
+- **Android 12+ phantom process killer.** Android limits child processes across all apps (32 by default), and kills ones that use excessive CPU while their app is in the background. A foreground service keeps the app out of the background state. Before E1 can be trusted for a long job, the real shell needs a soak test with the service and the screen off.
+
 ## What this does *not* cover yet
-- **Running from inside an app.** The workflow runs the binary from `/data/local/tmp` as the shell user. Inside an app it must run from `nativeLibraryDir`, packaged as `libnode_exec.so`, because of Android 10+ W^X rules. Testing that needs a minimal APK (the Kotlin shell).
+- **Foreground service, wake locks and long jobs.** The APK runs Node from an `Activity`. The real shell would own it from a `connectedDevice` foreground service (see the phantom process note above).
 - **Real hardware timing.** Emulator timings come from KVM on x86_64. Measure arm64 startup on a target tablet.
 - **USB, serial and flashing.** All stubbed. Those are S3.
