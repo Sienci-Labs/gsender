@@ -22,7 +22,9 @@ OUT="$RESULTS/$LABEL.md"
 JSON="$RESULTS/$LABEL.json"
 FAIL=0
 
-sh_dev() { adb shell "$@" | tr -d '\r'; }
+# Every device command gets a deadline: a hung `adb shell` would otherwise sit
+# until the job's timeout and lose all results.
+sh_dev() { timeout 60 adb shell "$@" | tr -d '\r'; }
 log() { echo "$*" | tee -a "$OUT"; }
 
 adb wait-for-device
@@ -62,7 +64,10 @@ log "- \`node -e 0\` startup: median **${BARE_MED} ms** (runs: ${BARE[*]})"
 READY_MS=()
 for i in $(seq 1 "$RUNS"); do
     sh_dev "pkill -f server/server.js; rm -f $DEV/log.txt" > /dev/null 2>&1
-    sh_dev "cd $DEV && $ENV nohup ./node server/server.js -p $PORT -H 127.0.0.1 > $DEV/log.txt 2>&1 &" > /dev/null
+    # Fully detach the server: no PTY (-T), adb stdin closed (-n), and the
+    # server's stdin from /dev/null. Otherwise adb shell waits for the
+    # background process to exit, and the server never does.
+    timeout 20 adb shell -T -n "cd $DEV && $ENV nohup ./node server/server.js -p $PORT -H 127.0.0.1 < /dev/null > $DEV/log.txt 2>&1 &" > /dev/null
     READY=""
     for _ in $(seq 1 120); do
         READY=$(sh_dev "grep -m1 -E 'S1_READY|S1_FAILED' $DEV/log.txt 2>/dev/null")

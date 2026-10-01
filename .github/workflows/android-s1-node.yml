@@ -273,7 +273,12 @@ jobs:
           api-level: 35
           arch: x86_64
           target: ${{ matrix.target }}
-          disable-animations: true
+          # Animations don't matter here (no UI), and the post-boot
+          # `adb shell settings put` the action runs to disable them failed
+          # (adb exit 224) on the slower-booting 16 KB image.
+          disable-animations: false
+          ram-size: 4096M
+          emulator-boot-timeout: 900
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
           script: bash docs/android/s1/emulator-smoke.sh "${{ runner.temp }}/s1" ${{ matrix.label }} "${{ runner.temp }}/results"
 

@@ -42,6 +42,12 @@ It runs on pushes to `features/android` that touch the workflow or this folder.
 3. **smoke:** runs the x86_64 binary on an API 35 emulator twice: with 4 KB pages (`google_apis`) and with 16 KB pages (`google_apis_ps16k`).
 4. **report:** a pass/fail table against the exit criteria, written to the run summary.
 
+## Results so far
+| Date | Finding |
+|---|---|
+| 2026-10-01 | **Node v24.21.0 runs on Android.** x86_64 build, API 35 emulator with 4 KB pages: `node -p` → `v24.21.0 x64 android`. Bare `node -e 0` median is 213 ms (runs: 166, 213, 346, 117, 408). The x86_64 binary passes the 16 KB alignment check. |
+| 2026-10-01 | **Size is the next concern.** The stripped x86_64 `node` is 96 MB, and it needs `libc++_shared.so` (8.8 MB) alongside it. Options to try: `--with-intl=small-icu` (full ICU is roughly 25–30 MB of that), and linking libc++ statically. First check which `Intl` features the server and pendant use. |
+
 ## Build patches needed so far
 These are part of what E1 would cost us to maintain. Each is applied in the workflow's *Configure and build* step.
 
