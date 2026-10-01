@@ -161,7 +161,17 @@ jobs:
           export GYP_DEFINES="target_arch=$gyp_arch v8_target_arch=$gyp_arch android_target_arch=$gyp_arch host_os=linux OS=android android_ndk_path=$NDK"
           # 16 KB pages (Play requirement). NDK r28+ defaults to this; be explicit.
           export LDFLAGS="-Wl,-z,max-page-size=16384"
-          python3 android_configure.py patch
+          # V8 trap handler (nodejs/node#36287). GYP_DEFINES OS=android also applies
+          # to the host toolset, so host tools like mksnapshot are built without
+          # the Linux trap-handler sources but with a header that enables it:
+          # "undefined reference to trap_handler::TryHandleSignal". Node's own
+          # android-patches/trap-handler.h.patch has stale context for V8 in Node
+          # 24 and android_configure.py ignores the failed patch, so disable the
+          # handler directly and fail loudly if the header layout changes again.
+          # Only affects WebAssembly bounds checks, and it's already off on Android.
+          th=deps/v8/src/trap-handler/trap-handler.h
+          perl -0pi -e 's{// X64 on Linux, Windows, MacOS, FreeBSD\.\n.*?// Everything else is unsupported\.\n#else\n#define V8_TRAP_HANDLER_SUPPORTED false\n#endif\n}{// S1 android cross-compile: disabled for host and target toolsets alike\n// (nodejs/node#36287; android-patches/trap-handler.h.patch no longer applies).\n#define V8_TRAP_HANDLER_SUPPORTED false\n}s' "$th"
+          if grep -q 'V8_TRAP_HANDLER_SUPPORTED true' "$th"; then echo "::error::trap-handler.h patch did not apply"; exit 1; fi
           # zlib's ARM CPU detection on OS=android calls android_getCpuFeatures()
           # from the NDK's deprecated cpufeatures lib, which Node never builds
           # (ld.lld: undefined symbol: android_getCpuFeatures). Bionic has had

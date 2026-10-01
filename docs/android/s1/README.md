@@ -47,6 +47,7 @@ These are part of what E1 would cost us to maintain. Each is applied in the work
 
 | Node | Arch | Symptom | Patch |
 |---|---|---|---|
+| v24.21.0 | both | host `mksnapshot` link fails with `undefined reference to v8::internal::trap_handler::TryHandleSignal` / `RegisterDefaultTrapHandler` | `deps/v8/src/trap-handler/trap-handler.h`: replace the platform block with `#define V8_TRAP_HANDLER_SUPPORTED false` (nodejs/node#36287). Node ships `android-patches/trap-handler.h.patch` for this, but its context is stale for Node 24's V8, and `android_configure.py patch` ignores the failure. The workflow therefore patches the header directly and fails if the edit didn't apply. This only affects WebAssembly bounds checking, and the handler is already off on Android. |
 | v24.21.0 | arm64 | `ld.lld: error: undefined symbol: android_getCpuFeatures` (zlib `cpu_features.c`) | `deps/zlib/zlib.gyp`: define `ARMV8_OS_LINUX` in place of `ARMV8_OS_ANDROID`. zlib then detects CRC32/PMULL through `getauxval(AT_HWCAP)` (bionic, API 18+) and no longer needs the NDK's deprecated cpufeatures library. |
 
 ## What this does *not* cover yet
