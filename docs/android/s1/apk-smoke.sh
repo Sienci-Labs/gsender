@@ -46,10 +46,12 @@ PAGE=()
 WEBVIEW=()  # WebView constructed
 SPAWN=()    # Node process started
 NODEMS=()   # Node's own time to ready (since its process start)
-for i in $(seq 1 "$RUNS"); do
+# Cold-start the app (force-stop first) and wait for the pendant page or a
+# failure. Extra args go to `am start`. Sets $state to ok | failed | timeout.
+launch() {
     sh_dev "am force-stop $PKG" > /dev/null
     timeout 10 adb logcat -c
-    sh_dev "am start -W -n $PKG/.MainActivity" > /dev/null
+    sh_dev "am start -W -n $PKG/.MainActivity $*" > /dev/null
     state=timeout
     for _ in $(seq 1 180); do
         lines=$(s1log)
@@ -57,6 +59,36 @@ for i in $(seq 1 "$RUNS"); do
         if echo "$lines" | grep -q '^PAGE_FINISHED'; then state=ok; break; fi
         sleep 0.5
     done
+}
+
+# Why did a launch fail? Full evidence to a file; the key lines to the summary.
+# Distinguishes Node exiting (NODE_EXITED), an app crash (crash buffer / fatal
+# signal), the system killing the app (ActivityManager / lowmemorykiller), and ANRs.
+dump_failure() {
+    local f="$RESULTS/$LABEL-failure-$1.txt"
+    {
+        echo "== pidof $PKG: $(sh_dev "pidof $PKG")"
+        echo "== node processes:"; sh_dev "ps -A -o PID,PPID,RSS,NAME" | grep -E 'libnode_exec|PID'
+        echo "== crash buffer"; timeout 30 adb logcat -d -b crash | tr -d '\r'
+        echo "== S1APK*"; timeout 30 adb logcat -d -v time -s S1APK:I S1APK-node:I S1APK-web:I | tr -d '\r'
+        echo "== system (filtered)"
+        timeout 30 adb logcat -d -v time | tr -d '\r' | grep -E "$PKG|libnode|ActivityManager.*(Kill|kill|died|ANR|Process)|lowmemorykiller|lmkd|Fatal signal|F DEBUG|chromium.*(crash|FATAL)" | tail -80
+    } > "$f" 2>&1
+    log "  failure evidence (\`$(basename "$f")\`):"
+    log '  ```'
+    grep -E 'pidof|NODE_EXITED|EXEC_FAILED|Fatal signal|lowmemorykiller|lmkd|Kill|kill|died|ANR|FATAL|S1_' "$f" | tail -15 | cut -c1-220 | sed 's/^/  /' | tee -a "$OUT"
+    log '  ```'
+}
+
+FIRST_RETRIED=false
+for i in $(seq 1 "$RUNS"); do
+    launch
+    if [ "$i" = 1 ] && [ "$state" != ok ] && [ "$FIRST_RETRIED" = false ]; then
+        log "- launch 1 attempt 1: **$state**, retrying once"
+        dump_failure 1
+        FIRST_RETRIED=true
+        launch
+    fi
     r=$(field '^READY' t); p=$(field '^PAGE_FINISHED' t); e=$(field '^EXTRACT ms' ms)
     w=$(field '^WEBVIEW_CREATED' t); s=$(field '^SPAWNED' t); n=$(field '^READY' ms)
     [ -n "$e" ] && EXTRACT_MS=$e
@@ -64,14 +96,20 @@ for i in $(seq 1 "$RUNS"); do
     WEBVIEW+=("$w"); SPAWN+=("$s"); NODEMS+=("$n")
     if [ "$state" != ok ]; then
         FAIL=1
-        log '  ```'
-        s1log | tail -5 | sed 's/^/  /' | tee -a "$OUT" > /dev/null
-        timeout 30 adb logcat -d -v raw -s S1APK-node:I | tail -15 | tr -d '\r' | sed 's/^/  /' >> "$OUT"
-        log '  ```'
+        dump_failure "$i"
         break
     fi
     READY+=("$r"); PAGE+=("$p")
 done
+
+# Is the compile cache used inside the app? (NODE_DEBUG_NATIVE=COMPILE_CACHE
+# output from the last launch, plus what's on disk; run-as works on debug APKs.)
+CC_LINES=$(timeout 30 adb logcat -d -v raw -s S1APK-node:I | tr -d '\r' | grep -i 'compile.cache' | head -6)
+CC_DISK=$(sh_dev "run-as $PKG du -sk cache/node-compile-cache 2>/dev/null" | awk '$1 ~ /^[0-9]+$/ {print $1}')
+log "- compile cache on disk: ${CC_DISK:-?} KB; Node's cache log (last launch):"
+log '  ```'
+log "${CC_LINES:-  (no compile-cache lines)}"
+log '  ```'
 
 # Leave the last launch running for the checks below.
 EXEC_LINE=$(s1log | grep -m1 '^EXEC ')
@@ -90,12 +128,25 @@ WEB_ERRORS=$(timeout 30 adb logcat -d -v raw -s S1APK-web:I | grep -c '^ERROR')
 log "- pendant console errors in WebView: $WEB_ERRORS"
 
 timeout 30 adb logcat -d -v time -s S1APK:I S1APK-node:I S1APK-web:I > "$RESULTS/$LABEL-logcat.txt"
+
+# Contention check: same warm launch, but the WebView is only built once Node is
+# ready, so Node starts with no Chromium init competing for the CPUs.
+DEFER_NODE=(); DEFER_PAGE=()
+if [ $FAIL -eq 0 ]; then
+    for i in 1 2; do
+        launch --ez s1_defer_webview true
+        n=$(field '^READY' ms); r=$(field '^READY' t); p=$(field '^PAGE_FINISHED' t)
+        log "- deferred-WebView launch $i: $state; Node's own ${n:-?} ms, Node ready at ${r:-?}, page loaded at ${p:-?} ms since onCreate"
+        DEFER_NODE+=("$n"); DEFER_PAGE+=("$p")
+    done
+    timeout 30 adb logcat -d -v time -s S1APK:I S1APK-node:I S1APK-web:I > "$RESULTS/$LABEL-logcat-deferred.txt"
+fi
 sh_dev "am force-stop $PKG" > /dev/null
 
 first() { echo "${1:-null}"; }
 min_warm() { local v; v=$(printf '%s\n' "${@:2}" | sed '/^$/d' | sort -n | head -1); echo "${v:-null}"; }
 cat > "$JSON" <<EOF
-{"label":"$LABEL","apk_bytes":$(stat -c %s "$APK"),"extract_ms":$EXTRACT_MS,"first_ready_ms":$(first "${READY[0]:-}"),"warm_ready_ms":$(min_warm "${READY[@]}"),"first_page_ms":$(first "${PAGE[0]:-}"),"warm_page_ms":$(min_warm "${PAGE[@]}"),"warm_webview_ms":$(min_warm "${WEBVIEW[@]}"),"warm_spawn_ms":$(min_warm "${SPAWN[@]}"),"first_node_ms":$(first "${NODEMS[0]:-}"),"warm_node_ms":$(min_warm "${NODEMS[@]}"),"untrusted_app":$(case "$PSLINE" in *untrusted_app*) echo true;; *) echo false;; esac),"http_ok":$([ "$API$PENDANT" = "200200" ] && echo true || echo false),"web_errors":$WEB_ERRORS,"fail":$FAIL}
+{"label":"$LABEL","apk_bytes":$(stat -c %s "$APK"),"extract_ms":$EXTRACT_MS,"first_ready_ms":$(first "${READY[0]:-}"),"warm_ready_ms":$(min_warm "${READY[@]}"),"first_page_ms":$(first "${PAGE[0]:-}"),"warm_page_ms":$(min_warm "${PAGE[@]}"),"warm_webview_ms":$(min_warm "${WEBVIEW[@]}"),"warm_spawn_ms":$(min_warm "${SPAWN[@]}"),"first_node_ms":$(first "${NODEMS[0]:-}"),"warm_node_ms":$(min_warm "${NODEMS[@]}"),"deferred_node_ms":$(min_warm x "${DEFER_NODE[@]}"),"deferred_page_ms":$(min_warm x "${DEFER_PAGE[@]}"),"cc_disk_kb":${CC_DISK:-null},"first_launch_retried":$FIRST_RETRIED,"untrusted_app":$(case "$PSLINE" in *untrusted_app*) echo true;; *) echo false;; esac),"http_ok":$([ "$API$PENDANT" = "200200" ] && echo true || echo false),"web_errors":$WEB_ERRORS,"fail":$FAIL}
 EOF
 log ""
 log "Result: $([ $FAIL -eq 0 ] && echo PASS || echo FAIL)"

@@ -23,7 +23,7 @@ import java.io.IOException
 class MainActivity : Activity() {
     private val createdAt = SystemClock.elapsedRealtime()
     private var node: Process? = null
-    private lateinit var web: WebView
+    private var web: WebView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,7 +32,16 @@ class MainActivity : Activity() {
         // should overlap that instead of waiting behind it. READY's loadUrl is
         // posted to the main looper, so it always runs after onCreate returns.
         Thread(::runNode, "s1-node").start()
-        web = WebView(this).apply {
+        // Diagnostic (apk-smoke.sh): build the WebView only once Node is ready,
+        // to measure Node's in-app startup with nothing competing for CPU.
+        if (!intent.getBooleanExtra(EXTRA_DEFER_WEBVIEW, false)) createWebView()
+        else log("WEBVIEW_DEFERRED")
+    }
+
+    /** Build the WebView on first use (main thread only). */
+    private fun createWebView(): WebView {
+        web?.let { return it }
+        val view = WebView(this).apply {
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
             webViewClient = object : WebViewClient() {
@@ -47,8 +56,10 @@ class MainActivity : Activity() {
                 }
             }
         }
-        setContentView(web)
+        web = view
+        setContentView(view)
         log("WEBVIEW_CREATED")
+        return view
     }
 
     override fun onDestroy() {
@@ -73,6 +84,8 @@ class MainActivity : Activity() {
             put("TMPDIR", cacheDir.path)
             put("LD_LIBRARY_PATH", applicationInfo.nativeLibraryDir)
             put("NODE_COMPILE_CACHE", File(cacheDir, "node-compile-cache").path)
+            // Spike diagnostic: Node logs compile-cache reads/writes to stderr.
+            put("NODE_DEBUG_NATIVE", "COMPILE_CACHE")
         }
 
         val p = try {
@@ -88,7 +101,7 @@ class MainActivity : Activity() {
             Log.i("$TAG-node", line)
             if (line.startsWith("S1_READY")) {
                 log("READY $line")
-                runOnUiThread { web.loadUrl("http://127.0.0.1:$PORT/pendant/") }
+                runOnUiThread { createWebView().loadUrl("http://127.0.0.1:$PORT/pendant/") }
             }
         }
         log("NODE_EXITED code=${p.waitFor()}")
@@ -128,5 +141,6 @@ class MainActivity : Activity() {
     companion object {
         private const val TAG = "S1APK"
         private const val PORT = 8123
+        private const val EXTRA_DEFER_WEBVIEW = "s1_defer_webview"
     }
 }
