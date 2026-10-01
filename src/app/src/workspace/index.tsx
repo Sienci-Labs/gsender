@@ -73,9 +73,9 @@ const Workspace = () => {
                 'homing',
             ].includes(command);
             const isInAlarmState = activeState === GRBL_ACTIVE_STATE_ALARM;
-            const commandIsValidForToolState = ["toolchange:acknowledge"].includes(
-                command,
-            );
+            const commandIsValidForToolState = [
+                'toolchange:acknowledge',
+            ].includes(command);
             const isInToolState = activeState === GRBL_ACTIVE_STATE_TOOL;
 
             // feedhold, cyclestart, homing, unlock, reset, tool

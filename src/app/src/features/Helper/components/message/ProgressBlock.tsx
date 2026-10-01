@@ -29,10 +29,16 @@ export function ProgressBlock({ kind, progress }: Props) {
                 aria-valuemin={0}
                 aria-valuemax={max}
                 aria-valuenow={value}
-                className={cx('h-2 w-full overflow-hidden rounded-full', neutral.track)}
+                className={cx(
+                    'h-2 w-full overflow-hidden rounded-full',
+                    neutral.track,
+                )}
             >
                 <div
-                    className={cx('h-full rounded-full', severity({ kind }).bar())}
+                    className={cx(
+                        'h-full rounded-full',
+                        severity({ kind }).bar(),
+                    )}
                     style={{ width: `${percent}%` }}
                 />
             </div>

@@ -88,8 +88,13 @@ export function ResourceBlock({ resource, variant, className }: Props) {
             >
                 {qr && (
                     <div className="flex flex-col items-center gap-2">
-                        <QrTile url={url} className="w-[156px] short:w-[120px]" />
-                        <span className={cx('text-center text-xs', neutral.muted)}>
+                        <QrTile
+                            url={url}
+                            className="w-[156px] short:w-[120px]"
+                        />
+                        <span
+                            className={cx('text-center text-xs', neutral.muted)}
+                        >
                             Scan to open on your phone
                         </span>
                     </div>

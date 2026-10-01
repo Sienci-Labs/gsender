@@ -67,7 +67,13 @@ const CONTENT_ANIMATION =
 
 const FOOTER_BUTTON = 'min-h-11 px-6 text-base font-bold';
 
-function Summary({ children, className }: { children: ReactNode; className: string }) {
+function Summary({
+    children,
+    className,
+}: {
+    children: ReactNode;
+    className: string;
+}) {
     return (
         <DialogPrimitive.Description asChild>
             <div className={cx(neutral.body, className)}>{children}</div>
@@ -200,8 +206,7 @@ const HelperInfo = ({ payload, infoVisible, onClose }: Props) => {
                                 className="landscape:hidden"
                             />
                         )}
-                        {(payload.secondaryAction ||
-                            payload.primaryAction) && (
+                        {(payload.secondaryAction || payload.primaryAction) && (
                             <div className="flex flex-wrap items-center justify-end gap-3 pt-1">
                                 {payload.secondaryAction && (
                                     <Button

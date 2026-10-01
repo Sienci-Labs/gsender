@@ -70,9 +70,11 @@ const lookupRegistry = (
     const controllerKey = context.controllerType
         ? `${context.controllerType.toLowerCase()}:${key}`
         : null;
-    return (controllerKey && HELPER_REGISTRY[controllerKey]) ||
+    return (
+        (controllerKey && HELPER_REGISTRY[controllerKey]) ||
         HELPER_REGISTRY[key] ||
-        {};
+        {}
+    );
 };
 
 const withResourceDefaults = (

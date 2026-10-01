@@ -1399,7 +1399,10 @@ class GCodeVirtualizer extends EventEmitter {
         }
 
         // Before setPosition: estimateLinear measures from this.position
-        this.estimateLinear(target, motion === 'G0' ? MOTION_RAPID : MOTION_FEED);
+        this.estimateLinear(
+            target,
+            motion === 'G0' ? MOTION_RAPID : MOTION_FEED,
+        );
         this.updateBounds(target);
         this.setPosition(target.x, target.y, target.z, target.a);
     }
