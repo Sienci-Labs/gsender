@@ -60,26 +60,43 @@ done
 BARE_MED=$(printf '%s\n' "${BARE[@]}" | sort -n | sed -n 3p)
 log "- \`node -e 0\` startup: median **${BARE_MED} ms** (runs: ${BARE[*]})"
 
-# Server startup: run 1 is a cold first launch (creates rc files), runs 2..N are warm.
-READY_MS=()
-for i in $(seq 1 "$RUNS"); do
-    sh_dev "pkill -f server/server.js; rm -f $DEV/log.txt" > /dev/null 2>&1
-    # Fully detach the server: no PTY (-T), adb stdin closed (-n), and the
-    # server's stdin from /dev/null. Otherwise adb shell waits for the
-    # background process to exit, and the server never does.
-    timeout 20 adb shell -T -n "cd $DEV && $ENV nohup ./node server/server.js -p $PORT -H 127.0.0.1 < /dev/null > $DEV/log.txt 2>&1 &" > /dev/null
-    READY=""
-    for _ in $(seq 1 120); do
-        READY=$(sh_dev "grep -m1 -E 'S1_READY|S1_FAILED' $DEV/log.txt 2>/dev/null")
-        [ -n "$READY" ] && break
-        sleep 0.5
+# Server startup series. Run 1 is a cold first launch (creates rc files, and
+# populates the compile cache when one is set); runs 2..N are warm.
+#   run_series <name> <extra env>   → fills READY_MS
+run_series() {
+    local name="$1" extra="$2"
+    READY_MS=()
+    for i in $(seq 1 "$RUNS"); do
+        sh_dev "pkill -f server/server.js; rm -f $DEV/log.txt" > /dev/null 2>&1
+        # Fully detach the server: no PTY (-T), adb stdin closed (-n), and the
+        # server's stdin from /dev/null. Otherwise adb shell waits for the
+        # background process to exit, and the server never does.
+        timeout 20 adb shell -T -n "cd $DEV && $ENV $extra nohup ./node server/server.js -p $PORT -H 127.0.0.1 < /dev/null > $DEV/log.txt 2>&1 &" > /dev/null
+        READY=""
+        for _ in $(seq 1 120); do
+            READY=$(sh_dev "grep -m1 -E 'S1_READY|S1_FAILED' $DEV/log.txt 2>/dev/null")
+            [ -n "$READY" ] && break
+            sleep 0.5
+        done
+        log "- $name run $i: \`${READY:-timed out after 60 s}\`"
+        case "$READY" in
+            S1_READY*) READY_MS+=("$(echo "$READY" | sed -E 's/.*ms=([0-9]+).*/\1/')") ;;
+            *) FAIL=1 ;;
+        esac
     done
-    log "- server run $i: \`${READY:-timed out after 60 s}\`"
-    case "$READY" in
-        S1_READY*) READY_MS+=("$(echo "$READY" | sed -E 's/.*ms=([0-9]+).*/\1/')") ;;
-        *) FAIL=1 ;;
-    esac
-done
+}
+
+run_series "server" ""
+COLD=${READY_MS[0]:-null}
+WARM=$(printf '%s\n' "${READY_MS[@]:1}" | sort -n | head -1)
+
+# Same again with V8's on-disk compile cache (Node 22+), as the app would run it.
+sh_dev "rm -rf $DEV/home/compile-cache" > /dev/null
+run_series "server + compile cache" "NODE_COMPILE_CACHE=$DEV/home/compile-cache"
+CC_FIRST=${READY_MS[0]:-null}
+CC_WARM=$(printf '%s\n' "${READY_MS[@]:1}" | sort -n | head -1)
+CC_BYTES=$(sh_dev "du -sk $DEV/home/compile-cache 2>/dev/null" | awk '{print $1 * 1024}')
+log "- compile cache on disk: $(( ${CC_BYTES:-0} / 1024 )) KB"
 
 # HTTP checks against the last (still running) server.
 adb forward tcp:$PORT tcp:$PORT > /dev/null
@@ -99,10 +116,8 @@ log "- lines mentioning 'error' in server log: $ERRORS"
 adb pull "$DEV/log.txt" "$RESULTS/$LABEL-server.log" > /dev/null 2>&1
 sh_dev "pkill -f server/server.js" > /dev/null 2>&1
 
-COLD=${READY_MS[0]:-null}
-WARM=$(printf '%s\n' "${READY_MS[@]:1}" | sort -n | head -1)
 cat > "$JSON" <<EOF
-{"label":"$LABEL","api":"$SDK","abi":"$ABI","page_size":"$PAGE","node":"$VERSION","bare_ms":${BARE_MED:-null},"cold_ready_ms":$COLD,"warm_ready_ms":${WARM:-null},"http_ok":$([ "$API$PENDANT$SOCK$ASSET_CODE" = "200200200200" ] && echo true || echo false),"fail":$FAIL}
+{"label":"$LABEL","api":"$SDK","abi":"$ABI","page_size":"$PAGE","node":"$VERSION","bare_ms":${BARE_MED:-null},"cold_ready_ms":$COLD,"warm_ready_ms":${WARM:-null},"cc_first_ready_ms":$CC_FIRST,"cc_warm_ready_ms":${CC_WARM:-null},"cc_bytes":${CC_BYTES:-null},"http_ok":$([ "$API$PENDANT$SOCK$ASSET_CODE" = "200200200200" ] && echo true || echo false),"fail":$FAIL}
 EOF
 log ""
 log "Result: $([ $FAIL -eq 0 ] && echo PASS || echo FAIL)"
