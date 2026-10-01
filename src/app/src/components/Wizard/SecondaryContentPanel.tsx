@@ -97,6 +97,25 @@ export function SecondaryContentPanel({
 
         if (item.type === 'component') {
             const Component = itemContent as ComponentType<any>;
+
+            if (item.centered) {
+                return (
+                    <div
+                        key={index}
+                        className={`${containerClassName} flex flex-col`}
+                    >
+                        {item.title && (
+                            <h3 className="text-sm font-semibold text-gray-700 dark:text-content-primary mb-2">
+                                {item.title}
+                            </h3>
+                        )}
+                        <div className="flex-1 min-h-0 flex items-center justify-center">
+                            <Component {...item.props} />
+                        </div>
+                    </div>
+                );
+            }
+
             return (
                 <div key={index} className={containerClassName}>
                     {item.title && (

@@ -64,7 +64,7 @@ const MarkingStep = ({ onComplete }: Props) => {
                     </p>
                 </div>
 
-                <div className="space-y-1 xl:space-y-2">
+                <div className="space-y-1 xl:space-y-2 w-min">
                     {currentMainStepData.subSteps.map((step, index) => {
                         const isCurrentStep =
                             index === currentSubStep && !step.completed;
@@ -76,7 +76,7 @@ const MarkingStep = ({ onComplete }: Props) => {
                         return (
                             <div
                                 key={step.buttonLabel}
-                                className={`flex items-center gap-4 p-2 rounded-lg transition-colors w-1/2 ${
+                                className={`flex items-center gap-4 p-2 rounded-lg transition-colors w-full ${
                                     isCurrentStep
                                         ? 'bg-blue-50 border border-blue-200 bg-opacity-40'
                                         : isPastStep
