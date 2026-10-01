@@ -271,7 +271,7 @@
     "@serialport/parser-byte-length": "^13.0.0",
     "@serialport/parser-readline": "^13.0.0",
     "@sienci/avrgirl-arduino": "^5.0.3",
-    "@sienci/gviewer": "^0.1.39",
+    "@sienci/gviewer": "https://github.com/revjmoney/gcode_parser_viewer.git#2242462ebf43ff2136326acb2095ce1388edf6d6",
     "@types/estree": "^1.0.9",
     "acorn": "^8.18.0",
     "acorn-walk": "^8.3.5",
