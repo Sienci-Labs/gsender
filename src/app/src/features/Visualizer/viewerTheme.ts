@@ -70,6 +70,7 @@ export const WORKSHOP_VISUALIZER_COLORS = {
     rapid: '#059669', // green.500
     cutting: '#3F85C7', // blue.500
     processed: '#59687B', // outline.DEFAULT
+    planned: '#c9883d', // orange.300 — one step lighter than machineBed's orange.400
     boundingBox: '#659dd2', // blue.300
     machineBed: '#c27924', // orange.400
     bit: '#79aad8', // blue.200
@@ -106,6 +107,7 @@ export function buildViewerTheme(themeName?: string): GCodeViewerTheme {
                 rapid: c.rapid,
                 cutting: c.cutting,
                 processed: c.processed,
+                planned: c.planned,
                 boundingBox: c.boundingBox,
                 machineBed: c.machineBed,
             },

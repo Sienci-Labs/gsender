@@ -984,6 +984,12 @@ class GCodeVirtualizer extends EventEmitter {
         estimator?: MotionPlanner | null;
         rotaryDiameter?: number;
         autoDetectRotaryDiameter?: boolean;
+        // Seeds `position` for the very first move's distance calculation.
+        // Omitted, the walk starts at machine origin (the pre-existing
+        // default) - only callers that know the real machine position at
+        // the moment they care about (e.g. a time-estimate re-run at job
+        // start) should pass this.
+        initialPosition?: BasicPosition;
     }) {
         super();
         const {
@@ -995,11 +1001,20 @@ class GCodeVirtualizer extends EventEmitter {
             estimator = null,
             rotaryDiameter,
             autoDetectRotaryDiameter = true,
+            initialPosition,
         } = options;
 
         this.fn = { addLine, addArcCurve, addCurve, callback };
         this.collate = collate;
         this.estimator = estimator;
+        if (initialPosition) {
+            this.position = {
+                x: initialPosition.x ?? 0,
+                y: initialPosition.y ?? 0,
+                z: initialPosition.z ?? 0,
+                a: initialPosition.a ?? 0,
+            };
+        }
 
         if (rotaryDiameter !== undefined) {
             this.rotaryDiameter = rotaryDiameter;

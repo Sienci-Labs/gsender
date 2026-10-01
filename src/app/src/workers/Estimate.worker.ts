@@ -3,6 +3,7 @@
  * loaded file's time estimate can be refreshed cheaply when machine settings
  * change (e.g. connecting after the file was opened).
  */
+import type { BasicPosition } from 'app/definitions/general';
 import GCodeVirtualizer from 'app/lib/GCodeVirtualizer';
 import MotionPlanner, {
     type EstimatorConfig,
@@ -13,10 +14,14 @@ interface EstimateWorkerData {
     jobId: number;
     content: string;
     estimatorConfig?: Partial<EstimatorConfig>;
+    // The real machine position at the moment this re-estimate was
+    // requested - only set when re-estimating for an actual job start away
+    // from origin; omitted for the ordinary settings-change re-estimate.
+    initialPosition?: BasicPosition;
 }
 
 self.onmessage = ({ data }: { data: EstimateWorkerData }) => {
-    const { jobId, content, estimatorConfig = {} } = data;
+    const { jobId, content, estimatorConfig = {}, initialPosition } = data;
     const noop = () => {};
     const estimator = new MotionPlanner(
         estimatorConfig,
@@ -27,6 +32,7 @@ self.onmessage = ({ data }: { data: EstimateWorkerData }) => {
         addArcCurve: noop,
         addCurve: noop,
         estimator,
+        initialPosition,
     });
 
     // Same line splitting as Visualize.worker so line indexes agree

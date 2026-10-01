@@ -84,6 +84,25 @@ const PICK_CANCEL_PX = 8;
 // Default marker color when an overlay marker doesn't specify one.
 const OVERLAY_DEFAULT_COLOR = 'rgba(14, 246, 174, 0.95)';
 
+// Default tween (260ms) is sized to bridge the controller's 250ms status-
+// report poll smoothly. At higher feed override the same time window covers
+// proportionally more travel distance, so the tween itself needs to shrink
+// or the bit visibly lags behind the (accurate, real-time) "planned"
+// coloring boundary. Never grows past the 260ms default — only shrinks as
+// override climbs above 100% — and floors at 80ms so it never gets
+// jarringly instant.
+function bitTweenMsForOverride(ovF: number): number {
+    const DEFAULT_TWEEN_MS = 260;
+    const MIN_TWEEN_MS = 80;
+    if (!(ovF > 100)) {
+        return DEFAULT_TWEEN_MS;
+    }
+    return Math.max(
+        MIN_TWEEN_MS,
+        Math.round(DEFAULT_TWEEN_MS * (100 / ovF)),
+    );
+}
+
 // Maps gSender's camera positions onto gviewer ViewCube presets.
 const VIEW_MAP: Partial<Record<string, GCodeViewerCameraView>> = {
     Top: 'top',
@@ -135,6 +154,14 @@ class GcodeViewer extends Component<Props> {
     outlineRunning = false;
 
     lastHiddenLine = -1;
+
+    // Composite dedupe key for the "planned" (acked, not yet cut) range —
+    // depends on two independently-changing values (execLine and received),
+    // so a single number can't dedupe it the way lastHiddenLine does.
+    lastPlannedKey: string | null = null;
+
+    // Dedupes applyBitTween's setOptions calls; see bitTweenMsForOverride.
+    lastBitTweenMs: number | null = null;
 
     // Theme selection in Settings only writes to the store once "Save" is
     // clicked, but the dropdown fires "theme:change" immediately for a live
@@ -449,6 +476,8 @@ class GcodeViewer extends Component<Props> {
     applyWorkerData(data: WorkerSegmentsData) {
         this.lastWorkerData = data;
         this.lastHiddenLine = -1;
+        this.lastPlannedKey = null;
+        this.lastBitTweenMs = null;
 
         // Shared so every viewer keeps the worker's per-tool palette; see
         // augmentWorkerGeometry for why gviewer drops it otherwise.
@@ -988,6 +1017,8 @@ class GcodeViewer extends Component<Props> {
     unload() {
         this.lastWorkerData = null;
         this.lastHiddenLine = -1;
+        this.lastPlannedKey = null;
+        this.lastBitTweenMs = null;
         this.lastSpinning = false;
         this.viewer3d?.setBitSpinning(false);
         this.viewer3d?.unload();
@@ -1066,6 +1097,19 @@ class GcodeViewer extends Component<Props> {
             pubsub.subscribe('theme:change', (_msg, theme) => {
                 this.previewThemeName = (theme as string) ?? null;
                 this.applyOptionsFromState();
+                // applyOptionsFromState rebuilds the full options object
+                // (buildOptions() hardcodes bit.tweenMs back to its 260ms
+                // default), flattening both gviewer's progress cursors (new
+                // theme colors mean a full repaint) and any override-scaled
+                // tween applyBitTween had set. Force all three straight back
+                // from live state so they reappear this tick instead of
+                // waiting on the next unrelated controller update.
+                this.lastHiddenLine = -1;
+                this.lastPlannedKey = null;
+                this.lastBitTweenMs = null;
+                const st = reduxStore.getState();
+                this.applyProgressColoring(st);
+                this.applyBitTween(st);
             }),
             pubsub.subscribe('visualizer:redraw', () => {
                 this.applyOptionsFromState();
@@ -1082,8 +1126,10 @@ class GcodeViewer extends Component<Props> {
             }),
             pubsub.subscribe('job:end', () => {
                 this.viewer3d?.showAll();
-                this.viewer3d?.resetColors();
+                this.viewer3d?.resetColors(); // also clears gviewer's planned cursors
                 this.lastHiddenLine = -1;
+                this.lastPlannedKey = null;
+                this.lastBitTweenMs = null;
             }),
             pubsub.subscribe('gcode:unload', () => {
                 this.unload();
@@ -1197,31 +1243,8 @@ class GcodeViewer extends Component<Props> {
                 );
             }
 
-            // Progress greying/hiding while a job runs: always grey, hide only when
-            // the hideProcessedLines setting is on. Use hideUntilLine (not seekToLine)
-            // so it never fights the DRO-driven bit position above.
-            if (
-                _get(st, 'controller.workflow.state') === WORKFLOW_STATE_RUNNING
-            ) {
-                const line =
-                    _get(
-                        st,
-                        'controller.sender.status.currentLineRunning',
-                        0,
-                    ) || _get(st, 'controller.sender.status.received', 0);
-                if (line !== this.lastHiddenLine && this.viewer3d) {
-                    this.lastHiddenLine = line;
-                    const mode = store.get(
-                        'widgets.visualizer.hideProcessedLines',
-                        false,
-                    )
-                        ? 'hide'
-                        : 'grey';
-                    // `line` counts Sender lines done; hideUntilLine takes the
-                    // index of the last one.
-                    this.viewer3d.hideUntilLine(line - 1, mode);
-                }
-            }
+            this.applyProgressColoring(st);
+            this.applyBitTween(st);
 
             // Spin the bit to simulate a running spindle.
             const spinning = this.computeShouldSpin(st, connected);
@@ -1230,6 +1253,87 @@ class GcodeViewer extends Component<Props> {
                 this.viewer3d?.setBitSpinning(spinning);
             }
         });
+    }
+
+    // Progress greying/hiding and "planned" colouring while a job runs. Grey
+    // (or hide, when the hideProcessedLines setting is on) always covers
+    // lines already physically cut, via hideUntilLine — never seekToLine, so
+    // it can't fight the DRO-driven bit position set elsewhere. "Planned"
+    // (acked by the controller but not yet cut) always covers the gap up to
+    // the last acked line, with no user toggle. Both boundaries come straight
+    // from the sender's own counters every tick — no client-side
+    // accumulation — so this can't drift the way the old pre-gviewer
+    // implementation did.
+    applyProgressColoring(st: unknown): void {
+        if (_get(st, 'controller.workflow.state') !== WORKFLOW_STATE_RUNNING) {
+            return;
+        }
+        if (!this.viewer3d) {
+            return;
+        }
+
+        const execLine = _get(
+            st,
+            'controller.sender.status.currentLineRunning',
+            0,
+        );
+        const received = _get(st, 'controller.sender.status.received', 0);
+        // currentLineRunning is falsy both "before the job starts advancing"
+        // and genuinely "at line 0" — received is the only reliable acked
+        // boundary in that window, so keep the fallback for the grey cursor.
+        // The planned range deliberately does NOT use this fallback: using
+        // it would collapse the planned span to empty exactly when it's most
+        // visible (job start, before the playhead starts moving).
+        const processedLine = execLine || received;
+
+        if (processedLine !== this.lastHiddenLine) {
+            this.lastHiddenLine = processedLine;
+            const mode = store.get(
+                'widgets.visualizer.hideProcessedLines',
+                false,
+            )
+                ? 'hide'
+                : 'grey';
+            // `processedLine` counts Sender lines done; hideUntilLine takes
+            // the index of the last one.
+            this.viewer3d.hideUntilLine(processedLine - 1, mode);
+        }
+
+        // Planned range is [execLine, received - 1] in Sender's line-count
+        // terms. `toLine < fromLine` (e.g. right after a start-from-line,
+        // where both are set equal) is the normal "nothing queued" clearing
+        // case and is issued every time, not special-cased away — that
+        // unconditional clear is exactly what the old heuristic-based
+        // implementation got wrong.
+        const plannedKey = `${execLine}:${received}`;
+        if (plannedKey !== this.lastPlannedKey) {
+            this.lastPlannedKey = plannedKey;
+            this.viewer3d.setPlannedRange(execLine, received - 1);
+        }
+    }
+
+    // Shrinks the bit's position-tween duration as feed override climbs
+    // above 100%. The bit's displayed position (wpos) is only ever as fresh
+    // as the controller's last-answered status-report poll (~250ms, see
+    // GrblController's queryTimer) — a fixed time budget that covers
+    // proportionally more travel distance at higher override, which widens
+    // the visible gap between the bit and the (real-time, unsmoothed)
+    // "planned" coloring boundary above. Reads controller.state.status.ov
+    // (not controller.sender.status.ovF) deliberately: it's part of the same
+    // runner-state snapshot wpos itself comes from, so it shares wpos's
+    // exact freshness/cadence rather than a separately-tracked copy.
+    applyBitTween(st: unknown): void {
+        if (!this.viewer3d) {
+            return;
+        }
+        const ovF = _get(st, 'controller.state.status.ov.0', 100);
+        const tweenMs = bitTweenMsForOverride(Number(ovF) || 100);
+        if (tweenMs !== this.lastBitTweenMs) {
+            this.lastBitTweenMs = tweenMs;
+            this.viewer3d.setOptions({
+                bit: { ...this.viewer3d.getOptions().bit, tweenMs },
+            });
+        }
     }
 
     computeShouldSpin(st: unknown, isConnected: boolean): boolean {

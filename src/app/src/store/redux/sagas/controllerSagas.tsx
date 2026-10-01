@@ -44,6 +44,7 @@ import {
     RENDER_RENDERED,
     VISUALIZER_PRIMARY,
     VISUALIZER_SECONDARY,
+    WORKFLOW_STATE_IDLE,
     WORKFLOW_STATE_RUNNING,
     WORKSPACE_MODE,
 } from 'app/constants';
@@ -54,6 +55,7 @@ import type {
 } from 'app/definitions/firmware';
 import type {
     BasicObject,
+    BasicPosition,
     GRBL_ACTIVE_STATES_T,
 } from 'app/definitions/general';
 import {
@@ -187,6 +189,10 @@ export function* initialize(): Generator<null, void, unknown> {
     let lastEstimateSignature = '';
     let currentState: GRBL_ACTIVE_STATES_T = GRBL_ACTIVE_STATE_IDLE;
     let prevState: GRBL_ACTIVE_STATES_T = GRBL_ACTIVE_STATE_IDLE;
+    // Dedupes maybeCorrectEstimateForIdlePosition's re-estimate calls - see
+    // its definition for why this watches position continuously while idle
+    // rather than reacting to job start.
+    let lastPositionCorrectionKey: string | null = null;
     let errors: string[] = [];
     // Per-line time estimates (one per Sender line) sent to the server, which
     // tracks job progress from them.
@@ -254,28 +260,19 @@ export function* initialize(): Generator<null, void, unknown> {
         hasEstimateData = false;
         lastPrimaryParse = null;
         pendingPrimaryParse = null;
+        lastPositionCorrectionKey = null;
     };
 
-    // Re-run the time estimate for the loaded file when machine settings that
-    // feed it change - most commonly connecting after the file was opened.
-    const scheduleReestimate = _debounce(() => {
-        const state = reduxStore.getState();
-        const content = _get(state, 'file.content');
-        if (!content || _get(state, 'file.fileProcessing')) {
-            return;
-        }
-        // Never swap estimates under a running job
-        if (
-            _get(state, 'controller.workflow.state') === WORKFLOW_STATE_RUNNING
-        ) {
-            return;
-        }
-        const signature = getEstimatorSignature();
-        if (signature === lastEstimateSignature) {
-            return;
-        }
-        lastEstimateSignature = signature;
-
+    // Shared by every re-estimate trigger below: spawns Estimate.worker.ts,
+    // supersedes any still-running estimate via the jobId check, and feeds
+    // the result through the same path a primary parse's estimate takes.
+    // `initialPosition`, when given, seeds the walk's starting position
+    // instead of machine origin - see maybeCorrectEstimateForIdlePosition
+    // below for why that matters.
+    const runReestimate = (
+        content: string,
+        options: { initialPosition?: BasicPosition } = {},
+    ) => {
         estimateWorker?.terminate();
         const jobId = ++estimateJobId;
         const worker = new Worker(
@@ -303,8 +300,90 @@ export function* initialize(): Generator<null, void, unknown> {
             jobId,
             content,
             estimatorConfig: getEstimatorConfig(),
+            initialPosition: options.initialPosition,
         });
+    };
+
+    // Re-run the time estimate for the loaded file when machine settings that
+    // feed it change - most commonly connecting after the file was opened.
+    const scheduleReestimate = _debounce(() => {
+        const state = reduxStore.getState();
+        const content = _get(state, 'file.content');
+        if (!content || _get(state, 'file.fileProcessing')) {
+            return;
+        }
+        // Never swap estimates under a running job
+        if (
+            _get(state, 'controller.workflow.state') === WORKFLOW_STATE_RUNNING
+        ) {
+            return;
+        }
+        const signature = getEstimatorSignature();
+        if (signature === lastEstimateSignature) {
+            return;
+        }
+        lastEstimateSignature = signature;
+        runReestimate(content);
     }, 750);
+
+    // mm - treat a position within this of work-coordinate origin as "at
+    // origin", skipping the re-estimate on the common case where the cached
+    // (origin-assumed) estimate is already correct.
+    const ESTIMATE_ORIGIN_EPSILON = 0.5;
+
+    // Keeps the cached time estimate's line-0 duration correct for wherever
+    // the bit actually is, by continuously re-checking while idle - NOT by
+    // reacting to the job actually starting. This runs off the
+    // 'controller:state' listener below (so roughly every status-report
+    // tick while connected), throttled to at most once/second, with the
+    // signature check below skipping repeat work once corrected.
+    //
+    // This must never run outside WORKFLOW_STATE_IDLE. Sender.setEstimateData()
+    // resets and resyncs execLine against `received` whenever jobActive is
+    // true (so a mid-job estimate swap doesn't leave the playhead on stale
+    // data) - but that resync is a direct snap (`execLine = received`), not
+    // a time-based recompute. Calling it mid-job (as an earlier version of
+    // this fix did, triggered off workflow:state's idle->running transition)
+    // made the "planned" gap *worse*: execLine would jump straight to
+    // `received` the moment the corrected estimate landed, regardless of how
+    // little time had actually elapsed, collapsing the planned buffer
+    // instantly instead of letting it advance at the correct wall-clock
+    // rate. Only ever applying the correction before the job starts (while
+    // `jobActive` is still false) keeps it on the safe, normal start path.
+    const maybeCorrectEstimateForIdlePosition = _throttle(() => {
+        const state = reduxStore.getState();
+        if (_get(state, 'controller.workflow.state') !== WORKFLOW_STATE_IDLE) {
+            return;
+        }
+        const content = _get(state, 'file.content');
+        if (!content || _get(state, 'file.fileProcessing')) {
+            return;
+        }
+        const wpos = _get(state, 'controller.wpos');
+        if (!wpos) {
+            return;
+        }
+        const x = Number(wpos.x) || 0;
+        const y = Number(wpos.y) || 0;
+        const z = Number(wpos.z) || 0;
+        const atOrigin =
+            Math.abs(x) <= ESTIMATE_ORIGIN_EPSILON &&
+            Math.abs(y) <= ESTIMATE_ORIGIN_EPSILON &&
+            Math.abs(z) <= ESTIMATE_ORIGIN_EPSILON;
+        if (atOrigin) {
+            // Nothing to correct here; reset so a later move away from
+            // origin (without an intervening file/settings change) is
+            // still seen as "new" and re-corrected.
+            lastPositionCorrectionKey = null;
+            return;
+        }
+        const key = `${content.length}:${x.toFixed(1)}:${y.toFixed(1)}:${z.toFixed(1)}:${lastEstimateSignature}`;
+        if (key === lastPositionCorrectionKey) {
+            return;
+        }
+        lastPositionCorrectionKey = key;
+        runReestimate(content, { initialPosition: { x, y, z } });
+    }, 1000);
 
     /* Health check - every 3 minutes */
     setInterval(
@@ -627,6 +706,7 @@ export function* initialize(): Generator<null, void, unknown> {
                 state.parserstate.modal.tool = tool;
             }
             reduxStore.dispatch(updateControllerState({ type, state }));
+            maybeCorrectEstimateForIdlePosition();
         },
     );
 
