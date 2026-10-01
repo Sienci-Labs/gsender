@@ -42,6 +42,26 @@ It runs on pushes to `features/android` that touch the workflow or this folder.
 3. **smoke:** runs the x86_64 binary on an API 35 emulator twice: with 4 KB pages (`google_apis`) and with 16 KB pages (`google_apis_ps16k`).
 4. **report:** a pass/fail table against the exit criteria, written to the run summary.
 
+## Conclusion (2026-10-01)
+**E1 is feasible.** A current Node LTS (v24.21.0), cross-compiled with the NDK and shipped as `libnode_exec.so`, runs the unchanged gSender server inside an installed app's sandbox (`untrusted_app`). It works on 4 KB and 16 KB page devices and serves the pendant to a WebView with no console errors.
+
+| S1 criterion | Result |
+|---|---|
+| arm64 binary is 16 KB-aligned | ✅ |
+| Server cold start < 2 s | ✅ 0.85–1.3 s (shell, emulator) |
+| Pendant, API and Socket.IO respond | ✅ |
+| APK < 120 MB | ✅ **42 MB** arm64 (debug) |
+| Runs from `nativeLibraryDir` in an installed app | ✅ |
+
+What E1 costs, and what's still open:
+- **Build maintenance.** Two Node build patches so far (zlib CPU detection, V8 trap handler). Node's own Android patch had silently stopped applying. Each Node upgrade needs a CI rebuild (about 1–1.5 h per architecture) and possibly new patches.
+- **Startup in the app.** 2.9–3.8 s warm and 4.8–5.6 s first launch to the pendant on the 2-vCPU emulator, about 1 s of it WebView contention. That's acceptable if a foreground service starts Node once per session and the UI shows a splash screen until the server is ready. **Measure on target tablet hardware**; the emulator numbers aren't representative of 8-core devices with a GPU.
+- **Not covered by S1:**
+  - Running under a foreground service with the screen off for a long job; this is also the defence against the phantom process killer.
+  - USB serial (S3).
+  - WebView performance on large files (S4).
+  - Play review of an app that executes a bundled binary.
+
 ## Results so far
 | Date | Finding |
 |---|---|
@@ -52,6 +72,7 @@ It runs on pushes to `features/android` that touch the workflow or this folder.
 | 2026-10-01 | **The compile cache helps.** Shell, warm ready: 443–516 ms with `NODE_COMPILE_CACHE` vs 552–804 ms without; the cache is 272 KB. Single CI-emulator runs vary by ±50%, so compare ranges, not single numbers. |
 | 2026-10-01 | **App launch to page loaded is too slow: 2.4–2.9 s warm, 4.4–5.4 s first launch.** In the app, Node is ready 1.7–2.2 s after `onCreate`, against about 0.5 s in the shell test. Suspected cause: `MainActivity` built the WebView (which loads Chromium) before starting Node, and both competed for the emulator's 2 CPUs. Node now starts first, and `apk-smoke.sh` records each phase (`warm_webview_ms`, `warm_spawn_ms`, `warm_node_ms`). Loading the pendant itself adds about 0.7 s. In the real app, a foreground service keeps Node running between Activity launches, so the full cold path happens once per session. |
 | 2026-10-01 | **Inside the app, Node itself is about 4× slower.** 16 KB emulator, warm launch, after the start-order fix:<br>• Node spawned at 116 ms and the WebView was built at 885 ms (so the fix worked)<br>• **Node's own time to ready: 1810 ms**, against 443 ms in the shell test with cache and 980 ms without<br>• first and warm app launches are the same (1897 / 1810 ms), so the compile cache looks unused in the app<br>Suspected causes: the compile cache doesn't take effect in the app, and the WebView renderer (software GPU via SwiftShader) competes with Node for the emulator's 2 CPUs. Next run tests both: the app turns on Node's compile-cache debug output (`NODE_DEBUG_NATIVE=COMPILE_CACHE`, plus a `run-as du` of the cache dir), and two extra launches build the WebView only after Node is ready (`deferred_node_ms`). The 4 KB APK job failed on its first launch in this run, after passing in the previous one. |
+| 2026-10-01 | **The app's slow start is mostly emulator contention; the compile cache works.** In the app the cache is written (272 KB, the same as the shell test). Node's own time to ready, warm (16 KB / 4 KB):<br>• shell test with cache: 525 / 348 ms<br>• app, WebView deferred until Node is ready: **1671 / 1617 ms**<br>• app, WebView built alongside: 2244 / 2704 ms<br>The WebView competing for the emulator's 2 vCPUs (SwiftShader software GPU) costs 0.6–1.1 s. The rest of the gap to the shell test is most likely system work around the app's own launch, which the shell test doesn't have. App launch to page loaded: 2.9–3.8 s warm, 4.8–5.6 s first launch. No retries were needed; both emulators passed. |
 | 2026-10-01 | **Binary size compresses well.** The stripped x86_64 `node` is 96 MB, plus `libc++_shared.so` (8.8 MB). Compressed inside the APK, it comes to the 42 MB total above, so size is no longer a blocker. Further cuts if wanted: `--with-intl=small-icu` (check which `Intl` features the server and pendant use first), and linking libc++ statically. |
 
 ## Build patches needed so far
