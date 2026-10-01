@@ -57,7 +57,7 @@ const PROBE_FAIL_RESOURCE: HelperResource = {
 
 const PROBE_FAIL_STEPS = [
     'Start probing from about 1/2" (5mm) above the touch plate, positioned over the inner square (AutoZero plates) or the logo (standard plates).',
-    'If the probe reads as triggered the instant the cycle starts, even with nothing touching it, the probe input is likely inverted: in Config ➜ Probe, toggle "Invert Probe Inputs ($6)" for the Toolsetter, apply settings, then power cycle the controller.',
+    'If the probe reads as triggered the instant the cycle starts, even with nothing touching it, the probe input is likely inverted: in Config ➜ Probe, toggle "Invert Probe Inputs ($6)", apply settings, then power cycle the controller.',
 ];
 
 // Alarm 4: probe was already triggered before the probe cycle started
@@ -140,7 +140,7 @@ const ESTOP: Partial<HelperMessage> = {
         'The controller sees the E-stop signal as active, so it stays locked until the E-stop circuit is clear.',
     steps: [
         'Press the E-stop button in, then twist it clockwise to release it, and click "Click to Unlock Machine". Do this every time you connect.',
-        "If the alarm persists, check the Console for motor error warnings, and confirm the blue relay light on the SLB-EXT turns on after the E-stop releases — if it doesn't, a motor short may be holding it tripped. Try unplugging a connected Vortex spindle to test.",
+        "If the alarm persists, check the Console for motor error warnings, and confirm the blue relay light on the SLB-EXT turns on after the E-stop releases — if it doesn't, a motor short may be holding it tripped.",
         'Short the E-stop bypass pins on the control board: if the red HALT LED goes out, the board is fine and the E-stop button itself needs replacing.',
         "Check the E-stop wiring and both red LEDs on the button — loose connections or LEDs that don't light or clear correctly mean the button should be replaced.",
     ],
