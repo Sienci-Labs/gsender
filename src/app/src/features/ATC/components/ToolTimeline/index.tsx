@@ -76,7 +76,7 @@ export function ToolTimelineWrapper() {
 
     useEffect(() => {
         pubsub.subscribe('file:toolchanges', (k, { toolEvents, total }) => {
-            const cuttingColor = getVisualizerTheme().get(G1_PART) ?? '#3e85c7';
+            const cuttingColor = getVisualizerTheme().get(G1_PART) ?? '#3f85c7';
             const toolArray = buildToolArray(toolEvents, total, cuttingColor);
 
             if (toolArray.length === 0) {

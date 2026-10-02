@@ -130,7 +130,7 @@ export function buildStepperTools(
     totalLines: number,
     toolSet: string[] = [],
 ): StepperTool[] {
-    const cuttingColor = getVisualizerTheme().get(G1_PART) ?? '#3e85c7';
+    const cuttingColor = getVisualizerTheme().get(G1_PART) ?? '#3f85c7';
     const events = spindleToolEvents ?? {};
     const toolChanges = buildToolArray(events, totalLines, cuttingColor);
 

@@ -73,7 +73,7 @@ const Instructions = () => {
 
     if (pendingToolchangeNotice && activeStep === 0 && activeSubstep === 0) {
         return (
-            <div className="flex-1 overflow-y-auto p-4 flex flex-col bg-white dark:bg-[#18181f]">
+            <div className="flex-1 overflow-y-auto p-4 flex flex-col bg-white dark:bg-surface-raised">
                 <PendingToolchangeNotice />
             </div>
         );
@@ -81,7 +81,7 @@ const Instructions = () => {
 
     if (resumingJob) {
         return (
-            <div className="flex-1 overflow-y-auto p-4 flex flex-col bg-white dark:bg-[#18181f]">
+            <div className="flex-1 overflow-y-auto p-4 flex flex-col bg-white dark:bg-surface-raised">
                 <ResumingJobNotice />
             </div>
         );
@@ -92,11 +92,11 @@ const Instructions = () => {
         : null;
 
     return (
-        <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3 bg-white dark:bg-[#18181f]">
+        <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3 bg-white dark:bg-surface-raised">
             {/* Breadcrumb */}
-            <div className="flex items-center gap-1 text-xs text-gray-400 dark:text-[#9ca3af]">
+            <div className="flex items-center gap-1 text-xs text-gray-400 dark:text-content-muted">
                 <span>{step.title}</span>
-                <span className="text-gray-300 dark:text-[#9ca3af]">›</span>
+                <span className="text-gray-300 dark:text-content-muted">›</span>
                 <span className="text-gray-600 dark:text-content-primary">
                     {substep.title}
                 </span>

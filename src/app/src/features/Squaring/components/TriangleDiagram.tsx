@@ -183,7 +183,7 @@ const TriangleDiagram = () => {
                 {/* Right angle indicator */}
                 <path
                     d={`M ${positions['bottom-right'].x} ${positions['bottom-right'].y - 20} L ${positions['bottom-right'].x} ${positions['bottom-right'].y} L ${positions['bottom-right'].x - 20} ${positions['bottom-right'].y}`}
-                    className="stroke-2 stroke-orange-50 fill-none"
+                    className="stroke-2 stroke-orange-300 fill-none"
                 />
 
                 {/* Movement Arrows with Labels */}

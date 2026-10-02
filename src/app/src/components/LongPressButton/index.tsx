@@ -297,7 +297,7 @@ export const LongPressButton: React.FC<LongPressButtonProps> = ({
             {secondaryLabel ? (
                 <span
                     className={cn(
-                        'text-xs font-medium text-blue-300',
+                        'text-xs font-medium text-blue-400',
                         secondaryLabelClassName,
                     )}
                 >

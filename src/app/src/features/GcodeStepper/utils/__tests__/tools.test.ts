@@ -53,7 +53,7 @@ beforeEach(() => {
     jest.clearAllMocks();
     // A stand-in for the real theme Map — buildStepperTools only ever calls
     // `.get(G1_PART)` on it, so the key doesn't need to match the real constant.
-    mockGetVisualizerTheme.mockReturnValue({ get: () => '#3e85c7' });
+    mockGetVisualizerTheme.mockReturnValue({ get: () => '#3f85c7' });
 });
 
 describe('parseToolDiameter', () => {
