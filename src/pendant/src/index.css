@@ -20,7 +20,7 @@
 
         --content-primary: theme("colors.gray.900");
         --content-secondary: theme("colors.gray.700");
-        --content-muted: theme("colors.gray.500");
+        --content-muted: theme("colors.gray.600");
         --content-disabled: theme("colors.gray.400");
         --content-inverse: #ffffff;
 
@@ -44,12 +44,12 @@
         --card-foreground: theme("colors.gray.900");
         --popover: #ffffff;
         --popover-foreground: theme("colors.gray.900");
-        --primary: theme("colors.blue.500");
+        --primary: theme("colors.blue.600");
         --primary-foreground: #ffffff;
         --secondary: theme("colors.gray.100");
         --secondary-foreground: theme("colors.gray.900");
         --muted: theme("colors.gray.100");
-        --muted-foreground: theme("colors.gray.500");
+        --muted-foreground: theme("colors.gray.600");
         --accent: theme("colors.gray.100");
         --accent-foreground: theme("colors.gray.900");
         --destructive: theme("colors.red.500");
@@ -90,7 +90,7 @@
         --card-foreground: theme("colors.content.primary");
         --popover: theme("colors.surface.elevated");
         --popover-foreground: theme("colors.content.primary");
-        --primary: theme("colors.blue.500");
+        --primary: theme("colors.blue.600");
         --primary-foreground: #ffffff;
         --secondary: theme("colors.surface.raised");
         --secondary-foreground: theme("colors.content.primary");

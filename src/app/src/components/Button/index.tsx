@@ -8,7 +8,7 @@ export const buttonStyle = tv({
     variants: {
         variant: {
             primary:
-                'border-blue-500 text-white bg-blue-500 dark:text-content-secondary',
+                'border-blue-600 text-white bg-blue-600 hover:bg-blue-700',
             secondary:
                 'border-robin-500 hover:bg-gray-200 text-gray-600 bg-white dark:bg-surface-raised dark:text-content-secondary',
             alt: 'bg-robin-500 text-white border-robin-500',
