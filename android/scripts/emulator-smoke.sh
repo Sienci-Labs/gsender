@@ -19,7 +19,9 @@ FAIL=0
 
 sh_dev() { timeout 60 adb shell "$@" | tr -d '\r'; }
 log() { echo "$*" | tee -a "$OUT"; }
-applog() { timeout 30 adb logcat -d -v raw -s "$TAG:I" "$TAG:W" | tr -d '\r'; }
+# One rule per tag: logcat keeps only the last rule for a tag, so
+# "$TAG:I" "$TAG:W" would mean W and above and hide every Log.i line.
+applog() { timeout 30 adb logcat -d -v raw -s "$TAG:I" | tr -d '\r'; }
 # Value of key=NNN from the last app log line matching $1
 field() { applog | grep -E "$1" | tail -1 | sed -nE "s/.* $2=([0-9]+).*/\1/p"; }
 
@@ -39,7 +41,7 @@ sh_dev "pm grant $PKG android.permission.POST_NOTIFICATIONS" > /dev/null 2>&1
 launch() {
     sh_dev "am force-stop $PKG" > /dev/null
     timeout 10 adb logcat -c
-    sh_dev "am start -W -n $PKG/.MainActivity" > /dev/null
+    sh_dev "am start -W -n $PKG/.MainActivity" > "$RESULTS/am-start-$run.txt"
     state=timeout
     for _ in $(seq 1 180); do
         lines=$(applog)
@@ -57,12 +59,19 @@ for run in first warm; do
     T[${run}_ready]=$(field '^STATE Ready' t)
     T[${run}_node]=$(field '^STATE Ready' node_ms)
     T[${run}_page]=$(field '^PAGE_LOADED' t)
-    log "- $run launch: **$state**; payload install ${installed:-skipped} ms, server ready ${T[${run}_ready]:-?} ms (Node ${T[${run}_node]:-?} ms), pendant loaded ${T[${run}_page]:-?} ms after process start"
+    log "- $run launch: **$state**; payload install ${installed:+$installed ms}${installed:-skipped}, server ready ${T[${run}_ready]:-?} ms (Node ${T[${run}_node]:-?} ms), pendant loaded ${T[${run}_page]:-?} ms after process start"
     if [ "$state" != ok ]; then
         FAIL=1
         timeout 30 adb logcat -d -v time > "$RESULTS/logcat-$run.txt"
+        log "  am start: $(grep -E '^(Status|Error)' "$RESULTS/am-start-$run.txt" | tr '\n' ' ')"
+        log "  pids: app $(sh_dev "pidof $PKG"), node $(sh_dev "pidof libnode_exec.so")"
         log '  ```'
-        applog | tail -8 | sed 's/^/  /' | tee -a "$OUT" > /dev/null
+        app_lines=$(applog)
+        echo "$app_lines" | tail -8 | sed 's/^/  /' >> "$OUT"
+        if [ -z "$app_lines" ]; then
+            # No app output at all: look for a startup crash, exec/linker error or SELinux denial.
+            grep -iE 'pendant|AndroidRuntime|libnode|linker|avc:' "$RESULTS/logcat-$run.txt" | tr -d '\r' | tail -20 | sed 's/^/  /' >> "$OUT"
+        fi
         timeout 30 adb logcat -d -v raw -s "$TAG-node:I" | tr -d '\r' | tail -12 | sed 's/^/  /' >> "$OUT"
         timeout 30 adb logcat -d -b crash | tr -d '\r' | tail -12 | sed 's/^/  /' >> "$OUT"
         log '  ```'
@@ -85,7 +94,7 @@ if [ $FAIL -eq 0 ]; then
     NOTIF=$(sh_dev "dumpsys notification --noredact" | grep -c "pkg=$PKG")
     log "- foreground service notification present: $([ "$NOTIF" -gt 0 ] && echo yes || echo no)"
 fi
-timeout 30 adb logcat -d -v time -s "$TAG:I" "$TAG:W" "$TAG-node:I" "$TAG-web:I" > "$RESULTS/app-log.txt"
+timeout 30 adb logcat -d -v time -s "$TAG:I" "$TAG-node:I" "$TAG-web:I" > "$RESULTS/app-log.txt"
 
 cat > "$RESULTS/results.json" <<EOF
 {"first_ready_ms":${T[first_ready]:-null},"first_page_ms":${T[first_page]:-null},"warm_ready_ms":${T[warm_ready]:-null},"warm_node_ms":${T[warm_node]:-null},"warm_page_ms":${T[warm_page]:-null},"fail":$FAIL}
