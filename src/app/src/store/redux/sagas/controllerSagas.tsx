@@ -102,9 +102,9 @@ import _debounce from 'lodash/debounce';
 import _throttle from 'lodash/throttle';
 import pubsub from 'pubsub-js';
 import {
-	AlarmsData,
-	ControllerSettings,
-	ControllerStateState,
+    AlarmsData,
+    ControllerSettings,
+    ControllerStateState,
     FILE_TYPE_T,
     NetworkAddress,
     PortInfo,
@@ -215,6 +215,78 @@ export function* initialize(): Generator<null, void, unknown> {
     let accessoryBaselineConnected: Partial<
         Record<AccessoryAutoconfigKey, boolean>
     > = {};
+    // Once per connection — a repeated $I shouldn't re-raise the warning.
+    let atcToolchangeChecked = false;
+
+    // ATC macros only see M6 when gSender passes it through untouched:
+    // passthrough on (otherwise M6 is commented out) and strategy Ignore
+    // (otherwise gSender runs its own tool change flow).
+    const checkAtcToolchangeConfig = (
+        newopt: Record<string, string | null>,
+    ) => {
+        if (atcToolchangeChecked || newopt.ATC !== '1') {
+            return;
+        }
+        atcToolchangeChecked = true;
+
+        const passthroughOff = !store.get(
+            'workspace.toolChange.passthrough',
+            false,
+        );
+        const strategy = store.get('workspace.toolChangeOption', 'Ignore');
+        const strategyWrong = strategy !== 'Ignore';
+        if (!passthroughOff && !strategyWrong) {
+            return;
+        }
+
+        pubsub.publish('helper:info', {
+            kind: 'reminder',
+            weight: 'compact',
+            title: 'Controller is set up to handle tool changes',
+            description: (
+                <>
+                    Your controller reported an ATC, but gSender's tool change
+                    settings will stop the ATC macros from running:
+                    <ul className="mt-2 list-disc list-inside">
+                        {passthroughOff && (
+                            <li>
+                                Passthrough is <b>off</b>, so M6 commands are
+                                being commented out and never reach the
+                                controller.
+                            </li>
+                        )}
+                        {strategyWrong && (
+                            <li>
+                                Tool change strategy is <b>{strategy}</b>, so
+                                gSender handles tool changes instead of the ATC
+                                macros.
+                            </li>
+                        )}
+                    </ul>
+                    <p className="mt-2">
+                        Update gSender's tool change settings?
+                    </p>
+                </>
+            ),
+            primaryAction: {
+                label:
+                    passthroughOff && !strategyWrong
+                        ? 'Enable passthrough'
+                        : 'Update settings',
+                onClick: () => {
+                    if (passthroughOff) {
+                        store.set('workspace.toolChange.passthrough', true);
+                    }
+                    if (strategyWrong) {
+                        store.set('workspace.toolChangeOption', 'Ignore');
+                    }
+                    updateToolchangeContext();
+                },
+            },
+            secondaryAction: { label: 'Keep current settings' },
+            dismissKey: 'atc-toolchange-config',
+        });
+    };
 
     const getFileType = () => {
         if (isLaserMode()) return 'laser';
@@ -759,6 +831,7 @@ export function* initialize(): Generator<null, void, unknown> {
             reduxStore.dispatch(closeConnection());
             // So a reconnect re-baselines cleanly from the next $I/NEWOPT response.
             accessoryBaselineConnected = {};
+            atcToolchangeChecked = false;
 
             pubsub.publish('machine:disconnected');
         },
@@ -1122,12 +1195,14 @@ export function* initialize(): Generator<null, void, unknown> {
         );
         if (showLineWarnings && error.type === ERROR) {
             pubsub.publish('helper:info', {
-                title: 'Invalid Line',
+                kind: 'error',
+                code: error.code,
+                title: 'Invalid line',
                 description: (
                     <div className="flex flex-col gap-2">
                         <p>
-                            The following line caused an{' '}
-                            <b>error {error.code}</b>: <i>'{error.line}'</i>
+                            The controller rejected this line:{' '}
+                            <code className="font-mono">{error.line}</code>
                         </p>
                         <p>Press Start to resume the job.</p>
                     </div>
@@ -1148,13 +1223,13 @@ export function* initialize(): Generator<null, void, unknown> {
                 { position: 'bottom-right' },
             );
 
-			posthog.capture(
-				error.type === ALARM ? 'alarm_raised' : 'controller_error',
-				{
-					code: error.code,
-					was_job_running: Boolean(_wasRunning),
-				},
-			);
+            posthog.capture(
+                error.type === ALARM ? 'alarm_raised' : 'controller_error',
+                {
+                    code: error.code,
+                    was_job_running: Boolean(_wasRunning),
+                },
+            );
         }
 
         pubsub.publish('error', error);
@@ -1291,6 +1366,8 @@ export function* initialize(): Generator<null, void, unknown> {
                     updateAutoconfig({ values: accessoryValues }),
                 );
             }
+
+            checkAtcToolchangeConfig(newopt);
         },
     );
 
@@ -1369,17 +1446,23 @@ export function* initialize(): Generator<null, void, unknown> {
                 });
             } else if (payload.subtype === '10') {
                 pubsub.publish('helper:info', {
-                    title: 'Jogging Inside Keepout Area',
+                    kind: 'info',
+                    title: 'Jogging inside keepout area',
+                    description:
+                        'You are attempting to jog inside the keepout area. Disable keepout using the switch below, then re-enable it to continue.',
                     content: (
-                        <div className="flex flex-row gap-4 items-centerx`">
-                            <span>Keepout:</span>
+                        <div className="flex items-center justify-between gap-4 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-outline-subtle dark:bg-surface-base">
+                            <span className="text-base font-bold text-gray-900 dark:text-content-primary">
+                                Keepout
+                            </span>
                             <KeepoutToggle />
                         </div>
                     ),
-                    description:
-                        'You are attempting to jog inside the keepout area.  Disable keepout using the switch below and then re-enable to continue',
-                    resourceLink:
-                        'https://resources.sienci.com/view/atc-final-checks/#troubleshooting',
+                    resource: {
+                        label: 'Keepout areas',
+                        url: 'https://resources.sienci.com/view/atc-final-checks/#troubleshooting',
+                        qr: false,
+                    },
                 });
             } else {
                 Confirm({

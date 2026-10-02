@@ -156,9 +156,7 @@ const JobControl: React.FC<JobControlProps> = ({
                             <p>
                                 This file references tool
                                 {outOfRangeTools.length > 1 ? 's' : ''}{' '}
-                                {outOfRangeTools
-                                    .map((n) => `T${n}`)
-                                    .join(', ')}
+                                {outOfRangeTools.map((n) => `T${n}`).join(', ')}
                                 , which exceed
                                 {outOfRangeTools.length === 1 ? 's' : ''} your
                                 configured tool table size ({toolTableSize}{' '}
@@ -169,8 +167,8 @@ const JobControl: React.FC<JobControlProps> = ({
                                 {outOfRangeTools.length > 1
                                     ? 'these tools'
                                     : 'this tool'}{' '}
-                                in the Tool Timeline before starting, or
-                                confirm to run anyway.
+                                in the Tool Timeline before starting, or confirm
+                                to run anyway.
                             </p>
                         </>
                     ),
