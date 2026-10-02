@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Pendant" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/pendant_bg</item>
+        <item name="android:statusBarColor">@color/pendant_bg</item>
+        <item name="android:navigationBarColor">@color/pendant_bg</item>
+        <item name="android:colorAccent">@color/pendant_accent</item>
+        <item name="android:colorPrimary">@color/pendant_bg</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>

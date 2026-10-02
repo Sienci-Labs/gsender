@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Android 12+ system splash: same background as the load screen, so the
+         splash → load screen → pendant hand-off doesn't flash. -->
+    <style name="Theme.Pendant" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/pendant_bg</item>
+        <item name="android:statusBarColor">@color/pendant_bg</item>
+        <item name="android:navigationBarColor">@color/pendant_bg</item>
+        <item name="android:colorAccent">@color/pendant_accent</item>
+        <item name="android:colorPrimary">@color/pendant_bg</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowSplashScreenBackground">@color/pendant_bg</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+    </style>
+</resources>

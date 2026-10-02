@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Matched to the pendant icon (electron-build/icon-pendant.png). -->
+    <color name="pendant_bg">#FF0E1A2B</color>
+    <color name="pendant_surface">#FF16263D</color>
+    <color name="pendant_text">#FFE6EDF5</color>
+    <color name="pendant_text_muted">#FF8FA3BC</color>
+    <color name="pendant_accent">#FF4AA3DF</color>
+    <color name="pendant_error">#FFF08A6C</color>
+</resources>

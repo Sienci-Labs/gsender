@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Status bar icon: a pendant (handheld tablet) outline. Monochrome, as the
+     status bar requires. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M7,2h10a2,2 0,0 1,2 2v16a2,2 0,0 1,-2 2H7a2,2 0,0 1,-2 -2V4a2,2 0,0 1,2 -2zM7,4v13h10V4H7zM12,18.25a1,1 0,1 0,0 2a1,1 0,1 0,0 -2zM12,6l2.5,6h-1.5v3h-2v-3H9.5L12,6z" />
+</vector>

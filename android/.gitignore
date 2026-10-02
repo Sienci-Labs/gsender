@@ -1,0 +1,13 @@
+# Gradle / Android Studio
+.gradle/
+build/
+app/build/
+.kotlin/
+local.properties
+.idea/
+*.iml
+captures/
+.cxx/
+
+# Node runtime unpacked by scripts/install-node-runtime.sh
+node-runtime/
