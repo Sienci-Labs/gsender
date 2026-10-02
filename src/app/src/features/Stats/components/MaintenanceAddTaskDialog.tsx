@@ -19,9 +19,9 @@ export const buttonStyle = tv({
     base: 'inline-flex items-center px-6 py-3 border text-base font-medium rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out',
     variants: {
         colors: {
-            primary: 'border-transparent text-white bg-blue-500',
+            primary: 'border-transparent text-white bg-blue-600',
             secondary:
-                'bg-white border-blue-500 text-blue-500 dark:bg-surface-raised dark:text-content-primary dark:border-outline',
+                'bg-white border-blue-500 text-blue-600 dark:bg-surface-raised dark:text-content-primary dark:border-outline',
             danger: 'text-white border-transparent bg-red-500',
         },
     },

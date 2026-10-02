@@ -30,12 +30,12 @@ export default function ConnectionBar() {
             className={`flex items-center gap-3 px-5 py-3 text-sm font-medium shrink-0 border-b border-gray-700 ${isConnected ? 'bg-gray-800' : 'bg-gray-900'}`}
         >
             <span
-                className={`text-xl ${isConnected ? 'text-green-400' : 'text-gray-500'}`}
+                className={`text-xl ${isConnected ? 'text-green-400' : 'text-gray-600'}`}
             >
                 {connectionIcon(port, isConnected)}
             </span>
             <span
-                className={`flex-1 ${isConnected ? 'text-white' : 'text-gray-500'}`}
+                className={`flex-1 ${isConnected ? 'text-white' : 'text-gray-600'}`}
             >
                 {isConnected ? port : 'Not connected'}
             </span>

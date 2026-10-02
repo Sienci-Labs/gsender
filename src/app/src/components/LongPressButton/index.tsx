@@ -248,7 +248,7 @@ export const LongPressButton: React.FC<LongPressButtonProps> = ({
             <button
                 type="button"
                 className={cn(
-                    'relative w-full min-h-12 select-none overflow-hidden rounded-lg border border-blue-500 bg-blue-500 px-4 py-3    text-center text-white shadow-md transition duration-150 hover:opacity-95',
+                    'relative w-full min-h-12 select-none overflow-hidden rounded-lg border border-blue-600 bg-blue-600 px-4 py-3    text-center text-white shadow-md transition duration-150 hover:opacity-95',
                     'active:shadow-[inset_7px_4px_6px_0px_rgba(30,_64,_175,_0.25)]',
                     'disabled:cursor-not-allowed disabled:border-gray-400 disabled:bg-gray-300 disabled:text-gray-500 disabled:opacity-100 disabled:hover:bg-gray-300 dark:disabled:bg-dark',
                     'touch-manipulation',

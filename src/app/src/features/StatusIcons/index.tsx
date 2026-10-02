@@ -58,7 +58,7 @@ const StatusIcons = () => {
         <div className="flex flex-row gap-4 absolute top-4 max-xl:top-2.5 right-4 max-sm:hidden">
             <Tooltip content="Wireless Control">
                 <button
-                    className="flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm text-gray-500"
+                    className="flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm text-gray-600"
                     onClick={toggleRemoteModeDialog}
                 >
                     <RemoteIndicator
@@ -71,7 +71,7 @@ const StatusIcons = () => {
             </Tooltip>
             <Tooltip content="Keyboard Shortcuts">
                 <Link
-                    className="flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm text-gray-500"
+                    className="flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm text-gray-600"
                     to={'/tools/keyboard-shortcuts'}
                 >
                     <FaRegKeyboard className="text-green-500 w-7 h-7" />
@@ -79,7 +79,7 @@ const StatusIcons = () => {
             </Tooltip>
             <Tooltip content="Gamepad Shortcuts">
                 <Link
-                    className="flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm text-gray-500"
+                    className="flex flex-col gap-0.5  self-center content-center items-center justify-center text-sm text-gray-600"
                     to={'/tools/gamepad'}
                 >
                     <LuGamepad2

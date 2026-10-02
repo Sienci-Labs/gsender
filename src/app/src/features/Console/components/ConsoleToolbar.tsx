@@ -38,7 +38,7 @@ function ToolbarAction({
                 type="button"
                 onClick={onClick}
                 aria-label={label}
-                className="flex items-center justify-center w-8 h-8 rounded text-gray-500 hover:text-gray-800 hover:bg-gray-100 active:bg-gray-200 dark:text-content-muted dark:hover:text-content-primary dark:hover:bg-overlay-hover dark:active:bg-overlay-active"
+                className="flex items-center justify-center w-8 h-8 rounded text-gray-600 hover:text-gray-800 hover:bg-gray-100 active:bg-gray-200 dark:text-content-muted dark:hover:text-content-primary dark:hover:bg-overlay-hover dark:active:bg-overlay-active"
             >
                 {children}
             </button>
@@ -74,7 +74,7 @@ export function ConsoleToolbar({
                             aria-pressed={selected}
                             className={`flex items-center gap-1 shrink-0 h-8 px-2 rounded text-xs font-medium transition-colors ${
                                 selected
-                                    ? 'bg-blue-500 text-white'
+                                    ? 'bg-blue-600 text-white'
                                     : 'text-gray-600 hover:bg-gray-100 dark:text-content-secondary dark:hover:bg-overlay-hover'
                             }`}
                         >

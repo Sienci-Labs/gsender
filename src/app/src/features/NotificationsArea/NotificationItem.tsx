@@ -22,7 +22,7 @@ const NotificationItem = ({ notification }: { notification: Notification }) => {
             <div className="py-2 px-4 flex flex-col w-full">
                 <div className="flex flex-col">
                     <div>{notification.message}</div>
-                    <div className="text-xs text-gray-500 dark:text-content-muted mt-1">
+                    <div className="text-xs text-gray-600 dark:text-content-muted mt-1">
                         {timeAgo}
                     </div>
                 </div>

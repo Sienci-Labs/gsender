@@ -14,7 +14,7 @@ export function ATCUnavailable({
             }
         >
             <div>
-                <p className="text-gray-500 dark:text-content-muted text-sm">
+                <p className="text-gray-600 dark:text-content-muted text-sm">
                     ATC Unavailable
                 </p>
                 <h1 className="text-xl font-bold dark:text-content-primary">
@@ -24,7 +24,7 @@ export function ATCUnavailable({
             <p className="dark:text-content-secondary">{message}</p>
 
             {additionalInfo && (
-                <p className="text-gray-500 dark:text-content-muted text-sm">
+                <p className="text-gray-600 dark:text-content-muted text-sm">
                     {additionalInfo}
                 </p>
             )}

@@ -223,7 +223,7 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                             <span className="text-base text-gray-900 dark:text-content-secondary">
                                 Last Job
                             </span>
-                            <div className="grid grid-rows-3 gap-4 max-xl:gap-2 -ml-[2px] text-gray-500 font-bold">
+                            <div className="grid grid-rows-3 gap-4 max-xl:gap-2 -ml-[2px] text-gray-600 font-bold">
                                 <TooltipProvider>
                                     <Tooltip>
                                         <TooltipTrigger asChild>
@@ -319,14 +319,14 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                 </Tooltip>
             </TooltipProvider>
 
-            <div className="text-gray-500 flex gap-1 text-xs">
+            <div className="text-gray-600 flex gap-1 text-xs">
                 <span>{fileSize}</span>
 
                 <span>({total} lines)</span>
             </div>
 
             {path && (
-                <div className="text-gray-500 text-xs max-w-full flex flex-row">
+                <div className="text-gray-600 text-xs max-w-full flex flex-row">
                     <span className="inline-block text-ellipsis overflow-hidden whitespace-nowrap">
                         {path}
                     </span>
@@ -335,7 +335,7 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
 
             <div className="flex gap-4 justify-center items-center w-full">
                 <div className="flex flex-col items-center flex-shrink-0">
-                    <span className="text-gray-500">Info</span>
+                    <span className="text-gray-600">Info</span>
                     <Switch
                         checked={toggleInfo}
                         onChange={() => setToggleInfo((prev) => !prev)}
@@ -343,7 +343,7 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                         data-testid="toggle-info"
                         aria-label="Toggle file info or size view"
                     />
-                    <span className="text-gray-500">Size</span>
+                    <span className="text-gray-600">Size</span>
                 </div>
 
                 <ToggleOutput />

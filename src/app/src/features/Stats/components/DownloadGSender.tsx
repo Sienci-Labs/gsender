@@ -43,7 +43,7 @@ export function DownloadGSender({ version = '1.5.0', downloadPercent = 0 }) {
                 </p>
                 <p>
                     <a
-                        className="text-sm text-blue-500 underline text-center"
+                        className="text-sm text-blue-600 dark:text-blue-400 underline text-center"
                         href="https://resources.sienci.com/view/gs-installation/#gsender-updates"
                         target="_blank"
                         rel="noreferrer"

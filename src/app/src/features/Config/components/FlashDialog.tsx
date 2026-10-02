@@ -233,7 +233,7 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                                 <SelectContent className="bg-white bg-opacity-100 z-[10000]">
                                     {ports.length > 0 && (
                                         <SelectGroup>
-                                            <SelectLabel className="text-gray-500 text-sm">
+                                            <SelectLabel className="text-gray-600 text-sm">
                                                 Recognized Ports
                                             </SelectLabel>
                                             {ports.map((p) => (
@@ -251,7 +251,7 @@ export function FlashDialog({ show, toggleShow }: flashDialogProps) {
                                     )}
                                     {unrecognizedPorts.length > 0 && (
                                         <SelectGroup>
-                                            <SelectLabel className="text-gray-500 text-sm">
+                                            <SelectLabel className="text-gray-600 text-sm">
                                                 Unrecognized Ports
                                             </SelectLabel>
                                             {unrecognizedPorts.map((p) => (

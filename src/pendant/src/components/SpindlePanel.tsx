@@ -108,7 +108,7 @@ function SpindleButton({
                         ? 'text-robin-500 shadow-[inset_7px_4px_6px_0px_rgba(59,130,246,0.12)] border-robin-400 dark:border-robin-600'
                         : danger
                           ? 'text-red-400'
-                          : 'text-gray-500 dark:text-content-muted',
+                          : 'text-gray-600 dark:text-content-muted',
                     { 'opacity-40': disabled },
                     !disabled &&
                         !active &&
@@ -804,7 +804,7 @@ export default function SpindlePanel({ mode }: Props) {
                             'text-[10px] font-medium leading-none',
                             !isLaserMode
                                 ? 'text-robin-500'
-                                : 'text-gray-500 dark:text-content-muted',
+                                : 'text-gray-600 dark:text-content-muted',
                         )}
                     >
                         Spindle
@@ -832,7 +832,7 @@ export default function SpindlePanel({ mode }: Props) {
                             'text-[10px] font-medium leading-none',
                             isLaserMode
                                 ? 'text-robin-500'
-                                : 'text-gray-500 dark:text-content-muted',
+                                : 'text-gray-600 dark:text-content-muted',
                         )}
                     >
                         Laser
@@ -845,7 +845,7 @@ export default function SpindlePanel({ mode }: Props) {
                     {divider}
 
                     <div className="flex items-center gap-3 px-4 pt-4 pb-2 shrink-0">
-                        <span className="text-xs text-gray-500 dark:text-content-muted w-14 shrink-0">
+                        <span className="text-xs text-gray-600 dark:text-content-muted w-14 shrink-0">
                             {isLaserMode ? 'Power' : 'Speed'}
                         </span>
                         <Slider
@@ -877,7 +877,7 @@ export default function SpindlePanel({ mode }: Props) {
 
                     {isLaserMode && (
                         <div className="flex items-center gap-3 px-4 py-2 shrink-0">
-                            <span className="text-xs text-gray-500 dark:text-content-muted w-14 shrink-0">
+                            <span className="text-xs text-gray-600 dark:text-content-muted w-14 shrink-0">
                                 Duration
                             </span>
                             <input
@@ -888,7 +888,7 @@ export default function SpindlePanel({ mode }: Props) {
                                 onChange={actions.handleLaserDurationChange}
                                 className="w-20 text-center rounded-lg border border-gray-300 dark:border-outline bg-white dark:bg-surface-elevated text-sm text-gray-700 dark:text-content-secondary px-2 py-1.5"
                             />
-                            <span className="text-xs text-gray-500 dark:text-content-muted">
+                            <span className="text-xs text-gray-600 dark:text-content-muted">
                                 sec
                             </span>
                         </div>

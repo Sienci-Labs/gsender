@@ -28,7 +28,7 @@ export function SpindleGcodePreview() {
                                         : ''
                                 }`}
                             >
-                                <span className="text-gray-500 dark:text-content-muted mr-4">
+                                <span className="text-gray-600 dark:text-content-muted mr-4">
                                     {index + 1}
                                 </span>
                                 {line}

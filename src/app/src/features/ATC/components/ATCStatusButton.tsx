@@ -16,7 +16,7 @@ export function ATCStatusButton({
     return (
         <button
             className={cn(
-                'p-2 border text-white bg-blue-500 rounded-lg flex flex-row items-center gap-2',
+                'p-2 border text-white bg-blue-600 rounded-lg flex flex-row items-center gap-2',
                 {
                     'bg-red-200 border-red-500 text-red-500': !predicate,
                 },

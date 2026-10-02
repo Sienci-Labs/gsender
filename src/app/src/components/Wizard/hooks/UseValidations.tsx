@@ -52,7 +52,7 @@ export function useValidations() {
                     update your firmware before proceeding.{' '}
                     <a
                         target="_blank"
-                        className="text-blue-500 underline"
+                        className="text-blue-600 dark:text-blue-400 underline"
                         href="https://resources.sienci.com/view/slb-firmware-flashing/"
                         rel="noopener"
                     >

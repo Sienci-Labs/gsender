@@ -57,7 +57,7 @@ export default function MachineStatus() {
             {/* Controller type */}
             {controllerType && (
                 <div className="flex flex-col items-center gap-1">
-                    <span className="text-xs uppercase tracking-widest text-gray-500">
+                    <span className="text-xs uppercase tracking-widest text-gray-600">
                         Controller
                     </span>
                     <span className="text-2xl font-semibold text-gray-200">

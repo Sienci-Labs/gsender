@@ -115,7 +115,7 @@ const LaserControls = ({ actions, state, canClick, isConnected }: Props) => {
                             id="laser-test-duration"
                             value={laser.duration}
                             onChange={actions.handleLaserDurationChange}
-                            className="z-0 text-center text-blue-500 text-xl"
+                            className="z-0 text-center text-blue-600 dark:text-blue-400 text-xl"
                             suffix="sec"
                             type="number"
                             sizing="xs"

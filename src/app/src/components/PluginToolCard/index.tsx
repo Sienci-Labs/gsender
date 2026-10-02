@@ -74,7 +74,7 @@ const PluginToolCard = ({
                 </span>
             </div>
 
-            <p className="text-blue-500 dark:text-content-primary text-lg font-bold leading-none tracking-tight m-0">
+            <p className="text-blue-600 dark:text-content-primary text-lg font-bold leading-none tracking-tight m-0">
                 {title}
             </p>
 

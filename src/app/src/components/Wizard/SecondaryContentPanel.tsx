@@ -144,7 +144,7 @@ export function SecondaryContentPanel({
                     <div className="bg-white dark:bg-surface-raised rounded-lg border border-gray-200 dark:border-gray-600 px-3 py-2 shadow-sm">
                         <div className="flex items-center gap-2">
                             <ExternalLink
-                                className="text-blue-500 flex-shrink-0"
+                                className="text-blue-600 dark:text-blue-400 flex-shrink-0"
                                 size={16}
                             />
                             <span className="flex-1 text-sm text-gray-700 dark:text-content-primary">

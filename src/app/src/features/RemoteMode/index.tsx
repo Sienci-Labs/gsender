@@ -292,7 +292,7 @@ export function RemoteModeDialog({
                                                 wireless control.
                                             </span>
                                         ) : (
-                                            <span className="text-gray-500 dark:text-content-muted">
+                                            <span className="text-gray-600 dark:text-content-muted">
                                                 {selectedEntry
                                                     ? `${selectedEntry.label} — `
                                                     : ''}

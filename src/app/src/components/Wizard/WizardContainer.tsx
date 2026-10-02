@@ -228,7 +228,7 @@ export function WizardContainer({ subWizard, onWizardExit }: Props) {
                                 onClick={onExit}
                                 testId="wizard-ending-exit"
                                 variant="nothing"
-                                className="flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors bg-gray-900 text-white hover:bg-gray-800 dark:bg-blue-500 dark:hover:bg-blue-600"
+                                className="flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors bg-gray-900 text-white hover:bg-gray-800 dark:bg-blue-600 dark:hover:bg-blue-700"
                             >
                                 Exit Wizard
                             </Button>
@@ -270,8 +270,8 @@ export function WizardContainer({ subWizard, onWizardExit }: Props) {
                 flex h-full items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors
                 ${
                     !isCurrentStepComplete
-                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        : 'bg-gray-900 text-white hover:text-white hover:bg-gray-500 dark:bg-blue-500 dark:hover:bg-blue-600'
+                        ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                        : 'bg-gray-900 text-white hover:text-white hover:bg-gray-500 dark:bg-blue-600 dark:hover:bg-blue-700'
                 }
               `}
                             >

@@ -10,7 +10,7 @@ interface CardHeaderProps {
 export function CardHeader({ children, link, linkLabel }: CardHeaderProps) {
     return (
         <div className="flex flex-row justify-between items-center">
-            <h1 className="text-2xl text-blue-500 pb-2">{children}</h1>
+            <h1 className="text-2xl text-blue-600 dark:text-blue-400 pb-2">{children}</h1>
             {link && <StatLink link={link} label={linkLabel} />}
         </div>
     );

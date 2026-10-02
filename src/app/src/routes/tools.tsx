@@ -17,7 +17,7 @@ const ToolsPage = () => {
             <h1 className="text-3xl font-bold dark:text-content-primary mb-2">
                 Tools
             </h1>
-            <p className="text-sm text-gray-500 dark:text-content-muted mb-4">
+            <p className="text-sm text-gray-600 dark:text-content-muted mb-4">
                 Tools are plugins that can be installed and used to extend the
                 functionality of gSender. Some are built in to gSender, some are
                 third party plugins.

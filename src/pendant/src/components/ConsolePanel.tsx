@@ -16,7 +16,7 @@ function lineColor(line: string): string {
     if (/error:/i.test(line) || /ALARM:/i.test(line)) {
         return 'text-red-400';
     }
-    return 'text-gray-500 dark:text-content-secondary';
+    return 'text-gray-600 dark:text-content-secondary';
 }
 
 export default function ConsolePanel({ className = '' }: Props) {
@@ -82,7 +82,7 @@ export default function ConsolePanel({ className = '' }: Props) {
                 </button>
                 <button
                     onClick={clear}
-                    className="shrink-0 px-2 py-1 text-xs font-medium rounded text-gray-500 dark:text-content-muted hover:text-gray-700 dark:hover:text-gray-200"
+                    className="shrink-0 px-2 py-1 text-xs font-medium rounded text-gray-600 dark:text-content-muted hover:text-gray-700 dark:hover:text-gray-200"
                 >
                     Clear
                 </button>

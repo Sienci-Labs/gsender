@@ -45,7 +45,7 @@ export function UpdateGSender({
                         What's new in v{version}
                     </h2>
                     <a
-                        className="text-sm text-blue-500 underline"
+                        className="text-sm text-blue-600 dark:text-blue-400 underline"
                         href="https://github.com/Sienci-Labs/gsender"
                         target="_blank"
                         rel="noreferrer"

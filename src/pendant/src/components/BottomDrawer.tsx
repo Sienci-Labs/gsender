@@ -413,7 +413,7 @@ export default function BottomDrawer() {
                                 className={`flex items-center justify-center border transition-colors ${
                                     mode === 'minimal' || mode === 'expanded'
                                         ? 'bg-[#ddeaf8] border-[#7aadd8] text-[#185FA5] dark:bg-blue-950 dark:border-blue-700 dark:text-blue-300'
-                                        : 'border-gray-200 dark:border-outline text-gray-500 dark:text-content-muted hover:bg-gray-50 dark:hover:bg-surface-hover'
+                                        : 'border-gray-200 dark:border-outline text-gray-600 dark:text-content-muted hover:bg-gray-50 dark:hover:bg-surface-hover'
                                 }`}
                             >
                                 {mode === 'expanded' ? (
@@ -429,7 +429,7 @@ export default function BottomDrawer() {
                                     height: 32,
                                     borderRadius: 6,
                                 }}
-                                className="flex items-center justify-center border border-gray-200 dark:border-outline text-gray-500 dark:text-content-muted hover:bg-gray-50 dark:hover:bg-surface-hover transition-colors"
+                                className="flex items-center justify-center border border-gray-200 dark:border-outline text-gray-600 dark:text-content-muted hover:bg-gray-50 dark:hover:bg-surface-hover transition-colors"
                             >
                                 <X size={16} />
                             </button>
@@ -494,7 +494,7 @@ export default function BottomDrawer() {
                             </div>
                         ) : (
                             <div className="shrink-0 px-3 py-3 flex items-center justify-between gap-3 border-b border-gray-200 dark:border-outline">
-                                <span className="text-xs text-gray-500 dark:text-content-muted">
+                                <span className="text-xs text-gray-600 dark:text-content-muted">
                                     No file loaded
                                 </span>
                                 <button
@@ -597,7 +597,7 @@ export default function BottomDrawer() {
                                     consoleHistory.map((line, i) => (
                                         <p
                                             key={i}
-                                            className="font-mono text-xs text-gray-500 dark:text-content-secondary truncate"
+                                            className="font-mono text-xs text-gray-600 dark:text-content-secondary truncate"
                                         >
                                             {line}
                                         </p>

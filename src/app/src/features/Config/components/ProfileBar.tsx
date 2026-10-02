@@ -172,7 +172,7 @@ export function ProfileBar() {
                     className={cn(
                         'p-3 text-lg rounded-sm border-gray-500',
                         {
-                            'bg-gray-300 text-gray-500 dark:bg-surface-elevated dark:text-content-secondary':
+                            'bg-gray-300 text-gray-600 dark:bg-surface-elevated dark:text-content-secondary':
                                 !settingsAreDirty,
                         },
                         {

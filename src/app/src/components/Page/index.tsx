@@ -47,7 +47,7 @@ const Page = ({
                         {title}
                     </h1>
                     {description && (
-                        <p className="text-gray-500">{description}</p>
+                        <p className="text-gray-600">{description}</p>
                     )}
                 </div>
 

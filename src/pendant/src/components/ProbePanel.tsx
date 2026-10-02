@@ -581,7 +581,7 @@ export default function ProbePanel({ mode }: Props) {
                         className={clsx(
                             'w-full flex-1 flex items-center justify-center gap-1.5 rounded-xl',
                             'font-semibold text-sm min-h-[44px]',
-                            'bg-blue-500 hover:bg-blue-600 text-white',
+                            'bg-blue-600 hover:bg-blue-700 text-white',
                             'disabled:opacity-40 disabled:cursor-default transition-colors',
                         )}
                     >
@@ -605,7 +605,7 @@ export default function ProbePanel({ mode }: Props) {
                                 setWizardMaxReached(2);
                             }}
                             disabled={!canClick()}
-                            className="w-full text-[10px] leading-tight text-gray-500 dark:text-content-muted border border-gray-300 dark:border-outline rounded-lg px-1 py-1 disabled:opacity-40"
+                            className="w-full text-[10px] leading-tight text-gray-600 dark:text-content-muted border border-gray-300 dark:border-outline rounded-lg px-1 py-1 disabled:opacity-40"
                         >
                             Repeat last: {CORNER_LABELS[lastProbeCorner]},{' '}
                             {formatDiameter(

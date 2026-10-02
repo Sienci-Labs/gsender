@@ -48,7 +48,7 @@ const ToolModalButton: React.FC<Props> = ({
             className={cx(
                 'w-full bg-white border-blue-500 border-1',
                 '[--tw-shadow:0_4px_6px_-1px_rgba(0,0,0,0.1),_0_2px_4px_-1px_rgba(0,0,0,0.06)]',
-                'shadow rounded text-blue-500 flex flex-row p-0 items-stretch text-base mb-4',
+                'shadow rounded text-blue-600 dark:text-blue-400 flex flex-row p-0 items-stretch text-base mb-4',
                 'hover:bg-gray-300 disabled:bg-black disabled:bg-opacity-15 disabled:text-black',
                 'disabled:text-opacity-30 disabled:border-black disabled:border-opacity-15 disabled:cursor-not-allowed',
                 className,
@@ -57,7 +57,7 @@ const ToolModalButton: React.FC<Props> = ({
             onClick={onClick}
             {...props}
         >
-            <div className="text-white text-2xl w-12 bg-blue-500 flex items-center justify-center mr-2 flex-col">
+            <div className="text-white text-2xl w-12 bg-blue-600 flex items-center justify-center mr-2 flex-col">
                 <Icon />
             </div>
             <div className="py-4 px-0 flex flex-grow justify-center">

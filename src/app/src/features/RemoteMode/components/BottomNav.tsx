@@ -9,10 +9,10 @@ export function BottomNavLink({ label, icon, href }) {
             to={href}
             className="inline-flex flex-col items-center justify-center border-gray-300 border-x hover:bg-gray-50 "
         >
-            <span className="w-5 h-5 mb-2 text-gray-500  group-hover:text-blue-600 text-2xl">
+            <span className="w-5 h-5 mb-2 text-gray-600  group-hover:text-blue-600 text-2xl">
                 {icon}
             </span>
-            <span className="text-sm text-gray-500  group-hover:text-blue-600">
+            <span className="text-sm text-gray-600  group-hover:text-blue-600">
                 {label}
             </span>
         </Link>

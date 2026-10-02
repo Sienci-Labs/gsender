@@ -97,14 +97,14 @@ const HelperInfo = ({ payload, infoVisible, onClose }: Props) => {
 
                             <Popover>
                                 <PopoverTrigger className="w-20">
-                                    <p className="text-blue-500">Click Me!</p>
+                                    <p className="text-blue-600 dark:text-blue-400">Click Me!</p>
                                 </PopoverTrigger>
                                 <PopoverContent
                                     className="w-80 text-sm ml-4"
                                     side="right"
                                 >
                                     <div className="flex flex-col items-center text-sm text-gray-600 gap-4 px-4 justify-center dark:text-white">
-                                        <h1 className="text-blue-500 text-2xl">
+                                        <h1 className="text-blue-600 dark:text-blue-400 text-2xl">
                                             Sienci Resources
                                         </h1>
                                         <div className="justify-center items-center">

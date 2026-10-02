@@ -106,7 +106,7 @@ export function ToolTimelineItem({
                     <div className="flex items-center gap-1.5 min-h-[1.25rem]">
                         {isRemapped ? (
                             <>
-                                <span className="text-xs text-gray-500 dark:text-content-muted line-through">
+                                <span className="text-xs text-gray-600 dark:text-content-muted line-through">
                                     {currentToolLabel}
                                 </span>
                                 <span className="font-mono text-sm font-semibold text-gray-900 dark:text-content-primary">
@@ -120,11 +120,11 @@ export function ToolTimelineItem({
                         )}
                         {hasNickname && (
                             <>
-                                <span className="text-gray-500 dark:text-content-muted">
+                                <span className="text-gray-600 dark:text-content-muted">
                                     ·
                                 </span>
                                 <Tooltip content={label} side="top">
-                                    <span className="text-xs text-gray-500 dark:text-content-muted">
+                                    <span className="text-xs text-gray-600 dark:text-content-muted">
                                         {label}
                                     </span>
                                 </Tooltip>
@@ -132,10 +132,10 @@ export function ToolTimelineItem({
                         )}
                         {!hasNickname && tool.comment && (
                             <>
-                                <span className="text-gray-500 dark:text-content-muted">
+                                <span className="text-gray-600 dark:text-content-muted">
                                     ·
                                 </span>
-                                <span className="text-xs text-gray-500 dark:text-content-muted truncate">
+                                <span className="text-xs text-gray-600 dark:text-content-muted truncate">
                                     {tool.comment}
                                 </span>
                             </>
@@ -170,7 +170,7 @@ export function ToolTimelineItem({
                 </div>
 
                 <div className="flex flex-shrink-0 items-center gap-3 self-stretch">
-                    <span className="whitespace-nowrap font-mono text-xs text-gray-500 dark:text-content-muted">
+                    <span className="whitespace-nowrap font-mono text-xs text-gray-600 dark:text-content-muted">
                         {lineRange}
                     </span>
                     {canRemap && (

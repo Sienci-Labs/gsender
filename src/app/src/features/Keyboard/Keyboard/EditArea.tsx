@@ -187,7 +187,7 @@ const EditArea = ({ shortcut, shortcuts, edit, onClose }: EditProps) => {
 
         if (shortcut.keys === '') {
             return (
-                <span className="text-gray-500 dark:text-gray-300">None</span>
+                <span className="text-gray-600 dark:text-gray-300">None</span>
             );
         }
 
@@ -211,7 +211,7 @@ const EditArea = ({ shortcut, shortcuts, edit, onClose }: EditProps) => {
         if (!state.pressed) {
             return (
                 <div className="h-12 flex items-center justify-center">
-                    <span className="text-blue-500 animate-pulse">
+                    <span className="text-blue-600 dark:text-blue-400 animate-pulse">
                         Press Some Keys...
                     </span>
                 </div>
@@ -254,7 +254,7 @@ const EditArea = ({ shortcut, shortcuts, edit, onClose }: EditProps) => {
                 {/* Header Section */}
                 <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-surface-elevated rounded-lg">
                     <div>
-                        <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                        <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                             Action
                         </h4>
                         <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
@@ -262,7 +262,7 @@ const EditArea = ({ shortcut, shortcuts, edit, onClose }: EditProps) => {
                         </h4>
                     </div>
                     <div>
-                        <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                        <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                             Current Shortcut
                         </h4>
                         <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
@@ -299,7 +299,7 @@ const EditArea = ({ shortcut, shortcuts, edit, onClose }: EditProps) => {
                             ) : state.status.error ? (
                                 <FaExclamationCircle className="text-red-500" />
                             ) : (
-                                <FaInfoCircle className="text-gray-500" />
+                                <FaInfoCircle className="text-gray-600" />
                             )}
                             <span>{state.status.message}</span>
                         </div>
@@ -314,8 +314,8 @@ const EditArea = ({ shortcut, shortcuts, edit, onClose }: EditProps) => {
                         className={cn(
                             'px-6 py-2 rounded-md font-medium transition-colors duration-200',
                             state.status.available
-                                ? 'bg-blue-500 text-white hover:bg-blue-600'
-                                : 'bg-gray-300 text-gray-500 cursor-not-allowed',
+                                ? 'bg-blue-600 text-white hover:bg-blue-700'
+                                : 'bg-gray-300 text-gray-600 cursor-not-allowed',
                         )}
                     >
                         Update Shortcut

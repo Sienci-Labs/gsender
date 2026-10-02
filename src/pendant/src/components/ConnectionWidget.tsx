@@ -132,7 +132,7 @@ function PortRow({
                 className={cn(
                     'conn-anim-port-glow flex items-center justify-center w-12 h-12 rounded-full shrink-0 bg-gray-100 dark:bg-slate-800',
                     muted
-                        ? 'text-gray-500 dark:text-content-muted'
+                        ? 'text-gray-600 dark:text-content-muted'
                         : 'text-blue-700',
                 )}
             >
@@ -147,17 +147,17 @@ function PortRow({
                     className={cn(
                         'block text-sm font-semibold truncate',
                         muted
-                            ? 'text-gray-500 dark:text-content-muted'
+                            ? 'text-gray-600 dark:text-content-muted'
                             : 'text-gray-700 dark:text-content-secondary',
                     )}
                 >
                     {row.label}
                 </span>
-                <span className="block text-xs font-mono mt-0.5 text-gray-500 dark:text-content-muted">
+                <span className="block text-xs font-mono mt-0.5 text-gray-600 dark:text-content-muted">
                     {row.meta}
                 </span>
             </span>
-            <ChevronRight className="w-4 h-4 shrink-0 text-gray-500 dark:text-content-muted" />
+            <ChevronRight className="w-4 h-4 shrink-0 text-gray-600 dark:text-content-muted" />
         </button>
     );
 }
@@ -186,11 +186,11 @@ function PortDropdown({
     return (
         <Dropdown open={open} onClose={onClose} width="w-80">
             <div className="px-3 py-3">
-                <p className="px-2 pb-1.5 text-xs font-medium uppercase tracking-widest text-gray-500 dark:text-content-muted">
+                <p className="px-2 pb-1.5 text-xs font-medium uppercase tracking-widest text-gray-600 dark:text-content-muted">
                     Recognized
                 </p>
                 {recognized.length === 0 ? (
-                    <p className="px-2 py-3 text-sm text-gray-500 dark:text-content-muted">
+                    <p className="px-2 py-3 text-sm text-gray-600 dark:text-content-muted">
                         No devices found
                     </p>
                 ) : (
@@ -211,7 +211,7 @@ function PortDropdown({
                         <button
                             type="button"
                             onClick={() => setShowUnrecognized((v) => !v)}
-                            className="w-full flex items-center justify-between px-2 py-2.5 text-xs font-medium uppercase tracking-widest text-gray-500 dark:text-content-muted outline-none"
+                            className="w-full flex items-center justify-between px-2 py-2.5 text-xs font-medium uppercase tracking-widest text-gray-600 dark:text-content-muted outline-none"
                         >
                             Unrecognized Ports
                             <ChevronDown
@@ -667,7 +667,7 @@ export default function ConnectionWidget() {
                     <p className="font-mono text-gray-700 dark:text-content-secondary">
                         Port: {displayPort || '—'} · {cfg.baud}
                     </p>
-                    <p className="text-xs pt-2 border-t border-gray-300 dark:border-outline text-gray-500 dark:text-content-muted">
+                    <p className="text-xs pt-2 border-t border-gray-300 dark:border-outline text-gray-600 dark:text-content-muted">
                         Hold the button to disconnect.
                     </p>
                 </div>

@@ -69,7 +69,7 @@ const AlertDialogHeader = ({
         )}
         {...props}
     >
-        <div className="text-4xl text-blue-500 flex items-center justify-center border-blue-500 border bg-blue-500 bg-opacity-20 rounded-md p-1 mr-6">
+        <div className="text-4xl text-blue-600 dark:text-blue-400 flex items-center justify-center border-blue-500 border bg-blue-500 bg-opacity-20 rounded-md p-1 mr-6">
             <span className="opacity-60">
                 <IoIosWarning />
             </span>
@@ -100,7 +100,7 @@ const AlertDialogTitle = React.forwardRef<
     <AlertDialogPrimitive.Title
         ref={ref}
         className={cx(
-            'text-2xl font-semibold text-blue-500 dark:text-content-primary',
+            'text-2xl font-semibold text-blue-600 dark:text-content-primary',
             className,
         )}
         {...props}

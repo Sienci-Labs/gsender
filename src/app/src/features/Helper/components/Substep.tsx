@@ -48,7 +48,7 @@ interface SubstepProps {
 const Substep = ({ step, index, stepIndex, firstRunOnly }: SubstepProps) => {
     return (
         <div className="flex flex-col gap-3" id={`step-${stepIndex}-${index}`}>
-            <div className="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-amber-400">
+            <div className="text-xs font-semibold uppercase tracking-widest text-gray-600 dark:text-amber-400">
                 {step.title}
             </div>
 
