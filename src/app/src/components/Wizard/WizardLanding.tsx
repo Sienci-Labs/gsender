@@ -156,7 +156,7 @@ export function WizardLanding({
                 <div className="border-2 border-blue-400 rounded-lg p-6 bg-white dark:bg-surface-raised">
                     <div className="flex items-start gap-3">
                         <HelpCircle
-                            className="text-blue-500 flex-shrink-0"
+                            className="text-blue-600 dark:text-blue-400 flex-shrink-0"
                             size={24}
                         />
                         <div>
@@ -172,7 +172,7 @@ export function WizardLanding({
                                     }
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-blue-500 font-bold"
+                                    className="text-blue-600 dark:text-blue-400 font-bold"
                                 >
                                     online resources
                                 </a>

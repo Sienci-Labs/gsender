@@ -83,7 +83,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                             type={type}
                             {...props}
                         />
-                        <div className="shrink-0 pl-2 text-xs flex items-center pointer-events-none text-gray-500 dark:text-content-primary">
+                        <div className="shrink-0 pl-2 text-xs flex items-center pointer-events-none text-gray-600 dark:text-content-primary">
                             {suffix}
                         </div>
                     </div>

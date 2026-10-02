@@ -89,7 +89,7 @@ export default function CornerSelector({
                 })}
             </div>
 
-            <p className="text-sm text-gray-500 dark:text-content-muted text-center">
+            <p className="text-sm text-gray-600 dark:text-content-muted text-center">
                 <span className="font-bold text-gray-700 dark:text-content-secondary">
                     {selectedCorner?.label ?? 'Unknown'}
                 </span>{' '}

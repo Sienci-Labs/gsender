@@ -61,7 +61,7 @@ const About = () => {
                             href="https://github.com/Sienci-Labs/gsender/releases"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-blue-500 underline"
+                            className="text-blue-600 dark:text-blue-400 underline"
                         >
                             GitHub.
                         </a>
@@ -136,20 +136,20 @@ const About = () => {
                     />
                     <div className="dark:text-content-primary">
                         <h1 className="text-3xl font-bold">gSender</h1>
-                        <p className="text-sm text-gray-500 dark:text-content-primary">
+                        <p className="text-sm text-gray-600 dark:text-content-primary">
                             By Sienci Labs
                         </p>
-                        <p className="text-sm text-gray-500 dark:text-content-primary">
+                        <p className="text-sm text-gray-600 dark:text-content-primary">
                             Version {version}
                         </p>
                     </div>
                 </div>
                 <div className="flex flex-col items-end gap-2 text-sm">
-                    <p className=" text-gray-500 dark:text-content-primary">
+                    <p className=" text-gray-600 dark:text-content-primary">
                         Copyright © {new Date().getFullYear()} Sienci Labs Inc.
                     </p>
                     <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-500 dark:text-content-primary">
+                        <span className="text-sm text-gray-600 dark:text-content-primary">
                             Made in Canada
                         </span>
                         <img src={canadaFlag.href} alt="Canada Flag" />
@@ -159,7 +159,7 @@ const About = () => {
                             href="https://github.com/Sienci-Labs/gsender/blob/master/LICENSE"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-blue-500 underline"
+                            className="text-blue-600 dark:text-blue-400 underline"
                         >
                             GNU GPLv3 License
                         </a>
@@ -177,7 +177,7 @@ const About = () => {
             </p>
 
             <div>
-                <h2 className="text-2xl text-blue-500 mb-2">gSender Team</h2>
+                <h2 className="text-2xl text-blue-600 dark:text-blue-400 mb-2">gSender Team</h2>
                 <div className="text-md md:text-lg dark:text-content-primary">
                     {team.map((member, index) => (
                         <span key={member.name}>
@@ -191,12 +191,12 @@ const About = () => {
             {!hasUpdate && (
                 <div className="h-full flex flex-col gap-2">
                     <div className="flex gap-2 items-center justify-between">
-                        <h2 className="text-2xl text-blue-500">
+                        <h2 className="text-2xl text-blue-600 dark:text-blue-400">
                             Release Notes
                         </h2>
 
                         <a
-                            className="text-sm text-blue-500 underline"
+                            className="text-sm text-blue-600 dark:text-blue-400 underline"
                             href="https://github.com/Sienci-Labs/gsender"
                             target="_blank"
                             rel="noreferrer"

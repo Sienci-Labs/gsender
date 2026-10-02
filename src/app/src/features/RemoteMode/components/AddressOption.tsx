@@ -56,7 +56,7 @@ export function AddressOption({ entry }: { entry: NetworkAddress }) {
                 <Icon
                     className={cx('w-4 h-4 shrink-0', {
                         'text-green-600 dark:text-green-400': entry.recommended,
-                        'text-gray-500 dark:text-content-muted':
+                        'text-gray-600 dark:text-content-muted':
                             !entry.recommended && entry.usable,
                         'text-gray-400 dark:text-content-disabled':
                             !entry.usable,
@@ -80,7 +80,7 @@ export function AddressOption({ entry }: { entry: NetworkAddress }) {
             ) : (
                 <span
                     className={cx('ml-3 shrink-0 text-[11px]', {
-                        'text-gray-500 dark:text-content-muted': entry.usable,
+                        'text-gray-600 dark:text-content-muted': entry.usable,
                         'text-gray-400 dark:text-content-disabled':
                             !entry.usable,
                     })}
@@ -111,7 +111,7 @@ export function AddressSummary({
             <Icon
                 className={cx('w-4 h-4 shrink-0', {
                     'text-green-600 dark:text-green-400': entry?.recommended,
-                    'text-gray-500 dark:text-content-muted':
+                    'text-gray-600 dark:text-content-muted':
                         !entry?.recommended,
                 })}
             />

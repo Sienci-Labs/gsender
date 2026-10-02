@@ -8,7 +8,7 @@ export const buttonStyle = tv({
     variants: {
         variant: {
             primary:
-                'border-blue-500 text-white bg-blue-500 dark:text-content-secondary',
+                'border-blue-600 text-white bg-blue-600 hover:bg-blue-700',
             secondary:
                 'border-robin-500 hover:bg-gray-200 text-gray-600 bg-white dark:bg-surface-raised dark:text-content-secondary',
             alt: 'bg-robin-500 text-white border-robin-500',
@@ -22,7 +22,7 @@ export const buttonStyle = tv({
             nothing: 'border-none bg-transparent shadow-none',
         },
         disabled: {
-            true: 'bg-gray-300 border-gray-400 text-gray-500 hover:bg-gray-300 dark:bg-surface-raised cursor-not-allowed',
+            true: 'bg-gray-300 border-gray-400 text-gray-600 hover:bg-gray-300 dark:bg-surface-raised cursor-not-allowed',
         },
         active: {
             true: 'bg-gray-200 shadow-[inset_7px_4px_6px_0px_rgba(59,_130,_246,_0.1)]',

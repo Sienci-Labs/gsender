@@ -75,7 +75,7 @@ const Wizard = () => {
             <div className="absolute top-2 left-1/2 -translate-x-1/2 z-[10000] pointer-events-auto flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/90 dark:bg-surface-raised/90 backdrop-blur-sm border border-gray-200 dark:border-outline-subtle shadow-md">
                 <Wrench
                     size={12}
-                    className="text-gray-500 dark:text-content-muted shrink-0"
+                    className="text-gray-600 dark:text-content-muted shrink-0"
                 />
                 <span className="font-medium text-gray-700 dark:text-content-primary text-xs whitespace-nowrap">
                     {title}
@@ -110,7 +110,7 @@ const Wizard = () => {
                         <div className="flex items-center gap-2">
                             <Wrench
                                 size={14}
-                                className="text-gray-500 dark:text-content-muted"
+                                className="text-gray-600 dark:text-content-muted"
                             />
                             <span className="font-semibold text-base text-gray-900 dark:text-content-primary">
                                 {title}

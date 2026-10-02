@@ -60,9 +60,9 @@ const CHROME = {
     titlebar:
         'flex items-center justify-between px-3 py-2 border-b border-gray-200 dark:border-outline-subtle bg-gray-100 dark:bg-surface-base',
     titleText: 'font-semibold text-base text-gray-900 dark:text-content-primary',
-    titleIcon: 'text-gray-500 dark:text-content-muted',
+    titleIcon: 'text-gray-600 dark:text-content-muted',
     titlebarButton:
-        'flex items-center justify-center w-7 h-7 rounded border border-gray-300 dark:border-outline bg-transparent text-gray-500 dark:text-content-muted hover:bg-gray-200 dark:hover:bg-white/10 disabled:opacity-35 disabled:pointer-events-none transition-colors',
+        'flex items-center justify-center w-7 h-7 rounded border border-gray-300 dark:border-outline bg-transparent text-gray-600 dark:text-content-muted hover:bg-gray-200 dark:hover:bg-white/10 disabled:opacity-35 disabled:pointer-events-none transition-colors',
     main: 'flex-1 min-w-0 overflow-y-auto p-4 flex flex-col gap-3 bg-white dark:bg-surface-raised',
     side: 'w-[280px] shrink-0 border-r border-gray-200 dark:border-outline-subtle bg-gray-50 dark:bg-[#141418] overflow-y-auto p-3 flex flex-col gap-3 portrait:w-full portrait:border-r-0 portrait:border-b',
     footer: 'flex items-center justify-between px-4 py-3 border-t border-gray-200 dark:border-outline-subtle bg-gray-50 dark:bg-surface-base',
@@ -71,7 +71,7 @@ const CHROME = {
     primaryButton:
         'flex items-center gap-1.5 text-xs px-3.5 py-1.5 rounded-md bg-blue-600 dark:bg-blue-700 text-white hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-35 disabled:pointer-events-none transition-colors',
     eyebrow:
-        'text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-amber-400',
+        'text-xs font-semibold uppercase tracking-widest text-gray-600 dark:text-amber-400',
     body: 'text-sm leading-relaxed text-gray-600 dark:text-content-muted',
     heading: 'text-sm font-semibold text-gray-900 dark:text-content-primary',
     muted: 'text-xs text-gray-400 dark:text-content-muted',

@@ -30,7 +30,7 @@ const MarkFirstLocation = ({ onComplete }: Props) => {
                         {markLocationCompleted ? (
                             <FaClipboardCheck className="min-w-8 min-h-8 text-green-500 " />
                         ) : (
-                            <FaClipboardList className="min-w-8 min-h-8 text-blue-500 " />
+                            <FaClipboardList className="min-w-8 min-h-8 text-blue-600 dark:text-blue-400 " />
                         )}
                     </div>
                     <div className="flex flex-col gap-2 flex-1">

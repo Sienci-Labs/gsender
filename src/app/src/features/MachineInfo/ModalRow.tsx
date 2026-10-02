@@ -13,7 +13,7 @@ const ModalRow: React.FC<Props> = ({ label, value }) => {
 
     return (
         <div className="flex items-center justify-between w-full h-[3px] mt-3 mb-3 border-b-2 border-b-gray-300 dark:border-b-dark-lighter">
-            <div className="bg-gray-50 pr-2 text-gray-500 dark:text-content-primary dark:bg-surface-raised">
+            <div className="bg-gray-50 pr-2 text-gray-600 dark:text-content-primary dark:bg-surface-raised">
                 {label}
             </div>
             <div className="bg-gray-50 pl-2 text-right dark:text-content-primary dark:bg-surface-raised">

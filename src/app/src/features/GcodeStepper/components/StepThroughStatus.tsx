@@ -54,7 +54,7 @@ const Block: React.FC<{
             className,
         )}
     >
-        <span className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-content-muted">
+        <span className="text-[10px] uppercase tracking-wide text-gray-600 dark:text-content-muted">
             {label}
         </span>
         {children}
@@ -66,7 +66,7 @@ const AxisReadout: React.FC<{ label: string; value: string }> = ({
     value,
 }) => (
     <div className="flex items-baseline gap-1">
-        <span className="text-xs text-gray-500 dark:text-content-muted">
+        <span className="text-xs text-gray-600 dark:text-content-muted">
             {label}
         </span>
         {/* Minimum-width and right-aligned: keeps the bar from reflowing on
@@ -75,7 +75,7 @@ const AxisReadout: React.FC<{ label: string; value: string }> = ({
 		    over a multi-rotation job, so the box must grow for it rather than
 		    let the value overflow past a fixed width. `ch` is exact under
 		    font-mono; 7 covers the common case ("-9999.99"). */}
-        <span className="inline-block min-w-[7ch] text-right font-mono tabular-nums text-blue-500 dark:text-blue-400">
+        <span className="inline-block min-w-[7ch] text-right font-mono tabular-nums text-blue-600 dark:text-blue-400">
             {value}
         </span>
     </div>
@@ -105,7 +105,7 @@ const ModalCell: React.FC<{
                 'text-[10px] uppercase tracking-wide',
                 changed
                     ? 'text-blue-700 dark:text-blue-200'
-                    : 'text-gray-500 dark:text-content-muted',
+                    : 'text-gray-600 dark:text-content-muted',
             )}
         >
             {label}
@@ -225,7 +225,7 @@ export const StepThroughStatus: React.FC<StepThroughStatusProps> = ({
 
             <Block label="Modals" className="min-w-[15rem] flex-1">
                 {current === null ? (
-                    <span className="text-xs text-gray-500 dark:text-content-muted">
+                    <span className="text-xs text-gray-600 dark:text-content-muted">
                         —
                     </span>
                 ) : (
@@ -257,7 +257,7 @@ export const StepThroughStatus: React.FC<StepThroughStatusProps> = ({
                     'flex min-h-[2.75rem] w-36 flex-shrink-0 items-center justify-center gap-2 rounded-lg border px-3 text-xs transition-colors',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                     hideProcessed
-                        ? 'border-blue-500 bg-blue-500 text-white hover:bg-blue-600'
+                        ? 'border-blue-600 bg-blue-600 text-white hover:bg-blue-700'
                         : 'border-gray-300 bg-white text-gray-600 hover:bg-gray-100 dark:border-outline dark:bg-surface-elevated dark:text-content-secondary dark:hover:bg-surface-hover',
                 )}
             >

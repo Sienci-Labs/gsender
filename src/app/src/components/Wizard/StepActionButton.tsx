@@ -74,7 +74,7 @@ export function StepActionButton({
 
         switch (state) {
             case 'available':
-                return `${baseStyles} bg-blue-500 text-white hover:bg-blue-600`;
+                return `${baseStyles} bg-blue-600 text-white hover:bg-blue-700`;
             case 'running':
                 return `${baseStyles} bg-blue-400 text-white cursor-not-allowed`;
             case 'finished':

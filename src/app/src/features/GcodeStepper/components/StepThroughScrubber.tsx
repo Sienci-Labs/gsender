@@ -222,7 +222,7 @@ export const StepThroughScrubber: React.FC<ScrubberProps> = ({
                         key={i}
                         style={{ left: `${i * 25}%` }}
                         className={cn(
-                            'absolute top-0 whitespace-nowrap text-xs tabular-nums text-gray-500 dark:text-content-muted',
+                            'absolute top-0 whitespace-nowrap text-xs tabular-nums text-gray-600 dark:text-content-muted',
                             i === 0 && 'translate-x-0',
                             i > 0 && i < 4 && '-translate-x-1/2',
                             i === 4 && '-translate-x-full',
@@ -233,7 +233,7 @@ export const StepThroughScrubber: React.FC<ScrubberProps> = ({
                 ))}
             </div>
 
-            <div className="text-center text-sm text-gray-500 dark:text-content-muted">
+            <div className="text-center text-sm text-gray-600 dark:text-content-muted">
                 <span className="font-semibold tabular-nums text-gray-700 dark:text-content-secondary">
                     {currentLine.toLocaleString()}
                 </span>

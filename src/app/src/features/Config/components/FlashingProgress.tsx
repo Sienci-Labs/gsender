@@ -96,7 +96,7 @@ export function FlashingProgress({ type }: { type: string }) {
                 </div>
                 <div className="px-3 py-2 h-40 overflow-y-auto">
                     {notifications.length === 0 ? (
-                        <div className="text-gray-500">Waiting for logs...</div>
+                        <div className="text-gray-600">Waiting for logs...</div>
                     ) : (
                         notifications.map((message, index) => {
                             const typeClass = {
@@ -107,7 +107,7 @@ export function FlashingProgress({ type }: { type: string }) {
                             }[message.type];
                             return (
                                 <div key={`${message.timestamp}-${index}`}>
-                                    <span className="text-gray-500">
+                                    <span className="text-gray-600">
                                         [{message.timestamp}]
                                     </span>{' '}
                                     <span className={typeClass}>

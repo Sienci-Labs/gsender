@@ -22,7 +22,7 @@ export function IndicatorButton({
             className={cn(
                 'p-2 border border-blue-500 rounded-lg shadow-lg hover:bg-gray-50 min-w-20 min-h-20 flex flex-col gap-2 justify-around items-center shadow-blue-200 text-4xl dark:hover:bg-dark-lighter',
                 {
-                    'bg-blue-500 text-gray-500 hover:bg-blue-400 hover:text-gray-900':
+                    'bg-blue-500 text-gray-600 hover:bg-blue-400 hover:text-gray-900':
                         active,
                 },
             )}
@@ -38,7 +38,7 @@ export function IndicatorButton({
                 {icon}
             </span>
             <span
-                className={cn('text-sm text-blue-500', {
+                className={cn('text-sm text-blue-600 dark:text-blue-400', {
                     'text-gray-200': active,
                 })}
             >

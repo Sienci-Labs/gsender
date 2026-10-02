@@ -82,7 +82,7 @@ const VisibilityButton: React.FC<{
             'relative z-10 flex w-11 flex-shrink-0 items-center justify-center self-stretch rounded-lg border transition-colors',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
             !isVisible &&
-                'border-gray-300/80 bg-gray-100 text-gray-500 hover:bg-gray-200 dark:border-outline/70 dark:bg-surface-elevated dark:text-content-muted dark:hover:bg-surface-hover',
+                'border-gray-300/80 bg-gray-100 text-gray-600 hover:bg-gray-200 dark:border-outline/70 dark:bg-surface-elevated dark:text-content-muted dark:hover:bg-surface-hover',
         )}
     >
         {isVisible ? (
@@ -171,10 +171,10 @@ const ToolVisibilityItem: React.FC<{
                     </span>
                     {tool.comment && (
                         <>
-                            <span className="text-gray-500 dark:text-content-muted">
+                            <span className="text-gray-600 dark:text-content-muted">
                                 ·
                             </span>
-                            <span className="truncate text-xs text-gray-500 dark:text-content-muted">
+                            <span className="truncate text-xs text-gray-600 dark:text-content-muted">
                                 {tool.comment}
                             </span>
                         </>
@@ -200,7 +200,7 @@ const ToolVisibilityItem: React.FC<{
             </div>
 
             <div className="flex flex-shrink-0 items-center gap-3 self-stretch">
-                <span className="whitespace-nowrap font-mono text-xs text-gray-500 dark:text-content-muted">
+                <span className="whitespace-nowrap font-mono text-xs text-gray-600 dark:text-content-muted">
                     {tool.startLine}-{tool.endLine}
                 </span>
                 <VisibilityButton
@@ -234,12 +234,12 @@ export const ToolVisibilityPanel: React.FC<ToolVisibilityPanelProps> = ({
     units,
 }) => (
     <div className="flex h-full min-h-0 flex-col gap-2">
-        <span className="text-xs uppercase tracking-wide text-gray-500 dark:text-content-muted">
+        <span className="text-xs uppercase tracking-wide text-gray-600 dark:text-content-muted">
             Tools
         </span>
 
         {tools.length === 0 ? (
-            <div className="flex flex-1 flex-col items-center justify-center gap-2 text-gray-500 dark:text-content-muted">
+            <div className="flex flex-1 flex-col items-center justify-center gap-2 text-gray-600 dark:text-content-muted">
                 <Wrench className="h-12 w-12" />
                 <span className="text-xs">No tools found in this file.</span>
             </div>

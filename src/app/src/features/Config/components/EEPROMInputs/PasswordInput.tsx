@@ -16,7 +16,7 @@ const PasswordInput = ({ setting, info, onChange, disabled }) => {
                 disabled={disabled}
             />
             {unit && (
-                <span className="absolute right-2 text-xs flex items-center pointer-events-none text-gray-500">
+                <span className="absolute right-2 text-xs flex items-center pointer-events-none text-gray-600">
                     {unit}
                 </span>
             )}

@@ -322,7 +322,7 @@ export const GcodeStepper: React.FC<GcodeStepperProps> = ({
                             type="button"
                             aria-label="Close step through"
                             onClick={() => onOpenChange(false)}
-                            className="flex h-11 w-11 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 dark:text-content-muted dark:hover:bg-surface-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            className="flex h-11 w-11 items-center justify-center rounded-lg text-gray-600 hover:bg-gray-100 dark:text-content-muted dark:hover:bg-surface-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                         >
                             <X className="h-6 w-6" />
                         </button>

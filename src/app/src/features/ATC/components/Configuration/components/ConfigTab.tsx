@@ -59,9 +59,9 @@ export const ConfigTab: React.FC = ({
 
     const nonDefaultStyling = 'bg-yellow-50 dark:bg-yellow-900/20';
     const labelClass =
-        'text-xs font-semibold text-gray-500 dark:text-content-primary';
+        'text-xs font-semibold text-gray-600 dark:text-content-primary';
     const subLabelClass =
-        'text-xs font-medium text-gray-500 dark:text-content-secondary';
+        'text-xs font-medium text-gray-600 dark:text-content-secondary';
     const rowLabelClass =
         'text-xs font-medium text-gray-700 dark:text-content-primary';
     const helperTextClass =

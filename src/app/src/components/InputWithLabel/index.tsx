@@ -53,7 +53,7 @@ const Input: React.FC<InputProps> = ({
                         onChange={onChange}
                         type="number"
                         className={classNames(
-                            'form-control text-xl text-center text-blue-500 px-1 z-0',
+                            'form-control text-xl text-center text-blue-600 dark:text-blue-400 px-1 z-0',
                             className,
                         )}
                         style={style}

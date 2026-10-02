@@ -123,7 +123,7 @@ export default function InfoStrip() {
     const activePins = PIN_LABELS;
 
     return (
-        <div className="relative z-40 flex flex-wrap items-center gap-4 px-3 md:px-4 py-1.5 bg-white border-b border-gray-200 dark:bg-surface-base dark:border-outline shrink-0 text-xs sm:text-sm text-gray-500 dark:text-content-muted">
+        <div className="relative z-40 flex flex-wrap items-center gap-4 px-3 md:px-4 py-1.5 bg-white border-b border-gray-200 dark:bg-surface-base dark:border-outline shrink-0 text-xs sm:text-sm text-gray-600 dark:text-content-muted">
             {showTool && (
                 <>
                     <Field label="tool" value={`T${currentTool}`} />

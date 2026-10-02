@@ -101,7 +101,7 @@ export function MachineInfoDisplay({
                 </div>
 
                 <div className="flex flex-row items-center gap-2">
-                    <div className="text-2xl text-gray-600 max-sm:hidden dark:text-content-primary cursor-pointer hover:text-blue-500 transition-colors">
+                    <div className="text-2xl text-gray-600 max-sm:hidden dark:text-content-primary cursor-pointer hover:text-blue-600 transition-colors">
                         {pinned ? (
                             <TiPin
                                 onClick={() => setPinned(!pinned)}
@@ -193,8 +193,8 @@ export function MachineInfoDisplay({
                 </div>
             </div>
             {currentTool >= 0 && (
-                <div className="text-gray-500 flex w-full gap-4">
-                    <span className="text-gray-500 dark:text-content-primary">
+                <div className="text-gray-600 flex w-full gap-4">
+                    <span className="text-gray-600 dark:text-content-primary">
                         Current tool:{' '}
                     </span>
                     <span className="text-black dark:text-content-primary">
@@ -204,7 +204,7 @@ export function MachineInfoDisplay({
             )}
             <div className="flex flex-row gap-4 items-center mt-4">
                 <span
-                    className="text-gray-500 dark:text-content-primary"
+                    className="text-gray-600 dark:text-content-primary"
                     id="lock-stepper-label"
                 >
                     Lock stepper motors
@@ -219,7 +219,7 @@ export function MachineInfoDisplay({
 
             {keepoutFlags && (
                 <div className="flex flex-row gap-2 items-center mt-2">
-                    <span className="text-gray-500 dark:text-content-primary">
+                    <span className="text-gray-600 dark:text-content-primary">
                         Keepout:
                     </span>
                     <KeepoutToggle />

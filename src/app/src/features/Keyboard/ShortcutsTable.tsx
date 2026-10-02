@@ -103,7 +103,7 @@ const ShortcutsTable = ({
                         variant="ghost"
                         size="sm"
                         icon={
-                            <LuPencil className="text-blue-500 hover:text-blue-700 w-6 h-6" />
+                            <LuPencil className="text-blue-600 dark:text-blue-400 hover:text-blue-700 w-6 h-6" />
                         }
                         onClick={() => onEdit(row)}
                         onKeyDown={null}
@@ -131,7 +131,7 @@ const ShortcutsTable = ({
                         variant="ghost"
                         size="sm"
                         icon={
-                            <LuPlus className="text-blue-500 hover:text-blue-700 w-6 h-6" />
+                            <LuPlus className="text-blue-600 dark:text-blue-400 hover:text-blue-700 w-6 h-6" />
                         }
                         onClick={() => onEdit(row)}
                         onKeyDown={null}

@@ -287,7 +287,7 @@ export default function JoggingCard() {
 
     const toneClasses: Record<JogTone, string> = {
         neutral:
-            'bg-white border-gray-400 text-gray-500 shadow-sm dark:bg-surface-raised dark:border-outline dark:text-content-muted dark:shadow-none',
+            'bg-white border-gray-400 text-gray-600 shadow-sm dark:bg-surface-raised dark:border-outline dark:text-content-muted dark:shadow-none',
         x: 'bg-white border-red-600 text-red-700 shadow-sm dark:bg-surface-raised dark:border-red-400 dark:text-red-400 dark:shadow-none',
         y: 'bg-white border-green-600 text-green-700 shadow-sm dark:bg-surface-raised dark:border-green-400 dark:text-green-400 dark:shadow-none',
         z: 'bg-white border-blue-600 text-blue-700 shadow-sm dark:bg-surface-raised dark:border-blue-400 dark:text-blue-400 dark:shadow-none',
@@ -398,7 +398,7 @@ export default function JoggingCard() {
                         className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
                             stepPreset === preset.id
                                 ? 'bg-robin-500 text-white border border-robin-500'
-                                : 'bg-white dark:bg-surface-raised text-gray-500 dark:text-content-muted hover:text-gray-700 dark:hover:text-content-primary border border-gray-300 dark:border-outline'
+                                : 'bg-white dark:bg-surface-raised text-gray-600 dark:text-content-muted hover:text-gray-700 dark:hover:text-content-primary border border-gray-300 dark:border-outline'
                         }`}
                     >
                         {preset.label}

@@ -175,7 +175,7 @@ const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
     return (
         <>
             {actions.length > 0 && (
-                <div className="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-amber-400 mb-1">
+                <div className="text-xs font-semibold uppercase tracking-widest text-gray-600 dark:text-amber-400 mb-1">
                     Run G-Code
                 </div>
             )}

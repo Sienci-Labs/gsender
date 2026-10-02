@@ -216,7 +216,7 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
                                 displayActiveState ===
                                     GRBL_ACTIVE_STATE_CHECK ||
                                 showPluginBusy,
-                            'bg-blue-500 text-white':
+                            'bg-blue-600 text-white':
                                 displayActiveState === GRBL_ACTIVE_STATE_HOME,
                             'bg-yellow-600 text-white':
                                 displayActiveState === GRBL_ACTIVE_STATE_HOLD ||

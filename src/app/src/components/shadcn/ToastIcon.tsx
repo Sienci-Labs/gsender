@@ -18,10 +18,10 @@ type ToastVariant =
 
 const variantClasses: Record<ToastVariant, string> = {
     success: 'bg-green-500/10 text-green-500',
-    info: 'bg-blue-500/10 text-blue-500',
+    info: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
     warning: 'bg-orange-500/10 text-orange-500',
     error: 'bg-red-500/10 text-red-500',
-    loading: 'bg-blue-500/10 text-blue-500',
+    loading: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
     default: 'bg-muted text-muted-foreground',
 };
 

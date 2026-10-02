@@ -97,7 +97,7 @@ export function TestAutoSpin({ onComplete }: Props) {
                 </Tooltip>
                 <div className="w-[10ch] text-left">{rpm} RPM</div>
             </div>
-            <div className="text-center text-sm text-gray-500 dark:text-content-muted">
+            <div className="text-center text-sm text-gray-600 dark:text-content-muted">
                 Range {spindleMin} - {spindleMax} RPM ($31 - $30)
                 {spindleRunning && reportedSpindle !== undefined
                     ? ` · reporting ${reportedSpindle} RPM`

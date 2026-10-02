@@ -205,7 +205,7 @@ const Console = ({ isActive, isChildWindow }: ConsoleProps) => {
                 className={`absolute top-0 left-0 rounded-lg w-full h-full bg-gray-50 z-10 transition-opacity dark:text-content-primary dark:bg-surface-raised
                     duration-300 ${port !== '' ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
             >
-                <div className="flex flex-col justify-center items-center gap-2 h-full text-gray-500 dark:text-content-muted">
+                <div className="flex flex-col justify-center items-center gap-2 h-full text-gray-600 dark:text-content-muted">
                     <Unplug className="h-12 w-12" />
                     <span className="text-sm">Not connected to a device</span>
                 </div>

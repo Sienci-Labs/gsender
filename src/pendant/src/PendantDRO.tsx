@@ -28,7 +28,7 @@ export default function PendantDRO() {
 
     if (!isConnected) {
         return (
-            <div className="flex flex-col items-center justify-center h-full gap-4 text-gray-500">
+            <div className="flex flex-col items-center justify-center h-full gap-4 text-gray-600">
                 <span className="text-xl">Waiting for connection…</span>
             </div>
         );

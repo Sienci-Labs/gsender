@@ -46,7 +46,7 @@ const Stepper = () => {
                                         ? 'bg-emerald-100 dark:bg-[#052e16] text-emerald-700 dark:text-[#6ee7b7]'
                                         : stepActive
                                           ? 'bg-blue-100 dark:bg-[#1e2a4a] text-blue-700 dark:text-blue-400'
-                                          : 'bg-gray-200 dark:bg-[#23232d] text-gray-500 dark:text-[#4b5563]',
+                                          : 'bg-gray-200 dark:bg-[#23232d] text-gray-600 dark:text-[#4b5563]',
                                 )}
                             >
                                 {stepDone ? <Check size={9} /> : si + 1}
@@ -105,7 +105,7 @@ const Stepper = () => {
                                             className={cx(
                                                 'text-xs leading-snug',
                                                 subDone
-                                                    ? 'text-gray-500 dark:text-content-muted'
+                                                    ? 'text-gray-600 dark:text-content-muted'
                                                     : subActive
                                                       ? 'font-medium text-blue-700 dark:text-blue-300'
                                                       : 'text-gray-400 dark:text-content-muted',

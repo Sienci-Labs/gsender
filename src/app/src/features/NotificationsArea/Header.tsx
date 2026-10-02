@@ -27,7 +27,7 @@ const Header = () => {
                 aria-label="Clear all notifications"
             >
                 <LuTrash
-                    className={`w-6 h-6 text-gray-500 ${
+                    className={`w-6 h-6 text-gray-600 ${
                         notifications?.length === 0
                             ? 'cursor-not-allowed'
                             : 'hover:text-gray-700'

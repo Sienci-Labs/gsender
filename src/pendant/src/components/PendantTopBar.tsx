@@ -553,7 +553,7 @@ export default function PendantTopBar() {
                 className={`w-[90px] flex items-center justify-center gap-2 font-bold px-3 py-2 rounded-lg text-sm transition-colors no-drag ${
                     unlockActionable
                         ? alarmCode === 11 || alarmCode === 'Homing'
-                            ? 'bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white unlock-attention-home'
+                            ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white unlock-attention-home'
                             : 'bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white unlock-attention'
                         : 'bg-gray-300 text-gray-600 dark:bg-surface-disabled dark:text-content-disabled'
                 }`}

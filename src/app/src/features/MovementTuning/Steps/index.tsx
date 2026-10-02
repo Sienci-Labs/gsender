@@ -150,14 +150,14 @@ const Steps = () => {
             <div className="flex flex-col gap-4 xl:gap-0">
                 <div className="max-w-7xl w-full grid gap-4 grid-cols-1 lg:grid-cols-[3fr_2fr]">
                     <div className="space-y-1 text-sm xl:text-base font-normal">
-                        <p className="text-gray-500 dark:text-content-secondary">
+                        <p className="text-gray-600 dark:text-content-secondary">
                             If you're looking to use your CNC for more accurate
                             work and notice a specific axis is always off by a
                             small amount - say 102mm instead of 100 - then use
                             this tool.
                         </p>
 
-                        <p className="text-gray-500 dark:text-content-secondary">
+                        <p className="text-gray-600 dark:text-content-secondary">
                             Since CNC firmware needs to understand its hardware
                             to make exact movements, small manufacturing
                             variations in the motors, lead screws, pulleys, or
@@ -165,7 +165,7 @@ const Steps = () => {
                             longer distances.
                         </p>
 
-                        <p className="text-gray-500 dark:text-content-secondary">
+                        <p className="text-gray-600 dark:text-content-secondary">
                             By testing for this difference using a marker or
                             tape and a measuring tape, this tool will better
                             tune the firmware to your machine.
@@ -443,7 +443,7 @@ const Steps = () => {
                                             <FaClipboard className="min-w-8 min-h-8 text-amber-600 dark:text-content-muted" />
                                         )}
                                     {currentStep === 0 && (
-                                        <FaClipboardList className="min-w-8 min-h-8 text-blue-500 " />
+                                        <FaClipboardList className="min-w-8 min-h-8 text-blue-600 dark:text-blue-400 " />
                                     )}
                                 </div>
                                 <div className="flex flex-col gap-2 flex-1">
@@ -483,7 +483,7 @@ const Steps = () => {
                                             <FaClipboard className="min-w-8 min-h-8 text-amber-600 dark:text-content-muted" />
                                         )}
                                     {currentStep === 1 && (
-                                        <FaClipboardList className="min-w-8 min-h-8 text-blue-500 " />
+                                        <FaClipboardList className="min-w-8 min-h-8 text-blue-600 dark:text-blue-400 " />
                                     )}
                                 </div>
                                 <div className="flex flex-col gap-2 flex-1">
@@ -546,7 +546,7 @@ const Steps = () => {
                                             <FaClipboard className="min-w-8 min-h-8 text-amber-600 dark:text-content-muted" />
                                         )}
                                     {currentStep === 2 && (
-                                        <FaClipboardList className="min-w-8 min-h-8 text-blue-500 " />
+                                        <FaClipboardList className="min-w-8 min-h-8 text-blue-600 dark:text-blue-400 " />
                                     )}
                                 </div>
                                 <div className="flex flex-col gap-2 flex-1">

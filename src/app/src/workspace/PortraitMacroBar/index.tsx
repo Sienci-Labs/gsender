@@ -96,7 +96,7 @@ function SortableMacroButton({
                 {...listeners}
                 className={cx(
                     'absolute top-1 left-1 p-1 rounded cursor-grab active:cursor-grabbing',
-                    'text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400',
+                    'text-gray-300 dark:text-gray-600 hover:text-gray-600 dark:hover:text-gray-400',
                     'touch-none',
                 )}
                 title="Drag to reorder"
