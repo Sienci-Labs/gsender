@@ -9,7 +9,6 @@ import {
     GRBL_ACTIVE_STATE_JOG,
     GRBL_ACTIVE_STATE_RUN,
     GRBL_ACTIVE_STATE_SLEEP,
-    GRBL_ACTIVE_STATE_TESTING,
     GRBL_ACTIVE_STATE_TOOL,
 } from 'app/constants';
 import { cancelJog } from 'app/features/Jogging/utils/Jogging';
@@ -21,7 +20,6 @@ import {
     CircleCheck,
     CircleOff,
     DoorClosed,
-    FileSearch,
     House,
     LockOpen,
     Moon,
@@ -85,12 +83,12 @@ const DISC_COLORS = {
         color: 'var(--content-muted)',
     },
     light: {
-        border: '#cbd5e1',
-        background: '#f8fafc',
-        iconBackground: '#94a3b8',
+        border: '#d1d5db', // gray-300
+        background: '#f9fafb', // gray-50
+        iconBackground: '#9ca3af', // gray-400
         iconColor: '#ffffff',
-        divider: '#cbd5e1',
-        color: '#94a3b8',
+        divider: '#d1d5db',
+        color: '#9ca3af',
     },
 };
 
@@ -118,12 +116,12 @@ const STATE_BADGES: Record<string, BadgeConfig> = {
             color: '#6b7280',
         },
         light: {
-            border: '#64748b',
-            background: '#f8fafc',
-            iconBackground: '#64748b',
+            border: '#6b7280', // gray-500
+            background: '#f9fafb', // gray-50
+            iconBackground: '#6b7280',
             iconColor: '#ffffff',
-            divider: 'rgba(100,116,139,0.3)',
-            color: '#64748b',
+            divider: 'rgba(107,114,128,0.3)',
+            color: '#6b7280',
         },
     },
     [GRBL_ACTIVE_STATE_RUN]: {
@@ -273,60 +271,40 @@ const STATE_BADGES: Record<string, BadgeConfig> = {
         label: 'Tool Change',
         icon: Wrench,
         dark: {
-            border: 'rgba(124,58,237,0.50)',
-            background: 'rgba(124,58,237,0.10)',
-            iconBackground: 'rgba(124,58,237,0.28)',
+            border: 'rgba(83,74,183,0.50)',
+            background: 'rgba(83,74,183,0.10)',
+            iconBackground: 'rgba(83,74,183,0.28)',
             iconColor: '#ffffff',
-            divider: 'rgba(124,58,237,0.30)',
-            color: '#7c3aed',
+            divider: 'rgba(83,74,183,0.30)',
+            color: '#9a94df',
         },
         light: {
-            border: '#7c3aed',
-            background: '#f5f3ff',
-            iconBackground: '#7c3aed',
+            border: '#534ab7',
+            background: '#f7f6fc',
+            iconBackground: '#534ab7',
             iconColor: '#ffffff',
-            divider: 'rgba(124,58,237,0.3)',
-            color: '#7c3aed',
+            divider: 'rgba(83,74,183,0.3)',
+            color: '#534ab7',
         },
     },
     [GRBL_ACTIVE_STATE_SLEEP]: {
         label: 'Sleep',
         icon: Moon,
         dark: {
-            border: 'rgba(100,130,180,0.30)',
-            background: 'rgba(26,41,66,0.60)',
-            iconBackground: 'rgba(100,130,180,0.20)',
-            iconColor: 'rgba(148,174,213,0.85)',
-            divider: 'rgba(100,130,180,0.20)',
-            color: 'rgba(148,174,213,0.85)',
+            border: 'rgba(136,179,220,0.30)', // blue-300
+            background: 'rgba(25,53,80,0.60)', // blue-950
+            iconBackground: 'rgba(136,179,220,0.20)',
+            iconColor: '#88b3dc',
+            divider: 'rgba(136,179,220,0.20)',
+            color: '#88b3dc',
         },
         light: {
-            border: '#93c5fd',
-            background: '#f0f9ff',
-            iconBackground: '#3b82f6',
+            border: '#88b3dc', // blue-300
+            background: '#f5f9fc', // blue-50
+            iconBackground: '#3f85c7', // blue-500
             iconColor: '#ffffff',
-            divider: 'rgba(59,130,246,0.3)',
-            color: '#3b82f6',
-        },
-    },
-    [GRBL_ACTIVE_STATE_TESTING]: {
-        label: 'Testing',
-        icon: FileSearch,
-        dark: {
-            border: 'rgba(99,102,241,0.50)',
-            background: 'rgba(67,56,202,0.10)',
-            iconBackground: 'rgba(99,102,241,0.28)',
-            iconColor: '#ffffff',
-            divider: 'rgba(99,102,241,0.30)',
-            color: '#6366f1',
-        },
-        light: {
-            border: '#4f46e5',
-            background: '#eef2ff',
-            iconBackground: '#4f46e5',
-            iconColor: '#ffffff',
-            divider: 'rgba(79,70,229,0.3)',
-            color: '#4f46e5',
+            divider: 'rgba(63,133,199,0.3)',
+            color: '#2c5d8b', // blue-700
         },
     },
 };
