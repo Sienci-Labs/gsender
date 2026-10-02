@@ -30,9 +30,9 @@ const MoveAxis = ({ onComplete }: Props) => {
                 </p>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-6 w-min">
                 <div
-                    className={`flex w-96 items-center gap-4 p-4 rounded-lg transition-colors dark:bg-dark dark:border-gray-700 dark:text-white ${
+                    className={`flex w-full items-center gap-4 p-4 rounded-lg transition-colors dark:bg-dark dark:border-gray-700 dark:text-white ${
                         moveAxisCompleted
                             ? 'bg-green-50 border border-green-200 bg-opacity-30'
                             : 'bg-blue-50 border border-blue-200 bg-opacity-40'

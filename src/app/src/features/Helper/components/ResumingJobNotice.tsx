@@ -26,7 +26,7 @@ import { Clock, Zap } from 'lucide-react';
 const ResumingJobNotice = () => {
     return (
         <div className="flex-1 flex items-center justify-center">
-            <div className="max-w-sm w-full bg-white dark:bg-[#18181f] border border-gray-200 dark:border-[#2a2a35] rounded-xl p-8 text-center">
+            <div className="max-w-sm w-full bg-white dark:bg-surface-raised border border-gray-200 dark:border-outline-subtle rounded-xl p-8 text-center">
                 <div className="relative w-[52px] h-[52px] mx-auto mb-4">
                     <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
                         <circle
@@ -36,7 +36,7 @@ const ResumingJobNotice = () => {
                             stroke="currentColor"
                             strokeWidth="3"
                             fill="none"
-                            className="text-gray-200 dark:text-[#2a2a35]"
+                            className="text-gray-200 dark:text-outline-subtle"
                         />
                         <circle
                             cx="26"
@@ -68,7 +68,7 @@ const ResumingJobNotice = () => {
                 <div className="text-xs font-medium tracking-widest uppercase text-gray-400 dark:text-content-muted">
                     Resuming Job
                 </div>
-                <div className="text-lg font-medium mt-1 mb-3 text-gray-900 dark:text-[#e5e5ea]">
+                <div className="text-lg font-medium mt-1 mb-3 text-gray-900 dark:text-content-primary">
                     Job resuming
                 </div>
                 <div className="text-sm leading-relaxed mb-6 text-gray-600 dark:text-content-muted">

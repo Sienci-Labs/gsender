@@ -87,7 +87,7 @@ const PluginPanel = ({ plugin, className = '', title }: PluginPanelProps) => {
                 key={reloadToken}
                 title={plugin.name}
                 src={iframeSrc}
-                className="flex-1 w-full min-h-[320px] border border-gray-200 rounded-md dark:border-outline"
+                className="flex-1 w-full border border-gray-200 rounded-md dark:border-outline"
                 sandbox="allow-scripts allow-forms allow-same-origin"
                 allow={buildIframeAllow(plugin.permissions)}
             />

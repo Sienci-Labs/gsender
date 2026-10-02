@@ -76,6 +76,7 @@ export function WizardManager({
                     onBack={onExit}
                     validations={wizard.validations}
                     helpUrl={wizard.helpUrl}
+                    isHub={isHub}
                 />
             )}
         </div>

@@ -72,12 +72,12 @@ const Wizard = () => {
     // Minimized: compact pill at top-center of visualizer
     if (minimized) {
         const pill = (
-            <div className="absolute top-2 left-1/2 -translate-x-1/2 z-[10000] pointer-events-auto flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/90 dark:bg-[#18181f]/90 backdrop-blur-sm border border-gray-200 dark:border-[#2a2a35] shadow-md">
+            <div className="absolute top-2 left-1/2 -translate-x-1/2 z-[10000] pointer-events-auto flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/90 dark:bg-surface-raised/90 backdrop-blur-sm border border-gray-200 dark:border-outline-subtle shadow-md">
                 <Wrench
                     size={12}
                     className="text-gray-500 dark:text-content-muted shrink-0"
                 />
-                <span className="font-medium text-gray-700 dark:text-[#e5e5ea] text-xs whitespace-nowrap">
+                <span className="font-medium text-gray-700 dark:text-content-primary text-xs whitespace-nowrap">
                     {title}
                 </span>
                 <MinMaxButton />
@@ -104,15 +104,15 @@ const Wizard = () => {
             )}
 
             <div className="fixed inset-y-0 left-0 right-[33%] flex items-center justify-center z-[10002] pointer-events-none">
-                <div className="pointer-events-auto w-[860px] rounded-lg overflow-hidden shadow-2xl border border-gray-300/50 dark:border-[#2a2a35] bg-white dark:bg-[#18181f]">
+                <div className="pointer-events-auto w-[860px] rounded-lg overflow-hidden shadow-2xl border border-gray-300/50 dark:border-outline-subtle bg-white dark:bg-surface-raised">
                     {/* Titlebar */}
-                    <div className="flex items-center justify-between px-3 py-2 border-b border-gray-200 dark:border-[#2a2a35] bg-gray-100 dark:bg-[#111116]">
+                    <div className="flex items-center justify-between px-3 py-2 border-b border-gray-200 dark:border-outline-subtle bg-gray-100 dark:bg-surface-base">
                         <div className="flex items-center gap-2">
                             <Wrench
                                 size={14}
                                 className="text-gray-500 dark:text-content-muted"
                             />
-                            <span className="font-semibold text-base text-gray-900 dark:text-[#e5e5ea]">
+                            <span className="font-semibold text-base text-gray-900 dark:text-content-primary">
                                 {title}
                             </span>
                         </div>

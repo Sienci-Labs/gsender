@@ -31,7 +31,7 @@ export function IndicatorButton({
             aria-pressed={active}
         >
             <span
-                className={cn('text-blue-300', {
+                className={cn('text-blue-400', {
                     'animate-pulse dark:text-content-primary': active,
                 })}
             >

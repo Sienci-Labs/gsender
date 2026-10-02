@@ -803,7 +803,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 
             <div
                 ref={scrollContainerRef}
-                className="relative w-full flex-1 overflow-auto line-container bg-gray-100 dark:bg-[#18181f]"
+                className="relative w-full flex-1 overflow-auto line-container bg-gray-100 dark:bg-surface-raised"
                 onScroll={handleScroll}
                 onClick={handleContainerClick}
                 // biome-ignore lint/a11y/noNoninteractiveTabindex: <>

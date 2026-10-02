@@ -236,7 +236,7 @@ export function WizardContainer({ subWizard, onWizardExit }: Props) {
                                 onClick={resetWizard}
                                 testId="wizard-reset"
                                 variant="nothing"
-                                className="flex h-full items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors text-gray-900 bg-gray-200 hover:bg-gray-100"
+                                className="flex h-full items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors text-gray-900 dark:text-content-secondary dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700"
                             >
                                 Restart Wizard
                             </Button>
@@ -271,7 +271,7 @@ export function WizardContainer({ subWizard, onWizardExit }: Props) {
                 ${
                     !isCurrentStepComplete
                         ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        : 'bg-gray-900 text-white hover:bg-gray-800 dark:bg-blue-500 dark:hover:bg-blue-600'
+                        : 'bg-gray-900 text-white hover:text-white hover:bg-gray-500 dark:bg-blue-500 dark:hover:bg-blue-600'
                 }
               `}
                             >

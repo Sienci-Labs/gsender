@@ -64,6 +64,7 @@ export function useXYSquaringWizard(): Wizard {
                                 {
                                     type: 'component',
                                     content: TriangleDiagram,
+                                    centered: true,
                                 },
                                 {
                                     type: 'link',
@@ -81,6 +82,7 @@ export function useXYSquaringWizard(): Wizard {
                                 {
                                     type: 'component',
                                     content: TriangleDiagram,
+                                    centered: true,
                                 },
                                 {
                                     type: 'link',

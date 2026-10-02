@@ -90,6 +90,9 @@ const setUserPluginsDir = (dir) => {
 	if (value) {
 		fs.mkdirSync(value, { recursive: true });
 	}
+	// Changes the discovery roots themselves, so a cached result from the old
+	// roots must not survive this.
+	invalidatePluginCache();
 	return value;
 };
 
@@ -201,6 +204,25 @@ const getMountSlug = (manifest) => {
 	return segments[segments.length - 1] || id;
 };
 
+// Cache for discoverPlugins(): the full discovery walk is synchronous
+// (readdirSync per root, then readFileSync + JSON.parse + a couple of
+// existsSync per plugin dir) and used to run once per GET /api/plugins, with
+// no dedupe across the several renderer components that each called it
+// independently on every navigation. That blocked the Node event loop and
+// showed up as UI jank. The cache is invalidated on every known write to a
+// plugin dir or its settings (see invalidatePluginCache() call sites below
+// and in install.js) — there's no time-based expiry on top of that.
+// Dropping a plugin folder in by hand while gSender keeps running isn't a
+// supported flow (plugins/README.md tells people to restart gSender after
+// copying a folder in, and a restart already clears this in-memory cache
+// for free), and every other real mutation path already invalidates
+// explicitly, so a TTL would only force periodic re-reads for no reason.
+let discoverCache = null; // { plugins, dirsKey }
+
+const invalidatePluginCache = () => {
+	discoverCache = null;
+};
+
 const getPluginSettings = () => config.get("pluginSettings", {});
 
 const isPluginEnabled = (pluginId) => {
@@ -215,12 +237,16 @@ const setPluginEnabled = (pluginId, enabled) => {
 	const pluginSettings = { ...getPluginSettings() };
 	pluginSettings[pluginId] = { ...pluginSettings[pluginId], enabled };
 	config.set("pluginSettings", pluginSettings);
+	// getPluginParserSpecs() (read by GrblController/GrblHalController when a
+	// port opens) must never hand back a disabled plugin's parsers.
+	invalidatePluginCache();
 };
 
 const forgetPluginSettings = (pluginId) => {
 	const pluginSettings = { ...getPluginSettings() };
 	delete pluginSettings[pluginId];
 	config.set("pluginSettings", pluginSettings);
+	invalidatePluginCache();
 };
 
 const discoverPluginsInDir = (pluginsDir) => {
@@ -290,7 +316,7 @@ const discoverPluginsInDir = (pluginsDir) => {
 	return plugins;
 };
 
-const discoverPlugins = () => {
+const discoverPluginsUncached = () => {
 	ensurePluginsDirectory();
 	const dirs = getPluginDirectories();
 
@@ -318,7 +344,26 @@ const discoverPlugins = () => {
 		});
 	});
 
-	return plugins;
+	return { plugins, dirsKey: dirs.join("|") };
+};
+
+const discoverPlugins = () => {
+	if (discoverCache) {
+		// Belt-and-braces: if the discovery roots themselves changed without
+		// going through setUserPluginsDir (shouldn't happen, but this is
+		// cheap), miss instead of serving plugins from the wrong roots.
+		if (discoverCache.dirsKey === getPluginDirectories().join("|")) {
+			return discoverCache.plugins;
+		}
+	}
+
+	const { plugins, dirsKey } = discoverPluginsUncached();
+	// Frozen because several callers only ever read (.find/.map/.filter), and
+	// this array is now shared and reused across calls instead of being a
+	// fresh one every time.
+	const frozen = Object.freeze(plugins);
+	discoverCache = { plugins: frozen, dirsKey };
+	return frozen;
 };
 
 const getEnabledPlugins = () =>
@@ -383,6 +428,7 @@ const watchPlugins = (onChange, { debounceMs = 200 } = {}) => {
 		}
 		watchDebounce = setTimeout(() => {
 			watchDebounce = null;
+			invalidatePluginCache();
 			try {
 				onChange({ dir, filename });
 			} catch (err) {
@@ -454,6 +500,7 @@ const changeManifestPermissions = (pluginPath, grant) => {
 	const manifestPath = path.join(pluginPath, MANIFEST_FILENAME);
 	try {
 		fs.writeFileSync(manifestPath, JSON.stringify(newManifest, null, "\t"));
+		invalidatePluginCache();
 		return 0;
 	} catch (err) {
 		log.error(`Failed to write manifest at ${manifestPath}: ${err.message}`);
@@ -481,5 +528,6 @@ export default {
 	readManifest,
 	isWithinAllowedRoots,
 	forgetPluginSettings,
+	invalidatePluginCache,
 	normalizeParsers,
 };

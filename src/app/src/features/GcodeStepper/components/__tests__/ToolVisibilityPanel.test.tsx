@@ -32,7 +32,7 @@ const tools: StepperTool[] = [
         index: 1,
         toolNumber: 1,
         label: 'T1',
-        color: '#3e85c7',
+        color: '#3f85c7',
         startLine: 1,
         endLine: 50,
         comment: '6mm endmill',
