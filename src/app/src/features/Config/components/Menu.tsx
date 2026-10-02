@@ -50,10 +50,10 @@ function MenuItem({
     return (
         <button
             className={cn(
-                'flex min-h-8 items-center justify-start gap-2 px-4 max-xl:px-1 max-xl:font-sm max-xl:gap-1 hover:text-blue-500 hover:fill-blue-500 font-sans group group-hover:text-blue-500',
+                'flex min-h-8 items-center justify-start gap-2 px-4 max-xl:px-1 max-xl:font-sm max-xl:gap-1 hover:text-blue-600 hover:fill-blue-500 font-sans group group-hover:text-blue-600',
                 {
                     'flex-1': !expanded,
-                    'text-blue-500 font-italic': active,
+                    'text-blue-600 dark:text-blue-400 font-italic': active,
                     hidden: available === 0,
                 },
             )}
@@ -61,16 +61,16 @@ function MenuItem({
         >
             <span
                 className={cn(
-                    'text-gray-600 text-2xl max-xl:text-xl group-hover:text-blue-500',
+                    'text-gray-600 text-2xl max-xl:text-xl group-hover:text-blue-600',
                     {
-                        'text-blue-500 fill-blue-500': active,
+                        'text-blue-600 dark:text-blue-400 fill-blue-500': active,
                     },
                 )}
             >
                 {icon({
                     className: active
-                        ? 'text-blue-500'
-                        : 'text-gray-600 group-hover:text-blue-500 hover:text-blue-500 dark:text-content-primary',
+                        ? 'text-blue-600 dark:text-blue-400'
+                        : 'text-gray-600 group-hover:text-blue-600 hover:text-blue-600 dark:text-content-primary',
                 })}
             </span>
             <span>{label}</span>
@@ -82,9 +82,9 @@ function SubMenuItem({ label, active, onClick }: SubMenuItemProps) {
     return (
         <button
             className={cn(
-                'flex min-h-6 items-center justify-start gap-2 pl-11 pr-4 py-1 max-xl:pl-6 max-xl:pr-2 max-xl:text-xs max-xl:gap-1 border-l-2 border-transparent hover:border-l-blue-500 hover:text-blue-500 font-sans text-sm text-gray-600 dark:text-content-primary',
+                'flex min-h-6 items-center justify-start gap-2 pl-11 pr-4 py-1 max-xl:pl-6 max-xl:pr-2 max-xl:text-xs max-xl:gap-1 border-l-2 border-transparent hover:border-l-blue-500 hover:text-blue-600 font-sans text-sm text-gray-600 dark:text-content-primary',
                 {
-                    'text-blue-500 font-italic bg-blue-200 bg-opacity-30 border-l-blue-400':
+                    'text-blue-600 dark:text-blue-400 font-italic bg-blue-200 bg-opacity-30 border-l-blue-400':
                         active,
                 },
             )}

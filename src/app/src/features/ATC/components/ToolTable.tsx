@@ -73,7 +73,7 @@ const ToolSection = ({
         <Collapsible open={isOpen} onOpenChange={setIsOpen}>
             <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-gray-100/30 hover:bg-muted/50 rounded-lg transition-colors">
                 <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-blue-500">{title}</h3>
+                    <h3 className="font-semibold text-blue-600 dark:text-blue-400">{title}</h3>
                     <Badge
                         variant="secondary"
                         className="min-w-[30px] justify-center"
@@ -140,7 +140,7 @@ const ToolSection = ({
                                                 size="sm"
                                             />
                                         </div>
-                                        <div className="inline-block w-[120px] px-3 py-1 bg-blue-500/10 border border-blue-500/20 text-center rounded-md font-mono font-semibold text-sm text-blue-500">
+                                        <div className="inline-block w-[120px] px-3 py-1 bg-blue-500/10 border border-blue-500/20 text-center rounded-md font-mono font-semibold text-sm text-blue-600 dark:text-blue-400">
                                             {tool.toolOffsets.z.toFixed(3)}
                                         </div>
                                     </TableCell>

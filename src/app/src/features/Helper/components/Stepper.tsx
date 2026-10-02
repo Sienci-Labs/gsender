@@ -30,7 +30,7 @@ const Stepper = () => {
     const { steps, activeStep, activeSubstep } = useWizardContext();
 
     return (
-        <div className="w-[230px] shrink-0 border-r border-gray-200 dark:border-[#2a2a35] bg-gray-50 dark:bg-[#141418] overflow-y-auto">
+        <div className="w-[230px] shrink-0 border-r border-gray-200 dark:border-outline-subtle bg-gray-50 dark:bg-[#141418] overflow-y-auto">
             {steps.map((step, si) => {
                 const stepDone = si < activeStep;
                 const stepActive = si === activeStep;
@@ -46,7 +46,7 @@ const Stepper = () => {
                                         ? 'bg-emerald-100 dark:bg-[#052e16] text-emerald-700 dark:text-[#6ee7b7]'
                                         : stepActive
                                           ? 'bg-blue-100 dark:bg-[#1e2a4a] text-blue-700 dark:text-blue-400'
-                                          : 'bg-gray-200 dark:bg-[#23232d] text-gray-500 dark:text-[#4b5563]',
+                                          : 'bg-gray-200 dark:bg-[#23232d] text-gray-600 dark:text-[#4b5563]',
                                 )}
                             >
                                 {stepDone ? <Check size={9} /> : si + 1}
@@ -56,10 +56,10 @@ const Stepper = () => {
                                     className={cx(
                                         'text-xs font-medium leading-snug',
                                         stepDone
-                                            ? 'text-emerald-600 dark:text-[#9ca3af]'
+                                            ? 'text-emerald-600 dark:text-content-muted'
                                             : stepActive
                                               ? 'text-blue-700 dark:text-blue-400'
-                                              : 'text-gray-400 dark:text-[#9ca3af]',
+                                              : 'text-gray-400 dark:text-content-muted',
                                     )}
                                 >
                                     {step.title}
@@ -98,17 +98,17 @@ const Stepper = () => {
                                                     ? 'bg-emerald-500'
                                                     : subActive
                                                       ? 'bg-blue-500 dark:bg-blue-400'
-                                                      : 'bg-gray-300 dark:bg-[#2a2a35]',
+                                                      : 'bg-gray-300 dark:bg-outline-subtle',
                                             )}
                                         />
                                         <span
                                             className={cx(
                                                 'text-xs leading-snug',
                                                 subDone
-                                                    ? 'text-gray-500 dark:text-[#9ca3af]'
+                                                    ? 'text-gray-600 dark:text-content-muted'
                                                     : subActive
                                                       ? 'font-medium text-blue-700 dark:text-blue-300'
-                                                      : 'text-gray-400 dark:text-[#9ca3af]',
+                                                      : 'text-gray-400 dark:text-content-muted',
                                             )}
                                         >
                                             {sub.title}

@@ -142,7 +142,7 @@ export function WizardsHub({
                         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-200 mb-4">
                             <Settings size={32} className="text-gray-400" />
                         </div>
-                        <p className="text-xl text-gray-500">
+                        <p className="text-xl text-gray-600">
                             No wizards available
                         </p>
                     </div>

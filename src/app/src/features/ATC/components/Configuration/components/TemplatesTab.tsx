@@ -308,7 +308,7 @@ function TemplateManagerUploadSection() {
         <div className="border border-border bg-white dark:border-outline dark:bg-surface-raised p-3">
             <Button
                 onClick={handleUploadClick}
-                className="w-full flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white"
+                className="w-full flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
             >
                 <Upload className="h-4 w-4" />
                 Upload JSON Template File
@@ -333,7 +333,7 @@ function TemplateViewer({ className = '' }: { className?: string }) {
                 className,
             )}
         >
-            <h1 className="text-sm font-semibold p-2 text-blue-500">
+            <h1 className="text-sm font-semibold p-2 text-blue-600 dark:text-blue-400">
                 {selectedTemplate ? selectedTemplate.name : 'Content'}
             </h1>
             <div className="flex-1 min-h-0 p-2 overflow-hidden">
@@ -371,7 +371,7 @@ export function TemplateManagerListContent({
             {showUploadButton && <TemplateManagerUploadSection />}
 
             <div className="border border-border bg-white dark:border-outline dark:bg-surface-raised flex flex-col min-h-0 flex-1 overflow-hidden">
-                <h1 className="text-sm font-semibold text-blue-500 p-2">
+                <h1 className="text-sm font-semibold text-blue-600 dark:text-blue-400 p-2">
                     Macros ({sortedTemplates.length})
                 </h1>
                 <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">

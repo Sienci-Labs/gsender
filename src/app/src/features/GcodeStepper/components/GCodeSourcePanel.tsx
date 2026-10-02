@@ -304,7 +304,7 @@ export const GCodeSourcePanel: React.FC<GCodeSourcePanelProps> = ({
     return (
         <div className="flex h-full min-h-0 flex-col gap-2">
             <div className="flex items-center justify-between gap-2">
-                <span className="whitespace-nowrap text-xs uppercase tracking-wide text-gray-500 dark:text-content-muted">
+                <span className="whitespace-nowrap text-xs uppercase tracking-wide text-gray-600 dark:text-content-muted">
                     G-code ({lines.length.toLocaleString()} lines)
                 </span>
                 <button
@@ -314,7 +314,7 @@ export const GCodeSourcePanel: React.FC<GCodeSourcePanelProps> = ({
                         setSearchOpen((prev) => !prev);
                         setQuery('');
                     }}
-                    className="flex h-11 w-11 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 dark:text-content-muted dark:hover:bg-surface-hover"
+                    className="flex h-11 w-11 items-center justify-center rounded-lg text-gray-600 hover:bg-gray-100 dark:text-content-muted dark:hover:bg-surface-hover"
                 >
                     {searchOpen ? (
                         <X className="h-4 w-4" />
@@ -341,7 +341,7 @@ export const GCodeSourcePanel: React.FC<GCodeSourcePanelProps> = ({
                         aria-label="Search G-code"
                         className="h-10 w-full rounded-lg border border-gray-300 bg-white px-2 text-xs text-gray-900 dark:border-outline dark:bg-surface-sunken dark:text-content-primary"
                     />
-                    <span className="whitespace-nowrap text-xs text-gray-500 dark:text-content-muted">
+                    <span className="whitespace-nowrap text-xs text-gray-600 dark:text-content-muted">
                         {query.trim() ? matches.length.toLocaleString() : '—'}
                     </span>
                 </div>

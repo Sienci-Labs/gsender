@@ -62,7 +62,7 @@ export const StepControls: React.FC<StepControlsProps> = ({
     onReset,
 }) => (
     <div className="flex flex-col gap-2">
-        <span className="text-xs uppercase tracking-wide text-gray-500 dark:text-content-muted">
+        <span className="text-xs uppercase tracking-wide text-gray-600 dark:text-content-muted">
             Step Controls
         </span>
 
@@ -77,7 +77,7 @@ export const StepControls: React.FC<StepControlsProps> = ({
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                     'disabled:cursor-not-allowed disabled:opacity-40',
                     isPlaying
-                        ? 'border-blue-500 bg-blue-500 text-white hover:bg-blue-600'
+                        ? 'border-blue-600 bg-blue-600 text-white hover:bg-blue-700'
                         : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100 dark:border-outline dark:bg-surface-elevated dark:text-content-primary dark:hover:bg-surface-hover',
                 )}
             >
@@ -114,7 +114,7 @@ export const StepControls: React.FC<StepControlsProps> = ({
                             'flex-1 rounded-md py-2 text-xs font-medium transition-colors',
                             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                             speed === preset
-                                ? 'bg-blue-500 text-white'
+                                ? 'bg-blue-600 text-white'
                                 : 'text-gray-600 hover:bg-gray-100 dark:text-content-secondary dark:hover:bg-surface-hover',
                         )}
                     >

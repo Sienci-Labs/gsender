@@ -63,7 +63,7 @@ function CoolantButton({
                     'border-gray-300 dark:border-outline',
                     active
                         ? 'text-robin-500 shadow-[inset_7px_4px_6px_0px_rgba(104,154,201,0.12)] border-robin-400 dark:border-robin-600'
-                        : 'text-gray-500 dark:text-content-muted',
+                        : 'text-gray-600 dark:text-content-muted',
                     {
                         'opacity-40': disabled,
                         'hover:bg-gray-200 dark:hover:bg-surface-hover':

@@ -123,7 +123,7 @@ const MacroForm = ({
                     <DialogHeader>
                         <DialogTitle>{title}</DialogTitle>
                     </DialogHeader>
-                    <DialogDescription className="mt-1 mb-4 text-sm text-gray-500">
+                    <DialogDescription className="mt-1 mb-4 text-sm text-gray-600">
                         {dialogDescription ??
                             'Macros are a way to store and reuse commands. They can be used to speed up repetitive tasks and make your CNC more efficient.'}
                     </DialogDescription>

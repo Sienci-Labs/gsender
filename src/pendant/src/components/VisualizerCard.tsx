@@ -32,7 +32,7 @@ export default function VisualizerCard() {
             <div className="rounded-xl border border-gray-300 dark:border-outline dark:bg-surface-raised flex flex-col">
                 {/* Top toolbar */}
                 <div className="flex items-center px-3 py-2 bg-gray-100 dark:bg-surface-raised border-b border-gray-200 dark:border-outline rounded-t-xl">
-                    <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-content-muted flex-1">
+                    <div className="flex items-center gap-3 text-xs text-gray-600 dark:text-content-muted flex-1">
                         <span className="flex items-center gap-1">
                             <span
                                 className="w-2 h-2 rounded-full inline-block"
@@ -79,7 +79,7 @@ export default function VisualizerCard() {
                             <span className="text-[13px] font-medium text-gray-400 dark:text-content-muted">
                                 No file loaded
                             </span>
-                            <span className="text-[11px] text-gray-500 dark:text-content-muted">
+                            <span className="text-[11px] text-gray-600 dark:text-content-muted">
                                 Tap here to open a G-code file
                             </span>
                         </button>

@@ -56,7 +56,7 @@ const PluginPage = () => {
         return (
             <Page title="Plugin" withGoBackButton>
                 <div className="h-full flex items-center justify-center">
-                    <p className="text-gray-500 dark:text-content-secondary">
+                    <p className="text-gray-600 dark:text-content-secondary">
                         Plugin not found or disabled. Install plugins to{' '}
                         <code className="text-sm">plugins</code> folder and
                         restart gSender.

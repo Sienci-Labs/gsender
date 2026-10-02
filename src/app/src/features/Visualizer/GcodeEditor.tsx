@@ -747,7 +747,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
     if (!content) {
         return (
             <div className="w-full h-full flex items-center justify-center">
-                <p className="text-gray-500">No G-code file loaded</p>
+                <p className="text-gray-600">No G-code file loaded</p>
             </div>
         );
     }
@@ -783,7 +783,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                         </span>
                     )}
                     {gcodeLines.length > 0 && (
-                        <span className="text-xs text-gray-500 dark:text-content-muted whitespace-nowrap">
+                        <span className="text-xs text-gray-600 dark:text-content-muted whitespace-nowrap">
                             {gcodeLines.length.toLocaleString()} lines
                         </span>
                     )}
@@ -803,7 +803,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
 
             <div
                 ref={scrollContainerRef}
-                className="relative w-full flex-1 overflow-auto line-container bg-gray-100 dark:bg-[#18181f]"
+                className="relative w-full flex-1 overflow-auto line-container bg-gray-100 dark:bg-surface-raised"
                 onScroll={handleScroll}
                 onClick={handleContainerClick}
                 // biome-ignore lint/a11y/noNoninteractiveTabindex: <>
@@ -867,7 +867,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                                 }
                             }}
                         />
-                        <span className="text-xs text-gray-500 dark:text-content-muted whitespace-nowrap">
+                        <span className="text-xs text-gray-600 dark:text-content-muted whitespace-nowrap">
                             {matchIndices.length > 0
                                 ? `${currentMatchIndex + 1}/${matchIndices.length}`
                                 : '0/0'}
@@ -908,7 +908,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                 )}
                 {isJumpOpen && (
                     <div className="fixed top-20 right-6 z-[8999] flex items-center gap-2 bg-gray-100 dark:bg-surface-raised border border-gray-300 dark:border-outline p-3 rounded">
-                        <span className="text-xs text-gray-500 dark:text-content-muted whitespace-nowrap">
+                        <span className="text-xs text-gray-600 dark:text-content-muted whitespace-nowrap">
                             Jump to line:
                         </span>
                         <Input
@@ -925,7 +925,7 @@ const GcodeEditor = ({ onClose }: GcodeEditorProps) => {
                                 }
                             }}
                         />
-                        <span className="text-xs text-gray-500 dark:text-content-muted whitespace-nowrap">
+                        <span className="text-xs text-gray-600 dark:text-content-muted whitespace-nowrap">
                             {`${Math.floor(
                                 (scrollContainerRef.current?.scrollTop ?? 0) /
                                     LINE_HEIGHT +

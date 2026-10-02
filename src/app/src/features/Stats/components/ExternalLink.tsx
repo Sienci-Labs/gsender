@@ -26,12 +26,12 @@ export function ExternalLink({
                 </span>
                 <div className={'flex flex-col text-left'}>
                     <h2 className="font-bold">{title}</h2>
-                    <span className="text-sm text-gray-500 dark:text-content-muted">
+                    <span className="text-sm text-gray-600 dark:text-content-muted">
                         {children}
                     </span>
                 </div>
             </div>
-            <div className="fill-blue-500 text-blue-500 flex align-end items-center flex-grow-1">
+            <div className="fill-blue-500 text-blue-600 dark:text-blue-400 flex align-end items-center flex-grow-1">
                 <FaExternalLinkAlt />
             </div>
         </a>

@@ -49,7 +49,7 @@ export const {
 export const CAMERA_MODE_PAN = 'pan';
 export const CAMERA_MODE_ROTATE = 'rotate';
 
-export const PRIMARY_COLOR = '#3E85C7'; // Light Blue
+export const PRIMARY_COLOR = '#3F85C7'; // Light Blue
 export const BORDER_COLOR = '#9CA3AF';
 export const SECONDARY_COLOR = '#6F7376'; // Grey (for disabled look)
 
@@ -116,9 +116,9 @@ export const DARK_THEME_VALUES = new Map<string, string>([
     [JOGGING_PART, '#0ef6ae'], // Light Green
     [PLANNED_PART, '#dff204'], // Yellow
     [G0_PART, '#0ef6ae'], // Light Green
-    [G1_PART, '#3e85c7'], // Light Blue
-    [G2_PART, '#3e85c7'], // Light Blue
-    [G3_PART, '#3e85c7'], // Light Blue
+    [G1_PART, '#3f85c7'], // Light Blue
+    [G2_PART, '#3f85c7'], // Light Blue
+    [G3_PART, '#3f85c7'], // Light Blue
     [LASER_PART, '#FF0000'], // Red
 ]);
 

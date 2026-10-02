@@ -16,7 +16,7 @@ const Ipv4Input = ({ info, setting, onChange, disabled }) => {
                 disabled={disabled}
             />
             {unit && (
-                <span className="absolute right-2 text-xs flex items-center pointer-events-none text-gray-500 rounded-md">
+                <span className="absolute right-2 text-xs flex items-center pointer-events-none text-gray-600 rounded-md">
                     {unit}
                 </span>
             )}

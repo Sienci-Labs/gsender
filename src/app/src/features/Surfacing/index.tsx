@@ -122,7 +122,7 @@ const SurfacingTool = () => {
     };
 
     const inputStyle =
-        'text-xl font-light z-0 align-center text-center text-blue-500 pl-1 pr-1 w-full';
+        'text-xl font-light z-0 align-center text-center text-blue-600 dark:text-blue-400 pl-1 pr-1 w-full';
 
     const convertedDefaultSurfacingState =
         units === 'mm'
@@ -144,7 +144,7 @@ const SurfacingTool = () => {
         <div className="bg-white dark:bg-transparent dark:text-content-primary w-full flex flex-col gap-2">
             <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-4 max-xl:gap-3 xl:gap-2">
-                    <p className="text-sm xl:text-base font-normal text-gray-500 dark:text-content-secondary">
+                    <p className="text-sm xl:text-base font-normal text-gray-600 dark:text-content-secondary">
                         <b>For ideal wasteboard surfacing:</b> know your CNCs
                         exact movement limits accounting for limit switches and
                         other add-ons, get nicer and faster cuts using your
@@ -455,7 +455,7 @@ const SurfacingTool = () => {
                             >
                                 G-Code{' '}
                                 {gcode.length !== 0 ? (
-                                    <span className="text-xs text-gray-500">
+                                    <span className="text-xs text-gray-600">
                                         ({gcode.split('\n').length} lines)
                                     </span>
                                 ) : null}

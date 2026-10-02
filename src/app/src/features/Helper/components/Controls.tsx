@@ -61,7 +61,7 @@ const Controls = () => {
     );
 
     return (
-        <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 dark:border-[#2a2a35] bg-gray-50 dark:bg-[#111116]">
+        <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 dark:border-outline-subtle bg-gray-50 dark:bg-surface-base">
             <button
                 type="button"
                 disabled={isFirst}
@@ -70,7 +70,7 @@ const Controls = () => {
                     updateSubstepOverlay(activeValues);
                     scrollToActiveStep(activeValues);
                 }}
-                className="flex items-center gap-1.5 text-xs px-3.5 py-1.5 rounded-md border border-gray-300 dark:border-[#3a3a48] text-gray-600 dark:text-content-muted hover:bg-gray-100 dark:hover:bg-white/5 disabled:opacity-35 disabled:pointer-events-none transition-colors"
+                className="flex items-center gap-1.5 text-xs px-3.5 py-1.5 rounded-md border border-gray-300 dark:border-outline text-gray-600 dark:text-content-muted hover:bg-gray-100 dark:hover:bg-white/5 disabled:opacity-35 disabled:pointer-events-none transition-colors"
             >
                 <ArrowLeft size={12} />
                 Back
@@ -86,7 +86,7 @@ const Controls = () => {
                                 ? 'w-[24px] bg-blue-600 dark:bg-blue-400'
                                 : i < flatCurrent
                                   ? 'w-[18px] bg-blue-300 dark:bg-blue-700'
-                                  : 'w-[18px] bg-gray-300 dark:bg-[#2a2a35]',
+                                  : 'w-[18px] bg-gray-300 dark:bg-outline-subtle',
                         )}
                     />
                 ))}

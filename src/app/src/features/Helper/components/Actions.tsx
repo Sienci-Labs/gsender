@@ -175,7 +175,7 @@ const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
     return (
         <>
             {actions.length > 0 && (
-                <div className="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-amber-400 mb-1">
+                <div className="text-xs font-semibold uppercase tracking-widest text-gray-600 dark:text-amber-400 mb-1">
                     Run G-Code
                 </div>
             )}
@@ -214,11 +214,11 @@ const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
                         <React.Fragment key={`action-${uniqueId()}`}>
                             {!isLoading && index > 0 && (
                                 <div className="flex items-center gap-2 my-0.5 px-6">
-                                    <div className="flex-1 h-px bg-gray-200 dark:bg-[#2a2a35]" />
+                                    <div className="flex-1 h-px bg-gray-200 dark:bg-outline-subtle" />
                                     <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-content-muted">
                                         or
                                     </span>
-                                    <div className="flex-1 h-px bg-gray-200 dark:bg-[#2a2a35]" />
+                                    <div className="flex-1 h-px bg-gray-200 dark:bg-outline-subtle" />
                                 </div>
                             )}
                             {isLoading && index === 0 ? (
@@ -233,7 +233,7 @@ const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
                                                 'flex items-center justify-between px-3 py-2 rounded border transition-colors duration-500',
                                                 showSuccess
                                                     ? 'border-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 dark:border-emerald-700'
-                                                    : 'border-gray-200 dark:border-[#2a2a35] bg-gray-50 dark:bg-[#0d0d12]',
+                                                    : 'border-gray-200 dark:border-outline-subtle bg-gray-50 dark:bg-surface-sunken',
                                             )}
                                             data-chip="true"
                                         >
@@ -303,7 +303,7 @@ const Actions = ({ actions = [], stepIndex, substepIndex }: ActionsProps) => {
                                                     zIndex: 9999,
                                                     pointerEvents: 'none',
                                                 }}
-                                                className="px-3 py-2.5 rounded border border-gray-200 dark:border-[#2a2a35] bg-white dark:bg-[#0d0d12] shadow-lg"
+                                                className="px-3 py-2.5 rounded border border-gray-200 dark:border-outline-subtle bg-white dark:bg-surface-sunken shadow-lg"
                                             >
                                                 {tooltip.lines.map(
                                                     (line, i) => (

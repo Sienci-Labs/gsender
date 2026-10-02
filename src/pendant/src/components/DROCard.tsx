@@ -121,7 +121,7 @@ export default function DROCard() {
                             className={cn(
                                 'flex-1 min-w-0 text-right font-mono text-[2rem] tabular-nums leading-tight',
                                 mode === 'work'
-                                    ? 'text-blue-500'
+                                    ? 'text-blue-600 dark:text-blue-400'
                                     : 'text-gray-400 dark:text-content-muted',
                             )}
                         >
@@ -136,7 +136,7 @@ export default function DROCard() {
                             disabled={!canZero}
                             className={`text-sm font-semibold border-[3px] border-gray-400 dark:border-outline rounded-md px-3 py-1.5 shrink-0 transition-colors ${
                                 canZero
-                                    ? 'text-gray-500 hover:text-gray-700 dark:text-content-muted dark:hover:text-content-secondary'
+                                    ? 'text-gray-600 hover:text-gray-700 dark:text-content-muted dark:hover:text-content-secondary'
                                     : 'text-gray-400 dark:text-content-muted cursor-default'
                             }`}
                         >
@@ -182,7 +182,7 @@ export default function DROCard() {
                                             ? canGoTo
                                             : isConnected
                                   )
-                                    ? 'border border-blue-500 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white'
+                                    ? 'border border-blue-600 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white'
                                     : 'border border-gray-200 dark:border-outline bg-gray-200 text-gray-400 dark:bg-surface-disabled dark:text-content-disabled'
                                 : canZero
                                   ? 'border-[3px] border-gray-400 dark:border-outline text-gray-600 dark:text-content-secondary hover:bg-gray-50 dark:hover:bg-surface-hover hover:text-gray-900 dark:hover:text-content-primary'

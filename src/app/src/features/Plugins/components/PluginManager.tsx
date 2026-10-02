@@ -111,7 +111,7 @@ const PluginManager = () => {
                     )}
                 </p>
 
-                <p className="text-sm text-gray-500 dark:text-content-muted">
+                <p className="text-sm text-gray-600 dark:text-content-muted">
                     Each plugin is a folder containing{' '}
                     <code className="text-xs">gsender-plugin.json</code> and a{' '}
                     <code className="text-xs">ui/</code> build output. After
@@ -149,11 +149,11 @@ const PluginManager = () => {
                 )}
 
                 {loading && (
-                    <p className="text-sm text-gray-500">Loading plugins...</p>
+                    <p className="text-sm text-gray-600">Loading plugins...</p>
                 )}
 
                 {!loading && plugins.length === 0 && (
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-600">
                         No plugins installed.
                     </p>
                 )}
@@ -168,7 +168,7 @@ const PluginManager = () => {
                                 <p className="font-semibold dark:text-content-primary">
                                     {plugin.name}
                                 </p>
-                                <p className="text-xs text-gray-500">
+                                <p className="text-xs text-gray-600">
                                     {plugin.id} · v{plugin.version}
                                 </p>
                                 {!plugin.valid && (
@@ -179,7 +179,7 @@ const PluginManager = () => {
                                     </ul>
                                 )}
                                 {plugin.contributions.length > 0 && (
-                                    <p className="mt-2 text-xs text-gray-500">
+                                    <p className="mt-2 text-xs text-gray-600">
                                         Slots:{' '}
                                         {plugin.contributions
                                             .map((c) => c.slot)

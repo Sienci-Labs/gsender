@@ -65,7 +65,7 @@ function ActionTile({ label, Icon, onClick }: ActionTileProps) {
                     'relative z-10 flex flex-col items-center justify-center gap-2 rounded-xl',
                     'min-h-[80px] px-2 py-4 border transition-colors',
                     'bg-gray-100 dark:bg-surface-raised border-gray-300 dark:border-outline',
-                    'text-gray-500 dark:text-content-muted',
+                    'text-gray-600 dark:text-content-muted',
                     'hover:bg-gray-200 dark:hover:bg-surface-hover',
                 )}
             >

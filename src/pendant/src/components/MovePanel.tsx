@@ -257,7 +257,7 @@ function HoldCorner({
                     ? 'border-green-500 bg-green-100 dark:bg-green-500/15 text-green-600 dark:text-green-400'
                     : selected
                       ? 'border-blue-400 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400'
-                      : 'border-gray-300 dark:border-outline bg-white dark:bg-surface-elevated text-gray-500 dark:text-content-secondary',
+                      : 'border-gray-300 dark:border-outline bg-white dark:bg-surface-elevated text-gray-600 dark:text-content-secondary',
             )}
             style={{ width: corner.size, height: corner.size }}
             disabled={disabled || settling}
@@ -527,7 +527,7 @@ export default function MovePanel({ mode, setMode }: Props) {
                                             ? 'bg-robin-100 dark:bg-robin-500/20 text-robin-700 dark:text-robin-400'
                                             : isDisabled
                                               ? 'text-gray-300 dark:text-content-disabled cursor-not-allowed'
-                                              : 'text-gray-500 dark:text-content-muted hover:bg-gray-100 dark:hover:bg-surface-hover',
+                                              : 'text-gray-600 dark:text-content-muted hover:bg-gray-100 dark:hover:bg-surface-hover',
                                     )}
                                 >
                                     {label}
@@ -587,7 +587,7 @@ export default function MovePanel({ mode, setMode }: Props) {
                                             onClick={() =>
                                                 adjustAxis(axis, -stepSize)
                                             }
-                                            className="w-11 h-11 rounded-lg border border-gray-300 dark:border-outline text-gray-500 dark:text-content-secondary hover:bg-gray-100 dark:hover:bg-surface-hover active:bg-gray-200 dark:active:bg-surface-active text-lg font-bold"
+                                            className="w-11 h-11 rounded-lg border border-gray-300 dark:border-outline text-gray-600 dark:text-content-secondary hover:bg-gray-100 dark:hover:bg-surface-hover active:bg-gray-200 dark:active:bg-surface-active text-lg font-bold"
                                         >
                                             –
                                         </button>
@@ -596,7 +596,7 @@ export default function MovePanel({ mode, setMode }: Props) {
                                             onClick={() =>
                                                 adjustAxis(axis, stepSize)
                                             }
-                                            className="w-11 h-11 rounded-lg border border-gray-300 dark:border-outline text-gray-500 dark:text-content-secondary hover:bg-gray-100 dark:hover:bg-surface-hover active:bg-gray-200 dark:active:bg-surface-active text-lg font-bold"
+                                            className="w-11 h-11 rounded-lg border border-gray-300 dark:border-outline text-gray-600 dark:text-content-secondary hover:bg-gray-100 dark:hover:bg-surface-hover active:bg-gray-200 dark:active:bg-surface-active text-lg font-bold"
                                         >
                                             +
                                         </button>

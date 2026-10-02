@@ -252,7 +252,7 @@ export default function ProbeWizardDrawer({
                         type="button"
                         onClick={handleBack}
                         disabled={step === 0}
-                        className="w-11 h-11 rounded-lg border border-gray-200 dark:border-outline flex items-center justify-center text-gray-500 dark:text-content-muted disabled:opacity-30"
+                        className="w-11 h-11 rounded-lg border border-gray-200 dark:border-outline flex items-center justify-center text-gray-600 dark:text-content-muted disabled:opacity-30"
                     >
                         <ChevronLeft size={20} />
                     </button>
@@ -283,7 +283,7 @@ export default function ProbeWizardDrawer({
                     <button
                         type="button"
                         onClick={handleBack}
-                        className="w-11 h-11 rounded-lg border border-gray-200 dark:border-outline flex items-center justify-center text-gray-500 dark:text-content-muted"
+                        className="w-11 h-11 rounded-lg border border-gray-200 dark:border-outline flex items-center justify-center text-gray-600 dark:text-content-muted"
                     >
                         <ChevronLeft size={20} />
                     </button>

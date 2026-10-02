@@ -27,7 +27,7 @@ const ToolCard = ({
             <CardTitle className="dark:text-content-primary">{title}</CardTitle>
 
             {description && (
-                <CardDescription className="text-sm text-gray-500">
+                <CardDescription className="text-sm text-gray-600">
                     {description}
                 </CardDescription>
             )}

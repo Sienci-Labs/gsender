@@ -20,7 +20,7 @@ function AutoSpinIcon() {
         <img
             src={autoSpinIcon}
             alt="AutoSpin Icon"
-            className="h-7 w-7 text-blue-500 fill-blue-500"
+            className="h-7 w-7 text-blue-600 dark:text-blue-400 fill-blue-500"
         />
     );
 }

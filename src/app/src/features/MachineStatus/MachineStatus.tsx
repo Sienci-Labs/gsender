@@ -44,6 +44,7 @@ import {
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_JOG,
     GRBL_ACTIVE_STATE_RUN,
+    GRBL_ACTIVE_STATE_SLEEP,
     GRBL_ACTIVE_STATE_TOOL,
 } from '../../constants';
 import controller from '../../lib/controller';
@@ -215,7 +216,7 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
                                 displayActiveState ===
                                     GRBL_ACTIVE_STATE_CHECK ||
                                 showPluginBusy,
-                            'bg-blue-500 text-white':
+                            'bg-blue-600 text-white':
                                 displayActiveState === GRBL_ACTIVE_STATE_HOME,
                             'bg-yellow-600 text-white':
                                 displayActiveState === GRBL_ACTIVE_STATE_HOLD ||
@@ -224,6 +225,8 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
                                 displayActiveState === GRBL_ACTIVE_STATE_ALARM,
                             'bg-purple-600 text-white':
                                 displayActiveState === GRBL_ACTIVE_STATE_TOOL,
+                            'bg-blue-300 text-blue-950':
+                                displayActiveState === GRBL_ACTIVE_STATE_SLEEP,
                         },
                     )}
                 >

@@ -147,7 +147,7 @@ export const FileList: React.FC = () => {
 
     if (!isConnected) {
         return (
-            <div className="border-gray-300 bg-white dark:bg-surface-raised text-center py-12 text-gray-500 rounded-lg shadow-sm border">
+            <div className="border-gray-300 bg-white dark:bg-surface-raised text-center py-12 text-gray-600 rounded-lg shadow-sm border">
                 Must be connected to use SD card functionality.
             </div>
         );
@@ -155,7 +155,7 @@ export const FileList: React.FC = () => {
 
     if (firmwareType !== 'grblHAL') {
         return (
-            <div className="border-gray-300 bg-white dark:bg-surface-raised text-center py-12 text-gray-500 rounded-lg shadow-sm border">
+            <div className="border-gray-300 bg-white dark:bg-surface-raised text-center py-12 text-gray-600 rounded-lg shadow-sm border">
                 SD card tools are only available for grblHAL devices.
             </div>
         );
@@ -163,7 +163,7 @@ export const FileList: React.FC = () => {
 
     if (!hasFTP && !hasYM) {
         return (
-            <div className="border-gray-300 bg-white dark:bg-surface-raised text-center py-12 text-gray-500 rounded-lg shadow-sm border">
+            <div className="border-gray-300 bg-white dark:bg-surface-raised text-center py-12 text-gray-600 rounded-lg shadow-sm border">
                 Enable FTP or YMODEM in firmware to use SD card tools.
             </div>
         );
@@ -173,7 +173,7 @@ export const FileList: React.FC = () => {
         return (
             <div
                 className={cn(
-                    'flex-1 items-center justify-center flex flex-col overflow-auto text-center py-12 text-gray-500 dark:text-content-secondary rounded-lg shadow-sm border border-gray-200',
+                    'flex-1 items-center justify-center flex flex-col overflow-auto text-center py-12 text-gray-600 dark:text-content-secondary rounded-lg shadow-sm border border-gray-200',
                     {
                         'border-blue-400 bg-blue-50': dragOver,
                         'border-gray-300 bg-white dark:bg-surface-raised':
@@ -280,7 +280,7 @@ export const FileList: React.FC = () => {
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        <span className="text-sm text-gray-500">
+                                        <span className="text-sm text-gray-600">
                                             {formatFileSize(file.size)}
                                         </span>
                                     </TableCell>
@@ -314,7 +314,7 @@ export const FileList: React.FC = () => {
                                                     isATCI ||
                                                     file.unusable
                                                 }
-                                                className="flex items-center space-x-1 px-3 py-1.5 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                                                className="flex items-center space-x-1 px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                                             >
                                                 <Play className="w-3.5 h-3.5" />
                                                 <span>Run</span>

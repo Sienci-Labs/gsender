@@ -57,7 +57,7 @@ const OverlayPanel = ({
                 <button
                     type="button"
                     aria-label="Close plugin"
-                    className="inline-flex h-6 w-6 items-center justify-center rounded text-gray-500 hover:bg-gray-100 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-dark-lighter dark:hover:text-gray-100"
+                    className="inline-flex h-6 w-6 items-center justify-center rounded text-gray-600 hover:bg-gray-100 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-dark-lighter dark:hover:text-gray-100"
                     onClick={onClose}
                 >
                     <X aria-hidden="true" className="h-4 w-4" />
@@ -149,7 +149,7 @@ const PluginVisualizerOverlayHost = ({ baseBottomPx, leftPx }: Props) => {
                                             isOpen,
                                         'border-gray-400/40 text-gray-300 hover:border-gray-200/70 hover:text-gray-100 hover:shadow-[0_12px_32px_rgba(0,_0,_0,_0.35)]':
                                             !isOpen && !gated,
-                                        'cursor-not-allowed border-gray-600/30 text-gray-500 opacity-40':
+                                        'cursor-not-allowed border-gray-600/30 text-gray-600 opacity-40':
                                             gated,
                                     },
                                 )}
