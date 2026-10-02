@@ -36,6 +36,7 @@ import {
 } from '@sienci/gviewer/viewer';
 import type { BBox } from 'app/definitions/general';
 import type { OverlayMarker } from 'app/features/Plugins/types';
+import type { SenderStatus } from 'app/lib/definitions/sender_feeder';
 import controller from 'app/lib/controller';
 import { isLaserMode } from 'app/lib/laserMode';
 import { getZUpTravel } from 'app/lib/SoftLimits.js';
@@ -134,7 +135,8 @@ class GcodeViewer extends Component<Props> {
 
     outlineRunning = false;
 
-    lastHiddenLine = -1;
+    // Dedupe key for run-progress updates; cleared whenever progress resets.
+    lastProgressKey = '';
 
     // Theme selection in Settings only writes to the store once "Save" is
     // clicked, but the dropdown fires "theme:change" immediately for a live
@@ -382,7 +384,13 @@ class GcodeViewer extends Component<Props> {
                 colorSource: 'custom',
                 color: WORKSHOP_VISUALIZER_COLORS.bit,
             },
-            progress: { mode: hideProcessed ? 'hide' : 'grey' },
+            progress: {
+                mode: hideProcessed ? 'hide' : 'grey',
+                plannedPulse: store.get(
+                    'widgets.visualizer.animatePlannedLines',
+                    true,
+                ),
+            },
             boundingBox: {
                 visible: store.get(
                     'widgets.visualizer.objects.limits.visible',
@@ -448,7 +456,7 @@ class GcodeViewer extends Component<Props> {
 
     applyWorkerData(data: WorkerSegmentsData) {
         this.lastWorkerData = data;
-        this.lastHiddenLine = -1;
+        this.lastProgressKey = '';
 
         // Shared so every viewer keeps the worker's per-tool palette; see
         // augmentWorkerGeometry for why gviewer drops it otherwise.
@@ -987,7 +995,7 @@ class GcodeViewer extends Component<Props> {
 
     unload() {
         this.lastWorkerData = null;
-        this.lastHiddenLine = -1;
+        this.lastProgressKey = '';
         this.lastSpinning = false;
         this.viewer3d?.setBitSpinning(false);
         this.viewer3d?.unload();
@@ -1083,7 +1091,7 @@ class GcodeViewer extends Component<Props> {
             pubsub.subscribe('job:end', () => {
                 this.viewer3d?.showAll();
                 this.viewer3d?.resetColors();
-                this.lastHiddenLine = -1;
+                this.lastProgressKey = '';
             }),
             pubsub.subscribe('gcode:unload', () => {
                 this.unload();
@@ -1197,29 +1205,54 @@ class GcodeViewer extends Component<Props> {
                 );
             }
 
-            // Progress greying/hiding while a job runs: always grey, hide only when
-            // the hideProcessedLines setting is on. Use hideUntilLine (not seekToLine)
-            // so it never fights the DRO-driven bit position above.
+            // Progress while a job runs: grey what has been cut (hide it instead
+            // with hideProcessedLines). With showPlannedLines the processed edge
+            // follows the bit along the toolpath and the lines sent but not cut
+            // yet are highlighted; otherwise it follows the server's estimate of
+            // the line running. Neither moves the bit, so the DRO-driven position
+            // above stays authoritative.
             if (
-                _get(st, 'controller.workflow.state') === WORKFLOW_STATE_RUNNING
+                _get(st, 'controller.workflow.state') ===
+                    WORKFLOW_STATE_RUNNING &&
+                this.viewer3d
             ) {
-                const line =
-                    _get(
-                        st,
-                        'controller.sender.status.currentLineRunning',
-                        0,
-                    ) || _get(st, 'controller.sender.status.received', 0);
-                if (line !== this.lastHiddenLine && this.viewer3d) {
-                    this.lastHiddenLine = line;
-                    const mode = store.get(
-                        'widgets.visualizer.hideProcessedLines',
-                        false,
-                    )
-                        ? 'hide'
-                        : 'grey';
-                    // `line` counts Sender lines done; hideUntilLine takes the
-                    // index of the last one.
-                    this.viewer3d.hideUntilLine(line - 1, mode);
+                const status: Partial<SenderStatus> =
+                    _get(st, 'controller.sender.status') ?? {};
+                const estimateLine =
+                    Number(status.currentLineRunning) ||
+                    Number(status.received) ||
+                    0;
+                const mode = store.get(
+                    'widgets.visualizer.hideProcessedLines',
+                    false,
+                )
+                    ? 'hide'
+                    : 'grey';
+                const showPlanned = store.get(
+                    'widgets.visualizer.showPlannedLines',
+                    true,
+                );
+                // Sender counts are lines done; gviewer takes line indices.
+                if (showPlanned) {
+                    const sent = Number(status.sent) || 0;
+                    const key = `planned,${mode},${sent},${estimateLine},${this.lastWposKey}`;
+                    if (key !== this.lastProgressKey) {
+                        this.lastProgressKey = key;
+                        this.viewer3d.trackRunProgress({
+                            minLine: Number(status.startLine) || 0,
+                            plannedLine: sent - 1,
+                            fallbackLine: estimateLine - 1,
+                            mode,
+                        });
+                    }
+                } else {
+                    const key = `line,${mode},${estimateLine}`;
+                    if (key !== this.lastProgressKey) {
+                        this.lastProgressKey = key;
+                        this.viewer3d.hideUntilLine(estimateLine - 1, mode);
+                        // Clears a planned span left by a switch mid-run.
+                        this.viewer3d.setPlannedRange(0, -1);
+                    }
                 }
             }
 
