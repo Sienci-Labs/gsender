@@ -215,6 +215,78 @@ export function* initialize(): Generator<null, void, unknown> {
     let accessoryBaselineConnected: Partial<
         Record<AccessoryAutoconfigKey, boolean>
     > = {};
+    // Once per connection — a repeated $I shouldn't re-raise the warning.
+    let atcToolchangeChecked = false;
+
+    // ATC macros only see M6 when gSender passes it through untouched:
+    // passthrough on (otherwise M6 is commented out) and strategy Ignore
+    // (otherwise gSender runs its own tool change flow).
+    const checkAtcToolchangeConfig = (
+        newopt: Record<string, string | null>,
+    ) => {
+        if (atcToolchangeChecked || newopt.ATC !== '1') {
+            return;
+        }
+        atcToolchangeChecked = true;
+
+        const passthroughOff = !store.get(
+            'workspace.toolChange.passthrough',
+            false,
+        );
+        const strategy = store.get('workspace.toolChangeOption', 'Ignore');
+        const strategyWrong = strategy !== 'Ignore';
+        if (!passthroughOff && !strategyWrong) {
+            return;
+        }
+
+        pubsub.publish('helper:info', {
+            kind: 'reminder',
+            weight: 'compact',
+            title: 'Controller is set up to handle tool changes',
+            description: (
+                <>
+                    Your controller reported an ATC, but gSender's tool change
+                    settings will stop the ATC macros from running:
+                    <ul className="mt-2 list-disc list-inside">
+                        {passthroughOff && (
+                            <li>
+                                Passthrough is <b>off</b>, so M6 commands are
+                                being commented out and never reach the
+                                controller.
+                            </li>
+                        )}
+                        {strategyWrong && (
+                            <li>
+                                Tool change strategy is <b>{strategy}</b>, so
+                                gSender handles tool changes instead of the ATC
+                                macros.
+                            </li>
+                        )}
+                    </ul>
+                    <p className="mt-2">
+                        Update gSender's tool change settings?
+                    </p>
+                </>
+            ),
+            primaryAction: {
+                label:
+                    passthroughOff && !strategyWrong
+                        ? 'Enable passthrough'
+                        : 'Update settings',
+                onClick: () => {
+                    if (passthroughOff) {
+                        store.set('workspace.toolChange.passthrough', true);
+                    }
+                    if (strategyWrong) {
+                        store.set('workspace.toolChangeOption', 'Ignore');
+                    }
+                    updateToolchangeContext();
+                },
+            },
+            secondaryAction: { label: 'Keep current settings' },
+            dismissKey: 'atc-toolchange-config',
+        });
+    };
 
     const getFileType = () => {
         if (isLaserMode()) return 'laser';
@@ -759,6 +831,7 @@ export function* initialize(): Generator<null, void, unknown> {
             reduxStore.dispatch(closeConnection());
             // So a reconnect re-baselines cleanly from the next $I/NEWOPT response.
             accessoryBaselineConnected = {};
+            atcToolchangeChecked = false;
 
             pubsub.publish('machine:disconnected');
         },
@@ -1293,6 +1366,8 @@ export function* initialize(): Generator<null, void, unknown> {
                     updateAutoconfig({ values: accessoryValues }),
                 );
             }
+
+            checkAtcToolchangeConfig(newopt);
         },
     );
 
