@@ -4,7 +4,7 @@ import { setNotifications } from 'app/store/redux/slices/preferences.slice';
 import type { Notification } from 'app/workspace/definitions';
 import get from 'lodash/get';
 import { toast as sonnerToast } from 'sonner';
-import uuid from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import {
     TOASTER_DEFAULT,
     TOASTER_DISABLED,
@@ -58,7 +58,7 @@ const saveNotificationToStore = ({
         type,
         status: 'unread',
         timestamp: new Date().toISOString(),
-        id: uuid.v4(),
+        id: uuidv4(),
     });
 
     reduxStore.dispatch(setNotifications(notifications));

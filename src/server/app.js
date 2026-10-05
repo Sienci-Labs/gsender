@@ -47,7 +47,6 @@ import _get from "lodash/get";
 import methodOverride from "method-override";
 import morgan from "morgan";
 // import _noop from 'lodash/noop';
-import rimraf from "rimraf";
 import favicon from "serve-favicon";
 import serveStatic from "serve-static";
 import sessionFileStore from "session-file-store";
@@ -140,7 +139,7 @@ const appMain = () => {
 		// https://github.com/valery-barysok/session-file-store
 		const path = settings.middleware.session.path; // Defaults to './sienci-sessions'
 
-		rimraf.sync(path);
+		fs.rmSync(path, { recursive: true, force: true });
 		fs.mkdirSync(path);
 
 		const FileStore = sessionFileStore(session);
