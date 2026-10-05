@@ -167,6 +167,20 @@ describe("Sender execution playhead", () => {
 		expect(sender.toJSON().currentLineRunning).toBe(2);
 	});
 
+	test("reports the run's start line until the next whole-file run", () => {
+		const sender = new Sender(SP_TYPE_CHAR_COUNTING, { bufferSize: 128 });
+		sender.load("job.nc", "G1 X1\nG1 X2\nG1 X3");
+		sender.setStartLine(2);
+		sender.next({ startFromLine: true });
+		expect(sender.toJSON().startLine).toBe(2);
+		sender.rewind();
+		expect(sender.toJSON().startLine).toBe(0);
+		sender.setStartLine(1);
+		sender.rewind();
+		sender.next();
+		expect(sender.toJSON().startLine).toBe(0);
+	});
+
 	test("line indexes skip blank lines of any line ending, like the estimator", () => {
 		const sender = new Sender(SP_TYPE_CHAR_COUNTING, { bufferSize: 128 });
 		sender.load("job.nc", "G1 X1\r\n\r\n  \rG1 X2\r(c)\n\nG1 X3");

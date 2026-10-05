@@ -70,6 +70,9 @@ export const WORKSHOP_VISUALIZER_COLORS = {
     rapid: '#059669', // green.500
     cutting: '#3F85C7', // blue.500
     processed: '#59687B', // outline.DEFAULT
+    // Sent to the controller but not cut yet. No yellow scale in the Tailwind
+    // config, so this is the old visualizer's planned yellow (PLANNED_PART).
+    planned: '#dff204',
     boundingBox: '#659dd2', // blue.300
     machineBed: '#c27924', // orange.400
     bit: '#79aad8', // blue.200
@@ -106,6 +109,7 @@ export function buildViewerTheme(themeName?: string): GCodeViewerTheme {
                 rapid: c.rapid,
                 cutting: c.cutting,
                 processed: c.processed,
+                planned: c.planned,
                 boundingBox: c.boundingBox,
                 machineBed: c.machineBed,
             },
