@@ -456,7 +456,7 @@ const defaultState: State = {
             showSoftLimitWarning: false,
             hideProcessedLines: false,
             showPlannedLines: true,
-            animatePlannedLines: true,
+            animatePlannedLines: false,
             boundingBoxLabels: false,
             followToolDuringRuntime: false,
             debug: {

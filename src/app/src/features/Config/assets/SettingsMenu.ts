@@ -560,7 +560,7 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         description:
                             'A pulse runs along the planned lines in the order they will be cut.',
                         type: 'boolean',
-                        defaultValue: true,
+                        defaultValue: false,
                         onChange: (value: boolean) => {
                             store.set(
                                 'widgets.visualizer.animatePlannedLines',

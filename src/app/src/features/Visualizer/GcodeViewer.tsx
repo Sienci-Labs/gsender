@@ -388,7 +388,7 @@ class GcodeViewer extends Component<Props> {
                 mode: hideProcessed ? 'hide' : 'grey',
                 plannedPulse: store.get(
                     'widgets.visualizer.animatePlannedLines',
-                    true,
+                    false,
                 ),
             },
             boundingBox: {
