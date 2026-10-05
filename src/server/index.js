@@ -21,7 +21,7 @@
  *
  */
 
-import bcrypt from "bcrypt-nodejs";
+import bcrypt from "bcryptjs";
 import chalk from "chalk";
 import dns from "dns";
 import ensureArray from "ensure-array";
