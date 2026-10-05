@@ -7,4 +7,9 @@
     <color name="pendant_text_muted">#FF8FA3BC</color>
     <color name="pendant_accent">#FF4AA3DF</color>
     <color name="pendant_error">#FFF08A6C</color>
+    <!-- Load screen rocket: flame and the icon's coloured sparkles. -->
+    <color name="pendant_flame">#FFF5A04A</color>
+    <color name="pendant_flame_core">#FFFFE3A8</color>
+    <color name="pendant_spark_green">#FF4CD08A</color>
+    <color name="pendant_spark_red">#FFE8606A</color>
 </resources>

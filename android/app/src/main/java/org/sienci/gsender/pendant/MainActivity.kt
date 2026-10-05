@@ -24,7 +24,6 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Button
 import android.widget.FrameLayout
-import android.widget.ProgressBar
 import android.widget.ScrollView
 import android.widget.TextView
 import android.window.OnBackInvokedDispatcher
@@ -42,7 +41,7 @@ import android.window.OnBackInvokedDispatcher
 class MainActivity : Activity() {
     private lateinit var webContainer: FrameLayout
     private lateinit var loading: View
-    private lateinit var progress: ProgressBar
+    private lateinit var rocket: RocketLaunchView
     private lateinit var status: TextView
     private lateinit var errorPanel: View
     private lateinit var errorMessage: TextView
@@ -55,6 +54,7 @@ class MainActivity : Activity() {
     private var loadedPort = -1
     private var pageLoaded = false
     private var pageError: String? = null
+    private var launching = false
 
     /** Until the service reports anything, show "starting" rather than "stopped". */
     private var awaitingServer = true
@@ -66,7 +66,7 @@ class MainActivity : Activity() {
         setContentView(R.layout.activity_main)
         webContainer = findViewById(R.id.web_container)
         loading = findViewById(R.id.loading)
-        progress = findViewById(R.id.progress)
+        rocket = findViewById(R.id.rocket)
         status = findViewById(R.id.status)
         errorPanel = findViewById(R.id.error_panel)
         errorMessage = findViewById(R.id.error_message)
@@ -111,19 +111,19 @@ class MainActivity : Activity() {
         if (state !is ServerState.Stopped) awaitingServer = false
         when (state) {
             ServerState.Stopped -> if (awaitingServer) {
-                showProgress(R.string.status_starting)
+                showProgress(R.string.status_starting, STAGE_WAITING)
             } else {
                 dropWebView()
                 showMessage(getString(R.string.status_stopped), R.string.action_start, isError = false)
             }
             is ServerState.Installing ->
-                showProgress(if (state.isUpdate) R.string.status_installing_update else R.string.status_installing)
-            ServerState.Starting -> showProgress(R.string.status_starting)
+                showProgress(if (state.isUpdate) R.string.status_installing_update else R.string.status_installing, STAGE_INSTALLING)
+            ServerState.Starting -> showProgress(R.string.status_starting, STAGE_STARTING)
             is ServerState.Ready -> {
                 if (loadedPort != state.port || web == null) loadPendant(state.port)
                 when {
                     pageError != null -> showMessage(getString(R.string.error_page, pageError), R.string.action_retry, isError = true)
-                    !pageLoaded -> showProgress(R.string.status_connecting)
+                    !pageLoaded -> showProgress(R.string.status_connecting, STAGE_CONNECTING)
                     else -> hideLoadScreen()
                 }
             }
@@ -133,9 +133,11 @@ class MainActivity : Activity() {
         }
     }
 
-    private fun showProgress(text: Int) {
+    /** [stage] is how far up the screen the rocket climbs, 0..1. */
+    private fun showProgress(text: Int, stage: Float) {
         showLoadScreen()
-        progress.visibility = View.VISIBLE
+        rocket.setEngineOn(true)
+        rocket.setStage(stage)
         status.visibility = View.VISIBLE
         status.setText(text)
         errorPanel.visibility = View.GONE
@@ -143,7 +145,7 @@ class MainActivity : Activity() {
 
     private fun showMessage(message: String, action: Int, isError: Boolean) {
         showLoadScreen()
-        progress.visibility = View.GONE
+        rocket.setEngineOn(false)
         status.visibility = View.GONE
         errorPanel.visibility = View.VISIBLE
         errorMessage.text = message
@@ -154,14 +156,22 @@ class MainActivity : Activity() {
     }
 
     private fun showLoadScreen() {
+        if (loading.visibility != View.VISIBLE || launching) rocket.reset()
+        launching = false
         loading.animate().cancel()
         loading.alpha = 1f
         loading.visibility = View.VISIBLE
     }
 
+    /** The rocket launches out the top; the screen fades over the end of its flight. */
     private fun hideLoadScreen() {
-        if (loading.visibility != View.VISIBLE) return
-        loading.animate().alpha(0f).setDuration(200).withEndAction { loading.visibility = View.GONE }
+        if (loading.visibility != View.VISIBLE || launching) return
+        launching = true
+        rocket.launch()
+        loading.animate().alpha(0f).setStartDelay(150).setDuration(200).withEndAction {
+            loading.visibility = View.GONE
+            launching = false
+        }
     }
 
     private fun onRetry() {
@@ -170,7 +180,7 @@ class MainActivity : Activity() {
                 // Server is fine; the page failed. Reload it.
                 pageError = null
                 pageLoaded = false
-                showProgress(R.string.status_connecting)
+                showProgress(R.string.status_connecting, STAGE_CONNECTING)
                 loadPendant(state.port)
             }
             ServerState.Stopped -> NodeService.start(this)
@@ -338,5 +348,11 @@ class MainActivity : Activity() {
         private const val REQUEST_FILE = 1
         private const val REQUEST_NOTIFICATIONS = 2
         private const val WEB_LOG_TAG = "GSenderPendant-web"
+
+        // Rocket heights for each startup stage (see RocketLaunchView).
+        private const val STAGE_WAITING = 0.1f
+        private const val STAGE_INSTALLING = 0.3f
+        private const val STAGE_STARTING = 0.55f
+        private const val STAGE_CONNECTING = 0.8f
     }
 }
