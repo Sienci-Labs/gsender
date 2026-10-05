@@ -548,6 +548,28 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         type: 'boolean',
                     },
                     {
+                        label: 'Show planned lines',
+                        key: 'widgets.visualizer.showPlannedLines',
+                        description:
+                            'While a job runs, highlight the toolpath between the bit and the last line sent to the controller.',
+                        type: 'boolean',
+                    },
+                    {
+                        label: 'Animate planned lines',
+                        key: 'widgets.visualizer.animatePlannedLines',
+                        description:
+                            'A pulse runs along the planned lines in the order they will be cut.',
+                        type: 'boolean',
+                        defaultValue: false,
+                        onChange: (value: boolean) => {
+                            store.set(
+                                'widgets.visualizer.animatePlannedLines',
+                                value,
+                            );
+                            pubsub.publish('visualizer:settings');
+                        },
+                    },
+                    {
                         label: 'Lightweight options',
                         key: 'widgets.visualizer.liteOption',
                         description:
