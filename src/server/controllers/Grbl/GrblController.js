@@ -1577,6 +1577,14 @@ class GrblController {
 		// A stream must never outlive the connection it is writing to.
 		this.jogStreamer.abort("close");
 
+		// A closed connection cannot have a job running over it. Without this,
+		// a connection that drops mid-job (e.g. an unexpected disconnect) never
+		// clears workflow state, and a later reconnect to the same port reuses
+		// this controller via open(..., refresh=true), which skips its own
+		// workflow.stop() - leaving the UI's zero/go-to/home buttons disabled
+		// forever even though the machine is genuinely idle.
+		this.workflow.stop();
+
 		// Clear initialized flag
 		this.initialized = false;
 

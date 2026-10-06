@@ -7,7 +7,6 @@ import type { FIRMWARE_TYPES_T } from 'app/definitions/firmware';
 import type { GRBL_ACTIVE_STATES_T } from 'app/definitions/general';
 import controller from 'app/lib/controller';
 import store from 'app/store';
-import map from 'lodash/map';
 
 export interface JogSpeeds {
     aStep: number;
@@ -62,21 +61,15 @@ export function filterAxesForLimits(axes: JogDistances): JogDistances | null {
     return Object.keys(filtered).length === 0 ? null : filtered;
 }
 
+/**
+ * A single discrete jog. Routed through the jog streamer's displacement mode
+ * (the same path continuous jogging and the MPG handwheel use) rather than a
+ * raw `$J=` gcode command - the streamer owns `ok` acks while it's active
+ * (including briefly after a hold releases), so a plain gcode command sent in
+ * that window could have its ack stolen and silently produce no motion.
+ */
 export function jogAxis(params: JogDistances, feedrate: number) {
-    const filtered = filterAxesForLimits(params);
-    if (!filtered) {
-        return;
-    }
-    params = filtered;
-
-    const units = store.get('workspace.units', 'mm');
-    const modal = units === 'mm' ? 'G21' : 'G20';
-    const s = map(
-        params,
-        (value, letter) => `${letter.toUpperCase()}${value}`,
-    ).join(' ');
-    const commands = [`$J=${modal} G91 ${s} F${feedrate}`];
-    controller.command('gcode', commands);
+    feedJog(params, feedrate);
 }
 
 export function continuousJogAxis(axes: JogDistances, feedrate: number) {
