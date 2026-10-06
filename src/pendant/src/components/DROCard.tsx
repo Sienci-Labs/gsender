@@ -134,10 +134,10 @@ export default function DROCard() {
                         <button
                             onClick={() => zeroWCS(label, 0)}
                             disabled={!canZero}
-                            className={`text-sm font-semibold border-[3px] border-gray-400 dark:border-outline rounded-md px-3 py-1.5 shrink-0 transition-colors ${
+                            className={`text-sm font-semibold rounded-md px-3 py-1.5 shrink-0 transition-colors border-[3px] ${
                                 canZero
-                                    ? 'text-gray-600 hover:text-gray-700 dark:text-content-muted dark:hover:text-content-secondary'
-                                    : 'text-gray-400 dark:text-content-muted cursor-default'
+                                    ? 'border-gray-600 text-gray-700 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-700 dark:border-outline-strong dark:text-content-secondary dark:hover:bg-surface-hover dark:hover:text-content-primary'
+                                    : 'border-gray-200 text-gray-400 dark:border-outline-disabled dark:text-content-disabled cursor-default'
                             }`}
                         >
                             ZERO
@@ -185,8 +185,8 @@ export default function DROCard() {
                                     ? 'border border-blue-600 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white'
                                     : 'border border-gray-200 dark:border-outline bg-gray-200 text-gray-400 dark:bg-surface-disabled dark:text-content-disabled'
                                 : canZero
-                                  ? 'border-[3px] border-gray-400 dark:border-outline text-gray-600 dark:text-content-secondary hover:bg-gray-50 dark:hover:bg-surface-hover hover:text-gray-900 dark:hover:text-content-primary'
-                                  : 'border-[3px] border-gray-400 dark:border-outline text-gray-400 dark:text-content-muted bg-gray-100 dark:bg-surface-elevated cursor-default'
+                                  ? 'border-[3px] border-gray-600 dark:border-outline-strong text-gray-700 dark:text-content-secondary hover:bg-gray-100 dark:hover:bg-surface-hover hover:text-gray-900 dark:hover:text-content-primary'
+                                  : 'border-[3px] border-gray-200 dark:border-outline-disabled text-gray-400 dark:text-content-disabled bg-gray-100 dark:bg-surface-elevated cursor-default'
                         }`}
                     >
                         <Icon size={16} />
