@@ -4,7 +4,6 @@ import type { ConsoleState } from '../../definitions';
 
 const initialState: ConsoleState = {
     inputHistory: [],
-    history: [],
 };
 
 const consoleSlice = createSlice({
@@ -21,22 +20,9 @@ const consoleSlice = createSlice({
                 -MAX_TERMINAL_INPUT_ARRAY_SIZE,
             );
         },
-        addToHistory(state, action: PayloadAction<string[]>) {
-            state.history = [...state.history, ...action.payload].slice(
-                -MAX_TERMINAL_INPUT_ARRAY_SIZE,
-            );
-        },
-        clearHistory(state) {
-            state.history = [];
-        },
     },
 });
 
-export const {
-    setInputHistory,
-    addToInputHistory,
-    addToHistory,
-    clearHistory,
-} = consoleSlice.actions;
+export const { setInputHistory, addToInputHistory } = consoleSlice.actions;
 
 export default consoleSlice.reducer;

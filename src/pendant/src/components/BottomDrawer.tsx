@@ -1,13 +1,9 @@
+import Console from 'app/features/Console';
 import GcodeEditor from 'app/features/Visualizer/GcodeEditor';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-import {
-    addControllerEvents,
-    removeControllerEvents,
-} from 'app/lib/controller';
 import type { RootState } from 'app/store/redux';
 import { store as reduxStore } from 'app/store/redux';
-import { addToHistory } from 'app/store/redux/slices/console.slice';
 import { unloadFileInfo } from 'app/store/redux/slices/fileInfo.slice';
 import {
     ChevronsUp,
@@ -30,7 +26,6 @@ import {
 import { applyGcodeFile } from '../utils/fileLoader';
 import { cancelGcodeProcessing } from '../utils/gcodeProcessing';
 import ATCPanel from './ATCPanel';
-import ConsolePanel from './ConsolePanel';
 import CoolantPanel from './CoolantPanel';
 import MacrosPanel from './MacrosPanel';
 import MovePanel from './MovePanel';
@@ -108,11 +103,7 @@ export default function BottomDrawer() {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const tapTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const lastTapRef = useRef(0);
-    const consolePreviewBottomRef = useRef<HTMLDivElement>(null);
     const file = useTypedSelector((s: RootState) => s.file);
-    const consoleHistory = useTypedSelector(
-        (s: RootState) => s.console.history,
-    );
     const { coolantFunctions = false, atcEnabled = false } =
         useWorkspaceState();
     const atcReport = useTypedSelector(
@@ -148,50 +139,6 @@ export default function BottomDrawer() {
         },
         [],
     );
-
-    useEffect(() => {
-        consolePreviewBottomRef.current?.scrollIntoView();
-    }, [consoleHistory]);
-
-    // Always-on serial event subscription — must not depend on drawer mode or tab
-    useEffect(() => {
-        const events = {
-            'serialport:read': (data: string) => {
-                const line = String(data).trim();
-                if (line) reduxStore.dispatch(addToHistory([line]));
-            },
-            'serialport:write': (
-                data: string,
-                context: { source?: string },
-            ) => {
-                const line = String(data).trim();
-                if (!line) return;
-                // Server notices (the jog streamer's lifecycle, for one) are not
-                // machine traffic, so they read as plain lines rather than as
-                // something a source sent. Mirrors WRITE_SOURCE_SERVER.
-                const source =
-                    context?.source === 'server' ? null : context?.source;
-                const prefix = source ? `[${source}] ` : '';
-                reduxStore.dispatch(addToHistory([`${prefix}${line}`]));
-            },
-            'serialport:open': ({
-                port,
-                baudrate,
-            }: {
-                port: string;
-                baudrate: number;
-            }) => {
-                reduxStore.dispatch(
-                    addToHistory([`Connected to ${port} @ ${baudrate}`]),
-                );
-            },
-            'serialport:close': () => {
-                reduxStore.dispatch(addToHistory(['Disconnected']));
-            },
-        };
-        addControllerEvents(events);
-        return () => removeControllerEvents(events);
-    }, []);
 
     const saveRecentEntry = (entry: RecentFile) => {
         const stored = readRecentFiles();
@@ -579,35 +526,20 @@ export default function BottomDrawer() {
                         <MovePanel mode={mode} setMode={setMode} />
                     </div>
 
-                    {/* Console tab — always mounted */}
+                    {/* Console tab — always mounted; Console is the same
+                        component the desktop app uses (app/features/Console),
+                        positioned absolutely against this relative wrapper. */}
                     <div
                         className={
                             activeTab === 'Console'
-                                ? 'flex-1 flex flex-col overflow-hidden min-h-0'
+                                ? 'flex-1 flex flex-col overflow-hidden min-h-0 relative'
                                 : 'hidden'
                         }
                     >
-                        {mode !== 'expanded' ? (
-                            <div className="flex-1 overflow-y-auto px-3 py-2 space-y-0.5 min-h-0">
-                                {consoleHistory.length === 0 ? (
-                                    <span className="font-mono text-xs text-gray-400 dark:text-content-muted italic">
-                                        No output yet
-                                    </span>
-                                ) : (
-                                    consoleHistory.map((line, i) => (
-                                        <p
-                                            key={i}
-                                            className="font-mono text-xs text-gray-600 dark:text-content-secondary truncate"
-                                        >
-                                            {line}
-                                        </p>
-                                    ))
-                                )}
-                                <div ref={consolePreviewBottomRef} />
-                            </div>
-                        ) : (
-                            <ConsolePanel className="h-full" />
-                        )}
+                        <Console
+                            isActive={activeTab === 'Console'}
+                            isChildWindow={false}
+                        />
                     </div>
 
                     {/* Macros tab — always mounted */}
