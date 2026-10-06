@@ -626,12 +626,16 @@ const main = () => {
                 }
             });
 
-            ipcMain.handle('copy-to-clipboard', (_channel, text) => {
+            ipcMain.handle('copy-to-clipboard', async (_channel, text) => {
                 if (!text) {
                     return { success: false, error: 'No text to copy' };
                 }
 
-                clipboard.writeText(text);
+                try {
+                    await clipboard.writeText(text);
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
 
                 return { success: true };
             });
