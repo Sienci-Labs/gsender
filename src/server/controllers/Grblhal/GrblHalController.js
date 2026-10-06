@@ -3050,10 +3050,14 @@ class GrblHalController {
 							await this.ftpClient.sendFile(fileData);
 							return;
 						}
-						this.ymodem.sendFile(
-							fileData,
-							this.connection.getConnectionObject(),
-						);
+						// Errors already reach the client via the ymodem
+						// "error" listener (wired in the constructor), which
+						// emits before this rejects - caught here only so a
+						// failed transfer doesn't also become an unhandled
+						// promise rejection on the server.
+						this.ymodem
+							.sendFile(fileData, this.connection.getConnectionObject())
+							.catch(() => {});
 					} else {
 						this.emit(
 							"ymodem:error",
@@ -3080,7 +3084,10 @@ class GrblHalController {
 							await this.ftpClient.sendFiles(files);
 							return;
 						}
-						this.ymodem.sendFiles(files, this.connection.getConnectionObject());
+						// See the matching note in "ymodem:upload" above.
+						this.ymodem
+							.sendFiles(files, this.connection.getConnectionObject())
+							.catch(() => {});
 					} else {
 						this.emit(
 							"ymodem:error",

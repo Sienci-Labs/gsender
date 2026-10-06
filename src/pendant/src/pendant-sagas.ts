@@ -12,7 +12,7 @@ import type {
     FIRMWARE_TYPES_T,
 } from 'app/definitions/firmware';
 import controller from 'app/lib/controller';
-import type { PortInfo } from 'app/store/definitions';
+import type { PortInfo, SDCardFile } from 'app/store/definitions';
 import { store as reduxStore } from 'app/store/redux';
 import {
     closeConnection,
@@ -21,6 +21,7 @@ import {
     setConnectionState,
 } from 'app/store/redux/slices/connection.slice';
 import {
+    addSDCardFileToList,
     addSpindle,
     resetHoming,
     updateControllerSettings,
@@ -65,6 +66,14 @@ export function* initialize() {
 
     controller.addListener('spindle:add', (spindle: any) => {
         reduxStore.dispatch(addSpindle(spindle));
+    });
+
+    // SD Card Manager (Tools page): the server replies to 'sdcard:list' with
+    // one 'sdcard:files' event per file. Without this listener the request
+    // still round-trips fine (visible server-side), but nothing ever reaches
+    // the store the listing reads from, so the UI just stays empty.
+    controller.addListener('sdcard:files', (file: SDCardFile) => {
+        reduxStore.dispatch(addSDCardFileToList({ file }));
     });
 
     // ── Homing state ───────────────────────────────────────────────────────

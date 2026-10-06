@@ -154,12 +154,21 @@ export class YModem extends events.EventEmitter {
 		this.logger("Finished sending packets");
 
 		// [>>> EOT]
-		this.comms.write([this.EOT]);
-		this.logger("[>>> EOT]");
-		this.comms.removeAllListeners("data");
-		await sleep(100);
-		this.comms.unpipe();
-		this.comms.pipe(new ReadlineParser({ delimiter: "\n" }));
+		try {
+			// A plain array works against a real SerialPort (which accepts
+			// byte arrays as a convenience), but a net.Socket - Ethernet, or
+			// the Android USB bridge - only accepts a string/Buffer/Uint8Array
+			// and throws on anything else.
+			this.comms.write(Buffer.from([this.EOT]));
+			this.logger("[>>> EOT]");
+			this.comms.removeAllListeners("data");
+			await sleep(100);
+			this.comms.unpipe();
+			this.comms.pipe(new ReadlineParser({ delimiter: "\n" }));
+		} catch (e) {
+			this.emit("error", e.message);
+			throw e;
+		}
 		this.emit("complete");
 	}
 
@@ -267,7 +276,14 @@ export class YModem extends events.EventEmitter {
 			}
 
 			// [>>> EOT]
-			this.comms.write([this.EOT]);
+			try {
+				// See the matching note in sendFile(): a plain array only
+				// works against a real SerialPort, not a net.Socket.
+				this.comms.write(Buffer.from([this.EOT]));
+			} catch (e) {
+				this.emit("error", e.message);
+				throw e;
+			}
 			this.logger("[>>> EOT]");
 
 			// eslint-disable-next-line no-await-in-loop
@@ -276,10 +292,15 @@ export class YModem extends events.EventEmitter {
 
 		this.logger("Finished sending packets");
 
-		this.comms.removeAllListeners("data");
-		await sleep(100);
-		this.comms.unpipe();
-		this.comms.pipe(new ReadlineParser({ delimiter: "\n" }));
+		try {
+			this.comms.removeAllListeners("data");
+			await sleep(100);
+			this.comms.unpipe();
+			this.comms.pipe(new ReadlineParser({ delimiter: "\n" }));
+		} catch (e) {
+			this.emit("error", e.message);
+			throw e;
+		}
 		this.emit("complete");
 	}
 
