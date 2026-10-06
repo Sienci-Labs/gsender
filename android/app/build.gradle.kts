@@ -42,6 +42,22 @@ android {
         versionName = gsenderVersion
     }
 
+    // A fixed, checked-in debug key so every build - CI or local - signs with
+    // the same certificate. Without this, AGP falls back to
+    // ~/.android/debug.keystore, auto-generated per machine; on CI's
+    // fresh-VM-per-run that means a new random key every build, so Android
+    // refuses to install an update over the previous one (signature
+    // mismatch) without an uninstall first. Debug-only, never used for
+    // release - the well-known default debug alias/passwords are fine here.
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     // arm64-v8a only (~42 MB); Node is most of it. No x86_64/emulator build -
     // physical arm64 tablets are the only target.
     splits {
@@ -105,10 +121,20 @@ val checkAndroidInputs by tasks.registering {
     val server = File(payloadAssets, "payload/server/server.js")
     val pendant = File(payloadAssets, "payload/server/pendant/index.html")
     val node = File(nodeJniLibs, "arm64-v8a/libnode_exec.so")
+    val debugKeystore = project.file("debug.keystore")
     doLast {
         val missing = buildList {
             if (!server.exists() || !pendant.exists()) add("JS payload: run `yarn android:payload` from the repo root")
             if (!node.exists()) add("Node runtime: run `yarn android:runtime` from the repo root")
+            if (!debugKeystore.exists()) {
+                add(
+                    "Debug keystore: generate android/app/debug.keystore once with " +
+                        "`keytool -genkeypair -v -keystore android/app/debug.keystore -storepass android " +
+                        "-alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 " +
+                        "-dname \"CN=gSender Debug,O=Sienci Labs,C=CA\"` and commit it - shared so every build " +
+                        "signs with the same debug key and updates install cleanly.",
+                )
+            }
         }
         if (missing.isNotEmpty()) throw GradleException("Missing build inputs:\n  " + missing.joinToString("\n  "))
     }

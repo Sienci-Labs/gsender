@@ -33,6 +33,14 @@ Alternatively, run `yarn android:runtime <dir>` with another directory, or build
 
 Or run all three with `yarn build:pendant:android`. Android Studio can open `android/` directly once the first two commands have run; the Gradle build stops with instructions if they haven't.
 
+**Debug signing:** `android/app/debug.keystore`, committed, is a fixed debug key shared by every build (CI and local) - without it, each machine signs with its own auto-generated `~/.android/debug.keystore`, and Android refuses to install an update over a build signed with a different key (uninstall required). If it's ever missing or needs regenerating:
+```sh
+keytool -genkeypair -v -keystore android/app/debug.keystore -storepass android \
+  -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 \
+  -dname "CN=gSender Debug,O=Sienci Labs,C=CA"
+```
+Regenerating it invalidates every previously installed debug build (same uninstall-first situation, once).
+
 To install on a device:
 
 ```sh
