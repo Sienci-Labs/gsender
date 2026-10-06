@@ -89,7 +89,14 @@ dependencies {
     // Kotlin/Java, no JNI, published via JitPack (see settings.gradle.kts).
     // Check https://github.com/mik3y/usb-serial-for-android/releases for the
     // latest tag before bumping.
-    implementation("com.github.mik3y:usb-serial-for-android:3.9.0")
+    //
+    // androidx.annotation is excluded: it's compile-time-only annotations
+    // (not used at runtime by this library), and this project deliberately
+    // stays off AndroidX (android.useAndroidX=false in gradle.properties;
+    // see MainActivity.kt) - pulling it in trips AGP's checkDebugAarMetadata.
+    implementation("com.github.mik3y:usb-serial-for-android:3.9.0") {
+        exclude(group = "androidx.annotation")
+    }
 }
 
 // Fail early, with the fix, if the inputs built outside Gradle are missing.
