@@ -30,8 +30,18 @@ const unavailable = (what) =>
     new Error(`${what} is not available in the Android app yet`);
 
 class SerialPortStub {
+    // The real Android port listing goes through
+    // src/server/lib/ports/AndroidPortProvider.js (CNCEngine.js's "list"
+    // handler calls getPortProvider(), which never reaches this stub on
+    // Android). This only exists as a defensive fallback for any other,
+    // unexpected `require('serialport')` call site.
     static list() {
-        return Promise.resolve([]);
+        try {
+            // eslint-disable-next-line global-require
+            return require('../server/lib/ports/UsbBridgeClient').getUsbBridgeClient().list();
+        } catch (e) {
+            return Promise.resolve([]);
+        }
     }
 
     constructor() {

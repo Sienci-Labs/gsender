@@ -2,9 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- The pendant UI talks to the bundled server over 127.0.0.1, and the
-         server reaches Ethernet/Wi-Fi controllers over TCP. -->
+         server reaches Ethernet/Wi-Fi controllers over TCP, or USB controllers
+         through the Kotlin USB-serial bridge (see the usb/ package). -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- USB host access is granted per-device via UsbManager.requestPermission,
+         not a manifest permission, so no <uses-permission> is needed for it. -->
+    <uses-feature android:name="android.hardware.usb.host" android:required="true" />
 
     <!-- NodeService keeps the server (and any running job) alive while the app
          is in the background. A connectedDevice foreground service on Android
@@ -34,6 +39,12 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+            </intent-filter>
+            <meta-data
+                android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
+                android:resource="@xml/device_filter" />
         </activity>
 
         <service

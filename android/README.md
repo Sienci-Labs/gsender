@@ -42,12 +42,13 @@ adb logcat -s GSenderPendant GSenderPendant-node GSenderPendant-web
 
 - **Debugging the pendant:** debug builds enable WebView debugging; open `chrome://inspect` on a desktop Chrome with the device connected over USB.
 - **Logcat tags:**
-  - `GSenderPendant`: app lifecycle (`STATE …`, `PAYLOAD_INSTALLED …`, `PAGE_LOADED …`)
+  - `GSenderPendant`: app lifecycle (`STATE …`, `PAYLOAD_INSTALLED …`, `PAGE_LOADED …`) and USB events (`USB_ATTACHED`, `USB_DETACHED`, `USB_PERMISSION granted=…`, `USB_BRIDGE_OPEN …`, `USB_BRIDGE_CLOSE … reason=…`)
   - `GSenderPendant-node`: the server's output
   - `GSenderPendant-web`: the pendant's console
 
 ## How it works
 - **Payload:** `scripts/android/build-payload.js` bundles `src/server-cli.js` and all its npm dependencies into one minified `server.js` (about 4.3 MB). Electron, `serialport`, `usb` and avrgirl are aliased to `src/android/stubs.js`. It builds the pendant with Vite. The layout mirrors `dist/gsender`, so the server's path logic is unchanged. The build fails if any dependency can't be resolved; a dependency left out would otherwise only fail on the device.
+- **USB serial:** a Kotlin `usb-serial-for-android` bridge (`android/app/src/main/java/.../pendant/usb/`) owns the USB device and exposes it on a loopback TCP socket; the server talks to it with a plain `net.Socket`, the same way it already does for Ethernet (`src/server/lib/SerialConnection.js`). `NodeService` passes the bridge's control-channel port to Node as `GSENDER_USB_CONTROL_PORT`; `src/server/lib/ports/` picks the Android vs. desktop implementation based on whether that env var is set. See `docs/android/pendant-investigation.md` §3.2 for the design.
 - **Startup:**
   - `MainActivity` starts `NodeService`.
   - On the first launch after an install or update, the service copies the payload from the APK into app storage, staged and then swapped.
@@ -89,7 +90,6 @@ It runs on the same branches and tags as the desktop CI.
 `versionName` is the gSender version, and `versionCode` is the commit count (CI checks out full history).
 
 ## Not in this milestone
-- **USB serial** (S3): Kotlin `usb-serial-for-android` behind a loopback-TCP bridge in `SerialConnection`. Until then, `SerialPort.list()` is empty and only Ethernet/Wi-Fi controllers can connect.
 - **Firmware flashing:** stubbed.
 - **Release signing, AAB and Play upload:** debug APKs only.
 - **Job-aware power handling:** wake and Wi-Fi locks while a job runs, and stopping the service automatically when idle. Today the server runs until **Stop** in the notification.

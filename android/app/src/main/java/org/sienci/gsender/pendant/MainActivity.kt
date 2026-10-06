@@ -105,6 +105,19 @@ class MainActivity : Activity() {
         super.onDestroy()
     }
 
+    /**
+     * A USB_DEVICE_ATTACHED intent can bring this singleTask activity back to
+     * the foreground while it's already running (manifest intent-filter +
+     * device_filter.xml). No action is needed here beyond consuming the
+     * intent: NodeService registers a dynamic BroadcastReceiver for the whole
+     * process lifetime (UsbPortRegistry), which already sees the same attach
+     * broadcast and updates port state independently of this activity.
+     */
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+    }
+
     // ── State → UI ─────────────────────────────────────────────────────────
 
     private fun render(state: ServerState) {

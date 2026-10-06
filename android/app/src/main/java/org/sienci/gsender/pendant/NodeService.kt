@@ -17,6 +17,9 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
+import org.sienci.gsender.pendant.usb.UsbControlChannel
+import org.sienci.gsender.pendant.usb.UsbPortRegistry
+import org.sienci.gsender.pendant.usb.UsbSerialBridgeService
 
 /**
  * Foreground service that owns the bundled Node.js process running the gSender
@@ -36,6 +39,9 @@ class NodeService : Service() {
     @Volatile
     private var stopping = false
 
+    @Volatile
+    private var usbControlChannel: UsbControlChannel? = null
+
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onCreate() {
@@ -43,6 +49,9 @@ class NodeService : Service() {
         val channel = NotificationChannel(CHANNEL_ID, getString(R.string.notification_channel), NotificationManager.IMPORTANCE_LOW)
         channel.description = getString(R.string.notification_channel_description)
         getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
+        // Lives for the whole process, independent of whether Node is running,
+        // so a device plugged in before the server starts is already known.
+        UsbPortRegistry.register(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -75,6 +84,7 @@ class NodeService : Service() {
     override fun onDestroy() {
         control.execute { stopServer() }
         control.shutdown()
+        UsbPortRegistry.unregister(this)
         super.onDestroy()
     }
 
@@ -93,6 +103,13 @@ class NodeService : Service() {
 
             val node = File(applicationInfo.nativeLibraryDir, NODE_EXECUTABLE)
             val home = File(filesDir, "home").apply { mkdirs() }
+
+            // Bound before Node starts, so the port handed to it is already
+            // listening; torn down in stopServer() alongside the process.
+            val usbChannel = UsbControlChannel(UsbSerialBridgeService())
+            usbChannel.start()
+            usbControlChannel = usbChannel
+
             val builder = ProcessBuilder(node.path, "server/server.js", "-p", "0", "-H", "127.0.0.1")
                 .directory(payload.dir)
                 .redirectErrorStream(true)
@@ -103,6 +120,7 @@ class NodeService : Service() {
                 put("TMPDIR", cacheDir.path)
                 put("LD_LIBRARY_PATH", applicationInfo.nativeLibraryDir)
                 put("NODE_COMPILE_CACHE", File(cacheDir, "node-compile-cache").path)
+                put("GSENDER_USB_CONTROL_PORT", usbChannel.port.toString())
             }
             val started = builder.start()
             process = started
@@ -112,6 +130,11 @@ class NodeService : Service() {
             ServerRuntime.appendLog(e.stackTraceToString())
             ServerRuntime.update(ServerState.Failed(e.message ?: e.toString()))
             refreshNotification()
+            // The failure may have happened after the USB channel bound but
+            // before the process started (e.g. node.path missing); stopServer()
+            // only runs if process != null, so close it here too.
+            usbControlChannel?.stop()
+            usbControlChannel = null
         }
     }
 
@@ -144,6 +167,8 @@ class NodeService : Service() {
 
     /** Runs on the control thread. */
     private fun stopServer() {
+        usbControlChannel?.stop()
+        usbControlChannel = null
         val p = process ?: return
         stopping = true
         p.destroy() // SIGTERM: let the server close the controller connection

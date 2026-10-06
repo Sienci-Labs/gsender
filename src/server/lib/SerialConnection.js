@@ -25,6 +25,20 @@ import { ReadlineParser } from "@serialport/parser-readline";
 import { EventEmitter } from "events";
 import net from "net";
 import { SerialPort } from "serialport";
+import { getUsbBridgeClient } from "./ports/UsbBridgeClient";
+
+const IP_PATTERN = (() => {
+	const octet = "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)";
+	return new RegExp(`^${octet}.${octet}.${octet}.${octet}$`, "g");
+})();
+
+const looksLikeIP = (path) => typeof path === "string" && !!path.match(IP_PATTERN);
+
+// Opaque port id assigned by the Android USB bridge (see
+// src/server/lib/ports/AndroidPortProvider.js); the bytes travel over a
+// loopback net.Socket, same as Ethernet, but the device must still be
+// treated as non-network (see the open()/usesSocket notes below).
+const isUsbBridgePath = (path) => typeof path === "string" && path.startsWith("usb:");
 
 // Validation
 
@@ -162,8 +176,18 @@ class SerialConnection extends EventEmitter {
 		return toIdent(this.settings);
 	}
 
+	// True whenever `this.port` is a net.Socket rather than a SerialPort -
+	// Ethernet, an IP-like path, or an Android USB-bridge path. isOpen/close()
+	// must agree with open()'s own branch choice below, or close() ends up
+	// calling a method the port object doesn't have (see the bug note in
+	// close()).
+	get usesSocket() {
+		const { path, network } = this.settings;
+		return !!network || looksLikeIP(path) || isUsbBridgePath(path);
+	}
+
 	get isOpen() {
-		if (this.settings.network) {
+		if (this.usesSocket) {
 			return this.port && this.port.writable && this.connected;
 		}
 		return this.port && this.port.isOpen;
@@ -177,19 +201,16 @@ class SerialConnection extends EventEmitter {
 	open(callback) {
 		this.callback = callback;
 		const { path, baudRate, network, ethernetPort, ...rest } = this.settings;
+		const isIpPath = looksLikeIP(path);
 
-		const ip = "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)";
-		const expr = new RegExp(`^${ip}.${ip}.${ip}.${ip}$`, "g");
-		const looksLikeIP = path.match(expr);
-
-		if (this.port && !looksLikeIP) {
+		if (this.port && !isIpPath) {
 			const err = new Error(`Cannot open serial port "${this.settings.path}"`);
 			callback(err);
 			return;
 		}
 
 		// Single telnet - don't return early, just close it and reopen it
-		if (this.port && (network || looksLikeIP)) {
+		if (this.port && (network || isIpPath)) {
 			this.port.destroy();
 			this.port = null;
 			const err = new Error("Serial port connection reset");
@@ -199,7 +220,7 @@ class SerialConnection extends EventEmitter {
 
 		console.log(`Connection to port ${ethernetPort}`);
 
-		if (network || looksLikeIP) {
+		if (network || isIpPath) {
 			this.connected = false;
 			this.port = new net.Socket();
 			this.port.setTimeout(2000, () => {
@@ -226,6 +247,40 @@ class SerialConnection extends EventEmitter {
 			});
 
 			this.port.connect(ethernetPort, path);
+		} else if (isUsbBridgePath(path)) {
+			this.connected = false;
+			getUsbBridgeClient()
+				.open(path, { baudRate, ...rest })
+				.then(({ bridgePort }) => {
+					this.port = new net.Socket();
+					this.port.setTimeout(2000, () => {
+						this.port.destroy();
+						this.port = null;
+						if (this.callback) {
+							this.callback("Connection timeout");
+							this.callback = null;
+						}
+					});
+
+					this.addPortListeners();
+
+					this.port.once("connect", () => {
+						this.connected = true;
+						this.port.setTimeout(0);
+						if (this.callback) {
+							this.callback();
+							this.callback = null;
+						}
+					});
+
+					this.port.connect(bridgePort, "127.0.0.1");
+				})
+				.catch((err) => {
+					if (this.callback) {
+						this.callback(err);
+						this.callback = null;
+					}
+				});
 		} else {
 			this.port = new SerialPort({
 				path,
@@ -261,7 +316,7 @@ class SerialConnection extends EventEmitter {
 		this.port.removeListener("error", this.eventListener.error);
 		this.parser.removeListener("data", this.eventListener.data);
 
-		if (this.settings.network) {
+		if (this.usesSocket) {
 			this.port.on("close", () => {
 				callback();
 			});

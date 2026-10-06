@@ -84,6 +84,14 @@ kotlin {
     }
 }
 
+dependencies {
+    // USB serial bridge (android/app/src/main/java/.../pendant/usb/). Pure
+    // Kotlin/Java, no JNI, published via JitPack (see settings.gradle.kts).
+    // Check https://github.com/mik3y/usb-serial-for-android/releases for the
+    // latest tag before bumping.
+    implementation("com.github.mik3y:usb-serial-for-android:3.9.0")
+}
+
 // Fail early, with the fix, if the inputs built outside Gradle are missing.
 val checkAndroidInputs by tasks.registering {
     val server = File(payloadAssets, "payload/server/server.js")

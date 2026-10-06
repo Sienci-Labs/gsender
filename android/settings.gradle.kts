@@ -11,6 +11,8 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        // usb-serial-for-android (mik3y) is published via JitPack, not Maven Central.
+        maven { url = uri("https://jitpack.io") }
     }
 }
 
