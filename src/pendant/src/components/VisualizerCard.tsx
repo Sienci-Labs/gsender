@@ -1,7 +1,8 @@
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import type { RootState } from 'app/store/redux';
 import { FileCode2 } from 'lucide-react';
-import { openGcodeFile } from '../utils/fileLoader';
+import { useRef } from 'react';
+import { applyPickedFile, openGcodeFileOrPrompt } from '../utils/fileLoader';
 import FeedOverrideWrapper from './FeedOverrideWrapper';
 import FileLoadingOverlay from './FileLoadingOverlay';
 import JobControls from './JobControls';
@@ -25,6 +26,7 @@ export default function VisualizerCard() {
             ? s.file.processingName || s.file.name || ''
             : s.file.name || '',
     );
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     return (
         <div className="flex flex-col gap-3">
@@ -68,7 +70,9 @@ export default function VisualizerCard() {
                     {!fileLoaded && !fileProcessing && (
                         <button
                             type="button"
-                            onClick={() => openGcodeFile()}
+                            onClick={() =>
+                                openGcodeFileOrPrompt(fileInputRef.current)
+                            }
                             className="absolute inset-2 rounded-lg flex flex-col items-center justify-center gap-2 bg-gray-100 dark:bg-transparent border border-dashed border-gray-300 dark:border-white/25 cursor-pointer"
                             aria-label="Open G-code file"
                         >
@@ -84,6 +88,17 @@ export default function VisualizerCard() {
                             </span>
                         </button>
                     )}
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".gcode,.nc,.tap,.cnc,.g,.gc"
+                        className="hidden"
+                        onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            e.target.value = '';
+                            if (f) void applyPickedFile(f);
+                        }}
+                    />
                 </div>
             </div>
 
