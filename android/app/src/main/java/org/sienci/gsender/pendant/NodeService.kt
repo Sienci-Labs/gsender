@@ -109,6 +109,7 @@ class NodeService : Service() {
             val usbChannel = UsbControlChannel(UsbSerialBridgeService())
             usbChannel.start()
             usbControlChannel = usbChannel
+            Log.i(ServerRuntime.TAG, "USB_CONTROL_CHANNEL port=${usbChannel.port}")
 
             val builder = ProcessBuilder(node.path, "server/server.js", "-p", "0", "-H", "127.0.0.1")
                 .directory(payload.dir)

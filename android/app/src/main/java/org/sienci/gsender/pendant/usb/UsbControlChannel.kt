@@ -24,7 +24,13 @@ import org.sienci.gsender.pendant.ServerRuntime
  * Events (here -> Node, no id): {"v":1,"event":"attached"|"detached","path":...}
  */
 class UsbControlChannel(private val bridge: UsbSerialBridgeService) {
-    private val server = ServerSocket(0, 1, InetAddress.getLoopbackAddress())
+    // Bind the literal IPv4 loopback address: Node always dials "127.0.0.1"
+    // (net.connect({host: "127.0.0.1", ...})), and InetAddress.getLoopbackAddress()
+    // can resolve to the IPv6 loopback (::1) on some devices, which would make
+    // this socket genuinely bound and listening yet unreachable from Node's
+    // IPv4 connect - ECONNREFUSED, not a timeout, since nothing answers on
+    // that specific address+port.
+    private val server = ServerSocket(0, 1, InetAddress.getByName("127.0.0.1"))
     private val acceptThread = Thread({ acceptLoop() }, "gsender-usb-control-accept")
 
     @Volatile private var closed = false
@@ -70,6 +76,7 @@ class UsbControlChannel(private val bridge: UsbSerialBridgeService) {
     }
 
     private fun handleClient(socket: Socket) {
+        Log.i(ServerRuntime.TAG, "USB_CONTROL_CONNECTED port=${server.localPort}")
         socket.tcpNoDelay = true
         val writer = PrintWriter(socket.getOutputStream(), false)
         out = writer

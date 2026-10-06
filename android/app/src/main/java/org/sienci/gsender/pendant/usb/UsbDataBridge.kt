@@ -41,7 +41,9 @@ class UsbDataBridge(
     private val onClosed: (String) -> Unit,
 ) {
     private val usbPort: UsbSerialPort
-    private val serverSocket = ServerSocket(0, 1, InetAddress.getLoopbackAddress())
+    // See the matching note in UsbControlChannel: bind literal IPv4, since
+    // Node's net.Socket always connects to the literal "127.0.0.1" string.
+    private val serverSocket = ServerSocket(0, 1, InetAddress.getByName("127.0.0.1"))
 
     @Volatile private var dataSocket: Socket? = null
 
