@@ -10,7 +10,6 @@ import java.io.IOException
 import java.net.InetAddress
 import java.net.ServerSocket
 import java.net.Socket
-import java.util.concurrent.Executors
 import org.sienci.gsender.pendant.ServerRuntime
 
 class NoDriverException(message: String) : IOException(message)
@@ -42,7 +41,6 @@ class UsbDataBridge(
     private val onClosed: (String) -> Unit,
 ) {
     private val usbPort: UsbSerialPort
-    private val ioExecutor = Executors.newSingleThreadExecutor()
     private val serverSocket = ServerSocket(0, 1, InetAddress.getLoopbackAddress())
 
     @Volatile private var dataSocket: Socket? = null
@@ -95,7 +93,10 @@ class UsbDataBridge(
             },
         )
         ioManager = manager
-        ioExecutor.submit(manager)
+        // SerialInputOutputManager manages its own background thread via
+        // start()/stop() in this library version - it isn't a Runnable meant
+        // to be submitted to an ExecutorService.
+        manager.start()
     }
 
     /** Accepts exactly one connection from the server's net.Socket, then relays bytes socket -> USB. */
@@ -130,7 +131,6 @@ class UsbDataBridge(
         runCatching { dataSocket?.close() }
         runCatching { serverSocket.close() }
         runCatching { usbPort.close() }
-        ioExecutor.shutdown()
         onClosed(reason)
     }
 
