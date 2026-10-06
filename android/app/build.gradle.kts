@@ -8,7 +8,7 @@ plugins {
 
 // Inputs produced outside Gradle (see android/README.md):
 //   ../dist/android/assets      yarn android:payload   (server bundle + pendant UI)
-//   node-runtime/jniLibs        yarn android:runtime   (Node.js for arm64/x86_64)
+//   node-runtime/jniLibs        yarn android:runtime   (Node.js for arm64)
 val repoRoot: File = rootProject.projectDir.parentFile
 val payloadAssets: File = File(repoRoot, "dist/android/assets")
 val nodeJniLibs: File = rootProject.file("node-runtime/jniLibs")
@@ -42,12 +42,13 @@ android {
         versionName = gsenderVersion
     }
 
-    // One APK per ABI (~42 MB each); Node is most of it.
+    // arm64-v8a only (~42 MB); Node is most of it. No x86_64/emulator build -
+    // physical arm64 tablets are the only target.
     splits {
         abi {
             isEnable = true
             reset()
-            include("arm64-v8a", "x86_64")
+            include("arm64-v8a")
             isUniversalApk = false
         }
     }

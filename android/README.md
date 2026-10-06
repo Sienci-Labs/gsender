@@ -20,14 +20,14 @@ APK
 
 ```sh
 yarn android:payload     # dist/android/assets/payload: server bundle + pendant UI
-yarn android:runtime     # android/node-runtime/jniLibs: Node.js for arm64 + x86_64 (see below)
+yarn android:runtime     # android/node-runtime/jniLibs: Node.js for arm64 (see below)
 cd android && ./gradlew assembleDebug
-# → app/build/outputs/apk/debug/app-{arm64-v8a,x86_64}-debug.apk
+# → app/build/outputs/apk/debug/app-arm64-v8a-debug.apk
 ```
 
-`yarn android:runtime` unpacks prebuilt Node tarballs from `dist/android/node-runtime/`. Cross-compiling Node takes 1–1.5 h, so locally:
-1. Download the `android-node-runtime-arm64` and `android-node-runtime-x86_64` artifacts from a recent run of the **Android** workflow.
-2. Extract both into `dist/android/node-runtime/`.
+`yarn android:runtime` unpacks a prebuilt Node tarball from `dist/android/node-runtime/`. Cross-compiling Node takes 1–1.5 h, so locally:
+1. Download the `android-node-runtime-arm64` artifact from a recent run of the **Android** workflow.
+2. Extract it into `dist/android/node-runtime/`.
 
 Alternatively, run `yarn android:runtime <dir>` with another directory, or build the tarballs on Linux with `android/node/build-node.sh`.
 
@@ -63,9 +63,9 @@ adb logcat -s GSenderPendant GSenderPendant-node GSenderPendant-web
 ## The Node runtime
 Node is cross-compiled once and reused from the GitHub Actions cache, not rebuilt on every build:
 - `android/node/runtime.env` pins the Node version, the NDK, minSdk and a revision.
-- The **Node runtime** job in `android.yml` runs `android/node/build-node.sh`, which calls `patch-node-source.sh`, for arm64 and x86_64.
-- The resulting tarballs are cached under a key that hashes everything in `android/node/`. A cache hit takes about a minute; a miss takes 1–1.5 h per architecture.
-- The job uploads the tarballs as artifacts (`android-node-runtime-<arch>`, kept for 14 days). `android/scripts/install-node-runtime.sh` checks their checksums and unpacks them.
+- The **Node runtime** job in `android.yml` runs `android/node/build-node.sh`, which calls `patch-node-source.sh`, for arm64.
+- The resulting tarball is cached under a key that hashes everything in `android/node/`. A cache hit takes about a minute; a miss takes 1–1.5 h.
+- The job uploads the tarball as an artifact (`android-node-runtime-arm64`, kept for 14 days). `android/scripts/install-node-runtime.sh` checks its checksum and unpacks it.
 
 When the cache misses:
 - **Changes:** any change in `android/node/`, e.g. bumping `NODE_VERSION`, or `RUNTIME_REVISION` to force a rebuild.
@@ -78,14 +78,7 @@ Moving to prebuilt GitHub Release assets later would remove the eviction rebuild
 
 ## CI (`.github/workflows/android.yml`)
 It runs on the same branches and tags as the desktop CI.
-- **Build:** produces debug APKs per ABI (artifact `android-apks`).
-- **Emulator check:** installs the x86_64 APK on an API 35 emulator with 16 KB pages, then launches it twice: first launch, then a warm start. It checks:
-  - Node runs inside the app sandbox (`untrusted_app`)
-  - the API and the pendant answer
-  - the foreground-service notification is shown
-  - console errors are reported
-
-  Timings and logs are in the run summary and the `android-emulator-results` artifact.
+- **Build:** produces a debug APK, arm64-v8a only (artifact `android-apks`). No emulator/x86_64 build - physical arm64 tablets are the only target, and `android/scripts/emulator-smoke.sh` is still there for manual smoke-testing against a real device over adb if needed.
 
 `versionName` is the gSender version, and `versionCode` is the commit count (CI checks out full history).
 

@@ -1,5 +1,6 @@
-# gSender Pendant for Android: builds debug APKs (arm64-v8a, x86_64) and checks
-# them on a 16 KB-page emulator. See android/README.md.
+# gSender Pendant for Android: builds a debug APK (arm64-v8a only - physical
+# arm64 tablets are the only target, no emulator/x86_64 build). See
+# android/README.md.
 #
 # The Node.js runtime (android/node) is cross-compiled here and kept in the
 # Actions cache, keyed on android/node/**. A cache hit takes about a minute; a
@@ -21,12 +22,9 @@ concurrency:
 
 jobs:
   node-runtime:
-    name: Node runtime ${{ matrix.arch }}
+    name: Node runtime arm64
     runs-on: ubuntu-latest
     timeout-minutes: 330
-    strategy:
-      matrix:
-        arch: [arm64, x86_64]
     steps:
       - uses: actions/checkout@v4
 
@@ -35,7 +33,7 @@ jobs:
         run: |
           source android/node/runtime.env
           echo "ndk=$NDK_VERSION" >> "$GITHUB_OUTPUT"
-          echo "key=android-node-$NODE_VERSION-${{ matrix.arch }}-${{ hashFiles('android/node/**') }}" >> "$GITHUB_OUTPUT"
+          echo "key=android-node-$NODE_VERSION-arm64-${{ hashFiles('android/node/**') }}" >> "$GITHUB_OUTPUT"
 
       - name: Restore cached runtime
         id: cache
@@ -58,7 +56,7 @@ jobs:
 
       - name: Cross-compile Node (cache miss, 1–1.5 h)
         if: steps.cache.outputs.cache-hit != 'true'
-        run: bash android/node/build-node.sh ${{ matrix.arch }} "${{ steps.ndk.outputs.ndk-path }}" "$RUNNER_TEMP/node-work" "$RUNNER_TEMP/node-runtime"
+        run: bash android/node/build-node.sh arm64 "${{ steps.ndk.outputs.ndk-path }}" "$RUNNER_TEMP/node-work" "$RUNNER_TEMP/node-runtime"
 
       - name: Save runtime to cache
         if: steps.cache.outputs.cache-hit != 'true'
@@ -70,7 +68,7 @@ jobs:
       - name: Summary
         run: |
           {
-            echo "### Node runtime — ${{ matrix.arch }} ($([ '${{ steps.cache.outputs.cache-hit }}' = true ] && echo 'from cache' || echo 'built'))"
+            echo "### Node runtime — arm64 ($([ '${{ steps.cache.outputs.cache-hit }}' = true ] && echo 'from cache' || echo 'built'))"
             echo '```'
             tar xzf "$RUNNER_TEMP"/node-runtime/*.tar.gz -O ./build-info.txt
             echo '```'
@@ -78,12 +76,12 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: android-node-runtime-${{ matrix.arch }}
+          name: android-node-runtime-arm64
           path: ${{ runner.temp }}/node-runtime
           retention-days: 14
 
   build:
-    name: Build APKs
+    name: Build APK
     needs: node-runtime
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -125,14 +123,12 @@ jobs:
         working-directory: android
         run: bash gradlew assembleDebug
 
-      - name: Collect APKs
+      - name: Collect APK
         id: apks
         run: |
           version=$(node -p "require('./src/package.json').version")
           mkdir -p apks
-          for abi in arm64-v8a x86_64; do
-            cp "android/app/build/outputs/apk/debug/app-$abi-debug.apk" "apks/gSender-Pendant-$version-Android-$abi-debug.apk"
-          done
+          cp "android/app/build/outputs/apk/debug/app-arm64-v8a-debug.apk" "apks/gSender-Pendant-$version-Android-arm64-v8a-debug.apk"
           cp android/node-runtime/build-info-*.txt apks/ 2>/dev/null || true
           {
             echo "### gSender Pendant $version (Android, debug)"
@@ -146,47 +142,3 @@ jobs:
           name: android-apks
           path: apks
           retention-days: 14
-
-  emulator:
-    name: Emulator (API 35, 16 KB pages)
-    needs: build
-    runs-on: ubuntu-latest
-    timeout-minutes: 40
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/download-artifact@v4
-        with:
-          name: android-apks
-          path: ${{ runner.temp }}/apks
-
-      - name: Enable KVM
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-
-      - name: Locate x86_64 APK
-        id: apk
-        run: echo "path=$(ls "$RUNNER_TEMP"/apks/*x86_64*.apk)" >> "$GITHUB_OUTPUT"
-
-      - name: Run on emulator
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 35
-          arch: x86_64
-          target: google_apis_ps16k
-          # The post-boot `settings put` the action uses to disable animations
-          # failed on this image (docs/android/s1-node-runtime-findings.md).
-          disable-animations: false
-          ram-size: 4096M
-          emulator-boot-timeout: 900
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
-          script: bash android/scripts/emulator-smoke.sh "${{ steps.apk.outputs.path }}" "${{ runner.temp }}/smoke"
-
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: android-emulator-results
-          path: ${{ runner.temp }}/smoke
-          retention-days: 7

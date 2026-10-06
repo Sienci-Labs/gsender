@@ -6,7 +6,8 @@
 #
 #   android/scripts/emulator-smoke.sh <apk> <results dir>
 #
-# Used by .github/workflows/android.yml; also works against a USB device.
+# Not run by CI (android.yml builds arm64-v8a only, no emulator); kept here
+# for manual smoke-testing against an emulator or a real USB-connected device.
 set -uo pipefail
 
 APK="$1"
