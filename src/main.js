@@ -905,7 +905,7 @@ const main = () => {
                     }
                 };
 
-                // In `npm run dev:electron`, the Ibackend server is a separate
+                // In `npm run dev:electron`, the backend server is a separate
                 // process supervised by scripts/electron-hot.js, not something
                 // this Electron process embeds itself (see that file's
                 // launchServer() branch, which only runs in production).

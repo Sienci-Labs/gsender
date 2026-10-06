@@ -10,8 +10,8 @@ APK
 ├─ assets/payload/                        server bundle + pendant UI             ← yarn android:payload
 └─ Kotlin shell
    ├─ NodeService      foreground service: installs the payload, runs Node
-   │                   (`server.js -p 0 -H 127.0.0.1`), restarts on request
-   └─ MainActivity     load screen → WebView at http://127.0.0.1:<port>/pendant/
+   │                   (`server.js -p 8000 -H 127.0.0.1`), restarts on request
+   └─ MainActivity     load screen → WebView at http://127.0.0.1:8000/pendant/
 ```
 
 ## Building
@@ -61,7 +61,7 @@ adb logcat -s GSenderPendant GSenderPendant-node GSenderPendant-web
   - `MainActivity` starts `NodeService`.
   - On the first launch after an install or update, the service copies the payload from the APK into app storage, staged and then swapped.
   - It then starts Node from `nativeLibraryDir`, the only place Android 10+ allows an app to execute files.
-  - `src/android/server-entry.js` prints `GSENDER_SERVER_READY port=… ms=…` once the server listens. The server binds to `127.0.0.1` on a port the OS picks.
+  - `src/android/server-entry.js` prints `GSENDER_SERVER_READY port=… ms=…` once the server listens. The server binds to `127.0.0.1:8000` - fixed, not an OS-assigned port, so the WebView's origin (and the `localStorage` settings keyed on it) stays stable across app restarts.
   - Only then is the WebView created: building it alongside Node's startup slowed both down in S1. The load screen fades out once the pendant page has loaded.
 - **State:** the service publishes `ServerState` (Stopped / Installing / Starting / Ready / Failed) through `ServerRuntime`. The activity renders it, including an error screen with Retry and the last 300 lines of server output.
 - **Background:** the foreground service (`connectedDevice`) keeps the server, and any job, running while the app is in the background. Back moves the app to the background instead of closing it. The notification's **Stop** action stops the server.

@@ -27,8 +27,10 @@
 //
 //   GSENDER_SERVER_READY port=<port> ms=<since process start> rss=<MB>
 //
-// The app (android/app/.../NodeService.kt) passes `-p 0 -H 127.0.0.1`, so the
-// OS picks a free port and the server is only reachable on the device.
+// The app (android/app/.../NodeService.kt) passes `-p 8000 -H 127.0.0.1`: a
+// fixed port, so the WebView's origin (and the localStorage settings keyed on
+// it) stays stable across restarts, and bound to loopback only, so the server
+// is never reachable off the device regardless of port.
 const { performance } = require('perf_hooks');
 const launchServer = require('server-cli-entry');
 

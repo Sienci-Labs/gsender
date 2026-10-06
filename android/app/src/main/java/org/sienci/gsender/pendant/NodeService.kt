@@ -111,7 +111,12 @@ class NodeService : Service() {
             usbControlChannel = usbChannel
             Log.i(ServerRuntime.TAG, "USB_CONTROL_CHANNEL port=${usbChannel.port}")
 
-            val builder = ProcessBuilder(node.path, "server/server.js", "-p", "0", "-H", "127.0.0.1")
+            // Fixed, not "-p 0": the WebView's origin (and therefore
+            // localStorage, where settings persist outside Electron) is keyed
+            // on host+port, so an OS-assigned ephemeral port would give every
+            // launch a fresh, unrelated origin and orphan the previous
+            // session's settings.
+            val builder = ProcessBuilder(node.path, "server/server.js", "-p", SERVER_PORT.toString(), "-H", "127.0.0.1")
                 .directory(payload.dir)
                 .redirectErrorStream(true)
             builder.environment().apply {
@@ -227,6 +232,11 @@ class NodeService : Service() {
         private const val NOTIFICATION_ID = 1
         private const val NODE_EXECUTABLE = "libnode_exec.so"
         private const val NODE_LOG_TAG = "GSenderPendant-node"
+
+        // Same default gSender already uses outside Electron (src/server-cli.js)
+        // and the one the pendant's own dev-server proxy targets
+        // (src/pendant/vite.config.ts) - not an arbitrary choice.
+        private const val SERVER_PORT = 8000
 
         /** Printed by src/android/server-entry.js once the server is listening. */
         private const val READY_MARKER = "GSENDER_SERVER_READY"
