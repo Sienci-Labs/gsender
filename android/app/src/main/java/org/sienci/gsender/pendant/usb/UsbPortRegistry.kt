@@ -8,6 +8,8 @@ import android.content.IntentFilter
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
 import android.os.Build
+import android.os.Handler
+import android.os.HandlerThread
 import android.util.Log
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArraySet
@@ -37,6 +39,14 @@ object UsbPortRegistry {
     private lateinit var usbManager: UsbManager
     private lateinit var appContext: Context
     private var receiver: BroadcastReceiver? = null
+
+    // onReceive() below leads into real USB/socket I/O (UsbDataBridge open or
+    // close) - registering with no Handler would dispatch it on the main
+    // thread and crash with NetworkOnMainThreadException the first time a
+    // permission grant or a detach actually does that work (a second run,
+    // where permission is already granted, takes a different, already-
+    // background-thread path, which is why this only shows up once).
+    private var handlerThread: HandlerThread? = null
 
     private val attachListeners = CopyOnWriteArraySet<(UsbDevice) -> Unit>()
     private val detachListeners = CopyOnWriteArraySet<(UsbDevice) -> Unit>()
@@ -76,17 +86,21 @@ object UsbPortRegistry {
             addAction(UsbManager.ACTION_USB_DEVICE_DETACHED)
             addAction(ACTION_USB_PERMISSION)
         }
+        val thread = HandlerThread("gsender-usb-events").apply { start() }
+        handlerThread = thread
+        val handler = Handler(thread.looper)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            appContext.registerReceiver(r, filter, Context.RECEIVER_NOT_EXPORTED)
+            appContext.registerReceiver(r, filter, null, handler, Context.RECEIVER_NOT_EXPORTED)
         } else {
-            @Suppress("UnspecifiedRegisterReceiverFlag")
-            appContext.registerReceiver(r, filter)
+            appContext.registerReceiver(r, filter, null, handler)
         }
     }
 
     fun unregister(context: Context) {
         receiver?.let { runCatching { context.applicationContext.unregisterReceiver(it) } }
         receiver = null
+        handlerThread?.quitSafely()
+        handlerThread = null
     }
 
     fun onAttached(listener: (UsbDevice) -> Unit) = attachListeners.add(listener)
