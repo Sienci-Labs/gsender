@@ -45,26 +45,25 @@ import { Button } from 'app/components/Button';
 import { toast } from 'app/lib/toaster';
 import { AlarmsErrors } from 'app/definitions/alarms_errors';
 import { EEPROMSettings, MachineProfile } from 'app/definitions/firmware';
-import { UNITS_EN } from 'app/definitions/general';
-import { JogSpeeds } from 'app/features/Jogging/definitions';
+import { SettingsMenu } from 'app/features/Config/assets/SettingsMenu.ts';
 import { SPINDLE_LASER_T } from 'app/features/Spindle/definitions';
+import {
+    buildConfigSettingsReport,
+    type ConfigReportSection,
+    type DiagnosticEventRecord,
+} from 'app/lib/configSettingsReport';
 import {
     ConnectionState,
     ControllerState,
     FileInfoState,
 } from 'app/store/definitions';
-import controllerInstance from 'app/lib/controller';
 
 import store from '../store';
 import { store as reduxStore } from '../store/redux';
 import pkg from '../../package.json';
-import {
-    GRBLHAL,
-    LASER_MODE,
-    METRIC_UNITS,
-    WORKSPACE_MODE,
-} from '../constants';
 import api from '../api';
+import { LASER_MODE } from '../constants';
+import defaultStoreState from '../store/defaultState';
 import { homingString } from '../lib/eeprom';
 
 const styles = StyleSheet.create({
@@ -309,6 +308,74 @@ const styles = StyleSheet.create({
     addBottomMargin: {
         marginBottom: 12,
     },
+
+    configIntro: {
+        fontSize: 10,
+        fontFamily: 'Helvetica',
+        color: '#666666',
+        marginBottom: 12,
+        lineHeight: 1.4,
+    },
+    configSection: {
+        marginBottom: 14,
+    },
+    configTitle: {
+        fontSize: 16,
+        fontFamily: 'Helvetica-Bold',
+        color: '#1a1a1a',
+        marginBottom: 8,
+        marginTop: 4,
+    },
+    configCard: {
+        backgroundColor: '#f3f4f6',
+        borderRadius: 8,
+        padding: 8,
+    },
+    configSubsection: {
+        backgroundColor: '#ffffff',
+        border: '1px solid #d1d5db',
+        borderRadius: 4,
+        marginBottom: 8,
+    },
+    configLegend: {
+        fontSize: 11,
+        fontFamily: 'Helvetica-Bold',
+        color: '#3b82f6',
+        paddingTop: 8,
+        paddingHorizontal: 8,
+        paddingBottom: 2,
+    },
+    configRow: {
+        flexDirection: 'row',
+        borderBottom: '1px solid #e5e7eb',
+        paddingVertical: 6,
+        paddingHorizontal: 8,
+    },
+    configRowChanged: {
+        backgroundColor: '#fef9c3',
+    },
+    configLabel: {
+        flex: 2.4,
+        fontSize: 9,
+        fontFamily: 'Helvetica-Bold',
+        color: '#374151',
+        paddingRight: 8,
+    },
+    configDescription: {
+        flex: 4.2,
+        fontSize: 8,
+        fontFamily: 'Helvetica',
+        color: '#6b7280',
+        paddingRight: 8,
+        lineHeight: 1.35,
+    },
+    configValue: {
+        flex: 2.2,
+        fontSize: 9,
+        fontFamily: 'Helvetica-Bold',
+        color: '#111827',
+        lineHeight: 1.35,
+    },
 });
 
 const getEEPROMValues = (): EEPROMSettings => {
@@ -370,27 +437,6 @@ const getConnection = (): ConnectionState => {
 const getFileInfo = (): FileInfoState => {
     const fileInfo: FileInfoState = get(reduxStore.getState(), 'file');
     return fileInfo;
-};
-
-const getJogPresets = (): JogSpeeds => {
-    const jogPresets: JogSpeeds = store.get('widgets.axes.jog', {});
-    return jogPresets;
-};
-
-const getWorkspaceUnits = (): string => {
-    const workspaceUnits: UNITS_EN = store.get('workspace.units', METRIC_UNITS);
-    return workspaceUnits;
-};
-
-const getRotaryMode = (): boolean => {
-    const { DEFAULT, ROTARY } = WORKSPACE_MODE;
-    const isRotaryMode = store.get('workspace.mode', DEFAULT) === ROTARY;
-    return isRotaryMode;
-};
-
-const getSafeHeight = (): number => {
-    const safeHeight: number = store.get('workspace.safeRetractHeight');
-    return safeHeight;
 };
 
 const getEvents = async () => {
@@ -579,6 +625,72 @@ async function exportSenderSettings() {
     return new Blob([settingsJSON], { type: 'application/json' });
 }
 
+function ConfigSettingsPages({
+    report,
+    connected,
+}: {
+    report: ConfigReportSection[];
+    connected: boolean;
+}) {
+    return (
+        <View style={styles.section} break>
+            <Text id="config" style={styles.subtitle}>
+                Config
+            </Text>
+            <Text style={styles.configIntro}>
+                These settings follow the Config page: same sections, groups,
+                and labels. Yellow rows differ from the app default or the
+                machine profile default.
+                {connected
+                    ? ''
+                    : ' Firmware settings stay hidden until a machine is connected, the same way they do in Config.'}
+            </Text>
+            {report.map((section) => (
+                <View key={section.id} style={styles.configSection}>
+                    <Text id={section.id} style={styles.configTitle}>
+                        {section.label}
+                    </Text>
+                    <View style={styles.configCard}>
+                        {section.subsections.map((subsection, index) => (
+                            <View
+                                key={`${section.id}-${index}`}
+                                style={styles.configSubsection}
+                            >
+                                {subsection.label ? (
+                                    <Text style={styles.configLegend}>
+                                        {subsection.label}
+                                    </Text>
+                                ) : null}
+                                {subsection.rows.map((row, rowIndex) => (
+                                    <View
+                                        key={`${section.id}-${index}-${rowIndex}`}
+                                        style={[
+                                            styles.configRow,
+                                            row.changed &&
+                                                styles.configRowChanged,
+                                        ]}
+                                        wrap={false}
+                                    >
+                                        <Text style={styles.configLabel}>
+                                            {row.label}
+                                        </Text>
+                                        <Text style={styles.configDescription}>
+                                            {row.description}
+                                        </Text>
+                                        <Text style={styles.configValue}>
+                                            {row.value}
+                                        </Text>
+                                    </View>
+                                ))}
+                            </View>
+                        ))}
+                    </View>
+                </View>
+            ))}
+        </View>
+    );
+}
+
 function generateSupportFile() {
     const [isGenerating, setIsGenerating] = useState(false);
     const [progress, setProgress] = useState('');
@@ -593,14 +705,13 @@ function generateSupportFile() {
     const mode = getMode();
     const connection = getConnection();
     const fileInfo = getFileInfo();
-    const jogPresets = getJogPresets();
-    const workspaceUnits = getWorkspaceUnits();
-    const isRotaryMode = getRotaryMode();
-    const safeHeight = getSafeHeight();
     const isConnected = connection.isConnected;
     const firmwareVersion = (() => {
         const disconnectedValue = 'disconnected';
-        const reportedFirmwareVersion = get(grblInfo, 'settings.version');
+        const reportedFirmwareVersion: unknown = get(
+            grblInfo,
+            'settings.version',
+        );
 
         if (!isConnected) {
             return disconnectedValue;
@@ -611,7 +722,10 @@ function generateSupportFile() {
             return sanitizedVersion || disconnectedValue;
         }
 
-        if (reportedFirmwareVersion && typeof reportedFirmwareVersion === 'object') {
+        if (
+            reportedFirmwareVersion &&
+            typeof reportedFirmwareVersion === 'object'
+        ) {
             const semver = get(reportedFirmwareVersion, 'semver');
 
             if (typeof semver === 'string' || typeof semver === 'number') {
@@ -622,19 +736,7 @@ function generateSupportFile() {
 
         return disconnectedValue;
     })();
-    let fileStart = {};
-    let filePause = {};
-    let fileResume = {};
-    let fileStop = {};
-
-    getEvents().then((events) => {
-        if (events) {
-            fileStart = events['gcode:start'];
-            filePause = events['gcode:pause'];
-            fileResume = events['gcode:resume'];
-            fileStop = events['gcode:stop'];
-        }
-    });
+    let diagnosticEvents: Record<string, DiagnosticEventRecord> = {};
 
     let alarms: Array<AlarmsErrors>,
         errors: Array<AlarmsErrors> = [];
@@ -650,881 +752,676 @@ function generateSupportFile() {
         eepromData.push({ key: key, value: value });
     });
 
-    const SupportFile = () => (
-        <Document>
-            <Page style={styles.body}>
-                <Text style={styles.title}>Diagnostics Report</Text>
-                <Text style={styles.author}>
-                    gSender v{version} • Generated on{' '}
-                    {new Date().toLocaleDateString()}
-                </Text>
+    const SupportFile = () => {
+        const configReport = buildConfigSettingsReport(SettingsMenu, {
+            getStoreValue: (key, defaultValue) => store.get(key, defaultValue),
+            getDefaultValue: (key) => get(defaultStoreState, key, null),
+            eeprom,
+            descriptions: get(grblInfo, 'settings.descriptions', {}),
+            connected: isConnected,
+            controllerType: grblInfo.type,
+            firmwareSemver: get(grblInfo, 'settings.version.semver'),
+            boardId: get(grblInfo, 'settings.info.BOARD'),
+            machineProfile,
+            events: diagnosticEvents,
+            axes: get(grblInfo, 'state.axes.axes', ['X', 'Y', 'Z']),
+        });
+        const connectedPort = connection.ports.find(
+            (port) => port.port === connection.port,
+        );
 
-                <View style={styles.navBar}>
-                    <Text style={styles.navTitle}>Quick Navigation</Text>
-                    <View style={styles.navLinks}>
-                        <Link src="#environment" style={styles.navLink}>
-                            Environment & Machine Profile
-                        </Link>
-                        <Link src="#connection" style={styles.navLink}>
-                            Connection & Controller Status
-                        </Link>
-                        <Link src="#preferences" style={styles.navLink}>
-                            Preferences & Settings
-                        </Link>
-                        <Link src="#automations" style={styles.navLink}>
-                            Automations
-                        </Link>
-                        <Link src="#firmware" style={styles.navLink}>
-                            Firmware Settings
-                        </Link>
-                        <Link src="#alerts" style={styles.navLink}>
-                            Errors and Alarms
-                        </Link>
-                        <Link src="#terminal" style={styles.navLink}>
-                            Terminal History
-                        </Link>
-                        <Link src="#gcode" style={styles.navLink}>
-                            G-Code File Status
-                        </Link>
+        return (
+            <Document>
+                <Page style={styles.body}>
+                    <Text style={styles.title}>Diagnostics Report</Text>
+                    <Text style={styles.author}>
+                        gSender v{version} • Generated on{' '}
+                        {new Date().toLocaleDateString()}
+                    </Text>
+
+                    <View style={styles.navBar}>
+                        <Text style={styles.navTitle}>Quick Navigation</Text>
+                        <View style={styles.navLinks}>
+                            <Link src="#environment" style={styles.navLink}>
+                                Environment & Machine Profile
+                            </Link>
+                            <Link src="#connection" style={styles.navLink}>
+                                Connection & Controller Status
+                            </Link>
+                            <Link src="#config" style={styles.navLink}>
+                                Config
+                            </Link>
+                            {configReport.map((section) => (
+                                <Link
+                                    key={section.id}
+                                    src={`#${section.id}`}
+                                    style={styles.navLink}
+                                >
+                                    {section.label}
+                                </Link>
+                            ))}
+                            <Link src="#firmware" style={styles.navLink}>
+                                Firmware Settings
+                            </Link>
+                            <Link src="#alerts" style={styles.navLink}>
+                                Errors and Alarms
+                            </Link>
+                            <Link src="#terminal" style={styles.navLink}>
+                                Terminal History
+                            </Link>
+                            <Link src="#gcode" style={styles.navLink}>
+                                G-Code File Status
+                            </Link>
+                        </View>
                     </View>
-                </View>
 
-                <View style={styles.grid}>
-                    <View style={styles.gridItem}>
-                        <Text id="environment" style={styles.subtitle}>
-                            Environment
-                        </Text>
-                        <Text style={styles.textBold}>Operating System:</Text>
-                        <Text style={styles.text}>{os}</Text>
+                    <View style={styles.grid}>
+                        <View style={styles.gridItem}>
+                            <Text id="environment" style={styles.subtitle}>
+                                Environment
+                            </Text>
+                            <Text style={styles.textBold}>
+                                Operating System:
+                            </Text>
+                            <Text style={styles.text}>{os}</Text>
 
-                        <Text style={styles.textBold}>Homing:</Text>
-                        <Text
-                            style={[
-                                styles.text,
-                                Number(eeprom.$22) % 2 === 1
-                                    ? styles.statusEnabled
-                                    : styles.statusDisabled,
-                            ]}
-                        >
-                            {isConnected
-                                ? Number(eeprom.$22) % 2 === 1
-                                    ? 'Enabled'
-                                    : 'Disabled'
-                                : 'Not Connected'}
-                        </Text>
+                            <Text style={styles.textBold}>Homing:</Text>
+                            <Text
+                                style={[
+                                    styles.text,
+                                    Number(eeprom.$22) % 2 === 1
+                                        ? styles.statusEnabled
+                                        : styles.statusDisabled,
+                                ]}
+                            >
+                                {isConnected
+                                    ? Number(eeprom.$22) % 2 === 1
+                                        ? 'Enabled'
+                                        : 'Disabled'
+                                    : 'Not Connected'}
+                            </Text>
 
-                        <Text style={styles.textBold}>Soft Limits:</Text>
-                        <Text
-                            style={[
-                                styles.text,
-                                eeprom.$20 === '1'
-                                    ? styles.statusEnabled
-                                    : styles.statusDisabled,
-                            ]}
-                        >
-                            {isConnected
-                                ? eeprom.$20 === '1'
-                                    ? 'Enabled'
-                                    : 'Disabled'
-                                : 'Not Connected'}
-                        </Text>
+                            <Text style={styles.textBold}>Soft Limits:</Text>
+                            <Text
+                                style={[
+                                    styles.text,
+                                    eeprom.$20 === '1'
+                                        ? styles.statusEnabled
+                                        : styles.statusDisabled,
+                                ]}
+                            >
+                                {isConnected
+                                    ? eeprom.$20 === '1'
+                                        ? 'Enabled'
+                                        : 'Disabled'
+                                    : 'Not Connected'}
+                            </Text>
 
-                        <Text style={styles.textBold}>Home Location:</Text>
-                        <Text
-                            style={[
-                                styles.text,
-                                !isConnected && styles.statusDisabled,
-                            ]}
-                        >
-                            {isConnected
-                                ? homingString(eeprom.$23 as string)
-                                : 'Not Connected'}
-                        </Text>
+                            <Text style={styles.textBold}>Home Location:</Text>
+                            <Text
+                                style={[
+                                    styles.text,
+                                    !isConnected && styles.statusDisabled,
+                                ]}
+                            >
+                                {isConnected
+                                    ? homingString(eeprom.$23 as string)
+                                    : 'Not Connected'}
+                            </Text>
 
-                        <Text style={styles.textBold}>Report Inches:</Text>
-                        <Text
-                            style={[
-                                styles.text,
-                                eeprom.$13 === '1'
-                                    ? styles.statusEnabled
-                                    : styles.statusDisabled,
-                            ]}
-                        >
-                            {isConnected
-                                ? eeprom.$13 === '1'
-                                    ? 'Enabled'
-                                    : 'Disabled'
-                                : 'Not Connected'}
-                        </Text>
+                            <Text style={styles.textBold}>Report Inches:</Text>
+                            <Text
+                                style={[
+                                    styles.text,
+                                    eeprom.$13 === '1'
+                                        ? styles.statusEnabled
+                                        : styles.statusDisabled,
+                                ]}
+                            >
+                                {isConnected
+                                    ? eeprom.$13 === '1'
+                                        ? 'Enabled'
+                                        : 'Disabled'
+                                    : 'Not Connected'}
+                            </Text>
 
-                        <Text style={styles.textBold}>Stepper Motors:</Text>
-                        <Text
-                            style={[
-                                styles.text,
-                                isConnected
+                            <Text style={styles.textBold}>Stepper Motors:</Text>
+                            <Text
+                                style={[
+                                    styles.text,
+                                    isConnected
+                                        ? eeprom.$1 === '255'
+                                            ? styles.statusWarning
+                                            : styles.statusEnabled
+                                        : styles.statusDisabled,
+                                ]}
+                            >
+                                {isConnected
                                     ? eeprom.$1 === '255'
-                                        ? styles.statusWarning
-                                        : styles.statusEnabled
-                                    : styles.statusDisabled,
-                            ]}
-                        >
-                            {isConnected
-                                ? eeprom.$1 === '255'
-                                    ? 'Locked'
-                                    : 'Unlocked'
-                                : 'Not Connected'}
-                        </Text>
-                    </View>
+                                        ? 'Locked'
+                                        : 'Unlocked'
+                                    : 'Not Connected'}
+                            </Text>
+                        </View>
 
-                    <View style={styles.gridItemLast}>
-                        <Text id="machine-profile" style={styles.subtitle}>
-                            Machine Profile
-                        </Text>
-                        {machineProfile ? (
-                            <>
-                                <Text style={styles.textBold}>ID:</Text>
-                                <Text style={styles.text}>
-                                    {machineProfile.id}
-                                </Text>
+                        <View style={styles.gridItemLast}>
+                            <Text id="machine-profile" style={styles.subtitle}>
+                                Machine Profile
+                            </Text>
+                            {machineProfile ? (
+                                <>
+                                    <Text style={styles.textBold}>ID:</Text>
+                                    <Text style={styles.text}>
+                                        {machineProfile.id}
+                                    </Text>
 
-                                <Text style={styles.textBold}>Company:</Text>
-                                <Text style={styles.text}>
-                                    {machineProfile.company}
-                                </Text>
+                                    <Text style={styles.textBold}>
+                                        Company:
+                                    </Text>
+                                    <Text style={styles.text}>
+                                        {machineProfile.company}
+                                    </Text>
 
-                                <Text style={styles.textBold}>Name:</Text>
-                                <Text style={styles.text}>
-                                    {machineProfile.name}
-                                </Text>
+                                    <Text style={styles.textBold}>Name:</Text>
+                                    <Text style={styles.text}>
+                                        {machineProfile.name}
+                                    </Text>
 
-                                <Text style={styles.textBold}>Type:</Text>
-                                <Text style={styles.text}>
-                                    {machineProfile.type}
-                                </Text>
+                                    <Text style={styles.textBold}>Type:</Text>
+                                    <Text style={styles.text}>
+                                        {machineProfile.type}
+                                    </Text>
 
-                                <Text style={styles.textBold}>Version:</Text>
-                                <Text style={styles.text}>
-                                    {machineProfile.version}
-                                </Text>
+                                    <Text style={styles.textBold}>
+                                        Version:
+                                    </Text>
+                                    <Text style={styles.text}>
+                                        {machineProfile.version}
+                                    </Text>
 
-                                <Text style={styles.textBold}>Work Area:</Text>
-                                <Text style={styles.textSmall}>
-                                    X: {get(machineProfile, 'limits.xmax', '0')}
-                                    mm{'\n'}
-                                    Y: {get(machineProfile, 'limits.ymax', '0')}
-                                    mm{'\n'}
-                                    Z: {get(machineProfile, 'limits.zmax', '0')}
-                                    mm
-                                </Text>
+                                    <Text style={styles.textBold}>
+                                        Work Area:
+                                    </Text>
+                                    <Text style={styles.textSmall}>
+                                        X:{' '}
+                                        {get(
+                                            machineProfile,
+                                            'limits.xmax',
+                                            '0',
+                                        )}
+                                        mm{'\n'}
+                                        Y:{' '}
+                                        {get(
+                                            machineProfile,
+                                            'limits.ymax',
+                                            '0',
+                                        )}
+                                        mm{'\n'}
+                                        Z:{' '}
+                                        {get(
+                                            machineProfile,
+                                            'limits.zmax',
+                                            '0',
+                                        )}
+                                        mm
+                                    </Text>
 
-                                <Text style={styles.textBold}>
-                                    Spindle/Laser:
-                                </Text>
-                                <Text
-                                    style={[
-                                        styles.text,
-                                        store.get(
+                                    <Text style={styles.textBold}>
+                                        Spindle/Laser:
+                                    </Text>
+                                    <Text
+                                        style={[
+                                            styles.text,
+                                            store.get(
+                                                'workspace.spindleFunctions',
+                                                false,
+                                            )
+                                                ? styles.statusEnabled
+                                                : styles.statusDisabled,
+                                        ]}
+                                    >
+                                        {store.get(
                                             'workspace.spindleFunctions',
                                             false,
                                         )
-                                            ? styles.statusEnabled
-                                            : styles.statusDisabled,
-                                    ]}
-                                >
-                                    {store.get(
-                                        'workspace.spindleFunctions',
-                                        false,
-                                    )
-                                        ? 'Available'
-                                        : 'Not Available'}
-                                </Text>
+                                            ? 'Available'
+                                            : 'Not Available'}
+                                    </Text>
 
-                                <Text style={styles.textBold}>Laser Mode:</Text>
-                                <Text
-                                    style={[
-                                        styles.text,
-                                        mode
-                                            ? styles.statusEnabled
-                                            : styles.statusDisabled,
-                                    ]}
-                                >
-                                    {mode ? 'Enabled' : 'Disabled'}
+                                    <Text style={styles.textBold}>
+                                        Laser Mode:
+                                    </Text>
+                                    <Text
+                                        style={[
+                                            styles.text,
+                                            mode
+                                                ? styles.statusEnabled
+                                                : styles.statusDisabled,
+                                        ]}
+                                    >
+                                        {mode ? 'Enabled' : 'Disabled'}
+                                    </Text>
+                                </>
+                            ) : (
+                                <Text style={styles.text}>
+                                    No machine profile loaded
                                 </Text>
-                            </>
-                        ) : (
-                            <Text style={styles.text}>
-                                No machine profile loaded
-                            </Text>
-                        )}
+                            )}
+                        </View>
                     </View>
-                </View>
 
-                <View style={styles.grid}>
-                    <View style={styles.gridItem}>
-                        <Text id="connection" style={styles.subtitle}>
-                            Connection
-                        </Text>
-                        {connection ? (
-                            <>
-                                <Text style={styles.textBold}>
-                                    Connected Port:
-                                </Text>
-                                <Text style={styles.text}>
-                                    {connection.port || 'Not connected'}
-                                </Text>
+                    <View style={styles.grid}>
+                        <View style={styles.gridItem}>
+                            <Text id="connection" style={styles.subtitle}>
+                                Connection
+                            </Text>
+                            {connection ? (
+                                <>
+                                    <Text style={styles.textBold}>
+                                        Connected Port:
+                                    </Text>
+                                    <Text style={styles.text}>
+                                        {connection.port || 'Not connected'}
+                                    </Text>
 
-                                <Text style={styles.textBold}>Baudrate:</Text>
-                                <Text style={styles.text}>
-                                    {connection.baudrate || 'N/A'}
-                                </Text>
+                                    <Text style={styles.textBold}>
+                                        Baudrate:
+                                    </Text>
+                                    <Text style={styles.text}>
+                                        {connection.baudrate || 'N/A'}
+                                    </Text>
 
-                                {connection.port && (
-                                    <>
-                                        <Text style={styles.textBold}>
-                                            Manufacturer:
-                                        </Text>
-                                        <Text style={styles.text}>
-                                            {connection.manufacturer ||
-                                                'Unknown'}
-                                        </Text>
-
-                                        <Text style={styles.textBold}>
-                                            In Use:
-                                        </Text>
-                                        <Text
-                                            style={[
-                                                styles.text,
-                                                connection.inUse
-                                                    ? styles.statusWarning
-                                                    : styles.statusEnabled,
-                                            ]}
-                                        >
-                                            {connection.inUse ? 'Yes' : 'No'}
-                                        </Text>
-                                    </>
-                                )}
-
-                                <Text style={styles.textBold}>
-                                    Available Ports:
-                                </Text>
-                                <Text style={styles.text}>
-                                    {connection.ports.length > 0
-                                        ? connection.ports
-                                              .map(
-                                                  (port, index) =>
-                                                      `${port.port}${index < connection.ports.length - 1 ? ', ' : ''}`,
-                                              )
-                                              .join('')
-                                        : 'None detected'}
-                                </Text>
-
-                                {connection.unrecognizedPorts &&
-                                    connection.unrecognizedPorts.length > 0 && (
+                                    {connection.port && (
                                         <>
                                             <Text style={styles.textBold}>
-                                                Unrecognized Ports:
+                                                Manufacturer:
                                             </Text>
-                                            {connection.unrecognizedPorts.map(
-                                                (port, index) => (
-                                                    <Text
-                                                        style={styles.text}
-                                                        key={index}
-                                                    >
-                                                        • {port.port}
-                                                    </Text>
-                                                ),
-                                            )}
+                                            <Text style={styles.text}>
+                                                {connectedPort?.manufacturer ||
+                                                    'Unknown'}
+                                            </Text>
+
+                                            <Text style={styles.textBold}>
+                                                In Use:
+                                            </Text>
+                                            <Text
+                                                style={[
+                                                    styles.text,
+                                                    connectedPort?.inuse
+                                                        ? styles.statusWarning
+                                                        : styles.statusEnabled,
+                                                ]}
+                                            >
+                                                {connectedPort?.inuse
+                                                    ? 'Yes'
+                                                    : 'No'}
+                                            </Text>
                                         </>
                                     )}
-                            </>
-                        ) : (
-                            <Text style={styles.text}>
-                                No connection information available
+
+                                    <Text style={styles.textBold}>
+                                        Available Ports:
+                                    </Text>
+                                    <Text style={styles.text}>
+                                        {connection.ports.length > 0
+                                            ? connection.ports
+                                                  .map(
+                                                      (port, index) =>
+                                                          `${port.port}${index < connection.ports.length - 1 ? ', ' : ''}`,
+                                                  )
+                                                  .join('')
+                                            : 'None detected'}
+                                    </Text>
+
+                                    {connection.unrecognizedPorts &&
+                                        connection.unrecognizedPorts.length >
+                                            0 && (
+                                            <>
+                                                <Text style={styles.textBold}>
+                                                    Unrecognized Ports:
+                                                </Text>
+                                                {connection.unrecognizedPorts.map(
+                                                    (port, index) => (
+                                                        <Text
+                                                            style={styles.text}
+                                                            key={index}
+                                                        >
+                                                            • {port.port}
+                                                        </Text>
+                                                    ),
+                                                )}
+                                            </>
+                                        )}
+                                </>
+                            ) : (
+                                <Text style={styles.text}>
+                                    No connection information available
+                                </Text>
+                            )}
+                        </View>
+
+                        <View style={styles.gridItemLast}>
+                            <Text
+                                id="controller-status"
+                                style={styles.subtitle}
+                            >
+                                Controller Status
                             </Text>
-                        )}
+                            {isConnected ? (
+                                <>
+                                    <Text style={styles.textBold}>Type:</Text>
+                                    <Text style={styles.text}>
+                                        {grblInfo.type || 'Unknown'}
+                                    </Text>
+
+                                    <Text style={styles.textBold}>Board:</Text>
+                                    <Text style={styles.text}>
+                                        {grblInfo.settings.info?.BOARD ||
+                                            'Unknown'}
+                                    </Text>
+
+                                    <Text style={styles.textBold}>
+                                        Firmware:
+                                    </Text>
+                                    <Text style={styles.text}>
+                                        {firmwareVersion}
+                                    </Text>
+
+                                    <Text style={styles.textBold}>
+                                        Workflow State:
+                                    </Text>
+                                    <Text
+                                        style={[
+                                            styles.text,
+                                            grblInfo.workflow.state === 'Idle'
+                                                ? styles.statusEnabled
+                                                : styles.statusWarning,
+                                        ]}
+                                    >
+                                        {grblInfo.workflow.state}
+                                    </Text>
+
+                                    <Text style={styles.textBold}>
+                                        Homing Status:
+                                    </Text>
+                                    <Text
+                                        style={[
+                                            styles.text,
+                                            grblInfo.homingFlag
+                                                ? styles.statusEnabled
+                                                : styles.statusDisabled,
+                                        ]}
+                                    >
+                                        {grblInfo.homingFlag
+                                            ? 'Homed'
+                                            : 'Not Homed'}
+                                    </Text>
+                                </>
+                            ) : (
+                                <Text
+                                    style={[styles.text, styles.statusDisabled]}
+                                >
+                                    Not Connected
+                                </Text>
+                            )}
+
+                            {isConnected && !isEmpty(grblInfo.mpos) && (
+                                <>
+                                    <Text style={styles.textBold}>
+                                        Machine Position:
+                                    </Text>
+                                    <Text style={styles.textSmall}>
+                                        X: {grblInfo.mpos.x}mm{'\n'}
+                                        Y: {grblInfo.mpos.y}mm{'\n'}
+                                        Z: {grblInfo.mpos.z}mm
+                                        {grblInfo.mpos.a !== undefined &&
+                                            `\nA: ${grblInfo.mpos.a}°`}
+                                        {grblInfo.mpos.b !== undefined &&
+                                            `\nB: ${grblInfo.mpos.b}°`}
+                                        {grblInfo.mpos.c !== undefined &&
+                                            `\nC: ${grblInfo.mpos.c}°`}
+                                    </Text>
+                                </>
+                            )}
+
+                            {isConnected && !isEmpty(grblInfo.wpos) && (
+                                <>
+                                    <Text style={styles.textBold}>
+                                        Work Position:
+                                    </Text>
+                                    <Text style={styles.textSmall}>
+                                        X: {grblInfo.wpos.x}mm{'\n'}
+                                        Y: {grblInfo.wpos.y}mm{'\n'}
+                                        Z: {grblInfo.wpos.z}mm
+                                        {grblInfo.wpos.a !== undefined &&
+                                            `\nA: ${grblInfo.wpos.a}°`}
+                                        {grblInfo.wpos.b !== undefined &&
+                                            `\nB: ${grblInfo.wpos.b}°`}
+                                        {grblInfo.wpos.c !== undefined &&
+                                            `\nC: ${grblInfo.wpos.c}°`}
+                                    </Text>
+                                </>
+                            )}
+                        </View>
                     </View>
 
-                    <View style={styles.gridItemLast}>
-                        <Text id="controller-status" style={styles.subtitle}>
-                            Controller Status
+                    <ConfigSettingsPages
+                        report={configReport}
+                        connected={isConnected}
+                    />
+
+                    <View style={styles.section} break>
+                        <Text id="firmware" style={styles.subtitle}>
+                            Firmware Settings
                         </Text>
                         {isConnected ? (
-                            <>
-                                <Text style={styles.textBold}>Type:</Text>
-                                <Text style={styles.text}>
-                                    {grblInfo.type || 'Unknown'}
-                                </Text>
+                            <View style={styles.table}>
+                                {/* TableHeader */}
+                                <View style={styles.tableHeader}>
+                                    <View style={styles.tableCol}>
+                                        <Text style={styles.tableCellHeader}>
+                                            Setting
+                                        </Text>
+                                    </View>
+                                    <View style={styles.tableCol}>
+                                        <Text style={styles.tableCellHeader}>
+                                            Current Value
+                                        </Text>
+                                    </View>
+                                    <View style={styles.tableColLast}>
+                                        <Text style={styles.tableCellHeader}>
+                                            Default Value
+                                        </Text>
+                                    </View>
+                                </View>
+                                {/* TableContent */}
 
-                                <Text style={styles.textBold}>Board:</Text>
-                                <Text style={styles.text}>
-                                    {grblInfo.board || 'Unknown'}
-                                </Text>
-
-                                <Text style={styles.textBold}>Firmware:</Text>
-                                <Text style={styles.text}>
-                                    {firmwareVersion}
-                                </Text>
-
-                                <Text style={styles.textBold}>
-                                    Workflow State:
-                                </Text>
-                                <Text
-                                    style={[
-                                        styles.text,
-                                        grblInfo.workflow.state === 'Idle'
-                                            ? styles.statusEnabled
-                                            : styles.statusWarning,
-                                    ]}
-                                >
-                                    {grblInfo.workflow.state}
-                                </Text>
-
-                                <Text style={styles.textBold}>
-                                    Homing Status:
-                                </Text>
-                                <Text
-                                    style={[
-                                        styles.text,
-                                        grblInfo.homingFlag
-                                            ? styles.statusEnabled
-                                            : styles.statusDisabled,
-                                    ]}
-                                >
-                                    {grblInfo.homingFlag
-                                        ? 'Homed'
-                                        : 'Not Homed'}
-                                </Text>
-                            </>
+                                {createTableRows(
+                                    eeprom,
+                                    machineProfile,
+                                    grblInfo.type,
+                                )}
+                            </View>
                         ) : (
                             <Text style={[styles.text, styles.statusDisabled]}>
                                 Not Connected
                             </Text>
                         )}
-
-                        {isConnected && !isEmpty(grblInfo.mpos) && (
-                            <>
-                                <Text style={styles.textBold}>
-                                    Machine Position:
-                                </Text>
-                                <Text style={styles.textSmall}>
-                                    X: {grblInfo.mpos.x}mm{'\n'}
-                                    Y: {grblInfo.mpos.y}mm{'\n'}
-                                    Z: {grblInfo.mpos.z}mm
-                                    {grblInfo.mpos.a !== undefined &&
-                                        `\nA: ${grblInfo.mpos.a}°`}
-                                    {grblInfo.mpos.b !== undefined &&
-                                        `\nB: ${grblInfo.mpos.b}°`}
-                                    {grblInfo.mpos.c !== undefined &&
-                                        `\nC: ${grblInfo.mpos.c}°`}
-                                </Text>
-                            </>
-                        )}
-
-                        {isConnected && !isEmpty(grblInfo.wpos) && (
-                            <>
-                                <Text style={styles.textBold}>
-                                    Work Position:
-                                </Text>
-                                <Text style={styles.textSmall}>
-                                    X: {grblInfo.wpos.x}mm{'\n'}
-                                    Y: {grblInfo.wpos.y}mm{'\n'}
-                                    Z: {grblInfo.wpos.z}mm
-                                    {grblInfo.wpos.a !== undefined &&
-                                        `\nA: ${grblInfo.wpos.a}°`}
-                                    {grblInfo.wpos.b !== undefined &&
-                                        `\nB: ${grblInfo.wpos.b}°`}
-                                    {grblInfo.wpos.c !== undefined &&
-                                        `\nC: ${grblInfo.wpos.c}°`}
-                                </Text>
-                            </>
-                        )}
                     </View>
-                </View>
+                    <View style={styles.section} break>
+                        <Text id="alerts" style={styles.subtitle}>
+                            Errors and Alarms
+                        </Text>
 
-                <View style={styles.section}>
-                    <Text id="preferences" style={styles.subtitle}>
-                        Preferences & Settings
-                    </Text>
-
-                    <View style={styles.grid}>
-                        <View style={styles.gridItem}>
-                            <Text style={styles.textBold}>
-                                Workspace Units:
-                            </Text>
-                            <Text
-                                style={[
-                                    styles.text,
-                                    workspaceUnits === 'mm'
-                                        ? styles.statusEnabled
-                                        : styles.statusWarning,
-                                ]}
-                            >
-                                {workspaceUnits === 'mm'
-                                    ? 'Metric (mm)'
-                                    : 'Imperial (inches)'}
-                            </Text>
-
-                            <Text style={styles.textBold}>Safeheight:</Text>
-                            <Text style={styles.text}>{safeHeight}</Text>
-
-                            <Text style={styles.textBold}>Laser Mode:</Text>
-                            <Text
-                                style={[
-                                    styles.text,
-                                    mode
-                                        ? styles.statusEnabled
-                                        : styles.statusDisabled,
-                                ]}
-                            >
-                                {mode ? 'Enabled' : 'Disabled'}
-                            </Text>
-
-                            <Text style={styles.textBold}>Rotary Mode:</Text>
-                            <Text
-                                style={[
-                                    styles.text,
-                                    isRotaryMode
-                                        ? styles.statusEnabled
-                                        : styles.statusDisabled,
-                                ]}
-                            >
-                                {isRotaryMode ? 'Enabled' : 'Disabled'}
-                            </Text>
-
-                            {isRotaryMode && (
-                                <>
-                                    <Text style={styles.textBold}>
-                                        Rotary Settings:
-                                    </Text>
-                                    {isConnected ? (
-                                        <Text style={styles.textSmall}>
-                                            Travel Resolution: Y={eeprom.$101}
-                                            {'\n'}
-                                            {grblInfo.type === GRBLHAL &&
-                                                `A=${eeprom.$103}\n`}
-                                            Max Rate: Y={eeprom.$111}
-                                            {grblInfo.type === GRBLHAL &&
-                                                `, A=${eeprom.$113}`}
-                                        </Text>
-                                    ) : (
-                                        <Text
-                                            style={[
-                                                styles.text,
-                                                styles.statusDisabled,
-                                            ]}
-                                        >
-                                            Not Connected
-                                        </Text>
-                                    )}
-                                </>
-                            )}
-                        </View>
-
-                        <View style={styles.gridItemLast}>
-                            <Text style={styles.textBold}>Jog Presets:</Text>
-
-                            <Text style={styles.textBold}>Rapid:</Text>
-                            <Text style={styles.text}>
-                                XY Step:{' '}
-                                {jogPresets.rapid?.xyStep
-                                    ? workspaceUnits === 'mm'
-                                        ? `${jogPresets.rapid.xyStep} mm`
-                                        : `${(jogPresets.rapid.xyStep / 25.4).toFixed(3)} in`
-                                    : 'N/A'}
-                            </Text>
-                            <Text style={styles.text}>
-                                Z Step:{' '}
-                                {jogPresets.rapid?.zStep
-                                    ? workspaceUnits === 'mm'
-                                        ? `${jogPresets.rapid.zStep} mm`
-                                        : `${(jogPresets.rapid.zStep / 25.4).toFixed(3)} in`
-                                    : 'N/A'}
-                            </Text>
-                            <Text style={styles.text}>
-                                Feedrate:{' '}
-                                {jogPresets.rapid?.feedrate
-                                    ? workspaceUnits === 'mm'
-                                        ? `${jogPresets.rapid.feedrate} mm/min`
-                                        : `${(jogPresets.rapid.feedrate / 25.4).toFixed(1)} in/min`
-                                    : 'N/A'}
-                            </Text>
-                            {jogPresets.rapid?.aStep && (
-                                <Text style={styles.text}>
-                                    A Step: {jogPresets.rapid.aStep}°
+                        <View style={styles.grid}>
+                            <View style={styles.gridItem}>
+                                <Text style={styles.textBold}>
+                                    All Alarms ({alarms.length})
                                 </Text>
-                            )}
-
-                            <Text style={styles.textBold}>Normal:</Text>
-                            <Text style={styles.text}>
-                                XY Step:{' '}
-                                {jogPresets.normal?.xyStep
-                                    ? workspaceUnits === 'mm'
-                                        ? `${jogPresets.normal.xyStep} mm`
-                                        : `${(jogPresets.normal.xyStep / 25.4).toFixed(3)} in`
-                                    : 'N/A'}
-                            </Text>
-                            <Text style={styles.text}>
-                                Z Step:{' '}
-                                {jogPresets.normal?.zStep
-                                    ? workspaceUnits === 'mm'
-                                        ? `${jogPresets.normal.zStep} mm`
-                                        : `${(jogPresets.normal.zStep / 25.4).toFixed(3)} in`
-                                    : 'N/A'}
-                            </Text>
-                            <Text style={styles.text}>
-                                Feedrate:{' '}
-                                {jogPresets.normal?.feedrate
-                                    ? workspaceUnits === 'mm'
-                                        ? `${jogPresets.normal.feedrate} mm/min`
-                                        : `${(jogPresets.normal.feedrate / 25.4).toFixed(1)} in/min`
-                                    : 'N/A'}
-                            </Text>
-                            {jogPresets.normal?.aStep && (
-                                <Text style={styles.text}>
-                                    A Step: {jogPresets.normal.aStep}°
-                                </Text>
-                            )}
-
-                            <Text style={styles.textBold}>Precise:</Text>
-                            <Text style={styles.text}>
-                                XY Step:{' '}
-                                {jogPresets.precise?.xyStep
-                                    ? workspaceUnits === 'mm'
-                                        ? `${jogPresets.precise.xyStep} mm`
-                                        : `${(jogPresets.precise.xyStep / 25.4).toFixed(3)} in`
-                                    : 'N/A'}
-                            </Text>
-                            <Text style={styles.text}>
-                                Z Step:{' '}
-                                {jogPresets.precise?.zStep
-                                    ? workspaceUnits === 'mm'
-                                        ? `${jogPresets.precise.zStep} mm`
-                                        : `${(jogPresets.precise.zStep / 25.4).toFixed(3)} in`
-                                    : 'N/A'}
-                            </Text>
-                            <Text style={styles.text}>
-                                Feedrate:{' '}
-                                {jogPresets.precise?.feedrate
-                                    ? workspaceUnits === 'mm'
-                                        ? `${jogPresets.precise.feedrate} mm/min`
-                                        : `${(jogPresets.precise.feedrate / 25.4).toFixed(1)} in/min`
-                                    : 'N/A'}
-                            </Text>
-                            {jogPresets.precise?.aStep && (
-                                <Text style={styles.text}>
-                                    A Step: {jogPresets.precise.aStep}°
-                                </Text>
-                            )}
-                        </View>
-                    </View>
-                </View>
-
-                <View style={styles.section} break>
-                    <Text id="automations" style={styles.subtitle}>
-                        Automations
-                    </Text>
-
-                    <Text style={styles.textBold}>File Start:</Text>
-                    <Text
-                        style={[
-                            styles.text,
-                            fileStart?.enabled
-                                ? styles.statusEnabled
-                                : styles.statusWarning,
-                        ]}
-                    >
-                        {fileStart?.enabled ? 'Enabled' : 'Disabled'}
-                    </Text>
-                    {fileStart?.commands ? (
-                        <View style={styles.codeBlock}>
-                            <Text style={styles.codeBlockText}>
-                                {fileStart?.commands}
-                            </Text>
-                        </View>
-                    ) : (
-                        <Text style={[styles.text, styles.addBottomMargin]}>
-                            {'N/A'}
-                        </Text>
-                    )}
-
-                    <Text style={styles.textBold}>File Pause:</Text>
-                    <Text
-                        style={[
-                            styles.text,
-                            filePause?.enabled
-                                ? styles.statusEnabled
-                                : styles.statusWarning,
-                        ]}
-                    >
-                        {filePause?.enabled ? 'Enabled' : 'Disabled'}
-                    </Text>
-
-                    {filePause?.commands ? (
-                        <View style={styles.codeBlock}>
-                            <Text style={styles.codeBlockText}>
-                                {filePause?.commands}
-                            </Text>
-                        </View>
-                    ) : (
-                        <Text style={[styles.text, styles.addBottomMargin]}>
-                            {'N/A'}
-                        </Text>
-                    )}
-
-                    <Text style={styles.textBold}>File Resume:</Text>
-                    <Text
-                        style={[
-                            styles.text,
-                            fileResume?.enabled
-                                ? styles.statusEnabled
-                                : styles.statusWarning,
-                        ]}
-                    >
-                        {fileResume?.enabled ? 'Enabled' : 'Disabled'}
-                    </Text>
-
-                    {fileResume?.commands ? (
-                        <View style={styles.codeBlock}>
-                            <Text style={styles.codeBlockText}>
-                                {fileResume?.commands}
-                            </Text>
-                        </View>
-                    ) : (
-                        <Text style={[styles.text, styles.addBottomMargin]}>
-                            {'N/A'}
-                        </Text>
-                    )}
-
-                    <Text style={styles.textBold}>File Stop/End:</Text>
-                    <Text
-                        style={[
-                            styles.text,
-                            fileStop?.enabled
-                                ? styles.statusEnabled
-                                : styles.statusWarning,
-                        ]}
-                    >
-                        {fileStop?.enabled ? 'Enabled' : 'Disabled'}
-                    </Text>
-
-                    {fileStop?.commands ? (
-                        <View style={styles.codeBlock}>
-                            <Text style={styles.codeBlockText}>
-                                {fileStop?.commands}
-                            </Text>
-                        </View>
-                    ) : (
-                        <Text style={[styles.text, styles.addBottomMargin]}>
-                            {'N/A'}
-                        </Text>
-                    )}
-                </View>
-
-                <View style={styles.section} break>
-                    <Text id="firmware" style={styles.subtitle}>
-                        Firmware Settings
-                    </Text>
-                    {isConnected ? (
-                        <View style={styles.table}>
-                            {/* TableHeader */}
-                            <View style={styles.tableHeader}>
-                                <View style={styles.tableCol}>
-                                    <Text style={styles.tableCellHeader}>
-                                        Setting
+                                {alarms.length > 0 ? (
+                                    <View style={styles.container}>
+                                        {alarms.map((log) => (
+                                            <View
+                                                style={[
+                                                    styles.alert,
+                                                    styles.alertError,
+                                                ]}
+                                                key={uniqueId()}
+                                            >
+                                                <Text style={styles.textSmall}>
+                                                    <Text
+                                                        style={styles.textBold}
+                                                    >
+                                                        {new Date(
+                                                            log.time,
+                                                        ).toLocaleString()}
+                                                    </Text>
+                                                    {'\n' + log.MESSAGE}
+                                                    {'\nInput: ' + log.line}
+                                                    {'\nController: ' +
+                                                        log.controller}
+                                                </Text>
+                                            </View>
+                                        ))}
+                                    </View>
+                                ) : (
+                                    <Text style={styles.text}>
+                                        No alarms recorded
                                     </Text>
-                                </View>
-                                <View style={styles.tableCol}>
-                                    <Text style={styles.tableCellHeader}>
-                                        Current Value
-                                    </Text>
-                                </View>
-                                <View style={styles.tableColLast}>
-                                    <Text style={styles.tableCellHeader}>
-                                        Default Value
-                                    </Text>
-                                </View>
+                                )}
                             </View>
-                            {/* TableContent */}
 
-                            {createTableRows(
-                                eeprom,
-                                machineProfile,
-                                grblInfo.type,
-                            )}
-                        </View>
-                    ) : (
-                        <Text style={[styles.text, styles.statusDisabled]}>
-                            Not Connected
-                        </Text>
-                    )}
-                </View>
-                <View style={styles.section} break>
-                    <Text id="alerts" style={styles.subtitle}>
-                        Errors and Alarms
-                    </Text>
-
-                    <View style={styles.grid}>
-                        <View style={styles.gridItem}>
-                            <Text style={styles.textBold}>
-                                All Alarms ({alarms.length})
-                            </Text>
-                            {alarms.length > 0 ? (
-                                <View style={styles.container}>
-                                    {alarms.map((log) => (
-                                        <View
-                                            style={[
-                                                styles.alert,
-                                                styles.alertError,
-                                            ]}
-                                            key={uniqueId()}
-                                        >
-                                            <Text style={styles.textSmall}>
-                                                <Text style={styles.textBold}>
-                                                    {new Date(
-                                                        log.time,
-                                                    ).toLocaleString()}
-                                                </Text>
-                                                {'\n' + log.MESSAGE}
-                                                {'\nInput: ' + log.line}
-                                                {'\nController: ' +
-                                                    log.controller}
-                                            </Text>
-                                        </View>
-                                    ))}
-                                </View>
-                            ) : (
-                                <Text style={styles.text}>
-                                    No alarms recorded
+                            <View style={styles.gridItemLast}>
+                                <Text style={styles.textBold}>
+                                    All Errors ({errors.length})
                                 </Text>
-                            )}
-                        </View>
-
-                        <View style={styles.gridItemLast}>
-                            <Text style={styles.textBold}>
-                                All Errors ({errors.length})
-                            </Text>
-                            {errors.length > 0 ? (
-                                <View style={styles.container}>
-                                    {errors.map((log) => (
-                                        <View
-                                            style={[
-                                                styles.alert,
-                                                styles.alertWarning,
-                                            ]}
-                                            key={uniqueId()}
-                                        >
-                                            <Text style={styles.textSmall}>
-                                                <Text style={styles.textBold}>
-                                                    {new Date(
-                                                        log.time,
-                                                    ).toLocaleString()}
+                                {errors.length > 0 ? (
+                                    <View style={styles.container}>
+                                        {errors.map((log) => (
+                                            <View
+                                                style={[
+                                                    styles.alert,
+                                                    styles.alertWarning,
+                                                ]}
+                                                key={uniqueId()}
+                                            >
+                                                <Text style={styles.textSmall}>
+                                                    <Text
+                                                        style={styles.textBold}
+                                                    >
+                                                        {new Date(
+                                                            log.time,
+                                                        ).toLocaleString()}
+                                                    </Text>
+                                                    {'\n' + log.MESSAGE}
+                                                    {'\nInput: ' + log.line}
+                                                    {'\nController: ' +
+                                                        log.controller}
                                                 </Text>
-                                                {'\n' + log.MESSAGE}
-                                                {'\nInput: ' + log.line}
-                                                {'\nController: ' +
-                                                    log.controller}
-                                            </Text>
-                                        </View>
-                                    ))}
-                                </View>
-                            ) : (
-                                <Text style={styles.text}>
-                                    No errors recorded
-                                </Text>
-                            )}
+                                            </View>
+                                        ))}
+                                    </View>
+                                ) : (
+                                    <Text style={styles.text}>
+                                        No errors recorded
+                                    </Text>
+                                )}
+                            </View>
                         </View>
                     </View>
-                </View>
 
-                <View style={styles.section}>
-                    <Text id="terminal" style={styles.subtitle}>
-                        Terminal History
-                    </Text>
-                    {isConnected ? (
-                        <View style={styles.codeBlock}>
-                            <Text style={styles.codeBlockText}>
-                                {terminalHistory.length > 0
-                                    ? terminalHistory.join('\n') // Show last 20 commands
-                                    : 'No terminal history available'}
-                            </Text>
-                        </View>
-                    ) : (
-                        <Text style={[styles.text, styles.statusDisabled]}>
-                            Not Connected
+                    <View style={styles.section}>
+                        <Text id="terminal" style={styles.subtitle}>
+                            Terminal History
                         </Text>
-                    )}
-                </View>
+                        {isConnected ? (
+                            <View style={styles.codeBlock}>
+                                <Text style={styles.codeBlockText}>
+                                    {terminalHistory.length > 0
+                                        ? terminalHistory.join('\n') // Show last 20 commands
+                                        : 'No terminal history available'}
+                                </Text>
+                            </View>
+                        ) : (
+                            <Text style={[styles.text, styles.statusDisabled]}>
+                                Not Connected
+                            </Text>
+                        )}
+                    </View>
 
-                <View style={styles.section}>
-                    <Text id="gcode" style={styles.subtitle}>
-                        G-Code File Status
-                    </Text>
-                    {fileInfo.fileLoaded && grblInfo.sender.status ? (
-                        <View>
-                            <Text style={styles.textBold}>
-                                File Information
-                            </Text>
-                            <Text style={styles.text}>
-                                Name: {grblInfo.sender.status.name}
-                            </Text>
-                            <Text style={styles.text}>
-                                Total Lines: {grblInfo.sender.status.total}
-                            </Text>
-                            <Text style={styles.text}>
-                                Lines Sent: {grblInfo.sender.status.sent}
-                            </Text>
-                            <Text style={styles.text}>
-                                Remaining:{' '}
-                                {grblInfo.sender.status.remainingTime}
-                            </Text>
-                            <Text style={styles.text}>
-                                Progress:{' '}
-                                <Text
-                                    style={[
-                                        Math.round(
+                    <View style={styles.section}>
+                        <Text id="gcode" style={styles.subtitle}>
+                            G-Code File Status
+                        </Text>
+                        {fileInfo.fileLoaded && grblInfo.sender.status ? (
+                            <View>
+                                <Text style={styles.textBold}>
+                                    File Information
+                                </Text>
+                                <Text style={styles.text}>
+                                    Name: {grblInfo.sender.status.name}
+                                </Text>
+                                <Text style={styles.text}>
+                                    Total Lines: {grblInfo.sender.status.total}
+                                </Text>
+                                <Text style={styles.text}>
+                                    Lines Sent: {grblInfo.sender.status.sent}
+                                </Text>
+                                <Text style={styles.text}>
+                                    Remaining:{' '}
+                                    {grblInfo.sender.status.remainingTime}
+                                </Text>
+                                <Text style={styles.text}>
+                                    Progress:{' '}
+                                    <Text
+                                        style={[
+                                            Math.round(
+                                                (grblInfo.sender.status.sent /
+                                                    grblInfo.sender.status
+                                                        .total) *
+                                                    100,
+                                            ) === 100
+                                                ? styles.statusEnabled
+                                                : styles.statusWarning,
+                                        ]}
+                                    >
+                                        {Math.round(
                                             (grblInfo.sender.status.sent /
                                                 grblInfo.sender.status.total) *
                                                 100,
-                                        ) === 100
-                                            ? styles.statusEnabled
-                                            : styles.statusWarning,
-                                    ]}
-                                >
-                                    {Math.round(
-                                        (grblInfo.sender.status.sent /
-                                            grblInfo.sender.status.total) *
-                                            100,
-                                    )}
-                                    % Complete
+                                        )}
+                                        % Complete
+                                    </Text>
                                 </Text>
-                            </Text>
 
-                            <Text style={styles.textBold}>
-                                Full G-Code Content
-                            </Text>
-                            <View
-                                id="g-code-file-content"
-                                style={styles.codeBlock}
-                            >
-                                <Text style={styles.codeBlockText}>
-                                    {gcode
-                                        ? gcode.substring(0, 2000) +
-                                          (gcode.length > 2000
-                                              ? '\n\n... (truncated for file size)'
-                                              : '')
-                                        : 'No file content available'}
+                                <Text style={styles.textBold}>
+                                    Full G-Code Content
                                 </Text>
+                                <View
+                                    id="g-code-file-content"
+                                    style={styles.codeBlock}
+                                >
+                                    <Text style={styles.codeBlockText}>
+                                        {gcode
+                                            ? gcode.substring(0, 2000) +
+                                              (gcode.length > 2000
+                                                  ? '\n\n... (truncated for file size)'
+                                                  : '')
+                                            : 'No file content available'}
+                                    </Text>
+                                </View>
                             </View>
-                        </View>
-                    ) : (
-                        <Text style={styles.text}>
-                            No G-code file loaded or no sender status available
-                        </Text>
-                    )}
-                </View>
-            </Page>
-        </Document>
-    );
+                        ) : (
+                            <Text style={styles.text}>
+                                No G-code file loaded or no sender status
+                                available
+                            </Text>
+                        )}
+                    </View>
+                </Page>
+            </Document>
+        );
+    };
 
     const submitDiagnosticForm = async () => {
         if (isGenerating) {
@@ -1542,6 +1439,15 @@ function generateSupportFile() {
                 // Step 1: Generate PDF
                 setProgress('Generating PDF...');
                 await delay(100); // Allow UI to update
+                try {
+                    diagnosticEvents = (await getEvents()) || {};
+                } catch (eventError) {
+                    console.error(
+                        'Unable to load automation events for diagnostics:',
+                        eventError,
+                    );
+                    diagnosticEvents = {};
+                }
                 const blob = await pdf(<SupportFile />).toBlob();
 
                 // Step 2: Prepare file data
