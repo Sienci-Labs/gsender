@@ -1,85 +1,166 @@
-import type { GCodeSVGRendererHandle } from '@sienci/gviewer/react';
-import { GCodeSVGVisualizer } from '@sienci/gviewer/react';
-import { WORKFLOW_STATE_RUNNING } from 'app/constants';
+import type { GCodeViewerHandle, GCodeViewerOptions } from '@sienci/gviewer/viewer';
+import { GCodeVisualizer } from '@sienci/gviewer/react';
+import { buildMachineBedOptions } from 'app/features/Visualizer/viewerOptions';
+import {
+    buildViewerTheme,
+    currentViewerThemeName,
+    WORKSHOP_VISUALIZER_COLORS,
+} from 'app/features/Visualizer/viewerTheme';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import type { RootState } from 'app/store/redux';
+import _get from 'lodash/get';
 import pubsub from 'pubsub-js';
-import { memo, useEffect, useRef } from 'react';
-import {
-    PENDANT_BOUNDS_COLOR,
-    PENDANT_CUT_COLOR,
-    PENDANT_RAPID_COLOR,
-} from '../visualizerTheme';
+import { memo, useEffect, useMemo, useRef } from 'react';
 
-// Module-level so the renderer sees the same options object on every render.
-const SVG_OPTIONS = {
-    cutColor: PENDANT_CUT_COLOR,
-    rapidColor: PENDANT_RAPID_COLOR,
-    boundingBoxColor: PENDANT_BOUNDS_COLOR,
-    strokeWidth: 1,
-    projectionMode: 'top',
-    padding: 8,
-} as const;
+// Pendant mode: gviewer's WebGL renderer locked top-down (orthographic, no
+// view cube, no grid), fed the worker's Z-deduped 2D segment groups. The
+// crosshair and origin dot are sized in screen pixels.
+const BASE_OPTIONS: Partial<GCodeViewerOptions> = {
+    viewMode: 'pendant',
+    units: 'mm',
+    bit: {
+        enabled: true,
+        type: 'crosshair',
+        size: 26,
+        opacity: 1,
+        tweenMs: 260,
+        colorSource: 'custom',
+        color: WORKSHOP_VISUALIZER_COLORS.bit,
+        spinRpm: 300,
+        screenSpace: true,
+    },
+    originMarker: { visible: true, color: '#ffffff', sizePx: 9 },
+    boundingBox: { visible: false, labels: false },
+    camera: {
+        projection: 'orthographic',
+        fov: 45,
+        focusDurationMs: 0,
+        orbit: { enableDamping: false },
+        initialPosition: { x: 0, y: 0, z: 400 },
+        lockTopDown: true,
+    },
+};
+
+// Everything the bed rectangle depends on. All low-frequency, so options are
+// rebuilt only when this key changes, not on every status report.
+const selectMachineBedKey = (s: RootState): string => {
+    const settings = s.controller.settings?.settings ?? {};
+    const keys = ['$22', '$23', '$130', '$131', '$683', '$684', '$685', '$686', '$687'];
+    const wco = s.controller.wco ?? { x: 0, y: 0 };
+    return [
+        ...keys.map((k) => _get(settings, k)),
+        !!s.controller.hasHomed,
+        wco.x,
+        wco.y,
+    ].join(',');
+};
+
+// A primitive key, so identical idle status reports don't re-render.
+const selectWposKey = (s: RootState): string => {
+    const { x, y, z } = s.controller.wpos ?? { x: 0, y: 0, z: 0 };
+    return `${Number(x) || 0},${Number(y) || 0},${Number(z) || 0}`;
+};
 
 function Visualizer() {
-    const svgRef = useRef<GCodeSVGRendererHandle>(null);
+    const viewerRef = useRef<GCodeViewerHandle>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
+    // A file loaded while the Carve tab is hidden has nothing to fit against;
+    // frame it once the container gets a size.
+    const pendingFocusRef = useRef(false);
+
     const fileLoaded = useTypedSelector((s: RootState) => s.file.fileLoaded);
-    const workflowState = useTypedSelector(
-        (s: RootState) => s.controller.workflow.state,
+    const isConnected = useTypedSelector(
+        (s: RootState) => s.connection.isConnected,
     );
-    // Status reports replace wpos several times a second even when idle; only
-    // a running job moves the bit marker, so don't re-render otherwise.
-    const wpos = useTypedSelector((s: RootState) =>
-        s.controller.workflow.state === WORKFLOW_STATE_RUNNING
-            ? s.controller.wpos
-            : null,
+    const machineBedKey = useTypedSelector(selectMachineBedKey);
+    const wposKey = useTypedSelector(selectWposKey);
+
+    const options = useMemo<Partial<GCodeViewerOptions>>(
+        () => ({
+            ...BASE_OPTIONS,
+            machineBed: buildMachineBedOptions({ ignoreUserToggle: true }),
+            render: {
+                antialias: true,
+                theme: buildViewerTheme(currentViewerThemeName()),
+            },
+        }),
+        // buildMachineBedOptions reads the store; the key tracks its inputs.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [machineBedKey],
     );
+
+    // The gviewer handle throws until its viewer exists.
+    const withViewer = (fn: (viewer: GCodeViewerHandle) => void) => {
+        const viewer = viewerRef.current;
+        if (!viewer) return;
+        try {
+            fn(viewer);
+        } catch {
+            // Not mounted yet, or already disposed.
+        }
+    };
+
+    const focusOrDefer = () => {
+        const el = containerRef.current;
+        if (!el || el.clientWidth === 0 || el.clientHeight === 0) {
+            pendingFocusRef.current = true;
+            return;
+        }
+        pendingFocusRef.current = false;
+        withViewer((v) => v.focusToModel());
+    };
 
     useEffect(() => {
-        const tokens = [
-            pubsub.subscribe('file:load', (_msg, data) => {
-                if (data.svgSegmentGroups?.length) {
-                    svgRef.current?.loadFromPrecomputedGroups(
-                        data.svgSegmentGroups,
-                        data.svgMeta,
-                    );
-                } else if (data.format === 'segments-v1') {
-                    svgRef.current?.loadFromSegments(data);
-                }
-            }),
-        ];
-
+        const token = pubsub.subscribe('file:load', (_msg, data) => {
+            if (!data?.svgSegmentGroups) return;
+            withViewer((v) =>
+                v.loadFromPrecomputedGroups(
+                    data.svgSegmentGroups,
+                    data.svgMeta,
+                ),
+            );
+            focusOrDefer();
+        });
         return () => {
-            tokens.forEach((token) => pubsub.unsubscribe(token));
+            pubsub.unsubscribe(token);
         };
     }, []);
 
     useEffect(() => {
+        const el = containerRef.current;
+        if (!el || typeof ResizeObserver === 'undefined') return;
+        const observer = new ResizeObserver(() => {
+            if (pendingFocusRef.current) focusOrDefer();
+        });
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, []);
+
+    useEffect(() => {
         if (!fileLoaded) {
-            svgRef.current?.clear();
+            pendingFocusRef.current = false;
+            withViewer((v) => v.unload());
         }
     }, [fileLoaded]);
 
     useEffect(() => {
-        svgRef.current?.setBitVisible(workflowState === WORKFLOW_STATE_RUNNING);
-    }, [workflowState]);
+        withViewer((v) => v.setBitVisible(isConnected));
+    }, [isConnected]);
 
     useEffect(() => {
-        if (!wpos) return;
-        svgRef.current?.setBitPosition({
-            x: Number(wpos.x),
-            y: Number(wpos.y),
-            z: Number(wpos.z),
-        });
-    }, [wpos]);
+        const [x, y, z] = wposKey.split(',').map(Number);
+        withViewer((v) => v.setBitPosition({ x, y, z }));
+    }, [wposKey]);
 
     return (
-        <GCodeSVGVisualizer
-            ref={svgRef}
-            id="pendant-svg-vis"
-            options={SVG_OPTIONS}
-            className="w-full h-full"
-        />
+        <div ref={containerRef} className="w-full h-full">
+            <GCodeVisualizer
+                ref={viewerRef}
+                id="pendant-gl-vis"
+                options={options}
+                className="w-full h-full"
+            />
+        </div>
     );
 }
 

@@ -4,6 +4,9 @@ import { FileCode2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import pubsub from 'pubsub-js';
 import { applyPickedFile, openGcodeFileOrPrompt } from '../utils/fileLoader';
+import { WORKSHOP_VISUALIZER_COLORS } from 'app/features/Visualizer/viewerTheme';
+import { PENDANT_CUT_COLOR, PENDANT_RAPID_COLOR } from '../visualizerTheme';
+import DepthGauge from './DepthGauge';
 import FeedOverrideWrapper from './FeedOverrideWrapper';
 import FileLoadingOverlay from './FileLoadingOverlay';
 import JobControls from './JobControls';
@@ -54,20 +57,26 @@ export default function VisualizerCard() {
                         <span className="flex items-center gap-1">
                             <span
                                 className="w-2 h-2 rounded-full inline-block"
-                                style={{ backgroundColor: '#3F85C7' }}
+                                style={{ backgroundColor: PENDANT_CUT_COLOR }}
                             />
                             Cut
                         </span>
                         <span className="flex items-center gap-1">
                             <span
                                 className="w-2 h-2 rounded-full inline-block"
-                                style={{ backgroundColor: '#059669' }}
+                                style={{ backgroundColor: PENDANT_RAPID_COLOR }}
                             />
                             Rapid
                         </span>
                         <span className="flex items-center gap-1">
-                            <span className="w-2 h-2 rounded-full bg-gray-400 inline-block" />
-                            Bounds
+                            <span
+                                className="w-2.5 h-2 rounded-[2px] border inline-block"
+                                style={{
+                                    borderColor:
+                                        WORKSHOP_VISUALIZER_COLORS.machineBed,
+                                }}
+                            />
+                            Bed
                         </span>
                     </div>
                     <WorkspaceSelector />
@@ -75,6 +84,7 @@ export default function VisualizerCard() {
 
                 <div className="relative h-56 overflow-hidden rounded-b-xl dark:bg-surface-sunken">
                     <Visualizer />
+                    {fileLoaded && !fileProcessing && <DepthGauge />}
                     {fileProcessing && (
                         <div className="absolute inset-0 flex items-center justify-center p-3 bg-dark-darker/95">
                             <LiveFileLoadingOverlay fileName={fileName} />

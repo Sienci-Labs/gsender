@@ -60,16 +60,19 @@ export interface GridOptions {
     } | null;
 }
 
-export function buildMachineBedOptions(): MachineBedOptions {
+// `ignoreUserToggle` is for surfaces that always show the bed (the pendant):
+// it still needs homing, since the bed's position is meaningless without it.
+export function buildMachineBedOptions({
+    ignoreUserToggle = false,
+}: { ignoreUserToggle?: boolean } = {}): MachineBedOptions {
     const state = reduxStore.getState();
     const $22 = _get(state, 'controller.settings.settings.$22', '0');
     const $23 = _get(state, 'controller.settings.settings.$23', '0');
     const hasHomed = !!_get(state, 'controller.hasHomed');
     const homingEnabled = Number($22) > 0;
-    const bedIndicatorEnabled = store.get(
-        'widgets.visualizer.objects.machineBed.visible',
-        false,
-    );
+    const bedIndicatorEnabled =
+        ignoreUserToggle ||
+        store.get('widgets.visualizer.objects.machineBed.visible', false);
 
     if (!bedIndicatorEnabled || !homingEnabled || !hasHomed) {
         return { visible: false, min: null, max: null, keepout: null };
