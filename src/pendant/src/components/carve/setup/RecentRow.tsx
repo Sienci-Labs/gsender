@@ -17,10 +17,12 @@ export default function RecentRow({
     onLoad: (file: RecentFile) => void;
 }) {
     const loadable = canLoadRecent(file);
-    const { progress, holding, bind } = useHoldToActivate(() => onLoad(file), {
-        durationMs: HOLD_MS,
-        disabled: !loadable,
-    });
+    const { progress, holding, showProgress, hintNode, bind } =
+        useHoldToActivate(() => onLoad(file), {
+            durationMs: HOLD_MS,
+            disabled: !loadable,
+            hint: 'Hold to load',
+        });
 
     return (
         <button
@@ -72,10 +74,11 @@ export default function RecentRow({
                         className="stroke-blue-400"
                         strokeDasharray={RING_C}
                         strokeDashoffset={RING_C * (1 - progress)}
-                        opacity={holding ? 1 : 0}
+                        opacity={showProgress ? 1 : 0}
                     />
                 </svg>
             )}
+            {hintNode}
         </button>
     );
 }

@@ -7,9 +7,9 @@
     flex: 0 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 11px;
-    padding: 13px 11px;
-    border-radius: 16px;
+    gap: 7px;
+    padding: 9px 10px;
+    border-radius: 14px;
     background: #1b222b;
     border: 1px solid #2c3540;
     box-shadow:
@@ -25,11 +25,11 @@
     gap: 8px;
 }
 .ovr-chip {
-    width: 27px;
-    height: 27px;
+    width: 24px;
+    height: 24px;
     flex: 0 0 auto;
     border-radius: 7px;
-    border: 3px solid;
+    border: 2.5px solid;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -69,7 +69,7 @@
 }
 .ovr-zone {
     position: relative;
-    height: 168px;
+    height: 146px;
     display: flex;
     justify-content: center;
     gap: 9px;
@@ -88,8 +88,8 @@
     position: absolute;
     left: 0;
     right: 0;
-    top: 13px;
-    bottom: 13px;
+    top: 11px;
+    bottom: 11px;
 }
 .ovr-seg {
     position: absolute;
@@ -141,8 +141,8 @@
 .ovr-centerline {
     position: absolute;
     left: 50%;
-    top: 13px;
-    bottom: 13px;
+    top: 11px;
+    bottom: 11px;
     width: 1px;
     background: #3f4b59;
     transform: translateX(-50%);
@@ -151,14 +151,14 @@
     position: absolute;
     left: -7px;
     right: -7px;
-    top: 13px;
-    bottom: 13px;
+    top: 11px;
+    bottom: 11px;
 }
 .ovr-thumb {
     position: absolute;
     left: 0;
     right: 0;
-    height: 32px;
+    height: 29px;
     transform: translateY(50%);
     box-sizing: border-box;
     border-radius: 9px;
@@ -196,12 +196,12 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 3px;
+    gap: 2px;
 }
 .ovr-big {
     font-family: "IBM Plex Mono", ui-monospace, monospace;
     font-weight: 700;
-    font-size: 21px;
+    font-size: 19px;
     letter-spacing: 0.5px;
     line-height: 1;
     font-variant-numeric: tabular-nums;
@@ -221,7 +221,9 @@
     color: #a0aaba;
 }
 .ovr-reset {
-    height: 30px;
+    position: relative;
+    overflow: hidden;
+    height: 26px;
     flex: 0 0 auto;
     border-radius: 8px;
     border: 2px solid #72849d;
@@ -235,6 +237,31 @@
     align-items: center;
     justify-content: center;
     gap: 6px;
+}
+.ovr-reset {
+    user-select: none;
+    touch-action: none;
+    -webkit-touch-callout: none;
+}
+.ovr-reset > :not(.ovr-reset-fill) {
+    position: relative;
+}
+.ovr-reset.is-holding {
+    border-color: #a0aaba;
+}
+.ovr-reset-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    pointer-events: none;
+}
+.ovr-reset-fill.feed {
+    background: rgba(63, 133, 199, 0.35);
+}
+.ovr-reset-fill.spindle {
+    background: rgba(5, 150, 105, 0.35);
+}
+.ovr-reset-fill.laser {
+    background: rgba(92, 82, 203, 0.4);
 }
 .ovr-reset:active:not(:disabled) {
     background: rgba(255, 255, 255, 0.06);

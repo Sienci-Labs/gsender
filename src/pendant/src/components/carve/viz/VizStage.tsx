@@ -4,8 +4,8 @@ import cn from 'classnames';
 import DepthGauge from '../../DepthGauge';
 import Visualizer from '../../Visualizer';
 import { LiveFileLoadingOverlay } from '../../VisualizerCard';
+import WorkspaceSelector from '../../WorkspaceSelector';
 import type { CarveMode } from '../carveMode';
-import FileChip from './FileChip';
 import InfoGlass from './InfoGlass';
 import VizJobControls from './VizJobControls';
 
@@ -22,15 +22,7 @@ const RING: Partial<Record<CarveMode, string>> = {
     toolchange: 'shadow-state-tool/50 border-state-tool/45',
 };
 
-export default function VizStage({
-    mode,
-    onLoadFile,
-    onCloseFile,
-}: {
-    mode: CarveMode;
-    onLoadFile: () => void;
-    onCloseFile: () => void;
-}) {
+export default function VizStage({ mode }: { mode: CarveMode }) {
     const fileLoaded = useTypedSelector((s: RootState) => s.file.fileLoaded);
     const fileProcessing = useTypedSelector(
         (s: RootState) => s.file.fileProcessing,
@@ -53,7 +45,10 @@ export default function VizStage({
                 </div>
             )}
 
-            <FileChip mode={mode} onLoad={onLoadFile} onClose={onCloseFile} />
+            {/* File name + close live in the File tab */}
+            <div className="absolute left-2.5 top-2.5 z-10">
+                <WorkspaceSelector menuAlign="left" />
+            </div>
             <InfoGlass />
             <VizJobControls mode={mode} />
 

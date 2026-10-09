@@ -83,6 +83,14 @@ export interface SpindleCardApi {
     sendLaserM3: () => void;
     handleModeToggle: () => void;
     handleHALSpindleSelect: (value: string) => void;
+    /** S range for the speed/power slider: $31-$30, or $731-$730 for a
+     * grblHAL laser. */
+    sMin: number;
+    sMax: number;
+    sStep: number;
+    /** The S value M3/M4 (or laser on) will send. */
+    sTarget: number;
+    setSTarget: (s: number) => void;
 }
 
 interface Props {
@@ -749,6 +757,21 @@ export default function SpindlePanel({ mode, renderCard }: Props) {
         indicatorSeparator: () => ({ display: 'none' }),
     };
 
+    // Laser power is stored as a % of the max power it is sent against
+    const laserSendMax =
+        spindle.label === 'SLB_LASER' ? laserMax : state.laser.maxPower;
+    const halLaser = isLaserMode && controllerType === GRBLHAL;
+    const sMin = halLaser ? laserMin : spindleMin;
+    const sMax = Math.max(sMin, halLaser ? laserMax : spindleMax);
+    const sTarget = isLaserMode
+        ? (laserSendMax * state.laser.power) / 100
+        : state.spindleSpeed;
+    const setSTarget = (s: number) => {
+        if (!isLaserMode) return actions.handleSpindleSpeedChange(s);
+        if (laserSendMax > 0)
+            actions.handleLaserPowerChange((s / laserSendMax) * 100);
+    };
+
     if (renderCard) {
         return (
             <>
@@ -772,6 +795,11 @@ export default function SpindlePanel({ mode, renderCard }: Props) {
                     sendLaserM3: actions.sendLaserM3,
                     handleModeToggle: actions.handleModeToggle,
                     handleHALSpindleSelect: actions.handleHALSpindleSelect,
+                    sMin,
+                    sMax,
+                    sStep: isLaserMode ? 1 : 10,
+                    sTarget,
+                    setSTarget,
                 })}
             </>
         );

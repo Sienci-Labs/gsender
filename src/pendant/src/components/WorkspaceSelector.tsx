@@ -43,7 +43,12 @@ export function isWorkspace(value: unknown): value is GrblWorkspace {
     );
 }
 
-export default function WorkspaceSelector() {
+export default function WorkspaceSelector({
+    menuAlign = 'right',
+}: {
+    /** Which edge the menu lines up with; 'left' when placed at a left edge. */
+    menuAlign?: 'left' | 'right';
+} = {}) {
     const activeWorkspace = useTypedSelector(
         (state: RootState) => state.controller.modal.wcs,
     );
@@ -116,7 +121,7 @@ export default function WorkspaceSelector() {
                 />
             </button>
             {workspaceMenuOpen && (
-                <div className="absolute top-full right-0 mt-1 z-50 w-28 rounded-md border border-gray-200 dark:border-outline bg-white dark:bg-surface-raised shadow-lg p-1">
+                <div className={`absolute top-full ${menuAlign === 'left' ? 'left-0' : 'right-0'} mt-1 z-50 w-28 rounded-md border border-gray-200 dark:border-outline bg-white dark:bg-surface-raised shadow-lg p-1`}>
                     {WORKSPACE_VALUES.map((value) => (
                         <button
                             key={value}

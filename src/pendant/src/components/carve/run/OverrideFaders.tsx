@@ -11,7 +11,6 @@ export default function OverrideFaders({
 }) {
     const {
         isConnected,
-        spindleFunctions,
         spindleLabel,
         unitString,
         feedrate,
@@ -28,7 +27,7 @@ export default function OverrideFaders({
     return (
         <div
             className={cn(
-                'flex items-center justify-center gap-2 pt-1.5 pb-0.5',
+                'flex items-center justify-center gap-2 pt-1 pb-0.5',
                 fill ? 'flex-1 min-h-0' : 'shrink-0',
             )}
         >
@@ -42,18 +41,17 @@ export default function OverrideFaders({
                 onPreview={previewFeed}
                 onCommit={commitFeed}
             />
-            {spindleFunctions && (
-                <IsoFader
-                    kind={isLaser ? 'laser' : 'spindle'}
-                    chip={isLaser ? 'P' : 'S'}
-                    title={isLaser ? 'Power' : 'Spindle'}
-                    value={localOvS}
-                    sub={isLaser ? 'Laser power' : `${spindle} RPM`}
-                    disabled={!isConnected}
-                    onPreview={previewSpindle}
-                    onCommit={commitSpindle}
-                />
-            )}
+            {/* Always shown, regardless of the workspace's spindleFunctions */}
+            <IsoFader
+                kind={isLaser ? 'laser' : 'spindle'}
+                chip={isLaser ? 'P' : 'S'}
+                title={isLaser ? 'Power' : 'Spindle'}
+                value={localOvS}
+                sub={isLaser ? 'Laser power' : `${spindle} RPM`}
+                disabled={!isConnected}
+                onPreview={previewSpindle}
+                onCommit={commitSpindle}
+            />
         </div>
     );
 }

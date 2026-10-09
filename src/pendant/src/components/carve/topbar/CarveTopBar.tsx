@@ -27,7 +27,7 @@ export default function CarveTopBar({ mode }: { mode: CarveMode }) {
             <div className="no-drag">
                 <StatusBadge mode={mode} />
             </div>
-            <TopBarClock />
+            <TopBarClock mode={mode} />
             <div className="flex items-center gap-1.5 no-drag">
                 <button
                     type="button"

@@ -1,6 +1,7 @@
 import { OVERRIDE_VALUE_RANGES } from 'app/constants';
 import { RotateCcw } from 'lucide-react';
 import { useRef, useState } from 'react';
+import { useHoldToActivate } from '../../../hooks/useHoldToActivate';
 import './isoFader.css';
 
 export type FaderKind = 'feed' | 'spindle' | 'laser';
@@ -9,7 +10,7 @@ const MIN = OVERRIDE_VALUE_RANGES.MIN;
 const MAX = OVERRIDE_VALUE_RANGES.MAX;
 const STEP = 10;
 // Matches .ovr-thumb-wrap's top/bottom inset
-const TRACK_INSET = 13;
+const TRACK_INSET = 11;
 const SEGMENTS = 11;
 
 const clampStep = (v: number) =>
@@ -51,6 +52,11 @@ export default function IsoFader({
     const shown = dragValue ?? Math.round(Number(value) || 100);
     const fraction = toFraction(shown);
     const currentSeg = Math.round(fraction * (SEGMENTS - 1));
+    // Reset needs a full 1 s hold so a stray tap can't snap a running job
+    const reset = useHoldToActivate(() => onCommit(100), {
+        disabled,
+        hint: 'Hold to reset',
+    });
 
     const valueAt = (clientY: number) => {
         const rect = zoneRef.current?.getBoundingClientRect();
@@ -165,13 +171,20 @@ export default function IsoFader({
                 <span className="ovr-sub">{sub}</span>
             </div>
             <button
-                className="ovr-reset"
+                className={`ovr-reset${reset.holding ? ' is-holding' : ''}`}
                 type="button"
                 disabled={disabled}
-                onClick={() => onCommit(100)}
+                aria-label={`Hold to reset ${title.toLowerCase()} override`}
+                {...reset.bind}
             >
-                <RotateCcw className="w-[13px] h-[13px]" aria-hidden />
+                <span
+                    aria-hidden
+                    className={`ovr-reset-fill ${kind}`}
+                    style={{ width: `${reset.progress * 100}%` }}
+                />
+                <RotateCcw className="w-[12px] h-[12px]" aria-hidden />
                 <span>Reset</span>
+                {reset.hintNode}
             </button>
         </div>
     );

@@ -70,6 +70,88 @@ describe('useHoldToActivate', () => {
         expect(onActivate).not.toHaveBeenCalled();
     });
 
+    it('drains progress back instead of snapping to zero', () => {
+        const { result } = renderHook(() =>
+            useHoldToActivate(jest.fn(), { durationMs: 1000 }),
+        );
+
+        act(() => result.current.bind.onPointerDown(press));
+        act(() => {
+            jest.advanceTimersByTime(600);
+        });
+        act(() => result.current.bind.onPointerUp());
+        expect(result.current.holding).toBe(false);
+        expect(result.current.progress).toBeGreaterThan(0.4);
+        expect(result.current.showProgress).toBe(true);
+
+        act(() => {
+            jest.advanceTimersByTime(100);
+        });
+        expect(result.current.progress).toBeGreaterThan(0);
+        expect(result.current.progress).toBeLessThan(0.5);
+
+        act(() => {
+            jest.advanceTimersByTime(200);
+        });
+        expect(result.current.progress).toBe(0);
+        expect(result.current.showProgress).toBe(false);
+    });
+
+    it('shows the hint after a tap, then hides it', () => {
+        const { result } = renderHook(() =>
+            useHoldToActivate(jest.fn(), { hint: 'Hold to zero X' }),
+        );
+
+        act(() => result.current.bind.onPointerDown(press));
+        act(() => {
+            jest.advanceTimersByTime(100);
+        });
+        act(() => result.current.bind.onPointerUp());
+        expect(result.current.hintVisible).toBe(true);
+
+        act(() => {
+            jest.advanceTimersByTime(1600);
+        });
+        expect(result.current.hintVisible).toBe(false);
+    });
+
+    it('shows no hint after a long release, a cancel, or with hint off', () => {
+        const { result } = renderHook(() =>
+            useHoldToActivate(jest.fn(), { durationMs: 1000 }),
+        );
+        act(() => result.current.bind.onPointerDown(press));
+        act(() => {
+            jest.advanceTimersByTime(500);
+        });
+        act(() => result.current.bind.onPointerUp());
+        expect(result.current.hintVisible).toBe(false);
+
+        act(() => result.current.bind.onPointerDown(press));
+        act(() => result.current.bind.onPointerCancel());
+        expect(result.current.hintVisible).toBe(false);
+
+        const off = renderHook(() =>
+            useHoldToActivate(jest.fn(), { hint: false }),
+        );
+        act(() => off.result.current.bind.onPointerDown(press));
+        act(() => off.result.current.bind.onPointerUp());
+        expect(off.result.current.hintVisible).toBe(false);
+    });
+
+    it('calls onTap for a tap instead of showing the hint', () => {
+        const onTap = jest.fn();
+        const onActivate = jest.fn();
+        const { result } = renderHook(() =>
+            useHoldToActivate(onActivate, { onTap }),
+        );
+
+        act(() => result.current.bind.onPointerDown(press));
+        act(() => result.current.bind.onPointerUp());
+        expect(onTap).toHaveBeenCalledTimes(1);
+        expect(result.current.hintVisible).toBe(false);
+        expect(onActivate).not.toHaveBeenCalled();
+    });
+
     it('ignores presses while disabled and secondary mouse buttons', () => {
         const onActivate = jest.fn();
         const { result, rerender } = renderHook(

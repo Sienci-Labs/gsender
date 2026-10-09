@@ -33,11 +33,11 @@ import {
     useRef,
     useState,
 } from 'react';
+import { useHoldToActivate } from '../hooks/useHoldToActivate';
 
-/* Hold-to-disconnect timing. A press under TAP_MAX is a tap (toggles the
- * info card); a press held for DURATION disconnects. */
+/* Hold-to-disconnect timing. A tap (under HOLD_TAP_MAX_MS) toggles the
+ * info card; a press held for DURATION disconnects. */
 const DURATION = 900;
-const TAP_MAX = 250;
 
 /* Per-status colour treatment. The custom brand families (blue-700 #2c5d8b,
  * green-700 #047854, red-600 #c62222) render identically in light and dark,
@@ -85,6 +85,7 @@ export interface ConnectedTriggerProps {
     onPointerDown: PointerEventHandler;
     onPointerUp: PointerEventHandler;
     onPointerLeave: PointerEventHandler;
+    onPointerCancel: PointerEventHandler;
 }
 
 interface ConnectionWidgetProps {
@@ -321,15 +322,10 @@ export default function ConnectionWidget({
     // Floating-panel + hold state.
     const [sheetOpen, setSheetOpen] = useState(false);
     const [infoOpen, setInfoOpen] = useState(false);
-    const [progress, setProgress] = useState(0);
-    const [holding, setHolding] = useState(false);
 
     const connectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
         null,
     );
-    const rafRef = useRef<number | null>(null);
-    const startRef = useRef(0);
-    const pressStartRef = useRef(0);
 
     // Refs mirroring latest values for use inside stable async callbacks.
     const activePortRef = useRef(activePort);
@@ -360,6 +356,18 @@ export default function ConnectionWidget({
         });
     }, []);
 
+    // Hold to disconnect; a tap toggles the info card instead of a hint.
+    const {
+        progress,
+        showProgress: holding,
+        reset: resetHold,
+        bind: holdBind,
+    } = useHoldToActivate(onDisconnectClick, {
+        durationMs: DURATION,
+        disabled: connectionState !== ConnectionState.CONNECTED,
+        onTap: () => setInfoOpen((v) => !v),
+    });
+
     const handleConnect = useCallback(
         (portName: string, type: ConnectionType) => {
             if (!portName) {
@@ -379,8 +387,7 @@ export default function ConnectionWidget({
             );
 
             // Clear hold state so a stale red fill can't flash on (re)connect.
-            setHolding(false);
-            setProgress(0);
+            resetHold();
 
             setConnectionState(ConnectionState.CONNECTING);
             setConnectionType(type);
@@ -457,9 +464,6 @@ export default function ConnectionWidget({
             if (connectTimeoutRef.current) {
                 clearTimeout(connectTimeoutRef.current);
             }
-            if (rafRef.current) {
-                cancelAnimationFrame(rafRef.current);
-            }
         };
     }, [onControllerDisconnect, attemptAutoConnect]);
 
@@ -493,51 +497,6 @@ export default function ConnectionWidget({
         }, 5000);
         return () => clearTimeout(t);
     }, [connectionState]);
-
-    // Hold-to-disconnect progress loop.
-    const tick = useCallback(
-        (ts: number) => {
-            if (!startRef.current) {
-                startRef.current = ts;
-            }
-            const pct = Math.min((ts - startRef.current) / DURATION, 1);
-            setProgress(pct);
-            if (pct >= 1) {
-                startRef.current = 0;
-                setHolding(false);
-                setProgress(0);
-                onDisconnectClick();
-                return;
-            }
-            rafRef.current = requestAnimationFrame(tick);
-        },
-        [onDisconnectClick],
-    );
-
-    const startHold = () => {
-        if (connectionStateRef.current !== ConnectionState.CONNECTED) {
-            return;
-        }
-        pressStartRef.current = performance.now();
-        startRef.current = 0;
-        setHolding(true);
-        rafRef.current = requestAnimationFrame(tick);
-    };
-
-    const endHold = () => {
-        if (rafRef.current) {
-            cancelAnimationFrame(rafRef.current);
-            rafRef.current = null;
-        }
-        startRef.current = 0;
-        setHolding(false);
-        setProgress(0);
-        const pressed = pressStartRef.current;
-        pressStartRef.current = 0;
-        if (pressed > 0 && performance.now() - pressed < TAP_MAX) {
-            setInfoOpen((v) => !v);
-        }
-    };
 
     const openSheet = () => {
         setCfg(readConfigValues());
@@ -682,18 +641,17 @@ export default function ConnectionWidget({
                         holding,
                         progress,
                         infoOpen,
-                        onPointerDown: startHold,
-                        onPointerUp: endHold,
-                        onPointerLeave: endHold,
+                        onPointerDown: holdBind.onPointerDown,
+                        onPointerUp: holdBind.onPointerUp,
+                        onPointerLeave: holdBind.onPointerLeave,
+                        onPointerCancel: holdBind.onPointerCancel,
                     })}
                 {connectionState === ConnectionState.CONNECTED &&
                     !renderConnected && (
                         <button
                             key="connected"
                             type="button"
-                            onPointerDown={startHold}
-                            onPointerUp={endHold}
-                            onPointerLeave={endHold}
+                            {...holdBind}
                             className={cn(
                                 pillBase,
                                 status.tint,

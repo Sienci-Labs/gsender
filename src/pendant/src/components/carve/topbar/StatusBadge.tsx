@@ -31,11 +31,11 @@ import {
     Wrench,
 } from 'lucide-react';
 import type { ComponentType } from 'react';
-import { useAlarmMessage } from '../../../hooks/useAlarmMessage';
 import ConnectionWidget, {
     type ConnectedTriggerProps,
 } from '../../ConnectionWidget';
-import { type CarveMode, isHomingAlarm } from '../carveMode';
+import type { CarveMode } from '../carveMode';
+import { useAlarmHeadline } from './useAlarmHeadline';
 
 type Tone = 'idle' | 'run' | 'hold' | 'alarm' | 'tool';
 
@@ -100,16 +100,13 @@ function useBadgeText(mode: CarveMode) {
     const activeState = useTypedSelector(
         (s: RootState) => s.controller.state.status?.activeState ?? '',
     );
-    const alarmCode = useTypedSelector(
-        (s: RootState) => s.controller.state.status?.alarmCode ?? 0,
-    );
     const currentTool = useTypedSelector(
         (s: RootState) =>
             (s.controller.state.status as any)?.currentTool ??
             (s.controller.state as any)?.parserstate?.modal?.tool,
     );
     const { toolchangeContext } = useWizardContext();
-    const alarmMessage = useAlarmMessage();
+    const alarm = useAlarmHeadline(mode);
 
     const entry =
         mode === 'toolchange'
@@ -119,16 +116,10 @@ function useBadgeText(mode: CarveMode) {
                   ? STATE_LABELS[GRBL_ACTIVE_STATE_HOLD]
                   : STATE_LABELS[GRBL_ACTIVE_STATE_IDLE]));
 
+    // In alarm the badge just names the code; the description lives in the
+    // centre slot (TopBarClock)
     let sub: string | null = null;
-    if (mode === 'alarm') {
-        if (isHomingAlarm(alarmCode)) {
-            sub = 'Homing required';
-        } else if (alarmCode !== 0 && alarmCode !== '0') {
-            sub = alarmMessage?.title
-                ? `Alarm ${alarmCode} · ${alarmMessage.title}`
-                : `Alarm ${alarmCode}`;
-        }
-    } else if (mode === 'toolchange') {
+    if (mode === 'toolchange') {
         const from = toolLabel(currentTool);
         const to = toolLabel(
             toolchangeContext?.tool ??
@@ -140,7 +131,7 @@ function useBadgeText(mode: CarveMode) {
 
     return {
         tone: toneFor(mode, activeState),
-        label: entry.label,
+        label: alarm?.label ?? entry.label,
         Icon: entry.icon,
         sub,
     };
@@ -162,6 +153,8 @@ function ConnectedBadge({
             onPointerDown={trigger.onPointerDown}
             onPointerUp={trigger.onPointerUp}
             onPointerLeave={trigger.onPointerLeave}
+            onPointerCancel={trigger.onPointerCancel}
+            onContextMenu={(e) => e.preventDefault()}
             aria-label={`${trigger.firmware} on ${trigger.displayPort}, ${label}. Tap for details, hold to disconnect.`}
             className={cn(
                 'relative flex items-center h-8 shrink-0 rounded-lg border-[1.5px] overflow-hidden touch-none select-none text-left',

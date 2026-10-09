@@ -69,11 +69,6 @@ export default function CarveScreen({ mode }: { mode: CarveMode }) {
     const isSetup = mode === 'setup' || mode === 'disconnected';
     const isRun = mode === 'running' || mode === 'holdJob';
 
-    const handleLoadFromChip = () => {
-        setActiveTab('File');
-        void fileActions.handleLoadClick();
-    };
-
     return (
         <div className="relative flex flex-1 flex-col min-h-0 bg-surface-base font-sans text-content-primary">
             <input
@@ -84,11 +79,7 @@ export default function CarveScreen({ mode }: { mode: CarveMode }) {
                 onChange={fileActions.handleFileChange}
             />
 
-            <VizStage
-                mode={mode}
-                onLoadFile={handleLoadFromChip}
-                onCloseFile={fileActions.handleUnload}
-            />
+            <VizStage mode={mode} />
 
             <div className="relative flex flex-1 min-h-0">
                 <div className="flex flex-col basis-[44%] shrink-0 min-h-0 border-r border-outline-subtle">

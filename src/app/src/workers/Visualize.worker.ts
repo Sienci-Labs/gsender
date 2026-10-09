@@ -457,13 +457,11 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
     let svg2DCachedRgb: [number, number, number] | null = null;
     let svg2DCachedOpacity = -1;
     let svg2DCachedGroup: Svg2DGroup | null = null;
-    const rgbToHex = (rgb: [number, number, number]): string => {
-        const ch = (v: number) =>
-            Math.round(Math.min(1, Math.max(0, v)) * 255)
-                .toString(16)
-                .padStart(2, '0');
-        return `#${ch(rgb[0])}${ch(rgb[1])}${ch(rgb[2])}`;
-    };
+    // rgb holds THREE's linear working-space channels; getHexString converts
+    // back to sRGB so the group gets the hex the theme/palette asked for.
+    const hexScratch = new THREE.Color();
+    const rgbToHex = (rgb: [number, number, number]): string =>
+        `#${hexScratch.setRGB(rgb[0], rgb[1], rgb[2]).getHexString()}`;
     const getSvg2DGroup = (motion: string, opacity: number): Svg2DGroup => {
         const rgb = getMotionColor(motion);
         // Motion colors change only on toolchange, so a one-entry cache keyed
@@ -603,10 +601,16 @@ self.onmessage = ({ data }: { data: WorkerData }) => {
         }
 
         toolchanges.push(segments.totalVertices);
-        if (segments.totalVertices === lastToolchangeVertex) {
+        // svgOnly never writes 3D vertices, so count the 2D segments instead;
+        // otherwise every tool after the first looks like a back-to-back
+        // change and keeps the previous colour.
+        const mark = svgOnly
+            ? svg2DKept + svg2DDupeDrops + svg2DDegenerateDrops
+            : segments.totalVertices;
+        if (mark === lastToolchangeVertex) {
             return;
         }
-        lastToolchangeVertex = segments.totalVertices;
+        lastToolchangeVertex = mark;
 
         // The first tool keeps the theme's cutting color (no palette swap), acting
         // as palette index 0; the array proper starts at index 1 for the second

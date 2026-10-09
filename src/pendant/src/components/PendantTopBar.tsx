@@ -30,10 +30,10 @@ import {
     Wrench,
 } from 'lucide-react';
 import type { ComponentType } from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useLongPress } from 'use-long-press';
+import { useEffect, useState } from 'react';
 import iconRound from '../assets/icon-round.png';
 import { isElectron, quitApp } from '../electron-bridge';
+import { useHoldToActivate } from '../hooks/useHoldToActivate';
 import { useUnlock } from '../hooks/useUnlock';
 import ConnectionWidget from './ConnectionWidget';
 
@@ -314,77 +314,32 @@ const QUIT_RING_RADIUS = 19;
 const QUIT_RING_CIRCUMFERENCE = 2 * Math.PI * QUIT_RING_RADIUS;
 
 function useLogoHoldToQuit() {
-    const [progress, setProgress] = useState(0);
-    const [isHolding, setIsHolding] = useState(false);
-    const startTimeRef = useRef(0);
-    const rafRef = useRef<number | null>(null);
-
-    const stopProgressLoop = useCallback(() => {
-        if (rafRef.current !== null) {
-            cancelAnimationFrame(rafRef.current);
-            rafRef.current = null;
-        }
-    }, []);
-
-    useEffect(() => stopProgressLoop, [stopProgressLoop]);
-
-    const startProgressLoop = useCallback(() => {
-        const update = (now: number) => {
-            const elapsed = now - startTimeRef.current;
-            setProgress(Math.min(elapsed / QUIT_HOLD_MS, 1));
-            rafRef.current = requestAnimationFrame(update);
-        };
-        rafRef.current = requestAnimationFrame(update);
-    }, []);
-
-    const bind = useLongPress(
-        () => {
-            setIsHolding(false);
-            stopProgressLoop();
-            setProgress(0);
+    return useHoldToActivate(
+        () =>
             Confirm({
                 title: 'Quit gSender?',
                 content: 'Are you sure you want to quit gSender?',
                 confirmLabel: 'Quit',
                 cancelLabel: 'Cancel',
                 onConfirm: () => quitApp(),
-            });
-        },
+            }),
         {
-            threshold: QUIT_HOLD_MS,
-            cancelOnMovement: true,
-            filterEvents: (event) => {
-                if (!isElectron()) {
-                    return false;
-                }
-                if ('button' in event && typeof event.button === 'number') {
-                    return event.button === 0;
-                }
-                return true;
-            },
-            onStart: () => {
-                startTimeRef.current = performance.now();
-                setProgress(0);
-                setIsHolding(true);
-                startProgressLoop();
-            },
-            onCancel: () => {
-                stopProgressLoop();
-                setProgress(0);
-                setIsHolding(false);
-            },
-            onFinish: () => {
-                stopProgressLoop();
-            },
+            durationMs: QUIT_HOLD_MS,
+            // Quitting only means something inside the Electron shell
+            disabled: !isElectron(),
+            hint: 'Hold to quit',
         },
     );
-
-    return { bind, progress, isHolding };
 }
 
 export default function PendantTopBar() {
     const isDark = useIsDark();
-    const { bind, progress, isHolding } = useLogoHoldToQuit();
+    const {
+        bind,
+        progress,
+        showProgress: isHolding,
+        hintNode: quitHint,
+    } = useLogoHoldToQuit();
     const isConnected = useTypedSelector(
         (s: RootState) => s.connection.isConnected,
     );
@@ -417,8 +372,7 @@ export default function PendantTopBar() {
             {/* Logo — hold to quit */}
             <div
                 className="relative flex items-center gap-2 shrink-0 no-drag touch-manipulation"
-                onContextMenu={(event) => event.preventDefault()}
-                {...bind()}
+                {...bind}
             >
                 <img src={iconRound} alt="gSender" className="w-9 h-9" />
                 {isHolding && (
@@ -445,6 +399,7 @@ export default function PendantTopBar() {
                         />
                     </svg>
                 )}
+                {quitHint}
             </div>
 
             {/* Touch-forward connection widget */}

@@ -12,7 +12,7 @@ import type { RootState } from 'app/store/redux';
 import { clsx } from 'clsx';
 import get from 'lodash/get';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useLongPress } from 'use-long-press';
+import { useHoldToActivate } from '../../hooks/useHoldToActivate';
 
 // Rapid-to-corner pad shared by MovePanel and the carve Position tab.
 
@@ -78,91 +78,37 @@ export function HoldCorner({
     /** Overrides the corner's own diameter (px). */
     size?: number;
 }) {
-    const [progress, setProgress] = useState(0);
-    const [holding, setHolding] = useState(false);
     const [confirmed, setConfirmed] = useState(false);
     const [settling, setSettling] = useState(false);
-
-    const rafRef = useRef<number | null>(null);
-    const startRef = useRef(0);
     const settleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-    // use-long-press invokes callbacks from closures captured at hook-call time,
-    // so latest disabled/settling need a ref rather than the stale render values.
-    const blockedRef = useRef(disabled || settling);
-    blockedRef.current = disabled || settling;
-
-    const clearRaf = useCallback(() => {
-        if (rafRef.current !== null) {
-            cancelAnimationFrame(rafRef.current);
-            rafRef.current = null;
-        }
-    }, []);
 
     useEffect(
         () => () => {
-            clearRaf();
             if (settleTimeoutRef.current)
                 clearTimeout(settleTimeoutRef.current);
         },
-        [clearRaf],
+        [],
     );
 
-    const startProgressLoop = useCallback(() => {
-        const step = (now: number) => {
-            const elapsed = now - startRef.current;
-            const pct = Math.min(100, (elapsed / HOLD_MS) * 100);
-            setProgress(pct);
-            if (pct < 100) {
-                rafRef.current = requestAnimationFrame(step);
-            }
-        };
-        rafRef.current = requestAnimationFrame(step);
-    }, []);
-
-    const longPressHandlers = useLongPress(
-        () => {
-            if (blockedRef.current) return;
-            clearRaf();
-            setProgress(100);
-            setHolding(false);
-            setConfirmed(true);
-            setSettling(true);
-            onConfirm(corner.id);
-            if (navigator.vibrate) navigator.vibrate(12);
-            settleTimeoutRef.current = setTimeout(() => {
-                setConfirmed(false);
-                setSettling(false);
-                setProgress(0);
-            }, SETTLE_MS);
-        },
-        {
-            threshold: HOLD_MS,
-            cancelOnMovement: true,
-            filterEvents: (event) => {
-                if (blockedRef.current) return false;
-                if ('button' in event && typeof event.button === 'number') {
-                    return event.button === 0;
-                }
-                return true;
+    const { progress, holding, showProgress, hintNode, bind } =
+        useHoldToActivate(
+            () => {
+                setConfirmed(true);
+                setSettling(true);
+                onConfirm(corner.id);
+                settleTimeoutRef.current = setTimeout(() => {
+                    setConfirmed(false);
+                    setSettling(false);
+                }, SETTLE_MS);
             },
-            onStart: () => {
-                if (blockedRef.current) return;
-                startRef.current = performance.now();
-                setProgress(0);
-                setHolding(true);
-                startProgressLoop();
+            {
+                durationMs: HOLD_MS,
+                disabled: disabled || settling,
+                hint: `Hold to rapid to ${corner.label.toLowerCase()}`,
             },
-            onCancel: () => {
-                clearRaf();
-                setHolding(false);
-                setProgress(0);
-            },
-            onFinish: () => {
-                clearRaf();
-                setHolding(false);
-            },
-        },
-    )();
+        );
+    // The confirmed ring stays full while it settles
+    const ring = confirmed ? 1 : progress;
 
     return (
         <button
@@ -182,16 +128,15 @@ export function HoldCorner({
                 height: size ?? corner.size,
             }}
             disabled={disabled || settling}
-            {...longPressHandlers}
-            onContextMenu={(e) => e.preventDefault()}
+            {...bind}
         >
-            {(holding || confirmed) && (
+            {(showProgress || confirmed) && (
                 <span
                     aria-hidden="true"
                     className="absolute rounded-full pointer-events-none"
                     style={{
                         inset: -6,
-                        background: `conic-gradient(${confirmed ? '#22c55e' : '#689AC9'} ${progress * 3.6}deg, transparent 0deg)`,
+                        background: `conic-gradient(${confirmed ? '#22c55e' : '#689AC9'} ${ring * 360}deg, transparent 0deg)`,
                         WebkitMask:
                             'radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px))',
                         mask: 'radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px))',
@@ -201,6 +146,7 @@ export function HoldCorner({
             <span className="text-[10px] font-bold uppercase leading-none z-10">
                 {corner.id === CENTER ? 'CTR' : corner.id}
             </span>
+            {hintNode}
         </button>
     );
 }
