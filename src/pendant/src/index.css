@@ -144,6 +144,18 @@
     animation: pulse-alarm 1s ease-in-out infinite;
 }
 
+/* Carve visualizer state glow: breathes between a dimmer and full glow so it
+   never fully disappears (the colour itself comes from the overlay's classes). */
+@keyframes viz-glow {
+    0%,
+    100% {
+        opacity: 0.55;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
 @keyframes border-march {
     0%,
     100% {

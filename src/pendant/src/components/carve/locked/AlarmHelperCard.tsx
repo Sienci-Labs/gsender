@@ -31,11 +31,16 @@ function AlarmMessage({ message }: { message: NormalizedHelperMessage }) {
             {message.steps && message.steps.length > 0 && (
                 <StepsList steps={message.steps} />
             )}
-            {message.resource && (
-                <ResourceBlock resource={message.resource} variant="row" />
-            )}
         </>
     );
+}
+
+/** The alarm's guide (QR + Open guide), shown under the left-column lock
+ * notice so the right-hand card doesn't have to scroll. */
+export function AlarmResource() {
+    const message = useAlarmMessage();
+    if (!message?.resource) return null;
+    return <ResourceBlock resource={message.resource} variant="column" />;
 }
 
 export default function AlarmHelperCard() {

@@ -21,10 +21,6 @@ export const SETUP_TABS = [
 ] as const;
 export type SetupTab = (typeof SETUP_TABS)[number];
 
-const HINTS: Partial<Record<SetupTab, string>> = {
-    File: 'Position, Tools, Prep, Console and Macros stay one tab away, no file required.',
-};
-
 /** The Setup-mode left column. Every body stays mounted (hidden when
  * inactive), as the old drawer did, so state survives tab switches. */
 export default function SetupTabs({
@@ -106,12 +102,6 @@ export default function SetupTabs({
             <div className={cn(body('Macros'), 'overflow-auto')}>
                 <MacrosPanel mode="expanded" />
             </div>
-
-            {HINTS[activeTab] && (
-                <p className="m-0 px-2.5 pb-[9px] text-[10.5px] leading-snug text-content-disabled shrink-0">
-                    {HINTS[activeTab]}
-                </p>
-            )}
         </div>
     );
 }

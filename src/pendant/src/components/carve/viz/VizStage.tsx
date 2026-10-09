@@ -9,13 +9,17 @@ import FileChip from './FileChip';
 import InfoGlass from './InfoGlass';
 import VizJobControls from './VizJobControls';
 
-// Inset ring keyed to the mode; G-code line colours never change with state
+// State glow around the stage, keyed to the mode; G-code line colours never
+// change with state. The mockup's 14px/30% ring disappears against the
+// near-black canvas, so this is a wider glow with a thin inner edge. Run and
+// alarm breathe at the status badge's own pace (2s / 1s).
 const RING: Partial<Record<CarveMode, string>> = {
-    running: 'shadow-state-run/30',
-    holdJob: 'shadow-state-hold/30',
-    holdIdle: 'shadow-state-hold/30',
-    alarm: 'shadow-state-alarm/35',
-    toolchange: 'shadow-state-tool/35',
+    running:
+        'shadow-state-run/45 border-state-run/40 animate-[viz-glow_2s_ease-in-out_infinite]',
+    holdJob: 'shadow-state-hold/45 border-state-hold/40',
+    holdIdle: 'shadow-state-hold/45 border-state-hold/40',
+    alarm: 'shadow-state-alarm/50 border-state-alarm/45 animate-[viz-glow_1s_ease-in-out_infinite]',
+    toolchange: 'shadow-state-tool/50 border-state-tool/45',
 };
 
 export default function VizStage({
@@ -62,7 +66,7 @@ export default function VizStage({
             {ring && (
                 <div
                     className={cn(
-                        'absolute inset-0 pointer-events-none shadow-[inset_0_0_14px_1px_var(--tw-shadow-color)]',
+                        'absolute inset-0 pointer-events-none border shadow-[inset_0_0_28px_2px_var(--tw-shadow-color)] motion-reduce:animate-none',
                         ring,
                     )}
                     aria-hidden

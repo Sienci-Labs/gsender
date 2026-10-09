@@ -6,9 +6,12 @@ import type { ReactNode } from 'react';
 export default function LockedNotice({
     tone,
     children,
+    footer,
 }: {
     tone: 'alarm' | 'hold';
     children: ReactNode;
+    /** Extra content under the reason, e.g. the alarm's guide QR. */
+    footer?: ReactNode;
 }) {
     const Icon = tone === 'alarm' ? TriangleAlert : Pause;
     return (
@@ -25,6 +28,7 @@ export default function LockedNotice({
             <p className="m-0 text-[11px] leading-normal text-content-disabled">
                 {children}
             </p>
+            {footer && <div className="mt-2">{footer}</div>}
         </div>
     );
 }

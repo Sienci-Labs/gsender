@@ -4,16 +4,11 @@ import { runOutline } from 'app/features/JobControl/OutlineButton';
 import StartFromLine from 'app/features/JobControl/StartFromLine';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import type { RootState } from 'app/store/redux';
-import cn from 'classnames';
 import { FileText } from 'lucide-react';
 import { type JSX, type ReactNode, useEffect, useState } from 'react';
-import { canLoadRecent, type FileActions } from '../../../hooks/useFileActions';
-import {
-    formatDay,
-    formatDayTime,
-    formatHMS,
-    formatSize,
-} from '../../../utils/format';
+import type { FileActions } from '../../../hooks/useFileActions';
+import { formatDayTime, formatHMS, formatSize } from '../../../utils/format';
+import RecentRow from './RecentRow';
 
 // Same no-op validator JobControls passes ControlButton
 const atcValidator = (): [
@@ -76,8 +71,15 @@ function NoFile({ actions }: { actions: FileActions }) {
                     Load file
                 </button>
             </div>
-            <span className="font-mono text-[9.5px] tracking-[0.08em] uppercase text-content-disabled">
-                Recent files
+            <span className="flex items-baseline justify-between gap-2">
+                <span className="font-mono text-[9.5px] tracking-[0.08em] uppercase text-content-disabled">
+                    Recent files
+                </span>
+                {recentFiles.length > 0 && (
+                    <span className="text-[9px] text-content-disabled">
+                        Hold to load
+                    </span>
+                )}
             </span>
             <div className="flex flex-col gap-1.5 flex-1 min-h-0 overflow-auto">
                 {recentFiles.length === 0 ? (
@@ -85,29 +87,13 @@ function NoFile({ actions }: { actions: FileActions }) {
                         No recent files.
                     </p>
                 ) : (
-                    recentFiles.map((r) => {
-                        const loadable = canLoadRecent(r);
-                        return (
-                            <button
-                                key={`${r.filePath || r.fileName}-${r.timeLoaded}`}
-                                type="button"
-                                disabled={!loadable}
-                                onClick={() => handleRecentLoad(r)}
-                                className={cn(
-                                    'flex items-center gap-2 px-[9px] py-[7px] rounded-md border border-outline-subtle bg-surface-raised text-left',
-                                    !loadable && 'opacity-50',
-                                )}
-                            >
-                                <span className="flex-1 min-w-0 font-mono text-[10.5px] text-content-primary truncate">
-                                    {r.fileName}
-                                </span>
-                                <span className="shrink-0 font-mono text-[9px] text-content-muted">
-                                    {formatSize(r.fileSize)} ·{' '}
-                                    {formatDay(r.timeLoaded)}
-                                </span>
-                            </button>
-                        );
-                    })
+                    recentFiles.map((r) => (
+                        <RecentRow
+                            key={`${r.filePath || r.fileName}-${r.timeLoaded}`}
+                            file={r}
+                            onLoad={handleRecentLoad}
+                        />
+                    ))
                 )}
             </div>
         </>

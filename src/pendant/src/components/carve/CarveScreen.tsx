@@ -6,7 +6,7 @@ import { GCODE_ACCEPT, useFileActions } from '../../hooks/useFileActions';
 import { useAlarmMessage } from '../../hooks/useAlarmMessage';
 import { isHomingAlarm } from './carveMode';
 import type { CarveMode } from './carveMode';
-import AlarmHelperCard from './locked/AlarmHelperCard';
+import AlarmHelperCard, { AlarmResource } from './locked/AlarmHelperCard';
 import HoldCard from './locked/HoldCard';
 import LockedNotice from './locked/LockedNotice';
 import RunLeft from './run/RunLeft';
@@ -108,7 +108,7 @@ export default function CarveScreen({ mode }: { mode: CarveMode }) {
                     </div>
                     {isRun && <RunLeft />}
                     {mode === 'alarm' && (
-                        <LockedNotice tone="alarm">
+                        <LockedNotice tone="alarm" footer={<AlarmResource />}>
                             <AlarmReason />
                         </LockedNotice>
                     )}
