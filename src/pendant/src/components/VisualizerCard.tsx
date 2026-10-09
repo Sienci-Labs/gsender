@@ -21,7 +21,7 @@ import WorkspaceSelector from './WorkspaceSelector';
 // 'toolpath:progress' pubsub event the desktop Visualizer's Loading.tsx
 // subscribes to (gcodeProcessing.ts already publishes it correctly). Mounted
 // only while a file is processing, so it starts fresh at 0 for each load.
-function LiveFileLoadingOverlay({ fileName }: { fileName: string }) {
+export function LiveFileLoadingOverlay({ fileName }: { fileName: string }) {
     const [progress, setProgress] = useState(0);
 
     useEffect(() => {

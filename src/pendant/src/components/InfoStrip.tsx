@@ -2,30 +2,10 @@ import { GRBLHAL } from 'app/constants';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import type { RootState } from 'app/store/redux';
 import cx from 'classnames';
-import { useEffect, useState } from 'react';
+import { useClock } from '../hooks/useClock';
 
 function Clock() {
-    const [time, setTime] = useState(() =>
-        new Date().toLocaleTimeString('en-US', {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false,
-        }),
-    );
-    useEffect(() => {
-        const id = setInterval(() => {
-            setTime(
-                new Date().toLocaleTimeString('en-US', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                    hour12: false,
-                }),
-            );
-        }, 1000);
-        return () => clearInterval(id);
-    }, []);
+    const time = useClock();
     return <span>{time}</span>;
 }
 

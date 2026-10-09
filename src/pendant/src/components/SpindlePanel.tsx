@@ -37,7 +37,14 @@ import {
     Timer,
 } from 'lucide-react';
 import pubsub from 'pubsub-js';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+    type ReactNode,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 import { useDispatch } from 'react-redux';
 import Select from 'react-select';
 
@@ -54,8 +61,34 @@ interface SpindleState {
     spindleMin: number;
 }
 
+/** What a custom card needs to drive the spindle/laser with this panel's
+ * own handlers (used by the carve screen's Prep tab). */
+export interface SpindleCardApi {
+    isConnected: boolean;
+    isLaserMode: boolean;
+    clickable: boolean;
+    laserIsOn: boolean;
+    spindleForward: boolean;
+    spindleReverse: boolean;
+    spindleSpeed: number;
+    laserPower: number;
+    hasSpindles: boolean;
+    spindleCount: number;
+    spindleOptions: { label: string; value: string }[];
+    selectedOption: { label: string; value: string } | null;
+    selectStyles: Record<string, unknown>;
+    sendM3: () => void;
+    sendM4: () => void;
+    sendM5: () => void;
+    sendLaserM3: () => void;
+    handleModeToggle: () => void;
+    handleHALSpindleSelect: (value: string) => void;
+}
+
 interface Props {
     mode: DrawerMode;
+    /** Replaces the panel's own layout; defaults to the drawer panel. */
+    renderCard?: (api: SpindleCardApi) => ReactNode;
 }
 
 // ── SpindleButton ──────────────────────────────────────────────────────────────
@@ -125,7 +158,7 @@ function SpindleButton({
 
 // ── SpindlePanel ───────────────────────────────────────────────────────────────
 
-export default function SpindlePanel({ mode }: Props) {
+export default function SpindlePanel({ mode, renderCard }: Props) {
     const dispatch = useDispatch();
     const config = new WidgetConfig('spindle');
 
@@ -715,6 +748,34 @@ export default function SpindlePanel({ mode }: Props) {
         }),
         indicatorSeparator: () => ({ display: 'none' }),
     };
+
+    if (renderCard) {
+        return (
+            <>
+                {renderCard({
+                    isConnected,
+                    isLaserMode,
+                    clickable,
+                    laserIsOn,
+                    spindleForward,
+                    spindleReverse,
+                    spindleSpeed: state.spindleSpeed,
+                    laserPower: state.laser.power,
+                    hasSpindles,
+                    spindleCount: enabledSpindles.length,
+                    spindleOptions,
+                    selectedOption,
+                    selectStyles,
+                    sendM3: actions.sendM3,
+                    sendM4: actions.sendM4,
+                    sendM5: actions.sendM5,
+                    sendLaserM3: actions.sendLaserM3,
+                    handleModeToggle: actions.handleModeToggle,
+                    handleHALSpindleSelect: actions.handleHALSpindleSelect,
+                })}
+            </>
+        );
+    }
 
     return (
         <div

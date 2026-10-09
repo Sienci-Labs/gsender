@@ -13,7 +13,6 @@ import {
 } from 'app/constants';
 import { cancelJog } from 'app/features/Jogging/utils/Jogging';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import controller from 'app/lib/controller';
 import type { RootState } from 'app/store/redux';
 import {
     Circle,
@@ -35,6 +34,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLongPress } from 'use-long-press';
 import iconRound from '../assets/icon-round.png';
 import { isElectron, quitApp } from '../electron-bridge';
+import { useUnlock } from '../hooks/useUnlock';
 import ConnectionWidget from './ConnectionWidget';
 
 interface StateColors {
@@ -391,11 +391,8 @@ export default function PendantTopBar() {
     const controllerType = useTypedSelector(
         (s: RootState) => s.controller.type,
     );
-    const rawState = useTypedSelector(
-        (s: RootState) => s.controller.state,
-    ) as any;
-    const activeState: string = rawState?.status?.activeState ?? '';
-    const alarmCode: string | number = rawState?.status?.alarmCode ?? 0;
+    const { activeState, alarmCode, unlockActionable, handleUnlock } =
+        useUnlock();
     const badge = !isConnected
         ? BADGE_DISCONNECTED
         : (STATE_BADGES[activeState] ?? BADGE_DEFAULT);
@@ -410,34 +407,6 @@ export default function PendantTopBar() {
     const badgeLabel = showAlarmCode
         ? `${badge.label} ${alarmCode}`
         : badge.label;
-    const unlockActionable =
-        isConnected &&
-        (activeState === GRBL_ACTIVE_STATE_HOLD ||
-            activeState === GRBL_ACTIVE_STATE_ALARM);
-    const handleUnlock = () => {
-        if (!isConnected) return;
-
-        if (activeState === GRBL_ACTIVE_STATE_ALARM) {
-            if (
-                alarmCode === 1 ||
-                alarmCode === 2 ||
-                alarmCode === 10 ||
-                alarmCode === 14 ||
-                alarmCode === 17
-            ) {
-                controller.command('reset:limit');
-            } else if (alarmCode === 11 || alarmCode === 'Homing') {
-                controller.command('homing');
-            } else {
-                controller.command('unlock');
-            }
-            return;
-        }
-
-        if (activeState === GRBL_ACTIVE_STATE_HOLD) {
-            controller.command('cyclestart');
-        }
-    };
     const handleEStop = () => {
         if (!isConnected) return;
         cancelJog(activeState, controllerType);

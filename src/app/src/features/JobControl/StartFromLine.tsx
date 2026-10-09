@@ -20,7 +20,7 @@ import { type RootState, store as reduxStore } from 'app/store/redux';
 import { updateJobOverrides } from 'app/store/redux/slices/visualizer.slice';
 import cx from 'classnames';
 import pubsub from 'pubsub-js';
-import { type JSX, useEffect, useState } from 'react';
+import { type JSX, type ReactNode, useEffect, useState } from 'react';
 import { FaPlay } from 'react-icons/fa';
 import { MdFormatListNumbered } from 'react-icons/md';
 import { useSelector } from 'react-redux';
@@ -28,6 +28,10 @@ import { useSelector } from 'react-redux';
 type StartFromLineProps = {
     disabled: boolean;
     lastLine: number;
+    /** Line the resume field starts on; defaults to 10 before lastLine. */
+    initialStartLine?: number;
+    /** Replaces the Start From button; receives the modal opener. */
+    renderTrigger?: (open: () => void) => ReactNode;
     atcValidator?: () => [
         boolean,
         {
@@ -41,6 +45,8 @@ type StartFromLineProps = {
 const StartFromLine = ({
     disabled,
     lastLine,
+    initialStartLine,
+    renderTrigger,
     atcValidator,
 }: StartFromLineProps) => {
     const posthog = usePostHog();
@@ -63,7 +69,8 @@ const StartFromLine = ({
         showModal: false,
         needsRecovery: false,
         value: lastLine,
-        startFromLine: lastLine - 10 >= 0 ? lastLine - 10 : 0,
+        startFromLine:
+            initialStartLine ?? (lastLine - 10 >= 0 ? lastLine - 10 : 0),
         waitForHoming: false,
         useDefaultSafe: safeRetractHeight === 0,
         safeHeight: calculateSafeHeight(),
@@ -112,34 +119,41 @@ const StartFromLine = ({
         });
     };
 
+    const openModal = () => {
+        const [invalidATC, payload] = atcValidator();
+        if (invalidATC) {
+            if (payload.type === 'error') {
+                pubsub.publish('atc_validator', payload);
+                return;
+            }
+        }
+
+        setState((prev) => ({ ...prev, showModal: true }));
+    };
+
     return (
         <>
-            <ShadButton
-                disabled={disabled}
-                variant="ghost"
-                className={cx(
-                    'rounded-[0.2rem] border-solid border-2 text-base px-2',
-                    {
-                        'border-blue-400 bg-white text-blue-600 dark:bg-surface-raised dark:text-content-secondary [box-shadow:_2px_2px_5px_0px_var(--tw-shadow-color)] shadow-gray-400':
-                            !disabled,
-                        'border-gray-500 bg-gray-400 dark:bg-surface-raised dark:text-content-muted':
-                            disabled,
-                    },
-                )}
-                onClick={() => {
-                    const [invalidATC, payload] = atcValidator();
-                    if (invalidATC) {
-                        if (payload.type === 'error') {
-                            pubsub.publish('atc_validator', payload);
-                            return;
-                        }
-                    }
-
-                    setState((prev) => ({ ...prev, showModal: true }));
-                }}
-            >
-                <MdFormatListNumbered className="text-2xl mr-1" /> Start From
-            </ShadButton>
+            {renderTrigger ? (
+                renderTrigger(openModal)
+            ) : (
+                <ShadButton
+                    disabled={disabled}
+                    variant="ghost"
+                    className={cx(
+                        'rounded-[0.2rem] border-solid border-2 text-base px-2',
+                        {
+                            'border-blue-400 bg-white text-blue-600 dark:bg-surface-raised dark:text-content-secondary [box-shadow:_2px_2px_5px_0px_var(--tw-shadow-color)] shadow-gray-400':
+                                !disabled,
+                            'border-gray-500 bg-gray-400 dark:bg-surface-raised dark:text-content-muted':
+                                disabled,
+                        },
+                    )}
+                    onClick={openModal}
+                >
+                    <MdFormatListNumbered className="text-2xl mr-1" /> Start
+                    From
+                </ShadButton>
+            )}
             <Dialog
                 open={state.showModal}
                 onOpenChange={() => {

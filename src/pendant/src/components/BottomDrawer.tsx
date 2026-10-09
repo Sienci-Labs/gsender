@@ -3,8 +3,6 @@ import GcodeEditor from 'app/features/Visualizer/GcodeEditor';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import type { RootState } from 'app/store/redux';
-import { store as reduxStore } from 'app/store/redux';
-import { unloadFileInfo } from 'app/store/redux/slices/fileInfo.slice';
 import {
     ChevronsUp,
     ChevronUp,
@@ -17,14 +15,8 @@ import {
     X,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import {
-    GcodeFilePayload,
-    isElectron,
-    pickGcodeFile,
-    readGcodeFile,
-} from '../electron-bridge';
-import { applyGcodeFile } from '../utils/fileLoader';
-import { cancelGcodeProcessing } from '../utils/gcodeProcessing';
+import { useFileActions } from '../hooks/useFileActions';
+import { formatHMS, formatSize } from '../utils/format';
 import ATCPanel from './ATCPanel';
 import CoolantPanel from './CoolantPanel';
 import MacrosPanel from './MacrosPanel';
@@ -44,29 +36,6 @@ const ALL_TABS = [
 ] as const;
 type DrawerTab = (typeof ALL_TABS)[number];
 type DrawerMode = 'closed' | 'minimal' | 'expanded';
-type RecentFile = {
-    fileName: string;
-    fileSize: number;
-    timeLoaded: number;
-    filePath?: string;
-};
-
-const RECENT_KEY = 'pendant-recent-files';
-
-const formatSize = (b: number) =>
-    b < 1024
-        ? `${b} B`
-        : b < 1048576
-          ? `${(b / 1024).toFixed(0)} KB`
-          : `${(b / 1048576).toFixed(1)} MB`;
-
-const formatHMS = (s: number) => {
-    if (!s) return '—';
-    const h = Math.floor(s / 3600);
-    const m = Math.floor((s % 3600) / 60);
-    const sec = Math.floor(s % 60);
-    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
-};
 
 // Compute bounding box from raw G-code by scanning X/Y/Z coordinates in motion lines
 
@@ -78,29 +47,20 @@ const formatAgo = (ts: number | null) => {
     return `${Math.floor(mins / 60)}h ago`;
 };
 
-const readRecentFiles = (): RecentFile[] => {
-    const raw = JSON.parse(
-        localStorage.getItem(RECENT_KEY) ?? '[]',
-    ) as Partial<RecentFile>[];
-    return raw
-        .map((entry) => ({
-            fileName: entry.fileName ?? '',
-            fileSize: Number(entry.fileSize) || 0,
-            timeLoaded: Number(entry.timeLoaded) || 0,
-            filePath: entry.filePath || '',
-        }))
-        .slice(0, 5);
-};
-
 export default function BottomDrawer() {
     const HEADER_HEIGHT_REM = 3.5;
     const DOUBLE_TAP_MS = 260;
     const [mode, setMode] = useState<DrawerMode>('closed');
     const [activeTab, setActiveTab] = useState<DrawerTab>('File');
-    const [recentFiles, setRecentFiles] = useState<RecentFile[]>([]);
-    const [loadedAt, setLoadedAt] = useState<number | null>(null);
-
-    const fileInputRef = useRef<HTMLInputElement>(null);
+    const {
+        recentFiles,
+        loadedAt,
+        fileInputRef,
+        handleLoadClick,
+        handleUnload,
+        handleFileChange,
+        handleRecentLoad,
+    } = useFileActions();
     const tapTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const lastTapRef = useRef(0);
     const file = useTypedSelector((s: RootState) => s.file);
@@ -125,12 +85,6 @@ export default function BottomDrawer() {
         }
     }, [coolantFunctions, atcEnabledOrCompiled, activeTab]);
 
-    useEffect(() => {
-        const normalized = readRecentFiles();
-        localStorage.setItem(RECENT_KEY, JSON.stringify(normalized));
-        setRecentFiles(normalized);
-    }, []);
-
     useEffect(
         () => () => {
             if (tapTimeoutRef.current) {
@@ -139,88 +93,6 @@ export default function BottomDrawer() {
         },
         [],
     );
-
-    const saveRecentEntry = (entry: RecentFile) => {
-        const stored = readRecentFiles();
-        const entryKey = entry.filePath?.trim()
-            ? `path:${entry.filePath}`
-            : `name:${entry.fileName}`;
-        const updated = [
-            entry,
-            ...stored.filter((r) => {
-                const existingKey = r.filePath?.trim()
-                    ? `path:${r.filePath}`
-                    : `name:${r.fileName}`;
-                return existingKey !== entryKey;
-            }),
-        ].slice(0, 5);
-
-        localStorage.setItem(RECENT_KEY, JSON.stringify(updated));
-        setRecentFiles(updated);
-    };
-
-    const applyLoadedFile = (payload: GcodeFilePayload) => {
-        applyGcodeFile(payload);
-        const timeLoaded = Date.now();
-        setLoadedAt(timeLoaded);
-        saveRecentEntry({
-            fileName: payload.name,
-            fileSize: payload.size,
-            timeLoaded,
-            filePath: payload.path,
-        });
-    };
-
-    const handleLoadClick = async () => {
-        if (!isElectron()) {
-            fileInputRef.current?.click();
-            return;
-        }
-
-        try {
-            const picked = await pickGcodeFile();
-            if (!picked) return;
-            applyLoadedFile(picked);
-        } catch (_error) {
-            // no-op: picker cancelled/failed
-        }
-    };
-
-    const handleUnload = () => {
-        cancelGcodeProcessing();
-        reduxStore.dispatch(unloadFileInfo());
-        setLoadedAt(null);
-    };
-
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const f = e.target.files?.[0];
-        if (!f) return;
-        e.target.value = '';
-
-        const content = await f.text();
-        applyLoadedFile({
-            name: f.name,
-            size: f.size,
-            content,
-            path: String((f as any).path || ''),
-        });
-    };
-
-    const handleRecentLoad = async (recentFile: RecentFile) => {
-        if (!recentFile.filePath) return;
-
-        if (isElectron()) {
-            try {
-                const loaded = await readGcodeFile(recentFile.filePath);
-                if (loaded) {
-                    applyLoadedFile(loaded);
-                }
-            } catch (_error) {
-                // no-op: file missing/unreadable
-            }
-            return;
-        }
-    };
 
     // Bounds from bbox.delta (populated when server parses; zeros when offline)
     const { delta } = file.bbox ?? { delta: { x: 0, y: 0, z: 0 } };

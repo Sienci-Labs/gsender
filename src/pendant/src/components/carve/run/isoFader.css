@@ -1,0 +1,244 @@
+/* ISO fader: the "Feed & spindle override" design's variant A, scaled to a
+   164px card. The one carve-screen element drawn at full fidelity, so it keeps
+   the mockup's literal values (CARVE_REDESIGN_SPEC.md §6.4) instead of tokens. */
+
+.ovr-card {
+    width: 164px;
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    padding: 13px 11px;
+    border-radius: 16px;
+    background: #1b222b;
+    border: 1px solid #2c3540;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.04),
+        0 14px 30px rgba(0, 0, 0, 0.4);
+}
+.ovr-card.is-disabled {
+    opacity: 0.55;
+}
+.ovr-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.ovr-chip {
+    width: 27px;
+    height: 27px;
+    flex: 0 0 auto;
+    border-radius: 7px;
+    border: 3px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-weight: 700;
+    font-size: 13.5px;
+}
+.ovr-chip.feed {
+    color: #5291cd;
+    border-color: #3f85c7;
+}
+.ovr-chip.spindle {
+    color: #1ea178;
+    border-color: #059669;
+}
+.ovr-chip.laser {
+    color: #9a94df;
+    border-color: #5c52cb;
+}
+.ovr-head-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+.ovr-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #f4f7fa;
+}
+.ovr-range {
+    font-size: 8px;
+    color: #a0aaba;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.ovr-zone {
+    position: relative;
+    height: 168px;
+    display: flex;
+    justify-content: center;
+    gap: 9px;
+    touch-action: none;
+    cursor: ns-resize;
+}
+.ovr-card.is-disabled .ovr-zone {
+    cursor: default;
+}
+.ovr-segs {
+    position: relative;
+    width: 18px;
+    height: 100%;
+}
+.ovr-segs-inner {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 13px;
+    bottom: 13px;
+}
+.ovr-seg {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 4px;
+    border-radius: 1px;
+    transform: translateY(50%);
+}
+.ovr-seg.feed.dim {
+    background: rgba(63, 133, 199, 0.18);
+}
+.ovr-seg.feed.filled {
+    background: #3f85c7;
+}
+.ovr-seg.feed.current {
+    background: #3f85c7;
+    box-shadow: 0 0 9px rgba(63, 133, 199, 0.6);
+}
+.ovr-seg.spindle.dim {
+    background: rgba(5, 150, 105, 0.18);
+}
+.ovr-seg.spindle.filled {
+    background: #059669;
+}
+.ovr-seg.spindle.current {
+    background: #059669;
+    box-shadow: 0 0 9px rgba(5, 150, 105, 0.6);
+}
+.ovr-seg.laser.dim {
+    background: rgba(92, 82, 203, 0.2);
+}
+.ovr-seg.laser.filled {
+    background: #5c52cb;
+}
+.ovr-seg.laser.current {
+    background: #5c52cb;
+    box-shadow: 0 0 9px rgba(92, 82, 203, 0.65);
+}
+.ovr-channel {
+    position: relative;
+    width: 42px;
+    height: 100%;
+    border-radius: 21px;
+    background: #090d12;
+    border: 1px solid #2c3540;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.7);
+}
+.ovr-centerline {
+    position: absolute;
+    left: 50%;
+    top: 13px;
+    bottom: 13px;
+    width: 1px;
+    background: #3f4b59;
+    transform: translateX(-50%);
+}
+.ovr-thumb-wrap {
+    position: absolute;
+    left: -7px;
+    right: -7px;
+    top: 13px;
+    bottom: 13px;
+}
+.ovr-thumb {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 32px;
+    transform: translateY(50%);
+    box-sizing: border-box;
+    border-radius: 9px;
+    background: linear-gradient(#3a4857, #2d3946);
+    border: 1px solid #59687b;
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+}
+.ovr-grip {
+    width: 20px;
+    height: 1.5px;
+    background: #72849d;
+}
+.ovr-grip.accent {
+    height: 2px;
+    border-radius: 1px;
+}
+.ovr-grip.accent.feed {
+    background: #3f85c7;
+    box-shadow: 0 0 6px rgba(63, 133, 199, 0.6);
+}
+.ovr-grip.accent.spindle {
+    background: #059669;
+    box-shadow: 0 0 6px rgba(5, 150, 105, 0.6);
+}
+.ovr-grip.accent.laser {
+    background: #5c52cb;
+    box-shadow: 0 0 6px rgba(92, 82, 203, 0.65);
+}
+.ovr-readout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+.ovr-big {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-weight: 700;
+    font-size: 21px;
+    letter-spacing: 0.5px;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+.ovr-big.feed {
+    color: #5291cd;
+}
+.ovr-big.spindle {
+    color: #1ea178;
+}
+.ovr-big.laser {
+    color: #9a94df;
+}
+.ovr-sub {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 9.5px;
+    color: #a0aaba;
+}
+.ovr-reset {
+    height: 30px;
+    flex: 0 0 auto;
+    border-radius: 8px;
+    border: 2px solid #72849d;
+    color: #f4f7fa;
+    background: transparent;
+    font:
+        600 10px "IBM Plex Sans",
+        system-ui,
+        sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+.ovr-reset:active:not(:disabled) {
+    background: rgba(255, 255, 255, 0.06);
+}
+.ovr-reset:disabled {
+    opacity: 0.5;
+}

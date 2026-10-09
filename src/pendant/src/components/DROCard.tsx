@@ -1,10 +1,4 @@
 import {
-    GRBL_ACTIVE_STATE_ALARM,
-    GRBL_ACTIVE_STATE_IDLE,
-    GRBL_ACTIVE_STATE_JOG,
-    WORKFLOW_STATE_RUNNING,
-} from 'app/constants';
-import {
     gotoZero,
     goXYAxes,
     homeMachine,
@@ -14,9 +8,9 @@ import {
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import type { RootState } from 'app/store/redux';
 import cn from 'classnames';
-import get from 'lodash/get';
 import { Crosshair, Home, Target } from 'lucide-react';
 import { useState } from 'react';
+import { useDroGating } from '../hooks/useDroGating';
 
 const AXES = [
     {
@@ -44,19 +38,7 @@ function formatAxisValue(value: unknown): string {
 
 export default function DROCard() {
     const [mode, setMode] = useState<'work' | 'machine'>('work');
-    const isConnected = useTypedSelector(
-        (s: RootState) => s.connection.isConnected,
-    );
-    const workflowState = useTypedSelector(
-        (s: RootState) => s.controller.workflow.state,
-    );
-    const activeState = useTypedSelector(
-        (s: RootState) => s.controller.state.status?.activeState ?? '',
-    );
-    const homingEnabled = useTypedSelector(
-        (s: RootState) =>
-            Number(get(s, 'controller.settings.settings.$22', 0)) > 0,
-    );
+    const { isConnected, canZero, canGoTo, canHome } = useDroGating();
     const wpos = useTypedSelector((s: RootState) => s.controller.wpos);
     const mpos = useTypedSelector((s: RootState) => s.controller.mpos);
     const activePos = !isConnected
@@ -64,19 +46,6 @@ export default function DROCard() {
         : mode === 'machine'
           ? mpos
           : wpos;
-    const alarmCode = useTypedSelector(
-        (s: RootState) => s.controller.state.status?.alarmCode ?? 0,
-    ) as string | number;
-    const isHomingAlarm =
-        activeState === GRBL_ACTIVE_STATE_ALARM &&
-        (alarmCode === 11 || alarmCode === 'Homing');
-    const canZero =
-        isConnected &&
-        workflowState !== WORKFLOW_STATE_RUNNING &&
-        (activeState === GRBL_ACTIVE_STATE_IDLE ||
-            activeState === GRBL_ACTIVE_STATE_JOG);
-    const canGoTo = canZero;
-    const canHome = (canGoTo && homingEnabled) || isHomingAlarm;
 
     return (
         <div className="rounded-xl bg-white border border-gray-300 dark:bg-surface-raised dark:border-outline p-2 flex flex-col gap-2">

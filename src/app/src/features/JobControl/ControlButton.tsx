@@ -50,6 +50,10 @@ interface ControlButtonProps {
         },
     ];
     onStop: () => void;
+    /** Pendant carve screen look; the default is the desktop button. */
+    variant?: 'default' | 'pendantCompact';
+    /** Replaces the Start/Pause/Stop label (e.g. "Resume"). */
+    labelOverride?: string;
 }
 
 interface Message {
@@ -72,6 +76,8 @@ const ControlButton: React.FC<ControlButtonProps> = ({
     fileLoaded,
     onStop,
     validateATC,
+    variant = 'default',
+    labelOverride,
 }) => {
     const posthog = usePostHog();
     const [isRunningSDFile, setIsRunningSDFile] = useState<boolean>(false);
@@ -348,11 +354,43 @@ const ControlButton: React.FC<ControlButtonProps> = ({
         STOP: <FiOctagon className="text-3xl" />,
     };
 
+    const compactIcons: Icons = {
+        START: <IoPlayOutline className="text-sm" />,
+        PAUSE: <PiPause className="text-sm" />,
+        STOP: <FiOctagon className="text-sm" />,
+    };
+
     const onClick: OnClick = {
         START: handleRun,
         PAUSE: handlePause,
         STOP: handleStop,
     };
+
+    if (variant === 'pendantCompact') {
+        return (
+            <button
+                type="button"
+                className={cx(
+                    'flex items-center justify-center gap-1.5 w-[74px] h-[38px] shrink-0 rounded-md border border-black/30 shadow-[0_1px_2px_rgba(0,0,0,0.4)] font-mono text-[10.5px] font-bold uppercase tracking-[0.05em] transition-colors',
+                    {
+                        'bg-surface-raised text-content-disabled cursor-not-allowed':
+                            disabled,
+                        'bg-state-run text-white': !disabled && type === START,
+                        'bg-state-pause text-white':
+                            !disabled && type === PAUSE,
+                        'bg-action-stop text-white': !disabled && type === STOP,
+                    },
+                )}
+                onClick={() => {
+                    onClick[type]();
+                }}
+                disabled={disabled}
+            >
+                {compactIcons[type]}
+                <span>{labelOverride ?? message[type]}</span>
+            </button>
+        );
+    }
 
     return (
         <div className="flex justify-center items-center">
@@ -379,7 +417,7 @@ const ControlButton: React.FC<ControlButtonProps> = ({
                 disabled={disabled}
             >
                 {icons[type]}
-                {message[type]}
+                {labelOverride ?? message[type]}
             </button>
         </div>
     );

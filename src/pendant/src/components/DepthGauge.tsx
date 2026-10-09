@@ -34,10 +34,16 @@ export default function DepthGauge() {
         const v = Number(_get(s, 'controller.settings.settings.$132'));
         return Number.isFinite(v) ? v : null;
     });
-    const workZ = useTypedSelector((s: RootState) => round2(s.controller.wpos?.z));
-    const wcoZ = useTypedSelector((s: RootState) => round2(s.controller.wco?.z));
+    const workZ = useTypedSelector((s: RootState) =>
+        round2(s.controller.wpos?.z),
+    );
+    const wcoZ = useTypedSelector((s: RootState) =>
+        round2(s.controller.wco?.z),
+    );
     const fileLoaded = useTypedSelector((s: RootState) => s.file.fileLoaded);
-    const jobTop = useTypedSelector((s: RootState) => round2(s.file.bbox?.max?.z));
+    const jobTop = useTypedSelector((s: RootState) =>
+        round2(s.file.bbox?.max?.z),
+    );
     const jobBottom = useTypedSelector((s: RootState) =>
         round2(s.file.bbox?.min?.z),
     );
@@ -73,23 +79,27 @@ export default function DepthGauge() {
             {isConnected && layout && (
                 <>
                     {layout.dimmed && (
-                        <div
-                            className="absolute right-0 top-1.5 text-[11px] leading-4 whitespace-nowrap text-[#4b5563] dark:text-[#a0aaba]"
-                        >
+                        <div className="absolute right-0 top-1.5 text-[11px] leading-4 whitespace-nowrap text-gray-600 dark:text-content-muted">
                             Not homed
                         </div>
                     )}
                     {layout.ends && (
                         <>
                             <div
-                                className="absolute left-6 w-12 text-center text-xs leading-4 text-[#4b5563] dark:text-[#a0aaba]"
-                                style={{ top: px(layout.ends.top.top), fontFamily: MONO }}
+                                className="absolute left-6 w-12 text-center text-xs leading-4 text-gray-600 dark:text-content-muted"
+                                style={{
+                                    top: px(layout.ends.top.top),
+                                    fontFamily: MONO,
+                                }}
                             >
                                 {layout.ends.top.text}
                             </div>
                             <div
-                                className="absolute left-6 w-12 text-center text-xs leading-4 text-[#4b5563] dark:text-[#a0aaba]"
-                                style={{ top: px(layout.ends.bottom.top), fontFamily: MONO }}
+                                className="absolute left-6 w-12 text-center text-xs leading-4 text-gray-600 dark:text-content-muted"
+                                style={{
+                                    top: px(layout.ends.bottom.top),
+                                    fontFamily: MONO,
+                                }}
                             >
                                 {layout.ends.bottom.text}
                             </div>
@@ -97,7 +107,7 @@ export default function DepthGauge() {
                     )}
 
                     <div
-                        className={`absolute left-[46px] w-1 rounded-full bg-[#e5e7eb] dark:bg-[#3f4b59] ${layout.dimmed ? 'opacity-40' : ''}`}
+                        className={`absolute left-[46px] w-1 rounded-full bg-gray-200 dark:bg-outline-subtle ${layout.dimmed ? 'opacity-40' : ''}`}
                         style={{
                             top: px(layout.track.top),
                             height: px(layout.track.height),
@@ -106,7 +116,7 @@ export default function DepthGauge() {
                     {layout.ticks.map((top) => (
                         <div
                             key={top}
-                            className="absolute left-[53px] w-1 h-px bg-[#d1d5db] dark:bg-[#59687b]"
+                            className="absolute left-[53px] w-1 h-px bg-gray-300 dark:bg-outline"
                             style={{ top: px(top) }}
                         />
                     ))}
@@ -114,7 +124,7 @@ export default function DepthGauge() {
                     {layout.job && (
                         <>
                             <div
-                                className="absolute left-[44px] w-2 rounded-full bg-[#3f85c7]"
+                                className="absolute left-[44px] w-2 rounded-full bg-blue-500"
                                 style={{
                                     top: px(layout.job.top),
                                     height: px(layout.job.height),
@@ -122,7 +132,7 @@ export default function DepthGauge() {
                             />
                             {layout.job.topLabel && (
                                 <div
-                                    className="absolute -left-4 w-14 text-right text-xs leading-4 text-[#3978b3] dark:text-[#5291cd]"
+                                    className="absolute -left-4 w-14 text-right text-xs leading-4 text-blue-600 dark:text-blue-400"
                                     style={{
                                         top: px(layout.job.topLabel.top),
                                         fontFamily: MONO,
@@ -133,7 +143,7 @@ export default function DepthGauge() {
                             )}
                             {layout.job.bottomLabel && (
                                 <div
-                                    className="absolute -left-4 w-14 text-right text-xs leading-4 text-[#3978b3] dark:text-[#5291cd]"
+                                    className="absolute -left-4 w-14 text-right text-xs leading-4 text-blue-600 dark:text-blue-400"
                                     style={{
                                         top: px(layout.job.bottomLabel.top),
                                         fontFamily: MONO,
@@ -146,18 +156,18 @@ export default function DepthGauge() {
                     )}
 
                     <div
-                        className="absolute left-[30px] w-[30px] h-0.5 bg-[#111827] dark:bg-[#f4f7fa]"
+                        className="absolute left-[30px] w-[30px] h-0.5 bg-gray-900 dark:bg-content-primary"
                         style={{ top: px(layout.current.line) }}
                     />
                     <div
-                        className="absolute -left-[52px] w-[86px] h-7 flex items-center justify-center gap-1.5 rounded backdrop-blur-md bg-white/35 dark:bg-[rgba(45,57,70,0.24)] shadow-[0_6px_16px_rgba(17,24,39,0.12)] dark:shadow-[0_6px_16px_rgba(0,0,0,0.35)]"
+                        className="absolute -left-[52px] w-[86px] h-7 flex items-center justify-center gap-1.5 rounded backdrop-blur-md bg-white/35 dark:bg-surface-elevated/[0.24] shadow-[0_6px_16px_rgba(17,24,39,0.12)] dark:shadow-[0_6px_16px_rgba(0,0,0,0.35)]"
                         style={{ top: px(layout.current.chip) }}
                     >
-                        <span className="text-[13px] font-bold text-[#3978b3] dark:text-[#5291cd]">
+                        <span className="text-[13px] font-bold text-blue-600 dark:text-blue-400">
                             Z
                         </span>
                         <span
-                            className="text-[15px] font-bold tabular-nums text-[#111827] dark:text-[#f4f7fa] [text-shadow:0_1px_0_rgba(255,255,255,0.8)] dark:[text-shadow:0_1px_2px_rgba(0,0,0,0.6)]"
+                            className="text-[15px] font-bold tabular-nums text-gray-900 dark:text-content-primary [text-shadow:0_1px_0_rgba(255,255,255,0.8)] dark:[text-shadow:0_1px_2px_rgba(0,0,0,0.6)]"
                             style={{ fontFamily: MONO }}
                         >
                             {layout.current.text}
