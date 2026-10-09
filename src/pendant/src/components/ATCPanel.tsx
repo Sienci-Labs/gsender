@@ -243,16 +243,18 @@ function ATCContent({ mode }: { mode: DrawerMode }) {
                 onConfirm={handleConfirmRemap}
             />
 
-            {/* Top row: tool info (flex-1) + Tools button */}
-            <div className="flex gap-3 shrink-0">
-                <div className="flex-1 min-w-0">
+            {/* Top row: tool info + Tools button. When the info would drop
+                below 240px the button wraps under it; the 999:1 grow keeps
+                the button at 12rem on one row and full width when wrapped */}
+            <div className="flex flex-wrap gap-3 shrink-0">
+                <div className="flex-[999_1_240px] min-w-0">
                     <ToolDisplay />
                 </div>
                 <button
                     type="button"
                     onClick={openToolTable}
                     disabled={disabled}
-                    className="w-48 shrink-0 flex flex-col items-center justify-center gap-1.5 rounded-xl border border-gray-300 dark:border-outline bg-gray-50 dark:bg-surface-elevated text-gray-600 dark:text-content-secondary text-xs font-medium disabled:opacity-40 disabled:cursor-default transition-colors hover:bg-gray-100 dark:hover:bg-surface-hover"
+                    className="flex-[1_0_12rem] min-h-[44px] py-2 flex flex-col items-center justify-center gap-1.5 rounded-xl border border-gray-300 dark:border-outline bg-gray-50 dark:bg-surface-elevated text-gray-600 dark:text-content-secondary text-xs font-medium disabled:opacity-40 disabled:cursor-default transition-colors hover:bg-gray-100 dark:hover:bg-surface-hover"
                 >
                     <Table2 className="w-5 h-5" />
                     <span>Tools</span>

@@ -528,9 +528,25 @@ export default function ProbePanel({ mode }: Props) {
         <div className="h-full flex flex-col px-3 py-2 gap-2 min-w-0 min-h-0 justify-center">
             {/* Control rows: flex-1 left section + fixed-width right column */}
             <div className="flex gap-2 shrink-0 min-h-[96px]">
-                {/* Left section: routine selector over the summary, so
+                {/* Left section: summary over the routine selector, so
                     five routines still fit a narrow column */}
                 <div className="flex-1 flex flex-col gap-1.5 min-w-0">
+                    {/* Read-only configuration summary — replaces the old probe block label */}
+                    <div
+                        className={clsx(
+                            'flex-1 min-w-0 flex flex-col justify-center gap-0.5',
+                            isZProbeOnly && 'invisible',
+                        )}
+                    >
+                        <span className="text-[10px] font-medium text-gray-400 dark:text-content-muted uppercase tracking-wide truncate">
+                            Configuration
+                        </span>
+                        <span className="text-xs font-semibold text-gray-700 dark:text-content-secondary truncate">
+                            {formatDiameter(toolDiameter, units, probeType)} ·{' '}
+                            {probeCmd?.id?.split(' ')[0] ?? '—'} ·{' '}
+                            {CORNER_LABELS[direction] ?? 'Unknown'}
+                        </span>
+                    </div>
                     {/* Routine selector */}
                     <div className="flex-1 min-w-0 flex bg-white dark:bg-surface-elevated rounded-lg border border-gray-300 dark:border-outline p-0.5">
                         {availableProbeCommands.map((cmd, i) => (
@@ -550,22 +566,6 @@ export default function ProbePanel({ mode }: Props) {
                                 {cmd.id.split(' ')[0]}
                             </button>
                         ))}
-                    </div>
-                    {/* Read-only configuration summary — replaces the old probe block label */}
-                    <div
-                        className={clsx(
-                            'flex-1 min-w-0 flex flex-col justify-center gap-0.5',
-                            isZProbeOnly && 'invisible',
-                        )}
-                    >
-                        <span className="text-[10px] font-medium text-gray-400 dark:text-content-muted uppercase tracking-wide truncate">
-                            Configuration
-                        </span>
-                        <span className="text-xs font-semibold text-gray-700 dark:text-content-secondary truncate">
-                            {formatDiameter(toolDiameter, units, probeType)} ·{' '}
-                            {probeCmd?.id?.split(' ')[0] ?? '—'} ·{' '}
-                            {CORNER_LABELS[direction] ?? 'Unknown'}
-                        </span>
                     </div>
                 </div>
 

@@ -15,7 +15,7 @@ import {
     X,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { useFileActions } from '../hooks/useFileActions';
+import { canLoadRecent, useFileActions } from '../hooks/useFileActions';
 import { formatHMS, formatSize } from '../utils/format';
 import ATCPanel from './ATCPanel';
 import CoolantPanel from './CoolantPanel';
@@ -367,10 +367,12 @@ export default function BottomDrawer() {
                                                                 )
                                                             }
                                                             disabled={
-                                                                !r.filePath
+                                                                !canLoadRecent(
+                                                                    r,
+                                                                )
                                                             }
                                                             className={`text-xs font-semibold rounded px-3 py-1.5 border transition-colors ${
-                                                                r.filePath
+                                                                canLoadRecent(r)
                                                                     ? 'text-robin-600 dark:text-robin-400 border-robin-300 dark:border-robin-600 hover:bg-robin-50 dark:hover:bg-robin-500/15'
                                                                     : 'text-gray-400 dark:text-content-muted border-gray-200 dark:border-outline cursor-default'
                                                             }`}

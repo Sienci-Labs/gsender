@@ -2,7 +2,10 @@ package org.sienci.gsender.pendant
 
 import android.Manifest
 import android.app.Activity
+import android.app.ActivityManager
+import android.app.admin.DevicePolicyManager
 import android.content.ActivityNotFoundException
+import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
@@ -14,6 +17,7 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsets
+import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.webkit.ConsoleMessage
 import android.webkit.ValueCallback
@@ -78,6 +82,7 @@ class MainActivity : Activity() {
         // A pendant sits beside the machine; don't let the screen sleep on it.
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         applySystemBarInsets(findViewById(R.id.root))
+        enterImmersive()
         // chrome://inspect on debug builds.
         WebView.setWebContentsDebuggingEnabled((applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0)
 
@@ -92,6 +97,19 @@ class MainActivity : Activity() {
     override fun onStart() {
         super.onStart()
         ServerRuntime.observe(observer)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        enterImmersive()
+        startKioskLockIfPermitted()
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        // Dialogs, the file picker and the notification shade all bring the
+        // bars back; hide them again once we have focus
+        if (hasFocus) enterImmersive()
     }
 
     override fun onStop() {
@@ -316,6 +334,52 @@ class MainActivity : Activity() {
     }
 
     // ── Window ─────────────────────────────────────────────────────────────
+
+    /**
+     * Kiosk-style full screen: status and navigation bars hidden, and a swipe
+     * from the edge only shows them briefly over the pendant.
+     */
+    private fun enterImmersive() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.insetsController?.let {
+                it.hide(WindowInsets.Type.systemBars())
+                it.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
+        } else {
+            // No LAYOUT_STABLE: it would keep reporting the hidden bars as
+            // insets, and applySystemBarInsets would pad for them
+            @Suppress("DEPRECATION")
+            window.decorView.systemUiVisibility = (
+                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
+                    View.SYSTEM_UI_FLAG_FULLSCREEN or
+                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                )
+        }
+    }
+
+    /**
+     * Full lock-task kiosk (no Home, Recents or notification shade) only when
+     * this app is the device owner, which lets it allow-list itself and start
+     * silently. Otherwise Android would ask the user to pin the screen every
+     * launch, so ordinary installs skip it. See README "Kiosk mode".
+     */
+    private fun startKioskLockIfPermitted() {
+        val dpm = getSystemService(DevicePolicyManager::class.java) ?: return
+        if (dpm.isDeviceOwnerApp(packageName)) {
+            dpm.setLockTaskPackages(ComponentName(this, KioskAdmin::class.java), arrayOf(packageName))
+        }
+        if (!dpm.isLockTaskPermitted(packageName)) return
+        val am = getSystemService(ActivityManager::class.java)
+        if (am?.lockTaskModeState == ActivityManager.LOCK_TASK_MODE_NONE) {
+            try {
+                startLockTask()
+            } catch (e: IllegalStateException) {
+                Log.w(ServerRuntime.TAG, "startLockTask failed", e)
+            }
+        }
+    }
 
     /** targetSdk 35+ is edge-to-edge: keep content clear of system bars, cutouts and the keyboard. */
     private fun applySystemBarInsets(root: View) {

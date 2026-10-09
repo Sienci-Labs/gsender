@@ -9,12 +9,20 @@ import {
 } from '../electron-bridge';
 import { applyGcodeFile } from '../utils/fileLoader';
 import { cancelGcodeProcessing } from '../utils/gcodeProcessing';
+import {
+    cacheRecentFile,
+    pruneRecentFileCache,
+    readCachedRecentFile,
+    recentCacheKey,
+} from '../utils/recentFileCache';
 
 export type RecentFile = {
     fileName: string;
     fileSize: number;
     timeLoaded: number;
     filePath?: string;
+    /** Key of the page's own copy (recentFileCache), outside Electron. */
+    cacheKey?: string;
 };
 
 export const RECENT_KEY = 'pendant-recent-files';
@@ -31,13 +39,22 @@ export const readRecentFiles = (): RecentFile[] => {
             fileSize: Number(entry.fileSize) || 0,
             timeLoaded: Number(entry.timeLoaded) || 0,
             filePath: entry.filePath || '',
+            cacheKey: entry.cacheKey || '',
         }))
         .slice(0, 5);
 };
 
-/** Whether a recent-file row can be reloaded (same rule as handleRecentLoad). */
+/** Whether a recent-file row can be reloaded (same rule as handleRecentLoad):
+ * Electron rereads the path, anywhere else needs the page's own copy. */
 export const canLoadRecent = (recentFile: RecentFile) =>
-    !!recentFile.filePath && isElectron();
+    isElectron() ? !!recentFile.filePath : !!recentFile.cacheKey;
+
+const entryKey = (r: RecentFile) =>
+    r.filePath?.trim()
+        ? `path:${r.filePath}`
+        : r.cacheKey
+          ? `cache:${r.cacheKey}`
+          : `name:${r.fileName}`;
 
 /**
  * File open / close / recent-files logic from the pendant's File drawer.
@@ -57,24 +74,22 @@ export function useFileActions() {
 
     const saveRecentEntry = (entry: RecentFile) => {
         const stored = readRecentFiles();
-        const entryKey = entry.filePath?.trim()
-            ? `path:${entry.filePath}`
-            : `name:${entry.fileName}`;
+        const key = entryKey(entry);
         const updated = [
             entry,
-            ...stored.filter((r) => {
-                const existingKey = r.filePath?.trim()
-                    ? `path:${r.filePath}`
-                    : `name:${r.fileName}`;
-                return existingKey !== entryKey;
-            }),
+            ...stored.filter((r) => entryKey(r) !== key),
         ].slice(0, 5);
 
         localStorage.setItem(RECENT_KEY, JSON.stringify(updated));
         setRecentFiles(updated);
+        if (!isElectron()) {
+            pruneRecentFileCache(
+                updated.map((r) => r.cacheKey || '').filter(Boolean),
+            );
+        }
     };
 
-    const applyLoadedFile = (payload: GcodeFilePayload) => {
+    const applyLoadedFile = (payload: GcodeFilePayload, cacheKey = '') => {
         applyGcodeFile(payload);
         const timeLoaded = Date.now();
         setLoadedAt(timeLoaded);
@@ -83,6 +98,7 @@ export function useFileActions() {
             fileSize: payload.size,
             timeLoaded,
             filePath: payload.path,
+            cacheKey,
         });
     };
 
@@ -109,12 +125,15 @@ export function useFileActions() {
 
     const applyBrowserFile = async (f: File) => {
         const content = await f.text();
-        applyLoadedFile({
-            name: f.name,
-            size: f.size,
-            content,
-            path: String((f as any).path || ''),
-        });
+        const path = String((f as any).path || '');
+        // A picked file has no path to reread outside Electron, so keep a
+        // copy for the recent list (skipped for very large files)
+        let cacheKey = '';
+        if (!isElectron()) {
+            const key = recentCacheKey(f.name, f.size, f.lastModified);
+            if (await cacheRecentFile(key, content)) cacheKey = key;
+        }
+        applyLoadedFile({ name: f.name, size: f.size, content, path }, cacheKey);
     };
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -125,18 +144,35 @@ export function useFileActions() {
     };
 
     const handleRecentLoad = async (recentFile: RecentFile) => {
-        if (!recentFile.filePath) return;
-
-        if (isElectron()) {
-            try {
-                const loaded = await readGcodeFile(recentFile.filePath);
-                if (loaded) {
-                    applyLoadedFile(loaded);
-                }
-            } catch (_error) {
-                // no-op: file missing/unreadable
+        if (!isElectron()) {
+            const key = recentFile.cacheKey;
+            if (!key) return;
+            const content = await readCachedRecentFile(key);
+            if (content === null) {
+                // Copy gone (storage cleared): the row can't reload any more
+                saveRecentEntry({ ...recentFile, cacheKey: '' });
+                return;
             }
+            applyLoadedFile(
+                {
+                    name: recentFile.fileName,
+                    size: recentFile.fileSize,
+                    content,
+                    path: '',
+                },
+                key,
+            );
             return;
+        }
+
+        if (!recentFile.filePath) return;
+        try {
+            const loaded = await readGcodeFile(recentFile.filePath);
+            if (loaded) {
+                applyLoadedFile(loaded);
+            }
+        } catch (_error) {
+            // no-op: file missing/unreadable
         }
     };
 

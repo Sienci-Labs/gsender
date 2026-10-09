@@ -339,9 +339,6 @@ export default function PrepTab() {
                     {coolantFunctions && <CoolantRow laser={isLaserMode} />}
                 </div>
                 <div className="prep-ovr">
-                    <p className="m-0 mt-0.5 mb-px font-mono text-[9.5px] tracking-[0.08em] uppercase text-content-disabled">
-                        Overrides
-                    </p>
                     <OverrideFaders />
                 </div>
             </div>

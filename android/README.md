@@ -84,6 +84,17 @@ Moving to prebuilt GitHub Release assets later would remove the eviction rebuild
 
 `patch-node-source.sh` carries two patches that Node's Android cross-compile needs; each one fails loudly if it stops applying. The binary is linked for 16 KB pages, and `build-node.sh` refuses to package it otherwise.
 
+## Kiosk mode
+The pendant always runs full screen. The status and navigation bars are hidden, and a swipe in from the edge shows them only briefly. Back still sends the app to the background.
+
+For a locked-down pendant with no Home, Recents or notification shade, make the app the tablet's device owner; it then allow-lists itself for lock task. This only works on a tablet with no accounts added, such as one fresh from a factory reset. The app then enters lock task on launch with no prompt:
+
+```sh
+adb shell dpm set-device-owner org.sienci.gsender.pendant/.KioskAdmin
+```
+
+Lock task is skipped unless the app is device owner, so ordinary installs never see Android's "pin this app" prompt. Android only lets `adb shell dpm remove-active-admin org.sienci.gsender.pendant/.KioskAdmin` remove a device owner on test-only builds. Otherwise getting out of kiosk mode takes a factory reset, so try it on a spare tablet first.
+
 ## CI (`.github/workflows/android.yml`)
 It runs on the same branches and tags as the desktop CI.
 - **Build:** produces a debug APK, arm64-v8a only (artifact `android-apks`). No emulator/x86_64 build - physical arm64 tablets are the only target, and `android/scripts/emulator-smoke.sh` is still there for manual smoke-testing against a real device over adb if needed.
@@ -94,4 +105,4 @@ It runs on the same branches and tags as the desktop CI.
 - **Firmware flashing:** stubbed.
 - **Release signing, AAB and Play upload:** debug APKs only.
 - **Job-aware power handling:** wake and Wi-Fi locks while a job runs, and stopping the service automatically when idle. Today the server runs until **Stop** in the notification.
-- **The native `window.pendantAPI` bridge:** the pendant's quit button and recent-file reload.
+- **The native `window.pendantAPI` bridge:** the pendant's quit button. Recent files reload from a copy the page keeps in IndexedDB instead.
