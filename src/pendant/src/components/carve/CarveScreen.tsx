@@ -82,7 +82,7 @@ export default function CarveScreen({ mode }: { mode: CarveMode }) {
             <VizStage mode={mode} />
 
             <div className="relative flex flex-1 min-h-0">
-                <div className="flex flex-col basis-[44%] shrink-0 min-h-0 border-r border-outline-subtle">
+                <div className="flex flex-col basis-[44%] shrink-0 min-w-0 min-h-0 border-r border-outline-subtle">
                     {/* Setup tabs stay mounted through a job so the chosen
                         tab and any tab state survive */}
                     <div

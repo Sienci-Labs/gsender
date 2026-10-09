@@ -1,10 +1,12 @@
-/* ISO fader: the "Feed & spindle override" design's variant A, scaled to a
-   164px card. The one carve-screen element drawn at full fidelity, so it keeps
-   the mockup's literal values (CARVE_REDESIGN_SPEC.md §6.4) instead of tokens. */
+/* ISO fader: the "Feed & spindle override" design's variant A. Cards share
+   the row's width (capped), and in a .ovr-fill row the track grows into the
+   spare height. The one carve-screen element drawn at full fidelity, so it
+   keeps the mockup's literal values (CARVE_REDESIGN_SPEC.md §6.4) instead of tokens. */
 
 .ovr-card {
-    width: 164px;
-    flex: 0 0 auto;
+    flex: 1 1 0;
+    min-width: 112px;
+    max-width: 240px;
     display: flex;
     flex-direction: column;
     gap: 7px;
@@ -15,6 +17,14 @@
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.04),
         0 14px 30px rgba(0, 0, 0, 0.4);
+}
+.ovr-fill .ovr-card {
+    align-self: stretch;
+}
+.ovr-fill .ovr-zone {
+    height: auto;
+    flex: 1 1 0;
+    min-height: 90px;
 }
 .ovr-card.is-disabled {
     opacity: 0.55;

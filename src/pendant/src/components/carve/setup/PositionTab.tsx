@@ -181,7 +181,9 @@ export default function PositionTab() {
                     { value: 'probe', label: 'Probe' },
                 ]}
             />
-            {/* Both stay mounted so a probe wizard survives a switch */}
+            {/* Both stay mounted so a probe wizard survives a switch. The
+                probe side keeps a usable height on short screens and the
+                tab scrolls instead */}
             <div
                 className={
                     method === 'manual' ? 'flex flex-col gap-[7px]' : 'hidden'
@@ -192,7 +194,7 @@ export default function PositionTab() {
             <div
                 className={
                     method === 'probe'
-                        ? 'flex flex-col flex-1 min-h-0'
+                        ? 'flex flex-col flex-1 min-w-0 min-h-[360px]'
                         : 'hidden'
                 }
             >

@@ -16,6 +16,7 @@ import { useHoldToActivate } from '../../../hooks/useHoldToActivate';
 import SpindlePanel, { type SpindleCardApi } from '../../SpindlePanel';
 import OverrideFaders from '../run/OverrideFaders';
 import Segmented from './Segmented';
+import './prepTab.css';
 
 const RING_R = 15;
 const RING_C = 2 * Math.PI * RING_R;
@@ -319,7 +320,8 @@ function CoolantRow({ laser }: { laser: boolean }) {
     );
 }
 
-/** Power source, coolant and the Feed / Spindle overrides (panels 05, 06). */
+/** Power source, coolant and the Feed / Spindle overrides (panels 05, 06).
+ * The overrides grow into the spare space; see prepTab.css. */
 export default function PrepTab() {
     const { coolantFunctions = false } = useWorkspaceState();
     const isLaserMode = useTypedSelector(
@@ -327,16 +329,22 @@ export default function PrepTab() {
     );
 
     return (
-        <div className="flex flex-col flex-1 min-h-0 gap-[7px] px-2.5 py-[9px] overflow-auto">
-            <SpindlePanel
-                mode="expanded"
-                renderCard={(api) => <PowerCard api={api} />}
-            />
-            {coolantFunctions && <CoolantRow laser={isLaserMode} />}
-            <p className="m-0 mt-0.5 mb-px font-mono text-[9.5px] tracking-[0.08em] uppercase text-content-disabled">
-                Overrides
-            </p>
-            <OverrideFaders fill={false} />
+        <div className="prep-tab flex-1 min-h-0 overflow-auto">
+            <div className="prep-layout px-2.5 py-[9px]">
+                <div className="prep-power">
+                    <SpindlePanel
+                        mode="expanded"
+                        renderCard={(api) => <PowerCard api={api} />}
+                    />
+                    {coolantFunctions && <CoolantRow laser={isLaserMode} />}
+                </div>
+                <div className="prep-ovr">
+                    <p className="m-0 mt-0.5 mb-px font-mono text-[9.5px] tracking-[0.08em] uppercase text-content-disabled">
+                        Overrides
+                    </p>
+                    <OverrideFaders />
+                </div>
+            </div>
         </div>
     );
 }

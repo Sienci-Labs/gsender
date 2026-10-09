@@ -525,13 +525,14 @@ export default function ProbePanel({ mode }: Props) {
     const isZProbeOnly = touchplate.touchplateType === TOUCHPLATE_TYPE_ZERO;
 
     return (
-        <div className="h-full flex flex-col px-3 py-2 gap-2 min-h-0 justify-center">
+        <div className="h-full flex flex-col px-3 py-2 gap-2 min-w-0 min-h-0 justify-center">
             {/* Control rows: flex-1 left section + fixed-width right column */}
             <div className="flex gap-2 shrink-0 min-h-[96px]">
-                {/* Left section */}
-                <div className="flex-1 flex gap-2 min-w-0 items-stretch">
+                {/* Left section: routine selector over the summary, so
+                    five routines still fit a narrow column */}
+                <div className="flex-1 flex flex-col gap-1.5 min-w-0">
                     {/* Routine selector */}
-                    <div className="flex-1 flex bg-white dark:bg-surface-elevated rounded-lg border border-gray-300 dark:border-outline p-0.5">
+                    <div className="flex-1 min-w-0 flex bg-white dark:bg-surface-elevated rounded-lg border border-gray-300 dark:border-outline p-0.5">
                         {availableProbeCommands.map((cmd, i) => (
                             <button
                                 key={cmd.id}
@@ -540,7 +541,7 @@ export default function ProbePanel({ mode }: Props) {
                                     actions.handleProbeCommandChange(i)
                                 }
                                 className={clsx(
-                                    'flex-1 text-xs font-semibold py-2.5 rounded-md transition-colors',
+                                    'flex-1 min-w-0 text-xs font-semibold py-2.5 rounded-md transition-colors',
                                     i === selectedProbeCommand
                                         ? 'bg-blue-400/30 text-blue-600 dark:text-blue-400'
                                         : 'text-gray-600 dark:text-content-muted hover:bg-gray-100 dark:hover:bg-surface-hover',
@@ -553,7 +554,7 @@ export default function ProbePanel({ mode }: Props) {
                     {/* Read-only configuration summary — replaces the old probe block label */}
                     <div
                         className={clsx(
-                            'flex-1 flex flex-col justify-center gap-0.5',
+                            'flex-1 min-w-0 flex flex-col justify-center gap-0.5',
                             isZProbeOnly && 'invisible',
                         )}
                     >
@@ -620,7 +621,7 @@ export default function ProbePanel({ mode }: Props) {
 
             {/* Expanded: probe wizard — pendant-only touch-first guided flow */}
             {mode === 'expanded' && (
-                <div className="flex-1 min-h-0">
+                <div className="flex-1 min-w-0 min-h-0">
                     <ProbeWizardDrawer
                         step={wizardStep}
                         onStepChange={setWizardStep}

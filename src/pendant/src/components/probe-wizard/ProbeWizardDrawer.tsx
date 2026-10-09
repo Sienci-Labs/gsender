@@ -130,7 +130,7 @@ export default function ProbeWizardDrawer({
                     }}
                 >
                     {/* Step 1 */}
-                    <div className="w-1/3 h-full overflow-y-auto px-5 py-4 flex flex-col gap-6">
+                    <div className="w-1/3 min-w-0 shrink-0 h-full overflow-y-auto px-5 py-4 flex flex-col gap-6">
                         <div>
                             <p className="text-sm font-medium text-gray-600 dark:text-content-secondary mb-2">
                                 Probe diameter
@@ -162,7 +162,7 @@ export default function ProbeWizardDrawer({
                     </div>
 
                     {/* Step 2 */}
-                    <div className="w-1/3 h-full overflow-y-auto px-5 py-4">
+                    <div className="w-1/3 min-w-0 shrink-0 h-full overflow-y-auto px-5 py-4">
                         <ContinuityCheck
                             onComplete={handleContinuityComplete}
                             onPhaseChange={setContinuityPhase}
@@ -170,7 +170,7 @@ export default function ProbeWizardDrawer({
                     </div>
 
                     {/* Step 3 */}
-                    <div className="w-1/3 h-full overflow-y-auto px-5 py-4 flex flex-col gap-5">
+                    <div className="w-1/3 min-w-0 shrink-0 h-full overflow-y-auto px-5 py-4 flex flex-col gap-5">
                         <div className="flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-green-500" />
                             <span className="text-sm font-semibold text-green-700 dark:text-green-400">

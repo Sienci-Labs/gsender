@@ -6,7 +6,8 @@ import IsoFader from './IsoFader';
 export default function OverrideFaders({
     fill = true,
 }: {
-    /** Grow to fill the column (Run); off inside a scrolling tab (Prep). */
+    /** Grow the cards into the spare height of the column; off keeps the
+     * fixed-height track. */
     fill?: boolean;
 }) {
     const {
@@ -27,8 +28,10 @@ export default function OverrideFaders({
     return (
         <div
             className={cn(
-                'flex items-center justify-center gap-2 pt-1 pb-0.5',
-                fill ? 'flex-1 min-h-0' : 'shrink-0',
+                'flex justify-center gap-2 pt-1 pb-0.5',
+                // min-h-fit: never squeeze below the tracks' minimum, so a
+                // short scrolling tab scrolls instead
+                fill ? 'ovr-fill flex-1 min-h-fit' : 'items-center shrink-0',
             )}
         >
             <IsoFader
