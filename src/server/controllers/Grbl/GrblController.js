@@ -29,20 +29,15 @@ import map from "lodash/map";
 import {
 	ALARM,
 	CONTROLLER_READY,
-	CYCLE_START,
 	ERROR,
-	FEED_HOLD,
 	FILE_TYPE,
-	FILE_UNLOAD,
 	HOMING,
 	MACRO_LOAD,
-	MACRO_RUN,
 	METRIC_UNITS,
 	PROGRAM_END,
 	PROGRAM_PAUSE,
 	PROGRAM_RESUME,
 	PROGRAM_START,
-	SLEEP,
 } from "../../../app/src/constants";
 import delay from "../../lib/delay";
 import EventTrigger from "../../lib/EventTrigger";
@@ -80,7 +75,7 @@ import {
 	WRITE_SOURCE_SERVER,
 	Y_AXIS_COMMANDS,
 } from "../constants";
-import { calcOverrides } from "../runOverride";
+import { dispatchCommand } from "../shared/commands";
 import {
 	GRBL,
 	GRBL_ACTIVE_STATE_ALARM,
@@ -103,21 +98,6 @@ const PAUSE_START = "%pause_start";
 
 const log = logger("controller:Grbl");
 
-// Commands the jog streamer either owns or can safely coexist with. Everything
-// else aborts an active stream before it runs.
-const JOG_COMMANDS = [
-	"jog:start",
-	"jog:update",
-	"jog:feed",
-	"jog:stop",
-	"jog:cancel",
-];
-const STREAM_SAFE_COMMANDS = [
-	"statusreport",
-	"reset",
-	"reset:soft",
-	"reset:quit",
-];
 const noop = _.noop;
 
 class GrblController {
@@ -1829,15 +1809,7 @@ class GrblController {
 
 	// eslint-disable-next-line max-lines-per-function
 	command(cmd, ...args) {
-		const handler = {
-			"firmware:recievedProfiles": () => {
-				const [files] = args;
-				this.emit("task:finish", files);
-			},
-			"firmware:grabMachineProfile": () => {
-				const machineProfile = store.get("machineProfile");
-				this.emit("sender:status", machineProfile);
-			},
+		const handlers = {
 			"gcode:load": () => {
 				let [meta, gcode, context = {}, callback = noop] = args;
 				const { name } = meta;
@@ -1892,22 +1864,6 @@ class GrblController {
 				this.workflow.stop();
 
 				callback(null, this.sender.toJSON());
-			},
-			"gcode:unload": () => {
-				this.workflow.stop();
-				this.engine.unload();
-
-				// Sender
-				this.sender.unload();
-
-				this.emit("file:unload");
-				this.event.trigger(FILE_UNLOAD);
-			},
-			start: () => {
-				log.warn(
-					`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`,
-				);
-				this.command("gcode:start");
 			},
 			"gcode:start": () => {
 				const preferences = store.get("preferences", {});
@@ -2051,12 +2007,6 @@ class GrblController {
 					this.sender.next({ startFromLine: true });
 				}
 			},
-			stop: () => {
-				log.warn(
-					`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`,
-				);
-				this.command("gcode:stop", ...args);
-			},
 			// @param {object} options The options object.
 			// @param {boolean} [options.force] Whether to force stop a G-code program. Defaults to false.
 			"gcode:stop": async () => {
@@ -2087,12 +2037,6 @@ class GrblController {
 				// Moved this to end so it triggers AFTER the reset on force stop
 				this.event.trigger(PROGRAM_END);
 			},
-			pause: () => {
-				log.warn(
-					`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`,
-				);
-				this.command("gcode:pause");
-			},
 			"gcode:pause": async () => {
 				if (this.event.hasEnabledEvent(PROGRAM_PAUSE)) {
 					this.workflow.pause();
@@ -2102,12 +2046,6 @@ class GrblController {
 					await delay(100);
 					this.write("!");
 				}
-			},
-			resume: () => {
-				log.warn(
-					`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`,
-				);
-				this.command("gcode:resume");
 			},
 			"gcode:resume": async () => {
 				const [ignoreEvents = false] = args;
@@ -2124,38 +2062,12 @@ class GrblController {
 					this.workflow.resume();
 				}
 			},
-			"feeder:feed": () => {
-				const [commands, context = {}] = args;
-				this.command("gcode", commands, context);
-			},
-			"feeder:start": async () => {
-				if (this.workflow.state === WORKFLOW_STATE_RUNNING) {
-					return;
-				}
-				this.write("~");
-				await delay(1000);
-				this.feeder.unhold();
-				this.feeder.next();
-			},
 			"feeder:stop": () => {
 				this.feeder.reset();
 
 				delay(100).then(() => {
 					this.write("~");
 				});
-			},
-			feedhold: () => {
-				this.event.trigger(FEED_HOLD);
-
-				this.write("!");
-			},
-			cyclestart: () => {
-				this.event.trigger(CYCLE_START);
-
-				this.write("~");
-			},
-			statusreport: () => {
-				this.write("?");
 			},
 			homing: () => {
 				this.event.trigger(HOMING);
@@ -2165,24 +2077,9 @@ class GrblController {
 				this.state.status.activeState = GRBL_ACTIVE_STATE_HOME;
 				this.emit("controller:state", GRBL, this.state);
 			},
-			sleep: () => {
-				this.event.trigger(SLEEP);
-
-				this.writeln("$SLP");
-			},
 			unlock: () => {
 				this.feeder.reset();
 				this.writeln("$X");
-			},
-			populateConfig: () => {
-				this.writeln("$$");
-			},
-			reset: () => {
-				this.workflow.stop();
-
-				this.feeder.reset();
-
-				this.write("\x18"); // ^x
 			},
 			"reset:limit": () => {
 				this.workflow.stop();
@@ -2192,60 +2089,6 @@ class GrblController {
 			},
 			checkStateUpdate: () => {
 				this.emit("controller:state", GRBL, this.state);
-			},
-			// Feed Overrides
-			// @param {number} value The amount of percentage increase or decrease.
-			feedOverride: () => {
-				const [value] = args;
-				const [feedOV] = this.state.status.ov;
-
-				const diff = value - feedOV;
-
-				if (value === 100) {
-					this.FOQueue.push(String.fromCharCode(0x90));
-				} else {
-					this.FOQueue.push(...calcOverrides(diff, "feed"));
-				}
-				this.consumeFOQ();
-
-				this.sender.setOvF(value);
-			},
-			// Spindle Speed Overrides
-			// @param {number} value The amount of percentage increase or decrease.
-			spindleOverride: () => {
-				const [value] = args;
-				const [, , spindleOV] = this.state.status.ov;
-
-				let diff = value - spindleOV;
-				//Limits for keyboard/gamepad shortcuts
-				if (value < 10) {
-					diff = 10 - spindleOV;
-				} else if (value > 230) {
-					diff = 230 - spindleOV;
-				}
-
-				if (value === 100) {
-					this.SOQueue.push(String.fromCharCode(0x99));
-				} else {
-					this.SOQueue.push(...calcOverrides(diff, "spindle"));
-				}
-				this.consumeSOQ();
-			},
-			// Rapid Overrides
-			// @param {number} value A percentage value of 25, 50, or 100. A value of zero will reset to 100%.
-			// 100: Set to 100% full rapid rate.
-			//  50: Set to 50% of rapid rate.
-			//  25: Set to 25% of rapid rate.
-			rapidOverride: () => {
-				const [value] = args;
-
-				if (value === 0 || value === 100) {
-					this.write("\x95");
-				} else if (value === 50) {
-					this.write("\x96");
-				} else if (value === 25) {
-					this.write("\x97");
-				}
 			},
 			"lasertest:on": () => {
 				const [power = 0, duration = 0] = args;
@@ -2268,44 +2111,6 @@ class GrblController {
 				this.emit("controller:state", GRBL, this.state);
 				this.command("gcode", commands);
 			},
-			"lasertest:off": () => {
-				const commands = ["M5S0"];
-				this.command("gcode", commands);
-			},
-			"laserpower:change": () => {
-				const [power = 0, maxS = 1000] = args;
-				const commands = [
-					// https://github.com/gnea/grbl/wiki/Grbl-v1.1-Laser-Mode
-					// The laser will only turn on when Grbl is in a G1, G2, or G3 motion mode.
-					"S" +
-						Math.round(ensurePositiveNumber(maxS * (power / 100)) * 100) / 100,
-				];
-				this.command("gcode", commands);
-			},
-			"spindlespeed:change": () => {
-				const [speed = 0] = args;
-				const commands = ["S" + speed];
-				this.command("gcode", commands);
-			},
-			gcode: () => {
-				const [commands, context] = args;
-				const data = ensureArray(commands)
-					.join("\n")
-					.split(/\r?\n/)
-					.filter((line) => {
-						if (typeof line !== "string") {
-							return false;
-						}
-
-						return line.trim().length > 0;
-					});
-
-				this.feeder.feed(data, context);
-
-				if (!this.feeder.isPending()) {
-					this.feeder.next();
-				}
-			},
 			"gcode:test": () => {
 				this.feederCB = () => {
 					this.workflow.start();
@@ -2315,64 +2120,13 @@ class GrblController {
 				};
 				this.command("gcode", ["%global.state.testWCS=modal.wcs", "$C"]);
 			},
-			"gcode:safe": () => {
-				const [commands, prefUnits] = args;
-				const deviceUnits = this.state.parserstate.modal.units;
-				let code = [];
-
-				if (!deviceUnits) {
-					log.error("Unable to determine device unit modal");
-					return;
-				}
-				// Force command in preferred units
-				if (prefUnits !== deviceUnits) {
-					code.push(prefUnits);
-				}
-				code = code.concat(commands);
-				// return modal to previous state if they were different previously
-				if (prefUnits !== deviceUnits) {
-					code = code.concat(deviceUnits);
-				}
-				this.command("gcode", code);
-			},
 			"jog:start": () => {
 				const [axes, feedrate = 1000, units = METRIC_UNITS] = args;
 				this.jogStreamer.start({ axes, feedrate, units });
 			},
-			"jog:update": () => {
-				const [axes, feedrate] = args;
-				this.jogStreamer.update({ axes, feedrate });
-			},
 			"jog:feed": () => {
 				const [axes, feedrate, units = METRIC_UNITS] = args;
 				this.jogStreamer.feed({ axes, feedrate, units });
-			},
-			"jog:stop": () => {
-				this.jogStreamer.stop();
-				this.write("\x85");
-			},
-			"jog:cancel": () => {
-				this.jogStreamer.abort("cancel");
-				this.write("\x85");
-			},
-			"macro:run": () => {
-				let [id, context = {}, callback = noop] = args;
-				if (typeof context === "function") {
-					callback = context;
-					context = {};
-				}
-				const macros = config.get("macros");
-				const macro = _.find(macros, { id: id });
-
-				if (!macro) {
-					log.error(`Cannot find the macro: id=${id}`);
-					return;
-				}
-
-				this.event.trigger(MACRO_RUN);
-				this.command("gcode", macro.content, context);
-
-				callback(null);
 			},
 			"macro:load": () => {
 				let [id, context = {}, callback = noop] = args;
@@ -2412,73 +2166,13 @@ class GrblController {
 					this.command("gcode:load", { name: file }, data, context, callback);
 				});
 			},
-			"machineprofile:load": () => {
-				const [machineProfile] = args;
-
-				store.set("machineProfile", machineProfile);
-			},
-			"settings:updated": () => {
-				const [newSettings = {}] = args;
-
-				const currentSettings = store.get("preferences") || {};
-
-				const updated = {
-					...currentSettings,
-					...newSettings,
-				};
-
-				store.set("preferences", updated);
-			},
 			"toolchange:context": () => {
 				const [context] = args;
 				this.toolChangeContext = context;
 			},
-			"toolchange:pre": () => {
-				log.debug("Starting pre hook");
-				this.runPreChangeHook();
-			},
-			"toolchange:post": () => {
-				log.debug("starting post hook");
-				this.command("feeder:start");
-				this.runPostChangeHook();
-			},
-			"wizard:start": () => {
-				log.debug("Wizard kickoff code");
-				const [gcode] = args;
+		};
 
-				this.toolChanger.addInterval(() => {
-					this.command("gcode", gcode);
-				});
-			},
-			"wizard:step": () => {
-				const [stepIndex, substepIndex] = args;
-				this.feederCB = () => {
-					this.emit("wizard:next", stepIndex, substepIndex);
-				};
-			},
-			updateEstimateData: () => {
-				const [estimateData] = args;
-				this.sender.setEstimateData(estimateData);
-			},
-		}[cmd];
-
-		if (!handler) {
-			log.error(`Unknown command: ${cmd}`);
-			return;
-		}
-
-		// A jog stream consumes its own acks, which is only safe while it is the
-		// sole writer of ack-producing lines. Anything else claiming the link
-		// ends the stream first.
-		if (
-			this.jogStreamer.isActive() &&
-			!JOG_COMMANDS.includes(cmd) &&
-			!STREAM_SAFE_COMMANDS.includes(cmd)
-		) {
-			this.jogStreamer.abort(`command:${cmd}`);
-		}
-
-		handler();
+		dispatchCommand(this, cmd, args, handlers, log);
 	}
 
 	// Grbl has no rotary axis of its own, so unless the user has explicitly

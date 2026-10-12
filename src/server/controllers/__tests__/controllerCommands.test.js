@@ -358,9 +358,7 @@ describe.each(FIRMWARES)("%s command dispatch", (firmware, Controller) => {
 		c.command("sdcard:run", "job.nc");
 
 		expect(order).toEqual(
-			firmware === "grblHAL"
-				? ["command:sdcard:run", "$F=job.nc\n"]
-				: [],
+			firmware === "grblHAL" ? ["command:sdcard:run", "$F=job.nc\n"] : [],
 		);
 	});
 
