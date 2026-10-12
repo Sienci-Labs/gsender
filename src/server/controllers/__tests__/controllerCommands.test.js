@@ -346,4 +346,32 @@ describe.each(FIRMWARES)("%s command dispatch", (firmware, Controller) => {
 		expect(abort).not.toHaveBeenCalled();
 		expect(f.writes()).toEqual(["?"]);
 	});
+
+	test("SD card commands claim the serial link only on grblHAL", () => {
+		const order = [];
+		jest.spyOn(c.jogStreamer, "isActive").mockReturnValue(true);
+		jest
+			.spyOn(c.jogStreamer, "abort")
+			.mockImplementation((reason) => order.push(reason));
+		f.connection.write.mockImplementation((data) => order.push(data));
+
+		c.command("sdcard:run", "job.nc");
+
+		expect(order).toEqual(
+			firmware === "grblHAL"
+				? ["command:sdcard:run", "$F=job.nc\n"]
+				: [],
+		);
+	});
+
+	test("a deferred wizard callback keeps its arguments across later commands", () => {
+		c.command("wizard:step", 2, 3);
+		c.command("firmware:recievedProfiles", ["Mill"]);
+		c.command("statusreport");
+
+		c.feeder.emit("complete");
+
+		expect(f.events("wizard:next")).toEqual([[2, 3]]);
+		expect(f.events("task:finish")).toEqual([[["Mill"]]]);
+	});
 });
