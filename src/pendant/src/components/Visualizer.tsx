@@ -1,5 +1,7 @@
 import type { GCodeViewerHandle, GCodeViewerOptions } from '@sienci/gviewer/viewer';
 import { GCodeVisualizer } from '@sienci/gviewer/react';
+import { GRBL_ACTIVE_STATE_IDLE, METRIC_UNITS } from 'app/constants';
+import { getSafeXYMoveCode } from 'app/features/DRO/utils/SafeMove';
 import { buildMachineBedOptions } from 'app/features/Visualizer/viewerOptions';
 import {
     buildViewerTheme,
@@ -7,10 +9,37 @@ import {
     WORKSHOP_VISUALIZER_COLORS,
 } from 'app/features/Visualizer/viewerTheme';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import controller from 'app/lib/controller';
+import { toast } from 'app/lib/toaster';
 import type { RootState } from 'app/store/redux';
 import _get from 'lodash/get';
 import pubsub from 'pubsub-js';
-import { memo, useEffect, useMemo, useRef } from 'react';
+import {
+    forwardRef,
+    memo,
+    useEffect,
+    useImperativeHandle,
+    useMemo,
+    useRef,
+    type ForwardedRef,
+} from 'react';
+
+export interface VisualizerHandle {
+    focusToModel: () => void;
+    focusToMachineBed: () => void;
+    /** Arms tap-to-jog: the next tap on the canvas sends a safe XY move there. */
+    armJog: () => void;
+    disarmJog: () => void;
+}
+
+interface VisualizerProps {
+    /** Fires whenever tap-to-jog is armed/disarmed, so an overlay button can
+     * reflect the pressed state. */
+    onJogArmedChange?: (armed: boolean) => void;
+}
+
+const MACHINE_NOT_READY_MESSAGE = 'Machine must be connected and idle to move';
 
 // Pendant mode: gviewer's WebGL renderer locked top-down (orthographic, no
 // view cube, no grid), fed the worker's Z-deduped 2D segment groups. The
@@ -61,7 +90,10 @@ const selectWposKey = (s: RootState): string => {
     return `${Number(x) || 0},${Number(y) || 0},${Number(z) || 0}`;
 };
 
-function Visualizer() {
+function VisualizerImpl(
+    { onJogArmedChange }: VisualizerProps,
+    ref: ForwardedRef<VisualizerHandle>,
+) {
     const viewerRef = useRef<GCodeViewerHandle>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     // A file loaded while the Carve tab is hidden has nothing to fit against;
@@ -72,8 +104,24 @@ function Visualizer() {
     const isConnected = useTypedSelector(
         (s: RootState) => s.connection.isConnected,
     );
+    const activeState = useTypedSelector((s: RootState) =>
+        _get(s, 'controller.state.status.activeState'),
+    );
+    const { units } = useWorkspaceState();
     const machineBedKey = useTypedSelector(selectMachineBedKey);
     const wposKey = useTypedSelector(selectWposKey);
+
+    // Mirrored into refs so the pointer-event handler (attached only while
+    // armed) always sees the latest values without needing to be re-attached.
+    const isConnectedRef = useRef(isConnected);
+    isConnectedRef.current = isConnected;
+    const activeStateRef = useRef(activeState);
+    activeStateRef.current = activeState;
+    const unitsRef = useRef(units);
+    unitsRef.current = units;
+
+    const jogArmedRef = useRef(false);
+    const jogHandlerRef = useRef<((e: PointerEvent) => void) | null>(null);
 
     const options = useMemo<Partial<GCodeViewerOptions>>(
         () => ({
@@ -109,6 +157,85 @@ function Visualizer() {
         pendingFocusRef.current = false;
         withViewer((v) => v.focusToModel());
     };
+
+    const machineReadyForJog = () =>
+        isConnectedRef.current &&
+        activeStateRef.current === GRBL_ACTIVE_STATE_IDLE;
+
+    const disarmJog = () => {
+        if (!jogArmedRef.current) return;
+        const el = containerRef.current;
+        if (jogHandlerRef.current) {
+            el?.removeEventListener('pointerup', jogHandlerRef.current);
+        }
+        jogHandlerRef.current = null;
+        withViewer((v) => v.setPanZoomEnabled(true));
+        jogArmedRef.current = false;
+        onJogArmedChange?.(false);
+    };
+
+    const armJog = () => {
+        if (jogArmedRef.current) return;
+        if (!machineReadyForJog()) {
+            toast.info(MACHINE_NOT_READY_MESSAGE, {
+                position: 'bottom-right',
+            });
+            return;
+        }
+        const el = containerRef.current;
+        if (!el) return;
+
+        // One-shot: the next tap commits the move (or is dropped, if the
+        // machine stopped being ready) and disarms, mirroring the desktop's
+        // "Move To Here" gesture.
+        const handlePointerUp = (e: PointerEvent) => {
+            disarmJog();
+            if (!machineReadyForJog()) {
+                toast.info(MACHINE_NOT_READY_MESSAGE, {
+                    position: 'bottom-right',
+                });
+                return;
+            }
+            withViewer((v) => {
+                const world = v.screenToWorld(e.clientX, e.clientY);
+                if (!world) return;
+                const x = Number(world.x.toFixed(3));
+                const y = Number(world.y.toFixed(3));
+                const unitModal =
+                    unitsRef.current === METRIC_UNITS ? 'G21' : 'G20';
+                controller.command(
+                    'gcode:safe',
+                    getSafeXYMoveCode(x, y),
+                    unitModal,
+                );
+                toast.success(`Moving to X${x.toFixed(2)} Y${y.toFixed(2)}`, {
+                    position: 'bottom-right',
+                });
+            });
+        };
+
+        jogHandlerRef.current = handlePointerUp;
+        el.addEventListener('pointerup', handlePointerUp);
+        withViewer((v) => v.setPanZoomEnabled(false));
+        jogArmedRef.current = true;
+        onJogArmedChange?.(true);
+    };
+
+    useImperativeHandle(
+        ref,
+        () => ({
+            focusToModel: () => withViewer((v) => v.focusToModel()),
+            focusToMachineBed: () => withViewer((v) => v.focusToMachineBed()),
+            armJog,
+            disarmJog,
+        }),
+        // Methods only close over refs/the viewer handle, so they stay stable.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [],
+    );
+
+    // Disarm on unmount so a stale listener never outlives the container.
+    useEffect(() => disarmJog, []);
 
     useEffect(() => {
         const token = pubsub.subscribe('file:load', (_msg, data) => {
@@ -163,5 +290,7 @@ function Visualizer() {
         </div>
     );
 }
+
+const Visualizer = forwardRef(VisualizerImpl);
 
 export default memo(Visualizer);

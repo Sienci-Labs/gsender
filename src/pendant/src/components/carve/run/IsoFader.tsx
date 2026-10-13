@@ -152,6 +152,12 @@ export default function IsoFader({
                     </div>
                 </div>
                 <div className="ovr-channel">
+                    <div className="ovr-fill-clip">
+                        <div
+                            className={`ovr-fill-level ${kind}`}
+                            style={{ height: `${fraction * 100}%` }}
+                        />
+                    </div>
                     <div className="ovr-centerline" />
                     <div className="ovr-thumb-wrap">
                         <div

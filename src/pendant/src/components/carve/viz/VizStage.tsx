@@ -1,13 +1,15 @@
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import type { RootState } from 'app/store/redux';
 import cn from 'classnames';
+import { useRef, useState } from 'react';
 import DepthGauge from '../../DepthGauge';
-import Visualizer from '../../Visualizer';
+import Visualizer, { type VisualizerHandle } from '../../Visualizer';
 import { LiveFileLoadingOverlay } from '../../VisualizerCard';
 import WorkspaceSelector from '../../WorkspaceSelector';
 import type { CarveMode } from '../carveMode';
 import InfoGlass from './InfoGlass';
 import VizJobControls from './VizJobControls';
+import VizViewTray from './VizViewTray';
 
 // State glow around the stage, keyed to the mode; G-code line colours never
 // change with state. The mockup's 14px/30% ring disappears against the
@@ -33,10 +35,13 @@ export default function VizStage({ mode }: { mode: CarveMode }) {
             : s.file.name || '',
     );
     const ring = RING[mode];
+    const visualizerRef = useRef<VisualizerHandle>(null);
+    const [jogArmed, setJogArmed] = useState(false);
 
     return (
         <div className="relative h-[42vh] shrink-0 border-b border-outline-subtle bg-surface-base overflow-hidden">
-            <Visualizer />
+            <Visualizer ref={visualizerRef} onJogArmedChange={setJogArmed} />
+            <VizViewTray visualizerRef={visualizerRef} jogArmed={jogArmed} />
 
             {fileLoaded && !fileProcessing && (
                 // Below the info glass so the two never overlap
