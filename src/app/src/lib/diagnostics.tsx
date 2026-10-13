@@ -37,6 +37,7 @@ import {
     Link,
     Document,
     StyleSheet,
+    Font,
 } from '@react-pdf/renderer';
 import saveAs from 'file-saver';
 import JSZip from 'jszip';
@@ -66,6 +67,8 @@ import api from '../api';
 import { LASER_MODE } from '../constants';
 import defaultStoreState from '../store/defaultState';
 import { homingString } from '../lib/eeprom';
+
+Font.registerHyphenationCallback((word) => [word]);
 
 const styles = StyleSheet.create({
     // Page layout
@@ -347,10 +350,34 @@ const styles = StyleSheet.create({
         paddingBottom: 2,
     },
     configRow: {
-        flexDirection: 'row',
         borderBottom: '1px solid #e5e7eb',
         paddingVertical: 6,
         paddingHorizontal: 8,
+    },
+    configRowMain: {
+        flexDirection: 'row',
+    },
+    configFlags: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        marginTop: 6,
+        paddingTop: 4,
+        borderTop: '1px dashed #e5e7eb',
+    },
+    configFlag: {
+        width: '33.33%',
+        fontSize: 8,
+        lineHeight: 1.35,
+        paddingVertical: 1,
+        paddingRight: 6,
+    },
+    configFlagOn: {
+        fontFamily: 'Helvetica-Bold',
+        color: '#15803d',
+    },
+    configFlagOff: {
+        fontFamily: 'Helvetica',
+        color: '#6b7280',
     },
     configRowChanged: {
         backgroundColor: '#fef9c3',
@@ -682,15 +709,38 @@ function ConfigSettingsPages({
                                         ]}
                                         wrap={false}
                                     >
-                                        <Text style={styles.configLabel}>
-                                            {row.label}
-                                        </Text>
-                                        <Text style={styles.configDescription}>
-                                            {row.description}
-                                        </Text>
-                                        <Text style={styles.configValue}>
-                                            {row.value}
-                                        </Text>
+                                        <View style={styles.configRowMain}>
+                                            <Text style={styles.configLabel}>
+                                                {row.label}
+                                            </Text>
+                                            <Text
+                                                style={styles.configDescription}
+                                            >
+                                                {row.description}
+                                            </Text>
+                                            <Text style={styles.configValue}>
+                                                {row.flags
+                                                    ? row.rawValue
+                                                    : row.value}
+                                            </Text>
+                                        </View>
+                                        {row.flags ? (
+                                            <View style={styles.configFlags}>
+                                                {row.flags.map((flag) => (
+                                                    <Text
+                                                        key={flag.label}
+                                                        style={[
+                                                            styles.configFlag,
+                                                            flag.on
+                                                                ? styles.configFlagOn
+                                                                : styles.configFlagOff,
+                                                        ]}
+                                                    >
+                                                        {`${flag.label}: ${flag.on ? 'On' : 'Off'}`}
+                                                    </Text>
+                                                ))}
+                                            </View>
+                                        ) : null}
                                     </View>
                                 ))}
                             </View>

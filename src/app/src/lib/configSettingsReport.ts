@@ -23,12 +23,19 @@ import isEqual from 'lodash/isEqual';
 
 export type ConfigReportEmphasis = 'on' | 'off';
 
+export type ConfigReportFlag = {
+    label: string;
+    on: boolean;
+};
+
 export type ConfigReportRow = {
     label: string;
     description: string;
     value: string;
     changed: boolean;
     emphasis?: ConfigReportEmphasis;
+    rawValue?: string;
+    flags?: ConfigReportFlag[];
 };
 
 export type ConfigReportSubsection = {
@@ -318,27 +325,41 @@ function eepromChanged(
 function formatBitfield(
     value: unknown,
     labels: string[] | undefined,
-): string | null {
+): { value: string; rawValue: string; flags: ConfigReportFlag[] } | null {
     if (!labels || labels.length === 0) {
         return null;
     }
     const bits = Number(value).toString(2).split('').map(Number).reverse();
-    const lines = labels
+    const flags = labels
         .map((label, index) => {
             if (!label || label === 'N/A') {
                 return null;
             }
-            return `${label}: ${bits[index] === 1 ? 'On' : 'Off'}`;
+            return { label, on: bits[index] === 1 };
         })
-        .filter((line): line is string => line !== null);
-    return lines.length > 0 ? lines.join('\n') : null;
+        .filter((flag): flag is ConfigReportFlag => flag !== null);
+    if (flags.length === 0) {
+        return null;
+    }
+    return {
+        value: flags
+            .map((flag) => `${flag.label}: ${flag.on ? 'On' : 'Off'}`)
+            .join('\n'),
+        rawValue: isBlank(value) ? EMPTY : String(value),
+        flags,
+    };
 }
 
 function formatEepromValue(
     value: unknown,
     meta: EepromDescription,
     axes: string[] | undefined,
-): { value: string; emphasis?: ConfigReportEmphasis } {
+): {
+    value: string;
+    emphasis?: ConfigReportEmphasis;
+    rawValue?: string;
+    flags?: ConfigReportFlag[];
+} {
     const dataType =
         meta.dataType === undefined ? undefined : Number(meta.dataType);
     if (dataType === PASSWORD_TYPE) {
@@ -366,7 +387,7 @@ function formatEepromValue(
         }
         const bitfield = formatBitfield(value, labels);
         if (bitfield) {
-            return { value: bitfield };
+            return bitfield;
         }
     }
     const text = isBlank(value) ? EMPTY : String(value);
@@ -513,6 +534,8 @@ function buildEepromRow(
         value: formatted.value,
         changed: eepromChanged(currentValue, defaultValue, dataType),
         emphasis: formatted.emphasis,
+        rawValue: formatted.rawValue,
+        flags: formatted.flags,
     };
 }
 
