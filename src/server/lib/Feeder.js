@@ -31,6 +31,7 @@ class Feeder extends events.EventEmitter {
 		pending: false,
 		changed: false,
 		outstanding: 0,
+		outstandingCommands: [],
 		interval: null,
 	};
 
@@ -102,6 +103,7 @@ class Feeder extends events.EventEmitter {
 		this.state.queue = [];
 		this.state.pending = false;
 		this.state.outstanding = 0;
+		this.state.outstandingCommands = [];
 		this.state.interval && clearInterval(this.state.interval);
 		this.emit("change");
 	}
@@ -112,6 +114,7 @@ class Feeder extends events.EventEmitter {
 		this.state.queue = [];
 		this.state.pending = false;
 		this.state.outstanding = 0;
+		this.state.outstandingCommands = [];
 		this.state.interval = null;
 		this.emit("change");
 	}
@@ -141,6 +144,7 @@ class Feeder extends events.EventEmitter {
 
 			this.state.pending = true;
 			this.state.outstanding++;
+			this.state.outstandingCommands.push(command);
 			this.emit("data", command, context);
 			this.emit("change");
 			break;
@@ -169,6 +173,9 @@ class Feeder extends events.EventEmitter {
 	ack() {
 		if (this.state.outstanding > 0) {
 			this.state.outstanding--;
+		}
+		if (this.state.outstandingCommands.length > 0) {
+			this.state.outstandingCommands.shift();
 		}
 	}
 

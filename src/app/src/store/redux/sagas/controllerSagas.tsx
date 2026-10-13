@@ -1197,14 +1197,12 @@ export function* initialize(): Generator<null, void, unknown> {
             pubsub.publish('helper:info', {
                 kind: 'error',
                 code: error.code,
-                title: 'Invalid line',
-                description: (
-                    <div className="flex flex-col gap-2">
+                content: (
+                    <div className="flex flex-col gap-2 dark:text-gray-200">
                         <p>
                             The controller rejected this line:{' '}
                             <code className="font-mono">{error.line}</code>
                         </p>
-                        <p>Press Start to resume the job.</p>
                     </div>
                 ),
             });
