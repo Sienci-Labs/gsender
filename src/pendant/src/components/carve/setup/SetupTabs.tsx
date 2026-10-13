@@ -97,6 +97,7 @@ export default function SetupTabs({
                 <Console
                     isActive={activeTab === 'Console'}
                     isChildWindow={false}
+                    showActions={false}
                 />
             </div>
             <div className={cn(body('Macros'), 'overflow-auto')}>

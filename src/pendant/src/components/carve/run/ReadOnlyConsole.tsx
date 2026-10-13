@@ -60,6 +60,7 @@ export default function ReadOnlyConsole() {
                 onFilterChange={setFilter}
                 onCopy={handleCopy}
                 onClear={handleClear}
+                showActions={false}
                 showPopout={false}
             />
             <div className="relative flex-1 min-h-0">

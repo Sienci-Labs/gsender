@@ -36,6 +36,7 @@ import {
 import { unloadFileInfo } from 'app/store/redux/slices/fileInfo.slice';
 import {
     applyControllerGcodePayload,
+    resendCachedEstimateData,
     shouldIgnoreControllerGcodeLoad,
 } from './utils/gcodeProcessing';
 
@@ -164,6 +165,12 @@ export function* initialize() {
 
     controller.addListener('gcode:unload', () => {
         reduxStore.dispatch(unloadFileInfo());
+    });
+
+    // Server asks for this when it needs a client to (re-)send its per-line
+    // time estimate (e.g. another client connects, or sender state resets).
+    controller.addListener('requestEstimateData', () => {
+        resendCachedEstimateData();
     });
 
     // ── ATC macro dialogs ───────────────────────────────────────────────────
