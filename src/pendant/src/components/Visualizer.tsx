@@ -44,7 +44,7 @@ const MACHINE_NOT_READY_MESSAGE = 'Machine must be connected and idle to move';
 // Pendant mode: gviewer's WebGL renderer locked top-down (orthographic, no
 // view cube, no grid), fed the worker's Z-deduped 2D segment groups. The
 // crosshair and origin dot are sized in screen pixels.
-const BASE_OPTIONS: Partial<GCodeViewerOptions> = {
+export const BASE_OPTIONS: Partial<GCodeViewerOptions> = {
     viewMode: 'pendant',
     units: 'mm',
     bit: {
@@ -72,7 +72,7 @@ const BASE_OPTIONS: Partial<GCodeViewerOptions> = {
 
 // Everything the bed rectangle depends on. All low-frequency, so options are
 // rebuilt only when this key changes, not on every status report.
-const selectMachineBedKey = (s: RootState): string => {
+export const selectMachineBedKey = (s: RootState): string => {
     const settings = s.controller.settings?.settings ?? {};
     const keys = ['$22', '$23', '$130', '$131', '$683', '$684', '$685', '$686', '$687'];
     const wco = s.controller.wco ?? { x: 0, y: 0 };

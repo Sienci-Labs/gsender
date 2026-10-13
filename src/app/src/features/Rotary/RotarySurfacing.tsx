@@ -22,7 +22,7 @@ import { convertToImperial, convertToMetric } from 'app/lib/units';
 import useKeybinding from 'app/lib/useKeybinding';
 import store from 'app/store';
 import cx from 'classnames';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ComponentType } from 'react';
 import { useNavigate } from 'react-router';
 import { GcodeViewer } from '../Surfacing/components/GcodeViewer';
 import InputArea from './components/InputArea';
@@ -31,7 +31,12 @@ import { DEFAULT_VALUES_MM } from './constants';
 import type { RotarySurfacingOptions } from './definitions';
 import { StockTurningGenerator } from './utils/Generator';
 
-const RotarySurfacing = () => {
+type RotarySurfacingProps = {
+    /** Pendant override: see VisualizerPreview's PreviewComponent prop. */
+    PreviewComponent?: ComponentType<{ gcode?: string }>;
+};
+
+const RotarySurfacing = ({ PreviewComponent }: RotarySurfacingProps = {}) => {
     const navigate = useNavigate();
     const { units } = useWorkspaceState();
     const [surfacingState, setSurfacingState] =
@@ -402,7 +407,10 @@ const RotarySurfacing = () => {
                                     },
                                 )}
                             >
-                                <VisualizerPreview gcode={gcode} />
+                                <VisualizerPreview
+                                    gcode={gcode}
+                                    PreviewComponent={PreviewComponent}
+                                />
                             </div>
                             <div
                                 className={cx(

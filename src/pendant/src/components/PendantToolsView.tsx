@@ -1,4 +1,5 @@
 import { AccessoryInstaller } from 'app/features/AccessoryInstaller';
+import GcodeToolPreviewVisualizer from './GcodeToolPreviewVisualizer';
 import PluginToolCard from 'app/components/PluginToolCard';
 import ToolCard from 'app/components/ToolCard';
 import KeyboardShortcuts from 'app/features/Keyboard';
@@ -41,7 +42,8 @@ type BuiltInToolKey =
 
 const BUILT_IN_TOOLS: Record<
     BuiltInToolKey,
-    { title: string; Component: React.ComponentType }
+    // biome-ignore lint/suspicious/noExplicitAny: tools take different, tool-specific prop shapes
+    { title: string; Component: React.ComponentType<any> }
 > = {
     surfacing: { title: 'Surfacing', Component: Surfacing },
     'rotary-surfacing': {
@@ -70,6 +72,8 @@ export default function PendantToolsView() {
 
     if (activeTool) {
         const { title, Component } = BUILT_IN_TOOLS[activeTool];
+        const usesGcodePreview =
+            activeTool === 'surfacing' || activeTool === 'rotary-surfacing';
 
         return (
             <div className="flex-1 flex flex-col min-h-0 p-3">
@@ -88,7 +92,13 @@ export default function PendantToolsView() {
                 </div>
                 <div className="flex-1 min-h-0 overflow-y-auto">
                     <MemoryRouter>
-                        <Component />
+                        {usesGcodePreview ? (
+                            <Component
+                                PreviewComponent={GcodeToolPreviewVisualizer}
+                            />
+                        ) : (
+                            <Component />
+                        )}
                     </MemoryRouter>
                 </div>
             </div>

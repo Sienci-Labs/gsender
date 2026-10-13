@@ -6,22 +6,38 @@ import {
 
 import Visualizer from 'app/features/Visualizer';
 import { setCurrentVisualizer } from 'app/store/redux/slices/visualizer.slice';
-import { useEffect } from 'react';
+import { useEffect, type ComponentType } from 'react';
 import { useDispatch } from 'react-redux';
 
 type VisualizerPreviewProps = {
     gcode: string;
+    /** Pendant override: renders gcode with the pendant's own viewer instead
+     * of the desktop secondary-visualizer plumbing below, which the pendant
+     * shell has no equivalent of. */
+    PreviewComponent?: ComponentType<{ gcode?: string }>;
 };
 
-const VisualizerPreview = ({ gcode }: VisualizerPreviewProps) => {
+const VisualizerPreview = ({ gcode, PreviewComponent }: VisualizerPreviewProps) => {
     const dispatch = useDispatch();
 
     useEffect(() => {
+        if (PreviewComponent) return;
         dispatch(setCurrentVisualizer(VISUALIZER_SECONDARY));
         return () => {
             dispatch(setCurrentVisualizer(VISUALIZER_PRIMARY));
         };
-    }, []);
+    }, [PreviewComponent]);
+
+    if (PreviewComponent) {
+        return (
+            <div
+                className="flex flex-col h-full items-center justify-center"
+                id={SURFACING_VISUALIZER_CONTAINER_ID}
+            >
+                <PreviewComponent gcode={gcode} />
+            </div>
+        );
+    }
 
     if (!gcode) {
         return (

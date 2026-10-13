@@ -22,7 +22,7 @@ import defaultState from 'app/store/defaultState';
 import cx from 'classnames';
 import get from 'lodash/get';
 import pubsub from 'pubsub-js';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ComponentType } from 'react';
 import { useNavigate } from 'react-router';
 import WidgetConfig from '../WidgetConfig/WidgetConfig';
 import { GcodeViewer } from './components/GcodeViewer';
@@ -37,7 +37,12 @@ const defaultSurfacingState = get(
     {},
 ) as Surfacing;
 
-const SurfacingTool = () => {
+type SurfacingToolProps = {
+    /** Pendant override: see VisualizerPreview's PreviewComponent prop. */
+    PreviewComponent?: ComponentType<{ gcode?: string }>;
+};
+
+const SurfacingTool = ({ PreviewComponent }: SurfacingToolProps = {}) => {
     const navigate = useNavigate();
     const surfacingConfig = new WidgetConfig('surfacing');
     const [tabSwitch, setTabSwitch] = useState(false);
@@ -471,7 +476,10 @@ const SurfacingTool = () => {
                                 },
                             )}
                         >
-                            <VisualizerPreview gcode={gcode} />
+                            <VisualizerPreview
+                                gcode={gcode}
+                                PreviewComponent={PreviewComponent}
+                            />
                         </div>
                         <div
                             className={cx('h-full relative p-2', {
