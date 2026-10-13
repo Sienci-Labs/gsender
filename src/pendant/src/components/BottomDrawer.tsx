@@ -124,9 +124,14 @@ export default function BottomDrawer() {
               ? `calc(10.5rem + ${HEADER_HEIGHT_REM}rem)`
               : `${HEADER_HEIGHT_REM}rem`;
     const handleTabChange = (tab: DrawerTab) => {
+        const isSwitchingTab = tab !== activeTab;
         setActiveTab(tab);
         if (tab === 'Console') {
             setMode('expanded');
+        } else if (tab === 'Probe' && isSwitchingTab) {
+            // The probe wizard shouldn't open pre-expanded just because the
+            // drawer was left expanded on a different tab.
+            setMode('minimal');
         } else if (mode === 'closed') {
             setMode('minimal');
         }

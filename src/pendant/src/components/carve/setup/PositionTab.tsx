@@ -136,9 +136,6 @@ function ManualZero() {
                     Zero All
                 </HoldButton>
             </div>
-            <p className="m-0 -mt-0.5 text-[9.5px] text-content-disabled">
-                Hold a button for 1 s to go to or zero
-            </p>
 
             <div className="mt-0.5 p-[9px] flex flex-col gap-[7px] rounded-lg border border-outline-subtle bg-surface-raised">
                 <p className="m-0 font-mono text-[9px] tracking-[0.08em] uppercase text-content-disabled">
@@ -160,9 +157,6 @@ function ManualZero() {
                         ))}
                     </div>
                 </div>
-                <p className="m-0 text-[9.5px] text-content-disabled">
-                    Hold a corner to rapid there, home required first
-                </p>
             </div>
         </>
     );
@@ -170,6 +164,9 @@ function ManualZero() {
 
 export default function PositionTab() {
     const [method, setMethod] = useState<'manual' | 'probe'>('manual');
+    const [probeMode, setProbeMode] = useState<'minimal' | 'expanded'>(
+        'minimal',
+    );
 
     return (
         <div className="flex flex-col flex-1 min-h-0 gap-[7px] px-2.5 py-[9px] overflow-auto">
@@ -198,7 +195,7 @@ export default function PositionTab() {
                         : 'hidden'
                 }
             >
-                <ProbePanel mode="expanded" />
+                <ProbePanel mode={probeMode} onModeChange={setProbeMode} />
             </div>
         </div>
     );

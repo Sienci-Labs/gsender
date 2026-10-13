@@ -27,8 +27,8 @@ function BracketIcon({
 }) {
     return (
         <svg
-            width="22"
-            height="22"
+            width="18"
+            height="18"
             viewBox="0 0 28 28"
             fill="none"
             style={{ transform: `rotate(${rotation}deg)` }}
@@ -54,8 +54,8 @@ export default function CornerSelector({
     const isNonDefault = direction !== DEFAULT_DIRECTION;
 
     return (
-        <div className="flex flex-col gap-2">
-            <div className="grid grid-cols-2 gap-2">
+        <div className="flex flex-col gap-1.5">
+            <div className="grid grid-cols-2 gap-1.5">
                 {CORNERS.map((corner) => {
                     const selected = corner.direction === direction;
                     return (
@@ -64,7 +64,7 @@ export default function CornerSelector({
                             type="button"
                             onClick={() => onChange(corner.direction)}
                             className={clsx(
-                                'flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 py-2.5 transition-colors',
+                                'flex flex-col items-center justify-center gap-1 rounded-xl border-2 py-1.5 transition-colors',
                                 selected
                                     ? 'border-green-400 bg-green-400/10'
                                     : 'border-gray-300 dark:border-outline bg-white dark:bg-surface-elevated',
@@ -98,7 +98,7 @@ export default function CornerSelector({
 
             <div
                 className={clsx(
-                    'rounded-lg border border-amber-400/60 bg-amber-50 dark:bg-amber-500/10 px-3 py-2 transition-opacity',
+                    'rounded-lg border border-amber-400/60 bg-amber-50 dark:bg-amber-500/10 px-3 py-1.5 transition-opacity',
                     isNonDefault
                         ? 'opacity-100 visible'
                         : 'opacity-0 invisible',

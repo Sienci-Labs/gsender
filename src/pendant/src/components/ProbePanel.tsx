@@ -34,7 +34,7 @@ import type { RootState } from 'app/store/redux';
 import { clsx } from 'clsx';
 import get from 'lodash/get';
 import includes from 'lodash/includes';
-import { Play } from 'lucide-react';
+import { Settings2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import ProbeWizardDrawer from './probe-wizard/ProbeWizardDrawer';
 
@@ -52,9 +52,12 @@ const formatDiameter = (
 type DrawerMode = 'closed' | 'minimal' | 'expanded';
 interface Props {
     mode: DrawerMode;
+    /** Lets a parent that owns `mode` as state (e.g. PositionTab's Manual/
+     * Probe toggle) expand to the wizard and collapse back out of it. */
+    onModeChange?: (mode: DrawerMode) => void;
 }
 
-export default function ProbePanel({ mode }: Props) {
+export default function ProbePanel({ mode, onModeChange }: Props) {
     const config = new WidgetConfig('probe');
 
     const {
@@ -525,16 +528,14 @@ export default function ProbePanel({ mode }: Props) {
     const isZProbeOnly = touchplate.touchplateType === TOUCHPLATE_TYPE_ZERO;
 
     return (
-        <div className="h-full flex flex-col px-3 py-2 gap-2 min-w-0 min-h-0 justify-center">
-            {/* Control rows: flex-1 left section + fixed-width right column */}
-            <div className="flex gap-2 shrink-0 min-h-[96px]">
-                {/* Left section: summary over the routine selector, so
-                    five routines still fit a narrow column */}
-                <div className="flex-1 flex flex-col gap-1.5 min-w-0">
+        <div className="h-full flex flex-col px-3 py-2 gap-2 min-w-0 min-h-0">
+            {/* Hidden while the wizard is open so it gets the full widget area. */}
+            {mode !== 'expanded' && (
+                <div className="flex-1 min-h-0 flex flex-col gap-2">
                     {/* Read-only configuration summary — replaces the old probe block label */}
                     <div
                         className={clsx(
-                            'flex-1 min-w-0 flex flex-col justify-center gap-0.5',
+                            'shrink-0 flex flex-col gap-0.5',
                             isZProbeOnly && 'invisible',
                         )}
                     >
@@ -542,13 +543,15 @@ export default function ProbePanel({ mode }: Props) {
                             Configuration
                         </span>
                         <span className="text-xs font-semibold text-gray-700 dark:text-content-secondary truncate">
-                            {formatDiameter(toolDiameter, units, probeType)} ·{' '}
-                            {probeCmd?.id?.split(' ')[0] ?? '—'} ·{' '}
+                            {formatDiameter(toolDiameter, units, probeType)}{' '}
+                            · {probeCmd?.id?.split(' ')[0] ?? '—'} ·{' '}
                             {CORNER_LABELS[direction] ?? 'Unknown'}
                         </span>
                     </div>
-                    {/* Routine selector */}
-                    <div className="flex-1 min-w-0 flex bg-white dark:bg-surface-elevated rounded-lg border border-gray-300 dark:border-outline p-0.5">
+
+                    {/* Routine selector — a vertical list so each routine gets
+                        a real tap target instead of a cramped shared row */}
+                    <div className="flex-1 min-h-0 flex flex-col gap-1 overflow-y-auto">
                         {availableProbeCommands.map((cmd, i) => (
                             <button
                                 key={cmd.id}
@@ -557,67 +560,68 @@ export default function ProbePanel({ mode }: Props) {
                                     actions.handleProbeCommandChange(i)
                                 }
                                 className={clsx(
-                                    'flex-1 min-w-0 text-xs font-semibold py-2.5 rounded-md transition-colors',
+                                    'flex-1 min-h-[34px] shrink-0 rounded-lg border text-sm font-semibold transition-colors',
                                     i === selectedProbeCommand
-                                        ? 'bg-blue-400/30 text-blue-600 dark:text-blue-400'
-                                        : 'text-gray-600 dark:text-content-muted hover:bg-gray-100 dark:hover:bg-surface-hover',
+                                        ? 'border-blue-400 bg-blue-400/20 text-blue-600 dark:text-blue-400'
+                                        : 'border-gray-300 dark:border-outline text-gray-600 dark:text-content-muted hover:bg-gray-100 dark:hover:bg-surface-hover',
                                 )}
                             >
                                 {cmd.id.split(' ')[0]}
                             </button>
                         ))}
                     </div>
-                </div>
 
-                {/* Fixed-width right column — full-height Probe button */}
-                <div className="shrink-0 flex flex-col gap-1 w-24">
                     <button
                         type="button"
                         onClick={() => {
                             setWizardSkipContinuity(false);
                             setWizardStep(0);
                             setWizardMaxReached(0);
+                            onModeChange?.('expanded');
                         }}
                         disabled={!canClick()}
                         className={clsx(
-                            'w-full flex-1 flex items-center justify-center gap-1.5 rounded-xl',
+                            'shrink-0 w-full flex items-center justify-center gap-1.5 rounded-xl',
                             'font-semibold text-sm min-h-[44px]',
                             'bg-blue-600 hover:bg-blue-700 text-white',
                             'disabled:opacity-40 disabled:cursor-default transition-colors',
                         )}
                     >
-                        <Play size={13} fill="white" className="text-white" />
-                        Probe
+                        <Settings2 size={15} className="text-white" />
+                        Set Up Probe
                     </button>
-                    {lastProbeCorner !== null && lastProbeDiameter !== null && (
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setDirection(lastProbeCorner);
-                                actions._setToolDiameter({
-                                    value: lastProbeDiameter,
-                                });
-                                if (lastProbeType)
-                                    actions._setProbeType(
-                                        lastProbeType as PROBE_TYPES_T,
-                                    );
-                                setWizardSkipContinuity(true);
-                                setWizardStep(2);
-                                setWizardMaxReached(2);
-                            }}
-                            disabled={!canClick()}
-                            className="w-full text-[10px] leading-tight text-gray-600 dark:text-content-muted border border-gray-300 dark:border-outline rounded-lg px-1 py-1 disabled:opacity-40"
-                        >
-                            Repeat last: {CORNER_LABELS[lastProbeCorner]},{' '}
-                            {formatDiameter(
-                                lastProbeDiameter,
-                                units,
-                                lastProbeType,
-                            )}
-                        </button>
-                    )}
+                    {lastProbeCorner !== null &&
+                        lastProbeDiameter !== null && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setDirection(lastProbeCorner);
+                                    actions._setToolDiameter({
+                                        value: lastProbeDiameter,
+                                    });
+                                    if (lastProbeType)
+                                        actions._setProbeType(
+                                            lastProbeType as PROBE_TYPES_T,
+                                        );
+                                    setWizardSkipContinuity(true);
+                                    setWizardStep(2);
+                                    setWizardMaxReached(2);
+                                    onModeChange?.('expanded');
+                                }}
+                                disabled={!canClick()}
+                                className="shrink-0 w-full text-xs leading-tight text-gray-600 dark:text-content-muted border border-gray-300 dark:border-outline rounded-lg px-2 py-1.5 disabled:opacity-40"
+                            >
+                                Repeat last:{' '}
+                                {CORNER_LABELS[lastProbeCorner]},{' '}
+                                {formatDiameter(
+                                    lastProbeDiameter,
+                                    units,
+                                    lastProbeType,
+                                )}
+                            </button>
+                        )}
                 </div>
-            </div>
+            )}
 
             {/* Expanded: probe wizard — pendant-only touch-first guided flow */}
             {mode === 'expanded' && (
@@ -635,6 +639,7 @@ export default function ProbePanel({ mode }: Props) {
                         state={state}
                         probeCmd={probeCmd}
                         skipContinuity={wizardSkipContinuity}
+                        onCollapse={() => onModeChange?.('minimal')}
                         onRunComplete={(corner, diameter) => {
                             config.set('lastProbeCorner', corner);
                             config.set('lastProbeDiameter', diameter);
