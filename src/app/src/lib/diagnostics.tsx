@@ -46,6 +46,7 @@ import { toast } from 'app/lib/toaster';
 import { AlarmsErrors } from 'app/definitions/alarms_errors';
 import { EEPROMSettings, MachineProfile } from 'app/definitions/firmware';
 import { SettingsMenu } from 'app/features/Config/assets/SettingsMenu.ts';
+import machineProfiles from 'app/features/Config/assets/MachineDefaults/defaultMachineProfiles.ts';
 import { SPINDLE_LASER_T } from 'app/features/Spindle/definitions';
 import {
     buildConfigSettingsReport,
@@ -394,6 +395,16 @@ const getMachineProfile = (): MachineProfile => {
     return machineProfile;
 };
 
+// Config compares against the bundled profile for this ID rather than the copy saved in the store
+const getDefaultsMachineProfile = (
+    machineProfile: MachineProfile,
+): MachineProfile => {
+    const latest = machineProfiles.find(
+        (profile) => profile.id === machineProfile?.id,
+    ) as MachineProfile | undefined;
+    return latest || machineProfile;
+};
+
 const getGSenderVersion = (): string => {
     const version = `${pkg.version}`;
     return version;
@@ -695,64 +706,55 @@ function generateSupportFile() {
     const [isGenerating, setIsGenerating] = useState(false);
     const [progress, setProgress] = useState('');
 
-    const eeprom = getEEPROMValues();
-    const machineProfile = getMachineProfile();
-    const version = getGSenderVersion();
-    const grblInfo = getGRBLInformation();
-    const os = getOS();
-    const terminalHistory = getTerminalHistory();
-    const gcode = getGCodeFile();
-    const mode = getMode();
-    const connection = getConnection();
-    const fileInfo = getFileInfo();
-    const isConnected = connection.isConnected;
-    const firmwareVersion = (() => {
-        const disconnectedValue = 'disconnected';
-        const reportedFirmwareVersion: unknown = get(
-            grblInfo,
-            'settings.version',
-        );
-
-        if (!isConnected) {
-            return disconnectedValue;
-        }
-
-        if (typeof reportedFirmwareVersion === 'string') {
-            const sanitizedVersion = reportedFirmwareVersion.trim();
-            return sanitizedVersion || disconnectedValue;
-        }
-
-        if (
-            reportedFirmwareVersion &&
-            typeof reportedFirmwareVersion === 'object'
-        ) {
-            const semver = get(reportedFirmwareVersion, 'semver');
-
-            if (typeof semver === 'string' || typeof semver === 'number') {
-                const sanitizedSemver = String(semver).trim();
-                return sanitizedSemver || disconnectedValue;
-            }
-        }
-
-        return disconnectedValue;
-    })();
     let diagnosticEvents: Record<string, DiagnosticEventRecord> = {};
-
-    let alarms: Array<AlarmsErrors>,
-        errors: Array<AlarmsErrors> = [];
-
-    api.alarmList.recent().then((value) => {
-        const grblAlarmsAndErrors = get(value, 'data.list', []);
-        [alarms, errors] = partition(grblAlarmsAndErrors, ['type', 'ALARM']);
-    });
-
-    let eepromData = [];
-    Object.entries(eeprom).forEach((entry) => {
-        const [key, value] = entry;
-        eepromData.push({ key: key, value: value });
-    });
+    let alarms: Array<AlarmsErrors> = [];
+    let errors: Array<AlarmsErrors> = [];
 
     const SupportFile = () => {
+        const eeprom = getEEPROMValues();
+        const machineProfile = getMachineProfile();
+        const defaultsMachineProfile =
+            getDefaultsMachineProfile(machineProfile);
+        const version = getGSenderVersion();
+        const grblInfo = getGRBLInformation();
+        const os = getOS();
+        const terminalHistory = getTerminalHistory();
+        const gcode = getGCodeFile();
+        const mode = getMode();
+        const connection = getConnection();
+        const fileInfo = getFileInfo();
+        const isConnected = connection.isConnected;
+        const firmwareVersion = (() => {
+            const disconnectedValue = 'disconnected';
+            const reportedFirmwareVersion: unknown = get(
+                grblInfo,
+                'settings.version',
+            );
+
+            if (!isConnected) {
+                return disconnectedValue;
+            }
+
+            if (typeof reportedFirmwareVersion === 'string') {
+                const sanitizedVersion = reportedFirmwareVersion.trim();
+                return sanitizedVersion || disconnectedValue;
+            }
+
+            if (
+                reportedFirmwareVersion &&
+                typeof reportedFirmwareVersion === 'object'
+            ) {
+                const semver = get(reportedFirmwareVersion, 'semver');
+
+                if (typeof semver === 'string' || typeof semver === 'number') {
+                    const sanitizedSemver = String(semver).trim();
+                    return sanitizedSemver || disconnectedValue;
+                }
+            }
+
+            return disconnectedValue;
+        })();
+
         const configReport = buildConfigSettingsReport(SettingsMenu, {
             getStoreValue: (key, defaultValue) => store.get(key, defaultValue),
             getDefaultValue: (key) => get(defaultStoreState, key, null),
@@ -762,7 +764,7 @@ function generateSupportFile() {
             controllerType: grblInfo.type,
             firmwareSemver: get(grblInfo, 'settings.version.semver'),
             boardId: get(grblInfo, 'settings.info.BOARD'),
-            machineProfile,
+            machineProfile: defaultsMachineProfile,
             events: diagnosticEvents,
             axes: get(grblInfo, 'state.axes.axes', ['X', 'Y', 'Z']),
         });
@@ -1238,7 +1240,7 @@ function generateSupportFile() {
 
                                 {createTableRows(
                                     eeprom,
-                                    machineProfile,
+                                    defaultsMachineProfile,
                                     grblInfo.type,
                                 )}
                             </View>
@@ -1448,6 +1450,20 @@ function generateSupportFile() {
                     );
                     diagnosticEvents = {};
                 }
+                try {
+                    const recentAlarms = await api.alarmList.recent();
+                    [alarms, errors] = partition(
+                        get(recentAlarms, 'data.list', []),
+                        ['type', 'ALARM'],
+                    );
+                } catch (alarmError) {
+                    console.error(
+                        'Unable to load alarms and errors for diagnostics:',
+                        alarmError,
+                    );
+                    alarms = [];
+                    errors = [];
+                }
                 const blob = await pdf(<SupportFile />).toBlob();
 
                 // Step 2: Prepare file data
@@ -1481,17 +1497,28 @@ function generateSupportFile() {
                 await delay(100);
                 const zip = new JSZip();
                 const diagnosticPDFLabel = `diagnostics_${currentDate}_${currentTime}.pdf`;
+                // JSZip writes entry timestamps from UTC fields, but unzip tools read them as local time
+                const zipEntryOptions = {
+                    date: new Date(
+                        date.getTime() - date.getTimezoneOffset() * 60000,
+                    ),
+                };
 
                 const code = getGCodeFile();
                 if (code.length > 0) {
-                    zip.file(getGCodeFileName(), new Blob([code]));
+                    zip.file(
+                        getGCodeFileName(),
+                        new Blob([code]),
+                        zipEntryOptions,
+                    );
                 }
 
-                zip.file(diagnosticPDFLabel, blob);
-                zip.file(eepromFileName, eepromBlob);
+                zip.file(diagnosticPDFLabel, blob, zipEntryOptions);
+                zip.file(eepromFileName, eepromBlob, zipEntryOptions);
                 zip.file(
                     `gSenderSettings_${currentDate}_${currentTime}.json`,
                     senderSettings,
+                    zipEntryOptions,
                 );
 
                 // Step 6: Generate and download

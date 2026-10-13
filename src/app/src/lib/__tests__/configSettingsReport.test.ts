@@ -196,6 +196,44 @@ describe('buildConfigSettingsReport', () => {
         ).toBe(true);
     });
 
+    test('includes safe height in carve units, jog delay, and tool changing from the real menu', () => {
+        const values: Record<string, unknown> = {
+            'workspace.units': 'in',
+            'workspace.safeRetractHeight': 254,
+            'widgets.axes.jog.threshold': 700,
+            'workspace.toolChangeOption': 'Code',
+            'workspace.toolChangeHooks.preHook': 'M5',
+        };
+        const report = buildConfigSettingsReport(SettingsMenu, {
+            getStoreValue: (key, fallback) =>
+                Object.hasOwn(values, key) ? values[key] : fallback,
+            getDefaultValue: () => null,
+            eeprom: {},
+            connected: false,
+            events: {},
+        });
+        const rows = (label: string) =>
+            report
+                .find((section) => section.label === label)
+                ?.subsections.flatMap((subsection) => subsection.rows) ?? [];
+
+        expect(
+            rows('Basics').find((row) => row.label === 'Safe height')?.value,
+        ).toBe('10 in');
+        expect(
+            rows('Basics').find((row) => row.label === 'Continuous jog delay')
+                ?.value,
+        ).toBe('700 ms');
+        const toolChanging = rows('Tool Changing');
+        expect(
+            toolChanging.find((row) => row.label === 'gSender strategy')?.value,
+        ).toBe('Code');
+        expect(
+            toolChanging.find((row) => row.label === 'Before tool change')
+                ?.value,
+        ).toBe('M5');
+    });
+
     test('mirrors config sections and hides settings the page would hide', () => {
         const report = buildConfigSettingsReport(menu, source());
 
