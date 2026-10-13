@@ -46,6 +46,12 @@ const authrequest = axios.create({
     },
 });
 
+// The pendant is served from file:// in Electron, so it has to point axios at
+// the server explicitly.
+export const setApiBaseURL = (baseURL: string): void => {
+    authrequest.defaults.baseURL = baseURL || '/';
+};
+
 // Request interceptor to add bearer token and prevent caching
 authrequest.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
@@ -456,7 +462,7 @@ const preferences = {
         return authrequest.get('/api/preferences');
     },
     replace: (options: Record<string, any>): Promise<AxiosResponse> => {
-        return authrequest.put('/api/preferences/', options);
+        return authrequest.put('/api/preferences', options);
     },
 };
 

@@ -102,9 +102,9 @@ import _debounce from 'lodash/debounce';
 import _throttle from 'lodash/throttle';
 import pubsub from 'pubsub-js';
 import {
-	AlarmsData,
-	ControllerSettings,
-	ControllerStateState,
+    AlarmsData,
+    ControllerSettings,
+    ControllerStateState,
     FILE_TYPE_T,
     NetworkAddress,
     PortInfo,
@@ -1148,13 +1148,13 @@ export function* initialize(): Generator<null, void, unknown> {
                 { position: 'bottom-right' },
             );
 
-			posthog.capture(
-				error.type === ALARM ? 'alarm_raised' : 'controller_error',
-				{
-					code: error.code,
-					was_job_running: Boolean(_wasRunning),
-				},
-			);
+            posthog.capture(
+                error.type === ALARM ? 'alarm_raised' : 'controller_error',
+                {
+                    code: error.code,
+                    was_job_running: Boolean(_wasRunning),
+                },
+            );
         }
 
         pubsub.publish('error', error);
@@ -1205,10 +1205,6 @@ export function* initialize(): Generator<null, void, unknown> {
                 cancelLabel: 'Close',
             });
         }
-    });
-
-    controller.addListener('connection:new', (content: string) => {
-        console.log('connection:new', content);
     });
 
     controller.addListener(
