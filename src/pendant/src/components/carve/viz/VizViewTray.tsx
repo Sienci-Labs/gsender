@@ -18,6 +18,9 @@ const BUTTON_ARMED = 'border-robin-500 bg-robin-500/20 text-robin-400';
  * loaded toolpath, center on the machine bed. */
 export default function VizViewTray({ visualizerRef, jogArmed }: Props) {
     const fileLoaded = useTypedSelector((s: RootState) => s.file.fileLoaded);
+    const isConnected = useTypedSelector(
+        (s: RootState) => s.connection.isConnected,
+    );
 
     return (
         <div className="absolute left-2.5 top-1/2 -translate-y-1/2 flex flex-col gap-1.5 p-1.5 rounded-md border border-outline-subtle bg-surface-sunken/[0.72] backdrop-blur-md">
@@ -38,9 +41,18 @@ export default function VizViewTray({ visualizerRef, jogArmed }: Props) {
             <button
                 type="button"
                 className={BUTTON}
-                disabled={!fileLoaded}
-                aria-label="Center on toolpath"
-                onClick={() => visualizerRef.current?.focusToModel()}
+                disabled={!fileLoaded && !isConnected}
+                aria-label={
+                    fileLoaded
+                        ? 'Center on toolpath'
+                        : 'Center on current position'
+                }
+                onClick={() => {
+                    const v = visualizerRef.current;
+                    if (!v) return;
+                    if (fileLoaded) v.focusToModel();
+                    else v.focusToBit();
+                }}
             >
                 <Waypoints className="h-5 w-5" aria-hidden />
             </button>

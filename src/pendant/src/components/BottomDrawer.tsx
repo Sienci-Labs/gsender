@@ -418,6 +418,7 @@ export default function BottomDrawer() {
                         <Console
                             isActive={activeTab === 'Console'}
                             isChildWindow={false}
+                            showActions={false}
                         />
                     </div>
 

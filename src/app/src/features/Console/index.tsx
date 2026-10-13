@@ -20,9 +20,12 @@ const COPY_HISTORY_LIMIT = 50;
 type ConsoleProps = {
     isActive: boolean;
     isChildWindow?: boolean;
+    // Hides the copy/clear/pop-out toolbar buttons — for hosts too narrow to
+    // fit them (e.g. the pendant's console tab).
+    showActions?: boolean;
 };
 
-const Console = ({ isActive, isChildWindow }: ConsoleProps) => {
+const Console = ({ isActive, isChildWindow, showActions = true }: ConsoleProps) => {
     const [port, setPort] = useState(controller.port);
     const [filter, setFilter] = useState<ConsoleFilter>('all');
     const posthog = usePostHog();
@@ -218,6 +221,7 @@ const Console = ({ isActive, isChildWindow }: ConsoleProps) => {
                     onClear={handleClear}
                     onPopout={handlePopout}
                     showPopout={!isChildWindow}
+                    showActions={showActions}
                 />
                 <ConsoleList
                     messages={visibleMessages}

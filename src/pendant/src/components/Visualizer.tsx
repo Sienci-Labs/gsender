@@ -28,6 +28,9 @@ import {
 export interface VisualizerHandle {
     focusToModel: () => void;
     focusToMachineBed: () => void;
+    /** Pans the camera to center on the bit's last known position, preserving
+     * the current zoom/angle — for when there's no toolpath to frame. */
+    focusToBit: () => void;
     /** Arms tap-to-jog: the next tap on the canvas sends a safe XY move there. */
     armJog: () => void;
     disarmJog: () => void;
@@ -122,6 +125,7 @@ function VisualizerImpl(
 
     const jogArmedRef = useRef(false);
     const jogHandlerRef = useRef<((e: PointerEvent) => void) | null>(null);
+    const lastPositionRef = useRef({ x: 0, y: 0, z: 0 });
 
     const options = useMemo<Partial<GCodeViewerOptions>>(
         () => ({
@@ -226,6 +230,18 @@ function VisualizerImpl(
         () => ({
             focusToModel: () => withViewer((v) => v.focusToModel()),
             focusToMachineBed: () => withViewer((v) => v.focusToMachineBed()),
+            // gviewer has no direct "center on point" call; engaging follow
+            // for one setBitPosition pans camera+target onto the bit while
+            // holding the current camera offset (zoom/angle) constant, then
+            // disengaging leaves it a one-shot recenter rather than tracking.
+            focusToBit: () =>
+                withViewer((v) => {
+                    v.setCameraFollowEnabled(true);
+                    v.setBitPosition(lastPositionRef.current, {
+                        immediate: true,
+                    });
+                    v.setCameraFollowEnabled(false);
+                }),
             armJog,
             disarmJog,
         }),
@@ -276,6 +292,7 @@ function VisualizerImpl(
 
     useEffect(() => {
         const [x, y, z] = wposKey.split(',').map(Number);
+        lastPositionRef.current = { x, y, z };
         withViewer((v) => v.setBitPosition({ x, y, z }));
     }, [wposKey]);
 

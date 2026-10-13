@@ -36,6 +36,9 @@ export function LiveFileLoadingOverlay({ fileName }: { fileName: string }) {
 }
 
 export default function VisualizerCard() {
+    const isConnected = useTypedSelector(
+        (s: RootState) => s.connection.isConnected,
+    );
     const fileLoaded = useTypedSelector((s: RootState) => s.file.fileLoaded);
     const fileProcessing = useTypedSelector(
         (s: RootState) => s.file.fileProcessing,
@@ -90,7 +93,7 @@ export default function VisualizerCard() {
                             <LiveFileLoadingOverlay fileName={fileName} />
                         </div>
                     )}
-                    {!fileLoaded && !fileProcessing && (
+                    {!fileLoaded && !fileProcessing && !isConnected && (
                         <button
                             type="button"
                             onClick={() =>
@@ -109,6 +112,23 @@ export default function VisualizerCard() {
                             <span className="text-[11px] text-gray-600 dark:text-content-muted">
                                 Tap here to open a G-code file
                             </span>
+                        </button>
+                    )}
+                    {/* Connected with nothing loaded: the canvas already shows
+                        the homed machine bed and position crosshair, so the
+                        "open file" affordance shrinks to a corner button
+                        instead of covering the view. */}
+                    {!fileLoaded && !fileProcessing && isConnected && (
+                        <button
+                            type="button"
+                            onClick={() =>
+                                openGcodeFileOrPrompt(fileInputRef.current)
+                            }
+                            className="absolute bottom-2 right-2 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-gray-900/70 text-white backdrop-blur-sm active:bg-gray-900/85 dark:bg-black/50"
+                            aria-label="Open G-code file"
+                        >
+                            <FileCode2 size={14} />
+                            Open file
                         </button>
                     )}
                     <input
