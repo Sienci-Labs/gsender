@@ -30,7 +30,7 @@ const VisualizerPreview = ({ gcode, PreviewComponent }: VisualizerPreviewProps) 
     if (PreviewComponent) {
         return (
             <div
-                className="flex flex-col h-full items-center justify-center border border-gray-200 rounded-md dark:border-outline"
+                className="flex flex-col h-full min-h-[320px] items-center justify-center border border-gray-200 rounded-md dark:border-outline"
                 id={SURFACING_VISUALIZER_CONTAINER_ID}
             >
                 <PreviewComponent gcode={gcode} />

@@ -88,14 +88,24 @@ export default function GcodeToolPreviewVisualizer({ gcode }: Props) {
             name: `tool-preview-${++previewJobCounter}.gcode`,
             size: gcode.length,
         })
-            .then((geometry) => {
-                if (cancelled) return;
+            .then(async (geometry) => {
+                if (cancelled || !geometry.svgSegmentGroups) return;
                 withViewer((v) =>
                     v.loadFromPrecomputedGroups(
                         geometry.svgSegmentGroups ?? [],
                         geometry.svgMeta,
                     ),
                 );
+                // The preview panel's height can depend on sibling content
+                // (e.g. the Surfacing form column) finishing its own layout
+                // pass; wait a paint cycle before measuring, or focusOrDefer
+                // can see a stale zero-size container and never re-check.
+                await new Promise<void>((resolve) =>
+                    requestAnimationFrame(() =>
+                        requestAnimationFrame(() => resolve()),
+                    ),
+                );
+                if (cancelled) return;
                 focusOrDefer();
             })
             .catch((error) => {

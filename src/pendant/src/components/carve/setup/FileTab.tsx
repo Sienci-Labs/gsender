@@ -7,7 +7,7 @@ import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import type { RootState } from 'app/store/redux';
 import cn from 'classnames';
 import { FileText, X } from 'lucide-react';
-import { type JSX, type ReactNode, useEffect, useState } from 'react';
+import type { JSX, ReactNode } from 'react';
 import type { FileActions } from '../../../hooks/useFileActions';
 import { useHoldToActivate } from '../../../hooks/useHoldToActivate';
 import { formatDayTime, formatHMS, formatSize } from '../../../utils/format';
@@ -121,10 +121,10 @@ function FileDetails() {
     return (
         <div className="flex flex-col gap-2 px-2.5 py-2 rounded-md bg-surface-raised">
             <div className="flex items-baseline justify-between">
-                <span className="font-mono text-[8px] tracking-[0.06em] uppercase text-content-disabled">
+                <span className="font-mono text-[9.5px] tracking-[0.06em] uppercase text-content-disabled">
                     Bounding box
                 </span>
-                <span className="font-mono text-[8px] text-content-disabled">
+                <span className="font-mono text-[9.5px] text-content-disabled">
                     {unitLabel}
                 </span>
             </div>
@@ -133,7 +133,7 @@ function FileDetails() {
                 {['Size', 'Min', 'Max'].map((h) => (
                     <span
                         key={h}
-                        className="text-right text-[8px] tracking-[0.06em] uppercase text-content-disabled"
+                        className="text-right text-[9.5px] tracking-[0.06em] uppercase text-content-disabled"
                     >
                         {h}
                     </span>
@@ -159,7 +159,7 @@ function FileDetails() {
                         key={label}
                         className="flex items-baseline justify-between gap-2 min-w-0"
                     >
-                        <span className="shrink-0 font-mono text-[8px] tracking-[0.06em] uppercase text-content-disabled">
+                        <span className="shrink-0 font-mono text-[9.5px] tracking-[0.06em] uppercase text-content-disabled">
                             {label}
                         </span>
                         <span className="font-mono text-[10.5px] font-semibold text-content-primary truncate">
@@ -285,11 +285,6 @@ function LoadedFile({
         (s: RootState) => s.controller.state.status?.activeState ?? '',
     );
     const total = Number(file.total) || 0;
-    const [line, setLine] = useState(1);
-
-    useEffect(() => {
-        setLine(1);
-    }, [file.name]);
 
     // The desktop JobControl rule for Outline and Start From
     const jobToolsDisabled =
@@ -309,9 +304,6 @@ function LoadedFile({
         { label: 'Loaded', value: formatDayTime(actions.loadedAt) },
     ];
 
-    const stepLine = (delta: number) =>
-        setLine((l) => Math.min(Math.max(1, l + delta), Math.max(1, total)));
-
     return (
         <>
             <div className="flex items-center gap-2 pl-2.5 pr-1 py-1 rounded-md border border-outline-subtle bg-surface-raised">
@@ -330,7 +322,7 @@ function LoadedFile({
             <div className="grid grid-cols-2 gap-x-2.5 gap-y-[7px] px-2.5 py-2 rounded-md bg-surface-raised">
                 {stats.map(({ label, value }) => (
                     <div key={label} className="flex flex-col gap-px min-w-0">
-                        <span className="font-mono text-[8px] tracking-[0.06em] uppercase text-content-disabled">
+                        <span className="font-mono text-[9.5px] tracking-[0.06em] uppercase text-content-disabled">
                             {label}
                         </span>
                         <span className="font-mono text-[11px] font-semibold text-content-primary truncate">
@@ -368,45 +360,21 @@ function LoadedFile({
                 title="Start from line"
                 sub="Resume without re-running finished passes"
             >
-                <div className="flex items-center gap-0.5 shrink-0 p-0.5 rounded-sm bg-surface-elevated">
-                    <button
-                        type="button"
-                        aria-label="Previous line"
-                        disabled={jobToolsDisabled || line <= 1}
-                        onClick={() => stepLine(-1)}
-                        className="w-[18px] h-[18px] rounded-sm flex items-center justify-center font-mono text-[11px] font-bold text-content-muted disabled:opacity-40"
-                    >
-                        −
-                    </button>
-                    {/* Keyed so the modal opens prefilled with this line */}
-                    <StartFromLine
-                        key={line}
-                        disabled={jobToolsDisabled}
-                        lastLine={line}
-                        initialStartLine={line}
-                        atcValidator={atcValidator}
-                        renderTrigger={(open) => (
-                            <button
-                                type="button"
-                                disabled={jobToolsDisabled}
-                                onClick={open}
-                                aria-label={`Start from line ${line}`}
-                                className="min-w-4 px-1 font-mono text-[10.5px] text-content-secondary underline decoration-dotted underline-offset-2 disabled:no-underline disabled:opacity-40"
-                            >
-                                {line}
-                            </button>
-                        )}
-                    />
-                    <button
-                        type="button"
-                        aria-label="Next line"
-                        disabled={jobToolsDisabled || line >= total}
-                        onClick={() => stepLine(1)}
-                        className="w-[18px] h-[18px] rounded-sm flex items-center justify-center font-mono text-[11px] font-bold text-content-muted disabled:opacity-40"
-                    >
-                        +
-                    </button>
-                </div>
+                <StartFromLine
+                    disabled={jobToolsDisabled}
+                    lastLine={1}
+                    atcValidator={atcValidator}
+                    renderTrigger={(open) => (
+                        <button
+                            type="button"
+                            className={SMALL_BTN}
+                            disabled={jobToolsDisabled}
+                            onClick={open}
+                        >
+                            Set
+                        </button>
+                    )}
+                />
             </InfoRow>
         </>
     );
