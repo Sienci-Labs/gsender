@@ -250,9 +250,7 @@ function lookupEepromMeta(
     >;
     const live =
         descriptions[numericKey] ||
-        (descriptions as Record<number, EepromDescription>)[
-            Number(numericKey)
-        ];
+        (descriptions as Record<number, EepromDescription>)[Number(numericKey)];
     const map =
         source.controllerType === GRBLHAL
             ? GRBL_HAL_SETTINGS_MAP
@@ -270,8 +268,7 @@ function lookupEepromMeta(
         label: live?.description || stat?.description || resolvedId,
         details: filterNewlines(live?.details || stat?.details || ''),
         unit: live?.unit || live?.unitString || stat?.units || '',
-        dataType:
-            live?.dataType !== undefined ? live.dataType : stat?.dataType,
+        dataType: live?.dataType !== undefined ? live.dataType : stat?.dataType,
         format: live?.format ?? null,
     };
 }
@@ -548,8 +545,7 @@ function buildRow(
         return null;
     }
 
-    const eepromLike =
-        setting.type === 'eeprom' || setting.type === 'hybrid';
+    const eepromLike = setting.type === 'eeprom' || setting.type === 'hybrid';
     if (eepromLike && !source.connected) {
         return null;
     }
