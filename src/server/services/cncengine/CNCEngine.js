@@ -537,7 +537,14 @@ class CNCEngine {
 			// with the adapter they belong to and which one we recommend hosting on.
 			socket.on("listAllIps", async () => {
 				try {
-					socket.emit("ip:list", await listNetworkAddresses());
+					const addresses = await listNetworkAddresses();
+					// TEMP DIAGNOSTIC - remove once Android's "no network
+					// detected" report is root-caused. Shows up in logcat
+					// under the GSenderPendant-node tag.
+					log.info(
+						`listAllIps: raw=${JSON.stringify(require("os").networkInterfaces())} resolved=${JSON.stringify(addresses)}`,
+					);
+					socket.emit("ip:list", addresses);
 				} catch (err) {
 					log.error(`Unable to list network addresses: ${err.message}`);
 					socket.emit("ip:list", []);
