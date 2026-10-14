@@ -29,6 +29,7 @@ import {
 } from 'app/constants';
 import { ReloadFileAlert } from 'app/features/FileControl/components/ReloadFileAlert.tsx';
 import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
+import { SendToPendantDialog } from 'app/features/SendToPendant';
 import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import controller from 'app/lib/controller';
@@ -44,7 +45,7 @@ import get from 'lodash/get';
 import throttle from 'lodash/throttle';
 import pubsub from 'pubsub-js';
 import { useEffect, useRef, useState } from 'react';
-import { FaFolderOpen } from 'react-icons/fa';
+import { FaFolderOpen, FaWifi } from 'react-icons/fa';
 import { MdClose, MdKeyboardArrowDown } from 'react-icons/md';
 import { useSelector } from 'react-redux';
 import Divider from './components/Divider';
@@ -59,6 +60,7 @@ const ButtonControlGroup = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const fileLoadedRef = useRef(false);
     const [recentFiles, setRecentFiles] = useState<RecentFile[]>([]);
+    const [showSendToPendant, setShowSendToPendant] = useState(false);
     const { fileLoaded, path, name } = useTypedSelector((state) => state.file);
 
     useEffect(() => {
@@ -228,7 +230,7 @@ const ButtonControlGroup = () => {
                 className="h-full px-4 rounded-none portrait:text-xl portrait:px-6"
             />
             <Divider />
-            <div className="grid grid-cols-[60px_2px_60px_2px_60px] h-full portrait:grid-cols-[80px_2px_80px_2px_80px]">
+            <div className="grid grid-cols-[60px_2px_60px_2px_60px_2px_60px] h-full portrait:grid-cols-[80px_2px_80px_2px_80px_2px_80px]">
                 <DropdownMenu>
                     <Tooltip content="View Recent Files">
                         <DropdownMenuTrigger asChild>
@@ -303,6 +305,24 @@ const ButtonControlGroup = () => {
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>
+
+                <Divider />
+
+                <Tooltip content="Send to Pendant">
+                    <Button
+                        icon={<FaWifi className="w-5 h-5" />}
+                        variant="ghost"
+                        className="h-full rounded-none"
+                        disabled={!canClick}
+                        aria-label="Send to Pendant"
+                        onClick={() => setShowSendToPendant(true)}
+                    />
+                </Tooltip>
+
+                <SendToPendantDialog
+                    isOpen={showSendToPendant}
+                    onClose={() => setShowSendToPendant(false)}
+                />
 
                 <input
                     ref={fileInputRef}

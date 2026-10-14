@@ -243,6 +243,32 @@ const remoteSetting = {
 };
 
 //
+// Remote File Receive (desktop -> pendant file transfer)
+//
+const remoteFileReceive = {
+    fetch: (): Promise<AxiosResponse> => {
+        return authrequest.get('/api/remoteFileReceive');
+    },
+
+    update: (options: {
+        enabled: boolean;
+        port?: number;
+    }): Promise<AxiosResponse> => {
+        return authrequest.put('/api/remoteFileReceive', options);
+    },
+
+    regenerateToken: (): Promise<AxiosResponse> => {
+        return authrequest.post('/api/remoteFileReceive/token');
+    },
+
+    readFile: (name: string): Promise<AxiosResponse> => {
+        return authrequest.get(
+            `/api/remoteFileReceive/files/${encodeURIComponent(name)}`,
+        );
+    },
+};
+
+//
 // Job Stats
 //
 const jobStats = {
@@ -516,6 +542,7 @@ export default {
     users,
     events,
     remoteSetting,
+    remoteFileReceive,
     jobStats,
     maintenance,
     macros,

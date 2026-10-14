@@ -38,6 +38,7 @@ import * as plugins from "./api.plugins";
 import * as preferences from "./api.preferences";
 import * as releaseNotes from "./api.releasenotes";
 import * as remote from "./api.remote";
+import * as remoteFileReceive from "./api.remoteFileReceive";
 import * as state from "./api.state";
 import * as users from "./api.users";
 import * as version from "./api.version";
@@ -61,6 +62,7 @@ export {
 	preferences,
 	releaseNotes,
 	remote,
+	remoteFileReceive,
 	state,
 	users,
 	version,

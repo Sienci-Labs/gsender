@@ -124,6 +124,9 @@ export interface ControllerListeners {
     'plugin:parser:match': Array<Function>;
     // A plugin's parser was rejected, rate limited, or quarantined.
     'plugin:parser:error': Array<Function>;
+    // A file was pushed onto this pendant remotely (Send to Pendant) and saved
+    // to its file library rather than loaded as the active job.
+    'remote:file-received': Array<Function>;
 }
 
 const ensureArray = (...args: Array<any>) => {
@@ -246,6 +249,7 @@ class Controller {
         // silently never be subscribed to.
         'plugin:parser:match': [],
         'plugin:parser:error': [],
+        'remote:file-received': [],
     };
 
     context = {

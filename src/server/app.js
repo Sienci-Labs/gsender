@@ -374,6 +374,31 @@ const appMain = () => {
 		app.put(urljoin(settings.route, "/api/remote"), api.remote.update);
 		app.get(urljoin(settings.route, "api/remote"), api.remote.fetch);
 
+		// Remote File Receive (desktop -> pendant file transfer). The actual
+		// LAN-reachable upload listener is a separate server - see
+		// src/server/services/remoteFileReceive. These routes only manage it
+		// and are served on this app's usual loopback-only origin.
+		app.get(
+			urljoin(settings.route, "api/remoteFileReceive"),
+			api.remoteFileReceive.fetch,
+		);
+		app.put(
+			urljoin(settings.route, "api/remoteFileReceive"),
+			api.remoteFileReceive.update,
+		);
+		app.post(
+			urljoin(settings.route, "api/remoteFileReceive/token"),
+			api.remoteFileReceive.regenerateToken,
+		);
+		app.get(
+			urljoin(settings.route, "api/remoteFileReceive/files"),
+			api.remoteFileReceive.listFiles,
+		);
+		app.get(
+			urljoin(settings.route, "api/remoteFileReceive/files/:name"),
+			api.remoteFileReceive.readFile,
+		);
+
 		// Job Stats
 		app.put(urljoin(settings.route, "/api/jobstats"), api.jobStats.update);
 		app.get(urljoin(settings.route, "api/jobstats"), api.jobStats.fetch);

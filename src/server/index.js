@@ -51,6 +51,7 @@ import errorConfig from "./services/configstore/alarmStore";
 import jobConfig from "./services/configstore/jobStore";
 import monitor from "./services/monitor";
 import pluginRegistry from "./services/pluginregistry";
+import remoteFileReceive from "./services/remoteFileReceive";
 
 const log = logger("init");
 
@@ -358,6 +359,16 @@ const createServer = (options, callback) => {
 				server,
 				options.controller || config.get("controller", ""),
 			);
+
+			// Resume "Remote File Receive" across restarts if it was left on -
+			// the operator shouldn't have to re-enable it every launch.
+			const remoteFileReceiveSettings = config.get("remoteFileReceive", {
+				enabled: false,
+				port: 8010,
+			});
+			if (remoteFileReceiveSettings.enabled) {
+				remoteFileReceive.start(remoteFileReceiveSettings.port);
+			}
 
 			// Dev-only: live-reload plugin iframes when their files change.
 			if (process.env.NODE_ENV === "development") {

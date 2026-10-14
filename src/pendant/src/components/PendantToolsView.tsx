@@ -9,6 +9,7 @@ import { PluginManager } from 'app/features/Plugins';
 import PluginPanel from 'app/features/Plugins/components/PluginPanel';
 import { usePlugins } from 'app/features/Plugins/hooks/usePlugins';
 import type { PluginRecord } from 'app/features/Plugins/types';
+import RemoteFileReceive from 'app/features/RemoteFileReceive';
 import RotarySurfacing from 'app/features/Rotary/RotarySurfacing';
 import SDCard from 'app/features/SDCard';
 import Squaring from 'app/features/Squaring';
@@ -16,12 +17,13 @@ import Surfacing from 'app/features/Surfacing';
 import { useState } from 'react';
 import { MemoryRouter } from 'react-router';
 import { BiSolidCylinder } from 'react-icons/bi';
-import { FaGamepad, FaKeyboard, FaSdCard } from 'react-icons/fa';
+import { FaGamepad, FaKeyboard, FaSdCard, FaWifi } from 'react-icons/fa';
 import { GiFlatPlatform } from 'react-icons/gi';
 import { LuArrowLeft, LuDrill } from 'react-icons/lu';
 import { MdSquareFoot } from 'react-icons/md';
 import { PiPuzzlePiece } from 'react-icons/pi';
 import { TbPuzzle, TbRulerMeasure } from 'react-icons/tb';
+import { applyGcodeFile } from '../utils/fileLoader';
 
 // react-router hooks (useNavigate/useParams) used inside several of these
 // need *some* Router context - the pendant shell mounts no top-level Router
@@ -38,7 +40,8 @@ type BuiltInToolKey =
     | 'gamepad'
     | 'sd'
     | 'accessoryInstall'
-    | 'plugins';
+    | 'plugins'
+    | 'remote-file-receive';
 
 const BUILT_IN_TOOLS: Record<
     BuiltInToolKey,
@@ -63,6 +66,10 @@ const BUILT_IN_TOOLS: Record<
         Component: AccessoryInstaller,
     },
     plugins: { title: 'Plugins', Component: PluginManager },
+    'remote-file-receive': {
+        title: 'Remote File Receive',
+        Component: RemoteFileReceive,
+    },
 };
 
 export default function PendantToolsView() {
@@ -74,6 +81,7 @@ export default function PendantToolsView() {
         const { title, Component } = BUILT_IN_TOOLS[activeTool];
         const usesGcodePreview =
             activeTool === 'surfacing' || activeTool === 'rotary-surfacing';
+        const isRemoteFileReceive = activeTool === 'remote-file-receive';
 
         return (
             <div className="flex-1 flex flex-col min-h-0 p-3">
@@ -96,6 +104,8 @@ export default function PendantToolsView() {
                             <Component
                                 PreviewComponent={GcodeToolPreviewVisualizer}
                             />
+                        ) : isRemoteFileReceive ? (
+                            <Component onOpenFile={applyGcodeFile} />
                         ) : (
                             <Component />
                         )}
@@ -202,6 +212,13 @@ export default function PendantToolsView() {
                     description="Manage installed UI plugins"
                     icon={PiPuzzlePiece}
                     onClick={() => setActiveTool('plugins')}
+                />
+
+                <ToolCard
+                    title="Remote File Receive"
+                    description="Receive g-code files sent from a desktop gSender over Wi-Fi"
+                    icon={FaWifi}
+                    onClick={() => setActiveTool('remote-file-receive')}
                 />
 
                 {toolsPagePlugins.map((plugin) => {
