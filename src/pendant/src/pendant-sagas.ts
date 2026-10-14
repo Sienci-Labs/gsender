@@ -34,6 +34,8 @@ import {
     updateWorkflowState,
 } from 'app/store/redux/slices/controller.slice';
 import { unloadFileInfo } from 'app/store/redux/slices/fileInfo.slice';
+import { setIpList } from 'app/store/redux/slices/preferences.slice';
+import type { NetworkAddress } from 'app/store/definitions';
 import {
     applyControllerGcodePayload,
     resendCachedEstimateData,
@@ -75,6 +77,13 @@ export function* initialize() {
     // the store the listing reads from, so the UI just stays empty.
     controller.addListener('sdcard:files', (file: SDCardFile) => {
         reduxStore.dispatch(addSDCardFileToList({ file }));
+    });
+
+    // Remote File Receive (Tools page): same shape of gap as sdcard:files
+    // above - the server replies to 'listAllIps' with 'ip:list', but nothing
+    // forwarded it into the store the panel reads addresses from.
+    controller.addListener('ip:list', (ipList: NetworkAddress[]) => {
+        reduxStore.dispatch(setIpList(ipList));
     });
 
     // ── Homing state ───────────────────────────────────────────────────────
