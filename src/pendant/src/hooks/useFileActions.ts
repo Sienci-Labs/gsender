@@ -1,3 +1,5 @@
+import { actions as remoteFileReceiveActions } from 'app/features/RemoteFileReceive/apiActions';
+import { toast } from 'app/lib/toaster';
 import { store as reduxStore } from 'app/store/redux';
 import { unloadFileInfo } from 'app/store/redux/slices/fileInfo.slice';
 import pubsub from 'pubsub-js';
@@ -25,9 +27,12 @@ export type RecentFile = {
     /** Key of the page's own copy (recentFileCache), outside Electron. */
     cacheKey?: string;
     /** Where the file came from - drives the recent-row icon. Absent/'local'
-     * means opened on this device; 'remote' means opened from a file a
-     * desktop pushed in via Send to Pendant. */
+     * means opened on this device; 'remote' means received from a desktop
+     * via Send to Pendant. */
     source?: 'local' | 'remote';
+    /** Server-side incoming/ filename (remote entries only), used to
+     * refetch the file's content on demand via the Remote File Receive API. */
+    savedName?: string;
 };
 
 export const RECENT_KEY = 'pendant-recent-files';
@@ -47,14 +52,21 @@ export const readRecentFiles = (): RecentFile[] => {
             filePath: entry.filePath || '',
             cacheKey: entry.cacheKey || '',
             source: entry.source === 'remote' ? 'remote' : 'local',
+            savedName: entry.savedName || '',
         }))
         .slice(0, 5);
 };
 
 /** Whether a recent-file row can be reloaded (same rule as handleRecentLoad):
- * Electron rereads the path, anywhere else needs the page's own copy. */
+ * a remote entry refetches its content from the server on demand, so it's
+ * always loadable; otherwise Electron rereads the path and anywhere else
+ * needs the page's own copy. */
 export const canLoadRecent = (recentFile: RecentFile) =>
-    isElectron() ? !!recentFile.filePath : !!recentFile.cacheKey;
+    recentFile.source === 'remote'
+        ? true
+        : isElectron()
+          ? !!recentFile.filePath
+          : !!recentFile.cacheKey;
 
 const entryKey = (r: RecentFile) =>
     r.filePath?.trim()
@@ -66,8 +78,8 @@ const entryKey = (r: RecentFile) =>
 /**
  * Persists a recent-file entry and broadcasts the update, so every mounted
  * useFileActions() instance (File tab, bottom drawer) stays in sync even when
- * the entry was recorded from somewhere else entirely (Remote File Receive's
- * "Open" action, via recordRemoteFileOpened below).
+ * the entry was recorded from somewhere else entirely - e.g. a remote file
+ * arriving while neither is the active screen (IncomingFileRecents.tsx).
  */
 export const saveRecentFileEntry = (entry: RecentFile): RecentFile[] => {
     const stored = readRecentFiles();
@@ -87,24 +99,6 @@ export const saveRecentFileEntry = (entry: RecentFile): RecentFile[] => {
     return updated;
 };
 
-/** Records a file opened from the Remote File Receive panel as a recent
- * file, tagged so its row shows the remote icon. Does not load the file
- * itself - callers pair this with applyGcodeFile. */
-export const recordRemoteFileOpened = ({
-    name,
-    size,
-}: {
-    name: string;
-    size: number;
-}) => {
-    saveRecentFileEntry({
-        fileName: name,
-        fileSize: size,
-        timeLoaded: Date.now(),
-        source: 'remote',
-    });
-};
-
 /**
  * File open / close / recent-files logic from the pendant's File drawer.
  * The returned fileInputRef must be attached to a hidden
@@ -122,7 +116,7 @@ export function useFileActions() {
     }, []);
 
     // Keeps this instance's list in sync with entries recorded by any other
-    // useFileActions() instance, or by recordRemoteFileOpened.
+    // useFileActions() instance, or by IncomingFileRecents.tsx.
     useEffect(() => {
         const token = pubsub.subscribe(
             RECENT_FILES_UPDATED,
@@ -139,6 +133,7 @@ export function useFileActions() {
         payload: GcodeFilePayload,
         cacheKey = '',
         source: RecentFile['source'] = 'local',
+        savedName = '',
     ) => {
         applyGcodeFile(payload);
         const timeLoaded = Date.now();
@@ -150,6 +145,7 @@ export function useFileActions() {
             filePath: payload.path,
             cacheKey,
             source,
+            savedName,
         });
     };
 
@@ -195,6 +191,32 @@ export function useFileActions() {
     };
 
     const handleRecentLoad = async (recentFile: RecentFile) => {
+        if (recentFile.source === 'remote') {
+            if (!recentFile.savedName) {
+                toast.error(`Could not open ${recentFile.fileName}`);
+                return;
+            }
+            const result = await remoteFileReceiveActions.readFile(
+                recentFile.savedName,
+            );
+            if (!result) {
+                toast.error(`Could not open ${recentFile.fileName}`);
+                return;
+            }
+            applyLoadedFile(
+                {
+                    name: recentFile.fileName,
+                    size: recentFile.fileSize,
+                    content: result.gcode,
+                    path: '',
+                },
+                '',
+                'remote',
+                recentFile.savedName,
+            );
+            return;
+        }
+
         if (!isElectron()) {
             const key = recentFile.cacheKey;
             if (!key) return;
@@ -213,6 +235,7 @@ export function useFileActions() {
                 },
                 key,
                 recentFile.source,
+                recentFile.savedName,
             );
             return;
         }
@@ -221,7 +244,7 @@ export function useFileActions() {
         try {
             const loaded = await readGcodeFile(recentFile.filePath);
             if (loaded) {
-                applyLoadedFile(loaded, '', recentFile.source);
+                applyLoadedFile(loaded, '', recentFile.source, recentFile.savedName);
             }
         } catch (_error) {
             // no-op: file missing/unreadable

@@ -11,6 +11,7 @@ import CarveScreen from './components/carve/CarveScreen';
 import WizardBridge from './components/carve/toolchange/WizardBridge';
 import CarveTopBar from './components/carve/topbar/CarveTopBar';
 import { useCarveMode } from './components/carve/useCarveMode';
+import IncomingFileRecents from './components/IncomingFileRecents';
 import IncomingFileToast from './components/IncomingFileToast';
 import InfoStrip from './components/InfoStrip';
 import JobCompletionAlert from './components/JobCompletionAlert';
@@ -112,6 +113,7 @@ export default function PendantShell() {
                 )}
                 <JobCompletionAlert />
                 <IncomingFileToast />
+                <IncomingFileRecents />
                 <ConfirmationDialog />
                 <Toaster closeButton visibleToasts={3} />
             </div>
