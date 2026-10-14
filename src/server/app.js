@@ -398,6 +398,10 @@ const appMain = () => {
 			urljoin(settings.route, "api/remoteFileReceive/files/:name"),
 			api.remoteFileReceive.readFile,
 		);
+		app.delete(
+			urljoin(settings.route, "api/remoteFileReceive/files"),
+			api.remoteFileReceive.deleteFiles,
+		);
 
 		// Job Stats
 		app.put(urljoin(settings.route, "/api/jobstats"), api.jobStats.update);

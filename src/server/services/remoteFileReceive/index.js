@@ -86,14 +86,48 @@ class RemoteFileReceive {
 		return dir;
 	}
 
+	// Maps a disk filename (uniquified with a suffix, see the POST handler)
+	// back to the original name the sender used, since listIncomingFiles()
+	// only ever sees what's actually on disk.
+	getManifestPath() {
+		return path.join(this.getIncomingDir(), ".manifest.json");
+	}
+
+	readManifest() {
+		try {
+			return JSON.parse(fs.readFileSync(this.getManifestPath(), "utf8"));
+		} catch {
+			return {};
+		}
+	}
+
+	writeManifest(manifest) {
+		fs.writeFileSync(
+			this.getManifestPath(),
+			JSON.stringify(manifest, null, 2),
+		);
+	}
+
+	setOriginalName(savedName, originalName) {
+		const manifest = this.readManifest();
+		manifest[savedName] = originalName;
+		this.writeManifest(manifest);
+	}
+
 	listIncomingFiles() {
 		const dir = this.getIncomingDir();
+		const manifest = this.readManifest();
 		return fs
 			.readdirSync(dir)
 			.filter((name) => GCODE_EXTENSIONS.test(name))
 			.map((name) => {
 				const stat = fs.statSync(path.join(dir, name));
-				return { name, size: stat.size, receivedAt: stat.mtimeMs };
+				return {
+					name: manifest[name] || name,
+					savedName: name,
+					size: stat.size,
+					receivedAt: stat.mtimeMs,
+				};
 			})
 			.sort((a, b) => b.receivedAt - a.receivedAt);
 	}
@@ -107,6 +141,27 @@ class RemoteFileReceive {
 			return null;
 		}
 		return fs.readFileSync(filePath, "latin1");
+	}
+
+	deleteIncomingFiles(names) {
+		const dir = this.getIncomingDir();
+		const deleted = [];
+		for (const rawName of names) {
+			const safeName = path.basename(rawName);
+			const filePath = path.join(dir, safeName);
+			if (fs.existsSync(filePath)) {
+				fs.unlinkSync(filePath);
+				deleted.push(safeName);
+			}
+		}
+		if (deleted.length > 0) {
+			const manifest = this.readManifest();
+			for (const name of deleted) {
+				delete manifest[name];
+			}
+			this.writeManifest(manifest);
+		}
+		return deleted;
 	}
 
 	start(port = DEFAULT_PORT) {
@@ -222,6 +277,7 @@ class RemoteFileReceive {
 					path.join(this.getIncomingDir(), savedName),
 					file.buffer,
 				);
+				this.setOriginalName(savedName, file.originalname);
 
 				CNCEngine.emit("remote:file-received", {
 					name: file.originalname,

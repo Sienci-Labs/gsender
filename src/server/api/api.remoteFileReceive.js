@@ -84,3 +84,15 @@ export const readFile = (req, res) => {
 
 	res.send({ name, gcode });
 };
+
+export const deleteFiles = (req, res) => {
+	const { names } = req.body;
+
+	if (!Array.isArray(names) || names.length === 0) {
+		res.status(ERR_BAD_REQUEST).send({ msg: "No files specified" });
+		return;
+	}
+
+	const deleted = remoteFileReceive.deleteIncomingFiles(names);
+	res.send({ deleted });
+};

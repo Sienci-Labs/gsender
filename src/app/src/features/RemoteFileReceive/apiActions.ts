@@ -1,7 +1,11 @@
 import api from 'app/api';
 
 export interface IncomingFile {
+    /** Clean, human-readable original filename - for display only. */
     name: string;
+    /** On-disk filename in the server's incoming/ directory - the real key
+     * for reading or deleting this file. */
+    savedName: string;
     size: number;
     receivedAt: number;
 }
@@ -61,6 +65,19 @@ export const actions = {
         } catch (error) {
             console.log(error);
             return null;
+        }
+    },
+
+    deleteFiles: async (
+        names: string[],
+        onSuccess: (deleted: string[]) => void,
+        onError: (error: unknown) => void,
+    ) => {
+        try {
+            const res = await api.remoteFileReceive.deleteFiles(names);
+            onSuccess(res.data.deleted);
+        } catch (error) {
+            onError(error);
         }
     },
 };

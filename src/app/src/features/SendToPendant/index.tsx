@@ -34,6 +34,12 @@ function loadLastTarget(): LastTarget {
     }
 }
 
+function formatFileSize(size: number): string {
+    if (size < 1024) return `${size} B`;
+    if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+    return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 interface SendToPendantDialogProps {
     isOpen: boolean;
     onClose: () => void;
@@ -47,9 +53,10 @@ export const SendToPendantDialog: React.FC<SendToPendantDialogProps> = ({
     const [port, setPort] = useState(DEFAULT_PORT);
     const [code, setCode] = useState('');
     const [mode, setMode] = useState<SendMode>('library');
-    const [file, setFile] = useState<File | null>(null);
+    const [files, setFiles] = useState<File[]>([]);
     const [dragOver, setDragOver] = useState(false);
     const [sending, setSending] = useState(false);
+    const [currentIndex, setCurrentIndex] = useState(0);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [sendComplete, setSendComplete] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -62,17 +69,42 @@ export const SendToPendantDialog: React.FC<SendToPendantDialogProps> = ({
         }
     }, [isOpen]);
 
-    const handleFileSelect = (files: FileList | null) => {
-        const picked = files?.[0];
-        if (!picked) return;
-
-        const extension = `.${picked.name.split('.').pop()?.toLowerCase()}`;
-        if (!GCODE_ACCEPT.split(',').includes(extension)) {
-            toast.error(`${picked.name}: Unsupported file type`);
-            return;
+    // Only one file can ever be "the" active job - fall back to library mode
+    // as soon as a second file is queued.
+    useEffect(() => {
+        if (files.length > 1 && mode === 'active') {
+            setMode('library');
         }
+    }, [files.length, mode]);
 
-        setFile(picked);
+    const handleFileSelect = (fileList: FileList | null) => {
+        if (!fileList) return;
+
+        const valid: File[] = [];
+        for (const picked of Array.from(fileList)) {
+            const extension = `.${picked.name.split('.').pop()?.toLowerCase()}`;
+            if (!GCODE_ACCEPT.split(',').includes(extension)) {
+                toast.error(`${picked.name}: Unsupported file type`);
+                continue;
+            }
+            valid.push(picked);
+        }
+        if (valid.length === 0) return;
+
+        setFiles((prev) => {
+            const existingKeys = new Set(
+                prev.map((f) => `${f.name}:${f.size}`),
+            );
+            const merged = [...prev];
+            for (const f of valid) {
+                const key = `${f.name}:${f.size}`;
+                if (!existingKeys.has(key)) {
+                    merged.push(f);
+                    existingKeys.add(key);
+                }
+            }
+            return merged;
+        });
     };
 
     const handleDrop = (e: React.DragEvent) => {
@@ -81,10 +113,15 @@ export const SendToPendantDialog: React.FC<SendToPendantDialogProps> = ({
         handleFileSelect(e.dataTransfer.files);
     };
 
+    const removeFile = (index: number) => {
+        setFiles((prev) => prev.filter((_, i) => i !== index));
+    };
+
     const handleOpenChange = (open: boolean) => {
         if (!open) {
-            setFile(null);
+            setFiles([]);
             setSending(false);
+            setCurrentIndex(0);
             setUploadProgress(0);
             setSendComplete(false);
             onClose();
@@ -92,57 +129,82 @@ export const SendToPendantDialog: React.FC<SendToPendantDialogProps> = ({
     };
 
     const handleSend = async () => {
-        if (!file || !ip || !port || !code) {
-            toast.error('Tablet IP, port, pairing code and a file are required');
+        if (files.length === 0 || !ip || !port || !code) {
+            toast.error(
+                'Tablet IP, port, pairing code and at least one file are required',
+            );
             return;
         }
 
         setSending(true);
-        setUploadProgress(0);
-        try {
-            const formData = new FormData();
-            formData.append('gcode', file, file.name);
-            formData.append('mode', mode);
 
-            await axios.post(`http://${ip}:${port}/pendant/file`, formData, {
-                headers: {
-                    'X-Pendant-Token': code,
-                    'X-Pendant-Filename': encodeURIComponent(file.name),
-                },
-                timeout: 30000,
-                onUploadProgress: (event) => {
-                    const total = event.total ?? file.size;
-                    if (!total) return;
-                    setUploadProgress(
-                        Math.round((event.loaded / total) * 100),
-                    );
-                },
-            });
-
-            localStorage.setItem(STORAGE_KEY, JSON.stringify({ ip, port }));
-            setUploadProgress(100);
-            setSendComplete(true);
-            toast.success(
-                mode === 'active'
-                    ? `Sent and loaded as the active job on ${ip}`
-                    : `Sent to ${ip}'s file library`,
-                { position: 'bottom-right' },
-            );
-            setTimeout(() => handleOpenChange(false), 600);
-        } catch (error: any) {
-            if (error?.response?.status === 401) {
-                toast.error('Incorrect pairing code');
-            } else if (error?.code === 'ECONNABORTED') {
-                toast.error('Timed out reaching the tablet');
-            } else {
-                toast.error(
-                    `Could not reach the tablet at ${ip}:${port}. Make sure Remote File Receive is turned on.`,
-                );
-            }
-            setSending(false);
+        for (let i = 0; i < files.length; i++) {
+            const current = files[i];
+            setCurrentIndex(i);
             setUploadProgress(0);
+
+            try {
+                const formData = new FormData();
+                formData.append('gcode', current, current.name);
+                formData.append('mode', mode);
+
+                await axios.post(`http://${ip}:${port}/pendant/file`, formData, {
+                    headers: {
+                        'X-Pendant-Token': code,
+                        'X-Pendant-Filename': encodeURIComponent(current.name),
+                    },
+                    timeout: 30000,
+                    onUploadProgress: (event) => {
+                        const total = event.total ?? current.size;
+                        if (!total) return;
+                        setUploadProgress(
+                            Math.round((event.loaded / total) * 100),
+                        );
+                    },
+                });
+            } catch (error: any) {
+                if (i > 0) {
+                    localStorage.setItem(
+                        STORAGE_KEY,
+                        JSON.stringify({ ip, port }),
+                    );
+                }
+                if (error?.response?.status === 401) {
+                    toast.error('Incorrect pairing code');
+                } else if (error?.code === 'ECONNABORTED') {
+                    toast.error('Timed out reaching the tablet');
+                } else {
+                    toast.error(
+                        `Could not reach the tablet at ${ip}:${port}. Make sure Remote File Receive is turned on.`,
+                    );
+                }
+                if (i > 0) {
+                    toast.error(
+                        `Sent ${i} of ${files.length} files before the error`,
+                        { position: 'bottom-right' },
+                    );
+                }
+                setSending(false);
+                setUploadProgress(0);
+                return;
+            }
         }
+
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ ip, port }));
+        setUploadProgress(100);
+        setSendComplete(true);
+        toast.success(
+            mode === 'active'
+                ? `Sent and loaded as the active job on ${ip}`
+                : files.length === 1
+                  ? `Sent to ${ip}'s file library`
+                  : `Sent ${files.length} files to ${ip}'s file library`,
+            { position: 'bottom-right' },
+        );
+        setTimeout(() => handleOpenChange(false), 600);
     };
+
+    const currentFile = files[currentIndex];
 
     return (
         <Dialog open={isOpen} onOpenChange={handleOpenChange}>
@@ -150,8 +212,8 @@ export const SendToPendantDialog: React.FC<SendToPendantDialogProps> = ({
                 <DialogHeader>
                     <DialogTitle>Send to Pendant</DialogTitle>
                     <DialogDescription>
-                        Send a g-code file to a tablet running the gSender
-                        pendant with Remote File Receive turned on.
+                        Send one or more g-code files to a tablet running the
+                        gSender pendant with Remote File Receive turned on.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -221,19 +283,27 @@ export const SendToPendantDialog: React.FC<SendToPendantDialogProps> = ({
                             />
                             Add to file library
                         </label>
-                        <label className="flex items-center gap-2">
+                        <label
+                            className={`flex items-center gap-2 ${files.length > 1 ? 'opacity-50' : ''}`}
+                        >
                             <input
                                 type="radio"
                                 checked={mode === 'active'}
-                                disabled={sending}
+                                disabled={sending || files.length > 1}
                                 onChange={() => setMode('active')}
                             />
                             Load as active job
                         </label>
                     </div>
+                    {files.length > 1 && mode === 'library' && (
+                        <p className="-mt-2 text-xs text-gray-500">
+                            Only one file can be the active job, so multiple
+                            files always go to the file library.
+                        </p>
+                    )}
 
                     <div
-                        className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors duration-200 ${
+                        className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors duration-200 ${
                             sending
                                 ? 'border-gray-200 opacity-60 pointer-events-none'
                                 : dragOver
@@ -247,24 +317,48 @@ export const SendToPendantDialog: React.FC<SendToPendantDialogProps> = ({
                         onDragLeave={() => setDragOver(false)}
                         onDrop={handleDrop}
                     >
-                        {file ? (
-                            <div className="flex items-center justify-center gap-2">
-                                <FileIcon className="w-5 h-5" />
-                                <span className="truncate">{file.name}</span>
+                        {files.length > 0 ? (
+                            <div className="space-y-2">
+                                <div className="max-h-36 overflow-y-auto space-y-1.5">
+                                    {files.map((f, i) => (
+                                        <div
+                                            key={`${f.name}:${f.size}`}
+                                            className="flex items-center gap-2 bg-gray-50 dark:bg-surface-base rounded px-2 py-1.5"
+                                        >
+                                            <FileIcon className="w-4 h-4 shrink-0 text-gray-500" />
+                                            <span className="flex-1 min-w-0 truncate text-left">
+                                                {f.name}
+                                            </span>
+                                            <span className="text-xs text-gray-500 shrink-0">
+                                                {formatFileSize(f.size)}
+                                            </span>
+                                            <button
+                                                type="button"
+                                                onClick={() => removeFile(i)}
+                                                disabled={sending}
+                                                className="p-0.5 hover:bg-gray-200 rounded shrink-0"
+                                            >
+                                                <X className="w-3.5 h-3.5" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
                                 <button
                                     type="button"
-                                    onClick={() => setFile(null)}
+                                    onClick={() =>
+                                        fileInputRef.current?.click()
+                                    }
                                     disabled={sending}
-                                    className="p-1 hover:bg-gray-200 rounded"
+                                    className="text-xs text-blue-600 dark:text-blue-400 font-medium"
                                 >
-                                    <X className="w-4 h-4" />
+                                    + Add more files
                                 </button>
                             </div>
                         ) : (
                             <>
                                 <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
                                 <p className="text-sm text-gray-600">
-                                    Drag & drop a g-code file, or{' '}
+                                    Drag & drop g-code files, or{' '}
                                     <button
                                         type="button"
                                         onClick={() =>
@@ -280,6 +374,7 @@ export const SendToPendantDialog: React.FC<SendToPendantDialogProps> = ({
                         <input
                             ref={fileInputRef}
                             type="file"
+                            multiple
                             accept={GCODE_ACCEPT}
                             onChange={(e) => handleFileSelect(e.target.files)}
                             className="hidden"
@@ -297,7 +392,9 @@ export const SendToPendantDialog: React.FC<SendToPendantDialogProps> = ({
                                 <>
                                     <div className="flex justify-between items-center text-xs text-gray-600 dark:text-content-muted">
                                         <span className="font-medium truncate">
-                                            Sending {file?.name}…
+                                            {files.length > 1
+                                                ? `Sending ${currentIndex + 1} of ${files.length}: ${currentFile?.name}…`
+                                                : `Sending ${currentFile?.name}…`}
                                         </span>
                                         <span className="tabular-nums">
                                             {uploadProgress}%
@@ -328,14 +425,16 @@ export const SendToPendantDialog: React.FC<SendToPendantDialogProps> = ({
                     <button
                         type="button"
                         onClick={handleSend}
-                        disabled={!file || sending}
+                        disabled={files.length === 0 || sending}
                         className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {sendComplete
                             ? 'Sent'
                             : sending
                               ? `Sending… ${uploadProgress}%`
-                              : 'Send'}
+                              : files.length > 1
+                                ? `Send ${files.length} files`
+                                : 'Send'}
                     </button>
                 </DialogFooter>
             </DialogContent>

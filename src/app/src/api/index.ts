@@ -266,6 +266,12 @@ const remoteFileReceive = {
             `/api/remoteFileReceive/files/${encodeURIComponent(name)}`,
         );
     },
+
+    deleteFiles: (names: string[]): Promise<AxiosResponse> => {
+        return authrequest.delete('/api/remoteFileReceive/files', {
+            data: { names },
+        });
+    },
 };
 
 //

@@ -1,9 +1,10 @@
 import Button from 'app/components/Button';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib.ts';
 import { Switch } from 'app/components/shadcn/Switch';
 import controller from 'app/lib/controller.ts';
 import { toast } from 'app/lib/toaster';
 import type { RootState } from 'app/store/redux';
-import { Download, RefreshCw } from 'lucide-react';
+import { Download, RefreshCw, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import {
@@ -43,6 +44,8 @@ export default function RemoteFileReceive({
     const [port, setPort] = useState(DEFAULT_PORT);
     const [busy, setBusy] = useState(false);
     const [openingFile, setOpeningFile] = useState<string | null>(null);
+    const [selected, setSelected] = useState<Set<string>>(new Set());
+    const [deleting, setDeleting] = useState(false);
 
     const ipList = useSelector((state: RootState) => state.preferences.ipList);
     const usableAddresses = ipList.filter((entry) => entry.usable);
@@ -114,18 +117,69 @@ export default function RemoteFileReceive({
 
     async function openIncomingFile(file: IncomingFile) {
         if (!onOpenFile) return;
-        setOpeningFile(file.name);
-        const result = await actions.readFile(file.name);
+        setOpeningFile(file.savedName);
+        const result = await actions.readFile(file.savedName);
         setOpeningFile(null);
         if (!result) {
             toast.error(`Could not open ${file.name}`);
             return;
         }
         onOpenFile({
-            name: result.name,
+            name: file.name,
             size: file.size,
             content: result.gcode,
             path: '',
+        });
+    }
+
+    function toggleSelected(savedName: string) {
+        setSelected((prev) => {
+            const next = new Set(prev);
+            if (next.has(savedName)) {
+                next.delete(savedName);
+            } else {
+                next.add(savedName);
+            }
+            return next;
+        });
+    }
+
+    function toggleSelectAll() {
+        setSelected((prev) =>
+            prev.size === files.length
+                ? new Set()
+                : new Set(files.map((file) => file.savedName)),
+        );
+    }
+
+    function handleDeleteSelected() {
+        const names = Array.from(selected);
+        if (names.length === 0) return;
+
+        Confirm({
+            title: 'Delete files?',
+            content: `Delete ${names.length} file${names.length > 1 ? 's' : ''} from this tablet? This can't be undone.`,
+            confirmLabel: 'Delete',
+            cancelLabel: 'Cancel',
+            onConfirm: () => {
+                setDeleting(true);
+                actions.deleteFiles(
+                    names,
+                    () => {
+                        setDeleting(false);
+                        setSelected(new Set());
+                        refresh();
+                        toast.success(
+                            `Deleted ${names.length} file${names.length > 1 ? 's' : ''}`,
+                            { position: 'bottom-right' },
+                        );
+                    },
+                    () => {
+                        setDeleting(false);
+                        toast.error('Failed to delete the selected files');
+                    },
+                );
+            },
         });
     }
 
@@ -195,9 +249,22 @@ export default function RemoteFileReceive({
             )}
 
             <div className="flex-1 min-h-0 flex flex-col">
-                <h2 className="text-sm font-bold dark:text-content-primary mb-2">
-                    Received files
-                </h2>
+                <div className="flex items-center justify-between mb-2">
+                    <h2 className="text-sm font-bold dark:text-content-primary">
+                        Received files
+                    </h2>
+                    {selected.size > 0 && (
+                        <button
+                            type="button"
+                            onClick={handleDeleteSelected}
+                            disabled={deleting}
+                            className="flex items-center gap-1 text-sm px-3 py-1.5 rounded-md border border-red-300 text-red-600 dark:border-red-500/40 dark:text-red-400 disabled:opacity-50"
+                        >
+                            <Trash2 className="w-4 h-4" />
+                            Delete ({selected.size})
+                        </button>
+                    )}
+                </div>
                 {files.length === 0 ? (
                     <p className="text-sm text-gray-500">
                         Files sent here with "Add to library" will show up in
@@ -205,30 +272,50 @@ export default function RemoteFileReceive({
                     </p>
                 ) : (
                     <div className="flex flex-col gap-2 overflow-y-auto">
+                        <label className="flex items-center gap-2 text-xs text-gray-500 dark:text-content-muted px-1">
+                            <input
+                                type="checkbox"
+                                checked={
+                                    selected.size === files.length &&
+                                    files.length > 0
+                                }
+                                onChange={toggleSelectAll}
+                            />
+                            Select all
+                        </label>
                         {files.map((file) => (
                             <div
-                                key={file.name}
+                                key={file.savedName}
                                 className="flex items-center justify-between gap-2 text-sm p-2 bg-gray-50 dark:bg-surface-raised rounded"
                             >
-                                <div className="flex flex-col min-w-0">
-                                    <span className="truncate dark:text-content-primary">
-                                        {file.name}
-                                    </span>
-                                    <span className="text-xs text-gray-500">
-                                        {formatFileSize(file.size)}
-                                    </span>
+                                <div className="flex items-center gap-2 min-w-0">
+                                    <input
+                                        type="checkbox"
+                                        checked={selected.has(file.savedName)}
+                                        onChange={() =>
+                                            toggleSelected(file.savedName)
+                                        }
+                                    />
+                                    <div className="flex flex-col min-w-0">
+                                        <span className="truncate dark:text-content-primary">
+                                            {file.name}
+                                        </span>
+                                        <span className="text-xs text-gray-500">
+                                            {formatFileSize(file.size)}
+                                        </span>
+                                    </div>
                                 </div>
                                 <button
                                     type="button"
                                     onClick={() => openIncomingFile(file)}
                                     disabled={
                                         !onOpenFile ||
-                                        openingFile === file.name
+                                        openingFile === file.savedName
                                     }
                                     className="flex items-center gap-1 text-sm px-3 py-1.5 rounded-md border border-gray-300 dark:border-outline dark:text-content-primary disabled:opacity-50"
                                 >
                                     <Download className="w-4 h-4" />
-                                    {openingFile === file.name
+                                    {openingFile === file.savedName
                                         ? 'Opening...'
                                         : 'Open'}
                                 </button>
