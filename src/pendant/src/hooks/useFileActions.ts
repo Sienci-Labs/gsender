@@ -1,5 +1,6 @@
 import { store as reduxStore } from 'app/store/redux';
 import { unloadFileInfo } from 'app/store/redux/slices/fileInfo.slice';
+import pubsub from 'pubsub-js';
 import { useEffect, useRef, useState } from 'react';
 import {
     type GcodeFilePayload,
@@ -23,9 +24,14 @@ export type RecentFile = {
     filePath?: string;
     /** Key of the page's own copy (recentFileCache), outside Electron. */
     cacheKey?: string;
+    /** Where the file came from - drives the recent-row icon. Absent/'local'
+     * means opened on this device; 'remote' means opened from a file a
+     * desktop pushed in via Send to Pendant. */
+    source?: 'local' | 'remote';
 };
 
 export const RECENT_KEY = 'pendant-recent-files';
+const RECENT_FILES_UPDATED = 'pendant-recent-files-updated';
 
 export const GCODE_ACCEPT = '.gcode,.nc,.tap,.cnc,.g,.gc';
 
@@ -40,6 +46,7 @@ export const readRecentFiles = (): RecentFile[] => {
             timeLoaded: Number(entry.timeLoaded) || 0,
             filePath: entry.filePath || '',
             cacheKey: entry.cacheKey || '',
+            source: entry.source === 'remote' ? 'remote' : 'local',
         }))
         .slice(0, 5);
 };
@@ -57,6 +64,48 @@ const entryKey = (r: RecentFile) =>
           : `name:${r.fileName}`;
 
 /**
+ * Persists a recent-file entry and broadcasts the update, so every mounted
+ * useFileActions() instance (File tab, bottom drawer) stays in sync even when
+ * the entry was recorded from somewhere else entirely (Remote File Receive's
+ * "Open" action, via recordRemoteFileOpened below).
+ */
+export const saveRecentFileEntry = (entry: RecentFile): RecentFile[] => {
+    const stored = readRecentFiles();
+    const key = entryKey(entry);
+    const updated = [
+        entry,
+        ...stored.filter((r) => entryKey(r) !== key),
+    ].slice(0, 5);
+
+    localStorage.setItem(RECENT_KEY, JSON.stringify(updated));
+    if (!isElectron()) {
+        pruneRecentFileCache(
+            updated.map((r) => r.cacheKey || '').filter(Boolean),
+        );
+    }
+    pubsub.publish(RECENT_FILES_UPDATED, updated);
+    return updated;
+};
+
+/** Records a file opened from the Remote File Receive panel as a recent
+ * file, tagged so its row shows the remote icon. Does not load the file
+ * itself - callers pair this with applyGcodeFile. */
+export const recordRemoteFileOpened = ({
+    name,
+    size,
+}: {
+    name: string;
+    size: number;
+}) => {
+    saveRecentFileEntry({
+        fileName: name,
+        fileSize: size,
+        timeLoaded: Date.now(),
+        source: 'remote',
+    });
+};
+
+/**
  * File open / close / recent-files logic from the pendant's File drawer.
  * The returned fileInputRef must be attached to a hidden
  * <input type="file" onChange={handleFileChange}> (the browser fallback).
@@ -72,24 +121,25 @@ export function useFileActions() {
         setRecentFiles(normalized);
     }, []);
 
-    const saveRecentEntry = (entry: RecentFile) => {
-        const stored = readRecentFiles();
-        const key = entryKey(entry);
-        const updated = [
-            entry,
-            ...stored.filter((r) => entryKey(r) !== key),
-        ].slice(0, 5);
+    // Keeps this instance's list in sync with entries recorded by any other
+    // useFileActions() instance, or by recordRemoteFileOpened.
+    useEffect(() => {
+        const token = pubsub.subscribe(
+            RECENT_FILES_UPDATED,
+            (_msg: string, files: RecentFile[]) => setRecentFiles(files),
+        );
+        return () => pubsub.unsubscribe(token);
+    }, []);
 
-        localStorage.setItem(RECENT_KEY, JSON.stringify(updated));
-        setRecentFiles(updated);
-        if (!isElectron()) {
-            pruneRecentFileCache(
-                updated.map((r) => r.cacheKey || '').filter(Boolean),
-            );
-        }
+    const saveRecentEntry = (entry: RecentFile) => {
+        setRecentFiles(saveRecentFileEntry(entry));
     };
 
-    const applyLoadedFile = (payload: GcodeFilePayload, cacheKey = '') => {
+    const applyLoadedFile = (
+        payload: GcodeFilePayload,
+        cacheKey = '',
+        source: RecentFile['source'] = 'local',
+    ) => {
         applyGcodeFile(payload);
         const timeLoaded = Date.now();
         setLoadedAt(timeLoaded);
@@ -99,6 +149,7 @@ export function useFileActions() {
             timeLoaded,
             filePath: payload.path,
             cacheKey,
+            source,
         });
     };
 
@@ -161,6 +212,7 @@ export function useFileActions() {
                     path: '',
                 },
                 key,
+                recentFile.source,
             );
             return;
         }
@@ -169,7 +221,7 @@ export function useFileActions() {
         try {
             const loaded = await readGcodeFile(recentFile.filePath);
             if (loaded) {
-                applyLoadedFile(loaded);
+                applyLoadedFile(loaded, '', recentFile.source);
             }
         } catch (_error) {
             // no-op: file missing/unreadable

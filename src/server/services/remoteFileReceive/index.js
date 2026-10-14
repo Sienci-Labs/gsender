@@ -215,7 +215,9 @@ class RemoteFileReceive {
 					return;
 				}
 
-				const savedName = `${Date.now()}-${path.basename(file.originalname)}`;
+				const ext = path.extname(file.originalname);
+				const base = path.basename(file.originalname, ext);
+				const savedName = `${base}_${Date.now().toString(36)}${ext}`;
 				fs.writeFileSync(
 					path.join(this.getIncomingDir(), savedName),
 					file.buffer,

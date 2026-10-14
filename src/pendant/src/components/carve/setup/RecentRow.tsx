@@ -1,4 +1,5 @@
 import cn from 'classnames';
+import { Wifi } from 'lucide-react';
 import { useHoldToActivate } from '../../../hooks/useHoldToActivate';
 import { canLoadRecent, type RecentFile } from '../../../hooks/useFileActions';
 import { formatDay, formatSize } from '../../../utils/format';
@@ -42,6 +43,12 @@ export default function RecentRow({
                 className="absolute inset-y-0 left-0 bg-blue-500/20 pointer-events-none"
                 style={{ width: `${progress * 100}%` }}
             />
+            {file.source === 'remote' && (
+                <Wifi
+                    aria-label="Received from a desktop"
+                    className="relative shrink-0 w-3 h-3 text-blue-400"
+                />
+            )}
             <span className="relative flex-1 min-w-0 font-mono text-[10.5px] text-content-primary truncate">
                 {file.fileName}
             </span>

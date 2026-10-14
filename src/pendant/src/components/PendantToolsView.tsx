@@ -23,6 +23,7 @@ import { LuArrowLeft, LuDrill } from 'react-icons/lu';
 import { MdSquareFoot } from 'react-icons/md';
 import { PiPuzzlePiece } from 'react-icons/pi';
 import { TbPuzzle, TbRulerMeasure } from 'react-icons/tb';
+import { recordRemoteFileOpened } from '../hooks/useFileActions';
 import { applyGcodeFile } from '../utils/fileLoader';
 
 // react-router hooks (useNavigate/useParams) used inside several of these
@@ -105,7 +106,20 @@ export default function PendantToolsView() {
                                 PreviewComponent={GcodeToolPreviewVisualizer}
                             />
                         ) : isRemoteFileReceive ? (
-                            <Component onOpenFile={applyGcodeFile} />
+                            <Component
+                                onOpenFile={(payload: {
+                                    name: string;
+                                    size: number;
+                                    content: string;
+                                    path: string;
+                                }) => {
+                                    applyGcodeFile(payload);
+                                    recordRemoteFileOpened({
+                                        name: payload.name,
+                                        size: payload.size,
+                                    });
+                                }}
+                            />
                         ) : (
                             <Component />
                         )}

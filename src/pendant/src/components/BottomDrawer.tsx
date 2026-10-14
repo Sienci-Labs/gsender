@@ -12,6 +12,7 @@ import {
     Hash,
     Move,
     Upload,
+    Wifi,
     X,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -356,8 +357,17 @@ export default function BottomDrawer() {
                                                     key={i}
                                                     className="flex items-center justify-between py-2 border-b border-gray-200 dark:border-outline last:border-0 gap-2"
                                                 >
-                                                    <span className="text-xs text-gray-700 dark:text-content-secondary truncate">
-                                                        {r.fileName}
+                                                    <span className="flex items-center gap-1.5 min-w-0">
+                                                        {r.source ===
+                                                            'remote' && (
+                                                            <Wifi
+                                                                aria-label="Received from a desktop"
+                                                                className="shrink-0 w-3 h-3 text-blue-400"
+                                                            />
+                                                        )}
+                                                        <span className="text-xs text-gray-700 dark:text-content-secondary truncate">
+                                                            {r.fileName}
+                                                        </span>
                                                     </span>
                                                     <div className="flex items-center gap-2 shrink-0">
                                                         <span className="text-[10px] text-gray-400">
