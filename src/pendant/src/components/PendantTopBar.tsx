@@ -36,6 +36,7 @@ import { isElectron, quitApp } from '../electron-bridge';
 import { useHoldToActivate } from '../hooks/useHoldToActivate';
 import { useUnlock } from '../hooks/useUnlock';
 import ConnectionWidget from './ConnectionWidget';
+import IncomingFilePill from './IncomingFilePill';
 
 interface StateColors {
     border: string;
@@ -405,6 +406,10 @@ export default function PendantTopBar() {
             {/* Touch-forward connection widget */}
             <div className="shrink-0 no-drag">
                 <ConnectionWidget />
+            </div>
+
+            <div className="shrink-0 no-drag">
+                <IncomingFilePill />
             </div>
 
             {/* State badge — absolutely centred so Connection resizing doesn't shift it */}

@@ -11,6 +11,8 @@ import {
     type IncomingFile,
     type RemoteFileReceiveSettings,
 } from './apiActions';
+import IncomingFileProgressBar from './IncomingFileProgressBar';
+import { useIncomingFileTransfer } from './useIncomingFileTransfer';
 
 const DEFAULT_PORT = 8010;
 
@@ -44,6 +46,7 @@ export default function RemoteFileReceive({
 
     const ipList = useSelector((state: RootState) => state.preferences.ipList);
     const usableAddresses = ipList.filter((entry) => entry.usable);
+    const incomingTransfer = useIncomingFileTransfer();
 
     const refresh = () => {
         actions.fetchSettings((data) => {
@@ -65,6 +68,14 @@ export default function RemoteFileReceive({
             controller.removeListener('remote:file-received', onReceived);
         };
     }, []);
+
+    // remote:file-received only covers library-mode transfers; this also
+    // catches active-mode ones so the progress bar still reaches 100%.
+    useEffect(() => {
+        if (incomingTransfer.state === 'complete') {
+            refresh();
+        }
+    }, [incomingTransfer.state]);
 
     function toggle() {
         if (!settings) return;
@@ -177,6 +188,10 @@ export default function RemoteFileReceive({
                         </Button>
                     </div>
                 </div>
+            )}
+
+            {incomingTransfer.state !== 'idle' && (
+                <IncomingFileProgressBar transfer={incomingTransfer} />
             )}
 
             <div className="flex-1 min-h-0 flex flex-col">

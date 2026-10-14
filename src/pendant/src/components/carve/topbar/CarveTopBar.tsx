@@ -4,6 +4,7 @@ import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import type { RootState } from 'app/store/redux';
 import cn from 'classnames';
 import { useDroGating } from '../../../hooks/useDroGating';
+import IncomingFilePill from '../../IncomingFilePill';
 import type { CarveMode } from '../carveMode';
 import StatusBadge from './StatusBadge';
 import TopBarClock from './TopBarClock';
@@ -29,6 +30,7 @@ export default function CarveTopBar({ mode }: { mode: CarveMode }) {
             </div>
             <TopBarClock mode={mode} />
             <div className="flex items-center gap-1.5 no-drag">
+                <IncomingFilePill />
                 <button
                     type="button"
                     onClick={homeMachine}

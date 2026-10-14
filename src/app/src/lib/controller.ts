@@ -127,6 +127,12 @@ export interface ControllerListeners {
     // A file was pushed onto this pendant remotely (Send to Pendant) and saved
     // to its file library rather than loaded as the active job.
     'remote:file-received': Array<Function>;
+    // Byte-level progress of an in-flight Send to Pendant upload, reported by
+    // the receiving side's remoteFileReceive service.
+    'remote:file-incoming:start': Array<Function>;
+    'remote:file-incoming:progress': Array<Function>;
+    'remote:file-incoming:complete': Array<Function>;
+    'remote:file-incoming:error': Array<Function>;
 }
 
 const ensureArray = (...args: Array<any>) => {
@@ -250,6 +256,10 @@ class Controller {
         'plugin:parser:match': [],
         'plugin:parser:error': [],
         'remote:file-received': [],
+        'remote:file-incoming:start': [],
+        'remote:file-incoming:progress': [],
+        'remote:file-incoming:complete': [],
+        'remote:file-incoming:error': [],
     };
 
     context = {

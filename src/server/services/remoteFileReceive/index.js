@@ -136,6 +136,46 @@ class RemoteFileReceive {
 			next();
 		};
 
+		// Reports upload progress before multer has parsed the multipart body -
+		// the whole file is still just bytes on the raw request stream at this
+		// point. The sender provides the filename up front via a header since
+		// it otherwise lives inside the (not yet parsed) multipart body.
+		const PROGRESS_THROTTLE_MS = 150;
+		const trackProgress = (req, res, next) => {
+			const total = Number(req.header("Content-Length")) || 0;
+			let name = "file";
+			try {
+				const rawName = req.header("X-Pendant-Filename");
+				if (rawName) name = decodeURIComponent(rawName);
+			} catch {
+				// Malformed header - fall back to the generic name.
+			}
+
+			CNCEngine.emit("remote:file-incoming:start", { name, size: total });
+
+			let received = 0;
+			let lastEmit = 0;
+			req.on("data", (chunk) => {
+				received += chunk.length;
+				const now = Date.now();
+				if (now - lastEmit < PROGRESS_THROTTLE_MS && received < total) {
+					return;
+				}
+				lastEmit = now;
+				const percent =
+					total > 0 ? Math.min(100, Math.round((received / total) * 100)) : 0;
+				CNCEngine.emit("remote:file-incoming:progress", percent);
+			});
+			req.on("aborted", () => {
+				CNCEngine.emit(
+					"remote:file-incoming:error",
+					"Transfer aborted by the sender.",
+				);
+			});
+
+			next();
+		};
+
 		app.get("/pendant/status", (req, res) => {
 			res.send({ status: "ready" });
 		});
@@ -143,12 +183,17 @@ class RemoteFileReceive {
 		app.post(
 			"/pendant/file",
 			requireToken,
+			trackProgress,
 			upload.single("gcode"),
 			(req, res) => {
 				const { file } = req;
 				const { mode = "library" } = req.body;
 
 				if (!file) {
+					CNCEngine.emit(
+						"remote:file-incoming:error",
+						"No file attached",
+					);
 					res.status(400).send({ msg: "No file attached" });
 					return;
 				}
@@ -160,6 +205,11 @@ class RemoteFileReceive {
 						gcode,
 						name: file.originalname,
 						size: file.size,
+					});
+					CNCEngine.emit("remote:file-incoming:complete", {
+						name: file.originalname,
+						size: file.size,
+						mode,
 					});
 					res.send({ msg: "Loaded as the active job", mode });
 					return;
@@ -176,10 +226,31 @@ class RemoteFileReceive {
 					savedName,
 					size: file.size,
 				});
+				CNCEngine.emit("remote:file-incoming:complete", {
+					name: file.originalname,
+					size: file.size,
+					mode,
+				});
 
 				res.send({ msg: "Added to the pendant's file library", mode });
 			},
 		);
+
+		// Catches multer errors (e.g. a file over MAX_FILE_SIZE) so the
+		// incoming-transfer UI resolves to an error state instead of hanging
+		// indefinitely at "receiving".
+		app.use("/pendant/file", (err, req, res, next) => {
+			if (!err) {
+				next();
+				return;
+			}
+			const message =
+				err instanceof multer.MulterError && err.code === "LIMIT_FILE_SIZE"
+					? "File is too large to send to this pendant."
+					: err.message || "Failed to receive the file.";
+			CNCEngine.emit("remote:file-incoming:error", message);
+			res.status(err.status || 400).send({ msg: message });
+		});
 
 		this.server = app.listen(port, "0.0.0.0", () => {
 			log.info(`Remote file receive listening on 0.0.0.0:${port}`);

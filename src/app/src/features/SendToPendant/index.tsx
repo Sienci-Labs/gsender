@@ -8,7 +8,7 @@ import {
 } from 'app/components/shadcn/Dialog';
 import { toast } from 'app/lib/toaster';
 import axios from 'axios';
-import { File as FileIcon, Upload, X } from 'lucide-react';
+import { CheckCircle2, File as FileIcon, Upload, X } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 
@@ -50,6 +50,8 @@ export const SendToPendantDialog: React.FC<SendToPendantDialogProps> = ({
     const [file, setFile] = useState<File | null>(null);
     const [dragOver, setDragOver] = useState(false);
     const [sending, setSending] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [sendComplete, setSendComplete] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -83,6 +85,8 @@ export const SendToPendantDialog: React.FC<SendToPendantDialogProps> = ({
         if (!open) {
             setFile(null);
             setSending(false);
+            setUploadProgress(0);
+            setSendComplete(false);
             onClose();
         }
     };
@@ -94,24 +98,37 @@ export const SendToPendantDialog: React.FC<SendToPendantDialogProps> = ({
         }
 
         setSending(true);
+        setUploadProgress(0);
         try {
             const formData = new FormData();
             formData.append('gcode', file, file.name);
             formData.append('mode', mode);
 
             await axios.post(`http://${ip}:${port}/pendant/file`, formData, {
-                headers: { 'X-Pendant-Token': code },
+                headers: {
+                    'X-Pendant-Token': code,
+                    'X-Pendant-Filename': encodeURIComponent(file.name),
+                },
                 timeout: 30000,
+                onUploadProgress: (event) => {
+                    const total = event.total ?? file.size;
+                    if (!total) return;
+                    setUploadProgress(
+                        Math.round((event.loaded / total) * 100),
+                    );
+                },
             });
 
             localStorage.setItem(STORAGE_KEY, JSON.stringify({ ip, port }));
+            setUploadProgress(100);
+            setSendComplete(true);
             toast.success(
                 mode === 'active'
                     ? `Sent and loaded as the active job on ${ip}`
                     : `Sent to ${ip}'s file library`,
                 { position: 'bottom-right' },
             );
-            handleOpenChange(false);
+            setTimeout(() => handleOpenChange(false), 600);
         } catch (error: any) {
             if (error?.response?.status === 401) {
                 toast.error('Incorrect pairing code');
@@ -122,8 +139,8 @@ export const SendToPendantDialog: React.FC<SendToPendantDialogProps> = ({
                     `Could not reach the tablet at ${ip}:${port}. Make sure Remote File Receive is turned on.`,
                 );
             }
-        } finally {
             setSending(false);
+            setUploadProgress(0);
         }
     };
 
@@ -149,9 +166,10 @@ export const SendToPendantDialog: React.FC<SendToPendantDialogProps> = ({
                             </label>
                             <input
                                 id="pendant-ip"
-                                className="w-full border border-gray-200 dark:border-outline rounded p-2 dark:bg-surface-base dark:text-content-primary"
+                                className="w-full border border-gray-200 dark:border-outline rounded p-2 dark:bg-surface-base dark:text-content-primary disabled:opacity-50"
                                 value={ip}
                                 placeholder="192.168.1.42"
+                                disabled={sending}
                                 onChange={(e) => setIp(e.target.value.trim())}
                             />
                         </div>
@@ -165,8 +183,9 @@ export const SendToPendantDialog: React.FC<SendToPendantDialogProps> = ({
                             <input
                                 id="pendant-port"
                                 type="number"
-                                className="w-full border border-gray-200 dark:border-outline rounded p-2 dark:bg-surface-base dark:text-content-primary"
+                                className="w-full border border-gray-200 dark:border-outline rounded p-2 dark:bg-surface-base dark:text-content-primary disabled:opacity-50"
                                 value={port}
+                                disabled={sending}
                                 onChange={(e) =>
                                     setPort(Number(e.target.value))
                                 }
@@ -183,10 +202,11 @@ export const SendToPendantDialog: React.FC<SendToPendantDialogProps> = ({
                         </label>
                         <input
                             id="pendant-code"
-                            className="w-full border border-gray-200 dark:border-outline rounded p-2 font-mono tracking-widest dark:bg-surface-base dark:text-content-primary"
+                            className="w-full border border-gray-200 dark:border-outline rounded p-2 font-mono tracking-widest dark:bg-surface-base dark:text-content-primary disabled:opacity-50"
                             value={code}
                             maxLength={6}
                             placeholder="000000"
+                            disabled={sending}
                             onChange={(e) => setCode(e.target.value.trim())}
                         />
                     </div>
@@ -196,6 +216,7 @@ export const SendToPendantDialog: React.FC<SendToPendantDialogProps> = ({
                             <input
                                 type="radio"
                                 checked={mode === 'library'}
+                                disabled={sending}
                                 onChange={() => setMode('library')}
                             />
                             Add to file library
@@ -204,6 +225,7 @@ export const SendToPendantDialog: React.FC<SendToPendantDialogProps> = ({
                             <input
                                 type="radio"
                                 checked={mode === 'active'}
+                                disabled={sending}
                                 onChange={() => setMode('active')}
                             />
                             Load as active job
@@ -212,9 +234,11 @@ export const SendToPendantDialog: React.FC<SendToPendantDialogProps> = ({
 
                     <div
                         className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors duration-200 ${
-                            dragOver
-                                ? 'border-blue-400 bg-blue-50'
-                                : 'border-gray-300 hover:border-gray-400'
+                            sending
+                                ? 'border-gray-200 opacity-60 pointer-events-none'
+                                : dragOver
+                                  ? 'border-blue-400 bg-blue-50'
+                                  : 'border-gray-300 hover:border-gray-400'
                         }`}
                         onDragOver={(e) => {
                             e.preventDefault();
@@ -230,6 +254,7 @@ export const SendToPendantDialog: React.FC<SendToPendantDialogProps> = ({
                                 <button
                                     type="button"
                                     onClick={() => setFile(null)}
+                                    disabled={sending}
                                     className="p-1 hover:bg-gray-200 rounded"
                                 >
                                     <X className="w-4 h-4" />
@@ -260,6 +285,36 @@ export const SendToPendantDialog: React.FC<SendToPendantDialogProps> = ({
                             className="hidden"
                         />
                     </div>
+
+                    {sending && (
+                        <div className="space-y-2">
+                            {sendComplete ? (
+                                <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400 animate-in fade-in-0 duration-300">
+                                    <CheckCircle2 className="w-5 h-5" />
+                                    <span className="font-medium">Sent!</span>
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="flex justify-between items-center text-xs text-gray-600 dark:text-content-muted">
+                                        <span className="font-medium truncate">
+                                            Sending {file?.name}…
+                                        </span>
+                                        <span className="tabular-nums">
+                                            {uploadProgress}%
+                                        </span>
+                                    </div>
+                                    <div className="relative w-full bg-gray-200 dark:bg-surface-base rounded-full h-2.5 overflow-hidden border border-gray-300/60 dark:border-outline">
+                                        <div
+                                            className="h-full bg-blue-600 rounded-full transition-[width] duration-150 ease-out"
+                                            style={{
+                                                width: `${uploadProgress}%`,
+                                            }}
+                                        />
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 <DialogFooter>
@@ -276,7 +331,11 @@ export const SendToPendantDialog: React.FC<SendToPendantDialogProps> = ({
                         disabled={!file || sending}
                         className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        {sending ? 'Sending...' : 'Send'}
+                        {sendComplete
+                            ? 'Sent'
+                            : sending
+                              ? `Sending… ${uploadProgress}%`
+                              : 'Send'}
                     </button>
                 </DialogFooter>
             </DialogContent>
