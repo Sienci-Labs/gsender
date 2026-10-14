@@ -359,10 +359,15 @@ export default function BottomDrawer() {
                                                 >
                                                     <span className="flex items-center gap-1.5 min-w-0">
                                                         {r.source ===
-                                                            'remote' && (
+                                                        'remote' ? (
                                                             <Wifi
                                                                 aria-label="Received from a desktop"
                                                                 className="shrink-0 w-3 h-3 text-blue-400"
+                                                            />
+                                                        ) : (
+                                                            <FileCode
+                                                                aria-hidden
+                                                                className="shrink-0 w-3 h-3 text-gray-400 dark:text-content-muted"
                                                             />
                                                         )}
                                                         <span className="text-xs text-gray-700 dark:text-content-secondary truncate">
