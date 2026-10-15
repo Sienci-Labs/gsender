@@ -86,11 +86,10 @@ const onImportConfirm = (file: File) => {
                 // Validate the imported data
                 // check that the major properties exist
                 if (
-                    !importData.settings ||
-                    !importData.settings.workspace ||
-                    !importData.settings.widgets ||
-                    !importData.settings.commandKeys ||
-                    !importData.events
+                    !importData.state ||
+                    !importData.state.workspace ||
+                    !importData.state.widgets ||
+                    !importData.state.commandKeys
                 ) {
                     throw new Error('Invalid gSender settings file format');
                 }
