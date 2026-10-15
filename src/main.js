@@ -21,6 +21,7 @@
  *
  */
 
+import './electron-app/userDataPath'; // must stay first, sets userData before anything reads it
 import * as Sentry from '@sentry/electron/main';
 import chalk from 'chalk';
 import {
@@ -49,15 +50,17 @@ import WindowManager from './electron-app/WindowManager';
 import pkg from './package.json';
 import launchServer from './server-cli';
 
-// Reads the renderer's persisted settings directly, since the main process
-// needs to know "use pendant view as default UI" before any window exists.
+// Reads the persisted settings directly, since the main process needs to know
+// "use pendant view as default UI" before any window exists. The server-owned
+// file wins; the legacy renderer-owned file is only a pre-migration fallback.
 const readUsePendantViewSetting = () => {
     try {
-        const configPath = path.join(
-            app.getPath('userData'),
-            'gsender-0.5.6.json',
-        );
-        if (!fs.existsSync(configPath)) return false;
+        const userData = app.getPath('userData');
+        const configPath = [
+            path.join(userData, 'gsender-preferences.json'),
+            path.join(userData, 'gsender-0.5.6.json'),
+        ].find((file) => fs.existsSync(file));
+        if (!configPath) return false;
         const raw = JSON.parse(fs.readFileSync(configPath, 'utf8') || '{}');
         return !!raw?.state?.workspace?.usePendantViewAsDefault;
     } catch (err) {

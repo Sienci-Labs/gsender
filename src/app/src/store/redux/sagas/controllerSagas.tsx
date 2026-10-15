@@ -1280,10 +1280,6 @@ export function* initialize(): Generator<null, void, unknown> {
         }
     });
 
-    controller.addListener('connection:new', (content: string) => {
-        console.log('connection:new', content);
-    });
-
     controller.addListener(
         'gcode_error',
         _throttle(
