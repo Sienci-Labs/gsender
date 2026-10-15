@@ -10,3 +10,6 @@ declare module 'react-select';
 declare module 'chained-function';
 declare module 'ensure-array';
 declare module 'uuid/v4';
+declare module 'mousetrap';
+declare module 'react-transition-group';
+declare module 'file-saver';
