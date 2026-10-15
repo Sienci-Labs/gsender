@@ -67,6 +67,8 @@ export interface SenderStatus {
     total: number;
     sent: number;
     received: number;
+    /** First line of the current run; non-zero after start from line. */
+    startLine: number;
     startTime: number;
     finishTime: number;
     elapsedTime: number;
