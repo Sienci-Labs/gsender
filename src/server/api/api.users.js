@@ -21,7 +21,7 @@
  *
  */
 
-import bcrypt from "bcrypt-nodejs";
+import bcrypt from "bcryptjs";
 import ensureArray from "ensure-array";
 import jwt from "jsonwebtoken";
 import find from "lodash/find";
