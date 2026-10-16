@@ -29,6 +29,7 @@ const About = () => {
         { name: 'Shilpa G', title: 'QA' },
         { name: 'Stephen C.', title: 'Docs' },
         { name: 'Kelly Z.', title: 'Icon Design' },
+        { name: 'Brady B.', title: 'UX/UI Dev' },
     ];
 
     const gSenderLogo = new URL(
