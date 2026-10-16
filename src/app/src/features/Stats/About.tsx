@@ -22,7 +22,6 @@ const About = () => {
     );
 
     const team = [
-        { name: 'Chris T.', title: 'Project Lead' },
         { name: 'Kevin G.', title: 'Lead Dev' },
         { name: 'Walid K.', title: 'Dev Manager' },
         { name: 'Sophia B.', title: 'Dev' },
@@ -194,7 +193,9 @@ const About = () => {
             {!hasUpdate && (
                 <div className="h-full flex flex-col gap-2">
                     <div className="flex gap-2 items-center justify-between">
-                        <h2 className="text-2xl text-blue-500">Release Notes</h2>
+                        <h2 className="text-2xl text-blue-500">
+                            Release Notes
+                        </h2>
 
                         <a
                             className="text-sm text-blue-500 underline"
