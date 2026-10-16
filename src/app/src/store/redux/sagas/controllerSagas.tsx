@@ -465,6 +465,14 @@ export function* initialize(): Generator<null, void, unknown> {
             'widgets.visualizer.rotaryDiameterOffsetEnabled',
             false,
         );
+        const rotaryPreviewAxis = store.get(
+            'widgets.visualizer.rotaryPreviewAxis',
+            'X',
+        );
+        const rotaryCenterlineZ = store.get(
+            'widgets.visualizer.rotaryCenterlineZ',
+            0,
+        );
         const estimatorConfig = getEstimatorConfig();
         const estimatorSignature = getEstimatorSignature();
         lastEstimateSignature = estimatorSignature;
@@ -486,6 +494,8 @@ export function* initialize(): Generator<null, void, unknown> {
             isLaser,
             estimatorSignature,
             rotaryDiameterOffsetEnabled,
+            rotaryPreviewAxis,
+            rotaryCenterlineZ,
             needsVisualization: shouldVisualize(),
             theme: Array.from(getVisualizerTheme()),
         });
@@ -560,6 +570,8 @@ export function* initialize(): Generator<null, void, unknown> {
                     isLaser,
                     estimatorConfig,
                     rotaryDiameterOffsetEnabled,
+                    rotaryPreviewAxis,
+                    rotaryCenterlineZ,
                     theme: getVisualizerTheme(),
                     profile: profileWorker,
                     profileSampleEvery,
@@ -626,6 +638,8 @@ export function* initialize(): Generator<null, void, unknown> {
             isNewFile,
             estimatorConfig,
             rotaryDiameterOffsetEnabled,
+            rotaryPreviewAxis,
+            rotaryCenterlineZ,
             theme: getVisualizerTheme(),
             profile: profileWorker,
             profileSampleEvery,

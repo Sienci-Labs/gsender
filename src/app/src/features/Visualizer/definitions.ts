@@ -79,6 +79,8 @@ export interface Visualizer {
     boundingBoxLabels: boolean;
     followToolDuringRuntime: boolean;
     rotaryDiameterOffsetEnabled: boolean;
+    rotaryPreviewAxis: 'X' | 'Y';
+    rotaryCenterlineZ: number;
     debug: {
         profileWorker: boolean;
         profileSampleEvery: number;
