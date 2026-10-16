@@ -1343,7 +1343,8 @@ class GcodeViewer extends Component<Props> {
             </div>
         );
         pubsub.publish('helper:info', {
-            title: 'Invalid Lines Detected',
+            kind: 'error',
+            title: 'Invalid lines detected',
             description,
         });
     }

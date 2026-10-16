@@ -1,5 +1,7 @@
 import { Button } from 'app/components/Button';
 import { ControlledInput } from 'app/components/ControlledInput';
+import { GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { FaClipboardCheck, FaClipboardList } from 'react-icons/fa';
 import { useMovementTuning } from '../utils/MovementTuningContext';
@@ -16,6 +18,8 @@ const DistanceTravelled = ({ onComplete }: Props) => {
         setMeasuredDistance,
     } = useMovementTuning();
     const { units } = useWorkspaceState();
+    const status = useTypedSelector((state) => state.controller.state.status);
+    const machineIsMoving = status?.activeState !== GRBL_ACTIVE_STATE_IDLE;
 
     return (
         <div className="flex flex-col gap-4">
@@ -46,7 +50,7 @@ const DistanceTravelled = ({ onComplete }: Props) => {
                     <div className="flex flex-col gap-2 flex-1">
                         <div className="flex items-center gap-4">
                             <Button
-                                // disabled={setTravelCompleted}
+                                disabled={machineIsMoving}
                                 onClick={() => {
                                     setSetTravelCompleted(true);
                                     onComplete();

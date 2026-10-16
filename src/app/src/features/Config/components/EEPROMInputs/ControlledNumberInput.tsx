@@ -43,7 +43,10 @@ const ControlledNumberInput = ({
                 setLocalValue(current);
             }
             onChange(e);
-        } else if (localValue && truncateDecimal(localValue) !== originalValue) {
+        } else if (
+            localValue &&
+            truncateDecimal(localValue) !== originalValue
+        ) {
             onChange(e);
         } else {
             setLocalValue(originalValue);

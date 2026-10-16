@@ -1,7 +1,10 @@
 import { GRBLHAL } from 'app/constants';
 import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import type { RootState } from 'app/store/redux';
-import { genericAutoSpinGcode, getGrblHalAutoSpinGcode } from './EepromConfig.tsx';
+import {
+    genericAutoSpinGcode,
+    getGrblHalAutoSpinGcode,
+} from './EepromConfig.tsx';
 
 export function AutoSpinGcodePreview() {
     const firmwareType = useTypedSelector(

@@ -364,6 +364,10 @@ export interface State {
         console: Console;
         job_status: JobStatus;
         grbl: GRBL;
+        helper: {
+            // dismissKey -> true for helper messages the user turned off
+            dismissed: Record<string, boolean>;
+        };
         location: Location;
         macro: {
             minimized: boolean;

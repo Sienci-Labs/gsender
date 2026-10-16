@@ -22,21 +22,50 @@
  */
 
 import { useWizardAPI } from 'app/features/Helper/context';
-import reduxStore from 'app/store/redux';
+import { useTypedSelector } from 'app/hooks/useTypedSelector';
+import store from 'app/store';
+import reduxStore, { type RootState } from 'app/store/redux';
 import {
     disableInfoHelper,
     enableInfoHelper,
     enableWizard,
 } from 'app/store/redux/slices/helper.slice.ts';
+import get from 'lodash/get';
 import pubsub from 'pubsub-js';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import HelperInfo from './HelperInfo';
+import {
+    getDismissStoreKey,
+    normalizeHelperMessage,
+} from './messages/normalize';
+import { KIND_META } from './messages/styles';
+import type { HelperPayload, NormalizedHelperMessage } from './messages/types';
 import Wizard from './Wizard';
+
+const normalizeWithControllerState = (payload: HelperPayload) => {
+    const state = reduxStore.getState();
+    return normalizeHelperMessage(payload, {
+        controllerType: get(state, 'controller.type'),
+        controllerAlarms: get(state, 'controller.settings.alarms'),
+        isDismissed: (key) => Boolean(store.get(getDismissStoreKey(key))),
+    });
+};
 
 const HelperWrapper = () => {
     const { load, updateSubstepOverlay } = useWizardAPI();
-    const [infoPayload, setInfoPayload] = useState({});
-    const [infoVisible, setInfoVisible] = useState(false);
+    const [infoMessage, setInfoMessage] =
+        useState<NormalizedHelperMessage | null>(null);
+    const currentRef = useRef<NormalizedHelperMessage | null>(null);
+    // Lower-severity messages that arrived while another was open
+    const queueRef = useRef<NormalizedHelperMessage[]>([]);
+    const infoHelperMinimized = useTypedSelector(
+        (state: RootState) => state.helper.infoHelperMinimized,
+    );
+
+    const showMessage = (message: NormalizedHelperMessage | null) => {
+        currentRef.current = message;
+        setInfoMessage(message);
+    };
 
     useEffect(() => {
         const tokens = [
@@ -49,9 +78,20 @@ const HelperWrapper = () => {
                 );
                 reduxStore.dispatch(enableWizard());
             }),
-            pubsub.subscribe('helper:info', (_, payload) => {
-                setInfoPayload(payload);
-                setInfoVisible(true);
+            pubsub.subscribe('helper:info', (_, payload: HelperPayload) => {
+                const message = normalizeWithControllerState(payload);
+                if (!message) {
+                    return;
+                }
+                const current = currentRef.current;
+                if (
+                    current &&
+                    KIND_META[message.kind].rank < KIND_META[current.kind].rank
+                ) {
+                    queueRef.current.push(message);
+                    return;
+                }
+                showMessage(message);
                 reduxStore.dispatch(enableInfoHelper());
             }),
         ];
@@ -64,15 +104,20 @@ const HelperWrapper = () => {
     }, []);
 
     const closeInfoHelper = () => {
-        setInfoVisible(false);
+        const next = queueRef.current.shift();
+        if (next) {
+            showMessage(next);
+            return;
+        }
+        showMessage(null);
         reduxStore.dispatch(disableInfoHelper());
     };
 
     return (
         <>
             <HelperInfo
-                payload={infoPayload}
-                infoVisible={infoVisible}
+                payload={infoMessage}
+                infoVisible={Boolean(infoMessage) && !infoHelperMinimized}
                 onClose={closeInfoHelper}
             />
             <Wizard />
