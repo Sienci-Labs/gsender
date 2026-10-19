@@ -355,6 +355,29 @@ store.on(
     }, 100),
 );
 
+// electron's main process keeps its own copy of these flags, so push them
+// whenever the store changes
+const electronSyncedFlags = [
+    ['workspace.promptExit', 'assignPromptExit'],
+    ['workspace.powerSaving', 'change-power-saving'],
+] as const;
+const lastSentFlags: Record<string, unknown> = {};
+const syncElectronFlags = (): void => {
+    if (!isElectron()) {
+        return;
+    }
+    for (const [key, channel] of electronSyncedFlags) {
+        const value = store.get(key);
+        if (value === undefined || lastSentFlags[key] === value) {
+            continue;
+        }
+        lastSentFlags[key] = value;
+        window.ipcRenderer.send(channel, value);
+    }
+};
+store.on('change', syncElectronFlags);
+store.on('replace', syncElectronFlags);
+
 //
 // Migration
 //
@@ -776,17 +799,7 @@ try {
     // saveBackup();
     migrateStore();
 
-    if (isElectron()) {
-        window.ipcRenderer.send(
-            'assignPromptExit',
-            store.get('workspace.promptExit'),
-        );
-
-        window.ipcRenderer.send(
-            'change-power-saving',
-            store.get('workspace.powerSaving'),
-        );
-    }
+    syncElectronFlags();
 } catch (err) {
     log.error(err);
 }
