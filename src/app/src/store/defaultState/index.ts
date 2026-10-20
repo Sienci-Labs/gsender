@@ -71,6 +71,7 @@ const defaultState: State = {
         powerSaving: false,
         backupLoc: '',
         userPluginsDir: '',
+        pinnedTools: [],
         lastBackupTime: 0,
         collectUsageDataStatus: 'pending',
         jobTimes: [],

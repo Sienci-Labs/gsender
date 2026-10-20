@@ -50,6 +50,7 @@ export interface Workspace {
     backupFreq: BackupFrequencies;
     backupLoc: string;
     userPluginsDir: string;
+    pinnedTools: string[];
     lastBackupTime: number;
     powerSaving: boolean;
     park: object;

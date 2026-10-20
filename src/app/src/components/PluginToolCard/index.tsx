@@ -2,6 +2,7 @@ import cx from 'classnames';
 import type { IconType } from 'react-icons';
 import { TbPlug, TbShieldCheck, TbUsers } from 'react-icons/tb';
 import { Link } from 'react-router';
+import PinButton from '../ToolCard/PinButton';
 
 type PluginToolCardProps = {
     title: string;
@@ -11,6 +12,8 @@ type PluginToolCardProps = {
     link?: string;
     onClick?: () => void;
     official: boolean;
+    pinned?: boolean;
+    onTogglePin?: () => void;
 };
 
 const PluginToolCard = ({
@@ -21,6 +24,8 @@ const PluginToolCard = ({
     link,
     onClick,
     official,
+    pinned = false,
+    onTogglePin,
 }: PluginToolCardProps) => {
     const CardContent = (
         <div
@@ -34,7 +39,19 @@ const PluginToolCard = ({
                 official ? 'border-teal-600' : 'border-purple-400',
             )}
         >
-            <div className="absolute top-2.5 left-3 flex items-center gap-1">
+            <div
+                className={cx(
+                    'absolute flex items-center gap-1',
+                    onTogglePin ? 'top-1.5 left-1.5' : 'top-2.5 left-3',
+                )}
+            >
+                {onTogglePin && (
+                    <PinButton
+                        pinned={pinned}
+                        onToggle={onTogglePin}
+                        className="mr-1"
+                    />
+                )}
                 <TbPlug
                     className={cx(
                         'w-4 h-4',
