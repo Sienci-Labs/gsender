@@ -56,7 +56,7 @@ import GrblHalLineParserResultStartup from "./GrblHalLineParserResultStartup";
 import GrblHalLineParserResultStatus from "./GrblHalLineParserResultStatus";
 import {
 	DEFAULT_PROBE_CONTINUITY,
-	mergeProbeContinuity,
+	mergeProbe,
 } from "./GrblHalProbeContinuity";
 import GrblHalLineParserResultTool from "./GrblHalLineParserResultTool";
 import GrblHalLineParserResultVersion from "./GrblHalLineParserResultVersion";
@@ -87,7 +87,10 @@ class GrblHalRunner extends events.EventEmitter {
 			subState: "",
 			probeActive: false,
 			pinState: {},
-			probeContinuity: { ...DEFAULT_PROBE_CONTINUITY },
+			// grblHAL probe: type/protected from P:, continuity from Pn: I/J/K
+			probe: {
+				continuity: { ...DEFAULT_PROBE_CONTINUITY },
+			},
 			currentTool: -1,
 			hasHomed: false,
 		},
@@ -151,14 +154,13 @@ class GrblHalRunner extends events.EventEmitter {
 
 		if (type === GrblHalLineParserResultStatus) {
 			// TEMP debug: log any I/J/K or i/j/k in the report
-			if (!_.isEmpty(payload.probeContinuity)) {
-				console.log("[grblHAL IJK status]", payload.probeContinuity, data);
+			if (payload.probe?.continuity) {
+				console.log("[grblHAL IJK status]", payload.probe.continuity, data);
 			}
-			// Probe continuity is sticky: merge this report's I/J/K over the last known state
-			payload.probeContinuity = mergeProbeContinuity(
-				this.state.status.probeContinuity,
-				payload.probeContinuity,
-			);
+			// Probe state is sticky: merge this report's P:/IJK over the last known probe
+			if (payload.probe) {
+				payload.probe = mergeProbe(this.state.status.probe, payload.probe);
+			}
 
 			// Grbl v1.1
 			// WCO:0.000,10.000,2.500
@@ -230,14 +232,13 @@ class GrblHalRunner extends events.EventEmitter {
 		}
 		if (type === GrblHalLineParserResultCompleteStatus) {
 			// TEMP debug: log any I/J/K or i/j/k in the report
-			if (!_.isEmpty(payload.probeContinuity)) {
-				console.log("[grblHAL IJK complete status]", payload.probeContinuity, data);
+			if (payload.probe?.continuity) {
+				console.log("[grblHAL IJK complete status]", payload.probe.continuity, data);
 			}
-			// Probe continuity is sticky: merge this report's I/J/K over the last known state
-			payload.probeContinuity = mergeProbeContinuity(
-				this.state.status.probeContinuity,
-				payload.probeContinuity,
-			);
+			// Probe state is sticky: merge this report's P:/IJK over the last known probe
+			if (payload.probe) {
+				payload.probe = mergeProbe(this.state.status.probe, payload.probe);
+			}
 
 			delete payload.raw;
 

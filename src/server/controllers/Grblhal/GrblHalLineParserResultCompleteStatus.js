@@ -85,9 +85,6 @@ class GrblHalLineParserResultCompleteStatus {
 			});
 		}
 
-		// Which probe input (I/J/K) is reporting continuity - see GrblHalProbeContinuity
-		payload.probeContinuity = getProbeContinuity(_.get(result, "Pn[0]", ""));
-
 		// Probe protection status
 		// P:0 -> default probe selected, no protection
 		// P:0,P -> default probe selected, protection enabled
@@ -97,6 +94,15 @@ class GrblHalLineParserResultCompleteStatus {
 				type: Number(result.P[0]),
 				protected: result.P[1] === "P",
 			};
+		}
+
+		// Which probe input (I/J/K) has continuity, kept on the probe object -
+		// see GrblHalProbeContinuity. Only present when the pins mention I/J/K.
+		{
+			const continuity = getProbeContinuity(_.get(result, "Pn[0]", ""));
+			if (!_.isEmpty(continuity)) {
+				payload.probe = { ...payload.probe, continuity };
+			}
 		}
 
 		// Current Tool

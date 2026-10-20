@@ -14,15 +14,14 @@
 import GrblStatus from "../Grbl/GrblLineParserResultStatus";
 import HalStatus from "../Grblhal/GrblHalLineParserResultStatus";
 
-// grblHAL always appends an SD-card block and probe continuity (Pn: I/J/K);
-// strip them so the shared expectations below stay readable. SD is asserted
-// separately, continuity in Grblhal/__tests__/GrblHalProbeContinuity.test.js.
+// grblHAL always appends an SD-card block; strip it so the shared expectations
+// below stay readable. Its presence is asserted separately.
 const HAL_SD_DEFAULT = { name: null, percentage: 0 };
 
 const grbl = (line) => GrblStatus.parse(line).payload;
 const hal = (line) => HalStatus.parse(line).payload;
 const halWithoutSd = (line) => {
-	const { SD, probeContinuity, ...rest } = hal(line);
+	const { SD, ...rest } = hal(line);
 	return rest;
 };
 

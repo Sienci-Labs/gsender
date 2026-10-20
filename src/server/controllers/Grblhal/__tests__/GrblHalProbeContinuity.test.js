@@ -36,22 +36,22 @@ describe("getProbeContinuity", () => {
 
 describe("GrblHalRunner probe continuity", () => {
 	test("defaults to no continuity", () => {
-		expect(new GrblHalRunner().state.status.probeContinuity).toEqual(NONE);
+		expect(new GrblHalRunner().state.status.probe.continuity).toEqual(NONE);
 	});
 
 	test("capital persists across reports until the lowercase letter clears it", () => {
 		const runner = new GrblHalRunner();
 
 		runner.parse("<Idle|MPos:0.000,0.000,0.000|FS:0,0|Pn:J>");
-		expect(runner.state.status.probeContinuity).toEqual({ ...NONE, tls: true });
+		expect(runner.state.status.probe.continuity).toEqual({ ...NONE, tls: true });
 
 		// Reports without the letter leave it alone
 		runner.parse("<Idle|MPos:0.000,0.000,0.000|FS:0,0>");
 		runner.parse("<Idle|MPos:0.000,0.000,0.000|FS:0,0|Pn:P>");
-		expect(runner.state.status.probeContinuity).toEqual({ ...NONE, tls: true });
+		expect(runner.state.status.probe.continuity).toEqual({ ...NONE, tls: true });
 
 		runner.parse("<Idle|MPos:0.000,0.000,0.000|FS:0,0|Pn:j>");
-		expect(runner.state.status.probeContinuity).toEqual(NONE);
+		expect(runner.state.status.probe.continuity).toEqual(NONE);
 	});
 
 	test("complete (0x87) report sets continuity that survives regular reports", () => {
@@ -60,21 +60,48 @@ describe("GrblHalRunner probe continuity", () => {
 		runner.parse(
 			"<Idle|MPos:0.000,0.000,0.000|FS:0,0|Pn:I|WCO:0.000,0.000,0.000|FW:grblHAL>",
 		);
-		expect(runner.state.status.probeContinuity).toEqual({ ...NONE, probe: true });
+		expect(runner.state.status.probe.continuity).toEqual({ ...NONE, probe: true });
 
 		runner.parse("<Idle|MPos:0.000,0.000,0.000|FS:0,0>");
-		expect(runner.state.status.probeContinuity).toEqual({ ...NONE, probe: true });
+		expect(runner.state.status.probe.continuity).toEqual({ ...NONE, probe: true });
 
 		runner.parse(
 			"<Idle|MPos:0.000,0.000,0.000|FS:0,0|Pn:i|FW:grblHAL>",
 		);
-		expect(runner.state.status.probeContinuity).toEqual(NONE);
+		expect(runner.state.status.probe.continuity).toEqual(NONE);
+	});
+
+	test("continuity lives alongside probe type/protected and both persist", () => {
+		const runner = new GrblHalRunner();
+
+		runner.parse(
+			"<Idle|MPos:0.000,0.000,0.000|FS:0,0|Pn:J|P:1,P|FW:grblHAL>",
+		);
+		expect(runner.state.status.probe).toEqual({
+			type: 1,
+			protected: true,
+			continuity: { ...NONE, tls: true },
+		});
+
+		// A P: without I/J/K keeps continuity; I/J/K without P: keeps type/protected
+		runner.parse("<Idle|MPos:0.000,0.000,0.000|FS:0,0|P:0>");
+		expect(runner.state.status.probe).toEqual({
+			type: 0,
+			protected: false,
+			continuity: { ...NONE, tls: true },
+		});
+		runner.parse("<Idle|MPos:0.000,0.000,0.000|FS:0,0|Pn:jI>");
+		expect(runner.state.status.probe).toEqual({
+			type: 0,
+			protected: false,
+			continuity: { ...NONE, probe: true },
+		});
 	});
 
 	test("complete report fields after FW:grblHAL are parsed", () => {
 		const runner = new GrblHalRunner();
 
 		runner.parse("<Idle|MPos:0.000,0.000,0.000|FS:0,0|FW:grblHAL|Pn:K>");
-		expect(runner.state.status.probeContinuity).toEqual({ ...NONE, altProbe: true });
+		expect(runner.state.status.probe.continuity).toEqual({ ...NONE, altProbe: true });
 	});
 });

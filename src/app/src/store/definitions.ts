@@ -141,8 +141,13 @@ export interface ControllerStateState {
         pinState: {
             P: boolean;
         };
-        // grblHAL only: which probe input has continuity (Pn: I/J/K)
-        probeContinuity?: ProbeContinuity;
+        // grblHAL only: selected probe and protection (P:), and which probe
+        // input has continuity (Pn: I/J/K)
+        probe?: {
+            type?: number;
+            protected?: boolean;
+            continuity: ProbeContinuity;
+        };
         currentTool: number;
         hasHomed: boolean;
         buf: {

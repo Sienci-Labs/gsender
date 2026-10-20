@@ -29,7 +29,7 @@
 // Capital means active, lowercase means no longer active. The state is sticky:
 // a report without the letter (most regular reports) leaves it unchanged, so
 // this returns only the keys the pin string actually mentions, to be merged
-// over the previous state - see mergeProbeContinuity().
+// over the previous state on status.probe.continuity - see mergeProbe().
 const PROBE_LETTERS = {
 	I: "probe",
 	J: "tls",
@@ -54,8 +54,14 @@ export const getProbeContinuity = (pins = "") => {
 	return update;
 };
 
-export const mergeProbeContinuity = (previous, update) => ({
-	...DEFAULT_PROBE_CONTINUITY,
+// Merge a report's probe update ({ type, protected } from P:, continuity from
+// Pn:) over the previous probe object, so fields a report omits persist.
+export const mergeProbe = (previous = {}, update = {}) => ({
 	...previous,
 	...update,
+	continuity: {
+		...DEFAULT_PROBE_CONTINUITY,
+		...previous.continuity,
+		...update.continuity,
+	},
 });
