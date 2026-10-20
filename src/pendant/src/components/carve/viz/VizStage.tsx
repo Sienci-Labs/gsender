@@ -1,3 +1,4 @@
+import type { ToolEntry } from 'app/features/ToolsPage/registry';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import type { RootState } from 'app/store/redux';
 import cn from 'classnames';
@@ -24,7 +25,13 @@ const RING: Partial<Record<CarveMode, string>> = {
     toolchange: 'shadow-state-tool/50 border-state-tool/45',
 };
 
-export default function VizStage({ mode }: { mode: CarveMode }) {
+export default function VizStage({
+    mode,
+    onOpenTool,
+}: {
+    mode: CarveMode;
+    onOpenTool: (tool: ToolEntry) => void;
+}) {
     const fileLoaded = useTypedSelector((s: RootState) => s.file.fileLoaded);
     const fileProcessing = useTypedSelector(
         (s: RootState) => s.file.fileProcessing,
@@ -41,7 +48,13 @@ export default function VizStage({ mode }: { mode: CarveMode }) {
     return (
         <div className="relative h-[42vh] shrink-0 border-b border-outline-subtle bg-surface-base overflow-hidden">
             <Visualizer ref={visualizerRef} onJogArmedChange={setJogArmed} />
-            <VizViewTray visualizerRef={visualizerRef} jogArmed={jogArmed} />
+            <VizViewTray
+                visualizerRef={visualizerRef}
+                jogArmed={jogArmed}
+                // Pinned tools only launch from Setup, like the setup tabs
+                toolsDisabled={mode !== 'setup' && mode !== 'disconnected'}
+                onOpenTool={onOpenTool}
+            />
 
             {fileLoaded && !fileProcessing && (
                 // Below the info glass so the two never overlap

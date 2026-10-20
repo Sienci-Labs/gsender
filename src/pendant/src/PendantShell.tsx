@@ -45,7 +45,7 @@ function RedesignedCarve({ activeTab }: { activeTab: NavTab }) {
     return (
         <>
             <div className="dark shrink-0" data-dark-theme="workshop">
-                <CarveTopBar mode={mode} onOpenTool={setOpenTool} />
+                <CarveTopBar mode={mode} />
             </div>
             {/* Always mounted — keeps the GL canvas alive across tab navigation */}
             <div
@@ -56,7 +56,7 @@ function RedesignedCarve({ activeTab }: { activeTab: NavTab }) {
                         : 'dark flex-1 flex flex-col min-h-0'
                 }
             >
-                <CarveScreen mode={mode} />
+                <CarveScreen mode={mode} onOpenTool={setOpenTool} />
             </div>
             {openTool && (
                 // Covers the carve body and bottom nav (top-14 clears the
