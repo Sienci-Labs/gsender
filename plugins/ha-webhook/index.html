@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Home Assistant Webhook</title>
+	</head>
+	<body>
+		<main class="app">
+			<section class="card">
+				<h2>Webhook</h2>
+				<label class="field">
+					<span>Webhook URL</span>
+					<input
+						id="url"
+						type="url"
+						placeholder="http://homeassistant.local:8123/api/webhook/gsender-cnc"
+					/>
+				</label>
+				<label class="field">
+					<span>Body format</span>
+					<select id="format">
+						<option value="form">Form fields (works without CORS setup)</option>
+						<option value="json">JSON (needs cors_allowed_origins in HA)</option>
+					</select>
+				</label>
+				<label class="field">
+					<span>Progress updates while running (seconds, 0 = off)</span>
+					<input id="interval" type="number" min="0" step="5" />
+				</label>
+				<label class="toggle">
+					<input id="enabled" type="checkbox" />
+					<span>Send events</span>
+				</label>
+				<div class="row">
+					<button type="button" id="save">Save</button>
+					<button type="button" id="test">Send test</button>
+				</div>
+			</section>
+
+			<section class="card">
+				<h2>Current status</h2>
+				<dl class="stats">
+					<div><dt>Connected</dt><dd id="s-connected">—</dd></div>
+					<div><dt>Machine</dt><dd id="s-state">—</dd></div>
+					<div><dt>Job</dt><dd id="s-job">—</dd></div>
+					<div><dt>Progress</dt><dd id="s-progress">—</dd></div>
+				</dl>
+			</section>
+
+			<section class="card">
+				<h2>Recent sends</h2>
+				<ul id="log" class="log"><li class="muted">Nothing sent yet</li></ul>
+			</section>
+		</main>
+		<script type="module" src="/src/main.js"></script>
+	</body>
+</html>

@@ -42,3 +42,6 @@ packages/plugin-sdk/dist
 /.claude
 CLAUDE.md
 */CLAUDE.md
+.agents
+android/
+skills-lock.json
