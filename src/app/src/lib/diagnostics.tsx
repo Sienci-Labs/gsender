@@ -556,7 +556,7 @@ const createTableRows = (
     array: object,
     machineProfile: MachineProfile,
     controllerType: string,
-): React.JSX.Element[] => {
+): React.ReactNode[] => {
     return Object.keys(array).map((key, index) => {
         const currentValue = array[key as keyof typeof array];
         const isDifferent = isEEPROMValueDifferent(
