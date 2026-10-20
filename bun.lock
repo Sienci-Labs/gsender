@@ -12,7 +12,7 @@
         "@serialport/parser-byte-length": "^13.0.0",
         "@serialport/parser-readline": "^13.0.0",
         "@sienci/avrgirl-arduino": "^5.0.3",
-        "@sienci/gviewer": "^0.1.37",
+        "@sienci/gviewer": "^0.1.39",
         "@types/estree": "^1.0.9",
         "acorn": "^8.18.0",
         "acorn-walk": "^8.3.5",
@@ -64,6 +64,7 @@
         "range_check": "~1.4.0",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
+        "react-virtuoso": "^4.18.13",
         "registry-auth-token": "~3.4.0",
         "registry-url": "~5.1.0",
         "rimraf": "~2.6.3",
@@ -989,7 +990,7 @@
 
     "@sienci/avrgirl-arduino": ["@sienci/avrgirl-arduino@5.0.3", "", { "dependencies": { "async": "^2.6.3", "awty": "^0.1.0", "browser-serialport": "git+https://github.com/noopkat/browser-serialport.git#c8628c41c11890d3058875994c15f83f2df8185b", "chip.avr.avr109": "^1.1.1", "colors": "^1.4.0", "graceful-fs": "^4.2.4", "intel-hex": "^0.1.2", "minimist": "^1.2.5", "process": "^0.11.10", "serialport": "^10.5.0", "stk500": "^2.0.3", "stk500-v2": "^1.0.4" }, "bin": { "avrgirl-arduino": "bin/cli.js" } }, ""],
 
-    "@sienci/gviewer": ["@sienci/gviewer@0.1.37", "", { "dependencies": { "gsap": "^3.15.0" }, "peerDependencies": { "react": ">=18", "react-dom": ">=18", "three": "^0.168.0" }, "optionalPeers": ["react", "react-dom", "three"] }, "sha512-SrjH+hvg/gZ83/WhkO1eGmVq95Cj/TXeeMj99CZOjjjKneUtKP0PvSSaw/YQVKV4EuqHdaDR1lDlxTbVlRiICA=="],
+    "@sienci/gviewer": ["@sienci/gviewer@0.1.45", "", { "dependencies": { "gsap": "^3.15.0" }, "peerDependencies": { "react": ">=18", "react-dom": ">=18", "three": "^0.168.0" }, "optionalPeers": ["react", "react-dom", "three"] }, "sha512-t2PZqE7NJmS6sQ6gOdoLCDUycaTJJvmoJNbRRVTowcFgTw0RNIwRlfpOWSGEEOcnbgX7xDijvn7pX58pnSKZ/Q=="],
 
     "@sinclair/typebox": ["@sinclair/typebox@0.34.48", "", {}, ""],
 
@@ -3064,6 +3065,8 @@
     "react-syntax-highlighter": ["react-syntax-highlighter@16.1.1", "", { "dependencies": { "@babel/runtime": "^7.28.4", "highlight.js": "^10.4.1", "highlightjs-vue": "^1.0.0", "lowlight": "^1.17.0", "prismjs": "^1.30.0", "refractor": "^5.0.0" }, "peerDependencies": { "react": ">= 0.14.0" } }, ""],
 
     "react-transition-group": ["react-transition-group@4.4.5", "", { "dependencies": { "@babel/runtime": "^7.5.5", "dom-helpers": "^5.0.1", "loose-envify": "^1.4.0", "prop-types": "^15.6.2" }, "peerDependencies": { "react": ">=16.6.0", "react-dom": ">=16.6.0" } }, ""],
+
+    "react-virtuoso": ["react-virtuoso@4.18.19", "", { "peerDependencies": { "react": ">=16 || >=17 || >= 18 || >= 19", "react-dom": ">=16 || >=17 || >= 18 || >=19" } }, "sha512-dewyZisA5IiQTldh7eHM5KpI+qxi0nKRVYi2iM01XmPkNa5tjvVUKJKAIc6ted1hAK1/NFlXuhXpVYqGHHdcdQ=="],
 
     "read-binary-file-arch": ["read-binary-file-arch@1.0.6", "", { "dependencies": { "debug": "^4.3.4" }, "bin": "cli.js" }, ""],
 
