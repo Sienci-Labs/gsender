@@ -33,16 +33,18 @@ export default function CarveTopBar({
 
     return (
         <header className="relative flex items-center justify-between h-12 px-2.5 border-b border-outline-subtle bg-surface-base shrink-0 select-none drag-region">
-            <div className="no-drag">
-                <StatusBadge mode={mode} />
-            </div>
-            <TopBarClock mode={mode} />
+            {/* Pinned tools sit on the left, away from Home and E-STOP, so a
+                missed tap can't move the machine. They only launch from
+                Setup, like the setup tabs. */}
             <div className="flex items-center gap-1.5 no-drag">
-                {/* Tools only launch from Setup, like the setup tabs */}
+                <StatusBadge mode={mode} />
                 <PinnedToolsMenu
                     onOpen={onOpenTool}
                     disabled={mode !== 'setup' && mode !== 'disconnected'}
                 />
+            </div>
+            <TopBarClock mode={mode} />
+            <div className="flex items-center gap-1.5 no-drag">
                 <IncomingFilePill />
                 <button
                     type="button"

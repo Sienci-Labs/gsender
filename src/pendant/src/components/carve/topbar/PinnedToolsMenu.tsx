@@ -50,7 +50,7 @@ export default function PinnedToolsMenu({
                         className="fixed inset-0 z-40"
                         onClick={() => setOpen(false)}
                     />
-                    <div className="conn-anim-dropdown-in origin-top-right absolute top-full right-0 mt-2 z-50 min-w-48 py-1 rounded-lg border border-outline bg-surface-elevated shadow-2xl overflow-hidden">
+                    <div className="conn-anim-dropdown-in absolute top-full left-0 mt-2 z-50 min-w-48 py-1 rounded-lg border border-outline bg-surface-elevated shadow-2xl overflow-hidden">
                         {pinnedTools.map((tool) => {
                             const Icon = tool.icon;
                             return (
