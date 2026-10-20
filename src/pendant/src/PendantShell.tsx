@@ -2,6 +2,7 @@ import ConfirmationDialog from 'app/components/ConfirmationDialog/ConfirmationDi
 import { Toaster } from 'app/components/shadcn/Sonner';
 import { WizardProvider } from 'app/features/Helper/context';
 import { installPluginBridgeListener } from 'app/features/Plugins/utils/pluginBridge';
+import type { ToolEntry } from 'app/features/ToolsPage/registry';
 import { useDarkMode } from 'app/hooks/useDarkMode';
 import store from 'app/store';
 import { useEffect, useState } from 'react';
@@ -18,6 +19,7 @@ import JobCompletionAlert from './components/JobCompletionAlert';
 import PendantConfigView from './components/PendantConfigView';
 import PendantToolsView from './components/PendantToolsView';
 import PendantTopBar from './components/PendantTopBar';
+import PendantToolHost from './components/tools/PendantToolHost';
 
 type NavTab = 'carve' | 'tools' | 'config';
 
@@ -30,10 +32,20 @@ const readLegacyCarve = () => Boolean(store.get('pendant.legacyCarve', false));
 // components' dark: variants) whatever the workspace's dark-mode setting is.
 function RedesignedCarve({ activeTab }: { activeTab: NavTab }) {
     const mode = useCarveMode();
+    const [openTool, setOpenTool] = useState<ToolEntry | null>(null);
+
+    // Pinned tools launch from Setup only; get out of the way if a job,
+    // alarm or tool change takes over while one is open
+    useEffect(() => {
+        if (mode !== 'setup' && mode !== 'disconnected') {
+            setOpenTool(null);
+        }
+    }, [mode]);
+
     return (
         <>
             <div className="dark shrink-0" data-dark-theme="workshop">
-                <CarveTopBar mode={mode} />
+                <CarveTopBar mode={mode} onOpenTool={setOpenTool} />
             </div>
             {/* Always mounted — keeps the GL canvas alive across tab navigation */}
             <div
@@ -46,6 +58,20 @@ function RedesignedCarve({ activeTab }: { activeTab: NavTab }) {
             >
                 <CarveScreen mode={mode} />
             </div>
+            {openTool && (
+                // Covers the carve body and bottom nav (top-12 clears the
+                // h-12 top bar so E-STOP stays reachable) without unmounting
+                // CarveScreen underneath
+                <div
+                    data-dark-theme="workshop"
+                    className="dark fixed inset-x-0 bottom-0 top-12 z-40 flex flex-col bg-surface-base"
+                >
+                    <PendantToolHost
+                        tool={openTool}
+                        onClose={() => setOpenTool(null)}
+                    />
+                </div>
+            )}
         </>
     );
 }

@@ -1,15 +1,23 @@
 import { homeMachine } from 'app/features/DRO/utils/DRO';
 import { cancelJog } from 'app/features/Jogging/utils/Jogging';
+import type { ToolEntry } from 'app/features/ToolsPage/registry';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import type { RootState } from 'app/store/redux';
 import cn from 'classnames';
 import { useDroGating } from '../../../hooks/useDroGating';
 import IncomingFilePill from '../../IncomingFilePill';
 import type { CarveMode } from '../carveMode';
+import PinnedToolsMenu from './PinnedToolsMenu';
 import StatusBadge from './StatusBadge';
 import TopBarClock from './TopBarClock';
 
-export default function CarveTopBar({ mode }: { mode: CarveMode }) {
+export default function CarveTopBar({
+    mode,
+    onOpenTool,
+}: {
+    mode: CarveMode;
+    onOpenTool: (tool: ToolEntry) => void;
+}) {
     const { isConnected, canHome } = useDroGating();
     const activeState = useTypedSelector(
         (s: RootState) => s.controller.state.status?.activeState ?? '',
@@ -30,6 +38,11 @@ export default function CarveTopBar({ mode }: { mode: CarveMode }) {
             </div>
             <TopBarClock mode={mode} />
             <div className="flex items-center gap-1.5 no-drag">
+                {/* Tools only launch from Setup, like the setup tabs */}
+                <PinnedToolsMenu
+                    onOpen={onOpenTool}
+                    disabled={mode !== 'setup' && mode !== 'disconnected'}
+                />
                 <IncomingFilePill />
                 <button
                     type="button"
