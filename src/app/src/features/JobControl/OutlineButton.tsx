@@ -1,6 +1,7 @@
 import { usePostHog } from '@posthog/react';
 import { Button } from 'app/components/shadcn/Button';
 import { LASER_MODE } from 'app/constants';
+import { getZUpTravel } from 'app/lib/SoftLimits.js';
 import { toast } from 'app/lib/toaster';
 import store from 'app/store';
 import { store as reduxStore } from 'app/store/redux';
@@ -32,10 +33,11 @@ export const runOutline = (
         if (outlineRunning) {
             return;
         }
+        outlineRunning = true;
         let maxRuntime: ReturnType<typeof setTimeout> | undefined;
         try {
             const outlineWorker = new Worker(
-                new URL('app/workers/Outline.worker.js', import.meta.url),
+                new URL('../../workers/Outline.worker.ts', import.meta.url),
                 { type: 'module' },
             );
             const bbox = get(reduxStore.getState(), 'file.bbox');
@@ -46,6 +48,13 @@ export const runOutline = (
             const spindleMode = store.get('widgets.spindle.mode');
             const isLaser = laserOnOutline && spindleMode === LASER_MODE;
             const outlineSpeed = store.get('workspace.outlineSpeed', null);
+            const settings = get(
+                reduxStore.getState(),
+                'controller.settings.settings',
+                {},
+            );
+            const homingEnabled = get(settings, '$22', '0') !== '0';
+            const zTravel = homingEnabled ? getZUpTravel(5) : 5;
 
             maxRuntime = setTimeout(() => {
                 outlineWorker.terminate();
@@ -75,6 +84,7 @@ export const runOutline = (
                 parsedData: [],
                 mode: 'Square',
                 bbox: bbox,
+                zTravel,
                 outlineSpeed,
             });
 
@@ -87,6 +97,7 @@ export const runOutline = (
         } catch (e) {
             clearTimeout(maxRuntime);
             console.log(e);
+            outlineRunning = false;
         }
     } else {
         pubsub.publish('outline:start');
