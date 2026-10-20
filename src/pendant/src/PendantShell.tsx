@@ -59,12 +59,12 @@ function RedesignedCarve({ activeTab }: { activeTab: NavTab }) {
                 <CarveScreen mode={mode} />
             </div>
             {openTool && (
-                // Covers the carve body and bottom nav (top-12 clears the
-                // h-12 top bar so E-STOP stays reachable) without unmounting
+                // Covers the carve body and bottom nav (top-14 clears the
+                // h-14 top bar so E-STOP stays reachable) without unmounting
                 // CarveScreen underneath
                 <div
                     data-dark-theme="workshop"
-                    className="dark fixed inset-x-0 bottom-0 top-12 z-40 flex flex-col bg-surface-base"
+                    className="dark fixed inset-x-0 bottom-0 top-14 z-40 flex flex-col bg-surface-base"
                 >
                     <PendantToolHost
                         tool={openTool}

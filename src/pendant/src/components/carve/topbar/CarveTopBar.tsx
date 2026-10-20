@@ -32,7 +32,7 @@ export default function CarveTopBar({
     };
 
     return (
-        <header className="relative flex items-center justify-between h-12 px-2.5 border-b border-outline-subtle bg-surface-base shrink-0 select-none drag-region">
+        <header className="relative flex items-center justify-between h-14 px-2.5 border-b border-outline-subtle bg-surface-base shrink-0 select-none drag-region">
             {/* Pinned tools sit on the left, away from Home and E-STOP, so a
                 missed tap can't move the machine. They only launch from
                 Setup, like the setup tabs. */}

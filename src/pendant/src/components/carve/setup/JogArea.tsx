@@ -87,25 +87,26 @@ export default function JogArea({ className }: { className?: string }) {
 
     return (
         <div className={cn('flex flex-col min-h-0', className)}>
-            <div className="flex gap-[5px] shrink-0 mb-2">
-                {PRESET_META.map((preset) => (
+            <div className="flex gap-1.5 shrink-0 mb-2">
+                {PRESET_META.map(({ id, label, icon: Icon }) => (
                     <button
-                        key={preset.id}
+                        key={id}
                         type="button"
-                        onClick={() => setStepPreset(preset.id)}
+                        onClick={() => setStepPreset(id)}
                         className={cn(
-                            'flex-1 py-[5px] rounded-sm border font-mono text-[8.5px] font-bold tracking-[0.03em] uppercase transition-colors',
-                            stepPreset === preset.id
+                            'flex-1 h-12 flex items-center justify-center gap-2 rounded-lg border font-mono text-xs font-bold tracking-[0.03em] uppercase transition-colors',
+                            stepPreset === id
                                 ? 'bg-robin-500 border-robin-500 text-white'
                                 : 'bg-surface-raised border-outline-subtle text-content-muted',
                         )}
                     >
-                        {preset.label}
+                        <Icon className="w-5 h-5 shrink-0" />
+                        {label}
                     </button>
                 ))}
             </div>
 
-            <div className="flex-1 min-h-0 grid grid-cols-3 grid-rows-3 gap-2">
+            <div className="flex-1 min-h-0 grid grid-cols-3 grid-rows-3 gap-1.5">
                 {renderXY(0)}
                 {renderXY(1)}
                 {renderXY(2)}
@@ -139,8 +140,8 @@ export default function JogArea({ className }: { className?: string }) {
                 {renderXY(7)}
             </div>
 
-            <div className="grid grid-cols-2 gap-2 shrink-0 mt-2">
-                <div className="flex flex-col gap-2">
+            <div className="grid grid-cols-2 gap-1.5 shrink-0 mt-1.5">
+                <div className="flex flex-col gap-1.5">
                     <JogActionButton
                         id="z-plus"
                         ariaLabel="Jog Z plus"
@@ -152,7 +153,7 @@ export default function JogArea({ className }: { className?: string }) {
                         onLongPress={() =>
                             continuousJogAxis({ Z: 1 }, feedrate)
                         }
-                        className={jogClass('z', 'h-[72px] text-[17px]')}
+                        className={jogClass('z', 'h-[58px] text-[17px]')}
                     >
                         {() => 'Z+'}
                     </JogActionButton>
@@ -167,12 +168,12 @@ export default function JogArea({ className }: { className?: string }) {
                         onLongPress={() =>
                             continuousJogAxis({ Z: -1 }, feedrate)
                         }
-                        className={jogClass('z', 'h-[72px] text-[17px]')}
+                        className={jogClass('z', 'h-[58px] text-[17px]')}
                     >
                         {() => 'Z−'}
                     </JogActionButton>
                 </div>
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-1.5">
                     <JogActionButton
                         id="a-plus"
                         ariaLabel={`Jog ${rotaryAxis} plus`}
@@ -187,7 +188,7 @@ export default function JogArea({ className }: { className?: string }) {
                                 feedrate,
                             )
                         }
-                        className={jogClass('a', 'h-[72px] text-[17px]')}
+                        className={jogClass('a', 'h-[58px] text-[17px]')}
                     >
                         {() => 'A+'}
                     </JogActionButton>
@@ -205,7 +206,7 @@ export default function JogArea({ className }: { className?: string }) {
                                 feedrate,
                             )
                         }
-                        className={jogClass('a', 'h-[72px] text-[17px]')}
+                        className={jogClass('a', 'h-[58px] text-[17px]')}
                     >
                         {() => 'A−'}
                     </JogActionButton>
