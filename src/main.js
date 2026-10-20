@@ -42,6 +42,11 @@ import mkdirp from 'mkdirp';
 import path from 'path';
 import WinReg from 'winreg';
 import { asyncCallWithTimeout } from './electron-app/AsyncTimeout';
+import {
+    createGcamHandoffServer,
+    DEFAULT_GCAM_ALLOWED_ORIGINS,
+    DEFAULT_GCAM_HANDOFF_PORT,
+} from './electron-app/GcamHandoff';
 import { getGRBLLog } from './electron-app/grblLogs';
 import { createPendantWindow } from './electron-app/pendant-window';
 import { parseAndReturnGCode } from './electron-app/RecentFiles';
@@ -181,6 +186,65 @@ const main = () => {
             log.error(`Error loading file association: ${err}`);
         }
     };
+
+    // gCAM "Send to gSender": the renderer pushes its handoff preference and
+    // workflow state so the listener can refuse files mid-job without a
+    // round trip. Received programs are written to disk and then follow the
+    // same path as an OS file association, so they land in recent files.
+    let gcamHandoffEnabled = true;
+    let gcamWorkflowRunning = false;
+    let gcamHandoff = null;
+
+    ipcMain.on('gcam-handoff:set-enabled', (_msg, enabled) => {
+        gcamHandoffEnabled = enabled !== false;
+    });
+    ipcMain.on('gcam-handoff:workflow-state', (_msg, state) => {
+        gcamWorkflowRunning = state === 'running';
+    });
+
+    const startGcamHandoff = (window) => {
+        const handoffDir = path.join(app.getPath('userData'), 'gcam');
+        gcamHandoff = createGcamHandoffServer({
+            version: pkg.version,
+            port: Number(
+                store.get('gcamHandoff.port', DEFAULT_GCAM_HANDOFF_PORT),
+            ),
+            allowedOrigins: [
+                ...DEFAULT_GCAM_ALLOWED_ORIGINS,
+                ...store.get('gcamHandoff.extraOrigins', []),
+            ],
+            isEnabled: () => gcamHandoffEnabled,
+            isBusy: () => gcamWorkflowRunning,
+            logger: log,
+            onFile: async ({ name, gcode }) => {
+                await fs.promises.mkdir(handoffDir, { recursive: true });
+                const filePath = path.join(handoffDir, name);
+                await fs.promises.writeFile(filePath, gcode, 'utf8');
+
+                if (window.isDestroyed()) {
+                    throw new Error('gSender window is closed');
+                }
+                if (window.isMinimized()) {
+                    window.restore();
+                }
+                window.show();
+                window.focus();
+                if (isRendererReady) {
+                    await loadFileAssociation(filePath, window);
+                } else {
+                    pendingFileToOpen = filePath;
+                }
+            },
+        });
+        gcamHandoff.start().catch((err) => {
+            log.warn(`gCAM handoff listener unavailable: ${err.message}`);
+            gcamHandoff = null;
+        });
+    };
+
+    app.on('before-quit', () => {
+        gcamHandoff?.stop();
+    });
 
     const openDirectoryDialog = async () => {
         try {
@@ -534,6 +598,10 @@ const main = () => {
                     pendingFileToOpen = null;
                 }
             });
+
+            if (!usePendantView) {
+                startGcamHandoff(window);
+            }
 
             ipcMain.on('change-power-saving', (_msg, enabled) => {
                 if (!enabled) {

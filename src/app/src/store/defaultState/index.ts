@@ -67,6 +67,7 @@ const defaultState: State = {
         outlineSpeed: 0,
         revertWorkspace: false,
         promptExit: false,
+        allowGcamHandoff: true,
         backupFreq: 'On Update',
         powerSaving: false,
         backupLoc: '',

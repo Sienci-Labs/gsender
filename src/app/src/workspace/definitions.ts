@@ -47,6 +47,7 @@ export interface Workspace {
     outlineSpeed: number | null;
     revertWorkspace: boolean;
     promptExit: boolean;
+    allowGcamHandoff: boolean;
     backupFreq: BackupFrequencies;
     backupLoc: string;
     userPluginsDir: string;
