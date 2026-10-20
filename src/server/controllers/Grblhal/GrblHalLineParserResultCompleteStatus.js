@@ -2,6 +2,7 @@
 //import _ from 'lodash';
 
 import _ from "lodash";
+import { getProbeContinuity } from "./GrblHalProbeContinuity";
 
 class GrblHalLineParserResultCompleteStatus {
 	static parse(line) {
@@ -23,7 +24,8 @@ class GrblHalLineParserResultCompleteStatus {
 
 		// Separate parameters and store them in results, further split by comma for sub values
 		{
-			r[3].split("|").forEach((param) => {
+			// Fields after FW:grblHAL (r[4]) are parsed too, so a trailing Pn: isn't lost
+			`${r[3]}${r[4] || ""}`.split("|").forEach((param) => {
 				const nv = param.match(/^([a-zA-Z]+):?(.*)$/);
 				if (nv) {
 					result[nv[1]] = nv[2].split(",");
@@ -82,6 +84,9 @@ class GrblHalLineParserResultCompleteStatus {
 				payload.pinState[pin] = true;
 			});
 		}
+
+		// Which probe input (I/J/K) is reporting continuity - see GrblHalProbeContinuity
+		payload.probeContinuity = getProbeContinuity(_.get(result, "Pn[0]", ""));
 
 		// Probe protection status
 		// P:0 -> default probe selected, no protection

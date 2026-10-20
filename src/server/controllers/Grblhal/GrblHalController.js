@@ -1401,9 +1401,7 @@ class GrblHalController {
 				if (this.runner.isAlarm() && this.actionMask.alarmCompleteReport) {
 					this.connection.writeImmediate(Buffer.from([0x87]));
 				} else {
-					this.connection.writeImmediate(
-						GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT,
-					); //? or \x80
+					this.connection.writeImmediate(Buffer.from([0x80]));
 				}
 			}
 		};
@@ -3114,10 +3112,20 @@ class GrblHalController {
 
 		const cmd = data.trim();
 
-		this.actionMask.replyStatusReport =
+		const isStatusReport =
 			cmd === GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT ||
+			cmd === GRBLHAL_REALTIME_COMMANDS.LEGACY_STATUS_REPORT;
+
+		this.actionMask.replyStatusReport =
+			isStatusReport ||
 			cmd === GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT ||
 			this.actionMask.replyStatusReport;
+
+		// Send status queries as the raw 0x80 byte - a "\x80" string would be
+		// UTF-8 encoded to two bytes on the way to the port.
+		if (isStatusReport) {
+			data = Buffer.from([0x80]);
+		}
 
 		// GCODE_REPORT is "$G\n" - the trailing newline is what makes the firmware
 		// execute it - but cmd is trimmed, so comparing the two raw would never

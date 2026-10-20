@@ -54,6 +54,10 @@ import GrblHalLineParserResultSettingDetails from "./GrblHalLineParserResultSett
 import LineParserResultSettings from "../shared/LineParserResultSettings";
 import GrblHalLineParserResultStartup from "./GrblHalLineParserResultStartup";
 import GrblHalLineParserResultStatus from "./GrblHalLineParserResultStatus";
+import {
+	DEFAULT_PROBE_CONTINUITY,
+	mergeProbeContinuity,
+} from "./GrblHalProbeContinuity";
 import GrblHalLineParserResultTool from "./GrblHalLineParserResultTool";
 import GrblHalLineParserResultVersion from "./GrblHalLineParserResultVersion";
 
@@ -83,6 +87,7 @@ class GrblHalRunner extends events.EventEmitter {
 			subState: "",
 			probeActive: false,
 			pinState: {},
+			probeContinuity: { ...DEFAULT_PROBE_CONTINUITY },
 			currentTool: -1,
 			hasHomed: false,
 		},
@@ -145,6 +150,16 @@ class GrblHalRunner extends events.EventEmitter {
 		const { raw } = payload;
 
 		if (type === GrblHalLineParserResultStatus) {
+			// TEMP debug: log any I/J/K or i/j/k in the report
+			if (!_.isEmpty(payload.probeContinuity)) {
+				console.log("[grblHAL IJK status]", payload.probeContinuity, data);
+			}
+			// Probe continuity is sticky: merge this report's I/J/K over the last known state
+			payload.probeContinuity = mergeProbeContinuity(
+				this.state.status.probeContinuity,
+				payload.probeContinuity,
+			);
+
 			// Grbl v1.1
 			// WCO:0.000,10.000,2.500
 			// A current work coordinate offset is now sent to easily convert
@@ -214,6 +229,16 @@ class GrblHalRunner extends events.EventEmitter {
 			return;
 		}
 		if (type === GrblHalLineParserResultCompleteStatus) {
+			// TEMP debug: log any I/J/K or i/j/k in the report
+			if (!_.isEmpty(payload.probeContinuity)) {
+				console.log("[grblHAL IJK complete status]", payload.probeContinuity, data);
+			}
+			// Probe continuity is sticky: merge this report's I/J/K over the last known state
+			payload.probeContinuity = mergeProbeContinuity(
+				this.state.status.probeContinuity,
+				payload.probeContinuity,
+			);
+
 			delete payload.raw;
 
 			// Grbl v1.1

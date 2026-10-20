@@ -122,6 +122,12 @@ export interface SDCardFile {
     unusable?: boolean;
 }
 
+export interface ProbeContinuity {
+    probe: boolean;
+    tls: boolean;
+    altProbe: boolean;
+}
+
 export interface ControllerStateState {
     status: {
         activeState: GRBL_ACTIVE_STATES_T;
@@ -135,6 +141,8 @@ export interface ControllerStateState {
         pinState: {
             P: boolean;
         };
+        // grblHAL only: which probe input has continuity (Pn: I/J/K)
+        probeContinuity?: ProbeContinuity;
         currentTool: number;
         hasHomed: boolean;
         buf: {

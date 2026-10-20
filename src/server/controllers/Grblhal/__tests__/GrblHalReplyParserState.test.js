@@ -112,5 +112,11 @@ describe('GrblHalController reply echo flags', () => {
         other.write(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
         expect(other.actionMask.replyStatusReport).toBe(true);
         other.destroy();
+
+        const legacy = makeController();
+        legacy.emit = () => {};
+        legacy.write('?');
+        expect(legacy.actionMask.replyStatusReport).toBe(true);
+        legacy.destroy();
     });
 });

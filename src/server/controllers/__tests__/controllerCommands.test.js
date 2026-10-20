@@ -21,8 +21,11 @@ describe.each(FIRMWARES)("%s command dispatch", (firmware, Controller) => {
 		c = f.controller;
 	});
 
+	// grblHAL queries status with the raw 0x80 byte instead of "?"
+	const STATUS_WIRE = firmware === "grblHAL" ? Buffer.from([0x80]) : "?";
+
 	test.each([
-		["statusreport", "?", null],
+		["statusreport", STATUS_WIRE, null],
 		["feedhold", "!", FEED_HOLD],
 		["cyclestart", "~", CYCLE_START],
 		["sleep", "$SLP\n", SLEEP],
@@ -344,6 +347,6 @@ describe.each(FIRMWARES)("%s command dispatch", (firmware, Controller) => {
 		c.command("statusreport");
 		c.command("not-a-command");
 		expect(abort).not.toHaveBeenCalled();
-		expect(f.writes()).toEqual(["?"]);
+		expect(f.writes()).toEqual([STATUS_WIRE]);
 	});
 });

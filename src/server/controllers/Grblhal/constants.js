@@ -46,11 +46,14 @@ export {
 	ACTIVE_STATE_CHECK as GRBL_HAL_ACTIVE_STATE_CHECK,
 } from "../shared/constants";
 
-// Real-time Commands: ~, !, ?, and Ctrl-x
+// Real-time Commands: ~, !, 0x80 (status report), and Ctrl-x
+// grblHAL treats 0x80 the same as "?". It must be written as a raw byte
+// (Buffer.from([0x80])) - a "\x80" string is UTF-8 encoded to two bytes.
 export const GRBLHAL_REALTIME_COMMANDS = {
 	CYCLE_START: "~",
 	FEED_HOLD: "!",
-	STATUS_REPORT: "?",
+	STATUS_REPORT: "\x80",
+	LEGACY_STATUS_REPORT: "?",
 	CMD_RESET: "\x18",
 	CMD_SOFT_STOP: "\x19",
 	COMPLETE_REALTIME_REPORT: "\x87",

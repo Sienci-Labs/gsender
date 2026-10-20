@@ -23,6 +23,10 @@
 
 /* eslint no-bitwise: ["error", { "allow": ["&", "<<"] }] */
 import _ from "lodash";
+import { getProbeContinuity } from "./GrblHalProbeContinuity";
+
+// TEMP debug: last Pn value, so pin changes are only logged once
+let lastLoggedPins = null;
 
 //https://github.com/grbl/grbl/blob/master/grbl/report.c
 class GrblHalLineParserResultStatus {
@@ -168,6 +172,17 @@ class GrblHalLineParserResultStatus {
 			pins.split("").forEach((pin) => {
 				payload.pinState[pin] = true;
 			});
+		}
+
+		// Which probe input (I/J/K) is reporting continuity - see GrblHalProbeContinuity
+		payload.probeContinuity = getProbeContinuity(_.get(result, "Pn[0]", ""));
+
+		{
+			const pins = _.get(result, "Pn[0]", "");
+			if (pins !== lastLoggedPins) {
+				lastLoggedPins = pins;
+				console.log("[grblHAL pins]", pins, line);
+			}
 		}
 
 		// Override Values (v1.1)
