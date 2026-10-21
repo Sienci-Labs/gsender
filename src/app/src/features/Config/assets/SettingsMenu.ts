@@ -308,6 +308,31 @@ export const SettingsMenu: SettingsMenuSection[] = [
                         },
                     },
                     {
+                        label: 'Allow gCAM to send files',
+                        key: 'workspace.allowGcamHandoff',
+                        type: 'boolean',
+                        defaultValue: true,
+                        description:
+                            'Let gCAM running on this computer load programs directly into gSender with "Send to gSender". Files are refused while a job is running.',
+                        hidden: () => !isElectron(),
+                        onEnable: () => {
+                            if (isElectron()) {
+                                (window as any).ipcRenderer.send(
+                                    'gcam-handoff:set-enabled',
+                                    true,
+                                );
+                            }
+                        },
+                        onDisable: () => {
+                            if (isElectron()) {
+                                (window as any).ipcRenderer.send(
+                                    'gcam-handoff:set-enabled',
+                                    false,
+                                );
+                            }
+                        },
+                    },
+                    {
                         label: 'Run settings backup',
                         key: 'workspace.backupFreq',
                         type: 'select',
