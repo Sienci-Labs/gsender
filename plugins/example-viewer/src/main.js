@@ -8,6 +8,7 @@ const gcodeInput = document.getElementById('gcode-input');
 const loadPreviewBtn = document.getElementById('load-preview');
 const loadMainBtn = document.getElementById('load-main');
 const goCarveBtn = document.getElementById('go-carve');
+const viewStatsBtn = document.getElementById('view-stats');
 const statusEl = document.getElementById('status');
 const viewerContainer = document.getElementById('viewer-container');
 
@@ -16,6 +17,7 @@ if (
     !loadPreviewBtn ||
     !loadMainBtn ||
     !goCarveBtn ||
+    !viewStatsBtn ||
     !viewerContainer
 ) {
     throw new Error('Missing required DOM elements');
@@ -96,6 +98,16 @@ const goToCarve = async () => {
     }
 };
 
+const viewStats = async () => {
+    try {
+        await navigation.navigate('/stats/jobs');
+    } catch (err) {
+        setStatus(
+            `Navigation failed: ${err instanceof Error ? err.message : String(err)}`,
+        );
+    }
+};
+
 loadPreviewBtn.addEventListener('click', () => {
     void loadPreview();
 });
@@ -106,6 +118,10 @@ loadMainBtn.addEventListener('click', () => {
 
 goCarveBtn.addEventListener('click', () => {
     void goToCarve();
+});
+
+viewStatsBtn.addEventListener('click', () => {
+    void viewStats();
 });
 
 void loadPreview();

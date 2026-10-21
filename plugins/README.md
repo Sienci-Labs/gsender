@@ -18,7 +18,7 @@ Then restart gSender.
 |--------|-------|----------------------|
 | `example-hello/` | Plain JS + Vite | Bridge client — `gsender`, `subscribeWorkspaceState`, `subscribeSelector` |
 | `react-ts-app/` | React + TypeScript + Vite | React hooks — `useWorkspaceState`, `useTypedSelector` |
-| `example-viewer/` | Plain JS + Vite | Embedded G-code preview — `GCodeViewer`, `gsender.gcode.loadToVisualizer`, `navigation.navigateToCarve` |
+| `example-viewer/` | Plain JS + Vite | Embedded G-code preview — `GCodeViewer`, `gsender.gcode.loadToVisualizer`, `navigation.navigateToCarve`, `navigation.navigate` |
 | `basic-cam/` | React + TypeScript + Vite + Tailwind | Full reference CAM plugin — combines all SDK entry points |
 | `corner-finder/` | React + TypeScript + Vite | Host visualizer bridge — `gsender.viewer.*` (picking, camera, overlay markers) + `machine.setBusy` |
 | `storage-test/` | Plain JS + Vite | Namespaced plugin storage — buttons for every `storage.*` method (get/set/delete/getAll/setAll/clear), for QA |

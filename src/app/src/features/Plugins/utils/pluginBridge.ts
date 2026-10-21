@@ -446,8 +446,13 @@ const handleBridgeRequest = async (
 ): Promise<unknown> => {
     // check if plugin is allowed to use this request type
     if (!capabilities.requestTypes.has(request.type)) {
-        console.error(`Plugin not authorized to use '${request.type}`);
-        throw new Error(`Plugin not authorized to use '${request.type}'`);
+        const who = pluginId ?? 'unregistered window';
+        console.error(
+            `Plugin '${who}' not authorized to use '${request.type}'`,
+        );
+        throw new Error(
+            `Plugin '${who}' not authorized to use '${request.type}'`,
+        );
     }
 
     // defense in depth: storage requests must resolve to a registered plugin
@@ -829,11 +834,12 @@ const addSubscription = (
 ) => {
     // check if plugin has subscription perms
     if (!capabilities.topics.has(subscribe.topic)) {
+        const who = pluginId ?? 'unregistered window';
         console.error(
-            `Plugin not authorized to subscribe to '${subscribe.topic}'`,
+            `Plugin '${who}' not authorized to subscribe to '${subscribe.topic}'`,
         );
         throw new Error(
-            `Plugin not authorized to subscribe to '${subscribe.topic}'`,
+            `Plugin '${who}' not authorized to subscribe to '${subscribe.topic}'`,
         );
     }
 
