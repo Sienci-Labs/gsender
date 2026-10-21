@@ -20,13 +20,13 @@ const About = () => {
     );
 
     const team = [
-        { name: 'Chris T.', title: 'Project Lead' },
         { name: 'Kevin G.', title: 'Lead Dev' },
         { name: 'Walid K.', title: 'Dev Manager' },
         { name: 'Sophia B.', title: 'Dev' },
         { name: 'Shilpa G', title: 'QA' },
         { name: 'Stephen C.', title: 'Docs' },
         { name: 'Kelly Z.', title: 'Icon Design' },
+        { name: 'Brady B.', title: 'UX/UI Dev' },
     ];
 
     const gSenderLogo = new URL(
@@ -177,7 +177,9 @@ const About = () => {
             </p>
 
             <div>
-                <h2 className="text-2xl text-blue-600 dark:text-blue-400 mb-2">gSender Team</h2>
+                <h2 className="text-2xl text-blue-600 dark:text-blue-400 mb-2">
+                    gSender Team
+                </h2>
                 <div className="text-md md:text-lg dark:text-content-primary">
                     {team.map((member, index) => (
                         <span key={member.name}>

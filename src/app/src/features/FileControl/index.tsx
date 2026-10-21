@@ -82,10 +82,26 @@ const FileControl = () => {
                 },
             );
 
+            // gCAM handoff refuses files while a job runs; keep main informed.
+            let lastWorkflowState: string | undefined;
+            const unsubscribeWorkflow = reduxStore.subscribe(() => {
+                const workflowState =
+                    reduxStore.getState().controller.workflow.state;
+                if (workflowState !== lastWorkflowState) {
+                    lastWorkflowState = workflowState;
+                    (window as any).ipcRenderer.send(
+                        'gcam-handoff:workflow-state',
+                        workflowState,
+                    );
+                }
+            });
+
             // Signal to main that we're ready to receive file association data
             setTimeout(() => {
                 (window as any).ipcRenderer.send('file-association-ready');
             }, 250);
+
+            return unsubscribeWorkflow;
         }
     }, []);
 

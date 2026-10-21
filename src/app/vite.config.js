@@ -77,6 +77,14 @@ export default defineConfig({
         // discovered when the worker first loads, Vite re-optimizes mid-session,
         // and the worker's import of it fails (outline then times out).
         include: ['**/*.styl', 'buffer', '@react-pdf/renderer', 'concaveman'],
+        // gviewer ships pre-bundled ESM from its own build, so it doesn't need
+        // esbuild pre-bundling for perf. More importantly: when it's rebuilt
+        // locally and reinstalled while the dev server is running, Vite's
+        // cached optimize-deps chunk goes stale and the browser gets a 504
+        // "Outdated Optimize Dep" instead of the new code. Excluding it means
+        // Vite transforms it fresh on every request instead of serving it from
+        // that hash-pinned cache.
+        exclude: ['@sienci/gviewer', '@sienci/gviewer/viewer'],
     },
     build: {
         sourcemap: true,

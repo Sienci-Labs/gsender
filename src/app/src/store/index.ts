@@ -735,6 +735,11 @@ const doInit = async (): Promise<void> => {
                 'change-power-saving',
                 store.get('workspace.powerSaving'),
             );
+
+            window.ipcRenderer.send(
+                'gcam-handoff:set-enabled',
+                store.get('workspace.allowGcamHandoff', true),
+            );
         }
     } catch (err) {
         log.error(err);

@@ -42,7 +42,7 @@ import useShuttleEvents from 'app/hooks/useShuttleEvents';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import controller from 'app/lib/controller';
-import { mapPositionToUnits } from 'app/lib/units.ts';
+import { mapPositionToMetricUnits, mapPositionToUnits } from 'app/lib/units.ts';
 import useKeybinding from 'app/lib/useKeybinding';
 import { cn } from 'app/lib/utils';
 import store from 'app/store';
@@ -403,12 +403,12 @@ function DRO({
     const isRotaryMode = mode === 'ROTARY';
 
     const wpos = mapValues(wposController, (pos, axis) => {
-        if (axis === 'a') return pos;
+        if (axis === 'a') return String(mapPositionToMetricUnits(pos));
         return String(mapPositionToUnits(pos, preferredUnits));
     });
 
     const mpos = mapValues(mposController, (pos, axis) => {
-        if (axis === 'a') return pos;
+        if (axis === 'a') return String(mapPositionToMetricUnits(pos));
         return String(mapPositionToUnits(pos, preferredUnits));
     });
 

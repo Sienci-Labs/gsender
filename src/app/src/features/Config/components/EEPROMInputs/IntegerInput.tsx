@@ -2,7 +2,7 @@ import React from 'react';
 import ControlledNumberInput from './ControlledNumberInput';
 import styles from './index.module.styl';
 
-const IntegerInput = ({ info, setting, onChange, min, max, disabled}) => {
+const IntegerInput = ({ info, setting, onChange, min, max, disabled }) => {
     const { unit = null } = info;
     let { value } = setting;
     value = Number(value);

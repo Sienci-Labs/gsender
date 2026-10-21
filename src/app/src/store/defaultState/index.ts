@@ -67,10 +67,12 @@ const defaultState: State = {
         outlineSpeed: 0,
         revertWorkspace: false,
         promptExit: false,
+        allowGcamHandoff: true,
         backupFreq: 'On Update',
         powerSaving: false,
         backupLoc: '',
         userPluginsDir: '',
+        pinnedTools: [],
         lastBackupTime: 0,
         collectUsageDataStatus: 'pending',
         jobTimes: [],
@@ -301,6 +303,10 @@ const defaultState: State = {
                     expanded: true,
                 },
             },
+        },
+        helper: {
+            // Helper messages the user asked not to see again, by dismissKey
+            dismissed: {},
         },
         location: {
             minimized: false,
