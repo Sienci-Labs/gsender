@@ -40,7 +40,6 @@ export function createPendantWindow(isDev, preloadPath) {
             // Shared code from src/app/ uses window.require + window.ipcRenderer
             // at module load; matching desktop's preload posture avoids forking that.
             nodeIntegration: true,
-            enableRemoteModule: true,
             contextIsolation: false,
             preload: preloadPath,
         },
