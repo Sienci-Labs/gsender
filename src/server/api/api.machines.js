@@ -26,7 +26,7 @@ import _find from "lodash/find";
 import _get from "lodash/get";
 import _isPlainObject from "lodash/isPlainObject";
 import _set from "lodash/set";
-import uuid from "uuid";
+import * as uuid from "uuid";
 import settings from "../config/settings";
 import {
 	ERR_BAD_REQUEST,
