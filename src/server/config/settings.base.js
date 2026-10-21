@@ -306,6 +306,7 @@ export default {
 		},
 	},
 
+	userDataDir: getUserDataPath(),
 	pluginsDir: path.resolve(getUserDataPath(), "plugins"),
 	extraPluginsDirs: getExtraPluginsDirs(),
 	pluginSdkDir: getPluginSdkDir(),

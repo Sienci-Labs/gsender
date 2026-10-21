@@ -192,7 +192,12 @@ const appMain = () => {
 			// Skip body parsing for the file upload route
 			return next();
 		}
-		express.json()(req, res, (err) => {
+		// Preferences hold the whole settings tree; the 100kb default is too small.
+		const jsonLimit =
+			req.path.replace(/\/+$/, "") === urljoin(settings.route, "api/preferences")
+				? "20mb"
+				: undefined;
+		express.json({ limit: jsonLimit })(req, res, (err) => {
 			if (err) {
 				return next(err);
 			}

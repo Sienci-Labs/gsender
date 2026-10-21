@@ -5,13 +5,14 @@ import {
     TOUCHPLATE_TYPE_STANDARD,
 } from 'app/lib/constants.ts';
 import ImmutableStore from 'app/lib/immutable-store';
+import controller from 'app/lib/controller';
 import log from 'app/lib/log';
-import type { BackupFrequencies } from 'app/workspace/definitions';
 import isElectron from 'is-electron';
 import debounce from 'lodash/debounce';
 import difference from 'lodash/difference';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
+import isEqual from 'lodash/isEqual';
 import set from 'lodash/set';
 import uniq from 'lodash/uniq';
 import pubsub from 'pubsub-js';
@@ -20,10 +21,6 @@ import settings from '../config/settings';
 import { MACRO_CATEGORY, METRIC_UNITS } from '../constants';
 import { defaultATCIMacros } from '../features/ATC/assets/defaultATCIMacros';
 import defaultState from './defaultState';
-
-interface UserData {
-    path: string;
-}
 
 interface CncData {
     version: string;
@@ -37,39 +34,22 @@ interface StoreData {
 
 const store = new ImmutableStore(defaultState);
 
-let userData: UserData | null = null;
+// id so we can ignore the 'preferences:changed' events we emitted
+const CLIENT_ID = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
 
-// Check whether the code is running in Electron renderer process
-if (isElectron()) {
-    const { app } = window.require('@electron/remote');
-    const path = window.require('path'); // Require the path module within Electron
-
-    userData = {
-        path: path.join(app.getPath('userData'), 'gsender-0.5.6.json'),
-    };
-}
-
-const getConfig = (): string => {
-    let content = '';
-
-    // Check whether the code is running in Electron renderer process
-    if (isElectron()) {
-        const fs = window.require('fs'); // Require the fs module within Electron
-        if (fs.existsSync(userData!.path)) {
-            content = fs.readFileSync(userData!.path, 'utf8') || '{}';
-        }
-    } else {
-        content = localStorage.getItem('sienci') || '{}';
-    }
-
-    if (content === '{}') {
-        content = JSON.stringify(normalizeState({}));
-    }
-
-    return content;
-};
+// persisting stays off until the server's copy has been loaded
+// that way we can't accidentally overwrite the settings with defaults
+let persistEnabled = false;
+let applyingRemote = false;
+// true from a socket disconnect until the server's copy has been re-fetched,
+// so a client that may be out of date can't overwrite newer settings
+let syncing = false;
 
 const persist = (data: StoreData): void => {
+    if (!persistEnabled || applyingRemote || syncing) {
+        return;
+    }
+
     const { version, state } = { ...data };
 
     const persistData: StoreData = {
@@ -80,22 +60,11 @@ const persist = (data: StoreData): void => {
         },
     };
 
-    try {
-        const value = JSON.stringify(persistData, null, 2);
-
-        // Check whether the code is running in Electron renderer process
-        if (isElectron()) {
-            const fs = window.require('fs'); // Use window.require to require fs module in Electron
-            fs.writeFileSync(userData!.path, value);
-
-            // save preferences to api so that remote window can fetch it
-            api.preferences.replace(persistData);
-        } else {
-            localStorage.setItem('sienci', value);
-        }
-    } catch (e) {
-        log.error(e);
-    }
+    api.preferences
+        .replace({ ...persistData, originId: CLIENT_ID })
+        .catch((e: any) =>
+            log.error('Failed to save preferences', e?.response?.status, e),
+        );
 };
 
 const normalizeState = (state: any): any => {
@@ -235,62 +204,6 @@ export const merge = (base: any, saved: any): any => {
     return result;
 };
 
-// Save backup
-const backupPreviousState = (data: any): void => {
-    const fs = window.require('fs'); // Use window.require to require fs module in Electron
-    const backupLoc: string = get(cnc.state, 'workspace.backupLoc', '');
-    const value = JSON.stringify(
-        { state: data, version: settings.version },
-        null,
-        2,
-    );
-    const now = new Date().toISOString().replaceAll(':', '-');
-
-    if (isElectron()) {
-        const { app } = window.require('@electron/remote');
-        const path = window.require('path'); // Require the path module within Electron
-        let directory = app.getPath('userData');
-
-        if (backupLoc !== '' && fs.existsSync(backupLoc)) {
-            directory = backupLoc;
-        }
-        backupLoc.length !== 0 ? backupLoc : app.getPath('userData');
-
-        const backupPath = path.join(
-            directory,
-            `preferences-backup-${now}.json`,
-        );
-
-        fs.writeFileSync(backupPath, value);
-    }
-};
-
-const isTimeToBackup = (
-    lastBackupTime: number,
-    frequency: BackupFrequencies,
-) => {
-    if (frequency === 'On Update') {
-        if (semver.lt(cnc.version, settings.version)) {
-            return true;
-        }
-        return false;
-    }
-
-    const now = Date.now();
-    const elapsed = now - lastBackupTime;
-
-    const intervals = {
-        Daily: 1000 * 60 * 60 * 24,
-        Weekly: 1000 * 60 * 60 * 24 * 7,
-        Monthly: 1000 * 60 * 60 * 24 * 30,
-    };
-
-    const interval = intervals[frequency];
-    if (!interval) throw new Error(`Unknown backup frequency: "${frequency}"`);
-
-    return elapsed >= interval;
-};
-
 const cnc: CncData = {
     version: settings.version,
     state: {},
@@ -315,45 +228,6 @@ const preserveSavedCommandKeys = (state: any, savedState: any): any => {
 
     return state;
 };
-
-try {
-    const text = getConfig();
-    const data = JSON.parse(text);
-    cnc.version = get(data, 'version', settings.version);
-    cnc.state = get(data, 'state', {});
-    const lastBackupTime = get(cnc.state, 'workspace.lastBackupTime', 0);
-    const backupFreq = get(cnc.state, 'workspace.backupFreq', 'On Update');
-
-    if (isTimeToBackup(lastBackupTime, backupFreq)) {
-        data.state.workspace.lastBackupTime = Date.now();
-        backupPreviousState(data);
-    }
-} catch (e) {
-    log.error(e);
-}
-
-const mergedState = merge(
-    JSON.parse(JSON.stringify(defaultState)),
-    cnc.state || {},
-);
-store.state = normalizeState(
-    preserveSavedCommandKeys(mergedState, cnc.state || {}),
-);
-
-// Debouncing enforces that a function not be called again until a certain amount of time (e.g. 100ms) has passed without it being called.
-store.on(
-    'change',
-    debounce((state: any) => {
-        persist({ version: settings.version, state: state });
-    }, 100),
-);
-
-store.on(
-    'replace',
-    debounce((state: any) => {
-        persist({ version: settings.version, state: state });
-    }, 100),
-);
 
 //
 // Migration
@@ -755,49 +629,193 @@ const migrateStore = (): void => {
     }
 };
 
-const syncPrefs = async () => {
+const defaultsMergedWith = (saved: any): any =>
+    preserveSavedCommandKeys(
+        merge(JSON.parse(JSON.stringify(defaultState)), saved || {}),
+        saved || {},
+    );
+
+const fetchPreferences = async (): Promise<StoreData> => {
+    const response = await api.preferences.fetch();
+    return (response?.data || {}) as StoreData;
+};
+
+// apply a state received from the server that another client wrote
+const applyRemoteState = (state: any): void => {
+    applyingRemote = true;
     try {
-        const config = await api.preferences.fetch();
-        if (config) {
-            store.restoreState(config.data.state, () => {
-                setTimeout(() => {
-                    pubsub.publish('repopulate');
-                }, 50);
-            });
-            // force UI to update with the changes
-            pubsub.publish('config:saved', config.data.state);
+        // same pipeline as initStore; normalizeState reads cnc.state
+        cnc.state = state || {};
+        store.restoreState(normalizeState(defaultsMergedWith(state)), () => {
+            setTimeout(() => {
+                pubsub.publish('repopulate');
+            }, 50);
+        });
+        pubsub.publish('config:saved', store.state);
+    } finally {
+        applyingRemote = false;
+    }
+};
+
+const FETCH_RETRY_DELAYS_MS = [500, 1000, 2000];
+
+const fetchWithRetry = async (): Promise<StoreData> => {
+    for (let attempt = 0; ; attempt++) {
+        try {
+            return await fetchPreferences();
+        } catch (err) {
+            const wait = FETCH_RETRY_DELAYS_MS[attempt];
+            if (wait === undefined) {
+                throw err;
+            }
+            await new Promise((resolve) => setTimeout(resolve, wait));
+        }
+    }
+};
+
+const reportLoadFailure = (err: unknown): void => {
+    log.error('Unable to load preferences from the server', err);
+    // using the sonner toaster directly because our wrapper saves to the store
+    setTimeout(() => {
+        import('sonner')
+            .then(({ toast }) =>
+                toast.error(
+                    'Could not load your settings from the gSender server. Defaults are shown and changes will not be saved until you reload.',
+                ),
+            )
+            .catch((e) => log.error(e));
+    }, 2000);
+};
+
+const doInit = async (): Promise<void> => {
+    let saved: StoreData;
+    try {
+        saved = await fetchWithRetry();
+    } catch (err) {
+        reportLoadFailure(err);
+        return;
+    }
+
+    cnc.version = get(saved, 'version', settings.version);
+    cnc.state = get(saved, 'state', {}) || {};
+
+    try {
+        store.state = normalizeState(
+            preserveSavedCommandKeys(
+                merge(JSON.parse(JSON.stringify(defaultState)), cnc.state),
+                cnc.state,
+            ),
+        );
+    } catch (e) {
+        log.error(e);
+    }
+
+    const debouncedPersist = debounce((state: any) => {
+        persist({ version: settings.version, state: state });
+    }, 100);
+    const onStoreChange = (state: any) => {
+        if (applyingRemote || syncing) {
+            // applying a remote state emits change events; don't echo it back.
+            debouncedPersist.cancel();
+            return;
+        }
+        debouncedPersist(state);
+    };
+
+    try {
+        migrateStore();
+
+        if (isElectron()) {
+            window.ipcRenderer.send(
+                'assignPromptExit',
+                store.get('workspace.promptExit'),
+            );
+
+            window.ipcRenderer.send(
+                'change-power-saving',
+                store.get('workspace.powerSaving'),
+            );
+
+            window.ipcRenderer.send(
+                'gcam-handoff:set-enabled',
+                store.get('workspace.allowGcamHandoff', true),
+            );
         }
     } catch (err) {
         log.error(err);
     }
+
+    persistEnabled = true;
+    store.on('change', onStoreChange);
+    store.on('replace', onStoreChange);
+
+    // save the migrated state
+    persist({ version: settings.version, state: store.state });
+
+    // save changes from another client
+    controller.addListener(
+        'preferences:changed',
+        (payload: StoreData & { originId?: string }) => {
+            if (!payload || payload.originId === CLIENT_ID) {
+                return;
+            }
+            applyRemoteState(payload.state);
+        },
+    );
+
+    // after a disconnect (e.g. server restart) stop persisting until the
+    // server's copy has been re-fetched and applied
+    let resyncing = false;
+    const resync = async (): Promise<void> => {
+        if (resyncing) {
+            return;
+        }
+        resyncing = true;
+        try {
+            const latest = await fetchWithRetry();
+            applyRemoteState(latest.state);
+            syncing = false;
+
+            // merging defaults into the server's copy may have added new keys
+            // save them (once) so they aren't only in memory
+            if (
+                latest.version !== settings.version ||
+                !isEqual(
+                    JSON.parse(JSON.stringify(store.state)),
+                    latest.state ?? {},
+                )
+            ) {
+                persist({ version: settings.version, state: store.state });
+            }
+        } catch (err) {
+            log.error(err);
+        } finally {
+            resyncing = false;
+        }
+    };
+
+    controller.addListener('disconnect', () => {
+        syncing = true;
+        debouncedPersist.cancel();
+    });
+    controller.addListener('connect', () => {
+        if (syncing) {
+            resync();
+        }
+    });
 };
 
-try {
-    // saveBackup();
-    migrateStore();
+let initPromise: Promise<void> | null = null;
 
-    if (isElectron()) {
-        window.ipcRenderer.send(
-            'assignPromptExit',
-            store.get('workspace.promptExit'),
-        );
-
-        window.ipcRenderer.send(
-            'change-power-saving',
-            store.get('workspace.powerSaving'),
-        );
-
-        window.ipcRenderer.send(
-            'gcam-handoff:set-enabled',
-            store.get('workspace.allowGcamHandoff', true),
-        );
+// loads preferences from the server
+// this must be finished before anything else reads the store
+export const initStore = (): Promise<void> => {
+    if (!initPromise) {
+        initPromise = doInit();
     }
-} catch (err) {
-    log.error(err);
-}
+    return initPromise;
+};
 
-store.getConfig = getConfig;
 store.persist = persist;
-store.syncPrefs = syncPrefs;
 
 export default store;
