@@ -18,7 +18,7 @@ Then restart gSender.
 |--------|-------|----------------------|
 | `example-hello/` | Plain JS + Vite | Bridge client — `gsender`, `subscribeWorkspaceState`, `subscribeSelector` |
 | `react-ts-app/` | React + TypeScript + Vite | React hooks — `useWorkspaceState`, `useTypedSelector` |
-| `example-viewer/` | Plain JS + Vite | Embedded G-code preview — `GCodeViewer`, `gsender.gcode.loadToVisualizer` |
+| `example-viewer/` | Plain JS + Vite | Embedded G-code preview — `GCodeViewer`, `gsender.gcode.loadToVisualizer`, `navigation.navigateToCarve` |
 | `basic-cam/` | React + TypeScript + Vite + Tailwind | Full reference CAM plugin — combines all SDK entry points |
 | `corner-finder/` | React + TypeScript + Vite | Host visualizer bridge — `gsender.viewer.*` (picking, camera, overlay markers) + `machine.setBusy` |
 | `storage-test/` | Plain JS + Vite | Namespaced plugin storage — buttons for every `storage.*` method (get/set/delete/getAll/setAll/clear), for QA |
@@ -108,6 +108,31 @@ plugin must `import { storage } from "@sienci/gsender-plugin-sdk"` directly
 to be scanned and granted this permission. See the [SDK README's storage
 section](../packages/plugin-sdk/README.md#plugin-storage) for the client
 API.
+
+#### `app:navigate`: in-app navigation
+
+Granted when a plugin imports `navigation` (or the `gsender` aggregate). Lets
+the plugin move the user around gSender, e.g. to Carve after loading a file:
+
+```ts
+import { gcode, navigation } from "@sienci/gsender-plugin-sdk";
+
+await gcode.loadToVisualizer(text, "job.nc");
+await navigation.navigateToCarve();
+await navigation.navigate("/tools/squaring", { replace: true });
+```
+
+`navigate(path)` takes an in-app route that starts with a single `/`; external
+URLs, `//host` and `scheme:` paths are rejected. The host navigates after
+replying, so the call resolves even if navigating unmounts your plugin view.
+
+```json
+"capabilities": {
+	"requestTypes": ["app:navigate"],
+	"topics": [],
+	"allowedFunctions": ["navigation"]
+}
+```
 
 #### `machine:parse` / `machine:query`: firmware response parsers
 

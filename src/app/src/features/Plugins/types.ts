@@ -182,6 +182,7 @@ export type PluginPermissionsType =
     | 'redux:read'
     | 'local-fonts'
     | 'storage'
+    | 'app:navigate'
     | (string & {});
 
 export type PluginTopicsType =
@@ -213,7 +214,8 @@ export type PluginBridgeRequestType =
     | 'storage:delete'
     | 'storage:get:all'
     | 'storage:set:all'
-    | 'storage:clear';
+    | 'storage:clear'
+    | 'app:navigate';
 
 /** A serialized regex. Matchers cross postMessage and run server-side, so they
  * can never be functions. */

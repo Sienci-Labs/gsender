@@ -59,6 +59,25 @@ describe("buildGrantFromScan", () => {
 		);
 	});
 
+	it("grants app:navigate for a 'navigation' import, with no topic", () => {
+		const { permissions, capabilities } = buildGrantFromScan(["navigation"]);
+
+		expect(permissions).toEqual(["app:navigate"]);
+		expect(capabilities.requestTypes).toEqual(["app:navigate"]);
+		expect(capabilities.topics).toEqual([]);
+	});
+
+	it("includes app:navigate in the 'gsender' aggregate and whole-module grants", () => {
+		for (const name of ["gsender", "*require-whole-module*"]) {
+			expect(buildGrantFromScan([name]).capabilities.requestTypes).toContain(
+				"app:navigate",
+			);
+		}
+		expect(buildGrantFromScan(["gsender"]).permissions).toContain(
+			"app:navigate",
+		);
+	});
+
 	it("grants nothing for malformed input rather than throwing", () => {
 		for (const raw of [undefined, null, {}, "gcode", [42, null]]) {
 			const { permissions, capabilities } = buildGrantFromScan(raw);

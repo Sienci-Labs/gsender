@@ -24,6 +24,7 @@ import {
     getOwnerIdForSource,
     getPluginIdForSource,
 } from './plugin-permissions';
+import { navigateForPlugin } from './pluginNavigation';
 
 const BRIDGE_CHANNEL: typeof PLUGIN_BRIDGE_CHANNEL = 'gsender:plugin-bridge';
 
@@ -560,6 +561,8 @@ const handleBridgeRequest = async (
             handle.setOverlay(Array.isArray(markers) ? markers : []);
             return { ok: true };
         }
+        case 'app:navigate':
+            return navigateForPlugin(request.payload);
         case 'storage:get':
             return getStorageValue(pluginId as string, request.payload);
         case 'storage:set':
