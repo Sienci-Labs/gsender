@@ -1201,7 +1201,9 @@ export function* initialize(): Generator<null, void, unknown> {
                     <div className="flex flex-col gap-2 dark:text-gray-200">
                         <p>
                             The controller rejected this line:{' '}
-                            <code className="font-mono font-bold">{error.line}</code>
+                            <code className="font-mono font-bold">
+                                {error.line}
+                            </code>
                         </p>
                     </div>
                 ),

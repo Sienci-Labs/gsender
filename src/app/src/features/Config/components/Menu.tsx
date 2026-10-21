@@ -63,7 +63,8 @@ function MenuItem({
                 className={cn(
                     'text-gray-600 text-2xl max-xl:text-xl group-hover:text-blue-600',
                     {
-                        'text-blue-600 dark:text-blue-400 fill-blue-500': active,
+                        'text-blue-600 dark:text-blue-400 fill-blue-500':
+                            active,
                     },
                 )}
             >
