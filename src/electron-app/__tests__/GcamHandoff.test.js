@@ -71,6 +71,19 @@ describe('GcamHandoff', () => {
         );
     });
 
+    it('allows the hosted gCAM origin', async () => {
+        const hosted = 'https://petervanderwalt.github.io';
+        const res = await fetch(`${baseUrl}/gcam/v1/load`, {
+            method: 'OPTIONS',
+            headers: {
+                Origin: hosted,
+                'Access-Control-Request-Method': 'POST',
+            },
+        });
+        expect(res.status).toBe(204);
+        expect(res.headers.get('access-control-allow-origin')).toBe(hosted);
+    });
+
     it('accepts a program and sanitizes its name', async () => {
         const res = await load({ name: '../part', gcode: 'G0 X0' });
         expect(res.status).toBe(202);
