@@ -24,8 +24,8 @@ export default function CarveTopBar({ mode }: { mode: CarveMode }) {
     };
 
     return (
-        <header className="relative flex items-center justify-between h-12 px-2.5 border-b border-outline-subtle bg-surface-base shrink-0 select-none drag-region">
-            <div className="no-drag">
+        <header className="relative flex items-center justify-between h-14 px-2.5 border-b border-outline-subtle bg-surface-base shrink-0 select-none drag-region">
+            <div className="flex items-center gap-1.5 no-drag">
                 <StatusBadge mode={mode} />
             </div>
             <TopBarClock mode={mode} />

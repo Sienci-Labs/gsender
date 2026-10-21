@@ -73,6 +73,14 @@ const TILE_TONE: Record<Tone, string> = {
     tool: 'bg-state-tool text-white',
 };
 
+const LABEL_TONE: Record<Tone, string> = {
+    idle: 'text-content-primary',
+    run: 'text-state-run',
+    hold: 'text-state-hold',
+    alarm: 'text-state-alarm',
+    tool: 'text-state-tool',
+};
+
 function toneFor(mode: CarveMode, activeState: string): Tone {
     switch (mode) {
         case 'toolchange':
@@ -157,8 +165,8 @@ function ConnectedBadge({
             onContextMenu={(e) => e.preventDefault()}
             aria-label={`${trigger.firmware} on ${trigger.displayPort}, ${label}. Tap for details, hold to disconnect.`}
             className={cn(
-                'relative flex items-center h-8 shrink-0 rounded-lg border-[1.5px] overflow-hidden touch-none select-none text-left',
-                tone === 'tool' ? 'w-[206px]' : 'w-[178px]',
+                'relative flex items-center h-10 shrink-0 rounded-lg border-[1.5px] overflow-hidden touch-none select-none text-left',
+                tone === 'tool' ? 'w-[244px]' : 'w-[214px]',
                 BADGE_TONE[tone],
             )}
         >
@@ -174,22 +182,27 @@ function ConnectedBadge({
                     {trigger.displayPort}
                 </span>
             </span>
-            <span className="relative w-px h-[18px] bg-outline-subtle shrink-0" />
+            <span className="relative w-px h-6 bg-outline-subtle shrink-0" />
             <span className="relative flex items-center gap-1.5 flex-1 min-w-0 pl-[7px] pr-1">
                 <span
                     className={cn(
-                        'w-5 h-5 rounded-sm shrink-0 flex items-center justify-center',
+                        'w-7 h-7 rounded-md shrink-0 flex items-center justify-center',
                         TILE_TONE[tone],
                     )}
                 >
-                    <Icon className="w-3 h-3" />
+                    <Icon className="w-4 h-4" />
                 </span>
                 <span className="flex flex-col min-w-0">
-                    <span className="text-xs font-bold leading-[14px] text-content-primary truncate">
+                    <span
+                        className={cn(
+                            'text-base font-bold uppercase tracking-wide leading-5 truncate',
+                            LABEL_TONE[tone],
+                        )}
+                    >
                         {label}
                     </span>
                     {sub && (
-                        <span className="text-[8px] leading-[9px] text-content-muted truncate">
+                        <span className="text-[10px] leading-3 text-content-muted truncate">
                             {sub}
                         </span>
                     )}

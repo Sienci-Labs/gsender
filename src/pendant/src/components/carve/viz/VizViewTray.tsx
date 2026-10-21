@@ -1,13 +1,17 @@
+import type { ToolEntry } from 'app/features/ToolsPage/registry';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import type { RootState } from 'app/store/redux';
 import cn from 'classnames';
 import { Crosshair, Scan, Waypoints } from 'lucide-react';
 import type { RefObject } from 'react';
 import type { VisualizerHandle } from '../../Visualizer';
+import PinnedToolsMenu from './PinnedToolsMenu';
 
 interface Props {
     visualizerRef: RefObject<VisualizerHandle>;
     jogArmed: boolean;
+    toolsDisabled: boolean;
+    onOpenTool: (tool: ToolEntry) => void;
 }
 
 const BUTTON =
@@ -15,8 +19,13 @@ const BUTTON =
 const BUTTON_ARMED = 'border-robin-500 bg-robin-500/20 text-robin-400';
 
 /** Left-center floating tray on the visualizer: tap-to-jog, center on the
- * loaded toolpath, center on the machine bed. */
-export default function VizViewTray({ visualizerRef, jogArmed }: Props) {
+ * loaded toolpath, center on the machine bed, pinned tools. */
+export default function VizViewTray({
+    visualizerRef,
+    jogArmed,
+    toolsDisabled,
+    onOpenTool,
+}: Props) {
     const fileLoaded = useTypedSelector((s: RootState) => s.file.fileLoaded);
     const isConnected = useTypedSelector(
         (s: RootState) => s.connection.isConnected,
@@ -64,6 +73,11 @@ export default function VizViewTray({ visualizerRef, jogArmed }: Props) {
             >
                 <Scan className="h-5 w-5" aria-hidden />
             </button>
+            <PinnedToolsMenu
+                className={BUTTON}
+                disabled={toolsDisabled}
+                onOpen={onOpenTool}
+            />
         </div>
     );
 }

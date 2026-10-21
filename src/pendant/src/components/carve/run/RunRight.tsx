@@ -1,9 +1,7 @@
 import { WORKFLOW_STATE_PAUSED } from 'app/constants';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
-import type { RootState } from 'app/store/redux';
 import cn from 'classnames';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useJobProgress } from '../../../hooks/useJobProgress';
 import { formatClock } from '../../../utils/format';
 import ReadOnlyConsole from './ReadOnlyConsole';
@@ -33,22 +31,20 @@ export default function RunRight() {
         workflowState,
         displaySent,
         totalLines,
-        received,
         progressPercent,
         isFlashingComplete,
         onFlashAnimationEnd,
     } = useJobProgress();
-    const fileContent = useTypedSelector((s: RootState) => s.file.content);
-    const lines = useMemo(
-        () => (fileContent ? fileContent.split('\n') : []),
-        [fileContent],
-    );
 
     const paused = workflowState === WORKFLOW_STATE_PAUSED;
     const pausedSeconds = usePausedSeconds(paused);
     const elapsedMs = Number(senderStatus?.elapsedTime) || 0;
     const remainingSeconds = Number(senderStatus?.remainingTime) || 0;
-    const currentLine = received > 0 ? (lines[received - 1] ?? '').trim() : '';
+    // Keep a minimum fill width so the percent pill always fits
+    const fillWidth =
+        progressPercent <= 0
+            ? '0%'
+            : `min(100%, max(${progressPercent}%, 56px))`;
 
     return (
         <div className="flex flex-col flex-1 min-h-0 p-2.5">
@@ -62,34 +58,44 @@ export default function RunRight() {
                         {totalLines.toLocaleString()}
                     </span>
                 </div>
-                <div className="h-[7px] rounded-sm bg-surface-elevated overflow-hidden">
+                <div className="h-7 rounded-md border border-outline bg-surface-elevated pendant-progress-track overflow-hidden">
                     <div
                         className={cn(
-                            'h-full rounded-sm transition-[width] duration-200 ease-out',
+                            'relative h-full rounded-md transition-[width] duration-200 ease-out',
                             paused ? 'bg-state-hold' : 'bg-state-run',
                             isFlashingComplete && 'pendant-progress-complete',
                         )}
-                        style={{ width: `${progressPercent}%` }}
+                        style={{ width: fillWidth }}
                         onAnimationEnd={onFlashAnimationEnd}
-                    />
+                    >
+                        {progressPercent > 0 && (
+                            <div className="absolute right-1 top-1/2 -translate-y-1/2 h-[22px] min-w-8 px-1 rounded-[5px] border border-white/80 bg-white/75 text-[11px] leading-none text-gray-900 font-semibold tabular-nums flex items-center justify-center">
+                                {Math.round(progressPercent)}%
+                            </div>
+                        )}
+                    </div>
                 </div>
-                <div className="flex justify-between font-mono text-[10px] text-content-muted tabular-nums">
-                    {paused ? (
-                        <span>Paused {formatClock(pausedSeconds)}</span>
-                    ) : (
-                        <span>
-                            Elapsed {convertMillisecondsToTimeStamp(elapsedMs)}
-                        </span>
-                    )}
-                    <span>
-                        Remaining ~
-                        {remainingSeconds > 0
-                            ? formatClock(remainingSeconds)
-                            : '—'}
+                <div className="flex justify-between items-end font-mono tabular-nums">
+                    <span className="text-xs text-content-muted pb-1">
+                        {paused
+                            ? `Paused ${formatClock(pausedSeconds)}`
+                            : `Elapsed ${convertMillisecondsToTimeStamp(elapsedMs)}`}
                     </span>
-                </div>
-                <div className="font-mono text-[10.5px] text-blue-400 bg-surface-sunken border border-outline-subtle rounded-md px-2 py-[7px] truncate">
-                    {currentLine || '—'}
+                    <span className="flex flex-col items-end">
+                        <span className="text-[9.5px] tracking-[0.08em] uppercase text-content-disabled">
+                            Remaining
+                        </span>
+                        <span
+                            className={cn(
+                                'text-2xl font-bold leading-7',
+                                paused ? 'text-state-hold' : 'text-state-run',
+                            )}
+                        >
+                            {remainingSeconds > 0
+                                ? `~${formatClock(remainingSeconds)}`
+                                : '—'}
+                        </span>
+                    </span>
                 </div>
             </div>
             <ReadOnlyConsole />

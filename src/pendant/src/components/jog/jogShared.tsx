@@ -31,6 +31,9 @@ import {
     ChevronLeft,
     ChevronRight,
     ChevronUp,
+    Rabbit,
+    Rocket,
+    Turtle,
 } from 'lucide-react';
 import {
     type ComponentType,
@@ -78,10 +81,14 @@ type JogActionButtonProps = {
 const QUICK_PRESS_MS = 110;
 const DEFAULT_THRESHOLD = 250;
 
-export const PRESET_META: { id: JogPresetId; label: string }[] = [
-    { id: 'precise', label: 'Precise' },
-    { id: 'normal', label: 'Normal' },
-    { id: 'rapid', label: 'Rapid' },
+export const PRESET_META: {
+    id: JogPresetId;
+    label: string;
+    icon: ComponentType<{ className?: string }>;
+}[] = [
+    { id: 'precise', label: 'Precise', icon: Turtle },
+    { id: 'normal', label: 'Normal', icon: Rabbit },
+    { id: 'rapid', label: 'Rapid', icon: Rocket },
 ];
 
 const DEFAULT_JOG_CONFIGS: Record<JogPresetId, JogConfig> = {

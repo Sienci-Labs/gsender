@@ -1,3 +1,4 @@
+import type { ToolEntry } from 'app/features/ToolsPage/registry';
 import GcodeEditor from 'app/features/Visualizer/GcodeEditor';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import type { RootState } from 'app/store/redux';
@@ -58,7 +59,13 @@ function AlarmReason() {
 
 /** The carve screen body: visualizer stage over a two-column area whose
  * contents follow the CarveMode (CARVE_REDESIGN_SPEC.md §3). */
-export default function CarveScreen({ mode }: { mode: CarveMode }) {
+export default function CarveScreen({
+    mode,
+    onOpenTool,
+}: {
+    mode: CarveMode;
+    onOpenTool: (tool: ToolEntry) => void;
+}) {
     const fileActions = useFileActions();
     const fileLoaded = useTypedSelector((s: RootState) => s.file.fileLoaded);
     const [activeTab, setActiveTab] = useState<SetupTab>(() =>
@@ -79,7 +86,7 @@ export default function CarveScreen({ mode }: { mode: CarveMode }) {
                 onChange={fileActions.handleFileChange}
             />
 
-            <VizStage mode={mode} />
+            <VizStage mode={mode} onOpenTool={onOpenTool} />
 
             <div className="relative flex flex-1 min-h-0">
                 <div className="flex flex-col basis-[44%] shrink-0 min-w-0 min-h-0 border-r border-outline-subtle">
