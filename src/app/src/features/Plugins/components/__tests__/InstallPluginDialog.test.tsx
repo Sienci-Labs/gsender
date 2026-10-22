@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import api from 'app/api';
 import type { PluginInstallPlan } from '../../types';
@@ -278,11 +278,16 @@ describe('InstallPluginDialog', () => {
             screen.getByRole('button', { name: /^install$/i }),
         );
 
-        expect(await screen.findByText(/was installed/i)).toBeInTheDocument();
+        // The wizard's last step and the restart prompt both say so; the
+        // prompt is what offers the restart.
+        const prompt = await screen.findByRole('alertdialog', {
+            name: /restart now/i,
+        });
+        expect(within(prompt).getByText(/was installed/i)).toBeInTheDocument();
         expect(onRestartRequired).toHaveBeenCalled();
 
         await userEvent.click(
-            screen.getByRole('button', { name: /restart now/i }),
+            within(prompt).getByRole('button', { name: /restart now/i }),
         );
         expect(ipcSend).toHaveBeenCalledWith('app-restart');
     });
@@ -358,7 +363,7 @@ describe('InstallPluginDialog', () => {
         await userEvent.click(
             screen.getByRole('button', { name: /^install$/i }),
         );
-        await screen.findByText(/was installed/i);
+        await within(panel).findByText(/was installed/i);
         expect(panel.className).toBe(sizeOnSource);
         expect(bodyOf()).toBeDefined();
     });
