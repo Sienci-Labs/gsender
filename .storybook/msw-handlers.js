@@ -9,6 +9,8 @@ export const mswHandlers = [
   // Stats page: alarm/error history and maintenance tasks
   http.get('*/api/alarmList', () => HttpResponse.json({ list: [] })),
   http.get('*/api/maintenance', () => HttpResponse.json([])),
+  // Event hooks (G-code run on job start/stop etc.) edited in Config
+  http.get('*/api/events', () => HttpResponse.json({ records: {} })),
   // Release history shown on Stats > About
   http.get('*/api/releasenotes', () => HttpResponse.json([])),
   // Wireless control (remote mode) status shown in StatusIcons
