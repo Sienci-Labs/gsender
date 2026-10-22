@@ -27,9 +27,13 @@ import {
     X,
     XCircle,
 } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { type InstallStep, usePluginInstall } from '../hooks/usePluginInstall';
-import type { PluginInstallKind, PluginInstallPlan } from '../types';
+import type {
+    PluginInstallKind,
+    PluginInstallLogEntry,
+    PluginInstallPlan,
+} from '../types';
 
 interface InstallPluginDialogProps {
     show: boolean;
@@ -169,11 +173,53 @@ const Fact = ({ label, value }: { label: string; value: React.ReactNode }) => (
     </div>
 );
 
+// Always expanded — the log is what you want the moment something goes wrong,
+// and hiding it behind a toggle also made the panel resize.
+const ActivityLog = ({ entries }: { entries: PluginInstallLogEntry[] }) => {
+    const endRef = useRef<HTMLDivElement>(null);
+
+    // Optional call: scrollIntoView is missing in some environments (jsdom, older
+    // embedded webviews) and an absent convenience must not take the panel down.
+    useEffect(() => {
+        endRef.current?.scrollIntoView?.({ block: 'nearest' });
+    }, [entries.length]);
+
+    if (entries.length === 0) {
+        return <p className={CHROME.muted}>Waiting for a plugin&hellip;</p>;
+    }
+
+    return (
+        <ul
+            className={cx(CHROME.inset, 'px-2 py-1.5 font-mono text-[11px]')}
+            data-testid="install-activity-log"
+        >
+            {entries.map((entry) => (
+                <li
+                    key={`${entry.at}-${entry.message}`}
+                    className={cx('break-words py-0.5', {
+                        'text-gray-600 dark:text-content-muted':
+                            entry.level === 'info',
+                        'text-amber-700 dark:text-amber-400':
+                            entry.level === 'warn',
+                        'text-red-700 dark:text-red-400':
+                            entry.level === 'error',
+                    })}
+                >
+                    {entry.message}
+                </li>
+            ))}
+            <div ref={endRef} />
+        </ul>
+    );
+};
+
 const InfoPanel = ({
     plan,
+    log,
     pluginsDir,
 }: {
     plan: PluginInstallPlan | null;
+    log: PluginInstallLogEntry[];
     pluginsDir?: string;
 }) => (
     <aside className={CHROME.side}>
@@ -234,6 +280,10 @@ const InfoPanel = ({
                     )}
                 </div>
             )}
+        </SideSection>
+
+        <SideSection label="Activity">
+            <ActivityLog entries={log} />
         </SideSection>
     </aside>
 );
@@ -368,6 +418,7 @@ export const InstallPluginDialog = ({
         step,
         busy,
         plan,
+        log,
         error,
         manifestErrors,
         restored,
@@ -497,7 +548,11 @@ export const InstallPluginDialog = ({
                     {/* Fixed body height: the left column scrolls so the panel never
 					    changes size as you move between steps. */}
                     <div className="flex h-[420px] portrait:h-auto portrait:flex-col">
-                        <InfoPanel plan={plan} pluginsDir={pluginsDir} />
+                        <InfoPanel
+                            plan={plan}
+                            log={log}
+                            pluginsDir={pluginsDir}
+                        />
 
                         <div className={CHROME.main}>
                             <p className={CHROME.eyebrow}>{EYEBROW[step]}</p>
