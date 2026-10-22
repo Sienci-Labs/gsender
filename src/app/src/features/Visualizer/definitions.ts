@@ -76,6 +76,8 @@ export interface Visualizer {
     showLineWarnings: boolean;
     showSoftLimitWarning: boolean;
     hideProcessedLines: boolean;
+    showPlannedLines: boolean;
+    animatePlannedLines: boolean;
     boundingBoxLabels: boolean;
     followToolDuringRuntime: boolean;
     rotaryDiameterOffsetEnabled: boolean;
