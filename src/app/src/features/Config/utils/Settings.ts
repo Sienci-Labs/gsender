@@ -83,13 +83,16 @@ const onImportConfirm = (file: File) => {
             try {
                 const importData = JSON.parse(event.target.result as string);
 
+                // Exports are { settings, events }; store backups are { version, state }
+                const data = importData.settings || importData.state;
+
                 // Validate the imported data
                 // check that the major properties exist
                 if (
-                    !importData.state ||
-                    !importData.state.workspace ||
-                    !importData.state.widgets ||
-                    !importData.state.commandKeys
+                    !data ||
+                    !data.workspace ||
+                    !data.widgets ||
+                    !data.commandKeys
                 ) {
                     throw new Error('Invalid gSender settings file format');
                 }
