@@ -55,8 +55,14 @@ export const TaskList = {
 
 export const ResetOneTimer = {
   play: async ({ canvas, canvasElement, userEvent, parameters }) => {
-    await userEvent.click(await canvas.findByRole('button', { name: 'Reset maintenance timer for Lubricate rails' }));
-    const dialog = await body(canvasElement).findByRole('alertdialog', { name: 'Reset Maintenance Timer' });
+    // Wait for the loaded tasks; the table re-renders as they arrive
+    await canvas.findAllByText('Lubricate rails');
+    await userEvent.click(canvas.getByRole('button', { name: 'Reset maintenance timer for Lubricate rails' }));
+    const dialog = await body(canvasElement).findByRole(
+      'alertdialog',
+      { name: 'Reset Maintenance Timer' },
+      { timeout: 3000 },
+    );
     await userEvent.click(within(dialog).getByRole('button', { name: 'Yes' }));
 
     await waitFor(() => expect(lastSave(parameters)).toBeDefined());

@@ -305,7 +305,9 @@ class SVGVisualizer extends Component {
 
             this.updateSVG();
 
-            reduxStore.dispatch(updateFileRenderState(RENDER_RENDERED));
+            reduxStore.dispatch(
+                updateFileRenderState({ renderState: RENDER_RENDERED }),
+            );
         }
     }
 

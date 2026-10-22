@@ -150,11 +150,15 @@ const handleGeometryReady = (data) => {
         setTimeout(() => {
             const renderState = _get(reduxStore.getState(), 'file.renderState');
             if (renderState !== RENDER_RENDERED) {
-                reduxStore.dispatch(updateFileRenderState(RENDER_RENDERING));
+                reduxStore.dispatch(
+                    updateFileRenderState({ renderState: RENDER_RENDERING }),
+                );
             }
         }, 250);
     } else {
-        reduxStore.dispatch(updateFileRenderState(RENDER_RENDERED));
+        reduxStore.dispatch(
+            updateFileRenderState({ renderState: RENDER_RENDERED }),
+        );
     }
 };
 

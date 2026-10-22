@@ -100,3 +100,23 @@ export const RenderStateAfterLoad = {
     await waitFor(() => expect(fileState().renderState).toBe('RENDER_RENDERED'), { timeout: 5000 });
   },
 };
+
+export const RenderedWithVisualizationDisabled = {
+  // No 3D parse output to draw: Visualize.response marks the file rendered itself
+  parameters: { appStore: { 'widgets.visualizer.disabled': true } },
+  play: async () => {
+    loadFile('rectangle-no-3d.nc');
+    await waitFor(() => expect(fileState().fileLoaded).toBe(true), { timeout: 5000 });
+    await waitFor(() => expect(fileState().renderState).toBe('RENDER_RENDERED'), { timeout: 3000 });
+  },
+};
+
+export const RenderedInLightweightSvgMode = {
+  // Lightweight mode draws an SVG preview instead of the three.js scene
+  parameters: { appStore: { 'widgets.visualizer.liteMode': true } },
+  play: async () => {
+    loadFile('rectangle-svg.nc');
+    await waitFor(() => expect(fileState().fileLoaded).toBe(true), { timeout: 5000 });
+    await waitFor(() => expect(fileState().renderState).toBe('RENDER_RENDERED'), { timeout: 3000 });
+  },
+};

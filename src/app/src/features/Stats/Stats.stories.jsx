@@ -36,11 +36,12 @@ export const Overview = {
     // Only the three COM4 jobs count towards this machine's stats
     await expect(rowValue(canvas, 'Total jobs run')).toHaveTextContent('3');
 
-    await expect(canvas.getByText('Urgent!')).toBeVisible();
+    // Maintenance and alarms come from their own requests and can arrive later
+    await expect(await canvas.findByText('Urgent!')).toBeVisible();
     await expect(canvas.getByText('Due')).toBeVisible();
     await expect(canvas.getByText('Lubricate rails')).toBeVisible();
 
-    await expect(canvas.getByText('ALARM 1')).toBeVisible();
+    await expect(await canvas.findByText('ALARM 1')).toBeVisible();
     await expect(canvas.getByText('ERROR 9')).toBeVisible();
   },
 };

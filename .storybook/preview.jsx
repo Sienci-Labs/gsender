@@ -5,6 +5,7 @@ import { createRoot } from 'react-dom/client';
 import { Provider as ReduxProvider } from 'react-redux';
 import { HashRouter } from 'react-router';
 import { mswLoader } from 'msw-storybook-addon/csf3';
+import { configure } from 'storybook/test';
 import { store as reduxStore } from 'app/store/redux';
 import appStore from 'app/store';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
@@ -24,6 +25,11 @@ function StoreSubscribers() {
   return null;
 }
 flushSync(() => createRoot(document.createElement('div')).render(<StoreSubscribers />));
+
+// The full Vitest run renders many story files in parallel, so mocked requests,
+// workers and dialog animations can take well over Testing Library's 1s default.
+// Only failing waits get slower.
+configure({ asyncUtilTimeout: 3000 });
 
 /** @type { import('@storybook/tanstack-react').Preview } */
 const preview = {
