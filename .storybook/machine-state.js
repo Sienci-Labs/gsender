@@ -83,6 +83,10 @@ export function applyMachineState(
     info = {},
     // Firmware version as reported at startup, e.g. '1.1f'
     version,
+    // ATC tool table keyed by tool number, e.g. { 1: { id: 1, toolOffsets: { x: 0, y: 0, z: -12.5 }, toolRadius: 3.175 } }
+    toolTable,
+    // ATCi settings reported by the firmware, e.g. { rack_size: 6 }
+    atci,
     // Extra fields for controller.state.status, e.g. { alarmCode: 1 } or { activeState: 'Door' }
     status = {},
     // grblHAL spindle list, e.g. [{ id: 0, label: 'Spindle', enabled: true, laser: false }]
@@ -123,6 +127,8 @@ export function applyMachineState(
         settings: { ...DEFAULT_SETTINGS, ...settings },
         info,
         ...(version && { version }),
+        ...(toolTable && { toolTable }),
+        ...(atci && { atci }),
       },
     }),
   );
