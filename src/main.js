@@ -54,6 +54,7 @@ import { parseAndReturnGCode } from './electron-app/RecentFiles';
 import WindowManager from './electron-app/WindowManager';
 import pkg from './package.json';
 import launchServer from './server-cli';
+import decodeGcode from './server/lib/decode-gcode';
 
 // Reads the persisted settings directly, since the main process needs to know
 // "use pendant view as default UI" before any window exists. The server-owned
@@ -793,7 +794,7 @@ const main = () => {
 
                     prevDirectory = filePath; // set previous directory
 
-                    fs.readFile(FULL_FILE_PATH, 'latin1', (err, data) => {
+                    fs.readFile(FULL_FILE_PATH, (err, buffer) => {
                         if (err) {
                             log.error(`Error in readFile: ${err}`);
                             return;
@@ -801,7 +802,7 @@ const main = () => {
 
                         const { size } = fs.statSync(FULL_FILE_PATH);
                         window.webContents.send('returned-upload-dialog-data', {
-                            data,
+                            data: decodeGcode(buffer),
                             size,
                             name: fileName,
                             path: FULL_FILE_PATH,
