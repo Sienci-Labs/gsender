@@ -86,3 +86,29 @@ export const TuneZAxis = {
     await expect(canvas.getByText(/Z-axis looks accurate/)).toBeVisible();
   },
 };
+
+export const ZMeasuredAsPositiveDistance = {
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const command = spyOn(controller, 'command');
+    await userEvent.click(canvas.getByRole('textbox'));
+    await userEvent.click(await canvas.findByText('Z-Axis'));
+    // Z moves -50 mm; a ruler reading of 49 is naturally entered as positive
+    await runTuning(canvas, userEvent, 'Z', 49);
+    await expect(canvas.getByText(/movement was\s+off by/)).toHaveTextContent('off by 1 mm.');
+
+    await userEvent.click(button(canvas, 'Update step/mm'));
+    const dialog = await within(canvasElement.ownerDocument.body).findByRole('alertdialog', { name: 'Update Firmware' });
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Update Firmware' }));
+    // 400 steps/mm * 50 / 49, never negative
+    await expect(command).toHaveBeenCalledWith('gcode', ['$102=408.16', '$$']);
+  },
+};
+
+export const ZMeasuredAsPositiveExactDistance = {
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('textbox'));
+    await userEvent.click(await canvas.findByText('Z-Axis'));
+    await runTuning(canvas, userEvent, 'Z', 50);
+    await expect(canvas.getByText(/Z-axis looks accurate/)).toBeVisible();
+  },
+};

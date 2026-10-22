@@ -59,6 +59,27 @@ describe('calculateNewStepsPerMM', () => {
     });
   });
 
+  // --- Direction ---
+  describe('direction of travel', () => {
+    test('uses magnitudes when the move is negative but measured as positive', () => {
+      const result = calculateNewStepsPerMM({
+        originalStepsPerMM: 400,
+        givenDistanceMoved: -50,
+        actualDistanceMoved: 49,
+      });
+      expect(result).toBeCloseTo(408.16, 2);
+    });
+
+    test('gives the same result whichever sign the distances are entered with', () => {
+      const result = calculateNewStepsPerMM({
+        originalStepsPerMM: 400,
+        givenDistanceMoved: -50,
+        actualDistanceMoved: -49,
+      });
+      expect(result).toBeCloseTo(408.16, 2);
+    });
+  });
+
   // --- Edge cases ---
   describe('edge cases', () => {
     test('handles zero actual distance', () => {
@@ -146,12 +167,14 @@ describe('calculateNewStepsPerMM', () => {
     });
 
     test('handles negative actualDistanceMoved', () => {
+      // Distances are compared by magnitude, so a sign mismatch can never
+      // produce a negative steps/mm to write to firmware
       const result = calculateNewStepsPerMM({
         originalStepsPerMM: 100,
         givenDistanceMoved: 100,
         actualDistanceMoved: -50,
       });
-      expect(result).toBeLessThanOrEqual(0);
+      expect(result).toBeCloseTo(200, 2);
     });
 
     test('handles negative givenDistanceMoved', () => {

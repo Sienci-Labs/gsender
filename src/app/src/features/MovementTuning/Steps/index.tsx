@@ -97,6 +97,9 @@ const Steps = () => {
     const isCompleted =
         markLocationCompleted && moveAxisCompleted && setTravelCompleted;
 
+    // Compare sizes, not signs: Z moves -50 mm but is usually measured as 50
+    const travelError = Math.abs(moveDistance) - Math.abs(measuredDistance);
+
     const stepImage =
         currentStep === 0
             ? {
@@ -236,7 +239,7 @@ const Steps = () => {
     }
 
     if (isCompleted) {
-        if (moveDistance !== measuredDistance) {
+        if (travelError !== 0) {
             return (
                 <div className="flex flex-col gap-4">
                     <div className="text-yellow-800 bg-yellow-100 p-4 rounded-lg border min-h-52 flex flex-col gap-4 justify-center items-center text-lg dark:bg-yellow-950 dark:text-white dark:border-yellow-950">
@@ -244,11 +247,7 @@ const Steps = () => {
                             Your {selectedAxis.toUpperCase()}-axis movement was
                             off by{' '}
                             <strong>
-                                {toFixedIfNecessary(
-                                    moveDistance - measuredDistance,
-                                    4,
-                                )}{' '}
-                                {units}.
+                                {toFixedIfNecessary(travelError, 4)} {units}.
                             </strong>{' '}
                             Consider updating your {selectedAxis.toUpperCase()}
                             -axis step/mm value in your CNC firmware.
