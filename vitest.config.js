@@ -21,10 +21,12 @@ export default defineConfig({
           // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
           storybookTest({ configDir: path.join(dirname, '.storybook') }),
         ],
-        // Crawl every story up front so Vite doesn't discover dependencies
-        // mid-run and reload the browser (fails whole files on a cold cache)
+        // Crawl every story up front, on every run, so Vite never discovers a
+        // dependency mid-run and reloads the browser (that fails whole files with
+        // "Invalid hook call"). Without force, a warm cache skips the crawl.
         optimizeDeps: {
           entries: ['.storybook/preview.jsx', 'src/**/*.stories.@(js|jsx|ts|tsx)'],
+          force: true,
         },
         test: {
           name: 'storybook',

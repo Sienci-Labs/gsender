@@ -8,7 +8,7 @@ import { store as reduxStore } from 'app/store/redux';
 import appStore from 'app/store';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
 import { mswHandlers } from './msw-handlers';
-import { applyMachineState, applyWorkspaceState } from './machine-state';
+import { applyAppState, applyMachineState } from './machine-state';
 
 // useWorkspaceState snapshots the workspace at import and only subscribes to
 // app/store once a component using it mounts, so on a fresh page it would miss
@@ -35,7 +35,7 @@ const preview = {
   async beforeEach({ msw, parameters }) {
     msw.use(...mswHandlers);
     applyMachineState(reduxStore, parameters.machine);
-    applyWorkspaceState(appStore, parameters.workspace);
+    applyAppState(appStore, parameters);
   },
   parameters: {
     controls: {

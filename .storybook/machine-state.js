@@ -7,8 +7,10 @@ import {
   updateControllerState,
   updateHasHomed,
   updatePartialControllerSettings,
+  updateSenderStatus,
   updateWorkflowState,
 } from 'app/store/redux/slices/controller.slice';
+import { unloadFileInfo, updateFileInfo } from 'app/store/redux/slices/fileInfo.slice';
 import { setNotifications } from 'app/store/redux/slices/preferences.slice';
 import {
   GRBLHAL,
@@ -72,28 +74,33 @@ export function applyMachineState(
     // grblHAL spindle list, e.g. [{ id: 0, label: 'Spindle', enabled: true, laser: false }]
     spindles = [],
     notifications = [],
+    // Loaded G-code file info, e.g. { name: 'part.nc', total: 4000 }; omit for no file
+    file,
+    // Sender progress while a job runs, e.g. { sent: 1200, total: 4000, remainingTime: 900 }
+    sender = null,
   } = {},
 ) {
   const { isConnected, activeState, workflow = WORKFLOW_STATE_IDLE } = PRESETS[preset];
 
   store.dispatch(setConnectionState({ isConnected }));
   store.dispatch(updatePartialControllerSettings({ ...DEFAULT_SETTINGS, ...settings }));
+  // The reducer always builds a status object, so give it the full shape the
+  // server reports (pinState included) even when disconnected
   store.dispatch(
     updateControllerState({
       type: isConnected ? type : '',
-      state: isConnected
-        ? {
-            status: {
-              activeState,
-              mpos: { ...ORIGIN, ...mpos },
-              wpos: { ...ORIGIN, ...wpos },
-              feedrate: 0,
-              ...status,
-            },
-            parserstate: { modal },
-            axes: { axes },
-          }
-        : {},
+      state: {
+        status: {
+          activeState,
+          mpos: { ...ORIGIN, ...mpos },
+          wpos: { ...ORIGIN, ...wpos },
+          feedrate: 0,
+          pinState: {},
+          ...status,
+        },
+        parserstate: { modal },
+        axes: { axes },
+      },
     }),
   );
   store.dispatch(updateWorkflowState({ state: workflow }));
@@ -103,6 +110,9 @@ export function applyMachineState(
     store.dispatch(addSpindle({ capabilities: '', raw: '', order, ...spindle })),
   );
   store.dispatch(setNotifications(notifications));
+  store.dispatch(unloadFileInfo());
+  if (file) store.dispatch(updateFileInfo(file));
+  store.dispatch(updateSenderStatus({ status: sender }));
 }
 
 const DEFAULT_WORKSPACE = {
@@ -111,10 +121,20 @@ const DEFAULT_WORKSPACE = {
   mode: WORKSPACE_MODE.DEFAULT,
 };
 
-// Workspace preferences live in app/store (persisted to localStorage outside Electron).
-// Stories override them with `parameters: { workspace: { units: 'in' } }`.
-export function applyWorkspaceState(store, workspace = {}) {
+let initialAppState;
+
+// app/store holds user preferences (persisted to localStorage outside Electron).
+// Each story starts from the state the page loaded with, then applies
+// `parameters: { workspace: { units: 'in' } }` and any other key paths via
+// `parameters: { appStore: { 'widgets.probe.connectivityTest': false } }`.
+export function applyAppState(store, { workspace = {}, appStore = {} } = {}) {
+  initialAppState ??= structuredClone(store.state);
+  store.state = structuredClone(initialAppState);
+
   for (const [key, value] of Object.entries({ ...DEFAULT_WORKSPACE, ...workspace })) {
     store.set(`workspace.${key}`, value);
+  }
+  for (const [path, value] of Object.entries(appStore)) {
+    store.set(path, value);
   }
 }
