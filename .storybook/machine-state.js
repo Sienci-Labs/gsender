@@ -1,4 +1,9 @@
-import { listPorts, setConnectionState } from 'app/store/redux/slices/connection.slice';
+import {
+  closeConnection,
+  listPorts,
+  openConnection,
+  setConnectionState,
+} from 'app/store/redux/slices/connection.slice';
 import {
   addSDCardFileToList,
   addSpindle,
@@ -12,6 +17,7 @@ import {
 } from 'app/store/redux/slices/controller.slice';
 import { unloadFileInfo, updateFileInfo } from 'app/store/redux/slices/fileInfo.slice';
 import { setInputHistory } from 'app/store/redux/slices/console.slice';
+import { unloadHelperInfo } from 'app/store/redux/slices/helper.slice';
 import { setIpList, setNotifications } from 'app/store/redux/slices/preferences.slice';
 import {
   GRBLHAL,
@@ -83,6 +89,8 @@ export function applyMachineState(
     file,
     // Sender progress while a job runs, e.g. { sent: 1200, total: 4000, remainingTime: 900 }
     sender = null,
+    // Port the machine is connected on (only used when connected), e.g. 'COM4'
+    port,
     // Serial ports the server lists, e.g. [{ port: '/dev/ttyACM0', manufacturer: 'Arduino', inuse: false }]
     ports = [],
     unrecognizedPorts = [],
@@ -96,6 +104,10 @@ export function applyMachineState(
 ) {
   const { isConnected, activeState, workflow = WORKFLOW_STATE_IDLE } = PRESETS[preset];
 
+  store.dispatch(closeConnection());
+  if (isConnected && port) {
+    store.dispatch(openConnection({ port, baudrate: '115200', isConnected }));
+  }
   store.dispatch(setConnectionState({ isConnected }));
   store.dispatch(listPorts({ ports, unrecognizedPorts, networkPorts: [] }));
   // Replace (not merge) settings so nothing leaks from the previous story
@@ -144,6 +156,8 @@ export function applyMachineState(
   store.dispatch(updateSenderStatus({ status: sender }));
   store.dispatch(setInputHistory(consoleInputHistory));
   store.dispatch(setIpList(ipList));
+  // Helper/wizard panels start closed
+  store.dispatch(unloadHelperInfo());
   store.dispatch(emptyAllSDFiles());
   sdFiles.forEach((file) => store.dispatch(addSDCardFileToList({ file })));
 }

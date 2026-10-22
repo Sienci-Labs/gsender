@@ -7,20 +7,22 @@ import { mswLoader } from 'msw-storybook-addon/csf3';
 import { store as reduxStore } from 'app/store/redux';
 import appStore from 'app/store';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { useWidgetState } from 'app/hooks/useWidgetState';
 import { Toaster } from 'app/components/shadcn/Sonner';
 import ConfirmationDialog from 'app/components/ConfirmationDialog/ConfirmationDialog';
 import { SettingsProvider } from 'app/features/Config/utils/SettingsContext';
 import { mswHandlers } from './msw-handlers';
 import { applyAppState, applyMachineState } from './machine-state';
 
-// useWorkspaceState snapshots the workspace at import and only subscribes to
-// app/store once a component using it mounts, so on a fresh page it would miss
-// what beforeEach applies for the first story. Mount one subscriber up front.
-function WorkspaceSubscriber() {
+// useWorkspaceState and useWidgetState snapshot app/store at import and only
+// subscribe once a component using them mounts, so on a fresh page they would
+// miss what beforeEach applies for the first story. Mount subscribers up front.
+function StoreSubscribers() {
   useWorkspaceState();
+  useWidgetState('rotary');
   return null;
 }
-flushSync(() => createRoot(document.createElement('div')).render(<WorkspaceSubscriber />));
+flushSync(() => createRoot(document.createElement('div')).render(<StoreSubscribers />));
 
 /** @type { import('@storybook/tanstack-react').Preview } */
 const preview = {

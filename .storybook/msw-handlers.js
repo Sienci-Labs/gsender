@@ -6,6 +6,9 @@ export const mswHandlers = [
   http.get('*/api/macros', () => HttpResponse.json({ records: [] })),
   // Job history; FileControl shows the most recent job when no file is loaded
   http.get('*/api/jobstats', () => HttpResponse.json({ jobs: [] })),
+  // Stats page: alarm/error history and maintenance tasks
+  http.get('*/api/alarmList', () => HttpResponse.json({ list: [] })),
+  http.get('*/api/maintenance', () => HttpResponse.json([])),
   // Wireless control (remote mode) status shown in StatusIcons
   http.get('*/api/remote', () =>
     HttpResponse.json({ ip: '192.168.0.42', port: 8000, headlessStatus: false }),
