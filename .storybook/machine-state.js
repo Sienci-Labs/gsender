@@ -2,18 +2,23 @@ import {
   setConnectionState,
 } from 'app/store/redux/slices/connection.slice';
 import {
+  addSpindle,
+  clearSpindles,
   updateControllerState,
   updateHasHomed,
   updatePartialControllerSettings,
   updateWorkflowState,
 } from 'app/store/redux/slices/controller.slice';
+import { setNotifications } from 'app/store/redux/slices/preferences.slice';
 import {
   GRBLHAL,
   GRBL_ACTIVE_STATE_ALARM,
+  GRBL_ACTIVE_STATE_HOLD,
   GRBL_ACTIVE_STATE_IDLE,
   GRBL_ACTIVE_STATE_RUN,
   METRIC_UNITS,
   WORKFLOW_STATE_IDLE,
+  WORKFLOW_STATE_PAUSED,
   WORKFLOW_STATE_RUNNING,
   WORKSPACE_MODE,
 } from 'app/constants';
@@ -32,6 +37,11 @@ const PRESETS = {
     activeState: GRBL_ACTIVE_STATE_RUN,
     workflow: WORKFLOW_STATE_RUNNING,
   },
+  hold: {
+    isConnected: true,
+    activeState: GRBL_ACTIVE_STATE_HOLD,
+    workflow: WORKFLOW_STATE_PAUSED,
+  },
   alarm: {
     isConnected: true,
     activeState: GRBL_ACTIVE_STATE_ALARM,
@@ -42,7 +52,7 @@ const PRESETS = {
 const ORIGIN = { x: 0, y: 0, z: 0, a: 0, b: 0, c: 0 };
 
 // EEPROM values stories may override; listed so each story starts from the same baseline
-const DEFAULT_SETTINGS = { $22: '0', $23: '0', $27: '1' };
+const DEFAULT_SETTINGS = { $13: '0', $22: '0', $23: '0', $27: '1', $32: '0' };
 
 // The preview shares one Redux store across stories, so every story resets
 // it through the same actions the socket listeners dispatch in the app.
@@ -57,6 +67,11 @@ export function applyMachineState(
     axes = ['X', 'Y', 'Z'],
     settings = {},
     hasHomed = false,
+    // Extra fields for controller.state.status, e.g. { alarmCode: 1 } or { activeState: 'Door' }
+    status = {},
+    // grblHAL spindle list, e.g. [{ id: 0, label: 'Spindle', enabled: true, laser: false }]
+    spindles = [],
+    notifications = [],
   } = {},
 ) {
   const { isConnected, activeState, workflow = WORKFLOW_STATE_IDLE } = PRESETS[preset];
@@ -68,7 +83,13 @@ export function applyMachineState(
       type: isConnected ? type : '',
       state: isConnected
         ? {
-            status: { activeState, mpos: { ...ORIGIN, ...mpos }, wpos: { ...ORIGIN, ...wpos }, feedrate: 0 },
+            status: {
+              activeState,
+              mpos: { ...ORIGIN, ...mpos },
+              wpos: { ...ORIGIN, ...wpos },
+              feedrate: 0,
+              ...status,
+            },
             parserstate: { modal },
             axes: { axes },
           }
@@ -77,6 +98,11 @@ export function applyMachineState(
   );
   store.dispatch(updateWorkflowState({ state: workflow }));
   store.dispatch(updateHasHomed({ hasHomed }));
+  store.dispatch(clearSpindles());
+  spindles.forEach((spindle, order) =>
+    store.dispatch(addSpindle({ capabilities: '', raw: '', order, ...spindle })),
+  );
+  store.dispatch(setNotifications(notifications));
 }
 
 const DEFAULT_WORKSPACE = {
