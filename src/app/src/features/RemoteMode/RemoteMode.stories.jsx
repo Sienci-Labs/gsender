@@ -3,6 +3,12 @@ import { http, HttpResponse } from 'msw';
 
 import { RemoteModeDialog } from './index';
 
+const IP_LIST = [
+  { address: '192.168.0.42', iface: 'Wi-Fi', kind: 'wifi', label: 'Wi-Fi', usable: true, recommended: true },
+  { address: '10.0.0.7', iface: 'Ethernet', kind: 'ethernet', label: 'Ethernet', usable: true, recommended: false },
+  { address: '172.24.16.1', iface: 'vEthernet (WSL)', kind: 'virtual', label: 'Virtual adapter', usable: false, recommended: false },
+];
+
 const meta = {
   component: RemoteModeDialog,
   tags: ['ai-generated'],
@@ -14,8 +20,9 @@ const meta = {
     onClose: fn(),
     setHeadlessSettings: fn(),
   },
-  // Addresses offered in the Addr select, applied to Redux by .storybook/machine-state.js
-  parameters: { machine: { preset: 'idle', ipList: ['192.168.0.42', '10.0.0.7'] } },
+  // This computer's addresses as the server reports them (ip:list), applied to Redux
+  // by .storybook/machine-state.js
+  parameters: { machine: { preset: 'idle', ipList: IP_LIST } },
 };
 
 export default meta;
@@ -65,7 +72,8 @@ export const ChooseAddress = {
   play: async ({ canvasElement, userEvent }) => {
     const body = getBody(canvasElement);
     await userEvent.click(await body.findByRole('combobox'));
-    await userEvent.click(await body.findByRole('option', { name: '10.0.0.7' }));
+    // Options show the address with its adapter description
+    await userEvent.click(await body.findByRole('option', { name: /10\.0\.0\.7/ }));
     // The QR code panel shows the address phones should open
     await waitFor(() => expect(body.getByText('10.0.0.7:8000')).toBeVisible());
     // The Select hides the rest of the page from assistive tech until it finishes closing
@@ -87,5 +95,16 @@ export const RejectsReservedPort = {
     await waitFor(() => expect(body.getByText(/Invalid Port Number/)).toBeVisible());
     await expect(update).not.toHaveBeenCalled();
     await expect(args.onClose).not.toHaveBeenCalled();
+  },
+};
+
+export const UnreachableAddressesGrouped = {
+  play: async ({ canvasElement, userEvent }) => {
+    const body = getBody(canvasElement);
+    await userEvent.click(await body.findByRole('combobox'));
+    // Addresses other devices can't reach (e.g. WSL adapters) are set apart
+    // The menu fades in
+    await waitFor(() => expect(body.getByText('Other / advanced')).toBeVisible());
+    await expect(body.getByRole('option', { name: /172\.24\.16\.1/ })).toBeVisible();
   },
 };

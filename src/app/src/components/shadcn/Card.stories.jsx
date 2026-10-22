@@ -24,7 +24,7 @@ export const Default = {};
 export const CssCheck = {
   play: async ({ canvas }) => {
     const title = canvas.getByRole('heading', { name: /job stats/i });
-    // CardTitle uses text-blue-500 (#3F85C7 in src/app/tailwind.config.ts) — fails if Tailwind did not load.
-    await expect(getComputedStyle(title).color).toBe('rgb(63, 133, 199)');
+    // CardTitle uses text-blue-600 (#3978B3 in src/app/tailwind.config.ts) — fails if Tailwind did not load.
+    await expect(getComputedStyle(title).color).toBe('rgb(57, 120, 179)');
   },
 };

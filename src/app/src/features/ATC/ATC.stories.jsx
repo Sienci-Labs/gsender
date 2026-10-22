@@ -39,6 +39,11 @@ export default meta;
 
 const body = (canvasElement) => within(canvasElement.ownerDocument.body);
 
+// The load popover ignores pointer input for 300ms after opening (useOpenInteractionGuard)
+// so a stray click can't trigger a tool change
+const waitUntilInteractive = (element) =>
+  waitFor(() => expect(getComputedStyle(element).pointerEvents).not.toBe('none'));
+
 export const NotConnected = {
   parameters: { machine: { preset: 'disconnected' } },
   play: async ({ canvas }) => {
@@ -82,6 +87,7 @@ export const LoadTool = {
     await waitFor(() => expect(popover.getByText('Load Tool')).toBeVisible());
 
     // Options are labelled by tool number
+    await waitUntilInteractive(popover.getByRole('combobox'));
     await userEvent.click(popover.getByRole('combobox'));
     await userEvent.click(await popover.findByRole('option', { name: /^3/ }));
     // The widget's own Load button shares the name, so stay inside the popover
@@ -98,6 +104,7 @@ export const SelectedToolStatus = {
     await waitFor(() => expect(popover.getByText('Load Tool')).toBeVisible());
 
     // T2 has no offset yet, so the popover should warn about it
+    await waitUntilInteractive(popover.getByRole('combobox'));
     await userEvent.click(popover.getByRole('combobox'));
     await userEvent.click(await popover.findByRole('option', { name: /^2/ }));
     await expect(await popover.findByText('Unprobed Tool')).toBeVisible();

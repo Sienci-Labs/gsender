@@ -26,7 +26,8 @@ export default meta;
 // A setting's label, description and control share one row
 const settingRow = (canvas, label) => within(canvas.getAllByText(label)[0].closest('div'));
 
-const applyButton = (canvas) => canvas.getByRole('button', { name: 'Apply Settings' });
+// "Apply Settings" hides the word Settings below the xl breakpoint
+const applyButton = (canvas) => canvas.getByRole('button', { name: /^Apply/ });
 
 export const Overview = {
   play: async ({ canvas }) => {

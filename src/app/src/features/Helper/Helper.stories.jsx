@@ -43,14 +43,18 @@ export const Hidden = {
 };
 
 export const AlarmInformation = {
-  play: async ({ canvas }) => {
-    // MachineStatus's alarm "?" icon publishes this
-    pubsub.publishSync('helper:info', {
-      title: 'Alarm Code 1',
-      description: 'Hard limit has been triggered. Machine position is likely lost.',
-    });
-    await expect(await canvas.findByText('Alarm Code 1')).toBeVisible();
-    await expect(canvas.getByText(/Hard limit has been triggered/)).toBeVisible();
+  play: async ({ canvasElement }) => {
+    // MachineStatus's alarm "?" icon publishes just the code; the helper adds the
+    // controller's description and its own guidance from the message registry
+    pubsub.publishSync('helper:info', { kind: 'alarm', code: 1 });
+    // The panel portals to document.body
+    const body = within(canvasElement.ownerDocument.body);
+    await waitFor(() => expect(body.getByText('Hard limit triggered')).toBeVisible());
+    await expect(body.getByText(/Clear the alarm, then home the machine/)).toBeVisible();
+    // Its guide is offered as a link (and QR code) to the limits article; the panel
+    // renders landscape and portrait variants, so check the link target, not one label
+    const guideLinks = body.getAllByRole('link').map((link) => link.getAttribute('href'));
+    await expect(guideLinks).toContain('https://sienci.zendesk.com/hc/en-us/articles/41566952133524-Alarm-1-Alarm-2');
   },
 };
 

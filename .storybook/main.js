@@ -41,9 +41,10 @@ const config = {
             !plugin?.name?.startsWith('sentry') &&
             plugin?.name !== 'vite-plugin-node-polyfills',
         ),
+        // Mirrors src/app/vite.config.js (@react-pdf/renderer needs Buffer)
         nodePolyfills({
-          include: ['process'],
-          globals: { global: true, process: true },
+          include: ['buffer', 'process'],
+          globals: { Buffer: true, global: true, process: true },
           protocolImports: false,
         }),
       ],

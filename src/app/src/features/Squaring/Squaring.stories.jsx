@@ -1,4 +1,4 @@
-import { expect, spyOn, within } from 'storybook/test';
+import { expect, spyOn, waitFor, within } from 'storybook/test';
 import controller from 'app/lib/controller';
 
 import Squaring from './index';
@@ -10,7 +10,7 @@ const meta = {
   parameters: { machine: { preset: 'idle', settings: { $100: '200', $101: '200' } } },
   decorators: [
     (Story) => (
-      <div className="w-[1100px] p-4">
+      <div className="h-[760px] w-[1200px] p-4">
         <Story />
       </div>
     ),
@@ -21,48 +21,61 @@ export default meta;
 
 const button = (canvas, name) => canvas.getByRole('button', { name });
 
+// The wizard opens on a landing page; its single sub-wizard is a card to start
+const start = async (canvas, userEvent) => {
+  await userEvent.click(await canvas.findByRole('button', { name: /XY Squaring/ }));
+};
+
+// The wizard advances with Next once the current step is complete
+const next = async (canvas, userEvent) => {
+  await waitFor(() => expect(button(canvas, /Next/)).toBeEnabled());
+  await userEvent.click(button(canvas, /Next/));
+};
+
 // Marks the triangle: point 1, move X 300 mm, point 2, move Y 300 mm, point 3
 const markPoints = async (canvas, userEvent) => {
-  await userEvent.click(button(canvas, 'Start XY Squaring'));
+  await start(canvas, userEvent);
+  await next(canvas, userEvent);
   for (const step of ['Mark Point 1', 'Move X-axis', 'Mark Point 2', 'Move Y-axis', 'Mark Point 3']) {
-    await userEvent.click(button(canvas, step));
+    await userEvent.click(await canvas.findByRole('button', { name: step }));
   }
-  await userEvent.click(button(canvas, 'Next Step'));
+  await next(canvas, userEvent);
 };
 
 // Enters the three tape-to-tape measurements in order 1-2, 2-3, 1-3
 const measure = async (canvas, userEvent, distances) => {
-  const inputs = canvas.getAllByPlaceholderText('Enter measurement');
+  const inputs = await canvas.findAllByPlaceholderText('Enter measurement');
   for (const [index, distance] of distances.entries()) {
     await userEvent.type(inputs[index], String(distance));
     // ControlledInput reports its value on blur
     await userEvent.tab();
     await userEvent.click(canvas.getAllByRole('button', { name: 'Confirm' })[0]);
   }
-  await userEvent.click(button(canvas, 'Next Step'));
+  // The results follow the last step
+  await next(canvas, userEvent);
 };
 
-export const Introduction = {
+export const Landing = {
   play: async ({ canvas }) => {
-    await expect(button(canvas, 'Start XY Squaring')).toBeEnabled();
+    await expect(await canvas.findByRole('button', { name: /XY Squaring/ })).toBeEnabled();
   },
 };
 
 export const NotConnected = {
   parameters: { machine: { preset: 'disconnected' } },
   play: async ({ canvas }) => {
-    await expect(canvas.getByText(/Please connect to a device/)).toBeVisible();
-    await expect(button(canvas, 'Start XY Squaring')).toBeDisabled();
+    await expect(await canvas.findByText(/not connected/i)).toBeVisible();
   },
 };
 
 export const MarkReferencePoints = {
   play: async ({ canvas, userEvent }) => {
     const command = spyOn(controller, 'command');
-    await userEvent.click(button(canvas, 'Start XY Squaring'));
+    await start(canvas, userEvent);
+    await next(canvas, userEvent);
 
     // Steps unlock in order
-    await expect(button(canvas, 'Move X-axis')).toBeDisabled();
+    await expect(await canvas.findByRole('button', { name: 'Move X-axis' })).toBeDisabled();
     await userEvent.click(button(canvas, 'Mark Point 1'));
     await userEvent.click(button(canvas, 'Move X-axis'));
     await expect(command).toHaveBeenCalledWith('gcode', 'G91 G21 G0 X300');
@@ -71,9 +84,8 @@ export const MarkReferencePoints = {
     await userEvent.click(button(canvas, 'Move Y-axis'));
     await expect(command).toHaveBeenCalledWith('gcode', 'G91 G21 G0 Y300');
 
-    await expect(button(canvas, 'Next Step')).toBeDisabled();
     await userEvent.click(button(canvas, 'Mark Point 3'));
-    await expect(button(canvas, 'Next Step')).toBeEnabled();
+    await waitFor(() => expect(button(canvas, /Next/)).toBeEnabled());
   },
 };
 

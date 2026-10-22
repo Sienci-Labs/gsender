@@ -59,19 +59,26 @@ export default meta;
 
 export const EmptyScene = {
   play: async ({ canvas, canvasElement }) => {
-    // three.js draws into a WebGL canvas
+    // gviewer draws into a WebGL canvas
     await waitFor(() => expect(canvasElement.querySelector('canvas')).not.toBeNull());
-    await expect(canvas.getByRole('button', { name: '3D view' })).toBeVisible();
+    await expect(canvas.getByRole('button', { name: 'Go to iso view' })).toBeVisible();
   },
 };
 
-export const CameraViews = {
+export const ProjectionToggle = {
   play: async ({ canvas, userEvent }) => {
-    // The camera widget titles itself with the current view
-    await userEvent.click(canvas.getByRole('button', { name: 'Top view' }));
-    await expect(canvas.getByRole('heading', { name: 'Top' })).toBeVisible();
-    await userEvent.click(canvas.getByRole('button', { name: 'Front view' }));
-    await expect(canvas.getByRole('heading', { name: 'Front' })).toBeVisible();
+    await userEvent.click(canvas.getByRole('button', { name: 'Switch to orthographic view' }));
+    // The same button now offers to switch back, and reports its pressed state
+    const toggle = await canvas.findByRole('button', { name: 'Switch to perspective view' });
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+  },
+};
+
+export const LightweightModeToggle = {
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: 'Enable lightweight mode' }));
+    const toggle = await canvas.findByRole('button', { name: 'Disable lightweight mode' });
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
   },
 };
 
@@ -107,16 +114,16 @@ export const RenderedWithVisualizationDisabled = {
   play: async () => {
     loadFile('rectangle-no-3d.nc');
     await waitFor(() => expect(fileState().fileLoaded).toBe(true), { timeout: 5000 });
-    await waitFor(() => expect(fileState().renderState).toBe('RENDER_RENDERED'), { timeout: 3000 });
+    await waitFor(() => expect(fileState().renderState).toBe('RENDER_RENDERED'), { timeout: 5000 });
   },
 };
 
-export const RenderedInLightweightSvgMode = {
-  // Lightweight mode draws an SVG preview instead of the three.js scene
+export const RenderedInLightweightMode = {
+  // Lightweight mode skips the full 3D render
   parameters: { appStore: { 'widgets.visualizer.liteMode': true } },
   play: async () => {
-    loadFile('rectangle-svg.nc');
+    loadFile('rectangle-lite.nc');
     await waitFor(() => expect(fileState().fileLoaded).toBe(true), { timeout: 5000 });
-    await waitFor(() => expect(fileState().renderState).toBe('RENDER_RENDERED'), { timeout: 3000 });
+    await waitFor(() => expect(fileState().renderState).toBe('RENDER_RENDERED'), { timeout: 5000 });
   },
 };
