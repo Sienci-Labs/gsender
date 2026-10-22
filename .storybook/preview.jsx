@@ -7,6 +7,9 @@ import { mswLoader } from 'msw-storybook-addon/csf3';
 import { store as reduxStore } from 'app/store/redux';
 import appStore from 'app/store';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
+import { Toaster } from 'app/components/shadcn/Sonner';
+import ConfirmationDialog from 'app/components/ConfirmationDialog/ConfirmationDialog';
+import { SettingsProvider } from 'app/features/Config/utils/SettingsContext';
 import { mswHandlers } from './msw-handlers';
 import { applyAppState, applyMachineState } from './machine-state';
 
@@ -22,11 +25,17 @@ flushSync(() => createRoot(document.createElement('div')).render(<WorkspaceSubsc
 /** @type { import('@storybook/tanstack-react').Preview } */
 const preview = {
   decorators: [
-    // Same provider tree as src/app/src/App.tsx
+    // Same provider tree as src/app/src/App.tsx, plus what workspace/index.tsx wraps
+    // every page in: SettingsProvider and the ConfirmationDialog that renders
+    // Confirm() requests published over pubsub
     (Story) => (
       <ReduxProvider store={reduxStore}>
+        <Toaster richColors closeButton theme="light" visibleToasts={5} />
         <HashRouter>
-          <Story />
+          <SettingsProvider>
+            <ConfirmationDialog />
+            <Story />
+          </SettingsProvider>
         </HashRouter>
       </ReduxProvider>
     ),

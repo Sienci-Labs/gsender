@@ -1,16 +1,18 @@
 import { listPorts, setConnectionState } from 'app/store/redux/slices/connection.slice';
 import {
+  addSDCardFileToList,
   addSpindle,
   clearSpindles,
+  emptyAllSDFiles,
   updateControllerState,
   updateHasHomed,
-  updatePartialControllerSettings,
+  updateControllerSettings,
   updateSenderStatus,
   updateWorkflowState,
 } from 'app/store/redux/slices/controller.slice';
 import { unloadFileInfo, updateFileInfo } from 'app/store/redux/slices/fileInfo.slice';
 import { setInputHistory } from 'app/store/redux/slices/console.slice';
-import { setNotifications } from 'app/store/redux/slices/preferences.slice';
+import { setIpList, setNotifications } from 'app/store/redux/slices/preferences.slice';
 import {
   GRBLHAL,
   GRBL_ACTIVE_STATE_ALARM,
@@ -52,7 +54,7 @@ const PRESETS = {
 
 const ORIGIN = { x: 0, y: 0, z: 0, a: 0, b: 0, c: 0 };
 
-// EEPROM values stories may override; listed so each story starts from the same baseline
+// EEPROM values every story starts from; stories add or override via `settings`
 const DEFAULT_SETTINGS = { $13: '0', $22: '0', $23: '0', $27: '1', $32: '0' };
 
 // The preview shares one Redux store across stories, so every story resets
@@ -68,6 +70,10 @@ export function applyMachineState(
     axes = ['X', 'Y', 'Z'],
     settings = {},
     hasHomed = false,
+    // Firmware build options, e.g. { NEWOPT: { YM: '' } } for YMODEM SD transfers
+    info = {},
+    // Firmware version as reported at startup, e.g. '1.1f'
+    version,
     // Extra fields for controller.state.status, e.g. { alarmCode: 1 } or { activeState: 'Door' }
     status = {},
     // grblHAL spindle list, e.g. [{ id: 0, label: 'Spindle', enabled: true, laser: false }]
@@ -82,13 +88,29 @@ export function applyMachineState(
     unrecognizedPorts = [],
     // Commands previously typed into the console (ArrowUp recalls them)
     consoleInputHistory = [],
+    // This machine's network addresses, offered for wireless control
+    ipList = [],
+    // Files on the controller's SD card, e.g. [{ name: 'part.nc', size: 20480 }]
+    sdFiles = [],
   } = {},
 ) {
   const { isConnected, activeState, workflow = WORKFLOW_STATE_IDLE } = PRESETS[preset];
 
   store.dispatch(setConnectionState({ isConnected }));
   store.dispatch(listPorts({ ports, unrecognizedPorts, networkPorts: [] }));
-  store.dispatch(updatePartialControllerSettings({ ...DEFAULT_SETTINGS, ...settings }));
+  // Replace (not merge) settings so nothing leaks from the previous story
+  store.dispatch(
+    updateControllerSettings({
+      type: isConnected ? type : '',
+      settings: {
+        parameters: {},
+        groups: {},
+        settings: { ...DEFAULT_SETTINGS, ...settings },
+        info,
+        ...(version && { version }),
+      },
+    }),
+  );
   // The reducer always builds a status object, so give it the full shape the
   // server reports (pinState included) even when disconnected
   store.dispatch(
@@ -101,6 +123,8 @@ export function applyMachineState(
           wpos: { ...ORIGIN, ...wpos },
           feedrate: 0,
           pinState: {},
+          // grblHAL status reports always carry SD; name is null when no SD job runs
+          ...(type === GRBLHAL && { SD: { name: null, percentage: 0 } }),
           ...status,
         },
         parserstate: { modal },
@@ -119,6 +143,9 @@ export function applyMachineState(
   if (file) store.dispatch(updateFileInfo(file));
   store.dispatch(updateSenderStatus({ status: sender }));
   store.dispatch(setInputHistory(consoleInputHistory));
+  store.dispatch(setIpList(ipList));
+  store.dispatch(emptyAllSDFiles());
+  sdFiles.forEach((file) => store.dispatch(addSDCardFileToList({ file })));
 }
 
 const DEFAULT_WORKSPACE = {
