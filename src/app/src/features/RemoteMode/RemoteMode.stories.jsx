@@ -32,7 +32,8 @@ const confirmSave = async (body, userEvent) => {
 export const Default = {
   play: async ({ canvasElement }) => {
     const body = getBody(canvasElement);
-    await expect(await body.findByRole('dialog', { name: 'Wireless CNC Control' })).toBeVisible();
+    // The dialog fades in
+    await waitFor(() => expect(body.getByRole('dialog', { name: 'Wireless CNC Control' })).toBeVisible());
     // Nothing to save until a setting changes
     await expect(body.getByRole('button', { name: 'Save' })).toBeDisabled();
     await expect(body.getByText('192.168.0.42:8000')).toBeVisible();
@@ -66,7 +67,7 @@ export const ChooseAddress = {
     await userEvent.click(await body.findByRole('combobox'));
     await userEvent.click(await body.findByRole('option', { name: '10.0.0.7' }));
     // The QR code panel shows the address phones should open
-    await expect(await body.findByText('10.0.0.7:8000')).toBeVisible();
+    await waitFor(() => expect(body.getByText('10.0.0.7:8000')).toBeVisible());
     // The Select hides the rest of the page from assistive tech until it finishes closing
     await expect(await body.findByRole('button', { name: 'Save' })).toBeEnabled();
   },

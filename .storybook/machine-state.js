@@ -20,6 +20,7 @@ import { setInputHistory } from 'app/store/redux/slices/console.slice';
 import { unloadHelperInfo } from 'app/store/redux/slices/helper.slice';
 import { setIpList, setNotifications } from 'app/store/redux/slices/preferences.slice';
 import { updateShuttleStatus } from 'app/store/redux/slices/shortcuts.slice';
+import { setCurrentVisualizer } from 'app/store/redux/slices/visualizer.slice';
 import {
   GRBLHAL,
   GRBL_ACTIVE_STATE_ALARM,
@@ -29,6 +30,7 @@ import {
   METRIC_UNITS,
   WORKFLOW_STATE_IDLE,
   WORKFLOW_STATE_PAUSED,
+  VISUALIZER_PRIMARY,
   WORKFLOW_STATE_RUNNING,
   WORKSPACE_MODE,
 } from 'app/constants';
@@ -159,6 +161,8 @@ export function applyMachineState(
   store.dispatch(setIpList(ipList));
   // Keyboard shortcuts have finished loading, as they always have once the app is up
   store.dispatch(updateShuttleStatus({ isFinished: true }));
+  // The main visualizer is active (Surfacing's preview switches to the secondary one)
+  store.dispatch(setCurrentVisualizer(VISUALIZER_PRIMARY));
   // Helper/wizard panels start closed
   store.dispatch(unloadHelperInfo());
   store.dispatch(emptyAllSDFiles());
@@ -173,7 +177,8 @@ const DEFAULT_WORKSPACE = {
 
 let initialAppState;
 
-// app/store holds user preferences (persisted to localStorage outside Electron).
+// app/store holds user preferences (persisted to localStorage outside Electron;
+// .storybook/isolate-storage.js turns that off here).
 // Each story starts from the state the page loaded with, then applies
 // `parameters: { workspace: { units: 'in' } }` and any other key paths via
 // `parameters: { appStore: { 'widgets.probe.connectivityTest': false } }`.
@@ -181,10 +186,15 @@ export function applyAppState(store, { workspace = {}, appStore = {} } = {}) {
   initialAppState ??= structuredClone(store.state);
   store.state = structuredClone(initialAppState);
 
+  // replace, not set: set deep-merges, so e.g. an empty array wouldn't clear a list
   for (const [key, value] of Object.entries({ ...DEFAULT_WORKSPACE, ...workspace })) {
-    store.set(`workspace.${key}`, value);
+    store.replace(`workspace.${key}`, value);
   }
   for (const [path, value] of Object.entries(appStore)) {
-    store.set(path, value);
+    store.replace(path, value);
   }
+  // The reset above assigns state directly and replace() skips unchanged values,
+  // so tell subscribers (useWorkspaceState, useWidgetState) the state may differ
+  // from what the previous story left them with
+  store.emit('change', store.state);
 }
