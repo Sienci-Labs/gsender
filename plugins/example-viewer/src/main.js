@@ -1,4 +1,4 @@
-import { gsender } from '@sienci/gsender-plugin-sdk';
+import { gcode as gcodeClient, navigation } from '@sienci/gsender-plugin-sdk';
 import { GCodeViewer } from '@sienci/gsender-plugin-sdk/viewer';
 
 import { SAMPLE_GCODE } from './sample-gcode.js';
@@ -7,10 +7,19 @@ import './style.css';
 const gcodeInput = document.getElementById('gcode-input');
 const loadPreviewBtn = document.getElementById('load-preview');
 const loadMainBtn = document.getElementById('load-main');
+const goCarveBtn = document.getElementById('go-carve');
+const viewStatsBtn = document.getElementById('view-stats');
 const statusEl = document.getElementById('status');
 const viewerContainer = document.getElementById('viewer-container');
 
-if (!gcodeInput || !loadPreviewBtn || !loadMainBtn || !viewerContainer) {
+if (
+    !gcodeInput ||
+    !loadPreviewBtn ||
+    !loadMainBtn ||
+    !goCarveBtn ||
+    !viewStatsBtn ||
+    !viewerContainer
+) {
     throw new Error('Missing required DOM elements');
 }
 
@@ -67,11 +76,34 @@ const loadToMain = async () => {
 
     setStatus('Sending to gSender…');
     try {
-        await gsender.gcode.loadToVisualizer(gcode, 'viewer-demo.nc');
-        setStatus("Loaded into gSender's main visualizer.");
+        await gcodeClient.loadToVisualizer(gcode, 'viewer-demo.nc');
+        goCarveBtn.disabled = false;
+        setStatus(
+            "Loaded into gSender's main visualizer. Go to Carve to run it.",
+        );
     } catch (err) {
         setStatus(
             `Load failed: ${err instanceof Error ? err.message : String(err)}`,
+        );
+    }
+};
+
+const goToCarve = async () => {
+    try {
+        await navigation.navigateToCarve();
+    } catch (err) {
+        setStatus(
+            `Navigation failed: ${err instanceof Error ? err.message : String(err)}`,
+        );
+    }
+};
+
+const viewStats = async () => {
+    try {
+        await navigation.navigate('/stats/jobs');
+    } catch (err) {
+        setStatus(
+            `Navigation failed: ${err instanceof Error ? err.message : String(err)}`,
         );
     }
 };
@@ -82,6 +114,14 @@ loadPreviewBtn.addEventListener('click', () => {
 
 loadMainBtn.addEventListener('click', () => {
     void loadToMain();
+});
+
+goCarveBtn.addEventListener('click', () => {
+    void goToCarve();
+});
+
+viewStatsBtn.addEventListener('click', () => {
+    void viewStats();
 });
 
 void loadPreview();

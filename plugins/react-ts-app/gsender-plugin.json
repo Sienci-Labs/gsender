@@ -14,5 +14,10 @@
       }
     ]
   },
-  "permissions": ["machine:read"]
+  "permissions": ["machine:read", "workspace:read", "redux:read"],
+  "capabilities": {
+    "requestTypes": ["machine:get:context"],
+    "topics": ["workspace", "redux"],
+    "allowedFunctions": ["gsender", "useWorkspaceState", "useTypedSelector"]
+  }
 }
