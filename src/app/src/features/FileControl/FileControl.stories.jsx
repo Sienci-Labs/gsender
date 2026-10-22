@@ -100,3 +100,12 @@ export const RunningJob = {
     await expect(canvas.getByRole('button', { name: 'Close File' })).toBeDisabled();
   },
 };
+
+export const MultiDotFileName = {
+  parameters: { machine: { preset: 'idle', file: { ...FILE, name: 'sign.v2.final.nc' } } },
+  play: async ({ canvas }) => {
+    // Only the last dot separates the extension
+    await expect(canvas.getByRole('heading', { name: 'sign.v2.final' })).toBeVisible();
+    await expect(canvas.getByRole('heading', { name: '.nc' })).toBeVisible();
+  },
+};
