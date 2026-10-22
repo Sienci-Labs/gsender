@@ -81,9 +81,8 @@ export default meta;
 // Each plugin is a bordered card with no role of its own
 const card = async (canvas, name) => within((await canvas.findByText(name)).closest('.rounded-md'));
 
-// Switch never passes its label down to Toggle, whose aria-label then falls back
-// to "Toggle" and overrides the visible Enabled/Disabled label
-const toggle = (scope) => scope.getByRole('checkbox', { name: 'Toggle' });
+// Each switch is named for its plugin; its visible label only says Enabled/Disabled
+const toggle = (scope, name) => scope.getByRole('checkbox', { name: `Enable ${name}` });
 
 const body = (canvasElement) => within(canvasElement.ownerDocument.body);
 
@@ -96,12 +95,12 @@ export const InstalledPlugins = {
     await expect(probe.getByText('probe-helper · v1.2.0')).toBeVisible();
     await expect(probe.getByText('Slots: tools-tab')).toBeVisible();
     await expect(probe.getByText('machine:read')).toBeVisible();
-    await expect(toggle(probe)).toBeChecked();
+    await expect(toggle(probe, 'Probe Helper')).toBeChecked();
 
     // An invalid plugin lists why, and can't be enabled
     const broken = await card(canvas, 'Broken Plugin');
     await expect(broken.getByText('gsender-plugin.json: missing "ui" entry')).toBeVisible();
-    await expect(toggle(broken)).toBeDisabled();
+    await expect(toggle(broken, 'Broken Plugin')).toBeDisabled();
   },
 };
 
@@ -125,12 +124,12 @@ export const DisablePlugin = {
   parameters: { plugins: [PROBE_HELPER] },
   play: async ({ canvas, parameters, userEvent }) => {
     const probe = await card(canvas, 'Probe Helper');
-    await userEvent.click(toggle(probe));
+    await userEvent.click(toggle(probe, 'Probe Helper'));
 
     await waitFor(() =>
       expect(parameters.pluginRequests.updates).toEqual([{ id: 'probe-helper', enabled: false }]),
     );
-    await waitFor(() => expect(toggle(probe)).not.toBeChecked());
+    await waitFor(() => expect(toggle(probe, 'Probe Helper')).not.toBeChecked());
     await expect(probe.getByText('Disabled')).toBeVisible();
     // Mount routes only change when the server restarts
     await expect(await canvas.findByText(/Restart gSender to apply plugin changes/)).toBeVisible();

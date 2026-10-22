@@ -5,6 +5,8 @@ import Toggle from './Toggle';
 
 interface SwitchProps {
     label?: string;
+    // Defaults to label; set it when label describes the state, not the setting
+    ariaLabel?: string;
     checked?: boolean;
     onChange: (
         checked: boolean,
@@ -21,6 +23,7 @@ interface SwitchProps {
 
 const Switch: React.FC<SwitchProps> = ({
     label,
+    ariaLabel,
     checked = false,
     onChange,
     className,
@@ -46,6 +49,7 @@ const Switch: React.FC<SwitchProps> = ({
             )}
             <Toggle
                 id={switchId}
+                ariaLabel={ariaLabel || label}
                 checked={checked}
                 onChange={onChange}
                 value={value}

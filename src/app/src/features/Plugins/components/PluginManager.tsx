@@ -236,6 +236,7 @@ const PluginManager = () => {
                                                 handleToggle(plugin.id, checked)
                                             }
                                             disabled={!plugin.valid}
+                                            ariaLabel={`Enable ${plugin.name}`}
                                             label={
                                                 plugin.enabled
                                                     ? 'Enabled'
