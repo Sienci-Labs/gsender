@@ -43,10 +43,12 @@ export function MaintenanceAddTaskDialog({
     const formRef = useRef<MaintenanceTaskFormRef>(null);
 
     const addTask = (newTask: MaintenanceTask) => {
-        const maxIDTask = maintenanceTasks.reduce((prev, current) => {
-            return prev && prev.id > current.id ? prev : current;
-        });
-        newTask.id = maxIDTask.id + 1;
+        // Start from 0 so the first task added to an empty list gets id 1
+        const maxID = maintenanceTasks.reduce(
+            (max, task) => Math.max(max, task.id ?? 0),
+            0,
+        );
+        newTask.id = maxID + 1;
 
         maintenanceTasks.push(newTask);
         setMaintenanceTasks([...maintenanceTasks]);

@@ -107,3 +107,14 @@ export const AddTask = {
     });
   },
 };
+
+export const AddFirstTask = {
+  beforeEach: maintenanceApi([]),
+  play: async ({ canvas, canvasElement, userEvent, parameters }) => {
+    await addTask(canvas, canvasElement, userEvent);
+    await waitFor(() => expect(lastSave(parameters)).toBeDefined());
+    await expect(lastSave(parameters)).toEqual([
+      expect.objectContaining({ id: 1, name: 'Clean dust shoe', rangeStart: 10, rangeEnd: 15, currentTime: 0 }),
+    ]);
+  },
+};
