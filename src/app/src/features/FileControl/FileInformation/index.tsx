@@ -289,8 +289,13 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
     const splitFileNameAndExtension = (name: string = '') => {
         if (!name) return ['', ''];
 
-        if (name.indexOf('.') > 0) {
-            return name.split('.');
+        // Split on the last dot so names like "sign.v2.nc" keep their real extension
+        const extensionIndex = name.lastIndexOf('.');
+        if (extensionIndex > 0) {
+            return [
+                name.slice(0, extensionIndex),
+                name.slice(extensionIndex + 1),
+            ];
         }
 
         return [name, ''];
@@ -310,9 +315,11 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                             <h2 className="inline-block text-lg font-bold text-ellipsis overflow-hidden whitespace-nowrap">
                                 {fileName}
                             </h2>
-                            <h2 className="inline-block text-lg font-bold">
-                                .{extension}
-                            </h2>
+                            {extension && (
+                                <h2 className="inline-block text-lg font-bold">
+                                    .{extension}
+                                </h2>
+                            )}
                         </div>
                     </TooltipTrigger>
                     <TooltipContent>{name}</TooltipContent>

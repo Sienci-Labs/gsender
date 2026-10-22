@@ -44,4 +44,5 @@ CLAUDE.md
 */CLAUDE.md
 .agents
 android/
-skills-lock.json
+skills-lock.json*storybook.log
+storybook-static

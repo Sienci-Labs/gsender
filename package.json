@@ -110,7 +110,9 @@
     "check-types": "node ./src/app/node_modules/typescript/bin/tsc --noEmit -p ./src/app",
     "test:unit": "jest",
     "test:unit:watch": "jest --watch",
-    "test:app": "yarn --cwd src/app test"
+    "test:app": "yarn --cwd src/app test",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "build": {
     "appId": "org.sienci.gsender-edge",
@@ -470,10 +472,29 @@
     "vite": "^7.3.1",
     "vite-css-modules": "^1.11.1",
     "vite-plugin-node-polyfills": "0.23.0",
-    "vite-tsconfig-paths": "5.0.1"
+    "vite-tsconfig-paths": "5.0.1",
+    "@chromatic-com/storybook": "latest",
+    "@storybook/addon-a11y": "^10.6.3",
+    "@storybook/addon-docs": "^10.6.3",
+    "@storybook/addon-mcp": "^10.6.3",
+    "@storybook/addon-vitest": "^10.6.3",
+    "@storybook/tanstack-react": "^10.6.3",
+    "@tanstack/react-query": "latest",
+    "@vitest/browser-playwright": "latest",
+    "@vitest/coverage-v8": "latest",
+    "msw": "^3.0.3",
+    "msw-storybook-addon": "^3",
+    "playwright": "latest",
+    "storybook": "^10.6.3",
+    "vitest": "latest"
   },
   "resolutions": {
     "@react-pdf/image": "3.0.4"
   },
-  "packageManager": "yarn@1.22.22"
+  "packageManager": "yarn@1.22.22",
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
+  }
 }
