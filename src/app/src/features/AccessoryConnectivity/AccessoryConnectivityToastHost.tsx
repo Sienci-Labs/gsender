@@ -1,6 +1,9 @@
 import { TOASTER_DEFAULT } from 'app/lib/toaster/ToasterLib';
 import pubsub from 'pubsub-js';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
+
+import { accessoryManageRoute } from './accessoryAutoconfigKeys';
 
 import { AccessoryConnectivityToast } from './AccessoryConnectivityToast';
 
@@ -12,6 +15,7 @@ export interface AccessoryConnectivityToastEntry {
 
 export function AccessoryConnectivityToastHost() {
     const [toasts, setToasts] = useState<AccessoryConnectivityToastEntry[]>([]);
+    const navigate = useNavigate();
 
     const dismiss = (id: string) => {
         setToasts((current) => current.filter((toast) => toast.id !== id));
@@ -48,6 +52,10 @@ export function AccessoryConnectivityToastHost() {
                     status={toast.status}
                     accessoryName={toast.accessoryName}
                     onDismiss={() => dismiss(toast.id)}
+                    onManage={() => {
+                        dismiss(toast.id);
+                        navigate(accessoryManageRoute(toast.accessoryName));
+                    }}
                 />
             ))}
         </div>

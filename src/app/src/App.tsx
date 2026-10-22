@@ -80,8 +80,9 @@ function App() {
             <FocusTrappingBridge>
                 <AccessibilitySettingsHandler />
                 <Toaster closeButton visibleToasts={5} />
-                <AccessoryConnectivityToastHost />
                 <HashRouter>
+                    {/* Inside the router so a toast's Manage button can navigate */}
+                    <AccessoryConnectivityToastHost />
                     <ReactRoutes />
                 </HashRouter>
             </FocusTrappingBridge>

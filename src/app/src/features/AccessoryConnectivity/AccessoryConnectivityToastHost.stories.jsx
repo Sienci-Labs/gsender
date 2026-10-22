@@ -1,4 +1,4 @@
-import { expect, within } from 'storybook/test';
+import { expect, waitFor, within } from 'storybook/test';
 import controller from 'app/lib/controller';
 import rootSaga, { sagaMiddleware } from 'app/store/redux/sagas';
 
@@ -30,7 +30,14 @@ const meta = {
   tags: ['ai-generated'],
   // Machine state is applied by .storybook/machine-state.js
   parameters: { machine: { preset: 'idle' } },
-  beforeEach: startSagas,
+  beforeEach: () => {
+    startSagas();
+    // Manage navigates the story's HashRouter; put it back afterwards
+    const { hash } = window.location;
+    return () => {
+      window.location.hash = hash;
+    };
+  },
   decorators: [
     (Story) => (
       <div className="relative h-[320px] w-[640px]">
@@ -68,5 +75,41 @@ export const NoChangeNoToast = {
     reportAutoconfig({ PROBE: '1', SPINDLE: '1' });
     await new Promise((resolve) => setTimeout(resolve, 300));
     await expect(body(canvasElement).queryByRole('article')).toBeNull();
+  },
+};
+
+// The host is a click-through overlay, so the toast itself has to take clicks
+export const DismissToast = {
+  play: async ({ canvasElement, userEvent }) => {
+    reportStartup({ TLS: '0' });
+    reportAutoconfig({ TLS: '1' });
+    const toast = within(await body(canvasElement).findByRole('article', { name: 'TLS connected' }));
+
+    await userEvent.click(toast.getByRole('button', { name: 'Dismiss tls connected notification' }));
+    await waitFor(() => expect(body(canvasElement).queryByRole('article')).toBeNull());
+  },
+};
+
+export const ManageOpensAccessoryWizard = {
+  play: async ({ canvasElement, userEvent }) => {
+    reportStartup({ ATCEXP: '0' });
+    reportAutoconfig({ ATCEXP: '1' });
+    const toast = within(await body(canvasElement).findByRole('article', { name: 'ATCEXP connected' }));
+
+    await userEvent.click(toast.getByRole('button', { name: /Manage/ }));
+    await waitFor(() => expect(window.location.hash).toBe('#/tools/accessoryInstall/sienci-atc'));
+    // Done with the toast once it has taken you there
+    await expect(body(canvasElement).queryByRole('article')).toBeNull();
+  },
+};
+
+export const ManageWithoutWizardOpensInstaller = {
+  play: async ({ canvasElement, userEvent }) => {
+    reportStartup({ PROBE: '0' });
+    reportAutoconfig({ PROBE: '1' });
+    const toast = within(await body(canvasElement).findByRole('article', { name: 'PROBE connected' }));
+
+    await userEvent.click(toast.getByRole('button', { name: /Manage/ }));
+    await waitFor(() => expect(window.location.hash).toBe('#/tools/accessoryInstall'));
   },
 };
