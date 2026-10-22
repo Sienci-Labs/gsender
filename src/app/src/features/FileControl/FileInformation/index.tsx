@@ -280,9 +280,11 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
                             <h2 className="inline-block text-lg font-bold text-ellipsis overflow-hidden whitespace-nowrap">
                                 {fileName}
                             </h2>
-                            <h2 className="inline-block text-lg font-bold">
-                                .{extension}
-                            </h2>
+                            {extension && (
+                                <h2 className="inline-block text-lg font-bold">
+                                    .{extension}
+                                </h2>
+                            )}
                         </div>
                     </TooltipTrigger>
                     <TooltipContent>{name}</TooltipContent>

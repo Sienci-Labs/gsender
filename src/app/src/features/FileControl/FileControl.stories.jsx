@@ -109,3 +109,12 @@ export const MultiDotFileName = {
     await expect(canvas.getByRole('heading', { name: '.nc' })).toBeVisible();
   },
 };
+
+export const NoExtension = {
+  parameters: { machine: { preset: 'idle', file: { ...FILE, name: 'toolpath' } } },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole('heading', { name: 'toolpath' })).toBeVisible();
+    // No dangling "." heading when the file has no extension
+    await expect(canvas.queryByRole('heading', { name: '.' })).toBeNull();
+  },
+};
