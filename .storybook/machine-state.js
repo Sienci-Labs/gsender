@@ -1,6 +1,4 @@
-import {
-  setConnectionState,
-} from 'app/store/redux/slices/connection.slice';
+import { listPorts, setConnectionState } from 'app/store/redux/slices/connection.slice';
 import {
   addSpindle,
   clearSpindles,
@@ -11,6 +9,7 @@ import {
   updateWorkflowState,
 } from 'app/store/redux/slices/controller.slice';
 import { unloadFileInfo, updateFileInfo } from 'app/store/redux/slices/fileInfo.slice';
+import { setInputHistory } from 'app/store/redux/slices/console.slice';
 import { setNotifications } from 'app/store/redux/slices/preferences.slice';
 import {
   GRBLHAL,
@@ -78,11 +77,17 @@ export function applyMachineState(
     file,
     // Sender progress while a job runs, e.g. { sent: 1200, total: 4000, remainingTime: 900 }
     sender = null,
+    // Serial ports the server lists, e.g. [{ port: '/dev/ttyACM0', manufacturer: 'Arduino', inuse: false }]
+    ports = [],
+    unrecognizedPorts = [],
+    // Commands previously typed into the console (ArrowUp recalls them)
+    consoleInputHistory = [],
   } = {},
 ) {
   const { isConnected, activeState, workflow = WORKFLOW_STATE_IDLE } = PRESETS[preset];
 
   store.dispatch(setConnectionState({ isConnected }));
+  store.dispatch(listPorts({ ports, unrecognizedPorts, networkPorts: [] }));
   store.dispatch(updatePartialControllerSettings({ ...DEFAULT_SETTINGS, ...settings }));
   // The reducer always builds a status object, so give it the full shape the
   // server reports (pinState included) even when disconnected
@@ -113,6 +118,7 @@ export function applyMachineState(
   store.dispatch(unloadFileInfo());
   if (file) store.dispatch(updateFileInfo(file));
   store.dispatch(updateSenderStatus({ status: sender }));
+  store.dispatch(setInputHistory(consoleInputHistory));
 }
 
 const DEFAULT_WORKSPACE = {
