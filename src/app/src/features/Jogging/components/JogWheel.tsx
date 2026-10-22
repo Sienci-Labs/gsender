@@ -226,10 +226,12 @@ export function JogWheel({
             feedrate: number,
             isContinuous: boolean,
         ) => void,
+        segmentEnabled: boolean = true,
     ) => {
         // tabIndex and pointer-events only stop new interaction; a segment that
-        // already had focus must not jog once jogging is disallowed (e.g. mid-job)
-        if (!canClick) {
+        // already had focus must not jog once jogging is disallowed (e.g. mid-job,
+        // or a Y segment after switching to rotary mode)
+        if (!canClick || !segmentEnabled) {
             return;
         }
         if (e.key === 'Enter' || e.key === ' ') {
@@ -262,7 +264,7 @@ export function JogWheel({
                         ? altColourClass
                         : disabledColorClass,
                 )}
-                onKeyDown={(e) => handleKeyDown(e, xPlusYMinus)}
+                onKeyDown={(e) => handleKeyDown(e, xPlusYMinus, !isRotaryMode)}
                 {...xPlusYMinusHandlers}
             />
             <path
@@ -276,7 +278,7 @@ export function JogWheel({
                         ? altColourClass
                         : disabledColorClass,
                 )}
-                onKeyDown={(e) => handleKeyDown(e, xMinusYMinus)}
+                onKeyDown={(e) => handleKeyDown(e, xMinusYMinus, !isRotaryMode)}
                 {...xMinusYMinusHandlers}
             />
             <path
@@ -290,7 +292,7 @@ export function JogWheel({
                         ? altColourClass
                         : disabledColorClass,
                 )}
-                onKeyDown={(e) => handleKeyDown(e, xMinusYPlus)}
+                onKeyDown={(e) => handleKeyDown(e, xMinusYPlus, !isRotaryMode)}
                 {...xMinusYPlusHandlers}
             />
             <path
@@ -304,7 +306,7 @@ export function JogWheel({
                         ? altColourClass
                         : disabledColorClass,
                 )}
-                onKeyDown={(e) => handleKeyDown(e, xPlusYPlus)}
+                onKeyDown={(e) => handleKeyDown(e, xPlusYPlus, !isRotaryMode)}
                 {...xPlusYPlusHandlers}
             />
             <path
@@ -319,7 +321,7 @@ export function JogWheel({
                         ? standardColourClass
                         : disabledColorClass,
                 )}
-                onKeyDown={(e) => handleKeyDown(e, yMinusJog)}
+                onKeyDown={(e) => handleKeyDown(e, yMinusJog, !isRotaryMode)}
                 {...yMinusJogHandlers}
             />
             <path
@@ -347,7 +349,7 @@ export function JogWheel({
                         ? standardColourClass
                         : disabledColorClass,
                 )}
-                onKeyDown={(e) => handleKeyDown(e, yPlusJog)}
+                onKeyDown={(e) => handleKeyDown(e, yPlusJog, !isRotaryMode)}
                 {...yPlusJogHandlers}
             />
             <path

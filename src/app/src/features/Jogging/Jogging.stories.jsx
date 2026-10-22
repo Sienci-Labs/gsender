@@ -1,5 +1,6 @@
 import { expect, spyOn, waitFor } from 'storybook/test';
 import controller from 'app/lib/controller';
+import appStore from 'app/store';
 import reduxStore from 'app/store/redux';
 import {
   updateControllerState,
@@ -104,6 +105,30 @@ export const KeyboardBlockedWhenJobStarts = {
     zPlus.focus();
     await userEvent.keyboard('{Enter}');
     await expect(command).not.toHaveBeenCalled();
+  },
+};
+
+export const KeyboardBlockedOnRotaryDisabledSegments = {
+  play: async ({ canvas, userEvent }) => {
+    const command = spyOn(controller, 'command');
+    const yPlus = jogButton(canvas, 'Jog Y plus');
+    const xPlusYPlus = jogButton(canvas, 'Jog X plus Y plus');
+
+    // Switching to rotary mode disables every segment that moves Y
+    yPlus.focus();
+    appStore.set('workspace.mode', 'ROTARY');
+    await waitFor(() => expect(yPlus).toHaveAttribute('tabindex', '-1'));
+    await expect(yPlus).toHaveFocus();
+
+    await userEvent.keyboard('{Enter}');
+    xPlusYPlus.focus();
+    await userEvent.keyboard(' ');
+    await expect(command).not.toHaveBeenCalled();
+
+    // X-only segments stay enabled in rotary mode
+    jogButton(canvas, 'Jog X plus').focus();
+    await userEvent.keyboard('{Enter}');
+    await expect(command).toHaveBeenCalledWith('gcode', ['$J=G21 G91 X5 F3000']);
   },
 };
 
