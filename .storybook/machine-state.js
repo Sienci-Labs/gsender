@@ -19,6 +19,7 @@ import { unloadFileInfo, updateFileInfo } from 'app/store/redux/slices/fileInfo.
 import { setInputHistory } from 'app/store/redux/slices/console.slice';
 import { unloadHelperInfo } from 'app/store/redux/slices/helper.slice';
 import { setIpList, setNotifications } from 'app/store/redux/slices/preferences.slice';
+import { updateShuttleStatus } from 'app/store/redux/slices/shortcuts.slice';
 import {
   GRBLHAL,
   GRBL_ACTIVE_STATE_ALARM,
@@ -156,6 +157,8 @@ export function applyMachineState(
   store.dispatch(updateSenderStatus({ status: sender }));
   store.dispatch(setInputHistory(consoleInputHistory));
   store.dispatch(setIpList(ipList));
+  // Keyboard shortcuts have finished loading, as they always have once the app is up
+  store.dispatch(updateShuttleStatus({ isFinished: true }));
   // Helper/wizard panels start closed
   store.dispatch(unloadHelperInfo());
   store.dispatch(emptyAllSDFiles());

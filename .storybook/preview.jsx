@@ -1,3 +1,4 @@
+import './isolate-storage';
 import '../src/app/src/index.css';
 import { flushSync } from 'react-dom';
 import { createRoot } from 'react-dom/client';

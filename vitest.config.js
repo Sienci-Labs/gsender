@@ -30,6 +30,8 @@ export default defineConfig({
         },
         test: {
           name: 'storybook',
+          // Runs before any story file imports app/store
+          setupFiles: ['.storybook/isolate-storage.js'],
           browser: {
             enabled: true,
             headless: true,

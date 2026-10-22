@@ -56,6 +56,15 @@ const config = {
           'vite-plugin-node-polyfills/shims/process',
         ],
       },
+      resolve: {
+        ...appShared.resolve,
+        alias: {
+          ...appShared.resolve.alias,
+          // From src/app/tsconfig.json paths, which vite-tsconfig-paths only finds
+          // when Vite's root is src/app (Storybook's root is the repo root)
+          'app-root': appDir,
+        },
+      },
       css: {
         ...appShared.css,
         // Use src/app/postcss.config.cjs so Tailwind finds src/app/tailwind.config.ts

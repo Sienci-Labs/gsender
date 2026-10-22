@@ -9,6 +9,8 @@ export const mswHandlers = [
   // Stats page: alarm/error history and maintenance tasks
   http.get('*/api/alarmList', () => HttpResponse.json({ list: [] })),
   http.get('*/api/maintenance', () => HttpResponse.json([])),
+  // Release history shown on Stats > About
+  http.get('*/api/releasenotes', () => HttpResponse.json([])),
   // Wireless control (remote mode) status shown in StatusIcons
   http.get('*/api/remote', () =>
     HttpResponse.json({ ip: '192.168.0.42', port: 8000, headlessStatus: false }),
