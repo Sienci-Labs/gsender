@@ -10,7 +10,8 @@
 import './commands';
 import 'cypress-real-events/support';
 import 'cypress-mochawesome-reporter/register';
-import 'cypress-grep';
+import registerCypressGrep from '@cypress/grep';
+registerCypressGrep();
 
 // cypress/support/e2e.js
 Cypress.on('uncaught:exception', (err) => {
