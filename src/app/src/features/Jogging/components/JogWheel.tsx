@@ -227,6 +227,11 @@ export function JogWheel({
             isContinuous: boolean,
         ) => void,
     ) => {
+        // tabIndex and pointer-events only stop new interaction; a segment that
+        // already had focus must not jog once jogging is disallowed (e.g. mid-job)
+        if (!canClick) {
+            return;
+        }
         if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
             action(distance, feedrate, false);

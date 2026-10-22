@@ -1,7 +1,21 @@
 import { expect, spyOn, waitFor } from 'storybook/test';
 import controller from 'app/lib/controller';
+import reduxStore from 'app/store/redux';
+import {
+  updateControllerState,
+  updateWorkflowState,
+} from 'app/store/redux/slices/controller.slice';
 
 import { Jogging } from './index';
+
+// Simulate a job starting while the widget is mounted, as the socket would report it
+const startJob = () => {
+  const { type, state } = reduxStore.getState().controller;
+  reduxStore.dispatch(
+    updateControllerState({ type, state: { ...state, status: { ...state.status, activeState: 'Run' } } }),
+  );
+  reduxStore.dispatch(updateWorkflowState({ state: 'running' }));
+};
 
 const meta = {
   component: Jogging,
@@ -70,6 +84,26 @@ export const RunningJob = {
     const xPlus = jogButton(canvas, 'Jog X plus');
     await expect(getComputedStyle(xPlus).pointerEvents).toBe('none');
     await expect(xPlus).toHaveAttribute('tabindex', '-1');
+  },
+};
+
+export const KeyboardBlockedWhenJobStarts = {
+  play: async ({ canvas, userEvent }) => {
+    const command = spyOn(controller, 'command');
+    const xPlus = jogButton(canvas, 'Jog X plus');
+    const zPlus = jogButton(canvas, 'Jog Z plus');
+
+    // A segment focused before the job keeps focus after it starts
+    xPlus.focus();
+    startJob();
+    await waitFor(() => expect(xPlus).toHaveAttribute('tabindex', '-1'));
+    await expect(xPlus).toHaveFocus();
+
+    await userEvent.keyboard('{Enter}');
+    await userEvent.keyboard(' ');
+    zPlus.focus();
+    await userEvent.keyboard('{Enter}');
+    await expect(command).not.toHaveBeenCalled();
   },
 };
 
