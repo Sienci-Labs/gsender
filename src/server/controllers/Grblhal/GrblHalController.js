@@ -1101,7 +1101,7 @@ class GrblHalController {
 				errorOrigin = "Console";
 			} else if (outstanding > 0) {
 				errorOrigin = "Feeder";
-				line = "N/A";
+				line = this.feeder.state.outstandingCommands[0] || "N/A";
 			} else if (isFileError) {
 				errorOrigin = name;
 				line = lines[received] || "";
@@ -1195,7 +1195,7 @@ class GrblHalController {
 				line = "$H";
 			} else if (outstanding > 0) {
 				errorOrigin = "Feeder";
-				line = "N/A";
+				line = this.feeder.state.outstandingCommands[0] || "N/A";
 			} else if (isFileError) {
 				errorOrigin = name;
 				line = lines[received] || "";

@@ -21,7 +21,7 @@
  *
  */
 
-import uuid from "uuid";
+import * as uuid from "uuid";
 import settings from "../config/settings";
 import {
 	ERR_BAD_REQUEST,

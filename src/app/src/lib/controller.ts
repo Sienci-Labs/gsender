@@ -110,7 +110,6 @@ export interface ControllerListeners {
     //A-Axis A.K.A Rotary-Axis events
     'rotaryAxis:updateState': Array<Function>;
     updateRotaryMode: Array<Function>;
-    'connection:new': Array<Function>;
 
     requestEstimateData: Array<Function>;
     'job:start': Array<Function>;
@@ -120,6 +119,7 @@ export interface ControllerListeners {
     'sdcard:json': Array<Function>;
     // Dev-only: emitted by the server when a plugin's files are updated.
     'plugins:changed': Array<Function>;
+    'preferences:changed': Array<Function>;
     // A plugin-registered parser matched a firmware response.
     'plugin:parser:match': Array<Function>;
     // A plugin's parser was rejected, rate limited, or quarantined.
@@ -224,7 +224,6 @@ class Controller {
         //A-Axis A.K.A Rotary-Axis events
         'rotaryAxis:updateState': [],
         updateRotaryMode: [],
-        'connection:new': [],
 
         requestEstimateData: [],
         'job:start': [],
@@ -240,6 +239,7 @@ class Controller {
         'ymodem:error': [],
         'job:stop': [],
         'plugins:changed': [],
+        'preferences:changed': [],
         // NOTE: these must appear in this object literal, not just in the
         // interface — the socket re-dispatch loop below iterates
         // Object.keys(this.listeners), so a key present only in the type would
@@ -395,8 +395,6 @@ class Controller {
 
             // don't want to update store if it is electron
             if (!isElectron()) {
-                this.socket && this.socket.emit('newConnection');
-
                 // A remote/browser client only ever talks to one controller at a
                 // time. If the desktop is already connected, join that session
                 // automatically instead of making the user click Connect — this
