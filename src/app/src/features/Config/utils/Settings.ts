@@ -3,7 +3,11 @@ import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib
 import type { EEPROM, FilteredEEPROM } from 'app/definitions/firmware';
 import { generateEEPROMSettings } from 'app/features/Config/utils/EEPROM.ts';
 import controller from 'app/lib/controller.ts';
-import { restoreDefault, storeUpdate } from 'app/lib/storeUpdate';
+import {
+    extractSettings,
+    restoreDefault,
+    storeUpdate,
+} from 'app/lib/storeUpdate';
 import store from 'app/store';
 import { State } from 'app/store/definitions';
 import pubsub from 'pubsub-js';
@@ -83,8 +87,8 @@ const onImportConfirm = (file: File) => {
             try {
                 const importData = JSON.parse(event.target.result as string);
 
-                // Exports are { settings, events }; store backups are { version, state }
-                const data = importData.settings || importData.state;
+                // handles exports, backups, and legacy double-wrapped backups
+                const data = extractSettings(importData);
 
                 // Validate the imported data
                 // check that the major properties exist

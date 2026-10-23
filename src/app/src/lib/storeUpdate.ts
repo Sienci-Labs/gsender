@@ -26,12 +26,24 @@ const restoreSettings = (state: object, isSync?: boolean): void => {
     });
 };
 
+// exports are { settings, events }
+// backups are { version, state }
+// TODO: backups written between MI-2255 and the server preferences store are
+// double-wrapped ({ state: { version, state } }). drop this unwrap once those age out
+export const extractSettings = (data: any) => {
+    const settings = data?.settings || data?.state;
+    if (settings?.state && !settings.workspace) {
+        return settings.state;
+    }
+    return settings;
+};
+
 export const storeUpdate = async (
     content: string,
     isSync?: boolean,
 ): Promise<void> => {
     try {
-        const { settings, events = [], state } = JSON.parse(content);
+        const parsed = JSON.parse(content);
 
         /*await new Promise((resolve, _reject) => {
             // delete all old events
@@ -45,7 +57,7 @@ export const storeUpdate = async (
             ]);
         });*/
 
-        const rawSettings = settings || state;
+        const rawSettings = extractSettings(parsed);
         const mergedSettings = merge(
             JSON.parse(JSON.stringify(defaultState)),
             rawSettings,
