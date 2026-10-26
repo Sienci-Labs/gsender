@@ -424,6 +424,8 @@ const defaultState: State = {
             theme: 'Dark',
             SVGEnabled: false,
             rotaryDiameterOffsetEnabled: false,
+            rotaryPreviewAxis: 'X',
+            rotaryCenterlineZ: 0,
             jobEndModal: true,
             maintenanceTaskNotifications: true,
             checkFile: false,

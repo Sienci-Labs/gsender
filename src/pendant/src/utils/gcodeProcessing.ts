@@ -229,6 +229,8 @@ const buildWorkerRequest = (payload: GcodeLoadPayload, jobId: number) => {
         isNewFile,
         estimatorConfig: getEstimatorConfig(),
         rotaryDiameterOffsetEnabled,
+        rotaryPreviewAxis: store.get('widgets.visualizer.rotaryPreviewAxis', 'X'),
+        rotaryCenterlineZ: store.get('widgets.visualizer.rotaryCenterlineZ', 0),
         theme: getPendantWorkerTheme(),
     };
 };
