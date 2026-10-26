@@ -22,7 +22,10 @@ const PREFERENCES_FILE = "gsender-preferences.json";
 const LEGACY_FILE = "gsender-0.5.6.json";
 const WRITE_DEBOUNCE_MS = 250;
 const MAX_BACKUPS = 3;
-const BACKUP_PATTERN = /^preferences-backup-.*\.json$/;
+// make sure it looks for a date at the end, otherwise it could be a user generated copy
+// it's safe to assume any file that has an ISO-looking date at the end is a file we generated
+const BACKUP_PATTERN =
+	/^preferences-backup-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}\.\d{3}Z\.json$/;
 
 const INTERVALS: Record<string, number> = {
 	Daily: 1000 * 60 * 60 * 24,

@@ -206,6 +206,27 @@ describe("preferencesStore", () => {
 			]);
 		});
 
+		it("ignores undated copies when choosing which backups to keep", () => {
+			seedBackups(dir);
+			write(dir, "preferences-backup-copy.json", {});
+			write(dir, NEW_FILE, {
+				version: "1.7.0",
+				state: { workspace: { backupFreq: "Daily", lastBackupTime: 0 } },
+			});
+
+			preferencesStore.load(dir);
+
+			expect(fs.existsSync(path.join(dir, "preferences-backup-copy.json"))).toBe(true);
+			const dated = backups(dir)
+				.filter((f) => f !== "preferences-backup-copy.json")
+				.sort();
+			expect(dated).toHaveLength(3);
+			expect(dated.slice(0, 2)).toEqual([
+				"preferences-backup-2020-01-04T00-00-00.000Z.json",
+				"preferences-backup-2020-01-05T00-00-00.000Z.json",
+			]);
+		});
+
 		it("leaves files that aren't preference backups alone", () => {
 			seedBackups(dir);
 			write(dir, "gsender-preferences.json.corrupt-1.bak", "x");
