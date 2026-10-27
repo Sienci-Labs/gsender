@@ -11,6 +11,7 @@ import android.content.pm.ServiceInfo
 import android.graphics.drawable.Icon
 import android.os.Build
 import android.os.IBinder
+import android.provider.Settings
 import android.util.Log
 import java.io.File
 import java.util.concurrent.ExecutorService
@@ -41,6 +42,8 @@ class NodeService : Service() {
 
     @Volatile
     private var usbControlChannel: UsbControlChannel? = null
+
+    private val advertiser by lazy { PendantAdvertiser(this) }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -127,6 +130,10 @@ class NodeService : Service() {
                 put("LD_LIBRARY_PATH", applicationInfo.nativeLibraryDir)
                 put("NODE_COMPILE_CACHE", File(cacheDir, "node-compile-cache").path)
                 put("GSENDER_USB_CONTROL_PORT", usbChannel.port.toString())
+                // Lets the server hand mDNS advertising to PendantAdvertiser
+                // and name this tablet the way the user named it.
+                put("GSENDER_PLATFORM", "android")
+                put("GSENDER_DEVICE_NAME", deviceName())
             }
             val started = builder.start()
             process = started
@@ -150,6 +157,7 @@ class NodeService : Service() {
             p.inputStream.bufferedReader().forEachLine { line ->
                 Log.i(NODE_LOG_TAG, line)
                 ServerRuntime.appendLog(line)
+                if (advertiser.handle(line)) return@forEachLine
                 if (line.startsWith(READY_MARKER)) {
                     val port = Regex("""port=(\d+)""").find(line)?.groupValues?.get(1)?.toInt()
                     val ms = Regex("""ms=(\d+)""").find(line)?.groupValues?.get(1)?.toLong() ?: -1
@@ -173,6 +181,7 @@ class NodeService : Service() {
 
     /** Runs on the control thread. */
     private fun stopServer() {
+        advertiser.unregister()
         usbControlChannel?.stop()
         usbControlChannel = null
         val p = process ?: return
@@ -181,6 +190,12 @@ class NodeService : Service() {
         if (!p.waitFor(3, TimeUnit.SECONDS)) p.destroyForcibly()
         process = null
     }
+
+    /** The user-set device name (Settings > About), falling back to the model. */
+    private fun deviceName(): String =
+        Settings.Global.getString(contentResolver, Settings.Global.DEVICE_NAME)
+            ?.takeIf { it.isNotBlank() }
+            ?: Build.MODEL
 
     private fun refreshNotification() {
         getSystemService(NotificationManager::class.java).notify(NOTIFICATION_ID, notification())

@@ -30,16 +30,20 @@
 // layers (authorizeIPAddress, the JWT middleware) are both no-ops today, so
 // binding it to 0.0.0.0 would open every /api/* route to the LAN
 // unauthenticated. This listener only exists while the feature is toggled on,
-// only exposes two routes, and gates the one that matters on a pairing code.
+// only exposes a handful of routes, and gates uploads on a paired desktop's
+// key (or the legacy on-screen code).
 import cors from "cors";
 import crypto from "crypto";
 import express from "express";
 import fs from "fs";
 import multer from "multer";
+import os from "os";
 import path from "path";
 import logger from "../../lib/logger";
 import CNCEngine from "../cncengine";
 import config from "../configstore";
+import advertiser from "./advertiser";
+import { PairingStore } from "./pairing";
 
 const log = logger("service:remoteFileReceive");
 
@@ -57,6 +61,16 @@ class RemoteFileReceive {
 	token = null;
 
 	port = null;
+
+	pairing = new PairingStore(config, CONFIG_KEY);
+
+	getDeviceId() {
+		return this.pairing.getDeviceId();
+	}
+
+	getDeviceName() {
+		return process.env.GSENDER_DEVICE_NAME || os.hostname();
+	}
 
 	getSettings() {
 		return config.get(CONFIG_KEY, { enabled: false, port: DEFAULT_PORT });
@@ -182,7 +196,19 @@ class RemoteFileReceive {
 			limits: { fileSize: MAX_FILE_SIZE },
 		});
 
+		// Paired desktops send their key as a bearer token alongside their id;
+		// older desktops still send the on-screen code.
 		const requireToken = (req, res, next) => {
+			const auth = req.header("Authorization") || "";
+			const desktopId = req.header("X-Pendant-Desktop-Id");
+			if (auth.startsWith("Bearer ")) {
+				if (this.pairing.verify(desktopId, auth.slice(7))) {
+					next();
+					return;
+				}
+				res.status(401).send({ msg: "This desktop is no longer paired" });
+				return;
+			}
 			const provided = req.header("X-Pendant-Token");
 			if (!provided || provided !== this.token) {
 				res.status(401).send({ msg: "Invalid or missing pairing code" });
@@ -232,7 +258,37 @@ class RemoteFileReceive {
 		};
 
 		app.get("/pendant/status", (req, res) => {
-			res.send({ status: "ready" });
+			res.send({
+				status: "ready",
+				deviceId: this.getDeviceId(),
+				deviceName: this.getDeviceName(),
+			});
+		});
+
+		// Unauthenticated by design - this is how a desktop earns its key.
+		// Desktops poll this with a QR nonce while their pairing QR is open,
+		// which is unguessable, so only the brute-forceable 6-digit code path
+		// is rate limited.
+		app.post("/pendant/pair/claim", express.json(), (req, res) => {
+			const body = req.body || {};
+			if (!body.nonce && !this.pairing.recordClaimAttempt(req.ip)) {
+				res.status(429).send({ msg: "Too many pairing attempts" });
+				return;
+			}
+			const result = this.pairing.claim(body, this.token);
+			if (!result) {
+				res.status(404).send({ msg: "No matching pairing request" });
+				return;
+			}
+			CNCEngine.emit("remote:pair-complete", {
+				desktopId: result.desktopId,
+				desktopName: result.desktopName,
+			});
+			res.send({
+				key: result.key,
+				deviceId: this.getDeviceId(),
+				deviceName: this.getDeviceName(),
+			});
 		});
 
 		app.post(
@@ -323,6 +379,13 @@ class RemoteFileReceive {
 			this.port = null;
 			config.set(`${CONFIG_KEY}.enabled`, false);
 		});
+		this.server.on("listening", () => {
+			advertiser.publish({
+				port,
+				id: this.getDeviceId(),
+				name: this.getDeviceName(),
+			});
+		});
 		this.port = port;
 
 		config.set(`${CONFIG_KEY}.enabled`, true);
@@ -332,6 +395,7 @@ class RemoteFileReceive {
 	}
 
 	stop() {
+		advertiser.unpublish();
 		if (this.server) {
 			this.server.close();
 			this.server = null;

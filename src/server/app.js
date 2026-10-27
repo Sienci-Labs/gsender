@@ -406,6 +406,41 @@ const appMain = () => {
 			urljoin(settings.route, "api/remoteFileReceive/files"),
 			api.remoteFileReceive.deleteFiles,
 		);
+		app.post(
+			urljoin(settings.route, "api/remoteFileReceive/pair/pending"),
+			api.remoteFileReceive.setPendingPair,
+		);
+		app.get(
+			urljoin(settings.route, "api/remoteFileReceive/desktops"),
+			api.remoteFileReceive.listDesktops,
+		);
+		app.delete(
+			urljoin(settings.route, "api/remoteFileReceive/desktops/:id"),
+			api.remoteFileReceive.forgetDesktop,
+		);
+
+		// Pendant pairing (desktop side): discovers pendants on the LAN and
+		// holds the keys this desktop has been issued by them.
+		app.post(
+			urljoin(settings.route, "api/pendantPairing/discover"),
+			api.pendantPairing.discover,
+		);
+		app.post(
+			urljoin(settings.route, "api/pendantPairing/qr"),
+			api.pendantPairing.createQr,
+		);
+		app.post(
+			urljoin(settings.route, "api/pendantPairing/claim"),
+			api.pendantPairing.claim,
+		);
+		app.get(
+			urljoin(settings.route, "api/pendantPairing/tablets"),
+			api.pendantPairing.listTablets,
+		);
+		app.delete(
+			urljoin(settings.route, "api/pendantPairing/tablets/:id"),
+			api.pendantPairing.forgetTablet,
+		);
 
 		// Job Stats
 		app.put(urljoin(settings.route, "/api/jobstats"), api.jobStats.update);

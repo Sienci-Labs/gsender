@@ -13,6 +13,7 @@ import {
     type RemoteFileReceiveSettings,
 } from './apiActions';
 import IncomingFileProgressBar from './IncomingFileProgressBar';
+import PairedDesktops from './PairedDesktops';
 import { useIncomingFileTransfer } from './useIncomingFileTransfer';
 
 const DEFAULT_PORT = 8010;
@@ -201,8 +202,18 @@ export default function RemoteFileReceive({
                 <Switch onChange={toggle} checked={running} disabled={busy} />
             </div>
 
+            {running && <PairedDesktops running={running} />}
+
             {running && (
                 <div className="flex flex-col gap-3 rounded-md border border-gray-200 dark:border-outline p-3">
+                    <span className="text-sm font-bold dark:text-content-primary">
+                        Manual pairing
+                    </span>
+                    <p className="text-xs text-gray-500">
+                        If the desktop can't find this tablet automatically,
+                        enter one of these addresses and the code below in its
+                        Send to Pendant dialog.
+                    </p>
                     <div>
                         <span className="text-xs text-gray-600 dark:text-content-muted">
                             Address(es) a desktop can send to:

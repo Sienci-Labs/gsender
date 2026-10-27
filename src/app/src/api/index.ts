@@ -278,6 +278,56 @@ const remoteFileReceive = {
             data: { names },
         });
     },
+
+    setPendingPair: (pair: {
+        nonce: string;
+        desktopId: string;
+        desktopName?: string;
+    }): Promise<AxiosResponse> => {
+        return authrequest.post('/api/remoteFileReceive/pair/pending', pair);
+    },
+
+    listDesktops: (): Promise<AxiosResponse> => {
+        return authrequest.get('/api/remoteFileReceive/desktops');
+    },
+
+    forgetDesktop: (id: string): Promise<AxiosResponse> => {
+        return authrequest.delete(
+            `/api/remoteFileReceive/desktops/${encodeURIComponent(id)}`,
+        );
+    },
+};
+
+//
+// Pendant pairing (desktop side of Send to Pendant)
+//
+const pendantPairing = {
+    discover: (): Promise<AxiosResponse> => {
+        return authrequest.post('/api/pendantPairing/discover');
+    },
+
+    createQr: (): Promise<AxiosResponse> => {
+        return authrequest.post('/api/pendantPairing/qr');
+    },
+
+    claim: (options: {
+        nonce?: string;
+        code?: string;
+        host?: string;
+        port?: number;
+    }): Promise<AxiosResponse> => {
+        return authrequest.post('/api/pendantPairing/claim', options);
+    },
+
+    listTablets: (): Promise<AxiosResponse> => {
+        return authrequest.get('/api/pendantPairing/tablets');
+    },
+
+    forgetTablet: (id: string): Promise<AxiosResponse> => {
+        return authrequest.delete(
+            `/api/pendantPairing/tablets/${encodeURIComponent(id)}`,
+        );
+    },
 };
 
 //
@@ -555,6 +605,7 @@ export default {
     events,
     remoteSetting,
     remoteFileReceive,
+    pendantPairing,
     jobStats,
     maintenance,
     macros,

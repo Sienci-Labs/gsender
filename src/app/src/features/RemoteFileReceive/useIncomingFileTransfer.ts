@@ -42,7 +42,11 @@ export function useIncomingFileTransfer(): IncomingFileTransfer {
             );
         };
         const onComplete = () => {
-            setTransfer((prev) => ({ ...prev, state: 'complete', percent: 100 }));
+            setTransfer((prev) => ({
+                ...prev,
+                state: 'complete',
+                percent: 100,
+            }));
         };
         const onError = (message: string) => {
             setTransfer((prev) => ({ ...prev, state: 'error', message }));

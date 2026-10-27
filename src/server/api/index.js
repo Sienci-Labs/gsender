@@ -34,6 +34,7 @@ import * as macros from "./api.macros";
 import * as maintenance from "./api.maintenance";
 import * as mdi from "./api.mdi";
 import * as metrics from "./api.metrics";
+import * as pendantPairing from "./api.pendantPairing";
 import * as plugins from "./api.plugins";
 import * as preferences from "./api.preferences";
 import * as releaseNotes from "./api.releasenotes";
@@ -63,6 +64,7 @@ export {
 	releaseNotes,
 	remote,
 	remoteFileReceive,
+	pendantPairing,
 	state,
 	users,
 	version,

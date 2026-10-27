@@ -14,6 +14,7 @@ import CarveTopBar from './components/carve/topbar/CarveTopBar';
 import { useCarveMode } from './components/carve/useCarveMode';
 import IncomingFileRecents from './components/IncomingFileRecents';
 import IncomingFileToast from './components/IncomingFileToast';
+import IncomingPairLink from './components/IncomingPairLink';
 import InfoStrip from './components/InfoStrip';
 import JobCompletionAlert from './components/JobCompletionAlert';
 import PendantConfigView from './components/PendantConfigView';
@@ -140,6 +141,7 @@ export default function PendantShell() {
                 <JobCompletionAlert />
                 <IncomingFileToast />
                 <IncomingFileRecents />
+                <IncomingPairLink />
                 <ConfirmationDialog />
                 <Toaster closeButton visibleToasts={3} />
             </div>

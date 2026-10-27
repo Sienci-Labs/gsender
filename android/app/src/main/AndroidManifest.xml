@@ -20,6 +20,12 @@
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- The Remote File Receive tool scans the desktop's pairing QR code with
+         the camera. Optional: tablets without one pair by scanning with the
+         system camera app (deep link below) or with the manual code. -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+
     <application
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
@@ -46,6 +52,15 @@
             <meta-data
                 android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
                 android:resource="@xml/device_filter" />
+            <!-- The desktop's Send to Pendant pairing QR encodes
+                 gsender-pendant://pair?... so any QR-capable camera app can
+                 hand it to us. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="gsender-pendant" android:host="pair" />
+            </intent-filter>
         </activity>
 
         <!-- Only active once made device owner for kiosk mode (README). -->

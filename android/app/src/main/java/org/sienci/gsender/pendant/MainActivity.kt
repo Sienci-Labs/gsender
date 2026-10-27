@@ -20,6 +20,7 @@ import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.webkit.ConsoleMessage
+import android.webkit.PermissionRequest
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
@@ -31,6 +32,7 @@ import android.widget.FrameLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import android.window.OnBackInvokedDispatcher
+import org.json.JSONObject
 
 /**
  * Hosts the pendant UI. Shows a native load screen while [NodeService] starts
@@ -63,6 +65,12 @@ class MainActivity : Activity() {
     /** Until the service reports anything, show "starting" rather than "stopped". */
     private var awaitingServer = true
     private var filePathCallback: ValueCallback<Array<Uri>>? = null
+
+    /** A WebView camera request waiting on the runtime CAMERA permission. */
+    private var pendingCameraRequest: PermissionRequest? = null
+
+    /** A gsender-pendant://pair link waiting for the pendant page to load. */
+    private var pendingPairLink: String? = null
     private val observer: (ServerState) -> Unit = { render(it) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,6 +98,7 @@ class MainActivity : Activity() {
         details.setOnClickListener { toggleDetails() }
         registerBackHandler()
         requestNotificationPermission()
+        takePairLink(intent)
 
         NodeService.start(this)
     }
@@ -130,10 +139,34 @@ class MainActivity : Activity() {
      * intent: NodeService registers a dynamic BroadcastReceiver for the whole
      * process lifetime (UsbPortRegistry), which already sees the same attach
      * broadcast and updates port state independently of this activity.
+     *
+     * A gsender-pendant://pair link (the desktop's pairing QR, scanned with
+     * the system camera app) also lands here and is forwarded to the page.
      */
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
+        takePairLink(intent)
+    }
+
+    private fun takePairLink(intent: Intent?) {
+        val data = intent?.data ?: return
+        if (data.scheme != PAIR_SCHEME || data.host != "pair") return
+        pendingPairLink = data.toString()
+        deliverPairLink()
+    }
+
+    /** Hands a pending pair link to the pendant UI (PairedDesktops.tsx). */
+    private fun deliverPairLink() {
+        val link = pendingPairLink ?: return
+        val view = web ?: return
+        if (!pageLoaded) return
+        pendingPairLink = null
+        val detail = JSONObject().put("url", link).toString()
+        view.evaluateJavascript(
+            "window.dispatchEvent(new CustomEvent('gsender:pair', { detail: $detail }))",
+            null,
+        )
     }
 
     // ── State → UI ─────────────────────────────────────────────────────────
@@ -271,6 +304,7 @@ class MainActivity : Activity() {
                 pageLoaded = true
                 Log.i(ServerRuntime.TAG, "PAGE_LOADED t=${ServerRuntime.sinceProcessStart()}")
                 render(ServerRuntime.state)
+                deliverPairLink()
             }
 
             override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
@@ -284,6 +318,27 @@ class MainActivity : Activity() {
             override fun onConsoleMessage(m: ConsoleMessage): Boolean {
                 Log.i(WEB_LOG_TAG, "${m.messageLevel()} ${m.message()} (${m.sourceId()}:${m.lineNumber()})")
                 return true
+            }
+
+            // getUserMedia for the pairing QR scanner. Only the camera, and
+            // only for the bundled pendant page.
+            override fun onPermissionRequest(request: PermissionRequest) {
+                val wantsCamera = PermissionRequest.RESOURCE_VIDEO_CAPTURE in request.resources
+                if (!wantsCamera || request.origin.host != "127.0.0.1") {
+                    request.deny()
+                    return
+                }
+                if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                    request.grant(arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE))
+                    return
+                }
+                pendingCameraRequest?.deny()
+                pendingCameraRequest = request
+                requestPermissions(arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA)
+            }
+
+            override fun onPermissionRequestCanceled(request: PermissionRequest) {
+                if (pendingCameraRequest === request) pendingCameraRequest = null
             }
 
             // The pendant falls back to <input type="file"> outside Electron;
@@ -413,6 +468,18 @@ class MainActivity : Activity() {
         moveTaskToBack(true)
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode != REQUEST_CAMERA) return
+        val request = pendingCameraRequest ?: return
+        pendingCameraRequest = null
+        if (grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED) {
+            request.grant(arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE))
+        } else {
+            request.deny()
+        }
+    }
+
     private fun requestNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
@@ -424,6 +491,8 @@ class MainActivity : Activity() {
     companion object {
         private const val REQUEST_FILE = 1
         private const val REQUEST_NOTIFICATIONS = 2
+        private const val REQUEST_CAMERA = 3
+        private const val PAIR_SCHEME = "gsender-pendant"
         private const val WEB_LOG_TAG = "GSenderPendant-web"
 
         // Rocket heights for each startup stage (see RocketLaunchView).

@@ -133,6 +133,10 @@ export interface ControllerListeners {
     'remote:file-incoming:progress': Array<Function>;
     'remote:file-incoming:complete': Array<Function>;
     'remote:file-incoming:error': Array<Function>;
+    // A desktop finished pairing with this pendant (QR or code claim).
+    'remote:pair-complete': Array<Function>;
+    // Desktop side: the set of pendants found over mDNS (or paired) changed.
+    'pendant:discovered': Array<Function>;
 }
 
 const ensureArray = (...args: Array<any>) => {
@@ -260,6 +264,8 @@ class Controller {
         'remote:file-incoming:progress': [],
         'remote:file-incoming:complete': [],
         'remote:file-incoming:error': [],
+        'remote:pair-complete': [],
+        'pendant:discovered': [],
     };
 
     context = {

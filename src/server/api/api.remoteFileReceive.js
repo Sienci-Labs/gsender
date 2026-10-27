@@ -96,3 +96,37 @@ export const deleteFiles = (req, res) => {
 	const deleted = remoteFileReceive.deleteIncomingFiles(names);
 	res.send({ deleted });
 };
+
+// Called by the pendant UI after it scans a desktop's pairing QR. The desktop
+// then claims the pending pair over the LAN listener.
+export const setPendingPair = (req, res) => {
+	const { nonce, desktopId, desktopName } = req.body || {};
+
+	if (!remoteFileReceive.isRunning()) {
+		res
+			.status(ERR_BAD_REQUEST)
+			.send({ msg: "Remote file receive is not running" });
+		return;
+	}
+	if (!remoteFileReceive.pairing.setPendingPair({ nonce, desktopId, desktopName })) {
+		res.status(ERR_BAD_REQUEST).send({ msg: "Invalid pairing request" });
+		return;
+	}
+
+	res.send({ pending: true, desktopName });
+};
+
+export const listDesktops = (req, res) => {
+	res.send({ desktops: remoteFileReceive.pairing.listTrusted() });
+};
+
+export const forgetDesktop = (req, res) => {
+	const { id } = req.params;
+
+	if (!remoteFileReceive.pairing.forget(id)) {
+		res.status(404).send({ msg: "Desktop not found" });
+		return;
+	}
+
+	res.send({ forgotten: id });
+};
