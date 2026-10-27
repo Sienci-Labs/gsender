@@ -21,6 +21,7 @@
  *
  */
 
+import './electron-app/userDataPath'; // must stay first, sets userData before anything reads it
 import * as Sentry from '@sentry/electron/main';
 import chalk from 'chalk';
 import {
@@ -42,22 +43,30 @@ import mkdirp from 'mkdirp';
 import path from 'path';
 import WinReg from 'winreg';
 import { asyncCallWithTimeout } from './electron-app/AsyncTimeout';
+import {
+    createGcamHandoffServer,
+    DEFAULT_GCAM_ALLOWED_ORIGINS,
+    DEFAULT_GCAM_HANDOFF_PORT,
+} from './electron-app/GcamHandoff';
 import { getGRBLLog } from './electron-app/grblLogs';
 import { createPendantWindow } from './electron-app/pendant-window';
 import { parseAndReturnGCode } from './electron-app/RecentFiles';
 import WindowManager from './electron-app/WindowManager';
 import pkg from './package.json';
 import launchServer from './server-cli';
+import decodeGcode from './server/lib/decode-gcode';
 
-// Reads the renderer's persisted settings directly, since the main process
-// needs to know "use pendant view as default UI" before any window exists.
+// Reads the persisted settings directly, since the main process needs to know
+// "use pendant view as default UI" before any window exists. The server-owned
+// file wins; the legacy renderer-owned file is only a pre-migration fallback.
 const readUsePendantViewSetting = () => {
     try {
-        const configPath = path.join(
-            app.getPath('userData'),
-            'gsender-0.5.6.json',
-        );
-        if (!fs.existsSync(configPath)) return false;
+        const userData = app.getPath('userData');
+        const configPath = [
+            path.join(userData, 'gsender-preferences.json'),
+            path.join(userData, 'gsender-0.5.6.json'),
+        ].find((file) => fs.existsSync(file));
+        if (!configPath) return false;
         const raw = JSON.parse(fs.readFileSync(configPath, 'utf8') || '{}');
         return !!raw?.state?.workspace?.usePendantViewAsDefault;
     } catch (err) {
@@ -181,6 +190,65 @@ const main = () => {
             log.error(`Error loading file association: ${err}`);
         }
     };
+
+    // gCAM "Send to gSender": the renderer pushes its handoff preference and
+    // workflow state so the listener can refuse files mid-job without a
+    // round trip. Received programs are written to disk and then follow the
+    // same path as an OS file association, so they land in recent files.
+    let gcamHandoffEnabled = true;
+    let gcamWorkflowRunning = false;
+    let gcamHandoff = null;
+
+    ipcMain.on('gcam-handoff:set-enabled', (_msg, enabled) => {
+        gcamHandoffEnabled = enabled !== false;
+    });
+    ipcMain.on('gcam-handoff:workflow-state', (_msg, state) => {
+        gcamWorkflowRunning = state === 'running';
+    });
+
+    const startGcamHandoff = (window) => {
+        const handoffDir = path.join(app.getPath('userData'), 'gcam');
+        gcamHandoff = createGcamHandoffServer({
+            version: pkg.version,
+            port: Number(
+                store.get('gcamHandoff.port', DEFAULT_GCAM_HANDOFF_PORT),
+            ),
+            allowedOrigins: [
+                ...DEFAULT_GCAM_ALLOWED_ORIGINS,
+                ...store.get('gcamHandoff.extraOrigins', []),
+            ],
+            isEnabled: () => gcamHandoffEnabled,
+            isBusy: () => gcamWorkflowRunning,
+            logger: log,
+            onFile: async ({ name, gcode }) => {
+                await fs.promises.mkdir(handoffDir, { recursive: true });
+                const filePath = path.join(handoffDir, name);
+                await fs.promises.writeFile(filePath, gcode, 'utf8');
+
+                if (window.isDestroyed()) {
+                    throw new Error('gSender window is closed');
+                }
+                if (window.isMinimized()) {
+                    window.restore();
+                }
+                window.show();
+                window.focus();
+                if (isRendererReady) {
+                    await loadFileAssociation(filePath, window);
+                } else {
+                    pendingFileToOpen = filePath;
+                }
+            },
+        });
+        gcamHandoff.start().catch((err) => {
+            log.warn(`gCAM handoff listener unavailable: ${err.message}`);
+            gcamHandoff = null;
+        });
+    };
+
+    app.on('before-quit', () => {
+        gcamHandoff?.stop();
+    });
 
     const openDirectoryDialog = async () => {
         try {
@@ -535,6 +603,10 @@ const main = () => {
                 }
             });
 
+            if (!usePendantView) {
+                startGcamHandoff(window);
+            }
+
             ipcMain.on('change-power-saving', (_msg, enabled) => {
                 if (!enabled) {
                     // Power saver - display sleep higher precedence over app suspension
@@ -626,12 +698,16 @@ const main = () => {
                 }
             });
 
-            ipcMain.handle('copy-to-clipboard', (_channel, text) => {
+            ipcMain.handle('copy-to-clipboard', async (_channel, text) => {
                 if (!text) {
                     return { success: false, error: 'No text to copy' };
                 }
 
-                clipboard.writeText(text);
+                try {
+                    await clipboard.writeText(text);
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
 
                 return { success: true };
             });
@@ -718,7 +794,7 @@ const main = () => {
 
                     prevDirectory = filePath; // set previous directory
 
-                    fs.readFile(FULL_FILE_PATH, 'latin1', (err, data) => {
+                    fs.readFile(FULL_FILE_PATH, (err, buffer) => {
                         if (err) {
                             log.error(`Error in readFile: ${err}`);
                             return;
@@ -726,7 +802,7 @@ const main = () => {
 
                         const { size } = fs.statSync(FULL_FILE_PATH);
                         window.webContents.send('returned-upload-dialog-data', {
-                            data,
+                            data: decodeGcode(buffer),
                             size,
                             name: fileName,
                             path: FULL_FILE_PATH,

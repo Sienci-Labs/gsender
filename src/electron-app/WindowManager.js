@@ -106,7 +106,6 @@ class WindowManager {
             autoHideMenuBar: true,
             webPreferences: {
                 nodeIntegration: true,
-                enableRemoteModule: true,
                 contextIsolation: false,
                 preload: path.join(__dirname, 'preload.js'),
             },
@@ -155,9 +154,9 @@ class WindowManager {
 
         // Open every external link in a new window
         // https://github.com/electron/electron/blob/master/docs/api/web-contents.md
-        webContents.on('new-window', (event, url) => {
-            event.preventDefault();
+        webContents.setWindowOpenHandler(({ url }) => {
             shell.openExternal(url);
+            return { action: 'deny' };
         });
 
         if (splashScreen) {

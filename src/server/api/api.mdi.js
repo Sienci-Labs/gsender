@@ -24,7 +24,7 @@
 import ensureArray from "ensure-array";
 import find from "lodash/find";
 import isPlainObject from "lodash/isPlainObject";
-import uuid from "uuid";
+import * as uuid from "uuid";
 import settings from "../config/settings";
 import {
 	ERR_BAD_REQUEST,

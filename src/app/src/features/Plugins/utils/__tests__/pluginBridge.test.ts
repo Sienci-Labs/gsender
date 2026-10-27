@@ -53,6 +53,7 @@ import {
     handlePluginBridgeSubscription,
     releaseRuntimeParsersForSource,
 } from '../pluginBridge';
+import { registerPluginNavigator } from '../pluginNavigation';
 
 const CHANNEL = 'gsender:plugin-bridge';
 
@@ -148,6 +149,7 @@ describe('plugin bridge request gate', () => {
         'viewer:pick:arm',
         'viewer:overlay:set',
         'machine:busy:set',
+        'app:navigate',
     ] as const)("denies '%s' when not granted", async (type) => {
         registerPluginWindow(
             source,
@@ -806,5 +808,82 @@ describe('controller events', () => {
         expect(source.postMessage).not.toHaveBeenCalled();
 
         unregisterPluginWindow(source);
+    });
+});
+
+describe('app:navigate', () => {
+    const source = {} as MessageEventSource;
+
+    beforeEach(() => {
+        jest.useFakeTimers();
+        registerPluginWindow(
+            source,
+            toRuntimeCapabilities({ requestTypes: ['app:navigate'] }),
+            'com.sienci.test-plugin',
+        );
+    });
+
+    afterEach(() => {
+        unregisterPluginWindow(source);
+        jest.useRealTimers();
+    });
+
+    it('replies first, then navigates on the next tick', async () => {
+        const navigate = jest.fn();
+        const off = registerPluginNavigator(navigate);
+
+        const response = await handlePluginBridgeMessage(
+            makeEvent(source, {
+                id: 'n1',
+                type: 'app:navigate',
+                payload: { path: '/', replace: true },
+            }),
+        );
+
+        expect(response).toEqual({ id: 'n1', ok: true, result: { ok: true } });
+        expect(navigate).not.toHaveBeenCalled();
+        jest.runAllTimers();
+        expect(navigate).toHaveBeenCalledWith('/', { replace: true });
+        off();
+    });
+
+    it.each([
+        '//evil.com',
+        '/\\evil.com',
+        'http://evil.com',
+        'javascript:alert(1)',
+        'tools',
+        '',
+        42,
+    ])('rejects path %p', async (path) => {
+        const navigate = jest.fn();
+        const off = registerPluginNavigator(navigate);
+
+        const response = await handlePluginBridgeMessage(
+            makeEvent(source, {
+                id: 'n2',
+                type: 'app:navigate',
+                payload: { path },
+            }),
+        );
+
+        expect(response).toMatchObject({ id: 'n2', ok: false });
+        expect(response?.error).toMatch(/in-app path/i);
+        jest.runAllTimers();
+        expect(navigate).not.toHaveBeenCalled();
+        off();
+    });
+
+    it('errors when no navigator is registered', async () => {
+        const response = await handlePluginBridgeMessage(
+            makeEvent(source, {
+                id: 'n3',
+                type: 'app:navigate',
+                payload: { path: '/' },
+            }),
+        );
+
+        expect(response).toMatchObject({ id: 'n3', ok: false });
+        expect(response?.error).toMatch(/not available/i);
     });
 });

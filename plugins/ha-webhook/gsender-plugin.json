@@ -1,0 +1,29 @@
+{
+  "id": "com.example.ha-webhook",
+  "name": "Home Assistant Webhook",
+  "description": "Sends machine and job status to a Home Assistant webhook so you can build automations (notify when a job finishes, turn on dust collection while running, flash a light on alarm).",
+  "version": "0.1.0",
+  "engine": ">=1.6.0",
+  "ui": {
+    "entry": "ui/index.html",
+    "contributions": [
+      {
+        "slot": "tools-tab",
+        "label": "Home Assistant"
+      }
+    ]
+  },
+  "permissions": ["redux:read", "storage"],
+  "capabilities": {
+    "requestTypes": [
+      "storage:get",
+      "storage:set",
+      "storage:delete",
+      "storage:get:all",
+      "storage:set:all",
+      "storage:clear"
+    ],
+    "topics": ["redux"],
+    "allowedFunctions": ["subscribeSelector", "storage"]
+  }
+}

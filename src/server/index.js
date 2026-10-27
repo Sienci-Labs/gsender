@@ -21,7 +21,7 @@
  *
  */
 
-import bcrypt from "bcrypt-nodejs";
+import bcrypt from "bcryptjs";
 import chalk from "chalk";
 import dns from "dns";
 import ensureArray from "ensure-array";
@@ -49,6 +49,7 @@ import cncengine from "./services/cncengine";
 import config, { validateAndRepairConfigFile } from "./services/configstore";
 import errorConfig from "./services/configstore/alarmStore";
 import jobConfig from "./services/configstore/jobStore";
+import preferencesStore from "./services/configstore/preferencesStore";
 import monitor from "./services/monitor";
 import pluginRegistry from "./services/pluginregistry";
 
@@ -91,6 +92,7 @@ const createServer = (options, callback) => {
 
 	errorConfig.load(rcfile, errorFile);
 	jobConfig.load(rcfile, jobFile);
+	preferencesStore.load(settings.userDataDir);
 	config.load(rcfile);
 
 	// rcfile

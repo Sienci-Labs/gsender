@@ -24,7 +24,8 @@ export type PluginBridgeRequestType =
     | 'viewer:camera:lock-rotate'
     | 'viewer:pick:arm'
     | 'viewer:pick:disarm'
-    | 'viewer:overlay:set';
+    | 'viewer:overlay:set'
+    | 'app:navigate';
 
 export type PluginBridgeTopic =
     | 'workspace'

@@ -47,6 +47,7 @@ const ALL_REQUEST_TYPES = [
 	"viewer:pick:arm",
 	"viewer:pick:disarm",
 	"viewer:overlay:set",
+	"app:navigate",
 ];
 
 const VIEWER_REQUEST_TYPES = [
@@ -79,6 +80,7 @@ export const permissionsMap = new Map([
 			"visualizer:load",
 			"workspace:read",
 			"redux:read",
+			"app:navigate",
 		],
 	],
 	["machine", ["machine:read", "machine:write", "machine:parse", "machine:query"]],
@@ -102,6 +104,7 @@ export const permissionsMap = new Map([
 	["subscribeSelector", ["redux:read"]],
 	["useTypedSelector", ["redux:read"]],
 	["storage", ["storage"]],
+	["navigation", ["app:navigate"]],
 ]);
 
 export const requestTypesMap = new Map([
@@ -132,6 +135,7 @@ export const requestTypesMap = new Map([
 	["getReduxState", ["redux:get:state"]],
 	["getSelector", ["redux:get:state"]],
 	["storage", STORAGE_REQUEST_TYPES],
+	["navigation", ["app:navigate"]],
 ]);
 
 export const topicsMap = new Map([
