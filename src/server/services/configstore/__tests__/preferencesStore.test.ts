@@ -186,6 +186,84 @@ describe("preferencesStore", () => {
 				fs.rmSync(backupLoc, { recursive: true, force: true });
 			}
 		});
+
+		const seedBackups = (target: string) => {
+			for (let day = 1; day <= 5; day++) {
+				write(target, `preferences-backup-2020-01-0${day}T00-00-00.000Z.json`, {});
+			}
+		};
+
+		it("keeps only the 3 newest backups", () => {
+			seedBackups(dir);
+			write(dir, NEW_FILE, {
+				version: "1.7.0",
+				state: { workspace: { backupFreq: "Daily", lastBackupTime: 0 } },
+			});
+
+			preferencesStore.load(dir);
+
+			const kept = backups(dir).sort();
+			expect(kept).toHaveLength(3);
+			expect(kept.slice(0, 2)).toEqual([
+				"preferences-backup-2020-01-04T00-00-00.000Z.json",
+				"preferences-backup-2020-01-05T00-00-00.000Z.json",
+			]);
+		});
+
+		it("ignores undated copies when choosing which backups to keep", () => {
+			seedBackups(dir);
+			write(dir, "preferences-backup-copy.json", {});
+			write(dir, NEW_FILE, {
+				version: "1.7.0",
+				state: { workspace: { backupFreq: "Daily", lastBackupTime: 0 } },
+			});
+
+			preferencesStore.load(dir);
+
+			expect(fs.existsSync(path.join(dir, "preferences-backup-copy.json"))).toBe(true);
+			const dated = backups(dir)
+				.filter((f) => f !== "preferences-backup-copy.json")
+				.sort();
+			expect(dated).toHaveLength(3);
+			expect(dated.slice(0, 2)).toEqual([
+				"preferences-backup-2020-01-04T00-00-00.000Z.json",
+				"preferences-backup-2020-01-05T00-00-00.000Z.json",
+			]);
+		});
+
+		it("leaves files that aren't preference backups alone", () => {
+			seedBackups(dir);
+			write(dir, "gsender-preferences.json.corrupt-1.bak", "x");
+			write(dir, "notes.json", {});
+			write(dir, NEW_FILE, {
+				version: "1.7.0",
+				state: { workspace: { backupFreq: "Daily", lastBackupTime: 0 } },
+			});
+
+			preferencesStore.load(dir);
+
+			expect(fs.existsSync(path.join(dir, "gsender-preferences.json.corrupt-1.bak"))).toBe(true);
+			expect(fs.existsSync(path.join(dir, "notes.json"))).toBe(true);
+		});
+
+		it("only prunes the folder the backup was written to", () => {
+			const backupLoc = fs.mkdtempSync(path.join(os.tmpdir(), "gsender-bak-"));
+			try {
+				seedBackups(dir);
+				seedBackups(backupLoc);
+				write(dir, NEW_FILE, {
+					version: "1.7.0",
+					state: { workspace: { backupFreq: "Daily", lastBackupTime: 0, backupLoc } },
+				});
+
+				preferencesStore.load(dir);
+
+				expect(backups(backupLoc)).toHaveLength(3);
+				expect(backups(dir)).toHaveLength(5);
+			} finally {
+				fs.rmSync(backupLoc, { recursive: true, force: true });
+			}
+		});
 	});
 });
 
