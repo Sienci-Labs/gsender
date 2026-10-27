@@ -1,13 +1,9 @@
+import { setApiBaseURL } from 'app/api';
 import controller from 'app/lib/controller';
-import { FocusTrappingProvider } from 'app/lib/focus-trapping';
-import { store as reduxStore } from 'app/store/redux';
-import { sagaMiddleware } from 'app/store/redux/sagas';
+import { initStore } from 'app/store';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { Provider as ReduxProvider } from 'react-redux';
 import { getHost } from './electron-bridge';
-import PendantShell from './PendantShell';
-import * as pendantSagas from './pendant-sagas';
 
 import '@fontsource/ibm-plex-sans/400.css';
 import '@fontsource/ibm-plex-sans/500.css';
@@ -19,13 +15,35 @@ import '@fontsource/ibm-plex-mono/600.css';
 import '@fontsource/ibm-plex-mono/700.css';
 import './index.css';
 
-sagaMiddleware.run(pendantSagas.initialize);
-
 async function bootstrap() {
     // In Electron, getHost() returns the embedded server's host.
     // In a browser, fall back to same-origin (connects to whatever served this page).
     const storedHost = await getHost();
     const host = storedHost ? `http://${storedHost}` : '';
+
+    // The pendant page is file:// in Electron, so API calls need the absolute host.
+    setApiBaseURL(host);
+
+    // Modules below read the store at import time, so load settings first.
+    await initStore();
+
+    const [
+        { Provider: ReduxProvider },
+        { FocusTrappingProvider },
+        { store: reduxStore },
+        { sagaMiddleware },
+        { default: PendantShell },
+        pendantSagas,
+    ] = await Promise.all([
+        import('react-redux'),
+        import('app/lib/focus-trapping'),
+        import('app/store/redux'),
+        import('app/store/redux/sagas'),
+        import('./PendantShell'),
+        import('./pendant-sagas'),
+    ]);
+
+    sagaMiddleware.run(pendantSagas.initialize);
 
     controller.connect(host, { query: 'token=' });
 

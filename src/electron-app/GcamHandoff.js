@@ -39,6 +39,7 @@ export const DEFAULT_GCAM_HANDOFF_PORT = 47820;
 export const DEFAULT_GCAM_HANDOFF_MAX_BYTES = 50 * 1024 * 1024;
 export const DEFAULT_GCAM_ALLOWED_ORIGINS = [
     'https://kglovern.github.io',
+    'https://petervanderwalt.github.io',
     'http://localhost:5174',
     'http://127.0.0.1:5174',
     'http://localhost:5180',

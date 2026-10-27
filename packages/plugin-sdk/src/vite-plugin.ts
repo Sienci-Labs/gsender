@@ -40,39 +40,40 @@ export default function gsenderPlugin(): PluginOption {
 
     return {
         name: 'gsender-plugin-sdk',
-        config(config) {
-            const existingExternal = config.build?.rollupOptions?.external;
+        // Rollup's `options` hook sees the FINAL input options, after vite has
+        // merged this plugin's config with the plugin author's own. Setting
+        // `external` from `config()` instead gets merged as `[...theirArray, fn]`,
+        // and rollup ignores a function nested in an array, so react would be
+        // bundled a second time next to the host-served SDK's copy.
+        options(opts) {
+            const existing = opts.external;
+            const matchesExisting = (
+                entry: unknown,
+                source: string,
+                importer: string | undefined,
+                isResolved: boolean,
+            ): boolean => {
+                if (Array.isArray(entry)) {
+                    return entry.some((item) =>
+                        matchesExisting(item, source, importer, isResolved),
+                    );
+                }
+                if (typeof entry === 'function') {
+                    return !!entry(source, importer, isResolved);
+                }
+                if (entry instanceof RegExp) return entry.test(source);
+                return typeof entry === 'string' && entry === source;
+            };
 
             return {
-                build: {
-                    rollupOptions: {
-                        external(source, importer, isResolved) {
-                            if (isExternalSpecifier(source)) return true;
-
-                            if (typeof existingExternal === 'function') {
-                                return existingExternal(
-                                    source,
-                                    importer,
-                                    isResolved,
-                                );
-                            }
-                            if (Array.isArray(existingExternal)) {
-                                return existingExternal.some((entry) =>
-                                    entry instanceof RegExp
-                                        ? entry.test(source)
-                                        : entry === source,
-                                );
-                            }
-                            if (existingExternal instanceof RegExp) {
-                                return existingExternal.test(source);
-                            }
-                            if (typeof existingExternal === 'string') {
-                                return existingExternal === source;
-                            }
-                            return false;
-                        },
-                    },
-                },
+                ...opts,
+                external: (
+                    source: string,
+                    importer: string | undefined,
+                    isResolved: boolean,
+                ) =>
+                    isExternalSpecifier(source) ||
+                    matchesExisting(existing, source, importer, isResolved),
             };
         },
         configResolved(config) {

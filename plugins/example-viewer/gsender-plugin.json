@@ -14,5 +14,15 @@
       }
     ]
   },
-  "permissions": ["machine:read", "files:read"]
+  "permissions": [
+    "machine:read",
+    "files:read",
+    "visualizer:load",
+    "app:navigate"
+  ],
+  "capabilities": {
+    "requestTypes": ["gcode:load:to:visualizer", "app:navigate"],
+    "topics": [],
+    "allowedFunctions": ["gcode", "navigation"]
+  }
 }

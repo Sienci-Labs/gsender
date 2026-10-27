@@ -133,8 +133,8 @@ code {
     color: #71717a;
 }
 
-input[type='url'],
-input[type='number'],
+input[type="url"],
+input[type="number"],
 select {
     padding: 0.4rem 0.5rem;
     border: 1px solid #d4d4d8;
@@ -145,8 +145,8 @@ select {
     color: #18181b;
 }
 
-html.dark input[type='url'],
-html.dark input[type='number'],
+html.dark input[type="url"],
+html.dark input[type="number"],
 html.dark select {
     border-color: #3f3f46;
     background: #27272a;

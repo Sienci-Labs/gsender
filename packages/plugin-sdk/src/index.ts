@@ -264,12 +264,24 @@ type ViewerClient = {
     /** Replace the overlay markers drawn on the host visualizer. */
     setOverlay: (markers: OverlayMarker[]) => Promise<void>;
 };
+type NavigationClient = {
+    /** Send the user to the Carve page (the main workspace). */
+    navigateToCarve: () => Promise<void>;
+    /**
+     * Navigate to an in-app route, e.g. `"/tools/squaring"`. The path must start
+     * with a single `/`; external URLs are rejected. The host navigates after
+     * replying, so a plugin view that unmounts on navigation still gets its
+     * response.
+     */
+    navigate: (path: string, opts?: { replace?: boolean }) => Promise<void>;
+};
 type GsenderClient = {
     machine: MachineClient;
     workspace: WorkspaceClient;
     redux: ReduxClient;
     gcode: GcodeClient;
     viewer: ViewerClient;
+    navigation: NavigationClient;
 };
 
 const createMachineClient = (): MachineClient => ({
@@ -428,12 +440,27 @@ const createStorageClient = (): StorageClient => ({
         request('storage:set:all', { value }).then(() => undefined),
     clear: () => request('storage:clear').then(() => undefined),
 });
+const createNavigationClient = (): NavigationClient => {
+    const navigate: NavigationClient['navigate'] = async (path, opts) => {
+        if (typeof path !== 'string' || !/^\/(?![/\\])/.test(path)) {
+            throw new Error(
+                `navigate: path must be an in-app path starting with a single "/" (got ${JSON.stringify(path)})`,
+            );
+        }
+        await request('app:navigate', { path, replace: !!opts?.replace });
+    };
+    return {
+        navigate,
+        navigateToCarve: () => navigate('/'),
+    };
+};
 export const machine = createMachineClient();
 export const workspace = createWorkspaceClient();
 export const redux = createReduxClient();
 export const gcode = createGcodeClient();
 export const storage = createStorageClient();
 export const viewer = createViewerClient();
+export const navigation = createNavigationClient();
 
 const createGsenderClient = (): GsenderClient => ({
     machine: machine,
@@ -441,6 +468,7 @@ const createGsenderClient = (): GsenderClient => ({
     redux: redux,
     gcode: gcode,
     viewer: viewer,
+    navigation: navigation,
 });
 export const gsender = createGsenderClient();
 

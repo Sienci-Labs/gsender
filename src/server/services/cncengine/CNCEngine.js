@@ -21,12 +21,10 @@
  *
  */
 
-import { app } from "electron";
 import ensureArray from "ensure-array";
-import fs from "fs";
 import noop from "lodash/noop";
 import partition from "lodash/partition";
-import path from "path";
+import { SerialPort } from "serialport";
 import socketIO from "socket.io";
 import { VISUALIZER_SECONDARY } from "../../../app/src/constants";
 import { authorizeIPAddress } from "../../access-control";
@@ -339,22 +337,6 @@ class CNCEngine {
 								controllerType: this.connection.controllerType,
 							}
 						: null,
-			});
-
-			socket.on("newConnection", () => {
-				// if the sockets include more than the original desktop client
-				// check if electron app is defined
-				if (this.sockets.length > 1 && app) {
-					const userDataPath = path.join(
-						app.getPath("userData"),
-						"preferences.json",
-					);
-
-					if (fs.existsSync(userDataPath)) {
-						const content = fs.readFileSync(userDataPath, "utf8") || "{}";
-						socket.emit("connection:new", content);
-					}
-				}
 			});
 
 			socket.on("disconnect", () => {

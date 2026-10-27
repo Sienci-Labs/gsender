@@ -24,7 +24,7 @@
 import pubsub from 'pubsub-js';
 import React, { PureComponent } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import uuid from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import Toast from './Toast';
 import { TOASTER_DEFAULT, TOASTER_UNTIL_CLOSE } from './ToasterLib';
 import styles from './toaster.styl';
@@ -42,7 +42,7 @@ class Toaster extends PureComponent {
     createNewToast({ duration = TOASTER_DEFAULT, ...options }) {
         const state = { ...this.state };
         const activeToasts = [...state.activeToasts];
-        const toastId = uuid();
+        const toastId = uuidv4();
         const closeHandler = () => {
             pubsub.publish('toast:remove', toastId);
         };

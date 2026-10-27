@@ -21,6 +21,7 @@
  *
  */
 
+import './electron-app/userDataPath'; // must stay first, sets userData before anything reads it
 import * as Sentry from '@sentry/electron/main';
 import chalk from 'chalk';
 import {
@@ -53,16 +54,19 @@ import { parseAndReturnGCode } from './electron-app/RecentFiles';
 import WindowManager from './electron-app/WindowManager';
 import pkg from './package.json';
 import launchServer from './server-cli';
+import decodeGcode from './server/lib/decode-gcode';
 
-// Reads the renderer's persisted settings directly, since the main process
-// needs to know "use pendant view as default UI" before any window exists.
+// Reads the persisted settings directly, since the main process needs to know
+// "use pendant view as default UI" before any window exists. The server-owned
+// file wins; the legacy renderer-owned file is only a pre-migration fallback.
 const readUsePendantViewSetting = () => {
     try {
-        const configPath = path.join(
-            app.getPath('userData'),
-            'gsender-0.5.6.json',
-        );
-        if (!fs.existsSync(configPath)) return false;
+        const userData = app.getPath('userData');
+        const configPath = [
+            path.join(userData, 'gsender-preferences.json'),
+            path.join(userData, 'gsender-0.5.6.json'),
+        ].find((file) => fs.existsSync(file));
+        if (!configPath) return false;
         const raw = JSON.parse(fs.readFileSync(configPath, 'utf8') || '{}');
         return !!raw?.state?.workspace?.usePendantViewAsDefault;
     } catch (err) {
@@ -694,12 +698,16 @@ const main = () => {
                 }
             });
 
-            ipcMain.handle('copy-to-clipboard', (_channel, text) => {
+            ipcMain.handle('copy-to-clipboard', async (_channel, text) => {
                 if (!text) {
                     return { success: false, error: 'No text to copy' };
                 }
 
-                clipboard.writeText(text);
+                try {
+                    await clipboard.writeText(text);
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
 
                 return { success: true };
             });
@@ -786,7 +794,7 @@ const main = () => {
 
                     prevDirectory = filePath; // set previous directory
 
-                    fs.readFile(FULL_FILE_PATH, 'latin1', (err, data) => {
+                    fs.readFile(FULL_FILE_PATH, (err, buffer) => {
                         if (err) {
                             log.error(`Error in readFile: ${err}`);
                             return;
@@ -794,7 +802,7 @@ const main = () => {
 
                         const { size } = fs.statSync(FULL_FILE_PATH);
                         window.webContents.send('returned-upload-dialog-data', {
-                            data,
+                            data: decodeGcode(buffer),
                             size,
                             name: fileName,
                             path: FULL_FILE_PATH,

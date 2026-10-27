@@ -15,6 +15,7 @@ import { Toaster } from './components/shadcn/Sonner';
 import { AccessoryConnectivityToastHost } from './features/AccessoryConnectivity/AccessoryConnectivityToastHost';
 import { AccessibilitySettingsHandler } from './features/Helper/AccessibilitySettingsHandler';
 import { installPluginBridgeListener } from './features/Plugins/utils/pluginBridge';
+import { PluginNavigationBridge } from './features/Plugins/utils/pluginNavigation';
 import { ReactRoutes } from './react-routes';
 
 function FocusTrappingBridge({ children }: { children: ReactNode }) {
@@ -82,6 +83,7 @@ function App() {
                 <Toaster closeButton visibleToasts={5} />
                 <AccessoryConnectivityToastHost />
                 <HashRouter>
+                    <PluginNavigationBridge />
                     <ReactRoutes />
                 </HashRouter>
             </FocusTrappingBridge>
