@@ -5,7 +5,7 @@ import controller from 'app/lib/controller.ts';
 import { toast } from 'app/lib/toaster';
 import type { RootState } from 'app/store/redux';
 import { Download, RefreshCw, Trash2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { type ComponentType, type ReactNode, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import {
     actions,
@@ -23,11 +23,24 @@ type GcodeFilePayload = {
     size: number;
     content: string;
     path: string;
+    /** Server-side incoming/ filename, so callers can record it as a recent. */
+    savedName?: string;
+};
+
+type OpenButtonProps = {
+    onActivate: () => void;
+    disabled?: boolean;
+    className?: string;
+    'aria-label'?: string;
+    children: ReactNode;
 };
 
 type RemoteFileReceiveProps = {
     /** Platform-specific "load this file" action - see fileLoader.ts callers. */
     onOpenFile?: (payload: GcodeFilePayload) => void;
+    /** Replaces the plain Load button, e.g. with the pendant's hold-to-confirm
+     * button - loading replaces the current job. */
+    OpenButton?: ComponentType<OpenButtonProps>;
 };
 
 function formatFileSize(size: number): string {
@@ -36,8 +49,29 @@ function formatFileSize(size: number): string {
     return `${(size / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function PlainOpenButton({
+    onActivate,
+    disabled,
+    className,
+    'aria-label': ariaLabel,
+    children,
+}: OpenButtonProps) {
+    return (
+        <button
+            type="button"
+            onClick={onActivate}
+            disabled={disabled}
+            aria-label={ariaLabel}
+            className={className}
+        >
+            {children}
+        </button>
+    );
+}
+
 export default function RemoteFileReceive({
     onOpenFile,
+    OpenButton = PlainOpenButton,
 }: RemoteFileReceiveProps) {
     const [settings, setSettings] = useState<RemoteFileReceiveSettings | null>(
         null,
@@ -130,6 +164,7 @@ export default function RemoteFileReceive({
             size: file.size,
             content: result.gcode,
             path: '',
+            savedName: file.savedName,
         });
     }
 
@@ -316,20 +351,20 @@ export default function RemoteFileReceive({
                                         </span>
                                     </div>
                                 </div>
-                                <button
-                                    type="button"
-                                    onClick={() => openIncomingFile(file)}
+                                <OpenButton
+                                    onActivate={() => openIncomingFile(file)}
                                     disabled={
                                         !onOpenFile ||
                                         openingFile === file.savedName
                                     }
+                                    aria-label={`Load ${file.name}`}
                                     className="flex items-center gap-1 text-sm px-3 py-1.5 rounded-md border border-gray-300 dark:border-outline dark:text-content-primary disabled:opacity-50"
                                 >
                                     <Download className="w-4 h-4" />
                                     {openingFile === file.savedName
-                                        ? 'Opening...'
-                                        : 'Open'}
-                                </button>
+                                        ? 'Loading...'
+                                        : 'Load'}
+                                </OpenButton>
                             </div>
                         ))}
                     </div>

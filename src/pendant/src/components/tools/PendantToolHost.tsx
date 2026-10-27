@@ -12,7 +12,10 @@ import Surfacing from 'app/features/Surfacing';
 import type { ToolEntry } from 'app/features/ToolsPage/registry';
 import { LuArrowLeft } from 'react-icons/lu';
 import { MemoryRouter } from 'react-router';
+import type { GcodeFilePayload } from '../../electron-bridge';
+import { saveRecentFileEntry } from '../../hooks/useFileActions';
 import { applyGcodeFile } from '../../utils/fileLoader';
+import HoldButton from '../carve/setup/HoldButton';
 import GcodeToolPreviewVisualizer from '../GcodeToolPreviewVisualizer';
 
 // Keyed by the registry's tool IDs. Tools take different, tool-specific props.
@@ -36,11 +39,14 @@ const BUILT_IN_TOOLS: Record<
     sd: { Component: SDCard },
     accessoryInstall: { Component: AccessoryInstaller },
     plugins: { Component: PluginManager },
-    'remote-file-receive': {
-        Component: RemoteFileReceive,
-        props: { onOpenFile: applyGcodeFile },
-    },
+    // onOpenFile is wired per render in PendantToolHost - it needs onClose
+    'remote-file-receive': { Component: RemoteFileReceive },
 };
+
+// Loading replaces the current job, so it takes a full hold like Recent Files
+function HoldToLoadButton(props: React.ComponentProps<typeof HoldButton>) {
+    return <HoldButton {...props} aria-label="Hold to load" />;
+}
 
 // react-router hooks (useNavigate/useParams) used inside several of these
 // need *some* Router context - the pendant shell mounts no top-level Router
@@ -51,11 +57,37 @@ const BUILT_IN_TOOLS: Record<
 export default function PendantToolHost({
     tool,
     onClose,
+    onShowCarve,
 }: {
     tool: ToolEntry;
     onClose: () => void;
+    /** Switches the shell to the Carve page; unset when already on it. */
+    onShowCarve?: () => void;
 }) {
     const builtIn = BUILT_IN_TOOLS[tool.id];
+
+    // Leaves the tool for Carve first, then loads on the next frame so the
+    // file is parsed and drawn into a visible visualizer.
+    const openRemoteFile = (
+        payload: GcodeFilePayload & { savedName?: string },
+    ) => {
+        onClose();
+        onShowCarve?.();
+        requestAnimationFrame(() => {
+            void applyGcodeFile(payload);
+        });
+        saveRecentFileEntry({
+            fileName: payload.name,
+            fileSize: payload.size,
+            timeLoaded: Date.now(),
+            source: 'remote',
+            savedName: payload.savedName || '',
+        });
+    };
+    const extraProps =
+        tool.id === 'remote-file-receive'
+            ? { onOpenFile: openRemoteFile, OpenButton: HoldToLoadButton }
+            : undefined;
 
     return (
         <div className="flex-1 flex flex-col min-h-0 p-3">
@@ -78,7 +110,10 @@ export default function PendantToolHost({
                 <div className="flex-1 min-h-0 overflow-y-auto">
                     {builtIn && (
                         <MemoryRouter>
-                            <builtIn.Component {...builtIn.props} />
+                            <builtIn.Component
+                                {...builtIn.props}
+                                {...extraProps}
+                            />
                         </MemoryRouter>
                     )}
                 </div>

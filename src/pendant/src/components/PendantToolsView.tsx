@@ -5,7 +5,11 @@ import { usePinnedTools } from 'app/features/ToolsPage/usePinnedTools';
 import { useState } from 'react';
 import PendantToolHost from './tools/PendantToolHost';
 
-export default function PendantToolsView() {
+export default function PendantToolsView({
+    onShowCarve,
+}: {
+    onShowCarve?: () => void;
+}) {
     const { tools, pinnedIds, togglePin } = usePinnedTools({ pendant: true });
     const [activeTool, setActiveTool] = useState<ToolEntry | null>(null);
 
@@ -14,6 +18,7 @@ export default function PendantToolsView() {
             <PendantToolHost
                 tool={activeTool}
                 onClose={() => setActiveTool(null)}
+                onShowCarve={onShowCarve}
             />
         );
     }

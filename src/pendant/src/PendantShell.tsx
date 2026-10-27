@@ -127,7 +127,11 @@ export default function PendantShell() {
                         <RedesignedCarve activeTab={activeTab} />
                     </>
                 )}
-                {activeTab === 'tools' && <PendantToolsView />}
+                {activeTab === 'tools' && (
+                    <PendantToolsView
+                        onShowCarve={() => setActiveTab('carve')}
+                    />
+                )}
                 {activeTab === 'config' && <PendantConfigView />}
 
                 {legacyCarve ? (

@@ -5,9 +5,9 @@ import { saveRecentFileEntry } from '../hooks/useFileActions';
 /**
  * Records a remotely-received file in the pendant's own Recent Files list as
  * soon as it arrives - not only once the operator opens it from the Remote
- * File Receive panel - so it shows up from any screen. Only fires for
- * library-mode transfers (the only ones saved to the server's incoming/
- * directory, and so the only ones that can be reloaded later).
+ * File Receive panel - so it shows up from any screen. Every transfer is
+ * saved to the server's incoming/ directory ("load as job" ones too), so
+ * each can be reloaded later.
  */
 export default function IncomingFileRecents() {
     useEffect(() => {
