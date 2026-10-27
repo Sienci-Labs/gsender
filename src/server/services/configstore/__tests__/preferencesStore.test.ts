@@ -138,6 +138,10 @@ describe("preferencesStore", () => {
 			const data = preferencesStore.load(dir);
 
 			expect(backups(dir)).toHaveLength(1);
+			// backup uses the same { version, state } shape as the preferences file (not double-wrapped)
+			const backup = read(dir, backups(dir)[0]);
+			expect(backup.state.workspace).toBeDefined();
+			expect(backup.state.state).toBeUndefined();
 			expect(data.state.workspace.lastBackupTime).toBeGreaterThan(0);
 			expect(read(dir, NEW_FILE).state.workspace.lastBackupTime).toBe(
 				data.state.workspace.lastBackupTime,
