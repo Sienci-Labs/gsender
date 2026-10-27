@@ -41,6 +41,9 @@ const CONFIG_KEY = "pendantPairing";
 const IDLE_STOP_MS = 2 * 60 * 1000;
 const QR_TTL_MS = 2 * 60 * 1000;
 const CLAIM_TIMEOUT_MS = 3000;
+const PROBE_TIMEOUT_MS = 1500;
+const SCAN_INTERVAL_MS = 15000;
+const DEFAULT_PORT = 8010;
 
 const pickIPv4 = (service) => {
 	const ipv4 = (service.addresses || []).find((addr) =>
@@ -49,10 +52,57 @@ const pickIPv4 = (service) => {
 	return ipv4 || service.referer?.address || null;
 };
 
+// Every other address on this computer's /24 networks, on the default
+// receiver port. Used when mDNS finds nothing: another app on this computer
+// (e.g. gCAM) can be bound to 5353 and receive the tablet's unicast replies
+// instead of us, and plenty of tablets and mesh routers drop multicast.
+const subnetTargets = () => {
+	const targets = [];
+	for (const addresses of Object.values(os.networkInterfaces())) {
+		for (const addr of addresses || []) {
+			if (addr.family !== "IPv4" || addr.internal) {
+				continue;
+			}
+			const prefix = addr.address.split(".").slice(0, 3).join(".");
+			for (let i = 1; i < 255; i++) {
+				const host = `${prefix}.${i}`;
+				if (host !== addr.address) {
+					targets.push({ host, port: DEFAULT_PORT });
+				}
+			}
+		}
+	}
+	return targets;
+};
+
+const probeStatus = async ({ host, port }) => {
+	try {
+		const res = await axios.get(`http://${host}:${port}/pendant/status`, {
+			timeout: PROBE_TIMEOUT_MS,
+		});
+		const status = res.data;
+		if (status?.status !== "ready" || !status.deviceId) {
+			return null;
+		}
+		return {
+			id: status.deviceId,
+			name: status.deviceName || "Pendant",
+			host,
+			port,
+		};
+	} catch {
+		return null;
+	}
+};
+
 class PendantDiscovery {
 	bonjour = null;
 
 	browser = null;
+
+	scanning = null;
+
+	lastScanAt = 0;
 
 	idleTimer = null;
 
@@ -135,18 +185,99 @@ class PendantDiscovery {
 			/\s\([0-9a-f]{4}\)$/i,
 			"",
 		);
-		this.discovered.set(id, { id, name, host, port: service.port });
+		this.remember({ id, name, host, port: service.port }, false);
+		this.emitList();
+	}
+
+	remember({ id, name, host, port }, viaScan) {
+		this.discovered.set(id, { id, name, host, port, viaScan });
 
 		// Follow a paired tablet to its new address after a DHCP change.
 		const paired = this.getPaired();
 		if (
 			paired[id] &&
-			(paired[id].lastHost !== host || paired[id].lastPort !== service.port)
+			(paired[id].lastHost !== host || paired[id].lastPort !== port)
 		) {
-			paired[id] = { ...paired[id], lastHost: host, lastPort: service.port };
+			paired[id] = { ...paired[id], lastHost: host, lastPort: port };
 			this.savePaired(paired);
 		}
+	}
+
+	// Fallback discovery: asks every address on the local /24 for the
+	// receiver's status page. Throttled; resolves once the sweep finishes.
+	scan() {
+		if (this.scanning || Date.now() - this.lastScanAt < SCAN_INTERVAL_MS) {
+			return this.scanning ?? Promise.resolve();
+		}
+		this.lastScanAt = Date.now();
+		this.scanning = Promise.all(subnetTargets().map(probeStatus))
+			.then((results) => {
+				const found = new Map();
+				for (const tablet of results) {
+					if (tablet) {
+						found.set(tablet.id, tablet);
+					}
+				}
+				for (const [id, entry] of this.discovered) {
+					if (entry.viaScan && !found.has(id)) {
+						this.discovered.delete(id);
+					}
+				}
+				// mDNS results win; they carry the advertised port.
+				for (const tablet of found.values()) {
+					const existing = this.discovered.get(tablet.id);
+					if (!existing || existing.viaScan) {
+						this.remember(tablet, true);
+					}
+				}
+				this.emitList();
+			})
+			.finally(() => {
+				this.scanning = null;
+			});
+		return this.scanning;
+	}
+
+	// Checks each paired tablet at its last known address. mDNS alone can
+	// leave a reachable tablet looking offline (e.g. after a restart while
+	// another app owns the 5353 replies), and that's one request per tablet.
+	async probePaired() {
+		const paired = this.getPaired();
+		const results = await Promise.all(
+			Object.entries(paired)
+				.filter(([, entry]) => entry.lastHost)
+				.map(async ([id, entry]) => ({
+					id,
+					host: entry.lastHost,
+					tablet: await probeStatus({
+						host: entry.lastHost,
+						port: entry.lastPort || DEFAULT_PORT,
+					}),
+				})),
+		);
+		for (const { id, host, tablet } of results) {
+			const existing = this.discovered.get(id);
+			if (tablet?.id === id) {
+				if (!existing || existing.viaScan) {
+					this.remember(tablet, true);
+				}
+			} else if (existing?.viaScan && existing.host === host) {
+				// Only drop it if a scan hasn't since found it somewhere else.
+				this.discovered.delete(id);
+			}
+		}
 		this.emitList();
+	}
+
+	// What the Send to Pendant dialog polls: keeps mDNS alive and verifies
+	// paired tablets over HTTP, pushing updates via pendant:discovered.
+	discover() {
+		this.touch();
+		void this.probePaired();
+		if (![...this.discovered.values()].some((t) => !t.viaScan)) {
+			void this.scan();
+		}
+		return this.list();
 	}
 
 	handleDown(service) {
@@ -177,7 +308,7 @@ class PendantDiscovery {
 				online: Boolean(live),
 			};
 		});
-		for (const [id, live] of this.discovered) {
+		for (const [id, { viaScan, ...live }] of this.discovered) {
 			if (!paired[id]) {
 				tablets.push({ ...live, paired: false, online: true });
 			}
@@ -193,7 +324,8 @@ class PendantDiscovery {
 		const nonce = crypto.randomBytes(16).toString("base64url");
 		const desktopId = this.getDesktopId();
 		const desktopName = this.getDesktopName();
-		this.activeQr = { nonce, expiresAt: Date.now() + QR_TTL_MS };
+		void this.scan();
+		this.activeQr ={ nonce, expiresAt: Date.now() + QR_TTL_MS };
 		const params = new URLSearchParams({
 			v: "1",
 			n: nonce,
@@ -242,6 +374,10 @@ class PendantDiscovery {
 			const err = new Error("Pairing QR has expired");
 			err.status = 410;
 			throw err;
+		}
+		// Nothing answered mDNS: keep sweeping the subnet while the QR is up.
+		if (![...this.discovered.values()].some((t) => !t.viaScan)) {
+			void this.scan();
 		}
 		const body = {
 			nonce,

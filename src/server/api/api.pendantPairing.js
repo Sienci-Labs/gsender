@@ -26,8 +26,7 @@ import pendantDiscovery from "../services/pendantDiscovery";
 
 // Starts (or keeps alive) LAN browsing and returns what's known so far.
 export const discover = (req, res) => {
-	pendantDiscovery.touch();
-	res.send(pendantDiscovery.list());
+	res.send(pendantDiscovery.discover());
 };
 
 export const createQr = (req, res) => {

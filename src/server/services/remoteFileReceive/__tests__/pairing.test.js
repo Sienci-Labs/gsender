@@ -60,6 +60,22 @@ describe("PairingStore", () => {
 		expect(pairing.claim({ nonce: "abc", desktopId: "desk-2" }, null)).toBeNull();
 	});
 
+	it("keeps pending pairs from different desktops apart", () => {
+		pairing.setPendingPair({ nonce: "abc", ...DESKTOP });
+		pairing.setPendingPair({
+			nonce: "xyz",
+			desktopId: "desk-2",
+			desktopName: "gCAM",
+		});
+
+		expect(
+			pairing.claim({ nonce: "xyz", desktopId: "desk-2" }, null),
+		).toMatchObject({ desktopId: "desk-2", desktopName: "gCAM" });
+		expect(
+			pairing.claim({ nonce: "abc", desktopId: "desk-1" }, null),
+		).toMatchObject({ desktopId: "desk-1", desktopName: "Shop PC" });
+	});
+
 	it("rejects an expired nonce", () => {
 		const now = 1_000_000;
 		pairing.setPendingPair({ nonce: "abc", ...DESKTOP }, now);

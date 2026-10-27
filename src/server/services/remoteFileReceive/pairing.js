@@ -42,7 +42,9 @@ const safeEqual = (a, b) => {
 };
 
 export class PairingStore {
-	pendingPair = null;
+	// Keyed by desktop id, so a gCAM and a gSender desktop can both have a
+	// scanned QR waiting to be claimed at once.
+	pendingPairs = new Map();
 
 	claimAttempts = new Map();
 
@@ -70,20 +72,23 @@ export class PairingStore {
 		if (!nonce || !desktopId) {
 			return false;
 		}
-		this.pendingPair = {
+		this.pendingPairs.set(String(desktopId), {
 			nonce: String(nonce),
 			desktopId: String(desktopId),
 			desktopName: String(desktopName || "Desktop"),
 			expiresAt: now + PENDING_PAIR_TTL_MS,
-		};
+		});
 		return true;
 	}
 
-	getPendingPair(now = Date.now()) {
-		if (this.pendingPair && this.pendingPair.expiresAt <= now) {
-			this.pendingPair = null;
+	getPendingPair(desktopId, now = Date.now()) {
+		const id = String(desktopId);
+		const pending = this.pendingPairs.get(id);
+		if (pending && pending.expiresAt <= now) {
+			this.pendingPairs.delete(id);
+			return null;
 		}
-		return this.pendingPair;
+		return pending || null;
 	}
 
 	// Returns false once `ip` has used up its attempts for the current window.
@@ -105,17 +110,13 @@ export class PairingStore {
 		}
 
 		let name = desktopName;
-		const pending = this.getPendingPair(now);
 		if (nonce) {
-			if (
-				!pending ||
-				!safeEqual(pending.nonce, nonce) ||
-				pending.desktopId !== String(desktopId)
-			) {
+			const pending = this.getPendingPair(desktopId, now);
+			if (!pending || !safeEqual(pending.nonce, nonce)) {
 				return null;
 			}
 			name = pending.desktopName;
-			this.pendingPair = null;
+			this.pendingPairs.delete(String(desktopId));
 		} else if (code) {
 			if (!currentCode || !safeEqual(currentCode, code)) {
 				return null;
