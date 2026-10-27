@@ -309,23 +309,7 @@ class RemoteFileReceive {
 					return;
 				}
 
-				const gcode = file.buffer.toString("latin1");
-
-				if (mode === "active") {
-					CNCEngine.load({
-						gcode,
-						name: file.originalname,
-						size: file.size,
-					});
-					CNCEngine.emit("remote:file-incoming:complete", {
-						name: file.originalname,
-						size: file.size,
-						mode,
-					});
-					res.send({ msg: "Loaded as the active job", mode });
-					return;
-				}
-
+				// Every file lands in the library; 'active' additionally loads it.
 				const ext = path.extname(file.originalname);
 				const base = path.basename(file.originalname, ext);
 				const savedName = `${base}_${Date.now().toString(36)}${ext}`;
@@ -340,13 +324,28 @@ class RemoteFileReceive {
 					savedName,
 					size: file.size,
 				});
+
+				if (mode === "active") {
+					CNCEngine.load({
+						gcode: file.buffer.toString("latin1"),
+						name: file.originalname,
+						size: file.size,
+					});
+				}
+
 				CNCEngine.emit("remote:file-incoming:complete", {
 					name: file.originalname,
 					size: file.size,
 					mode,
 				});
 
-				res.send({ msg: "Added to the pendant's file library", mode });
+				res.send({
+					msg:
+						mode === "active"
+							? "Added to the library and loaded as the active job"
+							: "Added to the pendant's file library",
+					mode,
+				});
 			},
 		);
 

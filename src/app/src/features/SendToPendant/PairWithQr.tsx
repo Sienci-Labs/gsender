@@ -82,7 +82,7 @@ export const PairWithQr: React.FC<PairWithQrProps> = ({
                 On the tablet, open <b>Remote File Receive</b> and tap{' '}
                 <b>Pair with desktop</b>, then point it at this code.
             </p>
-            <div className="bg-white p-3 rounded-md border border-gray-200">
+            <div className="bg-white p-3 rounded-lg border border-gray-200 dark:border-outline">
                 {qr ? (
                     <QRCode
                         size={200}
@@ -98,7 +98,7 @@ export const PairWithQr: React.FC<PairWithQrProps> = ({
             {error ? (
                 <p className="text-red-600 text-xs">{error}</p>
             ) : (
-                <p className="flex items-center gap-2 text-xs text-gray-500">
+                <p className="flex items-center gap-2 text-xs text-gray-500 dark:text-content-muted">
                     <Loader2 className="w-3 h-3 animate-spin" />
                     Waiting for a tablet to scan…
                 </p>
@@ -107,14 +107,14 @@ export const PairWithQr: React.FC<PairWithQrProps> = ({
                 <button
                     type="button"
                     onClick={onUseCode}
-                    className="text-blue-600 dark:text-blue-400 font-medium"
+                    className="font-medium text-robin-700 dark:text-robin-400 hover:underline"
                 >
                     Use pairing code instead
                 </button>
                 <button
                     type="button"
                     onClick={onCancel}
-                    className="text-gray-600 dark:text-content-muted"
+                    className="text-gray-500 hover:text-gray-700 dark:text-content-muted dark:hover:text-content-primary"
                 >
                     Back
                 </button>
