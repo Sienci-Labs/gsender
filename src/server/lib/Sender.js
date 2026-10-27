@@ -210,6 +210,8 @@ class Sender extends events.EventEmitter {
 		total: 0,
 		sent: 0,
 		received: 0,
+		// First line of the current run: non-zero after start from line.
+		startLine: 0,
 		startTime: 0,
 		finishTime: 0,
 		elapsedTime: 0,
@@ -351,6 +353,7 @@ class Sender extends events.EventEmitter {
 			total: this.state.total,
 			sent: this.state.sent,
 			received: this.state.received,
+			startLine: this.state.startLine,
 			startTime: this.state.startTime,
 			finishTime: this.state.finishTime,
 			elapsedTime: this.state.elapsedTime,
@@ -411,6 +414,7 @@ class Sender extends events.EventEmitter {
 		this.state.total = this.state.lines.length;
 		this.state.sent = 0;
 		this.state.received = 0;
+		this.state.startLine = 0;
 		this.state.startTime = 0;
 		this.state.finishTime = 0;
 		this.state.elapsedTime = 0;
@@ -445,6 +449,7 @@ class Sender extends events.EventEmitter {
 		this.state.total = 0;
 		this.state.sent = 0;
 		this.state.received = 0;
+		this.state.startLine = 0;
 		this.state.startTime = 0;
 		this.state.finishTime = 0;
 		this.state.elapsedTime = 0;
@@ -480,6 +485,7 @@ class Sender extends events.EventEmitter {
 	setStartLine(line = 0) {
 		this.state.sent = line;
 		this.state.received = line;
+		this.state.startLine = line;
 	}
 
 	// Tells the sender to send more data.
@@ -515,6 +521,7 @@ class Sender extends events.EventEmitter {
 			handleStart();
 		} else if (this.state.total > 0 && this.state.sent === 0) {
 			this.state.received = 0;
+			this.state.startLine = 0;
 			handleStart();
 		}
 
@@ -555,6 +562,7 @@ class Sender extends events.EventEmitter {
 		this.state.holdReason = null;
 		this.state.sent = 0;
 		this.state.received = 0;
+		this.state.startLine = 0;
 		this.state.toolChanges = 0;
 		// remainingTime is left as-is so a finished job keeps showing 0
 		this.jobActive = false;
