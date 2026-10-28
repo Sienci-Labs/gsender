@@ -205,7 +205,7 @@ function NoFile({ actions }: { actions: FileActions }) {
                     </span>
                 )}
             </span>
-            <div className="flex flex-col gap-1.5 flex-1 min-h-0 overflow-auto">
+            <div className="flex flex-col gap-2 flex-1 min-h-0 overflow-auto">
                 {recentFiles.length === 0 ? (
                     <p className="m-0 text-[10.5px] text-content-disabled">
                         No recent files.
