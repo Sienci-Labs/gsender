@@ -26,9 +26,12 @@ const ANCHORED = 'left-0 top-0 -translate-x-1/2 -translate-y-1/2';
 
 type Point = { x: number; y: number };
 
+// Just the four bed corners - no centre target on the visualizer
+const BED_CORNERS = CORNERS.filter((corner) => corner.id !== CENTER);
+
 /**
- * Corner-rapid targets drawn on the machine bed's real corners (and centre):
- * hold one to rapid there. Shown under the same rule as the bed itself -
+ * Corner-rapid targets drawn on the machine bed's four real corners: hold
+ * one to rapid there. Shown under the same rule as the bed itself -
  * homing enabled and the machine homed (buildMachineBedOptions) - and they
  * track the visualizer's pan/zoom.
  */
@@ -60,8 +63,7 @@ export default function VizCornerTargets({
             [BACK_RIGHT]: { x: max.x, y: max.y },
             [FRONT_LEFT]: { x: min.x, y: min.y },
             [FRONT_RIGHT]: { x: max.x, y: min.y },
-            [CENTER]: { x: (min.x + max.x) / 2, y: (min.y + max.y) / 2 },
-        } as Record<CornerId, Point>;
+        } as Partial<Record<CornerId, Point>>;
     }, [bed]);
 
     const rootRef = useRef<HTMLDivElement>(null);
@@ -118,7 +120,7 @@ export default function VizCornerTargets({
 
     return (
         <div ref={rootRef} className="absolute inset-0 pointer-events-none">
-            {CORNERS.map((corner) => {
+            {BED_CORNERS.map((corner) => {
                 const point = screen[corner.id];
                 if (!point) return null;
                 return (

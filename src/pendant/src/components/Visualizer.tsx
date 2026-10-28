@@ -86,6 +86,9 @@ export const BASE_OPTIONS: Partial<GCodeViewerOptions> = {
         orbit: { enableDamping: false },
         initialPosition: { x: 0, y: 0, z: 400 },
         lockTopDown: true,
+        // Frame the model/bed with a little more room than gviewer's 1.1
+        // default, so edges and corner targets aren't pinned to the stage edge
+        topDownFitMargin: 1.3,
     },
 };
 
