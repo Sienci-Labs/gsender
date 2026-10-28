@@ -44,6 +44,8 @@ export const DEFAULT_GCAM_ALLOWED_ORIGINS = [
     'http://127.0.0.1:5174',
     'http://localhost:5180',
     'http://127.0.0.1:5180',
+    // gCAM desktop renderer, served from its privileged custom scheme.
+    'gcam://app',
 ];
 
 const sendJson = (res, status, body, corsHeaders = {}) => {
@@ -143,6 +145,7 @@ export const createGcamHandoffServer = ({
     const handle = async (req, res) => {
         const { origin } = req.headers;
         if (!isOriginAllowed(origin, allowedOrigins)) {
+            logger.warn(`gCAM handoff rejected origin ${origin}`);
             sendJson(res, 403, { error: 'origin-not-allowed' });
             return;
         }
