@@ -402,7 +402,12 @@ function VisualizerImpl(
     }, [fileLoaded]);
 
     useEffect(() => {
-        withViewer((v) => v.setBitVisible(isConnected));
+        withViewer((v) => {
+            v.setBitVisible(isConnected);
+            // Show where work zero sits even before a file is loaded - only
+            // meaningful with a machine connected
+            v.setOriginVisible(isConnected);
+        });
     }, [isConnected]);
 
     useEffect(() => {
