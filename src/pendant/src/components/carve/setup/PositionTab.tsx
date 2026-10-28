@@ -10,7 +10,6 @@ import cn from 'classnames';
 import { ArrowRight, Crosshair, MoveUpRight } from 'lucide-react';
 import { useState } from 'react';
 import { useDroGating } from '../../../hooks/useDroGating';
-import { CORNERS, HoldCorner, useCornerRapid } from '../../move/cornerRapid';
 import ProbePanel from '../../ProbePanel';
 import HoldButton from './HoldButton';
 import Segmented from './Segmented';
@@ -34,10 +33,6 @@ function ManualZero() {
     const [coords, setCoords] = useState<'work' | 'machine'>('work');
     const wpos = useTypedSelector((s: RootState) => s.controller.wpos);
     const mpos = useTypedSelector((s: RootState) => s.controller.mpos);
-    const hasHomed = useTypedSelector((s: RootState) => s.controller.hasHomed);
-    // Same gate as MovePanel's Corner Select: canAct && hasHomed
-    const canCorner = canGoTo && hasHomed;
-    const { selectedCorner, handleConfirmCorner } = useCornerRapid(canCorner);
     const pos = !isConnected
         ? { x: 0, y: 0, z: 0, a: 0 }
         : coords === 'machine'
@@ -47,7 +42,7 @@ function ManualZero() {
     return (
         <>
             <div className="flex items-center justify-between">
-                <span className="font-mono text-[9px] tracking-[0.08em] uppercase text-content-disabled">
+                <span className="font-mono text-[11px] tracking-[0.08em] uppercase text-content-disabled">
                     {coords === 'machine' ? 'Machine position' : 'Work position'}
                 </span>
                 <div className="flex gap-0.5 p-0.5 rounded-md border border-outline-subtle bg-surface-raised">
@@ -58,7 +53,7 @@ function ManualZero() {
                             onClick={() => setCoords(c)}
                             aria-pressed={coords === c}
                             className={cn(
-                                'px-2.5 py-1 rounded-sm font-mono text-[9px] tracking-[0.04em] uppercase transition-colors',
+                                'px-3.5 py-2 rounded-sm font-mono text-[11px] tracking-[0.04em] uppercase transition-colors',
                                 coords === c
                                     ? 'bg-robin-600/20 text-robin-400'
                                     : 'text-content-disabled',
@@ -74,7 +69,8 @@ function ManualZero() {
                 <div
                     key={label}
                     className={cn(
-                        'flex items-center justify-between px-[9px] py-[7px] rounded-md bg-surface-raised border-l-[3px]',
+                        // Rows share the tab's free height
+                        'flex flex-1 min-h-[60px] items-center justify-between gap-2 px-2.5 py-1.5 rounded-md bg-surface-raised border-l-[3px]',
                         border,
                     )}
                 >
@@ -83,19 +79,16 @@ function ManualZero() {
                         disabled={!canGoTo}
                         aria-label={`Hold to go to ${label} 0`}
                         className={cn(
-                            'gap-1 h-8 px-2.5 rounded-sm border border-outline-subtle bg-surface-sunken font-mono text-[12px] font-semibold disabled:opacity-40',
+                            'gap-1.5 h-[80%] min-h-12 min-w-[64px] px-3.5 rounded-md border border-outline-subtle bg-surface-sunken font-mono text-[15px] font-semibold disabled:opacity-40',
                             text,
                         )}
                     >
                         <span>{label}</span>
-                        <ArrowRight
-                            className="w-[10px] h-[10px]"
-                            strokeWidth={2.5}
-                        />
+                        <ArrowRight className="w-3.5 h-3.5" strokeWidth={2.5} />
                     </HoldButton>
                     <span
                         className={cn(
-                            'font-mono text-[17px] font-semibold tabular-nums leading-none',
+                            'font-mono text-[26px] font-semibold tabular-nums leading-none',
                             text,
                         )}
                     >
@@ -107,21 +100,21 @@ function ManualZero() {
                         onActivate={() => zeroWCS(label, 0)}
                         disabled={!canZero}
                         aria-label={`Hold to zero ${label}`}
-                        className="h-8 px-2.5 rounded-md border border-outline-strong font-mono text-[10px] tracking-[0.05em] text-content-secondary disabled:opacity-40"
+                        className="h-[80%] min-h-12 min-w-[72px] px-3.5 rounded-md border border-outline-strong font-mono text-[13px] tracking-[0.05em] text-content-secondary disabled:opacity-40"
                     >
                         ZERO
                     </HoldButton>
                 </div>
             ))}
 
-            <div className="flex gap-[7px] mt-px">
+            <div className="flex gap-2 shrink-0">
                 <HoldButton
                     onActivate={goXYAxes}
                     disabled={!canGoTo}
                     aria-label="Hold to go to XY 0"
-                    className="flex-1 gap-1.5 h-11 rounded-md border border-outline-strong font-mono text-[10.5px] font-bold tracking-[0.04em] uppercase text-content-secondary disabled:opacity-40"
+                    className="flex-1 gap-2 h-14 rounded-md border border-outline-strong font-mono text-[13px] font-bold tracking-[0.04em] uppercase text-content-secondary disabled:opacity-40"
                 >
-                    <MoveUpRight className="w-3.5 h-3.5" />
+                    <MoveUpRight className="w-[18px] h-[18px]" />
                     Go To XY
                 </HoldButton>
                 <HoldButton
@@ -130,33 +123,11 @@ function ManualZero() {
                     aria-label="Hold to zero all axes"
                     fillClassName="bg-white/30"
                     holdingClassName="ring-1 ring-white/60"
-                    className="flex-1 gap-1.5 h-11 rounded-md border border-transparent bg-blue-600 font-mono text-[10.5px] font-bold tracking-[0.04em] uppercase text-white disabled:opacity-40"
+                    className="flex-1 gap-2 h-14 rounded-md border border-transparent bg-blue-600 font-mono text-[13px] font-bold tracking-[0.04em] uppercase text-white disabled:opacity-40"
                 >
-                    <Crosshair className="w-3.5 h-3.5" />
+                    <Crosshair className="w-[18px] h-[18px]" />
                     Zero All
                 </HoldButton>
-            </div>
-
-            <div className="mt-0.5 p-[9px] flex flex-col gap-[7px] rounded-lg border border-outline-subtle bg-surface-raised">
-                <p className="m-0 font-mono text-[9px] tracking-[0.08em] uppercase text-content-disabled">
-                    Rapid to corner
-                </p>
-                {/* Inset so the corner targets, centred on the pad's corners,
-                    stay inside the card */}
-                <div className="px-4 py-4">
-                    <div className="relative h-20 rounded-md border-[1.5px] border-dashed border-outline-strong bg-surface-sunken">
-                        {CORNERS.map((corner) => (
-                            <HoldCorner
-                                key={corner.id}
-                                corner={corner}
-                                selected={selectedCorner === corner.id}
-                                disabled={!canCorner}
-                                onConfirm={handleConfirmCorner}
-                                size={corner.size > 60 ? 32 : 28}
-                            />
-                        ))}
-                    </div>
-                </div>
             </div>
         </>
     );
@@ -183,7 +154,9 @@ export default function PositionTab() {
                 tab scrolls instead */}
             <div
                 className={
-                    method === 'manual' ? 'flex flex-col gap-[7px]' : 'hidden'
+                    method === 'manual'
+                        ? 'flex flex-col flex-1 gap-2'
+                        : 'hidden'
                 }
             >
                 <ManualZero />

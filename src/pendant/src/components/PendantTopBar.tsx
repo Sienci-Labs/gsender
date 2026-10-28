@@ -310,7 +310,6 @@ const STATE_BADGES: Record<string, BadgeConfig> = {
     },
 };
 
-const QUIT_HOLD_MS = 1000;
 const QUIT_RING_RADIUS = 19;
 const QUIT_RING_CIRCUMFERENCE = 2 * Math.PI * QUIT_RING_RADIUS;
 
@@ -325,7 +324,6 @@ function useLogoHoldToQuit() {
                 onConfirm: () => quitApp(),
             }),
         {
-            durationMs: QUIT_HOLD_MS,
             // Quitting only means something inside the Electron shell
             disabled: !isElectron(),
             hint: 'Hold to quit',

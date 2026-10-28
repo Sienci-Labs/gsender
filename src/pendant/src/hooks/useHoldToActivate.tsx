@@ -8,6 +8,13 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 
+/** Standard press-and-hold length for every hold-to-confirm control on the
+ * pendant. Change it here to retime them all together. */
+export const HOLD_MS = 700;
+/** Longer hold for actions that warrant extra deliberation (not yet assigned
+ * to any control). */
+export const LONG_HOLD_MS = 1000;
+
 /** A release before this counts as a tap, not an attempted hold. */
 export const HOLD_TAP_MAX_MS = 300;
 /** How long the "Hold to …" bubble stays up after a tap. */
@@ -40,7 +47,7 @@ interface HoldOptions {
 export function useHoldToActivate(
     onActivate: () => void,
     {
-        durationMs = 1000,
+        durationMs = HOLD_MS,
         disabled = false,
         hint = 'Hold to confirm',
         onTap,

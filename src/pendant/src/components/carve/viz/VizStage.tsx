@@ -10,6 +10,7 @@ import { LiveFileLoadingOverlay } from '../../VisualizerCard';
 import WorkspaceSelector from '../../WorkspaceSelector';
 import type { CarveMode } from '../carveMode';
 import InfoGlass from './InfoGlass';
+import VizCornerTargets from './VizCornerTargets';
 import VizJobControls from './VizJobControls';
 import VizViewTray from './VizViewTray';
 
@@ -55,6 +56,13 @@ export default function VizStage({
     return (
         <div className="relative h-[42vh] shrink-0 border-b border-outline-subtle bg-surface-base overflow-hidden">
             <Visualizer ref={visualizerRef} onJogArmedChange={setJogArmed} />
+            {/* Before the tray/selector/glass so those win any overlap.
+                Hidden outside Setup and while hold-to-move is armed, so two
+                hold targets never compete */}
+            <VizCornerTargets
+                visualizerRef={visualizerRef}
+                hidden={mode !== 'setup' || jogArmed || fileProcessing}
+            />
             <VizViewTray
                 visualizerRef={visualizerRef}
                 jogArmed={jogArmed}

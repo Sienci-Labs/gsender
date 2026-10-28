@@ -25,7 +25,7 @@ import {
     useState,
     type ForwardedRef,
 } from 'react';
-import { HOLD_TAP_MAX_MS } from '../hooks/useHoldToActivate';
+import { HOLD_MS, HOLD_TAP_MAX_MS } from '../hooks/useHoldToActivate';
 
 export interface VisualizerHandle {
     focusToModel: () => void;
@@ -37,6 +37,9 @@ export interface VisualizerHandle {
      * there. */
     armJog: () => void;
     disarmJog: () => void;
+    /** Projects a world (work-coordinate) point to client px, tracking the
+     * current pan/zoom; null until the viewer has a layout. */
+    worldToScreen: (x: number, y: number) => { x: number; y: number } | null;
 }
 
 interface VisualizerProps {
@@ -47,8 +50,6 @@ interface VisualizerProps {
 
 const MACHINE_NOT_READY_MESSAGE = 'Machine must be connected and idle to move';
 
-/** How long a press must be held on the canvas before the move is sent. */
-const MOVE_HOLD_MS = 1000;
 /** A press that drifts further than this is a drag, not a target. */
 const MOVE_SLOP_PX = 14;
 // Big enough to show clearly around a fingertip
@@ -240,7 +241,7 @@ function VisualizerImpl(
         const el = containerRef.current;
         if (!el) return;
 
-        // A press only becomes a move once held for MOVE_HOLD_MS without
+        // A press only becomes a move once held for HOLD_MS without
         // drifting; a ring around the finger shows the progress. A short or
         // dragged press is dropped and leaves the move armed.
         let press: {
@@ -264,7 +265,7 @@ function VisualizerImpl(
             if (!press) return;
             const progress = Math.min(
                 1,
-                (performance.now() - press.start) / MOVE_HOLD_MS,
+                (performance.now() - press.start) / HOLD_MS,
             );
             if (progress < 1) {
                 setMoveHold({ x: press.x, y: press.y, progress });
@@ -348,6 +349,13 @@ function VisualizerImpl(
                 }),
             armJog,
             disarmJog,
+            worldToScreen: (x: number, y: number) => {
+                let point: { x: number; y: number } | null = null;
+                withViewer((v) => {
+                    point = v.worldToScreen(x, y);
+                });
+                return point;
+            },
         }),
         // Methods only close over refs/the viewer handle, so they stay stable.
         // eslint-disable-next-line react-hooks/exhaustive-deps

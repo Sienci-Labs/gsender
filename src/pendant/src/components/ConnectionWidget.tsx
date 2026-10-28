@@ -35,9 +35,8 @@ import {
 } from 'react';
 import { useHoldToActivate } from '../hooks/useHoldToActivate';
 
-/* Hold-to-disconnect timing. A tap (under HOLD_TAP_MAX_MS) toggles the
- * info card; a press held for DURATION disconnects. */
-const DURATION = 900;
+/* Hold-to-disconnect: a tap (under HOLD_TAP_MAX_MS) toggles the info card;
+ * a full hold (HOLD_MS) disconnects. */
 
 /* Per-status colour treatment. The custom brand families (blue-700 #2c5d8b,
  * green-700 #047854, red-600 #c62222) render identically in light and dark,
@@ -363,7 +362,6 @@ export default function ConnectionWidget({
         reset: resetHold,
         bind: holdBind,
     } = useHoldToActivate(onDisconnectClick, {
-        durationMs: DURATION,
         disabled: connectionState !== ConnectionState.CONNECTED,
         onTap: () => setInfoOpen((v) => !v),
     });

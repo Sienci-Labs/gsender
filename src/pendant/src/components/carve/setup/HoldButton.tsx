@@ -2,10 +2,8 @@ import cn from 'classnames';
 import type { ReactNode } from 'react';
 import { useHoldToActivate } from '../../../hooks/useHoldToActivate';
 
-const HOLD_MS = 1000;
-
-/** A button that fires only after a full 1 s hold; a fill sweeps across it
- * as the hold progresses (same feedback as RecentRow). */
+/** A button that fires only after a full hold (HOLD_MS); a fill sweeps across
+ * it as the hold progresses (same feedback as RecentRow). */
 export default function HoldButton({
     onActivate,
     disabled,
@@ -27,7 +25,7 @@ export default function HoldButton({
 }) {
     const { progress, holding, hintNode, bind } = useHoldToActivate(
         onActivate,
-        { durationMs: HOLD_MS, disabled, hint: ariaLabel ?? 'Hold to confirm' },
+        { disabled, hint: ariaLabel ?? 'Hold to confirm' },
     );
 
     return (

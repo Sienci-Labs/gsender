@@ -16,8 +16,10 @@ import { useHoldToActivate } from '../../hooks/useHoldToActivate';
 
 // Rapid-to-corner pad shared by MovePanel and the carve Position tab.
 
-const HOLD_MS = 700;
 const SETTLE_MS = 900;
+/** Diameter of the bigRing progress ring - big enough to show around a
+ * fingertip, like the visualizer's hold-to-move ring. */
+const BIG_RING_PX = 96;
 
 export type CornerId =
     | typeof FRONT_RIGHT
@@ -70,6 +72,7 @@ export function HoldCorner({
     disabled,
     onConfirm,
     size,
+    bigRing = false,
 }: {
     corner: (typeof CORNERS)[number];
     selected: boolean;
@@ -77,6 +80,9 @@ export function HoldCorner({
     onConfirm: (id: CornerId) => void;
     /** Overrides the corner's own diameter (px). */
     size?: number;
+    /** Draws the hold progress as a large flashing ring around the target
+     * instead of on its edge, so it stays visible under a finger. */
+    bigRing?: boolean;
 }) {
     const [confirmed, setConfirmed] = useState(false);
     const [settling, setSettling] = useState(false);
@@ -102,13 +108,15 @@ export function HoldCorner({
                 }, SETTLE_MS);
             },
             {
-                durationMs: HOLD_MS,
                 disabled: disabled || settling,
                 hint: `Hold to rapid to ${corner.label.toLowerCase()}`,
             },
         );
     // The confirmed ring stays full while it settles
     const ring = confirmed ? 1 : progress;
+    const diameter = size ?? corner.size;
+    const ringInset = bigRing ? -(BIG_RING_PX - diameter) / 2 : -6;
+    const ringWidth = bigRing ? 6 : 4;
 
     return (
         <button
@@ -123,23 +131,24 @@ export function HoldCorner({
                       ? 'border-blue-400 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400'
                       : 'border-gray-300 dark:border-outline bg-white dark:bg-surface-elevated text-gray-600 dark:text-content-secondary',
             )}
-            style={{
-                width: size ?? corner.size,
-                height: size ?? corner.size,
-            }}
+            style={{ width: diameter, height: diameter }}
             disabled={disabled || settling}
             {...bind}
         >
             {(showProgress || confirmed) && (
                 <span
                     aria-hidden="true"
-                    className="absolute rounded-full pointer-events-none"
+                    className={clsx(
+                        'absolute rounded-full pointer-events-none',
+                        bigRing &&
+                            !confirmed &&
+                            'animate-[move-ring-flash_0.5s_ease-in-out_infinite] motion-reduce:animate-none',
+                    )}
                     style={{
-                        inset: -6,
-                        background: `conic-gradient(${confirmed ? '#22c55e' : '#689AC9'} ${ring * 360}deg, transparent 0deg)`,
-                        WebkitMask:
-                            'radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px))',
-                        mask: 'radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px))',
+                        inset: ringInset,
+                        background: `conic-gradient(${confirmed ? '#22c55e' : '#689AC9'} ${ring * 360}deg, ${bigRing ? 'rgba(104, 154, 201, 0.25)' : 'transparent'} 0deg)`,
+                        WebkitMask: `radial-gradient(farthest-side, transparent calc(100% - ${ringWidth}px), #000 calc(100% - ${ringWidth}px))`,
+                        mask: `radial-gradient(farthest-side, transparent calc(100% - ${ringWidth}px), #000 calc(100% - ${ringWidth}px))`,
                     }}
                 />
             )}
