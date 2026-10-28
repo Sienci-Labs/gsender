@@ -156,6 +156,16 @@
     }
 }
 
+@keyframes move-ring-flash {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.45;
+    }
+}
+
 @keyframes border-march {
     0%,
     100% {

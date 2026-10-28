@@ -22,8 +22,10 @@ import {
     useImperativeHandle,
     useMemo,
     useRef,
+    useState,
     type ForwardedRef,
 } from 'react';
+import { HOLD_TAP_MAX_MS } from '../hooks/useHoldToActivate';
 
 export interface VisualizerHandle {
     focusToModel: () => void;
@@ -31,7 +33,8 @@ export interface VisualizerHandle {
     /** Pans the camera to center on the bit's last known position, preserving
      * the current zoom/angle — for when there's no toolpath to frame. */
     focusToBit: () => void;
-    /** Arms tap-to-jog: the next tap on the canvas sends a safe XY move there. */
+    /** Arms tap-to-jog: the next full hold on the canvas sends a safe XY move
+     * there. */
     armJog: () => void;
     disarmJog: () => void;
 }
@@ -43,6 +46,18 @@ interface VisualizerProps {
 }
 
 const MACHINE_NOT_READY_MESSAGE = 'Machine must be connected and idle to move';
+
+/** How long a press must be held on the canvas before the move is sent. */
+const MOVE_HOLD_MS = 1000;
+/** A press that drifts further than this is a drag, not a target. */
+const MOVE_SLOP_PX = 14;
+// Big enough to show clearly around a fingertip
+const RING_SIZE = 120;
+const RING_STROKE = 6;
+const RING_R = (RING_SIZE - RING_STROKE) / 2;
+const RING_C = 2 * Math.PI * RING_R;
+
+type MoveHold = { x: number; y: number; progress: number };
 
 // Pendant mode: gviewer's WebGL renderer locked top-down (orthographic, no
 // view cube, no grid), fed the worker's Z-deduped 2D segment groups. The
@@ -124,7 +139,13 @@ function VisualizerImpl(
     unitsRef.current = units;
 
     const jogArmedRef = useRef(false);
-    const jogHandlerRef = useRef<((e: PointerEvent) => void) | null>(null);
+    const jogHandlersRef = useRef<{
+        down: (e: PointerEvent) => void;
+        move: (e: PointerEvent) => void;
+        end: (e: PointerEvent) => void;
+        contextMenu: (e: Event) => void;
+    } | null>(null);
+    const [moveHold, setMoveHold] = useState<MoveHold | null>(null);
     const lastPositionRef = useRef({ x: 0, y: 0, z: 0 });
 
     const options = useMemo<Partial<GCodeViewerOptions>>(
@@ -166,16 +187,46 @@ function VisualizerImpl(
         isConnectedRef.current &&
         activeStateRef.current === GRBL_ACTIVE_STATE_IDLE;
 
+    // Cleans up whatever press-and-hold is in flight; armJog fills it in.
+    const cancelHoldRef = useRef<() => void>(() => {});
+
     const disarmJog = () => {
         if (!jogArmedRef.current) return;
+        cancelHoldRef.current();
         const el = containerRef.current;
-        if (jogHandlerRef.current) {
-            el?.removeEventListener('pointerup', jogHandlerRef.current);
+        const handlers = jogHandlersRef.current;
+        if (handlers) {
+            el?.removeEventListener('pointerdown', handlers.down);
+            el?.removeEventListener('pointermove', handlers.move);
+            el?.removeEventListener('pointerup', handlers.end);
+            el?.removeEventListener('pointercancel', handlers.end);
+            el?.removeEventListener('contextmenu', handlers.contextMenu);
         }
-        jogHandlerRef.current = null;
+        jogHandlersRef.current = null;
         withViewer((v) => v.setPanZoomEnabled(true));
         jogArmedRef.current = false;
         onJogArmedChange?.(false);
+    };
+
+    const commitMove = (clientX: number, clientY: number) => {
+        if (!machineReadyForJog()) {
+            toast.info(MACHINE_NOT_READY_MESSAGE, {
+                position: 'bottom-right',
+            });
+            return;
+        }
+        withViewer((v) => {
+            const world = v.screenToWorld(clientX, clientY);
+            if (!world) return;
+            const x = Number(world.x.toFixed(3));
+            const y = Number(world.y.toFixed(3));
+            const unitModal = unitsRef.current === METRIC_UNITS ? 'G21' : 'G20';
+            controller.command('gcode:safe', getSafeXYMoveCode(x, y), unitModal);
+            if (navigator.vibrate) navigator.vibrate(12);
+            toast.success(`Moving to X${x.toFixed(2)} Y${y.toFixed(2)}`, {
+                position: 'bottom-right',
+            });
+        });
     };
 
     const armJog = () => {
@@ -189,37 +240,90 @@ function VisualizerImpl(
         const el = containerRef.current;
         if (!el) return;
 
-        // One-shot: the next tap commits the move (or is dropped, if the
-        // machine stopped being ready) and disarms, mirroring the desktop's
-        // "Move To Here" gesture.
-        const handlePointerUp = (e: PointerEvent) => {
-            disarmJog();
-            if (!machineReadyForJog()) {
-                toast.info(MACHINE_NOT_READY_MESSAGE, {
-                    position: 'bottom-right',
-                });
+        // A press only becomes a move once held for MOVE_HOLD_MS without
+        // drifting; a ring around the finger shows the progress. A short or
+        // dragged press is dropped and leaves the move armed.
+        let press: {
+            id: number;
+            clientX: number;
+            clientY: number;
+            x: number;
+            y: number;
+            start: number;
+            frame: number;
+        } | null = null;
+
+        const endPress = () => {
+            if (press) cancelAnimationFrame(press.frame);
+            press = null;
+            setMoveHold(null);
+        };
+        cancelHoldRef.current = endPress;
+
+        const tick = () => {
+            if (!press) return;
+            const progress = Math.min(
+                1,
+                (performance.now() - press.start) / MOVE_HOLD_MS,
+            );
+            if (progress < 1) {
+                setMoveHold({ x: press.x, y: press.y, progress });
+                press.frame = requestAnimationFrame(tick);
                 return;
             }
-            withViewer((v) => {
-                const world = v.screenToWorld(e.clientX, e.clientY);
-                if (!world) return;
-                const x = Number(world.x.toFixed(3));
-                const y = Number(world.y.toFixed(3));
-                const unitModal =
-                    unitsRef.current === METRIC_UNITS ? 'G21' : 'G20';
-                controller.command(
-                    'gcode:safe',
-                    getSafeXYMoveCode(x, y),
-                    unitModal,
-                );
-                toast.success(`Moving to X${x.toFixed(2)} Y${y.toFixed(2)}`, {
-                    position: 'bottom-right',
-                });
-            });
+            const { clientX, clientY } = press;
+            endPress();
+            disarmJog();
+            commitMove(clientX, clientY);
         };
 
-        jogHandlerRef.current = handlePointerUp;
-        el.addEventListener('pointerup', handlePointerUp);
+        const down = (e: PointerEvent) => {
+            if (press || !e.isPrimary) return;
+            const rect = el.getBoundingClientRect();
+            press = {
+                id: e.pointerId,
+                clientX: e.clientX,
+                clientY: e.clientY,
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top,
+                start: performance.now(),
+                frame: 0,
+            };
+            setMoveHold({ x: press.x, y: press.y, progress: 0 });
+            press.frame = requestAnimationFrame(tick);
+        };
+
+        const move = (e: PointerEvent) => {
+            if (!press || e.pointerId !== press.id) return;
+            if (
+                Math.hypot(e.clientX - press.clientX, e.clientY - press.clientY) >
+                MOVE_SLOP_PX
+            ) {
+                endPress();
+            }
+        };
+
+        const end = (e: PointerEvent) => {
+            if (!press || e.pointerId !== press.id) return;
+            const wasTap = performance.now() - press.start < HOLD_TAP_MAX_MS;
+            endPress();
+            if (wasTap && e.type === 'pointerup') {
+                toast.info('Hold on a spot to move there', {
+                    id: 'pendant-move-hold-hint',
+                    position: 'bottom-right',
+                });
+            }
+        };
+
+        // Android fires the long-press menu before the hold completes
+        const contextMenu = (e: Event) => e.preventDefault();
+
+        jogHandlersRef.current = { down, move, end, contextMenu };
+        el.addEventListener('pointerdown', down);
+        el.addEventListener('pointermove', move);
+        el.addEventListener('pointerup', end);
+        el.addEventListener('pointercancel', end);
+        el.addEventListener('contextmenu', contextMenu);
         withViewer((v) => v.setPanZoomEnabled(false));
         jogArmedRef.current = true;
         onJogArmedChange?.(true);
@@ -297,13 +401,57 @@ function VisualizerImpl(
     }, [wposKey]);
 
     return (
-        <div ref={containerRef} className="w-full h-full">
+        // touch-none/select-none: a held press must not turn into a browser
+        // scroll, selection or long-press menu, which would cancel it
+        <div
+            ref={containerRef}
+            className="relative w-full h-full touch-none select-none"
+        >
             <GCodeVisualizer
                 ref={viewerRef}
                 id="pendant-gl-vis"
                 options={options}
                 className="w-full h-full"
             />
+            {moveHold && (
+                <svg
+                    aria-hidden
+                    width={RING_SIZE}
+                    height={RING_SIZE}
+                    viewBox={`0 0 ${RING_SIZE} ${RING_SIZE}`}
+                    className="absolute pointer-events-none -rotate-90 animate-[move-ring-flash_0.5s_ease-in-out_infinite] motion-reduce:animate-none"
+                    style={{
+                        left: moveHold.x - RING_SIZE / 2,
+                        top: moveHold.y - RING_SIZE / 2,
+                    }}
+                >
+                    <circle
+                        cx={RING_SIZE / 2}
+                        cy={RING_SIZE / 2}
+                        r={RING_R}
+                        fill="none"
+                        strokeWidth={RING_STROKE}
+                        className="stroke-robin-500/30"
+                    />
+                    <circle
+                        cx={RING_SIZE / 2}
+                        cy={RING_SIZE / 2}
+                        r={RING_R}
+                        fill="none"
+                        strokeWidth={RING_STROKE}
+                        strokeLinecap="round"
+                        className="stroke-robin-400"
+                        strokeDasharray={RING_C}
+                        strokeDashoffset={RING_C * (1 - moveHold.progress)}
+                    />
+                    <circle
+                        cx={RING_SIZE / 2}
+                        cy={RING_SIZE / 2}
+                        r={3}
+                        className="fill-robin-400"
+                    />
+                </svg>
+            )}
         </div>
     );
 }

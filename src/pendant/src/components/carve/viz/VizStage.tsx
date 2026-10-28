@@ -2,6 +2,7 @@ import type { ToolEntry } from 'app/features/ToolsPage/registry';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import type { RootState } from 'app/store/redux';
 import cn from 'classnames';
+import { Crosshair, X } from 'lucide-react';
 import { useRef, useState } from 'react';
 import DepthGauge from '../../DepthGauge';
 import Visualizer, { type VisualizerHandle } from '../../Visualizer';
@@ -25,6 +26,12 @@ const RING: Partial<Record<CarveMode, string>> = {
     toolchange: 'shadow-state-tool/50 border-state-tool/45',
 };
 
+// Tap-to-move armed: the next hold on the canvas moves the machine, so it
+// gets its own unmistakable breathing glow. Only armable while idle, so it
+// never competes with the run/alarm rings.
+const ARMED_RING =
+    'border-2 shadow-robin-500/55 border-robin-500/60 animate-[viz-glow_1.2s_ease-in-out_infinite]';
+
 export default function VizStage({
     mode,
     onOpenTool,
@@ -41,9 +48,9 @@ export default function VizStage({
             ? (s.file as any).processingName || s.file.name || ''
             : s.file.name || '',
     );
-    const ring = RING[mode];
     const visualizerRef = useRef<VisualizerHandle>(null);
     const [jogArmed, setJogArmed] = useState(false);
+    const ring = jogArmed ? ARMED_RING : RING[mode];
 
     return (
         <div className="relative h-[42vh] shrink-0 border-b border-outline-subtle bg-surface-base overflow-hidden">
@@ -69,6 +76,23 @@ export default function VizStage({
             </div>
             <InfoGlass />
             <VizJobControls mode={mode} />
+
+            {jogArmed && !fileProcessing && (
+                // Only the dismiss button takes pointer events, so presses
+                // beside the pill still reach the canvas
+                <div className="absolute left-1/2 top-2.5 z-10 -translate-x-1/2 flex items-center gap-2 pl-2.5 pr-1 py-1 rounded-md border border-robin-500/70 bg-surface-sunken/[0.8] backdrop-blur-md text-xs font-medium text-robin-300 whitespace-nowrap pointer-events-none">
+                    <Crosshair className="h-4 w-4 shrink-0" aria-hidden />
+                    <span>Move armed — hold on a spot to move</span>
+                    <button
+                        type="button"
+                        aria-label="Cancel move"
+                        onClick={() => visualizerRef.current?.disarmJog()}
+                        className="pointer-events-auto flex h-8 w-8 items-center justify-center rounded text-content-secondary hover:text-content-primary"
+                    >
+                        <X className="h-4 w-4" aria-hidden />
+                    </button>
+                </div>
+            )}
 
             {fileProcessing && (
                 <div className="absolute inset-0 flex items-center justify-center p-3 bg-dark-darker/95">
