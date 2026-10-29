@@ -4,25 +4,46 @@ import { http, HttpResponse } from 'msw';
 import { RemoteModeDialog } from './index';
 
 const IP_LIST = [
-  { address: '192.168.0.42', iface: 'Wi-Fi', kind: 'wifi', label: 'Wi-Fi', usable: true, recommended: true },
-  { address: '10.0.0.7', iface: 'Ethernet', kind: 'ethernet', label: 'Ethernet', usable: true, recommended: false },
-  { address: '172.24.16.1', iface: 'vEthernet (WSL)', kind: 'virtual', label: 'Virtual adapter', usable: false, recommended: false },
+    {
+        address: '192.168.0.42',
+        iface: 'Wi-Fi',
+        kind: 'wifi',
+        label: 'Wi-Fi',
+        usable: true,
+        recommended: true,
+    },
+    {
+        address: '10.0.0.7',
+        iface: 'Ethernet',
+        kind: 'ethernet',
+        label: 'Ethernet',
+        usable: true,
+        recommended: false,
+    },
+    {
+        address: '172.24.16.1',
+        iface: 'vEthernet (WSL)',
+        kind: 'virtual',
+        label: 'Virtual adapter',
+        usable: false,
+        recommended: false,
+    },
 ];
 
 const meta = {
-  component: RemoteModeDialog,
-  tags: ['ai-generated'],
-  args: {
-    showRemote: true,
-    remoteIp: '192.168.0.42',
-    remotePort: 8000,
-    remoteOn: false,
-    onClose: fn(),
-    setHeadlessSettings: fn(),
-  },
-  // This computer's addresses as the server reports them (ip:list), applied to Redux
-  // by .storybook/machine-state.js
-  parameters: { machine: { preset: 'idle', ipList: IP_LIST } },
+    component: RemoteModeDialog,
+    tags: ['ai-generated'],
+    args: {
+        showRemote: true,
+        remoteIp: '192.168.0.42',
+        remotePort: 8000,
+        remoteOn: false,
+        onClose: fn(),
+        setHeadlessSettings: fn(),
+    },
+    // This computer's addresses as the server reports them (ip:list), applied to Redux
+    // by .storybook/machine-state.js
+    parameters: { machine: { preset: 'idle', ipList: IP_LIST } },
 };
 
 export default meta;
@@ -31,80 +52,110 @@ export default meta;
 const getBody = (canvasElement) => within(canvasElement.ownerDocument.body);
 
 const confirmSave = async (body, userEvent) => {
-  await userEvent.click(body.getByRole('button', { name: 'Save' }));
-  const confirm = await body.findByRole('alertdialog', { name: 'Save Wireless CNC Settings' });
-  await userEvent.click(within(confirm).getByRole('button', { name: 'Save Settings' }));
+    await userEvent.click(body.getByRole('button', { name: 'Save' }));
+    const confirm = await body.findByRole('alertdialog', {
+        name: 'Save Wireless CNC Settings',
+    });
+    await userEvent.click(
+        within(confirm).getByRole('button', { name: 'Save Settings' }),
+    );
 };
 
 export const Default = {
-  play: async ({ canvasElement }) => {
-    const body = getBody(canvasElement);
-    // The dialog fades in
-    await waitFor(() => expect(body.getByRole('dialog', { name: 'Wireless CNC Control' })).toBeVisible());
-    // Nothing to save until a setting changes
-    await expect(body.getByRole('button', { name: 'Save' })).toBeDisabled();
-    await expect(body.getByText('192.168.0.42:8000')).toBeVisible();
-  },
+    play: async ({ canvasElement }) => {
+        const body = getBody(canvasElement);
+        // The dialog fades in
+        await waitFor(() =>
+            expect(
+                body.getByRole('dialog', { name: 'Wireless CNC Control' }),
+            ).toBeVisible(),
+        );
+        // Nothing to save until a setting changes
+        await expect(body.getByRole('button', { name: 'Save' })).toBeDisabled();
+        await expect(body.getByText('192.168.0.42:8000')).toBeVisible();
+    },
 };
 
 export const EnableAndSave = {
-  play: async ({ args, canvasElement, userEvent, msw }) => {
-    let saved;
-    msw.use(
-      http.put('*/api/remote', async ({ request }) => {
-        saved = await request.json();
-        return HttpResponse.json({});
-      }),
-    );
-    const body = getBody(canvasElement);
-    await userEvent.click(await body.findByRole('switch'));
-    await confirmSave(body, userEvent);
+    play: async ({ args, canvasElement, userEvent, msw }) => {
+        let saved;
+        msw.use(
+            http.put('*/api/remote', async ({ request }) => {
+                saved = await request.json();
+                return HttpResponse.json({});
+            }),
+        );
+        const body = getBody(canvasElement);
+        await userEvent.click(await body.findByRole('switch'));
+        await confirmSave(body, userEvent);
 
-    const payload = { ip: '192.168.0.42', port: 8000, headlessStatus: true };
-    await waitFor(() => expect(saved).toEqual(payload));
-    await expect(args.setHeadlessSettings).toHaveBeenCalledWith(payload);
-    await expect(args.onClose).toHaveBeenCalledWith(false);
-    await waitFor(() => expect(body.getByText('Updated Wireless Control Settings')).toBeVisible());
-  },
+        const payload = {
+            ip: '192.168.0.42',
+            port: 8000,
+            headlessStatus: true,
+        };
+        await waitFor(() => expect(saved).toEqual(payload));
+        await expect(args.setHeadlessSettings).toHaveBeenCalledWith(payload);
+        await expect(args.onClose).toHaveBeenCalledWith(false);
+        await waitFor(() =>
+            expect(
+                body.getByText('Updated Wireless Control Settings'),
+            ).toBeVisible(),
+        );
+    },
 };
 
 export const ChooseAddress = {
-  play: async ({ canvasElement, userEvent }) => {
-    const body = getBody(canvasElement);
-    await userEvent.click(await body.findByRole('combobox'));
-    // Options show the address with its adapter description
-    await userEvent.click(await body.findByRole('option', { name: /10\.0\.0\.7/ }));
-    // The QR code panel shows the address phones should open
-    await waitFor(() => expect(body.getByText('10.0.0.7:8000')).toBeVisible());
-    // The Select hides the rest of the page from assistive tech until it finishes closing
-    await expect(await body.findByRole('button', { name: 'Save' })).toBeEnabled();
-  },
+    play: async ({ canvasElement, userEvent }) => {
+        const body = getBody(canvasElement);
+        await userEvent.click(await body.findByRole('combobox'));
+        // Options show the address with its adapter description
+        await userEvent.click(
+            await body.findByRole('option', { name: /10\.0\.0\.7/ }),
+        );
+        // The QR code panel shows the address phones should open
+        await waitFor(() =>
+            expect(body.getByText('10.0.0.7:8000')).toBeVisible(),
+        );
+        // The Select hides the rest of the page from assistive tech until it finishes closing
+        await expect(
+            await body.findByRole('button', { name: 'Save' }),
+        ).toBeEnabled();
+    },
 };
 
 export const RejectsReservedPort = {
-  play: async ({ args, canvasElement, userEvent, msw }) => {
-    const update = fn();
-    msw.use(http.put('*/api/remote', () => update() ?? HttpResponse.json({})));
-    const body = getBody(canvasElement);
-    const port = await body.findByRole('spinbutton');
-    await userEvent.clear(port);
-    await userEvent.type(port, '80');
-    await confirmSave(body, userEvent);
+    play: async ({ args, canvasElement, userEvent, msw }) => {
+        const update = fn();
+        msw.use(
+            http.put('*/api/remote', () => update() ?? HttpResponse.json({})),
+        );
+        const body = getBody(canvasElement);
+        const port = await body.findByRole('spinbutton');
+        await userEvent.clear(port);
+        await userEvent.type(port, '80');
+        await confirmSave(body, userEvent);
 
-    // Toasts fade in
-    await waitFor(() => expect(body.getByText(/Invalid Port Number/)).toBeVisible());
-    await expect(update).not.toHaveBeenCalled();
-    await expect(args.onClose).not.toHaveBeenCalled();
-  },
+        // Toasts fade in
+        await waitFor(() =>
+            expect(body.getByText(/Invalid Port Number/)).toBeVisible(),
+        );
+        await expect(update).not.toHaveBeenCalled();
+        await expect(args.onClose).not.toHaveBeenCalled();
+    },
 };
 
 export const UnreachableAddressesGrouped = {
-  play: async ({ canvasElement, userEvent }) => {
-    const body = getBody(canvasElement);
-    await userEvent.click(await body.findByRole('combobox'));
-    // Addresses other devices can't reach (e.g. WSL adapters) are set apart
-    // The menu fades in
-    await waitFor(() => expect(body.getByText('Other / advanced')).toBeVisible());
-    await expect(body.getByRole('option', { name: /172\.24\.16\.1/ })).toBeVisible();
-  },
+    play: async ({ canvasElement, userEvent }) => {
+        const body = getBody(canvasElement);
+        await userEvent.click(await body.findByRole('combobox'));
+        // Addresses other devices can't reach (e.g. WSL adapters) are set apart
+        // The menu fades in
+        await waitFor(() =>
+            expect(body.getByText('Other / advanced')).toBeVisible(),
+        );
+        await expect(
+            body.getByRole('option', { name: /172\.24\.16\.1/ }),
+        ).toBeVisible();
+    },
 };

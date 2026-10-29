@@ -1,64 +1,70 @@
 import {
-  closeConnection,
-  listPorts,
-  openConnection,
-  setConnectionState,
+    closeConnection,
+    listPorts,
+    openConnection,
+    setConnectionState,
 } from 'app/store/redux/slices/connection.slice';
 import {
-  addSDCardFileToList,
-  addSpindle,
-  clearSpindles,
-  emptyAllSDFiles,
-  updateControllerState,
-  updateHasHomed,
-  updateControllerSettings,
-  updateSenderStatus,
-  updateWorkflowState,
+    addSDCardFileToList,
+    addSpindle,
+    clearSpindles,
+    emptyAllSDFiles,
+    updateControllerState,
+    updateHasHomed,
+    updateControllerSettings,
+    updateSenderStatus,
+    updateWorkflowState,
 } from 'app/store/redux/slices/controller.slice';
-import { unloadFileInfo, updateFileInfo } from 'app/store/redux/slices/fileInfo.slice';
+import {
+    unloadFileInfo,
+    updateFileInfo,
+} from 'app/store/redux/slices/fileInfo.slice';
 import { setInputHistory } from 'app/store/redux/slices/console.slice';
 import { unloadHelperInfo } from 'app/store/redux/slices/helper.slice';
-import { setIpList, setNotifications } from 'app/store/redux/slices/preferences.slice';
+import {
+    setIpList,
+    setNotifications,
+} from 'app/store/redux/slices/preferences.slice';
 import { updateShuttleStatus } from 'app/store/redux/slices/shortcuts.slice';
 import { setCurrentVisualizer } from 'app/store/redux/slices/visualizer.slice';
 import {
-  GRBLHAL,
-  GRBL_ACTIVE_STATE_ALARM,
-  GRBL_ACTIVE_STATE_HOLD,
-  GRBL_ACTIVE_STATE_IDLE,
-  GRBL_ACTIVE_STATE_RUN,
-  METRIC_UNITS,
-  WORKFLOW_STATE_IDLE,
-  WORKFLOW_STATE_PAUSED,
-  VISUALIZER_PRIMARY,
-  WORKFLOW_STATE_RUNNING,
-  WORKSPACE_MODE,
+    GRBLHAL,
+    GRBL_ACTIVE_STATE_ALARM,
+    GRBL_ACTIVE_STATE_HOLD,
+    GRBL_ACTIVE_STATE_IDLE,
+    GRBL_ACTIVE_STATE_RUN,
+    METRIC_UNITS,
+    WORKFLOW_STATE_IDLE,
+    WORKFLOW_STATE_PAUSED,
+    VISUALIZER_PRIMARY,
+    WORKFLOW_STATE_RUNNING,
+    WORKSPACE_MODE,
 } from 'app/constants';
 
 // Presets describe what the controller would report over the socket.
 // Stories pick one with `parameters: { machine: { preset: 'idle' } }`.
 const PRESETS = {
-  disconnected: { isConnected: false },
-  idle: {
-    isConnected: true,
-    activeState: GRBL_ACTIVE_STATE_IDLE,
-    workflow: WORKFLOW_STATE_IDLE,
-  },
-  running: {
-    isConnected: true,
-    activeState: GRBL_ACTIVE_STATE_RUN,
-    workflow: WORKFLOW_STATE_RUNNING,
-  },
-  hold: {
-    isConnected: true,
-    activeState: GRBL_ACTIVE_STATE_HOLD,
-    workflow: WORKFLOW_STATE_PAUSED,
-  },
-  alarm: {
-    isConnected: true,
-    activeState: GRBL_ACTIVE_STATE_ALARM,
-    workflow: WORKFLOW_STATE_IDLE,
-  },
+    disconnected: { isConnected: false },
+    idle: {
+        isConnected: true,
+        activeState: GRBL_ACTIVE_STATE_IDLE,
+        workflow: WORKFLOW_STATE_IDLE,
+    },
+    running: {
+        isConnected: true,
+        activeState: GRBL_ACTIVE_STATE_RUN,
+        workflow: WORKFLOW_STATE_RUNNING,
+    },
+    hold: {
+        isConnected: true,
+        activeState: GRBL_ACTIVE_STATE_HOLD,
+        workflow: WORKFLOW_STATE_PAUSED,
+    },
+    alarm: {
+        isConnected: true,
+        activeState: GRBL_ACTIVE_STATE_ALARM,
+        workflow: WORKFLOW_STATE_IDLE,
+    },
 };
 
 const ORIGIN = { x: 0, y: 0, z: 0, a: 0, b: 0, c: 0 };
@@ -69,116 +75,126 @@ const DEFAULT_SETTINGS = { $13: '0', $22: '0', $23: '0', $27: '1', $32: '0' };
 // The preview shares one Redux store across stories, so every story resets
 // it through the same actions the socket listeners dispatch in the app.
 export function applyMachineState(
-  store,
-  {
-    preset = 'disconnected',
-    type = GRBLHAL,
-    modal = {},
-    mpos = ORIGIN,
-    wpos = mpos,
-    axes = ['X', 'Y', 'Z'],
-    settings = {},
-    hasHomed = false,
-    // Firmware build options, e.g. { NEWOPT: { YM: '' } } for YMODEM SD transfers
-    info = {},
-    // Firmware version as reported at startup, e.g. '1.1f'
-    version,
-    // ATC tool table keyed by tool number, e.g. { 1: { id: 1, toolOffsets: { x: 0, y: 0, z: -12.5 }, toolRadius: 3.175 } }
-    toolTable,
-    // ATCi settings reported by the firmware, e.g. { rack_size: 6 }
-    atci,
-    // Extra fields for controller.state.status, e.g. { alarmCode: 1 } or { activeState: 'Door' }
-    status = {},
-    // grblHAL spindle list, e.g. [{ id: 0, label: 'Spindle', enabled: true, laser: false }]
-    spindles = [],
-    notifications = [],
-    // Loaded G-code file info, e.g. { name: 'part.nc', total: 4000 }; omit for no file
-    file,
-    // Sender progress while a job runs, e.g. { sent: 1200, total: 4000, remainingTime: 900 }
-    sender = null,
-    // Port the machine is connected on (only used when connected), e.g. 'COM4'
-    port,
-    // Serial ports the server lists, e.g. [{ port: '/dev/ttyACM0', manufacturer: 'Arduino', inuse: false }]
-    ports = [],
-    unrecognizedPorts = [],
-    // Commands previously typed into the console (ArrowUp recalls them)
-    consoleInputHistory = [],
-    // This machine's network addresses, offered for wireless control
-    ipList = [],
-    // Files on the controller's SD card, e.g. [{ name: 'part.nc', size: 20480 }]
-    sdFiles = [],
-  } = {},
+    store,
+    {
+        preset = 'disconnected',
+        type = GRBLHAL,
+        modal = {},
+        mpos = ORIGIN,
+        wpos = mpos,
+        axes = ['X', 'Y', 'Z'],
+        settings = {},
+        hasHomed = false,
+        // Firmware build options, e.g. { NEWOPT: { YM: '' } } for YMODEM SD transfers
+        info = {},
+        // Firmware version as reported at startup, e.g. '1.1f'
+        version,
+        // ATC tool table keyed by tool number, e.g. { 1: { id: 1, toolOffsets: { x: 0, y: 0, z: -12.5 }, toolRadius: 3.175 } }
+        toolTable,
+        // ATCi settings reported by the firmware, e.g. { rack_size: 6 }
+        atci,
+        // Extra fields for controller.state.status, e.g. { alarmCode: 1 } or { activeState: 'Door' }
+        status = {},
+        // grblHAL spindle list, e.g. [{ id: 0, label: 'Spindle', enabled: true, laser: false }]
+        spindles = [],
+        notifications = [],
+        // Loaded G-code file info, e.g. { name: 'part.nc', total: 4000 }; omit for no file
+        file,
+        // Sender progress while a job runs, e.g. { sent: 1200, total: 4000, remainingTime: 900 }
+        sender = null,
+        // Port the machine is connected on (only used when connected), e.g. 'COM4'
+        port,
+        // Serial ports the server lists, e.g. [{ port: '/dev/ttyACM0', manufacturer: 'Arduino', inuse: false }]
+        ports = [],
+        unrecognizedPorts = [],
+        // Commands previously typed into the console (ArrowUp recalls them)
+        consoleInputHistory = [],
+        // This machine's network addresses, offered for wireless control
+        ipList = [],
+        // Files on the controller's SD card, e.g. [{ name: 'part.nc', size: 20480 }]
+        sdFiles = [],
+    } = {},
 ) {
-  const { isConnected, activeState, workflow = WORKFLOW_STATE_IDLE } = PRESETS[preset];
+    const {
+        isConnected,
+        activeState,
+        workflow = WORKFLOW_STATE_IDLE,
+    } = PRESETS[preset];
 
-  store.dispatch(closeConnection());
-  if (isConnected && port) {
-    store.dispatch(openConnection({ port, baudrate: '115200', isConnected }));
-  }
-  store.dispatch(setConnectionState({ isConnected }));
-  store.dispatch(listPorts({ ports, unrecognizedPorts, networkPorts: [] }));
-  // Replace (not merge) settings so nothing leaks from the previous story
-  store.dispatch(
-    updateControllerSettings({
-      type: isConnected ? type : '',
-      settings: {
-        parameters: {},
-        groups: {},
-        settings: { ...DEFAULT_SETTINGS, ...settings },
-        info,
-        ...(version && { version }),
-        ...(toolTable && { toolTable }),
-        ...(atci && { atci }),
-      },
-    }),
-  );
-  // The reducer always builds a status object, so give it the full shape the
-  // server reports (pinState included) even when disconnected
-  store.dispatch(
-    updateControllerState({
-      type: isConnected ? type : '',
-      state: {
-        status: {
-          activeState,
-          mpos: { ...ORIGIN, ...mpos },
-          wpos: { ...ORIGIN, ...wpos },
-          feedrate: 0,
-          pinState: {},
-          // grblHAL status reports always carry SD; name is null when no SD job runs
-          ...(type === GRBLHAL && { SD: { name: null, percentage: 0 } }),
-          ...status,
-        },
-        parserstate: { modal },
-        axes: { axes },
-      },
-    }),
-  );
-  store.dispatch(updateWorkflowState({ state: workflow }));
-  store.dispatch(updateHasHomed({ hasHomed }));
-  store.dispatch(clearSpindles());
-  spindles.forEach((spindle, order) =>
-    store.dispatch(addSpindle({ capabilities: '', raw: '', order, ...spindle })),
-  );
-  store.dispatch(setNotifications(notifications));
-  store.dispatch(unloadFileInfo());
-  if (file) store.dispatch(updateFileInfo(file));
-  store.dispatch(updateSenderStatus({ status: sender }));
-  store.dispatch(setInputHistory(consoleInputHistory));
-  store.dispatch(setIpList(ipList));
-  // Keyboard shortcuts have finished loading, as they always have once the app is up
-  store.dispatch(updateShuttleStatus({ isFinished: true }));
-  // The main visualizer is active (Surfacing's preview switches to the secondary one)
-  store.dispatch(setCurrentVisualizer(VISUALIZER_PRIMARY));
-  // Helper/wizard panels start closed
-  store.dispatch(unloadHelperInfo());
-  store.dispatch(emptyAllSDFiles());
-  sdFiles.forEach((file) => store.dispatch(addSDCardFileToList({ file })));
+    store.dispatch(closeConnection());
+    if (isConnected && port) {
+        store.dispatch(
+            openConnection({ port, baudrate: '115200', isConnected }),
+        );
+    }
+    store.dispatch(setConnectionState({ isConnected }));
+    store.dispatch(listPorts({ ports, unrecognizedPorts, networkPorts: [] }));
+    // Replace (not merge) settings so nothing leaks from the previous story
+    store.dispatch(
+        updateControllerSettings({
+            type: isConnected ? type : '',
+            settings: {
+                parameters: {},
+                groups: {},
+                settings: { ...DEFAULT_SETTINGS, ...settings },
+                info,
+                ...(version && { version }),
+                ...(toolTable && { toolTable }),
+                ...(atci && { atci }),
+            },
+        }),
+    );
+    // The reducer always builds a status object, so give it the full shape the
+    // server reports (pinState included) even when disconnected
+    store.dispatch(
+        updateControllerState({
+            type: isConnected ? type : '',
+            state: {
+                status: {
+                    activeState,
+                    mpos: { ...ORIGIN, ...mpos },
+                    wpos: { ...ORIGIN, ...wpos },
+                    feedrate: 0,
+                    pinState: {},
+                    // grblHAL status reports always carry SD; name is null when no SD job runs
+                    ...(type === GRBLHAL && {
+                        SD: { name: null, percentage: 0 },
+                    }),
+                    ...status,
+                },
+                parserstate: { modal },
+                axes: { axes },
+            },
+        }),
+    );
+    store.dispatch(updateWorkflowState({ state: workflow }));
+    store.dispatch(updateHasHomed({ hasHomed }));
+    store.dispatch(clearSpindles());
+    spindles.forEach((spindle, order) =>
+        store.dispatch(
+            addSpindle({ capabilities: '', raw: '', order, ...spindle }),
+        ),
+    );
+    store.dispatch(setNotifications(notifications));
+    store.dispatch(unloadFileInfo());
+    if (file) store.dispatch(updateFileInfo(file));
+    store.dispatch(updateSenderStatus({ status: sender }));
+    store.dispatch(setInputHistory(consoleInputHistory));
+    store.dispatch(setIpList(ipList));
+    // Keyboard shortcuts have finished loading, as they always have once the app is up
+    store.dispatch(updateShuttleStatus({ isFinished: true }));
+    // The main visualizer is active (Surfacing's preview switches to the secondary one)
+    store.dispatch(setCurrentVisualizer(VISUALIZER_PRIMARY));
+    // Helper/wizard panels start closed
+    store.dispatch(unloadHelperInfo());
+    store.dispatch(emptyAllSDFiles());
+    sdFiles.forEach((file) => store.dispatch(addSDCardFileToList({ file })));
 }
 
 const DEFAULT_WORKSPACE = {
-  units: METRIC_UNITS,
-  shouldWarnZero: false,
-  mode: WORKSPACE_MODE.DEFAULT,
+    units: METRIC_UNITS,
+    shouldWarnZero: false,
+    mode: WORKSPACE_MODE.DEFAULT,
 };
 
 let initialAppState;
@@ -189,18 +205,21 @@ let initialAppState;
 // `parameters: { workspace: { units: 'in' } }` and any other key paths via
 // `parameters: { appStore: { 'widgets.probe.connectivityTest': false } }`.
 export function applyAppState(store, { workspace = {}, appStore = {} } = {}) {
-  initialAppState ??= structuredClone(store.state);
-  store.state = structuredClone(initialAppState);
+    initialAppState ??= structuredClone(store.state);
+    store.state = structuredClone(initialAppState);
 
-  // replace, not set: set deep-merges, so e.g. an empty array wouldn't clear a list
-  for (const [key, value] of Object.entries({ ...DEFAULT_WORKSPACE, ...workspace })) {
-    store.replace(`workspace.${key}`, value);
-  }
-  for (const [path, value] of Object.entries(appStore)) {
-    store.replace(path, value);
-  }
-  // The reset above assigns state directly and replace() skips unchanged values,
-  // so tell subscribers (useWorkspaceState, useWidgetState) the state may differ
-  // from what the previous story left them with
-  store.emit('change', store.state);
+    // replace, not set: set deep-merges, so e.g. an empty array wouldn't clear a list
+    for (const [key, value] of Object.entries({
+        ...DEFAULT_WORKSPACE,
+        ...workspace,
+    })) {
+        store.replace(`workspace.${key}`, value);
+    }
+    for (const [path, value] of Object.entries(appStore)) {
+        store.replace(path, value);
+    }
+    // The reset above assigns state directly and replace() skips unchanged values,
+    // so tell subscribers (useWorkspaceState, useWidgetState) the state may differ
+    // from what the previous story left them with
+    store.emit('change', store.state);
 }

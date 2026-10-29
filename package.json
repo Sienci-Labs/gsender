@@ -473,20 +473,20 @@
     "vite-css-modules": "^1.11.1",
     "vite-plugin-node-polyfills": "0.23.0",
     "vite-tsconfig-paths": "5.0.1",
-    "@chromatic-com/storybook": "latest",
+    "@chromatic-com/storybook": "^5.6.0",
     "@storybook/addon-a11y": "^10.6.3",
     "@storybook/addon-docs": "^10.6.3",
     "@storybook/addon-mcp": "^10.6.3",
     "@storybook/addon-vitest": "^10.6.3",
     "@storybook/tanstack-react": "^10.6.3",
-    "@tanstack/react-query": "latest",
-    "@vitest/browser-playwright": "latest",
-    "@vitest/coverage-v8": "latest",
+    "@vitest/browser-playwright": "^5.0.5",
+    "@vitest/coverage-v8": "^5.0.5",
     "msw": "^3.0.3",
     "msw-storybook-addon": "^3",
-    "playwright": "latest",
+    "playwright": "^1.64.1",
     "storybook": "^10.6.3",
-    "vitest": "latest"
+    "typescript": "^5.4.5",
+    "vitest": "^5.0.5"
   },
   "resolutions": {
     "@react-pdf/image": "3.0.4"

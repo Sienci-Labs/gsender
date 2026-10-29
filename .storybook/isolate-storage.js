@@ -7,14 +7,14 @@
 const STORE_KEY = 'sienci';
 
 try {
-  window.localStorage.removeItem(STORE_KEY);
-  const setItem = Storage.prototype.setItem;
-  Storage.prototype.setItem = function (key, value) {
-    if (this === window.localStorage && key === STORE_KEY) {
-      return;
-    }
-    return setItem.call(this, key, value);
-  };
+    window.localStorage.removeItem(STORE_KEY);
+    const setItem = Storage.prototype.setItem;
+    Storage.prototype.setItem = function (key, value) {
+        if (this === window.localStorage && key === STORE_KEY) {
+            return;
+        }
+        return setItem.call(this, key, value);
+    };
 } catch {
-  // Storage unavailable (e.g. blocked); app/store then starts from defaults anyway
+    // Storage unavailable (e.g. blocked); app/store then starts from defaults anyway
 }

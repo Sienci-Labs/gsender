@@ -11,7 +11,8 @@
       "**",
       "!src/server/**",
       "!cypress/fixtures/invalid-settings.json",
-      "!cypress/dashboard/report/index.html"
+      "!cypress/dashboard/report/index.html",
+      "!public/mockServiceWorker.js"
     ]
   },
   "formatter": {

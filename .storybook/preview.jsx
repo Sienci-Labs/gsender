@@ -20,11 +20,13 @@ import { applyAppState, applyMachineState } from './machine-state';
 // subscribe once a component using them mounts, so on a fresh page they would
 // miss what beforeEach applies for the first story. Mount subscribers up front.
 function StoreSubscribers() {
-  useWorkspaceState();
-  useWidgetState('rotary');
-  return null;
+    useWorkspaceState();
+    useWidgetState('rotary');
+    return null;
 }
-flushSync(() => createRoot(document.createElement('div')).render(<StoreSubscribers />));
+flushSync(() =>
+    createRoot(document.createElement('div')).render(<StoreSubscribers />),
+);
 
 // The full Vitest run renders many story files in parallel, so mocked requests,
 // workers and dialog animations can take well over Testing Library's 1s default.
@@ -33,43 +35,53 @@ configure({ asyncUtilTimeout: 3000 });
 
 /** @type { import('@storybook/tanstack-react').Preview } */
 const preview = {
-  decorators: [
-    // Same provider tree as src/app/src/App.tsx, plus what workspace/index.tsx wraps
-    // every page in: SettingsProvider and the ConfirmationDialog that renders
-    // Confirm() requests published over pubsub
-    (Story) => (
-      <ReduxProvider store={reduxStore}>
-        <Toaster richColors closeButton theme="light" visibleToasts={5} />
-        <HashRouter>
-          <SettingsProvider>
-            <ConfirmationDialog />
-            <Story />
-          </SettingsProvider>
-        </HashRouter>
-      </ReduxProvider>
-    ),
-  ],
-  loaders: [mswLoader()],
-  async beforeEach({ msw, parameters }) {
-    msw.use(...mswHandlers);
-    applyMachineState(reduxStore, parameters.machine);
-    applyAppState(appStore, parameters);
-  },
-  parameters: {
-    controls: {
-      matchers: {
-       color: /(background|color)$/i,
-       date: /Date$/i,
-      },
+    decorators: [
+        // Same provider tree as src/app/src/App.tsx, plus what workspace/index.tsx wraps
+        // every page in: SettingsProvider and the ConfirmationDialog that renders
+        // Confirm() requests published over pubsub
+        (Story) => (
+            <ReduxProvider store={reduxStore}>
+                <Toaster
+                    richColors
+                    closeButton
+                    theme="light"
+                    visibleToasts={5}
+                />
+                <HashRouter>
+                    <SettingsProvider>
+                        <ConfirmationDialog />
+                        <Story />
+                    </SettingsProvider>
+                </HashRouter>
+            </ReduxProvider>
+        ),
+    ],
+    loaders: [mswLoader()],
+    async beforeEach({ msw, parameters }) {
+        msw.use(...mswHandlers);
+        applyMachineState(reduxStore, parameters.machine);
+        applyAppState(appStore, parameters);
     },
+    parameters: {
+        controls: {
+            // Show each prop's type, default and description beside its control
+            expanded: true,
+            sort: 'requiredFirst',
+            // Event handlers can't be edited as values; pass fn() and watch Actions
+            exclude: /^on[A-Z]/,
+            matchers: {
+                color: /(background|color)$/i,
+                date: /Date$/i,
+            },
+        },
 
-    a11y: {
-      // 'todo' - show a11y violations in the test UI only
-      // 'error' - fail CI on a11y violations
-      // 'off' - skip a11y checks entirely
-      test: "todo"
-    }
-  },
+        a11y: {
+            // 'todo' - show a11y violations in the test UI only
+            // 'error' - fail CI on a11y violations
+            // 'off' - skip a11y checks entirely
+            test: 'todo',
+        },
+    },
 };
 
 export default preview;
