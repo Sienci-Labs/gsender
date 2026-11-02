@@ -43,7 +43,7 @@ import {
 
 // Presets describe what the controller would report over the socket.
 // Stories pick one with `parameters: { machine: { preset: 'idle' } }`.
-const PRESETS = {
+export const PRESETS = {
     disconnected: { isConnected: false },
     idle: {
         isConnected: true,

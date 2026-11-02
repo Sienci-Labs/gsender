@@ -15,6 +15,11 @@ import ConfirmationDialog from 'app/components/ConfirmationDialog/ConfirmationDi
 import { SettingsProvider } from 'app/features/Config/utils/SettingsContext';
 import { mswHandlers } from './msw-handlers';
 import { applyAppState, applyMachineState } from './machine-state';
+import {
+    argsEnhancers,
+    argTypesEnhancers,
+    stateFromArgs,
+} from './machine-args';
 
 // useWorkspaceState and useWidgetState snapshot app/store at import and only
 // subscribe once a component using them mounts, so on a fresh page they would
@@ -57,10 +62,15 @@ const preview = {
         ),
     ],
     loaders: [mswLoader()],
-    async beforeEach({ msw, parameters }) {
+    argTypesEnhancers,
+    argsEnhancers,
+    // Storybook re-runs this when args change, so the machine state controls
+    // (see machine-args.js) take effect without remounting the story
+    async beforeEach({ msw, parameters, argsByTarget }) {
         msw.use(...mswHandlers);
-        applyMachineState(reduxStore, parameters.machine);
-        applyAppState(appStore, parameters);
+        const { machine, workspace } = stateFromArgs(parameters, argsByTarget);
+        applyMachineState(reduxStore, machine);
+        applyAppState(appStore, { ...parameters, workspace });
     },
     parameters: {
         controls: {
