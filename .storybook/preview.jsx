@@ -40,6 +40,11 @@ configure({ asyncUtilTimeout: 3000 });
 
 /** @type { import('@storybook/tanstack-react').Preview } */
 const preview = {
+    // Generate a Docs page for every component from its stories, argTypes and JSDoc.
+    // Feature stories set `docs.story.inline: false`: inline stories on one Docs
+    // page share the Redux store and app/store, so each would show whatever state
+    // the last story applied. In their own iframes each gets its own stores.
+    tags: ['autodocs'],
     decorators: [
         // Same provider tree as src/app/src/App.tsx, plus what workspace/index.tsx wraps
         // every page in: SettingsProvider and the ConfirmationDialog that renders

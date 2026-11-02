@@ -44,7 +44,10 @@ const meta = {
     component: Visualizer,
     tags: ['ai-generated'],
     // Machine state is applied by .storybook/machine-state.js
-    parameters: { machine: { preset: 'idle' } },
+    parameters: {
+        docs: { story: { inline: false, height: '600px' } },
+        machine: { preset: 'idle' },
+    },
     beforeEach: startSagas,
     decorators: [
         (Story) => (

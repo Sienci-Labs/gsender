@@ -20,7 +20,10 @@ const meta = {
     component: JobControl,
     tags: ['ai-generated'],
     // Machine state is applied by .storybook/machine-state.js
-    parameters: { machine: { preset: 'idle', file: FILE } },
+    parameters: {
+        docs: { story: { inline: false, height: '460px' } },
+        machine: { preset: 'idle', file: FILE },
+    },
     decorators: [
         // Buttons and progress are absolutely positioned above the widget (top-[-80px])
         (Story) => (

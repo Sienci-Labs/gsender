@@ -7,7 +7,10 @@ const meta = {
     component: DRO,
     tags: ['ai-generated'],
     // Machine and workspace state are applied by .storybook/machine-state.js
-    parameters: { machine: { preset: 'idle' } },
+    parameters: {
+        docs: { story: { inline: false, height: '300px' } },
+        machine: { preset: 'idle' },
+    },
     decorators: [
         (Story) => (
             <div className="w-[420px] p-4">

@@ -6,7 +6,10 @@ const meta = {
     component: Tools,
     tags: ['ai-generated'],
     // Machine and workspace state are applied by .storybook/machine-state.js
-    parameters: { machine: { preset: 'idle' } },
+    parameters: {
+        docs: { story: { inline: false, height: '830px' } },
+        machine: { preset: 'idle' },
+    },
     decorators: [
         // The tab strip sits absolutely above the widget body (Tabs uses top-[-41px])
         (Story) => (

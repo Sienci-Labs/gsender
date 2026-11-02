@@ -7,7 +7,10 @@ const meta = {
     component: WorkspaceSelector,
     tags: ['ai-generated'],
     // Machine state is applied by .storybook/machine-state.js
-    parameters: { machine: { preset: 'idle' } },
+    parameters: {
+        docs: { story: { inline: false, height: '100px' } },
+        machine: { preset: 'idle' },
+    },
     decorators: [
         // Positioned absolutely (top-4 right-4) in the visualizer corner
         (Story) => (

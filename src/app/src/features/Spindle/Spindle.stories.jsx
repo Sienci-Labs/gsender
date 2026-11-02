@@ -7,7 +7,10 @@ const meta = {
     component: SpindleWidget,
     tags: ['ai-generated'],
     // Machine state is applied by .storybook/machine-state.js
-    parameters: { machine: { preset: 'idle' } },
+    parameters: {
+        docs: { story: { inline: false, height: '680px' } },
+        machine: { preset: 'idle' },
+    },
     decorators: [
         (Story) => (
             <div className="h-64 w-[420px]">

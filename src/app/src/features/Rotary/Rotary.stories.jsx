@@ -16,7 +16,10 @@ const meta = {
     component: RotaryNew,
     tags: ['ai-generated'],
     // Machine and workspace state are applied by .storybook/machine-state.js
-    parameters: { machine: GRBL_IDLE },
+    parameters: {
+        docs: { story: { inline: false, height: '900px' } },
+        machine: GRBL_IDLE,
+    },
     decorators: [
         (Story) => (
             <div className="h-[260px] w-[460px] p-4">

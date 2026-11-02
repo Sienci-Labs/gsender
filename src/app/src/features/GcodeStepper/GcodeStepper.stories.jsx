@@ -40,7 +40,10 @@ const meta = {
     args: { open: true, onOpenChange: fn() },
     // Machine state is applied by .storybook/machine-state.js. Parameters
     // deep-merge, so each story names its whole file rather than overriding one.
-    parameters: { machine: { preset: 'idle' } },
+    parameters: {
+        docs: { story: { inline: false, height: '850px' } },
+        machine: { preset: 'idle' },
+    },
 };
 
 export default meta;

@@ -8,6 +8,7 @@ const meta = {
     tags: ['ai-generated'],
     // Machine state is applied by .storybook/machine-state.js
     parameters: {
+        docs: { story: { inline: false, height: '920px' } },
         machine: {
             preset: 'idle',
             modal: { wcs: 'G55', units: 'G20', spindle: 'M3', coolant: 'M8' },

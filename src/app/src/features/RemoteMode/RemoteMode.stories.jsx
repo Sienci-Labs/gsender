@@ -43,7 +43,10 @@ const meta = {
     },
     // This computer's addresses as the server reports them (ip:list), applied to Redux
     // by .storybook/machine-state.js
-    parameters: { machine: { preset: 'idle', ipList: IP_LIST } },
+    parameters: {
+        docs: { story: { inline: false, height: '900px' } },
+        machine: { preset: 'idle', ipList: IP_LIST },
+    },
 };
 
 export default meta;

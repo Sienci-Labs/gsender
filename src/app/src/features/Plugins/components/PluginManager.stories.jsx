@@ -68,6 +68,7 @@ const pluginServer = (msw, initial) => {
 const meta = {
     component: PluginManager,
     tags: ['ai-generated'],
+    parameters: { docs: { story: { inline: false, height: '900px' } } },
     beforeEach: ({ msw, parameters }) => {
         if (parameters.plugins) {
             parameters.pluginRequests = pluginServer(msw, parameters.plugins);

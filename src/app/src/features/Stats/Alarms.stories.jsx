@@ -8,7 +8,10 @@ import { ALARMS, statsApi } from './statsFixtures';
 const meta = {
     component: Alarms,
     tags: ['ai-generated'],
-    parameters: { machine: { preset: 'idle', port: 'COM4' } },
+    parameters: {
+        docs: { story: { inline: false, height: '640px' } },
+        machine: { preset: 'idle', port: 'COM4' },
+    },
     beforeEach: statsApi({ alarms: ALARMS }),
     decorators: [
         // StatParent wraps the stats routes in StatsProvider

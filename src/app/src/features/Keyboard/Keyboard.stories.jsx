@@ -40,7 +40,10 @@ const meta = {
     component: Shortcuts,
     tags: ['ai-generated'],
     // Bindings live in app/store; applied by .storybook/machine-state.js
-    parameters: { appStore: { commandKeys: COMMAND_KEYS } },
+    parameters: {
+        docs: { story: { inline: false, height: '900px' } },
+        appStore: { commandKeys: COMMAND_KEYS },
+    },
     // On mount, combokeys.reload() snapshots commandKeys, awaits GET /api/macros, then
     // writes the snapshot back, reverting any change saved in between. Stories wait
     // for that request (as a user effectively does) before changing bindings; if it

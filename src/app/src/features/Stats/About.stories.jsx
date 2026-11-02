@@ -20,6 +20,7 @@ const RELEASES = [
 const meta = {
     component: About,
     tags: ['ai-generated'],
+    parameters: { docs: { story: { inline: false, height: '740px' } } },
     beforeEach: ({ msw }) => {
         msw.use(
             http.get('*/api/releasenotes', () => HttpResponse.json(RELEASES)),

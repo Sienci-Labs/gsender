@@ -5,6 +5,7 @@ import { AccessoryConnectivityToast } from './AccessoryConnectivityToast';
 const meta = {
     component: AccessoryConnectivityToast,
     tags: ['ai-generated'],
+    parameters: { docs: { story: { inline: false, height: '230px' } } },
     args: {
         accessoryName: 'TLS',
         status: 'connected',

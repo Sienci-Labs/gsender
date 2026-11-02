@@ -29,7 +29,10 @@ const meta = {
     tags: ['ai-generated'],
     args: { isActive: true },
     // Machine state is applied by .storybook/machine-state.js
-    parameters: { machine: { preset: 'idle' } },
+    parameters: {
+        docs: { story: { inline: false, height: '360px' } },
+        machine: { preset: 'idle' },
+    },
     beforeEach: () => {
         // Messages live in a module-level store shared by every console view; closing
         // the port clears it (and its once-per-connection banner) between stories

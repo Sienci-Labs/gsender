@@ -7,7 +7,10 @@ const meta = {
     component: MachineStatus,
     tags: ['ai-generated'],
     // Machine state is applied by .storybook/machine-state.js
-    parameters: { machine: { preset: 'idle' } },
+    parameters: {
+        docs: { story: { inline: false, height: '260px' } },
+        machine: { preset: 'idle' },
+    },
     decorators: [
         // Centred absolutely over the visualizer in the app
         (Story) => (

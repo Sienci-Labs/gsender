@@ -30,7 +30,10 @@ const meta = {
     component: AccessoryConnectivityToastHost,
     tags: ['ai-generated'],
     // Machine state is applied by .storybook/machine-state.js
-    parameters: { machine: { preset: 'idle' } },
+    parameters: {
+        docs: { story: { inline: false, height: '920px' } },
+        machine: { preset: 'idle' },
+    },
     beforeEach: () => {
         startSagas();
         // Manage navigates the story's HashRouter; put it back afterwards

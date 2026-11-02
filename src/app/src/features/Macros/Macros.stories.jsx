@@ -55,7 +55,10 @@ const meta = {
     component: MacroWidget,
     tags: ['ai-generated'],
     // Machine state is applied by .storybook/machine-state.js
-    parameters: { machine: { preset: 'idle' } },
+    parameters: {
+        docs: { story: { inline: false, height: '900px' } },
+        machine: { preset: 'idle' },
+    },
     beforeEach: withMacros(MACROS),
     decorators: [
         (Story) => (

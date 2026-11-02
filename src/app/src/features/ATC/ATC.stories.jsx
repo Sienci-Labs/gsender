@@ -29,7 +29,10 @@ const meta = {
     component: ATCWidget,
     tags: ['ai-generated'],
     // Machine state is applied by .storybook/machine-state.js
-    parameters: { machine: ATC_READY },
+    parameters: {
+        docs: { story: { inline: false, height: '740px' } },
+        machine: ATC_READY,
+    },
     decorators: [
         (Story) => (
             <div className="h-[360px] w-[620px] p-2">

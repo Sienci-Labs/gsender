@@ -8,7 +8,10 @@ import { JOBS, statsApi } from './statsFixtures';
 const meta = {
     component: Jobs,
     tags: ['ai-generated'],
-    parameters: { machine: { preset: 'idle', port: 'COM4' } },
+    parameters: {
+        docs: { story: { inline: false, height: '790px' } },
+        machine: { preset: 'idle', port: 'COM4' },
+    },
     beforeEach: statsApi({ jobs: JOBS }),
     decorators: [
         // StatParent wraps the stats routes in StatsProvider

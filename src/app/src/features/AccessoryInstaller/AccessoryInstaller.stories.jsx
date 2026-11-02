@@ -17,7 +17,10 @@ const meta = {
     component: AccessoryInstaller,
     tags: ['ai-generated'],
     // Machine state is applied by .storybook/machine-state.js
-    parameters: { machine: READY },
+    parameters: {
+        docs: { story: { inline: false, height: '920px' } },
+        machine: READY,
+    },
     decorators: [
         (Story) => (
             <div className="h-[720px] w-[1200px]">

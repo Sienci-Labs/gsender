@@ -8,6 +8,7 @@ const meta = {
     tags: ['ai-generated'],
     // Machine state is applied by .storybook/machine-state.js; $100/$101 are steps/mm
     parameters: {
+        docs: { story: { inline: false, height: '900px' } },
         machine: { preset: 'idle', settings: { $100: '200', $101: '200' } },
     },
     decorators: [

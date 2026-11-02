@@ -9,7 +9,10 @@ const meta = {
     component: Connection,
     tags: ['ai-generated'],
     // Port list is applied to Redux by .storybook/machine-state.js
-    parameters: { machine: { preset: 'disconnected', ports: PORTS } },
+    parameters: {
+        docs: { story: { inline: false, height: '320px' } },
+        machine: { preset: 'disconnected', ports: PORTS },
+    },
     beforeEach: () => {
         // refreshPorts() reconnects the socket and asks the server for ports on mount
         // and on hover; keep stories off the network

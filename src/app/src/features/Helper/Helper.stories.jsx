@@ -9,7 +9,10 @@ const meta = {
     component: Helper,
     tags: ['ai-generated'],
     // Machine state is applied by .storybook/machine-state.js
-    parameters: { machine: { preset: 'idle' } },
+    parameters: {
+        docs: { story: { inline: false, height: '920px' } },
+        machine: { preset: 'idle' },
+    },
     decorators: [
         // Panels position themselves absolutely within the workspace
         (Story) => (

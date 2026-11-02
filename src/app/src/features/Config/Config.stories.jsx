@@ -9,6 +9,7 @@ const meta = {
     tags: ['ai-generated'],
     // Machine state is applied by .storybook/machine-state.js
     parameters: {
+        docs: { story: { inline: false, height: '920px' } },
         machine: {
             preset: 'idle',
             type: 'Grbl',

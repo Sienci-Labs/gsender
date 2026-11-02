@@ -28,7 +28,10 @@ const meta = {
     component: Jogging,
     tags: ['ai-generated'],
     // Machine state is applied by .storybook/machine-state.js
-    parameters: { machine: { preset: 'idle' } },
+    parameters: {
+        docs: { story: { inline: false, height: '350px' } },
+        machine: { preset: 'idle' },
+    },
     decorators: [
         (Story) => (
             <div className="w-[460px] p-2">

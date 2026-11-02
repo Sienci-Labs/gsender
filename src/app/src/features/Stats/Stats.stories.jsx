@@ -8,7 +8,10 @@ const meta = {
     component: Stats,
     tags: ['ai-generated'],
     // Connected on COM4; stats only count jobs from the connected port
-    parameters: { machine: { preset: 'idle', port: 'COM4' } },
+    parameters: {
+        docs: { story: { inline: false, height: '920px' } },
+        machine: { preset: 'idle', port: 'COM4' },
+    },
     beforeEach: statsApi({ jobs: JOBS, alarms: ALARMS, tasks: TASKS }),
     decorators: [
         // StatParent wraps the stats routes in StatsProvider

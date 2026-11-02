@@ -31,6 +31,7 @@ const storedProfiles = () => appStore.get('workspace.gamepad.profiles');
 const meta = {
     component: GamepadWrapper,
     tags: ['ai-generated'],
+    parameters: { docs: { story: { inline: false, height: '900px' } } },
     beforeEach: ({ parameters }) => {
         // No physical controller in the test browser: report a simulated one
         parameters.gamepad = createGamepad();

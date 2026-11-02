@@ -22,6 +22,7 @@ const startAt = (route) => () => {
 const meta = {
     component: NavBar,
     tags: ['ai-generated'],
+    parameters: { docs: { story: { inline: false, height: '460px' } } },
     beforeEach: startAt('/'),
     decorators: [
         (Story) => (

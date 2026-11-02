@@ -7,7 +7,10 @@ const meta = {
     component: UnlockButton,
     tags: ['ai-generated'],
     // Machine state is applied by .storybook/machine-state.js
-    parameters: { machine: { preset: 'idle' } },
+    parameters: {
+        docs: { story: { inline: false, height: '120px' } },
+        machine: { preset: 'idle' },
+    },
     decorators: [
         // Positioned absolutely (left-72) against the top bar
         (Story) => (

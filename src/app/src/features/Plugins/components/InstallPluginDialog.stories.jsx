@@ -75,6 +75,7 @@ const pretendDesktopApp = () => {
 const meta = {
     component: InstallPluginDialog,
     tags: ['ai-generated'],
+    parameters: { docs: { story: { inline: false, height: '730px' } } },
     args: {
         show: true,
         onClose: fn(),

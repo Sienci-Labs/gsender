@@ -52,7 +52,10 @@ const maintenanceApi =
 const meta = {
     component: Maintenance,
     tags: ['ai-generated'],
-    parameters: { machine: { preset: 'idle', port: 'COM4' } },
+    parameters: {
+        docs: { story: { inline: false, height: '790px' } },
+        machine: { preset: 'idle', port: 'COM4' },
+    },
     beforeEach: maintenanceApi(TASKS),
     decorators: [
         // StatParent wraps the stats routes in StatsProvider

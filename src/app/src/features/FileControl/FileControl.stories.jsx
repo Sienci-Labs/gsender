@@ -10,7 +10,10 @@ const meta = {
     component: FileControl,
     tags: ['ai-generated'],
     // Machine state is applied by .storybook/machine-state.js
-    parameters: { machine: { preset: 'idle' } },
+    parameters: {
+        docs: { story: { inline: false, height: '900px' } },
+        machine: { preset: 'idle' },
+    },
     decorators: [
         // The Load/Close button bar sits absolutely above the widget (top-[-35px])
         (Story) => (

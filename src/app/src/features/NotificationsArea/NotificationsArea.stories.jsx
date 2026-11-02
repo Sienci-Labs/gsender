@@ -41,7 +41,10 @@ const meta = {
     component: NotificationsArea,
     tags: ['ai-generated'],
     // Notifications are applied to Redux by .storybook/machine-state.js
-    parameters: { machine: { preset: 'idle', notifications: NOTIFICATIONS } },
+    parameters: {
+        docs: { story: { inline: false, height: '450px' } },
+        machine: { preset: 'idle', notifications: NOTIFICATIONS },
+    },
     decorators: [
         (Story) => (
             <div className="h-[380px] w-[420px] p-2">

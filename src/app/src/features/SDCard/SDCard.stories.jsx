@@ -21,7 +21,10 @@ const meta = {
     component: SDCard,
     tags: ['ai-generated'],
     // Machine state is applied by .storybook/machine-state.js
-    parameters: { machine: MOUNTED },
+    parameters: {
+        docs: { story: { inline: false, height: '600px' } },
+        machine: MOUNTED,
+    },
     decorators: [
         (Story) => (
             <div className="h-[560px] w-[760px]">

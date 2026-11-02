@@ -6,6 +6,7 @@ import StatusIcons from './index';
 const meta = {
     component: StatusIcons,
     tags: ['ai-generated'],
+    parameters: { docs: { story: { inline: false, height: '100px' } } },
     decorators: [
         // Positioned absolutely (top-4 right-4) in the top bar
         (Story) => (

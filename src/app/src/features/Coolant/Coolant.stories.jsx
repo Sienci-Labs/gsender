@@ -7,7 +7,10 @@ const meta = {
     component: Coolant,
     tags: ['ai-generated'],
     // Machine state is applied to the Redux store by .storybook/machine-state.js
-    parameters: { machine: { preset: 'idle' } },
+    parameters: {
+        docs: { story: { inline: false, height: '620px' } },
+        machine: { preset: 'idle' },
+    },
 };
 
 export default meta;
