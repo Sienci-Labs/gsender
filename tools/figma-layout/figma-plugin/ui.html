@@ -1,0 +1,295 @@
+<meta charset="utf-8" />
+<style>
+    :root {
+        color-scheme: light dark;
+        --bg: var(--figma-color-bg, #fff);
+        --bg-2: var(--figma-color-bg-secondary, #f5f5f5);
+        --text: var(--figma-color-text, #222);
+        --muted: var(--figma-color-text-secondary, #666);
+        --border: var(--figma-color-border, #e5e5e5);
+        --accent: var(--figma-color-bg-brand, #0d99ff);
+        --accent-text: var(--figma-color-text-onbrand, #fff);
+        --link: var(--figma-color-text-brand, #0d99ff);
+        --success: var(--figma-color-icon-success, #14ae5c);
+        --danger: var(--figma-color-text-danger, #e03e1a);
+    }
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        padding: 12px;
+        font: 12px/1.4 Inter, system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+    }
+    h2 { font-size: 11px; font-weight: 600; margin: 0 0 6px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+    section { margin-bottom: 14px; }
+    .live { background: var(--bg-2); border-radius: 6px; padding: 8px 10px; }
+    .live-head { display: flex; align-items: center; gap: 6px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex: none; }
+    .dot.on { background: var(--success); }
+    .live small, .hint { color: var(--muted); }
+    .live ul { max-height: 110px; }
+    .live li { display: flex; gap: 6px; align-items: baseline; }
+    .live li span { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+    .link { all: unset; color: var(--link); cursor: pointer; flex: none; }
+    .link:disabled { color: var(--muted); cursor: default; }
+    .drop {
+        display: block;
+        border: 1px dashed var(--border);
+        border-radius: 6px;
+        padding: 14px 12px;
+        text-align: center;
+        color: var(--muted);
+        cursor: pointer;
+    }
+    .drop.over { border-color: var(--accent); color: var(--text); }
+    .drop input { display: none; }
+    ul { list-style: none; margin: 6px 0 0; padding: 0; max-height: 84px; overflow: auto; }
+    li { padding: 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    fieldset { border: 0; margin: 0; padding: 0; display: grid; gap: 6px; }
+    label { display: flex; gap: 6px; align-items: flex-start; }
+    label small { display: block; color: var(--muted); }
+    select { margin-top: 4px; font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 3px; }
+    .primary {
+        width: 100%;
+        margin-top: 8px;
+        padding: 8px;
+        border: 0;
+        border-radius: 6px;
+        background: var(--accent);
+        color: var(--accent-text);
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    .primary:disabled { opacity: 0.4; cursor: default; }
+    #status { margin-top: 8px; min-height: 1.4em; color: var(--muted); }
+    #status.error { color: var(--danger); }
+</style>
+
+<section class="live">
+    <div class="live-head">
+        <span class="dot" id="liveDot"></span>
+        <b id="liveTitle">Live capture</b>
+    </div>
+    <small id="liveHint">Not running. Start it with <code>yarn figma:live</code>, then press ⌥⇧F in the app to capture.</small>
+    <label style="margin-top: 6px">
+        <input type="checkbox" id="autoImport" />
+        <span>Import new captures automatically</span>
+    </label>
+    <ul id="liveList"></ul>
+</section>
+
+<section>
+    <h2>From files</h2>
+    <label class="drop" id="drop">
+        <input id="file" type="file" accept=".json,application/json" multiple />
+        Drop <b>.figma-layout.json</b> files here or click to choose
+    </label>
+    <ul id="files"></ul>
+    <button class="primary" id="go" disabled>Import files</button>
+</section>
+
+<section>
+    <h2>Options</h2>
+    <fieldset>
+        <label>
+            <input type="checkbox" id="autoLayout" />
+            <span>Auto layout<small>Turn flex containers into auto layout when it reproduces the same positions</small></span>
+        </label>
+        <label>
+            <input type="checkbox" id="variables" />
+            <span>Color variables<small>Create variables from Tailwind color classes and bind fills to them</small></span>
+        </label>
+        <label>
+            <span>Font<small>
+                <select id="font">
+                    <option value="Inter">Inter + Inconsolata (design docs)</option>
+                    <option value="">Match the app (system fonts)</option>
+                </select>
+            </small></span>
+        </label>
+        <label>
+            <input type="checkbox" id="states" />
+            <span>Tabs &amp; menus<small>Tab groups become a component with a variant per tab; menus and popovers become components beside the screen</small></span>
+        </label>
+        <label>
+            <input type="checkbox" id="backdrops" />
+            <span>Component backgrounds<small>Give tab and menu components without a background of their own the colour behind them in the app</small></span>
+        </label>
+        <label>
+            <input type="checkbox" id="simplify" />
+            <span>Flatten wrappers<small>Drop empty boxes and wrappers that only pass a child through</small></span>
+        </label>
+    </fieldset>
+</section>
+
+<div id="status"></div>
+
+<script>
+    const LIVE_URL = 'http://localhost:7777';
+    const $ = (id) => document.getElementById(id);
+    const status = $('status');
+    const go = $('go');
+    let docs = [];
+
+    /* Options, remembered between runs via figma.clientStorage ---------- */
+
+    const DEFAULTS = { autoLayout: true, variables: true, states: true, backdrops: true, simplify: true, font: 'Inter', autoImport: true };
+    const OPTION_IDS = Object.keys(DEFAULTS);
+
+    function readOptions() {
+        const o = {};
+        for (const id of OPTION_IDS) o[id] = $(id).type === 'checkbox' ? $(id).checked : $(id).value;
+        return o;
+    }
+    function applyOptions(o) {
+        for (const id of OPTION_IDS) {
+            const v = o && id in o ? o[id] : DEFAULTS[id];
+            if ($(id).type === 'checkbox') $(id).checked = v;
+            else $(id).value = v;
+        }
+    }
+    applyOptions(DEFAULTS);
+    for (const id of OPTION_IDS) {
+        $(id).addEventListener('change', () =>
+            parent.postMessage({ pluginMessage: { type: 'save-options', options: readOptions() } }, '*'),
+        );
+    }
+
+    /* Import queue: one import at a time --------------------------------- */
+
+    const queue = [];
+    let importing = false;
+
+    function enqueue(docsToImport) {
+        queue.push(docsToImport);
+        pump();
+    }
+    function pump() {
+        if (importing || !queue.length) return;
+        importing = true;
+        go.disabled = true;
+        status.className = '';
+        status.textContent = 'Starting…';
+        parent.postMessage({ pluginMessage: { type: 'import', docs: queue.shift(), options: readOptions() } }, '*');
+    }
+    function finished() {
+        importing = false;
+        go.disabled = !docs.length;
+        pump();
+    }
+
+    /* Files ---------------------------------------------------------------- */
+
+    async function load(files) {
+        docs = [];
+        $('files').innerHTML = '';
+        for (const f of files) {
+            const li = document.createElement('li');
+            try {
+                const doc = JSON.parse(await f.text());
+                if (doc.format !== 'layout-to-figma') throw new Error('not a layout capture');
+                docs.push(doc);
+                li.textContent = `✓ ${f.name}`;
+            } catch (e) {
+                li.textContent = `✕ ${f.name}: ${e.message}`;
+            }
+            $('files').appendChild(li);
+        }
+        go.disabled = !docs.length || importing;
+    }
+
+    $('file').addEventListener('change', () => load($('file').files));
+    $('drop').addEventListener('dragover', (e) => {
+        e.preventDefault();
+        $('drop').classList.add('over');
+    });
+    $('drop').addEventListener('dragleave', () => $('drop').classList.remove('over'));
+    $('drop').addEventListener('drop', (e) => {
+        e.preventDefault();
+        $('drop').classList.remove('over');
+        load(e.dataTransfer.files);
+    });
+    go.addEventListener('click', () => enqueue(docs));
+
+    /* Live ----------------------------------------------------------------- */
+
+    let seen = null; // capture names that existed when we first connected
+
+    async function importLive(name) {
+        try {
+            const res = await fetch(`${LIVE_URL}/captures/${encodeURIComponent(name)}`);
+            enqueue([await res.json()]);
+        } catch (e) {
+            status.className = 'error';
+            status.textContent = `Could not fetch ${name}: ${e.message}`;
+        }
+    }
+
+    function timeAgo(ms) {
+        const s = Math.round((Date.now() - ms) / 1000);
+        if (s < 60) return `${s}s ago`;
+        if (s < 3600) return `${Math.round(s / 60)}m ago`;
+        return new Date(ms).toLocaleString();
+    }
+
+    function renderLive(list) {
+        const ul = $('liveList');
+        ul.innerHTML = '';
+        for (const c of list.slice(0, 8)) {
+            const li = document.createElement('li');
+            const label = document.createElement('span');
+            label.textContent = `${c.title} · ${c.theme} · ${timeAgo(c.mtimeMs)}`;
+            label.title = c.name;
+            const btn = document.createElement('button');
+            btn.className = 'link';
+            btn.textContent = 'Import';
+            btn.addEventListener('click', () => importLive(c.name));
+            li.append(label, btn);
+            ul.appendChild(li);
+        }
+    }
+
+    async function poll() {
+        try {
+            const list = await (await fetch(`${LIVE_URL}/captures`, { cache: 'no-store' })).json();
+            $('liveDot').classList.add('on');
+            $('liveHint').textContent = 'Running. Press ⌥⇧F (Alt+Shift+F) in the app, or click its ◧ Capture button.';
+            if (!seen) seen = new Set(list.map((c) => c.name));
+            const fresh = list.filter((c) => !seen.has(c.name)).reverse();
+            for (const c of fresh) {
+                seen.add(c.name);
+                if ($('autoImport').checked) importLive(c.name);
+            }
+            renderLive(list);
+        } catch (e) {
+            $('liveDot').classList.remove('on');
+            $('liveHint').innerHTML =
+                'Not running. Start it with <code>yarn figma:live</code>, then press ⌥⇧F in the app to capture.';
+            $('liveList').innerHTML = '';
+            seen = null;
+        }
+        setTimeout(poll, 1500);
+    }
+    poll();
+
+    /* Messages from the plugin ------------------------------------------- */
+
+    window.onmessage = (e) => {
+        const msg = e.data.pluginMessage;
+        if (!msg) return;
+        if (msg.type === 'options') applyOptions(msg.options);
+        if (msg.type === 'progress') status.textContent = msg.text;
+        if (msg.type === 'done') {
+            status.className = '';
+            status.textContent = msg.text;
+            finished();
+        }
+        if (msg.type === 'error') {
+            status.className = 'error';
+            status.textContent = msg.text;
+            finished();
+        }
+    };
+</script>

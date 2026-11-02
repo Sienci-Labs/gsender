@@ -75,7 +75,14 @@ function spawnElectron() {
     // path of the real platform binary (the standard technique dev tooling
     // like electron-forge uses), so this goes straight there with no
     // intermediary that could drop the channel.
-    const child = spawn(electronPath, [path.join(rootDir, 'output/main')], {
+    const args = [path.join(rootDir, 'output/main')];
+    // Lets DevTools-protocol tools attach, e.g. `yarn figma:capture --connect`.
+    if (process.env.REMOTE_DEBUGGING_PORT) {
+        args.unshift(
+            `--remote-debugging-port=${process.env.REMOTE_DEBUGGING_PORT}`,
+        );
+    }
+    const child = spawn(electronPath, args, {
         cwd: rootDir,
         // The 4th ('ipc') fd lets src/main.js's restartApp() tell us a real
         // restart (not just a window close) is happening, via process.send.

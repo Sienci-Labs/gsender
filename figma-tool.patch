@@ -1,0 +1,46 @@
+diff --git a/.gitignore b/.gitignore
+index 8a5da45df..c88aec6a4 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -6,6 +6,7 @@ package-lock.json
+ /dist
+ /docs
+ /output
++/figma-captures
+ /releases
+ .idea
+ electron-builder.yml
+diff --git a/package.json b/package.json
+index e883819c1..766e822ae 100644
+--- a/package.json
++++ b/package.json
+@@ -77,6 +77,9 @@
+     "dev": "npm run prebuild-dev && npm run build-dev-server && npm run prepare-dev-plugins && concurrently --kill-others-on-fail --names \"esbuild,server,tailwind\" \"npm run watch-dev\" \"npm run start-dev:nodemon\" \"npm run tailwind-dev\"",
+     "dev:electron": "npm run build-dev && npm run prepare-dev-plugins && node scripts/electron-hot.js",
+     "vite:dev": "cd src/app && vite --port 5173 --host --force",
++    "figma": "node tools/figma-layout/start.mjs",
++    "figma:capture": "node tools/figma-layout/capture/cli.mjs",
++    "figma:live": "node tools/figma-layout/start.mjs --live",
+     "prod": "npm run build-prod && NODE_ENV=production ./bin/gsender",
+     "format": "biome format --write .",
+     "format:check": "biome format .",
+diff --git a/scripts/electron-hot.js b/scripts/electron-hot.js
+index f7c5eca2a..e25a03109 100644
+--- a/scripts/electron-hot.js
++++ b/scripts/electron-hot.js
+@@ -75,7 +75,14 @@ function spawnElectron() {
+     // path of the real platform binary (the standard technique dev tooling
+     // like electron-forge uses), so this goes straight there with no
+     // intermediary that could drop the channel.
+-    const child = spawn(electronPath, [path.join(rootDir, 'output/main')], {
++    const args = [path.join(rootDir, 'output/main')];
++    // Lets DevTools-protocol tools attach, e.g. `yarn figma:capture --connect`.
++    if (process.env.REMOTE_DEBUGGING_PORT) {
++        args.unshift(
++            `--remote-debugging-port=${process.env.REMOTE_DEBUGGING_PORT}`,
++        );
++    }
++    const child = spawn(electronPath, args, {
+         cwd: rootDir,
+         // The 4th ('ipc') fd lets src/main.js's restartApp() tell us a real
+         // restart (not just a window close) is happening, via process.send.
