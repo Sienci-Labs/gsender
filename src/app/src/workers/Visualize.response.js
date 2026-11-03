@@ -25,8 +25,8 @@ const storeVisualizerProfile = (profile) => {
         typeof window !== 'undefined'
             ? window
             : typeof globalThis !== 'undefined'
-                ? globalThis
-                : null;
+              ? globalThis
+              : null;
     if (!root) {
         return;
     }

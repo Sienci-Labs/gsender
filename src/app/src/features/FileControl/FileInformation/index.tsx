@@ -37,8 +37,9 @@ const FileInformation: React.FC<Props> = ({ handleRecentFileUpload }) => {
 
     const [toggleInfo, setToggleInfo] = useState(false);
     const [showEditor, setShowEditor] = useState(false);
-    const [recentFiles, setRecentFiles] =
-        useState<RecentFile[]>(getRecentFiles());
+    const [recentFiles, setRecentFiles] = useState<RecentFile[]>(
+        getRecentFiles(),
+    );
     const [lastJob, setLastJob] = useState<Job>(null);
 
     const fetchJobs = async () => {

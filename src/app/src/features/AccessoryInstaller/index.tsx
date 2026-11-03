@@ -4,7 +4,10 @@ import { useAllWizards } from 'app/features/AccessoryInstaller/Wizards';
 
 export function AccessoryInstaller() {
     const wizards = useAllWizards();
-    const { wizardId, subWizardId } = useParams<{ wizardId?: string; subWizardId?: string }>();
+    const { wizardId, subWizardId } = useParams<{
+        wizardId?: string;
+        subWizardId?: string;
+    }>();
     return (
         <div className="fixed-content-area h-full max-h-full w-full overflow-hidden">
             <WizardsManager

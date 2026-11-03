@@ -130,7 +130,10 @@ const ProbeDiameter = ({ actions, state, probeCommand }: Props) => {
         const baseOptions: Option[] = [];
         const toolsObjects = convertAvailableTools(availableTools, units);
 
-        if (touchplateType === TOUCHPLATE_TYPE_AUTOZERO || touchplateType === TOUCHPLATE_TYPE_BITZERO) {
+        if (
+            touchplateType === TOUCHPLATE_TYPE_AUTOZERO ||
+            touchplateType === TOUCHPLATE_TYPE_BITZERO
+        ) {
             baseOptions.push(
                 { value: PROBE_TYPE_AUTO, label: PROBE_TYPE_AUTO, tool: null },
                 { value: PROBE_TYPE_TIP, label: PROBE_TYPE_TIP, tool: null },

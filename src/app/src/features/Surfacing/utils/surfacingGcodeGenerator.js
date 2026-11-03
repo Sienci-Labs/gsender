@@ -56,10 +56,11 @@ export default class Generator {
         const dwell = shouldDwell ? [`G04 P${SURFACING_DWELL_DURATION}`] : [];
         const m7 = mist ? ['M7'] : [];
         const m8 = flood ? ['M8'] : [];
-        const setUnits = {
-            [METRIC_UNITS]: 'G21 ;mm',
-            [IMPERIAL_UNITS]: 'G20 ;inches',
-        }[units] ?? 'G21 ;mm';
+        const setUnits =
+            {
+                [METRIC_UNITS]: 'G21 ;mm',
+                [IMPERIAL_UNITS]: 'G20 ;inches',
+            }[units] ?? 'G21 ;mm';
 
         const depth = skimDepth;
         const gcodeArr = [

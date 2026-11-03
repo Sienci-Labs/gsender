@@ -6,7 +6,7 @@ import { ATCStartValidations } from 'app/features/ATC/components/ATCStartValidat
 import pubsub from 'pubsub-js';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { getATCUnavailablePayload } from 'app/features/ATC/utils';
-import {ATCUnavailable} from "app/features/ATC/components/ATCUnavailable.tsx";
+import { ATCUnavailable } from 'app/features/ATC/components/ATCUnavailable.tsx';
 
 export function ATC() {
     const { atcAvailable, connected } = useToolChange();

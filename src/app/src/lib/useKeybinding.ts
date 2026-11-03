@@ -106,10 +106,7 @@ export function removeOldKeybindings(): void {
     // Only keep keybindings that exist in the shuttleControlEvents arrays
     Object.entries(currentCommandKeys).forEach(([key, keybinding]) => {
         const event = allShuttleControlEvents[key];
-        if (
-            event !== undefined ||
-            keybinding?.category === MACRO_CATEGORY
-        ) {
+        if (event !== undefined || keybinding?.category === MACRO_CATEGORY) {
             updatedCommandKeys[key] = keybinding;
         }
     });

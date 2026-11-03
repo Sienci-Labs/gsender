@@ -103,7 +103,7 @@ const MacroItem = ({
             />
 
             <DropdownMenu>
-                <DropdownMenuTrigger 
+                <DropdownMenuTrigger
                     className="flex items-center justify-center w-10 h-8 cursor-pointer hover:bg-gray-200 rounded dark:hover:bg-dark-lighter"
                     aria-label={`Options for macro ${macro.name}`}
                 >

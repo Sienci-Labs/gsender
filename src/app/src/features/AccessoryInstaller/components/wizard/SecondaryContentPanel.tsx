@@ -136,7 +136,7 @@ export function SecondaryContentPanel({ content }: SecondaryContentPanelProps) {
                                         </a>
                                     </>
                                 ) : (
-                                    linkItem.content as string
+                                    (linkItem.content as string)
                                 )}
                             </span>
                             {linkItem.url && (

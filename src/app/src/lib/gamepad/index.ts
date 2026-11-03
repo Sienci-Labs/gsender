@@ -254,12 +254,13 @@ export const runAction = ({ event }: { event: GamepadDetail }): void => {
                 throttle(
                     (payload: unknown) => {
                         // Get fresh callback reference in case it was updated
-                        const currentEvent = shuttleEvents.allShuttleControlEvents[action] as ShuttleEvent;
+                        const currentEvent = shuttleEvents
+                            .allShuttleControlEvents[action] as ShuttleEvent;
                         currentEvent?.callback?.(null, payload);
                     },
                     100,
-                    { trailing: false }
-                )
+                    { trailing: false },
+                ),
             );
         }
 

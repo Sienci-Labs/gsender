@@ -24,7 +24,7 @@ export function UnitBadge({ isRemote }: Props) {
         store.set('workspace.units', localUnits);
     };
 
-    const unitLabel = units == METRIC_UNITS ? 'mm' : "Inch";
+    const unitLabel = units == METRIC_UNITS ? 'mm' : 'Inch';
     return (
         <>
             <div
@@ -44,7 +44,7 @@ export function UnitBadge({ isRemote }: Props) {
                     Units:
                     <br /> {units}
                 </div>
-                <div className={"max-xl:block hidden px-1 py-1.5"}>
+                <div className={'max-xl:block hidden px-1 py-1.5'}>
                     {unitLabel}
                 </div>
             </div>
@@ -75,7 +75,12 @@ export function UnitBadge({ isRemote }: Props) {
                                     id="units-imperial"
                                     aria-label="Inches"
                                 />
-                                <label htmlFor="units-imperial" className="cursor-pointer">{IMPERIAL_UNITS}</label>
+                                <label
+                                    htmlFor="units-imperial"
+                                    className="cursor-pointer"
+                                >
+                                    {IMPERIAL_UNITS}
+                                </label>
                             </div>
                             <div className="flex flex-row gap-3 items-center">
                                 <RadioGroupItem
@@ -84,7 +89,12 @@ export function UnitBadge({ isRemote }: Props) {
                                     id="units-metric"
                                     aria-label="Millimeters"
                                 />
-                                <label htmlFor="units-metric" className="cursor-pointer">{METRIC_UNITS}</label>
+                                <label
+                                    htmlFor="units-metric"
+                                    className="cursor-pointer"
+                                >
+                                    {METRIC_UNITS}
+                                </label>
                             </div>
                         </div>
                     </RadioGroup>
