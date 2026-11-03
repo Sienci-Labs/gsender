@@ -66,25 +66,24 @@ describe('initStore', () => {
     });
 
     it.each([
-        ['orthographic', 'Perspective'],
+        ['perspective', 'Perspective'],
+        ['orthographic', 'Orthographic'],
+        ['Perspective', 'Perspective'],
         ['Orthographic', 'Orthographic'],
         [undefined, 'Perspective'],
-    ])(
-        'normalizes saved camera projection %s to %s',
-        async (saved, expected) => {
-            mockFetch.mockResolvedValue({
-                data: {
-                    version: '1.6.4',
-                    state: { widgets: { visualizer: { projection: saved } } },
-                },
-            });
-            const { initStore, default: store } = loadStore();
+    ])('migrates saved camera projection %s to %s', async (saved, expected) => {
+        mockFetch.mockResolvedValue({
+            data: {
+                version: '1.6.4',
+                state: { widgets: { visualizer: { projection: saved } } },
+            },
+        });
+        const { initStore, default: store } = loadStore();
 
-            await initStore();
+        await initStore();
 
-            expect(store.get('widgets.visualizer.projection')).toBe(expected);
-        },
-    );
+        expect(store.get('widgets.visualizer.projection')).toBe(expected);
+    });
 
     it('is idempotent', async () => {
         mockFetch.mockResolvedValue({ data: { version: '1.7.0', state: {} } });
