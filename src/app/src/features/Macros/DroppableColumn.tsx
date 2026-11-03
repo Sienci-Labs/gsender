@@ -110,10 +110,7 @@ const DroppableColumn = ({
     });
 
     return (
-        <div
-            ref={setNodeRef}
-            className="flex flex-col gap-1"
-        >
+        <div ref={setNodeRef} className="flex flex-col gap-1">
             {macros.map((macro) => (
                 <SortableMacroItem
                     key={macro.id}

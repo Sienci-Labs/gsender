@@ -37,9 +37,13 @@ interface ToolChangerPopoverProps {
     trigger?: React.ReactNode;
     contentClassName?: string;
     contentAlign?: React.ComponentProps<typeof PopoverContent>['align'];
-    contentAlignOffset?: React.ComponentProps<typeof PopoverContent>['alignOffset'];
+    contentAlignOffset?: React.ComponentProps<
+        typeof PopoverContent
+    >['alignOffset'];
     contentSide?: React.ComponentProps<typeof PopoverContent>['side'];
-    contentSideOffset?: React.ComponentProps<typeof PopoverContent>['sideOffset'];
+    contentSideOffset?: React.ComponentProps<
+        typeof PopoverContent
+    >['sideOffset'];
 }
 
 const ToolChangerPopover: React.FC<ToolChangerPopoverProps> = ({
@@ -64,7 +68,7 @@ const ToolChangerPopover: React.FC<ToolChangerPopoverProps> = ({
     const allowManualBadge = connected && atcAvailable;
     const isManual = allowManualBadge
         ? selectedTool
-            ? selectedTool.isManual ?? selectedTool.id > rackSize
+            ? (selectedTool.isManual ?? selectedTool.id > rackSize)
             : false
         : false;
 
@@ -127,7 +131,9 @@ const ToolChangerPopover: React.FC<ToolChangerPopoverProps> = ({
 
     return (
         <Popover open={isOpen} onOpenChange={setIsOpen}>
-            {trigger ? <PopoverTrigger asChild>{trigger}</PopoverTrigger> : null}
+            {trigger ? (
+                <PopoverTrigger asChild>{trigger}</PopoverTrigger>
+            ) : null}
             <PopoverContent
                 className={cn('w-96 p-6', contentClassName)}
                 align={contentAlign ?? 'end'}
@@ -174,8 +180,8 @@ const ToolChangerPopover: React.FC<ToolChangerPopoverProps> = ({
                                 <SelectContent className="w-full flex-1 bg-white z-[10000]">
                                     {tools.map((tool) => {
                                         const toolIsManual = allowManualBadge
-                                            ? tool.isManual ??
-                                              tool.id > rackSize
+                                            ? (tool.isManual ??
+                                              tool.id > rackSize)
                                             : false;
                                         return (
                                             <SelectItem

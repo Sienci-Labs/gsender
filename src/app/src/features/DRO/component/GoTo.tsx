@@ -278,5 +278,6 @@ export function GoTo({ units, wpos, disabled }: GotoProps) {
                 </div>
             </PopoverContent>
         </Popover>
-    );Ï
+    );
+    Ï;
 }

@@ -28,12 +28,13 @@ const getGRBLLog = async (logPath) => {
     try {
         content = await fs.readFile(logPath, 'utf-8');
         if (content) {
-            content = content
-                .toString()
-                .split(/\r?\n/);
+            content = content.toString().split(/\r?\n/);
             let tempContent = [];
-            content.forEach(record => {
-                if (record.toLowerCase().includes('error') || record.toLowerCase().includes('alarm')) {
+            content.forEach((record) => {
+                if (
+                    record.toLowerCase().includes('error') ||
+                    record.toLowerCase().includes('alarm')
+                ) {
                     tempContent.push(record);
                 }
             });

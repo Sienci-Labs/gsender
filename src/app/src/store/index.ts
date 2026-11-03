@@ -325,8 +325,13 @@ try {
     log.error(e);
 }
 
-const mergedState = merge(JSON.parse(JSON.stringify(defaultState)), cnc.state || {});
-store.state = normalizeState(preserveSavedCommandKeys(mergedState, cnc.state || {}));
+const mergedState = merge(
+    JSON.parse(JSON.stringify(defaultState)),
+    cnc.state || {},
+);
+store.state = normalizeState(
+    preserveSavedCommandKeys(mergedState, cnc.state || {}),
+);
 
 // Debouncing enforces that a function not be called again until a certain amount of time (e.g. 100ms) has passed without it being called.
 store.on(
@@ -352,7 +357,10 @@ const migrateStore = (): void => {
     }
 
     if (semver.lt(cnc.version, '1.6.4')) {
-        store.set('widgets.probe.direction', defaultState.widgets.probe.direction);
+        store.set(
+            'widgets.probe.direction',
+            defaultState.widgets.probe.direction,
+        );
     }
 
     if (semver.lt(cnc.version, '1.6.2')) {

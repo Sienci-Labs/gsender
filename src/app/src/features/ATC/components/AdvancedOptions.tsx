@@ -8,11 +8,7 @@ import {
 } from 'app/features/ATC/utils/ATCFunctions.ts';
 
 export function AdvancedOptions() {
-    const {
-        disabled,
-        setLoadToolMode,
-        setLoadToolOpen,
-    } = useToolChange();
+    const { disabled, setLoadToolMode, setLoadToolOpen } = useToolChange();
 
     const handleManualLoad = () => {
         setLoadToolMode('manual');

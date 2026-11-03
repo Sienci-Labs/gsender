@@ -8,7 +8,7 @@ import { RootState } from 'app/store/redux';
 import { FirstToolBehavior } from 'app/workspace/definitions';
 import { updateToolchangeContext } from 'app/features/Helper/Wizard.tsx';
 import pubsub from 'pubsub-js';
-import controller from "app/lib/controller.ts";
+import controller from 'app/lib/controller.ts';
 import { firmwarePastVersion } from 'app/lib/firmwareSemver.ts';
 import { ATCI_SUPPORTED_VERSION } from 'app/features/ATC/utils/ATCiConstants.ts';
 
@@ -60,10 +60,7 @@ export function TLSOptions({ onComplete, onUncomplete }: StepProps) {
         controller.command('gcode', code);
 
         store.set('workspace.toolChangeOption', 'Fixed Tool Sensor');
-        store.set(
-            'workspace.toolChange.moveToManualPosition',
-            customLocation,
-        );
+        store.set('workspace.toolChange.moveToManualPosition', customLocation);
         store.set(
             'workspace.toolChange.firstToolBehaviour',
             firstToolBehaviour,
@@ -80,8 +77,8 @@ export function TLSOptions({ onComplete, onUncomplete }: StepProps) {
     return (
         <div className="flex flex-col gap-5 justify-start">
             <p className="dark:text-white">
-                Configure how gSender should handle tool changes with your
-                Tool Length Sensor (TLS).
+                Configure how gSender should handle tool changes with your Tool
+                Length Sensor (TLS).
             </p>
 
             <div>
@@ -128,8 +125,8 @@ export function TLSOptions({ onComplete, onUncomplete }: StepProps) {
             </label>
 
             <p className="dark:text-white">
-                Select <b>"Apply"</b> to set your tool change strategy to
-                Fixed Tool Sensor and save these options.
+                Select <b>"Apply"</b> to set your tool change strategy to Fixed
+                Tool Sensor and save these options.
             </p>
             <StepActionButton
                 label={'Apply'}

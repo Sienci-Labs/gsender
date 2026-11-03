@@ -37,9 +37,8 @@ export function IconUpdater() {
             window.ipcRenderer.on('maximize-window', () => {
                 setTimeout(() => {
                     window.dispatchEvent(new Event('resize'));
-                }, 500)
+                }, 500);
             });
-
         }
     }, []);
 

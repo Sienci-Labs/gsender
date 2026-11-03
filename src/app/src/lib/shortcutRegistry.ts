@@ -38,7 +38,9 @@ class ShortcutRegistry {
 export const shortcutRegistry = new ShortcutRegistry();
 
 export const useActiveShortcuts = () => {
-    const [shortcuts, setShortcuts] = useState<ShuttleEvent[]>(shortcutRegistry.getActiveEvents());
+    const [shortcuts, setShortcuts] = useState<ShuttleEvent[]>(
+        shortcutRegistry.getActiveEvents(),
+    );
 
     useEffect(() => {
         return shortcutRegistry.subscribe(() => {

@@ -3,7 +3,7 @@ import { useTypedSelector } from 'app/hooks/useTypedSelector.ts';
 import { RootState } from 'app/store/redux';
 import { firmwareSemver } from 'app/lib/firmwareSemver.ts';
 import { ATCI_SUPPORTED_VERSION } from 'app/features/ATC/utils/ATCiConstants.ts';
-import {GRBL, GRBLHAL} from "app/constants";
+import { GRBL, GRBLHAL } from 'app/constants';
 
 export function useValidations() {
     const isConnected = useTypedSelector(
@@ -21,7 +21,9 @@ export function useValidations() {
         ATCI_SUPPORTED_VERSION,
     );
 
-    const firmwareType = useTypedSelector((state: RootState) => state.controller.type);
+    const firmwareType = useTypedSelector(
+        (state: RootState) => state.controller.type,
+    );
 
     const connectionValidation = useMemo(
         () => () => ({
@@ -40,7 +42,19 @@ export function useValidations() {
     const coreFirmwareValidation = useMemo(
         () => () => ({
             success: currentFirmware,
-            reason: <p>This setup wizard requires a newer firmware version, please update your firmware before proceeding. <a target="_blank" className="text-blue-500 underline" href="https://resources.sienci.com/view/slb-firmware-flashing/">Learn More</a></p>,
+            reason: (
+                <p>
+                    This setup wizard requires a newer firmware version, please
+                    update your firmware before proceeding.{' '}
+                    <a
+                        target="_blank"
+                        className="text-blue-500 underline"
+                        href="https://resources.sienci.com/view/slb-firmware-flashing/"
+                    >
+                        Learn More
+                    </a>
+                </p>
+            ),
         }),
         [currentFirmware],
     );
@@ -66,6 +80,6 @@ export function useValidations() {
         homingValidation,
         coreFirmwareValidation,
         grblHAlValidator,
-        grblValidator
+        grblValidator,
     };
 }

@@ -18,13 +18,18 @@ function compileElectronApp() {
 
     try {
         const rootDir = path.join(__dirname, '..');
-        execSync('npx babel src/electron-app --config-file ./babel.config.js --out-dir output/electron-app --quiet', {
-            cwd: rootDir,
-            stdio: 'pipe',
-            env: { ...process.env, NODE_ENV: 'development' },
-            shell: true
-        });
-        console.log(`[${timestamp}] ✅ electron-app compiled (Electron will auto-reload)\n`);
+        execSync(
+            'npx babel src/electron-app --config-file ./babel.config.js --out-dir output/electron-app --quiet',
+            {
+                cwd: rootDir,
+                stdio: 'pipe',
+                env: { ...process.env, NODE_ENV: 'development' },
+                shell: true,
+            },
+        );
+        console.log(
+            `[${timestamp}] ✅ electron-app compiled (Electron will auto-reload)\n`,
+        );
     } catch (err) {
         console.error(`[${timestamp}] ❌ Compilation error:`, err.message);
     }
@@ -37,7 +42,7 @@ compileElectronApp();
 const watcher = chokidar.watch('src/electron-app/**/*.js', {
     persistent: true,
     ignoreInitial: true,
-    cwd: path.join(__dirname, '..')
+    cwd: path.join(__dirname, '..'),
 });
 
 watcher.on('change', (file) => {

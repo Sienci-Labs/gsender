@@ -13,12 +13,8 @@ import {
 
 export function ATCConfigDRO() {
     const { units: preferredUnits } = useWorkspaceState();
-    const wposController = useTypedSelector(
-        (state) => state.controller.wpos,
-    );
-    const mposController = useTypedSelector(
-        (state) => state.controller.mpos,
-    );
+    const wposController = useTypedSelector((state) => state.controller.wpos);
+    const mposController = useTypedSelector((state) => state.controller.mpos);
     const workflowState = useTypedSelector(
         (state) => state.controller.workflow.state,
     );
@@ -29,9 +25,8 @@ export function ATCConfigDRO() {
         (state) => state.connection.isConnected,
     );
 
-    const wpos = mapValues(
-        wposController || defaultDROPosition,
-        (pos) => mapPositionToUnits(pos, preferredUnits),
+    const wpos = mapValues(wposController || defaultDROPosition, (pos) =>
+        mapPositionToUnits(pos, preferredUnits),
     );
 
     const canClick = (() => {

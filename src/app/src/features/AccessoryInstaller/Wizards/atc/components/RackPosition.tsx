@@ -60,7 +60,13 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
 
     useEffect(() => {
         if (isManuallyEditing.current) return;
-        if (!mpos || mpos.x === undefined || mpos.y === undefined || mpos.z === undefined) return;
+        if (
+            !mpos ||
+            mpos.x === undefined ||
+            mpos.y === undefined ||
+            mpos.z === undefined
+        )
+            return;
         const { x, y, z } = mpos;
         setPosition({
             x: mapPositionToUnits(x, units),
@@ -127,20 +133,26 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
             </div>
             {rackPositionMethod === 'utility' && (
                 <>
-                <ol className="list-decimal p-5 gap-4 space-y-2">
-                    <li className="dark:text-white">
-                        Populate your tool rack with tool holders
-                    </li>
-                    <li className="dark:text-white">
-                        Position the spindle so that the tool-stud sensor is directly over the right most tool holder. Once in the proper position, the LED on the sensor will light up.
-                    </li>
-                    <li className="dark:text-white">
-                        Press the <b>“Find Rack”</b> button for the wizard to determine the precise position of your tool holders.
-
-                    </li>
-                </ol>
+                    <ol className="list-decimal p-5 gap-4 space-y-2">
+                        <li className="dark:text-white">
+                            Populate your tool rack with tool holders
+                        </li>
+                        <li className="dark:text-white">
+                            Position the spindle so that the tool-stud sensor is
+                            directly over the right most tool holder. Once in
+                            the proper position, the LED on the sensor will
+                            light up.
+                        </li>
+                        <li className="dark:text-white">
+                            Press the <b>“Find Rack”</b> button for the wizard
+                            to determine the precise position of your tool
+                            holders.
+                        </li>
+                    </ol>
                     <p className="dark:text-white">
-                        The machine will take a few minutes to check the position of the left-most and right-most position of each tool rack.
+                        The machine will take a few minutes to check the
+                        position of the left-most and right-most position of
+                        each tool rack.
                     </p>
                     <StepActionButton
                         label="Find Rack"
@@ -150,21 +162,30 @@ export function RackPosition({ onComplete, onUncomplete }: StepProps) {
                         error={error}
                     />
                 </>
-
             )}
 
             {rackPositionMethod === 'manual' && (
                 <>
                     <p className="text-gray-900 dark:text-white">
                         <b>
-                            It is highly recommended that you use the automatic method, your rack may be damaged if done incorrectly.
+                            It is highly recommended that you use the automatic
+                            method, your rack may be damaged if done
+                            incorrectly.
                         </b>
                     </p>
-                  <ol className="list-decimal p-5 gap-4 space-y-2 dark:text-white">
-                      <li>Install a tool holder (with pull-stud removed) into the left-most slot</li>
-                      <li>Lower the spindle taper onto the tool holder until the tapers match</li>
-                      <li>Press <b>“Set Position”</b></li>
-                  </ol>
+                    <ol className="list-decimal p-5 gap-4 space-y-2 dark:text-white">
+                        <li>
+                            Install a tool holder (with pull-stud removed) into
+                            the left-most slot
+                        </li>
+                        <li>
+                            Lower the spindle taper onto the tool holder until
+                            the tapers match
+                        </li>
+                        <li>
+                            Press <b>“Set Position”</b>
+                        </li>
+                    </ol>
                     <PositionSetter
                         showZ={true}
                         xPosition={position.x}

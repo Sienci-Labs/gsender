@@ -49,7 +49,9 @@ export const parseAndReturnGCode = async ({ filePath }) => {
         const fileExists = await fileExistsAtPath(filePath);
 
         if (!fileExists) {
-            throw new ReferenceError('Error loading recent file, it may have been deleted, renamed, or moved to a different folder.'); // TODO: Handle null as FILENOTFOUND error
+            throw new ReferenceError(
+                'Error loading recent file, it may have been deleted, renamed, or moved to a different folder.',
+            ); // TODO: Handle null as FILENOTFOUND error
         }
 
         const stats = fsBase.statSync(filePath);
@@ -62,7 +64,7 @@ export const parseAndReturnGCode = async ({ filePath }) => {
             size: size,
             name: fileName,
             dir: fileDir,
-            fullPath: filePath
+            fullPath: filePath,
         };
     } catch (error) {
         log.error(error);

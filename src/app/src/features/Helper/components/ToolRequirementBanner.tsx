@@ -28,7 +28,10 @@ interface ToolRequirementBannerProps {
     comment?: string;
 }
 
-const ToolRequirementBanner = ({ toolLabel, comment }: ToolRequirementBannerProps) => {
+const ToolRequirementBanner = ({
+    toolLabel,
+    comment,
+}: ToolRequirementBannerProps) => {
     if (!toolLabel) {
         return null;
     }

@@ -71,7 +71,10 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({
                         value="config"
                         className="flex-1 mt-4 min-h-0 h-0"
                     >
-                        <ConfigTab uploading={uploading} uploadError={uploadError} />
+                        <ConfigTab
+                            uploading={uploading}
+                            uploadError={uploadError}
+                        />
                     </TabsContent>
 
                     <TabsContent

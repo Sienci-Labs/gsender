@@ -20,7 +20,15 @@ function truncatePortName(port: string = ''): string {
     return portName.substring(portName.length - 10, portName.length);
 }
 
-export function PortListingButton({ port, connectionHandler, baud }: { port: Port, connectionHandler: (port: string, type: ConnectionType) => void, baud: number }): JSX.Element {
+export function PortListingButton({
+    port,
+    connectionHandler,
+    baud,
+}: {
+    port: Port;
+    connectionHandler: (port: string, type: ConnectionType) => void;
+    baud: number;
+}): JSX.Element {
     return (
         <button
             type="button"
@@ -112,18 +120,26 @@ export function PortListings(props: PortListingsProps): JSX.Element {
                     >
                         <span>Unrecognized Ports</span>
                         <span
-                            className={cn('transition-transform duration-300 ease-in-out', {
-                                'rotate-90': openUnrecognized,
-                            })}
+                            className={cn(
+                                'transition-transform duration-300 ease-in-out',
+                                {
+                                    'rotate-90': openUnrecognized,
+                                },
+                            )}
                         >
                             <FaArrowAltCircleRight />
                         </span>
                     </button>
                     <div
-                        className={cn('flex flex-col transition-all duration-300 ease-in-out origin-top', {
-                            'max-h-0 opacity-0 scale-y-0': !openUnrecognized,
-                            'max-h-[500px] opacity-100 scale-y-100': openUnrecognized,
-                        })}
+                        className={cn(
+                            'flex flex-col transition-all duration-300 ease-in-out origin-top',
+                            {
+                                'max-h-0 opacity-0 scale-y-0':
+                                    !openUnrecognized,
+                                'max-h-[500px] opacity-100 scale-y-100':
+                                    openUnrecognized,
+                            },
+                        )}
                     >
                         {props.unrecognizedPorts.map((port) => {
                             return (
