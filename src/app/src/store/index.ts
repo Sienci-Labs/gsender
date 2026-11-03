@@ -164,6 +164,15 @@ const normalizeState = (state: any): any => {
         set(state, 'workspace.reverseWidgets', false);
     }
 
+    // before 1.7, the values were lowercase
+    // migrate them to uppercase
+    const projection = get(state, 'widgets.visualizer.projection');
+    if (projection === 'perspective') {
+        set(state, 'widgets.visualizer.projection', 'Perspective');
+    } else if (projection === 'orthographic') {
+        set(state, 'widgets.visualizer.projection', 'Orthographic');
+    }
+
     return state;
 };
 

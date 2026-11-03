@@ -532,12 +532,12 @@ class Visualizer extends Component {
         },
         toPerspectiveProjection: (projection) => {
             this.setState((state) => ({
-                projection: 'perspective',
+                projection: 'Perspective',
             }));
         },
         toOrthographicProjection: (projection) => {
             this.setState((state) => ({
-                projection: 'orthographic',
+                projection: 'Orthographic',
             }));
         },
         toggleProjection: () => {
@@ -1072,7 +1072,7 @@ class Visualizer extends Component {
             liteOption: this.config.get('liteOption'),
             liteMode: this.config.get('liteMode'),
             minimizeRenders: this.config.get('minimizeRenders'),
-            projection: this.config.get('projection', 'orthographic'),
+            projection: this.config.get('projection', 'Perspective'),
             objects: {
                 limits: {
                     visible: this.config.get('objects.limits.visible', true),

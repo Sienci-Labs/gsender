@@ -126,7 +126,7 @@ export interface State {
     liteMode: boolean;
     liteOption: LIGHTWEIGHT_OPTIONS_T;
     minimizeRenders: boolean;
-    projection: 'perspective' | 'orthographic';
+    projection: 'Perspective' | 'Orthographic';
     objects: {
         limits: {
             visible: boolean;
