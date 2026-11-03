@@ -130,6 +130,19 @@ export type QueryResult = {
     durationMs: number;
 };
 
+export type FileFilter = { name: string; extensions: string[] };
+
+export type FileSavePayload = {
+    content: string;
+    options: {
+        defaultFileName?: string;
+        title?: string;
+        filters?: FileFilter[];
+    };
+};
+
+export type FileSaveResult = { success: boolean; message: string };
+
 /** Normalises a RegExp to the serialized form the wire requires. The g and y
  * flags are dropped: their lastIndex persists between calls, which would make a
  * parser match every other line. */
@@ -275,6 +288,13 @@ type NavigationClient = {
      */
     navigate: (path: string, opts?: { replace?: boolean }) => Promise<void>;
 };
+type FileClient = {
+    /**
+     * Opens the native save dialog and writes `content` to the path the user picks.
+     * Resolves `{ success: false }` if the user cancels.
+     */
+    openSaveDialog: (fileData: FileSavePayload) => Promise<FileSaveResult>;
+};
 type GsenderClient = {
     machine: MachineClient;
     workspace: WorkspaceClient;
@@ -282,6 +302,7 @@ type GsenderClient = {
     gcode: GcodeClient;
     viewer: ViewerClient;
     navigation: NavigationClient;
+    file: FileClient;
 };
 
 const createMachineClient = (): MachineClient => ({
@@ -454,6 +475,10 @@ const createNavigationClient = (): NavigationClient => {
         navigateToCarve: () => navigate('/'),
     };
 };
+const createFileClient = (): FileClient => ({
+    openSaveDialog: (fileData) =>
+        request<FileSaveResult>('file:save', fileData),
+});
 export const machine = createMachineClient();
 export const workspace = createWorkspaceClient();
 export const redux = createReduxClient();
@@ -461,6 +486,7 @@ export const gcode = createGcodeClient();
 export const storage = createStorageClient();
 export const viewer = createViewerClient();
 export const navigation = createNavigationClient();
+export const file = createFileClient();
 
 const createGsenderClient = (): GsenderClient => ({
     machine: machine,
@@ -469,6 +495,7 @@ const createGsenderClient = (): GsenderClient => ({
     gcode: gcode,
     viewer: viewer,
     navigation: navigation,
+    file: file,
 });
 export const gsender = createGsenderClient();
 

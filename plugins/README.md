@@ -18,7 +18,7 @@ Then restart gSender.
 |--------|-------|----------------------|
 | `example-hello/` | Plain JS + Vite | Bridge client — `gsender`, `subscribeWorkspaceState`, `subscribeSelector` |
 | `react-ts-app/` | React + TypeScript + Vite | React hooks — `useWorkspaceState`, `useTypedSelector` |
-| `example-viewer/` | Plain JS + Vite | Embedded G-code preview — `GCodeViewer`, `gsender.gcode.loadToVisualizer`, `navigation.navigateToCarve`, `navigation.navigate` |
+| `example-viewer/` | Plain JS + Vite | Embedded G-code preview — `GCodeViewer`, `gsender.gcode.loadToVisualizer`, `navigation.navigateToCarve`, `navigation.navigate`, `file.openSaveDialog` |
 | `basic-cam/` | React + TypeScript + Vite + Tailwind | Full reference CAM plugin — combines all SDK entry points |
 | `corner-finder/` | React + TypeScript + Vite | Host visualizer bridge — `gsender.viewer.*` (picking, camera, overlay markers) + `machine.setBusy` |
 | `storage-test/` | Plain JS + Vite | Namespaced plugin storage — buttons for every `storage.*` method (get/set/delete/getAll/setAll/clear), for QA |
@@ -131,6 +131,40 @@ replying, so the call resolves even if navigating unmounts your plugin view.
 	"requestTypes": ["app:navigate"],
 	"topics": [],
 	"allowedFunctions": ["navigation"]
+}
+```
+
+#### `file:save`: save a file via the native dialog
+
+Granted when a plugin imports `file` (or the `gsender` aggregate). There is no
+separate permission prompt: the save dialog is the consent, since the user
+chooses whether and where the file is written.
+
+```ts
+import { file } from "@sienci/gsender-plugin-sdk";
+
+const result = await file.openSaveDialog({
+	content: gcode,
+	options: {
+		defaultFileName: "job.nc",
+		title: "Save G-code",
+		filters: [{ name: "G-code", extensions: ["nc", "gcode"] }],
+	},
+});
+// result: { success: boolean; message: string } — success is false on cancel
+```
+
+`content` must be a string (text only). The plugin only suggests a file name,
+title and filters; it can't pick the folder, and `defaultFileName` is reduced to
+its base name. In the desktop app this opens a native save dialog. In a browser
+(remote mode) it triggers a download instead, so `title` and `filters` are
+ignored and the browser's settings decide where the file goes.
+
+```json
+"capabilities": {
+	"requestTypes": ["file:save"],
+	"topics": [],
+	"allowedFunctions": ["file"]
 }
 ```
 
