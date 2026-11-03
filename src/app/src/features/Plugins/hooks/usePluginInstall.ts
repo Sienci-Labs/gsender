@@ -142,29 +142,61 @@ export const usePluginInstall = ({
     const busyRef = useRef(false);
     busyRef.current = state.busy;
 
-    const prepare = useCallback(async (sourcePath: string) => {
-        dispatch({ type: 'preparing' });
-        try {
-            const { data } = await api.plugins.installPrepare(sourcePath);
-            const response = data as PluginInstallPrepareResponse;
+    // Shared by prepare() and uploadAndPrepare() - the server returns the same
+    // shape whether the source was a path (Electron) or an uploaded zip
+    // (Android/browser).
+    const handlePrepareResponse = useCallback(
+        (data: PluginInstallPrepareResponse) => {
             dispatch({
                 type: 'prepared',
-                sessionId: response.sessionId as string,
-                plan: response.plan as PluginInstallPlan,
-                log: response.log ?? [],
+                sessionId: data.sessionId as string,
+                plan: data.plan as PluginInstallPlan,
+                log: data.log ?? [],
             });
-        } catch (err) {
-            const data = (
-                err as { response?: { data?: PluginInstallPrepareResponse } }
-            )?.response?.data;
-            dispatch({
-                type: 'failed',
-                error: messageFromError(err, 'Could not read that plugin'),
-                log: data?.log,
-                manifestErrors: data?.manifestErrors,
-            });
-        }
+        },
+        [],
+    );
+
+    const handlePrepareError = useCallback((err: unknown) => {
+        const data = (
+            err as { response?: { data?: PluginInstallPrepareResponse } }
+        )?.response?.data;
+        dispatch({
+            type: 'failed',
+            error: messageFromError(err, 'Could not read that plugin'),
+            log: data?.log,
+            manifestErrors: data?.manifestErrors,
+        });
     }, []);
+
+    const prepare = useCallback(
+        async (sourcePath: string) => {
+            dispatch({ type: 'preparing' });
+            try {
+                const { data } = await api.plugins.installPrepare(sourcePath);
+                handlePrepareResponse(data as PluginInstallPrepareResponse);
+            } catch (err) {
+                handlePrepareError(err);
+            }
+        },
+        [handlePrepareResponse, handlePrepareError],
+    );
+
+    // Android's SAF picker and a plain browser's <input type="file"> both only
+    // hand the renderer bytes, never a filesystem path the server can read -
+    // so the zip is uploaded instead of referenced by path.
+    const uploadAndPrepare = useCallback(
+        async (file: File) => {
+            dispatch({ type: 'preparing' });
+            try {
+                const { data } = await api.plugins.installPrepareUpload(file);
+                handlePrepareResponse(data as PluginInstallPrepareResponse);
+            } catch (err) {
+                handlePrepareError(err);
+            }
+        },
+        [handlePrepareResponse, handlePrepareError],
+    );
 
     // The native picker lives in the main process; it always replies, including
     // on cancel, so the wizard never sits waiting on a message that never comes.
@@ -206,11 +238,17 @@ export const usePluginInstall = ({
         };
     }, [prepare]);
 
+    // Electron only: the native dialog lives in the main process and replies
+    // over IPC (see the effect above). Outside Electron - Android or a plain
+    // browser - there is no native dialog; the caller uses a hidden
+    // <input type="file"> and uploadAndPrepare() instead (folders are not
+    // selectable that way, hence PluginInstallDialog only offering ".zip"
+    // there).
     const chooseSource = useCallback((mode: PluginSourceMode) => {
         if (!isElectron()) {
             dispatch({
                 type: 'failed',
-                error: 'Installing plugins from a file needs the gSender desktop app. Copy the plugin folder into the plugins directory instead.',
+                error: 'Picking a folder needs the gSender desktop app. Use a .zip file instead.',
             });
             return;
         }
@@ -272,6 +310,7 @@ export const usePluginInstall = ({
         ...state,
         chooseSource,
         prepare,
+        uploadAndPrepare,
         install,
         startOver,
         reset,

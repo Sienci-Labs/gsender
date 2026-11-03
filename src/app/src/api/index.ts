@@ -575,6 +575,17 @@ const plugins = {
     installPrepare: (sourcePath: string): Promise<AxiosResponse> => {
         return authrequest.post('/api/plugins/install/prepare', { sourcePath });
     },
+    // Same as installPrepare, for platforms with no filesystem path to hand
+    // the server (Android's SAF picker, or a plain browser's file input) -
+    // the picked zip is uploaded as bytes instead.
+    installPrepareUpload: (file: File): Promise<AxiosResponse> => {
+        const formData = new FormData();
+        formData.append('zip', file);
+        return authrequest.post(
+            '/api/plugins/install/prepare-upload',
+            formData,
+        );
+    },
     installCommit: (sessionId: string): Promise<AxiosResponse> => {
         return authrequest.post('/api/plugins/install/commit', { sessionId });
     },

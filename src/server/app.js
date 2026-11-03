@@ -186,9 +186,14 @@ const appMain = () => {
 	// app.use(bodyParser.urlencoded(settings.middleware['body-parser'].urlencoded));
 	// app.use(express.json());
 	// app.use(express.urlencoded({ extended: true }));
+	const multipartPaths = [
+		urljoin(settings.route, "api/file"),
+		urljoin(settings.route, "api/plugins/install/prepare-upload"),
+	];
 	app.use((req, res, next) => {
-		if (req.path === urljoin(settings.route, "api/file")) {
-			// Skip body parsing for the file upload route
+		if (multipartPaths.includes(req.path)) {
+			// Skip body parsing for multipart upload routes - multer reads the
+			// stream itself, and express.json() would otherwise consume it first.
 			return next();
 		}
 		// Preferences hold the whole settings tree; the 100kb default is too small.
@@ -555,6 +560,14 @@ const appMain = () => {
 		app.post(
 			urljoin(settings.route, "api/plugins/install/prepare"),
 			api.plugins.installPrepare,
+		);
+		// Android/browser equivalent of install/prepare: there is no native path
+		// to hand the server (SAF content:// URIs and browser File objects are
+		// both bytes, not a path), so the picked zip is uploaded instead.
+		app.post(
+			urljoin(settings.route, "api/plugins/install/prepare-upload"),
+			upload.single("zip"),
+			api.plugins.installPrepareUpload,
 		);
 		app.post(
 			urljoin(settings.route, "api/plugins/install/commit"),

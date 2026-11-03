@@ -350,10 +350,26 @@ class MainActivity : Activity() {
             ): Boolean {
                 filePathCallback?.onReceiveValue(null)
                 filePathCallback = callback
+                // params.acceptTypes mirrors the input's accept attribute, e.g.
+                // [".zip", "application/zip"] for the plugin install picker.
+                // Extensions aren't valid MIME types for SAF, so only pass
+                // through entries that actually look like one; some document
+                // providers mislabel zips (application/octet-stream etc.), so
+                // fall back to no filter rather than risk hiding valid files.
+                val mimeTypes = params.acceptTypes
+                    ?.filter { it.contains('/') }
+                    ?.filter { it.isNotBlank() }
+                    ?.toTypedArray()
+                    .orEmpty()
                 val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
                     .addCategory(Intent.CATEGORY_OPENABLE)
                     .setType("*/*")
                     .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, params.mode == FileChooserParams.MODE_OPEN_MULTIPLE)
+                if (mimeTypes.size == 1) {
+                    intent.setType(mimeTypes[0])
+                } else if (mimeTypes.size > 1) {
+                    intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes)
+                }
                 return try {
                     @Suppress("DEPRECATION")
                     startActivityForResult(intent, REQUEST_FILE)
