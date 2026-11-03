@@ -107,6 +107,7 @@ export interface gSenderSetting {
 	key?: string;
 	description?: string | any[];
 	options?: string[] | number[];
+	labels?: (string | number)[];
 	unit?: string;
 	eID?: EEPROM;
 	globalIndex?: number;
@@ -639,6 +640,28 @@ export const SettingsMenu: SettingsMenuSection[] = [
 							TOUCHPLATE_TYPE_3D,
 							TOUCHPLATE_TYPE_BITZERO,
 						],
+					},
+					{
+						label: "Corner",
+						key: "widgets.probe.direction",
+						type: "select",
+						description:
+							"Which corner of the stock the probe routine references. (Default Bottom Left)",
+						options: [0, 1, 2, 3],
+						labels: [
+							"Bottom Left",
+							"Top Left",
+							"Top Right",
+							"Bottom Right",
+						],
+						hidden: (getPending) => {
+							const probeType = getPending(
+								"workspace.probeProfile.touchplateType",
+								"",
+							);
+							// Hidden if we are using the Z Probe/puck touchplate, which doesn't use a corner direction
+							return probeType === TOUCHPLATE_TYPE_ZERO;
+						},
 					},
 					{
 						label: "Show touch plate switcher",

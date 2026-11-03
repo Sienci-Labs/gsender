@@ -24,6 +24,7 @@ import get from 'lodash/get';
 import includes from 'lodash/includes';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePostHog } from '@posthog/react';
+import pubsub from 'pubsub-js';
 // import Space from 'app/components/Space';
 import controller from 'app/lib/controller';
 import {
@@ -444,6 +445,21 @@ const ProbeWidget = () => {
             store.removeListener('change', onStoreChange);
         };
     }, [touchplateType, units, toolDiameter, probeType]);
+
+    useEffect(() => {
+        const token = pubsub.subscribe(
+            'config:saved',
+            (_, settingsToUpdate) => {
+                if ('widgets.probe.direction' in settingsToUpdate) {
+                    setDirection(Number(config.get('direction', 0)));
+                }
+            },
+        );
+
+        return () => {
+            pubsub.unsubscribe(token);
+        };
+    }, []);
 
     useEffect(() => {
         config.set('probeCommand', probeCommand);

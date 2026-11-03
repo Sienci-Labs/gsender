@@ -51,16 +51,21 @@ function returnSettingControl(
                     disabled={setting.disabled}
                 />
             );
-        case 'select':
+        case 'select': {
+            const isNumericOptions = setting.options?.every(
+                (o) => typeof o === 'number',
+            );
             return (
                 <SelectSettingInput
                     options={setting.options}
+                    labels={setting.labels}
                     index={index}
                     value={value as string}
-                    onChange={handler}
+                    onChange={(v) => handler(isNumericOptions ? Number(v) : v)}
                     disabled={setting.disabled}
                 />
             );
+        }
         case 'number':
             return (
                 <NumberSettingInput

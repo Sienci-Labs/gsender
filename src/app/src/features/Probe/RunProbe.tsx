@@ -63,6 +63,7 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
         selectedProbeCommand,
         touchplate,
         connectivityTest,
+        direction,
     } = state;
     const { probePinStatus } = useTypedSelector((state) => ({
         probePinStatus: state.controller.state.status?.pinState.P ?? false,
@@ -138,6 +139,14 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
     //const probeCommands = actions.generateProbeCommands();
     //console.log(probeCommands.length);
     const probeCommand = availableProbeCommands[selectedProbeCommand];
+    const directionLabels = [
+        'Bottom Left',
+        'Top Left',
+        'Top Right',
+        'Bottom Right',
+    ];
+    const directionLabel = directionLabels[direction] || 'Unknown';
+    const showDirectionWarning = direction !== 0;
     const is3DProbe = touchplateType === TOUCHPLATE_TYPE_3D;
 
     const probeActive = actions.returnProbeConnectivity();
@@ -159,6 +168,38 @@ const RunProbe = ({ actions, state }: RunProbeProps) => {
                 <div className="grid grid-cols-[1.5fr_1fr] gap-2 w-[600px] min-h-[200px]">
                     <div className="flex flex-col justify-between pb-4">
                         <div className="text-black leading-snug dark:text-white">
+                            <div
+                                className={cx(
+                                    'flex items-center p-4 text-sm text-yellow-800 border border-yellow-300 rounded-lg bg-yellow-50 w-full mb-3',
+                                    {
+                                        invisible: !showDirectionWarning,
+                                    },
+                                )}
+                                role={
+                                    showDirectionWarning ? 'alert' : undefined
+                                }
+                                aria-hidden={!showDirectionWarning}
+                            >
+                                <svg
+                                    className="flex-shrink-0 inline w-4 h-4 me-3"
+                                    aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20"
+                                >
+                                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+                                </svg>
+                                <span className="sr-only">Warning</span>
+                                <div>
+                                    <span className="font-medium">
+                                        Warning - Probing {directionLabel}{' '}
+                                        corner
+                                    </span>
+                                    <div>
+                                        Verify this is correct before starting.
+                                    </div>
+                                </div>
+                            </div>
                             <p className="mb-3">
                                 1. Check the tool is positioned correctly
                                 (pictured).
