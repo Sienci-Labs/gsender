@@ -48,6 +48,7 @@ const ALL_REQUEST_TYPES = [
 	"viewer:pick:disarm",
 	"viewer:overlay:set",
 	"app:navigate",
+	"file:save",
 ];
 
 const VIEWER_REQUEST_TYPES = [
@@ -136,6 +137,7 @@ export const requestTypesMap = new Map([
 	["getSelector", ["redux:get:state"]],
 	["storage", STORAGE_REQUEST_TYPES],
 	["navigation", ["app:navigate"]],
+	["file", ["file:save"]],
 ]);
 
 export const topicsMap = new Map([

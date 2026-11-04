@@ -35,6 +35,11 @@ export const viteServer = async (app) => {
 			appType: "spa", // handles SPA routing + index.html fallback automatically
 			base,
 			configFile: path.resolve(devDir, "vite.config.js"),
+			// electron:dev also runs a standalone Vite (vite:dev, --force) on the
+			// same app; sharing one cacheDir lets them overwrite each other's
+			// optimized chunks at startup, which shows up as 504 "Outdated
+			// Optimize Dep".
+			cacheDir: path.resolve(devDir, "node_modules/.vite-middleware"),
 		});
 		app.use(vite.middlewares);
 	} else {

@@ -41,8 +41,13 @@ jest.mock('app/store/redux', () => ({
     subscribe: jest.fn(),
 }));
 jest.mock('app/constants', () => ({ VISUALIZER_PRIMARY: 'primary' }));
+jest.mock('is-electron', () => ({
+    __esModule: true,
+    default: jest.fn(() => true),
+}));
 
 import controller from 'app/lib/controller';
+import isElectron from 'is-electron';
 import { toRuntimeCapabilities } from '../capabilities';
 import {
     registerPluginWindow,
@@ -150,6 +155,7 @@ describe('plugin bridge request gate', () => {
         'viewer:overlay:set',
         'machine:busy:set',
         'app:navigate',
+        'file:save',
     ] as const)("denies '%s' when not granted", async (type) => {
         registerPluginWindow(
             source,
@@ -885,5 +891,93 @@ describe('app:navigate', () => {
 
         expect(response).toMatchObject({ id: 'n3', ok: false });
         expect(response?.error).toMatch(/not available/i);
+    });
+});
+
+describe('file:save', () => {
+    const source = {} as MessageEventSource;
+    const payload = {
+        content: 'G0 X0',
+        options: { defaultFileName: 'job.nc', title: 'Save' },
+    };
+    const invoke = jest.fn();
+
+    beforeEach(() => {
+        invoke.mockReset();
+        (window as any).ipcRenderer = { invoke };
+        (isElectron as jest.Mock).mockReturnValue(true);
+        registerPluginWindow(
+            source,
+            toRuntimeCapabilities({ requestTypes: ['file:save'] }),
+            'com.sienci.test-plugin',
+        );
+    });
+
+    afterEach(() => {
+        unregisterPluginWindow(source);
+        delete (window as any).ipcRenderer;
+    });
+
+    it('forwards a granted save to the Electron dialog handler', async () => {
+        invoke.mockResolvedValue({ success: true, message: 'Saved' });
+
+        const response = await handlePluginBridgeMessage(
+            makeEvent(source, { id: 'f1', type: 'file:save', payload }),
+        );
+
+        expect(invoke).toHaveBeenCalledWith('dialog:saveFile', payload);
+        expect(response).toEqual({
+            id: 'f1',
+            ok: true,
+            result: { success: true, message: 'Saved' },
+        });
+    });
+
+    it('rejects non-string content without opening a dialog', async () => {
+        const response = await handlePluginBridgeMessage(
+            makeEvent(source, {
+                id: 'f2',
+                type: 'file:save',
+                payload: { content: 42, options: {} },
+            }),
+        );
+
+        expect(invoke).not.toHaveBeenCalled();
+        expect(response).toMatchObject({
+            id: 'f2',
+            ok: true,
+            result: { success: false },
+        });
+    });
+
+    it('falls back to a browser download outside Electron, using only the base name', async () => {
+        (isElectron as jest.Mock).mockReturnValue(false);
+        URL.createObjectURL = jest.fn(() => 'blob:x');
+        URL.revokeObjectURL = jest.fn();
+        const click = jest
+            .spyOn(HTMLAnchorElement.prototype, 'click')
+            .mockImplementation(() => {});
+        const setAttribute = jest.spyOn(
+            HTMLAnchorElement.prototype,
+            'setAttribute',
+        );
+
+        const response = await handlePluginBridgeMessage(
+            makeEvent(source, {
+                id: 'f3',
+                type: 'file:save',
+                payload: {
+                    content: 'G0',
+                    options: { defaultFileName: '../../evil.nc' },
+                },
+            }),
+        );
+
+        expect(invoke).not.toHaveBeenCalled();
+        expect(click).toHaveBeenCalled();
+        expect(setAttribute).toHaveBeenCalledWith('download', 'evil.nc');
+        expect(response).toMatchObject({ ok: true, result: { success: true } });
+        click.mockRestore();
+        setAttribute.mockRestore();
     });
 });

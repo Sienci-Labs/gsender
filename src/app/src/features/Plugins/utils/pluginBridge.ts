@@ -5,9 +5,12 @@ import controller from 'app/lib/controller';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 import store from 'app/store';
 import reduxStore from 'app/store/redux';
+import isElectron from 'is-electron';
 import { setPluginBusy } from 'app/store/redux/slices/pluginState.slice';
 import type {
     ControllerEvent,
+    FileSavePayload,
+    FileSaveResult,
     OverlayMarker,
     PLUGIN_BRIDGE_CHANNEL,
     PluginBridgeRequest,
@@ -153,6 +156,37 @@ const machineIsConnectedAndIdle = (): boolean => {
     const isConnected = !!state.connection?.isConnected;
     const activeState = state.controller?.state?.status?.activeState;
     return isConnected && activeState === GRBL_ACTIVE_STATE_IDLE;
+};
+
+// Plugin iframes are sandboxed without allow-downloads, so the host performs
+// the save. Electron shows a native dialog; the browser can only trigger a
+// download, so the user's browser settings decide whether/where it saves.
+const savePluginFile = async (
+    payload: FileSavePayload,
+): Promise<FileSaveResult> => {
+    if (typeof payload?.content !== 'string') {
+        return { success: false, message: 'Invalid file content' };
+    }
+
+    if (isElectron()) {
+        return (window as any).ipcRenderer.invoke('dialog:saveFile', payload);
+    }
+
+    // Never trust the plugin's name as a path: keep the base name only.
+    const fileName =
+        (payload.options?.defaultFileName ?? '').split(/[\\/]/).pop() ||
+        'download.txt';
+    const blob = new Blob([payload.content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    return { success: true, message: 'Download started' };
 };
 
 const getMachineContext = () => {
@@ -580,6 +614,8 @@ const handleBridgeRequest = async (
             return setAllStorageValues(pluginId as string, request.payload);
         case 'storage:clear':
             return clearStorageValues(pluginId as string);
+        case 'file:save':
+            return savePluginFile(request.payload as FileSavePayload);
         default:
             console.error(`Unknown bridge request: ${request.type}`);
             throw new Error(`Unknown bridge request: ${request.type}`);
