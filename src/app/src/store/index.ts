@@ -21,6 +21,7 @@ import settings from '../config/settings';
 import { MACRO_CATEGORY, METRIC_UNITS } from '../constants';
 import { defaultATCIMacros } from '../features/ATC/assets/defaultATCIMacros';
 import defaultState from './defaultState';
+import { migrateValues } from './valueMigrations';
 
 interface CncData {
     version: string;
@@ -164,7 +165,7 @@ const normalizeState = (state: any): any => {
         set(state, 'workspace.reverseWidgets', false);
     }
 
-    return state;
+    return migrateValues(state);
 };
 
 export const merge = (base: any, saved: any): any => {

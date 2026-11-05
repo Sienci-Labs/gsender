@@ -45,3 +45,6 @@ CLAUDE.md
 .agents
 android/
 skills-lock.json
+
+**/tsconfig.tsbuildinfo
+**/tsconfig.node.tsbuildinfo
