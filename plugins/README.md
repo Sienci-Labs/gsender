@@ -158,7 +158,10 @@ const result = await file.openSaveDialog({
 title and filters; it can't pick the folder, and `defaultFileName` is reduced to
 its base name. In the desktop app this opens a native save dialog. In a browser
 (remote mode) it triggers a download instead, so `title` and `filters` are
-ignored and the browser's settings decide where the file goes.
+ignored and the browser's settings decide where the file goes. Because the
+browser has no native dialog to act as consent, gSender shows its own prompt
+naming the plugin and file; the user must click Download, otherwise the call
+resolves `{ success: false }`. Only one prompt can be open at a time.
 
 ```json
 "capabilities": {
