@@ -46,7 +46,7 @@ export function useVacuumTableWizard(): Wizard {
                         },
                         {
                             id: 'select-size',
-                            title: 'Table Size',
+                            title: 'Table Type',
                             component: SelectSize,
                             secondaryContent: [
                                 {
@@ -75,6 +75,17 @@ export function useVacuumTableWizard(): Wizard {
                         'Carve an optional alignment grid onto your vacuum table.',
                     estimatedTime: '5 minutes',
                     steps: [
+                        {
+                            id: 'select-size',
+                            title: 'Table Type',
+                            component: SelectSize,
+                            secondaryContent: [
+                                {
+                                    type: 'component',
+                                    content: Fragment,
+                                },
+                            ],
+                        },
                         {
                             id: 'load-grid-gcode',
                             title: 'Load Grid to Carve',

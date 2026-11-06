@@ -21,7 +21,7 @@ export function SelectSize({ onComplete }: StepProps) {
     return (
         <div className="flex flex-col gap-5 justify-start">
             <p className="dark:text-content-primary">
-                Choose the size of your vacuum table.
+                Choose your vacuum table type.
             </p>
             <Select value={tableSize} onValueChange={setTableSize}>
                 <SelectTrigger>

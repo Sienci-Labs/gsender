@@ -6,9 +6,14 @@ export interface VacuumTableSize {
 
 export const VACUUM_TABLE_SIZES: VacuumTableSize[] = [
     {
-        value: '4x8',
-        label: "4' x 8' Vacuum Table",
-        description: 'Standard full-sheet size',
+        value: 'full',
+        label: 'Full Table',
+        description: "Full 4' x 8' table",
+    },
+    {
+        value: 'joinery',
+        label: 'Joinery Table',
+        description: 'Table with joinery section',
     },
 ];
 
