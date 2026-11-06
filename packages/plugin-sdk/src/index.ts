@@ -292,6 +292,9 @@ type FileClient = {
     /**
      * Opens the native save dialog and writes `content` to the path the user picks.
      * Resolves `{ success: false }` if the user cancels.
+     *
+     * In a browser (no native dialog) gSender asks the user to confirm a
+     * download of the file; it resolves `{ success: false }` if they cancel.
      */
     openSaveDialog: (fileData: FileSavePayload) => Promise<FileSaveResult>;
 };

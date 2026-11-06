@@ -46,6 +46,16 @@ jest.mock('is-electron', () => ({
     default: jest.fn(() => true),
 }));
 
+jest.mock('app/components/ConfirmationDialog/ConfirmationDialogLib', () => ({
+    Confirm: jest.fn(),
+}));
+jest.mock('../../hooks/pluginStore', () => ({
+    getSnapshot: jest.fn(() => ({
+        plugins: [{ id: 'com.sienci.test-plugin', name: 'Test Plugin' }],
+    })),
+}));
+
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import controller from 'app/lib/controller';
 import isElectron from 'is-electron';
 import { toRuntimeCapabilities } from '../capabilities';
@@ -950,8 +960,97 @@ describe('file:save', () => {
         });
     });
 
+    const mockClick = () =>
+        jest
+            .spyOn(HTMLAnchorElement.prototype, 'click')
+            .mockImplementation(() => {});
+
+    // Lets a test choose how the user answers the (mocked) host dialog.
+    const answerDialog = (answer: 'confirm' | 'cancel') =>
+        (Confirm as jest.Mock).mockImplementation((opts) =>
+            answer === 'confirm' ? opts.onConfirm() : opts.onClose(),
+        );
+
+    beforeEach(() => {
+        (Confirm as jest.Mock).mockReset();
+        URL.createObjectURL = jest.fn(() => 'blob:x');
+        URL.revokeObjectURL = jest.fn();
+    });
+
+    it('asks the user to confirm a browser download before saving', async () => {
+        (isElectron as jest.Mock).mockReturnValue(false);
+        answerDialog('confirm');
+        const click = mockClick();
+
+        const response = await handlePluginBridgeMessage(
+            makeEvent(source, { id: 'f4', type: 'file:save', payload }),
+        );
+
+        const opts = (Confirm as jest.Mock).mock.calls[0][0];
+        expect(opts.content).toContain('Test Plugin');
+        expect(opts.content).toContain('job.nc');
+        expect(click).toHaveBeenCalled();
+        expect(response).toMatchObject({ ok: true, result: { success: true } });
+        click.mockRestore();
+    });
+
+    it('does not download when the user cancels the browser prompt', async () => {
+        (isElectron as jest.Mock).mockReturnValue(false);
+        answerDialog('cancel');
+        const click = mockClick();
+
+        const response = await handlePluginBridgeMessage(
+            makeEvent(source, { id: 'f5', type: 'file:save', payload }),
+        );
+
+        expect(click).not.toHaveBeenCalled();
+        expect(response).toMatchObject({
+            ok: true,
+            result: { success: false, message: 'Save cancelled' },
+        });
+        click.mockRestore();
+    });
+
+    it('rejects a second browser save while a prompt is still open', async () => {
+        (isElectron as jest.Mock).mockReturnValue(false);
+        let confirmFirst: () => void = () => {};
+        (Confirm as jest.Mock).mockImplementationOnce((opts) => {
+            confirmFirst = opts.onConfirm;
+        });
+        const click = mockClick();
+
+        const first = handlePluginBridgeMessage(
+            makeEvent(source, { id: 'f6', type: 'file:save', payload }),
+        );
+        const second = await handlePluginBridgeMessage(
+            makeEvent(source, { id: 'f7', type: 'file:save', payload }),
+        );
+
+        expect(second).toMatchObject({
+            ok: true,
+            result: { success: false, message: 'A save is already pending' },
+        });
+        expect(Confirm).toHaveBeenCalledTimes(1);
+
+        confirmFirst();
+        await first;
+        click.mockRestore();
+    });
+
+    it('never shows the host prompt in Electron (the native dialog is the consent)', async () => {
+        invoke.mockResolvedValue({ success: true, message: 'Saved' });
+
+        await handlePluginBridgeMessage(
+            makeEvent(source, { id: 'f8', type: 'file:save', payload }),
+        );
+
+        expect(Confirm).not.toHaveBeenCalled();
+        expect(invoke).toHaveBeenCalledWith('dialog:saveFile', payload);
+    });
+
     it('falls back to a browser download outside Electron, using only the base name', async () => {
         (isElectron as jest.Mock).mockReturnValue(false);
+        answerDialog('confirm');
         URL.createObjectURL = jest.fn(() => 'blob:x');
         URL.revokeObjectURL = jest.fn();
         const click = jest
