@@ -268,7 +268,7 @@ class Controller {
 
     type = '';
 
-    settings = {};
+    settings: Record<string, any> = {};
 
     state = {};
 
