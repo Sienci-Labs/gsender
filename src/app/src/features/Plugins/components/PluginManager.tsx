@@ -91,8 +91,10 @@ const PluginManager = () => {
             description="Manage UI plugins installed on this machine"
             withGoBackButton
             withFullPadding
+            withFixedArea
+            withFlexContent
         >
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 flex-1 min-h-0">
                 <p className="text-sm text-gray-600 dark:text-content-secondary">
                     Plugins directory:{' '}
                     {canOpenDir ? (
@@ -158,7 +160,7 @@ const PluginManager = () => {
                     </p>
                 )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 relative content-start flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
                     {plugins.map((plugin) => (
                         <div
                             key={plugin.id}
