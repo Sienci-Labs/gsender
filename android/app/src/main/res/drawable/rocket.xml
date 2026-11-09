@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Rocket line art, matched to the launcher icon. Square so it scales
+     without distortion; the nozzle sits at (48, 82) in viewport units, which
+     RocketLaunchView relies on to place the flame. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="96dp"
+    android:height="96dp"
+    android:viewportWidth="96"
+    android:viewportHeight="96">
+    <group
+        android:translateX="16"
+        android:translateY="14">
+        <!-- Fins -->
+        <path
+            android:fillColor="@color/pendant_surface"
+            android:pathData="M20,44 L9,64 L20,60 Z M44,44 L55,64 L44,60 Z"
+            android:strokeColor="@color/pendant_accent"
+            android:strokeLineJoin="round"
+            android:strokeWidth="2.5" />
+        <!-- Nozzle -->
+        <path
+            android:fillColor="@color/pendant_surface"
+            android:pathData="M25,60 L27,68 L37,68 L39,60 Z"
+            android:strokeColor="@color/pendant_accent"
+            android:strokeLineJoin="round"
+            android:strokeWidth="2.5" />
+        <!-- Body -->
+        <path
+            android:fillColor="@color/pendant_surface"
+            android:pathData="M32,4 C43,15 46,33 44,60 L20,60 C18,33 21,15 32,4 Z"
+            android:strokeColor="@color/pendant_accent"
+            android:strokeLineJoin="round"
+            android:strokeWidth="2.5" />
+        <!-- Nose band and porthole -->
+        <path
+            android:pathData="M24.5,17 L39.5,17"
+            android:strokeColor="@color/pendant_accent"
+            android:strokeLineCap="round"
+            android:strokeWidth="2" />
+        <path
+            android:fillColor="@color/pendant_bg"
+            android:pathData="M26,32 a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0"
+            android:strokeColor="@color/pendant_accent"
+            android:strokeWidth="2.5" />
+        <path
+            android:pathData="M32,46 L32,56"
+            android:strokeColor="@color/pendant_accent"
+            android:strokeLineCap="round"
+            android:strokeWidth="2" />
+    </group>
+</vector>

@@ -177,9 +177,14 @@ const appMain = () => {
 	// app.use(bodyParser.urlencoded(settings.middleware['body-parser'].urlencoded));
 	// app.use(express.json());
 	// app.use(express.urlencoded({ extended: true }));
+	const multipartPaths = [
+		urljoin(settings.route, "api/file"),
+		urljoin(settings.route, "api/plugins/install/prepare-upload"),
+	];
 	app.use((req, res, next) => {
-		if (req.path === urljoin(settings.route, "api/file")) {
-			// Skip body parsing for the file upload route
+		if (multipartPaths.includes(req.path)) {
+			// Skip body parsing for multipart upload routes - multer reads the
+			// stream itself, and express.json() would otherwise consume it first.
 			return next();
 		}
 		// Preferences hold the whole settings tree; the 100kb default is too small.
@@ -367,6 +372,70 @@ const appMain = () => {
 		app.put(urljoin(settings.route, "/api/remote"), api.remote.update);
 		app.get(urljoin(settings.route, "api/remote"), api.remote.fetch);
 
+		// Remote File Receive (desktop -> pendant file transfer). The actual
+		// LAN-reachable upload listener is a separate server - see
+		// src/server/services/remoteFileReceive. These routes only manage it
+		// and are served on this app's usual loopback-only origin.
+		app.get(
+			urljoin(settings.route, "api/remoteFileReceive"),
+			api.remoteFileReceive.fetch,
+		);
+		app.put(
+			urljoin(settings.route, "api/remoteFileReceive"),
+			api.remoteFileReceive.update,
+		);
+		app.post(
+			urljoin(settings.route, "api/remoteFileReceive/token"),
+			api.remoteFileReceive.regenerateToken,
+		);
+		app.get(
+			urljoin(settings.route, "api/remoteFileReceive/files"),
+			api.remoteFileReceive.listFiles,
+		);
+		app.get(
+			urljoin(settings.route, "api/remoteFileReceive/files/:name"),
+			api.remoteFileReceive.readFile,
+		);
+		app.delete(
+			urljoin(settings.route, "api/remoteFileReceive/files"),
+			api.remoteFileReceive.deleteFiles,
+		);
+		app.post(
+			urljoin(settings.route, "api/remoteFileReceive/pair/pending"),
+			api.remoteFileReceive.setPendingPair,
+		);
+		app.get(
+			urljoin(settings.route, "api/remoteFileReceive/desktops"),
+			api.remoteFileReceive.listDesktops,
+		);
+		app.delete(
+			urljoin(settings.route, "api/remoteFileReceive/desktops/:id"),
+			api.remoteFileReceive.forgetDesktop,
+		);
+
+		// Pendant pairing (desktop side): discovers pendants on the LAN and
+		// holds the keys this desktop has been issued by them.
+		app.post(
+			urljoin(settings.route, "api/pendantPairing/discover"),
+			api.pendantPairing.discover,
+		);
+		app.post(
+			urljoin(settings.route, "api/pendantPairing/qr"),
+			api.pendantPairing.createQr,
+		);
+		app.post(
+			urljoin(settings.route, "api/pendantPairing/claim"),
+			api.pendantPairing.claim,
+		);
+		app.get(
+			urljoin(settings.route, "api/pendantPairing/tablets"),
+			api.pendantPairing.listTablets,
+		);
+		app.delete(
+			urljoin(settings.route, "api/pendantPairing/tablets/:id"),
+			api.pendantPairing.forgetTablet,
+		);
+
 		// Job Stats
 		app.put(urljoin(settings.route, "/api/jobstats"), api.jobStats.update);
 		app.get(urljoin(settings.route, "api/jobstats"), api.jobStats.fetch);
@@ -480,6 +549,14 @@ const appMain = () => {
 		app.post(
 			urljoin(settings.route, "api/plugins/install/prepare"),
 			api.plugins.installPrepare,
+		);
+		// Android/browser equivalent of install/prepare: there is no native path
+		// to hand the server (SAF content:// URIs and browser File objects are
+		// both bytes, not a path), so the picked zip is uploaded instead.
+		app.post(
+			urljoin(settings.route, "api/plugins/install/prepare-upload"),
+			upload.single("zip"),
+			api.plugins.installPrepareUpload,
 		);
 		app.post(
 			urljoin(settings.route, "api/plugins/install/commit"),

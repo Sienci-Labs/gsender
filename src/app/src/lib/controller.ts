@@ -124,6 +124,19 @@ export interface ControllerListeners {
     'plugin:parser:match': Array<Function>;
     // A plugin's parser was rejected, rate limited, or quarantined.
     'plugin:parser:error': Array<Function>;
+    // A file was pushed onto this pendant remotely (Send to Pendant) and saved
+    // to its file library rather than loaded as the active job.
+    'remote:file-received': Array<Function>;
+    // Byte-level progress of an in-flight Send to Pendant upload, reported by
+    // the receiving side's remoteFileReceive service.
+    'remote:file-incoming:start': Array<Function>;
+    'remote:file-incoming:progress': Array<Function>;
+    'remote:file-incoming:complete': Array<Function>;
+    'remote:file-incoming:error': Array<Function>;
+    // A desktop finished pairing with this pendant (QR or code claim).
+    'remote:pair-complete': Array<Function>;
+    // Desktop side: the set of pendants found over mDNS (or paired) changed.
+    'pendant:discovered': Array<Function>;
 }
 
 const ensureArray = (...args: Array<any>) => {
@@ -246,6 +259,13 @@ class Controller {
         // silently never be subscribed to.
         'plugin:parser:match': [],
         'plugin:parser:error': [],
+        'remote:file-received': [],
+        'remote:file-incoming:start': [],
+        'remote:file-incoming:progress': [],
+        'remote:file-incoming:complete': [],
+        'remote:file-incoming:error': [],
+        'remote:pair-complete': [],
+        'pendant:discovered': [],
     };
 
     context = {

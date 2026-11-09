@@ -102,7 +102,7 @@ describe.each(FIRMWARES)(
 				expect(c.workflow.state).toBe("running");
 				expect(c.sender.state.sent).toBe(0);
 				expect(next).toHaveBeenCalledWith({ startFromLine: true });
-				expect(f.events("job:start")).toEqual([[]]);
+				expect(f.events("job:start")).toEqual([[false]]);
 			},
 		);
 

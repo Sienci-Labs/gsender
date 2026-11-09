@@ -1,6 +1,7 @@
 import { GRBL_ACTIVE_STATE_IDLE, VISUALIZER_PRIMARY } from 'app/constants';
 import type { VisualizerBridgeHandle } from 'app/features/Visualizer/visualizerBridge';
 import { visualizerBridge } from 'app/features/Visualizer/visualizerBridge';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import controller from 'app/lib/controller';
 import { uploadGcodeFileToServer } from 'app/lib/fileupload';
 import store from 'app/store';
@@ -21,6 +22,7 @@ import type {
     PluginParserError,
     PluginParserMatch,
 } from '../types';
+import { getSnapshot as getPluginStoreSnapshot } from '../hooks/pluginStore';
 import {
     EMPTY_CAPABILITIES,
     getCapabilitiesForSource,
@@ -159,10 +161,32 @@ const machineIsConnectedAndIdle = (): boolean => {
 };
 
 // Plugin iframes are sandboxed without allow-downloads, so the host performs
-// the save. Electron shows a native dialog; the browser can only trigger a
-// download, so the user's browser settings decide whether/where it saves.
+// the save. Electron shows a native dialog (the user's consent)
+// the browser has no such dialog, so the host asks the user to confirm the download itself
+let pendingWebSave = false;
+
+const formatBytes = (bytes: number): string =>
+    bytes < 1024 ? `${bytes} B` : `${(bytes / 1024).toFixed(1)} KB`;
+
+const confirmWebDownload = (
+    pluginName: string,
+    fileName: string,
+    size: number,
+): Promise<boolean> =>
+    new Promise((resolve) => {
+        Confirm({
+            title: 'Download file?',
+            content: `${pluginName} wants to download "${fileName}" (${formatBytes(size)}).`,
+            confirmLabel: 'Download',
+            cancelLabel: 'Cancel',
+            onConfirm: () => resolve(true),
+            onClose: () => resolve(false),
+        });
+    });
+
 const savePluginFile = async (
     payload: FileSavePayload,
+    pluginId: string | null,
 ): Promise<FileSaveResult> => {
     if (typeof payload?.content !== 'string') {
         return { success: false, message: 'Invalid file content' };
@@ -172,11 +196,33 @@ const savePluginFile = async (
         return (window as any).ipcRenderer.invoke('dialog:saveFile', payload);
     }
 
+    if (pendingWebSave) {
+        return { success: false, message: 'A save is already pending' };
+    }
+
     // Never trust the plugin's name as a path: keep the base name only.
     const fileName =
         (payload.options?.defaultFileName ?? '').split(/[\\/]/).pop() ||
         'download.txt';
     const blob = new Blob([payload.content], { type: 'text/plain' });
+
+    const pluginName =
+        getPluginStoreSnapshot().plugins.find((p) => p.id === pluginId)?.name ??
+        pluginId ??
+        'A plugin';
+
+    pendingWebSave = true;
+    let confirmed = false;
+    try {
+        confirmed = await confirmWebDownload(pluginName, fileName, blob.size);
+    } finally {
+        pendingWebSave = false;
+    }
+
+    if (!confirmed) {
+        return { success: false, message: 'Save cancelled' };
+    }
+
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -615,7 +661,7 @@ const handleBridgeRequest = async (
         case 'storage:clear':
             return clearStorageValues(pluginId as string);
         case 'file:save':
-            return savePluginFile(request.payload as FileSavePayload);
+            return savePluginFile(request.payload as FileSavePayload, pluginId);
         default:
             console.error(`Unknown bridge request: ${request.type}`);
             throw new Error(`Unknown bridge request: ${request.type}`);

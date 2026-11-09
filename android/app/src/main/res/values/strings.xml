@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">gSender Pendant</string>
+
+    <!-- Load screen -->
+    <string name="status_installing">Preparing…</string>
+    <string name="status_installing_update">Installing update…</string>
+    <string name="status_starting">Starting gSender…</string>
+    <string name="status_connecting">Loading pendant…</string>
+    <string name="status_stopped">gSender is stopped.</string>
+    <string name="error_title">gSender couldn\'t start</string>
+    <string name="error_page">The pendant didn\'t load: %1$s</string>
+    <string name="action_retry">Retry</string>
+    <string name="action_start">Start</string>
+    <string name="action_show_details">Show details</string>
+    <string name="action_hide_details">Hide details</string>
+
+    <!-- Foreground service notification -->
+    <string name="notification_channel">gSender server</string>
+    <string name="notification_channel_description">Shown while gSender is running, so jobs keep going in the background.</string>
+    <string name="notification_starting">Starting…</string>
+    <string name="notification_running">Running</string>
+    <string name="notification_failed">Stopped with an error</string>
+    <string name="notification_stop">Stop</string>
+</resources>

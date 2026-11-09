@@ -1,0 +1,148 @@
+# gSender Pendant for Android: builds a debug APK (arm64-v8a only - physical
+# arm64 tablets are the only target, no emulator/x86_64 build). See
+# android/README.md.
+#
+# The Node.js runtime (android/node) is cross-compiled here and kept in the
+# Actions cache, keyed on android/node/**. A cache hit takes about a minute; a
+# miss (runtime change, or cache evicted after 7 days unused) takes 1–1.5 h.
+#
+# Android is not part of gSender releases: this workflow never runs for tags or
+# master and never publishes to GitHub Releases. APKs are Actions artifacts
+# only. Do not add a release upload step.
+name: Android
+run-name: "Android — ${{ github.event.head_commit.message || github.ref_name }}"
+
+on:
+  push:
+    branches: [dev, 'features/*', 'bugfix/*']
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  node-runtime:
+    name: Node runtime arm64
+    # Belt and braces: a manual dispatch against a tag must not build either.
+    if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read runtime.env
+        id: env
+        run: |
+          source android/node/runtime.env
+          echo "ndk=$NDK_VERSION" >> "$GITHUB_OUTPUT"
+          echo "key=android-node-$NODE_VERSION-arm64-${{ hashFiles('android/node/**') }}" >> "$GITHUB_OUTPUT"
+
+      - name: Restore cached runtime
+        id: cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/node-runtime
+          key: ${{ steps.env.outputs.key }}
+
+      - name: Set up NDK
+        if: steps.cache.outputs.cache-hit != 'true'
+        id: ndk
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: ${{ steps.env.outputs.ndk }}
+          add-to-path: false
+
+      - name: Free disk space
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android/sdk/ndk /opt/ghc /usr/local/.ghcup && df -h /
+
+      - name: Cross-compile Node (cache miss, 1–1.5 h)
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: bash android/node/build-node.sh arm64 "${{ steps.ndk.outputs.ndk-path }}" "$RUNNER_TEMP/node-work" "$RUNNER_TEMP/node-runtime"
+
+      - name: Save runtime to cache
+        if: steps.cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/node-runtime
+          key: ${{ steps.env.outputs.key }}
+
+      - name: Summary
+        run: |
+          {
+            echo "### Node runtime — arm64 ($([ '${{ steps.cache.outputs.cache-hit }}' = true ] && echo 'from cache' || echo 'built'))"
+            echo '```'
+            tar xzf "$RUNNER_TEMP"/node-runtime/*.tar.gz -O ./build-info.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-node-runtime-arm64
+          path: ${{ runner.temp }}/node-runtime
+          retention-days: 14
+
+  build:
+    name: Build APK
+    needs: node-runtime
+    if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      NODE_OPTIONS: --max-old-space-size=8192
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # versionCode is the commit count, as for desktop branch builds.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: yarn install --non-interactive
+
+      - name: Build JS payload (server bundle + pendant UI)
+        run: yarn android:payload
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: android-node-runtime-*
+          path: ${{ runner.temp }}/node-runtime
+          merge-multiple: true
+
+      - name: Install Node runtime
+        run: yarn android:runtime "$RUNNER_TEMP/node-runtime"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Build APKs
+        working-directory: android
+        run: bash gradlew assembleDebug
+
+      - name: Collect APK
+        id: apks
+        run: |
+          version=$(node -p "require('./src/package.json').version")
+          mkdir -p apks
+          cp "android/app/build/outputs/apk/debug/app-arm64-v8a-debug.apk" "apks/gSender-Pendant-$version-Android-arm64-v8a-debug.apk"
+          cp android/node-runtime/build-info-*.txt apks/ 2>/dev/null || true
+          {
+            echo "### gSender Pendant $version (Android, debug)"
+            echo ""
+            for f in apks/*.apk; do echo "- $(basename "$f"): $(( $(stat -c %s "$f") / 1048576 )) MB"; done
+            echo "- Node runtime: $(head -1 android/node-runtime/build-info-arm64.txt)"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-apks
+          path: apks
+          retention-days: 14

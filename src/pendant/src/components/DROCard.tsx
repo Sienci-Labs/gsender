@@ -1,10 +1,4 @@
 import {
-    GRBL_ACTIVE_STATE_ALARM,
-    GRBL_ACTIVE_STATE_IDLE,
-    GRBL_ACTIVE_STATE_JOG,
-    WORKFLOW_STATE_RUNNING,
-} from 'app/constants';
-import {
     gotoZero,
     goXYAxes,
     homeMachine,
@@ -14,9 +8,9 @@ import {
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import type { RootState } from 'app/store/redux';
 import cn from 'classnames';
-import get from 'lodash/get';
 import { Crosshair, Home, Target } from 'lucide-react';
 import { useState } from 'react';
+import { useDroGating } from '../hooks/useDroGating';
 
 const AXES = [
     {
@@ -44,19 +38,7 @@ function formatAxisValue(value: unknown): string {
 
 export default function DROCard() {
     const [mode, setMode] = useState<'work' | 'machine'>('work');
-    const isConnected = useTypedSelector(
-        (s: RootState) => s.connection.isConnected,
-    );
-    const workflowState = useTypedSelector(
-        (s: RootState) => s.controller.workflow.state,
-    );
-    const activeState = useTypedSelector(
-        (s: RootState) => s.controller.state.status?.activeState ?? '',
-    );
-    const homingEnabled = useTypedSelector(
-        (s: RootState) =>
-            Number(get(s, 'controller.settings.settings.$22', 0)) > 0,
-    );
+    const { isConnected, canZero, canGoTo, canHome } = useDroGating();
     const wpos = useTypedSelector((s: RootState) => s.controller.wpos);
     const mpos = useTypedSelector((s: RootState) => s.controller.mpos);
     const activePos = !isConnected
@@ -64,19 +46,6 @@ export default function DROCard() {
         : mode === 'machine'
           ? mpos
           : wpos;
-    const alarmCode = useTypedSelector(
-        (s: RootState) => s.controller.state.status?.alarmCode ?? 0,
-    ) as string | number;
-    const isHomingAlarm =
-        activeState === GRBL_ACTIVE_STATE_ALARM &&
-        (alarmCode === 11 || alarmCode === 'Homing');
-    const canZero =
-        isConnected &&
-        workflowState !== WORKFLOW_STATE_RUNNING &&
-        (activeState === GRBL_ACTIVE_STATE_IDLE ||
-            activeState === GRBL_ACTIVE_STATE_JOG);
-    const canGoTo = canZero;
-    const canHome = (canGoTo && homingEnabled) || isHomingAlarm;
 
     return (
         <div className="rounded-xl bg-white border border-gray-300 dark:bg-surface-raised dark:border-outline p-2 flex flex-col gap-2">
@@ -134,10 +103,10 @@ export default function DROCard() {
                         <button
                             onClick={() => zeroWCS(label, 0)}
                             disabled={!canZero}
-                            className={`text-sm font-semibold border-[3px] border-gray-400 dark:border-outline rounded-md px-3 py-1.5 shrink-0 transition-colors ${
+                            className={`text-sm font-semibold rounded-md px-3 py-1.5 shrink-0 transition-colors border-[3px] ${
                                 canZero
-                                    ? 'text-gray-600 hover:text-gray-700 dark:text-content-muted dark:hover:text-content-secondary'
-                                    : 'text-gray-400 dark:text-content-muted cursor-default'
+                                    ? 'border-gray-600 text-gray-700 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-700 dark:border-outline-strong dark:text-content-secondary dark:hover:bg-surface-hover dark:hover:text-content-primary'
+                                    : 'border-gray-200 text-gray-400 dark:border-outline-disabled dark:text-content-disabled cursor-default'
                             }`}
                         >
                             ZERO
@@ -185,8 +154,8 @@ export default function DROCard() {
                                     ? 'border border-blue-600 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white'
                                     : 'border border-gray-200 dark:border-outline bg-gray-200 text-gray-400 dark:bg-surface-disabled dark:text-content-disabled'
                                 : canZero
-                                  ? 'border-[3px] border-gray-400 dark:border-outline text-gray-600 dark:text-content-secondary hover:bg-gray-50 dark:hover:bg-surface-hover hover:text-gray-900 dark:hover:text-content-primary'
-                                  : 'border-[3px] border-gray-400 dark:border-outline text-gray-400 dark:text-content-muted bg-gray-100 dark:bg-surface-elevated cursor-default'
+                                  ? 'border-[3px] border-gray-600 dark:border-outline-strong text-gray-700 dark:text-content-secondary hover:bg-gray-100 dark:hover:bg-surface-hover hover:text-gray-900 dark:hover:text-content-primary'
+                                  : 'border-[3px] border-gray-200 dark:border-outline-disabled text-gray-400 dark:text-content-disabled bg-gray-100 dark:bg-surface-elevated cursor-default'
                         }`}
                     >
                         <Icon size={16} />

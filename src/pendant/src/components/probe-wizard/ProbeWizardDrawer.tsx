@@ -34,6 +34,9 @@ interface ProbeWizardDrawerProps {
     state: State;
     probeCmd: ProbeCommand;
     skipContinuity: boolean;
+    /** Collapses the wizard back to the compact view; wired to the step-0
+     * Back button, since there's no earlier step to go back to. */
+    onCollapse?: () => void;
     onRunComplete: (direction: number, diameter: number) => void;
 }
 
@@ -50,6 +53,7 @@ export default function ProbeWizardDrawer({
     state,
     probeCmd,
     skipContinuity,
+    onCollapse,
     onRunComplete,
 }: ProbeWizardDrawerProps) {
     const [continuityPhase, setContinuityPhase] = useState<ContinuityPhase>(
@@ -68,6 +72,10 @@ export default function ProbeWizardDrawer({
     };
 
     const handleBack = () => {
+        if (step === 0) {
+            onCollapse?.();
+            return;
+        }
         onStepChange(Math.max(0, step - 1));
     };
 
@@ -135,9 +143,9 @@ export default function ProbeWizardDrawer({
                     }}
                 >
                     {/* Step 1 */}
-                    <div className="w-1/3 h-full overflow-y-auto px-5 py-4 flex flex-col gap-6">
+                    <div className="w-1/3 min-w-0 shrink-0 h-full overflow-y-auto px-5 py-4 flex flex-col gap-4">
                         <div>
-                            <p className="text-sm font-medium text-gray-600 dark:text-content-secondary mb-2">
+                            <p className="text-sm font-medium text-gray-600 dark:text-content-secondary mb-1.5">
                                 Probe diameter
                             </p>
                             {probeCmd?.tool ? (
@@ -156,7 +164,7 @@ export default function ProbeWizardDrawer({
                             )}
                         </div>
                         <div>
-                            <p className="text-sm font-medium text-gray-600 dark:text-content-secondary mb-2">
+                            <p className="text-sm font-medium text-gray-600 dark:text-content-secondary mb-1.5">
                                 Corner
                             </p>
                             <CornerSelector
@@ -167,15 +175,16 @@ export default function ProbeWizardDrawer({
                     </div>
 
                     {/* Step 2 */}
-                    <div className="w-1/3 h-full overflow-y-auto px-5 py-4">
+                    <div className="w-1/3 min-w-0 shrink-0 h-full overflow-y-auto px-5 py-4">
                         <ContinuityCheck
+                            active={step === 1}
                             onComplete={handleContinuityComplete}
                             onPhaseChange={setContinuityPhase}
                         />
                     </div>
 
                     {/* Step 3 */}
-                    <div className="w-1/3 h-full overflow-y-auto px-5 py-4 flex flex-col gap-5">
+                    <div className="w-1/3 min-w-0 shrink-0 h-full overflow-y-auto px-5 py-4 flex flex-col gap-5">
                         <div className="flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-green-500" />
                             <span className="text-sm font-semibold text-green-700 dark:text-green-400">
@@ -256,7 +265,7 @@ export default function ProbeWizardDrawer({
                     <button
                         type="button"
                         onClick={handleBack}
-                        disabled={step === 0}
+                        aria-label={step === 0 ? 'Collapse probe wizard' : 'Back'}
                         className="w-11 h-11 rounded-lg border border-gray-200 dark:border-outline flex items-center justify-center text-gray-600 dark:text-content-muted disabled:opacity-30"
                     >
                         <ChevronLeft size={20} />

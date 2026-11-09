@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Gates the OS-level "device plugged in, offer to open gSender" prompt and the
+  USB_DEVICE_ATTACHED launch intent. vendor-id is DECIMAL (Android's filter
+  format), not hex - easy to get backwards.
+
+  One entry per vendor in validVendorIDs (src/server/services/cncengine/
+  CNCEngine.js, the "list" socket handler) - no product-id, so a real cross
+  product isn't needed here. The actual recognized/unrecognized decision
+  still happens server-side against both validVendorIDs and validProductIDs;
+  this file only controls whether Android offers to launch the app.
+-->
+<resources>
+    <usb-device vendor-id="11914" /> <!-- 0x2E8A -->
+    <usb-device vendor-id="5824" />  <!-- 0x16C0 -->
+    <usb-device vendor-id="7504" />  <!-- 0x1D50 -->
+    <usb-device vendor-id="1027" />  <!-- 0x0403 FTDI -->
+    <usb-device vendor-id="9025" />  <!-- 0x2341 Arduino -->
+    <usb-device vendor-id="66" />    <!-- 0x0042 -->
+    <usb-device vendor-id="6790" />  <!-- 0x1A86 CH340/341 -->
+    <usb-device vendor-id="4292" />  <!-- 0x10C4 CP210x -->
+    <usb-device vendor-id="1659" />  <!-- 0x067B -->
+    <usb-device vendor-id="1003" />  <!-- 0x03EB -->
+    <usb-device vendor-id="5840" />  <!-- 0x16D0 -->
+    <usb-device vendor-id="1155" />  <!-- 0x0483 -->
+</resources>

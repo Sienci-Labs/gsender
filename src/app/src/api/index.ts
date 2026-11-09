@@ -249,6 +249,88 @@ const remoteSetting = {
 };
 
 //
+// Remote File Receive (desktop -> pendant file transfer)
+//
+const remoteFileReceive = {
+    fetch: (): Promise<AxiosResponse> => {
+        return authrequest.get('/api/remoteFileReceive');
+    },
+
+    update: (options: {
+        enabled: boolean;
+        port?: number;
+    }): Promise<AxiosResponse> => {
+        return authrequest.put('/api/remoteFileReceive', options);
+    },
+
+    regenerateToken: (): Promise<AxiosResponse> => {
+        return authrequest.post('/api/remoteFileReceive/token');
+    },
+
+    readFile: (name: string): Promise<AxiosResponse> => {
+        return authrequest.get(
+            `/api/remoteFileReceive/files/${encodeURIComponent(name)}`,
+        );
+    },
+
+    deleteFiles: (names: string[]): Promise<AxiosResponse> => {
+        return authrequest.delete('/api/remoteFileReceive/files', {
+            data: { names },
+        });
+    },
+
+    setPendingPair: (pair: {
+        nonce: string;
+        desktopId: string;
+        desktopName?: string;
+    }): Promise<AxiosResponse> => {
+        return authrequest.post('/api/remoteFileReceive/pair/pending', pair);
+    },
+
+    listDesktops: (): Promise<AxiosResponse> => {
+        return authrequest.get('/api/remoteFileReceive/desktops');
+    },
+
+    forgetDesktop: (id: string): Promise<AxiosResponse> => {
+        return authrequest.delete(
+            `/api/remoteFileReceive/desktops/${encodeURIComponent(id)}`,
+        );
+    },
+};
+
+//
+// Pendant pairing (desktop side of Send to Pendant)
+//
+const pendantPairing = {
+    discover: (): Promise<AxiosResponse> => {
+        return authrequest.post('/api/pendantPairing/discover');
+    },
+
+    createQr: (): Promise<AxiosResponse> => {
+        return authrequest.post('/api/pendantPairing/qr');
+    },
+
+    claim: (options: {
+        nonce?: string;
+        code?: string;
+        host?: string;
+        port?: number;
+    }): Promise<AxiosResponse> => {
+        return authrequest.post('/api/pendantPairing/claim', options);
+    },
+
+    listTablets: (): Promise<AxiosResponse> => {
+        return authrequest.get('/api/pendantPairing/tablets');
+    },
+
+    forgetTablet: (id: string): Promise<AxiosResponse> => {
+        return authrequest.delete(
+            `/api/pendantPairing/tablets/${encodeURIComponent(id)}`,
+        );
+    },
+};
+
+//
 // Job Stats
 //
 const jobStats = {
@@ -493,6 +575,17 @@ const plugins = {
     installPrepare: (sourcePath: string): Promise<AxiosResponse> => {
         return authrequest.post('/api/plugins/install/prepare', { sourcePath });
     },
+    // Same as installPrepare, for platforms with no filesystem path to hand
+    // the server (Android's SAF picker, or a plain browser's file input) -
+    // the picked zip is uploaded as bytes instead.
+    installPrepareUpload: (file: File): Promise<AxiosResponse> => {
+        const formData = new FormData();
+        formData.append('zip', file);
+        return authrequest.post(
+            '/api/plugins/install/prepare-upload',
+            formData,
+        );
+    },
     installCommit: (sessionId: string): Promise<AxiosResponse> => {
         return authrequest.post('/api/plugins/install/commit', { sessionId });
     },
@@ -522,6 +615,8 @@ export default {
     users,
     events,
     remoteSetting,
+    remoteFileReceive,
+    pendantPairing,
     jobStats,
     maintenance,
     macros,

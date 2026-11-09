@@ -292,6 +292,7 @@ class GcodeViewer extends Component<Props> {
                 container: this.containerRef,
                 options: this.buildOptions(),
             });
+            this.syncBitVisibility();
             this.snapToView();
         }
     }
@@ -355,11 +356,6 @@ class GcodeViewer extends Component<Props> {
     buildOptions(): Partial<GCodeViewerOptions> {
         const { state } = this.props;
         const laser = isLaserMode();
-        const isConnected = !!_get(
-            reduxStore.getState(),
-            'connection.isConnected',
-        );
-        const toolVisible = this.cuttingToolVisible();
         const hideProcessed = store.get(
             'widgets.visualizer.hideProcessedLines',
             false,
@@ -371,8 +367,10 @@ class GcodeViewer extends Component<Props> {
             units: isMetric ? 'mm' : 'in',
             mode: { laser, sim3d: false },
             bit: {
-                // Bit only shows while connected, matching the old visualizer.
-                enabled: isConnected && toolVisible,
+                // Always enabled: gviewer (>=0.1.48) shows the bit only when
+                // bit.enabled AND setBitVisible(true), so visibility is driven
+                // solely by syncBitVisibility() (connected + "show bit").
+                enabled: true,
                 type: laser ? 'laser' : 'drill',
                 // Matches the old bit.stl (68.67mm) scaled 0.5 → ~34mm tall; gviewer
                 // scales the drill so largestDim = size * 1.6.
@@ -433,6 +431,8 @@ class GcodeViewer extends Component<Props> {
     applyOptionsFromState() {
         if (this.viewer3d) {
             this.viewer3d.setOptions(this.buildOptions());
+            // setOptions resets the bit marker, so re-apply visibility.
+            this.syncBitVisibility();
         }
         if (this.viewerSvg) {
             this.viewerSvg.setOptions(this.buildSvgOptions());
@@ -1201,9 +1201,7 @@ class GcodeViewer extends Component<Props> {
             const connected = !!_get(st, 'connection.isConnected');
             if (connected !== this.lastConnected) {
                 this.lastConnected = connected;
-                this.viewer3d?.setBitVisible(
-                    connected && this.cuttingToolVisible(),
-                );
+                this.syncBitVisibility();
             }
 
             // Progress while a job runs: grey what has been cut (hide it instead
@@ -1294,6 +1292,15 @@ class GcodeViewer extends Component<Props> {
             );
         }
         return false;
+    }
+
+    /** The bit shows only while connected and when "show bit" is on. */
+    syncBitVisibility() {
+        const connected = !!_get(
+            reduxStore.getState(),
+            'connection.isConnected',
+        );
+        this.viewer3d?.setBitVisible(connected && this.cuttingToolVisible());
     }
 
     cuttingToolVisible(): boolean {

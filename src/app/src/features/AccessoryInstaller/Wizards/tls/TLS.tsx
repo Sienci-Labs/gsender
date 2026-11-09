@@ -9,7 +9,7 @@ import { TLSOptions } from 'app/features/AccessoryInstaller/Wizards/tls/componen
 import { Jogging } from 'app/features/Jogging';
 import store from 'app/store';
 import { useMemo } from 'react';
-import { useValidations } from 'src/components/Wizard/hooks/UseValidations.tsx';
+import { useValidations } from 'app/components/Wizard/hooks/UseValidations.tsx';
 import TLS_STEP_ONE from './assets/TLS_Step_01.png';
 import TLS_STEP_TWO from './assets/TLS_Step_02.png';
 import TLS_STEP_THREE from './assets/TLS_Step_03_Pin.png';

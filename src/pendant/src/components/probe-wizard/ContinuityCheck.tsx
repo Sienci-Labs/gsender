@@ -7,11 +7,17 @@ import { ContinuityIndicator, ContinuityPhase } from './ContinuityIndicator';
 export const CONTINUITY_CHECK_SUCCESS_DELAY_MS = 1500;
 
 interface ContinuityCheckProps {
+    /** Only step 1 (the continuity-check step) is actually on screen - the
+     * wizard mounts all 3 steps at once as a sliding carousel, so without
+     * this the pin-watching effects below would run (and could auto-advance
+     * the wizard) while the user is on an entirely different step. */
+    active: boolean;
     onComplete: () => void;
     onPhaseChange?: (phase: ContinuityPhase) => void;
 }
 
 export function ContinuityCheck({
+    active,
     onComplete,
     onPhaseChange,
 }: ContinuityCheckProps) {
@@ -22,20 +28,26 @@ export function ContinuityCheck({
             state.controller.state.status?.pinState.P ?? false,
     );
 
+    // Leaving the step mid-check shouldn't leave a stale phase (e.g.
+    // 'success') ready to instantly complete the next time it's revisited.
+    useEffect(() => {
+        if (!active) setPhase('checking-idle');
+    }, [active]);
+
     // Detect an idle/stuck-on pin immediately, without waiting for a timeout.
     useEffect(() => {
-        if (phase !== 'checking-idle') return;
+        if (!active || phase !== 'checking-idle') return;
         setPhase(probePinOn ? 'stuck-on' : 'waiting');
-    }, [phase, probePinOn]);
+    }, [active, phase, probePinOn]);
 
     // Detect a successful press while waiting. No timeout — wait indefinitely
     // for continuity.
     useEffect(() => {
-        if (phase !== 'waiting') return;
+        if (!active || phase !== 'waiting') return;
         if (probePinOn) {
             setPhase('success');
         }
-    }, [phase, probePinOn]);
+    }, [active, phase, probePinOn]);
 
     useEffect(() => {
         onPhaseChange?.(phase);
@@ -44,12 +56,12 @@ export function ContinuityCheck({
     // On success, delay onComplete so the user has time to see the success
     // banner before the wizard advances.
     useEffect(() => {
-        if (phase !== 'success') return;
+        if (!active || phase !== 'success') return;
         const completeTimeout = setTimeout(() => {
             onComplete();
         }, CONTINUITY_CHECK_SUCCESS_DELAY_MS);
         return () => clearTimeout(completeTimeout);
-    }, [phase, onComplete]);
+    }, [active, phase, onComplete]);
 
     const handleRetry = () => {
         setPhase('checking-idle');

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12+ splash icon. The system draws it at 288dp and masks it to a
+     ~192dp circle; the inset keeps the rocket well inside that circle. -->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/rocket"
+    android:inset="72dp" />

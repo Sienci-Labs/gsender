@@ -1,23 +1,12 @@
 import {
-    GRBL,
-    GRBL_ACTIVE_STATE_IDLE,
-    GRBLHAL,
-    WORKFLOW_STATE_RUNNING,
-} from 'app/constants';
-import {
     startFlood,
     startMist,
     stopCoolant,
 } from 'app/features/Coolant/utils/actions';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import type { RootState } from 'app/store/redux';
 import { clsx } from 'clsx';
-import ensureArray from 'ensure-array';
-import get from 'lodash/get';
-import includes from 'lodash/includes';
-import { useCallback } from 'react';
 import { FaWater } from 'react-icons/fa';
 import { FaBan, FaShower } from 'react-icons/fa6';
+import { useCoolant } from '../hooks/useCoolant';
 
 // ── CoolantButton ──────────────────────────────────────────────────────────────
 
@@ -81,33 +70,7 @@ function CoolantButton({
 // ── CoolantPanel ───────────────────────────────────────────────────────────────
 
 export default function CoolantPanel() {
-    const { workflow, isConnected, controllerState, controllerType } =
-        useTypedSelector((s: RootState) => ({
-            workflow: s.controller.workflow,
-            isConnected: s.connection.isConnected ?? false,
-            controllerState: s.controller.state ?? {},
-            controllerType: s.controller.type ?? 'grbl',
-        }));
-
-    const coolantModal: string = useTypedSelector((s: RootState) =>
-        get(s, 'controller.modal.coolant', 'M9'),
-    );
-
-    const coolantArray = ensureArray(coolantModal);
-    const mistActive = includes(coolantArray, 'M7');
-    const floodActive = includes(coolantArray, 'M8');
-
-    const canClick = useCallback((): boolean => {
-        if (!isConnected) return false;
-        if (workflow.state === WORKFLOW_STATE_RUNNING) return false;
-        if (![GRBL, GRBLHAL].includes(controllerType)) return false;
-        return (
-            (controllerState as any)?.status?.activeState ===
-            GRBL_ACTIVE_STATE_IDLE
-        );
-    }, [isConnected, workflow.state, controllerType, controllerState]);
-
-    const clickable = canClick();
+    const { isConnected, mistActive, floodActive, clickable } = useCoolant();
 
     return (
         <div className="h-full flex items-center justify-center px-4 py-3 gap-3">

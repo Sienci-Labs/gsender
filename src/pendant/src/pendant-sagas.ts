@@ -13,7 +13,7 @@ import type {
 } from 'app/definitions/firmware';
 import { i18n } from 'app/i18n';
 import controller from 'app/lib/controller';
-import type { PortInfo } from 'app/store/definitions';
+import type { PortInfo, SDCardFile } from 'app/store/definitions';
 import { store as reduxStore } from 'app/store/redux';
 import {
     closeConnection,
@@ -22,6 +22,7 @@ import {
     setConnectionState,
 } from 'app/store/redux/slices/connection.slice';
 import {
+    addSDCardFileToList,
     addSpindle,
     resetHoming,
     updateControllerSettings,
@@ -34,8 +35,11 @@ import {
     updateWorkflowState,
 } from 'app/store/redux/slices/controller.slice';
 import { unloadFileInfo } from 'app/store/redux/slices/fileInfo.slice';
+import { setIpList } from 'app/store/redux/slices/preferences.slice';
+import type { NetworkAddress } from 'app/store/definitions';
 import {
     applyControllerGcodePayload,
+    resendCachedEstimateData,
     shouldIgnoreControllerGcodeLoad,
 } from './utils/gcodeProcessing';
 
@@ -66,6 +70,21 @@ export function* initialize() {
 
     controller.addListener('spindle:add', (spindle: any) => {
         reduxStore.dispatch(addSpindle(spindle));
+    });
+
+    // SD Card Manager (Tools page): the server replies to 'sdcard:list' with
+    // one 'sdcard:files' event per file. Without this listener the request
+    // still round-trips fine (visible server-side), but nothing ever reaches
+    // the store the listing reads from, so the UI just stays empty.
+    controller.addListener('sdcard:files', (file: SDCardFile) => {
+        reduxStore.dispatch(addSDCardFileToList({ file }));
+    });
+
+    // Remote File Receive (Tools page): same shape of gap as sdcard:files
+    // above - the server replies to 'listAllIps' with 'ip:list', but nothing
+    // forwarded it into the store the panel reads addresses from.
+    controller.addListener('ip:list', (ipList: NetworkAddress[]) => {
+        reduxStore.dispatch(setIpList(ipList));
     });
 
     // ── Homing state ───────────────────────────────────────────────────────
@@ -156,6 +175,12 @@ export function* initialize() {
 
     controller.addListener('gcode:unload', () => {
         reduxStore.dispatch(unloadFileInfo());
+    });
+
+    // Server asks for this when it needs a client to (re-)send its per-line
+    // time estimate (e.g. another client connects, or sender state resets).
+    controller.addListener('requestEstimateData', () => {
+        resendCachedEstimateData();
     });
 
     // ── ATC macro dialogs ───────────────────────────────────────────────────

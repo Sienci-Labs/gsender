@@ -1,7 +1,12 @@
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import type { RootState } from 'app/store/redux';
 import { FileCode2 } from 'lucide-react';
-import { openGcodeFile } from '../utils/fileLoader';
+import { useEffect, useRef, useState } from 'react';
+import pubsub from 'pubsub-js';
+import { applyPickedFile, openGcodeFileOrPrompt } from '../utils/fileLoader';
+import { WORKSHOP_VISUALIZER_COLORS } from 'app/features/Visualizer/viewerTheme';
+import { PENDANT_CUT_COLOR, PENDANT_RAPID_COLOR } from '../visualizerTheme';
+import DepthGauge from './DepthGauge';
 import FeedOverrideWrapper from './FeedOverrideWrapper';
 import FileLoadingOverlay from './FileLoadingOverlay';
 import JobControls from './JobControls';
@@ -9,22 +14,41 @@ import ProgressAreaWrapper from './ProgressAreaWrapper';
 import Visualizer from './Visualizer';
 import WorkspaceSelector from './WorkspaceSelector';
 
+// gcodeProcessing.ts dispatches processingProgress/processingName into
+// fileInfo.slice, but updateFileProcessing's reducer only ever assigns
+// fileProcessing - those fields aren't even part of FileInfoState, so they
+// always read back as undefined. Progress instead comes from the same
+// 'toolpath:progress' pubsub event the desktop Visualizer's Loading.tsx
+// subscribes to (gcodeProcessing.ts already publishes it correctly). Mounted
+// only while a file is processing, so it starts fresh at 0 for each load.
+export function LiveFileLoadingOverlay({ fileName }: { fileName: string }) {
+    const [progress, setProgress] = useState(0);
+
+    useEffect(() => {
+        const token = pubsub.subscribe(
+            'toolpath:progress',
+            (_msg: string, value: number) => setProgress(value),
+        );
+        return () => pubsub.unsubscribe(token);
+    }, []);
+
+    return <FileLoadingOverlay fileName={fileName} progress={progress} />;
+}
+
 export default function VisualizerCard() {
+    const isConnected = useTypedSelector(
+        (s: RootState) => s.connection.isConnected,
+    );
     const fileLoaded = useTypedSelector((s: RootState) => s.file.fileLoaded);
     const fileProcessing = useTypedSelector(
         (s: RootState) => s.file.fileProcessing,
-    );
-    const processingName = useTypedSelector(
-        (s: RootState) => s.file.processingName ?? '',
-    );
-    const processingProgress = useTypedSelector(
-        (s: RootState) => s.file.processingProgress ?? 0,
     );
     const fileName = useTypedSelector((s: RootState) =>
         s.file.fileProcessing
             ? s.file.processingName || s.file.name || ''
             : s.file.name || '',
     );
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     return (
         <div className="flex flex-col gap-3">
@@ -36,20 +60,26 @@ export default function VisualizerCard() {
                         <span className="flex items-center gap-1">
                             <span
                                 className="w-2 h-2 rounded-full inline-block"
-                                style={{ backgroundColor: '#3F85C7' }}
+                                style={{ backgroundColor: PENDANT_CUT_COLOR }}
                             />
                             Cut
                         </span>
                         <span className="flex items-center gap-1">
                             <span
                                 className="w-2 h-2 rounded-full inline-block"
-                                style={{ backgroundColor: '#059669' }}
+                                style={{ backgroundColor: PENDANT_RAPID_COLOR }}
                             />
                             Rapid
                         </span>
                         <span className="flex items-center gap-1">
-                            <span className="w-2 h-2 rounded-full bg-gray-400 inline-block" />
-                            Bounds
+                            <span
+                                className="w-2.5 h-2 rounded-[2px] border inline-block"
+                                style={{
+                                    borderColor:
+                                        WORKSHOP_VISUALIZER_COLORS.machineBed,
+                                }}
+                            />
+                            Bed
                         </span>
                     </div>
                     <WorkspaceSelector />
@@ -57,18 +87,18 @@ export default function VisualizerCard() {
 
                 <div className="relative h-56 overflow-hidden rounded-b-xl dark:bg-surface-sunken">
                     <Visualizer />
+                    {fileLoaded && !fileProcessing && <DepthGauge />}
                     {fileProcessing && (
                         <div className="absolute inset-0 flex items-center justify-center p-3 bg-dark-darker/95">
-                            <FileLoadingOverlay
-                                fileName={processingName || fileName}
-                                progress={processingProgress}
-                            />
+                            <LiveFileLoadingOverlay fileName={fileName} />
                         </div>
                     )}
-                    {!fileLoaded && !fileProcessing && (
+                    {!fileLoaded && !fileProcessing && !isConnected && (
                         <button
                             type="button"
-                            onClick={() => openGcodeFile()}
+                            onClick={() =>
+                                openGcodeFileOrPrompt(fileInputRef.current)
+                            }
                             className="absolute inset-2 rounded-lg flex flex-col items-center justify-center gap-2 bg-gray-100 dark:bg-transparent border border-dashed border-gray-300 dark:border-white/25 cursor-pointer"
                             aria-label="Open G-code file"
                         >
@@ -84,6 +114,34 @@ export default function VisualizerCard() {
                             </span>
                         </button>
                     )}
+                    {/* Connected with nothing loaded: the canvas already shows
+                        the homed machine bed and position crosshair, so the
+                        "open file" affordance shrinks to a corner button
+                        instead of covering the view. */}
+                    {!fileLoaded && !fileProcessing && isConnected && (
+                        <button
+                            type="button"
+                            onClick={() =>
+                                openGcodeFileOrPrompt(fileInputRef.current)
+                            }
+                            className="absolute bottom-2 right-2 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-gray-900/70 text-white backdrop-blur-sm active:bg-gray-900/85 dark:bg-black/50"
+                            aria-label="Open G-code file"
+                        >
+                            <FileCode2 size={14} />
+                            Open file
+                        </button>
+                    )}
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".gcode,.nc,.tap,.cnc,.g,.gc"
+                        className="hidden"
+                        onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            e.target.value = '';
+                            if (f) void applyPickedFile(f);
+                        }}
+                    />
                 </div>
             </div>
 

@@ -17,7 +17,9 @@
  */
 
 import { spawn } from "node:child_process";
+import crypto from "node:crypto";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 
 import {
@@ -222,6 +224,44 @@ export const installPrepare = async (req, res) => {
 			ok: false,
 			error: `Something went wrong preparing the install: ${err.message}`,
 		});
+	}
+};
+
+// Same as installPrepare, but for callers that cannot hand the server a
+// filesystem path (the Android app's picker only has bytes from a SAF
+// content:// URI, and a plain browser's <input type="file"> never has one
+// either). The upload is written to a throwaway temp file so the rest of
+// prepare() - which reads from disk - runs unmodified.
+export const installPrepareUpload = async (req, res) => {
+	const { file } = req;
+
+	if (!file) {
+		return res.status(ERR_BAD_REQUEST).send({
+			ok: false,
+			error: "No file was uploaded",
+		});
+	}
+
+	const tempPath = path.join(
+		os.tmpdir(),
+		`gsender-plugin-upload-${crypto.randomUUID()}.zip`,
+	);
+
+	try {
+		fs.writeFileSync(tempPath, file.buffer);
+		const result = await pluginInstaller.prepare(tempPath);
+		if (!result.ok) {
+			return res.status(ERR_BAD_REQUEST).send(result);
+		}
+		res.send(result);
+	} catch (err) {
+		log.error(`Failed to prepare uploaded plugin install: ${err.message}`);
+		res.status(ERR_INTERNAL_SERVER_ERROR).send({
+			ok: false,
+			error: `Something went wrong preparing the install: ${err.message}`,
+		});
+	} finally {
+		fs.rm(tempPath, { force: true }, () => {});
 	}
 };
 

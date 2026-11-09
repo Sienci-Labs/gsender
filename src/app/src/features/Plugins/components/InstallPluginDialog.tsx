@@ -27,7 +27,7 @@ import {
     X,
     XCircle,
 } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { type InstallStep, usePluginInstall } from '../hooks/usePluginInstall';
 import type { PluginInstallKind, PluginInstallPlan } from '../types';
 
@@ -373,10 +373,24 @@ export const InstallPluginDialog = ({
         restored,
         result,
         chooseSource,
+        uploadAndPrepare,
         install,
         startOver,
         reset,
     } = usePluginInstall({ onInstalled });
+
+    // Outside Electron (Android, or a plain browser) there is no native
+    // dialog, so ".zip" falls back to a hidden file input. On Android this is
+    // backed by the WebView's SAF document picker, not a custom bridge.
+    const zipInputRef = useRef<HTMLInputElement>(null);
+
+    const handleZipChosen = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        event.target.value = '';
+        if (file) {
+            uploadAndPrepare(file);
+        }
+    };
 
     // Reset once the dialog is fully closed so reopening starts clean, and drop
     // any staged copy the user walked away from.
@@ -512,15 +526,22 @@ export const InstallPluginDialog = ({
 
                                     {!isElectron() && (
                                         <Callout
-                                            tone="warn"
+                                            tone="info"
                                             icon={<AlertTriangle size={13} />}
                                         >
-                                            Picking a file needs the gSender
-                                            desktop app. In the browser, copy
-                                            the plugin folder into the plugins
-                                            directory by hand.
+                                            Picking a folder needs the gSender
+                                            desktop app. Use a .zip file
+                                            instead.
                                         </Callout>
                                     )}
+
+                                    <input
+                                        ref={zipInputRef}
+                                        type="file"
+                                        className="hidden"
+                                        accept=".zip,application/zip"
+                                        onChange={handleZipChosen}
+                                    />
 
                                     <div className="flex flex-col gap-2 sm:flex-row">
                                         <button
@@ -537,8 +558,12 @@ export const InstallPluginDialog = ({
                                         </button>
                                         <button
                                             type="button"
-                                            onClick={() => chooseSource('zip')}
-                                            disabled={busy || !isElectron()}
+                                            onClick={() =>
+                                                isElectron()
+                                                    ? chooseSource('zip')
+                                                    : zipInputRef.current?.click()
+                                            }
+                                            disabled={busy}
                                             className={cx(
                                                 CHROME.ghostButton,
                                                 'flex-1 justify-center py-3',

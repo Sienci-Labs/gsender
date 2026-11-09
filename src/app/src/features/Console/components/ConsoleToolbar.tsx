@@ -21,6 +21,9 @@ type Props = {
     onClear: () => void;
     onPopout?: () => void;
     showPopout?: boolean;
+    // Hides copy/clear/pop-out entirely — for hosts too narrow to fit them
+    // (e.g. the pendant's console tab).
+    showActions?: boolean;
 };
 
 function ToolbarAction({
@@ -53,6 +56,7 @@ export function ConsoleToolbar({
     onClear,
     onPopout,
     showPopout = true,
+    showActions = true,
 }: Props) {
     return (
         <div className="flex items-center justify-between gap-2">
@@ -92,19 +96,27 @@ export function ConsoleToolbar({
                 })}
             </div>
 
-            <div className="flex items-center gap-0.5 shrink-0">
-                <ToolbarAction label="Copy last 50 messages" onClick={onCopy}>
-                    <Copy className="w-4 h-4" />
-                </ToolbarAction>
-                <ToolbarAction label="Clear console" onClick={onClear}>
-                    <Eraser className="w-4 h-4" />
-                </ToolbarAction>
-                {showPopout && onPopout && (
-                    <ToolbarAction label="Pop out console" onClick={onPopout}>
-                        <ExternalLink className="w-4 h-4" />
+            {showActions && (
+                <div className="flex items-center gap-0.5 shrink-0">
+                    <ToolbarAction
+                        label="Copy last 50 messages"
+                        onClick={onCopy}
+                    >
+                        <Copy className="w-4 h-4" />
                     </ToolbarAction>
-                )}
-            </div>
+                    <ToolbarAction label="Clear console" onClick={onClear}>
+                        <Eraser className="w-4 h-4" />
+                    </ToolbarAction>
+                    {showPopout && onPopout && (
+                        <ToolbarAction
+                            label="Pop out console"
+                            onClick={onPopout}
+                        >
+                            <ExternalLink className="w-4 h-4" />
+                        </ToolbarAction>
+                    )}
+                </div>
+            )}
         </div>
     );
 }

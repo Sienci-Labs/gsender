@@ -17,7 +17,7 @@ import {
     PENDANT_RAPID_OPACITY,
 } from '../visualizerTheme';
 
-type GcodeLoadPayload = {
+export type GcodeLoadPayload = {
     content: string;
     name: string;
     size: number;
@@ -78,12 +78,20 @@ type VisualizeWorkerGeometryMessage = {
 type VisualizeWorkerMetadataMessage = {
     type: 'metadataReady';
     jobId: number;
+    info?: { estimatedTime?: number; [key: string]: unknown };
+    parsedData?: {
+        lineTime?: Float32Array;
+        lineKind?: Uint8Array;
+        [key: string]: unknown;
+    };
 };
 
 type VisualizeWorkerMessage =
     | VisualizeWorkerProgressMessage
     | VisualizeWorkerGeometryMessage
     | VisualizeWorkerMetadataMessage;
+
+export type { VisualizeWorkerGeometryMessage };
 
 let visualizeWorker: Worker | null = null;
 let activeJobId = 0;
@@ -97,6 +105,47 @@ const pendingControllerEchoes = new Map<
 >();
 
 class GcodeProcessingCancelledError extends Error {}
+
+// Per-line time estimate (seconds) and kind, sent to the server so it can
+// track job progress and compute a remaining-time countdown — mirrors
+// desktop's equivalent cache in controllerSagas.tsx.
+type EstimateData = {
+    lineTime: ArrayBuffer;
+    lineKind: ArrayBuffer;
+    estimatedTime: number;
+};
+
+let latestEstimateData: EstimateData | null = null;
+
+const toExactBuffer = (view?: ArrayBufferView): ArrayBuffer => {
+    if (!view || !ArrayBuffer.isView(view)) {
+        return new ArrayBuffer(0);
+    }
+    const { buffer, byteOffset, byteLength } = view;
+    if (byteOffset === 0 && byteLength === buffer.byteLength) {
+        return buffer as ArrayBuffer;
+    }
+    return buffer.slice(byteOffset, byteOffset + byteLength) as ArrayBuffer;
+};
+
+const sendEstimateData = (data: VisualizeWorkerMetadataMessage) => {
+    const parsedData = data.parsedData ?? {};
+    const estimateData: EstimateData = {
+        lineTime: toExactBuffer(parsedData.lineTime),
+        lineKind: toExactBuffer(parsedData.lineKind),
+        estimatedTime: Number(data.info?.estimatedTime) || 0,
+    };
+    latestEstimateData = estimateData;
+    controller.command('updateEstimateData', estimateData);
+};
+
+// The server asks for this again when it needs a client to (re-)send its
+// estimate (e.g. another client connects, or the sender state resets).
+export const resendCachedEstimateData = () => {
+    if (latestEstimateData) {
+        controller.command('updateEstimateData', latestEstimateData);
+    }
+};
 
 const buildLoadSignature = ({
     name,
@@ -243,13 +292,25 @@ const runVisualizeWorker = (
         const worker = createVisualizeWorker();
         visualizeWorker = worker;
         let settled = false;
+        let finalized = false;
+        let fallbackTerminateId: ReturnType<typeof setTimeout> | null = null;
 
-        const rejectWorker = (error: Error) => {
-            if (settled) {
+        // Cleanup (terminate the worker) is deliberately decoupled from
+        // resolving the geometry promise below: the worker posts
+        // 'geometryReady' first and 'metadataReady' second, and terminating
+        // as soon as the promise resolves (on 'geometryReady') raced the
+        // already-queued 'metadataReady' message, which carries the per-line
+        // time estimate the server needs for the remaining-time countdown.
+        const finalizeWorker = () => {
+            if (finalized) {
                 return;
             }
 
-            settled = true;
+            finalized = true;
+            if (fallbackTerminateId !== null) {
+                clearTimeout(fallbackTerminateId);
+                fallbackTerminateId = null;
+            }
             if (visualizeWorker === worker) {
                 visualizeWorker = null;
             }
@@ -257,6 +318,15 @@ const runVisualizeWorker = (
                 activeWorkerReject = null;
             }
             worker.terminate();
+        };
+
+        const rejectWorker = (error: Error) => {
+            if (settled) {
+                return;
+            }
+
+            settled = true;
+            finalizeWorker();
             reject(error);
         };
 
@@ -266,14 +336,10 @@ const runVisualizeWorker = (
             }
 
             settled = true;
-            if (visualizeWorker === worker) {
-                visualizeWorker = null;
-            }
-            if (activeWorkerReject) {
-                activeWorkerReject = null;
-            }
-            worker.terminate();
             resolve(data);
+            // Safety net in case 'metadataReady' never arrives, so the
+            // worker doesn't leak.
+            fallbackTerminateId = setTimeout(finalizeWorker, 10_000);
         };
 
         activeWorkerReject = rejectWorker;
@@ -311,6 +377,12 @@ const runVisualizeWorker = (
                 });
 
                 resolveWorker(data);
+                return;
+            }
+
+            if (data.type === 'metadataReady') {
+                sendEstimateData(data);
+                finalizeWorker();
             }
         };
 
@@ -498,6 +570,73 @@ export const applyControllerGcodePayload = async (
     const processId = ++activeProcessId;
     await processGcodePayload(payload, { upload: false, processId });
 };
+
+// Tool-preview worker queue - deliberately separate from activeJobId/
+// visualizeWorker/activeWorkerReject above. Those are shared by every real
+// file-load/controller-echo call, which fire on their own schedule (e.g. a
+// 'gcode:load' echo from the controller); sharing that queue let an
+// unrelated real-file job silently cancel a tool's in-flight preview (and
+// vice versa) via cancelInFlightWork, so nothing ever rendered.
+let previewWorker: Worker | null = null;
+let previewReject: ((error: Error) => void) | null = null;
+let previewJobId = 0;
+
+/**
+ * Visualizes gcode generated by a tool (e.g. Surfacing) without touching the
+ * loaded-file redux state or uploading anything to the controller - previewing
+ * a tool's output must never replace the file the user actually has loaded.
+ */
+export const computeGcodePreviewGeometry = (
+    payload: GcodeLoadPayload,
+): Promise<VisualizeWorkerGeometryMessage> =>
+    new Promise((resolve, reject) => {
+        previewWorker?.terminate();
+        previewReject?.(
+            new Error('Preview superseded by a newer request.'),
+        );
+
+        const jobId = ++previewJobId;
+        const worker = createVisualizeWorker();
+        previewWorker = worker;
+        previewReject = reject;
+
+        const cleanup = () => {
+            if (previewWorker === worker) {
+                previewWorker = null;
+            }
+            if (previewReject === reject) {
+                previewReject = null;
+            }
+            worker.terminate();
+        };
+
+        worker.onmessage = ({
+            data,
+        }: MessageEvent<VisualizeWorkerMessage | number>) => {
+            if (!data || typeof data !== 'object' || data.jobId !== jobId) {
+                return;
+            }
+            if (data.type === 'geometryReady') {
+                cleanup();
+                resolve(data);
+            }
+        };
+        worker.onerror = (event) => {
+            cleanup();
+            reject(
+                event.error ??
+                    new Error(event.message || 'Visualize worker failed.'),
+            );
+        };
+        worker.onmessageerror = () => {
+            cleanup();
+            reject(
+                new Error('Visualize worker produced an unreadable message.'),
+            );
+        };
+
+        worker.postMessage(buildWorkerRequest(payload, jobId));
+    });
 
 export const cancelGcodeProcessing = () => {
     activeProcessId += 1;

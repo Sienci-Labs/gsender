@@ -2,6 +2,7 @@ import { usePostHog } from '@posthog/react';
 import { Button } from 'app/components/shadcn/Button';
 import { LASER_MODE } from 'app/constants';
 import { i18n } from 'app/i18n';
+import { getZUpTravel } from 'app/lib/SoftLimits.js';
 import { toast } from 'app/lib/toaster';
 import store from 'app/store';
 import { store as reduxStore } from 'app/store/redux';
@@ -17,80 +18,95 @@ interface OutlineButtonProps {
 
 let outlineRunning = false;
 
+/**
+ * Runs the outline for the loaded file. liteMode defaults to the
+ * widgets.visualizer.liteMode setting; pass true to always use the outline
+ * worker (no visualizer needed).
+ */
+export const runOutline = (
+    posthog?: ReturnType<typeof usePostHog>,
+    options: { liteMode?: boolean } = {},
+) => {
+    const liteMode =
+        options.liteMode ?? store.get('widgets.visualizer.liteMode', false);
+    if (liteMode) {
+        // lightweight mode
+        if (outlineRunning) {
+            return;
+        }
+        outlineRunning = true;
+        let maxRuntime: ReturnType<typeof setTimeout> | undefined;
+        try {
+            const outlineWorker = new Worker(
+                new URL('../../workers/Outline.worker.ts', import.meta.url),
+                { type: 'module' },
+            );
+            const bbox = get(reduxStore.getState(), 'file.bbox');
+            const laserOnOutline = store.get(
+                'widgets.spindle.laser.laserOnOutline',
+                false,
+            );
+            const spindleMode = store.get('widgets.spindle.mode');
+            const isLaser = laserOnOutline && spindleMode === LASER_MODE;
+            const outlineSpeed = store.get('workspace.outlineSpeed', null);
+            const settings = get(
+                reduxStore.getState(),
+                'controller.settings.settings',
+                {},
+            );
+            const homingEnabled = get(settings, '$22', '0') !== '0';
+            const zTravel = homingEnabled ? getZUpTravel(5) : 5;
+
+            maxRuntime = setTimeout(() => {
+                outlineWorker.terminate();
+                toast.error(i18n.t('notifications:jobControl.outlineTimedOut'));
+                outlineRunning = false;
+            }, 15000);
+
+            outlineWorker.onmessage = ({ data }) => {
+                clearTimeout(maxRuntime);
+                outlineResponse({ data });
+                // Enable the outline button again
+                outlineRunning = false;
+            };
+            // A worker that fails to load or throws never posts back; report
+            // it now instead of letting it surface as the 15 s timeout.
+            const onWorkerError = (event: Event) => {
+                clearTimeout(maxRuntime);
+                outlineWorker.terminate();
+                console.error('Outline worker failed', event);
+                toast.error(i18n.t('notifications:jobControl.outlineFailed'));
+                outlineRunning = false;
+            };
+            outlineWorker.onerror = onWorkerError;
+            outlineWorker.onmessageerror = onWorkerError;
+            outlineWorker.postMessage({
+                isLaser,
+                parsedData: [],
+                mode: 'Square',
+                bbox: bbox,
+                zTravel,
+                outlineSpeed,
+            });
+
+            posthog?.capture('outline_run', {
+                is_in_lite_mode: liteMode,
+                is_laser: isLaser,
+                outline_speed: outlineSpeed,
+                bbox,
+            });
+        } catch (e) {
+            clearTimeout(maxRuntime);
+            console.log(e);
+            outlineRunning = false;
+        }
+    } else {
+        pubsub.publish('outline:start');
+    }
+};
+
 const OutlineButton: React.FC<OutlineButtonProps> = ({ disabled }) => {
     const posthog = usePostHog();
-    // TODO
-    const runOutline = () => {
-        const liteMode = store.get('widgets.visualizer.liteMode', false);
-        if (liteMode) {
-            // lightweight mode
-            if (outlineRunning) {
-                return;
-            }
-            let maxRuntime: ReturnType<typeof setTimeout> | undefined;
-            try {
-                const outlineWorker = new Worker(
-                    new URL('app/workers/Outline.worker.js', import.meta.url),
-                    { type: 'module' },
-                );
-                const bbox = get(reduxStore.getState(), 'file.bbox');
-                const laserOnOutline = store.get(
-                    'widgets.spindle.laser.laserOnOutline',
-                    false,
-                );
-                const spindleMode = store.get('widgets.spindle.mode');
-                const isLaser = laserOnOutline && spindleMode === LASER_MODE;
-                const outlineSpeed = store.get('workspace.outlineSpeed', null);
-
-                maxRuntime = setTimeout(() => {
-                    outlineWorker.terminate();
-                    toast.error(
-                        i18n.t('notifications:jobControl.outlineTimedOut'),
-                    );
-                    outlineRunning = false;
-                }, 15000);
-
-                outlineWorker.onmessage = ({ data }) => {
-                    clearTimeout(maxRuntime);
-                    outlineResponse({ data });
-                    // Enable the outline button again
-                    outlineRunning = false;
-                };
-                // A worker that fails to load or throws never posts back; report
-                // it now instead of letting it surface as the 15 s timeout.
-                const onWorkerError = (event: Event) => {
-                    clearTimeout(maxRuntime);
-                    outlineWorker.terminate();
-                    console.error('Outline worker failed', event);
-                    toast.error(
-                        i18n.t('notifications:jobControl.outlineFailed'),
-                    );
-                    outlineRunning = false;
-                };
-                outlineWorker.onerror = onWorkerError;
-                outlineWorker.onmessageerror = onWorkerError;
-                outlineWorker.postMessage({
-                    isLaser,
-                    parsedData: [],
-                    mode: 'Square',
-                    bbox: bbox,
-                    outlineSpeed,
-                });
-
-                posthog?.capture('outline_run', {
-                    is_in_lite_mode: liteMode,
-                    is_laser: isLaser,
-                    outline_speed: outlineSpeed,
-                    bbox,
-                });
-            } catch (e) {
-                clearTimeout(maxRuntime);
-                console.log(e);
-            }
-        } else {
-            pubsub.publish('outline:start');
-        }
-    };
 
     return (
         <Button
@@ -103,7 +119,7 @@ const OutlineButton: React.FC<OutlineButtonProps> = ({ disabled }) => {
                     'border-gray-500 bg-gray-400': disabled,
                 },
             )}
-            onClick={runOutline}
+            onClick={() => runOutline(posthog)}
         >
             <TbVector className="text-2xl mr-1" /> Outline
         </Button>

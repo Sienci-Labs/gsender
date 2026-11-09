@@ -1,14 +1,8 @@
+import Console from 'app/features/Console';
 import GcodeEditor from 'app/features/Visualizer/GcodeEditor';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-import {
-    addControllerEvents,
-    removeControllerEvents,
-} from 'app/lib/controller';
 import type { RootState } from 'app/store/redux';
-import { store as reduxStore } from 'app/store/redux';
-import { addToHistory } from 'app/store/redux/slices/console.slice';
-import { unloadFileInfo } from 'app/store/redux/slices/fileInfo.slice';
 import {
     ChevronsUp,
     ChevronUp,
@@ -18,19 +12,13 @@ import {
     Hash,
     Move,
     Upload,
+    Wifi,
     X,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import {
-    GcodeFilePayload,
-    isElectron,
-    pickGcodeFile,
-    readGcodeFile,
-} from '../electron-bridge';
-import { applyGcodeFile } from '../utils/fileLoader';
-import { cancelGcodeProcessing } from '../utils/gcodeProcessing';
+import { canLoadRecent, useFileActions } from '../hooks/useFileActions';
+import { formatHMS, formatSize } from '../utils/format';
 import ATCPanel from './ATCPanel';
-import ConsolePanel from './ConsolePanel';
 import CoolantPanel from './CoolantPanel';
 import MacrosPanel from './MacrosPanel';
 import MovePanel from './MovePanel';
@@ -49,29 +37,6 @@ const ALL_TABS = [
 ] as const;
 type DrawerTab = (typeof ALL_TABS)[number];
 type DrawerMode = 'closed' | 'minimal' | 'expanded';
-type RecentFile = {
-    fileName: string;
-    fileSize: number;
-    timeLoaded: number;
-    filePath?: string;
-};
-
-const RECENT_KEY = 'pendant-recent-files';
-
-const formatSize = (b: number) =>
-    b < 1024
-        ? `${b} B`
-        : b < 1048576
-          ? `${(b / 1024).toFixed(0)} KB`
-          : `${(b / 1048576).toFixed(1)} MB`;
-
-const formatHMS = (s: number) => {
-    if (!s) return '—';
-    const h = Math.floor(s / 3600);
-    const m = Math.floor((s % 3600) / 60);
-    const sec = Math.floor(s % 60);
-    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
-};
 
 // Compute bounding box from raw G-code by scanning X/Y/Z coordinates in motion lines
 
@@ -83,36 +48,23 @@ const formatAgo = (ts: number | null) => {
     return `${Math.floor(mins / 60)}h ago`;
 };
 
-const readRecentFiles = (): RecentFile[] => {
-    const raw = JSON.parse(
-        localStorage.getItem(RECENT_KEY) ?? '[]',
-    ) as Partial<RecentFile>[];
-    return raw
-        .map((entry) => ({
-            fileName: entry.fileName ?? '',
-            fileSize: Number(entry.fileSize) || 0,
-            timeLoaded: Number(entry.timeLoaded) || 0,
-            filePath: entry.filePath || '',
-        }))
-        .slice(0, 5);
-};
-
 export default function BottomDrawer() {
     const HEADER_HEIGHT_REM = 3.5;
     const DOUBLE_TAP_MS = 260;
     const [mode, setMode] = useState<DrawerMode>('closed');
     const [activeTab, setActiveTab] = useState<DrawerTab>('File');
-    const [recentFiles, setRecentFiles] = useState<RecentFile[]>([]);
-    const [loadedAt, setLoadedAt] = useState<number | null>(null);
-
-    const fileInputRef = useRef<HTMLInputElement>(null);
+    const {
+        recentFiles,
+        loadedAt,
+        fileInputRef,
+        handleLoadClick,
+        handleUnload,
+        handleFileChange,
+        handleRecentLoad,
+    } = useFileActions();
     const tapTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const lastTapRef = useRef(0);
-    const consolePreviewBottomRef = useRef<HTMLDivElement>(null);
     const file = useTypedSelector((s: RootState) => s.file);
-    const consoleHistory = useTypedSelector(
-        (s: RootState) => s.console.history,
-    );
     const { coolantFunctions = false, atcEnabled = false } =
         useWorkspaceState();
     const atcReport = useTypedSelector(
@@ -134,12 +86,6 @@ export default function BottomDrawer() {
         }
     }, [coolantFunctions, atcEnabledOrCompiled, activeTab]);
 
-    useEffect(() => {
-        const normalized = readRecentFiles();
-        localStorage.setItem(RECENT_KEY, JSON.stringify(normalized));
-        setRecentFiles(normalized);
-    }, []);
-
     useEffect(
         () => () => {
             if (tapTimeoutRef.current) {
@@ -148,132 +94,6 @@ export default function BottomDrawer() {
         },
         [],
     );
-
-    useEffect(() => {
-        consolePreviewBottomRef.current?.scrollIntoView();
-    }, [consoleHistory]);
-
-    // Always-on serial event subscription — must not depend on drawer mode or tab
-    useEffect(() => {
-        const events = {
-            'serialport:read': (data: string) => {
-                const line = String(data).trim();
-                if (line) reduxStore.dispatch(addToHistory([line]));
-            },
-            'serialport:write': (
-                data: string,
-                context: { source?: string },
-            ) => {
-                const line = String(data).trim();
-                if (!line) return;
-                // Server notices (the jog streamer's lifecycle, for one) are not
-                // machine traffic, so they read as plain lines rather than as
-                // something a source sent. Mirrors WRITE_SOURCE_SERVER.
-                const source =
-                    context?.source === 'server' ? null : context?.source;
-                const prefix = source ? `[${source}] ` : '';
-                reduxStore.dispatch(addToHistory([`${prefix}${line}`]));
-            },
-            'serialport:open': ({
-                port,
-                baudrate,
-            }: {
-                port: string;
-                baudrate: number;
-            }) => {
-                reduxStore.dispatch(
-                    addToHistory([`Connected to ${port} @ ${baudrate}`]),
-                );
-            },
-            'serialport:close': () => {
-                reduxStore.dispatch(addToHistory(['Disconnected']));
-            },
-        };
-        addControllerEvents(events);
-        return () => removeControllerEvents(events);
-    }, []);
-
-    const saveRecentEntry = (entry: RecentFile) => {
-        const stored = readRecentFiles();
-        const entryKey = entry.filePath?.trim()
-            ? `path:${entry.filePath}`
-            : `name:${entry.fileName}`;
-        const updated = [
-            entry,
-            ...stored.filter((r) => {
-                const existingKey = r.filePath?.trim()
-                    ? `path:${r.filePath}`
-                    : `name:${r.fileName}`;
-                return existingKey !== entryKey;
-            }),
-        ].slice(0, 5);
-
-        localStorage.setItem(RECENT_KEY, JSON.stringify(updated));
-        setRecentFiles(updated);
-    };
-
-    const applyLoadedFile = (payload: GcodeFilePayload) => {
-        applyGcodeFile(payload);
-        const timeLoaded = Date.now();
-        setLoadedAt(timeLoaded);
-        saveRecentEntry({
-            fileName: payload.name,
-            fileSize: payload.size,
-            timeLoaded,
-            filePath: payload.path,
-        });
-    };
-
-    const handleLoadClick = async () => {
-        if (!isElectron()) {
-            fileInputRef.current?.click();
-            return;
-        }
-
-        try {
-            const picked = await pickGcodeFile();
-            if (!picked) return;
-            applyLoadedFile(picked);
-        } catch (_error) {
-            // no-op: picker cancelled/failed
-        }
-    };
-
-    const handleUnload = () => {
-        cancelGcodeProcessing();
-        reduxStore.dispatch(unloadFileInfo());
-        setLoadedAt(null);
-    };
-
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const f = e.target.files?.[0];
-        if (!f) return;
-        e.target.value = '';
-
-        const content = await f.text();
-        applyLoadedFile({
-            name: f.name,
-            size: f.size,
-            content,
-            path: String((f as any).path || ''),
-        });
-    };
-
-    const handleRecentLoad = async (recentFile: RecentFile) => {
-        if (!recentFile.filePath) return;
-
-        if (isElectron()) {
-            try {
-                const loaded = await readGcodeFile(recentFile.filePath);
-                if (loaded) {
-                    applyLoadedFile(loaded);
-                }
-            } catch (_error) {
-                // no-op: file missing/unreadable
-            }
-            return;
-        }
-    };
 
     // Bounds from bbox.delta (populated when server parses; zeros when offline)
     const { delta } = file.bbox ?? { delta: { x: 0, y: 0, z: 0 } };
@@ -305,9 +125,14 @@ export default function BottomDrawer() {
               ? `calc(10.5rem + ${HEADER_HEIGHT_REM}rem)`
               : `${HEADER_HEIGHT_REM}rem`;
     const handleTabChange = (tab: DrawerTab) => {
+        const isSwitchingTab = tab !== activeTab;
         setActiveTab(tab);
         if (tab === 'Console') {
             setMode('expanded');
+        } else if (tab === 'Probe' && isSwitchingTab) {
+            // The probe wizard shouldn't open pre-expanded just because the
+            // drawer was left expanded on a different tab.
+            setMode('minimal');
         } else if (mode === 'closed') {
             setMode('minimal');
         }
@@ -532,8 +357,22 @@ export default function BottomDrawer() {
                                                     key={i}
                                                     className="flex items-center justify-between py-2 border-b border-gray-200 dark:border-outline last:border-0 gap-2"
                                                 >
-                                                    <span className="text-xs text-gray-700 dark:text-content-secondary truncate">
-                                                        {r.fileName}
+                                                    <span className="flex items-center gap-1.5 min-w-0">
+                                                        {r.source ===
+                                                        'remote' ? (
+                                                            <Wifi
+                                                                aria-label="Received from a desktop"
+                                                                className="shrink-0 w-3 h-3 text-blue-400"
+                                                            />
+                                                        ) : (
+                                                            <FileCode
+                                                                aria-hidden
+                                                                className="shrink-0 w-3 h-3 text-gray-400 dark:text-content-muted"
+                                                            />
+                                                        )}
+                                                        <span className="text-xs text-gray-700 dark:text-content-secondary truncate">
+                                                            {r.fileName}
+                                                        </span>
                                                     </span>
                                                     <div className="flex items-center gap-2 shrink-0">
                                                         <span className="text-[10px] text-gray-400">
@@ -548,10 +387,12 @@ export default function BottomDrawer() {
                                                                 )
                                                             }
                                                             disabled={
-                                                                !r.filePath
+                                                                !canLoadRecent(
+                                                                    r,
+                                                                )
                                                             }
                                                             className={`text-xs font-semibold rounded px-3 py-1.5 border transition-colors ${
-                                                                r.filePath
+                                                                canLoadRecent(r)
                                                                     ? 'text-robin-600 dark:text-robin-400 border-robin-300 dark:border-robin-600 hover:bg-robin-50 dark:hover:bg-robin-500/15'
                                                                     : 'text-gray-400 dark:text-content-muted border-gray-200 dark:border-outline cursor-default'
                                                             }`}
@@ -579,35 +420,21 @@ export default function BottomDrawer() {
                         <MovePanel mode={mode} setMode={setMode} />
                     </div>
 
-                    {/* Console tab — always mounted */}
+                    {/* Console tab — always mounted; Console is the same
+                        component the desktop app uses (app/features/Console),
+                        positioned absolutely against this relative wrapper. */}
                     <div
                         className={
                             activeTab === 'Console'
-                                ? 'flex-1 flex flex-col overflow-hidden min-h-0'
+                                ? 'flex-1 flex flex-col overflow-hidden min-h-0 relative'
                                 : 'hidden'
                         }
                     >
-                        {mode !== 'expanded' ? (
-                            <div className="flex-1 overflow-y-auto px-3 py-2 space-y-0.5 min-h-0">
-                                {consoleHistory.length === 0 ? (
-                                    <span className="font-mono text-xs text-gray-400 dark:text-content-muted italic">
-                                        No output yet
-                                    </span>
-                                ) : (
-                                    consoleHistory.map((line, i) => (
-                                        <p
-                                            key={i}
-                                            className="font-mono text-xs text-gray-600 dark:text-content-secondary truncate"
-                                        >
-                                            {line}
-                                        </p>
-                                    ))
-                                )}
-                                <div ref={consolePreviewBottomRef} />
-                            </div>
-                        ) : (
-                            <ConsolePanel className="h-full" />
-                        )}
+                        <Console
+                            isActive={activeTab === 'Console'}
+                            isChildWindow={false}
+                            showActions={false}
+                        />
                     </div>
 
                     {/* Macros tab — always mounted */}

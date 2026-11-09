@@ -84,6 +84,27 @@ describe('GcamHandoff', () => {
         expect(res.headers.get('access-control-allow-origin')).toBe(hosted);
     });
 
+    it('allows the gCAM desktop origin', async () => {
+        const desktop = 'gcam://app';
+        const res = await load(
+            { name: 'part.nc', gcode: 'G0 X0' },
+            { Origin: desktop },
+        );
+        expect(res.status).toBe(202);
+        expect(res.headers.get('access-control-allow-origin')).toBe(desktop);
+        expect(received).toHaveLength(1);
+    });
+
+    it('accepts programs from local clients without an Origin', async () => {
+        const res = await fetch(`${baseUrl}/gcam/v1/load`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: 'part.nc', gcode: 'G0 X0' }),
+        });
+        expect(res.status).toBe(202);
+        expect(received).toEqual([{ name: 'part.nc', gcode: 'G0 X0' }]);
+    });
+
     it('accepts a program and sanitizes its name', async () => {
         const res = await load({ name: '../part', gcode: 'G0 X0' });
         expect(res.status).toBe(202);

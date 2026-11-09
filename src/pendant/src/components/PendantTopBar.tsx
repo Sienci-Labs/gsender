@@ -14,7 +14,6 @@ import {
 import { cancelJog } from 'app/features/Jogging/utils/Jogging';
 import { useTypedSelector } from 'app/hooks/useTypedSelector';
 import { i18n } from 'app/i18n';
-import controller from 'app/lib/controller';
 import type { RootState } from 'app/store/redux';
 import {
     Circle,
@@ -32,11 +31,13 @@ import {
     Wrench,
 } from 'lucide-react';
 import type { ComponentType } from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useLongPress } from 'use-long-press';
+import { useEffect, useState } from 'react';
 import iconRound from '../assets/icon-round.png';
 import { isElectron, quitApp } from '../electron-bridge';
+import { useHoldToActivate } from '../hooks/useHoldToActivate';
+import { useUnlock } from '../hooks/useUnlock';
 import ConnectionWidget from './ConnectionWidget';
+import IncomingFilePill from './IncomingFilePill';
 
 interface StateColors {
     border: string;
@@ -310,93 +311,43 @@ const STATE_BADGES: Record<string, BadgeConfig> = {
     },
 };
 
-const QUIT_HOLD_MS = 1000;
 const QUIT_RING_RADIUS = 19;
 const QUIT_RING_CIRCUMFERENCE = 2 * Math.PI * QUIT_RING_RADIUS;
 
 function useLogoHoldToQuit() {
-    const [progress, setProgress] = useState(0);
-    const [isHolding, setIsHolding] = useState(false);
-    const startTimeRef = useRef(0);
-    const rafRef = useRef<number | null>(null);
-
-    const stopProgressLoop = useCallback(() => {
-        if (rafRef.current !== null) {
-            cancelAnimationFrame(rafRef.current);
-            rafRef.current = null;
-        }
-    }, []);
-
-    useEffect(() => stopProgressLoop, [stopProgressLoop]);
-
-    const startProgressLoop = useCallback(() => {
-        const update = (now: number) => {
-            const elapsed = now - startTimeRef.current;
-            setProgress(Math.min(elapsed / QUIT_HOLD_MS, 1));
-            rafRef.current = requestAnimationFrame(update);
-        };
-        rafRef.current = requestAnimationFrame(update);
-    }, []);
-
-    const bind = useLongPress(
-        () => {
-            setIsHolding(false);
-            stopProgressLoop();
-            setProgress(0);
+    return useHoldToActivate(
+        () =>
             Confirm({
                 title: i18n.t('notifications:pendant.quit.title'),
                 content: i18n.t('notifications:pendant.quit.content'),
                 confirmLabel: i18n.t('notifications:pendant.quit.confirm'),
                 cancelLabel: i18n.t('common:actions.cancel'),
                 onConfirm: () => quitApp(),
-            });
-        },
+            }),
         {
-            threshold: QUIT_HOLD_MS,
-            cancelOnMovement: true,
-            filterEvents: (event) => {
-                if (!isElectron()) {
-                    return false;
-                }
-                if ('button' in event && typeof event.button === 'number') {
-                    return event.button === 0;
-                }
-                return true;
-            },
-            onStart: () => {
-                startTimeRef.current = performance.now();
-                setProgress(0);
-                setIsHolding(true);
-                startProgressLoop();
-            },
-            onCancel: () => {
-                stopProgressLoop();
-                setProgress(0);
-                setIsHolding(false);
-            },
-            onFinish: () => {
-                stopProgressLoop();
-            },
+            // Quitting only means something inside the Electron shell
+            disabled: !isElectron(),
+            hint: 'Hold to quit',
         },
     );
-
-    return { bind, progress, isHolding };
 }
 
 export default function PendantTopBar() {
     const isDark = useIsDark();
-    const { bind, progress, isHolding } = useLogoHoldToQuit();
+    const {
+        bind,
+        progress,
+        showProgress: isHolding,
+        hintNode: quitHint,
+    } = useLogoHoldToQuit();
     const isConnected = useTypedSelector(
         (s: RootState) => s.connection.isConnected,
     );
     const controllerType = useTypedSelector(
         (s: RootState) => s.controller.type,
     );
-    const rawState = useTypedSelector(
-        (s: RootState) => s.controller.state,
-    ) as any;
-    const activeState: string = rawState?.status?.activeState ?? '';
-    const alarmCode: string | number = rawState?.status?.alarmCode ?? 0;
+    const { activeState, alarmCode, unlockActionable, handleUnlock } =
+        useUnlock();
     const badge = !isConnected
         ? BADGE_DISCONNECTED
         : (STATE_BADGES[activeState] ?? BADGE_DEFAULT);
@@ -411,34 +362,6 @@ export default function PendantTopBar() {
     const badgeLabel = showAlarmCode
         ? `${badge.label} ${alarmCode}`
         : badge.label;
-    const unlockActionable =
-        isConnected &&
-        (activeState === GRBL_ACTIVE_STATE_HOLD ||
-            activeState === GRBL_ACTIVE_STATE_ALARM);
-    const handleUnlock = () => {
-        if (!isConnected) return;
-
-        if (activeState === GRBL_ACTIVE_STATE_ALARM) {
-            if (
-                alarmCode === 1 ||
-                alarmCode === 2 ||
-                alarmCode === 10 ||
-                alarmCode === 14 ||
-                alarmCode === 17
-            ) {
-                controller.command('reset:limit');
-            } else if (alarmCode === 11 || alarmCode === 'Homing') {
-                controller.command('homing');
-            } else {
-                controller.command('unlock');
-            }
-            return;
-        }
-
-        if (activeState === GRBL_ACTIVE_STATE_HOLD) {
-            controller.command('cyclestart');
-        }
-    };
     const handleEStop = () => {
         if (!isConnected) return;
         cancelJog(activeState, controllerType);
@@ -449,8 +372,7 @@ export default function PendantTopBar() {
             {/* Logo — hold to quit */}
             <div
                 className="relative flex items-center gap-2 shrink-0 no-drag touch-manipulation"
-                onContextMenu={(event) => event.preventDefault()}
-                {...bind()}
+                {...bind}
             >
                 <img src={iconRound} alt="gSender" className="w-9 h-9" />
                 {isHolding && (
@@ -477,11 +399,16 @@ export default function PendantTopBar() {
                         />
                     </svg>
                 )}
+                {quitHint}
             </div>
 
             {/* Touch-forward connection widget */}
             <div className="shrink-0 no-drag">
                 <ConnectionWidget />
+            </div>
+
+            <div className="shrink-0 no-drag">
+                <IncomingFilePill />
             </div>
 
             {/* State badge — absolutely centred so Connection resizing doesn't shift it */}

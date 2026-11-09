@@ -1,89 +1,26 @@
 import RangeSlider from 'app/components/RangeSlider';
+import { OVERRIDE_VALUE_RANGES } from 'app/constants';
 import {
-    METRIC_UNITS,
-    OVERRIDE_VALUE_RANGES,
-    SPINDLE_MODE,
-} from 'app/constants';
-import { useTypedSelector } from 'app/hooks/useTypedSelector';
-import { useWorkspaceState } from 'app/hooks/useWorkspaceState';
-import controller from 'app/lib/controller';
-import { mapPositionToUnits } from 'app/lib/units';
-import store from 'app/store';
-import type { RootState } from 'app/store/redux';
-import debounce from 'lodash/debounce';
-import get from 'lodash/get';
-import { useEffect, useState } from 'react';
-
-const debouncedFeed = debounce(
-    (v: number) => controller.command('feedOverride', v),
-    750,
-);
-const debouncedSpindle = debounce(
-    (v: number) => controller.command('spindleOverride', v),
-    1000,
-);
-
-let globalOvTimestamp = 0;
-let globalLocalOvFTimestamp = 0;
-let globalLocalOvSTimestamp = 0;
-
-const debouncedOvFUpdate = debounce((ovF: number, set: (v: number) => void) => {
-    if (globalOvTimestamp > globalLocalOvFTimestamp) set(ovF);
-}, 1000);
-const debouncedOvSUpdate = debounce((ovS: number, set: (v: number) => void) => {
-    if (globalOvTimestamp > globalLocalOvSTimestamp) set(ovS);
-}, 1000);
+    sendFeedOverride,
+    sendSpindleOverride,
+    useOverrides,
+} from '../hooks/useOverrides';
 
 export default function FeedOverrideWrapper() {
-    const status = useTypedSelector((s: RootState) =>
-        get(s, 'controller.state.status', {}),
-    ) as any;
-    const isConnected = useTypedSelector(
-        (s: RootState) => s.connection.isConnected,
-    );
-    const { units, spindleFunctions } = useWorkspaceState();
-
-    const [spindleLabel, setSpindleLabel] = useState(
-        store.get('widgets.spindle.mode') === SPINDLE_MODE
-            ? 'Spindle'
-            : 'Laser',
-    );
-
-    useEffect(() => {
-        const handler = () => {
-            setSpindleLabel(
-                store.get('widgets.spindle.mode', SPINDLE_MODE) === SPINDLE_MODE
-                    ? 'Spindle'
-                    : 'Laser',
-            );
-        };
-        store.on('change', handler);
-        return () => {
-            store.removeListener('change', handler);
-        };
-    }, []);
-
-    const ov: number[] = status.ov ?? [100, 100, 100];
-    const ovF = ov[0];
-    const ovS = ov[2];
-    const ovTimestamp = status.ovTimestamp ?? 0;
-    let feedrate = status.feedrate ?? '0';
-    const spindle = status.spindle ?? '0';
-
-    globalOvTimestamp = ovTimestamp;
-
-    const [localOvF, setLocalOvF] = useState(ovF);
-    const [localOvS, setLocalOvS] = useState(ovS);
-
-    useEffect(() => {
-        debouncedOvFUpdate(ovF, setLocalOvF);
-    }, [ovF]);
-    useEffect(() => {
-        debouncedOvSUpdate(ovS, setLocalOvS);
-    }, [ovS]);
-
-    const unitString = `${units}/min`;
-    if (units !== METRIC_UNITS) feedrate = mapPositionToUnits(feedrate, units);
+    const {
+        isConnected,
+        spindleFunctions,
+        spindleLabel,
+        unitString,
+        feedrate,
+        spindle,
+        localOvF,
+        localOvS,
+        previewFeed,
+        previewSpindle,
+        commitFeed,
+        commitSpindle,
+    } = useOverrides();
 
     return (
         <div
@@ -107,16 +44,13 @@ export default function FeedOverrideWrapper() {
                 colour={isConnected ? 'bg-blue-400' : 'bg-gray-500'}
                 disabled={!isConnected}
                 onChange={(vals) => {
-                    setLocalOvF(vals[0]);
-                    globalLocalOvFTimestamp = Date.now();
+                    previewFeed(vals[0]);
                 }}
                 onButtonPress={(vals) => {
-                    setLocalOvF(vals[0]);
-                    globalLocalOvFTimestamp = Date.now();
-                    debouncedFeed(vals[0]);
+                    commitFeed(vals[0]);
                 }}
                 onLostPointerCapture={() => {
-                    debouncedFeed(localOvF);
+                    sendFeedOverride(localOvF);
                 }}
             />
             {spindleFunctions && (
@@ -140,16 +74,13 @@ export default function FeedOverrideWrapper() {
                     }
                     disabled={!isConnected}
                     onChange={(vals) => {
-                        setLocalOvS(vals[0]);
-                        globalLocalOvSTimestamp = Date.now();
+                        previewSpindle(vals[0]);
                     }}
                     onButtonPress={(vals) => {
-                        setLocalOvS(vals[0]);
-                        globalLocalOvSTimestamp = Date.now();
-                        debouncedSpindle(vals[0]);
+                        commitSpindle(vals[0]);
                     }}
                     onPointerUp={() => {
-                        debouncedSpindle(localOvS);
+                        sendSpindleOverride(localOvS);
                     }}
                 />
             )}

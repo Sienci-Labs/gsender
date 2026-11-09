@@ -49,6 +49,12 @@ export default defineConfig({
             '@': path.join(root, 'src/app/src'),
         },
     },
+    optimizeDeps: {
+        // concaveman is imported only by Outline.worker, which the dependency
+        // scan doesn't follow; see src/app/vite.config.js for why it must be
+        // pre-bundled up front.
+        include: ['concaveman'],
+    },
     server: {
         port: 5174,
         fs: {

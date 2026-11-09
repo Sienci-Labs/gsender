@@ -39,6 +39,7 @@ import FlashingFirmware from "../../lib/Firmware/Flashing/firmwareflashing";
 import UF2Flasher from "../../lib/Firmware/Flashing/UF2Flasher";
 import logger from "../../lib/logger";
 import { listNetworkAddresses } from "../../lib/network-interfaces";
+import { getPortProvider } from "../../lib/ports";
 import store from "../../store";
 import config from "../configstore";
 import taskRunner from "../taskrunner";
@@ -415,7 +416,8 @@ class CNCEngine {
 			socket.on("list", () => {
 				log.debug(`socket.list(): id=${socket.id}`);
 
-				SerialPort.list()
+				getPortProvider()
+					.list()
 					.then((ports) => {
 						ports = ports.concat(ensureArray(config.get("ports", [])));
 

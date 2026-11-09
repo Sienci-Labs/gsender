@@ -24,12 +24,19 @@ import {
     Usb,
 } from 'lucide-react';
 import pubsub from 'pubsub-js';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+    type PointerEventHandler,
+    type ReactNode,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
+import { useHoldToActivate } from '../hooks/useHoldToActivate';
 
-/* Hold-to-disconnect timing. A press under TAP_MAX is a tap (toggles the
- * info card); a press held for DURATION disconnects. */
-const DURATION = 900;
-const TAP_MAX = 250;
+/* Hold-to-disconnect: a tap (under HOLD_TAP_MAX_MS) toggles the info card;
+ * a full hold (HOLD_MS) disconnects. */
 
 /* Per-status colour treatment. The custom brand families (blue-700 #2c5d8b,
  * green-700 #047854, red-600 #c62222) render identically in light and dark,
@@ -62,6 +69,30 @@ const STATUS_CLASSES: Record<
 
 const PILL_BASE =
     'conn-anim-pop-in flex items-center gap-2 w-48 h-11 pl-1.5 pr-3 rounded-md border';
+// Badge-sized pill used by the carve screen's status badge slot
+const PILL_BASE_COMPACT =
+    'conn-anim-pop-in flex items-center gap-1.5 w-[178px] h-8 pl-1 pr-2 rounded-lg border';
+
+/** Everything a custom connected-state trigger needs to reuse this widget's
+ * tap-for-info / hold-to-disconnect behaviour. */
+export interface ConnectedTriggerProps {
+    firmware: string;
+    displayPort: string;
+    holding: boolean;
+    progress: number;
+    infoOpen: boolean;
+    onPointerDown: PointerEventHandler;
+    onPointerUp: PointerEventHandler;
+    onPointerLeave: PointerEventHandler;
+    onPointerCancel: PointerEventHandler;
+}
+
+interface ConnectionWidgetProps {
+    /** Badge-sized pills for the disconnected / connecting / error states. */
+    compact?: boolean;
+    /** Replaces the connected pill; defaults to the pendant's own pill. */
+    renderConnected?: (props: ConnectedTriggerProps) => ReactNode;
+}
 
 function truncatePortName(port: string = ''): string {
     const portName = port.split('/').pop() ?? '';
@@ -256,7 +287,10 @@ function readConfigValues(): ConnectionConfigValues {
     };
 }
 
-export default function ConnectionWidget() {
+export default function ConnectionWidget({
+    compact = false,
+    renderConnected,
+}: ConnectionWidgetProps = {}) {
     const connectionConfig = useMemo(() => new WidgetConfig('connection'), []);
 
     // Redux-backed data (populated by the pendant sagas' serialport:list bridge).
@@ -287,15 +321,10 @@ export default function ConnectionWidget() {
     // Floating-panel + hold state.
     const [sheetOpen, setSheetOpen] = useState(false);
     const [infoOpen, setInfoOpen] = useState(false);
-    const [progress, setProgress] = useState(0);
-    const [holding, setHolding] = useState(false);
 
     const connectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
         null,
     );
-    const rafRef = useRef<number | null>(null);
-    const startRef = useRef(0);
-    const pressStartRef = useRef(0);
 
     // Refs mirroring latest values for use inside stable async callbacks.
     const activePortRef = useRef(activePort);
@@ -326,6 +355,17 @@ export default function ConnectionWidget() {
         });
     }, []);
 
+    // Hold to disconnect; a tap toggles the info card instead of a hint.
+    const {
+        progress,
+        showProgress: holding,
+        reset: resetHold,
+        bind: holdBind,
+    } = useHoldToActivate(onDisconnectClick, {
+        disabled: connectionState !== ConnectionState.CONNECTED,
+        onTap: () => setInfoOpen((v) => !v),
+    });
+
     const handleConnect = useCallback(
         (portName: string, type: ConnectionType) => {
             if (!portName) {
@@ -345,8 +385,7 @@ export default function ConnectionWidget() {
             );
 
             // Clear hold state so a stale red fill can't flash on (re)connect.
-            setHolding(false);
-            setProgress(0);
+            resetHold();
 
             setConnectionState(ConnectionState.CONNECTING);
             setConnectionType(type);
@@ -423,9 +462,6 @@ export default function ConnectionWidget() {
             if (connectTimeoutRef.current) {
                 clearTimeout(connectTimeoutRef.current);
             }
-            if (rafRef.current) {
-                cancelAnimationFrame(rafRef.current);
-            }
         };
     }, [onControllerDisconnect, attemptAutoConnect]);
 
@@ -459,51 +495,6 @@ export default function ConnectionWidget() {
         }, 5000);
         return () => clearTimeout(t);
     }, [connectionState]);
-
-    // Hold-to-disconnect progress loop.
-    const tick = useCallback(
-        (ts: number) => {
-            if (!startRef.current) {
-                startRef.current = ts;
-            }
-            const pct = Math.min((ts - startRef.current) / DURATION, 1);
-            setProgress(pct);
-            if (pct >= 1) {
-                startRef.current = 0;
-                setHolding(false);
-                setProgress(0);
-                onDisconnectClick();
-                return;
-            }
-            rafRef.current = requestAnimationFrame(tick);
-        },
-        [onDisconnectClick],
-    );
-
-    const startHold = () => {
-        if (connectionStateRef.current !== ConnectionState.CONNECTED) {
-            return;
-        }
-        pressStartRef.current = performance.now();
-        startRef.current = 0;
-        setHolding(true);
-        rafRef.current = requestAnimationFrame(tick);
-    };
-
-    const endHold = () => {
-        if (rafRef.current) {
-            cancelAnimationFrame(rafRef.current);
-            rafRef.current = null;
-        }
-        startRef.current = 0;
-        setHolding(false);
-        setProgress(0);
-        const pressed = pressStartRef.current;
-        pressStartRef.current = 0;
-        if (pressed > 0 && performance.now() - pressed < TAP_MAX) {
-            setInfoOpen((v) => !v);
-        }
-    };
 
     const openSheet = () => {
         setCfg(readConfigValues());
@@ -544,6 +535,12 @@ export default function ConnectionWidget() {
     };
 
     const status = STATUS_CLASSES[connectionState];
+    const pillBase = compact ? PILL_BASE_COMPACT : PILL_BASE;
+    const pillIconBox = compact
+        ? 'flex items-center justify-center w-7 h-7 shrink-0'
+        : 'flex items-center justify-center w-11 h-11 shrink-0';
+    const pillIcon = compact ? 'w-4 h-4' : 'w-6 h-6';
+    const pillText = compact ? 'text-xs' : 'text-sm';
     const displayPort = isIPv4(activePort)
         ? activePort
         : truncatePortName(activePort) || activePort;
@@ -557,16 +554,21 @@ export default function ConnectionWidget() {
                         type="button"
                         onClick={openSheet}
                         className={cn(
-                            PILL_BASE,
+                            pillBase,
                             status.tint,
                             status.border,
                             'active:scale-95 transition-transform',
                         )}
                     >
-                        <span className="flex items-center justify-center w-11 h-11 shrink-0">
-                            <Plug className={cn('w-6 h-6', status.icon)} />
+                        <span className={pillIconBox}>
+                            <Plug className={cn(pillIcon, status.icon)} />
                         </span>
-                        <span className="flex-1 min-w-0 text-left truncate font-semibold text-sm text-black dark:text-content-primary">
+                        <span
+                            className={cn(
+                                'flex-1 min-w-0 text-left truncate font-semibold text-black dark:text-content-primary',
+                                pillText,
+                            )}
+                        >
                             Connect to CNC
                         </span>
                     </button>
@@ -576,21 +578,27 @@ export default function ConnectionWidget() {
                     <div
                         key="connecting"
                         className={cn(
-                            PILL_BASE,
+                            pillBase,
                             status.tint,
                             status.border,
                             'conn-anim-shimmer',
                         )}
                     >
-                        <span className="flex items-center justify-center w-11 h-11 shrink-0">
+                        <span className={pillIconBox}>
                             <Loader2
                                 className={cn(
-                                    'w-6 h-6 animate-spin',
+                                    pillIcon,
+                                    'animate-spin',
                                     status.icon,
                                 )}
                             />
                         </span>
-                        <span className="flex-1 min-w-0 text-left truncate font-semibold text-sm text-black dark:text-content-primary">
+                        <span
+                            className={cn(
+                                'flex-1 min-w-0 text-left truncate font-semibold text-black dark:text-content-primary',
+                                pillText,
+                            )}
+                        >
                             Connecting…
                         </span>
                     </div>
@@ -602,56 +610,74 @@ export default function ConnectionWidget() {
                         type="button"
                         onClick={openSheet}
                         className={cn(
-                            PILL_BASE,
+                            pillBase,
                             status.tint,
                             status.border,
                             'active:scale-95 transition-transform',
                         )}
                     >
-                        <span className="flex items-center justify-center w-11 h-11 shrink-0">
+                        <span className={pillIconBox}>
                             <AlertTriangle
-                                className={cn('w-6 h-6', status.icon)}
+                                className={cn(pillIcon, status.icon)}
                             />
                         </span>
-                        <span className="flex-1 min-w-0 text-left truncate font-semibold text-sm text-red-600">
+                        <span
+                            className={cn(
+                                'flex-1 min-w-0 text-left truncate font-semibold text-red-600',
+                                pillText,
+                            )}
+                        >
                             Connection failed
                         </span>
                     </button>
                 )}
 
-                {connectionState === ConnectionState.CONNECTED && (
-                    <button
-                        key="connected"
-                        type="button"
-                        onPointerDown={startHold}
-                        onPointerUp={endHold}
-                        onPointerLeave={endHold}
-                        className={cn(
-                            PILL_BASE,
-                            status.tint,
-                            status.border,
-                            'relative overflow-hidden touch-none select-none',
-                        )}
-                    >
-                        {holding && (
-                            <span
-                                className="absolute inset-y-0 left-0 bg-red-600"
-                                style={{ width: `${progress * 100}%` }}
-                            />
-                        )}
-                        <span className="relative flex items-center justify-center w-11 h-11 shrink-0">
-                            <PlugZap className={cn('w-6 h-6', status.icon)} />
-                        </span>
-                        <span className="relative flex-1 min-w-0 text-left leading-tight">
-                            <span className="block text-sm font-semibold truncate text-gray-900 dark:text-content-primary">
-                                {firmware || 'Connected'}
+                {connectionState === ConnectionState.CONNECTED &&
+                    renderConnected?.({
+                        firmware: firmware || 'Connected',
+                        displayPort,
+                        holding,
+                        progress,
+                        infoOpen,
+                        onPointerDown: holdBind.onPointerDown,
+                        onPointerUp: holdBind.onPointerUp,
+                        onPointerLeave: holdBind.onPointerLeave,
+                        onPointerCancel: holdBind.onPointerCancel,
+                    })}
+                {connectionState === ConnectionState.CONNECTED &&
+                    !renderConnected && (
+                        <button
+                            key="connected"
+                            type="button"
+                            {...holdBind}
+                            className={cn(
+                                pillBase,
+                                status.tint,
+                                status.border,
+                                'relative overflow-hidden touch-none select-none',
+                            )}
+                        >
+                            {holding && (
+                                <span
+                                    className="absolute inset-y-0 left-0 bg-red-600"
+                                    style={{ width: `${progress * 100}%` }}
+                                />
+                            )}
+                            <span className="relative flex items-center justify-center w-11 h-11 shrink-0">
+                                <PlugZap
+                                    className={cn('w-6 h-6', status.icon)}
+                                />
                             </span>
-                            <span className="block text-xs font-mono truncate text-gray-600 dark:text-content-muted">
-                                {displayPort}
+                            <span className="relative flex-1 min-w-0 text-left leading-tight">
+                                <span className="block text-sm font-semibold truncate text-gray-900 dark:text-content-primary">
+                                    {firmware || 'Connected'}
+                                </span>
+                                <span className="block text-xs font-mono truncate text-gray-600 dark:text-content-muted">
+                                    {displayPort}
+                                </span>
                             </span>
-                        </span>
-                    </button>
-                )}
+                        </button>
+                    )}
             </div>
 
             {/* Info card — opened by a quick tap while connected. */}

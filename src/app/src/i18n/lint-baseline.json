@@ -248,13 +248,15 @@
     "hardcoded: to set your tool change strategy to Fixed\n                Tool Sensor and save these options.": 1
   },
   "src/app/src/features/AccessoryInstaller/Wizards/vacuum-table/components/LoadGridFile.tsx": {
-    "hardcoded: Load the alignment grid pattern for your vacuum table. This will\n                open the file in the main visualizer.": 1
+    "hardcoded: Load the alignment grid pattern for your vacuum table. This will\n                open the file in the main visualizer.": 1,
+    "hardcoded: Use a 3/8\" (0.375 in) bit.": 1
   },
   "src/app/src/features/AccessoryInstaller/Wizards/vacuum-table/components/LoadMountingFile.tsx": {
-    "hardcoded: Load the mounting-hole pattern for your vacuum table. This will\n                open the file in the main visualizer.": 1
+    "hardcoded: Load the mounting-hole pattern for your vacuum table. This will\n                open the file in the main visualizer.": 1,
+    "hardcoded: Use a 3/8\" (0.375 in) bit.": 1
   },
   "src/app/src/features/AccessoryInstaller/Wizards/vacuum-table/components/SelectSize.tsx": {
-    "hardcoded: Choose the size of your vacuum table.": 1
+    "hardcoded: Choose your vacuum table type.": 1
   },
   "src/app/src/features/AccessoryInstaller/Wizards/vacuum-table/components/ZeroPosition.tsx": {
     "hardcoded: Jog to the front-left corner of your vacuum table.": 1,
@@ -682,6 +684,30 @@
     "hardcoded: Warning - Probing": 1,
     "hardcoded: corner": 1
   },
+  "src/app/src/features/RemoteFileReceive/IncomingFileProgressBar.tsx": {
+    "hardcoded: Received": 1
+  },
+  "src/app/src/features/RemoteFileReceive/index.tsx": {
+    "hardcoded: Address(es) a desktop can send to:": 1,
+    "hardcoded: Delete (": 1,
+    "hardcoded: Enabled": 1,
+    "hardcoded: Files sent here with \"Add to library\" will show up in\n                        this list.": 1,
+    "hardcoded: If the desktop can't find this tablet automatically,\n                        enter one of these addresses and the code below in its\n                        Send to Pendant dialog.": 1,
+    "hardcoded: Let a desktop gSender send a g-code file to this tablet over\n                Wi-Fi, without copying it over first.": 1,
+    "hardcoded: Manual pairing": 1,
+    "hardcoded: New code": 1,
+    "hardcoded: No network connection detected.": 1,
+    "hardcoded: Pairing code": 1,
+    "hardcoded: Received files": 1,
+    "hardcoded: Select all": 1
+  },
+  "src/app/src/features/RemoteFileReceive/PairedDesktops.tsx": {
+    "hardcoded: Forget": 1,
+    "hardcoded: On the desktop, open Send to Pendant and choose \"Pair a new\n                    tablet\", then scan the code it shows.": 1,
+    "hardcoded: Pair with desktop": 1,
+    "hardcoded: Paired desktops": 1,
+    "hardcoded: Pairing with": 1
+  },
   "src/app/src/features/RemoteMode/components/AddressOption.tsx": {
     "hardcoded: Recommended": 1
   },
@@ -762,6 +788,44 @@
   "src/app/src/features/SDCard/components/UploadProgressBar.tsx": {
     "hardcoded: Upload complete!": 1,
     "hardcoded: Uploading...": 1
+  },
+  "src/app/src/features/SendToPendant/PairWithQr.tsx": {
+    "hardcoded: , then point it at this code.": 1,
+    "hardcoded: Back": 1,
+    "hardcoded: On the tablet, open": 1,
+    "hardcoded: Use pairing code instead": 1,
+    "hardcoded: Waiting for a tablet to scan…": 1,
+    "hardcoded: and tap": 1
+  },
+  "src/app/src/features/SendToPendant/TabletConnect.tsx": {
+    "hardcoded: + Add more files": 1,
+    "hardcoded: Cancel": 1,
+    "hardcoded: Drop g-code files here, or": 1,
+    "hardcoded: Load as active job": 1,
+    "hardcoded: On the tablet, open Tools → Remote File Receive and turn\n                        it on. Then scan this computer's QR code, or enter the\n                        IP and code it shows.": 1,
+    "hardcoded: Pair": 1,
+    "hardcoded: Pair with code": 1,
+    "hardcoded: Pairing code (shown on the tablet)": 1,
+    "hardcoded: Port": 1,
+    "hardcoded: Remove": 1,
+    "hardcoded: Send files": 1,
+    "hardcoded: Sending is paused while a job is running.": 1,
+    "hardcoded: Sent!": 1,
+    "hardcoded: Tablet IP": 1,
+    "hardcoded: Tablets": 1,
+    "hardcoded: browse": 1
+  },
+  "src/app/src/features/SendToPendant/TabletPicker.tsx": {
+    "hardcoded: Change": 1,
+    "hardcoded: Choose a tablet": 1,
+    "hardcoded: Enter IP & code instead": 1,
+    "hardcoded: Enter IP manually": 1,
+    "hardcoded: Forget this tablet": 2,
+    "hardcoded: No pendant paired yet": 1,
+    "hardcoded: Pair another tablet": 1,
+    "hardcoded: Pair once and it's remembered for future sends.": 1,
+    "hardcoded: Pair with QR code": 1,
+    "hardcoded: Sending to": 1
   },
   "src/app/src/features/Spindle/components/LaserControls.tsx": {
     "hardcoded: Power": 1,
@@ -1039,9 +1103,67 @@
     "hardcoded: Load": 1,
     "hardcoded: Load File": 1,
     "hardcoded: No file loaded": 1,
-    "hardcoded: No output yet": 1,
     "hardcoded: No recent files.": 1,
     "hardcoded: Recent files": 1
+  },
+  "src/pendant/src/components/carve/locked/AlarmHelperCard.tsx": {
+    "hardcoded: Alarm": 1,
+    "hardcoded: The controller is in an alarm state. Unlock to clear it,\n                        or reset the controller.": 1
+  },
+  "src/pendant/src/components/carve/locked/HoldCard.tsx": {
+    "hardcoded: Hold": 1,
+    "hardcoded: Resume to continue from where motion stopped, or reset to drop\n                the hold and return to Idle.": 1
+  },
+  "src/pendant/src/components/carve/run/IsoFader.tsx": {
+    "hardcoded: Reset": 1
+  },
+  "src/pendant/src/components/carve/run/RapidPresets.tsx": {
+    "hardcoded: Rapid": 1
+  },
+  "src/pendant/src/components/carve/run/RunRight.tsx": {
+    "hardcoded: Lines sent": 1,
+    "hardcoded: Remaining": 1
+  },
+  "src/pendant/src/components/carve/setup/FileTab.tsx": {
+    "hardcoded: Bounding box": 1,
+    "hardcoded: Hold to close file": 1,
+    "hardcoded: Hold to load": 1,
+    "hardcoded: No file loaded": 1,
+    "hardcoded: No recent files.": 1,
+    "hardcoded: Open": 1,
+    "hardcoded: Open a G-code file to get started": 1,
+    "hardcoded: Open file": 1,
+    "hardcoded: Recent files": 1,
+    "hardcoded: Run": 1,
+    "hardcoded: Set": 1
+  },
+  "src/pendant/src/components/carve/setup/PrepTab.tsx": {
+    "hardcoded: (S)": 1,
+    "hardcoded: Coolant": 1,
+    "hardcoded: Hold icon to swap to": 1
+  },
+  "src/pendant/src/components/carve/toolchange/TcLeft.tsx": {
+    "hardcoded: Back": 1,
+    "hardcoded: The controller is waiting on a tool change. Follow the steps\n                    on gSender, then resume the job.": 1,
+    "hardcoded: Tool change": 1
+  },
+  "src/pendant/src/components/carve/toolchange/TcRight.tsx": {
+    "hardcoded: No tool-change guide was loaded on the pendant. Use\n                            Jog to position the machine if you need to.": 1
+  },
+  "src/pendant/src/components/carve/topbar/CarveTopBar.tsx": {
+    "hardcoded: E-STOP": 1,
+    "hardcoded: Home": 1
+  },
+  "src/pendant/src/components/carve/viz/PinnedToolsMenu.tsx": {
+    "hardcoded: Pinned tools": 1
+  },
+  "src/pendant/src/components/carve/viz/VizStage.tsx": {
+    "hardcoded: Cancel move": 1,
+    "hardcoded: Move armed — hold on a spot to move": 1
+  },
+  "src/pendant/src/components/carve/viz/VizViewTray.tsx": {
+    "hardcoded: Center on machine": 1,
+    "hardcoded: Tap the canvas to jog there": 1
   },
   "src/pendant/src/components/ConnectionWidget.tsx": {
     "hardcoded: Connect to CNC": 1,
@@ -1054,16 +1176,18 @@
     "hardcoded: Recognized": 1,
     "hardcoded: Unrecognized Ports": 1
   },
-  "src/pendant/src/components/ConsolePanel.tsx": {
-    "hardcoded: Clear": 1,
-    "hardcoded: No output yet": 1,
-    "hardcoded: Send": 1
+  "src/pendant/src/components/DepthGauge.tsx": {
+    "hardcoded: Not homed": 1
   },
   "src/pendant/src/components/DROCard.tsx": {
     "hardcoded: ZERO": 1
   },
   "src/pendant/src/components/FileLoadingOverlay.tsx": {
     "hardcoded: building toolpath...": 1
+  },
+  "src/pendant/src/components/GcodeToolPreviewVisualizer.tsx": {
+    "hardcoded: No g-code generated yet.": 1,
+    "hardcoded: Please generate g-code first.": 1
   },
   "src/pendant/src/components/JoggingCard.tsx": {
     "hardcoded: A+": 1,
@@ -1089,9 +1213,8 @@
     "hardcoded: Config crashed:": 1
   },
   "src/pendant/src/components/PendantToolsView.tsx": {
-    "hardcoded: Back": 1,
     "hardcoded: Tools": 1,
-    "hardcoded: Tools are plugins that can be installed and used to extend the\n                functionality of gSender. Some are built in to gSender, some are\n                third party plugins.": 1
+    "hardcoded: Tools are plugins that can be installed and used to extend the\n                functionality of gSender. Some are built in to gSender, some are\n                third party plugins. Star a tool to pin it to the carve screen.": 1
   },
   "src/pendant/src/components/PendantTopBar.tsx": {
     "hardcoded: E-STOP": 1,
@@ -1124,8 +1247,8 @@
   },
   "src/pendant/src/components/ProbePanel.tsx": {
     "hardcoded: Configuration": 1,
-    "hardcoded: Probe": 1,
-    "hardcoded: Repeat last:": 1
+    "hardcoded: Repeat last:": 1,
+    "hardcoded: Set Up Probe": 1
   },
   "src/pendant/src/components/ProgressAreaWrapper.tsx": {
     "hardcoded: Progress": 1
@@ -1136,11 +1259,15 @@
     "hardcoded: Spindle": 1,
     "hardcoded: sec": 1
   },
+  "src/pendant/src/components/tools/PendantToolHost.tsx": {
+    "hardcoded: Back": 1
+  },
   "src/pendant/src/components/VisualizerCard.tsx": {
-    "hardcoded: Bounds": 1,
+    "hardcoded: Bed": 1,
     "hardcoded: Cut": 1,
     "hardcoded: No file loaded": 1,
-    "hardcoded: Open G-code file": 1,
+    "hardcoded: Open G-code file": 2,
+    "hardcoded: Open file": 1,
     "hardcoded: Rapid": 1,
     "hardcoded: Tap here to open a G-code file": 1
   },
