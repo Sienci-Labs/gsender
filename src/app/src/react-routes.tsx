@@ -24,6 +24,7 @@ import Probe from './features/Probe';
 import { BottomNav } from './features/RemoteMode/components/BottomNav';
 import Rotary from './features/Rotary';
 import RotarySurfacing from './features/Rotary/RotarySurfacing';
+import TabletConnect from './features/SendToPendant';
 import Spindle from './features/Spindle';
 import Squaring from './features/Squaring';
 import { Stats } from './features/Stats';
@@ -116,6 +117,18 @@ export const ReactRoutes = () => {
                                 withFixedArea
                             >
                                 <Gamepad />
+                            </Page>
+                        }
+                    />
+                    <Route
+                        path="tablet-connect"
+                        element={
+                            <Page
+                                title="Tablet Connect"
+                                description="Pair tablets running the gSender pendant and send them g-code files"
+                                withGoBackButton
+                            >
+                                <TabletConnect />
                             </Page>
                         }
                     />

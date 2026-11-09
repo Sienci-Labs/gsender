@@ -47,6 +47,7 @@ describe('usePinnedTools', () => {
         const toolIds = ids(result.current.tools);
         expect(toolIds).not.toContain('keyboard-shortcuts');
         expect(toolIds).not.toContain('gamepad');
+        expect(toolIds).not.toContain('tablet-connect');
         expect(toolIds).toContain('remote-file-receive');
     });
 
@@ -55,6 +56,7 @@ describe('usePinnedTools', () => {
         const toolIds = ids(result.current.tools);
         expect(toolIds).toContain('keyboard-shortcuts');
         expect(toolIds).toContain('gamepad');
+        expect(toolIds).toContain('tablet-connect');
         expect(toolIds).not.toContain('remote-file-receive');
     });
 

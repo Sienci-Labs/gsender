@@ -1,7 +1,13 @@
 import type { PluginRecord } from 'app/features/Plugins/types';
 import type { IconType } from 'react-icons';
 import { BiSolidCylinder } from 'react-icons/bi';
-import { FaGamepad, FaKeyboard, FaSdCard, FaWifi } from 'react-icons/fa';
+import {
+    FaGamepad,
+    FaKeyboard,
+    FaSdCard,
+    FaTabletAlt,
+    FaWifi,
+} from 'react-icons/fa';
 import { GiFlatPlatform } from 'react-icons/gi';
 import { LuDrill } from 'react-icons/lu';
 import { MdSquareFoot } from 'react-icons/md';
@@ -69,6 +75,15 @@ export const BUILT_IN_TOOLS: ToolEntry[] = [
             'Easy hand-held CNC control using pre-made or custom profiles',
         icon: FaGamepad,
         link: '/tools/gamepad',
+        hideOnPendant: true,
+    },
+    {
+        id: 'tablet-connect',
+        title: 'Tablet Connect',
+        description:
+            'Pair tablets running the gSender pendant and send them g-code files over Wi-Fi',
+        icon: FaTabletAlt,
+        link: '/tools/tablet-connect',
         hideOnPendant: true,
     },
     {
