@@ -17,14 +17,12 @@ import i18n, { type ParseKeys } from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import {
     LANGUAGE_SYSTEM,
-    PSEUDO_LANGUAGE,
     resolveLanguage,
     SOURCE_LANGUAGE,
     SUPPORTED_LANGUAGES,
 } from './languages';
 import { loadLocale } from './loadLocale';
 import { NAMESPACES, type Namespace, resources } from './locales/en';
-import { pseudoPostProcessor } from './pseudo';
 
 export { i18n };
 export type { Namespace };
@@ -56,15 +54,19 @@ export const translateKey = (
     if (!value.includes(':') || !i18n.exists(value)) {
         return value;
     }
-    // biome-ignore lint/suspicious/noExplicitAny: key validated by i18n.exists
-    return i18n.t(value as any, lng ? { lng } : undefined) as string;
+    // Check lng's type: `.map(translateKey)` passes the array index here.
+    return i18n.t(
+        // biome-ignore lint/suspicious/noExplicitAny: key validated by i18n.exists
+        value as any,
+        typeof lng === 'string' && lng ? { lng } : undefined,
+    ) as string;
 };
 
 /** English text for a key, for logs and support reports. */
 export const toEnglish = (value: string | undefined | null): string =>
     translateKey(value, SOURCE_LANGUAGE);
 
-const loaded = new Set<string>([SOURCE_LANGUAGE, PSEUDO_LANGUAGE]);
+const loaded = new Set<string>([SOURCE_LANGUAGE]);
 
 const ensureLoaded = async (lng: string): Promise<void> => {
     if (loaded.has(lng)) {
@@ -94,25 +96,21 @@ const applyDocumentLanguage = (lng: string): void => {
 export const initI18n = async (preference?: string): Promise<typeof i18n> => {
     const lng = resolveLanguage(preference);
     if (!i18n.isInitialized) {
-        await i18n
-            .use(initReactI18next)
-            .use(pseudoPostProcessor)
-            .init({
-                resources: { [SOURCE_LANGUAGE]: resources },
-                lng: SOURCE_LANGUAGE,
-                fallbackLng: SOURCE_LANGUAGE,
-                supportedLngs: SUPPORTED_LANGUAGES.map((l) => l.code),
-                ns: NAMESPACES,
-                defaultNS: 'common',
-                // Empty strings in a translation file fall back to English.
-                returnEmptyString: false,
-                returnNull: false,
-                interpolation: { escapeValue: false },
-                postProcess: ['pseudo'],
-                react: { useSuspense: false },
-                // English is bundled, so initialize synchronously.
-                initAsync: false,
-            });
+        await i18n.use(initReactI18next).init({
+            resources: { [SOURCE_LANGUAGE]: resources },
+            lng: SOURCE_LANGUAGE,
+            fallbackLng: SOURCE_LANGUAGE,
+            supportedLngs: SUPPORTED_LANGUAGES.map((l) => l.code),
+            ns: NAMESPACES,
+            defaultNS: 'common',
+            // Empty strings in a translation file fall back to English.
+            returnEmptyString: false,
+            returnNull: false,
+            interpolation: { escapeValue: false },
+            react: { useSuspense: false },
+            // English is bundled, so initialize synchronously.
+            initAsync: false,
+        });
     }
     await changeLanguage(lng);
     return i18n;

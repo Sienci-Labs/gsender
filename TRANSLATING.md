@@ -201,11 +201,6 @@ existed is recorded in `src/app/src/i18n/lint-baseline.json`, so CI only fails
 on **new** hardcoded text. After converting an area, run `yarn i18n:baseline`
 to shrink the baseline.
 
-To find untagged text visually, run `yarn dev` and choose **Pseudo (dev)** as
-the language. Every translated string shows as `[Ţŕàñšļàţéð~~]`; anything
-still plain English isn't tagged yet. It also shows which layouts break with
-longer text.
-
 ### Notes
 
 - Translations are bundled with the app and work offline. English is always

@@ -56,7 +56,7 @@ export const NavBar = () => {
         <>
             <div
                 className={cx(
-                    'grid [grid-template-rows:minmax(0,30%)_auto_auto] gap-0 justify-end flex-grow self-stretch',
+                    'grid [grid-template-rows:minmax(0,30%)_auto_auto] grid-cols-[minmax(0,1fr)] gap-0 justify-end flex-grow self-stretch',
                 )}
             >
                 <div className="py-5 border-gray-400 border-r-2 dark:border-outline"></div>

@@ -61,7 +61,7 @@ function returnSettingControl(
             return (
                 <SelectSettingInput
                     options={setting.options}
-                    labels={setting.labels?.map(translateKey)}
+                    labels={setting.labels?.map((label) => translateKey(label))}
                     index={index}
                     value={value as string}
                     onChange={(v) => handler(isNumericOptions ? Number(v) : v)}
@@ -84,7 +84,7 @@ function returnSettingControl(
             return (
                 <RadioSettingInput
                     options={setting.options}
-                    labels={setting.labels?.map(translateKey)}
+                    labels={setting.labels?.map((label) => translateKey(label))}
                     index={index}
                     value={value as string}
                     onChange={handler}

@@ -536,9 +536,6 @@
     "hardcoded: Machine Information": 1,
     "hardcoded: Pins": 1
   },
-  "src/app/src/features/MachineStatus/MachineStatus.tsx": {
-    "hardcoded: Disconnected": 1
-  },
   "src/app/src/features/Macros/Macro.tsx": {
     "hardcoded: No Macros...": 1
   },

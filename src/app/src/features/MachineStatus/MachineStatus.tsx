@@ -31,6 +31,7 @@ import {
     isHomingFailureAlarm,
     UnlockButton as SmallUnlockButton,
 } from 'app/features/UnlockButton';
+import { useAppTranslation } from 'app/i18n';
 import cx from 'classnames';
 import get from 'lodash/get';
 import { useEffect, useState } from 'react';
@@ -83,6 +84,7 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
     pluginBusyLabel,
 }) => {
     const isPortOpen = isConnected || !!port;
+    const { t } = useAppTranslation();
     const [hasFreshControllerState, setHasFreshControllerState] = useState(
         isPortOpen && !!activeState,
     );
@@ -181,19 +183,26 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
      * Function to output the machine state based on multiple conditions
      */
     const machineStateRender = (): React.ReactElement => {
+        // Keyed by the state name the controller reports, which stays English.
         const message: Message = {
-            Idle: 'Idle',
-            Run: 'Running',
-            Hold: 'Hold',
-            Jog: 'Jogging',
-            Check: 'Check',
-            Home: 'Homing',
-            Sleep: 'Sleep',
-            Alarm: 'Alarm',
-            Disconnected: 'Disconnected',
-            Tool: 'Tool Change',
-            Door: 'Door',
+            Idle: t('common:machineState.idle'),
+            Run: t('common:machineState.running'),
+            Hold: t('common:machineState.hold'),
+            Jog: t('common:machineState.jogging'),
+            Check: t('common:machineState.check'),
+            Home: t('common:machineState.homing'),
+            Sleep: t('common:machineState.sleep'),
+            Alarm: t('common:machineState.alarm'),
+            Disconnected: t('common:machineState.disconnected'),
+            Tool: t('common:machineState.toolChange'),
+            Door: t('common:machineState.door'),
         };
+
+        // Some translations (e.g. "Cambio de herramienta") are much longer
+        // than the English, so long labels get a smaller size to fit the pill.
+        const stateLabel = showPluginBusy
+            ? (pluginBusyLabel ?? t('common:machineState.running'))
+            : (message[displayActiveState] ?? displayActiveState ?? '');
 
         return (
             <div
@@ -235,7 +244,7 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
                             {displayActiveState === GRBL_ACTIVE_STATE_ALARM ? (
                                 <div className="flex w-full flex-row justify-center align-middle items-center font-light sm:text-base text-3xl mb-1">
                                     <div className="flex justify-center">
-                                        {displayActiveState}
+                                        {message[displayActiveState]}
                                         {displayActiveState ===
                                             GRBL_ACTIVE_STATE_ALARM && (
                                             <span>({alarmCode})</span>
@@ -248,16 +257,21 @@ const MachineStatus: React.FC<MachineStatusProps> = ({
                                     </div>
                                 </div>
                             ) : (
-                                <span className="flex w-full font-light text-3xl max-sm:text-base sm:text-normal mb-1 justify-center">
-                                    {showPluginBusy
-                                        ? (pluginBusyLabel ?? 'Running')
-                                        : message[displayActiveState]}
+                                <span
+                                    className={cx(
+                                        'flex w-full font-light max-sm:text-base mb-1 justify-center text-center leading-tight px-10',
+                                        stateLabel.length > 14
+                                            ? 'text-xl'
+                                            : 'text-3xl',
+                                    )}
+                                >
+                                    {stateLabel}
                                 </span>
                             )}
                         </>
                     ) : (
                         <h1 className="flex w-full font-light text-3xl max-sm:text-base mb-1 justify-center">
-                            Disconnected
+                            {t('common:machineState.disconnected')}
                         </h1>
                     )}
                 </div>

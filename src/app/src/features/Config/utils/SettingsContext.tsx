@@ -505,10 +505,10 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         const visibleText =
             v.type === 'eeprom'
                 ? [searchChecker?.description, searchChecker?.details]
-                      .map(translateKey)
+                      .map((text) => translateKey(text))
                       .join(' ')
                 : [v.label, v.description, ...(v.labels ?? [])]
-                      .map(translateKey)
+                      .map((text) => translateKey(text))
                       .join(' ');
 
         return `${JSON.stringify(searchChecker)} ${visibleText}`

@@ -5,7 +5,6 @@ const path = require('path');
 const LOCALES_DIR = path.join(__dirname, '..', 'i18n', 'locales');
 
 module.exports = {
-    IS_DEV_BUILD: true,
     loadLocale: async (lng) => {
         const dir = path.join(LOCALES_DIR, lng);
         if (!fs.existsSync(dir)) {

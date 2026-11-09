@@ -2,7 +2,6 @@
 // This module is replaced by a stub under Jest (see jest.config.js), because
 // babel-jest can't evaluate `import.meta`.
 
-export const IS_DEV_BUILD = Boolean(import.meta.env.DEV);
 type LocaleModule = { default: Record<string, unknown> };
 
 // English is bundled statically (see locales/en/index.ts).

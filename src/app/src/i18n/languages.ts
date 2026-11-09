@@ -8,22 +8,16 @@
  *
  * See TRANSLATING.md at the repo root for the full guide.
  */
-import { IS_DEV_BUILD } from './loadLocale';
 
 export interface SupportedLanguage {
     code: string;
     nativeName: string;
-    /** Only offered in development builds. */
-    devOnly?: boolean;
 }
 
 export const SOURCE_LANGUAGE = 'en';
 
 /** Stored preference meaning "follow the operating system's language". */
 export const LANGUAGE_SYSTEM = 'system';
-
-/** Development-only pseudo-locale that makes untranslated text easy to spot. */
-export const PSEUDO_LANGUAGE = 'en-XA';
 
 export const SUPPORTED_LANGUAGES: SupportedLanguage[] = [
     { code: 'en', nativeName: 'English' },
@@ -32,11 +26,10 @@ export const SUPPORTED_LANGUAGES: SupportedLanguage[] = [
     { code: 'fr', nativeName: 'Français' },
     { code: 'it', nativeName: 'Italiano' },
     { code: 'ru', nativeName: 'Русский' },
-    { code: PSEUDO_LANGUAGE, nativeName: 'Pseudo (dev)', devOnly: true },
 ];
 
 export const getAvailableLanguages = (): SupportedLanguage[] =>
-    SUPPORTED_LANGUAGES.filter((l) => !l.devOnly || IS_DEV_BUILD);
+    SUPPORTED_LANGUAGES;
 
 /**
  * Resolves a stored preference to a supported language code.
@@ -57,9 +50,7 @@ export const resolveLanguage = (
             continue;
         }
         const base = lang.toLowerCase().split('-')[0];
-        const match = available.find(
-            (code) => code.toLowerCase() === base && code !== PSEUDO_LANGUAGE,
-        );
+        const match = available.find((code) => code.toLowerCase() === base);
         if (match) {
             return match;
         }

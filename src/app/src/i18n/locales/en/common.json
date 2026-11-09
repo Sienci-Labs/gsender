@@ -24,5 +24,18 @@
     "tools": "Tools",
     "config": "Config",
     "mainNavigation": "Main Navigation"
+  },
+  "machineState": {
+    "idle": "Idle",
+    "running": "Running",
+    "hold": "Hold",
+    "jogging": "Jogging",
+    "check": "Check",
+    "homing": "Homing",
+    "sleep": "Sleep",
+    "alarm": "Alarm",
+    "disconnected": "Disconnected",
+    "toolChange": "Tool Change",
+    "door": "Door"
   }
 }

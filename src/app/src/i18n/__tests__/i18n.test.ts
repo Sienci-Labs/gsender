@@ -3,13 +3,11 @@ import path from 'path';
 import {
     changeLanguage,
     i18n,
-    PSEUDO_LANGUAGE,
     resolveLanguage,
     SUPPORTED_LANGUAGES,
     tk,
     translateKey,
 } from 'app/i18n';
-import { pseudoLocalize } from 'app/i18n/pseudo';
 
 const LOCALES = path.join(__dirname, '..', 'locales');
 
@@ -60,23 +58,22 @@ describe('translation helpers', () => {
         expect(translateKey(undefined)).toBe('');
     });
 
+    it('ignores the array index when used as a map callback', () => {
+        // .map passes (value, index); index 1 used to reach i18next as lng
+        // and crash Config with "lng?.toLowerCase is not a function".
+        const keys = [tk('common:actions.cancel'), tk('common:actions.cancel')];
+        expect(keys.map(translateKey as never)).toEqual(['Cancel', 'Cancel']);
+    });
+
     it('switches language at runtime and falls back to English', async () => {
         await changeLanguage('de');
         expect(i18n.t('common:actions.cancel')).toBe('Abbrechen');
         expect(document.documentElement.lang).toBe('de');
     });
-
-    it('pseudo-localizes without breaking <Trans> markup', async () => {
-        expect(pseudoLocalize('Go <1>home</1>')).toBe('[Ĝö <1>ĥöɱé</1>~~]');
-        await changeLanguage(PSEUDO_LANGUAGE);
-        expect(i18n.t('common:actions.ok')).toBe('[ÖĶ~]');
-    });
 });
 
 describe('language registry', () => {
-    const registered = SUPPORTED_LANGUAGES.filter((l) => !l.devOnly)
-        .map((l) => l.code)
-        .sort();
+    const registered = SUPPORTED_LANGUAGES.map((l) => l.code).sort();
 
     it('matches the locales in i18next.config.ts', () => {
         const config = fs.readFileSync(
@@ -105,9 +102,9 @@ describe('locale files', () => {
     const en = fs
         .readdirSync(path.join(LOCALES, 'en'))
         .filter((f) => f.endsWith('.json'));
-    const languages = SUPPORTED_LANGUAGES.filter(
-        (l) => !l.devOnly && l.code !== 'en',
-    ).map((l) => l.code);
+    const languages = SUPPORTED_LANGUAGES.filter((l) => l.code !== 'en').map(
+        (l) => l.code,
+    );
 
     it.each(languages)(
         '%s has no keys or placeholders English lacks',

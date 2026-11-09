@@ -20,7 +20,7 @@ export function NavbarLink(props: NavbarLinkProps) {
             to={props.href}
             className={({ isActive }: { isActive: boolean }) =>
                 cn(
-                    'h-full flex items-center justify-center ml-1 py-6 max-xl:py-5 border-gray-400 dark:border-outline',
+                    'h-full min-w-0 flex items-center justify-center ml-1 py-6 max-xl:py-5 border-gray-400 dark:border-outline',
                     {
                         'border-r-white border-2 border-r-0 [border-radius:5px_0_0_5px] bg-opacity-30 bg-blue-200 dark:bg-blue-900 [background:linear-gradient(90deg,rgba(121,170,216,0.3)_40%,rgba(255,255,255,1)_100%)] dark:[background:linear-gradient(90deg,rgba(59,130,246,0.2)_40%,var(--surface-raised)_100%)] text-blue-600 dark:text-blue-400 dark:border-outline':
                             isActive,
@@ -33,7 +33,7 @@ export function NavbarLink(props: NavbarLinkProps) {
             {({ isActive }: { isActive: boolean }) => (
                 <div
                     className={cn(
-                        'h-full justify-center flex flex-col gap-0.5 items-center',
+                        'h-full w-full min-w-0 justify-center flex flex-col gap-0.5 items-center',
                     )}
                 >
                     {props.icon && (
@@ -42,7 +42,18 @@ export function NavbarLink(props: NavbarLinkProps) {
                         />
                     )}
                     {props.svg && <img src={props.svg} />}
-                    <span className={cn('text-xs xl:text-sm')}>
+                    {/* Translated labels can be wider than the rail: wrap them
+                        (hyphenating where the browser can) instead of
+                        overflowing and clipping the start of the word. */}
+                    <span
+                        className={cn(
+                            'w-full px-0.5 text-center leading-tight hyphens-auto [overflow-wrap:anywhere]',
+                            props.label.length > 8
+                                ? 'text-[10px] xl:text-xs'
+                                : 'text-xs xl:text-sm',
+                        )}
+                        title={props.label}
+                    >
                         {props.label}
                     </span>
                 </div>

@@ -24,5 +24,18 @@
     "tools": "Инструменты",
     "config": "Настройки",
     "mainNavigation": "Главная навигация"
+  },
+  "machineState": {
+    "idle": "Ожидание",
+    "running": "Выполнение",
+    "hold": "Пауза",
+    "jogging": "Перемещение",
+    "check": "Проверка",
+    "homing": "Выход в ноль",
+    "sleep": "Сон",
+    "alarm": "Тревога",
+    "disconnected": "Отключено",
+    "toolChange": "Смена инструмента",
+    "door": "Дверь"
   }
 }

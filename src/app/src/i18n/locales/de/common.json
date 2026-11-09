@@ -24,5 +24,18 @@
     "tools": "Werkzeuge",
     "config": "Einstellungen",
     "mainNavigation": "Hauptnavigation"
+  },
+  "machineState": {
+    "idle": "Bereit",
+    "running": "Läuft",
+    "hold": "Angehalten",
+    "jogging": "Verfahren",
+    "check": "Prüfmodus",
+    "homing": "Referenzfahrt",
+    "sleep": "Ruhezustand",
+    "alarm": "Alarm",
+    "disconnected": "Getrennt",
+    "toolChange": "Werkzeugwechsel",
+    "door": "Tür"
   }
 }

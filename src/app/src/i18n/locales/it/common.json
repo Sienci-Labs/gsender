@@ -24,5 +24,18 @@
     "tools": "Strumenti",
     "config": "Configurazione",
     "mainNavigation": "Navigazione principale"
+  },
+  "machineState": {
+    "idle": "Inattivo",
+    "running": "In esecuzione",
+    "hold": "In pausa",
+    "jogging": "Spostamento",
+    "check": "Verifica",
+    "homing": "Azzeramento",
+    "sleep": "Sospensione",
+    "alarm": "Allarme",
+    "disconnected": "Disconnesso",
+    "toolChange": "Cambio utensile",
+    "door": "Sportello"
   }
 }
